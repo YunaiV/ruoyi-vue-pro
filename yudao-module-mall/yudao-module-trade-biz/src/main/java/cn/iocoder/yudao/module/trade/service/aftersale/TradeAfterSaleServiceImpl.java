@@ -393,7 +393,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
                 .setUserId(userId)
                 .setUserType(userType)
                 .setAfterSaleId(afterSale.getId())
-                .setOperateType(afterStatus.toString());
+                .setOperateType(afterStatus);
         // TODO 废弃，待删除
         this.createLog(logDTO);
     }

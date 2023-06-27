@@ -4,6 +4,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.util.spring.SpringExpressionUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
+import cn.iocoder.yudao.module.trade.enums.aftersale.AfterSaleOperateTypeEnum;
 import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.annotations.AfterSaleLog;
 import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.dto.TradeAfterSaleLogCreateReqDTO;
 import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.service.AfterSaleLogService;
@@ -47,13 +48,12 @@ public class AfterSaleLogAspect {
             // 日志对象拼接
             Integer userType = WebFrameworkUtils.getLoginUserType();
             Long id = WebFrameworkUtils.getLoginUserId();
-            Map<String, String> formatObj = spelFormat(joinPoint, info);
             TradeAfterSaleLogCreateReqDTO dto = new TradeAfterSaleLogCreateReqDTO()
                     .setUserId(id)
                     .setUserType(userType)
-                    .setAfterSaleId(MapUtil.getLong(formatObj, ID))
-                    .setOperateType(MapUtil.getStr(formatObj, OPERATE_TYPE))
-                    .setContent(MapUtil.getStr(formatObj, CONTENT));
+                    .setAfterSaleId(getAfterSaleId(joinPoint, info, afterSaleLog.id()))
+                    .setOperateType(afterSaleLog.operateType().getType())
+                    .setContent(getContent(joinPoint, info, afterSaleLog));
             // 异步存入数据库
             afterSaleLogService.createLog(dto);
         } catch (Exception exception) {
@@ -64,26 +64,49 @@ public class AfterSaleLogAspect {
     /**
      * 获取描述信息
      */
-    public static Map<String, String> spelFormat(JoinPoint joinPoint, Object info) {
+    private static Map<String, Object> spelFormat(JoinPoint joinPoint, Object info) {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         AfterSaleLog afterSaleLogPoint = signature.getMethod().getAnnotation(AfterSaleLog.class);
-        HashMap<String, String> result = Maps.newHashMapWithExpectedSize(2);
-        Map<String, Object> spelMap = SpringExpressionUtils.parseExpression(joinPoint, info,
+        return SpringExpressionUtils.parseExpression(joinPoint, info,
                 asList(afterSaleLogPoint.id(), afterSaleLogPoint.content()));
-        // TODO @chenchen：是不是抽成 3 个方法好点；毕竟 map 太抽象了；；
-        // 售后ID
-        String id = MapUtil.getStr(spelMap, afterSaleLogPoint.id());
-        result.put(ID, id);
-        // 操作类型
-        String operateType = afterSaleLogPoint.operateType().description();
-        result.put(OPERATE_TYPE, operateType);
-        // 日志内容
-        String content = MapUtil.getStr(spelMap, afterSaleLogPoint.content());
-        if (ObjectUtil.isNotNull(afterSaleLogPoint.operateType())) {
-            content += operateType;
-        }
-        result.put(CONTENT, content);
-        return result;
     }
+
+    /**
+     * 获取售后ID
+     */
+    private static Long getAfterSaleId(JoinPoint joinPoint, Object info, String spel) {
+        Map<String, Object> spelMap = spelFormat(joinPoint, info);
+        return MapUtil.getLong(spelMap, spel);
+    }
+
+    /**
+     * 获取解析后的日志内容
+     */
+    private static String getContent(JoinPoint joinPoint, Object info, AfterSaleLog afterSaleLog) {
+        Map<String, Object> spelMap = spelFormat(joinPoint, info);
+        StringBuilder content = new StringBuilder().append(MapUtil.getStr(spelMap, afterSaleLog.content()));
+        AfterSaleOperateTypeEnum afterSaleOperateTypeEnum = afterSaleLog.operateType();
+        return ObjectUtil.isNotNull(afterSaleOperateTypeEnum) ?
+                content.append(afterSaleOperateTypeEnum.getDescription()).toString() : content.toString();
+    }
+
+    //   public static Map<String, Object> spelFormat(JoinPoint joinPoint, Object info) {
+    //        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+    //        AfterSaleLog afterSaleLogPoint = signature.getMethod().getAnnotation(AfterSaleLog.class);
+    //        HashMap<String, Object> result = Maps.newHashMapWithExpectedSize(2);
+    //        Map<String, Object> spelMap = SpringExpressionUtils.parseExpression(joinPoint, info,
+    //                asList(afterSaleLogPoint.id(), afterSaleLogPoint.content()));
+    //
+    //        // 售后ID
+    //        result.put(ID, MapUtil.getLong(spelMap, afterSaleLogPoint.id()));
+    //        // 操作类型
+    //        result.put(OPERATE_TYPE, afterSaleLogPoint.operateType().getType());
+    //        // 日志内容
+    //        StringBuilder content = new StringBuilder().append(MapUtil.getStr(spelMap, afterSaleLogPoint.content()));
+    //
+    //        result.put(CONTENT, ObjectUtil.isNotNull(afterSaleLogPoint.operateType()) ?
+    //                content.append(afterSaleLogPoint.operateType().getDescription()).toString() : content.toString());
+    //        return result;
+    //    }
 
 }

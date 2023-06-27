@@ -37,7 +37,7 @@ public class TradeAfterSaleLogCreateReqDTO {
     /**
      * 操作类型
      */
-    private String operateType;
+    private Integer operateType;
     /**
      * 操作明细
      */

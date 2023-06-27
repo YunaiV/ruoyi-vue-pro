@@ -54,7 +54,7 @@ public class TradeAfterSaleLogDO extends BaseDO {
      *
      * 枚举 {@link AfterSaleOperateTypeEnum}
      */
-    private String operateType;
+    private Integer operateType;
     /**
      * 操作明细
      */
