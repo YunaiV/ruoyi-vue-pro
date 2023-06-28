@@ -85,7 +85,7 @@ public class AppProductCommentController {
     }
 
     // TODO 芋艿：需要搞下
-    @GetMapping("/getCommentStatistics")
+    @GetMapping("/statistics")
     @Operation(summary = "获得商品的评价统计")
     public CommonResult<AppCommentStatisticsRespVO> getCommentStatistics(@Valid @RequestParam("spuId") Long spuId) {
         return success(productCommentService.getCommentStatistics(spuId, Boolean.TRUE));

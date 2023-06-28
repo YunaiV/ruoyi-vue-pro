@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.member.controller.app.address.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 // TODO 芋艿：example 缺失
@@ -31,6 +30,6 @@ public class AppAddressBaseVO {
 
     @Schema(description = "是否默认地址", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "是否默认地址不能为空")
-    private Boolean defaulted;
+    private Boolean defaultStatus;
 
 }

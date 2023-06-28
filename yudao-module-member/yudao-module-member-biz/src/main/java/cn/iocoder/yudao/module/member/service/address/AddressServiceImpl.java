@@ -32,9 +32,9 @@ public class AddressServiceImpl implements AddressService {
     @Transactional(rollbackFor = Exception.class)
     public Long createAddress(Long userId, AppAddressCreateReqVO createReqVO) {
         // 如果添加的是默认收件地址，则将原默认地址修改为非默认
-        if (Boolean.TRUE.equals(createReqVO.getDefaulted())) {
+        if (Boolean.TRUE.equals(createReqVO.getDefaultStatus())) {
             List<MemberAddressDO> addresses = addressMapper.selectListByUserIdAndDefaulted(userId, true);
-            addresses.forEach(address -> addressMapper.updateById(new MemberAddressDO().setId(address.getId()).setDefaulted(false)));
+            addresses.forEach(address -> addressMapper.updateById(new MemberAddressDO().setId(address.getId()).setDefaultStatus(false)));
         }
 
         // 插入
@@ -52,10 +52,10 @@ public class AddressServiceImpl implements AddressService {
         validAddressExists(userId, updateReqVO.getId());
 
         // 如果修改的是默认收件地址，则将原默认地址修改为非默认
-        if (Boolean.TRUE.equals(updateReqVO.getDefaulted())) {
+        if (Boolean.TRUE.equals(updateReqVO.getDefaultStatus())) {
             List<MemberAddressDO> addresses = addressMapper.selectListByUserIdAndDefaulted(userId, true);
             addresses.stream().filter(u -> !u.getId().equals(updateReqVO.getId())) // 排除自己
-                    .forEach(address -> addressMapper.updateById(new MemberAddressDO().setId(address.getId()).setDefaulted(false)));
+                    .forEach(address -> addressMapper.updateById(new MemberAddressDO().setId(address.getId()).setDefaultStatus(false)));
         }
 
         // 更新

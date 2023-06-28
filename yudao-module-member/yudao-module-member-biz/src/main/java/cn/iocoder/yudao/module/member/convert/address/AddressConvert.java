@@ -1,12 +1,14 @@
 package cn.iocoder.yudao.module.member.convert.address;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
 import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressCreateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressRespVO;
 import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressUpdateReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.address.MemberAddressDO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -25,12 +27,16 @@ public interface AddressConvert {
 
     MemberAddressDO convert(AppAddressUpdateReqVO bean);
 
+    @Mapping(source = "areaId", target = "areaName",  qualifiedByName = "convertAreaIdToAreaName")
     AppAddressRespVO convert(MemberAddressDO bean);
 
     List<AppAddressRespVO> convertList(List<MemberAddressDO> list);
 
-    PageResult<AppAddressRespVO> convertPage(PageResult<MemberAddressDO> page);
-
     AddressRespDTO convert02(MemberAddressDO bean);
+
+    @Named("convertAreaIdToAreaName")
+    default String convertAreaIdToAreaName(Integer areaId) {
+        return AreaUtils.format(areaId);
+    }
 
 }

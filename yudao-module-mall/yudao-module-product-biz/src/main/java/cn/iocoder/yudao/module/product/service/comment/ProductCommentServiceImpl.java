@@ -135,15 +135,13 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     @Override
     public AppCommentStatisticsRespVO getCommentStatistics(Long spuId, Boolean visible) {
         return ProductCommentConvert.INSTANCE.convert(
-                // 查询商品 id = spuId 的所有评论数量
-                productCommentMapper.selectCountBySpuId(spuId, visible, null),
                 // 查询商品 id = spuId 的所有好评数量
                 productCommentMapper.selectCountBySpuId(spuId, visible, AppCommentPageReqVO.GOOD_COMMENT),
                 // 查询商品 id = spuId 的所有中评数量
                 productCommentMapper.selectCountBySpuId(spuId, visible, AppCommentPageReqVO.MEDIOCRE_COMMENT),
                 // 查询商品 id = spuId 的所有差评数量
                 productCommentMapper.selectCountBySpuId(spuId, visible, AppCommentPageReqVO.NEGATIVE_COMMENT)
-        );
+        ).setScores(3.0); // TODO @puhui999：这里要实现下；；
     }
 
     @Override
