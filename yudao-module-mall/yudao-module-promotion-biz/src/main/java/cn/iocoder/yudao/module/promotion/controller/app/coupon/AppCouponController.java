@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.promotion.controller.app.coupon;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponMatchReqVO;
+import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponMatchRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.template.AppCouponTemplatePageReqVO;
@@ -28,6 +30,38 @@ public class AppCouponController {
     @Operation(summary = "领取优惠劵")
     public CommonResult<Long> takeCoupon(@RequestBody AppCouponTemplatePageReqVO pageReqVO) {
         return success(1L);
+    }
+
+    // TODO 芋艿：待实现
+    @GetMapping("/match-list")
+    @Operation(summary = "获得匹配指定商品的优惠劵列表")
+    public CommonResult<List<AppCouponMatchRespVO>> getMatchCouponList(AppCouponMatchReqVO matchReqVO) {
+        List<AppCouponMatchRespVO> list = new ArrayList<>();
+        Random random = new Random();
+        for (int i = 0; i < 10; i++) {
+            AppCouponMatchRespVO vo = new AppCouponMatchRespVO();
+            vo.setId(i + 1L);
+            vo.setName("优惠劵" + (i + 1));
+            vo.setUsePrice(random.nextInt(100) * 100);
+            vo.setValidStartTime(LocalDateTime.now().plusDays(random.nextInt(10)));
+            vo.setValidEndTime(LocalDateTime.now().plusDays(random.nextInt(20) + 10));
+            vo.setDiscountType(random.nextInt(2) + 1);
+            if (vo.getDiscountType() == 1) {
+                vo.setDiscountPercent(null);
+                vo.setDiscountPrice(random.nextInt(50) * 100);
+                vo.setDiscountLimitPrice(null);
+            } else {
+                vo.setDiscountPercent(random.nextInt(90) + 10);
+                vo.setDiscountPrice(null);
+                vo.setDiscountLimitPrice(random.nextInt(200) * 100);
+            }
+            vo.setMatch(random.nextBoolean());
+            if (!vo.getMatch()) {
+                vo.setDescription("不符合条件噢");
+            }
+            list.add(vo);
+        }
+        return success(list);
     }
 
     // TODO 芋艿：待实现
