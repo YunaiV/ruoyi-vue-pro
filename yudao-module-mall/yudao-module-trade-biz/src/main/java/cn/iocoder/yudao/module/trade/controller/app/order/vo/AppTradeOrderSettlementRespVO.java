@@ -6,11 +6,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Schema(description = "用户 App - 交易订单结算信息 Response VO")
 @Data
 public class AppTradeOrderSettlementRespVO {
+
+    @Schema(description = "交易类型", required = true, example = "1") // 对应 TradeOrderTypeEnum 枚举
+    private Integer type = 1; // TODO 芋艿：改成计算
 
     @Schema(description = "购物项数组", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<Item> items;
@@ -20,6 +24,12 @@ public class AppTradeOrderSettlementRespVO {
 
     @Schema(description = "收件地址", requiredMode = Schema.RequiredMode.REQUIRED)
     private Address address;
+
+    @Schema(description = "已使用的积分", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
+    private Integer usedPoint;
+
+    @Schema(description = "总积分", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
+    private Integer totalPoint;
 
     @Schema(description = "购物项")
     @Data
@@ -90,26 +100,17 @@ public class AppTradeOrderSettlementRespVO {
         @Schema(description = "手机号", requiredMode = Schema.RequiredMode.REQUIRED, example = "15601691300")
         private String mobile;
 
-        @Schema(description = "省份编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-        private Integer provinceId;
-        @Schema(description = "省份名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "北京")
-        private String provinceName;
-
-        @Schema(description = "城市编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-        private Integer cityId;
-        @Schema(description = "城市名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "北京")
-        private String cityName;
-
-        @Schema(description = "地区编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-        private Integer districtId;
-        @Schema(description = "地区名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "朝阳区")
-        private String districtName;
+        @Schema(description = "地区编号", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotNull(message = "地区编号不能为空")
+        private Long areaId;
+        @Schema(description = "地区名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "上海上海市普陀区")
+        private String areaName;
 
         @Schema(description = "详细地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "望京悠乐汇 A 座")
         private String detailAddress;
 
         @Schema(description = "是否默认收件地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
-        private Boolean defaulted;
+        private Boolean defaultStatus;
 
     }
 

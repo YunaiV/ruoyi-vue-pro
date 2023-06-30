@@ -31,18 +31,12 @@ public class AddressRespDTO {
      */
     private Integer areaId;
     /**
-     * 邮编
-     */
-    private String postCode;
-    /**
      * 收件详细地址
      */
     private String detailAddress;
     /**
      * 是否默认
-     *
-     * true - 默认收件地址
      */
-    private Boolean defaulted;
+    private Boolean defaultStatus;
 
 }

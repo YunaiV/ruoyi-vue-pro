@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.trade.convert.order;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.ip.core.Area;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
@@ -303,14 +302,11 @@ public interface TradeOrderConvert {
     default AppTradeOrderSettlementRespVO convert(TradePriceCalculateRespBO calculate, AddressRespDTO address) {
         AppTradeOrderSettlementRespVO respVO = convert0(calculate, address);
         if (address != null) {
-            Area area = AreaUtils.getArea(address.getAreaId());
-            respVO.getAddress().setDistrictId(area.getId());
-            respVO.getAddress().setDistrictName(area.getName());
-            respVO.getAddress().setCityId(area.getParent().getId());
-            respVO.getAddress().setCityName(area.getParent().getName());
-            respVO.getAddress().setProvinceId(area.getParent().getParent().getId());
-            respVO.getAddress().setProvinceName(area.getParent().getParent().getName());
+            respVO.getAddress().setAreaName(AreaUtils.format(address.getAreaId()));
         }
+        // TODO 芋艿：积分的接入；
+        respVO.setUsedPoint(1);
+        respVO.setTotalPoint(100);
         return respVO;
     }
 

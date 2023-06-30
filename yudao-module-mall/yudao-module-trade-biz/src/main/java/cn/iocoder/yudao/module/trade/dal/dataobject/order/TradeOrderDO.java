@@ -176,6 +176,7 @@ public class TradeOrderDO extends BaseDO {
      *
      * 关联 DeliveryTemplateDO 的 id 编号
      */
+    // TODO 芋艿：需要删除
     private Long deliveryTemplateId;
     /**
      * 发货物流公司编号
@@ -243,6 +244,7 @@ public class TradeOrderDO extends BaseDO {
      * 对应 taobao 的 trade.coupon_fee 字段
      */
     private Integer couponPrice;
+    // TODO 芋艿：需要记录使用的积分；
     /**
      * 积分抵扣的金额，单位：分
      *
