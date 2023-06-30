@@ -66,9 +66,9 @@ public class AppTradeOrderController {
     @PostMapping("/create")
     @Operation(summary = "创建订单")
     @PreAuthenticated
-    public CommonResult<Long> createOrder(@RequestBody AppTradeOrderCreateReqVO createReqVO) {
-        Long orderId = tradeOrderService.createOrder(getLoginUserId(), getClientIP(), createReqVO);
-        return success(orderId);
+    public CommonResult<AppTradeOrderCreateRespVO> createOrder(@RequestBody AppTradeOrderCreateReqVO createReqVO) {
+        TradeOrderDO order = tradeOrderService.createOrder(getLoginUserId(), getClientIP(), createReqVO);
+        return success(new AppTradeOrderCreateRespVO().setId(order.getId()).setPayOrderId(order.getPayOrderId()));
     }
 
     @PostMapping("/update-paid")

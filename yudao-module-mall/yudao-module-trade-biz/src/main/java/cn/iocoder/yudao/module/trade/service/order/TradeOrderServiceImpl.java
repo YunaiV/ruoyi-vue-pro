@@ -152,7 +152,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO) {
+    public TradeOrderDO createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO) {
         // 1. 用户收件地址的校验
         AddressRespDTO address = validateAddress(userId, createReqVO.getAddressId());
 
@@ -167,7 +167,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // 订单创建完后的逻辑
         afterCreateTradeOrder(userId, createReqVO, order, orderItems, calculateRespBO);
         // TODO @LeeYan9: 是可以思考下, 订单的营销优惠记录, 应该记录在哪里, 微信讨论起来!
-        return order.getId();
+        return order;
     }
 
     /**
@@ -250,6 +250,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
         // 更新到交易单上
         tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId()).setPayOrderId(payOrderId));
+        order.setPayOrderId(payOrderId);
     }
 
     @Override

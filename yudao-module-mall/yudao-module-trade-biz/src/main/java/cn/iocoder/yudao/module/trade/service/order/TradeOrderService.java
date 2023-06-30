@@ -40,9 +40,9 @@ public interface TradeOrderService {
      * @param userId 登录用户
      * @param userIp 用户 IP 地址
      * @param createReqVO 创建交易订单请求模型
-     * @return 交易订单的编号
+     * @return 交易订单的
      */
-    Long createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO);
+    TradeOrderDO createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO);
 
     /**
      * 更新交易订单已支付

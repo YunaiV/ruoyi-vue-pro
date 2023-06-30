@@ -197,6 +197,7 @@ public class TradeOrderDO extends BaseDO {
      */
     private LocalDateTime deliveryTime;
 
+    // TODO @芋艿：pickUpStoreId;
     /**
      * 收货时间
      */
