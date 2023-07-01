@@ -62,7 +62,7 @@ public class TradeOrderBaseVO {
     private Long payOrderId;
 
     @Schema(description = "是否已支付", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
-    private Boolean payed;
+    private Boolean payStatus;
 
     @Schema(description = "付款时间")
     private LocalDateTime payTime;

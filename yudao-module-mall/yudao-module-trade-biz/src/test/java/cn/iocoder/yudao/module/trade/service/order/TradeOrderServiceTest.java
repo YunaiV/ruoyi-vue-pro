@@ -168,7 +168,7 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         assertNull(tradeOrderDO.getCancelType());
         assertEquals(tradeOrderDO.getUserRemark(), "我是备注");
         assertNull(tradeOrderDO.getRemark());
-        assertFalse(tradeOrderDO.getPayed());
+        assertFalse(tradeOrderDO.getPayStatus());
         assertNull(tradeOrderDO.getPayTime());
         assertEquals(tradeOrderDO.getTotalPrice(), 230);
         assertEquals(tradeOrderDO.getDiscountPrice(), 0);
@@ -249,7 +249,7 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         // mock 数据（TradeOrder）
         TradeOrderDO order = randomPojo(TradeOrderDO.class, o -> {
             o.setId(1L).setStatus(TradeOrderStatusEnum.UNPAID.getStatus());
-            o.setPayOrderId(10L).setPayed(false).setPayPrice(100).setPayTime(null);
+            o.setPayOrderId(10L).setPayStatus(false).setPayPrice(100).setPayTime(null);
         });
         tradeOrderMapper.insert(order);
         // 准备参数
@@ -265,7 +265,7 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         // 断言
         TradeOrderDO dbOrder = tradeOrderMapper.selectById(id);
         assertEquals(dbOrder.getStatus(), TradeOrderStatusEnum.UNDELIVERED.getStatus());
-        assertTrue(dbOrder.getPayed());
+        assertTrue(dbOrder.getPayStatus());
         assertNotNull(dbOrder.getPayTime());
         assertEquals(dbOrder.getPayChannelCode(), "wx_pub");
     }

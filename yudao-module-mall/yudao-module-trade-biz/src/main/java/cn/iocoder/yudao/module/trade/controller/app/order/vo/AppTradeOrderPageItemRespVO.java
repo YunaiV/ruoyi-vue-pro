@@ -34,6 +34,9 @@ public class AppTradeOrderPageItemRespVO {
 
     // ========== 价格 + 支付基本信息 ==========
 
+    @Schema(description = "支付订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    private Long payOrderId;
+
     @Schema(description = "应付金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1000")
     private Integer payPrice;
 

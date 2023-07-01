@@ -116,7 +116,7 @@ public class TradeOrderDO extends BaseDO {
      * true - 已经支付过
      * false - 没有支付过
      */
-    private Boolean payed;
+    private Boolean payStatus;
     /**
      * 付款时间
      */

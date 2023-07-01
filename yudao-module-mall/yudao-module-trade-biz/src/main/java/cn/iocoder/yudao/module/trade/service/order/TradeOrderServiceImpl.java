@@ -195,7 +195,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         order.setProductCount(getSumValue(calculateRespBO.getItems(), TradePriceCalculateRespBO.OrderItem::getCount, Integer::sum));
         order.setTerminal(TerminalEnum.H5.getTerminal()); // todo 数据来源?
         // 支付信息
-        order.setAdjustPrice(0).setPayed(false);
+        order.setAdjustPrice(0).setPayStatus(false);
         // 物流信息 TODO 芋艿：暂时写死物流方式；应该是前端选择的
         order.setDeliveryType(DeliveryTypeEnum.EXPRESS.getMode()).setDeliveryStatus(TradeOrderDeliveryStatusEnum.UNDELIVERED.getStatus());
         // 退款信息
@@ -262,7 +262,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
         // 更新 TradeOrderDO 状态为已支付，等待发货
         int updateCount = tradeOrderMapper.updateByIdAndStatus(id, order.getStatus(),
-                new TradeOrderDO().setStatus(TradeOrderStatusEnum.UNDELIVERED.getStatus()).setPayed(true)
+                new TradeOrderDO().setStatus(TradeOrderStatusEnum.UNDELIVERED.getStatus()).setPayStatus(true)
                         .setPayTime(LocalDateTime.now()).setPayChannelCode(payOrder.getChannelCode()));
         if (updateCount == 0) {
             throw exception(ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
@@ -292,7 +292,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
             throw exception(ORDER_NOT_FOUND);
         }
         // 校验订单未支付
-        if (!TradeOrderStatusEnum.isUnpaid(order.getStatus()) || order.getPayed()) {
+        if (!TradeOrderStatusEnum.isUnpaid(order.getStatus()) || order.getPayStatus()) {
             log.error("[validateOrderPaid][order({}) 不处于待支付状态，请进行处理！order 数据是：{}]",
                     id, JsonUtils.toJsonString(order));
             throw exception(ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);

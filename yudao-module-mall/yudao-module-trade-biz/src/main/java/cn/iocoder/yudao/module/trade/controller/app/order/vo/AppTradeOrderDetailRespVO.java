@@ -44,7 +44,7 @@ public class AppTradeOrderDetailRespVO {
     // ========== 价格 + 支付基本信息 ==========
 
     @Schema(description = "是否已支付", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
-    private Boolean payed;
+    private Boolean payStatus;
 
     @Schema(description = "支付订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long payOrderId;
