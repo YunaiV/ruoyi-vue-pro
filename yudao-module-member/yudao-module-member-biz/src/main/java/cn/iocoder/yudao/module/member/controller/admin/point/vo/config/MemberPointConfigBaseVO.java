@@ -12,6 +12,8 @@ import java.math.BigDecimal;
 @Data
 public class MemberPointConfigBaseVO {
 
+    private Long id;
+
     @Schema(description = "积分抵扣开关", required = true, example = "true")
     private Boolean tradeDeductEnable;
 
