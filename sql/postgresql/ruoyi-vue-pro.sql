@@ -2405,6 +2405,10 @@ INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "st
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1158, 3, 'implicit', 'implicit', 'system_oauth2_grant_type', 0, 'success', '', '简化模式', '1', '2022-05-12 00:23:40', '1', '2022-05-11 16:26:05', 0);
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1159, 4, 'client_credentials', 'client_credentials', 'system_oauth2_grant_type', 0, 'default', '', '客户端模式', '1', '2022-05-12 00:23:51', '1', '2022-05-11 16:26:08', 0);
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1160, 5, 'refresh_token', 'refresh_token', 'system_oauth2_grant_type', 0, 'info', '', '刷新模式', '1', '2022-05-12 00:24:02', '1', '2022-05-11 16:26:11', 0);
+INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1161, 4, 'Vue 3 Vben', '30', 'infra_codegen_front_type', 0, '', '', '', '1', '2023-06-14 15:24:37.447', '1', '2023-06-14 15:24:37.447', 0);
+INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1162, 3, 'Vue 3 Schema', '21', 'infra_codegen_front_type', 0, '', '', 'Vue 3 Element Plus Schema', '1', '2023-06-14 15:24:18.714', '1', '2023-06-14 15:36:40.317', 0);
+INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1163, 2, 'Vue 3', '20', 'infra_codegen_front_type', 0, '', '', 'Vue 3 Element Plus', '1', '2023-06-14 15:24:05.654', '1', '2023-06-14 15:24:05.654', 0);
+INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1164, 1, 'Vue 2', '10', 'infra_codegen_front_type', 0, '', '', 'Vue 2', '1', '2023-06-14 15:23:12.211', '1', '2023-06-14 15:23:57.816', 0);
 COMMIT;
 
 -- ----------------------------
@@ -2500,6 +2504,7 @@ INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creat
 INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (145, '角色类型', 'system_role_type', 0, '角色类型', '1', '2022-02-16 13:01:46', '1', '2022-02-16 13:01:46', 0);
 INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (146, '文件存储器', 'infra_file_storage', 0, '文件存储器', '1', '2022-03-15 00:24:38', '1', '2022-03-15 00:24:38', 0);
 INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (147, 'OAuth 2.0 授权类型', 'system_oauth2_grant_type', 0, 'OAuth 2.0 授权类型（模式）', '1', '2022-05-12 00:20:52', '1', '2022-05-11 16:25:49', 0);
+INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (148, '生成前端代码类型', 'infra_codegen_front_type', 0, '生成前端代码类型', '1', '2023-6-14 16:07:35', '1', '2023-6-14 16:07:39', 0);
 COMMIT;
 
 -- ----------------------------
@@ -2589,7 +2594,7 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS "system_menu";
 CREATE TABLE "system_menu" (
-  "id" int8 NOT NULL,
+  "id" int8 NOT NULL DEFAULT nextval('system_menu_seq'::regclass),
   "name" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
   "permission" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
   "type" int2 NOT NULL,
@@ -2599,15 +2604,15 @@ CREATE TABLE "system_menu" (
   "icon" varchar(100) COLLATE "pg_catalog"."default",
   "component" varchar(255) COLLATE "pg_catalog"."default",
   "status" int2 NOT NULL,
-  "visible" bool NOT NULL,
-  "keep_alive" bool NOT NULL,
+  "visible" bool NOT NULL DEFAULT true,
+  "keep_alive" bool NOT NULL DEFAULT false,
   "creator" varchar(64) COLLATE "pg_catalog"."default",
-  "create_time" timestamp(6) NOT NULL,
+  "create_time" timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   "updater" varchar(64) COLLATE "pg_catalog"."default",
-  "update_time" timestamp(6) NOT NULL,
+  "update_time" timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   "deleted" int2 NOT NULL DEFAULT 0,
   "component_name" varchar(255) COLLATE "pg_catalog"."default",
-  "always_show" char(1) COLLATE "pg_catalog"."default"
+  "always_show" bool NOT NULL DEFAULT false
 )
 ;
 COMMENT ON COLUMN "system_menu"."id" IS '菜单ID';
@@ -2738,19 +2743,19 @@ INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_i
 INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted", "component_name", "always_show") VALUES (1091, '文件查询', 'infra:file:query', 3, 1, 1090, '', '', '', 0, 't', 't', '', '2021-03-12 20:16:20', '', '2022-04-20 17:03:10', 0, NULL, '1');
 INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted", "component_name", "always_show") VALUES (1092, '文件删除', 'infra:file:delete', 3, 4, 1090, '', '', '', 0, 't', 't', '', '2021-03-12 20:16:20', '', '2022-04-20 17:03:10', 0, NULL, '1');
 INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted", "component_name", "always_show") VALUES (1093, '短信管理', '', 1, 11, 1, 'sms', 'validCode', NULL, 0, 't', 't', '1', '2021-04-05 01:10:16', '1', '2022-04-20 17:03:10', 0, NULL, '1');
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted", "component_name", "always_show") VALUES (1094, '短信渠道', '', 2, 0, 1093, 'sms-channel', 'phone', 'system/sms/smsChannel', 0, 't', 't', '', '2021-04-01 11:07:15', '1', '2022-04-20 17:03:10', 0, NULL, '1');
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted", "component_name", "always_show") VALUES (1094, '短信渠道', '', 2, 0, 1093, 'sms-channel', 'phone', 'system/sms/channel', 0, 't', 't', '', '2021-04-01 11:07:15', '1', '2022-04-20 17:03:10', 0, NULL, '1');
 INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted", "component_name", "always_show") VALUES (1095, '短信渠道查询', 'system:sms-channel:query', 3, 1, 1094, '', '', '', 0, 't', 't', '', '2021-04-01 11:07:15', '', '2022-04-20 17:03:10', 0, NULL, '1');
 INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted", "component_name", "always_show") VALUES (1096, '短信渠道创建', 'system:sms-channel:create', 3, 2, 1094, '', '', '', 0, 't', 't', '', '2021-04-01 11:07:15', '', '2022-04-20 17:03:10', 0, NULL, '1');
 INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted", "component_name", "always_show") VALUES (1097, '短信渠道更新', 'system:sms-channel:update', 3, 3, 1094, '', '', '', 0, 't', 't', '', '2021-04-01 11:07:15', '', '2022-04-20 17:03:10', 0, NULL, '1');
 INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted", "component_name", "always_show") VALUES (1098, '短信渠道删除', 'system:sms-channel:delete', 3, 4, 1094, '', '', '', 0, 't', 't', '', '2021-04-01 11:07:15', '', '2022-04-20 17:03:10', 0, NULL, '1');
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted", "component_name", "always_show") VALUES (1100, '短信模板', '', 2, 1, 1093, 'sms-template', 'phone', 'system/sms/smsTemplate', 0, 't', 't', '', '2021-04-01 17:35:17', '1', '2022-04-20 17:03:10', 0, NULL, '1');
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted", "component_name", "always_show") VALUES (1100, '短信模板', '', 2, 1, 1093, 'sms-template', 'phone', 'system/sms/template', 0, 't', 't', '', '2021-04-01 17:35:17', '1', '2022-04-20 17:03:10', 0, NULL, '1');
 INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted", "component_name", "always_show") VALUES (1101, '短信模板查询', 'system:sms-template:query', 3, 1, 1100, '', '', '', 0, 't', 't', '', '2021-04-01 17:35:17', '', '2022-04-20 17:03:10', 0, NULL, '1');
 INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted", "component_name", "always_show") VALUES (1102, '短信模板创建', 'system:sms-template:create', 3, 2, 1100, '', '', '', 0, 't', 't', '', '2021-04-01 17:35:17', '', '2022-04-20 17:03:10', 0, NULL, '1');
 INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted", "component_name", "always_show") VALUES (1103, '短信模板更新', 'system:sms-template:update', 3, 3, 1100, '', '', '', 0, 't', 't', '', '2021-04-01 17:35:17', '', '2022-04-20 17:03:10', 0, NULL, '1');
 INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted", "component_name", "always_show") VALUES (1104, '短信模板删除', 'system:sms-template:delete', 3, 4, 1100, '', '', '', 0, 't', 't', '', '2021-04-01 17:35:17', '', '2022-04-20 17:03:10', 0, NULL, '1');
 INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted", "component_name", "always_show") VALUES (1105, '短信模板导出', 'system:sms-template:export', 3, 5, 1100, '', '', '', 0, 't', 't', '', '2021-04-01 17:35:17', '', '2022-04-20 17:03:10', 0, NULL, '1');
 INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted", "component_name", "always_show") VALUES (1106, '发送测试短信', 'system:sms-template:send-sms', 3, 6, 1100, '', '', '', 0, 't', 't', '1', '2021-04-11 00:26:40', '1', '2022-04-20 17:03:10', 0, NULL, '1');
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted", "component_name", "always_show") VALUES (1107, '短信日志', '', 2, 2, 1093, 'sms-log', 'phone', 'system/sms/smsLog', 0, 't', 't', '', '2021-04-11 08:37:05', '1', '2022-04-20 17:03:10', 0, NULL, '1');
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted", "component_name", "always_show") VALUES (1107, '短信日志', '', 2, 2, 1093, 'sms-log', 'phone', 'system/sms/log', 0, 't', 't', '', '2021-04-11 08:37:05', '1', '2022-04-20 17:03:10', 0, NULL, '1');
 INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted", "component_name", "always_show") VALUES (1108, '短信日志查询', 'system:sms-log:query', 3, 1, 1107, '', '', '', 0, 't', 't', '', '2021-04-11 08:37:05', '', '2022-04-20 17:03:10', 0, NULL, '1');
 INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted", "component_name", "always_show") VALUES (1109, '短信日志导出', 'system:sms-log:export', 3, 5, 1107, '', '', '', 0, 't', 't', '', '2021-04-11 08:37:05', '', '2022-04-20 17:03:10', 0, NULL, '1');
 INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted", "component_name", "always_show") VALUES (1110, '错误码管理', '', 2, 12, 1, 'error-code', 'code', 'system/errorCode/index', 0, 't', 't', '', '2021-04-13 21:46:42', '1', '2022-04-20 17:03:10', 0, NULL, '1');
@@ -4239,7 +4244,7 @@ CREATE TABLE "system_notify_message" (
   "template_content" varchar(1024) COLLATE "pg_catalog"."default" NOT NULL,
   "template_type" int4 NOT NULL,
   "template_params" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
-  "read_status" varchar(1) COLLATE "pg_catalog"."default" NOT NULL,
+  "read_status" bool NOT NULL DEFAULT false,
   "read_time" timestamp(6),
   "creator" varchar(64) COLLATE "pg_catalog"."default",
   "create_time" timestamp(6) NOT NULL,
