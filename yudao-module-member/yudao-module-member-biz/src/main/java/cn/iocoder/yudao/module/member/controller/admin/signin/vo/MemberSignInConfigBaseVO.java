@@ -10,7 +10,7 @@ import lombok.*;
 @Data
 public class MemberSignInConfigBaseVO {
 
-    @Schema(description = "签到第x天", example = "7")
+    @Schema(description = "签到第 x 天", example = "7")
     private Integer day;
 
     @Schema(description = "签到天数对应分数", example = "10")

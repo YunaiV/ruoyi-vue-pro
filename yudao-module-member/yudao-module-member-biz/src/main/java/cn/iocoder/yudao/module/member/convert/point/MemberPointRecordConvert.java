@@ -1,11 +1,7 @@
 package cn.iocoder.yudao.module.member.convert.point;
 
-import java.util.*;
-
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
 import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.MemberPointRecordCreateReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.MemberPointRecordExcelVO;
 import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.MemberPointRecordRespVO;
 import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.MemberPointRecordUpdateReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.point.MemberPointRecordDO;
@@ -28,10 +24,6 @@ public interface MemberPointRecordConvert {
 
     MemberPointRecordRespVO convert(MemberPointRecordDO bean);
 
-    List<MemberPointRecordRespVO> convertList(List<MemberPointRecordDO> list);
-
     PageResult<MemberPointRecordRespVO> convertPage(PageResult<MemberPointRecordDO> page);
-
-    List<MemberPointRecordExcelVO> convertList02(List<MemberPointRecordDO> list);
 
 }

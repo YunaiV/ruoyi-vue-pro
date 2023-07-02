@@ -2,9 +2,10 @@ package cn.iocoder.yudao.module.member.controller.admin.signin;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.member.controller.admin.signin.vo.*;
+import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInConfigCreateReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInConfigPageReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInConfigRespVO;
+import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInConfigUpdateReqVO;
 import cn.iocoder.yudao.module.member.convert.signin.MemberSignInConfigConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInConfigDO;
 import cn.iocoder.yudao.module.member.service.signin.MemberSignInConfigService;
@@ -16,14 +17,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Tag(name = "管理后台 - 积分签到规则")
 @RestController
@@ -67,33 +63,12 @@ public class MemberSignInConfigController {
         return success(MemberSignInConfigConvert.INSTANCE.convert(signInConfig));
     }
 
-    @GetMapping("/list")
-    @Operation(summary = "获得积分签到规则列表")
-    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @PreAuthorize("@ss.hasPermission('point:sign-in-config:query')")
-    public CommonResult<List<MemberSignInConfigRespVO>> getSignInConfigList(@RequestParam("ids") Collection<Integer> ids) {
-        List<MemberSignInConfigDO> list = memberSignInConfigService.getSignInConfigList(ids);
-        return success(MemberSignInConfigConvert.INSTANCE.convertList(list));
-    }
-
     @GetMapping("/page")
     @Operation(summary = "获得积分签到规则分页")
     @PreAuthorize("@ss.hasPermission('point:sign-in-config:query')")
     public CommonResult<PageResult<MemberSignInConfigRespVO>> getSignInConfigPage(@Valid MemberSignInConfigPageReqVO pageVO) {
         PageResult<MemberSignInConfigDO> pageResult = memberSignInConfigService.getSignInConfigPage(pageVO);
         return success(MemberSignInConfigConvert.INSTANCE.convertPage(pageResult));
-    }
-
-    @GetMapping("/export-excel")
-    @Operation(summary = "导出积分签到规则 Excel")
-    @PreAuthorize("@ss.hasPermission('point:sign-in-config:export')")
-    @OperateLog(type = EXPORT)
-    public void exportSignInConfigExcel(@Valid MemberSignInConfigExportReqVO exportReqVO,
-              HttpServletResponse response) throws IOException {
-        List<MemberSignInConfigDO> list = memberSignInConfigService.getSignInConfigList(exportReqVO);
-        // 导出 Excel
-        List<MemberSignInConfigExcelVO> datas = MemberSignInConfigConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "积分签到规则.xls", "数据", MemberSignInConfigExcelVO.class, datas);
     }
 
 }

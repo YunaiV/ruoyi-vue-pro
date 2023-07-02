@@ -35,12 +35,13 @@ public class MemberPointRecordDO extends BaseDO {
     /**
      * 业务类型
      *
-     * 枚举 {@link TODO biz_type 对应的类}
+     * 枚举 {@link TODO biz_type 对应枚举，然后改成 int 类型哈}
      */
     private String bizType;
     /**
      * 1增加 0扣减
      */
+    // TODO @xiaqing：要不把 type 合并到 point 里？增加 point 是正数，减少 point 是负数？
     private String type;
     /**
      * 积分标题
@@ -60,7 +61,6 @@ public class MemberPointRecordDO extends BaseDO {
     private Integer totalPoint;
     /**
      * 状态：1-订单创建，2-冻结期，3-完成，4-失效（订单退款）
-
      *
      * 枚举 {@link TODO point_status 对应的类}
      */

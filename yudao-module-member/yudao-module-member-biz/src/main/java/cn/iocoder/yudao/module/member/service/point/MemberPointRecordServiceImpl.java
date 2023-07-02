@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.module.member.service.point;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.MemberPointRecordCreateReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.MemberPointRecordExportReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.MemberPointRecordPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.MemberPointRecordUpdateReqVO;
 import cn.iocoder.yudao.module.member.convert.point.MemberPointRecordConvert;
@@ -40,7 +38,6 @@ public class MemberPointRecordServiceImpl implements MemberPointRecordService {
         recordMapper.updateById(updateObj);
     }
 
-
     private void validateRecordExists(Long id) {
         if (recordMapper.selectById(id) == null) {
             throw exception(ErrorCodeConstants.RECORD_NOT_EXISTS);
@@ -53,18 +50,8 @@ public class MemberPointRecordServiceImpl implements MemberPointRecordService {
     }
 
     @Override
-    public List<MemberPointRecordDO> getRecordList(Collection<Long> ids) {
-        return recordMapper.selectBatchIds(ids);
-    }
-
-    @Override
     public PageResult<MemberPointRecordDO> getRecordPage(MemberPointRecordPageReqVO pageReqVO) {
         return recordMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public List<MemberPointRecordDO> getRecordList(MemberPointRecordExportReqVO exportReqVO) {
-        return recordMapper.selectList(exportReqVO);
     }
 
 }

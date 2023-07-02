@@ -1,22 +1,16 @@
 package cn.iocoder.yudao.module.member.service.signin;
 
-import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInRecordCreateReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInRecordExportReqVO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInRecordPageReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInRecordUpdateReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInRecordDO;
+import cn.iocoder.yudao.module.member.dal.mysql.signin.MemberSignInRecordMapper;
 import org.springframework.stereotype.Service;
-import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.*;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
-import cn.iocoder.yudao.module.member.convert.signin.MemberSignInRecordConvert;
-import cn.iocoder.yudao.module.member.dal.mysql.signin.MemberSignInRecordMapper;
+import javax.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.SIGN_IN_RECORD_NOT_EXISTS;
 
 /**
  * 用户签到积分 Service 实现类
@@ -50,18 +44,8 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
     }
 
     @Override
-    public List<MemberSignInRecordDO> getSignInRecordList(Collection<Long> ids) {
-        return memberSignInRecordMapper.selectBatchIds(ids);
-    }
-
-    @Override
     public PageResult<MemberSignInRecordDO> getSignInRecordPage(MemberSignInRecordPageReqVO pageReqVO) {
         return memberSignInRecordMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public List<MemberSignInRecordDO> getSignInRecordList(MemberSignInRecordExportReqVO exportReqVO) {
-        return memberSignInRecordMapper.selectList(exportReqVO);
     }
 
 }

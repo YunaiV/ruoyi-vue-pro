@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.member.controller.admin.point;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.*;
+import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.MemberPointRecordPageReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.MemberPointRecordRespVO;
+import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.MemberPointRecordUpdateReqVO;
 import cn.iocoder.yudao.module.member.convert.point.MemberPointRecordConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.point.MemberPointRecordDO;
 import cn.iocoder.yudao.module.member.service.point.MemberPointRecordService;
@@ -16,14 +16,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Tag(name = "管理后台 - 用户积分记录")
 @RestController
@@ -34,6 +29,7 @@ public class MemberPointRecordController {
     @Resource
     private MemberPointRecordService recordService;
 
+    // TODO @xiaqing：积分应该没有更新操作呀？可以删除哈；
     @PutMapping("/update")
     @Operation(summary = "更新用户积分记录")
     @PreAuthorize("@ss.hasPermission('point:record:update')")
@@ -51,33 +47,12 @@ public class MemberPointRecordController {
         return success(MemberPointRecordConvert.INSTANCE.convert(record));
     }
 
-    @GetMapping("/list")
-    @Operation(summary = "获得用户积分记录列表")
-    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @PreAuthorize("@ss.hasPermission('point:record:query')")
-    public CommonResult<List<MemberPointRecordRespVO>> getRecordList(@RequestParam("ids") Collection<Long> ids) {
-        List<MemberPointRecordDO> list = recordService.getRecordList(ids);
-        return success(MemberPointRecordConvert.INSTANCE.convertList(list));
-    }
-
     @GetMapping("/page")
     @Operation(summary = "获得用户积分记录分页")
     @PreAuthorize("@ss.hasPermission('point:record:query')")
     public CommonResult<PageResult<MemberPointRecordRespVO>> getRecordPage(@Valid MemberPointRecordPageReqVO pageVO) {
         PageResult<MemberPointRecordDO> pageResult = recordService.getRecordPage(pageVO);
         return success(MemberPointRecordConvert.INSTANCE.convertPage(pageResult));
-    }
-
-    @GetMapping("/export-excel")
-    @Operation(summary = "导出用户积分记录 Excel")
-    @PreAuthorize("@ss.hasPermission('point:record:export')")
-    @OperateLog(type = EXPORT)
-    public void exportRecordExcel(@Valid MemberPointRecordExportReqVO exportReqVO,
-              HttpServletResponse response) throws IOException {
-        List<MemberPointRecordDO> list = recordService.getRecordList(exportReqVO);
-        // 导出 Excel
-        List<MemberPointRecordExcelVO> datas = MemberPointRecordConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "用户积分记录.xls", "数据", MemberPointRecordExcelVO.class, datas);
     }
 
 }

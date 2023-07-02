@@ -1,11 +1,7 @@
 package cn.iocoder.yudao.module.member.convert.signin;
 
-import java.util.*;
-
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
 import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInRecordCreateReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInRecordExcelVO;
 import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInRecordRespVO;
 import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInRecordUpdateReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInRecordDO;
@@ -28,10 +24,6 @@ public interface MemberSignInRecordConvert {
 
     MemberSignInRecordRespVO convert(MemberSignInRecordDO bean);
 
-    List<MemberSignInRecordRespVO> convertList(List<MemberSignInRecordDO> list);
-
     PageResult<MemberSignInRecordRespVO> convertPage(PageResult<MemberSignInRecordDO> page);
-
-    List<MemberSignInRecordExcelVO> convertList02(List<MemberSignInRecordDO> list);
 
 }
