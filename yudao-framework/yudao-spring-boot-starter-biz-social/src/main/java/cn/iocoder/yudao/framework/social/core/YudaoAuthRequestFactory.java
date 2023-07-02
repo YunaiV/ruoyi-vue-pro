@@ -4,12 +4,12 @@ import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.yudao.framework.social.core.enums.AuthExtendSource;
 import cn.iocoder.yudao.framework.social.core.request.AuthWeChatMiniAppRequest;
-import com.xkcoding.justauth.AuthRequestFactory;
-import com.xkcoding.justauth.autoconfigure.JustAuthProperties;
-import me.zhyd.oauth.cache.AuthStateCache;
-import me.zhyd.oauth.config.AuthConfig;
-import me.zhyd.oauth.config.AuthSource;
-import me.zhyd.oauth.request.AuthRequest;
+import com.xingyuv.jushauth.cache.AuthStateCache;
+import com.xingyuv.jushauth.config.AuthConfig;
+import com.xingyuv.jushauth.config.AuthSource;
+import com.xingyuv.jushauth.request.AuthRequest;
+import com.xingyuv.justauth.AuthRequestFactory;
+import com.xingyuv.justauth.autoconfigure.JustAuthProperties;
 
 import java.lang.reflect.Method;
 
