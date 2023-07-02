@@ -102,6 +102,9 @@ public class AppTradeOrderDetailRespVO {
     @Schema(description = "收件人详细地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "中关村大街 1 号")
     private String receiverDetailAddress;
 
+    @Schema(description = "自提门店编号", example = "1088")
+    private Long pickUpStoreId;
+
     // ========== 售后基本信息 ==========
 
     // ========== 营销基本信息 ==========

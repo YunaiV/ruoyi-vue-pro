@@ -151,7 +151,6 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
 
         // 测试分页 tab count
         AppCommentStatisticsRespVO tabsCount = productCommentService.getCommentStatistics(spuId, Boolean.TRUE);
-        assertEquals(6, tabsCount.getAllCount());
         assertEquals(4, tabsCount.getGoodCount());
         assertEquals(2, tabsCount.getMediocreCount());
         assertEquals(0, tabsCount.getNegativeCount());

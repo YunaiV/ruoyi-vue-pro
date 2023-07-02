@@ -15,6 +15,7 @@ import java.util.Arrays;
 @AllArgsConstructor
 public enum DeliveryTypeEnum implements IntArrayValuable {
 
+    NULL(0, "无需物流"),
     EXPRESS(1, "快递发货"),
     PICK_UP(2, "用户自提"),;
 

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.trade.dal.dataobject.order;
 
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryPickUpStoreDO;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.*;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -172,13 +173,6 @@ public class TradeOrderDO extends BaseDO {
      */
     private Integer deliveryType;
     /**
-     * 配置模板的编号
-     *
-     * 关联 DeliveryTemplateDO 的 id 编号
-     */
-    // TODO 芋艿：需要删除
-    private Long deliveryTemplateId;
-    /**
      * 发货物流公司编号
      */
     private Long logisticsId;
@@ -197,7 +191,6 @@ public class TradeOrderDO extends BaseDO {
      */
     private LocalDateTime deliveryTime;
 
-    // TODO @芋艿：pickUpStoreId;
     /**
      * 收货时间
      */
@@ -218,6 +211,13 @@ public class TradeOrderDO extends BaseDO {
      * 收件人详细地址
      */
     private String receiverDetailAddress;
+
+    /**
+     * 自提门店编号
+     *
+     * 关联 {@link DeliveryPickUpStoreDO#getId()}
+     */
+    private Long pickUpStoreId;
 
     // ========== 售后基本信息 ==========
     /**

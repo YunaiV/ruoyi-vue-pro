@@ -127,6 +127,14 @@ public class AppTradeOrderController {
         return success(orderCount);
     }
 
+    @PutMapping("/take")
+    @Operation(summary = "确认交易订单收货")
+    @Parameter(name = "id", description = "交易订单编号")
+    public CommonResult<Boolean> takeOrder(@RequestParam("id") Long id) {
+        // TODO @芋艿：未实现，mock 用
+        return success(true);
+    }
+
     @DeleteMapping("/cancel")
     @Operation(summary = "取消交易订单")
     @Parameter(name = "id", description = "交易订单编号")
