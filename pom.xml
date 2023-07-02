@@ -38,8 +38,8 @@
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <!-- 看看咋放到 bom 里 -->
-        <lombok.version>1.18.28</lombok.version>
-        <spring.boot.version>2.7.13</spring.boot.version>
+        <lombok.version>1.18.26</lombok.version>
+        <spring.boot.version>2.7.12</spring.boot.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -96,13 +96,8 @@
         </pluginManagement>
     </build>
 
-    <!-- 使用 huawei / aliyun 的 Maven 源，提升下载速度 -->
+    <!-- 使用 aliyun 的 Maven 源，提升下载速度 -->
     <repositories>
-        <repository>
-            <id>huaweicloud</id>
-            <name>huawei</name>
-            <url>https://mirrors.huaweicloud.com/repository/maven/</url>
-        </repository>
         <repository>
             <id>aliyunmaven</id>
             <name>aliyun</name>
