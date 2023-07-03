@@ -21,6 +21,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -98,6 +99,15 @@ public class ProductSpuController {
     public CommonResult<List<ProductSpuSimpleRespVO>> getSpuSimpleList() {
         List<ProductSpuDO> list = productSpuService.getSpuList();
         return success(ProductSpuConvert.INSTANCE.convertList02(list));
+    }
+
+    @GetMapping("/list")
+    @Operation(summary = "获得商品 SPU 详情列表")
+    @Parameter(name = "spuIds", description = "spu 编号列表", required = true, example = "[1,2,3]")
+    @PreAuthorize("@ss.hasPermission('product:spu:query')")
+    public CommonResult<List<ProductSpuDetailRespVO>> getSpuList(@RequestParam("spuIds") Collection<Long> spuIds) {
+        return success(ProductSpuConvert.INSTANCE.convertForSpuDetailRespListVO(
+                productSpuService.getSpuList(spuIds), productSkuService.getSkuListBySpuId(spuIds)));
     }
 
     @GetMapping("/page")
