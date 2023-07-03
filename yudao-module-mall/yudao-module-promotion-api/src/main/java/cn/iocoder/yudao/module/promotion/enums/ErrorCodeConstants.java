@@ -59,4 +59,6 @@ public interface ErrorCodeConstants {
     ErrorCode SECKILL_TIME_EQUAL = new ErrorCode(1013009002, "秒杀时段开始时间和结束时间不能相等");
     ErrorCode SECKILL_START_TIME_BEFORE_END_TIME = new ErrorCode(1013009003, "秒杀时段开始时间不能在结束时间之后");
 
+    // ========== 拼团活动 1013010000 ==========
+    ErrorCode COMBINATION_ACTIVITY_NOT_EXISTS = new ErrorCode(1013010000, "拼团活动不存在");
 }

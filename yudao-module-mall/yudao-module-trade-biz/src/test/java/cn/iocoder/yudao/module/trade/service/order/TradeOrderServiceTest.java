@@ -115,7 +115,8 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         when(productSpuApi.getSpuList(eq(asSet(11L, 21L)))).thenReturn(Arrays.asList(spu01, spu02));
         // mock 方法（用户收件地址的校验）
         AddressRespDTO addressRespDTO = new AddressRespDTO().setId(10L).setUserId(userId).setName("芋艿")
-                .setMobile("15601691300").setAreaId(3306).setPostCode("85757").setDetailAddress("土豆村");
+                //.setMobile("15601691300").setAreaId(3306).setPostCode("85757").setDetailAddress("土豆村");
+                .setMobile("15601691300").setAreaId(3306).setDetailAddress("土豆村");
         when(addressApi.getAddress(eq(10L), eq(userId))).thenReturn(addressRespDTO);
         // mock 方法（价格计算）
         PriceCalculateRespDTO.OrderItem priceOrderItem01 = new PriceCalculateRespDTO.OrderItem()
@@ -150,12 +151,12 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         }))).thenReturn(1000L);
 
         // 调用方法
-        Long tradeOrderId = tradeOrderService.createOrder(userId, userIp, reqVO);
+        TradeOrderDO order = tradeOrderService.createOrder(userId, userIp, reqVO);
         // 断言 TradeOrderDO 订单
         List<TradeOrderDO> tradeOrderDOs = tradeOrderMapper.selectList();
         assertEquals(tradeOrderDOs.size(), 1);
         TradeOrderDO tradeOrderDO = tradeOrderDOs.get(0);
-        assertEquals(tradeOrderDO.getId(), tradeOrderId);
+        assertEquals(tradeOrderDO.getId(), order.getId());
         assertNotNull(tradeOrderDO.getNo());
         assertEquals(tradeOrderDO.getType(), TradeOrderTypeEnum.NORMAL.getType());
         assertEquals(tradeOrderDO.getTerminal(), TerminalEnum.H5.getTerminal());
@@ -195,7 +196,7 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         TradeOrderItemDO tradeOrderItemDO01 = tradeOrderItemDOs.get(0);
         assertNotNull(tradeOrderItemDO01.getId());
         assertEquals(tradeOrderItemDO01.getUserId(), userId);
-        assertEquals(tradeOrderItemDO01.getOrderId(), tradeOrderId);
+        assertEquals(tradeOrderItemDO01.getOrderId(), order.getId());
         assertEquals(tradeOrderItemDO01.getSpuId(), 11L);
         assertEquals(tradeOrderItemDO01.getSkuId(), 1L);
         assertEquals(tradeOrderItemDO01.getProperties().size(), 1);
@@ -213,7 +214,7 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         TradeOrderItemDO tradeOrderItemDO02 = tradeOrderItemDOs.get(1);
         assertNotNull(tradeOrderItemDO02.getId());
         assertEquals(tradeOrderItemDO02.getUserId(), userId);
-        assertEquals(tradeOrderItemDO02.getOrderId(), tradeOrderId);
+        assertEquals(tradeOrderItemDO02.getOrderId(), order.getId());
         assertEquals(tradeOrderItemDO02.getSpuId(), 21L);
         assertEquals(tradeOrderItemDO02.getSkuId(), 2L);
         assertEquals(tradeOrderItemDO02.getProperties().size(), 1);
@@ -239,7 +240,7 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         verify(couponApi).useCoupon(argThat(reqDTO -> {
             assertEquals(reqDTO.getId(), reqVO.getCouponId());
             assertEquals(reqDTO.getUserId(), userId);
-            assertEquals(reqDTO.getOrderId(), tradeOrderId);
+            assertEquals(reqDTO.getOrderId(), order.getId());
             return true;
         }));
     }

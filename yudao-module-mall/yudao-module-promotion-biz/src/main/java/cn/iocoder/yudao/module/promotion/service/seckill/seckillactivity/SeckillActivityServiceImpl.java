@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.promotion.service.seckill.seckillactivity;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -26,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -109,13 +109,13 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         // 过滤出所有 spuIds 有交集的活动
         List<SeckillActivityDO> doList = activityDOs.stream().filter(s -> {
             // 判断 spu 是否有交集
-            List<Long> spuIdsClone = ArrayUtil.clone(s.getSpuIds());
+            ArrayList<Long> spuIdsClone = CollUtil.newArrayList(s.getSpuIds());
             spuIdsClone.retainAll(spuIds);
             if (CollUtil.isEmpty(spuIdsClone)) {
                 return false;
             }
             // 判断秒杀时段是否有交集
-            List<Long> configIdsClone = ArrayUtil.clone(s.getConfigIds());
+            List<Long> configIdsClone = CollUtil.newArrayList(s.getConfigIds());
             configIdsClone.retainAll(configIds);
             return CollUtil.isNotEmpty(configIdsClone);
         }).collect(Collectors.toList());
