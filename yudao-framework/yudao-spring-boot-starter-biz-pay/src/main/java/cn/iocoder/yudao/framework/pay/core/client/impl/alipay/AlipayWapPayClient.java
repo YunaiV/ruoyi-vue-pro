@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.Method;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
@@ -37,9 +36,8 @@ public class AlipayWapPayClient extends AbstractAlipayClient {
         model.setTotalAmount(formatAmount(reqDTO.getAmount()));
         model.setProductCode("QUICK_WAP_PAY"); // 销售产品码. 目前 Wap 支付场景下仅支持 QUICK_WAP_PAY
         // ② 个性化的参数【无】
-        // ③ 支付宝 Wap 支付只有一种展示，考虑到前端可能希望二维码扫描后，手机打开
-        String displayMode = ObjectUtil.defaultIfNull(reqDTO.getDisplayMode(),
-                PayDisplayModeEnum.URL.getMode());
+        // ③ 支付宝 Wap 支付只有一种展示：URL
+        String displayMode = PayDisplayModeEnum.URL.getMode();
 
         // 1.2 构建 AlipayTradeWapPayRequest 请求
         AlipayTradeWapPayRequest request = new AlipayTradeWapPayRequest();

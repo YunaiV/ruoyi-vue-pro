@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
-import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.Method;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
@@ -41,11 +40,11 @@ public class AlipayPcPayClient extends AbstractAlipayClient {
         model.setTimeExpire(formatTime(reqDTO.getExpireTime()));
         model.setProductCode("FAST_INSTANT_TRADE_PAY"); // 销售产品码. 目前 PC 支付场景下仅支持 FAST_INSTANT_TRADE_PAY
         // ② 个性化的参数
-        // 参考 https://www.pingxx.com/api/支付渠道 extra 参数说明.html 的 alipay_pc_direct 部分
-        model.setQrPayMode(MapUtil.getStr(reqDTO.getChannelExtras(), "qr_pay_mode"));
-        model.setQrcodeWidth(MapUtil.getLong(reqDTO.getChannelExtras(), "qr_code_width"));
-        // ③ 支付宝 PC 支付有多种展示模式，因此这里需要计算
-        String displayMode = getDisplayMode(reqDTO.getDisplayMode(), model.getQrPayMode());
+        // 如果想弄更多个性化的参数，可参考 https://www.pingxx.com/api/支付渠道 extra 参数说明.html 的 alipay_pc_direct 部分进行拓展
+        model.setQrPayMode("2"); // 跳转模式 - 订单码，效果参见：https://help.pingxx.com/article/1137360/
+        // ③ 支付宝 PC 支付有两种展示模式：FORM、URL
+        String displayMode = ObjectUtil.defaultIfNull(reqDTO.getDisplayMode(),
+                PayDisplayModeEnum.URL.getMode());
 
         // 1.2 构建 AlipayTradePagePayRequest 请求
         AlipayTradePagePayRequest request = new AlipayTradePagePayRequest();
@@ -65,27 +64,6 @@ public class AlipayPcPayClient extends AbstractAlipayClient {
         validateSuccess(response);
         return new PayOrderUnifiedRespDTO().setDisplayMode(displayMode)
                 .setDisplayContent(response.getBody());
-    }
-
-    /**
-     * 获得最终的支付 UI 展示模式
-     *
-     * @param displayMode 前端传递的 UI 展示模式
-     * @param qrPayMode 前端传递的二维码模式
-     * @return 最终的支付 UI 展示模式
-     */
-    private String getDisplayMode(String displayMode, String qrPayMode) {
-        // 1.1 支付宝二维码的前置模式
-        if (StrUtil.equalsAny(qrPayMode, "0", "1", "3", "4")) {
-            return PayDisplayModeEnum.IFRAME.getMode();
-        }
-        // 1.2 支付宝二维码的跳转模式
-        if (StrUtil.equals(qrPayMode, "2")) {
-            return PayDisplayModeEnum.URL.getMode();
-        }
-        // 2. 前端传递了 UI 展示模式
-        return displayMode != null ? displayMode :
-                PayDisplayModeEnum.URL.getMode(); // 模式使用 URL 跳转
     }
 
 }

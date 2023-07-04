@@ -4,7 +4,6 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
@@ -44,7 +43,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.*;
+import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 
 /**
  * 支付订单 Service 实现类
@@ -147,7 +146,7 @@ public class PayOrderServiceImpl implements PayOrderService {
                 .setMerchantOrderId(orderExtension.getNo()) // 注意，此处使用的是 PayOrderExtensionDO.no 属性！
                 .setSubject(order.getSubject()).setBody(order.getBody())
                 .setNotifyUrl(genChannelPayNotifyUrl(channel))
-                .setReturnUrl(genChannelReturnUrl(channel))
+                .setReturnUrl(reqVO.getReturnUrl())
                 // 订单相关字段
                 .setAmount(order.getAmount()).setExpireTime(order.getExpireTime());
         PayOrderUnifiedRespDTO unifiedOrderRespDTO = client.unifiedOrder(unifiedOrderReqDTO);
@@ -181,15 +180,6 @@ public class PayOrderServiceImpl implements PayOrderService {
             throw exception(ErrorCodeConstants.PAY_CHANNEL_CLIENT_NOT_FOUND);
         }
         return channel;
-    }
-
-    /**
-     * 根据支付渠道的编码，生成支付渠道的返回地址
-     * @param channel 支付渠道
-     * @return 支付成功返回的地址。 配置地址 + "/" + channel id
-     */
-    private String genChannelReturnUrl(PayChannelDO channel) {
-        return payProperties.getReturnUrl() + "/" + channel.getId();
     }
 
     /**

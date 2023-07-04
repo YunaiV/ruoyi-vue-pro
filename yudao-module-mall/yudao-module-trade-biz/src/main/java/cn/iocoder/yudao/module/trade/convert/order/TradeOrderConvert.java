@@ -1,12 +1,15 @@
 package cn.iocoder.yudao.module.trade.convert.order;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
+import cn.iocoder.yudao.module.pay.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
@@ -234,6 +237,9 @@ public interface TradeOrderConvert {
                                                 List<ProductPropertyValueDetailRespDTO> propertyValueDetails, TradeOrderProperties tradeOrderProperties) {
         AppTradeOrderDetailRespVO orderVO = convert3(order, orderItems);
         orderVO.setPayExpireTime(addTime(tradeOrderProperties.getExpireTime()));
+        if (StrUtil.isNotEmpty(order.getPayChannelCode())) {
+            orderVO.setPayChannelName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.CHANNEL_CODE_TYPE, order.getPayChannelCode()));
+        }
         // 处理商品属性
         Map<Long, ProductPropertyValueDetailRespDTO> propertyValueDetailMap = convertMap(propertyValueDetails, ProductPropertyValueDetailRespDTO::getValueId);
         for (int i = 0; i < orderItems.size(); i++) {
