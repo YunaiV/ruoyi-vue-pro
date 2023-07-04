@@ -61,4 +61,5 @@ public interface ErrorCodeConstants {
 
     // ========== 拼团活动 1013010000 ==========
     ErrorCode COMBINATION_ACTIVITY_NOT_EXISTS = new ErrorCode(1013010000, "拼团活动不存在");
+    ErrorCode COMBINATION_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1013010000, "存在商品参加了其它拼团活动");
 }

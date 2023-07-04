@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
@@ -12,7 +11,8 @@ import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityUpdateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.product.SeckillProductBaseVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.product.SeckillProductCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.product.SeckillProductUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.convert.seckill.seckillactivity.SeckillActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillProductDO;
@@ -28,13 +28,12 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.promotion.util.PromotionUtils.validateProductSkuExistence;
 import static java.util.Arrays.asList;
 
 /**
@@ -61,8 +60,10 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     public Long createSeckillActivity(SeckillActivityCreateReqVO createReqVO) {
         // 校验商品秒秒杀时段是否冲突
         validateProductSpuSeckillConflict(createReqVO.getConfigIds(), createReqVO.getSpuIds());
+        // 获取所选 spu下的所有 sku
+        List<ProductSkuRespDTO> skus = productSkuApi.getSkuListBySpuId(createReqVO.getSpuIds());
         // 校验商品 sku 是否存在
-        validateProductSkuExistence(createReqVO.getSpuIds(), createReqVO.getProducts());
+        validateProductSkuExistence(skus, createReqVO.getProducts(), SeckillProductCreateReqVO::getSkuId);
 
         // 插入秒杀活动
         SeckillActivityDO activity = SeckillActivityConvert.INSTANCE.convert(createReqVO)
@@ -72,28 +73,6 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         List<SeckillProductDO> product = SeckillActivityConvert.INSTANCE.convertList(activity, createReqVO.getProducts());
         seckillProductMapper.insertBatch(product);
         return activity.getId();
-    }
-
-    private <T extends SeckillProductBaseVO> void validateProductSkuExistence(List<Long> spuIds, List<T> products) {
-        // 校验 spu 个数是否相等
-        // TODO @puhui999：不用校验 SPU 哈，只校验 sku 对应的 spuId 是否一致；
-        Set<Long> convertedSpuIds = CollectionUtils.convertSet(products, T::getSpuId);
-        if (ObjectUtil.notEqual(spuIds.size(), convertedSpuIds.size())) {
-            throw exception(SKU_NOT_EXISTS);
-        }
-        // 获取所选 spu下的所有 sku
-        // TODO @puhui999：变量可以简单一点；skus
-        List<ProductSkuRespDTO> skuRespDTOs = productSkuApi.getSkuListBySpuId(spuIds);
-        // 校验 sku 个数是否一致
-        Set<Long> skuIdsSet = CollectionUtils.convertSet(products, T::getSkuId);
-        Set<Long> skuIdsSet1 = CollectionUtils.convertSet(skuRespDTOs, ProductSkuRespDTO::getId);
-        if (ObjectUtil.notEqual(skuIdsSet.size(), skuIdsSet1.size())) {
-            throw exception(SKU_NOT_EXISTS);
-        }
-        // 校验 skuId 是否存在
-        if (!skuIdsSet1.containsAll(skuIdsSet) || !skuIdsSet.containsAll(skuIdsSet1)) {
-            throw exception(SKU_NOT_EXISTS);
-        }
     }
 
     private void validateProductSpuSeckillConflict(List<Long> configIds, List<Long> spuIds) {
@@ -133,8 +112,10 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         }
         // 校验商品是否冲突
         validateProductSpuSeckillConflict(updateReqVO.getConfigIds(), updateReqVO.getSpuIds());
+        // 获取所选 spu下的所有 sku
+        List<ProductSkuRespDTO> skus = productSkuApi.getSkuListBySpuId(updateReqVO.getSpuIds());
         // 校验商品 sku 是否存在
-        validateProductSkuExistence(updateReqVO.getSpuIds(), updateReqVO.getProducts());
+        validateProductSkuExistence(skus, updateReqVO.getProducts(), SeckillProductUpdateReqVO::getSkuId);
 
         // 更新活动
         SeckillActivityDO updateObj = SeckillActivityConvert.INSTANCE.convert(updateReqVO)

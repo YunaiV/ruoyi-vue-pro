@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.controller.admin.combination.vo;
+package cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity;
 
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;

@@ -2,12 +2,12 @@ package cn.iocoder.yudao.module.promotion.service.combination;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.CombinationActivityCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.CombinationActivityExportReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.CombinationActivityPageReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.CombinationActivityUpdateReqVO;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
-import cn.iocoder.yudao.module.promotion.dal.mysql.combination.CombinationActivityMapper;
+import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityExportReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityPageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.combinationactivity.CombinationActivityDO;
+import cn.iocoder.yudao.module.promotion.dal.mysql.combination.combinationactivity.CombinationActivityMapper;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
@@ -107,7 +107,7 @@ public class CombinationActivityServiceImplTest extends BaseDbUnitTest {
         // mock 数据
         CombinationActivityDO dbCombinationActivity = randomPojo(CombinationActivityDO.class, o -> { // 等会查询到
             o.setName(null);
-            o.setSpuId(null);
+            //o.setSpuId(null);
             o.setTotalLimitCount(null);
             o.setSingleLimitCount(null);
             o.setStartTime(null);
@@ -125,7 +125,7 @@ public class CombinationActivityServiceImplTest extends BaseDbUnitTest {
         // 测试 name 不匹配
         combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setName(null)));
         // 测试 spuId 不匹配
-        combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setSpuId(null)));
+        //combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setSpuId(null)));
         // 测试 totalLimitCount 不匹配
         combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setTotalLimitCount(null)));
         // 测试 singleLimitCount 不匹配
@@ -181,7 +181,7 @@ public class CombinationActivityServiceImplTest extends BaseDbUnitTest {
         // mock 数据
         CombinationActivityDO dbCombinationActivity = randomPojo(CombinationActivityDO.class, o -> { // 等会查询到
             o.setName(null);
-            o.setSpuId(null);
+            //o.setSpuId(null);
             o.setTotalLimitCount(null);
             o.setSingleLimitCount(null);
             o.setStartTime(null);
@@ -199,7 +199,7 @@ public class CombinationActivityServiceImplTest extends BaseDbUnitTest {
         // 测试 name 不匹配
         combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setName(null)));
         // 测试 spuId 不匹配
-        combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setSpuId(null)));
+        //combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setSpuId(null)));
         // 测试 totalLimitCount 不匹配
         combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setTotalLimitCount(null)));
         // 测试 singleLimitCount 不匹配

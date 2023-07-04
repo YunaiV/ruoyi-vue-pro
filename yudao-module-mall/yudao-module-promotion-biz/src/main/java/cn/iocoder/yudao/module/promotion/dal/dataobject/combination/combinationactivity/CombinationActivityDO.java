@@ -1,13 +1,16 @@
-package cn.iocoder.yudao.module.promotion.dal.dataobject.combination;
+package cn.iocoder.yudao.module.promotion.dal.dataobject.combination.combinationactivity;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.sun.xml.internal.bind.v2.TODO;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 拼团活动 DO
@@ -36,7 +39,8 @@ public class CombinationActivityDO extends BaseDO {
     /**
      * 商品 SPU 编号关联 ProductSpuDO 的 id
      */
-    private Long spuId;
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> spuIds;
     /**
      * 总限购数量
      */
@@ -76,7 +80,7 @@ public class CombinationActivityDO extends BaseDO {
     /**
      * 活动状态：0开启 1关闭
      * <p>
-     * 枚举 {@link TODO common_status 对应的类}
+     * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
     /**
