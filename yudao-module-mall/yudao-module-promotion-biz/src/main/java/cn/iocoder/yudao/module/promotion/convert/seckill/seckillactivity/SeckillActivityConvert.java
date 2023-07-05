@@ -3,11 +3,13 @@ package cn.iocoder.yudao.module.promotion.convert.seckill.seckillactivity;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityDetailRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.product.SeckillProductBaseVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.product.SeckillProductRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.product.SeckillProductUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillProductDO;
@@ -40,9 +42,27 @@ public interface SeckillActivityConvert {
 
     PageResult<SeckillActivityRespVO> convertPage(PageResult<SeckillActivityDO> page);
 
-    SeckillActivityDetailRespVO convert(SeckillActivityDO seckillActivity, List<SeckillProductDO> seckillProducts);
+    default PageResult<SeckillActivityRespVO> convertPage(PageResult<SeckillActivityDO> page, List<SeckillProductDO> seckillProducts, List<ProductSpuRespDTO> spuList) {
+        Map<Long, ProductSpuRespDTO> spuMap = CollectionUtils.convertMap(spuList, ProductSpuRespDTO::getId, c -> c);
+        PageResult<SeckillActivityRespVO> pageResult = convertPage(page);
+        pageResult.getList().forEach(item -> {
+            item.setSpuName(spuMap.get(item.getSpuId()).getName());
+            item.setPicUrl(spuMap.get(item.getSpuId()).getPicUrl());
+            item.setProducts(convertList2(seckillProducts));
+        });
+        return pageResult;
+    }
+
+    SeckillActivityDetailRespVO convert1(SeckillActivityDO seckillActivity);
+
+    default SeckillActivityDetailRespVO convert(SeckillActivityDO seckillActivity, List<SeckillProductDO> seckillProducts) {
+        SeckillActivityDetailRespVO respVO = convert1(seckillActivity);
+        respVO.setProducts(convertList2(seckillProducts));
+        return respVO;
+    }
 
     @Mappings({
+            @Mapping(target = "id", expression = "java(null)"),
             @Mapping(target = "activityId", source = "activityDO.id"),
             @Mapping(target = "configIds", source = "activityDO.configIds"),
             @Mapping(target = "spuId", source = "activityDO.spuId"),
@@ -75,5 +95,7 @@ public interface SeckillActivityConvert {
         });
         return list;
     }
+
+    List<SeckillProductRespVO> convertList2(List<SeckillProductDO> productDOs);
 
 }

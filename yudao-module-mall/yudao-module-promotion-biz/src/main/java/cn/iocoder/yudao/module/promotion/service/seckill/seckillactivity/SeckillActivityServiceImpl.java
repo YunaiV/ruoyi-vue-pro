@@ -160,7 +160,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         if (CollUtil.isNotEmpty(u)) {
             List<SeckillProductUpdateReqVO> vos = CollectionUtils.filterList(products, item -> u.contains(item.getSkuId()));
             List<SeckillProductDO> productDOs = SeckillActivityConvert.INSTANCE.convertList1(updateObj, vos, seckillProductDOs);
-            seckillProductMapper.insertBatch(productDOs);
+            seckillProductMapper.updateBatch(productDOs);
         }
     }
 
@@ -206,7 +206,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
 
     @Override
     public SeckillActivityDO getSeckillActivity(Long id) {
-        return seckillActivityMapper.selectById(id);
+        return validateSeckillActivityExists(id);
     }
 
     @Override
@@ -222,6 +222,11 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     @Override
     public List<SeckillProductDO> getSeckillProductListByActivityId(Long id) {
         return seckillProductMapper.selectListByActivityId(id);
+    }
+
+    @Override
+    public List<SeckillProductDO> getSeckillProductListByActivityId(Collection<Long> ids) {
+        return seckillProductMapper.selectListByActivityId(ids);
     }
 
 }

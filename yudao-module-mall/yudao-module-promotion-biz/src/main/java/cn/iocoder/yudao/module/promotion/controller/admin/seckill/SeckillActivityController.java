@@ -2,6 +2,9 @@ package cn.iocoder.yudao.module.promotion.controller.admin.seckill;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.*;
 import cn.iocoder.yudao.module.promotion.convert.seckill.seckillactivity.SeckillActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillActivityDO;
@@ -18,6 +21,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -29,6 +33,8 @@ public class SeckillActivityController {
 
     @Resource
     private SeckillActivityService seckillActivityService;
+    @Resource
+    private ProductSpuApi spuApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建秒杀活动")
@@ -69,11 +75,8 @@ public class SeckillActivityController {
     @PreAuthorize("@ss.hasPermission('promotion:seckill-activity:query')")
     public CommonResult<SeckillActivityDetailRespVO> getSeckillActivity(@RequestParam("id") Long id) {
         SeckillActivityDO seckillActivity = seckillActivityService.getSeckillActivity(id);
-        if (seckillActivity == null) {
-            return success(null);
-        }
-        List<SeckillProductDO> seckillProducts =  seckillActivityService.getSeckillProductListByActivityId(id);
-        return success(SeckillActivityConvert.INSTANCE.convert(seckillActivity,seckillProducts));
+        List<SeckillProductDO> seckillProducts = seckillActivityService.getSeckillProductListByActivityId(id);
+        return success(SeckillActivityConvert.INSTANCE.convert(seckillActivity, seckillProducts));
     }
 
     @GetMapping("/list")
@@ -90,7 +93,11 @@ public class SeckillActivityController {
     @PreAuthorize("@ss.hasPermission('promotion:seckill-activity:query')")
     public CommonResult<PageResult<SeckillActivityRespVO>> getSeckillActivityPage(@Valid SeckillActivityPageReqVO pageVO) {
         PageResult<SeckillActivityDO> pageResult = seckillActivityService.getSeckillActivityPage(pageVO);
-        return success(SeckillActivityConvert.INSTANCE.convertPage(pageResult));
+        Set<Long> aIds = CollectionUtils.convertSet(pageResult.getList(), SeckillActivityDO::getId);
+        List<SeckillProductDO> seckillProducts = seckillActivityService.getSeckillProductListByActivityId(aIds);
+        Set<Long> spuIds = CollectionUtils.convertSet(pageResult.getList(), SeckillActivityDO::getSpuId);
+        List<ProductSpuRespDTO> spuList = spuApi.getSpuList(spuIds);
+        return success(SeckillActivityConvert.INSTANCE.convertPage(pageResult, seckillProducts, spuList));
     }
 
 }

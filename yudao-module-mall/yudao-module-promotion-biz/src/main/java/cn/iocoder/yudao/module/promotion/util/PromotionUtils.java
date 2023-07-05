@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.util;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
@@ -35,7 +36,8 @@ public class PromotionUtils {
         Set<Long> skuIdsSet = CollectionUtils.convertSet(products, func);
         Set<Long> skuIdsSet1 = CollectionUtils.convertSet(skus, ProductSkuRespDTO::getId);
         // 校验 skuId 是否存在
-        if (!skuIdsSet1.containsAll(skuIdsSet) || !skuIdsSet.containsAll(skuIdsSet1)) {
+        List<Long> f = CollectionUtils.filterList(skuIdsSet, s -> !skuIdsSet1.contains(s));
+        if (CollUtil.isNotEmpty(f)) {
             throw exception(SKU_NOT_EXISTS);
         }
     }
