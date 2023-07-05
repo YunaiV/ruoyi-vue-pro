@@ -45,12 +45,10 @@ docker compose --env-file docker.env up -d
 第一次执行，由于数据库未初始化，因此yudao-server容器会运行失败。执行如下命令初始化数据库：
 
 ```shell
-docker exec -i yudao-mysql \
-    sh -c 'exec mysql -uroot -p"$MYSQL_ROOT_PASSWORD" ruoyi-vue-pro' \
+docker compose exec -T mysql \
+    sh -c 'exec mysql -uroot -p"$MYSQL_ROOT_PASSWORD" --default-character-set=utf8mb4 ruoyi-vue-pro' \
     < ./sql/mysql/ruoyi-vue-pro.sql
 ```
-
-注意：这里用docker compose exec 会出现 `the input device is not a TTY` 报错
 
 ## Server:Port
 

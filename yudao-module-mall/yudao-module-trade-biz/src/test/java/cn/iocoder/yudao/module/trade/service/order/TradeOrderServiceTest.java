@@ -115,7 +115,6 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         when(productSpuApi.getSpuList(eq(asSet(11L, 21L)))).thenReturn(Arrays.asList(spu01, spu02));
         // mock 方法（用户收件地址的校验）
         AddressRespDTO addressRespDTO = new AddressRespDTO().setId(10L).setUserId(userId).setName("芋艿")
-                //.setMobile("15601691300").setAreaId(3306).setPostCode("85757").setDetailAddress("土豆村");
                 .setMobile("15601691300").setAreaId(3306).setDetailAddress("土豆村");
         when(addressApi.getAddress(eq(10L), eq(userId))).thenReturn(addressRespDTO);
         // mock 方法（价格计算）
@@ -177,7 +176,6 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         assertEquals(tradeOrderDO.getPayPrice(), 80);
         assertEquals(tradeOrderDO.getPayOrderId(), 1000L);
         assertNull(tradeOrderDO.getPayChannelCode());
-        assertNull(tradeOrderDO.getDeliveryTemplateId());
         assertNull(tradeOrderDO.getLogisticsId());
         assertEquals(tradeOrderDO.getDeliveryStatus(), TradeOrderDeliveryStatusEnum.UNDELIVERED.getStatus());
         assertNull(tradeOrderDO.getDeliveryTime());

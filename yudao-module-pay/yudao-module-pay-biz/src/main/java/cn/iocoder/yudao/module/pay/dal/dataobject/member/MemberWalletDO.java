@@ -6,8 +6,9 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+// TODO @jason：修改 MemberWalletDO 为 PayWalletDO
 /**
- * 支付-会员钱包 DO
+ * 支付 - 会员钱包 DO
  *
  * @author jason
  */
@@ -22,10 +23,12 @@ public class MemberWalletDO extends BaseDO {
     @TableId
     private Long id;
 
+    // TODO @jaosn：增加 userType 字段；
     /**
      * 用户 id
      *
      * 关联 MemberUserDO 的 id 编号
+     * 关联 AdminUserDO 的 id 编号
      */
     private Long userId;
 

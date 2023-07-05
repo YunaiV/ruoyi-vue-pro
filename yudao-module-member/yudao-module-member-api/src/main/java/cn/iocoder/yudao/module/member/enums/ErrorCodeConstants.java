@@ -23,4 +23,15 @@ public interface ErrorCodeConstants {
     // ========== 用户收件地址 1004004000 ==========
     ErrorCode ADDRESS_NOT_EXISTS = new ErrorCode(1004004000, "用户收件地址不存在");
 
+    //========== 用户积分 1004005000 ==========
+
+    // TODO @xiaqing：错误码要分段；例如说这里，积分配置、积分记录、签到配置、签到记录；分成 4 段；
+
+    ErrorCode SIGN_IN_CONFIG_NOT_EXISTS = new ErrorCode(1004005003, "签到天数规则不存在");
+    ErrorCode SIGN_IN_CONFIG_EXISTS = new ErrorCode(1004005004, "签到天数规则已存在");
+
+    ErrorCode RECORD_NOT_EXISTS = new ErrorCode( 1004005005, "用户积分记录不存在");
+
+    ErrorCode SIGN_IN_RECORD_NOT_EXISTS = new ErrorCode(1004005006, "用户签到积分不存在");
+
 }

@@ -55,8 +55,10 @@ public class AppTradeOrderDetailRespVO {
     @Schema(description = "付款超时时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime payExpireTime;
 
-    @Schema(description = "支付渠道", requiredMode = Schema.RequiredMode.REQUIRED, example = "wx_lite_pay")
+    @Schema(description = "支付渠道", example = "wx_lite_pay")
     private String payChannelCode;
+    @Schema(description = "支付渠道名", example = "微信小程序支付")
+    private String payChannelName;
 
     @Schema(description = "商品原价（总）", requiredMode = Schema.RequiredMode.REQUIRED, example = "1000")
     private Integer totalPrice;
@@ -101,6 +103,9 @@ public class AppTradeOrderDetailRespVO {
 
     @Schema(description = "收件人详细地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "中关村大街 1 号")
     private String receiverDetailAddress;
+
+    @Schema(description = "自提门店编号", example = "1088")
+    private Long pickUpStoreId;
 
     // ========== 售后基本信息 ==========
 

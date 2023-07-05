@@ -25,6 +25,10 @@ public class RedisCaptchaServiceImpl implements CaptchaCacheService {
         return "redis";
     }
 
+    public void setStringRedisTemplate(StringRedisTemplate stringRedisTemplate) {
+        this.stringRedisTemplate = stringRedisTemplate;
+    }
+
     @Override
     public void set(String key, String value, long expiresInSeconds) {
         stringRedisTemplate.opsForValue().set(key, value, expiresInSeconds, TimeUnit.SECONDS);

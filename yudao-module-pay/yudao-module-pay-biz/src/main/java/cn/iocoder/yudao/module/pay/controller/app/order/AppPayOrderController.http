@@ -5,6 +5,6 @@ Authorization: Bearer {{appToken}}
 tenant-id: {{appTenentId}}
 
 {
-  "id": 125,
-  "channelCode": "alipay_qr"
+  "id": 174,
+  "channelCode": "alipay_pc"
 }

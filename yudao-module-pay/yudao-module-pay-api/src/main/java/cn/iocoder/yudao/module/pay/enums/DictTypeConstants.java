@@ -7,6 +7,8 @@ package cn.iocoder.yudao.module.pay.enums;
  */
 public interface DictTypeConstants {
 
+    String CHANNEL_CODE_TYPE = "pay_channel_code_type"; // 支付-渠道名
+
     String ORDER_STATUS = "pay_order_status"; // 支付-订单-订单状态
     String ORDER_NOTIFY_STATUS = "pay_order_notify_status"; // 支付-订单-订单回调商户状态
 

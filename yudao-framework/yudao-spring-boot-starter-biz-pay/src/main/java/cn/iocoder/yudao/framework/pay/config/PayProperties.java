@@ -23,13 +23,4 @@ public class PayProperties {
     @URL(message = "回调地址的格式必须是 URL")
     private String callbackUrl;
 
-    /**
-     * 回跳地址
-     *
-     * 实际上，对应的 PayNotifyController 的 returnCallback 方法的 URL
-     */
-    @URL(message = "回跳地址的格式必须是 URL")
-    @NotEmpty(message = "回跳地址不能为空")
-    private String returnUrl;
-
 }
