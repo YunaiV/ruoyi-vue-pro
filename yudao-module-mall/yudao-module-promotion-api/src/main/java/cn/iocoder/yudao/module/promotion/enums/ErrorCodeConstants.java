@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 
 /**
  * Promotion 错误码枚举类
- *
+ * <p>
  * promotion 系统，使用 1-013-000-000 段
  */
 public interface ErrorCodeConstants {
@@ -58,6 +58,7 @@ public interface ErrorCodeConstants {
     ErrorCode SECKILL_TIME_CONFLICTS = new ErrorCode(1013009001, "秒杀时段冲突");
     ErrorCode SECKILL_TIME_EQUAL = new ErrorCode(1013009002, "秒杀时段开始时间和结束时间不能相等");
     ErrorCode SECKILL_START_TIME_BEFORE_END_TIME = new ErrorCode(1013009003, "秒杀时段开始时间不能在结束时间之后");
+    ErrorCode SECKILL_TIME_DISABLE = new ErrorCode(1013009004, "秒杀时段已关闭");
 
     // ========== 拼团活动 1013010000 ==========
     ErrorCode COMBINATION_ACTIVITY_NOT_EXISTS = new ErrorCode(1013010000, "拼团活动不存在");

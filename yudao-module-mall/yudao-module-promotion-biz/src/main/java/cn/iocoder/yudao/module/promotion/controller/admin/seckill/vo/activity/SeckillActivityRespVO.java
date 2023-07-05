@@ -23,7 +23,7 @@ public class SeckillActivityRespVO extends SeckillActivityBaseVO {
     private Long id;
 
     @Schema(description = "秒杀商品", requiredMode = Schema.RequiredMode.REQUIRED)
-    private List<SeckillProductRespVO> products; // TODO puhui: 考虑是否去除
+    private List<SeckillProductRespVO> products;
 
     @Schema(description = "活动状态 开启：0 禁用：1", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     private Integer status;

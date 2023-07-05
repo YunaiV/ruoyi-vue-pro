@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.promotion.service.seckill.seckillconfig;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigUpdateReqVO;
@@ -127,10 +129,18 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
         if (CollUtil.isEmpty(configIds)) {
             throw exception(SECKILL_TIME_NOT_EXISTS);
         }
-        if (seckillConfigMapper.selectBatchIds(configIds).size() != configIds.size()) {
+        List<SeckillConfigDO> configDOs = seckillConfigMapper.selectBatchIds(configIds);
+        if (CollUtil.isEmpty(configDOs)) {
             throw exception(SECKILL_TIME_NOT_EXISTS);
         }
-        // TODO @puhui999：应该要校验个 status 哈；如果有禁用的，也不行
+        // 过滤出关闭的时段
+        List<SeckillConfigDO> filterList = CollectionUtils.filterList(configDOs, item -> ObjectUtil.equal(item.getStatus(), CommonStatusEnum.DISABLE.getStatus()));
+        if (CollUtil.isNotEmpty(filterList)) {
+            throw exception(SECKILL_TIME_DISABLE);
+        }
+        if (configDOs.size() != configIds.size()) {
+            throw exception(SECKILL_TIME_NOT_EXISTS);
+        }
     }
 
     @Override
