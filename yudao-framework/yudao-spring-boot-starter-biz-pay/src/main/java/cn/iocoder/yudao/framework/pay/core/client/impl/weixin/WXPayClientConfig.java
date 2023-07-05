@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.pay.core.client.impl.wx;
+package cn.iocoder.yudao.framework.pay.core.client.impl.weixin;
 
 import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;

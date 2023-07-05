@@ -5,10 +5,10 @@ import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.*;
-import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXLitePayClient;
-import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXNativePayClient;
-import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPayClientConfig;
-import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPubPayClient;
+import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WXLitePayClient;
+import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WXNativePayClient;
+import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WXPayClientConfig;
+import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WXPubPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import lombok.extern.slf4j.Slf4j;
 

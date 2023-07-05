@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.pay.core.enums;
 import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig;
-import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPayClientConfig;
+import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WXPayClientConfig;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

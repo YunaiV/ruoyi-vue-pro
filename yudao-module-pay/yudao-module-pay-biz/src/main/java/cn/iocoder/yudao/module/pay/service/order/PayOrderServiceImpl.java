@@ -141,7 +141,7 @@ public class PayOrderServiceImpl implements PayOrderService {
         orderExtensionMapper.insert(orderExtension);
 
         // 3. 调用三方接口
-        PayOrderUnifiedReqDTO unifiedOrderReqDTO = PayOrderConvert.INSTANCE.convert2(reqVO)
+        PayOrderUnifiedReqDTO unifiedOrderReqDTO = PayOrderConvert.INSTANCE.convert2(reqVO, userIp)
                 // 商户相关的字段
                 .setMerchantOrderId(orderExtension.getNo()) // 注意，此处使用的是 PayOrderExtensionDO.no 属性！
                 .setSubject(order.getSubject()).setBody(order.getBody())

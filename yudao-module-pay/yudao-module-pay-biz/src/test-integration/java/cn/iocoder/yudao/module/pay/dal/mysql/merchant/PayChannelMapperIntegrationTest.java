@@ -4,7 +4,7 @@ import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayChannelDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig;
-import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPayClientConfig;
+import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WXPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.test.BaseDbIntegrationTest;
 import org.junit.jupiter.api.Test;

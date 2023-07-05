@@ -125,6 +125,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     @Override
     public AppAuthLoginRespVO weixinMiniAppLogin(AppAuthWeixinMiniAppLoginReqVO reqVO) {
         // 获得对应的手机号信息
+        // TODO @芋艿：需要弱化微信小程序的依赖，通过 system 获取手机号
         WxMaPhoneNumberInfo phoneNumberInfo;
         try {
             phoneNumberInfo = wxMaService.getUserService().getNewPhoneNoInfo(reqVO.getPhoneCode());

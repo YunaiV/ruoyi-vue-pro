@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.member.controller.app.weixin;
+package cn.iocoder.yudao.module.system.controller.app.weixin;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,7 +19,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "微信公众号")
 @RestController
-@RequestMapping("/member/wx-mp")
+@RequestMapping("/system/wx-mp")
 @Validated
 @Slf4j
 public class AppWxMpController {
@@ -27,6 +27,7 @@ public class AppWxMpController {
     @Resource
     private WxMpService mpService;
 
+    // TODO @芋艿：需要额外考虑个问题；多租户下，如果每个小程序一个微信公众号，则会存在多个 appid；
     @PostMapping("/create-jsapi-signature")
     @Operation(summary = "创建微信 JS SDK 初始化所需的签名",
         description = "参考 https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html 文档")

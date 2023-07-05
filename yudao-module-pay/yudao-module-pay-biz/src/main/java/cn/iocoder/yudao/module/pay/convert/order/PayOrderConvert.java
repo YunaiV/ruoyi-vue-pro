@@ -94,7 +94,7 @@ public interface PayOrderConvert {
     @Mapping(target = "id", ignore = true)
     PayOrderExtensionDO convert(PayOrderSubmitReqVO bean, String userIp);
 
-    PayOrderUnifiedReqDTO convert2(PayOrderSubmitReqVO reqVO);
+    PayOrderUnifiedReqDTO convert2(PayOrderSubmitReqVO reqVO, String userIp);
 
     PayOrderSubmitRespVO convert(PayOrderUnifiedRespDTO bean);
 
