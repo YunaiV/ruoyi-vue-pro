@@ -28,6 +28,10 @@ public class WxPubPayClient extends AbstractWxPayClient {
         super(channelId, PayChannelEnum.WX_PUB.getCode(), config);
     }
 
+    protected WxPubPayClient(Long channelId, String channelCode, WxPayClientConfig config) {
+        super(channelId, channelCode, config);
+    }
+
     @Override
     protected void doInit() {
         super.doInit(WxPayConstants.TradeType.JSAPI);
