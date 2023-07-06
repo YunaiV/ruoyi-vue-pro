@@ -25,16 +25,16 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 
 /**
- * 支付宝抽象类， 实现支付宝统一的接口。如退款
+ * 支付宝抽象类，实现支付宝统一的接口、以及部分实现（退款）
  *
- * @author  jason
+ * @author jason
  */
 @Slf4j
-public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayClientConfig> {
+public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPayClientConfig> {
 
     protected DefaultAlipayClient client;
 
-    public AbstractAlipayClient(Long channelId, String channelCode, AlipayPayClientConfig config) {
+    public AbstractAlipayPayClient(Long channelId, String channelCode, AlipayPayClientConfig config) {
         super(channelId, channelCode, config);
     }
 
@@ -106,9 +106,11 @@ public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayCl
                     .build();
         }
         // 2.2 支付的情况
-        return PayOrderNotifyRespDTO.builder().orderExtensionNo(bodyObj.get("out_trade_no"))
-                .channelOrderNo(bodyObj.get("trade_no")).channelUserId(bodyObj.get("seller_id"))
-                .tradeStatus(bodyObj.get("trade_status")).successTime(parseTime(params.get("notify_time")))
+        return PayOrderNotifyRespDTO.builder()
+                .orderExtensionNo(bodyObj.get("out_trade_no"))
+                .channelOrderNo(bodyObj.get("trade_no"))
+                .channelUserId(bodyObj.get("seller_id"))
+                .successTime(parseTime(params.get("notify_time")))
                 .build();
     }
 

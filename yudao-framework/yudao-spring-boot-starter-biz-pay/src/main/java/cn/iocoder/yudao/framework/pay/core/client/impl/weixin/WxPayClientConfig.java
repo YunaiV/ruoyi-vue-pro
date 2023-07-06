@@ -18,15 +18,17 @@ import java.util.Set;
  * @author 芋道源码
  */
 @Data
-public class WXPayClientConfig implements PayClientConfig {
+public class WxPayClientConfig implements PayClientConfig {
 
     /**
      * API 版本 - V2
+     *
      * https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=4_1
      */
     public static final String API_VERSION_V2 = "v2";
     /**
      * API 版本 - V3
+     *
      * https://pay.weixin.qq.com/wiki/doc/apiv3/wechatpay/wechatpay-1.shtml
      */
     public static final String API_VERSION_V3 = "v3";

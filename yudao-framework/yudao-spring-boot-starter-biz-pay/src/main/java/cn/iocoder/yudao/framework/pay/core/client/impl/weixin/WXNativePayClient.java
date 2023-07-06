@@ -37,11 +37,11 @@ import java.util.Objects;
  * @author zwy
  */
 @Slf4j
-public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
+public class WXNativePayClient extends AbstractPayClient<WxPayClientConfig> {
 
     private WxPayService client;
 
-    public WXNativePayClient(Long channelId, WXPayClientConfig config) {
+    public WXNativePayClient(Long channelId, WxPayClientConfig config) {
         super(channelId, PayChannelEnum.WX_NATIVE.getCode(), config);
     }
 
@@ -134,9 +134,9 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
         log.info("微信支付回调data数据:{}", data.getBody());
         // 微信支付 v2 回调结果处理
         switch (config.getApiVersion()) {
-            case WXPayClientConfig.API_VERSION_V2:
+            case WxPayClientConfig.API_VERSION_V2:
                 return parseOrderNotifyV2(data);
-            case WXPayClientConfig.API_VERSION_V3:
+            case WxPayClientConfig.API_VERSION_V3:
                 return parseOrderNotifyV3(data);
             default:
                 throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));

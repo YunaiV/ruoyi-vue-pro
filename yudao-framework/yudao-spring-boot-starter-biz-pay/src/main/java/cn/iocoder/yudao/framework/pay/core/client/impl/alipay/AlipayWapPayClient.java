@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author 芋道源码
  */
 @Slf4j
-public class AlipayWapPayClient extends AbstractAlipayClient {
+public class AlipayWapPayClient extends AbstractAlipayPayClient {
 
     public AlipayWapPayClient(Long channelId, AlipayPayClientConfig config) {
         super(channelId, PayChannelEnum.ALIPAY_WAP.getCode(), config);

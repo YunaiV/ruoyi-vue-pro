@@ -7,8 +7,8 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDT
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayQrPayClient;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayWapPayClient;
-import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WXPayClientConfig;
-import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WXPubPayClient;
+import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WxPayClientConfig;
+import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WxPubPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -27,15 +27,15 @@ public class PayClientFactoryImplIntegrationTest {
     private final PayClientFactoryImpl payClientFactory = new PayClientFactoryImpl();
 
     /**
-     * {@link WXPubPayClient} 的 V2 版本
+     * {@link WxPubPayClient} 的 V2 版本
      */
     @Test
     public void testCreatePayClient_WX_PUB_V2() {
         // 创建配置
-        WXPayClientConfig config = new WXPayClientConfig();
+        WxPayClientConfig config = new WxPayClientConfig();
         config.setAppId("wx041349c6f39b268b");
         config.setMchId("1545083881");
-        config.setApiVersion(WXPayClientConfig.API_VERSION_V2);
+        config.setApiVersion(WxPayClientConfig.API_VERSION_V2);
         config.setMchKey("0alL64UDQdlCwiKZ73ib7ypaIjMns06p");
         // 创建客户端
         Long channelId = RandomUtil.randomLong();
@@ -48,15 +48,15 @@ public class PayClientFactoryImplIntegrationTest {
     }
 
     /**
-     * {@link WXPubPayClient} 的 V3 版本
+     * {@link WxPubPayClient} 的 V3 版本
      */
     @Test
     public void testCreatePayClient_WX_PUB_V3() throws FileNotFoundException {
         // 创建配置
-        WXPayClientConfig config = new WXPayClientConfig();
+        WxPayClientConfig config = new WxPayClientConfig();
         config.setAppId("wx041349c6f39b268b");
         config.setMchId("1545083881");
-        config.setApiVersion(WXPayClientConfig.API_VERSION_V3);
+        config.setApiVersion(WxPayClientConfig.API_VERSION_V3);
         config.setPrivateKeyContent(IoUtil.readUtf8(new FileInputStream("/Users/yunai/Downloads/wx_pay/apiclient_key.pem")));
         config.setPrivateCertContent(IoUtil.readUtf8(new FileInputStream("/Users/yunai/Downloads/wx_pay/apiclient_cert.pem")));
         config.setApiV3Key("joerVi8y5DJ3o4ttA0o1uH47Xz1u2Ase");

@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig;
-import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WXPayClientConfig;
+import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WxPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel.PayChannelCreateReqVO;
@@ -49,7 +49,7 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
     @Test
     public void testCreateWechatVersion2Channel_success() {
         // 准备参数
-        WXPayClientConfig v2Config = getV2Config();
+        WxPayClientConfig v2Config = getV2Config();
         PayChannelCreateReqVO reqVO = randomPojo(PayChannelCreateReqVO.class, o -> {
             o.setCode(PayChannelEnum.WX_PUB.getCode());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
@@ -70,7 +70,7 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
     @Test
     public void testCreateWechatVersion3Channel_success() {
         // 准备参数
-        WXPayClientConfig v3Config = getV3Config();
+        WxPayClientConfig v3Config = getV3Config();
         PayChannelCreateReqVO reqVO = randomPojo(PayChannelCreateReqVO.class, o -> {
             o.setCode(PayChannelEnum.WX_PUB.getCode());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
@@ -346,22 +346,22 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         assertPojoEquals(payClientConfig, list.get(0).getConfig());
     }
 
-    public WXPayClientConfig getV2Config() {
-        return new WXPayClientConfig()
+    public WxPayClientConfig getV2Config() {
+        return new WxPayClientConfig()
                 .setAppId("APP00001")
                 .setMchId("MCH00001")
-                .setApiVersion(WXPayClientConfig.API_VERSION_V2)
+                .setApiVersion(WxPayClientConfig.API_VERSION_V2)
                 .setMchKey("dsa1d5s6a1d6sa16d1sa56d15a61das6")
                 .setApiV3Key("")
                 .setPrivateCertContent("")
                 .setPrivateKeyContent("");
     }
 
-    public WXPayClientConfig getV3Config() {
-        return new WXPayClientConfig()
+    public WxPayClientConfig getV3Config() {
+        return new WxPayClientConfig()
                 .setAppId("APP00001")
                 .setMchId("MCH00001")
-                .setApiVersion(WXPayClientConfig.API_VERSION_V3)
+                .setApiVersion(WxPayClientConfig.API_VERSION_V3)
                 .setMchKey("")
                 .setApiV3Key("sdadasdsadadsa")
                 .setPrivateKeyContent("dsa445das415d15asd16ad156as")

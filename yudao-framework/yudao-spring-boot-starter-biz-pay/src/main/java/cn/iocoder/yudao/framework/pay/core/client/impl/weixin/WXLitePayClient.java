@@ -39,11 +39,11 @@ import java.util.Objects;
  * @author zwy
  */
 @Slf4j
-public class WXLitePayClient extends AbstractPayClient<WXPayClientConfig> {
+public class WXLitePayClient extends AbstractPayClient<WxPayClientConfig> {
 
     private WxPayService client;
 
-    public WXLitePayClient(Long channelId, WXPayClientConfig config) {
+    public WXLitePayClient(Long channelId, WxPayClientConfig config) {
         super(channelId, PayChannelEnum.WX_LITE.getCode(), config);
     }
 
@@ -99,7 +99,7 @@ public class WXLitePayClient extends AbstractPayClient<WXPayClientConfig> {
         WxPayUnifiedOrderRequest request = WxPayUnifiedOrderRequest.newBuilder()
                 .outTradeNo(reqDTO.getMerchantOrderId())
                 .body(reqDTO.getBody())
-                .totalFee(reqDTO.getAmount().intValue()) // 单位分
+                .totalFee(reqDTO.getAmount()) // 单位分
                 .timeExpire(DateUtil.format(reqDTO.getExpireTime(), "yyyyMMddHHmmss")) // v2的时间格式
                 .spbillCreateIp(reqDTO.getUserIp())
                 .openid(getOpenid(reqDTO))
@@ -117,9 +117,7 @@ public class WXLitePayClient extends AbstractPayClient<WXPayClientConfig> {
         request.setDescription(reqDTO.getBody());
         request.setAmount(new WxPayUnifiedOrderV3Request
                 .Amount()
-                .setTotal(reqDTO
-                        .getAmount()
-                        .intValue())); // 单位分
+                .setTotal(reqDTO.getAmount())); // 单位分
         request.setTimeExpire(DateUtil.format(Date.from(reqDTO.getExpireTime().atZone(ZoneId.systemDefault()).toInstant()), "yyyy-MM-dd'T'HH:mm:ssXXX")); // v3的时间格式
         request.setPayer(new WxPayUnifiedOrderV3Request.Payer().setOpenid(getOpenid(reqDTO)));
         request.setSceneInfo(new WxPayUnifiedOrderV3Request.SceneInfo().setPayerClientIp(reqDTO.getUserIp()));
@@ -149,9 +147,9 @@ public class WXLitePayClient extends AbstractPayClient<WXPayClientConfig> {
         log.info("[parseOrderNotify][微信支付回调data数据:{}]", data.getBody());
         // 微信支付 v2 回调结果处理
         switch (config.getApiVersion()) {
-            case WXPayClientConfig.API_VERSION_V2:
+            case WxPayClientConfig.API_VERSION_V2:
                 return parseOrderNotifyV2(data);
-            case WXPayClientConfig.API_VERSION_V3:
+            case WxPayClientConfig.API_VERSION_V3:
                 return parseOrderNotifyV3(data);
             default:
                 throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));

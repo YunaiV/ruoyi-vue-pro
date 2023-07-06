@@ -24,7 +24,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
  * @author 芋道源码
  */
 @Slf4j
-public class AlipayBarPayClient extends AbstractAlipayClient {
+public class AlipayBarPayClient extends AbstractAlipayPayClient {
 
     public AlipayBarPayClient(Long channelId, AlipayPayClientConfig config) {
         super(channelId, PayChannelEnum.ALIPAY_BAR.getCode(), config);
