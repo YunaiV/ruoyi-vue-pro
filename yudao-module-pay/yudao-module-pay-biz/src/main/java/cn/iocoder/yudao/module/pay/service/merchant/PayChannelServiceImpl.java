@@ -24,7 +24,6 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.validation.Validator;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -41,11 +40,6 @@ import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.CHANNEL_NOT_E
 @Slf4j
 @Validated
 public class PayChannelServiceImpl implements PayChannelService {
-
-    /**
-     * 缓存菜单的最大更新时间，用于后续的增量轮询，判断是否有更新
-     */
-    private volatile LocalDateTime maxUpdateTime;
 
     @Resource
     private PayClientFactory payClientFactory;
@@ -122,11 +116,6 @@ public class PayChannelServiceImpl implements PayChannelService {
     }
 
     @Override
-    public List<PayChannelDO> getChannelList(Collection<Long> ids) {
-        return channelMapper.selectBatchIds(ids);
-    }
-
-    @Override
     public PageResult<PayChannelDO> getChannelPage(PayChannelPageReqVO pageReqVO) {
         return channelMapper.selectPage(pageReqVO);
     }
@@ -145,20 +134,6 @@ public class PayChannelServiceImpl implements PayChannelService {
     @Override
     public List<PayChannelDO> getChannelListByAppIds(Collection<Long> appIds) {
         return channelMapper.getChannelListByAppIds(appIds);
-    }
-
-
-    /**
-     * 根据条件获取渠道数量
-     *
-     * @param merchantId 商户编号
-     * @param appid      应用编号
-     * @param code       渠道编码
-     * @return 数量
-     */
-    @Override
-    public Integer getChannelCountByConditions(Long merchantId, Long appid, String code) {
-        return this.channelMapper.selectCount(merchantId, appid, code);
     }
 
     /**
@@ -204,8 +179,13 @@ public class PayChannelServiceImpl implements PayChannelService {
     @Override
     public PayChannelDO validPayChannel(Long appId, String code) {
         PayChannelDO channel = channelMapper.selectByAppIdAndCode(appId, code);
-        this.validPayChannel(channel);
+        validPayChannel(channel);
         return channel;
+    }
+
+    @Override
+    public List<PayChannelDO> getEnableChannelList(Long appId) {
+        return channelMapper.selectListByAppId(appId, CommonStatusEnum.ENABLE.getStatus());
     }
 
     private void validPayChannel(PayChannelDO channel) {
@@ -216,4 +196,5 @@ public class PayChannelServiceImpl implements PayChannelService {
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.PAY_CHANNEL_IS_DISABLE);
         }
     }
+
 }

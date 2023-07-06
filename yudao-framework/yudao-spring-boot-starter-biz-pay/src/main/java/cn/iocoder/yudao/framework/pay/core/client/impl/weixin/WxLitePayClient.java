@@ -11,9 +11,9 @@ import lombok.extern.slf4j.Slf4j;
  * @author zwy
  */
 @Slf4j
-public class WXLitePayClient extends WxPubPayClient {
+public class WxLitePayClient extends WxPubPayClient {
 
-    public WXLitePayClient(Long channelId, WxPayClientConfig config) {
+    public WxLitePayClient(Long channelId, WxPayClientConfig config) {
         super(channelId, PayChannelEnum.WX_LITE.getCode(), config);
     }
 

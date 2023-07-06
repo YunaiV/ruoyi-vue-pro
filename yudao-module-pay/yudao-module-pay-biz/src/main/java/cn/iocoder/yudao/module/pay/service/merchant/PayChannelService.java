@@ -55,15 +55,6 @@ public interface PayChannelService {
     PayChannelDO getChannel(Long id);
 
     /**
-     * 获得支付渠道列表
-     *
-     * @param ids 编号
-     * @return 支付渠道
-     * 列表
-     */
-    List<PayChannelDO> getChannelList(Collection<Long> ids);
-
-    /**
      * 获得支付渠道分页
      *
      * @param pageReqVO 分页查询
@@ -88,16 +79,6 @@ public interface PayChannelService {
      * @return 支付渠道列表
      */
     List<PayChannelDO> getChannelListByAppIds(Collection<Long> appIds);
-
-    /**
-     * 根据条件获取渠道数量
-     *
-     * @param merchantId 商户编号
-     * @param appid      应用编号
-     * @param code       渠道编码
-     * @return 数量
-     */
-    Integer getChannelCountByConditions(Long merchantId, Long appid, String code);
 
     /**
      * 根据条件获取渠道
@@ -129,5 +110,13 @@ public interface PayChannelService {
      * @return 渠道信息
      */
     PayChannelDO validPayChannel(Long appId, String code);
+
+    /**
+     * 获得指定应用的开启的渠道列表
+     *
+     * @param appId 应用编号
+     * @return 渠道列表
+     */
+    List<PayChannelDO> getEnableChannelList(Long appId);
 
 }

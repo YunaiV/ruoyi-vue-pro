@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.pay.dal.mysql.merchant;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel.PayChannelExportReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel.PayChannelPageReqVO;
@@ -44,21 +45,6 @@ public interface PayChannelMapper extends BaseMapperX<PayChannelDO> {
     }
 
     /**
-     * 根据条件获取渠道数量
-     *
-     * @param merchantId 商户编号
-     * @param appid      应用编号
-     * @param code       渠道编码
-     * @return 数量
-     */
-    default Integer selectCount(Long merchantId, Long appid, String code) {
-        return this.selectCount(new QueryWrapper<PayChannelDO>().lambda()
-                .eq(PayChannelDO::getMerchantId, merchantId)
-                .eq(PayChannelDO::getAppId, appid)
-                .eq(PayChannelDO::getCode, code)).intValue();
-    }
-
-    /**
      * 根据条件获取渠道
      *
      * @param merchantId 商户编号
@@ -84,6 +70,12 @@ public interface PayChannelMapper extends BaseMapperX<PayChannelDO> {
     default List<PayChannelDO> getChannelListByAppIds(Collection<Long> appIds){
         return this.selectList(new QueryWrapper<PayChannelDO>().lambda()
                 .in(PayChannelDO::getAppId, appIds));
+    }
+
+    default List<PayChannelDO> selectListByAppId(Long appId, Integer status) {
+        return selectList(new LambdaQueryWrapperX<PayChannelDO>()
+                .eq(PayChannelDO::getAppId, appId)
+                .eq(PayChannelDO::getStatus, status));
     }
 
 }

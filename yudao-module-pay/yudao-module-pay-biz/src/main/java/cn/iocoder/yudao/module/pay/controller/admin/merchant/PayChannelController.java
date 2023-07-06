@@ -1,17 +1,17 @@
 package cn.iocoder.yudao.module.pay.controller.admin.merchant;
 
-import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel.*;
-import cn.iocoder.yudao.module.pay.convert.channel.PayChannelConvert;
-import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayChannelDO;
-import cn.iocoder.yudao.module.pay.service.merchant.PayChannelService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel.*;
+import cn.iocoder.yudao.module.pay.convert.channel.PayChannelConvert;
+import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayChannelDO;
+import cn.iocoder.yudao.module.pay.service.merchant.PayChannelService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +20,11 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Tag(name = "管理后台 - 支付渠道")
@@ -68,16 +69,6 @@ public class PayChannelController {
         return success(PayChannelConvert.INSTANCE.convert(channel));
     }
 
-    @GetMapping("/list")
-    @Operation(summary = "获得支付渠道列表")
-    @Parameter(name = "ids", description = "编号列表",
-            required = true, example = "1024,2048")
-    @PreAuthorize("@ss.hasPermission('pay:channel:query')")
-    public CommonResult<List<PayChannelRespVO>> getChannelList(@RequestParam("ids") Collection<Long> ids) {
-        List<PayChannelDO> list = channelService.getChannelList(ids);
-        return success(PayChannelConvert.INSTANCE.convertList(list));
-    }
-
     @GetMapping("/page")
     @Operation(summary = "获得支付渠道分页")
     @PreAuthorize("@ss.hasPermission('pay:channel:query')")
@@ -98,6 +89,7 @@ public class PayChannelController {
         ExcelUtils.write(response, "支付渠道.xls", "数据", PayChannelExcelVO.class, datas);
     }
 
+    // TODO 芋艿：需要 review 下实现
     @GetMapping("/get-channel")
     @Operation(summary = "根据条件查询微信支付渠道")
     @Parameters({
@@ -119,6 +111,14 @@ public class PayChannelController {
         // 拼凑数据
         PayChannelRespVO respVo = PayChannelConvert.INSTANCE.convert(channel);
         return success(respVo);
+    }
+
+    @GetMapping("/get-enable-code-list")
+    @Operation(summary = "获得指定应用的开启的支付渠道编码列表")
+    @Parameter(name = "appId", description = "应用编号", required = true, example = "1")
+    public CommonResult<Set<String>> getEnableChannelCodeList(@RequestParam("appId") Long appId) {
+        List<PayChannelDO> channels = channelService.getEnableChannelList(appId);
+        return success(convertSet(channels, PayChannelDO::getCode));
     }
 
 }
