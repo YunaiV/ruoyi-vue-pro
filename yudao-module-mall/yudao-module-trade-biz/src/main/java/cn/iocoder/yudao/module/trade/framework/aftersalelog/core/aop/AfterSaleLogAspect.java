@@ -32,10 +32,6 @@ import static java.util.Arrays.asList;
 @Aspect
 public class AfterSaleLogAspect {
 
-    private final static String OPERATE_TYPE = "operateType";
-    private final static String ID = "id";
-    private final static String CONTENT = "content";
-
     @Resource
     private AfterSaleLogService afterSaleLogService;
 
@@ -89,24 +85,5 @@ public class AfterSaleLogAspect {
         return ObjectUtil.isNotNull(afterSaleOperateTypeEnum) ?
                 content.append(afterSaleOperateTypeEnum.getDescription()).toString() : content.toString();
     }
-
-    //   public static Map<String, Object> spelFormat(JoinPoint joinPoint, Object info) {
-    //        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-    //        AfterSaleLog afterSaleLogPoint = signature.getMethod().getAnnotation(AfterSaleLog.class);
-    //        HashMap<String, Object> result = Maps.newHashMapWithExpectedSize(2);
-    //        Map<String, Object> spelMap = SpringExpressionUtils.parseExpression(joinPoint, info,
-    //                asList(afterSaleLogPoint.id(), afterSaleLogPoint.content()));
-    //
-    //        // 售后ID
-    //        result.put(ID, MapUtil.getLong(spelMap, afterSaleLogPoint.id()));
-    //        // 操作类型
-    //        result.put(OPERATE_TYPE, afterSaleLogPoint.operateType().getType());
-    //        // 日志内容
-    //        StringBuilder content = new StringBuilder().append(MapUtil.getStr(spelMap, afterSaleLogPoint.content()));
-    //
-    //        result.put(CONTENT, ObjectUtil.isNotNull(afterSaleLogPoint.operateType()) ?
-    //                content.append(afterSaleLogPoint.operateType().getDescription()).toString() : content.toString());
-    //        return result;
-    //    }
 
 }
