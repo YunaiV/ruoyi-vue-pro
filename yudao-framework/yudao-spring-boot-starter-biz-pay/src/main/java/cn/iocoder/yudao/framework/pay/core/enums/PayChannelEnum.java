@@ -9,7 +9,6 @@ import lombok.Getter;
 
 /**
  * 支付渠道的编码的枚举
- * 枚举值
  *
  * @author 芋道源码
  */
@@ -21,6 +20,7 @@ public enum PayChannelEnum {
     WX_LITE("wx_lite", "微信小程序支付", WxPayClientConfig.class),
     WX_APP("wx_app", "微信 App 支付", WxPayClientConfig.class),
     WX_NATIVE("wx_native", "微信 native 支付", WxPayClientConfig.class),
+    WX_BAR("wx_bar", "微信付款码支付", WxPayClientConfig.class),
 
     ALIPAY_PC("alipay_pc", "支付宝 PC 网站支付", AlipayPayClientConfig.class),
     ALIPAY_WAP("alipay_wap", "支付宝 Wap 网站支付", AlipayPayClientConfig.class),

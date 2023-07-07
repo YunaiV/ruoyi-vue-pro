@@ -42,7 +42,8 @@ public class WxPubPayClient extends AbstractWxPayClient {
         // 构建 WxPayUnifiedOrderRequest 对象
         WxPayUnifiedOrderRequest request = WxPayUnifiedOrderRequest.newBuilder()
                 .outTradeNo(reqDTO.getMerchantOrderId())
-                .body(reqDTO.getBody())
+                .body(reqDTO.getSubject())
+                .detail(reqDTO.getBody())
                 .totalFee(reqDTO.getAmount()) // 单位分
                 .timeExpire(formatDateV2(reqDTO.getExpireTime()))
                 .spbillCreateIp(reqDTO.getUserIp())
@@ -62,7 +63,7 @@ public class WxPubPayClient extends AbstractWxPayClient {
         // 构建 WxPayUnifiedOrderRequest 对象
         WxPayUnifiedOrderV3Request request = new WxPayUnifiedOrderV3Request();
         request.setOutTradeNo(reqDTO.getMerchantOrderId());
-        request.setDescription(reqDTO.getBody());
+        request.setDescription(reqDTO.getSubject());
         request.setAmount(new WxPayUnifiedOrderV3Request.Amount().setTotal(reqDTO.getAmount())); // 单位分
         request.setTimeExpire(formatDateV3(reqDTO.getExpireTime()));
         request.setPayer(new WxPayUnifiedOrderV3Request.Payer().setOpenid(getOpenid(reqDTO)));

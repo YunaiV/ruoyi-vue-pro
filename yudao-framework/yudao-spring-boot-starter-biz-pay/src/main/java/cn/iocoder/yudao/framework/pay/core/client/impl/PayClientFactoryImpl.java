@@ -5,10 +5,7 @@ import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.*;
-import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WxLitePayClient;
-import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WXNativePayClient;
-import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WxPayClientConfig;
-import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WxPubPayClient;
+import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.*;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import lombok.extern.slf4j.Slf4j;
 
@@ -58,11 +55,14 @@ public class PayClientFactoryImpl implements PayClientFactory {
         PayChannelEnum channelEnum = PayChannelEnum.getByCode(channelCode);
         Assert.notNull(channelEnum, String.format("支付渠道(%s) 为空", channelEnum));
         // 创建客户端
-        // TODO @芋艿 WX_LITE WX_APP 如果不添加在 项目启动的时候去初始化会报错无法启动。所以我手动加了两个，具体需要你来配
+        // TODO @芋艿 WX_APP 如果不添加在 项目启动的时候去初始化会报错无法启动。所以我手动加了两个，具体需要你来配
         switch (channelEnum) {
+            // 微信支付
             case WX_PUB: return (AbstractPayClient<Config>) new WxPubPayClient(channelId, (WxPayClientConfig) config);
             case WX_LITE: return (AbstractPayClient<Config>) new WxLitePayClient(channelId, (WxPayClientConfig) config);
             case WX_APP: return (AbstractPayClient<Config>) new WxPubPayClient(channelId, (WxPayClientConfig) config);
+            case WX_BAR: return (AbstractPayClient<Config>) new WxBarPayClient(channelId, (WxPayClientConfig) config);
+            // 支付宝支付
             case WX_NATIVE: return (AbstractPayClient<Config>) new WXNativePayClient(channelId, (WxPayClientConfig) config);
             case ALIPAY_WAP: return (AbstractPayClient<Config>) new AlipayWapPayClient(channelId, (AlipayPayClientConfig) config);
             case ALIPAY_QR: return (AbstractPayClient<Config>) new AlipayQrPayClient(channelId, (AlipayPayClientConfig) config);
