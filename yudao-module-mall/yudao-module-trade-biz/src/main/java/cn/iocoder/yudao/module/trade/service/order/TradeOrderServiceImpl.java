@@ -31,16 +31,21 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageRe
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
+import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleLogDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.cart.TradeCartDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.order.OrderLogDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
+import cn.iocoder.yudao.module.trade.dal.mysql.order.OrderLogMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderItemMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
 import cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.*;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
+import cn.iocoder.yudao.module.trade.framework.order.core.dto.TradeOrderLogCreateReqDTO;
+import cn.iocoder.yudao.module.trade.framework.order.core.service.OrderLogService;
 import cn.iocoder.yudao.module.trade.service.cart.TradeCartService;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
 import cn.iocoder.yudao.module.trade.service.price.TradePriceService;
@@ -57,6 +62,7 @@ import java.util.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getSumValue;
+import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.PAY_ORDER_NOT_FOUND;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
@@ -68,10 +74,12 @@ import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
  */
 @Service
 @Slf4j
-public class TradeOrderServiceImpl implements TradeOrderService {
+public class TradeOrderServiceImpl implements TradeOrderService, OrderLogService {
 
     @Resource
     private TradeOrderMapper tradeOrderMapper;
+    @Resource
+    private OrderLogMapper orderLogMapper;
     @Resource
     private TradeOrderItemMapper tradeOrderItemMapper;
 
@@ -568,4 +576,25 @@ public class TradeOrderServiceImpl implements TradeOrderService {
                 TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus()));
     }
 
+    /**
+     * 创建交易下单日志
+     *
+     * @param logDTO 日志记录
+     * @author 陈賝
+     * @since 2023/7/6 15:45
+     */
+    @Override
+    public void createLog(TradeOrderLogCreateReqDTO logDTO) {
+        try {
+            OrderLogDO orderLogDO = new OrderLogDO()
+                    .setUserId(logDTO.getUserId())
+                    .setUserType(logDTO.getUserType())
+                    .setOrderId(logDTO.getOrderId())
+                    .setOperateType(logDTO.getOperateType())
+                    .setContent(logDTO.getContent());
+            orderLogMapper.insert(orderLogDO);
+        } catch (Exception exception) {
+            log.error("[createLog][request({}) 日志记录错误]", toJsonString(logDTO), exception);
+        }
+    }
 }
