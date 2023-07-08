@@ -7,8 +7,8 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDT
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedRespDTO;
-import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
-import cn.iocoder.yudao.framework.pay.core.enums.PayDisplayModeEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderV3Request;
@@ -58,8 +58,8 @@ public class WxPubPayClient extends AbstractWxPayClient {
         WxPayMpOrderResult response = client.createOrder(request);
 
         // 转换结果
-        return new PayOrderUnifiedRespDTO().setDisplayMode(PayDisplayModeEnum.CUSTOM.getMode())
-                .setDisplayContent(JsonUtils.toJsonString(response));
+        return new PayOrderUnifiedRespDTO(PayOrderDisplayModeEnum.CUSTOM.getMode(),
+                JsonUtils.toJsonString(response));
     }
 
     @Override
@@ -77,8 +77,8 @@ public class WxPubPayClient extends AbstractWxPayClient {
         WxPayUnifiedOrderV3Result.JsapiResult response = client.createOrderV3(TradeTypeEnum.JSAPI, request);
 
         // 转换结果
-        return new PayOrderUnifiedRespDTO().setDisplayMode(PayDisplayModeEnum.CUSTOM.getMode())
-                .setDisplayContent(JsonUtils.toJsonString(response));
+        return new PayOrderUnifiedRespDTO(PayOrderDisplayModeEnum.CUSTOM.getMode(),
+                JsonUtils.toJsonString(response));
     }
 
     @Override

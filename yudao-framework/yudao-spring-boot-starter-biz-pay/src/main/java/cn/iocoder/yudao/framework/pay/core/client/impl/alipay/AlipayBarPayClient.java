@@ -4,8 +4,8 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
-import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
-import cn.iocoder.yudao.framework.pay.core.enums.PayDisplayModeEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.domain.AlipayTradePayModel;
 import com.alipay.api.request.AlipayTradePayRequest;
@@ -47,7 +47,7 @@ public class AlipayBarPayClient extends AbstractAlipayPayClient {
         // ② 个性化的参数
         model.setAuthCode(authCode);
         // ③ 支付宝条码支付只有一种展示
-        String displayMode = PayDisplayModeEnum.BAR_CODE.getMode();
+        String displayMode = PayOrderDisplayModeEnum.BAR_CODE.getMode();
 
         // 1.2 构建 AlipayTradePayRequest 请求
         AlipayTradePayRequest request = new AlipayTradePayRequest();
@@ -59,8 +59,7 @@ public class AlipayBarPayClient extends AbstractAlipayPayClient {
         AlipayTradePayResponse response = client.execute(request);
         // 2.2 处理结果
         validateUnifiedOrderResponse(request, response);
-        return new PayOrderUnifiedRespDTO()
-                .setDisplayMode(displayMode).setDisplayContent("");
+        return new PayOrderUnifiedRespDTO(displayMode, "");
     }
 
 }

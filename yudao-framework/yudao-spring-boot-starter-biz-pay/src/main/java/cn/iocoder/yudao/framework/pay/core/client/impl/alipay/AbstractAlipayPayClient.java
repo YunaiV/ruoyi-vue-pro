@@ -10,7 +10,7 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayRefundNotifyResp
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
-import cn.iocoder.yudao.framework.pay.core.enums.PayNotifyRefundStatusEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.refund.PayNotifyRefundStatusEnum;
 import com.alipay.api.*;
 import com.alipay.api.domain.AlipayTradeRefundModel;
 import com.alipay.api.internal.util.AlipaySignature;

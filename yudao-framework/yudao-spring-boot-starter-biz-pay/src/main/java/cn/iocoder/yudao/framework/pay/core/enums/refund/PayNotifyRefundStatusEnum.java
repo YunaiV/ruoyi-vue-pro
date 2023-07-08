@@ -1,5 +1,6 @@
-package cn.iocoder.yudao.framework.pay.core.enums;
+package cn.iocoder.yudao.framework.pay.core.enums.refund;
 
+// TODO 芋艿：看看能不能去掉
 /**
  * 退款通知, 统一的渠道退款状态
  *

@@ -1,16 +1,16 @@
-package cn.iocoder.yudao.framework.pay.core.enums;
+package cn.iocoder.yudao.framework.pay.core.enums.refund;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 渠道统一的退款返回结果
+ * 渠道的退款状态枚举
  *
- * @author  jason
+ * @author jason
  */
 @Getter
 @AllArgsConstructor
-public enum PayChannelRefundRespEnum {
+public enum PayRefundRespEnum {
 
     SUCCESS(1, "退款成功"),
     FAILURE(2, "退款失败"),

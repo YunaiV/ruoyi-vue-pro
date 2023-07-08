@@ -7,8 +7,8 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDT
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedRespDTO;
-import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
-import cn.iocoder.yudao.framework.pay.core.enums.PayDisplayModeEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
 import com.github.binarywang.wxpay.bean.request.WxPayMicropayRequest;
 import com.github.binarywang.wxpay.bean.result.WxPayMicropayResult;
 import com.github.binarywang.wxpay.constant.WxPayConstants;
@@ -44,8 +44,8 @@ public class WxBarPayClient extends AbstractWxPayClient {
 
         // 转换结果
         // TODO 芋艿：这里后面要看看
-        return new PayOrderUnifiedRespDTO().setDisplayMode(PayDisplayModeEnum.CUSTOM.getMode())
-                .setDisplayContent(JsonUtils.toJsonString(response));
+        return new PayOrderUnifiedRespDTO(PayOrderDisplayModeEnum.CUSTOM.getMode(),
+                JsonUtils.toJsonString(response));
     }
 
     @Override

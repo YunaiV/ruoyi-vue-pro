@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.pay.core.enums;
+package cn.iocoder.yudao.framework.pay.core.enums.order;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,7 +10,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum PayDisplayModeEnum {
+public enum PayOrderDisplayModeEnum {
 
     URL("url"), // Redirect 跳转链接的方式
     IFRAME("iframe"), // IFrame 内嵌链接的方式【目前暂时用不到】

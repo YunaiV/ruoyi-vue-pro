@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.framework.pay.core.client.dto.notify;
 
-import cn.iocoder.yudao.framework.pay.core.enums.PayNotifyRefundStatusEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.refund.PayNotifyRefundStatusEnum;
 import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;

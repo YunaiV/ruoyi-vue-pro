@@ -4,8 +4,8 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.Method;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
-import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
-import cn.iocoder.yudao.framework.pay.core.enums.PayDisplayModeEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.domain.AlipayTradePagePayModel;
 import com.alipay.api.request.AlipayTradePagePayRequest;
@@ -44,7 +44,7 @@ public class AlipayPcPayClient extends AbstractAlipayPayClient {
         model.setQrPayMode("2"); // 跳转模式 - 订单码，效果参见：https://help.pingxx.com/article/1137360/
         // ③ 支付宝 PC 支付有两种展示模式：FORM、URL
         String displayMode = ObjectUtil.defaultIfNull(reqDTO.getDisplayMode(),
-                PayDisplayModeEnum.URL.getMode());
+                PayOrderDisplayModeEnum.URL.getMode());
 
         // 1.2 构建 AlipayTradePagePayRequest 请求
         AlipayTradePagePayRequest request = new AlipayTradePagePayRequest();
@@ -54,15 +54,14 @@ public class AlipayPcPayClient extends AbstractAlipayPayClient {
 
         // 2.1 执行请求
         AlipayTradePagePayResponse response;
-        if (Objects.equals(displayMode, PayDisplayModeEnum.FORM.getMode())) {
+        if (Objects.equals(displayMode, PayOrderDisplayModeEnum.FORM.getMode())) {
             response = client.pageExecute(request, Method.POST.name()); // 需要特殊使用 POST 请求
         } else {
             response = client.pageExecute(request, Method.GET.name());
         }
         // 2.2 处理结果
         validateUnifiedOrderResponse(request, response);
-        return new PayOrderUnifiedRespDTO().setDisplayMode(displayMode)
-                .setDisplayContent(response.getBody());
+        return new PayOrderUnifiedRespDTO(displayMode, response.getBody());
     }
 
 }

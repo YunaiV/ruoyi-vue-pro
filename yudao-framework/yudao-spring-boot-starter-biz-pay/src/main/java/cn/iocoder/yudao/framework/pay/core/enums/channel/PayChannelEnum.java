@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.pay.core.enums;
+package cn.iocoder.yudao.framework.pay.core.enums.channel;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
