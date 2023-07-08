@@ -23,6 +23,8 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 /**
  * 微信支付（公众号）的 PayClient 实现类
  *
+ * 文档：<a href="https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_1_1.shtml">JSAPI 下单</>
+ *
  * @author 芋道源码
  */
 @Slf4j

@@ -34,6 +34,8 @@ import java.util.Objects;
 /**
  * 微信 App 支付
  *
+ * TODO 芋艿：待测试，可能实现也不太对；
+ *
  * @author zwy
  */
 @Slf4j

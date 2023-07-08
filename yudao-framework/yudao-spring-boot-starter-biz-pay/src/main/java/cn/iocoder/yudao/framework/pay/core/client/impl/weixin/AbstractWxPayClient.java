@@ -169,7 +169,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
             if (Objects.equals(e.getErrCode(), "PARAM_ERROR")) {
                 throw invalidParamException(e.getErrCodeDes());
             }
-            throw exception(PayFrameworkErrorCodeConstants.ORDER_UNIFIED_ERROR, e.getReturnMsg());
+            throw exception(PayFrameworkErrorCodeConstants.ORDER_UNIFIED_ERROR, e.getErrCodeDes());
         }
         // 情况二：状态码结果为 FAIL
         if (Objects.equals(e.getReturnCode(), "FAIL")) {

@@ -23,20 +23,21 @@ public class WxPayClientConfig implements PayClientConfig {
     /**
      * API 版本 - V2
      *
-     * https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=4_1
+     * <a href="https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=4_1">V2 协议说明</a>
      */
     public static final String API_VERSION_V2 = "v2";
     /**
      * API 版本 - V3
      *
-     * https://pay.weixin.qq.com/wiki/doc/apiv3/wechatpay/wechatpay-1.shtml
+     * <a href="https://pay.weixin.qq.com/wiki/doc/apiv3/wechatpay/wechatpay-1.shtml">V3 协议说明</a>
      */
     public static final String API_VERSION_V3 = "v3";
 
     /**
      * 公众号或者小程序的 appid
+     *
+     * 只有公众号或小程序需要该字段
      */
-    @NotBlank(message = "APPID 不能为空", groups = {V2.class, V3.class})
     private String appId;
     /**
      * 商户号
