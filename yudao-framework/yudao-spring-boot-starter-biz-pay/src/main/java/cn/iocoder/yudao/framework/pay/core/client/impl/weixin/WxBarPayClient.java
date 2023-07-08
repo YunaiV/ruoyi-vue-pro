@@ -14,6 +14,8 @@ import com.github.binarywang.wxpay.bean.result.WxPayMicropayResult;
 import com.github.binarywang.wxpay.constant.WxPayConstants;
 import com.github.binarywang.wxpay.exception.WxPayException;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.invalidParamException;
+
 public class WxBarPayClient extends AbstractWxPayClient {
 
     public WxBarPayClient(Long channelId, WxPayClientConfig config) {
@@ -57,10 +59,11 @@ public class WxBarPayClient extends AbstractWxPayClient {
     }
 
     // ========== 各种工具方法 ==========
+
     static String getAuthCode(PayOrderUnifiedReqDTO reqDTO) {
         String authCode = MapUtil.getStr(reqDTO.getChannelExtras(), "authCode");
         if (StrUtil.isEmpty(authCode)) {
-            throw new IllegalArgumentException("支付请求的 authCode 不能为空！");
+            throw invalidParamException("支付请求的 authCode 不能为空！");
         }
         return authCode;
     }

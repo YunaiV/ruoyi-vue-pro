@@ -59,9 +59,8 @@ public class AlipayPcPayClient extends AbstractAlipayPayClient {
         } else {
             response = client.pageExecute(request, Method.GET.name());
         }
-
         // 2.2 处理结果
-        validateSuccess(response);
+        validateUnifiedOrderResponse(request, response);
         return new PayOrderUnifiedRespDTO().setDisplayMode(displayMode)
                 .setDisplayContent(response.getBody());
     }

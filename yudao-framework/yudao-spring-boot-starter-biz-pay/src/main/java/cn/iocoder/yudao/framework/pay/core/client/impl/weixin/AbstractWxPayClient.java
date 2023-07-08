@@ -4,16 +4,14 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.date.TemporalAccessorUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.io.FileUtils;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayOrderNotifyRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
-import cn.iocoder.yudao.framework.pay.core.client.exception.PayException;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
+import cn.iocoder.yudao.framework.pay.core.enums.PayFrameworkErrorCodeConstants;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyV3Result;
 import com.github.binarywang.wxpay.config.WxPayConfig;
@@ -26,6 +24,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Objects;
 
+import static cn.hutool.core.date.DatePattern.PURE_DATETIME_PATTERN;
+import static cn.hutool.core.date.DatePattern.UTC_WITH_XXX_OFFSET_PATTERN;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.*;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 
 /**
@@ -67,8 +68,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     }
 
     @Override
-    protected PayOrderUnifiedRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO)
-            throws Throwable {
+    protected PayOrderUnifiedRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) throws Exception {
         try {
             switch (config.getApiVersion()) {
                 case WxPayClientConfig.API_VERSION_V2:
@@ -79,8 +79,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
                     throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
             }
         } catch (WxPayException e) {
-            log.error("[doUnifiedOrder][request({}) 发起支付失败]", toJsonString(reqDTO), e);
-            throw buildPayException(e);
+            throw buildUnifiedOrderException(reqDTO, e);
         }
     }
 
@@ -118,7 +117,9 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
             }
         } catch (WxPayException e) {
             log.error("[parseNotify][rawNotify({}) 解析失败]", toJsonString(rawNotify), e);
-            throw buildPayException(e);
+//            throw buildPayException(e);
+            throw new RuntimeException(e);
+            // TODO 芋艿：缺一个异常翻译
         }
     }
 
@@ -151,33 +152,47 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
 
     // ========== 各种工具方法 ==========
 
-    static String getOpenid(PayOrderUnifiedReqDTO reqDTO) {
-        String openid = MapUtil.getStr(reqDTO.getChannelExtras(), "openid");
-        if (StrUtil.isEmpty(openid)) {
-            throw new IllegalArgumentException("支付请求的 openid 不能为空！");
+    /**
+     * 构建统一下单的异常
+     *
+     * 目的：将参数不正确等异常，转换成 {@link cn.iocoder.yudao.framework.common.exception.ServiceException} 业务异常
+     *
+     * @param reqDTO 请求
+     * @param e 微信的支付异常
+     * @return 转换后的异常
+     *
+     */
+    static Exception buildUnifiedOrderException(PayOrderUnifiedReqDTO reqDTO, WxPayException e) {
+        // 情况一：业务结果为 FAIL
+        if (Objects.equals(e.getResultCode(), "FAIL")) {
+            log.error("[buildUnifiedOrderException][request({}) 发起支付失败]", toJsonString(reqDTO), e);
+            if (Objects.equals(e.getErrCode(), "PARAM_ERROR")) {
+                throw invalidParamException(e.getErrCodeDes());
+            }
+            throw exception(PayFrameworkErrorCodeConstants.ORDER_UNIFIED_ERROR, e.getReturnMsg());
         }
-        return openid;
-    }
-
-    static PayException buildPayException(WxPayException e) {
-        return new PayException(ObjectUtils.defaultIfNull(e.getErrCode(), e.getReturnCode()),
-                ObjectUtils.defaultIfNull(e.getErrCodeDes(), e.getCustomErrorMsg()));
+        // 情况二：状态码结果为 FAIL
+        if (Objects.equals(e.getReturnCode(), "FAIL")) {
+            throw exception(PayFrameworkErrorCodeConstants.ORDER_UNIFIED_ERROR, e.getReturnMsg());
+        }
+        // 情况三：系统异常，这里暂时不打，交给上层的 AbstractPayClient 统一打
+        return e;
     }
 
     static String formatDateV2(LocalDateTime time) {
-        return TemporalAccessorUtil.format(time.atZone(ZoneId.systemDefault()), "yyyyMMddHHmmss");
+        return TemporalAccessorUtil.format(time.atZone(ZoneId.systemDefault()), PURE_DATETIME_PATTERN);
     }
 
     static LocalDateTime parseDateV2(String time) {
-        return LocalDateTimeUtil.parse(time, "yyyyMMddHHmmss");
+        return LocalDateTimeUtil.parse(time, PURE_DATETIME_PATTERN);
     }
 
     static String formatDateV3(LocalDateTime time) {
-        return TemporalAccessorUtil.format(time.atZone(ZoneId.systemDefault()), "yyyy-MM-dd'T'HH:mm:ssXXX");
+        return TemporalAccessorUtil.format(time.atZone(ZoneId.systemDefault()), UTC_WITH_XXX_OFFSET_PATTERN);
     }
 
     static LocalDateTime parseDateV3(String time) {
-        return LocalDateTimeUtil.parse(time, "yyyy-MM-dd'T'HH:mm:ssXXX");
+        return LocalDateTimeUtil.parse(time, UTC_WITH_XXX_OFFSET_PATTERN);
     }
 
 }

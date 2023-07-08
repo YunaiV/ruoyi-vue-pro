@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.weixin;
 
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
@@ -15,6 +17,8 @@ import com.github.binarywang.wxpay.bean.result.enums.TradeTypeEnum;
 import com.github.binarywang.wxpay.constant.WxPayConstants;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import lombok.extern.slf4j.Slf4j;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.invalidParamException;
 
 /**
  * 微信支付（公众号）的 PayClient 实现类
@@ -81,6 +85,16 @@ public class WxPubPayClient extends AbstractWxPayClient {
     protected PayRefundUnifiedRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) {
         // TODO 需要实现
         throw new UnsupportedOperationException();
+    }
+
+    // ========== 各种工具方法 ==========
+
+    static String getOpenid(PayOrderUnifiedReqDTO reqDTO) {
+        String openid = MapUtil.getStr(reqDTO.getChannelExtras(), "openid");
+        if (StrUtil.isEmpty(openid)) {
+            throw invalidParamException("支付请求的 openid 不能为空！");
+        }
+        return openid;
     }
 
 }

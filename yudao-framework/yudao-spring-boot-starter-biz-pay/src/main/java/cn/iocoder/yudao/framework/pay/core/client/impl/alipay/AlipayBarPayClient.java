@@ -13,7 +13,6 @@ import com.alipay.api.response.AlipayTradePayResponse;
 import lombok.extern.slf4j.Slf4j;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
 
 /**
@@ -59,8 +58,9 @@ public class AlipayBarPayClient extends AbstractAlipayPayClient {
         // 2.1 执行请求
         AlipayTradePayResponse response = client.execute(request);
         // 2.2 处理结果
-        validateSuccess(response);
+        validateUnifiedOrderResponse(request, response);
         return new PayOrderUnifiedRespDTO()
                 .setDisplayMode(displayMode).setDisplayContent("");
     }
+
 }

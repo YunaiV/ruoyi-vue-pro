@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.common.exception.util;
 
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 
@@ -78,6 +79,10 @@ public class ServiceExceptionUtil {
     public static ServiceException exception0(Integer code, String messagePattern, Object... params) {
         String message = doFormat(code, messagePattern, params);
         return new ServiceException(code, message);
+    }
+
+    public static ServiceException invalidParamException(String messagePattern, Object... params) {
+        return exception0(GlobalErrorCodeConstants.BAD_REQUEST.getCode(), messagePattern, params);
     }
 
     // ========== 格式化方法 ==========

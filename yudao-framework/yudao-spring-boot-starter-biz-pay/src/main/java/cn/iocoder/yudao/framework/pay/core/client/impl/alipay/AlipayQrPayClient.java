@@ -47,7 +47,7 @@ public class AlipayQrPayClient extends AbstractAlipayPayClient {
         // 2.1 执行请求
         AlipayTradePrecreateResponse response = client.execute(request);
         // 2.2 处理结果
-        validateSuccess(response);
+        validateUnifiedOrderResponse(request, response);
         return new PayOrderUnifiedRespDTO()
                 .setDisplayMode(displayMode).setDisplayContent(response.getQrCode());
     }
