@@ -55,14 +55,14 @@ public class PayClientFactoryImpl implements PayClientFactory {
         PayChannelEnum channelEnum = PayChannelEnum.getByCode(channelCode);
         Assert.notNull(channelEnum, String.format("支付渠道(%s) 为空", channelEnum));
         // 创建客户端
-        // TODO @芋艿 WX_APP 如果不添加在 项目启动的时候去初始化会报错无法启动。所以我手动加了两个，具体需要你来配
         switch (channelEnum) {
             // 微信支付
             case WX_PUB: return (AbstractPayClient<Config>) new WxPubPayClient(channelId, (WxPayClientConfig) config);
             case WX_LITE: return (AbstractPayClient<Config>) new WxLitePayClient(channelId, (WxPayClientConfig) config);
-            case WX_APP: return (AbstractPayClient<Config>) new WxPubPayClient(channelId, (WxPayClientConfig) config);
+            case WX_APP: return (AbstractPayClient<Config>) new WxAppPayClient(channelId, (WxPayClientConfig) config);
             case WX_BAR: return (AbstractPayClient<Config>) new WxBarPayClient(channelId, (WxPayClientConfig) config);
             case WX_NATIVE: return (AbstractPayClient<Config>) new WxNativePayClient(channelId, (WxPayClientConfig) config);
+            case WX_H5: return (AbstractPayClient<Config>) new WxH5PayClient(channelId, (WxPayClientConfig) config);
             // 支付宝支付
             case ALIPAY_WAP: return (AbstractPayClient<Config>) new AlipayWapPayClient(channelId, (AlipayPayClientConfig) config);
             case ALIPAY_QR: return (AbstractPayClient<Config>) new AlipayQrPayClient(channelId, (AlipayPayClientConfig) config);
