@@ -62,8 +62,8 @@ public class PayClientFactoryImpl implements PayClientFactory {
             case WX_LITE: return (AbstractPayClient<Config>) new WxLitePayClient(channelId, (WxPayClientConfig) config);
             case WX_APP: return (AbstractPayClient<Config>) new WxPubPayClient(channelId, (WxPayClientConfig) config);
             case WX_BAR: return (AbstractPayClient<Config>) new WxBarPayClient(channelId, (WxPayClientConfig) config);
+            case WX_NATIVE: return (AbstractPayClient<Config>) new WxNativePayClient(channelId, (WxPayClientConfig) config);
             // 支付宝支付
-            case WX_NATIVE: return (AbstractPayClient<Config>) new WXNativePayClient(channelId, (WxPayClientConfig) config);
             case ALIPAY_WAP: return (AbstractPayClient<Config>) new AlipayWapPayClient(channelId, (AlipayPayClientConfig) config);
             case ALIPAY_QR: return (AbstractPayClient<Config>) new AlipayQrPayClient(channelId, (AlipayPayClientConfig) config);
             case ALIPAY_APP: return (AbstractPayClient<Config>) new AlipayAppPayClient(channelId, (AlipayPayClientConfig) config);

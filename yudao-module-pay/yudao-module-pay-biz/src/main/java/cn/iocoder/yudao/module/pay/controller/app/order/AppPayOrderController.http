@@ -50,3 +50,14 @@ tenant-id: {{appTenentId}}
     "openid": "oLefc4g5GjKWHJjLjMSXB3wX0fD0"
   }
 }
+
+### /pay/create 提交支付订单【wx_native】
+POST {{appApi}}/pay/order/submit
+Content-Type: application/json
+Authorization: Bearer {{appToken}}
+tenant-id: {{appTenentId}}
+
+{
+  "id": 202,
+  "channelCode": "wx_native"
+}
