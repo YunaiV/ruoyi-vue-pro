@@ -36,3 +36,17 @@ tenant-id: {{appTenentId}}
     "openid": "ockUAwIZ-0OeMZl9ogcZ4ILrGba0"
   }
 }
+
+### /pay/create 提交支付订单【wx_lite】
+POST {{appApi}}/pay/order/submit
+Content-Type: application/json
+Authorization: Bearer {{appToken}}
+tenant-id: {{appTenentId}}
+
+{
+  "id": 202,
+  "channelCode": "wx_lite",
+  "channelExtras": {
+    "openid": "oLefc4g5GjKWHJjLjMSXB3wX0fD0"
+  }
+}
