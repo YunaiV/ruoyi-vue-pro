@@ -12,9 +12,6 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class PayOrderExportReqVO {
 
-    @Schema(description = "商户编号")
-    private Long merchantId;
-
     @Schema(description = "应用编号")
     private Long appId;
 

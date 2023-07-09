@@ -16,9 +16,6 @@ public class PayOrderDetailsRespVO extends PayOrderBaseVO {
     @Schema(description = "支付订单编号")
     private Long id;
 
-    @Schema(description = "商户名称")
-    private String merchantName;
-
     @Schema(description = "应用名称")
     private String appName;
 

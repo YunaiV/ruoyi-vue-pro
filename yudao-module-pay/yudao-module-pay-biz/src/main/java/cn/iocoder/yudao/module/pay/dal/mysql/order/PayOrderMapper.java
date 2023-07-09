@@ -18,7 +18,6 @@ public interface PayOrderMapper extends BaseMapperX<PayOrderDO> {
 
     default PageResult<PayOrderDO> selectPage(PayOrderPageReqVO reqVO) {
         return selectPage(reqVO, new QueryWrapperX<PayOrderDO>()
-                .eqIfPresent("merchant_id", reqVO.getMerchantId())
                 .eqIfPresent("app_id", reqVO.getAppId())
                 .eqIfPresent("channel_id", reqVO.getChannelId())
                 .eqIfPresent("channel_code", reqVO.getChannelCode())
@@ -33,7 +32,6 @@ public interface PayOrderMapper extends BaseMapperX<PayOrderDO> {
 
     default List<PayOrderDO> selectList(PayOrderExportReqVO reqVO) {
         return selectList(new QueryWrapperX<PayOrderDO>()
-                .eqIfPresent("merchant_id", reqVO.getMerchantId())
                 .eqIfPresent("app_id", reqVO.getAppId())
                 .eqIfPresent("channel_id", reqVO.getChannelId())
                 .eqIfPresent("channel_code", reqVO.getChannelCode())

@@ -91,14 +91,14 @@ public class PayNotifyServiceImpl implements PayNotifyService {
         task.setType(reqDTO.getType()).setDataId(reqDTO.getDataId());
         task.setStatus(PayNotifyStatusEnum.WAITING.getStatus()).setNextNotifyTime(LocalDateTime.now())
                 .setNotifyTimes(0).setMaxNotifyTimes(PayNotifyTaskDO.NOTIFY_FREQUENCY.length + 1);
-        // 补充 merchantId + appId + notifyUrl 字段
+        // 补充 appId + notifyUrl 字段
         if (Objects.equals(task.getType(), PayNotifyTypeEnum.ORDER.getType())) {
             PayOrderDO order = orderService.getOrder(task.getDataId()); // 不进行非空判断，有问题直接异常
-            task.setMerchantId(order.getMerchantId()).setAppId(order.getAppId()).
+            task.setAppId(order.getAppId()).
                     setMerchantOrderId(order.getMerchantOrderId()).setNotifyUrl(order.getNotifyUrl());
         } else if (Objects.equals(task.getType(), PayNotifyTypeEnum.REFUND.getType())) {
             PayRefundDO refundDO = refundService.getRefund(task.getDataId());
-            task.setMerchantId(refundDO.getMerchantId()).setAppId(refundDO.getAppId())
+            task.setAppId(refundDO.getAppId())
                     .setMerchantOrderId(refundDO.getMerchantOrderId()).setNotifyUrl(refundDO.getNotifyUrl());
         }
 

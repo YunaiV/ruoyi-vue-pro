@@ -29,7 +29,6 @@ public class PayChannelMapperIntegrationTest extends BaseDbIntegrationTest {
         payChannelDO.setCode(PayChannelEnum.WX_PUB.getCode());
         payChannelDO.setStatus(CommonStatusEnum.ENABLE.getStatus());
         payChannelDO.setFeeRate(1D);
-        payChannelDO.setMerchantId(1L);
         payChannelDO.setAppId(6L);
         // 配置
         WXPayClientConfig config = new WXPayClientConfig();
@@ -55,7 +54,6 @@ public class PayChannelMapperIntegrationTest extends BaseDbIntegrationTest {
         payChannelDO.setCode(PayChannelEnum.ALIPAY_QR.getCode());
         payChannelDO.setStatus(CommonStatusEnum.ENABLE.getStatus());
         payChannelDO.setFeeRate(1D);
-        payChannelDO.setMerchantId(1L);
         payChannelDO.setAppId(6L);
         // 配置
         AlipayPayClientConfig config = new AlipayPayClientConfig();

@@ -1,14 +1,15 @@
 package cn.iocoder.yudao.module.pay.convert.app;
 
-import java.util.*;
-
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
-import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.app.*;
-import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayAppDO;
-import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayMerchantDO;
+import cn.iocoder.yudao.module.pay.controller.admin.app.vo.PayAppCreateReqVO;
+import cn.iocoder.yudao.module.pay.controller.admin.app.vo.PayAppPageItemRespVO;
+import cn.iocoder.yudao.module.pay.controller.admin.app.vo.PayAppRespVO;
+import cn.iocoder.yudao.module.pay.controller.admin.app.vo.PayAppUpdateReqVO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 /**
  * 支付应用信息 Convert
@@ -22,8 +23,6 @@ public interface PayAppConvert {
 
     PayAppPageItemRespVO pageConvert (PayAppDO bean);
 
-    PayAppPageItemRespVO.PayMerchant convert(PayMerchantDO bean);
-
     PayAppDO convert(PayAppCreateReqVO bean);
 
     PayAppDO convert(PayAppUpdateReqVO bean);
@@ -33,7 +32,5 @@ public interface PayAppConvert {
     List<PayAppRespVO> convertList(List<PayAppDO> list);
 
     PageResult<PayAppRespVO> convertPage(PageResult<PayAppDO> page);
-
-    List<PayAppExcelVO> convertList02(List<PayAppDO> list);
 
 }

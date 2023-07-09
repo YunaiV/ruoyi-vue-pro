@@ -1,13 +1,12 @@
 package cn.iocoder.yudao.module.pay.dal.dataobject.order;
 
-import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayAppDO;
-import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayChannelDO;
-import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayMerchantDO;
-import cn.iocoder.yudao.module.pay.enums.order.PayOrderNotifyStatusEnum;
-import cn.iocoder.yudao.module.pay.enums.refund.PayRefundTypeEnum;
-import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
+import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
+import cn.iocoder.yudao.module.pay.enums.order.PayOrderNotifyStatusEnum;
+import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
+import cn.iocoder.yudao.module.pay.enums.refund.PayRefundTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -33,12 +32,6 @@ public class PayOrderDO extends BaseDO {
      * 订单编号，数据库自增
      */
     private Long id;
-    /**
-     * 商户编号
-     *
-     * 关联 {@link PayMerchantDO#getId()}
-     */
-    private Long merchantId;
     /**
      * 应用编号
      *

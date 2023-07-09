@@ -19,9 +19,6 @@ public class PayOrderExcelVO {
     @ExcelProperty("支付订单编号")
     private Long id;
 
-    @ExcelProperty(value = "商户名称")
-    private String merchantName;
-
     @ExcelProperty(value = "应用名称")
     private String appName;
 

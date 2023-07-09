@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.pay.controller.app.channel;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayChannelDO;
-import cn.iocoder.yudao.module.pay.service.merchant.PayChannelService;
+import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
+import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

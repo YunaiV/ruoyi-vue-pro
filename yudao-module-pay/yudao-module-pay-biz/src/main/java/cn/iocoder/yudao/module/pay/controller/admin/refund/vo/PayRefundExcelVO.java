@@ -22,9 +22,6 @@ public class PayRefundExcelVO {
     @ExcelProperty("商品名称")
     private String subject;
 
-    @ExcelProperty(value = "商户名称")
-    private String merchantName;
-
     @ExcelProperty(value = "应用名称")
     private String appName;
 

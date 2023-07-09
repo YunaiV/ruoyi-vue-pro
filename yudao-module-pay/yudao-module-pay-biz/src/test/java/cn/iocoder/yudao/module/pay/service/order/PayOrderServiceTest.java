@@ -14,8 +14,8 @@ import cn.iocoder.yudao.module.pay.dal.mysql.order.PayOrderMapper;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderNotifyStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundTypeEnum;
-import cn.iocoder.yudao.module.pay.service.merchant.PayAppService;
-import cn.iocoder.yudao.module.pay.service.merchant.PayChannelService;
+import cn.iocoder.yudao.module.pay.service.app.PayAppService;
+import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -67,7 +67,6 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
 
         // mock 数据
         PayOrderDO dbOrder = randomPojo(PayOrderDO.class, o -> { // 等会查询到
-            o.setMerchantId(1L);
             o.setAppId(1L);
             o.setChannelId(1L);
             o.setChannelCode(PayChannelEnum.WX_PUB.getCode());
@@ -94,8 +93,6 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
             o.setUpdateTime(LocalDateTime.of(2018, 1, 1, 10, 10, 15));
         });
         orderMapper.insert(dbOrder);
-        // 测试 merchantId 不匹配
-        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setMerchantId(2L)));
         // 测试 appId 不匹配
         orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setAppId(2L)));
         // 测试 channelId 不匹配
@@ -115,7 +112,6 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
                 1))));
         // 准备参数
         PayOrderPageReqVO reqVO = new PayOrderPageReqVO();
-        reqVO.setMerchantId(1L);
         reqVO.setAppId(1L);
         reqVO.setChannelId(1L);
         reqVO.setChannelCode(PayChannelEnum.WX_PUB.getCode());
@@ -139,7 +135,6 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
         String merchantOrderId = generateNo();
         String channelOrderId = generateNo();
         PayOrderDO dbOrder = randomPojo(PayOrderDO.class, o -> { // 等会查询到
-            o.setMerchantId(1L);
             o.setAppId(1L);
             o.setChannelId(1L);
             o.setChannelCode(PayChannelEnum.WX_PUB.getCode());
@@ -167,8 +162,6 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
 
         });
         orderMapper.insert(dbOrder);
-        // 测试 merchantId 不匹配
-        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setMerchantId(2L)));
         // 测试 appId 不匹配
         orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setAppId(2L)));
         // 测试 channelId 不匹配
@@ -188,7 +181,6 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
                 1))));
         // 准备参数
         PayOrderExportReqVO reqVO = new PayOrderExportReqVO();
-        reqVO.setMerchantId(1L);
         reqVO.setAppId(1L);
         reqVO.setChannelId(1L);
         reqVO.setChannelCode(PayChannelEnum.WX_PUB.getCode());
