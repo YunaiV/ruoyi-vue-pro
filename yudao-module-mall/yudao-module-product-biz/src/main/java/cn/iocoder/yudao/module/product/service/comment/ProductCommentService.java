@@ -54,7 +54,7 @@ public interface ProductCommentService {
      * @param visible 是否可见
      * @return 商品评价分页
      */
-    PageResult<AppProductCommentRespVO> getCommentPage(AppCommentPageReqVO pageVO, Boolean visible);
+    PageResult<ProductCommentDO> getCommentPage(AppCommentPageReqVO pageVO, Boolean visible);
 
     /**
      * 创建商品评论

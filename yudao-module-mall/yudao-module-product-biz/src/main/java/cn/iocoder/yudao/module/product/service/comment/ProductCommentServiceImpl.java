@@ -81,7 +81,7 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     @Transactional(rollbackFor = Exception.class)
     public void createComment(ProductCommentCreateReqVO createReqVO) {
         // 校验评论
-        validateComment(createReqVO.getSpuId(), createReqVO.getUserId(), createReqVO.getOrderItemId());
+        validateComment(createReqVO.getSkuId(), createReqVO.getUserId(), createReqVO.getOrderItemId());
 
         ProductCommentDO commentDO = ProductCommentConvert.INSTANCE.convert(createReqVO);
         productCommentMapper.insert(commentDO);
@@ -108,11 +108,11 @@ public class ProductCommentServiceImpl implements ProductCommentService {
         return commentDO.getId();
     }
 
-    private void validateComment(Long spuId, Long userId, Long orderItemId) {
+    private void validateComment(Long skuId, Long userId, Long orderItemId) {
         // 判断当前订单的当前商品用户是否评价过
-        ProductCommentDO exist = productCommentMapper.selectByUserIdAndOrderItemIdAndSpuId(userId, orderItemId, spuId);
+        ProductCommentDO exist = productCommentMapper.selectByUserIdAndOrderItemIdAndSpuId(userId, orderItemId, skuId);
         if (null != exist) {
-            throw exception(ORDER_SPU_COMMENT_EXISTS);
+            throw exception(ORDER_SKU_COMMENT_EXISTS);
         }
     }
 
@@ -141,23 +141,17 @@ public class ProductCommentServiceImpl implements ProductCommentService {
                 productCommentMapper.selectCountBySpuId(spuId, visible, AppCommentPageReqVO.MEDIOCRE_COMMENT),
                 // 查询商品 id = spuId 的所有差评数量
                 productCommentMapper.selectCountBySpuId(spuId, visible, AppCommentPageReqVO.NEGATIVE_COMMENT)
-        ).setScores(3.0); // TODO @puhui999：这里要实现下；；
+        );
     }
 
     @Override
     public List<AppProductCommentRespVO> getCommentList(Long spuId, Integer count) {
-        // 校验商品 spu 是否存在
-        // TODO @puhui 这里校验可以去掉哈。
-        ProductSpuDO spuDO = validateSpu(spuId);
-        return ProductCommentConvert.INSTANCE.convertList02(productCommentMapper.selectCommentList(spuDO.getId(), count).getList());
+        return ProductCommentConvert.INSTANCE.convertList02(productCommentMapper.selectCommentList(spuId, count).getList());
     }
 
-    // TODO @puhui 可以放到 controller 去 convert 哈
     @Override
-    public PageResult<AppProductCommentRespVO> getCommentPage(AppCommentPageReqVO pageVO, Boolean visible) {
-        // TODO @puhui 可以放到 controller 去 convert 哈
-        return ProductCommentConvert.INSTANCE.convertPage02(
-                productCommentMapper.selectPage(pageVO, visible));
+    public PageResult<ProductCommentDO> getCommentPage(AppCommentPageReqVO pageVO, Boolean visible) {
+        return productCommentMapper.selectPage(pageVO, visible);
     }
 
     @Override

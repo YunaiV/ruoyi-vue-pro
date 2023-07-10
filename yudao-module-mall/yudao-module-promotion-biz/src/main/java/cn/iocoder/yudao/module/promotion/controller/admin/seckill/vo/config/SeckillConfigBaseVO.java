@@ -1,9 +1,13 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
+import java.time.LocalTime;
+import java.util.List;
 
 /**
  * 秒杀时段 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -26,12 +30,24 @@ public class SeckillConfigBaseVO {
     @NotNull(message = "结束时间点不能为空")
     private String endTime;
 
-    @Schema(description = "秒杀主图", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn")
-    @NotNull(message = "秒杀主图不能为空")
-    private String picUrl;
+    @Schema(description = "秒杀轮播图", requiredMode = Schema.RequiredMode.REQUIRED, example = "[https://www.iocoder.cn/xx.png]")
+    @NotNull(message = "秒杀轮播图不能为空")
+    private List<String> sliderPicUrls;
 
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     @NotNull(message = "状态不能为空")
     private Integer status;
+
+    @AssertTrue(message = "秒杀时段开始时间和结束时间不能相等")
+    @JsonIgnore
+    public boolean isValidStartTimeValid() {
+        return !LocalTime.parse(startTime).equals(LocalTime.parse(endTime));
+    }
+
+    @AssertTrue(message = "秒杀时段开始时间不能在结束时间之后")
+    @JsonIgnore
+    public boolean isValidEndTimeValid() {
+        return !LocalTime.parse(startTime).isAfter(LocalTime.parse(endTime));
+    }
 
 }

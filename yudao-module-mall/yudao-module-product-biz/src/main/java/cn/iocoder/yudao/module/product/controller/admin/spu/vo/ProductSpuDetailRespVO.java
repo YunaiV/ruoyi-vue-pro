@@ -8,12 +8,6 @@ import lombok.ToString;
 
 import java.util.List;
 
-/**
- * 商品 SPU 详细 Response VO
- * 包括关联的 SKU 等信息
- *
- * @author HUIHUI
- */
 @Schema(description = "管理后台 - 商品 SPU 详细 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)

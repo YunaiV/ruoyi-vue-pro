@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigUpdateReqVO;
@@ -12,14 +13,13 @@ import cn.iocoder.yudao.module.promotion.convert.seckill.seckillconfig.SeckillCo
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillconfig.SeckillConfigDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillconfig.SeckillConfigMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
@@ -37,9 +37,10 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
     private SeckillConfigMapper seckillConfigMapper;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Long createSeckillConfig(SeckillConfigCreateReqVO createReqVO) {
         // 校验时间段是否冲突
-        validateSeckillConfigConflict(createReqVO.getStartTime(), createReqVO.getEndTime());
+        validateSeckillConfigConflict(createReqVO.getStartTime(), createReqVO.getEndTime(), null);
 
         // 插入
         SeckillConfigDO seckillConfig = SeckillConfigConvert.INSTANCE.convert(createReqVO);
@@ -49,18 +50,30 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateSeckillConfig(SeckillConfigUpdateReqVO updateReqVO) {
         // 校验存在
         validateSeckillConfigExists(updateReqVO.getId());
         // 校验时间段是否冲突
-        validateSeckillConfigConflict(updateReqVO.getStartTime(), updateReqVO.getEndTime());
+        validateSeckillConfigConflict(updateReqVO.getStartTime(), updateReqVO.getEndTime(), updateReqVO.getId());
 
         // 更新
         SeckillConfigDO updateObj = SeckillConfigConvert.INSTANCE.convert(updateReqVO);
         seckillConfigMapper.updateById(updateObj);
     }
 
+    // TODO  @puhui999: 这个要不合并到更新操作里? 不单独有个操作咧; 更新状态不用那么多必须的参数，更新的时候需要校验时间段
     @Override
+    public void updateSeckillConfigStatus(Long id, Integer status) {
+        // 校验秒杀时段是否存在
+        validateSeckillConfigExists(id);
+
+        // 更新状态
+        seckillConfigMapper.updateById(new SeckillConfigDO().setId(id).setStatus(status));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteSeckillConfig(Long id) {
         // 校验存在
         validateSeckillConfigExists(id);
@@ -81,38 +94,28 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
      * @param startTime 开始时间
      * @param endTime   结束时间
      */
-    private void validateSeckillConfigConflict(String startTime, String endTime) {
+    private void validateSeckillConfigConflict(String startTime, String endTime, Long seckillConfigId) {
         LocalTime startTime1 = LocalTime.parse(startTime);
         LocalTime endTime1 = LocalTime.parse(endTime);
-        // TODO @puhui999： 这个可以用 validator 里的 assertTrue 去做哈；
-        // 检查选择的时间是否相等
-        if (startTime1.equals(endTime1)) {
-            throw exception(SECKILL_TIME_EQUAL);
-        }
-        // 检查开始时间是否在结束时间之前
-        if (startTime1.isAfter(endTime1)) {
-            throw exception(SECKILL_START_TIME_BEFORE_END_TIME);
-        }
         // 查询出所有的时段配置
         List<SeckillConfigDO> configDOs = seckillConfigMapper.selectList();
+        // 更新时排除自己
+        if (seckillConfigId != null) {
+            configDOs.removeIf(item -> ObjectUtil.equal(item.getId(), seckillConfigId));
+        }
         // 过滤出重叠的时段 ids
-        // TODO @puhui999：感觉 findOne 就可以了？
-        Set<Long> ids = configDOs.stream().filter((config) -> {
+        boolean hasConflict = configDOs.stream().anyMatch(config -> {
             LocalTime startTime2 = LocalTime.parse(config.getStartTime());
             LocalTime endTime2 = LocalTime.parse(config.getEndTime());
             // 判断时间是否重叠
-            // 开始时间在已配置时段的结束时间之前 且 结束时间在已配置时段的开始时间之后 []
-            // todo @puhui999：LocalDateUtils 可以写个工具类？是否是有重叠的时间？感觉别的场景，可能也会有需要
-            return startTime1.isBefore(endTime2) && endTime1.isAfter(startTime2)
-                    // 开始时间在已配置时段的开始时间之前 且 结束时间在已配置时段的开始时间之后 (] 或 ()
-                    || startTime1.isBefore(startTime2) && endTime1.isAfter(startTime2)
-                    // 开始时间在已配置时段的结束时间之前 且 结束时间在已配值时段的结束时间之后 [) 或 ()
-                    || startTime1.isBefore(endTime2) && endTime1.isAfter(endTime2);
-        }).map(SeckillConfigDO::getId).collect(Collectors.toSet());
-        if (CollUtil.isNotEmpty(ids)) {
+            return LocalDateTimeUtils.checkTimeOverlap(startTime1, endTime1, startTime2, endTime2);
+        });
+
+        if (hasConflict) {
             throw exception(SECKILL_TIME_CONFLICTS);
         }
     }
+
 
     @Override
     public SeckillConfigDO getSeckillConfig(Long id) {
@@ -148,23 +151,9 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
         return seckillConfigMapper.selectPage(pageVO);
     }
 
-    // TODO  @puhui999:写个查询状态的; 尽可能通用哈
     @Override
     public List<SeckillConfigDO> getListAllSimple() {
-        return seckillConfigMapper.selectList(SeckillConfigDO::getStatus, CommonStatusEnum.ENABLE.getStatus());
-    }
-
-    // TODO  @puhui999: 这个要不合并到更新操作里? 不单独有个操作咧;
-    @Override
-    public void updateSeckillConfigStatus(Long id, Integer status) {
-        // 校验秒杀时段是否存在
-        validateSeckillConfigExists(id);
-
-        SeckillConfigDO seckillConfigDO = new SeckillConfigDO();
-        seckillConfigDO.setId(id);
-        seckillConfigDO.setStatus(status);
-        // 更新状态
-        seckillConfigMapper.updateById(seckillConfigDO);
+        return seckillConfigMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus());
     }
 
 }

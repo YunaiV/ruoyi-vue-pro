@@ -9,11 +9,6 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * 管理后台 - 秒杀活动 Response VO
- *
- * @author HUIHUI
- */
 @Schema(description = "管理后台 - 秒杀活动 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)

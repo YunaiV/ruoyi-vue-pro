@@ -7,11 +7,6 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 
-/**
- * 商品 SPU Status 更新 Request VO
- *
- * @author HUIHUI
- */
 @Schema(description = "管理后台 - 商品 SPU Status 更新 Request VO")
 @Data
 public class ProductSpuUpdateStatusReqVO{

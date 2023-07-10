@@ -19,11 +19,6 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-/**
- * 管理后台 - 秒杀时段相关接口
- *
- * @author HUIHUI
- */
 @Tag(name = "管理后台 - 秒杀时段")
 @RestController
 @RequestMapping("/promotion/seckill-config")

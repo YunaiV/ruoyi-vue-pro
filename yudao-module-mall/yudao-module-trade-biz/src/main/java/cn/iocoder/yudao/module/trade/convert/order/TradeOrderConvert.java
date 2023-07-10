@@ -270,7 +270,6 @@ public interface TradeOrderConvert {
     @Mapping(target = "skuId", source = "tradeOrderItemDO.skuId")
     @Mapping(target = "orderId", source = "tradeOrderItemDO.orderId")
     @Mapping(target = "orderItemId", source = "tradeOrderItemDO.id")
-    @Mapping(target = "scores", source = "createReqVO.scores")
     @Mapping(target = "descriptionScores", source = "createReqVO.descriptionScores")
     @Mapping(target = "benefitScores", source = "createReqVO.benefitScores")
     @Mapping(target = "content", source = "createReqVO.content")

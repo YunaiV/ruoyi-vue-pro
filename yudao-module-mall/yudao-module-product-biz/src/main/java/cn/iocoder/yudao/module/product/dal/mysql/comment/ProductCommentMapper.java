@@ -51,11 +51,11 @@ public interface ProductCommentMapper extends BaseMapperX<ProductCommentDO> {
         return selectPage(reqVO, queryWrapper);
     }
 
-    default ProductCommentDO selectByUserIdAndOrderItemIdAndSpuId(Long userId, Long orderItemId, Long spuId) {
+    default ProductCommentDO selectByUserIdAndOrderItemIdAndSpuId(Long userId, Long orderItemId, Long skuId) {
         return selectOne(new LambdaQueryWrapperX<ProductCommentDO>()
                 .eq(ProductCommentDO::getUserId, userId)
                 .eq(ProductCommentDO::getOrderItemId, orderItemId)
-                .eq(ProductCommentDO::getSpuId, spuId));
+                .eq(ProductCommentDO::getSpuId, skuId));
     }
 
     default Long selectCountBySpuId(Long spuId, Boolean visible, Integer type) {

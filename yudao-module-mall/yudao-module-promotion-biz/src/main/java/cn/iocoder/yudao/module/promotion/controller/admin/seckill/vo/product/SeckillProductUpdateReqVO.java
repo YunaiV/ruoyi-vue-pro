@@ -5,11 +5,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-/**
- * 管理后台 - 秒杀参与商品更新 Request VO
- *
- * @author HUIHUI
- */
 @Schema(description = "管理后台 - 秒杀参与商品更新 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)

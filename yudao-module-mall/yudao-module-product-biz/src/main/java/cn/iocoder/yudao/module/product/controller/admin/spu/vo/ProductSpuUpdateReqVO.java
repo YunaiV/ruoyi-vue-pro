@@ -12,11 +12,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-/**
- * 商品 SPU 更新 Request VO
- *
- * @author HUIHUI
- */
 @Schema(description = "管理后台 - 商品 SPU 更新 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)

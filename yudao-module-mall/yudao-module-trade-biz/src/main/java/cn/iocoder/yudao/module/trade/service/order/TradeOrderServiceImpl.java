@@ -17,19 +17,21 @@ import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
+import cn.iocoder.yudao.module.product.api.comment.ProductCommentApi;
+import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponUseReqDTO;
 import cn.iocoder.yudao.module.system.api.notify.NotifyMessageSendApi;
 import cn.iocoder.yudao.module.system.api.notify.dto.NotifySendSingleToUserReqDTO;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.cart.TradeCartDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
@@ -57,6 +59,7 @@ import java.util.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getSumValue;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.PAY_ORDER_NOT_FOUND;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
@@ -93,7 +96,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     @Resource
     private MemberUserApi memberUserApi;
     @Resource
-    private AdminUserApi adminUserApi;
+    private ProductCommentApi productCommentApi;
     @Resource
     private NotifyMessageSendApi notifyMessageSendApi;
 
@@ -554,6 +557,30 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     @Override
     public TradeOrderDO getOrderByIdAndUserId(Long orderId, Long loginUserId) {
         return tradeOrderMapper.selectOrderByIdAndUserId(orderId, loginUserId);
+    }
+
+    @Override
+    public Long createOrderItemComment(AppTradeOrderItemCommentCreateReqVO createReqVO) {
+        Long loginUserId = getLoginUserId();
+        // 先通过订单项 ID 查询订单项是否存在
+        TradeOrderItemDO orderItemDO = getOrderItemByIdAndUserId(createReqVO.getOrderItemId(), loginUserId);
+        if (orderItemDO == null) {
+            throw exception(ORDER_ITEM_NOT_FOUND);
+        }
+        // 校验订单
+        TradeOrderDO orderDO = getOrderByIdAndUserId(orderItemDO.getOrderId(), loginUserId);
+        if (orderDO == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+        if (ObjectUtil.notEqual(orderDO.getStatus(), TradeOrderStatusEnum.COMPLETED.getStatus())) {
+            throw exception(ORDER_COMMENT_FAIL_STATUS_NOT_COMPLETED);
+        }
+        if (ObjectUtil.notEqual(orderDO.getCommentStatus(), Boolean.FALSE)) {
+            throw exception(ORDER_COMMENT_STATUS_NOT_FALSE);
+        }
+
+        ProductCommentCreateReqDTO productCommentCreateReqDTO = TradeOrderConvert.INSTANCE.convert04(createReqVO, orderItemDO);
+        return productCommentApi.createComment(productCommentCreateReqDTO);
     }
 
     /**

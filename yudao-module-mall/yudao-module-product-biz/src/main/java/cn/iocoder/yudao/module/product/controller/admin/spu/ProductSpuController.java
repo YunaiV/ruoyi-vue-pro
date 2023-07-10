@@ -30,11 +30,6 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_EXISTS;
 
-/**
- * 商品 SPU 相关接口
- *
- * @author HUIHUI
- */
 @Tag(name = "管理后台 - 商品 SPU")
 @RestController
 @RequestMapping("/product/spu")

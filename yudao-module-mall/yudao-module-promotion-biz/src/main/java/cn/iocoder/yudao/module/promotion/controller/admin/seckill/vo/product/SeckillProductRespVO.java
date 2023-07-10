@@ -1,14 +1,12 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.product;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 import java.time.LocalDateTime;
 
-/**
- * 管理后台 - 秒杀参与商品 Response VO
- *
- * @author HUIHUI
- */
 @Schema(description = "管理后台 - 秒杀参与商品 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
