@@ -54,7 +54,7 @@ export const DICT_TYPE = {
   PAY_CHANNEL_ALIPAY_SIGN_TYPE: 'pay_channel_alipay_sign_type', // 支付渠道支付宝算法类型
   PAY_CHANNEL_ALIPAY_MODE: 'pay_channel_alipay_mode', // 支付宝公钥类型
   PAY_CHANNEL_ALIPAY_SERVER_TYPE: 'pay_channel_alipay_server_type', // 支付宝网关地址
-  PAY_CHANNEL_CODE_TYPE: 'pay_channel_code_type', // 支付渠道编码类型
+  PAY_CHANNEL_CODE: 'pay_channel_code', // 支付渠道编码类型
   PAY_ORDER_NOTIFY_STATUS: 'pay_order_notify_status', // 商户支付订单回调状态
   PAY_ORDER_STATUS: 'pay_order_status', // 商户支付订单状态
   PAY_ORDER_REFUND_STATUS: 'pay_order_refund_status', // 商户支付订单退款状态

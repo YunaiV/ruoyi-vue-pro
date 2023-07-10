@@ -238,7 +238,7 @@ public interface TradeOrderConvert {
         AppTradeOrderDetailRespVO orderVO = convert3(order, orderItems);
         orderVO.setPayExpireTime(addTime(tradeOrderProperties.getExpireTime()));
         if (StrUtil.isNotEmpty(order.getPayChannelCode())) {
-            orderVO.setPayChannelName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.CHANNEL_CODE_TYPE, order.getPayChannelCode()));
+            orderVO.setPayChannelName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.CHANNEL_CODE, order.getPayChannelCode()));
         }
         // 处理商品属性
         Map<Long, ProductPropertyValueDetailRespDTO> propertyValueDetailMap = convertMap(propertyValueDetails, ProductPropertyValueDetailRespDTO::getValueId);

@@ -18,15 +18,15 @@
       <el-descriptions title="选择支付宝支付">
       </el-descriptions>
       <div class="pay-channel-container">
-        <div class="box" v-for="channel in aliPayChannels" :key="channel.code" @click="submit(channel.code)">
-          <img :src="icons[channel.code]">
+        <div class="box" v-for="channel in channels" v-if="channel.code.indexOf('alipay_') === 0" :key="channel.code" @click="submit(channel.code)">
+          <img :src="channel.icon">
           <div class="title">{{ channel.name }}</div>
         </div>
       </div>
       <!-- 微信支付 -->
       <el-descriptions title="选择微信支付" style="margin-top: 20px;" />
       <div class="pay-channel-container">
-        <div class="box" v-for="channel in wxPayChannels" :key="channel.code">
+        <div class="box" v-for="channel in channels" v-if="channel.code.indexOf('wx_') === 0" :key="channel.code">
           <img :src="icons[channel.code]">
           <div class="title">{{ channel.name }}</div>
         </div>
@@ -34,7 +34,8 @@
       <!-- 其它支付 -->
       <el-descriptions title="选择其它支付" style="margin-top: 20px;" />
       <div class="pay-channel-container">
-        <div class="box" v-for="channel in otherPayChannels" :key="channel.code">
+        <div class="box" v-for="channel in channels" :key="channel.code"
+             v-if="channel.code.indexOf('alipay_') === -1 && channel.code.indexOf('wx_') === -1">
           <img :src="icons[channel.code]">
           <div class="title">{{ channel.name }}</div>
         </div>
@@ -101,20 +102,43 @@ export default {
       returnUrl: undefined, // 支付完的回调地址
       loading: false, // 支付信息的 loading
       payOrder: {}, // 支付信息
-      aliPayChannels: [], // 阿里支付的渠道
-      wxPayChannels: [], // 微信支付的渠道
-      otherPayChannels: [], // 其它的支付渠道
-      icons: {
-        alipay_qr: require("@/assets/images/pay/icon/alipay_qr.svg"),
-        alipay_app: require("@/assets/images/pay/icon/alipay_app.svg"),
-        alipay_wap: require("@/assets/images/pay/icon/alipay_wap.svg"),
-        alipay_pc: require("@/assets/images/pay/icon/alipay_pc.svg"),
-        alipay_bar: require("@/assets/images/pay/icon/alipay_bar.svg"),
-        wx_app: require("@/assets/images/pay/icon/wx_app.svg"),
-        wx_lite: require("@/assets/images/pay/icon/wx_lite.svg"),
-        wx_pub: require("@/assets/images/pay/icon/wx_pub.svg"),
-        mock: require("@/assets/images/pay/icon/mock.svg"),
-      },
+      channels: [{
+        name: '支付宝 PC 网站支付',
+        icon: require("@/assets/images/pay/icon/alipay_pc.svg"),
+        code: "alipay_pc"
+      }, {
+        name: '支付宝 Wap 网站支付',
+        icon: require("@/assets/images/pay/icon/alipay_wap.svg"),
+        code: "alipay_wap"
+      }, {
+        name: '支付宝 App 网站支付',
+        icon: require("@/assets/images/pay/icon/alipay_app.svg"),
+        code: "alipay_app"
+      }, {
+        name: '支付宝扫码支付',
+        icon: require("@/assets/images/pay/icon/alipay_app.svg"),
+        code: "alipay_qr"
+      }, {
+        name: '支付宝条码支付',
+        icon: require("@/assets/images/pay/icon/alipay_bar.svg"),
+        code: "alipay_bar"
+      }, {
+        name: '微信公众号支付',
+        icon: require("@/assets/images/pay/icon/wx_pub.svg"),
+        code: "wx_pub"
+      }, {
+        name: '微信小程序支付',
+        icon: require("@/assets/images/pay/icon/wx_lite.svg"),
+        code: "wx_lite"
+      }, {
+        name: '微信 App 支付',
+        icon: require("@/assets/images/pay/icon/wx_lite.svg"),
+        code: "wx_app"
+      }, {
+        name: '模拟支付',
+        icon: require("@/assets/images/pay/icon/mock.svg"),
+        code: "mock"
+      }],
       submitLoading: false, // 提交支付的 loading
       interval: undefined, // 定时任务，轮询是否完成支付
       qrCode: { // 展示形式：二维码
@@ -144,26 +168,8 @@ export default {
       this.returnUrl = decodeURIComponent(this.$route.query.returnUrl)
     }
     this.getDetail();
-    this.initPayChannels();
   },
   methods: {
-    /** 初始化支付渠道 */
-    initPayChannels() {
-      // 微信支付
-      for (const dict of getDictDatas(DICT_TYPE.PAY_CHANNEL_CODE_TYPE)) {
-        const payChannel = {
-          name: dict.label,
-          code: dict.value
-        }
-        if (dict.value.indexOf('wx_') === 0) {
-          this.wxPayChannels.push(payChannel);
-        } else if (dict.value.indexOf('alipay_') === 0) {
-          this.aliPayChannels.push(payChannel);
-        } else {
-          this.otherPayChannels.push(payChannel);
-        }
-      }
-    },
     /** 获得支付信息 */
     getDetail() {
       // 1.1 未传递订单编号
@@ -180,6 +186,7 @@ export default {
           return;
         }
         // 1.3 订单已支付
+        // TODO 芋艿：已支付
         if (response.data.status !== PayOrderStatusEnum.WAITING.status) {
           this.$message.error('支付订单不处于待支付状态，请检查！');
           this.goBackToList();

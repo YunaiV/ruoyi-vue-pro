@@ -298,7 +298,7 @@ export default {
       // 支付应用列表集合
       appList: null,
       // 支付渠道编码字典数据集合
-      payChannelCodeDictDatum: getDictDatas(DICT_TYPE.PAY_CHANNEL_CODE_TYPE),
+      payChannelCodeDictDatum: getDictDatas(DICT_TYPE.PAY_CHANNEL_CODE),
       // 订单退款状态字典数据集合
       payRefundOrderDictDatum: getDictDatas(DICT_TYPE.PAY_REFUND_ORDER_STATUS),
       // 退款订单类别字典数据集合

@@ -42,7 +42,7 @@
         <el-col :span="6" :xs="24">
           <el-form-item label="支付方式" prop="payChannelCode">
             <el-select v-model="queryParams.payChannelCode" clearable style="width: 240px">
-              <el-option v-for="dict in this.getDictDatas(DICT_TYPE.PAY_CHANNEL_CODE_TYPE)"
+              <el-option v-for="dict in this.getDictDatas(DICT_TYPE.PAY_CHANNEL_CODE)"
                          :key="dict.value" :label="dict.label" :value="dict.value"/>
             </el-select>
           </el-form-item>
@@ -86,7 +86,7 @@
                   <dict-tag :type="DICT_TYPE.TERMINAL" :value="row.terminal" />
                 </el-col>
                 <el-col :span="4">支付方式：
-                  <dict-tag v-if="row.payChannelCode" :type="DICT_TYPE.PAY_CHANNEL_CODE_TYPE" :value="row.payChannelCode" />
+                  <dict-tag v-if="row.payChannelCode" :type="DICT_TYPE.PAY_CHANNEL_CODE" :value="row.payChannelCode" />
                   <span v-else>未支付</span>
                 </el-col>
                 <el-col :span="6" align="right">
