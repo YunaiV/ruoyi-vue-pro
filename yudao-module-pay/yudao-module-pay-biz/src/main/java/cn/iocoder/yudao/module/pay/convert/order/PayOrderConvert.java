@@ -27,7 +27,6 @@ public interface PayOrderConvert {
 
     PayOrderConvert INSTANCE = Mappers.getMapper(PayOrderConvert.class);
 
-    @Mapping(source = "amount", target = "price")
     PayOrderRespVO convert(PayOrderDO bean);
 
     PayOrderRespDTO convert2(PayOrderDO order);
@@ -39,8 +38,6 @@ public interface PayOrderConvert {
     List<PayOrderRespVO> convertList(List<PayOrderDO> list);
 
     PageResult<PayOrderRespVO> convertPage(PageResult<PayOrderDO> page);
-
-    List<PayOrderExcelVO> convertList02(List<PayOrderDO> list);
 
     /**
      * 订单 DO 转自定义分页对象
@@ -76,14 +73,14 @@ public interface PayOrderConvert {
 
         BigDecimal multiple = new BigDecimal(100);
 
-        payOrderExcelVO.setAmount(BigDecimal.valueOf(bean.getAmount())
+        payOrderExcelVO.setPrice(BigDecimal.valueOf(bean.getPrice())
                 .divide(multiple, 2, RoundingMode.HALF_UP).toString());
 
-        payOrderExcelVO.setChannelFeeAmount(BigDecimal.valueOf(bean.getChannelFeeAmount())
+        payOrderExcelVO.setChannelFeePrice(BigDecimal.valueOf(bean.getChannelFeePrice())
                 .divide(multiple, 2, RoundingMode.HALF_UP).toString());
         payOrderExcelVO.setChannelFeeRate(java.math.BigDecimal.valueOf(bean.getChannelFeeRate())
                 .multiply(multiple).toString());
-        payOrderExcelVO.setRefundAmount(BigDecimal.valueOf(bean.getRefundAmount())
+        payOrderExcelVO.setRefundPrice(BigDecimal.valueOf(bean.getRefundPrice())
                 .divide(multiple, 2, RoundingMode.HALF_UP).toString());
 
         return payOrderExcelVO;

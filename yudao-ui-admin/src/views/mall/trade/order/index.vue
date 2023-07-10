@@ -113,7 +113,7 @@
                   </template>
                 </el-table-column>
                 <!-- TODO @小程：这里应该是一个订单下，多个商品，只展示订单上的总金额，就是 order.payPrice -->
-                <el-table-column label="实付金额(元)" prop="amount" align="center" width="100"/>
+                <el-table-column label="实付金额(元)" prop="price" align="center" width="100"/>
                 <!-- TODO @小程：这里应该是一个订单下，多个商品，只展示订单上的收件信息；使用 order.receiverXXX 开头的字段 -->
                 <el-table-column label="买家/收货人" prop="buyer" header-align="center" width="auto" min-width="300">
                   <template v-slot="{ row }">

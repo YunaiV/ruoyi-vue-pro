@@ -48,5 +48,5 @@ public class PayRefundCreateReqDTO {
      */
     @NotNull(message = "退款金额不能为空")
     @Min(value = 1, message = "退款金额必须大于零")
-    private Integer amount;
+    private Integer price;
 }

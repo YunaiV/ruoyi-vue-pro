@@ -317,7 +317,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
             throw exception(ORDER_UPDATE_PAID_FAIL_PAY_ORDER_STATUS_NOT_SUCCESS);
         }
         // 校验支付金额一致
-        if (ObjectUtil.notEqual(payOrder.getAmount(), order.getPayPrice())) {
+        if (ObjectUtil.notEqual(payOrder.getPrice(), order.getPayPrice())) {
             log.error("[validateOrderPaid][order({}) payOrder({}) 支付金额不匹配，请进行处理！order 数据是：{}，payOrder 数据是：{}]",
                     id, payOrderId, JsonUtils.toJsonString(order), JsonUtils.toJsonString(payOrder));
             throw exception(ORDER_UPDATE_PAID_FAIL_PAY_PRICE_NOT_MATCH);

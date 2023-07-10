@@ -106,7 +106,7 @@ public interface TradeOrderConvert {
         createReqDTO.setSubject(subject);
         createReqDTO.setBody(subject); // TODO 芋艿：临时写死
         // 订单相关字段
-        createReqDTO.setAmount(order.getPayPrice()).setExpireTime(addTime(orderProperties.getExpireTime()));
+        createReqDTO.setPrice(order.getPayPrice()).setExpireTime(addTime(orderProperties.getExpireTime()));
         return createReqDTO;
     }
 

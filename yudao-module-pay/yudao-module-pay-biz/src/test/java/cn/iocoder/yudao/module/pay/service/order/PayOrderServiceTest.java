@@ -75,9 +75,9 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
             o.setBody("斌斌子送给灿灿子的炸弹猫");
             o.setNotifyUrl("https://hc.com/lbh");
             o.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
-            o.setAmount(10000);
+            o.setPrice(10000);
             o.setChannelFeeRate(0.01);
-            o.setChannelFeeAmount(1L);
+            o.setChannelFeePrice(1L);
             o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus());
             o.setUserIp("127.0.0.1");
             o.setCreateTime(LocalDateTime.of(2018, 1, 1, 10, 1, 0));
@@ -87,7 +87,7 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
             o.setSuccessExtensionId(1L);
             o.setRefundStatus(PayRefundTypeEnum.NO.getStatus());
             o.setRefundTimes(0);
-            o.setRefundAmount(0L);
+            o.setRefundPrice(0L);
             o.setChannelUserId("1008611");
             o.setChannelOrderNo(channelOrderId);
             o.setUpdateTime(LocalDateTime.of(2018, 1, 1, 10, 10, 15));
@@ -143,9 +143,9 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
             o.setBody("斌斌子送给灿灿子的炸弹猫");
             o.setNotifyUrl("https://hc.com/lbh");
             o.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
-            o.setAmount(10000);
+            o.setPrice(10000);
             o.setChannelFeeRate(0.01);
-            o.setChannelFeeAmount(1L);
+            o.setChannelFeePrice(1L);
             o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus());
             o.setUserIp("127.0.0.1");
             o.setCreateTime(LocalDateTime.of(2018, 1, 1, 10, 1, 0));
@@ -155,7 +155,7 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
             o.setSuccessExtensionId(1L);
             o.setRefundStatus(PayRefundTypeEnum.NO.getStatus());
             o.setRefundTimes(0);
-            o.setRefundAmount(0L);
+            o.setRefundPrice(0L);
             o.setChannelUserId("1008611");
             o.setChannelOrderNo(channelOrderId);
             o.setUpdateTime(LocalDateTime.of(2018, 1, 1, 10, 10, 15));

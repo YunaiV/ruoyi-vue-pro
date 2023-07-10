@@ -67,7 +67,7 @@ public class MemberWalletTransactionDO extends BaseDO {
     /**
      * 交易金额, 单位分
      */
-    private Integer amount;
+    private Integer price;
 
     /**
      * 余额, 单位分

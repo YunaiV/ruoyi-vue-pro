@@ -118,7 +118,7 @@ public class PayOrderServiceImpl implements PayOrderService {
         // 退款相关字段
         // todo @芋艿 创建支付的订单的退款状态枚举是不是有问题，应该是 PayRefundTypeEnum 吧 您这填写的是 PayOrderNotifyStatusEnum 回调状态枚举
         order.setRefundStatus(PayOrderNotifyStatusEnum.NO.getStatus())
-                .setRefundTimes(0).setRefundAmount(0L);
+                .setRefundTimes(0).setRefundPrice(0L);
         orderMapper.insert(order);
         // 最终返回
         return order.getId();
@@ -147,7 +147,7 @@ public class PayOrderServiceImpl implements PayOrderService {
                 .setNotifyUrl(genChannelPayNotifyUrl(channel))
                 .setReturnUrl(reqVO.getReturnUrl())
                 // 订单相关字段
-                .setAmount(order.getAmount()).setExpireTime(order.getExpireTime());
+                .setAmount(order.getPrice()).setExpireTime(order.getExpireTime());
         PayOrderUnifiedRespDTO unifiedOrderRespDTO = client.unifiedOrder(unifiedOrderReqDTO);
 
         // TODO 轮询三方接口，是否已经支付的任务

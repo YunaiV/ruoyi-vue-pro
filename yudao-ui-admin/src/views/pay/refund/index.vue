@@ -95,14 +95,14 @@
           </p>
         </template>
       </el-table-column>
-      <el-table-column label="支付金额(元)" align="center" prop="payAmount" width="100">
+      <el-table-column label="支付金额(元)" align="center" prop="payPrice" width="100">
         <template v-slot="scope" class="">
-          ￥{{ parseFloat(scope.row.payAmount / 100).toFixed(2) }}
+          ￥{{ parseFloat(scope.row.payPrice / 100).toFixed(2) }}
         </template>
       </el-table-column>
-      <el-table-column label="退款金额(元)" align="center" prop="refundAmount" width="100">
+      <el-table-column label="退款金额(元)" align="center" prop="refundPrice" width="100">
         <template v-slot="scope">
-          ￥{{ parseFloat(scope.row.refundAmount / 100).toFixed(2) }}
+          ￥{{ parseFloat(scope.row.refundPrice / 100).toFixed(2) }}
         </template>
       </el-table-column>
       <el-table-column label="退款类型" align="center" prop="type" width="80">
@@ -160,10 +160,10 @@
       <el-divider></el-divider>
       <el-descriptions :column="2" label-class-name="desc-label">
         <el-descriptions-item label="支付金额">
-          {{ parseFloat(refundDetail.payAmount / 100).toFixed(2) }}
+          {{ parseFloat(refundDetail.payPrice / 100).toFixed(2) }}
         </el-descriptions-item>
         <el-descriptions-item label="退款金额" size="mini">
-          <el-tag class="tag-purple" size="mini">{{ parseFloat(refundDetail.refundAmount / 100).toFixed(2) }}</el-tag>
+          <el-tag class="tag-purple" size="mini">{{ parseFloat(refundDetail.refundPrice / 100).toFixed(2) }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="退款类型">
           <template v-slot="scope">
@@ -234,9 +234,9 @@ const defaultRefundDetail = {
   notifyTime: null,
   notifyUrl: '',
   orderId: null,
-  payAmount: null,
+  payPrice: null,
   reason: '',
-  refundAmount: null,
+  refundPrice: null,
   status: null,
   subject: '',
   successTime: null,
@@ -277,8 +277,8 @@ export default {
         notifyStatus: null,
         status: null,
         type: null,
-        payAmount: null,
-        refundAmount: null,
+        payPrice: null,
+        refundPrice: null,
         reason: null,
         userIp: null,
         channelOrderNo: null,

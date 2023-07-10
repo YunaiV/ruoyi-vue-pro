@@ -51,10 +51,10 @@ public class PayRefundPageReqVO extends PageParam {
     private Integer type;
 
     @Schema(description = "支付金额,单位分")
-    private Long payAmount;
+    private Long payPrice;
 
     @Schema(description = "退款金额,单位分")
-    private Long refundAmount;
+    private Long refundPrice;
 
     @Schema(description = "退款原因")
     private String reason;

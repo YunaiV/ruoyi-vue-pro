@@ -49,17 +49,13 @@ public class PayOrderBaseVO {
 
     @Schema(description = "支付金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "支付金额，单位：分不能为空")
-    private Long amount;
-
-    @Schema(description = "支付金额，单位：分", required = true)
-    @NotNull(message = "支付金额，单位：分不能为空")
     private Long price;
 
     @Schema(description = "渠道手续费，单位：百分比")
     private Double channelFeeRate;
 
     @Schema(description = "渠道手续金额，单位：分")
-    private Long channelFeeAmount;
+    private Long channelFeePrice;
 
     @Schema(description = "支付状态", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "支付状态不能为空")
@@ -95,7 +91,7 @@ public class PayOrderBaseVO {
 
     @Schema(description = "退款总金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "退款总金额，单位：分不能为空")
-    private Long refundAmount;
+    private Long refundPrice;
 
     @Schema(description = "渠道用户编号")
     private String channelUserId;

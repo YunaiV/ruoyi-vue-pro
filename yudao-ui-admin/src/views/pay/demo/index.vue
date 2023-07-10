@@ -29,9 +29,9 @@
         </template>
       </el-table-column>
       <el-table-column label="支付单号" align="center" prop="payOrderId" />
-      <el-table-column label="是否支付" align="center" prop="payed">
+      <el-table-column label="是否支付" align="center" prop="payStatus">
         <template v-slot="scope">
-          <dict-tag :type="DICT_TYPE.INFRA_BOOLEAN_STRING" :value="scope.row.payed" />
+          <dict-tag :type="DICT_TYPE.INFRA_BOOLEAN_STRING" :value="scope.row.payStatus" />
         </template>
       </el-table-column>
       <el-table-column label="支付时间" align="center" prop="payTime" width="180">
@@ -47,9 +47,9 @@
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handlePay(scope.row)"
-                     v-if="!scope.row.payed">前往支付</el-button>
+                     v-if="!scope.row.payStatus">前往支付</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleRefund(scope.row)"
-                     v-if="scope.row.payed && !scope.row.payRefundId">发起退款</el-button>
+                     v-if="scope.row.payStatus && !scope.row.payRefundId">发起退款</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -78,12 +78,10 @@
 </template>
 
 <script>
-import {createDemoOrder, getDemoOrderPage, refundDemoOrder} from "@/api/pay/demo";
+import { createDemoOrder, getDemoOrderPage, refundDemoOrder } from "@/api/pay/demo";
 
 export default {
   name: "PayDemoOrder",
-  components: {
-  },
   data() {
     return {
       // 遮罩层
@@ -192,9 +190,10 @@ export default {
     /** 支付按钮操作 */
     handlePay(row) {
       this.$router.push({
-          name: 'PayOrderSubmit',
+          name: 'PayCashier',
           query:{
-            id: row.payOrderId
+            id: row.payOrderId,
+            returnUrl: encodeURIComponent('/pay/demo-order?id=' + row.id)
           }
       })
     },

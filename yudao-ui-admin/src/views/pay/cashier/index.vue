@@ -6,7 +6,7 @@
         <el-descriptions-item label="支付单号">{{ payOrder.id }}</el-descriptions-item>
         <el-descriptions-item label="商品标题">{{ payOrder.subject }}</el-descriptions-item>
         <el-descriptions-item label="商品内容">{{ payOrder.body }}</el-descriptions-item>
-        <el-descriptions-item label="支付金额">￥{{ (payOrder.amount / 100.0).toFixed(2) }}</el-descriptions-item>
+        <el-descriptions-item label="支付金额">￥{{ (payOrder.price / 100.0).toFixed(2) }}</el-descriptions-item>
         <el-descriptions-item label="创建时间">{{ parseTime(payOrder.createTime) }}</el-descriptions-item>
         <el-descriptions-item label="过期时间">{{ parseTime(payOrder.expireTime) }}</el-descriptions-item>
       </el-descriptions>
@@ -88,16 +88,17 @@
 import QrcodeVue from 'qrcode.vue'
 import { DICT_TYPE, getDictDatas } from "@/utils/dict";
 import { getOrder, submitOrder } from '@/api/pay/order';
-import {PayChannelEnum, PayDisplayModeEnum, PayOrderStatusEnum} from "@/utils/constants";
+import { PayChannelEnum, PayDisplayModeEnum, PayOrderStatusEnum } from "@/utils/constants";
 
 export default {
-  name: "PayOrderSubmit",
+  name: "PayCashier",
   components: {
     QrcodeVue,
   },
   data() {
     return {
       id: undefined, // 请假编号
+      returnUrl: undefined, // 支付完的回调地址
       loading: false, // 支付信息的 loading
       payOrder: {}, // 支付信息
       aliPayChannels: [], // 阿里支付的渠道
@@ -139,6 +140,9 @@ export default {
   },
   created() {
     this.id = this.$route.query.id;
+    if (this.$route.query.returnUrl) {
+      this.returnUrl = decodeURIComponent(this.$route.query.returnUrl)
+    }
     this.getDetail();
     this.initPayChannels();
   },
@@ -296,7 +300,8 @@ export default {
     },
     /** 提交支付后，URL 的展示形式 */
     displayUrl(channelCode, data) {
-      window.open(data.displayContent)
+      // window.open(data.displayContent)window
+      location.href = data.displayContent
       this.submitLoading = false
     },
     /** 提交支付后，Form 的展示形式 */
@@ -369,6 +374,10 @@ export default {
     goBackToList() {
       this.$tab.closePage();
       this.$router.go(-1);
+      // TODO 芋艿：需要优化；
+      // this.$router.push({
+      //   path: this.returnUrl
+      // });
     }
   }
 };

@@ -81,19 +81,19 @@
         </template>
       </el-table-column>
       <el-table-column label="商品标题" align="center" prop="subject" width="180" :show-overflow-tooltip="true"/>
-      <el-table-column label="支付金额" align="center" prop="amount" width="100">
+      <el-table-column label="支付金额" align="center" prop="price" width="100">
         <template v-slot="scope">
-          ￥{{ parseFloat(scope.row.amount / 100).toFixed(2) }}
+          ￥{{ parseFloat(scope.row.price / 100).toFixed(2) }}
         </template>
       </el-table-column>
-      <el-table-column label="手续金额" align="center" prop="channelFeeAmount" width="100">
+      <el-table-column label="手续金额" align="center" prop="channelFeePrice" width="100">
         <template v-slot="scope">
-          ￥{{ parseFloat(scope.row.channelFeeAmount / 100).toFixed(2) }}
+          ￥{{ parseFloat(scope.row.channelFeePrice / 100).toFixed(2) }}
         </template>
       </el-table-column>
-      <el-table-column label="退款金额" align="center" prop="refundAmount" width="100">
+      <el-table-column label="退款金额" align="center" prop="refundPrice" width="100">
         <template v-slot="scope">
-          ￥{{ parseFloat(scope.row.refundAmount / 100).toFixed(2) }}
+          ￥{{ parseFloat(scope.row.refundPrice / 100).toFixed(2) }}
         </template>
       </el-table-column>
       <el-table-column label="支付状态" align="center" prop="status">
@@ -154,10 +154,10 @@
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="金额">
-          <el-tag type="success" size="small">{{ parseFloat(orderDetail.amount / 100, 2) }}</el-tag>
+          <el-tag type="success" size="small">{{ parseFloat(orderDetail.price / 100, 2) }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="手续费">
-          <el-tag type="warning" size="small">{{ parseFloat(orderDetail.channelFeeAmount / 100, 2) }}</el-tag>
+          <el-tag type="warning" size="small">{{ parseFloat(orderDetail.channelFeePrice / 100, 2) }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="手续费比例">
           {{ parseFloat(orderDetail.channelFeeRate / 100, 2) }}%
@@ -184,7 +184,7 @@
         <el-descriptions-item label="退款次数">{{ orderDetail.refundTimes }}</el-descriptions-item>
         <el-descriptions-item label="退款金额">
           <el-tag type="warning">
-            {{ parseFloat(orderDetail.refundAmount / 100, 2) }}
+            {{ parseFloat(orderDetail.refundPrice / 100, 2) }}
           </el-tag>
         </el-descriptions-item>
       </el-descriptions>
@@ -213,16 +213,16 @@ const defaultOrderDetail = {
   merchantOrderId: null,
   channelOrderNo: '',
   body: '',
-  amount: null,
+  price: null,
   channelFeeRate: null,
-  channelFeeAmount: null,
+  channelFeePrice: null,
   userIp: '',
   status: null,
   notifyUrl: '',
   notifyStatus: null,
   refundStatus: null,
   refundTimes: '',
-  refundAmount: null,
+  refundPrice: null,
   createTime: '',
   successTime: '',
   notifyTime: '',
@@ -262,15 +262,15 @@ export default {
         body: null,
         notifyUrl: null,
         notifyStatus: null,
-        amount: null,
+        price: null,
         channelFeeRate: null,
-        channelFeeAmount: null,
+        channelFeePrice: null,
         status: null,
         userIp: null,
         successExtensionId: null,
         refundStatus: null,
         refundTimes: null,
-        refundAmount: null,
+        refundPrice: null,
         channelUserId: null,
         channelOrderNo: null,
         expireTime: [],
