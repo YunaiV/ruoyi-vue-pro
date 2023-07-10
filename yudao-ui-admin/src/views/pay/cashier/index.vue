@@ -27,7 +27,7 @@
       <el-descriptions title="选择微信支付" style="margin-top: 20px;" />
       <div class="pay-channel-container">
         <div class="box" v-for="channel in channels" v-if="channel.code.indexOf('wx_') === 0" :key="channel.code">
-          <img :src="icons[channel.code]">
+          <img :src="channel.icon">
           <div class="title">{{ channel.name }}</div>
         </div>
       </div>
@@ -36,7 +36,7 @@
       <div class="pay-channel-container">
         <div class="box" v-for="channel in channels" :key="channel.code"
              v-if="channel.code.indexOf('alipay_') === -1 && channel.code.indexOf('wx_') === -1">
-          <img :src="icons[channel.code]">
+          <img :src="channel.icon">
           <div class="title">{{ channel.name }}</div>
         </div>
       </div>
@@ -132,7 +132,7 @@ export default {
         code: "wx_lite"
       }, {
         name: '微信 App 支付',
-        icon: require("@/assets/images/pay/icon/wx_lite.svg"),
+        icon: require("@/assets/images/pay/icon/wx_app.svg"),
         code: "wx_app"
       }, {
         name: '模拟支付',

@@ -5,13 +5,13 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayOrderNotifyRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
-import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
 import com.github.binarywang.wxpay.bean.request.WxPayMicropayRequest;
 import com.github.binarywang.wxpay.bean.result.WxPayMicropayResult;
 import com.github.binarywang.wxpay.constant.WxPayConstants;
@@ -70,9 +70,15 @@ public class WxBarPayClient extends AbstractWxPayClient {
             try {
                 WxPayMicropayResult response = client.micropay(request);
                 // 支付成功（例如说，用户输入了密码）
+                PayOrderNotifyRespDTO notify = PayOrderNotifyRespDTO.builder()
+                        .orderExtensionNo(response.getOutTradeNo())
+                        .channelOrderNo(response.getTransactionId())
+                        .channelUserId(response.getOpenid())
+                        .successTime(parseDateV2(response.getTimeEnd()))
+                        .build();
                 return new PayOrderUnifiedRespDTO(PayOrderDisplayModeEnum.BAR_CODE.getMode(),
-                        JsonUtils.toJsonString(response),
-                        PayOrderStatusRespEnum.SUCCESS.getStatus());
+                        JsonUtils.toJsonString(response))
+                        .setNotify(notify);
             } catch (WxPayException ex) {
                 // 如果不满足这 3 种任一的，则直接抛出 WxPayException 异常，不仅需处理
                 // 1. SYSTEMERROR：接口返回错误：请立即调用被扫订单结果查询API，查询当前订单状态，并根据订单的状态决定下一步的操作。

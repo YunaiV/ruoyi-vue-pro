@@ -93,7 +93,7 @@ public interface PayOrderConvert {
 
     PayOrderUnifiedReqDTO convert2(PayOrderSubmitReqVO reqVO, String userIp);
 
-    PayOrderSubmitRespVO convert(PayOrderUnifiedRespDTO bean);
+    PayOrderSubmitRespVO convert(PayOrderDO order, PayOrderUnifiedRespDTO unifiedRespDTO);
 
     AppPayOrderSubmitRespVO convert3(PayOrderSubmitRespVO bean);
 
