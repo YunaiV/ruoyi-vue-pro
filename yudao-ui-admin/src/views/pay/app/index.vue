@@ -7,10 +7,6 @@
         <el-input v-model="queryParams.name" placeholder="请输入应用名" clearable
                   @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="商户名称" prop="merchantName">
-        <el-input v-model="queryParams.merchantName" placeholder="请输入商户名称" clearable
-                  @keyup.enter.native="handleQuery"/>
-      </el-form-item>
       <el-form-item label="开启状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择开启状态" clearable>
           <el-option v-for="dict in statusDictDatas" :key="parseInt(dict.value)" :label="dict.label"
@@ -32,11 +28,6 @@
       <el-col :span="1.5">
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
                    v-hasPermi="['pay:app:create']">新增
-        </el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport"
-                   v-hasPermi="['pay:app:export']">导出
         </el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
@@ -174,23 +165,6 @@
         <el-form-item label="应用名" prop="name">
           <el-input v-model="form.name" placeholder="请输入应用名"/>
         </el-form-item>
-        <el-form-item label="所属商户" prop="merchantId">
-          <el-select
-            v-model="form.merchantId"
-            filterable
-            remote
-            reserve-keyword
-            placeholder="请选择所属商户"
-            :remote-method="handleGetMerchantListByName"
-            :loading="loading">
-            <el-option
-              v-for="item in merchantList"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id">
-            </el-option>
-          </el-select>
-        </el-form-item>
         <el-form-item label="开启状态" prop="status">
           <el-radio-group v-model="form.status">
             <el-radio v-for="dict in statusDictDatas" :key="parseInt(dict.value)" :label="parseInt(dict.value)">
@@ -221,10 +195,9 @@
 </template>
 
 <script>
-import {createApp, updateApp, changeAppStatus, deleteApp, getApp, getAppPage, exportAppExcel} from "@/api/pay/app";
-import {DICT_TYPE, getDictDatas} from "@/utils/dict";
-import {PayType, PayChannelEnum, CommonStatusEnum} from "@/utils/constants";
-import {getMerchantListByName} from "@/api/pay/merchant";
+import { createApp, updateApp, changeAppStatus, deleteApp, getApp, getAppPage } from "@/api/pay/app";
+import { DICT_TYPE, getDictDatas } from "@/utils/dict";
+import { PayType, PayChannelEnum, CommonStatusEnum } from "@/utils/constants";
 import wechatChannelForm from "@/views/pay/app/components/wechatChannelForm";
 import aliPayChannelForm from "@/views/pay/app/components/aliPayChannelForm";
 
@@ -254,10 +227,6 @@ export default {
         pageSize: 10,
         name: null,
         status: null,
-        remark: null,
-        payNotifyUrl: null,
-        refundNotifyUrl: null,
-        merchantName: null,
         createTime: []
       },
       // 表单参数
@@ -268,7 +237,6 @@ export default {
         status: [{required: true, message: "开启状态不能为空", trigger: "blur"}],
         payNotifyUrl: [{required: true, message: "支付结果的回调地址不能为空", trigger: "blur"}],
         refundNotifyUrl: [{required: true, message: "退款结果的回调地址不能为空", trigger: "blur"}],
-        merchantId: [{required: true, message: "商户编号不能为空", trigger: "blur"}],
       },
       // 数据字典
       statusDictDatas: getDictDatas(DICT_TYPE.COMMON_STATUS),
@@ -277,8 +245,6 @@ export default {
       payChannelEnum: PayChannelEnum,
       // 支付类型
       payType: PayType,
-      // 商户列表
-      merchantList: [],
       // 是否显示支付窗口
       payOpen: false,
       // 微信组件传参参数
@@ -305,7 +271,6 @@ export default {
   },
   created() {
     this.getList();
-    this.handleGetMerchantListByName(null);
   },
   methods: {
     /** 查询列表 */
@@ -332,7 +297,6 @@ export default {
         remark: undefined,
         payNotifyUrl: undefined,
         refundNotifyUrl: undefined,
-        merchantId: undefined,
       };
       this.resetForm("form");
     },
@@ -411,28 +375,6 @@ export default {
         });
       });
     },
-    /** 导出按钮操作 */
-    handleExport() {
-      // 处理查询参数
-      let params = {...this.queryParams};
-      params.pageNo = undefined;
-      params.pageSize = undefined;
-      // 执行导出
-      this.$modal.confirm('是否确认导出所有支付应用信息数据项?').then(function () {
-        return exportAppExcel(params);
-      }).then(response => {
-        this.$download.excel(response, '支付应用信息.xls');
-      }).catch(() => {});
-    },
-    /**
-     * 根据商户名称模糊匹配商户信息
-     * @param name 商户名称
-     */
-    handleGetMerchantListByName(name) {
-      getMerchantListByName(name).then(response => {
-        this.merchantList = response.data;
-      });
-    },
     /**
      * 修改支付渠道信息
      */
@@ -440,7 +382,6 @@ export default {
       this.settingChannelParam(row, payCode, type)
       this.channelParam.edit = true;
       this.channelParam.loading = true;
-
     },
     /**
      * 新增支付渠道信息
@@ -475,9 +416,6 @@ export default {
      */
     judgeChannelExist(channels, channelCode) {
       return channels.indexOf(channelCode) !== -1;
-    },
-    refreshTable() {
-      this.getList();
     }
   }
 };

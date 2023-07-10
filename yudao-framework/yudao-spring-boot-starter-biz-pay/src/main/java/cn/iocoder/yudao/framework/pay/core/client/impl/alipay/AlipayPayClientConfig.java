@@ -9,8 +9,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
 
-// TODO 芋艿：参数校验
-
 /**
  * 支付宝的 PayClientConfig 实现类
  * 属性主要来自 {@link com.alipay.api.AlipayConfig} 的必要属性
@@ -111,7 +109,9 @@ public class AlipayPayClientConfig implements PayClientConfig {
 
     @Override
     public Set<ConstraintViolation<PayClientConfig>> verifyParam(Validator validator) {
+        // TODO 芋艿：参数校验
         return validator.validate(this,
                 MODE_PUBLIC_KEY.equals(this.getMode()) ? ModePublicKey.class : ModeCertificate.class);
     }
+
 }

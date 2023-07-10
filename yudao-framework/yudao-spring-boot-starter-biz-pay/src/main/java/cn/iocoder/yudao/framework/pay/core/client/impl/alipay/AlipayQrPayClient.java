@@ -2,8 +2,8 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
-import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
-import cn.iocoder.yudao.framework.pay.core.enums.PayDisplayModeEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.domain.AlipayTradePrecreateModel;
 import com.alipay.api.request.AlipayTradePrecreateRequest;
@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author 芋道源码
  */
 @Slf4j
-public class AlipayQrPayClient extends AbstractAlipayClient {
+public class AlipayQrPayClient extends AbstractAlipayPayClient {
 
     public AlipayQrPayClient(Long channelId, AlipayPayClientConfig config) {
         super(channelId, PayChannelEnum.ALIPAY_QR.getCode(), config);
@@ -36,7 +36,7 @@ public class AlipayQrPayClient extends AbstractAlipayClient {
         model.setProductCode("FACE_TO_FACE_PAYMENT"); // 销售产品码. 目前扫码支付场景下仅支持 FACE_TO_FACE_PAYMENT
         // ② 个性化的参数【无】
         // ③ 支付宝扫码支付只有一种展示，考虑到前端可能希望二维码扫描后，手机打开
-        String displayMode = PayDisplayModeEnum.QR_CODE.getMode();
+        String displayMode = PayOrderDisplayModeEnum.QR_CODE.getMode();
 
         // 1.2 构建 AlipayTradePrecreateRequest 请求
         AlipayTradePrecreateRequest request = new AlipayTradePrecreateRequest();
@@ -47,8 +47,8 @@ public class AlipayQrPayClient extends AbstractAlipayClient {
         // 2.1 执行请求
         AlipayTradePrecreateResponse response = client.execute(request);
         // 2.2 处理结果
-        validateSuccess(response);
-        return new PayOrderUnifiedRespDTO()
-                .setDisplayMode(displayMode).setDisplayContent(response.getQrCode());
+        validateUnifiedOrderResponse(request, response);
+        return new PayOrderUnifiedRespDTO(displayMode, response.getQrCode());
     }
+
 }

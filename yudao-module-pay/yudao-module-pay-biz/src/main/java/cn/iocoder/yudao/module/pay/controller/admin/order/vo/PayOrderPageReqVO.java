@@ -17,9 +17,6 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class PayOrderPageReqVO extends PageParam {
 
-    @Schema(description = "商户编号")
-    private Long merchantId;
-
     @Schema(description = "应用编号")
     private Long appId;
 

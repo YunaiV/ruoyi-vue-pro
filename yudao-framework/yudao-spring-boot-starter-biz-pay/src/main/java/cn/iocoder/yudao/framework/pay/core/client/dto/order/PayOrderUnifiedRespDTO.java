@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.pay.core.client.dto.order;
 
-import lombok.AllArgsConstructor;
+import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
 import lombok.Data;
 
 /**
@@ -13,6 +14,8 @@ public class PayOrderUnifiedRespDTO {
 
     /**
      * 展示模式
+     *
+     * 枚举 {@link PayOrderDisplayModeEnum} 类
      */
     private String displayMode;
     /**
@@ -20,4 +23,20 @@ public class PayOrderUnifiedRespDTO {
      */
     private String displayContent;
 
+    /**
+     * 支付状态
+     *
+     * 枚举 {@link PayOrderStatusRespEnum} 类
+     */
+    private Integer status;
+
+    public PayOrderUnifiedRespDTO(String displayMode, String displayContent) {
+        this(displayMode, displayContent, PayOrderStatusRespEnum.WAITING.getStatus());
+    }
+
+    public PayOrderUnifiedRespDTO(String displayMode, String displayContent, Integer status) {
+        this.displayMode = displayMode;
+        this.displayContent = displayContent;
+        this.status = status;
+    }
 }

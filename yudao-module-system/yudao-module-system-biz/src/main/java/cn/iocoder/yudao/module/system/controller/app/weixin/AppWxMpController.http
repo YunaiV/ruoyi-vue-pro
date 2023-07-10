@@ -1,0 +1,4 @@
+### 请求 /login 接口 => 成功
+POST {{appApi}}/system/wx-mp/create-jsapi-signature?url=http://www.iocoder.cn
+Authorization: Bearer {{appToken}}
+tenant-id: {{appTenentId}}

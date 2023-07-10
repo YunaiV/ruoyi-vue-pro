@@ -17,7 +17,7 @@
             </el-form-item>
             <el-form-item label="参与场次" prop="timeId">
                 <el-select v-model="queryParams.timeId" placeholder="请选择参与场次" clearable size="small">
-                    <el-option v-for="item in SeckillConfigList" :key="item.id" :label="item.name" :value="item.id"/>
+                    <el-option v-for="item in seckillTimeList" :key="item.id" :label="item.name" :value="item.id" />
                 </el-select>
             </el-form-item>
             <el-form-item label="创建时间" prop="createTime">
@@ -38,9 +38,8 @@
                     v-hasPermi="['promotion:seckill-activity:create']">新增秒杀活动</el-button>
             </el-col>
             <el-col :span="1.5">
-              <el-button v-hasPermi="['promotion:seckill-activity:create']" icon="el-icon-menu" plain size="mini" type="primary"
-                         @click="openSeckillConfig">管理参与场次
-              </el-button>
+                <el-button type="primary" plain icon="el-icon-menu" size="mini" @click="openSeckillTime"
+                    v-hasPermi="['promotion:seckill-activity:create']">管理参与场次</el-button>
             </el-col>
             <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
@@ -55,8 +54,8 @@
             </el-table-column>
             <el-table-column label="参与场次" prop="timeIds" width="250">
                 <template v-slot="scope">
-                    <span v-for="item in SeckillConfigList" v-if="scope.row.timeIds.includes(item.id)"
-                          :key="item.id">
+                    <span v-for="item in seckillTimeList" :key="item.id"
+                        v-if="scope.row.timeIds.includes(item.id)">
                         <el-tag style="margin:4px;" size="small">{{ item.name }}</el-tag>
                     </span>
                 </template>
@@ -111,13 +110,12 @@
                 <el-form-item label="场次选择">
                     <el-select v-model="form.timeIds" placeholder="请选择参与场次" clearable size="small" multiple filterable
                         style="width: 880px">
-                      <el-option v-for="item in SeckillConfigList" :key="item.id" :label="item.name" :value="item.id">
-                            <span style="float: left">{{ item.name + ': { ' }} {{ item.startTime }} -- {{
-                                item.endTime +
-                                ' }'
-                              }}</span>
-                        <span style="float: right; color: #8492a6; font-size: 13px"></span>
-                      </el-option>
+                        <el-option v-for="item in seckillTimeList" :key="item.id" :label="item.name" :value="item.id">
+                            <span style="float: left">{{ item.name + ': { ' }} {{ item.startTime }} -- {{ item.endTime +
+                                    ' }'
+                            }}</span>
+                            <span style="float: right; color: #8492a6; font-size: 13px"></span>
+                        </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="商品选择">
@@ -188,17 +186,10 @@
 </template>
 
 <script>
-import {getSkuOptionList} from "@/api/mall/product/sku";
-import {
-  closeSeckillActivity,
-  createSeckillActivity,
-  deleteSeckillActivity,
-  getSeckillActivity,
-  getSeckillActivityPage,
-  updateSeckillActivity
-} from "@/api/mall/promotion/seckillActivity";
-import {getSeckillConfigList} from "@/api/mall/promotion/SeckillConfig";
-import {deepClone} from "@/utils";
+import { getSkuOptionList } from "@/api/mall/product/sku";
+import { createSeckillActivity, updateSeckillActivity, closeSeckillActivity, deleteSeckillActivity, getSeckillActivity, getSeckillActivityPage, exportSeckillActivityExcel } from "@/api/mall/promotion/seckillActivity";
+import { getSeckillTimeList } from "@/api/mall/promotion/seckillTime";
+import { deepClone } from "@/utils";
 
 export default {
     name: "PromotionSeckillActivity",
@@ -206,26 +197,26 @@ export default {
     },
     data() {
         return {
-          // 遮罩层
-          loading: true,
-          // 显示搜索条件
-          showSearch: true,
-          // 总条数
-          total: 0,
-          // 秒杀活动列表
-          list: [],
-          // 秒杀场次列表
-          SeckillConfigList: [],
-          // 弹出层标题
-          title: "",
-          // 是否显示弹出层
-          open: false,
-          // 查询参数
-          queryParams: {
-            pageNo: 1,
-            pageSize: 10,
-            name: null,
-            status: null,
+            // 遮罩层
+            loading: true,
+            // 显示搜索条件
+            showSearch: true,
+            // 总条数
+            total: 0,
+            // 秒杀活动列表
+            list: [],
+            // 秒杀场次列表
+            seckillTimeList: [],
+            // 弹出层标题
+            title: "",
+            // 是否显示弹出层
+            open: false,
+            // 查询参数
+            queryParams: {
+                pageNo: 1,
+                pageSize: 10,
+                name: null,
+                status: null,
                 timeId: null,
                 createTime: [],
             },
@@ -270,18 +261,18 @@ export default {
                 this.total = response.data.total;
                 this.loading = false;
             });
-          if (timeId) {
-            //查询完成后设置为空
-            this.$route.params.timeId = undefined
-          }
-          // 获得 SKU 商品列表
-          getSkuOptionList().then(response => {
-            this.productSkus = response.data;
-          });
-          // 获取参与场次列表
-          getSeckillConfigList().then(response => {
-            this.SeckillConfigList = response.data;
-          });
+            if (timeId) {
+                //查询完成后设置为空
+                this.$route.params.timeId = undefined
+            }
+            // 获得 SKU 商品列表
+            getSkuOptionList().then(response => {
+                this.productSkus = response.data;
+            });
+            // 获取参与场次列表
+            getSeckillTimeList().then(response => {
+                this.seckillTimeList = response.data;
+            });
         },
         /** 取消按钮 */
         cancel() {
@@ -315,10 +306,10 @@ export default {
             this.resetForm("queryForm");
             this.handleQuery();
         },
-      /**打开秒杀场次管理页面 */
-      openSeckillConfig() {
-        this.$tab.openPage("秒杀场次管理", "/promotion/seckill-time");
-      },
+        /**打开秒杀场次管理页面 */
+        openSeckillTime() {
+            this.$tab.openPage("秒杀场次管理", "/promotion/seckill-time");
+        },
         /** 新增按钮操作 */
         handleAdd() {
             this.reset();

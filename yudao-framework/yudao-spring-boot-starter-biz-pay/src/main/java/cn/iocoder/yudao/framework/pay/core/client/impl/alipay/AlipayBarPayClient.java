@@ -4,8 +4,8 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
-import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
-import cn.iocoder.yudao.framework.pay.core.enums.PayDisplayModeEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.domain.AlipayTradePayModel;
 import com.alipay.api.request.AlipayTradePayRequest;
@@ -13,7 +13,6 @@ import com.alipay.api.response.AlipayTradePayResponse;
 import lombok.extern.slf4j.Slf4j;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
 
 /**
@@ -24,7 +23,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
  * @author 芋道源码
  */
 @Slf4j
-public class AlipayBarPayClient extends AbstractAlipayClient {
+public class AlipayBarPayClient extends AbstractAlipayPayClient {
 
     public AlipayBarPayClient(Long channelId, AlipayPayClientConfig config) {
         super(channelId, PayChannelEnum.ALIPAY_BAR.getCode(), config);
@@ -48,7 +47,7 @@ public class AlipayBarPayClient extends AbstractAlipayClient {
         // ② 个性化的参数
         model.setAuthCode(authCode);
         // ③ 支付宝条码支付只有一种展示
-        String displayMode = PayDisplayModeEnum.BAR_CODE.getMode();
+        String displayMode = PayOrderDisplayModeEnum.BAR_CODE.getMode();
 
         // 1.2 构建 AlipayTradePayRequest 请求
         AlipayTradePayRequest request = new AlipayTradePayRequest();
@@ -59,8 +58,8 @@ public class AlipayBarPayClient extends AbstractAlipayClient {
         // 2.1 执行请求
         AlipayTradePayResponse response = client.execute(request);
         // 2.2 处理结果
-        validateSuccess(response);
-        return new PayOrderUnifiedRespDTO()
-                .setDisplayMode(displayMode).setDisplayContent("");
+        validateUnifiedOrderResponse(request, response);
+        return new PayOrderUnifiedRespDTO(displayMode, "");
     }
+
 }

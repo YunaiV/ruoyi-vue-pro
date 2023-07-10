@@ -131,7 +131,6 @@ const defaultForm = {
   remark: '',
   feeRate: null,
   appId: '',
-  merchantId: null,
   aliPayConfig: {
     appId: '',
     serverUrl: null,
@@ -161,13 +160,6 @@ export default {
       "appId": null,
       // 渠道编码
       "payCode": null,
-      // 商户对象
-      "payMerchant": {
-        // 编号
-        "id": null,
-        // 名称
-        "name": null
-      },
     }
   },
   data() {
@@ -249,7 +241,6 @@ export default {
         if (newVal.aliPayOpen) {
           this.form.code = newVal.payCode;
           this.form.appId = newVal.appId;
-          this.form.merchantId = newVal.payMerchant.id;
           // 只有在初次进来为编辑 并且为加载中的时候才回去请求数据
           if (newVal.edit === true && newVal.loading) {
             this.title = "编辑支付渠道";
@@ -264,7 +255,7 @@ export default {
 
   methods: {
     init() {
-      getChannel(this.transferParam.payMerchant.id, this.transferParam.appId, this.transferParam.payCode)
+      getChannel(this.transferParam.appId, this.transferParam.payCode)
         .then(response => {
           this.form.id = response.data.id;
           this.form.feeRate = response.data.feeRate;

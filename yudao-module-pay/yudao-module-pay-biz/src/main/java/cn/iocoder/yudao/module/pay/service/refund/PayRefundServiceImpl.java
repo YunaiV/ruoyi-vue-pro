@@ -10,12 +10,12 @@ import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayRefundNotifyRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.enums.PayNotifyRefundStatusEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.refund.PayNotifyRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundExportReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundPageReqVO;
-import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayAppDO;
-import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayChannelDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
@@ -27,8 +27,8 @@ import cn.iocoder.yudao.module.pay.enums.order.PayOrderNotifyStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundTypeEnum;
-import cn.iocoder.yudao.module.pay.service.merchant.PayAppService;
-import cn.iocoder.yudao.module.pay.service.merchant.PayChannelService;
+import cn.iocoder.yudao.module.pay.service.app.PayAppService;
+import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
 import cn.iocoder.yudao.module.pay.service.notify.dto.PayNotifyTaskCreateReqDTO;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderExtensionService;
@@ -141,7 +141,6 @@ public class PayRefundServiceImpl implements PayRefundService {
                     .channelOrderNo(order.getChannelOrderNo())
                     .channelCode(order.getChannelCode())
                     .channelId(order.getChannelId())
-                    .merchantId(order.getMerchantId())
                     .orderId(order.getId())
                     .merchantRefundNo(merchantRefundId) // TODO 芋艿：需要优化
                     .notifyUrl(app.getRefundNotifyUrl())

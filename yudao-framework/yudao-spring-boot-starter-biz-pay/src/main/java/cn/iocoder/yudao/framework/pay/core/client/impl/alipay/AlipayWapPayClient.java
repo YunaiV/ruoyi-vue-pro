@@ -3,8 +3,8 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 import cn.hutool.http.Method;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
-import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
-import cn.iocoder.yudao.framework.pay.core.enums.PayDisplayModeEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.domain.AlipayTradeWapPayModel;
 import com.alipay.api.request.AlipayTradeWapPayRequest;
@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author 芋道源码
  */
 @Slf4j
-public class AlipayWapPayClient extends AbstractAlipayClient {
+public class AlipayWapPayClient extends AbstractAlipayPayClient {
 
     public AlipayWapPayClient(Long channelId, AlipayPayClientConfig config) {
         super(channelId, PayChannelEnum.ALIPAY_WAP.getCode(), config);
@@ -37,7 +37,7 @@ public class AlipayWapPayClient extends AbstractAlipayClient {
         model.setProductCode("QUICK_WAP_PAY"); // 销售产品码. 目前 Wap 支付场景下仅支持 QUICK_WAP_PAY
         // ② 个性化的参数【无】
         // ③ 支付宝 Wap 支付只有一种展示：URL
-        String displayMode = PayDisplayModeEnum.URL.getMode();
+        String displayMode = PayOrderDisplayModeEnum.URL.getMode();
 
         // 1.2 构建 AlipayTradeWapPayRequest 请求
         AlipayTradeWapPayRequest request = new AlipayTradeWapPayRequest();
@@ -50,9 +50,8 @@ public class AlipayWapPayClient extends AbstractAlipayClient {
         AlipayTradeWapPayResponse response = client.pageExecute(request, Method.GET.name());
 
         // 2.2 处理结果
-        validateSuccess(response);
-        return new PayOrderUnifiedRespDTO()
-                .setDisplayMode(displayMode).setDisplayContent(response.getBody());
+        validateUnifiedOrderResponse(request, response);
+        return new PayOrderUnifiedRespDTO(displayMode, response.getBody());
     }
 
 }

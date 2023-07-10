@@ -17,10 +17,6 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class PayOrderBaseVO {
 
-    @Schema(description = "商户编号", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "商户编号不能为空")
-    private Long merchantId;
-
     @Schema(description = "应用编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "应用编号不能为空")
     private Long appId;

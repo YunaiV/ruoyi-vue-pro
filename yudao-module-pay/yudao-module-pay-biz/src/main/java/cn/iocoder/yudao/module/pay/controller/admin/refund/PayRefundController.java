@@ -4,12 +4,10 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.*;
 import cn.iocoder.yudao.module.pay.convert.refund.PayRefundConvert;
-import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayAppDO;
-import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayMerchantDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
-import cn.iocoder.yudao.module.pay.service.merchant.PayAppService;
-import cn.iocoder.yudao.module.pay.service.merchant.PayMerchantService;
+import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -17,7 +15,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,8 +46,6 @@ public class PayRefundController {
     @Resource
     private PayRefundService refundService;
     @Resource
-    private PayMerchantService merchantService;
-    @Resource
     private PayAppService appService;
     @Resource
     private PayOrderService orderService;
@@ -64,13 +60,11 @@ public class PayRefundController {
             return success(new PayRefundDetailsRespVO());
         }
 
-        PayMerchantDO merchantDO = merchantService.getMerchant(refund.getMerchantId());
         PayAppDO appDO = appService.getApp(refund.getAppId());
         PayChannelEnum channelEnum = PayChannelEnum.getByCode(refund.getChannelCode());
         PayOrderDO orderDO = orderService.getOrder(refund.getOrderId());
 
         PayRefundDetailsRespVO refundDetail = PayRefundConvert.INSTANCE.refundDetailConvert(refund);
-        refundDetail.setMerchantName(ObjectUtil.isNotNull(merchantDO) ? merchantDO.getName() : "未知商户");
         refundDetail.setAppName(ObjectUtil.isNotNull(appDO) ? appDO.getName() : "未知应用");
         refundDetail.setChannelCodeName(ObjectUtil.isNotNull(channelEnum) ? channelEnum.getName() : "未知渠道");
         refundDetail.setSubject(orderDO.getSubject());
@@ -87,21 +81,16 @@ public class PayRefundController {
             return success(new PageResult<>(pageResult.getTotal()));
         }
 
-        // 处理商户ID数据
-        Map<Long, PayMerchantDO> merchantMap = merchantService.getMerchantMap(
-                CollectionUtils.convertList(pageResult.getList(), PayRefundDO::getMerchantId));
         // 处理应用ID数据
         Map<Long, PayAppDO> appMap = appService.getAppMap(
                 CollectionUtils.convertList(pageResult.getList(), PayRefundDO::getAppId));
         List<PayRefundPageItemRespVO> list = new ArrayList<>(pageResult.getList().size());
         pageResult.getList().forEach(c -> {
-            PayMerchantDO merchantDO = merchantMap.get(c.getMerchantId());
             PayAppDO appDO = appMap.get(c.getAppId());
             PayChannelEnum channelEnum = PayChannelEnum.getByCode(c.getChannelCode());
 
             PayRefundPageItemRespVO item = PayRefundConvert.INSTANCE.pageItemConvert(c);
 
-            item.setMerchantName(ObjectUtil.isNotNull(merchantDO) ? merchantDO.getName() : "未知商户");
             item.setAppName(ObjectUtil.isNotNull(appDO) ? appDO.getName() : "未知应用");
             item.setChannelCodeName(ObjectUtil.isNotNull(channelEnum) ? channelEnum.getName() : "未知渠道");
             list.add(item);
@@ -123,9 +112,6 @@ public class PayRefundController {
                     PayRefundExcelVO.class, new ArrayList<>());
         }
 
-        // 处理商户ID数据
-        Map<Long, PayMerchantDO> merchantMap = merchantService.getMerchantMap(
-                CollectionUtils.convertList(list, PayRefundDO::getMerchantId));
         // 处理应用ID数据
         Map<Long, PayAppDO> appMap = appService.getAppMap(
                 CollectionUtils.convertList(list, PayRefundDO::getAppId));
@@ -136,12 +122,10 @@ public class PayRefundController {
                 CollectionUtils.convertList(list, PayRefundDO::getOrderId));
 
         list.forEach(c -> {
-            PayMerchantDO merchantDO = merchantMap.get(c.getMerchantId());
             PayAppDO appDO = appMap.get(c.getAppId());
             PayChannelEnum channelEnum = PayChannelEnum.getByCode(c.getChannelCode());
 
             PayRefundExcelVO excelItem = PayRefundConvert.INSTANCE.excelConvert(c);
-            excelItem.setMerchantName(ObjectUtil.isNotNull(merchantDO) ? merchantDO.getName() : "未知商户");
             excelItem.setAppName(ObjectUtil.isNotNull(appDO) ? appDO.getName() : "未知应用");
             excelItem.setChannelCodeName(ObjectUtil.isNotNull(channelEnum) ? channelEnum.getName() : "未知渠道");
             excelItem.setSubject(orderMap.get(c.getOrderId()).getSubject());

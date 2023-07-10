@@ -2,13 +2,6 @@
   <div class="app-container">
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="120px">
-      <el-form-item label="所属商户" prop="merchantId">
-        <el-select v-model="queryParams.merchantId" clearable @clear="()=>{queryParams.merchantId = null}"
-          filterable remote reserve-keyword placeholder="请选择所属商户" @change="handleGetAppListByMerchantId"
-          :remote-method="handleGetMerchantListByName" :loading="merchantLoading">
-          <el-option v-for="item in merchantList" :key="item.id" :label="item.name" :value="item.id" />
-        </el-select>
-      </el-form-item>
       <el-form-item label="应用编号" prop="appId">
         <el-select clearable v-model="queryParams.appId" filterable placeholder="请选择应用信息">
           <el-option v-for="item in appList" :key="item.id" :label="item.name" :value="item.id" />
@@ -65,12 +58,9 @@
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
       <el-table-column label="编号" align="center" prop="id"/>
-      <!--      <el-table-column label="商户名称" align="center" prop="merchantName" width="120"/>-->
-      <!--      <el-table-column label="应用名称" align="center" prop="appName" width="120"/>-->
       <el-table-column label="支付渠道" align="center" width="130">
         <template v-slot="scope">
           <el-popover trigger="hover" placement="top">
-            <p>商户名称: {{ scope.row.merchantName }}</p>
             <p>应用名称: {{ scope.row.appName }}</p>
             <p>渠道名称: {{ scope.row.channelCodeName }}</p>
             <div slot="reference" class="name-wrapper">
@@ -156,7 +146,6 @@
     <!-- 对话框(添加 / 修改) -->
     <el-dialog title="退款订单详情" :visible.sync="open" width="700px" append-to-body>
       <el-descriptions :column="2" label-class-name="desc-label">
-        <el-descriptions-item label="商户名称">{{ refundDetail.merchantName }}</el-descriptions-item>
         <el-descriptions-item label="应用名称">{{ refundDetail.appName }}</el-descriptions-item>
         <el-descriptions-item label="商品名称">{{ refundDetail.subject }}</el-descriptions-item>
       </el-descriptions>
@@ -221,14 +210,9 @@
 
 <script>
 import {getRefundPage, exportRefundExcel, getRefund} from "@/api/pay/refund";
-import {getMerchantListByName} from "@/api/pay/merchant";
-import {getAppListByMerchantId} from "@/api/pay/app";
-import {DICT_TYPE, getDictDatas} from "@/utils/dict";
-import {
-  PayOrderRefundStatusEnum,
-  PayRefundStatusEnum
-} from "@/utils/constants";
-import {getNowDateTime} from "@/utils/ruoyi";
+import { DICT_TYPE, getDictDatas } from "@/utils/dict";
+import { PayOrderRefundStatusEnum, PayRefundStatusEnum } from "@/utils/constants";
+import { getNowDateTime } from "@/utils/ruoyi";
 
 const defaultRefundDetail = {
   id: null,
@@ -244,8 +228,6 @@ const defaultRefundDetail = {
   channelRefundNo: '',
   createTime: null,
   expireTime: null,
-  merchantId: null,
-  merchantName: '',
   merchantOrderId: '',
   merchantRefundNo: '',
   notifyStatus: null,
@@ -284,7 +266,6 @@ export default {
       queryParams: {
         pageNo: 1,
         pageSize: 10,
-        merchantId: null,
         appId: null,
         channelId: null,
         channelCode: null,
@@ -396,15 +377,6 @@ export default {
       getMerchantListByName(name).then(response => {
         this.merchantList = response.data;
         this.merchantLoading = false;
-      });
-    },
-    /**
-     * 根据商户 ID 查询支付应用信息
-     */
-    handleGetAppListByMerchantId() {
-      this.queryParams.appId = null;
-      getAppListByMerchantId(this.queryParams.merchantId).then(response => {
-        this.appList = response.data;
       });
     },
     /**

@@ -1,12 +1,11 @@
 package cn.iocoder.yudao.module.pay.dal.dataobject.notify;
 
-import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayAppDO;
-import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayMerchantDO;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -42,12 +41,6 @@ public class PayNotifyTaskDO extends BaseDO {
      * 编号，自增
      */
     private Long id;
-    /**
-     * 商户编号
-     *
-     * 关联 {@link PayMerchantDO#getId()}
-     */
-    private Long merchantId;
     /**
      * 应用编号
      *

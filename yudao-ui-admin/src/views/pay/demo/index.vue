@@ -79,7 +79,6 @@
 
 <script>
 import {createDemoOrder, getDemoOrderPage, refundDemoOrder} from "@/api/pay/demo";
-import {deleteMerchant} from "@/api/pay/merchant";
 
 export default {
   name: "PayDemoOrder",

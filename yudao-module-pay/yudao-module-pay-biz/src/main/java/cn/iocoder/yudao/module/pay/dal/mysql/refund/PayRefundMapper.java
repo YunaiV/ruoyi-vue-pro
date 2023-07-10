@@ -16,7 +16,6 @@ public interface PayRefundMapper extends BaseMapperX<PayRefundDO> {
 
     default PageResult<PayRefundDO> selectPage(PayRefundPageReqVO reqVO) {
         return selectPage(reqVO, new QueryWrapperX<PayRefundDO>()
-                .eqIfPresent("merchant_id", reqVO.getMerchantId())
                 .eqIfPresent("app_id", reqVO.getAppId())
                 .eqIfPresent("channel_code", reqVO.getChannelCode())
                 .likeIfPresent("merchant_refund_no", reqVO.getMerchantRefundNo())
@@ -29,7 +28,6 @@ public interface PayRefundMapper extends BaseMapperX<PayRefundDO> {
 
     default List<PayRefundDO> selectList(PayRefundExportReqVO reqVO) {
         return selectList(new QueryWrapperX<PayRefundDO>()
-                .eqIfPresent("merchant_id", reqVO.getMerchantId())
                 .eqIfPresent("app_id", reqVO.getAppId())
                 .eqIfPresent("channel_code", reqVO.getChannelCode())
                 .likeIfPresent("merchant_refund_no", reqVO.getMerchantRefundNo())

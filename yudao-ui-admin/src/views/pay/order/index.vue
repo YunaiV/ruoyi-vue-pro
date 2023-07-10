@@ -3,13 +3,6 @@
 
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="120px">
-      <el-form-item label="所属商户" prop="merchantId">
-        <el-select v-model="queryParams.merchantId" clearable @clear="()=>{queryParams.merchantId = null}"
-          filterable remote reserve-keyword placeholder="请选择所属商户"  @change="handleGetAppListByMerchantId"
-          :remote-method="handleGetMerchantListByName" :loading="merchantLoading">
-          <el-option v-for="item in merchantList" :key="item.id" :label="item.name" :value="item.id"/>
-        </el-select>
-      </el-form-item>
       <el-form-item label="应用编号" prop="appId">
         <el-select clearable v-model="queryParams.appId" filterable placeholder="请选择应用信息">
           <el-option v-for="item in appList" :key="item.id" :label="item.name" :value="item.id" />
@@ -70,12 +63,9 @@
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
       <el-table-column label="订单编号" align="center" prop="id" width="80"/>
-<!--      <el-table-column label="商户名称" align="center" prop="merchantName" width="120"/>-->
-<!--      <el-table-column label="应用名称" align="center" prop="appName" width="120"/>-->
       <el-table-column label="支付渠道" align="center" width="130">
         <template v-slot="scope">
           <el-popover trigger="hover" placement="top">
-            <p>商户名称: {{ scope.row.merchantName }}</p>
             <p>应用名称: {{ scope.row.appName }}</p>
             <p>渠道名称: {{ scope.row.channelCodeName }}</p>
             <div slot="reference" class="name-wrapper">
@@ -86,12 +76,10 @@
       </el-table-column>
       <el-table-column label="支付订单" align="left" width="280">
         <template v-slot="scope">
-          <p class="order-font"><el-tag size="mini">商户</el-tag> {{scope.row.merchantOrderId}}</p>
-          <p class="order-font"><el-tag size="mini" type="warning">支付</el-tag> {{scope.row.channelOrderNo}}</p>
+          <p class="order-font"><el-tag size="mini">商户单号</el-tag> {{scope.row.merchantOrderId}}</p>
+          <p class="order-font"><el-tag size="mini" type="warning">支付单号</el-tag> {{scope.row.channelOrderNo}}</p>
         </template>
       </el-table-column>
-<!--      <el-table-column label="商户订单编号" align="center" prop="merchantOrderId" width="140"/>-->
-<!--      <el-table-column label="渠道订单号" align="center" prop="channelOrderNo" width="140"/>-->
       <el-table-column label="商品标题" align="center" prop="subject" width="180" :show-overflow-tooltip="true"/>
       <el-table-column label="支付金额" align="center" prop="amount" width="100">
         <template v-slot="scope">
@@ -149,7 +137,6 @@
     <!-- 对话框(添加 / 修改) -->
     <el-dialog title="订单详情" :visible.sync="open" width="50%">
       <el-descriptions :column="2" label-class-name="desc-label">
-        <el-descriptions-item label="商户名称">{{ orderDetail.merchantName }}</el-descriptions-item>
         <el-descriptions-item label="应用名称">{{ orderDetail.appName }}</el-descriptions-item>
         <el-descriptions-item label="商品名称">{{ orderDetail.subject }}</el-descriptions-item>
       </el-descriptions>
@@ -215,14 +202,11 @@
 </template>
 
 <script>
-import { getOrderDetail, getOrderPage, exportOrderExcel} from "@/api/pay/order";
-import {getMerchantListByName} from "@/api/pay/merchant";
-import {getAppListByMerchantId} from "@/api/pay/app";
-import {DICT_TYPE, getDictDatas} from "@/utils/dict";
+import { getOrderDetail, getOrderPage, exportOrderExcel } from "@/api/pay/order";
+import { DICT_TYPE, getDictDatas } from "@/utils/dict";
 import { getNowDateTime} from "@/utils/ruoyi";
 
 const defaultOrderDetail = {
-  merchantName: '',
   appName: '',
   channelCodeName: '',
   subject: '',
@@ -266,11 +250,10 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      // 查询参数
+      // 查询参数 TODO 芋艿：多余字段的清理
       queryParams: {
         pageNo: 1,
         pageSize: 10,
-        merchantId: null,
         appId: null,
         channelId: null,
         channelCode: null,
@@ -386,32 +369,12 @@ export default {
         this.$download.excel(response, '支付订单.xls');
       }).catch(() => {});
     },
-    /**
-     * 根据商户名称模糊匹配商户信息
-     * @param name 商户名称
-     */
-    handleGetMerchantListByName(name) {
-      getMerchantListByName(name).then(response => {
-        this.merchantList = response.data;
-        this.merchantLoading = false;
-      });
-    },
-    /**
-     * 根据商户 ID 查询支付应用信息
-     */
-    handleGetAppListByMerchantId() {
-      this.queryParams.appId = null;
-      getAppListByMerchantId(this.queryParams.merchantId).then(response => {
-        this.appList = response.data;
-      });
-    }
   }
 };
 </script>
 <style>
 .desc-label {
   font-weight: bold;
-
 }
 
 .tag-purple {

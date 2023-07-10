@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.framework.pay.core.client.dto.order;
 
-import cn.iocoder.yudao.framework.pay.core.enums.PayDisplayModeEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.URL;
@@ -8,7 +8,6 @@ import org.hibernate.validator.constraints.URL;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -85,7 +84,7 @@ public class PayOrderUnifiedReqDTO {
      *
      * 如果不传递，则每个支付渠道使用默认的方式
      *
-     * 枚举 {@link PayDisplayModeEnum}
+     * 枚举 {@link PayOrderDisplayModeEnum}
      */
     private String displayMode;
 

@@ -16,8 +16,8 @@
 <script>
     let shopOrderId = undefined;
     let payOrderId = undefined;
-    // let server = 'http://127.0.0.1:48080';
-    let server = 'http://niubi.natapp1.cc';
+    let server = 'http://127.0.0.1:48080';
+    // let server = 'http://niubi.natapp1.cc';
     // TODO openid
     let openid = "ockUAwIZ-0OeMZl9ogcZ4ILrGba0";
     $(function() {
@@ -26,6 +26,9 @@
         $.ajax({
             url: server + "/app-api/wx/mp/create-jsapi-signature?url=" + document.location.href,
             method: 'POST',
+						headers: {
+              'tenant-id': 1
+						},
             success: function( result ) {
                 if (result.code !== 0) {
                     alert('获取 JsapiTicket 失败，原因：' + result.msg)

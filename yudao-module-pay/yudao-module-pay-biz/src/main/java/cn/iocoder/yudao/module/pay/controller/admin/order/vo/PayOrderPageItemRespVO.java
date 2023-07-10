@@ -19,9 +19,6 @@ public class PayOrderPageItemRespVO extends PayOrderBaseVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
-    @Schema(description = "商户名称")
-    private String merchantName;
-
     @Schema(description = "应用名称")
     private String  appName;
 
