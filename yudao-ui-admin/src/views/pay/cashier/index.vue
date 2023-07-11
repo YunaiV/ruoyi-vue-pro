@@ -48,15 +48,6 @@
       <qrcode-vue :value="qrCode.url" size="310" level="L" />
     </el-dialog>
 
-    <!-- 展示形式：IFrame -->
-    <el-dialog :title="iframe.title" :visible.sync="iframe.visible" width="800px" height="800px" append-to-body
-               :close-on-press-escape="false">
-      <iframe :src="iframe.url" width="100%" />
-    </el-dialog>
-
-    <!-- 展示形式：Form -->
-    <div ref="formRef" v-html="form.value" />
-
     <!-- 展示形式：BarCode 条形码 -->
     <el-dialog :title="barCode.title" :visible.sync="barCode.visible" width="500px" append-to-body
                :close-on-press-escape="false">
@@ -146,14 +137,6 @@ export default {
         title: '',
         visible: false,
       },
-      iframe: { // 展示形式：iframe
-        url: '',
-        title: '',
-        visible: false
-      },
-      form: { // 展示形式：form
-        html: '',
-      },
       barCode: { // 展示形式：条形码
         channelCode: '',
         value: '',
@@ -175,21 +158,24 @@ export default {
       // 1.1 未传递订单编号
       if (!this.id) {
         this.$message.error('未传递支付单号，无法查看对应的支付信息');
-        this.goBackToList();
+        this.goReturnUrl('cancel');
         return;
       }
       getOrder(this.id).then(response => {
         // 1.2 无法查询到支付信息
         if (!response.data) {
           this.$message.error('支付订单不存在，请检查！');
-          this.goBackToList();
+          this.goReturnUrl('cancel');
           return;
         }
-        // 1.3 订单已支付
-        // TODO 芋艿：已支付
-        if (response.data.status !== PayOrderStatusEnum.WAITING.status) {
-          this.$message.error('支付订单不处于待支付状态，请检查！');
-          this.goBackToList();
+        // 1.3 如果已支付、或者已关闭，则直接跳转
+        if (response.data.status === PayOrderStatusEnum.SUCCESS.status) {
+          this.$message.success('支付成功');
+          this.goReturnUrl('success');
+          return;
+        } else if (response.data.status === PayOrderStatusEnum.CLOSED.status) {
+          this.$message.error('无法支付，原因：订单已关闭');
+          this.goReturnUrl('close');
           return;
         }
 
@@ -218,15 +204,12 @@ export default {
       submitOrder({
         id: this.id,
         channelCode: channelCode,
+        returnUrl: location.href, // 支付成功后，支付渠道跳转回当前页；再由当前页，跳转回 {@link returnUrl} 对应的地址
         ...this.buildSubmitParam(channelCode)
       }).then(response => {
         const data = response.data
-        if (data.displayMode === PayDisplayModeEnum.IFRAME.mode) {
-          this.displayIFrame(channelCode, data)
-        } else if (data.displayMode === PayDisplayModeEnum.URL.mode) {
+        if (data.displayMode === PayDisplayModeEnum.URL.mode) {
           this.displayUrl(channelCode, data)
-        } else if (data.displayMode === PayDisplayModeEnum.FORM.mode) {
-          this.displayForm(channelCode, data)
         } else if (data.displayMode === PayDisplayModeEnum.QR_CODE.mode) {
           this.displayQrCode(channelCode, data)
         }
@@ -239,53 +222,7 @@ export default {
     },
     /** 构建提交支付的额外参数 */
     buildSubmitParam(channelCode) {
-      // ① 支付宝 PC 支付时，有多种展示形态
-      if (channelCode === PayChannelEnum.ALIPAY_PC.code) {
-        // 情况【前置模式】：将二维码前置到商户的订单确认页的模式。需要商户在自己的页面中以 iframe 方式请求支付宝页面。具体支持的枚举值有以下几种：
-        // 0：订单码-简约前置模式，对应 iframe 宽度不能小于 600px，高度不能小于 300px
-        // return {
-        //   "channelExtras": {
-        //     "qr_pay_mode": "0"
-        //   }
-        // }
-        // 1：订单码-前置模式，对应iframe 宽度不能小于 300px，高度不能小于 600px
-        // return {
-        //   "channelExtras": {
-        //     "qr_pay_mode": "1"
-        //   }
-        // }
-        // 3：订单码-迷你前置模式，对应 iframe 宽度不能小于 75px，高度不能小于 75px
-        // return {
-        //   "channelExtras": {
-        //     "qr_pay_mode": "3"
-        //   }
-        // }
-        // 4：订单码-可定义宽度的嵌入式二维码，商户可根据需要设定二维码的大小
-        // return {
-        //   "channelExtras": {
-        //     "qr_pay_mode": "4"
-        //   }
-        // }
-        // 情况【跳转模式】：跳转模式下，用户的扫码界面是由支付宝生成的，不在商户的域名下。支持传入的枚举值有
-        return {
-          "channelExtras": {
-            "qr_pay_mode": "2"
-          }
-        }
-        // 情况【表单模式】：直接提交当前页面到支付宝
-        // return {
-        //   displayMode: PayDisplayModeEnum.FORM.mode
-        // }
-      }
-
-      // ② 支付宝 Wap 支付时，引导手机扫码支付
-      if (channelCode === PayChannelEnum.ALIPAY_WAP.code) {
-        return {
-          displayMode: PayDisplayModeEnum.QR_CODE.mode
-        }
-      }
-
-      // ③ 支付宝 BarCode 支付时，需要传递 authCode 条形码
+      // ① 支付宝 BarCode 支付时，需要传递 authCode 条形码
       if (channelCode === PayChannelEnum.ALIPAY_BAR.code) {
         return {
           "channelExtras": {
@@ -295,36 +232,11 @@ export default {
       }
       return {}
     },
-    /** 提交支付后，IFrame 内置 URL 的展示形式 */
-    displayIFrame(channelCode, data) {
-      // TODO 芋艿：目前有点奇怪，支付宝总是会显示“支付环境存在风险”
-      this.iframe = {
-        title: '支付窗口',
-        url: data.displayContent,
-        visible: true
-      }
-      this.submitLoading = false
-    },
     /** 提交支付后，URL 的展示形式 */
     displayUrl(channelCode, data) {
-      // window.open(data.displayContent)window
+      // window.open(data.displayContent)
       location.href = data.displayContent
       this.submitLoading = false
-    },
-    /** 提交支付后，Form 的展示形式 */
-    displayForm(channelCode, data) {
-      // 渲染支付页面
-      this.form = {
-        value: data.displayContent
-      }
-      // 防抖避免重复支付
-      this.$nextTick(() => {
-        // 提交支付表单
-        this.$refs.formRef.children[0].submit();
-        setTimeout(() => {
-          this.submitLoading = false
-        }, 1000);
-      });
     },
     /** 提交支付后（支付宝扫码支付） */
     displayQrCode(channelCode, data) {
@@ -354,13 +266,13 @@ export default {
           if (response.data.status === PayOrderStatusEnum.SUCCESS.status) {
             this.clearQueryInterval();
             this.$message.success('支付成功！');
-            this.goBackToList();
+            this.goReturnUrl();
           }
           // 已取消
           if (response.data.status === PayOrderStatusEnum.CLOSED.status) {
             this.clearQueryInterval();
             this.$message.error('支付已关闭！');
-            this.goBackToList();
+            this.goReturnUrl();
           }
         })
       }, 1000 * 2)
@@ -377,14 +289,34 @@ export default {
       clearInterval(this.interval)
       this.interval = undefined
     },
-    /** 回到列表 **/
-    goBackToList() {
-      this.$tab.closePage();
-      this.$router.go(-1);
-      // TODO 芋艿：需要优化；
-      // this.$router.push({
-      //   path: this.returnUrl
-      // });
+    /**
+     * 回到业务的 URL
+     *
+     * @param payResult 支付结果
+     *                  ① success：支付成功
+     *                  ② cancel：取消支付
+     *                  ③ close：支付已关闭
+     */
+    goReturnUrl(payResult) {
+      // 未配置的情况下，只能关闭
+      if (!this.returnUrl) {
+        this.$tab.closePage();
+        return
+      }
+
+      const url = this.returnUrl.indexOf('?') >= 0
+        ? this.returnUrl + '&payResult=' + payResult
+        : this.returnUrl + '?payResult=' + payResult
+      // 如果有配置，且是 http 开头，则浏览器跳转
+      if (this.returnUrl.indexOf('http') === 0) {
+        location.href = url;
+      } else {
+        this.$tab.closePage(() => {
+          this.$router.push({
+            path: url
+          });
+        });
+      }
     }
   }
 };

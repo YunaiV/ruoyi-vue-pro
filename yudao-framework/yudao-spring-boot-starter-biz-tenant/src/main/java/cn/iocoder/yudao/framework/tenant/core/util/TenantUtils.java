@@ -82,9 +82,9 @@ public class TenantUtils {
      * 将多租户编号，添加到 header 中
      *
      * @param headers HTTP 请求 headers
+     * @param tenantId 租户编号
      */
-    public static void addTenantHeader(Map<String, String> headers) {
-        Long tenantId = TenantContextHolder.getTenantId();
+    public static void addTenantHeader(Map<String, String> headers, Long tenantId) {
         if (tenantId != null) {
             headers.put(HEADER_TENANT_ID, tenantId.toString());
         }

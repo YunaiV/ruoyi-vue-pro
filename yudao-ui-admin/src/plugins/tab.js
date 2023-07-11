@@ -36,6 +36,9 @@ export default {
         return router.push(lastPath || '/');
       });
     }
+    if (typeof obj === "function") {
+      return store.dispatch('tagsView/delView', router.currentRoute).then(obj);
+    }
     return store.dispatch('tagsView/delView', obj);
   },
   // 关闭所有tab页签
