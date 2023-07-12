@@ -1,32 +1,32 @@
 package cn.iocoder.yudao.module.pay.service.channel;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WxPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.pay.controller.admin.channel.vo.PayChannelCreateReqVO;
-import cn.iocoder.yudao.module.pay.controller.admin.channel.vo.PayChannelPageReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.channel.vo.PayChannelUpdateReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.channel.PayChannelMapper;
 import com.alibaba.fastjson.JSON;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import javax.validation.Validator;
-import java.time.LocalDateTime;
 
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
+import java.util.Collections;
+import java.util.List;
+
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
+import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.CHANNEL_EXIST_SAME_CHANNEL_ERROR;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.CHANNEL_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -46,109 +46,62 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
     @MockBean
     private Validator validator;
 
+    @BeforeEach
+    public void setUp() {
+        channelService.setChannelCache(null);
+    }
+
     @Test
-    public void testCreateWechatVersion2Channel_success() {
+    public void testCreateChannel_success() {
         // 准备参数
-        WxPayClientConfig v2Config = getV2Config();
+        WxPayClientConfig config = randomWxPayClientConfig();
         PayChannelCreateReqVO reqVO = randomPojo(PayChannelCreateReqVO.class, o -> {
+            o.setStatus(randomCommonStatus());
             o.setCode(PayChannelEnum.WX_PUB.getCode());
-            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-            o.setConfig(JSON.toJSONString(v2Config));
+            o.setConfig(JsonUtils.toJsonString(config));
         });
 
         // 调用
         Long channelId = channelService.createChannel(reqVO);
-        // 断言
-        assertNotNull(channelId);
         // 校验记录的属性是否正确
         PayChannelDO channel = channelMapper.selectById(channelId);
         assertPojoEquals(reqVO, channel, "config");
-        // 关于config 对象应该拿出来重新对比
-        assertPojoEquals(v2Config, channel.getConfig());
+        assertPojoEquals(config, channel.getConfig());
+        // 校验缓存
+        assertEquals(1, channelService.getChannelCache().size());
+        assertEquals(channel, channelService.getChannelCache().get(0));
     }
 
     @Test
-    public void testCreateWechatVersion3Channel_success() {
+    public void testCreateChannel_exists() {
+        // mock 数据
+        PayChannelDO dbChannel = randomPojo(PayChannelDO.class,
+                o -> o.setConfig(randomWxPayClientConfig()));
+        channelMapper.insert(dbChannel);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        WxPayClientConfig v3Config = getV3Config();
         PayChannelCreateReqVO reqVO = randomPojo(PayChannelCreateReqVO.class, o -> {
-            o.setCode(PayChannelEnum.WX_PUB.getCode());
-            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-            o.setConfig(JSON.toJSONString(v3Config));
+            o.setAppId(dbChannel.getAppId());
+            o.setCode(dbChannel.getCode());
         });
 
-        // 调用
-        Long channelId = channelService.createChannel(reqVO);
-        // 断言
-        assertNotNull(channelId);
-        // 校验记录的属性是否正确
-        PayChannelDO channel = channelMapper.selectById(channelId);
-        assertPojoEquals(reqVO, channel, "config");
-        // 关于config 对象应该拿出来重新对比
-        assertPojoEquals(v3Config, channel.getConfig());
-    }
-
-    @Test
-    public void testCreateAliPayPublicKeyChannel_success() {
-        // 准备参数
-
-        AlipayPayClientConfig payClientConfig = getPublicKeyConfig();
-        PayChannelCreateReqVO reqVO = randomPojo(PayChannelCreateReqVO.class, o -> {
-            o.setCode(PayChannelEnum.ALIPAY_APP.getCode());
-            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-            o.setConfig(JSON.toJSONString(payClientConfig));
-        });
-
-        // 调用
-        Long channelId = channelService.createChannel(reqVO);
-        // 断言
-        assertNotNull(channelId);
-        // 校验记录的属性是否正确
-        PayChannelDO channel = channelMapper.selectById(channelId);
-        assertPojoEquals(reqVO, channel, "config");
-        // 关于config 对象应该拿出来重新对比
-        assertPojoEquals(payClientConfig, channel.getConfig());
-    }
-
-    @Test
-    public void testCreateAliPayCertificateChannel_success() {
-        // 准备参数
-
-        AlipayPayClientConfig payClientConfig = getCertificateConfig();
-        PayChannelCreateReqVO reqVO = randomPojo(PayChannelCreateReqVO.class, o -> {
-            o.setCode(PayChannelEnum.ALIPAY_APP.getCode());
-            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-            o.setConfig(JSON.toJSONString(payClientConfig));
-        });
-
-        // 调用
-        Long channelId = channelService.createChannel(reqVO);
-        // 断言
-        assertNotNull(channelId);
-        // 校验记录的属性是否正确
-        PayChannelDO channel = channelMapper.selectById(channelId);
-        assertPojoEquals(reqVO, channel, "config");
-        // 关于config 对象应该拿出来重新对比
-        assertPojoEquals(payClientConfig, channel.getConfig());
+        // 调用, 并断言异常
+        assertServiceException(() -> channelService.createChannel(reqVO), CHANNEL_EXIST_SAME_CHANNEL_ERROR);
     }
 
     @Test
     public void testUpdateChannel_success() {
         // mock 数据
-        AlipayPayClientConfig payClientConfig = getCertificateConfig();
         PayChannelDO dbChannel = randomPojo(PayChannelDO.class, o -> {
             o.setCode(PayChannelEnum.ALIPAY_APP.getCode());
-            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-            o.setConfig(payClientConfig);
+            o.setConfig(randomAlipayPayClientConfig());
         });
         channelMapper.insert(dbChannel);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        AlipayPayClientConfig payClientPublicKeyConfig = getPublicKeyConfig();
+        AlipayPayClientConfig config = randomAlipayPayClientConfig();
         PayChannelUpdateReqVO reqVO = randomPojo(PayChannelUpdateReqVO.class, o -> {
-            o.setCode(dbChannel.getCode());
-            o.setStatus(dbChannel.getStatus());
-            o.setConfig(JSON.toJSONString(payClientPublicKeyConfig));
             o.setId(dbChannel.getId()); // 设置更新的 ID
+            o.setStatus(randomCommonStatus());
+            o.setConfig(JsonUtils.toJsonString(config));
         });
 
         // 调用
@@ -156,15 +109,17 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         // 校验是否更新正确
         PayChannelDO channel = channelMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, channel, "config");
-        assertPojoEquals(payClientPublicKeyConfig, channel.getConfig());
+        assertPojoEquals(config, channel.getConfig());
+        // 校验缓存
+        assertEquals(1, channelService.getChannelCache().size());
+        assertEquals(channel, channelService.getChannelCache().get(0));
     }
 
     @Test
     public void testUpdateChannel_notExists() {
         // 准备参数
-        AlipayPayClientConfig payClientPublicKeyConfig = getPublicKeyConfig();
+        AlipayPayClientConfig payClientPublicKeyConfig = randomAlipayPayClientConfig();
         PayChannelUpdateReqVO reqVO = randomPojo(PayChannelUpdateReqVO.class, o -> {
-            o.setCode(PayChannelEnum.ALIPAY_APP.getCode());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
             o.setConfig(JSON.toJSONString(payClientPublicKeyConfig));
         });
@@ -176,11 +131,9 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
     @Test
     public void testDeleteChannel_success() {
         // mock 数据
-        AlipayPayClientConfig payClientConfig = getCertificateConfig();
         PayChannelDO dbChannel = randomPojo(PayChannelDO.class, o -> {
             o.setCode(PayChannelEnum.ALIPAY_APP.getCode());
-            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-            o.setConfig(payClientConfig);
+            o.setConfig(randomAlipayPayClientConfig());
         });
         channelMapper.insert(dbChannel);// @Sql: 先插入出一条存在的数据
         // 准备参数
@@ -190,6 +143,8 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         channelService.deleteChannel(id);
         // 校验数据不存在了
         assertNull(channelMapper.selectById(id));
+        // 校验缓存
+        assertEquals(0, channelService.getChannelCache().size());
     }
 
     @Test
@@ -201,119 +156,80 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         assertServiceException(() -> channelService.deleteChannel(id), CHANNEL_NOT_EXISTS);
     }
 
-    @Test // TODO 请修改 null 为需要的值
-    public void testGetChannelPage() {
+    @Test
+    public void testGetChannel() {
         // mock 数据
-        AlipayPayClientConfig payClientConfig = getCertificateConfig();
-        PayChannelDO dbChannel = randomPojo(PayChannelDO.class, o -> { // 等会查询到
+        PayChannelDO dbChannel = randomPojo(PayChannelDO.class, o -> {
             o.setCode(PayChannelEnum.ALIPAY_APP.getCode());
-            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-            o.setRemark("灿灿子的支付渠道");
-            o.setFeeRate(0.03);
-            o.setAppId(1L);
-            o.setConfig(payClientConfig);
-            o.setCreateTime(buildTime(2021,11,20));
+            o.setConfig(randomAlipayPayClientConfig());
         });
-        channelMapper.insert(dbChannel);
-        // 执行拷贝的时候会出现异常，所以在插入后要重置为null 后续在写入新的
-        dbChannel.setConfig(null);
-        // 测试 code 不匹配
-        channelMapper.insert(cloneIgnoreId(dbChannel, o -> {
-            o.setConfig(payClientConfig);
-            o.setCode(PayChannelEnum.WX_PUB.getCode());
-        }));
-        // 测试 status 不匹配
-        channelMapper.insert(cloneIgnoreId(dbChannel, o -> {
-            o.setConfig(payClientConfig);
-            o.setStatus(CommonStatusEnum.DISABLE.getStatus());
-        }));
-        // 测试 remark 不匹配
-        channelMapper.insert(cloneIgnoreId(dbChannel, o ->{
-            o.setConfig(payClientConfig);
-            o.setRemark("敏敏子的渠道");
-        }));
-        // 测试 feeRate 不匹配
-        channelMapper.insert(cloneIgnoreId(dbChannel, o -> {
-            o.setConfig(payClientConfig);
-            o.setFeeRate(1.23);
-        }));
-        // 测试 appId 不匹配
-        channelMapper.insert(cloneIgnoreId(dbChannel, o -> {
-            o.setConfig(payClientConfig);
-            o.setAppId(2L);
-        }));
-        // 测试 createTime 不匹配
-        channelMapper.insert(cloneIgnoreId(dbChannel, o -> {
-            o.setConfig(payClientConfig);
-            o.setCreateTime(buildTime(2021, 10, 20));
-        }));
+        channelMapper.insert(dbChannel);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        PayChannelPageReqVO reqVO = new PayChannelPageReqVO();
-        reqVO.setCode(PayChannelEnum.ALIPAY_APP.getCode());
-        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setRemark("灿灿子的支付渠道");
-        reqVO.setFeeRate(0.03);
-        reqVO.setAppId(1L);
-        reqVO.setConfig(JSON.toJSONString(payClientConfig));
-        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021,11,19),buildTime(2021,11,21)}));
+        Long id = dbChannel.getId();
 
         // 调用
-        PageResult<PayChannelDO> pageResult = channelService.getChannelPage(reqVO);
+        PayChannelDO channel = channelService.getChannel(id);
+        // 校验是否更新正确
+        assertPojoEquals(dbChannel, channel);
+    }
+
+    @Test
+    public void testGetChannelListByAppIds() {
+        // mock 数据
+        PayChannelDO dbChannel01 = randomPojo(PayChannelDO.class, o -> {
+            o.setCode(PayChannelEnum.ALIPAY_APP.getCode());
+            o.setConfig(randomAlipayPayClientConfig());
+        });
+        channelMapper.insert(dbChannel01);// @Sql: 先插入出一条存在的数据
+        PayChannelDO dbChannel02 = randomPojo(PayChannelDO.class, o -> {
+            o.setCode(PayChannelEnum.WX_PUB.getCode());
+            o.setConfig(randomWxPayClientConfig());
+        });
+        channelMapper.insert(dbChannel02);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        Long appId = dbChannel01.getAppId();
+
+        // 调用
+        List<PayChannelDO> channels = channelService.getChannelListByAppIds(Collections.singleton(appId));
+        // 校验是否更新正确
+        assertEquals(1, channels.size());
+        assertPojoEquals(dbChannel01, channels.get(0));
+    }
+
+    @Test
+    public void testGetChannelByAppIdAndCode() {
+        // mock 数据
+        PayChannelDO dbChannel = randomPojo(PayChannelDO.class, o -> {
+            o.setCode(PayChannelEnum.ALIPAY_APP.getCode());
+            o.setConfig(randomAlipayPayClientConfig());
+        });
+        channelMapper.insert(dbChannel);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        Long appId = dbChannel.getAppId();
+        String code = dbChannel.getCode();;
+
+        // 调用
+        PayChannelDO channel = channelService.getChannelByAppIdAndCode(appId, code);
         // 断言
-        assertEquals(1, pageResult.getTotal());
-        assertEquals(1, pageResult.getList().size());
-        assertPojoEquals(dbChannel, pageResult.getList().get(0), "config");
-        assertPojoEquals(payClientConfig, pageResult.getList().get(0).getConfig());
-
+        assertPojoEquals(channel, dbChannel);
     }
 
-    public WxPayClientConfig getV2Config() {
+    public WxPayClientConfig randomWxPayClientConfig() {
         return new WxPayClientConfig()
-                .setAppId("APP00001")
-                .setMchId("MCH00001")
+                .setAppId(randomString())
+                .setMchId(randomString())
                 .setApiVersion(WxPayClientConfig.API_VERSION_V2)
-                .setMchKey("dsa1d5s6a1d6sa16d1sa56d15a61das6")
-                .setApiV3Key("")
-                .setPrivateCertContent("")
-                .setPrivateKeyContent("");
+                .setMchKey(randomString());
     }
 
-    public WxPayClientConfig getV3Config() {
-        return new WxPayClientConfig()
-                .setAppId("APP00001")
-                .setMchId("MCH00001")
-                .setApiVersion(WxPayClientConfig.API_VERSION_V3)
-                .setMchKey("")
-                .setApiV3Key("sdadasdsadadsa")
-                .setPrivateKeyContent("dsa445das415d15asd16ad156as")
-                .setPrivateCertContent("dsadasd45asd4s5a");
-
-    }
-
-    public AlipayPayClientConfig getPublicKeyConfig() {
+    public AlipayPayClientConfig randomAlipayPayClientConfig() {
         return new AlipayPayClientConfig()
-                .setServerUrl(ALIPAY_SERVER_URL)
-                .setAppId("APP00001")
+                .setServerUrl(randomURL())
+                .setAppId(randomString())
                 .setSignType(AlipayPayClientConfig.SIGN_TYPE_DEFAULT)
                 .setMode(AlipayPayClientConfig.MODE_PUBLIC_KEY)
-                .setPrivateKey("13131321312")
-                .setAlipayPublicKey("13321321321")
-                .setAppCertContent("")
-                .setAlipayPublicCertContent("")
-                .setRootCertContent("");
-    }
-
-    public AlipayPayClientConfig getCertificateConfig() {
-        return new AlipayPayClientConfig()
-                .setServerUrl(ALIPAY_SERVER_URL)
-                .setAppId("APP00001")
-                .setSignType(AlipayPayClientConfig.SIGN_TYPE_DEFAULT)
-                .setMode(AlipayPayClientConfig.MODE_CERTIFICATE)
-                .setPrivateKey("")
-                .setAlipayPublicKey("")
-                .setAppCertContent("13321321321sda")
-                .setAlipayPublicCertContent("13321321321aqeqw")
-                .setRootCertContent("13321321321dsad");
+                .setPrivateKey(randomString())
+                .setAlipayPublicKey(randomString());
     }
 
 }

@@ -16,4 +16,5 @@ public class PayChannelUpdateReqVO extends PayChannelBaseVO {
     @Schema(description = "渠道配置的json字符串")
     @NotBlank(message = "渠道配置不能为空")
     private String config;
+
 }

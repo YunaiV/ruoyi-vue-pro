@@ -22,9 +22,11 @@ import static org.mockito.Mockito.when;
 
 public class AlipayQrPayClientTest extends BaseMockitoUnitTest {
 
+    private static final String SERVER_URL_SANDBOX = "https://openapi.alipaydev.com/gateway.do";
+
     private final AlipayPayClientConfig config = new AlipayPayClientConfig()
         .setAppId("2021000118634035")
-        .setServerUrl(AlipayPayClientConfig.SERVER_URL_SANDBOX)
+        .setServerUrl(SERVER_URL_SANDBOX)
         .setSignType(AlipayPayClientConfig.SIGN_TYPE_DEFAULT)
         // TODO @tina：key 可以随机就好，简洁一点哈。
         .setPrivateKey("MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCHsEV1cDupwJ" +

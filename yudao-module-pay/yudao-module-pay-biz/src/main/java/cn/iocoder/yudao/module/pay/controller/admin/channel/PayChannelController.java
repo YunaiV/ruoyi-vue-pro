@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.module.pay.controller.admin.channel;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.controller.admin.channel.vo.PayChannelCreateReqVO;
-import cn.iocoder.yudao.module.pay.controller.admin.channel.vo.PayChannelPageReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.channel.vo.PayChannelRespVO;
 import cn.iocoder.yudao.module.pay.controller.admin.channel.vo.PayChannelUpdateReqVO;
 import cn.iocoder.yudao.module.pay.convert.channel.PayChannelConvert;
@@ -11,7 +9,6 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -59,39 +56,19 @@ public class PayChannelController {
     }
 
     @GetMapping("/get")
-    @Operation(summary = "获得支付渠道 ")
+    @Operation(summary = "获得支付渠道")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('pay:channel:query')")
-    public CommonResult<PayChannelRespVO> getChannel(@RequestParam("id") Long id) {
-        PayChannelDO channel = channelService.getChannel(id);
-        return success(PayChannelConvert.INSTANCE.convert(channel));
-    }
-
-    @GetMapping("/page")
-    @Operation(summary = "获得支付渠道分页")
-    @PreAuthorize("@ss.hasPermission('pay:channel:query')")
-    public CommonResult<PageResult<PayChannelRespVO>> getChannelPage(@Valid PayChannelPageReqVO pageVO) {
-        PageResult<PayChannelDO> pageResult = channelService.getChannelPage(pageVO);
-        return success(PayChannelConvert.INSTANCE.convertPage(pageResult));
-    }
-
-    // TODO 芋艿：需要 review 下实现
-    @GetMapping("/get-channel")
-    @Operation(summary = "根据条件查询微信支付渠道")
-    @Parameters({
-            @Parameter(name = "appId", description = "应用编号", required = true, example = "1"),
-            @Parameter(name = "code", description = "支付渠道编码", required = true, example = "wx_pub")
-    })
-    @PreAuthorize("@ss.hasPermission('pay:channel:query')")
-    public CommonResult<PayChannelRespVO> getChannel(@RequestParam Long appId, @RequestParam String code) {
-        // 獲取渠道
-        PayChannelDO channel = channelService.getChannelByConditions(appId, code);
-        if (channel == null) {
-            return success(new PayChannelRespVO());
+    public CommonResult<PayChannelRespVO> getChannel(@RequestParam(value = "id", required = false) Long id,
+                                                     @RequestParam(value = "appId", required = false) Long appId,
+                                                     @RequestParam(value = "code", required = false) String code) {
+        PayChannelDO channel = null;
+        if (id != null) {
+            channel = channelService.getChannel(id);
+        } else if (appId != null && code != null) {
+            channel = channelService.getChannelByAppIdAndCode(appId, code);
         }
-        // 拼凑数据
-        PayChannelRespVO respVo = PayChannelConvert.INSTANCE.convert(channel);
-        return success(respVo);
+        return success(PayChannelConvert.INSTANCE.convert(channel));
     }
 
     @GetMapping("/get-enable-code-list")

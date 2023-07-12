@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
+import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import lombok.Data;
 
@@ -100,9 +101,8 @@ public class AlipayPayClientConfig implements PayClientConfig {
     }
 
     @Override
-    public Set<ConstraintViolation<PayClientConfig>> verifyParam(Validator validator) {
-        // TODO 芋艿：参数校验
-        return validator.validate(this,
+    public void validate(Validator validator) {
+        ValidationUtils.validate(validator, this,
                 MODE_PUBLIC_KEY.equals(this.getMode()) ? ModePublicKey.class : ModeCertificate.class);
     }
 

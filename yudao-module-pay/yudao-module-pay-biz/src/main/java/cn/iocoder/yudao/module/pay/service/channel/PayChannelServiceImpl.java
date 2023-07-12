@@ -1,30 +1,35 @@
 package cn.iocoder.yudao.module.pay.service.channel;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.pay.controller.admin.channel.vo.PayChannelCreateReqVO;
-import cn.iocoder.yudao.module.pay.controller.admin.channel.vo.PayChannelPageReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.channel.vo.PayChannelUpdateReqVO;
 import cn.iocoder.yudao.module.pay.convert.channel.PayChannelConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.channel.PayChannelMapper;
 import cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.validation.Validator;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.CHANNEL_EXIST_SAME_CHANNEL_ERROR;
@@ -40,6 +45,10 @@ import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.CHANNEL_NOT_E
 @Validated
 public class PayChannelServiceImpl implements PayChannelService {
 
+    @Getter // 为了方便测试，这里提供 getter 方法
+    @Setter
+    private volatile List<PayChannelDO> channelCache;
+
     @Resource
     private PayClientFactory payClientFactory;
 
@@ -52,7 +61,6 @@ public class PayChannelServiceImpl implements PayChannelService {
     /**
      * 初始化 {@link #payClientFactory} 缓存
      */
-    @Override
     @PostConstruct
     public void initLocalCache() {
         // 注意：忽略自动多租户，因为要全局初始化缓存
@@ -64,49 +72,101 @@ public class PayChannelServiceImpl implements PayChannelService {
             // 第二步：构建缓存：创建或更新支付 Client
             channels.forEach(payChannel -> payClientFactory.createOrUpdatePayClient(payChannel.getId(),
                     payChannel.getCode(), payChannel.getConfig()));
+            this.channelCache = channels;
         });
+    }
+
+    /**
+     * 通过定时任务轮询，刷新缓存
+     *
+     * 目的：多节点部署时，通过轮询”通知“所有节点，进行刷新
+     */
+    @Scheduled(initialDelay = 60, fixedRate = 60, timeUnit = TimeUnit.SECONDS)
+    public void refreshLocalCache() {
+        // 情况一：如果缓存里没有数据，则直接刷新缓存
+        if (CollUtil.isEmpty(channelCache)) {
+            initLocalCache();
+            return;
+        }
+
+        // 情况二，如果缓存里数据，则通过 updateTime 判断是否有数据变更，有变更则刷新缓存
+        LocalDateTime maxTime = CollectionUtils.getMaxValue(channelCache, PayChannelDO::getUpdateTime);
+        if (channelMapper.selectCountByUpdateTimeGt(maxTime) > 0) {
+            initLocalCache();
+        }
     }
 
     @Override
     public Long createChannel(PayChannelCreateReqVO reqVO) {
         // 断言是否有重复的
-        PayChannelDO channelDO = this.getChannelByConditions(reqVO.getAppId(), reqVO.getCode());
-        if (ObjectUtil.isNotNull(channelDO)) {
+        PayChannelDO dbChannel = getChannelByAppIdAndCode(reqVO.getAppId(), reqVO.getCode());
+        if (dbChannel != null) {
             throw exception(CHANNEL_EXIST_SAME_CHANNEL_ERROR);
         }
 
         // 新增渠道
-        PayChannelDO channel = PayChannelConvert.INSTANCE.convert(reqVO);
-        settingConfigAndCheckParam(channel, reqVO.getConfig());
+        PayChannelDO channel = PayChannelConvert.INSTANCE.convert(reqVO)
+                .setConfig(parseConfig(reqVO.getCode(), reqVO.getConfig()));
         channelMapper.insert(channel);
-        // TODO 芋艿：缺少刷新本地缓存的机制
+
+        // 刷新缓存
+        refreshLocalCache();
         return channel.getId();
     }
 
     @Override
     public void updateChannel(PayChannelUpdateReqVO updateReqVO) {
         // 校验存在
-        this.validateChannelExists(updateReqVO.getId());
+        PayChannelDO dbChannel = validateChannelExists(updateReqVO.getId());
+
         // 更新
-        PayChannelDO channel = PayChannelConvert.INSTANCE.convert(updateReqVO);
-        settingConfigAndCheckParam(channel, updateReqVO.getConfig());
+        PayChannelDO channel = PayChannelConvert.INSTANCE.convert(updateReqVO)
+                .setConfig(parseConfig(dbChannel.getCode(), updateReqVO.getConfig()));
         channelMapper.updateById(channel);
-        // TODO 芋艿：缺少刷新本地缓存的机制
+
+        // 刷新缓存
+        refreshLocalCache();
+    }
+
+    /**
+     * 解析并校验配置
+     *
+     * @param code      渠道编码
+     * @param configStr 配置
+     * @return 支付配置
+     */
+    private PayClientConfig parseConfig(String code, String configStr) {
+        // 解析配置
+        Class<? extends PayClientConfig> payClass = PayChannelEnum.getByCode(code).getConfigClass();
+        if (ObjectUtil.isNull(payClass)) {
+            throw exception(CHANNEL_NOT_EXISTS);
+        }
+        PayClientConfig config = JsonUtils.parseObject2(configStr, payClass);
+        Assert.notNull(config);
+
+        // 验证参数
+        config.validate(validator);
+        return config;
     }
 
     @Override
     public void deleteChannel(Long id) {
         // 校验存在
-        this.validateChannelExists(id);
+        validateChannelExists(id);
+
         // 删除
         channelMapper.deleteById(id);
-        // TODO 芋艿：缺少刷新本地缓存的机制
+
+        // 刷新缓存
+        refreshLocalCache();
     }
 
-    private void validateChannelExists(Long id) {
-        if (channelMapper.selectById(id) == null) {
+    private PayChannelDO validateChannelExists(Long id) {
+        PayChannelDO channel = channelMapper.selectById(id);
+        if (channel == null) {
             throw exception(CHANNEL_NOT_EXISTS);
         }
+        return channel;
     }
 
     @Override
@@ -115,44 +175,19 @@ public class PayChannelServiceImpl implements PayChannelService {
     }
 
     @Override
-    public PageResult<PayChannelDO> getChannelPage(PayChannelPageReqVO pageReqVO) {
-        return channelMapper.selectPage(pageReqVO);
-    }
-
-    @Override
     public List<PayChannelDO> getChannelListByAppIds(Collection<Long> appIds) {
-        return channelMapper.getChannelListByAppIds(appIds);
+        return channelMapper.selectListByAppIds(appIds);
     }
 
     @Override
-    public PayChannelDO getChannelByConditions(Long appid, String code) {
-        return this.channelMapper.selectOne(appid, code);
-    }
-
-    /**
-     * 设置渠道配置以及参数校验
-     *
-     * @param channel   渠道
-     * @param configStr 配置
-     */
-    private void settingConfigAndCheckParam(PayChannelDO channel, String configStr) {
-        // 得到这个渠道是微信的还是支付宝的
-        Class<? extends PayClientConfig> payClass = PayChannelEnum.getByCode(channel.getCode()).getConfigClass();
-        if (ObjectUtil.isNull(payClass)) {
-            throw exception(CHANNEL_NOT_EXISTS);
-        }
-        // TODO @芋艿：不要使用 hutool 的 json 工具，用项目的
-        PayClientConfig config = JSONUtil.toBean(configStr, payClass);
-
-        // 验证参数
-        config.validate(validator);
-        channel.setConfig(config);
+    public PayChannelDO getChannelByAppIdAndCode(Long appId, String code) {
+        return channelMapper.selectByAppIdAndCode(appId, code);
     }
 
     @Override
     public PayChannelDO validPayChannel(Long id) {
         PayChannelDO channel = channelMapper.selectById(id);
-        this.validPayChannel(channel);
+        validPayChannel(channel);
         return channel;
     }
 
@@ -163,18 +198,18 @@ public class PayChannelServiceImpl implements PayChannelService {
         return channel;
     }
 
+    private void validPayChannel(PayChannelDO channel) {
+        if (channel == null) {
+            throw exception(ErrorCodeConstants.PAY_CHANNEL_NOT_FOUND);
+        }
+        if (CommonStatusEnum.DISABLE.getStatus().equals(channel.getStatus())) {
+            throw exception(ErrorCodeConstants.PAY_CHANNEL_IS_DISABLE);
+        }
+    }
+
     @Override
     public List<PayChannelDO> getEnableChannelList(Long appId) {
         return channelMapper.selectListByAppId(appId, CommonStatusEnum.ENABLE.getStatus());
-    }
-
-    private void validPayChannel(PayChannelDO channel) {
-        if (channel == null) {
-            throw ServiceExceptionUtil.exception(ErrorCodeConstants.PAY_CHANNEL_NOT_FOUND);
-        }
-        if (CommonStatusEnum.DISABLE.getStatus().equals(channel.getStatus())) {
-            throw ServiceExceptionUtil.exception(ErrorCodeConstants.PAY_CHANNEL_IS_DISABLE);
-        }
     }
 
 }

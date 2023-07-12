@@ -68,10 +68,7 @@ public class PayAppServiceImpl implements PayAppService {
         // 校验商户存在
         validateAppExists(id);
         // 更新状态
-        PayAppDO app = new PayAppDO();
-        app.setId(id);
-        app.setStatus(status);
-        appMapper.updateById(app);
+        appMapper.updateById(new PayAppDO().setId(id).setStatus(status));
     }
 
     @Override
@@ -116,11 +113,11 @@ public class PayAppServiceImpl implements PayAppService {
         PayAppDO app = appMapper.selectById(id);
         // 校验是否存在
         if (app == null) {
-            throw ServiceExceptionUtil.exception(ErrorCodeConstants.PAY_APP_NOT_FOUND);
+            throw exception(ErrorCodeConstants.PAY_APP_NOT_FOUND);
         }
         // 校验是否禁用
         if (CommonStatusEnum.DISABLE.getStatus().equals(app.getStatus())) {
-            throw ServiceExceptionUtil.exception(ErrorCodeConstants.PAY_APP_IS_DISABLE);
+            throw exception(ErrorCodeConstants.PAY_APP_IS_DISABLE);
         }
         return app;
     }

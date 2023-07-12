@@ -1,4 +1,6 @@
 package cn.iocoder.yudao.module.pay.controller.admin.app.vo;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.hibernate.validator.constraints.URL;
@@ -18,6 +20,7 @@ public class PayAppBaseVO {
 
     @Schema(description = "开启状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     @NotNull(message = "开启状态不能为空")
+    @InEnum(CommonStatusEnum.class)
     private Integer status;
 
     @Schema(description = "备注", example = "我是一个测试应用")

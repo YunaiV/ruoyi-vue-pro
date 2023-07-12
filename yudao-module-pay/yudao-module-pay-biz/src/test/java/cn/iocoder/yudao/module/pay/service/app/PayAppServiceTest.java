@@ -19,6 +19,8 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
@@ -26,8 +28,11 @@ import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgn
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
-import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.PAY_APP_NOT_FOUND;
+import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
+import static java.util.Collections.singleton;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 /**
  * {@link PayAppServiceImpl} 的单元测试
@@ -67,8 +72,7 @@ public class PayAppServiceTest extends BaseDbUnitTest {
     @Test
     public void testUpdateApp_success() {
         // mock 数据
-        PayAppDO dbApp = randomPojo(PayAppDO.class, o ->
-                o.setStatus(CommonStatusEnum.DISABLE.getStatus()));
+        PayAppDO dbApp = randomPojo(PayAppDO.class);
         appMapper.insert(dbApp);// @Sql: 先插入出一条存在的数据
         // 准备参数
         PayAppUpdateReqVO reqVO = randomPojo(PayAppUpdateReqVO.class, o -> {
@@ -94,10 +98,26 @@ public class PayAppServiceTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testDeleteApp_success() {
+    public void testUpdateAppStatus() {
         // mock 数据
         PayAppDO dbApp = randomPojo(PayAppDO.class, o ->
-                o.setStatus((RandomUtil.randomEle(CommonStatusEnum.values()).getStatus())));
+                o.setStatus(CommonStatusEnum.DISABLE.getStatus()));
+        appMapper.insert(dbApp);// @Sql: 先插入出一条存在的数据
+
+        // 准备参数
+        Long id = dbApp.getId();
+        Integer status = CommonStatusEnum.ENABLE.getStatus();
+        // 调用
+        appService.updateAppStatus(id, status);
+        // 断言
+        PayAppDO app = appMapper.selectById(id); // 获取最新的
+        assertEquals(status, app.getStatus());
+    }
+
+    @Test
+    public void testDeleteApp_success() {
+        // mock 数据
+        PayAppDO dbApp = randomPojo(PayAppDO.class);
         appMapper.insert(dbApp);// @Sql: 先插入出一条存在的数据
         // 准备参数
         Long id = dbApp.getId();
@@ -115,6 +135,65 @@ public class PayAppServiceTest extends BaseDbUnitTest {
 
         // 调用, 并断言异常
         assertServiceException(() -> appService.deleteApp(id), PAY_APP_NOT_FOUND);
+    }
+
+    @Test
+    public void testDeleteApp_existOrder() {
+        // mock 数据
+        PayAppDO dbApp = randomPojo(PayAppDO.class);
+        appMapper.insert(dbApp);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        Long id = dbApp.getId();
+        // mock 订单有订单
+        when(orderService.getOrderCountByAppId(eq(id))).thenReturn(10L);
+
+        // 调用, 并断言异常
+        assertServiceException(() -> appService.deleteApp(id), PAY_APP_EXIST_ORDER_CANT_DELETE);
+    }
+
+    @Test
+    public void testDeleteApp_existRefund() {
+        // mock 数据
+        PayAppDO dbApp = randomPojo(PayAppDO.class);
+        appMapper.insert(dbApp);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        Long id = dbApp.getId();
+        // mock 订单有订单
+        when(refundService.getRefundCountByAppId(eq(id))).thenReturn(10L);
+
+        // 调用, 并断言异常
+        assertServiceException(() -> appService.deleteApp(id), PAY_APP_EXIST_REFUND_CANT_DELETE);
+    }
+
+    @Test
+    public void testApp() {
+        // mock 数据
+        PayAppDO dbApp = randomPojo(PayAppDO.class);
+        appMapper.insert(dbApp);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        Long id = dbApp.getId();
+
+        // 调用
+        PayAppDO app = appService.getApp(id);
+        // 校验数据一致
+        assertPojoEquals(app, dbApp);
+    }
+
+    @Test
+    public void testAppMap() {
+        // mock 数据
+        PayAppDO dbApp01 = randomPojo(PayAppDO.class);
+        appMapper.insert(dbApp01);// @Sql: 先插入出一条存在的数据
+        PayAppDO dbApp02 = randomPojo(PayAppDO.class);
+        appMapper.insert(dbApp02);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        Long id = dbApp01.getId();
+
+        // 调用
+        Map<Long, PayAppDO> appMap = appService.getAppMap(singleton(id));
+        // 校验数据一致
+        assertEquals(1, appMap.size());
+        assertPojoEquals(dbApp01, appMap.get(id));
     }
 
     @Test
@@ -145,6 +224,39 @@ public class PayAppServiceTest extends BaseDbUnitTest {
         assertEquals(1, pageResult.getTotal());
         assertEquals(1, pageResult.getList().size());
         assertPojoEquals(dbApp, pageResult.getList().get(0));
+    }
+
+    @Test
+    public void testValidPayApp_success() {
+        // mock 数据
+        PayAppDO dbApp = randomPojo(PayAppDO.class,
+                o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        appMapper.insert(dbApp);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        Long id = dbApp.getId();
+
+        // 调用
+        PayAppDO app = appService.validPayApp(id);
+        // 校验数据一致
+        assertPojoEquals(app, dbApp);
+    }
+
+    @Test
+    public void testValidPayApp_notFound() {
+        assertServiceException(() -> appService.validPayApp(randomLongId()), PAY_APP_NOT_FOUND);
+    }
+
+    @Test
+    public void testValidPayApp_disable() {
+        // mock 数据
+        PayAppDO dbApp = randomPojo(PayAppDO.class,
+                o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus()));
+        appMapper.insert(dbApp);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        Long id = dbApp.getId();
+
+        // 调用，并断言异常
+        assertServiceException(() -> appService.validPayApp(id), PAY_APP_IS_DISABLE);
     }
 
 }
