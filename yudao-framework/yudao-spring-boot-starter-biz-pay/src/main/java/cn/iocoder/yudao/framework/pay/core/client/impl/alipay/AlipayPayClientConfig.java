@@ -19,15 +19,6 @@ import java.util.Set;
 public class AlipayPayClientConfig implements PayClientConfig {
 
     /**
-     * 网关地址 - 线上
-     */
-    public static final String SERVER_URL_PROD = "https://openapi.alipay.com/gateway.do";
-    /**
-     * 网关地址 - 沙箱
-     */
-    public static final String SERVER_URL_SANDBOX = "https://openapi.alipaydev.com/gateway.do";
-
-    /**
      * 公钥类型 - 公钥模式
      */
     public static final Integer MODE_PUBLIC_KEY = 1;
@@ -43,8 +34,9 @@ public class AlipayPayClientConfig implements PayClientConfig {
 
     /**
      * 网关地址
-     * 1. {@link #SERVER_URL_PROD}
-     * 2. {@link #SERVER_URL_SANDBOX}
+     *
+     * 1. <a href="https://openapi.alipay.com/gateway.do">生产环境</a>
+     * 2. <a href="https://openapi-sandbox.dl.alipaydev.com/gateway.do">沙箱环境</a>
      */
     @NotBlank(message = "网关地址不能为空", groups = {ModePublicKey.class, ModeCertificate.class})
     private String serverUrl;

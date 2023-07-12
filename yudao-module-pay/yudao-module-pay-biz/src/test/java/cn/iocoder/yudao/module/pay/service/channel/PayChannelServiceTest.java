@@ -33,6 +33,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @Import({PayChannelServiceImpl.class})
 public class PayChannelServiceTest extends BaseDbUnitTest {
 
+    private static final String ALIPAY_SERVER_URL = "https://openapi.alipay.com/gateway.do";
+
     @Resource
     private PayChannelServiceImpl channelService;
 
@@ -106,7 +108,6 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         assertPojoEquals(reqVO, channel, "config");
         // 关于config 对象应该拿出来重新对比
         assertPojoEquals(payClientConfig, channel.getConfig());
-
     }
 
     @Test
@@ -291,7 +292,7 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
 
     public AlipayPayClientConfig getPublicKeyConfig() {
         return new AlipayPayClientConfig()
-                .setServerUrl(AlipayPayClientConfig.SERVER_URL_PROD)
+                .setServerUrl(ALIPAY_SERVER_URL)
                 .setAppId("APP00001")
                 .setSignType(AlipayPayClientConfig.SIGN_TYPE_DEFAULT)
                 .setMode(AlipayPayClientConfig.MODE_PUBLIC_KEY)
@@ -304,7 +305,7 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
 
     public AlipayPayClientConfig getCertificateConfig() {
         return new AlipayPayClientConfig()
-                .setServerUrl(AlipayPayClientConfig.SERVER_URL_PROD)
+                .setServerUrl(ALIPAY_SERVER_URL)
                 .setAppId("APP00001")
                 .setSignType(AlipayPayClientConfig.SIGN_TYPE_DEFAULT)
                 .setMode(AlipayPayClientConfig.MODE_CERTIFICATE)
