@@ -9,12 +9,13 @@ import cn.iocoder.yudao.module.pay.controller.admin.app.vo.PayAppUpdateReqVO;
 import cn.iocoder.yudao.module.pay.convert.app.PayAppConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.app.PayAppMapper;
-import cn.iocoder.yudao.module.pay.dal.mysql.order.PayOrderMapper;
 import cn.iocoder.yudao.module.pay.dal.mysql.refund.PayRefundMapper;
 import cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
-import com.google.common.annotations.VisibleForTesting;
+import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
+import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -23,11 +24,10 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.PAY_APP_EXIST_TRANSACTION_ORDER_CANT_DELETE;
-import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.PAY_APP_NOT_FOUND;
+import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
 
 /**
- * 支付应用信息 Service 实现类
+ * 支付应用 Service 实现类
  *
  * @author aquan
  */
@@ -37,11 +37,13 @@ public class PayAppServiceImpl implements PayAppService {
 
     @Resource
     private PayAppMapper appMapper;
-    // TODO 芋艿：不能调用对方的 mapper
+
     @Resource
-    private PayOrderMapper orderMapper;
+    @Lazy // 延迟加载，避免循环依赖报错
+    private PayOrderService orderService;
     @Resource
-    private PayRefundMapper refundMapper;
+    @Lazy // 延迟加载，避免循环依赖报错
+    private PayRefundService refundService;
 
     @Override
     public Long createApp(PayAppCreateReqVO createReqVO) {
@@ -55,17 +57,34 @@ public class PayAppServiceImpl implements PayAppService {
     @Override
     public void updateApp(PayAppUpdateReqVO updateReqVO) {
         // 校验存在
-        this.validateAppExists(updateReqVO.getId());
+        validateAppExists(updateReqVO.getId());
         // 更新
         PayAppDO updateObj = PayAppConvert.INSTANCE.convert(updateReqVO);
         appMapper.updateById(updateObj);
     }
 
     @Override
+    public void updateAppStatus(Long id, Integer status) {
+        // 校验商户存在
+        validateAppExists(id);
+        // 更新状态
+        PayAppDO app = new PayAppDO();
+        app.setId(id);
+        app.setStatus(status);
+        appMapper.updateById(app);
+    }
+
+    @Override
     public void deleteApp(Long id) {
         // 校验存在
-        this.validateAppExists(id);
-        this.validateOrderTransactionExist(id);
+        validateAppExists(id);
+        // 校验关联数据是否存在
+        if (orderService.getOrderCountByAppId(id) > 0) {
+            throw exception(PAY_APP_EXIST_ORDER_CANT_DELETE);
+        }
+        if (refundService.getRefundCountByAppId(id) > 0) {
+            throw exception(PAY_APP_EXIST_REFUND_CANT_DELETE);
+        }
 
         // 删除
         appMapper.deleteById(id);
@@ -90,49 +109,6 @@ public class PayAppServiceImpl implements PayAppService {
     @Override
     public PageResult<PayAppDO> getAppPage(PayAppPageReqVO pageReqVO) {
         return appMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public void updateAppStatus(Long id, Integer status) {
-        // 校验商户存在
-        this.checkAppExists(id);
-        // 更新状态
-        PayAppDO app = new PayAppDO();
-        app.setId(id);
-        app.setStatus(status);
-        appMapper.updateById(app);
-    }
-
-    /**
-     * 检查商户是否存在
-     *
-     * @param id 商户编号
-     */
-    @VisibleForTesting
-    public void checkAppExists(Long id) {
-        if (id == null) {
-            return;
-        }
-        PayAppDO payApp = appMapper.selectById(id);
-        if (payApp == null) {
-            throw exception(PAY_APP_NOT_FOUND);
-        }
-    }
-
-    /**
-     * 验证是否存在交易中或者退款中等处理中状态的订单
-     *
-     * @param appId 应用 ID
-     */
-    private void validateOrderTransactionExist(Long appId) {
-        // 查看交易订单
-        if (orderMapper.selectCount(appId, PayOrderStatusEnum.WAITING.getStatus()) > 0) {
-            throw exception(PAY_APP_EXIST_TRANSACTION_ORDER_CANT_DELETE);
-        }
-        // 查看退款订单
-        if (refundMapper.selectCount(appId, PayRefundStatusEnum.CREATE.getStatus()) > 0) {
-            throw exception(PAY_APP_EXIST_TRANSACTION_ORDER_CANT_DELETE);
-        }
     }
 
     @Override

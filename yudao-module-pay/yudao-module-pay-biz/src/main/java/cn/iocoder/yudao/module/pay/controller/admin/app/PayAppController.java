@@ -24,6 +24,7 @@ import javax.validation.Valid;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 @Slf4j
 @Tag(name = "管理后台 - 支付应用信息")
@@ -78,15 +79,6 @@ public class PayAppController {
         return success(PayAppConvert.INSTANCE.convert(app));
     }
 
-    @GetMapping("/list")
-    @Operation(summary = "获得支付应用信息列表")
-    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @PreAuthorize("@ss.hasPermission('pay:app:query')")
-    public CommonResult<List<PayAppRespVO>> getAppList(@RequestParam("ids") Collection<Long> ids) {
-        List<PayAppDO> list = appService.getAppList(ids);
-        return success(PayAppConvert.INSTANCE.convertList(list));
-    }
-
     @GetMapping("/page")
     @Operation(summary = "获得支付应用信息分页")
     @PreAuthorize("@ss.hasPermission('pay:app:query')")
@@ -94,34 +86,15 @@ public class PayAppController {
         // 得到应用分页列表
         PageResult<PayAppDO> pageResult = appService.getAppPage(pageVO);
         if (CollUtil.isEmpty(pageResult.getList())) {
-            return success(new PageResult<>(pageResult.getTotal()));
+            return success(PageResult.empty());
         }
 
         // 得到所有的应用编号，查出所有的渠道
-        Collection<Long> payAppIds = CollectionUtils.convertList(pageResult.getList(), PayAppDO::getId);
-        List<PayChannelDO> channels = channelService.getChannelListByAppIds(payAppIds);
-        // TODO @aquan：可以基于 appId 简历一个 multiMap。这样下面，直接 get 到之后，CollUtil buildSet 即可
-        Iterator<PayChannelDO> iterator = channels.iterator();
+        Collection<Long> appIds = convertList(pageResult.getList(), PayAppDO::getId);
+        List<PayChannelDO> channels = channelService.getChannelListByAppIds(appIds);
 
-        // 利用反射将渠道数据复制到返回的数据结构中去
-        List<PayAppPageItemRespVO> appList = new ArrayList<>(pageResult.getList().size());
-        pageResult.getList().forEach(app -> {
-            // 写入应用信息的数据
-            PayAppPageItemRespVO respVO = PayAppConvert.INSTANCE.pageConvert(app);
-            // 写入支付渠道信息的数据
-            Set<String> channelCodes = new HashSet<>(PayChannelEnum.values().length);
-            while (iterator.hasNext()) {
-                PayChannelDO channelDO = iterator.next();
-                if (channelDO.getAppId().equals(app.getId())) {
-                    channelCodes.add(channelDO.getCode());
-                    iterator.remove();
-                }
-            }
-            respVO.setChannelCodes(channelCodes);
-            appList.add(respVO);
-        });
-
-        return success(new PageResult<>(appList, pageResult.getTotal()));
+        // 拼接后返回
+        return success(PayAppConvert.INSTANCE.convertPage(pageResult, channels));
     }
 
 }

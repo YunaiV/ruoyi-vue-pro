@@ -83,6 +83,11 @@ public class PayOrderServiceImpl implements PayOrderService {
     }
 
     @Override
+    public Long getOrderCountByAppId(Long appId) {
+        return orderMapper.selectCountByAppId(appId);
+    }
+
+    @Override
     public PageResult<PayOrderDO> getOrderPage(PayOrderPageReqVO pageReqVO) {
         return orderMapper.selectPage(pageReqVO);
     }

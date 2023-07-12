@@ -102,6 +102,10 @@ public class RandomUtils {
         return randomString() + "@qq.com";
     }
 
+    public static String randomURL() {
+        return "https://www.iocoder.cn/" + randomString();
+    }
+
     @SafeVarargs
     public static <T> T randomPojo(Class<T> clazz, Consumer<T>... consumers) {
         T pojo = PODAM_FACTORY.manufacturePojo(clazz);

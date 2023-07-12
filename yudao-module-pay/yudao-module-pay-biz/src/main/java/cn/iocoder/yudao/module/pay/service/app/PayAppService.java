@@ -36,6 +36,14 @@ public interface PayAppService {
     void updateApp(@Valid PayAppUpdateReqVO updateReqVO);
 
     /**
+     * 修改应用信息状态
+     *
+     * @param id     应用编号
+     * @param status 状态
+     */
+    void updateAppStatus(Long id, Integer status);
+
+    /**
      * 删除支付应用信息
      *
      * @param id 编号
@@ -67,14 +75,6 @@ public interface PayAppService {
     PageResult<PayAppDO> getAppPage(PayAppPageReqVO pageReqVO);
 
     /**
-     * 修改应用信息状态
-     *
-     * @param id     应用编号
-     * @param status 状态{@link cn.iocoder.yudao.framework.common.enums.CommonStatusEnum}
-     */
-    void updateAppStatus(Long id, Integer status);
-
-    /**
      * 获得指定编号的商户 Map
      *
      * @param ids 应用编号集合
@@ -84,7 +84,6 @@ public interface PayAppService {
         List<PayAppDO> list =  getAppList(ids);
         return CollectionUtils.convertMap(list, PayAppDO::getId);
     }
-
 
     /**
      * 支付应用的合法性

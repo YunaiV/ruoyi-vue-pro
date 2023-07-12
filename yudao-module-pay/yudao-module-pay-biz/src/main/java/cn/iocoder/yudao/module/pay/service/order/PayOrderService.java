@@ -33,6 +33,14 @@ public interface PayOrderService {
     PayOrderDO getOrder(Long id);
 
     /**
+     * 获得指定应用的订单数量
+     *
+     * @param appId 应用编号
+     * @return 订单数量
+     */
+    Long getOrderCountByAppId(Long appId);
+
+    /**
      * 获得支付订单
      * 分页
      *

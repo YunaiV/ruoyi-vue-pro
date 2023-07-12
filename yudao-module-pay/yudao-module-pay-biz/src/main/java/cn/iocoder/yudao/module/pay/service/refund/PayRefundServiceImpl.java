@@ -81,6 +81,11 @@ public class PayRefundServiceImpl implements PayRefundService {
     }
 
     @Override
+    public Long getRefundCountByAppId(Long appId) {
+        return refundMapper.selectCountByApp(appId);
+    }
+
+    @Override
     public PageResult<PayRefundDO> getRefundPage(PayRefundPageReqVO pageReqVO) {
         return refundMapper.selectPage(pageReqVO);
     }

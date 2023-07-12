@@ -12,7 +12,8 @@ public interface ErrorCodeConstants {
     // ========== APP 模块 1007000000 ==========
     ErrorCode PAY_APP_NOT_FOUND = new ErrorCode(1007000000, "App 不存在");
     ErrorCode PAY_APP_IS_DISABLE = new ErrorCode(1007000002, "App 已经被禁用");
-    ErrorCode PAY_APP_EXIST_TRANSACTION_ORDER_CANT_DELETE =  new ErrorCode(1007000003, "支付应用存在交易中的订单,无法删除");
+    ErrorCode PAY_APP_EXIST_ORDER_CANT_DELETE =  new ErrorCode(1007000003, "支付应用存在支付订单，无法删除");
+    ErrorCode PAY_APP_EXIST_REFUND_CANT_DELETE =  new ErrorCode(1007000004, "支付应用存在退款订单，无法删除");
 
     // ========== CHANNEL 模块 1007001000 ==========
     ErrorCode PAY_CHANNEL_NOT_FOUND = new ErrorCode(1007001000, "支付渠道的配置不存在");

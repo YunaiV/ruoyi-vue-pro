@@ -6,7 +6,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -38,11 +37,8 @@ public interface PayRefundMapper extends BaseMapperX<PayRefundDO> {
                 .orderByDesc("id"));
     }
 
-    default Long selectCount(Long appId, Integer status) {
-
-        return selectCount(new LambdaQueryWrapper<PayRefundDO>()
-                .eq(PayRefundDO::getAppId, appId)
-                .eq(PayRefundDO::getStatus, status));
+    default Long selectCountByApp(Long appId) {
+         return selectCount(PayRefundDO::getAppId, appId);
     }
 
     default PayRefundDO selectByReqNo(String reqNo) {
@@ -52,4 +48,5 @@ public interface PayRefundMapper extends BaseMapperX<PayRefundDO> {
     default  PayRefundDO selectByTradeNoAndMerchantRefundNo(String tradeNo, String merchantRefundNo){
         return selectOne("trade_no", tradeNo, "merchant_refund_no", merchantRefundNo);
     }
+
 }

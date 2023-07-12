@@ -17,20 +17,11 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class PayAppPageReqVO extends PageParam {
 
-    @Schema(description = "应用名")
+    @Schema(description = "应用名", example = "小豆")
     private String name;
 
-    @Schema(description = "开启状态")
+    @Schema(description = "开启状态", example = "0")
     private Integer status;
-
-    @Schema(description = "备注")
-    private String remark;
-
-    @Schema(description = "支付结果的回调地址")
-    private String payNotifyUrl;
-
-    @Schema(description = "退款结果的回调地址")
-    private String refundNotifyUrl;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @Schema(description = "创建时间")
