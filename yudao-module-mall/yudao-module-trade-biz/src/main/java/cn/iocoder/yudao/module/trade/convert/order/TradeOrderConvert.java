@@ -106,7 +106,7 @@ public interface TradeOrderConvert {
         createReqDTO.setSubject(subject);
         createReqDTO.setBody(subject); // TODO 芋艿：临时写死
         // 订单相关字段
-        createReqDTO.setAmount(order.getPayPrice()).setExpireTime(addTime(orderProperties.getExpireTime()));
+        createReqDTO.setPrice(order.getPayPrice()).setExpireTime(addTime(orderProperties.getExpireTime()));
         return createReqDTO;
     }
 
@@ -238,7 +238,7 @@ public interface TradeOrderConvert {
         AppTradeOrderDetailRespVO orderVO = convert3(order, orderItems);
         orderVO.setPayExpireTime(addTime(tradeOrderProperties.getExpireTime()));
         if (StrUtil.isNotEmpty(order.getPayChannelCode())) {
-            orderVO.setPayChannelName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.CHANNEL_CODE_TYPE, order.getPayChannelCode()));
+            orderVO.setPayChannelName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.CHANNEL_CODE, order.getPayChannelCode()));
         }
         // 处理商品属性
         Map<Long, ProductPropertyValueDetailRespDTO> propertyValueDetailMap = convertMap(propertyValueDetails, ProductPropertyValueDetailRespDTO::getValueId);

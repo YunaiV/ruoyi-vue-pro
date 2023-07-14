@@ -50,17 +50,8 @@ public interface PayOrderMapper extends BaseMapperX<PayOrderDO> {
                 .in(PayOrderDO::getId, idList));
     }
 
-    /**
-     * 查询符合的订单数量
-     *
-     * @param appId 应用编号
-     * @param status 订单状态
-     * @return 条数
-     */
-    default Long selectCount(Long appId, Integer status) {
-        return selectCount(new LambdaQueryWrapper<PayOrderDO>()
-                .eq(PayOrderDO::getAppId, appId)
-                .in(PayOrderDO::getStatus, status));
+    default Long selectCountByAppId(Long appId) {
+        return selectCount(PayOrderDO::getAppId, appId);
     }
 
     default PayOrderDO selectByAppIdAndMerchantOrderId(Long appId, String merchantOrderId) {

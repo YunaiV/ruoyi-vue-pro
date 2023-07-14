@@ -76,17 +76,13 @@ public class PayOrderDO extends BaseDO {
      * 枚举 {@link PayOrderNotifyStatusEnum}
      */
     private Integer notifyStatus;
-//    /**
-//     * 商户拓展参数
-//     */
-//    private Map<String, String> merchantExtras;
 
     // ========== 订单相关字段 ==========
 
     /**
      * 支付金额，单位：分
      */
-    private Integer amount;
+    private Integer price;
     /**
      * 渠道手续费，单位：百分比
      *
@@ -96,7 +92,7 @@ public class PayOrderDO extends BaseDO {
     /**
      * 渠道手续金额，单位：分
      */
-    private Long channelFeeAmount;
+    private Long channelFeePrice;
     /**
      * 支付状态
      *
@@ -140,7 +136,7 @@ public class PayOrderDO extends BaseDO {
     /**
      * 退款总金额，单位：分
      */
-    private Long refundAmount;
+    private Long refundPrice;
 
     // ========== 渠道相关字段 ==========
     /**

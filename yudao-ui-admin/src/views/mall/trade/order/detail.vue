@@ -17,7 +17,7 @@
       <el-descriptions-item label="商家备注">{{ order.remark }}</el-descriptions-item>
       <el-descriptions-item label="支付单号">{{ order.payOrderId }}</el-descriptions-item>
       <el-descriptions-item label="付款方式">
-        <dict-tag :type="DICT_TYPE.PAY_CHANNEL_CODE_TYPE" :value="order.payChannelCode" />
+        <dict-tag :type="DICT_TYPE.PAY_CHANNEL_CODE" :value="order.payChannelCode" />
       </el-descriptions-item>
       <el-descriptions-item label="买家">{{ order.user.nickname }}</el-descriptions-item> <!-- TODO 芋艿：待实现：跳转会员 -->
       <el-descriptions-item label="收货地址">

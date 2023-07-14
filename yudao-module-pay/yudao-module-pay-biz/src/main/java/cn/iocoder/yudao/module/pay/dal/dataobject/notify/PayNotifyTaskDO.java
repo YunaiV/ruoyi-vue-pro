@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.pay.dal.dataobject.notify;
 
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
-public class PayNotifyTaskDO extends BaseDO {
+public class PayNotifyTaskDO extends TenantBaseDO {
 
     /**
      * 通知频率，单位为秒。

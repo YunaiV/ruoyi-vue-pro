@@ -30,7 +30,7 @@ public class PayRefundRespDTO {
     /**
      * 退款金额，单位：分
      */
-    private Integer refundAmount;
+    private Integer refundPrice;
 
     // ========== 商户相关字段 ==========
     /**

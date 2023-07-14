@@ -77,9 +77,9 @@ public interface PayRefundConvert {
         payRefundExcelVO.setCreateTime(bean.getCreateTime());
 
         BigDecimal multiple = new BigDecimal(100);
-        payRefundExcelVO.setPayAmount(BigDecimal.valueOf(bean.getPayAmount())
+        payRefundExcelVO.setPayPrice(BigDecimal.valueOf(bean.getPayPrice())
                 .divide(multiple, 2, RoundingMode.HALF_UP).toString());
-        payRefundExcelVO.setRefundAmount(BigDecimal.valueOf(bean.getRefundAmount())
+        payRefundExcelVO.setRefundPrice(BigDecimal.valueOf(bean.getRefundPrice())
                 .divide(multiple, 2, RoundingMode.HALF_UP).toString());
 
         return payRefundExcelVO;
@@ -87,7 +87,7 @@ public interface PayRefundConvert {
 
     //TODO 太多需要处理了， 暂时不用
     @Mappings(value = {
-            @Mapping(source = "amount", target = "payAmount"),
+            @Mapping(source = "price", target = "payPrice"),
             @Mapping(source = "id", target = "orderId"),
             @Mapping(target = "status",ignore = true)
     })

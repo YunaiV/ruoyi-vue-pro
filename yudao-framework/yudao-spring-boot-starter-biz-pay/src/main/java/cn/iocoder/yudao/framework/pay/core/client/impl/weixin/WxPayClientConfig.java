@@ -1,15 +1,14 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.weixin;
 
 import cn.hutool.core.io.IoUtil;
+import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import lombok.Data;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.NotBlank;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.Set;
 
 /**
  * 微信支付的 PayClientConfig 实现类
@@ -100,8 +99,9 @@ public class WxPayClientConfig implements PayClientConfig {
     }
 
     @Override
-    public Set<ConstraintViolation<PayClientConfig>> verifyParam(Validator validator) {
-        return validator.validate(this, this.getApiVersion().equals(API_VERSION_V2) ? V2.class : V3.class);
+    public void validate(Validator validator) {
+        ValidationUtils.validate(validator, this,
+                API_VERSION_V2.equals(this.getApiVersion()) ? V2.class : V3.class);
     }
 
     public static void main(String[] args) throws FileNotFoundException {

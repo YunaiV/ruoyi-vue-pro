@@ -144,7 +144,7 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
             assertNotNull(createReqDTO.getMerchantOrderId()); // 由于 tradeOrderId 后生成，只能校验非空
             assertEquals(createReqDTO.getSubject(), "商品 1 等多件");
             assertNull(createReqDTO.getBody());
-            assertEquals(createReqDTO.getAmount(), 80);
+            assertEquals(createReqDTO.getPrice(), 80);
             assertNotNull(createReqDTO.getExpireTime());
             return true;
         }))).thenReturn(1000L);
@@ -257,7 +257,7 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         // mock 方法（支付单）
         when(payOrderApi.getOrder(eq(10L))).thenReturn(randomPojo(PayOrderRespDTO.class,
                 o -> o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus()).setChannelCode("wx_pub")
-                        .setMerchantOrderId("1")).setAmount(100));
+                        .setMerchantOrderId("1")).setPrice(100));
 
         // 调用
         tradeOrderService.updateOrderPaid(id, payOrderId);

@@ -14,13 +14,13 @@ import java.util.Set;
 @ToString(callSuper = true)
 public class PayAppPageItemRespVO extends PayAppBaseVO {
 
-    @Schema(description = "应用编号", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "应用编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
-    @Schema(description = "渠道编码集合", requiredMode = Schema.RequiredMode.REQUIRED, example = "[alipay_pc, alipay_wap]")
+    @Schema(description = "已配置的支付渠道编码", requiredMode = Schema.RequiredMode.REQUIRED, example = "[alipay_pc, alipay_wap]")
     private Set<String> channelCodes;
 
 }

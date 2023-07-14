@@ -26,6 +26,14 @@ public interface PayRefundService {
     PayRefundDO getRefund(Long id);
 
     /**
+     * 获得指定应用的退款数量
+     *
+     * @param appId 应用编号
+     * @return 退款数量
+     */
+    Long getRefundCountByAppId(Long appId);
+
+    /**
      * 获得退款订单分页
      *
      * @param pageReqVO 分页查询

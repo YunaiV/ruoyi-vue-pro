@@ -124,11 +124,11 @@ public class PayRefundDO extends BaseDO {
     /**
      * 支付金额，单位：分
      */
-    private Integer payAmount;
+    private Integer payPrice;
     /**
      * 退款金额，单位：分
      */
-    private Integer refundAmount;
+    private Integer refundPrice;
 
     /**
      * 退款原因

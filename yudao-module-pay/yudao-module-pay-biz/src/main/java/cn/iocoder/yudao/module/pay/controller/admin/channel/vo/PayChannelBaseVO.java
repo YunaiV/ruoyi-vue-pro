@@ -1,4 +1,6 @@
 package cn.iocoder.yudao.module.pay.controller.admin.channel.vo;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import javax.validation.constraints.*;
@@ -10,22 +12,19 @@ import javax.validation.constraints.*;
 @Data
 public class PayChannelBaseVO {
 
-    @Schema(description = "渠道编码", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "渠道编码不能为空")
-    private String code;
-
-    @Schema(description = "开启状态", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "开启状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "开启状态不能为空")
+    @InEnum(CommonStatusEnum.class)
     private Integer status;
 
-    @Schema(description = "备注")
+    @Schema(description = "备注", example = "我是小备注")
     private String remark;
 
-    @Schema(description = "渠道费率，单位：百分比", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "渠道费率，单位：百分比", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     @NotNull(message = "渠道费率，单位：百分比不能为空")
     private Double feeRate;
 
-    @Schema(description = "应用编号", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "应用编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "应用编号不能为空")
     private Long appId;
 

@@ -35,10 +35,10 @@ public class PayOrderExcelVO {
     private String no;
 
     @ExcelProperty("支付金额,单位：元")
-    private String amount;
+    private String price;
 
     @ExcelProperty("渠道手续金额，单位：元")
-    private String channelFeeAmount;
+    private String channelFeePrice;
 
     @ExcelProperty("渠道手续费，单位：百分比")
     private String channelFeeRate;
@@ -80,7 +80,7 @@ public class PayOrderExcelVO {
     private Integer refundTimes;
 
     @ExcelProperty("退款总金额，单位：元")
-    private String  refundAmount;
+    private String refundPrice;
 
     @ExcelProperty("商品描述")
     private String body;

@@ -30,7 +30,7 @@ public class PayOrderServiceIntegrationTest extends BaseDbIntegrationTest {
         reqDTO.setMerchantOrderId(String.valueOf(System.currentTimeMillis()));
         reqDTO.setSubject("标题");
         reqDTO.setBody("内容");
-        reqDTO.setAmount(100);
+        reqDTO.setPrice(100);
         reqDTO.setExpireTime(DateUtils.addTime(Duration.ofDays(1)));
         // 发起请求
         payOrderService.createPayOrder(reqDTO);

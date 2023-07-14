@@ -41,17 +41,17 @@
           </el-radio-group>
         </el-form-item>
         <div v-if="form.aliPayConfig.mode === 1">
-          <el-form-item label-width="180px" label="商户私钥" prop="aliPayConfig.privateKey">
+          <el-form-item label-width="180px" label="应用私钥" prop="aliPayConfig.privateKey">
             <el-input type="textarea" :autosize="{minRows: 8, maxRows: 8}" v-model="form.aliPayConfig.privateKey"
-                      placeholder="请输入商户私钥" clearable :style="{width: '100%'}">
+                      placeholder="请输入应用私钥" clearable :style="{width: '100%'}">
             </el-input>
           </el-form-item>
-          <el-form-item label-width="180px" label="支付宝公钥字符串" prop="aliPayConfig.alipayPublicKey">
+          <el-form-item label-width="180px" label="支付宝公钥" prop="aliPayConfig.alipayPublicKey">
             <el-input
               type="textarea"
               :autosize="{minRows: 8, maxRows: 8}"
               v-model="form.aliPayConfig.alipayPublicKey"
-              placeholder="请输入支付宝公钥字符串" clearable
+              placeholder="请输入支付宝公钥" clearable
               :style="{width: '100%'}">
             </el-input>
           </el-form-item>

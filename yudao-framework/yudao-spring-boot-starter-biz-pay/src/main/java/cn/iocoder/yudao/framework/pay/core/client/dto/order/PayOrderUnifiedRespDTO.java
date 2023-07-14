@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.pay.core.client.dto.order;
 
+import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayOrderNotifyRespDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
-import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
 import lombok.Data;
 
 /**
@@ -24,19 +24,15 @@ public class PayOrderUnifiedRespDTO {
     private String displayContent;
 
     /**
-     * 支付状态
+     * 同步的通知信息
      *
-     * 枚举 {@link PayOrderStatusRespEnum} 类
+     * 目前只有 bar 条码支付才会出现，它是支付发起时，直接返回是否支付成功的，而其它支付还是异步通知
      */
-    private Integer status;
+    private PayOrderNotifyRespDTO notify;
 
     public PayOrderUnifiedRespDTO(String displayMode, String displayContent) {
-        this(displayMode, displayContent, PayOrderStatusRespEnum.WAITING.getStatus());
-    }
-
-    public PayOrderUnifiedRespDTO(String displayMode, String displayContent, Integer status) {
         this.displayMode = displayMode;
         this.displayContent = displayContent;
-        this.status = status;
     }
+
 }

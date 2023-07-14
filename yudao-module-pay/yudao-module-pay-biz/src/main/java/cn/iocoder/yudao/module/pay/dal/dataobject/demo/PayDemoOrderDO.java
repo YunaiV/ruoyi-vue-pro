@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * 示例订单
@@ -53,7 +52,7 @@ public class PayDemoOrderDO extends BaseDO {
     /**
      * 是否支付
      */
-    private Boolean payed;
+    private Boolean payStatus;
     /**
      * 支付订单编号
      *
