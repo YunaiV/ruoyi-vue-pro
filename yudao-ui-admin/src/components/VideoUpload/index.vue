@@ -92,6 +92,9 @@ export default {
         if (val) {
           this.videoUrl = val;
           this.uploadFlag = true;
+        } else {
+          this.videoUrl = null;
+          this.uploadFlag = null;
         }
       },
       deep: true,
