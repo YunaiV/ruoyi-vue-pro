@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Schema(description = "管理后台 - 拼团活动创建 Request VO")
@@ -14,7 +15,8 @@ import java.util.List;
 @ToString(callSuper = true)
 public class CombinationActivityCreateReqVO extends CombinationActivityBaseVO {
 
-    @Schema(description = "秒杀商品", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "拼团商品", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Valid
     private List<CombinationProductCreateReqVO> products;
 
 }

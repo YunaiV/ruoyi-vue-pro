@@ -2,15 +2,12 @@ package cn.iocoder.yudao.module.promotion.dal.dataobject.combination.combination
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import com.baomidou.mybatisplus.annotation.KeySequence;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * 拼团活动 DO
@@ -39,8 +36,7 @@ public class CombinationActivityDO extends BaseDO {
     /**
      * 商品 SPU 编号关联 ProductSpuDO 的 id
      */
-    @TableField(typeHandler = LongListTypeHandler.class)
-    private List<Long> spuIds;
+    private Long spuId;
     /**
      * 总限购数量
      */

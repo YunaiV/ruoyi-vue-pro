@@ -6,7 +6,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -23,7 +22,7 @@ public class CombinationActivityBaseVO {
 
     @Schema(description = "商品 SPU 编号关联 ProductSpuDO 的 id", example = "[1,2,3]")
     @NotNull(message = "拼团商品不能为空")
-    private List<Long> spuIds;
+    private Long spuId;
 
     @Schema(description = "总限购数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "16218")
     @NotNull(message = "总限购数量不能为空")

@@ -1,12 +1,15 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity;
 
+import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.product.CombinationProductRespVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "管理后台 - 拼团活动 Response VO")
 @Data
@@ -39,5 +42,9 @@ public class CombinationActivityRespVO extends CombinationActivityBaseVO {
     @Schema(description = "活动状态：0开启 1关闭", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     @NotNull(message = "活动状态：0开启 1关闭不能为空")
     private Integer status;
+
+    @Schema(description = "拼团商品", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Valid
+    private List<CombinationProductRespVO> products;
 
 }

@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.*;
 import cn.iocoder.yudao.module.promotion.convert.combination.CombinationActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.combinationactivity.CombinationActivityDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.combinationactivity.CombinationProductDO;
 import cn.iocoder.yudao.module.promotion.service.combination.CombinationActivityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -64,7 +65,8 @@ public class CombinationActivityController {
     @PreAuthorize("@ss.hasPermission('promotion:combination-activity:query')")
     public CommonResult<CombinationActivityRespVO> getCombinationActivity(@RequestParam("id") Long id) {
         CombinationActivityDO combinationActivity = combinationActivityService.getCombinationActivity(id);
-        return success(CombinationActivityConvert.INSTANCE.convert(combinationActivity));
+        List<CombinationProductDO> productDOs = combinationActivityService.getProductsByActivityId(id);
+        return success(CombinationActivityConvert.INSTANCE.convert(combinationActivity, productDOs));
     }
 
     @GetMapping("/list")

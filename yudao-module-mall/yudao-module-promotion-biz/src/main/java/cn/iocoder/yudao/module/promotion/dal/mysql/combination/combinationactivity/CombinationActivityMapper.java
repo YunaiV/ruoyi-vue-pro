@@ -34,4 +34,5 @@ public interface CombinationActivityMapper extends BaseMapperX<CombinationActivi
     default List<CombinationActivityDO> selectListByStatus(Integer status) {
         return selectList(CombinationActivityDO::getStatus, status);
     }
+
 }

@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activit
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.combinationactivity.CombinationActivityDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.combinationactivity.CombinationProductDO;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -72,4 +73,11 @@ public interface CombinationActivityService {
      */
     List<CombinationActivityDO> getCombinationActivityList(CombinationActivityExportReqVO exportReqVO);
 
+    /**
+     * 获得拼团活动商品列表
+     *
+     * @param id 拼团活动 ID
+     * @return 拼团活动的商品列表
+     */
+    List<CombinationProductDO> getProductsByActivityId(Long id);
 }

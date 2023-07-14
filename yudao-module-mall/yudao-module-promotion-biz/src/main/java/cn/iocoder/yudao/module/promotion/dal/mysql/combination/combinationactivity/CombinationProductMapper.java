@@ -44,4 +44,8 @@ public interface CombinationProductMapper extends BaseMapperX<CombinationProduct
                 .orderByDesc(CombinationProductDO::getId));
     }
 
+    default List<CombinationProductDO> selectListByActivityId(Long id) {
+        return selectList(CombinationProductDO::getActivityId, id);
+    }
+
 }
