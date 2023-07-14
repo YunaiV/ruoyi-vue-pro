@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.product
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.combinationactivity.CombinationProductDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -44,8 +45,8 @@ public interface CombinationProductMapper extends BaseMapperX<CombinationProduct
                 .orderByDesc(CombinationProductDO::getId));
     }
 
-    default List<CombinationProductDO> selectListByActivityId(Long id) {
-        return selectList(CombinationProductDO::getActivityId, id);
+    default List<CombinationProductDO> selectListByActivityIds(Collection<Long> ids) {
+        return selectList(CombinationProductDO::getActivityId, ids);
     }
 
 }

@@ -18,7 +18,7 @@ public class SeckillActivityRespVO extends SeckillActivityBaseVO {
     @Schema(description = "商品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "618大促")
     private String spuName;
 
-    @Schema(description = "商品主图", requiredMode = Schema.RequiredMode.REQUIRED, example = "618大促")
+    @Schema(description = "商品主图", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xx.png")
     private String picUrl;
 
     @Schema(description = "秒杀活动id", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")

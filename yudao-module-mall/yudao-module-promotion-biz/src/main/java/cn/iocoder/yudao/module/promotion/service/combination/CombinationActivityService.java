@@ -76,8 +76,8 @@ public interface CombinationActivityService {
     /**
      * 获得拼团活动商品列表
      *
-     * @param id 拼团活动 ID
+     * @param ids 拼团活动 ids
      * @return 拼团活动的商品列表
      */
-    List<CombinationProductDO> getProductsByActivityId(Long id);
+    List<CombinationProductDO> getProductsByActivityIds(Collection<Long> ids);
 }

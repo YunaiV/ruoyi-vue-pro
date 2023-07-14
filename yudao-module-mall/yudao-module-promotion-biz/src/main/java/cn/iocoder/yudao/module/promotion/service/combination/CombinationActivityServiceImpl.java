@@ -129,7 +129,7 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
      * @param products  商品配置
      */
     private void updateCombinationProduct(CombinationActivityDO updateObj, List<CombinationProductUpdateReqVO> products) {
-        List<CombinationProductDO> combinationProductDOs = combinationProductMapper.selectListByActivityId(updateObj.getId());
+        List<CombinationProductDO> combinationProductDOs = combinationProductMapper.selectListByActivityIds(CollUtil.newArrayList(updateObj.getId()));
         // 数据库中的活动商品
         Set<Long> convertSet = CollectionUtils.convertSet(combinationProductDOs, CombinationProductDO::getSkuId);
         // 前端传过来的活动商品
@@ -197,8 +197,8 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     }
 
     @Override
-    public List<CombinationProductDO> getProductsByActivityId(Long id) {
-        return combinationProductMapper.selectListByActivityId(id);
+    public List<CombinationProductDO> getProductsByActivityIds(Collection<Long> ids) {
+        return combinationProductMapper.selectListByActivityIds(ids);
     }
 
 }

@@ -62,7 +62,7 @@ public interface SeckillActivityConvert {
     }
 
     @Mappings({
-            @Mapping(target = "id", expression = "java(null)"),
+            @Mapping(target = "id", ignore = true),
             @Mapping(target = "activityId", source = "activityDO.id"),
             @Mapping(target = "configIds", source = "activityDO.configIds"),
             @Mapping(target = "spuId", source = "activityDO.spuId"),

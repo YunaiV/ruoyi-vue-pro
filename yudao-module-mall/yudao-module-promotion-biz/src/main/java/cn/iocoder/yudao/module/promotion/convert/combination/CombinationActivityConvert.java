@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.promotion.convert.combination;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityExcelVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityRespVO;
@@ -63,17 +64,26 @@ public interface CombinationActivityConvert {
 
     default CombinationActivityRespVO convert(CombinationActivityDO bean, List<CombinationProductDO> productDOs) {
         CombinationActivityRespVO respVO = convert(bean);
-        ArrayList<CombinationProductRespVO> vos = new ArrayList<>();
-        productDOs.forEach(item -> {
-            vos.add(convert(item));
-        });
-        respVO.setProducts(vos);
+        respVO.setProducts(convertList2(productDOs));
         return respVO;
     }
 
     List<CombinationActivityRespVO> convertList(List<CombinationActivityDO> list);
 
     PageResult<CombinationActivityRespVO> convertPage(PageResult<CombinationActivityDO> page);
+
+    default PageResult<CombinationActivityRespVO> convertPage(PageResult<CombinationActivityDO> page, List<CombinationProductDO> productDOList, List<ProductSpuRespDTO> spuList) {
+        Map<Long, ProductSpuRespDTO> spuMap = CollectionUtils.convertMap(spuList, ProductSpuRespDTO::getId, c -> c);
+        PageResult<CombinationActivityRespVO> pageResult = convertPage(page);
+        pageResult.getList().forEach(item -> {
+            item.setSpuName(spuMap.get(item.getSpuId()).getName());
+            item.setPicUrl(spuMap.get(item.getSpuId()).getPicUrl());
+            item.setProducts(convertList2(productDOList));
+        });
+        return pageResult;
+    }
+
+    List<CombinationProductRespVO> convertList2(List<CombinationProductDO> productDOs);
 
     List<CombinationActivityExcelVO> convertList02(List<CombinationActivityDO> list);
 

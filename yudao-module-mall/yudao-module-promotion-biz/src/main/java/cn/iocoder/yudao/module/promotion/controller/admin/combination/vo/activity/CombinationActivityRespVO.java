@@ -17,6 +17,12 @@ import java.util.List;
 @ToString(callSuper = true)
 public class CombinationActivityRespVO extends CombinationActivityBaseVO {
 
+    @Schema(description = "商品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "618大促")
+    private String spuName;
+
+    @Schema(description = "商品主图", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xx.png")
+    private String picUrl;
+
     @Schema(description = "活动编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "22901")
     private Long id;
 

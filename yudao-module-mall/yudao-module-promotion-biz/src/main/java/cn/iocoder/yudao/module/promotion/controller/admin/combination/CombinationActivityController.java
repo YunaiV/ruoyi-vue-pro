@@ -1,9 +1,13 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.combination;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.*;
 import cn.iocoder.yudao.module.promotion.convert.combination.CombinationActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.combinationactivity.CombinationActivityDO;
@@ -22,6 +26,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
@@ -34,6 +39,8 @@ public class CombinationActivityController {
 
     @Resource
     private CombinationActivityService combinationActivityService;
+    @Resource
+    private ProductSpuApi spuApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建拼团活动")
@@ -65,7 +72,7 @@ public class CombinationActivityController {
     @PreAuthorize("@ss.hasPermission('promotion:combination-activity:query')")
     public CommonResult<CombinationActivityRespVO> getCombinationActivity(@RequestParam("id") Long id) {
         CombinationActivityDO combinationActivity = combinationActivityService.getCombinationActivity(id);
-        List<CombinationProductDO> productDOs = combinationActivityService.getProductsByActivityId(id);
+        List<CombinationProductDO> productDOs = combinationActivityService.getProductsByActivityIds(CollectionUtil.newArrayList(id));
         return success(CombinationActivityConvert.INSTANCE.convert(combinationActivity, productDOs));
     }
 
@@ -83,7 +90,11 @@ public class CombinationActivityController {
     @PreAuthorize("@ss.hasPermission('promotion:combination-activity:query')")
     public CommonResult<PageResult<CombinationActivityRespVO>> getCombinationActivityPage(@Valid CombinationActivityPageReqVO pageVO) {
         PageResult<CombinationActivityDO> pageResult = combinationActivityService.getCombinationActivityPage(pageVO);
-        return success(CombinationActivityConvert.INSTANCE.convertPage(pageResult));
+        Set<Long> aIds = CollectionUtils.convertSet(pageResult.getList(), CombinationActivityDO::getId);
+        List<CombinationProductDO> productDOs = combinationActivityService.getProductsByActivityIds(aIds);
+        Set<Long> spuIds = CollectionUtils.convertSet(pageResult.getList(), CombinationActivityDO::getSpuId);
+        List<ProductSpuRespDTO> spuList = spuApi.getSpuList(spuIds);
+        return success(CombinationActivityConvert.INSTANCE.convertPage(pageResult, productDOs, spuList));
     }
 
     @GetMapping("/export-excel")
