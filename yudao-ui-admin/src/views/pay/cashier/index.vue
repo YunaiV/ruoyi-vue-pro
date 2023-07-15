@@ -126,6 +126,10 @@ export default {
         icon: require("@/assets/images/pay/icon/wx_app.svg"),
         code: "wx_app"
       }, {
+        name: '微信扫码支付',
+        icon: require("@/assets/images/pay/icon/wx_native.svg"),
+        code: "wx_native"
+      }, {
         name: '微信条码支付',
         icon: require("@/assets/images/pay/icon/wx_bar.svg"),
         code: "wx_bar"

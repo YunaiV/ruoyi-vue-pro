@@ -50,7 +50,7 @@ public class WxNativePayClient extends AbstractWxPayClient {
         WxPayNativeOrderResult response = client.createOrder(request);
 
         // 转换结果
-        return new PayOrderUnifiedRespDTO(PayOrderDisplayModeEnum.QR_CODE_URL.getMode(),
+        return new PayOrderUnifiedRespDTO(PayOrderDisplayModeEnum.QR_CODE.getMode(),
                 response.getCodeUrl());
     }
 
@@ -68,7 +68,7 @@ public class WxNativePayClient extends AbstractWxPayClient {
         WxPayNativeOrderResult response = client.createOrderV3(TradeTypeEnum.NATIVE, request);
 
         // 转换结果
-        return new PayOrderUnifiedRespDTO(PayOrderDisplayModeEnum.QR_CODE_URL.getMode(),
+        return new PayOrderUnifiedRespDTO(PayOrderDisplayModeEnum.QR_CODE.getMode(),
                 response.getCodeUrl());
     }
 

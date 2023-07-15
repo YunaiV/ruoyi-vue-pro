@@ -132,6 +132,10 @@ export const PayChannelEnum = {
     "code": "wx_app",
     "name": "微信 APP 支付"
   },
+  WX_NATIVE: {
+    "code": "wx_native",
+    "name": "微信扫码支付"
+  },
   WX_BAR: {
     "code": "wx_bar",
     "name": "微信条码支付"
