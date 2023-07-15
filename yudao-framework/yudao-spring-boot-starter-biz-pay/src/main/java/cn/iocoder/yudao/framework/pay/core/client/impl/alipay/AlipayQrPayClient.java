@@ -29,10 +29,10 @@ public class AlipayQrPayClient extends AbstractAlipayPayClient {
         // 1.1 构建 AlipayTradePrecreateModel 请求
         AlipayTradePrecreateModel model = new AlipayTradePrecreateModel();
         // ① 通用的参数
-        model.setOutTradeNo(reqDTO.getMerchantOrderId());
+        model.setOutTradeNo(reqDTO.getOutTradeNo());
         model.setSubject(reqDTO.getSubject());
         model.setBody(reqDTO.getBody());
-        model.setTotalAmount(formatAmount(reqDTO.getAmount()));
+        model.setTotalAmount(formatAmount(reqDTO.getPrice()));
         model.setProductCode("FACE_TO_FACE_PAYMENT"); // 销售产品码. 目前扫码支付场景下仅支持 FACE_TO_FACE_PAYMENT
         // ② 个性化的参数【无】
         // ③ 支付宝扫码支付只有一种展示，考虑到前端可能希望二维码扫描后，手机打开

@@ -5,8 +5,8 @@ import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.exception.PayException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -92,10 +92,10 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
             throws Throwable;
 
     @Override
-    public PayRefundUnifiedRespDTO unifiedRefund(PayRefundUnifiedReqDTO reqDTO) {
+    public PayRefundRespDTO unifiedRefund(PayRefundUnifiedReqDTO reqDTO) {
         Validation.buildDefaultValidatorFactory().getValidator().validate(reqDTO);
         // 执行统一退款
-        PayRefundUnifiedRespDTO resp;
+        PayRefundRespDTO resp;
         try {
             resp = doUnifiedRefund(reqDTO);
         } catch (ServiceException ex) {
@@ -109,7 +109,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
         return resp;
     }
 
-    protected abstract PayRefundUnifiedRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable;
+    protected abstract PayRefundRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable;
 
     // ========== 各种工具方法 ==========
 

@@ -6,8 +6,7 @@ import cn.hutool.core.date.TemporalAccessorUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.io.FileUtils;
-import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayOrderNotifyRespDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
@@ -22,11 +21,13 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Map;
 import java.util.Objects;
 
 import static cn.hutool.core.date.DatePattern.PURE_DATETIME_PATTERN;
 import static cn.hutool.core.date.DatePattern.UTC_WITH_XXX_OFFSET_PATTERN;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.*;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.invalidParamException;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 
 /**
@@ -103,47 +104,47 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
 
 
     @Override
-    public Object parseNotify(PayNotifyReqDTO rawNotify) {
-        log.info("[parseNotify][微信支付回调 data 数据: {}]", rawNotify.getBody());
+    public Object parseNotify(Map<String, String> params, String body) {
+        log.info("[parseNotify][微信支付回调 data 数据: {}]", body);
         try {
             // 微信支付 v2 回调结果处理
             switch (config.getApiVersion()) {
                 case WxPayClientConfig.API_VERSION_V2:
-                    return parseOrderNotifyV2(rawNotify);
+                    return parseOrderNotifyV2(body);
                 case WxPayClientConfig.API_VERSION_V3:
-                    return parseOrderNotifyV3(rawNotify);
+                    return parseOrderNotifyV3(body);
                 default:
                     throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
             }
         } catch (WxPayException e) {
-            log.error("[parseNotify][rawNotify({}) 解析失败]", toJsonString(rawNotify), e);
+            log.error("[parseNotify][params({}) body({}) 解析失败]", params, body, e);
 //            throw buildPayException(e);
             throw new RuntimeException(e);
             // TODO 芋艿：缺一个异常翻译
         }
     }
 
-    private PayOrderNotifyRespDTO parseOrderNotifyV2(PayNotifyReqDTO data) throws WxPayException {
-        WxPayOrderNotifyResult notifyResult = client.parseOrderNotifyResult(data.getBody());
+    private PayOrderRespDTO parseOrderNotifyV2(String body) throws WxPayException {
+        WxPayOrderNotifyResult notifyResult = client.parseOrderNotifyResult(body);
         Assert.isTrue(Objects.equals(notifyResult.getResultCode(), "SUCCESS"), "支付结果非 SUCCESS");
         // 转换结果
-        return PayOrderNotifyRespDTO
+        return PayOrderRespDTO
                 .builder()
-                .orderExtensionNo(notifyResult.getOutTradeNo())
+                .outTradeNo(notifyResult.getOutTradeNo())
                 .channelOrderNo(notifyResult.getTransactionId())
                 .channelUserId(notifyResult.getOpenid())
                 .successTime(parseDateV2(notifyResult.getTimeEnd()))
                 .build();
     }
 
-    private PayOrderNotifyRespDTO parseOrderNotifyV3(PayNotifyReqDTO data) throws WxPayException {
-        WxPayOrderNotifyV3Result notifyResult = client.parseOrderNotifyV3Result(data.getBody(), null);
+    private PayOrderRespDTO parseOrderNotifyV3(String body) throws WxPayException {
+        WxPayOrderNotifyV3Result notifyResult = client.parseOrderNotifyV3Result(body, null);
         WxPayOrderNotifyV3Result.DecryptNotifyResult result = notifyResult.getResult();
         // 转换结果
         Assert.isTrue(Objects.equals(notifyResult.getResult().getTradeState(), "SUCCESS"),
                 "支付结果非 SUCCESS");
-        return PayOrderNotifyRespDTO.builder()
-                .orderExtensionNo(result.getOutTradeNo())
+        return PayOrderRespDTO.builder()
+                .outTradeNo(result.getOutTradeNo())
                 .channelOrderNo(result.getTradeState())
                 .channelUserId(result.getPayer() != null ? result.getPayer().getOpenid() : null)
                 .successTime(parseDateV3(result.getSuccessTime()))
@@ -175,7 +176,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
         if (Objects.equals(e.getReturnCode(), "FAIL")) {
             throw exception(PayFrameworkErrorCodeConstants.ORDER_UNIFIED_ERROR, e.getReturnMsg());
         }
-        // 情况三：系统异常，这里暂时不打，交给上层的 AbstractPayClient 统一打
+        // 情况三：系统异常，这里暂时不打，交给上层的 AbstractPayClient 统一打日志
         return e;
     }
 

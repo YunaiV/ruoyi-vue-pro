@@ -24,33 +24,20 @@ import javax.validation.constraints.NotNull;
 public class PayRefundUnifiedReqDTO {
 
     /**
-     * 用户 IP
+     * 外部订单号
+     *
+     * 对应 PayOrderExtensionDO 的 no 字段
      */
-    private String userIp;
-
-    // TODO @jason：这个是否为非必传字段呀，只需要传递 payTradeNo 字段即可。尽可能精简
-    /**
-     * https://api.mch.weixin.qq.com/v3/refund/domestic/refunds 中的 transaction_id
-     * https://opendocs.alipay.com/apis alipay.trade.refund 中的 trade_no
-     * 渠道订单号
-     */
-    private String channelOrderNo;
+    @NotEmpty(message = "外部订单编号不能为空")
+    private String outTradeNo;
 
     /**
-     * https://api.mch.weixin.qq.com/v3/refund/domestic/refunds 中的 out_trade_no
-     * https://opendocs.alipay.com/apis alipay.trade.refund 中的 out_trade_no
-     * 支付交易号 {PayOrderExtensionDO no字段} 和 渠道订单号 不能同时为空
+     * 外部退款号
+     *
+     * 对应 PayRefundDO 的 no 字段
      */
-    private String payTradeNo;
-
-    /**
-     * https://api.mch.weixin.qq.com/v3/refund/domestic/refunds 中的 out_refund_no
-     * https://opendocs.alipay.com/apis alipay.trade.refund 中的 out_trade_no
-     * 退款请求单号  同一退款请求单号多次请求只退一笔。
-     * 使用 商户的退款单号。{PayRefundDO 字段 merchantRefundNo}
-     */
-    @NotEmpty(message = "退款请求单号")
-    private String merchantRefundId;
+    @NotEmpty(message = "退款请求单号不能为空")
+    private String outRefundNo;
 
     /**
      * 退款原因
@@ -63,11 +50,12 @@ public class PayRefundUnifiedReqDTO {
      */
     @NotNull(message = "退款金额不能为空")
     @DecimalMin(value = "0", inclusive = false, message = "支付金额必须大于零")
-    private Integer amount;
+    private Integer price;
 
     /**
-     * 退款结果 notify 回调地址， 支付宝退款不需要回调地址， 微信需要
+     * 退款结果的 notify 回调地址
      */
+    @NotEmpty(message = "支付结果的回调地址不能为空")
     @URL(message = "支付结果的 notify 回调地址必须是 URL 格式")
     private String notifyUrl;
 

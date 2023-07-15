@@ -30,10 +30,10 @@ public class AlipayWapPayClient extends AbstractAlipayPayClient {
         // 1.1 构建 AlipayTradeWapPayModel 请求
         AlipayTradeWapPayModel model = new AlipayTradeWapPayModel();
         // ① 通用的参数
-        model.setOutTradeNo(reqDTO.getMerchantOrderId());
+        model.setOutTradeNo(reqDTO.getOutTradeNo());
         model.setSubject(reqDTO.getSubject());
         model.setBody(reqDTO.getBody());
-        model.setTotalAmount(formatAmount(reqDTO.getAmount()));
+        model.setTotalAmount(formatAmount(reqDTO.getPrice()));
         model.setProductCode("QUICK_WAP_PAY"); // 销售产品码. 目前 Wap 支付场景下仅支持 QUICK_WAP_PAY
         // ② 个性化的参数【无】
         // ③ 支付宝 Wap 支付只有一种展示：URL

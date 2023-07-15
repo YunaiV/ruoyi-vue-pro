@@ -2,16 +2,19 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayOrderNotifyRespDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayRefundNotifyRespDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
-import cn.iocoder.yudao.framework.pay.core.enums.refund.PayNotifyRefundStatusEnum;
-import com.alipay.api.*;
+import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
+import com.alipay.api.AlipayApiException;
+import com.alipay.api.AlipayConfig;
+import com.alipay.api.AlipayResponse;
+import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.domain.AlipayTradeRefundModel;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipayTradeRefundRequest;
@@ -22,6 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 import static cn.hutool.core.date.DatePattern.NORM_DATETIME_FORMATTER;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
@@ -52,69 +57,72 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
 
     /**
      * 支付宝统一的退款接口 alipay.trade.refund
+     *
      * @param reqDTO 退款请求 request DTO
      * @return 退款请求 Response
      */
     @Override
-    protected PayRefundUnifiedRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO)  {
-        AlipayTradeRefundModel model=new AlipayTradeRefundModel();
-        model.setTradeNo(reqDTO.getChannelOrderNo());
-        model.setOutTradeNo(reqDTO.getPayTradeNo());
-
-        model.setOutRequestNo(reqDTO.getMerchantRefundId());
-        model.setRefundAmount(formatAmount(reqDTO.getAmount()));
+    protected PayRefundRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO)  {
+        // 1.1 构建 AlipayTradeRefundModel 请求
+        AlipayTradeRefundModel model = new AlipayTradeRefundModel();
+        model.setOutTradeNo(reqDTO.getOutTradeNo());
+        model.setOutRequestNo(reqDTO.getOutRefundNo());
+        model.setRefundAmount(formatAmount(reqDTO.getPrice()));
+//        model.setRefundAmount(formatAmount(reqDTO.getPrice() / 2));
         model.setRefundReason(reqDTO.getReason());
-
-        AlipayTradeRefundRequest refundRequest = new AlipayTradeRefundRequest();
-        refundRequest.setBizModel(model);
-        refundRequest.setNotifyUrl(reqDTO.getNotifyUrl());
-        refundRequest.setReturnUrl(reqDTO.getNotifyUrl());
+        // 1.2 构建 AlipayTradePayRequest 请求
+        AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();
+        request.setBizModel(model);
         try {
-            AlipayTradeRefundResponse response =  client.execute(refundRequest);
-            log.info("[doUnifiedRefund][response({}) 发起退款 渠道返回", toJsonString(response));
+            // 2.1 执行请求
+            AlipayTradeRefundResponse response =  client.execute(request);
+            PayRefundRespDTO refund = new PayRefundRespDTO()
+                    .setRawData(response);
+            // 支付宝只要退款调用返回 success，就认为退款成功，不需要回调。具体可见 parseNotify 方法的说明。
+            // 另外，支付宝没有退款单号，所以不用设置
             if (response.isSuccess()) {
-                //退款导致触发的异步通知是发送到支付接口中设置的notify_url
-                //支付宝不返回退款单号，设置为空
-                PayRefundUnifiedRespDTO respDTO = new PayRefundUnifiedRespDTO();
-                respDTO.setChannelRefundId("");
-//                return PayCommonResult.build(response.getCode(), response.getMsg(), respDTO, codeMapping); TODO
-                return null;
+                refund.setStatus(PayOrderStatusRespEnum.SUCCESS.getStatus())
+                        .setSuccessTime(LocalDateTimeUtil.of(response.getGmtRefundPay()));
+                Assert.notNull(refund.getSuccessTime(), "退款成功时间不能为空");
+            } else {
+                refund.setStatus(PayOrderStatusRespEnum.CLOSED.getStatus());
             }
-            // 失败。需要抛出异常
-//            return PayCommonResult.build(response.getCode(), response.getMsg(), null, codeMapping); TODO
-            return null;
+            return refund;
         } catch (AlipayApiException e) {
-            // TODO 记录异常日志
-            log.error("[doUnifiedRefund][request({}) 发起退款失败,网络读超时，退款状态未知]", toJsonString(reqDTO), e);
-//            return PayCommonResult.build(e.getErrCode(), e.getErrMsg(), null, codeMapping); TODO
+            log.error("[doUnifiedRefund][request({}) 发起退款异常]", toJsonString(reqDTO), e);
             return null;
         }
     }
 
     @Override
     @SneakyThrows
-    public Object parseNotify(PayNotifyReqDTO rawNotify) {
+    public Object parseNotify(Map<String, String> params, String body) {
+        // 补充说明：支付宝退款时，没有回调，这点和微信支付是不同的。并且，退款分成部分退款、和全部退款。
+        // ① 部分退款：是会有回调，但是它回调的是订单状态的同步回调，不是退款订单的回调
+        // ② 全部退款：Wap 支付有订单状态的同步回调，但是 PC/扫码又没有
+        // 所以，这里在解析时，即使是退款导致的订单状态同步，我们也忽略不做为“退款同步”，而是订单的回调。
+        // 实际上，支付宝退款只要发起成功，就可以认为退款成功，不需要等待回调。
+
         // 1. 校验回调数据
-        String body = rawNotify.getBody();
-        Map<String, String> params = rawNotify.getParams();
         Map<String, String> bodyObj = HttpUtil.decodeParamMap(body, StandardCharsets.UTF_8);
         AlipaySignature.rsaCheckV1(bodyObj, config.getAlipayPublicKey(),
-                StandardCharsets.UTF_8.name(), "RSA2");
+                StandardCharsets.UTF_8.name(), config.getSignType());
 
-        // 2.1 退款的情况
-        if (bodyObj.containsKey("refund_fee")) {
-            return PayRefundNotifyRespDTO.builder().channelOrderNo(bodyObj.get("trade_no"))
-                    .tradeNo(bodyObj.get("out_trade_no")).reqNo(bodyObj.get("out_biz_no"))
-                    .status(PayNotifyRefundStatusEnum.SUCCESS)
-                    .refundSuccessTime(parseTime(params.get("gmt_refund")))
-                    .build();
-        }
-        // 2.2 支付的情况
-        return PayOrderNotifyRespDTO.builder()
-                .orderExtensionNo(bodyObj.get("out_trade_no"))
+        // 2. 解析订单的状态
+        String tradeStatus = bodyObj.get("trade_status");
+        PayOrderStatusRespEnum status = Objects.equals("WAIT_BUYER_PAY", tradeStatus) ? PayOrderStatusRespEnum.WAITING
+                : Objects.equals("TRADE_SUCCESS", tradeStatus) ? PayOrderStatusRespEnum.SUCCESS
+                : Objects.equals("TRADE_CLOSED", tradeStatus) ? PayOrderStatusRespEnum.CLOSED : null;
+        Assert.notNull(status, (Supplier<Throwable>) () -> {
+            throw new IllegalArgumentException(StrUtil.format("body({}) 的 trade_status 不正确", body));
+        });
+        return PayOrderRespDTO.builder()
+                .status(Objects.requireNonNull(status).getStatus())
+                .outTradeNo(bodyObj.get("out_trade_no"))
                 .channelOrderNo(bodyObj.get("trade_no"))
                 .channelUserId(bodyObj.get("seller_id"))
-                .successTime(parseTime(params.get("notify_time")))
+                .successTime(parseTime(params.get("gmt_payment")))
+                .rawData(body)
                 .build();
     }
 

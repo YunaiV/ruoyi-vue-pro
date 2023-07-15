@@ -60,9 +60,10 @@ public interface PayRefundConvert {
         PayRefundExcelVO payRefundExcelVO = new PayRefundExcelVO();
 
         payRefundExcelVO.setId(bean.getId());
-        payRefundExcelVO.setTradeNo(bean.getTradeNo());
+        payRefundExcelVO.setTradeNo(bean.getNo());
         payRefundExcelVO.setMerchantOrderId(bean.getMerchantOrderId());
-        payRefundExcelVO.setMerchantRefundNo(bean.getMerchantRefundNo());
+        // TODO 芋艿：晚点在改
+//        payRefundExcelVO.setMerchantRefundNo(bean.getMerchantRefundNo());
         payRefundExcelVO.setNotifyUrl(bean.getNotifyUrl());
         payRefundExcelVO.setNotifyStatus(bean.getNotifyStatus());
         payRefundExcelVO.setStatus(bean.getStatus());
@@ -71,9 +72,7 @@ public interface PayRefundConvert {
         payRefundExcelVO.setUserIp(bean.getUserIp());
         payRefundExcelVO.setChannelOrderNo(bean.getChannelOrderNo());
         payRefundExcelVO.setChannelRefundNo(bean.getChannelRefundNo());
-        payRefundExcelVO.setExpireTime(bean.getExpireTime());
         payRefundExcelVO.setSuccessTime(bean.getSuccessTime());
-        payRefundExcelVO.setNotifyTime(bean.getNotifyTime());
         payRefundExcelVO.setCreateTime(bean.getCreateTime());
 
         BigDecimal multiple = new BigDecimal(100);

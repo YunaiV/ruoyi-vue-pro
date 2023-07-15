@@ -83,17 +83,20 @@ public class PayChannelServiceImpl implements PayChannelService {
      */
     @Scheduled(initialDelay = 60, fixedRate = 60, timeUnit = TimeUnit.SECONDS)
     public void refreshLocalCache() {
-        // 情况一：如果缓存里没有数据，则直接刷新缓存
-        if (CollUtil.isEmpty(channelCache)) {
-            initLocalCache();
-            return;
-        }
+        // 注意：忽略自动多租户，因为要全局初始化缓存
+        TenantUtils.executeIgnore(() -> {
+            // 情况一：如果缓存里没有数据，则直接刷新缓存
+            if (CollUtil.isEmpty(channelCache)) {
+                initLocalCache();
+                return;
+            }
 
-        // 情况二，如果缓存里数据，则通过 updateTime 判断是否有数据变更，有变更则刷新缓存
-        LocalDateTime maxTime = CollectionUtils.getMaxValue(channelCache, PayChannelDO::getUpdateTime);
-        if (channelMapper.selectCountByUpdateTimeGt(maxTime) > 0) {
-            initLocalCache();
-        }
+            // 情况二，如果缓存里数据，则通过 updateTime 判断是否有数据变更，有变更则刷新缓存
+            LocalDateTime maxTime = CollectionUtils.getMaxValue(channelCache, PayChannelDO::getUpdateTime);
+            if (channelMapper.selectCountByUpdateTimeGt(maxTime) > 0) {
+                initLocalCache();
+            }
+        });
     }
 
     @Override

@@ -62,7 +62,7 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
             o.setChannelId(1L);
             o.setChannelCode(PayChannelEnum.WX_PUB.getCode());
             o.setOrderId(1L);
-            o.setTradeNo("OT0000001");
+            o.setNo("OT0000001");
             o.setMerchantOrderId("MOT0000001");
             o.setMerchantRefundNo("MRF0000001");
             o.setNotifyUrl("https://www.cancanzi.com");
@@ -127,7 +127,7 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
             o.setChannelId(1L);
             o.setChannelCode(PayChannelEnum.WX_PUB.getCode());
             o.setOrderId(1L);
-            o.setTradeNo("OT0000001");
+            o.setNo("OT0000001");
             o.setMerchantOrderId("MOT0000001");
             o.setMerchantRefundNo("MRF0000001");
             o.setNotifyUrl("https://www.cancanzi.com");

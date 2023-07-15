@@ -55,7 +55,8 @@ public class PayOrderDO extends BaseDO {
 
     /**
      * 商户订单编号
-     * 例如说，内部系统 A 的订单号。需要保证每个 PayMerchantDO 唯一
+     *
+     * 例如说，内部系统 A 的订单号，需要保证每个 PayAppDO 唯一
      */
     private String merchantOrderId;
     /**

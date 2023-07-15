@@ -45,8 +45,10 @@ public interface PayRefundMapper extends BaseMapperX<PayRefundDO> {
         return selectOne("req_no", reqNo);
     }
 
+    // TODO 芋艿：要重构
     default  PayRefundDO selectByTradeNoAndMerchantRefundNo(String tradeNo, String merchantRefundNo){
-        return selectOne("trade_no", tradeNo, "merchant_refund_no", merchantRefundNo);
+//        return selectOne("trade_no", tradeNo, "merchant_refund_no", merchantRefundNo);
+        return null;
     }
 
 }

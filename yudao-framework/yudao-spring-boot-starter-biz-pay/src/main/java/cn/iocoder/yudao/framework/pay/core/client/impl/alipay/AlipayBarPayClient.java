@@ -39,10 +39,10 @@ public class AlipayBarPayClient extends AbstractAlipayPayClient {
         // 1.1 构建 AlipayTradePayModel 请求
         AlipayTradePayModel model = new AlipayTradePayModel();
         // ① 通用的参数
-        model.setOutTradeNo(reqDTO.getMerchantOrderId());
+        model.setOutTradeNo(reqDTO.getOutTradeNo());
         model.setSubject(reqDTO.getSubject());
         model.setBody(reqDTO.getBody());
-        model.setTotalAmount(formatAmount(reqDTO.getAmount()));
+        model.setTotalAmount(formatAmount(reqDTO.getPrice()));
         model.setScene("bar_code"); // 当面付条码支付场景
         // ② 个性化的参数
         model.setAuthCode(authCode);

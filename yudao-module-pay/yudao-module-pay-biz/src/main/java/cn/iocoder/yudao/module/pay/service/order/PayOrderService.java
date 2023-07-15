@@ -2,8 +2,7 @@ package cn.iocoder.yudao.module.pay.service.order;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayOrderNotifyRespDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderExportReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderPageReqVO;
@@ -103,8 +102,7 @@ public interface PayOrderService {
      *
      * @param channelId 渠道编号
      * @param notify    通知
-     * @param rawNotify 通知数据
      */
-    void notifyPayOrder(Long channelId, PayOrderNotifyRespDTO notify, PayNotifyReqDTO rawNotify);
+    void notifyPayOrder(Long channelId, PayOrderRespDTO notify);
 
 }

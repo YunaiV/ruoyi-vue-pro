@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.framework.pay.core.client.dto.order;
 
-import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayOrderNotifyRespDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
 import lombok.Data;
 
@@ -24,11 +23,12 @@ public class PayOrderUnifiedRespDTO {
     private String displayContent;
 
     /**
-     * 同步的通知信息
+     * 渠道支付订单
      *
+     * 只有在订单直接支付成功时，才会进行返回。
      * 目前只有 bar 条码支付才会出现，它是支付发起时，直接返回是否支付成功的，而其它支付还是异步通知
      */
-    private PayOrderNotifyRespDTO notify;
+    private PayOrderRespDTO order;
 
     public PayOrderUnifiedRespDTO(String displayMode, String displayContent) {
         this.displayMode = displayMode;

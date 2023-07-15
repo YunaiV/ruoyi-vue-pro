@@ -3,9 +3,8 @@ package cn.iocoder.yudao.module.pay.controller.admin.notify;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
-import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayOrderNotifyRespDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayRefundNotifyRespDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -61,18 +60,17 @@ public class PayNotifyController {
         }
 
         // 2. 解析通知数据
-        PayNotifyReqDTO rawNotify = PayNotifyReqDTO.builder().params(params).body(body).build();
-        Object notify = payClient.parseNotify(rawNotify);
+        Object notify = payClient.parseNotify(params, body);
 
         // 3. 处理通知
         // 3.1：退款通知
-        if (notify instanceof PayRefundNotifyRespDTO) {
-            refundService.notifyPayRefund(channelId, (PayRefundNotifyRespDTO) notify, rawNotify);
+        if (notify instanceof PayRefundRespDTO) {
+            refundService.notifyPayRefund(channelId, (PayRefundRespDTO) notify);
             return "success";
         }
         // 3.2：支付通知
-        if (notify instanceof PayOrderNotifyRespDTO) {
-            orderService.notifyPayOrder(channelId, (PayOrderNotifyRespDTO) notify, rawNotify);
+        if (notify instanceof PayOrderRespDTO) {
+            orderService.notifyPayOrder(channelId, (PayOrderRespDTO) notify);
             return "success";
         }
         throw new UnsupportedOperationException("未知通知：" + toJsonString(notify));
