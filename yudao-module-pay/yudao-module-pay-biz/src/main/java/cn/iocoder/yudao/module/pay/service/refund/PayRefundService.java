@@ -62,6 +62,6 @@ public interface PayRefundService {
      * @param channelId  渠道编号
      * @param notify     通知
      */
-    void notifyPayRefund(Long channelId, PayRefundRespDTO notify);
+    void notifyRefund(Long channelId, PayRefundRespDTO notify);
 
 }

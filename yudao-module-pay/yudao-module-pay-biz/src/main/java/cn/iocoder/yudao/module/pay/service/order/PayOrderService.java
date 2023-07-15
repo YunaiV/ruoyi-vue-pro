@@ -32,6 +32,15 @@ public interface PayOrderService {
     PayOrderDO getOrder(Long id);
 
     /**
+     * 获得支付订单
+     *
+     * @param appId 应用编号
+     * @param merchantOrderId 商户订单编号
+     * @return 支付订单
+     */
+    PayOrderDO getOrder(Long appId, String merchantOrderId);
+
+    /**
      * 获得指定应用的订单数量
      *
      * @param appId 应用编号
@@ -70,11 +79,11 @@ public interface PayOrderService {
     /**
      * 根据订单 ID 集合获取订单商品名称Map集合
      *
-     * @param idList 订单 ID 集合
+     * @param ids 订单 ID 集合
      * @return 订单商品 map 集合
      */
-    default Map<Long, PayOrderDO> getOrderSubjectMap(Collection<Long> idList) {
-        List<PayOrderDO> list = getOrderSubjectList(idList);
+    default Map<Long, PayOrderDO> getOrderSubjectMap(Collection<Long> ids) {
+        List<PayOrderDO> list = getOrderSubjectList(ids);
         return CollectionUtils.convertMap(list, PayOrderDO::getId);
     }
 
@@ -84,7 +93,7 @@ public interface PayOrderService {
      * @param reqDTO 创建请求
      * @return 支付单编号
      */
-    Long createPayOrder(@Valid PayOrderCreateReqDTO reqDTO);
+    Long createOrder(@Valid PayOrderCreateReqDTO reqDTO);
 
     /**
      * 提交支付
@@ -94,8 +103,8 @@ public interface PayOrderService {
      * @param userIp 提交 IP
      * @return 提交结果
      */
-    PayOrderSubmitRespVO submitPayOrder(@Valid PayOrderSubmitReqVO reqVO,
-                                        @NotEmpty(message = "提交 IP 不能为空") String userIp);
+    PayOrderSubmitRespVO submitOrder(@Valid PayOrderSubmitReqVO reqVO,
+                                     @NotEmpty(message = "提交 IP 不能为空") String userIp);
 
     /**
      * 通知支付单成功
@@ -103,6 +112,14 @@ public interface PayOrderService {
      * @param channelId 渠道编号
      * @param notify    通知
      */
-    void notifyPayOrder(Long channelId, PayOrderRespDTO notify);
+    void notifyOrder(Long channelId, PayOrderRespDTO notify);
+
+    /**
+     * 更新支付订单的退款金额
+     *
+     * @param id 编号
+     * @param incrRefundPrice 增加的退款金额
+     */
+    void updateOrderRefundPrice(Long id, Integer incrRefundPrice);
 
 }

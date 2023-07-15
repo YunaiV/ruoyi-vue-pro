@@ -86,7 +86,7 @@ public class PayOrderController {
     @PostMapping("/submit")
     @Operation(summary = "提交支付订单")
     public CommonResult<PayOrderSubmitRespVO> submitPayOrder(@RequestBody PayOrderSubmitReqVO reqVO) {
-        PayOrderSubmitRespVO respVO = payOrderService.submitPayOrder(reqVO, getClientIP());
+        PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, getClientIP());
         return success(respVO);
     }
 

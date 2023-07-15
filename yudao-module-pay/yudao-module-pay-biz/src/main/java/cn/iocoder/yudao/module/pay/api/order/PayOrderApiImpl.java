@@ -22,7 +22,7 @@ public class PayOrderApiImpl implements PayOrderApi {
 
     @Override
     public Long createOrder(PayOrderCreateReqDTO reqDTO) {
-        return payOrderService.createPayOrder(reqDTO);
+        return payOrderService.createOrder(reqDTO);
     }
 
     @Override

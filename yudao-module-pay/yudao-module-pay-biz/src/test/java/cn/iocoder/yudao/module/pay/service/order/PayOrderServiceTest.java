@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.order.PayOrderMapper;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderNotifyStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
-import cn.iocoder.yudao.module.pay.enums.refund.PayRefundTypeEnum;
+import cn.iocoder.yudao.module.pay.enums.order.PayOrderRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
@@ -85,7 +85,7 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
             o.setSuccessTime(LocalDateTime.of(2018, 1, 1, 10, 10, 2));
             o.setNotifyTime(LocalDateTime.of(2018, 1, 1, 10, 10, 15));
             o.setSuccessExtensionId(1L);
-            o.setRefundStatus(PayRefundTypeEnum.NO.getStatus());
+            o.setRefundStatus(PayOrderRefundStatusEnum.NO.getStatus());
             o.setRefundTimes(0);
             o.setRefundPrice(0L);
             o.setChannelUserId("1008611");
@@ -106,7 +106,7 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
         // 测试 status 不匹配
         orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setStatus(PayOrderStatusEnum.CLOSED.getStatus())));
         // 测试 refundStatus 不匹配
-        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setRefundStatus(PayRefundTypeEnum.ALL.getStatus())));
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setRefundStatus(PayOrderRefundStatusEnum.ALL.getStatus())));
         // 测试 createTime 不匹配
         orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setCreateTime(LocalDateTime.of(2019, 1, 1, 10, 10,
                 1))));
@@ -118,7 +118,7 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
         reqVO.setMerchantOrderId(merchantOrderId);
         reqVO.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
         reqVO.setStatus(PayOrderStatusEnum.SUCCESS.getStatus());
-        reqVO.setRefundStatus(PayRefundTypeEnum.NO.getStatus());
+        reqVO.setRefundStatus(PayOrderRefundStatusEnum.NO.getStatus());
         reqVO.setCreateTime((new LocalDateTime[]{LocalDateTime.of(2018, 1, 1, 10, 1, 0), LocalDateTime.of(2018, 1, 1, 10, 1, 0)}));
         // 调用
         PageResult<PayOrderDO> pageResult = orderService.getOrderPage(reqVO);
@@ -153,7 +153,7 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
             o.setSuccessTime(LocalDateTime.of(2018, 1, 1, 10, 10, 2));
             o.setNotifyTime(LocalDateTime.of(2018, 1, 1, 10, 10, 15));
             o.setSuccessExtensionId(1L);
-            o.setRefundStatus(PayRefundTypeEnum.NO.getStatus());
+            o.setRefundStatus(PayOrderRefundStatusEnum.NO.getStatus());
             o.setRefundTimes(0);
             o.setRefundPrice(0L);
             o.setChannelUserId("1008611");
@@ -175,7 +175,7 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
         // 测试 status 不匹配
         orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setStatus(PayOrderStatusEnum.CLOSED.getStatus())));
         // 测试 refundStatus 不匹配
-        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setRefundStatus(PayRefundTypeEnum.ALL.getStatus())));
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setRefundStatus(PayOrderRefundStatusEnum.ALL.getStatus())));
         // 测试 createTime 不匹配
         orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setCreateTime(LocalDateTime.of(2019, 1, 1, 10, 10,
                 1))));
@@ -187,7 +187,7 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
         reqVO.setMerchantOrderId(merchantOrderId);
         reqVO.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
         reqVO.setStatus(PayOrderStatusEnum.SUCCESS.getStatus());
-        reqVO.setRefundStatus(PayRefundTypeEnum.NO.getStatus());
+        reqVO.setRefundStatus(PayOrderRefundStatusEnum.NO.getStatus());
         reqVO.setCreateTime((new LocalDateTime[]{LocalDateTime.of(2018, 1, 1, 10, 1, 0), LocalDateTime.of(2018, 1, 1, 10, 1, 0)}));
 
         // 调用

@@ -21,6 +21,13 @@ public class PayRefundRespDTO {
     private Integer status;
 
     /**
+     * 外部退款号
+     *
+     * 对应 PayRefundDO 的 no 字段
+     */
+    private String outRefundNo;
+
+    /**
      * 渠道退款单号
      *
      * 对应 PayRefundDO.channelRefundNo 字段

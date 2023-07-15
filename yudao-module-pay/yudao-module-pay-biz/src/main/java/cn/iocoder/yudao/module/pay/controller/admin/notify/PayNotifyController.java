@@ -65,12 +65,12 @@ public class PayNotifyController {
         // 3. 处理通知
         // 3.1：退款通知
         if (notify instanceof PayRefundRespDTO) {
-            refundService.notifyPayRefund(channelId, (PayRefundRespDTO) notify);
+            refundService.notifyRefund(channelId, (PayRefundRespDTO) notify);
             return "success";
         }
         // 3.2：支付通知
         if (notify instanceof PayOrderRespDTO) {
-            orderService.notifyPayOrder(channelId, (PayOrderRespDTO) notify);
+            orderService.notifyOrder(channelId, (PayOrderRespDTO) notify);
             return "success";
         }
         throw new UnsupportedOperationException("未知通知：" + toJsonString(notify));

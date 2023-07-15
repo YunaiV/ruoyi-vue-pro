@@ -68,7 +68,6 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
         model.setOutTradeNo(reqDTO.getOutTradeNo());
         model.setOutRequestNo(reqDTO.getOutRefundNo());
         model.setRefundAmount(formatAmount(reqDTO.getPrice()));
-//        model.setRefundAmount(formatAmount(reqDTO.getPrice() / 2));
         model.setRefundReason(reqDTO.getReason());
         // 1.2 构建 AlipayTradePayRequest 请求
         AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();
@@ -77,6 +76,7 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
             // 2.1 执行请求
             AlipayTradeRefundResponse response =  client.execute(request);
             PayRefundRespDTO refund = new PayRefundRespDTO()
+                    .setOutRefundNo(reqDTO.getOutRefundNo())
                     .setRawData(response);
             // 支付宝只要退款调用返回 success，就认为退款成功，不需要回调。具体可见 parseNotify 方法的说明。
             // 另外，支付宝没有退款单号，所以不用设置

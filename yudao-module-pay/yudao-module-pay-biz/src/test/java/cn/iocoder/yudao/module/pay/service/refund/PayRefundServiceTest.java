@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.refund.PayRefundMapper;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderNotifyStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
-import cn.iocoder.yudao.module.pay.enums.refund.PayRefundTypeEnum;
+import cn.iocoder.yudao.module.pay.enums.order.PayOrderRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
@@ -64,11 +64,11 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
             o.setOrderId(1L);
             o.setNo("OT0000001");
             o.setMerchantOrderId("MOT0000001");
-            o.setMerchantRefundNo("MRF0000001");
+            o.setMerchantRefundId("MRF0000001");
             o.setNotifyUrl("https://www.cancanzi.com");
             o.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
             o.setStatus(PayRefundStatusEnum.SUCCESS.getStatus());
-            o.setType(PayRefundTypeEnum.SOME.getStatus());
+            o.setType(PayOrderRefundStatusEnum.PART.getStatus());
             o.setPayPrice(100);
             o.setRefundPrice(500);
             o.setReason("就是想退款了，你有意见吗");
@@ -77,10 +77,7 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
             o.setChannelRefundNo("CHR0000001");
             o.setChannelErrorCode("");
             o.setChannelErrorMsg("");
-            o.setChannelExtras("");
-            o.setExpireTime(LocalDateTime.of(2021, 1, 1, 10, 10, 30));
             o.setSuccessTime(LocalDateTime.of(2021, 1, 1, 10, 10, 15));
-            o.setNotifyTime(LocalDateTime.of(2021, 1, 1, 10, 10, 20));
             o.setCreateTime(LocalDateTime.of(2021, 1, 1, 10, 10, 10));
             o.setUpdateTime(LocalDateTime.of(2021, 1, 1, 10, 10, 35));
         });
@@ -90,14 +87,14 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
         // 测试 channelCode 不匹配
         refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setChannelCode(PayChannelEnum.ALIPAY_APP.getCode())));
         // 测试 merchantRefundNo 不匹配
-        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setMerchantRefundNo("MRF1111112")));
+        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setMerchantRefundId("MRF1111112")));
         // 测试 notifyStatus 不匹配
         refundMapper.insert(
                 cloneIgnoreId(dbRefund, o -> o.setNotifyStatus(PayOrderNotifyStatusEnum.FAILURE.getStatus())));
         // 测试 status 不匹配
-        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setStatus(PayRefundStatusEnum.CLOSE.getStatus())));
+        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setStatus(PayRefundStatusEnum.FAILURE.getStatus())));
         // 测试 type 不匹配
-        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setType(PayRefundTypeEnum.ALL.getStatus())));
+        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setType(PayOrderRefundStatusEnum.ALL.getStatus())));
         // 测试 createTime 不匹配
         refundMapper.insert(cloneIgnoreId(dbRefund, o ->
                 o.setCreateTime(LocalDateTime.of(2022, 1, 1, 10, 10, 10))));
@@ -108,7 +105,7 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
         reqVO.setMerchantRefundNo("MRF0000001");
         reqVO.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
         reqVO.setStatus(PayRefundStatusEnum.SUCCESS.getStatus());
-        reqVO.setType(PayRefundTypeEnum.SOME.getStatus());
+        reqVO.setType(PayOrderRefundStatusEnum.PART.getStatus());
         reqVO.setCreateTime((new LocalDateTime[]{LocalDateTime.of(2021, 1, 1, 10, 10, 10), LocalDateTime.of(2021, 1, 1, 10, 10, 12)}));
 
         // 调用
@@ -129,11 +126,11 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
             o.setOrderId(1L);
             o.setNo("OT0000001");
             o.setMerchantOrderId("MOT0000001");
-            o.setMerchantRefundNo("MRF0000001");
+            o.setMerchantRefundId("MRF0000001");
             o.setNotifyUrl("https://www.cancanzi.com");
             o.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
             o.setStatus(PayRefundStatusEnum.SUCCESS.getStatus());
-            o.setType(PayRefundTypeEnum.SOME.getStatus());
+            o.setType(PayOrderRefundStatusEnum.PART.getStatus());
             o.setPayPrice(100);
             o.setRefundPrice(500);
             o.setReason("就是想退款了，你有意见吗");
@@ -142,10 +139,7 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
             o.setChannelRefundNo("CHR0000001");
             o.setChannelErrorCode("");
             o.setChannelErrorMsg("");
-            o.setChannelExtras("");
-            o.setExpireTime(LocalDateTime.of(2021, 1, 1, 10, 10, 30));
             o.setSuccessTime(LocalDateTime.of(2021, 1, 1, 10, 10, 15));
-            o.setNotifyTime(LocalDateTime.of(2021, 1, 1, 10, 10, 20));
             o.setCreateTime(LocalDateTime.of(2021, 1, 1, 10, 10, 10));
             o.setUpdateTime(LocalDateTime.of(2021, 1, 1, 10, 10, 35));
         });
@@ -155,14 +149,14 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
         // 测试 channelCode 不匹配
         refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setChannelCode(PayChannelEnum.ALIPAY_APP.getCode())));
         // 测试 merchantRefundNo 不匹配
-        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setMerchantRefundNo("MRF1111112")));
+        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setMerchantRefundId("MRF1111112")));
         // 测试 notifyStatus 不匹配
         refundMapper.insert(
                 cloneIgnoreId(dbRefund, o -> o.setNotifyStatus(PayOrderNotifyStatusEnum.FAILURE.getStatus())));
         // 测试 status 不匹配
-        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setStatus(PayRefundStatusEnum.CLOSE.getStatus())));
+        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setStatus(PayRefundStatusEnum.FAILURE.getStatus())));
         // 测试 type 不匹配
-        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setType(PayRefundTypeEnum.ALL.getStatus())));
+        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setType(PayOrderRefundStatusEnum.ALL.getStatus())));
         // 测试 createTime 不匹配
         refundMapper.insert(cloneIgnoreId(dbRefund, o ->
                 o.setCreateTime(LocalDateTime.of(2022, 1, 1, 10, 10, 10))));
@@ -174,7 +168,7 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
         reqVO.setMerchantRefundNo("MRF0000001");
         reqVO.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
         reqVO.setStatus(PayRefundStatusEnum.SUCCESS.getStatus());
-        reqVO.setType(PayRefundTypeEnum.SOME.getStatus());
+        reqVO.setType(PayOrderRefundStatusEnum.PART.getStatus());
         reqVO.setCreateTime((new LocalDateTime[]{LocalDateTime.of(2021, 1, 1, 10, 10, 10), LocalDateTime.of(2021, 1, 1, 10, 10, 12)}));
 
         // 调用

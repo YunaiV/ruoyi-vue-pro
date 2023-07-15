@@ -1,12 +1,11 @@
 package cn.iocoder.yudao.module.pay.convert.refund;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
+import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundRespDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.*;
-import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
 import java.math.BigDecimal;
@@ -44,8 +43,6 @@ public interface PayRefundConvert {
 
     PageResult<PayRefundRespVO> convertPage(PageResult<PayRefundDO> page);
 
-    List<PayRefundExcelVO> convertList02(List<PayRefundDO> list);
-
     /**
      * 退款订单DO 转 导出excel VO
      *
@@ -67,7 +64,6 @@ public interface PayRefundConvert {
         payRefundExcelVO.setNotifyUrl(bean.getNotifyUrl());
         payRefundExcelVO.setNotifyStatus(bean.getNotifyStatus());
         payRefundExcelVO.setStatus(bean.getStatus());
-        payRefundExcelVO.setType(bean.getType());
         payRefundExcelVO.setReason(bean.getReason());
         payRefundExcelVO.setUserIp(bean.getUserIp());
         payRefundExcelVO.setChannelOrderNo(bean.getChannelOrderNo());
@@ -84,12 +80,8 @@ public interface PayRefundConvert {
         return payRefundExcelVO;
     }
 
-    //TODO 太多需要处理了， 暂时不用
-    @Mappings(value = {
-            @Mapping(source = "price", target = "payPrice"),
-            @Mapping(source = "id", target = "orderId"),
-            @Mapping(target = "status",ignore = true)
-    })
-    PayRefundDO convert(PayOrderDO orderDO);
+    PayRefundDO convert(PayRefundCreateReqDTO bean);
+
+    PayRefundRespDTO convert02(PayRefundDO bean);
 
 }

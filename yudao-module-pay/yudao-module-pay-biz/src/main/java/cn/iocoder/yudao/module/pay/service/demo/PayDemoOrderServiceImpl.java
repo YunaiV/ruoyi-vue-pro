@@ -184,12 +184,17 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
         // 1. 校验订单是否可以退款
         PayDemoOrderDO order = validateDemoOrderCanRefund(id);
 
-        // 2.1 创建退款单
+        // 2.1 生成退款单号
+        // 一般来说，用户发起退款的时候，都会单独插入一个售后维权表，然后使用该表的 id 作为 refundId
+        // 这里我们是个简单的 demo，所以没有售后维权表，直接使用订单 id + "-refund" 来演示
+        String refundId = order.getId() + "-refund";
+        // 2.2 创建退款单
         Long payRefundId = payRefundApi.createPayRefund(new PayRefundCreateReqDTO()
                 .setAppId(PAY_APP_ID).setUserIp(getClientIP()) // 支付应用
-                .setPayOrderId(order.getPayOrderId()) // 支付单号
+                .setMerchantOrderId(String.valueOf(order.getId())) // 支付单号
+                .setMerchantRefundId(refundId)
                 .setReason("想退钱").setPrice(order.getPrice()));// 价格信息
-        // 2.2 更新退款单到 demo 订单
+        // 2.3 更新退款单到 demo 订单
         payDemoOrderMapper.updateById(new PayDemoOrderDO().setId(id)
                 .setPayRefundId(payRefundId).setRefundPrice(order.getPrice()));
     }

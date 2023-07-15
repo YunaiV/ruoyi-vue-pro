@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
-import cn.iocoder.yudao.module.pay.enums.refund.PayRefundTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -105,12 +104,6 @@ public class PayRefundDO extends BaseDO {
     private Integer status;
 
     /**
-     * 退款类型(部分退款，全部退款)
-     *
-     * 枚举 {@link PayRefundTypeEnum}
-     */
-    private Integer type;
-    /**
      * 支付金额，单位：分
      */
     private Integer payPrice;
@@ -157,12 +150,6 @@ public class PayRefundDO extends BaseDO {
      */
     private String channelErrorMsg;
 
-    /**
-     * 支付渠道的额外参数
-     *
-     * 参见 <a href="https://www.pingxx.com/api/支付渠道%20extra%20参数说明.html">参数说明</>
-     */
-    private String channelExtras;
     /**
      * 支付渠道异步通知的内容
      *
