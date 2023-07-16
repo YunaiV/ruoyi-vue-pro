@@ -67,7 +67,7 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
         AlipayTradeRefundModel model = new AlipayTradeRefundModel();
         model.setOutTradeNo(reqDTO.getOutTradeNo());
         model.setOutRequestNo(reqDTO.getOutRefundNo());
-        model.setRefundAmount(formatAmount(reqDTO.getPrice()));
+        model.setRefundAmount(formatAmount(reqDTO.getRefundPrice()));
         model.setRefundReason(reqDTO.getReason());
         // 1.2 构建 AlipayTradePayRequest 请求
         AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();
@@ -75,6 +75,7 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
         try {
             // 2.1 执行请求
             AlipayTradeRefundResponse response =  client.execute(request);
+            // 2.2 创建返回结果
             PayRefundRespDTO refund = new PayRefundRespDTO()
                     .setOutRefundNo(reqDTO.getOutRefundNo())
                     .setRawData(response);

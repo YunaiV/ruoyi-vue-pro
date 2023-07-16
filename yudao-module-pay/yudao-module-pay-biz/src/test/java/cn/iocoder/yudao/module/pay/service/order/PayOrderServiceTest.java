@@ -87,7 +87,7 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
             o.setSuccessExtensionId(1L);
             o.setRefundStatus(PayOrderRefundStatusEnum.NO.getStatus());
             o.setRefundTimes(0);
-            o.setRefundPrice(0L);
+            o.setRefundPrice(0);
             o.setChannelUserId("1008611");
             o.setChannelOrderNo(channelOrderId);
             o.setUpdateTime(LocalDateTime.of(2018, 1, 1, 10, 10, 15));
@@ -155,7 +155,7 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
             o.setSuccessExtensionId(1L);
             o.setRefundStatus(PayOrderRefundStatusEnum.NO.getStatus());
             o.setRefundTimes(0);
-            o.setRefundPrice(0L);
+            o.setRefundPrice(0);
             o.setChannelUserId("1008611");
             o.setChannelOrderNo(channelOrderId);
             o.setUpdateTime(LocalDateTime.of(2018, 1, 1, 10, 10, 15));

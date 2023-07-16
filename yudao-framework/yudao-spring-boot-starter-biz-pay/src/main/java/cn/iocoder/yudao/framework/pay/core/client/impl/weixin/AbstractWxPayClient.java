@@ -9,10 +9,15 @@ import cn.iocoder.yudao.framework.common.util.io.FileUtils;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.PayFrameworkErrorCodeConstants;
+import cn.iocoder.yudao.framework.pay.core.enums.refund.PayRefundStatusRespEnum;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyV3Result;
+import com.github.binarywang.wxpay.bean.request.WxPayRefundRequest;
+import com.github.binarywang.wxpay.bean.result.WxPayRefundResult;
 import com.github.binarywang.wxpay.config.WxPayConfig;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
@@ -80,6 +85,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
                     throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
             }
         } catch (WxPayException e) {
+            // todo 芋艿：异常的处理；
             throw buildUnifiedOrderException(reqDTO, e);
         }
     }
@@ -102,6 +108,51 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     protected abstract PayOrderUnifiedRespDTO doUnifiedOrderV3(PayOrderUnifiedReqDTO reqDTO)
             throws WxPayException;
 
+    @Override
+    protected PayRefundRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable {
+        try {
+            switch (config.getApiVersion()) {
+                case WxPayClientConfig.API_VERSION_V2:
+                    return doUnifiedRefundV2(reqDTO);
+                case WxPayClientConfig.API_VERSION_V3:
+                    return doUnifiedRefundV3(reqDTO);
+                default:
+                    throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
+            }
+        } catch (WxPayException e) {
+            // todo 芋艿：异常的处理；
+            throw buildUnifiedOrderException(null, e);
+        }
+    }
+
+    private PayRefundRespDTO doUnifiedRefundV2(PayRefundUnifiedReqDTO reqDTO) throws Throwable {
+        // 1. 构建 WxPayRefundRequest 请求
+        WxPayRefundRequest request = new WxPayRefundRequest()
+                .setOutTradeNo(reqDTO.getOutTradeNo())
+                .setOutRefundNo(reqDTO.getOutRefundNo())
+                .setRefundFee(reqDTO.getRefundPrice())
+                .setRefundDesc(reqDTO.getReason())
+                .setTotalFee(reqDTO.getPayPrice())
+                .setNotifyUrl(reqDTO.getNotifyUrl());
+        // 2.1 执行请求
+        WxPayRefundResult response = client.refundV2(request); // TODO 芋艿：可以分成 V2 和 V3 的退款接口
+        // 2.2 创建返回结果
+        PayRefundRespDTO refund = new PayRefundRespDTO()
+                .setOutRefundNo(reqDTO.getOutRefundNo())
+                .setRawData(response);
+        if (Objects.equals("SUCCESS", response.getResultCode())) {
+            refund.setStatus(PayRefundStatusRespEnum.WAITING.getStatus());
+            refund.setChannelRefundNo(response.getRefundId());
+        } else {
+            refund.setStatus(PayRefundStatusRespEnum.FAILURE.getStatus());
+            // TODO 芋艿；异常的处理；
+        }
+        return refund;
+    }
+
+    private PayRefundRespDTO doUnifiedRefundV3(PayRefundUnifiedReqDTO reqDTO) throws Throwable {
+        return null;
+    }
 
     @Override
     public Object parseNotify(Map<String, String> params, String body) {

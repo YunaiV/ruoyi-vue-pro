@@ -46,11 +46,19 @@ public class PayRefundUnifiedReqDTO {
     private String reason;
 
     /**
+     * 支付金额，单位：分
+     *
+     * 目前微信支付在退款的时候，必须传递该字段
+     */
+    @NotNull(message = "支付金额不能为空")
+    @DecimalMin(value = "0", inclusive = false, message = "支付金额必须大于零")
+    private Integer payPrice;
+    /**
      * 退款金额，单位：分
      */
     @NotNull(message = "退款金额不能为空")
     @DecimalMin(value = "0", inclusive = false, message = "支付金额必须大于零")
-    private Integer price;
+    private Integer refundPrice;
 
     /**
      * 退款结果的 notify 回调地址

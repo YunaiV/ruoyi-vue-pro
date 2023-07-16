@@ -2,8 +2,6 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.weixin;
 
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
 import com.github.binarywang.wxpay.bean.order.WxPayNativeOrderResult;
@@ -65,16 +63,11 @@ public class WxNativePayClient extends AbstractWxPayClient {
         request.setSceneInfo(new WxPayUnifiedOrderV3Request.SceneInfo().setPayerClientIp(reqDTO.getUserIp()));
         request.setNotifyUrl(reqDTO.getNotifyUrl());
         // 执行请求
-        WxPayNativeOrderResult response = client.createOrderV3(TradeTypeEnum.NATIVE, request);
+        String response = client.createOrderV3(TradeTypeEnum.NATIVE, request);
 
         // 转换结果
         return new PayOrderUnifiedRespDTO(PayOrderDisplayModeEnum.QR_CODE.getMode(),
-                response.getCodeUrl());
-    }
-
-    @Override
-    protected PayRefundRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable {
-        return null;
+                response);
     }
 
 }

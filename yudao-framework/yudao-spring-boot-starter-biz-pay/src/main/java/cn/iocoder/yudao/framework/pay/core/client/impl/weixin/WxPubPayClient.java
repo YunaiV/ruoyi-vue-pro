@@ -5,8 +5,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
@@ -81,12 +79,6 @@ public class WxPubPayClient extends AbstractWxPayClient {
         // 转换结果
         return new PayOrderUnifiedRespDTO(PayOrderDisplayModeEnum.CUSTOM.getMode(),
                 JsonUtils.toJsonString(response));
-    }
-
-    @Override
-    protected PayRefundRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) {
-        // TODO 需要实现
-        throw new UnsupportedOperationException();
     }
 
     // ========== 各种工具方法 ==========

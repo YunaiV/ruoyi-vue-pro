@@ -129,8 +129,9 @@ public class PayRefundServiceImpl implements PayRefundService {
         refundMapper.insert(refund);
         // 2.2 向渠道发起退款申请
         PayOrderExtensionDO orderExtension = orderExtensionService.getOrderExtension(order.getSuccessExtensionId());
-        PayRefundUnifiedReqDTO unifiedReqDTO = new PayRefundUnifiedReqDTO();
-        unifiedReqDTO.setPrice(reqDTO.getPrice())
+        PayRefundUnifiedReqDTO unifiedReqDTO = new PayRefundUnifiedReqDTO()
+                .setPayPrice(order.getPrice())
+                .setRefundPrice(reqDTO.getPrice())
                 .setOutTradeNo(orderExtension.getNo())
                 .setOutRefundNo(refund.getNo())
                 .setNotifyUrl(genChannelPayNotifyUrl(channel)) // TODO 芋艿：优化下 notifyUrl

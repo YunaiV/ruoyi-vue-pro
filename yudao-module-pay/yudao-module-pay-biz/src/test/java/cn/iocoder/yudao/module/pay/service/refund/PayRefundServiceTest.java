@@ -68,7 +68,6 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
             o.setNotifyUrl("https://www.cancanzi.com");
             o.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
             o.setStatus(PayRefundStatusEnum.SUCCESS.getStatus());
-            o.setType(PayOrderRefundStatusEnum.PART.getStatus());
             o.setPayPrice(100);
             o.setRefundPrice(500);
             o.setReason("就是想退款了，你有意见吗");
@@ -93,8 +92,6 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
                 cloneIgnoreId(dbRefund, o -> o.setNotifyStatus(PayOrderNotifyStatusEnum.FAILURE.getStatus())));
         // 测试 status 不匹配
         refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setStatus(PayRefundStatusEnum.FAILURE.getStatus())));
-        // 测试 type 不匹配
-        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setType(PayOrderRefundStatusEnum.ALL.getStatus())));
         // 测试 createTime 不匹配
         refundMapper.insert(cloneIgnoreId(dbRefund, o ->
                 o.setCreateTime(LocalDateTime.of(2022, 1, 1, 10, 10, 10))));
@@ -105,7 +102,6 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
         reqVO.setMerchantRefundNo("MRF0000001");
         reqVO.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
         reqVO.setStatus(PayRefundStatusEnum.SUCCESS.getStatus());
-        reqVO.setType(PayOrderRefundStatusEnum.PART.getStatus());
         reqVO.setCreateTime((new LocalDateTime[]{LocalDateTime.of(2021, 1, 1, 10, 10, 10), LocalDateTime.of(2021, 1, 1, 10, 10, 12)}));
 
         // 调用
@@ -130,7 +126,6 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
             o.setNotifyUrl("https://www.cancanzi.com");
             o.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
             o.setStatus(PayRefundStatusEnum.SUCCESS.getStatus());
-            o.setType(PayOrderRefundStatusEnum.PART.getStatus());
             o.setPayPrice(100);
             o.setRefundPrice(500);
             o.setReason("就是想退款了，你有意见吗");
@@ -155,8 +150,6 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
                 cloneIgnoreId(dbRefund, o -> o.setNotifyStatus(PayOrderNotifyStatusEnum.FAILURE.getStatus())));
         // 测试 status 不匹配
         refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setStatus(PayRefundStatusEnum.FAILURE.getStatus())));
-        // 测试 type 不匹配
-        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setType(PayOrderRefundStatusEnum.ALL.getStatus())));
         // 测试 createTime 不匹配
         refundMapper.insert(cloneIgnoreId(dbRefund, o ->
                 o.setCreateTime(LocalDateTime.of(2022, 1, 1, 10, 10, 10))));
