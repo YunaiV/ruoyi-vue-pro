@@ -44,7 +44,7 @@ public class WxBarPayClientIntegrationTest {
                 .totalFee(1) // 单位分
                 .timeExpire(formatDateV2(LocalDateTimeUtils.addTime(Duration.ofMinutes(2))))
                 .spbillCreateIp("127.0.0.1")
-                .authCode("131276541518138032")
+                .authCode("134298744426278497")
                 .build();
         System.out.println("========= request ==========");
         System.out.println(JsonUtils.toJsonPrettyString(request));
@@ -63,7 +63,7 @@ public class WxBarPayClientIntegrationTest {
 
         // 执行发起退款
         WxPayRefundRequest request = new WxPayRefundRequest()
-                .setOutTradeNo("1689504162805")
+                .setOutTradeNo("1689545667276")
                 .setOutRefundNo(String.valueOf(System.currentTimeMillis()))
                 .setRefundFee(1)
                 .setRefundDesc("就是想退了")
@@ -103,8 +103,6 @@ public class WxBarPayClientIntegrationTest {
         config.setMchKey("dS1ngeN63JLr3NRbvPH9AJy3MyUxZdim");
         config.setSignType(WxPayConstants.SignType.MD5);
         config.setKeyPath("/Users/yunai/Downloads/wx_pay/apiclient_cert.p12");
-        config.setPrivateCertPath("/Users/yunai/Downloads/wx_pay/apiclient_cert.pem");
-        config.setPrivateKeyPath("/Users/yunai/Downloads/wx_pay/apiclient_key.pem");
         return config;
     }
 

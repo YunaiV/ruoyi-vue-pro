@@ -58,7 +58,7 @@ public class WxNativePayClientIntegrationTest {
 
         // 执行发起退款
         WxPayRefundV3Request request = new WxPayRefundV3Request()
-                .setOutTradeNo("1689506153043")
+                .setOutTradeNo("1689545729695")
                 .setOutRefundNo(String.valueOf(System.currentTimeMillis()))
                 .setAmount(new WxPayRefundV3Request.Amount().setTotal(1).setRefund(1).setCurrency("CNY"))
                 .setReason("就是想退了");
@@ -73,10 +73,8 @@ public class WxNativePayClientIntegrationTest {
         WxPayConfig config = new WxPayConfig();
         config.setAppId("wx62056c0d5e8db250");
         config.setMchId("1545083881");
-        config.setMchKey("dS1ngeN63JLr3NRbvPH9AJy3MyUxZdim");
         config.setApiV3Key("459arNsYHl1mgkiO6H9ZH5KkhFXSxaA4");
 //        config.setCertSerialNo(serialNo);
-        config.setKeyPath("/Users/yunai/Downloads/wx_pay/apiclient_cert.p12");
         config.setPrivateCertPath("/Users/yunai/Downloads/wx_pay/apiclient_cert.pem");
         config.setPrivateKeyPath("/Users/yunai/Downloads/wx_pay/apiclient_key.pem");
         return config;

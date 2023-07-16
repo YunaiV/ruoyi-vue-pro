@@ -143,6 +143,30 @@
             </el-button>
           </template>
         </el-table-column>
+        <el-table-column :label="payChannelEnum.WX_NATIVE.name" align="center">
+          <template v-slot="scope">
+            <el-button type="success" icon="el-icon-check" circle
+                       v-if="judgeChannelExist(scope.row.channelCodes,payChannelEnum.WX_NATIVE.code)"
+                       @click="handleUpdateChannel(scope.row,payChannelEnum.WX_NATIVE.code,payType.WECHAT)">
+            </el-button>
+            <el-button v-else
+                       type="danger" icon="el-icon-close" circle
+                       @click="handleCreateChannel(scope.row,payChannelEnum.WX_NATIVE.code,payType.WECHAT)">
+            </el-button>
+          </template>
+        </el-table-column>
+        <el-table-column :label="payChannelEnum.WX_BAR.name" align="center">
+          <template v-slot="scope">
+            <el-button type="success" icon="el-icon-check" circle
+                       v-if="judgeChannelExist(scope.row.channelCodes,payChannelEnum.WX_BAR.code)"
+                       @click="handleUpdateChannel(scope.row,payChannelEnum.WX_BAR.code,payType.WECHAT)">
+            </el-button>
+            <el-button v-else
+                       type="danger" icon="el-icon-close" circle
+                       @click="handleCreateChannel(scope.row,payChannelEnum.WX_BAR.code,payType.WECHAT)">
+            </el-button>
+          </template>
+        </el-table-column>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">

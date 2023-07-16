@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.weixin;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.date.TemporalAccessorUtil;
 import cn.hutool.core.lang.Assert;
@@ -34,6 +35,7 @@ import static cn.hutool.core.date.DatePattern.UTC_WITH_XXX_OFFSET_PATTERN;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.invalidParamException;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
+import static cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WxPayClientConfig.API_VERSION_V2;
 
 /**
  * 微信支付抽象类，实现微信统一的接口、以及部分实现（退款）
@@ -59,12 +61,17 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
         WxPayConfig payConfig = new WxPayConfig();
         BeanUtil.copyProperties(config, payConfig, "keyContent");
         payConfig.setTradeType(tradeType);
+//        if (WxPayClientConfig.API_VERSION_V2.equals(config.getApiVersion())) {
+//            payConfig.setSignType(WxPayConstants.SignType.MD5);
+//        }
+        // weixin-pay-java 无法设置内容，只允许读取文件，所以这里要创建临时文件来解决
+        if (Base64.isBase64(config.getKeyContent())) {
+            payConfig.setKeyPath(FileUtils.createTempFile(Base64.decode(config.getKeyContent())).getPath());
+        }
         if (StrUtil.isNotEmpty(config.getPrivateKeyContent())) {
-            // weixin-pay-java 存在 BUG，无法直接设置内容，所以创建临时文件来解决
             payConfig.setPrivateKeyPath(FileUtils.createTempFile(config.getPrivateKeyContent()).getPath());
         }
         if (StrUtil.isNotEmpty(config.getPrivateCertContent())) {
-            // weixin-pay-java 存在 BUG，无法直接设置内容，所以创建临时文件来解决
             payConfig.setPrivateCertPath(FileUtils.createTempFile(config.getPrivateCertContent()).getPath());
         }
 
@@ -77,7 +84,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     protected PayOrderUnifiedRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) throws Exception {
         try {
             switch (config.getApiVersion()) {
-                case WxPayClientConfig.API_VERSION_V2:
+                case API_VERSION_V2:
                     return doUnifiedOrderV2(reqDTO);
                 case WxPayClientConfig.API_VERSION_V3:
                     return doUnifiedOrderV3(reqDTO);
@@ -112,7 +119,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     protected PayRefundRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable {
         try {
             switch (config.getApiVersion()) {
-                case WxPayClientConfig.API_VERSION_V2:
+                case API_VERSION_V2:
                     return doUnifiedRefundV2(reqDTO);
                 case WxPayClientConfig.API_VERSION_V3:
                     return doUnifiedRefundV3(reqDTO);
@@ -160,7 +167,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
         try {
             // 微信支付 v2 回调结果处理
             switch (config.getApiVersion()) {
-                case WxPayClientConfig.API_VERSION_V2:
+                case API_VERSION_V2:
                     return parseOrderNotifyV2(body);
                 case WxPayClientConfig.API_VERSION_V3:
                     return parseOrderNotifyV3(body);

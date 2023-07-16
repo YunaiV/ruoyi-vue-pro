@@ -8,8 +8,8 @@
             <template slot="append">%</template>
           </el-input>
         </el-form-item>
-        <el-form-item label-width="180px" label="公众号APPID" prop="weChatConfig.appId">
-          <el-input v-model="form.weChatConfig.appId" placeholder="请输入公众号APPID" clearable :style="{width: '100%'}">
+        <el-form-item label-width="180px" label="公众号 APPID" prop="weChatConfig.appId">
+          <el-input v-model="form.weChatConfig.appId" placeholder="请输入公众号 APPID" clearable :style="{width: '100%'}">
           </el-input>
         </el-form-item>
         <el-form-item label-width="180px" label="商户号" prop="weChatConfig.mchId">
@@ -29,29 +29,41 @@
             </el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label-width="180px" label="商户密钥" prop="weChatConfig.mchKey"
-                      v-if="form.weChatConfig.apiVersion === 'v2'">
-          <el-input v-model="form.weChatConfig.mchKey" placeholder="请输入商户密钥" clearable
-                    :style="{width: '100%'}" type="textarea" :autosize="{minRows: 8, maxRows: 8}"></el-input>
-        </el-form-item>
-        <div v-if="form.weChatConfig.apiVersion === 'v3'">
-          <el-form-item label-width="180px" label="API V3密钥" prop="weChatConfig.apiV3Key">
-            <el-input v-model="form.weChatConfig.apiV3Key" placeholder="请输入API V3密钥" clearable
+        <div v-if="form.weChatConfig.apiVersion === 'v2'">
+          <el-form-item label-width="180px" label="商户密钥" prop="weChatConfig.mchKey">
+            <el-input v-model="form.weChatConfig.mchKey" placeholder="请输入商户密钥" clearable
                       :style="{width: '100%'}" type="textarea" :autosize="{minRows: 8, maxRows: 8}"></el-input>
           </el-form-item>
-          <el-form-item label-width="180px" label="apiclient_key.perm证书" prop="weChatConfig.privateKeyContent">
+          <el-form-item label-width="180px" label="apiclient_cert.p12 证书" prop="weChatConfig.keyContent">
+            <el-input v-model="form.weChatConfig.keyContent" type="textarea"
+                      placeholder="请上传 apiclient_cert.p12 证书"
+                      readonly :autosize="{minRows: 8, maxRows: 8}" :style="{width: '100%'}"></el-input>
+          </el-form-item>
+          <el-form-item label-width="180px" label="">
+            <el-upload :limit="1" accept=".p12" action=""
+                       :before-upload="p12FileBeforeUpload"
+                       :http-request="keyContentUpload">
+              <el-button size="small" type="primary" icon="el-icon-upload">点击上传</el-button>
+            </el-upload>
+          </el-form-item>
+        </div>
+        <div v-if="form.weChatConfig.apiVersion === 'v3'">
+          <el-form-item label-width="180px" label="API V3 密钥" prop="weChatConfig.apiV3Key">
+            <el-input v-model="form.weChatConfig.apiV3Key" placeholder="请输入 API V3 密钥" clearable
+                      :style="{width: '100%'}" type="textarea" :autosize="{minRows: 8, maxRows: 8}"></el-input>
+          </el-form-item>
+          <el-form-item label-width="180px" label="apiclient_key.perm 证书" prop="weChatConfig.privateKeyContent">
             <el-input v-model="form.weChatConfig.privateKeyContent" type="textarea"
-                      placeholder="请上传apiclient_key.perm证书"
+                      placeholder="请上传 apiclient_key.perm 证书"
                       readonly :autosize="{minRows: 8, maxRows: 8}" :style="{width: '100%'}"></el-input>
           </el-form-item>
           <el-form-item label-width="180px" label="" prop="privateKeyContentFile">
             <el-upload ref="privateKeyContentFile"
                        :limit="1"
-                       :accept="fileAccept"
-                       :headers="header"
+                       accept=".pem"
                        action=""
                        :before-upload="pemFileBeforeUpload"
-                       :http-request="privateKeyUpload"
+                       :http-request="privateKeyContentUpload"
             >
               <el-button size="small" type="primary" icon="el-icon-upload">点击上传</el-button>
             </el-upload>
@@ -64,18 +76,17 @@
           <el-form-item label-width="180px" label="" prop="privateCertContentFile">
             <el-upload ref="privateCertContentFile"
                        :limit="1"
-                       :accept="fileAccept"
-                       :headers="header"
+                       accept=".pem"
                        action=""
                        :before-upload="pemFileBeforeUpload"
-                       :http-request="privateCertUpload"
+                       :http-request="privateCertContentUpload"
             >
               <el-button size="small" type="primary" icon="el-icon-upload">点击上传</el-button>
             </el-upload>
           </el-form-item>
         </div>
         <el-form-item label-width="180px" label="备注" prop="remark">
-          <el-input v-model="form.remark" :style="{width: '100%'}"></el-input>
+          <el-input v-model="form.remark" :style="{width: '100%'}" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -100,6 +111,7 @@ const defaultForm = {
     mchId: '',
     apiVersion: '',
     mchKey: '',
+    keyContent: '',
     privateKeyContent: '',
     privateCertContent: '',
     apiV3Key:'',
@@ -159,27 +171,27 @@ export default {
           message: '请输入商户密钥',
           trigger: 'blur'
         }],
+        'weChatConfig.keyContent': [{
+          required: true,
+          message: '请上传 apiclient_cert.p12 证书',
+          trigger: 'blur'
+        }],
         'weChatConfig.privateKeyContent': [{
           required: true,
-          message: '请上传apiclient_key.perm证书',
+          message: '请上传 apiclient_key.perm 证书',
           trigger: 'blur'
         }],
         'weChatConfig.privateCertContent': [{
           required: true,
-          message: '请上传apiclient_cert.perm证书',
+          message: '请上传 apiclient_cert.perm证 书',
           trigger: 'blur'
         }],
         'weChatConfig.apiV3Key': [{
           required: true,
-          message: '请上传apiV3密钥值',
+          message: '请上传 api V3 密钥值',
           trigger: 'blur'
         }],
       },
-      // 文件上传的header
-      header: {
-        "Authorization": null
-      },
-      fileAccept: ".pem",
       // 渠道状态 数据字典
       statusDictDatas: getDictDatas(DICT_TYPE.COMMON_STATUS),
       versionDictDatas: getDictDatas(DICT_TYPE.PAY_CHANNEL_WECHAT_VERSION),
@@ -218,6 +230,7 @@ export default {
           this.form.weChatConfig.apiVersion = config.apiVersion;
           this.form.weChatConfig.mchId = config.mchId;
           this.form.weChatConfig.mchKey = config.mchKey;
+          this.form.weChatConfig.keyContent = config.keyContent;
           this.form.weChatConfig.privateKeyContent = config.privateKeyContent;
           this.form.weChatConfig.privateCertContent = config.privateCertContent;
           this.form.weChatConfig.apiV3Key = config.apiV3Key;
@@ -241,7 +254,6 @@ export default {
               this.$modal.msgSuccess("修改成功");
               this.close();
             }
-
           })
         } else {
 
@@ -255,10 +267,14 @@ export default {
         }
       });
     },
-    pemFileBeforeUpload(file) {
+    /**
+     * apiclient_cert.p12、apiclient_cert.pem、apiclient_key.pem 上传前的校验
+     */
+    fileBeforeUpload(file, fileAccept) {
       let format = '.' + file.name.split(".")[1];
-      if (format !== this.fileAccept) {
-        this.$message.error('请上传指定格式"' + this.fileAccept + '"文件');
+      if (format !== fileAccept) {
+        debugger
+        this.$message.error('请上传指定格式"' + fileAccept + '"文件');
         return false;
       }
       let isRightSize = file.size / 1024 / 1024 < 2
@@ -267,19 +283,41 @@ export default {
       }
       return isRightSize
     },
-    privateKeyUpload(event) {
+    p12FileBeforeUpload(file) {
+      this.fileBeforeUpload(file, '.p12')
+    },
+    pemFileBeforeUpload(file) {
+      this.fileBeforeUpload(file, '.pem')
+    },
+    /**
+     * 读取 apiclient_key.pem 到 privateKeyContent 字段
+     */
+    privateKeyContentUpload(event) {
       const readFile = new FileReader()
       readFile.onload = (e) => {
         this.form.weChatConfig.privateKeyContent = e.target.result
       }
       readFile.readAsText(event.file);
     },
-    privateCertUpload(event) {
+    /**
+     * 读取 apiclient_cert.pem 到 privateCertContent 字段
+     */
+    privateCertContentUpload(event) {
       const readFile = new FileReader()
       readFile.onload = (e) => {
         this.form.weChatConfig.privateCertContent = e.target.result
       }
       readFile.readAsText(event.file);
+    },
+    /**
+     * 读取 apiclient_cert.p12 到 keyContent 字段
+     */
+    keyContentUpload(event) {
+      const readFile = new FileReader()
+      readFile.onload = (e) => {
+        this.form.weChatConfig.keyContent = e.target.result.split(',')[1]
+      }
+      readFile.readAsDataURL(event.file); // 读成 base64
     }
   }
 }
