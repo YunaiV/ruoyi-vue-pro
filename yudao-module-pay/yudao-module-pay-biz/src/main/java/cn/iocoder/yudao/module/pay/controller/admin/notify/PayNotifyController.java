@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.pay.controller.admin.notify;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
-import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,7 +18,6 @@ import javax.annotation.security.PermitAll;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.PAY_CHANNEL_CLIENT_NOT_FOUND;
 
 @Tag(name = "管理后台 - 支付通知")
@@ -36,22 +35,14 @@ public class PayNotifyController {
     @Resource
     private PayClientFactory payClientFactory;
 
-    /**
-     * 统一的渠道支付回调，支付宝的退款回调
-     *
-     * @param channelId 渠道编号
-     * @param params form 参数
-     * @param body request body
-     * @return 成功返回 "success"
-     */
-    @PostMapping(value = "/callback/{channelId}")
-    @Operation(summary = "支付渠道的统一回调接口 - 包括支付回调，退款回调")
+    @PostMapping(value = "/order/{channelId}")
+    @Operation(summary = "支付渠道的统一【支付】回调")
     @PermitAll
     @OperateLog(enable = false) // 回调地址，无需记录操作日志
-    public String notifyCallback(@PathVariable("channelId") Long channelId,
-                                 @RequestParam(required = false) Map<String, String> params,
-                                 @RequestBody(required = false) String body) {
-        log.info("[notifyCallback][channelId({}) 回调数据({}/{})]", channelId, params, body);
+    public String notifyOrder(@PathVariable("channelId") Long channelId,
+                              @RequestParam(required = false) Map<String, String> params,
+                              @RequestBody(required = false) String body) {
+        log.info("[notifyOrder][channelId({}) 回调数据({}/{})]", channelId, params, body);
         // 1. 校验支付渠道是否存在
         PayClient payClient = payClientFactory.getPayClient(channelId);
         if (payClient == null) {
@@ -60,20 +51,30 @@ public class PayNotifyController {
         }
 
         // 2. 解析通知数据
-        Object notify = payClient.parseNotify(params, body);
+        PayOrderRespDTO notify = payClient.parseOrderNotify(params, body);
+        orderService.notifyOrder(channelId, notify);
+        return "success";
+    }
 
-        // 3. 处理通知
-        // 3.1：退款通知
-        if (notify instanceof PayRefundRespDTO) {
-            refundService.notifyRefund(channelId, (PayRefundRespDTO) notify);
-            return "success";
+    @PostMapping(value = "/refund/{channelId}")
+    @Operation(summary = "支付渠道的统一【退款】回调")
+    @PermitAll
+    @OperateLog(enable = false) // 回调地址，无需记录操作日志
+    public String notifyRefund(@PathVariable("channelId") Long channelId,
+                              @RequestParam(required = false) Map<String, String> params,
+                              @RequestBody(required = false) String body) {
+        log.info("[notifyRefund][channelId({}) 回调数据({}/{})]", channelId, params, body);
+        // 1. 校验支付渠道是否存在
+        PayClient payClient = payClientFactory.getPayClient(channelId);
+        if (payClient == null) {
+            log.error("[notifyCallback][渠道编号({}) 找不到对应的支付客户端]", channelId);
+            throw exception(PAY_CHANNEL_CLIENT_NOT_FOUND);
         }
-        // 3.2：支付通知
-        if (notify instanceof PayOrderRespDTO) {
-            orderService.notifyOrder(channelId, (PayOrderRespDTO) notify);
-            return "success";
-        }
-        throw new UnsupportedOperationException("未知通知：" + toJsonString(notify));
+
+        // 2. 解析通知数据
+        PayRefundRespDTO notify = payClient.parseRefundNotify(params, body);
+        refundService.notifyRefund(channelId, notify);
+        return "success";
     }
 
 }

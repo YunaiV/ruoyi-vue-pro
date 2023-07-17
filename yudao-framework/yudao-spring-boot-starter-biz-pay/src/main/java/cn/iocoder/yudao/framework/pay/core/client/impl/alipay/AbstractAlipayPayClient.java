@@ -97,13 +97,7 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
 
     @Override
     @SneakyThrows
-    public Object parseNotify(Map<String, String> params, String body) {
-        // 补充说明：支付宝退款时，没有回调，这点和微信支付是不同的。并且，退款分成部分退款、和全部退款。
-        // ① 部分退款：是会有回调，但是它回调的是订单状态的同步回调，不是退款订单的回调
-        // ② 全部退款：Wap 支付有订单状态的同步回调，但是 PC/扫码又没有
-        // 所以，这里在解析时，即使是退款导致的订单状态同步，我们也忽略不做为“退款同步”，而是订单的回调。
-        // 实际上，支付宝退款只要发起成功，就可以认为退款成功，不需要等待回调。
-
+    public PayOrderRespDTO parseOrderNotify(Map<String, String> params, String body) {
         // 1. 校验回调数据
         Map<String, String> bodyObj = HttpUtil.decodeParamMap(body, StandardCharsets.UTF_8);
         AlipaySignature.rsaCheckV1(bodyObj, config.getAlipayPublicKey(),
@@ -125,6 +119,16 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
                 .successTime(parseTime(params.get("gmt_payment")))
                 .rawData(body)
                 .build();
+    }
+
+    @Override
+    public PayRefundRespDTO parseRefundNotify(Map<String, String> params, String body) {
+        // 补充说明：支付宝退款时，没有回调，这点和微信支付是不同的。并且，退款分成部分退款、和全部退款。
+        // ① 部分退款：是会有回调，但是它回调的是订单状态的同步回调，不是退款订单的回调
+        // ② 全部退款：Wap 支付有订单状态的同步回调，但是 PC/扫码又没有
+        // 所以，这里在解析时，即使是退款导致的订单状态同步，我们也忽略不做为“退款同步”，而是订单的回调。
+        // 实际上，支付宝退款只要发起成功，就可以认为退款成功，不需要等待回调。
+        throw new UnsupportedOperationException("支付宝无退款回调");
     }
 
     // ========== 各种工具方法 ==========

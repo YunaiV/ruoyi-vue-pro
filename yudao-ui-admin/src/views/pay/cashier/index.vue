@@ -331,6 +331,9 @@ export default {
      *                  ③ close：支付已关闭
      */
     goReturnUrl(payResult) {
+      // 清理任务
+      this.clearQueryInterval();
+
       // 未配置的情况下，只能关闭
       if (!this.returnUrl) {
         this.$tab.closePage();

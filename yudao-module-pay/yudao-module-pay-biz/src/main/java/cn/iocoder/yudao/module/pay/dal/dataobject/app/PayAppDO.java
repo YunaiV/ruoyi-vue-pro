@@ -48,7 +48,7 @@ public class PayAppDO extends BaseDO {
     /**
      * 支付结果的回调地址
      */
-    private String payNotifyUrl;
+    private String orderNotifyUrl;
     /**
      * 退款结果的回调地址
      */

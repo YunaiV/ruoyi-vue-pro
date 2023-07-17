@@ -125,7 +125,7 @@ public class PayOrderServiceImpl implements PayOrderService {
         // 创建支付交易单
         order = PayOrderConvert.INSTANCE.convert(reqDTO).setAppId(app.getId())
                 // 商户相关字段
-                .setNotifyUrl(app.getPayNotifyUrl()).setNotifyStatus(PayOrderNotifyStatusEnum.NO.getStatus())
+                .setNotifyUrl(app.getOrderNotifyUrl()).setNotifyStatus(PayOrderNotifyStatusEnum.NO.getStatus())
                 // 订单相关字段
                 .setStatus(PayOrderStatusEnum.WAITING.getStatus())
                 // 退款相关字段
@@ -206,7 +206,7 @@ public class PayOrderServiceImpl implements PayOrderService {
      * @return 支付渠道的回调地址  配置地址 + "/" + channel id
      */
     private String genChannelPayNotifyUrl(PayChannelDO channel) {
-        return payProperties.getCallbackUrl() + "/" + channel.getId();
+        return payProperties.getOrderNotifyUrl() + "/" + channel.getId();
     }
 
     private String generateOrderExtensionNo() {

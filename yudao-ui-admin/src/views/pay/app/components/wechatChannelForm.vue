@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-dialog :visible.sync="transferParam.wechatOpen" :title="title" @close="close" append-to-body width="800px">
-      <el-form ref="wechatJsApiForm" :model="form" :rules="rules" size="medium" label-width="100px"
+      <el-form ref="wechatJsApiForm" :model="form" :rules="rules" size="medium" label-width="120px"
                v-loading="transferParam.loading">
         <el-form-item label-width="180px" label="渠道费率" prop="feeRate">
           <el-input v-model="form.feeRate" placeholder="请输入渠道费率" clearable :style="{width: '100%'}">

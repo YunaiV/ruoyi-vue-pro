@@ -14,9 +14,11 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.PayFrameworkErrorCodeConstants;
+import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.refund.PayRefundStatusRespEnum;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyV3Result;
+import com.github.binarywang.wxpay.bean.notify.WxPayRefundNotifyResult;
 import com.github.binarywang.wxpay.bean.request.WxPayRefundRequest;
 import com.github.binarywang.wxpay.bean.result.WxPayRefundResult;
 import com.github.binarywang.wxpay.config.WxPayConfig;
@@ -30,8 +32,7 @@ import java.time.ZoneId;
 import java.util.Map;
 import java.util.Objects;
 
-import static cn.hutool.core.date.DatePattern.PURE_DATETIME_PATTERN;
-import static cn.hutool.core.date.DatePattern.UTC_WITH_XXX_OFFSET_PATTERN;
+import static cn.hutool.core.date.DatePattern.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.invalidParamException;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
@@ -61,9 +62,6 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
         WxPayConfig payConfig = new WxPayConfig();
         BeanUtil.copyProperties(config, payConfig, "keyContent");
         payConfig.setTradeType(tradeType);
-//        if (WxPayClientConfig.API_VERSION_V2.equals(config.getApiVersion())) {
-//            payConfig.setSignType(WxPayConstants.SignType.MD5);
-//        }
         // weixin-pay-java 无法设置内容，只允许读取文件，所以这里要创建临时文件来解决
         if (Base64.isBase64(config.getKeyContent())) {
             payConfig.setKeyPath(FileUtils.createTempFile(Base64.decode(config.getKeyContent())).getPath());
@@ -162,8 +160,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     }
 
     @Override
-    public Object parseNotify(Map<String, String> params, String body) {
-        log.info("[parseNotify][微信支付回调 data 数据: {}]", body);
+    public PayOrderRespDTO parseOrderNotify(Map<String, String> params, String body) {
         try {
             // 微信支付 v2 回调结果处理
             switch (config.getApiVersion()) {
@@ -183,21 +180,24 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     }
 
     private PayOrderRespDTO parseOrderNotifyV2(String body) throws WxPayException {
-        WxPayOrderNotifyResult notifyResult = client.parseOrderNotifyResult(body);
-        Assert.isTrue(Objects.equals(notifyResult.getResultCode(), "SUCCESS"), "支付结果非 SUCCESS");
-        // 转换结果
-        return PayOrderRespDTO
-                .builder()
-                .outTradeNo(notifyResult.getOutTradeNo())
-                .channelOrderNo(notifyResult.getTransactionId())
-                .channelUserId(notifyResult.getOpenid())
-                .successTime(parseDateV2(notifyResult.getTimeEnd()))
+        // 1. 解析回调
+        WxPayOrderNotifyResult response = client.parseOrderNotifyResult(body);
+        // 2. 构建结果
+        return PayOrderRespDTO.builder()
+                .outTradeNo(response.getOutTradeNo())
+                .channelOrderNo(response.getTransactionId())
+                .channelUserId(response.getOpenid())
+                .status(Objects.equals(response.getResultCode(), "SUCCESS") ?
+                        PayOrderStatusRespEnum.SUCCESS.getStatus() : PayOrderStatusRespEnum.CLOSED.getStatus())
+                .successTime(parseDateV2(response.getTimeEnd()))
+                .rawData(response)
                 .build();
     }
 
     private PayOrderRespDTO parseOrderNotifyV3(String body) throws WxPayException {
         WxPayOrderNotifyV3Result notifyResult = client.parseOrderNotifyV3Result(body, null);
         WxPayOrderNotifyV3Result.DecryptNotifyResult result = notifyResult.getResult();
+        // TODO 芋艿：翻译下 state
         // 转换结果
         Assert.isTrue(Objects.equals(notifyResult.getResult().getTradeState(), "SUCCESS"),
                 "支付结果非 SUCCESS");
@@ -207,6 +207,49 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
                 .channelUserId(result.getPayer() != null ? result.getPayer().getOpenid() : null)
                 .successTime(parseDateV3(result.getSuccessTime()))
                 .build();
+    }
+
+    @Override
+    public PayRefundRespDTO parseRefundNotify(Map<String, String> params, String body) {
+        try {
+            // 微信支付 v2 回调结果处理
+            switch (config.getApiVersion()) {
+                case API_VERSION_V2:
+                    return parseRefundNotifyV2(body);
+                case WxPayClientConfig.API_VERSION_V3:
+                    return parseRefundNotifyV3(body);
+                default:
+                    throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
+            }
+        } catch (WxPayException e) {
+            log.error("[parseNotify][params({}) body({}) 解析失败]", params, body, e);
+//            throw buildPayException(e);
+            throw new RuntimeException(e);
+            // TODO 芋艿：缺一个异常翻译
+        }
+    }
+
+    private PayRefundRespDTO parseRefundNotifyV2(String body) throws WxPayException {
+        // 1. 解析回调
+        WxPayRefundNotifyResult response = client.parseRefundNotifyResult(body);
+        WxPayRefundNotifyResult.ReqInfo reqInfo = response.getReqInfo();
+        // 2. 构建结果
+        PayRefundRespDTO notify = new PayRefundRespDTO()
+                .setChannelRefundNo(reqInfo.getRefundId())
+                .setOutRefundNo(reqInfo.getOutRefundNo())
+                .setRawData(response);
+        if (Objects.equals("SUCCESS", reqInfo.getRefundStatus())) {
+            notify.setStatus(PayRefundStatusRespEnum.SUCCESS.getStatus())
+                    .setSuccessTime(parseDateV2B(reqInfo.getSuccessTime()));
+        } else {
+            notify.setStatus(PayRefundStatusRespEnum.FAILURE.getStatus());
+        }
+        return notify;
+    }
+
+    private PayRefundRespDTO parseRefundNotifyV3(String body) throws WxPayException {
+        // TODO 芋艿：未实现
+        return null;
     }
 
     // ========== 各种工具方法 ==========
@@ -244,6 +287,10 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
 
     static LocalDateTime parseDateV2(String time) {
         return LocalDateTimeUtil.parse(time, PURE_DATETIME_PATTERN);
+    }
+
+    static LocalDateTime parseDateV2B(String time) {
+        return LocalDateTimeUtil.parse(time, NORM_DATETIME_PATTERN);
     }
 
     static String formatDateV3(LocalDateTime time) {

@@ -22,6 +22,8 @@ public interface PayClient {
      */
     Long getId();
 
+    // ============ 支付相关 ==========
+
     /**
      * 调用支付渠道，统一下单
      *
@@ -29,6 +31,17 @@ public interface PayClient {
      * @return 各支付渠道的返回结果
      */
     PayOrderUnifiedRespDTO unifiedOrder(PayOrderUnifiedReqDTO reqDTO);
+
+    /**
+     * 解析 order 回调数据
+     *
+     * @param params HTTP 回调接口 content type 为 application/x-www-form-urlencoded 的所有参数
+     * @param body HTTP 回调接口的 request body
+     * @return 支付订单信息
+     */
+    PayOrderRespDTO parseOrderNotify(Map<String, String> params, String body);
+
+    // ============ 退款相关 ==========
 
     /**
      * 调用支付渠道，进行退款
@@ -39,16 +52,12 @@ public interface PayClient {
     PayRefundRespDTO unifiedRefund(PayRefundUnifiedReqDTO reqDTO);
 
     /**
-     * 解析回调数据
+     * 解析 refund 回调数据
      *
      * @param params HTTP 回调接口 content type 为 application/x-www-form-urlencoded 的所有参数
      * @param body HTTP 回调接口的 request body
-     * @return 回调对象
-     *         1. {@link PayRefundRespDTO} 退款通知
-     *         2. {@link PayOrderRespDTO} 支付通知
+     * @return 支付订单信息
      */
-    default Object parseNotify(Map<String, String> params, String body) {
-        throw new UnsupportedOperationException("未实现 parseNotify 方法！");
-    }
+    PayRefundRespDTO parseRefundNotify(Map<String, String> params, String body);
 
 }
