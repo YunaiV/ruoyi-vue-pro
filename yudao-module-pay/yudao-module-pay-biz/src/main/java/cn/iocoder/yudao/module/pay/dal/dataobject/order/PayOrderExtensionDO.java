@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.pay.dal.dataobject.order;
 
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
@@ -65,7 +66,6 @@ public class PayOrderExtensionDO extends BaseDO {
      * 支付状态
      *
      * 枚举 {@link PayOrderStatusEnum}
-     * 注意，只包含上述枚举的 WAITING 和 SUCCESS
      */
     private Integer status;
     /**
@@ -75,10 +75,20 @@ public class PayOrderExtensionDO extends BaseDO {
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private Map<String, String> channelExtras;
+
     /**
-     * 支付渠道异步通知的内容
+     * 调用渠道的错误码
+     */
+    private String channelErrorCode;
+    /**
+     * 调用渠道报错时，错误信息
+     */
+    private String channelErrorMsg;
+
+    /**
+     * 支付渠道的同步/异步通知的内容
      *
-     * 在支持成功后，会记录回调的数据
+     * 对应 {@link PayOrderRespDTO#getRawData()}
      */
     private String channelNotifyData;
 

@@ -2,7 +2,6 @@ package cn.iocoder.yudao.framework.pay.core.client;
 
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
 
@@ -30,7 +29,7 @@ public interface PayClient {
      * @param reqDTO 下单信息
      * @return 各支付渠道的返回结果
      */
-    PayOrderUnifiedRespDTO unifiedOrder(PayOrderUnifiedReqDTO reqDTO);
+    PayOrderRespDTO unifiedOrder(PayOrderUnifiedReqDTO reqDTO);
 
     /**
      * 解析 order 回调数据

@@ -32,4 +32,14 @@ public enum PayOrderStatusRespEnum {
         return Objects.equals(status, SUCCESS.getStatus());
     }
 
+    /**
+     * 判断是否支付关闭
+     *
+     * @param status 状态
+     * @return 是否支付关闭
+     */
+    public static boolean isClosed(Integer status) {
+        return Objects.equals(status, CLOSED.getStatus());
+    }
+
 }

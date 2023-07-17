@@ -22,12 +22,12 @@ public class PayRefundApiImpl implements PayRefundApi {
     private PayRefundService payRefundService;
 
     @Override
-    public Long createPayRefund(PayRefundCreateReqDTO reqDTO) {
+    public Long createRefund(PayRefundCreateReqDTO reqDTO) {
         return payRefundService.createPayRefund(reqDTO);
     }
 
     @Override
-    public PayRefundRespDTO getPayRefund(Long id) {
+    public PayRefundRespDTO getRefund(Long id) {
         return PayRefundConvert.INSTANCE.convert02(payRefundService.getRefund(id));
     }
 

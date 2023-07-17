@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
 import com.alipay.api.AlipayApiException;
@@ -25,7 +25,7 @@ public class AlipayQrPayClient extends AbstractAlipayPayClient {
     }
 
     @Override
-    public PayOrderUnifiedRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) throws AlipayApiException {
+    public PayOrderRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) throws AlipayApiException {
         // 1.1 构建 AlipayTradePrecreateModel 请求
         AlipayTradePrecreateModel model = new AlipayTradePrecreateModel();
         // ① 通用的参数
@@ -47,8 +47,11 @@ public class AlipayQrPayClient extends AbstractAlipayPayClient {
         // 2.1 执行请求
         AlipayTradePrecreateResponse response = client.execute(request);
         // 2.2 处理结果
-        validateUnifiedOrderResponse(request, response);
-        return new PayOrderUnifiedRespDTO(displayMode, response.getQrCode());
+        if (!response.isSuccess()) {
+            return buildClosedPayOrderRespDTO(reqDTO, response);
+        }
+        return new PayOrderRespDTO(displayMode, response.getQrCode(),
+                reqDTO.getOutTradeNo(), response);
     }
 
 }

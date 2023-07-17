@@ -5,8 +5,8 @@ import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
@@ -29,9 +29,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 import static cn.hutool.core.date.DatePattern.NORM_DATETIME_FORMATTER;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
-import static cn.iocoder.yudao.framework.pay.core.enums.PayFrameworkErrorCodeConstants.ORDER_UNIFIED_ERROR;
 
 /**
  * 支付宝抽象类，实现支付宝统一的接口、以及部分实现（退款）
@@ -54,6 +52,40 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
         BeanUtil.copyProperties(config, alipayConfig, false);
         this.client = new DefaultAlipayClient(alipayConfig);
     }
+
+    // ============ 支付相关 ==========
+
+    /**
+     * 构造支付关闭的 {@link PayOrderRespDTO} 对象
+     *
+     * @return 支付关闭的 {@link PayOrderRespDTO} 对象
+     */
+    protected PayOrderRespDTO buildClosedPayOrderRespDTO(PayOrderUnifiedReqDTO reqDTO, AlipayResponse response) {
+        Assert.isFalse(response.isSuccess());
+        return PayOrderRespDTO.build(response.getSubCode(), response.getSubMsg(),
+                reqDTO.getOutTradeNo(), response);
+    }
+
+    @Override
+    public PayOrderRespDTO doParseOrderNotify(Map<String, String> params, String body) throws Throwable {
+        // 1. 校验回调数据
+        Map<String, String> bodyObj = HttpUtil.decodeParamMap(body, StandardCharsets.UTF_8);
+        AlipaySignature.rsaCheckV1(bodyObj, config.getAlipayPublicKey(),
+                StandardCharsets.UTF_8.name(), config.getSignType());
+
+        // 2. 解析订单的状态
+        String tradeStatus = bodyObj.get("trade_status");
+        Integer status = Objects.equals("WAIT_BUYER_PAY", tradeStatus) ? PayOrderStatusRespEnum.WAITING.getStatus()
+                : Objects.equals("TRADE_SUCCESS", tradeStatus) ? PayOrderStatusRespEnum.SUCCESS.getStatus()
+                : Objects.equals("TRADE_CLOSED", tradeStatus) ? PayOrderStatusRespEnum.CLOSED.getStatus() : null;
+        Assert.notNull(status, (Supplier<Throwable>) () -> {
+            throw new IllegalArgumentException(StrUtil.format("body({}) 的 trade_status 不正确", body));
+        });
+        return new PayOrderRespDTO(status, bodyObj.get("trade_no"), bodyObj.get("seller_id"), parseTime(params.get("gmt_payment")),
+                bodyObj.get("out_trade_no"), body);
+    }
+
+    // ============ 退款相关 ==========
 
     /**
      * 支付宝统一的退款接口 alipay.trade.refund
@@ -96,32 +128,6 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
     }
 
     @Override
-    @SneakyThrows
-    public PayOrderRespDTO parseOrderNotify(Map<String, String> params, String body) {
-        // 1. 校验回调数据
-        Map<String, String> bodyObj = HttpUtil.decodeParamMap(body, StandardCharsets.UTF_8);
-        AlipaySignature.rsaCheckV1(bodyObj, config.getAlipayPublicKey(),
-                StandardCharsets.UTF_8.name(), config.getSignType());
-
-        // 2. 解析订单的状态
-        String tradeStatus = bodyObj.get("trade_status");
-        PayOrderStatusRespEnum status = Objects.equals("WAIT_BUYER_PAY", tradeStatus) ? PayOrderStatusRespEnum.WAITING
-                : Objects.equals("TRADE_SUCCESS", tradeStatus) ? PayOrderStatusRespEnum.SUCCESS
-                : Objects.equals("TRADE_CLOSED", tradeStatus) ? PayOrderStatusRespEnum.CLOSED : null;
-        Assert.notNull(status, (Supplier<Throwable>) () -> {
-            throw new IllegalArgumentException(StrUtil.format("body({}) 的 trade_status 不正确", body));
-        });
-        return PayOrderRespDTO.builder()
-                .status(Objects.requireNonNull(status).getStatus())
-                .outTradeNo(bodyObj.get("out_trade_no"))
-                .channelOrderNo(bodyObj.get("trade_no"))
-                .channelUserId(bodyObj.get("seller_id"))
-                .successTime(parseTime(params.get("gmt_payment")))
-                .rawData(body)
-                .build();
-    }
-
-    @Override
     public PayRefundRespDTO parseRefundNotify(Map<String, String> params, String body) {
         // 补充说明：支付宝退款时，没有回调，这点和微信支付是不同的。并且，退款分成部分退款、和全部退款。
         // ① 部分退款：是会有回调，但是它回调的是订单状态的同步回调，不是退款订单的回调
@@ -143,23 +149,6 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
 
     protected LocalDateTime parseTime(String str) {
         return LocalDateTimeUtil.parse(str, NORM_DATETIME_FORMATTER);
-    }
-
-    /**
-     * 校验支付宝统一下单的响应
-     *
-     * 如果校验不通过，则抛出 {@link cn.iocoder.yudao.framework.common.exception.ServiceException} 异常
-     *
-     * @param request 请求
-     * @param response 响应
-     */
-    protected void validateUnifiedOrderResponse(Object request, AlipayResponse response) {
-        if (response.isSuccess()) {
-            return;
-        }
-        log.error("[validateUnifiedOrderResponse][发起支付失败，request({})，response({})]",
-                JsonUtils.toJsonString(request), JsonUtils.toJsonString(response));
-        throw exception0(ORDER_UNIFIED_ERROR.getCode(), response.getSubMsg());
     }
 
 }

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.pay.dal.dataobject.refund;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
@@ -151,9 +152,9 @@ public class PayRefundDO extends BaseDO {
     private String channelErrorMsg;
 
     /**
-     * 支付渠道异步通知的内容
+     * 支付渠道的同步/异步通知的内容
      *
-     * 在退款成功后，会记录回调的数据
+     * 对应 {@link PayRefundRespDTO#getRawData()}
      */
     private String channelNotifyData;
 

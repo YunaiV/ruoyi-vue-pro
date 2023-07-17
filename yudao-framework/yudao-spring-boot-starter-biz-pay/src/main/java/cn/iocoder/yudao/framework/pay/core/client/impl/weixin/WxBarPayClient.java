@@ -4,13 +4,10 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
-import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
 import com.github.binarywang.wxpay.bean.request.WxPayMicropayRequest;
 import com.github.binarywang.wxpay.bean.result.WxPayMicropayResult;
 import com.github.binarywang.wxpay.constant.WxPayConstants;
@@ -22,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.invalidParamException;
+import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 
 /**
  * 微信支付【付款码支付】的 PayClient 实现类
@@ -48,7 +46,7 @@ public class WxBarPayClient extends AbstractWxPayClient {
     }
 
     @Override
-    protected PayOrderUnifiedRespDTO doUnifiedOrderV2(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
+    protected PayOrderRespDTO doUnifiedOrderV2(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
         // 由于付款码需要不断轮询，所以需要在较短的时间完成支付
         LocalDateTime expireTime = LocalDateTimeUtils.addTime(AUTH_CODE_EXPIRE);
         if (expireTime.isAfter(reqDTO.getExpireTime())) {
@@ -65,22 +63,16 @@ public class WxBarPayClient extends AbstractWxPayClient {
                 .authCode(getAuthCode(reqDTO))
                 .build();
         // 执行请求，重试直到失败（过期），或者成功
+        WxPayException lastWxPayException = null;
         for (int i = 1; i < Byte.MAX_VALUE; i++) {
             try {
                 WxPayMicropayResult response = client.micropay(request);
-                // 支付成功（例如说，用户输入了密码）
-                PayOrderRespDTO order = PayOrderRespDTO.builder()
-                        .status(PayOrderStatusRespEnum.SUCCESS.getStatus())
-                        .outTradeNo(response.getOutTradeNo())
-                        .channelOrderNo(response.getTransactionId())
-                        .channelUserId(response.getOpenid())
-                        .successTime(parseDateV2(response.getTimeEnd()))
-                        .rawData(response)
-                        .build();
-                return new PayOrderUnifiedRespDTO(PayOrderDisplayModeEnum.BAR_CODE.getMode(),
-                        JsonUtils.toJsonString(response))
-                        .setOrder(order);
+                // 支付成功，例如说：1）用户输入了密码；2）
+                return new PayOrderRespDTO(response.getTransactionId(), response.getOpenid(), parseDateV2(response.getTimeEnd()),
+                        response.getOutTradeNo(), response)
+                        .setDisplayMode(PayOrderDisplayModeEnum.BAR_CODE.getMode());
             } catch (WxPayException ex) {
+                lastWxPayException = ex;
                 // 如果不满足这 3 种任一的，则直接抛出 WxPayException 异常，不仅需处理
                 // 1. SYSTEMERROR：接口返回错误：请立即调用被扫订单结果查询API，查询当前订单状态，并根据订单的状态决定下一步的操作。
                 // 2. USERPAYING：用户支付中，需要输入密码：等待 5 秒，然后调用被扫订单结果查询 API，查询当前订单的不同状态，决定下一步的操作。
@@ -90,15 +82,15 @@ public class WxBarPayClient extends AbstractWxPayClient {
                 }
                 // 等待 5 秒，继续下一轮重新发起支付
                 log.info("[doUnifiedOrderV2][发起微信 Bar 支付第({})失败，等待下一轮重试，请求({})，响应({})]", i,
-                        JsonUtils.toJsonString(request), ex.getMessage());
+                        toJsonString(request), ex.getMessage());
                 ThreadUtil.sleep(5, TimeUnit.SECONDS);
             }
         }
-        throw new IllegalStateException("微信 Bar 支付，重试多次失败");
+        throw lastWxPayException;
     }
 
     @Override
-    protected PayOrderUnifiedRespDTO doUnifiedOrderV3(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
+    protected PayOrderRespDTO doUnifiedOrderV3(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
         return doUnifiedOrderV2(reqDTO);
     }
 

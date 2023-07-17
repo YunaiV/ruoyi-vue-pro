@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.weixin;
 
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
 import com.github.binarywang.wxpay.bean.order.WxPayNativeOrderResult;
@@ -32,7 +32,7 @@ public class WxNativePayClient extends AbstractWxPayClient {
     }
 
     @Override
-    protected PayOrderUnifiedRespDTO doUnifiedOrderV2(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
+    protected PayOrderRespDTO doUnifiedOrderV2(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
         // 构建 WxPayUnifiedOrderRequest 对象
         WxPayUnifiedOrderRequest request = WxPayUnifiedOrderRequest.newBuilder()
                 .outTradeNo(reqDTO.getOutTradeNo())
@@ -48,12 +48,12 @@ public class WxNativePayClient extends AbstractWxPayClient {
         WxPayNativeOrderResult response = client.createOrder(request);
 
         // 转换结果
-        return new PayOrderUnifiedRespDTO(PayOrderDisplayModeEnum.QR_CODE.getMode(),
-                response.getCodeUrl());
+        return new PayOrderRespDTO(PayOrderDisplayModeEnum.QR_CODE.getMode(), response.getCodeUrl(),
+                reqDTO.getOutTradeNo(), response);
     }
 
     @Override
-    protected PayOrderUnifiedRespDTO doUnifiedOrderV3(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
+    protected PayOrderRespDTO doUnifiedOrderV3(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
         // 构建 WxPayUnifiedOrderRequest 对象
         WxPayUnifiedOrderV3Request request = new WxPayUnifiedOrderV3Request()
                 .setOutTradeNo(reqDTO.getOutTradeNo())
@@ -66,8 +66,8 @@ public class WxNativePayClient extends AbstractWxPayClient {
         String response = client.createOrderV3(TradeTypeEnum.NATIVE, request);
 
         // 转换结果
-        return new PayOrderUnifiedRespDTO(PayOrderDisplayModeEnum.QR_CODE.getMode(),
-                response);
+        return new PayOrderRespDTO(PayOrderDisplayModeEnum.QR_CODE.getMode(), response,
+                reqDTO.getOutTradeNo(), response);
     }
 
 }

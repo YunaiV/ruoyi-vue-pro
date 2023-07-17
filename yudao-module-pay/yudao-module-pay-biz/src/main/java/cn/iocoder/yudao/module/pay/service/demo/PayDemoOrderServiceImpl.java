@@ -189,7 +189,7 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
         // 这里我们是个简单的 demo，所以没有售后维权表，直接使用订单 id + "-refund" 来演示
         String refundId = order.getId() + "-refund";
         // 2.2 创建退款单
-        Long payRefundId = payRefundApi.createPayRefund(new PayRefundCreateReqDTO()
+        Long payRefundId = payRefundApi.createRefund(new PayRefundCreateReqDTO()
                 .setAppId(PAY_APP_ID).setUserIp(getClientIP()) // 支付应用
                 .setMerchantOrderId(String.valueOf(order.getId())) // 支付单号
                 .setMerchantRefundId(refundId)
@@ -239,7 +239,7 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
         }
 
         // 2.1 校验退款订单
-        PayRefundRespDTO payRefund = payRefundApi.getPayRefund(payRefundId);
+        PayRefundRespDTO payRefund = payRefundApi.getRefund(payRefundId);
         if (payRefund == null) {
             throw exception(PAY_DEMO_ORDER_REFUND_FAIL_REFUND_NOT_FOUND);
         }

@@ -2,9 +2,8 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.weixin;
 
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
@@ -17,6 +16,7 @@ import com.github.binarywang.wxpay.exception.WxPayException;
 import lombok.extern.slf4j.Slf4j;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.invalidParamException;
+import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 
 /**
  * 微信支付（公众号）的 PayClient 实现类
@@ -42,7 +42,7 @@ public class WxPubPayClient extends AbstractWxPayClient {
     }
 
     @Override
-    protected PayOrderUnifiedRespDTO doUnifiedOrderV2(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
+    protected PayOrderRespDTO doUnifiedOrderV2(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
         // 构建 WxPayUnifiedOrderRequest 对象
         WxPayUnifiedOrderRequest request = WxPayUnifiedOrderRequest.newBuilder()
                 .outTradeNo(reqDTO.getOutTradeNo())
@@ -58,12 +58,12 @@ public class WxPubPayClient extends AbstractWxPayClient {
         WxPayMpOrderResult response = client.createOrder(request);
 
         // 转换结果
-        return new PayOrderUnifiedRespDTO(PayOrderDisplayModeEnum.CUSTOM.getMode(),
-                JsonUtils.toJsonString(response));
+        return new PayOrderRespDTO(PayOrderDisplayModeEnum.APP.getMode(), toJsonString(response),
+                reqDTO.getOutTradeNo(), response);
     }
 
     @Override
-    protected PayOrderUnifiedRespDTO doUnifiedOrderV3(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
+    protected PayOrderRespDTO doUnifiedOrderV3(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
         // 构建 WxPayUnifiedOrderRequest 对象
         WxPayUnifiedOrderV3Request request = new WxPayUnifiedOrderV3Request();
         request.setOutTradeNo(reqDTO.getOutTradeNo());
@@ -77,8 +77,8 @@ public class WxPubPayClient extends AbstractWxPayClient {
         WxPayUnifiedOrderV3Result.JsapiResult response = client.createOrderV3(TradeTypeEnum.JSAPI, request);
 
         // 转换结果
-        return new PayOrderUnifiedRespDTO(PayOrderDisplayModeEnum.CUSTOM.getMode(),
-                JsonUtils.toJsonString(response));
+        return new PayOrderRespDTO(PayOrderDisplayModeEnum.APP.getMode(), toJsonString(response),
+                reqDTO.getOutTradeNo(), response);
     }
 
     // ========== 各种工具方法 ==========
