@@ -134,7 +134,7 @@ public class PayRefundServiceImpl implements PayRefundService {
                 .setRefundPrice(reqDTO.getPrice())
                 .setOutTradeNo(orderExtension.getNo())
                 .setOutRefundNo(refund.getNo())
-                .setNotifyUrl(genChannelPayNotifyUrl(channel))
+                .setNotifyUrl(genChannelRefundNotifyUrl(channel))
                 .setReason(reqDTO.getReason());
         PayRefundRespDTO refundRespDTO = client.unifiedRefund(unifiedReqDTO); // TODO 增加一个 channelErrorCode、channelErrorMsg 字段
         // 2.3 处理退款返回
@@ -182,7 +182,7 @@ public class PayRefundServiceImpl implements PayRefundService {
      * @param channel 支付渠道
      * @return 支付渠道的回调地址  配置地址 + "/" + channel id
      */
-    private String genChannelPayNotifyUrl(PayChannelDO channel) {
+    private String genChannelRefundNotifyUrl(PayChannelDO channel) {
         return payProperties.getRefundNotifyUrl() + "/" + channel.getId();
     }
 

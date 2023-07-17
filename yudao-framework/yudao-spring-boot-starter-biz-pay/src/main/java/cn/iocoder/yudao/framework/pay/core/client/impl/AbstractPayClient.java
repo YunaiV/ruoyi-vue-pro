@@ -46,7 +46,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
      */
     public final void init() {
         doInit();
-        log.info("[init][配置({}) 初始化完成]", config);
+        log.info("[init][客户端({}) 初始化完成]", getId());
     }
 
     /**
@@ -59,7 +59,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
         if (config.equals(this.config)) {
             return;
         }
-        log.info("[refresh][配置({})发生变化，重新初始化]", config);
+        log.info("[refresh][客户端({})发生变化，重新初始化]", getId());
         this.config = config;
         // 初始化
         this.init();

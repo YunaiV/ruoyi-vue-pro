@@ -54,7 +54,7 @@ public class PayAppServiceTest extends BaseDbUnitTest {
         // 准备参数
         PayAppCreateReqVO reqVO = randomPojo(PayAppCreateReqVO.class, o ->
                 o.setStatus((RandomUtil.randomEle(CommonStatusEnum.values()).getStatus()))
-                        .setPayNotifyUrl(randomURL())
+                        .setOrderNotifyUrl(randomURL())
                         .setRefundNotifyUrl(randomURL()));
 
         // 调用
@@ -73,7 +73,7 @@ public class PayAppServiceTest extends BaseDbUnitTest {
         // 准备参数
         PayAppUpdateReqVO reqVO = randomPojo(PayAppUpdateReqVO.class, o -> {
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-            o.setPayNotifyUrl(randomURL()).setRefundNotifyUrl(randomURL());
+            o.setOrderNotifyUrl(randomURL()).setRefundNotifyUrl(randomURL());
             o.setId(dbApp.getId()); // 设置更新的 ID
         });
 

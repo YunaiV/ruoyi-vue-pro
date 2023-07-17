@@ -155,7 +155,7 @@ public class PayOrderServiceImpl implements PayOrderService {
                 // 商户相关的字段
                 .setOutTradeNo(orderExtension.getNo()) // 注意，此处使用的是 PayOrderExtensionDO.no 属性！
                 .setSubject(order.getSubject()).setBody(order.getBody())
-                .setNotifyUrl(genChannelPayNotifyUrl(channel))
+                .setNotifyUrl(genChannelOrderNotifyUrl(channel))
                 .setReturnUrl(reqVO.getReturnUrl())
                 // 订单相关字段
                 .setPrice(order.getPrice()).setExpireTime(order.getExpireTime());
@@ -205,7 +205,7 @@ public class PayOrderServiceImpl implements PayOrderService {
      * @param channel 支付渠道
      * @return 支付渠道的回调地址  配置地址 + "/" + channel id
      */
-    private String genChannelPayNotifyUrl(PayChannelDO channel) {
+    private String genChannelOrderNotifyUrl(PayChannelDO channel) {
         return payProperties.getOrderNotifyUrl() + "/" + channel.getId();
     }
 
