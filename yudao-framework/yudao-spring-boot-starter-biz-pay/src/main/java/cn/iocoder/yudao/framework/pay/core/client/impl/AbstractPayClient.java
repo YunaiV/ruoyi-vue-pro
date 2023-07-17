@@ -70,6 +70,8 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
         return channelId;
     }
 
+    // ============ 支付相关 ==========
+
     @Override
     public final PayOrderUnifiedRespDTO unifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
         Validation.buildDefaultValidatorFactory().getValidator().validate(reqDTO);
@@ -90,6 +92,8 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
 
     protected abstract PayOrderUnifiedRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO)
             throws Throwable;
+
+    // ============ 退款相关 ==========
 
     @Override
     public PayRefundRespDTO unifiedRefund(PayRefundUnifiedReqDTO reqDTO) {

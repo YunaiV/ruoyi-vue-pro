@@ -4,7 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.date.TemporalAccessorUtil;
-import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.io.FileUtils;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
@@ -19,8 +18,11 @@ import cn.iocoder.yudao.framework.pay.core.enums.refund.PayRefundStatusRespEnum;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyV3Result;
 import com.github.binarywang.wxpay.bean.notify.WxPayRefundNotifyResult;
+import com.github.binarywang.wxpay.bean.notify.WxPayRefundNotifyV3Result;
 import com.github.binarywang.wxpay.bean.request.WxPayRefundRequest;
+import com.github.binarywang.wxpay.bean.request.WxPayRefundV3Request;
 import com.github.binarywang.wxpay.bean.result.WxPayRefundResult;
+import com.github.binarywang.wxpay.bean.result.WxPayRefundV3Result;
 import com.github.binarywang.wxpay.config.WxPayConfig;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
@@ -78,6 +80,8 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
         client.setConfig(payConfig);
     }
 
+    // ============ 支付相关 ==========
+
     @Override
     protected PayOrderUnifiedRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) throws Exception {
         try {
@@ -112,52 +116,6 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
      */
     protected abstract PayOrderUnifiedRespDTO doUnifiedOrderV3(PayOrderUnifiedReqDTO reqDTO)
             throws WxPayException;
-
-    @Override
-    protected PayRefundRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable {
-        try {
-            switch (config.getApiVersion()) {
-                case API_VERSION_V2:
-                    return doUnifiedRefundV2(reqDTO);
-                case WxPayClientConfig.API_VERSION_V3:
-                    return doUnifiedRefundV3(reqDTO);
-                default:
-                    throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
-            }
-        } catch (WxPayException e) {
-            // todo 芋艿：异常的处理；
-            throw buildUnifiedOrderException(null, e);
-        }
-    }
-
-    private PayRefundRespDTO doUnifiedRefundV2(PayRefundUnifiedReqDTO reqDTO) throws Throwable {
-        // 1. 构建 WxPayRefundRequest 请求
-        WxPayRefundRequest request = new WxPayRefundRequest()
-                .setOutTradeNo(reqDTO.getOutTradeNo())
-                .setOutRefundNo(reqDTO.getOutRefundNo())
-                .setRefundFee(reqDTO.getRefundPrice())
-                .setRefundDesc(reqDTO.getReason())
-                .setTotalFee(reqDTO.getPayPrice())
-                .setNotifyUrl(reqDTO.getNotifyUrl());
-        // 2.1 执行请求
-        WxPayRefundResult response = client.refundV2(request); // TODO 芋艿：可以分成 V2 和 V3 的退款接口
-        // 2.2 创建返回结果
-        PayRefundRespDTO refund = new PayRefundRespDTO()
-                .setOutRefundNo(reqDTO.getOutRefundNo())
-                .setRawData(response);
-        if (Objects.equals("SUCCESS", response.getResultCode())) {
-            refund.setStatus(PayRefundStatusRespEnum.WAITING.getStatus());
-            refund.setChannelRefundNo(response.getRefundId());
-        } else {
-            refund.setStatus(PayRefundStatusRespEnum.FAILURE.getStatus());
-            // TODO 芋艿；异常的处理；
-        }
-        return refund;
-    }
-
-    private PayRefundRespDTO doUnifiedRefundV3(PayRefundUnifiedReqDTO reqDTO) throws Throwable {
-        return null;
-    }
 
     @Override
     public PayOrderRespDTO parseOrderNotify(Map<String, String> params, String body) {
@@ -195,18 +153,91 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     }
 
     private PayOrderRespDTO parseOrderNotifyV3(String body) throws WxPayException {
-        WxPayOrderNotifyV3Result notifyResult = client.parseOrderNotifyV3Result(body, null);
-        WxPayOrderNotifyV3Result.DecryptNotifyResult result = notifyResult.getResult();
-        // TODO 芋艿：翻译下 state
-        // 转换结果
-        Assert.isTrue(Objects.equals(notifyResult.getResult().getTradeState(), "SUCCESS"),
-                "支付结果非 SUCCESS");
+        // 1. 解析回调
+        WxPayOrderNotifyV3Result response = client.parseOrderNotifyV3Result(body, null);
+        WxPayOrderNotifyV3Result.DecryptNotifyResult responseResult = response.getResult();
+        // 2. 构建结果
         return PayOrderRespDTO.builder()
-                .outTradeNo(result.getOutTradeNo())
-                .channelOrderNo(result.getTradeState())
-                .channelUserId(result.getPayer() != null ? result.getPayer().getOpenid() : null)
-                .successTime(parseDateV3(result.getSuccessTime()))
+                .outTradeNo(responseResult.getOutTradeNo())
+                .channelOrderNo(responseResult.getTradeState())
+                .channelUserId(responseResult.getPayer() != null ? responseResult.getPayer().getOpenid() : null)
+                .status(Objects.equals(responseResult.getTradeState(), "SUCCESS") ?
+                        PayOrderStatusRespEnum.SUCCESS.getStatus() : PayOrderStatusRespEnum.CLOSED.getStatus())
+                .successTime(parseDateV3(responseResult.getSuccessTime()))
                 .build();
+    }
+
+    // ============ 退款相关 ==========
+
+    @Override
+    protected PayRefundRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable {
+        try {
+            switch (config.getApiVersion()) {
+                case API_VERSION_V2:
+                    return doUnifiedRefundV2(reqDTO);
+                case WxPayClientConfig.API_VERSION_V3:
+                    return doUnifiedRefundV3(reqDTO);
+                default:
+                    throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
+            }
+        } catch (WxPayException e) {
+            // todo 芋艿：异常的处理；
+            throw buildUnifiedOrderException(null, e);
+        }
+    }
+
+    private PayRefundRespDTO doUnifiedRefundV2(PayRefundUnifiedReqDTO reqDTO) throws Throwable {
+        // 1. 构建 WxPayRefundRequest 请求
+        WxPayRefundRequest request = new WxPayRefundRequest()
+                .setOutTradeNo(reqDTO.getOutTradeNo())
+                .setOutRefundNo(reqDTO.getOutRefundNo())
+                .setRefundFee(reqDTO.getRefundPrice())
+                .setRefundDesc(reqDTO.getReason())
+                .setTotalFee(reqDTO.getPayPrice())
+                .setNotifyUrl(reqDTO.getNotifyUrl());
+        // 2.1 执行请求
+        WxPayRefundResult response = client.refundV2(request);
+        // 2.2 创建返回结果
+        PayRefundRespDTO refund = new PayRefundRespDTO()
+                .setOutRefundNo(reqDTO.getOutRefundNo())
+                .setRawData(response);
+        if (Objects.equals("SUCCESS", response.getResultCode())) {
+            refund.setStatus(PayRefundStatusRespEnum.WAITING.getStatus())
+                    .setChannelRefundNo(response.getRefundId());
+        } else {
+            refund.setStatus(PayRefundStatusRespEnum.FAILURE.getStatus());
+        }
+        // TODO 芋艿；异常的处理；
+        return refund;
+    }
+
+    private PayRefundRespDTO doUnifiedRefundV3(PayRefundUnifiedReqDTO reqDTO) throws Throwable {
+        // 1. 构建 WxPayRefundRequest 请求
+        WxPayRefundV3Request request = new WxPayRefundV3Request()
+                .setOutTradeNo(reqDTO.getOutTradeNo())
+                .setOutRefundNo(reqDTO.getOutRefundNo())
+                .setAmount(new WxPayRefundV3Request.Amount().setRefund(reqDTO.getRefundPrice())
+                        .setTotal(reqDTO.getPayPrice()).setCurrency("CNY"))
+                .setReason(reqDTO.getReason())
+                .setNotifyUrl(reqDTO.getNotifyUrl());
+        // 2.1 执行请求
+        WxPayRefundV3Result response = client.refundV3(request);
+        // 2.2 创建返回结果
+        PayRefundRespDTO refund = new PayRefundRespDTO()
+                .setOutRefundNo(reqDTO.getOutRefundNo())
+                .setRawData(response);
+        if (Objects.equals("SUCCESS", response.getStatus())) {
+            refund.setStatus(PayRefundStatusRespEnum.SUCCESS.getStatus())
+                    .setChannelRefundNo(response.getRefundId())
+                    .setSuccessTime(parseDateV3(response.getSuccessTime()));
+        } else if (Objects.equals("PROCESSING", response.getStatus())) {
+            refund.setStatus(PayRefundStatusRespEnum.WAITING.getStatus())
+                    .setChannelRefundNo(response.getRefundId());
+        } else {
+            refund.setStatus(PayRefundStatusRespEnum.FAILURE.getStatus());
+        }
+        // TODO 芋艿；异常的处理；
+        return refund;
     }
 
     @Override
@@ -229,27 +260,42 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
         }
     }
 
+    @SuppressWarnings("DuplicatedCode")
     private PayRefundRespDTO parseRefundNotifyV2(String body) throws WxPayException {
         // 1. 解析回调
         WxPayRefundNotifyResult response = client.parseRefundNotifyResult(body);
-        WxPayRefundNotifyResult.ReqInfo reqInfo = response.getReqInfo();
+        WxPayRefundNotifyResult.ReqInfo responseResult = response.getReqInfo();
         // 2. 构建结果
         PayRefundRespDTO notify = new PayRefundRespDTO()
-                .setChannelRefundNo(reqInfo.getRefundId())
-                .setOutRefundNo(reqInfo.getOutRefundNo())
+                .setChannelRefundNo(responseResult.getRefundId())
+                .setOutRefundNo(responseResult.getOutRefundNo())
                 .setRawData(response);
-        if (Objects.equals("SUCCESS", reqInfo.getRefundStatus())) {
+        if (Objects.equals("SUCCESS", responseResult.getRefundStatus())) {
             notify.setStatus(PayRefundStatusRespEnum.SUCCESS.getStatus())
-                    .setSuccessTime(parseDateV2B(reqInfo.getSuccessTime()));
+                    .setSuccessTime(parseDateV2B(responseResult.getSuccessTime()));
         } else {
             notify.setStatus(PayRefundStatusRespEnum.FAILURE.getStatus());
         }
         return notify;
     }
 
+    @SuppressWarnings("DuplicatedCode")
     private PayRefundRespDTO parseRefundNotifyV3(String body) throws WxPayException {
-        // TODO 芋艿：未实现
-        return null;
+        // 1. 解析回调
+        WxPayRefundNotifyV3Result response = client.parseRefundNotifyV3Result(body, null);
+        WxPayRefundNotifyV3Result.DecryptNotifyResult responseResult = response.getResult();
+        // 2. 构建结果
+        PayRefundRespDTO notify = new PayRefundRespDTO()
+                .setChannelRefundNo(responseResult.getRefundId())
+                .setOutRefundNo(responseResult.getOutRefundNo())
+                .setRawData(response);
+        if (Objects.equals("SUCCESS", responseResult.getRefundStatus())) {
+            notify.setStatus(PayRefundStatusRespEnum.SUCCESS.getStatus())
+                    .setSuccessTime(parseDateV3(responseResult.getSuccessTime()));
+        } else {
+            notify.setStatus(PayRefundStatusRespEnum.FAILURE.getStatus());
+        }
+        return notify;
     }
 
     // ========== 各种工具方法 ==========

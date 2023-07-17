@@ -55,13 +55,13 @@ public class WxNativePayClient extends AbstractWxPayClient {
     @Override
     protected PayOrderUnifiedRespDTO doUnifiedOrderV3(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
         // 构建 WxPayUnifiedOrderRequest 对象
-        WxPayUnifiedOrderV3Request request = new WxPayUnifiedOrderV3Request();
-        request.setOutTradeNo(reqDTO.getOutTradeNo());
-        request.setDescription(reqDTO.getBody());
-        request.setAmount(new WxPayUnifiedOrderV3Request.Amount().setTotal(reqDTO.getPrice())); // 单位分
-        request.setTimeExpire(formatDateV3(reqDTO.getExpireTime()));
-        request.setSceneInfo(new WxPayUnifiedOrderV3Request.SceneInfo().setPayerClientIp(reqDTO.getUserIp()));
-        request.setNotifyUrl(reqDTO.getNotifyUrl());
+        WxPayUnifiedOrderV3Request request = new WxPayUnifiedOrderV3Request()
+                .setOutTradeNo(reqDTO.getOutTradeNo())
+                .setDescription(reqDTO.getSubject())
+                .setAmount(new WxPayUnifiedOrderV3Request.Amount().setTotal(reqDTO.getPrice())) // 单位分
+                .setTimeExpire(formatDateV3(reqDTO.getExpireTime()))
+                .setSceneInfo(new WxPayUnifiedOrderV3Request.SceneInfo().setPayerClientIp(reqDTO.getUserIp()))
+                .setNotifyUrl(reqDTO.getNotifyUrl());
         // 执行请求
         String response = client.createOrderV3(TradeTypeEnum.NATIVE, request);
 
