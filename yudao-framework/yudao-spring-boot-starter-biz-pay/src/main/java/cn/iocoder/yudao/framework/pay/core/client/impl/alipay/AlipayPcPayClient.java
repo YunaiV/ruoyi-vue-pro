@@ -2,8 +2,8 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.Method;
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
 import com.alipay.api.AlipayApiException;
@@ -29,14 +29,14 @@ public class AlipayPcPayClient extends AbstractAlipayPayClient {
     }
 
     @Override
-    public PayOrderUnifiedRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) throws AlipayApiException {
+    public PayOrderRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) throws AlipayApiException {
         // 1.1 构建 AlipayTradePagePayModel 请求
         AlipayTradePagePayModel model = new AlipayTradePagePayModel();
         // ① 通用的参数
-        model.setOutTradeNo(reqDTO.getMerchantOrderId());
+        model.setOutTradeNo(reqDTO.getOutTradeNo());
         model.setSubject(reqDTO.getSubject());
         model.setBody(reqDTO.getBody());
-        model.setTotalAmount(formatAmount(reqDTO.getAmount()));
+        model.setTotalAmount(formatAmount(reqDTO.getPrice()));
         model.setTimeExpire(formatTime(reqDTO.getExpireTime()));
         model.setProductCode("FAST_INSTANT_TRADE_PAY"); // 销售产品码. 目前 PC 支付场景下仅支持 FAST_INSTANT_TRADE_PAY
         // ② 个性化的参数
@@ -60,8 +60,11 @@ public class AlipayPcPayClient extends AbstractAlipayPayClient {
             response = client.pageExecute(request, Method.GET.name());
         }
         // 2.2 处理结果
-        validateUnifiedOrderResponse(request, response);
-        return new PayOrderUnifiedRespDTO(displayMode, response.getBody());
+        if (!response.isSuccess()) {
+            return buildClosedPayOrderRespDTO(reqDTO, response);
+        }
+        return new PayOrderRespDTO(displayMode, response.getBody(),
+                reqDTO.getOutTradeNo(), response);
     }
 
 }

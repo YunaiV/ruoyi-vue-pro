@@ -18,7 +18,7 @@ public interface PayRefundApi {
      * @param reqDTO 创建请求
      * @return 退款单编号
      */
-    Long createPayRefund(@Valid PayRefundCreateReqDTO reqDTO);
+    Long createRefund(@Valid PayRefundCreateReqDTO reqDTO);
 
     /**
      * 获得退款单
@@ -26,6 +26,6 @@ public interface PayRefundApi {
      * @param id 退款单编号
      * @return 退款单
      */
-    PayRefundRespDTO getPayRefund(Long id);
+    PayRefundRespDTO getRefund(Long id);
 
 }

@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 import cn.hutool.core.util.ReflectUtil;
-import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.DefaultAlipayClient;
@@ -74,8 +72,8 @@ public class AlipayQrPayClientTest extends BaseMockitoUnitTest {
         // 这里，设置可以直接随机整个对象。
         Long shopOrderId = System.currentTimeMillis();
         PayOrderUnifiedReqDTO reqDTO=new PayOrderUnifiedReqDTO();
-        reqDTO.setMerchantOrderId(String.valueOf(System.currentTimeMillis()));
-        reqDTO.setAmount(1);
+        reqDTO.setOutTradeNo(String.valueOf(System.currentTimeMillis()));
+        reqDTO.setPrice(1);
         reqDTO.setBody("内容：" + shopOrderId);
         reqDTO.setSubject("标题："+shopOrderId);
         String notify="http://niubi.natapp1.cc/api/pay/order/notify";

@@ -3,9 +3,7 @@ package cn.iocoder.yudao.module.pay.service.app;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.framework.test.core.util.RandomUtils;
 import cn.iocoder.yudao.module.pay.controller.admin.app.vo.PayAppCreateReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.app.vo.PayAppPageReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.app.vo.PayAppUpdateReqVO;
@@ -18,8 +16,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
@@ -58,7 +54,7 @@ public class PayAppServiceTest extends BaseDbUnitTest {
         // 准备参数
         PayAppCreateReqVO reqVO = randomPojo(PayAppCreateReqVO.class, o ->
                 o.setStatus((RandomUtil.randomEle(CommonStatusEnum.values()).getStatus()))
-                        .setPayNotifyUrl(randomURL())
+                        .setOrderNotifyUrl(randomURL())
                         .setRefundNotifyUrl(randomURL()));
 
         // 调用
@@ -77,7 +73,7 @@ public class PayAppServiceTest extends BaseDbUnitTest {
         // 准备参数
         PayAppUpdateReqVO reqVO = randomPojo(PayAppUpdateReqVO.class, o -> {
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-            o.setPayNotifyUrl(randomURL()).setRefundNotifyUrl(randomURL());
+            o.setOrderNotifyUrl(randomURL()).setRefundNotifyUrl(randomURL());
             o.setId(dbApp.getId()); // 设置更新的 ID
         });
 

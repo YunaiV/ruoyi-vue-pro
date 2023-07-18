@@ -18,8 +18,7 @@ public enum PayOrderDisplayModeEnum {
     QR_CODE("qr_code"), // 二维码的文字内容
     QR_CODE_URL("qr_code_url"), // 二维码的图片链接
     BAR_CODE("bar_code"), // 条形码
-    APP("app"), // 应用【目前暂时用不到】
-    CUSTOM("custom"), // 自定义：每种支付方式，做个性化处理；例如说，微信公众号支付时，调用 JSAPI 接口
+    APP("app"), // 应用：Android、iOS、微信小程序、微信公众号等，需要做自定义处理的
     ;
 
     /**

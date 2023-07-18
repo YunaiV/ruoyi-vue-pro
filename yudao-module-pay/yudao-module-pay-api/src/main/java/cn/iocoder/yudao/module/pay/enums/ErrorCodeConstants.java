@@ -27,17 +27,19 @@ public interface ErrorCodeConstants {
     ErrorCode PAY_ORDER_STATUS_IS_NOT_WAITING = new ErrorCode(1007002001, "支付订单不处于待支付");
     ErrorCode PAY_ORDER_STATUS_IS_NOT_SUCCESS = new ErrorCode(1007002002, "支付订单不处于已支付");
     ErrorCode PAY_ORDER_IS_EXPIRED = new ErrorCode(1007002003, "支付订单已经过期");
+    ErrorCode PAY_ORDER_SUBMIT_CHANNEL_ERROR = new ErrorCode(1007002004, "发起支付报错，错误码：{}，错误提示：{}");
 
     // ========== ORDER 模块(拓展单) 1007003000 ==========
     ErrorCode PAY_ORDER_EXTENSION_NOT_FOUND = new ErrorCode(1007003000, "支付交易拓展单不存在");
     ErrorCode PAY_ORDER_EXTENSION_STATUS_IS_NOT_WAITING = new ErrorCode(1007003001, "支付交易拓展单不处于待支付");
 
     // ========== 支付模块(退款) 1007006000 ==========
-    ErrorCode PAY_PRICE_PRICE_EXCEED = new ErrorCode(1007006000, "退款金额超过订单可退款金额");
+    ErrorCode PAY_REFUND_PRICE_EXCEED = new ErrorCode(1007006000, "退款金额超过订单可退款金额");
     ErrorCode PAY_REFUND_ALL_REFUNDED = new ErrorCode(1007006001, "订单已经全额退款");
-    ErrorCode PAY_REFUND_CHN_ORDER_NO_IS_NULL = new ErrorCode(1007006002, "该订单的渠道订单为空");
-    ErrorCode PAY_REFUND_SUCCEED = new ErrorCode(1007006003, "已经退款成功");
+    ErrorCode PAY_REFUND_HAS_REFUNDING = new ErrorCode(1007006002, "已经有退款在处理中");
+    ErrorCode PAY_REFUND_EXISTS = new ErrorCode(1007006003, "已经存在退款单");
     ErrorCode PAY_REFUND_NOT_FOUND = new ErrorCode(1007006004, "支付退款单不存在");
+    ErrorCode PAY_REFUND_STATUS_IS_NOT_WAITING = new ErrorCode(1007006005, "支付退款单不处于待退款");
 
     // ========== 示例订单 1007900000 ==========
     ErrorCode PAY_DEMO_ORDER_NOT_FOUND = new ErrorCode(1007900000, "示例订单不存在");

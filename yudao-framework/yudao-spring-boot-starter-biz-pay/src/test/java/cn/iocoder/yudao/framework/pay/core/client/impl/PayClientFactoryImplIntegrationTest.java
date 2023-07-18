@@ -121,10 +121,10 @@ public class PayClientFactoryImplIntegrationTest {
 
     private static PayOrderUnifiedReqDTO buildPayOrderUnifiedReqDTO() {
         PayOrderUnifiedReqDTO reqDTO = new PayOrderUnifiedReqDTO();
-        reqDTO.setAmount(123);
+        reqDTO.setPrice(123);
         reqDTO.setSubject("IPhone 13");
         reqDTO.setBody("biubiubiu");
-        reqDTO.setMerchantOrderId(String.valueOf(System.currentTimeMillis()));
+        reqDTO.setOutTradeNo(String.valueOf(System.currentTimeMillis()));
         reqDTO.setUserIp("127.0.0.1");
         reqDTO.setNotifyUrl("http://127.0.0.1:8080");
         return reqDTO;

@@ -41,7 +41,8 @@
       </el-table-column>
       <el-table-column label="退款时间" align="center" prop="refundTime" width="180">
         <template v-slot="scope">
-          <span>{{ parseTime(scope.row.refundTime) }}</span>
+          <span v-if="scope.row.refundTime">{{ parseTime(scope.row.refundTime) }}</span>
+          <span v-else-if="scope.row.payRefundId">退款中，等待退款结果</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">

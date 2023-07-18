@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.pay.service.refund;
 
-import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayRefundNotifyRespDTO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundExportReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundPageReqVO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 
 import java.util.List;
@@ -62,8 +61,7 @@ public interface PayRefundService {
      *
      * @param channelId  渠道编号
      * @param notify     通知
-     * @param rawNotify  通知数据
      */
-    void notifyPayRefund(Long channelId, PayRefundNotifyRespDTO notify, PayNotifyReqDTO rawNotify);
+    void notifyRefund(Long channelId, PayRefundRespDTO notify);
 
 }

@@ -143,6 +143,30 @@
             </el-button>
           </template>
         </el-table-column>
+        <el-table-column :label="payChannelEnum.WX_NATIVE.name" align="center">
+          <template v-slot="scope">
+            <el-button type="success" icon="el-icon-check" circle
+                       v-if="judgeChannelExist(scope.row.channelCodes,payChannelEnum.WX_NATIVE.code)"
+                       @click="handleUpdateChannel(scope.row,payChannelEnum.WX_NATIVE.code,payType.WECHAT)">
+            </el-button>
+            <el-button v-else
+                       type="danger" icon="el-icon-close" circle
+                       @click="handleCreateChannel(scope.row,payChannelEnum.WX_NATIVE.code,payType.WECHAT)">
+            </el-button>
+          </template>
+        </el-table-column>
+        <el-table-column :label="payChannelEnum.WX_BAR.name" align="center">
+          <template v-slot="scope">
+            <el-button type="success" icon="el-icon-check" circle
+                       v-if="judgeChannelExist(scope.row.channelCodes,payChannelEnum.WX_BAR.code)"
+                       @click="handleUpdateChannel(scope.row,payChannelEnum.WX_BAR.code,payType.WECHAT)">
+            </el-button>
+            <el-button v-else
+                       type="danger" icon="el-icon-close" circle
+                       @click="handleCreateChannel(scope.row,payChannelEnum.WX_BAR.code,payType.WECHAT)">
+            </el-button>
+          </template>
+        </el-table-column>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
@@ -173,8 +197,8 @@
           </el-radio-group>
         </el-form-item>
 
-        <el-form-item label="支付结果的回调地址" prop="payNotifyUrl">
-          <el-input v-model="form.payNotifyUrl" placeholder="请输入支付结果的回调地址"/>
+        <el-form-item label="支付结果的回调地址" prop="orderNotifyUrl">
+          <el-input v-model="form.orderNotifyUrl" placeholder="请输入支付结果的回调地址"/>
         </el-form-item>
         <el-form-item label="退款结果的回调地址" prop="refundNotifyUrl">
           <el-input v-model="form.refundNotifyUrl" placeholder="请输入退款结果的回调地址"/>
@@ -235,7 +259,7 @@ export default {
       rules: {
         name: [{required: true, message: "应用名不能为空", trigger: "blur"}],
         status: [{required: true, message: "开启状态不能为空", trigger: "blur"}],
-        payNotifyUrl: [{required: true, message: "支付结果的回调地址不能为空", trigger: "blur"}],
+        orderNotifyUrl: [{required: true, message: "支付结果的回调地址不能为空", trigger: "blur"}],
         refundNotifyUrl: [{required: true, message: "退款结果的回调地址不能为空", trigger: "blur"}],
       },
       // 数据字典
@@ -295,7 +319,7 @@ export default {
         name: undefined,
         status: undefined,
         remark: undefined,
-        payNotifyUrl: undefined,
+        orderNotifyUrl: undefined,
         refundNotifyUrl: undefined,
       };
       this.resetForm("form");

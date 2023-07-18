@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderNotifyStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
-import cn.iocoder.yudao.module.pay.enums.refund.PayRefundTypeEnum;
+import cn.iocoder.yudao.module.pay.enums.order.PayOrderRefundStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -55,7 +55,8 @@ public class PayOrderDO extends BaseDO {
 
     /**
      * 商户订单编号
-     * 例如说，内部系统 A 的订单号。需要保证每个 PayMerchantDO 唯一
+     *
+     * 例如说，内部系统 A 的订单号，需要保证每个 PayAppDO 唯一
      */
     private String merchantOrderId;
     /**
@@ -126,7 +127,7 @@ public class PayOrderDO extends BaseDO {
     /**
      * 退款状态
      *
-     * 枚举 {@link PayRefundTypeEnum}
+     * 枚举 {@link PayOrderRefundStatusEnum}
      */
     private Integer refundStatus;
     /**
@@ -136,7 +137,7 @@ public class PayOrderDO extends BaseDO {
     /**
      * 退款总金额，单位：分
      */
-    private Long refundPrice;
+    private Integer refundPrice;
 
     // ========== 渠道相关字段 ==========
     /**

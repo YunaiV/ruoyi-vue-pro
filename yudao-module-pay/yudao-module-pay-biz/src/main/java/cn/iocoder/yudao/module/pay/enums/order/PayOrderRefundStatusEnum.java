@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.pay.enums.refund;
+package cn.iocoder.yudao.module.pay.enums.order;
 
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
@@ -11,10 +11,10 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum PayRefundTypeEnum implements IntArrayValuable {
+public enum PayOrderRefundStatusEnum implements IntArrayValuable {
 
     NO(0, "未退款"),
-    SOME(10, "部分退款"),
+    PART(10, "部分退款"),
     ALL(20, "全部退款")
     ;
 

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.pay.enums.refund;
+package cn.iocoder.yudao.framework.pay.core.enums.refund;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,11 +8,11 @@ import java.util.Objects;
 /**
  * 渠道的退款状态枚举
  *
- * @author 芋道源码
+ * @author jason
  */
 @Getter
 @AllArgsConstructor
-public enum PayRefundStatusEnum {
+public enum PayRefundStatusRespEnum {
 
     WAITING(0, "未退款"),
     SUCCESS(10, "退款成功"),

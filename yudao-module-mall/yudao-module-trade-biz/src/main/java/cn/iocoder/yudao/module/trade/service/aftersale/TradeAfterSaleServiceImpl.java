@@ -351,7 +351,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
             public void afterCommit() {
                 // 创建退款单
                 PayRefundCreateReqDTO createReqDTO = TradeAfterSaleConvert.INSTANCE.convert(userIp, afterSale, tradeOrderProperties);
-                Long payRefundId = payRefundApi.createPayRefund(createReqDTO);
+                Long payRefundId = payRefundApi.createRefund(createReqDTO);
                 // 更新售后单的退款单号
                 tradeAfterSaleMapper.updateById(new TradeAfterSaleDO().setId(afterSale.getId()).setPayRefundId(payRefundId));
             }

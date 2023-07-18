@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.weixin;
 
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
 import com.github.binarywang.wxpay.bean.order.WxPayNativeOrderResult;
@@ -34,14 +32,14 @@ public class WxNativePayClient extends AbstractWxPayClient {
     }
 
     @Override
-    protected PayOrderUnifiedRespDTO doUnifiedOrderV2(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
+    protected PayOrderRespDTO doUnifiedOrderV2(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
         // 构建 WxPayUnifiedOrderRequest 对象
         WxPayUnifiedOrderRequest request = WxPayUnifiedOrderRequest.newBuilder()
-                .outTradeNo(reqDTO.getMerchantOrderId())
+                .outTradeNo(reqDTO.getOutTradeNo())
                 .body(reqDTO.getSubject())
                 .detail(reqDTO.getBody())
-                .totalFee(reqDTO.getAmount()) // 单位分
-                .productId(reqDTO.getMerchantOrderId())
+                .totalFee(reqDTO.getPrice()) // 单位分
+                .productId(reqDTO.getOutTradeNo())
                 .timeExpire(formatDateV2(reqDTO.getExpireTime()))
                 .spbillCreateIp(reqDTO.getUserIp())
                 .notifyUrl(reqDTO.getNotifyUrl())
@@ -50,31 +48,26 @@ public class WxNativePayClient extends AbstractWxPayClient {
         WxPayNativeOrderResult response = client.createOrder(request);
 
         // 转换结果
-        return new PayOrderUnifiedRespDTO(PayOrderDisplayModeEnum.QR_CODE_URL.getMode(),
-                response.getCodeUrl());
+        return new PayOrderRespDTO(PayOrderDisplayModeEnum.QR_CODE.getMode(), response.getCodeUrl(),
+                reqDTO.getOutTradeNo(), response);
     }
 
     @Override
-    protected PayOrderUnifiedRespDTO doUnifiedOrderV3(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
+    protected PayOrderRespDTO doUnifiedOrderV3(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
         // 构建 WxPayUnifiedOrderRequest 对象
-        WxPayUnifiedOrderV3Request request = new WxPayUnifiedOrderV3Request();
-        request.setOutTradeNo(reqDTO.getMerchantOrderId());
-        request.setDescription(reqDTO.getBody());
-        request.setAmount(new WxPayUnifiedOrderV3Request.Amount().setTotal(reqDTO.getAmount())); // 单位分
-        request.setTimeExpire(formatDateV3(reqDTO.getExpireTime()));
-        request.setSceneInfo(new WxPayUnifiedOrderV3Request.SceneInfo().setPayerClientIp(reqDTO.getUserIp()));
-        request.setNotifyUrl(reqDTO.getNotifyUrl());
+        WxPayUnifiedOrderV3Request request = new WxPayUnifiedOrderV3Request()
+                .setOutTradeNo(reqDTO.getOutTradeNo())
+                .setDescription(reqDTO.getSubject())
+                .setAmount(new WxPayUnifiedOrderV3Request.Amount().setTotal(reqDTO.getPrice())) // 单位分
+                .setTimeExpire(formatDateV3(reqDTO.getExpireTime()))
+                .setSceneInfo(new WxPayUnifiedOrderV3Request.SceneInfo().setPayerClientIp(reqDTO.getUserIp()))
+                .setNotifyUrl(reqDTO.getNotifyUrl());
         // 执行请求
-        WxPayNativeOrderResult response = client.createOrderV3(TradeTypeEnum.NATIVE, request);
+        String response = client.createOrderV3(TradeTypeEnum.NATIVE, request);
 
         // 转换结果
-        return new PayOrderUnifiedRespDTO(PayOrderDisplayModeEnum.QR_CODE_URL.getMode(),
-                response.getCodeUrl());
-    }
-
-    @Override
-    protected PayRefundUnifiedRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable {
-        return null;
+        return new PayOrderRespDTO(PayOrderDisplayModeEnum.QR_CODE.getMode(), response,
+                reqDTO.getOutTradeNo(), response);
     }
 
 }

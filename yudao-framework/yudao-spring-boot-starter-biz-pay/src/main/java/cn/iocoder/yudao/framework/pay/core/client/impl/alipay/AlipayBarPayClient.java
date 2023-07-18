@@ -2,8 +2,8 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
 import com.alipay.api.AlipayApiException;
@@ -30,7 +30,7 @@ public class AlipayBarPayClient extends AbstractAlipayPayClient {
     }
 
     @Override
-    public PayOrderUnifiedRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) throws AlipayApiException {
+    public PayOrderRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) throws AlipayApiException {
         String authCode = MapUtil.getStr(reqDTO.getChannelExtras(), "auth_code");
         if (StrUtil.isEmpty(authCode)) {
             throw exception0(BAD_REQUEST.getCode(), "条形码不能为空");
@@ -39,10 +39,10 @@ public class AlipayBarPayClient extends AbstractAlipayPayClient {
         // 1.1 构建 AlipayTradePayModel 请求
         AlipayTradePayModel model = new AlipayTradePayModel();
         // ① 通用的参数
-        model.setOutTradeNo(reqDTO.getMerchantOrderId());
+        model.setOutTradeNo(reqDTO.getOutTradeNo());
         model.setSubject(reqDTO.getSubject());
         model.setBody(reqDTO.getBody());
-        model.setTotalAmount(formatAmount(reqDTO.getAmount()));
+        model.setTotalAmount(formatAmount(reqDTO.getPrice()));
         model.setScene("bar_code"); // 当面付条码支付场景
         // ② 个性化的参数
         model.setAuthCode(authCode);
@@ -55,11 +55,15 @@ public class AlipayBarPayClient extends AbstractAlipayPayClient {
         request.setNotifyUrl(reqDTO.getNotifyUrl());
         request.setReturnUrl(reqDTO.getReturnUrl());
 
+        // TODO 芋艿：各种边界的处理
         // 2.1 执行请求
         AlipayTradePayResponse response = client.execute(request);
         // 2.2 处理结果
-        validateUnifiedOrderResponse(request, response);
-        return new PayOrderUnifiedRespDTO(displayMode, "");
+        if (!response.isSuccess()) {
+            return buildClosedPayOrderRespDTO(reqDTO, response);
+        }
+        return new PayOrderRespDTO(displayMode, "",
+                reqDTO.getOutTradeNo(), response);
     }
 
 }

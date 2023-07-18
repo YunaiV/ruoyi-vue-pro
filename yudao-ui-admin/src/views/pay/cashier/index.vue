@@ -26,7 +26,7 @@
       <!-- 微信支付 -->
       <el-descriptions title="选择微信支付" style="margin-top: 20px;" />
       <div class="pay-channel-container">
-        <div class="box" v-for="channel in channels" v-if="channel.code.indexOf('wx_') === 0" :key="channel.code">
+        <div class="box" v-for="channel in channels" v-if="channel.code.indexOf('wx_') === 0" :key="channel.code" @click="submit(channel.code)">
           <img :src="channel.icon">
           <div class="title">{{ channel.name }}</div>
         </div>
@@ -126,6 +126,14 @@ export default {
         icon: require("@/assets/images/pay/icon/wx_app.svg"),
         code: "wx_app"
       }, {
+        name: '微信扫码支付',
+        icon: require("@/assets/images/pay/icon/wx_native.svg"),
+        code: "wx_native"
+      }, {
+        name: '微信条码支付',
+        icon: require("@/assets/images/pay/icon/wx_bar.svg"),
+        code: "wx_bar"
+      }, {
         name: '模拟支付',
         icon: require("@/assets/images/pay/icon/mock.svg"),
         code: "mock"
@@ -195,6 +203,15 @@ export default {
         }
         return;
       }
+      if (channelCode === PayChannelEnum.WX_BAR.code) {
+        this.barCode = {
+          channelCode: channelCode,
+          value: '',
+          title: '“微信”条码支付',
+          visible: true
+        }
+        return;
+      }
 
       // 默认的提交处理
       this.submit0(channelCode)
@@ -207,7 +224,16 @@ export default {
         returnUrl: location.href, // 支付成功后，支付渠道跳转回当前页；再由当前页，跳转回 {@link returnUrl} 对应的地址
         ...this.buildSubmitParam(channelCode)
       }).then(response => {
+        // 直接返回已支付的情况，例如说扫码支付
         const data = response.data
+        if (data.status === PayOrderStatusEnum.SUCCESS.status) {
+          this.clearQueryInterval();
+          this.$message.success('支付成功！');
+          this.goReturnUrl();
+          return
+        }
+
+        // 展示对应的界面
         if (data.displayMode === PayDisplayModeEnum.URL.mode) {
           this.displayUrl(channelCode, data)
         } else if (data.displayMode === PayDisplayModeEnum.QR_CODE.mode) {
@@ -230,11 +256,18 @@ export default {
           }
         }
       }
+      // ② 微信 BarCode 支付时，需要传递 authCode 条形码
+      if (channelCode === PayChannelEnum.WX_BAR.code) {
+        return {
+          "channelExtras": {
+            "authCode": this.barCode.value
+          }
+        }
+      }
       return {}
     },
     /** 提交支付后，URL 的展示形式 */
     displayUrl(channelCode, data) {
-      // window.open(data.displayContent)
       location.href = data.displayContent
       this.submitLoading = false
     },
@@ -298,6 +331,9 @@ export default {
      *                  ③ close：支付已关闭
      */
     goReturnUrl(payResult) {
+      // 清理任务
+      this.clearQueryInterval();
+
       // 未配置的情况下，只能关闭
       if (!this.returnUrl) {
         this.$tab.closePage();
