@@ -29,7 +29,6 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 import static cn.hutool.core.date.DatePattern.NORM_DATETIME_FORMATTER;
-import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 
 /**
  * 支付宝抽象类，实现支付宝统一的接口、以及部分实现（退款）
@@ -94,7 +93,7 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
      * @return 退款请求 Response
      */
     @Override
-    protected PayRefundRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO)  {
+    protected PayRefundRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws AlipayApiException {
         // 1.1 构建 AlipayTradeRefundModel 请求
         AlipayTradeRefundModel model = new AlipayTradeRefundModel();
         model.setOutTradeNo(reqDTO.getOutTradeNo());
@@ -104,31 +103,22 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
         // 1.2 构建 AlipayTradePayRequest 请求
         AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();
         request.setBizModel(model);
-        try {
-            // 2.1 执行请求
-            AlipayTradeRefundResponse response =  client.execute(request);
-            // 2.2 创建返回结果
-            PayRefundRespDTO refund = new PayRefundRespDTO()
-                    .setOutRefundNo(reqDTO.getOutRefundNo())
-                    .setRawData(response);
-            // 支付宝只要退款调用返回 success，就认为退款成功，不需要回调。具体可见 parseNotify 方法的说明。
-            // 另外，支付宝没有退款单号，所以不用设置
-            if (response.isSuccess()) {
-                refund.setStatus(PayOrderStatusRespEnum.SUCCESS.getStatus())
-                        .setSuccessTime(LocalDateTimeUtil.of(response.getGmtRefundPay()));
-                Assert.notNull(refund.getSuccessTime(), "退款成功时间不能为空");
-            } else {
-                refund.setStatus(PayOrderStatusRespEnum.CLOSED.getStatus());
-            }
-            return refund;
-        } catch (AlipayApiException e) {
-            log.error("[doUnifiedRefund][request({}) 发起退款异常]", toJsonString(reqDTO), e);
-            return null;
+
+        // 2.1 执行请求
+        AlipayTradeRefundResponse response =  client.execute(request);
+        // 2.2 创建返回结果
+        // 支付宝只要退款调用返回 success，就认为退款成功，不需要回调。具体可见 parseNotify 方法的说明。
+        // 另外，支付宝没有退款单号，所以不用设置
+        if (response.isSuccess()) {
+            return PayRefundRespDTO.successOf(null, LocalDateTimeUtil.of(response.getGmtRefundPay()),
+                    reqDTO.getOutRefundNo(), response);
+        } else {
+            return PayRefundRespDTO.failureOf(reqDTO.getOutRefundNo(), response);
         }
     }
 
     @Override
-    public PayRefundRespDTO parseRefundNotify(Map<String, String> params, String body) {
+    public PayRefundRespDTO doParseRefundNotify(Map<String, String> params, String body) {
         // 补充说明：支付宝退款时，没有回调，这点和微信支付是不同的。并且，退款分成部分退款、和全部退款。
         // ① 部分退款：是会有回调，但是它回调的是订单状态的同步回调，不是退款订单的回调
         // ② 全部退款：Wap 支付有订单状态的同步回调，但是 PC/扫码又没有
