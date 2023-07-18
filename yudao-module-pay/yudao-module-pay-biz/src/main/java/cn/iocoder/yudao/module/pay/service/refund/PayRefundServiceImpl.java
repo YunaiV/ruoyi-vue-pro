@@ -43,6 +43,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
+import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.CHANNEL_NOT_FOUND;
 
 /**
  * 退款订单 Service 实现类
@@ -106,13 +107,13 @@ public class PayRefundServiceImpl implements PayRefundService {
         PayClient client = payClientFactory.getPayClient(channel.getId());
         if (client == null) {
             log.error("[refund][渠道编号({}) 找不到对应的支付客户端]", channel.getId());
-            throw exception(ErrorCodeConstants.PAY_CHANNEL_CLIENT_NOT_FOUND);
+            throw exception(CHANNEL_NOT_FOUND);
         }
         // 1.4 校验退款订单是否已经存在
         PayRefundDO refund = refundMapper.selectByAppIdAndMerchantRefundId(
                 app.getId(), reqDTO.getMerchantRefundId());
         if (refund != null) {
-            throw exception(ErrorCodeConstants.PAY_REFUND_EXISTS);
+            throw exception(ErrorCodeConstants.REFUND_EXISTS);
         }
 
         // 2.1 插入退款单
@@ -153,25 +154,25 @@ public class PayRefundServiceImpl implements PayRefundService {
     private PayOrderDO validatePayOrderCanRefund(PayRefundCreateReqDTO reqDTO) {
         PayOrderDO order = orderService.getOrder(reqDTO.getAppId(), reqDTO.getMerchantOrderId());
         if (order == null) {
-            throw exception(ErrorCodeConstants.PAY_ORDER_NOT_FOUND);
+            throw exception(ErrorCodeConstants.ORDER_NOT_FOUND);
         }
         // 校验状态，必须是支付状态
         if (!PayOrderStatusEnum.SUCCESS.getStatus().equals(order.getStatus())) {
-            throw exception(ErrorCodeConstants.PAY_ORDER_STATUS_IS_NOT_SUCCESS);
+            throw exception(ErrorCodeConstants.ORDER_STATUS_IS_NOT_SUCCESS);
         }
 
         // 是否已经全额退款
         if (PayOrderRefundStatusEnum.ALL.getStatus().equals(order.getRefundStatus())) {
-            throw exception(ErrorCodeConstants.PAY_REFUND_ALL_REFUNDED);
+            throw exception(ErrorCodeConstants.REFUND_ALL_REFUNDED);
         }
         // 校验金额 退款金额不能大于原定的金额
         if (reqDTO.getPrice() + order.getRefundPrice() > order.getPrice()){
-            throw exception(ErrorCodeConstants.PAY_REFUND_PRICE_EXCEED);
+            throw exception(ErrorCodeConstants.REFUND_PRICE_EXCEED);
         }
         // 是否有退款中的订单
         if (refundMapper.selectCountByAppIdAndOrderId(reqDTO.getAppId(), order.getId(),
                 PayRefundStatusEnum.WAITING.getStatus()) > 0) {
-            throw exception(ErrorCodeConstants.PAY_REFUND_HAS_REFUNDING);
+            throw exception(ErrorCodeConstants.REFUND_HAS_REFUNDING);
         }
         return order;
     }
@@ -230,13 +231,13 @@ public class PayRefundServiceImpl implements PayRefundService {
         PayRefundDO refund = refundMapper.selectByAppIdAndNo(
                 channel.getAppId(), notify.getOutRefundNo());
         if (refund == null) {
-            throw exception(ErrorCodeConstants.PAY_REFUND_NOT_FOUND);
+            throw exception(ErrorCodeConstants.REFUND_NOT_FOUND);
         }
         if (PayRefundStatusEnum.isSuccess(refund.getStatus())) { // 如果已经是成功，直接返回，不用重复更新
             return;
         }
         if (!PayRefundStatusEnum.WAITING.getStatus().equals(refund.getStatus())) {
-            throw exception(ErrorCodeConstants.PAY_REFUND_STATUS_IS_NOT_WAITING);
+            throw exception(ErrorCodeConstants.REFUND_STATUS_IS_NOT_WAITING);
         }
 
         // 1.2 更新 PayRefundDO
@@ -247,7 +248,7 @@ public class PayRefundServiceImpl implements PayRefundService {
                 .setChannelNotifyData(toJsonString(notify));
         int updateCounts = refundMapper.updateByIdAndStatus(refund.getId(), refund.getStatus(), updateRefundObj);
         if (updateCounts == 0) { // 校验状态，必须是等待状态
-            throw exception(ErrorCodeConstants.PAY_REFUND_STATUS_IS_NOT_WAITING);
+            throw exception(ErrorCodeConstants.REFUND_STATUS_IS_NOT_WAITING);
         }
 
         // 2. 更新订单

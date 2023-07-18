@@ -49,41 +49,37 @@ public interface PayOrderService {
     Long getOrderCountByAppId(Long appId);
 
     /**
-     * 获得支付订单
-     * 分页
+     * 获得支付订单分页
      *
      * @param pageReqVO 分页查询
-     * @return 支付订单
-     * 分页
+     * @return 支付订单分页
      */
     PageResult<PayOrderDO> getOrderPage(PayOrderPageReqVO pageReqVO);
 
     /**
-     * 获得支付订单
-     * 列表, 用于 Excel 导出
+     * 获得支付订单列表, 用于 Excel 导出
      *
      * @param exportReqVO 查询条件
-     * @return 支付订单
-     * 列表
+     * @return 支付订单列表
      */
     List<PayOrderDO> getOrderList(PayOrderExportReqVO exportReqVO);
 
     /**
-     * 根据 ID 集合获取只包含商品名称的订单集合
-     *
-     * @param idList 订单 ID 集合
-     * @return 只包含商品名称的订单集合
-     */
-    List<PayOrderDO> getOrderSubjectList(Collection<Long> idList);
-
-    /**
-     * 根据订单 ID 集合获取订单商品名称Map集合
+     * 获得支付订单列表
      *
      * @param ids 订单 ID 集合
-     * @return 订单商品 map 集合
+     * @return 支付订单列表
+     */
+    List<PayOrderDO> getOrderList(Collection<Long> ids);
+
+    /**
+     * 获得支付订单 Map
+     *
+     * @param ids 订单 ID 集合
+     * @return 支付订单 Map 集合
      */
     default Map<Long, PayOrderDO> getOrderSubjectMap(Collection<Long> ids) {
-        List<PayOrderDO> list = getOrderSubjectList(ids);
+        List<PayOrderDO> list = getOrderList(ids);
         return CollectionUtils.convertMap(list, PayOrderDO::getId);
     }
 

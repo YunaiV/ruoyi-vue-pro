@@ -44,12 +44,6 @@ public interface PayOrderMapper extends BaseMapperX<PayOrderDO> {
                 .orderByDesc("id"));
     }
 
-    default List<PayOrderDO> findByIdListQueryOrderSubject(Collection<Long> idList) {
-        return selectList(new LambdaQueryWrapper<PayOrderDO>()
-                .select(PayOrderDO::getId, PayOrderDO::getSubject)
-                .in(PayOrderDO::getId, idList));
-    }
-
     default Long selectCountByAppId(Long appId) {
         return selectCount(PayOrderDO::getAppId, appId);
     }

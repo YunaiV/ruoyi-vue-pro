@@ -90,7 +90,7 @@ public class PayAppServiceTest extends BaseDbUnitTest {
         PayAppUpdateReqVO reqVO = randomPojo(PayAppUpdateReqVO.class, o ->
                 o.setStatus((RandomUtil.randomEle(CommonStatusEnum.values()).getStatus())));
         // 调用, 并断言异常
-        assertServiceException(() -> appService.updateApp(reqVO), PAY_APP_NOT_FOUND);
+        assertServiceException(() -> appService.updateApp(reqVO), APP_NOT_FOUND);
     }
 
     @Test
@@ -130,7 +130,7 @@ public class PayAppServiceTest extends BaseDbUnitTest {
         Long id = randomLongId();
 
         // 调用, 并断言异常
-        assertServiceException(() -> appService.deleteApp(id), PAY_APP_NOT_FOUND);
+        assertServiceException(() -> appService.deleteApp(id), APP_NOT_FOUND);
     }
 
     @Test
@@ -144,7 +144,7 @@ public class PayAppServiceTest extends BaseDbUnitTest {
         when(orderService.getOrderCountByAppId(eq(id))).thenReturn(10L);
 
         // 调用, 并断言异常
-        assertServiceException(() -> appService.deleteApp(id), PAY_APP_EXIST_ORDER_CANT_DELETE);
+        assertServiceException(() -> appService.deleteApp(id), APP_EXIST_ORDER_CANT_DELETE);
     }
 
     @Test
@@ -158,7 +158,7 @@ public class PayAppServiceTest extends BaseDbUnitTest {
         when(refundService.getRefundCountByAppId(eq(id))).thenReturn(10L);
 
         // 调用, 并断言异常
-        assertServiceException(() -> appService.deleteApp(id), PAY_APP_EXIST_REFUND_CANT_DELETE);
+        assertServiceException(() -> appService.deleteApp(id), APP_EXIST_REFUND_CANT_DELETE);
     }
 
     @Test
@@ -239,7 +239,7 @@ public class PayAppServiceTest extends BaseDbUnitTest {
 
     @Test
     public void testValidPayApp_notFound() {
-        assertServiceException(() -> appService.validPayApp(randomLongId()), PAY_APP_NOT_FOUND);
+        assertServiceException(() -> appService.validPayApp(randomLongId()), APP_NOT_FOUND);
     }
 
     @Test
@@ -252,7 +252,7 @@ public class PayAppServiceTest extends BaseDbUnitTest {
         Long id = dbApp.getId();
 
         // 调用，并断言异常
-        assertServiceException(() -> appService.validPayApp(id), PAY_APP_IS_DISABLE);
+        assertServiceException(() -> appService.validPayApp(id), APP_IS_DISABLE);
     }
 
 }
