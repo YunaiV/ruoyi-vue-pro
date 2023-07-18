@@ -237,6 +237,7 @@ public class PayOrderServiceImpl implements PayOrderService {
         TenantUtils.execute(channel.getTenantId(), () -> notifyPayOrder(channel, notify));
     }
 
+    // TODO 芋艿：事务问题
     private void notifyPayOrder(PayChannelDO channel, PayOrderRespDTO notify) {
         // 情况一：支付成功的回调
         if (PayOrderStatusRespEnum.isSuccess(notify.getStatus())) {
@@ -372,7 +373,7 @@ public class PayOrderServiceImpl implements PayOrderService {
             throw exception(ORDER_NOT_FOUND);
         }
         if (!PayOrderStatusEnum.isSuccess(order.getStatus())) {
-            throw exception(REFUND_PRICE_EXCEED);
+            throw exception(ORDER_STATUS_IS_NOT_SUCCESS);
         }
         if (order.getRefundPrice() + incrRefundPrice > order.getPrice()) {
             throw exception(REFUND_PRICE_EXCEED);
@@ -389,7 +390,10 @@ public class PayOrderServiceImpl implements PayOrderService {
             updateObj.setStatus(PayOrderStatusEnum.CLOSED.getStatus())
                     .setRefundStatus(PayOrderRefundStatusEnum.PART.getStatus());
         }
-        orderMapper.updateByIdAndStatus(id, PayOrderStatusEnum.SUCCESS.getStatus(), updateObj);
+        int updateCount = orderMapper.updateByIdAndStatus(id, PayOrderStatusEnum.SUCCESS.getStatus(), updateObj);
+        if (updateCount == 0) {
+            throw exception(ORDER_STATUS_IS_NOT_SUCCESS);
+        }
     }
 
 }

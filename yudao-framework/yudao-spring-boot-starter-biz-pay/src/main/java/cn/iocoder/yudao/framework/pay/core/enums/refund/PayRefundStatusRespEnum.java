@@ -25,4 +25,8 @@ public enum PayRefundStatusRespEnum {
         return Objects.equals(status, SUCCESS.getStatus());
     }
 
+    public static boolean isFailure(Integer status) {
+        return Objects.equals(status, FAILURE.getStatus());
+    }
+
 }

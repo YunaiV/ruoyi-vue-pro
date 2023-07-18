@@ -206,7 +206,6 @@ public class PayRefundServiceImpl implements PayRefundService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void notifyRefund(Long channelId, PayRefundRespDTO notify) {
         // 校验支付渠道是否有效
         channelService.validPayChannel(channelId);
@@ -218,15 +217,20 @@ public class PayRefundServiceImpl implements PayRefundService {
         TenantUtils.execute(channel.getTenantId(), () -> notifyRefund(channel, notify));
     }
 
+    // TODO 芋艿：事务问题
     private void notifyRefund(PayChannelDO channel, PayRefundRespDTO notify) {
+        // 情况一：退款成功
         if (PayRefundStatusRespEnum.isSuccess(notify.getStatus())) {
             notifyRefundSuccess(channel, notify);
-        } else {
+            return;
+        }
+        // 情况二：退款失败
+        if (PayRefundStatusRespEnum.isFailure(notify.getStatus())) {
             notifyRefundFailure(channel, notify);
         }
     }
 
-    private void notifyRefundSuccess(PayChannelDO channel, PayRefundRespDTO notify) {
+    public void notifyRefundSuccess(PayChannelDO channel, PayRefundRespDTO notify) {
         // 1.1 查询 PayRefundDO
         PayRefundDO refund = refundMapper.selectByAppIdAndNo(
                 channel.getAppId(), notify.getOutRefundNo());
@@ -234,12 +238,12 @@ public class PayRefundServiceImpl implements PayRefundService {
             throw exception(ErrorCodeConstants.REFUND_NOT_FOUND);
         }
         if (PayRefundStatusEnum.isSuccess(refund.getStatus())) { // 如果已经是成功，直接返回，不用重复更新
+            log.info("[notifyRefundSuccess][退款订单({}) 已经是退款成功，无需更新]", refund.getId());
             return;
         }
         if (!PayRefundStatusEnum.WAITING.getStatus().equals(refund.getStatus())) {
             throw exception(ErrorCodeConstants.REFUND_STATUS_IS_NOT_WAITING);
         }
-
         // 1.2 更新 PayRefundDO
         PayRefundDO updateRefundObj = new PayRefundDO()
                 .setSuccessTime(notify.getSuccessTime())
@@ -250,17 +254,46 @@ public class PayRefundServiceImpl implements PayRefundService {
         if (updateCounts == 0) { // 校验状态，必须是等待状态
             throw exception(ErrorCodeConstants.REFUND_STATUS_IS_NOT_WAITING);
         }
+        log.info("[notifyRefundSuccess][退款订单({}) 更新为退款成功]", refund.getId());
 
         // 2. 更新订单
         orderService.updateOrderRefundPrice(refund.getOrderId(), refund.getRefundPrice());
 
-        // 3. 插入退款通知记录
+        // 3. 插入退款通知记录 TODO 芋艿：退款成功
         notifyService.createPayNotifyTask(PayNotifyTaskCreateReqDTO.builder()
                 .type(PayNotifyTypeEnum.REFUND.getType()).dataId(refund.getId()).build());
     }
 
-    private void notifyRefundFailure(PayChannelDO channel, PayRefundRespDTO notify) {
-        // TODO 芋艿：未实现
+    @Transactional(rollbackFor = Exception.class)
+    public void notifyRefundFailure(PayChannelDO channel, PayRefundRespDTO notify) {
+        // 1.1 查询 PayRefundDO
+        PayRefundDO refund = refundMapper.selectByAppIdAndNo(
+                channel.getAppId(), notify.getOutRefundNo());
+        if (refund == null) {
+            throw exception(ErrorCodeConstants.REFUND_NOT_FOUND);
+        }
+        if (PayRefundStatusEnum.isFailure(refund.getStatus())) { // 如果已经是成功，直接返回，不用重复更新
+            log.info("[notifyRefundSuccess][退款订单({}) 已经是退款关闭，无需更新]", refund.getId());
+            return;
+        }
+        if (!PayRefundStatusEnum.WAITING.getStatus().equals(refund.getStatus())) {
+            throw exception(ErrorCodeConstants.REFUND_STATUS_IS_NOT_WAITING);
+        }
+        // 1.2 更新 PayRefundDO
+        PayRefundDO updateRefundObj = new PayRefundDO()
+                .setChannelRefundNo(notify.getChannelRefundNo())
+                .setStatus(PayRefundStatusEnum.FAILURE.getStatus())
+                .setChannelNotifyData(toJsonString(notify))
+                .setChannelErrorCode(notify.getChannelErrorCode()).setChannelErrorMsg(notify.getChannelErrorMsg());
+        int updateCounts = refundMapper.updateByIdAndStatus(refund.getId(), refund.getStatus(), updateRefundObj);
+        if (updateCounts == 0) { // 校验状态，必须是等待状态
+            throw exception(ErrorCodeConstants.REFUND_STATUS_IS_NOT_WAITING);
+        }
+        log.info("[notifyRefundFailure][退款订单({}) 更新为退款失败]", refund.getId());
+
+        // 2. 插入退款通知记录 TODO 芋艿：退款失败
+        notifyService.createPayNotifyTask(PayNotifyTaskCreateReqDTO.builder()
+                .type(PayNotifyTypeEnum.REFUND.getType()).dataId(refund.getId()).build());
     }
 
 }
