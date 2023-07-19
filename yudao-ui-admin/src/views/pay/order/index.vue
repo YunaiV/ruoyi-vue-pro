@@ -127,7 +127,7 @@
           <el-tag size="small">{{ orderDetail.merchantOrderId }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="支付单号">
-          <el-tag type="warning" v-if="orderDetail.no">{{ orderDetail.no }}</el-tag>
+          <el-tag type="warning" size="small" v-if="orderDetail.no">{{ orderDetail.no }}</el-tag>
         </el-descriptions-item>
       </el-descriptions>
       <el-descriptions :column="2" label-class-name="desc-label">
@@ -278,7 +278,6 @@ export default {
         this.open = true;
       });
     },
-
     /** 导出按钮操作 */
     handleExport() {
       // 处理查询参数

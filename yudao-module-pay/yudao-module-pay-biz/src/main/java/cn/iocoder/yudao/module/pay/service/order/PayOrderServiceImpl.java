@@ -41,7 +41,6 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -100,11 +99,6 @@ public class PayOrderServiceImpl implements PayOrderService {
     @Override
     public List<PayOrderDO> getOrderList(PayOrderExportReqVO exportReqVO) {
         return orderMapper.selectList(exportReqVO);
-    }
-
-    @Override
-    public List<PayOrderDO> getOrderList(Collection<Long> ids) {
-        return orderMapper.selectBatchIds(ids);
     }
 
     @Override

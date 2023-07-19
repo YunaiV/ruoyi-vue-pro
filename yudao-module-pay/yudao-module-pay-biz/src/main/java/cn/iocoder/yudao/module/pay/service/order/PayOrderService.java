@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.pay.service.order;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderExportReqVO;
@@ -13,9 +12,7 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 支付订单 Service 接口
@@ -64,25 +61,6 @@ public interface PayOrderService {
      * @return 支付订单列表
      */
     List<PayOrderDO> getOrderList(PayOrderExportReqVO exportReqVO);
-
-    /**
-     * 获得支付订单列表
-     *
-     * @param ids 订单 ID 集合
-     * @return 支付订单列表
-     */
-    List<PayOrderDO> getOrderList(Collection<Long> ids);
-
-    /**
-     * 获得支付订单 Map
-     *
-     * @param ids 订单 ID 集合
-     * @return 支付订单 Map 集合
-     */
-    default Map<Long, PayOrderDO> getOrderSubjectMap(Collection<Long> ids) {
-        List<PayOrderDO> list = getOrderList(ids);
-        return CollectionUtils.convertMap(list, PayOrderDO::getId);
-    }
 
     /**
      * 创建支付单

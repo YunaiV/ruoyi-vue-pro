@@ -78,7 +78,7 @@
             <el-tag size="mini">商户</el-tag> {{scope.row.merchantRefundId}}
           </p>
           <p class="order-font">
-            <el-tag size="mini" type="warning">支付</el-tag> {{scope.row.no}}
+            <el-tag size="mini" type="warning">退款</el-tag> {{scope.row.no}}
           </p>
           <p class="order-font" v-if="scope.row.channelRefundNo">
             <el-tag size="mini" type="success">渠道</el-tag> {{scope.row.channelRefundNo}}
@@ -110,6 +110,11 @@
           <span>{{ parseTime(scope.row.successTime) }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="支付应用" align="center" prop="successTime" width="100">
+        <template v-slot="scope">
+          <span>{{ scope.row.appName }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" fixed="right" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-search" @click="handleQueryDetails(scope.row)"
@@ -122,64 +127,75 @@
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
 
-    <!-- 对话框(添加 / 修改) -->
+    <!-- 对话框(详情) -->
     <el-dialog title="退款订单详情" :visible.sync="open" width="700px" append-to-body>
       <el-descriptions :column="2" label-class-name="desc-label">
-        <el-descriptions-item label="应用名称">{{ refundDetail.appName }}</el-descriptions-item>
-        <el-descriptions-item label="商品名称">{{ refundDetail.subject }}</el-descriptions-item>
-      </el-descriptions>
-      <el-divider></el-divider>
-      <el-descriptions :column="2" label-class-name="desc-label">
         <el-descriptions-item label="商户退款单号">
-          <el-tag  size="mini">{{ refundDetail.merchantRefundNo }}</el-tag>
+          <el-tag size="small">{{ refundDetail.merchantRefundId }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="商户订单号">{{ refundDetail.merchantOrderId }}</el-descriptions-item>
-        <el-descriptions-item label="交易订单号">{{ refundDetail.tradeNo }}</el-descriptions-item>
+        <el-descriptions-item label="渠道退款单号">
+          <el-tag type="success" size="small" v-if="refundDetail.channelRefundNo">{{ refundDetail.channelRefundNo }}</el-tag>
+        </el-descriptions-item>
       </el-descriptions>
-      <el-divider></el-divider>
+      <el-descriptions :column="2" label-class-name="desc-label">
+        <el-descriptions-item label="商户支付单号">
+          <el-tag size="small">{{ refundDetail.merchantOrderId }}</el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item label="渠道支付单号">
+          <el-tag type="success" size="small">{{ refundDetail.channelOrderNo }}</el-tag>
+        </el-descriptions-item>
+      </el-descriptions>
+      <el-descriptions :column="2" label-class-name="desc-label">
+        <el-descriptions-item label="应用编号">{{ refundDetail.appId }}</el-descriptions-item>
+        <el-descriptions-item label="应用名称">{{ refundDetail.appName }}</el-descriptions-item>
+      </el-descriptions>
       <el-descriptions :column="2" label-class-name="desc-label">
         <el-descriptions-item label="支付金额">
-          {{ parseFloat(refundDetail.payPrice / 100).toFixed(2) }}
+          <el-tag type="success" size="small">￥{{ (refundDetail.payPrice / 100.0).toFixed(2) }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="退款金额" size="mini">
-          <el-tag class="tag-purple" size="mini">{{ parseFloat(refundDetail.refundPrice / 100).toFixed(2) }}</el-tag>
+        <el-descriptions-item label="退款金额">
+          <el-tag size="mini" type="danger">￥{{ (refundDetail.refundPrice / 100.0).toFixed(2) }}</el-tag>
         </el-descriptions-item>
+      </el-descriptions>
+      <el-descriptions :column="2" label-class-name="desc-label">
         <el-descriptions-item label="退款状态">
           <dict-tag :type="DICT_TYPE.PAY_REFUND_STATUS" :value="refundDetail.status" />
         </el-descriptions-item>
+        <el-descriptions-item label="退款时间">{{ parseTime(refundDetail.successTime) }}</el-descriptions-item>
+      </el-descriptions>
+      <el-descriptions :column="2" label-class-name="desc-label">
         <el-descriptions-item label="创建时间">{{ parseTime(refundDetail.createTime) }}</el-descriptions-item>
-        <el-descriptions-item label="退款成功时间">{{ parseTime(refundDetail.successTime) }}</el-descriptions-item>
-        <el-descriptions-item label="退款失效时间">{{ parseTime(refundDetail.expireTime) }}</el-descriptions-item>
         <el-descriptions-item label="更新时间">{{ parseTime(refundDetail.updateTime) }}</el-descriptions-item>
       </el-descriptions>
-      <el-divider></el-divider>
+      <!-- 分割线 -->
+      <el-divider />
       <el-descriptions :column="2" label-class-name="desc-label">
-        <el-descriptions-item label="支付渠道">
-          {{ refundDetail.channelCodeName }}
+        <el-descriptions-item label="退款渠道">
+          <dict-tag :type="DICT_TYPE.PAY_CHANNEL_CODE" :value="refundDetail.channelCode" />
         </el-descriptions-item>
-        <el-descriptions-item label="支付IP" size="mini">
-          {{refundDetail.userIp}}
-        </el-descriptions-item>
-        <el-descriptions-item label="回调地址">{{ refundDetail.notifyUrl }}</el-descriptions-item>
+        <el-descriptions-item label="退款原因">{{ refundDetail.reason }}</el-descriptions-item>
       </el-descriptions>
+      <el-descriptions :column="2" label-class-name="desc-label">
+        <el-descriptions-item label="退款 IP">{{ refundDetail.userIp }}</el-descriptions-item>
+        <el-descriptions-item label="通知 URL">{{ refundDetail.notifyUrl }}</el-descriptions-item>
+      </el-descriptions>
+      <!-- 分割线 -->
       <el-divider></el-divider>
       <el-descriptions :column="2" label-class-name="desc-label">
-        <el-descriptions-item label="渠道订单号">{{ refundDetail.channelOrderNo }}</el-descriptions-item>
-        <el-descriptions-item label="渠道退款单号">{{ refundDetail.channelRefundNo }}</el-descriptions-item>
         <el-descriptions-item label="渠道错误码">{{refundDetail.channelErrorCode}}</el-descriptions-item>
         <el-descriptions-item label="渠道错误码描述">{{refundDetail.channelErrorMsg}}</el-descriptions-item>
       </el-descriptions>
-      <br>
       <el-descriptions :column="1" label-class-name="desc-label" direction="vertical" border>
-        <el-descriptions-item label="渠道额外参数">{{ refundDetail.channelExtras }}</el-descriptions-item>
-        <el-descriptions-item label="退款原因">{{ refundDetail.reason }}</el-descriptions-item>
+        <el-descriptions-item label="支付通道异步回调内容">
+          {{ refundDetail.channelNotifyData }}
+        </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import {getRefundPage, exportRefundExcel, getRefund} from "@/api/pay/refund";
+import { getRefundPage, exportRefundExcel, getRefund } from "@/api/pay/refund";
 import { getAppList } from "@/api/pay/app";
 
 export default {
@@ -213,7 +229,7 @@ export default {
         createTime: []
       },
       // 支付应用列表集合
-      appList: null,
+      appList: [],
       // 退款订单详情
       refundDetail: {},
     };
@@ -263,9 +279,7 @@ export default {
         this.$download.excel(response, '退款订单.xls');
       }).catch(() => {});
     },
-    /**
-     * 查看订单详情
-     */
+    /** 详情按钮操作 */
     handleQueryDetails(row) {
       this.refundDetail = {};
       getRefund(row.id).then(response => {

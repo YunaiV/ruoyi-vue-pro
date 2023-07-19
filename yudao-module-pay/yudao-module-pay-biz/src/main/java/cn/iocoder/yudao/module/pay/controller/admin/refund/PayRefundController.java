@@ -1,16 +1,13 @@
 package cn.iocoder.yudao.module.pay.controller.admin.refund;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.*;
 import cn.iocoder.yudao.module.pay.convert.refund.PayRefundConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
-import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
@@ -62,8 +59,7 @@ public class PayRefundController {
 
         // 拼接数据
         PayAppDO app = appService.getApp(refund.getAppId());
-        PayOrderDO order = orderService.getOrder(refund.getOrderId());
-        return success(PayRefundConvert.INSTANCE.convert(refund, order, app));
+        return success(PayRefundConvert.INSTANCE.convert(refund, app));
     }
 
     @GetMapping("/page")
@@ -93,29 +89,11 @@ public class PayRefundController {
             return;
         }
 
-        // 处理应用ID数据
-        Map<Long, PayAppDO> appMap = appService.getAppMap(
-                convertList(list, PayRefundDO::getAppId));
-
-        List<PayRefundExcelVO> excelDatum = new ArrayList<>(list.size());
-        // 处理商品名称数据
-        Map<Long, PayOrderDO> orderMap = orderService.getOrderSubjectMap(
-                convertList(list, PayRefundDO::getOrderId));
-
-        list.forEach(c -> {
-            PayAppDO appDO = appMap.get(c.getAppId());
-            PayChannelEnum channelEnum = PayChannelEnum.getByCode(c.getChannelCode());
-
-            PayRefundExcelVO excelItem = PayRefundConvert.INSTANCE.excelConvert(c);
-            excelItem.setAppName(ObjectUtil.isNotNull(appDO) ? appDO.getName() : "未知应用");
-            excelItem.setChannelCodeName(ObjectUtil.isNotNull(channelEnum) ? channelEnum.getName() : "未知渠道");
-            excelItem.setSubject(orderMap.get(c.getOrderId()).getSubject());
-
-            excelDatum.add(excelItem);
-        });
-
+        // 拼接返回
+        Map<Long, PayAppDO> appMap = appService.getAppMap(convertList(list, PayRefundDO::getAppId));
+        List<PayRefundExcelVO> excelList = PayRefundConvert.INSTANCE.convertList(list, appMap);
         // 导出 Excel
-        ExcelUtils.write(response, "退款订单.xls", "数据", PayRefundExcelVO.class, excelDatum);
+        ExcelUtils.write(response, "退款订单.xls", "数据", PayRefundExcelVO.class, excelList);
     }
 
 }
