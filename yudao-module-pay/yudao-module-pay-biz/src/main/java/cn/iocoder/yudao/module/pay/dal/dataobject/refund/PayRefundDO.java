@@ -140,7 +140,7 @@ public class PayRefundDO extends BaseDO {
      */
     private String channelErrorCode;
     /**
-     * 调用渠道报错时，错误信息
+     * 调用渠道的错误提示
      */
     private String channelErrorMsg;
 

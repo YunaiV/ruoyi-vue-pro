@@ -91,7 +91,7 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
         PayRefundPageReqVO reqVO = new PayRefundPageReqVO();
         reqVO.setAppId(1L);
         reqVO.setChannelCode(PayChannelEnum.WX_PUB.getCode());
-        reqVO.setMerchantRefundNo("MRF0000001");
+        reqVO.setMerchantRefundId("MRF0000001");
         reqVO.setStatus(PayRefundStatusEnum.SUCCESS.getStatus());
         reqVO.setCreateTime((new LocalDateTime[]{LocalDateTime.of(2021, 1, 1, 10, 10, 10), LocalDateTime.of(2021, 1, 1, 10, 10, 12)}));
 
@@ -145,7 +145,6 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
         PayRefundExportReqVO reqVO = new PayRefundExportReqVO();
         reqVO.setAppId(1L);
         reqVO.setChannelCode(PayChannelEnum.WX_PUB.getCode());
-        reqVO.setMerchantRefundNo("MRF0000001");
         reqVO.setStatus(PayRefundStatusEnum.SUCCESS.getStatus());
         reqVO.setCreateTime((new LocalDateTime[]{LocalDateTime.of(2021, 1, 1, 10, 10, 10), LocalDateTime.of(2021, 1, 1, 10, 10, 12)}));
 

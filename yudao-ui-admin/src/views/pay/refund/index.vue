@@ -7,25 +7,30 @@
           <el-option v-for="item in appList" :key="item.id" :label="item.name" :value="item.id" />
         </el-select>
       </el-form-item>
-      <el-form-item label="渠道编码" prop="channelCode">
-        <el-select v-model="queryParams.channelCode" placeholder="请输入渠道编码" clearable
-                   @clear="()=>{queryParams.channelCode = null}">
-          <el-option v-for="dict in payChannelCodeDictDatum" :key="dict.value" :label="dict.label" :value="dict.value"/>
+      <el-form-item label="退款渠道" prop="channelCode">
+        <el-select v-model="queryParams.channelCode" placeholder="请选择退款渠道" clearable>
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.PAY_CHANNEL_CODE)" :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="退款类型" prop="type">
-        <el-select v-model="queryParams.type" placeholder="请选择退款类型" clearable>
-          <el-option v-for="dict in payRefundOrderTypeDictDatum" :key="parseInt(dict.value)"
-                     :label="dict.label" :value="parseInt(dict.value)"/>
-        </el-select>
+      <el-form-item label="商户支付单号" prop="merchantOrderId">
+        <el-input v-model="queryParams.merchantOrderId" placeholder="请输入商户支付单号" clearable
+                  @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="商户退款订单号" prop="merchantRefundNo">
-        <el-input v-model="queryParams.merchantRefundNo" placeholder="请输入商户退款订单号" clearable
+      <el-form-item label="商户退款单号" prop="merchantRefundId">
+        <el-input v-model="queryParams.merchantRefundId" placeholder="请输入商户退款单号" clearable
+                  @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="渠道支付单号" prop="channelOrderNo">
+        <el-input v-model="queryParams.channelOrderNo" placeholder="请输入渠道支付单号" clearable
+                  @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="渠道退款单号" prop="channelRefundNo">
+        <el-input v-model="queryParams.channelRefundNo" placeholder="请输入渠道退款单号" clearable
                   @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="退款状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择退款状态" clearable>
-          <el-option v-for="dict in payRefundOrderDictDatum" :key="parseInt(dict.value)"
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.PAY_REFUND_STATUS)" :key="parseInt(dict.value)"
                      :label="dict.label" :value="parseInt(dict.value)"/>
         </el-select>
       </el-form-item>
@@ -52,65 +57,55 @@
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
       <el-table-column label="编号" align="center" prop="id"/>
-      <el-table-column label="支付渠道" align="center" width="130">
-        <template v-slot="scope">
-          <el-popover trigger="hover" placement="top">
-            <p>应用名称: {{ scope.row.appName }}</p>
-            <p>渠道名称: {{ scope.row.channelCodeName }}</p>
-            <div slot="reference" class="name-wrapper">
-              {{ scope.row.channelCodeName }}
-            </div>
-          </el-popover>
-        </template>
-      </el-table-column>
-      <!--      <el-table-column label="交易订单号" align="center" prop="tradeNo" width="140"/>-->
-      <!--      <el-table-column label="商户订单编号" align="center" prop="merchantOrderId" width="140"/>-->
-      <el-table-column label="商户订单号" align="left" width="230">
-        <template v-slot="scope">
-          <p class="order-font">
-            <el-tag size="mini">退款</el-tag>
-            {{ scope.row.merchantRefundNo }}
-          </p>
-          <p class="order-font">
-            <el-tag type="success">交易</el-tag>
-            {{ scope.row.merchantOrderId }}
-          </p>
-        </template>
-      </el-table-column>
-      <el-table-column label="支付订单号" align="center" prop="merchantRefundNo" width="250">
-        <template v-slot="scope">
-          <p class="order-font">
-            <el-tag size="mini">交易</el-tag>
-            {{ scope.row.tradeNo }}
-          </p>
-          <p class="order-font">
-            <el-tag size="mini" type="warning">渠道</el-tag>
-            {{ scope.row.channelOrderNo }}
-          </p>
-        </template>
-      </el-table-column>
-      <el-table-column label="支付金额(元)" align="center" prop="payPrice" width="100">
-        <template v-slot="scope" class="">
-          ￥{{ parseFloat(scope.row.payPrice / 100).toFixed(2) }}
-        </template>
-      </el-table-column>
-      <el-table-column label="退款金额(元)" align="center" prop="refundPrice" width="100">
-        <template v-slot="scope">
-          ￥{{ parseFloat(scope.row.refundPrice / 100).toFixed(2) }}
-        </template>
-      </el-table-column>
-      <el-table-column label="退款状态" align="center" prop="status">
-        <template v-slot="scope">
-          <dict-tag :type="DICT_TYPE.PAY_REFUND_ORDER_STATUS" :value="scope.row.status" />
-        </template>
-      </el-table-column>
-      <el-table-column label="退款原因" align="center" prop="reason" width="140" :show-overflow-tooltip="true"/>
-      <el-table-column label="创建时间" align="center" prop="createTime" width="100">
+      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="退款成功时间" align="center" prop="successTime" width="100">
+      <el-table-column label="支付金额" align="center" prop="payPrice" width="100">
+        <template v-slot="scope" class="">
+          ￥{{ (scope.row.payPrice / 100.0).toFixed(2) }}
+        </template>
+      </el-table-column>
+      <el-table-column label="退款金额" align="center" prop="refundPrice" width="100">
+        <template v-slot="scope">
+          ￥{{ (scope.row.refundPrice / 100.0).toFixed(2) }}
+        </template>
+      </el-table-column>
+      <el-table-column label="退款订单号" align="left" width="300">
+        <template v-slot="scope">
+          <p class="order-font">
+            <el-tag size="mini">商户</el-tag> {{scope.row.merchantRefundId}}
+          </p>
+          <p class="order-font">
+            <el-tag size="mini" type="warning">支付</el-tag> {{scope.row.no}}
+          </p>
+          <p class="order-font" v-if="scope.row.channelRefundNo">
+            <el-tag size="mini" type="success">渠道</el-tag> {{scope.row.channelRefundNo}}
+          </p>
+        </template>
+      </el-table-column>
+      <el-table-column label="支付订单号" align="left" width="300">
+        <template v-slot="scope">
+          <p class="order-font">
+            <el-tag size="mini">商户</el-tag> {{scope.row.merchantOrderId}}
+          </p>
+          <p class="order-font">
+            <el-tag size="mini" type="success">渠道</el-tag> {{scope.row.channelOrderNo}}
+          </p>
+        </template>
+      </el-table-column>
+      <el-table-column label="退款状态" align="center" prop="status">
+        <template v-slot="scope">
+          <dict-tag :type="DICT_TYPE.PAY_REFUND_STATUS" :value="scope.row.status" />
+        </template>
+      </el-table-column>
+      <el-table-column label="退款渠道" align="center" width="140">
+        <template v-slot="scope">
+          <dict-tag :type="DICT_TYPE.PAY_CHANNEL_CODE" :value="scope.row.channelCode" />
+        </template>
+      </el-table-column>
+      <el-table-column label="成功时间" align="center" prop="successTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.successTime) }}</span>
         </template>
@@ -150,7 +145,7 @@
           <el-tag class="tag-purple" size="mini">{{ parseFloat(refundDetail.refundPrice / 100).toFixed(2) }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="退款状态">
-          <dict-tag :type="DICT_TYPE.PAY_REFUND_ORDER_STATUS" :value="refundDetail.status" />
+          <dict-tag :type="DICT_TYPE.PAY_REFUND_STATUS" :value="refundDetail.status" />
         </el-descriptions-item>
         <el-descriptions-item label="创建时间">{{ parseTime(refundDetail.createTime) }}</el-descriptions-item>
         <el-descriptions-item label="退款成功时间">{{ parseTime(refundDetail.successTime) }}</el-descriptions-item>
@@ -185,37 +180,7 @@
 
 <script>
 import {getRefundPage, exportRefundExcel, getRefund} from "@/api/pay/refund";
-import { DICT_TYPE, getDictDatas } from "@/utils/dict";
-import { getNowDateTime } from "@/utils/ruoyi";
-
-const defaultRefundDetail = {
-  id: null,
-  appId: null,
-  appName: '',
-  channelCode: '',
-  channelCodeName: '',
-  channelErrorCode: '',
-  channelErrorMsg: '',
-  channelExtras: '',
-  channelId: null,
-  channelOrderNo: '',
-  channelRefundNo: '',
-  createTime: null,
-  expireTime: null,
-  merchantOrderId: '',
-  merchantRefundNo: '',
-  notifyUrl: '',
-  orderId: null,
-  payPrice: null,
-  reason: '',
-  refundPrice: null,
-  status: null,
-  subject: '',
-  successTime: null,
-  tradeNo: '',
-  type: null,
-  userIp: ''
-}
+import { getAppList } from "@/api/pay/app";
 
 export default {
   name: "PayRefund",
@@ -239,67 +204,30 @@ export default {
         pageNo: 1,
         pageSize: 10,
         appId: null,
-        channelId: null,
         channelCode: null,
-        orderId: null,
-        tradeNo: null,
         merchantOrderId: null,
-        merchantRefundNo: null,
-        notifyUrl: null,
-        status: null,
-        type: null,
-        payPrice: null,
-        refundPrice: null,
-        reason: null,
-        userIp: null,
+        merchantRefundId: null,
         channelOrderNo: null,
         channelRefundNo: null,
-        channelErrorCode: null,
-        channelErrorMsg: null,
-        channelExtras: null,
-        expireTime: [],
-        successTime: [],
+        status: null,
         createTime: []
       },
-      // 商户加载遮罩层
-      merchantLoading: false,
-      // 商户列表集合
-      merchantList: null,
       // 支付应用列表集合
       appList: null,
-      // 支付渠道编码字典数据集合
-      payChannelCodeDictDatum: getDictDatas(DICT_TYPE.PAY_CHANNEL_CODE),
-      // 订单退款状态字典数据集合
-      payRefundOrderDictDatum: getDictDatas(DICT_TYPE.PAY_REFUND_ORDER_STATUS),
-      // 订单回调商户状态字典数据集合
-      payOrderNotifyDictDatum: getDictDatas(DICT_TYPE.PAY_NOTIFY_STATUS),
       // 退款订单详情
-      refundDetail: JSON.parse(JSON.stringify(defaultRefundDetail)),
+      refundDetail: {},
     };
   },
   created() {
-    this.initTime();
     this.getList();
-    this.handleGetMerchantListByName(null);
+    // 获得筛选项
+    getAppList().then(response => {
+      this.appList = response.data;
+    })
   },
   methods: {
-    initTime(){
-      this.queryParams.createTime = [getNowDateTime("00:00:00"), getNowDateTime("23:59:59")];
-    },
     /** 查询列表 */
     getList() {
-      // 判断选择的日期是否超过了一个月
-      let oneMonthTime = 31 * 24 * 3600 * 1000;
-      if (this.queryParams.createTime == null){
-        this.initTime();
-      } else {
-        let minDateTime = new Date(this.queryParams.createTime[0]).getTime();
-        let maxDateTime = new Date(this.queryParams.createTime[1]).getTime()
-        if (maxDateTime - minDateTime > oneMonthTime) {
-          this.$message.error('时间范围最大为 31 天！');
-          return false;
-        }
-      }
       this.loading = true;
       // 执行查询
       getRefundPage(this.queryParams).then(response => {
@@ -336,25 +264,14 @@ export default {
       }).catch(() => {});
     },
     /**
-     * 根据商户名称模糊匹配商户信息
-     * @param name 商户名称
-     */
-    handleGetMerchantListByName(name) {
-      getMerchantListByName(name).then(response => {
-        this.merchantList = response.data;
-        this.merchantLoading = false;
-      });
-    },
-    /**
      * 查看订单详情
      */
     handleQueryDetails(row) {
-      this.refundDetail = JSON.parse(JSON.stringify(defaultRefundDetail));
+      this.refundDetail = {};
       getRefund(row.id).then(response => {
         this.refundDetail = response.data;
         this.open = true;
       });
-
     },
   }
 };
