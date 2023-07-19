@@ -56,31 +56,20 @@ public class PayOrderController {
         return success(PayOrderConvert.INSTANCE.convert(payOrderService.getOrder(id)));
     }
 
-    // TODO 芋艿：看看怎么优化下；
     @GetMapping("/get-detail")
     @Operation(summary = "获得支付订单详情")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('pay:order:query')")
     public CommonResult<PayOrderDetailsRespVO> getOrderDetail(@RequestParam("id") Long id) {
         PayOrderDO order = payOrderService.getOrder(id);
-        if (ObjectUtil.isNull(order)) {
-            return success(new PayOrderDetailsRespVO());
+        if (order == null) {
+            return success(null);
         }
 
-        PayAppDO appDO = appService.getApp(order.getAppId());
-        PayChannelEnum channelEnum = PayChannelEnum.getByCode(order.getChannelCode());
-
-        // TODO @aquan：文案，都是前端 format；
-        PayOrderDetailsRespVO respVO = PayOrderConvert.INSTANCE.orderDetailConvert(order);
-        respVO.setAppName(ObjectUtil.isNotNull(appDO) ? appDO.getName() : "未知应用");
-        respVO.setChannelCodeName(ObjectUtil.isNotNull(channelEnum) ? channelEnum.getName() : "未知渠道");
-
-        PayOrderExtensionDO extensionDO = orderExtensionService.getOrderExtension(order.getSuccessExtensionId());
-        if (ObjectUtil.isNotNull(extensionDO)) {
-            respVO.setPayOrderExtension(PayOrderConvert.INSTANCE.orderDetailExtensionConvert(extensionDO));
-        }
-
-        return success(respVO);
+        // 拼接返回
+        PayAppDO app = appService.getApp(order.getAppId());
+        PayOrderExtensionDO orderExtension = orderExtensionService.getOrderExtension(order.getSuccessExtensionId());
+        return success(PayOrderConvert.INSTANCE.convert(order, orderExtension, app));
     }
 
     @PostMapping("/submit")
@@ -90,6 +79,7 @@ public class PayOrderController {
         return success(respVO);
     }
 
+    // TODO 芋艿：优化
     @GetMapping("/page")
     @Operation(summary = "获得支付订单分页")
     @PreAuthorize("@ss.hasPermission('pay:order:query')")
@@ -116,6 +106,7 @@ public class PayOrderController {
         return success(new PageResult<>(pageList, pageResult.getTotal()));
     }
 
+    // TODO 芋艿：优化
     @GetMapping("/export-excel")
     @Operation(summary = "导出支付订单Excel")
     @PreAuthorize("@ss.hasPermission('pay:order:export')")

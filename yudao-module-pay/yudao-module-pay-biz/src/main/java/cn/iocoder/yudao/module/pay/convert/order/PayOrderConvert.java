@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.*;
 import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitRespVO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 import org.mapstruct.Mapper;
@@ -30,9 +31,16 @@ public interface PayOrderConvert {
 
     PayOrderRespDTO convert2(PayOrderDO order);
 
-    PayOrderDetailsRespVO orderDetailConvert(PayOrderDO bean);
-
-    PayOrderDetailsRespVO.PayOrderExtension orderDetailExtensionConvert(PayOrderExtensionDO bean);
+    default PayOrderDetailsRespVO convert(PayOrderDO order, PayOrderExtensionDO orderExtension, PayAppDO app) {
+        PayOrderDetailsRespVO respVO = convertDetail(order);
+        respVO.setExtension(convert(orderExtension));
+        if (app != null) {
+            respVO.setAppName(app.getName());
+        }
+        return respVO;
+    }
+    PayOrderDetailsRespVO convertDetail(PayOrderDO bean);
+    PayOrderDetailsRespVO.PayOrderExtension convert(PayOrderExtensionDO bean);
 
     List<PayOrderRespVO> convertList(List<PayOrderDO> list);
 

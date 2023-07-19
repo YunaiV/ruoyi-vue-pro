@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.pay.config.PayProperties;
@@ -161,7 +162,7 @@ public class PayOrderServiceImpl implements PayOrderService {
 
         // 4. 如果调用直接支付成功，则直接更新支付单状态为成功。例如说：付款码支付，免密支付时，就直接验证支付成功
         if (unifiedOrderResp != null) {
-            notifyPayOrder(channel, unifiedOrderResp);
+            getSelf().notifyPayOrder(channel, unifiedOrderResp);
             // 如有渠道错误码，则抛出业务异常，提示用户
             if (StrUtil.isNotEmpty(unifiedOrderResp.getChannelErrorCode())) {
                 throw exception(ORDER_SUBMIT_CHANNEL_ERROR, unifiedOrderResp.getChannelErrorCode(),
@@ -234,11 +235,17 @@ public class PayOrderServiceImpl implements PayOrderService {
         // 校验支付渠道是否有效
         PayChannelDO channel = channelService.validPayChannel(channelId);
         // 更新支付订单为已支付
-        TenantUtils.execute(channel.getTenantId(), () -> notifyPayOrder(channel, notify));
+        TenantUtils.execute(channel.getTenantId(), () -> getSelf().notifyPayOrder(channel, notify));
     }
 
-    // TODO 芋艿：事务问题
-    private void notifyPayOrder(PayChannelDO channel, PayOrderRespDTO notify) {
+    /**
+     * 通知并更新订单的支付结果
+     *
+     * @param channel 支付渠道
+     * @param notify 通知
+     */
+    @Transactional(rollbackFor = Exception.class) // 注意，如果是方法内调用该方法，需要通过 getSelf().notifyPayOrder(channel, notify) 调用，否则事务不生效
+    public void notifyPayOrder(PayChannelDO channel, PayOrderRespDTO notify) {
         // 情况一：支付成功的回调
         if (PayOrderStatusRespEnum.isSuccess(notify.getStatus())) {
             notifyOrderSuccess(channel, notify);
@@ -394,6 +401,15 @@ public class PayOrderServiceImpl implements PayOrderService {
         if (updateCount == 0) {
             throw exception(ORDER_STATUS_IS_NOT_SUCCESS);
         }
+    }
+
+    /**
+     * 获得自身的代理对象，解决 AOP 生效问题
+     *
+     * @return 自己
+     */
+    private PayOrderServiceImpl getSelf() {
+        return SpringUtil.getBean(getClass());
     }
 
 }

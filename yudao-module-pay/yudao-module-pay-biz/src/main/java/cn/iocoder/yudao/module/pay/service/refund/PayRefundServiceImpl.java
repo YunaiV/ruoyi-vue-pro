@@ -137,7 +137,7 @@ public class PayRefundServiceImpl implements PayRefundService {
                 .setOutRefundNo(refund.getNo())
                 .setNotifyUrl(genChannelRefundNotifyUrl(channel))
                 .setReason(reqDTO.getReason());
-        PayRefundRespDTO refundRespDTO = client.unifiedRefund(unifiedReqDTO); // TODO 增加一个 channelErrorCode、channelErrorMsg 字段
+        PayRefundRespDTO refundRespDTO = client.unifiedRefund(unifiedReqDTO);
         // 2.3 处理退款返回
         notifyRefund(channel, refundRespDTO);
 
