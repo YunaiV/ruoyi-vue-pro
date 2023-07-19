@@ -21,16 +21,13 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.refund.PayRefundMapper;
 import cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants;
-import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
-import cn.iocoder.yudao.module.pay.enums.order.PayOrderRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
 import cn.iocoder.yudao.module.pay.service.notify.dto.PayNotifyTaskCreateReqDTO;
-import cn.iocoder.yudao.module.pay.service.order.PayOrderExtensionService;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -66,8 +63,6 @@ public class PayRefundServiceImpl implements PayRefundService {
 
     @Resource
     private PayOrderService orderService;
-    @Resource
-    private PayOrderExtensionService orderExtensionService;
     @Resource
     private PayAppService appService;
     @Resource
@@ -121,7 +116,7 @@ public class PayRefundServiceImpl implements PayRefundService {
                 .setNo(generateRefundNo()).setOrderId(order.getId())
                 .setChannelId(order.getChannelId()).setChannelCode(order.getChannelCode())
                 // 商户相关的字段
-                .setNotifyUrl(app.getRefundNotifyUrl()).setNotifyStatus(PayNotifyStatusEnum.WAITING.getStatus())
+                .setNotifyUrl(app.getRefundNotifyUrl())
                 // 渠道相关字段
                 .setChannelOrderNo(order.getChannelOrderNo())
                 // 退款相关字段
@@ -129,7 +124,7 @@ public class PayRefundServiceImpl implements PayRefundService {
                 .setPayPrice(order.getPrice()).setRefundPrice(reqDTO.getPrice());
         refundMapper.insert(refund);
         // 2.2 向渠道发起退款申请
-        PayOrderExtensionDO orderExtension = orderExtensionService.getOrderExtension(order.getSuccessExtensionId());
+        PayOrderExtensionDO orderExtension = orderService.getOrderExtension(order.getExtensionId());
         PayRefundUnifiedReqDTO unifiedReqDTO = new PayRefundUnifiedReqDTO()
                 .setPayPrice(order.getPrice())
                 .setRefundPrice(reqDTO.getPrice())
@@ -161,10 +156,6 @@ public class PayRefundServiceImpl implements PayRefundService {
             throw exception(ErrorCodeConstants.ORDER_STATUS_IS_NOT_SUCCESS);
         }
 
-        // 是否已经全额退款
-        if (PayOrderRefundStatusEnum.ALL.getStatus().equals(order.getRefundStatus())) {
-            throw exception(ErrorCodeConstants.REFUND_ALL_REFUNDED);
-        }
         // 校验金额 退款金额不能大于原定的金额
         if (reqDTO.getPrice() + order.getRefundPrice() > order.getPrice()){
             throw exception(ErrorCodeConstants.REFUND_PRICE_EXCEED);

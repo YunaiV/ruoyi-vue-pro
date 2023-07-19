@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.pay.enums.order;
 
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -17,7 +18,8 @@ public enum PayOrderStatusEnum implements IntArrayValuable {
 
     WAITING(0, "未支付"),
     SUCCESS(10, "支付成功"),
-    CLOSED(20, "支付关闭"), // 未付款交易超时关闭，或支付完成后全额退款
+    REFUND(20, "已退款"),
+    CLOSED(30, "支付关闭"), // 注意：全部退款后，还是 REFUND 状态
     ;
 
     private final Integer status;
@@ -36,6 +38,17 @@ public enum PayOrderStatusEnum implements IntArrayValuable {
      */
     public static boolean isSuccess(Integer status) {
         return Objects.equals(status, SUCCESS.getStatus());
+    }
+
+    /**
+     * 判断是否支付成功或者已退款
+     *
+     * @param status 状态
+     * @return 是否支付成功或者已退款
+     */
+    public static boolean isSuccessOrRefund(Integer status) {
+        return ObjectUtils.equalsAny(status,
+                SUCCESS.getStatus(), REFUND.getStatus());
     }
 
     /**

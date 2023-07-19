@@ -41,9 +41,6 @@ public class PayRefundPageReqVO extends PageParam {
     @Schema(description = "异步通知商户地址")
     private String notifyUrl;
 
-    @Schema(description = "通知商户退款结果的回调状态")
-    private Integer notifyStatus;
-
     @Schema(description = "退款状态")
     private Integer status;
 
@@ -84,10 +81,6 @@ public class PayRefundPageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @Schema(description = "退款成功时间")
     private LocalDateTime[] successTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @Schema(description = "退款通知时间")
-    private LocalDateTime[] notifyTime;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @Schema(description = "创建时间")

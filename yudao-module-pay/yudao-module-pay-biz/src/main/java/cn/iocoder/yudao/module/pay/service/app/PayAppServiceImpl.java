@@ -100,6 +100,11 @@ public class PayAppServiceImpl implements PayAppService {
     }
 
     @Override
+    public List<PayAppDO> getAppList() {
+         return appMapper.selectList();
+    }
+
+    @Override
     public PageResult<PayAppDO> getAppPage(PayAppPageReqVO pageReqVO) {
         return appMapper.selectPage(pageReqVO);
     }

@@ -130,6 +130,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
         // 1. 解析回调
         WxPayOrderNotifyResult response = client.parseOrderNotifyResult(body);
         // 2. 构建结果
+        // 微信支付的回调，只有 SUCCESS 支付成功、CLOSED 支付失败两种情况，无需像支付宝一样解析的比较复杂
         Integer status = Objects.equals(response.getResultCode(), "SUCCESS") ?
                 PayOrderStatusRespEnum.SUCCESS.getStatus() : PayOrderStatusRespEnum.CLOSED.getStatus();
         return new PayOrderRespDTO(status, response.getTransactionId(), response.getOpenid(), parseDateV2(response.getTimeEnd()),
@@ -141,6 +142,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
         WxPayOrderNotifyV3Result response = client.parseOrderNotifyV3Result(body, null);
         WxPayOrderNotifyV3Result.DecryptNotifyResult result = response.getResult();
         // 2. 构建结果
+        // 微信支付的回调，只有 SUCCESS 支付成功、CLOSED 支付失败两种情况，无需像支付宝一样解析的比较复杂
         Integer status = Objects.equals(result.getTradeState(), "SUCCESS") ?
                 PayOrderStatusRespEnum.SUCCESS.getStatus() : PayOrderStatusRespEnum.CLOSED.getStatus();
         String openid = result.getPayer() != null ? result.getPayer().getOpenid() : null;

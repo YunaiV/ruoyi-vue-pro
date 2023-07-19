@@ -47,10 +47,6 @@ public class PayRefundBaseVO {
     @NotNull(message = "异步通知商户地址不能为空")
     private String notifyUrl;
 
-    @Schema(description = "通知商户退款结果的回调状态", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "通知商户退款结果的回调状态不能为空")
-    private Integer notifyStatus;
-
     @Schema(description = "退款状态", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "退款状态不能为空")
     private Integer status;
@@ -97,9 +93,5 @@ public class PayRefundBaseVO {
     @Schema(description = "退款成功时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime successTime;
-
-    @Schema(description = "退款通知时间")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime notifyTime;
 
 }

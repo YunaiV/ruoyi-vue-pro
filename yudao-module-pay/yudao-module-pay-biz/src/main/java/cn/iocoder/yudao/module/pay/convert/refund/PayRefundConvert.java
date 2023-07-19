@@ -62,7 +62,6 @@ public interface PayRefundConvert {
         // TODO 芋艿：晚点在改
 //        payRefundExcelVO.setMerchantRefundNo(bean.getMerchantRefundNo());
         payRefundExcelVO.setNotifyUrl(bean.getNotifyUrl());
-        payRefundExcelVO.setNotifyStatus(bean.getNotifyStatus());
         payRefundExcelVO.setStatus(bean.getStatus());
         payRefundExcelVO.setReason(bean.getReason());
         payRefundExcelVO.setUserIp(bean.getUserIp());

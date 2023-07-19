@@ -36,9 +36,6 @@ public class PayRefundExportReqVO {
     @Schema(description = "异步通知商户地址")
     private String notifyUrl;
 
-    @Schema(description = "通知商户退款结果的回调状态")
-    private Integer notifyStatus;
-
     @Schema(description = "退款状态")
     private Integer status;
 

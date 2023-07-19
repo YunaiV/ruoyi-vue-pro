@@ -50,7 +50,7 @@ public class AlipayQrPayClient extends AbstractAlipayPayClient {
         if (!response.isSuccess()) {
             return buildClosedPayOrderRespDTO(reqDTO, response);
         }
-        return new PayOrderRespDTO(displayMode, response.getQrCode(),
+        return PayOrderRespDTO.waitingOf(displayMode, response.getQrCode(),
                 reqDTO.getOutTradeNo(), response);
     }
 

@@ -29,12 +29,6 @@
                      :label="dict.label" :value="parseInt(dict.value)"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="退款回调状态" prop="notifyStatus">
-        <el-select v-model="queryParams.notifyStatus" placeholder="请选择通知商户退款结果的回调状态" clearable>
-          <el-option v-for="dict in payOrderNotifyDictDatum" :key="parseInt(dict.value)"
-                     :label="dict.label" :value="parseInt(dict.value)"/>
-        </el-select>
-      </el-form-item>
       <el-form-item label="创建时间" prop="createTime">
         <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
                         range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
@@ -105,19 +99,9 @@
           ￥{{ parseFloat(scope.row.refundPrice / 100).toFixed(2) }}
         </template>
       </el-table-column>
-      <el-table-column label="退款类型" align="center" prop="type" width="80">
-        <template v-slot="scope">
-          <dict-tag :type="DICT_TYPE.PAY_REFUND_ORDER_TYPE" :value="scope.row.type" />
-        </template>
-      </el-table-column>
       <el-table-column label="退款状态" align="center" prop="status">
         <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.PAY_REFUND_ORDER_STATUS" :value="scope.row.status" />
-        </template>
-      </el-table-column>
-      <el-table-column label="回调状态" align="center" prop="notifyStatus">
-        <template v-slot="scope">
-          <dict-tag :type="DICT_TYPE.PAY_ORDER_NOTIFY_STATUS" :value="scope.row.notifyStatus" />
         </template>
       </el-table-column>
       <el-table-column label="退款原因" align="center" prop="reason" width="140" :show-overflow-tooltip="true"/>
@@ -165,11 +149,6 @@
         <el-descriptions-item label="退款金额" size="mini">
           <el-tag class="tag-purple" size="mini">{{ parseFloat(refundDetail.refundPrice / 100).toFixed(2) }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="退款类型">
-          <template v-slot="scope">
-            <dict-tag :type="DICT_TYPE.PAY_REFUND_ORDER_TYPE" :value="refundDetail.type" />
-          </template>
-        </el-descriptions-item>
         <el-descriptions-item label="退款状态">
           <dict-tag :type="DICT_TYPE.PAY_REFUND_ORDER_STATUS" :value="refundDetail.status" />
         </el-descriptions-item>
@@ -187,10 +166,6 @@
           {{refundDetail.userIp}}
         </el-descriptions-item>
         <el-descriptions-item label="回调地址">{{ refundDetail.notifyUrl }}</el-descriptions-item>
-        <el-descriptions-item label="回调状态">
-          <dict-tag :type="DICT_TYPE.PAY_ORDER_NOTIFY_STATUS" :value="refundDetail.notifyStatus" />
-        </el-descriptions-item>
-        <el-descriptions-item label="回调时间">{{ parseTime(refundDetail.notifyTime) }}</el-descriptions-item>
       </el-descriptions>
       <el-divider></el-divider>
       <el-descriptions :column="2" label-class-name="desc-label">
@@ -211,7 +186,6 @@
 <script>
 import {getRefundPage, exportRefundExcel, getRefund} from "@/api/pay/refund";
 import { DICT_TYPE, getDictDatas } from "@/utils/dict";
-import { PayOrderRefundStatusEnum, PayRefundStatusEnum } from "@/utils/constants";
 import { getNowDateTime } from "@/utils/ruoyi";
 
 const defaultRefundDetail = {
@@ -230,8 +204,6 @@ const defaultRefundDetail = {
   expireTime: null,
   merchantOrderId: '',
   merchantRefundNo: '',
-  notifyStatus: null,
-  notifyTime: null,
   notifyUrl: '',
   orderId: null,
   payPrice: null,
@@ -274,7 +246,6 @@ export default {
         merchantOrderId: null,
         merchantRefundNo: null,
         notifyUrl: null,
-        notifyStatus: null,
         status: null,
         type: null,
         payPrice: null,
@@ -288,7 +259,6 @@ export default {
         channelExtras: null,
         expireTime: [],
         successTime: [],
-        notifyTime: [],
         createTime: []
       },
       // 商户加载遮罩层
@@ -301,12 +271,8 @@ export default {
       payChannelCodeDictDatum: getDictDatas(DICT_TYPE.PAY_CHANNEL_CODE),
       // 订单退款状态字典数据集合
       payRefundOrderDictDatum: getDictDatas(DICT_TYPE.PAY_REFUND_ORDER_STATUS),
-      // 退款订单类别字典数据集合
-      payRefundOrderTypeDictDatum: getDictDatas(DICT_TYPE.PAY_REFUND_ORDER_TYPE),
       // 订单回调商户状态字典数据集合
-      payOrderNotifyDictDatum: getDictDatas(DICT_TYPE.PAY_ORDER_NOTIFY_STATUS),
-      // el-tag订单退款状态type值
-      refundStatusType: '',
+      payOrderNotifyDictDatum: getDictDatas(DICT_TYPE.PAY_NOTIFY_STATUS),
       // 退款订单详情
       refundDetail: JSON.parse(JSON.stringify(defaultRefundDetail)),
     };
@@ -378,40 +344,6 @@ export default {
         this.merchantList = response.data;
         this.merchantLoading = false;
       });
-    },
-    /**
-     * 根据退款类别得到样式名称
-     * @param refundType 退款类别
-     */
-    findByRefundTypeGetStyle(refundType) {
-      switch (refundType) {
-        case PayOrderRefundStatusEnum.NO.status:
-          return "success";
-        case PayOrderRefundStatusEnum.SOME.status:
-          return "warning";
-        case PayOrderRefundStatusEnum.ALL.status:
-          return "danger";
-      }
-    },
-    /**
-     * 根据退款状态得到样式名称
-     * @param refundStatus 退款状态
-     */
-    findByRefundStatusGetStyle(refundStatus) {
-      switch (refundStatus) {
-        case PayRefundStatusEnum.CREATE.status:
-          return "info";
-        case PayRefundStatusEnum.SUCCESS.status:
-          return "success";
-        case PayRefundStatusEnum.FAILURE.status:
-        case PayRefundStatusEnum.CLOSE.status:
-          return "danger";
-        case PayRefundStatusEnum.PROCESSING_NOTIFY.status:
-        case PayRefundStatusEnum.PROCESSING_QUERY.status:
-        case PayRefundStatusEnum.UNKNOWN_RETRY.status:
-        case PayRefundStatusEnum.UNKNOWN_QUERY.status:
-          return "warning";
-      }
     },
     /**
      * 查看订单详情

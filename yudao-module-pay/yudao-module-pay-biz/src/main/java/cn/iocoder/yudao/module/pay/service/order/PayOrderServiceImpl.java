@@ -28,13 +28,12 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.order.PayOrderExtensionMapper;
 import cn.iocoder.yudao.module.pay.dal.mysql.order.PayOrderMapper;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
-import cn.iocoder.yudao.module.pay.enums.order.PayOrderNotifyStatusEnum;
-import cn.iocoder.yudao.module.pay.enums.order.PayOrderRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
 import cn.iocoder.yudao.module.pay.service.notify.dto.PayNotifyTaskCreateReqDTO;
+import cn.iocoder.yudao.module.pay.util.MoneyUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -125,11 +124,11 @@ public class PayOrderServiceImpl implements PayOrderService {
         // 创建支付交易单
         order = PayOrderConvert.INSTANCE.convert(reqDTO).setAppId(app.getId())
                 // 商户相关字段
-                .setNotifyUrl(app.getOrderNotifyUrl()).setNotifyStatus(PayOrderNotifyStatusEnum.NO.getStatus())
+                .setNotifyUrl(app.getOrderNotifyUrl())
                 // 订单相关字段
                 .setStatus(PayOrderStatusEnum.WAITING.getStatus())
                 // 退款相关字段
-                .setRefundStatus(PayOrderRefundStatusEnum.NO.getStatus()).setRefundTimes(0).setRefundPrice(0);
+                .setRefundPrice(0);
         orderMapper.insert(order);
         return order.getId();
     }
@@ -255,6 +254,8 @@ public class PayOrderServiceImpl implements PayOrderService {
         if (PayOrderStatusRespEnum.isClosed(notify.getStatus())) {
             notifyOrderClosed(channel, notify);
         }
+        // 情况三：WAITING：无需处理
+        // 情况四：REFUND：通过退款回调处理
     }
 
     private void notifyOrderSuccess(PayChannelDO channel, PayOrderRespDTO notify) {
@@ -318,7 +319,7 @@ public class PayOrderServiceImpl implements PayOrderService {
             throw exception(ORDER_NOT_FOUND);
         }
         if (PayOrderStatusEnum.isSuccess(order.getStatus()) // 如果已经是成功，直接返回，不用重复更新
-                && Objects.equals(order.getSuccessExtensionId(), orderExtension.getId())) {
+                && Objects.equals(order.getExtensionId(), orderExtension.getId())) {
             log.info("[updateOrderExtensionSuccess][支付订单({}) 已经是已支付，无需更新]", order.getId());
             return Pair.of(true, order);
         }
@@ -330,9 +331,10 @@ public class PayOrderServiceImpl implements PayOrderService {
         int updateCounts = orderMapper.updateByIdAndStatus(order.getId(), PayOrderStatusEnum.WAITING.getStatus(),
                 PayOrderDO.builder().status(PayOrderStatusEnum.SUCCESS.getStatus())
                         .channelId(channel.getId()).channelCode(channel.getCode())
-                        .successTime(notify.getSuccessTime()).successExtensionId(orderExtension.getId())
+                        .successTime(notify.getSuccessTime()).extensionId(orderExtension.getId()).no(orderExtension.getNo())
                         .channelOrderNo(notify.getChannelOrderNo()).channelUserId(notify.getChannelUserId())
-                        .notifyTime(LocalDateTime.now()).build());
+                        .channelFeeRate(channel.getFeeRate()).channelFeePrice(MoneyUtils.calculateRatePrice(order.getPrice(), channel.getFeeRate()))
+                        .build());
         if (updateCounts == 0) { // 校验状态，必须是待支付
             throw exception(ORDER_STATUS_IS_NOT_WAITING);
         }
@@ -379,8 +381,8 @@ public class PayOrderServiceImpl implements PayOrderService {
         if (order == null) {
             throw exception(ORDER_NOT_FOUND);
         }
-        if (!PayOrderStatusEnum.isSuccess(order.getStatus())) {
-            throw exception(ORDER_STATUS_IS_NOT_SUCCESS);
+        if (!PayOrderStatusEnum.isSuccessOrRefund(order.getStatus())) {
+            throw exception(ORDER_REFUND_FAIL_STATUS_ERROR);
         }
         if (order.getRefundPrice() + incrRefundPrice > order.getPrice()) {
             throw exception(REFUND_PRICE_EXCEED);
@@ -389,18 +391,16 @@ public class PayOrderServiceImpl implements PayOrderService {
         // 更新订单
         PayOrderDO updateObj = new PayOrderDO()
                 .setRefundPrice(order.getRefundPrice() + incrRefundPrice)
-                .setRefundTimes(order.getRefundTimes() + 1);
-        if (Objects.equals(updateObj.getRefundPrice(), order.getPrice())) {
-            updateObj.setStatus(PayOrderStatusEnum.CLOSED.getStatus())
-                    .setRefundStatus(PayOrderRefundStatusEnum.ALL.getStatus());
-        } else {
-            updateObj.setStatus(PayOrderStatusEnum.CLOSED.getStatus())
-                    .setRefundStatus(PayOrderRefundStatusEnum.PART.getStatus());
-        }
-        int updateCount = orderMapper.updateByIdAndStatus(id, PayOrderStatusEnum.SUCCESS.getStatus(), updateObj);
+                .setStatus(PayOrderStatusEnum.REFUND.getStatus());
+        int updateCount = orderMapper.updateByIdAndStatus(id, order.getStatus(), updateObj);
         if (updateCount == 0) {
-            throw exception(ORDER_STATUS_IS_NOT_SUCCESS);
+            throw exception(ORDER_REFUND_FAIL_STATUS_ERROR);
         }
+    }
+
+    @Override
+    public PayOrderExtensionDO getOrderExtension(Long id) {
+        return orderExtensionMapper.selectById(id);
     }
 
     /**

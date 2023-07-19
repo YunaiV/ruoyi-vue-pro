@@ -1,16 +1,12 @@
 package cn.iocoder.yudao.module.pay.service.order;
 
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.framework.test.core.util.AssertUtils;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderExportReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderPageReqVO;
@@ -18,27 +14,23 @@ import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitReqVO
 import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
-import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;import cn.iocoder.yudao.module.pay.dal.mysql.order.PayOrderExtensionMapper;
+import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
+import cn.iocoder.yudao.module.pay.dal.mysql.order.PayOrderExtensionMapper;
 import cn.iocoder.yudao.module.pay.dal.mysql.order.PayOrderMapper;
-import cn.iocoder.yudao.module.pay.enums.order.PayOrderNotifyStatusEnum;
-import cn.iocoder.yudao.module.pay.enums.order.PayOrderRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.equalsAny;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
@@ -83,40 +75,36 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
         // mock 数据
         PayOrderDO dbOrder = randomPojo(PayOrderDO.class, o -> { // 等会查询到
             o.setAppId(1L);
-            o.setChannelId(10L);
             o.setChannelCode(PayChannelEnum.WX_PUB.getCode());
             o.setMerchantOrderId("110");
-            o.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
+            o.setChannelOrderNo("220");
+            o.setNo("330");
             o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus());
             o.setCreateTime(buildTime(2018, 1, 15));
-            o.setRefundStatus(PayOrderRefundStatusEnum.NO.getStatus());
         });
         orderMapper.insert(dbOrder);
         // 测试 appId 不匹配
         orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setAppId(2L)));
-        // 测试 channelId 不匹配
-        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setChannelId(2L)));
         // 测试 channelCode 不匹配
         orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setChannelCode(PayChannelEnum.ALIPAY_APP.getCode())));
         // 测试 merchantOrderId 不匹配
         orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setMerchantOrderId(randomString())));
-        // 测试 notifyStatus 不匹配
-        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setNotifyStatus(PayOrderNotifyStatusEnum.FAILURE.getStatus())));
+        // 测试 channelOrderNo 不匹配
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setChannelOrderNo(randomString())));
+        // 测试 no 不匹配
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setNo(randomString())));
         // 测试 status 不匹配
         orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setStatus(PayOrderStatusEnum.CLOSED.getStatus())));
-        // 测试 refundStatus 不匹配
-        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setRefundStatus(PayOrderRefundStatusEnum.ALL.getStatus())));
         // 测试 createTime 不匹配
         orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setCreateTime(buildTime(2019, 1, 1))));
         // 准备参数
         PayOrderPageReqVO reqVO = new PayOrderPageReqVO();
         reqVO.setAppId(1L);
-        reqVO.setChannelId(10L);
         reqVO.setChannelCode(PayChannelEnum.WX_PUB.getCode());
-        reqVO.setMerchantOrderId("110");
-        reqVO.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
+        reqVO.setMerchantOrderId("11");
+        reqVO.setChannelOrderNo("22");
+        reqVO.setNo("33");
         reqVO.setStatus(PayOrderStatusEnum.SUCCESS.getStatus());
-        reqVO.setRefundStatus(PayOrderRefundStatusEnum.NO.getStatus());
         reqVO.setCreateTime(buildBetweenTime(2018, 1, 10, 2018, 1, 30));
 
         // 调用
@@ -132,40 +120,36 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
         // mock 数据
         PayOrderDO dbOrder = randomPojo(PayOrderDO.class, o -> { // 等会查询到
             o.setAppId(1L);
-            o.setChannelId(10L);
             o.setChannelCode(PayChannelEnum.WX_PUB.getCode());
             o.setMerchantOrderId("110");
-            o.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
+            o.setChannelOrderNo("220");
+            o.setNo("330");
             o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus());
             o.setCreateTime(buildTime(2018, 1, 15));
-            o.setRefundStatus(PayOrderRefundStatusEnum.NO.getStatus());
         });
         orderMapper.insert(dbOrder);
         // 测试 appId 不匹配
         orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setAppId(2L)));
-        // 测试 channelId 不匹配
-        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setChannelId(2L)));
         // 测试 channelCode 不匹配
         orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setChannelCode(PayChannelEnum.ALIPAY_APP.getCode())));
         // 测试 merchantOrderId 不匹配
         orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setMerchantOrderId(randomString())));
-        // 测试 notifyStatus 不匹配
-        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setNotifyStatus(PayOrderNotifyStatusEnum.FAILURE.getStatus())));
+        // 测试 channelOrderNo 不匹配
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setChannelOrderNo(randomString())));
+        // 测试 no 不匹配
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setNo(randomString())));
         // 测试 status 不匹配
         orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setStatus(PayOrderStatusEnum.CLOSED.getStatus())));
-        // 测试 refundStatus 不匹配
-        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setRefundStatus(PayOrderRefundStatusEnum.ALL.getStatus())));
         // 测试 createTime 不匹配
         orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setCreateTime(buildTime(2019, 1, 1))));
         // 准备参数
         PayOrderExportReqVO reqVO = new PayOrderExportReqVO();
         reqVO.setAppId(1L);
-        reqVO.setChannelId(10L);
         reqVO.setChannelCode(PayChannelEnum.WX_PUB.getCode());
-        reqVO.setMerchantOrderId("110");
-        reqVO.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
+        reqVO.setMerchantOrderId("11");
+        reqVO.setChannelOrderNo("22");
+        reqVO.setNo("33");
         reqVO.setStatus(PayOrderStatusEnum.SUCCESS.getStatus());
-        reqVO.setRefundStatus(PayOrderRefundStatusEnum.NO.getStatus());
         reqVO.setCreateTime(buildBetweenTime(2018, 1, 10, 2018, 1, 30));
 
         // 调用
@@ -193,11 +177,9 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
         assertEquals(order.getAppId(), 1L);
         assertEquals(order.getNotifyUrl(), "http://127.0.0.1");
         assertEquals(order.getStatus(), PayOrderStatusEnum.WAITING.getStatus());
-        assertEquals(order.getRefundStatus(), PayOrderRefundStatusEnum.NO.getStatus());
-        assertEquals(order.getRefundTimes(), 0);
         assertEquals(order.getRefundPrice(), 0);
     }
-    
+
     @Test
     public void testCreateOrder_exists() {
         // mock 参数

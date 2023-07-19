@@ -79,14 +79,16 @@ public class PayOrderRespDTO {
     /**
      * 创建【WAITING】状态的订单返回
      */
-    public PayOrderRespDTO(String displayMode, String displayContent,
-                           String outTradeNo, Object rawData) {
-        this.status = PayOrderStatusRespEnum.WAITING.getStatus();
-        this.displayMode = displayMode;
-        this.displayContent = displayContent;
+    public static PayOrderRespDTO waitingOf(String displayMode, String displayContent,
+                                            String outTradeNo, Object rawData) {
+        PayOrderRespDTO respDTO = new PayOrderRespDTO();
+        respDTO.status = PayOrderStatusRespEnum.WAITING.getStatus();
+        respDTO.displayMode = displayMode;
+        respDTO.displayContent = displayContent;
         // 相对通用的字段
-        this.outTradeNo = outTradeNo;
-        this.rawData = rawData;
+        respDTO.outTradeNo = outTradeNo;
+        respDTO.rawData = rawData;
+        return respDTO;
     }
 
     /**

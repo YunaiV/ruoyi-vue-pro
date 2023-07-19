@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderPageReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitRespVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -117,5 +118,13 @@ public interface PayOrderService {
      * @param incrRefundPrice 增加的退款金额
      */
     void updateOrderRefundPrice(Long id, Integer incrRefundPrice);
+
+    /**
+     * 获得支付订单
+     *
+     * @param id 编号
+     * @return 支付订单
+     */
+    PayOrderExtensionDO getOrderExtension(Long id);
 
 }
