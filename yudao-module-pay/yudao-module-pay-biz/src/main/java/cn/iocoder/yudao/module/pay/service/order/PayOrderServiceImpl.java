@@ -1,14 +1,11 @@
 package cn.iocoder.yudao.module.pay.service.order;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
-import cn.iocoder.yudao.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
@@ -27,8 +24,10 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.order.PayOrderExtensionMapper;
 import cn.iocoder.yudao.module.pay.dal.mysql.order.PayOrderMapper;
+import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
+import cn.iocoder.yudao.module.pay.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
@@ -40,7 +39,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -68,6 +66,8 @@ public class PayOrderServiceImpl implements PayOrderService {
     private PayOrderMapper orderMapper;
     @Resource
     private PayOrderExtensionMapper orderExtensionMapper;
+    @Resource
+    private PayNoRedisDAO noRedisDAO;
 
     @Resource
     private PayAppService appService;
@@ -136,8 +136,9 @@ public class PayOrderServiceImpl implements PayOrderService {
         PayClient client = payClientFactory.getPayClient(channel.getId());
 
         // 2. 插入 PayOrderExtensionDO
+        String no = noRedisDAO.generate(payProperties.getOrderNoPrefix());
         PayOrderExtensionDO orderExtension = PayOrderConvert.INSTANCE.convert(reqVO, userIp)
-                .setOrderId(order.getId()).setNo(generateOrderExtensionNo())
+                .setOrderId(order.getId()).setNo(no)
                 .setChannelId(channel.getId()).setChannelCode(channel.getCode())
                 .setStatus(PayOrderStatusEnum.WAITING.getStatus());
         orderExtensionMapper.insert(orderExtension);
@@ -155,7 +156,7 @@ public class PayOrderServiceImpl implements PayOrderService {
 
         // 4. 如果调用直接支付成功，则直接更新支付单状态为成功。例如说：付款码支付，免密支付时，就直接验证支付成功
         if (unifiedOrderResp != null) {
-            getSelf().notifyPayOrder(channel, unifiedOrderResp);
+            getSelf().notifyOrder(channel, unifiedOrderResp);
             // 如有渠道错误码，则抛出业务异常，提示用户
             if (StrUtil.isNotEmpty(unifiedOrderResp.getChannelErrorCode())) {
                 throw exception(ORDER_SUBMIT_CHANNEL_ERROR, unifiedOrderResp.getChannelErrorCode(),
@@ -204,31 +205,12 @@ public class PayOrderServiceImpl implements PayOrderService {
         return payProperties.getOrderNotifyUrl() + "/" + channel.getId();
     }
 
-    private String generateOrderExtensionNo() {
-//    wx
-//    2014
-//    10
-//    27
-//    20
-//    09
-//    39
-//    5522657
-//    a690389285100
-        // 目前的算法
-        // 时间序列，年月日时分秒 14 位
-        // 纯随机，6 位 TODO 芋艿：此处估计是会有问题的，后续在调整
-        return DateUtil.format(LocalDateTime.now(), "yyyyMMddHHmmss") + // 时间序列
-                RandomUtil.randomInt(100000, 999999) // 随机。为什么是这个范围，因为偷懒
-                ;
-    }
-
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void notifyOrder(Long channelId, PayOrderRespDTO notify) {
         // 校验支付渠道是否有效
         PayChannelDO channel = channelService.validPayChannel(channelId);
         // 更新支付订单为已支付
-        TenantUtils.execute(channel.getTenantId(), () -> getSelf().notifyPayOrder(channel, notify));
+        TenantUtils.execute(channel.getTenantId(), () -> getSelf().notifyOrder(channel, notify));
     }
 
     /**
@@ -238,7 +220,7 @@ public class PayOrderServiceImpl implements PayOrderService {
      * @param notify 通知
      */
     @Transactional(rollbackFor = Exception.class) // 注意，如果是方法内调用该方法，需要通过 getSelf().notifyPayOrder(channel, notify) 调用，否则事务不生效
-    public void notifyPayOrder(PayChannelDO channel, PayOrderRespDTO notify) {
+    public void notifyOrder(PayChannelDO channel, PayOrderRespDTO notify) {
         // 情况一：支付成功的回调
         if (PayOrderStatusRespEnum.isSuccess(notify.getStatus())) {
             notifyOrderSuccess(channel, notify);
@@ -254,16 +236,16 @@ public class PayOrderServiceImpl implements PayOrderService {
 
     private void notifyOrderSuccess(PayChannelDO channel, PayOrderRespDTO notify) {
         // 1. 更新 PayOrderExtensionDO 支付成功
-        PayOrderExtensionDO orderExtension = updateOrderExtensionSuccess(notify);
+        PayOrderExtensionDO orderExtension = updateOrderSuccess(notify);
         // 2. 更新 PayOrderDO 支付成功
-        Pair<Boolean, PayOrderDO> order = updateOrderExtensionSuccess(channel, orderExtension, notify);
-        if (order.getKey()) { // 如果之前已经成功回调，则直接返回，不用重复记录支付通知记录；例如说：支付平台重复回调
+        Boolean paid = updateOrderSuccess(channel, orderExtension, notify);
+        if (paid) { // 如果之前已经成功回调，则直接返回，不用重复记录支付通知记录；例如说：支付平台重复回调
             return;
         }
 
         // 3. 插入支付通知记录
         notifyService.createPayNotifyTask(PayNotifyTaskCreateReqDTO.builder()
-                .type(PayNotifyTypeEnum.ORDER.getType()).dataId(order.getValue().getId()).build());
+                .type(PayNotifyTypeEnum.ORDER.getType()).dataId(orderExtension.getOrderId()).build());
     }
 
     /**
@@ -272,7 +254,7 @@ public class PayOrderServiceImpl implements PayOrderService {
      * @param notify 通知
      * @return PayOrderExtensionDO 对象
      */
-    private PayOrderExtensionDO updateOrderExtensionSuccess(PayOrderRespDTO notify) {
+    private PayOrderExtensionDO updateOrderSuccess(PayOrderRespDTO notify) {
         // 1. 查询 PayOrderExtensionDO
         PayOrderExtensionDO orderExtension = orderExtensionMapper.selectByNo(notify.getOutTradeNo());
         if (orderExtension == null) {
@@ -302,11 +284,10 @@ public class PayOrderServiceImpl implements PayOrderService {
      * @param channel 支付渠道
      * @param orderExtension 支付拓展单
      * @param notify 通知回调
-     * @return key：是否之前已经成功回调
-     *         value：PayOrderDO 对象
+     * @return 是否之前已经成功回调
      */
-    private Pair<Boolean, PayOrderDO> updateOrderExtensionSuccess(PayChannelDO channel, PayOrderExtensionDO orderExtension,
-                                                                  PayOrderRespDTO notify) {
+    private Boolean updateOrderSuccess(PayChannelDO channel, PayOrderExtensionDO orderExtension,
+                                                         PayOrderRespDTO notify) {
         // 1. 判断 PayOrderDO 是否处于待支付
         PayOrderDO order = orderMapper.selectById(orderExtension.getOrderId());
         if (order == null) {
@@ -315,7 +296,7 @@ public class PayOrderServiceImpl implements PayOrderService {
         if (PayOrderStatusEnum.isSuccess(order.getStatus()) // 如果已经是成功，直接返回，不用重复更新
                 && Objects.equals(order.getExtensionId(), orderExtension.getId())) {
             log.info("[updateOrderExtensionSuccess][支付订单({}) 已经是已支付，无需更新]", order.getId());
-            return Pair.of(true, order);
+            return true;
         }
         if (!PayOrderStatusEnum.WAITING.getStatus().equals(order.getStatus())) { // 校验状态，必须是待支付
             throw exception(ORDER_STATUS_IS_NOT_WAITING);
@@ -333,7 +314,7 @@ public class PayOrderServiceImpl implements PayOrderService {
             throw exception(ORDER_STATUS_IS_NOT_WAITING);
         }
         log.info("[updateOrderExtensionSuccess][支付订单({}) 更新为已支付]", order.getId());
-        return Pair.of(false, order);
+        return false;
     }
 
     private void notifyOrderClosed(PayChannelDO channel, PayOrderRespDTO notify) {

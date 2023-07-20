@@ -14,4 +14,12 @@ public interface RedisKeyConstants {
             "pay_notify:lock:", // 参数来自 DefaultLockKeyBuilder 类
             RedisKeyDefine.KeyTypeEnum.HASH, RLock.class, RedisKeyDefine.TimeoutTypeEnum.DYNAMIC); // Redisson 的 Lock 锁，使用 Hash 数据结构
 
+    /**
+     * 支付序号的缓存
+     *
+     * KEY 格式：pay_no:{prefix}
+     * VALUE 数据格式：编号自增
+     */
+    String PAY_NO = "pay_no";
+
 }

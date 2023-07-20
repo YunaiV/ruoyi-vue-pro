@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.pay.config;
+package cn.iocoder.yudao.module.pay.framework.pay.config;
 
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
@@ -11,6 +11,9 @@ import javax.validation.constraints.NotEmpty;
 @Validated
 @Data
 public class PayProperties {
+
+    private static final String ORDER_NO_PREFIX = "P";
+    private static final String REFUND_NO_PREFIX = "R";
 
     /**
      * 支付回调地址
@@ -33,5 +36,17 @@ public class PayProperties {
     @NotEmpty(message = "支付回调地址不能为空")
     @URL(message = "支付回调地址的格式必须是 URL")
     private String refundNotifyUrl;
+
+    /**
+     * 支付订单 no 的前缀
+     */
+    @NotEmpty(message = "支付订单 no 的前缀不能为空")
+    private String orderNoPrefix = ORDER_NO_PREFIX;
+
+    /**
+     * 退款订单 no 的前缀
+     */
+    @NotEmpty(message = "退款订单 no 的前缀不能为空")
+    private String refundNoPrefix = REFUND_NO_PREFIX;
 
 }
