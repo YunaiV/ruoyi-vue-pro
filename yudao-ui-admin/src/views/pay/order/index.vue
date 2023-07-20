@@ -121,7 +121,7 @@
                 @pagination="getList"/>
 
     <!-- 对话框(详情) -->
-    <el-dialog title="订单详情" :visible.sync="open" width="50%">
+    <el-dialog title="订单详情" :visible.sync="open" width="700px" v-dialogDrag append-to-body>
       <el-descriptions :column="2" label-class-name="desc-label">
         <el-descriptions-item label="商户单号">
           <el-tag size="small">{{ orderDetail.merchantOrderId }}</el-tag>

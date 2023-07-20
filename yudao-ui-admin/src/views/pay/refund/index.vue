@@ -128,7 +128,7 @@
                 @pagination="getList"/>
 
     <!-- 对话框(详情) -->
-    <el-dialog title="退款订单详情" :visible.sync="open" width="700px" append-to-body>
+    <el-dialog title="退款订单详情" :visible.sync="open" width="700px" v-dialogDrag append-to-body>
       <el-descriptions :column="2" label-class-name="desc-label">
         <el-descriptions-item label="商户退款单号">
           <el-tag size="small">{{ refundDetail.merchantRefundId }}</el-tag>
@@ -180,7 +180,7 @@
         <el-descriptions-item label="通知 URL">{{ refundDetail.notifyUrl }}</el-descriptions-item>
       </el-descriptions>
       <!-- 分割线 -->
-      <el-divider></el-divider>
+      <el-divider />
       <el-descriptions :column="2" label-class-name="desc-label">
         <el-descriptions-item label="渠道错误码">{{refundDetail.channelErrorCode}}</el-descriptions-item>
         <el-descriptions-item label="渠道错误码描述">{{refundDetail.channelErrorMsg}}</el-descriptions-item>

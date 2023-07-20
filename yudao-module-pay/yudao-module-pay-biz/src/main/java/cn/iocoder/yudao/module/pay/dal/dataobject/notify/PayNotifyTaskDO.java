@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
 import java.time.LocalDateTime;
 
 /**
- * 商户支付、退款等的通知
+ * 支付通知
  * 在支付系统收到支付渠道的支付、退款的结果后，需要不断的通知到业务系统，直到成功。
  *
  * @author 芋道源码
