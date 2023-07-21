@@ -65,4 +65,5 @@ public interface ErrorCodeConstants {
     ErrorCode COMBINATION_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1013010001, "存在商品参加了其它拼团活动");
     ErrorCode COMBINATION_ACTIVITY_STATUS_DISABLE = new ErrorCode(1013010002, "拼团活动已关闭不能修改");
     ErrorCode COMBINATION_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1013010003, "拼团活动未关闭或未结束，不能删除");
+    ErrorCode COMBINATION_RECORD_NOT_EXISTS = new ErrorCode(1013010004, "拼团不存在");
 }

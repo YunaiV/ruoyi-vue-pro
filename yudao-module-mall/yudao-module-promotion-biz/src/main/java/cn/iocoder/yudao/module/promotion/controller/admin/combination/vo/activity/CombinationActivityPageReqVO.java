@@ -37,7 +37,7 @@ public class CombinationActivityPageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] endTime;
 
-    @Schema(description = "购买人数")
+    @Schema(description = "开团人数")
     private Integer userSize;
 
     @Schema(description = "开团组数")

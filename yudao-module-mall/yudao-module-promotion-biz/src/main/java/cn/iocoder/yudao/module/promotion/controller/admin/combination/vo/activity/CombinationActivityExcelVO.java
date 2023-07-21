@@ -37,7 +37,7 @@ public class CombinationActivityExcelVO {
     @ExcelProperty("结束时间")
     private LocalDateTime endTime;
 
-    @ExcelProperty("购买人数")
+    @ExcelProperty("开团人数")
     private Integer userSize;
 
     @ExcelProperty("开团组数")

@@ -54,7 +54,7 @@ public class CombinationActivityDO extends BaseDO {
      */
     private LocalDateTime endTime;
     /**
-     * 购买人数
+     * 几人团
      */
     private Integer userSize;
     /**

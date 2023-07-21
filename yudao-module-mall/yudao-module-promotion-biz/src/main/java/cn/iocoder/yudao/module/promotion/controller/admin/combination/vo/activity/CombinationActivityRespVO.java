@@ -29,8 +29,8 @@ public class CombinationActivityRespVO extends CombinationActivityBaseVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
-    @Schema(description = "购买人数", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "购买人数不能为空")
+    @Schema(description = "开团人数", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "开团人数不能为空")
     private Integer userSize;
 
     @Schema(description = "开团组数", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -46,7 +46,7 @@ public class CombinationActivityRespVO extends CombinationActivityBaseVO {
     private Integer virtualGroup;
 
     @Schema(description = "活动状态：0开启 1关闭", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
-    @NotNull(message = "活动状态：0开启 1关闭不能为空")
+    @NotNull(message = "活动状态不能为空")
     private Integer status;
 
     @Schema(description = "拼团商品", requiredMode = Schema.RequiredMode.REQUIRED)

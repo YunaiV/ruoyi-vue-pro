@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.promotion.service.combination;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordReqDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityExportReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityPageReqVO;
@@ -9,6 +10,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.combinationa
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.combinationactivity.CombinationProductDO;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -80,4 +82,31 @@ public interface CombinationActivityService {
      * @return 拼团活动的商品列表
      */
     List<CombinationProductDO> getProductsByActivityIds(Collection<Long> ids);
+
+    /**
+     * 更新拼团状态
+     *
+     * @param userId  用户编号
+     * @param orderId 订单编号
+     * @param status  状态
+     */
+    void updateRecordStatusByUserIdAndOrderId(Long userId, Long orderId, Integer status);
+
+    /**
+     * 更新拼团状态和开始时间
+     *
+     * @param userId    用户编号
+     * @param orderId   订单编号
+     * @param status    状态
+     * @param startTime 开始时间
+     */
+    void updateRecordStatusAndStartTimeByUserIdAndOrderId(Long userId, Long orderId, Integer status, LocalDateTime startTime);
+
+    /**
+     * 创建拼团记录
+     *
+     * @param reqDTO 创建信息
+     */
+    void createRecord(CombinationRecordReqDTO reqDTO);
+
 }

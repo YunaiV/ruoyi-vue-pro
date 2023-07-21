@@ -21,8 +21,10 @@ import cn.iocoder.yudao.module.product.api.comment.ProductCommentApi;
 import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.CombinationApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponUseReqDTO;
+import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
 import cn.iocoder.yudao.module.system.api.notify.NotifyMessageSendApi;
 import cn.iocoder.yudao.module.system.api.notify.dto.NotifySendSingleToUserReqDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
@@ -103,6 +105,8 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     @Resource
     private TradeOrderProperties tradeOrderProperties;
 
+    @Resource
+    private CombinationApi combinationApi;
     // =================== Order ===================
 
     @Override
@@ -158,7 +162,6 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     public TradeOrderDO createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO) {
         // 1. 用户收件地址的校验
         AddressRespDTO address = validateAddress(userId, createReqVO.getAddressId());
-
         // 2. 价格计算
         TradePriceCalculateRespBO calculateRespBO = calculatePrice(userId, createReqVO);
 
@@ -166,9 +169,17 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         TradeOrderDO order = createTradeOrder(userId, userIp, createReqVO, calculateRespBO, address);
         // 3.2 插入 TradeOrderItemDO 订单项
         List<TradeOrderItemDO> orderItems = createTradeOrderItems(order, calculateRespBO);
-
         // 订单创建完后的逻辑
         afterCreateTradeOrder(userId, createReqVO, order, orderItems, calculateRespBO);
+        // 3.3 校验订单类型
+        // 拼团
+        if (ObjectUtil.equal(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
+            MemberUserRespDTO user = memberUserApi.getUser(userId);
+            // TODO 拼团一次应该只能选择一种规格的商品
+            combinationApi.createRecord(TradeOrderConvert.INSTANCE.convert(order, orderItems.get(0), createReqVO, user)
+                    .setStatus(CombinationRecordStatusEnum.NOT_PAY.getStatus()));
+        }
+
         // TODO @LeeYan9: 是可以思考下, 订单的营销优惠记录, 应该记录在哪里, 微信讨论起来!
         return order;
     }
@@ -188,12 +199,29 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         return address;
     }
 
+    /**
+     * 校验活动返回订单类型
+     *
+     * @param createReqVO 请求参数
+     * @return 订单类型
+     */
+    private Integer validateActivity(AppTradeOrderCreateReqVO createReqVO) {
+        if (createReqVO.getSeckillActivityId() != null) {
+            return TradeOrderTypeEnum.SECKILL.getType();
+        }
+        if (createReqVO.getCombinationActivityId() != null) {
+            return TradeOrderTypeEnum.COMBINATION.getType();
+        }
+        // TODO 砍价敬请期待
+        return TradeOrderTypeEnum.NORMAL.getType();
+    }
+
     private TradeOrderDO createTradeOrder(Long userId, String clientIp, AppTradeOrderCreateReqVO createReqVO,
                                           TradePriceCalculateRespBO calculateRespBO, AddressRespDTO address) {
         TradeOrderDO order = TradeOrderConvert.INSTANCE.convert(userId, clientIp, createReqVO, calculateRespBO, address);
+        order.setType(validateActivity(createReqVO));
         order.setNo(IdUtil.getSnowflakeNextId() + ""); // TODO @LeeYan9: 思考下, 怎么生成好点哈; 这个是会展示给用户的;
         order.setStatus(TradeOrderStatusEnum.UNPAID.getStatus());
-        order.setType(TradeOrderTypeEnum.NORMAL.getType());
         order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus());
         order.setProductCount(getSumValue(calculateRespBO.getItems(), TradePriceCalculateRespBO.OrderItem::getCount, Integer::sum));
         order.setTerminal(TerminalEnum.H5.getTerminal()); // todo 数据来源?
@@ -270,7 +298,12 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         if (updateCount == 0) {
             throw exception(ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
-
+        // 校验活动
+        // 1、拼团活动
+        if (ObjectUtil.equal(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
+            // 更新拼团状态 TODO puhui999：订单支付失败或订单过期删除这条拼团记录
+            combinationApi.updateRecordStatusAndStartTime(order.getUserId(), order.getId(), CombinationRecordStatusEnum.ONGOING.getStatus());
+        }
         // TODO 芋艿：发送订单变化的消息
 
         // TODO 芋艿：发送站内信
@@ -334,12 +367,12 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         return new KeyValue<>(order, payOrder);
     }
 
-    // TODO 芋艿：如果无需发货，需要怎么存储？
+    // TODO 芋艿：如果无需发货，需要怎么存储？ fix：更改订单发货类型为无需发货更改发货类型为等待自提，等待用户自提后更改订单状态为已完成
     @Override
     public void deliveryOrder(Long userId, TradeOrderDeliveryReqVO deliveryReqVO) {
         // 校验并获得交易订单（可发货）
         TradeOrderDO order = validateOrderDeliverable(deliveryReqVO.getId());
-        // TODO 芋艿：logisticsId 校验存在 发货物流公司 fix
+        // TODO 判断发货类型，根据发货类型发货
         DeliveryExpressDO deliveryExpress = deliveryExpressService.getDeliveryExpress(deliveryReqVO.getLogisticsId());
         if (deliveryExpress == null) {
             throw exception(EXPRESS_NOT_EXISTS);
@@ -369,7 +402,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
                         .setTemplateParams(msgMap));
         // TODO 芋艿：OrderLog
 
-        // TODO 设计：like：是否要单独一个 delivery 发货单表？？？
+        // TODO 设计：like：是否要单独一个 delivery 发货单表？？？ fix: 确实单独一张发货表就能解决整单发货和单独发货的问题
         // TODO 设计：niu：要不要支持一个订单下，多个 order item 单独发货，类似有赞
         // TODO 设计：lili：是不是发货后，才支持售后？
     }
@@ -393,6 +426,15 @@ public class TradeOrderServiceImpl implements TradeOrderService {
                 || ObjectUtil.notEqual(order.getDeliveryStatus(), TradeOrderDeliveryStatusEnum.UNDELIVERED.getStatus())) {
             throw exception(ORDER_DELIVERY_FAIL_STATUS_NOT_UNDELIVERED);
         }
+        // 校验订单是否退款
+        if (ObjectUtil.notEqual(TradeOrderRefundStatusEnum.NONE.getStatus(), order.getRefundStatus())) {
+            throw exception(ORDER_DELIVERY_FAIL_REFUND_STATUS_NOT_NONE);
+        }
+        // 校验订单拼团是否成功
+        if (ObjectUtil.equal(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
+
+        }
+        // TODO puhui999: 校验订单砍价是否成功
         return order;
     }
 

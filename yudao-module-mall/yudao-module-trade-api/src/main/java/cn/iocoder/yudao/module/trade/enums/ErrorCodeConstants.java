@@ -29,6 +29,7 @@ public interface ErrorCodeConstants {
     ErrorCode ORDER_RECEIVE_FAIL_STATUS_NOT_DELIVERED = new ErrorCode(1011000018, "交易订单收货失败，订单不是【待收货】状态");
     ErrorCode ORDER_COMMENT_FAIL_STATUS_NOT_COMPLETED = new ErrorCode(1011000019, "创建交易订单项的评价失败，订单不是【已完成】状态");
     ErrorCode ORDER_COMMENT_STATUS_NOT_FALSE = new ErrorCode(1011000019, "创建交易订单项的评价失败，订单已评价");
+    ErrorCode ORDER_DELIVERY_FAIL_REFUND_STATUS_NOT_NONE = new ErrorCode(1011000017, "交易订单发货失败，订单已退款或部分退款");
 
     // ==========  After Sale 模块 1011000100 ==========
     ErrorCode AFTER_SALE_NOT_FOUND = new ErrorCode(1011000100, "售后单不存在");

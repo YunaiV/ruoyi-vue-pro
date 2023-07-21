@@ -37,9 +37,9 @@ public class CombinationActivityBaseVO {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] activityTime;
 
-    @Schema(description = "参与人数", requiredMode = Schema.RequiredMode.REQUIRED, example = "25222")
-    @NotNull(message = "参与人数不能为空")
-    private Integer orderUserCount;
+    @Schema(description = "开团人数", requiredMode = Schema.RequiredMode.REQUIRED, example = "25222")
+    @NotNull(message = "开团人数不能为空")
+    private Integer userSize;
 
     @Schema(description = "限制时长（小时）", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "限制时长（小时）不能为空")

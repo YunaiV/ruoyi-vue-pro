@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordReqDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityExportReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityPageReqVO;
@@ -19,12 +20,15 @@ import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.product
 import cn.iocoder.yudao.module.promotion.convert.combination.CombinationActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.combinationactivity.CombinationActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.combinationactivity.CombinationProductDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.combinationactivity.CombinationRecordDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.combination.combinationactivity.CombinationActivityMapper;
 import cn.iocoder.yudao.module.promotion.dal.mysql.combination.combinationactivity.CombinationProductMapper;
+import cn.iocoder.yudao.module.promotion.dal.mysql.combination.combinationactivity.CombinationRecordMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -46,6 +50,8 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     @Resource
     private CombinationActivityMapper combinationActivityMapper;
     @Resource
+    private CombinationRecordMapper recordMapper;
+    @Resource
     private CombinationProductMapper combinationProductMapper;
     @Resource
     private ProductSpuApi productSpuApi;
@@ -66,7 +72,6 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
         // 插入拼团活动
         CombinationActivityDO activityDO = CombinationActivityConvert.INSTANCE.convert(createReqVO);
         // TODO 营销相关属性初始化
-        activityDO.setUserSize(0);
         activityDO.setTotalNum(0);
         activityDO.setSuccessNum(0);
         activityDO.setOrderUserCount(0);
@@ -199,6 +204,48 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     @Override
     public List<CombinationProductDO> getProductsByActivityIds(Collection<Long> ids) {
         return combinationProductMapper.selectListByActivityIds(ids);
+    }
+
+    @Override
+    public void updateRecordStatusByUserIdAndOrderId(Long userId, Long orderId, Integer status) {
+        // 校验拼团是否存在
+        CombinationRecordDO recordDO = validateCombinationRecord(userId, orderId);
+
+        // 更新状态
+        recordDO.setStatus(status);
+        recordMapper.updateById(recordDO);
+    }
+
+    @Override
+    public void updateRecordStatusAndStartTimeByUserIdAndOrderId(Long userId, Long orderId, Integer status, LocalDateTime startTime) {
+        CombinationRecordDO recordDO = validateCombinationRecord(userId, orderId);
+
+        // 更新状态
+        recordDO.setStatus(status);
+        // 更新开始时间
+        recordDO.setStartTime(startTime);
+        recordMapper.updateById(recordDO);
+    }
+
+    private CombinationRecordDO validateCombinationRecord(Long userId, Long orderId) {
+        // 校验拼团是否存在
+        CombinationRecordDO recordDO = recordMapper.selectRecord(userId, orderId);
+        if (recordDO == null) {
+            throw exception(COMBINATION_RECORD_NOT_EXISTS);
+        }
+        return recordDO;
+    }
+
+    @Override
+    public void createRecord(CombinationRecordReqDTO reqDTO) {
+        // 校验拼团活动
+        CombinationActivityDO activityDO = validateCombinationActivityExists(reqDTO.getActivityId());
+
+        CombinationRecordDO recordDO = CombinationActivityConvert.INSTANCE.convert(reqDTO);
+        recordDO.setVirtualGroup(false);
+        recordDO.setExpireTime(activityDO.getLimitDuration());
+        recordDO.setUserSize(activityDO.getUserSize());
+        recordMapper.insert(recordDO);
     }
 
 }

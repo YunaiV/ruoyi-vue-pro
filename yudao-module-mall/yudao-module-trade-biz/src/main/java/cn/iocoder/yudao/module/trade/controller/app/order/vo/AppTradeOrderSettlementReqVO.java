@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.trade.controller.app.order.vo;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -18,11 +17,6 @@ import java.util.List;
 @Schema(description = "用户 App - 交易订单结算 Request VO")
 @Data
 public class AppTradeOrderSettlementReqVO {
-
-    @NotNull(message = "交易类型不能为空")
-    @InEnum(value = TradeOrderTypeEnum.class, message = "交易类型必须是 {value}")
-    @Deprecated // TODO 芋艿：后续干掉这个字段，对于前端不需要关注这个
-    private Integer type = 1;
 
     @Schema(description = "商品项数组", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "商品不能为空")
