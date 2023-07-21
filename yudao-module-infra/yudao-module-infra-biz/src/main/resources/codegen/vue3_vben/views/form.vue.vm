@@ -19,10 +19,10 @@ const { createMessage } = useMessage()
 const emit = defineEmits(['success', 'register'])
 const isUpdate = ref(true)
 
-const [registerForm, { setFieldsValue, resetFields, validate }] = useForm({
+const [registerForm, { setFieldsValue, resetFields, resetSchema, validate }] = useForm({
   labelWidth: 120,
   baseColProps: { span: 24 },
-  schemas: isUpdate? updateFormSchema : createFormSchema,
+  schemas: createFormSchema,
   showActionButtonGroup: false,
   actionColOptions: { span: 23 }
 })
@@ -32,6 +32,7 @@ const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data
   setModalProps({ confirmLoading: false })
   isUpdate.value = !!data?.isUpdate
   if (unref(isUpdate)) {
+    resetSchema(updateFormSchema)
     const res = await get${simpleClassName}(data.record.id)
     setFieldsValue({ ...res })
   }
