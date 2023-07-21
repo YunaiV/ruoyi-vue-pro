@@ -213,7 +213,9 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
-    <wechat-channel-form :transferParam="channelParam"></wechat-channel-form>
+
+    <!-- 弹窗 -->
+    <wechat-channel-form :transferParam="channelParam" />
     <ali-pay-channel-form :transferParam="channelParam"></ali-pay-channel-form>
   </div>
 </template>

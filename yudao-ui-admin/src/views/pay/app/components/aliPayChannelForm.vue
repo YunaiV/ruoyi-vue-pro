@@ -8,36 +8,32 @@
             <template slot="append">%</template>
           </el-input>
         </el-form-item>
-        <el-form-item label-width="180px" label="开放平台APPID" prop="aliPayConfig.appId">
+        <el-form-item label-width="180px" label="开放平台 APPID" prop="aliPayConfig.appId">
           <el-input v-model="form.aliPayConfig.appId" placeholder="请输入开放平台APPID" clearable :style="{width: '100%'}">
           </el-input>
         </el-form-item>
         <el-form-item label-width="180px" label="渠道状态" prop="status">
           <el-radio-group v-model="form.status" size="medium">
-            <el-radio v-for="dict in statusDictDatas" :key="parseInt(dict.value)" :label="parseInt(dict.value)">
+            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)" :key="parseInt(dict.value)" :label="parseInt(dict.value)">
               {{ dict.label }}
             </el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label-width="180px" label="网关地址" prop="aliPayConfig.serverUrl">
           <el-radio-group v-model="form.aliPayConfig.serverUrl" size="medium">
-            <el-radio v-for="dict in aliPayServerDatas" :key="dict.value" :label="dict.value">
-              {{ dict.label }}
-            </el-radio>
+            <el-radio label="https://openapi.alipay.com/gateway.do">线上环境</el-radio>
+            <el-radio label="https://openapi-sandbox.dl.alipaydev.com/gateway.do">沙箱环境</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label-width="180px" label="算法类型" prop="aliPayConfig.signType">
           <el-radio-group v-model="form.aliPayConfig.signType" size="medium">
-            <el-radio v-for="dict in aliPaySignTypeDatas" :key="dict.value" :label="dict.value">
-              {{ dict.label }}
-            </el-radio>
+            <el-radio key="RSA2" label="RSA2">RSA2</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label-width="180px" label="公钥类型" prop="aliPayConfig.mode">
           <el-radio-group v-model="form.aliPayConfig.mode" size="medium">
-            <el-radio v-for="dict in aliPayModeDatas" :key="parseInt(dict.value)" :label="parseInt(dict.value)">
-              {{ dict.label }}
-            </el-radio>
+            <el-radio  key="公钥模式" :label="1">公钥模式</el-radio>
+            <el-radio  key="证书模式" :label="2">证书模式</el-radio>
           </el-radio-group>
         </el-form-item>
         <div v-if="form.aliPayConfig.mode === 1">
@@ -122,7 +118,6 @@
   </div>
 </template>
 <script>
-import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 import {createChannel, getChannel, updateChannel} from "@/api/pay/channel";
 
 const defaultForm = {
@@ -167,71 +162,19 @@ export default {
       title:'',
       form: JSON.parse(JSON.stringify(defaultForm)),
       rules: {
-        feeRate: [{
-          required: true,
-          message: '请输入渠道费率',
-          trigger: 'blur'
-        }],
-        'aliPayConfig.appId': [{
-          required: true,
-          message: '请输入开放平台上创建的应用的 ID',
-          trigger: 'blur'
-        }],
-        status: [{
-          required: true,
-          message: '渠道状态不能为空',
-          trigger: 'blur'
-        }],
-        'aliPayConfig.serverUrl': [{
-          required: true,
-          message: '请传入网关地址',
-          trigger: 'blur'
-        }],
-        'aliPayConfig.signType': [{
-          required: true,
-          message: '请传入签名算法类型',
-          trigger: 'blur'
-        }],
-        'aliPayConfig.mode': [{
-          required: true,
-          message: '公钥类型不能为空',
-          trigger: 'blur'
-        }],
-        'aliPayConfig.privateKey': [{
-          required: true,
-          message: '请输入商户私钥',
-          trigger: 'blur'
-        }],
-        'aliPayConfig.alipayPublicKey': [{
-          required: true,
-          message: '请输入支付宝公钥字符串',
-          trigger: 'blur'
-        }],
-        'aliPayConfig.appCertContent': [{
-          required: true,
-          message: '请上传商户公钥应用证书',
-          trigger: 'blur'
-        }],
-        'aliPayConfig.alipayPublicCertContent': [{
-          required: true,
-          message: '请上传支付宝公钥证书',
-          trigger: 'blur'
-        }],
-        'aliPayConfig.rootCertContent': [{
-          required: true,
-          message: '请上传指定根证书',
-          trigger: 'blur'
-        }],
+        feeRate: [{ required: true,  message: '请输入渠道费率', trigger: 'blur' }],
+        status: [{ required: true,  message: '渠道状态不能为空',  trigger: 'blur' }],
+        'aliPayConfig.appId': [{ required: true, message: '请输入开放平台上创建的应用的 ID', trigger: 'blur' }],
+        'aliPayConfig.serverUrl': [{ required: true, message: '请传入网关地址', trigger: 'blur' }],
+        'aliPayConfig.signType': [{ required: true, message: '请传入签名算法类型', trigger: 'blur' }],
+        'aliPayConfig.mode': [{ required: true, message: '公钥类型不能为空', trigger: 'blur'}],
+        'aliPayConfig.privateKey': [{ required: true, message: '请输入商户私钥', trigger: 'blur' }],
+        'aliPayConfig.alipayPublicKey': [{ required: true, message: '请输入支付宝公钥字符串', trigger: 'blur' }],
+        'aliPayConfig.appCertContent': [{ required: true,  message: '请上传商户公钥应用证书', trigger: 'blur' }],
+        'aliPayConfig.alipayPublicCertContent': [{ required: true, message: '请上传支付宝公钥证书', trigger: 'blur'}],
+        'aliPayConfig.rootCertContent': [{ required: true, message: '请上传指定根证书', trigger: 'blur' }],
       },
       fileAccept: ".crt",
-      // 渠道状态 数据字典
-      statusDictDatas: getDictDatas(DICT_TYPE.COMMON_STATUS),
-      // 支付宝加密方式
-      aliPaySignTypeDatas: getDictDatas(DICT_TYPE.PAY_CHANNEL_ALIPAY_SIGN_TYPE),
-      // 版本状态 数据字典
-      aliPayModeDatas: getDictDatas(DICT_TYPE.PAY_CHANNEL_ALIPAY_MODE),
-      // 支付宝网关地址
-      aliPayServerDatas: getDictDatas(DICT_TYPE.PAY_CHANNEL_ALIPAY_SERVER_TYPE),
     }
   },
   watch: {
@@ -252,7 +195,6 @@ export default {
       }
     }
   },
-
   methods: {
     init() {
       getChannel(this.transferParam.appId, this.transferParam.payCode)
@@ -292,10 +234,8 @@ export default {
               this.$modal.msgSuccess("修改成功");
               this.close();
             }
-
           })
         } else {
-
           createChannel(data).then(response => {
             if (response.code === 0) {
               this.$modal.msgSuccess("新增成功");
