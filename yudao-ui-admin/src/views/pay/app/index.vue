@@ -216,7 +216,7 @@
 
     <!-- 弹窗 -->
     <wechat-channel-form :transferParam="channelParam" />
-    <ali-pay-channel-form :transferParam="channelParam"></ali-pay-channel-form>
+    <alipay-channel-form ref="alipayChannelFormRef" @success="getList" />
   </div>
 </template>
 
@@ -225,13 +225,13 @@ import { createApp, updateApp, changeAppStatus, deleteApp, getApp, getAppPage } 
 import { DICT_TYPE, getDictDatas } from "@/utils/dict";
 import { PayType, PayChannelEnum, CommonStatusEnum } from "@/utils/constants";
 import wechatChannelForm from "@/views/pay/app/components/wechatChannelForm";
-import aliPayChannelForm from "@/views/pay/app/components/aliPayChannelForm";
+import alipayChannelForm from "@/views/pay/app/components/alipayChannelForm";
 
 export default {
   name: "PayApp",
   components: {
     "wechatChannelForm": wechatChannelForm,
-    "aliPayChannelForm": aliPayChannelForm
+    "alipayChannelForm": alipayChannelForm
   },
   data() {
     return {
@@ -285,13 +285,6 @@ export default {
         "appId": null,
         // 渠道编码
         "payCode": null,
-        // 商户对象
-        "payMerchant": {
-          // 编号
-          "id": null,
-          // 名称
-          "name": null
-        },
       }
     };
   },
@@ -426,14 +419,12 @@ export default {
         this.channelParam.aliPayOpen = false;
       }
       if (type === PayType.ALIPAY) {
-        this.channelParam.aliPayOpen = true;
-        this.channelParam.wechatOpen = false;
+        console.log(this.$refs['alipayChannelFormRef'])
+        this.$refs['alipayChannelFormRef'].open(row.id, payCode);
+        return;
+        // this.channelParam.aliPayOpen = true;
+        // this.channelParam.wechatOpen = false;
       }
-      this.channelParam.edit = false;
-      this.channelParam.loading = false;
-      this.channelParam.appId = row.id;
-      this.channelParam.payCode = payCode;
-      this.channelParam.payMerchant = row.payMerchant;
     },
     /**
      * 根据渠道编码判断渠道列表中是否存在
