@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.pay.service.app;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.controller.admin.app.vo.PayAppCreateReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.app.vo.PayAppPageReqVO;
@@ -9,10 +8,7 @@ import cn.iocoder.yudao.module.pay.controller.admin.app.vo.PayAppUpdateReqVO;
 import cn.iocoder.yudao.module.pay.convert.app.PayAppConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.app.PayAppMapper;
-import cn.iocoder.yudao.module.pay.dal.mysql.refund.PayRefundMapper;
 import cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants;
-import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
-import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
 import org.springframework.context.annotation.Lazy;
@@ -77,10 +73,10 @@ public class PayAppServiceImpl implements PayAppService {
         validateAppExists(id);
         // 校验关联数据是否存在
         if (orderService.getOrderCountByAppId(id) > 0) {
-            throw exception(PAY_APP_EXIST_ORDER_CANT_DELETE);
+            throw exception(APP_EXIST_ORDER_CANT_DELETE);
         }
         if (refundService.getRefundCountByAppId(id) > 0) {
-            throw exception(PAY_APP_EXIST_REFUND_CANT_DELETE);
+            throw exception(APP_EXIST_REFUND_CANT_DELETE);
         }
 
         // 删除
@@ -89,7 +85,7 @@ public class PayAppServiceImpl implements PayAppService {
 
     private void validateAppExists(Long id) {
         if (appMapper.selectById(id) == null) {
-            throw exception(PAY_APP_NOT_FOUND);
+            throw exception(APP_NOT_FOUND);
         }
     }
 
@@ -104,6 +100,11 @@ public class PayAppServiceImpl implements PayAppService {
     }
 
     @Override
+    public List<PayAppDO> getAppList() {
+         return appMapper.selectList();
+    }
+
+    @Override
     public PageResult<PayAppDO> getAppPage(PayAppPageReqVO pageReqVO) {
         return appMapper.selectPage(pageReqVO);
     }
@@ -113,11 +114,11 @@ public class PayAppServiceImpl implements PayAppService {
         PayAppDO app = appMapper.selectById(id);
         // 校验是否存在
         if (app == null) {
-            throw exception(ErrorCodeConstants.PAY_APP_NOT_FOUND);
+            throw exception(ErrorCodeConstants.APP_NOT_FOUND);
         }
         // 校验是否禁用
         if (CommonStatusEnum.DISABLE.getStatus().equals(app.getStatus())) {
-            throw exception(ErrorCodeConstants.PAY_APP_IS_DISABLE);
+            throw exception(ErrorCodeConstants.APP_IS_DISABLE);
         }
         return app;
     }

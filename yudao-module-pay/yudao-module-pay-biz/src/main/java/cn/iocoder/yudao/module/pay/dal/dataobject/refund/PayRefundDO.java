@@ -6,7 +6,6 @@ import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
-import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -89,12 +88,6 @@ public class PayRefundDO extends BaseDO {
      * 异步通知地址
      */
     private String notifyUrl;
-    /**
-     * 通知商户退款结果的回调状态
-     *
-     * 枚举 {@link PayNotifyStatusEnum}
-     */
-    private Integer notifyStatus;
 
     // ========== 退款相关字段 ==========
     /**
@@ -147,7 +140,7 @@ public class PayRefundDO extends BaseDO {
      */
     private String channelErrorCode;
     /**
-     * 调用渠道报错时，错误信息
+     * 调用渠道的错误提示
      */
     private String channelErrorMsg;
 

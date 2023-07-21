@@ -52,7 +52,7 @@ public class AlipayWapPayClient extends AbstractAlipayPayClient {
         if (!response.isSuccess()) {
             return buildClosedPayOrderRespDTO(reqDTO, response);
         }
-        return new PayOrderRespDTO(displayMode, response.getBody(),
+        return PayOrderRespDTO.waitingOf(displayMode, response.getBody(),
                 reqDTO.getOutTradeNo(), response);
     }
 

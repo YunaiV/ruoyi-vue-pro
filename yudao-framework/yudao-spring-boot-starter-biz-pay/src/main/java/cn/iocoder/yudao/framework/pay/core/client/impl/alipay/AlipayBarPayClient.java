@@ -62,7 +62,7 @@ public class AlipayBarPayClient extends AbstractAlipayPayClient {
         if (!response.isSuccess()) {
             return buildClosedPayOrderRespDTO(reqDTO, response);
         }
-        return new PayOrderRespDTO(displayMode, "",
+        return PayOrderRespDTO.waitingOf(displayMode, "",
                 reqDTO.getOutTradeNo(), response);
     }
 

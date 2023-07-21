@@ -97,4 +97,12 @@ public class PayAppController {
         return success(PayAppConvert.INSTANCE.convertPage(pageResult, channels));
     }
 
+    @GetMapping("/list")
+    @Operation(summary = "获得应用列表")
+    @PreAuthorize("@ss.hasPermission('pay:merchant:query')")
+    public CommonResult<List<PayAppRespVO>> getAppList() {
+        List<PayAppDO> appListDO = appService.getAppList();
+        return success(PayAppConvert.INSTANCE.convertList(appListDO));
+    }
+
 }

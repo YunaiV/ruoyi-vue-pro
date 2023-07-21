@@ -98,7 +98,8 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
         try {
             return doParseOrderNotify(params, body);
         } catch (Throwable ex) {
-            log.error("[parseOrderNotify][params({}) body({}) 解析失败]", params, body, ex);
+            log.error("[parseOrderNotify][客户端({}) params({}) body({}) 解析失败]",
+                    getId(), params, body, ex);
             throw buildPayException(ex);
         }
     }
@@ -128,6 +129,20 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
     }
 
     protected abstract PayRefundRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable;
+
+    @Override
+    public PayRefundRespDTO parseRefundNotify(Map<String, String> params, String body) {
+        try {
+            return doParseRefundNotify(params, body);
+        } catch (Throwable ex) {
+            log.error("[parseRefundNotify][客户端({}) params({}) body({}) 解析失败]",
+                    getId(), params, body, ex);
+            throw buildPayException(ex);
+        }
+    }
+
+    protected abstract PayRefundRespDTO doParseRefundNotify(Map<String, String> params, String body)
+            throws Throwable;
 
     // ========== 各种工具方法 ==========
 

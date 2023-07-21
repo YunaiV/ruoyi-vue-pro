@@ -119,7 +119,7 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
                 new PayDemoOrderDO().setPayStatus(true).setPayTime(LocalDateTime.now())
                         .setPayChannelCode(payOrder.getChannelCode()));
         if (updateCount == 0) {
-            throw exception(PAY_DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
+            throw exception(DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
     }
 
@@ -137,44 +137,44 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
         // 1.1 校验订单是否存在
         PayDemoOrderDO order = payDemoOrderMapper.selectById(id);
         if (order == null) {
-            throw exception(PAY_DEMO_ORDER_NOT_FOUND);
+            throw exception(DEMO_ORDER_NOT_FOUND);
         }
         // 1.2 校验订单未支付
         if (order.getPayStatus()) {
             log.error("[validateDemoOrderCanPaid][order({}) 不处于待支付状态，请进行处理！order 数据是：{}]",
                     id, toJsonString(order));
-            throw exception(PAY_DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
+            throw exception(DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
         // 1.3 校验支付订单匹配
         if (notEqual(order.getPayOrderId(), payOrderId)) { // 支付单号
             log.error("[validateDemoOrderCanPaid][order({}) 支付单不匹配({})，请进行处理！order 数据是：{}]",
                     id, payOrderId, toJsonString(order));
-            throw exception(PAY_DEMO_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR);
+            throw exception(DEMO_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR);
         }
 
         // 2.1 校验支付单是否存在
         PayOrderRespDTO payOrder = payOrderApi.getOrder(payOrderId);
         if (payOrder == null) {
             log.error("[validateDemoOrderCanPaid][order({}) payOrder({}) 不存在，请进行处理！]", id, payOrderId);
-            throw exception(PAY_ORDER_NOT_FOUND);
+            throw exception(ORDER_NOT_FOUND);
         }
         // 2.2 校验支付单已支付
         if (!PayOrderStatusEnum.isSuccess(payOrder.getStatus())) {
             log.error("[validateDemoOrderCanPaid][order({}) payOrder({}) 未支付，请进行处理！payOrder 数据是：{}]",
                     id, payOrderId, toJsonString(payOrder));
-            throw exception(PAY_DEMO_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_STATUS_NOT_SUCCESS);
+            throw exception(DEMO_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_STATUS_NOT_SUCCESS);
         }
         // 2.3 校验支付金额一致
         if (notEqual(payOrder.getPrice(), order.getPrice())) {
             log.error("[validateDemoOrderCanPaid][order({}) payOrder({}) 支付金额不匹配，请进行处理！order 数据是：{}，payOrder 数据是：{}]",
                     id, payOrderId, toJsonString(order), toJsonString(payOrder));
-            throw exception(PAY_DEMO_ORDER_UPDATE_PAID_FAIL_PAY_PRICE_NOT_MATCH);
+            throw exception(DEMO_ORDER_UPDATE_PAID_FAIL_PAY_PRICE_NOT_MATCH);
         }
         // 2.4 校验支付订单匹配（二次）
         if (notEqual(payOrder.getMerchantOrderId(), id.toString())) {
             log.error("[validateDemoOrderCanPaid][order({}) 支付单不匹配({})，请进行处理！payOrder 数据是：{}]",
                     id, payOrderId, toJsonString(payOrder));
-            throw exception(PAY_DEMO_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR);
+            throw exception(DEMO_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR);
         }
         return payOrder;
     }
@@ -203,15 +203,15 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
         // 校验订单是否存在
         PayDemoOrderDO order = payDemoOrderMapper.selectById(id);
         if (order == null) {
-            throw exception(PAY_DEMO_ORDER_NOT_FOUND);
+            throw exception(DEMO_ORDER_NOT_FOUND);
         }
         // 校验订单是否支付
         if (!order.getPayStatus()) {
-            throw exception(PAY_DEMO_ORDER_REFUND_FAIL_NOT_PAID);
+            throw exception(DEMO_ORDER_REFUND_FAIL_NOT_PAID);
         }
         // 校验订单是否已退款
         if (order.getPayRefundId() != null) {
-            throw exception(PAY_DEMO_ORDER_REFUND_FAIL_REFUNDED);
+            throw exception(DEMO_ORDER_REFUND_FAIL_REFUNDED);
         }
         return order;
     }
@@ -229,35 +229,35 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
         // 1.1 校验示例订单
         PayDemoOrderDO order = payDemoOrderMapper.selectById(id);
         if (order == null) {
-            throw exception(PAY_DEMO_ORDER_NOT_FOUND);
+            throw exception(DEMO_ORDER_NOT_FOUND);
         }
         // 1.2 校验退款订单匹配
         if (Objects.equals(order.getPayOrderId(), payRefundId)) {
             log.error("[validateDemoOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！order 数据是：{}]",
                     id, payRefundId, toJsonString(order));
-            throw exception(PAY_DEMO_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
+            throw exception(DEMO_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
         }
 
         // 2.1 校验退款订单
         PayRefundRespDTO payRefund = payRefundApi.getRefund(payRefundId);
         if (payRefund == null) {
-            throw exception(PAY_DEMO_ORDER_REFUND_FAIL_REFUND_NOT_FOUND);
+            throw exception(DEMO_ORDER_REFUND_FAIL_REFUND_NOT_FOUND);
         }
         // 2.2
         if (!PayRefundStatusEnum.isSuccess(payRefund.getStatus())) {
-            throw exception(PAY_DEMO_ORDER_REFUND_FAIL_REFUND_NOT_SUCCESS);
+            throw exception(DEMO_ORDER_REFUND_FAIL_REFUND_NOT_SUCCESS);
         }
         // 2.3 校验退款金额一致
         if (notEqual(payRefund.getRefundPrice(), order.getPrice())) {
             log.error("[validateDemoOrderCanRefunded][order({}) payRefund({}) 退款金额不匹配，请进行处理！order 数据是：{}，payRefund 数据是：{}]",
                     id, payRefundId, toJsonString(order), toJsonString(payRefund));
-            throw exception(PAY_DEMO_ORDER_REFUND_FAIL_REFUND_PRICE_NOT_MATCH);
+            throw exception(DEMO_ORDER_REFUND_FAIL_REFUND_PRICE_NOT_MATCH);
         }
         // 2.4 校验退款订单匹配（二次）
         if (notEqual(payRefund.getMerchantOrderId(), id.toString())) {
             log.error("[validateDemoOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！payRefund 数据是：{}]",
                     id, payRefundId, toJsonString(payRefund));
-            throw exception(PAY_DEMO_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
+            throw exception(DEMO_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
         }
         return payRefund;
     }

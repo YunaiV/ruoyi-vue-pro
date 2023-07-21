@@ -32,8 +32,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.CHANNEL_EXIST_SAME_CHANNEL_ERROR;
-import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.CHANNEL_NOT_EXISTS;
+import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
 
 /**
  * 支付渠道 Service 实现类
@@ -142,7 +141,7 @@ public class PayChannelServiceImpl implements PayChannelService {
         // 解析配置
         Class<? extends PayClientConfig> payClass = PayChannelEnum.getByCode(code).getConfigClass();
         if (ObjectUtil.isNull(payClass)) {
-            throw exception(CHANNEL_NOT_EXISTS);
+            throw exception(CHANNEL_NOT_FOUND);
         }
         PayClientConfig config = JsonUtils.parseObject2(configStr, payClass);
         Assert.notNull(config);
@@ -167,7 +166,7 @@ public class PayChannelServiceImpl implements PayChannelService {
     private PayChannelDO validateChannelExists(Long id) {
         PayChannelDO channel = channelMapper.selectById(id);
         if (channel == null) {
-            throw exception(CHANNEL_NOT_EXISTS);
+            throw exception(CHANNEL_NOT_FOUND);
         }
         return channel;
     }
@@ -203,10 +202,10 @@ public class PayChannelServiceImpl implements PayChannelService {
 
     private void validPayChannel(PayChannelDO channel) {
         if (channel == null) {
-            throw exception(ErrorCodeConstants.PAY_CHANNEL_NOT_FOUND);
+            throw exception(CHANNEL_NOT_FOUND);
         }
         if (CommonStatusEnum.DISABLE.getStatus().equals(channel.getStatus())) {
-            throw exception(ErrorCodeConstants.PAY_CHANNEL_IS_DISABLE);
+            throw exception(CHANNEL_IS_DISABLE);
         }
     }
 

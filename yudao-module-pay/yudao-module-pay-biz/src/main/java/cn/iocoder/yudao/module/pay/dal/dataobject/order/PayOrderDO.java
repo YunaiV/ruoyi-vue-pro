@@ -4,9 +4,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
-import cn.iocoder.yudao.module.pay.enums.order.PayOrderNotifyStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
-import cn.iocoder.yudao.module.pay.enums.order.PayOrderRefundStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -71,12 +69,6 @@ public class PayOrderDO extends BaseDO {
      * 异步通知地址
      */
     private String notifyUrl;
-    /**
-     * 通知商户支付结果的回调状态
-     *
-     * 枚举 {@link PayOrderNotifyStatusEnum}
-     */
-    private Integer notifyStatus;
 
     // ========== 订单相关字段 ==========
 
@@ -93,7 +85,7 @@ public class PayOrderDO extends BaseDO {
     /**
      * 渠道手续金额，单位：分
      */
-    private Long channelFeePrice;
+    private Integer channelFeePrice;
     /**
      * 支付状态
      *
@@ -113,27 +105,19 @@ public class PayOrderDO extends BaseDO {
      */
     private LocalDateTime successTime;
     /**
-     * 订单支付通知时间，即支付渠道的通知时间
-     */
-    private LocalDateTime notifyTime;
-    /**
      * 支付成功的订单拓展单编号
      *
-     * 关联 {@link PayOrderDO#getId()}
+     * 关联 {@link PayOrderExtensionDO#getId()}
      */
-    private Long successExtensionId;
+    private Long extensionId;
+    /**
+     * 支付成功的外部订单号
+     *
+     * 关联 {@link PayOrderExtensionDO#getNo()}
+     */
+    private String no;
 
     // ========== 退款相关字段 ==========
-    /**
-     * 退款状态
-     *
-     * 枚举 {@link PayOrderRefundStatusEnum}
-     */
-    private Integer refundStatus;
-    /**
-     * 退款次数
-     */
-    private Integer refundTimes;
     /**
      * 退款总金额，单位：分
      */

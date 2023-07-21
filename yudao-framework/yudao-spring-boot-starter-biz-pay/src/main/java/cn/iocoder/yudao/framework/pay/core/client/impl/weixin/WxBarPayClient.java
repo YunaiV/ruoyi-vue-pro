@@ -67,7 +67,7 @@ public class WxBarPayClient extends AbstractWxPayClient {
         for (int i = 1; i < Byte.MAX_VALUE; i++) {
             try {
                 WxPayMicropayResult response = client.micropay(request);
-                // 支付成功，例如说：1）用户输入了密码；2）
+                // 支付成功，例如说：1）用户输入了密码；2）用户免密支付
                 return new PayOrderRespDTO(response.getTransactionId(), response.getOpenid(), parseDateV2(response.getTimeEnd()),
                         response.getOutTradeNo(), response)
                         .setDisplayMode(PayOrderDisplayModeEnum.BAR_CODE.getMode());

@@ -58,7 +58,7 @@ public class WxPubPayClient extends AbstractWxPayClient {
         WxPayMpOrderResult response = client.createOrder(request);
 
         // 转换结果
-        return new PayOrderRespDTO(PayOrderDisplayModeEnum.APP.getMode(), toJsonString(response),
+        return PayOrderRespDTO.waitingOf(PayOrderDisplayModeEnum.APP.getMode(), toJsonString(response),
                 reqDTO.getOutTradeNo(), response);
     }
 
@@ -77,7 +77,7 @@ public class WxPubPayClient extends AbstractWxPayClient {
         WxPayUnifiedOrderV3Result.JsapiResult response = client.createOrderV3(TradeTypeEnum.JSAPI, request);
 
         // 转换结果
-        return new PayOrderRespDTO(PayOrderDisplayModeEnum.APP.getMode(), toJsonString(response),
+        return PayOrderRespDTO.waitingOf(PayOrderDisplayModeEnum.APP.getMode(), toJsonString(response),
                 reqDTO.getOutTradeNo(), response);
     }
 

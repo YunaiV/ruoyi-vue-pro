@@ -207,42 +207,6 @@ export const PayOrderStatusEnum = {
 }
 
 /**
- * 支付订单回调状态枚举
- */
-export const PayOrderNotifyStatusEnum = {
-  NO: {
-    status: 0,
-    name: '未通知'
-  },
-  SUCCESS: {
-    status: 10,
-    name: '通知成功'
-  },
-  FAILURE: {
-    status: 20,
-    name: '通知失败'
-  }
-}
-
-/**
- * 支付订单退款状态枚举
- */
-export const PayOrderRefundStatusEnum = {
-  NO: {
-    status: 0,
-    name: '未退款'
-  },
-  SOME: {
-    status: 10,
-    name: '部分退款'
-  },
-  ALL: {
-    status: 20,
-    name: '全部退款'
-  }
-}
-
-/**
  * 支付退款订单状态枚举
  */
 export const PayRefundStatusEnum = {

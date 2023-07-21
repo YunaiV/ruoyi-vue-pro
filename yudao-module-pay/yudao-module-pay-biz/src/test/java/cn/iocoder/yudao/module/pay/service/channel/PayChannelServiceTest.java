@@ -26,8 +26,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
-import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.CHANNEL_EXIST_SAME_CHANNEL_ERROR;
-import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.CHANNEL_NOT_EXISTS;
+import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Import({PayChannelServiceImpl.class})
@@ -49,6 +48,40 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
     @BeforeEach
     public void setUp() {
         channelService.setChannelCache(null);
+    }
+
+    @Test
+    public void testInitLocalCache() {
+        // mock 数据
+        PayChannelDO dbChannel = randomPojo(PayChannelDO.class,
+                o -> o.setConfig(randomWxPayClientConfig()));
+        channelMapper.insert(dbChannel);// @Sql: 先插入出一条存在的数据
+
+        // 调用
+        channelService.initLocalCache();
+        // 校验缓存
+        assertEquals(1, channelService.getChannelCache().size());
+        assertEquals(dbChannel, channelService.getChannelCache().get(0));
+    }
+
+    @Test
+    public void testRefreshLocalCache() {
+        // mock 数据 01
+        PayChannelDO dbChannel = randomPojo(PayChannelDO.class,
+                o -> o.setConfig(randomWxPayClientConfig()));
+        channelMapper.insert(dbChannel);// @Sql: 先插入出一条存在的数据
+        channelService.initLocalCache();
+        // mock 数据 02
+        PayChannelDO dbChannel02 = randomPojo(PayChannelDO.class,
+                o -> o.setConfig(randomWxPayClientConfig()));
+        channelMapper.insert(dbChannel02);// @Sql: 先插入出一条存在的数据
+
+        // 调用
+        channelService.refreshLocalCache();
+        // 校验缓存
+        assertEquals(2, channelService.getChannelCache().size());
+        assertEquals(dbChannel, channelService.getChannelCache().get(0));
+        assertEquals(dbChannel02, channelService.getChannelCache().get(1));
     }
 
     @Test
@@ -125,7 +158,7 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         });
 
         // 调用, 并断言异常
-        assertServiceException(() -> channelService.updateChannel(reqVO), CHANNEL_NOT_EXISTS);
+        assertServiceException(() -> channelService.updateChannel(reqVO), CHANNEL_NOT_FOUND);
     }
 
     @Test
@@ -153,7 +186,7 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         Long id = randomLongId();
 
         // 调用, 并断言异常
-        assertServiceException(() -> channelService.deleteChannel(id), CHANNEL_NOT_EXISTS);
+        assertServiceException(() -> channelService.deleteChannel(id), CHANNEL_NOT_FOUND);
     }
 
     @Test
@@ -212,6 +245,101 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         PayChannelDO channel = channelService.getChannelByAppIdAndCode(appId, code);
         // 断言
         assertPojoEquals(channel, dbChannel);
+    }
+
+    @Test
+    public void testValidPayChannel_notExists() {
+        // 准备参数
+        Long id = randomLongId();
+
+        // 调用, 并断言异常
+        assertServiceException(() -> channelService.validPayChannel(id), CHANNEL_NOT_FOUND);
+    }
+
+    @Test
+    public void testValidPayChannel_isDisable() {
+        // mock 数据
+        PayChannelDO dbChannel = randomPojo(PayChannelDO.class, o -> {
+            o.setCode(PayChannelEnum.ALIPAY_APP.getCode());
+            o.setConfig(randomAlipayPayClientConfig());
+            o.setStatus(CommonStatusEnum.DISABLE.getStatus());
+        });
+        channelMapper.insert(dbChannel);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        Long id = dbChannel.getId();
+
+        // 调用, 并断言异常
+        assertServiceException(() -> channelService.validPayChannel(id), CHANNEL_IS_DISABLE);
+    }
+
+    @Test
+    public void testValidPayChannel_success() {
+        // mock 数据
+        PayChannelDO dbChannel = randomPojo(PayChannelDO.class, o -> {
+            o.setCode(PayChannelEnum.ALIPAY_APP.getCode());
+            o.setConfig(randomAlipayPayClientConfig());
+            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        });
+        channelMapper.insert(dbChannel);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        Long id = dbChannel.getId();
+
+        // 调用
+        PayChannelDO channel = channelService.validPayChannel(id);
+        // 断言异常
+        assertPojoEquals(channel, dbChannel);
+    }
+
+    @Test
+    public void testValidPayChannel_appIdAndCode() {
+        // mock 数据
+        PayChannelDO dbChannel = randomPojo(PayChannelDO.class, o -> {
+            o.setCode(PayChannelEnum.ALIPAY_APP.getCode());
+            o.setConfig(randomAlipayPayClientConfig());
+            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        });
+        channelMapper.insert(dbChannel);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        Long appId = dbChannel.getAppId();
+        String code = dbChannel.getCode();
+
+        // 调用
+        PayChannelDO channel = channelService.validPayChannel(appId, code);
+        // 断言异常
+        assertPojoEquals(channel, dbChannel);
+    }
+
+    @Test
+    public void testGetEnableChannelList() {
+        // 准备参数
+        Long appId = randomLongId();
+        // mock 数据 01（enable 不匹配）
+        PayChannelDO dbChannel01 = randomPojo(PayChannelDO.class, o -> {
+            o.setCode(PayChannelEnum.ALIPAY_APP.getCode());
+            o.setConfig(randomAlipayPayClientConfig());
+            o.setStatus(CommonStatusEnum.DISABLE.getStatus());
+        });
+        channelMapper.insert(dbChannel01);// @Sql: 先插入出一条存在的数据
+        // mock 数据 02（appId 不匹配）
+        PayChannelDO dbChannel02 = randomPojo(PayChannelDO.class, o -> {
+            o.setCode(PayChannelEnum.ALIPAY_APP.getCode());
+            o.setConfig(randomAlipayPayClientConfig());
+            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        });
+        channelMapper.insert(dbChannel02);// @Sql: 先插入出一条存在的数据
+        // mock 数据 03
+        PayChannelDO dbChannel03 = randomPojo(PayChannelDO.class, o -> {
+            o.setCode(PayChannelEnum.ALIPAY_APP.getCode());
+            o.setConfig(randomAlipayPayClientConfig());
+            o.setAppId(appId);
+            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        });
+        channelMapper.insert(dbChannel03);// @Sql: 先插入出一条存在的数据
+
+        // 调用
+        List<PayChannelDO> channel = channelService.getEnableChannelList(appId);
+        // 断言异常
+        assertPojoEquals(channel, dbChannel03);
     }
 
     public WxPayClientConfig randomWxPayClientConfig() {
