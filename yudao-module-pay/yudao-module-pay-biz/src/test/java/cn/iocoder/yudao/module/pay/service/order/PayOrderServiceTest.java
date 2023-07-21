@@ -30,7 +30,6 @@ import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
 import cn.iocoder.yudao.module.pay.service.notify.dto.PayNotifyTaskCreateReqDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatcher;
 import org.mockito.MockedStatic;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -44,8 +43,7 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -83,6 +81,51 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
     @BeforeEach
     public void setUp() {
         when(properties.getOrderNotifyUrl()).thenReturn("http://127.0.0.1");
+    }
+
+    @Test
+    public void testGetOrder_id() {
+        // mock 数据（PayOrderDO）
+        PayOrderDO order = randomPojo(PayOrderDO.class);
+        orderMapper.insert(order);
+        // 准备参数
+        Long id = order.getId();
+
+        // 调用
+        PayOrderDO dbOrder = orderService.getOrder(id);
+        // 断言
+        assertPojoEquals(dbOrder, order);
+    }
+
+    @Test
+    public void testGetOrder_appIdAndMerchantOrderId() {
+        // mock 数据（PayOrderDO）
+        PayOrderDO order = randomPojo(PayOrderDO.class);
+        orderMapper.insert(order);
+        // 准备参数
+        Long appId = order.getAppId();
+        String merchantOrderId = order.getMerchantOrderId();
+
+        // 调用
+        PayOrderDO dbOrder = orderService.getOrder(appId, merchantOrderId);
+        // 断言
+        assertPojoEquals(dbOrder, order);
+    }
+
+    @Test
+    public void testGetOrderCountByAppId() {
+        // mock 数据（PayOrderDO）
+        PayOrderDO order01 = randomPojo(PayOrderDO.class);
+        orderMapper.insert(order01);
+        PayOrderDO order02 = randomPojo(PayOrderDO.class);
+        orderMapper.insert(order02);
+        // 准备参数
+        Long appId = order01.getAppId();
+
+        // 调用
+        Long count = orderService.getOrderCountByAppId(appId);
+        // 断言
+        assertEquals(count, 1L);
     }
 
     @Test
@@ -350,7 +393,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
             // mock 方法（client）
             PayClient client = mock(PayClient.class);
             when(payClientFactory.getPayClient(eq(10L))).thenReturn(client);
-            // mock 方法（）
+            // mock 方法（支付渠道的调用）
             PayOrderRespDTO unifiedOrderResp = randomPojo(PayOrderRespDTO.class, o -> o.setChannelErrorCode(null).setChannelErrorMsg(null)
                     .setDisplayMode(PayOrderDisplayModeEnum.URL.getMode()).setDisplayContent("tudou"));
             when(client.unifiedOrder(argThat(payOrderUnifiedReqDTO -> {
@@ -553,14 +596,193 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         assertPojoEquals(order, orderMapper.selectOne(null),
                 "updateTime", "updater");
         // 断言，调用
-        verify(notifyService).createPayNotifyTask(argThat(new ArgumentMatcher<PayNotifyTaskCreateReqDTO>() {
-            @Override
-            public boolean matches(PayNotifyTaskCreateReqDTO reqDTO) {
-                assertEquals(reqDTO.getType(), PayNotifyTypeEnum.ORDER.getType());
-                assertEquals(reqDTO.getDataId(), orderExtension.getOrderId());
-                return true;
-            }
+        verify(notifyService).createPayNotifyTask(argThat(reqDTO -> {
+            assertEquals(reqDTO.getType(), PayNotifyTypeEnum.ORDER.getType());
+            assertEquals(reqDTO.getDataId(), orderExtension.getOrderId());
+            return true;
         }));
+    }
+
+    @Test
+    public void testNotifyOrderClosed_orderExtension_notFound() {
+        // 准备参数
+        PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L));
+        PayOrderRespDTO notify = randomPojo(PayOrderRespDTO.class,
+                o -> o.setStatus(PayOrderStatusRespEnum.CLOSED.getStatus()));
+
+        // 调用，并断言异常
+        assertServiceException(() -> orderService.notifyOrder(channel, notify),
+                ORDER_EXTENSION_NOT_FOUND);
+    }
+
+    @Test
+    public void testNotifyOrderClosed_orderExtension_closed() {
+        // mock 数据（PayOrderExtensionDO）
+        PayOrderExtensionDO orderExtension = randomPojo(PayOrderExtensionDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.CLOSED.getStatus())
+                        .setNo("P110"));
+        orderExtensionMapper.insert(orderExtension);
+        // 准备参数
+        PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L));
+        PayOrderRespDTO notify = randomPojo(PayOrderRespDTO.class,
+                o -> o.setStatus(PayOrderStatusRespEnum.CLOSED.getStatus())
+                        .setOutTradeNo("P110"));
+
+        // 调用，并断言
+        orderService.notifyOrder(channel, notify);
+        // 断言 PayOrderExtensionDO ：数据未更新，因为它是 CLOSED
+        assertPojoEquals(orderExtension, orderExtensionMapper.selectOne(null));
+    }
+
+    @Test
+    public void testNotifyOrderClosed_orderExtension_paid() {
+        // mock 数据（PayOrderExtensionDO）
+        PayOrderExtensionDO orderExtension = randomPojo(PayOrderExtensionDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus())
+                        .setNo("P110"));
+        orderExtensionMapper.insert(orderExtension);
+        // 准备参数
+        PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L));
+        PayOrderRespDTO notify = randomPojo(PayOrderRespDTO.class,
+                o -> o.setStatus(PayOrderStatusRespEnum.CLOSED.getStatus())
+                        .setOutTradeNo("P110"));
+
+        // 调用，并断言
+        orderService.notifyOrder(channel, notify);
+        // 断言 PayOrderExtensionDO ：数据未更新，因为它是 SUCCESS
+        assertPojoEquals(orderExtension, orderExtensionMapper.selectOne(null));
+    }
+
+    @Test
+    public void testNotifyOrderClosed_orderExtension_refund() {
+        // mock 数据（PayOrderExtensionDO）
+        PayOrderExtensionDO orderExtension = randomPojo(PayOrderExtensionDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.REFUND.getStatus())
+                        .setNo("P110"));
+        orderExtensionMapper.insert(orderExtension);
+        // 准备参数
+        PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L));
+        PayOrderRespDTO notify = randomPojo(PayOrderRespDTO.class,
+                o -> o.setStatus(PayOrderStatusRespEnum.CLOSED.getStatus())
+                        .setOutTradeNo("P110"));
+
+        // 调用，并断言异常
+        assertServiceException(() -> orderService.notifyOrder(channel, notify),
+                ORDER_EXTENSION_STATUS_IS_NOT_WAITING);
+    }
+
+    @Test
+    public void testNotifyOrderClosed_orderExtension_waiting() {
+        // mock 数据（PayOrderExtensionDO）
+        PayOrderExtensionDO orderExtension = randomPojo(PayOrderExtensionDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())
+                        .setNo("P110"));
+        orderExtensionMapper.insert(orderExtension);
+        // 准备参数
+        PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L));
+        PayOrderRespDTO notify = randomPojo(PayOrderRespDTO.class,
+                o -> o.setStatus(PayOrderStatusRespEnum.CLOSED.getStatus())
+                        .setOutTradeNo("P110"));
+
+        // 调用
+        orderService.notifyOrder(channel, notify);
+        // 断言 PayOrderExtensionDO
+        orderExtension.setStatus(PayOrderStatusEnum.CLOSED.getStatus()).setChannelNotifyData(toJsonString(notify))
+                .setChannelErrorCode(notify.getChannelErrorCode()).setChannelErrorMsg(notify.getChannelErrorMsg());
+        assertPojoEquals(orderExtension, orderExtensionMapper.selectOne(null),
+                "updateTime", "updater");
+    }
+
+    @Test
+    public void testUpdateOrderRefundPrice_notFound() {
+        // 准备参数
+        Long id = randomLongId();
+        Integer incrRefundPrice = randomInteger();
+
+        // 调用，并断言异常
+        assertServiceException(() -> orderService.updateOrderRefundPrice(id, incrRefundPrice),
+                ORDER_NOT_FOUND);
+    }
+
+    @Test
+    public void testUpdateOrderRefundPrice_waiting() {
+        testUpdateOrderRefundPrice_waitingOrClosed(PayOrderStatusEnum.WAITING.getStatus());
+    }
+
+    @Test
+    public void testUpdateOrderRefundPrice_closed() {
+        testUpdateOrderRefundPrice_waitingOrClosed(PayOrderStatusEnum.CLOSED.getStatus());
+    }
+
+    private void testUpdateOrderRefundPrice_waitingOrClosed(Integer status) {
+        // mock 数据（PayOrderDO）
+        PayOrderDO order = randomPojo(PayOrderDO.class,
+                o -> o.setStatus(status));
+        orderMapper.insert(order);
+        // 准备参数
+        Long id = order.getId();
+        Integer incrRefundPrice = randomInteger();
+
+        // 调用，并断言异常
+        assertServiceException(() -> orderService.updateOrderRefundPrice(id, incrRefundPrice),
+                ORDER_REFUND_FAIL_STATUS_ERROR);
+    }
+
+    @Test
+    public void testUpdateOrderRefundPrice_priceExceed() {
+        // mock 数据（PayOrderDO）
+        PayOrderDO order = randomPojo(PayOrderDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus())
+                        .setRefundPrice(1).setPrice(10));
+        orderMapper.insert(order);
+        // 准备参数
+        Long id = order.getId();
+        Integer incrRefundPrice = 10;
+
+        // 调用，并断言异常
+        assertServiceException(() -> orderService.updateOrderRefundPrice(id, incrRefundPrice),
+                REFUND_PRICE_EXCEED);
+    }
+
+    @Test
+    public void testUpdateOrderRefundPrice_refund() {
+        testUpdateOrderRefundPrice_refundOrSuccess(PayOrderStatusEnum.REFUND.getStatus());
+    }
+
+    @Test
+    public void testUpdateOrderRefundPrice_success() {
+        testUpdateOrderRefundPrice_refundOrSuccess(PayOrderStatusEnum.SUCCESS.getStatus());
+    }
+
+    private void testUpdateOrderRefundPrice_refundOrSuccess(Integer status) {
+        // mock 数据（PayOrderDO）
+        PayOrderDO order = randomPojo(PayOrderDO.class,
+                o -> o.setStatus(status).setRefundPrice(1).setPrice(10));
+        orderMapper.insert(order);
+        // 准备参数
+        Long id = order.getId();
+        Integer incrRefundPrice = 8;
+
+        // 调用
+        orderService.updateOrderRefundPrice(id, incrRefundPrice);
+        // 断言
+        order.setRefundPrice(9).setStatus(PayOrderStatusEnum.REFUND.getStatus());
+        assertPojoEquals(order, orderMapper.selectOne(null),
+                "updateTime", "updater");
+    }
+
+    @Test
+    public void testGetOrderExtension() {
+        // mock 数据（PayOrderExtensionDO）
+        PayOrderExtensionDO orderExtension = randomPojo(PayOrderExtensionDO.class);
+        orderExtensionMapper.insert(orderExtension);
+        // 准备参数
+        Long id = orderExtension.getId();
+
+        // 调用
+        PayOrderExtensionDO dbOrderExtension = orderService.getOrderExtension(id);
+        // 断言
+        assertPojoEquals(dbOrderExtension, orderExtension);
     }
 
 }

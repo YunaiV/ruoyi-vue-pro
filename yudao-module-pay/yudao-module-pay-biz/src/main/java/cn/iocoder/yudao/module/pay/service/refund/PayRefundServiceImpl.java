@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.pay.service.refund;
 
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.RandomUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
@@ -16,9 +15,9 @@ import cn.iocoder.yudao.module.pay.convert.refund.PayRefundConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
-import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.refund.PayRefundMapper;
+import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
 import cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
@@ -35,12 +34,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
-import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.CHANNEL_NOT_FOUND;
+import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
 
 /**
  * 退款订单 Service 实现类
@@ -60,6 +58,8 @@ public class PayRefundServiceImpl implements PayRefundService {
 
     @Resource
     private PayRefundMapper refundMapper;
+    @Resource
+    private PayNoRedisDAO noRedisDAO;
 
     @Resource
     private PayOrderService orderService;
@@ -112,8 +112,9 @@ public class PayRefundServiceImpl implements PayRefundService {
         }
 
         // 2.1 插入退款单
+        String no = noRedisDAO.generate(payProperties.getRefundNoPrefix());
         refund = PayRefundConvert.INSTANCE.convert(reqDTO)
-                .setNo(generateRefundNo()).setOrderId(order.getId())
+                .setNo(no).setOrderId(order.getId())
                 .setChannelId(order.getChannelId()).setChannelCode(order.getChannelCode())
                 // 商户相关的字段
                 .setNotifyUrl(app.getRefundNotifyUrl())
@@ -123,20 +124,27 @@ public class PayRefundServiceImpl implements PayRefundService {
                 .setStatus(PayRefundStatusEnum.WAITING.getStatus())
                 .setPayPrice(order.getPrice()).setRefundPrice(reqDTO.getPrice());
         refundMapper.insert(refund);
-        // 2.2 向渠道发起退款申请
-        PayOrderExtensionDO orderExtension = orderService.getOrderExtension(order.getExtensionId());
-        PayRefundUnifiedReqDTO unifiedReqDTO = new PayRefundUnifiedReqDTO()
-                .setPayPrice(order.getPrice())
-                .setRefundPrice(reqDTO.getPrice())
-                .setOutTradeNo(orderExtension.getNo())
-                .setOutRefundNo(refund.getNo())
-                .setNotifyUrl(genChannelRefundNotifyUrl(channel))
-                .setReason(reqDTO.getReason());
-        PayRefundRespDTO refundRespDTO = client.unifiedRefund(unifiedReqDTO);
-        // 2.3 处理退款返回
-        notifyRefund(channel, refundRespDTO);
+        try {
+            // 2.2 向渠道发起退款申请
+            PayRefundUnifiedReqDTO unifiedReqDTO = new PayRefundUnifiedReqDTO()
+                    .setPayPrice(order.getPrice())
+                    .setRefundPrice(reqDTO.getPrice())
+                    .setOutTradeNo(order.getNo())
+                    .setOutRefundNo(refund.getNo())
+                    .setNotifyUrl(genChannelRefundNotifyUrl(channel))
+                    .setReason(reqDTO.getReason());
+            PayRefundRespDTO refundRespDTO = client.unifiedRefund(unifiedReqDTO);
+            // 2.3 处理退款返回
+            getSelf().notifyRefund(channel, refundRespDTO);
+        } catch (Throwable e) {
+            // 注意：这里仅打印异常，不进行抛出。
+            // 原因是：虽然调用支付渠道进行退款发生异常（网络请求超时），实际退款成功。这个结果，后续通过退款回调、或者退款轮询补偿可以拿到。
+            // 最终，在异常的情况下，支付中心会异步回调业务的退款回调接口，提供退款结果
+            log.error("[createPayRefund][退款 id({}) requestDTO({}) 发生异常]",
+                    refund.getId(), reqDTO, e);
+        }
 
-        // 成功在 退款回调中处理
+        // 返回退款编号
         return refund.getId();
     }
 
@@ -151,12 +159,12 @@ public class PayRefundServiceImpl implements PayRefundService {
         if (order == null) {
             throw exception(ErrorCodeConstants.ORDER_NOT_FOUND);
         }
-        // 校验状态，必须是支付状态
-        if (!PayOrderStatusEnum.SUCCESS.getStatus().equals(order.getStatus())) {
-            throw exception(ErrorCodeConstants.ORDER_STATUS_IS_NOT_SUCCESS);
+        // 校验状态，必须是已支付、或者已退款
+        if (!PayOrderStatusEnum.isSuccessOrRefund(order.getStatus())) {
+            throw exception(ORDER_REFUND_FAIL_STATUS_ERROR);
         }
 
-        // 校验金额 退款金额不能大于原定的金额
+        // 校验金额，退款金额不能大于原定的金额
         if (reqDTO.getPrice() + order.getRefundPrice() > order.getPrice()){
             throw exception(ErrorCodeConstants.REFUND_PRICE_EXCEED);
         }
@@ -178,38 +186,22 @@ public class PayRefundServiceImpl implements PayRefundService {
         return payProperties.getRefundNotifyUrl() + "/" + channel.getId();
     }
 
-    private String generateRefundNo() {
-//    wx
-//    2014
-//    10
-//    27
-//    20
-//    09
-//    39
-//    5522657
-//    a690389285100
-        // 目前的算法
-        // 时间序列，年月日时分秒 14 位
-        // 纯随机，6 位 TODO 芋艿：此处估计是会有问题的，后续在调整
-        return DateUtil.format(LocalDateTime.now(), "yyyyMMddHHmmss") + // 时间序列
-                RandomUtil.randomInt(100000, 999999) // 随机。为什么是这个范围，因为偷懒
-                ;
-    }
-
     @Override
     public void notifyRefund(Long channelId, PayRefundRespDTO notify) {
         // 校验支付渠道是否有效
-        channelService.validPayChannel(channelId);
-        // 通知结果
-
-        // 校验支付渠道是否有效
         PayChannelDO channel = channelService.validPayChannel(channelId);
         // 更新退款订单
-        TenantUtils.execute(channel.getTenantId(), () -> notifyRefund(channel, notify));
+        TenantUtils.execute(channel.getTenantId(), () -> getSelf().notifyRefund(channel, notify));
     }
 
-    // TODO 芋艿：事务问题
-    private void notifyRefund(PayChannelDO channel, PayRefundRespDTO notify) {
+    /**
+     * 通知并更新订单的退款结果
+     *
+     * @param channel 支付渠道
+     * @param notify 通知
+     */
+    @Transactional(rollbackFor = Exception.class)  // 注意，如果是方法内调用该方法，需要通过 getSelf().notifyRefund(channel, notify) 调用，否则事务不生效
+    public void notifyRefund(PayChannelDO channel, PayRefundRespDTO notify) {
         // 情况一：退款成功
         if (PayRefundStatusRespEnum.isSuccess(notify.getStatus())) {
             notifyRefundSuccess(channel, notify);
@@ -226,14 +218,14 @@ public class PayRefundServiceImpl implements PayRefundService {
         PayRefundDO refund = refundMapper.selectByAppIdAndNo(
                 channel.getAppId(), notify.getOutRefundNo());
         if (refund == null) {
-            throw exception(ErrorCodeConstants.REFUND_NOT_FOUND);
+            throw exception(REFUND_NOT_FOUND);
         }
         if (PayRefundStatusEnum.isSuccess(refund.getStatus())) { // 如果已经是成功，直接返回，不用重复更新
             log.info("[notifyRefundSuccess][退款订单({}) 已经是退款成功，无需更新]", refund.getId());
             return;
         }
         if (!PayRefundStatusEnum.WAITING.getStatus().equals(refund.getStatus())) {
-            throw exception(ErrorCodeConstants.REFUND_STATUS_IS_NOT_WAITING);
+            throw exception(REFUND_STATUS_IS_NOT_WAITING);
         }
         // 1.2 更新 PayRefundDO
         PayRefundDO updateRefundObj = new PayRefundDO()
@@ -243,7 +235,7 @@ public class PayRefundServiceImpl implements PayRefundService {
                 .setChannelNotifyData(toJsonString(notify));
         int updateCounts = refundMapper.updateByIdAndStatus(refund.getId(), refund.getStatus(), updateRefundObj);
         if (updateCounts == 0) { // 校验状态，必须是等待状态
-            throw exception(ErrorCodeConstants.REFUND_STATUS_IS_NOT_WAITING);
+            throw exception(REFUND_STATUS_IS_NOT_WAITING);
         }
         log.info("[notifyRefundSuccess][退款订单({}) 更新为退款成功]", refund.getId());
 
@@ -261,14 +253,14 @@ public class PayRefundServiceImpl implements PayRefundService {
         PayRefundDO refund = refundMapper.selectByAppIdAndNo(
                 channel.getAppId(), notify.getOutRefundNo());
         if (refund == null) {
-            throw exception(ErrorCodeConstants.REFUND_NOT_FOUND);
+            throw exception(REFUND_NOT_FOUND);
         }
         if (PayRefundStatusEnum.isFailure(refund.getStatus())) { // 如果已经是成功，直接返回，不用重复更新
             log.info("[notifyRefundSuccess][退款订单({}) 已经是退款关闭，无需更新]", refund.getId());
             return;
         }
         if (!PayRefundStatusEnum.WAITING.getStatus().equals(refund.getStatus())) {
-            throw exception(ErrorCodeConstants.REFUND_STATUS_IS_NOT_WAITING);
+            throw exception(REFUND_STATUS_IS_NOT_WAITING);
         }
         // 1.2 更新 PayRefundDO
         PayRefundDO updateRefundObj = new PayRefundDO()
@@ -278,13 +270,22 @@ public class PayRefundServiceImpl implements PayRefundService {
                 .setChannelErrorCode(notify.getChannelErrorCode()).setChannelErrorMsg(notify.getChannelErrorMsg());
         int updateCounts = refundMapper.updateByIdAndStatus(refund.getId(), refund.getStatus(), updateRefundObj);
         if (updateCounts == 0) { // 校验状态，必须是等待状态
-            throw exception(ErrorCodeConstants.REFUND_STATUS_IS_NOT_WAITING);
+            throw exception(REFUND_STATUS_IS_NOT_WAITING);
         }
         log.info("[notifyRefundFailure][退款订单({}) 更新为退款失败]", refund.getId());
 
         // 2. 插入退款通知记录 TODO 芋艿：退款失败
         notifyService.createPayNotifyTask(PayNotifyTaskCreateReqDTO.builder()
                 .type(PayNotifyTypeEnum.REFUND.getType()).dataId(refund.getId()).build());
+    }
+
+    /**
+     * 获得自身的代理对象，解决 AOP 生效问题
+     *
+     * @return 自己
+     */
+    private PayRefundServiceImpl getSelf() {
+        return SpringUtil.getBean(getClass());
     }
 
 }
