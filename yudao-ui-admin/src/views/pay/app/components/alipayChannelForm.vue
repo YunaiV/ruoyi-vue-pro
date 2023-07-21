@@ -172,7 +172,7 @@ export default {
           this.formData = response.data;
           this.formData.config = JSON.parse(response.data.config);
         }
-        this.title = this.formData.id ? '创建支付渠道' : '编辑支付渠道'
+        this.title = !this.formData.id ? '创建支付渠道' : '编辑支付渠道'
       }).finally(() => {
         this.formLoading = false;
       });
@@ -257,12 +257,7 @@ export default {
         this.formData.config.rootCertContent = e.target.result
       }
       readFile.readAsText(event.file);
-    },
-
+    }
   }
 }
-
 </script>
-<style scoped>
-
-</style>
