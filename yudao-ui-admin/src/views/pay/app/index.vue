@@ -43,7 +43,6 @@
                      @change="handleStatusChange(scope.row)"/>
         </template>
       </el-table-column>
-      <el-table-column label="商户名称" align="center" prop="payMerchant.name"/>
       <el-table-column label="支付宝配置" align="center">
         <el-table-column :label="payChannelEnum.ALIPAY_APP.name" align="center">
           <template v-slot="scope">

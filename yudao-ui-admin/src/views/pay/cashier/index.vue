@@ -78,7 +78,6 @@
 </template>
 <script>
 import QrcodeVue from 'qrcode.vue'
-import { DICT_TYPE, getDictDatas } from "@/utils/dict";
 import { getOrder, submitOrder } from '@/api/pay/order';
 import { PayChannelEnum, PayDisplayModeEnum, PayOrderStatusEnum } from "@/utils/constants";
 

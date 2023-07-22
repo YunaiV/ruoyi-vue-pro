@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.pay.service.order;
 
-import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
@@ -33,6 +32,7 @@ import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
 import cn.iocoder.yudao.module.pay.service.notify.dto.PayNotifyTaskCreateReqDTO;
 import cn.iocoder.yudao.module.pay.util.MoneyUtils;
+import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -129,10 +129,10 @@ public class PayOrderServiceImpl implements PayOrderService {
 
     @Override // 注意，这里不能添加事务注解，避免调用支付渠道失败时，将 PayOrderExtensionDO 回滚了
     public PayOrderSubmitRespVO submitOrder(PayOrderSubmitReqVO reqVO, String userIp) {
-        // 1. 获得 PayOrderDO ，并校验其是否存在
+        // 1.1 获得 PayOrderDO ，并校验其是否存在
         PayOrderDO order = validateOrderCanSubmit(reqVO.getId());
-        // 1.2 校验支付渠道是否有效
-        PayChannelDO channel = validatePayChannelCanSubmit(order.getAppId(), reqVO.getChannelCode());
+        // 1.32 校验支付渠道是否有效
+        PayChannelDO channel = validateChannelCanSubmit(order.getAppId(), reqVO.getChannelCode());
         PayClient client = payClientFactory.getPayClient(channel.getId());
 
         // 2. 插入 PayOrderExtensionDO
@@ -173,16 +173,52 @@ public class PayOrderServiceImpl implements PayOrderService {
         if (order == null) { // 是否存在
             throw exception(ORDER_NOT_FOUND);
         }
+        if (PayOrderStatusEnum.isSuccess(order.getStatus())) { // 校验状态，发现已支付
+            throw exception(ORDER_STATUS_IS_SUCCESS);
+        }
         if (!PayOrderStatusEnum.WAITING.getStatus().equals(order.getStatus())) { // 校验状态，必须是待支付
             throw exception(ORDER_STATUS_IS_NOT_WAITING);
         }
         if (LocalDateTimeUtils.beforeNow(order.getExpireTime())) { // 校验是否过期
             throw exception(ORDER_IS_EXPIRED);
         }
+
+        // 【重要】校验是否支付拓展单已支付，只是没有回调、或者数据不正常
+        validateOrderActuallyPaid(id);
         return order;
     }
 
-    private PayChannelDO validatePayChannelCanSubmit(Long appId, String channelCode) {
+    /**
+     * 校验支付订单实际已支付
+     *
+     * @param id 支付编号
+     */
+    @VisibleForTesting
+    void validateOrderActuallyPaid(Long id) {
+        List<PayOrderExtensionDO> orderExtensions = orderExtensionMapper.selectListByOrderId(id);
+        orderExtensions.forEach(orderExtension -> {
+            // 情况一：校验数据库中的 orderExtension 是不是已支付
+            if (PayOrderStatusEnum.isSuccess(orderExtension.getStatus())) {
+                log.warn("[validateOrderCanSubmit][order({}) 的 extension({}) 已支付，可能是数据不一致]",
+                        id, orderExtension.getId());
+                throw exception(ORDER_EXTENSION_IS_PAID);
+            }
+            // 情况二：调用三方接口，查询支付单状态，是不是已支付
+            PayClient payClient = payClientFactory.getPayClient(orderExtension.getChannelId());
+            if (payClient == null) {
+                log.error("[validateOrderCanSubmit][渠道编号({}) 找不到对应的支付客户端]", orderExtension.getChannelId());
+                return;
+            }
+            PayOrderRespDTO respDTO = payClient.getOrder(orderExtension.getNo());
+            if (respDTO != null && PayOrderStatusRespEnum.isSuccess(respDTO.getStatus())) {
+                log.warn("[validateOrderCanSubmit][order({}) 的 PayOrderRespDTO({}) 已支付，可能是回调延迟]",
+                        id, toJsonString(respDTO));
+                throw exception(ORDER_EXTENSION_IS_PAID);
+            }
+        });
+    }
+
+    private PayChannelDO validateChannelCanSubmit(Long appId, String channelCode) {
         // 校验 App
         appService.validPayApp(appId);
         // 校验支付渠道是否有效

@@ -10,7 +10,6 @@ import cn.iocoder.yudao.module.pay.convert.refund.PayRefundConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
-import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -44,8 +43,6 @@ public class PayRefundController {
     private PayRefundService refundService;
     @Resource
     private PayAppService appService;
-    @Resource
-    private PayOrderService orderService;
 
     @GetMapping("/get")
     @Operation(summary = "获得退款订单")

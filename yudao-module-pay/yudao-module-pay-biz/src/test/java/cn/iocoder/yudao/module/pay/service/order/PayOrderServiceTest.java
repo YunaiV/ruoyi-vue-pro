@@ -267,7 +267,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
     @Test
     public void testSubmitOrder_notWaiting() {
         // mock 数据（order）
-        PayOrderDO order = randomPojo(PayOrderDO.class, o -> o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus()));
+        PayOrderDO order = randomPojo(PayOrderDO.class, o -> o.setStatus(PayOrderStatusEnum.REFUND.getStatus()));
         orderMapper.insert(order);
         // 准备参数
         PayOrderSubmitReqVO reqVO = randomPojo(PayOrderSubmitReqVO.class, o -> o.setId(order.getId()));
@@ -275,6 +275,19 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
 
         // 调用, 并断言异常
         assertServiceException(() -> orderService.submitOrder(reqVO, userIp), ORDER_STATUS_IS_NOT_WAITING);
+    }
+
+    @Test
+    public void testSubmitOrder_isSuccess() {
+        // mock 数据（order）
+        PayOrderDO order = randomPojo(PayOrderDO.class, o -> o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus()));
+        orderMapper.insert(order);
+        // 准备参数
+        PayOrderSubmitReqVO reqVO = randomPojo(PayOrderSubmitReqVO.class, o -> o.setId(order.getId()));
+        String userIp = randomString();
+
+        // 调用, 并断言异常
+        assertServiceException(() -> orderService.submitOrder(reqVO, userIp), ORDER_STATUS_IS_SUCCESS);
     }
 
     @Test
@@ -424,6 +437,57 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
             // 断言，调用
             verify(payOrderServiceImpl).notifyOrder(same(channel), same(unifiedOrderResp));
         }
+    }
+
+    @Test
+    public void testValidateOrderActuallyPaid_dbPaid() {
+        // 准备参数
+        Long id = randomLongId();
+        // mock 方法（OrderExtension 已支付）
+        PayOrderExtensionDO orderExtension = randomPojo(PayOrderExtensionDO.class,
+                o -> o.setOrderId(id).setStatus(PayOrderStatusEnum.SUCCESS.getStatus()));
+        orderExtensionMapper.insert(orderExtension);
+
+        // 调用，并断言异常
+        assertServiceException(() -> orderService.validateOrderActuallyPaid(id),
+                ORDER_EXTENSION_IS_PAID);
+    }
+
+    @Test
+    public void testValidateOrderActuallyPaid_remotePaid() {
+        // 准备参数
+        Long id = randomLongId();
+        // mock 方法（OrderExtension 已支付）
+        PayOrderExtensionDO orderExtension = randomPojo(PayOrderExtensionDO.class,
+                o -> o.setOrderId(id).setStatus(PayOrderStatusEnum.WAITING.getStatus()));
+        orderExtensionMapper.insert(orderExtension);
+        // mock 方法（PayClient 已支付）
+        PayClient client = mock(PayClient.class);
+        when(payClientFactory.getPayClient(eq(orderExtension.getChannelId()))).thenReturn(client);
+        when(client.getOrder(eq(orderExtension.getNo()))).thenReturn(randomPojo(PayOrderRespDTO.class,
+                o -> o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus())));
+
+        // 调用，并断言异常
+        assertServiceException(() -> orderService.validateOrderActuallyPaid(id),
+                ORDER_EXTENSION_IS_PAID);
+    }
+
+    @Test
+    public void testValidateOrderActuallyPaid_success() {
+        // 准备参数
+        Long id = randomLongId();
+        // mock 方法（OrderExtension 已支付）
+        PayOrderExtensionDO orderExtension = randomPojo(PayOrderExtensionDO.class,
+                o -> o.setOrderId(id).setStatus(PayOrderStatusEnum.WAITING.getStatus()));
+        orderExtensionMapper.insert(orderExtension);
+        // mock 方法（PayClient 已支付）
+        PayClient client = mock(PayClient.class);
+        when(payClientFactory.getPayClient(eq(orderExtension.getChannelId()))).thenReturn(client);
+        when(client.getOrder(eq(orderExtension.getNo()))).thenReturn(randomPojo(PayOrderRespDTO.class,
+                o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())));
+
+        // 调用，并断言异常
+        orderService.validateOrderActuallyPaid(id);
     }
 
     @Test
