@@ -956,4 +956,154 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         }
     }
 
+    @Test
+    public void testExpireOrder_orderExtension_isSuccess() {
+        // mock 数据（PayOrderDO）
+        PayOrderDO order = randomPojo(PayOrderDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())
+                        .setExpireTime(addTime(Duration.ofMinutes(-1))));
+        orderMapper.insert(order);
+        // mock 数据（PayOrderExtensionDO 已支付）
+        PayOrderExtensionDO orderExtension = randomPojo(PayOrderExtensionDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus())
+                        .setOrderId(order.getId()));
+        orderExtensionMapper.insert(orderExtension);
+        // mock 方法（PayClient）
+        PayClient client = mock(PayClient.class);
+        when(payClientFactory.getPayClient(eq(10L))).thenReturn(client);
+
+        // 调用
+        int count = orderService.expireOrder();
+        // 断言
+        assertEquals(count, 0);
+        // 断言 order 没有变化，因为没更新
+        assertPojoEquals(order, orderMapper.selectOne(null));
+    }
+
+    @Test
+    public void testExpireOrder_payClient_notFound() {
+        // mock 数据（PayOrderDO）
+        PayOrderDO order = randomPojo(PayOrderDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())
+                        .setExpireTime(addTime(Duration.ofMinutes(-1))));
+        orderMapper.insert(order);
+        // mock 数据（PayOrderExtensionDO 等待中）
+        PayOrderExtensionDO orderExtension = randomPojo(PayOrderExtensionDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())
+                        .setOrderId(order.getId())
+                        .setChannelId(10L));
+        orderExtensionMapper.insert(orderExtension);
+
+        // 调用
+        int count = orderService.expireOrder();
+        // 断言
+        assertEquals(count, 0);
+        // 断言 order 没有变化，因为没更新
+        assertPojoEquals(order, orderMapper.selectOne(null));
+    }
+
+    @Test
+    public void testExpireOrder_getOrder_isRefund() {
+        // mock 数据（PayOrderDO）
+        PayOrderDO order = randomPojo(PayOrderDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())
+                        .setExpireTime(addTime(Duration.ofMinutes(-1))));
+        orderMapper.insert(order);
+        // mock 数据（PayOrderExtensionDO 等待中）
+        PayOrderExtensionDO orderExtension = randomPojo(PayOrderExtensionDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())
+                        .setOrderId(order.getId()).setNo("P110")
+                        .setChannelId(10L));
+        orderExtensionMapper.insert(orderExtension);
+        // mock 方法（PayClient）
+        PayClient client = mock(PayClient.class);
+        when(payClientFactory.getPayClient(eq(10L))).thenReturn(client);
+        // mock 方法（PayClient 退款返回）
+        PayOrderRespDTO respDTO = randomPojo(PayOrderRespDTO.class,
+                o -> o.setStatus(PayOrderStatusEnum.REFUND.getStatus()));
+        when(client.getOrder(eq("P110"))).thenReturn(respDTO);
+
+        // 调用
+        int count = orderService.expireOrder();
+        // 断言
+        assertEquals(count, 0);
+        // 断言 order 没有变化，因为没更新
+        assertPojoEquals(order, orderMapper.selectOne(null));
+    }
+
+    @Test
+    public void testExpireOrder_getOrder_isSuccess() {
+        PayOrderServiceImpl payOrderServiceImpl = mock(PayOrderServiceImpl.class);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PayOrderServiceImpl.class)))
+                    .thenReturn(payOrderServiceImpl);
+
+            // mock 数据（PayOrderDO）
+            PayOrderDO order = randomPojo(PayOrderDO.class,
+                    o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())
+                            .setExpireTime(addTime(Duration.ofMinutes(-1))));
+            orderMapper.insert(order);
+            // mock 数据（PayOrderExtensionDO 等待中）
+            PayOrderExtensionDO orderExtension = randomPojo(PayOrderExtensionDO.class,
+                    o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())
+                            .setOrderId(order.getId()).setNo("P110")
+                            .setChannelId(10L));
+            orderExtensionMapper.insert(orderExtension);
+            // mock 方法（PayClient）
+            PayClient client = mock(PayClient.class);
+            when(payClientFactory.getPayClient(eq(10L))).thenReturn(client);
+            // mock 方法（PayClient 成功返回）
+            PayOrderRespDTO respDTO = randomPojo(PayOrderRespDTO.class,
+                    o -> o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus()));
+            when(client.getOrder(eq("P110"))).thenReturn(respDTO);
+            // mock 方法（PayChannelDO）
+            PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L));
+            when(channelService.validPayChannel(eq(10L))).thenReturn(channel);
+
+            // 调用
+            int count = orderService.expireOrder();
+            // 断言
+            assertEquals(count, 0);
+            // 断言 order 没有变化，因为没更新
+            assertPojoEquals(order, orderMapper.selectOne(null));
+            verify(payOrderServiceImpl).notifyOrder(same(channel), same(respDTO));
+        }
+    }
+
+    @Test
+    public void testExpireOrder_success() {
+        // mock 数据（PayOrderDO）
+        PayOrderDO order = randomPojo(PayOrderDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())
+                        .setExpireTime(addTime(Duration.ofMinutes(-1))));
+        orderMapper.insert(order);
+        // mock 数据（PayOrderExtensionDO 等待中）
+        PayOrderExtensionDO orderExtension = randomPojo(PayOrderExtensionDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())
+                        .setOrderId(order.getId()).setNo("P110")
+                        .setChannelId(10L));
+        orderExtensionMapper.insert(orderExtension);
+        // mock 方法（PayClient）
+        PayClient client = mock(PayClient.class);
+        when(payClientFactory.getPayClient(eq(10L))).thenReturn(client);
+        // mock 方法（PayClient 关闭返回）
+        PayOrderRespDTO respDTO = randomPojo(PayOrderRespDTO.class,
+                o -> o.setStatus(PayOrderStatusEnum.CLOSED.getStatus()));
+        when(client.getOrder(eq("P110"))).thenReturn(respDTO);
+
+        // 调用
+        int count = orderService.expireOrder();
+        // 断言
+        assertEquals(count, 1);
+        // 断言 extension 变化
+        orderExtension.setStatus(PayOrderStatusEnum.CLOSED.getStatus())
+                .setChannelNotifyData(toJsonString(respDTO));
+        assertPojoEquals(orderExtension, orderExtensionMapper.selectOne(null),
+                "updateTime", "updater");
+        // 断言 order 变化
+        order.setStatus(PayOrderStatusEnum.CLOSED.getStatus());
+        assertPojoEquals(order, orderMapper.selectOne(null),
+                "updateTime", "updater");
+    }
+
 }
