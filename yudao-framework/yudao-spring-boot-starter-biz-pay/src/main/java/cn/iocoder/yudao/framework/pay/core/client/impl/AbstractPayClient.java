@@ -107,6 +107,20 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
     protected abstract PayOrderRespDTO doParseOrderNotify(Map<String, String> params, String body)
             throws Throwable;
 
+    @Override
+    public PayOrderRespDTO getOrder(String outTradeNo) {
+        try {
+            return doGetOrder(outTradeNo);
+        } catch (Throwable ex) {
+            log.error("[getOrder][客户端({}) outTradeNo({}) 查询支付单异常]",
+                    getId(), outTradeNo, ex);
+            throw buildPayException(ex);
+        }
+    }
+
+    protected abstract PayOrderRespDTO doGetOrder(String outTradeNo)
+            throws Throwable;
+
     // ============ 退款相关 ==========
 
     @Override

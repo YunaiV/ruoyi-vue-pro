@@ -94,38 +94,40 @@ public class PayOrderRespDTO {
     /**
      * 创建【SUCCESS】状态的订单返回
      */
-    public PayOrderRespDTO(String channelOrderNo, String channelUserId, LocalDateTime successTime,
-                           String outTradeNo, Object rawData) {
-        this.status = PayOrderStatusRespEnum.SUCCESS.getStatus();
-        this.channelOrderNo = channelOrderNo;
-        this.channelUserId = channelUserId;
-        this.successTime = successTime;
+    public static PayOrderRespDTO successOf(String channelOrderNo, String channelUserId, LocalDateTime successTime,
+                                            String outTradeNo, Object rawData) {
+        PayOrderRespDTO respDTO = new PayOrderRespDTO();
+        respDTO.status = PayOrderStatusRespEnum.SUCCESS.getStatus();
+        respDTO.channelOrderNo = channelOrderNo;
+        respDTO.channelUserId = channelUserId;
+        respDTO.successTime = successTime;
         // 相对通用的字段
-        this.outTradeNo = outTradeNo;
-        this.rawData = rawData;
+        respDTO.outTradeNo = outTradeNo;
+        respDTO.rawData = rawData;
+        return respDTO;
     }
 
     /**
-     * 创建【SUCCESS】或【CLOSED】状态的订单返回，适合支付渠道回调时
+     * 创建指定状态的订单返回，适合支付渠道回调时
      */
-    public PayOrderRespDTO(Integer status, String channelOrderNo, String channelUserId, LocalDateTime successTime,
-                           String outTradeNo, Object rawData) {
-        this.status = status;
-        this.channelOrderNo = channelOrderNo;
-        this.channelUserId = channelUserId;
-        this.successTime = successTime;
+    public static PayOrderRespDTO of(Integer status, String channelOrderNo, String channelUserId, LocalDateTime successTime,
+                                     String outTradeNo, Object rawData) {
+        PayOrderRespDTO respDTO = new PayOrderRespDTO();
+        respDTO.status = status;
+        respDTO.channelOrderNo = channelOrderNo;
+        respDTO.channelUserId = channelUserId;
+        respDTO.successTime = successTime;
         // 相对通用的字段
-        this.outTradeNo = outTradeNo;
-        this.rawData = rawData;
+        respDTO.outTradeNo = outTradeNo;
+        respDTO.rawData = rawData;
+        return respDTO;
     }
 
     /**
      * 创建【CLOSED】状态的订单返回，适合调用支付渠道失败时
-     *
-     * 参数和 {@link #PayOrderRespDTO(String, String, String, Object)} 冲突，所以独立个方法出来
      */
-    public static PayOrderRespDTO build(String channelErrorCode, String channelErrorMsg,
-                                        String outTradeNo, Object rawData) {
+    public static PayOrderRespDTO closedOf(String channelErrorCode, String channelErrorMsg,
+                                           String outTradeNo, Object rawData) {
         PayOrderRespDTO respDTO = new PayOrderRespDTO();
         respDTO.status = PayOrderStatusRespEnum.CLOSED.getStatus();
         respDTO.channelErrorCode = channelErrorCode;

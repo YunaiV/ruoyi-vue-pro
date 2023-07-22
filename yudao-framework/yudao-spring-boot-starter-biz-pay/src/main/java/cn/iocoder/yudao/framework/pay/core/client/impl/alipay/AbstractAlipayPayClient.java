@@ -17,9 +17,12 @@ import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayConfig;
 import com.alipay.api.AlipayResponse;
 import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.domain.AlipayTradeQueryModel;
 import com.alipay.api.domain.AlipayTradeRefundModel;
 import com.alipay.api.internal.util.AlipaySignature;
+import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.request.AlipayTradeRefundRequest;
+import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.alipay.api.response.AlipayTradeRefundResponse;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -63,7 +66,7 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
      */
     protected PayOrderRespDTO buildClosedPayOrderRespDTO(PayOrderUnifiedReqDTO reqDTO, AlipayResponse response) {
         Assert.isFalse(response.isSuccess());
-        return PayOrderRespDTO.build(response.getSubCode(), response.getSubMsg(),
+        return PayOrderRespDTO.closedOf(response.getSubCode(), response.getSubMsg(),
                 reqDTO.getOutTradeNo(), response);
     }
 
@@ -76,10 +79,7 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
 
         // 2. 解析订单的状态
         // 额外说明：支付宝不仅仅支付成功会回调，再各种触发支付单数据变化时，都会进行回调，所以这里 status 的解析会写的比较复杂
-        String tradeStatus = bodyObj.get("trade_status");
-        Integer status = Objects.equals("WAIT_BUYER_PAY", tradeStatus) ? PayOrderStatusRespEnum.WAITING.getStatus()
-                : ObjectUtils.equalsAny(tradeStatus, "TRADE_FINISHED", "TRADE_SUCCESS") ? PayOrderStatusRespEnum.SUCCESS.getStatus()
-                : Objects.equals("TRADE_CLOSED", tradeStatus) ? PayOrderStatusRespEnum.CLOSED.getStatus() : null;
+        Integer status = parseStatus(bodyObj.get("trade_status"));
         // 特殊逻辑: 支付宝没有退款成功的状态，所以，如果有退款金额，我们认为是退款成功
         if (MapUtil.getDouble(bodyObj, "refund_fee", 0D) > 0) {
             status = PayOrderStatusRespEnum.REFUND.getStatus();
@@ -87,8 +87,38 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
         Assert.notNull(status, (Supplier<Throwable>) () -> {
             throw new IllegalArgumentException(StrUtil.format("body({}) 的 trade_status 不正确", body));
         });
-        return new PayOrderRespDTO(status, bodyObj.get("trade_no"), bodyObj.get("seller_id"), parseTime(params.get("gmt_payment")),
+        return PayOrderRespDTO.of(status, bodyObj.get("trade_no"), bodyObj.get("seller_id"), parseTime(params.get("gmt_payment")),
                 bodyObj.get("out_trade_no"), body);
+    }
+
+    @Override
+    protected PayOrderRespDTO doGetOrder(String outTradeNo) throws Throwable {
+        // 1.1 构建 AlipayTradeRefundModel 请求
+        AlipayTradeQueryModel model = new AlipayTradeQueryModel();
+        model.setOutTradeNo(outTradeNo);
+        // 1.2 构建 AlipayTradeQueryRequest 请求
+        AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
+        request.setBizModel(model);
+
+        // 2.1 执行请求
+        AlipayTradeQueryResponse response =  client.execute(request);
+        if (!response.isSuccess()) {
+            return PayOrderRespDTO.closedOf(response.getSubCode(), response.getSubMsg(),
+                    outTradeNo, response);
+        }
+        // 2.2 解析订单的状态
+        Integer status = parseStatus(response.getTradeStatus());
+        Assert.notNull(status, (Supplier<Throwable>) () -> {
+            throw new IllegalArgumentException(StrUtil.format("body({}) 的 trade_status 不正确", response.getBody()));
+        });
+        return PayOrderRespDTO.of(status, response.getTradeNo(), response.getBuyerUserId(), LocalDateTimeUtil.of(response.getSendPayDate()),
+                outTradeNo, response);
+    }
+
+    private Integer parseStatus(String tradeStatus) {
+        return Objects.equals("WAIT_BUYER_PAY", tradeStatus) ? PayOrderStatusRespEnum.WAITING.getStatus()
+                : ObjectUtils.equalsAny(tradeStatus, "TRADE_FINISHED", "TRADE_SUCCESS") ? PayOrderStatusRespEnum.SUCCESS.getStatus()
+                : Objects.equals("TRADE_CLOSED", tradeStatus) ? PayOrderStatusRespEnum.CLOSED.getStatus() : null;
     }
 
     // ============ 退款相关 ==========

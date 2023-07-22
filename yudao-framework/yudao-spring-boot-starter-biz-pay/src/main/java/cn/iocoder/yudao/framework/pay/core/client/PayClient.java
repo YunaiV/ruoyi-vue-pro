@@ -27,7 +27,7 @@ public interface PayClient {
      * 调用支付渠道，统一下单
      *
      * @param reqDTO 下单信息
-     * @return 各支付渠道的返回结果
+     * @return 支付订单信息
      */
     PayOrderRespDTO unifiedOrder(PayOrderUnifiedReqDTO reqDTO);
 
@@ -39,6 +39,14 @@ public interface PayClient {
      * @return 支付订单信息
      */
     PayOrderRespDTO parseOrderNotify(Map<String, String> params, String body);
+
+    /**
+     * 获得支付订单信息
+     *
+     * @param outTradeNo 外部订单号
+     * @return 支付订单信息
+     */
+    PayOrderRespDTO getOrder(String outTradeNo);
 
     // ============ 退款相关 ==========
 

@@ -90,7 +90,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
         } catch (WxPayException e) {
             String errorCode = getErrorCode(e);
             String errorMessage = getErrorMessage(e);
-            return PayOrderRespDTO.build(errorCode, errorMessage,
+            return PayOrderRespDTO.closedOf(errorCode, errorMessage,
                     reqDTO.getOutTradeNo(), e.getXmlString());
         }
     }
@@ -133,7 +133,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
         // 微信支付的回调，只有 SUCCESS 支付成功、CLOSED 支付失败两种情况，无需像支付宝一样解析的比较复杂
         Integer status = Objects.equals(response.getResultCode(), "SUCCESS") ?
                 PayOrderStatusRespEnum.SUCCESS.getStatus() : PayOrderStatusRespEnum.CLOSED.getStatus();
-        return new PayOrderRespDTO(status, response.getTransactionId(), response.getOpenid(), parseDateV2(response.getTimeEnd()),
+        return PayOrderRespDTO.of(status, response.getTransactionId(), response.getOpenid(), parseDateV2(response.getTimeEnd()),
                 response.getOutTradeNo(), body);
     }
 
@@ -146,8 +146,13 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
         Integer status = Objects.equals(result.getTradeState(), "SUCCESS") ?
                 PayOrderStatusRespEnum.SUCCESS.getStatus() : PayOrderStatusRespEnum.CLOSED.getStatus();
         String openid = result.getPayer() != null ? result.getPayer().getOpenid() : null;
-        return new PayOrderRespDTO(status, result.getTransactionId(), openid, parseDateV3(result.getSuccessTime()),
+        return PayOrderRespDTO.of(status, result.getTransactionId(), openid, parseDateV3(result.getSuccessTime()),
                 result.getOutTradeNo(), body);
+    }
+
+    @Override
+    protected PayOrderRespDTO doGetOrder(String outTradeNo) throws Throwable {
+        return null;
     }
 
     // ============ 退款相关 ==========
