@@ -16,8 +16,12 @@ import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyV3Result;
 import com.github.binarywang.wxpay.bean.notify.WxPayRefundNotifyResult;
 import com.github.binarywang.wxpay.bean.notify.WxPayRefundNotifyV3Result;
+import com.github.binarywang.wxpay.bean.request.WxPayOrderQueryRequest;
+import com.github.binarywang.wxpay.bean.request.WxPayOrderQueryV3Request;
 import com.github.binarywang.wxpay.bean.request.WxPayRefundRequest;
 import com.github.binarywang.wxpay.bean.request.WxPayRefundV3Request;
+import com.github.binarywang.wxpay.bean.result.WxPayOrderQueryResult;
+import com.github.binarywang.wxpay.bean.result.WxPayOrderQueryV3Result;
 import com.github.binarywang.wxpay.bean.result.WxPayRefundResult;
 import com.github.binarywang.wxpay.bean.result.WxPayRefundV3Result;
 import com.github.binarywang.wxpay.config.WxPayConfig;
@@ -115,7 +119,6 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
 
     @Override
     public PayOrderRespDTO doParseOrderNotify(Map<String, String> params, String body) throws WxPayException {
-        // 微信支付 v2 回调结果处理
         switch (config.getApiVersion()) {
             case API_VERSION_V2:
                 return doParseOrderNotifyV2(body);
@@ -130,7 +133,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
         // 1. 解析回调
         WxPayOrderNotifyResult response = client.parseOrderNotifyResult(body);
         // 2. 构建结果
-        // 微信支付的回调，只有 SUCCESS 支付成功、CLOSED 支付失败两种情况，无需像支付宝一样解析的比较复杂
+        // V2 微信支付的回调，只有 SUCCESS 支付成功、CLOSED 支付失败两种情况，无需像支付宝一样解析的比较复杂
         Integer status = Objects.equals(response.getResultCode(), "SUCCESS") ?
                 PayOrderStatusRespEnum.SUCCESS.getStatus() : PayOrderStatusRespEnum.CLOSED.getStatus();
         return PayOrderRespDTO.of(status, response.getTransactionId(), response.getOpenid(), parseDateV2(response.getTimeEnd()),
@@ -142,9 +145,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
         WxPayOrderNotifyV3Result response = client.parseOrderNotifyV3Result(body, null);
         WxPayOrderNotifyV3Result.DecryptNotifyResult result = response.getResult();
         // 2. 构建结果
-        // 微信支付的回调，只有 SUCCESS 支付成功、CLOSED 支付失败两种情况，无需像支付宝一样解析的比较复杂
-        Integer status = Objects.equals(result.getTradeState(), "SUCCESS") ?
-                PayOrderStatusRespEnum.SUCCESS.getStatus() : PayOrderStatusRespEnum.CLOSED.getStatus();
+        Integer status = parseStatus(result.getTradeState());
         String openid = result.getPayer() != null ? result.getPayer().getOpenid() : null;
         return PayOrderRespDTO.of(status, result.getTransactionId(), openid, parseDateV3(result.getSuccessTime()),
                 result.getOutTradeNo(), body);
@@ -152,7 +153,59 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
 
     @Override
     protected PayOrderRespDTO doGetOrder(String outTradeNo) throws Throwable {
-        return null;
+        switch (config.getApiVersion()) {
+            case API_VERSION_V2:
+                return doGetOrderV2(outTradeNo);
+            case WxPayClientConfig.API_VERSION_V3:
+                return doGetOrderV3(outTradeNo);
+            default:
+                throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
+        }
+    }
+
+    private PayOrderRespDTO doGetOrderV2(String outTradeNo) throws WxPayException {
+        // 构建 WxPayUnifiedOrderRequest 对象
+        WxPayOrderQueryRequest request = WxPayOrderQueryRequest.newBuilder()
+                .outTradeNo(outTradeNo).build();
+        // 执行请求
+        WxPayOrderQueryResult response = client.queryOrder(request);
+
+        // 转换结果
+        Integer status = parseStatus(response.getTradeState());
+        return PayOrderRespDTO.of(status, response.getTransactionId(), response.getOpenid(), parseDateV2(response.getTimeEnd()),
+                outTradeNo, response);
+    }
+
+    private PayOrderRespDTO doGetOrderV3(String outTradeNo) throws WxPayException {
+        // 构建 WxPayUnifiedOrderRequest 对象
+        WxPayOrderQueryV3Request request = new WxPayOrderQueryV3Request()
+                .setOutTradeNo(outTradeNo);
+        // 执行请求
+        WxPayOrderQueryV3Result response = client.queryOrderV3(request);
+
+        // 转换结果
+        Integer status = parseStatus(response.getTradeState());
+        String openid = response.getPayer() != null ? response.getPayer().getOpenid() : null;
+        return PayOrderRespDTO.of(status, response.getTransactionId(), openid, parseDateV3(response.getSuccessTime()),
+                outTradeNo, response);
+    }
+
+    private static Integer parseStatus(String tradeState) {
+        switch (tradeState) {
+            case "NOTPAY":
+            case "USERPAYING": // 支付中，等待用户输入密码（条码支付独有）
+                return PayOrderStatusRespEnum.WAITING.getStatus();
+            case "SUCCESS":
+                return PayOrderStatusRespEnum.SUCCESS.getStatus();
+            case "REFUND":
+                return PayOrderStatusRespEnum.REFUND.getStatus();
+            case "CLOSED":
+            case "REVOKED": // 已撤销（刷卡支付独有）
+            case "PAYERROR": // 支付失败（其它原因，如银行返回失败）
+                return PayOrderStatusRespEnum.CLOSED.getStatus();
+            default:
+                throw new IllegalArgumentException(StrUtil.format("未知的支付状态({})", tradeState));
+        }
     }
 
     // ============ 退款相关 ==========

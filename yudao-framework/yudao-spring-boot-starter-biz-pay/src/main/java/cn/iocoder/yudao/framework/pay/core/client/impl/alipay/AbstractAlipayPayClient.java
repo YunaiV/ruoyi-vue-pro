@@ -115,7 +115,7 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
                 outTradeNo, response);
     }
 
-    private Integer parseStatus(String tradeStatus) {
+    private static Integer parseStatus(String tradeStatus) {
         return Objects.equals("WAIT_BUYER_PAY", tradeStatus) ? PayOrderStatusRespEnum.WAITING.getStatus()
                 : ObjectUtils.equalsAny(tradeStatus, "TRADE_FINISHED", "TRADE_SUCCESS") ? PayOrderStatusRespEnum.SUCCESS.getStatus()
                 : Objects.equals("TRADE_CLOSED", tradeStatus) ? PayOrderStatusRespEnum.CLOSED.getStatus() : null;
