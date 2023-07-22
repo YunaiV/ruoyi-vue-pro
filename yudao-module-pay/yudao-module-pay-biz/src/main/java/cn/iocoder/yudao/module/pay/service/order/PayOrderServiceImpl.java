@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.pay.service.order;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
@@ -39,6 +40,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -152,6 +155,7 @@ public class PayOrderServiceImpl implements PayOrderService {
                 .setReturnUrl(reqVO.getReturnUrl())
                 // 订单相关字段
                 .setPrice(order.getPrice()).setExpireTime(order.getExpireTime());
+        unifiedOrderReqDTO.setExpireTime(LocalDateTimeUtils.addTime(Duration.ofSeconds(70))); // TODO 芋艿：稍后删除掉
         PayOrderRespDTO unifiedOrderResp = client.unifiedOrder(unifiedOrderReqDTO);
 
         // 4. 如果调用直接支付成功，则直接更新支付单状态为成功。例如说：付款码支付，免密支付时，就直接验证支付成功
@@ -297,7 +301,7 @@ public class PayOrderServiceImpl implements PayOrderService {
             throw exception(ORDER_EXTENSION_NOT_FOUND);
         }
         if (PayOrderStatusEnum.isSuccess(orderExtension.getStatus())) { // 如果已经是成功，直接返回，不用重复更新
-            log.info("[updateOrderExtensionSuccess][支付拓展单({}) 已经是已支付，无需更新]", orderExtension.getId());
+            log.info("[updateOrderExtensionSuccess][orderExtension({}) 已经是已支付，无需更新]", orderExtension.getId());
             return orderExtension;
         }
         if (ObjectUtil.notEqual(orderExtension.getStatus(), PayOrderStatusEnum.WAITING.getStatus())) { // 校验状态，必须是待支付
@@ -310,7 +314,7 @@ public class PayOrderServiceImpl implements PayOrderService {
         if (updateCounts == 0) { // 校验状态，必须是待支付
             throw exception(ORDER_EXTENSION_STATUS_IS_NOT_WAITING);
         }
-        log.info("[updateOrderExtensionSuccess][支付拓展单({}) 更新为已支付]", orderExtension.getId());
+        log.info("[updateOrderExtensionSuccess][orderExtension({}) 更新为已支付]", orderExtension.getId());
         return orderExtension;
     }
 
@@ -331,7 +335,7 @@ public class PayOrderServiceImpl implements PayOrderService {
         }
         if (PayOrderStatusEnum.isSuccess(order.getStatus()) // 如果已经是成功，直接返回，不用重复更新
                 && Objects.equals(order.getExtensionId(), orderExtension.getId())) {
-            log.info("[updateOrderExtensionSuccess][支付订单({}) 已经是已支付，无需更新]", order.getId());
+            log.info("[updateOrderExtensionSuccess][order({}) 已经是已支付，无需更新]", order.getId());
             return true;
         }
         if (!PayOrderStatusEnum.WAITING.getStatus().equals(order.getStatus())) { // 校验状态，必须是待支付
@@ -349,7 +353,7 @@ public class PayOrderServiceImpl implements PayOrderService {
         if (updateCounts == 0) { // 校验状态，必须是待支付
             throw exception(ORDER_STATUS_IS_NOT_WAITING);
         }
-        log.info("[updateOrderExtensionSuccess][支付订单({}) 更新为已支付]", order.getId());
+        log.info("[updateOrderExtensionSuccess][order({}) 更新为已支付]", order.getId());
         return false;
     }
 
@@ -364,12 +368,12 @@ public class PayOrderServiceImpl implements PayOrderService {
             throw exception(ORDER_EXTENSION_NOT_FOUND);
         }
         if (PayOrderStatusEnum.isClosed(orderExtension.getStatus())) { // 如果已经是关闭，直接返回，不用重复更新
-            log.info("[updateOrderExtensionClosed][支付拓展单({}) 已经是支付关闭，无需更新]", orderExtension.getId());
+            log.info("[updateOrderExtensionClosed][orderExtension({}) 已经是支付关闭，无需更新]", orderExtension.getId());
             return;
         }
         // 一般出现先是支付成功，然后支付关闭，都是全部退款导致关闭的场景。这个情况，我们不更新支付拓展单，只通过退款流程，更新支付单
         if (PayOrderStatusEnum.isSuccess(orderExtension.getStatus())) {
-            log.info("[updateOrderExtensionClosed][支付拓展单({}) 是已支付，无需更新为支付关闭]", orderExtension.getId());
+            log.info("[updateOrderExtensionClosed][orderExtension({}) 是已支付，无需更新为支付关闭]", orderExtension.getId());
             return;
         }
         if (ObjectUtil.notEqual(orderExtension.getStatus(), PayOrderStatusEnum.WAITING.getStatus())) { // 校验状态，必须是待支付
@@ -383,7 +387,7 @@ public class PayOrderServiceImpl implements PayOrderService {
         if (updateCounts == 0) { // 校验状态，必须是待支付
             throw exception(ORDER_EXTENSION_STATUS_IS_NOT_WAITING);
         }
-        log.info("[updateOrderExtensionClosed][支付拓展单({}) 更新为支付关闭]", orderExtension.getId());
+        log.info("[updateOrderExtensionClosed][orderExtension({}) 更新为支付关闭]", orderExtension.getId());
     }
 
     @Override
@@ -412,6 +416,128 @@ public class PayOrderServiceImpl implements PayOrderService {
     @Override
     public PayOrderExtensionDO getOrderExtension(Long id) {
         return orderExtensionMapper.selectById(id);
+    }
+
+    @Override
+    public int syncOrder(LocalDateTime minCreateTime) {
+        // 1. 查询指定创建时间内的待支付订单
+        List<PayOrderExtensionDO> orderExtensions = orderExtensionMapper.selectListByStatusAndCreateTimeGe(
+                PayOrderStatusEnum.WAITING.getStatus(), minCreateTime);
+        if (CollUtil.isEmpty(orderExtensions)) {
+            return 0;
+        }
+        // 2. 遍历执行
+        int count = 0;
+        for (PayOrderExtensionDO orderExtension : orderExtensions) {
+            count += syncOrder(orderExtension) ? 1 : 0;
+        }
+        return count;
+    }
+
+    /**
+     * 同步单个支付拓展单
+     *
+     * @param orderExtension 支付拓展单
+     * @return 是否已支付
+     */
+    private boolean syncOrder(PayOrderExtensionDO orderExtension) {
+        try {
+            // 1.1 查询支付订单信息
+            PayClient payClient = payClientFactory.getPayClient(orderExtension.getChannelId());
+            if (payClient == null) {
+                log.error("[syncOrder][渠道编号({}) 找不到对应的支付客户端]", orderExtension.getChannelId());
+                return false;
+            }
+            PayOrderRespDTO respDTO = payClient.getOrder(orderExtension.getNo());
+            // 1.2 回调支付结果
+            notifyOrder(orderExtension.getChannelId(), respDTO);
+
+            // 2. 如果是已支付，则返回 1
+            return PayOrderStatusRespEnum.isSuccess(respDTO.getStatus());
+        } catch (Throwable e) {
+            log.error("[syncOrder][orderExtension({}) 同步支付状态异常]", orderExtension.getId(), e);
+            return false;
+        }
+    }
+
+    @Override
+    public int expireOrder() {
+        // 1. 查询过期的待支付订单
+        List<PayOrderDO> orders = orderMapper.selectListByStatusAndExpireTimeLt(
+                PayOrderStatusEnum.WAITING.getStatus(), LocalDateTime.now());
+        if (CollUtil.isEmpty(orders)) {
+            return 0;
+        }
+
+        // 2. 遍历执行
+        int count = 0;
+        for (PayOrderDO order : orders) {
+            count += expireOrder(order) ? 1 : 0;
+        }
+        return count;
+    }
+
+    /**
+     * 同步单个支付单
+     *
+     * @param order 支付单
+     * @return 是否已过期
+     */
+    private boolean expireOrder(PayOrderDO order) {
+        try {
+            // 1. 需要先处理关联的支付拓展单，避免错误的过期已支付 or 已退款的订单
+            List<PayOrderExtensionDO> orderExtensions = orderExtensionMapper.selectListByOrderId(order.getId());
+            for (PayOrderExtensionDO orderExtension : orderExtensions) {
+                if (PayOrderStatusEnum.isClosed(orderExtension.getStatus())) {
+                    continue;
+                }
+                // 情况一：校验数据库中的 orderExtension 是不是已支付
+                if (PayOrderStatusEnum.isSuccess(orderExtension.getStatus())) {
+                    log.error("[expireOrder][order({}) 的 extension({}) 已支付，可能是数据不一致]",
+                            order.getId(), orderExtension.getId());
+                    return false;
+                }
+                // 情况二：调用三方接口，查询支付单状态，是不是已支付/已退款
+                PayClient payClient = payClientFactory.getPayClient(orderExtension.getChannelId());
+                if (payClient == null) {
+                    log.error("[expireOrder][渠道编号({}) 找不到对应的支付客户端]", orderExtension.getChannelId());
+                    return false;
+                }
+                PayOrderRespDTO respDTO = payClient.getOrder(orderExtension.getNo());
+                if (PayOrderStatusRespEnum.isRefund(respDTO.getStatus())) {
+                    // 补充说明：按道理，应该是 WAITING => SUCCESS => REFUND 状态，如果直接 WAITING => REFUND 状态，说明中间丢了过程
+                    // 此时，需要人工介入，手工补齐数据，保持 WAITING => SUCCESS => REFUND 的过程
+                    log.error("[expireOrder][extension({}) 的 PayOrderRespDTO({}) 已退款，可能是回调延迟]",
+                            orderExtension.getId(), toJsonString(respDTO));
+                    return false;
+                }
+                if (PayOrderStatusRespEnum.isSuccess(respDTO.getStatus())) {
+                    notifyOrder(orderExtension.getChannelId(), respDTO);
+                    return false;
+                }
+                // 兜底逻辑：将支付拓展单更新为已关闭
+                PayOrderExtensionDO updateObj = new PayOrderExtensionDO().setStatus(PayOrderStatusEnum.CLOSED.getStatus())
+                        .setChannelNotifyData(toJsonString(respDTO));
+                if (orderExtensionMapper.updateByIdAndStatus(orderExtension.getId(), PayOrderStatusEnum.WAITING.getStatus(),
+                        updateObj) == 0) {
+                    log.error("[expireOrder][extension({}) 更新为支付关闭失败]", orderExtension.getId());
+                    return false;
+                }
+                log.info("[expireOrder][extension({}) 更新为支付关闭成功]", orderExtension.getId());
+            }
+
+            // 2. 都没有上述情况，可以安心更新为已关闭
+            PayOrderDO updateObj = new PayOrderDO().setStatus(PayOrderStatusEnum.CLOSED.getStatus());
+            if (orderMapper.updateByIdAndStatus(order.getId(), order.getStatus(), updateObj) == 0) {
+                log.error("[expireOrder][order({}) 更新为支付关闭失败]", order.getId());
+                return false;
+            }
+            log.info("[expireOrder][order({}) 更新为支付关闭失败]", order.getId());
+            return true;
+        } catch (Throwable e) {
+            log.error("[expireOrder][order({}) 过期订单异常]", order.getId(), e);
+            return false;
+        }
     }
 
     /**

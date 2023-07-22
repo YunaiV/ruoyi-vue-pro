@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -21,6 +22,12 @@ public interface PayOrderExtensionMapper extends BaseMapperX<PayOrderExtensionDO
 
     default List<PayOrderExtensionDO> selectListByOrderId(Long orderId) {
         return selectList(PayOrderExtensionDO::getOrderId, orderId);
+    }
+
+    default List<PayOrderExtensionDO> selectListByStatusAndCreateTimeGe(Integer status, LocalDateTime minCreateTime) {
+        return selectList(new LambdaQueryWrapper<PayOrderExtensionDO>()
+                .eq(PayOrderExtensionDO::getStatus, status)
+                .ge(PayOrderExtensionDO::getCreateTime, minCreateTime));
     }
 
 }
