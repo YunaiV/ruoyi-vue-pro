@@ -40,7 +40,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -155,7 +154,6 @@ public class PayOrderServiceImpl implements PayOrderService {
                 .setReturnUrl(reqVO.getReturnUrl())
                 // 订单相关字段
                 .setPrice(order.getPrice()).setExpireTime(order.getExpireTime());
-        unifiedOrderReqDTO.setExpireTime(LocalDateTimeUtils.addTime(Duration.ofSeconds(70))); // TODO 芋艿：稍后删除掉
         PayOrderRespDTO unifiedOrderResp = client.unifiedOrder(unifiedOrderReqDTO);
 
         // 4. 如果调用直接支付成功，则直接更新支付单状态为成功。例如说：付款码支付，免密支付时，就直接验证支付成功

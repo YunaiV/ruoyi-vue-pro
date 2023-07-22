@@ -36,6 +36,7 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
@@ -847,6 +848,112 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         PayOrderExtensionDO dbOrderExtension = orderService.getOrderExtension(id);
         // 断言
         assertPojoEquals(dbOrderExtension, orderExtension);
+    }
+
+    @Test
+    public void testSyncOrder_payClientNotFound() {
+        // 准备参数
+        LocalDateTime minCreateTime = LocalDateTime.now().minus(Duration.ofMinutes(10));
+        // mock 数据（PayOrderExtensionDO）
+        PayOrderExtensionDO orderExtension = randomPojo(PayOrderExtensionDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())
+                        .setCreateTime(LocalDateTime.now()));
+        orderExtensionMapper.insert(orderExtension);
+
+        // 调用
+        int count = orderService.syncOrder(minCreateTime);
+        // 断言
+        assertEquals(count, 0);
+    }
+
+    @Test
+    public void testSyncOrder_exception() {
+        // 准备参数
+        LocalDateTime minCreateTime = LocalDateTime.now().minus(Duration.ofMinutes(10));
+        // mock 数据（PayOrderExtensionDO）
+        PayOrderExtensionDO orderExtension = randomPojo(PayOrderExtensionDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())
+                        .setChannelId(10L)
+                        .setCreateTime(LocalDateTime.now()));
+        orderExtensionMapper.insert(orderExtension);
+        // mock 方法（PayClient）
+        PayClient client = mock(PayClient.class);
+        when(payClientFactory.getPayClient(eq(10L))).thenReturn(client);
+        // mock 方法（PayClient 异常）
+        when(client.getOrder(any())).thenThrow(new RuntimeException());
+
+        // 调用
+        int count = orderService.syncOrder(minCreateTime);
+        // 断言
+        assertEquals(count, 0);
+    }
+
+    @Test
+    public void testSyncOrder_orderSuccess() {
+        PayOrderServiceImpl payOrderServiceImpl = mock(PayOrderServiceImpl.class);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PayOrderServiceImpl.class)))
+                    .thenReturn(payOrderServiceImpl);
+
+            // 准备参数
+            LocalDateTime minCreateTime = LocalDateTime.now().minus(Duration.ofMinutes(10));
+            // mock 数据（PayOrderExtensionDO）
+            PayOrderExtensionDO orderExtension = randomPojo(PayOrderExtensionDO.class,
+                    o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())
+                            .setChannelId(10L).setNo("P110")
+                            .setCreateTime(LocalDateTime.now()));
+            orderExtensionMapper.insert(orderExtension);
+            // mock 方法（PayClient）
+            PayClient client = mock(PayClient.class);
+            when(payClientFactory.getPayClient(eq(10L))).thenReturn(client);
+            // mock 方法（PayClient 成功返回）
+            PayOrderRespDTO respDTO = randomPojo(PayOrderRespDTO.class,
+                    o -> o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus()));
+            when(client.getOrder(eq("P110"))).thenReturn(respDTO);
+            // mock 方法（PayChannelDO）
+            PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L));
+            when(channelService.validPayChannel(eq(10L))).thenReturn(channel);
+
+            // 调用
+            int count = orderService.syncOrder(minCreateTime);
+            // 断言
+            assertEquals(count, 1);
+            verify(payOrderServiceImpl).notifyOrder(same(channel), same(respDTO));
+        }
+    }
+
+    @Test
+    public void testSyncOrder_orderClosed() {
+        PayOrderServiceImpl payOrderServiceImpl = mock(PayOrderServiceImpl.class);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PayOrderServiceImpl.class)))
+                    .thenReturn(payOrderServiceImpl);
+
+            // 准备参数
+            LocalDateTime minCreateTime = LocalDateTime.now().minus(Duration.ofMinutes(10));
+            // mock 数据（PayOrderExtensionDO）
+            PayOrderExtensionDO orderExtension = randomPojo(PayOrderExtensionDO.class,
+                    o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())
+                            .setChannelId(10L).setNo("P110")
+                            .setCreateTime(LocalDateTime.now()));
+            orderExtensionMapper.insert(orderExtension);
+            // mock 方法（PayClient）
+            PayClient client = mock(PayClient.class);
+            when(payClientFactory.getPayClient(eq(10L))).thenReturn(client);
+            // mock 方法（PayClient 成功返回）
+            PayOrderRespDTO respDTO = randomPojo(PayOrderRespDTO.class,
+                    o -> o.setStatus(PayOrderStatusEnum.CLOSED.getStatus()));
+            when(client.getOrder(eq("P110"))).thenReturn(respDTO);
+            // mock 方法（PayChannelDO）
+            PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L));
+            when(channelService.validPayChannel(eq(10L))).thenReturn(channel);
+
+            // 调用
+            int count = orderService.syncOrder(minCreateTime);
+            // 断言
+            assertEquals(count, 0);
+            verify(payOrderServiceImpl).notifyOrder(same(channel), same(respDTO));
+        }
     }
 
 }
