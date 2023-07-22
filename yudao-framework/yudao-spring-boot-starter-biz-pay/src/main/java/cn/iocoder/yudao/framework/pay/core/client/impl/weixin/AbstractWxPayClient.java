@@ -307,6 +307,11 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
         return PayRefundRespDTO.failureOf(result.getOutRefundNo(), response);
     }
 
+    @Override
+    protected PayRefundRespDTO doGetRefund(String outTradeNo, String outRefundNo) {
+        return null;
+    }
+
     // ========== 各种工具方法 ==========
 
     static String formatDateV2(LocalDateTime time) {

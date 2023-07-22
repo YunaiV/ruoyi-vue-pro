@@ -94,7 +94,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
             throws Throwable;
 
     @Override
-    public PayOrderRespDTO parseOrderNotify(Map<String, String> params, String body) {
+    public final PayOrderRespDTO parseOrderNotify(Map<String, String> params, String body) {
         try {
             return doParseOrderNotify(params, body);
         } catch (Throwable ex) {
@@ -108,7 +108,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
             throws Throwable;
 
     @Override
-    public PayOrderRespDTO getOrder(String outTradeNo) {
+    public final PayOrderRespDTO getOrder(String outTradeNo) {
         try {
             return doGetOrder(outTradeNo);
         } catch (Throwable ex) {
@@ -124,7 +124,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
     // ============ 退款相关 ==========
 
     @Override
-    public PayRefundRespDTO unifiedRefund(PayRefundUnifiedReqDTO reqDTO) {
+    public final PayRefundRespDTO unifiedRefund(PayRefundUnifiedReqDTO reqDTO) {
         ValidationUtils.validate(reqDTO);
         // 执行统一退款
         PayRefundRespDTO resp;
@@ -145,7 +145,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
     protected abstract PayRefundRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable;
 
     @Override
-    public PayRefundRespDTO parseRefundNotify(Map<String, String> params, String body) {
+    public final PayRefundRespDTO parseRefundNotify(Map<String, String> params, String body) {
         try {
             return doParseRefundNotify(params, body);
         } catch (Throwable ex) {
@@ -156,6 +156,20 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
     }
 
     protected abstract PayRefundRespDTO doParseRefundNotify(Map<String, String> params, String body)
+            throws Throwable;
+
+    @Override
+    public final PayRefundRespDTO getRefund(String outTradeNo, String outRefundNo) {
+        try {
+            return doGetRefund(outTradeNo, outRefundNo);
+        } catch (Throwable ex) {
+            log.error("[getRefund][客户端({}) outTradeNo({}) outRefundNo({}) 查询退款单异常]",
+                    getId(), outTradeNo, outRefundNo, ex);
+            throw buildPayException(ex);
+        }
+    }
+
+    protected abstract PayRefundRespDTO doGetRefund(String outTradeNo, String outRefundNo)
             throws Throwable;
 
     // ========== 各种工具方法 ==========

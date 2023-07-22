@@ -67,4 +67,13 @@ public interface PayClient {
      */
     PayRefundRespDTO parseRefundNotify(Map<String, String> params, String body);
 
+    /**
+     * 获得退款订单信息
+     *
+     * @param outTradeNo 外部订单号
+     * @param outRefundNo 外部退款号
+     * @return 退款订单信息
+     */
+    PayRefundRespDTO getRefund(String outTradeNo, String outRefundNo);
+
 }
