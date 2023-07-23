@@ -450,7 +450,7 @@ public class PayOrderServiceImpl implements PayOrderService {
             // 1.2 回调支付结果
             notifyOrder(orderExtension.getChannelId(), respDTO);
 
-            // 2. 如果是已支付，则返回 1
+            // 2. 如果是已支付，则返回 true
             return PayOrderStatusRespEnum.isSuccess(respDTO.getStatus());
         } catch (Throwable e) {
             log.error("[syncOrder][orderExtension({}) 同步支付状态异常]", orderExtension.getId(), e);

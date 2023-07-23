@@ -37,7 +37,7 @@ public class PayOrderSyncJob implements JobHandler {
     public String execute(String param) {
         LocalDateTime minCreateTime = LocalDateTime.now().minus(CREATE_TIME_DURATION_BEFORE);
         int count = orderService.syncOrder(minCreateTime);
-        return StrUtil.format("同步订单 {} 个", count);
+        return StrUtil.format("同步支付订单 {} 个", count);
     }
 
 }

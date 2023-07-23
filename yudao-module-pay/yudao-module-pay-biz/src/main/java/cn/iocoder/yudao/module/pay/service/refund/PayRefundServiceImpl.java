@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.pay.service.refund;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
@@ -242,7 +243,7 @@ public class PayRefundServiceImpl implements PayRefundService {
         // 2. 更新订单
         orderService.updateOrderRefundPrice(refund.getOrderId(), refund.getRefundPrice());
 
-        // 3. 插入退款通知记录 TODO 芋艿：退款成功
+        // 3. 插入退款通知记录
         notifyService.createPayNotifyTask(PayNotifyTaskCreateReqDTO.builder()
                 .type(PayNotifyTypeEnum.REFUND.getType()).dataId(refund.getId()).build());
     }
@@ -274,9 +275,51 @@ public class PayRefundServiceImpl implements PayRefundService {
         }
         log.info("[notifyRefundFailure][退款订单({}) 更新为退款失败]", refund.getId());
 
-        // 2. 插入退款通知记录 TODO 芋艿：退款失败
+        // 2. 插入退款通知记录
         notifyService.createPayNotifyTask(PayNotifyTaskCreateReqDTO.builder()
                 .type(PayNotifyTypeEnum.REFUND.getType()).dataId(refund.getId()).build());
+    }
+
+    @Override
+    public int syncRefund() {
+        // 1. 查询指定创建时间内的待退款订单
+        List<PayRefundDO> refunds = refundMapper.selectListByStatus(PayRefundStatusEnum.WAITING.getStatus());
+        if (CollUtil.isEmpty(refunds)) {
+            return 0;
+        }
+        // 2. 遍历执行
+        int count = 0;
+        for (PayRefundDO refund : refunds) {
+            count += syncRefund(refund) ? 1 : 0;
+        }
+        return count;
+    }
+
+    /**
+     * 同步单个退款订单
+     *
+     * @param refund 退款订单
+     * @return 是否同步到
+     */
+    private boolean syncRefund(PayRefundDO refund) {
+        try {
+            // 1.1 查询退款订单信息
+            PayClient payClient = payClientFactory.getPayClient(refund.getChannelId());
+            if (payClient == null) {
+                log.error("[syncRefund][渠道编号({}) 找不到对应的支付客户端]", refund.getChannelId());
+                return false;
+            }
+            PayRefundRespDTO respDTO = payClient.getRefund(refund.getOrderNo(), refund.getNo());
+            // 1.2 回调退款结果
+            notifyRefund(refund.getChannelId(), respDTO);
+
+            // 2. 如果同步到，则返回 true
+            return PayRefundStatusEnum.isSuccess(respDTO.getStatus())
+                    || PayRefundStatusEnum.isFailure(respDTO.getStatus());
+        } catch (Throwable e) {
+            log.error("[syncRefund][refund({}) 同步退款状态异常]", refund.getId(), e);
+            return false;
+        }
     }
 
     /**
