@@ -19,7 +19,6 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.refund.PayRefundMapper;
 import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
-import cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
@@ -92,7 +91,6 @@ public class PayRefundServiceImpl implements PayRefundService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public Long createPayRefund(PayRefundCreateReqDTO reqDTO) {
         // 1.1 校验 App
         PayAppDO app = appService.validPayApp(reqDTO.getAppId());
@@ -109,7 +107,7 @@ public class PayRefundServiceImpl implements PayRefundService {
         PayRefundDO refund = refundMapper.selectByAppIdAndMerchantRefundId(
                 app.getId(), reqDTO.getMerchantRefundId());
         if (refund != null) {
-            throw exception(ErrorCodeConstants.REFUND_EXISTS);
+            throw exception(REFUND_EXISTS);
         }
 
         // 2.1 插入退款单
@@ -158,7 +156,7 @@ public class PayRefundServiceImpl implements PayRefundService {
     private PayOrderDO validatePayOrderCanRefund(PayRefundCreateReqDTO reqDTO) {
         PayOrderDO order = orderService.getOrder(reqDTO.getAppId(), reqDTO.getMerchantOrderId());
         if (order == null) {
-            throw exception(ErrorCodeConstants.ORDER_NOT_FOUND);
+            throw exception(ORDER_NOT_FOUND);
         }
         // 校验状态，必须是已支付、或者已退款
         if (!PayOrderStatusEnum.isSuccessOrRefund(order.getStatus())) {
@@ -167,12 +165,12 @@ public class PayRefundServiceImpl implements PayRefundService {
 
         // 校验金额，退款金额不能大于原定的金额
         if (reqDTO.getPrice() + order.getRefundPrice() > order.getPrice()){
-            throw exception(ErrorCodeConstants.REFUND_PRICE_EXCEED);
+            throw exception(REFUND_PRICE_EXCEED);
         }
         // 是否有退款中的订单
         if (refundMapper.selectCountByAppIdAndOrderId(reqDTO.getAppId(), order.getId(),
                 PayRefundStatusEnum.WAITING.getStatus()) > 0) {
-            throw exception(ErrorCodeConstants.REFUND_HAS_REFUNDING);
+            throw exception(REFUND_HAS_REFUNDING);
         }
         return order;
     }

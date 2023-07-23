@@ -1,12 +1,15 @@
 package cn.iocoder.yudao.module.pay.service.refund;
 
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
+import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbAndRedisUnitTest;
-import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundExportReqVO;
+import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
+import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundExportReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundPageReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
@@ -21,12 +24,13 @@ import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
@@ -37,10 +41,12 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServic
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * {@link PayRefundServiceImpl} 的单元测试类
@@ -68,6 +74,41 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
     private PayChannelService channelService;
     @MockBean
     private PayNotifyService notifyService;
+
+    @BeforeEach
+    public void setUp() {
+        when(payProperties.getRefundNotifyUrl()).thenReturn("http://127.0.0.1");
+    }
+
+    @Test
+    public void testGetRefund() {
+        // mock 数据
+        PayRefundDO refund = randomPojo(PayRefundDO.class);
+        refundMapper.insert(refund);
+        // 准备参数
+        Long id = refund.getId();
+
+        // 调用
+        PayRefundDO dbRefund = refundService.getRefund(id);
+        // 断言
+        assertPojoEquals(dbRefund, refund);
+    }
+
+    @Test
+    public void testGetRefundCountByAppId() {
+        // mock 数据
+        PayRefundDO refund01 = randomPojo(PayRefundDO.class);
+        refundMapper.insert(refund01);
+        PayRefundDO refund02 = randomPojo(PayRefundDO.class);
+        refundMapper.insert(refund02);
+        // 准备参数
+        Long appId = refund01.getAppId();
+
+        // 调用
+        Long count = refundService.getRefundCountByAppId(appId);
+        // 断言
+        assertEquals(count, 1);
+    }
 
     @Test
     public void testGetRefundPage() {
@@ -276,7 +317,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
         // 准备参数
         PayRefundCreateReqDTO reqDTO = randomPojo(PayRefundCreateReqDTO.class,
                 o -> o.setAppId(1L).setMerchantOrderId("100").setPrice(9)
-                        .setReason("测试退款"));
+                        .setMerchantRefundId("200").setReason("测试退款"));
         // mock 方法（app）
         PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L));
         when(appService.validPayApp(eq(1L))).thenReturn(app);
@@ -295,7 +336,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
         when(payClientFactory.getPayClient(eq(10L))).thenReturn(client);
         // mock 数据（refund 已存在）
         PayRefundDO refund = randomPojo(PayRefundDO.class, o ->
-                o.setOrderId(order.getId()).setStatus(PayOrderStatusEnum.WAITING.getStatus()));
+                o.setAppId(1L).setMerchantRefundId("200"));
         refundMapper.insert(refund);
 
         // 调用，并断言异常
@@ -305,12 +346,97 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
 
     @Test
     public void testCreateRefund_invokeException() {
+        // 准备参数
+        PayRefundCreateReqDTO reqDTO = randomPojo(PayRefundCreateReqDTO.class,
+                o -> o.setAppId(1L).setMerchantOrderId("100").setPrice(9)
+                        .setMerchantRefundId("200").setReason("测试退款"));
+        // mock 方法（app）
+        PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L));
+        when(appService.validPayApp(eq(1L))).thenReturn(app);
+        // mock 数据（order）
+        PayOrderDO order = randomPojo(PayOrderDO.class, o ->
+                o.setStatus(PayOrderStatusEnum.REFUND.getStatus())
+                        .setPrice(10).setRefundPrice(1)
+                        .setChannelId(10L).setChannelCode(PayChannelEnum.ALIPAY_APP.getCode()));
+        when(orderService.getOrder(eq(1L), eq("100"))).thenReturn(order);
+        // mock 方法（channel）
+        PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L)
+                .setCode(PayChannelEnum.ALIPAY_APP.getCode()));
+        when(channelService.validPayChannel(eq(10L))).thenReturn(channel);
+        // mock 方法（client）
+        PayClient client = mock(PayClient.class);
+        when(payClientFactory.getPayClient(eq(10L))).thenReturn(client);
+        // mock 方法（client 调用发生异常）
+        when(client.unifiedRefund(any(PayRefundUnifiedReqDTO.class))).thenThrow(new RuntimeException());
 
+        // 调用
+        Long refundId = refundService.createPayRefund(reqDTO);
+        // 断言
+        PayRefundDO refundDO = refundMapper.selectById(refundId);
+        assertPojoEquals(reqDTO, refundDO);
+        assertNotNull(refundDO.getNo());
+        assertThat(refundDO)
+                .extracting("orderId", "orderNo", "channelId", "channelCode",
+                        "notifyUrl", "channelOrderNo", "status", "payPrice", "refundPrice")
+                .containsExactly(order.getId(), order.getNo(), channel.getId(), channel.getCode(),
+                        app.getRefundNotifyUrl(), order.getChannelOrderNo(), PayRefundStatusEnum.WAITING.getStatus(),
+                        order.getPrice(), reqDTO.getPrice());
     }
 
     @Test
     public void testCreateRefund_invokeSuccess() {
+        PayRefundServiceImpl payRefundServiceImpl = mock(PayRefundServiceImpl.class);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PayRefundServiceImpl.class)))
+                    .thenReturn(payRefundServiceImpl);
 
+            // 准备参数
+            PayRefundCreateReqDTO reqDTO = randomPojo(PayRefundCreateReqDTO.class,
+                    o -> o.setAppId(1L).setMerchantOrderId("100").setPrice(9)
+                            .setMerchantRefundId("200").setReason("测试退款"));
+            // mock 方法（app）
+            PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L));
+            when(appService.validPayApp(eq(1L))).thenReturn(app);
+            // mock 数据（order）
+            PayOrderDO order = randomPojo(PayOrderDO.class, o ->
+                    o.setStatus(PayOrderStatusEnum.REFUND.getStatus())
+                            .setPrice(10).setRefundPrice(1)
+                            .setChannelId(10L).setChannelCode(PayChannelEnum.ALIPAY_APP.getCode()));
+            when(orderService.getOrder(eq(1L), eq("100"))).thenReturn(order);
+            // mock 方法（channel）
+            PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L)
+                    .setCode(PayChannelEnum.ALIPAY_APP.getCode()));
+            when(channelService.validPayChannel(eq(10L))).thenReturn(channel);
+            // mock 方法（client）
+            PayClient client = mock(PayClient.class);
+            when(payClientFactory.getPayClient(eq(10L))).thenReturn(client);
+            // mock 方法（client 成功）
+            PayRefundRespDTO refundRespDTO = randomPojo(PayRefundRespDTO.class);
+            when(client.unifiedRefund(argThat(unifiedReqDTO -> {
+                assertNotNull(unifiedReqDTO.getOutRefundNo());
+                assertThat(unifiedReqDTO)
+                        .extracting("payPrice", "refundPrice", "outTradeNo",
+                                 "notifyUrl", "reason")
+                        .containsExactly(order.getPrice(), reqDTO.getPrice(), order.getNo(),
+                                "http://127.0.0.1/10", reqDTO.getReason());
+                return true;
+            }))).thenReturn(refundRespDTO);
+
+            // 调用
+            Long refundId = refundService.createPayRefund(reqDTO);
+            // 断言
+            PayRefundDO refundDO = refundMapper.selectById(refundId);
+            assertPojoEquals(reqDTO, refundDO);
+            assertNotNull(refundDO.getNo());
+            assertThat(refundDO)
+                    .extracting("orderId", "orderNo", "channelId", "channelCode",
+                            "notifyUrl", "channelOrderNo", "status", "payPrice", "refundPrice")
+                    .containsExactly(order.getId(), order.getNo(), channel.getId(), channel.getCode(),
+                            app.getRefundNotifyUrl(), order.getChannelOrderNo(), PayRefundStatusEnum.WAITING.getStatus(),
+                            order.getPrice(), reqDTO.getPrice());
+            // 断言调用
+            verify(payRefundServiceImpl).notifyRefund(same(channel), same(refundRespDTO));
+        }
     }
 
 }

@@ -87,6 +87,7 @@ CREATE TABLE IF NOT EXISTS `pay_refund` (
     `channel_id`         bigint(20)    NOT NULL,
     `channel_code`       varchar(32)   NOT NULL,
     `order_id`           bigint(20)    NOT NULL,
+    `order_no`           varchar(64)    NOT NULL,
     `merchant_order_id`  varchar(64)   NOT NULL,
     `merchant_refund_id` varchar(64)   NOT NULL,
     `notify_url`         varchar(1024) NOT NULL,
