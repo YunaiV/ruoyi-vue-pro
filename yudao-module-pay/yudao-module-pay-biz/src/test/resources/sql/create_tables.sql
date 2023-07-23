@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS "pay_app" (
     "name"              varchar(64)   NOT NULL,
     "status"            tinyint       NOT NULL,
     "remark"            varchar(255)           DEFAULT NULL,
-    `pay_notify_url`    varchar(1024) NOT NULL,
+    `order_notify_url`    varchar(1024) NOT NULL,
     `refund_notify_url` varchar(1024) NOT NULL,
     "creator"           varchar(64)            DEFAULT '',
     "create_time"       datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP,
