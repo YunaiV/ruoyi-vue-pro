@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.refund.PayRefundStatusRespEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbAndRedisUnitTest;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundExportReqVO;
@@ -17,12 +18,14 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.refund.PayRefundMapper;
 import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
+import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
+import cn.iocoder.yudao.module.pay.service.notify.dto.PayNotifyTaskCreateReqDTO;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +38,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -42,8 +46,7 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -437,6 +440,265 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
             // 断言调用
             verify(payRefundServiceImpl).notifyRefund(same(channel), same(refundRespDTO));
         }
+    }
+
+    @Test
+    public void testNotifyRefund() {
+        PayRefundServiceImpl payRefundServiceImpl = mock(PayRefundServiceImpl.class);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PayRefundServiceImpl.class)))
+                    .thenReturn(payRefundServiceImpl);
+
+            // 准备参数
+            Long channelId = 10L;
+            PayRefundRespDTO refundRespDTO = randomPojo(PayRefundRespDTO.class);
+            // mock 方法（channel）
+            PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L));
+            when(channelService.validPayChannel(eq(10L))).thenReturn(channel);
+
+            // 调用
+            refundService.notifyRefund(channelId, refundRespDTO);
+            // 断言
+            verify(payRefundServiceImpl).notifyRefund(same(channel), same(refundRespDTO));
+        }
+    }
+
+    @Test
+    public void testNotifyRefundSuccess_notFound() {
+        // 准备参数
+        PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L).setAppId(1L));
+        PayRefundRespDTO refundRespDTO = randomPojo(PayRefundRespDTO.class,
+                o -> o.setStatus(PayRefundStatusRespEnum.SUCCESS.getStatus()).setOutRefundNo("R100"));
+
+        // 调用，并断言异常
+        assertServiceException(() -> refundService.notifyRefund(channel, refundRespDTO),
+                REFUND_NOT_FOUND);
+    }
+
+    @Test
+    public void testNotifyRefundSuccess_isSuccess() {
+        // 准备参数
+        PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L).setAppId(1L));
+        PayRefundRespDTO refundRespDTO = randomPojo(PayRefundRespDTO.class,
+                o -> o.setStatus(PayRefundStatusRespEnum.SUCCESS.getStatus()).setOutRefundNo("R100"));
+        // mock 数据（refund + 已支付）
+        PayRefundDO refund = randomPojo(PayRefundDO.class, o -> o.setAppId(1L).setNo("R100")
+                .setStatus(PayRefundStatusEnum.SUCCESS.getStatus()));
+        refundMapper.insert(refund);
+
+        // 调用
+        refundService.notifyRefund(channel, refundRespDTO);
+        // 断言，refund 没有更新，因为已经退款成功
+        assertPojoEquals(refund, refundMapper.selectById(refund.getId()));
+    }
+
+    @Test
+    public void testNotifyRefundSuccess_failure() {
+        // 准备参数
+        PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L).setAppId(1L));
+        PayRefundRespDTO refundRespDTO = randomPojo(PayRefundRespDTO.class,
+                o -> o.setStatus(PayRefundStatusRespEnum.SUCCESS.getStatus()).setOutRefundNo("R100"));
+        // mock 数据（refund + 已支付）
+        PayRefundDO refund = randomPojo(PayRefundDO.class, o -> o.setAppId(1L).setNo("R100")
+                .setStatus(PayRefundStatusEnum.FAILURE.getStatus()));
+        refundMapper.insert(refund);
+
+        // 调用，并断言异常
+        assertServiceException(() -> refundService.notifyRefund(channel, refundRespDTO),
+                REFUND_STATUS_IS_NOT_WAITING);
+    }
+
+    @Test
+    public void testNotifyRefundSuccess_updateOrderException() {
+        // 准备参数
+        PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L).setAppId(1L));
+        PayRefundRespDTO refundRespDTO = randomPojo(PayRefundRespDTO.class,
+                o -> o.setStatus(PayRefundStatusRespEnum.SUCCESS.getStatus()).setOutRefundNo("R100"));
+        // mock 数据（refund + 已支付）
+        PayRefundDO refund = randomPojo(PayRefundDO.class, o -> o.setAppId(1L).setNo("R100")
+                .setStatus(PayRefundStatusEnum.WAITING.getStatus())
+                .setOrderId(100L).setRefundPrice(23));
+        refundMapper.insert(refund);
+        // mock 方法（order + 更新异常）
+        doThrow(new RuntimeException()).when(orderService)
+                .updateOrderRefundPrice(eq(100L), eq(23));
+
+        // 调用，并断言异常
+        assertThrows(RuntimeException.class, () -> refundService.notifyRefund(channel, refundRespDTO));
+        // 断言，refund 没有更新，因为事务回滚了
+        assertPojoEquals(refund, refundMapper.selectById(refund.getId()));
+    }
+
+    @Test
+    public void testNotifyRefundSuccess_success() {
+        // 准备参数
+        PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L).setAppId(1L));
+        PayRefundRespDTO refundRespDTO = randomPojo(PayRefundRespDTO.class,
+                o -> o.setStatus(PayRefundStatusRespEnum.SUCCESS.getStatus()).setOutRefundNo("R100"));
+        // mock 数据（refund + 已支付）
+        PayRefundDO refund = randomPojo(PayRefundDO.class, o -> o.setAppId(1L).setNo("R100")
+                .setStatus(PayRefundStatusEnum.WAITING.getStatus())
+                .setOrderId(100L).setRefundPrice(23));
+        refundMapper.insert(refund);
+
+        // 调用
+        refundService.notifyRefund(channel, refundRespDTO);
+        // 断言，refund
+        refund.setSuccessTime(refundRespDTO.getSuccessTime())
+                .setChannelRefundNo(refundRespDTO.getChannelRefundNo())
+                .setStatus(PayRefundStatusEnum.SUCCESS.getStatus())
+                .setChannelNotifyData(toJsonString(refundRespDTO));
+        assertPojoEquals(refund, refundMapper.selectById(refund.getId()),
+                "updateTime", "updater");
+        // 断言，调用
+        verify(orderService).updateOrderRefundPrice(eq(100L), eq(23));
+        verify(notifyService).createPayNotifyTask(eq(PayNotifyTaskCreateReqDTO.builder()
+                .type(PayNotifyTypeEnum.REFUND.getType()).dataId(refund.getId()).build()));
+    }
+
+    @Test
+    public void testNotifyRefundFailure_notFound() {
+        // 准备参数
+        PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L).setAppId(1L));
+        PayRefundRespDTO refundRespDTO = randomPojo(PayRefundRespDTO.class,
+                o -> o.setStatus(PayRefundStatusRespEnum.FAILURE.getStatus()).setOutRefundNo("R100"));
+
+        // 调用，并断言异常
+        assertServiceException(() -> refundService.notifyRefund(channel, refundRespDTO),
+                REFUND_NOT_FOUND);
+    }
+
+    @Test
+    public void testNotifyRefundFailure_isFailure() {
+        // 准备参数
+        PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L).setAppId(1L));
+        PayRefundRespDTO refundRespDTO = randomPojo(PayRefundRespDTO.class,
+                o -> o.setStatus(PayRefundStatusRespEnum.FAILURE.getStatus()).setOutRefundNo("R100"));
+        // mock 数据（refund + 退款失败）
+        PayRefundDO refund = randomPojo(PayRefundDO.class, o -> o.setAppId(1L).setNo("R100")
+                .setStatus(PayRefundStatusEnum.FAILURE.getStatus()));
+        refundMapper.insert(refund);
+
+        // 调用
+        refundService.notifyRefund(channel, refundRespDTO);
+        // 断言，refund 没有更新，因为已经退款失败
+        assertPojoEquals(refund, refundMapper.selectById(refund.getId()));
+    }
+
+    @Test
+    public void testNotifyRefundFailure_isSuccess() {
+        // 准备参数
+        PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L).setAppId(1L));
+        PayRefundRespDTO refundRespDTO = randomPojo(PayRefundRespDTO.class,
+                o -> o.setStatus(PayRefundStatusRespEnum.FAILURE.getStatus()).setOutRefundNo("R100"));
+        // mock 数据（refund + 已支付）
+        PayRefundDO refund = randomPojo(PayRefundDO.class, o -> o.setAppId(1L).setNo("R100")
+                .setStatus(PayRefundStatusEnum.SUCCESS.getStatus()));
+        refundMapper.insert(refund);
+
+        // 调用，并断言异常
+        assertServiceException(() -> refundService.notifyRefund(channel, refundRespDTO),
+                REFUND_STATUS_IS_NOT_WAITING);
+    }
+
+    @Test
+    public void testNotifyRefundFailure_success() {
+        // 准备参数
+        PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L).setAppId(1L));
+        PayRefundRespDTO refundRespDTO = randomPojo(PayRefundRespDTO.class,
+                o -> o.setStatus(PayRefundStatusRespEnum.FAILURE.getStatus()).setOutRefundNo("R100"));
+        // mock 数据（refund + 已支付）
+        PayRefundDO refund = randomPojo(PayRefundDO.class, o -> o.setAppId(1L).setNo("R100")
+                .setStatus(PayRefundStatusEnum.WAITING.getStatus())
+                .setOrderId(100L).setRefundPrice(23));
+        refundMapper.insert(refund);
+
+        // 调用
+        refundService.notifyRefund(channel, refundRespDTO);
+        // 断言，refund
+        refund.setChannelRefundNo(refundRespDTO.getChannelRefundNo())
+                .setStatus(PayRefundStatusEnum.FAILURE.getStatus())
+                .setChannelNotifyData(toJsonString(refundRespDTO))
+                .setChannelErrorCode(refundRespDTO.getChannelErrorCode())
+                .setChannelErrorMsg(refundRespDTO.getChannelErrorMsg());
+        assertPojoEquals(refund, refundMapper.selectById(refund.getId()),
+                "updateTime", "updater");
+        // 断言，调用
+        verify(notifyService).createPayNotifyTask(eq(PayNotifyTaskCreateReqDTO.builder()
+                .type(PayNotifyTypeEnum.REFUND.getType()).dataId(refund.getId()).build()));
+    }
+
+    @Test
+    public void testSyncRefund_notFound() {
+        // 准备参数
+        PayRefundDO refund = randomPojo(PayRefundDO.class, o -> o.setAppId(1L)
+                .setStatus(PayRefundStatusEnum.WAITING.getStatus()));
+        refundMapper.insert(refund);
+
+        // 调用
+        int count = refundService.syncRefund();
+        // 断言
+        assertEquals(count, 0);
+    }
+
+    @Test
+    public void testSyncRefund_waiting() {
+        assertEquals(testSyncRefund_waitingOrSuccessOrFailure(PayRefundStatusRespEnum.WAITING.getStatus()), 0);
+    }
+
+    @Test
+    public void testSyncRefund_success() {
+        assertEquals(testSyncRefund_waitingOrSuccessOrFailure(PayRefundStatusRespEnum.SUCCESS.getStatus()), 1);
+    }
+
+    @Test
+    public void testSyncRefund_failure() {
+        assertEquals(testSyncRefund_waitingOrSuccessOrFailure(PayRefundStatusRespEnum.FAILURE.getStatus()), 1);
+    }
+
+    private int testSyncRefund_waitingOrSuccessOrFailure(Integer status) {
+        PayRefundServiceImpl payRefundServiceImpl = mock(PayRefundServiceImpl.class);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PayRefundServiceImpl.class)))
+                    .thenReturn(payRefundServiceImpl);
+
+            // 准备参数
+            PayRefundDO refund = randomPojo(PayRefundDO.class, o -> o.setAppId(1L).setChannelId(10L)
+                    .setStatus(PayRefundStatusEnum.WAITING.getStatus())
+                    .setOrderNo("P110").setNo("R220"));
+            refundMapper.insert(refund);
+            // mock 方法（client）
+            PayClient client = mock(PayClient.class);
+            when(payClientFactory.getPayClient(eq(10L))).thenReturn(client);
+            // mock 方法（client 返回指定状态）
+            PayRefundRespDTO respDTO = randomPojo(PayRefundRespDTO.class, o -> o.setStatus(status));
+            when(client.getRefund(eq("P110"), eq("R220"))).thenReturn(respDTO);
+            // mock 方法（channel）
+            PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L));
+            when(channelService.validPayChannel(eq(10L))).thenReturn(channel);
+
+            // 调用
+            return refundService.syncRefund();
+        }
+    }
+
+    @Test
+    public void testSyncRefund_exception() {
+        // 准备参数
+        PayRefundDO refund = randomPojo(PayRefundDO.class, o -> o.setAppId(1L).setChannelId(10L)
+                .setStatus(PayRefundStatusEnum.WAITING.getStatus())
+                .setOrderNo("P110").setNo("R220"));
+        refundMapper.insert(refund);
+        // mock 方法（client）
+        PayClient client = mock(PayClient.class);
+        when(payClientFactory.getPayClient(eq(10L))).thenReturn(client);
+        // mock 方法（client 抛出异常）
+        when(client.getRefund(eq("P110"), eq("R220"))).thenThrow(new RuntimeException());
+
+        // 调用
+        int count = refundService.syncRefund();
+        // 断言
+        assertEquals(count, 0);
     }
 
 }

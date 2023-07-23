@@ -212,7 +212,7 @@ public class PayRefundServiceImpl implements PayRefundService {
         }
     }
 
-    public void notifyRefundSuccess(PayChannelDO channel, PayRefundRespDTO notify) {
+    private void notifyRefundSuccess(PayChannelDO channel, PayRefundRespDTO notify) {
         // 1.1 查询 PayRefundDO
         PayRefundDO refund = refundMapper.selectByAppIdAndNo(
                 channel.getAppId(), notify.getOutRefundNo());
@@ -246,8 +246,7 @@ public class PayRefundServiceImpl implements PayRefundService {
                 .type(PayNotifyTypeEnum.REFUND.getType()).dataId(refund.getId()).build());
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public void notifyRefundFailure(PayChannelDO channel, PayRefundRespDTO notify) {
+    private void notifyRefundFailure(PayChannelDO channel, PayRefundRespDTO notify) {
         // 1.1 查询 PayRefundDO
         PayRefundDO refund = refundMapper.selectByAppIdAndNo(
                 channel.getAppId(), notify.getOutRefundNo());
