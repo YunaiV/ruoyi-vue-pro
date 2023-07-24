@@ -212,6 +212,16 @@ export default {
         return;
       }
 
+      // 微信公众号、小程序支付，无法在 PC 网页中进行
+      if (channelCode === PayChannelEnum.WX_PUB.code) {
+        this.$message.error('微信公众号支付：不支持 PC 网站');
+        return;
+      }
+      if (channelCode === PayChannelEnum.WX_LITE.code) {
+        this.$message.error('微信小程序：不支持 PC 网站');
+        return;
+      }
+
       // 默认的提交处理
       this.submit0(channelCode)
     },
@@ -292,7 +302,10 @@ export default {
     /** 提交支付后（App） */
     displayApp(channelCode, data) {
       if (channelCode === PayChannelEnum.ALIPAY_APP.code) {
-        this.$message.error('支付宝 App 无法在网页支付！');
+        this.$message.error('支付宝 App 支付：无法在网页支付！');
+      }
+      if (channelCode === PayChannelEnum.WX_APP.code) {
+        this.$message.error('微信 App 支付：无法在网页支付！');
       }
       this.submitLoading = false
     },

@@ -113,6 +113,41 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     protected abstract PayOrderRespDTO doUnifiedOrderV3(PayOrderUnifiedReqDTO reqDTO)
             throws WxPayException;
 
+    /**
+     * 【V2】创建微信下单请求
+     *
+     * @param reqDTO 下信息
+     * @return 下单请求
+     */
+    protected WxPayUnifiedOrderRequest buildPayUnifiedOrderRequestV2(PayOrderUnifiedReqDTO reqDTO) {
+        return WxPayUnifiedOrderRequest.newBuilder()
+                .outTradeNo(reqDTO.getOutTradeNo())
+                .body(reqDTO.getSubject())
+                .detail(reqDTO.getBody())
+                .totalFee(reqDTO.getPrice()) // 单位分
+                .timeExpire(formatDateV2(reqDTO.getExpireTime()))
+                .spbillCreateIp(reqDTO.getUserIp())
+                .notifyUrl(reqDTO.getNotifyUrl())
+                .build();
+    }
+
+    /**
+     * 【V3】创建微信下单请求
+     *
+     * @param reqDTO 下信息
+     * @return 下单请求
+     */
+    protected WxPayUnifiedOrderV3Request buildPayUnifiedOrderRequestV3(PayOrderUnifiedReqDTO reqDTO) {
+        WxPayUnifiedOrderV3Request request = new WxPayUnifiedOrderV3Request();
+        request.setOutTradeNo(reqDTO.getOutTradeNo());
+        request.setDescription(reqDTO.getSubject());
+        request.setAmount(new WxPayUnifiedOrderV3Request.Amount().setTotal(reqDTO.getPrice())); // 单位分
+        request.setTimeExpire(formatDateV3(reqDTO.getExpireTime()));
+        request.setSceneInfo(new WxPayUnifiedOrderV3Request.SceneInfo().setPayerClientIp(reqDTO.getUserIp()));
+        request.setNotifyUrl(reqDTO.getNotifyUrl());
+        return request;
+    }
+
     @Override
     public PayOrderRespDTO doParseOrderNotify(Map<String, String> params, String body) throws WxPayException {
         switch (config.getApiVersion()) {
