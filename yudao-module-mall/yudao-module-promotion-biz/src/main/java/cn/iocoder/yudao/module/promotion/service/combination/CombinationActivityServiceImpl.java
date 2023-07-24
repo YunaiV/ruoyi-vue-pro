@@ -24,7 +24,9 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.combinationa
 import cn.iocoder.yudao.module.promotion.dal.mysql.combination.combinationactivity.CombinationActivityMapper;
 import cn.iocoder.yudao.module.promotion.dal.mysql.combination.combinationactivity.CombinationProductMapper;
 import cn.iocoder.yudao.module.promotion.dal.mysql.combination.combinationactivity.CombinationRecordMapper;
+import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -217,14 +219,27 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateRecordStatusAndStartTimeByUserIdAndOrderId(Long userId, Long orderId, Integer status, LocalDateTime startTime) {
         CombinationRecordDO recordDO = validateCombinationRecord(userId, orderId);
-
         // 更新状态
         recordDO.setStatus(status);
         // 更新开始时间
         recordDO.setStartTime(startTime);
         recordMapper.updateById(recordDO);
+
+        // 更新拼团参入人数
+        List<CombinationRecordDO> recordDOs = recordMapper.selectListByHeadIdAndStatus(recordDO.getHeadId(), status);
+        if (CollUtil.isNotEmpty(recordDOs)) {
+            recordDOs.forEach(item -> {
+                item.setUserCount(recordDOs.size());
+                // 校验拼团是否满足要求
+                if (recordDOs.size() >= recordDO.getUserSize()) {
+                    item.setStatus(CombinationRecordStatusEnum.SUCCESS.getStatus());
+                }
+            });
+        }
+        recordMapper.updateBatch(recordDOs);
     }
 
     private CombinationRecordDO validateCombinationRecord(Long userId, Long orderId) {
@@ -249,9 +264,18 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     }
 
     @Override
-    public Integer getRecordStatus(Long userId, Long orderId) {
+    public boolean validateRecordStatusIsSuccess(Long userId, Long orderId) {
         CombinationRecordDO recordDO = validateCombinationRecord(userId, orderId);
-        return recordDO.getStatus();
+        return ObjectUtil.equal(recordDO.getStatus(), CombinationRecordStatusEnum.SUCCESS.getStatus());
+    }
+
+    /**
+     * APP 端获取开团记录
+     *
+     * @return 开团记录
+     */
+    public List<CombinationRecordDO> getRecordList() {
+        return recordMapper.selectListByStatus(CombinationRecordStatusEnum.ONGOING.getStatus());
     }
 
 }

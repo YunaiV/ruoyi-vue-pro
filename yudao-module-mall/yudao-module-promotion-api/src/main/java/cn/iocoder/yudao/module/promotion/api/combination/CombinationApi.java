@@ -24,7 +24,8 @@ public interface CombinationApi {
      * @param userId  用户编号
      * @param orderId 订单编号
      */
-    Integer getRecordStatus(Long userId, Long orderId);
+    boolean validateRecordStatusIsSuccess(Long userId, Long orderId);
+
 
     /**
      * 更新开团记录状态
@@ -41,6 +42,7 @@ public interface CombinationApi {
      * @param userId  用户编号
      * @param orderId 订单编号
      * @param status  状态值
+     * @return
      */
     void updateRecordStatusAndStartTime(Long userId, Long orderId, Integer status);
 

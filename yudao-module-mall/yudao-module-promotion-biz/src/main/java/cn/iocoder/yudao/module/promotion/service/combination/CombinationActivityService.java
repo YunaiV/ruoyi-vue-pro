@@ -99,6 +99,7 @@ public interface CombinationActivityService {
      * @param orderId   订单编号
      * @param status    状态
      * @param startTime 开始时间
+     * @return
      */
     void updateRecordStatusAndStartTimeByUserIdAndOrderId(Long userId, Long orderId, Integer status, LocalDateTime startTime);
 
@@ -116,5 +117,5 @@ public interface CombinationActivityService {
      * @param orderId 订单编号
      * @return 拼团状态
      */
-    Integer getRecordStatus(Long userId, Long orderId);
+    boolean validateRecordStatusIsSuccess(Long userId, Long orderId);
 }

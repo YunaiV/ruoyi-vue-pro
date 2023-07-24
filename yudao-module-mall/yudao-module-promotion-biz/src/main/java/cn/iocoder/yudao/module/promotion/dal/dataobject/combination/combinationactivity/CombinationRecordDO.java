@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.promotion.dal.dataobject.combination.combinationactivity;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -72,7 +73,9 @@ public class CombinationRecordDO extends BaseDO {
      */
     private String avatar;
     /**
-     * 开团状态： 正在开团 拼团成功 拼团失败
+     * 开团状态
+     *
+     * 关联 {@link CombinationRecordStatusEnum}
      */
     private Integer status;
     /**

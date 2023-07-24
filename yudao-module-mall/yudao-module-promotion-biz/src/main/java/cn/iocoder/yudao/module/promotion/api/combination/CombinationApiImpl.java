@@ -23,8 +23,8 @@ public class CombinationApiImpl implements CombinationApi {
     }
 
     @Override
-    public Integer getRecordStatus(Long userId, Long orderId) {
-        return activityService.getRecordStatus(userId, orderId);
+    public boolean validateRecordStatusIsSuccess(Long userId, Long orderId) {
+        return activityService.validateRecordStatusIsSuccess(userId, orderId);
     }
 
     @Override

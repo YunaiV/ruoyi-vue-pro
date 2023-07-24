@@ -164,13 +164,10 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public TradeOrderDO createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO) {
-        // 1. 用户收件地址的校验
-        AddressRespDTO address = validateAddress(userId, createReqVO.getAddressId());
         // 2. 价格计算
         TradePriceCalculateRespBO calculateRespBO = calculatePrice(userId, createReqVO);
-
         // 3.1 插入 TradeOrderDO 订单
-        TradeOrderDO order = createTradeOrder(userId, userIp, createReqVO, calculateRespBO, address);
+        TradeOrderDO order = createTradeOrder(userId, userIp, createReqVO, calculateRespBO);
         // 3.2 插入 TradeOrderItemDO 订单项
         List<TradeOrderItemDO> orderItems = createTradeOrderItems(order, calculateRespBO);
         // 订单创建完后的逻辑
@@ -182,6 +179,10 @@ public class TradeOrderServiceImpl implements TradeOrderService {
             // TODO 拼团一次应该只能选择一种规格的商品
             combinationApi.createRecord(TradeOrderConvert.INSTANCE.convert(order, orderItems.get(0), createReqVO, user)
                     .setStatus(CombinationRecordStatusEnum.NOT_PAY.getStatus()));
+        }
+        // TODO 秒杀扣减库存是下单就扣除还是等待订单支付成功再扣除
+        if (ObjectUtil.equal(TradeOrderTypeEnum.SECKILL.getType(), order.getType())) {
+
         }
 
         // TODO @LeeYan9: 是可以思考下, 订单的营销优惠记录, 应该记录在哪里, 微信讨论起来!
@@ -221,7 +222,13 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     }
 
     private TradeOrderDO createTradeOrder(Long userId, String clientIp, AppTradeOrderCreateReqVO createReqVO,
-                                          TradePriceCalculateRespBO calculateRespBO, AddressRespDTO address) {
+                                          TradePriceCalculateRespBO calculateRespBO) {
+        // 用户选择物流配送的时候才需要填写收货地址
+        AddressRespDTO address = new AddressRespDTO();
+        if (ObjectUtil.equal(createReqVO.getDeliveryType(), DeliveryTypeEnum.EXPRESS.getMode())) {
+            // 用户收件地址的校验
+            address = validateAddress(userId, createReqVO.getAddressId());
+        }
         TradeOrderDO order = TradeOrderConvert.INSTANCE.convert(userId, clientIp, createReqVO, calculateRespBO, address);
         order.setType(validateActivity(createReqVO));
         order.setNo(IdUtil.getSnowflakeNextId() + ""); // TODO @LeeYan9: 思考下, 怎么生成好点哈; 这个是会展示给用户的;
@@ -232,7 +239,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // 支付信息
         order.setAdjustPrice(0).setPayStatus(false);
         // 物流信息 TODO 芋艿：暂时写死物流方式；应该是前端选择的
-        order.setDeliveryType(DeliveryTypeEnum.EXPRESS.getMode()).setDeliveryStatus(TradeOrderDeliveryStatusEnum.UNDELIVERED.getStatus());
+        order.setDeliveryType(createReqVO.getDeliveryType()).setDeliveryStatus(TradeOrderDeliveryStatusEnum.UNDELIVERED.getStatus());
         // 退款信息
         order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus()).setRefundPrice(0);
         tradeOrderMapper.insert(order);
@@ -260,7 +267,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
                                        TradePriceCalculateRespBO calculateRespBO) {
         // 下单时扣减商品库存
         productSkuApi.updateSkuStock(new ProductSkuUpdateStockReqDTO(TradeOrderConvert.INSTANCE.convertList(orderItems)));
-        // TODO puhui：扣减活动库存
+
         // 删除购物车商品 TODO 芋艿：待实现
 
         // 扣减积分，抵扣金额 TODO 芋艿：待实现
@@ -271,7 +278,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
                     .setOrderId(tradeOrderDO.getId()));
         }
 
-        // 生成预支付 TODO puhui: 活动支付金额怎么算？
+        // 生成预支付
         createPayOrder(tradeOrderDO, orderItems, calculateRespBO);
 
         // 增加订单日志 TODO 芋艿：待实现
@@ -289,6 +296,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateOrderPaid(Long id, Long payOrderId) {
         // 校验并获得交易订单（可支付）
         KeyValue<TradeOrderDO, PayOrderRespDTO> orderResult = validateOrderPayable(id, payOrderId);
@@ -305,7 +313,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // 校验活动
         // 1、拼团活动
         if (ObjectUtil.equal(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
-            // 更新拼团状态 TODO puhui999：订单支付失败或订单过期删除这条拼团记录
+            // 更新拼团状态 TODO puhui999：订单支付失败或订单支付过期删除这条拼团记录
             combinationApi.updateRecordStatusAndStartTime(order.getUserId(), order.getId(), CombinationRecordStatusEnum.ONGOING.getStatus());
         }
         // TODO 芋艿：发送订单变化的消息
@@ -498,10 +506,11 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         if (ObjectUtil.notEqual(TradeOrderRefundStatusEnum.NONE.getStatus(), order.getRefundStatus())) {
             throw exception(ORDER_DELIVERY_FAIL_REFUND_STATUS_NOT_NONE);
         }
-        // 校验订单拼团是否成功
+        // 订单类型：拼团
         if (ObjectUtil.equal(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
+            // 校验订单拼团是否成功
             // TODO 用户 ID 使用当前登录用户的还是订单保存的？
-            if (ObjectUtil.notEqual(combinationApi.getRecordStatus(order.getUserId(), order.getId()), CombinationRecordStatusEnum.SUCCESS.getStatus())) {
+            if (combinationApi.validateRecordStatusIsSuccess(order.getUserId(), order.getId())) {
                 throw exception(ORDER_DELIVERY_FAIL_COMBINATION_RECORD_STATUS_NOT_SUCCESS);
             }
         }
