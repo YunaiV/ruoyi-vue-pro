@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Schema(description = "管理后台 - 订单发货 Request VO")
 @Data
@@ -25,6 +26,12 @@ public class TradeOrderDeliveryReqVO {
 
     @Schema(description = "发货物流单号", example = "SF123456789")
     private String logisticsNo;
+
+    // TODO 订单项商品单独发货
+
+    @Schema(description = "发货订单项", example = "[1,2,3]")
+    @NotNull(message = "发货订单项不能为空")
+    private List<Long> orderItemIds;
 
     // =============== 同城配送  ================
     // TODO

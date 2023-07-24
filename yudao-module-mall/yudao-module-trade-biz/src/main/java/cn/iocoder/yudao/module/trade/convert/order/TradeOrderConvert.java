@@ -18,6 +18,7 @@ import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateReqDTO;
 import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.base.member.user.MemberUserRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.base.product.property.ProductPropertyValueDetailRespVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDetailRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageItemRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.base.property.AppProductPropertyValueDetailRespVO;
@@ -26,6 +27,7 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderI
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.cart.TradeCartDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDeliveryDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
@@ -333,5 +335,16 @@ public interface TradeOrderConvert {
             @Mapping(target = "status", ignore = true)
     })
     CombinationRecordReqDTO convert(TradeOrderDO order, TradeOrderItemDO orderItem, AppTradeOrderCreateReqVO createReqVO, MemberUserRespDTO user);
+
+    TradeOrderDeliveryDO covert(Long orderId, Long orderItemId, Long userId, Integer deliveryType, Long logisticsId, String logisticsNo);
+
+    default List<TradeOrderDeliveryDO> covert(TradeOrderDO order, TradeOrderDeliveryReqVO deliveryReqVO) {
+        ArrayList<TradeOrderDeliveryDO> arrayList = new ArrayList<>();
+        deliveryReqVO.getOrderItemIds().forEach(item -> {
+            arrayList.add(covert(order.getId(), item, order.getUserId(), deliveryReqVO.getType(),
+                    deliveryReqVO.getLogisticsId(), deliveryReqVO.getLogisticsNo()));
+        });
+        return arrayList;
+    }
 
 }

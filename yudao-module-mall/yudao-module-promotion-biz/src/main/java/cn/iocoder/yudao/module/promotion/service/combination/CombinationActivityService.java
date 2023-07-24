@@ -109,4 +109,12 @@ public interface CombinationActivityService {
      */
     void createRecord(CombinationRecordReqDTO reqDTO);
 
+    /**
+     * 获得拼团状态
+     *
+     * @param userId  用户编号
+     * @param orderId 订单编号
+     * @return 拼团状态
+     */
+    Integer getRecordStatus(Long userId, Long orderId);
 }

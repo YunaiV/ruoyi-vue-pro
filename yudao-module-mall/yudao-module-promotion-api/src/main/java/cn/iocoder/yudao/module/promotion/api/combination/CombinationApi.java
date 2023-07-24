@@ -19,6 +19,14 @@ public interface CombinationApi {
     void createRecord(@Valid CombinationRecordReqDTO reqDTO);
 
     /**
+     * 获取开团记录状态
+     *
+     * @param userId  用户编号
+     * @param orderId 订单编号
+     */
+    Integer getRecordStatus(Long userId, Long orderId);
+
+    /**
      * 更新开团记录状态
      *
      * @param userId  用户编号

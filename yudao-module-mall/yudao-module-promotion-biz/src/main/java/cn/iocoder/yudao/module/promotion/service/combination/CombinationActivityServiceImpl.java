@@ -248,4 +248,10 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
         recordMapper.insert(recordDO);
     }
 
+    @Override
+    public Integer getRecordStatus(Long userId, Long orderId) {
+        CombinationRecordDO recordDO = validateCombinationRecord(userId, orderId);
+        return recordDO.getStatus();
+    }
+
 }
