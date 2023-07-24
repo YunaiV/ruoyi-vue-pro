@@ -21,13 +21,13 @@ public class PayNotifyTaskPageReqVO extends PageParam {
     private Long appId;
 
     @Schema(description = "通知类型", example = "2")
-    private Byte type;
+    private Integer type;
 
     @Schema(description = "数据编号", example = "6722")
     private Long dataId;
 
     @Schema(description = "通知状态", example = "1")
-    private Byte status;
+    private Integer status;
 
     @Schema(description = "商户订单编号", example = "26697")
     private String merchantOrderId;

@@ -25,6 +25,7 @@ import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
+import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -177,7 +178,7 @@ public class PayNotifyServiceImpl implements PayNotifyService {
         });
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void executeNotify0(PayNotifyTaskDO task) {
         // 发起回调
         CommonResult<?> invokeResult = null;
@@ -237,7 +238,8 @@ public class PayNotifyServiceImpl implements PayNotifyService {
      * @param invokeException 通知异常
      * @return 最终任务的状态
      */
-    private Integer processNotifyResult(PayNotifyTaskDO task, CommonResult<?> invokeResult, Throwable invokeException) {
+    @VisibleForTesting
+    Integer processNotifyResult(PayNotifyTaskDO task, CommonResult<?> invokeResult, Throwable invokeException) {
         // 设置通用的更新 PayNotifyTaskDO 的字段
         PayNotifyTaskDO updateTask = new PayNotifyTaskDO()
                 .setId(task.getId())
