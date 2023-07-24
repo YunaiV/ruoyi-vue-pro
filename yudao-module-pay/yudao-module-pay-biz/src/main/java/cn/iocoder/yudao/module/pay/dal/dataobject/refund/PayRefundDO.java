@@ -70,6 +70,12 @@ public class PayRefundDO extends BaseDO {
      * 关联 {@link PayOrderDO#getId()}
      */
     private Long orderId;
+    /**
+     * 支付订单编号
+     *
+     * 冗余 {@link PayOrderDO#getNo()}
+     */
+    private String orderNo;
 
     // ========== 商户相关字段 ==========
     /**

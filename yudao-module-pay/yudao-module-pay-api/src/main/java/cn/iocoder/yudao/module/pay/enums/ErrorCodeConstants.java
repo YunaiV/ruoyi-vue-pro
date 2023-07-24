@@ -23,7 +23,7 @@ public interface ErrorCodeConstants {
     // ========== ORDER 模块 1007002000 ==========
     ErrorCode ORDER_NOT_FOUND = new ErrorCode(1007002000, "支付订单不存在");
     ErrorCode ORDER_STATUS_IS_NOT_WAITING = new ErrorCode(1007002001, "支付订单不处于待支付");
-    ErrorCode ORDER_STATUS_IS_NOT_SUCCESS = new ErrorCode(1007002002, "支付订单不处于已支付");
+    ErrorCode ORDER_STATUS_IS_SUCCESS = new ErrorCode(1007002002, "订单已支付，请刷新页面");
     ErrorCode ORDER_IS_EXPIRED = new ErrorCode(1007002003, "支付订单已经过期");
     ErrorCode ORDER_SUBMIT_CHANNEL_ERROR = new ErrorCode(1007002004, "发起支付报错，错误码：{}，错误提示：{}");
     ErrorCode ORDER_REFUND_FAIL_STATUS_ERROR = new ErrorCode(1007002005, "支付订单退款失败，原因：状态不是已支付或已退款");
@@ -31,6 +31,7 @@ public interface ErrorCodeConstants {
     // ========== ORDER 模块(拓展单) 1007003000 ==========
     ErrorCode ORDER_EXTENSION_NOT_FOUND = new ErrorCode(1007003000, "支付交易拓展单不存在");
     ErrorCode ORDER_EXTENSION_STATUS_IS_NOT_WAITING = new ErrorCode(1007003001, "支付交易拓展单不处于待支付");
+    ErrorCode ORDER_EXTENSION_IS_PAID = new ErrorCode(1007003002, "订单已支付，请等待支付结果");
 
     // ========== 支付模块(退款) 1007006000 ==========
     ErrorCode REFUND_PRICE_EXCEED = new ErrorCode(1007006000, "退款金额超过订单可退款金额");

@@ -64,4 +64,11 @@ public interface PayRefundService {
      */
     void notifyRefund(Long channelId, PayRefundRespDTO notify);
 
+    /**
+     * 同步渠道退款的退款状态
+     *
+     * @return 同步到状态的退款数量，包括退款成功、退款失败
+     */
+    int syncRefund();
+
 }

@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.system.service.social;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.social.core.YudaoAuthRequestFactory;
-import cn.iocoder.yudao.framework.test.core.ut.BaseDbAndRedisUnitTest;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserBindDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @Import(SocialUserServiceImpl.class)
-public class SocialUserServiceImplTest extends BaseDbAndRedisUnitTest {
+public class SocialUserServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private SocialUserServiceImpl socialUserService;

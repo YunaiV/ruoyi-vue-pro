@@ -20,9 +20,11 @@ import org.springframework.context.annotation.Import;
 import javax.annotation.Resource;
 import javax.validation.Validator;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.addTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
@@ -68,7 +70,7 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
     public void testRefreshLocalCache() {
         // mock 数据 01
         PayChannelDO dbChannel = randomPojo(PayChannelDO.class,
-                o -> o.setConfig(randomWxPayClientConfig()));
+                o -> o.setConfig(randomWxPayClientConfig()).setUpdateTime(addTime(Duration.ofMinutes(-2))));
         channelMapper.insert(dbChannel);// @Sql: 先插入出一条存在的数据
         channelService.initLocalCache();
         // mock 数据 02

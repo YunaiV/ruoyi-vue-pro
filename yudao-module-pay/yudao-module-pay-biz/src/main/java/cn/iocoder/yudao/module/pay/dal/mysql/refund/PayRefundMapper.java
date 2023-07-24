@@ -68,4 +68,8 @@ public interface PayRefundMapper extends BaseMapperX<PayRefundDO> {
                 .orderByDesc(PayRefundDO::getId));
     }
 
+    default List<PayRefundDO> selectListByStatus(Integer status) {
+        return selectList(PayRefundDO::getStatus, status);
+    }
+
 }

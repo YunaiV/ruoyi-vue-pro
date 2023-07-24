@@ -39,7 +39,7 @@ public class MemberAddressDO extends BaseDO {
     /**
      * 地区编号
      */
-    private Integer areaId;
+    private Long areaId;
     /**
      * 收件详细地址
      */

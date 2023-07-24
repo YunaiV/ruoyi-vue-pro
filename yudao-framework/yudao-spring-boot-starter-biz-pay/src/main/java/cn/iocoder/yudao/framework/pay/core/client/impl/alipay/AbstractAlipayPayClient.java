@@ -17,15 +17,22 @@ import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayConfig;
 import com.alipay.api.AlipayResponse;
 import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.domain.AlipayTradeFastpayRefundQueryModel;
+import com.alipay.api.domain.AlipayTradeQueryModel;
 import com.alipay.api.domain.AlipayTradeRefundModel;
 import com.alipay.api.internal.util.AlipaySignature;
+import com.alipay.api.request.AlipayTradeFastpayRefundQueryRequest;
+import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.request.AlipayTradeRefundRequest;
+import com.alipay.api.response.AlipayTradeFastpayRefundQueryResponse;
+import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.alipay.api.response.AlipayTradeRefundResponse;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -63,7 +70,7 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
      */
     protected PayOrderRespDTO buildClosedPayOrderRespDTO(PayOrderUnifiedReqDTO reqDTO, AlipayResponse response) {
         Assert.isFalse(response.isSuccess());
-        return PayOrderRespDTO.build(response.getSubCode(), response.getSubMsg(),
+        return PayOrderRespDTO.closedOf(response.getSubCode(), response.getSubMsg(),
                 reqDTO.getOutTradeNo(), response);
     }
 
@@ -76,10 +83,7 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
 
         // 2. 解析订单的状态
         // 额外说明：支付宝不仅仅支付成功会回调，再各种触发支付单数据变化时，都会进行回调，所以这里 status 的解析会写的比较复杂
-        String tradeStatus = bodyObj.get("trade_status");
-        Integer status = Objects.equals("WAIT_BUYER_PAY", tradeStatus) ? PayOrderStatusRespEnum.WAITING.getStatus()
-                : ObjectUtils.equalsAny(tradeStatus, "TRADE_FINISHED", "TRADE_SUCCESS") ? PayOrderStatusRespEnum.SUCCESS.getStatus()
-                : Objects.equals("TRADE_CLOSED", tradeStatus) ? PayOrderStatusRespEnum.CLOSED.getStatus() : null;
+        Integer status = parseStatus(bodyObj.get("trade_status"));
         // 特殊逻辑: 支付宝没有退款成功的状态，所以，如果有退款金额，我们认为是退款成功
         if (MapUtil.getDouble(bodyObj, "refund_fee", 0D) > 0) {
             status = PayOrderStatusRespEnum.REFUND.getStatus();
@@ -87,8 +91,38 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
         Assert.notNull(status, (Supplier<Throwable>) () -> {
             throw new IllegalArgumentException(StrUtil.format("body({}) 的 trade_status 不正确", body));
         });
-        return new PayOrderRespDTO(status, bodyObj.get("trade_no"), bodyObj.get("seller_id"), parseTime(params.get("gmt_payment")),
+        return PayOrderRespDTO.of(status, bodyObj.get("trade_no"), bodyObj.get("seller_id"), parseTime(params.get("gmt_payment")),
                 bodyObj.get("out_trade_no"), body);
+    }
+
+    @Override
+    protected PayOrderRespDTO doGetOrder(String outTradeNo) throws Throwable {
+        // 1.1 构建 AlipayTradeRefundModel 请求
+        AlipayTradeQueryModel model = new AlipayTradeQueryModel();
+        model.setOutTradeNo(outTradeNo);
+        // 1.2 构建 AlipayTradeQueryRequest 请求
+        AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
+        request.setBizModel(model);
+
+        // 2.1 执行请求
+        AlipayTradeQueryResponse response =  client.execute(request);
+        if (!response.isSuccess()) { // 不成功，例如说订单不存在
+            return PayOrderRespDTO.closedOf(response.getSubCode(), response.getSubMsg(),
+                    outTradeNo, response);
+        }
+        // 2.2 解析订单的状态
+        Integer status = parseStatus(response.getTradeStatus());
+        Assert.notNull(status, (Supplier<Throwable>) () -> {
+            throw new IllegalArgumentException(StrUtil.format("body({}) 的 trade_status 不正确", response.getBody()));
+        });
+        return PayOrderRespDTO.of(status, response.getTradeNo(), response.getBuyerUserId(), LocalDateTimeUtil.of(response.getSendPayDate()),
+                outTradeNo, response);
+    }
+
+    private static Integer parseStatus(String tradeStatus) {
+        return Objects.equals("WAIT_BUYER_PAY", tradeStatus) ? PayOrderStatusRespEnum.WAITING.getStatus()
+                : ObjectUtils.equalsAny(tradeStatus, "TRADE_FINISHED", "TRADE_SUCCESS") ? PayOrderStatusRespEnum.SUCCESS.getStatus()
+                : Objects.equals("TRADE_CLOSED", tradeStatus) ? PayOrderStatusRespEnum.CLOSED.getStatus() : null;
     }
 
     // ============ 退款相关 ==========
@@ -112,16 +146,15 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
         request.setBizModel(model);
 
         // 2.1 执行请求
-        AlipayTradeRefundResponse response =  client.execute(request);
+        AlipayTradeRefundResponse response = client.execute(request);
+        if (!response.isSuccess()) {
+            return PayRefundRespDTO.failureOf(reqDTO.getOutRefundNo(), response);
+        }
         // 2.2 创建返回结果
         // 支付宝只要退款调用返回 success，就认为退款成功，不需要回调。具体可见 parseNotify 方法的说明。
         // 另外，支付宝没有退款单号，所以不用设置
-        if (response.isSuccess()) {
-            return PayRefundRespDTO.successOf(null, LocalDateTimeUtil.of(response.getGmtRefundPay()),
-                    reqDTO.getOutRefundNo(), response);
-        } else {
-            return PayRefundRespDTO.failureOf(reqDTO.getOutRefundNo(), response);
-        }
+        return PayRefundRespDTO.successOf(null, LocalDateTimeUtil.of(response.getGmtRefundPay()),
+                reqDTO.getOutRefundNo(), response);
     }
 
     @Override
@@ -132,6 +165,35 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
         // 所以，这里在解析时，即使是退款导致的订单状态同步，我们也忽略不做为“退款同步”，而是订单的回调。
         // 实际上，支付宝退款只要发起成功，就可以认为退款成功，不需要等待回调。
         throw new UnsupportedOperationException("支付宝无退款回调");
+    }
+
+    @Override
+    protected PayRefundRespDTO doGetRefund(String outTradeNo, String outRefundNo) throws AlipayApiException {
+        // 1.1 构建 AlipayTradeFastpayRefundQueryModel 请求
+        AlipayTradeFastpayRefundQueryModel model = new AlipayTradeFastpayRefundQueryModel();
+        model.setOutTradeNo(outTradeNo);
+        model.setOutRequestNo(outRefundNo);
+        model.setQueryOptions(Collections.singletonList("gmt_refund_pay"));
+        // 1.2 构建 AlipayTradeFastpayRefundQueryRequest 请求
+        AlipayTradeFastpayRefundQueryRequest request = new AlipayTradeFastpayRefundQueryRequest();
+        request.setBizModel(model);
+
+        // 2.1 执行请求
+        AlipayTradeFastpayRefundQueryResponse response = client.execute(request);
+        if (!response.isSuccess()) {
+            // 明确不存在的情况，应该就是失败，可进行关闭
+            if (ObjectUtils.equalsAny(response.getSubCode(), "TRADE_NOT_EXIST", "ACQ.TRADE_NOT_EXIST")) {
+                return PayRefundRespDTO.failureOf(outRefundNo, response);
+            }
+            // 可能存在“ACQ.SYSTEM_ERROR”系统错误等情况，所以返回 WAIT 继续等待
+            return PayRefundRespDTO.waitingOf(null, outRefundNo, response);
+        }
+        // 2.2 创建返回结果
+        if (Objects.equals(response.getRefundStatus(), "REFUND_SUCCESS")) {
+            return PayRefundRespDTO.successOf(null, LocalDateTimeUtil.of(response.getGmtRefundPay()),
+                    outRefundNo, response);
+        }
+        return PayRefundRespDTO.waitingOf(null, outRefundNo, response);
     }
 
     // ========== 各种工具方法 ==========

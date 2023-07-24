@@ -34,6 +34,16 @@ public enum PayOrderStatusRespEnum {
     }
 
     /**
+     * 判断是否已退款
+     *
+     * @param status 状态
+     * @return 是否支付成功
+     */
+    public static boolean isRefund(Integer status) {
+        return Objects.equals(status, REFUND.getStatus());
+    }
+
+    /**
      * 判断是否支付关闭
      *
      * @param status 状态

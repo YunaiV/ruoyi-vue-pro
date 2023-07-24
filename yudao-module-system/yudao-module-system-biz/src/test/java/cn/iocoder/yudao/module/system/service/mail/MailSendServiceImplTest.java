@@ -84,6 +84,9 @@ class MailSendServiceImplTest extends BaseMockitoUnitTest {
             o.setParams(Lists.newArrayList("code", "op"));
         });
         when(mailTemplateService.getMailTemplateByCodeFromCache(eq(templateCode))).thenReturn(template);
+        String title = RandomUtils.randomString();
+        when(mailTemplateService.formatMailTemplateContent(eq(template.getTitle()), eq(templateParams)))
+                .thenReturn(title);
         String content = RandomUtils.randomString();
         when(mailTemplateService.formatMailTemplateContent(eq(template.getContent()), eq(templateParams)))
                 .thenReturn(content);
@@ -101,7 +104,7 @@ class MailSendServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(mailLogId, resultMailLogId);
         // 断言调用
         verify(mailProducer).sendMailSendMessage(eq(mailLogId), eq(user.getEmail()),
-                eq(account.getId()), eq(template.getNickname()), eq(template.getTitle()), eq(content));
+                eq(account.getId()), eq(template.getNickname()), eq(title), eq(content));
     }
 
     @Test
@@ -122,6 +125,9 @@ class MailSendServiceImplTest extends BaseMockitoUnitTest {
             o.setParams(Lists.newArrayList("code", "op"));
         });
         when(mailTemplateService.getMailTemplateByCodeFromCache(eq(templateCode))).thenReturn(template);
+        String title = RandomUtils.randomString();
+        when(mailTemplateService.formatMailTemplateContent(eq(template.getTitle()), eq(templateParams)))
+                .thenReturn(title);
         String content = RandomUtils.randomString();
         when(mailTemplateService.formatMailTemplateContent(eq(template.getContent()), eq(templateParams)))
                 .thenReturn(content);
@@ -139,7 +145,7 @@ class MailSendServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(mailLogId, resultMailLogId);
         // 断言调用
         verify(mailProducer).sendMailSendMessage(eq(mailLogId), eq(mail),
-                eq(account.getId()), eq(template.getNickname()), eq(template.getTitle()), eq(content));
+                eq(account.getId()), eq(template.getNickname()), eq(title), eq(content));
     }
 
     /**
@@ -161,6 +167,9 @@ class MailSendServiceImplTest extends BaseMockitoUnitTest {
             o.setParams(Lists.newArrayList("code", "op"));
         });
         when(mailTemplateService.getMailTemplateByCodeFromCache(eq(templateCode))).thenReturn(template);
+        String title = RandomUtils.randomString();
+        when(mailTemplateService.formatMailTemplateContent(eq(template.getTitle()), eq(templateParams)))
+                .thenReturn(title);
         String content = RandomUtils.randomString();
         when(mailTemplateService.formatMailTemplateContent(eq(template.getContent()), eq(templateParams)))
                 .thenReturn(content);
@@ -178,7 +187,7 @@ class MailSendServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(mailLogId, resultMailLogId);
         // 断言调用
         verify(mailProducer).sendMailSendMessage(eq(mailLogId), eq(mail),
-                eq(account.getId()), eq(template.getNickname()), eq(template.getTitle()), eq(content));
+                eq(account.getId()), eq(template.getNickname()), eq(title), eq(content));
     }
 
     /**
@@ -200,6 +209,9 @@ class MailSendServiceImplTest extends BaseMockitoUnitTest {
             o.setParams(Lists.newArrayList("code", "op"));
         });
         when(mailTemplateService.getMailTemplateByCodeFromCache(eq(templateCode))).thenReturn(template);
+        String title = RandomUtils.randomString();
+        when(mailTemplateService.formatMailTemplateContent(eq(template.getTitle()), eq(templateParams)))
+                .thenReturn(title);
         String content = RandomUtils.randomString();
         when(mailTemplateService.formatMailTemplateContent(eq(template.getContent()), eq(templateParams)))
                 .thenReturn(content);

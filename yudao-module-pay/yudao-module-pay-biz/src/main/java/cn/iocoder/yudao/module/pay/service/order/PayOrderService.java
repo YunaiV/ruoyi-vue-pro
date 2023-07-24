@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -104,5 +105,20 @@ public interface PayOrderService {
      * @return 支付订单
      */
     PayOrderExtensionDO getOrderExtension(Long id);
+
+    /**
+     * 同步订单的支付状态
+     *
+     * @param minCreateTime 最小创建时间
+     * @return 同步到已支付的订单数量
+     */
+    int syncOrder(LocalDateTime minCreateTime);
+
+    /**
+     * 将已过期的订单，状态修改为已关闭
+     *
+     * @return 过期的订单数量
+     */
+    int expireOrder();
 
 }
