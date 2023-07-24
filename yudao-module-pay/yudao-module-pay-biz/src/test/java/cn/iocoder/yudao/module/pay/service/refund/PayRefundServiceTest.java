@@ -25,7 +25,6 @@ import cn.iocoder.yudao.module.pay.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
-import cn.iocoder.yudao.module.pay.service.notify.dto.PayNotifyTaskCreateReqDTO;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -552,8 +551,8 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
                 "updateTime", "updater");
         // 断言，调用
         verify(orderService).updateOrderRefundPrice(eq(100L), eq(23));
-        verify(notifyService).createPayNotifyTask(eq(PayNotifyTaskCreateReqDTO.builder()
-                .type(PayNotifyTypeEnum.REFUND.getType()).dataId(refund.getId()).build()));
+        verify(notifyService).createPayNotifyTask(eq(PayNotifyTypeEnum.REFUND.getType()),
+                eq(refund.getId()));
     }
 
     @Test
@@ -624,8 +623,8 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
         assertPojoEquals(refund, refundMapper.selectById(refund.getId()),
                 "updateTime", "updater");
         // 断言，调用
-        verify(notifyService).createPayNotifyTask(eq(PayNotifyTaskCreateReqDTO.builder()
-                .type(PayNotifyTypeEnum.REFUND.getType()).dataId(refund.getId()).build()));
+        verify(notifyService).createPayNotifyTask(eq(PayNotifyTypeEnum.REFUND.getType()),
+                eq(refund.getId()));
     }
 
     @Test

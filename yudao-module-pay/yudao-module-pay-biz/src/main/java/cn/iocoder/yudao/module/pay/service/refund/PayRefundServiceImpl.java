@@ -26,7 +26,6 @@ import cn.iocoder.yudao.module.pay.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
-import cn.iocoder.yudao.module.pay.service.notify.dto.PayNotifyTaskCreateReqDTO;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -242,8 +241,8 @@ public class PayRefundServiceImpl implements PayRefundService {
         orderService.updateOrderRefundPrice(refund.getOrderId(), refund.getRefundPrice());
 
         // 3. 插入退款通知记录
-        notifyService.createPayNotifyTask(PayNotifyTaskCreateReqDTO.builder()
-                .type(PayNotifyTypeEnum.REFUND.getType()).dataId(refund.getId()).build());
+        notifyService.createPayNotifyTask(PayNotifyTypeEnum.REFUND.getType(),
+                refund.getId());
     }
 
     private void notifyRefundFailure(PayChannelDO channel, PayRefundRespDTO notify) {
@@ -273,8 +272,8 @@ public class PayRefundServiceImpl implements PayRefundService {
         log.info("[notifyRefundFailure][退款订单({}) 更新为退款失败]", refund.getId());
 
         // 2. 插入退款通知记录
-        notifyService.createPayNotifyTask(PayNotifyTaskCreateReqDTO.builder()
-                .type(PayNotifyTypeEnum.REFUND.getType()).dataId(refund.getId()).build());
+        notifyService.createPayNotifyTask(PayNotifyTypeEnum.REFUND.getType(),
+                refund.getId());
     }
 
     @Override

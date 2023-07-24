@@ -27,7 +27,6 @@ import cn.iocoder.yudao.module.pay.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
-import cn.iocoder.yudao.module.pay.service.notify.dto.PayNotifyTaskCreateReqDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -622,7 +621,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         // 断言 PayOrderDO ：数据未更新，因为它是 SUCCESS
         assertPojoEquals(order, orderMapper.selectOne(null));
         // 断言，调用
-        verify(notifyService, never()).createPayNotifyTask(any(PayNotifyTaskCreateReqDTO.class));
+        verify(notifyService, never()).createPayNotifyTask(anyInt(), anyLong());
     }
 
     @Test
@@ -661,11 +660,8 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         assertPojoEquals(order, orderMapper.selectOne(null),
                 "updateTime", "updater");
         // 断言，调用
-        verify(notifyService).createPayNotifyTask(argThat(reqDTO -> {
-            assertEquals(reqDTO.getType(), PayNotifyTypeEnum.ORDER.getType());
-            assertEquals(reqDTO.getDataId(), orderExtension.getOrderId());
-            return true;
-        }));
+        verify(notifyService).createPayNotifyTask(eq(PayNotifyTypeEnum.ORDER.getType()),
+            eq(orderExtension.getOrderId()));
     }
 
     @Test

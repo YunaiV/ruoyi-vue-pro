@@ -31,7 +31,6 @@ import cn.iocoder.yudao.module.pay.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
-import cn.iocoder.yudao.module.pay.service.notify.dto.PayNotifyTaskCreateReqDTO;
 import cn.iocoder.yudao.module.pay.util.MoneyUtils;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
@@ -282,8 +281,8 @@ public class PayOrderServiceImpl implements PayOrderService {
         }
 
         // 3. 插入支付通知记录
-        notifyService.createPayNotifyTask(PayNotifyTaskCreateReqDTO.builder()
-                .type(PayNotifyTypeEnum.ORDER.getType()).dataId(orderExtension.getOrderId()).build());
+        notifyService.createPayNotifyTask(PayNotifyTypeEnum.ORDER.getType(),
+                orderExtension.getOrderId());
     }
 
     /**

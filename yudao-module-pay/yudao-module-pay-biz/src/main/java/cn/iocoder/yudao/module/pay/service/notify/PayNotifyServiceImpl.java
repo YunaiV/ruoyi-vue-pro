@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.pay.service.notify;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -22,7 +23,6 @@ import cn.iocoder.yudao.module.pay.dal.mysql.notify.PayNotifyTaskMapper;
 import cn.iocoder.yudao.module.pay.dal.redis.notify.PayNotifyLockRedisDAO;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
-import cn.iocoder.yudao.module.pay.service.notify.dto.PayNotifyTaskCreateReqDTO;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
 import lombok.extern.slf4j.Slf4j;
@@ -84,15 +84,10 @@ public class PayNotifyServiceImpl implements PayNotifyService {
     @Resource
     private PayNotifyLockRedisDAO notifyLockCoreRedisDAO;
 
-    @Resource
-    @Lazy // 循环依赖（自己依赖自己），避免报错
-    private PayNotifyServiceImpl self;
-
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void createPayNotifyTask(PayNotifyTaskCreateReqDTO reqDTO) {
-        PayNotifyTaskDO task = new PayNotifyTaskDO();
-        task.setType(reqDTO.getType()).setDataId(reqDTO.getDataId());
+    public void createPayNotifyTask(Integer type, Long dataId) {
+        PayNotifyTaskDO task = new PayNotifyTaskDO().setType(type).setDataId(dataId);
         task.setStatus(PayNotifyStatusEnum.WAITING.getStatus()).setNextNotifyTime(LocalDateTime.now())
                 .setNotifyTimes(0).setMaxNotifyTimes(PayNotifyTaskDO.NOTIFY_FREQUENCY.length + 1);
         // 补充 appId + notifyUrl 字段
@@ -178,7 +173,7 @@ public class PayNotifyServiceImpl implements PayNotifyService {
             }
 
             // 执行通知
-            self.executeNotify0(dbTask);
+            getSelf().executeNotify0(dbTask);
         });
     }
 
@@ -283,6 +278,15 @@ public class PayNotifyServiceImpl implements PayNotifyService {
     @Override
     public List<PayNotifyLogDO> getNotifyLogList(Long taskId) {
         return notifyLogMapper.selectListByTaskId(taskId);
+    }
+
+    /**
+     * 获得自身的代理对象，解决 AOP 生效问题
+     *
+     * @return 自己
+     */
+    private PayNotifyServiceImpl getSelf() {
+        return SpringUtil.getBean(getClass());
     }
 
 }

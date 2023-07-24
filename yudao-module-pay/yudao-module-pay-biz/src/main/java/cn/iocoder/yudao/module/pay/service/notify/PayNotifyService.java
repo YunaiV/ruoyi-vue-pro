@@ -4,9 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.controller.admin.notify.vo.PayNotifyTaskPageReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.notify.PayNotifyLogDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.notify.PayNotifyTaskDO;
-import cn.iocoder.yudao.module.pay.service.notify.dto.PayNotifyTaskCreateReqDTO;
 
-import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -19,9 +17,10 @@ public interface PayNotifyService {
     /**
      * 创建回调通知任务
      *
-     * @param reqDTO 任务信息
+     * @param type 类型
+     * @param dataId 数据编号
      */
-    void createPayNotifyTask(@Valid PayNotifyTaskCreateReqDTO reqDTO);
+    void createPayNotifyTask(Integer type, Long dataId);
 
     /**
      * 执行回调通知
