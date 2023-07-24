@@ -106,7 +106,7 @@ export default {
         code: "alipay_app"
       }, {
         name: '支付宝扫码支付',
-        icon: require("@/assets/images/pay/icon/alipay_app.svg"),
+        icon: require("@/assets/images/pay/icon/alipay_qr.svg"),
         code: "alipay_qr"
       }, {
         name: '支付宝条码支付',
@@ -237,6 +237,8 @@ export default {
           this.displayUrl(channelCode, data)
         } else if (data.displayMode === PayDisplayModeEnum.QR_CODE.mode) {
           this.displayQrCode(channelCode, data)
+        } else if (data.displayMode === PayDisplayModeEnum.APP.mode) {
+          this.displayApp(channelCode, data)
         }
 
         // 打开轮询任务
@@ -270,7 +272,7 @@ export default {
       location.href = data.displayContent
       this.submitLoading = false
     },
-    /** 提交支付后（支付宝扫码支付） */
+    /** 提交支付后（扫码支付） */
     displayQrCode(channelCode, data) {
       let title = '请使用手机浏览器“扫一扫”';
       if (channelCode === PayChannelEnum.ALIPAY_WAP.code) {
@@ -287,6 +289,14 @@ export default {
       }
       this.submitLoading = false
     },
+    /** 提交支付后（App） */
+    displayApp(channelCode, data) {
+      if (channelCode === PayChannelEnum.ALIPAY_APP.code) {
+        this.$message.error('支付宝 App 无法在网页支付！');
+      }
+      this.submitLoading = false
+    },
+
     /** 轮询查询任务 */
     createQueryInterval() {
       if (this.interval) {

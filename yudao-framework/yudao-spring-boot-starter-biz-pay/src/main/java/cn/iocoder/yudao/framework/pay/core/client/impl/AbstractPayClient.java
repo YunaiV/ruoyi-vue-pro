@@ -83,7 +83,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
             resp = doUnifiedOrder(reqDTO);
         } catch (Throwable ex) {
             // 系统异常，则包装成 PayException 异常抛出
-            log.error("[unifiedRefund][客户端({}) request({}) 发起支付异常]",
+            log.error("[unifiedOrder][客户端({}) request({}) 发起支付异常]",
                     getId(), toJsonString(reqDTO), ex);
             throw buildPayException(ex);
         }

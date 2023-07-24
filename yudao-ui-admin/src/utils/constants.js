@@ -177,6 +177,9 @@ export const PayDisplayModeEnum = {
   },
   QR_CODE: {
     "mode": "qr_code"
+  },
+  APP: {
+    "mode": "app"
   }
 }
 
