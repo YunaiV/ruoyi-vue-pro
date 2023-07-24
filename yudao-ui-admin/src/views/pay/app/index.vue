@@ -382,7 +382,7 @@ export default {
      * @param channelCode 渠道编码
      */
     isChannelExists(channels, channelCode) {
-      return channels.indexOf(channelCode) !== -1;
+      return channels && channels.indexOf(channelCode) !== -1;
     }
   }
 }
