@@ -81,6 +81,8 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
         PayOrderRespDTO resp;
         try {
             resp = doUnifiedOrder(reqDTO);
+        } catch (ServiceException ex) { // 业务异常，都是实现类已经翻译，所以直接抛出即可
+            throw ex;
         } catch (Throwable ex) {
             // 系统异常，则包装成 PayException 异常抛出
             log.error("[unifiedOrder][客户端({}) request({}) 发起支付异常]",
@@ -97,6 +99,8 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
     public final PayOrderRespDTO parseOrderNotify(Map<String, String> params, String body) {
         try {
             return doParseOrderNotify(params, body);
+        } catch (ServiceException ex) { // 业务异常，都是实现类已经翻译，所以直接抛出即可
+            throw ex;
         } catch (Throwable ex) {
             log.error("[parseOrderNotify][客户端({}) params({}) body({}) 解析失败]",
                     getId(), params, body, ex);
@@ -111,6 +115,8 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
     public final PayOrderRespDTO getOrder(String outTradeNo) {
         try {
             return doGetOrder(outTradeNo);
+        } catch (ServiceException ex) { // 业务异常，都是实现类已经翻译，所以直接抛出即可
+            throw ex;
         } catch (Throwable ex) {
             log.error("[getOrder][客户端({}) outTradeNo({}) 查询支付单异常]",
                     getId(), outTradeNo, ex);
@@ -130,8 +136,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
         PayRefundRespDTO resp;
         try {
             resp = doUnifiedRefund(reqDTO);
-        } catch (ServiceException ex) {
-            // 业务异常，都是实现类已经翻译，所以直接抛出即可
+        } catch (ServiceException ex) { // 业务异常，都是实现类已经翻译，所以直接抛出即可
             throw ex;
         } catch (Throwable ex) {
             // 系统异常，则包装成 PayException 异常抛出
@@ -148,6 +153,8 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
     public final PayRefundRespDTO parseRefundNotify(Map<String, String> params, String body) {
         try {
             return doParseRefundNotify(params, body);
+        } catch (ServiceException ex) { // 业务异常，都是实现类已经翻译，所以直接抛出即可
+            throw ex;
         } catch (Throwable ex) {
             log.error("[parseRefundNotify][客户端({}) params({}) body({}) 解析失败]",
                     getId(), params, body, ex);
@@ -162,6 +169,8 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
     public final PayRefundRespDTO getRefund(String outTradeNo, String outRefundNo) {
         try {
             return doGetRefund(outTradeNo, outRefundNo);
+        } catch (ServiceException ex) { // 业务异常，都是实现类已经翻译，所以直接抛出即可
+            throw ex;
         } catch (Throwable ex) {
             log.error("[getRefund][客户端({}) outTradeNo({}) outRefundNo({}) 查询退款单异常]",
                     getId(), outTradeNo, outRefundNo, ex);

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
@@ -55,13 +56,17 @@ public class AlipayBarPayClient extends AbstractAlipayPayClient {
         request.setNotifyUrl(reqDTO.getNotifyUrl());
         request.setReturnUrl(reqDTO.getReturnUrl());
 
-        // TODO 芋艿：各种边界的处理
         // 2.1 执行请求
         AlipayTradePayResponse response = client.execute(request);
         // 2.2 处理结果
         if (!response.isSuccess()) {
             return buildClosedPayOrderRespDTO(reqDTO, response);
         }
+        if ("10000".equals(response.getCode())) { // 免密支付
+            return PayOrderRespDTO.successOf(response.getTradeNo(), response.getBuyerUserId(), LocalDateTimeUtil.of(response.getGmtPayment()),
+                    response.getOutTradeNo(), response);
+        }
+        // 大额支付，需要用户输入密码，所以返回 waiting。此时，前端一般会进行轮询
         return PayOrderRespDTO.waitingOf(displayMode, "",
                 reqDTO.getOutTradeNo(), response);
     }
