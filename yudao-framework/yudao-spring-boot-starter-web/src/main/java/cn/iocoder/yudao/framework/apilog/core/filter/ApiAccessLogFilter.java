@@ -104,7 +104,7 @@ public class ApiAccessLogFilter extends ApiRequestFilter {
         // 持续时间
         accessLog.setBeginTime(beginTime);
         accessLog.setEndTime(LocalDateTime.now());
-        accessLog.setDuration((int) LocalDateTimeUtil.between(accessLog.getBeginTime(), accessLog.getEndTime(), ChronoUnit.SECONDS));
+        accessLog.setDuration((int) LocalDateTimeUtil.between(accessLog.getBeginTime(), accessLog.getEndTime(), ChronoUnit.MILLIS));
     }
 
 }
