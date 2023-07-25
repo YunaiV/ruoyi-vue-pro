@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.pay.dal.dataobject.order;
 
-import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayChannelDO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -14,6 +15,7 @@ import java.util.Map;
 /**
  * 支付订单拓展 DO
  *
+ * 每次调用支付渠道，都会生成一条对应记录
  *
  * @author 芋道源码
  */
@@ -32,10 +34,11 @@ public class PayOrderExtensionDO extends BaseDO {
      */
     private Long id;
     /**
-     * 支付订单号，根据规则生成
-     * 调用支付渠道时，使用该字段作为对接的订单号。
-     * 1. 调用微信支付 https://api.mch.weixin.qq.com/pay/unifiedorder 时，使用该字段作为 out_trade_no
-     * 2. 调用支付宝 https://opendocs.alipay.com/apis 时，使用该字段作为 out_trade_no
+     * 外部订单号，根据规则生成
+     *
+     * 调用支付渠道时，使用该字段作为对接的订单号：
+     * 1. 微信支付：对应 <a href="https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_1_1.shtml">JSAPI 支付</a> 的 out_trade_no 字段
+     * 2. 支付宝支付：对应 <a href="https://opendocs.alipay.com/open/270/105898">电脑网站支付</a> 的 out_trade_no 字段
      *
      * 例如说，P202110132239124200055
      */
@@ -64,20 +67,29 @@ public class PayOrderExtensionDO extends BaseDO {
      * 支付状态
      *
      * 枚举 {@link PayOrderStatusEnum}
-     * 注意，只包含上述枚举的 WAITING 和 SUCCESS
      */
     private Integer status;
     /**
      * 支付渠道的额外参数
      *
-     * 参见 https://www.pingxx.com/api/支付渠道%20extra%20参数说明.html
+     * 参见 <a href="https://www.pingxx.com/api/支付渠道%20extra%20参数说明.html">参数说明</>
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private Map<String, String> channelExtras;
+
     /**
-     * 支付渠道异步通知的内容
+     * 调用渠道的错误码
+     */
+    private String channelErrorCode;
+    /**
+     * 调用渠道报错时，错误信息
+     */
+    private String channelErrorMsg;
+
+    /**
+     * 支付渠道的同步/异步通知的内容
      *
-     * 在支持成功后，会记录回调的数据
+     * 对应 {@link PayOrderRespDTO#getRawData()}
      */
     private String channelNotifyData;
 

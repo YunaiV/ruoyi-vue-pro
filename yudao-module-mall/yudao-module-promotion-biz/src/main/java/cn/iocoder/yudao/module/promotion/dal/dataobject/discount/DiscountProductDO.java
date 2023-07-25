@@ -24,12 +24,15 @@ public class DiscountProductDO extends BaseDO {
      */
     @TableId
     private Long id;
+
+    // TODO 芋艿：把 activity 所有的字段冗余过来
     /**
      * 限时折扣活动的编号
      *
      * 关联 {@link DiscountActivityDO#getId()}
      */
     private Long activityId;
+
     /**
      * 商品 SPU 编号
      *

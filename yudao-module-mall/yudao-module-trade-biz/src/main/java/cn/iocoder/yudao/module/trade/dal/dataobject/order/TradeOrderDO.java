@@ -2,12 +2,9 @@ package cn.iocoder.yudao.module.trade.dal.dataobject.order;
 
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO.OrderItem;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderCancelTypeEnum;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderAfterSaleStatusEnum;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderDeliveryStatusEnum;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
+import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryPickUpStoreDO;
+import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.order.*;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -94,6 +91,13 @@ public class TradeOrderDO extends BaseDO {
      * 商家备注
      */
     private String remark;
+    /**
+     * 是否评价
+     *
+     * true - 已评价
+     * false - 未评价
+     */
+    private Boolean commentStatus;
 
     // ========== 价格 + 支付基本信息 ==========
 
@@ -113,7 +117,7 @@ public class TradeOrderDO extends BaseDO {
      * true - 已经支付过
      * false - 没有支付过
      */
-    private Boolean payed;
+    private Boolean payStatus;
     /**
      * 付款时间
      */
@@ -126,24 +130,15 @@ public class TradeOrderDO extends BaseDO {
     private String payChannelCode;
 
     /**
-     * 商品原价（总），单位：分
+     * 商品原价，单位：分
      *
-     * 基于 {@link TradeOrderItemDO#getOriginalPrice()} 求和
+     * totalPrice = {@link TradeOrderItemDO#getPrice()} * {@link TradeOrderItemDO#getCount()} 求和
      *
      * 对应 taobao 的 trade.total_fee 字段
      */
-    private Integer originalPrice;
+    private Integer totalPrice;
     /**
-     * 订单原价（总），单位：分
-     *
-     * 基于 {@link OrderItem#getPayPrice()} 求和
-     * 和 {@link #originalPrice} 的差异：去除商品级优惠
-     */
-    private Integer orderPrice;
-    /**
-     * 订单优惠（总），单位：分
-     *
-     * 订单级优惠：对主订单的优惠，常见如：订单满 200 元减 10 元；订单满 80 包邮。
+     * 优惠金额，单位：分
      *
      * 对应 taobao 的 order.discount_fee 字段
      */
@@ -153,7 +148,7 @@ public class TradeOrderDO extends BaseDO {
      */
     private Integer deliveryPrice;
     /**
-     * 订单调价（总），单位：分
+     * 订单调价，单位：分
      *
      * 正数，加价；负数，减价
      */
@@ -161,22 +156,22 @@ public class TradeOrderDO extends BaseDO {
     /**
      * 应付金额（总），单位：分
      *
-     * = {@link OrderItem#getPayPrice()} 求和
+     * = {@link #totalPrice}
      * - {@link #couponPrice}
      * - {@link #pointPrice}
-     * + {@link #deliveryPrice}
      * - {@link #discountPrice}
+     * + {@link #deliveryPrice}
      * + {@link #adjustPrice}
      */
     private Integer payPrice;
 
     // ========== 收件 + 物流基本信息 ==========
     /**
-     * 配置模板的编号
+     * 配送方式
      *
-     * 关联 DeliveryTemplateDO 的 id 编号
+     * 枚举 {@link DeliveryTypeEnum}
      */
-    private Long deliveryTemplateId;
+    private Integer deliveryType;
     /**
      * 发货物流公司编号
      */
@@ -213,21 +208,24 @@ public class TradeOrderDO extends BaseDO {
      */
     private Integer receiverAreaId;
     /**
-     * 收件人邮编
-     */
-    private Integer receiverPostCode;
-    /**
      * 收件人详细地址
      */
     private String receiverDetailAddress;
 
+    /**
+     * 自提门店编号
+     *
+     * 关联 {@link DeliveryPickUpStoreDO#getId()}
+     */
+    private Long pickUpStoreId;
+
     // ========== 售后基本信息 ==========
     /**
-     * 收货状态
+     * 售后状态
      *
-     * 枚举 {@link TradeOrderAfterSaleStatusEnum}
+     * 枚举 {@link TradeOrderRefundStatusEnum}
      */
-    private Integer afterSaleStatus;
+    private Integer refundStatus;
     /**
      * 退款金额，单位：分
      *
@@ -247,6 +245,7 @@ public class TradeOrderDO extends BaseDO {
      * 对应 taobao 的 trade.coupon_fee 字段
      */
     private Integer couponPrice;
+    // TODO 芋艿：需要记录使用的积分；
     /**
      * 积分抵扣的金额，单位：分
      *

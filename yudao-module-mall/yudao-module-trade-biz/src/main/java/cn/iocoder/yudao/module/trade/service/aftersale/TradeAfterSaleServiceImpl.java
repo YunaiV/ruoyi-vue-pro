@@ -24,8 +24,12 @@ import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleWayEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
+import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.dto.TradeAfterSaleLogCreateReqDTO;
+import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.service.AfterSaleLogService;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -36,6 +40,7 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
 /**
@@ -43,9 +48,10 @@ import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
  *
  * @author 芋道源码
  */
+@Slf4j
 @Service
 @Validated
-public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
+public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSaleLogService {
 
     @Resource
     private TradeOrderService tradeOrderService;
@@ -80,7 +86,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
     /**
      * 校验交易订单项是否可以申请售后
      *
-     * @param userId 用户编号
+     * @param userId      用户编号
      * @param createReqVO 售后创建信息
      * @return 交易订单项
      */
@@ -97,7 +103,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
         }
 
         // 申请的退款金额，不能超过商品的价格
-        if (createReqVO.getRefundPrice() > orderItem.getOrderDividePrice()) {
+        if (createReqVO.getRefundPrice() > orderItem.getPayPrice()) {
             throw exception(AFTER_SALE_CREATE_FAIL_REFUND_PRICE_ERROR);
         }
 
@@ -117,7 +123,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
         }
         // 如果是【退货退款】的情况，需要额外校验是否发货
         if (createReqVO.getWay().equals(TradeAfterSaleWayEnum.RETURN_AND_REFUND.getWay())
-            && !TradeOrderStatusEnum.haveDelivered(order.getStatus())) {
+                && !TradeOrderStatusEnum.haveDelivered(order.getStatus())) {
             throw exception(AFTER_SALE_CREATE_FAIL_ORDER_STATUS_NO_DELIVERED);
         }
         return orderItem;
@@ -133,7 +139,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
         TradeOrderDO order = tradeOrderService.getOrder(orderItem.getUserId(), orderItem.getOrderId());
         afterSale.setOrderNo(order.getNo()); // 记录 orderNo 订单流水，方便后续检索
         afterSale.setType(TradeOrderStatusEnum.isCompleted(order.getStatus())
-            ? TradeAfterSaleTypeEnum.AFTER_SALE.getType() : TradeAfterSaleTypeEnum.IN_SALE.getType());
+                ? TradeAfterSaleTypeEnum.AFTER_SALE.getType() : TradeAfterSaleTypeEnum.IN_SALE.getType());
         // TODO 退还积分
         tradeAfterSaleMapper.insert(afterSale);
 
@@ -345,7 +351,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
             public void afterCommit() {
                 // 创建退款单
                 PayRefundCreateReqDTO createReqDTO = TradeAfterSaleConvert.INSTANCE.convert(userIp, afterSale, tradeOrderProperties);
-                Long payRefundId = payRefundApi.createPayRefund(createReqDTO);
+                Long payRefundId = payRefundApi.createRefund(createReqDTO);
                 // 更新售后单的退款单号
                 tradeAfterSaleMapper.updateById(new TradeAfterSaleDO().setId(afterSale.getId()).setPayRefundId(payRefundId));
             }
@@ -380,13 +386,40 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
                 TradeOrderItemAfterSaleStatusEnum.NONE.getStatus(), null);
     }
 
+    @Deprecated
     private void createAfterSaleLog(Long userId, Integer userType, TradeAfterSaleDO afterSale,
                                     Integer beforeStatus, Integer afterStatus) {
-        TradeAfterSaleLogDO afterSaleLog = new TradeAfterSaleLogDO().setUserId(userId).setUserType(userType)
-                .setAfterSaleId(afterSale.getId()).setOrderId(afterSale.getOrderId())
-                .setOrderItemId(afterSale.getOrderItemId()).setBeforeStatus(beforeStatus).setAfterStatus(afterStatus)
-                .setContent(TradeAfterSaleStatusEnum.valueOf(afterStatus).getContent());
-        tradeAfterSaleLogMapper.insert(afterSaleLog);
+        TradeAfterSaleLogCreateReqDTO logDTO = new TradeAfterSaleLogCreateReqDTO()
+                .setUserId(userId)
+                .setUserType(userType)
+                .setAfterSaleId(afterSale.getId())
+                .setOperateType(afterStatus.toString());
+        // TODO 废弃，待删除
+        this.createLog(logDTO);
     }
 
+    // TODO @CHENCHEN：这个注释，写在接口就好了，补充重复写哈；@date 应该是 @since
+    /**
+     * 日志记录
+     *
+     * @param logDTO 日志记录
+     * @author 陈賝
+     * @date 2023/6/12 14:18
+     */
+    @Override
+    @Async
+    public void createLog(TradeAfterSaleLogCreateReqDTO logDTO) {
+        try {
+            TradeAfterSaleLogDO afterSaleLog = new TradeAfterSaleLogDO()
+                    .setUserId(logDTO.getUserId())
+                    .setUserType(logDTO.getUserType())
+                    .setAfterSaleId(logDTO.getAfterSaleId())
+                    .setOperateType(logDTO.getOperateType())
+                    .setContent(logDTO.getContent());
+            tradeAfterSaleLogMapper.insert(afterSaleLog);
+       // TODO @CHENCHEN：代码排版哈；空格要正确
+        }catch (Exception exception){
+            log.error("[createLog][request({}) 日志记录错误]", toJsonString(logDTO), exception);
+        }
+    }
 }

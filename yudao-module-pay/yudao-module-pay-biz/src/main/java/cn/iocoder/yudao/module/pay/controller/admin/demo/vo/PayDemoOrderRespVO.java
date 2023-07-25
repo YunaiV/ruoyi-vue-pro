@@ -28,7 +28,7 @@ public class PayDemoOrderRespVO {
     private Integer price;
 
     @Schema(description = "是否已支付", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Boolean payed;
+    private Boolean payStatus;
 
     @Schema(description = "支付订单编号", example = "16863")
     private Long payOrderId;

@@ -20,11 +20,11 @@ import javax.annotation.Resource;
 public class PayNotifyJob implements JobHandler {
 
     @Resource
-    private PayNotifyService payNotifyCoreService;
+    private PayNotifyService payNotifyService;
 
     @Override
     public String execute(String param) throws Exception {
-        int notifyCount = payNotifyCoreService.executeNotify();
+        int notifyCount = payNotifyService.executeNotify();
         return String.format("执行支付通知 %s 个", notifyCount);
     }
 

@@ -2,18 +2,15 @@ package cn.iocoder.yudao.module.promotion.convert.discount;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.module.promotion.api.discount.dto.DiscountProductRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.*;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProductDO;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionDiscountTypeEnum;
-import cn.iocoder.yudao.module.promotion.service.discount.bo.DiscountProductDetailBO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 限时折扣活动 Convert
@@ -33,19 +30,9 @@ public interface DiscountActivityConvert {
 
     List<DiscountActivityRespVO> convertList(List<DiscountActivityDO> list);
 
+    List<DiscountProductRespDTO> convertList02(List<DiscountProductDO> list);
+
     PageResult<DiscountActivityRespVO> convertPage(PageResult<DiscountActivityDO> page);
-
-    DiscountProductDetailBO convert(DiscountProductDO product);
-
-    default List<DiscountProductDetailBO> convertList(List<DiscountProductDO> products, Map<Long, DiscountActivityDO> activityMap) {
-        return CollectionUtils.convertList(products, product -> {
-            DiscountProductDetailBO detail = convert(product);
-            MapUtils.findAndThen(activityMap, product.getActivityId(), activity -> {
-                detail.setActivityName(activity.getName());
-            });
-            return detail;
-        });
-    }
 
     DiscountProductDO convert(DiscountActivityBaseVO.Product bean);
 
@@ -98,5 +85,6 @@ public interface DiscountActivityConvert {
         }
         return true;
     }
+
 
 }

@@ -40,11 +40,8 @@ public class TradeOrderItemBaseVO {
 
     // ========== 价格 + 支付基本信息 ==========
 
-    @Schema(description = "商品原价（总）", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
-    private Integer originalPrice;
-
     @Schema(description = "商品原价（单）", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
-    private Integer originalUnitPrice;
+    private Integer price;
 
     @Schema(description = "商品优惠（总）", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
     private Integer discountPrice;

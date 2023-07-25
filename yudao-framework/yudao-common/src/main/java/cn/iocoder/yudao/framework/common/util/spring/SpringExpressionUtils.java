@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.common.util.spring;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.core.DefaultParameterNameDiscoverer;
@@ -24,7 +25,13 @@ import java.util.Map;
  */
 public class SpringExpressionUtils {
 
+    /**
+     * spel表达式解析器
+     */
     private static final ExpressionParser EXPRESSION_PARSER = new SpelExpressionParser();
+    /**
+     * 参数名发现器
+     */
     private static final ParameterNameDiscoverer PARAMETER_NAME_DISCOVERER = new DefaultParameterNameDiscoverer();
 
     private SpringExpressionUtils() {
@@ -33,7 +40,7 @@ public class SpringExpressionUtils {
     /**
      * 从切面中，单个解析 EL 表达式的结果
      *
-     * @param joinPoint  切面点
+     * @param joinPoint        切面点
      * @param expressionString EL 表达式数组
      * @return 执行界面
      */
@@ -45,7 +52,7 @@ public class SpringExpressionUtils {
     /**
      * 从切面中，批量解析 EL 表达式的结果
      *
-     * @param joinPoint   切面点
+     * @param joinPoint         切面点
      * @param expressionStrings EL 表达式数组
      * @return 结果，key 为表达式，value 为对应值
      */
@@ -79,4 +86,48 @@ public class SpringExpressionUtils {
         });
         return result;
     }
+
+    /**
+     * JoinPoint 切面 批量解析 EL 表达式，转换 jspl参数
+     *
+     * @param joinPoint         切面点
+     * @param info              返回值
+     * @param expressionStrings EL 表达式数组
+     * @return Map<String, Object> 结果
+     * @author 陈賝
+     * @since 2023/6/18 11:20
+     */
+    // TODO @chenchen: 这个方法，和 parseExpressions 比较接近，是不是可以合并下；
+    public static Map<String, Object> parseExpression(JoinPoint joinPoint, Object info, List<String> expressionStrings) {
+        // 如果为空，则不进行解析
+        if (CollUtil.isEmpty(expressionStrings)) {
+            return MapUtil.newHashMap();
+        }
+
+        // 第一步，构建解析的上下文 EvaluationContext
+        // 通过 joinPoint 获取被注解方法
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        Method method = signature.getMethod();
+        // 使用 spring 的 ParameterNameDiscoverer 获取方法形参名数组
+        String[] parameterNames = PARAMETER_NAME_DISCOVERER.getParameterNames(method);
+        // Spring 的表达式上下文对象
+        EvaluationContext context = new StandardEvaluationContext();
+        if (ArrayUtil.isNotEmpty(parameterNames)) {
+            //获取方法参数值
+            Object[] args = joinPoint.getArgs();
+            for (int i = 0; i < args.length; i++) {
+                // 替换 SP EL 里的变量值为实际值， 比如 #user --> user对象
+                context.setVariable(parameterNames[i], args[i]);
+            }
+            context.setVariable("info", info);
+        }
+        // 第二步，逐个参数解析
+        Map<String, Object> result = MapUtil.newHashMap(expressionStrings.size(), true);
+        expressionStrings.forEach(key -> {
+            Object value = EXPRESSION_PARSER.parseExpression(key).getValue(context);
+            result.put(key, value);
+        });
+        return result;
+    }
+
 }

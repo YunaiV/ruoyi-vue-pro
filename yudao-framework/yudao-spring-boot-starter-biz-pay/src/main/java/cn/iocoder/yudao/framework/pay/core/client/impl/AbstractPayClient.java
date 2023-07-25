@@ -1,23 +1,19 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl;
 
-import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedRespDTO;
-import com.alipay.api.AlipayResponse;import lombok.extern.slf4j.Slf4j;
+import cn.iocoder.yudao.framework.pay.core.client.exception.PayException;
+import lombok.extern.slf4j.Slf4j;
 
-import javax.validation.Validation;
-import java.time.LocalDateTime;
+import java.util.Map;
 
-import static cn.hutool.core.date.DatePattern.NORM_DATETIME_FORMATTER;
-import static cn.hutool.core.date.DatePattern.NORM_DATETIME_MS_FORMATTER;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
-import static cn.iocoder.yudao.framework.pay.core.enums.PayFrameworkErrorCodeConstants.PAY_EXCEPTION;
 
 /**
  * 支付客户端的抽象类，提供模板方法，减少子类的冗余代码
@@ -34,6 +30,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
     /**
      * 渠道编码
      */
+    @SuppressWarnings("FieldCanBeLocal")
     private final String channelCode;
     /**
      * 支付配置
@@ -51,7 +48,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
      */
     public final void init() {
         doInit();
-        log.info("[init][配置({}) 初始化完成]", config);
+        log.info("[init][客户端({}) 初始化完成]", getId());
     }
 
     /**
@@ -64,7 +61,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
         if (config.equals(this.config)) {
             return;
         }
-        log.info("[refresh][配置({})发生变化，重新初始化]", config);
+        log.info("[refresh][客户端({})发生变化，重新初始化]", getId());
         this.config = config;
         // 初始化
         this.init();
@@ -75,67 +72,122 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
         return channelId;
     }
 
+    // ============ 支付相关 ==========
+
     @Override
-    public final PayOrderUnifiedRespDTO unifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
-        Validation.buildDefaultValidatorFactory().getValidator().validate(reqDTO);
-        // 执行短信发送
-        PayOrderUnifiedRespDTO result;
+    public final PayOrderRespDTO unifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
+        ValidationUtils.validate(reqDTO);
+        // 执行统一下单
+        PayOrderRespDTO resp;
         try {
-            result = doUnifiedOrder(reqDTO);
+            resp = doUnifiedOrder(reqDTO);
+        } catch (ServiceException ex) { // 业务异常，都是实现类已经翻译，所以直接抛出即可
+            throw ex;
         } catch (Throwable ex) {
-            // 打印异常日志
-            log.error("[unifiedOrder][request({}) 发起支付失败]", toJsonString(reqDTO), ex);
-            throw buildException(ex);
-        }
-        return result;
-    }
-
-    protected abstract PayOrderUnifiedRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO)
-            throws Throwable;
-
-    @Override
-    public PayRefundUnifiedRespDTO unifiedRefund(PayRefundUnifiedReqDTO reqDTO) {
-        PayRefundUnifiedRespDTO resp;
-        try {
-            resp = doUnifiedRefund(reqDTO);
-        }  catch (Throwable ex) {
-            // 记录异常日志
-            log.error("[unifiedRefund][request({}) 发起退款失败]", toJsonString(reqDTO), ex);
-            throw buildException(ex);
+            // 系统异常，则包装成 PayException 异常抛出
+            log.error("[unifiedOrder][客户端({}) request({}) 发起支付异常]",
+                    getId(), toJsonString(reqDTO), ex);
+            throw buildPayException(ex);
         }
         return resp;
     }
 
-    protected abstract PayRefundUnifiedRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable;
+    protected abstract PayOrderRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO)
+            throws Throwable;
+
+    @Override
+    public final PayOrderRespDTO parseOrderNotify(Map<String, String> params, String body) {
+        try {
+            return doParseOrderNotify(params, body);
+        } catch (ServiceException ex) { // 业务异常，都是实现类已经翻译，所以直接抛出即可
+            throw ex;
+        } catch (Throwable ex) {
+            log.error("[parseOrderNotify][客户端({}) params({}) body({}) 解析失败]",
+                    getId(), params, body, ex);
+            throw buildPayException(ex);
+        }
+    }
+
+    protected abstract PayOrderRespDTO doParseOrderNotify(Map<String, String> params, String body)
+            throws Throwable;
+
+    @Override
+    public final PayOrderRespDTO getOrder(String outTradeNo) {
+        try {
+            return doGetOrder(outTradeNo);
+        } catch (ServiceException ex) { // 业务异常，都是实现类已经翻译，所以直接抛出即可
+            throw ex;
+        } catch (Throwable ex) {
+            log.error("[getOrder][客户端({}) outTradeNo({}) 查询支付单异常]",
+                    getId(), outTradeNo, ex);
+            throw buildPayException(ex);
+        }
+    }
+
+    protected abstract PayOrderRespDTO doGetOrder(String outTradeNo)
+            throws Throwable;
+
+    // ============ 退款相关 ==========
+
+    @Override
+    public final PayRefundRespDTO unifiedRefund(PayRefundUnifiedReqDTO reqDTO) {
+        ValidationUtils.validate(reqDTO);
+        // 执行统一退款
+        PayRefundRespDTO resp;
+        try {
+            resp = doUnifiedRefund(reqDTO);
+        } catch (ServiceException ex) { // 业务异常，都是实现类已经翻译，所以直接抛出即可
+            throw ex;
+        } catch (Throwable ex) {
+            // 系统异常，则包装成 PayException 异常抛出
+            log.error("[unifiedRefund][客户端({}) request({}) 发起退款异常]",
+                    getId(), toJsonString(reqDTO), ex);
+            throw buildPayException(ex);
+        }
+        return resp;
+    }
+
+    protected abstract PayRefundRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable;
+
+    @Override
+    public final PayRefundRespDTO parseRefundNotify(Map<String, String> params, String body) {
+        try {
+            return doParseRefundNotify(params, body);
+        } catch (ServiceException ex) { // 业务异常，都是实现类已经翻译，所以直接抛出即可
+            throw ex;
+        } catch (Throwable ex) {
+            log.error("[parseRefundNotify][客户端({}) params({}) body({}) 解析失败]",
+                    getId(), params, body, ex);
+            throw buildPayException(ex);
+        }
+    }
+
+    protected abstract PayRefundRespDTO doParseRefundNotify(Map<String, String> params, String body)
+            throws Throwable;
+
+    @Override
+    public final PayRefundRespDTO getRefund(String outTradeNo, String outRefundNo) {
+        try {
+            return doGetRefund(outTradeNo, outRefundNo);
+        } catch (ServiceException ex) { // 业务异常，都是实现类已经翻译，所以直接抛出即可
+            throw ex;
+        } catch (Throwable ex) {
+            log.error("[getRefund][客户端({}) outTradeNo({}) outRefundNo({}) 查询退款单异常]",
+                    getId(), outTradeNo, outRefundNo, ex);
+            throw buildPayException(ex);
+        }
+    }
+
+    protected abstract PayRefundRespDTO doGetRefund(String outTradeNo, String outRefundNo)
+            throws Throwable;
 
     // ========== 各种工具方法 ==========
 
-    private RuntimeException buildException(Throwable ex) {
-        if (ex instanceof RuntimeException) {
-            return (RuntimeException) ex;
+    private PayException buildPayException(Throwable ex) {
+        if (ex instanceof PayException) {
+            return (PayException) ex;
         }
-        throw new RuntimeException(ex);
-    }
-
-    protected void validateSuccess(AlipayResponse response) {
-        if (response.isSuccess()) {
-            return;
-        }
-        throw exception0(PAY_EXCEPTION.getCode(), response.getSubMsg());
-    }
-
-    protected String formatAmount(Integer amount) {
-        return String.valueOf(amount / 100.0);
-    }
-
-    protected String formatTime(LocalDateTime time) {
-        // "yyyy-MM-dd HH:mm:ss"
-        return LocalDateTimeUtil.format(time, NORM_DATETIME_FORMATTER);
-    }
-
-    protected LocalDateTime parseTime(String str) {
-        // "yyyy-MM-dd HH:mm:ss"
-        return LocalDateTimeUtil.parse(str, NORM_DATETIME_FORMATTER);
+        throw new PayException(ex);
     }
 
 }

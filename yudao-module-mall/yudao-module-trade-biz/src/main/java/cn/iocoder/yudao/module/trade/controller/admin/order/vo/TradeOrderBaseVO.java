@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
 * 交易订单 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -63,7 +62,7 @@ public class TradeOrderBaseVO {
     private Long payOrderId;
 
     @Schema(description = "是否已支付", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
-    private Boolean payed;
+    private Boolean payStatus;
 
     @Schema(description = "付款时间")
     private LocalDateTime payTime;
@@ -72,10 +71,7 @@ public class TradeOrderBaseVO {
     private String payChannelCode;
 
     @Schema(description = "商品原价（总）", requiredMode = Schema.RequiredMode.REQUIRED, example = "1000")
-    private Integer originalPrice;
-
-    @Schema(description = "订单原价（总）", requiredMode = Schema.RequiredMode.REQUIRED, example = "1000")
-    private Integer orderPrice;
+    private Integer totalPrice;
 
     @Schema(description = "订单优惠（总）", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
     private Integer discountPrice;
@@ -117,9 +113,6 @@ public class TradeOrderBaseVO {
 
     @Schema(description = "收件人地区编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "110000")
     private Integer receiverAreaId;
-
-    @Schema(description = "收件人邮编", requiredMode = Schema.RequiredMode.REQUIRED, example = "100000")
-    private Integer receiverPostCode;
 
     @Schema(description = "收件人详细地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "中关村大街 1 号")
     private String receiverDetailAddress;

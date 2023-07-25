@@ -35,7 +35,7 @@ public class PayOrderRespDTO {
     /**
      * 支付金额，单位：分
      */
-    private Integer amount;
+    private Integer price;
     /**
      * 支付状态
      *

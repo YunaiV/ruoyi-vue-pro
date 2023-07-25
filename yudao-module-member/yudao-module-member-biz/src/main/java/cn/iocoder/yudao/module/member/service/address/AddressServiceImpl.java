@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressCreateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressUpdateReqVO;
 import cn.iocoder.yudao.module.member.convert.address.AddressConvert;
-import cn.iocoder.yudao.module.member.dal.dataobject.address.AddressDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.address.MemberAddressDO;
 import cn.iocoder.yudao.module.member.dal.mysql.address.AddressMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,13 +32,13 @@ public class AddressServiceImpl implements AddressService {
     @Transactional(rollbackFor = Exception.class)
     public Long createAddress(Long userId, AppAddressCreateReqVO createReqVO) {
         // 如果添加的是默认收件地址，则将原默认地址修改为非默认
-        if (Boolean.TRUE.equals(createReqVO.getDefaulted())) {
-            List<AddressDO> addresses = addressMapper.selectListByUserIdAndDefaulted(userId, true);
-            addresses.forEach(address -> addressMapper.updateById(new AddressDO().setId(address.getId()).setDefaulted(false)));
+        if (Boolean.TRUE.equals(createReqVO.getDefaultStatus())) {
+            List<MemberAddressDO> addresses = addressMapper.selectListByUserIdAndDefaulted(userId, true);
+            addresses.forEach(address -> addressMapper.updateById(new MemberAddressDO().setId(address.getId()).setDefaultStatus(false)));
         }
 
         // 插入
-        AddressDO address = AddressConvert.INSTANCE.convert(createReqVO);
+        MemberAddressDO address = AddressConvert.INSTANCE.convert(createReqVO);
         address.setUserId(userId);
         addressMapper.insert(address);
         // 返回
@@ -52,14 +52,14 @@ public class AddressServiceImpl implements AddressService {
         validAddressExists(userId, updateReqVO.getId());
 
         // 如果修改的是默认收件地址，则将原默认地址修改为非默认
-        if (Boolean.TRUE.equals(updateReqVO.getDefaulted())) {
-            List<AddressDO> addresses = addressMapper.selectListByUserIdAndDefaulted(userId, true);
+        if (Boolean.TRUE.equals(updateReqVO.getDefaultStatus())) {
+            List<MemberAddressDO> addresses = addressMapper.selectListByUserIdAndDefaulted(userId, true);
             addresses.stream().filter(u -> !u.getId().equals(updateReqVO.getId())) // 排除自己
-                    .forEach(address -> addressMapper.updateById(new AddressDO().setId(address.getId()).setDefaulted(false)));
+                    .forEach(address -> addressMapper.updateById(new MemberAddressDO().setId(address.getId()).setDefaultStatus(false)));
         }
 
         // 更新
-        AddressDO updateObj = AddressConvert.INSTANCE.convert(updateReqVO);
+        MemberAddressDO updateObj = AddressConvert.INSTANCE.convert(updateReqVO);
         addressMapper.updateById(updateObj);
     }
 
@@ -72,25 +72,25 @@ public class AddressServiceImpl implements AddressService {
     }
 
     private void validAddressExists(Long userId, Long id) {
-        AddressDO addressDO = getAddress(userId, id);
+        MemberAddressDO addressDO = getAddress(userId, id);
         if (addressDO == null) {
             throw exception(ADDRESS_NOT_EXISTS);
         }
     }
 
     @Override
-    public AddressDO getAddress(Long userId, Long id) {
+    public MemberAddressDO getAddress(Long userId, Long id) {
         return addressMapper.selectByIdAndUserId(id, userId);
     }
 
     @Override
-    public List<AddressDO> getAddressList(Long userId) {
+    public List<MemberAddressDO> getAddressList(Long userId) {
         return addressMapper.selectListByUserIdAndDefaulted(userId, null);
     }
 
     @Override
-    public AddressDO getDefaultUserAddress(Long userId) {
-        List<AddressDO> addresses = addressMapper.selectListByUserIdAndDefaulted(userId, true);
+    public MemberAddressDO getDefaultUserAddress(Long userId) {
+        List<MemberAddressDO> addresses = addressMapper.selectListByUserIdAndDefaulted(userId, true);
         return CollUtil.getFirst(addresses);
     }
 

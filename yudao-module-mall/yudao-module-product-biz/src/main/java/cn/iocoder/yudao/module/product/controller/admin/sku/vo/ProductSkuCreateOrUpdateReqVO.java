@@ -13,9 +13,4 @@ import java.util.List;
 @ToString(callSuper = true)
 public class ProductSkuCreateOrUpdateReqVO extends ProductSkuBaseVO {
 
-    /**
-     * 属性数组
-     */
-    private List<Property> properties;
-
 }

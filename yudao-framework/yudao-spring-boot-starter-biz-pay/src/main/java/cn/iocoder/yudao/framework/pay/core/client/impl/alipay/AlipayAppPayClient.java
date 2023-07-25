@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
-import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
-import cn.iocoder.yudao.framework.pay.core.enums.PayDisplayModeEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.domain.AlipayTradeAppPayModel;
 import com.alipay.api.request.AlipayTradeAppPayRequest;
@@ -20,25 +20,26 @@ import lombok.extern.slf4j.Slf4j;
  * @author 芋道源码
  */
 @Slf4j
-public class AlipayAppPayClient extends AbstractAlipayClient {
+public class AlipayAppPayClient extends AbstractAlipayPayClient {
 
     public AlipayAppPayClient(Long channelId, AlipayPayClientConfig config) {
         super(channelId, PayChannelEnum.ALIPAY_APP.getCode(), config);
     }
 
     @Override
-    public PayOrderUnifiedRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) throws AlipayApiException {
+    public PayOrderRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) throws AlipayApiException {
         // 1.1 构建 AlipayTradeAppPayModel 请求
         AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
         // ① 通用的参数
-        model.setOutTradeNo(reqDTO.getMerchantOrderId());
+        model.setOutTradeNo(reqDTO.getOutTradeNo());
         model.setSubject(reqDTO.getSubject());
-        model.setBody(reqDTO.getBody());
-        model.setTotalAmount(formatAmount(reqDTO.getAmount()));
-        model.setProductCode(" QUICK_MSECURITY_PAY"); // 销售产品码：无线快捷支付产品
+        model.setBody(reqDTO.getBody() + "test");
+        model.setTotalAmount(formatAmount(reqDTO.getPrice()));
+        model.setTimeExpire(formatTime(reqDTO.getExpireTime()));
+        model.setProductCode("QUICK_MSECURITY_PAY"); // 销售产品码：无线快捷支付产品
         // ② 个性化的参数【无】
         // ③ 支付宝扫码支付只有一种展示
-        String displayMode = PayDisplayModeEnum.APP.getMode();
+        String displayMode = PayOrderDisplayModeEnum.APP.getMode();
 
         // 1.2 构建 AlipayTradePrecreateRequest 请求
         AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
@@ -47,11 +48,13 @@ public class AlipayAppPayClient extends AbstractAlipayClient {
         request.setReturnUrl(reqDTO.getReturnUrl());
 
         // 2.1 执行请求
-        AlipayTradeAppPayResponse response = client.execute(request);
+        AlipayTradeAppPayResponse response = client.sdkExecute(request);
         // 2.2 处理结果
-        validateSuccess(response);
-        return new PayOrderUnifiedRespDTO()
-                .setDisplayMode(displayMode).setDisplayContent("");
+        if (!response.isSuccess()) {
+            return buildClosedPayOrderRespDTO(reqDTO, response);
+        }
+        return PayOrderRespDTO.waitingOf(displayMode, response.getBody(),
+                reqDTO.getOutTradeNo(), response);
     }
 
 }

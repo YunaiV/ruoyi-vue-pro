@@ -5,6 +5,8 @@ import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliver
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 
@@ -24,14 +26,23 @@ public interface TradeOrderService {
     // =================== Order ===================
 
     /**
+     * 获得订单结算信息
+     *
+     * @param userId 登录用户
+     * @param settlementReqVO 订单结算请求
+     * @return 订单结算结果
+     */
+    AppTradeOrderSettlementRespVO settlementOrder(Long userId, AppTradeOrderSettlementReqVO settlementReqVO);
+
+    /**
      * 【会员】创建交易订单
      *
      * @param userId 登录用户
      * @param userIp 用户 IP 地址
      * @param createReqVO 创建交易订单请求模型
-     * @return 交易订单的编号
+     * @return 交易订单的
      */
-    Long createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO);
+    TradeOrderDO createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO);
 
     /**
      * 更新交易订单已支付
@@ -91,6 +102,16 @@ public interface TradeOrderService {
      */
     PageResult<TradeOrderDO> getOrderPage(Long userId, AppTradeOrderPageReqVO reqVO);
 
+    /**
+     * 【会员】获得交易订单数量
+     *
+     * @param userId       用户编号
+     * @param status       订单状态。如果为空，则不进行筛选
+     * @param commonStatus 评价状态。如果为空，则不进行筛选
+     * @return 订单数量
+     */
+    Long getOrderCount(Long userId, Integer status, Boolean commonStatus);
+
     // =================== Order Item ===================
 
     /**
@@ -139,4 +160,21 @@ public interface TradeOrderService {
      */
     List<TradeOrderItemDO> getOrderItemListByOrderId(Collection<Long> orderIds);
 
+    /**
+     * 得到订单项通过 订单项 id 和用户 id
+     *
+     * @param orderItemId 订单项 id
+     * @param loginUserId 登录用户 id
+     * @return 得到订单项
+     */
+    TradeOrderItemDO getOrderItemByIdAndUserId(Long orderItemId, Long loginUserId);
+
+    /**
+     * 得到订单通过 id 和 用户 id
+     *
+     * @param orderId     订单 id
+     * @param loginUserId 登录用户 id
+     * @return 得到订单
+     */
+    TradeOrderDO getOrderByIdAndUserId(Long orderId, Long loginUserId);
 }

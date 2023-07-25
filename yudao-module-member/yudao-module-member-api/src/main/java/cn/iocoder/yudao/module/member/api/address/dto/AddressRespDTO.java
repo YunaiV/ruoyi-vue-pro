@@ -29,20 +29,14 @@ public class AddressRespDTO {
     /**
      * 地区编号
      */
-    private Long areaId;
-    /**
-     * 邮编
-     */
-    private String postCode;
+    private Integer areaId;
     /**
      * 收件详细地址
      */
     private String detailAddress;
     /**
      * 是否默认
-     *
-     * true - 默认收件地址
      */
-    private Boolean defaulted;
+    private Boolean defaultStatus;
 
 }

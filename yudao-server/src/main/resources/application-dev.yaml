@@ -168,7 +168,6 @@ yudao:
       - ${management.endpoints.web.base-path}/** # 不处理 Actuator 的请求
   pay:
     callback-url: http://yunai.natapp1.cc/admin-api/pay/notify/callback
-    return-url: http://yunai.natapp1.cc/admin-api/pay/notify/return
   demo: true # 开启演示模式
 
 justauth:

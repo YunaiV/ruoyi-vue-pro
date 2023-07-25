@@ -2,11 +2,10 @@ package cn.iocoder.yudao.module.pay.controller.admin.order.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.URL;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.awt.*;
 import java.util.Map;
 
 @Schema(description = "管理后台 - 支付订单提交 Request VO")
@@ -26,4 +25,9 @@ public class PayOrderSubmitReqVO {
 
     @Schema(description = "展示模式", example = "url") // 参见 {@link PayDisplayModeEnum} 枚举。如果不传递，则每个支付渠道使用默认的方式
     private String displayMode;
+
+    @Schema(description = "回跳地址")
+    @URL(message = "回跳地址的格式必须是 URL")
+    private String returnUrl;
+
 }

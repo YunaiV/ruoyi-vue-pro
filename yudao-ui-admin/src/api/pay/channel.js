@@ -28,44 +28,14 @@ export function deleteChannel(id) {
 }
 
 // 获得支付渠道
-// export function getChannel(id) {
-//   return request({
-//     url: '/pay/channel/get?id=' + id,
-//     method: 'get'
-//   })
-// }
-
-
-
-// 获得支付渠道分页
-export function getChannelPage(query) {
+export function getChannel(appId, code) {
   return request({
-    url: '/pay/channel/page',
+    url: '/pay/channel/get',
     method: 'get',
-    params: query
-  })
-}
-
-// 导出支付渠道Excel
-export function exportChannelExcel(query) {
-  return request({
-    url: '/pay/channel/export-excel',
-    method: 'get',
-    params: query,
-    responseType: 'blob'
-  })
-}
-
-// 获得支付渠道
-export function getChannel(merchantId,appId,code) {
-  return request({
-    url: '/pay/channel/get-channel',
     params:{
-      merchantId:merchantId,
-      appId:appId,
-      code:code
+      appId,
+      code
     },
-    method: 'get'
   })
 }
 

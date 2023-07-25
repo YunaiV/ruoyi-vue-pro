@@ -55,7 +55,6 @@ public class DateUtils {
         return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
     }
 
-    @Deprecated
     public static Date addTime(Duration duration) {
         return new Date(System.currentTimeMillis() + duration.toMillis());
     }

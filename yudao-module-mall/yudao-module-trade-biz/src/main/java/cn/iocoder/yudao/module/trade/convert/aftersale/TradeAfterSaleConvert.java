@@ -38,7 +38,7 @@ public interface TradeAfterSaleConvert {
 
     @Mappings({
             @Mapping(source = "afterSale.applyReason", target = "reason"),
-            @Mapping(source = "afterSale.refundPrice", target = "amount")
+            @Mapping(source = "afterSale.refundPrice", target = "price")
     })
     PayRefundCreateReqDTO convert(String userIp, TradeAfterSaleDO afterSale,
                                   TradeOrderProperties orderProperties);

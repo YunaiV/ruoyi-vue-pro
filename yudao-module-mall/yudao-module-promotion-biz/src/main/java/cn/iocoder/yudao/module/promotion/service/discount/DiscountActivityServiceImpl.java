@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.promotion.service.discount;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityBaseVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityPageReqVO;
@@ -14,18 +13,17 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProduct
 import cn.iocoder.yudao.module.promotion.dal.mysql.discount.DiscountActivityMapper;
 import cn.iocoder.yudao.module.promotion.dal.mysql.discount.DiscountProductMapper;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionActivityStatusEnum;
-import cn.iocoder.yudao.module.promotion.service.discount.bo.DiscountProductDetailBO;
 import cn.iocoder.yudao.module.promotion.util.PromotionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
-import static java.util.Arrays.asList;
 
 /**
  * 限时折扣 Service 实现类
@@ -42,9 +40,9 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
     private DiscountProductMapper discountProductMapper;
 
     @Override
-    public Map<Long, DiscountProductDetailBO> getMatchDiscountProducts(Collection<Long> skuIds) {
-        List<DiscountProductDetailBO> discountProducts = getRewardProductListBySkuIds(skuIds, singleton(PromotionActivityStatusEnum.RUN.getStatus()));
-        return convertMap(discountProducts, DiscountProductDetailBO::getSkuId);
+    public List<DiscountProductDO> getMatchDiscountProductList(Collection<Long> skuIds) {
+        // TODO 芋艿：开启、满足 skuId、日期内
+        return null;
     }
 
     @Override
@@ -54,7 +52,7 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
 
         // 插入活动
         DiscountActivityDO discountActivity = DiscountActivityConvert.INSTANCE.convert(createReqVO)
-                .setStatus(PromotionUtils.calculateActivityStatus(createReqVO.getStartTime(), createReqVO.getEndTime()));
+                .setStatus(PromotionUtils.calculateActivityStatus(createReqVO.getEndTime()));
         discountActivityMapper.insert(discountActivity);
         // 插入商品
         List<DiscountProductDO> discountProducts = convertList(createReqVO.getProducts(),
@@ -76,7 +74,7 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
 
         // 更新活动
         DiscountActivityDO updateObj = DiscountActivityConvert.INSTANCE.convert(updateReqVO)
-                .setStatus(PromotionUtils.calculateActivityStatus(updateReqVO.getStartTime(), updateReqVO.getEndTime()));
+                .setStatus(PromotionUtils.calculateActivityStatus(updateReqVO.getEndTime()));
         discountActivityMapper.updateById(updateObj);
         // 更新商品
         updateDiscountProduct(updateReqVO);
@@ -101,6 +99,7 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
         }
     }
 
+    // TODO 芋艿：校验逻辑简化，只查询时间冲突的活动，开启状态的。
     /**
      * 校验商品是否冲突
      *
@@ -112,9 +111,10 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
             return;
         }
         // 查询商品参加的活动
-        List<DiscountProductDetailBO> discountActivityProductList = getRewardProductListBySkuIds(
-                convertSet(products, DiscountActivityBaseVO.Product::getSkuId),
-                asList(PromotionActivityStatusEnum.WAIT.getStatus(), PromotionActivityStatusEnum.RUN.getStatus()));
+        List<DiscountProductDO> discountActivityProductList = null;
+//                getRewardProductListBySkuIds(
+//                convertSet(products, DiscountActivityBaseVO.Product::getSkuId),
+//                asList(PromotionActivityStatusEnum.WAIT.getStatus(), PromotionActivityStatusEnum.RUN.getStatus()));
         if (id != null) { // 排除自己这个活动
             discountActivityProductList.removeIf(product -> id.equals(product.getActivityId()));
         }
@@ -122,24 +122,6 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
         if (CollUtil.isNotEmpty(discountActivityProductList)) {
             throw exception(DISCOUNT_ACTIVITY_SPU_CONFLICTS);
         }
-    }
-
-    private List<DiscountProductDetailBO> getRewardProductListBySkuIds(Collection<Long> skuIds,
-                                                                       Collection<Integer> statuses) {
-        // 查询商品
-        List<DiscountProductDO> products = discountProductMapper.selectListBySkuId(skuIds);
-        if (CollUtil.isEmpty(products)) {
-            return new ArrayList<>(0);
-        }
-
-        // 查询活动
-        List<DiscountActivityDO> activities = discountActivityMapper.selectBatchIds(skuIds);
-        activities.removeIf(activity -> !statuses.contains(activity.getStatus())); // 移除不满足 statuses 状态的
-        Map<Long, DiscountActivityDO> activityMap = CollectionUtils.convertMap(activities, DiscountActivityDO::getId);
-
-        // 移除不满足活动的商品
-        products.removeIf(product -> !activityMap.containsKey(product.getActivityId()));
-        return DiscountActivityConvert.INSTANCE.convertList(products, activityMap);
     }
 
     @Override
@@ -153,7 +135,7 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
             throw exception(DISCOUNT_ACTIVITY_CLOSE_FAIL_STATUS_END);
         }
 
-        // 更新
+        // 更新为关闭。
         DiscountActivityDO updateObj = new DiscountActivityDO().setId(id).setStatus(PromotionActivityStatusEnum.CLOSE.getStatus());
         discountActivityMapper.updateById(updateObj);
     }

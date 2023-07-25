@@ -27,26 +27,32 @@ public class PayRefundCreateReqDTO {
     private String userIp;
 
     // ========== 商户相关字段 ==========
+    /**
+     * 商户订单编号
+     */
+    @NotEmpty(message = "商户订单编号不能为空")
+    private String merchantOrderId;
+
+    /**
+     * 商户退款编号
+     */
+    @NotEmpty(message = "商户退款编号不能为空")
+    private String merchantRefundId;
 
     /**
      * 退款描述
      */
     @NotEmpty(message = "退款描述不能为空")
-    @Length(max = 128, message = "退款描述长度不能超过128")
+    @Length(max = 128, message = "退款描述长度不能超过 128")
     private String reason;
 
     // ========== 订单相关字段 ==========
-
-    /**
-     * 支付单号
-     */
-    @NotNull(message = "支付单号不能为空")
-    private Long payOrderId;
 
     /**
      * 退款金额，单位：分
      */
     @NotNull(message = "退款金额不能为空")
     @Min(value = 1, message = "退款金额必须大于零")
-    private Integer amount;
+    private Integer price;
+
 }

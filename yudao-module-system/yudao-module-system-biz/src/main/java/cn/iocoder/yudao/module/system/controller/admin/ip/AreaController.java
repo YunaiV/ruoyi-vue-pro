@@ -6,17 +6,17 @@ import cn.iocoder.yudao.framework.ip.core.Area;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.framework.ip.core.utils.IPUtils;
 import cn.iocoder.yudao.module.system.controller.admin.ip.vo.AreaNodeRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.ip.vo.AreaNodeSimpleRespVO;
 import cn.iocoder.yudao.module.system.convert.ip.AreaConvert;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -32,6 +32,28 @@ public class AreaController {
         Area area = AreaUtils.getArea(Area.ID_CHINA);
         Assert.notNull(area, "获取不到中国");
         return success(AreaConvert.INSTANCE.convertList(area.getChildren()));
+    }
+
+    @GetMapping("/get-children")
+    @Operation(summary = "获得地区的下级区域")
+    @Parameter(name = "id", description = "区域编号", required = true, example = "150000")
+    public CommonResult<List<AreaNodeSimpleRespVO>> getChildren(@RequestParam("id") Integer id) {
+        Area area = AreaUtils.getArea(id);
+        Assert.notNull(area, String.format("获取不到 id : %d 的区域", id));
+        return success(AreaConvert.INSTANCE.convertList2(area.getChildren()));
+    }
+
+    // 4)方法改成 getAreaChildrenList 获得子节点们；5）url 可以已改成 children-list
+    //@芋艿 是不是叫 getAreaListByIds 更合适。 因为不一定是子节点。 用于前端树选择获取缓存数据。 见 <el-tree-select :cache-data="areaCache">
+    @GetMapping("/get-by-ids")
+    @Operation(summary = "通过区域 ids 获得地区列表")
+    @Parameter(name = "ids", description = "区域编号 ids", required = true, example = "1,150000")
+    public CommonResult<List<AreaNodeSimpleRespVO>> getAreaListByIds(@RequestParam("ids") Set<Integer> ids) {
+        List<Area> areaList = new ArrayList<>(ids.size());
+        for (Integer areaId : ids) {
+            areaList.add(AreaUtils.getArea(areaId));
+        }
+        return success(AreaConvert.INSTANCE.convertList2(areaList));
     }
 
     @GetMapping("/get-by-ip")

@@ -69,7 +69,7 @@ public class TradeAfterSaleServiceTest extends BaseDbUnitTest {
                 .setApplyPicUrls(asList("https://www.baidu.com/1.png", "https://www.baidu.com/2.png"));
         // mock 方法（交易订单项）
         TradeOrderItemDO orderItem = randomPojo(TradeOrderItemDO.class, o -> {
-            o.setOrderId(111L).setUserId(userId).setOrderDividePrice(200);
+            o.setOrderId(111L).setUserId(userId).setPayPrice(200);
             o.setAfterSaleStatus(TradeOrderItemAfterSaleStatusEnum.NONE.getStatus());
         });
         when(tradeOrderService.getOrderItem(eq(1024L), eq(1L)))
@@ -102,8 +102,6 @@ public class TradeAfterSaleServiceTest extends BaseDbUnitTest {
         assertEquals(afterSaleLog.getUserType(), UserTypeEnum.MEMBER.getValue());
         assertEquals(afterSaleLog.getAfterSaleId(), afterSaleId);
         assertPojoEquals(afterSale, orderItem, "id", "creator", "createTime", "updater", "updateTime");
-        assertNull(afterSaleLog.getBeforeStatus());
-        assertEquals(afterSaleLog.getAfterStatus(), TradeAfterSaleStatusEnum.APPLY.getStatus());
         assertEquals(afterSaleLog.getContent(), TradeAfterSaleStatusEnum.APPLY.getContent());
     }
 

@@ -42,7 +42,6 @@ public class PayOrderCreateReqDTO implements Serializable {
     /**
      * 商品描述
      */
-//    @NotEmpty(message = "商品描述信息不能为空")
     @Length(max = 128, message = "商品描述信息长度不能超过128")
     private String body;
 
@@ -53,7 +52,7 @@ public class PayOrderCreateReqDTO implements Serializable {
      */
     @NotNull(message = "支付金额不能为空")
     @DecimalMin(value = "0", inclusive = false, message = "支付金额必须大于零")
-    private Integer amount;
+    private Integer price;
 
     /**
      * 支付过期时间

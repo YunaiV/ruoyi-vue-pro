@@ -7,34 +7,39 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 
+/**
+ * 商品 SPU Response VO
+ *
+ * @author HUIHUI
+ */
 @Schema(description = "管理后台 - 商品 SPU Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ProductSpuRespVO extends ProductSpuBaseVO {
 
-    @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "spuId", requiredMode = Schema.RequiredMode.REQUIRED, example = "111")
     private Long id;
 
-    @Schema(description = "创建时间")
-    private LocalDateTime createTime;
+    @Schema(description = "商品价格", requiredMode = Schema.RequiredMode.REQUIRED, example = "1999")
+    private Integer price;
 
-    // ========== SKU 相关字段 =========
-
-    @Schema(description = "库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
-    private Integer totalStock;
-
-    @Schema(description = " 最小价格，单位使用：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    private Integer minPrice;
-
-    @Schema(description = "最大价格，单位使用：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    private Integer maxPrice;
-
-    @Schema(description = "商品销量", example = "1024")
+    @Schema(description = "商品销量", requiredMode = Schema.RequiredMode.REQUIRED, example = "2000")
     private Integer salesCount;
 
-    // ========== 统计相关字段 =========
+    @Schema(description = "市场价，单位使用：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "199")
+    private Integer marketPrice;
 
-    @Schema(description = "点击量", example = "1024")
-    private Integer clickCount;
+    @Schema(description = "成本价，单位使用：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "19")
+    private Integer costPrice;
+
+    @Schema(description = "商品库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "10000")
+    private Integer stock;
+
+    @Schema(description = "商品创建时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "2023-05-24 00:00:00")
+    private LocalDateTime createTime;
+
+    @Schema(description = "商品状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    private Integer status;
+
 }

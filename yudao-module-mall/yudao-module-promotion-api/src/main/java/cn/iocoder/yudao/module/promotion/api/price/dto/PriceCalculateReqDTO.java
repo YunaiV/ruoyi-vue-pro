@@ -12,6 +12,7 @@ import java.util.List;
  * @author 芋道源码
  */
 @Data
+@Deprecated
 public class PriceCalculateReqDTO {
 
     /**
@@ -25,6 +26,11 @@ public class PriceCalculateReqDTO {
      * 优惠劵编号
      */
     private Long couponId;
+
+    /**
+     * 收货地址编号
+     */
+    private Long addressId;
 
     /**
      * 商品 SKU 数组

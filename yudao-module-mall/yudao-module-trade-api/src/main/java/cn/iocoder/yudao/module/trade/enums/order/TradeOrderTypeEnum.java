@@ -17,8 +17,9 @@ public enum TradeOrderTypeEnum implements IntArrayValuable {
 
     NORMAL(0, "普通订单"),
     SECKILL(1, "秒杀订单"),
-    TEAM(2, "拼团订单"),
-    BARGAIN(3, "砍价订单");
+    BARGAIN(2, "砍价订单"),
+    COMBINATION(3, "拼团订单"),
+    ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(TradeOrderTypeEnum::getType).toArray();
 

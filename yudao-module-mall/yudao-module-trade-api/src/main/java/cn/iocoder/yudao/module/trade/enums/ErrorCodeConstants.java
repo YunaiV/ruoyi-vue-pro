@@ -3,18 +3,17 @@ package cn.iocoder.yudao.module.trade.enums;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 
 /**
- * 交易 错误码枚举类
- * 交易系统，使用 1-011-000-000 段
+ * Trade 错误码枚举类
+ * trade 系统，使用 1-011-000-000 段
  *
  * @author LeeYan9
  * @since 2022-08-26
  */
 public interface ErrorCodeConstants {
 
-    // ==========  Order 模块 1-011-000-000 ==========
+    // ==========  Order 模块 1011000000 ==========
     ErrorCode ORDER_CREATE_SKU_NOT_FOUND = new ErrorCode(1011000001, "商品 SKU 不存在");
     ErrorCode ORDER_CREATE_SPU_NOT_SALE = new ErrorCode(1011000002, "商品 SPU 不可售卖");
-    ErrorCode ORDER_CREATE_SKU_NOT_SALE = new ErrorCode(1011000003, "商品 SKU 不可售卖");
     ErrorCode ORDER_CREATE_SKU_STOCK_NOT_ENOUGH = new ErrorCode(1011000004, "商品 SKU 库存不足");
     ErrorCode ORDER_CREATE_SPU_NOT_FOUND = new ErrorCode(1011000005, "商品 SPU 不可售卖");
     ErrorCode ORDER_CREATE_ADDRESS_NOT_FOUND = new ErrorCode(1011000006, "收货地址不存在");
@@ -29,7 +28,7 @@ public interface ErrorCodeConstants {
     ErrorCode ORDER_DELIVERY_FAIL_STATUS_NOT_UNDELIVERED = new ErrorCode(1011000017, "交易订单发货失败，订单不是【待发货】状态");
     ErrorCode ORDER_RECEIVE_FAIL_STATUS_NOT_DELIVERED = new ErrorCode(1011000018, "交易订单收货失败，订单不是【待收货】状态");
 
-    // ==========  After Sale 模块 1-011-000-000 ==========
+    // ==========  After Sale 模块 1011000100 ==========
     ErrorCode AFTER_SALE_NOT_FOUND = new ErrorCode(1011000100, "售后单不存在");
     ErrorCode AFTER_SALE_CREATE_FAIL_REFUND_PRICE_ERROR = new ErrorCode(1011000101, "申请退款金额错误");
     ErrorCode AFTER_SALE_CREATE_FAIL_ORDER_STATUS_CANCELED = new ErrorCode(1011000102, "订单已关闭，无法申请售后");
@@ -43,7 +42,29 @@ public interface ErrorCodeConstants {
     ErrorCode AFTER_SALE_REFUND_FAIL_STATUS_NOT_WAIT_REFUND = new ErrorCode(1011000110, "退款失败，售后单状态不是【待退款】");
     ErrorCode AFTER_SALE_CANCEL_FAIL_STATUS_NOT_APPLY_OR_AGREE = new ErrorCode(1011000111, "取消售后单失败，售后单状态不是【待审核】或【卖家同意】");
 
-    // ==========  Cart 模块 1-011-001-000 ==========
+    // ==========  Cart 模块 1011002000 ==========
     ErrorCode CARD_ITEM_NOT_FOUND = new ErrorCode(1011002000, "购物车项不存在");
+
+    // ========== Price 相关 1011003000 ============
+    ErrorCode PRICE_CALCULATE_PAY_PRICE_ILLEGAL = new ErrorCode(1011003000, "支付价格计算异常，原因：价格小于等于 0");
+    ErrorCode PRICE_CALCULATE_DELIVERY_PRICE_USER_ADDR_IS_EMPTY = new ErrorCode(1011003001, "计算快递运费异常，收件人地址编号为空");
+    ErrorCode PRICE_CALCULATE_DELIVERY_PRICE_TEMPLATE_NOT_FOUND = new ErrorCode(1011003002, "计算快递运费异常，找不到对应的运费模板");
+
+    // ==========  物流 Express 模块 1011004000 ==========
+    ErrorCode EXPRESS_NOT_EXISTS = new ErrorCode(1011004000, "快递公司不存在");
+    ErrorCode EXPRESS_CODE_DUPLICATE = new ErrorCode(1011004001, "已经存在该编码的快递公司");
+    ErrorCode EXPRESS_CLIENT_NOT_PROVIDE = new ErrorCode(1011004002, "需要接入快递服务商，比如【快递100】");
+
+    ErrorCode EXPRESS_API_QUERY_ERROR = new ErrorCode(1011004101, "快递查询接口异常");
+    ErrorCode EXPRESS_API_QUERY_FAILED = new ErrorCode(1011004102, "快递查询返回失败，原因：{}");
+
+    // ==========  物流 Template 模块 1011005000 ==========
+    ErrorCode EXPRESS_TEMPLATE_NAME_DUPLICATE = new ErrorCode(1011005000, "已经存在该运费模板名");
+    ErrorCode EXPRESS_TEMPLATE_NOT_EXISTS = new ErrorCode(1011005001, "运费模板不存在");
+
+    // ==========  物流 PICK_UP 模块 1011006000 ==========
+
+    ErrorCode PICK_UP_STORE_NOT_EXISTS = new ErrorCode(1011006000, "自提门店不存在");
+
 
 }

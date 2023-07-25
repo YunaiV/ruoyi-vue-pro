@@ -41,4 +41,10 @@ public class DefaultController {
                 "[报表模块 yudao-module-report - 已禁用][参考 https://doc.iocoder.cn/report/ 开启]");
     }
 
+    @RequestMapping(value = {"/admin-api/pay/**"})
+    public CommonResult<Boolean> pay404() {
+        return CommonResult.error(NOT_IMPLEMENTED.getCode(),
+                "[支付模块 yudao-module-pay - 已禁用][参考 https://doc.iocoder.cn/pay/build/ 开启]");
+    }
+
 }

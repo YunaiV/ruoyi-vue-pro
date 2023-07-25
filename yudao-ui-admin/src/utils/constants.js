@@ -132,6 +132,14 @@ export const PayChannelEnum = {
     "code": "wx_app",
     "name": "微信 APP 支付"
   },
+  WX_NATIVE: {
+    "code": "wx_native",
+    "name": "微信扫码支付"
+  },
+  WX_BAR: {
+    "code": "wx_bar",
+    "name": "微信条码支付"
+  },
   ALIPAY_PC: {
     "code": "alipay_pc",
     "name": "支付宝 PC 网站支付"
@@ -169,15 +177,10 @@ export const PayDisplayModeEnum = {
   },
   QR_CODE: {
     "mode": "qr_code"
+  },
+  APP: {
+    "mode": "app"
   }
-}
-
-/**
- * 支付类型枚举
- */
-export const PayType = {
-  WECHAT: "WECHAT",
-  ALIPAY: "ALIPAY"
 }
 
 /**
@@ -195,42 +198,6 @@ export const PayOrderStatusEnum = {
   CLOSED: {
     status: 20,
     name: '支付关闭'
-  }
-}
-
-/**
- * 支付订单回调状态枚举
- */
-export const PayOrderNotifyStatusEnum = {
-  NO: {
-    status: 0,
-    name: '未通知'
-  },
-  SUCCESS: {
-    status: 10,
-    name: '通知成功'
-  },
-  FAILURE: {
-    status: 20,
-    name: '通知失败'
-  }
-}
-
-/**
- * 支付订单退款状态枚举
- */
-export const PayOrderRefundStatusEnum = {
-  NO: {
-    status: 0,
-    name: '未退款'
-  },
-  SOME: {
-    status: 10,
-    name: '部分退款'
-  },
-  ALL: {
-    status: 20,
-    name: '全部退款'
   }
 }
 

@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressCreate
 import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressRespVO;
 import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressUpdateReqVO;
 import cn.iocoder.yudao.module.member.convert.address.AddressConvert;
-import cn.iocoder.yudao.module.member.dal.dataobject.address.AddressDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.address.MemberAddressDO;
 import cn.iocoder.yudao.module.member.service.address.AddressService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -54,21 +54,21 @@ public class AppAddressController {
     @Operation(summary = "获得用户收件地址")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     public CommonResult<AppAddressRespVO> getAddress(@RequestParam("id") Long id) {
-        AddressDO address = addressService.getAddress(getLoginUserId(), id);
+        MemberAddressDO address = addressService.getAddress(getLoginUserId(), id);
         return success(AddressConvert.INSTANCE.convert(address));
     }
 
     @GetMapping("/get-default")
     @Operation(summary = "获得默认的用户收件地址")
     public CommonResult<AppAddressRespVO> getDefaultUserAddress() {
-        AddressDO address = addressService.getDefaultUserAddress(getLoginUserId());
+        MemberAddressDO address = addressService.getDefaultUserAddress(getLoginUserId());
         return success(AddressConvert.INSTANCE.convert(address));
     }
 
     @GetMapping("/list")
     @Operation(summary = "获得用户收件地址列表")
     public CommonResult<List<AppAddressRespVO>> getAddressList() {
-        List<AddressDO> list = addressService.getAddressList(getLoginUserId());
+        List<MemberAddressDO> list = addressService.getAddressList(getLoginUserId());
         return success(AddressConvert.INSTANCE.convertList(list));
     }
 

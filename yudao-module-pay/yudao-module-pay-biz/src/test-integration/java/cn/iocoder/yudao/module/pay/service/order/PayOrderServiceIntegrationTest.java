@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.pay.service.order;
 
-import cn.iocoder.yudao.module.pay.service.merchant.PayAppServiceImpl;
-import cn.iocoder.yudao.module.pay.service.merchant.PayChannelServiceImpl;
+import cn.iocoder.yudao.module.pay.service.channel.PayAppServiceImpl;
+import cn.iocoder.yudao.module.pay.service.channel.PayChannelServiceImpl;
 import cn.iocoder.yudao.module.pay.service.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.service.order.dto.PayOrderSubmitReqDTO;
 import cn.iocoder.yudao.module.pay.test.BaseDbIntegrationTest;
@@ -30,7 +30,7 @@ public class PayOrderServiceIntegrationTest extends BaseDbIntegrationTest {
         reqDTO.setMerchantOrderId(String.valueOf(System.currentTimeMillis()));
         reqDTO.setSubject("标题");
         reqDTO.setBody("内容");
-        reqDTO.setAmount(100);
+        reqDTO.setPrice(100);
         reqDTO.setExpireTime(DateUtils.addTime(Duration.ofDays(1)));
         // 发起请求
         payOrderService.createPayOrder(reqDTO);

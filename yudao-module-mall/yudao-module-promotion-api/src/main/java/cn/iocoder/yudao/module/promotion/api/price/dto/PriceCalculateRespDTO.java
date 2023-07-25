@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.promotion.api.price.dto;
 
-import cn.iocoder.yudao.module.promotion.enums.common.PromotionLevelEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
 import lombok.Data;
 
@@ -24,6 +23,7 @@ import java.util.List;
  * @author 芋道源码
  */
 @Data
+@Deprecated
 public class PriceCalculateRespDTO {
 
     /**
@@ -38,6 +38,7 @@ public class PriceCalculateRespDTO {
      */
     private List<Promotion> promotions;
 
+    // TODO @芋艿：需要改造下，主要是价格字段
     /**
      * 订单
      */
@@ -51,14 +52,7 @@ public class PriceCalculateRespDTO {
          *
          * 对应 taobao 的 trade.total_fee 字段
          */
-        private Integer originalPrice;
-        /**
-         * 订单原价（总），单位：分
-         *
-         * 基于 {@link OrderItem#getPayPrice()} 求和
-         * 和 {@link #originalPrice} 的差异：去除商品级优惠
-         */
-        private Integer orderPrice;
+        private Integer totalPrice;
         /**
          * 订单优惠（总），单位：分
          *
@@ -180,6 +174,7 @@ public class PriceCalculateRespDTO {
      * 营销明细
      */
     @Data
+    @Deprecated
     public static class Promotion {
 
         /**
@@ -201,13 +196,13 @@ public class PriceCalculateRespDTO {
         /**
          * 营销级别
          *
-         * 枚举 {@link PromotionLevelEnum}
+         * 枚举 @link PromotionLevelEnum} TODO PromotionLevelEnum 没有这个枚举类
          */
         private Integer level;
         /**
          * 计算时的原价（总），单位：分
          */
-        private Integer originalPrice;
+        private Integer totalPrice;
         /**
          * 计算时的优惠（总），单位：分
          */
@@ -222,14 +217,14 @@ public class PriceCalculateRespDTO {
         /**
          * 是否满足优惠条件
          */
-        private Boolean meet;
+        private Boolean match;
         /**
          * 满足条件的提示
          *
-         * 如果 {@link #meet} = true 满足，则提示“圣诞价:省 150.00 元”
-         * 如果 {@link #meet} = false 不满足，则提示“购满 85 元，可减 40 元”
+         * 如果 {@link #match} = true 满足，则提示“圣诞价:省 150.00 元”
+         * 如果 {@link #match} = false 不满足，则提示“购满 85 元，可减 40 元”
          */
-        private String meetTip;
+        private String description;
 
     }
 

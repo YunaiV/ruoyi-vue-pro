@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.trade.dal.dataobject.order;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.cart.TradeCartDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -42,6 +43,12 @@ public class TradeOrderItemDO extends BaseDO {
      * 关联 {@link TradeOrderDO#getId()}
      */
     private Long orderId;
+    /**
+     * 购物车项编号
+     *
+     * 关联 {@link TradeCartDO#getId()}
+     */
+    private Long cartId;
 
     // ========== 商品基本信息; 冗余较多字段，减少关联查询 ==========
     /**
@@ -77,68 +84,65 @@ public class TradeOrderItemDO extends BaseDO {
      * 购买数量
      */
     private Integer count;
-//    /**
-//     * 是否评论 TODO
-//     *
-//     * false - 未评论
-//     * true - 已评论
-//     */
-//    private Boolean commented;
+    /**
+     * 是否评价
+     *
+     * true - 已评价
+     * false - 未评价
+     */
+    private Boolean commentStatus;
 
     // ========== 价格 + 支付基本信息 ==========
 
-    /**
-     * 商品原价（总），单位：分
-     *
-     * = {@link #originalUnitPrice} * {@link #getCount()}
-     */
-    private Integer originalPrice;
     /**
      * 商品原价（单），单位：分
      *
      * 对应 ProductSkuDO 的 price 字段
      * 对应 taobao 的 order.price 字段
      */
-    private Integer originalUnitPrice;
+    private Integer price;
     /**
-     * 商品优惠（总），单位：分
-     *
-     * 商品级优惠：对单个商品的，常见如：商品原价的 8 折；商品原价的减 50 元
+     * 优惠金额（总），单位：分
      *
      * 对应 taobao 的 order.discount_fee 字段
      */
     private Integer discountPrice;
     /**
-     * 子订单实付金额，不算主订单分摊金额，单位：分
+     * 运费金额（总），单位：分
+     */
+    private Integer deliveryPrice;
+    /**
+     * 订单调价（总），单位：分
      *
-     * = {@link #originalPrice}
+     * 正数，加价；负数，减价
+     */
+    private Integer adjustPrice;
+    /**
+     * 应付金额（总），单位：分
+     *
+     * = {@link #price} * {@link #count}
+     * - {@link #couponPrice}
+     * - {@link #pointPrice}
      * - {@link #discountPrice}
-     *
-     * 对应 taobao 的 order.payment 字段
+     * + {@link #deliveryPrice}
+     * + {@link #adjustPrice}
      */
     private Integer payPrice;
 
-    /**
-     * 子订单分摊金额（总），单位：分
-     * 需要分摊 {@link TradeOrderDO#getDiscountPrice()}、{@link TradeOrderDO#getCouponPrice()}、{@link TradeOrderDO#getPointPrice()}
-     *
-     * 对应 taobao 的 order.part_mjz_discount 字段
-     * 淘宝说明：子订单分摊优惠基础逻辑：一般正常优惠券和满减优惠按照子订单的金额进行分摊，特殊情况如果优惠券是指定商品使用的，只会分摊到对应商品子订单上不分摊。
-     */
-    private Integer orderPartPrice;
-    /**
-     * 分摊后子订单实付金额（总），单位：分
-     *
-     * = {@link #payPrice}
-     * - {@link #orderPartPrice}
-     *
-     * 对应 taobao 的 divide_order_fee 字段
-     */
-    private Integer orderDividePrice;
-
     // ========== 营销基本信息 ==========
 
-    // TODO 芋艿：在捉摸一下
+    /**
+     * 优惠劵减免金额，单位：分
+     *
+     * 对应 taobao 的 trade.coupon_fee 字段
+     */
+    private Integer couponPrice;
+    /**
+     * 积分抵扣的金额，单位：分
+     *
+     * 对应 taobao 的 trade.point_fee 字段
+     */
+    private Integer pointPrice;
 
     // ========== 售后基本信息 ==========
     /**
@@ -163,11 +167,24 @@ public class TradeOrderItemDO extends BaseDO {
          */
         private Long propertyId;
         /**
+         * 属性名字
+         *
+         * 关联 ProductPropertyDO 的 name 字段
+         */
+        private String propertyName;
+
+        /**
          * 属性值编号
          *
          * 关联 ProductPropertyValueDO 的 id 编号
          */
         private Long valueId;
+        /**
+         * 属性值名字
+         *
+         * 关联 ProductPropertyValueDO 的 name 字段
+         */
+        private String valueName;
 
     }
 

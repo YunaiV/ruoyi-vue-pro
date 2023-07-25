@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.product.convert.brand;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.brand.vo.ProductBrandCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.brand.vo.ProductBrandRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.brand.vo.ProductBrandSimpleRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.brand.vo.ProductBrandUpdateReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.brand.ProductBrandDO;
 import org.mapstruct.Mapper;
@@ -25,6 +26,8 @@ public interface ProductBrandConvert {
     ProductBrandDO convert(ProductBrandUpdateReqVO bean);
 
     ProductBrandRespVO convert(ProductBrandDO bean);
+
+    List<ProductBrandSimpleRespVO> convertList1(List<ProductBrandDO> list);
 
     List<ProductBrandRespVO> convertList(List<ProductBrandDO> list);
 

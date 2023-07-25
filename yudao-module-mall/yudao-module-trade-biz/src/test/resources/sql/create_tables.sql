@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS "trade_order" (
      "product_count" int NOT NULL,
      "cancel_type" int,
      "remark" varchar,
-     "payed" bit NOT NULL,
+     "pay_status" bit NOT NULL,
      "pay_time" datetime,
      "finish_time" datetime,
      "cancel_time" datetime,

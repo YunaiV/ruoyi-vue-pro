@@ -114,4 +114,9 @@ public class ProductBrandServiceImpl implements ProductBrandService {
         return brandMapper.selectPage(pageReqVO);
     }
 
+    @Override
+    public List<ProductBrandDO> getBrandListByStatus(Integer status) {
+        return brandMapper.selectListByStatus(status);
+    }
+
 }

@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-// 创建支付应用信息
+// 创建支付应用
 export function createApp(data) {
   return request({
     url: '/pay/app/create',
@@ -9,7 +9,7 @@ export function createApp(data) {
   })
 }
 
-// 更新支付应用信息
+// 更新支付应用
 export function updateApp(data) {
   return request({
     url: '/pay/app/update',
@@ -18,7 +18,7 @@ export function updateApp(data) {
   })
 }
 
-// 支付应用信息状态修改
+// 支付应用状态修改
 export function changeAppStatus(id, status) {
   const data = {
     id,
@@ -31,7 +31,7 @@ export function changeAppStatus(id, status) {
   })
 }
 
-// 删除支付应用信息
+// 删除支付应用
 export function deleteApp(id) {
   return request({
     url: '/pay/app/delete?id=' + id,
@@ -39,7 +39,7 @@ export function deleteApp(id) {
   })
 }
 
-// 获得支付应用信息
+// 获得支付应用
 export function getApp(id) {
   return request({
     url: '/pay/app/get?id=' + id,
@@ -47,7 +47,7 @@ export function getApp(id) {
   })
 }
 
-// 获得支付应用信息分页
+// 获得支付应用分页
 export function getAppPage(query) {
   return request({
     url: '/pay/app/page',
@@ -56,23 +56,10 @@ export function getAppPage(query) {
   })
 }
 
-// 导出支付应用信息 Excel
-export function exportAppExcel(query) {
+// 获得支付应用列表
+export function getAppList() {
   return request({
-    url: '/pay/app/export-excel',
-    method: 'get',
-    params: query,
-    responseType: 'blob'
-  })
-}
-
-// 根据商ID称搜索应用列表
-export function getAppListByMerchantId(merchantId) {
-  return request({
-    url: '/pay/app/list-merchant-id',
-    params:{
-      merchantId:merchantId
-    },
+    url: '/pay/app/list',
     method: 'get'
   })
 }

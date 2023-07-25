@@ -20,6 +20,6 @@ public class AppProductSpuBaseRespVO {
     private String name;
 
     @Schema(description = "商品主图地址", example = "https://www.iocoder.cn/xx.png")
-    private List<String> picUrls;
+    private String picUrl;
 
 }

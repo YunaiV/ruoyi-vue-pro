@@ -1,5 +1,10 @@
 <template>
   <div class="app-container">
+    <doc-alert title="支付宝支付接入" url="https://doc.iocoder.cn/pay/alipay-pay-demo/" />
+    <doc-alert title="支付宝、微信退款接入" url="https://doc.iocoder.cn/pay/refund-demo/" />
+    <doc-alert title="微信公众号支付接入" url="https://doc.iocoder.cn/pay/wx-pub-pay-demo/" />
+    <doc-alert title="微信小程序支付接入" url="https://doc.iocoder.cn/pay/wx-lite-pay-demo/" />
+
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
@@ -29,9 +34,9 @@
         </template>
       </el-table-column>
       <el-table-column label="支付单号" align="center" prop="payOrderId" />
-      <el-table-column label="是否支付" align="center" prop="payed">
+      <el-table-column label="是否支付" align="center" prop="payStatus">
         <template v-slot="scope">
-          <dict-tag :type="DICT_TYPE.INFRA_BOOLEAN_STRING" :value="scope.row.payed" />
+          <dict-tag :type="DICT_TYPE.INFRA_BOOLEAN_STRING" :value="scope.row.payStatus" />
         </template>
       </el-table-column>
       <el-table-column label="支付时间" align="center" prop="payTime" width="180">
@@ -41,15 +46,16 @@
       </el-table-column>
       <el-table-column label="退款时间" align="center" prop="refundTime" width="180">
         <template v-slot="scope">
-          <span>{{ parseTime(scope.row.refundTime) }}</span>
+          <span v-if="scope.row.refundTime">{{ parseTime(scope.row.refundTime) }}</span>
+          <span v-else-if="scope.row.payRefundId">退款中，等待退款结果</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handlePay(scope.row)"
-                     v-if="!scope.row.payed">前往支付</el-button>
+                     v-if="!scope.row.payStatus">前往支付</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleRefund(scope.row)"
-                     v-if="scope.row.payed && !scope.row.payRefundId">发起退款</el-button>
+                     v-if="scope.row.payStatus && !scope.row.payRefundId">发起退款</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -78,13 +84,10 @@
 </template>
 
 <script>
-import {createDemoOrder, getDemoOrderPage, refundDemoOrder} from "@/api/pay/demo";
-import {deleteMerchant} from "@/api/pay/merchant";
+import { createDemoOrder, getDemoOrderPage, refundDemoOrder } from "@/api/pay/demo";
 
 export default {
   name: "PayDemoOrder",
-  components: {
-  },
   data() {
     return {
       // 遮罩层
@@ -193,9 +196,10 @@ export default {
     /** 支付按钮操作 */
     handlePay(row) {
       this.$router.push({
-          name: 'PayOrderSubmit',
+          name: 'PayCashier',
           query:{
-            id: row.payOrderId
+            id: row.payOrderId,
+            returnUrl: encodeURIComponent('/pay/demo-order?id=' + row.id)
           }
       })
     },

@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuOptionRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuDetailRespVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -35,15 +34,13 @@ public interface ProductSkuConvert {
 
     List<ProductSkuDO> convertList06(List<ProductSkuCreateOrUpdateReqVO> list);
 
-    default List<ProductSkuDO> convertList06(List<ProductSkuCreateOrUpdateReqVO> list, Long spuId, String spuName) {
+    default List<ProductSkuDO> convertList06(List<ProductSkuCreateOrUpdateReqVO> list, Long spuId) {
         List<ProductSkuDO> result = convertList06(list);
-        result.forEach(item -> item.setSpuId(spuId).setSpuName(spuName));
+        result.forEach(item -> item.setSpuId(spuId));
         return result;
     }
 
     ProductSkuRespDTO convert02(ProductSkuDO bean);
-
-    List<ProductSpuDetailRespVO.Sku> convertList03(List<ProductSkuDO> list);
 
     List<ProductSkuRespDTO> convertList04(List<ProductSkuDO> list);
 
@@ -69,16 +66,6 @@ public interface ProductSkuConvert {
             spuIdAndStockMap.put(spuId, stock);
         });
         return spuIdAndStockMap;
-    }
-
-    default Collection<Long> convertPropertyValueIds(List<ProductSkuDO> list) {
-        if (CollUtil.isEmpty(list)) {
-            return new HashSet<>();
-        }
-        return list.stream().filter(item -> item.getProperties() != null)
-                .flatMap(p -> p.getProperties().stream()) // 遍历多个 Property 属性
-                .map(ProductSkuDO.Property::getValueId) // 将每个 Property 转换成对应的 propertyId，最后形成集合
-                .collect(Collectors.toSet());
     }
 
     default String buildPropertyKey(ProductSkuDO bean) {
