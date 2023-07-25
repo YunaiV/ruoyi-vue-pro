@@ -27,18 +27,24 @@ public class DefaultController {
                 "[微信公众号 yudao-module-mp - 已禁用][参考 https://doc.iocoder.cn/mp/build/ 开启]");
     }
 
-//    @RequestMapping(value = {"/admin-api/product/**", // 商品中心
-//            "/admin-api/trade/**", // 交易中心
-//            "/admin-api/promotion/**"})  // 营销中心
-//    public CommonResult<Boolean> mall404() {
-//        return CommonResult.error(NOT_IMPLEMENTED.getCode(),
-//                "[商城系统 yudao-module-mall - 已禁用][参考 https://doc.iocoder.cn/mall/build/ 开启]");
-//    }
+    @RequestMapping(value = {"/admin-api/product/**", // 商品中心
+            "/admin-api/trade/**", // 交易中心
+            "/admin-api/promotion/**"})  // 营销中心
+    public CommonResult<Boolean> mall404() {
+        return CommonResult.error(NOT_IMPLEMENTED.getCode(),
+                "[商城系统 yudao-module-mall - 已禁用][参考 https://doc.iocoder.cn/mall/build/ 开启]");
+    }
 
     @RequestMapping(value = {"/admin-api/report/**"})
     public CommonResult<Boolean> report404() {
         return CommonResult.error(NOT_IMPLEMENTED.getCode(),
                 "[报表模块 yudao-module-report - 已禁用][参考 https://doc.iocoder.cn/report/ 开启]");
+    }
+
+    @RequestMapping(value = {"/admin-api/pay/**"})
+    public CommonResult<Boolean> pay404() {
+        return CommonResult.error(NOT_IMPLEMENTED.getCode(),
+                "[支付模块 yudao-module-pay - 已禁用][参考 https://doc.iocoder.cn/pay/build/ 开启]");
     }
 
 }
