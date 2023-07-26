@@ -70,6 +70,7 @@ public class LocalDateTimeUtils {
      * @param endTime2   校验所需的结束时间
      * @return 是否重叠
      */
+    // TODO @puhui999：LocalDateTimeUtil.isOverlap() 是不是可以满足呀？
     public static boolean checkTimeOverlap(LocalTime startTime1, LocalTime endTime1, LocalTime startTime2, LocalTime endTime2) {
         // 判断时间是否重叠
         // 开始时间在已配置时段的结束时间之前 且 结束时间在已配置时段的开始时间之后 []

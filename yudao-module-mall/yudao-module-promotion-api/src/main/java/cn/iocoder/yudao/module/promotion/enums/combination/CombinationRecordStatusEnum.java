@@ -14,8 +14,9 @@ import java.util.Arrays;
 @AllArgsConstructor
 @Getter
 public enum CombinationRecordStatusEnum implements IntArrayValuable {
-    NOT_PAY(0, "未付款"),
-    ONGOING(1, "进行中"),
+
+    WAITING(0, "未付款"),
+    IN_PROGRESS(1, "进行中"),
     SUCCESS(2, "拼团成功"),
     FAILED(3, "拼团失败");
 

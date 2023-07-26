@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.product.convert.comment;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentCreateReqVO;
@@ -34,37 +35,33 @@ public interface ProductCommentConvert {
 
     ProductCommentRespVO convert(ProductCommentDO bean);
 
+    @Mapping(target = "scores", expression = "java(calculateOverallScore(goodCount, mediocreCount, negativeCount))")
+    AppCommentStatisticsRespVO convert(Long goodCount, Long mediocreCount, Long negativeCount);
     @Named("calculateOverallScore")
     default double calculateOverallScore(long goodCount, long mediocreCount, long negativeCount) {
         return (goodCount * 5 + mediocreCount * 3 + negativeCount) / (double) (goodCount + mediocreCount + negativeCount);
     }
-
-    @Mapping(target = "scores", expression = "java(calculateOverallScore(goodCount, mediocreCount, negativeCount))")
-    AppCommentStatisticsRespVO convert(Long goodCount, Long mediocreCount, Long negativeCount);
-
+    
     List<ProductCommentRespVO> convertList(List<ProductCommentDO> list);
-
-    List<AppProductPropertyValueDetailRespVO> convertList01(List<ProductSkuDO.Property> properties);
 
     PageResult<ProductCommentRespVO> convertPage(PageResult<ProductCommentDO> page);
 
     PageResult<AppProductCommentRespVO> convertPage01(PageResult<ProductCommentDO> pageResult);
 
-    default PageResult<AppProductCommentRespVO> convertPage02(PageResult<ProductCommentDO> pageResult, Map<Long, ProductSkuDO> skuDOMap) {
+    default PageResult<AppProductCommentRespVO> convertPage02(PageResult<ProductCommentDO> pageResult,
+                                                              Map<Long, ProductSkuDO> skuMap) {
         PageResult<AppProductCommentRespVO> page = convertPage01(pageResult);
         page.getList().forEach(item -> {
             // 判断用户是否选择匿名
             if (ObjectUtil.equal(item.getAnonymous(), true)) {
                 item.setUserNickname(ProductCommentDO.NICKNAME_ANONYMOUS);
             }
-            ProductSkuDO productSkuDO = skuDOMap.get(item.getSkuId());
-            if (productSkuDO != null) {
-                List<AppProductPropertyValueDetailRespVO> skuProperties = ProductCommentConvert.INSTANCE.convertList01(productSkuDO.getProperties());
-                item.setSkuProperties(skuProperties);
-            }
+            MapUtils.findAndThen(skuMap, item.getSkuId(),
+                    sku -> item.setSkuProperties(convertList01(sku.getProperties())));
         });
         return page;
     }
+    List<AppProductPropertyValueDetailRespVO> convertList01(List<ProductSkuDO.Property> properties);
 
     /**
      * 计算综合评分
@@ -83,14 +80,19 @@ public interface ProductCommentConvert {
 
     ProductCommentDO convert(ProductCommentCreateReqDTO createReqDTO);
 
-    @Mapping(target = "scores", expression = "java(convertScores(createReqDTO.getDescriptionScores(), createReqDTO.getBenefitScores()))")
+    @Mapping(target = "scores",
+            expression = "java(convertScores(createReqDTO.getDescriptionScores(), createReqDTO.getBenefitScores()))")
     default ProductCommentDO convert(ProductCommentCreateReqDTO createReqDTO, ProductSpuDO spuDO, MemberUserRespDTO user) {
         ProductCommentDO commentDO = convert(createReqDTO);
-        commentDO.setUserId(user.getId());
-        commentDO.setUserNickname(user.getNickname());
-        commentDO.setUserAvatar(user.getAvatar());
-        commentDO.setSpuId(spuDO.getId());
-        commentDO.setSpuName(spuDO.getName());
+        if (user != null) {
+            commentDO.setUserId(user.getId());
+            commentDO.setUserNickname(user.getNickname());
+            commentDO.setUserAvatar(user.getAvatar());
+        }
+        if (spuDO != null) {
+            commentDO.setSpuId(spuDO.getId());
+            commentDO.setSpuName(spuDO.getName());
+        }
         return commentDO;
     }
 
@@ -98,7 +100,8 @@ public interface ProductCommentConvert {
     @Mapping(target = "orderId", constant = "0L")
     @Mapping(target = "orderItemId", constant = "0L")
     @Mapping(target = "anonymous", expression = "java(Boolean.FALSE)")
-    @Mapping(target = "scores", expression = "java(convertScores(createReq.getDescriptionScores(), createReq.getBenefitScores()))")
+    @Mapping(target = "scores",
+            expression = "java(convertScores(createReq.getDescriptionScores(), createReq.getBenefitScores()))")
     ProductCommentDO convert(ProductCommentCreateReqVO createReq);
 
     List<AppProductCommentRespVO> convertList02(List<ProductCommentDO> list);

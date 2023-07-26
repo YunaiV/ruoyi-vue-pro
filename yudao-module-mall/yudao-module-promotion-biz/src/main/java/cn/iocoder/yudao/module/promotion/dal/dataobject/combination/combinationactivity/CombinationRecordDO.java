@@ -31,11 +31,11 @@ public class CombinationRecordDO extends BaseDO {
      */
     private Long activityId;
     /**
-     * spu 编号
+     * SPU 编号
      */
     private Long spuId;
     /**
-     * sku 编号
+     * SKU 编号
      */
     private Long skuId;
     /**
@@ -48,7 +48,7 @@ public class CombinationRecordDO extends BaseDO {
     private Long orderId;
     /**
      * 团长编号
-     * <p>
+     *
      * 关联 {@link CombinationRecordDO#getUserId()}
      */
     private Long headId;
@@ -84,7 +84,8 @@ public class CombinationRecordDO extends BaseDO {
     private Boolean virtualGroup;
     /**
      * 过期时间，单位：小时
-     * 关联关联 {@link CombinationActivityDO#getLimitDuration()}
+     *
+     * 关联 {@link CombinationActivityDO#getLimitDuration()}
      */
     private Integer expireTime;
     /**
@@ -97,6 +98,7 @@ public class CombinationRecordDO extends BaseDO {
     private LocalDateTime endTime;
     /**
      * 开团需要人数
+     *
      * 关联 {@link CombinationActivityDO#getUserSize()}
      */
     private Integer userSize;

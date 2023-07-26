@@ -23,5 +23,4 @@ public interface SeckillConfigMapper extends BaseMapperX<SeckillConfigDO> {
         return selectList(SeckillConfigDO::getStatus, status);
     }
 
-
 }

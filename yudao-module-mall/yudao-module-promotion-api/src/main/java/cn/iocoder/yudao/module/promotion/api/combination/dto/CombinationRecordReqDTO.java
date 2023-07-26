@@ -5,6 +5,7 @@ import lombok.Data;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+// TODO @puhui999：CombinationRecordCreateReqDTO，这样更容易知道是创建噢
 /**
  * 拼团记录 Request DTO
  *

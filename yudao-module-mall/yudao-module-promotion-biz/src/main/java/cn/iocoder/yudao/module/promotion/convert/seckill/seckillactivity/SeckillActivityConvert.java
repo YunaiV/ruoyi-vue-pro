@@ -84,6 +84,7 @@ public interface SeckillActivityConvert {
         return list;
     }
 
+    // TODO @puhui999：同拼团那个 convert 想通的情况哈。
     default List<SeckillProductDO> convertList1(SeckillActivityDO activityDO, List<SeckillProductUpdateReqVO> vos, List<SeckillProductDO> productDOs) {
         Map<Long, Long> longMap = CollectionUtils.convertMap(productDOs, SeckillProductDO::getSkuId, SeckillProductDO::getId);
         List<SeckillProductDO> list = new ArrayList<>();

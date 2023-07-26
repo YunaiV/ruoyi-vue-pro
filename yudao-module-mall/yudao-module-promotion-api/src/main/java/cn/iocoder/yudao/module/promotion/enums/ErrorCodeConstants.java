@@ -42,8 +42,7 @@ public interface ErrorCodeConstants {
     ErrorCode REWARD_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1013006004, "满减送活动已关闭，不能重复关闭");
     ErrorCode REWARD_ACTIVITY_CLOSE_FAIL_STATUS_END = new ErrorCode(1013006005, "满减送活动已结束，不能关闭");
 
-    // ========== Price 相关 1013007000 ============
-    ErrorCode PRICE_CALCULATE_PAY_PRICE_ILLEGAL = new ErrorCode(1013007000, "支付价格计算异常，原因：价格小于等于 0");
+    // ========== TODO 空着 1013007000 ============
 
     // ========== 秒杀活动 1013008000 ==========
     ErrorCode SECKILL_ACTIVITY_NOT_EXISTS = new ErrorCode(1013008000, "秒杀活动不存在");
@@ -66,4 +65,5 @@ public interface ErrorCodeConstants {
     ErrorCode COMBINATION_ACTIVITY_STATUS_DISABLE = new ErrorCode(1013010002, "拼团活动已关闭不能修改");
     ErrorCode COMBINATION_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1013010003, "拼团活动未关闭或未结束，不能删除");
     ErrorCode COMBINATION_RECORD_NOT_EXISTS = new ErrorCode(1013010004, "拼团不存在");
+
 }

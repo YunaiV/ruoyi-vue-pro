@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.product.convert.spu;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
@@ -22,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
 
 /**
  * 商品 SPU Convert
@@ -110,8 +110,9 @@ public interface ProductSpuConvert {
     }
 
     default List<ProductSpuDetailRespVO> convertForSpuDetailRespListVO(List<ProductSpuDO> spus, List<ProductSkuDO> skus) {
-        ArrayList<ProductSpuDetailRespVO> vos = new ArrayList<>();
-        Map<Long, List<ProductSkuDO>> skuMultiMap = CollectionUtils.convertMultiMap(skus, ProductSkuDO::getSpuId);
+        List<ProductSpuDetailRespVO> vos = new ArrayList<>(spus.size());
+        Map<Long, List<ProductSkuDO>> skuMultiMap = convertMultiMap(skus, ProductSkuDO::getSpuId);
+        // TODO @puhui999：可以直接使用 CollUtils.convertList
         spus.forEach(spu -> {
             ProductSpuDetailRespVO detailRespVO = convert03(spu);
             detailRespVO.setSkus(ProductSkuConvert.INSTANCE.convertList(skuMultiMap.get(spu.getId())));

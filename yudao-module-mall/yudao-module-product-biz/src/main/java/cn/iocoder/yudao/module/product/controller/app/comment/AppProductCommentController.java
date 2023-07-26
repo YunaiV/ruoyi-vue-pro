@@ -51,14 +51,16 @@ public class AppProductCommentController {
             @Parameter(name = "spuId", description = "商品 SPU 编号", required = true, example = "1024"),
             @Parameter(name = "count", description = "数量", required = true, example = "10")
     })
-    public CommonResult<List<AppProductCommentRespVO>> getCommentList(@RequestParam("spuId") Long spuId,
-                                                                      @RequestParam(value = "count", defaultValue = "10") Integer count) {
+    public CommonResult<List<AppProductCommentRespVO>> getCommentList(
+            @RequestParam("spuId") Long spuId,
+            @RequestParam(value = "count", defaultValue = "10") Integer count) {
         return success(productCommentService.getCommentList(spuId, count));
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得商品评价分页")
     public CommonResult<PageResult<AppProductCommentRespVO>> getCommentPage(@Valid AppCommentPageReqVO pageVO) {
+        // TODO @puhui999：写到 convert 里，可以更简洁哈。
         PageResult<ProductCommentDO> commentDOPage = productCommentService.getCommentPage(pageVO, Boolean.TRUE);
         Set<Long> skuIds = CollectionUtils.convertSet(commentDOPage.getList(), ProductCommentDO::getSkuId);
         List<ProductSkuDO> skuList = productSkuService.getSkuList(skuIds);

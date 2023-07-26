@@ -180,8 +180,7 @@ public interface TradeOrderService {
     TradeOrderDO getOrderByIdAndUserId(Long orderId, Long loginUserId);
 
     /**
-     * 创建订单项评论
-     * 创建交易订单项的评价
+     * 创建订单项的评论
      *
      * @param createReqVO 创建请求
      * @return 得到评价 id

@@ -24,6 +24,7 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.COMBINATION_ACTIVITY_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
 
+// TODO 芋艿：等完成后，在补全单测
 /**
  * {@link CombinationActivityServiceImpl} 的单元测试类
  *

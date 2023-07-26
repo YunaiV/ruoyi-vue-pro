@@ -60,9 +60,10 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     public Long createSeckillActivity(SeckillActivityCreateReqVO createReqVO) {
         // 校验商品秒秒杀时段是否冲突
         validateProductSpuSeckillConflict(createReqVO.getConfigIds(), createReqVO.getSpuId(), null);
-        // 获取所选 spu下的所有 sku
+        // 获取所选 spu 下的所有 sku
         List<ProductSkuRespDTO> skus = productSkuApi.getSkuListBySpuId(CollUtil.newArrayList(createReqVO.getSpuId()));
         // 校验商品 sku 是否存在
+        // TODO @puhui999：直接校验 sku 数量，是不是就完事啦，不需要校验的特别严谨哈；
         validateProductSkuExistence(skus, createReqVO.getProducts(), SeckillProductCreateReqVO::getSkuId);
 
         // 插入秒杀活动
@@ -71,6 +72,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
                 .setTotalStock(CollectionUtils.getSumValue(createReqVO.getProducts(), SeckillProductCreateReqVO::getStock, Integer::sum));
         seckillActivityMapper.insert(activity);
         // 插入商品
+        // TODO @puhui999：products 要注意复数哈
         List<SeckillProductDO> product = SeckillActivityConvert.INSTANCE.convertList(activity, createReqVO.getProducts());
         seckillProductMapper.insertBatch(product);
         return activity.getId();
@@ -97,6 +99,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         }
         List<SeckillActivityDO> activityDOs2 = CollectionUtils.convertList(activityDOs, c -> c, s -> {
             // 判断秒杀时段是否有交集
+            // TODO @puhui999：是不是 containsAny 就是有交集呀
             List<Long> configIdsClone = CollUtil.newArrayList(s.getConfigIds());
             configIdsClone.retainAll(configIds);
             return CollUtil.isNotEmpty(configIdsClone);
@@ -134,29 +137,32 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     /**
      * 更新秒杀商品
      *
-     * @param updateObj DO
+     * @param updateObj 更新的活动
      * @param products  商品配置
      */
+    // TODO @puhui999：我在想，我们是不是可以封装一个 CollUtil 的方法，传入两个数组，判断出哪些是新增、哪些是修改、哪些是删除；
+    // 例如说，products 先转化成 SeckillProductDO；然后，基于一个 func(key1, key2) 做比对；
+    // 如果可以跑通，所有涉及到这种逻辑的，都可以服用哈。
     private void updateSeckillProduct(SeckillActivityDO updateObj, List<SeckillProductUpdateReqVO> products) {
-        List<SeckillProductDO> seckillProductDOs = seckillProductMapper.selectListByActivityId(updateObj.getId());
         // 数据库中的活动商品
-        Set<Long> convertSet = CollectionUtils.convertSet(seckillProductDOs, SeckillProductDO::getSkuId);
-        // 前端传过来的活动商品
-        Set<Long> convertSet1 = CollectionUtils.convertSet(products, SeckillProductUpdateReqVO::getSkuId);
-        // 删除后台存在的前端不存在的商品
-        List<Long> d = CollectionUtils.filterList(convertSet, item -> !convertSet1.contains(item));
+        List<SeckillProductDO> seckillProductDOs = seckillProductMapper.selectListByActivityId(updateObj.getId());
+        Set<Long> dbSkuIds = CollectionUtils.convertSet(seckillProductDOs, SeckillProductDO::getSkuId);
+        // 1. 删除后台存在的前端不存在的商品
+        // TODO @puhui999：delete 应该是 id，不是 skuId 哈
+        Set<Long> voSkuIds = CollectionUtils.convertSet(products, SeckillProductUpdateReqVO::getSkuId);
+        List<Long> d = CollectionUtils.filterList(dbSkuIds, item -> !voSkuIds.contains(item));
         if (CollUtil.isNotEmpty(d)) {
             seckillProductMapper.deleteBatchIds(d);
         }
-        // 前端存在的后端不存在的商品
-        List<Long> c = CollectionUtils.filterList(convertSet1, item -> !convertSet.contains(item));
+        // 2. 前端存在的后端不存在的商品
+        List<Long> c = CollectionUtils.filterList(voSkuIds, item -> !dbSkuIds.contains(item));
         if (CollUtil.isNotEmpty(c)) {
             List<SeckillProductUpdateReqVO> vos = CollectionUtils.filterList(products, item -> c.contains(item.getSkuId()));
             List<SeckillProductDO> productDOs = SeckillActivityConvert.INSTANCE.convertList(updateObj, vos);
             seckillProductMapper.insertBatch(productDOs);
         }
-        // 更新已存在的商品
-        List<Long> u = CollectionUtils.filterList(convertSet1, convertSet::contains);
+        // 3. 更新已存在的商品
+        List<Long> u = CollectionUtils.filterList(voSkuIds, dbSkuIds::contains);
         if (CollUtil.isNotEmpty(u)) {
             List<SeckillProductUpdateReqVO> vos = CollectionUtils.filterList(products, item -> u.contains(item.getSkuId()));
             List<SeckillProductDO> productDOs = SeckillActivityConvert.INSTANCE.convertList1(updateObj, vos, seckillProductDOs);
@@ -165,12 +171,12 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class) // TODO @puhui999：这个不用加事务哈
     public void closeSeckillActivity(Long id) {
         // TODO 待验证没使用过
         // 校验存在
-        SeckillActivityDO seckillActivity = validateSeckillActivityExists(id);
-        if (CommonStatusEnum.DISABLE.getStatus().equals(seckillActivity.getStatus())) {
+        SeckillActivityDO activity = validateSeckillActivityExists(id);
+        if (CommonStatusEnum.DISABLE.getStatus().equals(activity.getStatus())) {
             throw exception(SECKILL_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED);
         }
 

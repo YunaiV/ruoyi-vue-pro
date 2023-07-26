@@ -83,6 +83,7 @@ public interface CombinationActivityService {
      */
     List<CombinationProductDO> getProductsByActivityIds(Collection<Long> ids);
 
+    // TODO @puhui999：拆一个 CombinationRecordService 里，方法名可以简洁成 updateRecordStatusByOrderId；service 方法可以稍微简单一点，如果是 update 方法
     /**
      * 更新拼团状态
      *
@@ -99,10 +100,10 @@ public interface CombinationActivityService {
      * @param orderId   订单编号
      * @param status    状态
      * @param startTime 开始时间
-     * @return
      */
     void updateRecordStatusAndStartTimeByUserIdAndOrderId(Long userId, Long orderId, Integer status, LocalDateTime startTime);
 
+    // TODO @puhui999：拆一个 CombinationRecordService 里
     /**
      * 创建拼团记录
      *
@@ -118,4 +119,5 @@ public interface CombinationActivityService {
      * @return 拼团状态
      */
     boolean validateRecordStatusIsSuccess(Long userId, Long orderId);
+
 }

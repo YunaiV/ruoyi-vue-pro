@@ -254,28 +254,33 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     @Override
     public void createRecord(CombinationRecordReqDTO reqDTO) {
         // 校验拼团活动
-        CombinationActivityDO activityDO = validateCombinationActivityExists(reqDTO.getActivityId());
+        CombinationActivityDO activity = validateCombinationActivityExists(reqDTO.getActivityId());
+        // TODO @puhui999：需要校验下，它当前是不是已经参加了该拼团；
+        // TODO @puhui999: 父拼团是否存在,是否已经满了
 
-        CombinationRecordDO recordDO = CombinationActivityConvert.INSTANCE.convert(reqDTO);
-        recordDO.setVirtualGroup(false);
-        recordDO.setExpireTime(activityDO.getLimitDuration());
-        recordDO.setUserSize(activityDO.getUserSize());
-        recordMapper.insert(recordDO);
+        CombinationRecordDO record = CombinationActivityConvert.INSTANCE.convert(reqDTO);
+        record.setVirtualGroup(false);
+        // TODO @puhui999：过期时间，应该是 Date 哈；
+        record.setExpireTime(activity.getLimitDuration());
+        record.setUserSize(activity.getUserSize());
+        recordMapper.insert(record);
     }
 
     @Override
     public boolean validateRecordStatusIsSuccess(Long userId, Long orderId) {
-        CombinationRecordDO recordDO = validateCombinationRecord(userId, orderId);
-        return ObjectUtil.equal(recordDO.getStatus(), CombinationRecordStatusEnum.SUCCESS.getStatus());
+        CombinationRecordDO record = validateCombinationRecord(userId, orderId);
+        // TODO @puhui999：可以搞个 getRecrod 方法，然后业务通过 CombinationRecordStatusEnum.isSuccess 方法校验
+        return ObjectUtil.equal(record.getStatus(), CombinationRecordStatusEnum.SUCCESS.getStatus());
     }
 
+    // TODO @puhui999：status 传入进来搞哈；
     /**
      * APP 端获取开团记录
      *
      * @return 开团记录
      */
     public List<CombinationRecordDO> getRecordList() {
-        return recordMapper.selectListByStatus(CombinationRecordStatusEnum.ONGOING.getStatus());
+        return recordMapper.selectListByStatus(CombinationRecordStatusEnum.IN_PROGRESS.getStatus());
     }
 
 }

@@ -7,7 +7,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-
+// TODO @puhui999：如无必要，导出都可以删除哈
 /**
  * 拼团活动 Excel VO
  *

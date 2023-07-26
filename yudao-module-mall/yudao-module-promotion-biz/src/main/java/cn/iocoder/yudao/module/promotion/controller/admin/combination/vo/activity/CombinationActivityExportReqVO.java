@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+// TODO @puhui999：如无必要，导出都可以删除哈
 @Schema(description = "管理后台 - 拼团活动 Excel 导出 Request VO，参数和 CombinationActivityPageReqVO 是一致的")
 @Data
 public class CombinationActivityExportReqVO {

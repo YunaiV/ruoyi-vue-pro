@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
+// TODO @puhui999：是不是应该在 combination 哈？
 /**
  * 拼团活动 Mapper
  *

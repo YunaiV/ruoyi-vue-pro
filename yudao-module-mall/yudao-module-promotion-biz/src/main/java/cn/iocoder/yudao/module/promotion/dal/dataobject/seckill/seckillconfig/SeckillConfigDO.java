@@ -50,7 +50,7 @@ public class SeckillConfigDO extends BaseDO {
     private List<String> sliderPicUrls;
     /**
      * 状态
-     * <p>
+     *
      * 枚举 {@link CommonStatusEnum 对应的类}
      */
     private Integer status;

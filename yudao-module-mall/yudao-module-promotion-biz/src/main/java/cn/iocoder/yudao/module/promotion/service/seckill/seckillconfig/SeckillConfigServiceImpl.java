@@ -151,6 +151,7 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
         return seckillConfigMapper.selectPage(pageVO);
     }
 
+    // TODO @puhui999：改成传入 enable 状态哈。一个通用的 getSeckillConfigList 方法
     @Override
     public List<SeckillConfigDO> getListAllSimple() {
         return seckillConfigMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus());

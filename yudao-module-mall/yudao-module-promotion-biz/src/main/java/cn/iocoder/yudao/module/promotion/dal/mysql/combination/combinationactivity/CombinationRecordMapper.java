@@ -16,16 +16,18 @@ import java.util.List;
 public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO> {
 
     default CombinationRecordDO selectRecord(Long userId, Long orderId) {
-        return selectOne(CombinationRecordDO::getUserId, userId, CombinationRecordDO::getOrderId, orderId);
+        return selectOne(CombinationRecordDO::getUserId, userId,
+                CombinationRecordDO::getOrderId, orderId);
     }
 
     default List<CombinationRecordDO> selectListByHeadIdAndStatus(Long headId, Integer status) {
-        return selectList(new LambdaQueryWrapperX<CombinationRecordDO>().eq(CombinationRecordDO::getHeadId, headId)
+        return selectList(new LambdaQueryWrapperX<CombinationRecordDO>()
+                .eq(CombinationRecordDO::getHeadId, headId)
                 .eq(CombinationRecordDO::getStatus, status));
     }
 
     default List<CombinationRecordDO> selectListByStatus(Integer status) {
-        return selectList(new LambdaQueryWrapperX<CombinationRecordDO>().eq(CombinationRecordDO::getStatus, status));
+        return selectList(CombinationRecordDO::getStatus, status);
     }
 
 }

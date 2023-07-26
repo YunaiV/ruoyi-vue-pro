@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.promotion.convert.combination;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordReqDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityCreateReqVO;
@@ -25,6 +24,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * 拼团活动 Convert
@@ -74,13 +75,17 @@ public interface CombinationActivityConvert {
 
     PageResult<CombinationActivityRespVO> convertPage(PageResult<CombinationActivityDO> page);
 
-    default PageResult<CombinationActivityRespVO> convertPage(PageResult<CombinationActivityDO> page, List<CombinationProductDO> productDOList, List<ProductSpuRespDTO> spuList) {
-        Map<Long, ProductSpuRespDTO> spuMap = CollectionUtils.convertMap(spuList, ProductSpuRespDTO::getId, c -> c);
+    default PageResult<CombinationActivityRespVO> convertPage(PageResult<CombinationActivityDO> page,
+                                                              List<CombinationProductDO> productList,
+                                                              List<ProductSpuRespDTO> spuList) {
+        // TODO @puhui999：c -> c 可以去掉哈
+        Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId, c -> c);
         PageResult<CombinationActivityRespVO> pageResult = convertPage(page);
         pageResult.getList().forEach(item -> {
+            // TODO @puhui999：最好 MapUtils.findAndThen，万一没找到呢，啊哈哈。
             item.setSpuName(spuMap.get(item.getSpuId()).getName());
             item.setPicUrl(spuMap.get(item.getSpuId()).getPicUrl());
-            item.setProducts(convertList2(productDOList));
+            item.setProducts(convertList2(productList));
         });
         return pageResult;
     }
@@ -111,12 +116,17 @@ public interface CombinationActivityConvert {
         return list;
     }
 
-    default List<CombinationProductDO> convertList1(CombinationActivityDO activityDO, List<CombinationProductUpdateReqVO> vos, List<CombinationProductDO> productDOs) {
-        Map<Long, Long> longMap = CollectionUtils.convertMap(productDOs, CombinationProductDO::getSkuId, CombinationProductDO::getId);
+    // TODO @puhui999：这个方法的参数，调整成 productDOs、vos、activityDO；因为 productDOs 是主角；
+    // 然后，这个方法，感觉不是为了 convert，而是为了补全；
+    default List<CombinationProductDO> convertList1(CombinationActivityDO activityDO,
+                                                    List<CombinationProductUpdateReqVO> vos,
+                                                    List<CombinationProductDO> productDOs) {
+        Map<Long, Long> longMap = convertMap(productDOs, CombinationProductDO::getSkuId, CombinationProductDO::getId);
         List<CombinationProductDO> list = new ArrayList<>();
         vos.forEach(sku -> {
             CombinationProductDO productDO = convert(activityDO, sku);
             productDO.setId(longMap.get(sku.getSkuId()));
+            // TODO @puhui999：是是不是用 activityDO 的状态；
             productDO.setActivityStatus(CommonStatusEnum.ENABLE.getStatus());
             list.add(productDO);
         });

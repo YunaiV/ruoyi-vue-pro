@@ -70,7 +70,9 @@ public interface ErrorCodeConstants {
     ErrorCode PICK_UP_STORE_NOT_EXISTS = new ErrorCode(1011006000, "自提门店不存在");
 
     // ==========  物流 PICK_UP 模块 1011007000 ==========
+    // TODO @puhui999：这几个错误码，应该属于订单哈
     ErrorCode ORDER_DELIVERY_FAILED_ITEMS_NOT_EMPTY = new ErrorCode(1011007000, "订单发货失败，请选择发货商品");
     ErrorCode ORDER_DELIVERY_FAILED_ITEM_NOT_EXISTS = new ErrorCode(1011007001, "订单发货失败，所选发货商品不存在");
-    ErrorCode ORDER_DELIVERY_FAILED_ITEM_ALREADY_DELIVERY = new ErrorCode(1011007001, "订单发货失败，所选商品已发货");
+    ErrorCode ORDER_DELIVERY_FAILED_ITEM_ALREADY_DELIVERY = new ErrorCode(1011007002, "订单发货失败，所选商品已发货");
+
 }

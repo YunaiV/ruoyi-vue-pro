@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.combination;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -28,6 +27,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import static cn.hutool.core.collection.CollectionUtil.newArrayList;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
@@ -71,9 +71,9 @@ public class CombinationActivityController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('promotion:combination-activity:query')")
     public CommonResult<CombinationActivityRespVO> getCombinationActivity(@RequestParam("id") Long id) {
-        CombinationActivityDO combinationActivity = combinationActivityService.getCombinationActivity(id);
-        List<CombinationProductDO> productDOs = combinationActivityService.getProductsByActivityIds(CollectionUtil.newArrayList(id));
-        return success(CombinationActivityConvert.INSTANCE.convert(combinationActivity, productDOs));
+        CombinationActivityDO activity = combinationActivityService.getCombinationActivity(id);
+        List<CombinationProductDO> products = combinationActivityService.getProductsByActivityIds(newArrayList(id));
+        return success(CombinationActivityConvert.INSTANCE.convert(activity, products));
     }
 
     @GetMapping("/list")
@@ -88,13 +88,15 @@ public class CombinationActivityController {
     @GetMapping("/page")
     @Operation(summary = "获得拼团活动分页")
     @PreAuthorize("@ss.hasPermission('promotion:combination-activity:query')")
-    public CommonResult<PageResult<CombinationActivityRespVO>> getCombinationActivityPage(@Valid CombinationActivityPageReqVO pageVO) {
+    public CommonResult<PageResult<CombinationActivityRespVO>> getCombinationActivityPage(
+            @Valid CombinationActivityPageReqVO pageVO) {
         PageResult<CombinationActivityDO> pageResult = combinationActivityService.getCombinationActivityPage(pageVO);
+        // TODO @puhui999：可以不一定 aIds，直接批量查询结果出来；下面也是类似；
         Set<Long> aIds = CollectionUtils.convertSet(pageResult.getList(), CombinationActivityDO::getId);
-        List<CombinationProductDO> productDOs = combinationActivityService.getProductsByActivityIds(aIds);
+        List<CombinationProductDO> products = combinationActivityService.getProductsByActivityIds(aIds);
         Set<Long> spuIds = CollectionUtils.convertSet(pageResult.getList(), CombinationActivityDO::getSpuId);
-        List<ProductSpuRespDTO> spuList = spuApi.getSpuList(spuIds);
-        return success(CombinationActivityConvert.INSTANCE.convertPage(pageResult, productDOs, spuList));
+        List<ProductSpuRespDTO> spus = spuApi.getSpuList(spuIds);
+        return success(CombinationActivityConvert.INSTANCE.convertPage(pageResult, products, spus));
     }
 
     @GetMapping("/export-excel")

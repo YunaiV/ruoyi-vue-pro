@@ -112,7 +112,7 @@ public class ProductCommentServiceImpl implements ProductCommentService {
         // 判断当前订单的当前商品用户是否评价过
         ProductCommentDO exist = productCommentMapper.selectByUserIdAndOrderItemIdAndSpuId(userId, orderItemId, skuId);
         if (null != exist) {
-            throw exception(ORDER_SKU_COMMENT_EXISTS);
+            throw exception(COMMENT_ORDER_EXISTS);
         }
     }
 

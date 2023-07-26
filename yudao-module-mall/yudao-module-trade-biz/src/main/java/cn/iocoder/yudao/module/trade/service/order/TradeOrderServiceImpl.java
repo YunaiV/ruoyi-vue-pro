@@ -178,7 +178,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
             MemberUserRespDTO user = memberUserApi.getUser(userId);
             // TODO 拼团一次应该只能选择一种规格的商品
             combinationApi.createRecord(TradeOrderConvert.INSTANCE.convert(order, orderItems.get(0), createReqVO, user)
-                    .setStatus(CombinationRecordStatusEnum.NOT_PAY.getStatus()));
+                    .setStatus(CombinationRecordStatusEnum.WAITING.getStatus()));
         }
         // TODO 秒杀扣减库存是下单就扣除还是等待订单支付成功再扣除
         if (ObjectUtil.equal(TradeOrderTypeEnum.SECKILL.getType(), order.getType())) {
@@ -204,23 +204,6 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         return address;
     }
 
-    /**
-     * 校验活动返回订单类型
-     *
-     * @param createReqVO 请求参数
-     * @return 订单类型
-     */
-    private Integer validateActivity(AppTradeOrderCreateReqVO createReqVO) {
-        if (createReqVO.getSeckillActivityId() != null) {
-            return TradeOrderTypeEnum.SECKILL.getType();
-        }
-        if (createReqVO.getCombinationActivityId() != null) {
-            return TradeOrderTypeEnum.COMBINATION.getType();
-        }
-        // TODO 砍价敬请期待
-        return TradeOrderTypeEnum.NORMAL.getType();
-    }
-
     private TradeOrderDO createTradeOrder(Long userId, String clientIp, AppTradeOrderCreateReqVO createReqVO,
                                           TradePriceCalculateRespBO calculateRespBO) {
         // 用户选择物流配送的时候才需要填写收货地址
@@ -244,6 +227,23 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus()).setRefundPrice(0);
         tradeOrderMapper.insert(order);
         return order;
+    }
+
+    /**
+     * 校验活动，并返回订单类型
+     *
+     * @param createReqVO 请求参数
+     * @return 订单类型
+     */
+    private Integer validateActivity(AppTradeOrderCreateReqVO createReqVO) {
+        if (createReqVO.getSeckillActivityId() != null) {
+            return TradeOrderTypeEnum.SECKILL.getType();
+        }
+        if (createReqVO.getCombinationActivityId() != null) {
+            return TradeOrderTypeEnum.COMBINATION.getType();
+        }
+        // TODO 砍价敬请期待
+        return TradeOrderTypeEnum.NORMAL.getType();
     }
 
     private List<TradeOrderItemDO> createTradeOrderItems(TradeOrderDO tradeOrderDO, TradePriceCalculateRespBO calculateRespBO) {
@@ -314,7 +314,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // 1、拼团活动
         if (ObjectUtil.equal(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
             // 更新拼团状态 TODO puhui999：订单支付失败或订单支付过期删除这条拼团记录
-            combinationApi.updateRecordStatusAndStartTime(order.getUserId(), order.getId(), CombinationRecordStatusEnum.ONGOING.getStatus());
+            combinationApi.updateRecordStatusAndStartTime(order.getUserId(), order.getId(), CombinationRecordStatusEnum.IN_PROGRESS.getStatus());
         }
         // TODO 芋艿：发送订单变化的消息
 
@@ -422,6 +422,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         orderDeliveryMapper.insertBatch(deliveryDOs);
         // TODO 芋艿：发送订单变化的消息
 
+        // TODO @puhui999：可以抽个 message 包，里面是 Order 所有的 message；类似工作流的
         // 发送站内信
         // 1、构造消息
         Map<String, Object> msgMap = new HashMap<>();
@@ -684,24 +685,26 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     @Override
     public Long createOrderItemComment(AppTradeOrderItemCommentCreateReqVO createReqVO) {
         Long loginUserId = getLoginUserId();
-        // 先通过订单项 ID 查询订单项是否存在
-        TradeOrderItemDO orderItemDO = getOrderItemByIdAndUserId(createReqVO.getOrderItemId(), loginUserId);
-        if (orderItemDO == null) {
+        // 先通过订单项 ID，查询订单项是否存在
+        TradeOrderItemDO orderItem = getOrderItemByIdAndUserId(createReqVO.getOrderItemId(), loginUserId);
+        if (orderItem == null) {
             throw exception(ORDER_ITEM_NOT_FOUND);
         }
         // 校验订单
-        TradeOrderDO orderDO = getOrderByIdAndUserId(orderItemDO.getOrderId(), loginUserId);
-        if (orderDO == null) {
+        TradeOrderDO order = getOrderByIdAndUserId(orderItem.getOrderId(), loginUserId);
+        if (order == null) {
             throw exception(ORDER_NOT_FOUND);
         }
-        if (ObjectUtil.notEqual(orderDO.getStatus(), TradeOrderStatusEnum.COMPLETED.getStatus())) {
+        if (ObjectUtil.notEqual(order.getStatus(), TradeOrderStatusEnum.COMPLETED.getStatus())) {
             throw exception(ORDER_COMMENT_FAIL_STATUS_NOT_COMPLETED);
         }
-        if (ObjectUtil.notEqual(orderDO.getCommentStatus(), Boolean.FALSE)) {
+        if (ObjectUtil.notEqual(order.getCommentStatus(), Boolean.FALSE)) {
             throw exception(ORDER_COMMENT_STATUS_NOT_FALSE);
         }
+        // TODO @puhui999：是不是评论完，要更新 status、commentStatus；另外，是不是上面 order 可以不校验，直接只判断 orderItem 就够；
+        // 对于 order 来说，就是评论完，把 order 更新完合理的 status 等字段。
 
-        ProductCommentCreateReqDTO productCommentCreateReqDTO = TradeOrderConvert.INSTANCE.convert04(createReqVO, orderItemDO);
+        ProductCommentCreateReqDTO productCommentCreateReqDTO = TradeOrderConvert.INSTANCE.convert04(createReqVO, orderItem);
         return productCommentApi.createComment(productCommentCreateReqDTO);
     }
 

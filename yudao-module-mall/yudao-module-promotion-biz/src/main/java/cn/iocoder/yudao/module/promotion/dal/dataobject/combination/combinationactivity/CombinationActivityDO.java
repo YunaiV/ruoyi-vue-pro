@@ -9,6 +9,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+// TODO @puhui999：是不是应该在 combination 哈？
 /**
  * 拼团活动 DO
  *
@@ -34,7 +35,9 @@ public class CombinationActivityDO extends BaseDO {
      */
     private String name;
     /**
-     * 商品 SPU 编号关联 ProductSpuDO 的 id
+     * 商品 SPU 编号
+     *
+     * 关联 ProductSpuDO 的 id
      */
     private Long spuId;
     /**
@@ -75,7 +78,7 @@ public class CombinationActivityDO extends BaseDO {
     private Integer virtualGroup;
     /**
      * 活动状态：0开启 1关闭
-     * <p>
+     *
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;

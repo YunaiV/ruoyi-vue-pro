@@ -45,7 +45,7 @@ public class CombinationActivityRespVO extends CombinationActivityBaseVO {
     @NotNull(message = "虚拟成团不能为空")
     private Integer virtualGroup;
 
-    @Schema(description = "活动状态：0开启 1关闭", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
+    @Schema(description = "活动状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     @NotNull(message = "活动状态不能为空")
     private Integer status;
 

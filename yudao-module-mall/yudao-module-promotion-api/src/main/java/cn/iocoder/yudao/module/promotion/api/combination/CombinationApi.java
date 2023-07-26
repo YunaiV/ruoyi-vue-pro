@@ -4,6 +4,8 @@ import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordRe
 
 import javax.validation.Valid;
 
+// TODO @puhui999:CombinationRecordApi 分成活动、记录哈
+// TODO @芋艿：后面也再撸撸这几个接口
 /**
  * 拼团活动 API 接口
  *
@@ -26,7 +28,6 @@ public interface CombinationApi {
      */
     boolean validateRecordStatusIsSuccess(Long userId, Long orderId);
 
-
     /**
      * 更新开团记录状态
      *
@@ -42,7 +43,6 @@ public interface CombinationApi {
      * @param userId  用户编号
      * @param orderId 订单编号
      * @param status  状态值
-     * @return
      */
     void updateRecordStatusAndStartTime(Long userId, Long orderId, Integer status);
 

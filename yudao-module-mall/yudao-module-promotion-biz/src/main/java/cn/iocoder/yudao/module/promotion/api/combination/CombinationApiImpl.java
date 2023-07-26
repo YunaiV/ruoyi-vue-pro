@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
  */
 @Service
 public class CombinationApiImpl implements CombinationApi {
+
     @Resource
     private CombinationActivityService activityService;
 

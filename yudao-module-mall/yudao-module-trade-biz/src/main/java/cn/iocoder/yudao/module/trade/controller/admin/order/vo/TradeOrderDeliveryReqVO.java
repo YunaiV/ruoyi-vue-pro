@@ -21,13 +21,15 @@ public class TradeOrderDeliveryReqVO {
     @NotNull(message = "发货类型不能为空")
     private Integer type;
 
+    // TODO @puhui999：还是要校验下
+
     @Schema(description = "发货物流公司编号", example = "1")
     private Long logisticsId;
 
     @Schema(description = "发货物流单号", example = "SF123456789")
     private String logisticsNo;
 
-    // TODO 订单项商品单独发货
+    // TODO 订单项商品单独发货；不做单独发
 
     @Schema(description = "发货订单项", example = "[1,2,3]")
     @NotNull(message = "发货订单项不能为空")

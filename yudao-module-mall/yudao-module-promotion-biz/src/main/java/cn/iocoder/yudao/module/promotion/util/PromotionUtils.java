@@ -31,6 +31,7 @@ public class PromotionUtils {
         return LocalDateTimeUtils.beforeNow(endTime) ? CommonStatusEnum.DISABLE.getStatus() : CommonStatusEnum.ENABLE.getStatus();
     }
 
+    // TODO @puhui999：写个注释哈。
     public static <T> void validateProductSkuExistence(List<ProductSkuRespDTO> skus, List<T> products, Function<T, Long> func) {
         // 校验 sku 个数是否一致
         Set<Long> skuIdsSet = CollectionUtils.convertSet(products, func);
