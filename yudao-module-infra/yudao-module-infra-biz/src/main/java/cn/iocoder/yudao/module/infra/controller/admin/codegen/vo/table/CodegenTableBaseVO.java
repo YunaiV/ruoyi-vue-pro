@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class CodegenTableBaseVO {
 
-    @Schema(description = "生成场景,参见 CodegenSceneEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "生成场景，参见 CodegenSceneEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "导入类型不能为空")
     private Integer scene;
 

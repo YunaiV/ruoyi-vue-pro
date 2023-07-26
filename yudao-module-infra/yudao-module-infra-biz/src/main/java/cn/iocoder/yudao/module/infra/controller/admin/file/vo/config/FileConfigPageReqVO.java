@@ -23,8 +23,8 @@ public class FileConfigPageReqVO extends PageParam {
     @Schema(description = "存储器", example = "1")
     private Integer storage;
 
+    @Schema(description = "创建时间", example = "[2022-07-01 00:00:00, 2022-07-01 23:59:59]")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @Schema(description = "创建时间")
     private LocalDateTime[] createTime;
 
 }
