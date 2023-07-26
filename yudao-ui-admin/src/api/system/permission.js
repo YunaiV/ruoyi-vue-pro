@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 查询角色拥有的菜单数组
 export function listRoleMenus(roleId) {
   return request({
-    url: '/system/permission/list-role-resources?roleId=' + roleId,
+    url: '/system/permission/list-role-menus?roleId=' + roleId,
     method: 'get'
   })
 }

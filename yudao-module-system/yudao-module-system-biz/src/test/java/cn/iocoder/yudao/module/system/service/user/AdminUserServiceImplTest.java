@@ -345,7 +345,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         reqVO.setDeptId(1L); // 其中，1L 是 2L 的父部门
         // mock 方法
         List<DeptDO> deptList = newArrayList(randomPojo(DeptDO.class, o -> o.setId(2L)));
-        when(deptService.getDeptListByParentIdFromCache(eq(reqVO.getDeptId()), eq(true))).thenReturn(deptList);
+        when(deptService.getChildDeptList(eq(reqVO.getDeptId()))).thenReturn(deptList);
 
         // 调用
         PageResult<AdminUserDO> pageResult = userService.getUserPage(reqVO);
@@ -368,7 +368,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         reqVO.setDeptId(1L); // 其中，1L 是 2L 的父部门
         // mock 方法
         List<DeptDO> deptList = newArrayList(randomPojo(DeptDO.class, o -> o.setId(2L)));
-        when(deptService.getDeptListByParentIdFromCache(eq(reqVO.getDeptId()), eq(true))).thenReturn(deptList);
+        when(deptService.getChildDeptList(eq(reqVO.getDeptId()))).thenReturn(deptList);
 
         // 调用
         List<AdminUserDO> list = userService.getUserList(reqVO);
