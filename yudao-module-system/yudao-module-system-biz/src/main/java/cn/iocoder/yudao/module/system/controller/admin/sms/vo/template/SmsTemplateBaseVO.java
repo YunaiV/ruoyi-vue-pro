@@ -11,11 +11,11 @@ import javax.validation.constraints.NotNull;
 @Data
 public class SmsTemplateBaseVO {
 
-    @Schema(description = "短信类型,参见 SmsTemplateTypeEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "短信类型，参见 SmsTemplateTypeEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "短信类型不能为空")
     private Integer type;
 
-    @Schema(description = "开启状态,参见 CommonStatusEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "开启状态，参见 CommonStatusEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "开启状态不能为空")
     private Integer status;
 

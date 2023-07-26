@@ -15,7 +15,7 @@ import javax.validation.constraints.Size;
 @Data
 public class LoginLogBaseVO {
 
-    @Schema(description = "日志类型,参见 LoginLogTypeEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "日志类型，参见 LoginLogTypeEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "日志类型不能为空")
     private Integer logType;
 
@@ -28,7 +28,7 @@ public class LoginLogBaseVO {
     @Size(max = 30, message = "用户账号长度不能超过30个字符")
     private String username;
 
-    @Schema(description = "登录结果,参见 LoginResultEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "登录结果，参见 LoginResultEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "登录结果不能为空")
     private Integer result;
 

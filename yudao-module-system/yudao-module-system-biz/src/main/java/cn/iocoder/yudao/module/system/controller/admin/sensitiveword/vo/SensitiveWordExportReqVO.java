@@ -18,7 +18,7 @@ public class SensitiveWordExportReqVO {
     @Schema(description = "标签", example = "短信,评论")
     private String tag;
 
-    @Schema(description = "状态,参见 CommonStatusEnum 枚举类", example = "1")
+    @Schema(description = "状态，参见 CommonStatusEnum 枚举类", example = "1")
     private Integer status;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

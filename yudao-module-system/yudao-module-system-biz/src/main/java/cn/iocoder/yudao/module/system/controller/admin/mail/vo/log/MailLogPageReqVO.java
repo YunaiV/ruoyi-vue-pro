@@ -20,7 +20,7 @@ public class MailLogPageReqVO extends PageParam {
     @Schema(description = "用户编号", example = "30883")
     private Long userId;
 
-    @Schema(description = "用户类型 - 参见 UserTypeEnum 枚举", example = "2")
+    @Schema(description = "用户类型，参见 UserTypeEnum 枚举", example = "2")
     private Integer userType;
 
     @Schema(description = "接收邮箱地址 模糊匹配", example = "76854@qq.com")
@@ -32,7 +32,7 @@ public class MailLogPageReqVO extends PageParam {
     @Schema(description = "模板编号", example = "5678")
     private Long templateId;
 
-    @Schema(description = "发送状态 - 参见 MailSendStatusEnum 枚举", example = "1")
+    @Schema(description = "发送状态，参见 MailSendStatusEnum 枚举", example = "1")
     private Integer sendStatus;
 
     @Schema(description = "发送时间")

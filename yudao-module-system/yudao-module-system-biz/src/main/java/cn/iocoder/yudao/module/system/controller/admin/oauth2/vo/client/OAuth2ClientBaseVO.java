@@ -38,7 +38,7 @@ public class OAuth2ClientBaseVO {
     @Schema(description = "应用描述", example = "我是一个应用")
     private String description;
 
-    @Schema(description = "状态,参见 CommonStatusEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "状态，参见 CommonStatusEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "状态不能为空")
     private Integer status;
 
@@ -55,7 +55,7 @@ public class OAuth2ClientBaseVO {
     private List<@NotEmpty(message = "重定向的 URI 不能为空")
         @URL(message = "重定向的 URI 格式不正确") String> redirectUris;
 
-    @Schema(description = "授权类型,参见 OAuth2GrantTypeEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "password")
+    @Schema(description = "授权类型，参见 OAuth2GrantTypeEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "password")
     @NotNull(message = "授权类型不能为空")
     private List<String> authorizedGrantTypes;
 

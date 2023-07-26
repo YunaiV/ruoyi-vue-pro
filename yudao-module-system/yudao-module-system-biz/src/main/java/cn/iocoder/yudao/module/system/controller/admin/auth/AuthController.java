@@ -55,6 +55,7 @@ public class AuthController {
     private PermissionService permissionService;
     @Resource
     private SocialUserService socialUserService;
+
     @Resource
     private SecurityProperties securityProperties;
 

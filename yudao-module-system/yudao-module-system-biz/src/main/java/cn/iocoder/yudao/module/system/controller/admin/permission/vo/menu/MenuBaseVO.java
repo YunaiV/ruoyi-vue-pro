@@ -23,7 +23,7 @@ public class MenuBaseVO {
     @Size(max = 100)
     private String permission;
 
-    @Schema(description = "类型,参见 MenuTypeEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "类型，参见 MenuTypeEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "菜单类型不能为空")
     private Integer type;
 

@@ -36,7 +36,7 @@ public class MailTemplateBaseVO {
     @NotEmpty(message = "内容不能为空")
     private String content;
 
-    @Schema(description = "状态 - 参见 CommonStatusEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "状态，参见 CommonStatusEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "状态不能为空")
     private Integer status;
 
