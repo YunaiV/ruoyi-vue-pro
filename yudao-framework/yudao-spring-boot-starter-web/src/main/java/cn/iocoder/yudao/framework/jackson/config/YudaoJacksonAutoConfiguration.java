@@ -21,6 +21,7 @@ public class YudaoJacksonAutoConfiguration {
     @Bean
     public BeanPostProcessor objectMapperBeanPostProcessor() {
         return new BeanPostProcessor() {
+
             @Override
             public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
                 if (!(bean instanceof ObjectMapper)) {

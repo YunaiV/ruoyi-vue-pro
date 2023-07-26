@@ -21,6 +21,10 @@ public interface SeckillProductMapper extends BaseMapperX<SeckillProductDO> {
         return selectList(SeckillProductDO::getActivityId, id);
     }
 
+    default List<SeckillProductDO> selectListByActivityId(Collection<Long> ids) {
+        return selectList(SeckillProductDO::getActivityId, ids);
+    }
+
     default List<SeckillProductDO> selectListBySkuIds(Collection<Long> skuIds) {
         return selectList(SeckillProductDO::getSkuId, skuIds);
     }

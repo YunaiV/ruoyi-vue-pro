@@ -79,7 +79,7 @@ public class TestDemoServiceImpl implements TestDemoService {
 
     @Override
     public PageResult<TestDemoDO> getTestDemoPage(TestDemoPageReqVO pageReqVO) {
-        testDemoMapper.selectList2();
+//        testDemoMapper.selectList2();
         return testDemoMapper.selectPage(pageReqVO);
     }
 

@@ -16,8 +16,9 @@ public class DictDataSimpleRespVO {
     @Schema(description = "字典标签", requiredMode = Schema.RequiredMode.REQUIRED, example = "男")
     private String label;
 
-    @Schema(description = "颜色类型,default、primary、success、info、warning、danger", example = "default")
+    @Schema(description = "颜色类型，default、primary、success、info、warning、danger", example = "default")
     private String colorType;
+
     @Schema(description = "css 样式", example = "btn-visible")
     private String cssClass;
 

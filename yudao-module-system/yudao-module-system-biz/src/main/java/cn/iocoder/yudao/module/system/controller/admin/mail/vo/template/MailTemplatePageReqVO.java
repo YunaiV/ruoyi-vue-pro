@@ -17,13 +17,13 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class MailTemplatePageReqVO extends PageParam {
 
-    @Schema(description = "状态 - 参见 CommonStatusEnum 枚举", example = "1")
+    @Schema(description = "状态，参见 CommonStatusEnum 枚举", example = "1")
     private Integer status;
 
-    @Schema(description = "标识 - 模糊匹配", example = "code_1024")
+    @Schema(description = "标识，模糊匹配", example = "code_1024")
     private String code;
 
-    @Schema(description = "名称 - 模糊匹配", example = "芋头")
+    @Schema(description = "名称，模糊匹配", example = "芋头")
     private String name;
 
     @Schema(description = "账号编号", example = "2048")

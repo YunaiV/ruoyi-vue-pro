@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 
 /**
  * Promotion 错误码枚举类
- *
+ * <p>
  * promotion 系统，使用 1-013-000-000 段
  */
 public interface ErrorCodeConstants {
@@ -42,8 +42,7 @@ public interface ErrorCodeConstants {
     ErrorCode REWARD_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1013006004, "满减送活动已关闭，不能重复关闭");
     ErrorCode REWARD_ACTIVITY_CLOSE_FAIL_STATUS_END = new ErrorCode(1013006005, "满减送活动已结束，不能关闭");
 
-    // ========== Price 相关 1013007000 ============
-    ErrorCode PRICE_CALCULATE_PAY_PRICE_ILLEGAL = new ErrorCode(1013007000, "支付价格计算异常，原因：价格小于等于 0");
+    // ========== TODO 空着 1013007000 ============
 
     // ========== 秒杀活动 1013008000 ==========
     ErrorCode SECKILL_ACTIVITY_NOT_EXISTS = new ErrorCode(1013008000, "秒杀活动不存在");
@@ -58,5 +57,13 @@ public interface ErrorCodeConstants {
     ErrorCode SECKILL_TIME_CONFLICTS = new ErrorCode(1013009001, "秒杀时段冲突");
     ErrorCode SECKILL_TIME_EQUAL = new ErrorCode(1013009002, "秒杀时段开始时间和结束时间不能相等");
     ErrorCode SECKILL_START_TIME_BEFORE_END_TIME = new ErrorCode(1013009003, "秒杀时段开始时间不能在结束时间之后");
+    ErrorCode SECKILL_TIME_DISABLE = new ErrorCode(1013009004, "秒杀时段已关闭");
+
+    // ========== 拼团活动 1013010000 ==========
+    ErrorCode COMBINATION_ACTIVITY_NOT_EXISTS = new ErrorCode(1013010000, "拼团活动不存在");
+    ErrorCode COMBINATION_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1013010001, "存在商品参加了其它拼团活动");
+    ErrorCode COMBINATION_ACTIVITY_STATUS_DISABLE = new ErrorCode(1013010002, "拼团活动已关闭不能修改");
+    ErrorCode COMBINATION_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1013010003, "拼团活动未关闭或未结束，不能删除");
+    ErrorCode COMBINATION_RECORD_NOT_EXISTS = new ErrorCode(1013010004, "拼团不存在");
 
 }

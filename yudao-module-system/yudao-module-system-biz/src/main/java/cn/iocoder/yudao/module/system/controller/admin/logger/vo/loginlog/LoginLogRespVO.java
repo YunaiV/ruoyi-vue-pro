@@ -20,7 +20,7 @@ public class LoginLogRespVO extends LoginLogBaseVO {
     @Schema(description = "用户编号", example = "666")
     private Long userId;
 
-    @Schema(description = "用户类型,参见 UserTypeEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @Schema(description = "用户类型，参见 UserTypeEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @NotNull(message = "用户类型不能为空")
     private Integer userType;
 

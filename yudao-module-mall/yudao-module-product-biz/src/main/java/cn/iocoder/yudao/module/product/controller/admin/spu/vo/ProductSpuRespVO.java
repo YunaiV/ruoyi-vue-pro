@@ -7,11 +7,6 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 
-/**
- * 商品 SPU Response VO
- *
- * @author HUIHUI
- */
 @Schema(description = "管理后台 - 商品 SPU Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)

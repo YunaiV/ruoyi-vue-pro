@@ -27,6 +27,10 @@ public interface ErrorCodeConstants {
     ErrorCode ORDER_UPDATE_PAID_FAIL_PAY_PRICE_NOT_MATCH = new ErrorCode(1011000016, "交易订单更新支付状态失败，支付单金额不匹配");
     ErrorCode ORDER_DELIVERY_FAIL_STATUS_NOT_UNDELIVERED = new ErrorCode(1011000017, "交易订单发货失败，订单不是【待发货】状态");
     ErrorCode ORDER_RECEIVE_FAIL_STATUS_NOT_DELIVERED = new ErrorCode(1011000018, "交易订单收货失败，订单不是【待收货】状态");
+    ErrorCode ORDER_COMMENT_FAIL_STATUS_NOT_COMPLETED = new ErrorCode(1011000019, "创建交易订单项的评价失败，订单不是【已完成】状态");
+    ErrorCode ORDER_COMMENT_STATUS_NOT_FALSE = new ErrorCode(1011000020, "创建交易订单项的评价失败，订单已评价");
+    ErrorCode ORDER_DELIVERY_FAIL_REFUND_STATUS_NOT_NONE = new ErrorCode(1011000021, "交易订单发货失败，订单已退款或部分退款");
+    ErrorCode ORDER_DELIVERY_FAIL_COMBINATION_RECORD_STATUS_NOT_SUCCESS = new ErrorCode(1011000022, "交易订单发货失败，拼团未成功");
 
     // ==========  After Sale 模块 1011000100 ==========
     ErrorCode AFTER_SALE_NOT_FOUND = new ErrorCode(1011000100, "售后单不存在");
@@ -63,8 +67,12 @@ public interface ErrorCodeConstants {
     ErrorCode EXPRESS_TEMPLATE_NOT_EXISTS = new ErrorCode(1011005001, "运费模板不存在");
 
     // ==========  物流 PICK_UP 模块 1011006000 ==========
-
     ErrorCode PICK_UP_STORE_NOT_EXISTS = new ErrorCode(1011006000, "自提门店不存在");
 
+    // ==========  物流 PICK_UP 模块 1011007000 ==========
+    // TODO @puhui999：这几个错误码，应该属于订单哈
+    ErrorCode ORDER_DELIVERY_FAILED_ITEMS_NOT_EMPTY = new ErrorCode(1011007000, "订单发货失败，请选择发货商品");
+    ErrorCode ORDER_DELIVERY_FAILED_ITEM_NOT_EXISTS = new ErrorCode(1011007001, "订单发货失败，所选发货商品不存在");
+    ErrorCode ORDER_DELIVERY_FAILED_ITEM_ALREADY_DELIVERY = new ErrorCode(1011007002, "订单发货失败，所选商品已发货");
 
 }

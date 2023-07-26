@@ -35,9 +35,8 @@ public class ProductCommentPageReqVO extends PageParam {
     @InEnum(ProductCommentScoresEnum.class)
     private Integer scores;
 
-    // TODO @puhui999：replyStatus 哈
     @Schema(description = "商家是否回复", example = "true")
-    private Boolean replied;
+    private Boolean replyStatus;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

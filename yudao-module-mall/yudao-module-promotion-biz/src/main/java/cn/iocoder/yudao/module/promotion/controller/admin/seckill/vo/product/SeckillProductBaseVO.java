@@ -14,11 +14,6 @@ import javax.validation.constraints.NotNull;
 @Data
 public class SeckillProductBaseVO {
 
-    // TODO @puhui：spuId 不用传递；因为一个秒杀活动只对应一个 SPU  哈;
-    @Schema(description = "商品spu_id", requiredMode = Schema.RequiredMode.REQUIRED, example = "30563")
-    @NotNull(message = "商品spu_id不能为空")
-    private Long spuId;
-
     @Schema(description = "商品sku_id", requiredMode = Schema.RequiredMode.REQUIRED, example = "30563")
     @NotNull(message = "商品sku_id不能为空")
     private Long skuId;
@@ -30,6 +25,5 @@ public class SeckillProductBaseVO {
     @Schema(description = "秒杀库存", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "秒杀库存不能为空")
     private Integer stock;
-
 
 }

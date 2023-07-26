@@ -43,7 +43,7 @@ public class JobLogBaseVO {
     @Schema(description = "执行时长", example = "123")
     private Integer duration;
 
-    @Schema(description = "任务状态,参见 JobLogStatusEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "任务状态，参见 JobLogStatusEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "任务状态不能为空")
     private Integer status;
 

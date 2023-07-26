@@ -11,11 +11,6 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-/**
- * 商品 SPU 分页 Request VO
- *
- * @author HUIHUI
- */
 @Schema(description = "管理后台 - 商品 SPU 分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)

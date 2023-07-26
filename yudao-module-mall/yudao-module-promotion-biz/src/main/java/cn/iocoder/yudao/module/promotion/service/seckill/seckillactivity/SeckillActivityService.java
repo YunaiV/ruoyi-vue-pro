@@ -79,4 +79,12 @@ public interface SeckillActivityService {
      */
     List<SeckillProductDO> getSeckillProductListByActivityId(Long id);
 
+    /**
+     * 通过活动编号获取活动商品
+     *
+     * @param ids 活动编号
+     * @return 活动商品列表
+     */
+    List<SeckillProductDO> getSeckillProductListByActivityId(Collection<Long> ids);
+
 }

@@ -19,10 +19,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
-* {@link AddressServiceImpl} 的单元测试类
-*
-* @author 芋道源码
-*/
+ * {@link AddressServiceImpl} 的单元测试类
+ *
+ * @author 芋道源码
+ */
 @Import(AddressServiceImpl.class)
 public class AddressServiceImplTest extends BaseDbUnitTest {
 
@@ -82,8 +82,8 @@ public class AddressServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         addressService.deleteAddress(dbAddress.getUserId(), id);
-       // 校验数据不存在了
-       assertNull(addressMapper.selectById(id));
+        // 校验数据不存在了
+        assertNull(addressMapper.selectById(id));
     }
 
     @Test

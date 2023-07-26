@@ -47,11 +47,11 @@ public class SeckillProductDO extends BaseDO {
     @TableField(typeHandler = LongListTypeHandler.class)
     private List<Long> configIds;
     /**
-     * 商品 spu_id
+     * 商品 SPU 编号
      */
     private Long spuId;
     /**
-     * 商品 sku_id
+     * 商品 SKU 编号
      */
     private Long skuId;
     /**

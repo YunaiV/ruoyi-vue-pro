@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.system.convert.auth;
 
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeSendReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeUseReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
@@ -15,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 import static cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO.ID_ROOT;
 
@@ -28,8 +28,8 @@ public interface AuthConvert {
     default AuthPermissionInfoRespVO convert(AdminUserDO user, List<RoleDO> roleList, List<MenuDO> menuList) {
         return AuthPermissionInfoRespVO.builder()
             .user(AuthPermissionInfoRespVO.UserVO.builder().id(user.getId()).nickname(user.getNickname()).avatar(user.getAvatar()).build())
-            .roles(CollectionUtils.convertSet(roleList, RoleDO::getCode))
-            .permissions(CollectionUtils.convertSet(menuList, MenuDO::getPermission))
+            .roles(convertSet(roleList, RoleDO::getCode))
+            .permissions(convertSet(menuList, MenuDO::getPermission))
             .build();
     }
 

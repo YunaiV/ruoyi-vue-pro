@@ -21,7 +21,7 @@ public class SensitiveWordBaseVO {
     @NotNull(message = "标签不能为空")
     private List<String> tags;
 
-    @Schema(description = "状态,参见 CommonStatusEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "状态，参见 CommonStatusEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "状态不能为空")
     private Integer status;
 
