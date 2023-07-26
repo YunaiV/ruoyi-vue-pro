@@ -18,10 +18,10 @@ public class MpUserPageReqVO extends PageParam {
     @NotNull(message = "公众号账号的编号不能为空")
     private Long accountId;
 
-    @Schema(description = "公众号粉丝标识 模糊匹配", example = "o6_bmjrPTlm6_2sgVt7hMZOPfL2M")
+    @Schema(description = "公众号粉丝标识，模糊匹配", example = "o6_bmjrPTlm6_2sgVt7hMZOPfL2M")
     private String openid;
 
-    @Schema(description = "公众号粉丝昵称 模糊匹配", example = "芋艿")
+    @Schema(description = "公众号粉丝昵称，模糊匹配", example = "芋艿")
     private String nickname;
 
 }

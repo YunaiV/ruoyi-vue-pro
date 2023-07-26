@@ -34,7 +34,7 @@ public class OAuth2OpenCheckTokenRespVO {
     @JsonProperty("access_token")
     private String accessToken;
 
-    @Schema(description = "过期时间,时间戳 / 1000，即单位：秒", requiredMode = Schema.RequiredMode.REQUIRED, example = "1593092157")
+    @Schema(description = "过期时间，时间戳 / 1000，即单位：秒", requiredMode = Schema.RequiredMode.REQUIRED, example = "1593092157")
     private Long exp;
 
 }

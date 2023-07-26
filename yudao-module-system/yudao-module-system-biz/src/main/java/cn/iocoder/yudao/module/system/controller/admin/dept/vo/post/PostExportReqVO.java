@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.system.controller.admin.dept.vo.post;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-@Schema(description = "管理后台 - 岗位导出 Request VO,参数和 PostExcelVO 是一致的")
+@Schema(description = "管理后台 - 岗位导出 Request VO，参数和 PostExcelVO 是一致的")
 @Data
 public class PostExportReqVO {
 
