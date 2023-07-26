@@ -119,8 +119,9 @@
 
   <!-- 列表 -->
   <ContentWrap>
-    <el-table v-loading="loading" :data="list">
-    #foreach($column in $columns)
+    <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
+      <el-table-column label="序号" type="index" width="70px" />
+      #foreach($column in $columns)
       #if ($column.listOperationResult)
         #set ($dictType=$column.dictType)
         #set ($javaField = $column.javaField)
@@ -132,19 +133,20 @@
         align="center"
         prop="${javaField}"
         :formatter="dateFormatter"
+        width="150px"
       />
         #elseif("" != $column.dictType)## 数据字典
-      <el-table-column label="${comment}" align="center" prop="${javaField}">
+      <el-table-column label="${comment}" align="center" prop="${javaField}" width="150px">
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="scope.row.${column.javaField}" />
         </template>
       </el-table-column>
         #else
-      <el-table-column label="${comment}" align="center" prop="${javaField}" />
+      <el-table-column label="${comment}" align="center" prop="${javaField}" width="150px"/>
         #end
       #end
     #end
-      <el-table-column label="操作" align="center">
+      <el-table-column label="操作" align="center" width="150px">
         <template #default="scope">
           <el-button
             link

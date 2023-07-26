@@ -202,7 +202,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         }
         // 执行删除
         repositoryService.deleteModel(id);
-        // 禁用流程实例
+        // 禁用流程定义
         updateProcessDefinitionSuspended(model.getDeploymentId());
     }
 

@@ -39,7 +39,7 @@
       </el-form-item>
         #elseif($column.htmlType == "editor")## 文本编辑器
       <el-form-item label="${comment}">
-        <Editor :model-value="formData.${javaField}" height="150px" />
+        <Editor v-model="formData.${javaField}" height="150px" />
       </el-form-item>
         #elseif($column.htmlType == "select")## 下拉框
       <el-form-item label="${comment}" prop="${javaField}">
