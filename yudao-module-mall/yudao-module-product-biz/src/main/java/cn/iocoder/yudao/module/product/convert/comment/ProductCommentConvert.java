@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.convert.comment;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
@@ -19,6 +20,7 @@ import org.mapstruct.factory.Mappers;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 商品评价 Convert
@@ -32,10 +34,12 @@ public interface ProductCommentConvert {
 
     ProductCommentRespVO convert(ProductCommentDO bean);
 
-    // TODO @puhui999：这里貌似字段对上，就不用 mapping 了；可以测试下看看哈
-    @Mapping(target = "goodCount", source = "goodCount")
-    @Mapping(target = "mediocreCount", source = "mediocreCount")
-    @Mapping(target = "negativeCount", source = "negativeCount")
+    @Named("calculateOverallScore")
+    default double calculateOverallScore(long goodCount, long mediocreCount, long negativeCount) {
+        return (goodCount * 5 + mediocreCount * 3 + negativeCount) / (double) (goodCount + mediocreCount + negativeCount);
+    }
+
+    @Mapping(target = "scores", expression = "java(calculateOverallScore(goodCount, mediocreCount, negativeCount))")
     AppCommentStatisticsRespVO convert(Long goodCount, Long mediocreCount, Long negativeCount);
 
     List<ProductCommentRespVO> convertList(List<ProductCommentDO> list);
@@ -44,7 +48,23 @@ public interface ProductCommentConvert {
 
     PageResult<ProductCommentRespVO> convertPage(PageResult<ProductCommentDO> page);
 
-    PageResult<AppProductCommentRespVO> convertPage02(PageResult<ProductCommentDO> pageResult);
+    PageResult<AppProductCommentRespVO> convertPage01(PageResult<ProductCommentDO> pageResult);
+
+    default PageResult<AppProductCommentRespVO> convertPage02(PageResult<ProductCommentDO> pageResult, Map<Long, ProductSkuDO> skuDOMap) {
+        PageResult<AppProductCommentRespVO> page = convertPage01(pageResult);
+        page.getList().forEach(item -> {
+            // 判断用户是否选择匿名
+            if (ObjectUtil.equal(item.getAnonymous(), true)) {
+                item.setUserNickname(ProductCommentDO.NICKNAME_ANONYMOUS);
+            }
+            ProductSkuDO productSkuDO = skuDOMap.get(item.getSkuId());
+            if (productSkuDO != null) {
+                List<AppProductPropertyValueDetailRespVO> skuProperties = ProductCommentConvert.INSTANCE.convertList01(productSkuDO.getProperties());
+                item.setSkuProperties(skuProperties);
+            }
+        });
+        return page;
+    }
 
     /**
      * 计算综合评分

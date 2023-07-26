@@ -10,7 +10,6 @@ import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommen
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentUpdateVisibleReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentStatisticsRespVO;
-import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppProductCommentRespVO;
 import cn.iocoder.yudao.module.product.convert.comment.ProductCommentConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
 import cn.iocoder.yudao.module.product.dal.mysql.comment.ProductCommentMapper;
@@ -128,7 +127,7 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
         productCommentPageReqVO.setSpuId(spuId);
         productCommentPageReqVO.setSpuName("感冒药");
         productCommentPageReqVO.setScores(ProductCommentScoresEnum.FOUR.getScores());
-        productCommentPageReqVO.setReplied(Boolean.TRUE);
+        productCommentPageReqVO.setReplyStatus(Boolean.TRUE);
 
         PageResult<ProductCommentDO> commentPage = productCommentService.getCommentPage(productCommentPageReqVO);
         PageResult<ProductCommentRespVO> result = ProductCommentConvert.INSTANCE.convertPage(productCommentMapper.selectPage(productCommentPageReqVO));
@@ -138,15 +137,15 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
         assertEquals(8, all.getTotal());
 
         // 测试获取所有商品分页评论数据
-        PageResult<AppProductCommentRespVO> result1 = productCommentService.getCommentPage(new AppCommentPageReqVO(), Boolean.TRUE);
+        PageResult<ProductCommentDO> result1 = productCommentService.getCommentPage(new AppCommentPageReqVO(), Boolean.TRUE);
         assertEquals(7, result1.getTotal());
 
         // 测试获取所有商品分页中评数据
-        PageResult<AppProductCommentRespVO> result2 = productCommentService.getCommentPage(new AppCommentPageReqVO().setType(AppCommentPageReqVO.MEDIOCRE_COMMENT), Boolean.TRUE);
+        PageResult<ProductCommentDO> result2 = productCommentService.getCommentPage(new AppCommentPageReqVO().setType(AppCommentPageReqVO.MEDIOCRE_COMMENT), Boolean.TRUE);
         assertEquals(2, result2.getTotal());
 
         // 测试获取指定 spuId 商品分页中评数据
-        PageResult<AppProductCommentRespVO> result3 = productCommentService.getCommentPage(new AppCommentPageReqVO().setSpuId(spuId).setType(AppCommentPageReqVO.MEDIOCRE_COMMENT), Boolean.TRUE);
+        PageResult<ProductCommentDO> result3 = productCommentService.getCommentPage(new AppCommentPageReqVO().setSpuId(spuId).setType(AppCommentPageReqVO.MEDIOCRE_COMMENT), Boolean.TRUE);
         assertEquals(2, result3.getTotal());
 
         // 测试分页 tab count

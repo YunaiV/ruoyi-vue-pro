@@ -19,11 +19,6 @@ public class AppTradeOrderItemCommentCreateReqVO {
     @NotNull(message = "交易订单项编号不能为空")
     private Long orderItemId;
 
-    // TODO @puhui999：貌似不用这个字段哈；
-    @Schema(description = "评分星级 1-5 分", requiredMode = Schema.RequiredMode.REQUIRED, example = "5")
-    @NotNull(message = "评分星级 1-5 分不能为空")
-    private Integer scores;
-
     @Schema(description = "描述星级 1-5 分", requiredMode = Schema.RequiredMode.REQUIRED, example = "5")
     @NotNull(message = "描述星级 1-5 分不能为空")
     private Integer descriptionScores;

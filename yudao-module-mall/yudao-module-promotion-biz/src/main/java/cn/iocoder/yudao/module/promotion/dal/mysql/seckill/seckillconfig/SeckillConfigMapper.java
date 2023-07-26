@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.Seck
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillconfig.SeckillConfigDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface SeckillConfigMapper extends BaseMapperX<SeckillConfigDO> {
 
@@ -16,5 +18,10 @@ public interface SeckillConfigMapper extends BaseMapperX<SeckillConfigDO> {
                 .eqIfPresent(SeckillConfigDO::getStatus, reqVO.getStatus())
                 .orderByDesc(SeckillConfigDO::getId));
     }
+
+    default List<SeckillConfigDO> selectListByStatus(Integer status) {
+        return selectList(SeckillConfigDO::getStatus, status);
+    }
+
 
 }

@@ -4,6 +4,7 @@ import cn.hutool.core.date.LocalDateTimeUtil;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 /**
  * 时间工具类，用于 {@link java.time.LocalDateTime}
@@ -50,7 +51,7 @@ public class LocalDateTimeUtils {
      * 判断当前时间是否在该时间范围内
      *
      * @param startTime 开始时间
-     * @param endTime 结束时间
+     * @param endTime   结束时间
      * @return 是否
      */
     public static boolean isBetween(LocalDateTime startTime, LocalDateTime endTime) {
@@ -58,6 +59,25 @@ public class LocalDateTimeUtils {
             return false;
         }
         return LocalDateTimeUtil.isIn(LocalDateTime.now(), startTime, endTime);
+    }
+
+    /**
+     * 检查时间重叠 不包含日期
+     *
+     * @param startTime1 需要校验的开始时间
+     * @param endTime1   需要校验的结束时间
+     * @param startTime2 校验所需的开始时间
+     * @param endTime2   校验所需的结束时间
+     * @return 是否重叠
+     */
+    public static boolean checkTimeOverlap(LocalTime startTime1, LocalTime endTime1, LocalTime startTime2, LocalTime endTime2) {
+        // 判断时间是否重叠
+        // 开始时间在已配置时段的结束时间之前 且 结束时间在已配置时段的开始时间之后 []
+        return startTime1.isBefore(endTime2) && endTime1.isAfter(startTime2)
+                // 开始时间在已配置时段的开始时间之前 且 结束时间在已配置时段的开始时间之后 (] 或 ()
+                || startTime1.isBefore(startTime2) && endTime1.isAfter(startTime2)
+                // 开始时间在已配置时段的结束时间之前 且 结束时间在已配值时段的结束时间之后 [) 或 ()
+                || startTime1.isBefore(endTime2) && endTime1.isAfter(endTime2);
     }
 
 }

@@ -90,7 +90,7 @@ public interface ProductSkuService {
      * @param spuIds spu 编码集合
      * @return 商品 sku 集合
      */
-    List<ProductSkuDO> getSkuListBySpuId(List<Long> spuIds);
+    List<ProductSkuDO> getSkuListBySpuId(Collection<Long> spuIds);
 
     /**
      * 通过 spuId 删除 sku 信息

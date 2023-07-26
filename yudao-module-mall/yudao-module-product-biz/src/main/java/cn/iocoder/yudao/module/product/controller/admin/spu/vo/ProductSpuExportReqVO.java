@@ -10,11 +10,6 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-/**
- * 商品Spu导出 Request VO,参数和 ProductSpuPageReqVO 是一致的
- *
- * @author HUIHUI
- */
 @Schema(description = "管理后台 - 商品Spu导出 Request VO,参数和 ProductSpuPageReqVO 是一致的")
 @Data
 @NoArgsConstructor

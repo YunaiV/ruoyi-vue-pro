@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreate
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 
@@ -177,4 +178,14 @@ public interface TradeOrderService {
      * @return 得到订单
      */
     TradeOrderDO getOrderByIdAndUserId(Long orderId, Long loginUserId);
+
+    /**
+     * 创建订单项评论
+     * 创建交易订单项的评价
+     *
+     * @param createReqVO 创建请求
+     * @return 得到评价 id
+     */
+    Long createOrderItemComment(AppTradeOrderItemCommentCreateReqVO createReqVO);
+
 }

@@ -1,18 +1,18 @@
 package cn.iocoder.yudao.module.product.controller.app.comment;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentStatisticsRespVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppProductCommentRespVO;
-import cn.iocoder.yudao.module.product.controller.app.property.vo.value.AppProductPropertyValueDetailRespVO;
 import cn.iocoder.yudao.module.product.convert.comment.ProductCommentConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.service.comment.ProductCommentService;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
+import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -26,11 +26,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -61,26 +59,14 @@ public class AppProductCommentController {
     @GetMapping("/page")
     @Operation(summary = "获得商品评价分页")
     public CommonResult<PageResult<AppProductCommentRespVO>> getCommentPage(@Valid AppCommentPageReqVO pageVO) {
-        PageResult<AppProductCommentRespVO> page = productCommentService.getCommentPage(pageVO, Boolean.TRUE);
-        // TODO @puhui CollUtils 有简化 convertmap 和 list 的方法
-        Set<Long> skuIds = page.getList().stream().map(AppProductCommentRespVO::getSkuId).collect(Collectors.toSet());
+        PageResult<ProductCommentDO> commentDOPage = productCommentService.getCommentPage(pageVO, Boolean.TRUE);
+        Set<Long> skuIds = CollectionUtils.convertSet(commentDOPage.getList(), ProductCommentDO::getSkuId);
         List<ProductSkuDO> skuList = productSkuService.getSkuList(skuIds);
-        Map<Long, ProductSkuDO> skuDOMap = new HashMap<>(skuIds.size());
+        Map<Long, ProductSkuDO> skuDOMap = Maps.newLinkedHashMapWithExpectedSize(skuIds.size());
         if (CollUtil.isNotEmpty(skuList)) {
-            skuDOMap.putAll(skuList.stream().collect(Collectors.toMap(ProductSkuDO::getId, c -> c)));
+            skuDOMap.putAll(CollectionUtils.convertMap(skuList, ProductSkuDO::getId, c -> c));
         }
-        // TODO @puihui999：下面也可以放到 convert 里哈
-        page.getList().forEach(item -> {
-            // 判断用户是否选择匿名
-            if (ObjectUtil.equal(item.getAnonymous(), true)) {
-                item.setUserNickname(ProductCommentDO.NICKNAME_ANONYMOUS);
-            }
-            ProductSkuDO productSkuDO = skuDOMap.get(item.getSkuId());
-            if (productSkuDO != null) {
-                List<AppProductPropertyValueDetailRespVO> skuProperties = ProductCommentConvert.INSTANCE.convertList01(productSkuDO.getProperties());
-                item.setSkuProperties(skuProperties);
-            }
-        });
+        PageResult<AppProductCommentRespVO> page = ProductCommentConvert.INSTANCE.convertPage02(commentDOPage, skuDOMap);
         return success(page);
     }
 

@@ -17,24 +17,30 @@ import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
+import cn.iocoder.yudao.module.product.api.comment.ProductCommentApi;
+import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.CombinationApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponUseReqDTO;
+import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
 import cn.iocoder.yudao.module.system.api.notify.NotifyMessageSendApi;
 import cn.iocoder.yudao.module.system.api.notify.dto.NotifySendSingleToUserReqDTO;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.cart.TradeCartDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDeliveryDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
+import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderDeliveryMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderItemMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
 import cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants;
@@ -57,6 +63,7 @@ import java.util.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getSumValue;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.ORDER_NOT_FOUND;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
@@ -93,13 +100,17 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     @Resource
     private MemberUserApi memberUserApi;
     @Resource
-    private AdminUserApi adminUserApi;
+    private ProductCommentApi productCommentApi;
     @Resource
     private NotifyMessageSendApi notifyMessageSendApi;
 
     @Resource
     private TradeOrderProperties tradeOrderProperties;
 
+    @Resource
+    private CombinationApi combinationApi;
+    @Resource
+    private TradeOrderDeliveryMapper orderDeliveryMapper;
     // =================== Order ===================
 
     @Override
@@ -153,19 +164,27 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public TradeOrderDO createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO) {
-        // 1. 用户收件地址的校验
-        AddressRespDTO address = validateAddress(userId, createReqVO.getAddressId());
-
         // 2. 价格计算
         TradePriceCalculateRespBO calculateRespBO = calculatePrice(userId, createReqVO);
-
         // 3.1 插入 TradeOrderDO 订单
-        TradeOrderDO order = createTradeOrder(userId, userIp, createReqVO, calculateRespBO, address);
+        TradeOrderDO order = createTradeOrder(userId, userIp, createReqVO, calculateRespBO);
         // 3.2 插入 TradeOrderItemDO 订单项
         List<TradeOrderItemDO> orderItems = createTradeOrderItems(order, calculateRespBO);
-
         // 订单创建完后的逻辑
         afterCreateTradeOrder(userId, createReqVO, order, orderItems, calculateRespBO);
+        // 3.3 校验订单类型
+        // 拼团
+        if (ObjectUtil.equal(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
+            MemberUserRespDTO user = memberUserApi.getUser(userId);
+            // TODO 拼团一次应该只能选择一种规格的商品
+            combinationApi.createRecord(TradeOrderConvert.INSTANCE.convert(order, orderItems.get(0), createReqVO, user)
+                    .setStatus(CombinationRecordStatusEnum.NOT_PAY.getStatus()));
+        }
+        // TODO 秒杀扣减库存是下单就扣除还是等待订单支付成功再扣除
+        if (ObjectUtil.equal(TradeOrderTypeEnum.SECKILL.getType(), order.getType())) {
+
+        }
+
         // TODO @LeeYan9: 是可以思考下, 订单的营销优惠记录, 应该记录在哪里, 微信讨论起来!
         return order;
     }
@@ -185,19 +204,42 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         return address;
     }
 
+    /**
+     * 校验活动返回订单类型
+     *
+     * @param createReqVO 请求参数
+     * @return 订单类型
+     */
+    private Integer validateActivity(AppTradeOrderCreateReqVO createReqVO) {
+        if (createReqVO.getSeckillActivityId() != null) {
+            return TradeOrderTypeEnum.SECKILL.getType();
+        }
+        if (createReqVO.getCombinationActivityId() != null) {
+            return TradeOrderTypeEnum.COMBINATION.getType();
+        }
+        // TODO 砍价敬请期待
+        return TradeOrderTypeEnum.NORMAL.getType();
+    }
+
     private TradeOrderDO createTradeOrder(Long userId, String clientIp, AppTradeOrderCreateReqVO createReqVO,
-                                          TradePriceCalculateRespBO calculateRespBO, AddressRespDTO address) {
+                                          TradePriceCalculateRespBO calculateRespBO) {
+        // 用户选择物流配送的时候才需要填写收货地址
+        AddressRespDTO address = new AddressRespDTO();
+        if (ObjectUtil.equal(createReqVO.getDeliveryType(), DeliveryTypeEnum.EXPRESS.getMode())) {
+            // 用户收件地址的校验
+            address = validateAddress(userId, createReqVO.getAddressId());
+        }
         TradeOrderDO order = TradeOrderConvert.INSTANCE.convert(userId, clientIp, createReqVO, calculateRespBO, address);
+        order.setType(validateActivity(createReqVO));
         order.setNo(IdUtil.getSnowflakeNextId() + ""); // TODO @LeeYan9: 思考下, 怎么生成好点哈; 这个是会展示给用户的;
         order.setStatus(TradeOrderStatusEnum.UNPAID.getStatus());
-        order.setType(TradeOrderTypeEnum.NORMAL.getType());
         order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus());
         order.setProductCount(getSumValue(calculateRespBO.getItems(), TradePriceCalculateRespBO.OrderItem::getCount, Integer::sum));
         order.setTerminal(TerminalEnum.H5.getTerminal()); // todo 数据来源?
         // 支付信息
         order.setAdjustPrice(0).setPayStatus(false);
         // 物流信息 TODO 芋艿：暂时写死物流方式；应该是前端选择的
-        order.setDeliveryType(DeliveryTypeEnum.EXPRESS.getMode()).setDeliveryStatus(TradeOrderDeliveryStatusEnum.UNDELIVERED.getStatus());
+        order.setDeliveryType(createReqVO.getDeliveryType()).setDeliveryStatus(TradeOrderDeliveryStatusEnum.UNDELIVERED.getStatus());
         // 退款信息
         order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus()).setRefundPrice(0);
         tradeOrderMapper.insert(order);
@@ -212,7 +254,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
     /**
      * 执行创建完创建完订单后的逻辑
-     * <p>
+     *
      * 例如说：优惠劵的扣减、积分的扣减、支付单的创建等等
      *
      * @param userId          用户编号
@@ -254,6 +296,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateOrderPaid(Long id, Long payOrderId) {
         // 校验并获得交易订单（可支付）
         KeyValue<TradeOrderDO, PayOrderRespDTO> orderResult = validateOrderPayable(id, payOrderId);
@@ -267,7 +310,12 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         if (updateCount == 0) {
             throw exception(ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
-
+        // 校验活动
+        // 1、拼团活动
+        if (ObjectUtil.equal(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
+            // 更新拼团状态 TODO puhui999：订单支付失败或订单支付过期删除这条拼团记录
+            combinationApi.updateRecordStatusAndStartTime(order.getUserId(), order.getId(), CombinationRecordStatusEnum.ONGOING.getStatus());
+        }
         // TODO 芋艿：发送订单变化的消息
 
         // TODO 芋艿：发送站内信
@@ -277,7 +325,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
     /**
      * 校验交易订单满足被支付的条件
-     * <p>
+     *
      * 1. 交易订单未支付
      * 2. 支付单已支付
      *
@@ -308,7 +356,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         PayOrderRespDTO payOrder = payOrderApi.getOrder(payOrderId);
         if (payOrder == null) {
             log.error("[validateOrderPaid][order({}) payOrder({}) 不存在，请进行处理！]", id, payOrderId);
-            throw exception(cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.ORDER_NOT_FOUND);
+            throw exception(ORDER_NOT_FOUND);
         }
         // 校验支付单已支付
         if (!PayOrderStatusEnum.isSuccess(payOrder.getStatus())) {
@@ -331,29 +379,50 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         return new KeyValue<>(order, payOrder);
     }
 
-    // TODO 芋艿：如果无需发货，需要怎么存储？
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deliveryOrder(Long userId, TradeOrderDeliveryReqVO deliveryReqVO) {
         // 校验并获得交易订单（可发货）
         TradeOrderDO order = validateOrderDeliverable(deliveryReqVO.getId());
-        // TODO 芋艿：logisticsId 校验存在 发货物流公司 fix
-        DeliveryExpressDO deliveryExpress = deliveryExpressService.getDeliveryExpress(deliveryReqVO.getLogisticsId());
-        if (deliveryExpress == null) {
-            throw exception(EXPRESS_NOT_EXISTS);
+
+        TradeOrderDO tradeOrderDO = new TradeOrderDO();
+        List<TradeOrderDeliveryDO> deliveryDOs = new ArrayList<>();
+        /* TODO
+         * fix: 首先需要店铺设置配送方式如： 自提 、配送、物流-配送、物流-配送-自提、商家配送
+         * 1.如果店铺有设置配送方式用户只填写收货地址的情况下店家后台自己选择配送方式
+         * 2.如果店铺只支持到店自提那么下单后默认发货不需要物流
+         * 3.如果店铺支持 物流-配送-自提 的情况下后台不需要选择配送方式按前端用户选择的配送方式发货即可
+         */
+        // 判断发货类型
+        // 快递发货
+        if (ObjectUtil.equal(deliveryReqVO.getType(), DeliveryTypeEnum.EXPRESS.getMode())) {
+            deliveryDOs = express(order, deliveryReqVO);
+            tradeOrderDO.setLogisticsId(deliveryReqVO.getLogisticsId()).setLogisticsNo(deliveryReqVO.getLogisticsNo());
+        }
+        // 用户自提
+        if (ObjectUtil.equal(deliveryReqVO.getType(), DeliveryTypeEnum.PICK_UP.getMode())) {
+            deliveryDOs = pickUp(order, deliveryReqVO);
+            // 重置一下确保快递公司和快递单号为空
+            tradeOrderDO.setLogisticsId(null).setLogisticsNo("");
+        }
+        // TODO 芋艿：如果无需发货，需要怎么存储？
+        if (ObjectUtil.equal(deliveryReqVO.getType(), DeliveryTypeEnum.NULL.getMode())) {
+            // TODO 情况一：正常走发货逻辑和用户自提有点像 不同点：不需要自提门店只需要用户确认收货
+            // TODO 情况二：用户下单付款后直接确认收货或等待用户确认收货
         }
 
         // 更新 TradeOrderDO 状态为已发货，等待收货
-        int updateCount = tradeOrderMapper.updateByIdAndStatus(order.getId(), order.getStatus(),
-                new TradeOrderDO().setStatus(TradeOrderStatusEnum.DELIVERED.getStatus())
-                        .setLogisticsId(deliveryReqVO.getLogisticsId()).setLogisticsNo(deliveryReqVO.getLogisticsNo())
-                        .setDeliveryStatus(TradeOrderDeliveryStatusEnum.DELIVERED.getStatus()).setDeliveryTime(LocalDateTime.now()));
+        tradeOrderDO.setStatus(TradeOrderStatusEnum.DELIVERED.getStatus())
+                .setDeliveryStatus(TradeOrderDeliveryStatusEnum.DELIVERED.getStatus()).setDeliveryTime(LocalDateTime.now());
+        int updateCount = tradeOrderMapper.updateByIdAndStatus(order.getId(), order.getStatus(), tradeOrderDO);
         if (updateCount == 0) {
             throw exception(ORDER_DELIVERY_FAIL_STATUS_NOT_UNDELIVERED);
         }
-
+        // 发货成功记录发货表
+        orderDeliveryMapper.insertBatch(deliveryDOs);
         // TODO 芋艿：发送订单变化的消息
 
-        // TODO 芋艿：发送站内信 fix
+        // 发送站内信
         // 1、构造消息
         Map<String, Object> msgMap = new HashMap<>();
         msgMap.put("orderId", deliveryReqVO.getId());
@@ -364,16 +433,59 @@ public class TradeOrderServiceImpl implements TradeOrderService {
                         .setUserId(userId)
                         .setTemplateCode("order_delivery")
                         .setTemplateParams(msgMap));
-        // TODO 芋艿：OrderLog
 
-        // TODO 设计：like：是否要单独一个 delivery 发货单表？？？
-        // TODO 设计：niu：要不要支持一个订单下，多个 order item 单独发货，类似有赞
+        // TODO 芋艿：OrderLog
         // TODO 设计：lili：是不是发货后，才支持售后？
+    }
+
+    private List<TradeOrderDeliveryDO> express(TradeOrderDO order, TradeOrderDeliveryReqVO deliveryReqVO) {
+        // 校验快递公司
+        DeliveryExpressDO deliveryExpress = deliveryExpressService.getDeliveryExpress(deliveryReqVO.getLogisticsId());
+        if (deliveryExpress == null) {
+            throw exception(EXPRESS_NOT_EXISTS);
+        }
+        // 校验发货商品
+        validateDeliveryOrderItem(order, deliveryReqVO);
+        // 创建发货记录
+        return TradeOrderConvert.INSTANCE.covert(order, deliveryReqVO);
+    }
+
+    private List<TradeOrderDeliveryDO> pickUp(TradeOrderDO order, TradeOrderDeliveryReqVO deliveryReqVO) {
+        // TODO 校验自提门店是否存在
+        // 重置一下确保快递公司和快递单号为空
+        deliveryReqVO.setLogisticsId(null);
+        deliveryReqVO.setLogisticsNo("");
+        // 校验发货商品
+        validateDeliveryOrderItem(order, deliveryReqVO);
+        // 创建发货记录
+        return TradeOrderConvert.INSTANCE.covert(order, deliveryReqVO);
+    }
+
+    private void validateDeliveryOrderItem(TradeOrderDO order, TradeOrderDeliveryReqVO deliveryReqVO) {
+        // TODO 设计：like：是否要单独一个 delivery 发货单表？？？ fix: 多商品可分开单独发货，添加 trade_order_delivery 交易订单发货日志表关联发货所选订单项设置物流单号
+        // TODO 设计：niu：要不要支持一个订单下，多个 order item 单独发货，类似有赞 fix
+        // 校验发货商品
+        if (CollUtil.isEmpty(deliveryReqVO.getOrderItemIds())) {
+            throw exception(ORDER_DELIVERY_FAILED_ITEMS_NOT_EMPTY);
+        }
+        // 校验发货商品是否存在
+        List<TradeOrderItemDO> orderItemDOs = tradeOrderItemMapper.selectListByOrderId(order.getId());
+        Set<Long> itemIds = convertSet(orderItemDOs, TradeOrderItemDO::getId);
+        if (!itemIds.containsAll(deliveryReqVO.getOrderItemIds())) {
+            throw exception(ORDER_DELIVERY_FAILED_ITEM_NOT_EXISTS);
+        }
+        // 校验所选订单项是否存在有已发货的
+        List<TradeOrderDeliveryDO> deliveryDOList = orderDeliveryMapper.selsectListByOrderIdAndItemIds(order.getId(), deliveryReqVO.getOrderItemIds());
+        if (CollUtil.isNotEmpty(deliveryDOList)) {
+            HashSet<Long> hashSet = CollUtil.newHashSet(deliveryReqVO.getOrderItemIds());
+            hashSet.retainAll(convertSet(deliveryDOList, TradeOrderDeliveryDO::getOrderItemId));
+            throw exception(ORDER_DELIVERY_FAILED_ITEM_ALREADY_DELIVERY);
+        }
     }
 
     /**
      * 校验交易订单满足被发货的条件
-     * <p>
+     *
      * 1. 交易订单未发货
      *
      * @param id 交易订单编号
@@ -390,6 +502,19 @@ public class TradeOrderServiceImpl implements TradeOrderService {
                 || ObjectUtil.notEqual(order.getDeliveryStatus(), TradeOrderDeliveryStatusEnum.UNDELIVERED.getStatus())) {
             throw exception(ORDER_DELIVERY_FAIL_STATUS_NOT_UNDELIVERED);
         }
+        // 校验订单是否退款
+        if (ObjectUtil.notEqual(TradeOrderRefundStatusEnum.NONE.getStatus(), order.getRefundStatus())) {
+            throw exception(ORDER_DELIVERY_FAIL_REFUND_STATUS_NOT_NONE);
+        }
+        // 订单类型：拼团
+        if (ObjectUtil.equal(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
+            // 校验订单拼团是否成功
+            // TODO 用户 ID 使用当前登录用户的还是订单保存的？
+            if (combinationApi.validateRecordStatusIsSuccess(order.getUserId(), order.getId())) {
+                throw exception(ORDER_DELIVERY_FAIL_COMBINATION_RECORD_STATUS_NOT_SUCCESS);
+            }
+        }
+        // TODO puhui999: 校验订单砍价是否成功
         return order;
     }
 
@@ -421,7 +546,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
     /**
      * 校验交易订单满足可售货的条件
-     * <p>
+     *
      * 1. 交易订单待收货
      *
      * @param userId 用户编号
@@ -554,6 +679,30 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     @Override
     public TradeOrderDO getOrderByIdAndUserId(Long orderId, Long loginUserId) {
         return tradeOrderMapper.selectOrderByIdAndUserId(orderId, loginUserId);
+    }
+
+    @Override
+    public Long createOrderItemComment(AppTradeOrderItemCommentCreateReqVO createReqVO) {
+        Long loginUserId = getLoginUserId();
+        // 先通过订单项 ID 查询订单项是否存在
+        TradeOrderItemDO orderItemDO = getOrderItemByIdAndUserId(createReqVO.getOrderItemId(), loginUserId);
+        if (orderItemDO == null) {
+            throw exception(ORDER_ITEM_NOT_FOUND);
+        }
+        // 校验订单
+        TradeOrderDO orderDO = getOrderByIdAndUserId(orderItemDO.getOrderId(), loginUserId);
+        if (orderDO == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+        if (ObjectUtil.notEqual(orderDO.getStatus(), TradeOrderStatusEnum.COMPLETED.getStatus())) {
+            throw exception(ORDER_COMMENT_FAIL_STATUS_NOT_COMPLETED);
+        }
+        if (ObjectUtil.notEqual(orderDO.getCommentStatus(), Boolean.FALSE)) {
+            throw exception(ORDER_COMMENT_STATUS_NOT_FALSE);
+        }
+
+        ProductCommentCreateReqDTO productCommentCreateReqDTO = TradeOrderConvert.INSTANCE.convert04(createReqVO, orderItemDO);
+        return productCommentApi.createComment(productCommentCreateReqDTO);
     }
 
     /**
