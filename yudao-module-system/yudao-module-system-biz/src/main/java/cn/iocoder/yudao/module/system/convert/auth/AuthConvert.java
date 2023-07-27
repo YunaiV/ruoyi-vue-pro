@@ -27,10 +27,11 @@ public interface AuthConvert {
 
     default AuthPermissionInfoRespVO convert(AdminUserDO user, List<RoleDO> roleList, List<MenuDO> menuList) {
         return AuthPermissionInfoRespVO.builder()
-            .user(AuthPermissionInfoRespVO.UserVO.builder().id(user.getId()).nickname(user.getNickname()).avatar(user.getAvatar()).build())
-            .roles(convertSet(roleList, RoleDO::getCode))
-            .permissions(convertSet(menuList, MenuDO::getPermission))
-            .build();
+                .user(AuthPermissionInfoRespVO.UserVO.builder().id(user.getId()).nickname(user.getNickname())
+                        .avatar(user.getAvatar()).build())
+                .roles(convertSet(roleList, RoleDO::getCode))
+                .permissions(convertSet(menuList, MenuDO::getPermission))
+                .build();
     }
 
     AuthMenuRespVO convertTreeNode(MenuDO menu);

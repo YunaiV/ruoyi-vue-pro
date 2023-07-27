@@ -298,7 +298,7 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
     }
 
     private Set<Long> calculateTaskCandidateUsersByPost(BpmTaskAssignRuleDO rule) {
-        List<AdminUserRespDTO> users = adminUserApi.getUsersByPostIds(rule.getOptions());
+        List<AdminUserRespDTO> users = adminUserApi.getUserListByPostIds(rule.getOptions());
         return convertSet(users, AdminUserRespDTO::getId);
     }
 
