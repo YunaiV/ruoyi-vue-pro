@@ -148,7 +148,7 @@ public class AdminAuthServiceImplTest extends BaseDbUnitTest {
         );
     }
 
-        @Test
+    @Test
     public void testLogin_success() {
         // 准备参数
         AuthLoginReqVO reqVO = randomPojo(AuthLoginReqVO.class, o ->
@@ -174,9 +174,9 @@ public class AdminAuthServiceImplTest extends BaseDbUnitTest {
         assertPojoEquals(accessTokenDO, loginRespVO);
         // 校验调用参数
         verify(loginLogService).createLoginLog(
-            argThat(o -> o.getLogType().equals(LoginLogTypeEnum.LOGIN_USERNAME.getType())
-                    && o.getResult().equals(LoginResultEnum.SUCCESS.getResult())
-                    && o.getUserId().equals(user.getId()))
+                argThat(o -> o.getLogType().equals(LoginLogTypeEnum.LOGIN_USERNAME.getType())
+                        && o.getResult().equals(LoginResultEnum.SUCCESS.getResult())
+                        && o.getUserId().equals(user.getId()))
         );
         verify(socialUserService).bindSocialUser(eq(new SocialUserBindReqDTO(
                 user.getId(), UserTypeEnum.ADMIN.getValue(),
@@ -317,8 +317,8 @@ public class AdminAuthServiceImplTest extends BaseDbUnitTest {
         assertServiceException(() -> authService.validateCaptcha(reqVO), AUTH_LOGIN_CAPTCHA_CODE_ERROR, "就是不对");
         // 校验调用参数
         verify(loginLogService).createLoginLog(
-            argThat(o -> o.getLogType().equals(LoginLogTypeEnum.LOGIN_USERNAME.getType())
-                    && o.getResult().equals(LoginResultEnum.CAPTCHA_CODE_ERROR.getResult()))
+                argThat(o -> o.getLogType().equals(LoginLogTypeEnum.LOGIN_USERNAME.getType())
+                        && o.getResult().equals(LoginResultEnum.CAPTCHA_CODE_ERROR.getResult()))
         );
     }
 
@@ -349,8 +349,9 @@ public class AdminAuthServiceImplTest extends BaseDbUnitTest {
         // 调用
         authService.logout(token, LoginLogTypeEnum.LOGOUT_SELF.getType());
         // 校验调用参数
-        verify(loginLogService).createLoginLog(argThat(o -> o.getLogType().equals(LoginLogTypeEnum.LOGOUT_SELF.getType())
-                    && o.getResult().equals(LoginResultEnum.SUCCESS.getResult()))
+        verify(loginLogService).createLoginLog(
+                argThat(o -> o.getLogType().equals(LoginLogTypeEnum.LOGOUT_SELF.getType())
+                        && o.getResult().equals(LoginResultEnum.SUCCESS.getResult()))
         );
         // 调用，并校验
 

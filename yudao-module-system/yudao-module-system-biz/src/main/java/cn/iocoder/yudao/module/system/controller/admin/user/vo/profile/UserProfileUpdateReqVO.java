@@ -25,7 +25,7 @@ public class UserProfileUpdateReqVO {
     @Length(min = 11, max = 11, message = "手机号长度必须 11 位")
     private String mobile;
 
-    @Schema(description = "用户性别-参见 SexEnum 枚举类", example = "1")
+    @Schema(description = "用户性别，参见 SexEnum 枚举类", example = "1")
     private Integer sex;
 
 }

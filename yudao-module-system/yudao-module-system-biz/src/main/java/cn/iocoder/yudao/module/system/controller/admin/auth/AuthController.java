@@ -149,7 +149,7 @@ public class AuthController {
             @Parameter(name = "redirectUri", description = "回调路径")
     })
     public CommonResult<String> socialLogin(@RequestParam("type") Integer type,
-                                                    @RequestParam("redirectUri") String redirectUri) {
+                                            @RequestParam("redirectUri") String redirectUri) {
         return CommonResult.success(socialUserService.getAuthorizeUrl(type, redirectUri));
     }
 

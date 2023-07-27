@@ -197,8 +197,8 @@ public class MenuServiceImpl implements MenuService {
             return Collections.emptyList();
         }
         return menuCache.values().stream().filter(menu -> menuIds.contains(menu.getId())
-                && menuTypes.contains(menu.getType())
-                && menusStatuses.contains(menu.getStatus()))
+                        && menuTypes.contains(menu.getType())
+                        && menusStatuses.contains(menu.getStatus()))
                 .collect(Collectors.toList());
     }
 

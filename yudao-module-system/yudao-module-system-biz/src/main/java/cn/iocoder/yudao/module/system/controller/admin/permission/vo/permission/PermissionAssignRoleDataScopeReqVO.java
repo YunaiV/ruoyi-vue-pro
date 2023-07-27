@@ -20,7 +20,7 @@ public class PermissionAssignRoleDataScopeReqVO {
 //    TODO 这里要多一个枚举校验
     private Integer dataScope;
 
-    @Schema(description = "部门编号列表,只有范围类型为 DEPT_CUSTOM 时，该字段才需要", example = "1,3,5")
+    @Schema(description = "部门编号列表，只有范围类型为 DEPT_CUSTOM 时，该字段才需要", example = "1,3,5")
     private Set<Long> dataScopeDeptIds = Collections.emptySet(); // 兜底
 
 }

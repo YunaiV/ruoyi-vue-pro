@@ -52,7 +52,8 @@ public class YudaoSwaggerAutoConfiguration {
                 // 接口信息
                 .info(buildInfo(properties))
                 // 接口安全配置
-                .components(new Components().securitySchemes(securitySchemas));
+                .components(new Components().securitySchemes(securitySchemas))
+                .addSecurityItem(new SecurityRequirement().addList(HttpHeaders.AUTHORIZATION));
         securitySchemas.keySet().forEach(key -> openAPI.addSecurityItem(new SecurityRequirement().addList(key)));
         return openAPI;
     }
