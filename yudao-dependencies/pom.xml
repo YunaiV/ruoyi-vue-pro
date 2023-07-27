@@ -71,7 +71,7 @@
         <justauth.version>1.0.1</justauth.version>
         <jimureport.version>1.5.8</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
-        <wx-java-mp.version>4.5.0</wx-java-mp.version>
+        <weixin-java.version>4.5.0</weixin-java.version>
     </properties>
 
     <dependencyManagement>
@@ -600,8 +600,23 @@
 
             <dependency>
                 <groupId>com.github.binarywang</groupId>
+                <artifactId>weixin-java-pay</artifactId>
+                <version>${weixin-java.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.binarywang</groupId>
+                <artifactId>weixin-java-mp</artifactId>
+                <version>${weixin-java.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.binarywang</groupId>
                 <artifactId>wx-java-mp-spring-boot-starter</artifactId>
-                <version>${wx-java-mp.version}</version>
+                <version>${weixin-java.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.binarywang</groupId>
+                <artifactId>wx-java-miniapp-spring-boot-starter</artifactId>
+                <version>${weixin-java.version}</version>
             </dependency>
 
             <!-- 积木报表-->
