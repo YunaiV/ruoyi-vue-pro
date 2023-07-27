@@ -35,7 +35,7 @@
       <el-descriptions title="选择其它支付" style="margin-top: 20px;" />
       <div class="pay-channel-container">
         <div class="box" v-for="channel in channels" :key="channel.code"
-             v-if="channel.code.indexOf('alipay_') === -1 && channel.code.indexOf('wx_') === -1">
+             v-if="channel.code.indexOf('alipay_') === -1 && channel.code.indexOf('wx_') === -1" @click="submit(channel.code)">
           <img :src="channel.icon">
           <div class="title">{{ channel.name }}</div>
         </div>
