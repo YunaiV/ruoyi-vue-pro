@@ -33,7 +33,30 @@ public final class ServerException extends RuntimeException {
         this.message = errorCode.getMsg();
     }
 
+    public ServerException(ErrorCode errorCode, Throwable cause) {
+        super(errorCode.getMsg(), cause);
+        this.code = errorCode.getCode();
+        this.message = errorCode.getMsg();
+    }
+
+    public ServerException(ErrorCode errorCode, String message) {
+        this.code = errorCode.getCode();
+        this.message = message;
+    }
+
+    public ServerException(ErrorCode errorCode, String message, Throwable cause) {
+        super(message, cause);
+        this.code = errorCode.getCode();
+        this.message = message;
+    }
+
     public ServerException(Integer code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+
+    public ServerException(Integer code, String message, Throwable cause) {
+        super(message, cause);
         this.code = code;
         this.message = message;
     }

@@ -33,7 +33,30 @@ public final class ServiceException extends RuntimeException {
         this.message = errorCode.getMsg();
     }
 
+    public ServiceException(ErrorCode errorCode, Throwable cause) {
+        super(errorCode.getMsg(), cause);
+        this.code = errorCode.getCode();
+        this.message = errorCode.getMsg();
+    }
+
+    public ServiceException(ErrorCode errorCode, String message) {
+        this.code = errorCode.getCode();
+        this.message = message;
+    }
+
+    public ServiceException(ErrorCode errorCode, String message, Throwable cause) {
+        super(message, cause);
+        this.code = errorCode.getCode();
+        this.message = message;
+    }
+
     public ServiceException(Integer code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+
+    public ServiceException(Integer code, String message, Throwable cause) {
+        super(message, cause);
         this.code = code;
         this.message = message;
     }
