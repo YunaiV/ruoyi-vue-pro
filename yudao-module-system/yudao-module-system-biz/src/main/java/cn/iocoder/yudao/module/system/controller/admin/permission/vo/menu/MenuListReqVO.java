@@ -7,10 +7,10 @@ import lombok.Data;
 @Data
 public class MenuListReqVO {
 
-    @Schema(description = "菜单名称,模糊匹配", example = "芋道")
+    @Schema(description = "菜单名称，模糊匹配", example = "芋道")
     private String name;
 
-    @Schema(description = "展示状态,参见 CommonStatusEnum 枚举类", example = "1")
+    @Schema(description = "展示状态，参见 CommonStatusEnum 枚举类", example = "1")
     private Integer status;
 
 }

@@ -4,11 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.ToString;
 
-/**
- * 商品 SPU 精简 Response VO
- *  TODO 商品 SPU 精简 VO 暂时没有使用到，用到的时候再按需添加\修改属性
- * @author HUIHUI
- */
 @Schema(description = "管理后台 - 商品 SPU 精简 Response VO")
 @Data
 @ToString(callSuper = true)

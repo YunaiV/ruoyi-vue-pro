@@ -30,14 +30,13 @@ public interface ProductSkuApi {
      */
     List<ProductSkuRespDTO> getSkuList(Collection<Long> ids);
 
-    // TODO puhui999：入参用 Collection<Long> 更通用
     /**
      * 批量查询 SKU 数组
      *
      * @param spuIds SPU 编号列表
      * @return SKU 数组
      */
-    List<ProductSkuRespDTO> getSkuListBySpuId(List<Long> spuIds);
+    List<ProductSkuRespDTO> getSkuListBySpuId(Collection<Long> spuIds);
 
     /**
      * 更新 SKU 库存

@@ -18,7 +18,7 @@ public class FileConfigRespVO extends FileConfigBaseVO {
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
-    @Schema(description = "存储器,参见 FileStorageEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "存储器，参见 FileStorageEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "存储器不能为空")
     private Integer storage;
 

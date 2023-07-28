@@ -10,11 +10,6 @@ import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * 用户 App - 商品评价详情 Response VO
- *
- * @author HUIHUI
- */
 @Schema(description = "用户 App - 商品评价详情 Response VO")
 @Data
 @ToString(callSuper = true)

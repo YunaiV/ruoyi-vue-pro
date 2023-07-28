@@ -21,7 +21,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.PRICE_CALCULATE_PAY_PRICE_ILLEGAL;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PRICE_CALCULATE_PAY_PRICE_ILLEGAL;
 
 /**
  * 价格计算 Service 实现类

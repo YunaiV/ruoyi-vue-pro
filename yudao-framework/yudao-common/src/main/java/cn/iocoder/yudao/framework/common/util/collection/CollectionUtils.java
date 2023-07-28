@@ -164,7 +164,7 @@ public class CollectionUtils {
         return from.stream().filter(predicate).findFirst().orElse(null);
     }
 
-    public static <T, V extends Comparable<? super V>> V getMaxValue(List<T> from, Function<T, V> valueFunc) {
+    public static <T, V extends Comparable<? super V>> V getMaxValue(Collection<T> from, Function<T, V> valueFunc) {
         if (CollUtil.isEmpty(from)) {
             return null;
         }

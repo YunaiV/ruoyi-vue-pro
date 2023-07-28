@@ -27,8 +27,6 @@ public interface WebFilterOrderEnum {
 
     int TENANT_SECURITY_FILTER = -99; // 需要保证在 Spring Security 过滤器后面
 
-    int ACTIVITI_FILTER = -98; // 需要保证在 Spring Security 过滤后面
-
     int FLOWABLE_FILTER = -98; // 需要保证在 Spring Security 过滤后面
 
     int DEMO_FILTER = Integer.MAX_VALUE;

@@ -18,7 +18,7 @@ public class UserImportRespVO {
     @Schema(description = "更新成功的用户名数组", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<String> updateUsernames;
 
-    @Schema(description = "导入失败的用户集合,key 为用户名，value 为失败原因", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "导入失败的用户集合，key 为用户名，value 为失败原因", requiredMode = Schema.RequiredMode.REQUIRED)
     private Map<String, String> failureUsernames;
 
 }

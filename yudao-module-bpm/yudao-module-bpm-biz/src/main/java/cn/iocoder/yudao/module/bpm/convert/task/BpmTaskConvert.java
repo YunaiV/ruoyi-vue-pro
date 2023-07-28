@@ -17,12 +17,9 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
-import org.springframework.beans.BeanUtils;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Bpm 任务 Convert
@@ -34,37 +31,9 @@ public interface BpmTaskConvert {
 
     BpmTaskConvert INSTANCE = Mappers.getMapper(BpmTaskConvert.class);
 
-    /**
-     * 复制对象
-     *
-     * @param source 源 要复制的对象
-     * @param target 目标 复制到此对象
-     * @param <T>
-     *
-     * @return
-     */
-    public static <T> T copy(Object source, Class<T> target) {
-        if (source == null || target == null) {
-            return null;
-        }
-        try {
-            T newInstance = target.getDeclaredConstructor().newInstance();
-            BeanUtils.copyProperties(source, newInstance);
-            return newInstance;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    default <T, K> List<K> copyList(List<T> source, Class<K> target) {
-        if (null == source || source.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return source.stream().map(e -> copy(e, target)).collect(Collectors.toList());
-    }
-
     default List<BpmTaskTodoPageItemRespVO> convertList1(List<Task> tasks,
-        Map<String, ProcessInstance> processInstanceMap, Map<Long, AdminUserRespDTO> userMap) {
+                                                         Map<String, ProcessInstance> processInstanceMap,
+                                                         Map<Long, AdminUserRespDTO> userMap) {
         return CollectionUtils.convertList(tasks, task -> {
             BpmTaskTodoPageItemRespVO respVO = convert1(task);
             ProcessInstance processInstance = processInstanceMap.get(task.getProcessInstanceId());
@@ -104,11 +73,13 @@ public interface BpmTaskConvert {
 
     BpmTaskDonePageItemRespVO convert2(HistoricTaskInstance bean);
 
-    @Mappings({@Mapping(source = "processInstance.id", target = "id"),
-        @Mapping(source = "processInstance.name", target = "name"),
-        @Mapping(source = "processInstance.startUserId", target = "startUserId"),
-        @Mapping(source = "processInstance.processDefinitionId", target = "processDefinitionId"),
-        @Mapping(source = "startUser.nickname", target = "startUserNickname")})
+    @Mappings({
+            @Mapping(source = "processInstance.id", target = "id"),
+            @Mapping(source = "processInstance.name", target = "name"),
+            @Mapping(source = "processInstance.startUserId", target = "startUserId"),
+            @Mapping(source = "processInstance.processDefinitionId", target = "processDefinitionId"),
+            @Mapping(source = "startUser.nickname", target = "startUserNickname")
+    })
     BpmTaskTodoPageItemRespVO.ProcessInstance convert(ProcessInstance processInstance, AdminUserRespDTO startUser);
 
     default List<BpmTaskRespVO> convertList3(List<HistoricTaskInstance> tasks,

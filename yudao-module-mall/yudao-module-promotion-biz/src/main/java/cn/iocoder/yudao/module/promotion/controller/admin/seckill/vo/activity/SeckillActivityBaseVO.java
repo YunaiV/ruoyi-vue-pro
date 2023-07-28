@@ -20,10 +20,9 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class SeckillActivityBaseVO {
 
-    // TODO @puhui999：对应单 spuId 哈
     @Schema(description = "秒杀活动商品id", requiredMode = Schema.RequiredMode.REQUIRED, example = "[121,1212]")
     @NotNull(message = "秒杀活动商品不能为空")
-    private List<Long> spuIds;
+    private Long spuId;
 
     @Schema(description = "秒杀活动名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "618大促")
     @NotNull(message = "秒杀活动名称不能为空")
@@ -55,9 +54,5 @@ public class SeckillActivityBaseVO {
 
     @Schema(description = "单次限够数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "31683")
     private Integer singleLimitCount;
-
-    // TODO @puhui999：这个应该是计算出来的字段，只返回，create 和 update 不用哈
-    @Schema(description = "秒杀总库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
-    private Integer totalStock;
 
 }

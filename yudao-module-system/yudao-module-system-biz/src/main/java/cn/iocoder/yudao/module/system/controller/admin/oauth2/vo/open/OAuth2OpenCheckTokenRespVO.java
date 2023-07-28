@@ -17,7 +17,7 @@ public class OAuth2OpenCheckTokenRespVO {
     @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "666")
     @JsonProperty("user_id")
     private Long userId;
-    @Schema(description = "用户类型,参见 UserTypeEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @Schema(description = "用户类型，参见 UserTypeEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @JsonProperty("user_type")
     private Integer userType;
     @Schema(description = "租户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
@@ -34,7 +34,7 @@ public class OAuth2OpenCheckTokenRespVO {
     @JsonProperty("access_token")
     private String accessToken;
 
-    @Schema(description = "过期时间,时间戳 / 1000，即单位：秒", requiredMode = Schema.RequiredMode.REQUIRED, example = "1593092157")
+    @Schema(description = "过期时间，时间戳 / 1000，即单位：秒", requiredMode = Schema.RequiredMode.REQUIRED, example = "1593092157")
     private Long exp;
 
 }

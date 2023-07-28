@@ -31,7 +31,7 @@ public class OperateLogBaseVO {
     @NotEmpty(message = "操作名")
     private String name;
 
-    @Schema(description = "操作分类,参见 OperateLogTypeEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "操作分类，参见 OperateLogTypeEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "操作分类不能为空")
     private Integer type;
 

@@ -43,7 +43,7 @@ public class ProductSkuApiImpl implements ProductSkuApi {
     }
 
     @Override
-    public List<ProductSkuRespDTO> getSkuListBySpuId(List<Long> spuIds) {
+    public List<ProductSkuRespDTO> getSkuListBySpuId(Collection<Long> spuIds) {
         if (CollUtil.isEmpty(spuIds)) {
             return Collections.emptyList();
         }

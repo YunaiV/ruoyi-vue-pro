@@ -26,6 +26,7 @@ public interface ProductCommentMapper extends BaseMapperX<ProductCommentDO> {
     }
 
     static void appendTabQuery(LambdaQueryWrapperX<ProductCommentDO> queryWrapper, Integer type) {
+        // TODO @puhui999：是不是不用 apply 拉？直接用 mybatis 的方法就好啦
         // 构建好评查询语句：好评计算 总评 >= 4
         if (ObjectUtil.equal(type, AppCommentPageReqVO.GOOD_COMMENT)) {
             queryWrapper.apply("scores >= 4");
@@ -51,11 +52,11 @@ public interface ProductCommentMapper extends BaseMapperX<ProductCommentDO> {
         return selectPage(reqVO, queryWrapper);
     }
 
-    default ProductCommentDO selectByUserIdAndOrderItemIdAndSpuId(Long userId, Long orderItemId, Long spuId) {
+    default ProductCommentDO selectByUserIdAndOrderItemIdAndSpuId(Long userId, Long orderItemId, Long skuId) {
         return selectOne(new LambdaQueryWrapperX<ProductCommentDO>()
                 .eq(ProductCommentDO::getUserId, userId)
                 .eq(ProductCommentDO::getOrderItemId, orderItemId)
-                .eq(ProductCommentDO::getSpuId, spuId));
+                .eq(ProductCommentDO::getSpuId, skuId));
     }
 
     default Long selectCountBySpuId(Long spuId, Boolean visible, Integer type) {

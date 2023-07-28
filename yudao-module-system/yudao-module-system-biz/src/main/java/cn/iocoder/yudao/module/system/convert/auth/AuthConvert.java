@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.system.convert.auth;
 
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeSendReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeUseReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
@@ -30,7 +29,7 @@ public interface AuthConvert {
     default AuthPermissionInfoRespVO convert(AdminUserDO user, List<RoleDO> roleList, List<MenuDO> menuList) {
         return AuthPermissionInfoRespVO.builder()
                 .user(AuthPermissionInfoRespVO.UserVO.builder().id(user.getId()).nickname(user.getNickname()).avatar(user.getAvatar()).build())
-                .roles(CollectionUtils.convertSet(roleList, RoleDO::getCode))
+                .roles(convertSet(roleList, RoleDO::getCode))
                 // 权限标识信息
                 .permissions(convertSet(menuList, MenuDO::getPermission))
                 // 菜单树

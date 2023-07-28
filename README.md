@@ -102,7 +102,7 @@
 
 系统内置多种多种业务功能，可以用于快速你的业务系统：
 
-![功能分层](https://static.iocoder.cn/ruoyi-vue-pro-biz.png)
+![功能分层](https://static.iocoder.cn/ruoyi-vue-pro-biz.png?imageView2/2/format/webp)
 
 * 系统功能
 * 基础设施

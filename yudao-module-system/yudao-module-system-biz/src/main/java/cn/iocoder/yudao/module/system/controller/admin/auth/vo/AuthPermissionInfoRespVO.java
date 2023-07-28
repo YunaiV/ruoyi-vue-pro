@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 import java.util.Set;
 
-@Schema(description = "管理后台 - 登录用户的权限信息 Response VO,额外包括用户信息和角色列表")
+@Schema(description = "管理后台 - 登录用户的权限信息 Response VO，额外包括用户信息和角色列表")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -41,7 +41,7 @@ public class AuthPermissionInfoRespVO {
         @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
         private String nickname;
 
-        @Schema(description = "用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "http://www.iocoder.cn/xx.jpg")
+        @Schema(description = "用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xx.jpg")
         private String avatar;
 
     }

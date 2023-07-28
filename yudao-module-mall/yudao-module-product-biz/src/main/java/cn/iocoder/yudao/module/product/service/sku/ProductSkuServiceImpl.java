@@ -148,7 +148,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     }
 
     @Override
-    public List<ProductSkuDO> getSkuListBySpuId(List<Long> spuIds) {
+    public List<ProductSkuDO> getSkuListBySpuId(Collection<Long> spuIds) {
         return productSkuMapper.selectListBySpuId(spuIds);
     }
 

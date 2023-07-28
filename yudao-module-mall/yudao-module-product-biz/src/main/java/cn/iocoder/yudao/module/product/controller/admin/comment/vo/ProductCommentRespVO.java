@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - 商品评价 Response VO")
@@ -39,5 +40,16 @@ public class ProductCommentRespVO extends ProductCommentBaseVO {
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
+
+    @Schema(description = "评分星级 1-5 分", requiredMode = Schema.RequiredMode.REQUIRED, example = "5")
+    private Integer scores;
+
+    @Schema(description = "商品 SPU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "清凉丝滑透气小短袖")
+    @NotNull(message = "商品 SPU 编号不能为空")
+    private Long spuId;
+
+    @Schema(description = "商品 SPU 名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "赵六")
+    @NotNull(message = "商品 SPU 名称不能为空")
+    private String spuName;
 
 }

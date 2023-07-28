@@ -34,8 +34,7 @@ public class SeckillActivityDO extends BaseDO {
     /**
      * 秒杀活动商品
      */
-    @TableField(typeHandler = LongListTypeHandler.class)
-    private List<Long> spuIds;
+    private Long spuId;
     /**
      * 秒杀活动名称
      */

@@ -16,7 +16,7 @@ public class ErrorCodeRespVO extends ErrorCodeBaseVO {
     @Schema(description = "错误码编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "错误码类型,参见 ErrorCodeTypeEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "错误码类型，参见 ErrorCodeTypeEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer type;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)

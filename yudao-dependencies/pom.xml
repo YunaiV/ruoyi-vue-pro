@@ -14,7 +14,7 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>1.7.3-snapshot</revision>
+        <revision>1.8.0-snapshot</revision>
         <!-- 统一依赖管理 -->
         <spring.boot.version>2.7.13</spring.boot.version>
         <!-- Web 相关 -->
@@ -71,7 +71,7 @@
         <justauth.version>1.0.1</justauth.version>
         <jimureport.version>1.5.8</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
-        <wx-java-mp.version>4.5.0</wx-java-mp.version>
+        <weixin-java.version>4.5.0</weixin-java.version>
     </properties>
 
     <dependencyManagement>
@@ -216,10 +216,9 @@
                 <artifactId>dynamic-datasource-spring-boot-starter</artifactId> <!-- 多数据源 -->
                 <version>${dynamic-datasource.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>com.github.yulichang</groupId>
-                <artifactId>mybatis-plus-join-boot-starter</artifactId>
+                <artifactId>mybatis-plus-join-boot-starter</artifactId> <!-- MyBatis 联表查询 -->
                 <version>${mybatis-plus-join-boot-starter.version}</version>
             </dependency>
 
@@ -601,8 +600,23 @@
 
             <dependency>
                 <groupId>com.github.binarywang</groupId>
+                <artifactId>weixin-java-pay</artifactId>
+                <version>${weixin-java.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.binarywang</groupId>
+                <artifactId>weixin-java-mp</artifactId>
+                <version>${weixin-java.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.binarywang</groupId>
                 <artifactId>wx-java-mp-spring-boot-starter</artifactId>
-                <version>${wx-java-mp.version}</version>
+                <version>${weixin-java.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.binarywang</groupId>
+                <artifactId>wx-java-miniapp-spring-boot-starter</artifactId>
+                <version>${weixin-java.version}</version>
             </dependency>
 
             <!-- 积木报表-->

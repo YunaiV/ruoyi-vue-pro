@@ -9,11 +9,6 @@ import lombok.ToString;
 import javax.validation.Valid;
 import java.util.List;
 
-/**
- * 商品 SPU 创建 Request VO
- *
- * @author HUIHUI
- */
 @Schema(description = "管理后台 - 商品 SPU 创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)

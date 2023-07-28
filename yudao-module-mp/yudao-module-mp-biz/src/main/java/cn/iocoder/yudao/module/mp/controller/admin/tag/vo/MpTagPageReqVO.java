@@ -18,7 +18,7 @@ public class MpTagPageReqVO extends PageParam {
     @NotEmpty(message = "公众号账号的编号不能为空")
     private Long accountId;
 
-    @Schema(description = "标签名 模糊匹配", example = "哈哈")
+    @Schema(description = "标签名，模糊匹配", example = "哈哈")
     private String name;
 
 }
