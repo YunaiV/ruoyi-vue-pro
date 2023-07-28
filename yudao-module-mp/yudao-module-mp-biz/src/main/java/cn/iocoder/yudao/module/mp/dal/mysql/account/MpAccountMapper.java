@@ -25,7 +25,7 @@ public interface MpAccountMapper extends BaseMapperX<MpAccountDO> {
         return selectOne(MpAccountDO::getAppId, appId);
     }
 
-    @Select("SELECT COUNT(*) FROM pay_account WHERE update_time > #{maxUpdateTime}")
+    @Select("SELECT COUNT(*) FROM mp_account WHERE update_time > #{maxUpdateTime}")
     Long selectCountByUpdateTimeGt(LocalDateTime maxUpdateTime);
 
 }
