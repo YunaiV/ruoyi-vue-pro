@@ -103,8 +103,15 @@ public interface BaseMapperX<T> extends BaseMapper<T> {
         update(update, new QueryWrapper<>());
     }
 
+    default void updateBatch(Collection<T> entities) {
+        Db.updateBatchById(entities);
+    }
     default void updateBatch(Collection<T> entities, int size) {
         Db.updateBatchById(entities, size);
+    }
+
+    default void saveOrUpdateBatch(Collection<T> collection) {
+        Db.saveOrUpdateBatch(collection);
     }
 
 }
