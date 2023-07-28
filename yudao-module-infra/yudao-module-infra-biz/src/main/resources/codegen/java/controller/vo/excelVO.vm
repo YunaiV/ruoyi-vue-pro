@@ -10,6 +10,9 @@ import java.math.BigDecimal;
 #if (${column.javaType} == "LocalDateTime")
 import java.time.LocalDateTime;
 #end
+#if (${column.javaType} == "LocalDate")
+import java.time.LocalDate;
+#end
 #end
 
 import com.alibaba.excel.annotation.ExcelProperty;

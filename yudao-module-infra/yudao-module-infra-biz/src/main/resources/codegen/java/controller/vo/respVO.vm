@@ -3,6 +3,12 @@ package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePac
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 #foreach ($column in $columns)
+#if (${column.javaType} == "LocalDate")
+import java.time.LocalDate;
+#break
+#end
+#end
+#foreach ($column in $columns)
 #if (${column.javaType} == "LocalDateTime")
 import java.time.LocalDateTime;
 #break

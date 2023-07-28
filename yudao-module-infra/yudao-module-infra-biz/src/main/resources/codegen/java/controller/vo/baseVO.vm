@@ -10,15 +10,31 @@ import java.math.BigDecimal;
 #if (${column.javaType} == "LocalDateTime")
 import java.time.LocalDateTime;
 #end
+#if (${column.javaType} == "LocalDate")
+import java.time.LocalDate;
+#end
 #end
 import javax.validation.constraints.*;
 ## 处理 Date 字段的引入
+#foreach ($column in $columns)
+#if (${column.javaType} == "LocalDate")
+import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import static ${DateUtilsClassName}.FORMAT_YEAR_MONTH_DAY;
+import static ${DateUtilsClassName}.TIME_ZONE_DEFAULT;
+#break
+#end
+#end
+
 #foreach ($column in $columns)
 #if (${column.createOperation} && ${column.updateOperation} && ${column.listOperationResult}
     && ${column.javaType} == "LocalDateTime")## 时间类型
 import org.springframework.format.annotation.DateTimeFormat;
 
 import static ${DateUtilsClassName}.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import static ${DateUtilsClassName}.TIME_ZONE_DEFAULT;
 #break
 #end
 #end

@@ -6,6 +6,9 @@ import java.util.*;
 #if (${column.javaType} == "BigDecimal")
 import java.math.BigDecimal;
 #end
+#if (${column.javaType} == "LocalDate")
+import java.time.LocalDate;
+#end
 #if (${column.javaType} == "LocalDateTime")
 import java.time.LocalDateTime;
 #end

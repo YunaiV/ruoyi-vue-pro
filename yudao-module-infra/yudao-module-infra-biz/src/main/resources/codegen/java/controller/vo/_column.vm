@@ -9,5 +9,10 @@
 #end
 #if (${column.javaType} == "LocalDateTime")## 时间类型
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
+#end
+#if (${column.javaType} == "LocalDate")## 日期类型
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY)
+    @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY, timezone = TIME_ZONE_DEFAULT)
 #end
     private ${column.javaType} ${column.javaField};

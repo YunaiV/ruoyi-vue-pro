@@ -6,7 +6,7 @@ export interface ${simpleClassName}VO {
 #if ($column.createOperation || $column.updateOperation)
 #if(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer" || ${column.javaType.toLowerCase()} == "short" || ${column.javaType.toLowerCase()} == "double" || ${column.javaType.toLowerCase()} == "bigdecimal")
   ${column.javaField}: number
-#elseif(${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdatetime")
+#elseif(${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdate" || ${column.javaType.toLowerCase()} == "localdatetime")
   ${column.javaField}: Date
 #else
   ${column.javaField}: ${column.javaType.toLowerCase()}

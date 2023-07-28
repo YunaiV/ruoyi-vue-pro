@@ -1,9 +1,20 @@
 import type { CrudSchema } from '@/hooks/web/useCrudSchemas'
+#set($hasDate = false)
+#set($hasDateTime = false)
 #foreach ($column in $columns)
-    #if ($column.listOperationResult && $column.htmlType == "datetime")
-import { dateFormatter } from '@/utils/formatTime'
-    #break
+    #if ($column.listOperationResult && $column.javaType == "LocalDate")
+        #set($hasDate = true)
     #end
+    #if ($column.listOperationResult && $column.htmlType == "datetime")
+        #set($hasDateTime = true)
+    #end
+#end
+#if ($hasDate && $hasDateTime)
+import { dateFormatter, dateFormatter2 } from '@/utils/formatTime'
+#elseif($hasDate)
+import { dateFormatter2 } from '@/utils/formatTime'
+#elseif($hasDateTime)
+import { dateFormatter } from '@/utils/formatTime'
 #end
 
 // 表单校验
@@ -41,14 +52,24 @@ const crudSchemas = reactive<CrudSchema[]>([
     #if (!$column.listOperationResult)
     isTable: false,
     #else
-      #if ($column.htmlType == "datetime")
-    formatter: dateFormatter,
+      #if ($javaType == "LocalDate")
+    formatter: dateFormatter2,
+      #elseif ($column.htmlType == "datetime")
+    formatter: dateFormatter2,
       #end
     #end
 ## ========= Search 表格部分 =========
     #if ($column.listOperation)
     isSearch: true,
-        #if ($column.htmlType == "datetime")
+         #if ($javaType == "LocalDate")
+    search: {
+      component: 'DatePicker',
+      componentProps: {
+        valueFormat: 'YYYY-MM-DD',
+        type: 'date'
+      }
+    },
+        #elseif ($column.htmlType == "datetime")
     search: {
       component: 'DatePicker',
       componentProps: {
@@ -90,6 +111,14 @@ const crudSchemas = reactive<CrudSchema[]>([
         #elseif($column.htmlType == "radio")## 单选框
     form: {
       component: 'Radio'
+    },
+        #elseif($javaType == "LocalDate")## 日期框
+    form: {
+      component: 'DatePicker',
+      componentProps: {
+        type: 'date',
+        valueFormat: 'YYYY-MM-DD'
+      }
     },
         #elseif($column.htmlType == "datetime")## 时间框
     form: {
