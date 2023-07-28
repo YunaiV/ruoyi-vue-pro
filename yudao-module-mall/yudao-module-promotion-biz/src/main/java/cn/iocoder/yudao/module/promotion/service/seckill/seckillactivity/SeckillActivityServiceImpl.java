@@ -64,7 +64,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         List<ProductSkuRespDTO> skus = productSkuApi.getSkuListBySpuId(CollUtil.newArrayList(createReqVO.getSpuId()));
         // 校验商品 sku 是否存在
         // TODO @puhui999：直接校验 sku 数量，是不是就完事啦，不需要校验的特别严谨哈；
-        validateProductSkuExistence(skus, createReqVO.getProducts(), SeckillProductCreateReqVO::getSkuId);
+        validateProductSkuExistence(createReqVO.getProducts(), skus, SeckillProductCreateReqVO::getSkuId);
 
         // 插入秒杀活动
         SeckillActivityDO activity = SeckillActivityConvert.INSTANCE.convert(createReqVO)
@@ -122,7 +122,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         // 获取所选 spu下的所有 sku
         List<ProductSkuRespDTO> skus = productSkuApi.getSkuListBySpuId(CollUtil.newArrayList(updateReqVO.getSpuId()));
         // 校验商品 sku 是否存在
-        validateProductSkuExistence(skus, updateReqVO.getProducts(), SeckillProductUpdateReqVO::getSkuId);
+        validateProductSkuExistence(updateReqVO.getProducts(), skus, SeckillProductUpdateReqVO::getSkuId);
 
         // 更新活动
         SeckillActivityDO updateObj = SeckillActivityConvert.INSTANCE.convert(updateReqVO)

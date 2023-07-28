@@ -2,10 +2,12 @@ package cn.iocoder.yudao.module.promotion.service.combination;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
@@ -31,9 +33,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_EXISTS;
@@ -67,7 +67,7 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
         // 获取所选 spu下的所有 sku
         List<ProductSkuRespDTO> skus = productSkuApi.getSkuListBySpuId(CollectionUtil.newArrayList(createReqVO.getSpuId()));
         // 校验商品 sku 是否存在
-        validateProductSkuExistence(skus, createReqVO.getProducts(), CombinationProductCreateReqVO::getSkuId);
+        validateProductSkuExistence(createReqVO.getProducts(), skus, CombinationProductCreateReqVO::getSkuId);
 
         // TODO 艿艿 有个小问题：现在有活动时间和限制时长，活动时间的结束时间早于设置的限制时间怎么算状态比如：
         //  活动时间 2023-08-05 15:00:00 - 2023-08-05 15:20:00 限制时长 2小时，那么活动时间结束就结束还是加时到满两小时
@@ -119,7 +119,7 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
         // 获取所选 spu下的所有 sku
         List<ProductSkuRespDTO> skus = productSkuApi.getSkuListBySpuId(CollectionUtil.newArrayList(updateReqVO.getSpuId()));
         // 校验商品 sku 是否存在
-        validateProductSkuExistence(skus, updateReqVO.getProducts(), CombinationProductUpdateReqVO::getSkuId);
+        validateProductSkuExistence(updateReqVO.getProducts(), skus, CombinationProductUpdateReqVO::getSkuId);
 
         // 更新
         CombinationActivityDO updateObj = CombinationActivityConvert.INSTANCE.convert(updateReqVO);
@@ -130,7 +130,6 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
 
     /**
      * 更新秒杀商品
-     *  TODO 更新商品要不要封装成通用方法
      *
      * @param updateObj DO
      * @param products  商品配置
@@ -141,25 +140,28 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
         Set<Long> convertSet = CollectionUtils.convertSet(combinationProductDOs, CombinationProductDO::getSkuId);
         // 前端传过来的活动商品
         Set<Long> convertSet1 = CollectionUtils.convertSet(products, CombinationProductUpdateReqVO::getSkuId);
-        // 删除后台存在的前端不存在的商品
-        List<Long> d = CollectionUtils.filterList(convertSet, item -> !convertSet1.contains(item));
-        if (CollUtil.isNotEmpty(d)) {
-            combinationProductMapper.deleteBatchIds(d);
-        }
-        // 前端存在的后端不存在的商品
-        List<Long> c = CollectionUtils.filterList(convertSet1, item -> !convertSet.contains(item));
-        if (CollUtil.isNotEmpty(c)) {
-            List<CombinationProductUpdateReqVO> vos = CollectionUtils.filterList(products, item -> c.contains(item.getSkuId()));
-            List<CombinationProductDO> productDOs = CombinationActivityConvert.INSTANCE.convertList(updateObj, vos);
-            combinationProductMapper.insertBatch(productDOs);
-        }
-        // 更新已存在的商品
-        List<Long> u = CollectionUtils.filterList(convertSet1, convertSet::contains);
-        if (CollUtil.isNotEmpty(u)) {
-            List<CombinationProductUpdateReqVO> vos = CollectionUtils.filterList(products, item -> u.contains(item.getSkuId()));
-            List<CombinationProductDO> productDOs = CombinationActivityConvert.INSTANCE.convertList1(updateObj, vos, combinationProductDOs);
-            combinationProductMapper.updateBatch(productDOs);
-        }
+        // 分化数据
+        Map<String, List<CombinationProductDO>> data = CollectionUtils.convertCDUMap(convertSet1, convertSet, mapData -> {
+            HashMap<String, List<CombinationProductDO>> cdu = MapUtil.newHashMap(3);
+            MapUtils.findAndThen(mapData, "create", list -> {
+                cdu.put("create", CombinationActivityConvert.INSTANCE.convertList(updateObj,
+                        CollectionUtils.filterList(products, item -> list.contains(item.getSkuId()))));
+            });
+            MapUtils.findAndThen(mapData, "delete", list -> {
+                cdu.put("create", CollectionUtils.filterList(combinationProductDOs, item -> list.contains(item.getSkuId())));
+            });
+            MapUtils.findAndThen(mapData, "update", list -> {
+                cdu.put("update", CombinationActivityConvert.INSTANCE.convertList1(updateObj,
+                        CollectionUtils.filterList(products, item -> list.contains(item.getSkuId())), combinationProductDOs));
+            });
+            return cdu;
+        });
+
+        // 执行增删改
+        MapUtils.findAndThen(data, "create", item -> combinationProductMapper.insertBatch(item));
+        MapUtils.findAndThen(data, "delete", item -> combinationProductMapper.deleteBatchIds(
+                CollectionUtils.convertSet(item, CombinationProductDO::getId)));
+        MapUtils.findAndThen(data, "update", item -> combinationProductMapper.updateBatch(item));
     }
 
     @Override
@@ -274,6 +276,7 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     }
 
     // TODO @puhui999：status 传入进来搞哈；
+
     /**
      * APP 端获取开团记录
      *
