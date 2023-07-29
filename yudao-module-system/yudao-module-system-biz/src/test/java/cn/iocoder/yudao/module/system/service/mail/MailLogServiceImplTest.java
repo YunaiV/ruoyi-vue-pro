@@ -25,10 +25,10 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
-* {@link MailLogServiceImpl} 的单元测试类
-*
-* @author 芋道源码
-*/
+ * {@link MailLogServiceImpl} 的单元测试类
+ *
+ * @author 芋道源码
+ */
 @Import(MailLogServiceImpl.class)
 public class MailLogServiceImplTest extends BaseDbUnitTest {
 

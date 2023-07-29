@@ -7,14 +7,12 @@ import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccou
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailAccountMapper;
-import cn.iocoder.yudao.module.system.mq.producer.mail.MailProducer;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
@@ -23,14 +21,13 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.MAIL_ACCOUNT_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
-* {@link MailAccountServiceImpl} 的单元测试类
-*
-* @author 芋道源码
-*/
+ * {@link MailAccountServiceImpl} 的单元测试类
+ *
+ * @author 芋道源码
+ */
 @Import(MailAccountServiceImpl.class)
 public class MailAccountServiceImplTest extends BaseDbUnitTest {
 
@@ -42,23 +39,6 @@ public class MailAccountServiceImplTest extends BaseDbUnitTest {
 
     @MockBean
     private MailTemplateService mailTemplateService;
-    @MockBean
-    private MailProducer mailProducer;
-
-    @Test
-    public void testInitLocalCache() {
-        MailAccountDO accountDO1 = randomPojo(MailAccountDO.class);
-        mailAccountMapper.insert(accountDO1);
-        MailAccountDO accountDO02 = randomPojo(MailAccountDO.class);
-        mailAccountMapper.insert(accountDO02);
-
-        // 调用
-        mailAccountService.initLocalCache();
-        // 断言 mailAccountCache 缓存
-        Map<Long, MailAccountDO> mailAccountCache = mailAccountService.getMailAccountCache();
-        assertPojoEquals(accountDO1, mailAccountCache.get(accountDO1.getId()));
-        assertPojoEquals(accountDO02, mailAccountCache.get(accountDO02.getId()));
-    }
 
     @Test
     public void testCreateMailAccount_success() {
@@ -72,7 +52,6 @@ public class MailAccountServiceImplTest extends BaseDbUnitTest {
         // 校验记录的属性是否正确
         MailAccountDO mailAccount = mailAccountMapper.selectById(mailAccountId);
         assertPojoEquals(reqVO, mailAccount);
-        verify(mailProducer).sendMailAccountRefreshMessage();
     }
 
     @Test
@@ -91,7 +70,6 @@ public class MailAccountServiceImplTest extends BaseDbUnitTest {
         // 校验是否更新正确
         MailAccountDO mailAccount = mailAccountMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, mailAccount);
-        verify(mailProducer).sendMailAccountRefreshMessage();
     }
 
     @Test
@@ -115,9 +93,8 @@ public class MailAccountServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         mailAccountService.deleteMailAccount(id);
-       // 校验数据不存在了
-       assertNull(mailAccountMapper.selectById(id));
-        verify(mailProducer).sendMailAccountRefreshMessage();
+        // 校验数据不存在了
+        assertNull(mailAccountMapper.selectById(id));
     }
 
     @Test
@@ -125,7 +102,6 @@ public class MailAccountServiceImplTest extends BaseDbUnitTest {
         // mock 数据
         MailAccountDO dbMailAccount = randomPojo(MailAccountDO.class);
         mailAccountMapper.insert(dbMailAccount);// @Sql: 先插入出一条存在的数据
-        mailAccountService.initLocalCache();
         // 准备参数
         Long id = dbMailAccount.getId();
 
@@ -146,27 +122,27 @@ public class MailAccountServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testGetMailAccountPage() {
-       // mock 数据
-       MailAccountDO dbMailAccount = randomPojo(MailAccountDO.class, o -> { // 等会查询到
-           o.setMail("768@qq.com");
-           o.setUsername("yunai");
-       });
-       mailAccountMapper.insert(dbMailAccount);
-       // 测试 mail 不匹配
-       mailAccountMapper.insert(cloneIgnoreId(dbMailAccount, o -> o.setMail("788@qq.com")));
-       // 测试 username 不匹配
-       mailAccountMapper.insert(cloneIgnoreId(dbMailAccount, o -> o.setUsername("tudou")));
-       // 准备参数
-       MailAccountPageReqVO reqVO = new MailAccountPageReqVO();
-       reqVO.setMail("768");
-       reqVO.setUsername("yu");
+        // mock 数据
+        MailAccountDO dbMailAccount = randomPojo(MailAccountDO.class, o -> { // 等会查询到
+            o.setMail("768@qq.com");
+            o.setUsername("yunai");
+        });
+        mailAccountMapper.insert(dbMailAccount);
+        // 测试 mail 不匹配
+        mailAccountMapper.insert(cloneIgnoreId(dbMailAccount, o -> o.setMail("788@qq.com")));
+        // 测试 username 不匹配
+        mailAccountMapper.insert(cloneIgnoreId(dbMailAccount, o -> o.setUsername("tudou")));
+        // 准备参数
+        MailAccountPageReqVO reqVO = new MailAccountPageReqVO();
+        reqVO.setMail("768");
+        reqVO.setUsername("yu");
 
-       // 调用
-       PageResult<MailAccountDO> pageResult = mailAccountService.getMailAccountPage(reqVO);
-       // 断言
-       assertEquals(1, pageResult.getTotal());
-       assertEquals(1, pageResult.getList().size());
-       assertPojoEquals(dbMailAccount, pageResult.getList().get(0));
+        // 调用
+        PageResult<MailAccountDO> pageResult = mailAccountService.getMailAccountPage(reqVO);
+        // 断言
+        assertEquals(1, pageResult.getTotal());
+        assertEquals(1, pageResult.getList().size());
+        assertPojoEquals(dbMailAccount, pageResult.getList().get(0));
     }
 
     @Test

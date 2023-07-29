@@ -6,10 +6,10 @@ import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.toolkit.Db;
-import com.github.yulichang.base.MPJBaseMapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
@@ -17,10 +17,8 @@ import java.util.List;
 
 /**
  * 在 MyBatis Plus 的 BaseMapper 的基础上拓展，提供更多的能力
- * <p>
- * 为什么继承 MPJBaseMapper 接口？支持 MyBatis Plus 多表 Join 的能力。
  */
-public interface BaseMapperX<T> extends MPJBaseMapper<T> {
+public interface BaseMapperX<T> extends BaseMapper<T> {
 
     default PageResult<T> selectPage(PageParam pageParam, @Param("ew") Wrapper<T> queryWrapper) {
         // MyBatis Plus 查询
@@ -44,18 +42,6 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
 
     default T selectOne(SFunction<T, ?> field1, Object value1, SFunction<T, ?> field2, Object value2) {
         return selectOne(new LambdaQueryWrapper<T>().eq(field1, value1).eq(field2, value2));
-    }
-
-    default T selectOne(SFunction<T, ?> field1, Object value1, SFunction<T, ?> field2, Object value2,
-                        SFunction<T, ?> field3, Object value3) {
-        return selectOne(new LambdaQueryWrapper<T>().eq(field1, value1).eq(field2, value2)
-                .eq(field3, value3));
-    }
-
-    default T selectOne(SFunction<T, ?> field1, Object value1, SFunction<T, ?> field2, Object value2,
-                        SFunction<T, ?> field3, Object value3, SFunction<T, ?> field4, Object value4) {
-        return selectOne(new LambdaQueryWrapper<T>().eq(field1, value1).eq(field2, value2)
-                .eq(field3, value3).eq(field4, value4));
     }
 
     default Long selectCount() {
@@ -117,11 +103,6 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         update(update, new QueryWrapper<>());
     }
 
-    /**
-     * 根据ID 批量更新，适合大量数据更新
-     *
-     * @param entities 实体们
-     */
     default void updateBatch(Collection<T> entities) {
         Db.updateBatchById(entities);
     }
@@ -130,13 +111,8 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         Db.updateBatchById(entities, size);
     }
 
-    /**
-     * 批量修改插入, 会根据实体的主键是否为空，更新还是修改。默认为 1000
-     *
-     * @param entities 实体们
-     */
-    default void saveOrUpdateBatch(Collection<T> entities){
-        Db.saveOrUpdateBatch(entities);
+    default void saveOrUpdateBatch(Collection<T> collection) {
+        Db.saveOrUpdateBatch(collection);
     }
 
 }

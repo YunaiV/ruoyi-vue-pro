@@ -73,11 +73,13 @@ public interface BpmTaskConvert {
 
     BpmTaskDonePageItemRespVO convert2(HistoricTaskInstance bean);
 
-    @Mappings({@Mapping(source = "processInstance.id", target = "id"),
-        @Mapping(source = "processInstance.name", target = "name"),
-        @Mapping(source = "processInstance.startUserId", target = "startUserId"),
-        @Mapping(source = "processInstance.processDefinitionId", target = "processDefinitionId"),
-        @Mapping(source = "startUser.nickname", target = "startUserNickname")})
+    @Mappings({
+            @Mapping(source = "processInstance.id", target = "id"),
+            @Mapping(source = "processInstance.name", target = "name"),
+            @Mapping(source = "processInstance.startUserId", target = "startUserId"),
+            @Mapping(source = "processInstance.processDefinitionId", target = "processDefinitionId"),
+            @Mapping(source = "startUser.nickname", target = "startUserNickname")
+    })
     BpmTaskTodoPageItemRespVO.ProcessInstance convert(ProcessInstance processInstance, AdminUserRespDTO startUser);
 
     default List<BpmTaskRespVO> convertList3(List<HistoricTaskInstance> tasks,

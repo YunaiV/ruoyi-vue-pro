@@ -4,7 +4,6 @@ import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.sms.core.client.SmsClient;
 import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
 import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
@@ -17,16 +16,15 @@ import cn.iocoder.yudao.module.system.convert.sms.SmsTemplateConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsTemplateMapper;
-import cn.iocoder.yudao.module.system.mq.producer.sms.SmsProducer;
+import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
 import com.google.common.annotations.VisibleForTesting;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -59,49 +57,6 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     @Resource
     private SmsClientFactory smsClientFactory;
 
-    @Resource
-    private SmsProducer smsProducer;
-
-    /**
-     * 短信模板缓存
-     * key：短信模板编码 {@link SmsTemplateDO#getCode()}
-     *
-     * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
-     */
-    @Getter // 为了方便测试，这里提供 getter 方法
-    private volatile Map<String, SmsTemplateDO> smsTemplateCache;
-
-    @Override
-    @PostConstruct
-    public void initLocalCache() {
-        // 第一步：查询数据
-        List<SmsTemplateDO> smsTemplateList = smsTemplateMapper.selectList();
-        log.info("[initLocalCache][缓存短信模版，数量为:{}]", smsTemplateList.size());
-
-        // 第二步：构建缓存
-        smsTemplateCache = CollectionUtils.convertMap(smsTemplateList, SmsTemplateDO::getCode);
-    }
-
-    @Override
-    public SmsTemplateDO getSmsTemplateByCodeFromCache(String code) {
-        return smsTemplateCache.get(code);
-    }
-
-    @Override
-    public String formatSmsTemplateContent(String content, Map<String, Object> params) {
-        return StrUtil.format(content, params);
-    }
-
-    @Override
-    public SmsTemplateDO getSmsTemplateByCode(String code) {
-        return smsTemplateMapper.selectByCode(code);
-    }
-
-    @VisibleForTesting
-    public List<String> parseTemplateContentParams(String content) {
-        return ReUtil.findAllGroup1(PATTERN_PARAMS, content);
-    }
-
     @Override
     public Long createSmsTemplate(SmsTemplateCreateReqVO createReqVO) {
         // 校验短信渠道
@@ -116,13 +71,13 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
         template.setParams(parseTemplateContentParams(template.getContent()));
         template.setChannelCode(channelDO.getCode());
         smsTemplateMapper.insert(template);
-        // 发送刷新消息
-        smsProducer.sendSmsTemplateRefreshMessage();
         // 返回
         return template.getId();
     }
 
     @Override
+    @CacheEvict(cacheNames = RedisKeyConstants.SMS_TEMPLATE,
+            allEntries = true) // allEntries 清空所有缓存，因为可能修改到 code 字段，不好清理
     public void updateSmsTemplate(SmsTemplateUpdateReqVO updateReqVO) {
         // 校验存在
         validateSmsTemplateExists(updateReqVO.getId());
@@ -138,18 +93,16 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
         updateObj.setParams(parseTemplateContentParams(updateObj.getContent()));
         updateObj.setChannelCode(channelDO.getCode());
         smsTemplateMapper.updateById(updateObj);
-        // 发送刷新消息
-        smsProducer.sendSmsTemplateRefreshMessage();
     }
 
     @Override
+    @CacheEvict(cacheNames = RedisKeyConstants.SMS_TEMPLATE,
+            allEntries = true) // allEntries 清空所有缓存，因为 id 不是直接的缓存 code，不好清理
     public void deleteSmsTemplate(Long id) {
         // 校验存在
         validateSmsTemplateExists(id);
         // 更新
         smsTemplateMapper.deleteById(id);
-        // 发送刷新消息
-        smsProducer.sendSmsTemplateRefreshMessage();
     }
 
     private void validateSmsTemplateExists(Long id) {
@@ -164,8 +117,10 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     }
 
     @Override
-    public List<SmsTemplateDO> getSmsTemplateList(Collection<Long> ids) {
-        return smsTemplateMapper.selectBatchIds(ids);
+    @Cacheable(cacheNames = RedisKeyConstants.SMS_TEMPLATE, key = "#code",
+            unless = "#result == null")
+    public SmsTemplateDO getSmsTemplateByCodeFromCache(String code) {
+        return smsTemplateMapper.selectByCode(code);
     }
 
     @Override
@@ -217,13 +172,23 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
      * @param apiTemplateId API 模板编号
      */
     @VisibleForTesting
-    public void validateApiTemplate(Long channelId, String apiTemplateId) {
+    void validateApiTemplate(Long channelId, String apiTemplateId) {
         // 获得短信模板
         SmsClient smsClient = smsClientFactory.getSmsClient(channelId);
         Assert.notNull(smsClient, String.format("短信客户端(%d) 不存在", channelId));
         SmsCommonResult<SmsTemplateRespDTO> templateResult = smsClient.getSmsTemplate(apiTemplateId);
         // 校验短信模板是否正确
         templateResult.checkError();
+    }
+
+    @Override
+    public String formatSmsTemplateContent(String content, Map<String, Object> params) {
+        return StrUtil.format(content, params);
+    }
+
+    @VisibleForTesting
+    List<String> parseTemplateContentParams(String content) {
+        return ReUtil.findAllGroup1(PATTERN_PARAMS, content);
     }
 
 }

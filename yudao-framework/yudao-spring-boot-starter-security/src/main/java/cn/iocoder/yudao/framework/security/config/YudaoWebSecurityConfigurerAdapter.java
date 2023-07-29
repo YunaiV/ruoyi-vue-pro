@@ -60,7 +60,7 @@ public class YudaoWebSecurityConfigurerAdapter {
     /**
      * 自定义的权限映射 Bean 们
      *
-     * @see #configure(HttpSecurity)
+     * @see #filterChain(HttpSecurity)
      */
     @Resource
     private List<AuthorizeRequestsCustomizer> authorizeRequestsCustomizers;
@@ -79,7 +79,7 @@ public class YudaoWebSecurityConfigurerAdapter {
 
     /**
      * 配置 URL 的安全配置
-     * <p>
+     *
      * anyRequest          |   匹配所有请求路径
      * access              |   SpringEl表达式结果为true时可以访问
      * anonymous           |   匿名可以访问
@@ -141,7 +141,6 @@ public class YudaoWebSecurityConfigurerAdapter {
 
         // 添加 Token Filter
         httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
-
         return httpSecurity.build();
     }
 

@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@Schema(description = "管理后台 - 用户分页时的信息 Response VO,相比用户基本信息来说，会多部门信息")
+@Schema(description = "管理后台 - 用户分页时的信息 Response VO，相比用户基本信息来说，会多部门信息")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

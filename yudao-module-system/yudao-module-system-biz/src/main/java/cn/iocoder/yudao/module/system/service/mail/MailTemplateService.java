@@ -19,11 +19,6 @@ import java.util.Map;
 public interface MailTemplateService {
 
     /**
-     * 初始化邮件模版的本地缓存
-     */
-    void initLocalCache();
-
-    /**
      * 邮件模版创建
      *
      * @param createReqVO 邮件信息

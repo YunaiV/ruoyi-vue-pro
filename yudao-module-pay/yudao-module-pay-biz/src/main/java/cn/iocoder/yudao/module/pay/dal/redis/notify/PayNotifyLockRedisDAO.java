@@ -33,7 +33,7 @@ public class PayNotifyLockRedisDAO {
     }
 
     private static String formatKey(Long id) {
-        return String.format(PAY_NOTIFY_LOCK.getKeyTemplate(), id);
+        return String.format(PAY_NOTIFY_LOCK, id);
     }
 
 }

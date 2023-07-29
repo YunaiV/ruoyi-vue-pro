@@ -6,8 +6,6 @@ import lombok.Data;
 /**
  * 支付单信息 Response DTO
  *
- * TODO 芋艿：还没定好字段
- *
  * @author 芋道源码
  */
 @Data

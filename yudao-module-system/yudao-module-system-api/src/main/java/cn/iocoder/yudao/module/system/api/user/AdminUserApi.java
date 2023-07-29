@@ -44,7 +44,7 @@ public interface AdminUserApi {
      * @param postIds 岗位数组
      * @return 用户数组
      */
-    List<AdminUserRespDTO> getUsersByPostIds(Collection<Long> postIds);
+    List<AdminUserRespDTO> getUserListByPostIds(Collection<Long> postIds);
 
     /**
      * 获得用户 Map
