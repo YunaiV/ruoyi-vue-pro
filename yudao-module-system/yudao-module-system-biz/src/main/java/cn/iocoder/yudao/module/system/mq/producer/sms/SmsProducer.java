@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.system.mq.producer.sms;
 
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.mq.core.RedisMQTemplate;
-import cn.iocoder.yudao.module.system.mq.message.sms.SmsChannelRefreshMessage;
 import cn.iocoder.yudao.module.system.mq.message.sms.SmsSendMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -22,14 +21,6 @@ public class SmsProducer {
 
     @Resource
     private RedisMQTemplate redisMQTemplate;
-
-    /**
-     * 发送 {@link SmsChannelRefreshMessage} 消息
-     */
-    public void sendSmsChannelRefreshMessage() {
-        SmsChannelRefreshMessage message = new SmsChannelRefreshMessage();
-        redisMQTemplate.send(message);
-    }
 
     /**
      * 发送 {@link SmsSendMessage} 消息
