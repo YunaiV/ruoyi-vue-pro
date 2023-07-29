@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.infra.service.file;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.file.core.client.FileClient;
@@ -15,20 +17,20 @@ import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigU
 import cn.iocoder.yudao.module.infra.convert.file.FileConfigConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileConfigDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.file.FileConfigMapper;
-import cn.iocoder.yudao.module.infra.mq.producer.file.FileConfigProducer;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.validation.Validator;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_CONFIG_DELETE_FAIL_MASTER;
@@ -46,6 +48,12 @@ public class FileConfigServiceImpl implements FileConfigService {
 
     @Resource
     private FileClientFactory fileClientFactory;
+
+    /**
+     * 文件配置的缓存
+     */
+    @Getter
+    private List<FileConfigDO> fileConfigCache;
     /**
      * Master FileClient 对象，有且仅有一个，即 {@link FileConfigDO#getMaster()} 对应的
      */
@@ -54,9 +62,6 @@ public class FileConfigServiceImpl implements FileConfigService {
 
     @Resource
     private FileConfigMapper fileConfigMapper;
-
-    @Resource
-    private FileConfigProducer fileConfigProducer;
 
     @Resource
     private Validator validator;
@@ -76,6 +81,27 @@ public class FileConfigServiceImpl implements FileConfigService {
                 masterFileClient = fileClientFactory.getFileClient(config.getId());
             }
         });
+        this.fileConfigCache = configs;
+    }
+
+    /**
+     * 通过定时任务轮询，刷新缓存
+     *
+     * 目的：多节点部署时，通过轮询”通知“所有节点，进行刷新
+     */
+    @Scheduled(initialDelay = 60, fixedRate = 60, timeUnit = TimeUnit.SECONDS)
+    public void refreshLocalCache() {
+        // 情况一：如果缓存里没有数据，则直接刷新缓存
+        if (CollUtil.isEmpty(fileConfigCache)) {
+            initLocalCache();
+            return;
+        }
+
+        // 情况二，如果缓存里数据，则通过 updateTime 判断是否有数据变更，有变更则刷新缓存
+        LocalDateTime maxTime = CollectionUtils.getMaxValue(fileConfigCache, FileConfigDO::getUpdateTime);
+        if (fileConfigMapper.selectCountByUpdateTimeGt(maxTime) > 0) {
+            initLocalCache();
+        }
     }
 
     @Override
@@ -85,9 +111,9 @@ public class FileConfigServiceImpl implements FileConfigService {
                 .setConfig(parseClientConfig(createReqVO.getStorage(), createReqVO.getConfig()))
                 .setMaster(false); // 默认非 master
         fileConfigMapper.insert(fileConfig);
-        // 发送刷新配置的消息
-        fileConfigProducer.sendFileConfigRefreshMessage();
-        // 返回
+
+        // 刷新缓存
+        initLocalCache();
         return fileConfig.getId();
     }
 
@@ -99,8 +125,9 @@ public class FileConfigServiceImpl implements FileConfigService {
         FileConfigDO updateObj = FileConfigConvert.INSTANCE.convert(updateReqVO)
                 .setConfig(parseClientConfig(config.getStorage(), updateReqVO.getConfig()));
         fileConfigMapper.updateById(updateObj);
-        // 发送刷新配置的消息
-        fileConfigProducer.sendFileConfigRefreshMessage();
+
+        // 刷新缓存
+        initLocalCache();
     }
 
     @Override
@@ -112,15 +139,9 @@ public class FileConfigServiceImpl implements FileConfigService {
         fileConfigMapper.updateBatch(new FileConfigDO().setMaster(false));
         // 更新
         fileConfigMapper.updateById(new FileConfigDO().setId(id).setMaster(true));
-        // 发送刷新配置的消息
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 
-            @Override
-            public void afterCommit() {
-                fileConfigProducer.sendFileConfigRefreshMessage();
-            }
-
-        });
+        // 刷新缓存
+        initLocalCache();
     }
 
     private FileClientConfig parseClientConfig(Integer storage, Map<String, Object> config) {
@@ -143,8 +164,9 @@ public class FileConfigServiceImpl implements FileConfigService {
         }
         // 删除
         fileConfigMapper.deleteById(id);
-        // 发送刷新配置的消息
-        fileConfigProducer.sendFileConfigRefreshMessage();
+
+        // 刷新缓存
+        initLocalCache();
     }
 
     private FileConfigDO validateFileConfigExists(Long id) {
