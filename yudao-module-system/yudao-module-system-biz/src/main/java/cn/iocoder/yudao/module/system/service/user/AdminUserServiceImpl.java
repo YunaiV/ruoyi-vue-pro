@@ -290,8 +290,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         if (deptId == null) {
             return Collections.emptySet();
         }
-        Set<Long> deptIds = convertSet(deptService.getDeptListByParentIdFromCache(
-                deptId, true), DeptDO::getId);
+        Set<Long> deptIds = convertSet(deptService.getChildDeptList(deptId), DeptDO::getId);
         deptIds.add(deptId); // 包括自身
         return deptIds;
     }

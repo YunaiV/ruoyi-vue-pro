@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqV
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Collection;
 import java.util.List;
 
 @Mapper
@@ -23,6 +24,10 @@ public interface DeptMapper extends BaseMapperX<DeptDO> {
 
     default Long selectCountByParentId(Long parentId) {
         return selectCount(DeptDO::getParentId, parentId);
+    }
+
+    default List<DeptDO> selectListByParentId(Collection<Long> parentIds) {
+        return selectList(DeptDO::getParentId, parentIds);
     }
 
 }
