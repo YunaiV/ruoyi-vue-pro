@@ -5,6 +5,8 @@ import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.*;
+import cn.iocoder.yudao.framework.pay.core.client.impl.mock.MockPayClient;
+import cn.iocoder.yudao.framework.pay.core.client.impl.mock.MockPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.*;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -68,6 +70,8 @@ public class PayClientFactoryImpl implements PayClientFactory {
             case ALIPAY_APP: return (AbstractPayClient<Config>) new AlipayAppPayClient(channelId, (AlipayPayClientConfig) config);
             case ALIPAY_PC: return (AbstractPayClient<Config>) new AlipayPcPayClient(channelId, (AlipayPayClientConfig) config);
             case ALIPAY_BAR: return (AbstractPayClient<Config>) new AlipayBarPayClient(channelId, (AlipayPayClientConfig) config);
+            // 其它支付
+            case MOCK: return (AbstractPayClient<Config>) new MockPayClient(channelId, (MockPayClientConfig) config);
         }
         // 创建失败，错误日志 + 抛出异常
         log.error("[createPayClient][配置({}) 找不到合适的客户端实现]", config);

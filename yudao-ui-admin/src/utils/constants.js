@@ -160,6 +160,10 @@ export const PayChannelEnum = {
     "code": "alipay_bar",
     "name": "支付宝条码支付"
   },
+  MOCK : {
+    "code": "mock",
+    "name": "模拟支付"
+  }
 }
 
 /**
