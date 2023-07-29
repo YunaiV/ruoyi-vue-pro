@@ -66,7 +66,6 @@ public class FileConfigServiceImpl implements FileConfigService {
     @Resource
     private Validator validator;
 
-    @Override
     @PostConstruct
     public void initLocalCache() {
         // 第一步：查询数据
