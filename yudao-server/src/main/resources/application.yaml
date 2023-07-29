@@ -134,6 +134,12 @@ yudao:
       - cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants
       - cn.iocoder.yudao.module.system.enums.ErrorCodeConstants
       - cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants
+  mq:
+    redis:
+      pubsub:
+        enable: false # 是否开启 Redis pubsub 广播消费，默认为 true。这里设置成 false，可以按需开启
+      stream:
+        enable: false  # 是否开启 Redis stream 集群消费，默认为 true。这里设置成 false，可以按需开启
   tenant: # 多租户相关配置项
     enable: true
     ignore-urls:
