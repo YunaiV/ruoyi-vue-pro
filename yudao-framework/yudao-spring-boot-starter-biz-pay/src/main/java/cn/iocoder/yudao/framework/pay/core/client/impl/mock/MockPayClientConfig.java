@@ -14,7 +14,9 @@ import javax.validation.Validator;
 public class MockPayClientConfig implements PayClientConfig {
 
     /**
-     * 配置名称,如果不加任何属性, JsonUtils.parseObject2 解析会报错. 暂时加个名称
+     * 配置名称
+     *
+     * 如果不加任何属性，JsonUtils.parseObject2 解析会报错，所以暂时加个名称
      */
     private String name;
 
@@ -22,4 +24,5 @@ public class MockPayClientConfig implements PayClientConfig {
     public void validate(Validator validator) {
         // 模拟支付配置无需校验
     }
+
 }

@@ -10,7 +10,6 @@
             </el-radio>
           </el-radio-group>
         </el-form-item>
-
         <el-form-item label-width="180px" label="备注" prop="remark">
           <el-input v-model="formData.remark" :style="{width: '100%'}"></el-input>
         </el-form-item>

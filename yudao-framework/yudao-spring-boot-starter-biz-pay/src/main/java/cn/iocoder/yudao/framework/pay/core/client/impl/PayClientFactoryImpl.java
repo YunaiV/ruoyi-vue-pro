@@ -70,6 +70,7 @@ public class PayClientFactoryImpl implements PayClientFactory {
             case ALIPAY_APP: return (AbstractPayClient<Config>) new AlipayAppPayClient(channelId, (AlipayPayClientConfig) config);
             case ALIPAY_PC: return (AbstractPayClient<Config>) new AlipayPcPayClient(channelId, (AlipayPayClientConfig) config);
             case ALIPAY_BAR: return (AbstractPayClient<Config>) new AlipayBarPayClient(channelId, (AlipayPayClientConfig) config);
+            // 其它支付
             case MOCK: return (AbstractPayClient<Config>) new MockPayClient(channelId, (MockPayClientConfig) config);
         }
         // 创建失败，错误日志 + 抛出异常
