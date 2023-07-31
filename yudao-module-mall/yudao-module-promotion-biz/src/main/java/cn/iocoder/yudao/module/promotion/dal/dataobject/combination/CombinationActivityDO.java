@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.dal.dataobject.combination.combinationactivity;
+package cn.iocoder.yudao.module.promotion.dal.dataobject.combination;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
@@ -9,7 +9,6 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-// TODO @puhui999：是不是应该在 combination 哈？
 /**
  * 拼团活动 DO
  *

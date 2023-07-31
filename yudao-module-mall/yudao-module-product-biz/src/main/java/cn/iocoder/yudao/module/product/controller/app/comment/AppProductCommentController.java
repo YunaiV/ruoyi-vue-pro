@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.product.controller.app.comment;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -9,10 +8,8 @@ import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentStati
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppProductCommentRespVO;
 import cn.iocoder.yudao.module.product.convert.comment.ProductCommentConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
-import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.service.comment.ProductCommentService;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
-import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -27,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -60,15 +56,9 @@ public class AppProductCommentController {
     @GetMapping("/page")
     @Operation(summary = "获得商品评价分页")
     public CommonResult<PageResult<AppProductCommentRespVO>> getCommentPage(@Valid AppCommentPageReqVO pageVO) {
-        // TODO @puhui999：写到 convert 里，可以更简洁哈。
         PageResult<ProductCommentDO> commentDOPage = productCommentService.getCommentPage(pageVO, Boolean.TRUE);
         Set<Long> skuIds = CollectionUtils.convertSet(commentDOPage.getList(), ProductCommentDO::getSkuId);
-        List<ProductSkuDO> skuList = productSkuService.getSkuList(skuIds);
-        Map<Long, ProductSkuDO> skuDOMap = Maps.newLinkedHashMapWithExpectedSize(skuIds.size());
-        if (CollUtil.isNotEmpty(skuList)) {
-            skuDOMap.putAll(CollectionUtils.convertMap(skuList, ProductSkuDO::getId, c -> c));
-        }
-        PageResult<AppProductCommentRespVO> page = ProductCommentConvert.INSTANCE.convertPage02(commentDOPage, skuDOMap);
+        PageResult<AppProductCommentRespVO> page = ProductCommentConvert.INSTANCE.convertPage02(commentDOPage, productSkuService.getSkuList(skuIds));
         return success(page);
     }
 

@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.promotion.service.seckill.seckillactivity;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
@@ -26,11 +28,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.promotion.util.PromotionUtils.validateProductSkuExistence;
@@ -63,8 +64,9 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         // 获取所选 spu 下的所有 sku
         List<ProductSkuRespDTO> skus = productSkuApi.getSkuListBySpuId(CollUtil.newArrayList(createReqVO.getSpuId()));
         // 校验商品 sku 是否存在
-        // TODO @puhui999：直接校验 sku 数量，是不是就完事啦，不需要校验的特别严谨哈；
-        validateProductSkuExistence(createReqVO.getProducts(), skus, SeckillProductCreateReqVO::getSkuId);
+        if (skus.size() != createReqVO.getProducts().size()) {
+            throw exception(SKU_NOT_EXISTS);
+        }
 
         // 插入秒杀活动
         SeckillActivityDO activity = SeckillActivityConvert.INSTANCE.convert(createReqVO)
@@ -72,9 +74,8 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
                 .setTotalStock(CollectionUtils.getSumValue(createReqVO.getProducts(), SeckillProductCreateReqVO::getStock, Integer::sum));
         seckillActivityMapper.insert(activity);
         // 插入商品
-        // TODO @puhui999：products 要注意复数哈
-        List<SeckillProductDO> product = SeckillActivityConvert.INSTANCE.convertList(activity, createReqVO.getProducts());
-        seckillProductMapper.insertBatch(product);
+        List<SeckillProductDO> products = SeckillActivityConvert.INSTANCE.complementList(createReqVO.getProducts(), activity);
+        seckillProductMapper.insertBatch(products);
         return activity.getId();
     }
 
@@ -99,11 +100,9 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         }
         List<SeckillActivityDO> activityDOs2 = CollectionUtils.convertList(activityDOs, c -> c, s -> {
             // 判断秒杀时段是否有交集
-            // TODO @puhui999：是不是 containsAny 就是有交集呀
-            List<Long> configIdsClone = CollUtil.newArrayList(s.getConfigIds());
-            configIdsClone.retainAll(configIds);
-            return CollUtil.isNotEmpty(configIdsClone);
+            return CollectionUtils.containsAny(s.getConfigIds(), configIds);
         });
+
         if (CollUtil.isNotEmpty(activityDOs2)) {
             throw exception(SECKILL_TIME_CONFLICTS);
         }
@@ -147,31 +146,31 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         // 数据库中的活动商品
         List<SeckillProductDO> seckillProductDOs = seckillProductMapper.selectListByActivityId(updateObj.getId());
         Set<Long> dbSkuIds = CollectionUtils.convertSet(seckillProductDOs, SeckillProductDO::getSkuId);
-        // 1. 删除后台存在的前端不存在的商品
-        // TODO @puhui999：delete 应该是 id，不是 skuId 哈
         Set<Long> voSkuIds = CollectionUtils.convertSet(products, SeckillProductUpdateReqVO::getSkuId);
-        List<Long> d = CollectionUtils.filterList(dbSkuIds, item -> !voSkuIds.contains(item));
-        if (CollUtil.isNotEmpty(d)) {
-            seckillProductMapper.deleteBatchIds(d);
-        }
-        // 2. 前端存在的后端不存在的商品
-        List<Long> c = CollectionUtils.filterList(voSkuIds, item -> !dbSkuIds.contains(item));
-        if (CollUtil.isNotEmpty(c)) {
-            List<SeckillProductUpdateReqVO> vos = CollectionUtils.filterList(products, item -> c.contains(item.getSkuId()));
-            List<SeckillProductDO> productDOs = SeckillActivityConvert.INSTANCE.convertList(updateObj, vos);
-            seckillProductMapper.insertBatch(productDOs);
-        }
-        // 3. 更新已存在的商品
-        List<Long> u = CollectionUtils.filterList(voSkuIds, dbSkuIds::contains);
-        if (CollUtil.isNotEmpty(u)) {
-            List<SeckillProductUpdateReqVO> vos = CollectionUtils.filterList(products, item -> u.contains(item.getSkuId()));
-            List<SeckillProductDO> productDOs = SeckillActivityConvert.INSTANCE.convertList1(updateObj, vos, seckillProductDOs);
-            seckillProductMapper.updateBatch(productDOs);
-        }
+        Map<String, List<SeckillProductDO>> data = CollectionUtils.convertCDUMap(voSkuIds, dbSkuIds, mapData -> {
+            HashMap<String, List<SeckillProductDO>> cdu = MapUtil.newHashMap(3);
+            MapUtils.findAndThen(mapData, "create", list -> {
+                cdu.put("create", SeckillActivityConvert.INSTANCE.complementList(
+                        CollectionUtils.filterList(products, item -> list.contains(item.getSkuId())), updateObj));
+            });
+            MapUtils.findAndThen(mapData, "delete", list -> {
+                cdu.put("create", CollectionUtils.filterList(seckillProductDOs, item -> list.contains(item.getSkuId())));
+            });
+            MapUtils.findAndThen(mapData, "update", list -> {
+                cdu.put("update", SeckillActivityConvert.INSTANCE.complementList(seckillProductDOs,
+                        CollectionUtils.filterList(products, item -> list.contains(item.getSkuId())), updateObj));
+            });
+            return cdu;
+        });
+
+        // 执行增删改
+        MapUtils.findAndThen(data, "create", item -> seckillProductMapper.insertBatch(item));
+        MapUtils.findAndThen(data, "delete", item -> seckillProductMapper.deleteBatchIds(
+                CollectionUtils.convertSet(item, SeckillProductDO::getId)));
+        MapUtils.findAndThen(data, "update", item -> seckillProductMapper.updateBatch(item));
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class) // TODO @puhui999：这个不用加事务哈
     public void closeSeckillActivity(Long id) {
         // TODO 待验证没使用过
         // 校验存在

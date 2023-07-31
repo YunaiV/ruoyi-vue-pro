@@ -8,6 +8,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
@@ -21,12 +22,10 @@ import cn.iocoder.yudao.module.product.api.comment.ProductCommentApi;
 import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
-import cn.iocoder.yudao.module.promotion.api.combination.CombinationApi;
+import cn.iocoder.yudao.module.promotion.api.combination.CombinationRecordApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponUseReqDTO;
 import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
-import cn.iocoder.yudao.module.system.api.notify.NotifyMessageSendApi;
-import cn.iocoder.yudao.module.system.api.notify.dto.NotifySendSingleToUserReqDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
@@ -38,9 +37,7 @@ import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.cart.TradeCartDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDeliveryDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
-import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderDeliveryMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderItemMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
 import cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants;
@@ -49,6 +46,8 @@ import cn.iocoder.yudao.module.trade.enums.order.*;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import cn.iocoder.yudao.module.trade.service.cart.TradeCartService;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
+import cn.iocoder.yudao.module.trade.service.message.TradeMessageService;
+import cn.iocoder.yudao.module.trade.service.message.dto.TradeOrderMessageWhenDeliveryOrderReqDTO;
 import cn.iocoder.yudao.module.trade.service.price.TradePriceService;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
@@ -102,15 +101,13 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     @Resource
     private ProductCommentApi productCommentApi;
     @Resource
-    private NotifyMessageSendApi notifyMessageSendApi;
-
+    private TradeMessageService tradeMessageService;
     @Resource
     private TradeOrderProperties tradeOrderProperties;
 
     @Resource
-    private CombinationApi combinationApi;
-    @Resource
-    private TradeOrderDeliveryMapper orderDeliveryMapper;
+    private CombinationRecordApi combinationRecordApi;
+
     // =================== Order ===================
 
     @Override
@@ -177,7 +174,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         if (ObjectUtil.equal(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
             MemberUserRespDTO user = memberUserApi.getUser(userId);
             // TODO 拼团一次应该只能选择一种规格的商品
-            combinationApi.createRecord(TradeOrderConvert.INSTANCE.convert(order, orderItems.get(0), createReqVO, user)
+            combinationRecordApi.createRecord(TradeOrderConvert.INSTANCE.convert(order, orderItems.get(0), createReqVO, user)
                     .setStatus(CombinationRecordStatusEnum.WAITING.getStatus()));
         }
         // TODO 秒杀扣减库存是下单就扣除还是等待订单支付成功再扣除
@@ -314,7 +311,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // 1、拼团活动
         if (ObjectUtil.equal(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
             // 更新拼团状态 TODO puhui999：订单支付失败或订单支付过期删除这条拼团记录
-            combinationApi.updateRecordStatusAndStartTime(order.getUserId(), order.getId(), CombinationRecordStatusEnum.IN_PROGRESS.getStatus());
+            combinationRecordApi.updateRecordStatusAndStartTime(order.getUserId(), order.getId(), CombinationRecordStatusEnum.IN_PROGRESS.getStatus());
         }
         // TODO 芋艿：发送订单变化的消息
 
@@ -385,23 +382,26 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // 校验并获得交易订单（可发货）
         TradeOrderDO order = validateOrderDeliverable(deliveryReqVO.getId());
 
-        TradeOrderDO tradeOrderDO = new TradeOrderDO();
-        List<TradeOrderDeliveryDO> deliveryDOs = new ArrayList<>();
         /* TODO
          * fix: 首先需要店铺设置配送方式如： 自提 、配送、物流-配送、物流-配送-自提、商家配送
          * 1.如果店铺有设置配送方式用户只填写收货地址的情况下店家后台自己选择配送方式
          * 2.如果店铺只支持到店自提那么下单后默认发货不需要物流
          * 3.如果店铺支持 物流-配送-自提 的情况下后台不需要选择配送方式按前端用户选择的配送方式发货即可
          */
+        TradeOrderDO tradeOrderDO = new TradeOrderDO();
         // 判断发货类型
         // 快递发货
         if (ObjectUtil.equal(deliveryReqVO.getType(), DeliveryTypeEnum.EXPRESS.getMode())) {
-            deliveryDOs = express(order, deliveryReqVO);
+            // 校验快递公司
+            DeliveryExpressDO deliveryExpress = deliveryExpressService.getDeliveryExpress(deliveryReqVO.getLogisticsId());
+            if (deliveryExpress == null) {
+                throw exception(EXPRESS_NOT_EXISTS);
+            }
             tradeOrderDO.setLogisticsId(deliveryReqVO.getLogisticsId()).setLogisticsNo(deliveryReqVO.getLogisticsNo());
         }
         // 用户自提
         if (ObjectUtil.equal(deliveryReqVO.getType(), DeliveryTypeEnum.PICK_UP.getMode())) {
-            deliveryDOs = pickUp(order, deliveryReqVO);
+            // TODO 校验自提门店是否存在
             // 重置一下确保快递公司和快递单号为空
             tradeOrderDO.setLogisticsId(null).setLogisticsNo("");
         }
@@ -409,6 +409,8 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         if (ObjectUtil.equal(deliveryReqVO.getType(), DeliveryTypeEnum.NULL.getMode())) {
             // TODO 情况一：正常走发货逻辑和用户自提有点像 不同点：不需要自提门店只需要用户确认收货
             // TODO 情况二：用户下单付款后直接确认收货或等待用户确认收货
+            // 重置一下确保快递公司和快递单号为空
+            tradeOrderDO.setLogisticsId(null).setLogisticsNo("");
         }
 
         // 更新 TradeOrderDO 状态为已发货，等待收货
@@ -418,70 +420,14 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         if (updateCount == 0) {
             throw exception(ORDER_DELIVERY_FAIL_STATUS_NOT_UNDELIVERED);
         }
-        // 发货成功记录发货表
-        orderDeliveryMapper.insertBatch(deliveryDOs);
         // TODO 芋艿：发送订单变化的消息
 
-        // TODO @puhui999：可以抽个 message 包，里面是 Order 所有的 message；类似工作流的
         // 发送站内信
-        // 1、构造消息
-        Map<String, Object> msgMap = new HashMap<>();
-        msgMap.put("orderId", deliveryReqVO.getId());
-        msgMap.put("msg", TradeOrderStatusEnum.DELIVERED.getStatus());
-        // 2、发送站内信
-        notifyMessageSendApi.sendSingleMessageToMember(
-                new NotifySendSingleToUserReqDTO()
-                        .setUserId(userId)
-                        .setTemplateCode("order_delivery")
-                        .setTemplateParams(msgMap));
+        tradeMessageService.sendMessageWhenDeliveryOrder(new TradeOrderMessageWhenDeliveryOrderReqDTO().setOrderId(order.getId())
+                .setUserId(userId).setMessage(TradeOrderDeliveryStatusEnum.DELIVERED.getName()));
 
         // TODO 芋艿：OrderLog
         // TODO 设计：lili：是不是发货后，才支持售后？
-    }
-
-    private List<TradeOrderDeliveryDO> express(TradeOrderDO order, TradeOrderDeliveryReqVO deliveryReqVO) {
-        // 校验快递公司
-        DeliveryExpressDO deliveryExpress = deliveryExpressService.getDeliveryExpress(deliveryReqVO.getLogisticsId());
-        if (deliveryExpress == null) {
-            throw exception(EXPRESS_NOT_EXISTS);
-        }
-        // 校验发货商品
-        validateDeliveryOrderItem(order, deliveryReqVO);
-        // 创建发货记录
-        return TradeOrderConvert.INSTANCE.covert(order, deliveryReqVO);
-    }
-
-    private List<TradeOrderDeliveryDO> pickUp(TradeOrderDO order, TradeOrderDeliveryReqVO deliveryReqVO) {
-        // TODO 校验自提门店是否存在
-        // 重置一下确保快递公司和快递单号为空
-        deliveryReqVO.setLogisticsId(null);
-        deliveryReqVO.setLogisticsNo("");
-        // 校验发货商品
-        validateDeliveryOrderItem(order, deliveryReqVO);
-        // 创建发货记录
-        return TradeOrderConvert.INSTANCE.covert(order, deliveryReqVO);
-    }
-
-    private void validateDeliveryOrderItem(TradeOrderDO order, TradeOrderDeliveryReqVO deliveryReqVO) {
-        // TODO 设计：like：是否要单独一个 delivery 发货单表？？？ fix: 多商品可分开单独发货，添加 trade_order_delivery 交易订单发货日志表关联发货所选订单项设置物流单号
-        // TODO 设计：niu：要不要支持一个订单下，多个 order item 单独发货，类似有赞 fix
-        // 校验发货商品
-        if (CollUtil.isEmpty(deliveryReqVO.getOrderItemIds())) {
-            throw exception(ORDER_DELIVERY_FAILED_ITEMS_NOT_EMPTY);
-        }
-        // 校验发货商品是否存在
-        List<TradeOrderItemDO> orderItemDOs = tradeOrderItemMapper.selectListByOrderId(order.getId());
-        Set<Long> itemIds = convertSet(orderItemDOs, TradeOrderItemDO::getId);
-        if (!itemIds.containsAll(deliveryReqVO.getOrderItemIds())) {
-            throw exception(ORDER_DELIVERY_FAILED_ITEM_NOT_EXISTS);
-        }
-        // 校验所选订单项是否存在有已发货的
-        List<TradeOrderDeliveryDO> deliveryDOList = orderDeliveryMapper.selsectListByOrderIdAndItemIds(order.getId(), deliveryReqVO.getOrderItemIds());
-        if (CollUtil.isNotEmpty(deliveryDOList)) {
-            HashSet<Long> hashSet = CollUtil.newHashSet(deliveryReqVO.getOrderItemIds());
-            hashSet.retainAll(convertSet(deliveryDOList, TradeOrderDeliveryDO::getOrderItemId));
-            throw exception(ORDER_DELIVERY_FAILED_ITEM_ALREADY_DELIVERY);
-        }
     }
 
     /**
@@ -511,7 +457,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         if (ObjectUtil.equal(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
             // 校验订单拼团是否成功
             // TODO 用户 ID 使用当前登录用户的还是订单保存的？
-            if (combinationApi.validateRecordStatusIsSuccess(order.getUserId(), order.getId())) {
+            if (combinationRecordApi.validateRecordStatusIsSuccess(order.getUserId(), order.getId())) {
                 throw exception(ORDER_DELIVERY_FAIL_COMBINATION_RECORD_STATUS_NOT_SUCCESS);
             }
         }
@@ -532,7 +478,6 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         if (updateCount == 0) {
             throw exception(ORDER_RECEIVE_FAIL_STATUS_NOT_DELIVERED);
         }
-
         // TODO 芋艿：OrderLog
 
         // TODO 芋艿：lili 发送订单变化的消息
@@ -683,6 +628,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Long createOrderItemComment(AppTradeOrderItemCommentCreateReqVO createReqVO) {
         Long loginUserId = getLoginUserId();
         // 先通过订单项 ID，查询订单项是否存在
@@ -690,7 +636,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         if (orderItem == null) {
             throw exception(ORDER_ITEM_NOT_FOUND);
         }
-        // 校验订单
+        // 校验订单相关状态
         TradeOrderDO order = getOrderByIdAndUserId(orderItem.getOrderId(), loginUserId);
         if (order == null) {
             throw exception(ORDER_NOT_FOUND);
@@ -701,11 +647,18 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         if (ObjectUtil.notEqual(order.getCommentStatus(), Boolean.FALSE)) {
             throw exception(ORDER_COMMENT_STATUS_NOT_FALSE);
         }
-        // TODO @puhui999：是不是评论完，要更新 status、commentStatus；另外，是不是上面 order 可以不校验，直接只判断 orderItem 就够；
-        // 对于 order 来说，就是评论完，把 order 更新完合理的 status 等字段。
 
+        // 创建评价
         ProductCommentCreateReqDTO productCommentCreateReqDTO = TradeOrderConvert.INSTANCE.convert04(createReqVO, orderItem);
-        return productCommentApi.createComment(productCommentCreateReqDTO);
+        Long comment = productCommentApi.createComment(productCommentCreateReqDTO);
+        // 更新订单项评价状态
+        tradeOrderItemMapper.updateById(new TradeOrderItemDO().setId(orderItem.getId()).setCommentStatus(Boolean.TRUE));
+        List<TradeOrderItemDO> orderItems = getOrderItemListByOrderId(CollUtil.newArrayList(order.getId()));
+        if (!CollectionUtils.isAny(orderItems, item -> ObjectUtil.equal(item.getCommentStatus(), Boolean.FALSE))) {
+            // 对于 order 来说，就是评论完，把 order 更新完合理的 status 等字段。
+            tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId()).setCommentStatus(Boolean.TRUE));
+        }
+        return comment;
     }
 
     /**

@@ -1,8 +1,8 @@
-package cn.iocoder.yudao.module.promotion.dal.mysql.combination.combinationactivity;
+package cn.iocoder.yudao.module.promotion.dal.mysql.combination;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.combinationactivity.CombinationRecordDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -18,6 +18,18 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
     default CombinationRecordDO selectRecord(Long userId, Long orderId) {
         return selectOne(CombinationRecordDO::getUserId, userId,
                 CombinationRecordDO::getOrderId, orderId);
+    }
+
+    /**
+     * 查询拼团记录
+     *
+     * @param headId     团长编号
+     * @param activityId 活动编号
+     * @return 拼团记录
+     */
+    default CombinationRecordDO selectRecordByHeadId(Long headId, Long activityId, Integer status) {
+        return selectOne(CombinationRecordDO::getUserId, headId, CombinationRecordDO::getActivityId, activityId,
+                CombinationRecordDO::getStatus, status);
     }
 
     default List<CombinationRecordDO> selectListByHeadIdAndStatus(Long headId, Integer status) {

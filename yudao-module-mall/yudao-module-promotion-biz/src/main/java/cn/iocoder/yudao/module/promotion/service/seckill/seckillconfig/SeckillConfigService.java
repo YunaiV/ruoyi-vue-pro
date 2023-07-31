@@ -73,9 +73,10 @@ public interface SeckillConfigService {
     /**
      * 获得所有正常状态的时段配置列表
      *
+     * @param status 状态
      * @return 秒杀时段列表
      */
-    List<SeckillConfigDO> getListAllSimple();
+    List<SeckillConfigDO> getSeckillConfigListByStatus(Integer status);
 
     /**
      * 更新秒杀时段配置状态

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.enums.combination;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,6 +35,10 @@ public enum CombinationRecordStatusEnum implements IntArrayValuable {
     @Override
     public int[] array() {
         return ARRAYS;
+    }
+
+    public static boolean isSuccess(Integer status) {
+        return ObjectUtil.equal(status, SUCCESS.getStatus());
     }
 
 }

@@ -31,6 +31,10 @@ public interface ErrorCodeConstants {
     ErrorCode ORDER_COMMENT_STATUS_NOT_FALSE = new ErrorCode(1011000020, "创建交易订单项的评价失败，订单已评价");
     ErrorCode ORDER_DELIVERY_FAIL_REFUND_STATUS_NOT_NONE = new ErrorCode(1011000021, "交易订单发货失败，订单已退款或部分退款");
     ErrorCode ORDER_DELIVERY_FAIL_COMBINATION_RECORD_STATUS_NOT_SUCCESS = new ErrorCode(1011000022, "交易订单发货失败，拼团未成功");
+    // TODO 已移除订单单独发货
+    ErrorCode ORDER_DELIVERY_FAILED_ITEMS_NOT_EMPTY = new ErrorCode(1011000023, "订单发货失败，请选择发货商品");
+    ErrorCode ORDER_DELIVERY_FAILED_ITEM_NOT_EXISTS = new ErrorCode(1011000024, "订单发货失败，所选发货商品不存在");
+    ErrorCode ORDER_DELIVERY_FAILED_ITEM_ALREADY_DELIVERY = new ErrorCode(1011000025, "订单发货失败，所选商品已发货");
 
     // ==========  After Sale 模块 1011000100 ==========
     ErrorCode AFTER_SALE_NOT_FOUND = new ErrorCode(1011000100, "售后单不存在");
@@ -68,11 +72,5 @@ public interface ErrorCodeConstants {
 
     // ==========  物流 PICK_UP 模块 1011006000 ==========
     ErrorCode PICK_UP_STORE_NOT_EXISTS = new ErrorCode(1011006000, "自提门店不存在");
-
-    // ==========  物流 PICK_UP 模块 1011007000 ==========
-    // TODO @puhui999：这几个错误码，应该属于订单哈
-    ErrorCode ORDER_DELIVERY_FAILED_ITEMS_NOT_EMPTY = new ErrorCode(1011007000, "订单发货失败，请选择发货商品");
-    ErrorCode ORDER_DELIVERY_FAILED_ITEM_NOT_EXISTS = new ErrorCode(1011007001, "订单发货失败，所选发货商品不存在");
-    ErrorCode ORDER_DELIVERY_FAILED_ITEM_ALREADY_DELIVERY = new ErrorCode(1011007002, "订单发货失败，所选商品已发货");
 
 }
