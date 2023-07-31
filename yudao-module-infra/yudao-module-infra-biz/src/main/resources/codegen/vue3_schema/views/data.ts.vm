@@ -55,7 +55,7 @@ const crudSchemas = reactive<CrudSchema[]>([
       #if ($javaType == "LocalDate")
     formatter: dateFormatter2,
       #elseif ($column.htmlType == "datetime")
-    formatter: dateFormatter2,
+    formatter: dateFormatter,
       #end
     #end
 ## ========= Search 表格部分 =========
