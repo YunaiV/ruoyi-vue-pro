@@ -199,7 +199,7 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
         role101.setTenantId(dbTenant.getId());
         when(roleService.getRoleListByStatus(isNull())).thenReturn(asList(role100, role101));
         // mock 每个角色的权限
-        when(permissionService.getRoleMenuIds(eq(101L))).thenReturn(asSet(201L, 202L));
+        when(permissionService.getRoleMenuListByRoleId(eq(101L))).thenReturn(asSet(201L, 202L));
 
         // 调用
         tenantService.updateTenant(reqVO);
@@ -454,7 +454,7 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
         TenantContextHolder.setTenantId(dbTenant.getId());
         // mock 菜单
         when(menuService.getMenuList()).thenReturn(Arrays.asList(randomPojo(MenuDO.class, o -> o.setId(100L)),
-                        randomPojo(MenuDO.class, o -> o.setId(101L))));
+                randomPojo(MenuDO.class, o -> o.setId(101L))));
 
         // 调用
         tenantService.handleTenantMenu(handler);

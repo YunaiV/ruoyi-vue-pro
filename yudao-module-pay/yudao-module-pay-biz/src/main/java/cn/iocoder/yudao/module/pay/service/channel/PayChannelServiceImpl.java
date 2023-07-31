@@ -15,7 +15,6 @@ import cn.iocoder.yudao.module.pay.controller.admin.channel.vo.PayChannelUpdateR
 import cn.iocoder.yudao.module.pay.convert.channel.PayChannelConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.channel.PayChannelMapper;
-import cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -112,7 +111,7 @@ public class PayChannelServiceImpl implements PayChannelService {
         channelMapper.insert(channel);
 
         // 刷新缓存
-        refreshLocalCache();
+        initLocalCache();
         return channel.getId();
     }
 
@@ -127,7 +126,7 @@ public class PayChannelServiceImpl implements PayChannelService {
         channelMapper.updateById(channel);
 
         // 刷新缓存
-        refreshLocalCache();
+        initLocalCache();
     }
 
     /**
@@ -160,7 +159,7 @@ public class PayChannelServiceImpl implements PayChannelService {
         channelMapper.deleteById(id);
 
         // 刷新缓存
-        refreshLocalCache();
+        initLocalCache();
     }
 
     private PayChannelDO validateChannelExists(Long id) {

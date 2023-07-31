@@ -18,19 +18,6 @@ import java.util.List;
 public interface MailAccountService {
 
     /**
-     * 初始化邮箱账号的本地缓存
-     */
-    void initLocalCache();
-
-    /**
-     * 从缓存中获取邮箱账号
-     *
-     * @param id 编号
-     * @return 邮箱账号
-     */
-    MailAccountDO getMailAccountFromCache(Long id);
-
-    /**
      * 创建邮箱账号
      *
      * @param createReqVO 邮箱账号信息
@@ -59,6 +46,14 @@ public interface MailAccountService {
      * @return 邮箱账号信息
      */
     MailAccountDO getMailAccount(Long id);
+
+    /**
+     * 从缓存中获取邮箱账号
+     *
+     * @param id 编号
+     * @return 邮箱账号
+     */
+    MailAccountDO getMailAccountFromCache(Long id);
 
     /**
      * 获取邮箱账号分页信息

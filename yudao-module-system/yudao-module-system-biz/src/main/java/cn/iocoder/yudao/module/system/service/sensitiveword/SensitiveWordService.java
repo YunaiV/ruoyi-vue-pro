@@ -19,11 +19,6 @@ import java.util.Set;
 public interface SensitiveWordService {
 
     /**
-     * 初始化本地缓存
-     */
-    void initLocalCache();
-
-    /**
      * 创建敏感词
      *
      * @param createReqVO 创建信息

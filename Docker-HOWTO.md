@@ -1,23 +1,24 @@
 # Docker Build & Up
 
 目标: 快速部署体验系统，帮助了解系统之间的依赖关系。
+依赖：docker compose v2，删除`name: yudao-system`，降低`version`版本为`3.3`以下，支持`docker-compose`。
 
 ## 功能文件列表
 
 ```text
 .
-├── Docker-HOWTO.md
-├── docker-compose.yml
-├── docker.env
+├── Docker-HOWTO.md                 
+├── docker-compose.yml              
+├── docker.env                      <-- 提供docker-compose环境变量配置
 ├── yudao-server
-│   ├── Dockerfile
-│   └── nginx.conf
+│   └── Dockerfile
 └── yudao-ui-admin
     ├── .dockerignore
-    └── Dockerfile
+    ├── Dockerfile
+    └── nginx.conf                  <-- 提供基础配置，gzip压缩、api转发
 ```
 
-## Maven build (Optional)
+## 构建 jar 包
 
 ```shell
 # 创建maven缓存volume
@@ -30,29 +31,19 @@ docker run -it --rm --name yudao-maven \
     maven mvn clean install package '-Dmaven.test.skip=true'
 ```
 
-## Docker Compose Build
-
-```shell
-docker compose --env-file docker.env build
-```
-
-## Docker Compose Up
+## 构建启动服务
 
 ```shell
 docker compose --env-file docker.env up -d
 ```
 
-第一次执行，由于数据库未初始化，因此yudao-server容器会运行失败。执行如下命令初始化数据库：
+首次运行会自动构建容器。可以通过`docker compose build [service]`来手动构建所有或某个docker镜像
 
-```shell
-docker compose exec -T mysql \
-    sh -c 'exec mysql -uroot -p"$MYSQL_ROOT_PASSWORD" --default-character-set=utf8mb4 ruoyi-vue-pro' \
-    < ./sql/mysql/ruoyi-vue-pro.sql
-```
+`--env-file docker.env`为可选参数，只是展示了通过`.env`文件配置容器启动的环境变量，`docker-compose.yml`本身已经提供足够的默认参数来正常运行系统。
 
-## Server:Port
+## 服务器的宿主机端口映射
 
-- admin: http://localhost:8080
-- API: http://localhost:48080
-- mysql: root/123456, port: 3308
+- admin ui: http://localhost:8080
+- api server: http://localhost:48080
+- mysql: root/123456, port: 3306
 - redis: port: 6379

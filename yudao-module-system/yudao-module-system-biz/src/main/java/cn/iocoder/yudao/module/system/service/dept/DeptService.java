@@ -7,10 +7,7 @@ import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqV
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 部门 Service 接口
@@ -18,11 +15,6 @@ import java.util.Map;
  * @author 芋道源码
  */
 public interface DeptService {
-
-    /**
-     * 初始化部门的本地缓存
-     */
-    void initLocalCache();
 
     /**
      * 创建部门
@@ -47,21 +39,12 @@ public interface DeptService {
     void deleteDept(Long id);
 
     /**
-     * 筛选部门列表
+     * 获得部门信息
      *
-     * @param reqVO 筛选条件请求 VO
-     * @return 部门列表
+     * @param id 部门编号
+     * @return 部门信息
      */
-    List<DeptDO> getDeptList(DeptListReqVO reqVO);
-
-    /**
-     * 获得所有子部门，从缓存中
-     *
-     * @param parentId 部门编号
-     * @param recursive 是否递归获取所有
-     * @return 子部门列表
-     */
-    List<DeptDO> getDeptListByParentIdFromCache(Long parentId, boolean recursive);
+    DeptDO getDept(Long id);
 
     /**
      * 获得部门信息数组
@@ -70,6 +53,14 @@ public interface DeptService {
      * @return 部门信息数组
      */
     List<DeptDO> getDeptList(Collection<Long> ids);
+
+    /**
+     * 筛选部门列表
+     *
+     * @param reqVO 筛选条件请求 VO
+     * @return 部门列表
+     */
+    List<DeptDO> getDeptList(DeptListReqVO reqVO);
 
     /**
      * 获得指定编号的部门 Map
@@ -86,12 +77,20 @@ public interface DeptService {
     }
 
     /**
-     * 获得部门信息
+     * 获得指定部门的所有子部门
      *
      * @param id 部门编号
-     * @return 部门信息
+     * @return 子部门列表
      */
-    DeptDO getDept(Long id);
+    List<DeptDO> getChildDeptList(Long id);
+
+    /**
+     * 获得所有子部门，从缓存中
+     *
+     * @param id 父部门编号
+     * @return 子部门列表
+     */
+    Set<Long> getChildDeptIdListFromCache(Long id);
 
     /**
      * 校验部门们是否有效。如下情况，视为无效：

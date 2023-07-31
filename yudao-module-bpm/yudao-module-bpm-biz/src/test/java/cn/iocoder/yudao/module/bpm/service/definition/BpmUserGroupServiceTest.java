@@ -23,10 +23,10 @@ import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgn
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.USER_GROUP_NOT_EXISTS;
 
 /**
-* {@link BpmUserGroupServiceImpl} 的单元测试类
-*
-* @author 芋道源码
-*/
+ * {@link BpmUserGroupServiceImpl} 的单元测试类
+ *
+ * @author 芋道源码
+ */
 @Import(BpmUserGroupServiceImpl.class)
 public class BpmUserGroupServiceTest extends BaseDbUnitTest {
 

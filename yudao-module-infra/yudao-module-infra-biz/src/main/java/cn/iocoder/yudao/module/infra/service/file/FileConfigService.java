@@ -17,11 +17,6 @@ import javax.validation.Valid;
 public interface FileConfigService {
 
     /**
-     * 初始化文件客户端
-     */
-    void initLocalCache();
-
-    /**
      * 创建文件配置
      *
      * @param createReqVO 创建信息

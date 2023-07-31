@@ -17,19 +17,6 @@ import java.util.Map;
 public interface NotifyTemplateService {
 
     /**
-     * 初始化站内信模板的本地缓存
-     */
-    void initLocalCache();
-
-    /**
-     * 获得站内信模板，从缓存中
-     *
-     * @param code 模板编码
-     * @return 站内信模板
-     */
-    NotifyTemplateDO getNotifyTemplateByCodeFromCache(String code);
-
-    /**
      * 创建站内信模版
      *
      * @param createReqVO 创建信息
@@ -58,6 +45,14 @@ public interface NotifyTemplateService {
      * @return 站内信模版
      */
     NotifyTemplateDO getNotifyTemplate(Long id);
+
+    /**
+     * 获得站内信模板，从缓存中
+     *
+     * @param code 模板编码
+     * @return 站内信模板
+     */
+    NotifyTemplateDO getNotifyTemplateByCodeFromCache(String code);
 
     /**
      * 获得站内信模版分页

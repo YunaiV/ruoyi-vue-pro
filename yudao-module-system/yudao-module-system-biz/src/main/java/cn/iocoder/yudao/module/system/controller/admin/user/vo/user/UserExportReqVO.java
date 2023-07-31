@@ -29,7 +29,7 @@ public class UserExportReqVO {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 
-    @Schema(description = "部门编号,同时筛选子部门", example = "1024")
+    @Schema(description = "部门编号，同时筛选子部门", example = "1024")
     private Long deptId;
 
 }

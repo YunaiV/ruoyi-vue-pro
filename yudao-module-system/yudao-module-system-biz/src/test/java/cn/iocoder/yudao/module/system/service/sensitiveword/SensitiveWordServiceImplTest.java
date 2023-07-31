@@ -10,9 +10,7 @@ import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.Sensitiv
 import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.SensitiveWordUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sensitiveword.SensitiveWordDO;
 import cn.iocoder.yudao.module.system.dal.mysql.sensitiveword.SensitiveWordMapper;
-import cn.iocoder.yudao.module.system.mq.producer.sensitiveword.SensitiveWordProducer;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
@@ -29,7 +27,6 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SENSITIVE_WORD_NOT_EXISTS;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
 
 /**
  * {@link SensitiveWordServiceImpl} 的单元测试类
@@ -45,9 +42,6 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
     @Resource
     private SensitiveWordMapper sensitiveWordMapper;
 
-    @MockBean
-    private SensitiveWordProducer sensitiveWordProducer;
-
     @Test
     public void testInitLocalCache() {
         SensitiveWordDO wordDO1 = randomPojo(SensitiveWordDO.class, o -> o.setName("傻瓜")
@@ -61,6 +55,10 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         sensitiveWordService.initLocalCache();
         // 断言 sensitiveWordTagsCache 缓存
         assertEquals(SetUtils.asSet("论坛", "蔬菜"), sensitiveWordService.getSensitiveWordTagSet());
+        // 断言 sensitiveWordCache
+        assertEquals(2, sensitiveWordService.getSensitiveWordCache().size());
+        assertPojoEquals(wordDO1, sensitiveWordService.getSensitiveWordCache().get(0));
+        assertPojoEquals(wordDO2, sensitiveWordService.getSensitiveWordCache().get(1));
         // 断言 tagSensitiveWordTries 缓存
         assertNotNull(sensitiveWordService.getDefaultSensitiveWordTrie());
         assertEquals(2, sensitiveWordService.getTagSensitiveWordTries().size());
@@ -80,7 +78,6 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         // 校验记录的属性是否正确
         SensitiveWordDO sensitiveWord = sensitiveWordMapper.selectById(sensitiveWordId);
         assertPojoEquals(reqVO, sensitiveWord);
-        verify(sensitiveWordProducer).sendSensitiveWordRefreshMessage();
     }
 
     @Test
@@ -98,7 +95,6 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         // 校验是否更新正确
         SensitiveWordDO sensitiveWord = sensitiveWordMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, sensitiveWord);
-        verify(sensitiveWordProducer).sendSensitiveWordRefreshMessage();
     }
 
     @Test
@@ -122,7 +118,6 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         sensitiveWordService.deleteSensitiveWord(id);
         // 校验数据不存在了
         assertNull(sensitiveWordMapper.selectById(id));
-        verify(sensitiveWordProducer).sendSensitiveWordRefreshMessage();
     }
 
     @Test

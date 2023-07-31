@@ -16,11 +16,6 @@ import java.util.List;
 public interface MenuService {
 
     /**
-     * 初始化菜单的本地缓存
-     */
-    void initLocalCache();
-
-    /**
      * 创建菜单
      *
      * @param reqVO 菜单信息
@@ -67,36 +62,12 @@ public interface MenuService {
     List<MenuDO> getMenuList(MenuListReqVO reqVO);
 
     /**
-     * 获得所有菜单，从缓存中
-     *
-     * 任一参数为空时，则返回为空
-     *
-     * @param menuTypes 菜单类型数组
-     * @param menusStatuses 菜单状态数组
-     * @return 菜单列表
-     */
-    List<MenuDO> getMenuListFromCache(Collection<Integer> menuTypes, Collection<Integer> menusStatuses);
-
-    /**
-     * 获得指定编号的菜单数组，从缓存中
-     *
-     * 任一参数为空时，则返回为空
-     *
-     * @param menuIds 菜单编号数组
-     * @param menuTypes 菜单类型数组
-     * @param menusStatuses 菜单状态数组
-     * @return 菜单数组
-     */
-    List<MenuDO> getMenuListFromCache(Collection<Long> menuIds, Collection<Integer> menuTypes,
-                                      Collection<Integer> menusStatuses);
-
-    /**
-     * 获得权限对应的菜单数组
+     * 获得权限对应的菜单编号数组
      *
      * @param permission 权限标识
      * @return 数组
      */
-    List<MenuDO> getMenuListByPermissionFromCache(String permission);
+    List<Long> getMenuIdListByPermissionFromCache(String permission);
 
     /**
      * 获得菜单
@@ -105,5 +76,13 @@ public interface MenuService {
      * @return 菜单
      */
     MenuDO getMenu(Long id);
+
+    /**
+     * 获得菜单数组
+     *
+     * @param ids 菜单编号数组
+     * @return 菜单数组
+     */
+    List<MenuDO> getMenuList(Collection<Long> ids);
 
 }
