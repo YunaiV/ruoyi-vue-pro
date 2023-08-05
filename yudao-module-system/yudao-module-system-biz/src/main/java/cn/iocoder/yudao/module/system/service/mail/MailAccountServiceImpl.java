@@ -47,8 +47,7 @@ public class MailAccountServiceImpl implements MailAccountService {
     }
 
     @Override
-    @CacheEvict(value = RedisKeyConstants.MAIL_ACCOUNT,
-            allEntries = true)// allEntries 清空所有缓存，主要一次更新涉及到的 mailAccountId 较多，反倒批量会更快
+    @CacheEvict(value = RedisKeyConstants.MAIL_ACCOUNT, key = "#updateReqVO.id")
     public void updateMailAccount(MailAccountUpdateReqVO updateReqVO) {
         // 校验是否存在
         validateMailAccountExists(updateReqVO.getId());
@@ -59,8 +58,7 @@ public class MailAccountServiceImpl implements MailAccountService {
     }
 
     @Override
-    @CacheEvict(value = RedisKeyConstants.MAIL_ACCOUNT,
-            allEntries = true) // allEntries 清空所有缓存，主要一次更新涉及到的 mailAccountId 较多，反倒批量会更快
+    @CacheEvict(value = RedisKeyConstants.MAIL_ACCOUNT, key = "#updateReqVO.id")
     public void deleteMailAccount(Long id) {
         // 校验是否存在账号
         validateMailAccountExists(id);
