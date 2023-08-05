@@ -58,7 +58,7 @@ public class MailAccountServiceImpl implements MailAccountService {
     }
 
     @Override
-    @CacheEvict(value = RedisKeyConstants.MAIL_ACCOUNT, key = "#updateReqVO.id")
+    @CacheEvict(value = RedisKeyConstants.MAIL_ACCOUNT, key = "#id")
     public void deleteMailAccount(Long id) {
         // 校验是否存在账号
         validateMailAccountExists(id);
