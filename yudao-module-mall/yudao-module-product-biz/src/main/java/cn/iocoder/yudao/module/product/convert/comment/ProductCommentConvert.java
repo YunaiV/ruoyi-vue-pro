@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.product.convert.comment;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -15,7 +14,6 @@ import cn.iocoder.yudao.module.product.controller.app.property.vo.value.AppProdu
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
-import com.google.common.collect.Maps;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -52,17 +50,16 @@ public interface ProductCommentConvert {
 
     PageResult<AppProductCommentRespVO> convertPage01(PageResult<ProductCommentDO> pageResult);
 
-    default PageResult<AppProductCommentRespVO> convertPage02(PageResult<ProductCommentDO> pageResult, List<ProductSkuDO> skuList) {
-        Map<Long, ProductSkuDO> skuMap = Maps.newLinkedHashMapWithExpectedSize(skuList.size());
-        if (CollUtil.isNotEmpty(skuList)) {
-            skuMap.putAll(CollectionUtils.convertMap(skuList, ProductSkuDO::getId));
-        }
+    default PageResult<AppProductCommentRespVO> convertPage02(PageResult<ProductCommentDO> pageResult,
+                                                              List<ProductSkuDO> skuList) {
+        Map<Long, ProductSkuDO> skuMap = CollectionUtils.convertMap(skuList, ProductSkuDO::getId);
         PageResult<AppProductCommentRespVO> page = convertPage01(pageResult);
         page.getList().forEach(item -> {
             // 判断用户是否选择匿名
             if (ObjectUtil.equal(item.getAnonymous(), true)) {
                 item.setUserNickname(ProductCommentDO.NICKNAME_ANONYMOUS);
             }
+            // 设置 SKU 规格值
             MapUtils.findAndThen(skuMap, item.getSkuId(),
                     sku -> item.setSkuProperties(convertList01(sku.getProperties())));
         });

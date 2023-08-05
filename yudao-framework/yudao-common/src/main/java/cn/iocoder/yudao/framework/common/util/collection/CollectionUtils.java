@@ -6,11 +6,10 @@ import cn.hutool.core.map.MapUtil;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.*;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 import java.util.stream.Collectors;
+
+import static java.util.Arrays.asList;
 
 /**
  * Collection 工具类
@@ -20,13 +19,14 @@ import java.util.stream.Collectors;
 public class CollectionUtils {
 
     public static boolean containsAny(Object source, Object... targets) {
-        return Arrays.asList(targets).contains(source);
+        return asList(targets).contains(source);
     }
 
     public static boolean isAnyEmpty(Collection<?>... collections) {
         return Arrays.stream(collections).anyMatch(CollectionUtil::isEmpty);
     }
 
+    // TODO @puhui999：anyMatch 更统一点
     public static <T> boolean isAny(Collection<T> from, Predicate<T> predicate) {
         return from.stream().anyMatch(predicate);
     }
@@ -187,6 +187,46 @@ public class CollectionUtils {
             mapData.put("update", u);
         }
         return func.apply(mapData);
+    }
+
+    /**
+     * 对比老、新两个列表，找出新增、修改、删除的数据
+     *
+     * @param oldList 老列表
+     * @param newList 新列表
+     * @param sameFunc 对比函数，返回 true 表示相同，返回 false 表示不同
+     *                 注意，same 是通过每个元素的“标识”，判断它们是不是同一个数据
+     * @return [新增列表、修改列表、删除列表]
+     */
+    public static <T> List<List<T>> diffList(Collection<T> oldList, Collection<T> newList,
+                                             BiFunction<T, T, Boolean> sameFunc) {
+        List<T> createList = new LinkedList<>(newList); // 默认都认为是新增的，后续会进行移除
+        List<T> updateList = new ArrayList<>();
+        List<T> deleteList = new ArrayList<>();
+
+        // 通过以 oldList 为主遍历，找出 updateList 和 deleteList
+        for (T oldObj : oldList) {
+            // 1. 寻找是否有匹配的
+            T foundObj = null;
+            for (Iterator<T> iterator = createList.iterator(); iterator.hasNext(); ) {
+                T newObj = iterator.next();
+                // 1.1 不匹配，则直接跳过
+                if (!sameFunc.apply(oldObj, newObj)) {
+                    continue;
+                }
+                // 1.2 匹配，则移除，并结束寻找
+                iterator.remove();
+                foundObj = newObj;
+                break;
+            }
+            // 2. 匹配添加到 updateList；不匹配则添加到 deleteList 中
+            if (foundObj != null) {
+                updateList.add(foundObj);
+            } else {
+                deleteList.add(oldObj);
+            }
+        }
+        return asList(createList, updateList, deleteList);
     }
 
     public static boolean containsAny(Collection<?> source, Collection<?> candidates) {

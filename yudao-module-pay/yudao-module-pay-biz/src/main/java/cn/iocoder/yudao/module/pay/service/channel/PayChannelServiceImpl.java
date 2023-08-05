@@ -27,6 +27,7 @@ import javax.annotation.Resource;
 import javax.validation.Validator;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -64,7 +65,15 @@ public class PayChannelServiceImpl implements PayChannelService {
         // 注意：忽略自动多租户，因为要全局初始化缓存
         TenantUtils.executeIgnore(() -> {
             // 第一步：查询数据
-            List<PayChannelDO> channels = channelMapper.selectList();
+            List<PayChannelDO> channels = Collections.emptyList();
+            try {
+                channels = channelMapper.selectList();
+            } catch (Throwable ex) {
+                if (!ex.getMessage().contains("doesn't exist")) {
+                    throw ex;
+                }
+                log.error("[支付模块 yudao-module-pay - 表结构未导入][参考 https://doc.iocoder.cn/pay/build/ 开启]");
+            }
             log.info("[initLocalCache][缓存支付渠道，数量为:{}]", channels.size());
 
             // 第二步：构建缓存：创建或更新支付 Client

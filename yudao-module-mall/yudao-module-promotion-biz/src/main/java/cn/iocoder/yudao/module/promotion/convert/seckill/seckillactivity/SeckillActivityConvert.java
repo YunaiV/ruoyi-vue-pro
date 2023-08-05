@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+
 /**
  * 秒杀活动 Convert
  *
@@ -37,6 +39,7 @@ public interface SeckillActivityConvert {
 
     SeckillActivityRespVO convert(SeckillActivityDO bean);
 
+    // TODO @puhui999：这个是不是还是 convertList 好点？
     List<SeckillActivityRespVO> complementList(List<SeckillActivityDO> list);
 
     PageResult<SeckillActivityRespVO> convertPage(PageResult<SeckillActivityDO> page);
@@ -73,7 +76,7 @@ public interface SeckillActivityConvert {
     })
     SeckillProductDO convert(SeckillActivityDO activityDO, SeckillProductBaseVO vo);
 
-    default List<SeckillProductDO> complementList(List<? extends SeckillProductBaseVO> products, SeckillActivityDO activityDO) {
+    default List<SeckillProductDO> convertList(List<? extends SeckillProductBaseVO> products, SeckillActivityDO activityDO) {
         List<SeckillProductDO> list = new ArrayList<>();
         products.forEach(sku -> {
             SeckillProductDO productDO = convert(activityDO, sku);
@@ -83,16 +86,12 @@ public interface SeckillActivityConvert {
         return list;
     }
 
-    default List<SeckillProductDO> complementList(List<SeckillProductDO> productDOs, List<SeckillProductUpdateReqVO> vos, SeckillActivityDO activityDO) {
-        Map<Long, Long> longMap = CollectionUtils.convertMap(productDOs, SeckillProductDO::getSkuId, SeckillProductDO::getId);
-        List<SeckillProductDO> list = new ArrayList<>();
-        vos.forEach(sku -> {
-            SeckillProductDO productDO = convert(activityDO, sku);
-            productDO.setId(longMap.get(sku.getSkuId()));
-            productDO.setActivityStatus(activityDO.getStatus());
-            list.add(productDO);
-        });
-        return list;
+    default List<SeckillProductDO> convertList(List<SeckillProductUpdateReqVO> updateProductVOs,
+                                                   List<SeckillProductDO> products, SeckillActivityDO activity) {
+        Map<Long, Long> productMap = convertMap(products, SeckillProductDO::getSkuId, SeckillProductDO::getId);
+        return CollectionUtils.convertList(updateProductVOs, updateProductVO -> convert(activity, updateProductVO)
+                .setId(productMap.get(updateProductVO.getSkuId()))
+                .setActivityStatus(activity.getStatus()));
     }
 
     List<SeckillProductRespVO> convertList2(List<SeckillProductDO> productDOs);

@@ -332,6 +332,7 @@ public interface TradeOrderConvert {
             @Mapping(target = "avatar", source = "user.avatar"),
             @Mapping(target = "status", ignore = true)
     })
-    CombinationRecordCreateReqDTO convert(TradeOrderDO order, TradeOrderItemDO orderItem, AppTradeOrderCreateReqVO createReqVO, MemberUserRespDTO user);
+    CombinationRecordCreateReqDTO convert(TradeOrderDO order, TradeOrderItemDO orderItem,
+                                          AppTradeOrderCreateReqVO createReqVO, MemberUserRespDTO user);
 
 }

@@ -27,6 +27,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -68,7 +69,15 @@ public class MpAccountServiceImpl implements MpAccountService {
         // 注意：忽略自动多租户，因为要全局初始化缓存
         TenantUtils.executeIgnore(() -> {
             // 第一步：查询数据
-            List<MpAccountDO> accounts = mpAccountMapper.selectList();
+            List<MpAccountDO> accounts = Collections.emptyList();
+            try {
+                accounts = mpAccountMapper.selectList();
+            } catch (Throwable ex) {
+                if (!ex.getMessage().contains("doesn't exist")) {
+                    throw ex;
+                }
+                log.error("[微信公众号 yudao-module-mp - 表结构未导入][参考 https://doc.iocoder.cn/mp/build/ 开启]");
+            }
             log.info("[initLocalCacheIfUpdate][缓存公众号账号，数量为:{}]", accounts.size());
 
             // 第二步：构建缓存。创建或更新支付 Client

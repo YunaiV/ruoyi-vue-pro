@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.promotion.convert.combination;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
@@ -70,7 +71,7 @@ public interface CombinationActivityConvert {
         return respVO;
     }
 
-    List<CombinationActivityRespVO> complementList(List<CombinationActivityDO> list);
+    List<CombinationActivityRespVO> convertList(List<CombinationActivityDO> list);
 
     PageResult<CombinationActivityRespVO> convertPage(PageResult<CombinationActivityDO> page);
 
@@ -80,8 +81,10 @@ public interface CombinationActivityConvert {
         Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
         PageResult<CombinationActivityRespVO> pageResult = convertPage(page);
         pageResult.getList().forEach(item -> {
-            MapUtils.findAndThen(spuMap, item.getSpuId(), spu -> item.setSpuName(spu.getName()));
-            MapUtils.findAndThen(spuMap, item.getSpuId(), spu -> item.setPicUrl(spu.getPicUrl()));
+            MapUtils.findAndThen(spuMap, item.getSpuId(), spu -> {
+                item.setSpuName(spu.getName());
+                item.setPicUrl(spu.getPicUrl());
+            });
             item.setProducts(convertList2(productList));
         });
         return pageResult;
@@ -100,7 +103,7 @@ public interface CombinationActivityConvert {
     })
     CombinationProductDO convert(CombinationActivityDO activityDO, CombinationProductBaseVO vo);
 
-    default List<CombinationProductDO> complementList(List<? extends CombinationProductBaseVO> products, CombinationActivityDO activityDO) {
+    default List<CombinationProductDO> convertList(List<? extends CombinationProductBaseVO> products, CombinationActivityDO activityDO) {
         List<CombinationProductDO> list = new ArrayList<>();
         products.forEach(sku -> {
             CombinationProductDO productDO = convert(activityDO, sku);
@@ -110,16 +113,12 @@ public interface CombinationActivityConvert {
         return list;
     }
 
-    default List<CombinationProductDO> complementList(List<CombinationProductDO> productDOs, List<CombinationProductUpdateReqVO> vos, CombinationActivityDO activityDO) {
-        Map<Long, Long> longMap = convertMap(productDOs, CombinationProductDO::getSkuId, CombinationProductDO::getId);
-        List<CombinationProductDO> list = new ArrayList<>();
-        vos.forEach(sku -> {
-            CombinationProductDO productDO = convert(activityDO, sku);
-            productDO.setId(longMap.get(sku.getSkuId()));
-            productDO.setActivityStatus(activityDO.getStatus());
-            list.add(productDO);
-        });
-        return list;
+    default List<CombinationProductDO> convertList(List<CombinationProductUpdateReqVO> updateProductVOs,
+                                                   List<CombinationProductDO> products, CombinationActivityDO activity) {
+        Map<Long, Long> productMap = convertMap(products, CombinationProductDO::getSkuId, CombinationProductDO::getId);
+        return CollectionUtils.convertList(updateProductVOs, updateProductVO -> convert(activity, updateProductVO)
+                        .setId(productMap.get(updateProductVO.getSkuId()))
+                        .setActivityStatus(activity.getStatus()));
     }
 
     CombinationRecordDO convert(CombinationRecordCreateReqDTO reqDTO);

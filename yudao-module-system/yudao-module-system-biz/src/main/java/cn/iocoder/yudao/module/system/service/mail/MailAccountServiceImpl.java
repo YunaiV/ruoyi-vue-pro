@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailAccountMapper;
 import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -46,7 +47,7 @@ public class MailAccountServiceImpl implements MailAccountService {
     }
 
     @Override
-    @Cacheable(value = RedisKeyConstants.MAIL_ACCOUNT, key = "#updateReqVO.id")
+    @CacheEvict(value = RedisKeyConstants.MAIL_ACCOUNT, key = "#updateReqVO.id")
     public void updateMailAccount(MailAccountUpdateReqVO updateReqVO) {
         // 校验是否存在
         validateMailAccountExists(updateReqVO.getId());
@@ -57,7 +58,7 @@ public class MailAccountServiceImpl implements MailAccountService {
     }
 
     @Override
-    @Cacheable(value = RedisKeyConstants.MAIL_ACCOUNT, key = "#id")
+    @CacheEvict(value = RedisKeyConstants.MAIL_ACCOUNT, key = "#id")
     public void deleteMailAccount(Long id) {
         // 校验是否存在账号
         validateMailAccountExists(id);

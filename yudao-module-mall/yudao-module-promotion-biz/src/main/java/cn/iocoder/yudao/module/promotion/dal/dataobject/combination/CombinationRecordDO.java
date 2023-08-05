@@ -12,6 +12,9 @@ import java.time.LocalDateTime;
 /**
  * 拼团记录 DO
  *
+ * 1. 用户参与拼团时，会创建一条记录
+ * 2. 团长的拼团记录，和参团人的拼团记录，通过 {@link #headId} 关联
+ *
  * @author HUIHUI
  */
 @TableName("promotion_combination_record")

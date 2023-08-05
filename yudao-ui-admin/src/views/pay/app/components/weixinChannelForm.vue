@@ -52,9 +52,9 @@
             <el-input v-model="formData.config.apiV3Key" placeholder="请输入 API V3 密钥" clearable
                       :style="{width: '100%'}" type="textarea" :autosize="{minRows: 8, maxRows: 8}"></el-input>
           </el-form-item>
-          <el-form-item label-width="180px" label="apiclient_key.perm 证书" prop="config.privateKeyContent">
+          <el-form-item label-width="180px" label="apiclient_key.pem 证书" prop="config.privateKeyContent">
             <el-input v-model="formData.config.privateKeyContent" type="textarea"
-                      placeholder="请上传 apiclient_key.perm 证书"
+                      placeholder="请上传 apiclient_key.pem 证书"
                       readonly :autosize="{minRows: 8, maxRows: 8}" :style="{width: '100%'}"></el-input>
           </el-form-item>
           <el-form-item label-width="180px" label="" prop="privateKeyContentFile">
@@ -132,7 +132,7 @@ export default {
         'config.apiVersion': [{ required: true, message: 'API版本不能为空', trigger: 'blur'}],
         'config.mchKey': [{ required: true, message: '请输入商户密钥', trigger: 'blur' }],
         'config.keyContent': [{ required: true, message: '请上传 apiclient_cert.p12 证书', trigger: 'blur' }],
-        'config.privateKeyContent': [{ required: true, message: '请上传 apiclient_key.perm 证书', trigger: 'blur' }],
+        'config.privateKeyContent': [{ required: true, message: '请上传 apiclient_key.pem 证书', trigger: 'blur' }],
         'config.privateCertContent': [{ required: true, message: '请上传 apiclient_cert.perm证 书', trigger: 'blur' }],
         'config.apiV3Key': [{ required: true, message: '请上传 api V3 密钥值', trigger: 'blur' }],
       },

@@ -37,7 +37,7 @@ import java.util.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.promotion.util.PromotionUtils.validateProductSkuExistence;
+import static cn.iocoder.yudao.module.promotion.util.PromotionUtils.validateProductSkuAllExists;
 
 /**
  * 拼团活动 Service 实现类
@@ -66,7 +66,7 @@ public class CombinationServiceImpl implements CombinationActivityService, Combi
         // 获取所选 spu下的所有 sku
         List<ProductSkuRespDTO> skus = productSkuApi.getSkuListBySpuId(CollectionUtil.newArrayList(createReqVO.getSpuId()));
         // 校验商品 sku 是否存在
-        validateProductSkuExistence(createReqVO.getProducts(), skus, CombinationProductCreateReqVO::getSkuId);
+        validateProductSkuAllExists(createReqVO.getProducts(), skus, CombinationProductCreateReqVO::getSkuId);
 
         // TODO 艿艿 有个小问题：现在有活动时间和限制时长，活动时间的结束时间早于设置的限制时间怎么算状态比如：
         //  活动时间 2023-08-05 15:00:00 - 2023-08-05 15:20:00 限制时长 2小时，那么活动时间结束就结束还是加时到满两小时
@@ -80,7 +80,7 @@ public class CombinationServiceImpl implements CombinationActivityService, Combi
         activityDO.setStatus(CommonStatusEnum.ENABLE.getStatus());
         combinationActivityMapper.insert(activityDO);
         // 插入商品
-        List<CombinationProductDO> productDOs = CombinationActivityConvert.INSTANCE.complementList(createReqVO.getProducts(), activityDO);
+        List<CombinationProductDO> productDOs = CombinationActivityConvert.INSTANCE.convertList(createReqVO.getProducts(), activityDO);
         combinationProductMapper.insertBatch(productDOs);
         // 返回
         return activityDO.getId();
@@ -118,7 +118,7 @@ public class CombinationServiceImpl implements CombinationActivityService, Combi
         // 获取所选 spu下的所有 sku
         List<ProductSkuRespDTO> skus = productSkuApi.getSkuListBySpuId(CollectionUtil.newArrayList(updateReqVO.getSpuId()));
         // 校验商品 sku 是否存在
-        validateProductSkuExistence(updateReqVO.getProducts(), skus, CombinationProductUpdateReqVO::getSkuId);
+        validateProductSkuAllExists(updateReqVO.getProducts(), skus, CombinationProductUpdateReqVO::getSkuId);
 
         // 更新
         CombinationActivityDO updateObj = CombinationActivityConvert.INSTANCE.convert(updateReqVO);
@@ -140,18 +140,21 @@ public class CombinationServiceImpl implements CombinationActivityService, Combi
         // 前端传过来的活动商品
         Set<Long> convertSet1 = CollectionUtils.convertSet(products, CombinationProductUpdateReqVO::getSkuId);
         // 分化数据
+        // TODO @芋艿：看下这个实现
         Map<String, List<CombinationProductDO>> data = CollectionUtils.convertCDUMap(convertSet1, convertSet, mapData -> {
             HashMap<String, List<CombinationProductDO>> cdu = MapUtil.newHashMap(3);
             MapUtils.findAndThen(mapData, "create", list -> {
-                cdu.put("create", CombinationActivityConvert.INSTANCE.complementList(CollectionUtils.filterList(products, item -> list.contains(item.getSkuId())), updateObj));
+                cdu.put("create", CombinationActivityConvert.INSTANCE.convertList(CollectionUtils.filterList(products, item -> list.contains(item.getSkuId())), updateObj));
             });
             MapUtils.findAndThen(mapData, "delete", list -> {
                 cdu.put("create", CollectionUtils.filterList(combinationProductDOs, item -> list.contains(item.getSkuId())));
             });
-            MapUtils.findAndThen(mapData, "update", list -> {
-                cdu.put("update", CombinationActivityConvert.INSTANCE.complementList(combinationProductDOs,
-                        CollectionUtils.filterList(products, item -> list.contains(item.getSkuId())), updateObj));
-            });
+            // TODO @芋艿：临时注释，避免有问题
+//            MapUtils.findAndThen(mapData, "update", list -> {
+//                cdu.put("update", CombinationActivityConvert.INSTANCE.convertList(
+//                        combinationProductDOs,
+//                        CollectionUtils.filterList(products, item -> list.contains(item.getSkuId())), updateObj));
+//            });
             return cdu;
         });
 
@@ -199,12 +202,12 @@ public class CombinationServiceImpl implements CombinationActivityService, Combi
     }
 
     @Override
-    public List<CombinationProductDO> getProductsByActivityIds(Collection<Long> ids) {
+    public List<CombinationProductDO> getCombinationProductsByActivityIds(Collection<Long> ids) {
         return combinationProductMapper.selectListByActivityIds(ids);
     }
 
     @Override
-    public void updateRecordStatusByUserIdAndOrderId(Long userId, Long orderId, Integer status) {
+    public void updateCombinationRecordStatusByUserIdAndOrderId(Long userId, Long orderId, Integer status) {
         // 校验拼团是否存在
         CombinationRecordDO recordDO = validateCombinationRecord(userId, orderId);
 
@@ -215,7 +218,7 @@ public class CombinationServiceImpl implements CombinationActivityService, Combi
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateRecordStatusAndStartTimeByUserIdAndOrderId(Long userId, Long orderId, Integer status, LocalDateTime startTime) {
+    public void updateCombinationRecordStatusAndStartTimeByUserIdAndOrderId(Long userId, Long orderId, Integer status, LocalDateTime startTime) {
         CombinationRecordDO recordDO = validateCombinationRecord(userId, orderId);
         // 更新状态
         recordDO.setStatus(status);
@@ -247,15 +250,15 @@ public class CombinationServiceImpl implements CombinationActivityService, Combi
     }
 
     @Override
-    public void createRecord(CombinationRecordCreateReqDTO reqDTO) {
-        // 校验拼团活动
+    public void createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {
+        // 1.1 校验拼团活动
         CombinationActivityDO activity = validateCombinationActivityExists(reqDTO.getActivityId());
-        // 需要校验下，它当前是不是已经参加了该拼团；
+        // 1.2 需要校验下，他当前是不是已经参加了该拼团；
         CombinationRecordDO recordDO = recordMapper.selectRecord(reqDTO.getUserId(), reqDTO.getOrderId());
         if (recordDO != null) {
             throw exception(COMBINATION_RECORD_EXISTS);
         }
-        // 父拼团是否存在,是否已经满了
+        // 1.3 父拼团是否存在,是否已经满了
         if (reqDTO.getHeadId() != null) {
             CombinationRecordDO recordDO1 = recordMapper.selectRecordByHeadId(reqDTO.getHeadId(), reqDTO.getActivityId(), CombinationRecordStatusEnum.IN_PROGRESS.getStatus());
             if (recordDO1 == null) {
@@ -266,9 +269,12 @@ public class CombinationServiceImpl implements CombinationActivityService, Combi
                 throw exception(COMBINATION_RECORD_USER_FULL);
             }
         }
+        // TODO @puhui999：应该还有一些校验，后续补噶；例如说，一个团，自己已经参与进去了，不能再参与进去；
 
+        // 2. 创建拼团记录
         CombinationRecordDO record = CombinationActivityConvert.INSTANCE.convert(reqDTO);
         if (reqDTO.getHeadId() == null) {
+            // TODO @puhui999：不是自己呀；headId 是父团长的 CombinationRecordDO.id 哈
             record.setHeadId(reqDTO.getUserId());
         }
         record.setVirtualGroup(false);
@@ -279,7 +285,7 @@ public class CombinationServiceImpl implements CombinationActivityService, Combi
     }
 
     @Override
-    public CombinationRecordDO getRecord(Long userId, Long orderId) {
+    public CombinationRecordDO getCombinationRecord(Long userId, Long orderId) {
         return validateCombinationRecord(userId, orderId);
     }
 

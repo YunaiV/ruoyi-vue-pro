@@ -20,23 +20,23 @@ public class CombinationRecordApiImpl implements CombinationRecordApi {
     private CombinationRecordService recordService;
 
     @Override
-    public void createRecord(CombinationRecordCreateReqDTO reqDTO) {
-        recordService.createRecord(reqDTO);
+    public void createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {
+        recordService.createCombinationRecord(reqDTO);
     }
 
     @Override
-    public boolean validateRecordStatusIsSuccess(Long userId, Long orderId) {
-        return CombinationRecordStatusEnum.isSuccess(recordService.getRecord(userId, orderId).getStatus());
+    public boolean isCombinationRecordSuccess(Long userId, Long orderId) {
+        return CombinationRecordStatusEnum.isSuccess(recordService.getCombinationRecord(userId, orderId).getStatus());
     }
 
     @Override
-    public void updateRecordStatus(Long userId, Long orderId, Integer status) {
-        recordService.updateRecordStatusByUserIdAndOrderId(userId, orderId, status);
+    public void updateCombinationRecordStatus(Long userId, Long orderId, Integer status) {
+        recordService.updateCombinationRecordStatusByUserIdAndOrderId(userId, orderId, status);
     }
 
     @Override
-    public void updateRecordStatusAndStartTime(Long userId, Long orderId, Integer status) {
-        recordService.updateRecordStatusAndStartTimeByUserIdAndOrderId(userId, orderId, status, LocalDateTime.now());
+    public void updateCombinationRecordStatusAndStartTime(Long userId, Long orderId, Integer status) {
+        recordService.updateCombinationRecordStatusAndStartTimeByUserIdAndOrderId(userId, orderId, status, LocalDateTime.now());
     }
 
 }

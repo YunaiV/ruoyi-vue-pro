@@ -31,18 +31,20 @@ public class PromotionUtils {
         return LocalDateTimeUtils.beforeNow(endTime) ? CommonStatusEnum.DISABLE.getStatus() : CommonStatusEnum.ENABLE.getStatus();
     }
 
+    // TODO @puhui999：是不是第一个参数是 sku；然后是 products；这样关联性好点；
     /**
-     * 校验商品 sku 是否存在
+     * 校验商品 sku 是否都存在
      *
      * @param products 需要校验的商品
      * @param skus     数据库中的商品 skus
      * @param func     获取需要校验的商品的 skuId
      */
-    public static <T> void validateProductSkuExistence(List<T> products, List<ProductSkuRespDTO> skus, Function<T, Long> func) {
+    public static <T> void validateProductSkuAllExists(List<T> products, List<ProductSkuRespDTO> skus, Function<T, Long> func) {
         // 校验 sku 个数是否一致
         Set<Long> skuIdsSet = CollectionUtils.convertSet(products, func);
         Set<Long> skuIdsSet1 = CollectionUtils.convertSet(skus, ProductSkuRespDTO::getId);
         // 校验 skuId 是否存在
+        // TODO @puhui999：findFirst
         List<Long> f = CollectionUtils.filterList(skuIdsSet, s -> !skuIdsSet1.contains(s));
         if (CollUtil.isNotEmpty(f)) {
             throw exception(SKU_NOT_EXISTS);

@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.product.controller.app.comment;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentStatisticsRespVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppProductCommentRespVO;
@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Tag(name = "用户 APP - 商品评价")
 @RestController
@@ -56,10 +57,17 @@ public class AppProductCommentController {
     @GetMapping("/page")
     @Operation(summary = "获得商品评价分页")
     public CommonResult<PageResult<AppProductCommentRespVO>> getCommentPage(@Valid AppCommentPageReqVO pageVO) {
-        PageResult<ProductCommentDO> commentDOPage = productCommentService.getCommentPage(pageVO, Boolean.TRUE);
-        Set<Long> skuIds = CollectionUtils.convertSet(commentDOPage.getList(), ProductCommentDO::getSkuId);
-        PageResult<AppProductCommentRespVO> page = ProductCommentConvert.INSTANCE.convertPage02(commentDOPage, productSkuService.getSkuList(skuIds));
-        return success(page);
+        // 查询评论分页
+        PageResult<ProductCommentDO> commentPageResult = productCommentService.getCommentPage(pageVO, Boolean.TRUE);
+        if (CollUtil.isEmpty(commentPageResult.getList())) {
+            return success(PageResult.empty(commentPageResult.getTotal()));
+        }
+
+        // 拼接返回
+        Set<Long> skuIds = convertSet(commentPageResult.getList(), ProductCommentDO::getSkuId);
+        PageResult<AppProductCommentRespVO> commentVOPageResult = ProductCommentConvert.INSTANCE.convertPage02(
+                commentPageResult, productSkuService.getSkuList(skuIds));
+        return success(commentVOPageResult);
     }
 
     // TODO 芋艿：需要搞下
