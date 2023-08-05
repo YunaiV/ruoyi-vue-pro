@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.seckill;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.*;
@@ -80,7 +81,7 @@ public class SeckillConfigController {
     @GetMapping("/list-all-simple")
     @Operation(summary = "获得所有开启状态的秒杀时段精简列表", description = "主要用于前端的下拉选项")
     public CommonResult<List<SeckillConfigSimpleRespVO>> getListAllSimple() {
-        List<SeckillConfigDO> list = seckillConfigService.getListAllSimple();
+        List<SeckillConfigDO> list = seckillConfigService.getSeckillConfigListByStatus(CommonStatusEnum.ENABLE.getStatus());
         return success(SeckillConfigConvert.INSTANCE.convertList1(list));
     }
 

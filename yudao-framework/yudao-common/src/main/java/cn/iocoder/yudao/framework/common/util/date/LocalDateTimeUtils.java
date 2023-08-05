@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.common.util.date;
 import cn.hutool.core.date.LocalDateTimeUtil;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -70,7 +71,7 @@ public class LocalDateTimeUtils {
      * @param endTime2   校验所需的结束时间
      * @return 是否重叠
      */
-    // TODO @puhui999：LocalDateTimeUtil.isOverlap() 是不是可以满足呀？
+    @Deprecated
     public static boolean checkTimeOverlap(LocalTime startTime1, LocalTime endTime1, LocalTime startTime2, LocalTime endTime2) {
         // 判断时间是否重叠
         // 开始时间在已配置时段的结束时间之前 且 结束时间在已配置时段的开始时间之后 []
@@ -79,6 +80,16 @@ public class LocalDateTimeUtils {
                 || startTime1.isBefore(startTime2) && endTime1.isAfter(startTime2)
                 // 开始时间在已配置时段的结束时间之前 且 结束时间在已配值时段的结束时间之后 [) 或 ()
                 || startTime1.isBefore(endTime2) && endTime1.isAfter(endTime2);
+    }
+
+    public static boolean isOverlap(LocalTime startTime1, LocalTime endTime1, LocalTime startTime2, LocalTime endTime2) {
+        // 日期部分使用了当前日期LocalDate.now()
+        LocalDateTime startDateTime1 = LocalDateTime.of(LocalDate.now(), startTime1);
+        LocalDateTime endDateTime1 = LocalDateTime.of(LocalDate.now(), endTime1);
+        LocalDateTime startDateTime2 = LocalDateTime.of(LocalDate.now(), startTime2);
+        LocalDateTime endDateTime2 = LocalDateTime.of(LocalDate.now(), endTime2);
+
+        return LocalDateTimeUtil.isOverlap(startDateTime1, endDateTime1, startDateTime2, endDateTime2);
     }
 
 }

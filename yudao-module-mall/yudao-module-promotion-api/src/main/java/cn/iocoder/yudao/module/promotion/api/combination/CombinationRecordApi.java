@@ -1,30 +1,30 @@
 package cn.iocoder.yudao.module.promotion.api.combination;
 
-import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordReqDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 
 import javax.validation.Valid;
-
-// TODO @puhui999:CombinationRecordApi 分成活动、记录哈
 // TODO @芋艿：后面也再撸撸这几个接口
+
 /**
- * 拼团活动 API 接口
+ * 拼团记录 API 接口
  *
  * @author HUIHUI
  */
-public interface CombinationApi {
+public interface CombinationRecordApi {
 
     /**
      * 创建开团记录
      *
      * @param reqDTO 请求 DTO
      */
-    void createRecord(@Valid CombinationRecordReqDTO reqDTO);
+    void createRecord(@Valid CombinationRecordCreateReqDTO reqDTO);
 
     /**
-     * 获取开团记录状态
+     * 校验拼团是否成功
      *
      * @param userId  用户编号
      * @param orderId 订单编号
+     * @return 拼团是否成功
      */
     boolean validateRecordStatusIsSuccess(Long userId, Long orderId);
 

@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.promotion.convert.seckill.seckillactivity;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
@@ -38,7 +37,7 @@ public interface SeckillActivityConvert {
 
     SeckillActivityRespVO convert(SeckillActivityDO bean);
 
-    List<SeckillActivityRespVO> convertList(List<SeckillActivityDO> list);
+    List<SeckillActivityRespVO> complementList(List<SeckillActivityDO> list);
 
     PageResult<SeckillActivityRespVO> convertPage(PageResult<SeckillActivityDO> page);
 
@@ -74,24 +73,23 @@ public interface SeckillActivityConvert {
     })
     SeckillProductDO convert(SeckillActivityDO activityDO, SeckillProductBaseVO vo);
 
-    default List<SeckillProductDO> convertList(SeckillActivityDO activityDO, List<? extends SeckillProductBaseVO> products) {
+    default List<SeckillProductDO> complementList(List<? extends SeckillProductBaseVO> products, SeckillActivityDO activityDO) {
         List<SeckillProductDO> list = new ArrayList<>();
         products.forEach(sku -> {
             SeckillProductDO productDO = convert(activityDO, sku);
-            productDO.setActivityStatus(CommonStatusEnum.ENABLE.getStatus());
+            productDO.setActivityStatus(activityDO.getStatus());
             list.add(productDO);
         });
         return list;
     }
 
-    // TODO @puhui999：同拼团那个 convert 想通的情况哈。
-    default List<SeckillProductDO> convertList1(SeckillActivityDO activityDO, List<SeckillProductUpdateReqVO> vos, List<SeckillProductDO> productDOs) {
+    default List<SeckillProductDO> complementList(List<SeckillProductDO> productDOs, List<SeckillProductUpdateReqVO> vos, SeckillActivityDO activityDO) {
         Map<Long, Long> longMap = CollectionUtils.convertMap(productDOs, SeckillProductDO::getSkuId, SeckillProductDO::getId);
         List<SeckillProductDO> list = new ArrayList<>();
         vos.forEach(sku -> {
             SeckillProductDO productDO = convert(activityDO, sku);
             productDO.setId(longMap.get(sku.getSkuId()));
-            productDO.setActivityStatus(CommonStatusEnum.ENABLE.getStatus());
+            productDO.setActivityStatus(activityDO.getStatus());
             list.add(productDO);
         });
         return list;

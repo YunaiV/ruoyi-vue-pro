@@ -62,7 +62,7 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
         seckillConfigMapper.updateById(updateObj);
     }
 
-    // TODO  @puhui999: 这个要不合并到更新操作里? 不单独有个操作咧; 更新状态不用那么多必须的参数，更新的时候需要校验时间段
+    // TODO  @puhui999: 这个要不合并到更新操作里? 不单独有个操作咧; fix: 更新状态不用那么多必须的参数，更新的时候需要校验时间段
     @Override
     public void updateSeckillConfigStatus(Long id, Integer status) {
         // 校验秒杀时段是否存在
@@ -108,7 +108,7 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
             LocalTime startTime2 = LocalTime.parse(config.getStartTime());
             LocalTime endTime2 = LocalTime.parse(config.getEndTime());
             // 判断时间是否重叠
-            return LocalDateTimeUtils.checkTimeOverlap(startTime1, endTime1, startTime2, endTime2);
+            return LocalDateTimeUtils.isOverlap(startTime1, endTime1, startTime2, endTime2);
         });
 
         if (hasConflict) {
@@ -151,10 +151,9 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
         return seckillConfigMapper.selectPage(pageVO);
     }
 
-    // TODO @puhui999：改成传入 enable 状态哈。一个通用的 getSeckillConfigList 方法
     @Override
-    public List<SeckillConfigDO> getListAllSimple() {
-        return seckillConfigMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus());
+    public List<SeckillConfigDO> getSeckillConfigListByStatus(Integer status) {
+        return seckillConfigMapper.selectListByStatus(status);
     }
 
 }

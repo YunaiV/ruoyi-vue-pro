@@ -85,7 +85,7 @@ public class SeckillActivityController {
     @PreAuthorize("@ss.hasPermission('promotion:seckill-activity:query')")
     public CommonResult<List<SeckillActivityRespVO>> getSeckillActivityList(@RequestParam("ids") Collection<Long> ids) {
         List<SeckillActivityDO> list = seckillActivityService.getSeckillActivityList(ids);
-        return success(SeckillActivityConvert.INSTANCE.convertList(list));
+        return success(SeckillActivityConvert.INSTANCE.complementList(list));
     }
 
     @GetMapping("/page")

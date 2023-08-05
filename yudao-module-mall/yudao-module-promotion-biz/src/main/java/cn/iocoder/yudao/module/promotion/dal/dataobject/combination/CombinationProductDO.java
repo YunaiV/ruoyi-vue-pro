@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.dal.dataobject.combination.combinationactivity;
+package cn.iocoder.yudao.module.promotion.dal.dataobject.combination;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -42,6 +42,8 @@ public class CombinationProductDO extends BaseDO {
     private Long skuId;
     /**
      * 拼团商品状态
+     *
+     * 关联 {@link CombinationActivityDO#getStatus()}
      */
     private Integer activityStatus;
     /**
