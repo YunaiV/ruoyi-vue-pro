@@ -70,6 +70,6 @@ public interface CombinationActivityService {
      * @param ids 拼团活动 ids
      * @return 拼团活动的商品列表
      */
-    List<CombinationProductDO> getProductsByActivityIds(Collection<Long> ids);
+    List<CombinationProductDO> getCombinationProductsByActivityIds(Collection<Long> ids);
 
 }

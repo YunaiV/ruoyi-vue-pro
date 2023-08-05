@@ -84,11 +84,11 @@ public class LocalDateTimeUtils {
 
     public static boolean isOverlap(LocalTime startTime1, LocalTime endTime1, LocalTime startTime2, LocalTime endTime2) {
         // 日期部分使用了当前日期LocalDate.now()
+        // TODO @puhui999：LocalDate.now() 抽一个变量，啊哈；然后注释写下；之后 4 个变量不用，直接调方法的时候，直接计算作为入参；
         LocalDateTime startDateTime1 = LocalDateTime.of(LocalDate.now(), startTime1);
         LocalDateTime endDateTime1 = LocalDateTime.of(LocalDate.now(), endTime1);
         LocalDateTime startDateTime2 = LocalDateTime.of(LocalDate.now(), startTime2);
         LocalDateTime endDateTime2 = LocalDateTime.of(LocalDate.now(), endTime2);
-
         return LocalDateTimeUtil.isOverlap(startDateTime1, endDateTime1, startDateTime2, endDateTime2);
     }
 

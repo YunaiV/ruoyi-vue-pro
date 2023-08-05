@@ -174,7 +174,8 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         if (ObjectUtil.equal(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
             MemberUserRespDTO user = memberUserApi.getUser(userId);
             // TODO 拼团一次应该只能选择一种规格的商品
-            combinationRecordApi.createRecord(TradeOrderConvert.INSTANCE.convert(order, orderItems.get(0), createReqVO, user)
+            // TODO @puhui999：应该是前置校验哈；然后不应该设置状态，而是交给拼团记录那处理；
+            combinationRecordApi.createCombinationRecord(TradeOrderConvert.INSTANCE.convert(order, orderItems.get(0), createReqVO, user)
                     .setStatus(CombinationRecordStatusEnum.WAITING.getStatus()));
         }
         // TODO 秒杀扣减库存是下单就扣除还是等待订单支付成功再扣除
@@ -311,7 +312,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // 1、拼团活动
         if (ObjectUtil.equal(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
             // 更新拼团状态 TODO puhui999：订单支付失败或订单支付过期删除这条拼团记录
-            combinationRecordApi.updateRecordStatusAndStartTime(order.getUserId(), order.getId(), CombinationRecordStatusEnum.IN_PROGRESS.getStatus());
+            combinationRecordApi.updateCombinationRecordStatusAndStartTime(order.getUserId(), order.getId(), CombinationRecordStatusEnum.IN_PROGRESS.getStatus());
         }
         // TODO 芋艿：发送订单变化的消息
 
@@ -376,10 +377,11 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         return new KeyValue<>(order, payOrder);
     }
 
+    // TODO @芋艿：后续在 review 下发货逻辑
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deliveryOrder(Long userId, TradeOrderDeliveryReqVO deliveryReqVO) {
-        // 校验并获得交易订单（可发货）
+        // 1.1 校验并获得交易订单（可发货）
         TradeOrderDO order = validateOrderDeliverable(deliveryReqVO.getId());
 
         /* TODO
@@ -388,35 +390,36 @@ public class TradeOrderServiceImpl implements TradeOrderService {
          * 2.如果店铺只支持到店自提那么下单后默认发货不需要物流
          * 3.如果店铺支持 物流-配送-自提 的情况下后台不需要选择配送方式按前端用户选择的配送方式发货即可
          */
-        TradeOrderDO tradeOrderDO = new TradeOrderDO();
+        TradeOrderDO updateOrderObj = new TradeOrderDO();
         // 判断发货类型
-        // 快递发货
+        // 2.1 快递发货
         if (ObjectUtil.equal(deliveryReqVO.getType(), DeliveryTypeEnum.EXPRESS.getMode())) {
             // 校验快递公司
+            // TODO @puhui999：getDeliveryExpress 直接封装一个校验的，会不会好点；因为还有开启关闭啥的；
             DeliveryExpressDO deliveryExpress = deliveryExpressService.getDeliveryExpress(deliveryReqVO.getLogisticsId());
             if (deliveryExpress == null) {
                 throw exception(EXPRESS_NOT_EXISTS);
             }
-            tradeOrderDO.setLogisticsId(deliveryReqVO.getLogisticsId()).setLogisticsNo(deliveryReqVO.getLogisticsNo());
+            updateOrderObj.setLogisticsId(deliveryReqVO.getLogisticsId()).setLogisticsNo(deliveryReqVO.getLogisticsNo());
         }
-        // 用户自提
+        // 2.2 用户自提
         if (ObjectUtil.equal(deliveryReqVO.getType(), DeliveryTypeEnum.PICK_UP.getMode())) {
             // TODO 校验自提门店是否存在
             // 重置一下确保快递公司和快递单号为空
-            tradeOrderDO.setLogisticsId(null).setLogisticsNo("");
+            updateOrderObj.setLogisticsId(null).setLogisticsNo("");
         }
-        // TODO 芋艿：如果无需发货，需要怎么存储？
+        // 2.3 TODO 芋艿：如果无需发货，需要怎么存储？回复：需要把 deliverType 设置为 DeliveryTypeEnum.NULL
         if (ObjectUtil.equal(deliveryReqVO.getType(), DeliveryTypeEnum.NULL.getMode())) {
             // TODO 情况一：正常走发货逻辑和用户自提有点像 不同点：不需要自提门店只需要用户确认收货
             // TODO 情况二：用户下单付款后直接确认收货或等待用户确认收货
             // 重置一下确保快递公司和快递单号为空
-            tradeOrderDO.setLogisticsId(null).setLogisticsNo("");
+            updateOrderObj.setLogisticsId(null).setLogisticsNo("");
         }
 
         // 更新 TradeOrderDO 状态为已发货，等待收货
-        tradeOrderDO.setStatus(TradeOrderStatusEnum.DELIVERED.getStatus())
+        updateOrderObj.setStatus(TradeOrderStatusEnum.DELIVERED.getStatus())
                 .setDeliveryStatus(TradeOrderDeliveryStatusEnum.DELIVERED.getStatus()).setDeliveryTime(LocalDateTime.now());
-        int updateCount = tradeOrderMapper.updateByIdAndStatus(order.getId(), order.getStatus(), tradeOrderDO);
+        int updateCount = tradeOrderMapper.updateByIdAndStatus(order.getId(), order.getStatus(), updateOrderObj);
         if (updateCount == 0) {
             throw exception(ORDER_DELIVERY_FAIL_STATUS_NOT_UNDELIVERED);
         }
@@ -457,7 +460,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         if (ObjectUtil.equal(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
             // 校验订单拼团是否成功
             // TODO 用户 ID 使用当前登录用户的还是订单保存的？
-            if (combinationRecordApi.validateRecordStatusIsSuccess(order.getUserId(), order.getId())) {
+            if (combinationRecordApi.isCombinationRecordSuccess(order.getUserId(), order.getId())) {
                 throw exception(ORDER_DELIVERY_FAIL_COMBINATION_RECORD_STATUS_NOT_SUCCESS);
             }
         }

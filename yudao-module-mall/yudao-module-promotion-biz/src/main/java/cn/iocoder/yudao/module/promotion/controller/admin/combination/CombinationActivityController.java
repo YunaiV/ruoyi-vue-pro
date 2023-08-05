@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.promotion.controller.admin.combination;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityPageReqVO;
@@ -23,9 +22,11 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import static cn.hutool.core.collection.CollectionUtil.newArrayList;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Tag(name = "管理后台 - 拼团活动")
 @RestController
@@ -35,6 +36,7 @@ public class CombinationActivityController {
 
     @Resource
     private CombinationActivityService combinationActivityService;
+
     @Resource
     private ProductSpuApi spuApi;
 
@@ -68,17 +70,18 @@ public class CombinationActivityController {
     @PreAuthorize("@ss.hasPermission('promotion:combination-activity:query')")
     public CommonResult<CombinationActivityRespVO> getCombinationActivity(@RequestParam("id") Long id) {
         CombinationActivityDO activity = combinationActivityService.getCombinationActivity(id);
-        List<CombinationProductDO> products = combinationActivityService.getProductsByActivityIds(newArrayList(id));
+        List<CombinationProductDO> products = combinationActivityService.getCombinationProductsByActivityIds(newArrayList(id));
         return success(CombinationActivityConvert.INSTANCE.convert(activity, products));
     }
 
+    // TODO @puhui999：是不是可以删掉，貌似没用？
     @GetMapping("/list")
     @Operation(summary = "获得拼团活动列表")
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
     @PreAuthorize("@ss.hasPermission('promotion:combination-activity:query')")
     public CommonResult<List<CombinationActivityRespVO>> getCombinationActivityList(@RequestParam("ids") Collection<Long> ids) {
         List<CombinationActivityDO> list = combinationActivityService.getCombinationActivityList(ids);
-        return success(CombinationActivityConvert.INSTANCE.complementList(list));
+        return success(CombinationActivityConvert.INSTANCE.convertList(list));
     }
 
     @GetMapping("/page")
@@ -86,10 +89,14 @@ public class CombinationActivityController {
     @PreAuthorize("@ss.hasPermission('promotion:combination-activity:query')")
     public CommonResult<PageResult<CombinationActivityRespVO>> getCombinationActivityPage(
             @Valid CombinationActivityPageReqVO pageVO) {
+        // 查询拼团活动
         PageResult<CombinationActivityDO> pageResult = combinationActivityService.getCombinationActivityPage(pageVO);
+        // 拼接数据
+        Set<Long> activityIds = convertSet(pageResult.getList(), CombinationActivityDO::getId);
+        Set<Long> spuIds = convertSet(pageResult.getList(), CombinationActivityDO::getSpuId);
         return success(CombinationActivityConvert.INSTANCE.convertPage(pageResult,
-                combinationActivityService.getProductsByActivityIds(CollectionUtils.convertSet(pageResult.getList(), CombinationActivityDO::getId)),
-                spuApi.getSpuList(CollectionUtils.convertSet(pageResult.getList(), CombinationActivityDO::getSpuId))));
+                combinationActivityService.getCombinationProductsByActivityIds(activityIds),
+                spuApi.getSpuList(spuIds)));
     }
 
 }

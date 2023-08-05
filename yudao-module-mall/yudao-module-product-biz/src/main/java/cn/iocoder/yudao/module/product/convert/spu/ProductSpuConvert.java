@@ -112,10 +112,9 @@ public interface ProductSpuConvert {
     }
 
     default List<ProductSpuDetailRespVO> convertForSpuDetailRespListVO(List<ProductSpuDO> spus, List<ProductSkuDO> skus) {
-        List<ProductSpuDetailRespVO> vos = new ArrayList<>(spus.size());
         Map<Long, List<ProductSkuDO>> skuMultiMap = convertMultiMap(skus, ProductSkuDO::getSpuId);
-        CollectionUtils.convertList(spus, spu -> vos.add(convert03(spu).setSkus(ProductSkuConvert.INSTANCE.convertList(skuMultiMap.get(spu.getId())))));
-        return vos;
+        return CollectionUtils.convertList(spus, spu -> convert03(spu)
+                .setSkus(ProductSkuConvert.INSTANCE.convertList(skuMultiMap.get(spu.getId()))));
     }
 
 }

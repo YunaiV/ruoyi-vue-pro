@@ -79,6 +79,7 @@ public class SeckillActivityController {
         return success(SeckillActivityConvert.INSTANCE.convert(seckillActivity, seckillProducts));
     }
 
+    // TODO @puhui999：是不是可以删掉，貌似没用？
     @GetMapping("/list")
     @Operation(summary = "获得秒杀活动列表")
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")

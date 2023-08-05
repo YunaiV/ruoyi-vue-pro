@@ -27,6 +27,7 @@ public class CollectionUtils {
         return Arrays.stream(collections).anyMatch(CollectionUtil::isEmpty);
     }
 
+    // TODO @puhui999：anyMatch 更统一点
     public static <T> boolean isAny(Collection<T> from, Predicate<T> predicate) {
         return from.stream().anyMatch(predicate);
     }

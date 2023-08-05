@@ -5,6 +5,7 @@ import lombok.Data;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+// TODO @puhui999：改成 ReqBO 哈；包名也换了；service 我们还是同一用 bo 对象
 /**
  * 订单发货时 Req DTO
  *

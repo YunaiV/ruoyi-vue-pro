@@ -34,7 +34,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.promotion.util.PromotionUtils.validateProductSkuExistence;
+import static cn.iocoder.yudao.module.promotion.util.PromotionUtils.validateProductSkuAllExists;
 
 /**
  * 秒杀活动 Service 实现类
@@ -74,7 +74,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
                 .setTotalStock(CollectionUtils.getSumValue(createReqVO.getProducts(), SeckillProductCreateReqVO::getStock, Integer::sum));
         seckillActivityMapper.insert(activity);
         // 插入商品
-        List<SeckillProductDO> products = SeckillActivityConvert.INSTANCE.complementList(createReqVO.getProducts(), activity);
+        List<SeckillProductDO> products = SeckillActivityConvert.INSTANCE.convertList(createReqVO.getProducts(), activity);
         seckillProductMapper.insertBatch(products);
         return activity.getId();
     }
@@ -121,7 +121,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         // 获取所选 spu下的所有 sku
         List<ProductSkuRespDTO> skus = productSkuApi.getSkuListBySpuId(CollUtil.newArrayList(updateReqVO.getSpuId()));
         // 校验商品 sku 是否存在
-        validateProductSkuExistence(updateReqVO.getProducts(), skus, SeckillProductUpdateReqVO::getSkuId);
+        validateProductSkuAllExists(updateReqVO.getProducts(), skus, SeckillProductUpdateReqVO::getSkuId);
 
         // 更新活动
         SeckillActivityDO updateObj = SeckillActivityConvert.INSTANCE.convert(updateReqVO)
@@ -150,16 +150,17 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         Map<String, List<SeckillProductDO>> data = CollectionUtils.convertCDUMap(voSkuIds, dbSkuIds, mapData -> {
             HashMap<String, List<SeckillProductDO>> cdu = MapUtil.newHashMap(3);
             MapUtils.findAndThen(mapData, "create", list -> {
-                cdu.put("create", SeckillActivityConvert.INSTANCE.complementList(
+                cdu.put("create", SeckillActivityConvert.INSTANCE.convertList(
                         CollectionUtils.filterList(products, item -> list.contains(item.getSkuId())), updateObj));
             });
             MapUtils.findAndThen(mapData, "delete", list -> {
                 cdu.put("create", CollectionUtils.filterList(seckillProductDOs, item -> list.contains(item.getSkuId())));
             });
-            MapUtils.findAndThen(mapData, "update", list -> {
-                cdu.put("update", SeckillActivityConvert.INSTANCE.complementList(seckillProductDOs,
-                        CollectionUtils.filterList(products, item -> list.contains(item.getSkuId())), updateObj));
-            });
+            // TODO @芋艿：临时注释
+//            MapUtils.findAndThen(mapData, "update", list -> {
+//                cdu.put("update", SeckillActivityConvert.INSTANCE.convertList(seckillProductDOs,
+//                        CollectionUtils.filterList(products, item -> list.contains(item.getSkuId())), updateObj));
+//            });
             return cdu;
         });
 
