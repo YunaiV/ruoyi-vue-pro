@@ -3,12 +3,10 @@ package cn.iocoder.yudao.module.trade.service.order;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
@@ -59,9 +57,10 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static cn.hutool.core.util.ObjectUtil.equal;
+import static cn.hutool.core.util.ObjectUtil.notEqual;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getSumValue;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.ORDER_NOT_FOUND;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
@@ -171,7 +170,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         afterCreateTradeOrder(userId, createReqVO, order, orderItems, calculateRespBO);
         // 3.3 校验订单类型
         // 拼团
-        if (ObjectUtil.equal(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
+        if (equal(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
             MemberUserRespDTO user = memberUserApi.getUser(userId);
             // TODO 拼团一次应该只能选择一种规格的商品
             // TODO @puhui999：应该是前置校验哈；然后不应该设置状态，而是交给拼团记录那处理；
@@ -179,7 +178,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
                     .setStatus(CombinationRecordStatusEnum.WAITING.getStatus()));
         }
         // TODO 秒杀扣减库存是下单就扣除还是等待订单支付成功再扣除
-        if (ObjectUtil.equal(TradeOrderTypeEnum.SECKILL.getType(), order.getType())) {
+        if (equal(TradeOrderTypeEnum.SECKILL.getType(), order.getType())) {
 
         }
 
@@ -206,7 +205,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
                                           TradePriceCalculateRespBO calculateRespBO) {
         // 用户选择物流配送的时候才需要填写收货地址
         AddressRespDTO address = new AddressRespDTO();
-        if (ObjectUtil.equal(createReqVO.getDeliveryType(), DeliveryTypeEnum.EXPRESS.getMode())) {
+        if (equal(createReqVO.getDeliveryType(), DeliveryTypeEnum.EXPRESS.getMode())) {
             // 用户收件地址的校验
             address = validateAddress(userId, createReqVO.getAddressId());
         }
@@ -310,7 +309,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         }
         // 校验活动
         // 1、拼团活动
-        if (ObjectUtil.equal(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
+        if (equal(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
             // 更新拼团状态 TODO puhui999：订单支付失败或订单支付过期删除这条拼团记录
             combinationRecordApi.updateCombinationRecordStatusAndStartTime(order.getUserId(), order.getId(), CombinationRecordStatusEnum.IN_PROGRESS.getStatus());
         }
@@ -344,7 +343,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
             throw exception(ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
         // 校验支付订单匹配
-        if (ObjectUtil.notEqual(order.getPayOrderId(), payOrderId)) { // 支付单号
+        if (notEqual(order.getPayOrderId(), payOrderId)) { // 支付单号
             log.error("[validateOrderPaid][order({}) 支付单不匹配({})，请进行处理！order 数据是：{}]",
                     id, payOrderId, JsonUtils.toJsonString(order));
             throw exception(ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR);
@@ -363,13 +362,13 @@ public class TradeOrderServiceImpl implements TradeOrderService {
             throw exception(ORDER_UPDATE_PAID_FAIL_PAY_ORDER_STATUS_NOT_SUCCESS);
         }
         // 校验支付金额一致
-        if (ObjectUtil.notEqual(payOrder.getPrice(), order.getPayPrice())) {
+        if (notEqual(payOrder.getPrice(), order.getPayPrice())) {
             log.error("[validateOrderPaid][order({}) payOrder({}) 支付金额不匹配，请进行处理！order 数据是：{}，payOrder 数据是：{}]",
                     id, payOrderId, JsonUtils.toJsonString(order), JsonUtils.toJsonString(payOrder));
             throw exception(ORDER_UPDATE_PAID_FAIL_PAY_PRICE_NOT_MATCH);
         }
         // 校验支付订单匹配（二次）
-        if (ObjectUtil.notEqual(payOrder.getMerchantOrderId(), id.toString())) {
+        if (notEqual(payOrder.getMerchantOrderId(), id.toString())) {
             log.error("[validateOrderPaid][order({}) 支付单不匹配({})，请进行处理！payOrder 数据是：{}]",
                     id, payOrderId, JsonUtils.toJsonString(payOrder));
             throw exception(ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR);
@@ -393,7 +392,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         TradeOrderDO updateOrderObj = new TradeOrderDO();
         // 判断发货类型
         // 2.1 快递发货
-        if (ObjectUtil.equal(deliveryReqVO.getType(), DeliveryTypeEnum.EXPRESS.getMode())) {
+        if (equal(deliveryReqVO.getType(), DeliveryTypeEnum.EXPRESS.getMode())) {
             // 校验快递公司
             // TODO @puhui999：getDeliveryExpress 直接封装一个校验的，会不会好点；因为还有开启关闭啥的；
             DeliveryExpressDO deliveryExpress = deliveryExpressService.getDeliveryExpress(deliveryReqVO.getLogisticsId());
@@ -403,13 +402,13 @@ public class TradeOrderServiceImpl implements TradeOrderService {
             updateOrderObj.setLogisticsId(deliveryReqVO.getLogisticsId()).setLogisticsNo(deliveryReqVO.getLogisticsNo());
         }
         // 2.2 用户自提
-        if (ObjectUtil.equal(deliveryReqVO.getType(), DeliveryTypeEnum.PICK_UP.getMode())) {
+        if (equal(deliveryReqVO.getType(), DeliveryTypeEnum.PICK_UP.getMode())) {
             // TODO 校验自提门店是否存在
             // 重置一下确保快递公司和快递单号为空
             updateOrderObj.setLogisticsId(null).setLogisticsNo("");
         }
         // 2.3 TODO 芋艿：如果无需发货，需要怎么存储？回复：需要把 deliverType 设置为 DeliveryTypeEnum.NULL
-        if (ObjectUtil.equal(deliveryReqVO.getType(), DeliveryTypeEnum.NULL.getMode())) {
+        if (equal(deliveryReqVO.getType(), DeliveryTypeEnum.NULL.getMode())) {
             // TODO 情况一：正常走发货逻辑和用户自提有点像 不同点：不需要自提门店只需要用户确认收货
             // TODO 情况二：用户下单付款后直接确认收货或等待用户确认收货
             // 重置一下确保快递公司和快递单号为空
@@ -449,15 +448,15 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         }
         // 校验订单是否是待发货状态
         if (!TradeOrderStatusEnum.isUndelivered(order.getStatus())
-                || ObjectUtil.notEqual(order.getDeliveryStatus(), TradeOrderDeliveryStatusEnum.UNDELIVERED.getStatus())) {
+                || notEqual(order.getDeliveryStatus(), TradeOrderDeliveryStatusEnum.UNDELIVERED.getStatus())) {
             throw exception(ORDER_DELIVERY_FAIL_STATUS_NOT_UNDELIVERED);
         }
         // 校验订单是否退款
-        if (ObjectUtil.notEqual(TradeOrderRefundStatusEnum.NONE.getStatus(), order.getRefundStatus())) {
+        if (notEqual(TradeOrderRefundStatusEnum.NONE.getStatus(), order.getRefundStatus())) {
             throw exception(ORDER_DELIVERY_FAIL_REFUND_STATUS_NOT_NONE);
         }
         // 订单类型：拼团
-        if (ObjectUtil.equal(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
+        if (equal(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
             // 校验订单拼团是否成功
             // TODO 用户 ID 使用当前登录用户的还是订单保存的？
             if (combinationRecordApi.isCombinationRecordSuccess(order.getUserId(), order.getId())) {
@@ -510,7 +509,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         }
         // 校验订单是否是待收货状态
         if (!TradeOrderStatusEnum.isDelivered(order.getStatus())
-                || ObjectUtil.notEqual(order.getDeliveryStatus(), TradeOrderDeliveryStatusEnum.DELIVERED.getStatus())) {
+                || notEqual(order.getDeliveryStatus(), TradeOrderDeliveryStatusEnum.DELIVERED.getStatus())) {
             throw exception(ORDER_RECEIVE_FAIL_STATUS_NOT_DELIVERED);
         }
         return order;
@@ -520,7 +519,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     public TradeOrderDO getOrder(Long userId, Long id) {
         TradeOrderDO order = tradeOrderMapper.selectById(id);
         if (order != null
-                && ObjectUtil.notEqual(order.getUserId(), userId)) {
+                && notEqual(order.getUserId(), userId)) {
             return null;
         }
         return order;
@@ -564,7 +563,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     public TradeOrderItemDO getOrderItem(Long userId, Long itemId) {
         TradeOrderItemDO orderItem = tradeOrderItemMapper.selectById(itemId);
         if (orderItem != null
-                && ObjectUtil.notEqual(orderItem.getUserId(), userId)) {
+                && notEqual(orderItem.getUserId(), userId)) {
             return null;
         }
         return orderItem;
@@ -644,10 +643,10 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         if (order == null) {
             throw exception(ORDER_NOT_FOUND);
         }
-        if (ObjectUtil.notEqual(order.getStatus(), TradeOrderStatusEnum.COMPLETED.getStatus())) {
+        if (notEqual(order.getStatus(), TradeOrderStatusEnum.COMPLETED.getStatus())) {
             throw exception(ORDER_COMMENT_FAIL_STATUS_NOT_COMPLETED);
         }
-        if (ObjectUtil.notEqual(order.getCommentStatus(), Boolean.FALSE)) {
+        if (notEqual(order.getCommentStatus(), Boolean.FALSE)) {
             throw exception(ORDER_COMMENT_STATUS_NOT_FALSE);
         }
 
@@ -657,7 +656,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // 更新订单项评价状态
         tradeOrderItemMapper.updateById(new TradeOrderItemDO().setId(orderItem.getId()).setCommentStatus(Boolean.TRUE));
         List<TradeOrderItemDO> orderItems = getOrderItemListByOrderId(CollUtil.newArrayList(order.getId()));
-        if (!CollectionUtils.isAny(orderItems, item -> ObjectUtil.equal(item.getCommentStatus(), Boolean.FALSE))) {
+        if (!anyMatch(orderItems, item -> equal(item.getCommentStatus(), Boolean.FALSE))) {
             // 对于 order 来说，就是评论完，把 order 更新完合理的 status 等字段。
             tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId()).setCommentStatus(Boolean.TRUE));
         }

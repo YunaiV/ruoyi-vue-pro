@@ -2,12 +2,10 @@ package cn.iocoder.yudao.module.promotion.service.combination;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
@@ -32,7 +30,8 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_EXISTS;
@@ -60,19 +59,20 @@ public class CombinationServiceImpl implements CombinationActivityService, Combi
     private ProductSkuApi productSkuApi;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Long createCombinationActivity(CombinationActivityCreateReqVO createReqVO) {
         // 校验商品 SPU 是否存在是否参加的别的活动
         validateProductCombinationConflict(createReqVO.getSpuId(), null);
         // 获取所选 spu下的所有 sku
         List<ProductSkuRespDTO> skus = productSkuApi.getSkuListBySpuId(CollectionUtil.newArrayList(createReqVO.getSpuId()));
         // 校验商品 sku 是否存在
-        validateProductSkuAllExists(createReqVO.getProducts(), skus, CombinationProductCreateReqVO::getSkuId);
+        validateProductSkuAllExists(skus, createReqVO.getProducts(), CombinationProductCreateReqVO::getSkuId);
 
         // TODO 艿艿 有个小问题：现在有活动时间和限制时长，活动时间的结束时间早于设置的限制时间怎么算状态比如：
         //  活动时间 2023-08-05 15:00:00 - 2023-08-05 15:20:00 限制时长 2小时，那么活动时间结束就结束还是加时到满两小时
         // 插入拼团活动
         CombinationActivityDO activityDO = CombinationActivityConvert.INSTANCE.convert(createReqVO);
-        // TODO 营销相关属性初始化
+        // TODO 营销相关属性初始化 拼团成功更新相关属性
         activityDO.setTotalNum(0);
         activityDO.setSuccessNum(0);
         activityDO.setOrderUserCount(0);
@@ -106,6 +106,7 @@ public class CombinationServiceImpl implements CombinationActivityService, Combi
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateCombinationActivity(CombinationActivityUpdateReqVO updateReqVO) {
         // 校验存在
         CombinationActivityDO activityDO = validateCombinationActivityExists(updateReqVO.getId());
@@ -118,7 +119,7 @@ public class CombinationServiceImpl implements CombinationActivityService, Combi
         // 获取所选 spu下的所有 sku
         List<ProductSkuRespDTO> skus = productSkuApi.getSkuListBySpuId(CollectionUtil.newArrayList(updateReqVO.getSpuId()));
         // 校验商品 sku 是否存在
-        validateProductSkuAllExists(updateReqVO.getProducts(), skus, CombinationProductUpdateReqVO::getSkuId);
+        validateProductSkuAllExists(skus, updateReqVO.getProducts(), CombinationProductUpdateReqVO::getSkuId);
 
         // 更新
         CombinationActivityDO updateObj = CombinationActivityConvert.INSTANCE.convert(updateReqVO);
@@ -128,44 +129,40 @@ public class CombinationServiceImpl implements CombinationActivityService, Combi
     }
 
     /**
-     * 更新秒杀商品
+     * 更新拼团商品
      *
-     * @param updateObj DO
+     * @param updateObj 更新的活动
      * @param products  商品配置
      */
     private void updateCombinationProduct(CombinationActivityDO updateObj, List<CombinationProductUpdateReqVO> products) {
-        List<CombinationProductDO> combinationProductDOs = combinationProductMapper.selectListByActivityIds(CollUtil.newArrayList(updateObj.getId()));
-        // 数据库中的活动商品
-        Set<Long> convertSet = CollectionUtils.convertSet(combinationProductDOs, CombinationProductDO::getSkuId);
-        // 前端传过来的活动商品
-        Set<Long> convertSet1 = CollectionUtils.convertSet(products, CombinationProductUpdateReqVO::getSkuId);
-        // 分化数据
-        // TODO @芋艿：看下这个实现
-        Map<String, List<CombinationProductDO>> data = CollectionUtils.convertCDUMap(convertSet1, convertSet, mapData -> {
-            HashMap<String, List<CombinationProductDO>> cdu = MapUtil.newHashMap(3);
-            MapUtils.findAndThen(mapData, "create", list -> {
-                cdu.put("create", CombinationActivityConvert.INSTANCE.convertList(CollectionUtils.filterList(products, item -> list.contains(item.getSkuId())), updateObj));
-            });
-            MapUtils.findAndThen(mapData, "delete", list -> {
-                cdu.put("create", CollectionUtils.filterList(combinationProductDOs, item -> list.contains(item.getSkuId())));
-            });
-            // TODO @芋艿：临时注释，避免有问题
-//            MapUtils.findAndThen(mapData, "update", list -> {
-//                cdu.put("update", CombinationActivityConvert.INSTANCE.convertList(
-//                        combinationProductDOs,
-//                        CollectionUtils.filterList(products, item -> list.contains(item.getSkuId())), updateObj));
-//            });
-            return cdu;
+        // 默认全部新增
+        List<CombinationProductDO> defaultNewList = CombinationActivityConvert.INSTANCE.convertList(products, updateObj);
+        // 数据库中的老数据
+        List<CombinationProductDO> oldList = combinationProductMapper.selectListByActivityIds(CollUtil.newArrayList(updateObj.getId()));
+        List<List<CombinationProductDO>> lists = CollectionUtils.diffList(oldList, defaultNewList, (oldVal, newVal) -> {
+            boolean same = ObjectUtil.equal(oldVal.getSkuId(), newVal.getSkuId());
+            if (same) {
+                newVal.setId(oldVal.getId());
+            }
+            return same;
         });
 
-        // 执行增删改
-        MapUtils.findAndThen(data, "create", item -> combinationProductMapper.insertBatch(item));
-        MapUtils.findAndThen(data, "delete", item -> combinationProductMapper.deleteBatchIds(
-                CollectionUtils.convertSet(item, CombinationProductDO::getId)));
-        MapUtils.findAndThen(data, "update", item -> combinationProductMapper.updateBatch(item));
+        // create
+        if (CollUtil.isNotEmpty(lists.get(0))) {
+            combinationProductMapper.insertBatch(lists.get(0));
+        }
+        // update
+        if (CollUtil.isNotEmpty(lists.get(1))) {
+            combinationProductMapper.updateBatch(lists.get(1));
+        }
+        // delete
+        if (CollUtil.isNotEmpty(lists.get(2))) {
+            combinationProductMapper.deleteBatchIds(CollectionUtils.convertList(lists.get(2), CombinationProductDO::getId));
+        }
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteCombinationActivity(Long id) {
         // 校验存在
         CombinationActivityDO activityDO = validateCombinationActivityExists(id);

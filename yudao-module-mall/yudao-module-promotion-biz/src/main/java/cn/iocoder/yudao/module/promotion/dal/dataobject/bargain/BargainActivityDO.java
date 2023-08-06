@@ -55,21 +55,6 @@ public class BargainActivityDO extends BaseDO {
     private Long spuId;
 
     /**
-     * 商品 SKU 编号
-     */
-    private Long skuId;
-
-    /**
-     * 应付金额，单位分
-     */
-    private Integer bargainFirstPrice;
-
-    /**
-     * 砍价底价，单位：分
-     */
-    private Integer bargainPrice;
-
-    /**
      * 达到该人数，才能砍到低价
      */
     private Integer userSize;
@@ -78,6 +63,11 @@ public class BargainActivityDO extends BaseDO {
      * 最大帮砍次数
      */
     private Integer bargainCount;
+
+    /**
+     * 总限购数量
+     */
+    private Integer totalLimitCount;
 
     /**
      * 砍价库存
