@@ -18,7 +18,6 @@ import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.product.Bar
 import cn.iocoder.yudao.module.promotion.convert.bargain.BargainActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainProductDO;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainRecordDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.bargain.BargainActivityMapper;
 import cn.iocoder.yudao.module.promotion.dal.mysql.bargain.BargainProductMapper;
 import cn.iocoder.yudao.module.promotion.dal.mysql.bargain.BargainRecordMapper;
@@ -27,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -187,11 +185,6 @@ public class BargainServiceImpl implements BargainActivityService, BargainRecord
     }
 
     @Override
-    public List<BargainActivityDO> getBargainActivityList(Collection<Long> ids) {
-        return bargainActivityMapper.selectBatchIds(ids);
-    }
-
-    @Override
     public PageResult<BargainActivityDO> getBargainActivityPage(BargainActivityPageReqVO pageReqVO) {
         return bargainActivityMapper.selectPage(pageReqVO);
     }
@@ -199,95 +192,6 @@ public class BargainServiceImpl implements BargainActivityService, BargainRecord
     @Override
     public List<BargainProductDO> getBargainProductsByActivityIds(Collection<Long> ids) {
         return bargainProductMapper.selectListByActivityIds(ids);
-    }
-
-    @Override
-    public void updateBargainRecordStatusByUserIdAndOrderId(Long userId, Long orderId, Integer status) {
-        // 校验砍价是否存在
-        // 更新状态
-        recordMapper.updateById(validateBargainRecord(userId, orderId).setStatus(status));
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateBargainRecordStatusAndStartTimeByUserIdAndOrderId(Long userId, Long orderId, Integer status, LocalDateTime startTime) {
-        BargainRecordDO recordDO = validateBargainRecord(userId, orderId);
-        // 更新状态
-        recordDO.setStatus(status);
-        // 更新开始时间
-        //recordDO.setStartTime(startTime);
-        //recordMapper.updateById(recordDO);
-        //
-        //// 更新砍价参入人数
-        //List<BargainRecordDO> recordDOs = recordMapper.selectListByHeadIdAndStatus(recordDO.getHeadId(), status);
-        //if (CollUtil.isNotEmpty(recordDOs)) {
-        //    recordDOs.forEach(item -> {
-        //        item.setUserCount(recordDOs.size());
-        //        // 校验砍价是否满足要求
-        //        if (ObjectUtil.equal(recordDOs.size(), recordDO.getUserSize())) {
-        //            item.setStatus(BargainRecordStatusEnum.SUCCESS.getStatus());
-        //        }
-        //    });
-        //}
-        //recordMapper.updateBatch(recordDOs);
-    }
-
-    private BargainRecordDO validateBargainRecord(Long userId, Long orderId) {
-        // 校验砍价是否存在
-        BargainRecordDO recordDO = recordMapper.selectRecord(userId, orderId);
-        if (recordDO == null) {
-            throw exception(BARGAIN_RECORD_NOT_EXISTS);
-        }
-        return recordDO;
-    }
-
-    //@Override
-    //public void createBargainRecord(BargainRecordCreateReqDTO reqDTO) {
-    //    // 1.1 校验砍价活动
-    //    BargainActivityDO activity = validateBargainActivityExists(reqDTO.getActivityId());
-    //    // 1.2 需要校验下，他当前是不是已经参加了该砍价；
-    //    BargainRecordDO recordDO = recordMapper.selectRecord(reqDTO.getUserId(), reqDTO.getOrderId());
-    //    if (recordDO != null) {
-    //        throw exception(BARGAIN_RECORD_EXISTS);
-    //    }
-    //    // 1.3 父砍价是否存在,是否已经满了
-    //    if (reqDTO.getHeadId() != null) {
-    //        BargainRecordDO recordDO1 = recordMapper.selectRecordByHeadId(reqDTO.getHeadId(), reqDTO.getActivityId(), BargainRecordStatusEnum.IN_PROGRESS.getStatus());
-    //        if (recordDO1 == null) {
-    //            throw exception(BARGAIN_RECORD_HEAD_NOT_EXISTS);
-    //        }
-    //        // 校验砍价是否满足要求
-    //        if (ObjectUtil.equal(recordDO1.getUserCount(), recordDO1.getUserSize())) {
-    //            throw exception(BARGAIN_RECORD_USER_FULL);
-    //        }
-    //    }
-    //    // TODO @puhui999：应该还有一些校验，后续补噶；例如说，一个团，自己已经参与进去了，不能再参与进去；
-    //
-    //    // 2. 创建砍价记录
-    //    BargainRecordDO record = BargainActivityConvert.INSTANCE.convert(reqDTO);
-    //    if (reqDTO.getHeadId() == null) {
-    //        // TODO @puhui999：不是自己呀；headId 是父团长的 BargainRecordDO.id 哈
-    //        record.setHeadId(reqDTO.getUserId());
-    //    }
-    //    record.setVirtualGroup(false);
-    //    // TODO @puhui999：过期时间，应该是 Date 哈；
-    //    record.setExpireTime(activity.getLimitDuration());
-    //    record.setUserSize(activity.getUserSize());
-    //    recordMapper.insert(record);
-    //}
-
-    @Override
-    public BargainRecordDO getBargainRecord(Long userId, Long orderId) {
-        return validateBargainRecord(userId, orderId);
-    }
-
-    /**
-     * APP 端获取开团记录
-     *
-     * @return 开团记录
-     */
-    public List<BargainRecordDO> getRecordListByStatus(Integer status) {
-        return recordMapper.selectListByStatus(status);
     }
 
 }

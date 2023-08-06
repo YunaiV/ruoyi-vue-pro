@@ -62,6 +62,7 @@ public interface ErrorCodeConstants {
     ErrorCode EXPRESS_NOT_EXISTS = new ErrorCode(1011004000, "快递公司不存在");
     ErrorCode EXPRESS_CODE_DUPLICATE = new ErrorCode(1011004001, "已经存在该编码的快递公司");
     ErrorCode EXPRESS_CLIENT_NOT_PROVIDE = new ErrorCode(1011004002, "需要接入快递服务商，比如【快递100】");
+    ErrorCode EXPRESS_STATUS_NOT_ENABLE = new ErrorCode(1011004003, "快递公司未启用");
 
     ErrorCode EXPRESS_API_QUERY_ERROR = new ErrorCode(1011004101, "快递查询接口异常");
     ErrorCode EXPRESS_API_QUERY_FAILED = new ErrorCode(1011004102, "快递查询返回失败，原因：{}");

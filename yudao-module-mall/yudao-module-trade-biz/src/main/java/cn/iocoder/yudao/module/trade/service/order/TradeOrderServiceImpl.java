@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -21,6 +22,7 @@ import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDT
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.CombinationRecordApi;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordUpdateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponUseReqDTO;
 import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
@@ -45,7 +47,7 @@ import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties
 import cn.iocoder.yudao.module.trade.service.cart.TradeCartService;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
 import cn.iocoder.yudao.module.trade.service.message.TradeMessageService;
-import cn.iocoder.yudao.module.trade.service.message.dto.TradeOrderMessageWhenDeliveryOrderReqDTO;
+import cn.iocoder.yudao.module.trade.service.message.bo.TradeOrderMessageWhenDeliveryOrderReqBO;
 import cn.iocoder.yudao.module.trade.service.price.TradePriceService;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
@@ -173,9 +175,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         if (equal(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
             MemberUserRespDTO user = memberUserApi.getUser(userId);
             // TODO 拼团一次应该只能选择一种规格的商品
-            // TODO @puhui999：应该是前置校验哈；然后不应该设置状态，而是交给拼团记录那处理；
-            combinationRecordApi.createCombinationRecord(TradeOrderConvert.INSTANCE.convert(order, orderItems.get(0), createReqVO, user)
-                    .setStatus(CombinationRecordStatusEnum.WAITING.getStatus()));
+            combinationRecordApi.createRecord(TradeOrderConvert.INSTANCE.convert(order, orderItems.get(0), createReqVO, user));
         }
         // TODO 秒杀扣减库存是下单就扣除还是等待订单支付成功再扣除
         if (equal(TradeOrderTypeEnum.SECKILL.getType(), order.getType())) {
@@ -311,7 +311,8 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // 1、拼团活动
         if (equal(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
             // 更新拼团状态 TODO puhui999：订单支付失败或订单支付过期删除这条拼团记录
-            combinationRecordApi.updateCombinationRecordStatusAndStartTime(order.getUserId(), order.getId(), CombinationRecordStatusEnum.IN_PROGRESS.getStatus());
+            combinationRecordApi.updateRecordStatus(new CombinationRecordUpdateReqDTO().setUserId(order.getUserId())
+                    .setOrderId(order.getId()).setStatus(CombinationRecordStatusEnum.IN_PROGRESS.getStatus()).setStartTime(LocalDateTime.now()));
         }
         // TODO 芋艿：发送订单变化的消息
 
@@ -394,11 +395,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // 2.1 快递发货
         if (equal(deliveryReqVO.getType(), DeliveryTypeEnum.EXPRESS.getMode())) {
             // 校验快递公司
-            // TODO @puhui999：getDeliveryExpress 直接封装一个校验的，会不会好点；因为还有开启关闭啥的；
-            DeliveryExpressDO deliveryExpress = deliveryExpressService.getDeliveryExpress(deliveryReqVO.getLogisticsId());
-            if (deliveryExpress == null) {
-                throw exception(EXPRESS_NOT_EXISTS);
-            }
+            validateDeliveryExpress(deliveryReqVO);
             updateOrderObj.setLogisticsId(deliveryReqVO.getLogisticsId()).setLogisticsNo(deliveryReqVO.getLogisticsNo());
         }
         // 2.2 用户自提
@@ -425,11 +422,21 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // TODO 芋艿：发送订单变化的消息
 
         // 发送站内信
-        tradeMessageService.sendMessageWhenDeliveryOrder(new TradeOrderMessageWhenDeliveryOrderReqDTO().setOrderId(order.getId())
+        tradeMessageService.sendMessageWhenDeliveryOrder(new TradeOrderMessageWhenDeliveryOrderReqBO().setOrderId(order.getId())
                 .setUserId(userId).setMessage(TradeOrderDeliveryStatusEnum.DELIVERED.getName()));
 
         // TODO 芋艿：OrderLog
         // TODO 设计：lili：是不是发货后，才支持售后？
+    }
+
+    private void validateDeliveryExpress(TradeOrderDeliveryReqVO deliveryReqVO) {
+        DeliveryExpressDO deliveryExpress = deliveryExpressService.getDeliveryExpress(deliveryReqVO.getLogisticsId());
+        if (deliveryExpress == null) {
+            throw exception(EXPRESS_NOT_EXISTS);
+        }
+        if (deliveryExpress.getStatus().equals(CommonStatusEnum.DISABLE.getStatus())) {
+            throw exception(EXPRESS_STATUS_NOT_ENABLE);
+        }
     }
 
     /**
@@ -458,8 +465,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // 订单类型：拼团
         if (equal(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
             // 校验订单拼团是否成功
-            // TODO 用户 ID 使用当前登录用户的还是订单保存的？
-            if (combinationRecordApi.isCombinationRecordSuccess(order.getUserId(), order.getId())) {
+            if (combinationRecordApi.isRecordSuccess(order.getUserId(), order.getId())) {
                 throw exception(ORDER_DELIVERY_FAIL_COMBINATION_RECORD_STATUS_NOT_SUCCESS);
             }
         }

@@ -49,14 +49,6 @@ public interface BargainActivityService {
     BargainActivityDO getBargainActivity(Long id);
 
     /**
-     * 获得砍价活动列表
-     *
-     * @param ids 编号
-     * @return 砍价活动列表
-     */
-    List<BargainActivityDO> getBargainActivityList(Collection<Long> ids);
-
-    /**
      * 获得砍价活动分页
      *
      * @param pageReqVO 分页查询

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.trade.service.message;
 
-import cn.iocoder.yudao.module.trade.service.message.dto.TradeOrderMessageWhenDeliveryOrderReqDTO;
+import cn.iocoder.yudao.module.trade.service.message.bo.TradeOrderMessageWhenDeliveryOrderReqBO;
 
 /**
  * Trade 消息 service 接口
@@ -10,10 +10,10 @@ import cn.iocoder.yudao.module.trade.service.message.dto.TradeOrderMessageWhenDe
 public interface TradeMessageService {
 
     /**
-     * 订单发货时发送消息
+     * 订单发货时发送通知
      *
-     * @param reqDTO 发送消息
+     * @param reqBO 发送消息
      */
-    void sendMessageWhenDeliveryOrder(TradeOrderMessageWhenDeliveryOrderReqDTO reqDTO);
+    void sendMessageWhenDeliveryOrder(TradeOrderMessageWhenDeliveryOrderReqBO reqBO);
 
 }

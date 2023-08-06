@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordUpdateReqDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityUpdateReqVO;
@@ -29,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -204,27 +204,27 @@ public class CombinationServiceImpl implements CombinationActivityService, Combi
     }
 
     @Override
-    public void updateCombinationRecordStatusByUserIdAndOrderId(Long userId, Long orderId, Integer status) {
+    public void updateCombinationRecordStatusByUserIdAndOrderId(CombinationRecordUpdateReqDTO reqDTO) {
         // 校验拼团是否存在
-        CombinationRecordDO recordDO = validateCombinationRecord(userId, orderId);
+        CombinationRecordDO recordDO = validateCombinationRecord(reqDTO.getUserId(), reqDTO.getOrderId());
 
         // 更新状态
-        recordDO.setStatus(status);
+        recordDO.setStatus(reqDTO.getStatus());
         recordMapper.updateById(recordDO);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateCombinationRecordStatusAndStartTimeByUserIdAndOrderId(Long userId, Long orderId, Integer status, LocalDateTime startTime) {
-        CombinationRecordDO recordDO = validateCombinationRecord(userId, orderId);
+    public void updateCombinationRecordStatusAndStartTimeByUserIdAndOrderId(CombinationRecordUpdateReqDTO reqDTO) {
+        CombinationRecordDO recordDO = validateCombinationRecord(reqDTO.getUserId(), reqDTO.getOrderId());
         // 更新状态
-        recordDO.setStatus(status);
+        recordDO.setStatus(reqDTO.getStatus());
         // 更新开始时间
-        recordDO.setStartTime(startTime);
+        recordDO.setStartTime(reqDTO.getStartTime());
         recordMapper.updateById(recordDO);
 
         // 更新拼团参入人数
-        List<CombinationRecordDO> recordDOs = recordMapper.selectListByHeadIdAndStatus(recordDO.getHeadId(), status);
+        List<CombinationRecordDO> recordDOs = recordMapper.selectListByHeadIdAndStatus(recordDO.getHeadId(), reqDTO.getStatus());
         if (CollUtil.isNotEmpty(recordDOs)) {
             recordDOs.forEach(item -> {
                 item.setUserCount(recordDOs.size());
@@ -239,7 +239,7 @@ public class CombinationServiceImpl implements CombinationActivityService, Combi
 
     private CombinationRecordDO validateCombinationRecord(Long userId, Long orderId) {
         // 校验拼团是否存在
-        CombinationRecordDO recordDO = recordMapper.selectRecord(userId, orderId);
+        CombinationRecordDO recordDO = recordMapper.selectByUserIdAndOrderId(userId, orderId);
         if (recordDO == null) {
             throw exception(COMBINATION_RECORD_NOT_EXISTS);
         }
@@ -251,7 +251,7 @@ public class CombinationServiceImpl implements CombinationActivityService, Combi
         // 1.1 校验拼团活动
         CombinationActivityDO activity = validateCombinationActivityExists(reqDTO.getActivityId());
         // 1.2 需要校验下，他当前是不是已经参加了该拼团；
-        CombinationRecordDO recordDO = recordMapper.selectRecord(reqDTO.getUserId(), reqDTO.getOrderId());
+        CombinationRecordDO recordDO = recordMapper.selectByUserIdAndOrderId(reqDTO.getUserId(), reqDTO.getOrderId());
         if (recordDO != null) {
             throw exception(COMBINATION_RECORD_EXISTS);
         }
@@ -270,10 +270,6 @@ public class CombinationServiceImpl implements CombinationActivityService, Combi
 
         // 2. 创建拼团记录
         CombinationRecordDO record = CombinationActivityConvert.INSTANCE.convert(reqDTO);
-        if (reqDTO.getHeadId() == null) {
-            // TODO @puhui999：不是自己呀；headId 是父团长的 CombinationRecordDO.id 哈
-            record.setHeadId(reqDTO.getUserId());
-        }
         record.setVirtualGroup(false);
         // TODO @puhui999：过期时间，应该是 Date 哈；
         record.setExpireTime(activity.getLimitDuration());

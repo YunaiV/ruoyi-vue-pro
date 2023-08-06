@@ -15,8 +15,7 @@ import java.util.List;
 @Mapper
 public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO> {
 
-    // TODO @puhui999：selectByUserIdAndOrderId
-    default CombinationRecordDO selectRecord(Long userId, Long orderId) {
+    default CombinationRecordDO selectByUserIdAndOrderId(Long userId, Long orderId) {
         return selectOne(CombinationRecordDO::getUserId, userId,
                 CombinationRecordDO::getOrderId, orderId);
     }

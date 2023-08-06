@@ -29,21 +29,8 @@ public class BargainActivityRespVO extends BargainActivityBaseVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
-    @Schema(description = "开团人数", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "开团人数不能为空")
-    private Integer userSize;
-
-    @Schema(description = "开团组数", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "开团组数不能为空")
-    private Integer totalNum;
-
-    @Schema(description = "成团组数", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "成团组数不能为空")
-    private Integer successNum;
-
-    @Schema(description = "虚拟成团", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "虚拟成团不能为空")
-    private Integer virtualGroup;
+    @Schema(description = "砍价成功数量", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Integer successCount;
 
     @Schema(description = "活动状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     @NotNull(message = "活动状态不能为空")
