@@ -67,6 +67,7 @@ public interface CombinationActivityConvert {
 
     List<CombinationProductRespVO> convertList2(List<CombinationProductDO> productDOs);
 
+    // TODO @puhui999：参数改成 activity、product 会不会干净一点哈
     @Mappings({
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "activityId", source = "activityDO.id"),

@@ -20,6 +20,7 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
                 CombinationRecordDO::getOrderId, orderId);
     }
 
+    // TODO @puhui999 selectByUserIdAndActivityId
     /**
      * 查询拼团记录
      *

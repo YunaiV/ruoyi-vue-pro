@@ -252,6 +252,7 @@ public class PayNotifyServiceImpl implements PayNotifyService {
             notifyTaskMapper.updateById(updateTask);
             return updateTask.getStatus();
         }
+
         // 情况二：调用失败、调用异常
         // 2.1 超过最大回调次数
         if (updateTask.getNotifyTimes() >= PayNotifyTaskDO.NOTIFY_FREQUENCY.length) {

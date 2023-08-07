@@ -17,6 +17,8 @@ import java.util.List;
 @ToString(callSuper = true)
 public class BargainActivityRespVO extends BargainActivityBaseVO {
 
+    // TODO @puhui999：example 补全
+
     @Schema(description = "商品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "618大促")
     private String spuName;
 

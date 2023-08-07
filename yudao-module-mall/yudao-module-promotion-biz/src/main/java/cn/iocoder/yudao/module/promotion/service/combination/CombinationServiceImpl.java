@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
-import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordUpdateReqDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordUpdateStatusReqDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityUpdateReqVO;
@@ -131,15 +131,14 @@ public class CombinationServiceImpl implements CombinationActivityService, Combi
     /**
      * 更新拼团商品
      *
-     * @param updateObj 更新的活动
-     * @param products  商品配置
+     * @param activity 拼团活动
+     * @param products  该活动的最新商品配置
      */
-    private void updateCombinationProduct(CombinationActivityDO updateObj, List<CombinationProductUpdateReqVO> products) {
-        // 默认全部新增
-        List<CombinationProductDO> defaultNewList = CombinationActivityConvert.INSTANCE.convertList(products, updateObj);
-        // 数据库中的老数据
-        List<CombinationProductDO> oldList = combinationProductMapper.selectListByActivityIds(CollUtil.newArrayList(updateObj.getId()));
-        List<List<CombinationProductDO>> lists = CollectionUtils.diffList(oldList, defaultNewList, (oldVal, newVal) -> {
+    private void updateCombinationProduct(CombinationActivityDO activity, List<CombinationProductUpdateReqVO> products) {
+        // 第一步，对比新老数据，获得添加、修改、删除的列表
+        List<CombinationProductDO> newList = CombinationActivityConvert.INSTANCE.convertList(products, activity);
+        List<CombinationProductDO> oldList = combinationProductMapper.selectListByActivityIds(CollUtil.newArrayList(activity.getId()));
+        List<List<CombinationProductDO>> diffList = CollectionUtils.diffList(oldList, newList, (oldVal, newVal) -> {
             boolean same = ObjectUtil.equal(oldVal.getSkuId(), newVal.getSkuId());
             if (same) {
                 newVal.setId(oldVal.getId());
@@ -147,17 +146,15 @@ public class CombinationServiceImpl implements CombinationActivityService, Combi
             return same;
         });
 
-        // create
-        if (CollUtil.isNotEmpty(lists.get(0))) {
-            combinationProductMapper.insertBatch(lists.get(0));
+        // 第二步，批量添加、修改、删除
+        if (CollUtil.isNotEmpty(diffList.get(0))) {
+            combinationProductMapper.insertBatch(diffList.get(0));
         }
-        // update
-        if (CollUtil.isNotEmpty(lists.get(1))) {
-            combinationProductMapper.updateBatch(lists.get(1));
+        if (CollUtil.isNotEmpty(diffList.get(1))) {
+            combinationProductMapper.updateBatch(diffList.get(1));
         }
-        // delete
-        if (CollUtil.isNotEmpty(lists.get(2))) {
-            combinationProductMapper.deleteBatchIds(CollectionUtils.convertList(lists.get(2), CombinationProductDO::getId));
+        if (CollUtil.isNotEmpty(diffList.get(2))) {
+            combinationProductMapper.deleteBatchIds(CollectionUtils.convertList(diffList.get(2), CombinationProductDO::getId));
         }
     }
 
@@ -204,7 +201,7 @@ public class CombinationServiceImpl implements CombinationActivityService, Combi
     }
 
     @Override
-    public void updateCombinationRecordStatusByUserIdAndOrderId(CombinationRecordUpdateReqDTO reqDTO) {
+    public void updateCombinationRecordStatusByUserIdAndOrderId(CombinationRecordUpdateStatusReqDTO reqDTO) {
         // 校验拼团是否存在
         CombinationRecordDO recordDO = validateCombinationRecord(reqDTO.getUserId(), reqDTO.getOrderId());
 
@@ -215,7 +212,7 @@ public class CombinationServiceImpl implements CombinationActivityService, Combi
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateCombinationRecordStatusAndStartTimeByUserIdAndOrderId(CombinationRecordUpdateReqDTO reqDTO) {
+    public void updateCombinationRecordStatusAndStartTimeByUserIdAndOrderId(CombinationRecordUpdateStatusReqDTO reqDTO) {
         CombinationRecordDO recordDO = validateCombinationRecord(reqDTO.getUserId(), reqDTO.getOrderId());
         // 更新状态
         recordDO.setStatus(reqDTO.getStatus());

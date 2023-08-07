@@ -40,6 +40,7 @@ public class BargainRecordCreateReqDTO {
      */
     @NotNull(message = "订单编号不能为空")
     private Long orderId;
+    // TODO @puhui999：spuName、picUrl、 之类字段不用传递；
     /**
      * 商品名字
      */
@@ -60,6 +61,7 @@ public class BargainRecordCreateReqDTO {
      */
     @NotNull(message = "商品原价不能为空")
     private Integer price;
+    // TODO @puhui999：nickname、avatar 不用传递，去查询；
     /**
      * 用户昵称
      */

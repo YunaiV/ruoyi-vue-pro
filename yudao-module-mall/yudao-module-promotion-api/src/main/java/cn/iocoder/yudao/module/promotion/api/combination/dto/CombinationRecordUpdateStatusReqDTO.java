@@ -6,12 +6,12 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 /**
- * 拼团记录的更新 Request DTO
+ * 拼团记录的更新状态 Request DTO
  *
  * @author HUIHUI
  */
 @Data
-public class CombinationRecordUpdateReqDTO {
+public class CombinationRecordUpdateStatusReqDTO {
 
     /**
      * 用户编号

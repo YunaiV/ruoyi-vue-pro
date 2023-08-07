@@ -65,6 +65,7 @@ public interface BargainActivityConvert {
 
     List<BargainProductRespVO> convertList2(List<BargainProductDO> productDOs);
 
+    // TODO @puhui999：参数改成 activity、product 会不会干净一点哈
     @Mappings({
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "activityId", source = "activityDO.id"),
@@ -89,7 +90,5 @@ public interface BargainActivityConvert {
                 .setId(productMap.get(updateProductVO.getSkuId()))
                 .setActivityStatus(activity.getStatus()));
     }
-
-    //BargainRecordDO convert(BargainRecordCreateReqDTO reqDTO);
 
 }

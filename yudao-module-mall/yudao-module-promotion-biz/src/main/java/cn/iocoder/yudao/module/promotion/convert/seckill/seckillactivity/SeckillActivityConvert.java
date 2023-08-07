@@ -56,6 +56,7 @@ public interface SeckillActivityConvert {
         return convert1(seckillActivity).setProducts(convertList2(seckillProducts));
     }
 
+    // TODO @puhui999：参数改成 activity、product 会不会干净一点哈
     @Mappings({
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "activityId", source = "activityDO.id"),

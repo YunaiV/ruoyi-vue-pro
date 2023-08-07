@@ -137,16 +137,14 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     /**
      * 更新秒杀商品
      *
-     * @param updateObj 更新的活动
-     * @param products  商品配置
+     * @param activity 秒杀活动
+     * @param products  该活动的最新商品配置
      */
-    private void updateSeckillProduct(SeckillActivityDO updateObj, List<SeckillProductUpdateReqVO> products) {
-        // 默认全部新增
-        List<SeckillProductDO> defaultNewList = SeckillActivityConvert.INSTANCE.convertList(products, updateObj);
-        // 数据库中的活动商品
-        List<SeckillProductDO> oldList = seckillProductMapper.selectListByActivityId(updateObj.getId());
-        // 对比老、新两个列表，找出新增、修改、删除的数据
-        List<List<SeckillProductDO>> lists = diffList(oldList, defaultNewList, (oldVal, newVal) -> {
+    private void updateSeckillProduct(SeckillActivityDO activity, List<SeckillProductUpdateReqVO> products) {
+        // 第一步，对比新老数据，获得添加、修改、删除的列表
+        List<SeckillProductDO> newList = SeckillActivityConvert.INSTANCE.convertList(products, activity);
+        List<SeckillProductDO> oldList = seckillProductMapper.selectListByActivityId(activity.getId());
+        List<List<SeckillProductDO>> diffList = diffList(oldList, newList, (oldVal, newVal) -> {
             boolean same = ObjectUtil.equal(oldVal.getSkuId(), newVal.getSkuId());
             if (same) {
                 newVal.setId(oldVal.getId());
@@ -154,17 +152,16 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
             return same;
         });
 
-        // create
-        if (isNotEmpty(lists.get(0))) {
-            seckillProductMapper.insertBatch(lists.get(0));
+        // 第二步，批量添加、修改、删除
+        if (isNotEmpty(diffList.get(0))) {
+            seckillProductMapper.insertBatch(diffList.get(0));
         }
-        // update
-        if (isNotEmpty(lists.get(1))) {
-            seckillProductMapper.updateBatch(lists.get(1));
+        if (isNotEmpty(diffList.get(1))) {
+            seckillProductMapper.updateBatch(diffList.get(1));
         }
         // delete
-        if (isNotEmpty(lists.get(2))) {
-            seckillProductMapper.deleteBatchIds(convertList(lists.get(2), SeckillProductDO::getId));
+        if (isNotEmpty(diffList.get(2))) {
+            seckillProductMapper.deleteBatchIds(convertList(diffList.get(2), SeckillProductDO::getId));
         }
     }
 

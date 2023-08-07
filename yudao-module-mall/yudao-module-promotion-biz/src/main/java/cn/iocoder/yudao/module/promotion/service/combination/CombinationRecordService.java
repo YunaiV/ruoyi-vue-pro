@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.promotion.service.combination;
 
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
-import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordUpdateReqDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordUpdateStatusReqDTO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
 
 /**
@@ -16,7 +16,7 @@ public interface CombinationRecordService {
      *
      * @param reqDTO 请求 DTO
      */
-    void updateCombinationRecordStatusByUserIdAndOrderId(CombinationRecordUpdateReqDTO reqDTO);
+    void updateCombinationRecordStatusByUserIdAndOrderId(CombinationRecordUpdateStatusReqDTO reqDTO);
 
     /**
      * 创建拼团记录
@@ -30,7 +30,7 @@ public interface CombinationRecordService {
      *
      * @param reqDTO 请求 DTO
      */
-    void updateCombinationRecordStatusAndStartTimeByUserIdAndOrderId(CombinationRecordUpdateReqDTO reqDTO);
+    void updateCombinationRecordStatusAndStartTimeByUserIdAndOrderId(CombinationRecordUpdateStatusReqDTO reqDTO);
 
     /**
      * 获得拼团状态
