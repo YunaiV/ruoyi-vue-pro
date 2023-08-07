@@ -16,10 +16,9 @@ import java.util.Arrays;
 @Getter
 public enum CombinationRecordStatusEnum implements IntArrayValuable {
 
-    WAITING(0, "未付款"),
-    IN_PROGRESS(1, "进行中"),
-    SUCCESS(2, "拼团成功"),
-    FAILED(3, "拼团失败");
+    IN_PROGRESS(0, "进行中"),
+    SUCCESS(1, "拼团成功"),
+    FAILED(2, "拼团失败");
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CombinationRecordStatusEnum::getStatus).toArray();
 

@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -72,16 +71,6 @@ public class CombinationActivityController {
         CombinationActivityDO activity = combinationActivityService.getCombinationActivity(id);
         List<CombinationProductDO> products = combinationActivityService.getCombinationProductsByActivityIds(newArrayList(id));
         return success(CombinationActivityConvert.INSTANCE.convert(activity, products));
-    }
-
-    // TODO @puhui999：是不是可以删掉，貌似没用？
-    @GetMapping("/list")
-    @Operation(summary = "获得拼团活动列表")
-    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @PreAuthorize("@ss.hasPermission('promotion:combination-activity:query')")
-    public CommonResult<List<CombinationActivityRespVO>> getCombinationActivityList(@RequestParam("ids") Collection<Long> ids) {
-        List<CombinationActivityDO> list = combinationActivityService.getCombinationActivityList(ids);
-        return success(CombinationActivityConvert.INSTANCE.convertList(list));
     }
 
     @GetMapping("/page")

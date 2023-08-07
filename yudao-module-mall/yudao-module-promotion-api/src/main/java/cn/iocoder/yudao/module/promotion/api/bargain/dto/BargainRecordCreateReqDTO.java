@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.api.combination.dto;
+package cn.iocoder.yudao.module.promotion.api.bargain.dto;
 
 import lombok.Data;
 
@@ -6,18 +6,19 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 // TODO @芋艿：这块要在看看
+
 /**
- * 拼团记录的创建 Request DTO
+ * 砍价记录的创建 Request DTO
  *
  * @author HUIHUI
  */
 @Data
-public class CombinationRecordCreateReqDTO {
+public class BargainRecordCreateReqDTO {
 
     /**
-     * 拼团活动编号
+     * 砍价活动编号
      */
-    @NotNull(message = "拼团活动编号不能为空")
+    @NotNull(message = "砍价活动编号不能为空")
     private Long activityId;
     /**
      * spu 编号
@@ -40,11 +41,6 @@ public class CombinationRecordCreateReqDTO {
     @NotNull(message = "订单编号不能为空")
     private Long orderId;
     /**
-     * 团长编号
-     */
-    @NotNull(message = "团长编号不能为空")
-    private Long headId;
-    /**
      * 商品名字
      */
     @NotEmpty(message = "商品名字不能为空")
@@ -55,10 +51,15 @@ public class CombinationRecordCreateReqDTO {
     @NotEmpty(message = "商品图片不能为空")
     private String picUrl;
     /**
-     * 拼团商品单价
+     * 砍价商品单价
      */
-    @NotNull(message = "拼团商品单价不能为空")
-    private Integer combinationPrice;
+    @NotNull(message = "砍价底价不能为空")
+    private Integer bargainPrice;
+    /**
+     * 商品原价，单位分
+     */
+    @NotNull(message = "商品原价不能为空")
+    private Integer price;
     /**
      * 用户昵称
      */
@@ -70,7 +71,7 @@ public class CombinationRecordCreateReqDTO {
     @NotEmpty(message = "用户头像不能为空")
     private String avatar;
     /**
-     * 开团状态：正在开团 拼团成功 拼团失败
+     * 开团状态：进行中 砍价成功 砍价失败
      */
     @NotNull(message = "开团状态不能为空")
     private Integer status;

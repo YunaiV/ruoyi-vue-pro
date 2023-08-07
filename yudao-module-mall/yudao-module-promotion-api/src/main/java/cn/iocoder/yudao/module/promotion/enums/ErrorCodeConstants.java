@@ -69,4 +69,14 @@ public interface ErrorCodeConstants {
     ErrorCode COMBINATION_RECORD_HEAD_NOT_EXISTS = new ErrorCode(1013010006, "拼团失败，父拼团不存在");
     ErrorCode COMBINATION_RECORD_USER_FULL = new ErrorCode(1013010006, "拼团失败，拼团人数已满");
 
+    // ========== 砍价活动 1013011000 ==========
+    ErrorCode BARGAIN_ACTIVITY_NOT_EXISTS = new ErrorCode(1013011000, "砍价活动不存在");
+    ErrorCode BARGAIN_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1013011001, "存在商品参加了其它砍价活动");
+    ErrorCode BARGAIN_ACTIVITY_STATUS_DISABLE = new ErrorCode(1013011002, "砍价活动已关闭不能修改");
+    ErrorCode BARGAIN_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1013011003, "砍价活动未关闭或未结束，不能删除");
+    ErrorCode BARGAIN_RECORD_NOT_EXISTS = new ErrorCode(1013011004, "砍价不存在");
+    ErrorCode BARGAIN_RECORD_EXISTS = new ErrorCode(1013011005, "砍价失败，已参与过该砍价");
+    ErrorCode BARGAIN_RECORD_HEAD_NOT_EXISTS = new ErrorCode(1013011006, "砍价失败，父砍价不存在");
+    ErrorCode BARGAIN_RECORD_USER_FULL = new ErrorCode(1013011007, "砍价失败，砍价人数已满");
+
 }

@@ -1,12 +1,9 @@
 package cn.iocoder.yudao.module.promotion.service.seckill.seckillactivity;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
@@ -28,9 +25,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
+import static cn.hutool.core.collection.CollUtil.isNotEmpty;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
@@ -71,7 +72,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         // 插入秒杀活动
         SeckillActivityDO activity = SeckillActivityConvert.INSTANCE.convert(createReqVO)
                 .setStatus(PromotionUtils.calculateActivityStatus(createReqVO.getEndTime()))
-                .setTotalStock(CollectionUtils.getSumValue(createReqVO.getProducts(), SeckillProductCreateReqVO::getStock, Integer::sum));
+                .setTotalStock(getSumValue(createReqVO.getProducts(), SeckillProductCreateReqVO::getStock, Integer::sum));
         seckillActivityMapper.insert(activity);
         // 插入商品
         List<SeckillProductDO> products = SeckillActivityConvert.INSTANCE.convertList(createReqVO.getProducts(), activity);
@@ -94,16 +95,16 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
             activityDOs.removeIf(item -> ObjectUtil.equal(item.getId(), activityId));
         }
         // 过滤出所有 spuId 有交集的活动
-        List<SeckillActivityDO> activityDOs1 = CollectionUtils.convertList(activityDOs, c -> c, s -> ObjectUtil.equal(s.getSpuId(), spuId));
-        if (CollUtil.isNotEmpty(activityDOs1)) {
+        List<SeckillActivityDO> activityDOs1 = convertList(activityDOs, c -> c, s -> ObjectUtil.equal(s.getSpuId(), spuId));
+        if (isNotEmpty(activityDOs1)) {
             throw exception(SECKILL_ACTIVITY_SPU_CONFLICTS);
         }
-        List<SeckillActivityDO> activityDOs2 = CollectionUtils.convertList(activityDOs, c -> c, s -> {
+        List<SeckillActivityDO> activityDOs2 = convertList(activityDOs, c -> c, s -> {
             // 判断秒杀时段是否有交集
-            return CollectionUtils.containsAny(s.getConfigIds(), configIds);
+            return containsAny(s.getConfigIds(), configIds);
         });
 
-        if (CollUtil.isNotEmpty(activityDOs2)) {
+        if (isNotEmpty(activityDOs2)) {
             throw exception(SECKILL_TIME_CONFLICTS);
         }
     }
@@ -121,12 +122,12 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         // 获取所选 spu下的所有 sku
         List<ProductSkuRespDTO> skus = productSkuApi.getSkuListBySpuId(CollUtil.newArrayList(updateReqVO.getSpuId()));
         // 校验商品 sku 是否存在
-        validateProductSkuAllExists(updateReqVO.getProducts(), skus, SeckillProductUpdateReqVO::getSkuId);
+        validateProductSkuAllExists(skus, updateReqVO.getProducts(), SeckillProductUpdateReqVO::getSkuId);
 
         // 更新活动
         SeckillActivityDO updateObj = SeckillActivityConvert.INSTANCE.convert(updateReqVO)
                 .setStatus(PromotionUtils.calculateActivityStatus(updateReqVO.getEndTime()))
-                .setTotalStock(CollectionUtils.getSumValue(updateReqVO.getProducts(), SeckillProductUpdateReqVO::getStock, Integer::sum));
+                .setTotalStock(getSumValue(updateReqVO.getProducts(), SeckillProductUpdateReqVO::getStock, Integer::sum));
         seckillActivityMapper.updateById(updateObj);
         // 更新商品
         updateSeckillProduct(updateObj, updateReqVO.getProducts());
@@ -139,36 +140,32 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
      * @param updateObj 更新的活动
      * @param products  商品配置
      */
-    // TODO @puhui999：我在想，我们是不是可以封装一个 CollUtil 的方法，传入两个数组，判断出哪些是新增、哪些是修改、哪些是删除；
-    // 例如说，products 先转化成 SeckillProductDO；然后，基于一个 func(key1, key2) 做比对；
-    // 如果可以跑通，所有涉及到这种逻辑的，都可以服用哈。
     private void updateSeckillProduct(SeckillActivityDO updateObj, List<SeckillProductUpdateReqVO> products) {
+        // 默认全部新增
+        List<SeckillProductDO> defaultNewList = SeckillActivityConvert.INSTANCE.convertList(products, updateObj);
         // 数据库中的活动商品
-        List<SeckillProductDO> seckillProductDOs = seckillProductMapper.selectListByActivityId(updateObj.getId());
-        Set<Long> dbSkuIds = CollectionUtils.convertSet(seckillProductDOs, SeckillProductDO::getSkuId);
-        Set<Long> voSkuIds = CollectionUtils.convertSet(products, SeckillProductUpdateReqVO::getSkuId);
-        Map<String, List<SeckillProductDO>> data = CollectionUtils.convertCDUMap(voSkuIds, dbSkuIds, mapData -> {
-            HashMap<String, List<SeckillProductDO>> cdu = MapUtil.newHashMap(3);
-            MapUtils.findAndThen(mapData, "create", list -> {
-                cdu.put("create", SeckillActivityConvert.INSTANCE.convertList(
-                        CollectionUtils.filterList(products, item -> list.contains(item.getSkuId())), updateObj));
-            });
-            MapUtils.findAndThen(mapData, "delete", list -> {
-                cdu.put("create", CollectionUtils.filterList(seckillProductDOs, item -> list.contains(item.getSkuId())));
-            });
-            // TODO @芋艿：临时注释
-//            MapUtils.findAndThen(mapData, "update", list -> {
-//                cdu.put("update", SeckillActivityConvert.INSTANCE.convertList(seckillProductDOs,
-//                        CollectionUtils.filterList(products, item -> list.contains(item.getSkuId())), updateObj));
-//            });
-            return cdu;
+        List<SeckillProductDO> oldList = seckillProductMapper.selectListByActivityId(updateObj.getId());
+        // 对比老、新两个列表，找出新增、修改、删除的数据
+        List<List<SeckillProductDO>> lists = diffList(oldList, defaultNewList, (oldVal, newVal) -> {
+            boolean same = ObjectUtil.equal(oldVal.getSkuId(), newVal.getSkuId());
+            if (same) {
+                newVal.setId(oldVal.getId());
+            }
+            return same;
         });
 
-        // 执行增删改
-        MapUtils.findAndThen(data, "create", item -> seckillProductMapper.insertBatch(item));
-        MapUtils.findAndThen(data, "delete", item -> seckillProductMapper.deleteBatchIds(
-                CollectionUtils.convertSet(item, SeckillProductDO::getId)));
-        MapUtils.findAndThen(data, "update", item -> seckillProductMapper.updateBatch(item));
+        // create
+        if (isNotEmpty(lists.get(0))) {
+            seckillProductMapper.insertBatch(lists.get(0));
+        }
+        // update
+        if (isNotEmpty(lists.get(1))) {
+            seckillProductMapper.updateBatch(lists.get(1));
+        }
+        // delete
+        if (isNotEmpty(lists.get(2))) {
+            seckillProductMapper.deleteBatchIds(convertList(lists.get(2), SeckillProductDO::getId));
+        }
     }
 
     @Override
@@ -198,7 +195,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         seckillActivityMapper.deleteById(id);
         // 删除活动商品
         List<SeckillProductDO> productDOs = seckillProductMapper.selectListByActivityId(id);
-        Set<Long> convertSet = CollectionUtils.convertSet(productDOs, SeckillProductDO::getSkuId);
+        Set<Long> convertSet = convertSet(productDOs, SeckillProductDO::getSkuId);
         seckillProductMapper.deleteBatchIds(convertSet);
     }
 

@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * 砍价助力 DO
+ * 砍价助力 DO TODO
  *
  * @author HUIHUI
  */

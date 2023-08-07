@@ -52,7 +52,7 @@ public class CombinationRecordDO extends BaseDO {
     /**
      * 团长编号
      *
-     * 关联 {@link CombinationRecordDO#getUserId()}
+     * 关联 {@link CombinationRecordDO#getId()}
      */
     private Long headId;
     /**

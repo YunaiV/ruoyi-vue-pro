@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.promotion.api.combination;
 
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordUpdateReqDTO;
 
 import javax.validation.Valid;
 
@@ -17,7 +18,7 @@ public interface CombinationRecordApi {
      *
      * @param reqDTO 请求 DTO
      */
-    void createCombinationRecord(@Valid CombinationRecordCreateReqDTO reqDTO);
+    void createRecord(@Valid CombinationRecordCreateReqDTO reqDTO);
 
     /**
      * 查询拼团记录是否成功
@@ -26,25 +27,13 @@ public interface CombinationRecordApi {
      * @param orderId 订单编号
      * @return 拼团是否成功
      */
-    boolean isCombinationRecordSuccess(Long userId, Long orderId);
+    boolean isRecordSuccess(Long userId, Long orderId);
 
-    // TODO @puhui999：updateRecordStatus 和 updateRecordStatusAndStartTime 看看后续是不是可以统一掉；
     /**
      * 更新开团记录状态
      *
-     * @param userId  用户编号
-     * @param orderId 订单编号
-     * @param status  状态值
+     * @param reqDTO 请求 DTO
      */
-    void updateCombinationRecordStatus(Long userId, Long orderId, Integer status);
-
-    /**
-     * 更新开团记录状态和开始时间
-     *
-     * @param userId  用户编号
-     * @param orderId 订单编号
-     * @param status  状态值
-     */
-    void updateCombinationRecordStatusAndStartTime(Long userId, Long orderId, Integer status);
+    void updateRecordStatus(CombinationRecordUpdateReqDTO reqDTO);
 
 }

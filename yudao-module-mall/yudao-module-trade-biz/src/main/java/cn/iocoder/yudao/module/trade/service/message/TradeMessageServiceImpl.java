@@ -2,7 +2,8 @@ package cn.iocoder.yudao.module.trade.service.message;
 
 import cn.iocoder.yudao.module.system.api.notify.NotifyMessageSendApi;
 import cn.iocoder.yudao.module.system.api.notify.dto.NotifySendSingleToUserReqDTO;
-import cn.iocoder.yudao.module.trade.service.message.dto.TradeOrderMessageWhenDeliveryOrderReqDTO;
+import cn.iocoder.yudao.module.trade.enums.MessageTemplateConstants;
+import cn.iocoder.yudao.module.trade.service.message.bo.TradeOrderMessageWhenDeliveryOrderReqBO;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -23,18 +24,16 @@ public class TradeMessageServiceImpl implements TradeMessageService {
     private NotifyMessageSendApi notifyMessageSendApi;
 
     @Override
-    public void sendMessageWhenDeliveryOrder(TradeOrderMessageWhenDeliveryOrderReqDTO reqDTO) {
+    public void sendMessageWhenDeliveryOrder(TradeOrderMessageWhenDeliveryOrderReqBO reqBO) {
         // 1、构造消息
-        Map<String, Object> msgMap = new HashMap<>();
-        msgMap.put("orderId", reqDTO.getOrderId());
-        // TODO puhui999：应该不是 msg 哇，应该是涉及到的模版参数哈；msg 太大了
-        msgMap.put("msg", reqDTO.getMessage());
+        Map<String, Object> msgMap = new HashMap<>(2);
+        msgMap.put("orderId", reqBO.getOrderId());
+        msgMap.put("deliveryMessage", reqBO.getMessage());
         // 2、发送站内信
         notifyMessageSendApi.sendSingleMessageToMember(
                 new NotifySendSingleToUserReqDTO()
-                        .setUserId(reqDTO.getUserId())
-                        // TODO puhui999：短信模版编号，枚举起来；
-                        .setTemplateCode("order_delivery")
+                        .setUserId(reqBO.getUserId())
+                        .setTemplateCode(MessageTemplateConstants.ORDER_DELIVERY)
                         .setTemplateParams(msgMap));
     }
 

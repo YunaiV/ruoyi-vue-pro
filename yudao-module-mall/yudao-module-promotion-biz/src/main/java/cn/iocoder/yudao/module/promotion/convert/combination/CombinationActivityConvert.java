@@ -17,11 +17,8 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationR
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
-import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -37,38 +34,16 @@ public interface CombinationActivityConvert {
 
     CombinationActivityConvert INSTANCE = Mappers.getMapper(CombinationActivityConvert.class);
 
-    @Mappings({
-            @Mapping(target = "startTime", expression = "java(bean.getActivityTime()[0])"),
-            @Mapping(target = "endTime", expression = "java(bean.getActivityTime()[1])")
-    })
     CombinationActivityDO convert(CombinationActivityCreateReqVO bean);
 
-    @Mappings({
-            @Mapping(target = "startTime", expression = "java(bean.getActivityTime()[0])"),
-            @Mapping(target = "endTime", expression = "java(bean.getActivityTime()[1])")
-    })
     CombinationActivityDO convert(CombinationActivityUpdateReqVO bean);
 
-    @Named("mergeTime")
-    default LocalDateTime[] mergeTime(LocalDateTime startTime, LocalDateTime endTime) {
-        // TODO 有点怪第一次这样写 hh
-        LocalDateTime[] localDateTime = new LocalDateTime[2];
-        localDateTime[0] = startTime;
-        localDateTime[1] = endTime;
-        return localDateTime;
-    }
-
-    @Mappings({
-            @Mapping(target = "activityTime", expression = "java(mergeTime(bean.getStartTime(),bean.getEndTime()))")
-    })
     CombinationActivityRespVO convert(CombinationActivityDO bean);
 
     CombinationProductRespVO convert(CombinationProductDO bean);
 
     default CombinationActivityRespVO convert(CombinationActivityDO bean, List<CombinationProductDO> productDOs) {
-        CombinationActivityRespVO respVO = convert(bean);
-        respVO.setProducts(convertList2(productDOs));
-        return respVO;
+        return convert(bean).setProducts(convertList2(productDOs));
     }
 
     List<CombinationActivityRespVO> convertList(List<CombinationActivityDO> list);
@@ -104,21 +79,15 @@ public interface CombinationActivityConvert {
     CombinationProductDO convert(CombinationActivityDO activityDO, CombinationProductBaseVO vo);
 
     default List<CombinationProductDO> convertList(List<? extends CombinationProductBaseVO> products, CombinationActivityDO activityDO) {
-        List<CombinationProductDO> list = new ArrayList<>();
-        products.forEach(sku -> {
-            CombinationProductDO productDO = convert(activityDO, sku);
-            productDO.setActivityStatus(activityDO.getStatus());
-            list.add(productDO);
-        });
-        return list;
+        return CollectionUtils.convertList(products, item -> convert(activityDO, item).setActivityStatus(activityDO.getStatus()));
     }
 
     default List<CombinationProductDO> convertList(List<CombinationProductUpdateReqVO> updateProductVOs,
                                                    List<CombinationProductDO> products, CombinationActivityDO activity) {
         Map<Long, Long> productMap = convertMap(products, CombinationProductDO::getSkuId, CombinationProductDO::getId);
         return CollectionUtils.convertList(updateProductVOs, updateProductVO -> convert(activity, updateProductVO)
-                        .setId(productMap.get(updateProductVO.getSkuId()))
-                        .setActivityStatus(activity.getStatus()));
+                .setId(productMap.get(updateProductVO.getSkuId()))
+                .setActivityStatus(activity.getStatus()));
     }
 
     CombinationRecordDO convert(CombinationRecordCreateReqDTO reqDTO);

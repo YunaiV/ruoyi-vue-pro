@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.promotion.controller.admin.seckill;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.*;
@@ -19,11 +18,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Tag(name = "管理后台 - 秒杀活动")
 @RestController
@@ -79,24 +78,14 @@ public class SeckillActivityController {
         return success(SeckillActivityConvert.INSTANCE.convert(seckillActivity, seckillProducts));
     }
 
-    // TODO @puhui999：是不是可以删掉，貌似没用？
-    @GetMapping("/list")
-    @Operation(summary = "获得秒杀活动列表")
-    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @PreAuthorize("@ss.hasPermission('promotion:seckill-activity:query')")
-    public CommonResult<List<SeckillActivityRespVO>> getSeckillActivityList(@RequestParam("ids") Collection<Long> ids) {
-        List<SeckillActivityDO> list = seckillActivityService.getSeckillActivityList(ids);
-        return success(SeckillActivityConvert.INSTANCE.complementList(list));
-    }
-
     @GetMapping("/page")
     @Operation(summary = "获得秒杀活动分页")
     @PreAuthorize("@ss.hasPermission('promotion:seckill-activity:query')")
     public CommonResult<PageResult<SeckillActivityRespVO>> getSeckillActivityPage(@Valid SeckillActivityPageReqVO pageVO) {
         PageResult<SeckillActivityDO> pageResult = seckillActivityService.getSeckillActivityPage(pageVO);
-        Set<Long> aIds = CollectionUtils.convertSet(pageResult.getList(), SeckillActivityDO::getId);
+        Set<Long> aIds = convertSet(pageResult.getList(), SeckillActivityDO::getId);
         List<SeckillProductDO> seckillProducts = seckillActivityService.getSeckillProductListByActivityId(aIds);
-        Set<Long> spuIds = CollectionUtils.convertSet(pageResult.getList(), SeckillActivityDO::getSpuId);
+        Set<Long> spuIds = convertSet(pageResult.getList(), SeckillActivityDO::getSpuId);
         List<ProductSpuRespDTO> spuList = spuApi.getSpuList(spuIds);
         return success(SeckillActivityConvert.INSTANCE.convertPage(pageResult, seckillProducts, spuList));
     }

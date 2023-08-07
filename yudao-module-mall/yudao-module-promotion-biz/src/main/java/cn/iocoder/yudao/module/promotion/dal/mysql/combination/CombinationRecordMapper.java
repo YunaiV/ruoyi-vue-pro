@@ -15,8 +15,7 @@ import java.util.List;
 @Mapper
 public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO> {
 
-    // TODO @puhui999：selectByUserIdAndOrderId
-    default CombinationRecordDO selectRecord(Long userId, Long orderId) {
+    default CombinationRecordDO selectByUserIdAndOrderId(Long userId, Long orderId) {
         return selectOne(CombinationRecordDO::getUserId, userId,
                 CombinationRecordDO::getOrderId, orderId);
     }
@@ -29,9 +28,10 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
      * @return 拼团记录
      */
     default CombinationRecordDO selectRecordByHeadId(Long headId, Long activityId, Integer status) {
-        return selectOne(CombinationRecordDO::getHeadId, headId,
-                CombinationRecordDO::getActivityId, activityId,
-                CombinationRecordDO::getStatus, status);
+        return selectOne(new LambdaQueryWrapperX<CombinationRecordDO>()
+                .eq(CombinationRecordDO::getUserId, headId)
+                .eq(CombinationRecordDO::getActivityId, activityId)
+                .eq(CombinationRecordDO::getStatus, status));
     }
 
     default List<CombinationRecordDO> selectListByHeadIdAndStatus(Long headId, Integer status) {

@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.Se
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.product.SeckillProductBaseVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.product.SeckillProductRespVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.product.SeckillProductUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillProductDO;
 import org.mapstruct.Mapper;
@@ -17,11 +16,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * 秒杀活动 Convert
@@ -39,8 +35,7 @@ public interface SeckillActivityConvert {
 
     SeckillActivityRespVO convert(SeckillActivityDO bean);
 
-    // TODO @puhui999：这个是不是还是 convertList 好点？
-    List<SeckillActivityRespVO> complementList(List<SeckillActivityDO> list);
+    List<SeckillActivityRespVO> convertList(List<SeckillActivityDO> list);
 
     PageResult<SeckillActivityRespVO> convertPage(PageResult<SeckillActivityDO> page);
 
@@ -58,9 +53,7 @@ public interface SeckillActivityConvert {
     SeckillActivityDetailRespVO convert1(SeckillActivityDO seckillActivity);
 
     default SeckillActivityDetailRespVO convert(SeckillActivityDO seckillActivity, List<SeckillProductDO> seckillProducts) {
-        SeckillActivityDetailRespVO respVO = convert1(seckillActivity);
-        respVO.setProducts(convertList2(seckillProducts));
-        return respVO;
+        return convert1(seckillActivity).setProducts(convertList2(seckillProducts));
     }
 
     @Mappings({
@@ -77,21 +70,7 @@ public interface SeckillActivityConvert {
     SeckillProductDO convert(SeckillActivityDO activityDO, SeckillProductBaseVO vo);
 
     default List<SeckillProductDO> convertList(List<? extends SeckillProductBaseVO> products, SeckillActivityDO activityDO) {
-        List<SeckillProductDO> list = new ArrayList<>();
-        products.forEach(sku -> {
-            SeckillProductDO productDO = convert(activityDO, sku);
-            productDO.setActivityStatus(activityDO.getStatus());
-            list.add(productDO);
-        });
-        return list;
-    }
-
-    default List<SeckillProductDO> convertList(List<SeckillProductUpdateReqVO> updateProductVOs,
-                                                   List<SeckillProductDO> products, SeckillActivityDO activity) {
-        Map<Long, Long> productMap = convertMap(products, SeckillProductDO::getSkuId, SeckillProductDO::getId);
-        return CollectionUtils.convertList(updateProductVOs, updateProductVO -> convert(activity, updateProductVO)
-                .setId(productMap.get(updateProductVO.getSkuId()))
-                .setActivityStatus(activity.getStatus()));
+        return CollectionUtils.convertList(products, item -> convert(activityDO, item).setActivityStatus(activityDO.getStatus()));
     }
 
     List<SeckillProductRespVO> convertList2(List<SeckillProductDO> productDOs);

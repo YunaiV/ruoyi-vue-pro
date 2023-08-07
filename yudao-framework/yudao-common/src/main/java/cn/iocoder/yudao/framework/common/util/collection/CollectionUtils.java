@@ -2,7 +2,6 @@ package cn.iocoder.yudao.framework.common.util.collection;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.map.MapUtil;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.*;
@@ -26,8 +25,7 @@ public class CollectionUtils {
         return Arrays.stream(collections).anyMatch(CollectionUtil::isEmpty);
     }
 
-    // TODO @puhui999：anyMatch 更统一点
-    public static <T> boolean isAny(Collection<T> from, Predicate<T> predicate) {
+    public static <T> boolean anyMatch(Collection<T> from, Predicate<T> predicate) {
         return from.stream().anyMatch(predicate);
     }
 
@@ -152,41 +150,6 @@ public class CollectionUtils {
         ImmutableMap.Builder<K, T> builder = ImmutableMap.builder();
         from.forEach(item -> builder.put(keyFunc.apply(item), item));
         return builder.build();
-    }
-
-    /**
-     * 数据划分为需要新增的、还是删除的、还是更新的。
-     *
-     * @param list1 需要处理的数据的相关编号列表
-     * @param list2 数据库中存在的数据的相关编号列表
-     * @param func  比较出哪些记录是新增，还是修改，还是删除
-     * @return 包含需要新增、修改、删除的数据 Map 对象
-     */
-    public static <D> Map<String, List<D>> convertCDUMap(Collection<Long> list1, Collection<Long> list2,
-                                                         Function<Map<String, List<Long>>, Map<String, List<D>>> func) {
-        HashMap<String, List<Long>> mapData = MapUtil.newHashMap(3);
-        if (CollUtil.isEmpty(list1)) {
-            return func.apply(mapData);
-        }
-        if (CollUtil.isEmpty(list2)) {
-            return func.apply(mapData);
-        }
-        // 后台存在的前端不存在的
-        List<Long> d = CollectionUtils.filterList(list2, item -> !list1.contains(item));
-        if (CollUtil.isNotEmpty(d)) {
-            mapData.put("delete", d);
-        }
-        // 前端存在的后端不存在的
-        List<Long> c = CollectionUtils.filterList(list1, item -> !list2.contains(item));
-        if (CollUtil.isNotEmpty(c)) {
-            mapData.put("create", c);
-        }
-        // 更新已存在的
-        List<Long> u = CollectionUtils.filterList(list1, list2::contains);
-        if (CollUtil.isNotEmpty(u)) {
-            mapData.put("update", u);
-        }
-        return func.apply(mapData);
     }
 
     /**
