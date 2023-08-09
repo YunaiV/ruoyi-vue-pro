@@ -17,13 +17,13 @@ public class MemberPointConfigBaseVO {
     @Schema(description = "积分抵扣开关", required = true, example = "true")
     private Boolean tradeDeductEnable;
 
-    @Schema(description = "积分抵扣，单位：元", example = "13506")
-    private BigDecimal tradeDeductUnitPrice;
+    @Schema(description = "积分抵扣，单位：分", example = "13506")
+    private Integer tradeDeductUnitPrice;
 
     @Schema(description = "积分抵扣最大值", example = "32428")
-    private Long tradeDeductMaxPrice;
+    private Integer tradeDeductMaxPrice;
 
     @Schema(description = "1 元赠送多少分")
-    private Long tradeGivePoint;
+    private Integer tradeGivePoint;
 
 }
