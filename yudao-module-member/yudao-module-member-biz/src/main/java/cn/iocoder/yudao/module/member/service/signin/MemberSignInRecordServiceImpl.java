@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInRecordPageReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInRecordDO;
 import cn.iocoder.yudao.module.member.dal.mysql.signin.MemberSignInRecordMapper;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -23,25 +24,10 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
 
     @Resource
     private MemberSignInRecordMapper memberSignInRecordMapper;
+    @Resource
+    AdminUserApi adminUserApi;
 
-    @Override
-    public void deleteSignInRecord(Long id) {
-        // 校验存在
-        validateSignInRecordExists(id);
-        // 删除
-        memberSignInRecordMapper.deleteById(id);
-    }
 
-    private void validateSignInRecordExists(Long id) {
-        if (memberSignInRecordMapper.selectById(id) == null) {
-            throw exception(SIGN_IN_RECORD_NOT_EXISTS);
-        }
-    }
-
-    @Override
-    public MemberSignInRecordDO getSignInRecord(Long id) {
-        return memberSignInRecordMapper.selectById(id);
-    }
 
     @Override
     public PageResult<MemberSignInRecordDO> getSignInRecordPage(MemberSignInRecordPageReqVO pageReqVO) {

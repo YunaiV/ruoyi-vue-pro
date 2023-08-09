@@ -1,12 +1,11 @@
 package cn.iocoder.yudao.module.member.service.signin;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInConfigCreateReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInConfigPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInConfigUpdateReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInConfigDO;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 积分签到规则 Service 接口
@@ -48,9 +47,8 @@ public interface MemberSignInConfigService {
     /**
      * 获得积分签到规则分页
      *
-     * @param pageReqVO 分页查询
      * @return 积分签到规则分页
      */
-    PageResult<MemberSignInConfigDO> getSignInConfigPage(MemberSignInConfigPageReqVO pageReqVO);
+    List<MemberSignInConfigDO> getSignInConfigList();
 
 }

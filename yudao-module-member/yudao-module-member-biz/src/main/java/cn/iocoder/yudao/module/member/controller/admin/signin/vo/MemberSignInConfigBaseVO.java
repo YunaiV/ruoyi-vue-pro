@@ -16,4 +16,8 @@ public class MemberSignInConfigBaseVO {
     @Schema(description = "签到天数对应分数", example = "10")
     private Integer point;
 
+    @Schema(description = "是否启用", example = "1")
+    private Boolean isEnable;
+
+
 }

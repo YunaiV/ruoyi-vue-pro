@@ -29,7 +29,7 @@ public class MemberSignInRecordDO extends BaseDO {
     /**
      * 签到用户
      */
-    private Integer userId;
+    private Long userId;
     /**
      * 第几天签到
      */

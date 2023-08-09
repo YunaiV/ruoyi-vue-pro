@@ -18,7 +18,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 public class MemberSignInRecordPageReqVO extends PageParam {
 
     @Schema(description = "签到用户", example = "6507")
-    private Integer userId;
+    private Long userId;
 
     @Schema(description = "第几天签到")
     private Integer day;

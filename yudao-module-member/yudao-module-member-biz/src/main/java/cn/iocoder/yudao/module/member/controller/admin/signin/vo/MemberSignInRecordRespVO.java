@@ -19,4 +19,7 @@ public class MemberSignInRecordRespVO extends MemberSignInRecordBaseVO {
     @Schema(description = "签到时间")
     private LocalDateTime createTime;
 
+    //昵称，用于前台展示
+    private String nickName;
+
 }

@@ -11,20 +11,7 @@ import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInRecordDO
  */
 public interface MemberSignInRecordService {
 
-    /**
-     * 删除用户签到积分
-     *
-     * @param id 编号
-     */
-    void deleteSignInRecord(Long id);
 
-    /**
-     * 获得用户签到积分
-     *
-     * @param id 编号
-     * @return 用户签到积分
-     */
-    MemberSignInRecordDO getSignInRecord(Long id);
 
     /**
      * 获得用户签到积分分页
@@ -33,5 +20,6 @@ public interface MemberSignInRecordService {
      * @return 用户签到积分分页
      */
     PageResult<MemberSignInRecordDO> getSignInRecordPage(MemberSignInRecordPageReqVO pageReqVO);
+
 
 }
