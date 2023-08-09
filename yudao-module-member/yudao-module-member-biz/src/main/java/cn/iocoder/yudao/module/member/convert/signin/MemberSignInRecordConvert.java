@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.member.convert.signin;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInRecordRespVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInRecordDO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
@@ -40,7 +41,7 @@ public interface MemberSignInRecordConvert {
         return memberSignInRecordRespVO;
     }
 
-    default PageResult <MemberSignInRecordRespVO> convertPage(PageResult <MemberSignInRecordDO> page, List<AdminUserRespDTO> userRespDTOS) {
+    default PageResult <MemberSignInRecordRespVO> convertPage(PageResult <MemberSignInRecordDO> page, List <MemberUserRespDTO> userRespDTOS) {
         if (page == null) {
             return null;
         }
@@ -53,7 +54,7 @@ public interface MemberSignInRecordConvert {
         return pageResult;
     }
 
-    default List <MemberSignInRecordRespVO> memberSignInRecordDOListToMemberSignInRecordRespVOList(List <MemberSignInRecordDO> list,List<AdminUserRespDTO> userRespDTOS) {
+    default List <MemberSignInRecordRespVO> memberSignInRecordDOListToMemberSignInRecordRespVOList(List <MemberSignInRecordDO> list,List <MemberUserRespDTO> userRespDTOS) {
         if (list == null) {
             return null;
         }
@@ -62,7 +63,7 @@ public interface MemberSignInRecordConvert {
         boolean userNickFlag = !CollectionUtils.isEmpty(userRespDTOS);
         if(userNickFlag){
             maps = userRespDTOS.stream()
-                    .collect(Collectors.toMap(AdminUserRespDTO::getId, AdminUserRespDTO::getNickname, (key1, key2) -> key2));
+                    .collect(Collectors.toMap(MemberUserRespDTO::getId, MemberUserRespDTO::getNickname, (key1, key2) -> key2));
         }
         List <MemberSignInRecordRespVO> list1 = new ArrayList <MemberSignInRecordRespVO>(list.size());
         for (MemberSignInRecordDO memberSignInRecordDO : list) {

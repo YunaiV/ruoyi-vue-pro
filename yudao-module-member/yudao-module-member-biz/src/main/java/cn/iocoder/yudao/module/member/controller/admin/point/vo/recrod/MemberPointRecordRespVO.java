@@ -16,4 +16,7 @@ public class MemberPointRecordRespVO extends MemberPointRecordBaseVO {
     @Schema(description = "发生时间")
     private LocalDateTime createTime;
 
+    //昵称
+    private String nickName;
+
 }
