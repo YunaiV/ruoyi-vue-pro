@@ -204,8 +204,6 @@ yudao:
     order:
       app-id: 1 # 商户编号
       expire-time: 2h # 支付的过期时间
-  cache: # spring cache 相关配置
-    redis-scan-batch-size: 30 # redis scan 一次返回数量
 
 debug: false
 
