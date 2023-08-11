@@ -302,25 +302,7 @@ export default {
   font-weight: bold;
 }
 
-.tag-purple {
-  color: #722ed1;
-  background: #f9f0ff;
-  border-color: #d3adf7;
-}
-
-.tag-cyan {
-  color: #13c2c2;
-  background: #e6fffb;
-  border-color: #87e8de;
-}
-
-.tag-pink {
-  color: #eb2f96;
-  background: #fff0f6;
-  border-color: #ffadd2;
-}
-
-.order-font{
+.order-font {
   font-size: 12px;
   padding: 2px 0;
 }
