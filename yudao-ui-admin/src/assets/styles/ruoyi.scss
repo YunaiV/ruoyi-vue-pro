@@ -95,7 +95,7 @@
       font-size: 13px;
     }
   }
-  .el-table__body-wrapper {
+  .el-table__body-wrapper,.el-table__fixed-body-wrapper {
     .el-button [class*="el-icon-"] + span {
       margin-left: 1px;
     }
