@@ -5552,7 +5552,7 @@ CREATE TABLE "system_role"
     "code"                varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
     "sort"                int4                                        NOT NULL,
     "data_scope"          int2                                        NOT NULL,
-    "data_scope_dept_ids" varchar(500) COLLATE "pg_catalog"."default" NOT NULL,
+    "data_scope_dept_ids" varchar(500) COLLATE "pg_catalog"."default" NOT NULL DEFAULT '',
     "status"              int2                                        NOT NULL,
     "type"                int2                                        NOT NULL,
     "remark"              varchar(500) COLLATE "pg_catalog"."default",
