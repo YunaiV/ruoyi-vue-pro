@@ -8,6 +8,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.cache.BatchStrategies;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.cache.RedisCacheWriter;
@@ -23,7 +24,7 @@ import static cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguratio
  * Cache 配置类，基于 Redis 实现
  */
 @AutoConfiguration
-@EnableConfigurationProperties({CacheProperties.class})
+@EnableConfigurationProperties({CacheProperties.class, YudaoCacheProperties.class})
 @EnableCaching
 public class YudaoCacheAutoConfiguration {
 
@@ -62,10 +63,12 @@ public class YudaoCacheAutoConfiguration {
 
     @Bean
     public RedisCacheManager redisCacheManager(RedisTemplate<String, Object> redisTemplate,
-                                               RedisCacheConfiguration redisCacheConfiguration) {
+                                               RedisCacheConfiguration redisCacheConfiguration,
+                                               YudaoCacheProperties yudaoCacheProperties) {
         // 创建 RedisCacheWriter 对象
         RedisConnectionFactory connectionFactory = Objects.requireNonNull(redisTemplate.getConnectionFactory());
-        RedisCacheWriter cacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(connectionFactory);
+        RedisCacheWriter cacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(connectionFactory,
+                BatchStrategies.scan(yudaoCacheProperties.getRedisScanBatchSize()));
         // 创建 TenantRedisCacheManager 对象
         return new TimeoutRedisCacheManager(cacheWriter, redisCacheConfiguration);
     }

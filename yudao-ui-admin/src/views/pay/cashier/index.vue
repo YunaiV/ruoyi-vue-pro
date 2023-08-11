@@ -238,7 +238,7 @@ export default {
         if (data.status === PayOrderStatusEnum.SUCCESS.status) {
           this.clearQueryInterval();
           this.$message.success('支付成功！');
-          this.goReturnUrl();
+          this.goReturnUrl('success');
           return
         }
 
@@ -321,13 +321,13 @@ export default {
           if (response.data.status === PayOrderStatusEnum.SUCCESS.status) {
             this.clearQueryInterval();
             this.$message.success('支付成功！');
-            this.goReturnUrl();
+            this.goReturnUrl('success');
           }
           // 已取消
           if (response.data.status === PayOrderStatusEnum.CLOSED.status) {
             this.clearQueryInterval();
             this.$message.error('支付已关闭！');
-            this.goReturnUrl();
+            this.goReturnUrl('close');
           }
         })
       }, 1000 * 2)
