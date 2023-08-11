@@ -53,7 +53,7 @@ public class WxAppPayClient extends AbstractWxPayClient {
         // 构建 WxPayUnifiedOrderV3Request 对象
         WxPayUnifiedOrderV3Request request = buildPayUnifiedOrderRequestV3(reqDTO);
         // 执行请求
-        WxPayUnifiedOrderV3Result.JsapiResult response = client.createOrderV3(TradeTypeEnum.APP, request);
+        WxPayUnifiedOrderV3Result.AppResult response = client.createOrderV3(TradeTypeEnum.APP, request);
 
         // 转换结果
         return PayOrderRespDTO.waitingOf(PayOrderDisplayModeEnum.APP.getMode(), toJsonString(response),
