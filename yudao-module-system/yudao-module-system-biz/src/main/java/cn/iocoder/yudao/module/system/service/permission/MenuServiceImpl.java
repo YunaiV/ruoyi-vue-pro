@@ -45,7 +45,8 @@ public class MenuServiceImpl implements MenuService {
     private TenantService tenantService;
 
     @Override
-    @CacheEvict(value = RedisKeyConstants.PERMISSION_MENU_ID_LIST, condition = "#reqVO.permission != null",  key = "#reqVO.permission")
+    @CacheEvict(value = RedisKeyConstants.PERMISSION_MENU_ID_LIST, key = "#reqVO.permission",
+            condition = "#reqVO.permission != null")
     public Long createMenu(MenuCreateReqVO reqVO) {
         // 校验父菜单存在
         validateParentMenu(reqVO.getParentId(), null);
