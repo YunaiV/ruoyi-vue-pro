@@ -8,24 +8,24 @@ import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.MemberPoi
 import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.MemberPointRecordRespVO;
 import cn.iocoder.yudao.module.member.convert.point.MemberPointRecordConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.point.MemberPointRecordDO;
-import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInRecordDO;
 import cn.iocoder.yudao.module.member.service.point.MemberPointRecordService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
+// TODO @xiaqing：url 使用 member 作为前缀
 @Tag(name = "管理后台 - 用户积分记录")
 @RestController
 @RequestMapping("/point/record")
@@ -33,35 +33,25 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 public class MemberPointRecordController {
 
     @Resource
-    private MemberPointRecordService recordService;
+    private MemberPointRecordService pointRecordService;
+
     @Resource
-    MemberUserApi memberUserApi;
+    private MemberUserApi memberUserApi;
 
     @GetMapping("/page")
     @Operation(summary = "获得用户积分记录分页")
     @PreAuthorize("@ss.hasPermission('point:record:query')")
-    public CommonResult <PageResult <MemberPointRecordRespVO>> getRecordPage(@Valid MemberPointRecordPageReqVO pageVO) {
-        //根据用户昵称查询出用户ids
-        List <Long> userIds = null;
-        if (StringUtils.isNotBlank(pageVO.getNickName())) {
-            List <MemberUserRespDTO> users = memberUserApi.getUserListByNickname(pageVO.getNickName());
-            //如果查询用户结果为空直接返回无需继续查询
-            if (CollectionUtils.isEmpty(users)) {
-                return success(new PageResult <>());
-            }
-            userIds=users.stream().map(user->user.getId()).collect(Collectors.toList());
-            pageVO.setUserIds(userIds);
+    public CommonResult<PageResult<MemberPointRecordRespVO>> getRecordPage(@Valid MemberPointRecordPageReqVO pageVO) {
+        // 执行分页查询
+        PageResult<MemberPointRecordDO> pageResult = pointRecordService.getRecordPage(pageVO);
+        if (CollectionUtils.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty(pageResult.getTotal()));
         }
 
-        PageResult <MemberPointRecordDO> pageResult = recordService.getRecordPage(pageVO);
-        //根据查询的userId转换成nickName
-        List <MemberPointRecordDO> result = pageResult.getList();
-        List <MemberUserRespDTO> users = null;
-        if (!CollectionUtils.isEmpty(result)) {
-            List <Long> ids = result.stream().map(user -> user.getUserId()).collect(Collectors.toList());
-            users = memberUserApi.getUsers(ids);
-        }
-        return success(MemberPointRecordConvert.INSTANCE.convertPage(pageResult,users));
+        // 拼接结果返回
+        List<MemberUserRespDTO> users = memberUserApi.getUserList(
+                convertSet(pageResult.getList(), MemberPointRecordDO::getUserId));
+        return success(MemberPointRecordConvert.INSTANCE.convertPage(pageResult, users));
     }
 
 }

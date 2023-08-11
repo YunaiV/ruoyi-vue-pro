@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.member.controller.admin.signin.vo;
+package cn.iocoder.yudao.module.member.controller.admin.signin.vo.config;
 
 import lombok.*;
 import io.swagger.v3.oas.annotations.media.Schema;

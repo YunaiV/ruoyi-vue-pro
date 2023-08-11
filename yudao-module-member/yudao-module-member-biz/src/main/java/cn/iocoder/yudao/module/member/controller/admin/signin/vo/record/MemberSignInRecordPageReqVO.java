@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.member.controller.admin.signin.vo;
+package cn.iocoder.yudao.module.member.controller.admin.signin.vo.record;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -8,7 +8,6 @@ import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -18,13 +17,10 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class MemberSignInRecordPageReqVO extends PageParam {
 
-    //用户前台模糊查询
-    @Schema(description = "签到用户", example = "6507")
-    private String nickName;
+    @Schema(description = "签到用户", example = "土豆")
+    private String nickname;
 
-    private List<Long>userIds;
-
-    @Schema(description = "第几天签到")
+    @Schema(description = "第几天签到", example = "10")
     private Integer day;
 
     @Schema(description = "签到时间")

@@ -20,5 +20,4 @@ public interface MemberPointConfigConvert {
 
     MemberPointConfigDO convert(MemberPointConfigSaveReqVO bean);
 
-
 }

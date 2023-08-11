@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.member.service.signin;
 
-import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInConfigCreateReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInConfigUpdateReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.signin.vo.config.MemberSignInConfigCreateReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.signin.vo.config.MemberSignInConfigUpdateReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInConfigDO;
 
 import javax.validation.Valid;
@@ -20,7 +20,7 @@ public interface MemberSignInConfigService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Integer createSignInConfig(@Valid MemberSignInConfigCreateReqVO createReqVO);
+    Long createSignInConfig(@Valid MemberSignInConfigCreateReqVO createReqVO);
 
     /**
      * 更新积分签到规则
@@ -34,7 +34,7 @@ public interface MemberSignInConfigService {
      *
      * @param id 编号
      */
-    void deleteSignInConfig(Integer id);
+    void deleteSignInConfig(Long id);
 
     /**
      * 获得积分签到规则
@@ -42,7 +42,7 @@ public interface MemberSignInConfigService {
      * @param id 编号
      * @return 积分签到规则
      */
-    MemberSignInConfigDO getSignInConfig(Integer id);
+    MemberSignInConfigDO getSignInConfig(Long id);
 
     /**
      * 获得积分签到规则分页

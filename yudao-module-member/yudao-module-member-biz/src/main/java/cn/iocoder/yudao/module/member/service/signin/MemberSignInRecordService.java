@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.member.service.signin;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInRecordPageReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.signin.vo.record.MemberSignInRecordPageReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInRecordDO;
 
 /**
@@ -11,8 +11,6 @@ import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInRecordDO
  */
 public interface MemberSignInRecordService {
 
-
-
     /**
      * 获得用户签到积分分页
      *
@@ -20,6 +18,5 @@ public interface MemberSignInRecordService {
      * @return 用户签到积分分页
      */
     PageResult<MemberSignInRecordDO> getSignInRecordPage(MemberSignInRecordPageReqVO pageReqVO);
-
 
 }

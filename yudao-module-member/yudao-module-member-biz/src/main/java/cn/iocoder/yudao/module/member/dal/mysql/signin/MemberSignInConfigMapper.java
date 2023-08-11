@@ -16,11 +16,7 @@ import java.util.List;
 @Mapper
 public interface MemberSignInConfigMapper extends BaseMapperX<MemberSignInConfigDO> {
 
-    /**
-     * 描述    :选择性更新对象属性，如果不为空则更新。
-     * Author :xiaqing
-     * Date   :2023-08-08 23:38:48
-     */
+    // TODO @qingxia：是不是不用这个方法，直接 updateById 即可
     default int updateIfPresent(MemberSignInConfigDO updateObj){
         LambdaUpdateWrapper <MemberSignInConfigDO> wrapper = new LambdaUpdateWrapper <>();
         wrapper.eq(MemberSignInConfigDO::getId, updateObj.getId())
@@ -30,18 +26,13 @@ public interface MemberSignInConfigMapper extends BaseMapperX<MemberSignInConfig
         return update(null,wrapper);
     }
 
-    default List <MemberSignInConfigDO> getList(){
+    // TODO @qingxia：不用这个方法，selectList，业务层自己排序即可
+    default List<MemberSignInConfigDO> getList() {
         return selectList(new LambdaQueryWrapperX <MemberSignInConfigDO>().orderByAsc(MemberSignInConfigDO::getDay));
     }
 
-    /**
-     * 描述    :根据天数查询对应记录
-     * Date   :2023-08-09 00:07:11
-     */
-    default MemberSignInConfigDO selectByDay(Integer day){
-        return selectOne(new LambdaQueryWrapperX <MemberSignInConfigDO>()
-                .eq(MemberSignInConfigDO::getDay,day));
-
+    default MemberSignInConfigDO selectByDay(Integer day) {
+        return selectOne(MemberSignInConfigDO::getDay, day);
     }
 
 }

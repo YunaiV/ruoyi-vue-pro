@@ -17,6 +17,7 @@ import javax.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
+// TODO @xiaqing：url 使用 member 作为前缀
 @Tag(name = "管理后台 - 会员积分设置")
 @RestController
 @RequestMapping("/point/config")

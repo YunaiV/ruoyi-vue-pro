@@ -29,7 +29,7 @@ public interface MemberUserApi {
      * @param ids 用户编号的数组
      * @return 用户信息们
      */
-    List<MemberUserRespDTO> getUsers(Collection<Long> ids);
+    List<MemberUserRespDTO> getUserList(Collection<Long> ids);
 
     /**
      * 获得会员用户 Map
@@ -38,7 +38,7 @@ public interface MemberUserApi {
      * @return 会员用户 Map
      */
     default Map<Long, MemberUserRespDTO> getUserMap(Collection<Long> ids) {
-        return convertMap(getUsers(ids), MemberUserRespDTO::getId);
+        return convertMap(getUserList(ids), MemberUserRespDTO::getId);
     }
 
     /**

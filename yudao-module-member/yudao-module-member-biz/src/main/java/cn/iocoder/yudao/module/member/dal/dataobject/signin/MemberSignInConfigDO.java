@@ -25,7 +25,7 @@ public class MemberSignInConfigDO extends BaseDO {
      * 规则自增主键
      */
     @TableId
-    private Integer id;
+    private Long id;
     /**
      * 签到第x天
      */
@@ -34,8 +34,11 @@ public class MemberSignInConfigDO extends BaseDO {
      * 签到天数对应分数
      */
     private Integer point;
+
+    // TODO @puhui999：enable；不用 is 开头
     /**
      * 是否启用
      */
     private Boolean isEnable;
+
 }

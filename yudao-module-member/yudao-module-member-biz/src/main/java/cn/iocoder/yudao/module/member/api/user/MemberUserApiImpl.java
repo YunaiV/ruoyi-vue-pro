@@ -30,7 +30,7 @@ public class MemberUserApiImpl implements MemberUserApi {
     }
 
     @Override
-    public List<MemberUserRespDTO> getUsers(Collection<Long> ids) {
+    public List<MemberUserRespDTO> getUserList(Collection<Long> ids) {
         return UserConvert.INSTANCE.convertList2(userService.getUserList(ids));
     }
 

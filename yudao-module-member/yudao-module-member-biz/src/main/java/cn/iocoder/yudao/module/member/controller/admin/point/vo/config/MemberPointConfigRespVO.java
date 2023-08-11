@@ -10,4 +10,8 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class MemberPointConfigRespVO extends MemberPointConfigBaseVO {
+
+    @Schema(description = "自增主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    private Long id;
+
 }

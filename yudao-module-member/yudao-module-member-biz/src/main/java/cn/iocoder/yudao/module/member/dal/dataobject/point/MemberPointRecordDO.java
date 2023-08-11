@@ -29,6 +29,13 @@ public class MemberPointRecordDO extends BaseDO {
     @TableId
     private Long id;
     /**
+     * 用户编号
+     *
+     * 对应 MemberUserDO 的 id 属性
+     */
+    private Long userId;
+
+    /**
      * 业务编码
      */
     private String bizId;
@@ -36,6 +43,7 @@ public class MemberPointRecordDO extends BaseDO {
      * 业务类型
      *
      * 枚举 {@link TODO biz_type 对应枚举，然后改成 int 类型哈}
+     * TODO @qingxia：这个改成 Integer，然后搞个枚举
      */
     private String bizType;
     /**
@@ -58,12 +66,10 @@ public class MemberPointRecordDO extends BaseDO {
      * 状态：1-订单创建，2-冻结期，3-完成，4-失效（订单退款）
      *
      * 枚举 {@link  point_status 对应的类}
+     * TODO @qingxia：搞个枚举
      */
     private Integer status;
-    /**
-     * 用户id
-     */
-    private Long userId;
+
     /**
      * 冻结时间
      */
