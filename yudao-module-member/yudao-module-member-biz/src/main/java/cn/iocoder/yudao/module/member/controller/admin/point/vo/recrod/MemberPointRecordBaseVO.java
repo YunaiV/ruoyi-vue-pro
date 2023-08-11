@@ -24,10 +24,6 @@ public class MemberPointRecordBaseVO {
     @NotNull(message = "业务类型不能为空")
     private String bizType;
 
-    @Schema(description = "1增加 0扣减", example = "1")
-    @NotNull(message = "操作类型不能为空")
-    private String type;
-
     @Schema(description = "积分标题")
     @NotNull(message = "积分标题不能为空")
     private String title;
@@ -46,10 +42,6 @@ public class MemberPointRecordBaseVO {
     @Schema(description = "状态：1-订单创建，2-冻结期，3-完成，4-失效（订单退款） ", example = "1")
     @NotNull(message = "积分状态不能为空")
     private Integer status;
-
-    @Schema(description = "用户id", example = "31169")
-    @NotNull(message = "用户ID不能为空")
-    private Integer userId;
 
     @Schema(description = "冻结时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

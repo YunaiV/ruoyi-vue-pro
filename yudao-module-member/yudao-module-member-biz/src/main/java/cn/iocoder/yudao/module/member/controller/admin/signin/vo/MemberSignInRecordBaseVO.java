@@ -11,7 +11,7 @@ import lombok.Data;
 public class MemberSignInRecordBaseVO {
 
     @Schema(description = "签到用户", example = "6507")
-    private Integer userId;
+    private Long userId;
 
     @Schema(description = "第几天签到")
     private Integer day;

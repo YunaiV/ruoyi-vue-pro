@@ -34,5 +34,8 @@ public class MemberSignInConfigDO extends BaseDO {
      * 签到天数对应分数
      */
     private Integer point;
-
+    /**
+     * 是否启用
+     */
+    private Boolean isEnable;
 }

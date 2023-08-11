@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.member.controller.admin.signin;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInConfigCreateReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInConfigPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInConfigRespVO;
 import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInConfigUpdateReqVO;
 import cn.iocoder.yudao.module.member.convert.signin.MemberSignInConfigConvert;
@@ -18,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -63,12 +64,12 @@ public class MemberSignInConfigController {
         return success(MemberSignInConfigConvert.INSTANCE.convert(signInConfig));
     }
 
-    @GetMapping("/page")
+    @GetMapping("/list")
     @Operation(summary = "获得积分签到规则分页")
     @PreAuthorize("@ss.hasPermission('point:sign-in-config:query')")
-    public CommonResult<PageResult<MemberSignInConfigRespVO>> getSignInConfigPage(@Valid MemberSignInConfigPageReqVO pageVO) {
-        PageResult<MemberSignInConfigDO> pageResult = memberSignInConfigService.getSignInConfigPage(pageVO);
-        return success(MemberSignInConfigConvert.INSTANCE.convertPage(pageResult));
+    public CommonResult<List<MemberSignInConfigRespVO>> getSignInConfigPage() {
+        List<MemberSignInConfigDO> pageResult = memberSignInConfigService.getSignInConfigList();
+        return success(MemberSignInConfigConvert.INSTANCE.convertList(pageResult));
     }
 
 }

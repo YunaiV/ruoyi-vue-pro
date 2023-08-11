@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.member.service.point;
 
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.member.controller.admin.point.vo.config.MemberPointConfigSaveReqVO;
 import cn.iocoder.yudao.module.member.convert.point.MemberPointConfigConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.point.MemberPointConfigDO;
@@ -24,13 +26,15 @@ public class MemberPointConfigServiceImpl implements MemberPointConfigService {
 
     @Override
     public void saveConfig(MemberPointConfigSaveReqVO saveReqVO) {
-        // TODO @xiaqing：直接 getConfig() 查询，如果不存在，则插入；存在，则进行更新；
-        long total = pointConfigMapper.selectCount();
+        //获取当前记录
+        MemberPointConfigDO configDO = getConfig();
         MemberPointConfigDO pointConfigDO = MemberPointConfigConvert.INSTANCE.convert(saveReqVO);
-        //大于0存在记录，则更新，否则插入
-        if (total > 0) {
+        //当前存在记录，则更新，否则插入
+        if (configDO != null) {
+            pointConfigDO.setId(configDO.getId());
             pointConfigMapper.updateById(pointConfigDO);
         } else {
+            pointConfigDO.setId(null);
             pointConfigMapper.insert(pointConfigDO);
         }
     }
@@ -38,8 +42,7 @@ public class MemberPointConfigServiceImpl implements MemberPointConfigService {
     @Override
     public MemberPointConfigDO getConfig() {
         List <MemberPointConfigDO> list = pointConfigMapper.selectList();
-        // TODO @xiaqing：可以使用 CollUtil.getFirst()
-        return list == null ? null : list.get(0);
+        return CollectionUtils.getFirst(list);
     }
 
 }

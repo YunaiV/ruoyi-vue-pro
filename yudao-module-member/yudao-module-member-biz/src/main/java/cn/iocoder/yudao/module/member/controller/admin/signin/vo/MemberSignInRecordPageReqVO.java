@@ -8,6 +8,7 @@ import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -17,8 +18,11 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class MemberSignInRecordPageReqVO extends PageParam {
 
+    //用户前台模糊查询
     @Schema(description = "签到用户", example = "6507")
-    private Integer userId;
+    private String nickName;
+
+    private List<Long>userIds;
 
     @Schema(description = "第几天签到")
     private Integer day;
