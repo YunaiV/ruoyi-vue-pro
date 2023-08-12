@@ -30,7 +30,7 @@ export const columns: BasicColumn[] = [
   {
     title: '${comment}',
     dataIndex: '${javaField}',
-    width: 160
+    width: 160,
   },
 #end
 #end
@@ -61,7 +61,7 @@ export const searchFormSchema: FormSchema[] = [
   #elseif($column.htmlType == "datetime")
     component: 'RangePicker',
     #end
-    colProps: { span: 8 }
+    colProps: { span: 8 },
   },
 #end
 #end
@@ -72,7 +72,7 @@ export const createFormSchema: FormSchema[] = [
     label: '编号',
     field: 'id',
     show: false,
-    component: 'Input'
+    component: 'Input',
   },
 #foreach($column in $columns)
 #if ($column.createOperation)
@@ -146,7 +146,7 @@ export const updateFormSchema: FormSchema[] = [
     label: '编号',
     field: 'id',
     show: false,
-    component: 'Input'
+    component: 'Input',
   },
 #foreach($column in $columns)
 #if ($column.updateOperation)
