@@ -56,14 +56,6 @@ public interface SeckillActivityService {
     SeckillActivityDO getSeckillActivity(Long id);
 
     /**
-     * 获得秒杀活动列表
-     *
-     * @param ids 编号
-     * @return 秒杀活动列表
-     */
-    List<SeckillActivityDO> getSeckillActivityList(Collection<Long> ids);
-
-    /**
      * 获得秒杀活动分页
      *
      * @param pageReqVO 分页查询
@@ -74,17 +66,17 @@ public interface SeckillActivityService {
     /**
      * 通过活动编号获取活动商品
      *
-     * @param id 活动编号
+     * @param activityId 活动编号
      * @return 活动商品列表
      */
-    List<SeckillProductDO> getSeckillProductListByActivityId(Long id);
+    List<SeckillProductDO> getSeckillProductListByActivityId(Long activityId);
 
     /**
      * 通过活动编号获取活动商品
      *
-     * @param ids 活动编号
+     * @param activityIds 活动编号
      * @return 活动商品列表
      */
-    List<SeckillProductDO> getSeckillProductListByActivityId(Collection<Long> ids);
+    List<SeckillProductDO> getSeckillProductListByActivityId(Collection<Long> activityIds);
 
 }

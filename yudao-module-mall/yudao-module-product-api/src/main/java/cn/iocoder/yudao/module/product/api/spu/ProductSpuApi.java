@@ -21,4 +21,11 @@ public interface ProductSpuApi {
      */
     List<ProductSpuRespDTO> getSpuList(Collection<Long> ids);
 
+    /**
+     * 获得 SPU
+     *
+     * @return SPU
+     */
+    ProductSpuRespDTO getSpu(Long id);
+
 }

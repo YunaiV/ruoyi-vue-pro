@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigPageReqVO;
@@ -13,7 +12,6 @@ import cn.iocoder.yudao.module.promotion.convert.seckill.seckillconfig.SeckillCo
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillconfig.SeckillConfigDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillconfig.SeckillConfigMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -37,7 +35,6 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
     private SeckillConfigMapper seckillConfigMapper;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public Long createSeckillConfig(SeckillConfigCreateReqVO createReqVO) {
         // 校验时间段是否冲突
         validateSeckillConfigConflict(createReqVO.getStartTime(), createReqVO.getEndTime(), null);
@@ -50,7 +47,6 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void updateSeckillConfig(SeckillConfigUpdateReqVO updateReqVO) {
         // 校验存在
         validateSeckillConfigExists(updateReqVO.getId());
@@ -62,7 +58,6 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
         seckillConfigMapper.updateById(updateObj);
     }
 
-    // TODO  @puhui999: 这个要不合并到更新操作里? 不单独有个操作咧; fix: 更新状态不用那么多必须的参数，更新的时候需要校验时间段
     @Override
     public void updateSeckillConfigStatus(Long id, Integer status) {
         // 校验秒杀时段是否存在
@@ -73,7 +68,6 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void deleteSeckillConfig(Long id) {
         // 校验存在
         validateSeckillConfigExists(id);
@@ -84,35 +78,31 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
 
     private void validateSeckillConfigExists(Long id) {
         if (seckillConfigMapper.selectById(id) == null) {
-            throw exception(SECKILL_TIME_NOT_EXISTS);
+            throw exception(SECKILL_CONFIG_NOT_EXISTS);
         }
     }
 
     /**
      * 校验时间是否存在冲突
      *
-     * @param startTime 开始时间
-     * @param endTime   结束时间
+     * @param startTimeStr 开始时间
+     * @param endTimeStr   结束时间
      */
-    private void validateSeckillConfigConflict(String startTime, String endTime, Long seckillConfigId) {
-        LocalTime startTime1 = LocalTime.parse(startTime);
-        LocalTime endTime1 = LocalTime.parse(endTime);
-        // 查询出所有的时段配置
-        List<SeckillConfigDO> configDOs = seckillConfigMapper.selectList();
+    private void validateSeckillConfigConflict(String startTimeStr, String endTimeStr, Long id) {
+        // 1. 查询出所有的时段配置
+        LocalTime startTime = LocalTime.parse(startTimeStr);
+        LocalTime endTime = LocalTime.parse(endTimeStr);
+        List<SeckillConfigDO> configs = seckillConfigMapper.selectList();
         // 更新时排除自己
-        if (seckillConfigId != null) {
-            configDOs.removeIf(item -> ObjectUtil.equal(item.getId(), seckillConfigId));
+        if (id != null) {
+            configs.removeIf(item -> ObjectUtil.equal(item.getId(), id));
         }
-        // 过滤出重叠的时段 ids
-        boolean hasConflict = configDOs.stream().anyMatch(config -> {
-            LocalTime startTime2 = LocalTime.parse(config.getStartTime());
-            LocalTime endTime2 = LocalTime.parse(config.getEndTime());
-            // 判断时间是否重叠
-            return LocalDateTimeUtils.isOverlap(startTime1, endTime1, startTime2, endTime2);
-        });
 
+        // 2. 判断是否有重叠的时间
+        boolean hasConflict = configs.stream().anyMatch(config -> LocalDateTimeUtils.isOverlap(startTime, endTime,
+                LocalTime.parse(config.getStartTime()), LocalTime.parse(config.getEndTime())));
         if (hasConflict) {
-            throw exception(SECKILL_TIME_CONFLICTS);
+            throw exception(SECKILL_CONFIG_TIME_CONFLICTS);
         }
     }
 
@@ -128,22 +118,22 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
     }
 
     @Override
-    public void validateSeckillConfigExists(Collection<Long> configIds) {
-        if (CollUtil.isEmpty(configIds)) {
-            throw exception(SECKILL_TIME_NOT_EXISTS);
+    public void validateSeckillConfigExists(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
         }
-        List<SeckillConfigDO> configDOs = seckillConfigMapper.selectBatchIds(configIds);
-        if (CollUtil.isEmpty(configDOs)) {
-            throw exception(SECKILL_TIME_NOT_EXISTS);
+        // 1. 如果有数量不匹配，说明有不存在的，则抛出 SECKILL_CONFIG_NOT_EXISTS 业务异常
+        List<SeckillConfigDO> configs = seckillConfigMapper.selectBatchIds(ids);
+        if (configs.size() != ids.size()) {
+            throw exception(SECKILL_CONFIG_NOT_EXISTS);
         }
-        // 过滤出关闭的时段
-        List<SeckillConfigDO> filterList = CollectionUtils.filterList(configDOs, item -> ObjectUtil.equal(item.getStatus(), CommonStatusEnum.DISABLE.getStatus()));
-        if (CollUtil.isNotEmpty(filterList)) {
-            throw exception(SECKILL_TIME_DISABLE);
-        }
-        if (configDOs.size() != configIds.size()) {
-            throw exception(SECKILL_TIME_NOT_EXISTS);
-        }
+
+        // 2. 如果存在关闭，则抛出 SECKILL_CONFIG_DISABLE 业务异常
+        configs.forEach(config -> {
+            if (ObjectUtil.equal(config.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
+                throw exception(SECKILL_CONFIG_DISABLE);
+            }
+        });
     }
 
     @Override

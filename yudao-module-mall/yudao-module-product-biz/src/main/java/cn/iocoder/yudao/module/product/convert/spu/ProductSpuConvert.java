@@ -64,6 +64,8 @@ public interface ProductSpuConvert {
 
     ProductSpuDetailRespVO convert03(ProductSpuDO spu);
 
+    ProductSpuRespDTO convert02(ProductSpuDO bean);
+
     // ========== 用户 App 相关 ==========
 
     PageResult<AppProductSpuPageRespVO> convertPageForGetSpuPage(PageResult<ProductSpuDO> page);

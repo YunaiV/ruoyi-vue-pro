@@ -50,14 +50,11 @@ public interface ErrorCodeConstants {
     ErrorCode SECKILL_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED = new ErrorCode(1013008003, "秒杀活动已关闭，不能修改");
     ErrorCode SECKILL_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1013008004, "秒杀活动未关闭或未结束，不能删除");
     ErrorCode SECKILL_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1013008005, "秒杀活动已关闭，不能重复关闭");
-    ErrorCode SECKILL_ACTIVITY_CLOSE_FAIL_STATUS_END = new ErrorCode(1013008006, "秒杀活动已结束，不能关闭");
 
     // ========== 秒杀时段 1013009000 ==========
-    ErrorCode SECKILL_TIME_NOT_EXISTS = new ErrorCode(1013009000, "秒杀时段不存在");
-    ErrorCode SECKILL_TIME_CONFLICTS = new ErrorCode(1013009001, "秒杀时段冲突");
-    ErrorCode SECKILL_TIME_EQUAL = new ErrorCode(1013009002, "秒杀时段开始时间和结束时间不能相等");
-    ErrorCode SECKILL_START_TIME_BEFORE_END_TIME = new ErrorCode(1013009003, "秒杀时段开始时间不能在结束时间之后");
-    ErrorCode SECKILL_TIME_DISABLE = new ErrorCode(1013009004, "秒杀时段已关闭");
+    ErrorCode SECKILL_CONFIG_NOT_EXISTS = new ErrorCode(1013009000, "秒杀时段不存在");
+    ErrorCode SECKILL_CONFIG_TIME_CONFLICTS = new ErrorCode(1013009001, "秒杀时段冲突");
+    ErrorCode SECKILL_CONFIG_DISABLE = new ErrorCode(1013009004, "秒杀时段已关闭");
 
     // ========== 拼团活动 1013010000 ==========
     ErrorCode COMBINATION_ACTIVITY_NOT_EXISTS = new ErrorCode(1013010000, "拼团活动不存在");

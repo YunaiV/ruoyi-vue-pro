@@ -20,7 +20,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class SeckillActivityBaseVO {
 
-    @Schema(description = "秒杀活动商品id", requiredMode = Schema.RequiredMode.REQUIRED, example = "[121,1212]")
+    @Schema(description = "秒杀活动商品 id", requiredMode = Schema.RequiredMode.REQUIRED, example = "[121,1212]")
     @NotNull(message = "秒杀活动商品不能为空")
     private Long spuId;
 

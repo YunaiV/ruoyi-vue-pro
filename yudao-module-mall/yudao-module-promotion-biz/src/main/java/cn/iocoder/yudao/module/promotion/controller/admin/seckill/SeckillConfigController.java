@@ -92,4 +92,5 @@ public class SeckillConfigController {
         PageResult<SeckillConfigDO> pageResult = seckillConfigService.getSeckillConfigPage(pageVO);
         return success(SeckillConfigConvert.INSTANCE.convertPage(pageResult));
     }
+
 }

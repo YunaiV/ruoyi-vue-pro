@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.promotion.convert.seckill.seckillactivity;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityDetailRespVO;
@@ -18,6 +19,8 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * 秒杀活动 Convert
@@ -37,43 +40,43 @@ public interface SeckillActivityConvert {
 
     List<SeckillActivityRespVO> convertList(List<SeckillActivityDO> list);
 
-    PageResult<SeckillActivityRespVO> convertPage(PageResult<SeckillActivityDO> page);
-
-    default PageResult<SeckillActivityRespVO> convertPage(PageResult<SeckillActivityDO> page, List<SeckillProductDO> seckillProducts, List<ProductSpuRespDTO> spuList) {
-        Map<Long, ProductSpuRespDTO> spuMap = CollectionUtils.convertMap(spuList, ProductSpuRespDTO::getId, c -> c);
+    default PageResult<SeckillActivityRespVO> convertPage(PageResult<SeckillActivityDO> page,
+                                                          List<SeckillProductDO> seckillProducts,
+                                                          List<ProductSpuRespDTO> spuList) {
         PageResult<SeckillActivityRespVO> pageResult = convertPage(page);
+        // 拼接商品
+        Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
         pageResult.getList().forEach(item -> {
-            item.setSpuName(spuMap.get(item.getSpuId()).getName());
-            item.setPicUrl(spuMap.get(item.getSpuId()).getPicUrl());
             item.setProducts(convertList2(seckillProducts));
+            MapUtils.findAndThen(spuMap, item.getSpuId(),
+                    spu -> item.setSpuName(spu.getName()).setPicUrl(spu.getPicUrl()));
         });
         return pageResult;
     }
+    PageResult<SeckillActivityRespVO> convertPage(PageResult<SeckillActivityDO> page);
 
     SeckillActivityDetailRespVO convert1(SeckillActivityDO seckillActivity);
 
-    default SeckillActivityDetailRespVO convert(SeckillActivityDO seckillActivity, List<SeckillProductDO> seckillProducts) {
-        return convert1(seckillActivity).setProducts(convertList2(seckillProducts));
+    default SeckillActivityDetailRespVO convert(SeckillActivityDO activity,
+                                                List<SeckillProductDO> products) {
+        return convert1(activity).setProducts(convertList2(products));
     }
-
-    // TODO @puhui999：参数改成 activity、product 会不会干净一点哈
-    @Mappings({
-            @Mapping(target = "id", ignore = true),
-            @Mapping(target = "activityId", source = "activityDO.id"),
-            @Mapping(target = "configIds", source = "activityDO.configIds"),
-            @Mapping(target = "spuId", source = "activityDO.spuId"),
-            @Mapping(target = "skuId", source = "vo.skuId"),
-            @Mapping(target = "seckillPrice", source = "vo.seckillPrice"),
-            @Mapping(target = "stock", source = "vo.stock"),
-            @Mapping(target = "activityStartTime", source = "activityDO.startTime"),
-            @Mapping(target = "activityEndTime", source = "activityDO.endTime")
-    })
-    SeckillProductDO convert(SeckillActivityDO activityDO, SeckillProductBaseVO vo);
+    List<SeckillProductRespVO> convertList2(List<SeckillProductDO> productDOs);
 
     default List<SeckillProductDO> convertList(List<? extends SeckillProductBaseVO> products, SeckillActivityDO activityDO) {
         return CollectionUtils.convertList(products, item -> convert(activityDO, item).setActivityStatus(activityDO.getStatus()));
     }
-
-    List<SeckillProductRespVO> convertList2(List<SeckillProductDO> productDOs);
+    @Mappings({
+            @Mapping(target = "id", ignore = true),
+            @Mapping(target = "activityId", source = "activity.id"),
+            @Mapping(target = "configIds", source = "activity.configIds"),
+            @Mapping(target = "spuId", source = "activity.spuId"),
+            @Mapping(target = "skuId", source = "product.skuId"),
+            @Mapping(target = "seckillPrice", source = "product.seckillPrice"),
+            @Mapping(target = "stock", source = "product.stock"),
+            @Mapping(target = "activityStartTime", source = "activity.startTime"),
+            @Mapping(target = "activityEndTime", source = "activity.endTime")
+    })
+    SeckillProductDO convert(SeckillActivityDO activity, SeckillProductBaseVO product);
 
 }
