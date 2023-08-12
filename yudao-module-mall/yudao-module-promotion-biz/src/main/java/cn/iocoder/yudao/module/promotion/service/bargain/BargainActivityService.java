@@ -59,9 +59,9 @@ public interface BargainActivityService {
     /**
      * 获得砍价活动商品列表
      *
-     * @param ids 砍价活动 ids
+     * @param activityIds 砍价活动 ids
      * @return 砍价活动的商品列表
      */
-    List<BargainProductDO> getBargainProductsByActivityIds(Collection<Long> ids);
+    List<BargainProductDO> getBargainProductsByActivityIds(Collection<Long> activityIds);
 
 }

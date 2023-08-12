@@ -13,14 +13,12 @@ import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.BargainActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.BargainActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.BargainActivityUpdateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.product.BargainProductCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.product.BargainProductUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.product.BargainProductBaseVO;
 import cn.iocoder.yudao.module.promotion.convert.bargain.BargainActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainProductDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.bargain.BargainActivityMapper;
 import cn.iocoder.yudao.module.promotion.dal.mysql.bargain.BargainProductMapper;
-import cn.iocoder.yudao.module.promotion.dal.mysql.bargain.BargainRecordMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -43,14 +41,13 @@ import static cn.iocoder.yudao.module.promotion.util.PromotionUtils.validateProd
  */
 @Service
 @Validated
-public class BargainServiceImpl implements BargainActivityService, BargainRecordService {
+public class BargainActivityServiceImpl implements BargainActivityService {
 
     @Resource
     private BargainActivityMapper bargainActivityMapper;
     @Resource
-    private BargainRecordMapper recordMapper;
-    @Resource
     private BargainProductMapper bargainProductMapper;
+
     @Resource
     private ProductSpuApi productSpuApi;
     @Resource
@@ -64,21 +61,21 @@ public class BargainServiceImpl implements BargainActivityService, BargainRecord
         // 获取所选 spu下的所有 sku
         List<ProductSkuRespDTO> skus = productSkuApi.getSkuListBySpuId(CollectionUtil.newArrayList(createReqVO.getSpuId()));
         // 校验商品 sku 是否存在
-        validateProductSkuAllExists(skus, createReqVO.getProducts(), BargainProductCreateReqVO::getSkuId);
+        validateProductSkuAllExists(skus, createReqVO.getProducts(), BargainProductBaseVO::getSkuId);
 
         // 插入砍价活动
-        BargainActivityDO activityDO = BargainActivityConvert.INSTANCE.convert(createReqVO);
+        BargainActivityDO activity = BargainActivityConvert.INSTANCE.convert(createReqVO);
         // TODO 营销相关属性初始化 砍价成功更新相关属性
-        activityDO.setSuccessCount(0);
+        activity.setSuccessCount(0);
         // 活动总库存
-        activityDO.setStock(getSumValue(createReqVO.getProducts(), BargainProductCreateReqVO::getStock, Integer::sum));
-        activityDO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        bargainActivityMapper.insert(activityDO);
+        activity.setStock(getSumValue(createReqVO.getProducts(), BargainProductBaseVO::getStock, Integer::sum));
+        activity.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        bargainActivityMapper.insert(activity);
         // 插入商品
-        List<BargainProductDO> productDOs = BargainActivityConvert.INSTANCE.convertList(createReqVO.getProducts(), activityDO);
+        List<BargainProductDO> productDOs = BargainActivityConvert.INSTANCE.convertList(createReqVO.getProducts(), activity);
         bargainProductMapper.insertBatch(productDOs);
         // 返回
-        return activityDO.getId();
+        return activity.getId();
     }
 
     private void validateProductBargainConflict(Long spuId, Long activityId) {
@@ -113,12 +110,12 @@ public class BargainServiceImpl implements BargainActivityService, BargainRecord
         // 获取所选 spu下的所有 sku
         List<ProductSkuRespDTO> skus = productSkuApi.getSkuListBySpuId(CollectionUtil.newArrayList(updateReqVO.getSpuId()));
         // 校验商品 sku 是否存在
-        validateProductSkuAllExists(skus, updateReqVO.getProducts(), BargainProductUpdateReqVO::getSkuId);
+        validateProductSkuAllExists(skus, updateReqVO.getProducts(), BargainProductBaseVO::getSkuId);
 
         // 更新
         BargainActivityDO updateObj = BargainActivityConvert.INSTANCE.convert(updateReqVO);
         // 更新活动库存
-        updateObj.setStock(getSumValue(updateReqVO.getProducts(), BargainProductUpdateReqVO::getStock, Integer::sum));
+        updateObj.setStock(getSumValue(updateReqVO.getProducts(), BargainProductBaseVO::getStock, Integer::sum));
         bargainActivityMapper.updateById(updateObj);
         // 更新商品
         updateBargainProduct(updateObj, updateReqVO.getProducts());
@@ -130,7 +127,7 @@ public class BargainServiceImpl implements BargainActivityService, BargainRecord
      * @param updateObj 更新的活动
      * @param products  商品配置
      */
-    private void updateBargainProduct(BargainActivityDO updateObj, List<BargainProductUpdateReqVO> products) {
+    private void updateBargainProduct(BargainActivityDO updateObj, List<BargainProductBaseVO> products) {
         // 默认全部新增
         List<BargainProductDO> defaultNewList = BargainActivityConvert.INSTANCE.convertList(products, updateObj);
         // 数据库中的老数据
@@ -181,7 +178,7 @@ public class BargainServiceImpl implements BargainActivityService, BargainRecord
 
     @Override
     public BargainActivityDO getBargainActivity(Long id) {
-        return validateBargainActivityExists(id);
+        return bargainActivityMapper.selectById(id);
     }
 
     @Override
@@ -190,8 +187,8 @@ public class BargainServiceImpl implements BargainActivityService, BargainRecord
     }
 
     @Override
-    public List<BargainProductDO> getBargainProductsByActivityIds(Collection<Long> ids) {
-        return bargainProductMapper.selectListByActivityIds(ids);
+    public List<BargainProductDO> getBargainProductsByActivityIds(Collection<Long> activityIds) {
+        return bargainProductMapper.selectListByActivityIds(activityIds);
     }
 
 }

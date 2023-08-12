@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity;
 
-import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.product.BargainProductCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.product.BargainProductBaseVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,6 +17,6 @@ public class BargainActivityCreateReqVO extends BargainActivityBaseVO {
 
     @Schema(description = "砍价商品", requiredMode = Schema.RequiredMode.REQUIRED)
     @Valid
-    private List<BargainProductCreateReqVO> products;
+    private List<BargainProductBaseVO> products;
 
 }

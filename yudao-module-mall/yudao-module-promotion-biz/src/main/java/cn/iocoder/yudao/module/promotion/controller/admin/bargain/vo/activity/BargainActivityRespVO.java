@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,8 +15,6 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class BargainActivityRespVO extends BargainActivityBaseVO {
-
-    // TODO @puhui999：example 补全
 
     @Schema(description = "商品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "618大促")
     private String spuName;
@@ -31,7 +28,7 @@ public class BargainActivityRespVO extends BargainActivityBaseVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
-    @Schema(description = "砍价成功数量", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "砍价成功数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "888")
     private Integer successCount;
 
     @Schema(description = "活动状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
@@ -39,7 +36,6 @@ public class BargainActivityRespVO extends BargainActivityBaseVO {
     private Integer status;
 
     @Schema(description = "砍价商品", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Valid
     private List<BargainProductRespVO> products;
 
 }

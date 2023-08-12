@@ -41,8 +41,9 @@ public interface CombinationActivityConvert {
 
     CombinationProductRespVO convert(CombinationProductDO bean);
 
-    default CombinationActivityRespVO convert(CombinationActivityDO bean, List<CombinationProductDO> productDOs) {
-        return convert(bean).setProducts(convertList2(productDOs));
+    default CombinationActivityRespVO convert(CombinationActivityDO activity,
+                                              List<CombinationProductDO> products) {
+        return convert(activity).setProducts(convertList2(products));
     }
 
     List<CombinationActivityRespVO> convertList(List<CombinationActivityDO> list);
