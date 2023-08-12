@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.combination;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityRespVO;
@@ -21,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Set;
 
 import static cn.hutool.core.collection.CollectionUtil.newArrayList;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -37,7 +38,7 @@ public class CombinationActivityController {
     private CombinationActivityService combinationActivityService;
 
     @Resource
-    private ProductSpuApi spuApi;
+    private ProductSpuApi productSpuApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建拼团活动")
@@ -80,12 +81,16 @@ public class CombinationActivityController {
             @Valid CombinationActivityPageReqVO pageVO) {
         // 查询拼团活动
         PageResult<CombinationActivityDO> pageResult = combinationActivityService.getCombinationActivityPage(pageVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty(pageResult.getTotal()));
+        }
+
         // 拼接数据
-        Set<Long> activityIds = convertSet(pageResult.getList(), CombinationActivityDO::getId);
-        Set<Long> spuIds = convertSet(pageResult.getList(), CombinationActivityDO::getSpuId);
-        return success(CombinationActivityConvert.INSTANCE.convertPage(pageResult,
-                combinationActivityService.getCombinationProductsByActivityIds(activityIds),
-                spuApi.getSpuList(spuIds)));
+        List<CombinationProductDO> products = combinationActivityService.getCombinationProductsByActivityIds(
+                convertSet(pageResult.getList(), CombinationActivityDO::getId));
+        List<ProductSpuRespDTO> spus = productSpuApi.getSpuList(
+                convertSet(pageResult.getList(), CombinationActivityDO::getSpuId));
+        return success(CombinationActivityConvert.INSTANCE.convertPage(pageResult, products, spus));
     }
 
 }

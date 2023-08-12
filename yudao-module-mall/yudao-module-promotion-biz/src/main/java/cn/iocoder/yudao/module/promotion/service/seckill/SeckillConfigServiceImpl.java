@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.service.seckill.seckillconfig;
+package cn.iocoder.yudao.module.promotion.service.seckill;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;

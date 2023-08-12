@@ -24,15 +24,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 // TODO 芋艿：等完成后，在补全单测
 /**
- * {@link CombinationServiceImpl} 的单元测试类
+ * {@link CombinationActivityServiceImpl} 的单元测试类
  *
  * @author HUIHUI
  */
-@Import(CombinationServiceImpl.class)
+@Import(CombinationActivityServiceImpl.class)
 public class CombinationActivityServiceImplTest extends BaseDbUnitTest {
 
     @Resource
-    private CombinationServiceImpl combinationActivityService;
+    private CombinationActivityServiceImpl combinationActivityService;
 
     @Resource
     private CombinationActivityMapper combinationActivityMapper;
@@ -112,8 +112,8 @@ public class CombinationActivityServiceImplTest extends BaseDbUnitTest {
             o.setStartTime(null);
             o.setEndTime(null);
             o.setUserSize(null);
-            o.setTotalNum(null);
-            o.setSuccessNum(null);
+            o.setTotalCount(null);
+            o.setSuccessCount(null);
             o.setOrderUserCount(null);
             o.setVirtualGroup(null);
             o.setStatus(null);
@@ -136,9 +136,9 @@ public class CombinationActivityServiceImplTest extends BaseDbUnitTest {
         // 测试 userSize 不匹配
         combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setUserSize(null)));
         // 测试 totalNum 不匹配
-        combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setTotalNum(null)));
+        combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setTotalCount(null)));
         // 测试 successNum 不匹配
-        combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setSuccessNum(null)));
+        combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setSuccessCount(null)));
         // 测试 orderUserCount 不匹配
         combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setOrderUserCount(null)));
         // 测试 virtualGroup 不匹配
@@ -186,8 +186,8 @@ public class CombinationActivityServiceImplTest extends BaseDbUnitTest {
             o.setStartTime(null);
             o.setEndTime(null);
             o.setUserSize(null);
-            o.setTotalNum(null);
-            o.setSuccessNum(null);
+            o.setTotalCount(null);
+            o.setSuccessCount(null);
             o.setOrderUserCount(null);
             o.setVirtualGroup(null);
             o.setStatus(null);
@@ -210,9 +210,9 @@ public class CombinationActivityServiceImplTest extends BaseDbUnitTest {
         // 测试 userSize 不匹配
         combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setUserSize(null)));
         // 测试 totalNum 不匹配
-        combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setTotalNum(null)));
+        combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setTotalCount(null)));
         // 测试 successNum 不匹配
-        combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setSuccessNum(null)));
+        combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setSuccessCount(null)));
         // 测试 orderUserCount 不匹配
         combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setOrderUserCount(null)));
         // 测试 virtualGroup 不匹配

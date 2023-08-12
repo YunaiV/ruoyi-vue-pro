@@ -62,11 +62,11 @@ public class CombinationActivityDO extends BaseDO {
     /**
      * 开团组数
      */
-    private Integer totalNum;
+    private Integer totalCount;
     /**
      * 成团组数
      */
-    private Integer successNum;
+    private Integer successCount;
     /**
      * 参与人数
      */
@@ -76,7 +76,7 @@ public class CombinationActivityDO extends BaseDO {
      */
     private Integer virtualGroup;
     /**
-     * 活动状态：0开启 1关闭
+     * 活动状态
      *
      * 枚举 {@link CommonStatusEnum}
      */

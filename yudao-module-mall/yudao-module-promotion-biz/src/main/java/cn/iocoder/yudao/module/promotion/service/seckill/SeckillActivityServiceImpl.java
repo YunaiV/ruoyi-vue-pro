@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.service.seckill.seckillactivity;
+package cn.iocoder.yudao.module.promotion.service.seckill;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -16,7 +16,6 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillProductDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillactivity.SeckillActivityMapper;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillactivity.SeckillProductMapper;
-import cn.iocoder.yudao.module.promotion.service.seckill.seckillconfig.SeckillConfigService;
 import cn.iocoder.yudao.module.promotion.util.PromotionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,8 +77,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
      * 校验秒杀商品参与的活动是否存在冲突
      *
      * 1. 校验秒杀时段是否存在
-     * 2. 校验商品 spu 是否存在
-     * 3. 秒杀商品是否参加其它活动
+     * 2. 秒杀商品是否参加其它活动
      *
      * @param configIds 秒杀时段数组
      * @param spuId 商品 SPU 编号

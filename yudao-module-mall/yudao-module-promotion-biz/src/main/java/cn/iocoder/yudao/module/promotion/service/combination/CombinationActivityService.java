@@ -41,20 +41,20 @@ public interface CombinationActivityService {
     void deleteCombinationActivity(Long id);
 
     /**
+     * 校验拼团活动是否存在
+     *
+     * @param id 编号
+     * @return 拼团活动
+     */
+    CombinationActivityDO validateCombinationActivityExists(Long id);
+
+    /**
      * 获得拼团活动
      *
      * @param id 编号
      * @return 拼团活动
      */
     CombinationActivityDO getCombinationActivity(Long id);
-
-    /**
-     * 获得拼团活动列表
-     *
-     * @param ids 编号
-     * @return 拼团活动列表
-     */
-    List<CombinationActivityDO> getCombinationActivityList(Collection<Long> ids);
 
     /**
      * 获得拼团活动分页
@@ -67,9 +67,9 @@ public interface CombinationActivityService {
     /**
      * 获得拼团活动商品列表
      *
-     * @param ids 拼团活动 ids
+     * @param activityIds 拼团活动 ids
      * @return 拼团活动的商品列表
      */
-    List<CombinationProductDO> getCombinationProductsByActivityIds(Collection<Long> ids);
+    List<CombinationProductDO> getCombinationProductsByActivityIds(Collection<Long> activityIds);
 
 }

@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.Seck
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillconfig.SeckillConfigDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillconfig.SeckillConfigMapper;
-import cn.iocoder.yudao.module.promotion.service.seckill.seckillconfig.SeckillConfigServiceImpl;
+import cn.iocoder.yudao.module.promotion.service.seckill.SeckillConfigServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Disabled;

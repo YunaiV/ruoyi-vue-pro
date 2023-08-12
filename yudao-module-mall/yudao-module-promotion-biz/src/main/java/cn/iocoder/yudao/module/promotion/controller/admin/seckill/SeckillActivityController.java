@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.*;
 import cn.iocoder.yudao.module.promotion.convert.seckill.seckillactivity.SeckillActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillProductDO;
-import cn.iocoder.yudao.module.promotion.service.seckill.seckillactivity.SeckillActivityService;
+import cn.iocoder.yudao.module.promotion.service.seckill.SeckillActivityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

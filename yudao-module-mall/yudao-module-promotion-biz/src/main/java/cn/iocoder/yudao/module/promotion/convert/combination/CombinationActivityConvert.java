@@ -10,7 +10,6 @@ import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activit
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.product.CombinationProductBaseVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.product.CombinationProductRespVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.product.CombinationProductUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
@@ -53,37 +52,34 @@ public interface CombinationActivityConvert {
     default PageResult<CombinationActivityRespVO> convertPage(PageResult<CombinationActivityDO> page,
                                                               List<CombinationProductDO> productList,
                                                               List<ProductSpuRespDTO> spuList) {
-        Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
         PageResult<CombinationActivityRespVO> pageResult = convertPage(page);
+        // 拼接商品
+        Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
         pageResult.getList().forEach(item -> {
-            MapUtils.findAndThen(spuMap, item.getSpuId(), spu -> {
-                item.setSpuName(spu.getName());
-                item.setPicUrl(spu.getPicUrl());
-            });
             item.setProducts(convertList2(productList));
+            MapUtils.findAndThen(spuMap, item.getSpuId(),
+                    spu -> item.setSpuName(spu.getName()).setPicUrl(spu.getPicUrl()));
         });
         return pageResult;
     }
 
     List<CombinationProductRespVO> convertList2(List<CombinationProductDO> productDOs);
 
-    // TODO @puhui999：参数改成 activity、product 会不会干净一点哈
-    @Mappings({
-            @Mapping(target = "id", ignore = true),
-            @Mapping(target = "activityId", source = "activityDO.id"),
-            @Mapping(target = "spuId", source = "activityDO.spuId"),
-            @Mapping(target = "skuId", source = "vo.skuId"),
-            @Mapping(target = "activePrice", source = "vo.activePrice"),
-            @Mapping(target = "activityStartTime", source = "activityDO.startTime"),
-            @Mapping(target = "activityEndTime", source = "activityDO.endTime")
-    })
-    CombinationProductDO convert(CombinationActivityDO activityDO, CombinationProductBaseVO vo);
-
     default List<CombinationProductDO> convertList(List<? extends CombinationProductBaseVO> products, CombinationActivityDO activityDO) {
         return CollectionUtils.convertList(products, item -> convert(activityDO, item).setActivityStatus(activityDO.getStatus()));
     }
+    @Mappings({
+            @Mapping(target = "id", ignore = true),
+            @Mapping(target = "activityId", source = "activity.id"),
+            @Mapping(target = "spuId", source = "activity.spuId"),
+            @Mapping(target = "skuId", source = "product.skuId"),
+            @Mapping(target = "combinationPrice", source = "product.combinationPrice"),
+            @Mapping(target = "activityStartTime", source = "activity.startTime"),
+            @Mapping(target = "activityEndTime", source = "activity.endTime")
+    })
+    CombinationProductDO convert(CombinationActivityDO activity, CombinationProductBaseVO product);
 
-    default List<CombinationProductDO> convertList(List<CombinationProductUpdateReqVO> updateProductVOs,
+    default List<CombinationProductDO> convertList(List<CombinationProductBaseVO> updateProductVOs,
                                                    List<CombinationProductDO> products, CombinationActivityDO activity) {
         Map<Long, Long> productMap = convertMap(products, CombinationProductDO::getSkuId, CombinationProductDO::getId);
         return CollectionUtils.convertList(updateProductVOs, updateProductVO -> convert(activity, updateProductVO)

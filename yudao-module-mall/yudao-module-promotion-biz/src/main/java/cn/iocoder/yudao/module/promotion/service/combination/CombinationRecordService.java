@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordUp
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
 
 /**
- * 商品活动记录 service
+ * 拼团记录 Service 接口
  *
  * @author HUIHUI
  */
