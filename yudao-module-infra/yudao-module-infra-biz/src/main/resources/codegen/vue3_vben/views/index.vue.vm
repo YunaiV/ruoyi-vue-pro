@@ -1,47 +1,12 @@
-<template>
-  <div>
-    <BasicTable @register="registerTable">
-      <template #toolbar>
-        <a-button type="primary" v-auth="['${permissionPrefix}:create']" :preIcon="IconEnum.ADD" @click="handleCreate">
-          {{ t('action.create') }}
-        </a-button>
-        <a-button type="warning" v-auth="['${permissionPrefix}:export']" :preIcon="IconEnum.EXPORT" @click="handleExport">
-          {{ t('action.export') }}
-        </a-button>
-      </template>
-      <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'action'">
-          <TableAction
-             :actions="[
-               { icon: IconEnum.EDIT, label: t('action.edit'), auth: '${permissionPrefix}:update', onClick: handleEdit.bind(null, record) },
-               {
-                  icon: IconEnum.DELETE,
-                  color: 'error',
-                  label: t('action.delete'),
-                  auth: '${permissionPrefix}:delete',
-                  popConfirm: {
-                    title: t('common.delMessage'),
-                    placement: 'left',
-                    confirm: handleDelete.bind(null, record)
-                  }
-              }
-            ]"
-          />
-        </template>
-      </template>
-    </BasicTable>
-    <${simpleClassName}Modal @register="registerModal" @success="reload()" />
-  </div>
-</template>
 <script lang="ts" setup>
+import ${simpleClassName}Modal from './${simpleClassName}Modal.vue'
+import { columns, searchFormSchema } from './${classNameVar}.data'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useModal } from '@/components/Modal'
-import ${simpleClassName}Modal from './${simpleClassName}Modal.vue'
 import { IconEnum } from '@/enums/appEnum'
 import { BasicTable, useTable, TableAction } from '@/components/Table'
 import { delete${simpleClassName}, export${simpleClassName}, get${simpleClassName}Page } from '@/api/${table.moduleName}/${classNameVar}'
-import { columns, searchFormSchema } from './${classNameVar}.data'
 
 defineOptions({ name: '${table.className}' })
 
@@ -60,8 +25,8 @@ const [registerTable, { getForm, reload }] = useTable({
     width: 140,
     title: t('common.action'),
     dataIndex: 'action',
-    fixed: 'right'
-  }
+    fixed: 'right',
+  },
 })
 
 function handleCreate() {
@@ -80,7 +45,7 @@ async function handleExport() {
     async onOk() {
       await export${simpleClassName}(getForm().getFieldsValue())
       createMessage.success(t('common.exportSuccessText'))
-    }
+    },
   })
 }
 
@@ -90,3 +55,38 @@ async function handleDelete(record: Recordable) {
   reload()
 }
 </script>
+<template>
+  <div>
+    <BasicTable @register="registerTable">
+      <template #toolbar>
+        <a-button type="primary" v-auth="['${permissionPrefix}:create']" :preIcon="IconEnum.ADD" @click="handleCreate">
+          {{ t('action.create') }}
+        </a-button>
+        <a-button type="warning" v-auth="['${permissionPrefix}:export']" :preIcon="IconEnum.EXPORT" @click="handleExport">
+          {{ t('action.export') }}
+        </a-button>
+      </template>
+      <template #bodyCell="{ column, record }">
+        <template v-if="column.key === 'action'">
+          <TableAction
+            :actions="[
+              { icon: IconEnum.EDIT, label: t('action.edit'), auth: '${permissionPrefix}:update', onClick: handleEdit.bind(null, record) },
+              {
+                icon: IconEnum.DELETE,
+                color: 'error',
+                label: t('action.delete'),
+                auth: '${permissionPrefix}:delete',
+                popConfirm: {
+                  title: t('common.delMessage'),
+                  placement: 'left',
+                  confirm: handleDelete.bind(null, record),
+                },
+              },
+            ]"
+          />
+        </template>
+      </template>
+    </BasicTable>
+    <${simpleClassName}Modal @register="registerModal" @success="reload()" />
+  </div>
+</template>
