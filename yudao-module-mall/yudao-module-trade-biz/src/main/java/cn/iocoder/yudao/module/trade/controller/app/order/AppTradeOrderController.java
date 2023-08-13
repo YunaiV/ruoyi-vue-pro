@@ -135,11 +135,11 @@ public class AppTradeOrderController {
         return success(orderCount);
     }
 
-    @PutMapping("/take")
+    @PutMapping("/receive")
     @Operation(summary = "确认交易订单收货")
     @Parameter(name = "id", description = "交易订单编号")
-    public CommonResult<Boolean> takeOrder(@RequestParam("id") Long id) {
-        // TODO @芋艿：未实现，mock 用
+    public CommonResult<Boolean> receiveOrder(@RequestParam("id") Long id) {
+        tradeOrderService.receiveOrder(getLoginUserId(), id);
         return success(true);
     }
 
