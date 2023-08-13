@@ -152,19 +152,9 @@ public class CombinationActivityServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         CombinationActivityPageReqVO reqVO = new CombinationActivityPageReqVO();
         reqVO.setName(null);
-        reqVO.setSpuId(null);
-        reqVO.setTotalLimitCount(null);
-        reqVO.setSingleLimitCount(null);
         reqVO.setStartTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
         reqVO.setEndTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
-        reqVO.setUserSize(null);
-        reqVO.setTotalNum(null);
-        reqVO.setSuccessNum(null);
-        reqVO.setOrderUserCount(null);
-        reqVO.setVirtualGroup(null);
         reqVO.setStatus(null);
-        reqVO.setLimitDuration(null);
-        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
         // 调用
         PageResult<CombinationActivityDO> pageResult = combinationActivityService.getCombinationActivityPage(reqVO);

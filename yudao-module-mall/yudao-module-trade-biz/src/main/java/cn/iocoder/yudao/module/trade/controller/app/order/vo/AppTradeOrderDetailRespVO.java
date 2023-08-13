@@ -80,6 +80,12 @@ public class AppTradeOrderDetailRespVO {
     @Schema(description = "配送方式", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer deliveryType;
 
+    @Schema(description = "发货物流公司编号", example = "10")
+    private Long logisticsId;
+
+    @Schema(description = "发货物流名称", example = "顺丰快递")
+    private String logisticsName;
+
     @Schema(description = "发货物流单号", example = "1024")
     private String logisticsNo;
 

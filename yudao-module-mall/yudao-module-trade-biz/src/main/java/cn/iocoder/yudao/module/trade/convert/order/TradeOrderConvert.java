@@ -25,6 +25,7 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.*;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.cart.TradeCartDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
@@ -234,7 +235,8 @@ public interface TradeOrderConvert {
 
     // TODO 芋艿：可简化
     default AppTradeOrderDetailRespVO convert02(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
-                                                List<ProductPropertyValueDetailRespDTO> propertyValueDetails, TradeOrderProperties tradeOrderProperties) {
+                                                List<ProductPropertyValueDetailRespDTO> propertyValueDetails, TradeOrderProperties tradeOrderProperties,
+                                                DeliveryExpressDO express) {
         AppTradeOrderDetailRespVO orderVO = convert3(order, orderItems);
         orderVO.setPayExpireTime(addTime(tradeOrderProperties.getExpireTime()));
         if (StrUtil.isNotEmpty(order.getPayChannelCode())) {
@@ -260,6 +262,9 @@ public interface TradeOrderConvert {
         }
         // 处理收货地址
         orderVO.setReceiverAreaName(AreaUtils.format(order.getReceiverAreaId()));
+        if (express != null) {
+            orderVO.setLogisticsId(express.getId()).setLogisticsName(express.getName());
+        }
         return orderVO;
     }
 

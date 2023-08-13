@@ -10,10 +10,12 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.*;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemRespVO;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
+import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
+import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderService;
 import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,7 +45,11 @@ public class AppTradeOrderController {
     @Resource
     private TradeOrderService tradeOrderService;
     @Resource
+    private DeliveryExpressService deliveryExpressService;
+
+    @Resource
     private ProductPropertyValueApi productPropertyValueApi;
+
     @Resource
     private TradeOrderProperties tradeOrderProperties;
 
@@ -76,14 +82,21 @@ public class AppTradeOrderController {
     public CommonResult<AppTradeOrderDetailRespVO> getOrder(@RequestParam("id") Long id) {
         // 查询订单
         TradeOrderDO order = tradeOrderService.getOrder(getLoginUserId(), id);
+        if (order == null) {
+            return success(null);
+        }
+
         // 查询订单项
         List<TradeOrderItemDO> orderItems = tradeOrderService.getOrderItemListByOrderId(order.getId());
         // 查询商品属性
         List<ProductPropertyValueDetailRespDTO> propertyValueDetails = productPropertyValueApi
                 .getPropertyValueDetailList(TradeOrderConvert.INSTANCE.convertPropertyValueIds(orderItems));
+        // 查询物流公司
+        DeliveryExpressDO express = order.getLogisticsId() != null && order.getLogisticsId() > 0 ?
+                deliveryExpressService.getDeliveryExpress(order.getLogisticsId()) : null;
         // 最终组合
         return success(TradeOrderConvert.INSTANCE.convert02(order, orderItems,
-                propertyValueDetails, tradeOrderProperties));
+                propertyValueDetails, tradeOrderProperties, express));
     }
 
     @GetMapping("/page")
