@@ -68,20 +68,19 @@ public interface CombinationActivityConvert {
 
     List<CombinationProductRespVO> convertList2(List<CombinationProductDO> productDOs);
 
-    // TODO @puhui999：参数改成 activity、product 会不会干净一点哈
     @Mappings({
             @Mapping(target = "id", ignore = true),
-            @Mapping(target = "activityId", source = "activityDO.id"),
-            @Mapping(target = "spuId", source = "activityDO.spuId"),
-            @Mapping(target = "skuId", source = "vo.skuId"),
-            @Mapping(target = "activePrice", source = "vo.activePrice"),
-            @Mapping(target = "activityStartTime", source = "activityDO.startTime"),
-            @Mapping(target = "activityEndTime", source = "activityDO.endTime")
+            @Mapping(target = "activityId", source = "activity.id"),
+            @Mapping(target = "spuId", source = "activity.spuId"),
+            @Mapping(target = "skuId", source = "product.skuId"),
+            @Mapping(target = "activePrice", source = "product.activePrice"),
+            @Mapping(target = "activityStartTime", source = "activity.startTime"),
+            @Mapping(target = "activityEndTime", source = "activity.endTime")
     })
-    CombinationProductDO convert(CombinationActivityDO activityDO, CombinationProductBaseVO vo);
+    CombinationProductDO convert(CombinationActivityDO activity, CombinationProductBaseVO product);
 
-    default List<CombinationProductDO> convertList(List<? extends CombinationProductBaseVO> products, CombinationActivityDO activityDO) {
-        return CollectionUtils.convertList(products, item -> convert(activityDO, item).setActivityStatus(activityDO.getStatus()));
+    default List<CombinationProductDO> convertList(List<? extends CombinationProductBaseVO> products, CombinationActivityDO activity) {
+        return CollectionUtils.convertList(products, item -> convert(activity, item).setActivityStatus(activity.getStatus()));
     }
 
     default List<CombinationProductDO> convertList(List<CombinationProductUpdateReqVO> updateProductVOs,

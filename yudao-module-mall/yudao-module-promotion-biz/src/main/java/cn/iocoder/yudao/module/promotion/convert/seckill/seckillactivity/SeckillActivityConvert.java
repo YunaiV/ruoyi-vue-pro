@@ -56,22 +56,21 @@ public interface SeckillActivityConvert {
         return convert1(seckillActivity).setProducts(convertList2(seckillProducts));
     }
 
-    // TODO @puhui999：参数改成 activity、product 会不会干净一点哈
     @Mappings({
             @Mapping(target = "id", ignore = true),
-            @Mapping(target = "activityId", source = "activityDO.id"),
-            @Mapping(target = "configIds", source = "activityDO.configIds"),
-            @Mapping(target = "spuId", source = "activityDO.spuId"),
-            @Mapping(target = "skuId", source = "vo.skuId"),
-            @Mapping(target = "seckillPrice", source = "vo.seckillPrice"),
-            @Mapping(target = "stock", source = "vo.stock"),
-            @Mapping(target = "activityStartTime", source = "activityDO.startTime"),
-            @Mapping(target = "activityEndTime", source = "activityDO.endTime")
+            @Mapping(target = "activityId", source = "activity.id"),
+            @Mapping(target = "configIds", source = "activity.configIds"),
+            @Mapping(target = "spuId", source = "activity.spuId"),
+            @Mapping(target = "skuId", source = "product.skuId"),
+            @Mapping(target = "seckillPrice", source = "product.seckillPrice"),
+            @Mapping(target = "stock", source = "product.stock"),
+            @Mapping(target = "activityStartTime", source = "activity.startTime"),
+            @Mapping(target = "activityEndTime", source = "activity.endTime")
     })
-    SeckillProductDO convert(SeckillActivityDO activityDO, SeckillProductBaseVO vo);
+    SeckillProductDO convert(SeckillActivityDO activity, SeckillProductBaseVO product);
 
-    default List<SeckillProductDO> convertList(List<? extends SeckillProductBaseVO> products, SeckillActivityDO activityDO) {
-        return CollectionUtils.convertList(products, item -> convert(activityDO, item).setActivityStatus(activityDO.getStatus()));
+    default List<SeckillProductDO> convertList(List<? extends SeckillProductBaseVO> products, SeckillActivityDO activity) {
+        return CollectionUtils.convertList(products, item -> convert(activity, item).setActivityStatus(activity.getStatus()));
     }
 
     List<SeckillProductRespVO> convertList2(List<SeckillProductDO> productDOs);
