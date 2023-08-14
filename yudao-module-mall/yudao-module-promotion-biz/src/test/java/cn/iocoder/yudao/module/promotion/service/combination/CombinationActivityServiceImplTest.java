@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -152,19 +151,7 @@ public class CombinationActivityServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         CombinationActivityPageReqVO reqVO = new CombinationActivityPageReqVO();
         reqVO.setName(null);
-        reqVO.setSpuId(null);
-        reqVO.setTotalLimitCount(null);
-        reqVO.setSingleLimitCount(null);
-        reqVO.setStartTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
-        reqVO.setEndTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
-        reqVO.setUserSize(null);
-        reqVO.setTotalNum(null);
-        reqVO.setSuccessNum(null);
-        reqVO.setOrderUserCount(null);
-        reqVO.setVirtualGroup(null);
         reqVO.setStatus(null);
-        reqVO.setLimitDuration(null);
-        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
         // 调用
         PageResult<CombinationActivityDO> pageResult = combinationActivityService.getCombinationActivityPage(reqVO);

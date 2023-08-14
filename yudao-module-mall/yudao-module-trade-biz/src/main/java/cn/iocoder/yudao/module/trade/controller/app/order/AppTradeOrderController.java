@@ -126,8 +126,7 @@ public class AppTradeOrderController {
     @Operation(summary = "确认交易订单收货")
     @Parameter(name = "id", description = "交易订单编号")
     public CommonResult<Boolean> takeOrder(@RequestParam("id") Long id) {
-        // TODO @芋艿：未实现，mock 用
-        return success(true);
+        return success(tradeOrderService.receiveOrder(getLoginUserId(), id));
     }
 
     @DeleteMapping("/cancel")

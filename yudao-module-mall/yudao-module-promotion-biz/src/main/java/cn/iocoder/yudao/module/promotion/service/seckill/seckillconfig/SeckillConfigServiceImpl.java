@@ -62,7 +62,6 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
         seckillConfigMapper.updateById(updateObj);
     }
 
-    // TODO  @puhui999: 这个要不合并到更新操作里? 不单独有个操作咧; fix: 更新状态不用那么多必须的参数，更新的时候需要校验时间段
     @Override
     public void updateSeckillConfigStatus(Long id, Integer status) {
         // 校验秒杀时段是否存在

@@ -20,6 +20,7 @@ public interface CombinationActivityMapper extends BaseMapperX<CombinationActivi
     default PageResult<CombinationActivityDO> selectPage(CombinationActivityPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<CombinationActivityDO>()
                 .likeIfPresent(CombinationActivityDO::getName, reqVO.getName())
+                .eqIfPresent(CombinationActivityDO::getStatus, reqVO.getStatus())
                 .orderByDesc(CombinationActivityDO::getId));
     }
 

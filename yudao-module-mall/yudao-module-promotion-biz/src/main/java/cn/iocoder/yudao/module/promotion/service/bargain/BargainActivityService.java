@@ -1,15 +1,12 @@
 package cn.iocoder.yudao.module.promotion.service.bargain;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.BargainActivityCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.BargainActivityPageReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.BargainActivityUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityPageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityDO;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainProductDO;
 
 import javax.validation.Valid;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * 砍价活动 Service 接口
@@ -56,12 +53,5 @@ public interface BargainActivityService {
      */
     PageResult<BargainActivityDO> getBargainActivityPage(BargainActivityPageReqVO pageReqVO);
 
-    /**
-     * 获得砍价活动商品列表
-     *
-     * @param ids 砍价活动 ids
-     * @return 砍价活动的商品列表
-     */
-    List<BargainProductDO> getBargainProductsByActivityIds(Collection<Long> ids);
 
 }

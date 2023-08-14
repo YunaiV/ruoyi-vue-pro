@@ -29,7 +29,5 @@ public class TradeOrderDeliveryReqVO {
     @NotEmpty(message = "发货物流单号不能为空")
     private String logisticsNo;
 
-    // =============== 同城配送  ================
-    // TODO
 
 }

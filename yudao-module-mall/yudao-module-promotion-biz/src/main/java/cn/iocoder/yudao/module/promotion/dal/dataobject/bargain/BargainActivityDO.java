@@ -53,7 +53,18 @@ public class BargainActivityDO extends BaseDO {
      * 商品 SPU 编号
      */
     private Long spuId;
-
+    /**
+     * 商品 SKU 编号
+     */
+    private Long skuId;
+    /**
+     * 砍价起始价格，单位分
+     */
+    private Integer bargainFirstPrice;
+    /**
+     * 砍价底价，单位：分
+     */
+    private Integer bargainPrice;
     /**
      * 达到该人数，才能砍到低价
      */
@@ -70,7 +81,7 @@ public class BargainActivityDO extends BaseDO {
     private Integer totalLimitCount;
 
     /**
-     * 砍价库存
+     * 砍价活动库存
      */
     private Integer stock;
 
