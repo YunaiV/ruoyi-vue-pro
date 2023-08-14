@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationR
 import java.util.List;
 
 /**
- * 商品活动记录 service
+ * 拼团记录 Service 接口
  *
  * @author HUIHUI
  */

@@ -41,6 +41,11 @@ public class CombinationProductDO extends BaseDO {
      */
     private Long skuId;
     /**
+     * 拼团价格，单位分
+     */
+    private Integer combinationPrice;
+
+    /**
      * 拼团商品状态
      *
      * 关联 {@link CombinationActivityDO#getStatus()}
@@ -48,15 +53,15 @@ public class CombinationProductDO extends BaseDO {
     private Integer activityStatus;
     /**
      * 活动开始时间点
+     *
+     * 冗余 {@link CombinationActivityDO#getStartTime()}
      */
     private LocalDateTime activityStartTime;
     /**
      * 活动结束时间点
+     *
+     * 冗余 {@link CombinationActivityDO#getEndTime()}
      */
     private LocalDateTime activityEndTime;
-    /**
-     * 拼团价格，单位分
-     */
-    private Integer activePrice;
 
 }

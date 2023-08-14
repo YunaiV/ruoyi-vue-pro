@@ -177,7 +177,6 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         assertEquals(tradeOrderDO.getPayOrderId(), 1000L);
         assertNull(tradeOrderDO.getPayChannelCode());
         assertNull(tradeOrderDO.getLogisticsId());
-        assertEquals(tradeOrderDO.getDeliveryStatus(), TradeOrderDeliveryStatusEnum.UNDELIVERED.getStatus());
         assertNull(tradeOrderDO.getDeliveryTime());
         assertNull(tradeOrderDO.getReceiveTime());
         assertEquals(tradeOrderDO.getReceiverName(), "芋艿");
@@ -274,8 +273,7 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         // mock 数据（TradeOrder）
         TradeOrderDO order = randomPojo(TradeOrderDO.class, o -> {
             o.setId(1L).setStatus(TradeOrderStatusEnum.UNDELIVERED.getStatus());
-            o.setLogisticsId(null).setLogisticsNo(null).setDeliveryTime(null)
-                    .setDeliveryStatus(TradeOrderDeliveryStatusEnum.UNDELIVERED.getStatus());
+            o.setLogisticsId(null).setLogisticsNo(null).setDeliveryTime(null);
         });
         tradeOrderMapper.insert(order);
         // 准备参数
@@ -288,7 +286,6 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         // 断言
         TradeOrderDO dbOrder = tradeOrderMapper.selectById(1L);
         assertEquals(dbOrder.getStatus(), TradeOrderStatusEnum.DELIVERED.getStatus());
-        assertEquals(dbOrder.getDeliveryStatus(), TradeOrderDeliveryStatusEnum.DELIVERED.getStatus());
         assertPojoEquals(dbOrder, deliveryReqVO);
         assertNotNull(dbOrder.getDeliveryTime());
     }
@@ -298,7 +295,7 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         // mock 数据（TradeOrder）
         TradeOrderDO order = randomPojo(TradeOrderDO.class, o -> {
             o.setId(1L).setUserId(10L).setStatus(TradeOrderStatusEnum.DELIVERED.getStatus());
-            o.setDeliveryStatus(TradeOrderDeliveryStatusEnum.DELIVERED.getStatus()).setReceiveTime(null);
+            o.setReceiveTime(null);
         });
         tradeOrderMapper.insert(order);
         // 准备参数
@@ -311,7 +308,6 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         // 断言
         TradeOrderDO dbOrder = tradeOrderMapper.selectById(1L);
         assertEquals(dbOrder.getStatus(), TradeOrderStatusEnum.COMPLETED.getStatus());
-        assertEquals(dbOrder.getDeliveryStatus(), TradeOrderDeliveryStatusEnum.RECEIVED.getStatus());
         assertNotNull(dbOrder.getReceiveTime());
     }
 

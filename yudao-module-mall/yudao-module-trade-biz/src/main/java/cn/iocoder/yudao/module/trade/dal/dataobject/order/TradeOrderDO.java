@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.trade.dal.dataobject.order;
 
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryPickUpStoreDO;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.*;
@@ -174,18 +175,18 @@ public class TradeOrderDO extends BaseDO {
     private Integer deliveryType;
     /**
      * 发货物流公司编号
+     *
+     * 如果无需发货，则 logisticsId 设置为 0。原因是，不想再添加额外字段
+     *
+     * 关联 {@link DeliveryExpressDO#getId()}
      */
     private Long logisticsId;
     /**
      * 发货物流单号
+     *
+     * 如果无需发货，则 logisticsNo 设置 ""。原因是，不想再添加额外字段
      */
     private String logisticsNo;
-    /**
-     * 发货状态
-     *
-     * 枚举 {@link TradeOrderDeliveryStatusEnum}
-     */
-    private Integer deliveryStatus;
     /**
      * 发货时间
      */

@@ -22,7 +22,7 @@ public class BargainActivityBaseVO {
     @NotNull(message = "砍价名称不能为空")
     private String name;
 
-    @Schema(description = "商品 SPU 编号，关联 ProductSpuDO 的 id", example = "[1,2,3]")
+    @Schema(description = "商品 SPU 编号", example = "1")
     @NotNull(message = "砍价商品不能为空")
     private Long spuId;
 

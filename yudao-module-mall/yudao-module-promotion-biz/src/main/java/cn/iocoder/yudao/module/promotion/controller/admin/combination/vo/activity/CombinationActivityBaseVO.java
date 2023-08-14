@@ -22,7 +22,7 @@ public class CombinationActivityBaseVO {
     @NotNull(message = "拼团名称不能为空")
     private String name;
 
-    @Schema(description = "商品 SPU 编号，关联 ProductSpuDO 的 id", example = "[1,2,3]")
+    @Schema(description = "商品 SPU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "拼团商品不能为空")
     private Long spuId;
 
@@ -48,7 +48,7 @@ public class CombinationActivityBaseVO {
     @NotNull(message = "开团人数不能为空")
     private Integer userSize;
 
-    @Schema(description = "限制时长（小时）", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "限制时长（小时）", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @NotNull(message = "限制时长不能为空")
     private Integer limitDuration;
 

@@ -35,5 +35,4 @@ public class AppTradeOrderItemCommentCreateReqVO {
     @Size(max = 9, message = "评论图片地址数组长度不能超过 9 张")
     private List<String> picUrls;
 
-
 }

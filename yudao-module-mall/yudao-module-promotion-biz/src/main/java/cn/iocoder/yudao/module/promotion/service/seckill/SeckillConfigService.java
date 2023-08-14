@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.service.seckill.seckillconfig;
+package cn.iocoder.yudao.module.promotion.service.seckill;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigCreateReqVO;
@@ -57,10 +57,9 @@ public interface SeckillConfigService {
     /**
      * 校验秒杀时段是否存在
      *
-     * @param timeIds 秒杀时段id集合
+     * @param ids 秒杀时段 id 集合
      */
-    void validateSeckillConfigExists(Collection<Long> timeIds);
-
+    void validateSeckillConfigExists(Collection<Long> ids);
 
     /**
      * 获得秒杀时间段配置分页数据
@@ -85,4 +84,5 @@ public interface SeckillConfigService {
      * @param status 状态
      */
     void updateSeckillConfigStatus(Long id, Integer status);
+
 }

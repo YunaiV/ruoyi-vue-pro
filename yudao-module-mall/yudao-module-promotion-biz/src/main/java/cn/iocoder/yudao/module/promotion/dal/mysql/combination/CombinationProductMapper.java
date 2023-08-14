@@ -26,7 +26,7 @@ public interface CombinationProductMapper extends BaseMapperX<CombinationProduct
                 .eqIfPresent(CombinationProductDO::getActivityStatus, reqVO.getActivityStatus())
                 .betweenIfPresent(CombinationProductDO::getActivityStartTime, reqVO.getActivityStartTime())
                 .betweenIfPresent(CombinationProductDO::getActivityEndTime, reqVO.getActivityEndTime())
-                .eqIfPresent(CombinationProductDO::getActivePrice, reqVO.getActivePrice())
+                .eqIfPresent(CombinationProductDO::getCombinationPrice, reqVO.getActivePrice())
                 .betweenIfPresent(CombinationProductDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(CombinationProductDO::getId));
     }

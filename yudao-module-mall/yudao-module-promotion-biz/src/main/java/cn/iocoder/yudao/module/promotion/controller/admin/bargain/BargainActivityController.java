@@ -1,12 +1,14 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.bargain;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
-import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityPageReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityRespVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityUpdateReqVO;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.BargainActivityCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.BargainActivityPageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.BargainActivityRespVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.BargainActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.convert.bargain.BargainActivityConvert;
 import cn.iocoder.yudao.module.promotion.service.bargain.BargainActivityService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.Collections;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -31,7 +35,7 @@ public class BargainActivityController {
     private BargainActivityService activityService;
 
     @Resource
-    private ProductSpuApi spuApi;
+    private ProductSpuApi productSpuApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建砍价活动")
@@ -70,6 +74,19 @@ public class BargainActivityController {
     @PreAuthorize("@ss.hasPermission('promotion:bargain-activity:query')")
     public CommonResult<PageResult<BargainActivityRespVO>> getBargainActivityPage(
             @Valid BargainActivityPageReqVO pageVO) {
+        // 查询砍价活动
+        PageResult<BargainActivityDO> pageResult = activityService.getBargainActivityPage(pageVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty(pageResult.getTotal()));
+        }
+
+        // 拼接数据
+//        List<BargainProductDO> products = activityService.getBargainProductsByActivityIds(
+//                convertSet(pageResult.getList(), BargainActivityDO::getId));
+        List<BargainProductDO> products = Collections.emptyList();
+        List<ProductSpuRespDTO> spus = productSpuApi.getSpuList(
+                convertSet(pageResult.getList(), BargainActivityDO::getSpuId));
+        return success(BargainActivityConvert.INSTANCE.convertPage(pageResult, products, spus));
         return success(BargainActivityConvert.INSTANCE.convertPage(activityService.getBargainActivityPage(pageVO)));
     }
 

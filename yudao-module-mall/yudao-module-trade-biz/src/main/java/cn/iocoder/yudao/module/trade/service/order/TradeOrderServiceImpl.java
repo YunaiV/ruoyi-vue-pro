@@ -233,8 +233,8 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         order.setTerminal(TerminalEnum.H5.getTerminal()); // todo 数据来源?
         // 支付信息
         order.setAdjustPrice(0).setPayStatus(false);
-        // 物流信息 TODO 芋艿：暂时写死物流方式；应该是前端选择的
-        order.setDeliveryType(createReqVO.getDeliveryType()).setDeliveryStatus(TradeOrderDeliveryStatusEnum.UNDELIVERED.getStatus());
+        // 物流信息
+        order.setDeliveryType(createReqVO.getDeliveryType());
         // 退款信息
         order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus()).setRefundPrice(0);
         tradeOrderMapper.insert(order);
@@ -418,8 +418,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         }
 
         // 更新 TradeOrderDO 状态为已发货，等待收货
-        updateOrderObj.setStatus(TradeOrderStatusEnum.DELIVERED.getStatus())
-                .setDeliveryStatus(TradeOrderDeliveryStatusEnum.DELIVERED.getStatus()).setDeliveryTime(LocalDateTime.now());
+        updateOrderObj.setStatus(TradeOrderStatusEnum.DELIVERED.getStatus()).setDeliveryTime(LocalDateTime.now());
         int updateCount = tradeOrderMapper.updateByIdAndStatus(order.getId(), order.getStatus(), updateOrderObj);
         if (updateCount == 0) {
             throw exception(ORDER_DELIVERY_FAIL_STATUS_NOT_UNDELIVERED);
@@ -428,7 +427,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
         // 发送站内信
         tradeMessageService.sendMessageWhenDeliveryOrder(new TradeOrderMessageWhenDeliveryOrderReqBO().setOrderId(order.getId())
-                .setUserId(userId).setMessage(TradeOrderDeliveryStatusEnum.DELIVERED.getName()));
+                .setUserId(userId).setMessage(null));
 
         // TODO 芋艿：OrderLog
         // TODO 设计：lili：是不是发货后，才支持售后？
@@ -449,8 +448,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
             throw exception(ORDER_NOT_FOUND);
         }
         // 校验订单是否是待发货状态
-        if (!TradeOrderStatusEnum.isUndelivered(order.getStatus())
-                || ObjectUtil.notEqual(order.getDeliveryStatus(), TradeOrderDeliveryStatusEnum.UNDELIVERED.getStatus())) {
+        if (!TradeOrderStatusEnum.isUndelivered(order.getStatus())) {
             throw exception(ORDER_DELIVERY_FAIL_STATUS_NOT_UNDELIVERED);
         }
         // 校验订单是否退款
@@ -482,8 +480,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
         // 更新 TradeOrderDO 状态为已完成
         int updateCount = tradeOrderMapper.updateByIdAndStatus(order.getId(), order.getStatus(),
-                new TradeOrderDO().setStatus(TradeOrderStatusEnum.COMPLETED.getStatus())
-                        .setDeliveryStatus(TradeOrderDeliveryStatusEnum.RECEIVED.getStatus()).setReceiveTime(LocalDateTime.now()));
+                new TradeOrderDO().setStatus(TradeOrderStatusEnum.COMPLETED.getStatus()).setReceiveTime(LocalDateTime.now()));
         if (updateCount == 0) {
             throw exception(ORDER_RECEIVE_FAIL_STATUS_NOT_DELIVERED);
         }
@@ -493,11 +490,6 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
         // TODO 芋艿：lili 发送商品被购买完成的数据
         return Boolean.TRUE;
-    }
-
-    @Override
-    public TradeOrderDO getOrder(Long id) {
-        return tradeOrderMapper.selectById(id);
     }
 
     /**
@@ -516,11 +508,15 @@ public class TradeOrderServiceImpl implements TradeOrderService {
             throw exception(ORDER_NOT_FOUND);
         }
         // 校验订单是否是待收货状态
-        if (!TradeOrderStatusEnum.isDelivered(order.getStatus())
-                || ObjectUtil.notEqual(order.getDeliveryStatus(), TradeOrderDeliveryStatusEnum.DELIVERED.getStatus())) {
+        if (!TradeOrderStatusEnum.isDelivered(order.getStatus())) {
             throw exception(ORDER_RECEIVE_FAIL_STATUS_NOT_DELIVERED);
         }
         return order;
+    }
+
+    @Override
+    public TradeOrderDO getOrder(Long id) {
+        return tradeOrderMapper.selectById(id);
     }
 
     @Override

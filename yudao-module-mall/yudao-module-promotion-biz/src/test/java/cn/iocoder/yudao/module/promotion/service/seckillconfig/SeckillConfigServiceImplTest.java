@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.Seck
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillconfig.SeckillConfigDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillconfig.SeckillConfigMapper;
-import cn.iocoder.yudao.module.promotion.service.seckill.seckillconfig.SeckillConfigServiceImpl;
+import cn.iocoder.yudao.module.promotion.service.seckill.SeckillConfigServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Disabled;
@@ -19,7 +19,7 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEq
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
-import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.SECKILL_TIME_NOT_EXISTS;
+import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.SECKILL_CONFIG_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -94,7 +94,7 @@ public class SeckillConfigServiceImplTest extends BaseDbUnitTest {
         SeckillConfigUpdateReqVO reqVO = randomPojo(SeckillConfigUpdateReqVO.class);
 
         // 调用, 并断言异常
-        assertServiceException(() -> SeckillConfigService.updateSeckillConfig(reqVO), SECKILL_TIME_NOT_EXISTS);
+        assertServiceException(() -> SeckillConfigService.updateSeckillConfig(reqVO), SECKILL_CONFIG_NOT_EXISTS);
     }
 
     @Test
@@ -117,7 +117,7 @@ public class SeckillConfigServiceImplTest extends BaseDbUnitTest {
         Long id = randomLongId();
 
         // 调用, 并断言异常
-        assertServiceException(() -> SeckillConfigService.deleteSeckillConfig(id), SECKILL_TIME_NOT_EXISTS);
+        assertServiceException(() -> SeckillConfigService.deleteSeckillConfig(id), SECKILL_CONFIG_NOT_EXISTS);
     }
 
     @Test

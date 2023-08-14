@@ -17,40 +17,34 @@ import java.util.List;
 @ToString(callSuper = true)
 public class CombinationActivityRespVO extends CombinationActivityBaseVO {
 
-    @Schema(description = "商品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "618大促")
+    @Schema(description = "活动编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "22901")
+    private Long id;
+
+    @Schema(description = "商品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "618 大促")
     private String spuName;
 
     @Schema(description = "商品主图", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xx.png")
     private String picUrl;
 
-    @Schema(description = "活动编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "22901")
-    private Long id;
-
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
-    @Schema(description = "开团人数", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "开团人数不能为空")
+    @Schema(description = "开团人数", requiredMode = Schema.RequiredMode.REQUIRED, example = "666")
     private Integer userSize;
 
-    @Schema(description = "开团组数", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "开团组数不能为空")
-    private Integer totalNum;
+    @Schema(description = "开团组数", requiredMode = Schema.RequiredMode.REQUIRED, example = "33")
+    private Integer totalCount;
 
-    @Schema(description = "成团组数", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "成团组数不能为空")
-    private Integer successNum;
+    @Schema(description = "成团组数", requiredMode = Schema.RequiredMode.REQUIRED, example = "20")
+    private Integer successCount;
 
-    @Schema(description = "虚拟成团", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "虚拟成团不能为空")
+    @Schema(description = "虚拟成团", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     private Integer virtualGroup;
 
     @Schema(description = "活动状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
-    @NotNull(message = "活动状态不能为空")
     private Integer status;
 
     @Schema(description = "拼团商品", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Valid
     private List<CombinationProductRespVO> products;
 
 }
