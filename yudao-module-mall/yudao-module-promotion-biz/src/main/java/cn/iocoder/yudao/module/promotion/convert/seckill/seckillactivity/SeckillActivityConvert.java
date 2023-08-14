@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.promotion.convert.seckill.seckillactivity;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityDetailRespVO;
@@ -40,11 +41,14 @@ public interface SeckillActivityConvert {
     PageResult<SeckillActivityRespVO> convertPage(PageResult<SeckillActivityDO> page);
 
     default PageResult<SeckillActivityRespVO> convertPage(PageResult<SeckillActivityDO> page, List<SeckillProductDO> seckillProducts, List<ProductSpuRespDTO> spuList) {
-        Map<Long, ProductSpuRespDTO> spuMap = CollectionUtils.convertMap(spuList, ProductSpuRespDTO::getId, c -> c);
+        Map<Long, ProductSpuRespDTO> spuMap = CollectionUtils.convertMap(spuList, ProductSpuRespDTO::getId);
         PageResult<SeckillActivityRespVO> pageResult = convertPage(page);
         pageResult.getList().forEach(item -> {
-            item.setSpuName(spuMap.get(item.getSpuId()).getName());
-            item.setPicUrl(spuMap.get(item.getSpuId()).getPicUrl());
+            MapUtils.findAndThen(spuMap, item.getSpuId(), spu -> {
+                item.setSpuName(spu.getName());
+                item.setPicUrl(spu.getPicUrl());
+            });
+
             item.setProducts(convertList2(seckillProducts));
         });
         return pageResult;

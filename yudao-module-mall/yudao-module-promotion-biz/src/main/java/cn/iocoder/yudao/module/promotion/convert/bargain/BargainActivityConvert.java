@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.promotion.convert.bargain;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityBaseVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityDO;
@@ -20,7 +20,7 @@ public interface BargainActivityConvert {
 
     BargainActivityConvert INSTANCE = Mappers.getMapper(BargainActivityConvert.class);
 
-    BargainActivityDO convert(BargainActivityCreateReqVO bean);
+    BargainActivityDO convert(BargainActivityBaseVO bean);
 
     BargainActivityDO convert(BargainActivityUpdateReqVO bean);
 

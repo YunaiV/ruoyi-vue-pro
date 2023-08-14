@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.promotion.service.bargain;
 
 
 /**
- * 商品活动记录 service
+ * 砍价记录 service 接口
  *
  * @author HUIHUI
  */

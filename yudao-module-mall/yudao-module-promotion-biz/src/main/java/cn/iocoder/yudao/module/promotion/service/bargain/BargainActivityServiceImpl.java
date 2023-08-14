@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
-import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityBaseVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.convert.bargain.BargainActivityConvert;
@@ -37,7 +37,8 @@ import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
  */
 @Service
 @Validated
-public class BargainServiceImpl implements BargainActivityService, BargainRecordService {
+public class BargainActivityServiceImpl implements BargainActivityService {
+
 
     @Resource
     private BargainActivityMapper bargainActivityMapper;
@@ -57,7 +58,7 @@ public class BargainServiceImpl implements BargainActivityService, BargainRecord
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long createBargainActivity(BargainActivityCreateReqVO createReqVO) {
+    public Long createBargainActivity(BargainActivityBaseVO createReqVO) {
         // 校验商品 SPU 是否存在是否参加的别的活动
         validateBargainConflict(createReqVO.getSpuId(), null);
         // 获取所选 spu下的所有 sku

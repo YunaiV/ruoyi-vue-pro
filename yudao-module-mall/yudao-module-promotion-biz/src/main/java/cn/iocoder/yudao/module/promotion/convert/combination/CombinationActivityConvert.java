@@ -11,7 +11,6 @@ import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activit
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.product.CombinationProductBaseVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.product.CombinationProductRespVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.product.CombinationProductUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
@@ -73,7 +72,7 @@ public interface CombinationActivityConvert {
             @Mapping(target = "activityId", source = "activity.id"),
             @Mapping(target = "spuId", source = "activity.spuId"),
             @Mapping(target = "skuId", source = "product.skuId"),
-            @Mapping(target = "activePrice", source = "product.activePrice"),
+            @Mapping(target = "combinationPrice", source = "product.combinationPrice"),
             @Mapping(target = "activityStartTime", source = "activity.startTime"),
             @Mapping(target = "activityEndTime", source = "activity.endTime")
     })
@@ -83,7 +82,7 @@ public interface CombinationActivityConvert {
         return CollectionUtils.convertList(products, item -> convert(activity, item).setActivityStatus(activity.getStatus()));
     }
 
-    default List<CombinationProductDO> convertList(List<CombinationProductUpdateReqVO> updateProductVOs,
+    default List<CombinationProductDO> convertList(List<CombinationProductBaseVO> updateProductVOs,
                                                    List<CombinationProductDO> products, CombinationActivityDO activity) {
         Map<Long, Long> productMap = convertMap(products, CombinationProductDO::getSkuId, CombinationProductDO::getId);
         return CollectionUtils.convertList(updateProductVOs, updateProductVO -> convert(activity, updateProductVO)

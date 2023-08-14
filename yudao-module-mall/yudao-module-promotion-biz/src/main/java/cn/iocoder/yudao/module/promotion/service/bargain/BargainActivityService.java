@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.promotion.service.bargain;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityBaseVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityDO;
@@ -21,7 +21,7 @@ public interface BargainActivityService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createBargainActivity(@Valid BargainActivityCreateReqVO createReqVO);
+    Long createBargainActivity(@Valid BargainActivityBaseVO createReqVO);
 
     /**
      * 更新砍价活动
