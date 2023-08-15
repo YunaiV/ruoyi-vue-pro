@@ -204,6 +204,14 @@ yudao:
     order:
       app-id: 1 # 商户编号
       expire-time: 2h # 支付的过期时间
+    express:
+      client: kd_niao
+      kd-niao:
+        api-key: cb022f1e-48f1-4c4a-a723-9001ac9676b8
+        business-id: 1809751
+      kd100:
+        key: pLXUGAwK5305
+        customer: E77DF18BE109F454A5CD319E44BF5177
 
 debug: false
 

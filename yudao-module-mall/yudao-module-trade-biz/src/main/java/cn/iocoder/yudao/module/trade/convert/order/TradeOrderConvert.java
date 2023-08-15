@@ -29,6 +29,7 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
+import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressTrackRespDTO;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
@@ -339,5 +340,7 @@ public interface TradeOrderConvert {
     })
     CombinationRecordCreateReqDTO convert(TradeOrderDO order, TradeOrderItemDO orderItem,
                                           AppTradeOrderCreateReqVO createReqVO, MemberUserRespDTO user);
+
+    List<AppOrderExpressTrackRespDTO> convertList02(List<ExpressTrackRespDTO> list);
 
 }

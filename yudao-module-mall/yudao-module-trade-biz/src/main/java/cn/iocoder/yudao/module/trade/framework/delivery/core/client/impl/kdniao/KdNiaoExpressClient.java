@@ -41,46 +41,49 @@ public class KdNiaoExpressClient implements ExpressClient {
      * 快递鸟即时查询免费版 RequestType
      */
     private static final String REAL_TIME_FREE_REQ_TYPE = "1002";
+
     private final RestTemplate restTemplate;
     private final TradeExpressProperties.KdNiaoConfig config;
 
     /**
-     * 快递鸟即时查询免费版本
+     * 查询快递轨迹【免费版】
      *
-     * @see <a href="https://www.yuque.com/kdnjishuzhichi/dfcrg1/wugo6k">快递鸟接口文档</a>
+     * 仅支持 3 家：申通快递、圆通速递、百世快递
+     *
+     * @see <a href="https://www.yuque.com/kdnjishuzhichi/dfcrg1/wugo6k">接口文档</a>
+     *
      * @param reqDTO 查询请求参数
+     * @return 快递轨迹
      */
     @Override
     public List<ExpressTrackRespDTO> getExpressTrackList(ExpressTrackQueryReqDTO reqDTO) {
-        KdNiaoExpressQueryReqDTO kdNiaoReqData = INSTANCE.convert(reqDTO);
-        // 快递公司编码需要转成大写
-        kdNiaoReqData.setExpressCode(reqDTO.getExpressCode().toUpperCase());
-        KdNiaoExpressQueryRespDTO respDTO = requestKdNiaoApi(REAL_TIME_QUERY_URL, REAL_TIME_FREE_REQ_TYPE,
-                kdNiaoReqData, KdNiaoExpressQueryRespDTO.class);
-        log.debug("[getExpressTrackList][快递鸟即时查询接口返回 {}]", respDTO);
+        // 发起请求
+        KdNiaoExpressQueryReqDTO requestDTO = INSTANCE.convert(reqDTO)
+                .setExpressCode(reqDTO.getExpressCode().toUpperCase());
+        KdNiaoExpressQueryRespDTO respDTO = httpRequest(REAL_TIME_QUERY_URL, REAL_TIME_FREE_REQ_TYPE,
+                requestDTO, KdNiaoExpressQueryRespDTO.class);
 
         // 处理结果
         if (respDTO == null || !respDTO.getSuccess()) {
             throw exception(EXPRESS_API_QUERY_FAILED, respDTO == null ? "" : respDTO.getReason());
         }
-        if (CollUtil.isNotEmpty(respDTO.getTracks())) {
+        if (CollUtil.isEmpty(respDTO.getTracks())) {
             return Collections.emptyList();
         }
         return INSTANCE.convertList(respDTO.getTracks());
     }
 
     /**
-     * 快递鸟 通用的 API 请求，暂时没有其他应用场景， 暂时放这里
+     * 快递鸟 API 请求
      *
      * @param url 请求 url
-     * @param requestType 对应的请求指令 (快递鸟的RequestType)
+     * @param requestType 对应的请求指令 (快递鸟的 RequestType)
      * @param req  对应请求的请求参数
      * @param respClass 对应请求的响应 class
      * @param <Req> 每个请求的请求结构 Req DTO
      * @param <Resp> 每个请求的响应结构 Resp DTO
      */
-    private <Req, Resp> Resp requestKdNiaoApi(String url, String requestType, Req req,
-                                              Class<Resp> respClass){
+    private <Req, Resp> Resp httpRequest(String url, String requestType, Req req, Class<Resp> respClass) {
         // 请求头
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -93,11 +96,12 @@ public class KdNiaoExpressClient implements ExpressClient {
         requestBody.add("EBusinessID", config.getBusinessId());
         requestBody.add("DataSign", dataSign);
         requestBody.add("RequestType", requestType);
-        log.debug("[requestKdNiaoApi][快递鸟接口 RequestType : {}, 的请求参数 {}]", requestType, requestBody);
+        log.debug("[httpRequest][RequestType({}) 的请求参数({})]", requestType, requestBody);
+
         // 发送请求
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
         ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-        log.debug("快递鸟接口 RequestType : {}, 的响应结果 {}", requestType,  responseEntity);
+        log.debug("[httpRequest][RequestType({}) 的响应结果({})", requestType, responseEntity);
         // 处理响应
         if (!responseEntity.getStatusCode().is2xxSuccessful()) {
             throw exception(EXPRESS_API_QUERY_ERROR);
@@ -106,7 +110,10 @@ public class KdNiaoExpressClient implements ExpressClient {
     }
 
     /**
-     * 快递鸟生成请求签名 参见 <a href="https://www.yuque.com/kdnjishuzhichi/dfcrg1/zes04h">签名说明</a>
+     * 快递鸟生成请求签名
+     *
+     * 参见 <a href="https://www.yuque.com/kdnjishuzhichi/dfcrg1/zes04h">签名说明</a>
+     *
      * @param reqData 请求实体
      * @param apiKey  api Key
      */

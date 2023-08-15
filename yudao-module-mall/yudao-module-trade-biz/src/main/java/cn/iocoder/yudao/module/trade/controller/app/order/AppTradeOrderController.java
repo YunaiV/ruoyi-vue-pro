@@ -16,6 +16,7 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
+import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderService;
 import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,6 +45,8 @@ public class AppTradeOrderController {
 
     @Resource
     private TradeOrderService tradeOrderService;
+    @Resource
+    private TradeOrderQueryService tradeOrderQueryService;
     @Resource
     private DeliveryExpressService deliveryExpressService;
 
@@ -97,6 +100,14 @@ public class AppTradeOrderController {
         // 最终组合
         return success(TradeOrderConvert.INSTANCE.convert02(order, orderItems,
                 propertyValueDetails, tradeOrderProperties, express));
+    }
+
+    @GetMapping("/get-express-track-list")
+    @Operation(summary = "获得交易订单的物流轨迹")
+    @Parameter(name = "id", description = "交易订单编号")
+    public CommonResult<List<?>> getOrderExpressTrackList(@RequestParam("id") Long id) {
+        return success(TradeOrderConvert.INSTANCE.convertList02(
+                tradeOrderQueryService.getExpressTrackList(id, getLoginUserId())));
     }
 
     @GetMapping("/page")
