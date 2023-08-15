@@ -31,9 +31,10 @@ public interface TradeOrderItemMapper extends BaseMapperX<TradeOrderItemDO> {
                 .eq(TradeOrderItemDO::getSkuId, skuIds));
     }
 
-    default TradeOrderItemDO selectOrderItemByIdAndUserId(Long orderItemId, Long loginUserId) {
+    default TradeOrderItemDO selectByIdAndUserId(Long orderItemId, Long loginUserId) {
         return selectOne(new LambdaQueryWrapperX<TradeOrderItemDO>()
                 .eq(TradeOrderItemDO::getId, orderItemId)
                 .eq(TradeOrderItemDO::getUserId, loginUserId));
     }
+
 }

@@ -8,7 +8,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
@@ -31,9 +30,7 @@ import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponUseReqDTO;
 import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
-import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
@@ -61,23 +58,23 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.ORDER_NOT_FOUND;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
 /**
- * 交易订单 Service 实现类
+ * 交易订单【写】Service 实现类
  *
  * @author LeeYan9
  * @since 2022-08-26
  */
 @Service
 @Slf4j
-public class TradeOrderServiceImpl implements TradeOrderService {
+public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     @Resource
     private TradeOrderMapper tradeOrderMapper;
@@ -514,64 +511,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         return order;
     }
 
-    @Override
-    public TradeOrderDO getOrder(Long id) {
-        return tradeOrderMapper.selectById(id);
-    }
-
-    @Override
-    public TradeOrderDO getOrder(Long userId, Long id) {
-        TradeOrderDO order = tradeOrderMapper.selectById(id);
-        if (order != null
-                && ObjectUtil.notEqual(order.getUserId(), userId)) {
-            return null;
-        }
-        return order;
-    }
-
-    @Override
-    public PageResult<TradeOrderDO> getOrderPage(TradeOrderPageReqVO reqVO) {
-        // 获得 userId 相关的查询
-        Set<Long> userIds = new HashSet<>();
-        if (StrUtil.isNotEmpty(reqVO.getUserMobile())) {
-            MemberUserRespDTO user = memberUserApi.getUserByMobile(reqVO.getUserMobile());
-            if (user == null) { // 没查询到用户，说明肯定也没他的订单
-                return new PageResult<>();
-            }
-            userIds.add(user.getId());
-        }
-        if (StrUtil.isNotEmpty(reqVO.getUserNickname())) {
-            List<MemberUserRespDTO> users = memberUserApi.getUserListByNickname(reqVO.getUserNickname());
-            if (CollUtil.isEmpty(users)) { // 没查询到用户，说明肯定也没他的订单
-                return new PageResult<>();
-            }
-            userIds.addAll(convertSet(users, MemberUserRespDTO::getId));
-        }
-        // 分页查询
-        return tradeOrderMapper.selectPage(reqVO, userIds);
-    }
-
-    @Override
-    public PageResult<TradeOrderDO> getOrderPage(Long userId, AppTradeOrderPageReqVO reqVO) {
-        return tradeOrderMapper.selectPage(reqVO, userId);
-    }
-
-    @Override
-    public Long getOrderCount(Long userId, Integer status, Boolean commentStatus) {
-        return tradeOrderMapper.selectCountByUserIdAndStatus(userId, status, commentStatus);
-    }
-
     // =================== Order Item ===================
-
-    @Override
-    public TradeOrderItemDO getOrderItem(Long userId, Long itemId) {
-        TradeOrderItemDO orderItem = tradeOrderItemMapper.selectById(itemId);
-        if (orderItem != null
-                && ObjectUtil.notEqual(orderItem.getUserId(), userId)) {
-            return null;
-        }
-        return orderItem;
-    }
 
     @Override
     public void updateOrderItemAfterSaleStatus(Long id, Integer oldAfterSaleStatus, Integer newAfterSaleStatus, Integer refundPrice) {
@@ -611,39 +551,15 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     }
 
     @Override
-    public List<TradeOrderItemDO> getOrderItemList(Collection<Long> ids) {
-        return tradeOrderItemMapper.selectBatchIds(ids);
-    }
-
-    @Override
-    public List<TradeOrderItemDO> getOrderItemListByOrderId(Collection<Long> orderIds) {
-        if (CollUtil.isEmpty(orderIds)) {
-            return Collections.emptyList();
-        }
-        return tradeOrderItemMapper.selectListByOrderId(orderIds);
-    }
-
-    @Override
-    public TradeOrderItemDO getOrderItemByIdAndUserId(Long orderItemId, Long loginUserId) {
-        return tradeOrderItemMapper.selectOrderItemByIdAndUserId(orderItemId, loginUserId);
-    }
-
-    @Override
-    public TradeOrderDO getOrderByIdAndUserId(Long orderId, Long loginUserId) {
-        return tradeOrderMapper.selectOrderByIdAndUserId(orderId, loginUserId);
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long createOrderItemComment(AppTradeOrderItemCommentCreateReqVO createReqVO) {
-        Long loginUserId = getLoginUserId();
+    public Long createOrderItemComment(Long userId, AppTradeOrderItemCommentCreateReqVO createReqVO) {
         // 先通过订单项 ID，查询订单项是否存在
-        TradeOrderItemDO orderItem = getOrderItemByIdAndUserId(createReqVO.getOrderItemId(), loginUserId);
+        TradeOrderItemDO orderItem = tradeOrderItemMapper.selectByIdAndUserId(createReqVO.getOrderItemId(), userId);
         if (orderItem == null) {
             throw exception(ORDER_ITEM_NOT_FOUND);
         }
         // 校验订单相关状态
-        TradeOrderDO order = getOrderByIdAndUserId(orderItem.getOrderId(), loginUserId);
+        TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(orderItem.getOrderId(), userId);
         if (order == null) {
             throw exception(ORDER_NOT_FOUND);
         }
@@ -654,14 +570,14 @@ public class TradeOrderServiceImpl implements TradeOrderService {
             throw exception(ORDER_COMMENT_STATUS_NOT_FALSE);
         }
 
-        // 创建评价
+        // 1. 创建评价
         ProductCommentCreateReqDTO productCommentCreateReqDTO = TradeOrderConvert.INSTANCE.convert04(createReqVO, orderItem);
         Long comment = productCommentApi.createComment(productCommentCreateReqDTO);
-        // 更新订单项评价状态
+
+        // 2. 更新订单项评价状态
         tradeOrderItemMapper.updateById(new TradeOrderItemDO().setId(orderItem.getId()).setCommentStatus(Boolean.TRUE));
-        List<TradeOrderItemDO> orderItems = getOrderItemListByOrderId(CollUtil.newArrayList(order.getId()));
+        List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(order.getId());
         if (!anyMatch(orderItems, item -> Objects.equals(item.getCommentStatus(), Boolean.FALSE))) {
-            // 对于 order 来说，就是评论完，把 order 更新完合理的 status 等字段。
             tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId()).setCommentStatus(Boolean.TRUE));
         }
         return comment;

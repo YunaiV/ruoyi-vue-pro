@@ -18,7 +18,7 @@ import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleWayEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
-import cn.iocoder.yudao.module.trade.service.order.TradeOrderService;
+import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -52,7 +52,7 @@ public class TradeAfterSaleServiceTest extends BaseDbUnitTest {
     private TradeAfterSaleLogMapper tradeAfterSaleLogMapper;
 
     @MockBean
-    private TradeOrderService tradeOrderService;
+    private TradeOrderUpdateService tradeOrderService;
     @MockBean
     private PayRefundApi payRefundApi;
 

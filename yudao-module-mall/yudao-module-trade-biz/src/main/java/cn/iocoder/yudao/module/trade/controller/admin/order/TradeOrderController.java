@@ -14,7 +14,8 @@ import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReq
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
-import cn.iocoder.yudao.module.trade.service.order.TradeOrderService;
+import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
+import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,7 +40,9 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 public class TradeOrderController {
 
     @Resource
-    private TradeOrderService tradeOrderService;
+    private TradeOrderUpdateService tradeOrderUpdateService;
+    @Resource
+    private TradeOrderQueryService tradeOrderQueryService;
 
     @Resource
     private ProductPropertyValueApi productPropertyValueApi;
@@ -51,7 +54,7 @@ public class TradeOrderController {
     @PreAuthorize("@ss.hasPermission('trade:order:query')")
     public CommonResult<PageResult<TradeOrderPageItemRespVO>> getOrderPage(TradeOrderPageReqVO reqVO) {
         // 查询订单
-        PageResult<TradeOrderDO> pageResult = tradeOrderService.getOrderPage(reqVO);
+        PageResult<TradeOrderDO> pageResult = tradeOrderQueryService.getOrderPage(reqVO);
         if (CollUtil.isEmpty(pageResult.getList())) {
             return success(PageResult.empty());
         }
@@ -59,7 +62,7 @@ public class TradeOrderController {
         // 查询用户信息
         Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(convertSet(pageResult.getList(), TradeOrderDO::getUserId));;
         // 查询订单项
-        List<TradeOrderItemDO> orderItems = tradeOrderService.getOrderItemListByOrderId(
+        List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(
                 convertSet(pageResult.getList(), TradeOrderDO::getId));
         // 查询商品属性
         List<ProductPropertyValueDetailRespDTO> propertyValueDetails = productPropertyValueApi
@@ -74,9 +77,9 @@ public class TradeOrderController {
     @PreAuthorize("@ss.hasPermission('trade:order:query')")
     public CommonResult<TradeOrderDetailRespVO> getOrderDetail(@RequestParam("id") Long id) {
         // 查询订单
-        TradeOrderDO order = tradeOrderService.getOrder(id);
+        TradeOrderDO order = tradeOrderQueryService.getOrder(id);
         // 查询订单项
-        List<TradeOrderItemDO> orderItems = tradeOrderService.getOrderItemListByOrderId(id);
+        List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(id);
         // 查询商品属性
         List<ProductPropertyValueDetailRespDTO> propertyValueDetails = productPropertyValueApi
                 .getPropertyValueDetailList(TradeOrderConvert.INSTANCE.convertPropertyValueIds(orderItems));
@@ -90,7 +93,7 @@ public class TradeOrderController {
     @Operation(summary = "发货订单")
     @PreAuthorize("@ss.hasPermission('trade:order:delivery')")
     public CommonResult<Boolean> deliveryOrder(@RequestBody TradeOrderDeliveryReqVO deliveryReqVO) {
-        tradeOrderService.deliveryOrder(getLoginUserId(), deliveryReqVO);
+        tradeOrderUpdateService.deliveryOrder(getLoginUserId(), deliveryReqVO);
         return success(true);
     }
 

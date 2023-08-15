@@ -48,16 +48,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * {@link TradeOrderServiceImpl} 的单元测试类
+ * {@link TradeOrderUpdateServiceImpl} 的单元测试类
  *
  * @author LeeYan9
  * @since 2022-09-07
  */
-@Import({TradeOrderServiceImpl.class, TradeOrderConfig.class})
-public class TradeOrderServiceTest extends BaseDbUnitTest {
+@Import({TradeOrderUpdateServiceImpl.class, TradeOrderConfig.class})
+public class TradeOrderUpdateServiceTest extends BaseDbUnitTest {
 
     @Resource
-    private TradeOrderServiceImpl tradeOrderService;
+    private TradeOrderUpdateServiceImpl tradeOrderUpdateService;
 
     @Resource
     private TradeOrderMapper tradeOrderMapper;
@@ -150,7 +150,7 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         }))).thenReturn(1000L);
 
         // 调用方法
-        TradeOrderDO order = tradeOrderService.createOrder(userId, userIp, reqVO);
+        TradeOrderDO order = tradeOrderUpdateService.createOrder(userId, userIp, reqVO);
         // 断言 TradeOrderDO 订单
         List<TradeOrderDO> tradeOrderDOs = tradeOrderMapper.selectList();
         assertEquals(tradeOrderDOs.size(), 1);
@@ -259,7 +259,7 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
                         .setMerchantOrderId("1")).setPrice(100));
 
         // 调用
-        tradeOrderService.updateOrderPaid(id, payOrderId);
+        tradeOrderUpdateService.updateOrderPaid(id, payOrderId);
         // 断言
         TradeOrderDO dbOrder = tradeOrderMapper.selectById(id);
         assertEquals(dbOrder.getStatus(), TradeOrderStatusEnum.UNDELIVERED.getStatus());
@@ -282,7 +282,7 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         // mock 方法（支付单）
 
         // 调用
-        tradeOrderService.deliveryOrder(randomLongId(), deliveryReqVO);
+        tradeOrderUpdateService.deliveryOrder(randomLongId(), deliveryReqVO);
         // 断言
         TradeOrderDO dbOrder = tradeOrderMapper.selectById(1L);
         assertEquals(dbOrder.getStatus(), TradeOrderStatusEnum.DELIVERED.getStatus());
@@ -304,7 +304,7 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         // mock 方法（支付单）
 
         // 调用
-        tradeOrderService.receiveOrder(userId, id);
+        tradeOrderUpdateService.receiveOrder(userId, id);
         // 断言
         TradeOrderDO dbOrder = tradeOrderMapper.selectById(1L);
         assertEquals(dbOrder.getStatus(), TradeOrderStatusEnum.COMPLETED.getStatus());
