@@ -20,18 +20,20 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
                 CombinationRecordDO::getOrderId, orderId);
     }
 
-    // TODO @puhui999 selectByUserIdAndActivityId
+    default List<CombinationRecordDO> selectListByUserIdAndStatus(Long userId, Integer status) {
+        return selectList(new LambdaQueryWrapperX<CombinationRecordDO>()
+                .eq(CombinationRecordDO::getUserId, userId)
+                .eq(CombinationRecordDO::getStatus, status));
+    }
     /**
      * 查询拼团记录
      *
-     * @param headId     团长编号
-     * @param activityId 活动编号
+     * @param headId 团长编号
      * @return 拼团记录
      */
-    default CombinationRecordDO selectRecordByHeadId(Long headId, Long activityId, Integer status) {
+    default CombinationRecordDO selectOneByHeadId(Long headId, Integer status) {
         return selectOne(new LambdaQueryWrapperX<CombinationRecordDO>()
-                .eq(CombinationRecordDO::getUserId, headId)
-                .eq(CombinationRecordDO::getActivityId, activityId)
+                .eq(CombinationRecordDO::getId, headId)
                 .eq(CombinationRecordDO::getStatus, status));
     }
 
@@ -45,4 +47,16 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
         return selectList(CombinationRecordDO::getStatus, status);
     }
 
+    /**
+     * 查询拼团记录
+     *
+     * @param userId     用户 id
+     * @param activityId 活动 id
+     * @return 拼团记录
+     */
+    default List<CombinationRecordDO> selectListByUserIdAndActivityId(Long userId, Long activityId) {
+        return selectList(new LambdaQueryWrapperX<CombinationRecordDO>()
+                .eq(CombinationRecordDO::getUserId, userId)
+                .eq(CombinationRecordDO::getActivityId, activityId));
+    }
 }

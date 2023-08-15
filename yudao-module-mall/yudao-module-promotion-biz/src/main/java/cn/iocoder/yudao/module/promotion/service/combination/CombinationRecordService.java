@@ -4,6 +4,8 @@ import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCr
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordUpdateStatusReqDTO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
 
+import java.util.List;
+
 /**
  * 拼团记录 Service 接口
  *
@@ -40,5 +42,24 @@ public interface CombinationRecordService {
      * @return 拼团状态
      */
     CombinationRecordDO getCombinationRecord(Long userId, Long orderId);
+
+    /**
+     * 获取拼团记录
+     *
+     * @param userId     用户 id
+     * @param activityId 活动 id
+     * @return 拼团记录列表
+     */
+    List<CombinationRecordDO> getRecordListByUserIdAndActivityId(Long userId, Long activityId);
+
+    /**
+     * 验证组合限制数
+     * 校验是否满足限购要求
+     *
+     * @param count      本次购买数量
+     * @param sumCount   已购买数量合计
+     * @param activityId 活动编号
+     */
+    void validateCombinationLimitCount(Long activityId, Integer count, Integer sumCount);
 
 }

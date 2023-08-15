@@ -20,8 +20,6 @@ import org.mapstruct.factory.Mappers;
 import java.util.List;
 import java.util.Map;
 
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
-
 /**
  * 秒杀活动 Convert
  *
@@ -40,32 +38,28 @@ public interface SeckillActivityConvert {
 
     List<SeckillActivityRespVO> convertList(List<SeckillActivityDO> list);
 
-    default PageResult<SeckillActivityRespVO> convertPage(PageResult<SeckillActivityDO> page,
-                                                          List<SeckillProductDO> seckillProducts,
-                                                          List<ProductSpuRespDTO> spuList) {
+    PageResult<SeckillActivityRespVO> convertPage(PageResult<SeckillActivityDO> page);
+
+    default PageResult<SeckillActivityRespVO> convertPage(PageResult<SeckillActivityDO> page, List<SeckillProductDO> seckillProducts, List<ProductSpuRespDTO> spuList) {
+        Map<Long, ProductSpuRespDTO> spuMap = CollectionUtils.convertMap(spuList, ProductSpuRespDTO::getId);
         PageResult<SeckillActivityRespVO> pageResult = convertPage(page);
-        // 拼接商品
-        Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
         pageResult.getList().forEach(item -> {
+            MapUtils.findAndThen(spuMap, item.getSpuId(), spu -> {
+                item.setSpuName(spu.getName());
+                item.setPicUrl(spu.getPicUrl());
+            });
+
             item.setProducts(convertList2(seckillProducts));
-            MapUtils.findAndThen(spuMap, item.getSpuId(),
-                    spu -> item.setSpuName(spu.getName()).setPicUrl(spu.getPicUrl()));
         });
         return pageResult;
     }
-    PageResult<SeckillActivityRespVO> convertPage(PageResult<SeckillActivityDO> page);
 
     SeckillActivityDetailRespVO convert1(SeckillActivityDO seckillActivity);
 
-    default SeckillActivityDetailRespVO convert(SeckillActivityDO activity,
-                                                List<SeckillProductDO> products) {
-        return convert1(activity).setProducts(convertList2(products));
+    default SeckillActivityDetailRespVO convert(SeckillActivityDO seckillActivity, List<SeckillProductDO> seckillProducts) {
+        return convert1(seckillActivity).setProducts(convertList2(seckillProducts));
     }
-    List<SeckillProductRespVO> convertList2(List<SeckillProductDO> productDOs);
 
-    default List<SeckillProductDO> convertList(List<? extends SeckillProductBaseVO> products, SeckillActivityDO activityDO) {
-        return CollectionUtils.convertList(products, item -> convert(activityDO, item).setActivityStatus(activityDO.getStatus()));
-    }
     @Mappings({
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "activityId", source = "activity.id"),
@@ -78,5 +72,11 @@ public interface SeckillActivityConvert {
             @Mapping(target = "activityEndTime", source = "activity.endTime")
     })
     SeckillProductDO convert(SeckillActivityDO activity, SeckillProductBaseVO product);
+
+    default List<SeckillProductDO> convertList(List<? extends SeckillProductBaseVO> products, SeckillActivityDO activity) {
+        return CollectionUtils.convertList(products, item -> convert(activity, item).setActivityStatus(activity.getStatus()));
+    }
+
+    List<SeckillProductRespVO> convertList2(List<SeckillProductDO> productDOs);
 
 }

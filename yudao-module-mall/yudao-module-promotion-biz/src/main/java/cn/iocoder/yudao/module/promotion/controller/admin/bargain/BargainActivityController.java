@@ -4,14 +4,12 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
-import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
-import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.BargainActivityCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.BargainActivityPageReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.BargainActivityRespVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.BargainActivityUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityBaseVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityPageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityRespVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.convert.bargain.BargainActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityDO;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainProductDO;
 import cn.iocoder.yudao.module.promotion.service.bargain.BargainActivityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,12 +20,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Collections;
-import java.util.List;
 
-import static cn.hutool.core.collection.CollectionUtil.newArrayList;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Tag(name = "管理后台 - 砍价活动")
 @RestController
@@ -44,7 +38,7 @@ public class BargainActivityController {
     @PostMapping("/create")
     @Operation(summary = "创建砍价活动")
     @PreAuthorize("@ss.hasPermission('promotion:bargain-activity:create')")
-    public CommonResult<Long> createBargainActivity(@Valid @RequestBody BargainActivityCreateReqVO createReqVO) {
+    public CommonResult<Long> createBargainActivity(@Valid @RequestBody BargainActivityBaseVO createReqVO) {
         return success(activityService.createBargainActivity(createReqVO));
     }
 
@@ -70,9 +64,7 @@ public class BargainActivityController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('promotion:bargain-activity:query')")
     public CommonResult<BargainActivityRespVO> getBargainActivity(@RequestParam("id") Long id) {
-        BargainActivityDO activity = activityService.getBargainActivity(id);
-        List<BargainProductDO> products = activityService.getBargainProductsByActivityIds(newArrayList(id));
-        return success(BargainActivityConvert.INSTANCE.convert(activity, products));
+        return success(BargainActivityConvert.INSTANCE.convert(activityService.getBargainActivity(id)));
     }
 
     @GetMapping("/page")
@@ -85,14 +77,7 @@ public class BargainActivityController {
         if (CollUtil.isEmpty(pageResult.getList())) {
             return success(PageResult.empty(pageResult.getTotal()));
         }
-
-        // 拼接数据
-//        List<BargainProductDO> products = activityService.getBargainProductsByActivityIds(
-//                convertSet(pageResult.getList(), BargainActivityDO::getId));
-        List<BargainProductDO> products = Collections.emptyList();
-        List<ProductSpuRespDTO> spus = productSpuApi.getSpuList(
-                convertSet(pageResult.getList(), BargainActivityDO::getSpuId));
-        return success(BargainActivityConvert.INSTANCE.convertPage(pageResult, products, spus));
+        return success(BargainActivityConvert.INSTANCE.convertPage(activityService.getBargainActivityPage(pageVO)));
     }
 
 }

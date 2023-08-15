@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityUpdateReqVO;
@@ -41,9 +42,8 @@ public interface CombinationActivityConvert {
 
     CombinationProductRespVO convert(CombinationProductDO bean);
 
-    default CombinationActivityRespVO convert(CombinationActivityDO activity,
-                                              List<CombinationProductDO> products) {
-        return convert(activity).setProducts(convertList2(products));
+    default CombinationActivityRespVO convert(CombinationActivityDO bean, List<CombinationProductDO> productDOs) {
+        return convert(bean).setProducts(convertList2(productDOs));
     }
 
     List<CombinationActivityRespVO> convertList(List<CombinationActivityDO> list);
@@ -53,22 +53,20 @@ public interface CombinationActivityConvert {
     default PageResult<CombinationActivityRespVO> convertPage(PageResult<CombinationActivityDO> page,
                                                               List<CombinationProductDO> productList,
                                                               List<ProductSpuRespDTO> spuList) {
-        PageResult<CombinationActivityRespVO> pageResult = convertPage(page);
-        // 拼接商品
         Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
+        PageResult<CombinationActivityRespVO> pageResult = convertPage(page);
         pageResult.getList().forEach(item -> {
+            MapUtils.findAndThen(spuMap, item.getSpuId(), spu -> {
+                item.setSpuName(spu.getName());
+                item.setPicUrl(spu.getPicUrl());
+            });
             item.setProducts(convertList2(productList));
-            MapUtils.findAndThen(spuMap, item.getSpuId(),
-                    spu -> item.setSpuName(spu.getName()).setPicUrl(spu.getPicUrl()));
         });
         return pageResult;
     }
 
     List<CombinationProductRespVO> convertList2(List<CombinationProductDO> productDOs);
 
-    default List<CombinationProductDO> convertList(List<? extends CombinationProductBaseVO> products, CombinationActivityDO activityDO) {
-        return CollectionUtils.convertList(products, item -> convert(activityDO, item).setActivityStatus(activityDO.getStatus()));
-    }
     @Mappings({
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "activityId", source = "activity.id"),
@@ -80,6 +78,10 @@ public interface CombinationActivityConvert {
     })
     CombinationProductDO convert(CombinationActivityDO activity, CombinationProductBaseVO product);
 
+    default List<CombinationProductDO> convertList(List<? extends CombinationProductBaseVO> products, CombinationActivityDO activity) {
+        return CollectionUtils.convertList(products, item -> convert(activity, item).setActivityStatus(activity.getStatus()));
+    }
+
     default List<CombinationProductDO> convertList(List<CombinationProductBaseVO> updateProductVOs,
                                                    List<CombinationProductDO> products, CombinationActivityDO activity) {
         Map<Long, Long> productMap = convertMap(products, CombinationProductDO::getSkuId, CombinationProductDO::getId);
@@ -89,5 +91,7 @@ public interface CombinationActivityConvert {
     }
 
     CombinationRecordDO convert(CombinationRecordCreateReqDTO reqDTO);
+
+    List<CombinationRecordRespDTO> convert(List<CombinationRecordDO> bean);
 
 }

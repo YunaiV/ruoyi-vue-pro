@@ -65,9 +65,10 @@ public interface TradeOrderService {
      * 【会员】收货交易订单
      *
      * @param userId 用户编号
-     * @param id 订单编号
+     * @param id     订单编号
+     * @return 成功/失败
      */
-    void receiveOrder(Long userId, Long id);
+    Boolean receiveOrder(Long userId, Long id);
 
     /**
      * 获得指定编号的交易订单

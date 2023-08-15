@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -152,8 +151,6 @@ public class CombinationActivityServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         CombinationActivityPageReqVO reqVO = new CombinationActivityPageReqVO();
         reqVO.setName(null);
-        reqVO.setStartTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
-        reqVO.setEndTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
         reqVO.setStatus(null);
 
         // 调用

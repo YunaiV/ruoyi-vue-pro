@@ -14,11 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.COMBINATION_RECORD_USER_FULL;
 
 // TODO 芋艿：等拼团记录做完，完整 review 下
 /**
@@ -37,6 +37,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     private CombinationRecordMapper recordMapper;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateCombinationRecordStatusByUserIdAndOrderId(CombinationRecordUpdateStatusReqDTO reqDTO) {
         // 校验拼团是否存在
         CombinationRecordDO recordDO = validateCombinationRecord(reqDTO.getUserId(), reqDTO.getOrderId());
@@ -80,6 +81,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {
         // 1.1 校验拼团活动
         CombinationActivityDO activity = combinationActivityService.validateCombinationActivityExists(reqDTO.getActivityId());
@@ -88,9 +90,19 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         if (recordDO != null) {
             throw exception(COMBINATION_RECORD_EXISTS);
         }
-        // 1.3 父拼团是否存在,是否已经满了
+        // 1.3 校验用户是否参加了其它拼团
+        List<CombinationRecordDO> recordDOList = recordMapper.selectListByUserIdAndStatus(reqDTO.getUserId(), CombinationRecordStatusEnum.IN_PROGRESS.getStatus());
+        if (CollUtil.isNotEmpty(recordDOList)) {
+            throw exception(COMBINATION_RECORD_FAILED_HAVE_JOINED);
+        }
+        // 1.4 校验当前活动是否过期
+        if (LocalDateTime.now().isAfter(activity.getEndTime())) {
+            throw exception(COMBINATION_RECORD_FAILED_TIME_END);
+        }
+        // 1.5 父拼团是否存在,是否已经满了
         if (reqDTO.getHeadId() != null) {
-            CombinationRecordDO recordDO1 = recordMapper.selectRecordByHeadId(reqDTO.getHeadId(), reqDTO.getActivityId(), CombinationRecordStatusEnum.IN_PROGRESS.getStatus());
+            // 查询进行中的父拼团
+            CombinationRecordDO recordDO1 = recordMapper.selectOneByHeadId(reqDTO.getHeadId(), CombinationRecordStatusEnum.IN_PROGRESS.getStatus());
             if (recordDO1 == null) {
                 throw exception(COMBINATION_RECORD_HEAD_NOT_EXISTS);
             }
@@ -99,7 +111,6 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
                 throw exception(COMBINATION_RECORD_USER_FULL);
             }
         }
-        // TODO @puhui999：应该还有一些校验，后续补噶；例如说，一个团，自己已经参与进去了，不能再参与进去；
 
         // 2. 创建拼团记录
         CombinationRecordDO record = CombinationActivityConvert.INSTANCE.convert(reqDTO);
@@ -113,6 +124,25 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     @Override
     public CombinationRecordDO getCombinationRecord(Long userId, Long orderId) {
         return validateCombinationRecord(userId, orderId);
+    }
+
+    @Override
+    public List<CombinationRecordDO> getRecordListByUserIdAndActivityId(Long userId, Long activityId) {
+        return recordMapper.selectListByUserIdAndActivityId(userId, activityId);
+    }
+
+    @Override
+    public void validateCombinationLimitCount(Long activityId, Integer count, Integer sumCount) {
+        // 1.1 校验拼团活动
+        CombinationActivityDO activity = combinationActivityService.validateCombinationActivityExists(activityId);
+        // 校验是否达到限购总限购标准
+        if ((sumCount + count) > activity.getTotalLimitCount()) {
+            throw exception(COMBINATION_RECORD_FAILED_TOTAL_LIMIT_COUNT_EXCEED);
+        }
+        // 单次购买是否达到限购标准
+        if (count > activity.getSingleLimitCount()) {
+            throw exception(COMBINATION_RECORD_FAILED_SINGLE_LIMIT_COUNT_EXCEED);
+        }
     }
 
     /**

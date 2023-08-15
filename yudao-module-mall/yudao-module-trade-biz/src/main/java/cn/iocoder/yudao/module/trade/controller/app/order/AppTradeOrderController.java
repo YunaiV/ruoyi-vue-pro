@@ -149,9 +149,8 @@ public class AppTradeOrderController {
     @PutMapping("/receive")
     @Operation(summary = "确认交易订单收货")
     @Parameter(name = "id", description = "交易订单编号")
-    public CommonResult<Boolean> receiveOrder(@RequestParam("id") Long id) {
-        tradeOrderService.receiveOrder(getLoginUserId(), id);
-        return success(true);
+    public CommonResult<Boolean> takeOrder(@RequestParam("id") Long id) {
+        return success(tradeOrderService.receiveOrder(getLoginUserId(), id));
     }
 
     @DeleteMapping("/cancel")

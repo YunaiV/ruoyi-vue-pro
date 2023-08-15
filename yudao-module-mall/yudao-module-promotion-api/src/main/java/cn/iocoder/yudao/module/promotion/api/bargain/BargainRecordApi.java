@@ -14,10 +14,19 @@ import javax.validation.Valid;
 public interface BargainRecordApi {
 
     /**
-     * 创建开团记录
+     * 创建砍价记录
      *
      * @param reqDTO 请求 DTO
      */
     void createRecord(@Valid BargainRecordCreateReqDTO reqDTO);
+
+    /**
+     * 查询砍价是否成功
+     *
+     * @param userId  用户编号
+     * @param orderId 订单编号
+     * @return 砍价是否成功
+     */
+    boolean validateRecordSuccess(Long userId, Long orderId);
 
 }
