@@ -190,7 +190,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
                         CollectionUtils.getSumValue(tradeOrderItemDOS, TradeOrderItemDO::getCount, Integer::sum), orderItemDO.getCount());
             }
 
-            combinationRecordApi.createRecord(TradeOrderConvert.INSTANCE.convert(order, orderItemDO, createReqVO, user));
+            combinationRecordApi.createCombinationRecord(TradeOrderConvert.INSTANCE.convert(order, orderItemDO, createReqVO, user));
         }
         // TODO 秒杀扣减库存是下单就扣除还是等待订单支付成功再扣除
         if (Objects.equals(TradeOrderTypeEnum.SECKILL.getType(), order.getType())) {
@@ -392,10 +392,10 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         return new KeyValue<>(order, payOrder);
     }
 
-    // TODO @芋艿：后续在 review 下发货逻辑
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deliveryOrder(Long userId, TradeOrderDeliveryReqVO deliveryReqVO) {
+        // TODO @puhui999：只有选择快递的，才可以发货
         // 1.1 校验并获得交易订单（可发货）
         TradeOrderDO order = validateOrderDeliverable(deliveryReqVO.getId());
         TradeOrderDO updateOrderObj = new TradeOrderDO();
@@ -412,6 +412,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
             }
             updateOrderObj.setLogisticsId(deliveryReqVO.getLogisticsId()).setLogisticsNo(deliveryReqVO.getLogisticsNo()).setDeliveryType(DeliveryTypeEnum.EXPRESS.getMode());
         }
+        // TODO @puhui999：无需发货时，更新 logisticsId 为 0；
         // 2.2 无需发货
         if (Objects.equals(deliveryReqVO.getType(), DeliveryTypeEnum.NULL.getMode())) {
             updateOrderObj.setLogisticsId(null).setLogisticsNo("").setDeliveryType(DeliveryTypeEnum.NULL.getMode());
@@ -458,14 +459,14 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // 订单类型：拼团
         if (Objects.equals(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
             // 校验订单拼团是否成功
-            if (combinationRecordApi.validateRecordSuccess(order.getUserId(), order.getId())) {
+            if (combinationRecordApi.isCombinationRecordSuccess(order.getUserId(), order.getId())) {
                 throw exception(ORDER_DELIVERY_FAIL_COMBINATION_RECORD_STATUS_NOT_SUCCESS);
             }
         }
         // 订单类类型：砍价
         if (Objects.equals(TradeOrderTypeEnum.BARGAIN.getType(), order.getType())) {
             // 校验订单砍价是否成功
-            if (bargainRecordApi.validateRecordSuccess(order.getUserId(), order.getId())) {
+            if (bargainRecordApi.isBargainRecordSuccess(order.getUserId(), order.getId())) {
                 throw exception(ORDER_DELIVERY_FAIL_BARGAIN_RECORD_STATUS_NOT_SUCCESS);
             }
         }
@@ -474,7 +475,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean receiveOrder(Long userId, Long id) {
+    public void receiveOrder(Long userId, Long id) {
         // 校验并获得交易订单（可收货）
         TradeOrderDO order = validateOrderReceivable(userId, id);
 
@@ -489,7 +490,6 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // TODO 芋艿：lili 发送订单变化的消息
 
         // TODO 芋艿：lili 发送商品被购买完成的数据
-        return Boolean.TRUE;
     }
 
     /**

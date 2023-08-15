@@ -16,6 +16,7 @@ public class TradeOrderDeliveryReqVO {
     @NotNull(message = "订单编号不能为空")
     private Long id;
 
+    // TODO @puhui999：可以去掉 type；如果无需发货，则 logisticsId 传递 0；logisticsNo 传递空串
     @Schema(description = "发货类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     @InEnum(DeliveryTypeEnum.class)
     @NotNull(message = "发货类型不能为空")
@@ -28,6 +29,5 @@ public class TradeOrderDeliveryReqVO {
     @Schema(description = "发货物流单号", example = "SF123456789")
     @NotEmpty(message = "发货物流单号不能为空")
     private String logisticsNo;
-
 
 }

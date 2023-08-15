@@ -12,12 +12,12 @@ import org.springframework.stereotype.Service;
 public class BargainRecordApiImpl implements BargainRecordApi {
 
     @Override
-    public void createRecord(BargainRecordCreateReqDTO reqDTO) {
+    public void createBargainRecord(BargainRecordCreateReqDTO reqDTO) {
 
     }
 
     @Override
-    public boolean validateRecordSuccess(Long userId, Long orderId) {
+    public boolean isBargainRecordSuccess(Long userId, Long orderId) {
         return false;
     }
 

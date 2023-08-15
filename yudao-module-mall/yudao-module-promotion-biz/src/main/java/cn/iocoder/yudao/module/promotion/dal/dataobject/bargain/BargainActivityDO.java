@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.dal.dataobject.bargain;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -38,7 +39,6 @@ public class BargainActivityDO extends BaseDO {
      * 活动开始时间
      */
     private LocalDateTime startTime;
-
     /**
      * 活动结束时间
      */
@@ -46,6 +46,8 @@ public class BargainActivityDO extends BaseDO {
 
     /**
      * 活动状态
+     *
+     * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
 
@@ -66,10 +68,14 @@ public class BargainActivityDO extends BaseDO {
      */
     private Integer bargainPrice;
     /**
+     * 砍价活动库存
+     */
+    private Integer stock;
+
+    /**
      * 达到该人数，才能砍到低价
      */
     private Integer userSize;
-
     /**
      * 最大帮砍次数
      */
@@ -79,22 +85,14 @@ public class BargainActivityDO extends BaseDO {
      * 总限购数量
      */
     private Integer totalLimitCount;
-
-    /**
-     * 砍价活动库存
-     */
-    private Integer stock;
-
     /**
      * 用户每次砍价的最小金额，单位：分
      */
     private Integer randomMinPrice;
-
     /**
      * 用户每次砍价的最大金额，单位：分
      */
     private Integer randomMaxPrice;
-
     /**
      * 砍价成功数量
      */

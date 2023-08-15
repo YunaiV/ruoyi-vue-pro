@@ -3,8 +3,7 @@ package cn.iocoder.yudao.module.promotion.controller.admin.bargain;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
-import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityBaseVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityUpdateReqVO;
@@ -32,13 +31,10 @@ public class BargainActivityController {
     @Resource
     private BargainActivityService activityService;
 
-    @Resource
-    private ProductSpuApi productSpuApi;
-
     @PostMapping("/create")
     @Operation(summary = "创建砍价活动")
     @PreAuthorize("@ss.hasPermission('promotion:bargain-activity:create')")
-    public CommonResult<Long> createBargainActivity(@Valid @RequestBody BargainActivityBaseVO createReqVO) {
+    public CommonResult<Long> createBargainActivity(@Valid @RequestBody BargainActivityCreateReqVO createReqVO) {
         return success(activityService.createBargainActivity(createReqVO));
     }
 

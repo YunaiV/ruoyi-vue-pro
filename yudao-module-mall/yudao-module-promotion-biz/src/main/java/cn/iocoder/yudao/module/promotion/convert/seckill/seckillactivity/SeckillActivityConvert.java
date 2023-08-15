@@ -40,24 +40,24 @@ public interface SeckillActivityConvert {
 
     PageResult<SeckillActivityRespVO> convertPage(PageResult<SeckillActivityDO> page);
 
-    default PageResult<SeckillActivityRespVO> convertPage(PageResult<SeckillActivityDO> page, List<SeckillProductDO> seckillProducts, List<ProductSpuRespDTO> spuList) {
-        Map<Long, ProductSpuRespDTO> spuMap = CollectionUtils.convertMap(spuList, ProductSpuRespDTO::getId);
+    default PageResult<SeckillActivityRespVO> convertPage(PageResult<SeckillActivityDO> page,
+                                                          List<SeckillProductDO> seckillProducts,
+                                                          List<ProductSpuRespDTO> spuList) {
         PageResult<SeckillActivityRespVO> pageResult = convertPage(page);
+        // 拼接商品
+        Map<Long, ProductSpuRespDTO> spuMap = CollectionUtils.convertMap(spuList, ProductSpuRespDTO::getId);
         pageResult.getList().forEach(item -> {
-            MapUtils.findAndThen(spuMap, item.getSpuId(), spu -> {
-                item.setSpuName(spu.getName());
-                item.setPicUrl(spu.getPicUrl());
-            });
-
             item.setProducts(convertList2(seckillProducts));
+            MapUtils.findAndThen(spuMap, item.getSpuId(),
+                    spu -> item.setSpuName(spu.getName()).setPicUrl(spu.getPicUrl()));
         });
         return pageResult;
     }
 
-    SeckillActivityDetailRespVO convert1(SeckillActivityDO seckillActivity);
+    SeckillActivityDetailRespVO convert1(SeckillActivityDO activity);
 
-    default SeckillActivityDetailRespVO convert(SeckillActivityDO seckillActivity, List<SeckillProductDO> seckillProducts) {
-        return convert1(seckillActivity).setProducts(convertList2(seckillProducts));
+    default SeckillActivityDetailRespVO convert(SeckillActivityDO activity, List<SeckillProductDO> products) {
+        return convert1(activity).setProducts(convertList2(products));
     }
 
     @Mappings({
@@ -77,6 +77,6 @@ public interface SeckillActivityConvert {
         return CollectionUtils.convertList(products, item -> convert(activity, item).setActivityStatus(activity.getStatus()));
     }
 
-    List<SeckillProductRespVO> convertList2(List<SeckillProductDO> productDOs);
+    List<SeckillProductRespVO> convertList2(List<SeckillProductDO> list);
 
 }

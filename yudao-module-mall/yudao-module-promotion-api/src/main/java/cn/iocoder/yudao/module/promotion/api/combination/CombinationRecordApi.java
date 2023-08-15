@@ -21,7 +21,7 @@ public interface CombinationRecordApi {
      *
      * @param reqDTO 请求 DTO
      */
-    void createRecord(@Valid CombinationRecordCreateReqDTO reqDTO);
+    void createCombinationRecord(@Valid CombinationRecordCreateReqDTO reqDTO);
 
     /**
      * 查询拼团记录是否成功
@@ -30,7 +30,7 @@ public interface CombinationRecordApi {
      * @param orderId 订单编号
      * @return 拼团是否成功
      */
-    boolean validateRecordSuccess(Long userId, Long orderId);
+    boolean isCombinationRecordSuccess(Long userId, Long orderId);
 
     /**
      * 获取拼团记录

@@ -23,12 +23,12 @@ public class CombinationRecordApiImpl implements CombinationRecordApi {
     private CombinationRecordService recordService;
 
     @Override
-    public void createRecord(CombinationRecordCreateReqDTO reqDTO) {
+    public void createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {
         recordService.createCombinationRecord(reqDTO);
     }
 
     @Override
-    public boolean validateRecordSuccess(Long userId, Long orderId) {
+    public boolean isCombinationRecordSuccess(Long userId, Long orderId) {
         return CombinationRecordStatusEnum.isSuccess(recordService.getCombinationRecord(userId, orderId).getStatus());
     }
 
