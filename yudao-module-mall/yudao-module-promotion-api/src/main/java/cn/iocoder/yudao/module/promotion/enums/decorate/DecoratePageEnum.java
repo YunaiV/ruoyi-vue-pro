@@ -17,12 +17,13 @@ public enum DecoratePageEnum implements IntArrayValuable {
 
     INDEX(1, "首页");
 
-    private static final int[] ARRAYS = Arrays.stream(values()).mapToInt(DecoratePageEnum::getId).toArray();
+    private static final int[] ARRAYS = Arrays.stream(values()).mapToInt(DecoratePageEnum::getPage).toArray();
 
     /**
-     * 页面 id
+     * 页面编号
      */
-    private final Integer id;
+    private final Integer page;
+
     /**
      * 页面名称
      */

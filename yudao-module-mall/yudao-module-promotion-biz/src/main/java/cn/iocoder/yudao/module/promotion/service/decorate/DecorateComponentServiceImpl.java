@@ -1,19 +1,13 @@
 package cn.iocoder.yudao.module.promotion.service.decorate;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.promotion.controller.admin.decorate.vo.DecorateComponentSaveReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.decorate.vo.DecorateComponentSaveReqVO.ComponentReqVO;
+import cn.iocoder.yudao.module.promotion.convert.decorate.DecorateComponentConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.decorate.DecorateComponentDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.decorate.DecorateComponentMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.module.promotion.convert.decorate.DecorateComponentConvert.INSTANCE;
 
 /**
  * 装修组件 Service 实现
@@ -27,22 +21,20 @@ public class DecorateComponentServiceImpl implements DecorateComponentService {
     private DecorateComponentMapper decorateComponentMapper;
 
     @Override
-    public void savePageComponents(DecorateComponentSaveReqVO reqVO) {
-        // 1.新增或修改页面组件
-        List<DecorateComponentDO> oldList = decorateComponentMapper.selectByPage(reqVO.getPageId());
-
-        decorateComponentMapper.saveOrUpdateBatch(INSTANCE.convertList(reqVO.getPageId(), reqVO.getComponents()));
-        // 2.删除相关组件
-        Set<Long> deleteIds = convertSet(oldList, DecorateComponentDO::getId);
-        deleteIds.removeAll(convertSet(reqVO.getComponents(), ComponentReqVO::getId, vo->Objects.nonNull(vo.getId())));
-        if (CollUtil.isNotEmpty(deleteIds)) {
-            decorateComponentMapper.deleteBatchIds(deleteIds);
+    public void saveDecorateComponent(DecorateComponentSaveReqVO reqVO) {
+        // 1. 如果存在，则进行更新
+        DecorateComponentDO dbComponent = decorateComponentMapper.selectByPageAndCode(reqVO.getPage(), reqVO.getCode());
+        if (dbComponent != null) {
+            decorateComponentMapper.updateById(DecorateComponentConvert.INSTANCE.convert(reqVO).setId(dbComponent.getId()));
+            return;
         }
+        // 2. 不存在，则进行新增
+        decorateComponentMapper.insert(DecorateComponentConvert.INSTANCE.convert(reqVO));
     }
 
     @Override
-    public List<DecorateComponentDO> getPageComponents(Integer pageId) {
-        return decorateComponentMapper.selectByPage(pageId);
+    public List<DecorateComponentDO> getDecorateComponentListByPage(Integer page, Integer status) {
+        return decorateComponentMapper.selectListByPageAndStatus(page, status);
     }
 
 }

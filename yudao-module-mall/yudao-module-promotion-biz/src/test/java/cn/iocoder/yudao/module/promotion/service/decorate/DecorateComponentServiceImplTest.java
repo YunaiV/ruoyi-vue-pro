@@ -12,7 +12,7 @@ import org.mockito.Mockito;
 import java.util.ArrayList;
 import java.util.List;
 
-import static cn.iocoder.yudao.module.promotion.enums.decorate.DecorateComponentEnum.ROLLING_BANNER;
+import static cn.iocoder.yudao.module.promotion.enums.decorate.DecorateComponentEnum.ROLLING_NEWS;
 import static cn.iocoder.yudao.module.promotion.enums.decorate.DecoratePageEnum.INDEX;
 import static org.mockito.ArgumentMatchers.eq;
 
@@ -37,10 +37,10 @@ public class DecorateComponentServiceImplTest extends BaseMockitoUnitTest {
     void testResp(){
         List<DecorateComponentDO> list = new ArrayList<>(1);
         DecorateComponentDO decorateDO = new DecorateComponentDO()
-                .setPageId(INDEX.getId()).setValue("")
-                .setCode(ROLLING_BANNER.getCode()).setId(1L);
+                .setPage(INDEX.getPage()).setValue("")
+                .setCode(ROLLING_NEWS.getCode()).setId(1L);
         list.add(decorateDO);
         //mock 方法
-        Mockito.when(decorateComponentMapper.selectByPage(eq(1))).thenReturn(list);
+        Mockito.when(decorateComponentMapper.selectListByPageAndStatus(eq(1))).thenReturn(list);
     }
 }
