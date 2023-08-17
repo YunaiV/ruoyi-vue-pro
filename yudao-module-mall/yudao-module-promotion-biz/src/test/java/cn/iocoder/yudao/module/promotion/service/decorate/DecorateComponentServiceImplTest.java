@@ -7,16 +7,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static cn.iocoder.yudao.module.promotion.enums.decorate.DecorateComponentEnum.ROLLING_NEWS;
 import static cn.iocoder.yudao.module.promotion.enums.decorate.DecoratePageEnum.INDEX;
-import static org.mockito.ArgumentMatchers.eq;
 
-// TODO @芋艿：后续 review 下
+// TODO 待完成  @芋艿：后续 review 下
 /**
  * @author jason
  */
@@ -41,6 +39,6 @@ public class DecorateComponentServiceImplTest extends BaseMockitoUnitTest {
                 .setCode(ROLLING_NEWS.getCode()).setId(1L);
         list.add(decorateDO);
         //mock 方法
-        Mockito.when(decorateComponentMapper.selectListByPageAndStatus(eq(1))).thenReturn(list);
+        //Mockito.when(decorateComponentMapper.selectListByPageAndStatus(eq(1))).thenReturn(list);
     }
 }
