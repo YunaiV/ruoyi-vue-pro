@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSa
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSalePageItemRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.base.property.AppProductPropertyValueDetailRespVO;
 import cn.iocoder.yudao.module.trade.enums.aftersale.AfterSaleOperateTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleWayEnum;
 import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.annotations.AfterSaleLog;
 import cn.iocoder.yudao.module.trade.service.aftersale.TradeAfterSaleService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -76,6 +79,17 @@ public class AppTradeAfterSaleController {
 
         return success(new PageResult<>(Arrays.asList(vo), 1L));
 //        return success(afterSaleService.getAfterSalePage(getLoginUserId()));
+    }
+
+    // TODO 芋艿：待实现
+    @GetMapping(value = "/get-reason-list")
+    @Operation(summary = "获得售后原因")
+    @Parameter(name = "way", description = "售后类型", required = true, example = "10")
+    public CommonResult<List<String>> getAfterSaleReasonList(@RequestParam("way") Integer way) {
+        if (Objects.equals(TradeAfterSaleWayEnum.REFUND.getWay(), way)) {
+            return success(Arrays.asList("不想要了", "商品质量问题", "商品描述不符"));
+        }
+        return success(Arrays.asList("不想要了", "商品质量问题", "商品描述不符", "商品错发漏发", "商品包装破损"));
     }
 
     @PostMapping(value = "/create")

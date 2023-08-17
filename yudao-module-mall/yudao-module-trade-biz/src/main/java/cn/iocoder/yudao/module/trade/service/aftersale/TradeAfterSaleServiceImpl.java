@@ -148,8 +148,8 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
 
         // 更新交易订单项的售后状态
         tradeOrderUpdateService.updateOrderItemAfterSaleStatus(orderItem.getId(),
-                TradeOrderItemAfterSaleStatusEnum.NONE.getStatus(),
-                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), null);
+                TradeOrderItemAfterSaleStatusEnum.NONE.getStatus(), TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(),
+                afterSale.getId(), null);
 
         // 记录售后日志
         createAfterSaleLog(orderItem.getUserId(), UserTypeEnum.MEMBER.getValue(),
@@ -200,8 +200,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
 
         // 更新交易订单项的售后状态为【未申请】
         tradeOrderUpdateService.updateOrderItemAfterSaleStatus(afterSale.getOrderItemId(),
-                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(),
-                TradeOrderItemAfterSaleStatusEnum.NONE.getStatus(), null);
+                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), TradeOrderItemAfterSaleStatusEnum.NONE.getStatus());
     }
 
     /**
@@ -295,8 +294,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
 
         // 更新交易订单项的售后状态为【未申请】
         tradeOrderUpdateService.updateOrderItemAfterSaleStatus(afterSale.getOrderItemId(),
-                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(),
-                TradeOrderItemAfterSaleStatusEnum.NONE.getStatus(), null);
+                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), TradeOrderItemAfterSaleStatusEnum.NONE.getStatus());
     }
 
     /**
@@ -343,8 +341,8 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
 
         // 更新交易订单项的售后状态为【已完成】
         tradeOrderUpdateService.updateOrderItemAfterSaleStatus(afterSale.getOrderItemId(),
-                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(),
-                TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus(), afterSale.getRefundPrice());
+                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus(),
+                null, afterSale.getRefundPrice());
     }
 
     private void createPayRefund(String userIp, TradeAfterSaleDO afterSale) {
@@ -385,8 +383,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
 
         // 更新交易订单项的售后状态为【未申请】
         tradeOrderUpdateService.updateOrderItemAfterSaleStatus(afterSale.getOrderItemId(),
-                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(),
-                TradeOrderItemAfterSaleStatusEnum.NONE.getStatus(), null);
+                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), TradeOrderItemAfterSaleStatusEnum.NONE.getStatus());
     }
 
     @Deprecated

@@ -30,7 +30,7 @@ public class AppDecorateController {
     @Resource
     private DecorateComponentService decorateComponentService;
 
-    @GetMapping("/get-component-list")
+    @GetMapping("/list")
     @Operation(summary = "获取指定页面的组件列表")
     @Parameter(name = "page", description = "页面编号", required = true)
     public CommonResult<List<AppDecorateComponentRespVO>> getDecorateComponentListByPage(

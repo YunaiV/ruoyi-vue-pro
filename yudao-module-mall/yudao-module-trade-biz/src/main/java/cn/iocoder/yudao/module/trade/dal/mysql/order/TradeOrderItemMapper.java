@@ -12,8 +12,9 @@ import java.util.List;
 @Mapper
 public interface TradeOrderItemMapper extends BaseMapperX<TradeOrderItemDO> {
 
-    default int updateAfterSaleStatus(Long id, Integer oldAfterSaleStatus, Integer newAfterSaleStatus) {
-        return update(new TradeOrderItemDO().setAfterSaleStatus(newAfterSaleStatus),
+    default int updateAfterSaleStatus(Long id, Integer oldAfterSaleStatus, Integer newAfterSaleStatus,
+                                      Long afterSaleId) {
+        return update(new TradeOrderItemDO().setAfterSaleStatus(newAfterSaleStatus).setAfterSaleId(afterSaleId),
                 new LambdaUpdateWrapper<>(new TradeOrderItemDO().setId(id).setAfterSaleStatus(oldAfterSaleStatus)));
     }
 

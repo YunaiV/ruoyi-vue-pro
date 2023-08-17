@@ -514,15 +514,22 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     // =================== Order Item ===================
 
     @Override
-    public void updateOrderItemAfterSaleStatus(Long id, Integer oldAfterSaleStatus, Integer newAfterSaleStatus, Integer refundPrice) {
+    @Transactional(rollbackFor = Exception.class)
+    public void updateOrderItemAfterSaleStatus(Long id, Integer oldAfterSaleStatus, Integer newAfterSaleStatus,
+                                               Long afterSaleId, Integer refundPrice) {
         // 如果退款成功，则 refundPrice 非空
         if (Objects.equals(newAfterSaleStatus, TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus())
                 && refundPrice == null) {
             throw new IllegalArgumentException(StrUtil.format("id({}) 退款成功，退款金额不能为空", id));
         }
+        // 如果退款发起，则 afterSaleId 非空
+        if (Objects.equals(newAfterSaleStatus, TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus())
+                && afterSaleId == null) {
+            throw new IllegalArgumentException(StrUtil.format("id({}) 退款发起，售后单编号不能为空", id));
+        }
 
         // 更新订单项
-        int updateCount = tradeOrderItemMapper.updateAfterSaleStatus(id, oldAfterSaleStatus, newAfterSaleStatus);
+        int updateCount = tradeOrderItemMapper.updateAfterSaleStatus(id, oldAfterSaleStatus, newAfterSaleStatus, afterSaleId);
         if (updateCount <= 0) {
             throw exception(ORDER_ITEM_UPDATE_AFTER_SALE_STATUS_FAIL);
         }
