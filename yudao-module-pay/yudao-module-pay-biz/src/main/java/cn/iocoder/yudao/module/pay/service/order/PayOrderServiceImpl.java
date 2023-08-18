@@ -39,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -345,7 +346,8 @@ public class PayOrderServiceImpl implements PayOrderService {
                         .channelId(channel.getId()).channelCode(channel.getCode())
                         .successTime(notify.getSuccessTime()).extensionId(orderExtension.getId()).no(orderExtension.getNo())
                         .channelOrderNo(notify.getChannelOrderNo()).channelUserId(notify.getChannelUserId())
-                        .channelFeeRate(channel.getFeeRate()).channelFeePrice(MoneyUtils.calculateRatePrice(order.getPrice(), channel.getFeeRate()))
+                        .channelFeeRate(channel.getFeeRate())
+		                .channelFeePrice(MoneyUtils.calculateRatePrice(order.getPrice(), channel.getFeeRate(), 0, RoundingMode.HALF_UP).intValue())
                         .build());
         if (updateCounts == 0) { // 校验状态，必须是待支付
             throw exception(ORDER_STATUS_IS_NOT_WAITING);
