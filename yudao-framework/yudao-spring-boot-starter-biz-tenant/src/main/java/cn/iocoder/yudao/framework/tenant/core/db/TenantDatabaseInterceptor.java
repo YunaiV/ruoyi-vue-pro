@@ -19,14 +19,17 @@ public class TenantDatabaseInterceptor implements TenantLineHandler {
 
     private final Set<String> ignoreTables = new HashSet<>();
 
-    public TenantDatabaseInterceptor(TenantProperties properties) {
-        // 不同 DB 下，大小写的习惯不同，所以需要都添加进去
-        properties.getIgnoreTables().forEach(table -> {
-            ignoreTables.add(table.toLowerCase());
-            ignoreTables.add(table.toUpperCase());
-        });
+    public TenantDatabaseInterceptor(TenantProperties tenantProperties) {
+        // 添加配置中需要忽略的表
+        tenantProperties.getIgnoreTables().forEach(this::addIgnoreTable);
         // 在 OracleKeyGenerator 中，生成主键时，会查询这个表，查询这个表后，会自动拼接 TENANT_ID 导致报错
         ignoreTables.add("DUAL");
+    }
+
+    public void addIgnoreTable(String table) {
+        // 不同 DB 下，大小写的习惯不同，所以需要都添加进去
+        ignoreTables.add(table.toLowerCase());
+        ignoreTables.add(table.toUpperCase());
     }
 
     @Override
