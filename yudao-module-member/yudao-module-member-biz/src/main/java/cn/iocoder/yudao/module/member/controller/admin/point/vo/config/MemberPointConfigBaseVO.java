@@ -14,7 +14,7 @@ public class MemberPointConfigBaseVO {
 
     private Long id;
 
-    @Schema(description = "积分抵扣开关", required = true, example = "true")
+    @Schema(description = "积分抵扣开关", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     private Boolean tradeDeductEnable;
 
     @Schema(description = "积分抵扣，单位：分", example = "13506")

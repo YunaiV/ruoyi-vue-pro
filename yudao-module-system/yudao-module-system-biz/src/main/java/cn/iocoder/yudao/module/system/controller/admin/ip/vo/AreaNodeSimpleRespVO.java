@@ -7,13 +7,13 @@ import lombok.Data;
 @Data
 public class AreaNodeSimpleRespVO {
 
-    @Schema(description = "编号", required = true, example = "110000")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "110000")
     private Integer id;
 
-    @Schema(description = "名字", required = true, example = "北京")
+    @Schema(description = "名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "北京")
     private String name;
 
-    @Schema(description = "是否叶子节点", required = false, example = "false")
+    @Schema(description = "是否叶子节点", example = "false")
     private Boolean leaf;
 
 }
