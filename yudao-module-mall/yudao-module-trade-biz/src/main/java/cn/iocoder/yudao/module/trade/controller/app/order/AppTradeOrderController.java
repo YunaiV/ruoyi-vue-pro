@@ -118,11 +118,8 @@ public class AppTradeOrderController {
         // 查询订单项
         List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(
                 convertSet(pageResult.getList(), TradeOrderDO::getId));
-        // 查询商品属性
-        List<ProductPropertyValueDetailRespDTO> propertyValueDetails = productPropertyValueApi
-                .getPropertyValueDetailList(TradeOrderConvert.INSTANCE.convertPropertyValueIds(orderItems));
         // 最终组合
-        return success(TradeOrderConvert.INSTANCE.convertPage02(pageResult, orderItems, propertyValueDetails));
+        return success(TradeOrderConvert.INSTANCE.convertPage02(pageResult, orderItems));
     }
 
     @GetMapping("/get-count")
