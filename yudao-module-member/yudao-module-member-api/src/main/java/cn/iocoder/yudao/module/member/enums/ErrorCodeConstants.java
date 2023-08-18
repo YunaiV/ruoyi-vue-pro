@@ -34,4 +34,9 @@ public interface ErrorCodeConstants {
 
     ErrorCode SIGN_IN_RECORD_NOT_EXISTS = new ErrorCode(1004005006, "用户签到积分不存在");
 
+
+    //========== 会员标签 1004006000 ==========
+    ErrorCode TAG_NOT_EXISTS = new ErrorCode(1004006000, "会员标签不存在");
+    ErrorCode TAG_NAME_EXISTS = new ErrorCode(1004006001, "会员标签已经存在");
+
 }
