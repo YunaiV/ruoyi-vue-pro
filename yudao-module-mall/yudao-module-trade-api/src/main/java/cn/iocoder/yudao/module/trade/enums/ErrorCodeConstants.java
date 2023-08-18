@@ -45,7 +45,8 @@ public interface ErrorCodeConstants {
     ErrorCode AFTER_SALE_DELIVERY_FAIL_STATUS_NOT_SELLER_AGREE = new ErrorCode(1011000108, "退货失败，售后单状态不处于【待买家退货】");
     ErrorCode AFTER_SALE_CONFIRM_FAIL_STATUS_NOT_BUYER_DELIVERY = new ErrorCode(1011000109, "确认收货失败，售后单状态不处于【待确认收货】");
     ErrorCode AFTER_SALE_REFUND_FAIL_STATUS_NOT_WAIT_REFUND = new ErrorCode(1011000110, "退款失败，售后单状态不是【待退款】");
-    ErrorCode AFTER_SALE_CANCEL_FAIL_STATUS_NOT_APPLY_OR_AGREE = new ErrorCode(1011000111, "取消售后单失败，售后单状态不是【待审核】或【卖家同意】");
+    ErrorCode AFTER_SALE_CANCEL_FAIL_STATUS_NOT_APPLY_OR_AGREE_OR_BUYER_DELIVERY =
+            new ErrorCode(1011000111, "取消售后单失败，售后单状态不是【待审核】或【卖家同意】或【商家待收货】");
 
     // ==========  Cart 模块 1011002000 ==========
     ErrorCode CARD_ITEM_NOT_FOUND = new ErrorCode(1011002000, "购物车项不存在");

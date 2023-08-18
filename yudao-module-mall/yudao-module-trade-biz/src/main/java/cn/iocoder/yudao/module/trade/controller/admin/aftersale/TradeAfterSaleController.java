@@ -3,10 +3,10 @@ package cn.iocoder.yudao.module.trade.controller.admin.aftersale;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
-import cn.iocoder.yudao.module.product.api.property.ProductPropertyValueApi;
-import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
+import cn.iocoder.yudao.module.pay.api.notify.dto.PayRefundNotifyReqDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleDisagreeReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSalePageReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleRefuseReqVO;
@@ -23,8 +23,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -32,7 +32,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
-@Tag(name = "管理后台 - 交易售后")
+@Tag(name = "管理后台 - 售后订单")
 @RestController
 @RequestMapping("/trade/after-sale")
 @Validated
@@ -44,11 +44,9 @@ public class TradeAfterSaleController {
 
     @Resource
     private MemberUserApi memberUserApi;
-    @Resource
-    private ProductPropertyValueApi productPropertyValueApi;
 
     @GetMapping("/page")
-    @Operation(summary = "获得交易售后分页")
+    @Operation(summary = "获得售后订单分页")
     @PreAuthorize("@ss.hasPermission('trade:after-sale:query')")
     public CommonResult<PageResult<TradeAfterSaleRespPageItemVO>> getAfterSalePage(@Valid TradeAfterSalePageReqVO pageVO) {
         // 查询售后
@@ -57,13 +55,10 @@ public class TradeAfterSaleController {
             return success(PageResult.empty());
         }
 
-        // 查询商品属性
-        List<ProductPropertyValueDetailRespDTO> propertyValueDetails = productPropertyValueApi
-                .getPropertyValueDetailList(TradeAfterSaleConvert.INSTANCE.convertPropertyValueIds(pageResult.getList()));
         // 查询会员
         Map<Long, MemberUserRespDTO> memberUsers = memberUserApi.getUserMap(
                 convertSet(pageResult.getList(), TradeAfterSaleDO::getUserId));
-        return success(TradeAfterSaleConvert.INSTANCE.convertPage(pageResult, memberUsers, propertyValueDetails));
+        return success(TradeAfterSaleConvert.INSTANCE.convertPage(pageResult, memberUsers));
     }
 
     @PutMapping("/agree")
@@ -101,12 +96,23 @@ public class TradeAfterSaleController {
         return success(true);
     }
 
-    @PostMapping("/refund")
+    @PutMapping("/refund")
     @Operation(summary = "确认退款")
     @Parameter(name = "id", description = "售后编号", required = true, example = "1")
     @PreAuthorize("@ss.hasPermission('trade:after-sale:refund')")
     public CommonResult<Boolean> refundAfterSale(@RequestParam("id") Long id) {
         afterSaleService.refundAfterSale(getLoginUserId(), getClientIP(), id);
+        return success(true);
+    }
+
+    @PostMapping("/update-refunded")
+    @Operation(summary = "更新售后订单为已退款") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
+    @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
+    @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
+    public CommonResult<Boolean> updateAfterRefund(@RequestBody PayRefundNotifyReqDTO notifyReqDTO) {
+        // 目前业务逻辑，不需要做任何事情
+        // 当然，退款会有小概率会失败的情况，可以监控失败状态，进行告警
+        log.info("[updateAfterRefund][notifyReqDTO({})]", notifyReqDTO);
         return success(true);
     }
 

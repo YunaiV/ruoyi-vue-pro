@@ -7,9 +7,9 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Schema(description = "用户 App - 交易售后的分页项 Request VO")
+@Schema(description = "用户 App - 交易售后 Response VO")
 @Data
-public class AppTradeAfterSalePageItemRespVO {
+public class AppTradeAfterSaleRespVO {
 
     @Schema(description = "售后编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;

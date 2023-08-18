@@ -2,3 +2,32 @@
 GET {{baseUrl}}/trade/after-sale/page?pageNo=1&pageSize=10
 Authorization: Bearer {{token}}
 tenant-id: {{adminTenentId}}
+
+### 同意售后 => 成功
+PUT {{baseUrl}}/trade/after-sale/agree?id=7
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+Content-Type: application/json
+
+### 拒绝售后 => 成功
+PUT {{baseUrl}}/trade/after-sale/disagree
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+Content-Type: application/json
+
+{
+  "id": 6,
+  "auditReason": "阿巴巴"
+}
+
+### 确认退款 => 成功
+PUT {{baseUrl}}/trade/after-sale/refund?id=6
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+Content-Type: application/json
+
+### 确认收货 => 成功
+PUT {{baseUrl}}/trade/after-sale/receive?id=7
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+Content-Type: application/json

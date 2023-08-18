@@ -1,14 +1,14 @@
 package cn.iocoder.yudao.module.trade.service.delivery;
 
-import java.util.*;
-import javax.validation.*;
-
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.express.DeliveryExpressCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.express.DeliveryExpressExportReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.express.DeliveryExpressPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.express.DeliveryExpressUpdateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
+
+import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 快递公司 Service 接口
@@ -48,14 +48,6 @@ public interface DeliveryExpressService {
     DeliveryExpressDO getDeliveryExpress(Long id);
 
     /**
-     * 获得快递公司列表
-     *
-     * @param ids 编号
-     * @return 快递公司列表
-     */
-    List<DeliveryExpressDO> getDeliveryExpressList(Collection<Long> ids);
-
-    /**
      * 获得快递公司分页
      *
      * @param pageReqVO 分页查询
@@ -70,5 +62,13 @@ public interface DeliveryExpressService {
      * @return 快递公司列表
      */
     List<DeliveryExpressDO> getDeliveryExpressList(DeliveryExpressExportReqVO exportReqVO);
+
+    /**
+     * 获得快递公司列表
+     *
+     * @param status 状态
+     * @return 快递公司列表
+     */
+    List<DeliveryExpressDO> getDeliveryExpressList(Integer status);
 
 }

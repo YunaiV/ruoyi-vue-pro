@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.dal.mysql.aftersale;
 
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -23,13 +24,20 @@ public interface TradeAfterSaleMapper extends BaseMapperX<TradeAfterSaleDO> {
                 .orderByDesc(TradeAfterSaleDO::getId));
     }
 
+    default PageResult<TradeAfterSaleDO> selectPage(Long userId, PageParam pageParam) {
+        return selectPage(pageParam, new LambdaQueryWrapperX<TradeAfterSaleDO>()
+                .eqIfPresent(TradeAfterSaleDO::getUserId, userId)
+                .orderByDesc(TradeAfterSaleDO::getId));
+    }
+
     default int updateByIdAndStatus(Long id, Integer status, TradeAfterSaleDO update) {
         return update(update, new LambdaUpdateWrapper<TradeAfterSaleDO>()
                 .eq(TradeAfterSaleDO::getId, id).eq(TradeAfterSaleDO::getStatus, status));
     }
 
-    default TradeAfterSaleDO selectByPayRefundId(Long payRefundId) {
-        return selectOne(TradeAfterSaleDO::getPayRefundId, payRefundId);
+    default TradeAfterSaleDO selectByIdAndUserId(Long id, Long userId) {
+        return selectOne(TradeAfterSaleDO::getId, id,
+                TradeAfterSaleDO::getUserId, userId);
     }
 
 }
