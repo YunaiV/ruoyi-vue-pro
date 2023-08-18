@@ -52,6 +52,9 @@ public class AppTradeOrderItemRespVO {
 
     // ========== 售后基本信息 ==========
 
+    @Schema(description = "售后编号", example = "1024")
+    private Long afterSaleId;
+
     @Schema(description = "售后状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer afterSaleStatus;
 
