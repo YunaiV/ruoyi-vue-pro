@@ -20,10 +20,9 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-// TODO @xiaqing：url 使用 member 作为前缀
 @Tag(name = "管理后台 - 积分签到规则")
 @RestController
-@RequestMapping("/point/sign-in-config")
+@RequestMapping("/member/point/sign-in-config")
 @Validated
 public class MemberSignInConfigController {
 

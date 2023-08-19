@@ -25,10 +25,9 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
-// TODO @xiaqing：url 使用 member 作为前缀
 @Tag(name = "管理后台 - 用户签到积分")
 @RestController
-@RequestMapping("/point/sign-in-record")
+@RequestMapping("/member/point/sign-in-record")
 @Validated
 public class MemberSignInRecordController {
 
