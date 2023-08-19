@@ -95,7 +95,7 @@ public class SmsSendServiceImpl implements SmsSendService {
         // 创建发送日志。如果模板被禁用，则不发送短信，只记录日志
         Boolean isSend = CommonStatusEnum.ENABLE.getStatus().equals(template.getStatus())
                 && CommonStatusEnum.ENABLE.getStatus().equals(smsChannel.getStatus());
-        ;
+
         String content = smsTemplateService.formatSmsTemplateContent(template.getContent(), templateParams);
         Long sendLogId = smsLogService.createSmsLog(mobile, userId, userType, isSend, template, content, templateParams);
 

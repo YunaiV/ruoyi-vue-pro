@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.pay.dal.mysql.app;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.pay.controller.admin.app.vo.PayAppPageReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import org.apache.ibatis.annotations.Mapper;

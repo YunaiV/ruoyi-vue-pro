@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.system.dal.dataobject.notify;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -11,7 +10,6 @@ import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Map;
 
 /**

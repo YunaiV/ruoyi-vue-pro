@@ -14,7 +14,6 @@ import org.mapstruct.factory.Mappers;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * 支付应用信息 Convert
