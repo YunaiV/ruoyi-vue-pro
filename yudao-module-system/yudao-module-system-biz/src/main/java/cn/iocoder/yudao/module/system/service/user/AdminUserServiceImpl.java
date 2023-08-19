@@ -53,6 +53,9 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Value("${sys.user.init-password:yudaoyuanma}")
     private String userInitPassword;
 
+    @Value("${yudao.web.admin-user}")
+    private Long adminId;
+
     @Resource
     private AdminUserMapper userMapper;
 
@@ -181,6 +184,10 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     @Override
     public void updateUserStatus(Long id, Integer status) {
+        // 校验不可停用超级管理员
+        if (isSuperAdmin(id) && CommonStatusEnum.DISABLE.getStatus().equals(status)) {
+            throw exception(USER_DISABLE_SUPER_ADMIN);
+        }
         // 校验用户存在
         validateUserExists(id);
         // 更新状态
@@ -193,6 +200,10 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteUser(Long id) {
+        // 校验不能删除超级管理员
+        if (isSuperAdmin(id)) {
+            throw exception(USER_DEL_SUPER_ADMIN);
+        }
         // 校验用户存在
         validateUserExists(id);
         // 删除用户
@@ -451,6 +462,14 @@ public class AdminUserServiceImpl implements AdminUserService {
      */
     private String encodePassword(String password) {
         return passwordEncoder.encode(password);
+    }
+
+    /**
+     * 判断是否为超级管理员
+     * @param userId 用户Id
+     */
+    private boolean isSuperAdmin(Long userId) {
+        return adminId.equals(userId);
     }
 
 }

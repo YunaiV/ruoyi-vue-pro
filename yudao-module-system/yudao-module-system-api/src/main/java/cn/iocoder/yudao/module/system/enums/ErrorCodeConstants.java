@@ -42,6 +42,8 @@ public interface ErrorCodeConstants {
     ErrorCode USER_PASSWORD_FAILED = new ErrorCode(1002003005, "用户密码校验失败");
     ErrorCode USER_IS_DISABLE = new ErrorCode(1002003006, "名字为【{}】的用户已被禁用");
     ErrorCode USER_COUNT_MAX = new ErrorCode(1002003008, "创建用户失败，原因：超过租户最大租户配额({})！");
+    ErrorCode USER_DEL_SUPER_ADMIN = new ErrorCode(1002003009, "不能删除超级管理员用户");
+    ErrorCode USER_DISABLE_SUPER_ADMIN = new ErrorCode(1002003010, "不能停用超级管理员用户");
 
     // ========== 部门模块 1002004000 ==========
     ErrorCode DEPT_NAME_DUPLICATE = new ErrorCode(1002004000, "已经存在该名字的部门");
