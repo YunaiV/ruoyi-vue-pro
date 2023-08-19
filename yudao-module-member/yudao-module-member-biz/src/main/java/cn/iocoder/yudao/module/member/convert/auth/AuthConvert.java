@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.member.controller.app.social.vo.AppSocialUserUnbi
 import cn.iocoder.yudao.module.system.api.oauth2.dto.OAuth2AccessTokenRespDTO;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeSendReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeUseReqDTO;
+import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeValidateReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserUnbindReqDTO;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
@@ -24,5 +25,7 @@ public interface AuthConvert {
     SmsCodeUseReqDTO convert(AppAuthSmsLoginReqVO reqVO, Integer scene, String usedIp);
 
     AppAuthLoginRespVO convert(OAuth2AccessTokenRespDTO bean);
+
+    SmsCodeValidateReqDTO convert(AppAuthSmsValidateReqVO bean);
 
 }

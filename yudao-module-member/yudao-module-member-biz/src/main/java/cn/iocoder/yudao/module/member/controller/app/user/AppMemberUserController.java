@@ -30,14 +30,6 @@ public class AppMemberUserController {
     @Resource
     private MemberUserService userService;
 
-    @PutMapping("/update")
-    @Operation(summary = "修改基本信息")
-    @PreAuthenticated
-    public CommonResult<Boolean> updateUser(@RequestBody @Valid AppMemberUserUpdateReqVO reqVO) {
-        userService.updateUser(getLoginUserId(), reqVO);
-        return success(true);
-    }
-
     @GetMapping("/get")
     @Operation(summary = "获得基本信息")
     @PreAuthenticated
@@ -46,10 +38,18 @@ public class AppMemberUserController {
         return success(MemberUserConvert.INSTANCE.convert(user));
     }
 
-    @PostMapping("/update-mobile")
+    @PutMapping("/update")
+    @Operation(summary = "修改基本信息")
+    @PreAuthenticated
+    public CommonResult<Boolean> updateUser(@RequestBody @Valid AppMemberUserUpdateReqVO reqVO) {
+        userService.updateUser(getLoginUserId(), reqVO);
+        return success(true);
+    }
+
+    @PutMapping("/update-mobile")
     @Operation(summary = "修改用户手机")
     @PreAuthenticated
-    public CommonResult<Boolean> updateMobile(@RequestBody @Valid AppUserUpdateMobileReqVO reqVO) {
+    public CommonResult<Boolean> updateUserMobile(@RequestBody @Valid AppUserUpdateMobileReqVO reqVO) {
         userService.updateUserMobile(getLoginUserId(), reqVO);
         return success(true);
     }

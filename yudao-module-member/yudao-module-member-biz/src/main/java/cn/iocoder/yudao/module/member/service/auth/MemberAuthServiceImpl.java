@@ -236,13 +236,27 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     @Override
     public void sendSmsCode(Long userId, AppAuthSmsSendReqVO reqVO) {
-        // TODO 要根据不同的场景，校验是否有用户
+        // 如果是修改手机场景，需要校验新手机号是否已经注册，说明不能使用该手机了
+        if (Objects.equals(reqVO.getScene(), SmsSceneEnum.MEMBER_UPDATE_MOBILE.getScene())) {
+            MemberUserDO user = userMapper.selectByMobile(reqVO.getMobile());
+            if (user != null && !Objects.equals(user.getId(), userId)) {
+                throw exception(AUTH_MOBILE_USED);
+            }
+        }
+
+        // 执行发送
         smsCodeApi.sendSmsCode(AuthConvert.INSTANCE.convert(reqVO).setCreateIp(getClientIP()));
     }
 
     @Override
+    public void validateSmsCode(Long userId, AppAuthSmsValidateReqVO reqVO) {
+        smsCodeApi.validateSmsCode(AuthConvert.INSTANCE.convert(reqVO));
+    }
+
+    @Override
     public AppAuthLoginRespVO refreshToken(String refreshToken) {
-        OAuth2AccessTokenRespDTO accessTokenDO = oauth2TokenApi.refreshAccessToken(refreshToken, OAuth2ClientConstants.CLIENT_ID_DEFAULT);
+        OAuth2AccessTokenRespDTO accessTokenDO = oauth2TokenApi.refreshAccessToken(refreshToken,
+                OAuth2ClientConstants.CLIENT_ID_DEFAULT);
         return AuthConvert.INSTANCE.convert(accessTokenDO);
     }
 

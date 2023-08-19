@@ -77,6 +77,13 @@ public class AppAuthController {
         return success(true);
     }
 
+    @PostMapping("/validate-sms-code")
+    @Operation(summary = "校验手机验证码")
+    public CommonResult<Boolean> validateSmsCode(@RequestBody @Valid AppAuthSmsValidateReqVO reqVO) {
+        authService.validateSmsCode(getLoginUserId(), reqVO);
+        return success(true);
+    }
+
     @PostMapping("/reset-password")
     @Operation(summary = "重置密码", description = "用户忘记密码时使用")
     @PreAuthenticated

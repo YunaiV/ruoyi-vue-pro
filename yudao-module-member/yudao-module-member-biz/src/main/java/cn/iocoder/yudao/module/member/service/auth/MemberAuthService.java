@@ -83,6 +83,14 @@ public interface MemberAuthService {
     void sendSmsCode(Long userId, AppAuthSmsSendReqVO reqVO);
 
     /**
+     * 校验短信验证码是否正确
+     *
+     * @param userId 用户编号
+     * @param reqVO 校验信息
+     */
+    void validateSmsCode(Long userId, AppAuthSmsValidateReqVO reqVO);
+
+    /**
      * 刷新访问令牌
      *
      * @param refreshToken 刷新令牌

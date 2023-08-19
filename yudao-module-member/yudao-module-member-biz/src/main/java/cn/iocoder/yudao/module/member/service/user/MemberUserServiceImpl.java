@@ -29,8 +29,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
-import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.USER_NOT_EXISTS;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_MOBILE_EXISTS;
+import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.*;
 
 /**
  * 会员 User Service 实现类
@@ -113,11 +112,12 @@ public class MemberUserServiceImpl implements MemberUserService {
     @Transactional(rollbackFor = Exception.class)
     public void updateUserMobile(Long userId, AppUserUpdateMobileReqVO reqVO) {
         // 检测用户是否存在
-        validateUserExists(userId);
-        // TODO 芋艿：oldMobile 应该不用传递
+        MemberUserDO user = validateUserExists(userId);
+        // 校验新手机是否已经被绑定
+        validateMobileUnique(null, reqVO.getMobile());
 
         // 校验旧手机和旧验证码
-        smsCodeApi.useSmsCode(new SmsCodeUseReqDTO().setMobile(reqVO.getOldMobile()).setCode(reqVO.getOldCode())
+        smsCodeApi.useSmsCode(new SmsCodeUseReqDTO().setMobile(user.getMobile()).setCode(reqVO.getOldCode())
                 .setScene(SmsSceneEnum.MEMBER_UPDATE_MOBILE.getScene()).setUsedIp(getClientIP()));
         // 使用新验证码
         smsCodeApi.useSmsCode(new SmsCodeUseReqDTO().setMobile(reqVO.getMobile()).setCode(reqVO.getCode())
@@ -177,10 +177,10 @@ public class MemberUserServiceImpl implements MemberUserService {
         }
         // 如果 id 为空，说明不用比较是否为相同 id 的用户
         if (id == null) {
-            throw exception(USER_MOBILE_EXISTS);
+            throw exception(USER_MOBILE_USED);
         }
         if (!user.getId().equals(id)) {
-            throw exception(USER_MOBILE_EXISTS);
+            throw exception(USER_MOBILE_USED);
         }
     }
 
