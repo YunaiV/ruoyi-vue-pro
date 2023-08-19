@@ -49,13 +49,9 @@ public class FileServiceImplTest extends BaseDbUnitTest {
         // 测试 path 不匹配
         fileMapper.insert(ObjectUtils.cloneIgnoreId(dbFile, o -> o.setPath("tudou")));
         // 测试 type 不匹配
-        fileMapper.insert(ObjectUtils.cloneIgnoreId(dbFile, o -> {
-            o.setType("image/png");
-        }));
+        fileMapper.insert(ObjectUtils.cloneIgnoreId(dbFile, o -> o.setType("image/png")));
         // 测试 createTime 不匹配
-        fileMapper.insert(ObjectUtils.cloneIgnoreId(dbFile, o -> {
-            o.setCreateTime(buildTime(2020, 1, 15));
-        }));
+        fileMapper.insert(ObjectUtils.cloneIgnoreId(dbFile, o -> o.setCreateTime(buildTime(2020, 1, 15))));
         // 准备参数
         FilePageReqVO reqVO = new FilePageReqVO();
         reqVO.setPath("yunai");

@@ -70,7 +70,7 @@ public class HttpUtils {
                 values.append(append);
             }
             for (String key : query.keySet()) {
-                if (values.length() > 0) {
+                if (!values.isEmpty()) {
                     values.append("&");
                 }
                 String name = key;
@@ -79,7 +79,7 @@ public class HttpUtils {
                 }
                 values.append(name).append("={").append(key).append("}");
             }
-            if (values.length() > 0) {
+            if (!values.isEmpty()) {
                 template.fragment(values.toString());
             }
             UriComponents encoded = template.build().expand(query).encode();

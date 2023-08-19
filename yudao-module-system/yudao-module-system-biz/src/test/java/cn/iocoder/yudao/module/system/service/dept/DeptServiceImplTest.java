@@ -130,9 +130,7 @@ public class DeptServiceImplTest extends BaseDbUnitTest {
         DeptDO parentDept = randomPojo(DeptDO.class);
         deptMapper.insert(parentDept);
         // mock 数据（子节点）
-        DeptDO childDept = randomPojo(DeptDO.class, o -> {
-            o.setParentId(parentDept.getId());
-        });
+        DeptDO childDept = randomPojo(DeptDO.class, o -> o.setParentId(parentDept.getId()));
         deptMapper.insert(childDept);
 
         // 准备参数

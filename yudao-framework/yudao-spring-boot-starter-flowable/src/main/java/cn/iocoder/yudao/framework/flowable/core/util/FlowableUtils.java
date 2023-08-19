@@ -37,13 +37,11 @@ public class FlowableUtils {
      */
     public static <T extends FlowElement> List<T> getBpmnModelElements(BpmnModel model, Class<T> clazz) {
         List<T> result = new ArrayList<>();
-        model.getProcesses().forEach(process -> {
-            process.getFlowElements().forEach(flowElement -> {
-                if (flowElement.getClass().isAssignableFrom(clazz)) {
-                    result.add((T) flowElement);
-                }
-            });
-        });
+        model.getProcesses().forEach(process -> process.getFlowElements().forEach(flowElement -> {
+            if (flowElement.getClass().isAssignableFrom(clazz)) {
+                result.add((T) flowElement);
+            }
+        }));
         return result;
     }
 

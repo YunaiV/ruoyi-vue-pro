@@ -125,10 +125,8 @@ public class SmsCodeServiceImplTest extends BaseDbUnitTest {
         });
         // mock 数据
         SqlConstants.init(DbType.MYSQL);
-        smsCodeMapper.insert(randomPojo(SmsCodeDO.class, o -> {
-            o.setMobile(reqDTO.getMobile()).setScene(reqDTO.getScene())
-                    .setCode(reqDTO.getCode()).setUsed(false);
-        }));
+        smsCodeMapper.insert(randomPojo(SmsCodeDO.class, o -> o.setMobile(reqDTO.getMobile()).setScene(reqDTO.getScene())
+                .setCode(reqDTO.getCode()).setUsed(false)));
 
         // 调用
         smsCodeService.useSmsCode(reqDTO);

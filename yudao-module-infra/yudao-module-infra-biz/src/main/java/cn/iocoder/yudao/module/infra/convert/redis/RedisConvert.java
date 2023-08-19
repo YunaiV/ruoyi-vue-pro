@@ -16,13 +16,11 @@ public interface RedisConvert {
     default RedisMonitorRespVO build(Properties info, Long dbSize, Properties commandStats) {
         RedisMonitorRespVO respVO = RedisMonitorRespVO.builder().info(info).dbSize(dbSize)
                 .commandStats(new ArrayList<>(commandStats.size())).build();
-        commandStats.forEach((key, value) -> {
-            respVO.getCommandStats().add(RedisMonitorRespVO.CommandStat.builder()
-                    .command(StrUtil.subAfter((String) key, "cmdstat_", false))
-                    .calls(Long.valueOf(StrUtil.subBetween((String) value, "calls=", ",")))
-                    .usec(Long.valueOf(StrUtil.subBetween((String) value, "usec=", ",")))
-                    .build());
-        });
+        commandStats.forEach((key, value) -> respVO.getCommandStats().add(RedisMonitorRespVO.CommandStat.builder()
+                .command(StrUtil.subAfter((String) key, "cmdstat_", false))
+                .calls(Long.valueOf(StrUtil.subBetween((String) value, "calls=", ",")))
+                .usec(Long.valueOf(StrUtil.subBetween((String) value, "usec=", ",")))
+                .build()));
         return respVO;
     }
 

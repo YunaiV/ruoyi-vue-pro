@@ -168,7 +168,7 @@ public class CollectionUtils {
         if (CollUtil.isEmpty(from)) {
             return null;
         }
-        assert from.size() > 0; // 断言，避免告警
+        assert !from.isEmpty(); // 断言，避免告警
         T t = from.stream().max(Comparator.comparing(valueFunc)).get();
         return valueFunc.apply(t);
     }
@@ -177,7 +177,7 @@ public class CollectionUtils {
         if (CollUtil.isEmpty(from)) {
             return null;
         }
-        assert from.size() > 0; // 断言，避免告警
+        assert !from.isEmpty(); // 断言，避免告警
         T t = from.stream().min(Comparator.comparing(valueFunc)).get();
         return valueFunc.apply(t);
     }
@@ -186,7 +186,7 @@ public class CollectionUtils {
         if (CollUtil.isEmpty(from)) {
             return null;
         }
-        assert from.size() > 0; // 断言，避免告警
+        assert !from.isEmpty(); // 断言，避免告警
         return from.stream().map(valueFunc).reduce(accumulator).get();
     }
 
