@@ -3,8 +3,9 @@ package cn.iocoder.yudao.module.member.controller.app.user;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserInfoRespVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateReqVO;
-import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateMobileReqVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateMobileReqVO;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
@@ -49,8 +50,16 @@ public class AppMemberUserController {
     @PutMapping("/update-mobile")
     @Operation(summary = "修改用户手机")
     @PreAuthenticated
-    public CommonResult<Boolean> updateUserMobile(@RequestBody @Valid AppUserUpdateMobileReqVO reqVO) {
+    public CommonResult<Boolean> updateUserMobile(@RequestBody @Valid AppMemberUserUpdateMobileReqVO reqVO) {
         userService.updateUserMobile(getLoginUserId(), reqVO);
+        return success(true);
+    }
+
+    @PutMapping("/update-password")
+    @Operation(summary = "修改用户密码", description = "用户修改密码时使用")
+    @PreAuthenticated
+    public CommonResult<Boolean> updatePassword(@RequestBody @Valid AppMemberUserUpdatePasswordReqVO reqVO) {
+        userService.updateUserPassword(getLoginUserId(), reqVO);
         return success(true);
     }
 

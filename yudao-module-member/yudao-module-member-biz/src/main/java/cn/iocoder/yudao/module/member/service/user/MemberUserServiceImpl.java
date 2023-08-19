@@ -7,8 +7,9 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateReqVO;
-import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateMobileReqVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateMobileReqVO;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
@@ -110,7 +111,7 @@ public class MemberUserServiceImpl implements MemberUserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateUserMobile(Long userId, AppUserUpdateMobileReqVO reqVO) {
+    public void updateUserMobile(Long userId, AppMemberUserUpdateMobileReqVO reqVO) {
         // 检测用户是否存在
         MemberUserDO user = validateUserExists(userId);
         // 校验新手机是否已经被绑定
@@ -125,6 +126,19 @@ public class MemberUserServiceImpl implements MemberUserService {
 
         // 更新用户手机
         memberUserMapper.updateById(MemberUserDO.builder().id(userId).mobile(reqVO.getMobile()).build());
+    }
+
+    @Override
+    public void updateUserPassword(Long userId, AppMemberUserUpdatePasswordReqVO reqVO) {
+        // 检测用户是否存在
+        MemberUserDO user = validateUserExists(userId);
+        // 校验验证码
+        smsCodeApi.useSmsCode(new SmsCodeUseReqDTO().setMobile(user.getMobile()).setCode(reqVO.getCode())
+                .setScene(SmsSceneEnum.MEMBER_UPDATE_PASSWORD.getScene()).setUsedIp(getClientIP()));
+
+        // 更新用户密码
+        memberUserMapper.updateById(MemberUserDO.builder().id(userId)
+                .password(passwordEncoder.encode(reqVO.getPassword())).build());
     }
 
     @Override

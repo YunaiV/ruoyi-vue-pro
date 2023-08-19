@@ -62,13 +62,6 @@ public interface MemberAuthService {
     String getSocialAuthorizeUrl(Integer type, String redirectUri);
 
     /**
-     * 修改用户密码
-     * @param userId 用户id
-     * @param userReqVO 用户请求实体类
-     */
-    void updatePassword(Long userId, AppAuthUpdatePasswordReqVO userReqVO);
-
-    /**
      * 忘记密码
      * @param userReqVO 用户请求实体类
      */

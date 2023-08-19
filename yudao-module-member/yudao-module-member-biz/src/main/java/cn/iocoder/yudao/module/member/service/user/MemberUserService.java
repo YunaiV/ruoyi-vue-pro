@@ -4,8 +4,9 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateReqVO;
-import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateMobileReqVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateMobileReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 
 import javax.validation.Valid;
@@ -81,9 +82,17 @@ public interface MemberUserService {
      * 【会员】修改手机
      *
      * @param userId 用户编号
-     * @param reqVO 请求实体
+     * @param reqVO 请求信息
      */
-    void updateUserMobile(Long userId, AppUserUpdateMobileReqVO reqVO);
+    void updateUserMobile(Long userId, AppMemberUserUpdateMobileReqVO reqVO);
+
+    /**
+     * 【会员】修改密码
+     *
+     * @param userId 用户编号
+     * @param reqVO 请求信息
+     */
+    void updateUserPassword(Long userId, AppMemberUserUpdatePasswordReqVO reqVO);
 
     /**
      * 判断密码是否匹配

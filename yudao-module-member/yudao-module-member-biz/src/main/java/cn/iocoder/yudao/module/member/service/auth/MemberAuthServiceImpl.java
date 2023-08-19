@@ -26,7 +26,6 @@ import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
 import cn.iocoder.yudao.module.system.enums.oauth2.OAuth2ClientConstants;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
-import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -210,17 +209,6 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     }
 
     @Override
-    public void updatePassword(Long userId, AppAuthUpdatePasswordReqVO reqVO) {
-        // 检验旧密码
-        MemberUserDO userDO = checkOldPassword(userId, reqVO.getOldPassword());
-
-        // 更新用户密码
-        // TODO 芋艿：需要重构到用户模块
-        userMapper.updateById(MemberUserDO.builder().id(userDO.getId())
-                .password(passwordEncoder.encode(reqVO.getPassword())).build());
-    }
-
-    @Override
     public void resetPassword(AppAuthResetPasswordReqVO reqVO) {
         // 检验用户是否存在
         MemberUserDO userDO = checkUserIfExists(reqVO.getMobile());
@@ -258,26 +246,6 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         OAuth2AccessTokenRespDTO accessTokenDO = oauth2TokenApi.refreshAccessToken(refreshToken,
                 OAuth2ClientConstants.CLIENT_ID_DEFAULT);
         return AuthConvert.INSTANCE.convert(accessTokenDO);
-    }
-
-    /**
-     * 校验旧密码
-     *
-     * @param id          用户 id
-     * @param oldPassword 旧密码
-     * @return MemberUserDO 用户实体
-     */
-    @VisibleForTesting
-    public MemberUserDO checkOldPassword(Long id, String oldPassword) {
-        MemberUserDO user = userMapper.selectById(id);
-        if (user == null) {
-            throw exception(USER_NOT_EXISTS);
-        }
-        // 参数：未加密密码，编码后的密码
-        if (!passwordEncoder.matches(oldPassword,user.getPassword())) {
-            throw exception(USER_PASSWORD_FAILED);
-        }
-        return user;
     }
 
     public MemberUserDO checkUserIfExists(String mobile) {

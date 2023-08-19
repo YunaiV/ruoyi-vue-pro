@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbAndRedisUnitTest;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
-import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateMobileReqVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateMobileReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
 import cn.iocoder.yudao.module.member.service.auth.MemberAuthServiceImpl;
@@ -114,7 +114,7 @@ public class MemberUserServiceImplTest extends BaseDbAndRedisUnitTest {
         // 更新手机号
         String newMobile = randomNumbers(11);
         String newCode = randomNumbers(4);
-        AppUserUpdateMobileReqVO reqVO = new AppUserUpdateMobileReqVO();
+        AppMemberUserUpdateMobileReqVO reqVO = new AppMemberUserUpdateMobileReqVO();
         reqVO.setMobile(newMobile);
         reqVO.setCode(newCode);
         reqVO.setOldMobile(oldMobile);

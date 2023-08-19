@@ -17,7 +17,7 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AppUserUpdateMobileReqVO {
+public class AppMemberUserUpdateMobileReqVO {
 
     @Schema(description = "手机验证码", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotEmpty(message = "手机验证码不能为空")
