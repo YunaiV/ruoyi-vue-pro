@@ -2,9 +2,14 @@ package cn.iocoder.yudao.module.member.service.user;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateMobileReqVO;
+import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
@@ -19,14 +24,14 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.USER_NOT_EXISTS;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_MOBILE_EXISTS;
 
 /**
  * 会员 User Service 实现类
@@ -101,7 +106,7 @@ public class MemberUserServiceImpl implements MemberUserService {
 
     @Override
     public void updateUserNickname(Long userId, String nickname) {
-        MemberUserDO user = this.checkUserExists(userId);
+        MemberUserDO user = this.validateUserExists(userId);
         // 仅当新昵称不等于旧昵称时进行修改
         if (nickname.equals(user.getNickname())){
             return;
@@ -113,8 +118,8 @@ public class MemberUserServiceImpl implements MemberUserService {
     }
 
     @Override
-    public String updateUserAvatar(Long userId, InputStream avatarFile) throws Exception {
-        this.checkUserExists(userId);
+    public String updateUserAvatar(Long userId, InputStream avatarFile) {
+        validateUserExists(userId);
         // 创建文件
         String avatar = fileApi.createFile(IoUtil.readBytes(avatarFile));
         // 更新头像路径
@@ -126,7 +131,7 @@ public class MemberUserServiceImpl implements MemberUserService {
     @Transactional(rollbackFor = Exception.class)
     public void updateUserMobile(Long userId, AppUserUpdateMobileReqVO reqVO) {
         // 检测用户是否存在
-        checkUserExists(userId);
+        validateUserExists(userId);
         // TODO 芋艿：oldMobile 应该不用传递
 
         // 校验旧手机和旧验证码
@@ -155,8 +160,20 @@ public class MemberUserServiceImpl implements MemberUserService {
         return passwordEncoder.encode(password);
     }
 
+    @Override
+    public void updateUser(MemberUserUpdateReqVO updateReqVO) {
+        // 校验存在
+        validateUserExists(updateReqVO.getId());
+        // 校验手机唯一
+        validateMobileUnique(updateReqVO.getId(), updateReqVO.getMobile());
+
+        // 更新
+        MemberUserDO updateObj = MemberUserConvert.INSTANCE.convert(updateReqVO);
+        memberUserMapper.updateById(updateObj);
+    }
+
     @VisibleForTesting
-    public MemberUserDO checkUserExists(Long id) {
+    MemberUserDO validateUserExists(Long id) {
         if (id == null) {
             return null;
         }
@@ -165,6 +182,29 @@ public class MemberUserServiceImpl implements MemberUserService {
             throw exception(USER_NOT_EXISTS);
         }
         return user;
+    }
+
+    @VisibleForTesting
+    void validateMobileUnique(Long id, String mobile) {
+        if (StrUtil.isBlank(mobile)) {
+            return;
+        }
+        MemberUserDO user = memberUserMapper.selectByMobile(mobile);
+        if (user == null) {
+            return;
+        }
+        // 如果 id 为空，说明不用比较是否为相同 id 的用户
+        if (id == null) {
+            throw exception(USER_MOBILE_EXISTS);
+        }
+        if (!user.getId().equals(id)) {
+            throw exception(USER_MOBILE_EXISTS);
+        }
+    }
+
+    @Override
+    public PageResult<MemberUserDO> getUserPage(MemberUserPageReqVO pageReqVO) {
+        return memberUserMapper.selectPage(pageReqVO);
     }
 
 }
