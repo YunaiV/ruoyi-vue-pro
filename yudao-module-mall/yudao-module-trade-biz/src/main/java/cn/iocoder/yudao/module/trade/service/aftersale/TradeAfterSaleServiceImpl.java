@@ -398,6 +398,11 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
                 TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), TradeOrderItemAfterSaleStatusEnum.NONE.getStatus());
     }
 
+    @Override
+    public Long getApplyingAfterSaleCount(Long userId) {
+        return tradeAfterSaleMapper.selectCountByUserIdAndStatus(userId, TradeAfterSaleStatusEnum.APPLYING_STATUSES);
+    }
+
     @Deprecated
     private void createAfterSaleLog(Long userId, Integer userType, TradeAfterSaleDO afterSale,
                                     Integer beforeStatus, Integer afterStatus) {

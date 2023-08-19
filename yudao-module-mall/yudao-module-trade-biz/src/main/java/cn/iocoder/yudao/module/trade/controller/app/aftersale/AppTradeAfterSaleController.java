@@ -50,6 +50,12 @@ public class AppTradeAfterSaleController {
         return success(TradeAfterSaleConvert.INSTANCE.convert(afterSaleService.getAfterSale(getLoginUserId(), id)));
     }
 
+    @GetMapping(value = "/get-applying-count")
+    @Operation(summary = "获得进行中的售后订单数量")
+    public CommonResult<Long> getApplyingAfterSaleCount() {
+        return success(afterSaleService.getApplyingAfterSaleCount(getLoginUserId()));
+    }
+
     // TODO 芋艿：待实现
     @GetMapping(value = "/get-reason-list")
     @Operation(summary = "获得售后原因")

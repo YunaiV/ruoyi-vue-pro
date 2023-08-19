@@ -108,4 +108,12 @@ public interface TradeAfterSaleService {
      */
     void cancelAfterSale(Long userId, Long id);
 
+    /**
+     * 【会员】获得正在进行中的售后订单数量
+     *
+     * @param userId
+     * @return 数量
+     */
+    Long getApplyingAfterSaleCount(Long userId);
+
 }

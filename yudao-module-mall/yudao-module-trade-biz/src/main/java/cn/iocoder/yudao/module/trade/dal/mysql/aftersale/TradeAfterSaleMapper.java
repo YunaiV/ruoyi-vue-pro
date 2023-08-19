@@ -9,6 +9,8 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Collection;
+
 @Mapper
 public interface TradeAfterSaleMapper extends BaseMapperX<TradeAfterSaleDO> {
 
@@ -38,6 +40,12 @@ public interface TradeAfterSaleMapper extends BaseMapperX<TradeAfterSaleDO> {
     default TradeAfterSaleDO selectByIdAndUserId(Long id, Long userId) {
         return selectOne(TradeAfterSaleDO::getId, id,
                 TradeAfterSaleDO::getUserId, userId);
+    }
+
+    default Long selectCountByUserIdAndStatus(Long userId, Collection<Integer> statuses) {
+        return selectCount(new LambdaQueryWrapperX<TradeAfterSaleDO>()
+                .eq(TradeAfterSaleDO::getUserId, userId)
+                .in(TradeAfterSaleDO::getStatus, statuses));
     }
 
 }

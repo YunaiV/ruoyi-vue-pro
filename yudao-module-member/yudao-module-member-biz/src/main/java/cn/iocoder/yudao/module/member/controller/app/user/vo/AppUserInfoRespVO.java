@@ -14,9 +14,13 @@ public class AppUserInfoRespVO {
     @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
     private String nickname;
 
-    @Schema(description = "用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "/infra/file/get/35a12e57-4297-4faa-bf7d-7ed2f211c952")
+    @Schema(description = "用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xxx.png")
     private String avatar;
 
     @Schema(description = "用户手机号", requiredMode = Schema.RequiredMode.REQUIRED, example = "15601691300")
     private String mobile;
+
+    @Schema(description = "积分", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
+    private Integer point;
+
 }

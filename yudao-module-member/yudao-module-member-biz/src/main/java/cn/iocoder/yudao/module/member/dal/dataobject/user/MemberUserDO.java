@@ -102,6 +102,11 @@ public class MemberUserDO extends TenantBaseDO {
 
     // ========== 其它信息 ==========
 
+    /**
+     * 积分
+     */
+    private Integer point;
+
     // TODO 积分、成长值、会员等级等等
 
 }

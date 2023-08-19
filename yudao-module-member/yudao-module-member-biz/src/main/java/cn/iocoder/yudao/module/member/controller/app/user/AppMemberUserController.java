@@ -27,7 +27,7 @@ import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_IS_EMP
 @RequestMapping("/member/user")
 @Validated
 @Slf4j
-public class AppUserController {
+public class AppMemberUserController {
 
     @Resource
     private MemberUserService userService;

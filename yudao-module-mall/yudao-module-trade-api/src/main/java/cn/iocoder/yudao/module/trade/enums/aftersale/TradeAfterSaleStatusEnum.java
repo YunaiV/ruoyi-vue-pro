@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 import static cn.hutool.core.util.ArrayUtil.firstMatch;
 
@@ -54,6 +55,18 @@ public enum TradeAfterSaleStatusEnum implements IntArrayValuable {
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(TradeAfterSaleStatusEnum::getStatus).toArray();
+
+    /**
+     * 进行中的售后状态
+     *
+     * 不包括已经结束的状态
+     */
+    public static final Collection<Integer> APPLYING_STATUSES = Arrays.asList(
+            APPLY.getStatus(),
+            SELLER_AGREE.getStatus(),
+            BUYER_DELIVERY.getStatus(),
+            WAIT_REFUND.getStatus()
+    );
 
     /**
      * 状态
