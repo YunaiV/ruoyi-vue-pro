@@ -27,7 +27,6 @@ import cn.iocoder.yudao.module.system.enums.oauth2.OAuth2ClientConstants;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,8 +60,6 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     @Resource
     private WxMaService wxMaService;
 
-    @Resource
-    private PasswordEncoder passwordEncoder;
     @Resource
     private MemberUserMapper userMapper;
 
@@ -209,26 +206,19 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     }
 
     @Override
-    public void resetPassword(AppAuthResetPasswordReqVO reqVO) {
-        // 检验用户是否存在
-        MemberUserDO userDO = checkUserIfExists(reqVO.getMobile());
-
-        // 使用验证码
-        smsCodeApi.useSmsCode(AuthConvert.INSTANCE.convert(reqVO, SmsSceneEnum.MEMBER_FORGET_PASSWORD,
-                getClientIP()));
-
-        // 更新密码
-        userMapper.updateById(MemberUserDO.builder().id(userDO.getId())
-                .password(passwordEncoder.encode(reqVO.getPassword())).build());
-    }
-
-    @Override
     public void sendSmsCode(Long userId, AppAuthSmsSendReqVO reqVO) {
-        // 如果是修改手机场景，需要校验新手机号是否已经注册，说明不能使用该手机了
+        // 情况 1：如果是修改手机场景，需要校验新手机号是否已经注册，说明不能使用该手机了
         if (Objects.equals(reqVO.getScene(), SmsSceneEnum.MEMBER_UPDATE_MOBILE.getScene())) {
-            MemberUserDO user = userMapper.selectByMobile(reqVO.getMobile());
+            MemberUserDO user = userService.getUserByMobile(reqVO.getMobile());
             if (user != null && !Objects.equals(user.getId(), userId)) {
                 throw exception(AUTH_MOBILE_USED);
+            }
+        }
+        // 情况 2：如果是重置密码场景，需要校验手机号是存在的
+        if (Objects.equals(reqVO.getScene(), SmsSceneEnum.MEMBER_RESET_PASSWORD.getScene())) {
+            MemberUserDO  user= userService.getUserByMobile(reqVO.getMobile());
+            if (user == null) {
+                throw exception(USER_MOBILE_NOT_EXISTS);
             }
         }
 
@@ -246,14 +236,6 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         OAuth2AccessTokenRespDTO accessTokenDO = oauth2TokenApi.refreshAccessToken(refreshToken,
                 OAuth2ClientConstants.CLIENT_ID_DEFAULT);
         return AuthConvert.INSTANCE.convert(accessTokenDO);
-    }
-
-    public MemberUserDO checkUserIfExists(String mobile) {
-        MemberUserDO user = userMapper.selectByMobile(mobile);
-        if (user == null) {
-            throw exception(USER_NOT_EXISTS);
-        }
-        return user;
     }
 
     private void createLogoutLog(Long userId) {

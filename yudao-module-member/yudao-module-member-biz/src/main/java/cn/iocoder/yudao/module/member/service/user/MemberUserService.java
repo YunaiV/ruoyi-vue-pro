@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserResetPasswordReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateMobileReqVO;
@@ -93,6 +94,13 @@ public interface MemberUserService {
      * @param reqVO 请求信息
      */
     void updateUserPassword(Long userId, AppMemberUserUpdatePasswordReqVO reqVO);
+
+    /**
+     * 【会员】忘记密码
+     *
+     * @param reqVO 请求信息
+     */
+    void resetUserPassword(AppMemberUserResetPasswordReqVO reqVO);
 
     /**
      * 判断密码是否匹配

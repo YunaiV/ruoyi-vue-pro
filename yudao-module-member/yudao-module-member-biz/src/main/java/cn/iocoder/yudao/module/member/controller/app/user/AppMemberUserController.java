@@ -2,10 +2,7 @@ package cn.iocoder.yudao.module.member.controller.app.user;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
-import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserInfoRespVO;
-import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdatePasswordReqVO;
-import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateReqVO;
-import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateMobileReqVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.*;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
@@ -60,6 +57,13 @@ public class AppMemberUserController {
     @PreAuthenticated
     public CommonResult<Boolean> updatePassword(@RequestBody @Valid AppMemberUserUpdatePasswordReqVO reqVO) {
         userService.updateUserPassword(getLoginUserId(), reqVO);
+        return success(true);
+    }
+
+    @PutMapping("/reset-password")
+    @Operation(summary = "重置密码", description = "用户忘记密码时使用")
+    public CommonResult<Boolean> resetPassword(@RequestBody @Valid AppMemberUserResetPasswordReqVO reqVO) {
+        userService.resetUserPassword(reqVO);
         return success(true);
     }
 

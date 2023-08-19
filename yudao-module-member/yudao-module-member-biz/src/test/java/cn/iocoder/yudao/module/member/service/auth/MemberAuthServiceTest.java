@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbAndRedisUnitTest;
-import cn.iocoder.yudao.module.member.controller.app.auth.vo.AppAuthResetPasswordReqVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserResetPasswordReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
@@ -101,7 +101,7 @@ public class MemberAuthServiceTest extends BaseDbAndRedisUnitTest {
         when(passwordEncoder.encode(password)).thenReturn(password);
 
         // 更新用户密码
-        AppAuthResetPasswordReqVO reqVO = new AppAuthResetPasswordReqVO();
+        AppMemberUserResetPasswordReqVO reqVO = new AppMemberUserResetPasswordReqVO();
         reqVO.setMobile(userDO.getMobile());
         reqVO.setPassword(password);
         reqVO.setCode(code);

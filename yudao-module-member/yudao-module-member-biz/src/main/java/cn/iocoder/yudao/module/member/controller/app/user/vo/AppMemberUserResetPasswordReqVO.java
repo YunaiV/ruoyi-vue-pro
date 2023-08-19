@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.member.controller.app.auth.vo;
+package cn.iocoder.yudao.module.member.controller.app.user.vo;
 
 import cn.iocoder.yudao.framework.common.validation.Mobile;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,13 +12,12 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 
-// TODO 芋艿：code review 相关逻辑
 @Schema(description = "用户 APP - 重置密码 Request VO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AppAuthResetPasswordReqVO {
+public class AppMemberUserResetPasswordReqVO {
 
     @Schema(description = "新密码", requiredMode = Schema.RequiredMode.REQUIRED, example = "buzhidao")
     @NotEmpty(message = "新密码不能为空")

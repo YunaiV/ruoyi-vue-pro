@@ -62,12 +62,6 @@ public interface MemberAuthService {
     String getSocialAuthorizeUrl(Integer type, String redirectUri);
 
     /**
-     * 忘记密码
-     * @param userReqVO 用户请求实体类
-     */
-    void resetPassword(AppAuthResetPasswordReqVO userReqVO);
-
-    /**
      * 给用户发送短信验证码
      *
      * @param userId 用户编号

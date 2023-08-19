@@ -4,7 +4,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.security.config.SecurityProperties;
-import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
 import cn.iocoder.yudao.module.member.service.auth.MemberAuthService;
@@ -81,14 +80,6 @@ public class AppAuthController {
     @Operation(summary = "校验手机验证码")
     public CommonResult<Boolean> validateSmsCode(@RequestBody @Valid AppAuthSmsValidateReqVO reqVO) {
         authService.validateSmsCode(getLoginUserId(), reqVO);
-        return success(true);
-    }
-
-    @PostMapping("/reset-password")
-    @Operation(summary = "重置密码", description = "用户忘记密码时使用")
-    @PreAuthenticated
-    public CommonResult<Boolean> resetPassword(@RequestBody @Valid AppAuthResetPasswordReqVO reqVO) {
-        authService.resetPassword(reqVO);
         return success(true);
     }
 

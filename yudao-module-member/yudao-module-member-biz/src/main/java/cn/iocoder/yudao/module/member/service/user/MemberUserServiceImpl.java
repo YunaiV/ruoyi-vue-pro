@@ -7,9 +7,11 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserResetPasswordReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateMobileReqVO;
+import cn.iocoder.yudao.module.member.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
@@ -139,6 +141,28 @@ public class MemberUserServiceImpl implements MemberUserService {
         // 更新用户密码
         memberUserMapper.updateById(MemberUserDO.builder().id(userId)
                 .password(passwordEncoder.encode(reqVO.getPassword())).build());
+    }
+
+    @Override
+    public void resetUserPassword(AppMemberUserResetPasswordReqVO reqVO) {
+        // 检验用户是否存在
+        MemberUserDO user = validateUserExists(reqVO.getMobile());
+
+        // 使用验证码
+        smsCodeApi.useSmsCode(AuthConvert.INSTANCE.convert(reqVO, SmsSceneEnum.MEMBER_RESET_PASSWORD,
+                getClientIP()));
+
+        // 更新密码
+        memberUserMapper.updateById(MemberUserDO.builder().id(user.getId())
+                .password(passwordEncoder.encode(reqVO.getPassword())).build());
+    }
+
+    private MemberUserDO validateUserExists(String mobile) {
+        MemberUserDO user = memberUserMapper.selectByMobile(mobile);
+        if (user == null) {
+            throw exception(USER_MOBILE_NOT_EXISTS);
+        }
+        return user;
     }
 
     @Override
