@@ -67,7 +67,7 @@ public class MemberUserServiceImplTest extends BaseDbAndRedisUnitTest {
         String newNickName = randomString();
 
         // 调用接口修改昵称
-        memberUserService.updateUserNickname(userDO.getId(),newNickName);
+        memberUserService.updateUser(userDO.getId(),newNickName);
         // 查询新修改后的昵称
         String nickname = memberUserService.getUser(userDO.getId()).getNickname();
         // 断言

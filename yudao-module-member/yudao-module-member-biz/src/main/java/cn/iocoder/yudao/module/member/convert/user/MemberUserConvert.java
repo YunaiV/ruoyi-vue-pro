@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserRespVO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
-import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserInfoRespVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserInfoRespVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -16,7 +16,7 @@ public interface MemberUserConvert {
 
     MemberUserConvert INSTANCE = Mappers.getMapper(MemberUserConvert.class);
 
-    AppUserInfoRespVO convert(MemberUserDO bean);
+    AppMemberUserInfoRespVO convert(MemberUserDO bean);
 
     MemberUserRespDTO convert2(MemberUserDO bean);
 

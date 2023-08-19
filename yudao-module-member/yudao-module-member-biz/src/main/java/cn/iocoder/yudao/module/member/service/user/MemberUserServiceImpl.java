@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.member.service.user;
 
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -8,6 +7,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateMobileReqVO;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -105,26 +104,9 @@ public class MemberUserServiceImpl implements MemberUserService {
     }
 
     @Override
-    public void updateUserNickname(Long userId, String nickname) {
-        MemberUserDO user = this.validateUserExists(userId);
-        // 仅当新昵称不等于旧昵称时进行修改
-        if (nickname.equals(user.getNickname())){
-            return;
-        }
-        MemberUserDO userDO = new MemberUserDO();
-        userDO.setId(user.getId());
-        userDO.setNickname(nickname);
-        memberUserMapper.updateById(userDO);
-    }
-
-    @Override
-    public String updateUserAvatar(Long userId, InputStream avatarFile) {
-        validateUserExists(userId);
-        // 创建文件
-        String avatar = fileApi.createFile(IoUtil.readBytes(avatarFile));
-        // 更新头像路径
-        memberUserMapper.updateById(MemberUserDO.builder().id(userId).avatar(avatar).build());
-        return avatar;
+    public void updateUser(Long userId, AppMemberUserUpdateReqVO reqVO) {
+        memberUserMapper.updateById(new MemberUserDO().setId(userId)
+                .setNickname(reqVO.getNickname()).setAvatar(reqVO.getAvatar()));
     }
 
     @Override

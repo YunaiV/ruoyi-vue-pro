@@ -4,11 +4,11 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateMobileReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 
 import javax.validation.Valid;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 
@@ -70,26 +70,17 @@ public interface MemberUserService {
     List<MemberUserDO> getUserList(Collection<Long> ids);
 
     /**
-     * 【会员】修改用户昵称
+     * 【会员】修改基本信息
      *
-     * @param userId 用户id
-     * @param nickname 用户新昵称
+     * @param userId 用户编号
+     * @param reqVO 基本信息
      */
-    void updateUserNickname(Long userId, String nickname);
-
-    /**
-     * 【会员】修改用户头像
-     *
-     * @param userId 用户id
-     * @param inputStream 头像文件
-     * @return 头像url
-     */
-    String updateUserAvatar(Long userId, InputStream inputStream) throws Exception;
+    void updateUser(Long userId, AppMemberUserUpdateReqVO reqVO);
 
     /**
      * 【会员】修改手机
      *
-     * @param userId 用户id
+     * @param userId 用户编号
      * @param reqVO 请求实体
      */
     void updateUserMobile(Long userId, AppUserUpdateMobileReqVO reqVO);
