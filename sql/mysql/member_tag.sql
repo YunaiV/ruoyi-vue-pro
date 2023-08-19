@@ -12,6 +12,7 @@ create table member_tag
 )
     comment '会员标签';
 
+alter table member_user add column tag_ids varchar(255) null comment '用户标签编号列表,以逗号分隔';
 
 -- 菜单 SQL
 INSERT INTO system_menu(

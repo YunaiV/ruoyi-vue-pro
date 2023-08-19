@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "管理后台 - 会员用户 Response VO")
 @Data
@@ -28,4 +29,9 @@ public class MemberUserRespVO extends MemberUserBaseVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
+
+    // ========== 其它信息 ==========
+
+    @Schema(description = "会员标签")
+    private List<String> tagNames;
 }

@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.member.service.tag;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagCreateReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagExportReqVO;
@@ -81,6 +83,9 @@ public class MemberTagServiceImpl implements MemberTagService {
 
     @Override
     public List<MemberTagDO> getTagList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return ListUtil.empty();
+        }
         return tagMapper.selectBatchIds(ids);
     }
 

@@ -2,15 +2,18 @@ package cn.iocoder.yudao.module.member.dal.dataobject.user;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.ip.core.Area;
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import cn.iocoder.yudao.module.system.enums.common.SexEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 会员用户 DO
@@ -102,6 +105,11 @@ public class MemberUserDO extends TenantBaseDO {
 
     // ========== 其它信息 ==========
 
-    // TODO 积分、成长值、会员等级等等
+    /**
+     * 会员标签列表，以逗号分隔
+     */
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> tagIds;
 
+    // TODO 积分、成长值、会员等级等等
 }
