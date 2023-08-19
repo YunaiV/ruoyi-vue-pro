@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.member.controller.admin.user.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - 会员用户 Response VO")
@@ -23,10 +24,6 @@ public class MemberUserRespVO extends MemberUserBaseVO {
 
     @Schema(description = "最后登录时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime loginDate;
-
-    @Schema(description = "头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/x.png")
-    @NotNull(message = "头像不能为空")
-    private String avatar;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
