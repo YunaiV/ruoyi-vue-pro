@@ -10,6 +10,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 @Mapper
 public interface MemberUserConvert {
@@ -28,4 +31,12 @@ public interface MemberUserConvert {
 
     MemberUserRespVO convert03(MemberUserDO bean);
 
+    default PageResult<MemberUserRespVO> convertPage(PageResult<MemberUserDO> pageResult,
+                                                     Map<Long, String> tagMap) {
+        PageResult<MemberUserRespVO> result = convertPage(pageResult);
+        for (MemberUserRespVO vo : result.getList()) {
+            vo.setTagNames(convertList(vo.getTagIds(), tagMap::get));
+        }
+        return result;
+    }
 }

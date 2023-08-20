@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY;
 
@@ -48,5 +49,8 @@ public class MemberUserBaseVO {
 
     @Schema(description = "会员备注", example = "我是小备注")
     private String mark;
+
+    @Schema(description = "会员标签")
+    private List<Long> tagIds;
 
 }

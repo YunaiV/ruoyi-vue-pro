@@ -1,23 +1,29 @@
 package cn.iocoder.yudao.module.member.controller.admin.user;
 
-import org.springframework.web.bind.annotation.*;
-import javax.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Operation;
-
-import javax.validation.*;
-
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-
-import cn.iocoder.yudao.module.member.controller.admin.user.vo.*;
-import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserRespVO;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
+import cn.iocoder.yudao.module.member.dal.dataobject.tag.MemberTagDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
+import cn.iocoder.yudao.module.member.service.tag.MemberTagService;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import javax.validation.Valid;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 @Tag(name = "管理后台 - 会员用户")
 @RestController
@@ -27,6 +33,8 @@ public class MemberUserController {
 
     @Resource
     private MemberUserService memberUserService;
+    @Resource
+    private MemberTagService memberTagService;
 
     @PutMapping("/update")
     @Operation(summary = "更新会员用户")
@@ -50,7 +58,17 @@ public class MemberUserController {
     @PreAuthorize("@ss.hasPermission('member:user:query')")
     public CommonResult<PageResult<MemberUserRespVO>> getUserPage(@Valid MemberUserPageReqVO pageVO) {
         PageResult<MemberUserDO> pageResult = memberUserService.getUserPage(pageVO);
-        return success(MemberUserConvert.INSTANCE.convertPage(pageResult));
+
+        // 处理会员标签返显
+        Set<Long> tagIds = pageResult.getList().stream()
+                .map(MemberUserDO::getTagIds)
+                .filter(Objects::nonNull)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
+        List<MemberTagDO> tags = memberTagService.getTagList(tagIds);
+        Map<Long, String> tagNameMap = convertMap(tags, MemberTagDO::getId, MemberTagDO::getName);
+
+        return success(MemberUserConvert.INSTANCE.convertPage(pageResult, tagNameMap));
     }
 
 }
