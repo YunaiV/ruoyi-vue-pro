@@ -29,6 +29,7 @@ public class MemberLevelBaseVO {
 
     @Schema(description = "等级", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "等级不能为空")
+    @Positive(message = "等级必须大于0")
     private Integer level;
 
     @Schema(description = "享受折扣", requiredMode = Schema.RequiredMode.REQUIRED, example = "98")
