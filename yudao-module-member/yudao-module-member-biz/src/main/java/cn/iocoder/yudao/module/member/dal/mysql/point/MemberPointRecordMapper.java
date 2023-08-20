@@ -21,7 +21,7 @@ public interface MemberPointRecordMapper extends BaseMapperX<MemberPointRecordDO
         return selectPage(reqVO, new LambdaQueryWrapperX<MemberPointRecordDO>()
                 .inIfPresent(MemberPointRecordDO::getUserId, userIds)
                 .eqIfPresent(MemberPointRecordDO::getBizType, reqVO.getBizType())
-                .eqIfPresent(MemberPointRecordDO::getTitle, reqVO.getTitle())
+                .likeIfPresent(MemberPointRecordDO::getTitle, reqVO.getTitle())
                 .eqIfPresent(MemberPointRecordDO::getStatus, reqVO.getStatus())
                 .orderByDesc(MemberPointRecordDO::getId));
     }
