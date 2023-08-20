@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInConfigDO
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * 积分签到规则 Mapper
+ * 签到规则 Mapper
  *
  * @author QingX
  */

@@ -10,7 +10,7 @@ import org.mapstruct.factory.Mappers;
 import java.util.List;
 
 /**
- * 积分签到规则 Convert
+ * 签到规则 Convert
  *
  * @author QingX
  */
