@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.Set;
 
 /**
- * 用户签到积分 Mapper
+ * 签到记录 Mapper
  *
  * @author 芋道源码
  */

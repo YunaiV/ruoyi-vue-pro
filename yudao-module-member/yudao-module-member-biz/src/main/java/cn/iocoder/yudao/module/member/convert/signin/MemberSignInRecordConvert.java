@@ -14,7 +14,7 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
- * 用户签到积分 Convert
+ * 签到记录 Convert
  *
  * @author 芋道源码
  */

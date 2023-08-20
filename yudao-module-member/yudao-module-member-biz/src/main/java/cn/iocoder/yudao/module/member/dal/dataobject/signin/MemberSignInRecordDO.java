@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * 用户签到积分 DO
+ * 签到记录 DO
  *
  * @author 芋道源码
  */

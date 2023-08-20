@@ -34,7 +34,7 @@ public interface ErrorCodeConstants {
 
     ErrorCode RECORD_NOT_EXISTS = new ErrorCode( 1004005005, "用户积分记录不存在");
 
-    ErrorCode SIGN_IN_RECORD_NOT_EXISTS = new ErrorCode(1004005006, "用户签到积分不存在");
+    ErrorCode SIGN_IN_RECORD_NOT_EXISTS = new ErrorCode(1004005006, "签到记录不存在");
 
 
     //========== 会员标签 1004006000 ==========
