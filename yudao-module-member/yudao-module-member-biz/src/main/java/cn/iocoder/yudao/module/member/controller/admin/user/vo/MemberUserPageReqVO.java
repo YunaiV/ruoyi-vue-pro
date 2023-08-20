@@ -32,7 +32,7 @@ public class MemberUserPageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 
-    @Schema(description = "会员标签")
+    @Schema(description = "会员标签", example = "[1, 2]")
     private List<Long> tagIds;
 
 }

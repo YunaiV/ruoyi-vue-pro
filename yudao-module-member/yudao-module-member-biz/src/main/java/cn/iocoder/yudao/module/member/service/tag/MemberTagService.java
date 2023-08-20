@@ -1,10 +1,14 @@
 package cn.iocoder.yudao.module.member.service.tag;
 
-import java.util.*;
-import javax.validation.*;
-import cn.iocoder.yudao.module.member.controller.admin.tag.vo.*;
-import cn.iocoder.yudao.module.member.dal.dataobject.tag.MemberTagDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagCreateReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagPageReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagUpdateReqVO;
+import cn.iocoder.yudao.module.member.dal.dataobject.tag.MemberTagDO;
+
+import javax.validation.Valid;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 会员标签 Service 接口
@@ -58,13 +62,5 @@ public interface MemberTagService {
      * @return 会员标签分页
      */
     PageResult<MemberTagDO> getTagPage(MemberTagPageReqVO pageReqVO);
-
-    /**
-     * 获得会员标签列表, 用于 Excel 导出
-     *
-     * @param exportReqVO 查询条件
-     * @return 会员标签列表
-     */
-    List<MemberTagDO> getTagList(MemberTagExportReqVO exportReqVO);
 
 }

@@ -2,9 +2,10 @@ package cn.iocoder.yudao.module.member.controller.admin.tag;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.member.controller.admin.tag.vo.*;
+import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagCreateReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagPageReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagRespVO;
+import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagUpdateReqVO;
 import cn.iocoder.yudao.module.member.convert.tag.MemberTagConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.tag.MemberTagDO;
 import cn.iocoder.yudao.module.member.service.tag.MemberTagService;
@@ -16,14 +17,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Tag(name = "管理后台 - 会员标签")
 @RestController
@@ -82,18 +80,6 @@ public class MemberTagController {
     public CommonResult<PageResult<MemberTagRespVO>> getTagPage(@Valid MemberTagPageReqVO pageVO) {
         PageResult<MemberTagDO> pageResult = tagService.getTagPage(pageVO);
         return success(MemberTagConvert.INSTANCE.convertPage(pageResult));
-    }
-
-    @GetMapping("/export-excel")
-    @Operation(summary = "导出会员标签 Excel")
-    @PreAuthorize("@ss.hasPermission('member:tag:export')")
-    @OperateLog(type = EXPORT)
-    public void exportTagExcel(@Valid MemberTagExportReqVO exportReqVO,
-                               HttpServletResponse response) throws IOException {
-        List<MemberTagDO> list = tagService.getTagList(exportReqVO);
-        // 导出 Excel
-        List<MemberTagExcelVO> datas = MemberTagConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "会员标签.xls", "数据", MemberTagExcelVO.class, datas);
     }
 
 }

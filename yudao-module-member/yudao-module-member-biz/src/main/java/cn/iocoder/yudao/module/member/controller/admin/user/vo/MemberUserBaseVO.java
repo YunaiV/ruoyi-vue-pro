@@ -50,7 +50,7 @@ public class MemberUserBaseVO {
     @Schema(description = "会员备注", example = "我是小备注")
     private String mark;
 
-    @Schema(description = "会员标签")
+    @Schema(description = "会员标签", example = "[1, 2]")
     private List<Long> tagIds;
 
 }

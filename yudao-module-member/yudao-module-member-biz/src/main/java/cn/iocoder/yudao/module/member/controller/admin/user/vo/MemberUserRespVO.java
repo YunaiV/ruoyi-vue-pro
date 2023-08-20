@@ -32,6 +32,7 @@ public class MemberUserRespVO extends MemberUserBaseVO {
 
     // ========== 其它信息 ==========
 
-    @Schema(description = "会员标签")
+    @Schema(description = "会员标签", example = "[红色, 快乐]")
     private List<String> tagNames;
+
 }

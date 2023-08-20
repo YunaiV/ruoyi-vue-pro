@@ -1,13 +1,14 @@
 package cn.iocoder.yudao.module.member.convert.tag;
 
-import java.util.*;
-
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
+import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagCreateReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagRespVO;
+import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagUpdateReqVO;
+import cn.iocoder.yudao.module.member.dal.dataobject.tag.MemberTagDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-import cn.iocoder.yudao.module.member.controller.admin.tag.vo.*;
-import cn.iocoder.yudao.module.member.dal.dataobject.tag.MemberTagDO;
+
+import java.util.List;
 
 /**
  * 会员标签 Convert
@@ -28,7 +29,5 @@ public interface MemberTagConvert {
     List<MemberTagRespVO> convertList(List<MemberTagDO> list);
 
     PageResult<MemberTagRespVO> convertPage(PageResult<MemberTagDO> page);
-
-    List<MemberTagExcelVO> convertList02(List<MemberTagDO> list);
 
 }

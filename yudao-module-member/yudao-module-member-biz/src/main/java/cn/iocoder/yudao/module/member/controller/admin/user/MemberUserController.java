@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.member.controller.admin.user;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
@@ -19,11 +20,13 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 @Tag(name = "管理后台 - 会员用户")
 @RestController
@@ -58,6 +61,9 @@ public class MemberUserController {
     @PreAuthorize("@ss.hasPermission('member:user:query')")
     public CommonResult<PageResult<MemberUserRespVO>> getUserPage(@Valid MemberUserPageReqVO pageVO) {
         PageResult<MemberUserDO> pageResult = memberUserService.getUserPage(pageVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty());
+        }
 
         // 处理会员标签返显
         Set<Long> tagIds = pageResult.getList().stream()
@@ -66,9 +72,7 @@ public class MemberUserController {
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
         List<MemberTagDO> tags = memberTagService.getTagList(tagIds);
-        Map<Long, String> tagNameMap = convertMap(tags, MemberTagDO::getId, MemberTagDO::getName);
-
-        return success(MemberUserConvert.INSTANCE.convertPage(pageResult, tagNameMap));
+        return success(MemberUserConvert.INSTANCE.convertPage(pageResult, tags));
     }
 
 }

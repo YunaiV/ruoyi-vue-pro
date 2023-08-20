@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.member.service.tag;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagCreateReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagExportReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagUpdateReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.tag.MemberTagDO;
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
@@ -124,30 +122,6 @@ public class MemberTagServiceImplTest extends BaseDbUnitTest {
         assertEquals(1, pageResult.getTotal());
         assertEquals(1, pageResult.getList().size());
         assertPojoEquals(dbTag, pageResult.getList().get(0));
-    }
-
-    @Test
-    public void testGetTagList() {
-        // mock 数据
-        MemberTagDO dbTag = randomPojo(MemberTagDO.class, o -> { // 等会查询到
-            o.setName("test");
-            o.setCreateTime(buildTime(2023, 2, 18));
-        });
-        tagMapper.insert(dbTag);
-        // 测试 name 不匹配
-        tagMapper.insert(cloneIgnoreId(dbTag, o -> o.setName("ne")));
-        // 测试 createTime 不匹配
-        tagMapper.insert(cloneIgnoreId(dbTag, o -> o.setCreateTime(null)));
-        // 准备参数
-        MemberTagExportReqVO reqVO = new MemberTagExportReqVO();
-        reqVO.setName("test");
-        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
-
-        // 调用
-        List<MemberTagDO> list = tagService.getTagList(reqVO);
-        // 断言
-        assertEquals(1, list.size());
-        assertPojoEquals(dbTag, list.get(0));
     }
 
 }

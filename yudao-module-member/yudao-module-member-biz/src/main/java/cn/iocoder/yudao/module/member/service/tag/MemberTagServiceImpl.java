@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagCreateReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagExportReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagUpdateReqVO;
 import cn.iocoder.yudao.module.member.convert.tag.MemberTagConvert;
@@ -63,6 +62,8 @@ public class MemberTagServiceImpl implements MemberTagService {
         tagMapper.deleteById(id);
     }
 
+    // TODO @疯狂：校验 tag name 不重复，参考 validateMobileUnique 方法，Mapper 尽量逻辑通用，处理交给 Service
+
     private void validateTagExists(Long id) {
         if (tagMapper.selectById(id) == null) {
             throw exception(TAG_NOT_EXISTS);
@@ -92,11 +93,6 @@ public class MemberTagServiceImpl implements MemberTagService {
     @Override
     public PageResult<MemberTagDO> getTagPage(MemberTagPageReqVO pageReqVO) {
         return tagMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public List<MemberTagDO> getTagList(MemberTagExportReqVO exportReqVO) {
-        return tagMapper.selectList(exportReqVO);
     }
 
 }

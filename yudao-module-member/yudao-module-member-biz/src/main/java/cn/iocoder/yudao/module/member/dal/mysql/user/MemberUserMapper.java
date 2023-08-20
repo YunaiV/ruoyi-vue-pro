@@ -30,13 +30,14 @@ public interface MemberUserMapper extends BaseMapperX<MemberUserDO> {
     }
 
     default PageResult<MemberUserDO> selectPage(MemberUserPageReqVO reqVO) {
+        // 处理 tagIds 过滤条件
         String tagIdSql = "";
         if (CollUtil.isNotEmpty(reqVO.getTagIds())) {
             tagIdSql = reqVO.getTagIds().stream()
                     .map(tagId -> "FIND_IN_SET(" + tagId + ", tag_ids)")
                     .collect(Collectors.joining(" OR "));
         }
-
+        // 分页查询
         return selectPage(reqVO, new LambdaQueryWrapperX<MemberUserDO>()
                 .likeIfPresent(MemberUserDO::getMobile, reqVO.getMobile())
                 .betweenIfPresent(MemberUserDO::getLoginDate, reqVO.getLoginDate())
