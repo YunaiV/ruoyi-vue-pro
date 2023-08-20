@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.*;
@@ -47,7 +49,7 @@ public class MemberSignInConfigServiceImpl implements MemberSignInConfigService 
 
         // 判断更新
         MemberSignInConfigDO updateObj = MemberSignInConfigConvert.INSTANCE.convert(updateReqVO);
-        signInConfigMapper.updateIfPresent(updateObj);
+        signInConfigMapper.updateById(updateObj);
     }
 
     @Override
@@ -89,7 +91,10 @@ public class MemberSignInConfigServiceImpl implements MemberSignInConfigService 
 
     @Override
     public List <MemberSignInConfigDO> getSignInConfigList() {
-        return signInConfigMapper.getList();
+        //查询出所有的配置记录
+        List<MemberSignInConfigDO> result = signInConfigMapper.selectList();
+        //业务侧排序后返回结果
+        return result.stream().sorted(Comparator.comparing(MemberSignInConfigDO::getDay)).collect(Collectors.toList());
     }
 
 }

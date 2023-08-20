@@ -91,7 +91,7 @@ CREATE TABLE `member_sign_in_config` (
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
   `update_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '变更时间',
   `tenant_id` varchar(255) DEFAULT NULL COMMENT '租户id',
-  `is_enable` tinyint(1) DEFAULT NULL COMMENT '是否启用 1启用，0未启动',
+  `enable` tinyint(1) DEFAULT NULL COMMENT '是否启用 1启用，0未启动',
   `deleted` int DEFAULT '0' COMMENT '是否删除',
   `creator` varchar(255) DEFAULT NULL COMMENT '创建人',
   `updater` varchar(255) DEFAULT NULL COMMENT '变更人',
@@ -102,11 +102,11 @@ CREATE TABLE `member_sign_in_config` (
 -- Records of member_sign_in_config
 -- ----------------------------
 BEGIN;
-INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `create_time`, `update_time`, `tenant_id`, `is_enable`, `deleted`, `creator`, `updater`) VALUES (1, 4, 10, '2023-06-10 11:34:43', '2023-08-08 15:10:03', '1', 1, 0, '1', '1');
-INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `create_time`, `update_time`, `tenant_id`, `is_enable`, `deleted`, `creator`, `updater`) VALUES (2, 2, 20, '2023-06-10 11:34:59', '2023-08-08 13:39:54', '1', 1, 1, '1', '1');
-INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `create_time`, `update_time`, `tenant_id`, `is_enable`, `deleted`, `creator`, `updater`) VALUES (3, 7, 1001, '2023-06-10 17:47:45', '2023-08-08 15:09:55', '1', 0, 0, '1', '1');
-INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `create_time`, `update_time`, `tenant_id`, `is_enable`, `deleted`, `creator`, `updater`) VALUES (4, 6, 12121, '2023-06-10 17:47:55', '2023-08-08 15:09:47', '1', 0, 0, '1', '1');
-INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `create_time`, `update_time`, `tenant_id`, `is_enable`, `deleted`, `creator`, `updater`) VALUES (5, 2, 12, '2023-06-10 19:54:52', '2023-08-08 15:10:03', '1', 1, 0, '1', '1');
+INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `create_time`, `update_time`, `tenant_id`, `enable`, `deleted`, `creator`, `updater`) VALUES (1, 4, 10, '2023-06-10 11:34:43', '2023-08-08 15:10:03', '1', 1, 0, '1', '1');
+INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `create_time`, `update_time`, `tenant_id`, `enable`, `deleted`, `creator`, `updater`) VALUES (2, 2, 20, '2023-06-10 11:34:59', '2023-08-08 13:39:54', '1', 1, 1, '1', '1');
+INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `create_time`, `update_time`, `tenant_id`, `enable`, `deleted`, `creator`, `updater`) VALUES (3, 7, 1001, '2023-06-10 17:47:45', '2023-08-08 15:09:55', '1', 0, 0, '1', '1');
+INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `create_time`, `update_time`, `tenant_id`, `enable`, `deleted`, `creator`, `updater`) VALUES (4, 6, 12121, '2023-06-10 17:47:55', '2023-08-08 15:09:47', '1', 0, 0, '1', '1');
+INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `create_time`, `update_time`, `tenant_id`, `enable`, `deleted`, `creator`, `updater`) VALUES (5, 2, 12, '2023-06-10 19:54:52', '2023-08-08 15:10:03', '1', 1, 0, '1', '1');
 COMMIT;
 
 -- ----------------------------

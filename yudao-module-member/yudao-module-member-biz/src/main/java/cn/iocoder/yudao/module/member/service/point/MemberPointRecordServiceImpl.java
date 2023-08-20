@@ -29,7 +29,6 @@ public class MemberPointRecordServiceImpl implements MemberPointRecordService {
 
     @Resource
     private MemberPointRecordMapper recordMapper;
-
     @Resource
     private MemberUserApi memberUserApi;
 

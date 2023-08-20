@@ -35,10 +35,9 @@ public class MemberSignInConfigDO extends BaseDO {
      */
     private Integer point;
 
-    // TODO @puhui999：enable；不用 is 开头
     /**
      * 是否启用
      */
-    private Boolean isEnable;
+    private Boolean enable;
 
 }
