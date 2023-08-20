@@ -22,7 +22,6 @@ public interface MemberPointRecordMapper extends BaseMapperX<MemberPointRecordDO
                 .inIfPresent(MemberPointRecordDO::getUserId, userIds)
                 .eqIfPresent(MemberPointRecordDO::getBizType, reqVO.getBizType())
                 .likeIfPresent(MemberPointRecordDO::getTitle, reqVO.getTitle())
-                .eqIfPresent(MemberPointRecordDO::getStatus, reqVO.getStatus())
                 .orderByDesc(MemberPointRecordDO::getId));
     }
 
