@@ -2,23 +2,24 @@ package cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 /**
- * 快递查询 Resp DTO
+ * 快递查询的轨迹 Resp DTO
  *
  * @author jason
  */
 @Data
 public class ExpressTrackRespDTO {
 
-    // TODO @jason：LocalDateTime
     /**
      * 发生时间
      */
-    private String time;
-    // TODO @jason：其它字段可能要补充下
+    private LocalDateTime time;
+
     /**
      * 快递状态
      */
-    private String state;
+    private String content;
 
 }

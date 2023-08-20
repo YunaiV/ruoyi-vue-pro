@@ -21,7 +21,7 @@ public class CombinationProductBaseVO {
     private Long skuId;
 
     @Schema(description = "拼团价格，单位分", requiredMode = Schema.RequiredMode.REQUIRED, example = "27682")
-    @NotNull(message = "拼团价格，单位分不能为空")
-    private Integer activePrice;
+    @NotNull(message = "拼团价格不能为空")
+    private Integer combinationPrice;
 
 }

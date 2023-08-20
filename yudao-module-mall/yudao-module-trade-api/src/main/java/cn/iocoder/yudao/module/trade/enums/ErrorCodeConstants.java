@@ -31,6 +31,7 @@ public interface ErrorCodeConstants {
     ErrorCode ORDER_COMMENT_STATUS_NOT_FALSE = new ErrorCode(1011000020, "创建交易订单项的评价失败，订单已评价");
     ErrorCode ORDER_DELIVERY_FAIL_REFUND_STATUS_NOT_NONE = new ErrorCode(1011000021, "交易订单发货失败，订单已退款或部分退款");
     ErrorCode ORDER_DELIVERY_FAIL_COMBINATION_RECORD_STATUS_NOT_SUCCESS = new ErrorCode(1011000022, "交易订单发货失败，拼团未成功");
+    ErrorCode ORDER_DELIVERY_FAIL_BARGAIN_RECORD_STATUS_NOT_SUCCESS = new ErrorCode(1011000023, "交易订单发货失败，砍价未成功");
 
     // ==========  After Sale 模块 1011000100 ==========
     ErrorCode AFTER_SALE_NOT_FOUND = new ErrorCode(1011000100, "售后单不存在");
@@ -44,7 +45,8 @@ public interface ErrorCodeConstants {
     ErrorCode AFTER_SALE_DELIVERY_FAIL_STATUS_NOT_SELLER_AGREE = new ErrorCode(1011000108, "退货失败，售后单状态不处于【待买家退货】");
     ErrorCode AFTER_SALE_CONFIRM_FAIL_STATUS_NOT_BUYER_DELIVERY = new ErrorCode(1011000109, "确认收货失败，售后单状态不处于【待确认收货】");
     ErrorCode AFTER_SALE_REFUND_FAIL_STATUS_NOT_WAIT_REFUND = new ErrorCode(1011000110, "退款失败，售后单状态不是【待退款】");
-    ErrorCode AFTER_SALE_CANCEL_FAIL_STATUS_NOT_APPLY_OR_AGREE = new ErrorCode(1011000111, "取消售后单失败，售后单状态不是【待审核】或【卖家同意】");
+    ErrorCode AFTER_SALE_CANCEL_FAIL_STATUS_NOT_APPLY_OR_AGREE_OR_BUYER_DELIVERY =
+            new ErrorCode(1011000111, "取消售后单失败，售后单状态不是【待审核】或【卖家同意】或【商家待收货】");
 
     // ==========  Cart 模块 1011002000 ==========
     ErrorCode CARD_ITEM_NOT_FOUND = new ErrorCode(1011002000, "购物车项不存在");
@@ -58,6 +60,7 @@ public interface ErrorCodeConstants {
     ErrorCode EXPRESS_NOT_EXISTS = new ErrorCode(1011004000, "快递公司不存在");
     ErrorCode EXPRESS_CODE_DUPLICATE = new ErrorCode(1011004001, "已经存在该编码的快递公司");
     ErrorCode EXPRESS_CLIENT_NOT_PROVIDE = new ErrorCode(1011004002, "需要接入快递服务商，比如【快递100】");
+    ErrorCode EXPRESS_STATUS_NOT_ENABLE = new ErrorCode(1011004003, "快递公司未启用");
 
     ErrorCode EXPRESS_API_QUERY_ERROR = new ErrorCode(1011004101, "快递查询接口异常");
     ErrorCode EXPRESS_API_QUERY_FAILED = new ErrorCode(1011004102, "快递查询返回失败，原因：{}");
@@ -68,11 +71,5 @@ public interface ErrorCodeConstants {
 
     // ==========  物流 PICK_UP 模块 1011006000 ==========
     ErrorCode PICK_UP_STORE_NOT_EXISTS = new ErrorCode(1011006000, "自提门店不存在");
-
-    // ==========  物流 PICK_UP 模块 1011007000 ==========
-    // TODO @puhui999：这几个错误码，应该属于订单哈
-    ErrorCode ORDER_DELIVERY_FAILED_ITEMS_NOT_EMPTY = new ErrorCode(1011007000, "订单发货失败，请选择发货商品");
-    ErrorCode ORDER_DELIVERY_FAILED_ITEM_NOT_EXISTS = new ErrorCode(1011007001, "订单发货失败，所选发货商品不存在");
-    ErrorCode ORDER_DELIVERY_FAILED_ITEM_ALREADY_DELIVERY = new ErrorCode(1011007002, "订单发货失败，所选商品已发货");
 
 }

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.trade.api.order;
 
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
-import cn.iocoder.yudao.module.trade.service.order.TradeOrderService;
+import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -20,12 +20,12 @@ import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.ORDER_ITEM_
 public class TradeOrderApiImpl implements TradeOrderApi {
 
     @Resource
-    private TradeOrderService tradeOrderService;
+    private TradeOrderQueryService tradeOrderQueryService;
 
     @Override
     public Long validateOrder(Long userId, Long orderItemId) {
         // 校验订单项，订单项存在订单就存在
-        TradeOrderItemDO item = tradeOrderService.getOrderItem(userId, orderItemId);
+        TradeOrderItemDO item = tradeOrderQueryService.getOrderItem(userId, orderItemId);
         if (item == null) {
             throw exception(ORDER_ITEM_NOT_FOUND);
         }

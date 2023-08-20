@@ -12,8 +12,9 @@ import java.util.List;
 @Mapper
 public interface TradeOrderItemMapper extends BaseMapperX<TradeOrderItemDO> {
 
-    default int updateAfterSaleStatus(Long id, Integer oldAfterSaleStatus, Integer newAfterSaleStatus) {
-        return update(new TradeOrderItemDO().setAfterSaleStatus(newAfterSaleStatus),
+    default int updateAfterSaleStatus(Long id, Integer oldAfterSaleStatus, Integer newAfterSaleStatus,
+                                      Long afterSaleId) {
+        return update(new TradeOrderItemDO().setAfterSaleStatus(newAfterSaleStatus).setAfterSaleId(afterSaleId),
                 new LambdaUpdateWrapper<>(new TradeOrderItemDO().setId(id).setAfterSaleStatus(oldAfterSaleStatus)));
     }
 
@@ -25,9 +26,16 @@ public interface TradeOrderItemMapper extends BaseMapperX<TradeOrderItemDO> {
         return selectList(TradeOrderItemDO::getOrderId, orderIds);
     }
 
-    default TradeOrderItemDO selectOrderItemByIdAndUserId(Long orderItemId, Long loginUserId) {
+    default List<TradeOrderItemDO> selectListByOrderIdAnSkuId(Collection<Long> orderIds, Collection<Long> skuIds) {
+        return selectList(new LambdaQueryWrapperX<TradeOrderItemDO>()
+                .in(TradeOrderItemDO::getOrderId, orderIds)
+                .eq(TradeOrderItemDO::getSkuId, skuIds));
+    }
+
+    default TradeOrderItemDO selectByIdAndUserId(Long orderItemId, Long loginUserId) {
         return selectOne(new LambdaQueryWrapperX<TradeOrderItemDO>()
                 .eq(TradeOrderItemDO::getId, orderItemId)
                 .eq(TradeOrderItemDO::getUserId, loginUserId));
     }
+
 }

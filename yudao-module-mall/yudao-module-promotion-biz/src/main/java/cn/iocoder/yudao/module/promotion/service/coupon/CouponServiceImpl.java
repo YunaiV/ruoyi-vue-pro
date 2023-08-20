@@ -120,4 +120,9 @@ public class CouponServiceImpl implements CouponService {
         }
     }
 
+    @Override
+    public Long getUnusedCouponCount(Long userId) {
+        return couponMapper.selectCountByUserIdAndStatus(userId, CouponStatusEnum.UNUSED.getStatus());
+    }
+
 }

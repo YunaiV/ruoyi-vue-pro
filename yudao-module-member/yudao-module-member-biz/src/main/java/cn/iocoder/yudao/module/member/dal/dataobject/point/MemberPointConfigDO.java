@@ -27,7 +27,7 @@ public class MemberPointConfigDO extends BaseDO {
      * 自增主键
      */
     @TableId
-    private Integer id;
+    private Long id;
     /**
      * 积分抵扣开关
      */
@@ -37,7 +37,7 @@ public class MemberPointConfigDO extends BaseDO {
      *
      * 1 积分抵扣多少分
      */
-    private BigDecimal tradeDeductUnitPrice;
+    private Integer tradeDeductUnitPrice;
     /**
      * 积分抵扣最大值
      */

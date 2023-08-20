@@ -14,17 +14,18 @@ import java.util.List;
 public interface DecorateComponentService {
 
     /**
-     * 店铺装修页面保存
+     * 保存页面的组件信息
      *
      * @param reqVO 请求 VO
      */
-    void savePageComponents(DecorateComponentSaveReqVO reqVO);
+    void saveDecorateComponent(DecorateComponentSaveReqVO reqVO);
 
     /**
-     * 根据页面 id。获取页面的组件信息
+     * 根据页面 id，获取页面的组件信息
      *
-     * @param pageId 页面类型 {@link DecoratePageEnum#getId()}
+     * @param page 页面编号 {@link DecoratePageEnum#getPage()}
+     * @param status 状态
      */
-    List<DecorateComponentDO> getPageComponents(Integer pageId);
+    List<DecorateComponentDO> getDecorateComponentListByPage(Integer page, Integer status);
 
 }

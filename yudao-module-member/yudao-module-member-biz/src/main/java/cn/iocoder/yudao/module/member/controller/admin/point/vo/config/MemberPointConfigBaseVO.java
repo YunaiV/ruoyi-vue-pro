@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.member.controller.admin.point.vo.config;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.math.BigDecimal;
+import javax.validation.constraints.NotNull;
 
 /**
  * 会员积分配置 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -12,18 +12,20 @@ import java.math.BigDecimal;
 @Data
 public class MemberPointConfigBaseVO {
 
-    private Long id;
-
     @Schema(description = "积分抵扣开关", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
+    @NotNull(message = "积分抵扣开发不能为空")
     private Boolean tradeDeductEnable;
 
-    @Schema(description = "积分抵扣，单位：分", example = "13506")
-    private BigDecimal tradeDeductUnitPrice;
+    @Schema(description = "积分抵扣，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "13506")
+    @NotNull(message = "积分抵扣不能为空")
+    private Integer tradeDeductUnitPrice;
 
-    @Schema(description = "积分抵扣最大值", example = "32428")
-    private Long tradeDeductMaxPrice;
+    @Schema(description = "积分抵扣最大值", requiredMode = Schema.RequiredMode.REQUIRED, example = "32428")
+    @NotNull(message = "积分抵扣最大值不能为空")
+    private Integer tradeDeductMaxPrice;
 
-    @Schema(description = "1 元赠送多少分")
-    private Long tradeGivePoint;
+    @Schema(description = "1 元赠送多少分", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
+    @NotNull(message = "1 元赠送积分不能为空")
+    private Integer tradeGivePoint;
 
 }

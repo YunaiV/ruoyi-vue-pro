@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.trade.service.aftersale;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
@@ -27,7 +28,8 @@ import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.dto.TradeAfterSaleLogCreateReqDTO;
 import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.service.AfterSaleLogService;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
-import cn.iocoder.yudao.module.trade.service.order.TradeOrderService;
+import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
+import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -44,7 +46,7 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
 /**
- * 交易售后 Service 实现类
+ * 售后订单 Service 实现类
  *
  * @author 芋道源码
  */
@@ -54,7 +56,9 @@ import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSaleLogService {
 
     @Resource
-    private TradeOrderService tradeOrderService;
+    private TradeOrderUpdateService tradeOrderUpdateService;
+    @Resource
+    private TradeOrderQueryService tradeOrderQueryService;
 
     @Resource
     private TradeAfterSaleMapper tradeAfterSaleMapper;
@@ -73,12 +77,22 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
     }
 
     @Override
+    public PageResult<TradeAfterSaleDO> getAfterSalePage(Long userId, PageParam pageParam) {
+        return tradeAfterSaleMapper.selectPage(userId, pageParam);
+    }
+
+    @Override
+    public TradeAfterSaleDO getAfterSale(Long userId, Long id) {
+         return tradeAfterSaleMapper.selectByIdAndUserId(id, userId);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createAfterSale(Long userId, AppTradeAfterSaleCreateReqVO createReqVO) {
         // 第一步，前置校验
         TradeOrderItemDO tradeOrderItem = validateOrderItemApplicable(userId, createReqVO);
 
-        // 第二步，存储交易售后
+        // 第二步，存储售后订单
         TradeAfterSaleDO afterSale = createAfterSale(createReqVO, tradeOrderItem);
         return afterSale.getId();
     }
@@ -92,7 +106,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
      */
     private TradeOrderItemDO validateOrderItemApplicable(Long userId, AppTradeAfterSaleCreateReqVO createReqVO) {
         // 校验订单项存在
-        TradeOrderItemDO orderItem = tradeOrderService.getOrderItem(userId, createReqVO.getOrderItemId());
+        TradeOrderItemDO orderItem = tradeOrderQueryService.getOrderItem(userId, createReqVO.getOrderItemId());
         if (orderItem == null) {
             throw exception(ORDER_ITEM_NOT_FOUND);
         }
@@ -108,7 +122,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
         }
 
         // 校验订单存在
-        TradeOrderDO order = tradeOrderService.getOrder(userId, orderItem.getOrderId());
+        TradeOrderDO order = tradeOrderQueryService.getOrder(userId, orderItem.getOrderId());
         if (order == null) {
             throw exception(ORDER_NOT_FOUND);
         }
@@ -136,7 +150,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
         afterSale.setNo(RandomUtil.randomString(10)); // TODO 芋艿：优化 no 生成逻辑
         afterSale.setStatus(TradeAfterSaleStatusEnum.APPLY.getStatus());
         // 标记是售中还是售后
-        TradeOrderDO order = tradeOrderService.getOrder(orderItem.getUserId(), orderItem.getOrderId());
+        TradeOrderDO order = tradeOrderQueryService.getOrder(orderItem.getUserId(), orderItem.getOrderId());
         afterSale.setOrderNo(order.getNo()); // 记录 orderNo 订单流水，方便后续检索
         afterSale.setType(TradeOrderStatusEnum.isCompleted(order.getStatus())
                 ? TradeAfterSaleTypeEnum.AFTER_SALE.getType() : TradeAfterSaleTypeEnum.IN_SALE.getType());
@@ -144,9 +158,9 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
         tradeAfterSaleMapper.insert(afterSale);
 
         // 更新交易订单项的售后状态
-        tradeOrderService.updateOrderItemAfterSaleStatus(orderItem.getId(),
-                TradeOrderItemAfterSaleStatusEnum.NONE.getStatus(),
-                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), null);
+        tradeOrderUpdateService.updateOrderItemAfterSaleStatus(orderItem.getId(),
+                TradeOrderItemAfterSaleStatusEnum.NONE.getStatus(), TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(),
+                afterSale.getId(), null);
 
         // 记录售后日志
         createAfterSaleLog(orderItem.getUserId(), UserTypeEnum.MEMBER.getValue(),
@@ -165,7 +179,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
         // 更新售后单的状态
         // 情况一：退款：标记为 WAIT_REFUND 状态。后续等退款发起成功后，在标记为 COMPLETE 状态
         // 情况二：退货退款：需要等用户退货后，才能发起退款
-        Integer newStatus = afterSale.getType().equals(TradeAfterSaleWayEnum.REFUND.getWay()) ?
+        Integer newStatus = afterSale.getWay().equals(TradeAfterSaleWayEnum.REFUND.getWay()) ?
                 TradeAfterSaleStatusEnum.WAIT_REFUND.getStatus() : TradeAfterSaleStatusEnum.SELLER_AGREE.getStatus();
         updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.APPLY.getStatus(), new TradeAfterSaleDO()
                 .setStatus(newStatus).setAuditUserId(userId).setAuditTime(LocalDateTime.now()));
@@ -196,9 +210,8 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
         // TODO 发送售后消息
 
         // 更新交易订单项的售后状态为【未申请】
-        tradeOrderService.updateOrderItemAfterSaleStatus(afterSale.getOrderItemId(),
-                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(),
-                TradeOrderItemAfterSaleStatusEnum.NONE.getStatus(), null);
+        tradeOrderUpdateService.updateOrderItemAfterSaleStatus(afterSale.getOrderItemId(),
+                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), TradeOrderItemAfterSaleStatusEnum.NONE.getStatus());
     }
 
     /**
@@ -241,7 +254,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
         updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.SELLER_AGREE.getStatus(), new TradeAfterSaleDO()
                 .setStatus(TradeAfterSaleStatusEnum.BUYER_DELIVERY.getStatus())
                 .setLogisticsId(deliveryReqVO.getLogisticsId()).setLogisticsNo(deliveryReqVO.getLogisticsNo())
-                .setDeliveryTime(deliveryReqVO.getDeliveryTime()));
+                .setDeliveryTime(LocalDateTime.now()));
 
         // 记录售后日志
         createAfterSaleLog(userId, UserTypeEnum.MEMBER.getValue(),
@@ -291,9 +304,8 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
         // TODO 发送售后消息
 
         // 更新交易订单项的售后状态为【未申请】
-        tradeOrderService.updateOrderItemAfterSaleStatus(afterSale.getOrderItemId(),
-                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(),
-                TradeOrderItemAfterSaleStatusEnum.NONE.getStatus(), null);
+        tradeOrderUpdateService.updateOrderItemAfterSaleStatus(afterSale.getOrderItemId(),
+                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), TradeOrderItemAfterSaleStatusEnum.NONE.getStatus());
     }
 
     /**
@@ -317,7 +329,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
     @Transactional(rollbackFor = Exception.class)
     public void refundAfterSale(Long userId, String userIp, Long id) {
         // 校验售后单的状态，并状态待退款
-        TradeAfterSaleDO afterSale = tradeAfterSaleMapper.selectByPayRefundId(id);
+        TradeAfterSaleDO afterSale = tradeAfterSaleMapper.selectById(id);
         if (afterSale == null) {
             throw exception(AFTER_SALE_NOT_FOUND);
         }
@@ -339,9 +351,9 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
         // TODO 发送售后消息
 
         // 更新交易订单项的售后状态为【已完成】
-        tradeOrderService.updateOrderItemAfterSaleStatus(afterSale.getOrderItemId(),
-                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(),
-                TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus(), afterSale.getRefundPrice());
+        tradeOrderUpdateService.updateOrderItemAfterSaleStatus(afterSale.getOrderItemId(),
+                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus(),
+                null, afterSale.getRefundPrice());
     }
 
     private void createPayRefund(String userIp, TradeAfterSaleDO afterSale) {
@@ -361,13 +373,14 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
     @Override
     public void cancelAfterSale(Long userId, Long id) {
         // 校验售后单的状态，并状态待退款
-        TradeAfterSaleDO afterSale = tradeAfterSaleMapper.selectByPayRefundId(id);
+        TradeAfterSaleDO afterSale = tradeAfterSaleMapper.selectById(id);
         if (afterSale == null) {
             throw exception(AFTER_SALE_NOT_FOUND);
         }
-        if (ObjectUtils.equalsAny(afterSale.getStatus(), TradeAfterSaleStatusEnum.APPLY.getStatus(),
-                TradeAfterSaleStatusEnum.SELLER_AGREE.getStatus())) {
-            throw exception(AFTER_SALE_CANCEL_FAIL_STATUS_NOT_APPLY_OR_AGREE);
+        if (!ObjectUtils.equalsAny(afterSale.getStatus(), TradeAfterSaleStatusEnum.APPLY.getStatus(),
+                TradeAfterSaleStatusEnum.SELLER_AGREE.getStatus(),
+                TradeAfterSaleStatusEnum.BUYER_DELIVERY.getStatus())) {
+            throw exception(AFTER_SALE_CANCEL_FAIL_STATUS_NOT_APPLY_OR_AGREE_OR_BUYER_DELIVERY);
         }
 
         // 更新售后单的状态为【已取消】
@@ -381,9 +394,13 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
         // TODO 发送售后消息
 
         // 更新交易订单项的售后状态为【未申请】
-        tradeOrderService.updateOrderItemAfterSaleStatus(afterSale.getOrderItemId(),
-                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(),
-                TradeOrderItemAfterSaleStatusEnum.NONE.getStatus(), null);
+        tradeOrderUpdateService.updateOrderItemAfterSaleStatus(afterSale.getOrderItemId(),
+                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), TradeOrderItemAfterSaleStatusEnum.NONE.getStatus());
+    }
+
+    @Override
+    public Long getApplyingAfterSaleCount(Long userId) {
+        return tradeAfterSaleMapper.selectCountByUserIdAndStatus(userId, TradeAfterSaleStatusEnum.APPLYING_STATUSES);
     }
 
     @Deprecated

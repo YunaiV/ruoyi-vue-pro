@@ -5,6 +5,8 @@ import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
+import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
+import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -24,15 +26,19 @@ import java.util.List;
 public class ProductSpuApiImpl implements ProductSpuApi {
 
     @Resource
-    private ProductSpuMapper productSpuMapper;
+    private ProductSpuService spuService;
 
     @Override
-    public List<ProductSpuRespDTO> getSpuList(Collection<Long> spuIds) {
-        if (CollectionUtil.isEmpty(spuIds)) {
+    public List<ProductSpuRespDTO> getSpuList(Collection<Long> ids) {
+        if (CollectionUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        List<ProductSpuDO> productSpuDOList = productSpuMapper.selectBatchIds(spuIds);
-        return ProductSpuConvert.INSTANCE.convertList2(productSpuDOList);
+        return ProductSpuConvert.INSTANCE.convertList2(spuService.getSpuList(ids));
+    }
+
+    @Override
+    public ProductSpuRespDTO getSpu(Long id) {
+        return ProductSpuConvert.INSTANCE.convert02(spuService.getSpu(id));
     }
 
 }

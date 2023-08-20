@@ -2,28 +2,35 @@ package cn.iocoder.yudao.module.promotion.controller.app.coupon;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponMatchReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponMatchRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.template.AppCouponTemplatePageReqVO;
+import cn.iocoder.yudao.module.promotion.service.coupon.CouponService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "用户 App - 优惠劵")
 @RestController
 @RequestMapping("/promotion/coupon")
 @Validated
 public class AppCouponController {
+
+    @Resource
+    private CouponService couponService;
 
     // TODO 芋艿：待实现
     @PostMapping("/take")
@@ -91,6 +98,13 @@ public class AppCouponController {
             list.add(vo);
         }
         return success(new PageResult<>(list, 20L));
+    }
+
+    @GetMapping(value = "/get-unused-count")
+    @Operation(summary = "获得未使用的优惠劵数量")
+    @PreAuthenticated
+    public CommonResult<Long> getUnusedCouponCount() {
+        return success(couponService.getUnusedCouponCount(getLoginUserId()));
     }
 
 }

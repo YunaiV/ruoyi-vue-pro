@@ -3,19 +3,16 @@ package cn.iocoder.yudao.module.promotion.service.combination;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityExportReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityUpdateReqVO;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.combinationactivity.CombinationActivityDO;
-import cn.iocoder.yudao.module.promotion.dal.mysql.combination.combinationactivity.CombinationActivityMapper;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
+import cn.iocoder.yudao.module.promotion.dal.mysql.combination.CombinationActivityMapper;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -114,8 +111,8 @@ public class CombinationActivityServiceImplTest extends BaseDbUnitTest {
             o.setStartTime(null);
             o.setEndTime(null);
             o.setUserSize(null);
-            o.setTotalNum(null);
-            o.setSuccessNum(null);
+            o.setTotalCount(null);
+            o.setSuccessCount(null);
             o.setOrderUserCount(null);
             o.setVirtualGroup(null);
             o.setStatus(null);
@@ -138,9 +135,9 @@ public class CombinationActivityServiceImplTest extends BaseDbUnitTest {
         // 测试 userSize 不匹配
         combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setUserSize(null)));
         // 测试 totalNum 不匹配
-        combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setTotalNum(null)));
+        combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setTotalCount(null)));
         // 测试 successNum 不匹配
-        combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setSuccessNum(null)));
+        combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setSuccessCount(null)));
         // 测试 orderUserCount 不匹配
         combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setOrderUserCount(null)));
         // 测试 virtualGroup 不匹配
@@ -154,19 +151,7 @@ public class CombinationActivityServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         CombinationActivityPageReqVO reqVO = new CombinationActivityPageReqVO();
         reqVO.setName(null);
-        reqVO.setSpuId(null);
-        reqVO.setTotalLimitCount(null);
-        reqVO.setSingleLimitCount(null);
-        reqVO.setStartTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
-        reqVO.setEndTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
-        reqVO.setUserSize(null);
-        reqVO.setTotalNum(null);
-        reqVO.setSuccessNum(null);
-        reqVO.setOrderUserCount(null);
-        reqVO.setVirtualGroup(null);
         reqVO.setStatus(null);
-        reqVO.setLimitDuration(null);
-        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
         // 调用
         PageResult<CombinationActivityDO> pageResult = combinationActivityService.getCombinationActivityPage(reqVO);
@@ -188,8 +173,8 @@ public class CombinationActivityServiceImplTest extends BaseDbUnitTest {
             o.setStartTime(null);
             o.setEndTime(null);
             o.setUserSize(null);
-            o.setTotalNum(null);
-            o.setSuccessNum(null);
+            o.setTotalCount(null);
+            o.setSuccessCount(null);
             o.setOrderUserCount(null);
             o.setVirtualGroup(null);
             o.setStatus(null);
@@ -212,9 +197,9 @@ public class CombinationActivityServiceImplTest extends BaseDbUnitTest {
         // 测试 userSize 不匹配
         combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setUserSize(null)));
         // 测试 totalNum 不匹配
-        combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setTotalNum(null)));
+        combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setTotalCount(null)));
         // 测试 successNum 不匹配
-        combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setSuccessNum(null)));
+        combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setSuccessCount(null)));
         // 测试 orderUserCount 不匹配
         combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setOrderUserCount(null)));
         // 测试 virtualGroup 不匹配
@@ -225,28 +210,7 @@ public class CombinationActivityServiceImplTest extends BaseDbUnitTest {
         combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setLimitDuration(null)));
         // 测试 createTime 不匹配
         combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setCreateTime(null)));
-        // 准备参数
-        CombinationActivityExportReqVO reqVO = new CombinationActivityExportReqVO();
-        reqVO.setName(null);
-        reqVO.setSpuId(null);
-        reqVO.setTotalLimitCount(null);
-        reqVO.setSingleLimitCount(null);
-        reqVO.setStartTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
-        reqVO.setEndTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
-        reqVO.setUserSize(null);
-        reqVO.setTotalNum(null);
-        reqVO.setSuccessNum(null);
-        reqVO.setOrderUserCount(null);
-        reqVO.setVirtualGroup(null);
-        reqVO.setStatus(null);
-        reqVO.setLimitDuration(null);
-        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
-        // 调用
-        List<CombinationActivityDO> list = combinationActivityService.getCombinationActivityList(reqVO);
-        // 断言
-        assertEquals(1, list.size());
-        assertPojoEquals(dbCombinationActivity, list.get(0));
     }
 
 }

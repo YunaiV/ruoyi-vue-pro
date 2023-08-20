@@ -10,7 +10,6 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.FAVORITE_EXISTS;
@@ -31,7 +30,7 @@ public class ProductFavoriteServiceImpl implements ProductFavoriteService {
     @Override
     public Long createFavorite(Long userId, Long spuId) {
         ProductFavoriteDO favorite = productFavoriteMapper.selectByUserIdAndSpuId(userId, spuId);
-        if (Objects.nonNull(favorite)) {
+        if (favorite != null) {
             throw exception(FAVORITE_EXISTS);
         }
 
@@ -43,7 +42,7 @@ public class ProductFavoriteServiceImpl implements ProductFavoriteService {
     @Override
     public void deleteFavorite(Long userId, Long spuId) {
         ProductFavoriteDO favorite = productFavoriteMapper.selectByUserIdAndSpuId(userId, spuId);
-        if (Objects.isNull(favorite)) {
+        if (favorite == null) {
             throw exception(FAVORITE_NOT_EXISTS);
         }
 
@@ -58,6 +57,11 @@ public class ProductFavoriteServiceImpl implements ProductFavoriteService {
     @Override
     public ProductFavoriteDO getFavorite(Long userId, Long spuId) {
         return productFavoriteMapper.selectByUserIdAndSpuId(userId, spuId);
+    }
+
+    @Override
+    public Long getFavoriteCount(Long userId) {
+        return productFavoriteMapper.selectCountByUserId(userId);
     }
 
 }

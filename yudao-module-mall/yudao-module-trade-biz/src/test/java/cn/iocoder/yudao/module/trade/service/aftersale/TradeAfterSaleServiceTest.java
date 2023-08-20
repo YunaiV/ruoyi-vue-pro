@@ -18,7 +18,8 @@ import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleWayEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
-import cn.iocoder.yudao.module.trade.service.order.TradeOrderService;
+import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
+import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -52,7 +53,9 @@ public class TradeAfterSaleServiceTest extends BaseDbUnitTest {
     private TradeAfterSaleLogMapper tradeAfterSaleLogMapper;
 
     @MockBean
-    private TradeOrderService tradeOrderService;
+    private TradeOrderUpdateService tradeOrderUpdateService;
+    @Resource
+    private TradeOrderQueryService tradeOrderQueryService;
     @MockBean
     private PayRefundApi payRefundApi;
 
@@ -72,12 +75,12 @@ public class TradeAfterSaleServiceTest extends BaseDbUnitTest {
             o.setOrderId(111L).setUserId(userId).setPayPrice(200);
             o.setAfterSaleStatus(TradeOrderItemAfterSaleStatusEnum.NONE.getStatus());
         });
-        when(tradeOrderService.getOrderItem(eq(1024L), eq(1L)))
+        when(tradeOrderQueryService.getOrderItem(eq(1024L), eq(1L)))
                 .thenReturn(orderItem);
         // mock 方法（交易订单）
         TradeOrderDO order = randomPojo(TradeOrderDO.class, o -> o.setStatus(TradeOrderStatusEnum.DELIVERED.getStatus())
                 .setNo("202211301234"));
-        when(tradeOrderService.getOrder(eq(1024L), eq(111L))).thenReturn(order);
+        when(tradeOrderQueryService.getOrder(eq(1024L), eq(111L))).thenReturn(order);
 
         // 调用
         Long afterSaleId = tradeAfterSaleService.createAfterSale(userId, createReqVO);

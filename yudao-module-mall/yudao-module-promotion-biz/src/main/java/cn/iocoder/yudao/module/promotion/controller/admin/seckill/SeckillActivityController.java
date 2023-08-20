@@ -1,15 +1,15 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.seckill;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.*;
 import cn.iocoder.yudao.module.promotion.convert.seckill.seckillactivity.SeckillActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillProductDO;
-import cn.iocoder.yudao.module.promotion.service.seckill.seckillactivity.SeckillActivityService;
+import cn.iocoder.yudao.module.promotion.service.seckill.SeckillActivityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,11 +19,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Tag(name = "管理后台 - 秒杀活动")
 @RestController
@@ -34,7 +33,7 @@ public class SeckillActivityController {
     @Resource
     private SeckillActivityService seckillActivityService;
     @Resource
-    private ProductSpuApi spuApi;
+    private ProductSpuApi productSpuApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建秒杀活动")
@@ -74,30 +73,27 @@ public class SeckillActivityController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('promotion:seckill-activity:query')")
     public CommonResult<SeckillActivityDetailRespVO> getSeckillActivity(@RequestParam("id") Long id) {
-        SeckillActivityDO seckillActivity = seckillActivityService.getSeckillActivity(id);
-        List<SeckillProductDO> seckillProducts = seckillActivityService.getSeckillProductListByActivityId(id);
-        return success(SeckillActivityConvert.INSTANCE.convert(seckillActivity, seckillProducts));
-    }
-
-    @GetMapping("/list")
-    @Operation(summary = "获得秒杀活动列表")
-    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @PreAuthorize("@ss.hasPermission('promotion:seckill-activity:query')")
-    public CommonResult<List<SeckillActivityRespVO>> getSeckillActivityList(@RequestParam("ids") Collection<Long> ids) {
-        List<SeckillActivityDO> list = seckillActivityService.getSeckillActivityList(ids);
-        return success(SeckillActivityConvert.INSTANCE.convertList(list));
+        SeckillActivityDO activity = seckillActivityService.getSeckillActivity(id);
+        List<SeckillProductDO> products = seckillActivityService.getSeckillProductListByActivityId(id);
+        return success(SeckillActivityConvert.INSTANCE.convert(activity, products));
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得秒杀活动分页")
     @PreAuthorize("@ss.hasPermission('promotion:seckill-activity:query')")
     public CommonResult<PageResult<SeckillActivityRespVO>> getSeckillActivityPage(@Valid SeckillActivityPageReqVO pageVO) {
+        // 查询活动列表
         PageResult<SeckillActivityDO> pageResult = seckillActivityService.getSeckillActivityPage(pageVO);
-        Set<Long> aIds = CollectionUtils.convertSet(pageResult.getList(), SeckillActivityDO::getId);
-        List<SeckillProductDO> seckillProducts = seckillActivityService.getSeckillProductListByActivityId(aIds);
-        Set<Long> spuIds = CollectionUtils.convertSet(pageResult.getList(), SeckillActivityDO::getSpuId);
-        List<ProductSpuRespDTO> spuList = spuApi.getSpuList(spuIds);
-        return success(SeckillActivityConvert.INSTANCE.convertPage(pageResult, seckillProducts, spuList));
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty(pageResult.getTotal()));
+        }
+
+        // 拼接数据
+        List<SeckillProductDO> products = seckillActivityService.getSeckillProductListByActivityId(
+                convertSet(pageResult.getList(), SeckillActivityDO::getId));
+        List<ProductSpuRespDTO> spuList = productSpuApi.getSpuList(
+                convertSet(pageResult.getList(), SeckillActivityDO::getSpuId));
+        return success(SeckillActivityConvert.INSTANCE.convertPage(pageResult, products, spuList));
     }
 
 }

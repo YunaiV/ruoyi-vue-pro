@@ -59,7 +59,7 @@ public class TradeExpressProperties {
     }
 
     /**
-     * 快递100 配置项
+     * 快递 100 配置项
      */
     @Data
     public static class Kd100Config {

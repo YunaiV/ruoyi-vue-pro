@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.enums.decorate;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
@@ -8,11 +9,44 @@ import lombok.Getter;
  * @author jason
  */
 @Getter
+@AllArgsConstructor
+@SuppressWarnings("JavadocLinkAsPlainText")
 public enum DecorateComponentEnum {
 
-    NAV_MENU("nav-menu", "导航菜单"),
-    ROLLING_BANNER("rolling-banner", "滚动横幅广告"),
-    PRODUCT_CATEGORY("product-category", "商品分类");
+    /**
+     * 格式：[{
+     *  "name": "标题"
+     *  "picUrl": "https://www.iocoder.cn/xxx.png",
+     *  "url": "/pages/users/index"
+     * }]
+     *
+     * 最多 10 个
+     */
+    MENU("menu", "菜单"),
+    /**
+     * 格式：[{
+     *  "name": "标题"
+     *  "url": "/pages/users/index"
+     * }]
+     */
+    ROLLING_NEWS("scrolling-news", "滚动新闻"),
+    /**
+     * 格式：[{
+     *  "picUrl": "https://www.iocoder.cn/xxx.png",
+     *  "url": "/pages/users/index"
+     * }]
+     */
+    SLIDE_SHOW("slide-show", "轮播图"),
+    /**
+     * 格式：[{
+     *  "name": "标题"
+     *  "type": "类型", // best、hot、new、benefit、good
+     *  "tag": "标签" // 例如说：多买多省
+     * }]
+     *
+     * 最多 4 个
+     */
+    PRODUCT_RECOMMEND("product-recommend", "商品推荐");
 
     /**
      * 页面组件代码
@@ -23,10 +57,5 @@ public enum DecorateComponentEnum {
      * 页面组件说明
      */
     private final String desc;
-
-    DecorateComponentEnum(String code, String desc) {
-        this.code = code;
-        this.desc = desc;
-    }
 
 }

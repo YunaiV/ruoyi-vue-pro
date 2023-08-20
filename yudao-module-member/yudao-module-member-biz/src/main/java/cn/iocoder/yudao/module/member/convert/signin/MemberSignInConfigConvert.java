@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.member.convert.signin;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInConfigCreateReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInConfigRespVO;
-import cn.iocoder.yudao.module.member.controller.admin.signin.vo.MemberSignInConfigUpdateReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.signin.vo.config.MemberSignInConfigCreateReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.signin.vo.config.MemberSignInConfigRespVO;
+import cn.iocoder.yudao.module.member.controller.admin.signin.vo.config.MemberSignInConfigUpdateReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInConfigDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -11,7 +10,7 @@ import org.mapstruct.factory.Mappers;
 import java.util.List;
 
 /**
- * 积分签到规则 Convert
+ * 签到规则 Convert
  *
  * @author QingX
  */
@@ -27,7 +26,5 @@ public interface MemberSignInConfigConvert {
     MemberSignInConfigRespVO convert(MemberSignInConfigDO bean);
 
     List<MemberSignInConfigRespVO> convertList(List<MemberSignInConfigDO> list);
-
-    PageResult<MemberSignInConfigRespVO> convertPage(PageResult<MemberSignInConfigDO> page);
 
 }

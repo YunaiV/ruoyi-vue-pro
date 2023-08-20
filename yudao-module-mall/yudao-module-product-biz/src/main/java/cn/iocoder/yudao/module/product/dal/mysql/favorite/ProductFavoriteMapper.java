@@ -21,4 +21,8 @@ public interface ProductFavoriteMapper extends BaseMapperX<ProductFavoriteDO> {
                 .orderByDesc(ProductFavoriteDO::getId));
     }
 
+    default Long selectCountByUserId(Long userId) {
+        return selectCount(ProductFavoriteDO::getUserId, userId);
+    }
+
 }

@@ -21,28 +21,28 @@ public class SeckillActivityRespVO extends SeckillActivityBaseVO {
     @Schema(description = "商品主图", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xx.png")
     private String picUrl;
 
-    @Schema(description = "秒杀活动id", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "秒杀活动 id", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
     @Schema(description = "秒杀商品", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<SeckillProductRespVO> products;
 
-    @Schema(description = "活动状态 开启：0 禁用：1", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
+    @Schema(description = "活动状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     private Integer status;
 
     @Schema(description = "订单实付金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "22354")
     private Integer totalPrice;
 
-    @Schema(description = "秒杀库存", example = "10")
+    @Schema(description = "秒杀库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     private Integer stock;
 
-    @Schema(description = "秒杀总库存", example = "20")
+    @Schema(description = "秒杀总库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "20")
     private Integer totalStock;
 
-    @Schema(description = "新增订单数", example = "20")
+    @Schema(description = "新增订单数", requiredMode = Schema.RequiredMode.REQUIRED, example = "20")
     private Integer orderCount;
 
-    @Schema(description = "付款人数", example = "20")
+    @Schema(description = "付款人数", requiredMode = Schema.RequiredMode.REQUIRED, example = "20")
     private Integer userCount;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)

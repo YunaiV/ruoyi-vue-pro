@@ -13,12 +13,10 @@ import cn.iocoder.yudao.module.pay.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
-import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordReqDTO;
-import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateReqDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.base.member.user.MemberUserRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.base.product.property.ProductPropertyValueDetailRespVO;
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDetailRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageItemRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.base.property.AppProductPropertyValueDetailRespVO;
@@ -26,10 +24,11 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.*;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.cart.TradeCartDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDeliveryDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
+import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressTrackRespDTO;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
@@ -84,9 +83,6 @@ public interface TradeOrderConvert {
 
     TradeOrderItemDO convert(TradePriceCalculateRespBO.OrderItem item);
 
-    @Mapping(source = "userId", target = "userId")
-    PriceCalculateReqDTO convert(AppTradeOrderCreateReqVO createReqVO, Long userId);
-
     @Mappings({
             @Mapping(source = "skuId", target = "id"),
             @Mapping(source = "count", target = "incrCount"),
@@ -123,38 +119,18 @@ public interface TradeOrderConvert {
     }
 
     // TODO 芋艿：可简化
-    default PageResult<TradeOrderPageItemRespVO> convertPage(PageResult<TradeOrderDO> pageResult, List<TradeOrderItemDO> orderItems,
-                                                             List<ProductPropertyValueDetailRespDTO> propertyValueDetails,
-                                                             Map<Long, MemberUserRespDTO> memberUserRespDTOMap) {
+    default PageResult<TradeOrderPageItemRespVO> convertPage(PageResult<TradeOrderDO> pageResult,
+                                                             List<TradeOrderItemDO> orderItems,
+                                                             Map<Long, MemberUserRespDTO> memberUserMap) {
         Map<Long, List<TradeOrderItemDO>> orderItemMap = convertMultiMap(orderItems, TradeOrderItemDO::getOrderId);
-        Map<Long, ProductPropertyValueDetailRespDTO> propertyValueDetailMap = convertMap(propertyValueDetails, ProductPropertyValueDetailRespDTO::getValueId);
         // 转化 List
         List<TradeOrderPageItemRespVO> orderVOs = CollectionUtils.convertList(pageResult.getList(), order -> {
             List<TradeOrderItemDO> xOrderItems = orderItemMap.get(order.getId());
             TradeOrderPageItemRespVO orderVO = convert(order, xOrderItems);
-            if (CollUtil.isNotEmpty(xOrderItems)) {
-                // 处理商品属性
-                for (int i = 0; i < xOrderItems.size(); i++) {
-                    List<TradeOrderItemDO.Property> properties = xOrderItems.get(i).getProperties();
-                    if (CollUtil.isEmpty(properties)) {
-                        continue;
-                    }
-                    TradeOrderPageItemRespVO.Item item = orderVO.getItems().get(i);
-                    item.setProperties(new ArrayList<>(properties.size()));
-                    // 遍历每个 properties，设置到 TradeOrderPageItemRespVO.Item 中
-                    properties.forEach(property -> {
-                        ProductPropertyValueDetailRespDTO propertyValueDetail = propertyValueDetailMap.get(property.getValueId());
-                        if (propertyValueDetail == null) {
-                            return;
-                        }
-                        item.getProperties().add(convert(propertyValueDetail));
-                    });
-                }
-            }
             // 处理收货地址
             orderVO.setReceiverAreaName(AreaUtils.format(order.getReceiverAreaId()));
             // 增加用户昵称
-            orderVO.setUser(memberUserRespDTOMap.get(orderVO.getUserId()));
+            orderVO.setUser(memberUserMap.get(orderVO.getUserId()));
             return orderVO;
         });
         return new PageResult<>(orderVOs, pageResult.getTotal());
@@ -164,28 +140,9 @@ public interface TradeOrderConvert {
 
     ProductPropertyValueDetailRespVO convert(ProductPropertyValueDetailRespDTO bean);
 
-    // TODO 芋艿：可简化
     default TradeOrderDetailRespVO convert(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
-                                           List<ProductPropertyValueDetailRespDTO> propertyValueDetails, MemberUserRespDTO user) {
+                                           MemberUserRespDTO user) {
         TradeOrderDetailRespVO orderVO = convert2(order, orderItems);
-        // 处理商品属性
-        Map<Long, ProductPropertyValueDetailRespDTO> propertyValueDetailMap = convertMap(propertyValueDetails, ProductPropertyValueDetailRespDTO::getValueId);
-        for (int i = 0; i < orderItems.size(); i++) {
-            List<TradeOrderItemDO.Property> properties = orderItems.get(i).getProperties();
-            if (CollUtil.isEmpty(properties)) {
-                continue;
-            }
-            TradeOrderDetailRespVO.Item item = orderVO.getItems().get(i);
-            item.setProperties(new ArrayList<>(properties.size()));
-            // 遍历每个 properties，设置到 TradeOrderPageItemRespVO.Item 中
-            properties.forEach(property -> {
-                ProductPropertyValueDetailRespDTO propertyValueDetail = propertyValueDetailMap.get(property.getValueId());
-                if (propertyValueDetail == null) {
-                    return;
-                }
-                item.getProperties().add(convert(propertyValueDetail));
-            });
-        }
         // 处理收货地址
         orderVO.setReceiverAreaName(AreaUtils.format(order.getReceiverAreaId()));
         // 处理用户信息
@@ -197,35 +154,13 @@ public interface TradeOrderConvert {
 
     MemberUserRespVO convert(MemberUserRespDTO bean);
 
-    // TODO 芋艿：可简化
-    default PageResult<AppTradeOrderPageItemRespVO> convertPage02(PageResult<TradeOrderDO> pageResult, List<TradeOrderItemDO> orderItems,
-                                                                  List<ProductPropertyValueDetailRespDTO> propertyValueDetails) {
+    default PageResult<AppTradeOrderPageItemRespVO> convertPage02(PageResult<TradeOrderDO> pageResult,
+                                                                  List<TradeOrderItemDO> orderItems) {
         Map<Long, List<TradeOrderItemDO>> orderItemMap = convertMultiMap(orderItems, TradeOrderItemDO::getOrderId);
-        Map<Long, ProductPropertyValueDetailRespDTO> propertyValueDetailMap = convertMap(propertyValueDetails, ProductPropertyValueDetailRespDTO::getValueId);
         // 转化 List
         List<AppTradeOrderPageItemRespVO> orderVOs = CollectionUtils.convertList(pageResult.getList(), order -> {
             List<TradeOrderItemDO> xOrderItems = orderItemMap.get(order.getId());
-            AppTradeOrderPageItemRespVO orderVO = convert02(order, xOrderItems);
-            if (CollUtil.isNotEmpty(xOrderItems)) {
-                // 处理商品属性
-                for (int i = 0; i < xOrderItems.size(); i++) {
-                    List<TradeOrderItemDO.Property> properties = xOrderItems.get(i).getProperties();
-                    if (CollUtil.isEmpty(properties)) {
-                        continue;
-                    }
-                    AppTradeOrderItemRespVO item = orderVO.getItems().get(i);
-                    item.setProperties(new ArrayList<>(properties.size()));
-                    // 遍历每个 properties，设置到 TradeOrderPageItemRespVO.Item 中
-                    properties.forEach(property -> {
-                        ProductPropertyValueDetailRespDTO propertyValueDetail = propertyValueDetailMap.get(property.getValueId());
-                        if (propertyValueDetail == null) {
-                            return;
-                        }
-                        item.getProperties().add(convert02(propertyValueDetail));
-                    });
-                }
-            }
-            return orderVO;
+            return convert02(order, xOrderItems);
         });
         return new PageResult<>(orderVOs, pageResult.getTotal());
     }
@@ -236,7 +171,8 @@ public interface TradeOrderConvert {
 
     // TODO 芋艿：可简化
     default AppTradeOrderDetailRespVO convert02(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
-                                                List<ProductPropertyValueDetailRespDTO> propertyValueDetails, TradeOrderProperties tradeOrderProperties) {
+                                                List<ProductPropertyValueDetailRespDTO> propertyValueDetails, TradeOrderProperties tradeOrderProperties,
+                                                DeliveryExpressDO express) {
         AppTradeOrderDetailRespVO orderVO = convert3(order, orderItems);
         orderVO.setPayExpireTime(addTime(tradeOrderProperties.getExpireTime()));
         if (StrUtil.isNotEmpty(order.getPayChannelCode())) {
@@ -262,6 +198,9 @@ public interface TradeOrderConvert {
         }
         // 处理收货地址
         orderVO.setReceiverAreaName(AreaUtils.format(order.getReceiverAreaId()));
+        if (express != null) {
+            orderVO.setLogisticsId(express.getId()).setLogisticsName(express.getName());
+        }
         return orderVO;
     }
 
@@ -334,17 +273,9 @@ public interface TradeOrderConvert {
             @Mapping(target = "avatar", source = "user.avatar"),
             @Mapping(target = "status", ignore = true)
     })
-    CombinationRecordReqDTO convert(TradeOrderDO order, TradeOrderItemDO orderItem, AppTradeOrderCreateReqVO createReqVO, MemberUserRespDTO user);
+    CombinationRecordCreateReqDTO convert(TradeOrderDO order, TradeOrderItemDO orderItem,
+                                          AppTradeOrderCreateReqVO createReqVO, MemberUserRespDTO user);
 
-    TradeOrderDeliveryDO covert(Long orderId, Long orderItemId, Long userId, Integer deliveryType, Long logisticsId, String logisticsNo);
-
-    default List<TradeOrderDeliveryDO> covert(TradeOrderDO order, TradeOrderDeliveryReqVO deliveryReqVO) {
-        ArrayList<TradeOrderDeliveryDO> arrayList = new ArrayList<>();
-        deliveryReqVO.getOrderItemIds().forEach(item -> {
-            arrayList.add(covert(order.getId(), item, order.getUserId(), deliveryReqVO.getType(),
-                    deliveryReqVO.getLogisticsId(), deliveryReqVO.getLogisticsNo()));
-        });
-        return arrayList;
-    }
+    List<AppOrderExpressTrackRespDTO> convertList02(List<ExpressTrackRespDTO> list);
 
 }

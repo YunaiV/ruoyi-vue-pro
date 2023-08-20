@@ -145,12 +145,17 @@ public class TradeOrderItemDO extends BaseDO {
     private Integer pointPrice;
 
     // ========== 售后基本信息 ==========
+
+    /**
+     * 售后单编号
+     *
+     * 关联 {@link TradeAfterSaleDO#getId()} 字段
+     */
+    private Long afterSaleId;
     /**
      * 售后状态
      *
      * 枚举 {@link TradeOrderItemAfterSaleStatusEnum}
-     *
-     * @see TradeAfterSaleDO
      */
     private Integer afterSaleStatus;
 

@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.MemberPoi
 import cn.iocoder.yudao.module.member.dal.dataobject.point.MemberPointRecordDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Set;
+
 /**
  * 用户积分记录 Mapper
  *
@@ -15,13 +17,11 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface MemberPointRecordMapper extends BaseMapperX<MemberPointRecordDO> {
 
-    default PageResult<MemberPointRecordDO> selectPage(MemberPointRecordPageReqVO reqVO) {
+    default PageResult<MemberPointRecordDO> selectPage(MemberPointRecordPageReqVO reqVO, Set<Long> userIds) {
         return selectPage(reqVO, new LambdaQueryWrapperX<MemberPointRecordDO>()
-                .eqIfPresent(MemberPointRecordDO::getBizId, reqVO.getBizId())
+                .inIfPresent(MemberPointRecordDO::getUserId, userIds)
                 .eqIfPresent(MemberPointRecordDO::getBizType, reqVO.getBizType())
-                .eqIfPresent(MemberPointRecordDO::getType, reqVO.getType())
-                .eqIfPresent(MemberPointRecordDO::getTitle, reqVO.getTitle())
-                .eqIfPresent(MemberPointRecordDO::getStatus, reqVO.getStatus())
+                .likeIfPresent(MemberPointRecordDO::getTitle, reqVO.getTitle())
                 .orderByDesc(MemberPointRecordDO::getId));
     }
 

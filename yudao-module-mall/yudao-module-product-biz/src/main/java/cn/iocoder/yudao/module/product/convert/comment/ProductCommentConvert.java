@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.product.convert.comment;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
@@ -37,11 +38,12 @@ public interface ProductCommentConvert {
 
     @Mapping(target = "scores", expression = "java(calculateOverallScore(goodCount, mediocreCount, negativeCount))")
     AppCommentStatisticsRespVO convert(Long goodCount, Long mediocreCount, Long negativeCount);
+
     @Named("calculateOverallScore")
     default double calculateOverallScore(long goodCount, long mediocreCount, long negativeCount) {
         return (goodCount * 5 + mediocreCount * 3 + negativeCount) / (double) (goodCount + mediocreCount + negativeCount);
     }
-    
+
     List<ProductCommentRespVO> convertList(List<ProductCommentDO> list);
 
     PageResult<ProductCommentRespVO> convertPage(PageResult<ProductCommentDO> page);
@@ -49,18 +51,21 @@ public interface ProductCommentConvert {
     PageResult<AppProductCommentRespVO> convertPage01(PageResult<ProductCommentDO> pageResult);
 
     default PageResult<AppProductCommentRespVO> convertPage02(PageResult<ProductCommentDO> pageResult,
-                                                              Map<Long, ProductSkuDO> skuMap) {
+                                                              List<ProductSkuDO> skuList) {
+        Map<Long, ProductSkuDO> skuMap = CollectionUtils.convertMap(skuList, ProductSkuDO::getId);
         PageResult<AppProductCommentRespVO> page = convertPage01(pageResult);
         page.getList().forEach(item -> {
             // 判断用户是否选择匿名
             if (ObjectUtil.equal(item.getAnonymous(), true)) {
                 item.setUserNickname(ProductCommentDO.NICKNAME_ANONYMOUS);
             }
+            // 设置 SKU 规格值
             MapUtils.findAndThen(skuMap, item.getSkuId(),
                     sku -> item.setSkuProperties(convertList01(sku.getProperties())));
         });
         return page;
     }
+
     List<AppProductPropertyValueDetailRespVO> convertList01(List<ProductSkuDO.Property> properties);
 
     /**

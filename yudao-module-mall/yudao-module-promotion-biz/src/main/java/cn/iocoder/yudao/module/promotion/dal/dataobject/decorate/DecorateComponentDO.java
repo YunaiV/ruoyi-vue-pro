@@ -26,13 +26,14 @@ public class DecorateComponentDO extends BaseDO {
 
     /**
      * 所属页面 id
-     * 枚举 {@link DecoratePageEnum#getId()}
+     *
+     * 枚举 {@link DecoratePageEnum#getPage()}
      */
-    private Integer pageId;
+    private Integer page;
 
     /**
-     *  组件编码
-     *  枚举 {@link DecorateComponentEnum#getCode()}
+     * 组件编码
+     * 枚举 {@link DecorateComponentEnum#getCode()}
      */
     private String code;
 
@@ -47,4 +48,5 @@ public class DecorateComponentDO extends BaseDO {
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
+
 }

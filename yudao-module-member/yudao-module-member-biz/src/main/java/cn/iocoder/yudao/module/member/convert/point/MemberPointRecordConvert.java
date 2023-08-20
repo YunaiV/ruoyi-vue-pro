@@ -1,12 +1,17 @@
 package cn.iocoder.yudao.module.member.convert.point;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.MemberPointRecordCreateReqVO;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.MemberPointRecordRespVO;
-import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.MemberPointRecordUpdateReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.point.MemberPointRecordDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * 用户积分记录 Convert
@@ -18,12 +23,14 @@ public interface MemberPointRecordConvert {
 
     MemberPointRecordConvert INSTANCE = Mappers.getMapper(MemberPointRecordConvert.class);
 
-    MemberPointRecordDO convert(MemberPointRecordCreateReqVO bean);
-
-    MemberPointRecordDO convert(MemberPointRecordUpdateReqVO bean);
-
-    MemberPointRecordRespVO convert(MemberPointRecordDO bean);
-
-    PageResult<MemberPointRecordRespVO> convertPage(PageResult<MemberPointRecordDO> page);
+    default PageResult<MemberPointRecordRespVO> convertPage(PageResult<MemberPointRecordDO> pageResult, List<MemberUserRespDTO> users) {
+        PageResult<MemberPointRecordRespVO> voPageResult = convertPage(pageResult);
+        // user 拼接
+        Map<Long, MemberUserRespDTO> userMap = convertMap(users, MemberUserRespDTO::getId);
+        voPageResult.getList().forEach(record -> MapUtils.findAndThen(userMap, record.getUserId(),
+                memberUserRespDTO -> record.setNickname(memberUserRespDTO.getNickname())));
+        return voPageResult;
+    }
+    PageResult<MemberPointRecordRespVO> convertPage(PageResult<MemberPointRecordDO> pageResult);
 
 }

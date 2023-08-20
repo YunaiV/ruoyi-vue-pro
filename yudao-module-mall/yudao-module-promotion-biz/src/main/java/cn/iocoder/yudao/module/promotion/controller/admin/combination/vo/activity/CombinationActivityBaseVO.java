@@ -12,6 +12,8 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 /**
  * 拼团活动 Base VO，提供给添加、修改、详细的子 VO 使用
  * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
+ *
+ * @author HUIHUI
  */
 @Data
 public class CombinationActivityBaseVO {
@@ -20,7 +22,7 @@ public class CombinationActivityBaseVO {
     @NotNull(message = "拼团名称不能为空")
     private String name;
 
-    @Schema(description = "商品 SPU 编号，关联 ProductSpuDO 的 id", example = "[1,2,3]")
+    @Schema(description = "商品 SPU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "拼团商品不能为空")
     private Long spuId;
 
@@ -32,17 +34,21 @@ public class CombinationActivityBaseVO {
     @NotNull(message = "单次限购数量不能为空")
     private Integer singleLimitCount;
 
-    // TODO @puhui999：是不是弄成 2 个字段会好点哈。开始、结束
-    @Schema(description = "活动时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "[2022-07-01 00:00:00,2022-07-01 23:59:59]")
+    @Schema(description = "活动时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "[2022-07-01 23:59:59]")
     @NotNull(message = "活动时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime[] activityTime;
+    private LocalDateTime startTime;
+
+    @Schema(description = "活动时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "[2022-07-01 23:59:59]")
+    @NotNull(message = "活动时间不能为空")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime endTime;
 
     @Schema(description = "开团人数", requiredMode = Schema.RequiredMode.REQUIRED, example = "25222")
     @NotNull(message = "开团人数不能为空")
     private Integer userSize;
 
-    @Schema(description = "限制时长（小时）", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "限制时长（小时）", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @NotNull(message = "限制时长不能为空")
     private Integer limitDuration;
 

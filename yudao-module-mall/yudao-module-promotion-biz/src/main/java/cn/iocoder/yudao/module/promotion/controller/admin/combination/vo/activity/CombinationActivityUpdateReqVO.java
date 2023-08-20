@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity;
 
-import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.product.CombinationProductUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.product.CombinationProductBaseVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,6 +22,6 @@ public class CombinationActivityUpdateReqVO extends CombinationActivityBaseVO {
 
     @Schema(description = "拼团商品", requiredMode = Schema.RequiredMode.REQUIRED)
     @Valid
-    private List<CombinationProductUpdateReqVO> products;
+    private List<CombinationProductBaseVO> products;
 
 }

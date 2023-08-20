@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * 用户签到积分 DO
+ * 签到记录 DO
  *
  * @author 芋道源码
  */
@@ -29,7 +29,7 @@ public class MemberSignInRecordDO extends BaseDO {
     /**
      * 签到用户
      */
-    private Integer userId;
+    private Long userId;
     /**
      * 第几天签到
      */

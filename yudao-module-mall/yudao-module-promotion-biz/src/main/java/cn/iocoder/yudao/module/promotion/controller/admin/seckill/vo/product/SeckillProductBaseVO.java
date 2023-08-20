@@ -22,7 +22,7 @@ public class SeckillProductBaseVO {
     @NotNull(message = "秒杀金额，单位：分不能为空")
     private Integer seckillPrice;
 
-    @Schema(description = "秒杀库存", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "秒杀库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
     @NotNull(message = "秒杀库存不能为空")
     private Integer stock;
 

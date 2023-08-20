@@ -40,18 +40,24 @@ public class Kd100ExpressClient implements ExpressClient {
     private final RestTemplate restTemplate;
     private final TradeExpressProperties.Kd100Config config;
 
+    /**
+     * 查询快递轨迹
+     *
+     * @see <a href="https://api.kuaidi100.com/debug-tool/query/">接口文档</a>
+     *
+     * @param reqDTO 查询请求参数
+     * @return 快递轨迹
+     */
     @Override
     public List<ExpressTrackRespDTO> getExpressTrackList(ExpressTrackQueryReqDTO reqDTO) {
-        // 发起查询
-        Kd100ExpressQueryReqDTO kd100ReqParam = INSTANCE.convert2(reqDTO);
-        kd100ReqParam.setExpressCode(kd100ReqParam.getExpressCode().toLowerCase()); // 快递公司编码需要转成小写
-        Kd100ExpressQueryRespDTO respDTO = requestExpressQuery(REAL_TIME_QUERY_URL, kd100ReqParam,
+        // 发起请求
+        Kd100ExpressQueryReqDTO requestDTO = INSTANCE.convert2(reqDTO)
+                .setExpressCode(reqDTO.getExpressCode().toLowerCase());
+        Kd100ExpressQueryRespDTO respDTO = httpRequest(REAL_TIME_QUERY_URL, requestDTO,
                 Kd100ExpressQueryRespDTO.class);
-        log.debug("[getExpressTrackList][快递 100 接口 查询接口返回 {}]", respDTO);
 
         // 处理结果
         if (Objects.equals("false", respDTO.getResult())) {
-            log.error("[getExpressTrackList][快递 100 接口 返回失败 {}]", respDTO.getMessage());
             throw exception(EXPRESS_API_QUERY_FAILED, respDTO.getMessage());
         }
         if (CollUtil.isEmpty(respDTO.getTracks())) {
@@ -61,7 +67,7 @@ public class Kd100ExpressClient implements ExpressClient {
     }
 
     /**
-     * 发送快递 100 实时快递查询请求，可以作为通用快递 100 通用请求接口。 目前没有其它场景需要使用。暂时放这里
+     * 快递 100 API 请求
      *
      * @param url 请求 url
      * @param req 对应请求的请求参数
@@ -69,24 +75,23 @@ public class Kd100ExpressClient implements ExpressClient {
      * @param <Req> 每个请求的请求结构 Req DTO
      * @param <Resp> 每个请求的响应结构 Resp DTO
      */
-    private <Req, Resp> Resp requestExpressQuery(String url, Req req, Class<Resp> respClass) {
+    private <Req, Resp> Resp httpRequest(String url, Req req, Class<Resp> respClass) {
         // 请求头
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        // 生成签名
-        String param = JsonUtils.toJsonString(req);
-        String sign = generateReqSign(param, config.getKey(), config.getCustomer());
         // 请求体
+        String param = JsonUtils.toJsonString(req);
+        String sign = generateReqSign(param, config.getKey(), config.getCustomer()); // 签名
         MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
         requestBody.add("customer", config.getCustomer());
         requestBody.add("sign", sign);
         requestBody.add("param", param);
-        log.debug("[sendExpressQueryReq][快递 100 接口的请求参数: {}]", requestBody);
+        log.debug("[httpRequest][请求参数({})]", requestBody);
+
         // 发送请求
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
         ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-        log.debug("[sendExpressQueryReq][快递 100 接口响应结果 {}]", responseEntity);
-
+        log.debug("[httpRequest][的响应结果({})]", responseEntity);
         // 处理响应
         if (!responseEntity.getStatusCode().is2xxSuccessful()) {
             throw exception(EXPRESS_API_QUERY_ERROR);
