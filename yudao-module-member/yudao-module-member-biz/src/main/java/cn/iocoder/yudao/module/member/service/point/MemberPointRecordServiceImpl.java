@@ -29,12 +29,13 @@ public class MemberPointRecordServiceImpl implements MemberPointRecordService {
 
     @Resource
     private MemberPointRecordMapper recordMapper;
+
     @Resource
     private MemberUserApi memberUserApi;
 
     @Override
     public PageResult<MemberPointRecordDO> getRecordPage(MemberPointRecordPageReqVO pageReqVO) {
-        // 根据用户昵称查询出用户ids
+        // 根据用户昵称查询出用户 ids
         Set<Long> userIds = null;
         if (StringUtils.isNotBlank(pageReqVO.getNickname())) {
             List<MemberUserRespDTO> users = memberUserApi.getUserListByNickname(pageReqVO.getNickname());
@@ -44,6 +45,7 @@ public class MemberPointRecordServiceImpl implements MemberPointRecordService {
             }
             userIds = convertSet(users, MemberUserRespDTO::getId);
         }
+        // 执行查询
         return recordMapper.selectPage(pageReqVO, userIds);
     }
 

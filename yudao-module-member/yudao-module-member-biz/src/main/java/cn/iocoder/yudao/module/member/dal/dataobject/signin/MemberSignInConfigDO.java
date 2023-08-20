@@ -31,7 +31,7 @@ public class MemberSignInConfigDO extends BaseDO {
      */
     private Integer day;
     /**
-     * 签到天数对应分数
+     * 奖励积分
      */
     private Integer point;
 

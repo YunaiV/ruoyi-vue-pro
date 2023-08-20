@@ -11,10 +11,10 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.SIGN_IN_CONFIG_EXISTS;
+import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.SIGN_IN_CONFIG_NOT_EXISTS;
 
 /**
  * 积分签到规则 Service 实现类
@@ -91,10 +91,9 @@ public class MemberSignInConfigServiceImpl implements MemberSignInConfigService 
 
     @Override
     public List <MemberSignInConfigDO> getSignInConfigList() {
-        //查询出所有的配置记录
-        List<MemberSignInConfigDO> result = signInConfigMapper.selectList();
-        //业务侧排序后返回结果
-        return result.stream().sorted(Comparator.comparing(MemberSignInConfigDO::getDay)).collect(Collectors.toList());
+        List<MemberSignInConfigDO> list = signInConfigMapper.selectList();
+        list.sort(Comparator.comparing(MemberSignInConfigDO::getDay));
+        return list;
     }
 
 }
