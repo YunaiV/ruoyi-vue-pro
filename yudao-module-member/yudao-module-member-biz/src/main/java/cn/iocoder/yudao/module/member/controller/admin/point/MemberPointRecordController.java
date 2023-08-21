@@ -25,6 +25,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
+@Tag(name = "管理后台 - 签到记录")
 @RestController
 @RequestMapping("/member/point/record")
 @Validated
@@ -39,9 +40,9 @@ public class MemberPointRecordController {
     @GetMapping("/page")
     @Operation(summary = "获得用户积分记录分页")
     @PreAuthorize("@ss.hasPermission('point:record:query')")
-    public CommonResult<PageResult<MemberPointRecordRespVO>> getRecordPage(@Valid MemberPointRecordPageReqVO pageVO) {
+    public CommonResult<PageResult<MemberPointRecordRespVO>> getPointRecordPage(@Valid MemberPointRecordPageReqVO pageVO) {
         // 执行分页查询
-        PageResult<MemberPointRecordDO> pageResult = pointRecordService.getRecordPage(pageVO);
+        PageResult<MemberPointRecordDO> pageResult = pointRecordService.getPointRecordPage(pageVO);
         if (CollectionUtils.isEmpty(pageResult.getList())) {
             return success(PageResult.empty(pageResult.getTotal()));
         }

@@ -109,6 +109,7 @@ public class MemberUserDO extends TenantBaseDO {
      * 积分
      */
     private Integer point;
+    // TODO 芋艿：增加一个 totalPoint；个人信息接口要返回
 
     /**
      * 会员标签列表，以逗号分隔

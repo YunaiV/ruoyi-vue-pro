@@ -22,7 +22,7 @@ import lombok.*;
 public class MemberSignInRecordDO extends BaseDO {
 
     /**
-     * 签到自增id
+     * 编号
      */
     @TableId
     private Long id;

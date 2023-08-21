@@ -96,4 +96,11 @@ public class MemberSignInConfigServiceImpl implements MemberSignInConfigService 
         return list;
     }
 
+    @Override
+    public List<MemberSignInConfigDO> getSignInConfigList(Integer status) {
+        List<MemberSignInConfigDO> list = signInConfigMapper.selectListByStatus(status);
+        list.sort(Comparator.comparing(MemberSignInConfigDO::getDay));
+        return list;
+    }
+
 }

@@ -45,10 +45,18 @@ public interface MemberSignInConfigService {
     MemberSignInConfigDO getSignInConfig(Long id);
 
     /**
-     * 获得签到规则分页
+     * 获得签到规则列表
      *
      * @return 签到规则分页
      */
     List<MemberSignInConfigDO> getSignInConfigList();
+
+    /**
+     * 获得签到规则列表
+     *
+     * @param status 状态
+     * @return 签到规则分页
+     */
+    List<MemberSignInConfigDO> getSignInConfigList(Integer status);
 
 }
