@@ -105,4 +105,9 @@ public class MemberTagServiceImpl implements MemberTagService {
         return tagMapper.selectPage(pageReqVO);
     }
 
+    @Override
+    public List<MemberTagDO> getList() {
+        return tagMapper.selectList();
+    }
+
 }
