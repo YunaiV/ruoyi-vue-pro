@@ -44,6 +44,7 @@ public interface MemberUserMapper extends BaseMapperX<MemberUserDO> {
                 .betweenIfPresent(MemberUserDO::getLoginDate, reqVO.getLoginDate())
                 .likeIfPresent(MemberUserDO::getNickname, reqVO.getNickname())
                 .betweenIfPresent(MemberUserDO::getCreateTime, reqVO.getCreateTime())
+                .eqIfPresent(MemberUserDO::getLevelId, reqVO.getLevelId())
                 .apply(StrUtil.isNotEmpty(tagIdSql), tagIdSql)
                 .orderByDesc(MemberUserDO::getId));
     }
