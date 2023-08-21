@@ -117,5 +117,14 @@ public class MemberUserDO extends TenantBaseDO {
     @TableField(typeHandler = LongListTypeHandler.class)
     private List<Long> tagIds;
 
-    // TODO 成长值、会员等级等等
+    /**
+     * 会员级别编号
+     */
+    private Long levelId;
+    /**
+     * 会员经验
+     */
+    private Integer experience;
+
+    // TODO 积分等等
 }

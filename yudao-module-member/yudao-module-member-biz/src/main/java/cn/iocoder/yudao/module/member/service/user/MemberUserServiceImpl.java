@@ -8,13 +8,14 @@ import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserResetPasswordReqVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateMobileReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateReqVO;
-import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateMobileReqVO;
 import cn.iocoder.yudao.module.member.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
+import cn.iocoder.yudao.module.member.service.level.MemberLevelService;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeUseReqDTO;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
@@ -54,6 +55,9 @@ public class MemberUserServiceImpl implements MemberUserService {
 
     @Resource
     private PasswordEncoder passwordEncoder;
+
+    @Resource
+    private MemberLevelService memberLevelService;
 
     @Override
     public MemberUserDO getUserByMobile(String mobile) {
@@ -180,16 +184,20 @@ public class MemberUserServiceImpl implements MemberUserService {
         return passwordEncoder.encode(password);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateUser(MemberUserUpdateReqVO updateReqVO) {
         // 校验存在
-        validateUserExists(updateReqVO.getId());
+        MemberUserDO user = validateUserExists(updateReqVO.getId());
         // 校验手机唯一
         validateMobileUnique(updateReqVO.getId(), updateReqVO.getMobile());
 
         // 更新
         MemberUserDO updateObj = MemberUserConvert.INSTANCE.convert(updateReqVO);
         memberUserMapper.updateById(updateObj);
+
+        // 会员级别修改
+        memberLevelService.updateUserLevel(user, updateReqVO.getLevelId(), updateReqVO.getLevelReason());
     }
 
     @VisibleForTesting

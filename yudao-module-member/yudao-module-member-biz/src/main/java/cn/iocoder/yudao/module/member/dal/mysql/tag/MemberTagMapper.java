@@ -22,9 +22,7 @@ public interface MemberTagMapper extends BaseMapperX<MemberTagDO> {
                 .orderByDesc(MemberTagDO::getId));
     }
 
-    default boolean exists(Long id, String name) {
-        return exists(new LambdaQueryWrapperX<MemberTagDO>()
-                .neIfPresent(MemberTagDO::getId, id)
-                .eq(MemberTagDO::getName, name));
+    default MemberTagDO selelctByName(String name) {
+        return selectOne(MemberTagDO::getName, name);
     }
 }

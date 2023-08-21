@@ -63,4 +63,10 @@ public interface MemberTagService {
      */
     PageResult<MemberTagDO> getTagPage(MemberTagPageReqVO pageReqVO);
 
+    /**
+     * 获取标签列表
+     *
+     * @return 标签列表
+     */
+    List<MemberTagDO> getList();
 }

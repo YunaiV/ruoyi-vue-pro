@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.member.service.tag;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagCreateReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagPageReqVO;
@@ -62,8 +63,6 @@ public class MemberTagServiceImpl implements MemberTagService {
         tagMapper.deleteById(id);
     }
 
-    // TODO @疯狂：校验 tag name 不重复，参考 validateMobileUnique 方法，Mapper 尽量逻辑通用，处理交给 Service
-
     private void validateTagExists(Long id) {
         if (tagMapper.selectById(id) == null) {
             throw exception(TAG_NOT_EXISTS);
@@ -71,8 +70,19 @@ public class MemberTagServiceImpl implements MemberTagService {
     }
 
     private void validateTagNameUnique(Long id, String name) {
-        boolean exists = tagMapper.exists(id, name);
-        if (exists) {
+        if (StrUtil.isBlank(name)) {
+            return;
+        }
+        MemberTagDO tag = tagMapper.selelctByName(name);
+        if (tag == null) {
+            return;
+        }
+
+        // 如果 id 为空，说明不用比较是否为相同 id 的标签
+        if (id == null) {
+            throw exception(TAG_NAME_EXISTS);
+        }
+        if (!tag.getId().equals(id)) {
             throw exception(TAG_NAME_EXISTS);
         }
     }
@@ -93,6 +103,11 @@ public class MemberTagServiceImpl implements MemberTagService {
     @Override
     public PageResult<MemberTagDO> getTagPage(MemberTagPageReqVO pageReqVO) {
         return tagMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<MemberTagDO> getList() {
+        return tagMapper.selectList();
     }
 
 }

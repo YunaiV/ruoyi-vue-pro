@@ -7,8 +7,10 @@ import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReq
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserRespVO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
+import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.tag.MemberTagDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
+import cn.iocoder.yudao.module.member.service.level.MemberLevelService;
 import cn.iocoder.yudao.module.member.service.tag.MemberTagService;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,6 +40,8 @@ public class MemberUserController {
     private MemberUserService memberUserService;
     @Resource
     private MemberTagService memberTagService;
+    @Resource
+    private MemberLevelService memberLevelService;
 
     @PutMapping("/update")
     @Operation(summary = "更新会员用户")
@@ -72,7 +76,11 @@ public class MemberUserController {
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
         List<MemberTagDO> tags = memberTagService.getTagList(tagIds);
-        return success(MemberUserConvert.INSTANCE.convertPage(pageResult, tags));
+
+        // 处理会员级别返显
+        List<MemberLevelDO> levels = memberLevelService.getEnableLevelList();
+
+        return success(MemberUserConvert.INSTANCE.convertPage(pageResult, tags, levels));
     }
 
 }

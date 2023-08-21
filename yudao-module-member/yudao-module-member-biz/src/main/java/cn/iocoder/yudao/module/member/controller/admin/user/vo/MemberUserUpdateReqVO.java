@@ -17,4 +17,7 @@ public class MemberUserUpdateReqVO extends MemberUserBaseVO {
     @NotNull(message = "编号不能为空")
     private Long id;
 
+    @Schema(description = "会员级别修改原因", requiredMode = Schema.RequiredMode.REQUIRED, example = "推广需要")
+    private String levelReason;
+
 }
