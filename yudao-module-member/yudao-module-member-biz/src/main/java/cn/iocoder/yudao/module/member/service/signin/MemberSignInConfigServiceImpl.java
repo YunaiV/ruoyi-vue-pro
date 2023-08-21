@@ -17,7 +17,7 @@ import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.SIGN_IN_CO
 import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.SIGN_IN_CONFIG_NOT_EXISTS;
 
 /**
- * 积分签到规则 Service 实现类
+ * 签到规则 Service 实现类
  *
  * @author QingX
  */
@@ -73,13 +73,13 @@ public class MemberSignInConfigServiceImpl implements MemberSignInConfigService 
      * @param id 编号，只有更新的时候会传递
      */
     private void validateSignInConfigDayDuplicate(Integer day, Long id) {
-        MemberSignInConfigDO configDO = signInConfigMapper.selectByDay(day);
-        // 1. 新增时，configDO 非空，则说明重复
-        if (id == null && configDO != null) {
+        MemberSignInConfigDO config = signInConfigMapper.selectByDay(day);
+        // 1. 新增时，config 非空，则说明重复
+        if (id == null && config != null) {
             throw exception(SIGN_IN_CONFIG_EXISTS);
         }
-        // 2. 更新时，如果 configDO 非空，且 id 不相等，则说明重复
-        if (id != null && configDO != null && !configDO.getId().equals(id)) {
+        // 2. 更新时，如果 config 非空，且 id 不相等，则说明重复
+        if (id != null && config != null && !config.getId().equals(id)) {
             throw exception(SIGN_IN_CONFIG_EXISTS);
         }
     }
@@ -92,6 +92,13 @@ public class MemberSignInConfigServiceImpl implements MemberSignInConfigService 
     @Override
     public List <MemberSignInConfigDO> getSignInConfigList() {
         List<MemberSignInConfigDO> list = signInConfigMapper.selectList();
+        list.sort(Comparator.comparing(MemberSignInConfigDO::getDay));
+        return list;
+    }
+
+    @Override
+    public List<MemberSignInConfigDO> getSignInConfigList(Integer status) {
+        List<MemberSignInConfigDO> list = signInConfigMapper.selectListByStatus(status);
         list.sort(Comparator.comparing(MemberSignInConfigDO::getDay));
         return list;
     }

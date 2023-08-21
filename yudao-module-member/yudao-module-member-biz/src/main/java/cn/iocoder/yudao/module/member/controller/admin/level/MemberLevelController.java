@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.member.controller.admin.level;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.*;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.*;
 import cn.iocoder.yudao.module.member.convert.level.MemberLevelConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
 import cn.iocoder.yudao.module.member.service.level.MemberLevelService;
@@ -20,9 +20,6 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-/**
- * @author owen
- */
 @Tag(name = "管理后台 - 会员等级")
 @RestController
 @RequestMapping("/member/level")
@@ -65,6 +62,7 @@ public class MemberLevelController {
         return success(MemberLevelConvert.INSTANCE.convert(level));
     }
 
+    // TODO @疯狂：这个应该用不到哈
     @GetMapping("/list")
     @Operation(summary = "获得会员等级列表")
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
@@ -83,6 +81,7 @@ public class MemberLevelController {
         return success(MemberLevelConvert.INSTANCE.convertSimpleList(list));
     }
 
+    // TODO @疯狂：是不是不做分页，直接 list 就好啦；返回的时候，按照经验排序下哈；
     @GetMapping("/page")
     @Operation(summary = "获得会员等级分页")
     @PreAuthorize("@ss.hasPermission('member:level:query')")

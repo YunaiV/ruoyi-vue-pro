@@ -20,9 +20,10 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Tag(name = "管理后台 - 积分签到规则")
+// TODO 芋艿：url
+@Tag(name = "管理后台 - 签到规则")
 @RestController
-@RequestMapping("/member/point/sign-in-config")
+@RequestMapping("/member/sign-in/config")
 @Validated
 public class MemberSignInConfigController {
 
@@ -30,14 +31,14 @@ public class MemberSignInConfigController {
     private MemberSignInConfigService signInConfigService;
 
     @PostMapping("/create")
-    @Operation(summary = "创建积分签到规则")
+    @Operation(summary = "创建签到规则")
     @PreAuthorize("@ss.hasPermission('point:sign-in-config:create')")
     public CommonResult<Long> createSignInConfig(@Valid @RequestBody MemberSignInConfigCreateReqVO createReqVO) {
         return success(signInConfigService.createSignInConfig(createReqVO));
     }
 
     @PutMapping("/update")
-    @Operation(summary = "更新积分签到规则")
+    @Operation(summary = "更新签到规则")
     @PreAuthorize("@ss.hasPermission('point:sign-in-config:update')")
     public CommonResult<Boolean> updateSignInConfig(@Valid @RequestBody MemberSignInConfigUpdateReqVO updateReqVO) {
         signInConfigService.updateSignInConfig(updateReqVO);
@@ -45,7 +46,7 @@ public class MemberSignInConfigController {
     }
 
     @DeleteMapping("/delete")
-    @Operation(summary = "删除积分签到规则")
+    @Operation(summary = "删除签到规则")
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('point:sign-in-config:delete')")
     public CommonResult<Boolean> deleteSignInConfig(@RequestParam("id") Long id) {
@@ -54,7 +55,7 @@ public class MemberSignInConfigController {
     }
 
     @GetMapping("/get")
-    @Operation(summary = "获得积分签到规则")
+    @Operation(summary = "获得签到规则")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('point:sign-in-config:query')")
     public CommonResult<MemberSignInConfigRespVO> getSignInConfig(@RequestParam("id") Long id) {
@@ -63,11 +64,11 @@ public class MemberSignInConfigController {
     }
 
     @GetMapping("/list")
-    @Operation(summary = "获得积分签到规则分页")
+    @Operation(summary = "获得签到规则列表")
     @PreAuthorize("@ss.hasPermission('point:sign-in-config:query')")
     public CommonResult<List<MemberSignInConfigRespVO>> getSignInConfigList() {
-        List<MemberSignInConfigDO> pageResult = signInConfigService.getSignInConfigList();
-        return success(MemberSignInConfigConvert.INSTANCE.convertList(pageResult));
+        List<MemberSignInConfigDO> list = signInConfigService.getSignInConfigList();
+        return success(MemberSignInConfigConvert.INSTANCE.convertList(list));
     }
 
 }

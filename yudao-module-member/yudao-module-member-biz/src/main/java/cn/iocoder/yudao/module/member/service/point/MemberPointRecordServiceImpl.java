@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.member.service.point;
 
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
@@ -19,7 +20,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 
 
 /**
- * 用户积分记录 Service 实现类
+ * 积分记录 Service 实现类
  *
  * @author QingX
  */
@@ -34,7 +35,7 @@ public class MemberPointRecordServiceImpl implements MemberPointRecordService {
     private MemberUserApi memberUserApi;
 
     @Override
-    public PageResult<MemberPointRecordDO> getRecordPage(MemberPointRecordPageReqVO pageReqVO) {
+    public PageResult<MemberPointRecordDO> getPointRecordPage(MemberPointRecordPageReqVO pageReqVO) {
         // 根据用户昵称查询出用户 ids
         Set<Long> userIds = null;
         if (StringUtils.isNotBlank(pageReqVO.getNickname())) {
@@ -47,6 +48,11 @@ public class MemberPointRecordServiceImpl implements MemberPointRecordService {
         }
         // 执行查询
         return recordMapper.selectPage(pageReqVO, userIds);
+    }
+
+    @Override
+    public PageResult<MemberPointRecordDO> getPointRecordPage(Long userId, PageParam pageVO) {
+        return recordMapper.selectPage(userId, pageVO);
     }
 
 }

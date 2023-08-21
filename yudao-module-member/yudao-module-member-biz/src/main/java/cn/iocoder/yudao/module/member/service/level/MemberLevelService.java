@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.member.service.level;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.MemberLevelCreateReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.MemberLevelPageReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.MemberLevelUpdateReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelCreateReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelPageReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelUpdateReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.enums.MemberExperienceBizTypeEnum;

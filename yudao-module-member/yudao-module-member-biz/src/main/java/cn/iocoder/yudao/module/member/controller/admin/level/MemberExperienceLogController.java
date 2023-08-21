@@ -28,9 +28,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-/**
- * @author owen
- */
+// TODO @疯狂：要不 Log 改成 Record，和 PointRecord 保持一致
 @Tag(name = "管理后台 - 会员经验记录")
 @RestController
 @RequestMapping("/member/experience-log")
@@ -40,6 +38,7 @@ public class MemberExperienceLogController {
     @Resource
     private MemberExperienceLogService experienceLogService;
 
+    // TODO @疯狂：不允许删除经验哈
     @DeleteMapping("/delete")
     @Operation(summary = "删除会员经验记录")
     @Parameter(name = "id", description = "编号", required = true)
@@ -58,6 +57,7 @@ public class MemberExperienceLogController {
         return success(MemberExperienceLogConvert.INSTANCE.convert(experienceLog));
     }
 
+    // TODO @疯狂：这个接口可以删除哈，应该用不到
     @GetMapping("/list")
     @Operation(summary = "获得会员经验记录列表")
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
@@ -75,6 +75,7 @@ public class MemberExperienceLogController {
         return success(MemberExperienceLogConvert.INSTANCE.convertPage(pageResult));
     }
 
+    // TODO @疯狂：导出可以先不支持，场景不多
     @GetMapping("/export-excel")
     @Operation(summary = "导出会员经验记录 Excel")
     @PreAuthorize("@ss.hasPermission('member:experience-log:export')")

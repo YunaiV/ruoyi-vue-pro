@@ -69,7 +69,7 @@ public class MemberTagController {
     @Operation(summary = "获取会员标签精简信息列表", description = "只包含被开启的会员标签，主要用于前端的下拉选项")
     public CommonResult<List<MemberTagRespVO>> getSimpleTagList() {
         // 获用户列表，只要开启状态的
-        List<MemberTagDO> list = tagService.getList();
+        List<MemberTagDO> list = tagService.getTagList();
         // 排序后，返回给前端
         return success(MemberTagConvert.INSTANCE.convertList(list));
     }

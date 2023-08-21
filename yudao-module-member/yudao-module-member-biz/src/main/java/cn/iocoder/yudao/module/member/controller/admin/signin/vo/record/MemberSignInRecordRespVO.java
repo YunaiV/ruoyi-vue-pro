@@ -5,7 +5,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@Schema(description = "管理后台 - 用户签到积分 Response VO")
+@Schema(description = "管理后台 - 签到记录 Response VO")
 @Data
 public class MemberSignInRecordRespVO {
 

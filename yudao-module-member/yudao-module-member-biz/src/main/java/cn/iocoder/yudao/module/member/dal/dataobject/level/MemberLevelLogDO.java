@@ -9,6 +9,8 @@ import lombok.*;
 /**
  * 会员等级记录 DO
  *
+ * 用户每次等级发生变更时，记录一条日志
+ *
  * @author owen
  */
 @TableName("member_level_log")

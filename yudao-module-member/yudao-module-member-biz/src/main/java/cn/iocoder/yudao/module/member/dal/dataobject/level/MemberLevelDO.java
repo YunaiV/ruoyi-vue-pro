@@ -10,6 +10,8 @@ import lombok.*;
 /**
  * 会员等级 DO
  *
+ * 配置每个等级需要的积分
+ *
  * @author owen
  */
 @TableName("member_level")

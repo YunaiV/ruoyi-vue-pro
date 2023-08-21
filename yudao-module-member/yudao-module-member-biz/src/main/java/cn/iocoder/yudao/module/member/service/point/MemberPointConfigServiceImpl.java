@@ -24,9 +24,9 @@ public class MemberPointConfigServiceImpl implements MemberPointConfigService {
     private MemberPointConfigMapper pointConfigMapper;
 
     @Override
-    public void saveConfig(MemberPointConfigSaveReqVO saveReqVO) {
+    public void savePointConfig(MemberPointConfigSaveReqVO saveReqVO) {
         // 存在，则进行更新
-        MemberPointConfigDO dbConfig = getConfig();
+        MemberPointConfigDO dbConfig = getPointConfig();
         if (dbConfig != null) {
             pointConfigMapper.updateById(MemberPointConfigConvert.INSTANCE.convert(saveReqVO).setId(dbConfig.getId()));
             return;
@@ -36,7 +36,7 @@ public class MemberPointConfigServiceImpl implements MemberPointConfigService {
     }
 
     @Override
-    public MemberPointConfigDO getConfig() {
+    public MemberPointConfigDO getPointConfig() {
         List<MemberPointConfigDO> list = pointConfigMapper.selectList();
         return CollectionUtils.getFirst(list);
     }

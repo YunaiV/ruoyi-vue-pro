@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.ip.core.Area;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
 import cn.iocoder.yudao.module.system.enums.common.SexEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -109,6 +110,7 @@ public class MemberUserDO extends TenantBaseDO {
      * 积分
      */
     private Integer point;
+    // TODO 芋艿：增加一个 totalPoint；个人信息接口要返回
 
     /**
      * 会员标签列表，以逗号分隔
@@ -118,6 +120,8 @@ public class MemberUserDO extends TenantBaseDO {
 
     /**
      * 会员级别编号
+     *
+     * 关联 {@link MemberLevelDO#getLevel()} 字段
      */
     private Long levelId;
     /**
@@ -129,5 +133,4 @@ public class MemberUserDO extends TenantBaseDO {
      */
     private Long groupId;
 
-    // TODO 积分等等
 }

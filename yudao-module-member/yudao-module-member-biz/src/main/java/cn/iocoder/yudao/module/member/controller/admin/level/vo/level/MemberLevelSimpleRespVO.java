@@ -1,12 +1,10 @@
-package cn.iocoder.yudao.module.member.controller.admin.level.vo;
+package cn.iocoder.yudao.module.member.controller.admin.level.vo.level;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.ToString;
 
-/**
- * @author owen
- */
+// TODO @疯狂：不需要继承 MemberLevelBaseVO
 @Schema(description = "管理后台 - 会员等级 Response VO")
 @Data
 @ToString(callSuper = true)

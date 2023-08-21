@@ -184,8 +184,8 @@ public class MemberUserServiceImpl implements MemberUserService {
         return passwordEncoder.encode(password);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateUser(MemberUserUpdateReqVO updateReqVO) {
         // 校验存在
         MemberUserDO user = validateUserExists(updateReqVO.getId());
@@ -197,6 +197,7 @@ public class MemberUserServiceImpl implements MemberUserService {
         memberUserMapper.updateById(updateObj);
 
         // 会员级别修改
+        // TODO @疯狂：修改用户等级，要不要单独一个前端操作 + 接口；因为它是个相对严肃独立的动作
         memberLevelService.updateUserLevel(user, updateReqVO.getLevelId(), updateReqVO.getLevelReason());
     }
 

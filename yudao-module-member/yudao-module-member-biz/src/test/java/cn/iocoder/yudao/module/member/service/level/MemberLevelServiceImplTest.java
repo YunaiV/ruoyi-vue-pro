@@ -4,9 +4,9 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.MemberLevelCreateReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.MemberLevelPageReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.MemberLevelUpdateReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelCreateReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelPageReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelUpdateReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
 import cn.iocoder.yudao.module.member.dal.mysql.level.MemberLevelMapper;
 import org.junit.jupiter.api.Test;
@@ -25,6 +25,7 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+// TODO 芋艿：完全 review 完，在去 review 单测
 /**
  * {@link MemberLevelServiceImpl} 的单元测试类
  *

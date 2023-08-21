@@ -16,12 +16,9 @@ public class MemberPointRecordPageReqVO extends PageParam {
     private String nickname;
 
     @Schema(description = "业务类型", example = "1")
-    private String bizType;
+    private Integer bizType;
 
     @Schema(description = "积分标题", example = "呵呵")
     private String title;
-
-    @Schema(description = "积分状态", example = "1")
-    private Integer status;
 
 }
