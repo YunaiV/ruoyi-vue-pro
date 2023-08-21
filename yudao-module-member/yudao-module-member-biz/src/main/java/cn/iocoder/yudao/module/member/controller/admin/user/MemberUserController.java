@@ -76,10 +76,9 @@ public class MemberUserController {
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
         List<MemberTagDO> tags = memberTagService.getTagList(tagIds);
-
         // 处理会员级别返显
         List<MemberLevelDO> levels = memberLevelService.getEnableLevelList();
-
+        // 拼接
         return success(MemberUserConvert.INSTANCE.convertPage(pageResult, tags, levels));
     }
 

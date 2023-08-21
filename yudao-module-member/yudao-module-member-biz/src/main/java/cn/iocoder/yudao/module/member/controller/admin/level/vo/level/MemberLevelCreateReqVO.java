@@ -1,10 +1,11 @@
-package cn.iocoder.yudao.module.member.controller.admin.level.vo;
+package cn.iocoder.yudao.module.member.controller.admin.level.vo.level;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+// TODO @疯狂：项目的 vo 和 controller 不写 author 信息哈，只写 swagger 注解
 /**
  * @author owen
  */

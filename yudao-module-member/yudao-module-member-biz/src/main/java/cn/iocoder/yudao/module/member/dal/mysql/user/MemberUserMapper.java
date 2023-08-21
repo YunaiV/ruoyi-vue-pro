@@ -49,6 +49,7 @@ public interface MemberUserMapper extends BaseMapperX<MemberUserDO> {
                 .orderByDesc(MemberUserDO::getId));
     }
 
+    // TODO @疯狂：命名可以改成 updateUserLevelToNull；db 侧的操作，尽量无业务含义，更多是 select、update、insert 操作
     /**
      * 取消会员的等级
      *

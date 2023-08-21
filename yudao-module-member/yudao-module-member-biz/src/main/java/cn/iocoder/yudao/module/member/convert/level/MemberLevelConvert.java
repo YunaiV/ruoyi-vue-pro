@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.member.convert.level;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.MemberLevelCreateReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.MemberLevelRespVO;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.MemberLevelSimpleRespVO;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.MemberLevelUpdateReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelCreateReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelRespVO;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelSimpleRespVO;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelUpdateReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

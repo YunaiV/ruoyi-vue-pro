@@ -6,9 +6,9 @@ import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.MemberLevelCreateReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.MemberLevelPageReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.MemberLevelUpdateReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelCreateReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelPageReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelUpdateReqVO;
 import cn.iocoder.yudao.module.member.convert.level.MemberLevelConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
@@ -74,6 +74,7 @@ public class MemberLevelServiceImpl implements MemberLevelService {
 
     @Override
     public void deleteLevel(Long id) {
+        // TODO @疯狂：校验是否有用户使用该等级
         // 校验存在
         validateLevelExists(id);
         // 删除

@@ -38,7 +38,7 @@ public class MemberExperienceLogBaseVO {
     @NotNull(message = "变更后的经验不能为空")
     private Integer totalExperience;
 
-    @Schema(description = "描述", requiredMode = Schema.RequiredMode.REQUIRED, example = "下单增加100经验")
+    @Schema(description = "描述", requiredMode = Schema.RequiredMode.REQUIRED, example = "下单增加 100 经验")
     @NotNull(message = "描述不能为空")
     private String description;
 

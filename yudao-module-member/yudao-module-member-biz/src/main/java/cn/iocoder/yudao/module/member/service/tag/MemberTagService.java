@@ -68,5 +68,6 @@ public interface MemberTagService {
      *
      * @return 标签列表
      */
-    List<MemberTagDO> getList();
+    List<MemberTagDO> getTagList();
+
 }

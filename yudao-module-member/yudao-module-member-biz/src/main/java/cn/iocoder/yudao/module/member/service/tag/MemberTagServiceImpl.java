@@ -106,7 +106,7 @@ public class MemberTagServiceImpl implements MemberTagService {
     }
 
     @Override
-    public List<MemberTagDO> getList() {
+    public List<MemberTagDO> getTagList() {
         return tagMapper.selectList();
     }
 

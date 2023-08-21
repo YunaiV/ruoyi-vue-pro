@@ -44,8 +44,6 @@ public interface MemberUserConvert {
         // 处理关联数据
         Map<Long, String> tagMap = convertMap(tags, MemberTagDO::getId, MemberTagDO::getName);
         Map<Long, String> levelMap = convertMap(levels, MemberLevelDO::getId, MemberLevelDO::getName);
-
-        // 填充关联数据
         for (MemberUserRespVO vo : result.getList()) {
             vo.setTagNames(convertList(vo.getTagIds(), tagMap::get));
             vo.setLevelName(MapUtil.getStr(levelMap, vo.getLevelId(), StrUtil.EMPTY));

@@ -28,9 +28,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-/**
- * @author owen
- */
+// TODO @疯狂：是不是不用这个 controller；因为日志只是为了记录，db 可以查询、和审计即可，目前暂时不需要开放出来；
 @Tag(name = "管理后台 - 会员等级记录")
 @RestController
 @RequestMapping("/member/level-log")
@@ -40,6 +38,7 @@ public class MemberLevelLogController {
     @Resource
     private MemberLevelLogService levelLogService;
 
+    // TODO @疯狂：这个不允许删除哈
     @DeleteMapping("/delete")
     @Operation(summary = "删除会员等级记录")
     @Parameter(name = "id", description = "编号", required = true)
@@ -58,6 +57,7 @@ public class MemberLevelLogController {
         return success(MemberLevelLogConvert.INSTANCE.convert(levelLog));
     }
 
+    // TODO @疯狂：这个接口，应该没用
     @GetMapping("/list")
     @Operation(summary = "获得会员等级记录列表")
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
@@ -75,6 +75,7 @@ public class MemberLevelLogController {
         return success(MemberLevelLogConvert.INSTANCE.convertPage(pageResult));
     }
 
+    // TODO @疯狂：导出可以去掉先
     @GetMapping("/export-excel")
     @Operation(summary = "导出会员等级记录 Excel")
     @PreAuthorize("@ss.hasPermission('member:level-log:export')")

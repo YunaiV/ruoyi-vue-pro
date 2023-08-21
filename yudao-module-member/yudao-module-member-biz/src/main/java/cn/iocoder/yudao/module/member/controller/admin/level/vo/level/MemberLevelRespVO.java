@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.member.controller.admin.level.vo;
+package cn.iocoder.yudao.module.member.controller.admin.level.vo.level;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
