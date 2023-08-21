@@ -74,9 +74,10 @@ public class MemberLevelServiceImpl implements MemberLevelService {
 
     @Override
     public void deleteLevel(Long id) {
-        // TODO @疯狂：校验是否有用户使用该等级
         // 校验存在
         validateLevelExists(id);
+        // 校验分组下是否有用户
+        validateLevelHasUser(id);
         // 删除
         levelMapper.deleteById(id);
     }
@@ -147,6 +148,14 @@ public class MemberLevelServiceImpl implements MemberLevelService {
         validateLevelUnique(list, id, level);
         // 校验升级所需经验是否有效: 大于前一个等级，小于下一个级别
         validateExperienceOutRange(list, id, level, experience);
+    }
+
+    @VisibleForTesting
+    void validateLevelHasUser(Long id) {
+        Long count = memberUserMapper.selectCountByLevelId(id);
+        if (count > 0) {
+            throw exception(GROUP_HAS_USER);
+        }
     }
 
     @Override
