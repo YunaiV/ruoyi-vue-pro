@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserRespVO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserInfoRespVO;
+import cn.iocoder.yudao.module.member.dal.dataobject.group.MemberGroupDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.tag.MemberTagDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
@@ -38,17 +39,20 @@ public interface MemberUserConvert {
 
     default PageResult<MemberUserRespVO> convertPage(PageResult<MemberUserDO> pageResult,
                                                      List<MemberTagDO> tags,
-                                                     List<MemberLevelDO> levels) {
+                                                     List<MemberLevelDO> levels,
+                                                     List<MemberGroupDO> groups) {
         PageResult<MemberUserRespVO> result = convertPage(pageResult);
 
         // 处理关联数据
         Map<Long, String> tagMap = convertMap(tags, MemberTagDO::getId, MemberTagDO::getName);
         Map<Long, String> levelMap = convertMap(levels, MemberLevelDO::getId, MemberLevelDO::getName);
+        Map<Long, String> groupMap = convertMap(groups, MemberGroupDO::getId, MemberGroupDO::getName);
 
         // 填充关联数据
         for (MemberUserRespVO vo : result.getList()) {
             vo.setTagNames(convertList(vo.getTagIds(), tagMap::get));
             vo.setLevelName(MapUtil.getStr(levelMap, vo.getLevelId(), StrUtil.EMPTY));
+            vo.setGroupName(MapUtil.getStr(groupMap, vo.getGroupId(), StrUtil.EMPTY));
         }
         return result;
     }

@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.member.controller.admin.level.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
@@ -10,9 +9,8 @@ import lombok.ToString;
  */
 @Schema(description = "管理后台 - 会员等级 Response VO")
 @Data
-@EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class MemberLevelSimpleRespVO extends MemberLevelBaseVO {
+public class MemberLevelSimpleRespVO {
 
     @Schema(description = "编号", example = "6103")
     private Long id;

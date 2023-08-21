@@ -124,6 +124,10 @@ public class MemberUserDO extends TenantBaseDO {
      * 会员经验
      */
     private Integer experience;
+    /**
+     * 用户分组编号
+     */
+    private Long groupId;
 
     // TODO 积分等等
 }

@@ -52,4 +52,9 @@ public interface ErrorCodeConstants {
     ErrorCode LEVEL_LOG_NOT_EXISTS = new ErrorCode(1004007100, "会员等级记录不存在");
     ErrorCode EXPERIENCE_LOG_NOT_EXISTS = new ErrorCode(1004007200, "会员经验记录不存在");
     ErrorCode LEVEL_REASON_NOT_EXISTS = new ErrorCode(1004007300, "会员等级调整原因不能为空");
+
+    //========== 用户分组 1004011000 ==========
+    ErrorCode GROUP_NOT_EXISTS = new ErrorCode(1004011000, "用户分组不存在");
+    ErrorCode GROUP_HAS_USER = new ErrorCode(1004011001, "用户分组下存在用户，无法删除");
+
 }
