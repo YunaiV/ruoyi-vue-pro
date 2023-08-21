@@ -120,7 +120,6 @@
   <!-- 列表 -->
   <ContentWrap>
     <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
-      <el-table-column label="序号" type="index" width="70px" />
       #foreach($column in $columns)
       #if ($column.listOperationResult)
         #set ($dictType=$column.dictType)
@@ -142,7 +141,7 @@
         </template>
       </el-table-column>
         #else
-      <el-table-column label="${comment}" align="center" prop="${javaField}" width="150px"/>
+      <el-table-column label="${comment}" align="center" prop="${javaField}" width="150px" />
         #end
       #end
     #end
@@ -180,7 +179,7 @@
   <${simpleClassName}Form ref="formRef" @success="getList" />
 </template>
 
-<script setup lang="ts" name="${table.className}">
+<script setup lang="ts">
 #if ($dictMethods.size() > 0)
 import { DICT_TYPE#foreach ($dictMethod in $dictMethods), ${dictMethod}#end } from '@/utils/dict'
 #end
@@ -193,6 +192,9 @@ import { dateFormatter } from '@/utils/formatTime'
 import download from '@/utils/download'
 import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${classNameVar}'
 import ${simpleClassName}Form from './${simpleClassName}Form.vue'
+
+defineOptions({ name: '${table.className}' })
+
 const message = useMessage() // 消息弹窗
 const { t } = useI18n() // 国际化
 

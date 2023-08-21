@@ -86,11 +86,6 @@ public class DeliveryExpressServiceImpl implements DeliveryExpressService {
     }
 
     @Override
-    public List<DeliveryExpressDO> getDeliveryExpressList(Collection<Long> ids) {
-        return deliveryExpressMapper.selectBatchIds(ids);
-    }
-
-    @Override
     public PageResult<DeliveryExpressDO> getDeliveryExpressPage(DeliveryExpressPageReqVO pageReqVO) {
         return deliveryExpressMapper.selectPage(pageReqVO);
     }

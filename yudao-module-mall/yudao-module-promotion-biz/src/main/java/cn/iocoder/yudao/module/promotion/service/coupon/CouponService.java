@@ -67,4 +67,12 @@ public interface CouponService {
      */
     List<CouponDO> getCouponList(Long userId, Integer status);
 
+    /**
+     * 获得未使用的优惠劵数量
+     *
+     * @param userId 用户编号
+     * @return 未使用的优惠劵数量
+     */
+    Long getUnusedCouponCount(Long userId);
+
 }

@@ -25,10 +25,9 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
-// TODO @xiaqing：url 使用 member 作为前缀
-@Tag(name = "管理后台 - 用户签到积分")
+@Tag(name = "管理后台 - 签到记录")
 @RestController
-@RequestMapping("/point/sign-in-record")
+@RequestMapping("/member/sign-in/record")
 @Validated
 public class MemberSignInRecordController {
 
@@ -39,7 +38,7 @@ public class MemberSignInRecordController {
     private MemberUserApi memberUserApi;
 
     @GetMapping("/page")
-    @Operation(summary = "获得用户签到积分分页")
+    @Operation(summary = "获得签到记录分页")
     @PreAuthorize("@ss.hasPermission('point:sign-in-record:query')")
     public CommonResult<PageResult<MemberSignInRecordRespVO>> getSignInRecordPage(@Valid MemberSignInRecordPageReqVO pageVO) {
         // 执行分页查询

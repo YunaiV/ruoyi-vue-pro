@@ -1,10 +1,16 @@
 package cn.iocoder.yudao.module.member.service.user;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
-import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateMobileReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserResetPasswordReqVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdatePasswordReqVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateReqVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateMobileReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 
-import java.io.InputStream;
+import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 
@@ -66,26 +72,35 @@ public interface MemberUserService {
     List<MemberUserDO> getUserList(Collection<Long> ids);
 
     /**
-     * 修改用户昵称
-     * @param userId 用户id
-     * @param nickname 用户新昵称
+     * 【会员】修改基本信息
+     *
+     * @param userId 用户编号
+     * @param reqVO 基本信息
      */
-    void updateUserNickname(Long userId, String nickname);
+    void updateUser(Long userId, AppMemberUserUpdateReqVO reqVO);
 
     /**
-     * 修改用户头像
-     * @param userId 用户id
-     * @param inputStream 头像文件
-     * @return 头像url
+     * 【会员】修改手机
+     *
+     * @param userId 用户编号
+     * @param reqVO 请求信息
      */
-    String updateUserAvatar(Long userId, InputStream inputStream) throws Exception;
+    void updateUserMobile(Long userId, AppMemberUserUpdateMobileReqVO reqVO);
 
     /**
-     * 修改手机
-     * @param userId 用户id
-     * @param reqVO 请求实体
+     * 【会员】修改密码
+     *
+     * @param userId 用户编号
+     * @param reqVO 请求信息
      */
-    void updateUserMobile(Long userId, AppUserUpdateMobileReqVO reqVO);
+    void updateUserPassword(Long userId, AppMemberUserUpdatePasswordReqVO reqVO);
+
+    /**
+     * 【会员】忘记密码
+     *
+     * @param reqVO 请求信息
+     */
+    void resetUserPassword(AppMemberUserResetPasswordReqVO reqVO);
 
     /**
      * 判断密码是否匹配
@@ -95,5 +110,20 @@ public interface MemberUserService {
      * @return 是否匹配
      */
     boolean isPasswordMatch(String rawPassword, String encodedPassword);
+
+    /**
+     * 【管理员】更新会员用户
+     *
+     * @param updateReqVO 更新信息
+     */
+    void updateUser(@Valid MemberUserUpdateReqVO updateReqVO);
+
+    /**
+     * 【管理员】获得会员用户分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 会员用户分页
+     */
+    PageResult<MemberUserDO> getUserPage(MemberUserPageReqVO pageReqVO);
 
 }

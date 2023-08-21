@@ -53,7 +53,9 @@ public class TradeAfterSaleServiceTest extends BaseDbUnitTest {
     private TradeAfterSaleLogMapper tradeAfterSaleLogMapper;
 
     @MockBean
-    private TradeOrderUpdateService tradeOrderService;
+    private TradeOrderUpdateService tradeOrderUpdateService;
+    @Resource
+    private TradeOrderQueryService tradeOrderQueryService;
     @MockBean
     private TradeOrderQueryService tradeOrderQueryService;
     @MockBean

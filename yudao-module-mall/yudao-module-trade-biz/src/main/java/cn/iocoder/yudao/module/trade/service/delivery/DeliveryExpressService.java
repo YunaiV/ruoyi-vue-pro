@@ -1,5 +1,8 @@
 package cn.iocoder.yudao.module.trade.service.delivery;
 
+import java.util.*;
+import javax.validation.*;
+
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.express.DeliveryExpressCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.express.DeliveryExpressExportReqVO;
@@ -47,14 +50,6 @@ public interface DeliveryExpressService {
      * @return 快递公司
      */
     DeliveryExpressDO getDeliveryExpress(Long id);
-
-    /**
-     * 获得快递公司列表
-     *
-     * @param ids 编号
-     * @return 快递公司列表
-     */
-    List<DeliveryExpressDO> getDeliveryExpressList(Collection<Long> ids);
 
     /**
      * 获得快递公司分页

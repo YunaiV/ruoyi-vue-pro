@@ -17,10 +17,9 @@ import javax.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-// TODO @xiaqing：url 使用 member 作为前缀
 @Tag(name = "管理后台 - 会员积分设置")
 @RestController
-@RequestMapping("/point/config")
+@RequestMapping("/member/point/config")
 @Validated
 public class MemberPointConfigController {
 
@@ -30,16 +29,16 @@ public class MemberPointConfigController {
     @PutMapping("/save")
     @Operation(summary = "保存会员积分配置")
     @PreAuthorize("@ss.hasPermission('point:config:save')")
-    public CommonResult<Boolean> updateConfig(@Valid @RequestBody MemberPointConfigSaveReqVO saveReqVO) {
-        memberPointConfigService.saveConfig(saveReqVO);
+    public CommonResult<Boolean> savePointConfig(@Valid @RequestBody MemberPointConfigSaveReqVO saveReqVO) {
+        memberPointConfigService.savePointConfig(saveReqVO);
         return success(true);
     }
 
     @GetMapping("/get")
     @Operation(summary = "获得会员积分配置")
     @PreAuthorize("@ss.hasPermission('point:config:query')")
-    public CommonResult<MemberPointConfigRespVO> getConfig() {
-        MemberPointConfigDO config = memberPointConfigService.getConfig();
+    public CommonResult<MemberPointConfigRespVO> getPointConfig() {
+        MemberPointConfigDO config = memberPointConfigService.getPointConfig();
         return success(MemberPointConfigConvert.INSTANCE.convert(config));
     }
 

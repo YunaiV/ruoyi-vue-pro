@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -84,8 +83,15 @@ public class AppFavoriteController {
     @Operation(summary = "检查是否收藏过商品")
     @PreAuthenticated
     public CommonResult<Boolean> isFavoriteExists(AppFavoriteReqVO reqVO) {
-        ProductFavoriteDO favoriteDO = productFavoriteService.getFavorite(getLoginUserId(), reqVO.getSpuId());
-        return success(Objects.nonNull(favoriteDO));
+        ProductFavoriteDO favorite = productFavoriteService.getFavorite(getLoginUserId(), reqVO.getSpuId());
+        return success(favorite != null);
+    }
+
+    @GetMapping(value = "/get-count")
+    @Operation(summary = "获得商品收藏数量")
+    @PreAuthenticated
+    public CommonResult<Long> getFavoriteCount() {
+        return success(productFavoriteService.getFavoriteCount(getLoginUserId()));
     }
 
 }

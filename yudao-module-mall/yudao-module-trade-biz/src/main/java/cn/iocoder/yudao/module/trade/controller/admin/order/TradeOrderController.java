@@ -5,9 +5,10 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
-import cn.iocoder.yudao.module.product.api.property.ProductPropertyValueApi;
-import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.*;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDetailRespVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageItemRespVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
@@ -42,8 +43,6 @@ public class TradeOrderController {
     private TradeOrderQueryService tradeOrderQueryService;
 
     @Resource
-    private ProductPropertyValueApi productPropertyValueApi;
-    @Resource
     private MemberUserApi memberUserApi;
 
     @GetMapping("/page")
@@ -61,11 +60,8 @@ public class TradeOrderController {
         // 查询订单项
         List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(
                 convertSet(pageResult.getList(), TradeOrderDO::getId));
-        // 查询商品属性
-        List<ProductPropertyValueDetailRespDTO> propertyValueDetails = productPropertyValueApi
-                .getPropertyValueDetailList(TradeOrderConvert.INSTANCE.convertPropertyValueIds(orderItems));
         // 最终组合
-        return success(TradeOrderConvert.INSTANCE.convertPage(pageResult, orderItems, propertyValueDetails, userMap));
+        return success(TradeOrderConvert.INSTANCE.convertPage(pageResult, orderItems, userMap));
     }
 
     @GetMapping("/get-detail")
@@ -77,13 +73,10 @@ public class TradeOrderController {
         TradeOrderDO order = tradeOrderQueryService.getOrder(id);
         // 查询订单项
         List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(id);
-        // 查询商品属性
-        List<ProductPropertyValueDetailRespDTO> propertyValueDetails = productPropertyValueApi
-                .getPropertyValueDetailList(TradeOrderConvert.INSTANCE.convertPropertyValueIds(orderItems));
-        // 查询会员
+
+        // 拼接数据
         MemberUserRespDTO user = memberUserApi.getUser(order.getUserId());
-        // 最终组合
-        return success(TradeOrderConvert.INSTANCE.convert(order, orderItems, propertyValueDetails, user));
+        return success(TradeOrderConvert.INSTANCE.convert(order, orderItems, user));
     }
 
     @PostMapping("/delivery")

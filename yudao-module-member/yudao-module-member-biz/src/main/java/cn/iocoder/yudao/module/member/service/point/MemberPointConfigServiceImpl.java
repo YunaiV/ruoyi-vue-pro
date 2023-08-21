@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.member.service.point;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.member.controller.admin.point.vo.config.MemberPointConfigSaveReqVO;
 import cn.iocoder.yudao.module.member.convert.point.MemberPointConfigConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.point.MemberPointConfigDO;
@@ -25,23 +24,20 @@ public class MemberPointConfigServiceImpl implements MemberPointConfigService {
     private MemberPointConfigMapper pointConfigMapper;
 
     @Override
-    public void saveConfig(MemberPointConfigSaveReqVO saveReqVO) {
-        //获取当前记录
-        MemberPointConfigDO configDO = getConfig();
-        MemberPointConfigDO pointConfigDO = MemberPointConfigConvert.INSTANCE.convert(saveReqVO);
-        //当前存在记录，则更新，否则插入
-        if (configDO != null) {
-            pointConfigDO.setId(configDO.getId());
-            pointConfigMapper.updateById(pointConfigDO);
-        } else {
-            pointConfigDO.setId(null);
-            pointConfigMapper.insert(pointConfigDO);
+    public void savePointConfig(MemberPointConfigSaveReqVO saveReqVO) {
+        // 存在，则进行更新
+        MemberPointConfigDO dbConfig = getPointConfig();
+        if (dbConfig != null) {
+            pointConfigMapper.updateById(MemberPointConfigConvert.INSTANCE.convert(saveReqVO).setId(dbConfig.getId()));
+            return;
         }
+        // 不存在，则进行插入
+        pointConfigMapper.insert(MemberPointConfigConvert.INSTANCE.convert(saveReqVO));
     }
 
     @Override
-    public MemberPointConfigDO getConfig() {
-        List <MemberPointConfigDO> list = pointConfigMapper.selectList();
+    public MemberPointConfigDO getPointConfig() {
+        List<MemberPointConfigDO> list = pointConfigMapper.selectList();
         return CollectionUtils.getFirst(list);
     }
 

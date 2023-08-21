@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * 交易售后，用于处理 {@link TradeOrderDO} 交易订单的退款退货流程
+ * 售后订单，用于处理 {@link TradeOrderDO} 交易订单的退款退货流程
  *
  * @author 芋道源码
  */
@@ -32,7 +32,7 @@ public class TradeAfterSaleDO extends BaseDO {
      */
     private Long id;
     /**
-     * 售后流水号
+     * 售后单号
      *
      * 例如说，1146347329394184195
      */

@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.module.member.service.signin;
 
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.member.controller.admin.signin.vo.record.MemberSignInRecordPageReqVO;
+import cn.iocoder.yudao.module.member.controller.app.signin.vo.record.AppMemberSignInRecordRespVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInRecordDO;
 import cn.iocoder.yudao.module.member.dal.mysql.signin.MemberSignInRecordMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +20,7 @@ import java.util.Set;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 /**
- * 用户签到积分 Service 实现类
+ * 签到记录 Service 实现类
  *
  * @author 芋道源码
  */
@@ -34,7 +36,7 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
 
     @Override
     public PageResult<MemberSignInRecordDO> getSignInRecordPage(MemberSignInRecordPageReqVO pageReqVO) {
-        // 根据用户昵称查询出用户ids
+        // 根据用户昵称查询出用户 ids
         Set<Long> userIds = null;
         if (StringUtils.isNotBlank(pageReqVO.getNickname())) {
             List<MemberUserRespDTO> users = memberUserApi.getUserListByNickname(pageReqVO.getNickname());
@@ -44,7 +46,13 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
             }
             userIds = convertSet(users, MemberUserRespDTO::getId);
         }
+        // 分页查询
         return signInRecordMapper.selectPage(pageReqVO, userIds);
+    }
+
+    @Override
+    public PageResult<MemberSignInRecordDO> getSignRecordPage(Long userId, PageParam pageParam) {
+        return signInRecordMapper.selectPage(userId, pageParam);
     }
 
 }
