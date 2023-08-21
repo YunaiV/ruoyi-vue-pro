@@ -3,7 +3,9 @@ package cn.iocoder.yudao.module.member.service.level;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.log.MemberLevelLogExportReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.log.MemberLevelLogPageReqVO;
+import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelLogDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 
 import java.util.Collection;
 import java.util.List;
@@ -54,4 +56,29 @@ public interface MemberLevelLogService {
      */
     List<MemberLevelLogDO> getLevelLogList(MemberLevelLogExportReqVO exportReqVO);
 
+    /**
+     * 创建记录： 取消等级
+     *
+     * @param userId 会员编号
+     * @param reason 调整原因
+     */
+    void createCancelLog(Long userId, String reason);
+
+    /**
+     * 创建记录： 手动调整
+     *
+     * @param user       会员
+     * @param level      等级
+     * @param experience 变动经验值
+     * @param reason     调整原因
+     */
+    void createAdjustLog(MemberUserDO user, MemberLevelDO level, int experience, String reason);
+
+    /**
+     * 创建记录： 自动升级
+     *
+     * @param user  会员
+     * @param level 等级
+     */
+    void createAutoUpgradeLog(MemberUserDO user, MemberLevelDO level);
 }

@@ -3,7 +3,9 @@ package cn.iocoder.yudao.module.member.service.level;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.log.MemberLevelLogExportReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.log.MemberLevelLogPageReqVO;
+import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelLogDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.level.MemberLevelLogMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -59,6 +61,55 @@ public class MemberLevelLogServiceImpl implements MemberLevelLogService {
     @Override
     public List<MemberLevelLogDO> getLevelLogList(MemberLevelLogExportReqVO exportReqVO) {
         return levelLogMapper.selectList(exportReqVO);
+    }
+
+    @Override
+    public void createCancelLog(Long userId, String reason) {
+        MemberLevelLogDO levelLogDO = new MemberLevelLogDO();
+        levelLogDO.setUserId(userId);
+        levelLogDO.setRemark(reason);
+        levelLogDO.setDescription("管理员取消");
+        levelLogMapper.insert(levelLogDO);
+
+        // 给会员发送等级变动消息
+        notifyMember(userId, levelLogDO);
+    }
+
+    @Override
+    public void createAdjustLog(MemberUserDO user, MemberLevelDO level, int experience, String reason) {
+        MemberLevelLogDO levelLogDO = new MemberLevelLogDO();
+        levelLogDO.setUserId(user.getId());
+        levelLogDO.setLevelId(level.getId());
+        levelLogDO.setLevel(level.getLevel());
+        levelLogDO.setDiscount(level.getDiscount());
+        levelLogDO.setUserExperience(level.getExperience());
+        levelLogDO.setExperience(experience);
+        levelLogDO.setRemark(reason);
+        levelLogDO.setDescription("管理员调整为：" + level.getName());
+        levelLogMapper.insert(levelLogDO);
+
+        // 给会员发送等级变动消息
+        notifyMember(user.getId(), levelLogDO);
+    }
+
+    @Override
+    public void createAutoUpgradeLog(MemberUserDO user, MemberLevelDO level) {
+        MemberLevelLogDO levelLogDO = new MemberLevelLogDO();
+        levelLogDO.setUserId(user.getId());
+        levelLogDO.setLevelId(level.getId());
+        levelLogDO.setLevel(level.getLevel());
+        levelLogDO.setDiscount(level.getDiscount());
+        levelLogDO.setExperience(level.getExperience());
+        levelLogDO.setUserExperience(user.getExperience());
+        levelLogDO.setDescription("成为：" + level.getName());
+        levelLogMapper.insert(levelLogDO);
+
+        // 给会员发送等级变动消息
+        notifyMember(user.getId(), levelLogDO);
+    }
+
+    private void notifyMember(Long userId, MemberLevelLogDO level) {
+        //todo: 给会员发消息
     }
 
 }

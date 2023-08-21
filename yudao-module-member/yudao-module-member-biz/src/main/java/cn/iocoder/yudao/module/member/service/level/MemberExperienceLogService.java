@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.experience.MemberExperienceLogExportReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.experience.MemberExperienceLogPageReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberExperienceLogDO;
+import cn.iocoder.yudao.module.member.enums.MemberExperienceBizTypeEnum;
 
 import java.util.Collection;
 import java.util.List;
@@ -54,4 +55,23 @@ public interface MemberExperienceLogService {
      */
     List<MemberExperienceLogDO> getExperienceLogList(MemberExperienceLogExportReqVO exportReqVO);
 
+    /**
+     * 创建 手动调整 经验变动记录
+     *
+     * @param userId          会员编号
+     * @param experience      变动经验值
+     * @param totalExperience 会员当前的经验
+     */
+    void createAdjustLog(Long userId, int experience, int totalExperience);
+
+    /**
+     * 根据业务类型, 创建 经验变动记录
+     *
+     * @param userId          会员编号
+     * @param experience      变动经验值
+     * @param totalExperience 会员当前的经验
+     * @param bizType         业务类型
+     * @param bizId           业务ID
+     */
+    void createBizLog(Long userId, int experience, int totalExperience, MemberExperienceBizTypeEnum bizType, String bizId);
 }

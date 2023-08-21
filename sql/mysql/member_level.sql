@@ -9,7 +9,7 @@ create table member_level
     name           varchar(30)  default ''                not null comment '等级名称',
     experience     int          default 0                 not null comment '升级经验',
     level          int          default 0                 not null comment '等级',
-    discount       int(4)       default 100               not null comment '享受折扣',
+    discount       tinyint      default 100               not null comment '享受折扣',
     icon           varchar(255) default ''                not null comment '等级图标',
     background_url varchar(255) default ''                not null comment '等级背景图',
     status         tinyint      default 0                 not null comment '状态',
@@ -28,9 +28,9 @@ create table member_level_log
     user_id         bigint       default 0                 not null comment '用户编号',
     level_id        bigint       default 0                 not null comment '等级编号',
     level           int          default 0                 not null comment '会员等级',
-    discount        int(4)       default 100               not null comment '享受折扣',
-    experience      int(4)       default 0                 not null comment '升级经验',
-    user_experience int(4)       default 0                 not null comment '会员此时的经验',
+    discount        tinyint      default 100               not null comment '享受折扣',
+    experience      int          default 0                 not null comment '升级经验',
+    user_experience int          default 0                 not null comment '会员此时的经验',
     remark          varchar(255) default ''                not null comment '备注',
     description     varchar(255) default ''                not null comment '描述',
     creator         varchar(64)  default ''                null comment '创建者',
@@ -68,54 +68,27 @@ create index idx_user_biz_type on member_experience_log (user_id, biz_type) comm
 
 -- 增加字典
 insert system_dict_type(name, type) values ('会员经验业务类型', 'member_experience_biz_type');
-insert system_dict_data(dict_type, label, value, sort) values ('member_experience_biz_type', '系统', '0', 0);
-insert system_dict_data(dict_type, label, value, sort) values ('member_experience_biz_type', '订单', '1', 1);
-insert system_dict_data(dict_type, label, value, sort) values ('member_experience_biz_type', '签到', '2', 2);
+insert system_dict_data(dict_type, label, value, sort) values ('member_experience_biz_type', '管理员调整', '0', 0);
+insert system_dict_data(dict_type, label, value, sort) values ('member_experience_biz_type', '邀新奖励', '1', 1);
+insert system_dict_data(dict_type, label, value, sort) values ('member_experience_biz_type', '下单奖励', '2', 2);
+insert system_dict_data(dict_type, label, value, sort) values ('member_experience_biz_type', '退单扣除', '3', 3);
+insert system_dict_data(dict_type, label, value, sort) values ('member_experience_biz_type', '签到奖励', '4', 4);
+insert system_dict_data(dict_type, label, value, sort) values ('member_experience_biz_type', '抽奖奖励', '5', 5);
 
 -- 菜单 SQL
-INSERT INTO system_menu(
-    name, permission, type, sort, parent_id,
-    path, icon, component, status, component_name
-)
-VALUES (
-    '会员等级', '', 2, 3, 2262,
-    'level', '', 'member/level/index', 0, 'MemberLevel'
-);
+INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status, component_name)
+VALUES ('会员等级', '', 2, 3, 2262, 'level', '', 'member/level/index', 0, 'MemberLevel');
 
 -- 按钮父菜单ID
 -- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
 SELECT @parentId := LAST_INSERT_ID();
 
 -- 按钮 SQL
-INSERT INTO system_menu(
-    name, permission, type, sort, parent_id,
-    path, icon, component, status
-)
-VALUES (
-    '会员等级查询', 'member:level:query', 3, 1, @parentId,
-    '', '', '', 0
-);
-INSERT INTO system_menu(
-    name, permission, type, sort, parent_id,
-    path, icon, component, status
-)
-VALUES (
-    '会员等级创建', 'member:level:create', 3, 2, @parentId,
-    '', '', '', 0
-);
-INSERT INTO system_menu(
-    name, permission, type, sort, parent_id,
-    path, icon, component, status
-)
-VALUES (
-    '会员等级更新', 'member:level:update', 3, 3, @parentId,
-    '', '', '', 0
-);
-INSERT INTO system_menu(
-    name, permission, type, sort, parent_id,
-    path, icon, component, status
-)
-VALUES (
-    '会员等级删除', 'member:level:delete', 3, 4, @parentId,
-    '', '', '', 0
-);
+INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
+VALUES ('会员等级查询', 'member:level:query', 3, 1, @parentId, '', '', '', 0);
+INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
+VALUES ('会员等级创建', 'member:level:create', 3, 2, @parentId, '', '', '', 0);
+INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
+VALUES ('会员等级更新', 'member:level:update', 3, 3, @parentId, '', '', '', 0);
+INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
+VALUES ('会员等级删除', 'member:level:delete', 3, 4, @parentId, '', '', '', 0);

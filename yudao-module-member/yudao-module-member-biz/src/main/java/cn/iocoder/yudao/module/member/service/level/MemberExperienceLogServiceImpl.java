@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.member.service.level;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.experience.MemberExperienceLogExportReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.experience.MemberExperienceLogPageReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberExperienceLogDO;
 import cn.iocoder.yudao.module.member.dal.mysql.level.MemberExperienceLogMapper;
+import cn.iocoder.yudao.module.member.enums.MemberExperienceBizTypeEnum;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -59,6 +61,26 @@ public class MemberExperienceLogServiceImpl implements MemberExperienceLogServic
     @Override
     public List<MemberExperienceLogDO> getExperienceLogList(MemberExperienceLogExportReqVO exportReqVO) {
         return experienceLogMapper.selectList(exportReqVO);
+    }
+
+    @Override
+    public void createAdjustLog(Long userId, int experience, int totalExperience) {
+        // 管理员调整时, 没有业务编号, 记录对应的枚举值
+        String bizId = MemberExperienceBizTypeEnum.ADMIN.getValue() + "";
+        this.createBizLog(userId, experience, totalExperience, MemberExperienceBizTypeEnum.ADMIN, bizId);
+    }
+
+    @Override
+    public void createBizLog(Long userId, int experience, int totalExperience, MemberExperienceBizTypeEnum bizType, String bizId) {
+        MemberExperienceLogDO experienceLogDO = new MemberExperienceLogDO();
+        experienceLogDO.setUserId(userId);
+        experienceLogDO.setExperience(experience);
+        experienceLogDO.setTotalExperience(totalExperience);
+        experienceLogDO.setBizId(bizId);
+        experienceLogDO.setBizType(bizType.getValue());
+        experienceLogDO.setTitle(bizType.getTitle());
+        experienceLogDO.setDescription(StrUtil.format(bizType.getDesc(), experience));
+        experienceLogMapper.insert(experienceLogDO);
     }
 
 }

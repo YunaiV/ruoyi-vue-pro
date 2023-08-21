@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.member.controller.admin.level;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.*;
@@ -77,9 +76,9 @@ public class MemberLevelController {
 
     @GetMapping("/list-all-simple")
     @Operation(summary = "获取会员等级精简信息列表", description = "只包含被开启的会员等级，主要用于前端的下拉选项")
-    public CommonResult<List<MemberLevelSimpleRespVO>> getSimpleUserList() {
+    public CommonResult<List<MemberLevelSimpleRespVO>> getSimpleLevelList() {
         // 获用户列表，只要开启状态的
-        List<MemberLevelDO> list = levelService.getLevelListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        List<MemberLevelDO> list = levelService.getEnableLevelList();
         // 排序后，返回给前端
         return success(MemberLevelConvert.INSTANCE.convertSimpleList(list));
     }

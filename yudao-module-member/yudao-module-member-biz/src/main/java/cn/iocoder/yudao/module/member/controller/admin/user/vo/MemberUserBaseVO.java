@@ -53,4 +53,7 @@ public class MemberUserBaseVO {
     @Schema(description = "会员标签", example = "[1, 2]")
     private List<Long> tagIds;
 
+    @Schema(description = "会员等级编号", example = "1")
+    private Long levelId;
+
 }

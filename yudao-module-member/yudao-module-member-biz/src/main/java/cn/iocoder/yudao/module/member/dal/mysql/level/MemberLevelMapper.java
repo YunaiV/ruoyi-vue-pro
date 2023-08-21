@@ -26,6 +26,8 @@ public interface MemberLevelMapper extends BaseMapperX<MemberLevelDO> {
 
 
     default List<MemberLevelDO> selectListByStatus(Integer status) {
-        return selectList(MemberLevelDO::getStatus, status);
+        return selectList(new LambdaQueryWrapperX<MemberLevelDO>()
+                .eq(MemberLevelDO::getStatus, status)
+                .orderByAsc(MemberLevelDO::getLevel));
     }
 }
