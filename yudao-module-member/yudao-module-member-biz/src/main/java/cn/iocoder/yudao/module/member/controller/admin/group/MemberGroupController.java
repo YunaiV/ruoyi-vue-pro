@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -61,15 +60,6 @@ public class MemberGroupController {
     public CommonResult<MemberGroupRespVO> getGroup(@RequestParam("id") Long id) {
         MemberGroupDO group = groupService.getGroup(id);
         return success(MemberGroupConvert.INSTANCE.convert(group));
-    }
-
-    @GetMapping("/list")
-    @Operation(summary = "获得用户分组列表")
-    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @PreAuthorize("@ss.hasPermission('member:group:query')")
-    public CommonResult<List<MemberGroupRespVO>> getGroupList(@RequestParam("ids") Collection<Long> ids) {
-        List<MemberGroupDO> list = groupService.getGroupList(ids);
-        return success(MemberGroupConvert.INSTANCE.convertList(list));
     }
 
     @GetMapping("/list-all-simple")

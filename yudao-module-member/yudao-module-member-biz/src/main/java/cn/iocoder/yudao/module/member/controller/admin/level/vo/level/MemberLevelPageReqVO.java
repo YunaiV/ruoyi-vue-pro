@@ -6,9 +6,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-/**
- * @author owen
- */
 @Schema(description = "管理后台 - 会员等级分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)

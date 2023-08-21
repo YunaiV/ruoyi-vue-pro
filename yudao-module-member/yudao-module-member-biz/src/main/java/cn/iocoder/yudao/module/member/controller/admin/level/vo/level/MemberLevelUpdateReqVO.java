@@ -7,9 +7,6 @@ import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
 
-/**
- * @author owen
- */
 @Schema(description = "管理后台 - 会员等级更新 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)

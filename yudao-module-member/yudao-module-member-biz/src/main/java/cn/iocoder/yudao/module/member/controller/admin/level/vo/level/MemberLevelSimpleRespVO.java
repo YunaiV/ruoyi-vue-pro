@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.ToString;
 
-// TODO @疯狂：不需要继承 MemberLevelBaseVO
 @Schema(description = "管理后台 - 会员等级 Response VO")
 @Data
 @ToString(callSuper = true)
