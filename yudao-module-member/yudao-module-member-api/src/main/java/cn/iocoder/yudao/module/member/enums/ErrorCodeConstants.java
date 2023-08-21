@@ -24,9 +24,10 @@ public interface ErrorCodeConstants {
     // ========== 用户收件地址 1004004000 ==========
     ErrorCode ADDRESS_NOT_EXISTS = new ErrorCode(1004004000, "用户收件地址不存在");
 
-    //========== 会员标签 1004006000 ==========
-    ErrorCode TAG_NOT_EXISTS = new ErrorCode(1004006000, "会员标签不存在");
-    ErrorCode TAG_NAME_EXISTS = new ErrorCode(1004006001, "会员标签已经存在");
+    //========== 用户标签 1004006000 ==========
+    ErrorCode TAG_NOT_EXISTS = new ErrorCode(1004006000, "用户标签不存在");
+    ErrorCode TAG_NAME_EXISTS = new ErrorCode(1004006001, "用户标签已经存在");
+    ErrorCode TAG_HAS_USER = new ErrorCode(1004006002, "用户标签下存在用户，无法删除");
 
     //========== 积分配置 1004007000 ==========
 
@@ -39,19 +40,20 @@ public interface ErrorCodeConstants {
     //========== 签到配置 1004010000 ==========
 
 
-    //========== 会员等级 1004007000 ==========
-    ErrorCode LEVEL_NOT_EXISTS = new ErrorCode(1004007000, "会员等级不存在");
-    ErrorCode LEVEL_NAME_EXISTS = new ErrorCode(1004007001, "会员等级名称[{}]已被使用");
-    ErrorCode LEVEL_VALUE_EXISTS = new ErrorCode(1004007002, "会员等级值[{}]已被[{}]使用");
-    ErrorCode LEVEL_EXPERIENCE_MIN = new ErrorCode(1004007003, "升级经验必须大于上一个等级[{}]设置的升级经验[{}]");
-    ErrorCode LEVEL_EXPERIENCE_MAX = new ErrorCode(1004007004, "升级经验必须小于下一个等级[{}]设置的升级经验[{}]");
+    //========== 用户等级 1004011000 ==========
+    ErrorCode LEVEL_NOT_EXISTS = new ErrorCode(1004011000, "用户等级不存在");
+    ErrorCode LEVEL_NAME_EXISTS = new ErrorCode(1004011001, "用户等级名称[{}]已被使用");
+    ErrorCode LEVEL_VALUE_EXISTS = new ErrorCode(1004011002, "用户等级值[{}]已被[{}]使用");
+    ErrorCode LEVEL_EXPERIENCE_MIN = new ErrorCode(1004011003, "升级经验必须大于上一个等级[{}]设置的升级经验[{}]");
+    ErrorCode LEVEL_EXPERIENCE_MAX = new ErrorCode(1004011004, "升级经验必须小于下一个等级[{}]设置的升级经验[{}]");
+    ErrorCode LEVEL_HAS_USER = new ErrorCode(1004011005, "用户等级下存在用户，无法删除");
 
-    ErrorCode LEVEL_LOG_NOT_EXISTS = new ErrorCode(1004007100, "会员等级记录不存在");
-    ErrorCode EXPERIENCE_LOG_NOT_EXISTS = new ErrorCode(1004007200, "会员经验记录不存在");
-    ErrorCode LEVEL_REASON_NOT_EXISTS = new ErrorCode(1004007300, "会员等级调整原因不能为空");
+    ErrorCode LEVEL_LOG_NOT_EXISTS = new ErrorCode(1004011100, "用户等级记录不存在");
+    ErrorCode EXPERIENCE_LOG_NOT_EXISTS = new ErrorCode(1004011200, "用户经验记录不存在");
+    ErrorCode LEVEL_REASON_NOT_EXISTS = new ErrorCode(1004011300, "用户等级调整原因不能为空");
 
-    //========== 用户分组 1004011000 ==========
-    ErrorCode GROUP_NOT_EXISTS = new ErrorCode(1004011000, "用户分组不存在");
-    ErrorCode GROUP_HAS_USER = new ErrorCode(1004011001, "用户分组下存在用户，无法删除");
+    //========== 用户分组 1004012000 ==========
+    ErrorCode GROUP_NOT_EXISTS = new ErrorCode(1004012000, "用户分组不存在");
+    ErrorCode GROUP_HAS_USER = new ErrorCode(1004012001, "用户分组下存在用户，无法删除");
 
 }
