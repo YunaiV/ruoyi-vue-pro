@@ -36,6 +36,11 @@ public interface DeliveryExpressMapper extends BaseMapperX<DeliveryExpressDO> {
         return selectOne(new LambdaQueryWrapper<DeliveryExpressDO>()
                 .eq(DeliveryExpressDO::getCode, code));
     }
+
+    default List<DeliveryExpressDO> selectListByStatus(Integer status) {
+        return selectList(DeliveryExpressDO::getStatus, status);
+    }
+
 }
 
 

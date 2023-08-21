@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderRemarkReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
@@ -59,6 +60,14 @@ public interface TradeOrderUpdateService {
      * @param id     订单编号
      */
     void receiveOrder(Long userId, Long id);
+
+    /**
+     * 【管理员】交易订单备注
+     *
+     * @param loginUserId 管理员编号
+     * @param remarkReqVO 备注请求
+     */
+    void remarkOrder(Long loginUserId, TradeOrderRemarkReqVO remarkReqVO);
 
     // =================== Order Item ===================
 

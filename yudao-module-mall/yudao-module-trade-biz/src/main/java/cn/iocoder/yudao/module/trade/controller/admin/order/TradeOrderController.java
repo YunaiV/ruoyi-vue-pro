@@ -7,10 +7,7 @@ import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.product.api.property.ProductPropertyValueApi;
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDetailRespVO;
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageItemRespVO;
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.*;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
@@ -96,5 +93,20 @@ public class TradeOrderController {
         tradeOrderUpdateService.deliveryOrder(getLoginUserId(), deliveryReqVO);
         return success(true);
     }
+
+    @PostMapping("/remark")
+    @Operation(summary = "发货订单")
+    @PreAuthorize("@ss.hasPermission('trade:order:remark')")
+    public CommonResult<Boolean> remarkOrder(@RequestBody TradeOrderRemarkReqVO remarkReqVO) {
+        tradeOrderUpdateService.remarkOrder(getLoginUserId(), remarkReqVO);
+        return success(true);
+    }
+
+    // TODO @puhui999 订单物流详情
+    // TODO @puhui999 【前台】订单取消
+    // TODO @puhui999 【后台】订单取消
+    // TODO @puhui999 【前台】订单核销
+    // TODO @puhui999 【前台】订单删除
+    // TODO @puhui999 【后台】订单统计
 
 }

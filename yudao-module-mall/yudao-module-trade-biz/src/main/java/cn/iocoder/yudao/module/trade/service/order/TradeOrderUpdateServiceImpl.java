@@ -30,6 +30,7 @@ import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponUseReqDTO;
 import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderRemarkReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
@@ -398,7 +399,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         TradeOrderDO updateOrderObj = new TradeOrderDO();
         // 判断发货类型
         // 2.1 快递发货
-        if (Objects.equals(deliveryReqVO.getType(), DeliveryTypeEnum.EXPRESS.getMode())) {
+        if (ObjectUtil.notEqual(deliveryReqVO.getLogisticsId(), 0L)) {
             // 校验快递公司
             DeliveryExpressDO deliveryExpress = deliveryExpressService.getDeliveryExpress(deliveryReqVO.getLogisticsId());
             if (deliveryExpress == null) {
@@ -408,11 +409,9 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                 throw exception(EXPRESS_STATUS_NOT_ENABLE);
             }
             updateOrderObj.setLogisticsId(deliveryReqVO.getLogisticsId()).setLogisticsNo(deliveryReqVO.getLogisticsNo()).setDeliveryType(DeliveryTypeEnum.EXPRESS.getMode());
-        }
-        // TODO @puhui999：无需发货时，更新 logisticsId 为 0；
-        // 2.2 无需发货
-        if (Objects.equals(deliveryReqVO.getType(), DeliveryTypeEnum.NULL.getMode())) {
-            updateOrderObj.setLogisticsId(null).setLogisticsNo("").setDeliveryType(DeliveryTypeEnum.NULL.getMode());
+        } else {
+            // 2.2 无需发货
+            updateOrderObj.setLogisticsId(0L).setLogisticsNo("").setDeliveryType(DeliveryTypeEnum.NULL.getMode());
         }
 
         // 更新 TradeOrderDO 状态为已发货，等待收货
@@ -487,6 +486,17 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // TODO 芋艿：lili 发送订单变化的消息
 
         // TODO 芋艿：lili 发送商品被购买完成的数据
+    }
+
+    @Override
+    public void remarkOrder(Long loginUserId, TradeOrderRemarkReqVO remarkReqVO) {
+        // 校验并获得交易订单
+        validateOrderDeliverable(remarkReqVO.getId());
+
+        TradeOrderDO updateOrderObj = new TradeOrderDO();
+        updateOrderObj.setId(remarkReqVO.getId());
+        updateOrderObj.setRemark(remarkReqVO.getRemark());
+        tradeOrderMapper.updateById(updateOrderObj);
     }
 
     /**

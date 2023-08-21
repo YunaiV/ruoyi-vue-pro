@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.trade.controller.admin.delivery;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.express.*;
-import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.express.DeliveryExpressUpdateReqVO;
 import cn.iocoder.yudao.module.trade.convert.delivery.DeliveryExpressConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
@@ -65,6 +65,15 @@ public class DeliveryExpressController {
     public CommonResult<DeliveryExpressRespVO> getDeliveryExpress(@RequestParam("id") Long id) {
         DeliveryExpressDO deliveryExpress = deliveryExpressService.getDeliveryExpress(id);
         return success(DeliveryExpressConvert.INSTANCE.convert(deliveryExpress));
+    }
+
+    @GetMapping("/list-all-simple")
+    @Operation(summary = "获取快递公司精简信息列表", description = "主要用于前端的下拉选项")
+    public CommonResult<List<DeliveryExpressSimpleRespVO>> getSimpleBrandList() {
+        // 获取品牌列表，只要开启状态的
+        List<DeliveryExpressDO> list = deliveryExpressService.getDeliveryExpressListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        // 排序后，返回给前端
+        return success(DeliveryExpressConvert.INSTANCE.convertList1(list));
     }
 
     @GetMapping("/page")

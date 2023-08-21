@@ -9,14 +9,15 @@ import cn.iocoder.yudao.module.trade.convert.delivery.DeliveryExpressConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.delivery.DeliveryExpressMapper;
 import org.springframework.stereotype.Service;
-import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.*;
-
+import javax.annotation.Resource;
+import java.util.Collection;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.EXPRESS_CODE_DUPLICATE;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.EXPRESS_NOT_EXISTS;
 
 /**
  * 快递公司 Service 实现类
@@ -97,6 +98,11 @@ public class DeliveryExpressServiceImpl implements DeliveryExpressService {
     @Override
     public List<DeliveryExpressDO> getDeliveryExpressList(DeliveryExpressExportReqVO exportReqVO) {
         return deliveryExpressMapper.selectList(exportReqVO);
+    }
+
+    @Override
+    public List<DeliveryExpressDO> getDeliveryExpressListByStatus(Integer status) {
+        return deliveryExpressMapper.selectListByStatus(status);
     }
 
 }
