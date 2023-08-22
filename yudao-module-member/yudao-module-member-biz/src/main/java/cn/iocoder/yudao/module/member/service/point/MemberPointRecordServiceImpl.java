@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.MemberPointRecordPageReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.point.MemberPointRecordDO;
 import cn.iocoder.yudao.module.member.dal.mysql.point.MemberPointRecordMapper;
-import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -46,9 +45,6 @@ public class MemberPointRecordServiceImpl implements MemberPointRecordService {
                 return PageResult.empty();
             }
             userIds = convertSet(users, MemberUserRespDTO::getId);
-        }
-        if (pageReqVO.getUserId() != null) {
-            userIds = Sets.newHashSet(pageReqVO.getUserId());
         }
         // 执行查询
         return recordMapper.selectPage(pageReqVO, userIds);
