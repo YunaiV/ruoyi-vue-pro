@@ -76,7 +76,7 @@ public class TradeOrderController {
     }
 
     @PostMapping("/delivery")
-    @Operation(summary = "发货订单")
+    @Operation(summary = "订单发货")
     @PreAuthorize("@ss.hasPermission('trade:order:update')")
     public CommonResult<Boolean> deliveryOrder(@RequestBody TradeOrderDeliveryReqVO deliveryReqVO) {
         tradeOrderUpdateService.deliveryOrder(deliveryReqVO);
@@ -84,7 +84,7 @@ public class TradeOrderController {
     }
 
     @PostMapping("/remark")
-    @Operation(summary = "发货订单")
+    @Operation(summary = "订单备注")
     @PreAuthorize("@ss.hasPermission('trade:order:update')")
     public CommonResult<Boolean> remarkOrder(@RequestBody TradeOrderRemarkReqVO reqVO) {
         tradeOrderUpdateService.remarkOrder(reqVO);
@@ -92,7 +92,7 @@ public class TradeOrderController {
     }
 
     @PostMapping("/adjust-price")
-    @Operation(summary = "发货订单")
+    @Operation(summary = "订单调价")
     @PreAuthorize("@ss.hasPermission('trade:order:update')")
     public CommonResult<Boolean> adjustPrice(@RequestBody TradeOrderAdjustPriceReqVO reqVO) {
         tradeOrderUpdateService.adjustPrice(reqVO);
@@ -100,7 +100,7 @@ public class TradeOrderController {
     }
 
     @PostMapping("/adjust-address")
-    @Operation(summary = "发货订单")
+    @Operation(summary = "修改订单收货地址")
     @PreAuthorize("@ss.hasPermission('trade:order:update')")
     public CommonResult<Boolean> adjustAddress(@RequestBody TradeOrderAdjustAddressReqVO reqVO) {
         tradeOrderUpdateService.adjustAddress(reqVO);
