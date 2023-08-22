@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.member.controller.admin.signin.vo.record.MemberSignInRecordPageReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInRecordDO;
 import cn.iocoder.yudao.module.member.dal.mysql.signin.MemberSignInRecordMapper;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -43,6 +44,9 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
                 return PageResult.empty();
             }
             userIds = convertSet(users, MemberUserRespDTO::getId);
+        }
+        if (pageReqVO.getUserId() != null) {
+            userIds = Sets.newHashSet(pageReqVO.getUserId());
         }
         // 分页查询
         return signInRecordMapper.selectPage(pageReqVO, userIds);

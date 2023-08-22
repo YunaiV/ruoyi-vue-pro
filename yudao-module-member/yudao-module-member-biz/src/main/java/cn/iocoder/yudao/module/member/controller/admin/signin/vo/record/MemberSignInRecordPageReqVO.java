@@ -23,6 +23,9 @@ public class MemberSignInRecordPageReqVO extends PageParam {
     @Schema(description = "第几天签到", example = "10")
     private Integer day;
 
+    @Schema(description = "用户ID", example = "123")
+    private Long userId;
+
     @Schema(description = "签到时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
