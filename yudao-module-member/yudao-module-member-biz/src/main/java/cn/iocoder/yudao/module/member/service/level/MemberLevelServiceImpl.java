@@ -141,7 +141,6 @@ public class MemberLevelServiceImpl implements MemberLevelService {
     @VisibleForTesting
     void validateConfigValid(Long id, String name, Integer level, Integer experience) {
         List<MemberLevelDO> list = levelMapper.selectList();
-
         // 校验名称唯一
         validateNameUnique(list, id, name);
         // 校验等级唯一
@@ -178,19 +177,14 @@ public class MemberLevelServiceImpl implements MemberLevelService {
         return levelMapper.selectListByStatus(status);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateUserLevel(MemberUserUpdateLevelReqVO updateReqVO) {
         MemberUserDO user = memberUserMapper.selectById(updateReqVO.getId());
         if (user == null) {
             throw exception(USER_NOT_EXISTS);
         }
-
-        // 未调整的情况1
-        if (user.getLevelId() == null && updateReqVO.getLevelId() == null) {
-            return;
-        }
-        // 未调整的情况2
+        // 等级未发生变化
         if (ObjUtil.equal(user.getLevelId(), updateReqVO.getLevelId())) {
             return;
         }
@@ -218,36 +212,40 @@ public class MemberLevelServiceImpl implements MemberLevelService {
             updateUserLevelIdAndExperience(user.getId(), updateReqVO.getLevelId(), totalExperience);
         }
 
-
         // 记录会员经验变动
         memberExperienceRecordService.createAdjustLog(user.getId(), experience, totalExperience);
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    // TODO @疯狂：方法名，建议改成 increase 或者 add 经验，和项目更统一一些
+    // TODO @疯狂：bizType 改成具体数值，主要是枚举在 api 不好传递，rpc 情况下
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void plusExperience(Long userId, Integer experience, MemberExperienceBizTypeEnum bizType, String bizId) {
         if (experience == 0) {
             return;
         }
 
         MemberUserDO user = memberUserMapper.selectById(userId);
-        if (user.getExperience() == null) {
-            user.setExperience(0);
-        }
 
         // 防止扣出负数
         int userExperience = NumberUtil.max(user.getExperience() + experience, 0);
-
         // 创建经验记录
         memberExperienceRecordService.createBizLog(userId, experience, userExperience, bizType, bizId);
 
         // 计算会员等级
-        Long levelId = calcLevel(user, userExperience);
+        MemberLevelDO newLevel = calculateNewLevel(user, userExperience);
+        Long newLevelId = null;
+        if (newLevel != null) {
+            newLevelId = newLevel.getId();
+            // 保存等级变更记录
+            memberLevelRecordService.createAutoUpgradeLog(user, newLevel);
+        }
 
         // 更新会员表上的等级编号、经验值
-        updateUserLevelIdAndExperience(user.getId(), levelId, userExperience);
+        updateUserLevelIdAndExperience(user.getId(), newLevelId, userExperience);
     }
 
+    // TODO @疯狂：让 memberUserService 那开个方法；每个模块，不直接操作对方的 mapper；
     private void updateUserLevelIdAndExperience(Long userId, Long levelId, Integer experience) {
         memberUserMapper.updateById(new MemberUserDO()
                 .setId(userId)
@@ -262,7 +260,7 @@ public class MemberLevelServiceImpl implements MemberLevelService {
      * @param userExperience 会员当前的经验值
      * @return 会员等级编号，null表示无变化
      */
-    private Long calcLevel(MemberUserDO user, int userExperience) {
+    private MemberLevelDO calculateNewLevel(MemberUserDO user, int userExperience) {
         List<MemberLevelDO> list = getEnableLevelList();
         if (CollUtil.isEmpty(list)) {
             log.warn("计算会员等级失败：会员等级配置不存在");
@@ -283,8 +281,6 @@ public class MemberLevelServiceImpl implements MemberLevelService {
             return null;
         }
 
-        // 保存等级变更记录
-        memberLevelRecordService.createAutoUpgradeLog(user, matchLevel);
-        return matchLevel.getId();
+        return matchLevel;
     }
 }

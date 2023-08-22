@@ -48,6 +48,16 @@ public interface MemberLevelRecordService {
     PageResult<MemberLevelRecordDO> getLevelLogPage(MemberLevelRecordPageReqVO pageReqVO);
 
     /**
+     * 获得会员等级记录列表, 用于 Excel 导出
+     *
+     * @param exportReqVO 查询条件
+     * @return 会员等级记录列表
+     */
+    List<MemberLevelLogDO> getLevelLogList(MemberLevelLogExportReqVO exportReqVO);
+
+    // TODO @疯狂：把 createCancelLog、createAdjustLog、createAutoUpgradeLog 几个日志合并成一个通用的日志方法；整体的内容，交给 MemberLevelService 去做；以及对应的 level 变化的通知；
+
+    /**
      * 创建记录： 取消等级
      *
      * @param userId 会员编号
