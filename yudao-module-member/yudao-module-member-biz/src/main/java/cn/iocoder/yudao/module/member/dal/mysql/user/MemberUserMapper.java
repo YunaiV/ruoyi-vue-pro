@@ -50,14 +50,13 @@ public interface MemberUserMapper extends BaseMapperX<MemberUserDO> {
                 .orderByDesc(MemberUserDO::getId));
     }
 
-    // TODO @疯狂：命名可以改成 updateUserLevelToNull；db 侧的操作，尽量无业务含义，更多是 select、update、insert 操作
     /**
      * 取消会员的等级
      *
      * @param userId 会员编号
      * @return 受影响的行数
      */
-    default int cancelUserLevel(Long userId) {
+    default int updateUserLevelToNull(Long userId) {
         return update(null, new LambdaUpdateWrapper<MemberUserDO>()
                 .eq(MemberUserDO::getId, userId)
                 .set(MemberUserDO::getExperience, 0)

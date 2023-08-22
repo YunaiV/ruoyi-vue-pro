@@ -15,7 +15,6 @@ import cn.iocoder.yudao.module.member.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
-import cn.iocoder.yudao.module.member.service.level.MemberLevelService;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeUseReqDTO;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
@@ -55,9 +54,6 @@ public class MemberUserServiceImpl implements MemberUserService {
 
     @Resource
     private PasswordEncoder passwordEncoder;
-
-    @Resource
-    private MemberLevelService memberLevelService;
 
     @Override
     public MemberUserDO getUserByMobile(String mobile) {
@@ -195,10 +191,6 @@ public class MemberUserServiceImpl implements MemberUserService {
         // 更新
         MemberUserDO updateObj = MemberUserConvert.INSTANCE.convert(updateReqVO);
         memberUserMapper.updateById(updateObj);
-
-        // 会员级别修改
-        // TODO @疯狂：修改用户等级，要不要单独一个前端操作 + 接口；因为它是个相对严肃独立的动作
-        memberLevelService.updateUserLevel(user, updateReqVO.getLevelId(), updateReqVO.getLevelReason());
     }
 
     @VisibleForTesting

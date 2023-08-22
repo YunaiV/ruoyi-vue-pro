@@ -50,7 +50,6 @@ public interface ErrorCodeConstants {
 
     ErrorCode LEVEL_LOG_NOT_EXISTS = new ErrorCode(1004011100, "用户等级记录不存在");
     ErrorCode EXPERIENCE_LOG_NOT_EXISTS = new ErrorCode(1004011200, "用户经验记录不存在");
-    ErrorCode LEVEL_REASON_NOT_EXISTS = new ErrorCode(1004011300, "用户等级调整原因不能为空");
 
     //========== 用户分组 1004012000 ==========
     ErrorCode GROUP_NOT_EXISTS = new ErrorCode(1004012000, "用户分组不存在");

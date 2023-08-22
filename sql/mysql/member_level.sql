@@ -92,3 +92,7 @@ INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, com
 VALUES ('会员等级更新', 'member:level:update', 3, 3, @parentId, '', '', '', 0);
 INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
 VALUES ('会员等级删除', 'member:level:delete', 3, 4, @parentId, '', '', '', 0);
+
+-- 会员用户管理： 增加按钮权限
+INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
+VALUES ('用户等级修改', 'member:user:update-level', 3, 5, 2309, '', '', '', 0);

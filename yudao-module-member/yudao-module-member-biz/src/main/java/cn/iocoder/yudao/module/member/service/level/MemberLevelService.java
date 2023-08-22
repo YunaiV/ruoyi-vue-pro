@@ -5,11 +5,10 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelCreateReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelUpdateReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateLevelReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
-import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.enums.MemberExperienceBizTypeEnum;
 
-import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
@@ -89,11 +88,9 @@ public interface MemberLevelService {
     /**
      * 修改会员的等级
      *
-     * @param user        会员
-     * @param levelId     要修改的等级编号，编号为空时，代表取消会员的等级
-     * @param levelReason 修改原因
+     * @param updateReqVO 修改参数
      */
-    void updateUserLevel(MemberUserDO user, @Nullable Long levelId, String levelReason);
+    void updateUserLevel(MemberUserUpdateLevelReqVO updateReqVO);
 
     /**
      * 增加会员经验

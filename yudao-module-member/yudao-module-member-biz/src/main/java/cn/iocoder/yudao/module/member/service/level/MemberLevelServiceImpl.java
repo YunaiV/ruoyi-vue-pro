@@ -4,11 +4,11 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelCreateReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelUpdateReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateLevelReqVO;
 import cn.iocoder.yudao.module.member.convert.level.MemberLevelConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
@@ -180,41 +180,42 @@ public class MemberLevelServiceImpl implements MemberLevelService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void updateUserLevel(MemberUserDO user, Long levelId, String reason) {
+    public void updateUserLevel(MemberUserUpdateLevelReqVO updateReqVO) {
+        MemberUserDO user = memberUserMapper.selectById(updateReqVO.getId());
+        if (user == null) {
+            throw exception(USER_NOT_EXISTS);
+        }
+
         // 未调整的情况1
-        if (user.getLevelId() == null && levelId == null) {
+        if (user.getLevelId() == null && updateReqVO.getLevelId() == null) {
             return;
         }
         // 未调整的情况2
-        if (ObjUtil.equal(user.getLevelId(), levelId)) {
+        if (ObjUtil.equal(user.getLevelId(), updateReqVO.getLevelId())) {
             return;
-        }
-
-        // 需要后台用户填写为什么调整会员的等级
-        if (StrUtil.isBlank(reason)) {
-            throw exception(LEVEL_REASON_NOT_EXISTS);
         }
 
         int experience;
         int totalExperience = 0;
         // 记录等级变动
-        if (levelId == null) {
+        if (updateReqVO.getLevelId() == null) {
+            // 取消用户等级时，为扣减经验
             experience = -user.getExperience();
 
             // 取消了会员的等级
-            memberLevelLogService.createCancelLog(user.getId(), reason);
-            memberUserMapper.cancelUserLevel(user.getId());
+            memberLevelLogService.createCancelLog(user.getId(), updateReqVO.getReason());
+            memberUserMapper.updateUserLevelToNull(user.getId());
         } else {
-            MemberLevelDO level = validateLevelExists(levelId);
+            MemberLevelDO level = validateLevelExists(updateReqVO.getLevelId());
             // 变动经验值 = 等级的升级经验 - 会员当前的经验；正数为增加经验，负数为扣减经验
             experience = level.getExperience() - user.getExperience();
             // 会员当前的经验 = 等级的升级经验
             totalExperience = level.getExperience();
 
-            memberLevelLogService.createAdjustLog(user, level, experience, reason);
+            memberLevelLogService.createAdjustLog(user, level, experience, updateReqVO.getReason());
 
             // 更新会员表上的等级编号、经验值
-            updateUserLevelIdAndExperience(user.getId(), levelId, totalExperience);
+            updateUserLevelIdAndExperience(user.getId(), updateReqVO.getLevelId(), totalExperience);
         }
 
 
