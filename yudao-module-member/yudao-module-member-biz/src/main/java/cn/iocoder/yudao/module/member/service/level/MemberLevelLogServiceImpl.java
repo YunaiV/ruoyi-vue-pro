@@ -75,7 +75,7 @@ public class MemberLevelLogServiceImpl implements MemberLevelLogService {
         levelLogDO.setUserId(user.getId());
         levelLogDO.setLevelId(level.getId());
         levelLogDO.setLevel(level.getLevel());
-        levelLogDO.setDiscount(level.getDiscount());
+        levelLogDO.setDiscountPercent(level.getDiscountPercent());
         levelLogDO.setUserExperience(level.getExperience());
         levelLogDO.setExperience(experience);
         levelLogDO.setRemark(reason);
@@ -92,7 +92,7 @@ public class MemberLevelLogServiceImpl implements MemberLevelLogService {
         levelLogDO.setUserId(user.getId());
         levelLogDO.setLevelId(level.getId());
         levelLogDO.setLevel(level.getLevel());
-        levelLogDO.setDiscount(level.getDiscount());
+        levelLogDO.setDiscountPercent(level.getDiscountPercent());
         levelLogDO.setExperience(level.getExperience());
         levelLogDO.setUserExperience(user.getExperience());
         levelLogDO.setDescription("成为：" + level.getName());

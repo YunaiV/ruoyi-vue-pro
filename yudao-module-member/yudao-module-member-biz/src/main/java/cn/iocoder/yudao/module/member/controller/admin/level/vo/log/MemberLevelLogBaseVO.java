@@ -26,7 +26,7 @@ public class MemberLevelLogBaseVO {
 
     @Schema(description = "享受折扣", requiredMode = Schema.RequiredMode.REQUIRED, example = "13319")
     @NotNull(message = "享受折扣不能为空")
-    private Integer discount;
+    private Integer discountPercent;
 
     @Schema(description = "升级经验", requiredMode = Schema.RequiredMode.REQUIRED, example = "13319")
     @NotNull(message = "升级经验不能为空")

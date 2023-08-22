@@ -49,7 +49,7 @@ public class MemberLevelServiceImplTest extends BaseDbUnitTest {
     public void testCreateLevel_success() {
         // 准备参数
         MemberLevelCreateReqVO reqVO = randomPojo(MemberLevelCreateReqVO.class, o -> {
-            o.setDiscount(randomInt());
+            o.setDiscountPercent(randomInt());
             o.setIcon(randomURL());
             o.setBackgroundUrl(randomURL());
         });
@@ -76,7 +76,7 @@ public class MemberLevelServiceImplTest extends BaseDbUnitTest {
             o.setLevel(dbLevel.getLevel());
             o.setExperience(dbLevel.getExperience());
             //以下是要修改的字段
-            o.setDiscount(randomInt());
+            o.setDiscountPercent(randomInt());
             o.setIcon(randomURL());
             o.setBackgroundUrl(randomURL());
         });
@@ -256,7 +256,7 @@ public class MemberLevelServiceImplTest extends BaseDbUnitTest {
     private static MemberLevelDO randomLevelDO(Consumer<MemberLevelDO>... consumers) {
         Consumer<MemberLevelDO> consumer = (o) -> {
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-            o.setDiscount(randomInt(0, 100));
+            o.setDiscountPercent(randomInt(0, 100));
             o.setIcon(randomURL());
             o.setBackgroundUrl(randomURL());
         };

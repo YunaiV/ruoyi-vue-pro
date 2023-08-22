@@ -39,14 +39,6 @@ public interface MemberExperienceLogService {
      */
     PageResult<MemberExperienceLogDO> getExperienceLogPage(MemberExperienceLogPageReqVO pageReqVO);
 
-    /**
-     * 获得会员经验记录列表, 用于 Excel 导出
-     *
-     * @param exportReqVO 查询条件
-     * @return 会员经验记录列表
-     */
-    List<MemberExperienceLogDO> getExperienceLogList(MemberExperienceLogExportReqVO exportReqVO);
-
     // TODO @疯狂：类似 MemberLevelLogService 的方法，这里也需要提供一个通用的方法，用于创建经验变动记录
 
     /**

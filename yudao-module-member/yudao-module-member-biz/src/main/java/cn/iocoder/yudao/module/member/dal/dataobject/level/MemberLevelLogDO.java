@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.member.dal.dataobject.level;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -30,20 +31,26 @@ public class MemberLevelLogDO extends BaseDO {
     private Long id;
     /**
      * 用户编号
+     *
+     * 关联 {@link MemberUserDO#getId()} 字段
      */
     private Long userId;
     /**
      * 等级编号
+     *
+     * 关联 {@link MemberLevelDO#getId()} 字段
      */
     private Long levelId;
     /**
      * 会员等级
+     *
+     * 冗余 {@link MemberLevelDO#getLevel()} 字段
      */
     private Integer level;
     /**
      * 享受折扣
      */
-    private Integer discount;
+    private Integer discountPercent;
     /**
      * 升级经验
      */
