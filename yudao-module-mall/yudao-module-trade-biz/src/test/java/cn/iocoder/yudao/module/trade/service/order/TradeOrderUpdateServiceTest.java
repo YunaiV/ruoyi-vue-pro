@@ -23,7 +23,10 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderItemMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
-import cn.iocoder.yudao.module.trade.enums.order.*;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderConfig;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +41,6 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
@@ -282,7 +284,7 @@ public class TradeOrderUpdateServiceTest extends BaseDbUnitTest {
         // mock 方法（支付单）
 
         // 调用
-        tradeOrderUpdateService.deliveryOrder(randomLongId(), deliveryReqVO);
+        tradeOrderUpdateService.deliveryOrder(deliveryReqVO);
         // 断言
         TradeOrderDO dbOrder = tradeOrderMapper.selectById(1L);
         assertEquals(dbOrder.getStatus(), TradeOrderStatusEnum.DELIVERED.getStatus());

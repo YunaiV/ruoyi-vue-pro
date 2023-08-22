@@ -6,9 +6,9 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
-* 交易订单 Base VO，提供给添加、修改、详细的子 VO 使用
-* 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
-*/
+ * 交易订单 Base VO，提供给添加、修改、详细的子 VO 使用
+ * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
+ */
 @Data
 public class TradeOrderBaseVO {
 
@@ -86,6 +86,12 @@ public class TradeOrderBaseVO {
     private Integer payPrice;
 
     // ========== 收件 + 物流基本信息 ==========
+
+    @Schema(description = "配送方式", example = "10")
+    private Integer deliveryType;
+
+    @Schema(description = "自提门店", example = "10")
+    private Long pickUpStoreId;
 
     @Schema(description = "配送模板编号", example = "1024")
     private Long deliveryTemplateId;

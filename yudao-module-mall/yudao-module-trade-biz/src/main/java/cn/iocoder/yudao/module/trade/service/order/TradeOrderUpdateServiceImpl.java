@@ -29,7 +29,10 @@ import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordUp
 import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponUseReqDTO;
 import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderAdjustAddressReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderAdjustPriceReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderRemarkReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
@@ -53,6 +56,7 @@ import cn.iocoder.yudao.module.trade.service.price.TradePriceService;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,6 +68,7 @@ import java.util.Objects;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.ORDER_NOT_FOUND;
+import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.ORDER_PAID_NO_ADJUST_PRICE;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
 /**
@@ -345,10 +350,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
      */
     private KeyValue<TradeOrderDO, PayOrderRespDTO> validateOrderPayable(Long id, Long payOrderId) {
         // 校验订单是否存在
-        TradeOrderDO order = tradeOrderMapper.selectById(id);
-        if (order == null) {
-            throw exception(ORDER_NOT_FOUND);
-        }
+        TradeOrderDO order = validateOrder(id);
         // 校验订单未支付
         if (!TradeOrderStatusEnum.isUnpaid(order.getStatus()) || order.getPayStatus()) {
             log.error("[validateOrderPaid][order({}) 不处于待支付状态，请进行处理！order 数据是：{}]",
@@ -391,14 +393,14 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deliveryOrder(Long userId, TradeOrderDeliveryReqVO deliveryReqVO) {
+    public void deliveryOrder(TradeOrderDeliveryReqVO deliveryReqVO) {
         // TODO @puhui999：只有选择快递的，才可以发货
         // 1.1 校验并获得交易订单（可发货）
         TradeOrderDO order = validateOrderDeliverable(deliveryReqVO.getId());
         TradeOrderDO updateOrderObj = new TradeOrderDO();
         // 判断发货类型
         // 2.1 快递发货
-        if (Objects.equals(deliveryReqVO.getType(), DeliveryTypeEnum.EXPRESS.getMode())) {
+        if (ObjectUtil.notEqual(deliveryReqVO.getLogisticsId(), 0L)) {
             // 校验快递公司
             DeliveryExpressDO deliveryExpress = deliveryExpressService.getDeliveryExpress(deliveryReqVO.getLogisticsId());
             if (deliveryExpress == null) {
@@ -408,11 +410,9 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                 throw exception(EXPRESS_STATUS_NOT_ENABLE);
             }
             updateOrderObj.setLogisticsId(deliveryReqVO.getLogisticsId()).setLogisticsNo(deliveryReqVO.getLogisticsNo()).setDeliveryType(DeliveryTypeEnum.EXPRESS.getMode());
-        }
-        // TODO @puhui999：无需发货时，更新 logisticsId 为 0；
-        // 2.2 无需发货
-        if (Objects.equals(deliveryReqVO.getType(), DeliveryTypeEnum.NULL.getMode())) {
-            updateOrderObj.setLogisticsId(null).setLogisticsNo("").setDeliveryType(DeliveryTypeEnum.NULL.getMode());
+        } else {
+            // 2.2 无需发货
+            updateOrderObj.setLogisticsId(0L).setLogisticsNo("").setDeliveryType(DeliveryTypeEnum.NULL.getMode());
         }
 
         // 更新 TradeOrderDO 状态为已发货，等待收货
@@ -425,7 +425,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
         // 发送站内信
         tradeMessageService.sendMessageWhenDeliveryOrder(new TradeOrderMessageWhenDeliveryOrderReqBO().setOrderId(order.getId())
-                .setUserId(userId).setMessage(null));
+                .setUserId(order.getUserId()).setMessage(null));
 
         // TODO 芋艿：OrderLog
         // TODO 设计：lili：是不是发货后，才支持售后？
@@ -440,11 +440,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
      * @return 交易订单
      */
     private TradeOrderDO validateOrderDeliverable(Long id) {
-        // 校验订单是否存在
-        TradeOrderDO order = tradeOrderMapper.selectById(id);
-        if (order == null) {
-            throw exception(ORDER_NOT_FOUND);
-        }
+        TradeOrderDO order = validateOrder(id);
         // 校验订单是否是待发货状态
         if (!TradeOrderStatusEnum.isUndelivered(order.getStatus())) {
             throw exception(ORDER_DELIVERY_FAIL_STATUS_NOT_UNDELIVERED);
@@ -470,6 +466,16 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         return order;
     }
 
+    @NotNull
+    private TradeOrderDO validateOrder(Long id) {
+        // 校验订单是否存在
+        TradeOrderDO order = tradeOrderMapper.selectById(id);
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+        return order;
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void receiveOrder(Long userId, Long id) {
@@ -487,6 +493,42 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // TODO 芋艿：lili 发送订单变化的消息
 
         // TODO 芋艿：lili 发送商品被购买完成的数据
+    }
+
+    @Override
+    public void remarkOrder(TradeOrderRemarkReqVO reqVO) {
+        // 校验并获得交易订单
+        validateOrder(reqVO.getId());
+
+        // 更新
+        TradeOrderDO order = TradeOrderConvert.INSTANCE.convert(reqVO);
+        tradeOrderMapper.updateById(order);
+    }
+
+    @Override
+    public void adjustPrice(TradeOrderAdjustPriceReqVO reqVO) {
+        // 校验交易订单
+        TradeOrderDO order = validateOrder(reqVO.getId());
+        if (order.getPayStatus()) {
+            throw exception(ORDER_PAID_NO_ADJUST_PRICE);
+        }
+
+        // 更新
+        TradeOrderDO update = TradeOrderConvert.INSTANCE.convert(reqVO);
+        update.setPayPrice(update.getPayPrice() + update.getAdjustPrice());
+        tradeOrderMapper.updateById(update);
+    }
+
+    @Override
+    public void adjustAddress(TradeOrderAdjustAddressReqVO reqVO) {
+        // 校验交易订单
+        validateOrder(reqVO.getId());
+        // TODO 是否需要校验订单是否发货
+        // TODO 发货后是否支持修改收货地址
+
+        // 更新
+        TradeOrderDO update = TradeOrderConvert.INSTANCE.convert(reqVO);
+        tradeOrderMapper.updateById(update);
     }
 
     /**

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.trade.convert.delivery;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.express.*;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.express.DeliveryExpressCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.express.DeliveryExpressExcelVO;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.express.DeliveryExpressRespVO;
@@ -29,6 +30,7 @@ public interface DeliveryExpressConvert {
 
     List<DeliveryExpressExcelVO> convertList02(List<DeliveryExpressDO> list);
 
+    List<DeliveryExpressSimpleRespVO> convertList1(List<DeliveryExpressDO> list);
     List<AppDeliveryExpressRespVO> convertList03(List<DeliveryExpressDO> list);
 
 }
