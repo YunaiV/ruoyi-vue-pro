@@ -31,6 +31,7 @@ public interface DeliveryExpressConvert {
     List<DeliveryExpressExcelVO> convertList02(List<DeliveryExpressDO> list);
 
     List<DeliveryExpressSimpleRespVO> convertList1(List<DeliveryExpressDO> list);
+
     List<AppDeliveryExpressRespVO> convertList03(List<DeliveryExpressDO> list);
 
 }

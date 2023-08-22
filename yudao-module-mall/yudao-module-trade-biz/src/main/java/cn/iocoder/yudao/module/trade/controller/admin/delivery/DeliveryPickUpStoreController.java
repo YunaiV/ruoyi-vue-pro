@@ -66,9 +66,7 @@ public class DeliveryPickUpStoreController {
     @GetMapping("/list-all-simple")
     @Operation(summary = "获取快递公司精简信息列表")
     public CommonResult<List<DeliveryPickUpStoreSimpleRespVO>> getSimpleDeliveryPickUpStoreList() {
-        // 获取品牌列表，只要开启状态的
         List<DeliveryPickUpStoreDO> list = deliveryPickUpStoreService.getDeliveryPickUpStoreListByStatus(CommonStatusEnum.ENABLE.getStatus());
-        // 排序后，返回给前端
         return success(DeliveryPickUpStoreConvert.INSTANCE.convertList1(list));
     }
 

@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 
 @Schema(description = "管理后台 - 订单修改地址 Request VO")
 @Data
-public class TradeOrderAdjustAddressReqVO {
+public class TradeOrderUpdateAddressReqVO {
 
     @Schema(description = "订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "订单编号不能为空")

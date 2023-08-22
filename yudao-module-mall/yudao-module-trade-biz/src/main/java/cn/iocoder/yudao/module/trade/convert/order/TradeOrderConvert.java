@@ -277,9 +277,9 @@ public interface TradeOrderConvert {
 
     List<AppOrderExpressTrackRespDTO> convertList02(List<ExpressTrackRespDTO> list);
 
-    TradeOrderDO convert(TradeOrderAdjustAddressReqVO reqVO);
+    TradeOrderDO convert(TradeOrderUpdateAddressReqVO reqVO);
 
-    TradeOrderDO convert(TradeOrderAdjustPriceReqVO reqVO);
+    TradeOrderDO convert(TradeOrderUpdatePriceReqVO reqVO);
 
     TradeOrderDO convert(TradeOrderRemarkReqVO reqVO);
 

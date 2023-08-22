@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderAdjustAddressReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderAdjustPriceReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdateAddressReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdatePriceReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderRemarkReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
@@ -67,21 +67,21 @@ public interface TradeOrderUpdateService {
      *
      * @param reqVO 请求
      */
-    void remarkOrder(TradeOrderRemarkReqVO reqVO);
+    void updateOrderRemark(TradeOrderRemarkReqVO reqVO);
 
     /**
-     * 调整价格
+     * 【管理员】调整价格
      *
      * @param reqVO 请求
      */
-    void adjustPrice(TradeOrderAdjustPriceReqVO reqVO);
+    void updateOrderPrice(TradeOrderUpdatePriceReqVO reqVO);
 
     /**
-     * 调整地址
+     * 【管理员】调整地址
      *
      * @param reqVO 请求
      */
-    void adjustAddress(TradeOrderAdjustAddressReqVO reqVO);
+    void updateOrderAddress(TradeOrderUpdateAddressReqVO reqVO);
 
     // =================== Order Item ===================
 
