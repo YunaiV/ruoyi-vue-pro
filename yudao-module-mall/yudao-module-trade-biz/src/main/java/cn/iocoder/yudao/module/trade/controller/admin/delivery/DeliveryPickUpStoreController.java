@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.trade.controller.admin.delivery;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.*;
 import cn.iocoder.yudao.module.trade.convert.delivery.DeliveryPickUpStoreConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryPickUpStoreDO;
@@ -16,14 +15,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Tag(name = "管理后台 - 自提门店")
 @RestController
@@ -67,6 +63,15 @@ public class DeliveryPickUpStoreController {
         return success(DeliveryPickUpStoreConvert.INSTANCE.convert(deliveryPickUpStore));
     }
 
+    @GetMapping("/list-all-simple")
+    @Operation(summary = "获取快递公司精简信息列表")
+    public CommonResult<List<DeliveryPickUpStoreSimpleRespVO>> getSimpleDeliveryPickUpStoreList() {
+        // 获取品牌列表，只要开启状态的
+        List<DeliveryPickUpStoreDO> list = deliveryPickUpStoreService.getDeliveryPickUpStoreListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        // 排序后，返回给前端
+        return success(DeliveryPickUpStoreConvert.INSTANCE.convertList1(list));
+    }
+
     @GetMapping("/list")
     @Operation(summary = "获得自提门店列表")
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
@@ -84,16 +89,4 @@ public class DeliveryPickUpStoreController {
         return success(DeliveryPickUpStoreConvert.INSTANCE.convertPage(pageResult));
     }
 
-    // TODO @jason：导出去掉好列；简化下，一般用不到哈。
-    @GetMapping("/export-excel")
-    @Operation(summary = "导出自提门店 Excel")
-    @PreAuthorize("@ss.hasPermission('trade:delivery:pick-up-store:export')")
-    @OperateLog(type = EXPORT)
-    public void exportDeliveryPickUpStoreExcel(@Valid DeliveryPickUpStoreExportReqVO exportReqVO,
-              HttpServletResponse response) throws IOException {
-        List<DeliveryPickUpStoreDO> list = deliveryPickUpStoreService.getDeliveryPickUpStoreList(exportReqVO);
-        // 导出 Excel
-        List<DeliveryPickUpStoreExcelVO> datas = DeliveryPickUpStoreConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "自提门店.xls", "数据", DeliveryPickUpStoreExcelVO.class, datas);
-    }
 }

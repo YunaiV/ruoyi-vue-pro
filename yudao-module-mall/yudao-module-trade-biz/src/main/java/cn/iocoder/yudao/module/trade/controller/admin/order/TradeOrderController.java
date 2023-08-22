@@ -25,6 +25,7 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 交易订单")
 @RestController
@@ -73,6 +74,15 @@ public class TradeOrderController {
         // 拼接数据
         MemberUserRespDTO user = memberUserApi.getUser(order.getUserId());
         return success(TradeOrderConvert.INSTANCE.convert(order, orderItems, user));
+    }
+
+    @GetMapping("/get-express-track-list")
+    @Operation(summary = "获得交易订单的物流轨迹")
+    @Parameter(name = "id", description = "交易订单编号")
+    @PreAuthorize("@ss.hasPermission('trade:order:query')")
+    public CommonResult<List<?>> getOrderExpressTrackList(@RequestParam("id") Long id) {
+        return success(TradeOrderConvert.INSTANCE.convertList02(
+                tradeOrderQueryService.getExpressTrackList(id, getLoginUserId())));
     }
 
     @PostMapping("/delivery")

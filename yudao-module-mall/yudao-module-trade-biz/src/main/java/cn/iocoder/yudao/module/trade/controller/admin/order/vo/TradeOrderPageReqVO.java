@@ -10,6 +10,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -29,6 +30,12 @@ public class TradeOrderPageReqVO extends PageParam {
     @Schema(description = "用户手机号", example = "小王")
     @Mobile
     private String userMobile;
+
+    @Schema(description = "发货物流公司编号", example = "1")
+    private Long logisticsId;
+
+    @Schema(description = "自提门店编号", example = "[1,2]")
+    private List<Long> pickUpStoreIds;
 
     @Schema(description = "收件人名称", example = "小红")
     private String receiverName;
