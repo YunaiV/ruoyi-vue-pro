@@ -25,7 +25,6 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 交易订单")
 @RestController
@@ -78,17 +77,33 @@ public class TradeOrderController {
 
     @PostMapping("/delivery")
     @Operation(summary = "发货订单")
-    @PreAuthorize("@ss.hasPermission('trade:order:delivery')")
+    @PreAuthorize("@ss.hasPermission('trade:order:update')")
     public CommonResult<Boolean> deliveryOrder(@RequestBody TradeOrderDeliveryReqVO deliveryReqVO) {
-        tradeOrderUpdateService.deliveryOrder(getLoginUserId(), deliveryReqVO);
+        tradeOrderUpdateService.deliveryOrder(deliveryReqVO);
         return success(true);
     }
 
     @PostMapping("/remark")
     @Operation(summary = "发货订单")
-    @PreAuthorize("@ss.hasPermission('trade:order:remark')")
-    public CommonResult<Boolean> remarkOrder(@RequestBody TradeOrderRemarkReqVO remarkReqVO) {
-        tradeOrderUpdateService.remarkOrder(getLoginUserId(), remarkReqVO);
+    @PreAuthorize("@ss.hasPermission('trade:order:update')")
+    public CommonResult<Boolean> remarkOrder(@RequestBody TradeOrderRemarkReqVO reqVO) {
+        tradeOrderUpdateService.remarkOrder(reqVO);
+        return success(true);
+    }
+
+    @PostMapping("/adjust-price")
+    @Operation(summary = "发货订单")
+    @PreAuthorize("@ss.hasPermission('trade:order:update')")
+    public CommonResult<Boolean> adjustPrice(@RequestBody TradeOrderAdjustPriceReqVO reqVO) {
+        tradeOrderUpdateService.adjustPrice(reqVO);
+        return success(true);
+    }
+
+    @PostMapping("/adjust-address")
+    @Operation(summary = "发货订单")
+    @PreAuthorize("@ss.hasPermission('trade:order:update')")
+    public CommonResult<Boolean> adjustAddress(@RequestBody TradeOrderAdjustAddressReqVO reqVO) {
+        tradeOrderUpdateService.adjustAddress(reqVO);
         return success(true);
     }
 

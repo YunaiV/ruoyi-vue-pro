@@ -17,8 +17,7 @@ import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCr
 import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.base.member.user.MemberUserRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.base.product.property.ProductPropertyValueDetailRespVO;
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDetailRespVO;
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageItemRespVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.*;
 import cn.iocoder.yudao.module.trade.controller.app.base.property.AppProductPropertyValueDetailRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.*;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
@@ -277,5 +276,11 @@ public interface TradeOrderConvert {
                                           AppTradeOrderCreateReqVO createReqVO, MemberUserRespDTO user);
 
     List<AppOrderExpressTrackRespDTO> convertList02(List<ExpressTrackRespDTO> list);
+
+    TradeOrderDO convert(TradeOrderAdjustAddressReqVO reqVO);
+
+    TradeOrderDO convert(TradeOrderAdjustPriceReqVO reqVO);
+
+    TradeOrderDO convert(TradeOrderRemarkReqVO reqVO);
 
 }
