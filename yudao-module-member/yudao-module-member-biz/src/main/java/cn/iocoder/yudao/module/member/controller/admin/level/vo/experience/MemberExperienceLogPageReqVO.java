@@ -11,9 +11,6 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-/**
- * @author owen
- */
 @Schema(description = "管理后台 - 会员经验记录分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)

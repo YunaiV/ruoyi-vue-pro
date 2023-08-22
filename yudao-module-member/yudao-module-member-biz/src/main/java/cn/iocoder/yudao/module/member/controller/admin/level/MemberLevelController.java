@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -60,16 +59,6 @@ public class MemberLevelController {
     public CommonResult<MemberLevelRespVO> getLevel(@RequestParam("id") Long id) {
         MemberLevelDO level = levelService.getLevel(id);
         return success(MemberLevelConvert.INSTANCE.convert(level));
-    }
-
-    // TODO @疯狂：这个应该用不到哈
-    @GetMapping("/list")
-    @Operation(summary = "获得会员等级列表")
-    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @PreAuthorize("@ss.hasPermission('member:level:query')")
-    public CommonResult<List<MemberLevelRespVO>> getLevelList(@RequestParam("ids") Collection<Long> ids) {
-        List<MemberLevelDO> list = levelService.getLevelList(ids);
-        return success(MemberLevelConvert.INSTANCE.convertList(list));
     }
 
     @GetMapping("/list-all-simple")

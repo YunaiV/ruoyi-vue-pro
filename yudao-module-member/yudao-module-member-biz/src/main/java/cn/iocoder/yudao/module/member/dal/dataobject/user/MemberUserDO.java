@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.ip.core.Area;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.group.MemberGroupDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
 import cn.iocoder.yudao.module.system.enums.common.SexEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -121,12 +122,18 @@ public class MemberUserDO extends TenantBaseDO {
     /**
      * 会员级别编号
      *
-     * 关联 {@link MemberLevelDO#getLevel()} 字段
+     * 关联 {@link MemberLevelDO#getId()} 字段
      */
     private Long levelId;
     /**
      * 会员经验
      */
     private Integer experience;
+    /**
+     * 用户分组编号
+     *
+     * 关联 {@link MemberGroupDO#getId()} 字段
+     */
+    private Long groupId;
 
 }

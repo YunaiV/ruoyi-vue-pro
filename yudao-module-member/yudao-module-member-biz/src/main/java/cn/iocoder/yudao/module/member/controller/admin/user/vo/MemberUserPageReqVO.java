@@ -35,7 +35,10 @@ public class MemberUserPageReqVO extends PageParam {
     @Schema(description = "会员标签编号列表", example = "[1, 2]")
     private List<Long> tagIds;
 
-    @Schema(description = "会员等级标号", example = "1")
+    @Schema(description = "会员等级编号", example = "1")
     private Long levelId;
+
+    @Schema(description = "用户分组编号", example = "1")
+    private Long groupId;
 
 }

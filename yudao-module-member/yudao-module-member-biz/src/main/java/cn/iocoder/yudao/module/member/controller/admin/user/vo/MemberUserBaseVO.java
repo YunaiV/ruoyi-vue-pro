@@ -56,4 +56,7 @@ public class MemberUserBaseVO {
     @Schema(description = "会员等级编号", example = "1")
     private Long levelId;
 
+    @Schema(description = "用户分组编号", example = "1")
+    private Long groupId;
+
 }
