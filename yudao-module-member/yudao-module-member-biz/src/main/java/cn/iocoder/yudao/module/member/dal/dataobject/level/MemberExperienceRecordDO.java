@@ -1,27 +1,26 @@
 package cn.iocoder.yudao.module.member.dal.dataobject.level;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.member.enums.MemberExperienceBizTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * 会员等级记录 DO
- *
- * 用户每次等级发生变更时，记录一条日志
+ * 会员经验记录 DO
  *
  * @author owen
  */
-@TableName("member_level_log")
-@KeySequence("member_level_log_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName("member_experience_record")
+@KeySequence("member_experience_record_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberLevelLogDO extends BaseDO {
+public class MemberExperienceRecordDO extends BaseDO {
 
     /**
      * 编号
@@ -33,29 +32,27 @@ public class MemberLevelLogDO extends BaseDO {
      */
     private Long userId;
     /**
-     * 等级编号
+     * 业务类型
+     * <p>
+     * 枚举 {@link MemberExperienceBizTypeEnum}
      */
-    private Long levelId;
+    private Integer bizType;
     /**
-     * 会员等级
+     * 业务编号
      */
-    private Integer level;
+    private String bizId;
     /**
-     * 享受折扣
+     * 标题
      */
-    private Integer discount;
+    private String title;
     /**
-     * 升级经验
+     * 经验
      */
     private Integer experience;
     /**
-     * 会员此时的经验
+     * 变更后的经验
      */
-    private Integer userExperience;
-    /**
-     * 备注
-     */
-    private String remark;
+    private Integer totalExperience;
     /**
      * 描述
      */

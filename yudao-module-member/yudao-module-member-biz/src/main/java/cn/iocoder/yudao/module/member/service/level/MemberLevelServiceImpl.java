@@ -42,9 +42,9 @@ public class MemberLevelServiceImpl implements MemberLevelService {
     @Resource
     private MemberLevelMapper levelMapper;
     @Resource
-    private MemberLevelLogService memberLevelLogService;
+    private MemberLevelRecordService memberLevelRecordService;
     @Resource
-    private MemberExperienceLogService memberExperienceLogService;
+    private MemberExperienceRecordService memberExperienceRecordService;
     @Resource
     private MemberUserMapper memberUserMapper;
 
@@ -203,7 +203,7 @@ public class MemberLevelServiceImpl implements MemberLevelService {
             experience = -user.getExperience();
 
             // 取消了会员的等级
-            memberLevelLogService.createCancelLog(user.getId(), updateReqVO.getReason());
+            memberLevelRecordService.createCancelLog(user.getId(), updateReqVO.getReason());
             memberUserMapper.updateUserLevelToNull(user.getId());
         } else {
             MemberLevelDO level = validateLevelExists(updateReqVO.getLevelId());
@@ -212,7 +212,7 @@ public class MemberLevelServiceImpl implements MemberLevelService {
             // 会员当前的经验 = 等级的升级经验
             totalExperience = level.getExperience();
 
-            memberLevelLogService.createAdjustLog(user, level, experience, updateReqVO.getReason());
+            memberLevelRecordService.createAdjustLog(user, level, experience, updateReqVO.getReason());
 
             // 更新会员表上的等级编号、经验值
             updateUserLevelIdAndExperience(user.getId(), updateReqVO.getLevelId(), totalExperience);
@@ -220,7 +220,7 @@ public class MemberLevelServiceImpl implements MemberLevelService {
 
 
         // 记录会员经验变动
-        memberExperienceLogService.createAdjustLog(user.getId(), experience, totalExperience);
+        memberExperienceRecordService.createAdjustLog(user.getId(), experience, totalExperience);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -239,7 +239,7 @@ public class MemberLevelServiceImpl implements MemberLevelService {
         int userExperience = NumberUtil.max(user.getExperience() + experience, 0);
 
         // 创建经验记录
-        memberExperienceLogService.createBizLog(userId, experience, userExperience, bizType, bizId);
+        memberExperienceRecordService.createBizLog(userId, experience, userExperience, bizType, bizId);
 
         // 计算会员等级
         Long levelId = calcLevel(user, userExperience);
@@ -284,7 +284,7 @@ public class MemberLevelServiceImpl implements MemberLevelService {
         }
 
         // 保存等级变更记录
-        memberLevelLogService.createAutoUpgradeLog(user, matchLevel);
+        memberLevelRecordService.createAutoUpgradeLog(user, matchLevel);
         return matchLevel.getId();
     }
 }

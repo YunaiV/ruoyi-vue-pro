@@ -41,9 +41,9 @@ public class MemberLevelServiceImplTest extends BaseDbUnitTest {
     private MemberLevelMapper levelMapper;
 
     @MockBean
-    private MemberLevelLogService memberLevelLogService;
+    private MemberLevelRecordService memberLevelRecordService;
     @MockBean
-    private MemberExperienceLogService memberExperienceLogService;
+    private MemberExperienceRecordService memberExperienceRecordService;
 
     @Test
     public void testCreateLevel_success() {

@@ -22,7 +22,7 @@ create table member_level
 )
     comment '会员等级';
 
-create table member_level_log
+create table member_level_record
 (
     id              bigint auto_increment comment '编号' primary key,
     user_id         bigint       default 0                 not null comment '用户编号',
@@ -42,9 +42,9 @@ create table member_level_log
 )
     comment '会员等级记录';
 
-create index idx_user_id on member_level_log (user_id) comment '会员等级记录-用户编号';
+create index idx_user_id on member_level_record (user_id) comment '会员等级记录-用户编号';
 
-create table member_experience_log
+create table member_experience_record
 (
     id               bigint auto_increment comment '编号' primary key,
     user_id          bigint       default 0                 not null comment '用户编号',
@@ -63,8 +63,8 @@ create table member_experience_log
 )
     comment '会员经验记录';
 
-create index idx_user_id on member_experience_log (user_id) comment '会员经验记录-用户编号';
-create index idx_user_biz_type on member_experience_log (user_id, biz_type) comment '会员经验记录-用户业务类型';
+create index idx_user_id on member_experience_record (user_id) comment '会员经验记录-用户编号';
+create index idx_user_biz_type on member_experience_record (user_id, biz_type) comment '会员经验记录-用户业务类型';
 
 -- 增加字典
 insert system_dict_type(name, type) values ('会员经验业务类型', 'member_experience_biz_type');

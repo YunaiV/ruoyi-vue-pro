@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.member.service.level;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.experience.MemberExperienceLogPageReqVO;
-import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberExperienceLogDO;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.experience.MemberExperienceRecordPageReqVO;
+import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberExperienceRecordDO;
 import cn.iocoder.yudao.module.member.enums.MemberExperienceBizTypeEnum;
 
 import java.util.Collection;
@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author owen
  */
-public interface MemberExperienceLogService {
+public interface MemberExperienceRecordService {
 
     /**
      * 获得会员经验记录
@@ -21,7 +21,7 @@ public interface MemberExperienceLogService {
      * @param id 编号
      * @return 会员经验记录
      */
-    MemberExperienceLogDO getExperienceLog(Long id);
+    MemberExperienceRecordDO getExperienceLog(Long id);
 
     /**
      * 获得会员经验记录列表
@@ -29,7 +29,7 @@ public interface MemberExperienceLogService {
      * @param ids 编号
      * @return 会员经验记录列表
      */
-    List<MemberExperienceLogDO> getExperienceLogList(Collection<Long> ids);
+    List<MemberExperienceRecordDO> getExperienceLogList(Collection<Long> ids);
 
     /**
      * 获得会员经验记录分页
@@ -37,7 +37,7 @@ public interface MemberExperienceLogService {
      * @param pageReqVO 分页查询
      * @return 会员经验记录分页
      */
-    PageResult<MemberExperienceLogDO> getExperienceLogPage(MemberExperienceLogPageReqVO pageReqVO);
+    PageResult<MemberExperienceRecordDO> getExperienceLogPage(MemberExperienceRecordPageReqVO pageReqVO);
 
     /**
      * 创建 手动调整 经验变动记录

@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.member.service.level;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.experience.MemberExperienceLogPageReqVO;
-import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberExperienceLogDO;
-import cn.iocoder.yudao.module.member.dal.mysql.level.MemberExperienceLogMapper;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.experience.MemberExperienceRecordPageReqVO;
+import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberExperienceRecordDO;
+import cn.iocoder.yudao.module.member.dal.mysql.level.MemberExperienceRecordMapper;
 import cn.iocoder.yudao.module.member.enums.MemberExperienceBizTypeEnum;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -20,24 +20,24 @@ import java.util.List;
  */
 @Service
 @Validated
-public class MemberExperienceLogServiceImpl implements MemberExperienceLogService {
+public class MemberExperienceRecordServiceImpl implements MemberExperienceRecordService {
 
     @Resource
-    private MemberExperienceLogMapper experienceLogMapper;
+    private MemberExperienceRecordMapper experienceLogMapper;
 
 
     @Override
-    public MemberExperienceLogDO getExperienceLog(Long id) {
+    public MemberExperienceRecordDO getExperienceLog(Long id) {
         return experienceLogMapper.selectById(id);
     }
 
     @Override
-    public List<MemberExperienceLogDO> getExperienceLogList(Collection<Long> ids) {
+    public List<MemberExperienceRecordDO> getExperienceLogList(Collection<Long> ids) {
         return experienceLogMapper.selectBatchIds(ids);
     }
 
     @Override
-    public PageResult<MemberExperienceLogDO> getExperienceLogPage(MemberExperienceLogPageReqVO pageReqVO) {
+    public PageResult<MemberExperienceRecordDO> getExperienceLogPage(MemberExperienceRecordPageReqVO pageReqVO) {
         return experienceLogMapper.selectPage(pageReqVO);
     }
 
@@ -50,7 +50,7 @@ public class MemberExperienceLogServiceImpl implements MemberExperienceLogServic
 
     @Override
     public void createBizLog(Long userId, int experience, int totalExperience, MemberExperienceBizTypeEnum bizType, String bizId) {
-        MemberExperienceLogDO experienceLogDO = new MemberExperienceLogDO();
+        MemberExperienceRecordDO experienceLogDO = new MemberExperienceRecordDO();
         experienceLogDO.setUserId(userId);
         experienceLogDO.setExperience(experience);
         experienceLogDO.setTotalExperience(totalExperience);

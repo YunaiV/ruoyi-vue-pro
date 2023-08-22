@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.member.service.level;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.log.MemberLevelLogPageReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.log.MemberLevelRecordPageReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
-import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelLogDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelRecordDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
-import cn.iocoder.yudao.module.member.dal.mysql.level.MemberLevelLogMapper;
+import cn.iocoder.yudao.module.member.dal.mysql.level.MemberLevelRecordMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -23,10 +23,10 @@ import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.LEVEL_LOG_
  */
 @Service
 @Validated
-public class MemberLevelLogServiceImpl implements MemberLevelLogService {
+public class MemberLevelRecordServiceImpl implements MemberLevelRecordService {
 
     @Resource
-    private MemberLevelLogMapper levelLogMapper;
+    private MemberLevelRecordMapper levelLogMapper;
 
     @Override
     public void deleteLevelLog(Long id) {
@@ -43,23 +43,23 @@ public class MemberLevelLogServiceImpl implements MemberLevelLogService {
     }
 
     @Override
-    public MemberLevelLogDO getLevelLog(Long id) {
+    public MemberLevelRecordDO getLevelLog(Long id) {
         return levelLogMapper.selectById(id);
     }
 
     @Override
-    public List<MemberLevelLogDO> getLevelLogList(Collection<Long> ids) {
+    public List<MemberLevelRecordDO> getLevelLogList(Collection<Long> ids) {
         return levelLogMapper.selectBatchIds(ids);
     }
 
     @Override
-    public PageResult<MemberLevelLogDO> getLevelLogPage(MemberLevelLogPageReqVO pageReqVO) {
+    public PageResult<MemberLevelRecordDO> getLevelLogPage(MemberLevelRecordPageReqVO pageReqVO) {
         return levelLogMapper.selectPage(pageReqVO);
     }
 
     @Override
     public void createCancelLog(Long userId, String reason) {
-        MemberLevelLogDO levelLogDO = new MemberLevelLogDO();
+        MemberLevelRecordDO levelLogDO = new MemberLevelRecordDO();
         levelLogDO.setUserId(userId);
         levelLogDO.setRemark(reason);
         levelLogDO.setDescription("管理员取消");
@@ -71,7 +71,7 @@ public class MemberLevelLogServiceImpl implements MemberLevelLogService {
 
     @Override
     public void createAdjustLog(MemberUserDO user, MemberLevelDO level, int experience, String reason) {
-        MemberLevelLogDO levelLogDO = new MemberLevelLogDO();
+        MemberLevelRecordDO levelLogDO = new MemberLevelRecordDO();
         levelLogDO.setUserId(user.getId());
         levelLogDO.setLevelId(level.getId());
         levelLogDO.setLevel(level.getLevel());
@@ -88,7 +88,7 @@ public class MemberLevelLogServiceImpl implements MemberLevelLogService {
 
     @Override
     public void createAutoUpgradeLog(MemberUserDO user, MemberLevelDO level) {
-        MemberLevelLogDO levelLogDO = new MemberLevelLogDO();
+        MemberLevelRecordDO levelLogDO = new MemberLevelRecordDO();
         levelLogDO.setUserId(user.getId());
         levelLogDO.setLevelId(level.getId());
         levelLogDO.setLevel(level.getLevel());
@@ -102,7 +102,7 @@ public class MemberLevelLogServiceImpl implements MemberLevelLogService {
         notifyMember(user.getId(), levelLogDO);
     }
 
-    private void notifyMember(Long userId, MemberLevelLogDO level) {
+    private void notifyMember(Long userId, MemberLevelRecordDO level) {
         //todo: 给会员发消息
     }
 
