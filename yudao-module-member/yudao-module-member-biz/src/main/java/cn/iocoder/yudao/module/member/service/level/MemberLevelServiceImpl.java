@@ -140,7 +140,6 @@ public class MemberLevelServiceImpl implements MemberLevelService {
     @VisibleForTesting
     void validateConfigValid(Long id, String name, Integer level, Integer experience) {
         List<MemberLevelDO> list = levelMapper.selectList();
-
         // 校验名称唯一
         validateNameUnique(list, id, name);
         // 校验等级唯一
@@ -169,9 +168,10 @@ public class MemberLevelServiceImpl implements MemberLevelService {
         return levelMapper.selectListByStatus(status);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateUserLevel(MemberUserDO user, Long levelId, String reason) {
+        // TODO @疯狂：可以直接 ObjUtil.equal(user.getLevelId(), levelId)，解决这 2 个场景
         // 未调整的情况1
         if (user.getLevelId() == null && levelId == null) {
             return;
@@ -182,6 +182,7 @@ public class MemberLevelServiceImpl implements MemberLevelService {
         }
 
         // 需要后台用户填写为什么调整会员的等级
+        // TODO @疯狂：这个 reason 是不是可以放到 validator 里做哈；
         if (StrUtil.isBlank(reason)) {
             throw exception(LEVEL_REASON_NOT_EXISTS);
         }
@@ -192,6 +193,7 @@ public class MemberLevelServiceImpl implements MemberLevelService {
         if (levelId == null) {
             experience = -user.getExperience();
 
+            // TODO @疯狂：这里的逻辑，应该和下面的 207 到 210 行的逻辑一致，都是先记录日志，再更新会员表；所以，是不是都可以类似 214 的写法哈。
             // 取消了会员的等级
             memberLevelLogService.createCancelLog(user.getId(), reason);
             memberUserMapper.cancelUserLevel(user.getId());
@@ -208,36 +210,38 @@ public class MemberLevelServiceImpl implements MemberLevelService {
             updateUserLevelIdAndExperience(user.getId(), levelId, totalExperience);
         }
 
-
         // 记录会员经验变动
         memberExperienceLogService.createAdjustLog(user.getId(), experience, totalExperience);
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    // TODO @疯狂：方法名，建议改成 increase 或者 add 经验，和项目更统一一些
+    // TODO @疯狂：bizType 改成具体数值，主要是枚举在 api 不好传递，rpc 情况下
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void plusExperience(Long userId, Integer experience, MemberExperienceBizTypeEnum bizType, String bizId) {
         if (experience == 0) {
             return;
         }
 
         MemberUserDO user = memberUserMapper.selectById(userId);
+        // TODO @疯狂：默认给 Experience 搞个 0 哈。这里就不做兜底逻辑啦
         if (user.getExperience() == null) {
             user.setExperience(0);
         }
 
         // 防止扣出负数
+        // TODO @疯狂：如果经验出现负数，是不是抛出异常会更合理；按道理不应该出现的；
         int userExperience = NumberUtil.max(user.getExperience() + experience, 0);
-
         // 创建经验记录
         memberExperienceLogService.createBizLog(userId, experience, userExperience, bizType, bizId);
 
         // 计算会员等级
         Long levelId = calcLevel(user, userExperience);
-
         // 更新会员表上的等级编号、经验值
         updateUserLevelIdAndExperience(user.getId(), levelId, userExperience);
     }
 
+    // TODO @疯狂：让 memberUserService 那开个方法；每个模块，不直接操作对方的 mapper；
     private void updateUserLevelIdAndExperience(Long userId, Long levelId, Integer experience) {
         memberUserMapper.updateById(new MemberUserDO()
                 .setId(userId)
@@ -252,6 +256,8 @@ public class MemberLevelServiceImpl implements MemberLevelService {
      * @param userExperience 会员当前的经验值
      * @return 会员等级编号，null表示无变化
      */
+    // calc
+    // TODO @疯狂：calc 改成完整的拼写哈。是不是改成 calculateNewLevel
     private Long calcLevel(MemberUserDO user, int userExperience) {
         List<MemberLevelDO> list = getEnableLevelList();
         if (CollUtil.isEmpty(list)) {
@@ -273,6 +279,7 @@ public class MemberLevelServiceImpl implements MemberLevelService {
             return null;
         }
 
+        // TODO @疯狂：这个方法，应该只做 level 的计算，不做登记的变更。
         // 保存等级变更记录
         memberLevelLogService.createAutoUpgradeLog(user, matchLevel);
         return matchLevel.getId();
