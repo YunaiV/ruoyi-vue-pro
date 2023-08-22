@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.member.service.level;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.log.MemberLevelLogExportReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.log.MemberLevelLogPageReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelLogDO;
@@ -47,14 +46,6 @@ public interface MemberLevelLogService {
      * @return 会员等级记录分页
      */
     PageResult<MemberLevelLogDO> getLevelLogPage(MemberLevelLogPageReqVO pageReqVO);
-
-    /**
-     * 获得会员等级记录列表, 用于 Excel 导出
-     *
-     * @param exportReqVO 查询条件
-     * @return 会员等级记录列表
-     */
-    List<MemberLevelLogDO> getLevelLogList(MemberLevelLogExportReqVO exportReqVO);
 
     /**
      * 创建记录： 取消等级

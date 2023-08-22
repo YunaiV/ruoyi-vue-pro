@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagUpdateReq
 import cn.iocoder.yudao.module.member.convert.tag.MemberTagConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.tag.MemberTagDO;
 import cn.iocoder.yudao.module.member.dal.mysql.tag.MemberTagMapper;
+import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -18,8 +19,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.TAG_NAME_EXISTS;
-import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.TAG_NOT_EXISTS;
+import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.*;
 
 /**
  * 会员标签 Service 实现类
@@ -32,6 +32,8 @@ public class MemberTagServiceImpl implements MemberTagService {
 
     @Resource
     private MemberTagMapper tagMapper;
+    @Resource
+    private MemberUserMapper memberUserMapper;
 
     @Override
     public Long createTag(MemberTagCreateReqVO createReqVO) {
@@ -59,6 +61,8 @@ public class MemberTagServiceImpl implements MemberTagService {
     public void deleteTag(Long id) {
         // 校验存在
         validateTagExists(id);
+        // 校验标签下是否有用户
+        validateTagHasUser(id);
         // 删除
         tagMapper.deleteById(id);
     }
@@ -84,6 +88,13 @@ public class MemberTagServiceImpl implements MemberTagService {
         }
         if (!tag.getId().equals(id)) {
             throw exception(TAG_NAME_EXISTS);
+        }
+    }
+
+    void validateTagHasUser(Long id) {
+        Long count = memberUserMapper.selectCountByTagId(id);
+        if (count > 0) {
+            throw exception(TAG_HAS_USER);
         }
     }
 

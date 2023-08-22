@@ -7,9 +7,6 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 
-/**
- * @author owen
- */
 @Schema(description = "管理后台 - 会员经验记录 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)

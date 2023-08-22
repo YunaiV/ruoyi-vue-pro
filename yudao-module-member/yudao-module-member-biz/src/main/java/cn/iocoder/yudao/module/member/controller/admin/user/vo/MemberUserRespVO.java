@@ -38,4 +38,7 @@ public class MemberUserRespVO extends MemberUserBaseVO {
     @Schema(description = "会员等级", example = "黄金会员")
     private String levelName;
 
+    @Schema(description = "用户分组", example = "购物达人")
+    private String groupName;
+
 }
