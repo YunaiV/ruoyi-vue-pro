@@ -133,5 +133,6 @@ public interface MemberUserService {
      * @param levelId    用户等级
      * @param experience 用户经验
      */
-    void updateLevelIdAndExperience(Long id, Long levelId, Integer experience);
+    void updateUserLevel(Long id, Long levelId, Integer experience);
+
 }

@@ -48,8 +48,6 @@ public interface ErrorCodeConstants {
     ErrorCode LEVEL_EXPERIENCE_MAX = new ErrorCode(1004011004, "升级经验必须小于下一个等级[{}]设置的升级经验[{}]");
     ErrorCode LEVEL_HAS_USER = new ErrorCode(1004011005, "用户等级下存在用户，无法删除");
 
-    ErrorCode LEVEL_LOG_NOT_EXISTS = new ErrorCode(1004011100, "用户等级记录不存在");
-    ErrorCode EXPERIENCE_LOG_NOT_EXISTS = new ErrorCode(1004011200, "用户经验记录不存在");
     ErrorCode EXPERIENCE_BIZ_NOT_SUPPORT = new ErrorCode(1004011201, "用户经验业务类型不支持");
 
     //========== 用户分组 1004012000 ==========

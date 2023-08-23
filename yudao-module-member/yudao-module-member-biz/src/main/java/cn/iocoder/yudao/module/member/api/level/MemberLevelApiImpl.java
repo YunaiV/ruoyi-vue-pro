@@ -24,12 +24,15 @@ public class MemberLevelApiImpl implements MemberLevelApi {
     @Resource
     private MemberLevelService memberLevelService;
 
-    public void plusExperience(Long userId, Integer experience, Integer bizType, String bizId) {
-        MemberExperienceBizTypeEnum bizTypeEnum = EnumUtil.getBy(MemberExperienceBizTypeEnum.class, e -> Objects.equals(bizType, e.getValue()));
+    @Override
+    public void addExperience(Long userId, Integer experience, Integer bizType, String bizId) {
+        // TODO @疯狂：可以在 MemberExperienceBizTypeEnum 增加一个方法，获得哈。
+        MemberExperienceBizTypeEnum bizTypeEnum = EnumUtil.getBy(MemberExperienceBizTypeEnum.class,
+                e -> Objects.equals(bizType, e.getType()));
         if (bizTypeEnum == null) {
             throw exception(EXPERIENCE_BIZ_NOT_SUPPORT);
         }
-
         memberLevelService.addExperience(userId, experience, bizTypeEnum, bizId);
     }
+
 }
