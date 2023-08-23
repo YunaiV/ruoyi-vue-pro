@@ -21,6 +21,7 @@ public interface MemberSignInRecordMapper extends BaseMapperX<MemberSignInRecord
     default PageResult<MemberSignInRecordDO> selectPage(MemberSignInRecordPageReqVO reqVO, Set<Long> userIds) {
         return selectPage(reqVO, new LambdaQueryWrapperX<MemberSignInRecordDO>()
                 .inIfPresent(MemberSignInRecordDO::getUserId, userIds)
+                .eqIfPresent(MemberSignInRecordDO::getUserId, reqVO.getUserId())
                 .eqIfPresent(MemberSignInRecordDO::getDay, reqVO.getDay())
                 .betweenIfPresent(MemberSignInRecordDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(MemberSignInRecordDO::getId));

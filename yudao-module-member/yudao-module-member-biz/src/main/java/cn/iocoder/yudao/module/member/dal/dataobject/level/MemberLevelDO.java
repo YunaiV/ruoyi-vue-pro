@@ -34,17 +34,18 @@ public class MemberLevelDO extends BaseDO {
      */
     private String name;
     /**
-     * 升级经验
-     */
-    private Integer experience;
-    /**
      * 等级
      */
     private Integer level;
     /**
+     * 升级经验
+     */
+    private Integer experience;
+    /**
      * 享受折扣
      */
-    private Integer discount;
+    private Integer discountPercent;
+
     /**
      * 等级图标
      */

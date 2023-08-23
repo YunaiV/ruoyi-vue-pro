@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -95,7 +96,7 @@ public class DeliveryExpressServiceImpl implements DeliveryExpressService {
     }
 
     @Override
-    public List<DeliveryExpressDO> getDeliveryExpressList(Integer status) {
+    public List<DeliveryExpressDO> getDeliveryExpressListByStatus(Integer status) {
         return deliveryExpressMapper.selectListByStatus(status);
     }
 

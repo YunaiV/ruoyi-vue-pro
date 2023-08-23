@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
-import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
@@ -16,8 +15,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
-
-import javax.validation.ConstraintViolationException;
 
 import static cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum.CLOSED;
 import static cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum.WAITING;
@@ -42,11 +39,12 @@ public class AlipayQrPayClientTest extends AbstractAlipayClientTest {
     }
 
     @Test
-    @DisplayName("支付包扫描支付下单成功")
+    @DisplayName("支付宝扫描支付下单成功")
     public void test_unified_order_success() throws AlipayApiException {
         // 准备返回对象
         String notifyUrl = randomURL();
         String qrCode = randomString();
+        Integer price = randomInteger();
         AlipayTradePrecreateResponse response = randomPojo(AlipayTradePrecreateResponse.class, o -> {
             o.setQrCode(qrCode);
             o.setSubCode("");
@@ -58,7 +56,7 @@ public class AlipayQrPayClientTest extends AbstractAlipayClientTest {
         }))).thenReturn(response);
         // 准备请求参数
         String outTradeNo = randomString();
-        PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(notifyUrl, outTradeNo);
+        PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(notifyUrl, outTradeNo, price);
 
         PayOrderRespDTO resp = client.unifiedOrder(reqDTO);
         // 断言
@@ -70,11 +68,12 @@ public class AlipayQrPayClientTest extends AbstractAlipayClientTest {
     }
 
     @Test
-    @DisplayName("支付包扫描支付,渠道返回失败")
+    @DisplayName("支付宝扫描支付,渠道返回失败")
     public void test_unified_order_channel_failed() throws AlipayApiException {
         String notifyUrl = randomURL();
         String subCode = randomString();
         String subMsg = randomString();
+        Integer price = randomInteger();
         AlipayTradePrecreateResponse response = randomPojo(AlipayTradePrecreateResponse.class, o -> {
             o.setSubCode(subCode);
             o.setSubMsg(subMsg);
@@ -86,7 +85,7 @@ public class AlipayQrPayClientTest extends AbstractAlipayClientTest {
         }))).thenReturn(response);
         // 准备请求参数
         String outTradeNo = randomString();
-        PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(notifyUrl, outTradeNo);
+        PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(notifyUrl, outTradeNo, price);
 
         PayOrderRespDTO resp = client.unifiedOrder(reqDTO);
         // 断言
@@ -97,59 +96,38 @@ public class AlipayQrPayClientTest extends AbstractAlipayClientTest {
     }
 
     @Test
-    @DisplayName("支付包扫描支付,抛出系统异常")
+    @DisplayName("支付宝扫描支付, 抛出系统异常")
     public void test_unified_order_throw_pay_exception() throws AlipayApiException {
         // 准备请求参数
         String outTradeNo = randomString();
         String notifyUrl = randomURL();
+        Integer price = randomInteger();
         // mock
         when(defaultAlipayClient.execute(argThat((ArgumentMatcher<AlipayTradePrecreateRequest>) request -> {
             assertEquals(notifyUrl, request.getNotifyUrl());
             return true;
         }))).thenThrow(new RuntimeException("系统异常"));
         // 准备请求参数
-        PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(notifyUrl, outTradeNo);
+        PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(notifyUrl, outTradeNo,price);
         // 断言
         assertThrows(PayException.class, () -> client.unifiedOrder(reqDTO));
     }
 
     @Test
-    @DisplayName("支付包扫描支付,抛出业务异常")
+    @DisplayName("支付宝 Client 统一下单,抛出业务异常")
     public void test_unified_order_throw_service_exception() throws AlipayApiException {
         // 准备请求参数
         String outTradeNo = randomString();
         String notifyUrl = randomURL();
+        Integer price = randomInteger();
         // mock
         when(defaultAlipayClient.execute(argThat((ArgumentMatcher<AlipayTradePrecreateRequest>) request -> {
             assertEquals(notifyUrl, request.getNotifyUrl());
             return true;
         }))).thenThrow(ServiceExceptionUtil.exception(GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR));
         // 准备请求参数
-        PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(notifyUrl, outTradeNo);
+        PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(notifyUrl, outTradeNo, price);
         // 断言
         assertThrows(ServiceException.class, () -> client.unifiedOrder(reqDTO));
-    }
-
-    @Test
-    @DisplayName("支付包扫描支付,参数校验不通过")
-    public void test_unified_order_param_validate() {
-        // 准备请求参数
-        String outTradeNo = randomString();
-        String notifyUrl = randomURL();
-        PayOrderUnifiedReqDTO reqDTO = randomPojo(PayOrderUnifiedReqDTO.class, o -> {
-            o.setOutTradeNo(outTradeNo);
-            o.setNotifyUrl(notifyUrl);
-        });
-        // 断言
-        assertThrows(ConstraintViolationException.class, () -> client.unifiedOrder(reqDTO));
-    }
-
-    private PayOrderUnifiedReqDTO buildOrderUnifiedReqDTO(String notifyUrl, String outTradeNo) {
-        return randomPojo(PayOrderUnifiedReqDTO.class, o -> {
-            o.setOutTradeNo(outTradeNo);
-            o.setNotifyUrl(notifyUrl);
-            o.setSubject(RandomUtil.randomString(32));
-            o.setBody(RandomUtil.randomString(32));
-        });
     }
 }

@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.exception.PayException;
@@ -16,6 +18,7 @@ import com.alipay.api.DefaultSigner;
 import com.alipay.api.domain.AlipayTradeRefundModel;
 import com.alipay.api.request.AlipayTradeRefundRequest;
 import com.alipay.api.response.AlipayTradeRefundResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
@@ -51,6 +54,12 @@ public abstract class AbstractAlipayClientTest extends BaseMockitoUnitTest {
     protected DefaultAlipayClient defaultAlipayClient;
 
     private AbstractAlipayPayClient client;
+
+    /**
+     * 子类需要实现该方法. 设置 client 的具体实现
+     */
+    @BeforeEach
+    public abstract void setUp();
 
     public void setClient(AbstractAlipayPayClient client) {
         this.client = client;
@@ -176,5 +185,29 @@ public abstract class AbstractAlipayClientTest extends BaseMockitoUnitTest {
         PayRefundUnifiedReqDTO refundReqDTO = randomPojo(PayRefundUnifiedReqDTO.class, o -> o.setNotifyUrl(notifyUrl));
         // 断言
         assertThrows(PayException.class, () -> client.unifiedRefund(refundReqDTO));
+    }
+
+    @Test
+    @DisplayName("支付宝 Client 统一下单, 参数校验不通过")
+    public void test_unified_order_param_validate() {
+        // 准备请求参数
+        String outTradeNo = randomString();
+        String notifyUrl = randomURL();
+        PayOrderUnifiedReqDTO reqDTO = randomPojo(PayOrderUnifiedReqDTO.class, o -> {
+            o.setOutTradeNo(outTradeNo);
+            o.setNotifyUrl(notifyUrl);
+        });
+        // 断言
+        assertThrows(ConstraintViolationException.class, () -> client.unifiedOrder(reqDTO));
+    }
+
+    protected PayOrderUnifiedReqDTO buildOrderUnifiedReqDTO(String notifyUrl, String outTradeNo, Integer price) {
+        return randomPojo(PayOrderUnifiedReqDTO.class, o -> {
+            o.setOutTradeNo(outTradeNo);
+            o.setNotifyUrl(notifyUrl);
+            o.setPrice(price);
+            o.setSubject(RandomUtil.randomString(32));
+            o.setBody(RandomUtil.randomString(32));
+        });
     }
 }

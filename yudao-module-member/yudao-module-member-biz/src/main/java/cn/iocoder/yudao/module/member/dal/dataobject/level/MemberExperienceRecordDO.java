@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.member.dal.dataobject.level;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.enums.MemberExperienceBizTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -29,6 +30,8 @@ public class MemberExperienceRecordDO extends BaseDO {
     private Long id;
     /**
      * 用户编号
+     *
+     * 关联 {@link MemberUserDO#getId()} 字段
      */
     private Long userId;
     /**
@@ -46,6 +49,10 @@ public class MemberExperienceRecordDO extends BaseDO {
      */
     private String title;
     /**
+     * 描述
+     */
+    private String description;
+    /**
      * 经验
      */
     private Integer experience;
@@ -53,9 +60,5 @@ public class MemberExperienceRecordDO extends BaseDO {
      * 变更后的经验
      */
     private Integer totalExperience;
-    /**
-     * 描述
-     */
-    private String description;
 
 }

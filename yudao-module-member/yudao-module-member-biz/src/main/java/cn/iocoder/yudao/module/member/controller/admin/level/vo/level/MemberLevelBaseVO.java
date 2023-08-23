@@ -35,7 +35,7 @@ public class MemberLevelBaseVO {
     @Schema(description = "享受折扣", requiredMode = Schema.RequiredMode.REQUIRED, example = "98")
     @NotNull(message = "享受折扣不能为空")
     @Range(min = 0, max = 100, message = "享受折扣的范围为 0-100")
-    private Integer discount;
+    private Integer discountPercent;
 
     @Schema(description = "等级图标", example = "https://www.iocoder.cn/yudao.jpg")
     @URL(message = "等级图标必须是 URL 格式")
