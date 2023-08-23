@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
  * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
  */
 @Data
-public class MemberLevelLogBaseVO {
+public class MemberLevelRecordBaseVO {
 
     @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "25923")
     @NotNull(message = "用户编号不能为空")

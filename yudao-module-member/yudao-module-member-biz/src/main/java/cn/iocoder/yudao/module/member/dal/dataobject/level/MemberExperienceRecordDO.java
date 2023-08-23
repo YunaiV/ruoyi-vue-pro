@@ -13,15 +13,15 @@ import lombok.*;
  *
  * @author owen
  */
-@TableName("member_experience_log")
-@KeySequence("member_experience_log_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName("member_experience_record")
+@KeySequence("member_experience_record_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberExperienceLogDO extends BaseDO {
+public class MemberExperienceRecordDO extends BaseDO {
 
     /**
      * 编号

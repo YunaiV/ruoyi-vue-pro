@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserRespVO;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateLevelReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.group.MemberGroupDO;
@@ -49,6 +50,14 @@ public class MemberUserController {
     @PreAuthorize("@ss.hasPermission('member:user:update')")
     public CommonResult<Boolean> updateUser(@Valid @RequestBody MemberUserUpdateReqVO updateReqVO) {
         memberUserService.updateUser(updateReqVO);
+        return success(true);
+    }
+
+    @PutMapping("/update-level")
+    @Operation(summary = "更新会员用户等级")
+    @PreAuthorize("@ss.hasPermission('member:user:update-level')")
+    public CommonResult<Boolean> updateUserLevel(@Valid @RequestBody MemberUserUpdateLevelReqVO updateReqVO) {
+        memberLevelService.updateUserLevel(updateReqVO);
         return success(true);
     }
 

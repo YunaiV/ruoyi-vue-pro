@@ -126,4 +126,12 @@ public interface MemberUserService {
      */
     PageResult<MemberUserDO> getUserPage(MemberUserPageReqVO pageReqVO);
 
+    /**
+     * 更新用户的等级和经验
+     *
+     * @param id         用户编号
+     * @param levelId    用户等级
+     * @param experience 用户经验
+     */
+    void updateLevelIdAndExperience(Long id, Long levelId, Integer experience);
 }

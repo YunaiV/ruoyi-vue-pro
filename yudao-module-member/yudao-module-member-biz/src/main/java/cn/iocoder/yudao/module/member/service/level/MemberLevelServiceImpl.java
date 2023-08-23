@@ -4,17 +4,19 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelCreateReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelPageReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelListReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelUpdateReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateLevelReqVO;
 import cn.iocoder.yudao.module.member.convert.level.MemberLevelConvert;
+import cn.iocoder.yudao.module.member.convert.level.MemberLevelRecordConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelRecordDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.level.MemberLevelMapper;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
 import cn.iocoder.yudao.module.member.enums.MemberExperienceBizTypeEnum;
+import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,11 +44,13 @@ public class MemberLevelServiceImpl implements MemberLevelService {
     @Resource
     private MemberLevelMapper levelMapper;
     @Resource
-    private MemberLevelLogService memberLevelLogService;
+    private MemberLevelRecordService memberLevelRecordService;
     @Resource
-    private MemberExperienceLogService memberExperienceLogService;
+    private MemberExperienceRecordService memberExperienceRecordService;
     @Resource
     private MemberUserMapper memberUserMapper;
+    @Resource
+    private MemberUserService memberUserService;
 
     @Override
     public Long createLevel(MemberLevelCreateReqVO createReqVO) {
@@ -168,8 +172,8 @@ public class MemberLevelServiceImpl implements MemberLevelService {
     }
 
     @Override
-    public PageResult<MemberLevelDO> getLevelPage(MemberLevelPageReqVO pageReqVO) {
-        return levelMapper.selectPage(pageReqVO);
+    public List<MemberLevelDO> getLevelList(MemberLevelListReqVO listReqVO) {
+        return levelMapper.selectList(listReqVO);
     }
 
     @Override
@@ -179,83 +183,83 @@ public class MemberLevelServiceImpl implements MemberLevelService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateUserLevel(MemberUserDO user, Long levelId, String reason) {
-        // TODO @疯狂：可以直接 ObjUtil.equal(user.getLevelId(), levelId)，解决这 2 个场景
-        // 未调整的情况1
-        if (user.getLevelId() == null && levelId == null) {
+    public void updateUserLevel(MemberUserUpdateLevelReqVO updateReqVO) {
+        MemberUserDO user = memberUserMapper.selectById(updateReqVO.getId());
+        if (user == null) {
+            throw exception(USER_NOT_EXISTS);
+        }
+        // 等级未发生变化
+        if (ObjUtil.equal(user.getLevelId(), updateReqVO.getLevelId())) {
             return;
         }
-        // 未调整的情况2
-        if (ObjUtil.equal(user.getLevelId(), levelId)) {
-            return;
-        }
 
-        // 需要后台用户填写为什么调整会员的等级
-        // TODO @疯狂：这个 reason 是不是可以放到 validator 里做哈；
-        if (StrUtil.isBlank(reason)) {
-            throw exception(LEVEL_REASON_NOT_EXISTS);
-        }
-
-        int experience;
-        int totalExperience = 0;
-        // 记录等级变动
-        if (levelId == null) {
-            experience = -user.getExperience();
-
-            // TODO @疯狂：这里的逻辑，应该和下面的 207 到 210 行的逻辑一致，都是先记录日志，再更新会员表；所以，是不是都可以类似 214 的写法哈。
-            // 取消了会员的等级
-            memberLevelLogService.createCancelLog(user.getId(), reason);
-            memberUserMapper.cancelUserLevel(user.getId());
+        MemberLevelRecordDO levelRecord = new MemberLevelRecordDO()
+                .setUserId(user.getId())
+                .setRemark(updateReqVO.getReason());
+        MemberLevelDO memberLevel = null;
+        if (updateReqVO.getLevelId() == null) {
+            // 取消用户等级时，为扣减经验
+            levelRecord.setExperience(-user.getExperience());
+            levelRecord.setDescription("管理员取消了等级");
         } else {
-            MemberLevelDO level = validateLevelExists(levelId);
+            memberLevel = validateLevelExists(updateReqVO.getLevelId());
+            // 复制等级配置
+            MemberLevelRecordConvert.INSTANCE.copyTo(memberLevel, levelRecord);
             // 变动经验值 = 等级的升级经验 - 会员当前的经验；正数为增加经验，负数为扣减经验
-            experience = level.getExperience() - user.getExperience();
+            levelRecord.setExperience(memberLevel.getExperience() - user.getExperience());
             // 会员当前的经验 = 等级的升级经验
-            totalExperience = level.getExperience();
-
-            memberLevelLogService.createAdjustLog(user, level, experience, reason);
-
-            // 更新会员表上的等级编号、经验值
-            updateUserLevelIdAndExperience(user.getId(), levelId, totalExperience);
+            levelRecord.setUserExperience(memberLevel.getExperience());
+            levelRecord.setDescription("管理员调整为：" + memberLevel.getName());
         }
+
+        // 记录等级变动
+        memberLevelRecordService.createLevelRecord(levelRecord);
 
         // 记录会员经验变动
-        memberExperienceLogService.createAdjustLog(user.getId(), experience, totalExperience);
+        memberExperienceRecordService.createExperienceRecord(user.getId(),
+                levelRecord.getExperience(), levelRecord.getUserExperience(),
+                MemberExperienceBizTypeEnum.ADMIN, MemberExperienceBizTypeEnum.ADMIN.getValue() + "");
+
+        // 更新会员表上的等级编号、经验值
+        memberUserService.updateLevelIdAndExperience(user.getId(), updateReqVO.getLevelId(), levelRecord.getUserExperience());
+
+        // 给会员发送等级变动消息
+        notifyMemberLevelChange(user.getId(), memberLevel);
     }
 
-    // TODO @疯狂：方法名，建议改成 increase 或者 add 经验，和项目更统一一些
-    // TODO @疯狂：bizType 改成具体数值，主要是枚举在 api 不好传递，rpc 情况下
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void plusExperience(Long userId, Integer experience, MemberExperienceBizTypeEnum bizType, String bizId) {
+    public void addExperience(Long userId, Integer experience, MemberExperienceBizTypeEnum bizType, String bizId) {
         if (experience == 0) {
             return;
         }
 
         MemberUserDO user = memberUserMapper.selectById(userId);
-        // TODO @疯狂：默认给 Experience 搞个 0 哈。这里就不做兜底逻辑啦
-        if (user.getExperience() == null) {
-            user.setExperience(0);
-        }
 
-        // 防止扣出负数
-        // TODO @疯狂：如果经验出现负数，是不是抛出异常会更合理；按道理不应该出现的；
         int userExperience = NumberUtil.max(user.getExperience() + experience, 0);
+        MemberLevelRecordDO levelRecord = new MemberLevelRecordDO()
+                .setUserId(user.getId())
+                .setExperience(experience)
+                // 防止扣出负数
+                .setUserExperience(userExperience);
+
         // 创建经验记录
-        memberExperienceLogService.createBizLog(userId, experience, userExperience, bizType, bizId);
+        memberExperienceRecordService.createExperienceRecord(userId, experience, userExperience,
+                bizType, bizId);
 
         // 计算会员等级
-        Long levelId = calcLevel(user, userExperience);
-        // 更新会员表上的等级编号、经验值
-        updateUserLevelIdAndExperience(user.getId(), levelId, userExperience);
-    }
+        MemberLevelDO newLevel = calculateNewLevel(user, userExperience);
+        if (newLevel != null) {
+            // 复制等级配置
+            MemberLevelRecordConvert.INSTANCE.copyTo(newLevel, levelRecord);
+            // 保存等级变更记录
+            memberLevelRecordService.createLevelRecord(levelRecord);
+            // 给会员发送等级变动消息
+            notifyMemberLevelChange(userId, newLevel);
+        }
 
-    // TODO @疯狂：让 memberUserService 那开个方法；每个模块，不直接操作对方的 mapper；
-    private void updateUserLevelIdAndExperience(Long userId, Long levelId, Integer experience) {
-        memberUserMapper.updateById(new MemberUserDO()
-                .setId(userId)
-                .setLevelId(levelId).setExperience(experience)
-        );
+        // 更新会员表上的等级编号、经验值
+        memberUserService.updateLevelIdAndExperience(user.getId(), levelRecord.getLevelId(), userExperience);
     }
 
     /**
@@ -263,11 +267,9 @@ public class MemberLevelServiceImpl implements MemberLevelService {
      *
      * @param user           会员
      * @param userExperience 会员当前的经验值
-     * @return 会员等级编号，null表示无变化
+     * @return 会员新的等级，null表示无变化
      */
-    // calc
-    // TODO @疯狂：calc 改成完整的拼写哈。是不是改成 calculateNewLevel
-    private Long calcLevel(MemberUserDO user, int userExperience) {
+    private MemberLevelDO calculateNewLevel(MemberUserDO user, int userExperience) {
         List<MemberLevelDO> list = getEnableLevelList();
         if (CollUtil.isEmpty(list)) {
             log.warn("计算会员等级失败：会员等级配置不存在");
@@ -288,9 +290,10 @@ public class MemberLevelServiceImpl implements MemberLevelService {
             return null;
         }
 
-        // TODO @疯狂：这个方法，应该只做 level 的计算，不做登记的变更。
-        // 保存等级变更记录
-        memberLevelLogService.createAutoUpgradeLog(user, matchLevel);
-        return matchLevel.getId();
+        return matchLevel;
+    }
+
+    private void notifyMemberLevelChange(Long userId, MemberLevelDO level) {
+        //todo: 给会员发消息
     }
 }

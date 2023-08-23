@@ -1,15 +1,13 @@
 package cn.iocoder.yudao.module.member.service.level;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelCreateReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelPageReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelListReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelUpdateReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateLevelReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
-import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.enums.MemberExperienceBizTypeEnum;
 
-import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
@@ -60,12 +58,12 @@ public interface MemberLevelService {
     List<MemberLevelDO> getLevelList(Collection<Long> ids);
 
     /**
-     * 获得会员等级分页
+     * 获得会员等级列表
      *
-     * @param pageReqVO 分页查询
-     * @return 会员等级分页
+     * @param listReqVO 查询参数
+     * @return 会员等级列表
      */
-    PageResult<MemberLevelDO> getLevelPage(MemberLevelPageReqVO pageReqVO);
+    List<MemberLevelDO> getLevelList(MemberLevelListReqVO listReqVO);
 
 
     /**
@@ -89,11 +87,9 @@ public interface MemberLevelService {
     /**
      * 修改会员的等级
      *
-     * @param user        会员
-     * @param levelId     要修改的等级编号，编号为空时，代表取消会员的等级
-     * @param levelReason 修改原因
+     * @param updateReqVO 修改参数
      */
-    void updateUserLevel(MemberUserDO user, @Nullable Long levelId, String levelReason);
+    void updateUserLevel(MemberUserUpdateLevelReqVO updateReqVO);
 
     /**
      * 增加会员经验
@@ -103,5 +99,5 @@ public interface MemberLevelService {
      * @param bizType    业务类型
      * @param bizId      业务编号
      */
-    void plusExperience(Long userId, Integer experience, MemberExperienceBizTypeEnum bizType, String bizId);
+    void addExperience(Long userId, Integer experience, MemberExperienceBizTypeEnum bizType, String bizId);
 }

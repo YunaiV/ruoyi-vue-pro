@@ -14,15 +14,15 @@ import lombok.*;
  *
  * @author owen
  */
-@TableName("member_level_log")
-@KeySequence("member_level_log_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName("member_level_record")
+@KeySequence("member_level_record_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberLevelLogDO extends BaseDO {
+public class MemberLevelRecordDO extends BaseDO {
 
     /**
      * 编号
@@ -59,7 +59,6 @@ public class MemberLevelLogDO extends BaseDO {
      * 会员此时的经验
      */
     private Integer userExperience;
-    // TODO @疯狂：是不是 remark 和 description 可以合并成 description 就够了
     /**
      * 备注
      */

@@ -7,7 +7,6 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -48,20 +47,6 @@ public interface MemberUserMapper extends BaseMapperX<MemberUserDO> {
                 .eqIfPresent(MemberUserDO::getGroupId, reqVO.getGroupId())
                 .apply(StrUtil.isNotEmpty(tagIdSql), tagIdSql)
                 .orderByDesc(MemberUserDO::getId));
-    }
-
-    // TODO @疯狂：命名可以改成 updateUserLevelToNull；db 侧的操作，尽量无业务含义，更多是 select、update、insert 操作
-    /**
-     * 取消会员的等级
-     *
-     * @param userId 会员编号
-     * @return 受影响的行数
-     */
-    default int cancelUserLevel(Long userId) {
-        return update(null, new LambdaUpdateWrapper<MemberUserDO>()
-                .eq(MemberUserDO::getId, userId)
-                .set(MemberUserDO::getExperience, 0)
-                .set(MemberUserDO::getLevelId, null));
     }
 
     default Long selectCountByGroupId(Long groupId) {
