@@ -4,9 +4,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelCreateReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelPageReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelListReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelUpdateReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateLevelReqVO;
 import cn.iocoder.yudao.module.member.convert.level.MemberLevelConvert;
@@ -173,8 +172,8 @@ public class MemberLevelServiceImpl implements MemberLevelService {
     }
 
     @Override
-    public PageResult<MemberLevelDO> getLevelPage(MemberLevelPageReqVO pageReqVO) {
-        return levelMapper.selectPage(pageReqVO);
+    public List<MemberLevelDO> getLevelList(MemberLevelListReqVO listReqVO) {
+        return levelMapper.selectList(listReqVO);
     }
 
     @Override
