@@ -14,8 +14,8 @@ public interface MemberLevelApi {
      *
      * @param userId     会员ID
      * @param experience 经验
-     * @param bizType    业务类型
+     * @param bizType    业务类型 {@link MemberExperienceBizTypeEnum}
      * @param bizId      业务编号
      */
-    void plusExperience(Long userId, Integer experience, MemberExperienceBizTypeEnum bizType, String bizId);
+    void plusExperience(Long userId, Integer experience, Integer bizType, String bizId);
 }

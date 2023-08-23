@@ -228,4 +228,16 @@ public class MemberUserServiceImpl implements MemberUserService {
         return memberUserMapper.selectPage(pageReqVO);
     }
 
+    @Override
+    public void updateLevelIdAndExperience(Long id, Long levelId, Integer experience) {
+        if (levelId == null) {
+            // 0 代表无等级：防止UpdateById时，会被过滤掉的问题
+            levelId = 0L;
+        }
+        memberUserMapper.updateById(new MemberUserDO()
+                .setId(id)
+                .setLevelId(levelId).setExperience(experience)
+        );
+    }
+
 }

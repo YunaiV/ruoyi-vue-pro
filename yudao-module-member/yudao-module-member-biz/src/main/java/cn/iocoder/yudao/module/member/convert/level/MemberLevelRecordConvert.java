@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.member.convert.level;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.log.MemberLevelRecordRespVO;
+import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelRecordDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -24,4 +25,13 @@ public interface MemberLevelRecordConvert {
 
     PageResult<MemberLevelRecordRespVO> convertPage(PageResult<MemberLevelRecordDO> page);
 
+    default MemberLevelRecordDO copyTo(MemberLevelDO from, MemberLevelRecordDO to) {
+        if (from != null) {
+            to.setLevelId(from.getId());
+            to.setLevel(from.getLevel());
+            to.setDiscount(from.getDiscount());
+            to.setExperience(from.getExperience());
+        }
+        return to;
+    }
 }

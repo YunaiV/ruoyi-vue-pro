@@ -52,7 +52,6 @@ public class MemberLevelRecordDO extends BaseDO {
      * 会员此时的经验
      */
     private Integer userExperience;
-    // TODO @疯狂：是不是 remark 和 description 可以合并成 description 就够了
     /**
      * 备注
      */

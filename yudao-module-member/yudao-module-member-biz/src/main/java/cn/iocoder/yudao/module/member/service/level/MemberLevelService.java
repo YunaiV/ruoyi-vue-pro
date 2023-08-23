@@ -100,5 +100,5 @@ public interface MemberLevelService {
      * @param bizType    业务类型
      * @param bizId      业务编号
      */
-    void plusExperience(Long userId, Integer experience, MemberExperienceBizTypeEnum bizType, String bizId);
+    void addExperience(Long userId, Integer experience, MemberExperienceBizTypeEnum bizType, String bizId);
 }

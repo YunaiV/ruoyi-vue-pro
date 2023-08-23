@@ -24,4 +24,7 @@ public interface MemberExperienceRecordConvert {
 
     PageResult<MemberExperienceRecordRespVO> convertPage(PageResult<MemberExperienceRecordDO> page);
 
+    MemberExperienceRecordDO convert(Long userId, Integer experience, Integer totalExperience,
+                                     String bizId, Integer bizType,
+                                     String title, String description);
 }
