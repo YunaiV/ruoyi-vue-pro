@@ -5,40 +5,40 @@ alter table member_user add column level_id bigint comment '等级编号';
 -- 增加3张表
 create table member_level
 (
-    id             bigint auto_increment comment '编号' primary key,
-    name           varchar(30)  default ''                not null comment '等级名称',
-    experience     int          default 0                 not null comment '升级经验',
-    level          int          default 0                 not null comment '等级',
-    discount       tinyint      default 100               not null comment '享受折扣',
-    icon           varchar(255) default ''                not null comment '等级图标',
-    background_url varchar(255) default ''                not null comment '等级背景图',
-    status         tinyint      default 0                 not null comment '状态',
-    creator        varchar(64)  default ''                null comment '创建者',
-    create_time    datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
-    updater        varchar(64)  default ''                null comment '更新者',
-    update_time    datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
-    deleted        bit          default b'0'              not null comment '是否删除',
-    tenant_id      bigint       default 0                 not null comment '租户编号'
+    id               bigint auto_increment comment '编号' primary key,
+    name             varchar(30)  default ''                not null comment '等级名称',
+    experience       int          default 0                 not null comment '升级经验',
+    level            int          default 0                 not null comment '等级',
+    discount_percent tinyint      default 100               not null comment '享受折扣',
+    icon             varchar(255) default ''                not null comment '等级图标',
+    background_url   varchar(255) default ''                not null comment '等级背景图',
+    status           tinyint      default 0                 not null comment '状态',
+    creator          varchar(64)  default ''                null comment '创建者',
+    create_time      datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updater          varchar(64)  default ''                null comment '更新者',
+    update_time      datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    deleted          bit          default b'0'              not null comment '是否删除',
+    tenant_id        bigint       default 0                 not null comment '租户编号'
 )
     comment '会员等级';
 
 create table member_level_record
 (
-    id              bigint auto_increment comment '编号' primary key,
-    user_id         bigint       default 0                 not null comment '用户编号',
-    level_id        bigint       default 0                 not null comment '等级编号',
-    level           int          default 0                 not null comment '会员等级',
-    discount        tinyint      default 100               not null comment '享受折扣',
-    experience      int          default 0                 not null comment '升级经验',
-    user_experience int          default 0                 not null comment '会员此时的经验',
-    remark          varchar(255) default ''                not null comment '备注',
-    description     varchar(255) default ''                not null comment '描述',
-    creator         varchar(64)  default ''                null comment '创建者',
-    create_time     datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
-    updater         varchar(64)  default ''                null comment '更新者',
-    update_time     datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
-    deleted         bit          default b'0'              not null comment '是否删除',
-    tenant_id       bigint       default 0                 not null comment '租户编号'
+    id               bigint auto_increment comment '编号' primary key,
+    user_id          bigint       default 0                 not null comment '用户编号',
+    level_id         bigint       default 0                 not null comment '等级编号',
+    level            int          default 0                 not null comment '会员等级',
+    discount_percent tinyint      default 100               not null comment '享受折扣',
+    experience       int          default 0                 not null comment '升级经验',
+    user_experience  int          default 0                 not null comment '会员此时的经验',
+    remark           varchar(255) default ''                not null comment '备注',
+    description      varchar(255) default ''                not null comment '描述',
+    creator          varchar(64)  default ''                null comment '创建者',
+    create_time      datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updater          varchar(64)  default ''                null comment '更新者',
+    update_time      datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    deleted          bit          default b'0'              not null comment '是否删除',
+    tenant_id        bigint       default 0                 not null comment '租户编号'
 )
     comment '会员等级记录';
 

@@ -29,7 +29,7 @@ public interface MemberLevelRecordConvert {
         if (from != null) {
             to.setLevelId(from.getId());
             to.setLevel(from.getLevel());
-            to.setDiscount(from.getDiscount());
+            to.setDiscountPercent(from.getDiscountPercent());
             to.setExperience(from.getExperience());
         }
         return to;
