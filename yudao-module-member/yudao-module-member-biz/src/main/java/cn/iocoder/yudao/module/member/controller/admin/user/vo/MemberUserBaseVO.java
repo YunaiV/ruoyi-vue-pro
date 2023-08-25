@@ -43,6 +43,9 @@ public class MemberUserBaseVO {
     @Schema(description = "所在地", example = "4371")
     private Long areaId;
 
+    @Schema(description = "所在地可视化显示", example = "4371")
+    private String areaName;
+
     @Schema(description = "出生日期", example = "2023-03-12")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY)
     private LocalDateTime birthday;
