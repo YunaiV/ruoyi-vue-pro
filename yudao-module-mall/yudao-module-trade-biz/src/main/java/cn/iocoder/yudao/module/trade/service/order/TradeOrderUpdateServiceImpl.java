@@ -12,8 +12,10 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
+import cn.iocoder.yudao.module.member.api.level.MemberLevelApi;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
+import cn.iocoder.yudao.module.member.enums.MemberExperienceBizTypeEnum;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
@@ -29,10 +31,10 @@ import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordUp
 import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponUseReqDTO;
 import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdateAddressReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdatePriceReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderRemarkReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdateAddressReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdatePriceReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
@@ -57,6 +59,7 @@ import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -101,8 +104,12 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private AddressApi addressApi;
     @Resource
     private CouponApi couponApi;
+
     @Resource
     private MemberUserApi memberUserApi;
+    @Resource
+    private MemberLevelApi memberLevelApi;
+
     @Resource
     private ProductCommentApi productCommentApi;
     @Resource
@@ -336,6 +343,11 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // TODO 芋艿：发送站内信
 
         // TODO 芋艿：OrderLog
+
+        // todo 增加用户积分
+
+        // 增加用户经验
+        addUserExperienceAsync(order.getUserId(), order.getPayPrice(), order.getId());
     }
 
     /**
@@ -602,6 +614,11 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         }
 
         // TODO 芋艿：未来如果有分佣，需要更新相关分佣订单为已失效
+
+        // todo 取消用户积分
+
+        // 取消用户经验
+        reduceUserExperienceAsync(order.getUserId(), orderRefundPrice, afterSaleId);
     }
 
     @Override
@@ -649,4 +666,15 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                 TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus()));
     }
 
+    @Async
+    protected void addUserExperienceAsync(Long userId, Integer payPrice, Long orderId) {
+        int bizType = MemberExperienceBizTypeEnum.ORDER.getType();
+        memberLevelApi.addExperience(userId, payPrice, bizType, String.valueOf(orderId));
+    }
+
+    @Async
+    protected void reduceUserExperienceAsync(Long userId, Integer refundPrice, Long afterSaleId){
+        int bizType = MemberExperienceBizTypeEnum.REFUND.getType();
+        memberLevelApi.addExperience(userId, -refundPrice, bizType, String.valueOf(afterSaleId));
+    }
 }
