@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.member.controller.admin.group.vo.MemberGroupUpdat
 import cn.iocoder.yudao.module.member.convert.group.MemberGroupConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.group.MemberGroupDO;
 import cn.iocoder.yudao.module.member.dal.mysql.group.MemberGroupMapper;
-import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
+import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -33,7 +33,7 @@ public class MemberGroupServiceImpl implements MemberGroupService {
     @Resource
     private MemberGroupMapper groupMapper;
     @Resource
-    private MemberUserMapper memberUserMapper;
+    private MemberUserService memberUserService;
 
     @Override
     public Long createGroup(MemberGroupCreateReqVO createReqVO) {
@@ -69,9 +69,8 @@ public class MemberGroupServiceImpl implements MemberGroupService {
         }
     }
 
-    // TODO @疯狂：不要直接调用 memberUserMapper，需要对方 service 提供方法
     void validateGroupHasUser(Long id) {
-        Long count = memberUserMapper.selectCountByGroupId(id);
+        Long count = memberUserService.getUserCountByGroupId(id);
         if (count > 0) {
             throw exception(GROUP_HAS_USER);
         }

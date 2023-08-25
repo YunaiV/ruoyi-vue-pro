@@ -5,9 +5,9 @@ import cn.iocoder.yudao.framework.common.validation.Mobile;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserResetPasswordReqVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateMobileReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateReqVO;
-import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateMobileReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 
 import javax.validation.Valid;
@@ -41,7 +41,7 @@ public interface MemberUserService {
      * 基于手机号创建用户。
      * 如果用户已经存在，则直接进行返回
      *
-     * @param mobile 手机号
+     * @param mobile     手机号
      * @param registerIp 注册 IP
      * @return 用户对象
      */
@@ -50,7 +50,7 @@ public interface MemberUserService {
     /**
      * 更新用户的最后登陆信息
      *
-     * @param id 用户编号
+     * @param id      用户编号
      * @param loginIp 登陆 IP
      */
     void updateUserLogin(Long id, String loginIp);
@@ -75,7 +75,7 @@ public interface MemberUserService {
      * 【会员】修改基本信息
      *
      * @param userId 用户编号
-     * @param reqVO 基本信息
+     * @param reqVO  基本信息
      */
     void updateUser(Long userId, AppMemberUserUpdateReqVO reqVO);
 
@@ -83,7 +83,7 @@ public interface MemberUserService {
      * 【会员】修改手机
      *
      * @param userId 用户编号
-     * @param reqVO 请求信息
+     * @param reqVO  请求信息
      */
     void updateUserMobile(Long userId, AppMemberUserUpdateMobileReqVO reqVO);
 
@@ -91,7 +91,7 @@ public interface MemberUserService {
      * 【会员】修改密码
      *
      * @param userId 用户编号
-     * @param reqVO 请求信息
+     * @param reqVO  请求信息
      */
     void updateUserPassword(Long userId, AppMemberUserUpdatePasswordReqVO reqVO);
 
@@ -105,7 +105,7 @@ public interface MemberUserService {
     /**
      * 判断密码是否匹配
      *
-     * @param rawPassword 未加密的密码
+     * @param rawPassword     未加密的密码
      * @param encodedPassword 加密后的密码
      * @return 是否匹配
      */
@@ -135,4 +135,27 @@ public interface MemberUserService {
      */
     void updateUserLevel(Long id, Long levelId, Integer experience);
 
+    /**
+     * 获得指定用户分组下的用户数量
+     *
+     * @param groupId 用户分组编号
+     * @return 用户数量
+     */
+    Long getUserCountByGroupId(Long groupId);
+
+    /**
+     * 获得指定用户等级下的用户数量
+     *
+     * @param levelId 用户等级编号
+     * @return 用户数量
+     */
+    Long getUserCountByLevelId(Long levelId);
+
+    /**
+     * 获得指定会员标签下的用户数量
+     *
+     * @param tagId 用户标签编号
+     * @return 用户数量
+     */
+    Long getUserCountByTagId(Long tagId);
 }
