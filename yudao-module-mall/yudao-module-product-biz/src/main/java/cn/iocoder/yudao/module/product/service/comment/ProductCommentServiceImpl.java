@@ -80,23 +80,18 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createComment(ProductCommentCreateReqVO createReqVO) {
-        // 校验评论
-        validateComment(createReqVO.getSkuId(), createReqVO.getUserId(), createReqVO.getOrderItemId());
+        // 校验商品
+        ProductSpuDO spuDO = validateProduct(createReqVO.getSkuId());
 
-        ProductCommentDO commentDO = ProductCommentConvert.INSTANCE.convert(createReqVO);
+        ProductCommentDO commentDO = ProductCommentConvert.INSTANCE.convert(createReqVO, spuDO);
         productCommentMapper.insert(commentDO);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createComment(ProductCommentCreateReqDTO createReqDTO) {
-        // 通过 sku ID 拿到 spu 相关信息
-        ProductSkuDO sku = productSkuService.getSku(createReqDTO.getSkuId());
-        if (sku == null) {
-            throw exception(SKU_NOT_EXISTS);
-        }
-        // 校验 spu 如果存在返回详情
-        ProductSpuDO spuDO = validateSpu(sku.getSpuId());
+        // 校验商品
+        ProductSpuDO spuDO = validateProduct(createReqDTO.getSkuId());
         // 校验评论
         validateComment(spuDO.getId(), createReqDTO.getUserId(), createReqDTO.getOrderId());
         // 获取用户详细信息
@@ -114,6 +109,21 @@ public class ProductCommentServiceImpl implements ProductCommentService {
         if (null != exist) {
             throw exception(COMMENT_ORDER_EXISTS);
         }
+    }
+
+    private ProductSpuDO validateProduct(Long skuId) {
+        // 通过 sku ID 拿到 spu 相关信息
+        ProductSkuDO sku = validateSku(skuId);
+        // 校验 spu 如果存在返回详情
+        return validateSpu(sku.getSpuId());
+    }
+
+    private ProductSkuDO validateSku(Long skuId) {
+        ProductSkuDO sku = productSkuService.getSku(skuId);
+        if (sku == null) {
+            throw exception(SKU_NOT_EXISTS);
+        }
+        return sku;
     }
 
     private ProductSpuDO validateSpu(Long spuId) {

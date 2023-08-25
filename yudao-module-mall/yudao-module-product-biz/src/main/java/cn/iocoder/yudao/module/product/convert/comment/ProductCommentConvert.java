@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.product.convert.comment;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentCreateReqVO;
@@ -23,6 +22,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 
 /**
  * 商品评价 Convert
@@ -60,7 +64,7 @@ public interface ProductCommentConvert {
                 item.setUserNickname(ProductCommentDO.NICKNAME_ANONYMOUS);
             }
             // 设置 SKU 规格值
-            MapUtils.findAndThen(skuMap, item.getSkuId(),
+            findAndThen(skuMap, item.getSkuId(),
                     sku -> item.setSkuProperties(convertList01(sku.getProperties())));
         });
         return page;
@@ -101,6 +105,8 @@ public interface ProductCommentConvert {
         return commentDO;
     }
 
+    @Mapping(target = "visible", constant = "true")
+    @Mapping(target = "replyStatus", constant = "false")
     @Mapping(target = "userId", constant = "0L")
     @Mapping(target = "orderId", constant = "0L")
     @Mapping(target = "orderItemId", constant = "0L")
@@ -111,4 +117,30 @@ public interface ProductCommentConvert {
 
     List<AppProductCommentRespVO> convertList02(List<ProductCommentDO> list);
 
+    default ProductCommentDO convert(ProductCommentCreateReqVO createReq, ProductSpuDO spuDO) {
+        ProductCommentDO commentDO = convert(createReq);
+        if (spuDO != null) {
+            commentDO.setSpuId(spuDO.getId());
+            commentDO.setSpuName(spuDO.getName());
+        }
+        return commentDO;
+    }
+
+    default PageResult<ProductCommentRespVO> convertPage(PageResult<ProductCommentDO> pageResult, List<ProductSkuDO> skuList) {
+        Map<Long, ProductSkuDO> skuMap = convertMap(skuList, ProductSkuDO::getId);
+
+        PageResult<ProductCommentRespVO> result = convertPage(pageResult);
+        for (ProductCommentRespVO vo : result.getList()) {
+            findAndThen(skuMap, vo.getSkuId(), sku -> {
+                String propertyNames = sku.getProperties().stream()
+                        .map(ProductSkuDO.Property::getValueName)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.joining(" "));
+
+                vo.setSkuPicUrl(sku.getPicUrl());
+                vo.setSpuName(vo.getSpuName() + " " + propertyNames);
+            });
+        }
+        return result;
+    }
 }
