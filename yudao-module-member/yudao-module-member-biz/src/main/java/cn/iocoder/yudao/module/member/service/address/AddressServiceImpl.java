@@ -1,6 +1,11 @@
 package cn.iocoder.yudao.module.member.service.address;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.member.controller.admin.address.vo.AddressCreateReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.address.vo.AddressExportReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.address.vo.AddressPageReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.address.vo.AddressUpdateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressCreateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressUpdateReqVO;
 import cn.iocoder.yudao.module.member.convert.address.AddressConvert;
@@ -11,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -92,6 +98,58 @@ public class AddressServiceImpl implements AddressService {
     public MemberAddressDO getDefaultUserAddress(Long userId) {
         List<MemberAddressDO> addresses = addressMapper.selectListByUserIdAndDefaulted(userId, true);
         return CollUtil.getFirst(addresses);
+    }
+
+    @Override
+    public Long createAddress(AddressCreateReqVO createReqVO) {
+        // 插入
+        MemberAddressDO address = AddressConvert.INSTANCE.convert(createReqVO);
+        addressMapper.insert(address);
+        // 返回
+        return address.getId();
+    }
+
+    @Override
+    public void updateAddress(AddressUpdateReqVO updateReqVO) {
+        // 校验存在
+        validateAddressExists(updateReqVO.getId());
+        // 更新
+        MemberAddressDO updateObj = AddressConvert.INSTANCE.convert(updateReqVO);
+        addressMapper.updateById(updateObj);
+    }
+
+    @Override
+    public void deleteAddress(Long id) {
+        // 校验存在
+        validateAddressExists(id);
+        // 删除
+        addressMapper.deleteById(id);
+    }
+
+    private void validateAddressExists(Long id) {
+        if (addressMapper.selectById(id) == null) {
+            throw exception(ADDRESS_NOT_EXISTS);
+        }
+    }
+
+    @Override
+    public MemberAddressDO getAddress(Long id) {
+        return addressMapper.selectById(id);
+    }
+
+    @Override
+    public List<MemberAddressDO> getAddressList(Collection<Long> ids) {
+        return addressMapper.selectBatchIds(ids);
+    }
+
+    @Override
+    public PageResult<MemberAddressDO> getAddressPage(AddressPageReqVO pageReqVO) {
+        return addressMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<MemberAddressDO> getAddressList(AddressExportReqVO exportReqVO) {
+        return addressMapper.selectList(exportReqVO);
     }
 
 }
