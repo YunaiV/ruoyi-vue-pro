@@ -1,12 +1,18 @@
 package cn.iocoder.yudao.module.member.service.point;
 
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.MemberPointRecordPageReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.point.MemberPointRecordDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.point.MemberPointRecordMapper;
+import cn.iocoder.yudao.module.member.enums.point.MemberPointBizTypeEnum;
+import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -33,6 +39,8 @@ public class MemberPointRecordServiceImpl implements MemberPointRecordService {
 
     @Resource
     private MemberUserApi memberUserApi;
+    @Resource
+    private MemberUserService memberUserService;
 
     @Override
     public PageResult<MemberPointRecordDO> getPointRecordPage(MemberPointRecordPageReqVO pageReqVO) {
@@ -53,6 +61,31 @@ public class MemberPointRecordServiceImpl implements MemberPointRecordService {
     @Override
     public PageResult<MemberPointRecordDO> getPointRecordPage(Long userId, PageParam pageVO) {
         return recordMapper.selectPage(userId, pageVO);
+    }
+
+    @Override
+    public void createPointRecord(Long userId, Integer point, MemberPointBizTypeEnum bizType, String bizId) {
+        if (bizType.isReduce() && point > 0) {
+            point = -point;
+        }
+
+        MemberUserDO user = memberUserService.getUser(userId);
+        Integer userPoint = ObjectUtil.defaultIfNull(user.getPoint(), 0);
+        // 用户变动后的积分，防止扣出负数
+        Integer totalPoint = NumberUtil.max(userPoint + point, 0);
+        // 增加积分记录
+        MemberPointRecordDO recordDO = new MemberPointRecordDO()
+                .setUserId(userId)
+                .setBizId(bizId)
+                .setBizType(bizType.getType())
+                .setTitle(bizType.getName())
+                .setDescription(StrUtil.format(bizType.getDescription(), point))
+                .setPoint(point)
+                .setTotalPoint(totalPoint);
+        recordMapper.insert(recordDO);
+
+        // 更新用户积分
+        memberUserService.updateUserPoint(userId, totalPoint);
     }
 
 }

@@ -235,6 +235,9 @@ public class MemberLevelServiceImpl implements MemberLevelService {
         if (experience == 0) {
             return;
         }
+        if (bizType.isReduce() && experience > 0) {
+            experience = -experience;
+        }
 
         MemberUserDO user = memberUserService.getUser(userId);
 

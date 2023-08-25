@@ -16,6 +16,7 @@ import cn.iocoder.yudao.module.member.api.level.MemberLevelApi;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.member.enums.MemberExperienceBizTypeEnum;
+import cn.iocoder.yudao.module.member.enums.point.MemberPointBizTypeEnum;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
@@ -344,8 +345,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
         // TODO 芋艿：OrderLog
 
-        // todo 增加用户积分
-
+        // 增加用户积分
+        addUserPointAsync(order.getUserId(), order.getPayPrice(), order.getId());
         // 增加用户经验
         addUserExperienceAsync(order.getUserId(), order.getPayPrice(), order.getId());
     }
@@ -615,9 +616,9 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
         // TODO 芋艿：未来如果有分佣，需要更新相关分佣订单为已失效
 
-        // todo 取消用户积分
-
-        // 取消用户经验
+        // 扣减用户积分
+        reduceUserPointAsync(order.getUserId(), orderRefundPrice, afterSaleId);
+        // 扣减用户经验
         reduceUserExperienceAsync(order.getUserId(), orderRefundPrice, afterSaleId);
     }
 
@@ -673,8 +674,20 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     }
 
     @Async
-    protected void reduceUserExperienceAsync(Long userId, Integer refundPrice, Long afterSaleId){
+    protected void reduceUserExperienceAsync(Long userId, Integer refundPrice, Long afterSaleId) {
         int bizType = MemberExperienceBizTypeEnum.REFUND.getType();
         memberLevelApi.addExperience(userId, -refundPrice, bizType, String.valueOf(afterSaleId));
+    }
+
+    @Async
+    protected void addUserPointAsync(Long userId, Integer payPrice, Long orderId) {
+        int bizType = MemberPointBizTypeEnum.ORDER_BUY.getType();
+        memberUserApi.addPoint(userId, payPrice, bizType, String.valueOf(orderId));
+    }
+
+    @Async
+    protected void reduceUserPointAsync(Long userId, Integer refundPrice, Long afterSaleId) {
+        int bizType = MemberPointBizTypeEnum.ORDER_CANCEL.getType();
+        memberUserApi.addPoint(userId, -refundPrice, bizType, String.valueOf(afterSaleId));
     }
 }

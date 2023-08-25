@@ -158,4 +158,12 @@ public interface MemberUserService {
      * @return 用户数量
      */
     Long getUserCountByTagId(Long tagId);
+
+    /**
+     * 更新用户的积分
+     *
+     * @param userId 用户ID
+     * @param point  积分数量
+     */
+    void updateUserPoint(Long userId, Integer point);
 }

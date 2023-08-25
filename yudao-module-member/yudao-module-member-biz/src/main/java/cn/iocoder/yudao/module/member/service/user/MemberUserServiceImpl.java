@@ -254,4 +254,9 @@ public class MemberUserServiceImpl implements MemberUserService {
         return memberUserMapper.selectCountByTagId(tagId);
     }
 
+    @Override
+    public void updateUserPoint(Long userId, Integer point) {
+        memberUserMapper.updateById(new MemberUserDO().setId(userId).setPoint(point));
+    }
+
 }
