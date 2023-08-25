@@ -27,7 +27,6 @@ CREATE TABLE `pay_wallet_transaction`
 (
     `id`               bigint      NOT NULL AUTO_INCREMENT COMMENT '编号',
     `wallet_id`        bigint      NOT NULL COMMENT '会员钱包 id',
-    `user_id`          bigint      NOT NULL COMMENT '用户 id',
     `biz_type`         tinyint     NOT NULL COMMENT '关联类型',
     `biz_id`           bigint      NOT NULL COMMENT '关联业务编号',
     `no`               varchar(64) NOT NULL COMMENT '流水号',
@@ -35,6 +34,7 @@ CREATE TABLE `pay_wallet_transaction`
     `amount`           int         NOT NULL COMMENT '交易金额, 单位分',
     `balance`          int         NOT NULL COMMENT '余额, 单位分',
     `transaction_time` datetime    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '交易时间',
+    `creator`          varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
     `create_time`      datetime    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `updater`          varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
     `update_time`      datetime    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',

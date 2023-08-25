@@ -41,6 +41,9 @@ public interface ErrorCodeConstants {
     ErrorCode REFUND_NOT_FOUND = new ErrorCode(1007006004, "支付退款单不存在");
     ErrorCode REFUND_STATUS_IS_NOT_WAITING = new ErrorCode(1007006005, "支付退款单不处于待退款");
 
+    // ========== 钱包模块(退款) 1007007000 ==========
+    ErrorCode WALLET_NOT_FOUND = new ErrorCode(1007007000, "用户钱包不存在");
+
     // ========== 示例订单 1007900000 ==========
     ErrorCode DEMO_ORDER_NOT_FOUND = new ErrorCode(1007900000, "示例订单不存在");
     ErrorCode DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID = new ErrorCode(1007900001, "示例订单更新支付状态失败，订单不是【未支付】状态");

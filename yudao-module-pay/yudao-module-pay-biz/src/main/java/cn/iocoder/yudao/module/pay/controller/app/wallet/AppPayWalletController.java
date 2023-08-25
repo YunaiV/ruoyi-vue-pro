@@ -22,7 +22,7 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 /**
  * @author jason
  */
-@Tag(name = "用户 APP - 支付钱包")
+@Tag(name = "用户 APP - 钱包")
 @RestController
 @RequestMapping("/pay/wallet")
 @Validated
@@ -33,7 +33,7 @@ public class AppPayWalletController {
     private PayWalletService payWalletService;
 
     @GetMapping("/get")
-    @Operation(summary = "获取支付钱包")
+    @Operation(summary = "获取钱包")
     public CommonResult<AppPayWalletRespVO> getPayWallet() {
         PayWalletDO payWallet = payWalletService.getPayWallet(getLoginUserId(), UserTypeEnum.MEMBER.getValue());
         return success(PayWalletConvert.INSTANCE.convert(payWallet));

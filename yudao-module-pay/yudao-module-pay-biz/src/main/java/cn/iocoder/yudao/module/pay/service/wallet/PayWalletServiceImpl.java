@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
 /**
- * 支付钱包 Service 实现类
+ * 钱包 Service 实现类
  *
  * @author jason
  */

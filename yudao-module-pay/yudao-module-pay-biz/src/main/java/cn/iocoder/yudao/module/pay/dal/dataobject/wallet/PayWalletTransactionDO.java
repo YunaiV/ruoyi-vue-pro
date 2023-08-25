@@ -27,22 +27,13 @@ public class PayWalletTransactionDO extends BaseDO {
 
     /**
      * 会员钱包 id
-     *
      * 关联 {@link PayWalletDO#getId()}
      */
     private Long walletId;
 
     /**
-     * 用户 id
-     *
-     * 关联 MemberUserDO 的 id 编号
-     */
-    private Long userId;
-
-    /**
-     * 关联业务
-     *
-     * 枚举 {@link WalletBizTypeEnum#getBizType()}
+     * 钱包交易业务分类
+     * 关联枚举 {@link WalletBizTypeEnum#getBizType()}
      */
     private Integer bizType;
 
