@@ -9,9 +9,11 @@ import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateR
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserInfoRespVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.group.MemberGroupDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
+import cn.iocoder.yudao.module.member.convert.address.AddressConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.tag.MemberTagDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -20,7 +22,7 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
-@Mapper
+@Mapper(uses = {AddressConvert.class})
 public interface MemberUserConvert {
 
     MemberUserConvert INSTANCE = Mappers.getMapper(MemberUserConvert.class);
@@ -35,6 +37,7 @@ public interface MemberUserConvert {
 
     PageResult<MemberUserRespVO> convertPage(PageResult<MemberUserDO> page);
 
+    @Mapping(source = "areaId", target = "areaName",  qualifiedByName = "convertAreaIdToAreaName")
     MemberUserRespVO convert03(MemberUserDO bean);
 
     default PageResult<MemberUserRespVO> convertPage(PageResult<MemberUserDO> pageResult,
