@@ -4,20 +4,21 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 钱包交易大类枚举
+ * 钱包交易业务分类
  *
  * @author jason
  */
 @AllArgsConstructor
 @Getter
-public enum WalletTransactionGategoryEnum {
-    TOP_UP(1, "充值"),
-    SPENDING(2, "支出");
+public enum WalletBizTypeEnum {
+    RECHARGE(1, "充值"),
+    RECHARGE_REFUND(2, "充值退款");
 
+    // TODO 后续增加
     /**
-     * 分类
+     * 业务分类
      */
-    private final Integer category;
+    private final Integer bizType;
 
     /**
      * 说明

@@ -4,16 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 钱包操作类型枚举
+ * 钱包交易大分类
  *
  * @author jason
  */
 @AllArgsConstructor
 @Getter
-public enum WalletOperateTypeEnum {
-    TOP_UP_INC(1, "充值增加"),
-    ORDER_DEC(2, "订单消费扣除");
-    // TODO 其它类型
+public enum WalletTypeEnum {
+    RECHARGE(1, "充值"),
+    EXPENSE(2, "消费");
 
     private final Integer type;
 
