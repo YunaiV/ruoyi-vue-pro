@@ -35,7 +35,7 @@ public class MemberLevelRecordController {
     @Operation(summary = "获得会员等级记录")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('member:level-record:query')")
-    public CommonResult<MemberLevelRecordRespVO> getLevelLog(@RequestParam("id") Long id) {
+    public CommonResult<MemberLevelRecordRespVO> getLevelRecord(@RequestParam("id") Long id) {
         MemberLevelRecordDO levelLog = levelLogService.getLevelRecord(id);
         return success(MemberLevelRecordConvert.INSTANCE.convert(levelLog));
     }
@@ -43,8 +43,10 @@ public class MemberLevelRecordController {
     @GetMapping("/page")
     @Operation(summary = "获得会员等级记录分页")
     @PreAuthorize("@ss.hasPermission('member:level-record:query')")
-    public CommonResult<PageResult<MemberLevelRecordRespVO>> getLevelLogPage(@Valid MemberLevelRecordPageReqVO pageVO) {
+    public CommonResult<PageResult<MemberLevelRecordRespVO>> getLevelRecordPage(
+            @Valid MemberLevelRecordPageReqVO pageVO) {
         PageResult<MemberLevelRecordDO> pageResult = levelLogService.getLevelRecordPage(pageVO);
         return success(MemberLevelRecordConvert.INSTANCE.convertPage(pageResult));
     }
+
 }

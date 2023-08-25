@@ -26,7 +26,6 @@ public class MemberExperienceRecordServiceImpl implements MemberExperienceRecord
     @Resource
     private MemberExperienceRecordMapper experienceLogMapper;
 
-
     @Override
     public MemberExperienceRecordDO getExperienceRecord(Long id) {
         return experienceLogMapper.selectById(id);
@@ -45,12 +44,11 @@ public class MemberExperienceRecordServiceImpl implements MemberExperienceRecord
     @Override
     public void createExperienceRecord(Long userId, Integer experience, Integer totalExperience,
                                        MemberExperienceBizTypeEnum bizType, String bizId) {
-        String description = StrUtil.format(bizType.getDesc(), experience);
-        MemberExperienceRecordDO recordDO = MemberExperienceRecordConvert.INSTANCE.convert(userId,
-                experience, totalExperience,
-                bizId, bizType.getValue(), bizType.getTitle(),
-                description);
-        experienceLogMapper.insert(recordDO);
+        String description = StrUtil.format(bizType.getDescription(), experience);
+        MemberExperienceRecordDO record = MemberExperienceRecordConvert.INSTANCE.convert(
+                userId, experience, totalExperience,
+                bizId, bizType.getType(), bizType.getTitle(), description);
+        experienceLogMapper.insert(record);
     }
 
 }

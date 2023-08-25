@@ -25,6 +25,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -153,11 +154,12 @@ public class MemberLevelServiceImpl implements MemberLevelService {
         validateExperienceOutRange(list, id, level, experience);
     }
 
+    // TODO 有 Service 提供接口哈，不直接调用对方的 memberUserMapper
     @VisibleForTesting
     void validateLevelHasUser(Long id) {
         Long count = memberUserMapper.selectCountByLevelId(id);
         if (count > 0) {
-            throw exception(GROUP_HAS_USER);
+            throw exception(LEVEL_HAS_USER);
         }
     }
 
@@ -168,6 +170,9 @@ public class MemberLevelServiceImpl implements MemberLevelService {
 
     @Override
     public List<MemberLevelDO> getLevelList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
         return levelMapper.selectBatchIds(ids);
     }
 
@@ -184,7 +189,7 @@ public class MemberLevelServiceImpl implements MemberLevelService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateUserLevel(MemberUserUpdateLevelReqVO updateReqVO) {
-        MemberUserDO user = memberUserMapper.selectById(updateReqVO.getId());
+        MemberUserDO user = memberUserService.getUser(updateReqVO.getId());
         if (user == null) {
             throw exception(USER_NOT_EXISTS);
         }
@@ -193,6 +198,7 @@ public class MemberLevelServiceImpl implements MemberLevelService {
             return;
         }
 
+        // 记录等级变动
         MemberLevelRecordDO levelRecord = new MemberLevelRecordDO()
                 .setUserId(user.getId())
                 .setRemark(updateReqVO.getReason());
@@ -211,17 +217,16 @@ public class MemberLevelServiceImpl implements MemberLevelService {
             levelRecord.setUserExperience(memberLevel.getExperience());
             levelRecord.setDescription("管理员调整为：" + memberLevel.getName());
         }
-
-        // 记录等级变动
         memberLevelRecordService.createLevelRecord(levelRecord);
 
         // 记录会员经验变动
         memberExperienceRecordService.createExperienceRecord(user.getId(),
                 levelRecord.getExperience(), levelRecord.getUserExperience(),
-                MemberExperienceBizTypeEnum.ADMIN, MemberExperienceBizTypeEnum.ADMIN.getValue() + "");
+                MemberExperienceBizTypeEnum.ADMIN, String.valueOf(MemberExperienceBizTypeEnum.ADMIN.getType()));
 
         // 更新会员表上的等级编号、经验值
-        memberUserService.updateLevelIdAndExperience(user.getId(), updateReqVO.getLevelId(), levelRecord.getUserExperience());
+        memberUserService.updateUserLevel(user.getId(), updateReqVO.getLevelId(),
+                levelRecord.getUserExperience());
 
         // 给会员发送等级变动消息
         notifyMemberLevelChange(user.getId(), memberLevel);
@@ -259,7 +264,7 @@ public class MemberLevelServiceImpl implements MemberLevelService {
         }
 
         // 更新会员表上的等级编号、经验值
-        memberUserService.updateLevelIdAndExperience(user.getId(), levelRecord.getLevelId(), userExperience);
+        memberUserService.updateUserLevel(user.getId(), levelRecord.getLevelId(), userExperience);
     }
 
     /**

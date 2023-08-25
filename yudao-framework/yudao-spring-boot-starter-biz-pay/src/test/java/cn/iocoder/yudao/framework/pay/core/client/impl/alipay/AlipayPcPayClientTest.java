@@ -23,6 +23,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 /**
+ * {@link  AlipayPcPayClient} 单元测试
+ *
  * @author jason
  */
 public class AlipayPcPayClientTest extends AbstractAlipayClientTest {
@@ -41,15 +43,13 @@ public class AlipayPcPayClientTest extends AbstractAlipayClientTest {
     public void test_unified_order_url_display_mode_success() throws AlipayApiException {
         // 准备返回对象
         String notifyUrl = randomURL();
-        Integer price = randomInteger();
-        AlipayTradePagePayResponse response = randomPojo(AlipayTradePagePayResponse.class, o -> {
-            o.setSubCode("");
-        });
+        AlipayTradePagePayResponse response = randomPojo(AlipayTradePagePayResponse.class, o -> o.setSubCode(""));
         // mock
         when(defaultAlipayClient.pageExecute(argThat((ArgumentMatcher<AlipayTradePagePayRequest>) request -> true),
                 eq(Method.GET.name()))).thenReturn(response);
         // 准备请求参数
         String outTradeNo = randomString();
+        Integer price = randomInteger();
         PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(notifyUrl, outTradeNo, price);
         // 设置  displayMode 为 null.
         reqDTO.setDisplayMode(null);
@@ -67,15 +67,13 @@ public class AlipayPcPayClientTest extends AbstractAlipayClientTest {
     public void test_unified_order_form_display_mode_success() throws AlipayApiException {
         // 准备返回对象
         String notifyUrl = randomURL();
-        Integer price = randomInteger();
-        AlipayTradePagePayResponse response = randomPojo(AlipayTradePagePayResponse.class, o -> {
-            o.setSubCode("");
-        });
+        AlipayTradePagePayResponse response = randomPojo(AlipayTradePagePayResponse.class, o -> o.setSubCode(""));
         // mock
         when(defaultAlipayClient.pageExecute(argThat((ArgumentMatcher<AlipayTradePagePayRequest>) request -> true),
                 eq(Method.POST.name()))).thenReturn(response);
         // 准备请求参数
         String outTradeNo = randomString();
+        Integer price = randomInteger();
         PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(notifyUrl, outTradeNo, price);
         reqDTO.setDisplayMode(PayOrderDisplayModeEnum.FORM.getMode());
 

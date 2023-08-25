@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.member.service.user;
 
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -229,11 +230,9 @@ public class MemberUserServiceImpl implements MemberUserService {
     }
 
     @Override
-    public void updateLevelIdAndExperience(Long id, Long levelId, Integer experience) {
-        if (levelId == null) {
-            // 0 代表无等级：防止UpdateById时，会被过滤掉的问题
-            levelId = 0L;
-        }
+    public void updateUserLevel(Long id, Long levelId, Integer experience) {
+        // 0 代表无等级：防止UpdateById时，会被过滤掉的问题
+        levelId = ObjectUtil.defaultIfNull(levelId, 0L);
         memberUserMapper.updateById(new MemberUserDO()
                 .setId(id)
                 .setLevelId(levelId).setExperience(experience)

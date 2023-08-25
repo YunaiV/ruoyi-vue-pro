@@ -69,6 +69,7 @@ public class MemberGroupServiceImpl implements MemberGroupService {
         }
     }
 
+    // TODO @疯狂：不要直接调用 memberUserMapper，需要对方 service 提供方法
     void validateGroupHasUser(Long id) {
         Long count = memberUserMapper.selectCountByGroupId(id);
         if (count > 0) {

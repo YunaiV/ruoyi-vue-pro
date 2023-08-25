@@ -4,9 +4,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.log.MemberLevelRecordPageReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelRecordDO;
 
-import java.util.Collection;
-import java.util.List;
-
 /**
  * 会员等级记录 Service 接口
  *
@@ -23,14 +20,6 @@ public interface MemberLevelRecordService {
     MemberLevelRecordDO getLevelRecord(Long id);
 
     /**
-     * 获得会员等级记录列表
-     *
-     * @param ids 编号
-     * @return 会员等级记录列表
-     */
-    List<MemberLevelRecordDO> getLevelRecordList(Collection<Long> ids);
-
-    /**
      * 获得会员等级记录分页
      *
      * @param pageReqVO 分页查询
@@ -44,4 +33,5 @@ public interface MemberLevelRecordService {
      * @param levelRecord 会员等级记录
      */
     void createLevelRecord(MemberLevelRecordDO levelRecord);
+
 }

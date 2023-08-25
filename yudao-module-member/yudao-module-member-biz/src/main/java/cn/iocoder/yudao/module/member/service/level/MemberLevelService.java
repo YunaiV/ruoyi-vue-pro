@@ -65,7 +65,6 @@ public interface MemberLevelService {
      */
     List<MemberLevelDO> getLevelList(MemberLevelListReqVO listReqVO);
 
-
     /**
      * 获得指定状态的会员等级列表
      *
@@ -73,7 +72,6 @@ public interface MemberLevelService {
      * @return 会员等级列表
      */
     List<MemberLevelDO> getLevelListByStatus(Integer status);
-
 
     /**
      * 获得开启状态的会员等级列表
@@ -100,4 +98,5 @@ public interface MemberLevelService {
      * @param bizId      业务编号
      */
     void addExperience(Long userId, Integer experience, MemberExperienceBizTypeEnum bizType, String bizId);
+
 }

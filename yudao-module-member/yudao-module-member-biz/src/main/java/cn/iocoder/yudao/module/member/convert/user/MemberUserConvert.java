@@ -42,12 +42,10 @@ public interface MemberUserConvert {
                                                      List<MemberLevelDO> levels,
                                                      List<MemberGroupDO> groups) {
         PageResult<MemberUserRespVO> result = convertPage(pageResult);
-
         // 处理关联数据
         Map<Long, String> tagMap = convertMap(tags, MemberTagDO::getId, MemberTagDO::getName);
         Map<Long, String> levelMap = convertMap(levels, MemberLevelDO::getId, MemberLevelDO::getName);
         Map<Long, String> groupMap = convertMap(groups, MemberGroupDO::getId, MemberGroupDO::getName);
-
         // 填充关联数据
         for (MemberUserRespVO vo : result.getList()) {
             vo.setTagNames(convertList(vo.getTagIds(), tagMap::get));
@@ -56,4 +54,5 @@ public interface MemberUserConvert {
         }
         return result;
     }
+
 }

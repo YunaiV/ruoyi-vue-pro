@@ -35,7 +35,7 @@ public class MemberExperienceRecordController {
     @Operation(summary = "获得会员经验记录")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('member:experience-record:query')")
-    public CommonResult<MemberExperienceRecordRespVO> getExperienceLog(@RequestParam("id") Long id) {
+    public CommonResult<MemberExperienceRecordRespVO> getExperienceRecord(@RequestParam("id") Long id) {
         MemberExperienceRecordDO experienceLog = experienceLogService.getExperienceRecord(id);
         return success(MemberExperienceRecordConvert.INSTANCE.convert(experienceLog));
     }
@@ -43,7 +43,8 @@ public class MemberExperienceRecordController {
     @GetMapping("/page")
     @Operation(summary = "获得会员经验记录分页")
     @PreAuthorize("@ss.hasPermission('member:experience-record:query')")
-    public CommonResult<PageResult<MemberExperienceRecordRespVO>> getExperienceLogPage(@Valid MemberExperienceRecordPageReqVO pageVO) {
+    public CommonResult<PageResult<MemberExperienceRecordRespVO>> getExperienceRecordPage(
+            @Valid MemberExperienceRecordPageReqVO pageVO) {
         PageResult<MemberExperienceRecordDO> pageResult = experienceLogService.getExperienceRecordPage(pageVO);
         return success(MemberExperienceRecordConvert.INSTANCE.convertPage(pageResult));
     }

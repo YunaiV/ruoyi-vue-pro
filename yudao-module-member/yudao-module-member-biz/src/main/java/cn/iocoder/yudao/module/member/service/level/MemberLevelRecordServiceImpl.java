@@ -8,11 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.List;
-
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.LEVEL_LOG_NOT_EXISTS;
 
 /**
  * 会员等级记录 Service 实现类
@@ -26,20 +21,9 @@ public class MemberLevelRecordServiceImpl implements MemberLevelRecordService {
     @Resource
     private MemberLevelRecordMapper levelLogMapper;
 
-    private void validateLevelLogExists(Long id) {
-        if (levelLogMapper.selectById(id) == null) {
-            throw exception(LEVEL_LOG_NOT_EXISTS);
-        }
-    }
-
     @Override
     public MemberLevelRecordDO getLevelRecord(Long id) {
         return levelLogMapper.selectById(id);
-    }
-
-    @Override
-    public List<MemberLevelRecordDO> getLevelRecordList(Collection<Long> ids) {
-        return levelLogMapper.selectBatchIds(ids);
     }
 
     @Override
