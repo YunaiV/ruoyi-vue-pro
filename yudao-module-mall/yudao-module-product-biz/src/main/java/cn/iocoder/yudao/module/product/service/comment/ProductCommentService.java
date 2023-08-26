@@ -25,38 +25,6 @@ import java.util.List;
 public interface ProductCommentService {
 
     /**
-     * 获得商品评价分页
-     *
-     * @param pageReqVO 分页查询
-     * @return 商品评价分页
-     */
-    PageResult<ProductCommentDO> getCommentPage(ProductCommentPageReqVO pageReqVO);
-
-    /**
-     * 修改评论是否可见
-     *
-     * @param updateReqVO 修改评论可见
-     */
-    void updateCommentVisible(ProductCommentUpdateVisibleReqVO updateReqVO);
-
-    /**
-     * 商家回复
-     *
-     * @param replyVO     商家回复
-     * @param loginUserId 管理后台商家登陆人 ID
-     */
-    void replyComment(ProductCommentReplyReqVO replyVO, Long loginUserId);
-
-    /**
-     * 获得商品评价分页
-     *
-     * @param pageVO  分页查询
-     * @param visible 是否可见
-     * @return 商品评价分页
-     */
-    PageResult<ProductCommentDO> getCommentPage(AppCommentPageReqVO pageVO, Boolean visible);
-
-    /**
      * 创建商品评论
      * 后台管理员创建评论使用
      *
@@ -72,6 +40,38 @@ public interface ProductCommentService {
      * @return 返回评论 id
      */
     Long createComment(ProductCommentCreateReqDTO createReqDTO);
+
+    /**
+     * 修改评论是否可见
+     *
+     * @param updateReqVO 修改评论可见
+     */
+    void updateCommentVisible(ProductCommentUpdateVisibleReqVO updateReqVO);
+
+    /**
+     * 商家回复
+     *
+     * @param replyVO     商家回复
+     * @param userId 管理后台商家登陆人 ID
+     */
+    void replyComment(ProductCommentReplyReqVO replyVO, Long userId);
+
+    /**
+     * 【管理员】获得商品评价分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 商品评价分页
+     */
+    PageResult<ProductCommentDO> getCommentPage(ProductCommentPageReqVO pageReqVO);
+
+    /**
+     * 【会员】获得商品评价分页
+     *
+     * @param pageVO  分页查询
+     * @param visible 是否可见
+     * @return 商品评价分页
+     */
+    PageResult<ProductCommentDO> getCommentPage(AppCommentPageReqVO pageVO, Boolean visible);
 
     /**
      * 获得商品的评价统计

@@ -117,26 +117,26 @@ public interface ProductCommentConvert {
 
     List<AppProductCommentRespVO> convertList02(List<ProductCommentDO> list);
 
-    default ProductCommentDO convert(ProductCommentCreateReqVO createReq, ProductSpuDO spuDO) {
+    default ProductCommentDO convert(ProductCommentCreateReqVO createReq, ProductSpuDO spu) {
         ProductCommentDO commentDO = convert(createReq);
-        if (spuDO != null) {
-            commentDO.setSpuId(spuDO.getId());
-            commentDO.setSpuName(spuDO.getName());
+        if (spu != null) {
+            commentDO.setSpuId(spu.getId()).setSpuName(spu.getName());
         }
         return commentDO;
     }
 
-    default PageResult<ProductCommentRespVO> convertPage(PageResult<ProductCommentDO> pageResult, List<ProductSkuDO> skuList) {
-        Map<Long, ProductSkuDO> skuMap = convertMap(skuList, ProductSkuDO::getId);
-
+    default PageResult<ProductCommentRespVO> convertPage(PageResult<ProductCommentDO> pageResult,
+                                                         List<ProductSkuDO> skus) {
         PageResult<ProductCommentRespVO> result = convertPage(pageResult);
+        // 拼接数据
+        Map<Long, ProductSkuDO> skuMap = convertMap(skus, ProductSkuDO::getId);
         for (ProductCommentRespVO vo : result.getList()) {
             findAndThen(skuMap, vo.getSkuId(), sku -> {
                 String propertyNames = sku.getProperties().stream()
                         .map(ProductSkuDO.Property::getValueName)
                         .filter(Objects::nonNull)
                         .collect(Collectors.joining(" "));
-
+                // TODO @疯狂：要不写入评论的时候，把商品图片、商品属性，都冗余进去。因为这种东西有“快照”的需求。商品后续会编辑掉
                 vo.setSkuPicUrl(sku.getPicUrl());
                 vo.setSpuName(vo.getSpuName() + " " + propertyNames);
             });

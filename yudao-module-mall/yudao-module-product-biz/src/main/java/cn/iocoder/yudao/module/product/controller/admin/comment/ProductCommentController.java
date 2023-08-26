@@ -38,10 +38,9 @@ public class ProductCommentController {
     @PreAuthorize("@ss.hasPermission('product:comment:query')")
     public CommonResult<PageResult<ProductCommentRespVO>> getCommentPage(@Valid ProductCommentPageReqVO pageVO) {
         PageResult<ProductCommentDO> pageResult = productCommentService.getCommentPage(pageVO);
-
+        // 拼接返回
         List<ProductSkuDO> skuList = productSkuService.getSkuList(
                 convertSet(pageResult.getList(), ProductCommentDO::getSkuId));
-
         return success(ProductCommentConvert.INSTANCE.convertPage(pageResult, skuList));
     }
 

@@ -99,7 +99,6 @@ public class MemberLevelServiceImpl implements MemberLevelService {
             if (ObjUtil.notEqual(levelDO.getName(), name)) {
                 continue;
             }
-
             if (id == null || !id.equals(levelDO.getId())) {
                 throw exception(LEVEL_NAME_EXISTS, levelDO.getName());
             }
@@ -151,7 +150,6 @@ public class MemberLevelServiceImpl implements MemberLevelService {
         validateExperienceOutRange(list, id, level, experience);
     }
 
-    // TODO 有 Service 提供接口哈，不直接调用对方的 memberUserMapper
     @VisibleForTesting
     void validateLevelHasUser(Long id) {
         Long count = memberUserService.getUserCountByLevelId(id);
@@ -195,37 +193,36 @@ public class MemberLevelServiceImpl implements MemberLevelService {
             return;
         }
 
-        // 记录等级变动
+        // 1. 记录等级变动
         MemberLevelRecordDO levelRecord = new MemberLevelRecordDO()
-                .setUserId(user.getId())
-                .setRemark(updateReqVO.getReason());
+                .setUserId(user.getId()).setRemark(updateReqVO.getReason());
         MemberLevelDO memberLevel = null;
         if (updateReqVO.getLevelId() == null) {
-            // 取消用户等级时，为扣减经验
+            // 取消用户等级时，需要扣减经验
             levelRecord.setExperience(-user.getExperience());
+            // TODO @疯狂：这里是不是也要设置下 setUserExperience 属性；
             levelRecord.setDescription("管理员取消了等级");
         } else {
-            memberLevel = validateLevelExists(updateReqVO.getLevelId());
             // 复制等级配置
+            memberLevel = validateLevelExists(updateReqVO.getLevelId());
             MemberLevelRecordConvert.INSTANCE.copyTo(memberLevel, levelRecord);
             // 变动经验值 = 等级的升级经验 - 会员当前的经验；正数为增加经验，负数为扣减经验
             levelRecord.setExperience(memberLevel.getExperience() - user.getExperience());
-            // 会员当前的经验 = 等级的升级经验
-            levelRecord.setUserExperience(memberLevel.getExperience());
+            levelRecord.setUserExperience(memberLevel.getExperience()); // 会员当前的经验 = 等级的升级经验
             levelRecord.setDescription("管理员调整为：" + memberLevel.getName());
         }
         memberLevelRecordService.createLevelRecord(levelRecord);
 
-        // 记录会员经验变动
+        // 2. 记录会员经验变动
         memberExperienceRecordService.createExperienceRecord(user.getId(),
                 levelRecord.getExperience(), levelRecord.getUserExperience(),
                 MemberExperienceBizTypeEnum.ADMIN, String.valueOf(MemberExperienceBizTypeEnum.ADMIN.getType()));
 
-        // 更新会员表上的等级编号、经验值
+        // 3. 更新会员表上的等级编号、经验值
         memberUserService.updateUserLevel(user.getId(), updateReqVO.getLevelId(),
                 levelRecord.getUserExperience());
 
-        // 给会员发送等级变动消息
+        // 4. 给会员发送等级变动消息
         notifyMemberLevelChange(user.getId(), memberLevel);
     }
 
@@ -239,31 +236,27 @@ public class MemberLevelServiceImpl implements MemberLevelService {
             experience = -experience;
         }
 
+        // 1. 创建经验记录
         MemberUserDO user = memberUserService.getUser(userId);
-
-        int userExperience = NumberUtil.max(user.getExperience() + experience, 0);
+        int userExperience = NumberUtil.max(user.getExperience() + experience, 0); // 防止扣出负数
         MemberLevelRecordDO levelRecord = new MemberLevelRecordDO()
                 .setUserId(user.getId())
                 .setExperience(experience)
-                // 防止扣出负数
                 .setUserExperience(userExperience);
-
-        // 创建经验记录
         memberExperienceRecordService.createExperienceRecord(userId, experience, userExperience,
                 bizType, bizId);
 
-        // 计算会员等级
+        // 2.1 保存等级变更记录
         MemberLevelDO newLevel = calculateNewLevel(user, userExperience);
         if (newLevel != null) {
-            // 复制等级配置
             MemberLevelRecordConvert.INSTANCE.copyTo(newLevel, levelRecord);
-            // 保存等级变更记录
             memberLevelRecordService.createLevelRecord(levelRecord);
-            // 给会员发送等级变动消息
+
+            // 2.2 给会员发送等级变动消息
             notifyMemberLevelChange(userId, newLevel);
         }
 
-        // 更新会员表上的等级编号、经验值
+        // 3. 更新会员表上的等级编号、经验值
         memberUserService.updateUserLevel(user.getId(), levelRecord.getLevelId(), userExperience);
     }
 
@@ -301,4 +294,5 @@ public class MemberLevelServiceImpl implements MemberLevelService {
     private void notifyMemberLevelChange(Long userId, MemberLevelDO level) {
         //todo: 给会员发消息
     }
+
 }

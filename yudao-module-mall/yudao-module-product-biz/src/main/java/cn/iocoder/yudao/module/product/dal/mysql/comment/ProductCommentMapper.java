@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.product.dal.mysql.comment;
 
-
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -54,11 +53,10 @@ public interface ProductCommentMapper extends BaseMapperX<ProductCommentDO> {
         return selectPage(reqVO, queryWrapper);
     }
 
-    default ProductCommentDO selectByUserIdAndOrderItemIdAndSpuId(Long userId, Long orderItemId, Long skuId) {
+    default ProductCommentDO selectByUserIdAndOrderItemId(Long userId, Long orderItemId) {
         return selectOne(new LambdaQueryWrapperX<ProductCommentDO>()
                 .eq(ProductCommentDO::getUserId, userId)
-                .eq(ProductCommentDO::getOrderItemId, orderItemId)
-                .eq(ProductCommentDO::getSpuId, skuId));
+                .eq(ProductCommentDO::getOrderItemId, orderItemId));
     }
 
     default Long selectCountBySpuId(Long spuId, Boolean visible, Integer type) {

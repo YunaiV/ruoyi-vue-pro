@@ -32,6 +32,7 @@ public enum MemberPointBizTypeEnum implements IntArrayValuable {
      * 描述
      */
     private final String description;
+    // TODO @疯狂：改成 add 会好点。一个是属性我们尽量不要 isXXX；另外尽量正向思维，不取反；
     /**
      * 是否为扣减积分
      */
@@ -41,7 +42,6 @@ public enum MemberPointBizTypeEnum implements IntArrayValuable {
     public int[] array() {
         return new int[0];
     }
-
 
     public static MemberPointBizTypeEnum getByType(Integer type) {
         return EnumUtil.getBy(MemberPointBizTypeEnum.class,

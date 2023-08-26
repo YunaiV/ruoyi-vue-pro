@@ -72,22 +72,22 @@ public class MemberPointRecordServiceImpl implements MemberPointRecordService {
     public void createPointRecord(Long userId, Integer point, MemberPointBizTypeEnum bizType, String bizId) {
         MemberPointConfigDO pointConfig = memberPointConfigService.getPointConfig();
         if (pointConfig == null || pointConfig.getTradeGivePoint() == null) {
-            log.warn("增加积分失败：积分配置”1 元赠送多少分“未设置, userId={}, point={}, bizType={}, bizId={}",
+            log.error("[createPointRecord][增加积分失败：tradeGivePoint 未配置，userId({}) point({}) bizType({}) bizId({})]",
                     userId, point, bizType.getType(), bizId);
             return;
         }
 
-        // 根据配置的比例，换算实际的积分
+        // 1. 根据配置的比例，换算实际的积分
         point = point * pointConfig.getTradeGivePoint();
         if (bizType.isReduce() && point > 0) {
             point = -point;
         }
 
+        // 2. 增加积分记录
         MemberUserDO user = memberUserService.getUser(userId);
         Integer userPoint = ObjectUtil.defaultIfNull(user.getPoint(), 0);
-        // 用户变动后的积分，防止扣出负数
+        // 用户变动后的积分，防止扣出负数 TODO 疯狂：积分是不是允许扣到负数。因为它是跟有钱有关的东西，不能让商家出现资金损失
         Integer totalPoint = NumberUtil.max(userPoint + point, 0);
-        // 增加积分记录
         MemberPointRecordDO recordDO = new MemberPointRecordDO()
                 .setUserId(userId)
                 .setBizId(bizId)
@@ -98,7 +98,7 @@ public class MemberPointRecordServiceImpl implements MemberPointRecordService {
                 .setTotalPoint(totalPoint);
         recordMapper.insert(recordDO);
 
-        // 更新用户积分
+        // 3. 更新用户积分
         memberUserService.updateUserPoint(userId, totalPoint);
     }
 

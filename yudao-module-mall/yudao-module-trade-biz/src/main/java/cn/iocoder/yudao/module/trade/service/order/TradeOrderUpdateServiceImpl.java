@@ -667,6 +667,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                 TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus()));
     }
 
+    // TODO @疯狂：直接 this 调用，async 不生效哈。全局搜下 getSelf();
     @Async
     protected void addUserExperienceAsync(Long userId, Integer payPrice, Long orderId) {
         int bizType = MemberExperienceBizTypeEnum.ORDER.getType();

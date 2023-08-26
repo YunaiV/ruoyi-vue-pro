@@ -58,6 +58,7 @@ public interface MemberUserApi {
      */
     MemberUserRespDTO getUserByMobile(String mobile);
 
+    // TODO @疯狂：是不是新的类，MemberPointApi？
     /**
      * 增加用户积分
      *
@@ -67,4 +68,5 @@ public interface MemberUserApi {
      * @param bizId   业务编号
      */
     void addPoint(Long userId, Integer point, Integer bizType, String bizId);
+
 }
