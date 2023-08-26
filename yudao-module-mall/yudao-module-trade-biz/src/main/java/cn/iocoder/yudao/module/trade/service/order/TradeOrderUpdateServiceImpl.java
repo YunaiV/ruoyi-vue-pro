@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
@@ -13,6 +14,7 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
 import cn.iocoder.yudao.module.member.api.level.MemberLevelApi;
+import cn.iocoder.yudao.module.member.api.point.MemberPointApi;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.member.enums.MemberExperienceBizTypeEnum;
@@ -110,6 +112,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private MemberUserApi memberUserApi;
     @Resource
     private MemberLevelApi memberLevelApi;
+    @Resource
+    private MemberPointApi memberPointApi;
 
     @Resource
     private ProductCommentApi productCommentApi;
@@ -346,9 +350,9 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // TODO 芋艿：OrderLog
 
         // 增加用户积分
-        addUserPointAsync(order.getUserId(), order.getPayPrice(), order.getId());
+        getSelf().addUserPointAsync(order.getUserId(), order.getPayPrice(), order.getId());
         // 增加用户经验
-        addUserExperienceAsync(order.getUserId(), order.getPayPrice(), order.getId());
+        getSelf().addUserExperienceAsync(order.getUserId(), order.getPayPrice(), order.getId());
     }
 
     /**
@@ -617,9 +621,9 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // TODO 芋艿：未来如果有分佣，需要更新相关分佣订单为已失效
 
         // 扣减用户积分
-        reduceUserPointAsync(order.getUserId(), orderRefundPrice, afterSaleId);
+        getSelf().reduceUserPointAsync(order.getUserId(), orderRefundPrice, afterSaleId);
         // 扣减用户经验
-        reduceUserExperienceAsync(order.getUserId(), orderRefundPrice, afterSaleId);
+        getSelf().reduceUserExperienceAsync(order.getUserId(), orderRefundPrice, afterSaleId);
     }
 
     @Override
@@ -667,7 +671,6 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                 TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus()));
     }
 
-    // TODO @疯狂：直接 this 调用，async 不生效哈。全局搜下 getSelf();
     @Async
     protected void addUserExperienceAsync(Long userId, Integer payPrice, Long orderId) {
         int bizType = MemberExperienceBizTypeEnum.ORDER.getType();
@@ -683,12 +686,22 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Async
     protected void addUserPointAsync(Long userId, Integer payPrice, Long orderId) {
         int bizType = MemberPointBizTypeEnum.ORDER_BUY.getType();
-        memberUserApi.addPoint(userId, payPrice, bizType, String.valueOf(orderId));
+        memberPointApi.addPoint(userId, payPrice, bizType, String.valueOf(orderId));
     }
 
     @Async
     protected void reduceUserPointAsync(Long userId, Integer refundPrice, Long afterSaleId) {
         int bizType = MemberPointBizTypeEnum.ORDER_CANCEL.getType();
-        memberUserApi.addPoint(userId, -refundPrice, bizType, String.valueOf(afterSaleId));
+        memberPointApi.addPoint(userId, -refundPrice, bizType, String.valueOf(afterSaleId));
     }
+
+    /**
+     * 获得自身的代理对象，解决 AOP 生效问题
+     *
+     * @return 自己
+     */
+    private TradeOrderUpdateServiceImpl getSelf() {
+        return SpringUtil.getBean(getClass());
+    }
+
 }

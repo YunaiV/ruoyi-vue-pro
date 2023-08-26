@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.member.api.user;
 
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
-import cn.iocoder.yudao.module.member.enums.point.MemberPointBizTypeEnum;
 
 import java.util.Collection;
 import java.util.List;
@@ -57,16 +56,4 @@ public interface MemberUserApi {
      * @return 用户信息
      */
     MemberUserRespDTO getUserByMobile(String mobile);
-
-    // TODO @疯狂：是不是新的类，MemberPointApi？
-    /**
-     * 增加用户积分
-     *
-     * @param userId  用户编号
-     * @param point   积分
-     * @param bizType 业务类型 {@link MemberPointBizTypeEnum}
-     * @param bizId   业务编号
-     */
-    void addPoint(Long userId, Integer point, Integer bizType, String bizId);
-
 }

@@ -86,6 +86,15 @@ public class ProductCommentDO extends BaseDO {
      * 关联 {@link ProductSkuDO#getId()}
      */
     private Long skuId;
+    /**
+     * 商品 SKU 图片地址
+     */
+    private String skuPicUrl;
+    /**
+     * 属性数组，JSON 格式
+     */
+    @TableField(typeHandler = ProductSkuDO.PropertyTypeHandler.class)
+    private List<ProductSkuDO.Property> skuProperties;
 
     /**
      * 是否可见

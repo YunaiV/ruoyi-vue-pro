@@ -200,7 +200,7 @@ public class MemberLevelServiceImpl implements MemberLevelService {
         if (updateReqVO.getLevelId() == null) {
             // 取消用户等级时，需要扣减经验
             levelRecord.setExperience(-user.getExperience());
-            // TODO @疯狂：这里是不是也要设置下 setUserExperience 属性；
+            levelRecord.setUserExperience(0);
             levelRecord.setDescription("管理员取消了等级");
         } else {
             // 复制等级配置
@@ -232,7 +232,7 @@ public class MemberLevelServiceImpl implements MemberLevelService {
         if (experience == 0) {
             return;
         }
-        if (bizType.isReduce() && experience > 0) {
+        if (!bizType.isAdd() && experience > 0) {
             experience = -experience;
         }
 

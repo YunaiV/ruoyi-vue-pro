@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.member.service.point;
 
-import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
@@ -75,15 +74,15 @@ public class MemberPointRecordServiceImpl implements MemberPointRecordService {
 
         // 1. 根据配置的比例，换算实际的积分
         point = point * pointConfig.getTradeGivePoint();
-        if (bizType.isReduce() && point > 0) {
+        if (!bizType.isAdd() && point > 0) {
             point = -point;
         }
 
         // 2. 增加积分记录
         MemberUserDO user = memberUserService.getUser(userId);
         Integer userPoint = ObjectUtil.defaultIfNull(user.getPoint(), 0);
-        // 用户变动后的积分，防止扣出负数 TODO 疯狂：积分是不是允许扣到负数。因为它是跟有钱有关的东西，不能让商家出现资金损失
-        Integer totalPoint = NumberUtil.max(userPoint + point, 0);
+        // 用户变动后的积分
+        Integer totalPoint = userPoint + point;
         MemberPointRecordDO recordDO = new MemberPointRecordDO()
                 .setUserId(userId)
                 .setBizId(bizId)

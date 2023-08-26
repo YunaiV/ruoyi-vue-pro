@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.convert.comment;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -91,7 +92,7 @@ public interface ProductCommentConvert {
 
     @Mapping(target = "scores",
             expression = "java(convertScores(createReqDTO.getDescriptionScores(), createReqDTO.getBenefitScores()))")
-    default ProductCommentDO convert(ProductCommentCreateReqDTO createReqDTO, ProductSpuDO spuDO, MemberUserRespDTO user) {
+    default ProductCommentDO convert(ProductCommentCreateReqDTO createReqDTO, ProductSpuDO spuDO, ProductSkuDO skuDO, MemberUserRespDTO user) {
         ProductCommentDO commentDO = convert(createReqDTO);
         if (user != null) {
             commentDO.setUserId(user.getId());
@@ -101,6 +102,10 @@ public interface ProductCommentConvert {
         if (spuDO != null) {
             commentDO.setSpuId(spuDO.getId());
             commentDO.setSpuName(spuDO.getName());
+        }
+        if (skuDO != null) {
+            commentDO.setSkuPicUrl(skuDO.getPicUrl());
+            commentDO.setSkuProperties(skuDO.getProperties());
         }
         return commentDO;
     }
@@ -117,27 +122,32 @@ public interface ProductCommentConvert {
 
     List<AppProductCommentRespVO> convertList02(List<ProductCommentDO> list);
 
-    default ProductCommentDO convert(ProductCommentCreateReqVO createReq, ProductSpuDO spu) {
+    default ProductCommentDO convert(ProductCommentCreateReqVO createReq, ProductSpuDO spuDO, ProductSkuDO skuDO) {
         ProductCommentDO commentDO = convert(createReq);
-        if (spu != null) {
-            commentDO.setSpuId(spu.getId()).setSpuName(spu.getName());
+        if (spuDO != null) {
+            commentDO.setSpuId(spuDO.getId());
+            commentDO.setSpuName(spuDO.getName());
+        }
+        if (skuDO != null) {
+            commentDO.setSkuPicUrl(skuDO.getPicUrl());
+            commentDO.setSkuProperties(skuDO.getProperties());
         }
         return commentDO;
     }
 
-    default PageResult<ProductCommentRespVO> convertPage(PageResult<ProductCommentDO> pageResult,
-                                                         List<ProductSkuDO> skus) {
+    default PageResult<ProductCommentRespVO> convertPage2(PageResult<ProductCommentDO> pageResult) {
+        Map<Long, List<ProductSkuDO.Property>> propertiesMap = convertMap(pageResult.getList(),
+                ProductCommentDO::getId,
+                // 这里会有NULL异常, 需要处理一下
+                comment -> CollUtil.emptyIfNull(comment.getSkuProperties()));
+
         PageResult<ProductCommentRespVO> result = convertPage(pageResult);
-        // 拼接数据
-        Map<Long, ProductSkuDO> skuMap = convertMap(skus, ProductSkuDO::getId);
         for (ProductCommentRespVO vo : result.getList()) {
-            findAndThen(skuMap, vo.getSkuId(), sku -> {
-                String propertyNames = sku.getProperties().stream()
+            findAndThen(propertiesMap, vo.getId(), properties -> {
+                String propertyNames = properties.stream()
                         .map(ProductSkuDO.Property::getValueName)
                         .filter(Objects::nonNull)
                         .collect(Collectors.joining(" "));
-                // TODO @疯狂：要不写入评论的时候，把商品图片、商品属性，都冗余进去。因为这种东西有“快照”的需求。商品后续会编辑掉
-                vo.setSkuPicUrl(sku.getPicUrl());
                 vo.setSpuName(vo.getSpuName() + " " + propertyNames);
             });
         }
