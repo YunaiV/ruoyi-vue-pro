@@ -36,7 +36,7 @@ public class CouponDO extends BaseDO {
      *
      * 关联 {@link CouponTemplateDO#getId()}
      */
-    private Integer templateId;
+    private Long templateId;
     /**
      * 优惠劵名
      *

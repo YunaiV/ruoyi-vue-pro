@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageItemRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponSendReqVO;
 import cn.iocoder.yudao.module.promotion.convert.coupon.CouponConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
 import cn.iocoder.yudao.module.promotion.service.coupon.CouponService;
@@ -72,4 +73,11 @@ public class CouponController {
         return success(pageResulVO);
     }
 
+    @PostMapping("/send")
+    @Operation(summary = "发送优惠劵")
+    @PreAuthorize("@ss.hasPermission('promotion:coupon:send')")
+    public CommonResult<Boolean> sendCoupon(@Valid @RequestBody CouponSendReqVO reqVO) {
+        Boolean result = couponService.sendCoupon(reqVO.getTemplateId(), reqVO.getUserIds());
+        return success(result);
+    }
 }
