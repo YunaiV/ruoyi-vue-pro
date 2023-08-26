@@ -43,4 +43,7 @@ public class MemberUserRespVO extends MemberUserBaseVO {
     @Schema(description = "用户分组", example = "购物达人")
     private String groupName;
 
+    @Schema(description = "用户经验值", example = "100")
+    private Integer experience;
+
 }
