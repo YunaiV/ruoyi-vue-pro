@@ -32,7 +32,7 @@ public class ProductCommentController {
     @PreAuthorize("@ss.hasPermission('product:comment:query')")
     public CommonResult<PageResult<ProductCommentRespVO>> getCommentPage(@Valid ProductCommentPageReqVO pageVO) {
         PageResult<ProductCommentDO> pageResult = productCommentService.getCommentPage(pageVO);
-        return success(ProductCommentConvert.INSTANCE.convertPage2(pageResult));
+        return success(ProductCommentConvert.INSTANCE.convertPage(pageResult));
     }
 
     @PutMapping("/update-visible")

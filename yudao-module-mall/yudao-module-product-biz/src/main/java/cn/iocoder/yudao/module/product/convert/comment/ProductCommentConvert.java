@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.product.convert.comment;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -23,10 +22,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 
 /**
@@ -122,35 +118,15 @@ public interface ProductCommentConvert {
 
     List<AppProductCommentRespVO> convertList02(List<ProductCommentDO> list);
 
-    default ProductCommentDO convert(ProductCommentCreateReqVO createReq, ProductSpuDO spuDO, ProductSkuDO skuDO) {
+    default ProductCommentDO convert(ProductCommentCreateReqVO createReq, ProductSpuDO spu, ProductSkuDO sku) {
         ProductCommentDO commentDO = convert(createReq);
-        if (spuDO != null) {
-            commentDO.setSpuId(spuDO.getId());
-            commentDO.setSpuName(spuDO.getName());
+        if (spu != null) {
+            commentDO.setSpuId(spu.getId()).setSpuName(spu.getName());
         }
-        if (skuDO != null) {
-            commentDO.setSkuPicUrl(skuDO.getPicUrl());
-            commentDO.setSkuProperties(skuDO.getProperties());
+        if (sku != null) {
+            commentDO.setSkuPicUrl(sku.getPicUrl()).setSkuProperties(sku.getProperties());
         }
         return commentDO;
     }
 
-    default PageResult<ProductCommentRespVO> convertPage2(PageResult<ProductCommentDO> pageResult) {
-        Map<Long, List<ProductSkuDO.Property>> propertiesMap = convertMap(pageResult.getList(),
-                ProductCommentDO::getId,
-                // 这里会有NULL异常, 需要处理一下
-                comment -> CollUtil.emptyIfNull(comment.getSkuProperties()));
-
-        PageResult<ProductCommentRespVO> result = convertPage(pageResult);
-        for (ProductCommentRespVO vo : result.getList()) {
-            findAndThen(propertiesMap, vo.getId(), properties -> {
-                String propertyNames = properties.stream()
-                        .map(ProductSkuDO.Property::getValueName)
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.joining(" "));
-                vo.setSpuName(vo.getSpuName() + " " + propertyNames);
-            });
-        }
-        return result;
-    }
 }

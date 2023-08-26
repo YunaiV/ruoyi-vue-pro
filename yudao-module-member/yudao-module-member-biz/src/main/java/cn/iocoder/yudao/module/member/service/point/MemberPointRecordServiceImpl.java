@@ -81,17 +81,12 @@ public class MemberPointRecordServiceImpl implements MemberPointRecordService {
         // 2. 增加积分记录
         MemberUserDO user = memberUserService.getUser(userId);
         Integer userPoint = ObjectUtil.defaultIfNull(user.getPoint(), 0);
-        // 用户变动后的积分
-        Integer totalPoint = userPoint + point;
-        MemberPointRecordDO recordDO = new MemberPointRecordDO()
-                .setUserId(userId)
-                .setBizId(bizId)
-                .setBizType(bizType.getType())
-                .setTitle(bizType.getName())
-                .setDescription(StrUtil.format(bizType.getDescription(), point))
-                .setPoint(point)
-                .setTotalPoint(totalPoint);
-        recordMapper.insert(recordDO);
+        Integer totalPoint = userPoint + point; // 用户变动后的积分
+        MemberPointRecordDO record = new MemberPointRecordDO()
+                .setUserId(userId).setBizId(bizId).setBizType(bizType.getType())
+                .setTitle(bizType.getName()).setDescription(StrUtil.format(bizType.getDescription(), point))
+                .setPoint(point).setTotalPoint(totalPoint);
+        recordMapper.insert(record);
 
         // 3. 更新用户积分
         memberUserService.updateUserPoint(userId, totalPoint);
