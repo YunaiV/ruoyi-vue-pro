@@ -5,8 +5,6 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
-import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.MemberPointRecordPageReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.point.MemberPointConfigDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.point.MemberPointRecordDO;
@@ -43,8 +41,6 @@ public class MemberPointRecordServiceImpl implements MemberPointRecordService {
     private MemberPointConfigService memberPointConfigService;
 
     @Resource
-    private MemberUserApi memberUserApi;
-    @Resource
     private MemberUserService memberUserService;
 
     @Override
@@ -52,12 +48,12 @@ public class MemberPointRecordServiceImpl implements MemberPointRecordService {
         // 根据用户昵称查询出用户 ids
         Set<Long> userIds = null;
         if (StringUtils.isNotBlank(pageReqVO.getNickname())) {
-            List<MemberUserRespDTO> users = memberUserApi.getUserListByNickname(pageReqVO.getNickname());
+            List<MemberUserDO> users = memberUserService.getUserListByNickname(pageReqVO.getNickname());
             // 如果查询用户结果为空直接返回无需继续查询
             if (CollectionUtils.isEmpty(users)) {
                 return PageResult.empty();
             }
-            userIds = convertSet(users, MemberUserRespDTO::getId);
+            userIds = convertSet(users, MemberUserDO::getId);
         }
         // 执行查询
         return recordMapper.selectPage(pageReqVO, userIds);
