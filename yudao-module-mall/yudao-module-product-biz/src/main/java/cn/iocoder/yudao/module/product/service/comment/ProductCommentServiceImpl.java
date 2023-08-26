@@ -53,25 +53,29 @@ public class ProductCommentServiceImpl implements ProductCommentService {
 
     @Override
     public void createComment(ProductCommentCreateReqVO createReqVO) {
-        // 校验商品
-        ProductSpuDO spu = validateSpuBySkuId(createReqVO.getSkuId());
+        // 校验 SKU
+        ProductSkuDO skuDO = validateSku(createReqVO.getSkuId());
+        // 校验 SPU
+        ProductSpuDO spuDO = validateSpu(skuDO.getSpuId());
 
         // 创建评论
-        ProductCommentDO comment = ProductCommentConvert.INSTANCE.convert(createReqVO, spu);
+        ProductCommentDO comment = ProductCommentConvert.INSTANCE.convert(createReqVO, spuDO, skuDO);
         productCommentMapper.insert(comment);
     }
 
     @Override
     public Long createComment(ProductCommentCreateReqDTO createReqDTO) {
-        // 校验商品
-        ProductSpuDO spuDO = validateSpuBySkuId(createReqDTO.getSkuId());
+        // 校验 SKU
+        ProductSkuDO skuDO = validateSku(createReqDTO.getSkuId());
+        // 校验 SPU
+        ProductSpuDO spuDO = validateSpu(skuDO.getSpuId());
         // 校验评论
         validateCommentExists(createReqDTO.getUserId(), createReqDTO.getOrderId());
         // 获取用户详细信息
         MemberUserRespDTO user = memberUserApi.getUser(createReqDTO.getUserId());
 
         // 创建评论
-        ProductCommentDO comment = ProductCommentConvert.INSTANCE.convert(createReqDTO, spuDO, user);
+        ProductCommentDO comment = ProductCommentConvert.INSTANCE.convert(createReqDTO, spuDO, skuDO, user);
         productCommentMapper.insert(comment);
         return comment.getId();
     }
@@ -79,7 +83,7 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     /**
      * 判断当前订单的当前商品用户是否评价过
      *
-     * @param userId 用户编号
+     * @param userId      用户编号
      * @param orderItemId 订单项编号
      */
     private void validateCommentExists(Long userId, Long orderItemId) {
@@ -103,13 +107,6 @@ public class ProductCommentServiceImpl implements ProductCommentService {
             throw exception(SPU_NOT_EXISTS);
         }
         return spu;
-    }
-
-    private ProductSpuDO validateSpuBySkuId(Long skuId) {
-        // 通过 sku ID 拿到 spu 相关信息
-        ProductSkuDO sku = validateSku(skuId);
-        // 校验 spu 如果存在返回详情
-        return validateSpu(sku.getSpuId());
     }
 
     @Override
