@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.member.enums;
 
+import cn.hutool.core.util.EnumUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import java.util.Objects;
 
 /**
  * 会员经验 - 业务类型
@@ -15,16 +18,33 @@ public enum MemberExperienceBizTypeEnum {
     /**
      * 管理员调整、邀请新用户、下单、退单、签到、抽奖
      */
-    ADMIN(0, "管理员调整","管理员调整获得 {} 经验"),
-    INVITE_REGISTER(1, "邀新奖励","邀请好友获得 {} 经验"),
-    ORDER(2, "下单奖励", "下单获得 {} 经验"),
-    REFUND(3, "退单扣除","退单获得 {} 经验"),
-    SIGN_IN(4, "签到奖励","签到获得 {} 经验"),
-    LOTTERY(5, "抽奖奖励","抽奖获得 {} 经验"),
+    ADMIN(0, "管理员调整", "管理员调整获得 {} 经验", false),
+    INVITE_REGISTER(1, "邀新奖励", "邀请好友获得 {} 经验", false),
+    ORDER(2, "下单奖励", "下单获得 {} 经验", false),
+    REFUND(3, "退单扣除", "退单获得 {} 经验", true),
+    SIGN_IN(4, "签到奖励", "签到获得 {} 经验", false),
+    LOTTERY(5, "抽奖奖励", "抽奖获得 {} 经验", false),
     ;
 
+    /**
+     * 业务类型
+     */
     private final int type;
+    /**
+     * 标题
+     */
     private final String title;
+    /**
+     * 描述
+     */
     private final String description;
+    /**
+     * 是否为扣减积分
+     */
+    private final boolean isReduce;
 
+    public static MemberExperienceBizTypeEnum getByType(Integer type) {
+        return EnumUtil.getBy(MemberExperienceBizTypeEnum.class,
+                e -> Objects.equals(type, e.getType()));
+    }
 }

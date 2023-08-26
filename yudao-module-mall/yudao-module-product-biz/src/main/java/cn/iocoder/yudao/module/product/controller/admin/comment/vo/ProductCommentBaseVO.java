@@ -11,11 +11,9 @@ import java.util.List;
 public class ProductCommentBaseVO {
 
     @Schema(description = "评价人", requiredMode = Schema.RequiredMode.REQUIRED, example = "16868")
-    @NotNull(message = "评价人不能为空")
     private Long userId;
 
     @Schema(description = "评价订单项", requiredMode = Schema.RequiredMode.REQUIRED, example = "19292")
-    @NotNull(message = "评价订单项不能为空")
     private Long orderItemId;
 
     @Schema(description = "评价人名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "小姑凉")

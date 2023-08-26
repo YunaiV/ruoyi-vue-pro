@@ -20,6 +20,7 @@ public interface ProductCommentMapper extends BaseMapperX<ProductCommentDO> {
                 .eqIfPresent(ProductCommentDO::getOrderId, reqVO.getOrderId())
                 .eqIfPresent(ProductCommentDO::getSpuId, reqVO.getSpuId())
                 .eqIfPresent(ProductCommentDO::getScores, reqVO.getScores())
+                .eqIfPresent(ProductCommentDO::getReplyStatus, reqVO.getReplyStatus())
                 .betweenIfPresent(ProductCommentDO::getCreateTime, reqVO.getCreateTime())
                 .likeIfPresent(ProductCommentDO::getSpuName, reqVO.getSpuName())
                 .orderByDesc(ProductCommentDO::getId));

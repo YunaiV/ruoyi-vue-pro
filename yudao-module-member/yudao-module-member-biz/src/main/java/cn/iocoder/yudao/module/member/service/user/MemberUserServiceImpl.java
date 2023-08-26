@@ -239,4 +239,24 @@ public class MemberUserServiceImpl implements MemberUserService {
         );
     }
 
+    @Override
+    public Long getUserCountByGroupId(Long groupId) {
+        return memberUserMapper.selectCountByGroupId(groupId);
+    }
+
+    @Override
+    public Long getUserCountByLevelId(Long levelId) {
+        return memberUserMapper.selectCountByLevelId(levelId);
+    }
+
+    @Override
+    public Long getUserCountByTagId(Long tagId) {
+        return memberUserMapper.selectCountByTagId(tagId);
+    }
+
+    @Override
+    public void updateUserPoint(Long userId, Integer point) {
+        memberUserMapper.updateById(new MemberUserDO().setId(userId).setPoint(point));
+    }
+
 }

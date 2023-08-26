@@ -14,7 +14,6 @@ import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelRecordDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.level.MemberLevelMapper;
-import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
 import cn.iocoder.yudao.module.member.enums.MemberExperienceBizTypeEnum;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import com.google.common.annotations.VisibleForTesting;
@@ -48,8 +47,6 @@ public class MemberLevelServiceImpl implements MemberLevelService {
     private MemberLevelRecordService memberLevelRecordService;
     @Resource
     private MemberExperienceRecordService memberExperienceRecordService;
-    @Resource
-    private MemberUserMapper memberUserMapper;
     @Resource
     private MemberUserService memberUserService;
 
@@ -157,7 +154,7 @@ public class MemberLevelServiceImpl implements MemberLevelService {
     // TODO 有 Service 提供接口哈，不直接调用对方的 memberUserMapper
     @VisibleForTesting
     void validateLevelHasUser(Long id) {
-        Long count = memberUserMapper.selectCountByLevelId(id);
+        Long count = memberUserService.getUserCountByLevelId(id);
         if (count > 0) {
             throw exception(LEVEL_HAS_USER);
         }
@@ -238,8 +235,11 @@ public class MemberLevelServiceImpl implements MemberLevelService {
         if (experience == 0) {
             return;
         }
+        if (bizType.isReduce() && experience > 0) {
+            experience = -experience;
+        }
 
-        MemberUserDO user = memberUserMapper.selectById(userId);
+        MemberUserDO user = memberUserService.getUser(userId);
 
         int userExperience = NumberUtil.max(user.getExperience() + experience, 0);
         MemberLevelRecordDO levelRecord = new MemberLevelRecordDO()

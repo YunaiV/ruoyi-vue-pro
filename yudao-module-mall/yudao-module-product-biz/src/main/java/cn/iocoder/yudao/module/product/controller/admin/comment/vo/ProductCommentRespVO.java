@@ -52,4 +52,6 @@ public class ProductCommentRespVO extends ProductCommentBaseVO {
     @NotNull(message = "商品 SPU 名称不能为空")
     private String spuName;
 
+    @Schema(description = "商品 SKU 图片地址", example = "https://www.iocoder.cn/yudao.jpg")
+    private String skuPicUrl;
 }
