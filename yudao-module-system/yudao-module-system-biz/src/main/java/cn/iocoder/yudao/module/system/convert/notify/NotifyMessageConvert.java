@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.convert.notify;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.message.NotifyMessageRespVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyMessageDO;
 import org.mapstruct.Mapper;
@@ -13,7 +14,7 @@ import java.util.List;
  *
  * @author xrcoder
  */
-@Mapper
+@Mapper(uses = DateUtils.class)
 public interface NotifyMessageConvert {
 
     NotifyMessageConvert INSTANCE = Mappers.getMapper(NotifyMessageConvert.class);
@@ -23,6 +24,5 @@ public interface NotifyMessageConvert {
     List<NotifyMessageRespVO> convertList(List<NotifyMessageDO> list);
 
     PageResult<NotifyMessageRespVO> convertPage(PageResult<NotifyMessageDO> page);
-
 
 }
