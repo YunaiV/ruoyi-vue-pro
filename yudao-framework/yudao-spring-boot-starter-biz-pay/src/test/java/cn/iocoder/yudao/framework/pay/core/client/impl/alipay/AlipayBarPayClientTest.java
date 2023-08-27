@@ -28,7 +28,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.when;
 
 /**
- * {@link  AlipayBarPayClient} 单元测试
+ * {@link AlipayBarPayClient} 单元测试
  *
  * @author jason
  */
@@ -44,16 +44,14 @@ public class AlipayBarPayClientTest extends AbstractAlipayClientTest {
     }
 
     @Test
-    @DisplayName("支付宝条码支付,非免密码支付下单成功")
-    public void test_unified_order_success() throws AlipayApiException {
+    @DisplayName("支付宝条码支付：非免密码支付下单成功")
+    public void testUnifiedOrder_success() throws AlipayApiException {
+        // mock 方法
         String outTradeNo = randomString();
         String notifyUrl = randomURL();
         Integer price = randomInteger();
         String authCode = randomString();
-        // 准备返回对象
         AlipayTradePayResponse response = randomPojo(AlipayTradePayResponse.class, o -> o.setSubCode(""));
-
-        // mock
         when(defaultAlipayClient.execute(argThat((ArgumentMatcher<AlipayTradePayRequest>) request -> {
             assertInstanceOf(AlipayTradePayModel.class, request.getBizModel());
             assertEquals(notifyUrl, request.getNotifyUrl());
@@ -65,28 +63,33 @@ public class AlipayBarPayClientTest extends AbstractAlipayClientTest {
         }))).thenReturn(response);
         // 准备请求参数
         PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(notifyUrl, outTradeNo, price);
-        // 设置条码
         Map<String, String> extraParam = new HashMap<>();
         extraParam.put("auth_code", authCode);
         reqDTO.setChannelExtras(extraParam);
-        // 下单请求
+
+        // 调用方法
         PayOrderRespDTO resp = client.unifiedOrder(reqDTO);
         // 断言
         assertEquals(WAITING.getStatus(), resp.getStatus());
-        assertEquals(PayOrderDisplayModeEnum.BAR_CODE.getMode(), resp.getDisplayMode());
         assertEquals(outTradeNo, resp.getOutTradeNo());
+        assertNull(resp.getChannelOrderNo());
+        assertNull(resp.getChannelUserId());
+        assertNull(resp.getSuccessTime());
+        assertEquals(PayOrderDisplayModeEnum.BAR_CODE.getMode(), resp.getDisplayMode());
         assertEquals("", resp.getDisplayContent());
         assertSame(response, resp.getRawData());
+        assertNull(resp.getChannelErrorCode());
+        assertNull(resp.getChannelErrorMsg());
     }
 
     @Test
-    @DisplayName("支付宝条码支付,免密码支付下单成功")
-    public void test_unified_order_code_10000_success() throws AlipayApiException {
+    @DisplayName("支付宝条码支付：免密码支付下单成功")
+    public void testUnifiedOrder_code10000Success() throws AlipayApiException {
+        // mock 方法
         String outTradeNo = randomString();
         String channelNo = randomString();
         String channelUserId = randomString();
         Date payTime = randomDate();
-        // 准备返回对象
         AlipayTradePayResponse response = randomPojo(AlipayTradePayResponse.class, o -> {
             o.setSubCode("");
             o.setCode("10000");
@@ -95,16 +98,15 @@ public class AlipayBarPayClientTest extends AbstractAlipayClientTest {
             o.setBuyerUserId(channelUserId);
             o.setGmtPayment(payTime);
         });
-        // mock
         when(defaultAlipayClient.execute(argThat((ArgumentMatcher<AlipayTradePayRequest>) request -> true)))
                 .thenReturn(response);
         // 准备请求参数
         String authCode = randomString();
         PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(randomURL(), outTradeNo, randomInteger());
-        // 设置条码
         Map<String, String> extraParam = new HashMap<>();
         extraParam.put("auth_code", authCode);
         reqDTO.setChannelExtras(extraParam);
+
         // 下单请求
         PayOrderRespDTO resp = client.unifiedOrder(reqDTO);
         // 断言
@@ -113,45 +115,56 @@ public class AlipayBarPayClientTest extends AbstractAlipayClientTest {
         assertEquals(channelNo, resp.getChannelOrderNo());
         assertEquals(channelUserId, resp.getChannelUserId());
         assertEquals(LocalDateTimeUtil.of(payTime), resp.getSuccessTime());
+        assertEquals(PayOrderDisplayModeEnum.BAR_CODE.getMode(), resp.getDisplayMode());
+        assertEquals("", resp.getDisplayContent());
         assertSame(response, resp.getRawData());
+        assertNull(resp.getChannelErrorCode());
+        assertNull(resp.getChannelErrorMsg());
     }
 
     @Test
-    @DisplayName("支付宝条码支付,没有传条码")
-    public void test_unified_order_empty_auth_code() {
+    @DisplayName("支付宝条码支付：没有传条码")
+    public void testUnifiedOrder_emptyAuthCode() {
+        // 准备参数
         PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(randomURL(), randomString(), randomInteger());
-        // 断言
+
+        // 调用，并断言
         assertThrows(ServiceException.class, () -> client.unifiedOrder(reqDTO));
     }
 
     @Test
-    @DisplayName("支付宝条码支付,渠道返回失败")
+    @DisplayName("支付宝条码支付：渠道返回失败")
     public void test_unified_order_channel_failed() throws AlipayApiException {
-        // 准备响应对象
+        // mock 方法
         String subCode = randomString();
         String subMsg = randomString();
         AlipayTradePayResponse response = randomPojo(AlipayTradePayResponse.class, o -> {
             o.setSubCode(subCode);
             o.setSubMsg(subMsg);
         });
-        // mock
         when(defaultAlipayClient.execute(argThat((ArgumentMatcher<AlipayTradePayRequest>) request -> true)))
                 .thenReturn(response);
         // 准备请求参数
         String authCode = randomString();
         String outTradeNo = randomString();
         PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(randomURL(), outTradeNo, randomInteger());
-        // 设置条码
         Map<String, String> extraParam = new HashMap<>();
         extraParam.put("auth_code", authCode);
         reqDTO.setChannelExtras(extraParam);
-        // 下单请求
+
+        // 调用方法
         PayOrderRespDTO resp = client.unifiedOrder(reqDTO);
         // 断言
         assertEquals(CLOSED.getStatus(), resp.getStatus());
+        assertEquals(outTradeNo, resp.getOutTradeNo());
+        assertNull(resp.getChannelOrderNo());
+        assertNull(resp.getChannelUserId());
+        assertNull(resp.getSuccessTime());
+        assertNull(resp.getDisplayMode());
+        assertNull(resp.getDisplayContent());
+        assertSame(response, resp.getRawData());
         assertEquals(subCode, resp.getChannelErrorCode());
         assertEquals(subMsg, resp.getChannelErrorMsg());
-        assertSame(response, resp.getRawData());
-
     }
+
 }
