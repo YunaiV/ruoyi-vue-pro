@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.mybatis.core.mapper;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
@@ -75,10 +76,16 @@ public interface BaseMapperX<T> extends BaseMapper<T> {
     }
 
     default List<T> selectList(String field, Collection<?> values) {
+        if (CollUtil.isEmpty(values)) {
+            return CollUtil.newArrayList();
+        }
         return selectList(new QueryWrapper<T>().in(field, values));
     }
 
     default List<T> selectList(SFunction<T, ?> field, Collection<?> values) {
+        if (CollUtil.isEmpty(values)) {
+            return CollUtil.newArrayList();
+        }
         return selectList(new LambdaQueryWrapper<T>().in(field, values));
     }
 
