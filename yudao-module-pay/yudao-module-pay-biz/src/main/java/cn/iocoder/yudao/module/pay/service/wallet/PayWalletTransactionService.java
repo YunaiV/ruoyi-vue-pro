@@ -20,4 +20,6 @@ public interface PayWalletTransactionService {
      */
     PageResult<PayWalletTransactionDO> getWalletTransactionPage(Long userId, Integer userType,
                                                                 AppPayWalletTransactionPageReqVO pageVO);
+
+    Long addPayWalletTransaction(PayWalletTransactionDO payWalletTransaction);
 }

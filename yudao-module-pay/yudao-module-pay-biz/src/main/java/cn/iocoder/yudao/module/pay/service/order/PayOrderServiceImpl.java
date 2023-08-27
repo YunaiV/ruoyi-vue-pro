@@ -416,6 +416,11 @@ public class PayOrderServiceImpl implements PayOrderService {
     }
 
     @Override
+    public PayOrderExtensionDO getOrderExtensionByNo(String no) {
+        return orderExtensionMapper.selectByNo(no);
+    }
+
+    @Override
     public int syncOrder(LocalDateTime minCreateTime) {
         // 1. 查询指定创建时间内的待支付订单
         List<PayOrderExtensionDO> orderExtensions = orderExtensionMapper.selectListByStatusAndCreateTimeGe(

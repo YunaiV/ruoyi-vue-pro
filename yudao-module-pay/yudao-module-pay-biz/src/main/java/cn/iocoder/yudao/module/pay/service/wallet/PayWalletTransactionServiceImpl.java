@@ -21,7 +21,7 @@ import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.WALLET_NOT_FO
  */
 @Service
 @Slf4j
-public class PayWalletTransactionServiceImpl implements  PayWalletTransactionService{
+public class PayWalletTransactionServiceImpl implements PayWalletTransactionService {
     @Resource
     private PayWalletService payWalletService;
     @Resource
@@ -38,4 +38,12 @@ public class PayWalletTransactionServiceImpl implements  PayWalletTransactionSer
         return payWalletTransactionMapper.selectPageByWalletIdAndQueryType(payWallet.getId(),
                 WalletTransactionQueryTypeEnum.valueOf(pageVO.getType()), pageVO);
     }
+
+    @Override
+    public Long addPayWalletTransaction(PayWalletTransactionDO payWalletTransaction) {
+         payWalletTransactionMapper.insert(payWalletTransaction);
+         return payWalletTransaction.getId();
+    }
+
+
 }

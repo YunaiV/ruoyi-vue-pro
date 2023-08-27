@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.pay.core.enums.channel;
 
 import cn.hutool.core.util.ArrayUtil;
+import cn.iocoder.yudao.framework.pay.core.client.impl.NonePayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.impl.mock.MockPayClientConfig;
@@ -29,7 +30,9 @@ public enum PayChannelEnum {
     ALIPAY_QR("alipay_qr", "支付宝扫码支付", AlipayPayClientConfig.class),
     ALIPAY_BAR("alipay_bar", "支付宝条码支付", AlipayPayClientConfig.class),
 
-    MOCK("mock", "模拟支付", MockPayClientConfig.class);
+    MOCK("mock", "模拟支付", MockPayClientConfig.class),
+
+    WALLET("wallet", "钱包支付", NonePayClientConfig.class);
 
     /**
      * 编码

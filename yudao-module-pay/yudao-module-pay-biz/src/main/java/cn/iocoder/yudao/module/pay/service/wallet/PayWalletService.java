@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.pay.service.wallet;
 
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
 
 /**
  * 钱包 Service 接口
@@ -15,4 +16,6 @@ public interface PayWalletService {
      * @param userType 用户类型
      */
     PayWalletDO getPayWallet(Long userId, Integer userType);
+
+    PayWalletTransactionDO pay(String outTradeNo, Integer price);
 }

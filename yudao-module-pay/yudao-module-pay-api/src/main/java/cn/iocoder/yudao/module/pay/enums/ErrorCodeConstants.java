@@ -43,6 +43,7 @@ public interface ErrorCodeConstants {
 
     // ========== 钱包模块(退款) 1007007000 ==========
     ErrorCode WALLET_NOT_FOUND = new ErrorCode(1007007000, "用户钱包不存在");
+    ErrorCode WALLET_NOT_ENOUGH = new ErrorCode(1007007001, "钱包余额不足");
 
     // ========== 示例订单 1007900000 ==========
     ErrorCode DEMO_ORDER_NOT_FOUND = new ErrorCode(1007900000, "示例订单不存在");
