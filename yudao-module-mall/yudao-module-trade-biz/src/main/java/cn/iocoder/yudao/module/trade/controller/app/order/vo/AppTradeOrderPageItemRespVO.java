@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderI
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Schema(description = "用户 App - 订单交易的分页项 Response VO")
@@ -30,7 +30,7 @@ public class AppTradeOrderPageItemRespVO {
     private Boolean commentStatus;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Date createTime;
+    private LocalDateTime createTime;
 
     // ========== 价格 + 支付基本信息 ==========
 
