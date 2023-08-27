@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
@@ -12,8 +13,12 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
+import cn.iocoder.yudao.module.member.api.level.MemberLevelApi;
+import cn.iocoder.yudao.module.member.api.point.MemberPointApi;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
+import cn.iocoder.yudao.module.member.enums.MemberExperienceBizTypeEnum;
+import cn.iocoder.yudao.module.member.enums.point.MemberPointBizTypeEnum;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
@@ -30,6 +35,9 @@ import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponUseReqDTO;
 import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderRemarkReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdateAddressReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdatePriceReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
@@ -53,6 +61,8 @@ import cn.iocoder.yudao.module.trade.service.price.TradePriceService;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,6 +74,7 @@ import java.util.Objects;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.ORDER_NOT_FOUND;
+import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.ORDER_UPDATE_PRICE_FAIL_PAID;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
 /**
@@ -96,8 +107,14 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private AddressApi addressApi;
     @Resource
     private CouponApi couponApi;
+
     @Resource
     private MemberUserApi memberUserApi;
+    @Resource
+    private MemberLevelApi memberLevelApi;
+    @Resource
+    private MemberPointApi memberPointApi;
+
     @Resource
     private ProductCommentApi productCommentApi;
     @Resource
@@ -331,6 +348,11 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // TODO 芋艿：发送站内信
 
         // TODO 芋艿：OrderLog
+
+        // 增加用户积分
+        getSelf().addUserPointAsync(order.getUserId(), order.getPayPrice(), order.getId());
+        // 增加用户经验
+        getSelf().addUserExperienceAsync(order.getUserId(), order.getPayPrice(), order.getId());
     }
 
     /**
@@ -345,10 +367,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
      */
     private KeyValue<TradeOrderDO, PayOrderRespDTO> validateOrderPayable(Long id, Long payOrderId) {
         // 校验订单是否存在
-        TradeOrderDO order = tradeOrderMapper.selectById(id);
-        if (order == null) {
-            throw exception(ORDER_NOT_FOUND);
-        }
+        TradeOrderDO order = validateOrderExists(id);
         // 校验订单未支付
         if (!TradeOrderStatusEnum.isUnpaid(order.getStatus()) || order.getPayStatus()) {
             log.error("[validateOrderPaid][order({}) 不处于待支付状态，请进行处理！order 数据是：{}]",
@@ -391,14 +410,16 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deliveryOrder(Long userId, TradeOrderDeliveryReqVO deliveryReqVO) {
+    public void deliveryOrder(TradeOrderDeliveryReqVO deliveryReqVO) {
         // TODO @puhui999：只有选择快递的，才可以发货
         // 1.1 校验并获得交易订单（可发货）
         TradeOrderDO order = validateOrderDeliverable(deliveryReqVO.getId());
-        TradeOrderDO updateOrderObj = new TradeOrderDO();
+
+        // TODO @puhui999：下面不修改 deliveryType，直接校验 deliveryType 是否为快递，是快递才可以发货；先做严格的方式哈。
         // 判断发货类型
+        TradeOrderDO updateOrderObj = new TradeOrderDO();
         // 2.1 快递发货
-        if (Objects.equals(deliveryReqVO.getType(), DeliveryTypeEnum.EXPRESS.getMode())) {
+        if (ObjectUtil.notEqual(deliveryReqVO.getLogisticsId(), 0L)) {
             // 校验快递公司
             DeliveryExpressDO deliveryExpress = deliveryExpressService.getDeliveryExpress(deliveryReqVO.getLogisticsId());
             if (deliveryExpress == null) {
@@ -408,27 +429,24 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                 throw exception(EXPRESS_STATUS_NOT_ENABLE);
             }
             updateOrderObj.setLogisticsId(deliveryReqVO.getLogisticsId()).setLogisticsNo(deliveryReqVO.getLogisticsNo()).setDeliveryType(DeliveryTypeEnum.EXPRESS.getMode());
+        } else {
+            // 2.2 无需发货
+            updateOrderObj.setLogisticsId(0L).setLogisticsNo("").setDeliveryType(DeliveryTypeEnum.NULL.getMode());
         }
-        // TODO @puhui999：无需发货时，更新 logisticsId 为 0；
-        // 2.2 无需发货
-        if (Objects.equals(deliveryReqVO.getType(), DeliveryTypeEnum.NULL.getMode())) {
-            updateOrderObj.setLogisticsId(null).setLogisticsNo("").setDeliveryType(DeliveryTypeEnum.NULL.getMode());
-        }
-
         // 更新 TradeOrderDO 状态为已发货，等待收货
         updateOrderObj.setStatus(TradeOrderStatusEnum.DELIVERED.getStatus()).setDeliveryTime(LocalDateTime.now());
         int updateCount = tradeOrderMapper.updateByIdAndStatus(order.getId(), order.getStatus(), updateOrderObj);
         if (updateCount == 0) {
             throw exception(ORDER_DELIVERY_FAIL_STATUS_NOT_UNDELIVERED);
         }
+
         // TODO 芋艿：发送订单变化的消息
 
         // 发送站内信
         tradeMessageService.sendMessageWhenDeliveryOrder(new TradeOrderMessageWhenDeliveryOrderReqBO().setOrderId(order.getId())
-                .setUserId(userId).setMessage(null));
+                .setUserId(order.getUserId()).setMessage(null));
 
         // TODO 芋艿：OrderLog
-        // TODO 设计：lili：是不是发货后，才支持售后？
     }
 
     /**
@@ -440,12 +458,9 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
      * @return 交易订单
      */
     private TradeOrderDO validateOrderDeliverable(Long id) {
-        // 校验订单是否存在
-        TradeOrderDO order = tradeOrderMapper.selectById(id);
-        if (order == null) {
-            throw exception(ORDER_NOT_FOUND);
-        }
+        TradeOrderDO order = validateOrderExists(id);
         // 校验订单是否是待发货状态
+        // TODO @puhui999：已经发货，可以重新发货，修改信息；
         if (!TradeOrderStatusEnum.isUndelivered(order.getStatus())) {
             throw exception(ORDER_DELIVERY_FAIL_STATUS_NOT_UNDELIVERED);
         }
@@ -456,6 +471,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 订单类型：拼团
         if (Objects.equals(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
             // 校验订单拼团是否成功
+            // TODO @puhui999：是不是取反？
             if (combinationRecordApi.isCombinationRecordSuccess(order.getUserId(), order.getId())) {
                 throw exception(ORDER_DELIVERY_FAIL_COMBINATION_RECORD_STATUS_NOT_SUCCESS);
             }
@@ -463,9 +479,20 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 订单类类型：砍价
         if (Objects.equals(TradeOrderTypeEnum.BARGAIN.getType(), order.getType())) {
             // 校验订单砍价是否成功
+            // TODO @puhui999：是不是取反？
             if (bargainRecordApi.isBargainRecordSuccess(order.getUserId(), order.getId())) {
                 throw exception(ORDER_DELIVERY_FAIL_BARGAIN_RECORD_STATUS_NOT_SUCCESS);
             }
+        }
+        return order;
+    }
+
+    @NotNull
+    private TradeOrderDO validateOrderExists(Long id) {
+        // 校验订单是否存在
+        TradeOrderDO order = tradeOrderMapper.selectById(id);
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
         }
         return order;
     }
@@ -487,6 +514,43 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // TODO 芋艿：lili 发送订单变化的消息
 
         // TODO 芋艿：lili 发送商品被购买完成的数据
+    }
+
+    @Override
+    public void updateOrderRemark(TradeOrderRemarkReqVO reqVO) {
+        // 校验并获得交易订单
+        validateOrderExists(reqVO.getId());
+
+        // 更新
+        TradeOrderDO order = TradeOrderConvert.INSTANCE.convert(reqVO);
+        tradeOrderMapper.updateById(order);
+    }
+
+    @Override
+    public void updateOrderPrice(TradeOrderUpdatePriceReqVO reqVO) {
+        // 校验交易订单
+        TradeOrderDO order = validateOrderExists(reqVO.getId());
+        if (order.getPayStatus()) {
+            throw exception(ORDER_UPDATE_PRICE_FAIL_PAID);
+        }
+
+        // 更新
+        // TODO @puhui999：TradeOrderItemDO 需要做 adjustPrice 的分摊；另外，支付订单那的价格，需要 update 下；
+        TradeOrderDO update = TradeOrderConvert.INSTANCE.convert(reqVO);
+        update.setPayPrice(update.getPayPrice() + update.getAdjustPrice());
+        tradeOrderMapper.updateById(update);
+    }
+
+    @Override
+    public void updateOrderAddress(TradeOrderUpdateAddressReqVO reqVO) {
+        // 校验交易订单
+        validateOrderExists(reqVO.getId());
+        // TODO 是否需要校验订单是否发货
+        // TODO 发货后是否支持修改收货地址
+
+        // 更新
+        TradeOrderDO update = TradeOrderConvert.INSTANCE.convert(reqVO);
+        tradeOrderMapper.updateById(update);
     }
 
     /**
@@ -555,6 +619,11 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         }
 
         // TODO 芋艿：未来如果有分佣，需要更新相关分佣订单为已失效
+
+        // 扣减用户积分
+        getSelf().reduceUserPointAsync(order.getUserId(), orderRefundPrice, afterSaleId);
+        // 扣减用户经验
+        getSelf().reduceUserExperienceAsync(order.getUserId(), orderRefundPrice, afterSaleId);
     }
 
     @Override
@@ -600,6 +669,39 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(id);
         return orderItems.stream().allMatch(orderItem -> Objects.equals(orderItem.getAfterSaleStatus(),
                 TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus()));
+    }
+
+    @Async
+    protected void addUserExperienceAsync(Long userId, Integer payPrice, Long orderId) {
+        int bizType = MemberExperienceBizTypeEnum.ORDER.getType();
+        memberLevelApi.addExperience(userId, payPrice, bizType, String.valueOf(orderId));
+    }
+
+    @Async
+    protected void reduceUserExperienceAsync(Long userId, Integer refundPrice, Long afterSaleId) {
+        int bizType = MemberExperienceBizTypeEnum.REFUND.getType();
+        memberLevelApi.addExperience(userId, -refundPrice, bizType, String.valueOf(afterSaleId));
+    }
+
+    @Async
+    protected void addUserPointAsync(Long userId, Integer payPrice, Long orderId) {
+        int bizType = MemberPointBizTypeEnum.ORDER_BUY.getType();
+        memberPointApi.addPoint(userId, payPrice, bizType, String.valueOf(orderId));
+    }
+
+    @Async
+    protected void reduceUserPointAsync(Long userId, Integer refundPrice, Long afterSaleId) {
+        int bizType = MemberPointBizTypeEnum.ORDER_CANCEL.getType();
+        memberPointApi.addPoint(userId, -refundPrice, bizType, String.valueOf(afterSaleId));
+    }
+
+    /**
+     * 获得自身的代理对象，解决 AOP 生效问题
+     *
+     * @return 自己
+     */
+    private TradeOrderUpdateServiceImpl getSelf() {
+        return SpringUtil.getBean(getClass());
     }
 
 }

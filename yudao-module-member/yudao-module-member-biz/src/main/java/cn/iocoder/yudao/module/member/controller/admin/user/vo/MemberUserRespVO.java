@@ -29,10 +29,24 @@ public class MemberUserRespVO extends MemberUserBaseVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
-
     // ========== 其它信息 ==========
+
+    @Schema(description = "积分", requiredMode  = Schema.RequiredMode.REQUIRED, example = "100")
+    private Integer point;
+
+    @Schema(description = "总积分", requiredMode = Schema.RequiredMode.REQUIRED, example = "2000")
+    private Integer totalPoint;
 
     @Schema(description = "会员标签", example = "[红色, 快乐]")
     private List<String> tagNames;
+
+    @Schema(description = "会员等级", example = "黄金会员")
+    private String levelName;
+
+    @Schema(description = "用户分组", example = "购物达人")
+    private String groupName;
+
+    @Schema(description = "用户经验值", requiredMode  = Schema.RequiredMode.REQUIRED, example = "200")
+    private Integer experience;
 
 }

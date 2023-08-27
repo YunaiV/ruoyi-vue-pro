@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.member.service.user;
 
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -8,9 +9,9 @@ import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserResetPasswordReqVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateMobileReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateReqVO;
-import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateMobileReqVO;
 import cn.iocoder.yudao.module.member.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
@@ -181,9 +182,10 @@ public class MemberUserServiceImpl implements MemberUserService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateUser(MemberUserUpdateReqVO updateReqVO) {
         // 校验存在
-        validateUserExists(updateReqVO.getId());
+        MemberUserDO user = validateUserExists(updateReqVO.getId());
         // 校验手机唯一
         validateMobileUnique(updateReqVO.getId(), updateReqVO.getMobile());
 
@@ -225,6 +227,36 @@ public class MemberUserServiceImpl implements MemberUserService {
     @Override
     public PageResult<MemberUserDO> getUserPage(MemberUserPageReqVO pageReqVO) {
         return memberUserMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public void updateUserLevel(Long id, Long levelId, Integer experience) {
+        // 0 代表无等级：防止UpdateById时，会被过滤掉的问题
+        levelId = ObjectUtil.defaultIfNull(levelId, 0L);
+        memberUserMapper.updateById(new MemberUserDO()
+                .setId(id)
+                .setLevelId(levelId).setExperience(experience)
+        );
+    }
+
+    @Override
+    public Long getUserCountByGroupId(Long groupId) {
+        return memberUserMapper.selectCountByGroupId(groupId);
+    }
+
+    @Override
+    public Long getUserCountByLevelId(Long levelId) {
+        return memberUserMapper.selectCountByLevelId(levelId);
+    }
+
+    @Override
+    public Long getUserCountByTagId(Long tagId) {
+        return memberUserMapper.selectCountByTagId(tagId);
+    }
+
+    @Override
+    public void updateUserPoint(Long userId, Integer point) {
+        memberUserMapper.updateById(new MemberUserDO().setId(userId).setPoint(point));
     }
 
 }

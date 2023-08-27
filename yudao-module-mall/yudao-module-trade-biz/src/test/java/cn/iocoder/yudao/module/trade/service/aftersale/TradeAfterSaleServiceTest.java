@@ -56,6 +56,7 @@ public class TradeAfterSaleServiceTest extends BaseDbUnitTest {
     private TradeOrderUpdateService tradeOrderUpdateService;
     @Resource
     private TradeOrderQueryService tradeOrderQueryService;
+
     @MockBean
     private PayRefundApi payRefundApi;
 

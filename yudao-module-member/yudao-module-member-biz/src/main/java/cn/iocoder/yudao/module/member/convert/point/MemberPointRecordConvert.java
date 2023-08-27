@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.MemberPointRecordRespVO;
+import cn.iocoder.yudao.module.member.controller.app.point.vo.AppMemberPointRecordRespVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.point.MemberPointRecordDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -32,5 +33,7 @@ public interface MemberPointRecordConvert {
         return voPageResult;
     }
     PageResult<MemberPointRecordRespVO> convertPage(PageResult<MemberPointRecordDO> pageResult);
+
+    PageResult<AppMemberPointRecordRespVO> convertPage02(PageResult<MemberPointRecordDO> pageResult);
 
 }

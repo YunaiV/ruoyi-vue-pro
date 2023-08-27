@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.member.service.signin;
 
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.member.controller.admin.signin.vo.record.MemberSignInRecordPageReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInRecordDO;
 import cn.iocoder.yudao.module.member.dal.mysql.signin.MemberSignInRecordMapper;
-import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -45,11 +45,13 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
             }
             userIds = convertSet(users, MemberUserRespDTO::getId);
         }
-        if (pageReqVO.getUserId() != null) {
-            userIds = Sets.newHashSet(pageReqVO.getUserId());
-        }
         // 分页查询
         return signInRecordMapper.selectPage(pageReqVO, userIds);
+    }
+
+    @Override
+    public PageResult<MemberSignInRecordDO> getSignRecordPage(Long userId, PageParam pageParam) {
+        return signInRecordMapper.selectPage(userId, pageParam);
     }
 
 }

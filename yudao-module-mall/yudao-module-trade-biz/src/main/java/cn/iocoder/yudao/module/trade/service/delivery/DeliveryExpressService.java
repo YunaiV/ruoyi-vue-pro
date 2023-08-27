@@ -64,11 +64,10 @@ public interface DeliveryExpressService {
     List<DeliveryExpressDO> getDeliveryExpressList(DeliveryExpressExportReqVO exportReqVO);
 
     /**
-     * 获得快递公司列表
+     * 获取指定状态的快递公司列表
      *
      * @param status 状态
      * @return 快递公司列表
      */
-    List<DeliveryExpressDO> getDeliveryExpressList(Integer status);
-
+    List<DeliveryExpressDO> getDeliveryExpressListByStatus(Integer status);
 }

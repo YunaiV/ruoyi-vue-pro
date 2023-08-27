@@ -27,7 +27,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 
 @Tag(name = "管理后台 - 签到记录")
 @RestController
-@RequestMapping("/member/point/sign-in-record")
+@RequestMapping("/member/sign-in/record")
 @Validated
 public class MemberSignInRecordController {
 

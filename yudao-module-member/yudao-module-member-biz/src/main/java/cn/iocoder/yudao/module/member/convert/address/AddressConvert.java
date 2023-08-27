@@ -1,12 +1,8 @@
 package cn.iocoder.yudao.module.member.convert.address;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
-import cn.iocoder.yudao.module.member.controller.admin.address.vo.AddressCreateReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.address.vo.AddressExcelVO;
 import cn.iocoder.yudao.module.member.controller.admin.address.vo.AddressRespVO;
-import cn.iocoder.yudao.module.member.controller.admin.address.vo.AddressUpdateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressCreateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressRespVO;
 import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressUpdateReqVO;
@@ -44,15 +40,6 @@ public interface AddressConvert {
         return AreaUtils.format(areaId);
     }
 
-    MemberAddressDO convert(AddressCreateReqVO bean);
-
-    MemberAddressDO convert(AddressUpdateReqVO bean);
-
-    AddressRespVO convert2(MemberAddressDO bean);
-
     List<AddressRespVO> convertList2(List<MemberAddressDO> list);
 
-    PageResult<AddressRespVO> convertPage(PageResult<MemberAddressDO> page);
-
-    List<AddressExcelVO> convertList02(List<MemberAddressDO> list);
 }

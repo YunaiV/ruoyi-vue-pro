@@ -20,9 +20,10 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
+// TODO 芋艿：url
 @Tag(name = "管理后台 - 签到规则")
 @RestController
-@RequestMapping("/member/point/sign-in-config")
+@RequestMapping("/member/sign-in/config")
 @Validated
 public class MemberSignInConfigController {
 
@@ -66,8 +67,8 @@ public class MemberSignInConfigController {
     @Operation(summary = "获得签到规则列表")
     @PreAuthorize("@ss.hasPermission('point:sign-in-config:query')")
     public CommonResult<List<MemberSignInConfigRespVO>> getSignInConfigList() {
-        List<MemberSignInConfigDO> pageResult = signInConfigService.getSignInConfigList();
-        return success(MemberSignInConfigConvert.INSTANCE.convertList(pageResult));
+        List<MemberSignInConfigDO> list = signInConfigService.getSignInConfigList();
+        return success(MemberSignInConfigConvert.INSTANCE.convertList(list));
     }
 
 }

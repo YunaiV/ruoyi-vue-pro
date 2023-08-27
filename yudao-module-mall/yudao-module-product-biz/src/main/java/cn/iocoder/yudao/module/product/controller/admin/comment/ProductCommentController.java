@@ -51,7 +51,7 @@ public class ProductCommentController {
         return success(true);
     }
 
-    @PutMapping("/create")
+    @PostMapping("/create")
     @Operation(summary = "添加自评")
     @PreAuthorize("@ss.hasPermission('product:comment:update')")
     public CommonResult<Boolean> createComment(@Valid @RequestBody ProductCommentCreateReqVO createReqVO) {

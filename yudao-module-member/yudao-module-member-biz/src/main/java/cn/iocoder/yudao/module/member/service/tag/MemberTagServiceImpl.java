@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.member.service.tag;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagCreateReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagPageReqVO;
@@ -9,6 +10,7 @@ import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagUpdateReq
 import cn.iocoder.yudao.module.member.convert.tag.MemberTagConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.tag.MemberTagDO;
 import cn.iocoder.yudao.module.member.dal.mysql.tag.MemberTagMapper;
+import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -17,8 +19,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.TAG_NAME_EXISTS;
-import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.TAG_NOT_EXISTS;
+import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.*;
 
 /**
  * 会员标签 Service 实现类
@@ -31,6 +32,8 @@ public class MemberTagServiceImpl implements MemberTagService {
 
     @Resource
     private MemberTagMapper tagMapper;
+    @Resource
+    private MemberUserService memberUserService;
 
     @Override
     public Long createTag(MemberTagCreateReqVO createReqVO) {
@@ -58,11 +61,11 @@ public class MemberTagServiceImpl implements MemberTagService {
     public void deleteTag(Long id) {
         // 校验存在
         validateTagExists(id);
+        // 校验标签下是否有用户
+        validateTagHasUser(id);
         // 删除
         tagMapper.deleteById(id);
     }
-
-    // TODO @疯狂：校验 tag name 不重复，参考 validateMobileUnique 方法，Mapper 尽量逻辑通用，处理交给 Service
 
     private void validateTagExists(Long id) {
         if (tagMapper.selectById(id) == null) {
@@ -71,9 +74,27 @@ public class MemberTagServiceImpl implements MemberTagService {
     }
 
     private void validateTagNameUnique(Long id, String name) {
-        boolean exists = tagMapper.exists(id, name);
-        if (exists) {
+        if (StrUtil.isBlank(name)) {
+            return;
+        }
+        MemberTagDO tag = tagMapper.selelctByName(name);
+        if (tag == null) {
+            return;
+        }
+
+        // 如果 id 为空，说明不用比较是否为相同 id 的标签
+        if (id == null) {
             throw exception(TAG_NAME_EXISTS);
+        }
+        if (!tag.getId().equals(id)) {
+            throw exception(TAG_NAME_EXISTS);
+        }
+    }
+
+    void validateTagHasUser(Long id) {
+        Long count = memberUserService.getUserCountByTagId(id);
+        if (count > 0) {
+            throw exception(TAG_HAS_USER);
         }
     }
 
@@ -93,6 +114,11 @@ public class MemberTagServiceImpl implements MemberTagService {
     @Override
     public PageResult<MemberTagDO> getTagPage(MemberTagPageReqVO pageReqVO) {
         return tagMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<MemberTagDO> getTagList() {
+        return tagMapper.selectList();
     }
 
 }

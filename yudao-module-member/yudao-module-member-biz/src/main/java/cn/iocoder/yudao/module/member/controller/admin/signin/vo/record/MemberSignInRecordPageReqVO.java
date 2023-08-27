@@ -23,7 +23,7 @@ public class MemberSignInRecordPageReqVO extends PageParam {
     @Schema(description = "第几天签到", example = "10")
     private Integer day;
 
-    @Schema(description = "用户ID", example = "123")
+    @Schema(description = "用户编号", example = "123")
     private Long userId;
 
     @Schema(description = "签到时间")

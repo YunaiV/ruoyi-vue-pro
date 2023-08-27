@@ -20,7 +20,6 @@ import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -53,67 +52,53 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     private MemberUserApi memberUserApi;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateCommentVisible(ProductCommentUpdateVisibleReqVO updateReqVO) {
-        // 校验评论是否存在
-        ProductCommentDO productCommentDO = validateCommentExists(updateReqVO.getId());
-        productCommentDO.setVisible(updateReqVO.getVisible());
-
-        // 更新可见状态
-        productCommentMapper.updateById(productCommentDO);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void replyComment(ProductCommentReplyReqVO replyVO, Long loginUserId) {
-        // 校验评论是否存在
-        ProductCommentDO productCommentDO = validateCommentExists(replyVO.getId());
-        productCommentDO.setReplyTime(LocalDateTime.now());
-        productCommentDO.setReplyUserId(loginUserId);
-        productCommentDO.setReplyStatus(Boolean.TRUE);
-        productCommentDO.setReplyContent(replyVO.getReplyContent());
-
-        // 回复评论
-        productCommentMapper.updateById(productCommentDO);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
     public void createComment(ProductCommentCreateReqVO createReqVO) {
-        // 校验评论
-        validateComment(createReqVO.getSkuId(), createReqVO.getUserId(), createReqVO.getOrderItemId());
+        // 校验 SKU
+        ProductSkuDO skuDO = validateSku(createReqVO.getSkuId());
+        // 校验 SPU
+        ProductSpuDO spuDO = validateSpu(skuDO.getSpuId());
 
-        ProductCommentDO commentDO = ProductCommentConvert.INSTANCE.convert(createReqVO);
-        productCommentMapper.insert(commentDO);
+        // 创建评论
+        ProductCommentDO comment = ProductCommentConvert.INSTANCE.convert(createReqVO, spuDO, skuDO);
+        productCommentMapper.insert(comment);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public Long createComment(ProductCommentCreateReqDTO createReqDTO) {
-        // 通过 sku ID 拿到 spu 相关信息
-        ProductSkuDO sku = productSkuService.getSku(createReqDTO.getSkuId());
-        if (sku == null) {
-            throw exception(SKU_NOT_EXISTS);
-        }
-        // 校验 spu 如果存在返回详情
-        ProductSpuDO spuDO = validateSpu(sku.getSpuId());
+        // 校验 SKU
+        ProductSkuDO skuDO = validateSku(createReqDTO.getSkuId());
+        // 校验 SPU
+        ProductSpuDO spuDO = validateSpu(skuDO.getSpuId());
         // 校验评论
-        validateComment(spuDO.getId(), createReqDTO.getUserId(), createReqDTO.getOrderId());
+        validateCommentExists(createReqDTO.getUserId(), createReqDTO.getOrderId());
         // 获取用户详细信息
         MemberUserRespDTO user = memberUserApi.getUser(createReqDTO.getUserId());
 
         // 创建评论
-        ProductCommentDO commentDO = ProductCommentConvert.INSTANCE.convert(createReqDTO, spuDO, user);
-        productCommentMapper.insert(commentDO);
-        return commentDO.getId();
+        ProductCommentDO comment = ProductCommentConvert.INSTANCE.convert(createReqDTO, spuDO, skuDO, user);
+        productCommentMapper.insert(comment);
+        return comment.getId();
     }
 
-    private void validateComment(Long skuId, Long userId, Long orderItemId) {
-        // 判断当前订单的当前商品用户是否评价过
-        ProductCommentDO exist = productCommentMapper.selectByUserIdAndOrderItemIdAndSpuId(userId, orderItemId, skuId);
-        if (null != exist) {
+    /**
+     * 判断当前订单的当前商品用户是否评价过
+     *
+     * @param userId      用户编号
+     * @param orderItemId 订单项编号
+     */
+    private void validateCommentExists(Long userId, Long orderItemId) {
+        ProductCommentDO exist = productCommentMapper.selectByUserIdAndOrderItemId(userId, orderItemId);
+        if (exist != null) {
             throw exception(COMMENT_ORDER_EXISTS);
         }
+    }
+
+    private ProductSkuDO validateSku(Long skuId) {
+        ProductSkuDO sku = productSkuService.getSku(skuId);
+        if (sku == null) {
+            throw exception(SKU_NOT_EXISTS);
+        }
+        return sku;
     }
 
     private ProductSpuDO validateSpu(Long spuId) {
@@ -122,6 +107,26 @@ public class ProductCommentServiceImpl implements ProductCommentService {
             throw exception(SPU_NOT_EXISTS);
         }
         return spu;
+    }
+
+    @Override
+    public void updateCommentVisible(ProductCommentUpdateVisibleReqVO updateReqVO) {
+        // 校验评论是否存在
+        validateCommentExists(updateReqVO.getId());
+
+        // 更新可见状态
+        productCommentMapper.updateById(new ProductCommentDO().setId(updateReqVO.getId())
+                .setVisible(true));
+    }
+
+    @Override
+    public void replyComment(ProductCommentReplyReqVO replyVO, Long userId) {
+        // 校验评论是否存在
+        validateCommentExists(replyVO.getId());
+        // 回复评论
+        productCommentMapper.updateById(new ProductCommentDO().setId(replyVO.getId())
+                .setReplyTime(LocalDateTime.now()).setReplyUserId(userId)
+                .setReplyStatus(Boolean.TRUE).setReplyContent(replyVO.getReplyContent()));
     }
 
     private ProductCommentDO validateCommentExists(Long id) {

@@ -43,8 +43,23 @@ public interface MemberUserMapper extends BaseMapperX<MemberUserDO> {
                 .betweenIfPresent(MemberUserDO::getLoginDate, reqVO.getLoginDate())
                 .likeIfPresent(MemberUserDO::getNickname, reqVO.getNickname())
                 .betweenIfPresent(MemberUserDO::getCreateTime, reqVO.getCreateTime())
+                .eqIfPresent(MemberUserDO::getLevelId, reqVO.getLevelId())
+                .eqIfPresent(MemberUserDO::getGroupId, reqVO.getGroupId())
                 .apply(StrUtil.isNotEmpty(tagIdSql), tagIdSql)
                 .orderByDesc(MemberUserDO::getId));
+    }
+
+    default Long selectCountByGroupId(Long groupId) {
+        return selectCount(MemberUserDO::getGroupId, groupId);
+    }
+
+    default Long selectCountByLevelId(Long levelId) {
+        return selectCount(MemberUserDO::getLevelId, levelId);
+    }
+
+    default Long selectCountByTagId(Long tagId) {
+        return selectCount(new LambdaQueryWrapperX<MemberUserDO>()
+                .apply("FIND_IN_SET({0}, tag_ids)", tagId));
     }
 
 }

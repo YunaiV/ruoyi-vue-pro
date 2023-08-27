@@ -73,11 +73,14 @@ public class ProductCommentDO extends BaseDO {
 
     /**
      * 商品 SPU 编号
+     *
      * 关联 {@link ProductSpuDO#getId()}
      */
     private Long spuId;
     /**
      * 商品 SPU 名称
+     *
+     * 关联 {@link ProductSpuDO#getName()}
      */
     private String spuName;
     /**
@@ -86,6 +89,19 @@ public class ProductCommentDO extends BaseDO {
      * 关联 {@link ProductSkuDO#getId()}
      */
     private Long skuId;
+    /**
+     * 商品 SKU 图片地址
+     *
+     * 关联 {@link ProductSkuDO#getPicUrl()}
+     */
+    private String skuPicUrl;
+    /**
+     * 属性数组，JSON 格式
+     *
+     * 关联 {@link ProductSkuDO#getProperties()}
+     */
+    @TableField(typeHandler = ProductSkuDO.PropertyTypeHandler.class)
+    private List<ProductSkuDO.Property> skuProperties;
 
     /**
      * 是否可见

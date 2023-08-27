@@ -27,6 +27,7 @@ public interface ErrorCodeConstants {
     ErrorCode ORDER_IS_EXPIRED = new ErrorCode(1007002003, "支付订单已经过期");
     ErrorCode ORDER_SUBMIT_CHANNEL_ERROR = new ErrorCode(1007002004, "发起支付报错，错误码：{}，错误提示：{}");
     ErrorCode ORDER_REFUND_FAIL_STATUS_ERROR = new ErrorCode(1007002005, "支付订单退款失败，原因：状态不是已支付或已退款");
+    ErrorCode ORDER_UPDATE_PRICE_FAIL_PAID = new ErrorCode(1007002006, "支付订单调价失败，原因：支付订单已付款,不能调价");
 
     // ========== ORDER 模块(拓展单) 1007003000 ==========
     ErrorCode ORDER_EXTENSION_NOT_FOUND = new ErrorCode(1007003000, "支付交易拓展单不存在");
@@ -39,6 +40,9 @@ public interface ErrorCodeConstants {
     ErrorCode REFUND_EXISTS = new ErrorCode(1007006003, "已经存在退款单");
     ErrorCode REFUND_NOT_FOUND = new ErrorCode(1007006004, "支付退款单不存在");
     ErrorCode REFUND_STATUS_IS_NOT_WAITING = new ErrorCode(1007006005, "支付退款单不处于待退款");
+
+    // ========== 钱包模块(退款) 1007007000 ==========
+    ErrorCode WALLET_NOT_FOUND = new ErrorCode(1007007000, "用户钱包不存在");
 
     // ========== 示例订单 1007900000 ==========
     ErrorCode DEMO_ORDER_NOT_FOUND = new ErrorCode(1007900000, "示例订单不存在");

@@ -5,10 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDetailRespVO;
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageItemRespVO;
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.*;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
@@ -79,12 +76,56 @@ public class TradeOrderController {
         return success(TradeOrderConvert.INSTANCE.convert(order, orderItems, user));
     }
 
+    @GetMapping("/get-express-track-list")
+    @Operation(summary = "获得交易订单的物流轨迹")
+    @Parameter(name = "id", description = "交易订单编号")
+    @PreAuthorize("@ss.hasPermission('trade:order:query')")
+    public CommonResult<List<?>> getOrderExpressTrackList(@RequestParam("id") Long id) {
+        return success(TradeOrderConvert.INSTANCE.convertList02(
+                tradeOrderQueryService.getExpressTrackList(id, getLoginUserId())));
+    }
+
+    // TODO @puhui999：put 请求哈
     @PostMapping("/delivery")
-    @Operation(summary = "发货订单")
-    @PreAuthorize("@ss.hasPermission('trade:order:delivery')")
+    @Operation(summary = "订单发货")
+    @PreAuthorize("@ss.hasPermission('trade:order:update')")
     public CommonResult<Boolean> deliveryOrder(@RequestBody TradeOrderDeliveryReqVO deliveryReqVO) {
-        tradeOrderUpdateService.deliveryOrder(getLoginUserId(), deliveryReqVO);
+        tradeOrderUpdateService.deliveryOrder(deliveryReqVO);
         return success(true);
     }
+
+    // TODO @puhui999：put 请求哈，update-remark；
+    @PostMapping("/remark")
+    @Operation(summary = "订单备注")
+    @PreAuthorize("@ss.hasPermission('trade:order:update')")
+    public CommonResult<Boolean> updateOrderRemark(@RequestBody TradeOrderRemarkReqVO reqVO) {
+        tradeOrderUpdateService.updateOrderRemark(reqVO);
+        return success(true);
+    }
+
+    // TODO @puhui999：put 请求哈，update-price；
+    @PostMapping("/adjust-price")
+    @Operation(summary = "订单调价")
+    @PreAuthorize("@ss.hasPermission('trade:order:update')")
+    public CommonResult<Boolean> updateOrderPrice(@RequestBody TradeOrderUpdatePriceReqVO reqVO) {
+        tradeOrderUpdateService.updateOrderPrice(reqVO);
+        return success(true);
+    }
+
+    // TODO @puhui999：put 请求哈，update-address；
+    @PostMapping("/adjust-address")
+    @Operation(summary = "修改订单收货地址")
+    @PreAuthorize("@ss.hasPermission('trade:order:update')")
+    public CommonResult<Boolean> updateOrderAddress(@RequestBody TradeOrderUpdateAddressReqVO reqVO) {
+        tradeOrderUpdateService.updateOrderAddress(reqVO);
+        return success(true);
+    }
+
+    // TODO @puhui999 订单物流详情
+    // TODO @puhui999 【前台】订单取消
+    // TODO @puhui999 【后台】订单取消
+    // TODO @puhui999 【前台】订单核销
+    // TODO @puhui999 【前台】订单删除
+    // TODO @puhui999 【后台】订单统计
 
 }

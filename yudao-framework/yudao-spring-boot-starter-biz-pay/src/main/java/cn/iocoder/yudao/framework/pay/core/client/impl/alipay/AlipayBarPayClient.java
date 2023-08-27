@@ -13,6 +13,8 @@ import com.alipay.api.request.AlipayTradePayRequest;
 import com.alipay.api.response.AlipayTradePayResponse;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDateTime;
+
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
 
@@ -63,8 +65,10 @@ public class AlipayBarPayClient extends AbstractAlipayPayClient {
             return buildClosedPayOrderRespDTO(reqDTO, response);
         }
         if ("10000".equals(response.getCode())) { // 免密支付
-            return PayOrderRespDTO.successOf(response.getTradeNo(), response.getBuyerUserId(), LocalDateTimeUtil.of(response.getGmtPayment()),
-                    response.getOutTradeNo(), response);
+            LocalDateTime successTime = LocalDateTimeUtil.of(response.getGmtPayment());
+            return PayOrderRespDTO.successOf(response.getTradeNo(), response.getBuyerUserId(), successTime,
+                            response.getOutTradeNo(), response)
+                    .setDisplayMode(displayMode).setDisplayContent("");
         }
         // 大额支付，需要用户输入密码，所以返回 waiting。此时，前端一般会进行轮询
         return PayOrderRespDTO.waitingOf(displayMode, "",
