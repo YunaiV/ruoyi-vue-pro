@@ -1,30 +1,29 @@
 package cn.iocoder.yudao.module.pay.dal.mysql.wallet;
 
 
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.transaction.AppPayWalletTransactionPageReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
-import cn.iocoder.yudao.module.pay.enums.member.WalletTransactionQueryTypeEnum;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.Objects;
 
 @Mapper
 public interface PayWalletTransactionMapper extends BaseMapperX<PayWalletTransactionDO> {
 
-    default PageResult<PayWalletTransactionDO> selectPageByWalletIdAndQueryType(Long walletId,
-                                                                                WalletTransactionQueryTypeEnum queryType,
-                                                                                PageParam pageParam) {
+    default PageResult<PayWalletTransactionDO> selectPage(Long walletId,
+                                                          AppPayWalletTransactionPageReqVO pageReqVO) {
         LambdaQueryWrapperX<PayWalletTransactionDO> query = new LambdaQueryWrapperX<PayWalletTransactionDO>()
                 .eq(PayWalletTransactionDO::getWalletId, walletId);
-        if (WalletTransactionQueryTypeEnum.RECHARGE == queryType ) {
-            query.ge(PayWalletTransactionDO::getAmount, 0);
-        }
-        if (WalletTransactionQueryTypeEnum.EXPENSE == queryType ) {
+        if (Objects.equals(pageReqVO.getType(), AppPayWalletTransactionPageReqVO.TYPE_INCOME)) {
+            query.gt(PayWalletTransactionDO::getAmount, 0);
+        } else if (Objects.equals(pageReqVO.getType(), AppPayWalletTransactionPageReqVO.TYPE_EXPENSE)) {
             query.lt(PayWalletTransactionDO::getAmount, 0);
         }
         query.orderByDesc(PayWalletTransactionDO::getId);
-        return selectPage(pageParam, query);
+        return selectPage(pageReqVO, query);
     }
 
     default PayWalletTransactionDO selectByNo(String no) {

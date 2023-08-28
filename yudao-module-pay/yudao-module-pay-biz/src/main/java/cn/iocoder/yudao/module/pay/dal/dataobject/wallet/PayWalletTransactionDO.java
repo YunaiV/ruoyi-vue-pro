@@ -48,6 +48,7 @@ public class PayWalletTransactionDO extends BaseDO {
      */
     private Long bizId;
 
+    // TODO @jason：想了下，改成 title；流水标题；因为账户明细那，会看到这个；
     /**
      * 附加说明
      */
