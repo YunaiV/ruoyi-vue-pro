@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.member.controller.admin.level.vo.log;
+package cn.iocoder.yudao.module.member.controller.admin.level.vo.record;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;

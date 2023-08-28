@@ -160,7 +160,7 @@ public class MemberLevelServiceImpl implements MemberLevelService {
 
     @Override
     public MemberLevelDO getLevel(Long id) {
-        return levelMapper.selectById(id);
+        return id != null && id > 0 ? levelMapper.selectById(id) : null;
     }
 
     @Override
