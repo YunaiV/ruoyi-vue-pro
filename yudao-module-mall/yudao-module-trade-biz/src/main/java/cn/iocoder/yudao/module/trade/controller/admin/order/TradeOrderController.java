@@ -85,8 +85,7 @@ public class TradeOrderController {
                 tradeOrderQueryService.getExpressTrackList(id, getLoginUserId())));
     }
 
-    // TODO @puhui999：put 请求哈
-    @PostMapping("/delivery")
+    @PutMapping("/delivery")
     @Operation(summary = "订单发货")
     @PreAuthorize("@ss.hasPermission('trade:order:update')")
     public CommonResult<Boolean> deliveryOrder(@RequestBody TradeOrderDeliveryReqVO deliveryReqVO) {
@@ -94,8 +93,7 @@ public class TradeOrderController {
         return success(true);
     }
 
-    // TODO @puhui999：put 请求哈，update-remark；
-    @PostMapping("/remark")
+    @PutMapping("/update-remark")
     @Operation(summary = "订单备注")
     @PreAuthorize("@ss.hasPermission('trade:order:update')")
     public CommonResult<Boolean> updateOrderRemark(@RequestBody TradeOrderRemarkReqVO reqVO) {
@@ -103,8 +101,7 @@ public class TradeOrderController {
         return success(true);
     }
 
-    // TODO @puhui999：put 请求哈，update-price；
-    @PostMapping("/adjust-price")
+    @PutMapping("/update-price")
     @Operation(summary = "订单调价")
     @PreAuthorize("@ss.hasPermission('trade:order:update')")
     public CommonResult<Boolean> updateOrderPrice(@RequestBody TradeOrderUpdatePriceReqVO reqVO) {
@@ -112,8 +109,7 @@ public class TradeOrderController {
         return success(true);
     }
 
-    // TODO @puhui999：put 请求哈，update-address；
-    @PostMapping("/adjust-address")
+    @PutMapping("/update-address")
     @Operation(summary = "修改订单收货地址")
     @PreAuthorize("@ss.hasPermission('trade:order:update')")
     public CommonResult<Boolean> updateOrderAddress(@RequestBody TradeOrderUpdateAddressReqVO reqVO) {
