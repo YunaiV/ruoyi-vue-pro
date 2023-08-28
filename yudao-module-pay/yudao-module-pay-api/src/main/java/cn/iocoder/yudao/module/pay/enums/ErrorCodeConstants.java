@@ -41,9 +41,9 @@ public interface ErrorCodeConstants {
     ErrorCode REFUND_NOT_FOUND = new ErrorCode(1007006004, "支付退款单不存在");
     ErrorCode REFUND_STATUS_IS_NOT_WAITING = new ErrorCode(1007006005, "支付退款单不处于待退款");
 
-    // ========== 钱包模块(退款) 1007007000 ==========
+    // ========== 钱包模块 1007007000 ==========
     ErrorCode WALLET_NOT_FOUND = new ErrorCode(1007007000, "用户钱包不存在");
-    ErrorCode WALLET_NOT_ENOUGH = new ErrorCode(1007007001, "钱包余额不足");
+    ErrorCode WALLET_BALANCE_NOT_ENOUGH = new ErrorCode(1007007001, "钱包余额不足");
     ErrorCode WALLET_TRANSACTION_NOT_FOUND = new ErrorCode(1007007002, "未找到对应的钱包交易");
     ErrorCode WALLET_REFUND_AMOUNT_ERROR = new ErrorCode(1007007003, "钱包退款金额不对");
     ErrorCode WALLET_REFUND_EXIST = new ErrorCode(1007007004, "已经存在钱包退款");

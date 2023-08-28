@@ -10,20 +10,22 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
-public enum WalletBizTypeEnum {
+public enum PayWalletBizTypeEnum {
+
     RECHARGE(1, "充值"),
     RECHARGE_REFUND(2, "充值退款"),
     PAYMENT(3, "支付"),
     PAYMENT_REFUND(4, "支付退款");
 
     // TODO 后续增加
+
     /**
      * 业务分类
      */
-    private final Integer bizType;
-
+    private final Integer type;
     /**
      * 说明
      */
-    private final String desc;
+    private final String description;
+
 }

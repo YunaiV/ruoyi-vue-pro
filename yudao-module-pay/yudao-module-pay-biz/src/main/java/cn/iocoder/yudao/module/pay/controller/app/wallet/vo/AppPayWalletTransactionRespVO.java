@@ -5,7 +5,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@Schema(description = "用户 APP - 钱包余额明细分页 Response VO")
+@Schema(description = "用户 APP - 钱包流水分页 Response VO")
 @Data
 public class AppPayWalletTransactionRespVO {
     @Schema(description = "交易金额, 单位分", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")

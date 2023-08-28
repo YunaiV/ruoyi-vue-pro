@@ -83,6 +83,7 @@ public class PayChannelServiceImpl implements PayChannelService {
             log.info("[initLocalCache][缓存支付渠道，数量为:{}]", channels.size());
             // 钱包 client 需要和其它 client 分开了创建
             List<PayChannelDO> walletChannels = new ArrayList<>();
+            // TODO @jason：有点复杂，看看用 PayClientInitializer 能不能简化
             List<PayChannelDO> otherChannels = new ArrayList<>();
             channels.forEach(t -> {
                 if (PayChannelEnum.WALLET.getCode().equals(t.getCode())) {

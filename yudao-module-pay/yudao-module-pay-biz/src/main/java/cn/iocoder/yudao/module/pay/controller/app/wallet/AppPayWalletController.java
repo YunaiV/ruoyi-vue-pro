@@ -38,4 +38,5 @@ public class AppPayWalletController {
         PayWalletDO payWallet = payWalletService.getPayWallet(getLoginUserId(), UserTypeEnum.MEMBER.getValue());
         return success(PayWalletConvert.INSTANCE.convert(payWallet));
     }
+
 }

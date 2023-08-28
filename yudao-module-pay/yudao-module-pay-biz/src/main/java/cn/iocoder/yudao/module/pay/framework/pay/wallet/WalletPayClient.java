@@ -22,29 +22,31 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
  */
 @Slf4j
 public class WalletPayClient extends DelegatePayClient<NonePayClientConfig> {
+
     private PayWalletService payWalletService;
 
     public WalletPayClient(Long channelId, String channelCode, NonePayClientConfig config) {
         super(channelId, channelCode, config);
     }
 
-    public WalletPayClient(Long channelId, String channelCode, NonePayClientConfig config, PayWalletService payWalletService) {
+    public WalletPayClient(Long channelId, String channelCode, NonePayClientConfig config,
+                           PayWalletService payWalletService) {
         this(channelId, channelCode, config);
         this.payWalletService = payWalletService;
     }
 
     @Override
     protected void doInit() {
-        // 钱包支付 无需初始化
+        // 钱包支付，无需初始化
     }
 
     @Override
     protected PayOrderRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
         try {
-            PayWalletTransactionDO payWalletTransaction = payWalletService.pay(reqDTO.getOutTradeNo(), reqDTO.getPrice());
-            return PayOrderRespDTO.successOf(payWalletTransaction.getNo(), payWalletTransaction.getCreator(),
-                    payWalletTransaction.getTransactionTime(),
-                    reqDTO.getOutTradeNo(), "WALLET_PAY_SUCCESS");
+            PayWalletTransactionDO transaction = payWalletService.pay(reqDTO.getOutTradeNo(), reqDTO.getPrice());
+            return PayOrderRespDTO.successOf(transaction.getNo(), transaction.getCreator(),
+                    transaction.getTransactionTime(),
+                    reqDTO.getOutTradeNo(), "WALLET_PAY_SUCCESS"); // TODO @jason：transaction 作为 traData 好了；
         } catch (Throwable ex) {
             log.error("[doUnifiedOrder] 失败", ex);
             Integer errorCode = INTERNAL_SERVER_ERROR.getCode();
@@ -99,4 +101,5 @@ public class WalletPayClient extends DelegatePayClient<NonePayClientConfig> {
     protected PayRefundRespDTO doGetRefund(String outTradeNo, String outRefundNo) {
         throw new UnsupportedOperationException("待实现");
     }
+
 }

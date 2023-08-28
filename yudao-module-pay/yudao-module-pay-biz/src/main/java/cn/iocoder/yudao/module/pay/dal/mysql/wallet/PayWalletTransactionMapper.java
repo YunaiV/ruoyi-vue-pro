@@ -23,7 +23,7 @@ public interface PayWalletTransactionMapper extends BaseMapperX<PayWalletTransac
         if (WalletTransactionQueryTypeEnum.EXPENSE == queryType ) {
             query.lt(PayWalletTransactionDO::getAmount, 0);
         }
-        query.orderByDesc(PayWalletTransactionDO::getTransactionTime);
+        query.orderByDesc(PayWalletTransactionDO::getId);
         return selectPage(pageParam, query);
     }
 
@@ -32,9 +32,11 @@ public interface PayWalletTransactionMapper extends BaseMapperX<PayWalletTransac
     }
 
     default PayWalletTransactionDO selectByWalletIdAndBiz(Long walletId, Long bizId, Integer bizType) {
-        return selectOne(PayWalletTransactionDO::getWalletId, walletId, PayWalletTransactionDO::getBizId,
-                bizId, PayWalletTransactionDO::getBizType, bizType);
+        return selectOne(PayWalletTransactionDO::getWalletId, walletId,
+                PayWalletTransactionDO::getBizId, bizId,
+                PayWalletTransactionDO::getBizType, bizType);
     }
+
 }
 
 
