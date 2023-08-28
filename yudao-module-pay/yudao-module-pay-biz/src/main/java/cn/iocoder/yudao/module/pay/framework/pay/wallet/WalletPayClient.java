@@ -47,14 +47,15 @@ public class WalletPayClient extends DelegatePayClient<NonePayClientConfig> {
                     reqDTO.getOutTradeNo(), "WALLET_PAY_SUCCESS");
         } catch (Throwable ex) {
             log.error("[doUnifiedOrder] 失败", ex);
-            String errorCode = String.valueOf(INTERNAL_SERVER_ERROR);
+            Integer errorCode = INTERNAL_SERVER_ERROR.getCode();
             String errorMsg = INTERNAL_SERVER_ERROR.getMsg();
             if (ex instanceof ServiceException) {
                 ServiceException serviceException = (ServiceException) ex;
-                errorCode = String.valueOf(serviceException.getCode());
+                errorCode = serviceException.getCode();
                 errorMsg = serviceException.getMessage();
             }
-            return PayOrderRespDTO.closedOf(errorCode, errorMsg, reqDTO.getOutTradeNo(), ex);
+            return PayOrderRespDTO.closedOf(String.valueOf(errorCode), errorMsg,
+                    reqDTO.getOutTradeNo(), "");
         }
     }
 
@@ -77,14 +78,15 @@ public class WalletPayClient extends DelegatePayClient<NonePayClientConfig> {
                     reqDTO.getOutRefundNo(), "WALLET_REFUND_SUCCESS");
         } catch (Throwable ex) {
             log.error("[doUnifiedRefund] 失败", ex);
-            String errorCode = String.valueOf(INTERNAL_SERVER_ERROR);
+            Integer errorCode = INTERNAL_SERVER_ERROR.getCode();
             String errorMsg = INTERNAL_SERVER_ERROR.getMsg();
             if (ex instanceof ServiceException) {
                 ServiceException serviceException = (ServiceException) ex;
-                errorCode = String.valueOf(serviceException.getCode());
+                errorCode =  serviceException.getCode();
                 errorMsg = serviceException.getMessage();
             }
-            return PayRefundRespDTO.failureOf(errorCode, errorMsg, reqDTO.getOutRefundNo(), ex);
+            return PayRefundRespDTO.failureOf(String.valueOf(errorCode), errorMsg,
+                    reqDTO.getOutRefundNo(), "");
         }
     }
 
