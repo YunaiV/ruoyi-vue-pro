@@ -53,7 +53,7 @@ public class PayClientFactoryImpl implements PayClientFactory {
     }
 
     @Override
-    public <Config extends PayClientConfig> void createOrUpdateDelegatePayClient(Long channelId, DelegatePayClient<Config> delegatePayClient) {
+    public <Config extends PayClientConfig> void addOrUpdateDelegatePayClient(Long channelId, DelegatePayClient<Config> delegatePayClient) {
         clients.put(channelId, delegatePayClient);
     }
 

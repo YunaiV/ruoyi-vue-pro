@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.AppPayWalletTransact
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletTransactionMapper;
+import cn.iocoder.yudao.module.pay.enums.member.WalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.enums.member.WalletTransactionQueryTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,16 @@ public class PayWalletTransactionServiceImpl implements PayWalletTransactionServ
     public Long addPayWalletTransaction(PayWalletTransactionDO payWalletTransaction) {
          payWalletTransactionMapper.insert(payWalletTransaction);
          return payWalletTransaction.getId();
+    }
+
+    @Override
+    public PayWalletTransactionDO getPayWalletTransactionByNo(String no) {
+        return payWalletTransactionMapper.selectByNo(no);
+    }
+
+    @Override
+    public PayWalletTransactionDO getPayWalletTransaction(Long walletId, Long bizId, WalletBizTypeEnum typeEnum) {
+        return payWalletTransactionMapper.selectByWalletIdAndBiz(walletId, bizId, typeEnum.getBizType());
     }
 
 

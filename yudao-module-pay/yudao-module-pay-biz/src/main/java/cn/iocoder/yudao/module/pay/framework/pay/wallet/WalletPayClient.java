@@ -1,16 +1,19 @@
 package cn.iocoder.yudao.module.pay.framework.pay.wallet;
 
-import cn.iocoder.yudao.framework.pay.core.client.impl.NonePayClientConfig;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.impl.NonePayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.impl.delegate.DelegatePayClient;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR;
 
 /**
  * 钱包支付的 PayClient 实现类
@@ -19,7 +22,6 @@ import java.util.Map;
  */
 @Slf4j
 public class WalletPayClient extends DelegatePayClient<NonePayClientConfig> {
-
     private PayWalletService payWalletService;
 
     public WalletPayClient(Long channelId, String channelCode, NonePayClientConfig config) {
@@ -38,12 +40,23 @@ public class WalletPayClient extends DelegatePayClient<NonePayClientConfig> {
 
     @Override
     protected PayOrderRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
-        PayWalletTransactionDO payWalletTransaction = payWalletService.pay(reqDTO.getOutTradeNo(), reqDTO.getPrice());
-        return PayOrderRespDTO.successOf(payWalletTransaction.getNo(), payWalletTransaction.getCreator(),
-                payWalletTransaction.getTransactionTime(),
-                reqDTO.getOutTradeNo(), "");
+        try {
+            PayWalletTransactionDO payWalletTransaction = payWalletService.pay(reqDTO.getOutTradeNo(), reqDTO.getPrice());
+            return PayOrderRespDTO.successOf(payWalletTransaction.getNo(), payWalletTransaction.getCreator(),
+                    payWalletTransaction.getTransactionTime(),
+                    reqDTO.getOutTradeNo(), "WALLET_PAY_SUCCESS");
+        } catch (Throwable ex) {
+            log.error("[doUnifiedOrder] 失败", ex);
+            String errorCode = String.valueOf(INTERNAL_SERVER_ERROR);
+            String errorMsg = INTERNAL_SERVER_ERROR.getMsg();
+            if (ex instanceof ServiceException) {
+                ServiceException serviceException = (ServiceException) ex;
+                errorCode = String.valueOf(serviceException.getCode());
+                errorMsg = serviceException.getMessage();
+            }
+            return PayOrderRespDTO.closedOf(errorCode, errorMsg, reqDTO.getOutTradeNo(), ex);
+        }
     }
-
 
     @Override
     protected PayOrderRespDTO doParseOrderNotify(Map<String, String> params, String body) {
@@ -52,12 +65,27 @@ public class WalletPayClient extends DelegatePayClient<NonePayClientConfig> {
 
     @Override
     protected PayOrderRespDTO doGetOrder(String outTradeNo) {
-        return null;
+        throw new UnsupportedOperationException("待实现");
     }
 
     @Override
     protected PayRefundRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) {
-        return null;
+        try {
+            PayWalletTransactionDO payWalletTransaction = payWalletService.refund(reqDTO.getOutRefundNo(),
+                    reqDTO.getRefundPrice(), reqDTO.getReason());
+            return PayRefundRespDTO.successOf(payWalletTransaction.getNo(), payWalletTransaction.getTransactionTime(),
+                    reqDTO.getOutRefundNo(), "WALLET_REFUND_SUCCESS");
+        } catch (Throwable ex) {
+            log.error("[doUnifiedRefund] 失败", ex);
+            String errorCode = String.valueOf(INTERNAL_SERVER_ERROR);
+            String errorMsg = INTERNAL_SERVER_ERROR.getMsg();
+            if (ex instanceof ServiceException) {
+                ServiceException serviceException = (ServiceException) ex;
+                errorCode = String.valueOf(serviceException.getCode());
+                errorMsg = serviceException.getMessage();
+            }
+            return PayRefundRespDTO.failureOf(errorCode, errorMsg, reqDTO.getOutRefundNo(), ex);
+        }
     }
 
     @Override
@@ -67,6 +95,6 @@ public class WalletPayClient extends DelegatePayClient<NonePayClientConfig> {
 
     @Override
     protected PayRefundRespDTO doGetRefund(String outTradeNo, String outRefundNo) {
-        return null;
+        throw new UnsupportedOperationException("待实现");
     }
 }

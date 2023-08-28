@@ -27,6 +27,12 @@ public interface PayClientFactory {
     <Config extends PayClientConfig> void createOrUpdatePayClient(Long channelId, String channelCode,
                                                                   Config config);
 
-    <Config extends PayClientConfig> void createOrUpdateDelegatePayClient(Long channelId, DelegatePayClient<Config> delegatePayClient);
+    /**
+     * 新增或更新代理支付客户端
+     * @param channelId 渠道编号
+     * @param delegatePayClient 代理支付客户端
+     * @param <Config> 支付配置
+     */
+    <Config extends PayClientConfig> void addOrUpdateDelegatePayClient(Long channelId, DelegatePayClient<Config> delegatePayClient);
 
 }

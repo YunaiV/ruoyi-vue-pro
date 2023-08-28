@@ -26,6 +26,15 @@ public interface PayWalletTransactionMapper extends BaseMapperX<PayWalletTransac
         query.orderByDesc(PayWalletTransactionDO::getTransactionTime);
         return selectPage(pageParam, query);
     }
+
+    default PayWalletTransactionDO selectByNo(String no) {
+        return selectOne(PayWalletTransactionDO::getNo, no);
+    }
+
+    default PayWalletTransactionDO selectByWalletIdAndBiz(Long walletId, Long bizId, Integer bizType) {
+        return selectOne(PayWalletTransactionDO::getWalletId, walletId, PayWalletTransactionDO::getBizId,
+                bizId, PayWalletTransactionDO::getBizType, bizType);
+    }
 }
 
 

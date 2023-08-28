@@ -13,7 +13,8 @@ import lombok.Getter;
 public enum WalletBizTypeEnum {
     RECHARGE(1, "充值"),
     RECHARGE_REFUND(2, "充值退款"),
-    PAYMENT(3, "支付");
+    PAYMENT(3, "支付"),
+    PAYMENT_REFUND(4, "支付退款");
 
     // TODO 后续增加
     /**

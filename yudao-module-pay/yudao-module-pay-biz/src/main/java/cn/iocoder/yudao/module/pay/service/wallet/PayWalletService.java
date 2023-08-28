@@ -17,5 +17,18 @@ public interface PayWalletService {
      */
     PayWalletDO getPayWallet(Long userId, Integer userType);
 
+    /**
+     * 钱包支付
+     * @param outTradeNo 外部订单号
+     * @param price 金额
+     */
     PayWalletTransactionDO pay(String outTradeNo, Integer price);
+
+    /**
+     * 钱包支付退款
+     * @param outRefundNo 外部退款号
+     * @param refundPrice 退款金额
+     * @param reason  退款原因
+     */
+    PayWalletTransactionDO refund(String outRefundNo, Integer refundPrice, String reason);
 }

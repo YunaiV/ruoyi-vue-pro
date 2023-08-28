@@ -10,6 +10,8 @@ import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import java.util.Map;
 
 /**
+ * 代理支付 Client 的抽象类。用于支付 Client 由其它模块实现, 例如钱包支付
+ *
  * @author jason
  */
 public abstract  class DelegatePayClient<Config extends PayClientConfig> extends AbstractPayClient<PayClientConfig> {
