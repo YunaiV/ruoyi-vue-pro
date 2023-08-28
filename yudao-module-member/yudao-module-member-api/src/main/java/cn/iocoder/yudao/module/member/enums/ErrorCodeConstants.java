@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 
 /**
  * Member 错误码枚举类
- *
+ * <p>
  * member 系统，使用 1-004-000-000 段
  */
 public interface ErrorCodeConstants {
@@ -32,6 +32,7 @@ public interface ErrorCodeConstants {
     //========== 积分配置 1004007000 ==========
 
     //========== 积分记录 1004008000 ==========
+    ErrorCode POINT_RECORD_BIZ_NOT_SUPPORT = new ErrorCode(1004008000, "用户积分记录业务类型不支持");
 
     //========== 签到配置 1004009000 ==========
     ErrorCode SIGN_IN_CONFIG_NOT_EXISTS = new ErrorCode(1004009000, "签到天数规则不存在");
@@ -48,9 +49,7 @@ public interface ErrorCodeConstants {
     ErrorCode LEVEL_EXPERIENCE_MAX = new ErrorCode(1004011004, "升级经验必须小于下一个等级[{}]设置的升级经验[{}]");
     ErrorCode LEVEL_HAS_USER = new ErrorCode(1004011005, "用户等级下存在用户，无法删除");
 
-    ErrorCode LEVEL_LOG_NOT_EXISTS = new ErrorCode(1004011100, "用户等级记录不存在");
-    ErrorCode EXPERIENCE_LOG_NOT_EXISTS = new ErrorCode(1004011200, "用户经验记录不存在");
-    ErrorCode LEVEL_REASON_NOT_EXISTS = new ErrorCode(1004011300, "用户等级调整原因不能为空");
+    ErrorCode EXPERIENCE_BIZ_NOT_SUPPORT = new ErrorCode(1004011201, "用户经验业务类型不支持");
 
     //========== 用户分组 1004012000 ==========
     ErrorCode GROUP_NOT_EXISTS = new ErrorCode(1004012000, "用户分组不存在");

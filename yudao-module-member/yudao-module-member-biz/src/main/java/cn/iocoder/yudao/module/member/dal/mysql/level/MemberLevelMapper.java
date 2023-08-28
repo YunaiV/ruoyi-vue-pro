@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.member.dal.mysql.level;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelPageReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelListReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -17,8 +16,8 @@ import java.util.List;
 @Mapper
 public interface MemberLevelMapper extends BaseMapperX<MemberLevelDO> {
 
-    default PageResult<MemberLevelDO> selectPage(MemberLevelPageReqVO reqVO) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<MemberLevelDO>()
+    default List<MemberLevelDO> selectList(MemberLevelListReqVO reqVO) {
+        return selectList(new LambdaQueryWrapperX<MemberLevelDO>()
                 .likeIfPresent(MemberLevelDO::getName, reqVO.getName())
                 .eqIfPresent(MemberLevelDO::getStatus, reqVO.getStatus())
                 .orderByAsc(MemberLevelDO::getLevel));

@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.member.controller.admin.level;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.*;
 import cn.iocoder.yudao.module.member.convert.level.MemberLevelConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
@@ -70,13 +69,12 @@ public class MemberLevelController {
         return success(MemberLevelConvert.INSTANCE.convertSimpleList(list));
     }
 
-    // TODO @疯狂：是不是不做分页，直接 list 就好啦；返回的时候，按照经验排序下哈；
-    @GetMapping("/page")
-    @Operation(summary = "获得会员等级分页")
+    @GetMapping("/list")
+    @Operation(summary = "获得会员等级列表")
     @PreAuthorize("@ss.hasPermission('member:level:query')")
-    public CommonResult<PageResult<MemberLevelRespVO>> getLevelPage(@Valid MemberLevelPageReqVO pageVO) {
-        PageResult<MemberLevelDO> pageResult = levelService.getLevelPage(pageVO);
-        return success(MemberLevelConvert.INSTANCE.convertPage(pageResult));
+    public CommonResult<List<MemberLevelRespVO>> getLevelList(@Valid MemberLevelListReqVO pageVO) {
+        List<MemberLevelDO> result = levelService.getLevelList(pageVO);
+        return success(MemberLevelConvert.INSTANCE.convertList(result));
     }
 
 }

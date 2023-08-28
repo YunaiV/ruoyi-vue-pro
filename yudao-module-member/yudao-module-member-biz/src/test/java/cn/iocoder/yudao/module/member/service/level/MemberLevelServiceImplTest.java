@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelCreateReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelPageReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelListReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.level.MemberLevelUpdateReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
 import cn.iocoder.yudao.module.member.dal.mysql.level.MemberLevelMapper;
@@ -41,9 +41,9 @@ public class MemberLevelServiceImplTest extends BaseDbUnitTest {
     private MemberLevelMapper levelMapper;
 
     @MockBean
-    private MemberLevelLogService memberLevelLogService;
+    private MemberLevelRecordService memberLevelRecordService;
     @MockBean
-    private MemberExperienceLogService memberExperienceLogService;
+    private MemberExperienceRecordService memberExperienceRecordService;
 
     @Test
     public void testCreateLevel_success() {
@@ -121,7 +121,7 @@ public class MemberLevelServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testGetLevelPage() {
+    public void testGetLevelList() {
         // mock 数据
         MemberLevelDO dbLevel = randomPojo(MemberLevelDO.class, o -> { // 等会查询到
             o.setName("黄金会员");
@@ -133,16 +133,15 @@ public class MemberLevelServiceImplTest extends BaseDbUnitTest {
         // 测试 status 不匹配
         levelMapper.insert(cloneIgnoreId(dbLevel, o -> o.setStatus(0)));
         // 准备参数
-        MemberLevelPageReqVO reqVO = new MemberLevelPageReqVO();
+        MemberLevelListReqVO reqVO = new MemberLevelListReqVO();
         reqVO.setName("黄金会员");
         reqVO.setStatus(1);
 
         // 调用
-        PageResult<MemberLevelDO> pageResult = levelService.getLevelPage(reqVO);
+        List<MemberLevelDO> list = levelService.getLevelList(reqVO);
         // 断言
-        assertEquals(1, pageResult.getTotal());
-        assertEquals(1, pageResult.getList().size());
-        assertPojoEquals(dbLevel, pageResult.getList().get(0));
+        assertEquals(1, list.size());
+        assertPojoEquals(dbLevel, list.get(0));
     }
 
     @Test

@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
@@ -12,8 +13,12 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
+import cn.iocoder.yudao.module.member.api.level.MemberLevelApi;
+import cn.iocoder.yudao.module.member.api.point.MemberPointApi;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
+import cn.iocoder.yudao.module.member.enums.MemberExperienceBizTypeEnum;
+import cn.iocoder.yudao.module.member.enums.point.MemberPointBizTypeEnum;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
@@ -57,6 +62,7 @@ import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -101,8 +107,14 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private AddressApi addressApi;
     @Resource
     private CouponApi couponApi;
+
     @Resource
     private MemberUserApi memberUserApi;
+    @Resource
+    private MemberLevelApi memberLevelApi;
+    @Resource
+    private MemberPointApi memberPointApi;
+
     @Resource
     private ProductCommentApi productCommentApi;
     @Resource
@@ -336,6 +348,11 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // TODO 芋艿：发送站内信
 
         // TODO 芋艿：OrderLog
+
+        // 增加用户积分
+        getSelf().addUserPointAsync(order.getUserId(), order.getPayPrice(), order.getId());
+        // 增加用户经验
+        getSelf().addUserExperienceAsync(order.getUserId(), order.getPayPrice(), order.getId());
     }
 
     /**
@@ -603,6 +620,11 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         }
 
         // TODO 芋艿：未来如果有分佣，需要更新相关分佣订单为已失效
+
+        // 扣减用户积分
+        getSelf().reduceUserPointAsync(order.getUserId(), orderRefundPrice, afterSaleId);
+        // 扣减用户经验
+        getSelf().reduceUserExperienceAsync(order.getUserId(), orderRefundPrice, afterSaleId);
     }
 
     @Override
@@ -648,6 +670,39 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(id);
         return orderItems.stream().allMatch(orderItem -> Objects.equals(orderItem.getAfterSaleStatus(),
                 TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus()));
+    }
+
+    @Async
+    protected void addUserExperienceAsync(Long userId, Integer payPrice, Long orderId) {
+        int bizType = MemberExperienceBizTypeEnum.ORDER.getType();
+        memberLevelApi.addExperience(userId, payPrice, bizType, String.valueOf(orderId));
+    }
+
+    @Async
+    protected void reduceUserExperienceAsync(Long userId, Integer refundPrice, Long afterSaleId) {
+        int bizType = MemberExperienceBizTypeEnum.REFUND.getType();
+        memberLevelApi.addExperience(userId, -refundPrice, bizType, String.valueOf(afterSaleId));
+    }
+
+    @Async
+    protected void addUserPointAsync(Long userId, Integer payPrice, Long orderId) {
+        int bizType = MemberPointBizTypeEnum.ORDER_BUY.getType();
+        memberPointApi.addPoint(userId, payPrice, bizType, String.valueOf(orderId));
+    }
+
+    @Async
+    protected void reduceUserPointAsync(Long userId, Integer refundPrice, Long afterSaleId) {
+        int bizType = MemberPointBizTypeEnum.ORDER_CANCEL.getType();
+        memberPointApi.addPoint(userId, -refundPrice, bizType, String.valueOf(afterSaleId));
+    }
+
+    /**
+     * 获得自身的代理对象，解决 AOP 生效问题
+     *
+     * @return 自己
+     */
+    private TradeOrderUpdateServiceImpl getSelf() {
+        return SpringUtil.getBean(getClass());
     }
 
 }

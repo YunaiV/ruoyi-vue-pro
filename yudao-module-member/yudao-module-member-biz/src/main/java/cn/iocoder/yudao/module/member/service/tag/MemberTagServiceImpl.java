@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagUpdateReq
 import cn.iocoder.yudao.module.member.convert.tag.MemberTagConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.tag.MemberTagDO;
 import cn.iocoder.yudao.module.member.dal.mysql.tag.MemberTagMapper;
-import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
+import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -33,7 +33,7 @@ public class MemberTagServiceImpl implements MemberTagService {
     @Resource
     private MemberTagMapper tagMapper;
     @Resource
-    private MemberUserMapper memberUserMapper;
+    private MemberUserService memberUserService;
 
     @Override
     public Long createTag(MemberTagCreateReqVO createReqVO) {
@@ -92,7 +92,7 @@ public class MemberTagServiceImpl implements MemberTagService {
     }
 
     void validateTagHasUser(Long id) {
-        Long count = memberUserMapper.selectCountByTagId(id);
+        Long count = memberUserService.getUserCountByTagId(id);
         if (count > 0) {
             throw exception(TAG_HAS_USER);
         }

@@ -40,8 +40,11 @@ public class MemberUserBaseVO {
     @Schema(description = "用户性别", example = "1")
     private Byte sex;
 
-    @Schema(description = "所在地", example = "4371")
+    @Schema(description = "所在地编号", example = "4371")
     private Long areaId;
+
+    @Schema(description = "所在地全程", example = "上海上海市普陀区")
+    private String areaName;
 
     @Schema(description = "出生日期", example = "2023-03-12")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY)
