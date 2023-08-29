@@ -7,13 +7,15 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayRefundNotifyReqDTO;
-import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleDisagreeReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSalePageReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleRefuseReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleRespPageItemVO;
+import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.*;
 import cn.iocoder.yudao.module.trade.convert.aftersale.TradeAfterSaleConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
+import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.dto.TradeAfterSaleLogRespDTO;
+import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.service.AfterSaleLogService;
 import cn.iocoder.yudao.module.trade.service.aftersale.TradeAfterSaleService;
+import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -41,7 +44,10 @@ public class TradeAfterSaleController {
 
     @Resource
     private TradeAfterSaleService afterSaleService;
-
+    @Resource
+    private TradeOrderQueryService tradeOrderQueryService;
+    @Resource
+    private AfterSaleLogService afterSaleLogService;
     @Resource
     private MemberUserApi memberUserApi;
 
@@ -59,6 +65,24 @@ public class TradeAfterSaleController {
         Map<Long, MemberUserRespDTO> memberUsers = memberUserApi.getUserMap(
                 convertSet(pageResult.getList(), TradeAfterSaleDO::getUserId));
         return success(TradeAfterSaleConvert.INSTANCE.convertPage(pageResult, memberUsers));
+    }
+
+    @GetMapping("/get-detail")
+    @Operation(summary = "获得售后订单详情")
+    @Parameter(name = "id", description = "售后编号", required = true, example = "1")
+    @PreAuthorize("@ss.hasPermission('trade:after-sale:query')")
+    public CommonResult<TradeAfterSaleDetailRespVO> getOrderDetail(@RequestParam("id") Long id) {
+        // 查询订单
+        TradeAfterSaleDO afterSale = afterSaleService.getAfterSale(id);
+        // 查询订单
+        TradeOrderDO order = tradeOrderQueryService.getOrder(afterSale.getOrderId());
+        // 查询订单项
+        List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(id);
+        // 拼接数据
+        MemberUserRespDTO user = memberUserApi.getUser(afterSale.getUserId());
+        // 获取售后日志
+        List<TradeAfterSaleLogRespDTO> logs = afterSaleLogService.getLog(afterSale.getId());
+        return success(TradeAfterSaleConvert.INSTANCE.convert(afterSale, order, orderItems, user, logs));
     }
 
     @PutMapping("/agree")
@@ -88,7 +112,7 @@ public class TradeAfterSaleController {
     }
 
     @PutMapping("/refuse")
-    @Operation(summary = "确认收货")
+    @Operation(summary = "拒绝收货")
     @Parameter(name = "id", description = "售后编号", required = true, example = "1")
     @PreAuthorize("@ss.hasPermission('trade:after-sale:receive')")
     public CommonResult<Boolean> refuseAfterSale(TradeAfterSaleRefuseReqVO refuseReqVO) {
