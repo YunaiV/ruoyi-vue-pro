@@ -23,7 +23,8 @@ public class DeliveryPickUpStoreSimpleRespVO {
     @Schema(description = "区域编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "18733")
     private Integer areaId;
 
-    // TODO @puhui999：要把 areaName 也返回哈
+    @Schema(description = "区域名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "xx市")
+    private String areaName;
 
     @Schema(description = "门店详细地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "复旦大学路 188 号")
     private String detailAddress;

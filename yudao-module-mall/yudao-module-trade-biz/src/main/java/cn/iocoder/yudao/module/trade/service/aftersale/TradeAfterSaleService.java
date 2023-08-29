@@ -43,6 +43,14 @@ public interface TradeAfterSaleService {
     TradeAfterSaleDO getAfterSale(Long userId, Long id);
 
     /**
+     * 【管理员】获得售后单
+     *
+     * @param id 售后编号
+     * @return 售后订单
+     */
+    TradeAfterSaleDO getAfterSale(Long id);
+
+    /**
      * 【会员】创建售后订单
      *
      * @param userId 会员用户编号

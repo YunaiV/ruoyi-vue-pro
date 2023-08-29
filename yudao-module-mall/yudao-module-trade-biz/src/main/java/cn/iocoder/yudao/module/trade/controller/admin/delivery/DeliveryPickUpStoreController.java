@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.trade.controller.admin.delivery;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.*;
 import cn.iocoder.yudao.module.trade.convert.delivery.DeliveryPickUpStoreConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryPickUpStoreDO;
@@ -64,10 +66,13 @@ public class DeliveryPickUpStoreController {
     }
 
     @GetMapping("/list-all-simple")
-    @Operation(summary = "获取快递公司精简信息列表")
+    @Operation(summary = "获得自提门店精简信息列表")
     public CommonResult<List<DeliveryPickUpStoreSimpleRespVO>> getSimpleDeliveryPickUpStoreList() {
         List<DeliveryPickUpStoreDO> list = deliveryPickUpStoreService.getDeliveryPickUpStoreListByStatus(CommonStatusEnum.ENABLE.getStatus());
-        return success(DeliveryPickUpStoreConvert.INSTANCE.convertList1(list));
+        return success(CollectionUtils.convertList(DeliveryPickUpStoreConvert.INSTANCE.convertList1(list), item -> {
+            item.setAreaName(AreaUtils.format(item.getAreaId()));
+            return item;
+        }));
     }
 
     @GetMapping("/list")
