@@ -9,7 +9,6 @@ import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayQrPayClient;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayWapPayClient;
 import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WxPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WxPubPayClient;
-import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -41,7 +40,8 @@ public class PayClientFactoryImplIntegrationTest {
         config.setMchKey("0alL64UDQdlCwiKZ73ib7ypaIjMns06p");
         // 创建客户端
         Long channelId = RandomUtil.randomLong();
-        payClientFactory.createOrUpdatePayClient(channelId, PayChannelEnum.WX_PUB.getCode(), config);
+
+        payClientFactory.addOrUpdatePayClient(channelId,  new WxPubPayClient(channelId,  config));
         PayClient client = payClientFactory.getPayClient(channelId);
         // 发起支付
         PayOrderUnifiedReqDTO reqDTO = buildPayOrderUnifiedReqDTO();
@@ -64,7 +64,7 @@ public class PayClientFactoryImplIntegrationTest {
         config.setApiV3Key("joerVi8y5DJ3o4ttA0o1uH47Xz1u2Ase");
         // 创建客户端
         Long channelId = RandomUtil.randomLong();
-        payClientFactory.createOrUpdatePayClient(channelId, PayChannelEnum.WX_PUB.getCode(), config);
+        payClientFactory.addOrUpdatePayClient(channelId, new WxPubPayClient(channelId,  config));
         PayClient client = payClientFactory.getPayClient(channelId);
         // 发起支付
         PayOrderUnifiedReqDTO reqDTO = buildPayOrderUnifiedReqDTO();
@@ -87,7 +87,7 @@ public class PayClientFactoryImplIntegrationTest {
         config.setAlipayPublicKey("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnq90KnF4dTnlzzmxpujbI05OYqi5WxAS6cL0gnZFv2gK51HExF8v/BaP7P979PhFMgWTqmOOI+Dtno5s+yD09XTY1WkshbLk6i4g2Xlr8fyW9ODnkU88RI2w9UdPhQU4cPPwBNlrsYhKkVK2OxwM3kFqjoBBY0CZoZCsSQ3LDH5WeZqPArlsS6xa2zqJBuuoKjMrdpELl3eXSjP8K54eDJCbeetCZNKWLL3DPahTPB7LZikfYmslb0QUvCgGapD0xkS7eVq70NaL1G57MWABs4tbfWgxike4Daj3EfUrzIVspQxj7w8HEj9WozJPgL88kSJSits0pqD3n5r8HSuseQIDAQAB");
         // 创建客户端
         Long channelId = RandomUtil.randomLong();
-        payClientFactory.createOrUpdatePayClient(channelId, PayChannelEnum.ALIPAY_QR.getCode(), config);
+        payClientFactory.addOrUpdatePayClient(channelId, new AlipayQrPayClient(channelId,  config));
         PayClient client = payClientFactory.getPayClient(channelId);
         // 发起支付
         PayOrderUnifiedReqDTO reqDTO = buildPayOrderUnifiedReqDTO();
@@ -111,7 +111,7 @@ public class PayClientFactoryImplIntegrationTest {
         config.setAlipayPublicKey("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnq90KnF4dTnlzzmxpujbI05OYqi5WxAS6cL0gnZFv2gK51HExF8v/BaP7P979PhFMgWTqmOOI+Dtno5s+yD09XTY1WkshbLk6i4g2Xlr8fyW9ODnkU88RI2w9UdPhQU4cPPwBNlrsYhKkVK2OxwM3kFqjoBBY0CZoZCsSQ3LDH5WeZqPArlsS6xa2zqJBuuoKjMrdpELl3eXSjP8K54eDJCbeetCZNKWLL3DPahTPB7LZikfYmslb0QUvCgGapD0xkS7eVq70NaL1G57MWABs4tbfWgxike4Daj3EfUrzIVspQxj7w8HEj9WozJPgL88kSJSits0pqD3n5r8HSuseQIDAQAB");
         // 创建客户端
         Long channelId = RandomUtil.randomLong();
-        payClientFactory.createOrUpdatePayClient(channelId, PayChannelEnum.ALIPAY_WAP.getCode(), config);
+        payClientFactory.addOrUpdatePayClient(channelId, new AlipayWapPayClient(channelId, config));
         PayClient client = payClientFactory.getPayClient(channelId);
         // 发起支付
         PayOrderUnifiedReqDTO reqDTO = buildPayOrderUnifiedReqDTO();

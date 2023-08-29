@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDT
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.exception.PayException;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -35,6 +36,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
     /**
      * 支付配置
      */
+    @Getter
     protected Config config;
 
     public AbstractPayClient(Long channelId, String channelCode, Config config) {
