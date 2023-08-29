@@ -168,7 +168,7 @@ public abstract class AbstractAlipayClientTest extends BaseMockitoUnitTest {
     @Test
     @DisplayName("支付宝 Client 统一退款：抛出业务异常")
     public void testUnifiedRefund_throwServiceException() throws AlipayApiException {
-        // mock
+        // mock 方法
         when(defaultAlipayClient.execute(argThat((ArgumentMatcher<AlipayTradeRefundRequest>) request -> true)))
                 .thenThrow(ServiceExceptionUtil.exception(GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR));
         // 准备请求参数
@@ -182,7 +182,7 @@ public abstract class AbstractAlipayClientTest extends BaseMockitoUnitTest {
     @Test
     @DisplayName("支付宝 Client 统一退款：抛出系统异常")
     public void testUnifiedRefund_throwPayException() throws AlipayApiException {
-        // mock
+        // mock 方法
         when(defaultAlipayClient.execute(argThat((ArgumentMatcher<AlipayTradeRefundRequest>) request -> true)))
                 .thenThrow(new RuntimeException("系统异常"));
         // 准备请求参数

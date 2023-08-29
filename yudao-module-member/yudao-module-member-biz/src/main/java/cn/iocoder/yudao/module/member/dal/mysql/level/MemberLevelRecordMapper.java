@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.member.dal.mysql.level;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.log.MemberLevelRecordPageReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.record.MemberLevelRecordPageReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelRecordDO;
 import org.apache.ibatis.annotations.Mapper;
 

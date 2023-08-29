@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.*;
+import cn.iocoder.yudao.framework.pay.core.client.impl.delegate.DelegatePayClient;
 import cn.iocoder.yudao.framework.pay.core.client.impl.mock.MockPayClient;
 import cn.iocoder.yudao.framework.pay.core.client.impl.mock.MockPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.*;
@@ -49,6 +50,11 @@ public class PayClientFactoryImpl implements PayClientFactory {
         } else {
             client.refresh(config);
         }
+    }
+
+    @Override
+    public <Config extends PayClientConfig> void addOrUpdateDelegatePayClient(Long channelId, DelegatePayClient<Config> delegatePayClient) {
+        clients.put(channelId, delegatePayClient);
     }
 
     @SuppressWarnings("unchecked")

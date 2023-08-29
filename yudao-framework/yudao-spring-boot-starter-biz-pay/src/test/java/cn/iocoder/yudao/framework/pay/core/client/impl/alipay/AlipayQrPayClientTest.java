@@ -39,9 +39,9 @@ public class AlipayQrPayClientTest extends AbstractAlipayClientTest {
     }
 
     @Test
-    @DisplayName("支付宝扫描支付下单成功")
-    public void test_unified_order_success() throws AlipayApiException {
-        // 准备返回对象
+    @DisplayName("支付宝扫描支付：下单成功")
+    public void testUnifiedOrder_success() throws AlipayApiException {
+        // mock 方法
         String notifyUrl = randomURL();
         String qrCode = randomString();
         Integer price = randomInteger();
@@ -49,7 +49,6 @@ public class AlipayQrPayClientTest extends AbstractAlipayClientTest {
             o.setQrCode(qrCode);
             o.setSubCode("");
         });
-        // mock
         when(defaultAlipayClient.execute(argThat((ArgumentMatcher<AlipayTradePrecreateRequest>) request -> {
             assertEquals(notifyUrl, request.getNotifyUrl());
             return true;
@@ -58,18 +57,25 @@ public class AlipayQrPayClientTest extends AbstractAlipayClientTest {
         String outTradeNo = randomString();
         PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(notifyUrl, outTradeNo, price);
 
+        // 调用
         PayOrderRespDTO resp = client.unifiedOrder(reqDTO);
         // 断言
         assertEquals(WAITING.getStatus(), resp.getStatus());
-        assertEquals(PayOrderDisplayModeEnum.QR_CODE.getMode(), resp.getDisplayMode());
         assertEquals(outTradeNo, resp.getOutTradeNo());
-        assertEquals(qrCode, resp.getDisplayContent());
+        assertNull(resp.getChannelOrderNo());
+        assertNull(resp.getChannelUserId());
+        assertNull(resp.getSuccessTime());
+        assertEquals(PayOrderDisplayModeEnum.QR_CODE.getMode(), resp.getDisplayMode());
+        assertEquals(response.getQrCode(), resp.getDisplayContent());
         assertSame(response, resp.getRawData());
+        assertNull(resp.getChannelErrorCode());
+        assertNull(resp.getChannelErrorMsg());
     }
 
     @Test
-    @DisplayName("支付宝扫描支付,渠道返回失败")
-    public void test_unified_order_channel_failed() throws AlipayApiException {
+    @DisplayName("支付宝扫描支付：渠道返回失败")
+    public void testUnifiedOrder_channelFailed() throws AlipayApiException {
+        // mock 方法
         String notifyUrl = randomURL();
         String subCode = randomString();
         String subMsg = randomString();
@@ -87,47 +93,55 @@ public class AlipayQrPayClientTest extends AbstractAlipayClientTest {
         String outTradeNo = randomString();
         PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(notifyUrl, outTradeNo, price);
 
+        // 调用
         PayOrderRespDTO resp = client.unifiedOrder(reqDTO);
         // 断言
         assertEquals(CLOSED.getStatus(), resp.getStatus());
+        assertEquals(outTradeNo, resp.getOutTradeNo());
+        assertNull(resp.getChannelOrderNo());
+        assertNull(resp.getChannelUserId());
+        assertNull(resp.getSuccessTime());
+        assertNull(resp.getDisplayMode());
+        assertNull(resp.getDisplayContent());
+        assertSame(response, resp.getRawData());
         assertEquals(subCode, resp.getChannelErrorCode());
         assertEquals(subMsg, resp.getChannelErrorMsg());
-        assertSame(response, resp.getRawData());
     }
 
     @Test
     @DisplayName("支付宝扫描支付, 抛出系统异常")
-    public void test_unified_order_throw_pay_exception() throws AlipayApiException {
-        // 准备请求参数
+    public void testUnifiedOrder_throwPayException() throws AlipayApiException {
+        // mock 方法
         String outTradeNo = randomString();
         String notifyUrl = randomURL();
         Integer price = randomInteger();
-        // mock
         when(defaultAlipayClient.execute(argThat((ArgumentMatcher<AlipayTradePrecreateRequest>) request -> {
             assertEquals(notifyUrl, request.getNotifyUrl());
             return true;
         }))).thenThrow(new RuntimeException("系统异常"));
         // 准备请求参数
         PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(notifyUrl, outTradeNo,price);
-        // 断言
+
+        // 调用，并断言
         assertThrows(PayException.class, () -> client.unifiedOrder(reqDTO));
     }
 
     @Test
-    @DisplayName("支付宝 Client 统一下单,抛出业务异常")
-    public void test_unified_order_throw_service_exception() throws AlipayApiException {
-        // 准备请求参数
+    @DisplayName("支付宝 Client 统一下单：抛出业务异常")
+    public void testUnifiedOrder_throwServiceException() throws AlipayApiException {
+        // mock 方法
         String outTradeNo = randomString();
         String notifyUrl = randomURL();
         Integer price = randomInteger();
-        // mock
         when(defaultAlipayClient.execute(argThat((ArgumentMatcher<AlipayTradePrecreateRequest>) request -> {
             assertEquals(notifyUrl, request.getNotifyUrl());
             return true;
         }))).thenThrow(ServiceExceptionUtil.exception(GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR));
         // 准备请求参数
         PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(notifyUrl, outTradeNo, price);
-        // 断言
+
+        // 调用，并断言
         assertThrows(ServiceException.class, () -> client.unifiedOrder(reqDTO));
     }
+
 }

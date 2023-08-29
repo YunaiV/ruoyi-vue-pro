@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.member.controller.app.point;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.member.controller.app.point.vo.AppMemberPointRecordRespVO;
 import cn.iocoder.yudao.module.member.convert.point.MemberPointRecordConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.point.MemberPointRecordDO;
@@ -31,6 +32,7 @@ public class AppMemberPointRecordController {
 
     @GetMapping("/page")
     @Operation(summary = "获得用户积分记录分页")
+    @PreAuthenticated
     public CommonResult<PageResult<AppMemberPointRecordRespVO>> getPointRecordPage(@Valid PageParam pageVO) {
         PageResult<MemberPointRecordDO> pageResult = pointRecordService.getPointRecordPage(getLoginUserId(), pageVO);
         return success(MemberPointRecordConvert.INSTANCE.convertPage02(pageResult));

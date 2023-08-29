@@ -107,6 +107,14 @@ public interface PayOrderService {
     PayOrderExtensionDO getOrderExtension(Long id);
 
     /**
+     * 获得支付订单
+     *
+     * @param no 支付订单 no
+     * @return 支付订单
+     */
+    PayOrderExtensionDO getOrderExtensionByNo(String no);
+
+    /**
      * 同步订单的支付状态
      *
      * @param minCreateTime 最小创建时间

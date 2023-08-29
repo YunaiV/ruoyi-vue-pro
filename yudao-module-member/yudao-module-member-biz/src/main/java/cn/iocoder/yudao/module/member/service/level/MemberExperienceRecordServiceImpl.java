@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.member.service.level;
 
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.level.vo.experience.MemberExperienceRecordPageReqVO;
 import cn.iocoder.yudao.module.member.convert.level.MemberExperienceRecordConvert;
@@ -32,13 +33,13 @@ public class MemberExperienceRecordServiceImpl implements MemberExperienceRecord
     }
 
     @Override
-    public List<MemberExperienceRecordDO> getExperienceRecordList(Collection<Long> ids) {
-        return experienceLogMapper.selectBatchIds(ids);
+    public PageResult<MemberExperienceRecordDO> getExperienceRecordPage(MemberExperienceRecordPageReqVO pageReqVO) {
+        return experienceLogMapper.selectPage(pageReqVO);
     }
 
     @Override
-    public PageResult<MemberExperienceRecordDO> getExperienceRecordPage(MemberExperienceRecordPageReqVO pageReqVO) {
-        return experienceLogMapper.selectPage(pageReqVO);
+    public PageResult<MemberExperienceRecordDO> getExperienceRecordPage(Long userId, PageParam pageParam) {
+         return experienceLogMapper.selectPage(userId, pageParam);
     }
 
     @Override

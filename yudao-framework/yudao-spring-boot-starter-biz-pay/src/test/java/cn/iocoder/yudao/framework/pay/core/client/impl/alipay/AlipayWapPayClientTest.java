@@ -42,9 +42,9 @@ public class AlipayWapPayClientTest extends AbstractAlipayClientTest {
     }
 
     @Test
-    @DisplayName("支付宝 H5 支付下单成功")
-    public void test_unified_order_success() throws AlipayApiException {
-        // 准备响应对象
+    @DisplayName("支付宝 H5 支付：下单成功")
+    public void testUnifiedOrder_success() throws AlipayApiException {
+        // mock 方法
         String h5Body = randomString();
         Integer price = randomInteger();
         AlipayTradeWapPayResponse response = randomPojo(AlipayTradeWapPayResponse.class, o -> {
@@ -52,7 +52,6 @@ public class AlipayWapPayClientTest extends AbstractAlipayClientTest {
             o.setBody(h5Body);
         });
         String notifyUrl = randomURL();
-        // mock
         when(defaultAlipayClient.pageExecute(argThat((ArgumentMatcher<AlipayTradeWapPayRequest>) request -> {
             assertInstanceOf(AlipayTradeWapPayModel.class, request.getBizModel());
             AlipayTradeWapPayModel bizModel = (AlipayTradeWapPayModel) request.getBizModel();
@@ -60,37 +59,53 @@ public class AlipayWapPayClientTest extends AbstractAlipayClientTest {
             assertEquals(notifyUrl, request.getNotifyUrl());
             return true;
         }), eq(Method.GET.name()))).thenReturn(response);
-
+        // 准备请求参数
         String outTradeNo = randomString();
         PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(notifyUrl, outTradeNo, price);
+
+        // 调用
         PayOrderRespDTO resp = client.unifiedOrder(reqDTO);
+        // 断言
         assertEquals(WAITING.getStatus(), resp.getStatus());
-        assertEquals(PayOrderDisplayModeEnum.URL.getMode(), resp.getDisplayMode());
         assertEquals(outTradeNo, resp.getOutTradeNo());
-        assertEquals(h5Body, resp.getDisplayContent());
+        assertNull(resp.getChannelOrderNo());
+        assertNull(resp.getChannelUserId());
+        assertNull(resp.getSuccessTime());
+        assertEquals(PayOrderDisplayModeEnum.URL.getMode(), resp.getDisplayMode());
+        assertEquals(response.getBody(), resp.getDisplayContent());
         assertSame(response, resp.getRawData());
+        assertNull(resp.getChannelErrorCode());
+        assertNull(resp.getChannelErrorMsg());
     }
 
     @Test
-    @DisplayName("支付宝 H5 支付,渠道返回失败")
+    @DisplayName("支付宝 H5 支付：渠道返回失败")
     public void test_unified_order_channel_failed() throws AlipayApiException {
-        // 准备响应对象
+        // mock 方法
         String subCode = randomString();
         String subMsg = randomString();
         AlipayTradeWapPayResponse response = randomPojo(AlipayTradeWapPayResponse.class, o -> {
             o.setSubCode(subCode);
             o.setSubMsg(subMsg);
         });
-        // mock
         when(defaultAlipayClient.pageExecute(argThat((ArgumentMatcher<AlipayTradeWapPayRequest>) request -> true),
                 eq(Method.GET.name()))).thenReturn(response);
-        PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(randomURL(), randomString(), randomInteger());
+        String outTradeNo = randomString();
+        PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(randomURL(), outTradeNo, randomInteger());
 
+        // 调用
         PayOrderRespDTO resp = client.unifiedOrder(reqDTO);
         // 断言
         assertEquals(CLOSED.getStatus(), resp.getStatus());
+        assertEquals(outTradeNo, resp.getOutTradeNo());
+        assertNull(resp.getChannelOrderNo());
+        assertNull(resp.getChannelUserId());
+        assertNull(resp.getSuccessTime());
+        assertNull(resp.getDisplayMode());
+        assertNull(resp.getDisplayContent());
+        assertSame(response, resp.getRawData());
         assertEquals(subCode, resp.getChannelErrorCode());
         assertEquals(subMsg, resp.getChannelErrorMsg());
-        assertSame(response, resp.getRawData());
     }
+
 }

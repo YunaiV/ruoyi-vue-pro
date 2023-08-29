@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.pay.controller.app.wallet;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.AppPayWalletTransactionPageReqVO;
-import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.AppPayWalletTransactionRespVO;
+import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.transaction.AppPayWalletTransactionPageReqVO;
+import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.transaction.AppPayWalletTransactionRespVO;
 import cn.iocoder.yudao.module.pay.convert.wallet.PayWalletTransactionConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletTransactionService;
@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+
+import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -33,11 +35,19 @@ public class AppPayWalletTransactionController {
     private PayWalletTransactionService payWalletTransactionService;
 
     @GetMapping("/page")
-    @Operation(summary = "获得钱包余额明细分页")
-    public CommonResult<PageResult<AppPayWalletTransactionRespVO>> pageWalletTransaction(
-            @Valid AppPayWalletTransactionPageReqVO pageVO) {
+    @Operation(summary = "获得钱包流水分页")
+    public CommonResult<PageResult<AppPayWalletTransactionRespVO>> getWalletTransactionPage(
+            @Valid AppPayWalletTransactionPageReqVO pageReqVO) {
+        if (true) {
+            PageResult<AppPayWalletTransactionRespVO> result = new PageResult<>(10L);
+            result.getList().add(new AppPayWalletTransactionRespVO().setPrice(1L)
+                    .setTitle("测试").setCreateTime(LocalDateTime.now()));
+            result.getList().add(new AppPayWalletTransactionRespVO().setPrice(-1L)
+                    .setTitle("测试2").setCreateTime(LocalDateTime.now()));
+            return success(result);
+        }
         PageResult<PayWalletTransactionDO> result = payWalletTransactionService.getWalletTransactionPage(getLoginUserId(),
-                UserTypeEnum.MEMBER.getValue(), pageVO);
+                UserTypeEnum.MEMBER.getValue(), pageReqVO);
         return success(PayWalletTransactionConvert.INSTANCE.convertPage(result));
     }
 }

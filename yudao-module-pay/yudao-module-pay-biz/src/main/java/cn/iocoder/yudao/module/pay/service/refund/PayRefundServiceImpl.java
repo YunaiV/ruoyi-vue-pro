@@ -75,6 +75,11 @@ public class PayRefundServiceImpl implements PayRefundService {
     }
 
     @Override
+    public PayRefundDO getRefundByNo(String no) {
+        return refundMapper.selectByNo(no);
+    }
+
+    @Override
     public Long getRefundCountByAppId(Long appId) {
         return refundMapper.selectCountByAppId(appId);
     }
