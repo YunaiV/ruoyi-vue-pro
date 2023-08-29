@@ -8,8 +8,10 @@ import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSa
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleRespVO;
 import cn.iocoder.yudao.module.trade.convert.aftersale.TradeAfterSaleConvert;
 import cn.iocoder.yudao.module.trade.enums.aftersale.AfterSaleOperateTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleWayEnum;
 import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.annotations.AfterSaleLog;
+import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.util.AfterSaleLogUtils;
 import cn.iocoder.yudao.module.trade.service.aftersale.TradeAfterSaleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -71,6 +73,8 @@ public class AppTradeAfterSaleController {
     @Operation(summary = "申请售后")
     @AfterSaleLog(id = "#info.data", content = "'申请售后:售后编号['+#info.data+'],订单编号['+#createReqVO.orderItemId+'], '", operateType = AfterSaleOperateTypeEnum.APPLY)
     public CommonResult<Long> createAfterSale(@RequestBody AppTradeAfterSaleCreateReqVO createReqVO) {
+        AfterSaleLogUtils.setBeforeStatus(0);
+        AfterSaleLogUtils.setAfterStatus(TradeAfterSaleStatusEnum.APPLY.getStatus());
         return success(afterSaleService.createAfterSale(getLoginUserId(), createReqVO));
     }
 

@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.framework.operatelog.core.util.OperateLogUtils;
 import cn.iocoder.yudao.module.infra.controller.admin.job.vo.log.JobLogExcelVO;
 import cn.iocoder.yudao.module.infra.controller.admin.job.vo.log.JobLogExportReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.job.vo.log.JobLogPageReqVO;
