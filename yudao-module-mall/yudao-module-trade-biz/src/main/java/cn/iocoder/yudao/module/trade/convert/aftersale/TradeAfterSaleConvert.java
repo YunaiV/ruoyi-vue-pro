@@ -74,6 +74,7 @@ public interface TradeAfterSaleConvert {
 
     TradeOrderBaseVO convert(TradeOrderDO order);
 
+    @Mapping(target = "id", source = "afterSale.id")
     TradeAfterSaleDetailRespVO convert(TradeAfterSaleDO afterSale, List<TradeOrderItemDO> orderItems, List<TradeAfterSaleLogRespVO> logs);
 
     default TradeAfterSaleDetailRespVO convert(TradeAfterSaleDO afterSale, TradeOrderDO order, List<TradeOrderItemDO> orderItems,
