@@ -7,7 +7,6 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -43,7 +42,6 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettle
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.cart.CartDO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderItemMapper;
@@ -416,32 +414,24 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deliveryOrder(TradeOrderDeliveryReqVO deliveryReqVO) {
-        // TODO @puhui999：只有选择快递的，才可以发货
         // 1.1 校验并获得交易订单（可发货）
         TradeOrderDO order = validateOrderDeliverable(deliveryReqVO.getId());
-        // 校验 deliveryType 是否为快递，是快递才可以发货
+        // 1.2 校验 deliveryType 是否为快递，是快递才可以发货
         if (ObjectUtil.notEqual(order.getDeliveryType(), DeliveryTypeEnum.EXPRESS.getMode())) {
             throw exception(ORDER_DELIVERY_FAIL_DELIVERY_TYPE_NOT_EXPRESS);
         }
-        // TODO @puhui999：下面不修改 deliveryType，直接校验 deliveryType 是否为快递，是快递才可以发货；先做严格的方式哈。
-        // 判断发货类型
+
+        // 2. 更新订单为已发货
         TradeOrderDO updateOrderObj = new TradeOrderDO();
         // 2.1 快递发货
-        if (ObjectUtil.notEqual(deliveryReqVO.getLogisticsId(), 0L)) {
-            // 校验快递公司
-            DeliveryExpressDO deliveryExpress = deliveryExpressService.getDeliveryExpress(deliveryReqVO.getLogisticsId());
-            if (deliveryExpress == null) {
-                throw exception(EXPRESS_NOT_EXISTS);
-            }
-            if (deliveryExpress.getStatus().equals(CommonStatusEnum.DISABLE.getStatus())) {
-                throw exception(EXPRESS_STATUS_NOT_ENABLE);
-            }
+        if (ObjectUtil.notEqual(deliveryReqVO.getLogisticsId(), TradeOrderDO.LOGISTICS_ID_NULL)) {
+            deliveryExpressService.validateDeliveryExpress(deliveryReqVO.getLogisticsId());
             updateOrderObj.setLogisticsId(deliveryReqVO.getLogisticsId()).setLogisticsNo(deliveryReqVO.getLogisticsNo());
         } else {
             // 2.2 无需发货
             updateOrderObj.setLogisticsId(0L).setLogisticsNo("");
         }
-        // 更新 TradeOrderDO 状态为已发货，等待收货
+        // 执行更新
         updateOrderObj.setStatus(TradeOrderStatusEnum.DELIVERED.getStatus()).setDeliveryTime(LocalDateTime.now());
         int updateCount = tradeOrderMapper.updateByIdAndStatus(order.getId(), order.getStatus(), updateOrderObj);
         if (updateCount == 0) {

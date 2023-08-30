@@ -8,7 +8,6 @@ import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderItemBas
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Schema(description = "管理后台 - 售后订单的详情 Response VO")
@@ -16,7 +15,6 @@ import java.util.List;
 public class TradeAfterSaleDetailRespVO extends TradeAfterSaleBaseVO {
 
     @Schema(description = "售后编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    @NotNull(message = "售后编号不能为空")
     private Long id;
 
     /**

@@ -69,14 +69,7 @@ public interface TradeAfterSaleConvert {
     PageResult<AppTradeAfterSaleRespVO> convertPage02(PageResult<TradeAfterSaleDO> page);
 
     List<TradeAfterSaleLogRespDTO> convertList(List<TradeAfterSaleLogDO> list);
-
-    List<TradeAfterSaleLogRespVO> convertList1(List<TradeAfterSaleLogRespDTO> list);
-
-    TradeOrderBaseVO convert(TradeOrderDO order);
-
-    @Mapping(target = "id", source = "afterSale.id")
-    TradeAfterSaleDetailRespVO convert(TradeAfterSaleDO afterSale, List<TradeOrderItemDO> orderItems, List<TradeAfterSaleLogRespVO> logs);
-
+    
     default TradeAfterSaleDetailRespVO convert(TradeAfterSaleDO afterSale, TradeOrderDO order, List<TradeOrderItemDO> orderItems,
                                                MemberUserRespDTO user, List<TradeAfterSaleLogRespDTO> logs) {
         TradeAfterSaleDetailRespVO respVO = convert(afterSale, orderItems, convertList1(logs));
@@ -86,4 +79,9 @@ public interface TradeAfterSaleConvert {
         respVO.setOrder(convert(order));
         return respVO;
     }
+    List<TradeAfterSaleLogRespVO> convertList1(List<TradeAfterSaleLogRespDTO> list);
+    @Mapping(target = "id", source = "afterSale.id")
+    TradeAfterSaleDetailRespVO convert(TradeAfterSaleDO afterSale, List<TradeOrderItemDO> orderItems, List<TradeAfterSaleLogRespVO> logs);
+    TradeOrderBaseVO convert(TradeOrderDO order);
+
 }

@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.Deliver
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.DeliveryPickUpStoreUpdateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryPickUpStoreDO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
@@ -28,10 +29,13 @@ public interface DeliveryPickUpStoreConvert {
 
     PageResult<DeliveryPickUpStoreRespVO> convertPage(PageResult<DeliveryPickUpStoreDO> page);
 
-    @Named("convertAreaIdToName")
-    default String convertAreaIdToName(Integer areaId) {
+    List<DeliveryPickUpStoreSimpleRespVO> convertList1(List<DeliveryPickUpStoreDO> list);
+    @Mapping(source = "areaId", target = "areaName", qualifiedByName = "convertAreaIdToAreaName")
+    DeliveryPickUpStoreSimpleRespVO convert02(DeliveryPickUpStoreDO bean);
+
+    @Named("convertAreaIdToAreaName")
+    default String convertAreaIdToAreaName(Integer areaId) {
         return AreaUtils.format(areaId);
     }
 
-    List<DeliveryPickUpStoreSimpleRespVO> convertList1(List<DeliveryPickUpStoreDO> list);
 }

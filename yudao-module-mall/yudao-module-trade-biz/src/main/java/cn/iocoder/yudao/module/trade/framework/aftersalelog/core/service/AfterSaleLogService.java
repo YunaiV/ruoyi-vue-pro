@@ -26,7 +26,7 @@ public interface AfterSaleLogService {
     /**
      * 获取售后日志
      *
-     * @param afterSaleId 售后 id
+     * @param afterSaleId 售后编号
      * @return 售后日志
      */
     List<TradeAfterSaleLogRespDTO> getLog(Long afterSaleId);

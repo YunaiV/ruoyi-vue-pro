@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
+// TODO @puhui999：这个是不是应该搞成 vo 啊？
 /**
  * 贸易售后日志详情 DTO
  *

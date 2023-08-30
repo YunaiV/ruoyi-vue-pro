@@ -91,6 +91,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
     @Override
     public TradeAfterSaleDO getAfterSale(Long id) {
         TradeAfterSaleDO afterSale = tradeAfterSaleMapper.selectById(id);
+        // TODO @puhui999；读不到，不要这里报错哈；交给前端报错；一般是读取信息不到，message 提示，然后 close tab；
         if (afterSale == null) {
             throw exception(AFTER_SALE_NOT_FOUND);
         }
@@ -457,4 +458,5 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
         List<TradeAfterSaleLogDO> saleLogDOs = tradeAfterSaleLogMapper.selectList(TradeAfterSaleLogDO::getAfterSaleId, afterSaleId);
         return TradeAfterSaleConvert.INSTANCE.convertList(saleLogDOs);
     }
+
 }
