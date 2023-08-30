@@ -2,11 +2,8 @@ package cn.iocoder.yudao.module.trade.controller.app.cart;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
-import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartAddReqVO;
-import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartListRespVO;
-import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartResetReqVO;
-import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartUpdateReqVO;
-import cn.iocoder.yudao.module.trade.service.cart.TradeCartService;
+import cn.iocoder.yudao.module.trade.controller.app.cart.vo.*;
+import cn.iocoder.yudao.module.trade.service.cart.CartService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,30 +26,38 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 @RequiredArgsConstructor
 @Validated
 @Slf4j
-public class TradeCartController {
+public class AppCartController {
 
     @Resource
-    private TradeCartService cartService;
+    private CartService cartService;
 
     @PostMapping("/add")
     @Operation(summary = "添加购物车商品")
     @PreAuthenticated
-    public CommonResult<Long> addCart(@Valid @RequestBody AppTradeCartAddReqVO addCountReqVO) {
+    public CommonResult<Long> addCart(@Valid @RequestBody AppCartAddReqVO addCountReqVO) {
         return success(cartService.addCart(getLoginUserId(), addCountReqVO));
     }
 
-    @PutMapping("/update")
-    @Operation(summary = "更新购物车商品")
+    @PutMapping("/update-count")
+    @Operation(summary = "更新购物车商品数量")
     @PreAuthenticated
-    public CommonResult<Boolean> updateCart(@Valid @RequestBody AppTradeCartUpdateReqVO updateReqVO) {
-        cartService.updateCart(getLoginUserId(), updateReqVO);
+    public CommonResult<Boolean> updateCartCount(@Valid @RequestBody AppCartUpdateCountReqVO updateReqVO) {
+        cartService.updateCartCount(getLoginUserId(), updateReqVO);
+        return success(true);
+    }
+
+    @PutMapping("/update-selected")
+    @Operation(summary = "更新购物车商品选中")
+    @PreAuthenticated
+    public CommonResult<Boolean> updateCartSelected(@Valid @RequestBody AppCartUpdateSelectedReqVO updateReqVO) {
+        cartService.updateCartSelected(getLoginUserId(), updateReqVO);
         return success(true);
     }
 
     @PutMapping("/reset")
     @Operation(summary = "重置购物车商品")
     @PreAuthenticated
-    public CommonResult<Boolean> resetCart(@Valid @RequestBody AppTradeCartResetReqVO updateReqVO) {
+    public CommonResult<Boolean> resetCart(@Valid @RequestBody AppCartResetReqVO updateReqVO) {
         cartService.resetCart(getLoginUserId(), updateReqVO);
         return success(true);
     }
@@ -83,7 +88,7 @@ public class TradeCartController {
     @GetMapping("/list")
     @Operation(summary = "查询用户的购物车列表")
     @PreAuthenticated
-    public CommonResult<AppTradeCartListRespVO> getCartList() {
+    public CommonResult<AppCartListRespVO> getCartList() {
         return success(cartService.getCartList(getLoginUserId()));
     }
 

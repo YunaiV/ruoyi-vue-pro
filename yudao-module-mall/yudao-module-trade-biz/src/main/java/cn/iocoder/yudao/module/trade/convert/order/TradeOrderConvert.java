@@ -22,7 +22,7 @@ import cn.iocoder.yudao.module.trade.controller.app.base.property.AppProductProp
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.*;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemRespVO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.cart.TradeCartDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.cart.CartDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
@@ -221,12 +221,12 @@ public interface TradeOrderConvert {
     ProductCommentCreateReqDTO convert04(AppTradeOrderItemCommentCreateReqVO createReqVO, TradeOrderItemDO tradeOrderItemDO);
 
     default TradePriceCalculateReqBO convert(Long userId, AppTradeOrderSettlementReqVO settlementReqVO,
-                                             List<TradeCartDO> cartList) {
+                                             List<CartDO> cartList) {
         TradePriceCalculateReqBO reqBO = new TradePriceCalculateReqBO();
         reqBO.setUserId(userId).setCouponId(settlementReqVO.getCouponId()).setAddressId(settlementReqVO.getAddressId())
                 .setItems(new ArrayList<>(settlementReqVO.getItems().size()));
         // 商品项的构建
-        Map<Long, TradeCartDO> cartMap = convertMap(cartList, TradeCartDO::getId);
+        Map<Long, CartDO> cartMap = convertMap(cartList, CartDO::getId);
         for (AppTradeOrderSettlementReqVO.Item item : settlementReqVO.getItems()) {
             // 情况一：skuId + count
             if (item.getSkuId() != null) {
@@ -235,7 +235,7 @@ public interface TradeOrderConvert {
                 continue;
             }
             // 情况二：cartId
-            TradeCartDO cart = cartMap.get(item.getCartId());
+            CartDO cart = cartMap.get(item.getCartId());
             if (cart == null) {
                 continue;
             }

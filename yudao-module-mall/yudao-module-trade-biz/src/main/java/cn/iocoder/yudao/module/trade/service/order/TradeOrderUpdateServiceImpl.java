@@ -43,7 +43,7 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettle
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
-import cn.iocoder.yudao.module.trade.dal.dataobject.cart.TradeCartDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.cart.CartDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
@@ -53,7 +53,7 @@ import cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.*;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
-import cn.iocoder.yudao.module.trade.service.cart.TradeCartService;
+import cn.iocoder.yudao.module.trade.service.cart.CartService;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
 import cn.iocoder.yudao.module.trade.service.message.TradeMessageService;
 import cn.iocoder.yudao.module.trade.service.message.bo.TradeOrderMessageWhenDeliveryOrderReqBO;
@@ -93,7 +93,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private TradeOrderItemMapper tradeOrderItemMapper;
 
     @Resource
-    private TradeCartService tradeCartService;
+    private CartService tradeCartService;
     @Resource
     private TradePriceService tradePriceService;
     @Resource
@@ -168,7 +168,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
      */
     private TradePriceCalculateRespBO calculatePrice(Long userId, AppTradeOrderSettlementReqVO settlementReqVO) {
         // 1. 如果来自购物车，则获得购物车的商品
-        List<TradeCartDO> cartList = tradeCartService.getCartList(userId,
+        List<CartDO> cartList = tradeCartService.getCartList(userId,
                 convertSet(settlementReqVO.getItems(), AppTradeOrderSettlementReqVO.Item::getCartId));
 
         // 2. 计算价格

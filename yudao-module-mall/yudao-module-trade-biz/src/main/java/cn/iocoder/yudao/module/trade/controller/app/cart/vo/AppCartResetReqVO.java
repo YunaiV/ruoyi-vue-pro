@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 
 @Schema(description = "用户 App - 购物车重置 Request VO")
 @Data
-public class AppTradeCartResetReqVO {
+public class AppCartResetReqVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "编号不能为空")
