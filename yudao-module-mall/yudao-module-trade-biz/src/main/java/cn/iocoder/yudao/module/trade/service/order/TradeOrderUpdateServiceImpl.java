@@ -414,7 +414,10 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // TODO @puhui999：只有选择快递的，才可以发货
         // 1.1 校验并获得交易订单（可发货）
         TradeOrderDO order = validateOrderDeliverable(deliveryReqVO.getId());
-
+        // 校验 deliveryType 是否为快递，是快递才可以发货
+        if (ObjectUtil.notEqual(order.getDeliveryType(), DeliveryTypeEnum.EXPRESS.getMode())) {
+            throw exception(ORDER_DELIVERY_FAIL_DELIVERY_TYPE_NOT_EXPRESS);
+        }
         // TODO @puhui999：下面不修改 deliveryType，直接校验 deliveryType 是否为快递，是快递才可以发货；先做严格的方式哈。
         // 判断发货类型
         TradeOrderDO updateOrderObj = new TradeOrderDO();
@@ -428,10 +431,10 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             if (deliveryExpress.getStatus().equals(CommonStatusEnum.DISABLE.getStatus())) {
                 throw exception(EXPRESS_STATUS_NOT_ENABLE);
             }
-            updateOrderObj.setLogisticsId(deliveryReqVO.getLogisticsId()).setLogisticsNo(deliveryReqVO.getLogisticsNo()).setDeliveryType(DeliveryTypeEnum.EXPRESS.getMode());
+            updateOrderObj.setLogisticsId(deliveryReqVO.getLogisticsId()).setLogisticsNo(deliveryReqVO.getLogisticsNo());
         } else {
             // 2.2 无需发货
-            updateOrderObj.setLogisticsId(0L).setLogisticsNo("").setDeliveryType(DeliveryTypeEnum.NULL.getMode());
+            updateOrderObj.setLogisticsId(0L).setLogisticsNo("");
         }
         // 更新 TradeOrderDO 状态为已发货，等待收货
         updateOrderObj.setStatus(TradeOrderStatusEnum.DELIVERED.getStatus()).setDeliveryTime(LocalDateTime.now());
@@ -471,16 +474,14 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 订单类型：拼团
         if (Objects.equals(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
             // 校验订单拼团是否成功
-            // TODO @puhui999：是不是取反？
-            if (combinationRecordApi.isCombinationRecordSuccess(order.getUserId(), order.getId())) {
+            if (!combinationRecordApi.isCombinationRecordSuccess(order.getUserId(), order.getId())) {
                 throw exception(ORDER_DELIVERY_FAIL_COMBINATION_RECORD_STATUS_NOT_SUCCESS);
             }
         }
         // 订单类类型：砍价
         if (Objects.equals(TradeOrderTypeEnum.BARGAIN.getType(), order.getType())) {
             // 校验订单砍价是否成功
-            // TODO @puhui999：是不是取反？
-            if (bargainRecordApi.isBargainRecordSuccess(order.getUserId(), order.getId())) {
+            if (!bargainRecordApi.isBargainRecordSuccess(order.getUserId(), order.getId())) {
                 throw exception(ORDER_DELIVERY_FAIL_BARGAIN_RECORD_STATUS_NOT_SUCCESS);
             }
         }
