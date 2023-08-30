@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -76,13 +75,6 @@ public class AppCartController {
     @PreAuthenticated
     public CommonResult<Integer> getCartCount() {
         return success(cartService.getCartCount(getLoginUserId()));
-    }
-
-    @GetMapping("get-count-map")
-    @Operation(summary = "查询用户在购物车中的商品 SPU 数量 Map")
-    @PreAuthenticated
-    public CommonResult<Map<Long, Integer>> getCartCountMap() {
-        return success(cartService.getCartCountMap(getLoginUserId()));
     }
 
     @GetMapping("/list")

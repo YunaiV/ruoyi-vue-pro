@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
@@ -82,13 +83,15 @@ public interface TradeOrderConvert {
 
     TradeOrderItemDO convert(TradePriceCalculateRespBO.OrderItem item);
 
+    default ProductSkuUpdateStockReqDTO convert(List<TradeOrderItemDO> list) {
+        return new ProductSkuUpdateStockReqDTO(TradeOrderConvert.INSTANCE.convertList(list));
+    }
+    List<ProductSkuUpdateStockReqDTO.Item> convertList(List<TradeOrderItemDO> list);
     @Mappings({
             @Mapping(source = "skuId", target = "id"),
             @Mapping(source = "count", target = "incrCount"),
     })
     ProductSkuUpdateStockReqDTO.Item convert(TradeOrderItemDO bean);
-
-    List<ProductSkuUpdateStockReqDTO.Item> convertList(List<TradeOrderItemDO> list);
 
     default PayOrderCreateReqDTO convert(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
                                          TradePriceCalculateRespBO calculateRespBO, TradeOrderProperties orderProperties) {
@@ -97,24 +100,12 @@ public interface TradeOrderConvert {
         // 商户相关字段
         createReqDTO.setMerchantOrderId(String.valueOf(order.getId()));
         String subject = calculateRespBO.getItems().get(0).getSpuName();
-        if (calculateRespBO.getItems().size() > 1) {
-            subject += " 等多件";
-        }
+        subject = StrUtils.maxLength(subject, PayOrderCreateReqDTO.SUBJECT_MAX_LENGTH); // 避免超过 32 位
         createReqDTO.setSubject(subject);
         createReqDTO.setBody(subject); // TODO 芋艿：临时写死
         // 订单相关字段
         createReqDTO.setPrice(order.getPayPrice()).setExpireTime(addTime(orderProperties.getExpireTime()));
         return createReqDTO;
-    }
-
-    default Set<Long> convertPropertyValueIds(List<TradeOrderItemDO> list) {
-        if (CollUtil.isEmpty(list)) {
-            return new HashSet<>();
-        }
-        return list.stream().filter(item -> item.getProperties() != null)
-                .flatMap(p -> p.getProperties().stream()) // 遍历多个 Property 属性
-                .map(TradeOrderItemDO.Property::getValueId) // 将每个 Property 转换成对应的 propertyId，最后形成集合
-                .collect(Collectors.toSet());
     }
 
     // TODO 芋艿：可简化
@@ -170,30 +161,12 @@ public interface TradeOrderConvert {
 
     // TODO 芋艿：可简化
     default AppTradeOrderDetailRespVO convert02(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
-                                                List<ProductPropertyValueDetailRespDTO> propertyValueDetails, TradeOrderProperties tradeOrderProperties,
+                                                TradeOrderProperties tradeOrderProperties,
                                                 DeliveryExpressDO express) {
         AppTradeOrderDetailRespVO orderVO = convert3(order, orderItems);
         orderVO.setPayExpireTime(addTime(tradeOrderProperties.getExpireTime()));
         if (StrUtil.isNotEmpty(order.getPayChannelCode())) {
             orderVO.setPayChannelName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.CHANNEL_CODE, order.getPayChannelCode()));
-        }
-        // 处理商品属性
-        Map<Long, ProductPropertyValueDetailRespDTO> propertyValueDetailMap = convertMap(propertyValueDetails, ProductPropertyValueDetailRespDTO::getValueId);
-        for (int i = 0; i < orderItems.size(); i++) {
-            List<TradeOrderItemDO.Property> properties = orderItems.get(i).getProperties();
-            if (CollUtil.isEmpty(properties)) {
-                continue;
-            }
-            AppTradeOrderItemRespVO item = orderVO.getItems().get(i);
-            item.setProperties(new ArrayList<>(properties.size()));
-            // 遍历每个 properties，设置到 TradeOrderPageItemRespVO.Item 中
-            properties.forEach(property -> {
-                ProductPropertyValueDetailRespDTO propertyValueDetail = propertyValueDetailMap.get(property.getValueId());
-                if (propertyValueDetail == null) {
-                    return;
-                }
-                item.getProperties().add(convert02(propertyValueDetail));
-            });
         }
         // 处理收货地址
         orderVO.setReceiverAreaName(AreaUtils.format(order.getReceiverAreaId()));

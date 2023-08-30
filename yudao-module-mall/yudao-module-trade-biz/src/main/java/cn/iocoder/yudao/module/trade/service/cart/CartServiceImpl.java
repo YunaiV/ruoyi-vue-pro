@@ -50,19 +50,14 @@ public class CartServiceImpl implements CartService {
         Integer count = addReqVO.getCount();
         ProductSkuRespDTO sku = checkProductSku(addReqVO.getSkuId(), count);
 
-        // 情况零：特殊，count 小于等于 0，说明前端项目删除
         // 情况一：存在，则进行数量更新
         if (cart != null) {
-            // 特殊情况，如果 count 小于等于 0，说明前端想要删除
-            if (count <= 0) {
-                cartMapper.deleteById(cart.getId());
-            } else {
-                cartMapper.updateById(new CartDO().setId(cart.getId()).setCount(count));
-            }
+            cartMapper.updateById(new CartDO().setId(cart.getId()).setSelected(true)
+                    .setCount(cart.getCount() + count));
             return cart.getId();
         // 情况二：不存在，则进行插入
         } else {
-            cart = new CartDO().setUserId(userId)
+            cart = new CartDO().setUserId(userId).setSelected(true)
                     .setSpuId(sku.getSpuId()).setSkuId(sku.getId()).setCount(count);
             cartMapper.insert(cart);
         }
@@ -101,7 +96,6 @@ public class CartServiceImpl implements CartService {
         cartMapper.deleteById(oldCart.getId());
 
         // 第二步：添加新的购物项
-        // TODO 芋艿：直接改成 addCart 貌似就行
         CartDO newCart = cartMapper.selectByUserIdAndSkuId(userId, resetReqVO.getSkuId());
         if (newCart != null) {
             updateCartCount(userId, new AppCartUpdateCountReqVO()
@@ -134,12 +128,6 @@ public class CartServiceImpl implements CartService {
     public Integer getCartCount(Long userId) {
         // TODO 芋艿：需要算上 selected
         return cartMapper.selectSumByUserId(userId);
-    }
-
-    @Override
-    public Map<Long, Integer> getCartCountMap(Long userId) {
-        // TODO 芋艿：需要算上 selected
-        return cartMapper.selectSumMapByUserId(userId);
     }
 
     @Override

@@ -26,7 +26,6 @@ import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.product.api.comment.ProductCommentApi;
 import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
-import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.promotion.api.bargain.BargainRecordApi;
 import cn.iocoder.yudao.module.promotion.api.combination.CombinationRecordApi;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordRespDTO;
@@ -70,6 +69,7 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -93,7 +93,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private TradeOrderItemMapper tradeOrderItemMapper;
 
     @Resource
-    private CartService tradeCartService;
+    private CartService cartService;
     @Resource
     private TradePriceService tradePriceService;
     @Resource
@@ -168,7 +168,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
      */
     private TradePriceCalculateRespBO calculatePrice(Long userId, AppTradeOrderSettlementReqVO settlementReqVO) {
         // 1. 如果来自购物车，则获得购物车的商品
-        List<CartDO> cartList = tradeCartService.getCartList(userId,
+        List<CartDO> cartList = cartService.getCartList(userId,
                 convertSet(settlementReqVO.getItems(), AppTradeOrderSettlementReqVO.Item::getCartId));
 
         // 2. 计算价格
@@ -190,6 +190,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 订单创建完后的逻辑
         afterCreateTradeOrder(userId, createReqVO, order, orderItems, calculateRespBO);
         // 3.3 校验订单类型
+        // TODO @puhui999：这个逻辑，先抽个小方法；未来要通过设计模式，把这些拼团之类的逻辑，抽象出去
         // 拼团
         if (Objects.equals(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
             MemberUserRespDTO user = memberUserApi.getUser(userId);
@@ -292,11 +293,15 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                                        TradeOrderDO tradeOrderDO, List<TradeOrderItemDO> orderItems,
                                        TradePriceCalculateRespBO calculateRespBO) {
         // 下单时扣减商品库存
-        productSkuApi.updateSkuStock(new ProductSkuUpdateStockReqDTO(TradeOrderConvert.INSTANCE.convertList(orderItems)));
+        productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convert(orderItems));
 
-        // 删除购物车商品 TODO 芋艿：待实现
+        // 删除购物车商品
+        Set<Long> cartIds = convertSet(createReqVO.getItems(), AppTradeOrderSettlementReqVO.Item::getCartId);
+        if (CollUtil.isNotEmpty(cartIds)) {
+            cartService.deleteCart(userId, cartIds);
+        }
 
-        // 扣减积分，抵扣金额 TODO 芋艿：待实现
+        // 扣减积分 TODO 芋艿：待实现
 
         // 有使用优惠券时更新
         if (createReqVO.getCouponId() != null) {

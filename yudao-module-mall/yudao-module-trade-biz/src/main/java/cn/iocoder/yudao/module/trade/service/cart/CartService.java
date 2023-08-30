@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.cart.CartDO;
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -83,13 +82,5 @@ public interface CartService {
      * @return 购物车列表
      */
     List<CartDO> getCartList(Long userId, Set<Long> ids);
-
-    /**
-     * 获得用户的购物车商品 SPU 数量的 Map
-     *
-     * @param userId 用户编号
-     * @return 购物车商品 SPU 数量的 Map
-     */
-    Map<Long, Integer> getCartCountMap(Long userId);
 
 }
