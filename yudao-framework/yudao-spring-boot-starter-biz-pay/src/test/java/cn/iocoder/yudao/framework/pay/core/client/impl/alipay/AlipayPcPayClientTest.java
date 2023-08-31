@@ -70,7 +70,7 @@ public class AlipayPcPayClientTest extends AbstractAlipayClientTest {
     @Test
     @DisplayName("支付宝 PC 网站支付：Form Display Mode 下单成功")
     public void testUnifiedOrder_formSuccess() throws AlipayApiException {
-        // mock
+        // mock 方法
         String notifyUrl = randomURL();
         AlipayTradePagePayResponse response = randomPojo(AlipayTradePagePayResponse.class, o -> o.setSubCode(""));
         when(defaultAlipayClient.pageExecute(argThat((ArgumentMatcher<AlipayTradePagePayRequest>) request -> true),
@@ -99,7 +99,7 @@ public class AlipayPcPayClientTest extends AbstractAlipayClientTest {
     @Test
     @DisplayName("支付宝 PC 网站支付：渠道返回失败")
     public void testUnifiedOrder_channelFailed() throws AlipayApiException {
-        // mock
+        // mock 方法
         String subCode = randomString();
         String subMsg = randomString();
         AlipayTradePagePayResponse response = randomPojo(AlipayTradePagePayResponse.class, o -> {

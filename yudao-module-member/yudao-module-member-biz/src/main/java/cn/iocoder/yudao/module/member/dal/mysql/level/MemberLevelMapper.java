@@ -29,4 +29,5 @@ public interface MemberLevelMapper extends BaseMapperX<MemberLevelDO> {
                 .eq(MemberLevelDO::getStatus, status)
                 .orderByAsc(MemberLevelDO::getLevel));
     }
+
 }

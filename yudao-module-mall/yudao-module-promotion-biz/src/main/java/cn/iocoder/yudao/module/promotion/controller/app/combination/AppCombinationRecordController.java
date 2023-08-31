@@ -41,7 +41,7 @@ public class AppCombinationRecordController {
         summary.getAvatars().add("https://thirdwx.qlogo.cn/mmopen/vi_32/ouwtwJycbic2JrCoZjETict0klxd1uRuicRneKk00ewMcCClxVcVHQT91Sh9MJGtwibf1fOicD1WpwSP4icJM6eQq1AA/132");
         summary.getAvatars().add("https://thirdwx.qlogo.cn/mmopen/vi_32/RpUrhwens58qc99OcGs993xL4M5QPOe05ekqF9Eia440kRicAlicicIdQWicHBmy2bzLgHzHguWEzHHxnIgeictL7bLA/132");
         summary.getAvatars().add("https://thirdwx.qlogo.cn/mmopen/vi_32/S4tfqmxc8GZGsKc1K4mnhpvtG16gtMrLnTQfDibhr7jJich9LRI5RQKZDoqEjZM3azMib5nic7F4ZXKMEgYyLO08KA/132");
-        summary.getAvatars().add("https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKXMYJOomfp7cebz3cIeb8sHk3GGSIJtWEgREe3j7J1WoAbTvIOicpcNdFkWAziatBSMod8b5RyS4CQ/132");
+        summary.getAvatars().add("https://static.iocoder.cn/mall/132.jpeg");
         return success(summary);
     }
 
@@ -61,7 +61,7 @@ public class AppCombinationRecordController {
             record.setExpireTime(new Date());
             record.setUserSize(10);
             record.setUserCount(i);
-            record.setPicUrl("https://demo26.crmeb.net/uploads/attach/2021/11/15/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
+            record.setPicUrl("https://static.iocoder.cn/mall/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
             record.setActivityId(1L);
             record.setSpuName("活动：" + i);
             list.add(record);
@@ -84,7 +84,7 @@ public class AppCombinationRecordController {
         headRecord.setUserCount(3);
         headRecord.setStatus(1);
         headRecord.setActivityId(10L);
-        headRecord.setPicUrl("https://demo26.crmeb.net/uploads/attach/2021/11/15/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
+        headRecord.setPicUrl("https://static.iocoder.cn/mall/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
         headRecord.setCombinationPrice(100);
         detail.setHeadRecord(headRecord);
         // 团员

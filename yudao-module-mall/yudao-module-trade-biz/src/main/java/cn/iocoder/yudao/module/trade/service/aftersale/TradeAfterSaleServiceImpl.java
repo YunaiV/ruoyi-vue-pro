@@ -26,6 +26,7 @@ import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleWayEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.dto.TradeAfterSaleLogCreateReqDTO;
+import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.dto.TradeAfterSaleLogRespDTO;
 import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.service.AfterSaleLogService;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
@@ -40,6 +41,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
@@ -84,6 +86,16 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
     @Override
     public TradeAfterSaleDO getAfterSale(Long userId, Long id) {
          return tradeAfterSaleMapper.selectByIdAndUserId(id, userId);
+    }
+
+    @Override
+    public TradeAfterSaleDO getAfterSale(Long id) {
+        TradeAfterSaleDO afterSale = tradeAfterSaleMapper.selectById(id);
+        // TODO @puhui999；读不到，不要这里报错哈；交给前端报错；一般是读取信息不到，message 提示，然后 close tab；
+        if (afterSale == null) {
+            throw exception(AFTER_SALE_NOT_FOUND);
+        }
+        return afterSale;
     }
 
     @Override
@@ -439,4 +451,12 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
             log.error("[createLog][request({}) 日志记录错误]", toJsonString(logDTO), exception);
         }
     }
+
+    @Override
+    public List<TradeAfterSaleLogRespDTO> getLog(Long afterSaleId) {
+        // TODO 不熟悉流程先这么滴
+        List<TradeAfterSaleLogDO> saleLogDOs = tradeAfterSaleLogMapper.selectList(TradeAfterSaleLogDO::getAfterSaleId, afterSaleId);
+        return TradeAfterSaleConvert.INSTANCE.convertList(saleLogDOs);
+    }
+
 }

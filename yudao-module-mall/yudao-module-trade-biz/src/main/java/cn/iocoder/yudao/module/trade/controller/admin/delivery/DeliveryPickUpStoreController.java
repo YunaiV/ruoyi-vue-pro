@@ -64,9 +64,10 @@ public class DeliveryPickUpStoreController {
     }
 
     @GetMapping("/list-all-simple")
-    @Operation(summary = "获取快递公司精简信息列表")
+    @Operation(summary = "获得自提门店精简信息列表")
     public CommonResult<List<DeliveryPickUpStoreSimpleRespVO>> getSimpleDeliveryPickUpStoreList() {
-        List<DeliveryPickUpStoreDO> list = deliveryPickUpStoreService.getDeliveryPickUpStoreListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        List<DeliveryPickUpStoreDO> list = deliveryPickUpStoreService.getDeliveryPickUpStoreListByStatus(
+                CommonStatusEnum.ENABLE.getStatus());
         return success(DeliveryPickUpStoreConvert.INSTANCE.convertList1(list));
     }
 

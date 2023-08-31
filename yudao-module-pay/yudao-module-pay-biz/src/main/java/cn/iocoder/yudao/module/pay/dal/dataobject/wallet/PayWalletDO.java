@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 /**
- * 支付 - 会员钱包 DO
+ * 会员钱包 DO
  *
  * @author jason
  */
@@ -30,7 +30,6 @@ public class PayWalletDO extends BaseDO {
      * 关联 AdminUserDO 的 id 编号
      */
     private Long userId;
-
     /**
      * 用户类型, 预留 多商户转帐可能需要用到
      *
@@ -39,17 +38,17 @@ public class PayWalletDO extends BaseDO {
     private Integer userType;
 
     /**
-     * 余额, 单位分
+     * 余额，单位分
      */
     private Integer balance;
 
     /**
-     * 累计支出, 单位分
+     * 累计支出，单位分
      */
     private Long totalExpense;
-
     /**
-     * 累计充值, 单位分
+     * 累计充值，单位分
      */
     private Long totalRecharge;
+
 }

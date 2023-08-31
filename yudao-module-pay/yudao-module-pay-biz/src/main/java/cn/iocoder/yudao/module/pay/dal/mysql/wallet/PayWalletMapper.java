@@ -9,7 +9,8 @@ import org.apache.ibatis.annotations.Mapper;
 public interface PayWalletMapper extends BaseMapperX<PayWalletDO> {
 
     default PayWalletDO selectByUserIdAndType(Long userId, Integer userType) {
-        return selectOne(PayWalletDO::getUserId, userId, PayWalletDO::getUserType, userType);
+        return selectOne(PayWalletDO::getUserId, userId,
+                PayWalletDO::getUserType, userType);
     }
 }
 

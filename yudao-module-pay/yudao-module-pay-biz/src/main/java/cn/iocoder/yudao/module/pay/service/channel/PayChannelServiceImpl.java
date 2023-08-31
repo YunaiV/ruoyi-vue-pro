@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.pay.controller.admin.channel.vo.PayChannelUpdateR
 import cn.iocoder.yudao.module.pay.convert.channel.PayChannelConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.channel.PayChannelMapper;
+import cn.iocoder.yudao.module.pay.framework.pay.wallet.WalletPayClient;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -62,6 +63,9 @@ public class PayChannelServiceImpl implements PayChannelService {
      */
     @PostConstruct
     public void initLocalCache() {
+        // 注册钱包支付 Class
+        payClientFactory.registerPayClientClass(PayChannelEnum.WALLET, WalletPayClient.class);
+
         // 注意：忽略自动多租户，因为要全局初始化缓存
         TenantUtils.executeIgnore(() -> {
             // 第一步：查询数据

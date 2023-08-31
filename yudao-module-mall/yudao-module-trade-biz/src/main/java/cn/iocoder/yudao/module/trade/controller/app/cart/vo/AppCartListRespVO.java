@@ -9,7 +9,7 @@ import java.util.List;
 
 @Schema(description = "用户 App - 用户的购物列表 Response VO")
 @Data
-public class AppTradeCartListRespVO {
+public class AppCartListRespVO {
 
     /**
      * 有效的购物项数组
@@ -30,6 +30,9 @@ public class AppTradeCartListRespVO {
 
         @Schema(description = "商品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Integer count;
+
+        @Schema(description = "是否选中", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
+        private Boolean selected;
 
         /**
          * 商品 SPU

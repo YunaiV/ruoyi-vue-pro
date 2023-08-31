@@ -72,8 +72,8 @@ public class MemberLevelController {
     @GetMapping("/list")
     @Operation(summary = "获得会员等级列表")
     @PreAuthorize("@ss.hasPermission('member:level:query')")
-    public CommonResult<List<MemberLevelRespVO>> getLevelList(@Valid MemberLevelListReqVO pageVO) {
-        List<MemberLevelDO> result = levelService.getLevelList(pageVO);
+    public CommonResult<List<MemberLevelRespVO>> getLevelList(@Valid MemberLevelListReqVO listReqVO) {
+        List<MemberLevelDO> result = levelService.getLevelList(listReqVO);
         return success(MemberLevelConvert.INSTANCE.convertList(result));
     }
 

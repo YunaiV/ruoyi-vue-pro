@@ -7,7 +7,6 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -26,7 +25,6 @@ import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.product.api.comment.ProductCommentApi;
 import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
-import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.promotion.api.bargain.BargainRecordApi;
 import cn.iocoder.yudao.module.promotion.api.combination.CombinationRecordApi;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordRespDTO;
@@ -43,8 +41,7 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettle
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
-import cn.iocoder.yudao.module.trade.dal.dataobject.cart.TradeCartDO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.cart.CartDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderItemMapper;
@@ -53,7 +50,7 @@ import cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.*;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
-import cn.iocoder.yudao.module.trade.service.cart.TradeCartService;
+import cn.iocoder.yudao.module.trade.service.cart.CartService;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
 import cn.iocoder.yudao.module.trade.service.message.TradeMessageService;
 import cn.iocoder.yudao.module.trade.service.message.bo.TradeOrderMessageWhenDeliveryOrderReqBO;
@@ -70,6 +67,7 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -93,7 +91,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private TradeOrderItemMapper tradeOrderItemMapper;
 
     @Resource
-    private TradeCartService tradeCartService;
+    private CartService cartService;
     @Resource
     private TradePriceService tradePriceService;
     @Resource
@@ -168,7 +166,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
      */
     private TradePriceCalculateRespBO calculatePrice(Long userId, AppTradeOrderSettlementReqVO settlementReqVO) {
         // 1. 如果来自购物车，则获得购物车的商品
-        List<TradeCartDO> cartList = tradeCartService.getCartList(userId,
+        List<CartDO> cartList = cartService.getCartList(userId,
                 convertSet(settlementReqVO.getItems(), AppTradeOrderSettlementReqVO.Item::getCartId));
 
         // 2. 计算价格
@@ -190,6 +188,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 订单创建完后的逻辑
         afterCreateTradeOrder(userId, createReqVO, order, orderItems, calculateRespBO);
         // 3.3 校验订单类型
+        // TODO @puhui999：这个逻辑，先抽个小方法；未来要通过设计模式，把这些拼团之类的逻辑，抽象出去
         // 拼团
         if (Objects.equals(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
             MemberUserRespDTO user = memberUserApi.getUser(userId);
@@ -292,11 +291,15 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                                        TradeOrderDO tradeOrderDO, List<TradeOrderItemDO> orderItems,
                                        TradePriceCalculateRespBO calculateRespBO) {
         // 下单时扣减商品库存
-        productSkuApi.updateSkuStock(new ProductSkuUpdateStockReqDTO(TradeOrderConvert.INSTANCE.convertList(orderItems)));
+        productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convert(orderItems));
 
-        // 删除购物车商品 TODO 芋艿：待实现
+        // 删除购物车商品
+        Set<Long> cartIds = convertSet(createReqVO.getItems(), AppTradeOrderSettlementReqVO.Item::getCartId);
+        if (CollUtil.isNotEmpty(cartIds)) {
+            cartService.deleteCart(userId, cartIds);
+        }
 
-        // 扣减积分，抵扣金额 TODO 芋艿：待实现
+        // 扣减积分 TODO 芋艿：待实现
 
         // 有使用优惠券时更新
         if (createReqVO.getCouponId() != null) {
@@ -411,29 +414,24 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deliveryOrder(TradeOrderDeliveryReqVO deliveryReqVO) {
-        // TODO @puhui999：只有选择快递的，才可以发货
         // 1.1 校验并获得交易订单（可发货）
         TradeOrderDO order = validateOrderDeliverable(deliveryReqVO.getId());
+        // 1.2 校验 deliveryType 是否为快递，是快递才可以发货
+        if (ObjectUtil.notEqual(order.getDeliveryType(), DeliveryTypeEnum.EXPRESS.getMode())) {
+            throw exception(ORDER_DELIVERY_FAIL_DELIVERY_TYPE_NOT_EXPRESS);
+        }
 
-        // TODO @puhui999：下面不修改 deliveryType，直接校验 deliveryType 是否为快递，是快递才可以发货；先做严格的方式哈。
-        // 判断发货类型
+        // 2. 更新订单为已发货
         TradeOrderDO updateOrderObj = new TradeOrderDO();
         // 2.1 快递发货
-        if (ObjectUtil.notEqual(deliveryReqVO.getLogisticsId(), 0L)) {
-            // 校验快递公司
-            DeliveryExpressDO deliveryExpress = deliveryExpressService.getDeliveryExpress(deliveryReqVO.getLogisticsId());
-            if (deliveryExpress == null) {
-                throw exception(EXPRESS_NOT_EXISTS);
-            }
-            if (deliveryExpress.getStatus().equals(CommonStatusEnum.DISABLE.getStatus())) {
-                throw exception(EXPRESS_STATUS_NOT_ENABLE);
-            }
-            updateOrderObj.setLogisticsId(deliveryReqVO.getLogisticsId()).setLogisticsNo(deliveryReqVO.getLogisticsNo()).setDeliveryType(DeliveryTypeEnum.EXPRESS.getMode());
+        if (ObjectUtil.notEqual(deliveryReqVO.getLogisticsId(), TradeOrderDO.LOGISTICS_ID_NULL)) {
+            deliveryExpressService.validateDeliveryExpress(deliveryReqVO.getLogisticsId());
+            updateOrderObj.setLogisticsId(deliveryReqVO.getLogisticsId()).setLogisticsNo(deliveryReqVO.getLogisticsNo());
         } else {
             // 2.2 无需发货
-            updateOrderObj.setLogisticsId(0L).setLogisticsNo("").setDeliveryType(DeliveryTypeEnum.NULL.getMode());
+            updateOrderObj.setLogisticsId(0L).setLogisticsNo("");
         }
-        // 更新 TradeOrderDO 状态为已发货，等待收货
+        // 执行更新
         updateOrderObj.setStatus(TradeOrderStatusEnum.DELIVERED.getStatus()).setDeliveryTime(LocalDateTime.now());
         int updateCount = tradeOrderMapper.updateByIdAndStatus(order.getId(), order.getStatus(), updateOrderObj);
         if (updateCount == 0) {
@@ -471,16 +469,14 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 订单类型：拼团
         if (Objects.equals(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
             // 校验订单拼团是否成功
-            // TODO @puhui999：是不是取反？
-            if (combinationRecordApi.isCombinationRecordSuccess(order.getUserId(), order.getId())) {
+            if (!combinationRecordApi.isCombinationRecordSuccess(order.getUserId(), order.getId())) {
                 throw exception(ORDER_DELIVERY_FAIL_COMBINATION_RECORD_STATUS_NOT_SUCCESS);
             }
         }
         // 订单类类型：砍价
         if (Objects.equals(TradeOrderTypeEnum.BARGAIN.getType(), order.getType())) {
             // 校验订单砍价是否成功
-            // TODO @puhui999：是不是取反？
-            if (bargainRecordApi.isBargainRecordSuccess(order.getUserId(), order.getId())) {
+            if (!bargainRecordApi.isBargainRecordSuccess(order.getUserId(), order.getId())) {
                 throw exception(ORDER_DELIVERY_FAIL_BARGAIN_RECORD_STATUS_NOT_SUCCESS);
             }
         }

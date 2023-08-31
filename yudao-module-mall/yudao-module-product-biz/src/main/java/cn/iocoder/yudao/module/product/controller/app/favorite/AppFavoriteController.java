@@ -42,6 +42,14 @@ public class AppFavoriteController {
         return success(productFavoriteService.createFavorite(getLoginUserId(), reqVO.getSpuId()));
     }
 
+    @PostMapping(value = "/create-list")
+    @Operation(summary = "添加多个商品收藏")
+    @PreAuthenticated
+    public CommonResult<Boolean> createFavoriteList(@RequestBody @Valid AppFavoriteBatchReqVO reqVO) {
+        // todo @jason：待实现；如果有已经收藏的，不用报错，忽略即可；
+        return success(true);
+    }
+
     @DeleteMapping(value = "/delete")
     @Operation(summary = "取消单个商品收藏")
     @PreAuthenticated

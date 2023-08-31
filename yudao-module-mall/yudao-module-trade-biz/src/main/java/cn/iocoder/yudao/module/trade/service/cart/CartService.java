@@ -1,15 +1,11 @@
 package cn.iocoder.yudao.module.trade.service.cart;
 
-import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartAddReqVO;
-import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartListRespVO;
-import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartResetReqVO;
-import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartUpdateReqVO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.cart.TradeCartDO;
+import cn.iocoder.yudao.module.trade.controller.app.cart.vo.*;
+import cn.iocoder.yudao.module.trade.dal.dataobject.cart.CartDO;
 
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -17,7 +13,7 @@ import java.util.Set;
  *
  * @author 芋道源码
  */
-public interface TradeCartService {
+public interface CartService {
 
     /**
      * 添加商品到购物车
@@ -26,7 +22,7 @@ public interface TradeCartService {
      * @param addReqVO 添加信息
      * @return 购物项的编号
      */
-    Long addCart(Long userId, @Valid AppTradeCartAddReqVO addReqVO);
+    Long addCart(Long userId, @Valid AppCartAddReqVO addReqVO);
 
     /**
      * 更新购物车商品数量
@@ -34,7 +30,15 @@ public interface TradeCartService {
      * @param userId 用户编号
      * @param updateCountReqVO 更新信息
      */
-    void updateCart(Long userId, AppTradeCartUpdateReqVO updateCountReqVO);
+    void updateCartCount(Long userId, AppCartUpdateCountReqVO updateCountReqVO);
+
+    /**
+     * 更新购物车选中状态
+     *
+     * @param userId 用户编号
+     * @param updateSelectedReqVO 更新信息
+     */
+    void updateCartSelected(Long userId, @Valid AppCartUpdateSelectedReqVO updateSelectedReqVO);
 
     /**
      * 重置购物车商品
@@ -44,7 +48,7 @@ public interface TradeCartService {
      * @param userId 用户编号
      * @param updateReqVO 重置信息
      */
-    void resetCart(Long userId, AppTradeCartResetReqVO updateReqVO);
+    void resetCart(Long userId, AppCartResetReqVO updateReqVO);
 
     /**
      * 删除购物车商品
@@ -68,7 +72,7 @@ public interface TradeCartService {
      * @param userId 用户编号
      * @return 购物车列表
      */
-    AppTradeCartListRespVO getCartList(Long userId);
+    AppCartListRespVO getCartList(Long userId);
 
     /**
      * 查询用户的购物车列表
@@ -77,14 +81,6 @@ public interface TradeCartService {
      * @param ids 购物项的编号
      * @return 购物车列表
      */
-    List<TradeCartDO> getCartList(Long userId, Set<Long> ids);
-
-    /**
-     * 获得用户的购物车商品 SPU 数量的 Map
-     *
-     * @param userId 用户编号
-     * @return 购物车商品 SPU 数量的 Map
-     */
-    Map<Long, Integer> getCartCountMap(Long userId);
+    List<CartDO> getCartList(Long userId, Set<Long> ids);
 
 }

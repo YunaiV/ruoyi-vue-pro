@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.member.controller.admin.level;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.log.MemberLevelRecordPageReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.level.vo.log.MemberLevelRecordRespVO;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.record.MemberLevelRecordPageReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.level.vo.record.MemberLevelRecordRespVO;
 import cn.iocoder.yudao.module.member.convert.level.MemberLevelRecordConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelRecordDO;
 import cn.iocoder.yudao.module.member.service.level.MemberLevelRecordService;

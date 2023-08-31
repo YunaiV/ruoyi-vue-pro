@@ -8,7 +8,7 @@ import java.util.List;
 
 @Schema(description = "用户 App - 用户的购物车明细 Response VO")
 @Data
-public class AppTradeCartDetailRespVO {
+public class AppCartDetailRespVO {
 
     /**
      * 商品分组数组

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.service.delivery;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.express.DeliveryExpressCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.express.DeliveryExpressExportReqVO;
@@ -12,12 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.EXPRESS_CODE_DUPLICATE;
-import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.EXPRESS_NOT_EXISTS;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
 /**
  * 快递公司 Service 实现类
@@ -83,6 +82,18 @@ public class DeliveryExpressServiceImpl implements DeliveryExpressService {
     @Override
     public DeliveryExpressDO getDeliveryExpress(Long id) {
         return deliveryExpressMapper.selectById(id);
+    }
+
+    @Override
+    public DeliveryExpressDO validateDeliveryExpress(Long id) {
+        DeliveryExpressDO deliveryExpress = deliveryExpressMapper.selectById(id);
+        if (deliveryExpress == null) {
+            throw exception(EXPRESS_NOT_EXISTS);
+        }
+        if (deliveryExpress.getStatus().equals(CommonStatusEnum.DISABLE.getStatus())) {
+            throw exception(EXPRESS_STATUS_NOT_ENABLE);
+        }
+        return deliveryExpress;
     }
 
     @Override
