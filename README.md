@@ -23,7 +23,7 @@
 >
 > 😜 给项目点点 Star 吧，这对我们真的很重要！
 
-![架构图](https://static.iocoder.cn/ruoyi-vue-pro-architecture.png?imageView2/2/format/webp)
+![架构图](/.image/common/ruoyi-vue-pro-architecture.png)
 
 * 管理后台的电脑端：Vue3 提供 [element-plus](https://gitee.com/yudaocode/yudao-ui-admin-vue3)、[vben(ant-design-vue)](https://gitee.com/yudaocode/yudao-ui-admin-vben) 两个版本，Vue2 提供 [element-ui](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master/yudao-ui-admin) 版本
 * 管理后台的移动端：采用 [uni-app](https://github.com/dcloudio/uni-app) 方案，一份代码多终端适配，同时支持 APP、小程序、H5！
@@ -102,7 +102,7 @@
 
 系统内置多种多种业务功能，可以用于快速你的业务系统：
 
-![功能分层](https://static.iocoder.cn/ruoyi-vue-pro-biz.png?imageView2/2/format/webp)
+![功能分层](/.image/common/ruoyi-vue-pro-biz.png)
 
 * 系统功能
 * 基础设施
@@ -213,8 +213,6 @@
 | 🚀  | 图文发表记录 | 查看已发布成功的图文素材，支持删除操作           |
 
 ### 商城系统
-
-建设中...
 
 ![功能图](/.image/common/mall-feature.png)
 
