@@ -25,7 +25,7 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 @Slf4j
 public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
 
-    private PayWalletService client;
+    private PayWalletService wallService;
 
     public WalletPayClient(Long channelId,  NonePayClientConfig config) {
         super(channelId, PayChannelEnum.WALLET.getCode(), config);
@@ -33,15 +33,15 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
 
     @Override
     protected void doInit() {
-        if (client == null) {
-            client = SpringUtil.getBean(PayWalletService.class);
+        if (wallService == null) {
+            wallService = SpringUtil.getBean(PayWalletService.class);
         }
     }
 
     @Override
     protected PayOrderRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
         try {
-            PayWalletTransactionDO transaction = client.pay(reqDTO.getOutTradeNo(), reqDTO.getPrice());
+            PayWalletTransactionDO transaction = wallService.pay(reqDTO.getOutTradeNo(), reqDTO.getPrice());
             return PayOrderRespDTO.successOf(transaction.getNo(), transaction.getCreator(),
                     transaction.getTransactionTime(),
                     reqDTO.getOutTradeNo(), transaction);
@@ -72,7 +72,7 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
     @Override
     protected PayRefundRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) {
         try {
-            PayWalletTransactionDO payWalletTransaction = client.refund(reqDTO.getOutRefundNo(),
+            PayWalletTransactionDO payWalletTransaction = wallService.refund(reqDTO.getOutRefundNo(),
                     reqDTO.getRefundPrice(), reqDTO.getReason());
             return PayRefundRespDTO.successOf(payWalletTransaction.getNo(), payWalletTransaction.getTransactionTime(),
                     reqDTO.getOutRefundNo(), payWalletTransaction);

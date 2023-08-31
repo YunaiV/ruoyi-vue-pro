@@ -45,6 +45,7 @@ public class PayWalletServiceImpl implements  PayWalletService {
     private PayWalletMapper payWalletMapper;
     @Resource
     private PayNoRedisDAO noRedisDAO;
+
     @Resource
     private PayWalletTransactionService payWalletTransactionService;
     @Resource

@@ -65,6 +65,7 @@ public class PayChannelServiceImpl implements PayChannelService {
     public void initLocalCache() {
         // 注册钱包支付 Class
         payClientFactory.registerPayClientClass(PayChannelEnum.WALLET, WalletPayClient.class);
+
         // 注意：忽略自动多租户，因为要全局初始化缓存
         TenantUtils.executeIgnore(() -> {
             // 第一步：查询数据
@@ -78,6 +79,7 @@ public class PayChannelServiceImpl implements PayChannelService {
                 log.error("[支付模块 yudao-module-pay - 表结构未导入][参考 https://doc.iocoder.cn/pay/build/ 开启]");
             }
             log.info("[initLocalCache][缓存支付渠道，数量为:{}]", channels.size());
+
             // 第二步：构建缓存：创建或更新支付 Client
             channels.forEach(payChannel -> payClientFactory.createOrUpdatePayClient(payChannel.getId(),
                     payChannel.getCode(), payChannel.getConfig()));

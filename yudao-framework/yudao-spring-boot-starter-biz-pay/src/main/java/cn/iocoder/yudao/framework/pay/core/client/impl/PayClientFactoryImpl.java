@@ -27,15 +27,15 @@ public class PayClientFactoryImpl implements PayClientFactory {
 
     /**
      * 支付客户端 Map
+     *
      * key：渠道编号
      */
     private final ConcurrentMap<Long, AbstractPayClient<?>> clients = new ConcurrentHashMap<>();
 
     /**
      * 支付客户端 Class Map
-     * key: 支付渠道的编码的枚举
      */
-    private final Map<PayChannelEnum, Class<?>>clientClass = new ConcurrentHashMap<>(16);
+    private final Map<PayChannelEnum, Class<?>> clientClass = new ConcurrentHashMap<>();
 
     public PayClientFactoryImpl() {
         // 微信支付客户端
@@ -52,6 +52,11 @@ public class PayClientFactoryImpl implements PayClientFactory {
         clientClass.put(ALIPAY_BAR, AlipayBarPayClient.class);
         // Mock 支付客户端
         clientClass.put(MOCK, MockPayClient.class);
+    }
+
+    @Override
+    public void registerPayClientClass(PayChannelEnum channel, Class<?> payClientClass) {
+        clientClass.put(channel, payClientClass);
     }
 
     @Override
@@ -75,11 +80,6 @@ public class PayClientFactoryImpl implements PayClientFactory {
         } else {
             client.refresh(config);
         }
-    }
-
-    @Override
-    public void registerPayClientClass(PayChannelEnum payChannelEnum, Class<?> payClientClass) {
-        clientClass.put(payChannelEnum, payClientClass);
     }
 
     @SuppressWarnings("unchecked")

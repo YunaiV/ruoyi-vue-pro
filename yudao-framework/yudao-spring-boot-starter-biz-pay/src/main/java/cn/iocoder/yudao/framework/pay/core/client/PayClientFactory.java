@@ -28,10 +28,11 @@ public interface PayClientFactory {
                                                                   Config config);
 
     /**
-     * 注册支付客户端 Class, 用于模块中实现的 PayClient
+     * 注册支付客户端 Class，用于模块中实现的 PayClient
      *
-     * @param payChannelEnum 支付渠道的编码的枚举
+     * @param channel 支付渠道的编码的枚举
      * @param payClientClass 支付客户端 class
      */
-    void registerPayClientClass(PayChannelEnum payChannelEnum, Class<?> payClientClass);
+    void registerPayClientClass(PayChannelEnum channel, Class<?> payClientClass);
+
 }
