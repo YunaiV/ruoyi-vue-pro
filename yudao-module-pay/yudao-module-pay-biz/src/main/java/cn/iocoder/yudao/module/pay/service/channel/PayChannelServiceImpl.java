@@ -6,7 +6,6 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.framework.pay.core.client.impl.NonePayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
@@ -17,7 +16,6 @@ import cn.iocoder.yudao.module.pay.convert.channel.PayChannelConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.channel.PayChannelMapper;
 import cn.iocoder.yudao.module.pay.framework.pay.wallet.WalletPayClient;
-import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +27,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.validation.Validator;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -60,14 +57,14 @@ public class PayChannelServiceImpl implements PayChannelService {
 
     @Resource
     private Validator validator;
-    @Resource
-    private PayWalletService payWalletService;
 
     /**
      * 初始化 {@link #payClientFactory} 缓存
      */
     @PostConstruct
     public void initLocalCache() {
+        // 注册钱包支付 Class
+        payClientFactory.registerPayClientClass(PayChannelEnum.WALLET, WalletPayClient.class);
         // 注意：忽略自动多租户，因为要全局初始化缓存
         TenantUtils.executeIgnore(() -> {
             // 第一步：查询数据
@@ -81,26 +78,9 @@ public class PayChannelServiceImpl implements PayChannelService {
                 log.error("[支付模块 yudao-module-pay - 表结构未导入][参考 https://doc.iocoder.cn/pay/build/ 开启]");
             }
             log.info("[initLocalCache][缓存支付渠道，数量为:{}]", channels.size());
-            // 钱包 client 需要和其它 client 分开了创建
-            List<PayChannelDO> walletChannels = new ArrayList<>();
-            // TODO @jason：有点复杂，看看用 PayClientInitializer 能不能简化
-            List<PayChannelDO> otherChannels = new ArrayList<>();
-            channels.forEach(t -> {
-                if (PayChannelEnum.WALLET.getCode().equals(t.getCode())) {
-                    walletChannels.add(t);
-                } else {
-                    otherChannels.add(t);
-                }
-            });
             // 第二步：构建缓存：创建或更新支付 Client
-            otherChannels.forEach(payChannel -> payClientFactory.createOrUpdatePayClient(payChannel.getId(),
+            channels.forEach(payChannel -> payClientFactory.createOrUpdatePayClient(payChannel.getId(),
                     payChannel.getCode(), payChannel.getConfig()));
-
-            walletChannels.forEach(payChannel -> {
-                WalletPayClient walletPayClient = new WalletPayClient(payChannel.getId(), payChannel.getCode(),
-                        (NonePayClientConfig) payChannel.getConfig(), payWalletService);
-                payClientFactory.addOrUpdateDelegatePayClient(payChannel.getId(), walletPayClient);
-            });
             this.channelCache = channels;
         });
     }
