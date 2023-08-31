@@ -39,7 +39,7 @@ public class AppSeckillActivityController {
         activity1.setId(1L);
         activity1.setName("618 大秒杀");
         activity1.setSpuId(2048L);
-        activity1.setPicUrl("https://demo26.crmeb.net/uploads/attach/2021/11/15/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
+        activity1.setPicUrl("https://static.iocoder.cn/mall/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
         activity1.setMarketPrice(50);
         activity1.setSeckillPrice(100);
         activityList.add(activity1);
@@ -48,7 +48,7 @@ public class AppSeckillActivityController {
         activity2.setId(2L);
         activity2.setName("双十一大秒杀");
         activity2.setSpuId(4096L);
-        activity2.setPicUrl("https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKXMYJOomfp7cebz3cIeb8sHk3GGSIJtWEgREe3j7J1WoAbTvIOicpcNdFkWAziatBSMod8b5RyS4CQ/132");
+        activity2.setPicUrl("https://static.iocoder.cn/mall/132.jpeg");
         activity2.setMarketPrice(100);
         activity2.setSeckillPrice(200);
         activityList.add(activity2);
@@ -65,7 +65,7 @@ public class AppSeckillActivityController {
         activity1.setId(1L);
         activity1.setName("618 大秒杀");
         activity1.setSpuId(2048L);
-        activity1.setPicUrl("https://demo26.crmeb.net/uploads/attach/2021/11/15/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
+        activity1.setPicUrl("https://static.iocoder.cn/mall/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
         activity1.setMarketPrice(50);
         activity1.setSeckillPrice(100);
         activity1.setUnitName("个");
@@ -77,7 +77,7 @@ public class AppSeckillActivityController {
         activity2.setId(2L);
         activity2.setName("双十一大秒杀");
         activity2.setSpuId(4096L);
-        activity2.setPicUrl("https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKXMYJOomfp7cebz3cIeb8sHk3GGSIJtWEgREe3j7J1WoAbTvIOicpcNdFkWAziatBSMod8b5RyS4CQ/132");
+        activity2.setPicUrl("https://static.iocoder.cn/mall/132.jpeg");
         activity2.setMarketPrice(100);
         activity2.setSeckillPrice(200);
         activity2.setUnitName("套");

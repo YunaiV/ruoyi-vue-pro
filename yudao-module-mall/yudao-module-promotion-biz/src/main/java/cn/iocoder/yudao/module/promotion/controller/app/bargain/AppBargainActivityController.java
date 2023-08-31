@@ -35,7 +35,7 @@ public class AppBargainActivityController {
         activity1.setId(1L);
         activity1.setName("618 大砍价");
         activity1.setSpuId(2048L);
-        activity1.setPicUrl("https://demo26.crmeb.net/uploads/attach/2021/11/15/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
+        activity1.setPicUrl("https://static.iocoder.cn/mall/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
         activity1.setMarketPrice(50);
         activity1.setBargainPrice(100);
         activity1.setStartTime(LocalDateTimeUtils.addTime(Duration.ofDays(-2)));
@@ -47,7 +47,7 @@ public class AppBargainActivityController {
         activity2.setId(2L);
         activity2.setName("双十一砍价");
         activity2.setSpuId(4096L);
-        activity2.setPicUrl("https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKXMYJOomfp7cebz3cIeb8sHk3GGSIJtWEgREe3j7J1WoAbTvIOicpcNdFkWAziatBSMod8b5RyS4CQ/132");
+        activity2.setPicUrl("https://static.iocoder.cn/mall/132.jpeg");
         activity2.setMarketPrice(100);
         activity2.setBargainPrice(200);
         activity2.setStartTime(LocalDateTimeUtils.addTime(Duration.ofDays(-2)));
@@ -69,7 +69,7 @@ public class AppBargainActivityController {
         activity1.setId(1L);
         activity1.setName("618 大砍价");
         activity1.setSpuId(2048L);
-        activity1.setPicUrl("https://demo26.crmeb.net/uploads/attach/2021/11/15/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
+        activity1.setPicUrl("https://static.iocoder.cn/mall/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
         activity1.setMarketPrice(50);
         activity1.setBargainPrice(100);
         activityList.add(activity1);
@@ -78,7 +78,7 @@ public class AppBargainActivityController {
         activity2.setId(2L);
         activity2.setName("双十一砍价");
         activity2.setSpuId(4096L);
-        activity2.setPicUrl("https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKXMYJOomfp7cebz3cIeb8sHk3GGSIJtWEgREe3j7J1WoAbTvIOicpcNdFkWAziatBSMod8b5RyS4CQ/132");
+        activity2.setPicUrl("https://static.iocoder.cn/mall/132.jpeg");
         activity2.setMarketPrice(100);
         activity2.setBargainPrice(200);
         activityList.add(activity2);
@@ -94,7 +94,7 @@ public class AppBargainActivityController {
         activity.setId(2L);
         activity.setName("618 大砍价");
         activity.setSpuId(2048L);
-        activity.setPicUrl("https://demo26.crmeb.net/uploads/attach/2021/11/15/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
+        activity.setPicUrl("https://static.iocoder.cn/mall/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
         activity.setMarketPrice(50);
         activity.setBargainPrice(100);
         activity.setStock(10);
