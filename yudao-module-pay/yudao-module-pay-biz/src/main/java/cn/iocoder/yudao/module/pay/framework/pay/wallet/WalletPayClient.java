@@ -5,8 +5,8 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.client.impl.NonePayClientConfig;
+import cn.iocoder.yudao.framework.pay.core.client.impl.delegate.DelegatePayClient;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
  * @author jason
  */
 @Slf4j
-public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
+public class WalletPayClient extends DelegatePayClient<NonePayClientConfig> {
 
     private PayWalletService payWalletService;
 
