@@ -8,12 +8,6 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
-import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
-import cn.iocoder.yudao.framework.pay.core.client.impl.NonePayClientConfig;
-import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.*;
-import cn.iocoder.yudao.framework.pay.core.client.impl.mock.MockPayClient;
-import cn.iocoder.yudao.framework.pay.core.client.impl.mock.MockPayClientConfig;
-import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.*;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.pay.controller.admin.channel.vo.PayChannelCreateReqVO;
@@ -22,7 +16,6 @@ import cn.iocoder.yudao.module.pay.convert.channel.PayChannelConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.channel.PayChannelMapper;
 import cn.iocoder.yudao.module.pay.framework.pay.wallet.WalletPayClient;
-import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -64,14 +57,14 @@ public class PayChannelServiceImpl implements PayChannelService {
 
     @Resource
     private Validator validator;
-    @Resource
-    private PayWalletService payWalletService;
 
     /**
      * 初始化 {@link #payClientFactory} 缓存
      */
     @PostConstruct
     public void initLocalCache() {
+        // 注册钱包支付 Class
+        payClientFactory.registerPayClientClass(PayChannelEnum.WALLET, WalletPayClient.class);
         // 注意：忽略自动多租户，因为要全局初始化缓存
         TenantUtils.executeIgnore(() -> {
             // 第一步：查询数据
@@ -86,53 +79,10 @@ public class PayChannelServiceImpl implements PayChannelService {
             }
             log.info("[initLocalCache][缓存支付渠道，数量为:{}]", channels.size());
             // 第二步：构建缓存：创建或更新支付 Client
-            channels.forEach(payChannel ->{
-                AbstractPayClient<PayClientConfig> payClient = createPayClient(payChannel.getId(), payChannel.getCode(), payChannel.getConfig());
-                payClientFactory.addOrUpdatePayClient(payChannel.getId(), payClient);
-
-            });
+            channels.forEach(payChannel -> payClientFactory.createOrUpdatePayClient(payChannel.getId(),
+                    payChannel.getCode(), payChannel.getConfig()));
             this.channelCache = channels;
         });
-    }
-    @SuppressWarnings("unchecked")
-    private <Config extends PayClientConfig> AbstractPayClient<Config> createPayClient(
-            Long channelId, String channelCode, Config config) {
-        PayChannelEnum channelEnum = PayChannelEnum.getByCode(channelCode);
-        Assert.notNull(channelEnum, String.format("支付渠道(%s) 为空", channelEnum));
-        // 创建客户端
-        switch (channelEnum) {
-            // 微信支付
-            case WX_PUB:
-                return (AbstractPayClient<Config>) new WxPubPayClient(channelId, (WxPayClientConfig) config);
-            case WX_LITE:
-                return (AbstractPayClient<Config>) new WxLitePayClient(channelId, (WxPayClientConfig) config);
-            case WX_APP:
-                return (AbstractPayClient<Config>) new WxAppPayClient(channelId, (WxPayClientConfig) config);
-            case WX_BAR:
-                return (AbstractPayClient<Config>) new WxBarPayClient(channelId, (WxPayClientConfig) config);
-            case WX_NATIVE:
-                return (AbstractPayClient<Config>) new WxNativePayClient(channelId, (WxPayClientConfig) config);
-            // 支付宝支付
-            case ALIPAY_WAP:
-                return (AbstractPayClient<Config>) new AlipayWapPayClient(channelId, (AlipayPayClientConfig) config);
-            case ALIPAY_QR:
-                return (AbstractPayClient<Config>) new AlipayQrPayClient(channelId, (AlipayPayClientConfig) config);
-            case ALIPAY_APP:
-                return (AbstractPayClient<Config>) new AlipayAppPayClient(channelId, (AlipayPayClientConfig) config);
-            case ALIPAY_PC:
-                return (AbstractPayClient<Config>) new AlipayPcPayClient(channelId, (AlipayPayClientConfig) config);
-            case ALIPAY_BAR:
-                return (AbstractPayClient<Config>) new AlipayBarPayClient(channelId, (AlipayPayClientConfig) config);
-            // 其它支付
-            case MOCK:
-                return (AbstractPayClient<Config>) new MockPayClient(channelId, (MockPayClientConfig) config);
-            case WALLET:
-                return (AbstractPayClient<Config>) new WalletPayClient(
-                        channelId, channelCode, (NonePayClientConfig) config, payWalletService);
-        }
-        // 创建失败，错误日志 + 抛出异常
-        log.error("[createPayClient][配置({}) 找不到合适的客户端实现]", config);
-        throw new IllegalArgumentException(String.format("配置(%s) 找不到合适的客户端实现", config));
     }
 
     /**
