@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template.Cou
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
 
 import javax.validation.Valid;
-import java.util.List;
 
 /**
  * 优惠劵模板 Service 接口
@@ -61,17 +60,6 @@ public interface CouponTemplateService {
      * @return 优惠劵模板分页
      */
     PageResult<CouponTemplateDO> getCouponTemplatePage(CouponTemplatePageReqVO pageReqVO);
-
-
-    /**
-     * 获得优惠劵模板分页
-     *
-     * @param pageReqVO    分页查询
-     * @param canTakeTypes 可领取的方式
-     * @return 优惠劵模板分页
-     */
-    PageResult<CouponTemplateDO> getCanTakeCouponTemplatePage(CouponTemplatePageReqVO pageReqVO,
-                                                              List<Integer> canTakeTypes);
 
     /**
      * 更新优惠劵模板的领取数量

@@ -76,8 +76,8 @@ public class CouponController {
     @Operation(summary = "发送优惠劵")
     @PreAuthorize("@ss.hasPermission('promotion:coupon:send')")
     public CommonResult<Boolean> sendCoupon(@Valid @RequestBody CouponSendReqVO reqVO) {
-        Boolean result = couponService.sendCoupon(reqVO.getTemplateId(), reqVO.getUserIds());
-        return success(result);
+        couponService.takeCouponByAdmin(reqVO.getTemplateId(), reqVO.getUserIds());
+        return success(true);
     }
 
 }

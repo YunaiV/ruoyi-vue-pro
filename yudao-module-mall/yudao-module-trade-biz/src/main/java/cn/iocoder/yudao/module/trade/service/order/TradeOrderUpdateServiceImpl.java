@@ -217,8 +217,6 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     // TODO @puhui999：订单超时，自动取消；
 
-    // TODO @疯狂：用户手动取消订单；
-
     /**
      * 校验收件地址是否存在
      *

@@ -78,27 +78,23 @@ public interface CouponService {
      */
     Long getUnusedCouponCount(Long userId);
 
-    // TODO @疯狂：可以返回 void；因为都是 true = =
     /**
      * 领取优惠券
      *
      * @param templateId 优惠券模板编号
      * @param userIds    用户编号列表
-     * @param takeType    领取方式
-     * @return 领取结果
+     * @param takeType   领取方式
      */
-    Boolean takeCoupon(Long templateId, Set<Long> userIds, CouponTakeTypeEnum takeType);
+    void takeCoupon(Long templateId, Set<Long> userIds, CouponTakeTypeEnum takeType);
 
-    // TODO @疯狂：感觉 3 个方法的命名，改成 takeCouponByAdmin；takeCouponByUser；takeCouponByRegister 会更容易理解哈；现在两个都叫 sendCoupon ，感觉不太好懂
     /**
      * 【管理员】给用户发送优惠券
      *
      * @param templateId 优惠券模板编号
      * @param userIds    用户编号列表
-     * @return 发送结果
      */
-    default Boolean sendCoupon(Long templateId, Set<Long> userIds) {
-        return takeCoupon(templateId, userIds, CouponTakeTypeEnum.BY_ADMIN);
+    default void takeCouponByAdmin(Long templateId, Set<Long> userIds) {
+        takeCoupon(templateId, userIds, CouponTakeTypeEnum.BY_ADMIN);
     }
 
     /**
@@ -106,10 +102,9 @@ public interface CouponService {
      *
      * @param templateId 优惠券模板编号
      * @param userId     用户编号
-     * @return 发送结果
      */
-    default Boolean receiveCoupon(Long templateId, Long userId) {
-        return takeCoupon(templateId, CollUtil.newHashSet(userId), CouponTakeTypeEnum.BY_USER);
+    default void takeCouponByUser(Long templateId, Long userId) {
+        takeCoupon(templateId, CollUtil.newHashSet(userId), CouponTakeTypeEnum.BY_USER);
     }
 
     /**
@@ -117,9 +112,8 @@ public interface CouponService {
      *
      * @param templateId 优惠券模板编号
      * @param userId     用户编号列表
-     * @return 发送结果
      */
-    default Boolean sendCoupon(Long templateId, Long userId) {
-        return takeCoupon(templateId, CollUtil.newHashSet(userId), CouponTakeTypeEnum.BY_REGISTER);
+    default void takeCouponByRegister(Long templateId, Long userId) {
+        takeCoupon(templateId, CollUtil.newHashSet(userId), CouponTakeTypeEnum.BY_REGISTER);
     }
 }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.dal.mysql.coupon;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
@@ -11,7 +12,6 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.function.Consumer;
 
 /**
@@ -23,27 +23,23 @@ import java.util.function.Consumer;
 public interface CouponTemplateMapper extends BaseMapperX<CouponTemplateDO> {
 
     default PageResult<CouponTemplateDO> selectPage(CouponTemplatePageReqVO reqVO) {
+        Consumer<LambdaQueryWrapper<CouponTemplateDO>> canTakeConsumer = null;
+        if (CollUtil.isNotEmpty(reqVO.getCanTakeTypes())) {
+            // 构建可领取的查询条件, 好啰嗦  ( ╯-_-)╯┴—┴
+            canTakeConsumer = w ->
+                    w.eq(CouponTemplateDO::getStatus, CommonStatusEnum.ENABLE.getStatus()) // 1. 状态为可用的
+                            .in(CouponTemplateDO::getTakeType, reqVO.getCanTakeTypes()) // 2. 领取方式一致
+                            .and(ww -> ww.isNull(CouponTemplateDO::getValidEndTime)  // 3. 未过期
+                                    .or().gt(CouponTemplateDO::getValidEndTime, LocalDateTime.now()))
+                            .apply(" take_count < total_count "); // 4. 剩余数量大于 0
+        }
+
         return selectPage(reqVO, new LambdaQueryWrapperX<CouponTemplateDO>()
                 .likeIfPresent(CouponTemplateDO::getName, reqVO.getName())
                 .eqIfPresent(CouponTemplateDO::getStatus, reqVO.getStatus())
                 .eqIfPresent(CouponTemplateDO::getDiscountType, reqVO.getDiscountType())
                 .betweenIfPresent(CouponTemplateDO::getCreateTime, reqVO.getCreateTime())
-                .orderByDesc(CouponTemplateDO::getId));
-    }
-
-    default PageResult<CouponTemplateDO> selectCanTakePage(CouponTemplatePageReqVO reqVO, Collection<Integer> takeTypes) {
-        // 构建可领取的查询条件, 好啰嗦  ( ╯-_-)╯┴—┴
-        Consumer<LambdaQueryWrapper<CouponTemplateDO>> canTakeConsumer = w ->
-                w.eq(CouponTemplateDO::getStatus, CommonStatusEnum.ENABLE.getStatus()) // 1. 状态为可用的
-                        .in(CouponTemplateDO::getTakeType, takeTypes) // 2. 领取方式一致
-                        .and(ww ->  ww.isNull(CouponTemplateDO::getValidEndTime)  // 3. 未过期
-                                .or().gt(CouponTemplateDO::getValidEndTime, LocalDateTime.now()))
-                        .apply(" take_count < total_count "); // 4. 剩余数量大于 0
-        return selectPage(reqVO, new LambdaQueryWrapperX<CouponTemplateDO>()
-                .likeIfPresent(CouponTemplateDO::getName, reqVO.getName())
-                .eqIfPresent(CouponTemplateDO::getDiscountType, reqVO.getDiscountType())
-                .betweenIfPresent(CouponTemplateDO::getCreateTime, reqVO.getCreateTime())
-                .and(canTakeConsumer)
+                .and(canTakeConsumer != null, canTakeConsumer)
                 .orderByDesc(CouponTemplateDO::getId));
     }
 
