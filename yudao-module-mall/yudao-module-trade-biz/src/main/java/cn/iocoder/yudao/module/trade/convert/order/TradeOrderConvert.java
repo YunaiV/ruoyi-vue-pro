@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.trade.convert.order;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -37,8 +36,10 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
@@ -86,7 +87,9 @@ public interface TradeOrderConvert {
     default ProductSkuUpdateStockReqDTO convert(List<TradeOrderItemDO> list) {
         return new ProductSkuUpdateStockReqDTO(TradeOrderConvert.INSTANCE.convertList(list));
     }
+
     List<ProductSkuUpdateStockReqDTO.Item> convertList(List<TradeOrderItemDO> list);
+
     @Mappings({
             @Mapping(source = "skuId", target = "id"),
             @Mapping(source = "count", target = "incrCount"),
@@ -137,6 +140,15 @@ public interface TradeOrderConvert {
         orderVO.setReceiverAreaName(AreaUtils.format(order.getReceiverAreaId()));
         // 处理用户信息
         orderVO.setUser(convert(user));
+        // TODO puhui999：模拟订单操作日志
+        ArrayList<TradeOrderDetailRespVO.OrderLog> orderLogs = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            TradeOrderDetailRespVO.OrderLog orderLog = new TradeOrderDetailRespVO.OrderLog();
+            orderLog.setContent("订单操作" + i);
+            orderLog.setCreateTime(LocalDateTime.now());
+            orderLogs.add(orderLog);
+        }
+        orderVO.setOrderLog(orderLogs);
         return orderVO;
     }
 
