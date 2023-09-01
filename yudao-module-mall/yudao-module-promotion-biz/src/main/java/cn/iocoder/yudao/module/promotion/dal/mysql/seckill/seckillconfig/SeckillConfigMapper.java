@@ -16,7 +16,7 @@ public interface SeckillConfigMapper extends BaseMapperX<SeckillConfigDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<SeckillConfigDO>()
                 .likeIfPresent(SeckillConfigDO::getName, reqVO.getName())
                 .eqIfPresent(SeckillConfigDO::getStatus, reqVO.getStatus())
-                .orderByDesc(SeckillConfigDO::getId));
+                .orderByAsc(SeckillConfigDO::getStartTime));
     }
 
     default List<SeckillConfigDO> selectListByStatus(Integer status) {

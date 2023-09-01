@@ -11,7 +11,6 @@ import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
 import cn.iocoder.yudao.module.member.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
-import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import cn.iocoder.yudao.module.system.api.logger.LoginLogApi;
 import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
@@ -59,9 +58,6 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     @Resource
     private WxMaService wxMaService;
-
-    @Resource
-    private MemberUserMapper userMapper;
 
     @Override
     public AppAuthLoginRespVO login(AppAuthLoginReqVO reqVO) {

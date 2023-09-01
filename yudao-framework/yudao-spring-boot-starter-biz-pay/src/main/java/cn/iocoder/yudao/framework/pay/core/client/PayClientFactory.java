@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.framework.pay.core.client;
 
-import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
+import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 
 /**
  * 支付客户端的工厂接口
@@ -21,8 +21,18 @@ public interface PayClientFactory {
      * 创建支付客户端
      *
      * @param channelId 渠道编号
-     * @param client 支付客户端
-     * @param <Config> 支付配置
+     * @param channelCode 渠道编码
+     * @param config 支付配置
      */
-    <Config extends PayClientConfig> void addOrUpdatePayClient(Long channelId, AbstractPayClient<Config> client);
+    <Config extends PayClientConfig> void createOrUpdatePayClient(Long channelId, String channelCode,
+                                                                  Config config);
+
+    /**
+     * 注册支付客户端 Class，用于模块中实现的 PayClient
+     *
+     * @param channel 支付渠道的编码的枚举
+     * @param payClientClass 支付客户端 class
+     */
+    void registerPayClientClass(PayChannelEnum channel, Class<?> payClientClass);
+
 }

@@ -23,7 +23,7 @@
 >
 > 😜 给项目点点 Star 吧，这对我们真的很重要！
 
-![架构图](https://static.iocoder.cn/ruoyi-vue-pro-architecture.png?imageView2/2/format/webp)
+![架构图](/.image/common/ruoyi-vue-pro-architecture.png)
 
 * 管理后台的电脑端：Vue3 提供 [element-plus](https://gitee.com/yudaocode/yudao-ui-admin-vue3)、[vben(ant-design-vue)](https://gitee.com/yudaocode/yudao-ui-admin-vben) 两个版本，Vue2 提供 [element-ui](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master/yudao-ui-admin) 版本
 * 管理后台的移动端：采用 [uni-app](https://github.com/dcloudio/uni-app) 方案，一份代码多终端适配，同时支持 APP、小程序、H5！
@@ -102,7 +102,7 @@
 
 系统内置多种多种业务功能，可以用于快速你的业务系统：
 
-![功能分层](https://static.iocoder.cn/ruoyi-vue-pro-biz.png?imageView2/2/format/webp)
+![功能分层](/.image/common/ruoyi-vue-pro-biz.png)
 
 * 系统功能
 * 基础设施
@@ -214,17 +214,19 @@
 
 ### 商城系统
 
-建设中...
+![功能图](/.image/common/mall-feature.png)
 
-![功能图](http://static.iocoder.cn/mall%20%E5%8A%9F%E8%83%BD%E5%9B%BE-min.png)
-
-![GIF 图-耐心等待](https://raw.githubusercontent.com/YunaiV/Blog/master/Mall/onemall-admin-min.gif)
-
-![GIF 图-耐心等待](https://raw.githubusercontent.com/YunaiV/Blog/master/Mall/onemall-h5-min.gif)
+![功能图](/.image/common/mall-preview.png)
 
 ### 会员中心
 
-和「商城系统」一起开发
+|     | 功能   | 描述                               |
+|-----|------|----------------------------------|
+| 🚀  | 会员管理 | 会员是 C 端的消费者，该功能用于会员的搜索与管理        |
+| 🚀  | 会员标签 | 对会员的标签进行创建、查询、修改、删除等操作           |
+| 🚀  | 会员等级 | 对会员的等级、成长值进行管理，可用于订单折扣等会员权益      |
+| 🚀  | 会员分组 | 对会员进行分组，用于用户画像、内容推送等运营手段         |
+| 🚀  | 积分签到 | 回馈给签到、消费等行为的积分，会员可订单抵现、积分兑换等途径消耗 |
 
 ## 🐨 技术栈
 
