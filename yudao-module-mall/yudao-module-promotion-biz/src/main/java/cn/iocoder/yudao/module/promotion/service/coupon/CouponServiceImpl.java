@@ -138,9 +138,9 @@ public class CouponServiceImpl implements CouponService {
     public void takeCoupon(Long templateId, Set<Long> userIds, CouponTakeTypeEnum takeType) {
         CouponTemplateDO template = couponTemplateService.getCouponTemplate(templateId);
         // 1. 过滤掉达到领取限制的用户
-        removeTakeLimitUserId(userIds, template);
+        removeTakeLimitUser(userIds, template);
         // 2. 校验优惠劵是否可以领取
-        validateCanTake(template, userIds, takeType);
+        validateCouponTemplateCanTake(template, userIds, takeType);
 
         // 3. 批量保存优惠劵
         couponMapper.insertBatch(convertList(userIds, userId -> CouponConvert.INSTANCE.convert(template, userId)));
@@ -156,7 +156,7 @@ public class CouponServiceImpl implements CouponService {
      * @param userIds        领取人列表
      * @param takeType       领取方式
      */
-    private void validateCanTake(CouponTemplateDO couponTemplate, Set<Long> userIds, CouponTakeTypeEnum takeType) {
+    private void validateCouponTemplateCanTake(CouponTemplateDO couponTemplate, Set<Long> userIds, CouponTakeTypeEnum takeType) {
         // 如果所有用户都领取过，则抛出异常
         if (CollUtil.isEmpty(userIds)) {
             throw exception(COUPON_TEMPLATE_USER_ALREADY_TAKE);
@@ -188,7 +188,7 @@ public class CouponServiceImpl implements CouponService {
      * @param userIds 用户编号数组
      * @param couponTemplate 优惠劵模版
      */
-    private void removeTakeLimitUserId(Set<Long> userIds, CouponTemplateDO couponTemplate) {
+    private void removeTakeLimitUser(Set<Long> userIds, CouponTemplateDO couponTemplate) {
         if (couponTemplate.getTakeLimitCount() <= 0) {
             return;
         }
