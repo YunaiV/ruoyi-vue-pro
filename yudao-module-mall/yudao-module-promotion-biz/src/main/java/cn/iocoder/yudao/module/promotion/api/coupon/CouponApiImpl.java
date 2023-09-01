@@ -34,4 +34,9 @@ public class CouponApiImpl implements CouponApi {
         return CouponConvert.INSTANCE.convert(coupon);
     }
 
+    @Override
+    public void returnUsedCoupon(Long id) {
+        couponService.returnUsedCoupon(id);
+    }
+
 }

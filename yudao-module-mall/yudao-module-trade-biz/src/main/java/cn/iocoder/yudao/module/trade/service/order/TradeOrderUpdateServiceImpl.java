@@ -299,7 +299,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 1）如果是秒杀商品：额外扣减秒杀的库存；
         // 2）如果是拼团活动：额外扣减拼团的库存；
         // 3）如果是砍价活动：额外扣减砍价的库存；
-        productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convert(orderItems));
+        productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convertNegative(orderItems));
 
         // 删除购物车商品
         Set<Long> cartIds = convertSet(createReqVO.getItems(), AppTradeOrderSettlementReqVO.Item::getCartId);
@@ -308,6 +308,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         }
 
         // 扣减积分 TODO 芋艿：待实现，需要前置；
+        // 这个是不是应该放到支付成功之后？如果支付后的话，可能积分可以重复使用哈。资源类，都要预扣
 
         // 有使用优惠券时更新 TODO 芋艿：需要前置；
         if (createReqVO.getCouponId() != null) {
@@ -668,6 +669,41 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             // TODO 待实现：已完成评价，要不要写一条订单日志？目前 crmeb 会写，有赞可以研究下
         }
         return comment;
+    }
+
+    @Override
+    public void cancelOrder(Long userId, Long id) {
+        // 校验存在
+        TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(id, userId);
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+        // 校验状态
+        if (ObjectUtil.notEqual(order.getStatus(), TradeOrderStatusEnum.UNPAID.getStatus())) {
+            throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
+        }
+
+        // 1.更新 TradeOrderDO 状态为已取消
+        int updateCount = tradeOrderMapper.updateByIdAndStatus(id, order.getStatus(),
+                new TradeOrderDO().setStatus(TradeOrderStatusEnum.CANCELED.getStatus())
+                        .setCancelTime(LocalDateTime.now())
+                        .setCancelType(TradeOrderCancelTypeEnum.MEMBER_CANCEL.getType()));
+        if (updateCount == 0) {
+            throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
+        }
+
+        // 2.回滚库存
+        List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(id);
+        productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convert(orderItems));
+
+        // 3.回滚优惠券
+        couponApi.returnUsedCoupon(order.getCouponId());
+
+        // 4.回滚积分：积分是支付成功后才增加的吧？
+
+        // TODO 芋艿：OrderLog
+
+        // TODO 芋艿：lili 发送订单变化的消息
     }
 
     /**
