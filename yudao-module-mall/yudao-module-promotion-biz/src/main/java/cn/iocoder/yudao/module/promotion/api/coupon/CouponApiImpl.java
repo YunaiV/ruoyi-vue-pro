@@ -29,14 +29,14 @@ public class CouponApiImpl implements CouponApi {
     }
 
     @Override
-    public CouponRespDTO validateCoupon(CouponValidReqDTO validReqDTO) {
-        CouponDO coupon = couponService.validCoupon(validReqDTO.getId(), validReqDTO.getUserId());
-        return CouponConvert.INSTANCE.convert(coupon);
+    public void returnUsedCoupon(Long id) {
+        couponService.returnUsedCoupon(id);
     }
 
     @Override
-    public void returnUsedCoupon(Long id) {
-        couponService.returnUsedCoupon(id);
+    public CouponRespDTO validateCoupon(CouponValidReqDTO validReqDTO) {
+        CouponDO coupon = couponService.validCoupon(validReqDTO.getId(), validReqDTO.getUserId());
+        return CouponConvert.INSTANCE.convert(coupon);
     }
 
 }

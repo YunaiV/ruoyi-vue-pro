@@ -103,6 +103,29 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
+    public void returnUsedCoupon(Long id) {
+        // 校验存在
+        CouponDO coupon = couponMapper.selectById(id);
+        if (coupon == null) {
+            throw exception(COUPON_NOT_EXISTS);
+        }
+        // 校验状态
+        if (ObjectUtil.notEqual(coupon.getTemplateId(), CouponStatusEnum.USED.getStatus())) {
+            throw exception(COUPON_STATUS_NOT_USED);
+        }
+
+        // 退还
+        // TODO @疯狂：最好 where status，避免可能存在的并发问题
+        Integer status = LocalDateTimeUtils.beforeNow(coupon.getValidEndTime())
+                // 退还时可能已经过期了
+                ? CouponStatusEnum.EXPIRE.getStatus()
+                : CouponStatusEnum.UNUSED.getStatus();
+        couponMapper.updateById(new CouponDO().setId(id).setStatus(status));
+
+        // TODO 增加优惠券变动记录？
+    }
+
+    @Override
     @Transactional
     public void deleteCoupon(Long id) {
         // 校验存在
@@ -200,29 +223,6 @@ public class CouponServiceImpl implements CouponService {
         // 移除达到领取限制的用户
         Map<Long, Integer> userTakeCountMap = CollStreamUtil.groupBy(alreadyTakeCoupons, CouponDO::getUserId, Collectors.summingInt(c -> 1));
         userIds.removeIf(userId -> MapUtil.getInt(userTakeCountMap, userId, 0) >= couponTemplate.getTakeLimitCount());
-    }
-
-    @Override
-    public void returnUsedCoupon(Long id) {
-        // 校验存在
-        CouponDO coupon = couponMapper.selectById(id);
-        if (coupon == null) {
-            throw exception(COUPON_NOT_EXISTS);
-        }
-
-        // 校验状态
-        if (!CouponStatusEnum.USED.getStatus().equals(coupon.getStatus())) {
-            throw exception(COUPON_STATUS_NOT_USED);
-        }
-
-        // 退还
-        Integer status = LocalDateTimeUtils.beforeNow(coupon.getValidEndTime())
-                // 退还时可能已经过期了
-                ? CouponStatusEnum.EXPIRE.getStatus()
-                : CouponStatusEnum.UNUSED.getStatus();
-        couponMapper.updateById(new CouponDO().setId(id).setStatus(status));
-
-        // TODO 增加优惠券变动记录？
     }
 
 }

@@ -55,6 +55,13 @@ public interface CouponService {
     void useCoupon(Long id, Long userId, Long orderId);
 
     /**
+     * 退还已使用的优惠券
+     *
+     * @param id 优惠券编号
+     */
+    void returnUsedCoupon(Long id);
+
+    /**
      * 回收优惠劵
      *
      * @param id 优惠劵编号
@@ -117,10 +124,4 @@ public interface CouponService {
         takeCoupon(templateId, CollUtil.newHashSet(userId), CouponTakeTypeEnum.REGISTER);
     }
 
-    /**
-     * 退还已使用的优惠券
-     *
-     * @param id 优惠券编号
-     */
-    void returnUsedCoupon(Long id);
 }

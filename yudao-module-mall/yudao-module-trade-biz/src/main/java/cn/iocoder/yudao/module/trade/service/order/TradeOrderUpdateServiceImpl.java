@@ -699,7 +699,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 3.回滚优惠券
         couponApi.returnUsedCoupon(order.getCouponId());
 
-        // 4.回滚积分：积分是支付成功后才增加的吧？
+        // 4.回滚积分：积分是支付成功后才增加的吧？ 回复：每个项目不同，目前看下来，确认收货貌似更合适，我再看看其它项目的业务选择；
 
         // TODO 芋艿：OrderLog
 
