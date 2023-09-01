@@ -94,7 +94,7 @@ public interface CouponService {
      * @param userIds    用户编号列表
      */
     default void takeCouponByAdmin(Long templateId, Set<Long> userIds) {
-        takeCoupon(templateId, userIds, CouponTakeTypeEnum.BY_ADMIN);
+        takeCoupon(templateId, userIds, CouponTakeTypeEnum.ADMIN);
     }
 
     /**
@@ -104,7 +104,7 @@ public interface CouponService {
      * @param userId     用户编号
      */
     default void takeCouponByUser(Long templateId, Long userId) {
-        takeCoupon(templateId, CollUtil.newHashSet(userId), CouponTakeTypeEnum.BY_USER);
+        takeCoupon(templateId, CollUtil.newHashSet(userId), CouponTakeTypeEnum.USER);
     }
 
     /**
@@ -114,6 +114,6 @@ public interface CouponService {
      * @param userId     用户编号列表
      */
     default void takeCouponByRegister(Long templateId, Long userId) {
-        takeCoupon(templateId, CollUtil.newHashSet(userId), CouponTakeTypeEnum.BY_REGISTER);
+        takeCoupon(templateId, CollUtil.newHashSet(userId), CouponTakeTypeEnum.REGISTER);
     }
 }

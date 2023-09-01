@@ -15,9 +15,9 @@ import java.util.Arrays;
 @Getter
 public enum CouponTakeTypeEnum implements IntArrayValuable {
 
-    BY_USER(1, "直接领取"), // 用户可在首页、每日领劵直接领取
-    BY_ADMIN(2, "指定发放"), // 后台指定会员赠送优惠劵
-    BY_REGISTER(3, "新人券"), // 注册时自动领取
+    USER(1, "直接领取"), // 用户可在首页、每日领劵直接领取
+    ADMIN(2, "指定发放"), // 后台指定会员赠送优惠劵
+    REGISTER(3, "新人券"), // 注册时自动领取
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CouponTakeTypeEnum::getValue).toArray();

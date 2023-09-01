@@ -138,8 +138,8 @@ public class CouponServiceImpl implements CouponService {
     public void takeCoupon(Long templateId, Set<Long> userIds, CouponTakeTypeEnum takeType) {
         CouponTemplateDO template = couponTemplateService.getCouponTemplate(templateId);
         // 1. 过滤掉达到领取限制的用户
-        removeTakeLimitUserId(template, userIds);
-        // 2. 校验用户
+        removeTakeLimitUserId(userIds, template);
+        // 2. 校验优惠劵是否可以领取
         validateCanTake(template, userIds, takeType);
 
         // 3. 批量保存优惠劵
@@ -158,7 +158,7 @@ public class CouponServiceImpl implements CouponService {
      */
     private void validateCanTake(CouponTemplateDO couponTemplate, Set<Long> userIds, CouponTakeTypeEnum takeType) {
         // 如果所有用户都领取过，则抛出异常
-        if (userIds.isEmpty()) {
+        if (CollUtil.isEmpty(userIds)) {
             throw exception(COUPON_TEMPLATE_USER_ALREADY_TAKE);
         }
 
@@ -176,22 +176,30 @@ public class CouponServiceImpl implements CouponService {
                 throw exception(COUPON_TEMPLATE_EXPIRED);
             }
         }
-
         // 校验领取方式
         if (ObjectUtil.notEqual(couponTemplate.getTakeType(), takeType.getValue())) {
             throw exception(COUPON_TEMPLATE_CANNOT_TAKE);
         }
     }
 
-    private void removeTakeLimitUserId(CouponTemplateDO couponTemplate, Set<Long> userIds) {
+    /**
+     * 过滤掉达到领取上线的用户
+     *
+     * @param userIds 用户编号数组
+     * @param couponTemplate 优惠劵模版
+     */
+    private void removeTakeLimitUserId(Set<Long> userIds, CouponTemplateDO couponTemplate) {
+        if (couponTemplate.getTakeLimitCount() <= 0) {
+            return;
+        }
         // 查询已领过券的用户
         List<CouponDO> alreadyTakeCoupons = couponMapper.selectListByTemplateIdAndUserId(couponTemplate.getId(), userIds);
-
-        // 移除达到领取限制的用户
-        if (couponTemplate.getTakeLimitCount() > 0) {
-            Map<Long, Integer> userTakeCountMap = CollStreamUtil.groupBy(alreadyTakeCoupons, CouponDO::getUserId, Collectors.summingInt(c -> 1));
-            userIds.removeIf(userId -> MapUtil.getInt(userTakeCountMap, userId, 0) >= couponTemplate.getTakeLimitCount());
+        if (CollUtil.isEmpty(alreadyTakeCoupons)) {
+            return;
         }
+        // 移除达到领取限制的用户
+        Map<Long, Integer> userTakeCountMap = CollStreamUtil.groupBy(alreadyTakeCoupons, CouponDO::getUserId, Collectors.summingInt(c -> 1));
+        userIds.removeIf(userId -> MapUtil.getInt(userTakeCountMap, userId, 0) >= couponTemplate.getTakeLimitCount());
     }
 
 }

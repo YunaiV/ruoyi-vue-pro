@@ -23,9 +23,9 @@ import java.util.function.Consumer;
 public interface CouponTemplateMapper extends BaseMapperX<CouponTemplateDO> {
 
     default PageResult<CouponTemplateDO> selectPage(CouponTemplatePageReqVO reqVO) {
+        // 构建可领取的查询条件, 好啰嗦  ( ╯-_-)╯┴—┴
         Consumer<LambdaQueryWrapper<CouponTemplateDO>> canTakeConsumer = null;
         if (CollUtil.isNotEmpty(reqVO.getCanTakeTypes())) {
-            // 构建可领取的查询条件, 好啰嗦  ( ╯-_-)╯┴—┴
             canTakeConsumer = w ->
                     w.eq(CouponTemplateDO::getStatus, CommonStatusEnum.ENABLE.getStatus()) // 1. 状态为可用的
                             .in(CouponTemplateDO::getTakeType, reqVO.getCanTakeTypes()) // 2. 领取方式一致
@@ -33,7 +33,7 @@ public interface CouponTemplateMapper extends BaseMapperX<CouponTemplateDO> {
                                     .or().gt(CouponTemplateDO::getValidEndTime, LocalDateTime.now()))
                             .apply(" take_count < total_count "); // 4. 剩余数量大于 0
         }
-
+        // 执行分页查询
         return selectPage(reqVO, new LambdaQueryWrapperX<CouponTemplateDO>()
                 .likeIfPresent(CouponTemplateDO::getName, reqVO.getName())
                 .eqIfPresent(CouponTemplateDO::getStatus, reqVO.getStatus())
