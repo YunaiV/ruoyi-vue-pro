@@ -72,16 +72,18 @@ public interface TradeAfterSaleConvert {
     
     default TradeAfterSaleDetailRespVO convert(TradeAfterSaleDO afterSale, TradeOrderDO order, List<TradeOrderItemDO> orderItems,
                                                MemberUserRespDTO user, List<TradeAfterSaleLogRespDTO> logs) {
-        TradeAfterSaleDetailRespVO respVO = convert(afterSale, orderItems, convertList1(logs));
+        TradeAfterSaleDetailRespVO respVO = convert(afterSale, orderItems);
         // 处理用户信息
         respVO.setUser(convert(user));
         // 处理订单信息
         respVO.setOrder(convert(order));
+        // 处理售后日志
+        respVO.setAfterSaleLog(convertList1(logs));
         return respVO;
     }
     List<TradeAfterSaleLogRespVO> convertList1(List<TradeAfterSaleLogRespDTO> list);
     @Mapping(target = "id", source = "afterSale.id")
-    TradeAfterSaleDetailRespVO convert(TradeAfterSaleDO afterSale, List<TradeOrderItemDO> orderItems, List<TradeAfterSaleLogRespVO> logs);
+    TradeAfterSaleDetailRespVO convert(TradeAfterSaleDO afterSale, List<TradeOrderItemDO> orderItems);
     TradeOrderBaseVO convert(TradeOrderDO order);
 
 }

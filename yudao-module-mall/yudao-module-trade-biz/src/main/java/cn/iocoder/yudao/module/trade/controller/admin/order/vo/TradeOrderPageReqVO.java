@@ -61,5 +61,5 @@ public class TradeOrderPageReqVO extends PageParam {
     @Schema(description = "订单来源", example = "10")
     @InEnum(value = TerminalEnum.class, message = "订单来源 {value}")
     private Integer terminal;
-
+//    TODO 添加配送方式筛选
 }
