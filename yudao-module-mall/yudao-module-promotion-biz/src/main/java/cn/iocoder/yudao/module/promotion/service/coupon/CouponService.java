@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.module.promotion.service.coupon;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
+import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTakeTypeEnum;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 优惠劵 Service 接口
@@ -75,4 +78,46 @@ public interface CouponService {
      */
     Long getUnusedCouponCount(Long userId);
 
+    /**
+     * 领取优惠券
+     *
+     * @param templateId 优惠券模板编号
+     * @param userIds    用户编号列表
+     * @param takType    领取方式
+     * @return 领取结果
+     */
+    Boolean takeCoupon(Long templateId, Set<Long> userIds, CouponTakeTypeEnum takType);
+
+    /**
+     * 【管理员】 给用户发送优惠券
+     *
+     * @param templateId 优惠券模板编号
+     * @param userIds    用户编号列表
+     * @return 发送结果
+     */
+    default Boolean sendCoupon(Long templateId, Set<Long> userIds) {
+        return takeCoupon(templateId, userIds, CouponTakeTypeEnum.BY_ADMIN);
+    }
+
+    /**
+     * 【会员】 领取优惠券
+     *
+     * @param templateId 优惠券模板编号
+     * @param userId     用户编号
+     * @return 发送结果
+     */
+    default Boolean receiveCoupon(Long templateId, Long userId) {
+        return takeCoupon(templateId, CollUtil.newHashSet(userId), CouponTakeTypeEnum.BY_USER);
+    }
+
+    /**
+     * 【系统】 给用户发送新人券
+     *
+     * @param templateId 优惠券模板编号
+     * @param userId     用户编号列表
+     * @return 发送结果
+     */
+    default Boolean sendCoupon(Long templateId, Long userId) {
+        return takeCoupon(templateId, CollUtil.newHashSet(userId), CouponTakeTypeEnum.BY_REGISTER);
+    }
 }

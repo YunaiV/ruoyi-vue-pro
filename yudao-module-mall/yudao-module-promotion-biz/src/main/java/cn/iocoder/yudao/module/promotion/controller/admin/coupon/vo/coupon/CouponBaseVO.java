@@ -26,7 +26,7 @@ public class CouponBaseVO {
     // ========== 基本信息 BEGIN ==========
     @Schema(description = "优惠劵模板编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "优惠劵模板编号不能为空")
-    private Integer templateId;
+    private Long templateId;
 
     @Schema(description = "优惠劵名", requiredMode = Schema.RequiredMode.REQUIRED, example = "春节送送送")
     @NotNull(message = "优惠劵名不能为空")

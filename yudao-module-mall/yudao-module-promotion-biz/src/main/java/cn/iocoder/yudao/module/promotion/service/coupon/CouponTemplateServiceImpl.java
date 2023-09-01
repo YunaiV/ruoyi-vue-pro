@@ -12,9 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.COUPON_TEMPLATE_NOT_EXISTS;
+import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.COUPON_TEMPLATE_TOTAL_COUNT_TOO_SMALL;
 
 /**
  * 优惠劵模板 Service 实现类
@@ -84,6 +86,11 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
     @Override
     public PageResult<CouponTemplateDO> getCouponTemplatePage(CouponTemplatePageReqVO pageReqVO) {
         return couponTemplateMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public PageResult<CouponTemplateDO> getCanTakeCouponTemplatePage(CouponTemplatePageReqVO pageReqVO, List<Integer> canTakeTypes) {
+        return couponTemplateMapper.selectCanTakePage(pageReqVO, canTakeTypes);
     }
 
     @Override
