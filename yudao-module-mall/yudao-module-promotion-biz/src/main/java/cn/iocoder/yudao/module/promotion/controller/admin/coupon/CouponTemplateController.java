@@ -1,12 +1,10 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.coupon;
 
-import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template.*;
 import cn.iocoder.yudao.module.promotion.convert.coupon.CouponTemplateConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
-import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTakeTypeEnum;
 import cn.iocoder.yudao.module.promotion.service.coupon.CouponTemplateService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -78,15 +75,4 @@ public class CouponTemplateController {
         PageResult<CouponTemplateDO> pageResult = couponTemplateService.getCouponTemplatePage(pageVO);
         return success(CouponTemplateConvert.INSTANCE.convertPage(pageResult));
     }
-
-    // TODO @疯狂：是不是可以合并到 getCouponTemplatePage 接口，作为一个参数选择
-    @GetMapping("/can-take-page")
-    @Operation(summary = "获得可用于领取的优惠劵模板分页")
-    @PreAuthorize("@ss.hasPermission('promotion:coupon-template:query')")
-    public CommonResult<PageResult<CouponTemplateRespVO>> getCanTakeCouponTemplatePage(@Valid CouponTemplatePageReqVO pageVO) {
-        List<Integer> canTakeTypes = ListUtil.of(CouponTakeTypeEnum.COMMON.getValue(), CouponTakeTypeEnum.BY_ADMIN.getValue());
-        PageResult<CouponTemplateDO> pageResult = couponTemplateService.getCanTakeCouponTemplatePage(pageVO, canTakeTypes);
-        return success(CouponTemplateConvert.INSTANCE.convertPage(pageResult));
-    }
-
 }

@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 import static java.util.Arrays.asList;
 
@@ -134,74 +135,63 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    public Boolean takeCoupon(Long templateId, Set<Long> userIds, CouponTakeTypeEnum takeType) {
-        // 1. 校验并过滤用户
+    public void takeCoupon(Long templateId, Set<Long> userIds, CouponTakeTypeEnum takeType) {
         CouponTemplateDO template = couponTemplateService.getCouponTemplate(templateId);
-        userIds = validateAndFilterTakeUserId(template, userIds, takeType);
+        // 1. 过滤掉达到领取限制的用户
+        removeTakeLimitUserId(template, userIds);
+        // 2. 校验用户
+        validateCanTake(template, userIds, takeType);
 
-        // 2. 批量保存优惠劵
-        // TODO @疯狂：这里可以使用 CollectionUtils.convertList 更简洁；stream 可以简化很多代码，常用的 stream 操作，使用 util 可以进一步简洁，同时提升可读性
-        List<CouponDO> couponList = userIds.stream()
-                .map(userId -> CouponConvert.INSTANCE.convert(template, userId))
-                .collect(Collectors.toList());
-        couponMapper.insertBatch(couponList);
+        // 3. 批量保存优惠劵
+        couponMapper.insertBatch(convertList(userIds, userId -> CouponConvert.INSTANCE.convert(template, userId)));
 
         // 3. 增加优惠劵模板的领取数量
         couponTemplateService.updateCouponTemplateTakeCount(templateId, userIds.size());
-        return true;
     }
 
     /**
-     * 校验优惠券模板, 并过滤不可以领取的用户
+     * 校验优惠券是否可以领取
      *
      * @param couponTemplate 优惠券模板
      * @param userIds        领取人列表
      * @param takeType       领取方式
-     * @return 可领取此券的用户列表
      */
-    // TODO @疯狂：我建议哈，校验模版，和过滤用户分成两个方法；混在一起，有点小重，后续单测可能也比较难写哈；
-    private Set<Long> validateAndFilterTakeUserId(CouponTemplateDO couponTemplate, Set<Long> userIds, CouponTakeTypeEnum takeType) {
-        // 1.1 校验模板
+    private void validateCanTake(CouponTemplateDO couponTemplate, Set<Long> userIds, CouponTakeTypeEnum takeType) {
+        // 如果所有用户都领取过，则抛出异常
+        if (userIds.isEmpty()) {
+            throw exception(COUPON_TEMPLATE_USER_ALREADY_TAKE);
+        }
+
+        // 校验模板
         if (couponTemplate == null) {
             throw exception(COUPON_TEMPLATE_NOT_EXISTS);
         }
-        // 1.2 校验剩余数量
+        // 校验剩余数量
         if (couponTemplate.getTakeCount() + userIds.size() > couponTemplate.getTotalCount()) {
             throw exception(COUPON_TEMPLATE_NOT_ENOUGH);
         }
-        // 1.3 校验"固定日期"的有效期类型是否过期
+        // 校验"固定日期"的有效期类型是否过期
         if (CouponTemplateValidityTypeEnum.DATE.getType().equals(couponTemplate.getValidityType())) {
             if (LocalDateTimeUtils.beforeNow(couponTemplate.getValidEndTime())) {
                 throw exception(COUPON_TEMPLATE_EXPIRED);
             }
         }
-        // 1.4 校验领取方式
-        // TODO @疯狂：如果要做这样的判断，使用 !ObjectUtils.equalsAny() 会更简洁
-        if (!CouponTakeTypeEnum.COMMON.getValue().equals(couponTemplate.getTakeType())) {
-            if (ObjectUtil.notEqual(couponTemplate.getTakeType(), takeType.getValue())) {
-                throw exception(COUPON_TEMPLATE_CANNOT_TAKE);
-            }
-        }
 
-        // 2.1 过滤掉，已经领取到上限的用户
-        List<CouponDO> alreadyTakeCoupons = couponMapper.selectByTemplateIdAndUserId(couponTemplate.getId(), userIds);
-        // 校验新人券
-        // TODO @疯狂：我在想，这个判断，是不是和下面的 couponTemplate.getTakeLimitCount() > 0 冗余了；可以先都过滤，然后最终去判断 userIds 是不是空了；
-        if (CouponTakeTypeEnum.BY_REGISTER.equals(takeType)) {
-            if (!alreadyTakeCoupons.isEmpty()) {
-                throw exception(COUPON_TEMPLATE_USER_ALREADY_TAKE);
-            }
+        // 校验领取方式
+        if (ObjectUtil.notEqual(couponTemplate.getTakeType(), takeType.getValue())) {
+            throw exception(COUPON_TEMPLATE_CANNOT_TAKE);
         }
-        // 校验领取数量限制
+    }
+
+    private void removeTakeLimitUserId(CouponTemplateDO couponTemplate, Set<Long> userIds) {
+        // 查询已领过券的用户
+        List<CouponDO> alreadyTakeCoupons = couponMapper.selectListByTemplateIdAndUserId(couponTemplate.getId(), userIds);
+
+        // 移除达到领取限制的用户
         if (couponTemplate.getTakeLimitCount() > 0) {
             Map<Long, Integer> userTakeCountMap = CollStreamUtil.groupBy(alreadyTakeCoupons, CouponDO::getUserId, Collectors.summingInt(c -> 1));
             userIds.removeIf(userId -> MapUtil.getInt(userTakeCountMap, userId, 0) >= couponTemplate.getTakeLimitCount());
-            // 2.2 如果所有用户都领取过，则抛出异常
-            if (userIds.isEmpty()) {
-                throw exception(COUPON_TEMPLATE_USER_ALREADY_TAKE);
-            }
         }
-        return userIds;
     }
 
 }
