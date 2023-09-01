@@ -86,6 +86,12 @@ public interface TradeOrderConvert {
     default ProductSkuUpdateStockReqDTO convert(List<TradeOrderItemDO> list) {
         return new ProductSkuUpdateStockReqDTO(TradeOrderConvert.INSTANCE.convertList(list));
     }
+
+    default ProductSkuUpdateStockReqDTO convertNegative(List<TradeOrderItemDO> list) {
+        List<ProductSkuUpdateStockReqDTO.Item> items = TradeOrderConvert.INSTANCE.convertList(list);
+        items.forEach(item -> item.setIncrCount(-item.getIncrCount()));
+        return new ProductSkuUpdateStockReqDTO(items);
+    }
     List<ProductSkuUpdateStockReqDTO.Item> convertList(List<TradeOrderItemDO> list);
     @Mappings({
             @Mapping(source = "skuId", target = "id"),

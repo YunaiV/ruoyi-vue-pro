@@ -117,4 +117,11 @@ public interface TradeOrderUpdateService {
      */
     Long createOrderItemComment(Long userId, AppTradeOrderItemCommentCreateReqVO createReqVO);
 
+    /**
+     * 【会员】取消订单
+     *
+     * @param userId 用户ID
+     * @param id     订单编号
+     */
+    void cancelOrder(Long userId, Long id);
 }

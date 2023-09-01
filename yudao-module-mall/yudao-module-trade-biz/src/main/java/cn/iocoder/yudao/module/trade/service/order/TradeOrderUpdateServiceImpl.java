@@ -291,7 +291,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                                        TradeOrderDO tradeOrderDO, List<TradeOrderItemDO> orderItems,
                                        TradePriceCalculateRespBO calculateRespBO) {
         // 下单时扣减商品库存
-        productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convert(orderItems));
+        productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convertNegative(orderItems));
 
         // 删除购物车商品
         Set<Long> cartIds = convertSet(createReqVO.getItems(), AppTradeOrderSettlementReqVO.Item::getCartId);
@@ -299,7 +299,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             cartService.deleteCart(userId, cartIds);
         }
 
-        // 扣减积分 TODO 芋艿：待实现
+        // 扣减积分 TODO 芋艿：待实现，  这个是不是应该放到支付成功之后？
 
         // 有使用优惠券时更新
         if (createReqVO.getCouponId() != null) {
@@ -653,6 +653,41 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId()).setCommentStatus(Boolean.TRUE));
         }
         return comment;
+    }
+
+    @Override
+    public void cancelOrder(Long userId, Long id) {
+        // 校验存在
+        TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(id, userId);
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+        // 校验状态
+        if (ObjectUtil.notEqual(order.getStatus(), TradeOrderStatusEnum.UNPAID.getStatus())) {
+            throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
+        }
+
+        // 1.更新 TradeOrderDO 状态为已取消
+        int updateCount = tradeOrderMapper.updateByIdAndStatus(id, order.getStatus(),
+                new TradeOrderDO().setStatus(TradeOrderStatusEnum.CANCELED.getStatus())
+                        .setCancelTime(LocalDateTime.now())
+                        .setCancelType(TradeOrderCancelTypeEnum.MEMBER_CANCEL.getType()));
+        if (updateCount == 0) {
+            throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
+        }
+
+        // 2.回滚库存
+        List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(id);
+        productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convert(orderItems));
+
+        // 3.回滚优惠券
+        couponApi.returnUsedCoupon(order.getCouponId());
+
+        // 4.回滚积分：积分是支付成功后才增加的吧？
+
+        // TODO 芋艿：OrderLog
+
+        // TODO 芋艿：lili 发送订单变化的消息
     }
 
     /**

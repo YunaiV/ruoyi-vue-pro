@@ -75,4 +75,10 @@ public interface CouponService {
      */
     Long getUnusedCouponCount(Long userId);
 
+    /**
+     * 退还已使用的优惠券
+     *
+     * @param id 优惠券编号
+     */
+    void returnUsedCoupon(Long id);
 }

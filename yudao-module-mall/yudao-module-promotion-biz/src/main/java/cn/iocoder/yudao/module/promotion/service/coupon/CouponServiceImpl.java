@@ -125,4 +125,27 @@ public class CouponServiceImpl implements CouponService {
         return couponMapper.selectCountByUserIdAndStatus(userId, CouponStatusEnum.UNUSED.getStatus());
     }
 
+    @Override
+    public void returnUsedCoupon(Long id) {
+        // 校验存在
+        CouponDO coupon = couponMapper.selectById(id);
+        if (coupon == null) {
+            throw exception(COUPON_NOT_EXISTS);
+        }
+
+        // 校验状态
+        if (!CouponStatusEnum.USED.getStatus().equals(coupon.getStatus())) {
+            throw exception(COUPON_STATUS_NOT_USED);
+        }
+
+        // 退还
+        Integer status = LocalDateTimeUtils.beforeNow(coupon.getValidEndTime())
+                // 退还时可能已经过期了
+                ? CouponStatusEnum.EXPIRE.getStatus()
+                : CouponStatusEnum.UNUSED.getStatus();
+        couponMapper.updateById(new CouponDO().setId(id).setStatus(status));
+
+        // TODO 增加优惠券变动记录？
+    }
+
 }

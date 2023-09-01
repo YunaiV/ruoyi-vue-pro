@@ -33,6 +33,7 @@ public interface ErrorCodeConstants {
     ErrorCode COUPON_DELETE_FAIL_USED = new ErrorCode(1013005001, "回收优惠劵失败，优惠劵已被使用");
     ErrorCode COUPON_STATUS_NOT_UNUSED = new ErrorCode(1013005002, "优惠劵不处于待使用状态");
     ErrorCode COUPON_VALID_TIME_NOT_NOW = new ErrorCode(1013005003, "优惠券不在使用时间范围内");
+    ErrorCode COUPON_STATUS_NOT_USED = new ErrorCode(1013005004, "优惠劵不是已使用状态");
 
     // ========== 满减送活动 1013006000 ==========
     ErrorCode REWARD_ACTIVITY_NOT_EXISTS = new ErrorCode(1013006000, "满减送活动不存在");

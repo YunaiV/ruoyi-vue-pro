@@ -28,4 +28,10 @@ public interface CouponApi {
      */
     CouponRespDTO validateCoupon(@Valid CouponValidReqDTO validReqDTO);
 
+    /**
+     * 退还已使用的优惠券
+     *
+     * @param id 优惠券编号
+     */
+    void returnUsedCoupon(Long id);
 }
