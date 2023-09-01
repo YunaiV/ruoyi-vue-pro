@@ -27,8 +27,8 @@ public interface ErrorCodeConstants {
     // ========== 优惠劵模板 1013004000 ==========
     ErrorCode COUPON_TEMPLATE_NOT_EXISTS = new ErrorCode(1013004000, "优惠劵模板不存在");
     ErrorCode COUPON_TEMPLATE_TOTAL_COUNT_TOO_SMALL = new ErrorCode(1013004001, "发放数量不能小于已领取数量({})");
-    ErrorCode COUPON_TEMPLATE_TASK_EMPTY = new ErrorCode(1013004002, "当前剩余数量不够领取");
-    ErrorCode COUPON_TEMPLATE_USER_TASKED = new ErrorCode(1013004003, "用户已领取过此优惠券");
+    ErrorCode COUPON_TEMPLATE_NOT_ENOUGH = new ErrorCode(1013004002, "当前剩余数量不够领取");
+    ErrorCode COUPON_TEMPLATE_USER_ALREADY_TAKE = new ErrorCode(1013004003, "用户已领取过此优惠券");
     ErrorCode COUPON_TEMPLATE_EXPIRED = new ErrorCode(1013004004, "优惠券已过期");
     ErrorCode COUPON_TEMPLATE_CANNOT_TAKE = new ErrorCode(1013004005, "领取方式不正确");
 

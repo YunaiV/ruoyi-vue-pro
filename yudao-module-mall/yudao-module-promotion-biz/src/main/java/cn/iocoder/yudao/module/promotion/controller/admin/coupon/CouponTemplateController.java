@@ -79,6 +79,7 @@ public class CouponTemplateController {
         return success(CouponTemplateConvert.INSTANCE.convertPage(pageResult));
     }
 
+    // TODO @疯狂：是不是可以合并到 getCouponTemplatePage 接口，作为一个参数选择
     @GetMapping("/can-take-page")
     @Operation(summary = "获得可用于领取的优惠劵模板分页")
     @PreAuthorize("@ss.hasPermission('promotion:coupon-template:query')")

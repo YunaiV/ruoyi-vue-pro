@@ -78,18 +78,20 @@ public interface CouponService {
      */
     Long getUnusedCouponCount(Long userId);
 
+    // TODO @疯狂：可以返回 void；因为都是 true = =
     /**
      * 领取优惠券
      *
      * @param templateId 优惠券模板编号
      * @param userIds    用户编号列表
-     * @param takType    领取方式
+     * @param takeType    领取方式
      * @return 领取结果
      */
-    Boolean takeCoupon(Long templateId, Set<Long> userIds, CouponTakeTypeEnum takType);
+    Boolean takeCoupon(Long templateId, Set<Long> userIds, CouponTakeTypeEnum takeType);
 
+    // TODO @疯狂：感觉 3 个方法的命名，改成 takeCouponByAdmin；takeCouponByUser；takeCouponByRegister 会更容易理解哈；现在两个都叫 sendCoupon ，感觉不太好懂
     /**
-     * 【管理员】 给用户发送优惠券
+     * 【管理员】给用户发送优惠券
      *
      * @param templateId 优惠券模板编号
      * @param userIds    用户编号列表
@@ -100,7 +102,7 @@ public interface CouponService {
     }
 
     /**
-     * 【会员】 领取优惠券
+     * 【会员】领取优惠券
      *
      * @param templateId 优惠券模板编号
      * @param userId     用户编号
@@ -111,7 +113,7 @@ public interface CouponService {
     }
 
     /**
-     * 【系统】 给用户发送新人券
+     * 【系统】给用户发送新人券
      *
      * @param templateId 优惠券模板编号
      * @param userId     用户编号列表

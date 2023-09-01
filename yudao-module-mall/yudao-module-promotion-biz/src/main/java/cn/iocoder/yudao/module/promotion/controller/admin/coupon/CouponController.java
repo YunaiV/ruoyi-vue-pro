@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.Map;
-import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -65,9 +64,9 @@ public class CouponController {
         if (CollUtil.isEmpty(pageResulVO.getList())) {
             return success(pageResulVO);
         }
+
         // 读取用户信息，进行拼接
-        Set<Long> userIds = convertSet(pageResult.getList(), CouponDO::getUserId);
-        Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(userIds);
+        Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(convertSet(pageResult.getList(), CouponDO::getUserId));
         pageResulVO.getList().forEach(itemRespVO -> MapUtils.findAndThen(userMap, itemRespVO.getUserId(),
                 userRespDTO -> itemRespVO.setNickname(userRespDTO.getNickname())));
         return success(pageResulVO);
@@ -80,4 +79,5 @@ public class CouponController {
         Boolean result = couponService.sendCoupon(reqVO.getTemplateId(), reqVO.getUserIds());
         return success(result);
     }
+
 }

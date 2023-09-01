@@ -34,17 +34,11 @@ public interface CouponTemplateMapper extends BaseMapperX<CouponTemplateDO> {
     default PageResult<CouponTemplateDO> selectCanTakePage(CouponTemplatePageReqVO reqVO, Collection<Integer> takeTypes) {
         // 构建可领取的查询条件, 好啰嗦  ( ╯-_-)╯┴—┴
         Consumer<LambdaQueryWrapper<CouponTemplateDO>> canTakeConsumer = w ->
-                // 1.状态为可用的
-                w.eq(CouponTemplateDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
-                        // 2.领取方式一致
-                        .in(CouponTemplateDO::getTakeType, takeTypes)
-                        // 3.未过期
-                        .and(ww -> ww.isNull(CouponTemplateDO::getValidEndTime)
-                                .or()
-                                .gt(CouponTemplateDO::getValidEndTime, LocalDateTime.now()))
-                        // 4.剩余数量大于0
-                        .apply(" take_count < total_count ");
-
+                w.eq(CouponTemplateDO::getStatus, CommonStatusEnum.ENABLE.getStatus()) // 1. 状态为可用的
+                        .in(CouponTemplateDO::getTakeType, takeTypes) // 2. 领取方式一致
+                        .and(ww ->  ww.isNull(CouponTemplateDO::getValidEndTime)  // 3. 未过期
+                                .or().gt(CouponTemplateDO::getValidEndTime, LocalDateTime.now()))
+                        .apply(" take_count < total_count "); // 4. 剩余数量大于 0
         return selectPage(reqVO, new LambdaQueryWrapperX<CouponTemplateDO>()
                 .likeIfPresent(CouponTemplateDO::getName, reqVO.getName())
                 .eqIfPresent(CouponTemplateDO::getDiscountType, reqVO.getDiscountType())

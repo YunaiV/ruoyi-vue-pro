@@ -55,6 +55,7 @@ public interface CouponMapper extends BaseMapperX<CouponDO> {
                 .eq(CouponDO::getStatus, status));
     }
 
+    // TODO @疯狂：要 selectList 哈；
     default List<CouponDO> selectByTemplateIdAndUserId(Long templateId, Collection<Long> userIds) {
         return selectList(new LambdaQueryWrapperX<CouponDO>()
                 .eq(CouponDO::getTemplateId, templateId)
