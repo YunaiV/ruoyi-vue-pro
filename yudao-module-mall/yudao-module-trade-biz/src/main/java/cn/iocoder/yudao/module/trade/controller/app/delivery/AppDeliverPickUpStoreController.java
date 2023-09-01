@@ -24,6 +24,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @Validated
 public class AppDeliverPickUpStoreController {
 
+    // TODO 待实现[门店自提]：如果 latitude、longitude 非空，计算经纬度，并排序。计算的库，可以使用 hutool 的 DistanceUtil 计算。
     @GetMapping("/list")
     @Operation(summary = "获得自提门店列表")
     public CommonResult<List<AppDeliveryPickUpStoreRespVO>> getDeliveryPickUpStoreList(
@@ -50,6 +51,7 @@ public class AppDeliverPickUpStoreController {
         return success(list);
     }
 
+    // TODO 待实现[门店自提]：
     @GetMapping("/get")
     @Operation(summary = "获得自提门店")
     @Parameter(name = "id", description = "门店编号")

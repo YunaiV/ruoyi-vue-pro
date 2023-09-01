@@ -98,6 +98,8 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
         return afterSale;
     }
 
+    // TODO 芋艿：拼团失败，要不要发起售后的方式退款？还是走取消逻辑？
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createAfterSale(Long userId, AppTradeAfterSaleCreateReqVO createReqVO) {
