@@ -26,10 +26,11 @@ public class TradeOrderDetailRespVO extends TradeOrderBaseVO {
     private MemberUserRespVO user;
 
     /**
-     * TODO 订单操作日志, 先模拟一波
+     * TODO 订单操作日志, 先模拟一波；返回 logs，简洁，然后复数哈
      */
     private List<OrderLog> orderLog;
 
+    // TODO @puhui999：swagger 注解
     @Data
     public static class OrderLog {
 

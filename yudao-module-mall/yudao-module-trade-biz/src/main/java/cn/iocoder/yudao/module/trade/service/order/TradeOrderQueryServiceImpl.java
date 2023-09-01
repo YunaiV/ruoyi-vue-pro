@@ -106,7 +106,7 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
             throw exception(ORDER_NOT_FOUND);
         }
 
-        return getTrackRespDTOs(order);
+        return getExpressTrackList(order);
     }
 
     @Override
@@ -117,16 +117,16 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
             throw exception(ORDER_NOT_FOUND);
         }
 
-        return getTrackRespDTOs(order);
+        return getExpressTrackList(order);
     }
 
     /**
-     * 得到物流轨迹
+     * 获得订单的物流轨迹
      *
      * @param order 订单
      * @return 物流轨迹
      */
-    private List<ExpressTrackRespDTO> getTrackRespDTOs(TradeOrderDO order) {
+    private List<ExpressTrackRespDTO> getExpressTrackList(TradeOrderDO order) {
         // 查询物流公司
         if (order.getLogisticsId() == null) {
             return Collections.emptyList();
