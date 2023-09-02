@@ -65,7 +65,7 @@ public class TradeCouponPriceCalculatorTest extends BaseMockitoUnitTest {
 
         // mock 方法（优惠劵 Coupon 信息）
         CouponRespDTO coupon = randomPojo(CouponRespDTO.class, o -> o.setId(1024L).setName("程序员节")
-                .setProductScope(PromotionProductScopeEnum.SPU.getScope()).setProductSpuIds(asList(1L, 2L))
+                .setProductScope(PromotionProductScopeEnum.SPU.getScope()).setProductScopeValues(asList(1L, 2L))
                 .setUsePrice(350).setDiscountType(PromotionDiscountTypeEnum.PERCENT.getType())
                 .setDiscountPercent(50).setDiscountLimitPrice(70));
         when(couponApi.validateCoupon(eq(new CouponValidReqDTO().setId(1024L).setUserId(233L)))).thenReturn(coupon);
