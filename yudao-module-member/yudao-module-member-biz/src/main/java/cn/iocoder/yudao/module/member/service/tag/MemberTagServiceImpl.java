@@ -31,7 +31,7 @@ import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.*;
 public class MemberTagServiceImpl implements MemberTagService {
 
     @Resource
-    private MemberTagMapper tagMapper;
+    private MemberTagMapper memberTagMapper;
     @Resource
     private MemberUserService memberUserService;
 
@@ -41,7 +41,7 @@ public class MemberTagServiceImpl implements MemberTagService {
         validateTagNameUnique(null, createReqVO.getName());
         // 插入
         MemberTagDO tag = MemberTagConvert.INSTANCE.convert(createReqVO);
-        tagMapper.insert(tag);
+        memberTagMapper.insert(tag);
         // 返回
         return tag.getId();
     }
@@ -54,7 +54,7 @@ public class MemberTagServiceImpl implements MemberTagService {
         validateTagNameUnique(updateReqVO.getId(), updateReqVO.getName());
         // 更新
         MemberTagDO updateObj = MemberTagConvert.INSTANCE.convert(updateReqVO);
-        tagMapper.updateById(updateObj);
+        memberTagMapper.updateById(updateObj);
     }
 
     @Override
@@ -64,11 +64,11 @@ public class MemberTagServiceImpl implements MemberTagService {
         // 校验标签下是否有用户
         validateTagHasUser(id);
         // 删除
-        tagMapper.deleteById(id);
+        memberTagMapper.deleteById(id);
     }
 
     private void validateTagExists(Long id) {
-        if (tagMapper.selectById(id) == null) {
+        if (memberTagMapper.selectById(id) == null) {
             throw exception(TAG_NOT_EXISTS);
         }
     }
@@ -77,7 +77,7 @@ public class MemberTagServiceImpl implements MemberTagService {
         if (StrUtil.isBlank(name)) {
             return;
         }
-        MemberTagDO tag = tagMapper.selelctByName(name);
+        MemberTagDO tag = memberTagMapper.selelctByName(name);
         if (tag == null) {
             return;
         }
@@ -100,7 +100,7 @@ public class MemberTagServiceImpl implements MemberTagService {
 
     @Override
     public MemberTagDO getTag(Long id) {
-        return tagMapper.selectById(id);
+        return memberTagMapper.selectById(id);
     }
 
     @Override
@@ -108,17 +108,17 @@ public class MemberTagServiceImpl implements MemberTagService {
         if (CollUtil.isEmpty(ids)) {
             return ListUtil.empty();
         }
-        return tagMapper.selectBatchIds(ids);
+        return memberTagMapper.selectBatchIds(ids);
     }
 
     @Override
     public PageResult<MemberTagDO> getTagPage(MemberTagPageReqVO pageReqVO) {
-        return tagMapper.selectPage(pageReqVO);
+        return memberTagMapper.selectPage(pageReqVO);
     }
 
     @Override
     public List<MemberTagDO> getTagList() {
-        return tagMapper.selectList();
+        return memberTagMapper.selectList();
     }
 
 }

@@ -42,7 +42,7 @@ import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.*;
 public class MemberLevelServiceImpl implements MemberLevelService {
 
     @Resource
-    private MemberLevelMapper levelMapper;
+    private MemberLevelMapper memberLevelMapper;
     @Resource
     private MemberLevelRecordService memberLevelRecordService;
     @Resource
@@ -57,7 +57,7 @@ public class MemberLevelServiceImpl implements MemberLevelService {
 
         // 插入
         MemberLevelDO level = MemberLevelConvert.INSTANCE.convert(createReqVO);
-        levelMapper.insert(level);
+        memberLevelMapper.insert(level);
         // 返回
         return level.getId();
     }
@@ -71,7 +71,7 @@ public class MemberLevelServiceImpl implements MemberLevelService {
 
         // 更新
         MemberLevelDO updateObj = MemberLevelConvert.INSTANCE.convert(updateReqVO);
-        levelMapper.updateById(updateObj);
+        memberLevelMapper.updateById(updateObj);
     }
 
     @Override
@@ -81,12 +81,12 @@ public class MemberLevelServiceImpl implements MemberLevelService {
         // 校验分组下是否有用户
         validateLevelHasUser(id);
         // 删除
-        levelMapper.deleteById(id);
+        memberLevelMapper.deleteById(id);
     }
 
     @VisibleForTesting
     MemberLevelDO validateLevelExists(Long id) {
-        MemberLevelDO levelDO = levelMapper.selectById(id);
+        MemberLevelDO levelDO = memberLevelMapper.selectById(id);
         if (levelDO == null) {
             throw exception(LEVEL_NOT_EXISTS);
         }
@@ -141,7 +141,7 @@ public class MemberLevelServiceImpl implements MemberLevelService {
 
     @VisibleForTesting
     void validateConfigValid(Long id, String name, Integer level, Integer experience) {
-        List<MemberLevelDO> list = levelMapper.selectList();
+        List<MemberLevelDO> list = memberLevelMapper.selectList();
         // 校验名称唯一
         validateNameUnique(list, id, name);
         // 校验等级唯一
@@ -160,7 +160,7 @@ public class MemberLevelServiceImpl implements MemberLevelService {
 
     @Override
     public MemberLevelDO getLevel(Long id) {
-        return id != null && id > 0 ? levelMapper.selectById(id) : null;
+        return id != null && id > 0 ? memberLevelMapper.selectById(id) : null;
     }
 
     @Override
@@ -168,17 +168,17 @@ public class MemberLevelServiceImpl implements MemberLevelService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return levelMapper.selectBatchIds(ids);
+        return memberLevelMapper.selectBatchIds(ids);
     }
 
     @Override
     public List<MemberLevelDO> getLevelList(MemberLevelListReqVO listReqVO) {
-        return levelMapper.selectList(listReqVO);
+        return memberLevelMapper.selectList(listReqVO);
     }
 
     @Override
     public List<MemberLevelDO> getLevelListByStatus(Integer status) {
-        return levelMapper.selectListByStatus(status);
+        return memberLevelMapper.selectListByStatus(status);
     }
 
     @Override

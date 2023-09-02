@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressCreateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressUpdateReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.address.MemberAddressDO;
-import cn.iocoder.yudao.module.member.dal.mysql.address.AddressMapper;
+import cn.iocoder.yudao.module.member.dal.mysql.address.MemberAddressMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
@@ -30,7 +30,7 @@ public class AddressServiceImplTest extends BaseDbUnitTest {
     private AddressServiceImpl addressService;
 
     @Resource
-    private AddressMapper addressMapper;
+    private MemberAddressMapper addressMapper;
 
     @Test
     public void testCreateAddress_success() {

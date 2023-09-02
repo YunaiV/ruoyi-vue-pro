@@ -31,7 +31,7 @@ import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.GROUP_NOT_
 public class MemberGroupServiceImpl implements MemberGroupService {
 
     @Resource
-    private MemberGroupMapper groupMapper;
+    private MemberGroupMapper memberGroupMapper;
     @Resource
     private MemberUserService memberUserService;
 
@@ -39,7 +39,7 @@ public class MemberGroupServiceImpl implements MemberGroupService {
     public Long createGroup(MemberGroupCreateReqVO createReqVO) {
         // 插入
         MemberGroupDO group = MemberGroupConvert.INSTANCE.convert(createReqVO);
-        groupMapper.insert(group);
+        memberGroupMapper.insert(group);
         // 返回
         return group.getId();
     }
@@ -50,7 +50,7 @@ public class MemberGroupServiceImpl implements MemberGroupService {
         validateGroupExists(updateReqVO.getId());
         // 更新
         MemberGroupDO updateObj = MemberGroupConvert.INSTANCE.convert(updateReqVO);
-        groupMapper.updateById(updateObj);
+        memberGroupMapper.updateById(updateObj);
     }
 
     @Override
@@ -60,11 +60,11 @@ public class MemberGroupServiceImpl implements MemberGroupService {
         // 校验分组下是否有用户
         validateGroupHasUser(id);
         // 删除
-        groupMapper.deleteById(id);
+        memberGroupMapper.deleteById(id);
     }
 
     void validateGroupExists(Long id) {
-        if (groupMapper.selectById(id) == null) {
+        if (memberGroupMapper.selectById(id) == null) {
             throw exception(GROUP_NOT_EXISTS);
         }
     }
@@ -78,7 +78,7 @@ public class MemberGroupServiceImpl implements MemberGroupService {
 
     @Override
     public MemberGroupDO getGroup(Long id) {
-        return groupMapper.selectById(id);
+        return memberGroupMapper.selectById(id);
     }
 
     @Override
@@ -86,17 +86,17 @@ public class MemberGroupServiceImpl implements MemberGroupService {
         if (CollUtil.isEmpty(ids)) {
             return ListUtil.empty();
         }
-        return groupMapper.selectBatchIds(ids);
+        return memberGroupMapper.selectBatchIds(ids);
     }
 
     @Override
     public PageResult<MemberGroupDO> getGroupPage(MemberGroupPageReqVO pageReqVO) {
-        return groupMapper.selectPage(pageReqVO);
+        return memberGroupMapper.selectPage(pageReqVO);
     }
 
     @Override
     public List<MemberGroupDO> getGroupListByStatus(Integer status) {
-        return groupMapper.selectListByStatus(status);
+        return memberGroupMapper.selectListByStatus(status);
     }
 
 }
