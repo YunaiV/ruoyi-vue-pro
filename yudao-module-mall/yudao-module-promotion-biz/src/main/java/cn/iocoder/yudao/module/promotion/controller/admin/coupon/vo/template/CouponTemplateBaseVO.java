@@ -54,7 +54,7 @@ public class CouponTemplateBaseVO {
     @InEnum(PromotionProductScopeEnum.class)
     private Integer productScope;
 
-    @Schema(description = "商品范围编号的数组", example = "1,3")
+    @Schema(description = "商品范围编号的数组", example = "[1, 3]")
     private List<Long> productScopeValues;
 
     @Schema(description = "生效日期类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
