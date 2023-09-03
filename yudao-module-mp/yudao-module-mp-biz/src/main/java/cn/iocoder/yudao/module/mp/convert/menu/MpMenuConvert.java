@@ -40,6 +40,8 @@ public interface MpMenuConvert {
     @Mappings({
             @Mapping(source = "menuKey", target = "key"),
             @Mapping(source = "children", target = "subButtons"),
+            @Mapping(source = "miniProgramAppId", target = "appId"),
+            @Mapping(source = "miniProgramPagePath", target = "pagePath"),
     })
     WxMenuButton convert(MpMenuSaveReqVO.Menu bean);
 
