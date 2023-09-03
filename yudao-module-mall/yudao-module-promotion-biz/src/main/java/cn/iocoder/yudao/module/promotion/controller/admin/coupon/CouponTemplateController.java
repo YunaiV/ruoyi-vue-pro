@@ -75,5 +75,4 @@ public class CouponTemplateController {
         PageResult<CouponTemplateDO> pageResult = couponTemplateService.getCouponTemplatePage(pageVO);
         return success(CouponTemplateConvert.INSTANCE.convertPage(pageResult));
     }
-
 }

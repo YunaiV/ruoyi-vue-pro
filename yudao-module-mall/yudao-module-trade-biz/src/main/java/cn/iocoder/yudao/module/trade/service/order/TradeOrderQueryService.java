@@ -66,13 +66,21 @@ public interface TradeOrderQueryService {
     Long getOrderCount(Long userId, Integer status, Boolean commonStatus);
 
     /**
-     * 获得订单的物流轨迹
+     * 【前台】获得订单的物流轨迹
      *
      * @param id 订单编号
      * @param userId 用户编号
      * @return 物流轨迹数组
      */
     List<ExpressTrackRespDTO> getExpressTrackList(Long id, Long userId);
+
+    /**
+     * 【后台】获得订单的物流轨迹
+     *
+     * @param id 订单编号
+     * @return 物流轨迹数组
+     */
+    List<ExpressTrackRespDTO> getExpressTrackList(Long id);
 
     // =================== Order Item ===================
 

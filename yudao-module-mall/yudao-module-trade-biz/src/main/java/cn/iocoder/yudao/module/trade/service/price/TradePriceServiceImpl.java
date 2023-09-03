@@ -41,6 +41,7 @@ public class TradePriceServiceImpl implements TradePriceService {
     @Resource
     private List<TradePriceCalculator> priceCalculators;
 
+    // TODO @疯狂：需要搞个 TradePriceCalculator，计算赠送积分；
     @Override
     public TradePriceCalculateRespBO calculatePrice(TradePriceCalculateReqBO calculateReqBO) {
         // 1.1 获得商品 SKU 数组

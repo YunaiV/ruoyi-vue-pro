@@ -55,4 +55,11 @@ public interface CouponMapper extends BaseMapperX<CouponDO> {
                 .eq(CouponDO::getStatus, status));
     }
 
+    default List<CouponDO> selectListByTemplateIdAndUserId(Long templateId, Collection<Long> userIds) {
+        return selectList(new LambdaQueryWrapperX<CouponDO>()
+                .eq(CouponDO::getTemplateId, templateId)
+                .in(CouponDO::getUserId, userIds)
+        );
+    }
+
 }

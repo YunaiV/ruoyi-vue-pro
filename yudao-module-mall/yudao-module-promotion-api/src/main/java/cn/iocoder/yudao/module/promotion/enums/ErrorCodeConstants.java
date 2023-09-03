@@ -27,12 +27,17 @@ public interface ErrorCodeConstants {
     // ========== 优惠劵模板 1013004000 ==========
     ErrorCode COUPON_TEMPLATE_NOT_EXISTS = new ErrorCode(1013004000, "优惠劵模板不存在");
     ErrorCode COUPON_TEMPLATE_TOTAL_COUNT_TOO_SMALL = new ErrorCode(1013004001, "发放数量不能小于已领取数量({})");
+    ErrorCode COUPON_TEMPLATE_NOT_ENOUGH = new ErrorCode(1013004002, "当前剩余数量不够领取");
+    ErrorCode COUPON_TEMPLATE_USER_ALREADY_TAKE = new ErrorCode(1013004003, "用户已领取过此优惠券");
+    ErrorCode COUPON_TEMPLATE_EXPIRED = new ErrorCode(1013004004, "优惠券已过期");
+    ErrorCode COUPON_TEMPLATE_CANNOT_TAKE = new ErrorCode(1013004005, "领取方式不正确");
 
-    // ========== 优惠劵模板 1013005000 ==========
+    // ========== 优惠劵 1013005000 ==========
     ErrorCode COUPON_NOT_EXISTS = new ErrorCode(1013005000, "优惠券不存在");
     ErrorCode COUPON_DELETE_FAIL_USED = new ErrorCode(1013005001, "回收优惠劵失败，优惠劵已被使用");
     ErrorCode COUPON_STATUS_NOT_UNUSED = new ErrorCode(1013005002, "优惠劵不处于待使用状态");
     ErrorCode COUPON_VALID_TIME_NOT_NOW = new ErrorCode(1013005003, "优惠券不在使用时间范围内");
+    ErrorCode COUPON_STATUS_NOT_USED = new ErrorCode(1013005004, "优惠劵不是已使用状态");
 
     // ========== 满减送活动 1013006000 ==========
     ErrorCode REWARD_ACTIVITY_NOT_EXISTS = new ErrorCode(1013006000, "满减送活动不存在");

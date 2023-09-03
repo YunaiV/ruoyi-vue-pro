@@ -50,9 +50,6 @@ public class AppTradeOrderController {
     private DeliveryExpressService deliveryExpressService;
 
     @Resource
-    private ProductPropertyValueApi productPropertyValueApi;
-
-    @Resource
     private TradeOrderProperties tradeOrderProperties;
 
     @GetMapping("/settlement")
@@ -78,6 +75,7 @@ public class AppTradeOrderController {
         return success(true);
     }
 
+    // TODO @芋艿：如果拼团活动、秒杀活动、砍价活动时，是不是要额外在返回活动之类的信息；
     @GetMapping("/get-detail")
     @Operation(summary = "获得交易订单")
     @Parameter(name = "id", description = "交易订单编号")
@@ -93,6 +91,7 @@ public class AppTradeOrderController {
         // 查询物流公司
         DeliveryExpressDO express = order.getLogisticsId() != null && order.getLogisticsId() > 0 ?
                 deliveryExpressService.getDeliveryExpress(order.getLogisticsId()) : null;
+        // TODO @puhui999：如果门店自提，信息的拼接；
         // 最终组合
         return success(TradeOrderConvert.INSTANCE.convert02(order, orderItems, tradeOrderProperties, express));
     }
@@ -141,7 +140,7 @@ public class AppTradeOrderController {
     @PutMapping("/receive")
     @Operation(summary = "确认交易订单收货")
     @Parameter(name = "id", description = "交易订单编号")
-    public CommonResult<Boolean> takeOrder(@RequestParam("id") Long id) {
+    public CommonResult<Boolean> receiveOrder(@RequestParam("id") Long id) {
         tradeOrderUpdateService.receiveOrder(getLoginUserId(), id);
         return success(true);
     }
@@ -150,7 +149,7 @@ public class AppTradeOrderController {
     @Operation(summary = "取消交易订单")
     @Parameter(name = "id", description = "交易订单编号")
     public CommonResult<Boolean> cancelOrder(@RequestParam("id") Long id) {
-        // TODO @芋艿：未实现，mock 用
+        tradeOrderUpdateService.cancelOrder(getLoginUserId(), id);
         return success(true);
     }
 

@@ -54,8 +54,8 @@ public class CouponTemplateBaseVO {
     @InEnum(PromotionProductScopeEnum.class)
     private Integer productScope;
 
-    @Schema(description = "商品 SPU 编号的数组", example = "1,3")
-    private List<Long> productSpuIds;
+    @Schema(description = "商品范围编号的数组", example = "[1, 3]")
+    private List<Long> productScopeValues;
 
     @Schema(description = "生效日期类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "生效日期类型不能为空")
@@ -95,11 +95,11 @@ public class CouponTemplateBaseVO {
     @Schema(description = "折扣上限", example = "100") // 单位：分，仅在 discountType 为 PERCENT 使用
     private Integer discountLimitPrice;
 
-    @AssertTrue(message = "商品 SPU 编号的数组不能为空")
+    @AssertTrue(message = "商品范围编号的数组不能为空")
     @JsonIgnore
-    public boolean isProductSpuIdsValid() {
+    public boolean isProductScopeValuesValid() {
         return Objects.equals(productScope, PromotionProductScopeEnum.ALL.getScope()) // 全部范围时，可以为空
-                || CollUtil.isNotEmpty(productSpuIds);
+                || CollUtil.isNotEmpty(productScopeValues);
     }
 
     @AssertTrue(message = "生效开始时间不能为空")

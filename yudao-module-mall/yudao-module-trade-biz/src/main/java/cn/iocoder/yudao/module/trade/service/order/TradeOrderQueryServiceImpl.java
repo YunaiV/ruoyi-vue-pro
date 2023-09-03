@@ -106,6 +106,27 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
             throw exception(ORDER_NOT_FOUND);
         }
 
+        return getExpressTrackList(order);
+    }
+
+    @Override
+    public List<ExpressTrackRespDTO> getExpressTrackList(Long id) {
+        // 查询订单
+        TradeOrderDO order = tradeOrderMapper.selectById(id);
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+
+        return getExpressTrackList(order);
+    }
+
+    /**
+     * 获得订单的物流轨迹
+     *
+     * @param order 订单
+     * @return 物流轨迹
+     */
+    private List<ExpressTrackRespDTO> getExpressTrackList(TradeOrderDO order) {
         // 查询物流公司
         if (order.getLogisticsId() == null) {
             return Collections.emptyList();

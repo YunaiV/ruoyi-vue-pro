@@ -25,7 +25,6 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 交易订单")
 @RestController
@@ -70,7 +69,7 @@ public class TradeOrderController {
         TradeOrderDO order = tradeOrderQueryService.getOrder(id);
         // 查询订单项
         List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(id);
-
+        // orderLog
         // 拼接数据
         MemberUserRespDTO user = memberUserApi.getUser(order.getUserId());
         return success(TradeOrderConvert.INSTANCE.convert(order, orderItems, user));
@@ -82,7 +81,7 @@ public class TradeOrderController {
     @PreAuthorize("@ss.hasPermission('trade:order:query')")
     public CommonResult<List<?>> getOrderExpressTrackList(@RequestParam("id") Long id) {
         return success(TradeOrderConvert.INSTANCE.convertList02(
-                tradeOrderQueryService.getExpressTrackList(id, getLoginUserId())));
+                tradeOrderQueryService.getExpressTrackList(id)));
     }
 
     @PutMapping("/delivery")
@@ -116,12 +115,5 @@ public class TradeOrderController {
         tradeOrderUpdateService.updateOrderAddress(reqVO);
         return success(true);
     }
-
-    // TODO @puhui999 订单物流详情
-    // TODO @puhui999 【前台】订单取消
-    // TODO @puhui999 【后台】订单取消
-    // TODO @puhui999 【前台】订单核销
-    // TODO @puhui999 【前台】订单删除
-    // TODO @puhui999 【后台】订单统计
 
 }

@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -82,6 +84,24 @@ public class TradeAfterSaleController {
         MemberUserRespDTO user = memberUserApi.getUser(afterSale.getUserId());
         // 获取售后日志
         List<TradeAfterSaleLogRespDTO> logs = afterSaleLogService.getLog(afterSale.getId());
+        // TODO 方便测试看效果，review 后移除
+        if (logs == null) {
+            logs = new ArrayList<>();
+        }
+        for (int i = 1; i <= 6; i++) {
+            TradeAfterSaleLogRespDTO respVO = new TradeAfterSaleLogRespDTO();
+            respVO.setId((long) i);
+            respVO.setUserId((long) i);
+            respVO.setUserType(1);
+            respVO.setAfterSaleId(id);
+            respVO.setOrderId((long) i);
+            respVO.setOrderItemId((long) i);
+            respVO.setBeforeStatus((i - 1) * 10);
+            respVO.setAfterStatus(i * 10);
+            respVO.setContent("66+6");
+            respVO.setCreateTime(LocalDateTime.now());
+            logs.add(respVO);
+        }
         return success(TradeAfterSaleConvert.INSTANCE.convert(afterSale, order, orderItems, user, logs));
     }
 

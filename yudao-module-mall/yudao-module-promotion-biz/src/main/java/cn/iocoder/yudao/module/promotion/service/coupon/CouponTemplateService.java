@@ -33,7 +33,7 @@ public interface CouponTemplateService {
     /**
      * 更新优惠劵模板的状态
      *
-     * @param id 编号
+     * @param id     编号
      * @param status 状态
      */
     void updateCouponTemplateStatus(Long id, Integer status);
@@ -64,7 +64,7 @@ public interface CouponTemplateService {
     /**
      * 更新优惠劵模板的领取数量
      *
-     * @param id 优惠劵模板编号
+     * @param id        优惠劵模板编号
      * @param incrCount 增加数量
      */
     void updateCouponTemplateTakeCount(Long id, int incrCount);

@@ -96,6 +96,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private TradePriceService tradePriceService;
     @Resource
     private DeliveryExpressService deliveryExpressService;
+    @Resource
+    private TradeMessageService tradeMessageService;
 
     @Resource
     private ProductSkuApi productSkuApi;
@@ -105,26 +107,21 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private AddressApi addressApi;
     @Resource
     private CouponApi couponApi;
-
+    @Resource
+    private CombinationRecordApi combinationRecordApi;
+    @Resource
+    private BargainRecordApi bargainRecordApi;
     @Resource
     private MemberUserApi memberUserApi;
     @Resource
     private MemberLevelApi memberLevelApi;
     @Resource
     private MemberPointApi memberPointApi;
-
     @Resource
     private ProductCommentApi productCommentApi;
-    @Resource
-    private TradeMessageService tradeMessageService;
+
     @Resource
     private TradeOrderProperties tradeOrderProperties;
-
-    @Resource
-    private CombinationRecordApi combinationRecordApi;
-
-    @Resource
-    private BargainRecordApi bargainRecordApi;
 
     // =================== Order ===================
 
@@ -179,15 +176,17 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public TradeOrderDO createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO) {
-        // 2. 价格计算
+        // 1. 价格计算
         TradePriceCalculateRespBO calculateRespBO = calculatePrice(userId, createReqVO);
-        // 3.1 插入 TradeOrderDO 订单
+
+        // 2.1 插入 TradeOrderDO 订单
         TradeOrderDO order = createTradeOrder(userId, userIp, createReqVO, calculateRespBO);
-        // 3.2 插入 TradeOrderItemDO 订单项
+        // 2.2 插入 TradeOrderItemDO 订单项
         List<TradeOrderItemDO> orderItems = createTradeOrderItems(order, calculateRespBO);
-        // 订单创建完后的逻辑
+
+        // 3. 订单创建完后的逻辑
         afterCreateTradeOrder(userId, createReqVO, order, orderItems, calculateRespBO);
-        // 3.3 校验订单类型
+        // 3.1 拼团的特殊逻辑
         // TODO @puhui999：这个逻辑，先抽个小方法；未来要通过设计模式，把这些拼团之类的逻辑，抽象出去
         // 拼团
         if (Objects.equals(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
@@ -205,14 +204,18 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
             combinationRecordApi.createCombinationRecord(TradeOrderConvert.INSTANCE.convert(order, orderItemDO, createReqVO, user));
         }
+        // 3.2 秒杀的特殊逻辑
         // TODO 秒杀扣减库存是下单就扣除还是等待订单支付成功再扣除
         if (Objects.equals(TradeOrderTypeEnum.SECKILL.getType(), order.getType())) {
 
         }
+        // 3.3 砍价的特殊逻辑
 
         // TODO @LeeYan9: 是可以思考下, 订单的营销优惠记录, 应该记录在哪里, 微信讨论起来!
         return order;
     }
+
+    // TODO @puhui999：订单超时，自动取消；
 
     /**
      * 校验收件地址是否存在
@@ -239,7 +242,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         }
         TradeOrderDO order = TradeOrderConvert.INSTANCE.convert(userId, clientIp, createReqVO, calculateRespBO, address);
         order.setType(validateActivity(createReqVO));
-        order.setNo(IdUtil.getSnowflakeNextId() + ""); // TODO @LeeYan9: 思考下, 怎么生成好点哈; 这个是会展示给用户的;
+        order.setNo(IdUtil.getSnowflakeNextId() + ""); // TODO @puhui999: 参考支付订单，的 no 生成哈;
         order.setStatus(TradeOrderStatusEnum.UNPAID.getStatus());
         order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus());
         order.setProductCount(getSumValue(calculateRespBO.getItems(), TradePriceCalculateRespBO.OrderItem::getCount, Integer::sum));
@@ -251,6 +254,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 退款信息
         order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus()).setRefundPrice(0);
         tradeOrderMapper.insert(order);
+        // TODO @puhui999：如果是门店订单，则需要生成核销码；
         return order;
     }
 
@@ -291,7 +295,11 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                                        TradeOrderDO tradeOrderDO, List<TradeOrderItemDO> orderItems,
                                        TradePriceCalculateRespBO calculateRespBO) {
         // 下单时扣减商品库存
-        productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convert(orderItems));
+        // TODO @puhui999：扣库存，需要前置；
+        // 1）如果是秒杀商品：额外扣减秒杀的库存；
+        // 2）如果是拼团活动：额外扣减拼团的库存；
+        // 3）如果是砍价活动：额外扣减砍价的库存；
+        productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convertNegative(orderItems));
 
         // 删除购物车商品
         Set<Long> cartIds = convertSet(createReqVO.getItems(), AppTradeOrderSettlementReqVO.Item::getCartId);
@@ -299,9 +307,10 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             cartService.deleteCart(userId, cartIds);
         }
 
-        // 扣减积分 TODO 芋艿：待实现
+        // 扣减积分 TODO 芋艿：待实现，需要前置；
+        // 这个是不是应该放到支付成功之后？如果支付后的话，可能积分可以重复使用哈。资源类，都要预扣
 
-        // 有使用优惠券时更新
+        // 有使用优惠券时更新 TODO 芋艿：需要前置；
         if (createReqVO.getCouponId() != null) {
             couponApi.useCoupon(new CouponUseReqDTO().setId(createReqVO.getCouponId()).setUserId(userId)
                     .setOrderId(tradeOrderDO.getId()));
@@ -510,6 +519,10 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // TODO 芋艿：lili 发送订单变化的消息
 
         // TODO 芋艿：lili 发送商品被购买完成的数据
+
+        // TODO 芋艿：销售佣金的记录；
+
+        // TODO 芋艿：获得积分；
     }
 
     @Override
@@ -529,11 +542,13 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         if (order.getPayStatus()) {
             throw exception(ORDER_UPDATE_PRICE_FAIL_PAID);
         }
+        // TODO @puhui999：如果改价，需要校验下是否真的变化；
 
         // 更新
         // TODO @puhui999：TradeOrderItemDO 需要做 adjustPrice 的分摊；另外，支付订单那的价格，需要 update 下；
         TradeOrderDO update = TradeOrderConvert.INSTANCE.convert(reqVO);
         update.setPayPrice(update.getPayPrice() + update.getAdjustPrice());
+        // TODO @芋艿：改价时，赠送的积分，要不要做改动？？？
         tradeOrderMapper.updateById(update);
     }
 
@@ -651,8 +666,44 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(order.getId());
         if (!anyMatch(orderItems, item -> Objects.equals(item.getCommentStatus(), Boolean.FALSE))) {
             tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId()).setCommentStatus(Boolean.TRUE));
+            // TODO 待实现：已完成评价，要不要写一条订单日志？目前 crmeb 会写，有赞可以研究下
         }
         return comment;
+    }
+
+    @Override
+    public void cancelOrder(Long userId, Long id) {
+        // 校验存在
+        TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(id, userId);
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+        // 校验状态
+        if (ObjectUtil.notEqual(order.getStatus(), TradeOrderStatusEnum.UNPAID.getStatus())) {
+            throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
+        }
+
+        // 1.更新 TradeOrderDO 状态为已取消
+        int updateCount = tradeOrderMapper.updateByIdAndStatus(id, order.getStatus(),
+                new TradeOrderDO().setStatus(TradeOrderStatusEnum.CANCELED.getStatus())
+                        .setCancelTime(LocalDateTime.now())
+                        .setCancelType(TradeOrderCancelTypeEnum.MEMBER_CANCEL.getType()));
+        if (updateCount == 0) {
+            throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
+        }
+
+        // 2.回滚库存
+        List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(id);
+        productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convert(orderItems));
+
+        // 3.回滚优惠券
+        couponApi.returnUsedCoupon(order.getCouponId());
+
+        // 4.回滚积分：积分是支付成功后才增加的吧？ 回复：每个项目不同，目前看下来，确认收货貌似更合适，我再看看其它项目的业务选择；
+
+        // TODO 芋艿：OrderLog
+
+        // TODO 芋艿：lili 发送订单变化的消息
     }
 
     /**
