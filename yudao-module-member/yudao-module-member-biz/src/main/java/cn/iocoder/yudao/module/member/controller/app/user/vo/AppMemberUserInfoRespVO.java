@@ -29,6 +29,9 @@ public class AppMemberUserInfoRespVO {
     @Schema(description = "用户等级")
     private Level level;
 
+    @Schema(description = "是否成为推广员", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
+    private Boolean brokerageEnabled;
+
     @Schema(description = "用户 App - 会员等级")
     @Data
     public static class Level {
