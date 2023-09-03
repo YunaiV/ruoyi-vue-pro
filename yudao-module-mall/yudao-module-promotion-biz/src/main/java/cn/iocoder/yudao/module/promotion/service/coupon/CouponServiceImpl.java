@@ -115,12 +115,14 @@ public class CouponServiceImpl implements CouponService {
         }
 
         // 退还
-        // TODO @疯狂：最好 where status，避免可能存在的并发问题
         Integer status = LocalDateTimeUtils.beforeNow(coupon.getValidEndTime())
                 // 退还时可能已经过期了
                 ? CouponStatusEnum.EXPIRE.getStatus()
                 : CouponStatusEnum.UNUSED.getStatus();
-        couponMapper.updateById(new CouponDO().setId(id).setStatus(status));
+        int updateCount = couponMapper.updateByIdAndStatus(id, CouponStatusEnum.UNUSED.getStatus(), new CouponDO().setStatus(status));
+        if (updateCount == 0) {
+            throw exception(COUPON_STATUS_NOT_USED);
+        }
 
         // TODO 增加优惠券变动记录？
     }
