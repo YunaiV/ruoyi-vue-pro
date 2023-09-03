@@ -28,8 +28,8 @@ public class AppCouponTemplateRespVO {
 //    @InEnum(PromotionProductScopeEnum.class)
 //    private Integer productScope;
 //
-//    @Schema(description = "商品 SPU 编号的数组", example = "1,3")
-//    private List<Long> productSpuIds;
+//    @Schema(description = "商品范围编号的数组", example = "1,3")
+//    private List<Long> productScopeValues;
 
     @Schema(description = "生效日期类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer validityType;

@@ -85,10 +85,10 @@ public class CouponTemplateDO extends BaseDO {
      */
     private Integer productScope;
     /**
-     * 商品 SPU 编号的数组
+     * 商品范围编号的数组
      */
     @TableField(typeHandler = LongListTypeHandler.class)
-    private List<Long> productSpuIds;
+    private List<Long> productScopeValues;
     /**
      * 生效日期类型
      *

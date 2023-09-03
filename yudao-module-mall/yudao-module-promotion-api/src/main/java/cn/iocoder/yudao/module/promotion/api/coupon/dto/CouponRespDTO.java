@@ -71,9 +71,9 @@ public class CouponRespDTO {
      */
     private Integer productScope;
     /**
-     * 商品 SPU 编号的数组
+     * 商品范围编号的数组
      */
-    private List<Long> productSpuIds;
+    private List<Long> productScopeValues;
     // ========== 使用规则 END ==========
 
     // ========== 使用效果 BEGIN ==========

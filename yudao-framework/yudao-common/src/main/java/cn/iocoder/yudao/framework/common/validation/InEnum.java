@@ -17,7 +17,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Constraint(
-        validatedBy = InEnumValidator.class
+        validatedBy = {InEnumValidator.class, InEnumCollectionValidator.class}
 )
 public @interface InEnum {
 
