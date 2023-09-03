@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.mp.controller.admin.material.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - 公众号素材 Response VO")
 @Data
@@ -42,6 +42,6 @@ public class MpMaterialRespVO {
     private String introduction;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

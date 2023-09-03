@@ -4,6 +4,7 @@ import java.util.*;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
+import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateUpdateReqVO;
@@ -16,7 +17,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyTemplateDO;
  *
  * @author xrcoder
  */
-@Mapper
+@Mapper(uses = DateUtils.class)
 public interface NotifyTemplateConvert {
 
     NotifyTemplateConvert INSTANCE = Mappers.getMapper(NotifyTemplateConvert.class);

@@ -35,7 +35,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 public class MemberPointRecordServiceImpl implements MemberPointRecordService {
 
     @Resource
-    private MemberPointRecordMapper recordMapper;
+    private MemberPointRecordMapper memberPointRecordMapper;
     @Resource
     private MemberPointConfigService memberPointConfigService;
 
@@ -55,12 +55,12 @@ public class MemberPointRecordServiceImpl implements MemberPointRecordService {
             userIds = convertSet(users, MemberUserDO::getId);
         }
         // 执行查询
-        return recordMapper.selectPage(pageReqVO, userIds);
+        return memberPointRecordMapper.selectPage(pageReqVO, userIds);
     }
 
     @Override
     public PageResult<MemberPointRecordDO> getPointRecordPage(Long userId, PageParam pageVO) {
-        return recordMapper.selectPage(userId, pageVO);
+        return memberPointRecordMapper.selectPage(userId, pageVO);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class MemberPointRecordServiceImpl implements MemberPointRecordService {
                 .setUserId(userId).setBizId(bizId).setBizType(bizType.getType())
                 .setTitle(bizType.getName()).setDescription(StrUtil.format(bizType.getDescription(), point))
                 .setPoint(point).setTotalPoint(totalPoint);
-        recordMapper.insert(record);
+        memberPointRecordMapper.insert(record);
 
         // 3. 更新用户积分
         memberUserService.updateUserPoint(userId, totalPoint);

@@ -1,8 +1,11 @@
 package cn.iocoder.yudao.module.system.controller.admin.notify.vo.message;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - 站内信 Response VO")
 @Data
@@ -14,6 +17,6 @@ public class NotifyMessageRespVO extends NotifyMessageBaseVO {
     private Long id;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

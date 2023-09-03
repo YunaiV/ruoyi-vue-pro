@@ -28,7 +28,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 public class MemberSignInRecordServiceImpl implements MemberSignInRecordService {
 
     @Resource
-    private MemberSignInRecordMapper signInRecordMapper;
+    private MemberSignInRecordMapper memberSignInRecordMapper;
 
     @Resource
     private MemberUserApi memberUserApi;
@@ -46,12 +46,12 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
             userIds = convertSet(users, MemberUserRespDTO::getId);
         }
         // 分页查询
-        return signInRecordMapper.selectPage(pageReqVO, userIds);
+        return memberSignInRecordMapper.selectPage(pageReqVO, userIds);
     }
 
     @Override
     public PageResult<MemberSignInRecordDO> getSignRecordPage(Long userId, PageParam pageParam) {
-        return signInRecordMapper.selectPage(userId, pageParam);
+        return memberSignInRecordMapper.selectPage(userId, pageParam);
     }
 
 }
