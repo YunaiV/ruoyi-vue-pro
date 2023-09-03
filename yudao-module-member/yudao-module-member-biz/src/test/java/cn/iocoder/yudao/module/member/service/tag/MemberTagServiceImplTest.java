@@ -7,7 +7,9 @@ import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagPageReqVO
 import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagUpdateReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.tag.MemberTagDO;
 import cn.iocoder.yudao.module.member.dal.mysql.tag.MemberTagMapper;
+import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
@@ -22,6 +24,7 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.TAG_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
 
+// TODO 芋艿：完全 review 完，在去 review 单测
 /**
  * {@link MemberTagServiceImpl} 的单元测试类
  *
@@ -35,6 +38,9 @@ public class MemberTagServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private MemberTagMapper tagMapper;
+
+    @MockBean
+    private MemberUserService memberUserService;
 
     @Test
     public void testCreateTag_success() {

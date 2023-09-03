@@ -32,6 +32,7 @@ public class MemberTagServiceImpl implements MemberTagService {
 
     @Resource
     private MemberTagMapper memberTagMapper;
+
     @Resource
     private MemberUserService memberUserService;
 

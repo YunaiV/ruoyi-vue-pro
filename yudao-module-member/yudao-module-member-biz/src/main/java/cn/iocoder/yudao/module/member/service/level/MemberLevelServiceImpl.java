@@ -43,6 +43,7 @@ public class MemberLevelServiceImpl implements MemberLevelService {
 
     @Resource
     private MemberLevelMapper memberLevelMapper;
+
     @Resource
     private MemberLevelRecordService memberLevelRecordService;
     @Resource
