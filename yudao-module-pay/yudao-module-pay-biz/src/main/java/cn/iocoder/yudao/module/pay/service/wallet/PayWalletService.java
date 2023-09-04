@@ -11,18 +11,19 @@ import cn.iocoder.yudao.module.pay.enums.member.PayWalletBizTypeEnum;
  */
 public interface PayWalletService {
 
-    // TODO @jason：改成 getOrCreateWallet；因为目前解耦，用户注册时，不会创建钱包；需要这里兜底处理；
     /**
-     * 获取钱包信息
+     * 获取钱包信息，如果不存在创建钱包。由于用户注册时候不会创建钱包
      *
      * @param userId 用户编号
      * @param userType 用户类型
      */
-    PayWalletDO getPayWallet(Long userId, Integer userType);
+    PayWalletDO getOrCreatePayWallet(Long userId, Integer userType);
 
     /**
      * 钱包订单支付
      *
+     * @param userId  用户 id
+     * @param userType 用户类型
      * @param outTradeNo 外部订单号
      * @param price 金额
      */

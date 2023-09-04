@@ -11,9 +11,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.WALLET_NOT_FOUND;
-
 /**
  * 钱包流水 Service 实现类
  *
@@ -32,11 +29,7 @@ public class PayWalletTransactionServiceImpl implements PayWalletTransactionServ
     @Override
     public PageResult<PayWalletTransactionDO> getWalletTransactionPage(Long userId, Integer userType,
                                                                        AppPayWalletTransactionPageReqVO pageVO) {
-        PayWalletDO wallet = payWalletService.getPayWallet(userId, userType);
-        if (wallet == null) {
-            log.error("[getWalletTransactionPage][用户({}/{}) 钱包不存在", userId, userType);
-            throw exception(WALLET_NOT_FOUND);
-        }
+        PayWalletDO wallet = payWalletService.getOrCreatePayWallet(userId, userType);
         return payWalletTransactionMapper.selectPage(wallet.getId(), pageVO);
     }
 

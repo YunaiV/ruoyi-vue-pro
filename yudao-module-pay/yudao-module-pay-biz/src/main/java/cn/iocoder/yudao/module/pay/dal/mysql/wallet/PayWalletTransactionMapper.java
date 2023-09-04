@@ -18,9 +18,9 @@ public interface PayWalletTransactionMapper extends BaseMapperX<PayWalletTransac
         LambdaQueryWrapperX<PayWalletTransactionDO> query = new LambdaQueryWrapperX<PayWalletTransactionDO>()
                 .eq(PayWalletTransactionDO::getWalletId, walletId);
         if (Objects.equals(pageReqVO.getType(), AppPayWalletTransactionPageReqVO.TYPE_INCOME)) {
-            query.gt(PayWalletTransactionDO::getAmount, 0);
+            query.gt(PayWalletTransactionDO::getPrice, 0);
         } else if (Objects.equals(pageReqVO.getType(), AppPayWalletTransactionPageReqVO.TYPE_EXPENSE)) {
-            query.lt(PayWalletTransactionDO::getAmount, 0);
+            query.lt(PayWalletTransactionDO::getPrice, 0);
         }
         query.orderByDesc(PayWalletTransactionDO::getId);
         return selectPage(pageReqVO, query);

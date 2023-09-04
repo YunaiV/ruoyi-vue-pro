@@ -57,8 +57,19 @@ public class PayWalletServiceImpl implements  PayWalletService {
     private PayRefundService payRefundService;
 
     @Override
-    public PayWalletDO getPayWallet(Long userId, Integer userType) {
-        return payWalletMapper.selectByUserIdAndType(userId, userType);
+    public PayWalletDO getOrCreatePayWallet(Long userId, Integer userType) {
+        PayWalletDO payWalletDO = payWalletMapper.selectByUserIdAndType(userId, userType);
+        if (payWalletDO == null) {
+            payWalletDO = new PayWalletDO();
+            payWalletDO.setUserId(userId);
+            payWalletDO.setUserType(userType);
+            payWalletDO.setBalance(0);
+            payWalletDO.setTotalExpense(0L);
+            payWalletDO.setTotalRecharge(0L);
+            payWalletDO.setCreateTime(LocalDateTime.now());
+            payWalletMapper.insert(payWalletDO);
+        }
+        return payWalletDO;
     }
 
 
@@ -76,8 +87,8 @@ public class PayWalletServiceImpl implements  PayWalletService {
     @Override
     public PayWalletTransactionDO reduceWalletBalance(Long userId, Integer userType,
                                                       Long bizId, PayWalletBizTypeEnum bizType, Integer price) {
-        // 1.1 判断钱包是否有效
-        PayWalletDO payWallet = validatePayWallet(userId, userType);
+        // 1.1 获取钱包
+        PayWalletDO payWallet = getOrCreatePayWallet(userId, userType);
         // 1.2 判断余额是否足够
         int afterBalance = payWallet.getBalance() - price;
         if (afterBalance < 0) {
@@ -90,12 +101,11 @@ public class PayWalletServiceImpl implements  PayWalletService {
         if (number == 0) {
             throw exception(TOO_MANY_REQUESTS);
         }
-
-        // 2.2 生成钱包流水 TODO 根据 bizType 生成 NO
-        String walletNo = noRedisDAO.generate(WALLET_PAY_NO_PREFIX);
+        // 2.2 生成钱包流水
+        String walletNo = generateWalletNo(bizType);
         PayWalletTransactionDO walletTransaction = new PayWalletTransactionDO().setWalletId(payWallet.getId())
-                .setNo(walletNo).setAmount(-price).setBalance(afterBalance).setTransactionTime(LocalDateTime.now())
-                .setBizId(bizId).setBizType(bizType.getType()).setDescription(bizType.getDescription());
+                .setNo(walletNo).setPrice(-price).setBalance(afterBalance)
+                .setBizId(String.valueOf(bizId)).setBizType(bizType.getType()).setTitle(bizType.getDescription());
         payWalletTransactionService.createWalletTransaction(walletTransaction);
         return walletTransaction;
     }
@@ -103,8 +113,8 @@ public class PayWalletServiceImpl implements  PayWalletService {
     @Override
     public PayWalletTransactionDO addWalletBalance(Long userId, Integer userType, Long bizId,
                                                    PayWalletBizTypeEnum bizType, Integer price) {
-        // 1.1 判断钱包是否有效
-        PayWalletDO payWallet = validatePayWallet(userId, userType);
+        // 1.1 获取钱包
+        PayWalletDO payWallet = getOrCreatePayWallet(userId, userType);
 
         // 2.1 增加余额
         int number = payWalletMapper.updateWhenIncBalance(bizType, payWallet.getBalance(), payWallet.getTotalRecharge(),
@@ -113,26 +123,30 @@ public class PayWalletServiceImpl implements  PayWalletService {
             throw exception(TOO_MANY_REQUESTS);
         }
 
-        // 2.2 生成钱包流水 TODO 根据 bizType 生成 NO
-        String walletNo = noRedisDAO.generate(WALLET_REFUND_NO_PREFIX);
+        // 2.2 生成钱包流水
+        String walletNo = generateWalletNo(bizType);
         PayWalletTransactionDO newWalletTransaction = new PayWalletTransactionDO().setWalletId(payWallet.getId())
-                .setNo(walletNo).setAmount(price).setBalance(payWallet.getBalance()+price).setTransactionTime(LocalDateTime.now())
-                .setBizId(bizId).setBizType(bizType.getType())
-                .setDescription(bizType.getDescription());
+                .setNo(walletNo).setPrice(price).setBalance(payWallet.getBalance()+price)
+                .setBizId(String.valueOf(bizId)).setBizType(bizType.getType())
+                .setTitle(bizType.getDescription());
         payWalletTransactionService.createWalletTransaction(newWalletTransaction);
         return newWalletTransaction;
     }
 
-
-    private PayWalletDO validatePayWallet(Long userId, Integer userType) {
-        PayWalletDO payWallet = getPayWallet(userId, userType);
-        if (payWallet == null) {
-            log.error("[validatePayWallet] 用户 {} 钱包不存在", userId);
-            throw exception(WALLET_NOT_FOUND);
+    private String generateWalletNo(PayWalletBizTypeEnum bizType) {
+        String no = "";
+        switch(bizType){
+            case PAYMENT :
+                no = noRedisDAO.generate(WALLET_PAY_NO_PREFIX);
+                break;
+            case PAYMENT_REFUND :
+                no = noRedisDAO.generate(WALLET_REFUND_NO_PREFIX);
+                break;
+            default :
+                // TODO 待增加
         }
-        return payWallet;
+        return no;
     }
-
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -163,7 +177,7 @@ public class PayWalletServiceImpl implements  PayWalletService {
             throw exception(WALLET_TRANSACTION_NOT_FOUND);
         }
         // 原来的支付金额
-        int amount = - payWalletTransaction.getAmount();
+        int amount = - payWalletTransaction.getPrice();
         if (refundPrice != amount) {
             throw exception(WALLET_REFUND_AMOUNT_ERROR);
         }

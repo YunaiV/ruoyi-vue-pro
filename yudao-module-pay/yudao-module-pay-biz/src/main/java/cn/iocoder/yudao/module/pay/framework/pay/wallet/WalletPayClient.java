@@ -50,7 +50,7 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
             PayWalletTransactionDO transaction = wallService.pay(Long.valueOf(userId), Integer.valueOf(userType),
                     reqDTO.getOutTradeNo(), reqDTO.getPrice());
             return PayOrderRespDTO.successOf(transaction.getNo(), transaction.getCreator(),
-                    transaction.getTransactionTime(),
+                    transaction.getCreateTime(),
                     reqDTO.getOutTradeNo(), transaction);
         } catch (Throwable ex) {
             log.error("[doUnifiedOrder] 失败", ex);
@@ -81,7 +81,7 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
         try {
             PayWalletTransactionDO payWalletTransaction = wallService.refund(reqDTO.getOutRefundNo(),
                     reqDTO.getRefundPrice(), reqDTO.getReason());
-            return PayRefundRespDTO.successOf(payWalletTransaction.getNo(), payWalletTransaction.getTransactionTime(),
+            return PayRefundRespDTO.successOf(payWalletTransaction.getNo(), payWalletTransaction.getCreateTime(),
                     reqDTO.getOutRefundNo(), payWalletTransaction);
         } catch (Throwable ex) {
             log.error("[doUnifiedRefund] 失败", ex);
