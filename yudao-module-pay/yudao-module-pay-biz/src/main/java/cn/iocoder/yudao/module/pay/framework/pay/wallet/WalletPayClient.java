@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.pay.framework.pay.wallet;
 
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
@@ -41,7 +43,12 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
     @Override
     protected PayOrderRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
         try {
-            PayWalletTransactionDO transaction = wallService.pay(reqDTO.getOutTradeNo(), reqDTO.getPrice());
+            String userId = MapUtil.getStr(reqDTO.getChannelExtras(), "user_id");
+            String userType = MapUtil.getStr(reqDTO.getChannelExtras(), "user_type");
+            Assert.notEmpty(userId, "用户 id 不能为空");
+            Assert.notEmpty(userType, "用户类型不能为空");
+            PayWalletTransactionDO transaction = wallService.pay(Long.valueOf(userId), Integer.valueOf(userType),
+                    reqDTO.getOutTradeNo(), reqDTO.getPrice());
             return PayOrderRespDTO.successOf(transaction.getNo(), transaction.getCreator(),
                     transaction.getTransactionTime(),
                     reqDTO.getOutTradeNo(), transaction);

@@ -5,6 +5,8 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
+import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.*;
 import cn.iocoder.yudao.module.pay.convert.order.PayOrderConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
@@ -23,9 +25,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -70,6 +70,12 @@ public class PayOrderController {
     @PostMapping("/submit")
     @Operation(summary = "提交支付订单")
     public CommonResult<PayOrderSubmitRespVO> submitPayOrder(@RequestBody PayOrderSubmitReqVO reqVO) {
+        if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
+            Map<String, String> channelExtras = reqVO.getChannelExtras() == null ? new HashMap<>(8) : reqVO.getChannelExtras();
+            channelExtras.put("user_id", String.valueOf(WebFrameworkUtils.getLoginUserId()));
+            channelExtras.put("user_type", String.valueOf(WebFrameworkUtils.getLoginUserType()));
+            reqVO.setChannelExtras(channelExtras);
+        }
         PayOrderSubmitRespVO respVO = orderService.submitOrder(reqVO, getClientIP());
         return success(respVO);
     }
