@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -29,7 +30,7 @@ public class AppBrokerageRecordController {
     @GetMapping("/page")
     @Operation(summary = "获得分销记录分页")
     @PreAuthenticated
-    public CommonResult<PageResult<AppBrokerageRecordRespVO>> getBrokerageRecordPage(AppBrokerageRecordPageReqVO pageReqVO) {
+    public CommonResult<PageResult<AppBrokerageRecordRespVO>> getBrokerageRecordPage(@Valid AppBrokerageRecordPageReqVO pageReqVO) {
         AppBrokerageRecordRespVO vo1 = new AppBrokerageRecordRespVO()
                 .setId(1L).setPrice(10).setTitle("收到钱").setCreateTime(LocalDateTime.now())
                 .setFinishTime(LocalDateTime.now());
