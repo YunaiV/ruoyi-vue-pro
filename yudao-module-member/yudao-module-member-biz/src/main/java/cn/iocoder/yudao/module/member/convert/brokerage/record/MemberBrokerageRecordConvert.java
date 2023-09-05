@@ -30,6 +30,10 @@ public interface MemberBrokerageRecordConvert {
     PageResult<MemberBrokerageRecordRespVO> convertPage(PageResult<MemberBrokerageRecordDO> page);
 
     default MemberBrokerageRecordDO convert(MemberUserDO user, String bizId, int brokerageFrozenDays, int brokerage, LocalDateTime unfreezeTime) {
+        // 不冻结时，佣金直接就是结算状态
+        Integer status = brokerageFrozenDays > 0
+                ? BrokerageRecordStatusEnum.WAIT_SETTLEMENT.getStatus()
+                : BrokerageRecordStatusEnum.SETTLEMENT.getStatus();
         return new MemberBrokerageRecordDO()
                 .setUserId(user.getId())
                 .setBizType(BrokerageRecordBizTypeEnum.ORDER.getType())
@@ -38,7 +42,7 @@ public interface MemberBrokerageRecordConvert {
                 .setTotalPrice(user.getBrokeragePrice())
                 .setTitle(BrokerageRecordBizTypeEnum.ORDER.getTitle())
                 .setDescription(StrUtil.format(BrokerageRecordBizTypeEnum.ORDER.getDescription(), String.valueOf(brokerage / 100.0)))
-                .setStatus(BrokerageRecordStatusEnum.WAIT_SETTLEMENT.getStatus())
+                .setStatus(status)
                 .setFrozenDays(brokerageFrozenDays)
                 .setUnfreezeTime(unfreezeTime);
     }
