@@ -42,7 +42,7 @@ create index idx_invite_user_id on trade_brokerage_user (brokerage_user_id) comm
 create index idx_agent on trade_brokerage_user (brokerage_enabled) comment '是否成为推广员';
 
 
-create table member_brokerage_record
+create table trade_brokerage_record
 (
     id            int auto_increment comment '编号'
         primary key,
@@ -65,12 +65,12 @@ create table member_brokerage_record
 )
     comment '佣金记录';
 
-create index idx_user_id on member_brokerage_record (user_id) comment '用户编号';
-create index idx_biz on member_brokerage_record (biz_type, biz_id) comment '业务';
-create index idx_status on member_brokerage_record (status) comment '状态';
+create index idx_user_id on trade_brokerage_record (user_id) comment '用户编号';
+create index idx_biz on trade_brokerage_record (biz_type, biz_id) comment '业务';
+create index idx_status on trade_brokerage_record (status) comment '状态';
 
 
-create table member_brokerage_withdraw
+create table trade_brokerage_withdraw
 (
     id                  int auto_increment comment '编号'
         primary key,
@@ -97,8 +97,8 @@ create table member_brokerage_withdraw
 )
     comment '佣金提现';
 
-create index idx_user_id on member_brokerage_withdraw (user_id) comment '用户编号';
-create index idx_audit_status on member_brokerage_withdraw (status) comment '状态';
+create index idx_user_id on trade_brokerage_withdraw (user_id) comment '用户编号';
+create index idx_audit_status on trade_brokerage_withdraw (status) comment '状态';
 
 -- 增加字典
 insert into system_dict_type(type, name)

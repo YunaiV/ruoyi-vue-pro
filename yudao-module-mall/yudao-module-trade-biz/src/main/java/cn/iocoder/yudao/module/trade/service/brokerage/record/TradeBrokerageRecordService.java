@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.trade.service.brokerage.record;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.trade.service.brokerage.record.bo.BrokerageAddReqDTO;
-import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.MemberBrokerageRecordPageReqVO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.record.MemberBrokerageRecordDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.record.TradeBrokerageRecordDO;
+import cn.iocoder.yudao.module.trade.service.brokerage.record.bo.BrokerageAddReqBO;
+import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.TradeBrokerageRecordPageReqVO;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author owen
  */
-public interface MemberBrokerageRecordService {
+public interface TradeBrokerageRecordService {
 
     /**
      * 获得佣金记录
@@ -20,7 +20,7 @@ public interface MemberBrokerageRecordService {
      * @param id 编号
      * @return 佣金记录
      */
-    MemberBrokerageRecordDO getMemberBrokerageRecord(Integer id);
+    TradeBrokerageRecordDO getBrokerageRecord(Integer id);
 
     /**
      * 获得佣金记录分页
@@ -28,7 +28,7 @@ public interface MemberBrokerageRecordService {
      * @param pageReqVO 分页查询
      * @return 佣金记录分页
      */
-    PageResult<MemberBrokerageRecordDO> getMemberBrokerageRecordPage(MemberBrokerageRecordPageReqVO pageReqVO);
+    PageResult<TradeBrokerageRecordDO> getBrokerageRecordPage(TradeBrokerageRecordPageReqVO pageReqVO);
 
     /**
      * 增加佣金
@@ -36,7 +36,7 @@ public interface MemberBrokerageRecordService {
      * @param userId 会员编号
      * @param list   请求参数列表
      */
-    void addBrokerage(Long userId, List<BrokerageAddReqDTO> list);
+    void addBrokerage(Long userId, List<BrokerageAddReqBO> list);
 
     /**
      * 取消佣金：将佣金记录，状态修改为已失效

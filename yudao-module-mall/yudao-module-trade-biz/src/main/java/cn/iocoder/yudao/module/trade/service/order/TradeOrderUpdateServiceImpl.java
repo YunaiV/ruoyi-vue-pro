@@ -12,8 +12,8 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
-import cn.iocoder.yudao.module.trade.service.brokerage.record.MemberBrokerageRecordService;
-import cn.iocoder.yudao.module.trade.service.brokerage.record.bo.BrokerageAddReqDTO;
+import cn.iocoder.yudao.module.trade.service.brokerage.record.TradeBrokerageRecordService;
+import cn.iocoder.yudao.module.trade.service.brokerage.record.bo.BrokerageAddReqBO;
 import cn.iocoder.yudao.module.member.api.level.MemberLevelApi;
 import cn.iocoder.yudao.module.member.api.point.MemberPointApi;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
@@ -120,7 +120,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Resource
     private MemberPointApi memberPointApi;
     @Resource
-    private MemberBrokerageRecordService memberBrokerageRecordService;
+    private TradeBrokerageRecordService tradeBrokerageRecordService;
     @Resource
     private ProductCommentApi productCommentApi;
 
@@ -752,14 +752,14 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Async
     protected void addBrokerageAsync(Long userId, Long orderId) {
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(orderId);
-        List<BrokerageAddReqDTO> list = convertList(orderItems,
+        List<BrokerageAddReqBO> list = convertList(orderItems,
                 item -> TradeOrderConvert.INSTANCE.convert(item, productSkuApi.getSku(item.getSkuId())));
-        memberBrokerageRecordService.addBrokerage(userId, list);
+        tradeBrokerageRecordService.addBrokerage(userId, list);
     }
 
     @Async
     protected void cancelBrokerageAsync(Long userId, Long orderItemId) {
-        memberBrokerageRecordService.cancelBrokerage(userId, String.valueOf(orderItemId));
+        tradeBrokerageRecordService.cancelBrokerage(userId, String.valueOf(orderItemId));
     }
 
     /**

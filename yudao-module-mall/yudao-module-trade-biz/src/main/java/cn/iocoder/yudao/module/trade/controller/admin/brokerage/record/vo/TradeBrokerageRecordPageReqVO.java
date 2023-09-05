@@ -15,7 +15,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class MemberBrokerageRecordPageReqVO extends PageParam {
+public class TradeBrokerageRecordPageReqVO extends PageParam {
 
     @Schema(description = "用户编号", example = "25973")
     private Long userId;

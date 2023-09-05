@@ -5,13 +5,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 佣金 增加 Request DTO
+ * 佣金 增加 Request BO
  * @author owen
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BrokerageAddReqDTO {
+public class BrokerageAddReqBO {
     /**
      * 业务ID
      */

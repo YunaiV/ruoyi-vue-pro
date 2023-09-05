@@ -6,13 +6,13 @@ import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.trade.service.brokerage.record.bo.BrokerageAddReqDTO;
-import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.MemberBrokerageRecordPageReqVO;
-import cn.iocoder.yudao.module.trade.convert.brokerage.record.MemberBrokerageRecordConvert;
-import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.record.MemberBrokerageRecordDO;
+import cn.iocoder.yudao.module.trade.convert.brokerage.record.TradeBrokerageRecordConvert;
+import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.record.TradeBrokerageRecordDO;
+import cn.iocoder.yudao.module.trade.service.brokerage.record.bo.BrokerageAddReqBO;
+import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.TradeBrokerageRecordPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.user.TradeBrokerageUserDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
-import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.record.MemberBrokerageRecordMapper;
+import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.record.TradeBrokerageRecordMapper;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.service.brokerage.user.TradeBrokerageUserService;
@@ -37,28 +37,28 @@ import java.util.function.Function;
 @Slf4j
 @Service
 @Validated
-public class MemberBrokerageRecordServiceImpl implements MemberBrokerageRecordService {
+public class TradeBrokerageRecordServiceImpl implements TradeBrokerageRecordService {
 
     @Resource
-    private MemberBrokerageRecordMapper memberBrokerageRecordMapper;
+    private TradeBrokerageRecordMapper tradeBrokerageRecordMapper;
     @Resource
     private TradeConfigService tradeConfigService;
     @Resource
     private TradeBrokerageUserService tradeBrokerageUserService;
 
     @Override
-    public MemberBrokerageRecordDO getMemberBrokerageRecord(Integer id) {
-        return memberBrokerageRecordMapper.selectById(id);
+    public TradeBrokerageRecordDO getBrokerageRecord(Integer id) {
+        return tradeBrokerageRecordMapper.selectById(id);
     }
 
     @Override
-    public PageResult<MemberBrokerageRecordDO> getMemberBrokerageRecordPage(MemberBrokerageRecordPageReqVO pageReqVO) {
-        return memberBrokerageRecordMapper.selectPage(pageReqVO);
+    public PageResult<TradeBrokerageRecordDO> getBrokerageRecordPage(TradeBrokerageRecordPageReqVO pageReqVO) {
+        return tradeBrokerageRecordMapper.selectPage(pageReqVO);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addBrokerage(Long buyerId, List<BrokerageAddReqDTO> list) {
+    public void addBrokerage(Long buyerId, List<BrokerageAddReqBO> list) {
         TradeConfigDO memberConfig = tradeConfigService.getTradeConfig();
         // 0 未启用分销功能
         if (memberConfig == null || !BooleanUtil.isTrue(memberConfig.getBrokerageEnabled())) {
@@ -73,7 +73,7 @@ public class MemberBrokerageRecordServiceImpl implements MemberBrokerageRecordSe
         }
 
         // 1.2 计算一级分佣
-        addBrokerage(firstUser, list, memberConfig.getBrokerageFrozenDays(), memberConfig.getBrokerageFirstPercent(), BrokerageAddReqDTO::getSkuFirstBrokeragePrice);
+        addBrokerage(firstUser, list, memberConfig.getBrokerageFrozenDays(), memberConfig.getBrokerageFirstPercent(), BrokerageAddReqBO::getSkuFirstBrokeragePrice);
 
 
         // 2.1 获得二级推广员
@@ -83,20 +83,20 @@ public class MemberBrokerageRecordServiceImpl implements MemberBrokerageRecordSe
         }
 
         // 2.2 计算二级分佣
-        addBrokerage(secondUser, list, memberConfig.getBrokerageFrozenDays(), memberConfig.getBrokerageSecondPercent(), BrokerageAddReqDTO::getSkuSecondBrokeragePrice);
+        addBrokerage(secondUser, list, memberConfig.getBrokerageFrozenDays(), memberConfig.getBrokerageSecondPercent(), BrokerageAddReqBO::getSkuSecondBrokeragePrice);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void cancelBrokerage(Long userId, String bizId) {
-        MemberBrokerageRecordDO record = memberBrokerageRecordMapper.selectByUserIdAndBizTypeAndBizId(BrokerageRecordBizTypeEnum.ORDER.getType(), bizId);
+        TradeBrokerageRecordDO record = tradeBrokerageRecordMapper.selectByUserIdAndBizTypeAndBizId(BrokerageRecordBizTypeEnum.ORDER.getType(), bizId);
         if (record == null || ObjectUtil.notEqual(record.getUserId(), userId)) {
             log.error("[cancelBrokerage][userId({})][bizId({}) 更新为已失效失败：记录不存在]", userId, bizId);
             return;
         }
 
-        MemberBrokerageRecordDO updateObj = new MemberBrokerageRecordDO().setStatus(BrokerageRecordStatusEnum.CANCEL.getStatus());
-        int updateRows = memberBrokerageRecordMapper.updateByIdAndStatus(record.getId(), record.getStatus(), updateObj);
+        TradeBrokerageRecordDO updateObj = new TradeBrokerageRecordDO().setStatus(BrokerageRecordStatusEnum.CANCEL.getStatus());
+        int updateRows = tradeBrokerageRecordMapper.updateByIdAndStatus(record.getId(), record.getStatus(), updateObj);
         if (updateRows == 0) {
             log.error("[cancelBrokerage][record({}) 更新为已失效失败]", record.getId());
             return;
@@ -140,8 +140,8 @@ public class MemberBrokerageRecordServiceImpl implements MemberBrokerageRecordSe
      * @param brokeragePercent     佣金比例
      * @param skuBrokeragePriceFun 商品 SKU 设置的佣金
      */
-    private void addBrokerage(TradeBrokerageUserDO user, List<BrokerageAddReqDTO> list, Integer brokerageFrozenDays,
-                              Integer brokeragePercent, Function<BrokerageAddReqDTO, Integer> skuBrokeragePriceFun) {
+    private void addBrokerage(TradeBrokerageUserDO user, List<BrokerageAddReqBO> list, Integer brokerageFrozenDays,
+                              Integer brokeragePercent, Function<BrokerageAddReqBO, Integer> skuBrokeragePriceFun) {
         // 处理冻结时间
         brokerageFrozenDays = ObjectUtil.defaultIfNull(brokerageFrozenDays, 0);
         LocalDateTime unfreezeTime = null;
@@ -151,12 +151,12 @@ public class MemberBrokerageRecordServiceImpl implements MemberBrokerageRecordSe
 
         // 计算分佣
         int totalBrokerage = 0;
-        List<MemberBrokerageRecordDO> records = new ArrayList<>();
-        for (BrokerageAddReqDTO dto : list) {
+        List<TradeBrokerageRecordDO> records = new ArrayList<>();
+        for (BrokerageAddReqBO dto : list) {
             int brokeragePerItem = calculateBrokerage(dto.getPayPrice(), brokeragePercent, skuBrokeragePriceFun.apply(dto));
             if (brokeragePerItem > 0) {
                 int brokerage = brokeragePerItem * dto.getCount();
-                records.add(MemberBrokerageRecordConvert.INSTANCE.convert(user, dto.getBizId(), brokerageFrozenDays, brokerage, unfreezeTime));
+                records.add(TradeBrokerageRecordConvert.INSTANCE.convert(user, dto.getBizId(), brokerageFrozenDays, brokerage, unfreezeTime));
                 totalBrokerage += brokerage;
             }
         }
@@ -166,7 +166,7 @@ public class MemberBrokerageRecordServiceImpl implements MemberBrokerageRecordSe
         }
 
         // 保存佣金记录
-        memberBrokerageRecordMapper.insertBatch(records);
+        tradeBrokerageRecordMapper.insertBatch(records);
 
         if (brokerageFrozenDays > 0) {
             // 更新用户冻结佣金
@@ -180,7 +180,7 @@ public class MemberBrokerageRecordServiceImpl implements MemberBrokerageRecordSe
     @Override
     public int unfreezeRecord() {
         // 1. 查询待结算的佣金记录
-        List<MemberBrokerageRecordDO> records = memberBrokerageRecordMapper.selectListByStatusAndUnfreezeTimeLt(
+        List<TradeBrokerageRecordDO> records = tradeBrokerageRecordMapper.selectListByStatusAndUnfreezeTimeLt(
                 BrokerageRecordStatusEnum.WAIT_SETTLEMENT.getStatus(), LocalDateTime.now());
         if (CollUtil.isEmpty(records)) {
             return 0;
@@ -188,7 +188,7 @@ public class MemberBrokerageRecordServiceImpl implements MemberBrokerageRecordSe
 
         // 2. 遍历执行
         int count = 0;
-        for (MemberBrokerageRecordDO record : records) {
+        for (TradeBrokerageRecordDO record : records) {
             try {
                 boolean successful = getSelf().unfreezeRecord(record);
                 if (successful) {
@@ -202,12 +202,12 @@ public class MemberBrokerageRecordServiceImpl implements MemberBrokerageRecordSe
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean unfreezeRecord(MemberBrokerageRecordDO record) {
+    public boolean unfreezeRecord(TradeBrokerageRecordDO record) {
         // 更新记录状态
-        MemberBrokerageRecordDO updateObj = new MemberBrokerageRecordDO()
+        TradeBrokerageRecordDO updateObj = new TradeBrokerageRecordDO()
                 .setStatus(BrokerageRecordStatusEnum.SETTLEMENT.getStatus())
                 .setUnfreezeTime(LocalDateTime.now());
-        int updateRows = memberBrokerageRecordMapper.updateByIdAndStatus(record.getId(), record.getStatus(), updateObj);
+        int updateRows = tradeBrokerageRecordMapper.updateByIdAndStatus(record.getId(), record.getStatus(), updateObj);
         if (updateRows == 0) {
             log.error("[unfreezeRecord][record({}) 更新为已结算失败]", record.getId());
             return false;
@@ -225,7 +225,7 @@ public class MemberBrokerageRecordServiceImpl implements MemberBrokerageRecordSe
      *
      * @return 自己
      */
-    private MemberBrokerageRecordServiceImpl getSelf() {
+    private TradeBrokerageRecordServiceImpl getSelf() {
         return SpringUtil.getBean(getClass());
     }
 

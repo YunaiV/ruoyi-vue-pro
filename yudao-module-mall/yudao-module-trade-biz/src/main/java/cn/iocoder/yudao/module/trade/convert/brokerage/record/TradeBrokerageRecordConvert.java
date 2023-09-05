@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.trade.convert.brokerage.record;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.MemberBrokerageRecordRespVO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.record.MemberBrokerageRecordDO;
+import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.TradeBrokerageRecordRespVO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.record.TradeBrokerageRecordDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.user.TradeBrokerageUserDO;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
@@ -19,22 +19,22 @@ import java.util.List;
  * @author owen
  */
 @Mapper
-public interface MemberBrokerageRecordConvert {
+public interface TradeBrokerageRecordConvert {
 
-    MemberBrokerageRecordConvert INSTANCE = Mappers.getMapper(MemberBrokerageRecordConvert.class);
+    TradeBrokerageRecordConvert INSTANCE = Mappers.getMapper(TradeBrokerageRecordConvert.class);
 
-    MemberBrokerageRecordRespVO convert(MemberBrokerageRecordDO bean);
+    TradeBrokerageRecordRespVO convert(TradeBrokerageRecordDO bean);
 
-    List<MemberBrokerageRecordRespVO> convertList(List<MemberBrokerageRecordDO> list);
+    List<TradeBrokerageRecordRespVO> convertList(List<TradeBrokerageRecordDO> list);
 
-    PageResult<MemberBrokerageRecordRespVO> convertPage(PageResult<MemberBrokerageRecordDO> page);
+    PageResult<TradeBrokerageRecordRespVO> convertPage(PageResult<TradeBrokerageRecordDO> page);
 
-    default MemberBrokerageRecordDO convert(TradeBrokerageUserDO user, String bizId, int brokerageFrozenDays, int brokerage, LocalDateTime unfreezeTime) {
+    default TradeBrokerageRecordDO convert(TradeBrokerageUserDO user, String bizId, int brokerageFrozenDays, int brokerage, LocalDateTime unfreezeTime) {
         // 不冻结时，佣金直接就是结算状态
         Integer status = brokerageFrozenDays > 0
                 ? BrokerageRecordStatusEnum.WAIT_SETTLEMENT.getStatus()
                 : BrokerageRecordStatusEnum.SETTLEMENT.getStatus();
-        return new MemberBrokerageRecordDO()
+        return new TradeBrokerageRecordDO()
                 .setUserId(user.getId())
                 .setBizType(BrokerageRecordBizTypeEnum.ORDER.getType())
                 .setBizId(bizId)
