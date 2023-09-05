@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.member.controller.app.brokerage.vo.record;
+package cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.record;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

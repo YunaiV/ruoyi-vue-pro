@@ -1,11 +1,11 @@
-package cn.iocoder.yudao.module.member.controller.app.brokerage.vo.user;
+package cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-@Schema(description = "用户 App - 分销排行用户 Response VO")
+@Schema(description = "用户 App - 分销排行用户（基于用户量） Response VO")
 @Data
-public class AppBrokerageUserRankRespVO {
+public class AppBrokerageUserRankByPriceRespVO {
 
     @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     private Long userId;
@@ -16,7 +16,7 @@ public class AppBrokerageUserRankRespVO {
     @Schema(description = "用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "http://www.iocoder.cn/xxx.jpg")
     private String avatar;
 
-    @Schema(description = "邀请用户数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
-    private Integer brokerageUserCount;
+    @Schema(description = "佣金金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
+    private Integer brokeragePrice;
 
 }
