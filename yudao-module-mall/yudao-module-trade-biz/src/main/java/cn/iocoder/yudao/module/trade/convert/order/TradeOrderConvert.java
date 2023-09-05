@@ -7,11 +7,13 @@ import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
+import cn.iocoder.yudao.module.member.api.brokerage.dto.BrokerageAddReqDTO;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderRespDTO;
@@ -273,4 +275,10 @@ public interface TradeOrderConvert {
 
     TradeOrderDO convert(TradeOrderRemarkReqVO reqVO);
 
+    default BrokerageAddReqDTO convert(TradeOrderItemDO item, ProductSkuRespDTO sku) {
+        return new BrokerageAddReqDTO().setBizId(String.valueOf(item.getId()))
+                .setPayPrice(item.getPayPrice()).setCount(item.getCount())
+                .setSkuFirstBrokeragePrice(sku.getSubCommissionFirstPrice())
+                .setSkuSecondBrokeragePrice(sku.getSubCommissionSecondPrice());
+    }
 }

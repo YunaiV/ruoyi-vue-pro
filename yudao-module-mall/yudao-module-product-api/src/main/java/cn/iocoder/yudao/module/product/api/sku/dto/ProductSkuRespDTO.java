@@ -60,4 +60,13 @@ public class ProductSkuRespDTO {
      */
     private Double volume;
 
+    /**
+     * 一级分销的佣金，单位：分
+     */
+    private Integer subCommissionFirstPrice;
+    /**
+     * 二级分销的佣金，单位：分
+     */
+    private Integer subCommissionSecondPrice;
+
 }
