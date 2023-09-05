@@ -1,24 +1,25 @@
 -- 增加配置
-alter table member_point_config
-    add column brokerage_enabled bit default 1 not null comment '是否启用分佣';
-alter table member_point_config
-    add column brokerage_enabled_condition tinyint default 0 not null comment '分佣模式：0-人人分销 1-指定分销';
-alter table member_point_config
-    add column brokerage_bind_mode tinyint default 0 not null comment '分销关系绑定模式: 0-没有推广人，1-新用户';
-alter table member_point_config
-    add column brokerage_post_urls varchar(2000) null comment '分销海报图地址数组';
-alter table member_point_config
-    add column brokerage_first_percent int not null comment '一级返佣比例';
-alter table member_point_config
-    add column brokerage_second_percent int not null comment '二级返佣比例';
-alter table member_point_config
-    add column brokerage_withdraw_min_price int not null comment '用户提现最低金额';
-alter table member_point_config
-    add column brokerage_bank_names varchar(200) not null comment '提现银行（字典类型=brokerage_bank_name）';
-alter table member_point_config
-    add column brokerage_frozen_days int default 7 not null comment '佣金冻结时间(天)';
-alter table member_point_config
-    add column brokerage_withdraw_type varchar(32) default '1,2,3,4' not null comment '提现方式：1-钱包；2-银行卡；3-微信；4-支付宝';
+create table trade_config
+(
+    id                           bigint auto_increment comment '自增主键'
+        primary key,
+    brokerage_enabled            bit                                    default 1                 not null comment '是否启用分佣',
+    brokerage_enabled_condition  tinyint                                default 0                 not null comment '分佣模式：0-人人分销 1-指定分销',
+    brokerage_bind_mode          tinyint                                default 0                 not null comment '分销关系绑定模式: 0-没有推广人，1-新用户',
+    brokerage_post_urls          varchar(2000)                          default ''                null comment '分销海报图地址数组',
+    brokerage_first_percent      int                                    default 0                 not null comment '一级返佣比例',
+    brokerage_second_percent     int                                    default 0                 not null comment '二级返佣比例',
+    brokerage_withdraw_min_price int                                    default 0                 not null comment '用户提现最低金额',
+    brokerage_bank_names         varchar(200)                           default ''                not null comment '提现银行（字典类型=brokerage_bank_name）',
+    brokerage_frozen_days        int                                    default 7                 not null comment '佣金冻结时间(天)',
+    brokerage_withdraw_type      varchar(32)                            default '1,2,3,4'         not null comment '提现方式：1-钱包；2-银行卡；3-微信；4-支付宝',
+    creator                      varchar(64) collate utf8mb4_unicode_ci default ''                null comment '创建者',
+    create_time                  datetime                               default CURRENT_TIMESTAMP not null comment '创建时间',
+    updater                      varchar(64) collate utf8mb4_unicode_ci default ''                null comment '更新者',
+    update_time                  datetime                               default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    deleted                      bit                                    default b'0'              not null comment '是否删除',
+    tenant_id                    bigint                                 default 0                 not null comment '租户编号'
+) comment '交易中心配置';
 
 -- 用户表增加分销相关字段
 alter table member_user
@@ -187,3 +188,17 @@ SELECT @parentId := LAST_INSERT_ID();
 -- 按钮 SQL
 INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
 VALUES ('佣金提现查询', 'member:brokerage-withdraw:query', 3, 1, @parentId, '', '', '', 0);
+
+-- 交易中心配置：菜单 SQL
+INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status, component_name)
+VALUES ('交易中心配置', '', 2, 0, 2072, 'config', '', 'trade/config/index', 0, 'TradeConfig');
+
+-- 按钮父菜单ID
+-- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
+VALUES ('交易中心配置查询', 'trade:config:query', 3, 1, @parentId, '', '', '', 0);
+INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
+VALUES ('交易中心配置保存', 'trade:config:save', 3, 2, @parentId, '', '', '', 0);
