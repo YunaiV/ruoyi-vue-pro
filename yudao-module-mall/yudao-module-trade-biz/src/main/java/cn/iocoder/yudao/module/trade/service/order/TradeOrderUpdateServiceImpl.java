@@ -12,6 +12,8 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
+import cn.iocoder.yudao.module.member.api.brokerage.BrokerageApi;
+import cn.iocoder.yudao.module.member.api.brokerage.dto.BrokerageAddReqDTO;
 import cn.iocoder.yudao.module.member.api.level.MemberLevelApi;
 import cn.iocoder.yudao.module.member.api.point.MemberPointApi;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
@@ -117,6 +119,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private MemberLevelApi memberLevelApi;
     @Resource
     private MemberPointApi memberPointApi;
+    @Resource
+    private BrokerageApi brokerageApi;
     @Resource
     private ProductCommentApi productCommentApi;
 
@@ -365,6 +369,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         getSelf().addUserPointAsync(order.getUserId(), order.getPayPrice(), order.getId());
         // 增加用户经验
         getSelf().addUserExperienceAsync(order.getUserId(), order.getPayPrice(), order.getId());
+        // 增加用户佣金
+        getSelf().addBrokerageAsync(order.getUserId(), order.getId());
     }
 
     /**
@@ -740,6 +746,15 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     protected void reduceUserPointAsync(Long userId, Integer refundPrice, Long afterSaleId) {
         int bizType = MemberPointBizTypeEnum.ORDER_CANCEL.getType();
         memberPointApi.addPoint(userId, -refundPrice, bizType, String.valueOf(afterSaleId));
+    }
+
+
+    @Async
+    protected void addBrokerageAsync(Long userId, Long orderId) {
+        List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(orderId);
+        List<BrokerageAddReqDTO> list = convertList(orderItems,
+                item -> TradeOrderConvert.INSTANCE.convert(item, productSkuApi.getSku(item.getSkuId())));
+        brokerageApi.addBrokerage(userId, list);
     }
 
     /**

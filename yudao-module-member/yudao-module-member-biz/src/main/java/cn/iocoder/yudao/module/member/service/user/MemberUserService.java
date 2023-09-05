@@ -166,4 +166,28 @@ public interface MemberUserService {
      * @param point  积分数量
      */
     void updateUserPoint(Long userId, Integer point);
+
+    /**
+     * 获得用户的推广人
+     *
+     * @param id 用户编号
+     * @return 用户的推广人
+     */
+    MemberUserDO getBrokerageUser(Long id);
+
+    /**
+     * 增加用户佣金
+     *
+     * @param id             用户编号
+     * @param brokeragePrice 用户可用佣金
+     */
+    void updateUserBrokeragePrice(Long id, int brokeragePrice);
+
+    /**
+     * 增加用户佣金
+     *
+     * @param id                   用户编号
+     * @param frozenBrokeragePrice 用户冻结佣金
+     */
+    void updateUserFrozenBrokeragePrice(Long id, int frozenBrokeragePrice);
 }

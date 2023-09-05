@@ -3,3 +3,4 @@ DELETE FROM "member_address";
 DELETE FROM "member_tag";
 DELETE FROM "member_level";
 DELETE FROM "member_group";
+DELETE FROM "member_brokerage_record";

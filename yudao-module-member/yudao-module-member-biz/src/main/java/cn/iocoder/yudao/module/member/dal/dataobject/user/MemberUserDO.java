@@ -136,4 +136,31 @@ public class MemberUserDO extends TenantBaseDO {
      */
     private Long groupId;
 
+    // ========== 分销相关 ==========
+
+    /**
+     * 推广员编号
+     */
+    private Long brokerageUserId;
+    /**
+     * 推广员绑定时间
+     */
+    private LocalDateTime brokerageBindTime;
+    /**
+     * 是否成为推广员
+     */
+    private Boolean brokerageEnabled;
+    /**
+     * 成为分销员时间
+     */
+    private LocalDateTime brokerageTime;
+    /**
+     * 可用佣金
+     */
+    private Integer brokeragePrice;
+    /**
+     * 冻结佣金
+     */
+    private Integer frozenBrokeragePrice;
+
 }
