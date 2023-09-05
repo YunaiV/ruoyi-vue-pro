@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.member.service.user;
 
-import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -31,7 +30,6 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
@@ -259,45 +257,6 @@ public class MemberUserServiceImpl implements MemberUserService {
     @Override
     public void updateUserPoint(Long userId, Integer point) {
         memberUserMapper.updateById(new MemberUserDO().setId(userId).setPoint(point));
-    }
-
-    @Override
-    public MemberUserDO getBrokerageUser(Long id) {
-        return Optional.ofNullable(id)
-                .map(this::getUser)
-                .map(MemberUserDO::getBrokerageUserId)
-                .map(this::getUser)
-                .orElse(null);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateUserBrokeragePrice(Long id, int brokeragePrice) {
-        if (brokeragePrice > 0) {
-            memberUserMapper.updateBrokeragePriceIncr(id, brokeragePrice);
-        } else if (brokeragePrice < 0) {
-            memberUserMapper.updateBrokeragePriceDecr(id, brokeragePrice);
-        }
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateUserFrozenBrokeragePrice(Long id, int frozenBrokeragePrice) {
-        if (frozenBrokeragePrice > 0) {
-            memberUserMapper.updateFrozenBrokeragePriceIncr(id, frozenBrokeragePrice);
-        } else if (frozenBrokeragePrice < 0) {
-            memberUserMapper.updateFrozenBrokeragePriceDecr(id, frozenBrokeragePrice);
-        }
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateFrozenBrokeragePriceDecrAndBrokeragePriceIncr(Long id, int frozenBrokeragePrice) {
-        Assert.isTrue(frozenBrokeragePrice < 0);
-        int updateRows = memberUserMapper.updateFrozenBrokeragePriceDecrAndBrokeragePriceIncr(id, frozenBrokeragePrice);
-        if (updateRows == 0) {
-            throw exception(MEMBER_FROZEN_BROKERAGE_PRICE_NOT_ENOUGH);
-        }
     }
 
 }

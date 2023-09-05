@@ -53,4 +53,36 @@ public interface TradeBrokerageUserService {
      * @param brokerageEnabled 推广资格
      */
     void updateBrokerageEnabled(Long id, Boolean brokerageEnabled);
+
+    /**
+     * 获得用户的推广人
+     *
+     * @param id 用户编号
+     * @return 用户的推广人
+     */
+    TradeBrokerageUserDO getInviteBrokerageUser(Long id);
+
+    /**
+     * 更新用户佣金
+     *
+     * @param id             用户编号
+     * @param brokeragePrice 用户可用佣金
+     */
+    void updateUserBrokeragePrice(Long id, int brokeragePrice);
+
+    /**
+     * 更新用户冻结佣金
+     *
+     * @param id                   用户编号
+     * @param frozenBrokeragePrice 用户冻结佣金
+     */
+    void updateUserFrozenBrokeragePrice(Long id, int frozenBrokeragePrice);
+
+    /**
+     * 更新用户冻结佣金（减少）, 更新用户佣金（增加）
+     *
+     * @param id                   用户编号
+     * @param frozenBrokeragePrice 减少冻结佣金（负数）
+     */
+    void updateFrozenBrokeragePriceDecrAndBrokeragePriceIncr(Long id, int frozenBrokeragePrice);
 }

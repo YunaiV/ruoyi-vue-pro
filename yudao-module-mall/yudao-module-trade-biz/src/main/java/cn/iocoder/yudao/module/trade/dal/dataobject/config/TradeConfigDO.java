@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.trade.dal.dataobject.config;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.IntegerListTypeHandler;
-import cn.iocoder.yudao.module.member.enums.brokerage.BrokerageBindModeEnum;
-import cn.iocoder.yudao.module.member.enums.brokerage.BrokerageEnabledConditionEnum;
-import cn.iocoder.yudao.module.member.enums.brokerage.BrokerageWithdrawTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageBindModeEnum;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageEnabledConditionEnum;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;

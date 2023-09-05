@@ -12,8 +12,8 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
-import cn.iocoder.yudao.module.member.api.brokerage.BrokerageApi;
-import cn.iocoder.yudao.module.member.api.brokerage.dto.BrokerageAddReqDTO;
+import cn.iocoder.yudao.module.trade.service.brokerage.record.MemberBrokerageRecordService;
+import cn.iocoder.yudao.module.trade.service.brokerage.record.bo.BrokerageAddReqDTO;
 import cn.iocoder.yudao.module.member.api.level.MemberLevelApi;
 import cn.iocoder.yudao.module.member.api.point.MemberPointApi;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
@@ -120,7 +120,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Resource
     private MemberPointApi memberPointApi;
     @Resource
-    private BrokerageApi brokerageApi;
+    private MemberBrokerageRecordService memberBrokerageRecordService;
     @Resource
     private ProductCommentApi productCommentApi;
 
@@ -754,12 +754,12 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(orderId);
         List<BrokerageAddReqDTO> list = convertList(orderItems,
                 item -> TradeOrderConvert.INSTANCE.convert(item, productSkuApi.getSku(item.getSkuId())));
-        brokerageApi.addBrokerage(userId, list);
+        memberBrokerageRecordService.addBrokerage(userId, list);
     }
 
     @Async
     protected void cancelBrokerageAsync(Long userId, Long orderItemId) {
-        brokerageApi.cancelBrokerage(userId, String.valueOf(orderItemId));
+        memberBrokerageRecordService.cancelBrokerage(userId, String.valueOf(orderItemId));
     }
 
     /**

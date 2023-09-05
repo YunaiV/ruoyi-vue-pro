@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.trade.controller.admin.config.vo;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.member.enums.brokerage.BrokerageBindModeEnum;
-import cn.iocoder.yudao.module.member.enums.brokerage.BrokerageEnabledConditionEnum;
-import cn.iocoder.yudao.module.member.enums.brokerage.BrokerageWithdrawTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageBindModeEnum;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageEnabledConditionEnum;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
