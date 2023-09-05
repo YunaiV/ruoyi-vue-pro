@@ -79,6 +79,21 @@ public interface MemberUserMapper extends BaseMapperX<MemberUserDO> {
     }
 
     /**
+     * 更新用户可用佣金（减少）
+     * 注意：理论上佣金可能已经提现，这时会扣出负数，确保平台不会造成损失
+     *
+     * @param id        用户编号
+     * @param incrCount 增加佣金（负数）
+     */
+    default void updateBrokeragePriceDecr(Long id, int incrCount) {
+        Assert.isTrue(incrCount < 0);
+        LambdaUpdateWrapper<MemberUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<MemberUserDO>()
+                .setSql(" brokerage_price = brokerage_price + " + incrCount) // 负数，所以使用 + 号
+                .eq(MemberUserDO::getId, id);
+        update(null, lambdaUpdateWrapper);
+    }
+
+    /**
      * 更新用户冻结佣金（增加）
      *
      * @param id        用户编号
@@ -94,12 +109,27 @@ public interface MemberUserMapper extends BaseMapperX<MemberUserDO> {
 
     /**
      * 更新用户冻结佣金（减少）
+     * 注意：理论上冻结佣金可能已经解冻，这时会扣出负数，确保平台不会造成损失
+     *
+     * @param id        用户编号
+     * @param incrCount 减少冻结佣金（负数）
+     */
+    default void updateFrozenBrokeragePriceDecr(Long id, int incrCount) {
+        Assert.isTrue(incrCount < 0);
+        LambdaUpdateWrapper<MemberUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<MemberUserDO>()
+                .setSql(" frozen_brokerage_price = frozen_brokerage_price + " + incrCount) // 负数，所以使用 + 号
+                .eq(MemberUserDO::getId, id);
+        update(null, lambdaUpdateWrapper);
+    }
+
+    /**
+     * 更新用户冻结佣金（减少）, 更新用户佣金（增加）
      *
      * @param id        用户编号
      * @param incrCount 减少冻结佣金（负数）
      * @return 更新条数
      */
-    default int updateFrozenBrokeragePriceDecr(Long id, int incrCount) {
+    default int updateFrozenBrokeragePriceDecrAndBrokeragePriceIncr(Long id, int incrCount) {
         Assert.isTrue(incrCount < 0);
         LambdaUpdateWrapper<MemberUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<MemberUserDO>()
                 .setSql(" frozen_brokerage_price = frozen_brokerage_price + " + incrCount + // 负数，所以使用 + 号

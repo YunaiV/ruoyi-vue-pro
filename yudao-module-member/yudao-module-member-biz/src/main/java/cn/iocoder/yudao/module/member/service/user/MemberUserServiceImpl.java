@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.member.service.user;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -272,7 +273,11 @@ public class MemberUserServiceImpl implements MemberUserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateUserBrokeragePrice(Long id, int brokeragePrice) {
-        memberUserMapper.updateBrokeragePriceIncr(id, brokeragePrice);
+        if (brokeragePrice > 0) {
+            memberUserMapper.updateBrokeragePriceIncr(id, brokeragePrice);
+        } else if (brokeragePrice < 0) {
+            memberUserMapper.updateBrokeragePriceDecr(id, brokeragePrice);
+        }
     }
 
     @Override
@@ -281,10 +286,17 @@ public class MemberUserServiceImpl implements MemberUserService {
         if (frozenBrokeragePrice > 0) {
             memberUserMapper.updateFrozenBrokeragePriceIncr(id, frozenBrokeragePrice);
         } else if (frozenBrokeragePrice < 0) {
-            int updateRows = memberUserMapper.updateFrozenBrokeragePriceDecr(id, frozenBrokeragePrice);
-            if (updateRows == 0) {
-                throw exception(MEMBER_FROZEN_BROKERAGE_PRICE_NOT_ENOUGH);
-            }
+            memberUserMapper.updateFrozenBrokeragePriceDecr(id, frozenBrokeragePrice);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateFrozenBrokeragePriceDecrAndBrokeragePriceIncr(Long id, int frozenBrokeragePrice) {
+        Assert.isTrue(frozenBrokeragePrice < 0);
+        int updateRows = memberUserMapper.updateFrozenBrokeragePriceDecrAndBrokeragePriceIncr(id, frozenBrokeragePrice);
+        if (updateRows == 0) {
+            throw exception(MEMBER_FROZEN_BROKERAGE_PRICE_NOT_ENOUGH);
         }
     }
 

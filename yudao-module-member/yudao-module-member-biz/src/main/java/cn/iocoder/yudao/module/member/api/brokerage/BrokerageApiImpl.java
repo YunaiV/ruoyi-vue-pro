@@ -27,6 +27,6 @@ public class BrokerageApiImpl implements BrokerageApi {
 
     @Override
     public void cancelBrokerage(Long userId, String bizId) {
-
+        memberBrokerageRecordService.cancelBrokerage(userId, bizId);
     }
 }

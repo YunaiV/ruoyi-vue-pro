@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.member.dal.dataobject.brokerage.record.MemberBrok
 import cn.iocoder.yudao.module.member.dal.dataobject.point.MemberPointConfigDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.brokerage.record.MemberBrokerageRecordMapper;
+import cn.iocoder.yudao.module.member.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.member.enums.brokerage.BrokerageRecordStatusEnum;
 import cn.iocoder.yudao.module.member.service.point.MemberPointConfigService;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
@@ -83,6 +84,29 @@ public class MemberBrokerageRecordServiceImpl implements MemberBrokerageRecordSe
 
         // 2.2 计算二级分佣
         addBrokerage(secondUser, list, memberConfig.getBrokerageFrozenDays(), memberConfig.getBrokerageSecondPercent(), BrokerageAddReqDTO::getSkuSecondBrokeragePrice);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void cancelBrokerage(Long userId, String bizId) {
+        MemberBrokerageRecordDO record = memberBrokerageRecordMapper.selectByUserIdAndBizTypeAndBizId(BrokerageRecordBizTypeEnum.ORDER.getType(), bizId);
+        if (record == null || ObjectUtil.notEqual(record.getUserId(), userId)) {
+            log.error("[cancelBrokerage][userId({})][bizId({}) 更新为已失效失败：记录不存在]", userId, bizId);
+            return;
+        }
+
+        MemberBrokerageRecordDO updateObj = new MemberBrokerageRecordDO().setStatus(BrokerageRecordStatusEnum.CANCEL.getStatus());
+        int updateRows = memberBrokerageRecordMapper.updateByIdAndStatus(record.getId(), record.getStatus(), updateObj);
+        if (updateRows == 0) {
+            log.error("[cancelBrokerage][record({}) 更新为已失效失败]", record.getId());
+            return;
+        }
+
+        if (BrokerageRecordStatusEnum.WAIT_SETTLEMENT.getStatus().equals(record.getStatus())) {
+            memberUserService.updateUserFrozenBrokeragePrice(userId, -record.getPrice());
+        } else if (BrokerageRecordStatusEnum.SETTLEMENT.getStatus().equals(record.getStatus())) {
+            memberUserService.updateUserBrokeragePrice(userId, -record.getPrice());
+        }
     }
 
     /**
@@ -190,7 +214,7 @@ public class MemberBrokerageRecordServiceImpl implements MemberBrokerageRecordSe
         }
 
         // 更新用户冻结佣金
-        memberUserService.updateUserFrozenBrokeragePrice(record.getUserId(), -record.getPrice());
+        memberUserService.updateFrozenBrokeragePriceDecrAndBrokeragePriceIncr(record.getUserId(), -record.getPrice());
 
         log.info("[unfreezeRecord][record({}) 更新为已结算成功]", record.getId());
         return true;

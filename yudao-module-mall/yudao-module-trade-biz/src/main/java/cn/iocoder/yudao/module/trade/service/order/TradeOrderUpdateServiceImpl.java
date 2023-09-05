@@ -635,12 +635,12 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                     .setRefundStatus(TradeOrderRefundStatusEnum.PART.getStatus()).setRefundPrice(orderRefundPrice));
         }
 
-        // TODO 芋艿：未来如果有分佣，需要更新相关分佣订单为已失效
-
         // 扣减用户积分
         getSelf().reduceUserPointAsync(order.getUserId(), orderRefundPrice, afterSaleId);
         // 扣减用户经验
         getSelf().reduceUserExperienceAsync(order.getUserId(), orderRefundPrice, afterSaleId);
+        // 更新分佣记录为已失效
+        getSelf().cancelBrokerageAsync(order.getUserId(), id);
     }
 
     @Override
@@ -755,6 +755,11 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         List<BrokerageAddReqDTO> list = convertList(orderItems,
                 item -> TradeOrderConvert.INSTANCE.convert(item, productSkuApi.getSku(item.getSkuId())));
         brokerageApi.addBrokerage(userId, list);
+    }
+
+    @Async
+    protected void cancelBrokerageAsync(Long userId, Long orderItemId) {
+        brokerageApi.cancelBrokerage(userId, String.valueOf(orderItemId));
     }
 
     /**

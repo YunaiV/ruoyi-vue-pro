@@ -39,4 +39,9 @@ public interface MemberBrokerageRecordMapper extends BaseMapperX<MemberBrokerage
                 .eq(MemberBrokerageRecordDO::getId, id)
                 .eq(MemberBrokerageRecordDO::getStatus, status));
     }
+
+    default MemberBrokerageRecordDO selectByUserIdAndBizTypeAndBizId(Integer bizType, String bizId) {
+        return selectOne(MemberBrokerageRecordDO::getBizType, bizType,
+                MemberBrokerageRecordDO::getBizId, bizId);
+    }
 }

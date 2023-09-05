@@ -33,10 +33,17 @@ public interface MemberBrokerageRecordService {
     /**
      * 增加佣金
      *
-     * @param userId 会员ID
+     * @param userId 会员编号
      * @param list   请求参数列表
      */
     void addBrokerage(Long userId, List<BrokerageAddReqDTO> list);
+
+    /**
+     * 取消佣金：将佣金记录，状态修改为已失效
+     * @param userId 会员编号
+     * @param bizId 业务编号
+     */
+    void cancelBrokerage(Long userId, String bizId);
 
     /**
      * 解冻佣金：将待结算的佣金记录，状态修改为已结算
@@ -44,5 +51,4 @@ public interface MemberBrokerageRecordService {
      * @return 解冻佣金的数量
      */
     int unfreezeRecord();
-
 }
