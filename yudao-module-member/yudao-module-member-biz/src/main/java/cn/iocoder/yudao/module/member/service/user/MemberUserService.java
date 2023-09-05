@@ -176,7 +176,7 @@ public interface MemberUserService {
     MemberUserDO getBrokerageUser(Long id);
 
     /**
-     * 增加用户佣金
+     * 更新用户佣金
      *
      * @param id             用户编号
      * @param brokeragePrice 用户可用佣金
@@ -184,7 +184,7 @@ public interface MemberUserService {
     void updateUserBrokeragePrice(Long id, int brokeragePrice);
 
     /**
-     * 增加用户佣金
+     * 更新用户冻结佣金
      *
      * @param id                   用户编号
      * @param frozenBrokeragePrice 用户冻结佣金

@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.member.service.brokerage.record;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.api.brokerage.dto.BrokerageAddReqDTO;
 import cn.iocoder.yudao.module.member.controller.admin.brokerage.record.vo.MemberBrokerageRecordPageReqVO;
@@ -11,10 +13,12 @@ import cn.iocoder.yudao.module.member.dal.dataobject.brokerage.record.MemberBrok
 import cn.iocoder.yudao.module.member.dal.dataobject.point.MemberPointConfigDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.brokerage.record.MemberBrokerageRecordMapper;
+import cn.iocoder.yudao.module.member.enums.brokerage.BrokerageRecordStatusEnum;
 import cn.iocoder.yudao.module.member.service.point.MemberPointConfigService;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -52,6 +56,7 @@ public class MemberBrokerageRecordServiceImpl implements MemberBrokerageRecordSe
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addBrokerage(Long buyerId, List<BrokerageAddReqDTO> list) {
         MemberPointConfigDO memberConfig = memberConfigService.getPointConfig();
         // 0 未启用分销功能
@@ -146,6 +151,58 @@ public class MemberBrokerageRecordServiceImpl implements MemberBrokerageRecordSe
             // 更新用户可用佣金
             memberUserService.updateUserBrokeragePrice(user.getId(), totalBrokerage);
         }
+    }
+
+    @Override
+    public int unfreezeRecord() {
+        // 1. 查询待结算的佣金记录
+        List<MemberBrokerageRecordDO> records = memberBrokerageRecordMapper.selectListByStatusAndUnfreezeTimeLt(
+                BrokerageRecordStatusEnum.WAIT_SETTLEMENT.getStatus(), LocalDateTime.now());
+        if (CollUtil.isEmpty(records)) {
+            return 0;
+        }
+
+        // 2. 遍历执行
+        int count = 0;
+        for (MemberBrokerageRecordDO record : records) {
+            try {
+                boolean successful = getSelf().unfreezeRecord(record);
+                if (successful) {
+                    count++;
+                }
+            } catch (Exception e) {
+                log.error("[unfreezeRecord][record({}) 更新为已结算失败]", record.getId(), e);
+            }
+        }
+        return count;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public boolean unfreezeRecord(MemberBrokerageRecordDO record) {
+        // 更新记录状态
+        MemberBrokerageRecordDO updateObj = new MemberBrokerageRecordDO()
+                .setStatus(BrokerageRecordStatusEnum.SETTLEMENT.getStatus())
+                .setUnfreezeTime(LocalDateTime.now());
+        int updateRows = memberBrokerageRecordMapper.updateByIdAndStatus(record.getId(), record.getStatus(), updateObj);
+        if (updateRows == 0) {
+            log.error("[unfreezeRecord][record({}) 更新为已结算失败]", record.getId());
+            return false;
+        }
+
+        // 更新用户冻结佣金
+        memberUserService.updateUserFrozenBrokeragePrice(record.getUserId(), record.getPrice());
+
+        log.info("[unfreezeRecord][record({}) 更新为已结算成功]", record.getId());
+        return true;
+    }
+
+    /**
+     * 获得自身的代理对象，解决 AOP 生效问题
+     *
+     * @return 自己
+     */
+    private MemberBrokerageRecordServiceImpl getSelf() {
+        return SpringUtil.getBean(getClass());
     }
 
 }

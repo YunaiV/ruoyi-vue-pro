@@ -278,7 +278,14 @@ public class MemberUserServiceImpl implements MemberUserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateUserFrozenBrokeragePrice(Long id, int frozenBrokeragePrice) {
-        memberUserMapper.updateFrozenBrokeragePriceIncr(id, frozenBrokeragePrice);
+        if (frozenBrokeragePrice > 0) {
+            memberUserMapper.updateFrozenBrokeragePriceIncr(id, frozenBrokeragePrice);
+        } else if (frozenBrokeragePrice < 0) {
+            int updateRows = memberUserMapper.updateFrozenBrokeragePriceDecr(id, frozenBrokeragePrice);
+            if (updateRows == 0) {
+                throw exception(MEMBER_FROZEN_BROKERAGE_PRICE_NOT_ENOUGH);
+            }
+        }
     }
 
 }

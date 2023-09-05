@@ -37,4 +37,12 @@ public interface MemberBrokerageRecordService {
      * @param list   请求参数列表
      */
     void addBrokerage(Long userId, List<BrokerageAddReqDTO> list);
+
+    /**
+     * 解冻佣金：将待结算的佣金记录，状态修改为已结算
+     *
+     * @return 解冻佣金的数量
+     */
+    int unfreezeRecord();
+
 }

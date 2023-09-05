@@ -92,4 +92,20 @@ public interface MemberUserMapper extends BaseMapperX<MemberUserDO> {
         update(null, lambdaUpdateWrapper);
     }
 
+    /**
+     * 更新用户冻结佣金（减少）
+     *
+     * @param id        用户编号
+     * @param incrCount 减少冻结佣金（负数）
+     * @return 更新条数
+     */
+    default int updateFrozenBrokeragePriceDecr(Long id, int incrCount) {
+        Assert.isTrue(incrCount < 0);
+        LambdaUpdateWrapper<MemberUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<MemberUserDO>()
+                .setSql(" frozen_brokerage_price = frozen_brokerage_price + " + incrCount + // 负数，所以使用 + 号
+                        ", brokerage_price = brokerage_price + " + -incrCount) // 负数，所以使用 - 号
+                .eq(MemberUserDO::getId, id)
+                .ge(MemberUserDO::getFrozenBrokeragePrice, -incrCount); // cas 逻辑
+        return update(null, lambdaUpdateWrapper);
+    }
 }
