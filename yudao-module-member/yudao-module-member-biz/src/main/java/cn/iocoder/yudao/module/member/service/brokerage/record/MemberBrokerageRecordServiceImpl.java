@@ -190,7 +190,7 @@ public class MemberBrokerageRecordServiceImpl implements MemberBrokerageRecordSe
         }
 
         // 更新用户冻结佣金
-        memberUserService.updateUserFrozenBrokeragePrice(record.getUserId(), record.getPrice());
+        memberUserService.updateUserFrozenBrokeragePrice(record.getUserId(), -record.getPrice());
 
         log.info("[unfreezeRecord][record({}) 更新为已结算成功]", record.getId());
         return true;
