@@ -1,8 +1,7 @@
--- 增加配置
+-- 增加配置表
 create table trade_config
 (
-    id                           bigint auto_increment comment '自增主键'
-        primary key,
+    id                           bigint auto_increment comment '自增主键' primary key,
     brokerage_enabled            bit                                    default 1                 not null comment '是否启用分佣',
     brokerage_enabled_condition  tinyint                                default 0                 not null comment '分佣模式：0-人人分销 1-指定分销',
     brokerage_bind_mode          tinyint                                default 0                 not null comment '分销关系绑定模式: 0-没有推广人，1-新用户',
@@ -21,22 +20,26 @@ create table trade_config
     tenant_id                    bigint                                 default 0                 not null comment '租户编号'
 ) comment '交易中心配置';
 
--- 用户表增加分销相关字段
-alter table member_user
-    add column brokerage_user_id bigint not null comment '推广员编号';
-alter table member_user
-    add column brokerage_bind_time datetime null comment '推广员绑定时间';
-alter table member_user
-    add column brokerage_enabled bit default 1 not null comment '是否成为推广员';
-alter table member_user
-    add column brokerage_time datetime null comment '成为分销员时间';
-alter table member_user
-    add column brokerage_price int default 0 not null comment '可用佣金';
-alter table member_user
-    add column frozen_brokerage_price int default 0 not null comment '冻结佣金';
+-- 增加分销用户扩展表
+create table trade_brokerage_user
+(
+    id                     bigint auto_increment comment '用户编号' primary key,
+    brokerage_user_id      bigint                                                           not null comment '推广员编号',
+    brokerage_bind_time    datetime                                                         null comment '推广员绑定时间',
+    brokerage_enabled      bit                                    default 1                 not null comment '是否成为推广员',
+    brokerage_time         datetime                                                         null comment '成为分销员时间',
+    brokerage_price        int                                    default 0                 not null comment '可用佣金',
+    frozen_brokerage_price int                                    default 0                 not null comment '冻结佣金',
+    creator                varchar(64) collate utf8mb4_unicode_ci default ''                null comment '创建者',
+    create_time            datetime                               default CURRENT_TIMESTAMP not null comment '创建时间',
+    updater                varchar(64) collate utf8mb4_unicode_ci default ''                null comment '更新者',
+    update_time            datetime                               default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    deleted                bit                                    default b'0'              not null comment '是否删除',
+    tenant_id              bigint                                 default 0                 not null comment '租户编号'
+) comment '分销用户';
 
-create index idx_invite_user_id on member_user (brokerage_user_id) comment '推广员编号';
-create index idx_agent on member_user (brokerage_enabled) comment '是否成为推广员';
+create index idx_invite_user_id on trade_brokerage_user (brokerage_user_id) comment '推广员编号';
+create index idx_agent on trade_brokerage_user (brokerage_enabled) comment '是否成为推广员';
 
 
 create table member_brokerage_record
@@ -150,55 +153,65 @@ values ('brokerage_bank_name', '工商银行', 0, 0),
        ('brokerage_bank_name', '交通银行', 4, 4),
        ('brokerage_bank_name', '招商银行', 5, 5);
 
--- 增加菜单：分销员管理
-INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status, component_name)
-VALUES ('分销员', '', 2, 7, 2262, 'brokerage', 'user', 'member/brokerage/user/index', 0, 'MemberBrokerageUser');
--- 按钮父菜单ID
-SELECT @parentId := LAST_INSERT_ID();
--- 按钮 SQL
-INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
-VALUES ('分销员查询', 'member:brokerage-user:query', 3, 1, @parentId, '', '', '', 0);
-INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
-VALUES ('分销员创建', 'member:brokerage-user:create', 3, 2, @parentId, '', '', '', 0);
-INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
-VALUES ('分销员更新', 'member:brokerage-user:update', 3, 3, @parentId, '', '', '', 0);
-INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
-VALUES ('分销员删除', 'member:brokerage-user:delete', 3, 4, @parentId, '', '', '', 0);
-
--- 增加菜单：佣金记录
-INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status, component_name)
-VALUES ('佣金记录', '', 2, 8, 2262, 'brokerage-record', 'list', 'member/brokerage/record/index', 0,
-        'MemberBrokerageRecord');
--- 按钮父菜单ID
--- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
-SELECT @parentId := LAST_INSERT_ID();
--- 按钮 SQL
-INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
-VALUES ('佣金记录查询', 'member:member-brokerage-record:query', 3, 1, @parentId, '', 'table', '', 0);
-
--- 增加菜单：佣金提现
-INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status, component_name)
-VALUES ('佣金提现', '', 2, 9, 2262, 'brokerage-withdraw', '', 'member/brokerage/withdraw/index', 0,
-        'MemberBrokerageWithdraw');
-
--- 按钮父菜单ID
--- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
-SELECT @parentId := LAST_INSERT_ID();
-
--- 按钮 SQL
-INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
-VALUES ('佣金提现查询', 'member:brokerage-withdraw:query', 3, 1, @parentId, '', '', '', 0);
 
 -- 交易中心配置：菜单 SQL
 INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status, component_name)
-VALUES ('交易中心配置', '', 2, 0, 2072, 'config', '', 'trade/config/index', 0, 'TradeConfig');
-
+VALUES ('交易中心配置', '', 2, 0, 2072, 'config', 'ep:setting', 'trade/config/index', 0, 'TradeConfig');
 -- 按钮父菜单ID
 -- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
 SELECT @parentId := LAST_INSERT_ID();
-
 -- 按钮 SQL
 INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
 VALUES ('交易中心配置查询', 'trade:config:query', 3, 1, @parentId, '', '', '', 0);
 INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
 VALUES ('交易中心配置保存', 'trade:config:save', 3, 2, @parentId, '', '', '', 0);
+
+
+-- 增加菜单：分销
+INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status, component_name)
+VALUES ('分销', '', 1, 5, 2072, 'brokerage', 'fa-solid:project-diagram', '', 0, '');
+-- 按钮父菜单ID
+SELECT @brokerageMenuId := LAST_INSERT_ID();
+
+-- 增加菜单：分销员
+-- 菜单 SQL
+INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status, component_name)
+VALUES ('分销用户', '', 2, 0, @brokerageMenuId, 'brokerage-user', 'fa-solid:user-tie', 'trade/brokerage/user/index', 0,
+        'TradeBrokerageUser');
+-- 按钮父菜单ID
+-- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
+SELECT @parentId := LAST_INSERT_ID();
+-- 按钮 SQL
+INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
+VALUES ('分销用户查询', 'trade:brokerage-user:query', 3, 1, @parentId, '', '', '', 0);
+INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
+VALUES ('分销用户修改推广员', 'trade:brokerage-user:update-brokerage-user', 3, 2, @parentId, '', '', '', 0);
+INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
+VALUES ('分销用户清除推广员', 'trade:brokerage-user:clear-brokerage-user', 3, 3, @parentId, '', '', '', 0);
+INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
+VALUES ('分销用户修改推广资格', 'trade:brokerage-user:update-brokerage-enable', 3, 4, @parentId, '', '', '', 0);
+
+
+-- 增加菜单：佣金记录
+INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status, component_name)
+VALUES ('佣金记录', '', 2, 1, @brokerageMenuId, 'brokerage-record', 'fa:money', 'trade/brokerage/record/index', 0,
+        'TradeBrokerageRecord');
+-- 按钮父菜单ID
+-- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
+SELECT @parentId := LAST_INSERT_ID();
+-- 按钮 SQL
+INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
+VALUES ('佣金记录查询', 'trade:brokerage-record:query', 3, 1, @parentId, '', '', '', 0);
+
+-- 增加菜单：佣金提现
+INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status, component_name)
+VALUES ('佣金提现', '', 2, 2, @brokerageMenuId, 'brokerage-withdraw', 'fa:credit-card',
+        'trade/brokerage/withdraw/index', 0, 'TradeBrokerageWithdraw');
+-- 按钮父菜单ID
+-- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
+SELECT @parentId := LAST_INSERT_ID();
+-- 按钮 SQL
+INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
+VALUES ('佣金提现查询', 'trade:brokerage-withdraw:query', 3, 1, @parentId, '', '', '', 0);
+INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
+VALUES ('佣金提现审核', 'trade:brokerage-withdraw:audit', 3, 2, @parentId, '', '', '', 0);
