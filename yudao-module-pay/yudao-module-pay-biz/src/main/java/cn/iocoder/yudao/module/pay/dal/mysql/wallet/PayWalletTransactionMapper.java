@@ -30,9 +30,8 @@ public interface PayWalletTransactionMapper extends BaseMapperX<PayWalletTransac
         return selectOne(PayWalletTransactionDO::getNo, no);
     }
 
-    default PayWalletTransactionDO selectByWalletIdAndBiz(Long walletId, Long bizId, Integer bizType) {
-        return selectOne(PayWalletTransactionDO::getWalletId, walletId,
-                PayWalletTransactionDO::getBizId, bizId,
+    default PayWalletTransactionDO selectByBiz(String bizId, Integer bizType) {
+        return selectOne(PayWalletTransactionDO::getBizId, bizId,
                 PayWalletTransactionDO::getBizType, bizType);
     }
 

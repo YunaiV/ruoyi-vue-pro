@@ -22,7 +22,6 @@ public class PayWalletTransactionServiceImpl implements PayWalletTransactionServ
 
     @Resource
     private PayWalletService payWalletService;
-
     @Resource
     private PayWalletTransactionMapper payWalletTransactionMapper;
 
@@ -45,8 +44,7 @@ public class PayWalletTransactionServiceImpl implements PayWalletTransactionServ
     }
 
     @Override
-    public PayWalletTransactionDO getWalletTransaction(Long walletId, Long bizId, PayWalletBizTypeEnum type) {
-        return payWalletTransactionMapper.selectByWalletIdAndBiz(walletId, bizId, type.getType());
+    public PayWalletTransactionDO getWalletTransaction(String bizId, PayWalletBizTypeEnum type) {
+        return payWalletTransactionMapper.selectByBiz(bizId, type.getType());
     }
-
 }

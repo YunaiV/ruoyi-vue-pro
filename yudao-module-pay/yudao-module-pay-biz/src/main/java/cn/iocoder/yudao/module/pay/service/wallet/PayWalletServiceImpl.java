@@ -75,7 +75,7 @@ public class PayWalletServiceImpl implements  PayWalletService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public PayWalletTransactionDO pay(Long userId, Integer userType, String outTradeNo, Integer price) {
+    public PayWalletTransactionDO orderPay(Long userId, Integer userType, String outTradeNo, Integer price) {
         // 判断支付交易拓展单是否存
         PayOrderExtensionDO orderExtension = payOrderService.getOrderExtensionByNo(outTradeNo);
         if (orderExtension == null) {
@@ -150,7 +150,7 @@ public class PayWalletServiceImpl implements  PayWalletService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public PayWalletTransactionDO refund(String outRefundNo, Integer refundPrice, String reason) {
+    public PayWalletTransactionDO orderRefund(String outRefundNo, Integer refundPrice, String reason) {
         // 1.1 判断退款单是否存在
         PayRefundDO payRefund = payRefundService.getRefundByNo(outRefundNo);
         if (payRefund == null) {
@@ -182,7 +182,7 @@ public class PayWalletServiceImpl implements  PayWalletService {
             throw exception(WALLET_REFUND_AMOUNT_ERROR);
         }
         PayWalletTransactionDO refundTransaction = payWalletTransactionService.getWalletTransaction(
-                payWalletTransaction.getWalletId(), refundId, PAYMENT_REFUND);
+                String.valueOf(refundId), PAYMENT_REFUND);
         if (refundTransaction != null) {
             throw exception(WALLET_REFUND_EXIST);
         }

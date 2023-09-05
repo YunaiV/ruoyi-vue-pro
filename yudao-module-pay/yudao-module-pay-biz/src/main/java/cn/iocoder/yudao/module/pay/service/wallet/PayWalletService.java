@@ -27,7 +27,7 @@ public interface PayWalletService {
      * @param outTradeNo 外部订单号
      * @param price 金额
      */
-    PayWalletTransactionDO pay(Long userId, Integer userType, String outTradeNo, Integer price);
+    PayWalletTransactionDO orderPay(Long userId, Integer userType, String outTradeNo, Integer price);
 
 
     /**
@@ -64,6 +64,6 @@ public interface PayWalletService {
      * @param refundPrice 退款金额
      * @param reason  退款原因
      */
-    PayWalletTransactionDO refund(String outRefundNo, Integer refundPrice, String reason);
+    PayWalletTransactionDO orderRefund(String outRefundNo, Integer refundPrice, String reason);
 
 }

@@ -40,11 +40,9 @@ public interface PayWalletTransactionService {
     /**
      * 获取钱包流水
      *
-     * @param walletId 钱包编号
      * @param bizId  业务编号
      * @param type  业务类型
      * @return 钱包流水
      */
-    PayWalletTransactionDO getWalletTransaction(Long walletId, Long bizId, PayWalletBizTypeEnum type);
-
+    PayWalletTransactionDO getWalletTransaction(String bizId, PayWalletBizTypeEnum type);
 }
