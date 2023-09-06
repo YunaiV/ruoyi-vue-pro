@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.member.controller.app.brokerage.vo.user;
+package cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;

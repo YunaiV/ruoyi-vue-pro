@@ -1,10 +1,10 @@
-package cn.iocoder.yudao.module.member.controller.app.brokerage;
+package cn.iocoder.yudao.module.trade.controller.app.brokerage;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
-import cn.iocoder.yudao.module.member.controller.app.brokerage.vo.record.AppBrokerageRecordPageReqVO;
-import cn.iocoder.yudao.module.member.controller.app.brokerage.vo.record.AppBrokerageRecordRespVO;
+import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.record.AppBrokerageRecordPageReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.record.AppBrokerageRecordRespVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ import static java.util.Arrays.asList;
 
 @Tag(name = "用户 APP - 分销用户")
 @RestController
-@RequestMapping("/member/brokerage-record")
+@RequestMapping("/trade/brokerage-record")
 @Validated
 @Slf4j
 public class AppBrokerageRecordController {

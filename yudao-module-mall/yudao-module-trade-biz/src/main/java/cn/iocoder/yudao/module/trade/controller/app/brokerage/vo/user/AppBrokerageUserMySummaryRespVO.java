@@ -1,11 +1,11 @@
-package cn.iocoder.yudao.module.member.controller.app.brokerage.vo.user;
+package cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Schema(description = "用户 App - 个人分销统计 Response VO")
 @Data
-public class AppBrokerageUserSummaryRespVO {
+public class AppBrokerageUserMySummaryRespVO {
 
     @Schema(description = "昨天的佣金，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     private Integer yesterdayBrokeragePrice;
@@ -18,5 +18,11 @@ public class AppBrokerageUserSummaryRespVO {
 
     @Schema(description = "冻结的佣金，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "234")
     private Integer frozenBrokeragePrice;
+
+    @Schema(description = "分销用户数量（一级）", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
+    private Integer firstBrokerageUserCount;
+
+    @Schema(description = "分销用户数量（二级）", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
+    private Integer secondBrokerageUserCount;
 
 }
