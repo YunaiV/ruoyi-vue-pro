@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDT
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
+import cn.iocoder.yudao.framework.pay.core.client.impl.NonePayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 
 import java.time.LocalDateTime;
@@ -17,11 +18,11 @@ import java.util.Map;
  *
  * @author jason
  */
-public class MockPayClient extends AbstractPayClient<MockPayClientConfig> {
+public class MockPayClient extends AbstractPayClient<NonePayClientConfig> {
 
     private static final String MOCK_RESP_SUCCESS_DATA = "MOCK_SUCCESS";
 
-    public MockPayClient(Long channelId, MockPayClientConfig config) {
+    public MockPayClient(Long channelId, NonePayClientConfig config) {
         super(channelId, PayChannelEnum.MOCK.getCode(), config);
     }
 
