@@ -74,4 +74,8 @@ public interface ErrorCodeConstants {
     // ==========  物流 PICK_UP 模块 1011006000 ==========
     ErrorCode PICK_UP_STORE_NOT_EXISTS = new ErrorCode(1011006000, "自提门店不存在");
 
+
+    // ==========  分销 分销用户 模块 1011007000 ==========
+    ErrorCode BROKERAGE_USER_NOT_EXISTS = new ErrorCode(1011007000, "分销用户不存在");
+
 }

@@ -30,7 +30,6 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
@@ -258,27 +257,6 @@ public class MemberUserServiceImpl implements MemberUserService {
     @Override
     public void updateUserPoint(Long userId, Integer point) {
         memberUserMapper.updateById(new MemberUserDO().setId(userId).setPoint(point));
-    }
-
-    @Override
-    public MemberUserDO getBrokerageUser(Long id) {
-        return Optional.ofNullable(id)
-                .map(this::getUser)
-                .map(MemberUserDO::getBrokerageUserId)
-                .map(this::getUser)
-                .orElse(null);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateUserBrokeragePrice(Long id, int brokeragePrice) {
-        memberUserMapper.updateBrokeragePriceIncr(id, brokeragePrice);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateUserFrozenBrokeragePrice(Long id, int frozenBrokeragePrice) {
-        memberUserMapper.updateFrozenBrokeragePriceIncr(id, frozenBrokeragePrice);
     }
 
 }

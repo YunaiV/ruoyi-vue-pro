@@ -70,6 +70,7 @@ public class PayOrderController {
     @PostMapping("/submit")
     @Operation(summary = "提交支付订单")
     public CommonResult<PayOrderSubmitRespVO> submitPayOrder(@RequestBody PayOrderSubmitReqVO reqVO) {
+        // 钱包支付需要 额外传 user_id 和 user_type
         if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
             Map<String, String> channelExtras = reqVO.getChannelExtras() == null ? new HashMap<>(8) : reqVO.getChannelExtras();
             channelExtras.put("user_id", String.valueOf(WebFrameworkUtils.getLoginUserId()));
