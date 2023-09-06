@@ -51,7 +51,7 @@ public interface ErrorCodeConstants {
 
     // ========== 秒杀活动 1013008000 ==========
     ErrorCode SECKILL_ACTIVITY_NOT_EXISTS = new ErrorCode(1013008000, "秒杀活动不存在");
-    ErrorCode SECKILL_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1013008002, "存在商品参加了其它秒杀活动");
+    ErrorCode SECKILL_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1013008002, "存在商品参加了其它秒杀活动，秒杀时段冲突");
     ErrorCode SECKILL_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED = new ErrorCode(1013008003, "秒杀活动已关闭，不能修改");
     ErrorCode SECKILL_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1013008004, "秒杀活动未关闭或未结束，不能删除");
     ErrorCode SECKILL_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1013008005, "秒杀活动已关闭，不能重复关闭");

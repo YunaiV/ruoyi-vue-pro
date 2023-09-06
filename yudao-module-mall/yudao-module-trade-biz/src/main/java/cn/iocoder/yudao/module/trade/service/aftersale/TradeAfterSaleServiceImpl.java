@@ -90,12 +90,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
 
     @Override
     public TradeAfterSaleDO getAfterSale(Long id) {
-        TradeAfterSaleDO afterSale = tradeAfterSaleMapper.selectById(id);
-        // TODO @puhui999；读不到，不要这里报错哈；交给前端报错；一般是读取信息不到，message 提示，然后 close tab；
-        if (afterSale == null) {
-            throw exception(AFTER_SALE_NOT_FOUND);
-        }
-        return afterSale;
+        return tradeAfterSaleMapper.selectById(id);
     }
 
     // TODO 芋艿：拼团失败，要不要发起售后的方式退款？还是走取消逻辑？

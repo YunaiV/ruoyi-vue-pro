@@ -92,15 +92,9 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         if (activityId != null) { // 排除自己
             activityList.removeIf(item -> ObjectUtil.equal(item.getId(), activityId));
         }
-        // TODO @puhui999：一个 spu，参与两个活动应该没关系，关键是活动时间不充能重叠；
-        // 2.2 过滤出所有 spuId 有交集的活动，判断是否存在重叠
-        List<SeckillActivityDO> activityDOs1 = filterList(activityList, s -> ObjectUtil.equal(s.getSpuId(), spuId));
-        if (isNotEmpty(activityDOs1)) {
-            throw exception(SECKILL_ACTIVITY_SPU_CONFLICTS);
-        }
-        // 2.3 过滤出所有 configIds 有交集的活动，判断是否存在重叠
-        List<SeckillActivityDO> activityDOs2 = filterList(activityList, s -> containsAny(s.getConfigIds(), configIds));
-        if (isNotEmpty(activityDOs2)) {
+        // 2.2 过滤出所有 configIds 有交集的活动，判断是否存在重叠
+        List<SeckillActivityDO> activityDOs = filterList(activityList, s -> containsAny(s.getConfigIds(), configIds));
+        if (isNotEmpty(activityDOs)) {
             throw exception(SECKILL_ACTIVITY_SPU_CONFLICTS);
         }
     }

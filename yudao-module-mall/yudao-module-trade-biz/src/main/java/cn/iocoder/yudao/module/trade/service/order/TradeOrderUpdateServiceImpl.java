@@ -28,7 +28,6 @@ import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.promotion.api.bargain.BargainRecordApi;
 import cn.iocoder.yudao.module.promotion.api.combination.CombinationRecordApi;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordRespDTO;
-import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordUpdateStatusReqDTO;
 import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponUseReqDTO;
 import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
@@ -352,8 +351,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 1、拼团活动
         if (Objects.equals(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
             // 更新拼团状态 TODO puhui999：订单支付失败或订单支付过期删除这条拼团记录
-            combinationRecordApi.updateCombinationRecordStatus(new CombinationRecordUpdateStatusReqDTO().setUserId(order.getUserId())
-                    .setOrderId(order.getId()).setStatus(CombinationRecordStatusEnum.IN_PROGRESS.getStatus()).setStartTime(LocalDateTime.now()));
+            combinationRecordApi.updateRecordStatusToInProgress(order.getUserId(), order.getId(), LocalDateTime.now());
         }
         // TODO 芋艿：发送订单变化的消息
 

@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.promotion.service.combination;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
-import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordUpdateStatusReqDTO;
 import cn.iocoder.yudao.module.promotion.convert.combination.CombinationActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
@@ -21,6 +20,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 
 // TODO 芋艿：等拼团记录做完，完整 review 下
+
 /**
  * 拼团记录 Service 实现类
  *
@@ -38,27 +38,27 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateCombinationRecordStatusByUserIdAndOrderId(CombinationRecordUpdateStatusReqDTO reqDTO) {
+    public void updateCombinationRecordStatusByUserIdAndOrderId(Integer status, Long userId, Long orderId) {
         // 校验拼团是否存在
-        CombinationRecordDO recordDO = validateCombinationRecord(reqDTO.getUserId(), reqDTO.getOrderId());
+        CombinationRecordDO recordDO = validateCombinationRecord(userId, orderId);
 
         // 更新状态
-        recordDO.setStatus(reqDTO.getStatus());
+        recordDO.setStatus(status);
         recordMapper.updateById(recordDO);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateCombinationRecordStatusAndStartTimeByUserIdAndOrderId(CombinationRecordUpdateStatusReqDTO reqDTO) {
-        CombinationRecordDO recordDO = validateCombinationRecord(reqDTO.getUserId(), reqDTO.getOrderId());
+    public void updateRecordStatusAndStartTimeByUserIdAndOrderId(Integer status, Long userId, Long orderId, LocalDateTime startTime) {
+        CombinationRecordDO recordDO = validateCombinationRecord(userId, orderId);
         // 更新状态
-        recordDO.setStatus(reqDTO.getStatus());
+        recordDO.setStatus(status);
         // 更新开始时间
-        recordDO.setStartTime(reqDTO.getStartTime());
+        recordDO.setStartTime(startTime);
         recordMapper.updateById(recordDO);
 
         // 更新拼团参入人数
-        List<CombinationRecordDO> recordDOs = recordMapper.selectListByHeadIdAndStatus(recordDO.getHeadId(), reqDTO.getStatus());
+        List<CombinationRecordDO> recordDOs = recordMapper.selectListByHeadIdAndStatus(recordDO.getHeadId(), status);
         if (CollUtil.isNotEmpty(recordDOs)) {
             recordDOs.forEach(item -> {
                 item.setUserCount(recordDOs.size());
@@ -115,8 +115,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         // 2. 创建拼团记录
         CombinationRecordDO record = CombinationActivityConvert.INSTANCE.convert(reqDTO);
         record.setVirtualGroup(false);
-        // TODO @puhui999：过期时间，应该是 Date 哈；
-        record.setExpireTime(activity.getLimitDuration());
+        record.setExpireTime(record.getStartTime().plusHours(activity.getLimitDuration()));
         record.setUserSize(activity.getUserSize());
         recordMapper.insert(record);
     }
