@@ -29,6 +29,17 @@ import static java.util.Arrays.asList;
 public class AppBrokerageUserController {
 
     // TODO 芋艿：临时 mock =>
+    @GetMapping("/get")
+    @Operation(summary = "获得个人分销信息")
+    @PreAuthenticated
+    public CommonResult<AppBrokerageUserRespVO> getBrokerageUser() {
+        AppBrokerageUserRespVO respVO = new AppBrokerageUserRespVO()
+                .setBrokeragePrice(2000)
+                .setFrozenBrokeragePrice(3000);
+        return success(respVO);
+    }
+
+    // TODO 芋艿：临时 mock =>
     @GetMapping("/get-summary")
     @Operation(summary = "获得个人分销统计")
     @PreAuthenticated

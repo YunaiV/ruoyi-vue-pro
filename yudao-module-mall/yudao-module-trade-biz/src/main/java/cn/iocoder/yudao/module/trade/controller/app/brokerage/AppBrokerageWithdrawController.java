@@ -3,15 +3,15 @@ package cn.iocoder.yudao.module.trade.controller.app.brokerage;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
+import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.withdraw.AppBrokerageWithdrawCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.withdraw.AppBrokerageWithdrawRespVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -34,6 +34,14 @@ public class AppBrokerageWithdrawController {
         AppBrokerageWithdrawRespVO vo2 = new AppBrokerageWithdrawRespVO()
                 .setId(2L).setStatus(0).setPrice(20).setStatusName("审批中").setCreateTime(LocalDateTime.now());
         return success(new PageResult<>(asList(vo1, vo2), 10L));
+    }
+
+    // TODO 芋艿：临时 mock =>
+    @PostMapping("/create")
+    @Operation(summary = "创建分销提现")
+    @PreAuthenticated
+    public CommonResult<Long> createBrokerageWithdraw(@RequestBody @Valid AppBrokerageWithdrawCreateReqVO createReqVO) {
+        return success(1L);
     }
 
 }
