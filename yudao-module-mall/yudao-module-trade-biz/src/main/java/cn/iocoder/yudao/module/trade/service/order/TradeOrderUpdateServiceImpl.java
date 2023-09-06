@@ -12,8 +12,8 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
-import cn.iocoder.yudao.module.member.api.brokerage.BrokerageApi;
-import cn.iocoder.yudao.module.member.api.brokerage.dto.BrokerageAddReqDTO;
+import cn.iocoder.yudao.module.trade.service.brokerage.record.TradeBrokerageRecordService;
+import cn.iocoder.yudao.module.trade.service.brokerage.record.bo.BrokerageAddReqBO;
 import cn.iocoder.yudao.module.member.api.level.MemberLevelApi;
 import cn.iocoder.yudao.module.member.api.point.MemberPointApi;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
@@ -120,7 +120,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Resource
     private MemberPointApi memberPointApi;
     @Resource
-    private BrokerageApi brokerageApi;
+    private TradeBrokerageRecordService tradeBrokerageRecordService;
     @Resource
     private ProductCommentApi productCommentApi;
 
@@ -635,12 +635,12 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                     .setRefundStatus(TradeOrderRefundStatusEnum.PART.getStatus()).setRefundPrice(orderRefundPrice));
         }
 
-        // TODO 芋艿：未来如果有分佣，需要更新相关分佣订单为已失效
-
         // 扣减用户积分
         getSelf().reduceUserPointAsync(order.getUserId(), orderRefundPrice, afterSaleId);
         // 扣减用户经验
         getSelf().reduceUserExperienceAsync(order.getUserId(), orderRefundPrice, afterSaleId);
+        // 更新分佣记录为已失效
+        getSelf().cancelBrokerageAsync(order.getUserId(), id);
     }
 
     @Override
@@ -752,9 +752,14 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Async
     protected void addBrokerageAsync(Long userId, Long orderId) {
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(orderId);
-        List<BrokerageAddReqDTO> list = convertList(orderItems,
+        List<BrokerageAddReqBO> list = convertList(orderItems,
                 item -> TradeOrderConvert.INSTANCE.convert(item, productSkuApi.getSku(item.getSkuId())));
-        brokerageApi.addBrokerage(userId, list);
+        tradeBrokerageRecordService.addBrokerage(userId, list);
+    }
+
+    @Async
+    protected void cancelBrokerageAsync(Long userId, Long orderItemId) {
+        tradeBrokerageRecordService.cancelBrokerage(userId, String.valueOf(orderItemId));
     }
 
     /**
