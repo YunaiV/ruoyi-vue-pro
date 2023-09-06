@@ -32,6 +32,7 @@ public class MemberGroupServiceImpl implements MemberGroupService {
 
     @Resource
     private MemberGroupMapper memberGroupMapper;
+
     @Resource
     private MemberUserService memberUserService;
 
