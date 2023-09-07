@@ -40,7 +40,7 @@ public interface TradeBrokerageRecordConvert {
                 .setBizId(bizId)
                 .setPrice(brokerage)
                 .setTotalPrice(user.getBrokeragePrice())
-                .setTitle(BrokerageRecordBizTypeEnum.ORDER.getTitle())
+                .setTitle(BrokerageRecordBizTypeEnum.ORDER.getTitle())  // TODO @疯狂：可能 title 不是很固化，会存在类似：沐晴成功购买《XXX JVM 实战》
                 .setDescription(StrUtil.format(BrokerageRecordBizTypeEnum.ORDER.getDescription(), String.valueOf(brokerage / 100.0)))
                 .setStatus(status)
                 .setFrozenDays(brokerageFrozenDays)

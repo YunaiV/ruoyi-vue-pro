@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
@@ -21,7 +22,7 @@ public class TradeBrokerageRecordBaseVO {
     private Long userId;
 
     @Schema(description = "业务编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "23353")
-    @NotNull(message = "业务编号不能为空")
+    @NotEmpty(message = "业务编号不能为空")
     private String bizId;
 
     @Schema(description = "业务类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
@@ -29,7 +30,7 @@ public class TradeBrokerageRecordBaseVO {
     private Integer bizType;
 
     @Schema(description = "标题", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "标题不能为空")
+    @NotEmpty(message = "标题不能为空")
     private String title;
 
     @Schema(description = "金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "28731")

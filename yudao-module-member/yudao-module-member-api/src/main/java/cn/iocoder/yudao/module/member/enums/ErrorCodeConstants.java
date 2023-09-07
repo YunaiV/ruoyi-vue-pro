@@ -9,7 +9,7 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
  */
 public interface ErrorCodeConstants {
 
-    // ========== 用户相关  1004001000============
+    // ========== 用户相关 1004001000============
     ErrorCode USER_NOT_EXISTS = new ErrorCode(1004001000, "用户不存在");
     ErrorCode USER_MOBILE_NOT_EXISTS = new ErrorCode(1004001001, "手机号未注册用户");
     ErrorCode USER_MOBILE_USED = new ErrorCode(1004001002, "修改手机失败，该手机号({})已经被使用");

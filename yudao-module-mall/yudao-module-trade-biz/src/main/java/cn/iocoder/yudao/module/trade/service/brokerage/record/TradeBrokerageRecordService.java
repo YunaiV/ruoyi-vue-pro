@@ -30,6 +30,7 @@ public interface TradeBrokerageRecordService {
      */
     PageResult<TradeBrokerageRecordDO> getBrokerageRecordPage(TradeBrokerageRecordPageReqVO pageReqVO);
 
+    // TODO @疯狂：是不是 bizType 得加下？方便未来拓展哈；
     /**
      * 增加佣金
      *
@@ -38,8 +39,10 @@ public interface TradeBrokerageRecordService {
      */
     void addBrokerage(Long userId, List<BrokerageAddReqBO> list);
 
+    // TODO @疯狂：是不是 bizType 得加下？方便未来拓展哈；
     /**
      * 取消佣金：将佣金记录，状态修改为已失效
+     *
      * @param userId 会员编号
      * @param bizId 业务编号
      */
@@ -51,4 +54,5 @@ public interface TradeBrokerageRecordService {
      * @return 解冻佣金的数量
      */
     int unfreezeRecord();
+
 }

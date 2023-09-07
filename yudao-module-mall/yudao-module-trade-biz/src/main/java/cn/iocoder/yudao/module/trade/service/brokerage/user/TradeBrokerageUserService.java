@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.user.TradeBrokerag
 import java.util.Collection;
 import java.util.List;
 
+// TODO @疯狂：要不去掉 Trade 前缀哈；交易这块，我准备除了 tradeorder 保持下，类似 aftersale，都要取消前缀了；tradeorder 保持的原因，是避免 payorder 和它重复
 /**
  * 分销用户 Service 接口
  *
@@ -70,6 +71,7 @@ public interface TradeBrokerageUserService {
      */
     void updateUserBrokeragePrice(Long id, int brokeragePrice);
 
+    // TODO @疯狂：int 类型一般不用哈；尽量都用封装类型；不差这点内存哈；
     /**
      * 更新用户冻结佣金
      *
@@ -85,4 +87,5 @@ public interface TradeBrokerageUserService {
      * @param frozenBrokeragePrice 减少冻结佣金（负数）
      */
     void updateFrozenBrokeragePriceDecrAndBrokeragePriceIncr(Long id, int frozenBrokeragePrice);
+
 }

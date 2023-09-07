@@ -8,6 +8,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+// TODO @疯狂：因为独立了表，是不是可以把字段的 brokerage 去掉了哈？
 /**
  * 分销用户 DO
  *
@@ -28,14 +29,19 @@ public class TradeBrokerageUserDO extends BaseDO {
      */
     @TableId
     private Long id;
+
+    // TODO @疯狂：貌似改成 bindUserId，更明确？
     /**
      * 推广员编号
+     *
+     * 关联 MemberUserDO 的 id 字段
      */
     private Long brokerageUserId;
     /**
      * 推广员绑定时间
      */
     private LocalDateTime brokerageBindTime;
+
     /**
      * 推广资格
      */
@@ -44,6 +50,7 @@ public class TradeBrokerageUserDO extends BaseDO {
      * 成为分销员时间
      */
     private LocalDateTime brokerageTime;
+
     /**
      * 可用佣金
      */

@@ -15,6 +15,7 @@ import java.util.Arrays;
 @Getter
 public enum BrokerageBindModeEnum implements IntArrayValuable {
 
+    // TODO @疯狂：要不从 1 开始？
     /**
      * 只要用户没有推广人，随时都可以绑定分销关系
      */
@@ -23,6 +24,7 @@ public enum BrokerageBindModeEnum implements IntArrayValuable {
      * 仅新用户注册时才能绑定推广关系
      */
     REGISTER(1, "新用户"),
+    // TODO @疯狂：要加个 2，每次扫码都覆盖
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BrokerageBindModeEnum::getMode).toArray();

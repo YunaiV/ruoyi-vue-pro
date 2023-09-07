@@ -12,7 +12,6 @@ import javax.validation.Valid;
  */
 public interface TradeConfigService {
 
-
     /**
      * 更新交易中心配置
      *

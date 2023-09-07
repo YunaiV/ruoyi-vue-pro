@@ -15,6 +15,8 @@ public class TradeBrokerageUserUpdateBrokerageEnabledReqVO {
     @NotNull(message = "用户编号不能为空")
     private Long id;
 
+    // TODO @疯狂：是不是这个字段，可以改成 enabled
+
     @Schema(description = "推广资格", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "推广资格不能为空")
     private Boolean brokerageEnabled;

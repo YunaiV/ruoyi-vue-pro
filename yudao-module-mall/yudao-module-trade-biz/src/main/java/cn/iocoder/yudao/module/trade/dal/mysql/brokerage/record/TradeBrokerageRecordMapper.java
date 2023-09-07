@@ -40,8 +40,10 @@ public interface TradeBrokerageRecordMapper extends BaseMapperX<TradeBrokerageRe
                 .eq(TradeBrokerageRecordDO::getStatus, status));
     }
 
+    // TODO @疯狂：userId???
     default TradeBrokerageRecordDO selectByUserIdAndBizTypeAndBizId(Integer bizType, String bizId) {
         return selectOne(TradeBrokerageRecordDO::getBizType, bizType,
                 TradeBrokerageRecordDO::getBizId, bizId);
     }
+
 }

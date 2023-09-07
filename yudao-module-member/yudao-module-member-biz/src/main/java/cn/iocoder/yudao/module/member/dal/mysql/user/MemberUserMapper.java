@@ -61,4 +61,5 @@ public interface MemberUserMapper extends BaseMapperX<MemberUserDO> {
         return selectCount(new LambdaQueryWrapperX<MemberUserDO>()
                 .apply("FIND_IN_SET({0}, tag_ids)", tagId));
     }
+
 }

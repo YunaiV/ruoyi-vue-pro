@@ -30,12 +30,6 @@ public class TradeBrokerageUserServiceImpl implements TradeBrokerageUserService 
     @Resource
     private TradeBrokerageUserMapper brokerageUserMapper;
 
-    private void validateBrokerageUserExists(Long id) {
-        if (brokerageUserMapper.selectById(id) == null) {
-            throw exception(BROKERAGE_USER_NOT_EXISTS);
-        }
-    }
-
     @Override
     public TradeBrokerageUserDO getBrokerageUser(Long id) {
         return brokerageUserMapper.selectById(id);
@@ -55,15 +49,23 @@ public class TradeBrokerageUserServiceImpl implements TradeBrokerageUserService 
     public void updateBrokerageUserId(Long id, Long brokerageUserId) {
         // 校验存在
         validateBrokerageUserExists(id);
-
+        // TODO @疯狂：貌似没实现完
     }
 
     @Override
     public void updateBrokerageEnabled(Long id, Boolean brokerageEnabled) {
         // 校验存在
         validateBrokerageUserExists(id);
+        // TODO @疯狂：貌似没实现完
     }
 
+    private void validateBrokerageUserExists(Long id) {
+        if (brokerageUserMapper.selectById(id) == null) {
+            throw exception(BROKERAGE_USER_NOT_EXISTS);
+        }
+    }
+
+    // TODO @疯狂：getBindBrokerageUser 会不会好点，因为统一使用 Bind 替代了 Invite
     @Override
     public TradeBrokerageUserDO getInviteBrokerageUser(Long id) {
         return Optional.ofNullable(id)
@@ -73,6 +75,7 @@ public class TradeBrokerageUserServiceImpl implements TradeBrokerageUserService 
                 .orElse(null);
     }
 
+    // TODO @疯狂：单个更新，不用事务哈；
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateUserBrokeragePrice(Long id, int brokeragePrice) {
@@ -83,6 +86,7 @@ public class TradeBrokerageUserServiceImpl implements TradeBrokerageUserService 
         }
     }
 
+    // TODO @疯狂：单个更新，不用事务哈；
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateUserFrozenBrokeragePrice(Long id, int frozenBrokeragePrice) {
@@ -93,12 +97,14 @@ public class TradeBrokerageUserServiceImpl implements TradeBrokerageUserService 
         }
     }
 
+    // TODO @疯狂：单个更新，不用事务哈；
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateFrozenBrokeragePriceDecrAndBrokeragePriceIncr(Long id, int frozenBrokeragePrice) {
         Assert.isTrue(frozenBrokeragePrice < 0);
         int updateRows = brokerageUserMapper.updateFrozenBrokeragePriceDecrAndBrokeragePriceIncr(id, frozenBrokeragePrice);
         if (updateRows == 0) {
+            // TODO @疯狂：挪到 trade 这变的错误码哈；
             throw exception(MEMBER_FROZEN_BROKERAGE_PRICE_NOT_ENOUGH);
         }
     }

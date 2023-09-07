@@ -15,6 +15,7 @@ import java.util.Arrays;
 @Getter
 public enum BrokerageEnabledConditionEnum implements IntArrayValuable {
 
+    // TODO @疯狂：这个也从 1 开始哇
     /**
      * 所有用户都可以分销
      */

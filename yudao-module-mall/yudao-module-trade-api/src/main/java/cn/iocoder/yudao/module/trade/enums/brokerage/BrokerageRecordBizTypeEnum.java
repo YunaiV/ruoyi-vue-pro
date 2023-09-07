@@ -15,6 +15,7 @@ import java.util.Arrays;
 @Getter
 public enum BrokerageRecordBizTypeEnum implements IntArrayValuable {
 
+    // TODO @疯狂：这个也从 1 开始哇
     ORDER(0, "获得推广佣金", "获得推广佣金 {}", true),
     WITHDRAW(1, "提现申请", "提现申请扣除佣金 {}", false),
     ;

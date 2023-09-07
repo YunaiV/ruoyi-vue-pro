@@ -136,6 +136,7 @@ public class MemberUserDO extends TenantBaseDO {
      */
     private Long groupId;
 
+    // TODO @疯狂：看看要不要删除掉哈
     // ========== 分销相关 ==========
 
     /**

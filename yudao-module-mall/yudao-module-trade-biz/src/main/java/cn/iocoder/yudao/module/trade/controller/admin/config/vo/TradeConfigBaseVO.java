@@ -54,6 +54,7 @@ public class TradeConfigBaseVO {
     @PositiveOrZero(message = "用户提现最低金额不能是负数")
     private Integer brokerageWithdrawMinPrice;
 
+    // TODO @疯狂：要不要做成字典？按道理都可以体现对哇？感觉是全局的配置哈；
     @Schema(description = "提现银行", requiredMode = Schema.RequiredMode.REQUIRED, example = "[0, 1]")
     @NotEmpty(message = "提现银行不能为空")
     private List<Integer> brokerageBankNames;

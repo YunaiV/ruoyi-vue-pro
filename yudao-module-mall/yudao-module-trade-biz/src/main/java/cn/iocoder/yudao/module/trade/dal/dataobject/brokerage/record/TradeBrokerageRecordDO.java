@@ -41,13 +41,19 @@ public class TradeBrokerageRecordDO extends BaseDO {
     /**
      * 业务类型
      * <p>
-     * 枚举 {@link BrokerageRecordBizTypeEnum 对应的类}
+     * 枚举 {@link BrokerageRecordBizTypeEnum}
      */
     private Integer bizType;
+
     /**
      * 标题
      */
     private String title;
+    /**
+     * 说明
+     */
+    private String description;
+
     /**
      * 金额
      */
@@ -56,16 +62,14 @@ public class TradeBrokerageRecordDO extends BaseDO {
      * 当前总佣金
      */
     private Integer totalPrice;
-    /**
-     * 说明
-     */
-    private String description;
+
     /**
      * 状态
      * <p>
-     * 枚举 {@link BrokerageRecordStatusEnum 对应的类}
+     * 枚举 {@link BrokerageRecordStatusEnum}
      */
     private Integer status;
+
     /**
      * 冻结时间（天）
      */

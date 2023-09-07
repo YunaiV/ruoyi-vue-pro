@@ -60,6 +60,7 @@ public class ProductSkuRespDTO {
      */
     private Double volume;
 
+    // TODO @puhui：这 2 字段，需要改下；firstBrokerageRecord、secondBrokerageRecord；和分佣保持一致；
     /**
      * 一级分销的佣金，单位：分
      */
