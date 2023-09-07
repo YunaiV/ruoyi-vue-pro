@@ -24,5 +24,4 @@ public interface NotifyMessageConvert {
 
     PageResult<NotifyMessageRespVO> convertPage(PageResult<NotifyMessageDO> page);
 
-
 }

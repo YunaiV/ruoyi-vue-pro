@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.datapermission.core.rule.DataPermissionRule;
 import cn.iocoder.yudao.framework.datapermission.core.rule.DataPermissionRuleFactory;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
-import com.alibaba.ttl.TransmittableThreadLocal;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.PluginUtils;
 import com.baomidou.mybatisplus.extension.parser.JsqlParserSupport;
@@ -508,6 +507,9 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
             // 单条规则的条件
             String tableName = MyBatisUtils.getTableName(table);
             Expression oneExpress = rule.getExpression(tableName, table.getAlias());
+            if (oneExpress == null){
+                continue;
+            }
             // 拼接到 allExpression 中
             allExpression = allExpression == null ? oneExpress
                     : new AndExpression(allExpression, oneExpress);

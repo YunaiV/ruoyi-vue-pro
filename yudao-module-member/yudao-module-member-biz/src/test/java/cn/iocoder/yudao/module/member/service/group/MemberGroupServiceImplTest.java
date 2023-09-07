@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.member.service.group;
 
-import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
@@ -8,11 +7,10 @@ import cn.iocoder.yudao.module.member.controller.admin.group.vo.MemberGroupCreat
 import cn.iocoder.yudao.module.member.controller.admin.group.vo.MemberGroupPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.group.vo.MemberGroupUpdateReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.group.MemberGroupDO;
-import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.group.MemberGroupMapper;
-import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
-import cn.iocoder.yudao.module.system.enums.common.SexEnum;
+import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
@@ -26,7 +24,10 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.GROUP_HAS_USER;
 import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.GROUP_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
+// TODO 芋艿：完全 review 完，在去 review 单测
 /**
  * {@link MemberGroupServiceImpl} 的单元测试类
  *
@@ -40,13 +41,15 @@ public class MemberGroupServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private MemberGroupMapper groupMapper;
-    @Resource
-    private MemberUserMapper memberUserMapper;
+
+    @MockBean
+    private MemberUserService memberUserService;
 
     @Test
     public void testCreateGroup_success() {
         // 准备参数
-        MemberGroupCreateReqVO reqVO = randomPojo(MemberGroupCreateReqVO.class);
+        MemberGroupCreateReqVO reqVO = randomPojo(MemberGroupCreateReqVO.class,
+                o -> o.setStatus(randomCommonStatus()));
 
         // 调用
         Long groupId = groupService.createGroup(reqVO);
@@ -65,6 +68,7 @@ public class MemberGroupServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         MemberGroupUpdateReqVO reqVO = randomPojo(MemberGroupUpdateReqVO.class, o -> {
             o.setId(dbGroup.getId()); // 设置更新的 ID
+            o.setStatus(randomCommonStatus());
         });
 
         // 调用
@@ -115,11 +119,7 @@ public class MemberGroupServiceImplTest extends BaseDbUnitTest {
         Long id = dbGroup.getId();
 
         // mock 会员数据
-        MemberUserDO dbUser = randomPojo(MemberUserDO.class, o -> {
-            o.setGroupId(id);
-            o.setSex(RandomUtil.randomEle(SexEnum.values()).getSex());
-        });
-        memberUserMapper.insert(dbUser);
+        when(memberUserService.getUserCountByGroupId(eq(id))).thenReturn(1L);
 
         // 调用, 并断言异常
         assertServiceException(() -> groupService.deleteGroup(id), GROUP_HAS_USER);

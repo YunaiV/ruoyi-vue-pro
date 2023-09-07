@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Schema(description = "用户 App - 拼团记录 Response VO")
 @Data
@@ -22,7 +22,7 @@ public class AppCombinationRecordRespVO {
     private String avatar;
 
     @Schema(description = "过期时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Date expireTime;
+    private LocalDateTime expireTime;
 
     @Schema(description = "可参团人数", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     private Integer userSize;

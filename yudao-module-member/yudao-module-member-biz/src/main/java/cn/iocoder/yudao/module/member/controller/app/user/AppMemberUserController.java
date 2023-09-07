@@ -39,7 +39,9 @@ public class AppMemberUserController {
     public CommonResult<AppMemberUserInfoRespVO> getUserInfo() {
         MemberUserDO user = userService.getUser(getLoginUserId());
         MemberLevelDO level = levelService.getLevel(user.getLevelId());
-        return success(MemberUserConvert.INSTANCE.convert(user, level));
+        return success(MemberUserConvert.INSTANCE.convert(user, level)
+                .setBrokerageEnabled(true) // TODO @疯狂：这里我先写死，后面改成 db 返回；
+        );
     }
 
     @PutMapping("/update")

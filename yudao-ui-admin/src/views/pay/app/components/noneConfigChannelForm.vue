@@ -5,7 +5,8 @@
         <el-form-item label-width="180px" label="渠道状态" prop="status">
           <el-radio-group v-model="formData.status" size="medium">
             <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)" :key="parseInt(dict.value)"
-                      :label="parseInt(dict.value)">
+                      :label="parseInt(dict.value)"
+            >
               {{ dict.label }}
             </el-radio>
           </el-radio-group>
@@ -22,16 +23,16 @@
   </div>
 </template>
 <script>
-import { createChannel, getChannel, updateChannel } from "@/api/pay/channel";
-import { CommonStatusEnum } from "@/utils/constants";
+import { createChannel, getChannel, updateChannel } from '@/api/pay/channel'
+import { CommonStatusEnum } from '@/utils/constants'
 
 export default {
-  name: "mockChannelForm",
+  name: 'noneConfigChannelForm',
   data() {
     return {
       dialogVisible: false,
       formLoading: false,
-      title:'',
+      title: '',
       formData: {
         appId: '',
         code: '',
@@ -39,54 +40,54 @@ export default {
         feeRate: 0,
         remark: '',
         config: {
-          name: 'mock-conf'
+          name: 'none-config'
         }
       },
       rules: {
-        status: [{ required: true,  message: '渠道状态不能为空',  trigger: 'blur' }]
+        status: [{ required: true, message: '渠道状态不能为空', trigger: 'blur' }]
       }
     }
   },
   methods: {
     open(appId, code) {
-      this.dialogVisible = true;
-      this.formLoading = true;
-      this.reset(appId, code);
+      this.dialogVisible = true
+      this.formLoading = true
+      this.reset(appId, code)
       getChannel(appId, code).then(response => {
         if (response.data && response.data.id) {
-          this.formData = response.data;
-          this.formData.config = JSON.parse(response.data.config);
+          this.formData = response.data
+          this.formData.config = JSON.parse(response.data.config)
         }
         this.title = !this.formData.id ? '创建支付渠道' : '编辑支付渠道'
       }).finally(() => {
-        this.formLoading = false;
-      });
+        this.formLoading = false
+      })
     },
     close() {
-      this.dialogVisible = false;
-      this.reset(undefined, undefined);
+      this.dialogVisible = false
+      this.reset(undefined, undefined)
     },
     submitForm() {
       this.$refs['form'].validate(valid => {
         if (!valid) {
           return
         }
-        const data = { ...this.formData };
-        data.config = JSON.stringify(this.formData.config);
+        const data = { ...this.formData }
+        data.config = JSON.stringify(this.formData.config)
         if (!data.id) {
           createChannel(data).then(response => {
-            this.$modal.msgSuccess("新增成功");
+            this.$modal.msgSuccess('新增成功')
             this.$emit('success')
-            this.close();
-          });
+            this.close()
+          })
         } else {
           updateChannel(data).then(response => {
-            this.$modal.msgSuccess("修改成功");
+            this.$modal.msgSuccess('修改成功')
             this.$emit('success')
-            this.close();
+            this.close()
           })
         }
-      });
+      })
     },
     /** 重置表单 */
     reset(appId, code) {
@@ -97,11 +98,11 @@ export default {
         remark: '',
         feeRate: 0,
         config: {
-          name: 'mock-conf'
+          name: 'none-config'
         }
       }
       this.resetForm('form')
-    },
+    }
   }
 }
 </script>

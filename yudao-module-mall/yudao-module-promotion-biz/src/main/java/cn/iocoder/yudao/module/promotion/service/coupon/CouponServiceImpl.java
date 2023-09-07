@@ -93,6 +93,7 @@ public class CouponServiceImpl implements CouponService {
     public void useCoupon(Long id, Long userId, Long orderId) {
         // 校验优惠劵
         validCoupon(id, userId);
+
         // 更新状态
         int updateCount = couponMapper.updateByIdAndStatus(id, CouponStatusEnum.UNUSED.getStatus(),
                 new CouponDO().setStatus(CouponStatusEnum.USED.getStatus())
@@ -115,12 +116,14 @@ public class CouponServiceImpl implements CouponService {
         }
 
         // 退还
-        // TODO @疯狂：最好 where status，避免可能存在的并发问题
         Integer status = LocalDateTimeUtils.beforeNow(coupon.getValidEndTime())
-                // 退还时可能已经过期了
-                ? CouponStatusEnum.EXPIRE.getStatus()
+                ? CouponStatusEnum.EXPIRE.getStatus() // 退还时可能已经过期了
                 : CouponStatusEnum.UNUSED.getStatus();
-        couponMapper.updateById(new CouponDO().setId(id).setStatus(status));
+        int updateCount = couponMapper.updateByIdAndStatus(id, CouponStatusEnum.UNUSED.getStatus(),
+                new CouponDO().setStatus(status));
+        if (updateCount == 0) {
+            throw exception(COUPON_STATUS_NOT_USED);
+        }
 
         // TODO 增加优惠券变动记录？
     }

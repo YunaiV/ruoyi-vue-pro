@@ -33,7 +33,7 @@ public interface CouponConvert {
                 .setTakeType(template.getTakeType())
                 .setUsePrice(template.getUsePrice())
                 .setProductScope(template.getProductScope())
-                .setProductSpuIds(template.getProductSpuIds())
+                .setProductScopeValues(template.getProductScopeValues())
                 .setDiscountType(template.getDiscountType())
                 .setDiscountPercent(template.getDiscountPercent())
                 .setDiscountPrice(template.getDiscountPrice())

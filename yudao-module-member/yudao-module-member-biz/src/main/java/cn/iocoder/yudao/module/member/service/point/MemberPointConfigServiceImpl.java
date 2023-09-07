@@ -21,23 +21,23 @@ import java.util.List;
 public class MemberPointConfigServiceImpl implements MemberPointConfigService {
 
     @Resource
-    private MemberPointConfigMapper pointConfigMapper;
+    private MemberPointConfigMapper memberPointConfigMapper;
 
     @Override
     public void savePointConfig(MemberPointConfigSaveReqVO saveReqVO) {
         // 存在，则进行更新
         MemberPointConfigDO dbConfig = getPointConfig();
         if (dbConfig != null) {
-            pointConfigMapper.updateById(MemberPointConfigConvert.INSTANCE.convert(saveReqVO).setId(dbConfig.getId()));
+            memberPointConfigMapper.updateById(MemberPointConfigConvert.INSTANCE.convert(saveReqVO).setId(dbConfig.getId()));
             return;
         }
         // 不存在，则进行插入
-        pointConfigMapper.insert(MemberPointConfigConvert.INSTANCE.convert(saveReqVO));
+        memberPointConfigMapper.insert(MemberPointConfigConvert.INSTANCE.convert(saveReqVO));
     }
 
     @Override
     public MemberPointConfigDO getPointConfig() {
-        List<MemberPointConfigDO> list = pointConfigMapper.selectList();
+        List<MemberPointConfigDO> list = memberPointConfigMapper.selectList();
         return CollectionUtils.getFirst(list);
     }
 

@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
 @Mapper
-public interface AddressMapper extends BaseMapperX<MemberAddressDO> {
+public interface MemberAddressMapper extends BaseMapperX<MemberAddressDO> {
 
     default MemberAddressDO selectByIdAndUserId(Long id, Long userId) {
         return selectOne(MemberAddressDO::getId, id, MemberAddressDO::getUserId, userId);

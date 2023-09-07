@@ -69,19 +69,19 @@ export default {
 		},
 		// 周期两个值变化时
 		cycleChange() {
-			if (this.radioValue === '2') {
+			if (this.radioValue === 2) {
 				this.$emit('update', 'min', this.cycleTotal, 'min');
 			}
 		},
 		// 平均两个值变化时
 		averageChange() {
-			if (this.radioValue === '3') {
+			if (this.radioValue === 3) {
 				this.$emit('update', 'min', this.averageTotal, 'min');
 			}
 		},
 		// checkbox值变化时
 		checkboxChange() {
-			if (this.radioValue === '4') {
+			if (this.radioValue === 4) {
 				this.$emit('update', 'min', this.checkboxString, 'min');
 			}
 		},

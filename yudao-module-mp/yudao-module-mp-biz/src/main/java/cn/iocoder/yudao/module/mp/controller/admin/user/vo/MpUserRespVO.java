@@ -48,6 +48,6 @@ public class MpUserRespVO  {
     private String appId;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

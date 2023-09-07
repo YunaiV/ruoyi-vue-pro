@@ -26,7 +26,7 @@ import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.SIGN_IN_CO
 public class MemberSignInConfigServiceImpl implements MemberSignInConfigService {
 
     @Resource
-    private MemberSignInConfigMapper signInConfigMapper;
+    private MemberSignInConfigMapper memberSignInConfigMapper;
 
     @Override
     public Long createSignInConfig(MemberSignInConfigCreateReqVO createReqVO) {
@@ -35,7 +35,7 @@ public class MemberSignInConfigServiceImpl implements MemberSignInConfigService 
 
         // 插入
         MemberSignInConfigDO signInConfig = MemberSignInConfigConvert.INSTANCE.convert(createReqVO);
-        signInConfigMapper.insert(signInConfig);
+        memberSignInConfigMapper.insert(signInConfig);
         // 返回
         return signInConfig.getId();
     }
@@ -49,7 +49,7 @@ public class MemberSignInConfigServiceImpl implements MemberSignInConfigService 
 
         // 判断更新
         MemberSignInConfigDO updateObj = MemberSignInConfigConvert.INSTANCE.convert(updateReqVO);
-        signInConfigMapper.updateById(updateObj);
+        memberSignInConfigMapper.updateById(updateObj);
     }
 
     @Override
@@ -57,11 +57,11 @@ public class MemberSignInConfigServiceImpl implements MemberSignInConfigService 
         // 校验存在
         validateSignInConfigExists(id);
         // 删除
-        signInConfigMapper.deleteById(id);
+        memberSignInConfigMapper.deleteById(id);
     }
 
     private void validateSignInConfigExists(Long id) {
-        if (signInConfigMapper.selectById(id) == null) {
+        if (memberSignInConfigMapper.selectById(id) == null) {
             throw exception(SIGN_IN_CONFIG_NOT_EXISTS);
         }
     }
@@ -73,7 +73,7 @@ public class MemberSignInConfigServiceImpl implements MemberSignInConfigService 
      * @param id 编号，只有更新的时候会传递
      */
     private void validateSignInConfigDayDuplicate(Integer day, Long id) {
-        MemberSignInConfigDO config = signInConfigMapper.selectByDay(day);
+        MemberSignInConfigDO config = memberSignInConfigMapper.selectByDay(day);
         // 1. 新增时，config 非空，则说明重复
         if (id == null && config != null) {
             throw exception(SIGN_IN_CONFIG_EXISTS);
@@ -86,19 +86,19 @@ public class MemberSignInConfigServiceImpl implements MemberSignInConfigService 
 
     @Override
     public MemberSignInConfigDO getSignInConfig(Long id) {
-        return signInConfigMapper.selectById(id);
+        return memberSignInConfigMapper.selectById(id);
     }
 
     @Override
     public List <MemberSignInConfigDO> getSignInConfigList() {
-        List<MemberSignInConfigDO> list = signInConfigMapper.selectList();
+        List<MemberSignInConfigDO> list = memberSignInConfigMapper.selectList();
         list.sort(Comparator.comparing(MemberSignInConfigDO::getDay));
         return list;
     }
 
     @Override
     public List<MemberSignInConfigDO> getSignInConfigList(Integer status) {
-        List<MemberSignInConfigDO> list = signInConfigMapper.selectListByStatus(status);
+        List<MemberSignInConfigDO> list = memberSignInConfigMapper.selectListByStatus(status);
         list.sort(Comparator.comparing(MemberSignInConfigDO::getDay));
         return list;
     }

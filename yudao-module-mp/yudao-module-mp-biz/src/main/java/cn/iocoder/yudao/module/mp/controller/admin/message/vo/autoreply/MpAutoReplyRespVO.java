@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - 公众号自动回复 Response VO")
 @Data
@@ -22,6 +22,6 @@ public class MpAutoReplyRespVO extends MpAutoReplyBaseVO {
     private String appId;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }
