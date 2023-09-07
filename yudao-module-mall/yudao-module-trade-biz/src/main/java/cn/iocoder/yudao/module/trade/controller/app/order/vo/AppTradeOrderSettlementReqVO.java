@@ -56,6 +56,10 @@ public class AppTradeOrderSettlementReqVO {
     @Schema(description = "拼团团长编号", example = "2048")
     private Long combinationHeadId;
 
+    // ========== 砍价活动相关字段 ==========
+    @Schema(description = "砍价活动编号", example = "123")
+    private Long bargainActivityId;
+
     @Data
     @Schema(description = "用户 App - 商品项")
     @Valid

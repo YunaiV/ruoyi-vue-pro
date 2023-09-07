@@ -25,6 +25,7 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.ORDER_NOT_FOUND;
 
 @Tag(name = "管理后台 - 交易订单")
 @RestController
@@ -67,6 +68,9 @@ public class TradeOrderController {
     public CommonResult<TradeOrderDetailRespVO> getOrderDetail(@RequestParam("id") Long id) {
         // 查询订单
         TradeOrderDO order = tradeOrderQueryService.getOrder(id);
+        if (order == null) {
+            return success(null, ORDER_NOT_FOUND.getMsg());
+        }
         // 查询订单项
         List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(id);
         // orderLog

@@ -4,7 +4,6 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
-import cn.iocoder.yudao.module.product.api.property.ProductPropertyValueApi;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.*;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemRespVO;
@@ -34,6 +33,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.ORDER_NOT_FOUND;
 
 @Tag(name = "用户 App - 交易订单")
 @RestController
@@ -83,7 +83,7 @@ public class AppTradeOrderController {
         // 查询订单
         TradeOrderDO order = tradeOrderQueryService.getOrder(getLoginUserId(), id);
         if (order == null) {
-            return success(null);
+            return success(null, ORDER_NOT_FOUND.getMsg());
         }
 
         // 查询订单项

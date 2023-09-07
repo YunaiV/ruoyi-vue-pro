@@ -29,4 +29,11 @@ public interface PayOrderApi {
      */
     PayOrderRespDTO getOrder(Long id);
 
+    /**
+     * 更新支付订单价格
+     *
+     * @param payOrderId 支付单编号
+     * @param payPrice   支付单价格
+     */
+    void updatePayOrderPriceById(Long payOrderId, Integer payPrice);
 }
