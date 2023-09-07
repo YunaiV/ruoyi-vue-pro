@@ -81,7 +81,7 @@ public class AppCombinationRecordController {
         headRecord.setId(1L);
         headRecord.setNickname("用户" + 1);
         headRecord.setAvatar("头像" + 1);
-        headRecord.setExpireTime((LocalDateTime.ofInstant(DateUtils.addTime(Duration.ofDays(1)).toInstant(), zoneId));
+        headRecord.setExpireTime((LocalDateTime.ofInstant(DateUtils.addTime(Duration.ofDays(1)).toInstant(), zoneId)));
         headRecord.setUserSize(10);
         headRecord.setUserCount(3);
         headRecord.setStatus(1);
