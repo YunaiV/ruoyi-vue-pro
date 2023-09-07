@@ -141,26 +141,32 @@ public class MemberUserDO extends TenantBaseDO {
     /**
      * 推广员编号
      */
+    @TableField(exist = false) // TODO 芋艿：避免报错
     private Long brokerageUserId;
     /**
      * 推广员绑定时间
      */
+    @TableField(exist = false) // TODO 芋艿：避免报错
     private LocalDateTime brokerageBindTime;
     /**
      * 是否成为推广员
      */
+    @TableField(exist = false) // TODO 芋艿：避免报错
     private Boolean brokerageEnabled;
     /**
      * 成为分销员时间
      */
+    @TableField(exist = false) // TODO 芋艿：避免报错
     private LocalDateTime brokerageTime;
     /**
      * 可用佣金
      */
+    @TableField(exist = false) // TODO 芋艿：避免报错
     private Integer brokeragePrice;
     /**
      * 冻结佣金
      */
+    @TableField(exist = false) // TODO 芋艿：避免报错
     private Integer frozenBrokeragePrice;
 
 }
