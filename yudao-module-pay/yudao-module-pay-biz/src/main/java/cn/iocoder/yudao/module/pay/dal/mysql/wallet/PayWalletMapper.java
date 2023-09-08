@@ -15,6 +15,7 @@ public interface PayWalletMapper extends BaseMapperX<PayWalletDO> {
                 PayWalletDO::getUserType, userType);
     }
 
+    // TODO @jason：减少时，需要 update price -= ? where price >= ?，避免并发问题。现在基于 price 来过滤，虽然也能解决并发问题，但是冲突概率会高一点；可以看到 TradeBrokerageUserMapper 的做法；
     /**
      * 当余额减少时候更新
      *
@@ -27,6 +28,7 @@ public interface PayWalletMapper extends BaseMapperX<PayWalletDO> {
      */
     default int updateWhenDecBalance(PayWalletBizTypeEnum bizType, Integer balance, Long totalRecharge,
                                      Long totalExpense, Integer price, Long id) {
+        // TODO @jason：这种偏判断的，最红放在 service 层；mapper 可以写多个方法；
         PayWalletDO updateDO = new PayWalletDO().setBalance(balance - price);
         if(bizType == PayWalletBizTypeEnum.PAYMENT){
             updateDO.setTotalExpense(totalExpense + price);
@@ -40,6 +42,7 @@ public interface PayWalletMapper extends BaseMapperX<PayWalletDO> {
                         .ge(PayWalletDO::getBalance, price));
     }
 
+    // TODO @jason：类似上面的修改建议哈；
     /**
      * 当余额增加时候更新
      *

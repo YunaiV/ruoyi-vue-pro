@@ -37,6 +37,8 @@ public class PayWalletDO extends BaseDO {
      */
     private Integer userType;
 
+    // TODO @jason：三个都搞 integer？应该要统一哈
+
     /**
      * 余额，单位分
      */
