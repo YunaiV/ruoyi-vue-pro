@@ -78,5 +78,11 @@ public interface ErrorCodeConstants {
     // ========== 分销用户 模块 1011007000 ==========
     ErrorCode BROKERAGE_USER_NOT_EXISTS = new ErrorCode(1011007000, "分销用户不存在");
     ErrorCode BROKERAGE_USER_FROZEN_PRICE_NOT_ENOUGH = new ErrorCode(1011007001, "用户冻结佣金({})数量不足");
+    ErrorCode BROKERAGE_BIND_SELF = new ErrorCode(1011007002, "不能绑定自己");
+    ErrorCode BROKERAGE_BIND_USER_NOT_ENABLED = new ErrorCode(1011007003, "绑定用户没有推广资格");
+    ErrorCode BROKERAGE_BIND_CONDITION_ADMIN = new ErrorCode(1011007004, "仅可在后台绑定推广员");
+    ErrorCode BROKERAGE_BIND_MODE_REGISTER = new ErrorCode(1011007005, "只有在注册时可以绑定");
+    ErrorCode BROKERAGE_BIND_OVERRIDE = new ErrorCode(1011007006, "已绑定了推广人");
+    ErrorCode BROKERAGE_BIND_LOOP = new ErrorCode(1011007007, "下级不能绑定自己的上级");
 
 }

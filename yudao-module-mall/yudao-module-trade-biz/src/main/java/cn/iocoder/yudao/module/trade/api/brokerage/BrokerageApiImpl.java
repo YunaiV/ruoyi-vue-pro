@@ -25,9 +25,8 @@ public class BrokerageApiImpl implements BrokerageApi {
     }
 
     @Override
-    public boolean bindUser(Long userId, Long bindUserId, Integer bindMode) {
-        // todo 待实现
-        return false;
+    public boolean bindUser(Long userId, Long bindUserId, Boolean isNewUser) {
+        return brokerageUserService.bindUser(userId, bindUserId, isNewUser);
     }
 
 }

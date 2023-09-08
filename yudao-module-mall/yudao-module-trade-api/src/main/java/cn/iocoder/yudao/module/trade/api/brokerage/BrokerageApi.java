@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.trade.api.brokerage;
 
 import cn.iocoder.yudao.module.trade.api.brokerage.dto.BrokerageUserDTO;
-import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageBindModeEnum;
 
 /**
  * 分销 API 接口
@@ -23,8 +22,8 @@ public interface BrokerageApi {
      *
      * @param userId     用户编号
      * @param bindUserId 推广员编号
-     * @param bindMode   绑定模式 {@link BrokerageBindModeEnum}
+     * @param isNewUser  是否为新用户
      * @return 是否绑定
      */
-    boolean bindUser(Long userId, Long bindUserId, Integer bindMode);
+    boolean bindUser(Long userId, Long bindUserId, Boolean isNewUser);
 }

@@ -93,4 +93,14 @@ public interface BrokerageUserService {
      * @return 推广用户数量
      */
     Long getCountByBindUserId(Long bindUserId);
+
+    /**
+     * 【会员】绑定推广员
+     *
+     * @param userId     用户编号
+     * @param bindUserId 推广员编号
+     * @param isNewUser  是否为新用户
+     * @return 是否绑定
+     */
+    boolean bindUser(Long userId, Long bindUserId, Boolean isNewUser);
 }

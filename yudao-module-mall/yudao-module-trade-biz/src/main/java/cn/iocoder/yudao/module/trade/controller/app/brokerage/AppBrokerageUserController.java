@@ -4,21 +4,22 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.*;
+import cn.iocoder.yudao.module.trade.service.brokerage.user.BrokerageUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static java.util.Arrays.asList;
 
 @Tag(name = "用户 APP - 分销用户")
@@ -27,6 +28,8 @@ import static java.util.Arrays.asList;
 @Validated
 @Slf4j
 public class AppBrokerageUserController {
+    @Resource
+    private BrokerageUserService brokerageUserService;
 
     // TODO 芋艿：临时 mock =>
     @GetMapping("/get")
@@ -118,6 +121,12 @@ public class AppBrokerageUserController {
     public CommonResult<Integer> getBrokerageUserRankByPrice(
             @RequestParam("times") @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND) LocalDateTime[] times) {
         return success(1);
+    }
+
+    @PutMapping("/bind-user")
+    @Operation(summary = "绑定推广员")
+    public CommonResult<Boolean> getBrokerageUserRankByPrice(@Valid AppBrokerageUserBindReqVO reqVO) {
+        return success(brokerageUserService.bindUser(getLoginUserId(), reqVO.getBindUserId(), false));
     }
 
 }
