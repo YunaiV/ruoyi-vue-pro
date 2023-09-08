@@ -52,7 +52,7 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     }
 
     @Override
-    public void updateBrokerageEnabled(Long id, Boolean brokerageEnabled) {
+    public void updateBrokerageEnabled(Long id, Boolean enabled) {
         // 校验存在
         validateBrokerageUserExists(id);
         // TODO @疯狂：貌似没实现完

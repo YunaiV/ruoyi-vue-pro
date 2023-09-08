@@ -62,7 +62,7 @@ public class BrokerageUserController {
     @Operation(summary = "修改推广资格")
     @PreAuthorize("@ss.hasPermission('trade:brokerage-user:update-brokerage-enable')")
     public CommonResult<Boolean> updateBrokerageEnabled(@Valid @RequestBody BrokerageUserUpdateBrokerageEnabledReqVO updateReqVO) {
-        brokerageUserService.updateBrokerageEnabled(updateReqVO.getId(), updateReqVO.getBrokerageEnabled());
+        brokerageUserService.updateBrokerageEnabled(updateReqVO.getId(), updateReqVO.getEnabled());
         return success(true);
     }
 

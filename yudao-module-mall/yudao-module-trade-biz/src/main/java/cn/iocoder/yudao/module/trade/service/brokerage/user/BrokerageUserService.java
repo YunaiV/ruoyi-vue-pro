@@ -49,10 +49,10 @@ public interface BrokerageUserService {
     /**
      * 修改推广资格
      *
-     * @param id               用户编号
-     * @param brokerageEnabled 推广资格
+     * @param id      用户编号
+     * @param enabled 推广资格
      */
-    void updateBrokerageEnabled(Long id, Boolean brokerageEnabled);
+    void updateBrokerageEnabled(Long id, Boolean enabled);
 
     /**
      * 获得用户的推广人
