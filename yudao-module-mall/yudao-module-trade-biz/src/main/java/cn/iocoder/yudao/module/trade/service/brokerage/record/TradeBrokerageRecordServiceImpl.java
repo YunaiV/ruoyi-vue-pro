@@ -2,10 +2,10 @@ package cn.iocoder.yudao.module.trade.service.brokerage.record;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.BooleanUtil;
-import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.TradeBrokerageRecordPageReqVO;
 import cn.iocoder.yudao.module.trade.convert.brokerage.record.TradeBrokerageRecordConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.record.TradeBrokerageRecordDO;
@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -126,9 +125,8 @@ public class TradeBrokerageRecordServiceImpl implements TradeBrokerageRecordServ
             return ObjectUtil.defaultIfNull(fixedBrokeragePrice, 0);
         }
         // 2. 根据比例计算佣金
-        // TODO @疯狂：要不要把 MoneyUtils 抽到 common 里，然后这里也使用这个类的方法；
         if (basePrice != null && basePrice > 0 && percent != null && percent > 0) {
-            return NumberUtil.div(NumberUtil.mul(basePrice, percent), 100, 0, RoundingMode.DOWN).intValue();
+            return MoneyUtils.calculateRatePriceFloor(basePrice, Double.valueOf(percent));
         }
         return 0;
     }
