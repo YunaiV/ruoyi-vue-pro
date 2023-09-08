@@ -9,7 +9,7 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
  */
 public interface ErrorCodeConstants {
 
-    // ========== AUTH 模块 1003000000 ==========
-    ErrorCode GO_VIEW_PROJECT_NOT_EXISTS = new ErrorCode(1003000000, "GoView 项目不存在");
+    // ========== AUTH 模块 1-003-000-000 ==========
+    ErrorCode GO_VIEW_PROJECT_NOT_EXISTS = new ErrorCode(1_003_000_000, "GoView 项目不存在");
 
 }
