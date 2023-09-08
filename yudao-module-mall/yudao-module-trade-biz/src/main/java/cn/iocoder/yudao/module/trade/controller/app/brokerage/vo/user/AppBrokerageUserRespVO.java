@@ -8,9 +8,9 @@ import lombok.Data;
 public class AppBrokerageUserRespVO {
 
     @Schema(description = "可用的佣金，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "2408")
-    private Integer brokeragePrice;
+    private Integer price;
 
     @Schema(description = "冻结的佣金，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "234")
-    private Integer frozenBrokeragePrice;
+    private Integer frozenPrice;
 
 }

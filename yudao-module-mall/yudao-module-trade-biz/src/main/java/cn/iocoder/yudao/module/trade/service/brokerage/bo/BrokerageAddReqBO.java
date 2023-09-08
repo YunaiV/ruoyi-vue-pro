@@ -28,10 +28,10 @@ public class BrokerageAddReqBO {
     /**
      * 一级佣金（固定）
      */
-    private Integer firstBrokeragePrice;
+    private Integer firstFixedPrice;
     /**
      * 二级佣金（固定）
      */
-    private Integer secondBrokeragePrice;
+    private Integer secondFixedPrice;
 
 }

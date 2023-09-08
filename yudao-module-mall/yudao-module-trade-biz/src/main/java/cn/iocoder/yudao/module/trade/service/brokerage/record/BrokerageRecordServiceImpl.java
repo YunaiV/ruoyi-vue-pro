@@ -72,7 +72,7 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
             return;
         }
         // 1.2 计算一级分佣
-        addBrokerage(firstUser, list, memberConfig.getBrokerageFrozenDays(), memberConfig.getBrokerageFirstPercent(), BrokerageAddReqBO::getFirstBrokeragePrice, bizType);
+        addBrokerage(firstUser, list, memberConfig.getBrokerageFrozenDays(), memberConfig.getBrokerageFirstPercent(), BrokerageAddReqBO::getFirstFixedPrice, bizType);
 
         // 2.1 获得二级推广员
         if (firstUser.getBindUserId() == null) {
@@ -83,7 +83,7 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
             return;
         }
         // 2.2 计算二级分佣
-        addBrokerage(secondUser, list, memberConfig.getBrokerageFrozenDays(), memberConfig.getBrokerageSecondPercent(), BrokerageAddReqBO::getSecondBrokeragePrice, bizType);
+        addBrokerage(secondUser, list, memberConfig.getBrokerageFrozenDays(), memberConfig.getBrokerageSecondPercent(), BrokerageAddReqBO::getSecondFixedPrice, bizType);
     }
 
     @Override
@@ -105,24 +105,24 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
 
         // 2. 更新用户的佣金
         if (BrokerageRecordStatusEnum.WAIT_SETTLEMENT.getStatus().equals(record.getStatus())) {
-            brokerageUserService.updateUserFrozenBrokeragePrice(userId, -record.getPrice());
+            brokerageUserService.updateUserFrozenPrice(userId, -record.getPrice());
         } else if (BrokerageRecordStatusEnum.SETTLEMENT.getStatus().equals(record.getStatus())) {
-            brokerageUserService.updateUserBrokeragePrice(userId, -record.getPrice());
+            brokerageUserService.updateUserPrice(userId, -record.getPrice());
         }
     }
 
     /**
      * 计算佣金
      *
-     * @param basePrice           佣金基数
-     * @param percent             佣金比例
-     * @param fixedBrokeragePrice 固定佣金
+     * @param basePrice  佣金基数
+     * @param percent    佣金比例
+     * @param fixedPrice 固定佣金
      * @return 佣金
      */
-    int calculateBrokeragePrice(Integer basePrice, Integer percent, Integer fixedBrokeragePrice) {
+    int calculatePrice(Integer basePrice, Integer percent, Integer fixedPrice) {
         // 1. 优先使用固定佣金
-        if (fixedBrokeragePrice != null && fixedBrokeragePrice > 0) {
-            return ObjectUtil.defaultIfNull(fixedBrokeragePrice, 0);
+        if (fixedPrice != null && fixedPrice > 0) {
+            return ObjectUtil.defaultIfNull(fixedPrice, 0);
         }
         // 2. 根据比例计算佣金
         if (basePrice != null && basePrice > 0 && percent != null && percent > 0) {
@@ -134,15 +134,15 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
     /**
      * 增加用户佣金
      *
-     * @param user                   用户
-     * @param list                   佣金增加参数列表
-     * @param brokerageFrozenDays    冻结天数
-     * @param brokeragePercent       佣金比例
-     * @param FixedBrokeragePriceFun 固定佣金
-     * @param bizType                业务类型
+     * @param user                用户
+     * @param list                佣金增加参数列表
+     * @param brokerageFrozenDays 冻结天数
+     * @param brokeragePercent    佣金比例
+     * @param fixedPriceFun       固定佣金
+     * @param bizType             业务类型
      */
     private void addBrokerage(BrokerageUserDO user, List<BrokerageAddReqBO> list, Integer brokerageFrozenDays,
-                              Integer brokeragePercent, Function<BrokerageAddReqBO, Integer> FixedBrokeragePriceFun,
+                              Integer brokeragePercent, Function<BrokerageAddReqBO, Integer> fixedPriceFun,
                               BrokerageRecordBizTypeEnum bizType) {
         // 1.1 处理冻结时间
         LocalDateTime unfreezeTime = null;
@@ -153,7 +153,7 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
         int totalBrokerage = 0;
         List<BrokerageRecordDO> records = new ArrayList<>();
         for (BrokerageAddReqBO item : list) {
-            int brokeragePerItem = calculateBrokeragePrice(item.getBasePrice(), brokeragePercent, FixedBrokeragePriceFun.apply(item));
+            int brokeragePerItem = calculatePrice(item.getBasePrice(), brokeragePercent, fixedPriceFun.apply(item));
             if (brokeragePerItem <= 0) {
                 continue;
             }
@@ -169,9 +169,9 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
 
         // 2. 更新用户佣金
         if (brokerageFrozenDays != null && brokerageFrozenDays > 0) { // 更新用户冻结佣金
-            brokerageUserService.updateUserFrozenBrokeragePrice(user.getId(), totalBrokerage);
+            brokerageUserService.updateUserFrozenPrice(user.getId(), totalBrokerage);
         } else { // 更新用户可用佣金
-            brokerageUserService.updateUserBrokeragePrice(user.getId(), totalBrokerage);
+            brokerageUserService.updateUserPrice(user.getId(), totalBrokerage);
         }
     }
 
@@ -218,7 +218,7 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
         }
 
         // 更新用户冻结佣金
-        brokerageUserService.updateFrozenBrokeragePriceDecrAndBrokeragePriceIncr(record.getUserId(), -record.getPrice());
+        brokerageUserService.updateFrozenPriceDecrAndPriceIncr(record.getUserId(), -record.getPrice());
         log.info("[unfreezeRecord][record({}) 更新为已结算成功]", record.getId());
         return true;
     }

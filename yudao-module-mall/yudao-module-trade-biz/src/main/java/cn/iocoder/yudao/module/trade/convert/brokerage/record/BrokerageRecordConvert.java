@@ -43,7 +43,7 @@ public interface BrokerageRecordConvert {
                 .setBizType(bizType.getType())
                 .setBizId(bizId)
                 .setPrice(brokerage)
-                .setTotalPrice(user.getBrokeragePrice())
+                .setTotalPrice(user.getPrice())
                 .setTitle(title)
                 .setDescription(StrUtil.format(bizType.getDescription(), String.valueOf(brokerage / 100.0)))
                 .setStatus(status)

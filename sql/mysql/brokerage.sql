@@ -23,19 +23,19 @@ create table trade_config
 -- 增加分销用户扩展表
 create table trade_brokerage_user
 (
-    id                     bigint auto_increment comment '用户编号' primary key,
-    bind_user_id           bigint                                                           null comment '推广员编号',
-    bind_user_time         datetime                                                         null comment '推广员绑定时间',
-    brokerage_enabled      bit                                    default 1                 not null comment '是否成为推广员',
-    brokerage_time         datetime                                                         null comment '成为分销员时间',
-    brokerage_price        int                                    default 0                 not null comment '可用佣金',
-    frozen_brokerage_price int                                    default 0                 not null comment '冻结佣金',
-    creator                varchar(64) collate utf8mb4_unicode_ci default ''                null comment '创建者',
-    create_time            datetime                               default CURRENT_TIMESTAMP not null comment '创建时间',
-    updater                varchar(64) collate utf8mb4_unicode_ci default ''                null comment '更新者',
-    update_time            datetime                               default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
-    deleted                bit                                    default b'0'              not null comment '是否删除',
-    tenant_id              bigint                                 default 0                 not null comment '租户编号'
+    id                bigint auto_increment comment '用户编号' primary key,
+    bind_user_id      bigint                                                           null comment '推广员编号',
+    bind_user_time    datetime                                                         null comment '推广员绑定时间',
+    brokerage_enabled bit                                    default 1                 not null comment '是否成为推广员',
+    brokerage_time    datetime                                                         null comment '成为分销员时间',
+    price             int                                    default 0                 not null comment '可用佣金',
+    frozen_price      int                                    default 0                 not null comment '冻结佣金',
+    creator           varchar(64) collate utf8mb4_unicode_ci default ''                null comment '创建者',
+    create_time       datetime                               default CURRENT_TIMESTAMP not null comment '创建时间',
+    updater           varchar(64) collate utf8mb4_unicode_ci default ''                null comment '更新者',
+    update_time       datetime                               default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    deleted           bit                                    default b'0'              not null comment '是否删除',
+    tenant_id         bigint                                 default 0                 not null comment '租户编号'
 ) comment '分销用户';
 
 create index idx_invite_user_id on trade_brokerage_user (bind_user_id) comment '推广员编号';

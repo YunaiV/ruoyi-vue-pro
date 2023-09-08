@@ -8,7 +8,6 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-// TODO @疯狂：因为独立了表，是不是可以把字段的 brokerage 去掉了哈？
 /**
  * 分销用户 DO
  *
@@ -55,10 +54,10 @@ public class BrokerageUserDO extends BaseDO {
     /**
      * 可用佣金
      */
-    private Integer brokeragePrice;
+    private Integer price;
     /**
      * 冻结佣金
      */
-    private Integer frozenBrokeragePrice;
+    private Integer frozenPrice;
 
 }

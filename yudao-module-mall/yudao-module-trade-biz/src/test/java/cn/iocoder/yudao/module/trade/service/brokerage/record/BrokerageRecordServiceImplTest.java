@@ -79,38 +79,38 @@ public class BrokerageRecordServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testCalculateBrokeragePrice_useFixedBrokeragePrice() {
+    public void testCalculatePrice_useFixedPrice() {
         // mock 数据
         Integer payPrice = randomInteger();
         Integer percent = randomInt(1, 101);
-        Integer fixedBrokeragePrice = randomInt();
+        Integer fixedPrice = randomInt();
         // 调用
-        int brokerage = brokerageRecordService.calculateBrokeragePrice(payPrice, percent, fixedBrokeragePrice);
+        int brokerage = brokerageRecordService.calculatePrice(payPrice, percent, fixedPrice);
         // 断言
-        assertEquals(brokerage, fixedBrokeragePrice);
+        assertEquals(brokerage, fixedPrice);
     }
 
     @Test
-    public void testCalculateBrokeragePrice_usePercent() {
+    public void testCalculatePrice_usePercent() {
         // mock 数据
         Integer payPrice = randomInteger();
         Integer percent = randomInt(1, 101);
-        Integer skuBrokeragePrice = randomEle(new Integer[]{0, null});
-        System.out.println("skuBrokeragePrice=" + skuBrokeragePrice);
+        Integer fixedPrice = randomEle(new Integer[]{0, null});
+        System.out.println("fixedPrice=" + fixedPrice);
         // 调用
-        int brokerage = brokerageRecordService.calculateBrokeragePrice(payPrice, percent, skuBrokeragePrice);
+        int brokerage = brokerageRecordService.calculatePrice(payPrice, percent, fixedPrice);
         // 断言
         assertEquals(brokerage, NumberUtil.div(NumberUtil.mul(payPrice, percent), 100, 0, RoundingMode.DOWN).intValue());
     }
 
     @Test
-    public void testCalculateBrokeragePrice_equalsZero() {
+    public void testCalculatePrice_equalsZero() {
         // mock 数据
         Integer payPrice = null;
         Integer percent = null;
-        Integer skuBrokeragePrice = null;
+        Integer fixedPrice = null;
         // 调用
-        int brokerage = brokerageRecordService.calculateBrokeragePrice(payPrice, percent, skuBrokeragePrice);
+        int brokerage = brokerageRecordService.calculatePrice(payPrice, percent, fixedPrice);
         // 断言
         assertEquals(brokerage, 0);
     }

@@ -34,10 +34,10 @@ public class BrokerageUserBaseVO {
 
     @Schema(description = "可用佣金", requiredMode = Schema.RequiredMode.REQUIRED, example = "11089")
     @NotNull(message = "可用佣金不能为空")
-    private Integer brokeragePrice;
+    private Integer price;
 
     @Schema(description = "冻结佣金", requiredMode = Schema.RequiredMode.REQUIRED, example = "30916")
     @NotNull(message = "冻结佣金不能为空")
-    private Integer frozenBrokeragePrice;
+    private Integer frozenPrice;
 
 }

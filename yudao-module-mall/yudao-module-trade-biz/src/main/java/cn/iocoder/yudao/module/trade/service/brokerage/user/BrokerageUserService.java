@@ -65,26 +65,26 @@ public interface BrokerageUserService {
     /**
      * 更新用户佣金
      *
-     * @param id             用户编号
-     * @param brokeragePrice 用户可用佣金
+     * @param id    用户编号
+     * @param price 用户可用佣金
      */
-    void updateUserBrokeragePrice(Long id, Integer brokeragePrice);
+    void updateUserPrice(Long id, Integer price);
 
     /**
      * 更新用户冻结佣金
      *
-     * @param id                   用户编号
-     * @param frozenBrokeragePrice 用户冻结佣金
+     * @param id          用户编号
+     * @param frozenPrice 用户冻结佣金
      */
-    void updateUserFrozenBrokeragePrice(Long id, Integer frozenBrokeragePrice);
+    void updateUserFrozenPrice(Long id, Integer frozenPrice);
 
     /**
      * 更新用户冻结佣金（减少）, 更新用户佣金（增加）
      *
-     * @param id                   用户编号
-     * @param frozenBrokeragePrice 减少冻结佣金（负数）
+     * @param id          用户编号
+     * @param frozenPrice 减少冻结佣金（负数）
      */
-    void updateFrozenBrokeragePriceDecrAndBrokeragePriceIncr(Long id, Integer frozenBrokeragePrice);
+    void updateFrozenPriceDecrAndPriceIncr(Long id, Integer frozenPrice);
 
     /**
      * 获得推广用户数量（一级）

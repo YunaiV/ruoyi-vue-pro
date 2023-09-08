@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.BROKERAGE_USER_FROZEN_PRICE_NOT_ENOUGH;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.BROKERAGE_USER_NOT_EXISTS;
-import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.USER_FROZEN_BROKERAGE_PRICE_NOT_ENOUGH;
 
 /**
  * 分销用户 Service 实现类
@@ -74,29 +74,29 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     }
 
     @Override
-    public void updateUserBrokeragePrice(Long id, Integer brokeragePrice) {
-        if (brokeragePrice > 0) {
-            brokerageUserMapper.updateBrokeragePriceIncr(id, brokeragePrice);
-        } else if (brokeragePrice < 0) {
-            brokerageUserMapper.updateBrokeragePriceDecr(id, brokeragePrice);
+    public void updateUserPrice(Long id, Integer price) {
+        if (price > 0) {
+            brokerageUserMapper.updatePriceIncr(id, price);
+        } else if (price < 0) {
+            brokerageUserMapper.updatePriceDecr(id, price);
         }
     }
 
     @Override
-    public void updateUserFrozenBrokeragePrice(Long id, Integer frozenBrokeragePrice) {
-        if (frozenBrokeragePrice > 0) {
-            brokerageUserMapper.updateFrozenBrokeragePriceIncr(id, frozenBrokeragePrice);
-        } else if (frozenBrokeragePrice < 0) {
-            brokerageUserMapper.updateFrozenBrokeragePriceDecr(id, frozenBrokeragePrice);
+    public void updateUserFrozenPrice(Long id, Integer frozenPrice) {
+        if (frozenPrice > 0) {
+            brokerageUserMapper.updateFrozenPriceIncr(id, frozenPrice);
+        } else if (frozenPrice < 0) {
+            brokerageUserMapper.updateFrozenPriceDecr(id, frozenPrice);
         }
     }
 
     @Override
-    public void updateFrozenBrokeragePriceDecrAndBrokeragePriceIncr(Long id, Integer frozenBrokeragePrice) {
-        Assert.isTrue(frozenBrokeragePrice < 0);
-        int updateRows = brokerageUserMapper.updateFrozenBrokeragePriceDecrAndBrokeragePriceIncr(id, frozenBrokeragePrice);
+    public void updateFrozenPriceDecrAndPriceIncr(Long id, Integer frozenPrice) {
+        Assert.isTrue(frozenPrice < 0);
+        int updateRows = brokerageUserMapper.updateFrozenPriceDecrAndPriceIncr(id, frozenPrice);
         if (updateRows == 0) {
-            throw exception(USER_FROZEN_BROKERAGE_PRICE_NOT_ENOUGH);
+            throw exception(BROKERAGE_USER_FROZEN_PRICE_NOT_ENOUGH);
         }
     }
 

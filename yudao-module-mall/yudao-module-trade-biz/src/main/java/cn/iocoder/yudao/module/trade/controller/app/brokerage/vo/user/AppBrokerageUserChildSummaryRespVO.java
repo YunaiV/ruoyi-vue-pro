@@ -19,7 +19,7 @@ public class AppBrokerageUserChildSummaryRespVO {
     private String avatar;
 
     @Schema(description = "佣金金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
-    private Integer brokeragePrice;
+    private Integer price;
 
     @Schema(description = "分销订单数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "20")
     private Integer brokerageOrderCount;
