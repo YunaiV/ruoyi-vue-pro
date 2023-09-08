@@ -71,7 +71,14 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     public void updateBrokerageEnabled(Long id, Boolean enabled) {
         // 校验存在
         validateBrokerageUserExists(id);
-        // TODO @疯狂：貌似没实现完
+        if (BooleanUtil.isTrue(enabled)) {
+            // 开通推广资格
+            brokerageUserMapper.updateById(new BrokerageUserDO().setId(id)
+                    .setBrokerageEnabled(true).setBrokerageTime(LocalDateTime.now()));
+        } else {
+            // 取消推广资格
+            brokerageUserMapper.updateEnabledFalseAndBrokerageTimeToNull(id);
+        }
     }
 
     private void validateBrokerageUserExists(Long id) {
