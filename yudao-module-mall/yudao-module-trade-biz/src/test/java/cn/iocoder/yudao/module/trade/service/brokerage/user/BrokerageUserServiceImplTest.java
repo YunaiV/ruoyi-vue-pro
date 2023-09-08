@@ -37,20 +37,20 @@ public class BrokerageUserServiceImplTest extends BaseDbUnitTest {
     public void testGetBrokerageUserPage() {
         // mock 数据
         BrokerageUserDO dbBrokerageUser = randomPojo(BrokerageUserDO.class, o -> { // 等会查询到
-            o.setBrokerageUserId(null);
+            o.setBindUserId(null);
             o.setBrokerageEnabled(null);
             o.setCreateTime(null);
         });
         brokerageUserMapper.insert(dbBrokerageUser);
         // 测试 brokerageUserId 不匹配
-        brokerageUserMapper.insert(cloneIgnoreId(dbBrokerageUser, o -> o.setBrokerageUserId(null)));
+        brokerageUserMapper.insert(cloneIgnoreId(dbBrokerageUser, o -> o.setBindUserId(null)));
         // 测试 brokerageEnabled 不匹配
         brokerageUserMapper.insert(cloneIgnoreId(dbBrokerageUser, o -> o.setBrokerageEnabled(null)));
         // 测试 createTime 不匹配
         brokerageUserMapper.insert(cloneIgnoreId(dbBrokerageUser, o -> o.setCreateTime(null)));
         // 准备参数
         BrokerageUserPageReqVO reqVO = new BrokerageUserPageReqVO();
-        reqVO.setBrokerageUserId(null);
+        reqVO.setBindUserId(null);
         reqVO.setBrokerageEnabled(null);
         reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 

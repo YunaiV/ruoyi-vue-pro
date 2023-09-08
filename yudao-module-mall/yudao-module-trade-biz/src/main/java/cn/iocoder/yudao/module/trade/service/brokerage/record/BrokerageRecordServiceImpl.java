@@ -75,10 +75,10 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
         addBrokerage(firstUser, list, memberConfig.getBrokerageFrozenDays(), memberConfig.getBrokerageFirstPercent(), BrokerageAddReqBO::getFirstBrokeragePrice, bizType);
 
         // 2.1 获得二级推广员
-        if (firstUser.getBrokerageUserId() == null) {
+        if (firstUser.getBindUserId() == null) {
             return;
         }
-        BrokerageUserDO secondUser = brokerageUserService.getBrokerageUser(firstUser.getBrokerageUserId());
+        BrokerageUserDO secondUser = brokerageUserService.getBrokerageUser(firstUser.getBindUserId());
         if (secondUser == null || !BooleanUtil.isTrue(secondUser.getBrokerageEnabled())) {
             return;
         }

@@ -19,7 +19,7 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
 
     default PageResult<BrokerageUserDO> selectPage(BrokerageUserPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<BrokerageUserDO>()
-                .eqIfPresent(BrokerageUserDO::getBrokerageUserId, reqVO.getBrokerageUserId())
+                .eqIfPresent(BrokerageUserDO::getBindUserId, reqVO.getBindUserId())
                 .eqIfPresent(BrokerageUserDO::getBrokerageEnabled, reqVO.getBrokerageEnabled())
                 .betweenIfPresent(BrokerageUserDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(BrokerageUserDO::getId));

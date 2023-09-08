@@ -68,7 +68,7 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     public BrokerageUserDO getBindBrokerageUser(Long id) {
         return Optional.ofNullable(id)
                 .map(this::getBrokerageUser)
-                .map(BrokerageUserDO::getBrokerageUserId)
+                .map(BrokerageUserDO::getBindUserId)
                 .map(this::getBrokerageUser)
                 .orElse(null);
     }
@@ -101,8 +101,8 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     }
 
     @Override
-    public Long getCountByBrokerageUserId(Long brokerageUserId) {
-        return brokerageUserMapper.selectCount(BrokerageUserDO::getBrokerageUserId, brokerageUserId);
+    public Long getCountByBindUserId(Long bindUserId) {
+        return brokerageUserMapper.selectCount(BrokerageUserDO::getBindUserId, bindUserId);
     }
 
 }

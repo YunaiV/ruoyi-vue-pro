@@ -26,21 +26,22 @@ public class BrokerageUserDO extends BaseDO {
 
     /**
      * 用户编号
+     * <p>
+     * 对应 MemberUserDO 的 id 字段
      */
     @TableId
     private Long id;
 
-    // TODO @疯狂：貌似改成 bindUserId，更明确？
     /**
      * 推广员编号
-     *
+     * <p>
      * 关联 MemberUserDO 的 id 字段
      */
-    private Long brokerageUserId;
+    private Long bindUserId;
     /**
      * 推广员绑定时间
      */
-    private LocalDateTime brokerageBindTime;
+    private LocalDateTime bindUserTime;
 
     /**
      * 推广资格

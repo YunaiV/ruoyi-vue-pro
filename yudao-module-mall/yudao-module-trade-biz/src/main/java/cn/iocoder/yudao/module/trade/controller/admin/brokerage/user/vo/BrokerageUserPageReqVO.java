@@ -18,7 +18,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 public class BrokerageUserPageReqVO extends PageParam {
 
     @Schema(description = "推广员编号", example = "4587")
-    private Long brokerageUserId;
+    private Long bindUserId;
 
     @Schema(description = "推广资格")
     private Boolean brokerageEnabled;

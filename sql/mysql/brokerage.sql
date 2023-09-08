@@ -24,8 +24,8 @@ create table trade_config
 create table trade_brokerage_user
 (
     id                     bigint auto_increment comment '用户编号' primary key,
-    brokerage_user_id      bigint                                                           null comment '推广员编号',
-    brokerage_bind_time    datetime                                                         null comment '推广员绑定时间',
+    bind_user_id           bigint                                                           null comment '推广员编号',
+    bind_user_time         datetime                                                         null comment '推广员绑定时间',
     brokerage_enabled      bit                                    default 1                 not null comment '是否成为推广员',
     brokerage_time         datetime                                                         null comment '成为分销员时间',
     brokerage_price        int                                    default 0                 not null comment '可用佣金',
@@ -38,7 +38,7 @@ create table trade_brokerage_user
     tenant_id              bigint                                 default 0                 not null comment '租户编号'
 ) comment '分销用户';
 
-create index idx_invite_user_id on trade_brokerage_user (brokerage_user_id) comment '推广员编号';
+create index idx_invite_user_id on trade_brokerage_user (bind_user_id) comment '推广员编号';
 create index idx_agent on trade_brokerage_user (brokerage_enabled) comment '是否成为推广员';
 
 

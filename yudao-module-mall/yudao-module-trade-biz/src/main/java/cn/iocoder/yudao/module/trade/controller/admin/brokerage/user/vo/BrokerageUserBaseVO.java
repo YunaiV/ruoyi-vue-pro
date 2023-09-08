@@ -18,11 +18,11 @@ public class BrokerageUserBaseVO {
 
     @Schema(description = "推广员编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "4587")
     @NotNull(message = "推广员编号不能为空")
-    private Long brokerageUserId;
+    private Long bindUserId;
 
     @Schema(description = "推广员绑定时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime brokerageBindTime;
+    private LocalDateTime bindUserTime;
 
     @Schema(description = "推广资格", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "推广资格不能为空")

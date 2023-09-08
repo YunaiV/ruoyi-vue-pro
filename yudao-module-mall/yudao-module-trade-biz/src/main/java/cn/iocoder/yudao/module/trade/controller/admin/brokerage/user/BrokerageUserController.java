@@ -94,7 +94,7 @@ public class BrokerageUserController {
         // 合计推广用户数量
         Map<Long, Long> brokerageUserCountMap = convertMap(userIds,
                 userId -> userId,
-                userId -> brokerageUserService.getCountByBrokerageUserId(userId));
+                userId -> brokerageUserService.getCountByBindUserId(userId));
 
         // todo 合计提现
 
