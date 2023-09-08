@@ -5,8 +5,11 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.TradeBrokerageRecordPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.record.TradeBrokerageRecordDO;
+import cn.iocoder.yudao.module.trade.service.brokerage.record.bo.UserBrokerageSummaryBO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -46,4 +49,8 @@ public interface TradeBrokerageRecordMapper extends BaseMapperX<TradeBrokerageRe
                 TradeBrokerageRecordDO::getBizId, bizId);
     }
 
+    @Select("select count(1), sum(price) from trade_brokerage_record where user_id = #{userId} and biz_type = #{bizType} and status = #{status}")
+    UserBrokerageSummaryBO selectCountAndSumPriceByUserIdAndBizTypeAndStatus(@Param("userId") Long userId,
+                                                                             @Param("bizType") Integer bizType,
+                                                                             @Param("status") Integer status);
 }

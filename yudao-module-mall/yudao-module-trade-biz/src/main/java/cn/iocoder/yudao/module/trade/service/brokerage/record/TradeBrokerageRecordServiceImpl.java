@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.record.TradeBrokerageRe
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.service.brokerage.record.bo.BrokerageAddReqBO;
+import cn.iocoder.yudao.module.trade.service.brokerage.record.bo.UserBrokerageSummaryBO;
 import cn.iocoder.yudao.module.trade.service.brokerage.user.TradeBrokerageUserService;
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
 import lombok.extern.slf4j.Slf4j;
@@ -201,6 +202,12 @@ public class TradeBrokerageRecordServiceImpl implements TradeBrokerageRecordServ
             }
         }
         return count;
+    }
+
+    @Override
+    public UserBrokerageSummaryBO summaryByUserIdAndBizTypeAndStatus(Long userId, Integer bizType, Integer status) {
+        UserBrokerageSummaryBO summaryBO = tradeBrokerageRecordMapper.selectCountAndSumPriceByUserIdAndBizTypeAndStatus(userId, bizType, status);
+        return summaryBO == null ? new UserBrokerageSummaryBO(0, 0) : summaryBO;
     }
 
     @Transactional(rollbackFor = Exception.class)

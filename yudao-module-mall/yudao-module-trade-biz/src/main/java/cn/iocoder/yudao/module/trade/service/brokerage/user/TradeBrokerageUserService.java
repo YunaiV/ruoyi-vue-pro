@@ -88,4 +88,11 @@ public interface TradeBrokerageUserService {
      */
     void updateFrozenBrokeragePriceDecrAndBrokeragePriceIncr(Long id, int frozenBrokeragePrice);
 
+    /**
+     * 获得推广用户数量（一级）
+     *
+     * @param brokerageUserId 推广员编号
+     * @return 推广用户数量
+     */
+    Long getCountByBrokerageUserId(Long brokerageUserId);
 }

@@ -2,9 +2,15 @@ package cn.iocoder.yudao.module.trade.controller.admin.brokerage.user;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.user.vo.*;
 import cn.iocoder.yudao.module.trade.convert.brokerage.user.TradeBrokerageUserConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.user.TradeBrokerageUserDO;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
+import cn.iocoder.yudao.module.trade.service.brokerage.record.TradeBrokerageRecordService;
+import cn.iocoder.yudao.module.trade.service.brokerage.record.bo.UserBrokerageSummaryBO;
 import cn.iocoder.yudao.module.trade.service.brokerage.user.TradeBrokerageUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,8 +21,12 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.Map;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Tag(name = "管理后台 - 分销用户")
 @RestController
@@ -26,6 +36,11 @@ public class TradeBrokerageUserController {
 
     @Resource
     private TradeBrokerageUserService brokerageUserService;
+    @Resource
+    private TradeBrokerageRecordService brokerageRecordService;
+
+    @Resource
+    private MemberUserApi memberUserApi;
 
     @PutMapping("/update-brokerage-user")
     @Operation(summary = "修改推广员")
@@ -64,8 +79,26 @@ public class TradeBrokerageUserController {
     @Operation(summary = "获得分销用户分页")
     @PreAuthorize("@ss.hasPermission('trade:brokerage-user:query')")
     public CommonResult<PageResult<TradeBrokerageUserRespVO>> getBrokerageUserPage(@Valid TradeBrokerageUserPageReqVO pageVO) {
+        // 分页查询
         PageResult<TradeBrokerageUserDO> pageResult = brokerageUserService.getBrokerageUserPage(pageVO);
-        return success(TradeBrokerageUserConvert.INSTANCE.convertPage(pageResult));
+
+        // 涉及到的用户
+        Set<Long> userIds = convertSet(pageResult.getList(), TradeBrokerageUserDO::getId);
+        // 查询用户信息
+        Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(userIds);
+        // 合计分佣订单
+        Map<Long, UserBrokerageSummaryBO> userOrderSummaryMap = convertMap(userIds,
+                userId -> userId,
+                userId -> brokerageRecordService.summaryByUserIdAndBizTypeAndStatus(userId,
+                        BrokerageRecordBizTypeEnum.ORDER.getType(), BrokerageRecordStatusEnum.SETTLEMENT.getStatus()));
+        // 合计推广用户数量
+        Map<Long, Long> brokerageUserCountMap = convertMap(userIds,
+                userId -> userId,
+                userId -> brokerageUserService.getCountByBrokerageUserId(userId));
+
+        // todo 合计提现
+
+        return success(TradeBrokerageUserConvert.INSTANCE.convertPage(pageResult, userMap, brokerageUserCountMap, userOrderSummaryMap));
     }
 
 }

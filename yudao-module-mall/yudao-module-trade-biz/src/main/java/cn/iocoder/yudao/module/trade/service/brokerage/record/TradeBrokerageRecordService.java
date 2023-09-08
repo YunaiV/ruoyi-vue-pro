@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.trade.service.brokerage.record;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.TradeBrokerageRecordPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.record.TradeBrokerageRecordDO;
 import cn.iocoder.yudao.module.trade.service.brokerage.record.bo.BrokerageAddReqBO;
-import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.TradeBrokerageRecordPageReqVO;
+import cn.iocoder.yudao.module.trade.service.brokerage.record.bo.UserBrokerageSummaryBO;
 
 import java.util.List;
 
@@ -44,7 +45,7 @@ public interface TradeBrokerageRecordService {
      * 取消佣金：将佣金记录，状态修改为已失效
      *
      * @param userId 会员编号
-     * @param bizId 业务编号
+     * @param bizId  业务编号
      */
     void cancelBrokerage(Long userId, String bizId);
 
@@ -55,4 +56,13 @@ public interface TradeBrokerageRecordService {
      */
     int unfreezeRecord();
 
+    /**
+     * 汇总用户佣金
+     *
+     * @param userId  用户编号
+     * @param bizType 业务类型
+     * @param status  佣金状态
+     * @return 用户佣金汇总
+     */
+    UserBrokerageSummaryBO summaryByUserIdAndBizTypeAndStatus(Long userId, Integer bizType, Integer status);
 }

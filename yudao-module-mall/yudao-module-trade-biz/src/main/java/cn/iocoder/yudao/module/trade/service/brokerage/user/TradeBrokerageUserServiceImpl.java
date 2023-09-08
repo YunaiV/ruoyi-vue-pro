@@ -109,4 +109,9 @@ public class TradeBrokerageUserServiceImpl implements TradeBrokerageUserService 
         }
     }
 
+    @Override
+    public Long getCountByBrokerageUserId(Long brokerageUserId) {
+        return brokerageUserMapper.selectCount(TradeBrokerageUserDO::getBrokerageUserId, brokerageUserId);
+    }
+
 }
