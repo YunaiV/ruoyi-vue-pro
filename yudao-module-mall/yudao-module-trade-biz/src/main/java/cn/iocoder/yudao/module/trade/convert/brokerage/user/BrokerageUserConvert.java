@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.trade.convert.brokerage.user;
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
+import cn.iocoder.yudao.module.trade.api.brokerage.dto.BrokerageUserDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.user.vo.BrokerageUserRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.user.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
@@ -58,4 +59,6 @@ public interface BrokerageUserConvert {
         }
         return result;
     }
+
+    BrokerageUserDTO convertDTO(BrokerageUserDO brokerageUser);
 }
