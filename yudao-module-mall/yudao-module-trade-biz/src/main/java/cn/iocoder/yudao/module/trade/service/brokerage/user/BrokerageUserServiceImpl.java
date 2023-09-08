@@ -54,10 +54,17 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     }
 
     @Override
-    public void updateBrokerageUserId(Long id, Long brokerageUserId) {
+    public void updateBrokerageUserId(Long id, Long bindUserId) {
         // 校验存在
         validateBrokerageUserExists(id);
-        // TODO @疯狂：貌似没实现完
+        if (bindUserId == null) {
+            // 清除推广员
+            brokerageUserMapper.updateBindUserIdAndBindUserTimeToNull(id);
+        } else {
+            // 修改推广员
+            brokerageUserMapper.updateById(new BrokerageUserDO().setId(id)
+                    .setBindUserId(bindUserId).setBindUserTime(LocalDateTime.now()));
+        }
     }
 
     @Override

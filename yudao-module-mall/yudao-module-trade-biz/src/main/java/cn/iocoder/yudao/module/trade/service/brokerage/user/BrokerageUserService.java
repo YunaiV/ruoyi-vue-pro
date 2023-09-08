@@ -41,10 +41,10 @@ public interface BrokerageUserService {
     /**
      * 修改推广员编号
      *
-     * @param id              用户编号
-     * @param brokerageUserId 推广员编号
+     * @param id         用户编号
+     * @param bindUserId 推广员编号
      */
-    void updateBrokerageUserId(Long id, Long brokerageUserId);
+    void updateBrokerageUserId(Long id, Long bindUserId);
 
     /**
      * 修改推广资格

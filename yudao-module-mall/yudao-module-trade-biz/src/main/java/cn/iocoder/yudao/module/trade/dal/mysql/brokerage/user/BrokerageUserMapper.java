@@ -100,4 +100,9 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
         return update(null, lambdaUpdateWrapper);
     }
 
+    default void updateBindUserIdAndBindUserTimeToNull(Long id) {
+        update(null, new LambdaUpdateWrapper<BrokerageUserDO>()
+                .eq(BrokerageUserDO::getId, id)
+                .set(BrokerageUserDO::getBindUserId, null).set(BrokerageUserDO::getBindUserTime, null));
+    }
 }
