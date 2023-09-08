@@ -412,6 +412,17 @@ public class PayOrderServiceImpl implements PayOrderService {
     }
 
     @Override
+    public void updatePayOrderPriceById(Long payOrderId, Integer payPrice) {
+        PayOrderDO order = orderMapper.selectById(payOrderId);
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+
+        order.setPrice(payPrice);
+        orderMapper.updateById(order);
+    }
+
+    @Override
     public PayOrderExtensionDO getOrderExtension(Long id) {
         return orderExtensionMapper.selectById(id);
     }

@@ -95,6 +95,7 @@ public interface TradeOrderConvert {
         items.forEach(item -> item.setIncrCount(-item.getIncrCount()));
         return new ProductSkuUpdateStockReqDTO(items);
     }
+
     List<ProductSkuUpdateStockReqDTO.Item> convertList(List<TradeOrderItemDO> list);
 
     @Mappings({
@@ -153,9 +154,10 @@ public interface TradeOrderConvert {
             TradeOrderDetailRespVO.OrderLog orderLog = new TradeOrderDetailRespVO.OrderLog();
             orderLog.setContent("订单操作" + i);
             orderLog.setCreateTime(LocalDateTime.now());
+            orderLog.setUserType(i % 2 == 0 ? 2 : 1);
             orderLogs.add(orderLog);
         }
-        orderVO.setOrderLog(orderLogs);
+        orderVO.setLogs(orderLogs);
         return orderVO;
     }
 

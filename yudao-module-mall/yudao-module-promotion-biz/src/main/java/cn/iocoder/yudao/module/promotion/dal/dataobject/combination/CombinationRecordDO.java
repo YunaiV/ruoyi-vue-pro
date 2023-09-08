@@ -86,11 +86,11 @@ public class CombinationRecordDO extends BaseDO {
      */
     private Boolean virtualGroup;
     /**
-     * 过期时间，单位：小时
+     * 过期时间
      *
-     * 关联 {@link CombinationActivityDO#getLimitDuration()}
+     * {@link CombinationRecordDO#getStartTime()} + {@link CombinationActivityDO#getLimitDuration()} 计算
      */
-    private Integer expireTime;
+    private LocalDateTime expireTime;
     /**
      * 开始时间 (订单付款后开始的时间)
      */

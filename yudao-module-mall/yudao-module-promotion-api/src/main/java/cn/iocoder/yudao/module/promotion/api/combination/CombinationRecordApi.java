@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.promotion.api.combination;
 
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordRespDTO;
-import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordUpdateStatusReqDTO;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 
 // TODO @芋艿：后面也再撸撸这几个接口
@@ -51,13 +51,29 @@ public interface CombinationRecordApi {
      */
     void validateCombinationLimitCount(Long activityId, Integer count, Integer sumCount);
 
-    // TODO @puhui999：是不是搞成具体的方法，拼团成功，拼团失败，这种方法；
+    /**
+     * 更新拼团状态为 成功
+     *
+     * @param userId  用户编号
+     * @param orderId 订单编号
+     */
+    void updateRecordStatusToSuccess(Long userId, Long orderId);
 
     /**
-     * 更新开团记录状态
+     * 更新拼团状态为 失败
      *
-     * @param reqDTO 请求 DTO
+     * @param userId  用户编号
+     * @param orderId 订单编号
      */
-    void updateCombinationRecordStatus(CombinationRecordUpdateStatusReqDTO reqDTO);
+    void updateRecordStatusToFailed(Long userId, Long orderId);
+
+    /**
+     * 更新拼团状态为 进行中
+     *
+     * @param userId    用户编号
+     * @param orderId   订单编号
+     * @param startTime 开始时间
+     */
+    void updateRecordStatusToInProgress(Long userId, Long orderId, LocalDateTime startTime);
 
 }

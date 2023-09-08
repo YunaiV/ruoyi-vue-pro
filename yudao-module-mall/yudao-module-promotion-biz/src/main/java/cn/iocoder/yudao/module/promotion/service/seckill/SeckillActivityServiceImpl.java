@@ -79,8 +79,8 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
      * 1. 校验秒杀时段是否存在
      * 2. 秒杀商品是否参加其它活动
      *
-     * @param configIds 秒杀时段数组
-     * @param spuId 商品 SPU 编号
+     * @param configIds  秒杀时段数组
+     * @param spuId      商品 SPU 编号
      * @param activityId 秒杀活动编号
      */
     private void validateProductConflict(List<Long> configIds, Long spuId, Long activityId) {
@@ -92,15 +92,9 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         if (activityId != null) { // 排除自己
             activityList.removeIf(item -> ObjectUtil.equal(item.getId(), activityId));
         }
-        // TODO @puhui999：一个 spu，参与两个活动应该没关系，关键是活动时间不充能重叠；
-        // 2.2 过滤出所有 spuId 有交集的活动，判断是否存在重叠
-        List<SeckillActivityDO> activityDOs1 = filterList(activityList, s -> ObjectUtil.equal(s.getSpuId(), spuId));
-        if (isNotEmpty(activityDOs1)) {
-            throw exception(SECKILL_ACTIVITY_SPU_CONFLICTS);
-        }
-        // 2.3 过滤出所有 configIds 有交集的活动，判断是否存在重叠
-        List<SeckillActivityDO> activityDOs2 = filterList(activityList, s -> containsAny(s.getConfigIds(), configIds));
-        if (isNotEmpty(activityDOs2)) {
+        // 2.2 过滤出所有 configIds 有交集的活动，判断是否存在重叠
+        List<SeckillActivityDO> activityDOs = filterList(activityList, s -> containsAny(s.getConfigIds(), configIds));
+        if (isNotEmpty(activityDOs)) {
             throw exception(SECKILL_ACTIVITY_SPU_CONFLICTS);
         }
     }
@@ -108,7 +102,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     /**
      * 校验秒杀商品是否都存在
      *
-     * @param spuId 商品 SPU 编号
+     * @param spuId    商品 SPU 编号
      * @param products 秒杀商品
      */
     private void validateProductExists(Long spuId, List<SeckillProductBaseVO> products) {
@@ -150,11 +144,21 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         updateSeckillProduct(updateObj, updateReqVO.getProducts());
     }
 
+    @Override
+    public void updateSeckillActivity(SeckillActivityDO activityDO) {
+        seckillActivityMapper.updateById(activityDO);
+    }
+
+    @Override
+    public void updateSeckillActivityProductByList(List<SeckillProductDO> productDOList) {
+        seckillProductMapper.updateBatch(productDOList);
+    }
+
     /**
      * 更新秒杀商品
      *
      * @param activity 秒杀活动
-     * @param products  该活动的最新商品配置
+     * @param products 该活动的最新商品配置
      */
     private void updateSeckillProduct(SeckillActivityDO activity, List<SeckillProductBaseVO> products) {
         // 第一步，对比新老数据，获得添加、修改、删除的列表

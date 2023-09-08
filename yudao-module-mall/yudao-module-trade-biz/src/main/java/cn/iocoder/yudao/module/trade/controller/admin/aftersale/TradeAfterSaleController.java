@@ -36,6 +36,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.AFTER_SALE_NOT_FOUND;
 
 @Tag(name = "管理后台 - 售后订单")
 @RestController
@@ -76,6 +77,9 @@ public class TradeAfterSaleController {
     public CommonResult<TradeAfterSaleDetailRespVO> getOrderDetail(@RequestParam("id") Long id) {
         // 查询订单
         TradeAfterSaleDO afterSale = afterSaleService.getAfterSale(id);
+        if (afterSale == null) {
+            return success(null, AFTER_SALE_NOT_FOUND.getMsg());
+        }
         // 查询订单
         TradeOrderDO order = tradeOrderQueryService.getOrder(afterSale.getOrderId());
         // 查询订单项
@@ -92,7 +96,11 @@ public class TradeAfterSaleController {
             TradeAfterSaleLogRespDTO respVO = new TradeAfterSaleLogRespDTO();
             respVO.setId((long) i);
             respVO.setUserId((long) i);
-            respVO.setUserType(1);
+            respVO.setUserType(i % 2 == 0 ? 2 : 1);
+            // 模拟系统操作
+            if (i == 2) {
+                respVO.setUserType(3);
+            }
             respVO.setAfterSaleId(id);
             respVO.setOrderId((long) i);
             respVO.setOrderItemId((long) i);

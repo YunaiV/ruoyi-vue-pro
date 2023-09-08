@@ -78,7 +78,7 @@ public interface TradeAfterSaleConvert {
         // 处理订单信息
         respVO.setOrder(convert(order));
         // 处理售后日志
-        respVO.setAfterSaleLog(convertList1(logs));
+        respVO.setLogs(convertList1(logs));
         return respVO;
     }
     List<TradeAfterSaleLogRespVO> convertList1(List<TradeAfterSaleLogRespDTO> list);

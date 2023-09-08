@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.promotion.service.combination;
 
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
-import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordUpdateStatusReqDTO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -16,9 +16,11 @@ public interface CombinationRecordService {
     /**
      * 更新拼团状态
      *
-     * @param reqDTO 请求 DTO
+     * @param status 状态
+     * @param userId 用户编号
+     * @param orderId 订单编号
      */
-    void updateCombinationRecordStatusByUserIdAndOrderId(CombinationRecordUpdateStatusReqDTO reqDTO);
+    void updateCombinationRecordStatusByUserIdAndOrderId(Integer status, Long userId, Long orderId);
 
     /**
      * 创建拼团记录
@@ -30,9 +32,12 @@ public interface CombinationRecordService {
     /**
      * 更新拼团状态和开始时间
      *
-     * @param reqDTO 请求 DTO
+     * @param status 状态
+     * @param userId 用户编号
+     * @param orderId 订单编号
+     * @param startTime 开始时间
      */
-    void updateCombinationRecordStatusAndStartTimeByUserIdAndOrderId(CombinationRecordUpdateStatusReqDTO reqDTO);
+    void updateRecordStatusAndStartTimeByUserIdAndOrderId(Integer status, Long userId, Long orderId, LocalDateTime startTime);
 
     /**
      * 获得拼团状态
