@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.trade.service.brokerage.user;
 
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.trade.controller.admin.brokerage.user.vo.TradeBrokerageUserPageReqVO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.user.TradeBrokerageUserDO;
-import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.user.TradeBrokerageUserMapper;
+import cn.iocoder.yudao.module.trade.controller.admin.brokerage.user.vo.BrokerageUserPageReqVO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.user.BrokerageUserDO;
+import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.user.BrokerageUserMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -24,23 +24,23 @@ import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.USER_FROZEN
  */
 @Service
 @Validated
-public class TradeBrokerageUserServiceImpl implements TradeBrokerageUserService {
+public class BrokerageUserServiceImpl implements BrokerageUserService {
 
     @Resource
-    private TradeBrokerageUserMapper brokerageUserMapper;
+    private BrokerageUserMapper brokerageUserMapper;
 
     @Override
-    public TradeBrokerageUserDO getBrokerageUser(Long id) {
+    public BrokerageUserDO getBrokerageUser(Long id) {
         return brokerageUserMapper.selectById(id);
     }
 
     @Override
-    public List<TradeBrokerageUserDO> getBrokerageUserList(Collection<Long> ids) {
+    public List<BrokerageUserDO> getBrokerageUserList(Collection<Long> ids) {
         return brokerageUserMapper.selectBatchIds(ids);
     }
 
     @Override
-    public PageResult<TradeBrokerageUserDO> getBrokerageUserPage(TradeBrokerageUserPageReqVO pageReqVO) {
+    public PageResult<BrokerageUserDO> getBrokerageUserPage(BrokerageUserPageReqVO pageReqVO) {
         return brokerageUserMapper.selectPage(pageReqVO);
     }
 
@@ -65,10 +65,10 @@ public class TradeBrokerageUserServiceImpl implements TradeBrokerageUserService 
     }
 
     @Override
-    public TradeBrokerageUserDO getBindBrokerageUser(Long id) {
+    public BrokerageUserDO getBindBrokerageUser(Long id) {
         return Optional.ofNullable(id)
                 .map(this::getBrokerageUser)
-                .map(TradeBrokerageUserDO::getBrokerageUserId)
+                .map(BrokerageUserDO::getBrokerageUserId)
                 .map(this::getBrokerageUser)
                 .orElse(null);
     }
@@ -102,7 +102,7 @@ public class TradeBrokerageUserServiceImpl implements TradeBrokerageUserService 
 
     @Override
     public Long getCountByBrokerageUserId(Long brokerageUserId) {
-        return brokerageUserMapper.selectCount(TradeBrokerageUserDO::getBrokerageUserId, brokerageUserId);
+        return brokerageUserMapper.selectCount(BrokerageUserDO::getBrokerageUserId, brokerageUserId);
     }
 
 }

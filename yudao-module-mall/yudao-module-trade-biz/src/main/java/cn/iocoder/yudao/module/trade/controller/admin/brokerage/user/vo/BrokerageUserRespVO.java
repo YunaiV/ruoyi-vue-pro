@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class TradeBrokerageUserRespVO extends TradeBrokerageUserBaseVO {
+public class BrokerageUserRespVO extends BrokerageUserBaseVO {
 
     @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "20019")
     private Long id;

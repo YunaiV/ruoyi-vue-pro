@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TradeBrokerageUserDO extends BaseDO {
+public class BrokerageUserDO extends BaseDO {
 
     /**
      * 用户编号

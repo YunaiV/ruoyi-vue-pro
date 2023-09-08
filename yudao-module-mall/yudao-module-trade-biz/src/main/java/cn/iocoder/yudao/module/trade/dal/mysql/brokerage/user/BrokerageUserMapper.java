@@ -4,8 +4,8 @@ import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.trade.controller.admin.brokerage.user.vo.TradeBrokerageUserPageReqVO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.user.TradeBrokerageUserDO;
+import cn.iocoder.yudao.module.trade.controller.admin.brokerage.user.vo.BrokerageUserPageReqVO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.user.BrokerageUserDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -15,14 +15,14 @@ import org.apache.ibatis.annotations.Mapper;
  * @author owen
  */
 @Mapper
-public interface TradeBrokerageUserMapper extends BaseMapperX<TradeBrokerageUserDO> {
+public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
 
-    default PageResult<TradeBrokerageUserDO> selectPage(TradeBrokerageUserPageReqVO reqVO) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<TradeBrokerageUserDO>()
-                .eqIfPresent(TradeBrokerageUserDO::getBrokerageUserId, reqVO.getBrokerageUserId())
-                .eqIfPresent(TradeBrokerageUserDO::getBrokerageEnabled, reqVO.getBrokerageEnabled())
-                .betweenIfPresent(TradeBrokerageUserDO::getCreateTime, reqVO.getCreateTime())
-                .orderByDesc(TradeBrokerageUserDO::getId));
+    default PageResult<BrokerageUserDO> selectPage(BrokerageUserPageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<BrokerageUserDO>()
+                .eqIfPresent(BrokerageUserDO::getBrokerageUserId, reqVO.getBrokerageUserId())
+                .eqIfPresent(BrokerageUserDO::getBrokerageEnabled, reqVO.getBrokerageEnabled())
+                .betweenIfPresent(BrokerageUserDO::getCreateTime, reqVO.getCreateTime())
+                .orderByDesc(BrokerageUserDO::getId));
     }
 
     /**
@@ -33,9 +33,9 @@ public interface TradeBrokerageUserMapper extends BaseMapperX<TradeBrokerageUser
      */
     default void updateBrokeragePriceIncr(Long id, Integer incrCount) {
         Assert.isTrue(incrCount > 0);
-        LambdaUpdateWrapper<TradeBrokerageUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<TradeBrokerageUserDO>()
+        LambdaUpdateWrapper<BrokerageUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<BrokerageUserDO>()
                 .setSql(" brokerage_price = brokerage_price + " + incrCount)
-                .eq(TradeBrokerageUserDO::getId, id);
+                .eq(BrokerageUserDO::getId, id);
         update(null, lambdaUpdateWrapper);
     }
 
@@ -48,9 +48,9 @@ public interface TradeBrokerageUserMapper extends BaseMapperX<TradeBrokerageUser
      */
     default void updateBrokeragePriceDecr(Long id, Integer incrCount) {
         Assert.isTrue(incrCount < 0);
-        LambdaUpdateWrapper<TradeBrokerageUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<TradeBrokerageUserDO>()
+        LambdaUpdateWrapper<BrokerageUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<BrokerageUserDO>()
                 .setSql(" brokerage_price = brokerage_price + " + incrCount) // 负数，所以使用 + 号
-                .eq(TradeBrokerageUserDO::getId, id);
+                .eq(BrokerageUserDO::getId, id);
         update(null, lambdaUpdateWrapper);
     }
 
@@ -62,9 +62,9 @@ public interface TradeBrokerageUserMapper extends BaseMapperX<TradeBrokerageUser
      */
     default void updateFrozenBrokeragePriceIncr(Long id, Integer incrCount) {
         Assert.isTrue(incrCount > 0);
-        LambdaUpdateWrapper<TradeBrokerageUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<TradeBrokerageUserDO>()
+        LambdaUpdateWrapper<BrokerageUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<BrokerageUserDO>()
                 .setSql(" frozen_brokerage_price = frozen_brokerage_price + " + incrCount)
-                .eq(TradeBrokerageUserDO::getId, id);
+                .eq(BrokerageUserDO::getId, id);
         update(null, lambdaUpdateWrapper);
     }
 
@@ -77,9 +77,9 @@ public interface TradeBrokerageUserMapper extends BaseMapperX<TradeBrokerageUser
      */
     default void updateFrozenBrokeragePriceDecr(Long id, Integer incrCount) {
         Assert.isTrue(incrCount < 0);
-        LambdaUpdateWrapper<TradeBrokerageUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<TradeBrokerageUserDO>()
+        LambdaUpdateWrapper<BrokerageUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<BrokerageUserDO>()
                 .setSql(" frozen_brokerage_price = frozen_brokerage_price + " + incrCount) // 负数，所以使用 + 号
-                .eq(TradeBrokerageUserDO::getId, id);
+                .eq(BrokerageUserDO::getId, id);
         update(null, lambdaUpdateWrapper);
     }
 
@@ -92,11 +92,11 @@ public interface TradeBrokerageUserMapper extends BaseMapperX<TradeBrokerageUser
      */
     default int updateFrozenBrokeragePriceDecrAndBrokeragePriceIncr(Long id, Integer incrCount) {
         Assert.isTrue(incrCount < 0);
-        LambdaUpdateWrapper<TradeBrokerageUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<TradeBrokerageUserDO>()
+        LambdaUpdateWrapper<BrokerageUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<BrokerageUserDO>()
                 .setSql(" frozen_brokerage_price = frozen_brokerage_price + " + incrCount + // 负数，所以使用 + 号
                         ", brokerage_price = brokerage_price + " + -incrCount) // 负数，所以使用 - 号
-                .eq(TradeBrokerageUserDO::getId, id)
-                .ge(TradeBrokerageUserDO::getFrozenBrokeragePrice, -incrCount); // cas 逻辑
+                .eq(BrokerageUserDO::getId, id)
+                .ge(BrokerageUserDO::getFrozenBrokeragePrice, -incrCount); // cas 逻辑
         return update(null, lambdaUpdateWrapper);
     }
 

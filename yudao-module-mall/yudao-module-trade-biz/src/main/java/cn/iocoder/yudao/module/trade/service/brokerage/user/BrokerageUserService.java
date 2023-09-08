@@ -1,19 +1,18 @@
 package cn.iocoder.yudao.module.trade.service.brokerage.user;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.trade.controller.admin.brokerage.user.vo.TradeBrokerageUserPageReqVO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.user.TradeBrokerageUserDO;
+import cn.iocoder.yudao.module.trade.controller.admin.brokerage.user.vo.BrokerageUserPageReqVO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.user.BrokerageUserDO;
 
 import java.util.Collection;
 import java.util.List;
 
-// TODO @疯狂：要不去掉 Trade 前缀哈；交易这块，我准备除了 tradeorder 保持下，类似 aftersale，都要取消前缀了；tradeorder 保持的原因，是避免 payorder 和它重复
 /**
  * 分销用户 Service 接口
  *
  * @author owen
  */
-public interface TradeBrokerageUserService {
+public interface BrokerageUserService {
 
     /**
      * 获得分销用户
@@ -21,7 +20,7 @@ public interface TradeBrokerageUserService {
      * @param id 编号
      * @return 分销用户
      */
-    TradeBrokerageUserDO getBrokerageUser(Long id);
+    BrokerageUserDO getBrokerageUser(Long id);
 
     /**
      * 获得分销用户列表
@@ -29,7 +28,7 @@ public interface TradeBrokerageUserService {
      * @param ids 编号
      * @return 分销用户列表
      */
-    List<TradeBrokerageUserDO> getBrokerageUserList(Collection<Long> ids);
+    List<BrokerageUserDO> getBrokerageUserList(Collection<Long> ids);
 
     /**
      * 获得分销用户分页
@@ -37,7 +36,7 @@ public interface TradeBrokerageUserService {
      * @param pageReqVO 分页查询
      * @return 分销用户分页
      */
-    PageResult<TradeBrokerageUserDO> getBrokerageUserPage(TradeBrokerageUserPageReqVO pageReqVO);
+    PageResult<BrokerageUserDO> getBrokerageUserPage(BrokerageUserPageReqVO pageReqVO);
 
     /**
      * 修改推广员编号
@@ -61,7 +60,7 @@ public interface TradeBrokerageUserService {
      * @param id 用户编号
      * @return 用户的推广人
      */
-    TradeBrokerageUserDO getBindBrokerageUser(Long id);
+    BrokerageUserDO getBindBrokerageUser(Long id);
 
     /**
      * 更新用户佣金

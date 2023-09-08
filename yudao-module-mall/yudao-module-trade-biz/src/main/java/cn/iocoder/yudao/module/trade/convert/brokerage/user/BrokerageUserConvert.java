@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.trade.convert.brokerage.user;
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
-import cn.iocoder.yudao.module.trade.controller.admin.brokerage.user.vo.TradeBrokerageUserRespVO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.user.TradeBrokerageUserDO;
+import cn.iocoder.yudao.module.trade.controller.admin.brokerage.user.vo.BrokerageUserRespVO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.user.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -19,22 +19,22 @@ import java.util.Optional;
  * @author owen
  */
 @Mapper
-public interface TradeBrokerageUserConvert {
+public interface BrokerageUserConvert {
 
-    TradeBrokerageUserConvert INSTANCE = Mappers.getMapper(TradeBrokerageUserConvert.class);
+    BrokerageUserConvert INSTANCE = Mappers.getMapper(BrokerageUserConvert.class);
 
-    TradeBrokerageUserRespVO convert(TradeBrokerageUserDO bean);
+    BrokerageUserRespVO convert(BrokerageUserDO bean);
 
-    List<TradeBrokerageUserRespVO> convertList(List<TradeBrokerageUserDO> list);
+    List<BrokerageUserRespVO> convertList(List<BrokerageUserDO> list);
 
-    PageResult<TradeBrokerageUserRespVO> convertPage(PageResult<TradeBrokerageUserDO> page);
+    PageResult<BrokerageUserRespVO> convertPage(PageResult<BrokerageUserDO> page);
 
-    default PageResult<TradeBrokerageUserRespVO> convertPage(PageResult<TradeBrokerageUserDO> pageResult,
-                                                             Map<Long, MemberUserRespDTO> userMap,
-                                                             Map<Long, Long> brokerageUserCountMap,
-                                                             Map<Long, UserBrokerageSummaryBO> userOrderSummaryMap) {
-        PageResult<TradeBrokerageUserRespVO> result = convertPage(pageResult);
-        for (TradeBrokerageUserRespVO vo : result.getList()) {
+    default PageResult<BrokerageUserRespVO> convertPage(PageResult<BrokerageUserDO> pageResult,
+                                                        Map<Long, MemberUserRespDTO> userMap,
+                                                        Map<Long, Long> brokerageUserCountMap,
+                                                        Map<Long, UserBrokerageSummaryBO> userOrderSummaryMap) {
+        PageResult<BrokerageUserRespVO> result = convertPage(pageResult);
+        for (BrokerageUserRespVO vo : result.getList()) {
             // 用户信息
             Optional.ofNullable(userMap.get(vo.getId()))
                     .ifPresent(user -> {

@@ -3,9 +3,9 @@ package cn.iocoder.yudao.module.trade.convert.brokerage.record;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.TradeBrokerageRecordRespVO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.record.TradeBrokerageRecordDO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.user.TradeBrokerageUserDO;
+import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.BrokerageRecordRespVO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.record.BrokerageRecordDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.user.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
 import org.mapstruct.Mapper;
@@ -20,25 +20,25 @@ import java.util.List;
  * @author owen
  */
 @Mapper
-public interface TradeBrokerageRecordConvert {
+public interface BrokerageRecordConvert {
 
-    TradeBrokerageRecordConvert INSTANCE = Mappers.getMapper(TradeBrokerageRecordConvert.class);
+    BrokerageRecordConvert INSTANCE = Mappers.getMapper(BrokerageRecordConvert.class);
 
-    TradeBrokerageRecordRespVO convert(TradeBrokerageRecordDO bean);
+    BrokerageRecordRespVO convert(BrokerageRecordDO bean);
 
-    List<TradeBrokerageRecordRespVO> convertList(List<TradeBrokerageRecordDO> list);
+    List<BrokerageRecordRespVO> convertList(List<BrokerageRecordDO> list);
 
-    PageResult<TradeBrokerageRecordRespVO> convertPage(PageResult<TradeBrokerageRecordDO> page);
+    PageResult<BrokerageRecordRespVO> convertPage(PageResult<BrokerageRecordDO> page);
 
-    default TradeBrokerageRecordDO convert(TradeBrokerageUserDO user, BrokerageRecordBizTypeEnum bizType, String bizId,
-                                           Integer brokerageFrozenDays, int brokerage, LocalDateTime unfreezeTime,
-                                           String title) {
+    default BrokerageRecordDO convert(BrokerageUserDO user, BrokerageRecordBizTypeEnum bizType, String bizId,
+                                      Integer brokerageFrozenDays, int brokerage, LocalDateTime unfreezeTime,
+                                      String title) {
         brokerageFrozenDays = ObjectUtil.defaultIfNull(brokerageFrozenDays, 0);
         // 不冻结时，佣金直接就是结算状态
         Integer status = brokerageFrozenDays > 0
                 ? BrokerageRecordStatusEnum.WAIT_SETTLEMENT.getStatus()
                 : BrokerageRecordStatusEnum.SETTLEMENT.getStatus();
-        return new TradeBrokerageRecordDO()
+        return new BrokerageRecordDO()
                 .setUserId(user.getId())
                 .setBizType(bizType.getType())
                 .setBizId(bizId)

@@ -51,7 +51,7 @@ import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.*;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
-import cn.iocoder.yudao.module.trade.service.brokerage.record.TradeBrokerageRecordService;
+import cn.iocoder.yudao.module.trade.service.brokerage.record.BrokerageRecordService;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
 import cn.iocoder.yudao.module.trade.service.cart.CartService;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
@@ -121,7 +121,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Resource
     private MemberPointApi memberPointApi;
     @Resource
-    private TradeBrokerageRecordService tradeBrokerageRecordService;
+    private BrokerageRecordService brokerageRecordService;
     @Resource
     private ProductCommentApi productCommentApi;
 
@@ -755,12 +755,12 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(orderId);
         List<BrokerageAddReqBO> list = convertList(orderItems,
                 item -> TradeOrderConvert.INSTANCE.convert(item, productSkuApi.getSku(item.getSkuId())));
-        tradeBrokerageRecordService.addBrokerage(userId, bizType, list);
+        brokerageRecordService.addBrokerage(userId, bizType, list);
     }
 
     @Async
     protected void cancelBrokerageAsync(Long userId, BrokerageRecordBizTypeEnum bizType, Long orderItemId) {
-        tradeBrokerageRecordService.cancelBrokerage(userId, bizType, String.valueOf(orderItemId));
+        brokerageRecordService.cancelBrokerage(userId, bizType, String.valueOf(orderItemId));
     }
 
     /**

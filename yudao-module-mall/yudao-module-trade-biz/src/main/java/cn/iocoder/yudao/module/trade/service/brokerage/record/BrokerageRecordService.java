@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.trade.service.brokerage.record;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.TradeBrokerageRecordPageReqVO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.record.TradeBrokerageRecordDO;
+import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.BrokerageRecordPageReqVO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.record.BrokerageRecordDO;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author owen
  */
-public interface TradeBrokerageRecordService {
+public interface BrokerageRecordService {
 
     /**
      * 获得佣金记录
@@ -22,7 +22,7 @@ public interface TradeBrokerageRecordService {
      * @param id 编号
      * @return 佣金记录
      */
-    TradeBrokerageRecordDO getBrokerageRecord(Integer id);
+    BrokerageRecordDO getBrokerageRecord(Integer id);
 
     /**
      * 获得佣金记录分页
@@ -30,7 +30,7 @@ public interface TradeBrokerageRecordService {
      * @param pageReqVO 分页查询
      * @return 佣金记录分页
      */
-    PageResult<TradeBrokerageRecordDO> getBrokerageRecordPage(TradeBrokerageRecordPageReqVO pageReqVO);
+    PageResult<BrokerageRecordDO> getBrokerageRecordPage(BrokerageRecordPageReqVO pageReqVO);
 
     /**
      * 增加佣金

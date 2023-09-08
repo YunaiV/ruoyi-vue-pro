@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo;
+package cn.iocoder.yudao.module.trade.controller.admin.brokerage.user.vo;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,20 +11,17 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@Schema(description = "管理后台 - 佣金记录分页 Request VO")
+@Schema(description = "管理后台 - 分销用户分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class TradeBrokerageRecordPageReqVO extends PageParam {
+public class BrokerageUserPageReqVO extends PageParam {
 
-    @Schema(description = "用户编号", example = "25973")
-    private Long userId;
+    @Schema(description = "推广员编号", example = "4587")
+    private Long brokerageUserId;
 
-    @Schema(description = "业务类型", example = "1")
-    private Integer bizType;
-
-    @Schema(description = "状态", example = "1")
-    private Integer status;
+    @Schema(description = "推广资格")
+    private Boolean brokerageEnabled;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

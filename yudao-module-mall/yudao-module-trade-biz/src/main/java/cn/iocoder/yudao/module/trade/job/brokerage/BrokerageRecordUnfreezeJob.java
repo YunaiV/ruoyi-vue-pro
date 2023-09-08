@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.trade.job.brokerage;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import cn.iocoder.yudao.framework.tenant.core.job.TenantJob;
-import cn.iocoder.yudao.module.trade.service.brokerage.record.TradeBrokerageRecordService;
+import cn.iocoder.yudao.module.trade.service.brokerage.record.BrokerageRecordService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -15,14 +15,14 @@ import javax.annotation.Resource;
  */
 @Component
 @TenantJob
-public class TradeBrokerageRecordUnfreezeJob implements JobHandler {
+public class BrokerageRecordUnfreezeJob implements JobHandler {
 
     @Resource
-    private TradeBrokerageRecordService tradeBrokerageRecordService;
+    private BrokerageRecordService brokerageRecordService;
 
     @Override
     public String execute(String param) {
-        int count = tradeBrokerageRecordService.unfreezeRecord();
+        int count = brokerageRecordService.unfreezeRecord();
         return StrUtil.format("解冻佣金 {} 个", count);
     }
 

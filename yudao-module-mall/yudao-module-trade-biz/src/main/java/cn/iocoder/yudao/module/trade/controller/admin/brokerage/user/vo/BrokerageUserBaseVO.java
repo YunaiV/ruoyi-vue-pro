@@ -14,7 +14,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
  * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
  */
 @Data
-public class TradeBrokerageUserBaseVO {
+public class BrokerageUserBaseVO {
 
     @Schema(description = "推广员编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "4587")
     @NotNull(message = "推广员编号不能为空")
