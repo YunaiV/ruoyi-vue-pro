@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.record;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -8,12 +11,12 @@ import lombok.Data;
 @Data
 public class AppBrokerageRecordPageReqVO extends PageParam {
 
-    // TODO @疯狂：要加下枚举校验
-
     @Schema(description = "业务类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @InEnum(value = BrokerageRecordBizTypeEnum.class, message = "业务类型必须是 {value}")
     private Integer bizType;
 
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @InEnum(value = BrokerageRecordStatusEnum.class, message = "状态必须是 {value}")
     private Integer status;
 
 }

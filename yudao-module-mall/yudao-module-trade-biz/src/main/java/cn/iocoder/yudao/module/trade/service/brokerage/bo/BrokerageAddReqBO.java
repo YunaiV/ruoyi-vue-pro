@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
+
 /**
  * 佣金 增加 Request BO
  *
@@ -14,11 +16,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BrokerageAddReqBO {
 
-    // TODO @疯狂：bo 的话，也可以考虑加下 @Validated 注解，校验下参数；防御性下哈，虽然不一定用的到
-
     /**
-     * 业务ID
+     * 业务编号
      */
+    @NotBlank(message = "业务编号不能为空")
     private String bizId;
     /**
      * 佣金基数
