@@ -79,38 +79,38 @@ public class TradeBrokerageRecordServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testCalculateBrokerage_useSkuBrokeragePrice() {
+    public void testCalculateBrokeragePrice_useFixedBrokeragePrice() {
         // mock 数据
         Integer payPrice = randomInteger();
         Integer percent = randomInt(1, 101);
-        Integer skuBrokeragePrice = randomInt();
+        Integer fixedBrokeragePrice = randomInt();
         // 调用
-        int brokerage = tradeBrokerageRecordService.calculateBrokerage(payPrice, percent, skuBrokeragePrice);
+        int brokerage = tradeBrokerageRecordService.calculateBrokeragePrice(payPrice, percent, fixedBrokeragePrice);
         // 断言
-        assertEquals(brokerage, skuBrokeragePrice);
+        assertEquals(brokerage, fixedBrokeragePrice);
     }
 
     @Test
-    public void testCalculateBrokerage_usePercent() {
+    public void testCalculateBrokeragePrice_usePercent() {
         // mock 数据
         Integer payPrice = randomInteger();
         Integer percent = randomInt(1, 101);
         Integer skuBrokeragePrice = randomEle(new Integer[]{0, null});
         System.out.println("skuBrokeragePrice=" + skuBrokeragePrice);
         // 调用
-        int brokerage = tradeBrokerageRecordService.calculateBrokerage(payPrice, percent, skuBrokeragePrice);
+        int brokerage = tradeBrokerageRecordService.calculateBrokeragePrice(payPrice, percent, skuBrokeragePrice);
         // 断言
         assertEquals(brokerage, NumberUtil.div(NumberUtil.mul(payPrice, percent), 100, 0, RoundingMode.DOWN).intValue());
     }
 
     @Test
-    public void testCalculateBrokerage_equalsZero() {
+    public void testCalculateBrokeragePrice_equalsZero() {
         // mock 数据
         Integer payPrice = null;
         Integer percent = null;
         Integer skuBrokeragePrice = null;
         // 调用
-        int brokerage = tradeBrokerageRecordService.calculateBrokerage(payPrice, percent, skuBrokeragePrice);
+        int brokerage = tradeBrokerageRecordService.calculateBrokeragePrice(payPrice, percent, skuBrokeragePrice);
         // 断言
         assertEquals(brokerage, 0);
     }

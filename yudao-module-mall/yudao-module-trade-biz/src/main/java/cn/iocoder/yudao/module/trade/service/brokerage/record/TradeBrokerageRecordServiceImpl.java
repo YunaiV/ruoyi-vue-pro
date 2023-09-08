@@ -14,8 +14,8 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.record.TradeBrokerageRecordMapper;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
-import cn.iocoder.yudao.module.trade.service.brokerage.record.bo.BrokerageAddReqBO;
-import cn.iocoder.yudao.module.trade.service.brokerage.record.bo.UserBrokerageSummaryBO;
+import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
+import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
 import cn.iocoder.yudao.module.trade.service.brokerage.user.TradeBrokerageUserService;
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
 import lombok.extern.slf4j.Slf4j;
@@ -57,42 +57,40 @@ public class TradeBrokerageRecordServiceImpl implements TradeBrokerageRecordServ
         return tradeBrokerageRecordMapper.selectPage(pageReqVO);
     }
 
-    // TODO @疯狂：buyerId 要不要统一改成 userId 哈；
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addBrokerage(Long buyerId, List<BrokerageAddReqBO> list) {
+    public void addBrokerage(Long userId, BrokerageRecordBizTypeEnum bizType, List<BrokerageAddReqBO> list) {
         TradeConfigDO memberConfig = tradeConfigService.getTradeConfig();
         // 0 未启用分销功能
-        // TODO @疯狂：BooleanUtil.isFalse()；逻辑里，尽量不做 !取反，这样要多思考一层；
         if (memberConfig == null || !BooleanUtil.isTrue(memberConfig.getBrokerageEnabled())) {
-            log.warn("[addBrokerage][增加佣金失败：brokerageEnabled 未配置，buyerId({})", buyerId);
+            log.warn("[addBrokerage][增加佣金失败：brokerageEnabled 未配置，userId({})", userId);
             return;
         }
 
         // 1.1 获得一级推广人
-        TradeBrokerageUserDO firstUser = tradeBrokerageUserService.getInviteBrokerageUser(buyerId);
+        TradeBrokerageUserDO firstUser = tradeBrokerageUserService.getBindBrokerageUser(userId);
         if (firstUser == null || !BooleanUtil.isTrue(firstUser.getBrokerageEnabled())) {
             return;
         }
-
-        // 1.2 计算一级分佣 // TODO 疯狂：类似 1.1 和 1.2 的空行，可以去掉；一般在代码里的空行，是为了逻辑分块；但是分块如果太多，就会导致代码里都是空行哈；
-        addBrokerage(firstUser, list, memberConfig.getBrokerageFrozenDays(), memberConfig.getBrokerageFirstPercent(), BrokerageAddReqBO::getSkuFirstBrokeragePrice);
+        // 1.2 计算一级分佣
+        addBrokerage(firstUser, list, memberConfig.getBrokerageFrozenDays(), memberConfig.getBrokerageFirstPercent(), BrokerageAddReqBO::getFirstBrokeragePrice, bizType);
 
         // 2.1 获得二级推广员
-        // TODO @疯狂：这里可以加个 firstUser.getBrokerageUserId() 为空的判断 return
+        if (firstUser.getBrokerageUserId() == null) {
+            return;
+        }
         TradeBrokerageUserDO secondUser = tradeBrokerageUserService.getBrokerageUser(firstUser.getBrokerageUserId());
         if (secondUser == null || !BooleanUtil.isTrue(secondUser.getBrokerageEnabled())) {
             return;
         }
-
         // 2.2 计算二级分佣
-        addBrokerage(secondUser, list, memberConfig.getBrokerageFrozenDays(), memberConfig.getBrokerageSecondPercent(), BrokerageAddReqBO::getSkuSecondBrokeragePrice);
+        addBrokerage(secondUser, list, memberConfig.getBrokerageFrozenDays(), memberConfig.getBrokerageSecondPercent(), BrokerageAddReqBO::getSecondBrokeragePrice, bizType);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void cancelBrokerage(Long userId, String bizId) {
-        TradeBrokerageRecordDO record = tradeBrokerageRecordMapper.selectByUserIdAndBizTypeAndBizId(BrokerageRecordBizTypeEnum.ORDER.getType(), bizId);
+    public void cancelBrokerage(Long userId, BrokerageRecordBizTypeEnum bizType, String bizId) {
+        TradeBrokerageRecordDO record = tradeBrokerageRecordMapper.selectByBizTypeAndBizId(bizType.getType(), bizId);
         if (record == null || ObjectUtil.notEqual(record.getUserId(), userId)) {
             log.error("[cancelBrokerage][userId({})][bizId({}) 更新为已失效失败：记录不存在]", userId, bizId);
             return;
@@ -114,24 +112,23 @@ public class TradeBrokerageRecordServiceImpl implements TradeBrokerageRecordServ
         }
     }
 
-    // TODO @疯狂：是不是 calculateBrokeragePrice
     /**
      * 计算佣金
      *
-     * @param payPrice          订单支付金额
-     * @param percent           商品 SKU 设置的佣金
-     * @param skuBrokeragePrice 商品的佣金
+     * @param basePrice           佣金基数
+     * @param percent             佣金比例
+     * @param fixedBrokeragePrice 固定佣金
      * @return 佣金
      */
-    int calculateBrokerage(Integer payPrice, Integer percent, Integer skuBrokeragePrice) {
-        // 1. 优先使用商品 SKU 设置的佣金
-        if (skuBrokeragePrice != null && skuBrokeragePrice > 0) {
-            return ObjectUtil.defaultIfNull(skuBrokeragePrice, 0);
+    int calculateBrokeragePrice(Integer basePrice, Integer percent, Integer fixedBrokeragePrice) {
+        // 1. 优先使用固定佣金
+        if (fixedBrokeragePrice != null && fixedBrokeragePrice > 0) {
+            return ObjectUtil.defaultIfNull(fixedBrokeragePrice, 0);
         }
-        // 2. 根据订单支付金额计算佣金
+        // 2. 根据比例计算佣金
         // TODO @疯狂：要不要把 MoneyUtils 抽到 common 里，然后这里也使用这个类的方法；
-        if (payPrice != null && payPrice > 0 && percent != null && percent > 0) {
-            return NumberUtil.div(NumberUtil.mul(payPrice, percent), 100, 0, RoundingMode.DOWN).intValue();
+        if (basePrice != null && basePrice > 0 && percent != null && percent > 0) {
+            return NumberUtil.div(NumberUtil.mul(basePrice, percent), 100, 0, RoundingMode.DOWN).intValue();
         }
         return 0;
     }
@@ -139,32 +136,32 @@ public class TradeBrokerageRecordServiceImpl implements TradeBrokerageRecordServ
     /**
      * 增加用户佣金
      *
-     * @param user                 用户
-     * @param list                 佣金增加参数列表
-     * @param brokerageFrozenDays  冻结天数
-     * @param brokeragePercent     佣金比例
-     * @param skuBrokeragePriceFun 商品 SKU 设置的佣金
+     * @param user                   用户
+     * @param list                   佣金增加参数列表
+     * @param brokerageFrozenDays    冻结天数
+     * @param brokeragePercent       佣金比例
+     * @param FixedBrokeragePriceFun 固定佣金
+     * @param bizType                业务类型
      */
     private void addBrokerage(TradeBrokerageUserDO user, List<BrokerageAddReqBO> list, Integer brokerageFrozenDays,
-                              Integer brokeragePercent, Function<BrokerageAddReqBO, Integer> skuBrokeragePriceFun) {
+                              Integer brokeragePercent, Function<BrokerageAddReqBO, Integer> FixedBrokeragePriceFun,
+                              BrokerageRecordBizTypeEnum bizType) {
         // 1.1 处理冻结时间
-        // TODO @疯狂：是不是 brokerageFrozenDays !=  null && brokerageFrozenDays > 0 ？然后计算；更简洁一点；
-        brokerageFrozenDays = ObjectUtil.defaultIfNull(brokerageFrozenDays, 0);
         LocalDateTime unfreezeTime = null;
-        if (brokerageFrozenDays > 0) {
+        if (brokerageFrozenDays != null && brokerageFrozenDays > 0) {
             unfreezeTime = LocalDateTime.now().plusDays(brokerageFrozenDays);
         }
         // 1.2 计算分佣
         int totalBrokerage = 0;
         List<TradeBrokerageRecordDO> records = new ArrayList<>();
         for (BrokerageAddReqBO item : list) {
-            int brokeragePerItem = calculateBrokerage(item.getPayPrice(), brokeragePercent, skuBrokeragePriceFun.apply(item));
-            // TODO @疯狂：其实可以 brokeragePerItem <= 0 ，continue；这样 { 层级更少；代码更简洁；}
-            if (brokeragePerItem > 0) {
-                int brokerage = brokeragePerItem * item.getCount();
-                records.add(TradeBrokerageRecordConvert.INSTANCE.convert(user, item.getBizId(), brokerageFrozenDays, brokerage, unfreezeTime));
-                totalBrokerage += brokerage;
+            int brokeragePerItem = calculateBrokeragePrice(item.getBasePrice(), brokeragePercent, FixedBrokeragePriceFun.apply(item));
+            if (brokeragePerItem <= 0) {
+                continue;
             }
+            records.add(TradeBrokerageRecordConvert.INSTANCE.convert(user, bizType, item.getBizId(),
+                    brokerageFrozenDays, brokeragePerItem, unfreezeTime, bizType.getTitle()));
+            totalBrokerage += brokeragePerItem;
         }
         if (CollUtil.isEmpty(records)) {
             return;
@@ -173,7 +170,7 @@ public class TradeBrokerageRecordServiceImpl implements TradeBrokerageRecordServ
         tradeBrokerageRecordMapper.insertBatch(records);
 
         // 2. 更新用户佣金
-        if (brokerageFrozenDays > 0) { // 更新用户冻结佣金
+        if (brokerageFrozenDays != null && brokerageFrozenDays > 0) { // 更新用户冻结佣金
             tradeBrokerageUserService.updateUserFrozenBrokeragePrice(user.getId(), totalBrokerage);
         } else { // 更新用户可用佣金
             tradeBrokerageUserService.updateUserBrokeragePrice(user.getId(), totalBrokerage);

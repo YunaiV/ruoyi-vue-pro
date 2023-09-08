@@ -31,7 +31,7 @@ public interface TradeBrokerageUserMapper extends BaseMapperX<TradeBrokerageUser
      * @param id        用户编号
      * @param incrCount 增加佣金（正数）
      */
-    default void updateBrokeragePriceIncr(Long id, int incrCount) {
+    default void updateBrokeragePriceIncr(Long id, Integer incrCount) {
         Assert.isTrue(incrCount > 0);
         LambdaUpdateWrapper<TradeBrokerageUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<TradeBrokerageUserDO>()
                 .setSql(" brokerage_price = brokerage_price + " + incrCount)
@@ -46,7 +46,7 @@ public interface TradeBrokerageUserMapper extends BaseMapperX<TradeBrokerageUser
      * @param id        用户编号
      * @param incrCount 增加佣金（负数）
      */
-    default void updateBrokeragePriceDecr(Long id, int incrCount) {
+    default void updateBrokeragePriceDecr(Long id, Integer incrCount) {
         Assert.isTrue(incrCount < 0);
         LambdaUpdateWrapper<TradeBrokerageUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<TradeBrokerageUserDO>()
                 .setSql(" brokerage_price = brokerage_price + " + incrCount) // 负数，所以使用 + 号
@@ -60,7 +60,7 @@ public interface TradeBrokerageUserMapper extends BaseMapperX<TradeBrokerageUser
      * @param id        用户编号
      * @param incrCount 增加冻结佣金（正数）
      */
-    default void updateFrozenBrokeragePriceIncr(Long id, int incrCount) {
+    default void updateFrozenBrokeragePriceIncr(Long id, Integer incrCount) {
         Assert.isTrue(incrCount > 0);
         LambdaUpdateWrapper<TradeBrokerageUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<TradeBrokerageUserDO>()
                 .setSql(" frozen_brokerage_price = frozen_brokerage_price + " + incrCount)
@@ -75,7 +75,7 @@ public interface TradeBrokerageUserMapper extends BaseMapperX<TradeBrokerageUser
      * @param id        用户编号
      * @param incrCount 减少冻结佣金（负数）
      */
-    default void updateFrozenBrokeragePriceDecr(Long id, int incrCount) {
+    default void updateFrozenBrokeragePriceDecr(Long id, Integer incrCount) {
         Assert.isTrue(incrCount < 0);
         LambdaUpdateWrapper<TradeBrokerageUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<TradeBrokerageUserDO>()
                 .setSql(" frozen_brokerage_price = frozen_brokerage_price + " + incrCount) // 负数，所以使用 + 号
@@ -90,7 +90,7 @@ public interface TradeBrokerageUserMapper extends BaseMapperX<TradeBrokerageUser
      * @param incrCount 减少冻结佣金（负数）
      * @return 更新条数
      */
-    default int updateFrozenBrokeragePriceDecrAndBrokeragePriceIncr(Long id, int incrCount) {
+    default int updateFrozenBrokeragePriceDecrAndBrokeragePriceIncr(Long id, Integer incrCount) {
         Assert.isTrue(incrCount < 0);
         LambdaUpdateWrapper<TradeBrokerageUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<TradeBrokerageUserDO>()
                 .setSql(" frozen_brokerage_price = frozen_brokerage_price + " + incrCount + // 负数，所以使用 + 号

@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.TradeBrokerageRecordPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.record.TradeBrokerageRecordDO;
-import cn.iocoder.yudao.module.trade.service.brokerage.record.bo.UserBrokerageSummaryBO;
+import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -43,8 +43,7 @@ public interface TradeBrokerageRecordMapper extends BaseMapperX<TradeBrokerageRe
                 .eq(TradeBrokerageRecordDO::getStatus, status));
     }
 
-    // TODO @疯狂：userId???
-    default TradeBrokerageRecordDO selectByUserIdAndBizTypeAndBizId(Integer bizType, String bizId) {
+    default TradeBrokerageRecordDO selectByBizTypeAndBizId(Integer bizType, String bizId) {
         return selectOne(TradeBrokerageRecordDO::getBizType, bizType,
                 TradeBrokerageRecordDO::getBizId, bizId);
     }

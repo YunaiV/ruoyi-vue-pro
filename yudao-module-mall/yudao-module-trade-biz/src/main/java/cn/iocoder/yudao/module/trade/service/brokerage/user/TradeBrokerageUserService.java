@@ -61,7 +61,7 @@ public interface TradeBrokerageUserService {
      * @param id 用户编号
      * @return 用户的推广人
      */
-    TradeBrokerageUserDO getInviteBrokerageUser(Long id);
+    TradeBrokerageUserDO getBindBrokerageUser(Long id);
 
     /**
      * 更新用户佣金
@@ -69,16 +69,15 @@ public interface TradeBrokerageUserService {
      * @param id             用户编号
      * @param brokeragePrice 用户可用佣金
      */
-    void updateUserBrokeragePrice(Long id, int brokeragePrice);
+    void updateUserBrokeragePrice(Long id, Integer brokeragePrice);
 
-    // TODO @疯狂：int 类型一般不用哈；尽量都用封装类型；不差这点内存哈；
     /**
      * 更新用户冻结佣金
      *
      * @param id                   用户编号
      * @param frozenBrokeragePrice 用户冻结佣金
      */
-    void updateUserFrozenBrokeragePrice(Long id, int frozenBrokeragePrice);
+    void updateUserFrozenBrokeragePrice(Long id, Integer frozenBrokeragePrice);
 
     /**
      * 更新用户冻结佣金（减少）, 更新用户佣金（增加）
@@ -86,7 +85,7 @@ public interface TradeBrokerageUserService {
      * @param id                   用户编号
      * @param frozenBrokeragePrice 减少冻结佣金（负数）
      */
-    void updateFrozenBrokeragePriceDecrAndBrokeragePriceIncr(Long id, int frozenBrokeragePrice);
+    void updateFrozenBrokeragePriceDecrAndBrokeragePriceIncr(Long id, Integer frozenBrokeragePrice);
 
     /**
      * 获得推广用户数量（一级）

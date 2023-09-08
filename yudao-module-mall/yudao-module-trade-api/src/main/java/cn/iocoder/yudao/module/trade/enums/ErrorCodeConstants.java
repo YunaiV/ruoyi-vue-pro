@@ -77,5 +77,6 @@ public interface ErrorCodeConstants {
 
     // ========== 分销用户 模块 1011007000 ==========
     ErrorCode BROKERAGE_USER_NOT_EXISTS = new ErrorCode(1011007000, "分销用户不存在");
+    ErrorCode USER_FROZEN_BROKERAGE_PRICE_NOT_ENOUGH = new ErrorCode(1011007001, "用户冻结佣金({})数量不足");
 
 }

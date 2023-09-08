@@ -3,8 +3,8 @@ create table trade_config
 (
     id                           bigint auto_increment comment '自增主键' primary key,
     brokerage_enabled            bit                                    default 1                 not null comment '是否启用分佣',
-    brokerage_enabled_condition  tinyint                                default 0                 not null comment '分佣模式：0-人人分销 1-指定分销',
-    brokerage_bind_mode          tinyint                                default 0                 not null comment '分销关系绑定模式: 0-没有推广人，1-新用户',
+    brokerage_enabled_condition  tinyint                                default 0                 not null comment '分佣模式：1-人人分销 2-指定分销',
+    brokerage_bind_mode          tinyint                                default 0                 not null comment '分销关系绑定模式: 1-没有推广人，2-新用户, 3-扫码覆盖',
     brokerage_post_urls          varchar(2000)                          default ''                null comment '分销海报图地址数组',
     brokerage_first_percent      int                                    default 0                 not null comment '一级返佣比例',
     brokerage_second_percent     int                                    default 0                 not null comment '二级返佣比例',
@@ -104,14 +104,15 @@ create index idx_audit_status on trade_brokerage_withdraw (status) comment '状�
 insert into system_dict_type(type, name)
 values ('brokerage_enabled_condition', '分佣模式');
 insert into system_dict_data(dict_type, label, value, sort, remark)
-values ('brokerage_enabled_condition', '人人分销', 0, 0, '所有用户都可以分销'),
-       ('brokerage_enabled_condition', '指定分销', 1, 1, '仅可后台手动设置推广员');
+values ('brokerage_enabled_condition', '人人分销', 1, 1, '所有用户都可以分销'),
+       ('brokerage_enabled_condition', '指定分销', 2, 2, '仅可后台手动设置推广员');
 
 insert into system_dict_type(type, name)
 values ('brokerage_bind_mode', '分销关系绑定模式');
 insert into system_dict_data(dict_type, label, value, sort, remark)
-values ('brokerage_bind_mode', '没有推广人', 0, 0, '只要用户没有推广人，随时都可以绑定推广关系'),
-       ('brokerage_bind_mode', '新用户', 1, 1, '仅新用户注册时才能绑定推广关系');
+values ('brokerage_bind_mode', '没有推广人', 1, 1, '只要用户没有推广人，随时都可以绑定推广关系'),
+       ('brokerage_bind_mode', '新用户', 2, 2, '仅新用户注册时才能绑定推广关系'),
+       ('brokerage_bind_mode', '扫码覆盖', 3, 3, '如果用户已经有推广人，推广人会被变更');
 
 insert into system_dict_type(type, name)
 values ('brokerage_withdraw_type', '佣金提现类型');
@@ -124,8 +125,8 @@ values ('brokerage_withdraw_type', '钱包', 1, 1),
 insert into system_dict_type(type, name)
 values ('brokerage_record_biz_type', '佣金记录业务类型');
 insert into system_dict_data(dict_type, label, value, sort)
-values ('brokerage_record_biz_type', '订单返佣', 0, 0),
-       ('brokerage_record_biz_type', '申请提现', 1, 1);
+values ('brokerage_record_biz_type', '订单返佣', 1, 1),
+       ('brokerage_record_biz_type', '申请提现', 2, 2);
 
 insert into system_dict_type(type, name)
 values ('brokerage_record_status', '佣金记录状态');
