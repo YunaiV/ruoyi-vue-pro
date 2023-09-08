@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.promotion.api.seckill.dto.SeckillActivityUpdateSt
  */
 public interface SeckillActivityApi {
 
-
     /**
      * 更新秒杀库存
      *

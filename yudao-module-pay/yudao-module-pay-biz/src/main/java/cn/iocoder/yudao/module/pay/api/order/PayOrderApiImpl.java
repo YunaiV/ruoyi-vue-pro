@@ -36,5 +36,4 @@ public class PayOrderApiImpl implements PayOrderApi {
         payOrderService.updatePayOrderPriceById(payOrderId, payPrice);
     }
 
-
 }

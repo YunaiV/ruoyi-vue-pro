@@ -36,7 +36,6 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
-import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.AFTER_SALE_NOT_FOUND;
 
 @Tag(name = "管理后台 - 售后订单")
 @RestController
@@ -77,9 +76,11 @@ public class TradeAfterSaleController {
     public CommonResult<TradeAfterSaleDetailRespVO> getOrderDetail(@RequestParam("id") Long id) {
         // 查询订单
         TradeAfterSaleDO afterSale = afterSaleService.getAfterSale(id);
-        if (afterSale == null) {
-            return success(null, AFTER_SALE_NOT_FOUND.getMsg());
-        }
+        // TODO @puhui999：这里建议改成，如果为 null，直接返回 success null；主要查询操作，尽量不要有非空的提示哈；交给前端处理；
+//        if (afterSale == null) {
+//            return success(null, AFTER_SALE_NOT_FOUND.getMsg());
+//        }
+
         // 查询订单
         TradeOrderDO order = tradeOrderQueryService.getOrder(afterSale.getOrderId());
         // 查询订单项

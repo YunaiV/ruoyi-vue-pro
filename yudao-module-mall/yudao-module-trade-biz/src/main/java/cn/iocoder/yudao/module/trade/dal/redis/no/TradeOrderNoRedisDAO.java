@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
  */
 @Repository
 public class TradeOrderNoRedisDAO {
+
     public static final String TRADE_ORDER_NO_PREFIX = "O";
 
     @Resource

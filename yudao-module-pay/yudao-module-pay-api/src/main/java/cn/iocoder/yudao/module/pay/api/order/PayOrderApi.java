@@ -29,6 +29,7 @@ public interface PayOrderApi {
      */
     PayOrderRespDTO getOrder(Long id);
 
+    // TODO @puhui999：可以去掉 byId；然后 payOrderId 参数改成 id；
     /**
      * 更新支付订单价格
      *
@@ -36,4 +37,5 @@ public interface PayOrderApi {
      * @param payPrice   支付单价格
      */
     void updatePayOrderPriceById(Long payOrderId, Integer payPrice);
+
 }

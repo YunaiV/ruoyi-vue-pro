@@ -52,7 +52,7 @@ public interface CombinationRecordApi {
     void validateCombinationLimitCount(Long activityId, Integer count, Integer sumCount);
 
     /**
-     * 更新拼团状态为 成功
+     * 更新拼团状态为成功
      *
      * @param userId  用户编号
      * @param orderId 订单编号
@@ -60,7 +60,7 @@ public interface CombinationRecordApi {
     void updateRecordStatusToSuccess(Long userId, Long orderId);
 
     /**
-     * 更新拼团状态为 失败
+     * 更新拼团状态为失败
      *
      * @param userId  用户编号
      * @param orderId 订单编号

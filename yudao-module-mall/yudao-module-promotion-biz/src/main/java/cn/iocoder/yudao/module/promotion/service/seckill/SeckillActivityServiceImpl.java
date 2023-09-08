@@ -93,8 +93,8 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
             activityList.removeIf(item -> ObjectUtil.equal(item.getId(), activityId));
         }
         // 2.2 过滤出所有 configIds 有交集的活动，判断是否存在重叠
-        List<SeckillActivityDO> activityDOs = filterList(activityList, s -> containsAny(s.getConfigIds(), configIds));
-        if (isNotEmpty(activityDOs)) {
+        List<SeckillActivityDO> conflictActivityList = filterList(activityList, s -> containsAny(s.getConfigIds(), configIds));
+        if (isNotEmpty(conflictActivityList)) {
             throw exception(SECKILL_ACTIVITY_SPU_CONFLICTS);
         }
     }
@@ -150,8 +150,8 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     }
 
     @Override
-    public void updateSeckillActivityProductByList(List<SeckillProductDO> productDOList) {
-        seckillProductMapper.updateBatch(productDOList);
+    public void updateSeckillActivityProductList(List<SeckillProductDO> productList) {
+        seckillProductMapper.updateBatch(productList);
     }
 
     /**

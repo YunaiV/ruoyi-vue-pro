@@ -561,6 +561,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     }
 
     @Override
+    // TODO @puhui999：考虑事务性
     public void updateOrderPrice(TradeOrderUpdatePriceReqVO reqVO) {
         // 校验交易订单
         TradeOrderDO order = validateOrderExists(reqVO.getId());
@@ -571,6 +572,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             throw exception(ORDER_UPDATE_PRICE_FAIL_EQUAL);
         }
 
+        // TODO @puhui999：应该是按照 payPrice 分配；并且要考虑取余问题；payPrice 也要考虑，item 里的
         List<TradeOrderItemDO> itemDOs = tradeOrderItemMapper.selectListByOrderId(order.getId());
         // TradeOrderItemDO 需要做 adjustPrice 的分摊
         int price = reqVO.getAdjustPrice() / itemDOs.size();
@@ -578,8 +580,10 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             item.setAdjustPrice(price);
         });
         // 更新 TradeOrderItem
+        // TODO @puhui999：不要整个对象去更新哈；应该 new 一下；
         tradeOrderItemMapper.updateBatch(itemDOs);
         // 更新订单
+        // TODO @puhui999：要考虑多次修改价格，不能单单的 payPrice + 价格；
         TradeOrderDO update = TradeOrderConvert.INSTANCE.convert(reqVO);
         update.setPayPrice(update.getPayPrice() + update.getAdjustPrice());
         // TODO @芋艿：改价时，赠送的积分，要不要做改动？？？

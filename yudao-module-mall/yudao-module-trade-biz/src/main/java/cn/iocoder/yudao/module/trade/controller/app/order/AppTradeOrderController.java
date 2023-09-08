@@ -33,7 +33,6 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
-import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.ORDER_NOT_FOUND;
 
 @Tag(name = "用户 App - 交易订单")
 @RestController
@@ -82,9 +81,10 @@ public class AppTradeOrderController {
     public CommonResult<AppTradeOrderDetailRespVO> getOrder(@RequestParam("id") Long id) {
         // 查询订单
         TradeOrderDO order = tradeOrderQueryService.getOrder(getLoginUserId(), id);
-        if (order == null) {
-            return success(null, ORDER_NOT_FOUND.getMsg());
-        }
+        // TODO @puhui999：这里建议改成，如果为 null，直接返回 success null；主要查询操作，尽量不要有非空的提示哈；交给前端处理；
+//        if (order == null) {
+//            return success(null, ORDER_NOT_FOUND.getMsg());
+//        }
 
         // 查询订单项
         List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(order.getId());

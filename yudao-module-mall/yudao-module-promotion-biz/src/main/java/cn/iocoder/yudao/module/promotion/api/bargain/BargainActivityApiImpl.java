@@ -23,6 +23,7 @@ public class BargainActivityApiImpl implements BargainActivityApi {
 
     @Override
     public void updateBargainActivityStock(Long activityId, Integer count) {
+        // TODO @puhui999：可以整个实现到 bargainActivityService 中
         // 查询砍价活动
         BargainActivityDO activity = bargainActivityService.getBargainActivity(activityId);
         if (activity == null) {
@@ -30,6 +31,7 @@ public class BargainActivityApiImpl implements BargainActivityApi {
         }
 
         // 更新砍价库存
+        // TODO @puhui999：考虑下并发更新问题
         BargainActivityUpdateReqVO reqVO = new BargainActivityUpdateReqVO();
         reqVO.setId(activityId);
         reqVO.setStock(activity.getStock() - count);

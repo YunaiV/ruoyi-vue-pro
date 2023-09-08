@@ -12,6 +12,10 @@ import java.util.List;
 @Data
 public class SeckillActivityUpdateStockReqDTO {
 
+    // TODO @puhui999：参数校验
+
+    // TODO @puhui999：秒杀的话，一次只能购买一种商品哈；不能多个哈；
+
     /**
      * 活动编号
      */
