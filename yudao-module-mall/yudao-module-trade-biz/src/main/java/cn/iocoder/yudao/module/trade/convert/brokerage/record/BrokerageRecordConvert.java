@@ -45,7 +45,7 @@ public interface BrokerageRecordConvert {
                 .setPrice(brokerage)
                 .setTotalPrice(user.getPrice())
                 .setTitle(title)
-                .setDescription(StrUtil.format(bizType.getDescription(), String.valueOf(brokerage / 100.0)))
+                .setDescription(StrUtil.format(bizType.getDescription(), String.format("￥%.2f", brokerage / 100d)))
                 .setStatus(status)
                 .setFrozenDays(brokerageFrozenDays)
                 .setUnfreezeTime(unfreezeTime);
