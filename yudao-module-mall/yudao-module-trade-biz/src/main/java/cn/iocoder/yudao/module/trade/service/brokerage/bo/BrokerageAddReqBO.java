@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * 佣金 增加 Request BO
@@ -24,6 +25,7 @@ public class BrokerageAddReqBO {
     /**
      * 佣金基数
      */
+    @NotNull(message = "佣金基数不能为空")
     private Integer basePrice;
     /**
      * 一级佣金（固定）

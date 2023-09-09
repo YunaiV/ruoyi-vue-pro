@@ -89,6 +89,7 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void cancelBrokerage(Long userId, BrokerageRecordBizTypeEnum bizType, String bizId) {
+        // TODO @疯狂：userId 加进去查询，会不会更好一点？万一穿错参数；
         BrokerageRecordDO record = brokerageRecordMapper.selectByBizTypeAndBizId(bizType.getType(), bizId);
         if (record == null || ObjectUtil.notEqual(record.getUserId(), userId)) {
             log.error("[cancelBrokerage][userId({})][bizId({}) 更新为已失效失败：记录不存在]", userId, bizId);
@@ -138,7 +139,7 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
      * @param list                佣金增加参数列表
      * @param brokerageFrozenDays 冻结天数
      * @param brokeragePercent    佣金比例
-     * @param fixedPriceFun       固定佣金
+     * @param fixedPriceFun       固定佣金 // TODO 疯狂：这里是不是可以直接传递 fixedPrice 呀？
      * @param bizType             业务类型
      */
     private void addBrokerage(BrokerageUserDO user, List<BrokerageAddReqBO> list, Integer brokerageFrozenDays,
@@ -200,9 +201,9 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
     }
 
     @Override
-    public UserBrokerageSummaryBO summaryByUserIdAndBizTypeAndStatus(Long userId, Integer bizType, Integer status) {
+    public UserBrokerageSummaryBO getUserBrokerageSummaryByUserId(Long userId, Integer bizType, Integer status) {
         UserBrokerageSummaryBO summaryBO = brokerageRecordMapper.selectCountAndSumPriceByUserIdAndBizTypeAndStatus(userId, bizType, status);
-        return summaryBO == null ? new UserBrokerageSummaryBO(0, 0) : summaryBO;
+        return summaryBO != null ? summaryBO : new UserBrokerageSummaryBO(0, 0);
     }
 
     @Transactional(rollbackFor = Exception.class)

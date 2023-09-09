@@ -30,25 +30,21 @@ public interface BrokerageRecordConvert {
 
     PageResult<BrokerageRecordRespVO> convertPage(PageResult<BrokerageRecordDO> page);
 
+    // TODO @疯狂：可能 title 不是很固化，会存在类似：沐晴成功购买《XXX JVM 实战》
     default BrokerageRecordDO convert(BrokerageUserDO user, BrokerageRecordBizTypeEnum bizType, String bizId,
-                                      Integer brokerageFrozenDays, int brokerage, LocalDateTime unfreezeTime,
+                                      Integer brokerageFrozenDays, int brokeragePrice, LocalDateTime unfreezeTime,
                                       String title) {
         brokerageFrozenDays = ObjectUtil.defaultIfNull(brokerageFrozenDays, 0);
         // 不冻结时，佣金直接就是结算状态
         Integer status = brokerageFrozenDays > 0
                 ? BrokerageRecordStatusEnum.WAIT_SETTLEMENT.getStatus()
                 : BrokerageRecordStatusEnum.SETTLEMENT.getStatus();
-        return new BrokerageRecordDO()
-                .setUserId(user.getId())
-                .setBizType(bizType.getType())
-                .setBizId(bizId)
-                .setPrice(brokerage)
-                .setTotalPrice(user.getPrice())
+        return new BrokerageRecordDO().setUserId(user.getId())
+                .setBizType(bizType.getType()).setBizId(bizId)
+                .setPrice(brokeragePrice).setTotalPrice(user.getPrice())
                 .setTitle(title)
-                .setDescription(StrUtil.format(bizType.getDescription(), String.valueOf(brokerage / 100.0)))
-                .setStatus(status)
-                .setFrozenDays(brokerageFrozenDays)
-                .setUnfreezeTime(unfreezeTime);
+                .setDescription(StrUtil.format(bizType.getDescription(), String.valueOf(brokeragePrice / 100.0)))
+                .setStatus(status).setFrozenDays(brokerageFrozenDays).setUnfreezeTime(unfreezeTime);
     }
 
 }

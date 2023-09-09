@@ -62,7 +62,7 @@ public class BrokerageUserController {
     @Operation(summary = "修改推广资格")
     @PreAuthorize("@ss.hasPermission('trade:brokerage-user:update-brokerage-enable')")
     public CommonResult<Boolean> updateBrokerageEnabled(@Valid @RequestBody BrokerageUserUpdateBrokerageEnabledReqVO updateReqVO) {
-        brokerageUserService.updateBrokerageEnabled(updateReqVO.getId(), updateReqVO.getEnabled());
+        brokerageUserService.updateBrokerageUserEnabled(updateReqVO.getId(), updateReqVO.getEnabled());
         return success(true);
     }
 
@@ -89,12 +89,12 @@ public class BrokerageUserController {
         // 合计分佣订单
         Map<Long, UserBrokerageSummaryBO> userOrderSummaryMap = convertMap(userIds,
                 userId -> userId,
-                userId -> brokerageRecordService.summaryByUserIdAndBizTypeAndStatus(userId,
+                userId -> brokerageRecordService.getUserBrokerageSummaryByUserId(userId,
                         BrokerageRecordBizTypeEnum.ORDER.getType(), BrokerageRecordStatusEnum.SETTLEMENT.getStatus()));
         // 合计推广用户数量
         Map<Long, Long> brokerageUserCountMap = convertMap(userIds,
                 userId -> userId,
-                userId -> brokerageUserService.getCountByBindUserId(userId));
+                userId -> brokerageUserService.getBrokerageUserCountByBindUserId(userId));
 
         // todo 合计提现
 

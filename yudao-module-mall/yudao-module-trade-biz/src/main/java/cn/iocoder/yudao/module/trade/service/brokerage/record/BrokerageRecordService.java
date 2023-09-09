@@ -66,5 +66,5 @@ public interface BrokerageRecordService {
      * @param status  佣金状态
      * @return 用户佣金汇总
      */
-    UserBrokerageSummaryBO summaryByUserIdAndBizTypeAndStatus(Long userId, Integer bizType, Integer status);
+    UserBrokerageSummaryBO getUserBrokerageSummaryByUserId(Long userId, Integer bizType, Integer status);
 }

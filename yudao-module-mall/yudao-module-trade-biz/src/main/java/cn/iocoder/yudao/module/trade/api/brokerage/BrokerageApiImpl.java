@@ -20,6 +20,7 @@ public class BrokerageApiImpl implements BrokerageApi {
     @Resource
     private BrokerageUserService brokerageUserService;
 
+    @Override
     public BrokerageUserDTO getBrokerageUser(Long userId) {
         return BrokerageUserConvert.INSTANCE.convertDTO(brokerageUserService.getBrokerageUser(userId));
     }

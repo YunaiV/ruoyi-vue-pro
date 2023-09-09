@@ -57,18 +57,22 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     public void updateBrokerageUserId(Long id, Long bindUserId) {
         // 校验存在
         validateBrokerageUserExists(id);
+
+        // 情况一：清除推广员
         if (bindUserId == null) {
             // 清除推广员
             brokerageUserMapper.updateBindUserIdAndBindUserTimeToNull(id);
-        } else {
-            // 修改推广员
-            brokerageUserMapper.updateById(new BrokerageUserDO().setId(id)
-                    .setBindUserId(bindUserId).setBindUserTime(LocalDateTime.now()));
+            return;
         }
+
+        // 情况二：修改推广员
+        // TODO @疯狂：要复用一些 validateCanBindUser 的校验哈；
+        brokerageUserMapper.updateById(new BrokerageUserDO().setId(id)
+                .setBindUserId(bindUserId).setBindUserTime(LocalDateTime.now()));
     }
 
     @Override
-    public void updateBrokerageEnabled(Long id, Boolean enabled) {
+    public void updateBrokerageUserEnabled(Long id, Boolean enabled) {
         // 校验存在
         validateBrokerageUserExists(id);
         if (BooleanUtil.isTrue(enabled)) {
@@ -124,36 +128,41 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     }
 
     @Override
-    public Long getCountByBindUserId(Long bindUserId) {
+    public Long getBrokerageUserCountByBindUserId(Long bindUserId) {
+        // TODO @疯狂：mapper 封装下哈；不直接在 service 调用这种基础 mapper 的基础方法
         return brokerageUserMapper.selectCount(BrokerageUserDO::getBindUserId, bindUserId);
     }
 
+    // TODO @疯狂：因为现在 user 会存在使用验证码直接注册，所以 isNewUser 不太好传递；我们是不是可以约定绑定的时间，createTime 在 30 秒内，就认为新用户；
     @Override
     public boolean bindUser(Long userId, Long bindUserId, Boolean isNewUser) {
+        // TODO @疯狂：userId 为空，搞到参数校验里哇；
         if (userId == null) {
             throw exception(0);
         }
 
-        boolean isInsert = false;
+        // 1. 获得分销用户
+        boolean isNewBrokerageUser = false;
         BrokerageUserDO brokerageUser = brokerageUserMapper.selectById(userId);
-        // 分销用户不存在的情况：1.新注册 2.旧数据 3.分销功能关闭后又打开
-        if (brokerageUser == null) {
-            isInsert = true;
+        if (brokerageUser == null) { // 分销用户不存在的情况：1. 新注册；2. 旧数据；3. 分销功能关闭后又打开
+            isNewBrokerageUser = true;
             brokerageUser = new BrokerageUserDO().setId(userId).setBrokerageEnabled(false).setPrice(0).setFrozenPrice(0);
         }
 
-        // 校验能否绑定
+        // 2.1 校验能否绑定
         boolean validated = validateCanBindUser(brokerageUser, bindUserId, isNewUser);
         if (!validated) {
             return false;
         }
 
-        if (isInsert) {
+        // 2.2 绑定用户
+        if (isNewBrokerageUser) {
             Integer enabledCondition = tradeConfigService.getTradeConfig().getBrokerageEnabledCondition();
-            if (BrokerageEnabledConditionEnum.ALL.getCondition().equals(enabledCondition)) {
-                // 人人分销：用户默认就有分销资格
+            if (BrokerageEnabledConditionEnum.ALL.getCondition().equals(enabledCondition)) { // 人人分销：用户默认就有分销资格
+                // TODO @疯狂：应该设置下 brokerageTime，而不是 bindUserTime
                 brokerageUser.setBrokerageEnabled(true).setBindUserTime(LocalDateTime.now());
             }
+            // TODO @疯狂：这里是不是要设置 bindUserId、bindUserTime 字段哈；
             brokerageUserMapper.insert(brokerageUser);
         } else {
             brokerageUserMapper.updateById(new BrokerageUserDO().setId(userId)
@@ -162,14 +171,16 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         return true;
     }
 
+    // TODO @疯狂：validate 方法，一般不返回 true false，而是抛出异常；如果要返回 true false 这种，方法名字可以改成 isUserCanBind
     private boolean validateCanBindUser(BrokerageUserDO user, Long bindUserId, Boolean isNewUser) {
+        // TODO @疯狂：bindUserId 为空，搞到参数校验里哇；
         if (bindUserId == null) {
             return false;
         }
 
         // 校验分销功能是否启用
         TradeConfigDO tradeConfig = tradeConfigService.getTradeConfig();
-        if (tradeConfig == null || !BooleanUtil.isTrue(tradeConfig.getBrokerageEnabled())) {
+        if (tradeConfig == null || BooleanUtil.isFalse(tradeConfig.getBrokerageEnabled())) {
             return false;
         }
 
@@ -180,7 +191,7 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
 
         // 校验要绑定的用户有无推广资格
         BrokerageUserDO bindUser = brokerageUserMapper.selectById(bindUserId);
-        if (bindUser == null || !BooleanUtil.isTrue(bindUser.getBrokerageEnabled())) {
+        if (bindUser == null || BooleanUtil.isFalse(bindUser.getBrokerageEnabled())) {
             throw exception(BROKERAGE_BIND_USER_NOT_ENABLED);
         }
 
@@ -200,6 +211,7 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
             }
         }
 
+        // TODO @疯狂：这块是不是一直查询到根节点，中间不允许出现自己；就是不能形成环。虽然目前是 2 级，但是未来可能会改多级； = = 环的话，就会存在问题哈
         // A->B->A：下级不能绑定自己的上级,   A->B->C->A可以!!
         if (Objects.equals(user.getId(), bindUser.getBindUserId())) {
             throw exception(BROKERAGE_BIND_LOOP);

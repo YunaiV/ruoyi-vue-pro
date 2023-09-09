@@ -395,7 +395,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 增加用户经验
         getSelf().addUserExperienceAsync(order.getUserId(), order.getPayPrice(), order.getId());
         // 增加用户佣金
-        getSelf().addBrokerageAsync(order.getUserId(), BrokerageRecordBizTypeEnum.ORDER, order.getId());
+        getSelf().addBrokerageAsync(order.getUserId(), order.getId());
     }
 
     /**
@@ -675,7 +675,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 扣减用户经验
         getSelf().reduceUserExperienceAsync(order.getUserId(), orderRefundPrice, afterSaleId);
         // 更新分佣记录为已失效
-        getSelf().cancelBrokerageAsync(order.getUserId(), BrokerageRecordBizTypeEnum.ORDER, id);
+        getSelf().cancelBrokerageAsync(order.getUserId(), id);
     }
 
     @Override
@@ -785,16 +785,16 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
 
     @Async
-    protected void addBrokerageAsync(Long userId, BrokerageRecordBizTypeEnum bizType, Long orderId) {
+    protected void addBrokerageAsync(Long userId, Long orderId) {
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(orderId);
         List<BrokerageAddReqBO> list = convertList(orderItems,
                 item -> TradeOrderConvert.INSTANCE.convert(item, productSkuApi.getSku(item.getSkuId())));
-        brokerageRecordService.addBrokerage(userId, bizType, list);
+        brokerageRecordService.addBrokerage(userId, BrokerageRecordBizTypeEnum.ORDER, list);
     }
 
     @Async
-    protected void cancelBrokerageAsync(Long userId, BrokerageRecordBizTypeEnum bizType, Long orderItemId) {
-        brokerageRecordService.cancelBrokerage(userId, bizType, String.valueOf(orderItemId));
+    protected void cancelBrokerageAsync(Long userId, Long orderItemId) {
+        brokerageRecordService.cancelBrokerage(userId, BrokerageRecordBizTypeEnum.ORDER, String.valueOf(orderItemId));
     }
 
     /**

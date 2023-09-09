@@ -48,6 +48,7 @@ public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
                 BrokerageRecordDO::getBizId, bizId);
     }
 
+    // TODO @疯狂：mysql 关键字，大写哈；这样看起来清晰点；例如说 SELECT COUNT(1)
     @Select("select count(1), sum(price) from trade_brokerage_record where user_id = #{userId} and biz_type = #{bizType} and status = #{status}")
     UserBrokerageSummaryBO selectCountAndSumPriceByUserIdAndBizTypeAndStatus(@Param("userId") Long userId,
                                                                              @Param("bizType") Integer bizType,
