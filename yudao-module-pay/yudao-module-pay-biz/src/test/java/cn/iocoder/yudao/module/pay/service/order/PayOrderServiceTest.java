@@ -261,7 +261,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         String userIp = randomString();
 
         // 调用, 并断言异常
-        assertServiceException(() -> orderService.submitOrder(reqVO, userIp), ORDER_NOT_FOUND);
+        assertServiceException(() -> orderService.submitOrder(reqVO, userIp), PAY_ORDER_NOT_FOUND);
     }
 
     @Test
@@ -274,7 +274,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         String userIp = randomString();
 
         // 调用, 并断言异常
-        assertServiceException(() -> orderService.submitOrder(reqVO, userIp), ORDER_STATUS_IS_NOT_WAITING);
+        assertServiceException(() -> orderService.submitOrder(reqVO, userIp), PAY_ORDER_STATUS_IS_NOT_WAITING);
     }
 
     @Test
@@ -287,7 +287,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         String userIp = randomString();
 
         // 调用, 并断言异常
-        assertServiceException(() -> orderService.submitOrder(reqVO, userIp), ORDER_STATUS_IS_SUCCESS);
+        assertServiceException(() -> orderService.submitOrder(reqVO, userIp), PAY_ORDER_STATUS_IS_SUCCESS);
     }
 
     @Test
@@ -301,7 +301,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         String userIp = randomString();
 
         // 调用, 并断言异常
-        assertServiceException(() -> orderService.submitOrder(reqVO, userIp), ORDER_IS_EXPIRED);
+        assertServiceException(() -> orderService.submitOrder(reqVO, userIp), PAY_ORDER_IS_EXPIRED);
     }
 
     @Test
@@ -366,7 +366,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
 
             // 调用，并断言异常
             assertServiceException(() -> orderService.submitOrder(reqVO, userIp),
-                    ORDER_SUBMIT_CHANNEL_ERROR, "001", "模拟异常");
+                    PAY_ORDER_SUBMIT_CHANNEL_ERROR, "001", "模拟异常");
             // 断言，数据记录（PayOrderExtensionDO）
             PayOrderExtensionDO orderExtension = orderExtensionMapper.selectOne(null);
             assertNotNull(orderExtension);
@@ -450,7 +450,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
 
         // 调用，并断言异常
         assertServiceException(() -> orderService.validateOrderActuallyPaid(id),
-                ORDER_EXTENSION_IS_PAID);
+                PAY_ORDER_EXTENSION_IS_PAID);
     }
 
     @Test
@@ -469,7 +469,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
 
         // 调用，并断言异常
         assertServiceException(() -> orderService.validateOrderActuallyPaid(id),
-                ORDER_EXTENSION_IS_PAID);
+                PAY_ORDER_EXTENSION_IS_PAID);
     }
 
     @Test
@@ -519,7 +519,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
 
         // 调用，并断言异常
         assertServiceException(() -> orderService.notifyOrder(channel, notify),
-                ORDER_EXTENSION_NOT_FOUND);
+                PAY_ORDER_EXTENSION_NOT_FOUND);
     }
 
     @Test
@@ -537,7 +537,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
 
         // 调用，并断言异常
         assertServiceException(() -> orderService.notifyOrder(channel, notify),
-                ORDER_EXTENSION_STATUS_IS_NOT_WAITING);
+                PAY_ORDER_EXTENSION_STATUS_IS_NOT_WAITING);
     }
 
     @Test
@@ -555,7 +555,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
 
         // 调用，并断言异常
         assertServiceException(() -> orderService.notifyOrder(channel, notify),
-                ORDER_NOT_FOUND);
+                PAY_ORDER_NOT_FOUND);
         // 断言 PayOrderExtensionDO ：数据更新被回滚
         assertPojoEquals(orderExtension, orderExtensionMapper.selectOne(null));
     }
@@ -588,7 +588,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
 
         // 调用，并断言异常
         assertServiceException(() -> orderService.notifyOrder(channel, notify),
-                ORDER_STATUS_IS_NOT_WAITING);
+                PAY_ORDER_STATUS_IS_NOT_WAITING);
         // 断言 PayOrderExtensionDO ：数据未更新，因为它是 SUCCESS
         assertPojoEquals(orderExtension, orderExtensionMapper.selectOne(null));
     }
@@ -673,7 +673,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
 
         // 调用，并断言异常
         assertServiceException(() -> orderService.notifyOrder(channel, notify),
-                ORDER_EXTENSION_NOT_FOUND);
+                PAY_ORDER_EXTENSION_NOT_FOUND);
     }
 
     @Test
@@ -729,7 +729,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
 
         // 调用，并断言异常
         assertServiceException(() -> orderService.notifyOrder(channel, notify),
-                ORDER_EXTENSION_STATUS_IS_NOT_WAITING);
+                PAY_ORDER_EXTENSION_STATUS_IS_NOT_WAITING);
     }
 
     @Test
@@ -762,7 +762,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
 
         // 调用，并断言异常
         assertServiceException(() -> orderService.updateOrderRefundPrice(id, incrRefundPrice),
-                ORDER_NOT_FOUND);
+                PAY_ORDER_NOT_FOUND);
     }
 
     @Test
@@ -786,7 +786,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
 
         // 调用，并断言异常
         assertServiceException(() -> orderService.updateOrderRefundPrice(id, incrRefundPrice),
-                ORDER_REFUND_FAIL_STATUS_ERROR);
+                PAY_ORDER_REFUND_FAIL_STATUS_ERROR);
     }
 
     @Test
