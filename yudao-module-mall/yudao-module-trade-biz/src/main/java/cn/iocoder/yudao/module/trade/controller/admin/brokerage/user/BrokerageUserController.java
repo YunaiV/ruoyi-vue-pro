@@ -9,8 +9,8 @@ import cn.iocoder.yudao.module.trade.convert.brokerage.user.BrokerageUserConvert
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.user.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
-import cn.iocoder.yudao.module.trade.service.brokerage.record.BrokerageRecordService;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
+import cn.iocoder.yudao.module.trade.service.brokerage.record.BrokerageRecordService;
 import cn.iocoder.yudao.module.trade.service.brokerage.user.BrokerageUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -72,7 +72,8 @@ public class BrokerageUserController {
     @PreAuthorize("@ss.hasPermission('trade:brokerage-user:query')")
     public CommonResult<BrokerageUserRespVO> getBrokerageUser(@RequestParam("id") Long id) {
         BrokerageUserDO brokerageUser = brokerageUserService.getBrokerageUser(id);
-        return success(BrokerageUserConvert.INSTANCE.convert(brokerageUser));
+        BrokerageUserRespVO respVO = BrokerageUserConvert.INSTANCE.convert(brokerageUser);
+        return success(BrokerageUserConvert.INSTANCE.copyTo(memberUserApi.getUser(id), respVO));
     }
 
     @GetMapping("/page")

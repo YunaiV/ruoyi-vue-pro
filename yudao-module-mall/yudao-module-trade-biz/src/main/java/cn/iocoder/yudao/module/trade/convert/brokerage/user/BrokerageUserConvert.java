@@ -37,11 +37,7 @@ public interface BrokerageUserConvert {
         PageResult<BrokerageUserRespVO> result = convertPage(pageResult);
         for (BrokerageUserRespVO vo : result.getList()) {
             // 用户信息
-            Optional.ofNullable(userMap.get(vo.getId()))
-                    .ifPresent(user -> {
-                        vo.setNickname(user.getNickname());
-                        vo.setAvatar(user.getAvatar());
-                    });
+            copyTo(userMap.get(vo.getId()), vo);
 
             // 推广用户数量（一级）
             vo.setBrokerageUserCount(MapUtil.getInt(brokerageUserCountMap, vo.getId(), 0));
@@ -58,6 +54,13 @@ public interface BrokerageUserConvert {
             vo.setWithdrawPrice(0);
         }
         return result;
+    }
+
+    default BrokerageUserRespVO copyTo(MemberUserRespDTO source, BrokerageUserRespVO target) {
+        Optional.ofNullable(source)
+                .ifPresent(user -> target.setNickname(user.getNickname())
+                        .setAvatar(user.getAvatar()));
+        return target;
     }
 
     BrokerageUserDTO convertDTO(BrokerageUserDO brokerageUser);

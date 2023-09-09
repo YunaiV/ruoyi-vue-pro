@@ -55,16 +55,19 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
 
     @Override
     public void updateBrokerageUserId(Long id, Long bindUserId) {
-        // 校验存在
-        validateBrokerageUserExists(id);
+        // 0. 校验存在
+        BrokerageUserDO brokerageUser = validateBrokerageUserExists(id);
         if (bindUserId == null) {
-            // 清除推广员
+            // 1. 清除推广员
             brokerageUserMapper.updateBindUserIdAndBindUserTimeToNull(id);
-        } else {
-            // 修改推广员
-            brokerageUserMapper.updateById(new BrokerageUserDO().setId(id)
-                    .setBindUserId(bindUserId).setBindUserTime(LocalDateTime.now()));
+            return;
         }
+
+        // 2.1 校验能否绑定
+        validateCanBindUser(brokerageUser, bindUserId);
+        // 2.2 修改推广员
+        brokerageUserMapper.updateById(new BrokerageUserDO().setId(id)
+                .setBindUserId(bindUserId).setBindUserTime(LocalDateTime.now()));
     }
 
     @Override
@@ -81,10 +84,13 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         }
     }
 
-    private void validateBrokerageUserExists(Long id) {
-        if (brokerageUserMapper.selectById(id) == null) {
+    private BrokerageUserDO validateBrokerageUserExists(Long id) {
+        BrokerageUserDO brokerageUserDO = brokerageUserMapper.selectById(id);
+        if (brokerageUserDO == null) {
             throw exception(BROKERAGE_USER_NOT_EXISTS);
         }
+
+        return brokerageUserDO;
     }
 
     @Override
@@ -142,11 +148,14 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
             brokerageUser = new BrokerageUserDO().setId(userId).setBrokerageEnabled(false).setPrice(0).setFrozenPrice(0);
         }
 
-        // 校验能否绑定
-        boolean validated = validateCanBindUser(brokerageUser, bindUserId, isNewUser);
+        // 校验分配配置
+        boolean validated = validateTradeConfig(brokerageUser, bindUserId, isNewUser);
         if (!validated) {
             return false;
         }
+
+        // 校验能否绑定
+        validateCanBindUser(brokerageUser, bindUserId);
 
         if (isInsert) {
             Integer enabledCondition = tradeConfigService.getTradeConfig().getBrokerageEnabledCondition();
@@ -162,26 +171,11 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         return true;
     }
 
-    private boolean validateCanBindUser(BrokerageUserDO user, Long bindUserId, Boolean isNewUser) {
-        if (bindUserId == null) {
-            return false;
-        }
-
+    private boolean validateTradeConfig(BrokerageUserDO user, Long bindUserId, Boolean isNewUser) {
         // 校验分销功能是否启用
         TradeConfigDO tradeConfig = tradeConfigService.getTradeConfig();
         if (tradeConfig == null || !BooleanUtil.isTrue(tradeConfig.getBrokerageEnabled())) {
             return false;
-        }
-
-        // 校验绑定自己
-        if (Objects.equals(user.getId(), bindUserId)) {
-            throw exception(BROKERAGE_BIND_SELF);
-        }
-
-        // 校验要绑定的用户有无推广资格
-        BrokerageUserDO bindUser = brokerageUserMapper.selectById(bindUserId);
-        if (bindUser == null || !BooleanUtil.isTrue(bindUser.getBrokerageEnabled())) {
-            throw exception(BROKERAGE_BIND_USER_NOT_ENABLED);
         }
 
         // 校验分佣模式：仅可后台手动设置推广员
@@ -200,11 +194,26 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
             }
         }
 
+        validateCanBindUser(user, bindUserId);
+        return true;
+    }
+
+    private void validateCanBindUser(BrokerageUserDO user, Long bindUserId) {
+        // 校验要绑定的用户有无推广资格
+        BrokerageUserDO bindUser = brokerageUserMapper.selectById(bindUserId);
+        if (bindUser == null || !BooleanUtil.isTrue(bindUser.getBrokerageEnabled())) {
+            throw exception(BROKERAGE_BIND_USER_NOT_ENABLED);
+        }
+
+        // 校验绑定自己
+        if (Objects.equals(user.getId(), bindUserId)) {
+            throw exception(BROKERAGE_BIND_SELF);
+        }
+
         // A->B->A：下级不能绑定自己的上级,   A->B->C->A可以!!
         if (Objects.equals(user.getId(), bindUser.getBindUserId())) {
             throw exception(BROKERAGE_BIND_LOOP);
         }
-        return true;
     }
 
 }
