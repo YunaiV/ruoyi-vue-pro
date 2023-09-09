@@ -146,7 +146,7 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         BrokerageUserDO brokerageUser = brokerageUserMapper.selectById(userId);
         if (brokerageUser == null) { // 分销用户不存在的情况：1. 新注册；2. 旧数据；3. 分销功能关闭后又打开
             isNewBrokerageUser = true;
-            brokerageUser = new BrokerageUserDO().setId(userId).setBrokerageEnabled(false).setPrice(0).setFrozenPrice(0);
+            brokerageUser = new BrokerageUserDO().setId(userId).setBrokerageEnabled(false).setBrokeragePrice(0).setFrozenPrice(0);
         }
 
         // 2.1 校验能否绑定

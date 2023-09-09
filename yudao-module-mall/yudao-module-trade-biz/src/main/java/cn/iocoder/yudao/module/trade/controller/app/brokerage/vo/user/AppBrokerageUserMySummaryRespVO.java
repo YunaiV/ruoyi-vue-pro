@@ -14,7 +14,7 @@ public class AppBrokerageUserMySummaryRespVO {
     private Integer withdrawPrice;
 
     @Schema(description = "可用的佣金，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "2408")
-    private Integer price;
+    private Integer brokeragePrice;
 
     @Schema(description = "冻结的佣金，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "234")
     private Integer frozenPrice;
