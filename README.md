@@ -218,6 +218,8 @@
 
 ![功能图](/.image/common/mall-preview.png)
 
+前端基于 crmeb uniapp 经过授权重构，优化代码实现，接入芋道快速开发平台
+
 ### 会员中心
 
 |     | 功能   | 描述                               |
