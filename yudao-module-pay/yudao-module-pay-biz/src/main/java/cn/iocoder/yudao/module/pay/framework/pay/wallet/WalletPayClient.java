@@ -62,13 +62,12 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
     @Override
     protected PayOrderRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
         try {
-            // TODO @jason：直接 getLong 和 getInt 会不会更简洁哈
-            String userId = MapUtil.getStr(reqDTO.getChannelExtras(), USER_ID_KEY);
-            String userType = MapUtil.getStr(reqDTO.getChannelExtras(), USER_TYPE_KEY);
-            Assert.notEmpty(userId, "用户 id 不能为空");
-            Assert.notEmpty(userType, "用户类型不能为空");
-            PayWalletTransactionDO transaction = wallService.orderPay(Long.valueOf(userId), Integer.valueOf(userType),
-                    reqDTO.getOutTradeNo(), reqDTO.getPrice());
+            Long userId = MapUtil.getLong(reqDTO.getChannelExtras(), USER_ID_KEY);
+            Integer userType = MapUtil.getInt(reqDTO.getChannelExtras(), USER_TYPE_KEY);
+            Assert.notNull(userId, "用户 id 不能为空");
+            Assert.notNull(userType, "用户类型不能为空");
+            PayWalletTransactionDO transaction = wallService.orderPay(userId, userType, reqDTO.getOutTradeNo(),
+                    reqDTO.getPrice());
             return PayOrderRespDTO.successOf(transaction.getNo(), transaction.getCreator(),
                     transaction.getCreateTime(),
                     reqDTO.getOutTradeNo(), transaction);
