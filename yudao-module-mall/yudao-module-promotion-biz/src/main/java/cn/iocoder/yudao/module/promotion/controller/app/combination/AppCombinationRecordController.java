@@ -52,13 +52,14 @@ public class AppCombinationRecordController {
             @RequestParam(value = "activityId", required = false) Long activityId,
             @RequestParam("status") Integer status,
             @RequestParam(value = "count", defaultValue = "20") @Max(20) Integer count) {
+        ZoneId zoneId = ZoneId.systemDefault();
         List<AppCombinationRecordRespVO> list = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
             AppCombinationRecordRespVO record = new AppCombinationRecordRespVO();
             record.setId((long) i);
             record.setNickname("用户" + i);
             record.setAvatar("头像" + i);
-            record.setExpireTime(new Date());
+            record.setExpireTime(LocalDateTime.ofInstant(new Date().toInstant(), zoneId));
             record.setUserSize(10);
             record.setUserCount(i);
             record.setPicUrl("https://static.iocoder.cn/mall/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
@@ -73,13 +74,14 @@ public class AppCombinationRecordController {
     @Operation(summary = "获得拼团记录明细")
     @Parameter(name = "id", description = "拼团记录编号", required = true, example = "1024")
     public CommonResult<AppCombinationRecordDetailRespVO> getCombinationRecordDetail(@RequestParam("id") Long id) {
+        ZoneId zoneId = ZoneId.systemDefault();
         AppCombinationRecordDetailRespVO detail = new AppCombinationRecordDetailRespVO();
         // 团长
         AppCombinationRecordRespVO headRecord = new AppCombinationRecordRespVO();
         headRecord.setId(1L);
         headRecord.setNickname("用户" + 1);
         headRecord.setAvatar("头像" + 1);
-        headRecord.setExpireTime(DateUtils.addTime(Duration.ofDays(1)));
+        headRecord.setExpireTime((LocalDateTime.ofInstant(DateUtils.addTime(Duration.ofDays(1)).toInstant(), zoneId)));
         headRecord.setUserSize(10);
         headRecord.setUserCount(3);
         headRecord.setStatus(1);
@@ -94,7 +96,7 @@ public class AppCombinationRecordController {
             record.setId((long) i);
             record.setNickname("用户" + i);
             record.setAvatar("头像" + i);
-            record.setExpireTime(new Date());
+            record.setExpireTime(LocalDateTime.ofInstant(new Date().toInstant(), zoneId));
             record.setUserSize(10);
             record.setUserCount(i);
             record.setStatus(1);
