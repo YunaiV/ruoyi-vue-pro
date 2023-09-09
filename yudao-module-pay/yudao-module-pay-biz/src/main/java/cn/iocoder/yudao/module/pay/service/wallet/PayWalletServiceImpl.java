@@ -112,13 +112,14 @@ public class PayWalletServiceImpl implements  PayWalletService {
     @Override
     public PayWalletTransactionDO reduceWalletBalance(Long userId, Integer userType,
                                                       Long bizId, PayWalletBizTypeEnum bizType, Integer price) {
-        // 1.1 获取钱包
+        // 1. 获取钱包
         PayWalletDO payWallet = getOrCreateWallet(userId, userType);
+
         // 2.1 扣除余额
-        int number = 0 ;
+        int updateCounts = 0 ;
         switch (bizType) {
             case PAYMENT: {
-                number = walletMapper.updateWhenConsumption(price, payWallet.getId());
+                updateCounts = walletMapper.updateWhenConsumption(price, payWallet.getId());
                 break;
             }
             case RECHARGE_REFUND: {
@@ -126,11 +127,11 @@ public class PayWalletServiceImpl implements  PayWalletService {
                 break;
             }
         }
-        if (number == 0) {
+        if (updateCounts == 0) {
             throw exception(WALLET_BALANCE_NOT_ENOUGH);
         }
-        int afterBalance = payWallet.getBalance() - price;
         // 2.2 生成钱包流水
+        Integer afterBalance = payWallet.getBalance() - price;
         CreateWalletTransactionBO bo = new CreateWalletTransactionBO().setWalletId(payWallet.getId())
                 .setPrice(-price).setBalance(afterBalance).setBizId(String.valueOf(bizId))
                 .setBizType(bizType.getType()).setTitle(bizType.getDescription());
@@ -140,7 +141,7 @@ public class PayWalletServiceImpl implements  PayWalletService {
     @Override
     public PayWalletTransactionDO addWalletBalance(Long userId, Integer userType,
                                                    Long bizId, PayWalletBizTypeEnum bizType, Integer price) {
-        // 获取钱包
+        // 1. 获取钱包
         PayWalletDO payWallet = getOrCreateWallet(userId, userType);
         switch (bizType) {
             case PAYMENT_REFUND: {
@@ -153,7 +154,8 @@ public class PayWalletServiceImpl implements  PayWalletService {
                 break;
             }
         }
-        // 2.2 生成钱包流水
+
+        // 2. 生成钱包流水
         CreateWalletTransactionBO bo = new CreateWalletTransactionBO().setWalletId(payWallet.getId())
                 .setPrice(price).setBalance(payWallet.getBalance()+price).setBizId(String.valueOf(bizId))
                 .setBizType(bizType.getType()).setTitle(bizType.getDescription());

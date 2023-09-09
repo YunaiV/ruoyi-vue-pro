@@ -22,10 +22,12 @@ import javax.annotation.Resource;
 @Service
 @Slf4j
 public class PayWalletTransactionServiceImpl implements PayWalletTransactionService {
+
     /**
      * 钱包流水的 no 前缀
      */
     private static final String WALLET_NO_PREFIX = "W";
+
     @Resource
     private PayWalletService payWalletService;
     @Resource
@@ -42,10 +44,10 @@ public class PayWalletTransactionServiceImpl implements PayWalletTransactionServ
 
     @Override
     public PayWalletTransactionDO createWalletTransaction(CreateWalletTransactionBO bo) {
-        PayWalletTransactionDO transactionDO = PayWalletTransactionConvert.INSTANCE.convert(bo);
-        transactionDO.setNo(noRedisDAO.generate(WALLET_NO_PREFIX));
-        payWalletTransactionMapper.insert(transactionDO);
-        return transactionDO;
+        PayWalletTransactionDO transaction = PayWalletTransactionConvert.INSTANCE.convert(bo)
+                .setNo(noRedisDAO.generate(WALLET_NO_PREFIX));
+        payWalletTransactionMapper.insert(transaction);
+        return transaction;
     }
 
     @Override
@@ -57,4 +59,5 @@ public class PayWalletTransactionServiceImpl implements PayWalletTransactionServ
     public PayWalletTransactionDO getWalletTransaction(String bizId, PayWalletBizTypeEnum type) {
         return payWalletTransactionMapper.selectByBiz(bizId, type.getType());
     }
+
 }

@@ -22,7 +22,8 @@ public interface PayWalletMapper extends BaseMapperX<PayWalletDO> {
      */
     default int updateWhenConsumptionRefund(Integer price, Long id){
         LambdaUpdateWrapper<PayWalletDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<PayWalletDO>()
-                .setSql(" balance = balance + " + price + ", total_expense = total_expense - " + price)
+                .setSql(" balance = balance + " + price
+                        + ", total_expense = total_expense - " + price)
                 .eq(PayWalletDO::getId, id);
         return update(null, lambdaUpdateWrapper);
     }
@@ -35,7 +36,8 @@ public interface PayWalletMapper extends BaseMapperX<PayWalletDO> {
      */
     default int updateWhenConsumption(Integer price, Long id){
         LambdaUpdateWrapper<PayWalletDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<PayWalletDO>()
-                .setSql(" balance = balance - " + price + ", total_expense = total_expense + " + price)
+                .setSql(" balance = balance - " + price
+                        + ", total_expense = total_expense + " + price)
                 .eq(PayWalletDO::getId, id)
                 .ge(PayWalletDO::getBalance, price); // cas 逻辑
         return update(null, lambdaUpdateWrapper);

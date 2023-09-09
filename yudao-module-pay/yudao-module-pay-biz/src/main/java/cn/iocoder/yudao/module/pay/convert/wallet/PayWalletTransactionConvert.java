@@ -14,5 +14,6 @@ public interface PayWalletTransactionConvert {
 
     PageResult<AppPayWalletTransactionRespVO> convertPage(PageResult<PayWalletTransactionDO> page);
 
-    PayWalletTransactionDO convert(CreateWalletTransactionBO bo);
+    PayWalletTransactionDO convert(CreateWalletTransactionBO bean);
+
 }

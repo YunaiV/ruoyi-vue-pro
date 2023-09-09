@@ -11,6 +11,8 @@ import lombok.Data;
 @Data
 public class CreateWalletTransactionBO {
 
+    // TODO @jason：bo 的话，最好加个参数校验哈；
+
     /**
      * 钱包编号
      *
