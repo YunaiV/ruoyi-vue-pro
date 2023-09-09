@@ -192,9 +192,9 @@ VALUES ('分销用户推广订单查询', 'trade:brokerage-user:order-query', 3,
 INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
 VALUES ('分销用户修改推广资格', 'trade:brokerage-user:update-brokerage-enable', 3, 4, @parentId, '', '', '', 0);
 INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
-VALUES ('分销用户修改推广员', 'trade:brokerage-user:update-brokerage-user', 3, 5, @parentId, '', '', '', 0);
+VALUES ('分销用户修改推广员', 'trade:brokerage-user:update-bind-user', 3, 5, @parentId, '', '', '', 0);
 INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
-VALUES ('分销用户清除推广员', 'trade:brokerage-user:clear-brokerage-user', 3, 6, @parentId, '', '', '', 0);
+VALUES ('分销用户清除推广员', 'trade:brokerage-user:clear-bind-user', 3, 6, @parentId, '', '', '', 0);
 
 -- 增加菜单：佣金记录
 INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status, component_name)

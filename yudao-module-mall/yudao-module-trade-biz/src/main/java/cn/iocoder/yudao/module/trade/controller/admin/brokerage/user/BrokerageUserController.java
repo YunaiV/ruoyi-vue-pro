@@ -42,18 +42,18 @@ public class BrokerageUserController {
     @Resource
     private MemberUserApi memberUserApi;
 
-    @PutMapping("/update-brokerage-user")
+    @PutMapping("/update-bind-user")
     @Operation(summary = "修改推广员")
-    @PreAuthorize("@ss.hasPermission('trade:brokerage-user:update-brokerage-user')")
-    public CommonResult<Boolean> updateBrokerageUser(@Valid @RequestBody BrokerageUserUpdateBrokerageUserReqVO updateReqVO) {
+    @PreAuthorize("@ss.hasPermission('trade:brokerage-user:update-bind-user')")
+    public CommonResult<Boolean> updateBindUser(@Valid @RequestBody BrokerageUserUpdateBrokerageUserReqVO updateReqVO) {
         brokerageUserService.updateBrokerageUserId(updateReqVO.getId(), updateReqVO.getBindUserId());
         return success(true);
     }
 
-    @PutMapping("/clear-brokerage-user")
+    @PutMapping("/clear-bind-user")
     @Operation(summary = "清除推广员")
-    @PreAuthorize("@ss.hasPermission('trade:brokerage-user:clear-brokerage-user')")
-    public CommonResult<Boolean> clearBrokerageUser(@Valid @RequestBody BrokerageUserClearBrokerageUserReqVO updateReqVO) {
+    @PreAuthorize("@ss.hasPermission('trade:brokerage-user:clear-bind-user')")
+    public CommonResult<Boolean> clearBindUser(@Valid @RequestBody BrokerageUserClearBrokerageUserReqVO updateReqVO) {
         brokerageUserService.updateBrokerageUserId(updateReqVO.getId(), null);
         return success(true);
     }
