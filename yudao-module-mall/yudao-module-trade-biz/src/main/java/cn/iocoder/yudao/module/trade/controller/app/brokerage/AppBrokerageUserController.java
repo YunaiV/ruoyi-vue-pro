@@ -43,6 +43,13 @@ public class AppBrokerageUserController {
         return success(respVO);
     }
 
+    @PutMapping("/bind")
+    @Operation(summary = "绑定推广员")
+    @PreAuthenticated
+    public CommonResult<Boolean> bindBrokerageUser(@Valid @RequestBody AppBrokerageUserBindReqVO reqVO) {
+        return success(brokerageUserService.bindBrokerageUser(getLoginUserId(), reqVO.getBindUserId(), false));
+    }
+
     // TODO 芋艿：临时 mock =>
     @GetMapping("/get-summary")
     @Operation(summary = "获得个人分销统计")
@@ -119,15 +126,9 @@ public class AppBrokerageUserController {
     @GetMapping("/get-rank-by-price")
     @Operation(summary = "获得分销用户排行（基于佣金）")
     @Parameter(name = "times", description = "时间段", required = true)
-    public CommonResult<Integer> getBrokerageUserRankByPrice(
+    public CommonResult<Integer> bindBrokerageUser(
             @RequestParam("times") @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND) LocalDateTime[] times) {
         return success(1);
-    }
-
-    @PutMapping("/bind-user")
-    @Operation(summary = "绑定推广员")
-    public CommonResult<Boolean> getBrokerageUserRankByPrice(@Valid AppBrokerageUserBindReqVO reqVO) {
-        return success(brokerageUserService.bindUser(getLoginUserId(), reqVO.getBindUserId(), false));
     }
 
 }

@@ -135,7 +135,7 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
 
     // TODO @疯狂：因为现在 user 会存在使用验证码直接注册，所以 isNewUser 不太好传递；我们是不是可以约定绑定的时间，createTime 在 30 秒内，就认为新用户；
     @Override
-    public boolean bindUser(Long userId, Long bindUserId, Boolean isNewUser) {
+    public boolean bindBrokerageUser(Long userId, Long bindUserId, Boolean isNewUser) {
         // TODO @疯狂：userId 为空，搞到参数校验里哇；
         if (userId == null) {
             throw exception(0);
