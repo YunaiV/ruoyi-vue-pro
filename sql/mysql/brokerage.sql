@@ -3,8 +3,8 @@ create table trade_config
 (
     id                           bigint auto_increment comment '自增主键' primary key,
     brokerage_enabled            bit                                    default 1                 not null comment '是否启用分佣',
-    brokerage_enabled_condition  tinyint                                default 0                 not null comment '分佣模式：0-人人分销 1-指定分销',
-    brokerage_bind_mode          tinyint                                default 0                 not null comment '分销关系绑定模式: 0-没有推广人，1-新用户',
+    brokerage_enabled_condition  tinyint                                default 0                 not null comment '分佣模式：1-人人分销 2-指定分销',
+    brokerage_bind_mode          tinyint                                default 0                 not null comment '分销关系绑定模式: 1-没有推广人，2-新用户, 3-扫码覆盖',
     brokerage_post_urls          varchar(2000)                          default ''                null comment '分销海报图地址数组',
     brokerage_first_percent      int                                    default 0                 not null comment '一级返佣比例',
     brokerage_second_percent     int                                    default 0                 not null comment '二级返佣比例',
@@ -23,22 +23,22 @@ create table trade_config
 -- 增加分销用户扩展表
 create table trade_brokerage_user
 (
-    id                     bigint auto_increment comment '用户编号' primary key,
-    brokerage_user_id      bigint                                                           not null comment '推广员编号',
-    brokerage_bind_time    datetime                                                         null comment '推广员绑定时间',
-    brokerage_enabled      bit                                    default 1                 not null comment '是否成为推广员',
-    brokerage_time         datetime                                                         null comment '成为分销员时间',
-    brokerage_price        int                                    default 0                 not null comment '可用佣金',
-    frozen_brokerage_price int                                    default 0                 not null comment '冻结佣金',
-    creator                varchar(64) collate utf8mb4_unicode_ci default ''                null comment '创建者',
-    create_time            datetime                               default CURRENT_TIMESTAMP not null comment '创建时间',
-    updater                varchar(64) collate utf8mb4_unicode_ci default ''                null comment '更新者',
-    update_time            datetime                               default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
-    deleted                bit                                    default b'0'              not null comment '是否删除',
-    tenant_id              bigint                                 default 0                 not null comment '租户编号'
+    id                bigint auto_increment comment '用户编号' primary key,
+    bind_user_id      bigint                                                           null comment '推广员编号',
+    bind_user_time    datetime                                                         null comment '推广员绑定时间',
+    brokerage_enabled bit                                    default 1                 not null comment '是否成为推广员',
+    brokerage_time    datetime                                                         null comment '成为分销员时间',
+    price             int                                    default 0                 not null comment '可用佣金',
+    frozen_price      int                                    default 0                 not null comment '冻结佣金',
+    creator           varchar(64) collate utf8mb4_unicode_ci default ''                null comment '创建者',
+    create_time       datetime                               default CURRENT_TIMESTAMP not null comment '创建时间',
+    updater           varchar(64) collate utf8mb4_unicode_ci default ''                null comment '更新者',
+    update_time       datetime                               default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    deleted           bit                                    default b'0'              not null comment '是否删除',
+    tenant_id         bigint                                 default 0                 not null comment '租户编号'
 ) comment '分销用户';
 
-create index idx_invite_user_id on trade_brokerage_user (brokerage_user_id) comment '推广员编号';
+create index idx_invite_user_id on trade_brokerage_user (bind_user_id) comment '推广员编号';
 create index idx_agent on trade_brokerage_user (brokerage_enabled) comment '是否成为推广员';
 
 
@@ -104,14 +104,15 @@ create index idx_audit_status on trade_brokerage_withdraw (status) comment '状�
 insert into system_dict_type(type, name)
 values ('brokerage_enabled_condition', '分佣模式');
 insert into system_dict_data(dict_type, label, value, sort, remark)
-values ('brokerage_enabled_condition', '人人分销', 0, 0, '所有用户都可以分销'),
-       ('brokerage_enabled_condition', '指定分销', 1, 1, '仅可后台手动设置推广员');
+values ('brokerage_enabled_condition', '人人分销', 1, 1, '所有用户都可以分销'),
+       ('brokerage_enabled_condition', '指定分销', 2, 2, '仅可后台手动设置推广员');
 
 insert into system_dict_type(type, name)
 values ('brokerage_bind_mode', '分销关系绑定模式');
 insert into system_dict_data(dict_type, label, value, sort, remark)
-values ('brokerage_bind_mode', '没有推广人', 0, 0, '只要用户没有推广人，随时都可以绑定推广关系'),
-       ('brokerage_bind_mode', '新用户', 1, 1, '仅新用户注册时才能绑定推广关系');
+values ('brokerage_bind_mode', '没有推广人', 1, 1, '只要用户没有推广人，随时都可以绑定推广关系'),
+       ('brokerage_bind_mode', '新用户', 2, 2, '仅新用户注册时才能绑定推广关系'),
+       ('brokerage_bind_mode', '扫码覆盖', 3, 3, '如果用户已经有推广人，推广人会被变更');
 
 insert into system_dict_type(type, name)
 values ('brokerage_withdraw_type', '佣金提现类型');
@@ -124,8 +125,8 @@ values ('brokerage_withdraw_type', '钱包', 1, 1),
 insert into system_dict_type(type, name)
 values ('brokerage_record_biz_type', '佣金记录业务类型');
 insert into system_dict_data(dict_type, label, value, sort)
-values ('brokerage_record_biz_type', '订单返佣', 0, 0),
-       ('brokerage_record_biz_type', '申请提现', 1, 1);
+values ('brokerage_record_biz_type', '订单返佣', 1, 1),
+       ('brokerage_record_biz_type', '申请提现', 2, 2);
 
 insert into system_dict_type(type, name)
 values ('brokerage_record_status', '佣金记录状态');
@@ -185,12 +186,15 @@ SELECT @parentId := LAST_INSERT_ID();
 INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
 VALUES ('分销用户查询', 'trade:brokerage-user:query', 3, 1, @parentId, '', '', '', 0);
 INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
-VALUES ('分销用户修改推广员', 'trade:brokerage-user:update-brokerage-user', 3, 2, @parentId, '', '', '', 0);
+VALUES ('分销用户推广人查询', 'trade:brokerage-user:user-query', 3, 2, @parentId, '', '', '', 0);
 INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
-VALUES ('分销用户清除推广员', 'trade:brokerage-user:clear-brokerage-user', 3, 3, @parentId, '', '', '', 0);
+VALUES ('分销用户推广订单查询', 'trade:brokerage-user:order-query', 3, 3, @parentId, '', '', '', 0);
 INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
 VALUES ('分销用户修改推广资格', 'trade:brokerage-user:update-brokerage-enable', 3, 4, @parentId, '', '', '', 0);
-
+INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
+VALUES ('分销用户修改推广员', 'trade:brokerage-user:update-brokerage-user', 3, 5, @parentId, '', '', '', 0);
+INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
+VALUES ('分销用户清除推广员', 'trade:brokerage-user:clear-brokerage-user', 3, 6, @parentId, '', '', '', 0);
 
 -- 增加菜单：佣金记录
 INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status, component_name)

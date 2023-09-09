@@ -3,10 +3,10 @@ package cn.iocoder.yudao.module.trade.service.brokerage.record;
 import cn.hutool.core.util.NumberUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.TradeBrokerageRecordPageReqVO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.record.TradeBrokerageRecordDO;
-import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.record.TradeBrokerageRecordMapper;
-import cn.iocoder.yudao.module.trade.service.brokerage.user.TradeBrokerageUserService;
+import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.BrokerageRecordPageReqVO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.record.BrokerageRecordDO;
+import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.record.BrokerageRecordMapper;
+import cn.iocoder.yudao.module.trade.service.brokerage.user.BrokerageUserService;
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -27,51 +27,51 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 // TODO @芋艿：单测后续看看
 /**
- * {@link TradeBrokerageRecordServiceImpl} 的单元测试类
+ * {@link BrokerageRecordServiceImpl} 的单元测试类
  *
  * @author owen
  */
-@Import(TradeBrokerageRecordServiceImpl.class)
-public class TradeBrokerageRecordServiceImplTest extends BaseDbUnitTest {
+@Import(BrokerageRecordServiceImpl.class)
+public class BrokerageRecordServiceImplTest extends BaseDbUnitTest {
 
     @Resource
-    private TradeBrokerageRecordServiceImpl tradeBrokerageRecordService;
+    private BrokerageRecordServiceImpl brokerageRecordService;
     @Resource
-    private TradeBrokerageRecordMapper tradeBrokerageRecordMapper;
+    private BrokerageRecordMapper brokerageRecordMapper;
 
     @MockBean
     private TradeConfigService tradeConfigService;
     @MockBean
-    private TradeBrokerageUserService tradeBrokerageUserService;
+    private BrokerageUserService brokerageUserService;
 
     @Test
     @Disabled  // TODO 请修改 null 为需要的值，然后删除 @Disabled 注解
     public void testGetBrokerageRecordPage() {
         // mock 数据
-        TradeBrokerageRecordDO dbBrokerageRecord = randomPojo(TradeBrokerageRecordDO.class, o -> { // 等会查询到
+        BrokerageRecordDO dbBrokerageRecord = randomPojo(BrokerageRecordDO.class, o -> { // 等会查询到
             o.setUserId(null);
             o.setBizType(null);
             o.setStatus(null);
             o.setCreateTime(null);
         });
-        tradeBrokerageRecordMapper.insert(dbBrokerageRecord);
+        brokerageRecordMapper.insert(dbBrokerageRecord);
         // 测试 userId 不匹配
-        tradeBrokerageRecordMapper.insert(cloneIgnoreId(dbBrokerageRecord, o -> o.setUserId(null)));
+        brokerageRecordMapper.insert(cloneIgnoreId(dbBrokerageRecord, o -> o.setUserId(null)));
         // 测试 bizType 不匹配
-        tradeBrokerageRecordMapper.insert(cloneIgnoreId(dbBrokerageRecord, o -> o.setBizType(null)));
+        brokerageRecordMapper.insert(cloneIgnoreId(dbBrokerageRecord, o -> o.setBizType(null)));
         // 测试 status 不匹配
-        tradeBrokerageRecordMapper.insert(cloneIgnoreId(dbBrokerageRecord, o -> o.setStatus(null)));
+        brokerageRecordMapper.insert(cloneIgnoreId(dbBrokerageRecord, o -> o.setStatus(null)));
         // 测试 createTime 不匹配
-        tradeBrokerageRecordMapper.insert(cloneIgnoreId(dbBrokerageRecord, o -> o.setCreateTime(null)));
+        brokerageRecordMapper.insert(cloneIgnoreId(dbBrokerageRecord, o -> o.setCreateTime(null)));
         // 准备参数
-        TradeBrokerageRecordPageReqVO reqVO = new TradeBrokerageRecordPageReqVO();
+        BrokerageRecordPageReqVO reqVO = new BrokerageRecordPageReqVO();
         reqVO.setUserId(null);
         reqVO.setBizType(null);
         reqVO.setStatus(null);
         reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
         // 调用
-        PageResult<TradeBrokerageRecordDO> pageResult = tradeBrokerageRecordService.getBrokerageRecordPage(reqVO);
+        PageResult<BrokerageRecordDO> pageResult = brokerageRecordService.getBrokerageRecordPage(reqVO);
         // 断言
         assertEquals(1, pageResult.getTotal());
         assertEquals(1, pageResult.getList().size());
@@ -79,38 +79,38 @@ public class TradeBrokerageRecordServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testCalculateBrokerage_useSkuBrokeragePrice() {
+    public void testCalculatePrice_useFixedPrice() {
         // mock 数据
         Integer payPrice = randomInteger();
         Integer percent = randomInt(1, 101);
-        Integer skuBrokeragePrice = randomInt();
+        Integer fixedPrice = randomInt();
         // 调用
-        int brokerage = tradeBrokerageRecordService.calculateBrokerage(payPrice, percent, skuBrokeragePrice);
+        int brokerage = brokerageRecordService.calculatePrice(payPrice, percent, fixedPrice);
         // 断言
-        assertEquals(brokerage, skuBrokeragePrice);
+        assertEquals(brokerage, fixedPrice);
     }
 
     @Test
-    public void testCalculateBrokerage_usePercent() {
+    public void testCalculatePrice_usePercent() {
         // mock 数据
         Integer payPrice = randomInteger();
         Integer percent = randomInt(1, 101);
-        Integer skuBrokeragePrice = randomEle(new Integer[]{0, null});
-        System.out.println("skuBrokeragePrice=" + skuBrokeragePrice);
+        Integer fixedPrice = randomEle(new Integer[]{0, null});
+        System.out.println("fixedPrice=" + fixedPrice);
         // 调用
-        int brokerage = tradeBrokerageRecordService.calculateBrokerage(payPrice, percent, skuBrokeragePrice);
+        int brokerage = brokerageRecordService.calculatePrice(payPrice, percent, fixedPrice);
         // 断言
         assertEquals(brokerage, NumberUtil.div(NumberUtil.mul(payPrice, percent), 100, 0, RoundingMode.DOWN).intValue());
     }
 
     @Test
-    public void testCalculateBrokerage_equalsZero() {
+    public void testCalculatePrice_equalsZero() {
         // mock 数据
         Integer payPrice = null;
         Integer percent = null;
-        Integer skuBrokeragePrice = null;
+        Integer fixedPrice = null;
         // 调用
-        int brokerage = tradeBrokerageRecordService.calculateBrokerage(payPrice, percent, skuBrokeragePrice);
+        int brokerage = brokerageRecordService.calculatePrice(payPrice, percent, fixedPrice);
         // 断言
         assertEquals(brokerage, 0);
     }

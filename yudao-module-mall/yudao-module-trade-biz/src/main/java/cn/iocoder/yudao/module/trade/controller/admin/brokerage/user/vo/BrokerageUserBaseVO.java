@@ -14,15 +14,15 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
  * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
  */
 @Data
-public class TradeBrokerageUserBaseVO {
+public class BrokerageUserBaseVO {
 
     @Schema(description = "推广员编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "4587")
     @NotNull(message = "推广员编号不能为空")
-    private Long brokerageUserId;
+    private Long bindUserId;
 
     @Schema(description = "推广员绑定时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime brokerageBindTime;
+    private LocalDateTime bindUserTime;
 
     @Schema(description = "推广资格", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "推广资格不能为空")
@@ -34,10 +34,10 @@ public class TradeBrokerageUserBaseVO {
 
     @Schema(description = "可用佣金", requiredMode = Schema.RequiredMode.REQUIRED, example = "11089")
     @NotNull(message = "可用佣金不能为空")
-    private Integer brokeragePrice;
+    private Integer price;
 
     @Schema(description = "冻结佣金", requiredMode = Schema.RequiredMode.REQUIRED, example = "30916")
     @NotNull(message = "冻结佣金不能为空")
-    private Integer frozenBrokeragePrice;
+    private Integer frozenPrice;
 
 }

@@ -2,11 +2,11 @@ package cn.iocoder.yudao.module.trade.controller.admin.brokerage.record;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.TradeBrokerageRecordPageReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.TradeBrokerageRecordRespVO;
-import cn.iocoder.yudao.module.trade.convert.brokerage.record.TradeBrokerageRecordConvert;
-import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.record.TradeBrokerageRecordDO;
-import cn.iocoder.yudao.module.trade.service.brokerage.record.TradeBrokerageRecordService;
+import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.BrokerageRecordPageReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.BrokerageRecordRespVO;
+import cn.iocoder.yudao.module.trade.convert.brokerage.record.BrokerageRecordConvert;
+import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.record.BrokerageRecordDO;
+import cn.iocoder.yudao.module.trade.service.brokerage.record.BrokerageRecordService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,26 +26,26 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RestController
 @RequestMapping("/trade/brokerage-record")
 @Validated
-public class TradeBrokerageRecordController {
+public class BrokerageRecordController {
 
     @Resource
-    private TradeBrokerageRecordService tradeBrokerageRecordService;
+    private BrokerageRecordService brokerageRecordService;
 
     @GetMapping("/get")
     @Operation(summary = "获得佣金记录")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('trade:brokerage-record:query')")
-    public CommonResult<TradeBrokerageRecordRespVO> getBrokerageRecord(@RequestParam("id") Integer id) {
-        TradeBrokerageRecordDO tradeBrokerageRecord = tradeBrokerageRecordService.getBrokerageRecord(id);
-        return success(TradeBrokerageRecordConvert.INSTANCE.convert(tradeBrokerageRecord));
+    public CommonResult<BrokerageRecordRespVO> getBrokerageRecord(@RequestParam("id") Integer id) {
+        BrokerageRecordDO brokerageRecord = brokerageRecordService.getBrokerageRecord(id);
+        return success(BrokerageRecordConvert.INSTANCE.convert(brokerageRecord));
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得佣金记录分页")
     @PreAuthorize("@ss.hasPermission('trade:brokerage-record:query')")
-    public CommonResult<PageResult<TradeBrokerageRecordRespVO>> getBrokerageRecordPage(@Valid TradeBrokerageRecordPageReqVO pageVO) {
-        PageResult<TradeBrokerageRecordDO> pageResult = tradeBrokerageRecordService.getBrokerageRecordPage(pageVO);
-        return success(TradeBrokerageRecordConvert.INSTANCE.convertPage(pageResult));
+    public CommonResult<PageResult<BrokerageRecordRespVO>> getBrokerageRecordPage(@Valid BrokerageRecordPageReqVO pageVO) {
+        PageResult<BrokerageRecordDO> pageResult = brokerageRecordService.getBrokerageRecordPage(pageVO);
+        return success(BrokerageRecordConvert.INSTANCE.convertPage(pageResult));
     }
 
 }

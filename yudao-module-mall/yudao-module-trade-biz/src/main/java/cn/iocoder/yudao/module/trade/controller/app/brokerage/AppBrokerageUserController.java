@@ -4,21 +4,22 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.*;
+import cn.iocoder.yudao.module.trade.service.brokerage.user.BrokerageUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static java.util.Arrays.asList;
 
 @Tag(name = "用户 APP - 分销用户")
@@ -27,6 +28,8 @@ import static java.util.Arrays.asList;
 @Validated
 @Slf4j
 public class AppBrokerageUserController {
+    @Resource
+    private BrokerageUserService brokerageUserService;
 
     // TODO 芋艿：临时 mock =>
     @GetMapping("/get")
@@ -34,8 +37,8 @@ public class AppBrokerageUserController {
     @PreAuthenticated
     public CommonResult<AppBrokerageUserRespVO> getBrokerageUser() {
         AppBrokerageUserRespVO respVO = new AppBrokerageUserRespVO()
-                .setBrokeragePrice(2000)
-                .setFrozenBrokeragePrice(3000);
+                .setPrice(2000)
+                .setFrozenPrice(3000);
         return success(respVO);
     }
 
@@ -45,10 +48,10 @@ public class AppBrokerageUserController {
     @PreAuthenticated
     public CommonResult<AppBrokerageUserMySummaryRespVO> getBrokerageUserSummary() {
         AppBrokerageUserMySummaryRespVO respVO = new AppBrokerageUserMySummaryRespVO()
-                .setYesterdayBrokeragePrice(1)
-                .setBrokeragePrice(2)
-                .setFrozenBrokeragePrice(3)
-                .setWithdrawBrokeragePrice(4)
+                .setYesterdayPrice(1)
+                .setPrice(2)
+                .setFrozenPrice(3)
+                .setWithdrawPrice(4)
                 .setFirstBrokerageUserCount(166)
                 .setSecondBrokerageUserCount(233);
         return success(respVO);
@@ -81,16 +84,16 @@ public class AppBrokerageUserController {
     public CommonResult<PageResult<AppBrokerageUserRankByPriceRespVO>> getBrokerageUserChildSummaryPageByPrice(AppBrokerageUserRankPageReqVO pageReqVO) {
         AppBrokerageUserRankByPriceRespVO vo1 = new AppBrokerageUserRankByPriceRespVO()
                 .setId(1L).setNickname("芋1**艿").setAvatar("http://www.iocoder.cn/images/common/wechat_mp_2017_07_31_bak.jpg")
-                .setBrokeragePrice(10);
+                .setPrice(10);
         AppBrokerageUserRankByPriceRespVO vo2 = new AppBrokerageUserRankByPriceRespVO()
                 .setId(2L).setNickname("芋2**艿").setAvatar("http://www.iocoder.cn/images/common/wechat_mp_2017_07_31_bak.jpg")
-                .setBrokeragePrice(6);
+                .setPrice(6);
         AppBrokerageUserRankByPriceRespVO vo3 = new AppBrokerageUserRankByPriceRespVO()
                 .setId(3L).setNickname("芋3**艿").setAvatar("http://www.iocoder.cn/images/common/wechat_mp_2017_07_31_bak.jpg")
-                .setBrokeragePrice(4);
+                .setPrice(4);
         AppBrokerageUserRankByPriceRespVO vo4 = new AppBrokerageUserRankByPriceRespVO()
                 .setId(3L).setNickname("芋3**艿").setAvatar("http://www.iocoder.cn/images/common/wechat_mp_2017_07_31_bak.jpg")
-                .setBrokeragePrice(4);
+                .setPrice(4);
         return success(new PageResult<>(asList(vo1, vo2, vo3, vo4), 10L));
     }
 
@@ -102,11 +105,11 @@ public class AppBrokerageUserController {
             AppBrokerageUserChildSummaryPageReqVO pageReqVO) {
         AppBrokerageUserChildSummaryRespVO vo1 = new AppBrokerageUserChildSummaryRespVO()
                 .setId(1L).setNickname("芋1**艿").setAvatar("http://www.iocoder.cn/images/common/wechat_mp_2017_07_31_bak.jpg")
-                .setBrokeragePrice(10).setBrokeragePrice(20).setBrokerageOrderCount(30)
+                .setPrice(10).setPrice(20).setBrokerageOrderCount(30)
                 .setBrokerageTime(LocalDateTime.now());
         AppBrokerageUserChildSummaryRespVO vo2 = new AppBrokerageUserChildSummaryRespVO()
                 .setId(1L).setNickname("芋2**艿").setAvatar("http://www.iocoder.cn/images/common/wechat_mp_2017_07_31_bak.jpg")
-                .setBrokeragePrice(20).setBrokeragePrice(30).setBrokerageOrderCount(40)
+                .setPrice(20).setPrice(30).setBrokerageOrderCount(40)
                 .setBrokerageTime(LocalDateTime.now());
         return success(new PageResult<>(asList(vo1, vo2), 10L));
     }
@@ -118,6 +121,12 @@ public class AppBrokerageUserController {
     public CommonResult<Integer> getBrokerageUserRankByPrice(
             @RequestParam("times") @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND) LocalDateTime[] times) {
         return success(1);
+    }
+
+    @PutMapping("/bind-user")
+    @Operation(summary = "绑定推广员")
+    public CommonResult<Boolean> getBrokerageUserRankByPrice(@Valid AppBrokerageUserBindReqVO reqVO) {
+        return success(brokerageUserService.bindUser(getLoginUserId(), reqVO.getBindUserId(), false));
     }
 
 }

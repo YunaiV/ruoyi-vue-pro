@@ -13,7 +13,6 @@ public interface ErrorCodeConstants {
     ErrorCode USER_NOT_EXISTS = new ErrorCode(1004001000, "用户不存在");
     ErrorCode USER_MOBILE_NOT_EXISTS = new ErrorCode(1004001001, "手机号未注册用户");
     ErrorCode USER_MOBILE_USED = new ErrorCode(1004001002, "修改手机失败，该手机号({})已经被使用");
-    ErrorCode MEMBER_FROZEN_BROKERAGE_PRICE_NOT_ENOUGH = new ErrorCode(1004001003, "用户冻结佣金({})数量不足");
 
     // ========== AUTH 模块 1004003000 ==========
     ErrorCode AUTH_LOGIN_BAD_CREDENTIALS = new ErrorCode(1004003000, "登录失败，账号密码不正确");

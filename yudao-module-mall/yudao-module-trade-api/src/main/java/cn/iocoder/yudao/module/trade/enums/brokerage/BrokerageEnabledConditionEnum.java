@@ -15,15 +15,14 @@ import java.util.Arrays;
 @Getter
 public enum BrokerageEnabledConditionEnum implements IntArrayValuable {
 
-    // TODO @疯狂：这个也从 1 开始哇
     /**
      * 所有用户都可以分销
      */
-    ALL(0, "人人分销"),
+    ALL(1, "人人分销"),
     /**
      * 仅可后台手动设置推广员
      */
-    ADMIN(1, "指定分销"),
+    ADMIN(2, "指定分销"),
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BrokerageEnabledConditionEnum::getCondition).toArray();

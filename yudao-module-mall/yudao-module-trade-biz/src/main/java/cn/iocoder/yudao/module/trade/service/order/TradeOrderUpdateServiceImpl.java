@@ -11,8 +11,6 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
-import cn.iocoder.yudao.module.trade.service.brokerage.record.TradeBrokerageRecordService;
-import cn.iocoder.yudao.module.trade.service.brokerage.record.bo.BrokerageAddReqBO;
 import cn.iocoder.yudao.module.member.api.level.MemberLevelApi;
 import cn.iocoder.yudao.module.member.api.point.MemberPointApi;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
@@ -51,9 +49,12 @@ import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderItemMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
 import cn.iocoder.yudao.module.trade.dal.redis.no.TradeOrderNoRedisDAO;
 import cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.*;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
+import cn.iocoder.yudao.module.trade.service.brokerage.record.BrokerageRecordService;
+import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
 import cn.iocoder.yudao.module.trade.service.cart.CartService;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
 import cn.iocoder.yudao.module.trade.service.message.TradeMessageService;
@@ -128,7 +129,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Resource
     private MemberPointApi memberPointApi;
     @Resource
-    private TradeBrokerageRecordService tradeBrokerageRecordService;
+    private BrokerageRecordService brokerageRecordService;
     @Resource
     private ProductCommentApi productCommentApi;
 
@@ -394,7 +395,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 增加用户经验
         getSelf().addUserExperienceAsync(order.getUserId(), order.getPayPrice(), order.getId());
         // 增加用户佣金
-        getSelf().addBrokerageAsync(order.getUserId(), order.getId());
+        getSelf().addBrokerageAsync(order.getUserId(), BrokerageRecordBizTypeEnum.ORDER, order.getId());
     }
 
     /**
@@ -674,7 +675,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 扣减用户经验
         getSelf().reduceUserExperienceAsync(order.getUserId(), orderRefundPrice, afterSaleId);
         // 更新分佣记录为已失效
-        getSelf().cancelBrokerageAsync(order.getUserId(), id);
+        getSelf().cancelBrokerageAsync(order.getUserId(), BrokerageRecordBizTypeEnum.ORDER, id);
     }
 
     @Override
@@ -784,16 +785,16 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
 
     @Async
-    protected void addBrokerageAsync(Long userId, Long orderId) {
+    protected void addBrokerageAsync(Long userId, BrokerageRecordBizTypeEnum bizType, Long orderId) {
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(orderId);
         List<BrokerageAddReqBO> list = convertList(orderItems,
                 item -> TradeOrderConvert.INSTANCE.convert(item, productSkuApi.getSku(item.getSkuId())));
-        tradeBrokerageRecordService.addBrokerage(userId, list);
+        brokerageRecordService.addBrokerage(userId, bizType, list);
     }
 
     @Async
-    protected void cancelBrokerageAsync(Long userId, Long orderItemId) {
-        tradeBrokerageRecordService.cancelBrokerage(userId, String.valueOf(orderItemId));
+    protected void cancelBrokerageAsync(Long userId, BrokerageRecordBizTypeEnum bizType, Long orderItemId) {
+        brokerageRecordService.cancelBrokerage(userId, bizType, String.valueOf(orderItemId));
     }
 
     /**
