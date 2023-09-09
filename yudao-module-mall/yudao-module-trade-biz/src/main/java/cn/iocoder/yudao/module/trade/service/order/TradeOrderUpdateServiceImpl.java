@@ -53,8 +53,8 @@ import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.*;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
-import cn.iocoder.yudao.module.trade.service.brokerage.record.BrokerageRecordService;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
+import cn.iocoder.yudao.module.trade.service.brokerage.record.BrokerageRecordService;
 import cn.iocoder.yudao.module.trade.service.cart.CartService;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
 import cn.iocoder.yudao.module.trade.service.message.TradeMessageService;
@@ -70,14 +70,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.ORDER_UPDATE_PRICE_FAIL_EQUAL;
-import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.ORDER_UPDATE_PRICE_FAIL_PAID;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
 /**
@@ -562,35 +561,67 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     }
 
     @Override
-    // TODO @puhui999：考虑事务性
+    @Transactional(rollbackFor = Exception.class)
     public void updateOrderPrice(TradeOrderUpdatePriceReqVO reqVO) {
-        // 校验交易订单
+        // 1、校验交易订单
         TradeOrderDO order = validateOrderExists(reqVO.getId());
         if (order.getPayStatus()) {
             throw exception(ORDER_UPDATE_PRICE_FAIL_PAID);
         }
+        // 2、校验订单项
+        List<TradeOrderItemDO> items = tradeOrderItemMapper.selectListByOrderId(order.getId());
+        if (CollUtil.isEmpty(items)) {
+            throw exception(ORDER_UPDATE_PRICE_FAIL_NOT_ITEM);
+        }
+        // 3、校验调价金额是否变化
         if (ObjectUtil.equal(order.getAdjustPrice(), reqVO.getAdjustPrice())) {
             throw exception(ORDER_UPDATE_PRICE_FAIL_EQUAL);
         }
 
-        // TODO @puhui999：应该是按照 payPrice 分配；并且要考虑取余问题；payPrice 也要考虑，item 里的
-        List<TradeOrderItemDO> itemDOs = tradeOrderItemMapper.selectListByOrderId(order.getId());
-        // TradeOrderItemDO 需要做 adjustPrice 的分摊
-        int price = reqVO.getAdjustPrice() / itemDOs.size();
-        itemDOs.forEach(item -> {
-            item.setAdjustPrice(price);
-        });
-        // 更新 TradeOrderItem
-        // TODO @puhui999：不要整个对象去更新哈；应该 new 一下；
-        tradeOrderItemMapper.updateBatch(itemDOs);
-        // 更新订单
-        // TODO @puhui999：要考虑多次修改价格，不能单单的 payPrice + 价格；
-        TradeOrderDO update = TradeOrderConvert.INSTANCE.convert(reqVO);
-        update.setPayPrice(update.getPayPrice() + update.getAdjustPrice());
+        // 4、更新订单
+        TradeOrderDO update = new TradeOrderDO();
+        update.setId(order.getId());
+        update.setAdjustPrice(reqVO.getAdjustPrice());
+        int orderPayPrice = order.getAdjustPrice() != null ? (order.getPayPrice() - order.getAdjustPrice())
+                + reqVO.getAdjustPrice() : order.getPayPrice() + reqVO.getAdjustPrice();
+        update.setPayPrice(orderPayPrice);
         // TODO @芋艿：改价时，赠送的积分，要不要做改动？？？
         tradeOrderMapper.updateById(update);
-        // 更新支付订单
-        payOrderApi.updatePayOrderPriceById(order.getPayOrderId(), update.getPayPrice());
+
+        // TODO @puhui999：应该是按照 payPrice 分配；并且要考虑取余问题；payPrice 也要考虑，item 里的
+        // TODO：先按 adjustPrice 实现，没明白 payPrice 怎么搞哈哈哈
+        // 5、更新 TradeOrderItem
+        if (items.size() > 1) {
+            // TradeOrderItemDO 需要做 adjustPrice 的分摊
+            int price = reqVO.getAdjustPrice() / items.size();
+            int remainderPrice = reqVO.getAdjustPrice() % items.size();
+            List<TradeOrderItemDO> orders = new ArrayList<>();
+            for (int i = 0; i < items.size(); i++) {
+                // 把平摊后剩余的金额加到第一个订单项
+                if (remainderPrice != 0 && i == 0) {
+                    orders.add(convertOrderItemPrice(items.get(i), price + remainderPrice));
+                }
+                orders.add(convertOrderItemPrice(items.get(i), price));
+            }
+            tradeOrderItemMapper.updateBatch(orders);
+        } else {
+            TradeOrderItemDO orderItem = items.get(0);
+            TradeOrderItemDO updateItem = convertOrderItemPrice(orderItem, reqVO.getAdjustPrice());
+            tradeOrderItemMapper.updateById(updateItem);
+        }
+
+        // 6、更新支付订单
+        payOrderApi.updatePayOrderPrice(order.getPayOrderId(), update.getPayPrice());
+    }
+
+    private TradeOrderItemDO convertOrderItemPrice(TradeOrderItemDO orderItem, Integer price) {
+        TradeOrderItemDO newOrderItem = new TradeOrderItemDO();
+        newOrderItem.setId(orderItem.getId());
+        newOrderItem.setAdjustPrice(price);
+        int payPrice = orderItem.getAdjustPrice() != null ? (orderItem.getPayPrice() - orderItem.getAdjustPrice())
+                + price : orderItem.getPayPrice() + price;
+        newOrderItem.setPayPrice(payPrice);
+        return newOrderItem;
     }
 
     @Override
