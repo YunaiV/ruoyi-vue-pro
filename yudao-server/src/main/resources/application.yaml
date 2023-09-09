@@ -43,6 +43,7 @@ springdoc:
   swagger-ui:
     enabled: true
     path: /swagger-ui
+  default-flat-param-object: true # 参见 https://doc.xiaominfo.com/docs/faq/v4/knife4j-parameterobject-flat-param 文档
 
 knife4j:
   enable: true
