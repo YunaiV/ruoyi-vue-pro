@@ -277,6 +277,7 @@ public interface TradeOrderConvert {
 
     default BrokerageAddReqBO convert(TradeOrderItemDO item, ProductSkuRespDTO sku) {
         return new BrokerageAddReqBO().setBizId(String.valueOf(item.getId()))
+                .setSourceUserId(item.getUserId())
                 .setBasePrice(item.getPayPrice() * item.getCount())
                 .setFirstFixedPrice(sku.getSubCommissionFirstPrice())
                 .setSecondFixedPrice(sku.getSubCommissionSecondPrice());
