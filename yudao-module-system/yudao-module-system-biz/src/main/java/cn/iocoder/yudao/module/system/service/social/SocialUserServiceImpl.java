@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.social.core.YudaoAuthRequestFactory;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialUserRespDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserBindDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.social.SocialUserBindMapper;
@@ -98,7 +99,7 @@ public class SocialUserServiceImpl implements SocialUserService {
 
     @Override
     @Transactional
-    public void bindSocialUser(SocialUserBindReqDTO reqDTO) {
+    public String bindSocialUser(SocialUserBindReqDTO reqDTO) {
         // 获得社交用户
         SocialUserDO socialUser = authSocialUser(reqDTO.getType(), reqDTO.getCode(), reqDTO.getState());
         Assert.notNull(socialUser, "社交用户不能为空");
@@ -115,6 +116,7 @@ public class SocialUserServiceImpl implements SocialUserService {
                 .userId(reqDTO.getUserId()).userType(reqDTO.getUserType())
                 .socialUserId(socialUser.getId()).socialType(socialUser.getType()).build();
         socialUserBindMapper.insert(socialUserBind);
+        return socialUser.getOpenid();
     }
 
     @Override
@@ -130,7 +132,7 @@ public class SocialUserServiceImpl implements SocialUserService {
     }
 
     @Override
-    public Long getBindUserId(Integer userType, Integer type, String code, String state) {
+    public SocialUserRespDTO getSocialUser(Integer userType, Integer type, String code, String state) {
         // 获得社交用户
         SocialUserDO socialUser = authSocialUser(type, code, state);
         Assert.notNull(socialUser, "社交用户不能为空");
@@ -141,7 +143,7 @@ public class SocialUserServiceImpl implements SocialUserService {
         if (socialUserBind == null) {
             throw exception(AUTH_THIRD_LOGIN_NOT_BIND);
         }
-        return socialUserBind.getUserId();
+        return new SocialUserRespDTO(socialUser.getOpenid(), socialUserBind.getUserId());
     }
 
     /**
