@@ -81,10 +81,9 @@ public class AppTradeOrderController {
     public CommonResult<AppTradeOrderDetailRespVO> getOrder(@RequestParam("id") Long id) {
         // 查询订单
         TradeOrderDO order = tradeOrderQueryService.getOrder(getLoginUserId(), id);
-        // TODO @puhui999：这里建议改成，如果为 null，直接返回 success null；主要查询操作，尽量不要有非空的提示哈；交给前端处理；
-//        if (order == null) {
-//            return success(null, ORDER_NOT_FOUND.getMsg());
-//        }
+        if (order == null) {
+            return success(null);
+        }
 
         // 查询订单项
         List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(order.getId());

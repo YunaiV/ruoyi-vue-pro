@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
+import cn.iocoder.yudao.module.promotion.api.seckill.dto.SeckillActivityUpdateStockReqDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityUpdateReqVO;
@@ -147,6 +148,40 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     @Override
     public void updateSeckillActivity(SeckillActivityDO activityDO) {
         seckillActivityMapper.updateById(activityDO);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateSeckillStock(SeckillActivityUpdateStockReqDTO updateStockReqDTO) {
+        // 1、校验秒杀活动是否存在
+        SeckillActivityDO seckillActivity = getSeckillActivity(updateStockReqDTO.getActivityId());
+        // 1.1、校验库存是否充足
+        if (seckillActivity.getStock() < updateStockReqDTO.getCount()) {
+            throw exception(SECKILL_ACTIVITY_UPDATE_STOCK_FAIL);
+        }
+
+        // 2、更新活动库存
+        // TODO @puhui999：考虑下并发更新
+        seckillActivity.setStock(seckillActivity.getStock() + updateStockReqDTO.getCount());
+        seckillActivity.setTotalStock(seckillActivity.getTotalStock() - updateStockReqDTO.getCount());
+        updateSeckillActivity(seckillActivity);
+
+        // 3、获取活动商品
+        List<SeckillProductDO> products = getSeckillProductListByActivityId(updateStockReqDTO.getActivityId());
+        // 3.1、过滤出购买的商品
+        SeckillProductDO product = findFirst(products, item -> ObjectUtil.equal(updateStockReqDTO.getItem().getSkuId(), item.getSkuId()));
+        // 3.2、检查活动商品库存是否充足
+        boolean isSufficient = product == null || (product.getStock() == 0 || (product.getStock() < updateStockReqDTO.getItem().getCount()) || (product.getStock() - updateStockReqDTO.getItem().getCount()) < 0);
+        if (isSufficient) {
+            throw exception(SECKILL_ACTIVITY_UPDATE_STOCK_FAIL);
+        }
+
+        // 4、更新活动商品库存
+        SeckillProductDO updateProduct = new SeckillProductDO();
+        updateProduct.setId(product.getId());
+        updateProduct.setStock(product.getStock() - updateStockReqDTO.getItem().getCount());
+        // TODO @puhui999：考虑下并发更新
+
     }
 
     @Override

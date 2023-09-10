@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.promotion.api.seckill.dto;
 
 import lombok.Data;
 
-import java.util.List;
+import javax.validation.constraints.NotNull;
 
 /**
  * 更新秒杀库存 request DTO
@@ -12,37 +12,25 @@ import java.util.List;
 @Data
 public class SeckillActivityUpdateStockReqDTO {
 
-    // TODO @puhui999：参数校验
-
-    // TODO @puhui999：秒杀的话，一次只能购买一种商品哈；不能多个哈；
-
-    /**
-     * 活动编号
-     */
+    @NotNull(message = "活动编号不能为空")
     private Long activityId;
-    /**
-     * 总购买数量
-     */
+
+    @NotNull(message = "购买数量不能为空")
     private Integer count;
-    /**
-     * 活动商品
-     */
-    private List<Item> items;
+
+    @NotNull(message = "活动商品不能为空")
+    private Item item;
 
     @Data
     public static class Item {
 
-        /**
-         * SPU 编号
-         */
+        @NotNull(message = "SPU 编号不能为空")
         private Long spuId;
-        /**
-         * SKU 编号
-         */
+
+        @NotNull(message = "SKU 编号活动商品不能为空")
         private Long skuId;
-        /**
-         * 购买数量
-         */
+
+        @NotNull(message = "购买数量不能为空")
         private Integer count;
 
     }

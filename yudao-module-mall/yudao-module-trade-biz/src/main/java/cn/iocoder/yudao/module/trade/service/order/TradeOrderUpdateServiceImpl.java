@@ -313,17 +313,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         Integer count = getSumValue(orderItems, TradeOrderItemDO::getCount, Integer::sum);
         // 1）如果是秒杀商品：额外扣减秒杀的库存；
         if (Objects.equals(TradeOrderTypeEnum.SECKILL.getType(), tradeOrderDO.getType())) {
-            SeckillActivityUpdateStockReqDTO updateStockReqDTO = new SeckillActivityUpdateStockReqDTO();
-            updateStockReqDTO.setActivityId(createReqVO.getSeckillActivityId());
-            updateStockReqDTO.setCount(count);
-            updateStockReqDTO.setItems(CollectionUtils.convertList(orderItems, item -> {
-                SeckillActivityUpdateStockReqDTO.Item item1 = new SeckillActivityUpdateStockReqDTO.Item();
-                item1.setSpuId(item.getSpuId());
-                item1.setSkuId(item.getSkuId());
-                item1.setCount(item.getCount());
-                return item1;
-            }));
-            seckillActivityApi.updateSeckillStock(updateStockReqDTO);
+            seckillActivityApi.updateSeckillStock(getSeckillActivityUpdateStockReqDTO(createReqVO, orderItems, count));
         }
         // 2）如果是砍价活动：额外扣减砍价的库存；
         bargainActivityApi.updateBargainActivityStock(createReqVO.getBargainActivityId(), count);
@@ -349,6 +339,20 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         createPayOrder(tradeOrderDO, orderItems, calculateRespBO);
 
         // 增加订单日志 TODO 芋艿：待实现
+    }
+
+    private SeckillActivityUpdateStockReqDTO getSeckillActivityUpdateStockReqDTO(AppTradeOrderCreateReqVO createReqVO, List<TradeOrderItemDO> orderItems, Integer count) {
+        SeckillActivityUpdateStockReqDTO updateStockReqDTO = new SeckillActivityUpdateStockReqDTO();
+        updateStockReqDTO.setActivityId(createReqVO.getSeckillActivityId());
+        updateStockReqDTO.setCount(count);
+        // 秒杀活动只能选择一个商品
+        TradeOrderItemDO item = orderItems.get(0);
+        SeckillActivityUpdateStockReqDTO.Item item1 = new SeckillActivityUpdateStockReqDTO.Item();
+        item1.setSpuId(item.getSpuId());
+        item1.setSkuId(item.getSkuId());
+        item1.setCount(item.getCount());
+        updateStockReqDTO.setItem(item1);
+        return updateStockReqDTO;
     }
 
     private void createPayOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems, TradePriceCalculateRespBO calculateRespBO) {
