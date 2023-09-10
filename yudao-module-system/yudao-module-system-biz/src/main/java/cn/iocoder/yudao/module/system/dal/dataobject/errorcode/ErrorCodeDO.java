@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.errorcode;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.enums.IgnoreTenantDB;
 import cn.iocoder.yudao.module.system.enums.errorcode.ErrorCodeTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -19,6 +20,7 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
+@IgnoreTenantDB
 public class ErrorCodeDO extends BaseDO {
 
     /**

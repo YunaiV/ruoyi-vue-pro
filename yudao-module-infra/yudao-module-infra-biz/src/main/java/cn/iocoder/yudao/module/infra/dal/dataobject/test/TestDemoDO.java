@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.infra.dal.dataobject.test;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.enums.IgnoreTenantDB;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -19,6 +20,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@IgnoreTenantDB
 public class TestDemoDO extends BaseDO {
 
     /**

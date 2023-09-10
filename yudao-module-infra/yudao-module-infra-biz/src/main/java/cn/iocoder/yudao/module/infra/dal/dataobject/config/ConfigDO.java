@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.infra.dal.dataobject.config;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.enums.IgnoreTenantDB;
 import cn.iocoder.yudao.module.infra.enums.config.ConfigTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -19,6 +20,7 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
+@IgnoreTenantDB
 public class ConfigDO extends BaseDO {
 
     /**

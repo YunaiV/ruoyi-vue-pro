@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.sms;
 
+import cn.iocoder.yudao.framework.mybatis.core.enums.IgnoreTenantDB;
 import cn.iocoder.yudao.module.system.enums.sms.SmsReceiveStatusEnum;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSendStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
@@ -28,6 +29,7 @@ import java.util.Map;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@IgnoreTenantDB
 public class SmsLogDO extends BaseDO {
 
     /**

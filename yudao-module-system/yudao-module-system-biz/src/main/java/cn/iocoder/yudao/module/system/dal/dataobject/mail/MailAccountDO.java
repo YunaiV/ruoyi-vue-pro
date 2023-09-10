@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.mail;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.enums.IgnoreTenantDB;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -17,6 +18,7 @@ import lombok.EqualsAndHashCode;
 @TableName(value = "system_mail_account", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
+@IgnoreTenantDB
 public class MailAccountDO extends BaseDO {
 
     /**

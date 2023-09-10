@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.system.dal.dataobject.mail;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.enums.IgnoreTenantDB;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
@@ -19,6 +20,7 @@ import java.util.List;
 @TableName(value = "system_mail_template", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
+@IgnoreTenantDB
 public class MailTemplateDO extends BaseDO {
 
     /**

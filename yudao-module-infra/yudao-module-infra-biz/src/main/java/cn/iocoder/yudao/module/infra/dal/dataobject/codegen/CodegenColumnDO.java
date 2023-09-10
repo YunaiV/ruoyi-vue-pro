@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.infra.dal.dataobject.codegen;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.enums.IgnoreTenantDB;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenColumnHtmlTypeEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenColumnListConditionEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -21,6 +22,7 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
+@IgnoreTenantDB
 public class CodegenColumnDO extends BaseDO {
 
     /**

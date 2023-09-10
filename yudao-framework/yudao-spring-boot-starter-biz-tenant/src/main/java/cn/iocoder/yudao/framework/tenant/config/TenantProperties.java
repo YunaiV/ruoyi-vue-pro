@@ -39,4 +39,6 @@ public class TenantProperties {
      */
     private Set<String> ignoreTables = Collections.emptySet();
 
+    /** 用于扫描需要忽略多租户的实体类的包列表 */
+    private String scanPackage = "";
 }
