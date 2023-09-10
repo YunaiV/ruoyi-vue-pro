@@ -55,7 +55,7 @@ public interface ErrorCodeConstants {
     ErrorCode SECKILL_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED = new ErrorCode(1013008003, "秒杀活动已关闭，不能修改");
     ErrorCode SECKILL_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1013008004, "秒杀活动未关闭或未结束，不能删除");
     ErrorCode SECKILL_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1013008005, "秒杀活动已关闭，不能重复关闭");
-    ErrorCode SECKILL_ACTIVITY_UPDATE_STOCK_FAIL = new ErrorCode(1013008006, "更新秒杀活动库存失败，原因秒杀库存不足");
+    ErrorCode SECKILL_ACTIVITY_UPDATE_STOCK_FAIL = new ErrorCode(1013008006, "秒杀失败，原因秒杀库存不足");
 
     // ========== 秒杀时段 1013009000 ==========
     ErrorCode SECKILL_CONFIG_NOT_EXISTS = new ErrorCode(1013009000, "秒杀时段不存在");
@@ -83,6 +83,7 @@ public interface ErrorCodeConstants {
     ErrorCode BARGAIN_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1013012001, "存在商品参加了其它砍价活动");
     ErrorCode BARGAIN_ACTIVITY_STATUS_DISABLE = new ErrorCode(1013012002, "砍价活动已关闭不能修改");
     ErrorCode BARGAIN_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1013012003, "砍价活动未关闭或未结束，不能删除");
+    ErrorCode BARGAIN_ACTIVITY_UPDATE_STOCK_FAIL = new ErrorCode(1013012004, "砍价失败，原因：该砍价活动库存不足");
 
     // ========== 砍价记录 1013013000 ==========
     ErrorCode BARGAIN_RECORD_NOT_EXISTS = new ErrorCode(1013013000, "砍价记录不存在");

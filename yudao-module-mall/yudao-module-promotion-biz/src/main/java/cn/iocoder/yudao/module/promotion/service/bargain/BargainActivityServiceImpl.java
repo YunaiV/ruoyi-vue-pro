@@ -82,11 +82,10 @@ public class BargainActivityServiceImpl implements BargainActivityService {
         }
 
         // 更新砍价库存
-        // TODO @puhui999：考虑下并发更新问题
-        BargainActivityUpdateReqVO reqVO = new BargainActivityUpdateReqVO();
-        reqVO.setId(id);
-        reqVO.setStock(activity.getStock() - count);
-        //bargainActivityService.updateBargainActivity(reqVO);
+        int row = bargainActivityMapper.updateActivityStock(id, count);
+        if (row == 0) {
+            throw exception(BARGAIN_ACTIVITY_UPDATE_STOCK_FAIL);
+        }
     }
 
     private void validateBargainConflict(Long spuId, Long activityId) {
