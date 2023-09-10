@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserBrokerageSummaryBO {
+
     /**
      * 佣金数量
      */
@@ -21,4 +22,5 @@ public class UserBrokerageSummaryBO {
      * 佣金总额
      */
     private Integer price;
+
 }

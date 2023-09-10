@@ -2,13 +2,13 @@ package cn.iocoder.yudao.module.promotion.api.combination;
 
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordRespDTO;
-import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordUpdateStatusReqDTO;
 import cn.iocoder.yudao.module.promotion.convert.combination.CombinationActivityConvert;
 import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
 import cn.iocoder.yudao.module.promotion.service.combination.CombinationRecordService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -43,12 +43,19 @@ public class CombinationRecordApiImpl implements CombinationRecordApi {
     }
 
     @Override
-    public void updateCombinationRecordStatus(CombinationRecordUpdateStatusReqDTO reqDTO) {
-        if (null == reqDTO.getStartTime()) {
-            recordService.updateCombinationRecordStatusByUserIdAndOrderId(reqDTO);
-        } else {
-            recordService.updateCombinationRecordStatusAndStartTimeByUserIdAndOrderId(reqDTO);
-        }
+    public void updateRecordStatusToSuccess(Long userId, Long orderId) {
+        recordService.updateCombinationRecordStatusByUserIdAndOrderId(CombinationRecordStatusEnum.SUCCESS.getStatus(), userId, orderId);
+    }
+
+    @Override
+    public void updateRecordStatusToFailed(Long userId, Long orderId) {
+        recordService.updateCombinationRecordStatusByUserIdAndOrderId(CombinationRecordStatusEnum.FAILED.getStatus(), userId, orderId);
+    }
+
+    @Override
+    public void updateRecordStatusToInProgress(Long userId, Long orderId, LocalDateTime startTime) {
+        recordService.updateRecordStatusAndStartTimeByUserIdAndOrderId(CombinationRecordStatusEnum.IN_PROGRESS.getStatus(),
+                userId, orderId, startTime);
     }
 
 }

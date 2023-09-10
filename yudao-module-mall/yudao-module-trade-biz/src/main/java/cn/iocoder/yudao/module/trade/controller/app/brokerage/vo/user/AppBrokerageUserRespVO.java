@@ -7,6 +7,9 @@ import lombok.Data;
 @Data
 public class AppBrokerageUserRespVO {
 
+    @Schema(description = "是否有分销资格", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
+    private Boolean brokerageEnabled;
+
     @Schema(description = "可用的佣金，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "2408")
     private Integer price;
 

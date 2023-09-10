@@ -52,7 +52,7 @@ public interface BrokerageUserService {
      * @param id      用户编号
      * @param enabled 推广资格
      */
-    void updateBrokerageEnabled(Long id, Boolean enabled);
+    void updateBrokerageUserEnabled(Long id, Boolean enabled);
 
     /**
      * 获得用户的推广人
@@ -79,20 +79,21 @@ public interface BrokerageUserService {
     void updateUserFrozenPrice(Long id, Integer frozenPrice);
 
     /**
-     * 更新用户冻结佣金（减少）, 更新用户佣金（增加）
+     * 更新用户冻结佣金（减少），更新用户佣金（增加）
      *
      * @param id          用户编号
      * @param frozenPrice 减少冻结佣金（负数）
      */
     void updateFrozenPriceDecrAndPriceIncr(Long id, Integer frozenPrice);
 
+    // TODO @疯狂：这个后面可能要支持下，二级
     /**
      * 获得推广用户数量（一级）
      *
      * @param bindUserId 绑定的推广员编号
      * @return 推广用户数量
      */
-    Long getCountByBindUserId(Long bindUserId);
+    Long getBrokerageUserCountByBindUserId(Long bindUserId);
 
     /**
      * 【会员】绑定推广员
@@ -102,5 +103,6 @@ public interface BrokerageUserService {
      * @param isNewUser  是否为新用户
      * @return 是否绑定
      */
-    boolean bindUser(Long userId, Long bindUserId, Boolean isNewUser);
+    boolean bindBrokerageUser(Long userId, Long bindUserId, Boolean isNewUser);
+
 }

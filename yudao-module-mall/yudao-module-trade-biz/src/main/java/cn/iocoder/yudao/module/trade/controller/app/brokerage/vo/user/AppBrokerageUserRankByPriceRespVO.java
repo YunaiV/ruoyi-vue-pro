@@ -17,6 +17,6 @@ public class AppBrokerageUserRankByPriceRespVO {
     private String avatar;
 
     @Schema(description = "佣金金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
-    private Integer price;
+    private Integer brokeragePrice;
 
 }

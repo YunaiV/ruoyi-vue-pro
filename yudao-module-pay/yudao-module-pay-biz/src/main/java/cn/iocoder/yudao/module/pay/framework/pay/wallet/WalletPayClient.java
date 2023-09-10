@@ -37,13 +37,13 @@ import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.REFUND_NOT_FO
 @Slf4j
 public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
 
+    public static final String USER_ID_KEY = "user_id";
+    public static final String USER_TYPE_KEY = "user_type";
+
     private PayWalletService wallService;
-
     private PayWalletTransactionService walletTransactionService;
-
-    private PayOrderService payOrderService;
-
-    private PayRefundService payRefundService;
+    private PayOrderService orderService;
+    private PayRefundService refundService;
 
     public WalletPayClient(Long channelId,  NonePayClientConfig config) {
         super(channelId, PayChannelEnum.WALLET.getCode(), config);
@@ -62,12 +62,12 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
     @Override
     protected PayOrderRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
         try {
-            String userId = MapUtil.getStr(reqDTO.getChannelExtras(), "user_id");
-            String userType = MapUtil.getStr(reqDTO.getChannelExtras(), "user_type");
-            Assert.notEmpty(userId, "用户 id 不能为空");
-            Assert.notEmpty(userType, "用户类型不能为空");
-            PayWalletTransactionDO transaction = wallService.orderPay(Long.valueOf(userId), Integer.valueOf(userType),
-                    reqDTO.getOutTradeNo(), reqDTO.getPrice());
+            Long userId = MapUtil.getLong(reqDTO.getChannelExtras(), USER_ID_KEY);
+            Integer userType = MapUtil.getInt(reqDTO.getChannelExtras(), USER_TYPE_KEY);
+            Assert.notNull(userId, "用户 id 不能为空");
+            Assert.notNull(userType, "用户类型不能为空");
+            PayWalletTransactionDO transaction = wallService.orderPay(userId, userType, reqDTO.getOutTradeNo(),
+                    reqDTO.getPrice());
             return PayOrderRespDTO.successOf(transaction.getNo(), transaction.getCreator(),
                     transaction.getCreateTime(),
                     reqDTO.getOutTradeNo(), transaction);
@@ -92,10 +92,10 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
 
     @Override
     protected PayOrderRespDTO doGetOrder(String outTradeNo) {
-        if (payOrderService == null) {
-            payOrderService = SpringUtil.getBean(PayOrderService.class);
+        if (orderService == null) {
+            orderService = SpringUtil.getBean(PayOrderService.class);
         }
-        PayOrderExtensionDO orderExtension = payOrderService.getOrderExtensionByNo(outTradeNo);
+        PayOrderExtensionDO orderExtension = orderService.getOrderExtensionByNo(outTradeNo);
         // 支付交易拓展单不存在， 返回关闭状态
         if (orderExtension == null) {
             return PayOrderRespDTO.closedOf(String.valueOf(ORDER_EXTENSION_NOT_FOUND.getCode()),
@@ -147,10 +147,10 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
 
     @Override
     protected PayRefundRespDTO doGetRefund(String outTradeNo, String outRefundNo) {
-        if (payRefundService == null) {
-            payRefundService = SpringUtil.getBean(PayRefundService.class);
+        if (refundService == null) {
+            refundService = SpringUtil.getBean(PayRefundService.class);
         }
-        PayRefundDO payRefund = payRefundService.getRefundByNo(outRefundNo);
+        PayRefundDO payRefund = refundService.getRefundByNo(outRefundNo);
         // 支付退款单不存在， 返回退款失败状态
         if (payRefund == null) {
             return PayRefundRespDTO.failureOf(String.valueOf(REFUND_NOT_FOUND), REFUND_NOT_FOUND.getMsg(),

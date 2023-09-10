@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.api.social;
 
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialUserRespDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserUnbindReqDTO;
 import cn.iocoder.yudao.module.system.service.social.SocialUserService;
 import org.springframework.stereotype.Service;
@@ -26,8 +27,8 @@ public class SocialUserApiImpl implements SocialUserApi {
     }
 
     @Override
-    public void bindSocialUser(SocialUserBindReqDTO reqDTO) {
-        socialUserService.bindSocialUser(reqDTO);
+    public String bindSocialUser(SocialUserBindReqDTO reqDTO) {
+        return socialUserService.bindSocialUser(reqDTO);
     }
 
     @Override
@@ -37,8 +38,8 @@ public class SocialUserApiImpl implements SocialUserApi {
     }
 
     @Override
-    public Long getBindUserId(Integer userType, Integer type, String code, String state) {
-       return socialUserService.getBindUserId(userType, type, code, state);
+    public SocialUserRespDTO getSocialUser(Integer userType, Integer type, String code, String state) {
+       return socialUserService.getSocialUser(userType, type, code, state);
     }
 
 }

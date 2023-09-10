@@ -23,20 +23,17 @@ public class AppBrokerageWithdrawCreateReqVO {
     @Min(value = 1, message = "提现金额不能小于 1")
     private Integer price;
 
-
     // ========== 银行卡、微信、支付宝 提现相关字段 ==========
 
     @Schema(description = "提现账号", requiredMode = Schema.RequiredMode.REQUIRED, example = "123456789")
     @NotBlank(message = "提现账号不能为空", groups = {Bank.class, Wechat.class, Alipay.class})
     private String accountNo;
 
-
     // ========== 微信、支付宝 提现相关字段 ==========
 
     @Schema(description = "收款码的图片", example = "https://www.iocoder.cn/1.png")
     @URL(message = "收款码的图片，必须是一个 URL")
     private String accountQrCodeUrl;
-
 
     // ========== 银行卡 提现相关字段 ==========
 

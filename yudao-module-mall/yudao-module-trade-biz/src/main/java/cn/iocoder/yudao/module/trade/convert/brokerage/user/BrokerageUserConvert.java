@@ -41,25 +41,19 @@ public interface BrokerageUserConvert {
 
             // 推广用户数量（一级）
             vo.setBrokerageUserCount(MapUtil.getInt(brokerageUserCountMap, vo.getId(), 0));
-
+            // 推广订单数量、推广订单金额
             Optional<UserBrokerageSummaryBO> orderSummaryOptional = Optional.ofNullable(userOrderSummaryMap.get(vo.getId()));
-            // 推广订单数量
-            vo.setBrokerageOrderCount(orderSummaryOptional.map(UserBrokerageSummaryBO::getCount).orElse(0));
-            // 推广订单金额
-            vo.setBrokerageOrderPrice(orderSummaryOptional.map(UserBrokerageSummaryBO::getPrice).orElse(0));
-
-            // todo 已提现次数
-            vo.setWithdrawCount(0);
-            // todo 已提现金额
-            vo.setWithdrawPrice(0);
+            vo.setBrokerageOrderCount(orderSummaryOptional.map(UserBrokerageSummaryBO::getCount).orElse(0))
+                    .setBrokerageOrderPrice(orderSummaryOptional.map(UserBrokerageSummaryBO::getPrice).orElse(0));
+            // todo 已提现次数、已提现金额
+            vo.setWithdrawCount(0).setWithdrawPrice(0);
         }
         return result;
     }
 
     default BrokerageUserRespVO copyTo(MemberUserRespDTO source, BrokerageUserRespVO target) {
-        Optional.ofNullable(source)
-                .ifPresent(user -> target.setNickname(user.getNickname())
-                        .setAvatar(user.getAvatar()));
+        Optional.ofNullable(source).ifPresent(
+                user -> target.setNickname(user.getNickname()).setAvatar(user.getAvatar()));
         return target;
     }
 

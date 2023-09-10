@@ -12,12 +12,14 @@ import cn.iocoder.yudao.module.pay.enums.member.PayWalletBizTypeEnum;
 public interface PayWalletService {
 
     /**
-     * 获取钱包信息，如果不存在创建钱包。由于用户注册时候不会创建钱包
+     * 获取钱包信息
+     *
+     * 如果不存在，则创建钱包。由于用户注册时候不会创建钱包
      *
      * @param userId 用户编号
      * @param userType 用户类型
      */
-    PayWalletDO getOrCreatePayWallet(Long userId, Integer userType);
+    PayWalletDO getOrCreateWallet(Long userId, Integer userType);
 
     /**
      * 钱包订单支付
@@ -29,6 +31,14 @@ public interface PayWalletService {
      */
     PayWalletTransactionDO orderPay(Long userId, Integer userType, String outTradeNo, Integer price);
 
+    /**
+     * 钱包订单支付退款
+     *
+     * @param outRefundNo 外部退款号
+     * @param refundPrice 退款金额
+     * @param reason  退款原因
+     */
+    PayWalletTransactionDO orderRefund(String outRefundNo, Integer refundPrice, String reason);
 
     /**
      * 扣减钱包余额
@@ -43,7 +53,6 @@ public interface PayWalletService {
     PayWalletTransactionDO reduceWalletBalance(Long userId, Integer userType,
                                                Long bizId, PayWalletBizTypeEnum bizType, Integer price);
 
-
     /**
      * 增加钱包余额
      *
@@ -56,14 +65,5 @@ public interface PayWalletService {
      */
     PayWalletTransactionDO addWalletBalance(Long userId, Integer userType,
                                             Long bizId, PayWalletBizTypeEnum bizType, Integer price);
-
-    /**
-     * 钱包订单支付退款
-     *
-     * @param outRefundNo 外部退款号
-     * @param refundPrice 退款金额
-     * @param reason  退款原因
-     */
-    PayWalletTransactionDO orderRefund(String outRefundNo, Integer refundPrice, String reason);
 
 }

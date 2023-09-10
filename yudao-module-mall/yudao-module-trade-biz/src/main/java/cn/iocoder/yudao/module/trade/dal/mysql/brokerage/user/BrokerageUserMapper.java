@@ -134,4 +134,5 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
                 .eq(BrokerageUserDO::getId, id)
                 .set(BrokerageUserDO::getBrokerageEnabled, false).set(BrokerageUserDO::getBrokerageTime, null));
     }
+
 }

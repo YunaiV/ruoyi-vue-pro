@@ -43,7 +43,7 @@ public class BrokerageUserDO extends BaseDO {
     private LocalDateTime bindUserTime;
 
     /**
-     * 推广资格
+     * 是否有分销资格
      */
     private Boolean brokerageEnabled;
     /**
@@ -54,7 +54,7 @@ public class BrokerageUserDO extends BaseDO {
     /**
      * 可用佣金
      */
-    private Integer price;
+    private Integer brokeragePrice;
     /**
      * 冻结佣金
      */

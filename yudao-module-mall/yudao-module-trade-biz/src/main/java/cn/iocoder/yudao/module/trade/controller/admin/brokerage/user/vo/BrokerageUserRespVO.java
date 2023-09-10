@@ -19,14 +19,12 @@ public class BrokerageUserRespVO extends BrokerageUserBaseVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
-
     // ========== 用户信息 ==========
 
     @Schema(description = "用户头像", example = "https://www.iocoder.cn/xxx.png")
     private String avatar;
     @Schema(description = "用户昵称", example = "李四")
     private String nickname;
-
 
     // ========== 推广信息 ==========
 
@@ -36,7 +34,6 @@ public class BrokerageUserRespVO extends BrokerageUserBaseVO {
     private Integer brokerageOrderCount;
     @Schema(description = "推广订单金额", example = "20019")
     private Integer brokerageOrderPrice;
-
 
     // ========== 提现信息 ==========
 
