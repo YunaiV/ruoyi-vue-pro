@@ -41,7 +41,7 @@ public interface BrokerageRecordConvert {
                 : BrokerageRecordStatusEnum.SETTLEMENT.getStatus();
         return new BrokerageRecordDO().setUserId(user.getId())
                 .setBizType(bizType.getType()).setBizId(bizId)
-                .setPrice(brokeragePrice).setTotalPrice(user.getPrice())
+                .setPrice(brokeragePrice).setTotalPrice(user.getBrokeragePrice())
                 .setTitle(title)
                 .setDescription(StrUtil.format(bizType.getDescription(), String.valueOf(brokeragePrice / 100.0)))
                 .setStatus(status).setFrozenDays(brokerageFrozenDays).setUnfreezeTime(unfreezeTime);

@@ -27,7 +27,7 @@ public class BrokerageApiImpl implements BrokerageApi {
 
     @Override
     public boolean bindUser(Long userId, Long bindUserId, Boolean isNewUser) {
-        return brokerageUserService.bindUser(userId, bindUserId, isNewUser);
+        return brokerageUserService.bindBrokerageUser(userId, bindUserId, isNewUser);
     }
 
 }

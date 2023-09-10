@@ -37,9 +37,17 @@ public class AppBrokerageUserController {
     @PreAuthenticated
     public CommonResult<AppBrokerageUserRespVO> getBrokerageUser() {
         AppBrokerageUserRespVO respVO = new AppBrokerageUserRespVO()
+                .setBrokerageEnabled(true)
                 .setPrice(2000)
                 .setFrozenPrice(3000);
         return success(respVO);
+    }
+
+    @PutMapping("/bind")
+    @Operation(summary = "绑定推广员")
+    @PreAuthenticated
+    public CommonResult<Boolean> bindBrokerageUser(@Valid @RequestBody AppBrokerageUserBindReqVO reqVO) {
+        return success(brokerageUserService.bindBrokerageUser(getLoginUserId(), reqVO.getBindUserId(), false));
     }
 
     // TODO 芋艿：临时 mock =>
@@ -49,7 +57,7 @@ public class AppBrokerageUserController {
     public CommonResult<AppBrokerageUserMySummaryRespVO> getBrokerageUserSummary() {
         AppBrokerageUserMySummaryRespVO respVO = new AppBrokerageUserMySummaryRespVO()
                 .setYesterdayPrice(1)
-                .setPrice(2)
+                .setBrokeragePrice(2)
                 .setFrozenPrice(3)
                 .setWithdrawPrice(4)
                 .setFirstBrokerageUserCount(166)
@@ -84,16 +92,16 @@ public class AppBrokerageUserController {
     public CommonResult<PageResult<AppBrokerageUserRankByPriceRespVO>> getBrokerageUserChildSummaryPageByPrice(AppBrokerageUserRankPageReqVO pageReqVO) {
         AppBrokerageUserRankByPriceRespVO vo1 = new AppBrokerageUserRankByPriceRespVO()
                 .setId(1L).setNickname("芋1**艿").setAvatar("http://www.iocoder.cn/images/common/wechat_mp_2017_07_31_bak.jpg")
-                .setPrice(10);
+                .setBrokeragePrice(10);
         AppBrokerageUserRankByPriceRespVO vo2 = new AppBrokerageUserRankByPriceRespVO()
                 .setId(2L).setNickname("芋2**艿").setAvatar("http://www.iocoder.cn/images/common/wechat_mp_2017_07_31_bak.jpg")
-                .setPrice(6);
+                .setBrokeragePrice(6);
         AppBrokerageUserRankByPriceRespVO vo3 = new AppBrokerageUserRankByPriceRespVO()
                 .setId(3L).setNickname("芋3**艿").setAvatar("http://www.iocoder.cn/images/common/wechat_mp_2017_07_31_bak.jpg")
-                .setPrice(4);
+                .setBrokeragePrice(4);
         AppBrokerageUserRankByPriceRespVO vo4 = new AppBrokerageUserRankByPriceRespVO()
                 .setId(3L).setNickname("芋3**艿").setAvatar("http://www.iocoder.cn/images/common/wechat_mp_2017_07_31_bak.jpg")
-                .setPrice(4);
+                .setBrokeragePrice(4);
         return success(new PageResult<>(asList(vo1, vo2, vo3, vo4), 10L));
     }
 
@@ -105,11 +113,11 @@ public class AppBrokerageUserController {
             AppBrokerageUserChildSummaryPageReqVO pageReqVO) {
         AppBrokerageUserChildSummaryRespVO vo1 = new AppBrokerageUserChildSummaryRespVO()
                 .setId(1L).setNickname("芋1**艿").setAvatar("http://www.iocoder.cn/images/common/wechat_mp_2017_07_31_bak.jpg")
-                .setPrice(10).setPrice(20).setBrokerageOrderCount(30)
+                .setBrokeragePrice(10).setBrokeragePrice(20).setBrokerageOrderCount(30)
                 .setBrokerageTime(LocalDateTime.now());
         AppBrokerageUserChildSummaryRespVO vo2 = new AppBrokerageUserChildSummaryRespVO()
                 .setId(1L).setNickname("芋2**艿").setAvatar("http://www.iocoder.cn/images/common/wechat_mp_2017_07_31_bak.jpg")
-                .setPrice(20).setPrice(30).setBrokerageOrderCount(40)
+                .setBrokeragePrice(20).setBrokeragePrice(30).setBrokerageOrderCount(40)
                 .setBrokerageTime(LocalDateTime.now());
         return success(new PageResult<>(asList(vo1, vo2), 10L));
     }
@@ -118,15 +126,9 @@ public class AppBrokerageUserController {
     @GetMapping("/get-rank-by-price")
     @Operation(summary = "获得分销用户排行（基于佣金）")
     @Parameter(name = "times", description = "时间段", required = true)
-    public CommonResult<Integer> getBrokerageUserRankByPrice(
+    public CommonResult<Integer> bindBrokerageUser(
             @RequestParam("times") @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND) LocalDateTime[] times) {
         return success(1);
-    }
-
-    @PutMapping("/bind-user")
-    @Operation(summary = "绑定推广员")
-    public CommonResult<Boolean> getBrokerageUserRankByPrice(@Valid AppBrokerageUserBindReqVO reqVO) {
-        return success(brokerageUserService.bindUser(getLoginUserId(), reqVO.getBindUserId(), false));
     }
 
 }

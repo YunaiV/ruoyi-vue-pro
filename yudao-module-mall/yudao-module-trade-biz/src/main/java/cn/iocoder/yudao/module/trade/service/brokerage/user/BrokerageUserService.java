@@ -103,6 +103,6 @@ public interface BrokerageUserService {
      * @param isNewUser  是否为新用户
      * @return 是否绑定
      */
-    boolean bindUser(Long userId, Long bindUserId, Boolean isNewUser);
+    boolean bindBrokerageUser(Long userId, Long bindUserId, Boolean isNewUser);
 
 }
