@@ -44,24 +44,26 @@ create index idx_agent on trade_brokerage_user (brokerage_enabled) comment '是�
 
 create table trade_brokerage_record
 (
-    id            int auto_increment comment '编号'
+    id               int auto_increment comment '编号'
         primary key,
-    user_id       bigint                                                           not null comment '用户编号',
-    biz_id        varchar(64)                            default ''                not null comment '业务编号',
-    biz_type      tinyint                                default 0                 not null comment '业务类型：0-订单，1-提现',
-    title         varchar(64)                            default ''                not null comment '标题',
-    price         int                                    default 0                 not null comment '金额',
-    total_price   int                                    default 0                 not null comment '当前总佣金',
-    description   varchar(500)                           default ''                not null comment '说明',
-    status        tinyint                                default 0                 not null comment '状态：0-待结算，1-已结算，2-已取消',
-    frozen_days   int                                    default 0                 not null comment '冻结时间（天）',
-    unfreeze_time datetime                                                         null comment '解冻时间',
-    creator       varchar(64) collate utf8mb4_general_ci default ''                null comment '创建者',
-    create_time   datetime                               default CURRENT_TIMESTAMP not null comment '创建时间',
-    updater       varchar(64) collate utf8mb4_general_ci default ''                null comment '更新者',
-    update_time   datetime                               default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
-    deleted       bit                                    default b'0'              not null comment '是否删除',
-    tenant_id     bigint                                 default 0                 not null comment '租户编号'
+    user_id          bigint                                                           not null comment '用户编号',
+    biz_id           varchar(64)                            default ''                not null comment '业务编号',
+    biz_type         tinyint                                default 0                 not null comment '业务类型：1-订单，2-提现',
+    title            varchar(64)                            default ''                not null comment '标题',
+    price            int                                    default 0                 not null comment '金额',
+    total_price      int                                    default 0                 not null comment '当前总佣金',
+    description      varchar(500)                           default ''                not null comment '说明',
+    status           tinyint                                default 0                 not null comment '状态：0-待结算，1-已结算，2-已取消',
+    frozen_days      int                                    default 0                 not null comment '冻结时间（天）',
+    unfreeze_time    datetime                                                         null comment '解冻时间',
+    source_user_type tinyint                                                          not null comment '来源用户类型：1-一级推广用户，2-二级推广用户',
+    source_user_id   bigint                                                           not null comment '来源用户编号',
+    creator          varchar(64) collate utf8mb4_general_ci default ''                null comment '创建者',
+    create_time      datetime                               default CURRENT_TIMESTAMP not null comment '创建时间',
+    updater          varchar(64) collate utf8mb4_general_ci default ''                null comment '更新者',
+    update_time      datetime                               default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    deleted          bit                                    default b'0'              not null comment '是否删除',
+    tenant_id        bigint                                 default 0                 not null comment '租户编号'
 )
     comment '佣金记录';
 

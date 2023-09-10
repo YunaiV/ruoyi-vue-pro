@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.record.BrokerageRecordMapper;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageUserTypeEnum;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
 import cn.iocoder.yudao.module.trade.service.brokerage.user.BrokerageUserService;
@@ -27,7 +28,6 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * 佣金记录 Service 实现类
@@ -72,7 +72,8 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
             return;
         }
         // 1.2 计算一级分佣
-        addBrokerage(firstUser, list, memberConfig.getBrokerageFrozenDays(), memberConfig.getBrokerageFirstPercent(), BrokerageAddReqBO::getFirstFixedPrice, bizType);
+        addBrokerage(firstUser, list, memberConfig.getBrokerageFrozenDays(), memberConfig.getBrokerageFirstPercent(),
+                bizType, BrokerageUserTypeEnum.FIRST);
 
         // 2.1 获得二级推广员
         if (firstUser.getBindUserId() == null) {
@@ -83,7 +84,8 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
             return;
         }
         // 2.2 计算二级分佣
-        addBrokerage(secondUser, list, memberConfig.getBrokerageFrozenDays(), memberConfig.getBrokerageSecondPercent(), BrokerageAddReqBO::getSecondFixedPrice, bizType);
+        addBrokerage(secondUser, list, memberConfig.getBrokerageFrozenDays(), memberConfig.getBrokerageSecondPercent(),
+                bizType, BrokerageUserTypeEnum.SECOND);
     }
 
     @Override
@@ -138,12 +140,11 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
      * @param list                佣金增加参数列表
      * @param brokerageFrozenDays 冻结天数
      * @param brokeragePercent    佣金比例
-     * @param fixedPriceFun       固定佣金
      * @param bizType             业务类型
+     * @param sourceUserType      来源用户类型
      */
     private void addBrokerage(BrokerageUserDO user, List<BrokerageAddReqBO> list, Integer brokerageFrozenDays,
-                              Integer brokeragePercent, Function<BrokerageAddReqBO, Integer> fixedPriceFun,
-                              BrokerageRecordBizTypeEnum bizType) {
+                              Integer brokeragePercent, BrokerageRecordBizTypeEnum bizType, BrokerageUserTypeEnum sourceUserType) {
         // 1.1 处理冻结时间
         LocalDateTime unfreezeTime = null;
         if (brokerageFrozenDays != null && brokerageFrozenDays > 0) {
@@ -153,12 +154,20 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
         int totalBrokerage = 0;
         List<BrokerageRecordDO> records = new ArrayList<>();
         for (BrokerageAddReqBO item : list) {
-            int brokeragePerItem = calculatePrice(item.getBasePrice(), brokeragePercent, fixedPriceFun.apply(item));
+            Integer fixedPrice = 0;
+            if (BrokerageUserTypeEnum.FIRST.equals(sourceUserType)) {
+                fixedPrice = item.getFirstFixedPrice();
+            } else if (BrokerageUserTypeEnum.SECOND.equals(sourceUserType)) {
+                fixedPrice = item.getSecondFixedPrice();
+            }
+
+            int brokeragePerItem = calculatePrice(item.getBasePrice(), brokeragePercent, fixedPrice);
             if (brokeragePerItem <= 0) {
                 continue;
             }
             records.add(BrokerageRecordConvert.INSTANCE.convert(user, bizType, item.getBizId(),
-                    brokerageFrozenDays, brokeragePerItem, unfreezeTime, bizType.getTitle()));
+                    brokerageFrozenDays, brokeragePerItem, unfreezeTime, bizType.getTitle(),
+                    item.getSourceUserId(), sourceUserType.getType()));
             totalBrokerage += brokeragePerItem;
         }
         if (CollUtil.isEmpty(records)) {

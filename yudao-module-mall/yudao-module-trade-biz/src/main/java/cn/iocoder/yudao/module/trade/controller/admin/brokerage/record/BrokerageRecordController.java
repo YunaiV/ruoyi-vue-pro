@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.trade.controller.admin.brokerage.record;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.BrokerageRecordPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.BrokerageRecordRespVO;
 import cn.iocoder.yudao.module.trade.convert.brokerage.record.BrokerageRecordConvert;
@@ -19,8 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.Map;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Tag(name = "管理后台 - 佣金记录")
 @RestController
@@ -30,6 +36,9 @@ public class BrokerageRecordController {
 
     @Resource
     private BrokerageRecordService brokerageRecordService;
+
+    @Resource
+    private MemberUserApi memberUserApi;
 
     @GetMapping("/get")
     @Operation(summary = "获得佣金记录")
@@ -45,7 +54,12 @@ public class BrokerageRecordController {
     @PreAuthorize("@ss.hasPermission('trade:brokerage-record:query')")
     public CommonResult<PageResult<BrokerageRecordRespVO>> getBrokerageRecordPage(@Valid BrokerageRecordPageReqVO pageVO) {
         PageResult<BrokerageRecordDO> pageResult = brokerageRecordService.getBrokerageRecordPage(pageVO);
-        return success(BrokerageRecordConvert.INSTANCE.convertPage(pageResult));
+
+        Set<Long> userIds = convertSet(pageResult.getList(), BrokerageRecordDO::getUserId);
+        userIds.addAll(convertList(pageResult.getList(), BrokerageRecordDO::getSourceUserId));
+        Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(userIds);
+
+        return success(BrokerageRecordConvert.INSTANCE.convertPage(pageResult, userMap));
     }
 
 }

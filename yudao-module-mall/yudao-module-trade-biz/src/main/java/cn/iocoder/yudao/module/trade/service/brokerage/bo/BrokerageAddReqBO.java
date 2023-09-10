@@ -34,4 +34,8 @@ public class BrokerageAddReqBO {
      */
     private Integer secondFixedPrice;
 
+    /**
+     * 来源用户编号
+     */
+    private Long sourceUserId;
 }
