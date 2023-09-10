@@ -39,7 +39,7 @@ public interface BrokerageUserConvert {
             // 用户信息
             copyTo(userMap.get(vo.getId()), vo);
 
-            // 推广用户数量（一级）
+            // 推广用户数量
             vo.setBrokerageUserCount(MapUtil.getInt(brokerageUserCountMap, vo.getId(), 0));
             // 推广订单数量、推广订单金额
             Optional<UserBrokerageSummaryBO> orderSummaryOptional = Optional.ofNullable(userOrderSummaryMap.get(vo.getId()));

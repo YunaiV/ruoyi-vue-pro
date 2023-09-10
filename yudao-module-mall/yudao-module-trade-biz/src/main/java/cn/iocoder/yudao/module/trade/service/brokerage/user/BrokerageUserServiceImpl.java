@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.user.BrokerageUserMapper;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageBindModeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageEnabledConditionEnum;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageUserTypeEnum;
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -131,19 +132,23 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     }
 
     @Override
-    public Long getBrokerageUserCountByBindUserId(Long bindUserId) {
-        // TODO @疯狂：mapper 封装下哈；不直接在 service 调用这种基础 mapper 的基础方法
-        return brokerageUserMapper.selectCount(BrokerageUserDO::getBindUserId, bindUserId);
+    public Long getBrokerageUserCountByBindUserId(Long bindUserId, BrokerageUserTypeEnum userType) {
+        switch (userType) {
+            case ALL:
+                Long firstCount = brokerageUserMapper.selectCountByBindUserId(bindUserId);
+                Long secondCount = brokerageUserMapper.selectCountByBindUserIdInBindUserId(bindUserId);
+                return firstCount + secondCount;
+            case FIRST:
+                return brokerageUserMapper.selectCountByBindUserId(bindUserId);
+            case SECOND:
+                return brokerageUserMapper.selectCountByBindUserIdInBindUserId(bindUserId);
+            default:
+                return 0L;
+        }
     }
 
-    // TODO @疯狂：因为现在 user 会存在使用验证码直接注册，所以 isNewUser 不太好传递；我们是不是可以约定绑定的时间，createTime 在 30 秒内，就认为新用户；
     @Override
     public boolean bindBrokerageUser(Long userId, Long bindUserId, Boolean isNewUser) {
-        // TODO @疯狂：userId 为空，搞到参数校验里哇；
-        if (userId == null) {
-            throw exception(0);
-        }
-
         // 1. 获得分销用户
         boolean isNewBrokerageUser = false;
         BrokerageUserDO brokerageUser = brokerageUserMapper.selectById(userId);
@@ -153,7 +158,7 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         }
 
         // 2.1 校验是否能绑定用户
-        boolean validated = isUserCanBind(brokerageUser, bindUserId, isNewUser);
+        boolean validated = isUserCanBind(brokerageUser, isNewUser);
         if (!validated) {
             return false;
         }
@@ -163,10 +168,9 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         if (isNewBrokerageUser) {
             Integer enabledCondition = tradeConfigService.getTradeConfig().getBrokerageEnabledCondition();
             if (BrokerageEnabledConditionEnum.ALL.getCondition().equals(enabledCondition)) { // 人人分销：用户默认就有分销资格
-                // TODO @疯狂：应该设置下 brokerageTime，而不是 bindUserTime
-                brokerageUser.setBrokerageEnabled(true).setBindUserTime(LocalDateTime.now());
+                brokerageUser.setBrokerageEnabled(true).setBrokerageTime(LocalDateTime.now());
             }
-            // TODO @疯狂：这里是不是要设置 bindUserId、bindUserTime 字段哈；
+            brokerageUser.setBindUserId(bindUserId).setBindUserTime(LocalDateTime.now());
             brokerageUserMapper.insert(brokerageUser);
         } else {
             brokerageUserMapper.updateById(new BrokerageUserDO().setId(userId)
@@ -175,7 +179,21 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         return true;
     }
 
-    private boolean isUserCanBind(BrokerageUserDO user, Long bindUserId, Boolean isNewUser) {
+    @Override
+    public Boolean getUserBrokerageEnabled(Long userId) {
+        // 全局分销功能是否开启
+        TradeConfigDO tradeConfig = tradeConfigService.getTradeConfig();
+        if (tradeConfig == null || !BooleanUtil.isTrue(tradeConfig.getBrokerageEnabled())) {
+            return false;
+        }
+
+        // 用户是否有分销资格
+        return Optional.ofNullable(getBrokerageUser(userId))
+                .map(BrokerageUserDO::getBrokerageEnabled)
+                .orElse(false);
+    }
+
+    private boolean isUserCanBind(BrokerageUserDO user, Boolean isNewUser) {
         // 校验分销功能是否启用
         TradeConfigDO tradeConfig = tradeConfigService.getTradeConfig();
         if (tradeConfig == null || !BooleanUtil.isTrue(tradeConfig.getBrokerageEnabled())) {

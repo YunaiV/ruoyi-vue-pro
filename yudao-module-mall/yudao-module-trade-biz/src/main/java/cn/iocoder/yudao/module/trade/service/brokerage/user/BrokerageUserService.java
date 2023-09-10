@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.trade.service.brokerage.user;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.user.vo.BrokerageUserPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.user.BrokerageUserDO;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageUserTypeEnum;
 
 import java.util.Collection;
 import java.util.List;
@@ -86,14 +87,14 @@ public interface BrokerageUserService {
      */
     void updateFrozenPriceDecrAndPriceIncr(Long id, Integer frozenPrice);
 
-    // TODO @疯狂：这个后面可能要支持下，二级
     /**
-     * 获得推广用户数量（一级）
+     * 获得推广用户数量
      *
      * @param bindUserId 绑定的推广员编号
+     * @param userType   用户类型
      * @return 推广用户数量
      */
-    Long getBrokerageUserCountByBindUserId(Long bindUserId);
+    Long getBrokerageUserCountByBindUserId(Long bindUserId, BrokerageUserTypeEnum userType);
 
     /**
      * 【会员】绑定推广员
@@ -105,4 +106,11 @@ public interface BrokerageUserService {
      */
     boolean bindBrokerageUser(Long userId, Long bindUserId, Boolean isNewUser);
 
+    /**
+     * 获取用户是否有分销资格
+     *
+     * @param userId 用户编号
+     * @return 是否有分销资格
+     */
+    Boolean getUserBrokerageEnabled(Long userId);
 }

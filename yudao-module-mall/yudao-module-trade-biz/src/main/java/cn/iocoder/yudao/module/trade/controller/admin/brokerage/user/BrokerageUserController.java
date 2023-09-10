@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.trade.convert.brokerage.user.BrokerageUserConvert
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.user.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageUserTypeEnum;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
 import cn.iocoder.yudao.module.trade.service.brokerage.record.BrokerageRecordService;
 import cn.iocoder.yudao.module.trade.service.brokerage.user.BrokerageUserService;
@@ -95,7 +96,7 @@ public class BrokerageUserController {
         // 合计推广用户数量
         Map<Long, Long> brokerageUserCountMap = convertMap(userIds,
                 userId -> userId,
-                userId -> brokerageUserService.getBrokerageUserCountByBindUserId(userId));
+                userId -> brokerageUserService.getBrokerageUserCountByBindUserId(userId, BrokerageUserTypeEnum.ALL));
 
         // todo 合计提现
 

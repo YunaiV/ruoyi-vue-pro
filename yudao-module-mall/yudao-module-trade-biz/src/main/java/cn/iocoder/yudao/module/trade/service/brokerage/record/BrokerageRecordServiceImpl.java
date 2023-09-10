@@ -91,9 +91,8 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void cancelBrokerage(Long userId, BrokerageRecordBizTypeEnum bizType, String bizId) {
-        // TODO @疯狂：userId 加进去查询，会不会更好一点？万一穿错参数；
-        BrokerageRecordDO record = brokerageRecordMapper.selectByBizTypeAndBizId(bizType.getType(), bizId);
-        if (record == null || ObjectUtil.notEqual(record.getUserId(), userId)) {
+        BrokerageRecordDO record = brokerageRecordMapper.selectByBizTypeAndBizIdAndUserId(bizType.getType(), bizId, userId);
+        if (record == null) {
             log.error("[cancelBrokerage][userId({})][bizId({}) 更新为已失效失败：记录不存在]", userId, bizId);
             return;
         }
@@ -167,7 +166,7 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
                 continue;
             }
             records.add(BrokerageRecordConvert.INSTANCE.convert(user, bizType, item.getBizId(),
-                    brokerageFrozenDays, brokeragePerItem, unfreezeTime, bizType.getTitle(),
+                    brokerageFrozenDays, brokeragePerItem, unfreezeTime, item.getTitle(),
                     item.getSourceUserId(), sourceUserType.getType()));
             totalBrokerage += brokeragePerItem;
         }

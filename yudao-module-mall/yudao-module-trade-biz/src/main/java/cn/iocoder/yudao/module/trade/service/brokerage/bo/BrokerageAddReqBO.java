@@ -40,4 +40,9 @@ public class BrokerageAddReqBO {
      * 来源用户编号
      */
     private Long sourceUserId;
+
+    /**
+     * 佣金记录标题
+     */
+    private String title;
 }

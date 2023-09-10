@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageUserTypeEnum;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * 分销用户 Mapper
@@ -135,4 +136,10 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
                 .set(BrokerageUserDO::getBrokerageEnabled, false).set(BrokerageUserDO::getBrokerageTime, null));
     }
 
+    default Long selectCountByBindUserId(Long bindUserId) {
+        return selectCount(BrokerageUserDO::getBindUserId, bindUserId);
+    }
+
+    @Select("SELECT COUNT(1) from trade_brokerage_user WHERE bind_user_id IN (SELECT id FROM trade_brokerage_user WHERE bind_user_id = #{bindUserId})")
+    Long selectCountByBindUserIdInBindUserId(Long bindUserId);
 }

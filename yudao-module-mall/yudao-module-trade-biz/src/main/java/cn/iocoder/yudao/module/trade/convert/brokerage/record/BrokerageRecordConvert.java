@@ -33,7 +33,6 @@ public interface BrokerageRecordConvert {
 
     PageResult<BrokerageRecordRespVO> convertPage(PageResult<BrokerageRecordDO> page);
 
-    // TODO @疯狂：可能 title 不是很固化，会存在类似：沐晴成功购买《XXX JVM 实战》
     default BrokerageRecordDO convert(BrokerageUserDO user, BrokerageRecordBizTypeEnum bizType, String bizId,
                                       Integer brokerageFrozenDays, int brokeragePrice, LocalDateTime unfreezeTime,
                                       String title, Long sourceUserId, Integer sourceUserType) {
