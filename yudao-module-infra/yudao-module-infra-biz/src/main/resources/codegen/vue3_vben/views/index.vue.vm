@@ -17,16 +17,16 @@ const [registerModal, { openModal }] = useModal()
 const [registerTable, { getForm, reload }] = useTable({
   title: '${table.classComment}列表',
   api: get${ simpleClassName }Page,
-        columns,
-        formConfig: { labelWidth: 120, schemas: searchFormSchema },
-useSearchForm: true,
-        showTableSetting: true,
-        actionColumn: {
-  width: 140,
-          title: t('common.action'),
-          dataIndex: 'action',
-          fixed: 'right',
-},
+    columns,
+    formConfig: { labelWidth: 120, schemas: searchFormSchema },
+    useSearchForm: true,
+    showTableSetting: true,
+    actionColumn: {
+      width: 140,
+      title: t('common.action'),
+      dataIndex: 'action',
+      fixed: 'right',
+    },
 })
 
 function handleCreate() {
