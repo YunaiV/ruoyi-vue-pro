@@ -165,8 +165,10 @@ debug: false
 --- #################### 微信公众号、小程序相关配置 ####################
 wx:
   mp: # 公众号配置（必填），参见 https://github.com/Wechat-Group/WxJava/blob/develop/spring-boot-starters/wx-java-mp-spring-boot-starter/README.md 文档
-    app-id: wx041349c6f39b268b
-    secret: 5abee519483bc9f8cb37ce280e814bd0
+#    app-id: wx041349c6f39b268b
+#    secret: 5abee519483bc9f8cb37ce280e814bd0
+    app-id: wx5b23ba7a5589ecbb # 测试号
+    secret: 2a7b3b20c537e52e74afd395eb85f61f
     # 存储配置，解决 AccessToken 的跨节点的共享
     config-storage:
       type: RedisTemplate # 采用 RedisTemplate 操作 Redis，会自动从 Spring 中获取
@@ -221,6 +223,11 @@ justauth:
       client-secret: ${wx.miniapp.secret}
       ignore-check-redirect-uri: true
       ignore-check-state: true # 微信小程序，不会使用到 state，所以不进行校验
+    WECHAT_MP: # 微信公众号
+      client-id: ${wx.mp.app-id}
+      client-secret: ${wx.mp.secret}
+      ignore-check-redirect-uri: true
+      ignore-check-state: true # 微信公众号，未调用后端的 getSocialAuthorizeUrl 方法，所以无法进行 state 校验 TODO 芋艿：后续考虑支持
 
   cache:
     type: REDIS
