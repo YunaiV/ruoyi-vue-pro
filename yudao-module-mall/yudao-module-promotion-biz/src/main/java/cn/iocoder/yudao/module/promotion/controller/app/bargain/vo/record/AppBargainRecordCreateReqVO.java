@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class AppBargainRecordCreateReqVO {
 
-    @Schema(description = "砍价活动编号", required = true, example = "1024")
+    @Schema(description = "砍价活动编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "砍价活动编号不能为空")
     private Long activityId;
 

@@ -13,16 +13,16 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class PayOrderDetailsRespVO extends PayOrderBaseVO {
 
-    @Schema(description = "支付订单编号", required = true, example = "1024")
+    @Schema(description = "支付订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
     @Schema(description = "应用名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
     private String appName;
 
-    @Schema(description = "创建时间", required = true)
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
-    @Schema(description = "更新时间", required = true)
+    @Schema(description = "更新时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime updateTime;
 
     /**
@@ -34,7 +34,7 @@ public class PayOrderDetailsRespVO extends PayOrderBaseVO {
     @Schema(description = "支付订单扩展")
     public static class PayOrderExtension {
 
-        @Schema(description = "支付订单号", required = true, example = "1024")
+        @Schema(description = "支付订单号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
         private String no;
 
         @Schema(description = "支付异步通知的内容")
