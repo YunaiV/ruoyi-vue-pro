@@ -13,8 +13,6 @@ import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
 import cn.iocoder.yudao.module.member.api.level.MemberLevelApi;
 import cn.iocoder.yudao.module.member.api.point.MemberPointApi;
-import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
-import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.member.enums.MemberExperienceBizTypeEnum;
 import cn.iocoder.yudao.module.member.enums.point.MemberPointBizTypeEnum;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
@@ -24,15 +22,10 @@ import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.product.api.comment.ProductCommentApi;
 import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
-import cn.iocoder.yudao.module.promotion.api.bargain.BargainActivityApi;
 import cn.iocoder.yudao.module.promotion.api.bargain.BargainRecordApi;
 import cn.iocoder.yudao.module.promotion.api.combination.CombinationRecordApi;
-import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordRespDTO;
 import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponUseReqDTO;
-import cn.iocoder.yudao.module.promotion.api.seckill.SeckillActivityApi;
-import cn.iocoder.yudao.module.promotion.api.seckill.dto.SeckillActivityUpdateStockReqDTO;
-import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderRemarkReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdateAddressReqVO;
@@ -59,6 +52,8 @@ import cn.iocoder.yudao.module.trade.service.cart.CartService;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
 import cn.iocoder.yudao.module.trade.service.message.TradeMessageService;
 import cn.iocoder.yudao.module.trade.service.message.bo.TradeOrderMessageWhenDeliveryOrderReqBO;
+import cn.iocoder.yudao.module.trade.service.order.bo.TradeBeforeOrderCreateReqBO;
+import cn.iocoder.yudao.module.trade.service.order.handler.TradeOrderHandler;
 import cn.iocoder.yudao.module.trade.service.price.TradePriceService;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
@@ -95,6 +90,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private TradeOrderItemMapper tradeOrderItemMapper;
     @Resource
     private TradeOrderNoRedisDAO orderNoRedisDAO;
+    @Resource
+    private List<TradeOrderHandler> orderHandlers;
 
     @Resource
     private CartService cartService;
@@ -117,12 +114,6 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private CombinationRecordApi combinationRecordApi;
     @Resource
     private BargainRecordApi bargainRecordApi;
-    @Resource
-    private SeckillActivityApi seckillActivityApi;
-    @Resource
-    private BargainActivityApi bargainActivityApi;
-    @Resource
-    private MemberUserApi memberUserApi;
     @Resource
     private MemberLevelApi memberLevelApi;
     @Resource
@@ -188,7 +179,13 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public TradeOrderDO createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO) {
-        // 1. 价格计算
+        // 1、执行订单创建前置处理器
+        TradeBeforeOrderCreateReqBO beforeOrderCreateReqBO = TradeOrderConvert.INSTANCE.convert(createReqVO);
+        beforeOrderCreateReqBO.setOrderType(validateActivity(createReqVO));
+        beforeOrderCreateReqBO.setCount(CollectionUtils.getSumValue(createReqVO.getItems(), AppTradeOrderSettlementReqVO.Item::getCount, Integer::sum));
+        orderHandlers.forEach(handler -> handler.beforeOrderCreate(beforeOrderCreateReqBO));
+
+        // 2. 价格计算
         TradePriceCalculateRespBO calculateRespBO = calculatePrice(userId, createReqVO);
 
         // 2.1 插入 TradeOrderDO 订单
@@ -198,37 +195,11 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
         // 3. 订单创建完后的逻辑
         afterCreateTradeOrder(userId, createReqVO, order, orderItems, calculateRespBO);
-        // 3.1 拼团的特殊逻辑
-        // TODO @puhui999：这个逻辑，先抽个小方法；未来要通过设计模式，把这些拼团之类的逻辑，抽象出去
-        // 拼团
-        if (Objects.equals(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
-            createCombinationRecord(userId, createReqVO, orderItems, order);
-        }
-        // 3.2 秒杀的特殊逻辑
-        if (Objects.equals(TradeOrderTypeEnum.SECKILL.getType(), order.getType())) {
-
-        }
-        // 3.3 砍价的特殊逻辑
 
         // TODO @LeeYan9: 是可以思考下, 订单的营销优惠记录, 应该记录在哪里, 微信讨论起来!
         return order;
     }
 
-    private void createCombinationRecord(Long userId, AppTradeOrderCreateReqVO createReqVO, List<TradeOrderItemDO> orderItems, TradeOrderDO order) {
-        MemberUserRespDTO user = memberUserApi.getUser(userId);
-        List<CombinationRecordRespDTO> recordRespDTOS = combinationRecordApi.getRecordListByUserIdAndActivityId(userId, createReqVO.getCombinationActivityId());
-        // TODO 拼团一次应该只能选择一种规格的商品
-        TradeOrderItemDO orderItemDO = orderItems.get(0);
-        if (CollUtil.isNotEmpty(recordRespDTOS)) {
-            List<Long> skuIds = convertList(recordRespDTOS, CombinationRecordRespDTO::getSkuId, item -> ObjectUtil.equals(item.getStatus(), CombinationRecordStatusEnum.SUCCESS.getStatus()));
-            List<TradeOrderItemDO> tradeOrderItemDOS = tradeOrderItemMapper.selectListByOrderIdAnSkuId(convertList(recordRespDTOS,
-                    CombinationRecordRespDTO::getOrderId, item -> ObjectUtil.equals(item.getStatus(), CombinationRecordStatusEnum.SUCCESS.getStatus())), skuIds);
-            combinationRecordApi.validateCombinationLimitCount(createReqVO.getCombinationActivityId(),
-                    CollectionUtils.getSumValue(tradeOrderItemDOS, TradeOrderItemDO::getCount, Integer::sum), orderItemDO.getCount());
-        }
-
-        combinationRecordApi.createCombinationRecord(TradeOrderConvert.INSTANCE.convert(order, orderItemDO, createReqVO, user));
-    }
 
     // TODO @puhui999：订单超时，自动取消；
 
@@ -310,13 +281,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private void afterCreateTradeOrder(Long userId, AppTradeOrderCreateReqVO createReqVO,
                                        TradeOrderDO tradeOrderDO, List<TradeOrderItemDO> orderItems,
                                        TradePriceCalculateRespBO calculateRespBO) {
-        Integer count = getSumValue(orderItems, TradeOrderItemDO::getCount, Integer::sum);
-        // 1）如果是秒杀商品：额外扣减秒杀的库存；
-        if (Objects.equals(TradeOrderTypeEnum.SECKILL.getType(), tradeOrderDO.getType())) {
-            seckillActivityApi.updateSeckillStock(getSeckillActivityUpdateStockReqDTO(createReqVO, orderItems, count));
-        }
-        // 2）如果是砍价活动：额外扣减砍价的库存；
-        bargainActivityApi.updateBargainActivityStock(createReqVO.getBargainActivityId(), count);
+        // 执行订单创建后置处理器
+        orderHandlers.forEach(handler -> handler.afterOrderCreate(TradeOrderConvert.INSTANCE.convert(userId, createReqVO, tradeOrderDO, orderItems.get(0))));
         // 扣减积分 TODO 芋艿：待实现，需要前置；
         // 这个是不是应该放到支付成功之后？如果支付后的话，可能积分可以重复使用哈。资源类，都要预扣
 
@@ -341,19 +307,6 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 增加订单日志 TODO 芋艿：待实现
     }
 
-    private SeckillActivityUpdateStockReqDTO getSeckillActivityUpdateStockReqDTO(AppTradeOrderCreateReqVO createReqVO, List<TradeOrderItemDO> orderItems, Integer count) {
-        SeckillActivityUpdateStockReqDTO updateStockReqDTO = new SeckillActivityUpdateStockReqDTO();
-        updateStockReqDTO.setActivityId(createReqVO.getSeckillActivityId());
-        updateStockReqDTO.setCount(count);
-        // 秒杀活动只能选择一个商品
-        TradeOrderItemDO item = orderItems.get(0);
-        SeckillActivityUpdateStockReqDTO.Item item1 = new SeckillActivityUpdateStockReqDTO.Item();
-        item1.setSpuId(item.getSpuId());
-        item1.setSkuId(item.getSkuId());
-        item1.setCount(item.getCount());
-        updateStockReqDTO.setItem(item1);
-        return updateStockReqDTO;
-    }
 
     private void createPayOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems, TradePriceCalculateRespBO calculateRespBO) {
         // 创建支付单，用于后续的支付
@@ -767,6 +720,9 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         if (updateCount == 0) {
             throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
         }
+
+        // TODO 活动相关库存回滚需要活动 id，活动 id 怎么获取？app 端能否传过来
+        orderHandlers.forEach(handler -> handler.rollbackStock());
 
         // 2.回滚库存
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(id);

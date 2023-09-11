@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.api.seckill.dto;
+package cn.iocoder.yudao.module.promotion.api.combination.dto;
 
 import lombok.Data;
 
@@ -6,12 +6,12 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 /**
- * 更新秒杀库存 request DTO
+ * 拼团活动更新活动库存 Request DTO
  *
  * @author HUIHUI
  */
 @Data
-public class SeckillActivityUpdateStockReqDTO {
+public class CombinationActivityUpdateStockReqDTO {
 
     @NotNull(message = "活动编号不能为空")
     private Long activityId;
