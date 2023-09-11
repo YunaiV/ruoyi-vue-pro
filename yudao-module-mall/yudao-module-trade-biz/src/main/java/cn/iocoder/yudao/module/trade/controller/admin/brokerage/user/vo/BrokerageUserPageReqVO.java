@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.trade.controller.admin.brokerage.user.vo;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageUserTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,4 +29,11 @@ public class BrokerageUserPageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 
+    @Schema(description = "用户类型")
+    @InEnum(value = BrokerageUserTypeEnum.class, message = "用户类型必须是 {value}")
+    private Integer userType;
+
+    @Schema(description = "绑定时间")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime[] bindUserTime;
 }

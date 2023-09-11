@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.member.service.user;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -103,6 +105,9 @@ public class MemberUserServiceImpl implements MemberUserService {
 
     @Override
     public List<MemberUserDO> getUserList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return ListUtil.empty();
+        }
         return memberUserMapper.selectBatchIds(ids);
     }
 

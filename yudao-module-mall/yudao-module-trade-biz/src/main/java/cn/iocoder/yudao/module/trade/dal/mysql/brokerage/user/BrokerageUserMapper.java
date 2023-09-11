@@ -1,13 +1,17 @@
 package cn.iocoder.yudao.module.trade.dal.mysql.brokerage.user;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.user.vo.BrokerageUserPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.user.BrokerageUserDO;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageUserTypeEnum;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * 分销用户 Mapper
@@ -19,10 +23,30 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
 
     default PageResult<BrokerageUserDO> selectPage(BrokerageUserPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<BrokerageUserDO>()
-                .eqIfPresent(BrokerageUserDO::getBindUserId, reqVO.getBindUserId())
                 .eqIfPresent(BrokerageUserDO::getBrokerageEnabled, reqVO.getBrokerageEnabled())
                 .betweenIfPresent(BrokerageUserDO::getCreateTime, reqVO.getCreateTime())
+                .betweenIfPresent(BrokerageUserDO::getBindUserTime, reqVO.getBindUserTime())
+                .and(reqVO.getBindUserId() != null, w -> buildBindUserCondition(reqVO, w))
                 .orderByDesc(BrokerageUserDO::getId));
+    }
+
+    static void buildBindUserCondition(BrokerageUserPageReqVO reqVO, LambdaQueryWrapper<BrokerageUserDO> wrapper) {
+        if (BrokerageUserTypeEnum.FIRST.getType().equals(reqVO.getUserType())) {
+            buildFirstBindUserCondition(reqVO.getBindUserId(), wrapper);
+        } else if (BrokerageUserTypeEnum.SECOND.getType().equals(reqVO.getUserType())) {
+            buildSecondBindUserCondition(reqVO.getBindUserId(), wrapper);
+        } else {
+            buildFirstBindUserCondition(reqVO.getBindUserId(), wrapper);
+            buildSecondBindUserCondition(reqVO.getBindUserId(), wrapper.or());
+        }
+    }
+
+    static void buildFirstBindUserCondition(Long bindUserId, LambdaQueryWrapper<BrokerageUserDO> wrapper) {
+        wrapper.eq(BrokerageUserDO::getBindUserId, bindUserId);
+    }
+
+    static void buildSecondBindUserCondition(Long bindUserId, LambdaQueryWrapper<BrokerageUserDO> w) {
+        w.inSql(BrokerageUserDO::getBindUserId, StrUtil.format("SELECT id FROM trade_brokerage_user WHERE bind_user_id = {}", bindUserId));
     }
 
     /**
@@ -112,4 +136,10 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
                 .set(BrokerageUserDO::getBrokerageEnabled, false).set(BrokerageUserDO::getBrokerageTime, null));
     }
 
+    default Long selectCountByBindUserId(Long bindUserId) {
+        return selectCount(BrokerageUserDO::getBindUserId, bindUserId);
+    }
+
+    @Select("SELECT COUNT(1) from trade_brokerage_user WHERE bind_user_id IN (SELECT id FROM trade_brokerage_user WHERE bind_user_id = #{bindUserId})")
+    Long selectCountByBindUserIdInBindUserId(Long bindUserId);
 }

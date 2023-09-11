@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.BrokerageRecordPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.record.BrokerageRecordDO;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageUserTypeEnum;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -23,10 +24,14 @@ import java.util.List;
 public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
 
     default PageResult<BrokerageRecordDO> selectPage(BrokerageRecordPageReqVO reqVO) {
+        boolean sourceUserTypeCondition = reqVO.getSourceUserType() != null &&
+                !BrokerageUserTypeEnum.ALL.getType().equals(reqVO.getSourceUserType());
+
         return selectPage(reqVO, new LambdaQueryWrapperX<BrokerageRecordDO>()
                 .eqIfPresent(BrokerageRecordDO::getUserId, reqVO.getUserId())
                 .eqIfPresent(BrokerageRecordDO::getBizType, reqVO.getBizType())
                 .eqIfPresent(BrokerageRecordDO::getStatus, reqVO.getStatus())
+                .eq(sourceUserTypeCondition, BrokerageRecordDO::getSourceUserType, reqVO.getSourceUserType())
                 .betweenIfPresent(BrokerageRecordDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(BrokerageRecordDO::getId));
     }
@@ -43,13 +48,13 @@ public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
                 .eq(BrokerageRecordDO::getStatus, status));
     }
 
-    default BrokerageRecordDO selectByBizTypeAndBizId(Integer bizType, String bizId) {
+    default BrokerageRecordDO selectByBizTypeAndBizIdAndUserId(Integer bizType, String bizId, Long userId) {
         return selectOne(BrokerageRecordDO::getBizType, bizType,
-                BrokerageRecordDO::getBizId, bizId);
+                BrokerageRecordDO::getBizId, bizId,
+                BrokerageRecordDO::getUserId, userId);
     }
 
-    // TODO @疯狂：mysql 关键字，大写哈；这样看起来清晰点；例如说 SELECT COUNT(1)
-    @Select("select count(1), sum(price) from trade_brokerage_record where user_id = #{userId} and biz_type = #{bizType} and status = #{status}")
+    @Select("SELECT COUNT(1), SUM(price) FROM trade_brokerage_record WHERE user_id = #{userId} AND biz_type = #{bizType} AND status = #{status}")
     UserBrokerageSummaryBO selectCountAndSumPriceByUserIdAndBizTypeAndStatus(@Param("userId") Long userId,
                                                                              @Param("bizType") Integer bizType,
                                                                              @Param("status") Integer status);

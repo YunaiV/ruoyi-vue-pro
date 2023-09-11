@@ -9,8 +9,9 @@ import cn.iocoder.yudao.module.trade.convert.brokerage.user.BrokerageUserConvert
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.user.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
-import cn.iocoder.yudao.module.trade.service.brokerage.record.BrokerageRecordService;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageUserTypeEnum;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
+import cn.iocoder.yudao.module.trade.service.brokerage.record.BrokerageRecordService;
 import cn.iocoder.yudao.module.trade.service.brokerage.user.BrokerageUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -42,18 +43,18 @@ public class BrokerageUserController {
     @Resource
     private MemberUserApi memberUserApi;
 
-    @PutMapping("/update-brokerage-user")
+    @PutMapping("/update-bind-user")
     @Operation(summary = "修改推广员")
-    @PreAuthorize("@ss.hasPermission('trade:brokerage-user:update-brokerage-user')")
-    public CommonResult<Boolean> updateBrokerageUser(@Valid @RequestBody BrokerageUserUpdateBrokerageUserReqVO updateReqVO) {
+    @PreAuthorize("@ss.hasPermission('trade:brokerage-user:update-bind-user')")
+    public CommonResult<Boolean> updateBindUser(@Valid @RequestBody BrokerageUserUpdateBrokerageUserReqVO updateReqVO) {
         brokerageUserService.updateBrokerageUserId(updateReqVO.getId(), updateReqVO.getBindUserId());
         return success(true);
     }
 
-    @PutMapping("/clear-brokerage-user")
+    @PutMapping("/clear-bind-user")
     @Operation(summary = "清除推广员")
-    @PreAuthorize("@ss.hasPermission('trade:brokerage-user:clear-brokerage-user')")
-    public CommonResult<Boolean> clearBrokerageUser(@Valid @RequestBody BrokerageUserClearBrokerageUserReqVO updateReqVO) {
+    @PreAuthorize("@ss.hasPermission('trade:brokerage-user:clear-bind-user')")
+    public CommonResult<Boolean> clearBindUser(@Valid @RequestBody BrokerageUserClearBrokerageUserReqVO updateReqVO) {
         brokerageUserService.updateBrokerageUserId(updateReqVO.getId(), null);
         return success(true);
     }
@@ -72,7 +73,8 @@ public class BrokerageUserController {
     @PreAuthorize("@ss.hasPermission('trade:brokerage-user:query')")
     public CommonResult<BrokerageUserRespVO> getBrokerageUser(@RequestParam("id") Long id) {
         BrokerageUserDO brokerageUser = brokerageUserService.getBrokerageUser(id);
-        return success(BrokerageUserConvert.INSTANCE.convert(brokerageUser));
+        BrokerageUserRespVO respVO = BrokerageUserConvert.INSTANCE.convert(brokerageUser);
+        return success(BrokerageUserConvert.INSTANCE.copyTo(memberUserApi.getUser(id), respVO));
     }
 
     @GetMapping("/page")
@@ -94,7 +96,7 @@ public class BrokerageUserController {
         // 合计推广用户数量
         Map<Long, Long> brokerageUserCountMap = convertMap(userIds,
                 userId -> userId,
-                userId -> brokerageUserService.getBrokerageUserCountByBindUserId(userId));
+                userId -> brokerageUserService.getBrokerageUserCountByBindUserId(userId, BrokerageUserTypeEnum.ALL));
 
         // todo 合计提现
 

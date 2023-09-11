@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.trade.convert.brokerage.record;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.BrokerageRecordRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.record.BrokerageRecordDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.user.BrokerageUserDO;
@@ -13,6 +14,8 @@ import org.mapstruct.factory.Mappers;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * 佣金记录 Convert
@@ -30,10 +33,9 @@ public interface BrokerageRecordConvert {
 
     PageResult<BrokerageRecordRespVO> convertPage(PageResult<BrokerageRecordDO> page);
 
-    // TODO @疯狂：可能 title 不是很固化，会存在类似：沐晴成功购买《XXX JVM 实战》
     default BrokerageRecordDO convert(BrokerageUserDO user, BrokerageRecordBizTypeEnum bizType, String bizId,
                                       Integer brokerageFrozenDays, int brokeragePrice, LocalDateTime unfreezeTime,
-                                      String title) {
+                                      String title, Long sourceUserId, Integer sourceUserType) {
         brokerageFrozenDays = ObjectUtil.defaultIfNull(brokerageFrozenDays, 0);
         // 不冻结时，佣金直接就是结算状态
         Integer status = brokerageFrozenDays > 0
@@ -43,8 +45,22 @@ public interface BrokerageRecordConvert {
                 .setBizType(bizType.getType()).setBizId(bizId)
                 .setPrice(brokeragePrice).setTotalPrice(user.getBrokeragePrice())
                 .setTitle(title)
-                .setDescription(StrUtil.format(bizType.getDescription(), String.valueOf(brokeragePrice / 100.0)))
-                .setStatus(status).setFrozenDays(brokerageFrozenDays).setUnfreezeTime(unfreezeTime);
+                .setDescription(StrUtil.format(bizType.getDescription(), String.format("￥%.2f", brokeragePrice / 100d)))
+                .setStatus(status).setFrozenDays(brokerageFrozenDays).setUnfreezeTime(unfreezeTime)
+                .setSourceUserType(sourceUserType).setSourceUserId(sourceUserId);
     }
 
+    default PageResult<BrokerageRecordRespVO> convertPage(PageResult<BrokerageRecordDO> pageResult, Map<Long, MemberUserRespDTO> userMap) {
+        PageResult<BrokerageRecordRespVO> result = convertPage(pageResult);
+
+        for (BrokerageRecordRespVO respVO : result.getList()) {
+            Optional.ofNullable(userMap.get(respVO.getUserId())).ifPresent(user ->
+                    respVO.setUserNickname(user.getNickname()).setUserAvatar(user.getAvatar()));
+
+            Optional.ofNullable(userMap.get(respVO.getSourceUserId())).ifPresent(user ->
+                    respVO.setSourceUserNickname(user.getNickname()).setSourceUserAvatar(user.getAvatar()));
+        }
+
+        return result;
+    }
 }

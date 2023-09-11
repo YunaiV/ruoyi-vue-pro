@@ -28,7 +28,7 @@ public class BrokerageUserRespVO extends BrokerageUserBaseVO {
 
     // ========== 推广信息 ==========
 
-    @Schema(description = "推广用户数量（一级）", example = "20019")
+    @Schema(description = "推广用户数量", example = "20019")
     private Integer brokerageUserCount;
     @Schema(description = "推广订单数量", example = "20019")
     private Integer brokerageOrderCount;

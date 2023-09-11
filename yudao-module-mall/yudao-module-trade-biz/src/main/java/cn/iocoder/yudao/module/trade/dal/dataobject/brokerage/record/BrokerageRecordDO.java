@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.record;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageUserTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -32,6 +33,8 @@ public class BrokerageRecordDO extends BaseDO {
     private Integer id;
     /**
      * 用户编号
+     * <p>
+     * 关联 MemberUserDO.id
      */
     private Long userId;
     /**
@@ -78,5 +81,18 @@ public class BrokerageRecordDO extends BaseDO {
      * 解冻时间
      */
     private LocalDateTime unfreezeTime;
+
+    /**
+     * 来源用户类型
+     * <p>
+     * 枚举 {@link BrokerageUserTypeEnum}
+     */
+    private Integer sourceUserType;
+    /**
+     * 来源用户编号
+     * <p>
+     * 关联 MemberUserDO.id
+     */
+    private Long sourceUserId;
 
 }
