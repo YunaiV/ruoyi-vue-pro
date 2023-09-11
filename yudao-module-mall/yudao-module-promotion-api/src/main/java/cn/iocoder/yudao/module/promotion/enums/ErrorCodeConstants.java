@@ -55,6 +55,7 @@ public interface ErrorCodeConstants {
     ErrorCode SECKILL_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_008_003, "秒杀活动已关闭，不能修改");
     ErrorCode SECKILL_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1_013_008_004, "秒杀活动未关闭或未结束，不能删除");
     ErrorCode SECKILL_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_008_005, "秒杀活动已关闭，不能重复关闭");
+    ErrorCode SECKILL_ACTIVITY_UPDATE_STOCK_FAIL = new ErrorCode(1013008006, "更新秒杀活动库存失败，原因秒杀库存不足");
 
     // ========== 秒杀时段 1-013-009-000 ==========
     ErrorCode SECKILL_CONFIG_NOT_EXISTS = new ErrorCode(1_013_009_000, "秒杀时段不存在");

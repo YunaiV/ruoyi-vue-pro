@@ -163,6 +163,10 @@ export const PayChannelEnum = {
   MOCK : {
     "code": "mock",
     "name": "模拟支付"
+  },
+  WALLET : {
+    "code": "wallet",
+    "name": "钱包支付"
   }
 }
 

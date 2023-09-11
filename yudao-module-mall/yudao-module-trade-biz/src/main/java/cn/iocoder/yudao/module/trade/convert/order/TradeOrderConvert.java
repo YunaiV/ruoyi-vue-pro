@@ -7,11 +7,13 @@ import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
+import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderRespDTO;
@@ -93,6 +95,7 @@ public interface TradeOrderConvert {
         items.forEach(item -> item.setIncrCount(-item.getIncrCount()));
         return new ProductSkuUpdateStockReqDTO(items);
     }
+
     List<ProductSkuUpdateStockReqDTO.Item> convertList(List<TradeOrderItemDO> list);
 
     @Mappings({
@@ -151,9 +154,10 @@ public interface TradeOrderConvert {
             TradeOrderDetailRespVO.OrderLog orderLog = new TradeOrderDetailRespVO.OrderLog();
             orderLog.setContent("订单操作" + i);
             orderLog.setCreateTime(LocalDateTime.now());
+            orderLog.setUserType(i % 2 == 0 ? 2 : 1);
             orderLogs.add(orderLog);
         }
-        orderVO.setOrderLog(orderLogs);
+        orderVO.setLogs(orderLogs);
         return orderVO;
     }
 
@@ -273,4 +277,10 @@ public interface TradeOrderConvert {
 
     TradeOrderDO convert(TradeOrderRemarkReqVO reqVO);
 
+    default BrokerageAddReqBO convert(TradeOrderItemDO item, ProductSkuRespDTO sku) {
+        return new BrokerageAddReqBO().setBizId(String.valueOf(item.getId()))
+                .setBasePrice(item.getPayPrice() * item.getCount())
+                .setFirstFixedPrice(sku.getSubCommissionFirstPrice())
+                .setSecondFixedPrice(sku.getSubCommissionSecondPrice());
+    }
 }

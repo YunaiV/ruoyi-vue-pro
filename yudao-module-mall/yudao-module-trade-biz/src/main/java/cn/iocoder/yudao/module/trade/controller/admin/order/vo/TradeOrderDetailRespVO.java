@@ -26,23 +26,22 @@ public class TradeOrderDetailRespVO extends TradeOrderBaseVO {
     private MemberUserRespVO user;
 
     /**
-     * TODO 订单操作日志, 先模拟一波；返回 logs，简洁，然后复数哈
+     * TODO 订单操作日志, 先模拟一波
      */
-    private List<OrderLog> orderLog;
+    private List<OrderLog> logs;
 
-    // TODO @puhui999：swagger 注解
+    @Schema(description = "管理后台 - 交易订单的操作日志")
     @Data
     public static class OrderLog {
 
-        /**
-         * 内容
-         */
+        @Schema(description = "操作详情", requiredMode = Schema.RequiredMode.REQUIRED, example = "订单发货")
         private String content;
 
-        /**
-         * 创建时间
-         */
+        @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "2023-06-01 10:50:20")
         private LocalDateTime createTime;
+
+        @Schema(description = "用户类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+        private Integer userType;
 
     }
 

@@ -35,7 +35,7 @@ public class TradeAfterSaleDetailRespVO extends TradeAfterSaleBaseVO {
     /**
      * 售后日志
      */
-    private List<TradeAfterSaleLogRespVO> afterSaleLog;
+    private List<TradeAfterSaleLogRespVO> logs;
 
     @Schema(description = "管理后台 - 交易订单的详情的订单项目")
     @Data

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.promotion.controller.app.combination;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.util.date.DateUtils;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordDetailRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordSummaryRespVO;
@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.Max;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -52,14 +52,13 @@ public class AppCombinationRecordController {
             @RequestParam(value = "activityId", required = false) Long activityId,
             @RequestParam("status") Integer status,
             @RequestParam(value = "count", defaultValue = "20") @Max(20) Integer count) {
-        ZoneId zoneId = ZoneId.systemDefault();
         List<AppCombinationRecordRespVO> list = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
             AppCombinationRecordRespVO record = new AppCombinationRecordRespVO();
             record.setId((long) i);
             record.setNickname("用户" + i);
             record.setAvatar("头像" + i);
-            record.setExpireTime(LocalDateTime.ofInstant(new Date().toInstant(), zoneId));
+            record.setExpireTime(LocalDateTime.now());
             record.setUserSize(10);
             record.setUserCount(i);
             record.setPicUrl("https://static.iocoder.cn/mall/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
@@ -74,14 +73,13 @@ public class AppCombinationRecordController {
     @Operation(summary = "获得拼团记录明细")
     @Parameter(name = "id", description = "拼团记录编号", required = true, example = "1024")
     public CommonResult<AppCombinationRecordDetailRespVO> getCombinationRecordDetail(@RequestParam("id") Long id) {
-        ZoneId zoneId = ZoneId.systemDefault();
         AppCombinationRecordDetailRespVO detail = new AppCombinationRecordDetailRespVO();
         // 团长
         AppCombinationRecordRespVO headRecord = new AppCombinationRecordRespVO();
         headRecord.setId(1L);
         headRecord.setNickname("用户" + 1);
         headRecord.setAvatar("头像" + 1);
-        headRecord.setExpireTime((LocalDateTime.ofInstant(DateUtils.addTime(Duration.ofDays(1)).toInstant(), zoneId)));
+        headRecord.setExpireTime(LocalDateTimeUtils.addTime(Duration.ofDays(1)));
         headRecord.setUserSize(10);
         headRecord.setUserCount(3);
         headRecord.setStatus(1);
@@ -96,7 +94,7 @@ public class AppCombinationRecordController {
             record.setId((long) i);
             record.setNickname("用户" + i);
             record.setAvatar("头像" + i);
-            record.setExpireTime(LocalDateTime.ofInstant(new Date().toInstant(), zoneId));
+            record.setExpireTime(LocalDateTime.now());
             record.setUserSize(10);
             record.setUserCount(i);
             record.setStatus(1);

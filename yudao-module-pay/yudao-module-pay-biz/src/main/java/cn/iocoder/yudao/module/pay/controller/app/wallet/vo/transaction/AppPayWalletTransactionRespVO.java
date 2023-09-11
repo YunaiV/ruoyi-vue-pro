@@ -15,9 +15,6 @@ public class AppPayWalletTransactionRespVO {
     @Schema(description = "业务分类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer bizType;
 
-    @Schema(description = "交易时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
-    private LocalDateTime transactionTime;
-
     @Schema(description = "交易金额，单位分", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
     private Long price;
 

@@ -31,4 +31,9 @@ public class PayOrderApiImpl implements PayOrderApi {
         return PayOrderConvert.INSTANCE.convert2(order);
     }
 
+    @Override
+    public void updatePayOrderPriceById(Long payOrderId, Integer payPrice) {
+        payOrderService.updatePayOrderPriceById(payOrderId, payPrice);
+    }
+
 }

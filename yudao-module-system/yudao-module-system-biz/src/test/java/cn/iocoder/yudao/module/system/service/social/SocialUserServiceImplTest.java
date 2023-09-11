@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.social.core.YudaoAuthRequestFactory;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialUserRespDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserBindDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.social.SocialUserBindMapper;
@@ -195,10 +196,11 @@ public class SocialUserServiceImplTest extends BaseDbUnitTest {
                 .setSocialType(SocialTypeEnum.GITEE.getType()).setSocialUserId(socialUser.getId()));
 
         // 调用
-        socialUserService.bindSocialUser(reqDTO);
+        String openid = socialUserService.bindSocialUser(reqDTO);
         // 断言
         List<SocialUserBindDO> socialUserBinds = socialUserBindMapper.selectList();
         assertEquals(1, socialUserBinds.size());
+        assertEquals(socialUser.getOpenid(), openid);
     }
 
     @Test
@@ -232,25 +234,26 @@ public class SocialUserServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testGetBindUserId() {
+    public void testGetSocialUser() {
         // 准备参数
         Integer userType = UserTypeEnum.ADMIN.getValue();
         Integer type = SocialTypeEnum.GITEE.getType();
         String code = "tudou";
         String state = "yuanma";
         // mock 社交用户
-        SocialUserDO socialUser = randomPojo(SocialUserDO.class).setType(type).setCode(code).setState(state);
-        socialUserMapper.insert(socialUser);
+        SocialUserDO socialUserDO = randomPojo(SocialUserDO.class).setType(type).setCode(code).setState(state);
+        socialUserMapper.insert(socialUserDO);
         // mock 社交用户的绑定
         Long userId = randomLong();
         SocialUserBindDO socialUserBind = randomPojo(SocialUserBindDO.class).setUserType(userType).setUserId(userId)
-                .setSocialType(type).setSocialUserId(socialUser.getId());
+                .setSocialType(type).setSocialUserId(socialUserDO.getId());
         socialUserBindMapper.insert(socialUserBind);
 
         // 调用
-        Long result = socialUserService.getBindUserId(userType, type, code, state);
+        SocialUserRespDTO socialUser = socialUserService.getSocialUser(userType, type, code, state);
         // 断言
-        assertEquals(userId, result);
+        assertEquals(userId, socialUser.getUserId());
+        assertEquals(socialUserDO.getOpenid(), socialUser.getOpenid());
     }
 
 }
