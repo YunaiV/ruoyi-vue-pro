@@ -82,8 +82,8 @@ public class BargainActivityServiceImpl implements BargainActivityService {
         }
 
         // 更新砍价库存
-        int row = bargainActivityMapper.updateActivityStock(id, count);
-        if (row == 0) {
+        int updateCount = bargainActivityMapper.updateActivityStock(id, count);
+        if (updateCount == 0) {
             throw exception(BARGAIN_ACTIVITY_UPDATE_STOCK_FAIL);
         }
     }

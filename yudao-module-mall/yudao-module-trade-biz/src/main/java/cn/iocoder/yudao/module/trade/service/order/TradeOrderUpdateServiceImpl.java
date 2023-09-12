@@ -542,11 +542,12 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         int orderPayPrice = order.getAdjustPrice() != null ? (order.getPayPrice() - order.getAdjustPrice())
                 + reqVO.getAdjustPrice() : order.getPayPrice() + reqVO.getAdjustPrice();
         update.setPayPrice(orderPayPrice);
-        // TODO @芋艿：改价时，赠送的积分，要不要做改动？？？
         tradeOrderMapper.updateById(update);
+        // TODO @芋艿：改价时，赠送的积分，要不要做改动？？？
 
         // TODO @puhui999：应该是按照 payPrice 分配；并且要考虑取余问题；payPrice 也要考虑，item 里的
         // TODO：先按 adjustPrice 实现，没明白 payPrice 怎么搞哈哈哈
+        // TODO @puhui999：就是对比新老 adjustPrice 的差值，然后计算补充的 adjustPrice 最终值；另外，可以不用区分 items.size 是不是 > 1 哈；应该是一致的逻辑；分摊的逻辑，有点类似 dividePrice 方法噢；
         // 5、更新 TradeOrderItem
         if (items.size() > 1) {
             // TradeOrderItemDO 需要做 adjustPrice 的分摊

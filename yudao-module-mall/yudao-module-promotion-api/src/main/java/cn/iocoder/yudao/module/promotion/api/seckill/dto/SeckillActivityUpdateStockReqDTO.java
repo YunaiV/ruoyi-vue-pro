@@ -13,6 +13,8 @@ import javax.validation.constraints.NotNull;
 @Data
 public class SeckillActivityUpdateStockReqDTO {
 
+    // TODO @puhui999：可以不用 dto，直接 activityId、skuId、count 即可
+
     @NotNull(message = "活动编号不能为空")
     private Long activityId;
 

@@ -128,6 +128,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         }
 
         // 2. 创建拼团记录
+        // TODO @puhui999：可以把 user、spu、sku 一起放 convert 里哈；
         CombinationRecordDO record = CombinationActivityConvert.INSTANCE.convert(reqDTO);
         record.setVirtualGroup(false);
         record.setExpireTime(record.getStartTime().plusHours(activity.getLimitDuration()));

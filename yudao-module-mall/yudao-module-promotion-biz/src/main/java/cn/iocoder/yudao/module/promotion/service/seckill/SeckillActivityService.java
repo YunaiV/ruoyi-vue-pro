@@ -35,24 +35,11 @@ public interface SeckillActivityService {
     void updateSeckillActivity(@Valid SeckillActivityUpdateReqVO updateReqVO);
 
     /**
-     * 更新秒杀活动
-     *
-     * @param activityDO 秒杀活动
-     */
-    void updateSeckillActivity(SeckillActivityDO activityDO);
-
-    /**
      * 更新秒杀库存
      *
      * @param updateStockReqDTO 更新信息
      */
     void updateSeckillStock(SeckillActivityUpdateStockReqDTO updateStockReqDTO);
-    /**
-     * 更新秒杀活动商品
-     *
-     * @param productList 活动商品列表
-     */
-    void updateSeckillActivityProductList(List<SeckillProductDO> productList);
 
     /**
      * 关闭秒杀活动

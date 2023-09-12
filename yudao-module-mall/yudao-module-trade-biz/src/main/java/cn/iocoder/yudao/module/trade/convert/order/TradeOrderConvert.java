@@ -34,7 +34,6 @@ import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEn
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressTrackRespDTO;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
-import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
 import cn.iocoder.yudao.module.trade.service.order.bo.TradeAfterOrderCreateReqBO;
 import cn.iocoder.yudao.module.trade.service.order.bo.TradeBeforeOrderCreateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
@@ -281,7 +280,7 @@ public interface TradeOrderConvert {
         return new BrokerageAddReqBO().setBizId(String.valueOf(item.getId())).setSourceUserId(item.getUserId())
                 .setBasePrice(item.getPayPrice() * item.getCount())
                 .setTitle(BrokerageRecordBizTypeEnum.ORDER.getTitle()) // TODO @疯狂：标题类似：木晴冰雪成功购买云时代的JVM原理与实战；茫农成功购买深入拆解消息队列47讲
-                .setFirstFixedPrice(sku.getFirstBrokerageRecord()).getSecondBrokerageRecord(sku.getSecondBrokerageRecord());
+                .setFirstFixedPrice(sku.getFirstBrokerageRecord()).setSecondFixedPrice(sku.getSecondBrokerageRecord());
     }
 
     @Mapping(target = "activityId", source = "reqBO.seckillActivityId")

@@ -13,6 +13,8 @@ import javax.validation.constraints.NotNull;
 @Data
 public class CombinationRecordCreateReqDTO {
 
+    // TODO @puhui999：注释还是要的哈
+
     @NotNull(message = "拼团活动编号不能为空")
     private Long activityId;
 

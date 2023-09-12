@@ -146,11 +146,6 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     }
 
     @Override
-    public void updateSeckillActivity(SeckillActivityDO activityDO) {
-        seckillActivityMapper.updateById(activityDO);
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateSeckillStock(SeckillActivityUpdateStockReqDTO updateStockReqDTO) {
         // 1、校验秒杀活动是否存在
@@ -171,21 +166,16 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         }
 
         // 3、更新活动商品库存
-        int itemRow = seckillProductMapper.updateActivityStock(product.getId(), updateStockReqDTO.getItem().getCount());
-        if (itemRow == 0) {
+        int updateCount = seckillProductMapper.updateActivityStock(product.getId(), updateStockReqDTO.getItem().getCount());
+        if (updateCount == 0) {
             throw exception(SECKILL_ACTIVITY_UPDATE_STOCK_FAIL);
         }
 
         // 4、更新活动库存
-        int row = seckillActivityMapper.updateActivityStock(seckillActivity.getId(), updateStockReqDTO.getCount());
-        if (row == 0) {
+        updateCount = seckillActivityMapper.updateActivityStock(seckillActivity.getId(), updateStockReqDTO.getCount());
+        if (updateCount == 0) {
             throw exception(SECKILL_ACTIVITY_UPDATE_STOCK_FAIL);
         }
-    }
-
-    @Override
-    public void updateSeckillActivityProductList(List<SeckillProductDO> productList) {
-        seckillProductMapper.updateBatch(productList);
     }
 
     /**

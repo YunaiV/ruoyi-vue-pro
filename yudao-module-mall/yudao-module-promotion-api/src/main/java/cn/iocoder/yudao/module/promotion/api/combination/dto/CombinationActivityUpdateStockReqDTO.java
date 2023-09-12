@@ -13,6 +13,8 @@ import javax.validation.constraints.NotNull;
 @Data
 public class CombinationActivityUpdateStockReqDTO {
 
+    // TODO @puhui999：是不是一个 activityId、count、skuId 参数就完事啦。
+
     @NotNull(message = "活动编号不能为空")
     private Long activityId;
 

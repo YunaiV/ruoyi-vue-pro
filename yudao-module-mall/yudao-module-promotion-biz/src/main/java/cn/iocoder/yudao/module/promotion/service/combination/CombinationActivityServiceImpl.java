@@ -215,23 +215,29 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
 
     @Override
     public void validateCombination(CombinationActivityUpdateStockReqDTO reqDTO) {
-        // 1、校验拼团活动是否存在
+        // 1.1 校验拼团活动是否存在
         CombinationActivityDO activity = validateCombinationActivityExists(reqDTO.getActivityId());
-        // 1.1、校验活动是否开启
+        // 1.2 校验活动是否开启
         if (ObjectUtil.equal(activity.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
             throw exception(COMBINATION_ACTIVITY_STATUS_DISABLE);
         }
-        // 1.2、校验是否超出单次限购数量
+        // 1.3 校验是否超出单次限购数量
         if (activity.getSingleLimitCount() < reqDTO.getCount()) {
             throw exception(COMBINATION_RECORD_FAILED_SINGLE_LIMIT_COUNT_EXCEED);
         }
-        // 1.3、校验是否超出总限购数量
-        List<CombinationRecordDO> recordList = combinationRecordService.getRecordListByUserIdAndActivityId(getLoginUserId(), reqDTO.getActivityId());
+
+        // 2. 校验是否超出总限购数量
+        // TODO @puhui999：userId 应该接口传递哈；要保证 service 无状态
+        List<CombinationRecordDO> recordList = combinationRecordService.getRecordListByUserIdAndActivityId(
+                getLoginUserId(), reqDTO.getActivityId());
+        // TODO @puhui999：最好 if true return；减少括号层数
         if (CollUtil.isNotEmpty(recordList)) {
             // 过滤出拼团成功的
+            // TODO @puhui999：count 要不存一个在 record 里？
             List<Long> skuIds = convertList(recordList, CombinationRecordDO::getSkuId,
                     item -> ObjectUtil.equals(item.getStatus(), CombinationRecordStatusEnum.SUCCESS.getStatus()));
-            Integer countSum = tradeOrderApi.getOrderItemCountSumByOrderIdAndSkuId(convertList(recordList, CombinationRecordDO::getOrderId,
+            Integer countSum = tradeOrderApi.getOrderItemCountSumByOrderIdAndSkuId(convertList(recordList,
+                    CombinationRecordDO::getOrderId,
                     item -> ObjectUtil.equals(item.getStatus(), CombinationRecordStatusEnum.SUCCESS.getStatus())), skuIds);
             if (activity.getTotalLimitCount() < countSum) {
                 throw exception(COMBINATION_RECORD_FAILED_TOTAL_LIMIT_COUNT_EXCEED);

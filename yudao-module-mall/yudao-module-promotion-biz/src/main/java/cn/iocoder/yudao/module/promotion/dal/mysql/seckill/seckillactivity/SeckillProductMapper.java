@@ -34,7 +34,7 @@ public interface SeckillProductMapper extends BaseMapperX<SeckillProductDO> {
     default int updateActivityStock(Long id, int count) {
         return update(null, new LambdaUpdateWrapper<SeckillProductDO>()
                 .eq(SeckillProductDO::getId, id)
-                .gt(SeckillProductDO::getStock, 0)
+                .gt(SeckillProductDO::getStock, 0)  // TODO @puhui999：不是 > 0，是要大于 count 哈
                 .setSql("stock = stock - " + count));
     }
 
