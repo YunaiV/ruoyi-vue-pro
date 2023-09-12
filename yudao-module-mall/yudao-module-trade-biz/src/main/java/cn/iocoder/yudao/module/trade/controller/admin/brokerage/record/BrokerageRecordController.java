@@ -55,10 +55,11 @@ public class BrokerageRecordController {
     public CommonResult<PageResult<BrokerageRecordRespVO>> getBrokerageRecordPage(@Valid BrokerageRecordPageReqVO pageVO) {
         PageResult<BrokerageRecordDO> pageResult = brokerageRecordService.getBrokerageRecordPage(pageVO);
 
+        // 查询用户信息
         Set<Long> userIds = convertSet(pageResult.getList(), BrokerageRecordDO::getUserId);
         userIds.addAll(convertList(pageResult.getList(), BrokerageRecordDO::getSourceUserId));
         Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(userIds);
-
+        // 拼接数据
         return success(BrokerageRecordConvert.INSTANCE.convertPage(pageResult, userMap));
     }
 

@@ -26,7 +26,7 @@ public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
     default PageResult<BrokerageRecordDO> selectPage(BrokerageRecordPageReqVO reqVO) {
         boolean sourceUserTypeCondition = reqVO.getSourceUserType() != null &&
                 !BrokerageUserTypeEnum.ALL.getType().equals(reqVO.getSourceUserType());
-
+        // 分页查询
         return selectPage(reqVO, new LambdaQueryWrapperX<BrokerageRecordDO>()
                 .eqIfPresent(BrokerageRecordDO::getUserId, reqVO.getUserId())
                 .eqIfPresent(BrokerageRecordDO::getBizType, reqVO.getBizType())
@@ -54,7 +54,8 @@ public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
                 BrokerageRecordDO::getUserId, userId);
     }
 
-    @Select("SELECT COUNT(1), SUM(price) FROM trade_brokerage_record WHERE user_id = #{userId} AND biz_type = #{bizType} AND status = #{status}")
+    @Select("SELECT COUNT(1), SUM(price) FROM trade_brokerage_record " +
+            "WHERE user_id = #{userId} AND biz_type = #{bizType} AND status = #{status}")
     UserBrokerageSummaryBO selectCountAndSumPriceByUserIdAndBizTypeAndStatus(@Param("userId") Long userId,
                                                                              @Param("bizType") Integer bizType,
                                                                              @Param("status") Integer status);

@@ -134,7 +134,7 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     @Override
     public Long getBrokerageUserCountByBindUserId(Long bindUserId, BrokerageUserTypeEnum userType) {
         switch (userType) {
-            case ALL:
+            case ALL: // TODO @疯狂：ALL 是不是不用搞个枚举，默认为空就是不过滤哈~
                 Long firstCount = brokerageUserMapper.selectCountByBindUserId(bindUserId);
                 Long secondCount = brokerageUserMapper.selectCountByBindUserIdInBindUserId(bindUserId);
                 return firstCount + secondCount;
@@ -183,7 +183,7 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     public Boolean getUserBrokerageEnabled(Long userId) {
         // 全局分销功能是否开启
         TradeConfigDO tradeConfig = tradeConfigService.getTradeConfig();
-        if (tradeConfig == null || !BooleanUtil.isTrue(tradeConfig.getBrokerageEnabled())) {
+        if (tradeConfig == null || BooleanUtil.isFalse(tradeConfig.getBrokerageEnabled())) {
             return false;
         }
 

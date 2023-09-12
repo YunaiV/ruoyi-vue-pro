@@ -35,18 +35,18 @@ public interface BrokerageUserConvert {
                                                         Map<Long, Long> brokerageUserCountMap,
                                                         Map<Long, UserBrokerageSummaryBO> userOrderSummaryMap) {
         PageResult<BrokerageUserRespVO> result = convertPage(pageResult);
-        for (BrokerageUserRespVO vo : result.getList()) {
+        for (BrokerageUserRespVO userVO : result.getList()) {
             // 用户信息
-            copyTo(userMap.get(vo.getId()), vo);
+            copyTo(userMap.get(userVO.getId()), userVO);
 
             // 推广用户数量
-            vo.setBrokerageUserCount(MapUtil.getInt(brokerageUserCountMap, vo.getId(), 0));
+            userVO.setBrokerageUserCount(MapUtil.getInt(brokerageUserCountMap, userVO.getId(), 0));
             // 推广订单数量、推广订单金额
-            Optional<UserBrokerageSummaryBO> orderSummaryOptional = Optional.ofNullable(userOrderSummaryMap.get(vo.getId()));
-            vo.setBrokerageOrderCount(orderSummaryOptional.map(UserBrokerageSummaryBO::getCount).orElse(0))
+            Optional<UserBrokerageSummaryBO> orderSummaryOptional = Optional.ofNullable(userOrderSummaryMap.get(userVO.getId()));
+            userVO.setBrokerageOrderCount(orderSummaryOptional.map(UserBrokerageSummaryBO::getCount).orElse(0))
                     .setBrokerageOrderPrice(orderSummaryOptional.map(UserBrokerageSummaryBO::getPrice).orElse(0));
             // todo 已提现次数、已提现金额
-            vo.setWithdrawCount(0).setWithdrawPrice(0);
+            userVO.setWithdrawCount(0).setWithdrawPrice(0);
         }
         return result;
     }

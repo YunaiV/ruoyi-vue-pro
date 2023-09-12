@@ -279,11 +279,9 @@ public interface TradeOrderConvert {
     TradeOrderDO convert(TradeOrderRemarkReqVO reqVO);
 
     default BrokerageAddReqBO convert(TradeOrderItemDO item, ProductSkuRespDTO sku) {
-        return new BrokerageAddReqBO().setBizId(String.valueOf(item.getId()))
-                .setSourceUserId(item.getUserId())
+        return new BrokerageAddReqBO().setBizId(String.valueOf(item.getId())).setSourceUserId(item.getUserId())
                 .setBasePrice(item.getPayPrice() * item.getCount())
-                .setFirstFixedPrice(sku.getSubCommissionFirstPrice())
-                .setSecondFixedPrice(sku.getSubCommissionSecondPrice())
-                .setTitle(BrokerageRecordBizTypeEnum.ORDER.getTitle());
+                .setTitle(BrokerageRecordBizTypeEnum.ORDER.getTitle()) // TODO @疯狂：标题类似：木晴冰雪成功购买云时代的JVM原理与实战；茫农成功购买深入拆解消息队列47讲
+                .setFirstFixedPrice(sku.getSubCommissionFirstPrice()).setSecondFixedPrice(sku.getSubCommissionSecondPrice());
     }
 }

@@ -52,15 +52,12 @@ public interface BrokerageRecordConvert {
 
     default PageResult<BrokerageRecordRespVO> convertPage(PageResult<BrokerageRecordDO> pageResult, Map<Long, MemberUserRespDTO> userMap) {
         PageResult<BrokerageRecordRespVO> result = convertPage(pageResult);
-
         for (BrokerageRecordRespVO respVO : result.getList()) {
             Optional.ofNullable(userMap.get(respVO.getUserId())).ifPresent(user ->
                     respVO.setUserNickname(user.getNickname()).setUserAvatar(user.getAvatar()));
-
             Optional.ofNullable(userMap.get(respVO.getSourceUserId())).ifPresent(user ->
                     respVO.setSourceUserNickname(user.getNickname()).setSourceUserAvatar(user.getAvatar()));
         }
-
         return result;
     }
 }

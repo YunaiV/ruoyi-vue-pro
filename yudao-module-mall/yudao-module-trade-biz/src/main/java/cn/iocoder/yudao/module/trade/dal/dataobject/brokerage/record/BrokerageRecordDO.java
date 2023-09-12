@@ -85,13 +85,13 @@ public class BrokerageRecordDO extends BaseDO {
     /**
      * 来源用户类型
      * <p>
-     * 枚举 {@link BrokerageUserTypeEnum}
+     * 枚举 {@link BrokerageUserTypeEnum}，被推广用户和 {@link #userId} 的推广层级关系
      */
     private Integer sourceUserType;
     /**
      * 来源用户编号
      * <p>
-     * 关联 MemberUserDO.id
+     * 关联 MemberUserDO.id 字段，被推广用户的编号
      */
     private Long sourceUserId;
 
