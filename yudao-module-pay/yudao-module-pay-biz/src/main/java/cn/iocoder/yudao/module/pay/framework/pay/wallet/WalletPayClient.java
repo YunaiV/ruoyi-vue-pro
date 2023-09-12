@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR;
-import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.ORDER_EXTENSION_NOT_FOUND;
+import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.PAY_ORDER_EXTENSION_NOT_FOUND;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.REFUND_NOT_FOUND;
 
 /**
@@ -98,8 +98,8 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
         PayOrderExtensionDO orderExtension = orderService.getOrderExtensionByNo(outTradeNo);
         // 支付交易拓展单不存在， 返回关闭状态
         if (orderExtension == null) {
-            return PayOrderRespDTO.closedOf(String.valueOf(ORDER_EXTENSION_NOT_FOUND.getCode()),
-                    ORDER_EXTENSION_NOT_FOUND.getMsg(), outTradeNo, "");
+            return PayOrderRespDTO.closedOf(String.valueOf(PAY_ORDER_EXTENSION_NOT_FOUND.getCode()),
+                    PAY_ORDER_EXTENSION_NOT_FOUND.getMsg(), outTradeNo, "");
         }
         // 关闭状态
         if (PayOrderStatusEnum.isClosed(orderExtension.getStatus())) {

@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityDO;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -26,6 +27,20 @@ public interface BargainActivityMapper extends BaseMapperX<BargainActivityDO> {
 
     default List<BargainActivityDO> selectListByStatus(Integer status) {
         return selectList(BargainActivityDO::getStatus, status);
+    }
+
+    /**
+     * 更新活动库存
+     *
+     * @param id    活动编号
+     * @param count 扣减的库存数量
+     * @return 影响的行数
+     */
+    default int updateActivityStock(Long id, int count) {
+        return update(null, new LambdaUpdateWrapper<BargainActivityDO>()
+                .eq(BargainActivityDO::getId, id)
+                .gt(BargainActivityDO::getStock, 0)
+                .setSql("stock = stock - " + count));
     }
 
 }

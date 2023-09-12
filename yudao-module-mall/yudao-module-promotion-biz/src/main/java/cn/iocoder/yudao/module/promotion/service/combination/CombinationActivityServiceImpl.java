@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationActivityUpdateStockReqDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityUpdateReqVO;
@@ -16,8 +17,11 @@ import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.product
 import cn.iocoder.yudao.module.promotion.convert.combination.CombinationActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.combination.CombinationActivityMapper;
 import cn.iocoder.yudao.module.promotion.dal.mysql.combination.CombinationProductMapper;
+import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
+import cn.iocoder.yudao.module.trade.api.order.TradeOrderApi;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -28,8 +32,8 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
@@ -48,11 +52,15 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     private CombinationActivityMapper combinationActivityMapper;
     @Resource
     private CombinationProductMapper combinationProductMapper;
+    @Resource
+    private CombinationRecordService combinationRecordService;
 
     @Resource
     private ProductSpuApi productSpuApi;
     @Resource
     private ProductSkuApi productSkuApi;
+    @Resource
+    private TradeOrderApi tradeOrderApi;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -97,7 +105,7 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
      * 校验拼团商品是否都存在
      *
      * @param spuId 商品 SPU 编号
-     * @param products 秒杀商品
+     * @param products 拼团商品
      */
     private void validateProductExists(Long spuId, List<CombinationProductBaseVO> products) {
         // 1. 校验商品 spu 是否存在
@@ -123,7 +131,7 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
         CombinationActivityDO activityDO = validateCombinationActivityExists(updateReqVO.getId());
         // 校验状态
         if (ObjectUtil.equal(activityDO.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
-            throw exception(COMBINATION_ACTIVITY_STATUS_DISABLE);
+            throw exception(COMBINATION_ACTIVITY_STATUS_DISABLE_NOT_UPDATE);
         }
         // 校验商品冲突
         validateProductConflict(updateReqVO.getSpuId(), updateReqVO.getId());
@@ -203,6 +211,32 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     @Override
     public List<CombinationProductDO> getCombinationProductsByActivityIds(Collection<Long> activityIds) {
         return combinationProductMapper.selectListByActivityIds(activityIds);
+    }
+
+    @Override
+    public void validateCombination(CombinationActivityUpdateStockReqDTO reqDTO) {
+        // 1、校验拼团活动是否存在
+        CombinationActivityDO activity = validateCombinationActivityExists(reqDTO.getActivityId());
+        // 1.1、校验活动是否开启
+        if (ObjectUtil.equal(activity.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
+            throw exception(COMBINATION_ACTIVITY_STATUS_DISABLE);
+        }
+        // 1.2、校验是否超出单次限购数量
+        if (activity.getSingleLimitCount() < reqDTO.getCount()) {
+            throw exception(COMBINATION_RECORD_FAILED_SINGLE_LIMIT_COUNT_EXCEED);
+        }
+        // 1.3、校验是否超出总限购数量
+        List<CombinationRecordDO> recordList = combinationRecordService.getRecordListByUserIdAndActivityId(getLoginUserId(), reqDTO.getActivityId());
+        if (CollUtil.isNotEmpty(recordList)) {
+            // 过滤出拼团成功的
+            List<Long> skuIds = convertList(recordList, CombinationRecordDO::getSkuId,
+                    item -> ObjectUtil.equals(item.getStatus(), CombinationRecordStatusEnum.SUCCESS.getStatus()));
+            Integer countSum = tradeOrderApi.getOrderItemCountSumByOrderIdAndSkuId(convertList(recordList, CombinationRecordDO::getOrderId,
+                    item -> ObjectUtil.equals(item.getStatus(), CombinationRecordStatusEnum.SUCCESS.getStatus())), skuIds);
+            if (activity.getTotalLimitCount() < countSum) {
+                throw exception(COMBINATION_RECORD_FAILED_TOTAL_LIMIT_COUNT_EXCEED);
+            }
+        }
     }
 
 }

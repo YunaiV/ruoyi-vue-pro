@@ -39,6 +39,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
     private ProductSkuApi productSkuApi;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Long createBargainActivity(BargainActivityCreateReqVO createReqVO) {
         // 校验商品 SPU 是否存在是否参加的别的活动
         validateBargainConflict(createReqVO.getSpuId(), null);
@@ -53,6 +54,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateBargainActivity(BargainActivityUpdateReqVO updateReqVO) {
         // 校验存在
         BargainActivityDO activityDO = validateBargainActivityExists(updateReqVO.getId());
@@ -68,6 +70,22 @@ public class BargainActivityServiceImpl implements BargainActivityService {
         // 更新
         BargainActivityDO updateObj = BargainActivityConvert.INSTANCE.convert(updateReqVO);
         bargainActivityMapper.updateById(updateObj);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateBargainActivityStock(Long id, Integer count) {
+        // 查询砍价活动
+        BargainActivityDO activity = getBargainActivity(id);
+        if (activity == null) {
+            throw exception(BARGAIN_ACTIVITY_NOT_EXISTS);
+        }
+
+        // 更新砍价库存
+        int row = bargainActivityMapper.updateActivityStock(id, count);
+        if (row == 0) {
+            throw exception(BARGAIN_ACTIVITY_UPDATE_STOCK_FAIL);
+        }
     }
 
     private void validateBargainConflict(Long spuId, Long activityId) {

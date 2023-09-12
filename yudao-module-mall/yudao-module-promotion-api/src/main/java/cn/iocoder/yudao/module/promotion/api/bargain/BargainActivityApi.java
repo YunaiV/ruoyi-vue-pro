@@ -10,9 +10,9 @@ public interface BargainActivityApi {
     /**
      * 更新砍价活动库存
      *
-     * @param activityId 砍价活动编号
+     * @param id 砍价活动编号
      * @param count      购买数量
      */
-    void updateBargainActivityStock(Long activityId, Integer count);
+    void updateBargainActivityStock(Long id, Integer count);
 
 }

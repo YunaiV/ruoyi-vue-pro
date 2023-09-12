@@ -76,10 +76,9 @@ public class TradeAfterSaleController {
     public CommonResult<TradeAfterSaleDetailRespVO> getOrderDetail(@RequestParam("id") Long id) {
         // 查询订单
         TradeAfterSaleDO afterSale = afterSaleService.getAfterSale(id);
-        // TODO @puhui999：这里建议改成，如果为 null，直接返回 success null；主要查询操作，尽量不要有非空的提示哈；交给前端处理；
-//        if (afterSale == null) {
-//            return success(null, AFTER_SALE_NOT_FOUND.getMsg());
-//        }
+        if (afterSale == null) {
+            return success(null);
+        }
 
         // 查询订单
         TradeOrderDO order = tradeOrderQueryService.getOrder(afterSale.getOrderId());

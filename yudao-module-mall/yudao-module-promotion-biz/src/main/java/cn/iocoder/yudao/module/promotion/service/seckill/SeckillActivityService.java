@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.promotion.service.seckill;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.promotion.api.seckill.dto.SeckillActivityUpdateStockReqDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityUpdateReqVO;
@@ -40,6 +41,12 @@ public interface SeckillActivityService {
      */
     void updateSeckillActivity(SeckillActivityDO activityDO);
 
+    /**
+     * 更新秒杀库存
+     *
+     * @param updateStockReqDTO 更新信息
+     */
+    void updateSeckillStock(SeckillActivityUpdateStockReqDTO updateStockReqDTO);
     /**
      * 更新秒杀活动商品
      *

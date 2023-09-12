@@ -31,18 +31,14 @@ public class TradeOrderPageReqVO extends PageParam {
     @Mobile
     private String userMobile;
 
+    @Schema(description = "配送方式", example = "1")
+    private Integer deliveryType;
+
     @Schema(description = "发货物流公司编号", example = "1")
     private Long logisticsId;
 
     @Schema(description = "自提门店编号", example = "[1,2]")
     private List<Long> pickUpStoreIds;
-
-    @Schema(description = "收件人名称", example = "小红")
-    private String receiverName;
-
-    @Schema(description = "收件人手机", example = "1560")
-    @Mobile
-    private String receiverMobile;
 
     @Schema(description = "订单类型", example = "1")
     private Integer type;
@@ -61,5 +57,5 @@ public class TradeOrderPageReqVO extends PageParam {
     @Schema(description = "订单来源", example = "10")
     @InEnum(value = TerminalEnum.class, message = "订单来源 {value}")
     private Integer terminal;
-//    TODO 添加配送方式筛选
+
 }

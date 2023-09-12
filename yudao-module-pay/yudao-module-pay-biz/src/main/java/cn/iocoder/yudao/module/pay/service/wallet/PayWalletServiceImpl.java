@@ -61,7 +61,7 @@ public class PayWalletServiceImpl implements  PayWalletService {
         // 1. 判断支付交易拓展单是否存
         PayOrderExtensionDO orderExtension = orderService.getOrderExtensionByNo(outTradeNo);
         if (orderExtension == null) {
-            throw exception(ORDER_EXTENSION_NOT_FOUND);
+            throw exception(PAY_ORDER_EXTENSION_NOT_FOUND);
         }
         // 2. 扣减余额
         return reduceWalletBalance(userId, userType, orderExtension.getOrderId(), PAYMENT, price);

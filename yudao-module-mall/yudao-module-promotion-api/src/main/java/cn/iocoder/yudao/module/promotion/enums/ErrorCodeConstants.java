@@ -55,7 +55,7 @@ public interface ErrorCodeConstants {
     ErrorCode SECKILL_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED = new ErrorCode(1013008003, "秒杀活动已关闭，不能修改");
     ErrorCode SECKILL_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1013008004, "秒杀活动未关闭或未结束，不能删除");
     ErrorCode SECKILL_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1013008005, "秒杀活动已关闭，不能重复关闭");
-    ErrorCode SECKILL_ACTIVITY_UPDATE_STOCK_FAIL = new ErrorCode(1013008006, "更新秒杀活动库存失败，原因秒杀库存不足");
+    ErrorCode SECKILL_ACTIVITY_UPDATE_STOCK_FAIL = new ErrorCode(1013008006, "秒杀失败，原因秒杀库存不足");
 
     // ========== 秒杀时段 1013009000 ==========
     ErrorCode SECKILL_CONFIG_NOT_EXISTS = new ErrorCode(1013009000, "秒杀时段不存在");
@@ -65,24 +65,26 @@ public interface ErrorCodeConstants {
     // ========== 拼团活动 1013010000 ==========
     ErrorCode COMBINATION_ACTIVITY_NOT_EXISTS = new ErrorCode(1013010000, "拼团活动不存在");
     ErrorCode COMBINATION_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1013010001, "存在商品参加了其它拼团活动");
-    ErrorCode COMBINATION_ACTIVITY_STATUS_DISABLE = new ErrorCode(1013010002, "拼团活动已关闭不能修改");
+    ErrorCode COMBINATION_ACTIVITY_STATUS_DISABLE_NOT_UPDATE = new ErrorCode(1013010002, "拼团活动已关闭不能修改");
     ErrorCode COMBINATION_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1013010003, "拼团活动未关闭或未结束，不能删除");
-    ErrorCode COMBINATION_RECORD_NOT_EXISTS = new ErrorCode(1013010004, "拼团不存在");
+    ErrorCode COMBINATION_ACTIVITY_STATUS_DISABLE = new ErrorCode(1013010004, "拼团失败，原因：拼团活动已关闭");
 
     // ========== 拼团记录 1013011000 ==========
-    ErrorCode COMBINATION_RECORD_EXISTS = new ErrorCode(1013011000, "拼团失败，已参与过该拼团");
-    ErrorCode COMBINATION_RECORD_HEAD_NOT_EXISTS = new ErrorCode(1013011001, "拼团失败，父拼团不存在");
-    ErrorCode COMBINATION_RECORD_USER_FULL = new ErrorCode(1013011002, "拼团失败，拼团人数已满");
-    ErrorCode COMBINATION_RECORD_FAILED_HAVE_JOINED = new ErrorCode(1013011003, "拼团失败，已参与其它拼团");
-    ErrorCode COMBINATION_RECORD_FAILED_TIME_END = new ErrorCode(1013011004, "拼团失败，活动已经结束");
-    ErrorCode COMBINATION_RECORD_FAILED_SINGLE_LIMIT_COUNT_EXCEED = new ErrorCode(1013011005, "拼团失败，单次限购超出");
-    ErrorCode COMBINATION_RECORD_FAILED_TOTAL_LIMIT_COUNT_EXCEED = new ErrorCode(1013011006, "拼团失败，单次限购超出");
+    ErrorCode COMBINATION_RECORD_NOT_EXISTS = new ErrorCode(1013011000, "拼团不存在");
+    ErrorCode COMBINATION_RECORD_EXISTS = new ErrorCode(1013011001, "拼团失败，已参与过该拼团");
+    ErrorCode COMBINATION_RECORD_HEAD_NOT_EXISTS = new ErrorCode(1013011002, "拼团失败，父拼团不存在");
+    ErrorCode COMBINATION_RECORD_USER_FULL = new ErrorCode(1013011003, "拼团失败，拼团人数已满");
+    ErrorCode COMBINATION_RECORD_FAILED_HAVE_JOINED = new ErrorCode(1013011004, "拼团失败，已参与其它拼团");
+    ErrorCode COMBINATION_RECORD_FAILED_TIME_END = new ErrorCode(1013011005, "拼团失败，活动已经结束");
+    ErrorCode COMBINATION_RECORD_FAILED_SINGLE_LIMIT_COUNT_EXCEED = new ErrorCode(1013011006, "拼团失败，原因：单次限购超出");
+    ErrorCode COMBINATION_RECORD_FAILED_TOTAL_LIMIT_COUNT_EXCEED = new ErrorCode(1013011007, "拼团失败，原因：超出总购买次数");
 
     // ========== 砍价活动 1013012000 ==========
     ErrorCode BARGAIN_ACTIVITY_NOT_EXISTS = new ErrorCode(1013012000, "砍价活动不存在");
     ErrorCode BARGAIN_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1013012001, "存在商品参加了其它砍价活动");
     ErrorCode BARGAIN_ACTIVITY_STATUS_DISABLE = new ErrorCode(1013012002, "砍价活动已关闭不能修改");
     ErrorCode BARGAIN_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1013012003, "砍价活动未关闭或未结束，不能删除");
+    ErrorCode BARGAIN_ACTIVITY_UPDATE_STOCK_FAIL = new ErrorCode(1013012004, "砍价失败，原因：该砍价活动库存不足");
 
     // ========== 砍价记录 1013013000 ==========
     ErrorCode BARGAIN_RECORD_NOT_EXISTS = new ErrorCode(1013013000, "砍价记录不存在");
