@@ -7,7 +7,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
@@ -90,8 +89,9 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private TradeOrderItemMapper tradeOrderItemMapper;
     @Resource
     private TradeOrderNoRedisDAO orderNoRedisDAO;
+
     @Resource
-    private List<TradeOrderHandler> orderHandlers;
+    private List<TradeOrderHandler> tradeOrderHandlers;
 
     @Resource
     private CartService cartService;
@@ -180,10 +180,12 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Transactional(rollbackFor = Exception.class)
     public TradeOrderDO createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO) {
         // 1、执行订单创建前置处理器
+        // TODO @puhui999：最好也抽个 beforeOrderCreate 方法；
         TradeBeforeOrderCreateReqBO beforeOrderCreateReqBO = TradeOrderConvert.INSTANCE.convert(createReqVO);
         beforeOrderCreateReqBO.setOrderType(validateActivity(createReqVO));
-        beforeOrderCreateReqBO.setCount(CollectionUtils.getSumValue(createReqVO.getItems(), AppTradeOrderSettlementReqVO.Item::getCount, Integer::sum));
-        orderHandlers.forEach(handler -> handler.beforeOrderCreate(beforeOrderCreateReqBO));
+        beforeOrderCreateReqBO.setCount(getSumValue(createReqVO.getItems(), AppTradeOrderSettlementReqVO.Item::getCount, Integer::sum));
+        // TODO @puhui999：这里有个纠结点；handler 的定义是只处理指定类型的订单的拓展逻辑；还是通用的 handler，类似可以处理优惠劵等等
+        tradeOrderHandlers.forEach(handler -> handler.beforeOrderCreate(beforeOrderCreateReqBO));
 
         // 2. 价格计算
         TradePriceCalculateRespBO calculateRespBO = calculatePrice(userId, createReqVO);
@@ -282,7 +284,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                                        TradeOrderDO tradeOrderDO, List<TradeOrderItemDO> orderItems,
                                        TradePriceCalculateRespBO calculateRespBO) {
         // 执行订单创建后置处理器
-        orderHandlers.forEach(handler -> handler.afterOrderCreate(TradeOrderConvert.INSTANCE.convert(userId, createReqVO, tradeOrderDO, orderItems.get(0))));
+        tradeOrderHandlers.forEach(handler -> handler.afterOrderCreate(TradeOrderConvert.INSTANCE.convert(userId, createReqVO, tradeOrderDO, orderItems.get(0))));
+
         // 扣减积分 TODO 芋艿：待实现，需要前置；
         // 这个是不是应该放到支付成功之后？如果支付后的话，可能积分可以重复使用哈。资源类，都要预扣
 
@@ -723,7 +726,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         }
 
         // TODO 活动相关库存回滚需要活动 id，活动 id 怎么获取？app 端能否传过来
-        orderHandlers.forEach(handler -> handler.rollbackStock());
+        tradeOrderHandlers.forEach(handler -> handler.rollbackStock());
 
         // 2.回滚库存
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(id);

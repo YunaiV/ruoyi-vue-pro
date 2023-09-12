@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 
+// TODO 芋艿：在想想这些参数的定义
 /**
  * 订单创建之后 Request BO
  *
