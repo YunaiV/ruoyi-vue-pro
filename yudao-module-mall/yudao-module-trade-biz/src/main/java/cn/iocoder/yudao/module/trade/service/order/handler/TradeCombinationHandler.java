@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.trade.service.order.handler;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.iocoder.yudao.module.promotion.api.combination.CombinationApi;
+import cn.iocoder.yudao.module.promotion.api.combination.CombinationActivityApi;
 import cn.iocoder.yudao.module.promotion.api.combination.CombinationRecordApi;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
@@ -20,7 +20,7 @@ import javax.annotation.Resource;
 public class TradeCombinationHandler implements TradeOrderHandler {
 
     @Resource
-    private CombinationApi combinationApi;
+    private CombinationActivityApi combinationActivityApi;
     @Resource
     private CombinationRecordApi combinationRecordApi;
 
@@ -32,7 +32,7 @@ public class TradeCombinationHandler implements TradeOrderHandler {
         }
 
         // 校验是否满足拼团活动相关限制
-        combinationApi.validateCombination(TradeOrderConvert.INSTANCE.convert1(reqBO));
+        combinationActivityApi.validateCombination(reqBO.getCombinationActivityId(), reqBO.getUserId(), reqBO.getSkuId(), reqBO.getCount());
     }
 
     @Override
@@ -42,7 +42,7 @@ public class TradeCombinationHandler implements TradeOrderHandler {
     }
 
     @Override
-    public void rollbackStock() {
+    public void rollback() {
 
     }
 

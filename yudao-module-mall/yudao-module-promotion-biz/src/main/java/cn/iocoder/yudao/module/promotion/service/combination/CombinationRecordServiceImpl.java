@@ -128,19 +128,10 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         }
 
         // 2. 创建拼团记录
-        // TODO @puhui999：可以把 user、spu、sku 一起放 convert 里哈；
-        CombinationRecordDO record = CombinationActivityConvert.INSTANCE.convert(reqDTO);
-        record.setVirtualGroup(false);
-        record.setExpireTime(record.getStartTime().plusHours(activity.getLimitDuration()));
-        record.setUserSize(activity.getUserSize());
         MemberUserRespDTO user = memberUserApi.getUser(reqDTO.getUserId());
-        record.setNickname(user.getNickname());
-        record.setAvatar(user.getAvatar());
-        ProductSpuRespDTO spu = productSpuApi.getSpu(record.getSpuId());
-        record.setSpuName(spu.getName());
-        ProductSkuRespDTO sku = productSkuApi.getSku(record.getSkuId());
-        record.setPicUrl(sku.getPicUrl());
-        recordMapper.insert(record);
+        ProductSpuRespDTO spu = productSpuApi.getSpu(reqDTO.getSpuId());
+        ProductSkuRespDTO sku = productSkuApi.getSku(reqDTO.getSkuId());
+        recordMapper.insert(CombinationActivityConvert.INSTANCE.convert1(reqDTO, activity, user, spu, sku));
     }
 
     @Override
@@ -151,20 +142,6 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     @Override
     public List<CombinationRecordDO> getRecordListByUserIdAndActivityId(Long userId, Long activityId) {
         return recordMapper.selectListByUserIdAndActivityId(userId, activityId);
-    }
-
-    @Override
-    public void validateCombinationLimitCount(Long activityId, Integer count, Integer sumCount) {
-        // 1.1 校验拼团活动
-        CombinationActivityDO activity = combinationActivityService.validateCombinationActivityExists(activityId);
-        // 校验是否达到限购总限购标准
-        if ((sumCount + count) > activity.getTotalLimitCount()) {
-            throw exception(COMBINATION_RECORD_FAILED_TOTAL_LIMIT_COUNT_EXCEED);
-        }
-        // 单次购买是否达到限购标准
-        if (count > activity.getSingleLimitCount()) {
-            throw exception(COMBINATION_RECORD_FAILED_SINGLE_LIMIT_COUNT_EXCEED);
-        }
     }
 
     /**

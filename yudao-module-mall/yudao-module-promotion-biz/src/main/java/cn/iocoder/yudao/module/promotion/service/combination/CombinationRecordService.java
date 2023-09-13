@@ -57,14 +57,4 @@ public interface CombinationRecordService {
      */
     List<CombinationRecordDO> getRecordListByUserIdAndActivityId(Long userId, Long activityId);
 
-    /**
-     * 验证组合限制数
-     * 校验是否满足限购要求
-     *
-     * @param count      本次购买数量
-     * @param sumCount   已购买数量合计
-     * @param activityId 活动编号
-     */
-    void validateCombinationLimitCount(Long activityId, Integer count, Integer sumCount);
-
 }

@@ -25,8 +25,8 @@ public interface TradeOrderHandler {
     void afterOrderCreate(TradeAfterOrderCreateReqBO reqBO);
 
     /**
-     * 回滚活动相关库存
+     * 回滚
      */
-    void rollbackStock();
+    void rollback();
 
 }

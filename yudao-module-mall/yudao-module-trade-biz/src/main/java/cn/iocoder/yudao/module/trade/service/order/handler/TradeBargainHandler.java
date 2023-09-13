@@ -22,7 +22,7 @@ public class TradeBargainHandler implements TradeOrderHandler {
 
     @Override
     public void beforeOrderCreate(TradeBeforeOrderCreateReqBO reqBO) {
-        // 如果是秒杀订单
+        // 如果是砍价订单
         if (ObjectUtil.notEqual(TradeOrderTypeEnum.BARGAIN.getType(), reqBO.getOrderType())) {
             return;
         }
@@ -37,7 +37,7 @@ public class TradeBargainHandler implements TradeOrderHandler {
     }
 
     @Override
-    public void rollbackStock() {
+    public void rollback() {
 
     }
 

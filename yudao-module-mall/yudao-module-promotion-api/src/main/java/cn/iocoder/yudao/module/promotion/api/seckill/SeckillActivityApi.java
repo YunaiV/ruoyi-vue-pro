@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.promotion.api.seckill;
 
-import cn.iocoder.yudao.module.promotion.api.seckill.dto.SeckillActivityUpdateStockReqDTO;
-
 /**
  * 秒杀活动 API 接口
  *
@@ -12,8 +10,10 @@ public interface SeckillActivityApi {
     /**
      * 更新秒杀库存
      *
-     * @param updateStockReqDTO 请求
+     * @param activityId 活动编号
+     * @param skuId      sku 编号
+     * @param count      数量
      */
-    void updateSeckillStock(SeckillActivityUpdateStockReqDTO updateStockReqDTO);
+    void updateSeckillStock(Long activityId, Long skuId, Integer count);
 
 }

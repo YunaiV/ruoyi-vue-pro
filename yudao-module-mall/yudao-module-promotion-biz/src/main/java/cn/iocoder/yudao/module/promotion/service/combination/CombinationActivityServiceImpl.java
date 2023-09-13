@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
-import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationActivityUpdateStockReqDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityUpdateReqVO;
@@ -33,7 +32,6 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
@@ -85,7 +83,7 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     /**
      * 校验拼团商品参与的活动是否存在冲突
      *
-     * @param spuId 商品 SPU 编号
+     * @param spuId      商品 SPU 编号
      * @param activityId 拼团活动编号
      */
     private void validateProductConflict(Long spuId, Long activityId) {
@@ -104,7 +102,7 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     /**
      * 校验拼团商品是否都存在
      *
-     * @param spuId 商品 SPU 编号
+     * @param spuId    商品 SPU 编号
      * @param products 拼团商品
      */
     private void validateProductExists(Long spuId, List<CombinationProductBaseVO> products) {
@@ -149,7 +147,7 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
      * 更新拼团商品
      *
      * @param activity 拼团活动
-     * @param products  该活动的最新商品配置
+     * @param products 该活动的最新商品配置
      */
     private void updateCombinationProduct(CombinationActivityDO activity, List<CombinationProductBaseVO> products) {
         // 第一步，对比新老数据，获得添加、修改、删除的列表
@@ -214,35 +212,34 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     }
 
     @Override
-    public void validateCombination(CombinationActivityUpdateStockReqDTO reqDTO) {
+    public void validateCombination(Long activityId, Long userId, Long skuId, Integer count) {
         // 1.1 校验拼团活动是否存在
-        CombinationActivityDO activity = validateCombinationActivityExists(reqDTO.getActivityId());
+        CombinationActivityDO activity = validateCombinationActivityExists(activityId);
         // 1.2 校验活动是否开启
         if (ObjectUtil.equal(activity.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
             throw exception(COMBINATION_ACTIVITY_STATUS_DISABLE);
         }
         // 1.3 校验是否超出单次限购数量
-        if (activity.getSingleLimitCount() < reqDTO.getCount()) {
+        if (activity.getSingleLimitCount() < count) {
             throw exception(COMBINATION_RECORD_FAILED_SINGLE_LIMIT_COUNT_EXCEED);
         }
 
         // 2. 校验是否超出总限购数量
-        // TODO @puhui999：userId 应该接口传递哈；要保证 service 无状态
-        List<CombinationRecordDO> recordList = combinationRecordService.getRecordListByUserIdAndActivityId(
-                getLoginUserId(), reqDTO.getActivityId());
-        // TODO @puhui999：最好 if true return；减少括号层数
-        if (CollUtil.isNotEmpty(recordList)) {
-            // 过滤出拼团成功的
-            // TODO @puhui999：count 要不存一个在 record 里？
-            List<Long> skuIds = convertList(recordList, CombinationRecordDO::getSkuId,
-                    item -> ObjectUtil.equals(item.getStatus(), CombinationRecordStatusEnum.SUCCESS.getStatus()));
-            Integer countSum = tradeOrderApi.getOrderItemCountSumByOrderIdAndSkuId(convertList(recordList,
-                    CombinationRecordDO::getOrderId,
-                    item -> ObjectUtil.equals(item.getStatus(), CombinationRecordStatusEnum.SUCCESS.getStatus())), skuIds);
-            if (activity.getTotalLimitCount() < countSum) {
-                throw exception(COMBINATION_RECORD_FAILED_TOTAL_LIMIT_COUNT_EXCEED);
-            }
+        List<CombinationRecordDO> recordList = combinationRecordService.getRecordListByUserIdAndActivityId(userId, activityId);
+        if (CollUtil.isEmpty(recordList)) {
+            return;
         }
+        // 过滤出拼团成功的
+        // TODO @puhui999：count 要不存一个在 record 里？
+        List<Long> skuIds = convertList(recordList, CombinationRecordDO::getSkuId,
+                item -> ObjectUtil.equals(item.getStatus(), CombinationRecordStatusEnum.SUCCESS.getStatus()));
+        Integer countSum = tradeOrderApi.getOrderItemCountSumByOrderIdAndSkuId(convertList(recordList,
+                CombinationRecordDO::getOrderId,
+                item -> ObjectUtil.equals(item.getStatus(), CombinationRecordStatusEnum.SUCCESS.getStatus())), skuIds);
+        if (activity.getTotalLimitCount() < countSum) {
+            throw exception(COMBINATION_RECORD_FAILED_TOTAL_LIMIT_COUNT_EXCEED);
+        }
+
     }
 
 }

@@ -14,9 +14,7 @@ import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDT
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
-import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationActivityUpdateStockReqDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
-import cn.iocoder.yudao.module.promotion.api.seckill.dto.SeckillActivityUpdateStockReqDTO;
 import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.base.member.user.MemberUserRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.base.product.property.ProductPropertyValueDetailRespVO;
@@ -280,14 +278,8 @@ public interface TradeOrderConvert {
         return new BrokerageAddReqBO().setBizId(String.valueOf(item.getId())).setSourceUserId(item.getUserId())
                 .setBasePrice(item.getPayPrice() * item.getCount())
                 .setTitle(BrokerageRecordBizTypeEnum.ORDER.getTitle()) // TODO @疯狂：标题类似：木晴冰雪成功购买云时代的JVM原理与实战；茫农成功购买深入拆解消息队列47讲
-                .setFirstFixedPrice(sku.getFirstBrokerageRecord()).setSecondFixedPrice(sku.getSecondBrokerageRecord());
+                .setFirstFixedPrice(sku.getFirstBrokeragePrice()).setSecondFixedPrice(sku.getSecondBrokeragePrice());
     }
-
-    @Mapping(target = "activityId", source = "reqBO.seckillActivityId")
-    SeckillActivityUpdateStockReqDTO convert(TradeBeforeOrderCreateReqBO reqBO);
-
-    @Mapping(target = "activityId", source = "reqBO.combinationActivityId")
-    CombinationActivityUpdateStockReqDTO convert1(TradeBeforeOrderCreateReqBO reqBO);
 
     TradeBeforeOrderCreateReqBO convert(AppTradeOrderCreateReqVO createReqVO);
 
