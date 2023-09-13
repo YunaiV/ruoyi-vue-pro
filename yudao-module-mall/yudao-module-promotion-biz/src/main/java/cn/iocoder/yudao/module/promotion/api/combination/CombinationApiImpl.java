@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.promotion.api.combination;
 
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationActivityUpdateStockReqDTO;
 import cn.iocoder.yudao.module.promotion.service.combination.CombinationActivityService;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 
@@ -10,6 +12,8 @@ import javax.annotation.Resource;
  *
  * @author HUIHUI
  */
+@Service
+@Validated
 public class CombinationApiImpl implements CombinationApi {
 
     @Resource
