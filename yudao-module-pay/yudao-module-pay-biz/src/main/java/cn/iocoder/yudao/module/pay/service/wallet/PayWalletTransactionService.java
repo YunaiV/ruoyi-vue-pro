@@ -4,6 +4,9 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.transaction.AppPayWalletTransactionPageReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
 import cn.iocoder.yudao.module.pay.enums.member.PayWalletBizTypeEnum;
+import cn.iocoder.yudao.module.pay.service.wallet.bo.CreateWalletTransactionBO;
+
+import javax.validation.Valid;
 
 /**
  * 钱包余额流水 Service 接口
@@ -25,10 +28,10 @@ public interface PayWalletTransactionService {
     /**
      * 新增钱包余额流水
      *
-     * @param payWalletTransaction 余额流水
-     * @return id
+     * @param bo 创建钱包流水 bo
+     * @return 新建的钱包 do
      */
-    Long createWalletTransaction(PayWalletTransactionDO payWalletTransaction);
+    PayWalletTransactionDO createWalletTransaction(@Valid CreateWalletTransactionBO bo);
 
     /**
      * 根据 no，获取钱包余流水
@@ -40,11 +43,10 @@ public interface PayWalletTransactionService {
     /**
      * 获取钱包流水
      *
-     * @param walletId 钱包编号
      * @param bizId  业务编号
      * @param type  业务类型
      * @return 钱包流水
      */
-    PayWalletTransactionDO getWalletTransaction(Long walletId, Long bizId, PayWalletBizTypeEnum type);
-
+    PayWalletTransactionDO getWalletTransaction(String bizId, PayWalletBizTypeEnum type);
+    
 }

@@ -29,7 +29,6 @@ public class AppMemberUserController {
 
     @Resource
     private MemberUserService userService;
-
     @Resource
     private MemberLevelService levelService;
 

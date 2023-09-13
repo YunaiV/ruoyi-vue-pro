@@ -9,6 +9,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+// TODO 芋艿：把字段的顺序，和 do 顺序对齐下
 /**
  * 拼团记录 DO
  *
@@ -27,34 +28,28 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CombinationRecordDO extends BaseDO {
 
+    /**
+     * 编号，主键自增
+     */
     @TableId
     private Long id;
+
     /**
      * 拼团活动编号
+     *
+     * 关联 {@link CombinationActivityDO#getId()}
      */
     private Long activityId;
+    /**
+     * 拼团商品单价
+     *
+     * 冗余 {@link CombinationProductDO#getCombinationPrice()}
+     */
+    private Integer combinationPrice;
     /**
      * SPU 编号
      */
     private Long spuId;
-    /**
-     * SKU 编号
-     */
-    private Long skuId;
-    /**
-     * 用户编号
-     */
-    private Long userId;
-    /**
-     * 订单编号
-     */
-    private Long orderId;
-    /**
-     * 团长编号
-     *
-     * 关联 {@link CombinationRecordDO#getId()}
-     */
-    private Long headId;
     /**
      * 商品名字
      */
@@ -64,9 +59,14 @@ public class CombinationRecordDO extends BaseDO {
      */
     private String picUrl;
     /**
-     * 拼团商品单价
+     * SKU 编号
      */
-    private Integer combinationPrice;
+    private Long skuId;
+
+    /**
+     * 用户编号
+     */
+    private Long userId;
     /**
      * 用户昵称
      */
@@ -75,6 +75,13 @@ public class CombinationRecordDO extends BaseDO {
      * 用户头像
      */
     private String avatar;
+
+    /**
+     * 团长编号
+     *
+     * 关联 {@link CombinationRecordDO#getId()}
+     */
+    private Long headId;
     /**
      * 开团状态
      *
@@ -82,23 +89,9 @@ public class CombinationRecordDO extends BaseDO {
      */
     private Integer status;
     /**
-     * 是否虚拟成团
+     * 订单编号
      */
-    private Boolean virtualGroup;
-    /**
-     * 过期时间，单位：小时
-     *
-     * 关联 {@link CombinationActivityDO#getLimitDuration()}
-     */
-    private Integer expireTime;
-    /**
-     * 开始时间 (订单付款后开始的时间)
-     */
-    private LocalDateTime startTime;
-    /**
-     * 结束时间（成团时间/失败时间）
-     */
-    private LocalDateTime endTime;
+    private Long orderId;
     /**
      * 开团需要人数
      *
@@ -109,5 +102,24 @@ public class CombinationRecordDO extends BaseDO {
      * 已加入拼团人数
      */
     private Integer userCount;
+    /**
+     * 是否虚拟成团
+     */
+    private Boolean virtualGroup;
+
+    /**
+     * 过期时间
+     *
+     * 基于 {@link CombinationRecordDO#getStartTime()} + {@link CombinationActivityDO#getLimitDuration()} 计算
+     */
+    private LocalDateTime expireTime;
+    /**
+     * 开始时间 (订单付款后开始的时间)
+     */
+    private LocalDateTime startTime;
+    /**
+     * 结束时间（成团时间/失败时间）
+     */
+    private LocalDateTime endTime;
 
 }

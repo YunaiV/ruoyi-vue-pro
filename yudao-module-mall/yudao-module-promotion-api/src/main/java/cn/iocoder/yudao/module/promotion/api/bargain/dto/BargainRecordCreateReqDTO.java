@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.promotion.api.bargain.dto;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 // TODO @芋艿：这块要在看看
@@ -40,17 +39,7 @@ public class BargainRecordCreateReqDTO {
      */
     @NotNull(message = "订单编号不能为空")
     private Long orderId;
-    // TODO @puhui999：spuName、picUrl、 之类字段不用传递；
-    /**
-     * 商品名字
-     */
-    @NotEmpty(message = "商品名字不能为空")
-    private String spuName;
-    /**
-     * 商品图片
-     */
-    @NotEmpty(message = "商品图片不能为空")
-    private String picUrl;
+
     /**
      * 砍价商品单价
      */
@@ -61,17 +50,7 @@ public class BargainRecordCreateReqDTO {
      */
     @NotNull(message = "商品原价不能为空")
     private Integer price;
-    // TODO @puhui999：nickname、avatar 不用传递，去查询；
-    /**
-     * 用户昵称
-     */
-    @NotEmpty(message = "用户昵称不能为空")
-    private String nickname;
-    /**
-     * 用户头像
-     */
-    @NotEmpty(message = "用户头像不能为空")
-    private String avatar;
+
     /**
      * 开团状态：进行中 砍价成功 砍价失败
      */

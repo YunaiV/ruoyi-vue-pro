@@ -11,9 +11,9 @@ public class AppPayWalletRespVO {
     private Integer balance;
 
     @Schema(description = "累计支出, 单位分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1000")
-    private Long totalExpense;
+    private Integer totalExpense;
 
     @Schema(description = "累计充值, 单位分", requiredMode = Schema.RequiredMode.REQUIRED, example = "2000")
-    private Long totalRecharge;
+    private Integer totalRecharge;
 
 }

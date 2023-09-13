@@ -1,13 +1,15 @@
 package cn.iocoder.yudao.module.pay.service.wallet;
 
+import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletMapper;
-import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
+import cn.iocoder.yudao.module.pay.enums.member.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
+import cn.iocoder.yudao.module.pay.service.wallet.bo.CreateWalletTransactionBO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -17,8 +19,6 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
-import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserType;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.pay.enums.member.PayWalletBizTypeEnum.PAYMENT;
 import static cn.iocoder.yudao.module.pay.enums.member.PayWalletBizTypeEnum.PAYMENT_REFUND;
@@ -32,105 +32,55 @@ import static cn.iocoder.yudao.module.pay.enums.member.PayWalletBizTypeEnum.PAYM
 @Slf4j
 public class PayWalletServiceImpl implements  PayWalletService {
 
-    /**
-     * 余额支付的 no 前缀
-     */
-    private static final String WALLET_PAY_NO_PREFIX = "WP";
-    /**
-     * 余额退款的 no 前缀
-     */
-    private static final String WALLET_REFUND_NO_PREFIX = "WR";
-
     @Resource
-    private PayWalletMapper payWalletMapper;
+    private PayWalletMapper walletMapper;
     @Resource
-    private PayNoRedisDAO noRedisDAO;
-
-    @Resource
-    private PayWalletTransactionService payWalletTransactionService;
+    private PayWalletTransactionService walletTransactionService;
     @Resource
     @Lazy
-    private PayOrderService payOrderService;
+    private PayOrderService orderService;
     @Resource
     @Lazy
-    private PayRefundService payRefundService;
+    private PayRefundService refundService;
 
     @Override
-    public PayWalletDO getPayWallet(Long userId, Integer userType) {
-        return payWalletMapper.selectByUserIdAndType(userId, userType);
+    public PayWalletDO getOrCreateWallet(Long userId, Integer userType) {
+        PayWalletDO wallet = walletMapper.selectByUserIdAndType(userId, userType);
+        if (wallet == null) {
+            wallet = new PayWalletDO().setUserId(userId).setUserType(userType)
+                    .setBalance(0).setTotalExpense(0).setTotalRecharge(0);
+            wallet.setCreateTime(LocalDateTime.now());
+            walletMapper.insert(wallet);
+        }
+        return wallet;
     }
 
-    // TODO @jason：可以做的更抽象一点；pay(bizType, bizId, price)；reduceWalletBalance；
-    // TODO @jason：最好是，明确传入哪个 userId 或者 walletId；
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public PayWalletTransactionDO pay(String outTradeNo, Integer price) {
-        // 1.1 判断支付交易拓展单是否存
-        PayOrderExtensionDO orderExtension = payOrderService.getOrderExtensionByNo(outTradeNo);
+    public PayWalletTransactionDO orderPay(Long userId, Integer userType, String outTradeNo, Integer price) {
+        // 1. 判断支付交易拓展单是否存
+        PayOrderExtensionDO orderExtension = orderService.getOrderExtensionByNo(outTradeNo);
         if (orderExtension == null) {
             throw exception(ORDER_EXTENSION_NOT_FOUND);
         }
-        // 1.2 判断余额是否足够
-        PayWalletDO payWallet = validatePayWallet();
-        int afterBalance = payWallet.getBalance() - price;
-        if (afterBalance < 0) {
-            throw exception(WALLET_BALANCE_NOT_ENOUGH);
-        }
-
-        // 2.1 扣除余额
-        // TODO @jason：不要直接整个更新；而是 new 一个出来更新；然后要考虑并发，要 where 余额 > price，以及 - price
-        payWallet.setBalance(afterBalance);
-        payWallet.setTotalExpense(payWallet.getTotalExpense() + price);
-        payWalletMapper.updateById(payWallet);
-
-        // 2.2 生成钱包流水
-        String walletNo = noRedisDAO.generate(WALLET_PAY_NO_PREFIX);
-        PayWalletTransactionDO walletTransaction = new PayWalletTransactionDO().setWalletId(payWallet.getId())
-                .setNo(walletNo).setAmount(price * -1).setBalance(afterBalance).setTransactionTime(LocalDateTime.now())
-                .setBizId(orderExtension.getOrderId()).setBizType(PAYMENT.getType());
-        payWalletTransactionService.createWalletTransaction(walletTransaction);
-        return walletTransaction;
+        // 2. 扣减余额
+        return reduceWalletBalance(userId, userType, orderExtension.getOrderId(), PAYMENT, price);
     }
 
-    // TODO @jason：不要在 service 里去使用用户上下文，这样和 request 就耦合了。
-    private PayWalletDO validatePayWallet() {
-        Long userId = getLoginUserId();
-        Integer userType = getLoginUserType();
-        PayWalletDO payWallet = getPayWallet(userId, userType);
-        if (payWallet == null) {
-            log.error("[validatePayWallet] 用户 {} 钱包不存在", userId);
-            throw exception(WALLET_NOT_FOUND);
-        }
-        return payWallet;
-    }
-
-    // TODO @jason：可以做的更抽象一点；pay(bizType, bizId, price)；addWalletBalance；这样，如果后续充值，应该也是能复用这个方法的；
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public PayWalletTransactionDO refund(String outRefundNo, Integer refundPrice, String reason) {
+    public PayWalletTransactionDO orderRefund(String outRefundNo, Integer refundPrice, String reason) {
         // 1.1 判断退款单是否存在
-        PayRefundDO payRefund = payRefundService.getRefundByNo(outRefundNo);
+        PayRefundDO payRefund = refundService.getRefundByNo(outRefundNo);
         if (payRefund == null) {
             throw exception(REFUND_NOT_FOUND);
         }
         // 1.2 校验是否可以退款
-        PayWalletDO payWallet = validatePayWallet();
-        validateWalletCanRefund(payRefund.getId(), payRefund.getChannelOrderNo(), payWallet.getId(), refundPrice);
-
-        // TODO @jason：不要直接整个更新；而是 new 一个出来更新；然后要考虑并发，要 where 余额 + 金额
-        Integer afterBalance = payWallet.getBalance() + refundPrice;
-        payWallet.setBalance(afterBalance);
-        payWallet.setTotalExpense(payWallet.getTotalExpense() + refundPrice * -1L);
-        payWalletMapper.updateById(payWallet);
-
-        // 2.2 生成钱包流水
-        String walletNo = noRedisDAO.generate(WALLET_REFUND_NO_PREFIX);
-        PayWalletTransactionDO newWalletTransaction = new PayWalletTransactionDO().setWalletId(payWallet.getId())
-                .setNo(walletNo).setAmount(refundPrice).setBalance(afterBalance).setTransactionTime(LocalDateTime.now())
-                .setBizId(payRefund.getId()).setBizType(PAYMENT_REFUND.getType())
-                .setDescription(reason);
-        payWalletTransactionService.createWalletTransaction(newWalletTransaction);
-        return newWalletTransaction;
+        Long walletId = validateWalletCanRefund(payRefund.getId(), payRefund.getChannelOrderNo(),  refundPrice);
+        PayWalletDO wallet = walletMapper.selectById(walletId);
+        Assert.notNull(wallet, "钱包 {} 不存在", walletId);
+        // 2. 增加余额
+        return addWalletBalance(wallet.getUserId(), wallet.getUserType(), payRefund.getId(), PAYMENT_REFUND, refundPrice);
     }
 
     /**
@@ -138,24 +88,78 @@ public class PayWalletServiceImpl implements  PayWalletService {
      *
      * @param refundId 支付退款单 id
      * @param walletPayNo 钱包支付 no
-     * @param walletId 钱包 id
      */
-    // TODO @jason：不要使用基本类型；
-    private void validateWalletCanRefund(long refundId, String walletPayNo, long walletId, int refundPrice) {
-        // 查询钱包支付交易
-        PayWalletTransactionDO payWalletTransaction = payWalletTransactionService.getWalletTransactionByNo(walletPayNo);
-        if (payWalletTransaction == null) {
+    private Long validateWalletCanRefund(Long refundId, String walletPayNo, Integer refundPrice) {
+        // 1. 校验钱包支付交易存在
+        PayWalletTransactionDO walletTransaction = walletTransactionService.getWalletTransactionByNo(walletPayNo);
+        if (walletTransaction == null) {
             throw exception(WALLET_TRANSACTION_NOT_FOUND);
         }
         // 原来的支付金额
-        int amount = payWalletTransaction.getAmount() * -1; // TODO @jason：直接 - payWalletTransaction.getAmount() 即可；
+        // TODO @jason：应该允许多次退款哈；
+        int amount = - walletTransaction.getPrice();
         if (refundPrice != amount) {
             throw exception(WALLET_REFUND_AMOUNT_ERROR);
         }
-        PayWalletTransactionDO refundTransaction = payWalletTransactionService.getWalletTransaction(walletId, refundId, PAYMENT_REFUND);
+        PayWalletTransactionDO refundTransaction = walletTransactionService.getWalletTransaction(
+                String.valueOf(refundId), PAYMENT_REFUND);
         if (refundTransaction != null) {
             throw exception(WALLET_REFUND_EXIST);
         }
+        return walletTransaction.getWalletId();
+    }
+
+    @Override
+    public PayWalletTransactionDO reduceWalletBalance(Long userId, Integer userType,
+                                                      Long bizId, PayWalletBizTypeEnum bizType, Integer price) {
+        // 1. 获取钱包
+        PayWalletDO payWallet = getOrCreateWallet(userId, userType);
+
+        // 2.1 扣除余额
+        int updateCounts = 0 ;
+        switch (bizType) {
+            case PAYMENT: {
+                updateCounts = walletMapper.updateWhenConsumption(price, payWallet.getId());
+                break;
+            }
+            case RECHARGE_REFUND: {
+                // TODO
+                break;
+            }
+        }
+        if (updateCounts == 0) {
+            throw exception(WALLET_BALANCE_NOT_ENOUGH);
+        }
+        // 2.2 生成钱包流水
+        Integer afterBalance = payWallet.getBalance() - price;
+        CreateWalletTransactionBO bo = new CreateWalletTransactionBO().setWalletId(payWallet.getId())
+                .setPrice(-price).setBalance(afterBalance).setBizId(String.valueOf(bizId))
+                .setBizType(bizType.getType()).setTitle(bizType.getDescription());
+        return walletTransactionService.createWalletTransaction(bo);
+    }
+
+    @Override
+    public PayWalletTransactionDO addWalletBalance(Long userId, Integer userType,
+                                                   Long bizId, PayWalletBizTypeEnum bizType, Integer price) {
+        // 1. 获取钱包
+        PayWalletDO payWallet = getOrCreateWallet(userId, userType);
+        switch (bizType) {
+            case PAYMENT_REFUND: {
+                // 更新退款
+                walletMapper.updateWhenConsumptionRefund(price, payWallet.getId());
+                break;
+            }
+            case RECHARGE: {
+                //TODO
+                break;
+            }
+        }
+
+        // 2. 生成钱包流水
+        CreateWalletTransactionBO bo = new CreateWalletTransactionBO().setWalletId(payWallet.getId())
+                .setPrice(price).setBalance(payWallet.getBalance()+price).setBizId(String.valueOf(bizId))
+                .setBizType(bizType.getType()).setTitle(bizType.getDescription());
+        return walletTransactionService.createWalletTransaction(bo);
     }
 
 }

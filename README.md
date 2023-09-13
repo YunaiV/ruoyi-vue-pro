@@ -62,7 +62,7 @@
 | [yudao-ui-admin](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master/yudao-ui-admin)               | [![Gitee star](https://gitee.com/zhijiantianya/ruoyi-vue-pro/badge/star.svg?theme=white)](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master/yudao-ui-admin) [![GitHub stars](https://img.shields.io/github/stars/YunaiV/ruoyi-vue-pro.svg?style=social&label=Stars)](https://github.com/YunaiV/ruoyi-vue-pro/tree/master/yudao-ui-admin)               | 基于 Vue2 + element-ui 实现的管理后台           |
 | [yudao-ui-admin-uniapp](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master/yudao-ui-admin-uniapp) | [![Gitee star](https://gitee.com/zhijiantianya/ruoyi-vue-pro/badge/star.svg?theme=white)](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master/yudao-ui-admin-uniapp) [![GitHub stars](https://img.shields.io/github/stars/YunaiV/ruoyi-vue-pro.svg?style=social&label=Stars)](https://github.com/YunaiV/ruoyi-vue-pro/tree/master/yudao-ui-admin-uniapp) | 基于 uni-app + uni-ui 实现的管理后台的小程序        |
 | [yudao-ui-go-view](https://gitee.com/yudaocode/yudao-ui-go-view)                                         | [![Gitee star](https://gitee.com/yudaocode/yudao-ui-go-view/badge/star.svg?theme=white)](https://gitee.com/yudaocode/yudao-ui-go-view) [![GitHub stars](https://img.shields.io/github/stars/yudaocode/yudao-ui-go-view.svg?style=social&label=Stars)](https://github.com/yudaocode/yudao-ui-go-view)                                                           | 基于 Vue3 + naive-ui 实现的大屏报表             |
-| [yudao-ui-app](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master/yudao-ui-app)                   | [![Gitee star](https://gitee.com/zhijiantianya/ruoyi-vue-pro/badge/star.svg?theme=white)](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master/yudao-ui-app) [![GitHub stars](https://img.shields.io/github/stars/YunaiV/ruoyi-vue-pro.svg?style=social&label=Stars)](https://github.com/YunaiV/ruoyi-vue-pro/tree/master/yudao-ui-app)                   | 基于 uni-app + uview 实现的用户 App           |
+| [yudao-mall-uniapp](https://gitee.com/yudaocode/yudao-mall-uniapp)                   | [![Gitee star](https://gitee.com/yudaocode/yudao-mall-uniapp/badge/star.svg?theme=white)](https://gitee.com/yudaocode/yudao-mall-uniapp) [![GitHub stars](https://img.shields.io/github/stars/yudaocode/yudao-mall-uniapp.svg?style=social&label=Stars)](https://github.com/yudaocode/yudao-mall-uniapp)                   | 基于 uni-app 实现的商城小程序                    |
 
 ## 🐰 分支说明
 
@@ -218,7 +218,9 @@
 
 ![功能图](/.image/common/mall-preview.png)
 
-前端基于 crmeb uniapp 经过授权重构，优化代码实现，接入芋道快速开发平台
+_前端基于 crmeb uniapp 经过授权重构，优化代码实现，接入芋道快速开发平台_
+
+演示地址：<https://doc.iocoder.cn/mall-preview/>
 
 ### 会员中心
 

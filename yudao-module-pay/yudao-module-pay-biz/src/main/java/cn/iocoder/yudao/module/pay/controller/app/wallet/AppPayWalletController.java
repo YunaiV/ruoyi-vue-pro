@@ -37,7 +37,7 @@ public class AppPayWalletController {
     @Operation(summary = "获取钱包")
     @PreAuthenticated
     public CommonResult<AppPayWalletRespVO> getPayWallet() {
-        PayWalletDO wallet = payWalletService.getPayWallet(getLoginUserId(), UserTypeEnum.MEMBER.getValue());
+        PayWalletDO wallet = payWalletService.getOrCreateWallet(getLoginUserId(), UserTypeEnum.MEMBER.getValue());
         return success(PayWalletConvert.INSTANCE.convert(wallet));
     }
 

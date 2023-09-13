@@ -7,8 +7,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 /**
  * 会员钱包流水 DO
  *
@@ -24,6 +22,7 @@ public class PayWalletTransactionDO extends BaseDO {
      */
     @TableId
     private Long id;
+
     /**
      * 流水号
      */
@@ -42,34 +41,26 @@ public class PayWalletTransactionDO extends BaseDO {
      * 枚举 {@link PayWalletBizTypeEnum#getType()}
      */
     private Integer bizType;
-    // TODO @jason：使用 string；因为可能有业务是 string 接入哈。
+
     /**
      * 关联业务编号
      */
-    private Long bizId;
+    private String bizId;
 
-    // TODO @jason：想了下，改成 title；流水标题；因为账户明细那，会看到这个；
     /**
-     * 附加说明
+     * 流水说明
      */
-    private String description;
+    private String title;
 
-    // TODO @jason：使用 price 哈。项目里，金额都是用这个为主；
     /**
      * 交易金额，单位分
      *
      * 正值表示余额增加，负值表示余额减少
      */
-    private Integer amount;
+    private Integer price;
+
     /**
      * 交易后余额，单位分
      */
     private Integer balance;
-
-    // TODO @jason：使用 createTime 就够啦
-    /**
-     * 交易时间
-     */
-    private LocalDateTime transactionTime;
-
 }
