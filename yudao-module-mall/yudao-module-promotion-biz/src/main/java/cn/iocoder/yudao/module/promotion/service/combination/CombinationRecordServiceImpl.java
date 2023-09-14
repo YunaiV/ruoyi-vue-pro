@@ -38,6 +38,7 @@ import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 public class CombinationRecordServiceImpl implements CombinationRecordService {
 
     @Resource
+    @Lazy
     private CombinationActivityService combinationActivityService;
     @Resource
     private CombinationRecordMapper recordMapper;

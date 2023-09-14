@@ -56,6 +56,11 @@ public class PayWalletServiceImpl implements  PayWalletService {
     }
 
     @Override
+    public PayWalletDO getWallet(Long walletId) {
+        return walletMapper.selectById(walletId);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public PayWalletTransactionDO orderPay(Long userId, Integer userType, String outTradeNo, Integer price) {
         // 1. 判断支付交易拓展单是否存
@@ -80,7 +85,7 @@ public class PayWalletServiceImpl implements  PayWalletService {
         PayWalletDO wallet = walletMapper.selectById(walletId);
         Assert.notNull(wallet, "钱包 {} 不存在", walletId);
         // 2. 增加余额
-        return addWalletBalance(wallet.getUserId(), wallet.getUserType(), payRefund.getId(), PAYMENT_REFUND, refundPrice);
+        return addWalletBalance(walletId, String.valueOf(payRefund.getId()), PAYMENT_REFUND, refundPrice);
     }
 
     /**
@@ -139,25 +144,33 @@ public class PayWalletServiceImpl implements  PayWalletService {
     }
 
     @Override
-    public PayWalletTransactionDO addWalletBalance(Long userId, Integer userType,
-                                                   Long bizId, PayWalletBizTypeEnum bizType, Integer price) {
+    public PayWalletTransactionDO addWalletBalance(Long walletId,
+                                                   String bizId, PayWalletBizTypeEnum bizType, Integer price) {
         // 1. 获取钱包
-        PayWalletDO payWallet = getOrCreateWallet(userId, userType);
+        PayWalletDO payWallet = getWallet(walletId);
+
+        if (payWallet == null) {
+            log.error("[addWalletBalance]，用户钱包({})不存在.", walletId);
+            throw exception(WALLET_NOT_FOUND);
+        }
+
         switch (bizType) {
             case PAYMENT_REFUND: {
-                // 更新退款
+                // 退款更新
                 walletMapper.updateWhenConsumptionRefund(price, payWallet.getId());
                 break;
             }
             case RECHARGE: {
-                //TODO
+                // 充值更新
+                walletMapper.updateWhenRecharge(price, payWallet.getId());
                 break;
             }
+            // TODO 其它类型
         }
 
         // 2. 生成钱包流水
         CreateWalletTransactionBO bo = new CreateWalletTransactionBO().setWalletId(payWallet.getId())
-                .setPrice(price).setBalance(payWallet.getBalance()+price).setBizId(String.valueOf(bizId))
+                .setPrice(price).setBalance(payWallet.getBalance()+price).setBizId(bizId)
                 .setBizType(bizType.getType()).setTitle(bizType.getDescription());
         return walletTransactionService.createWalletTransaction(bo);
     }

@@ -42,6 +42,19 @@ public interface PayWalletMapper extends BaseMapperX<PayWalletDO> {
                 .ge(PayWalletDO::getBalance, price); // cas 逻辑
         return update(null, lambdaUpdateWrapper);
     }
+
+    /**
+     * 当充值的时候，更新钱包
+     * @param price 钱包金额
+     * @param id 钱包 id
+     */
+    default int updateWhenRecharge(Integer price, Long id){
+        LambdaUpdateWrapper<PayWalletDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<PayWalletDO>()
+                .setSql(" balance = balance + " + price
+                        + ", total_recharge = total_recharge + " + price)
+                .eq(PayWalletDO::getId, id);
+        return update(null, lambdaUpdateWrapper);
+    }
 }
 
 

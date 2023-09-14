@@ -22,6 +22,13 @@ public interface PayWalletService {
     PayWalletDO getOrCreateWallet(Long userId, Integer userType);
 
     /**
+     * 获取钱包信息
+     *
+     * @param walletId 钱包 id
+     */
+    PayWalletDO getWallet(Long walletId);
+
+    /**
      * 钱包订单支付
      *
      * @param userId  用户 id
@@ -56,14 +63,13 @@ public interface PayWalletService {
     /**
      * 增加钱包余额
      *
-     * @param userId 用户 id
-     * @param userType 用户类型
+     * @param walletId 钱包 id
      * @param bizId 业务关联 id
      * @param bizType 业务关联分类
      * @param price 增加金额
      * @return 钱包流水
      */
-    PayWalletTransactionDO addWalletBalance(Long userId, Integer userType,
-                                            Long bizId, PayWalletBizTypeEnum bizType, Integer price);
+    PayWalletTransactionDO addWalletBalance(Long walletId, String bizId,
+                                            PayWalletBizTypeEnum bizType, Integer price);
 
 }
