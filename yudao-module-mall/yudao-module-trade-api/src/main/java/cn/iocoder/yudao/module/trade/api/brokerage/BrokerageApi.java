@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.trade.api.brokerage.dto.BrokerageUserDTO;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
+// TODO @疯狂：是不是不需要这个啦？
 /**
  * 分销 API 接口
  *
@@ -31,6 +32,7 @@ public interface BrokerageApi {
      */
     default boolean bindUser(@NotNull Long userId, @NotNull Long bindUserId, @NotNull LocalDateTime registerTime) {
         // 注册时间在30秒内的，都算新用户
+        // TODO @疯狂：这个要不抽到 service 里哈？
         boolean isNewUser = LocalDateTimeUtils.afterNow(registerTime.minusSeconds(30));
         return bindUser(userId, bindUserId, isNewUser);
     }
@@ -43,5 +45,8 @@ public interface BrokerageApi {
      * @param isNewUser  是否为新用户
      * @return 是否绑定
      */
-    boolean bindUser(@NotNull Long userId, @NotNull Long bindUserId, @NotNull Boolean isNewUser);
+    boolean bindUser(@NotNull(message = "用户编号不能为空") Long userId,
+                     @NotNull(message = "推广员编号不能为空") Long bindUserId,
+                     @NotNull Boolean isNewUser);
+
 }

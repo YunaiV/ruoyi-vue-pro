@@ -6,6 +6,7 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
+// TODO @疯狂：是不是搞成层级，类似 level 这样？因为本质上，它是 1 级、2 级、3 级这样的关系哈
 /**
  * 分销用户类型枚举
  *

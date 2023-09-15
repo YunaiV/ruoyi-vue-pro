@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.trade.service.brokerage.record;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
@@ -154,21 +155,24 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
         int totalBrokerage = 0;
         List<BrokerageRecordDO> records = new ArrayList<>();
         for (BrokerageAddReqBO item : list) {
-            Integer fixedPrice = 0;
+            // 计算金额
+            Integer fixedPrice;
             if (BrokerageUserTypeEnum.FIRST.equals(sourceUserType)) {
                 fixedPrice = item.getFirstFixedPrice();
             } else if (BrokerageUserTypeEnum.SECOND.equals(sourceUserType)) {
                 fixedPrice = item.getSecondFixedPrice();
+            } else {
+                throw new IllegalArgumentException(StrUtil.format("来源用户({}) 不合法", sourceUserType));
             }
-
-            int brokeragePerItem = calculatePrice(item.getBasePrice(), brokeragePercent, fixedPrice);
-            if (brokeragePerItem <= 0) {
+            int brokeragePrice = calculatePrice(item.getBasePrice(), brokeragePercent, fixedPrice);
+            if (brokeragePrice <= 0) {
                 continue;
             }
+            totalBrokerage += brokeragePrice;
+            // 创建记录实体
             records.add(BrokerageRecordConvert.INSTANCE.convert(user, bizType, item.getBizId(),
-                    brokerageFrozenDays, brokeragePerItem, unfreezeTime, item.getTitle(),
+                    brokerageFrozenDays, brokeragePrice, unfreezeTime, item.getTitle(),
                     item.getSourceUserId(), sourceUserType.getType()));
-            totalBrokerage += brokeragePerItem;
         }
         if (CollUtil.isEmpty(records)) {
             return;

@@ -119,4 +119,13 @@ public interface TradeOrderQueryService {
      */
     List<TradeOrderItemDO> getOrderItemListByOrderId(Collection<Long> orderIds);
 
+    /**
+     * 获取订单项商品购买数量总和
+     *
+     * @param orderIds 订单编号
+     * @param skuIds   sku 编号
+     * @return 订单项商品购买数量总和
+     */
+    Integer getOrderItemCountSumByOrderIdAndSkuId(Collection<Long> orderIds, Collection<Long> skuIds);
+
 }

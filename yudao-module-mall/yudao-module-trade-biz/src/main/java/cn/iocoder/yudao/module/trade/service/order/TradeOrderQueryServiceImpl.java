@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
@@ -165,6 +166,12 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
             return Collections.emptyList();
         }
         return tradeOrderItemMapper.selectListByOrderId(orderIds);
+    }
+
+    @Override
+    public Integer getOrderItemCountSumByOrderIdAndSkuId(Collection<Long> orderIds, Collection<Long> skuIds) {
+        List<TradeOrderItemDO> tradeOrderItems = tradeOrderItemMapper.selectListByOrderIdAnSkuId(orderIds, skuIds);
+        return CollectionUtils.getSumValue(tradeOrderItems, TradeOrderItemDO::getCount, Integer::sum);
     }
 
 }

@@ -36,8 +36,9 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
         } else if (BrokerageUserTypeEnum.SECOND.getType().equals(reqVO.getUserType())) {
             buildSecondBindUserCondition(reqVO.getBindUserId(), wrapper);
         } else {
+            // TODO @疯狂：要不要把这个逻辑，挪到 Service 里，算出子用户有哪些，然后 IN？
             buildFirstBindUserCondition(reqVO.getBindUserId(), wrapper);
-            buildSecondBindUserCondition(reqVO.getBindUserId(), wrapper.or());
+            buildSecondBindUserCondition(reqVO.getBindUserId(), wrapper.or()); // 通过 or 实现多个条件
         }
     }
 
@@ -45,8 +46,8 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
         wrapper.eq(BrokerageUserDO::getBindUserId, bindUserId);
     }
 
-    static void buildSecondBindUserCondition(Long bindUserId, LambdaQueryWrapper<BrokerageUserDO> w) {
-        w.inSql(BrokerageUserDO::getBindUserId, StrUtil.format("SELECT id FROM trade_brokerage_user WHERE bind_user_id = {}", bindUserId));
+    static void buildSecondBindUserCondition(Long bindUserId, LambdaQueryWrapper<BrokerageUserDO> wrapper) {
+        wrapper.inSql(BrokerageUserDO::getBindUserId, StrUtil.format("SELECT id FROM trade_brokerage_user WHERE bind_user_id = {}", bindUserId));
     }
 
     /**
@@ -142,4 +143,5 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
 
     @Select("SELECT COUNT(1) from trade_brokerage_user WHERE bind_user_id IN (SELECT id FROM trade_brokerage_user WHERE bind_user_id = #{bindUserId})")
     Long selectCountByBindUserIdInBindUserId(Long bindUserId);
+
 }

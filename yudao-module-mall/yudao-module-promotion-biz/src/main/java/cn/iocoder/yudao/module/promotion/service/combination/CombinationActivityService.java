@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.promotion.service.combination;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationActivityUpdateStockReqDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityUpdateReqVO;
@@ -71,5 +72,12 @@ public interface CombinationActivityService {
      * @return 拼团活动的商品列表
      */
     List<CombinationProductDO> getCombinationProductsByActivityIds(Collection<Long> activityIds);
+
+    /**
+     * 更新拼图活动库存
+     *
+     * @param reqDTO 请求
+     */
+    void validateCombination(CombinationActivityUpdateStockReqDTO reqDTO);
 
 }

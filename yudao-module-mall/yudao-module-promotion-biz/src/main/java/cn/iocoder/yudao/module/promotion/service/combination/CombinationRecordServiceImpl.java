@@ -2,12 +2,19 @@ package cn.iocoder.yudao.module.promotion.service.combination;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
+import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
+import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.promotion.convert.combination.CombinationActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.combination.CombinationRecordMapper;
 import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -31,10 +38,19 @@ import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 public class CombinationRecordServiceImpl implements CombinationRecordService {
 
     @Resource
+    @Lazy
     private CombinationActivityService combinationActivityService;
-
     @Resource
     private CombinationRecordMapper recordMapper;
+
+    @Resource
+    private MemberUserApi memberUserApi;
+    @Resource
+    @Lazy
+    private ProductSpuApi productSpuApi;
+    @Resource
+    @Lazy
+    private ProductSkuApi productSkuApi;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -102,21 +118,29 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         // 1.5 父拼团是否存在,是否已经满了
         if (reqDTO.getHeadId() != null) {
             // 查询进行中的父拼团
-            CombinationRecordDO recordDO1 = recordMapper.selectOneByHeadId(reqDTO.getHeadId(), CombinationRecordStatusEnum.IN_PROGRESS.getStatus());
-            if (recordDO1 == null) {
+            CombinationRecordDO record = recordMapper.selectOneByHeadId(reqDTO.getHeadId(), CombinationRecordStatusEnum.IN_PROGRESS.getStatus());
+            if (record == null) {
                 throw exception(COMBINATION_RECORD_HEAD_NOT_EXISTS);
             }
             // 校验拼团是否满足要求
-            if (ObjectUtil.equal(recordDO1.getUserCount(), recordDO1.getUserSize())) {
+            if (ObjectUtil.equal(record.getUserCount(), record.getUserSize())) {
                 throw exception(COMBINATION_RECORD_USER_FULL);
             }
         }
 
         // 2. 创建拼团记录
+        // TODO @puhui999：可以把 user、spu、sku 一起放 convert 里哈；
         CombinationRecordDO record = CombinationActivityConvert.INSTANCE.convert(reqDTO);
         record.setVirtualGroup(false);
         record.setExpireTime(record.getStartTime().plusHours(activity.getLimitDuration()));
         record.setUserSize(activity.getUserSize());
+        MemberUserRespDTO user = memberUserApi.getUser(reqDTO.getUserId());
+        record.setNickname(user.getNickname());
+        record.setAvatar(user.getAvatar());
+        ProductSpuRespDTO spu = productSpuApi.getSpu(record.getSpuId());
+        record.setSpuName(spu.getName());
+        ProductSkuRespDTO sku = productSkuApi.getSku(record.getSkuId());
+        record.setPicUrl(sku.getPicUrl());
         recordMapper.insert(record);
     }
 

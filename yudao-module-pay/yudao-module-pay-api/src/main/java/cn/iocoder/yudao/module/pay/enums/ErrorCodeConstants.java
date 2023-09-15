@@ -21,19 +21,17 @@ public interface ErrorCodeConstants {
     ErrorCode CHANNEL_EXIST_SAME_CHANNEL_ERROR = new ErrorCode(1007001004, "已存在相同的渠道");
 
     // ========== ORDER 模块 1007002000 ==========
-    ErrorCode ORDER_NOT_FOUND = new ErrorCode(1007002000, "支付订单不存在");
-    ErrorCode ORDER_STATUS_IS_NOT_WAITING = new ErrorCode(1007002001, "支付订单不处于待支付");
-    ErrorCode ORDER_STATUS_IS_SUCCESS = new ErrorCode(1007002002, "订单已支付，请刷新页面");
-    ErrorCode ORDER_IS_EXPIRED = new ErrorCode(1007002003, "支付订单已经过期");
-    ErrorCode ORDER_SUBMIT_CHANNEL_ERROR = new ErrorCode(1007002004, "发起支付报错，错误码：{}，错误提示：{}");
-    ErrorCode ORDER_REFUND_FAIL_STATUS_ERROR = new ErrorCode(1007002005, "支付订单退款失败，原因：状态不是已支付或已退款");
-    ErrorCode ORDER_UPDATE_PRICE_FAIL_PAID = new ErrorCode(1007002006, "支付订单调价失败，原因：支付订单已付款,不能调价");
-    ErrorCode ORDER_UPDATE_PRICE_FAIL_EQUAL = new ErrorCode(1007002007, "支付订单调价失败，原因：价格没有变化");
+    ErrorCode PAY_ORDER_NOT_FOUND = new ErrorCode(1007002000, "支付订单不存在");
+    ErrorCode PAY_ORDER_STATUS_IS_NOT_WAITING = new ErrorCode(1007002001, "支付订单不处于待支付");
+    ErrorCode PAY_ORDER_STATUS_IS_SUCCESS = new ErrorCode(1007002002, "订单已支付，请刷新页面");
+    ErrorCode PAY_ORDER_IS_EXPIRED = new ErrorCode(1007002003, "支付订单已经过期");
+    ErrorCode PAY_ORDER_SUBMIT_CHANNEL_ERROR = new ErrorCode(1007002004, "发起支付报错，错误码：{}，错误提示：{}");
+    ErrorCode PAY_ORDER_REFUND_FAIL_STATUS_ERROR = new ErrorCode(1007002005, "支付订单退款失败，原因：状态不是已支付或已退款");
 
     // ========== ORDER 模块(拓展单) 1007003000 ==========
-    ErrorCode ORDER_EXTENSION_NOT_FOUND = new ErrorCode(1007003000, "支付交易拓展单不存在");
-    ErrorCode ORDER_EXTENSION_STATUS_IS_NOT_WAITING = new ErrorCode(1007003001, "支付交易拓展单不处于待支付");
-    ErrorCode ORDER_EXTENSION_IS_PAID = new ErrorCode(1007003002, "订单已支付，请等待支付结果");
+    ErrorCode PAY_ORDER_EXTENSION_NOT_FOUND = new ErrorCode(1007003000, "支付交易拓展单不存在");
+    ErrorCode PAY_ORDER_EXTENSION_STATUS_IS_NOT_WAITING = new ErrorCode(1007003001, "支付交易拓展单不处于待支付");
+    ErrorCode PAY_ORDER_EXTENSION_IS_PAID = new ErrorCode(1007003002, "订单已支付，请等待支付结果");
 
     // ========== 支付模块(退款) 1007006000 ==========
     ErrorCode REFUND_PRICE_EXCEED = new ErrorCode(1007006000, "退款金额超过订单可退款金额");
@@ -48,6 +46,11 @@ public interface ErrorCodeConstants {
     ErrorCode WALLET_TRANSACTION_NOT_FOUND = new ErrorCode(1007007002, "未找到对应的钱包交易");
     ErrorCode WALLET_REFUND_AMOUNT_ERROR = new ErrorCode(1007007003, "钱包退款金额不对");
     ErrorCode WALLET_REFUND_EXIST = new ErrorCode(1007007004, "已经存在钱包退款");
+    ErrorCode WALLET_RECHARGE_NOT_FOUND = new ErrorCode(1007007005, "钱包充值记录不存在");
+    ErrorCode WALLET_RECHARGE_UPDATE_PAID_STATUS_NOT_UNPAID = new ErrorCode(1007007006, "钱包充值更新支付状态失败，钱包充值记录不是【未支付】状态");
+    ErrorCode WALLET_RECHARGE_UPDATE_PAID_PAY_ORDER_ID_ERROR = new ErrorCode(1007007007, "钱包充值更新支付状态失败，支付单编号不匹配");
+    ErrorCode WALLET_RECHARGE_UPDATE_PAID_PAY_ORDER_STATUS_NOT_SUCCESS = new ErrorCode(1007007008, "钱包充值更新支付状态失败，支付单状态不是【支付成功】状态");
+    ErrorCode WALLET_RECHARGE_UPDATE_PAID_PAY_PRICE_NOT_MATCH = new ErrorCode(1007007009, "钱包充值更新支付状态失败，支付单金额不匹配");
 
     // ========== 示例订单 1007900000 ==========
     ErrorCode DEMO_ORDER_NOT_FOUND = new ErrorCode(1007900000, "示例订单不存在");

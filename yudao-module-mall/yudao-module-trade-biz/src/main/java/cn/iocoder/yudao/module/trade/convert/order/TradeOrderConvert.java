@@ -14,7 +14,9 @@ import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDT
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationActivityUpdateStockReqDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
+import cn.iocoder.yudao.module.promotion.api.seckill.dto.SeckillActivityUpdateStockReqDTO;
 import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.base.member.user.MemberUserRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.base.product.property.ProductPropertyValueDetailRespVO;
@@ -32,6 +34,8 @@ import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEn
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressTrackRespDTO;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
+import cn.iocoder.yudao.module.trade.service.order.bo.TradeAfterOrderCreateReqBO;
+import cn.iocoder.yudao.module.trade.service.order.bo.TradeBeforeOrderCreateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import org.mapstruct.Mapper;
@@ -254,21 +258,15 @@ public interface TradeOrderConvert {
     AppTradeOrderSettlementRespVO convert0(TradePriceCalculateRespBO calculate, AddressRespDTO address);
 
     @Mappings({
-            @Mapping(target = "activityId", source = "createReqVO.combinationActivityId"),
-            @Mapping(target = "spuId", source = "orderItem.spuId"),
-            @Mapping(target = "skuId", source = "orderItem.skuId"),
-            @Mapping(target = "userId", source = "order.userId"),
-            @Mapping(target = "orderId", source = "order.id"),
-            @Mapping(target = "headId", source = "createReqVO.combinationHeadId"),
-            @Mapping(target = "spuName", source = "orderItem.spuName"),
-            @Mapping(target = "picUrl", source = "orderItem.picUrl"),
-            @Mapping(target = "combinationPrice", source = "orderItem.payPrice"),
-            @Mapping(target = "nickname", source = "user.nickname"),
-            @Mapping(target = "avatar", source = "user.avatar"),
-            @Mapping(target = "status", ignore = true)
+            @Mapping(target = "activityId", source = "afterOrderCreateReqBO.combinationActivityId"),
+            @Mapping(target = "spuId", source = "afterOrderCreateReqBO.spuId"),
+            @Mapping(target = "skuId", source = "afterOrderCreateReqBO.skuId"),
+            @Mapping(target = "orderId", source = "afterOrderCreateReqBO.orderId"),
+            @Mapping(target = "userId", source = "afterOrderCreateReqBO.userId"),
+            @Mapping(target = "headId", source = "afterOrderCreateReqBO.combinationHeadId"),
+            @Mapping(target = "combinationPrice", source = "afterOrderCreateReqBO.payPrice"),
     })
-    CombinationRecordCreateReqDTO convert(TradeOrderDO order, TradeOrderItemDO orderItem,
-                                          AppTradeOrderCreateReqVO createReqVO, MemberUserRespDTO user);
+    CombinationRecordCreateReqDTO convert(TradeAfterOrderCreateReqBO afterOrderCreateReqBO);
 
     List<AppOrderExpressTrackRespDTO> convertList02(List<ExpressTrackRespDTO> list);
 
@@ -279,11 +277,29 @@ public interface TradeOrderConvert {
     TradeOrderDO convert(TradeOrderRemarkReqVO reqVO);
 
     default BrokerageAddReqBO convert(TradeOrderItemDO item, ProductSkuRespDTO sku) {
-        return new BrokerageAddReqBO().setBizId(String.valueOf(item.getId()))
-                .setSourceUserId(item.getUserId())
+        return new BrokerageAddReqBO().setBizId(String.valueOf(item.getId())).setSourceUserId(item.getUserId())
                 .setBasePrice(item.getPayPrice() * item.getCount())
-                .setFirstFixedPrice(sku.getSubCommissionFirstPrice())
-                .setSecondFixedPrice(sku.getSubCommissionSecondPrice())
-                .setTitle(BrokerageRecordBizTypeEnum.ORDER.getTitle());
+                .setTitle(BrokerageRecordBizTypeEnum.ORDER.getTitle()) // TODO @疯狂：标题类似：木晴冰雪成功购买云时代的JVM原理与实战；茫农成功购买深入拆解消息队列47讲
+                .setFirstFixedPrice(sku.getFirstBrokerageRecord()).setSecondFixedPrice(sku.getSecondBrokerageRecord());
     }
+
+    @Mapping(target = "activityId", source = "reqBO.seckillActivityId")
+    SeckillActivityUpdateStockReqDTO convert(TradeBeforeOrderCreateReqBO reqBO);
+
+    @Mapping(target = "activityId", source = "reqBO.combinationActivityId")
+    CombinationActivityUpdateStockReqDTO convert1(TradeBeforeOrderCreateReqBO reqBO);
+
+    TradeBeforeOrderCreateReqBO convert(AppTradeOrderCreateReqVO createReqVO);
+
+    @Mappings({
+            @Mapping(target = "combinationActivityId", source = "createReqVO.combinationActivityId"),
+            @Mapping(target = "combinationHeadId", source = "createReqVO.combinationHeadId"),
+            @Mapping(target = "spuId", source = "orderItem.spuId"),
+            @Mapping(target = "skuId", source = "orderItem.skuId"),
+            @Mapping(target = "orderId", source = "tradeOrderDO.id"),
+            @Mapping(target = "userId", source = "userId"),
+            @Mapping(target = "payPrice", source = "tradeOrderDO.payPrice"),
+    })
+    TradeAfterOrderCreateReqBO convert(Long userId, AppTradeOrderCreateReqVO createReqVO, TradeOrderDO tradeOrderDO, TradeOrderItemDO orderItem);
+
 }

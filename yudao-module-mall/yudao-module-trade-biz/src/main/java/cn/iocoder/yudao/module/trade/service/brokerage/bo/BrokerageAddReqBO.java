@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -30,6 +31,7 @@ public class BrokerageAddReqBO {
     /**
      * 一级佣金（固定）
      */
+    @NotNull(message = "一级佣金（固定）不能为空")
     private Integer firstFixedPrice;
     /**
      * 二级佣金（固定）
@@ -39,10 +41,13 @@ public class BrokerageAddReqBO {
     /**
      * 来源用户编号
      */
+    @NotNull(message = "来源用户编号不能为空")
     private Long sourceUserId;
 
     /**
      * 佣金记录标题
      */
+    @NotEmpty(message = "佣金记录标题不能为空")
     private String title;
+
 }
