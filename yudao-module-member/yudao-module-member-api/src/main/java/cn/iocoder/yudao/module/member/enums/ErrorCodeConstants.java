@@ -39,6 +39,7 @@ public interface ErrorCodeConstants {
     ErrorCode SIGN_IN_CONFIG_EXISTS = new ErrorCode(1004009001, "签到天数规则已存在");
 
     //========== 签到配置 1004010000 ==========
+    ErrorCode SIGN_IN_RECORD_EXISTS = new ErrorCode(1004010000,"用户重复签到");
 
 
     //========== 用户等级 1004011000 ==========

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.member.service.signin;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -37,7 +38,7 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
 
     @Resource
     private MemberSignInRecordMapper memberSignInRecordMapper;
-
+    @Resource
     private MemberSignInRecordMapper signInRecordMapper;
     @Resource
     private MemberSignInConfigMapper signInConfigMapper;
@@ -134,7 +135,7 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
         /**2.获取签到对应的分数**/
         //获取所有的签到规则，按照天数排序，只获取启用的
         List <MemberSignInConfigDO> configDOList = signInConfigMapper.selectList(new LambdaQueryWrapperX <MemberSignInConfigDO>()
-                .eq(MemberSignInConfigDO::getEnable, 1)
+                .eq(MemberSignInConfigDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
                 .orderByAsc(MemberSignInConfigDO::getDay));
         //如果签到的天数大于最大启用的规则天数，直接给最大签到的分数
         MemberSignInConfigDO lastConfig = configDOList.get(configDOList.size() - 1);
