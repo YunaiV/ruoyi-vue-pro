@@ -102,7 +102,10 @@ public class TradeCouponPriceCalculator implements TradePriceCalculator {
         Predicate<TradePriceCalculateRespBO.OrderItem> matchPredicate = TradePriceCalculateRespBO.OrderItem::getSelected;
         if (PromotionProductScopeEnum.SPU.getScope().equals(coupon.getProductScope())) {
             matchPredicate = matchPredicate // 额外加如下条件
-                    .and(orderItem -> coupon.getProductSpuIds().contains(orderItem.getSpuId()));
+                    .and(orderItem -> coupon.getProductScopeValues().contains(orderItem.getSpuId()));
+        } else if (PromotionProductScopeEnum.CATEGORY.getScope().equals(coupon.getProductScope())) {
+            matchPredicate = matchPredicate // 额外加如下条件
+                    .and(orderItem -> coupon.getProductScopeValues().contains(orderItem.getCategoryId()));
         }
         return filterList(result.getItems(), matchPredicate);
     }

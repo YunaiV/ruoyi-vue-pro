@@ -56,7 +56,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     protected void doInit(String tradeType) {
         // 创建 config 配置
         WxPayConfig payConfig = new WxPayConfig();
-        BeanUtil.copyProperties(config, payConfig, "keyContent");
+        BeanUtil.copyProperties(config, payConfig, "keyContent", "privateKeyContent", "privateCertContent");
         payConfig.setTradeType(tradeType);
         // weixin-pay-java 无法设置内容，只允许读取文件，所以这里要创建临时文件来解决
         if (Base64.isBase64(config.getKeyContent())) {

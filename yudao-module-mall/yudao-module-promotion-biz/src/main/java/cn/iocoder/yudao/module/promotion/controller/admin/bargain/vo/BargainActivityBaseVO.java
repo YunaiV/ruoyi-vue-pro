@@ -18,7 +18,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class BargainActivityBaseVO {
 
-    @Schema(description = "砍价活动名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "越拼越省钱")
+    @Schema(description = "砍价活动名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "砍得越多省得越多，是兄弟就来砍我")
     @NotNull(message = "砍价名称不能为空")
     private String name;
 

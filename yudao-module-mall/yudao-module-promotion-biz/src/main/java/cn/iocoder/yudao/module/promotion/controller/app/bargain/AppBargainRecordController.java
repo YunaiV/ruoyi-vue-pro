@@ -81,7 +81,7 @@ public class AppBargainRecordController {
         record1.setPrice(200);
         record1.setPayPrice(180);
         record1.setStatus(1);
-        record1.setPicUrl("https://demo26.crmeb.net/uploads/attach/2021/11/15/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
+        record1.setPicUrl("https://static.iocoder.cn/mall/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
         record1.setExpireTime(LocalDateTimeUtils.addTime(Duration.ofDays(2)));
         page.getList().add(record1);
 
@@ -96,7 +96,7 @@ public class AppBargainRecordController {
         record2.setPrice(200);
         record2.setPayPrice(280);
         record2.setStatus(2);
-        record2.setPicUrl("https://demo26.crmeb.net/uploads/attach/2021/11/15/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
+        record2.setPicUrl("https://static.iocoder.cn/mall/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
         record2.setExpireTime(LocalDateTimeUtils.addTime(Duration.ofDays(2)));
         page.getList().add(record2);
 
@@ -111,7 +111,7 @@ public class AppBargainRecordController {
         record3.setPrice(200);
         record3.setPayPrice(380);
         record3.setStatus(2);
-        record3.setPicUrl("https://demo26.crmeb.net/uploads/attach/2021/11/15/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
+        record3.setPicUrl("https://static.iocoder.cn/mall/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
         record3.setExpireTime(LocalDateTimeUtils.addTime(Duration.ofDays(2)));
         record3.setOrderId(100L);
         page.getList().add(record3);
@@ -127,7 +127,7 @@ public class AppBargainRecordController {
         record4.setPrice(200);
         record4.setPayPrice(380);
         record4.setStatus(3);
-        record4.setPicUrl("https://demo26.crmeb.net/uploads/attach/2021/11/15/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
+        record4.setPicUrl("https://static.iocoder.cn/mall/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
         record4.setExpireTime(LocalDateTimeUtils.addTime(Duration.ofDays(2)));
         record4.setOrderId(100L);
         page.getList().add(record4);

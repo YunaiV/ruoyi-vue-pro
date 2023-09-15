@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdateAddressReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdatePriceReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderRemarkReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
@@ -20,7 +23,7 @@ public interface TradeOrderUpdateService {
     /**
      * 获得订单结算信息
      *
-     * @param userId 登录用户
+     * @param userId          登录用户
      * @param settlementReqVO 订单结算请求
      * @return 订单结算结果
      */
@@ -29,8 +32,8 @@ public interface TradeOrderUpdateService {
     /**
      * 【会员】创建交易订单
      *
-     * @param userId 登录用户
-     * @param userIp 用户 IP 地址
+     * @param userId      登录用户
+     * @param userIp      用户 IP 地址
      * @param createReqVO 创建交易订单请求模型
      * @return 交易订单的
      */
@@ -39,7 +42,7 @@ public interface TradeOrderUpdateService {
     /**
      * 更新交易订单已支付
      *
-     * @param id 交易订单编号
+     * @param id         交易订单编号
      * @param payOrderId 支付订单编号
      */
     void updateOrderPaid(Long id, Long payOrderId);
@@ -47,10 +50,9 @@ public interface TradeOrderUpdateService {
     /**
      * 【管理员】发货交易订单
      *
-     * @param userId 管理员编号
      * @param deliveryReqVO 发货请求
      */
-    void deliveryOrder(Long userId, TradeOrderDeliveryReqVO deliveryReqVO);
+    void deliveryOrder(TradeOrderDeliveryReqVO deliveryReqVO);
 
     /**
      * 【会员】收货交易订单
@@ -60,12 +62,33 @@ public interface TradeOrderUpdateService {
      */
     void receiveOrder(Long userId, Long id);
 
+    /**
+     * 【管理员】交易订单备注
+     *
+     * @param reqVO 请求
+     */
+    void updateOrderRemark(TradeOrderRemarkReqVO reqVO);
+
+    /**
+     * 【管理员】调整价格
+     *
+     * @param reqVO 请求
+     */
+    void updateOrderPrice(TradeOrderUpdatePriceReqVO reqVO);
+
+    /**
+     * 【管理员】调整地址
+     *
+     * @param reqVO 请求
+     */
+    void updateOrderAddress(TradeOrderUpdateAddressReqVO reqVO);
+
     // =================== Order Item ===================
 
     /**
      * 更新交易订单项的售后状态
      *
-     * @param id 交易订单项编号
+     * @param id                 交易订单项编号
      * @param oldAfterSaleStatus 当前售后状态；如果不符，更新后会抛出异常
      * @param newAfterSaleStatus 目标售后状态
      */
@@ -76,11 +99,11 @@ public interface TradeOrderUpdateService {
     /**
      * 更新交易订单项的售后状态
      *
-     * @param id 交易订单项编号
+     * @param id                 交易订单项编号
      * @param oldAfterSaleStatus 当前售后状态；如果不符，更新后会抛出异常
      * @param newAfterSaleStatus 目标售后状态
-     * @param afterSaleId 售后单编号；当订单项发起售后时，必须传递该字段
-     * @param refundPrice 退款金额；当订单项退款成功时，必须传递该值
+     * @param afterSaleId        售后单编号；当订单项发起售后时，必须传递该字段
+     * @param refundPrice        退款金额；当订单项退款成功时，必须传递该值
      */
     void updateOrderItemAfterSaleStatus(Long id, Integer oldAfterSaleStatus, Integer newAfterSaleStatus,
                                         Long afterSaleId, Integer refundPrice);
@@ -94,4 +117,11 @@ public interface TradeOrderUpdateService {
      */
     Long createOrderItemComment(Long userId, AppTradeOrderItemCommentCreateReqVO createReqVO);
 
+    /**
+     * 【会员】取消订单
+     *
+     * @param userId 用户ID
+     * @param id     订单编号
+     */
+    void cancelOrder(Long userId, Long id);
 }

@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - 公众号标签 Response VO")
 @Data
@@ -20,6 +20,6 @@ public class MpTagRespVO extends MpTagBaseVO {
     private Integer count;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

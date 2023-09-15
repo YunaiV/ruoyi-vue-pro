@@ -4,14 +4,13 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.security.config.SecurityProperties;
-import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
 import cn.iocoder.yudao.module.member.service.auth.MemberAuthService;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -77,19 +76,10 @@ public class AppAuthController {
         return success(true);
     }
 
-    @PostMapping("/reset-password")
-    @Operation(summary = "重置密码", description = "用户忘记密码时使用")
-    @PreAuthenticated
-    public CommonResult<Boolean> resetPassword(@RequestBody @Valid AppAuthResetPasswordReqVO reqVO) {
-        authService.resetPassword(reqVO);
-        return success(true);
-    }
-
-    @PostMapping("/update-password")
-    @Operation(summary = "修改用户密码", description = "用户修改密码时使用")
-    @PreAuthenticated
-    public CommonResult<Boolean> updatePassword(@RequestBody @Valid AppAuthUpdatePasswordReqVO reqVO) {
-        authService.updatePassword(getLoginUserId(), reqVO);
+    @PostMapping("/validate-sms-code")
+    @Operation(summary = "校验手机验证码")
+    public CommonResult<Boolean> validateSmsCode(@RequestBody @Valid AppAuthSmsValidateReqVO reqVO) {
+        authService.validateSmsCode(getLoginUserId(), reqVO);
         return success(true);
     }
 

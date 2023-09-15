@@ -56,5 +56,4 @@ public interface MemberUserApi {
      * @return 用户信息
      */
     MemberUserRespDTO getUserByMobile(String mobile);
-
 }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.member.dal.mysql.point;
 
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -20,9 +21,15 @@ public interface MemberPointRecordMapper extends BaseMapperX<MemberPointRecordDO
     default PageResult<MemberPointRecordDO> selectPage(MemberPointRecordPageReqVO reqVO, Set<Long> userIds) {
         return selectPage(reqVO, new LambdaQueryWrapperX<MemberPointRecordDO>()
                 .inIfPresent(MemberPointRecordDO::getUserId, userIds)
+                .eqIfPresent(MemberPointRecordDO::getUserId, reqVO.getUserId())
                 .eqIfPresent(MemberPointRecordDO::getBizType, reqVO.getBizType())
                 .likeIfPresent(MemberPointRecordDO::getTitle, reqVO.getTitle())
-                .eqIfPresent(MemberPointRecordDO::getStatus, reqVO.getStatus())
+                .orderByDesc(MemberPointRecordDO::getId));
+    }
+
+    default PageResult<MemberPointRecordDO> selectPage(Long userId, PageParam pageVO) {
+        return selectPage(pageVO, new LambdaQueryWrapperX<MemberPointRecordDO>()
+                .eq(MemberPointRecordDO::getUserId, userId)
                 .orderByDesc(MemberPointRecordDO::getId));
     }
 

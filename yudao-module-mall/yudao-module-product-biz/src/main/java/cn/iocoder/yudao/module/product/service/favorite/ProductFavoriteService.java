@@ -16,7 +16,7 @@ public interface ProductFavoriteService {
     /**
      * 创建商品收藏
      *
-     * @param userId 用户 id
+     * @param userId 用户编号
      * @param spuId SPU 编号
      */
     Long createFavorite(Long userId, Long spuId);
@@ -24,7 +24,7 @@ public interface ProductFavoriteService {
     /**
      * 取消商品收藏
      *
-     * @param userId 用户 id
+     * @param userId 用户编号
      * @param spuId SPU 编号
      */
     void deleteFavorite(Long userId, Long spuId);
@@ -32,7 +32,7 @@ public interface ProductFavoriteService {
     /**
      * 分页查询用户收藏列表
      *
-     * @param userId 用户 id
+     * @param userId 用户编号
      * @param reqVO 请求 vo
      */
     PageResult<ProductFavoriteDO> getFavoritePage(Long userId, @Valid AppFavoritePageReqVO reqVO);
@@ -40,9 +40,17 @@ public interface ProductFavoriteService {
     /**
      * 获取收藏过商品
      *
-     * @param userId 用户id
+     * @param userId 用户编号
      * @param spuId SPU 编号
      */
     ProductFavoriteDO getFavorite(Long userId, Long spuId);
+
+    /**
+     * 获取用户收藏数量
+     *
+     * @param userId 用户编号
+     * @return 数量
+     */
+    Long getFavoriteCount(Long userId);
 
 }

@@ -170,6 +170,19 @@
           </template>
         </el-table-column>
       </el-table-column>
+      <el-table-column label="钱包支付配置" align="center">
+        <el-table-column :label="payChannelEnum.WALLET.name" align="center">
+          <template v-slot="scope">
+            <el-button type="success" icon="el-icon-check" circle
+                       v-if="isChannelExists(scope.row.channelCodes, payChannelEnum.WALLET.code)"
+                       @click="handleChannel(scope.row, payChannelEnum.WALLET.code)">
+            </el-button>
+            <el-button v-else type="danger" icon="el-icon-close" circle
+                       @click="handleChannel(scope.row, payChannelEnum.WALLET.code)">
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
@@ -219,7 +232,7 @@
     <!-- 对话框（支付应用的配置） -->
     <weixin-channel-form ref="weixinChannelFormRef" @success="getList" />
     <alipay-channel-form ref="alipayChannelFormRef" @success="getList" />
-    <mock-channel-form ref="mockChannelFormRef" @success="getList" />
+    <none-config-channel-form ref="noneConfigChannelFormRef" @success="getList" />
   </div>
 </template>
 
@@ -228,14 +241,14 @@ import { createApp, updateApp, changeAppStatus, deleteApp, getApp, getAppPage } 
 import { PayChannelEnum, CommonStatusEnum } from "@/utils/constants";
 import weixinChannelForm from "@/views/pay/app/components/weixinChannelForm";
 import alipayChannelForm from "@/views/pay/app/components/alipayChannelForm";
-import mockChannelForm from '@/views/pay/app/components/mockChannelForm';
+import noneConfigChannelForm from '@/views/pay/app/components/noneConfigChannelForm';
 
 export default {
   name: "PayApp",
   components: {
     weixinChannelForm,
     alipayChannelForm,
-    mockChannelForm
+    noneConfigChannelForm
   },
   data() {
     return {
@@ -391,7 +404,11 @@ export default {
         return
       }
       if (code === 'mock') {
-        this.$refs['mockChannelFormRef'].open(row.id, code);
+        this.$refs['noneConfigChannelFormRef'].open(row.id, code);
+        return
+      }
+      if (code === 'wallet') {
+        this.$refs['noneConfigChannelFormRef'].open(row.id, code);
         return
       }
     },

@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -41,6 +40,14 @@ public class AppFavoriteController {
     @PreAuthenticated
     public CommonResult<Long> createFavorite(@RequestBody @Valid AppFavoriteReqVO reqVO) {
         return success(productFavoriteService.createFavorite(getLoginUserId(), reqVO.getSpuId()));
+    }
+
+    @PostMapping(value = "/create-list")
+    @Operation(summary = "添加多个商品收藏")
+    @PreAuthenticated
+    public CommonResult<Boolean> createFavoriteList(@RequestBody @Valid AppFavoriteBatchReqVO reqVO) {
+        // todo @jason：待实现；如果有已经收藏的，不用报错，忽略即可；
+        return success(true);
     }
 
     @DeleteMapping(value = "/delete")
@@ -84,8 +91,15 @@ public class AppFavoriteController {
     @Operation(summary = "检查是否收藏过商品")
     @PreAuthenticated
     public CommonResult<Boolean> isFavoriteExists(AppFavoriteReqVO reqVO) {
-        ProductFavoriteDO favoriteDO = productFavoriteService.getFavorite(getLoginUserId(), reqVO.getSpuId());
-        return success(Objects.nonNull(favoriteDO));
+        ProductFavoriteDO favorite = productFavoriteService.getFavorite(getLoginUserId(), reqVO.getSpuId());
+        return success(favorite != null);
+    }
+
+    @GetMapping(value = "/get-count")
+    @Operation(summary = "获得商品收藏数量")
+    @PreAuthenticated
+    public CommonResult<Long> getFavoriteCount() {
+        return success(productFavoriteService.getFavoriteCount(getLoginUserId()));
     }
 
 }

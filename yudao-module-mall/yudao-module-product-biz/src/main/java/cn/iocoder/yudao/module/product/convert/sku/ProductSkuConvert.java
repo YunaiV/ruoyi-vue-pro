@@ -5,7 +5,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuOptionRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import org.mapstruct.Mapper;
@@ -43,8 +42,6 @@ public interface ProductSkuConvert {
     ProductSkuRespDTO convert02(ProductSkuDO bean);
 
     List<ProductSkuRespDTO> convertList04(List<ProductSkuDO> list);
-
-    List<ProductSkuOptionRespVO> convertList05(List<ProductSkuDO> skus);
 
     /**
      * 获得 SPU 的库存变化 Map

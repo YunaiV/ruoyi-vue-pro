@@ -136,6 +136,10 @@ export default {
         name: '模拟支付',
         icon: require("@/assets/images/pay/icon/mock.svg"),
         code: "mock"
+      }, {
+          name: '钱包支付',
+          icon: require("@/assets/images/pay/icon/mock.svg"),
+          code: "wallet"
       }],
       submitLoading: false, // 提交支付的 loading
       interval: undefined, // 定时任务，轮询是否完成支付

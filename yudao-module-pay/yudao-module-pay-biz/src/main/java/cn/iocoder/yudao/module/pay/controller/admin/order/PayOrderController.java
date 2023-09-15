@@ -5,13 +5,16 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.*;
 import cn.iocoder.yudao.module.pay.convert.order.PayOrderConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
+import cn.iocoder.yudao.module.pay.framework.pay.wallet.WalletPayClient;
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
+import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,11 +29,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
+import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
+import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserType;
 
 @Tag(name = "管理后台 - 支付订单")
 @RestController
@@ -70,6 +76,16 @@ public class PayOrderController {
     @PostMapping("/submit")
     @Operation(summary = "提交支付订单")
     public CommonResult<PayOrderSubmitRespVO> submitPayOrder(@RequestBody PayOrderSubmitReqVO reqVO) {
+        // 1. 钱包支付事，需要额外传 user_id 和 user_type
+        if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
+            Map<String, String> channelExtras = reqVO.getChannelExtras() == null ?
+                    Maps.newHashMapWithExpectedSize(2) : reqVO.getChannelExtras();
+            channelExtras.put(WalletPayClient.USER_ID_KEY, String.valueOf(getLoginUserId()));
+            channelExtras.put(WalletPayClient.USER_TYPE_KEY, String.valueOf(getLoginUserType()));
+            reqVO.setChannelExtras(channelExtras);
+        }
+
+        // 2. 提交支付
         PayOrderSubmitRespVO respVO = orderService.submitOrder(reqVO, getClientIP());
         return success(respVO);
     }

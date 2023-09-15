@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.member.dal.dataobject.signin;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -7,7 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * 积分签到规则 DO
+ * 签到规则 DO
  *
  * @author QingX
  */
@@ -27,17 +28,19 @@ public class MemberSignInConfigDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 签到第x天
+     * 签到第 x 天
      */
     private Integer day;
     /**
-     * 签到天数对应分数
+     * 奖励积分
      */
     private Integer point;
 
     /**
-     * 是否启用
+     * 状态
+     *
+     * 枚举 {@link CommonStatusEnum}
      */
-    private Boolean enable;
+    private Integer status;
 
 }

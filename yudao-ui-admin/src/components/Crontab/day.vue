@@ -103,25 +103,25 @@ export default {
 		},
 		// 周期两个值变化时
 		cycleChange() {
-			if (this.radioValue === '3') {
+			if (this.radioValue === 3) {
 				this.$emit('update', 'day', this.cycleTotal);
 			}
 		},
 		// 平均两个值变化时
 		averageChange() {
-			if (this.radioValue === '4') {
+			if (this.radioValue === 4) {
 				this.$emit('update', 'day', this.averageTotal);
 			}
 		},
 		// 最近工作日值变化时
 		workdayChange() {
-			if (this.radioValue === '5') {
+			if (this.radioValue === 5) {
 				this.$emit('update', 'day', this.workdayCheck + 'W');
 			}
 		},
 		// checkbox值变化时
 		checkboxChange() {
-			if (this.radioValue === '7') {
+			if (this.radioValue === 7) {
 				this.$emit('update', 'day', this.checkboxString);
 			}
 		}

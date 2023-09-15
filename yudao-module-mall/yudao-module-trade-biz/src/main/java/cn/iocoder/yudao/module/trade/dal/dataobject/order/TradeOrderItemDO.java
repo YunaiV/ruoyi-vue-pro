@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.trade.dal.dataobject.order;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleDO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.cart.TradeCartDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.cart.CartDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -46,7 +46,7 @@ public class TradeOrderItemDO extends BaseDO {
     /**
      * 购物车项编号
      *
-     * 关联 {@link TradeCartDO#getId()}
+     * 关联 {@link CartDO#getId()}
      */
     private Long cartId;
 
@@ -143,6 +143,8 @@ public class TradeOrderItemDO extends BaseDO {
      * 对应 taobao 的 trade.point_fee 字段
      */
     private Integer pointPrice;
+    // TODO @芋艿：如果商品 vip 折扣时，到底是新增一个 vipPrice 记录优惠记录，还是 vipDiscountPrice，记录 vip 的优惠；还是直接使用 vipPrice；
+    // 目前 crmeb 的选择，单独一个 vipPrice 记录优惠价格；感觉不一定合理，可以在看看有赞的；
 
     // ========== 售后基本信息 ==========
 

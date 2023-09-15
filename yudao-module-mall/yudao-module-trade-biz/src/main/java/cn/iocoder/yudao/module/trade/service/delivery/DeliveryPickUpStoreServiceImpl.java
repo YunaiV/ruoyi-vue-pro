@@ -2,21 +2,20 @@ package cn.iocoder.yudao.module.trade.service.delivery;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.DeliveryPickUpStoreCreateReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.DeliveryPickUpStoreExportReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.DeliveryPickUpStorePageReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.DeliveryPickUpStoreUpdateReqVO;
 import cn.iocoder.yudao.module.trade.convert.delivery.DeliveryPickUpStoreConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryPickUpStoreDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.delivery.DeliveryPickUpStoreMapper;
 import org.springframework.stereotype.Service;
-import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.*;
-
+import javax.annotation.Resource;
+import java.util.Collection;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PICK_UP_STORE_NOT_EXISTS;
 
 /**
  * 自提门店 Service 实现类
@@ -78,7 +77,8 @@ public class DeliveryPickUpStoreServiceImpl implements DeliveryPickUpStoreServic
     }
 
     @Override
-    public List<DeliveryPickUpStoreDO> getDeliveryPickUpStoreList(DeliveryPickUpStoreExportReqVO exportReqVO) {
-        return deliveryPickUpStoreMapper.selectList(exportReqVO);
+    public List<DeliveryPickUpStoreDO> getDeliveryPickUpStoreListByStatus(Integer status) {
+        return deliveryPickUpStoreMapper.selectListByStatus(status);
     }
+
 }

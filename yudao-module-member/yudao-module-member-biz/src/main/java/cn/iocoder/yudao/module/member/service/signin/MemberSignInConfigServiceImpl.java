@@ -11,13 +11,13 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.SIGN_IN_CONFIG_EXISTS;
+import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.SIGN_IN_CONFIG_NOT_EXISTS;
 
 /**
- * 积分签到规则 Service 实现类
+ * 签到规则 Service 实现类
  *
  * @author QingX
  */
@@ -26,7 +26,7 @@ import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.*;
 public class MemberSignInConfigServiceImpl implements MemberSignInConfigService {
 
     @Resource
-    private MemberSignInConfigMapper signInConfigMapper;
+    private MemberSignInConfigMapper memberSignInConfigMapper;
 
     @Override
     public Long createSignInConfig(MemberSignInConfigCreateReqVO createReqVO) {
@@ -35,7 +35,7 @@ public class MemberSignInConfigServiceImpl implements MemberSignInConfigService 
 
         // 插入
         MemberSignInConfigDO signInConfig = MemberSignInConfigConvert.INSTANCE.convert(createReqVO);
-        signInConfigMapper.insert(signInConfig);
+        memberSignInConfigMapper.insert(signInConfig);
         // 返回
         return signInConfig.getId();
     }
@@ -49,7 +49,7 @@ public class MemberSignInConfigServiceImpl implements MemberSignInConfigService 
 
         // 判断更新
         MemberSignInConfigDO updateObj = MemberSignInConfigConvert.INSTANCE.convert(updateReqVO);
-        signInConfigMapper.updateById(updateObj);
+        memberSignInConfigMapper.updateById(updateObj);
     }
 
     @Override
@@ -57,11 +57,11 @@ public class MemberSignInConfigServiceImpl implements MemberSignInConfigService 
         // 校验存在
         validateSignInConfigExists(id);
         // 删除
-        signInConfigMapper.deleteById(id);
+        memberSignInConfigMapper.deleteById(id);
     }
 
     private void validateSignInConfigExists(Long id) {
-        if (signInConfigMapper.selectById(id) == null) {
+        if (memberSignInConfigMapper.selectById(id) == null) {
             throw exception(SIGN_IN_CONFIG_NOT_EXISTS);
         }
     }
@@ -73,28 +73,34 @@ public class MemberSignInConfigServiceImpl implements MemberSignInConfigService 
      * @param id 编号，只有更新的时候会传递
      */
     private void validateSignInConfigDayDuplicate(Integer day, Long id) {
-        MemberSignInConfigDO configDO = signInConfigMapper.selectByDay(day);
-        // 1. 新增时，configDO 非空，则说明重复
-        if (id == null && configDO != null) {
+        MemberSignInConfigDO config = memberSignInConfigMapper.selectByDay(day);
+        // 1. 新增时，config 非空，则说明重复
+        if (id == null && config != null) {
             throw exception(SIGN_IN_CONFIG_EXISTS);
         }
-        // 2. 更新时，如果 configDO 非空，且 id 不相等，则说明重复
-        if (id != null && configDO != null && !configDO.getId().equals(id)) {
+        // 2. 更新时，如果 config 非空，且 id 不相等，则说明重复
+        if (id != null && config != null && !config.getId().equals(id)) {
             throw exception(SIGN_IN_CONFIG_EXISTS);
         }
     }
 
     @Override
     public MemberSignInConfigDO getSignInConfig(Long id) {
-        return signInConfigMapper.selectById(id);
+        return memberSignInConfigMapper.selectById(id);
     }
 
     @Override
     public List <MemberSignInConfigDO> getSignInConfigList() {
-        //查询出所有的配置记录
-        List<MemberSignInConfigDO> result = signInConfigMapper.selectList();
-        //业务侧排序后返回结果
-        return result.stream().sorted(Comparator.comparing(MemberSignInConfigDO::getDay)).collect(Collectors.toList());
+        List<MemberSignInConfigDO> list = memberSignInConfigMapper.selectList();
+        list.sort(Comparator.comparing(MemberSignInConfigDO::getDay));
+        return list;
+    }
+
+    @Override
+    public List<MemberSignInConfigDO> getSignInConfigList(Integer status) {
+        List<MemberSignInConfigDO> list = memberSignInConfigMapper.selectListByStatus(status);
+        list.sort(Comparator.comparing(MemberSignInConfigDO::getDay));
+        return list;
     }
 
 }

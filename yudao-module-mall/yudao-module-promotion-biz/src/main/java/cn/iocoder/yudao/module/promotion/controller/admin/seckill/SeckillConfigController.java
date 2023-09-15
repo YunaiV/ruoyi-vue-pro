@@ -81,12 +81,13 @@ public class SeckillConfigController {
     @GetMapping("/list-all-simple")
     @Operation(summary = "获得所有开启状态的秒杀时段精简列表", description = "主要用于前端的下拉选项")
     public CommonResult<List<SeckillConfigSimpleRespVO>> getListAllSimple() {
-        List<SeckillConfigDO> list = seckillConfigService.getSeckillConfigListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        List<SeckillConfigDO> list = seckillConfigService.getSeckillConfigListByStatus(
+                CommonStatusEnum.ENABLE.getStatus());
         return success(SeckillConfigConvert.INSTANCE.convertList1(list));
     }
 
     @GetMapping("/page")
-    @Operation(summary = "获得秒杀活动分页")
+    @Operation(summary = "获得秒杀时间段分页")
     @PreAuthorize("@ss.hasPermission('promotion:seckill-config:query')")
     public CommonResult<PageResult<SeckillConfigRespVO>> getSeckillActivityPage(@Valid SeckillConfigPageReqVO pageVO) {
         PageResult<SeckillConfigDO> pageResult = seckillConfigService.getSeckillConfigPage(pageVO);

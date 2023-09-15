@@ -110,8 +110,9 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         spu.setMarketPrice(getMinValue(skus, ProductSkuCreateOrUpdateReqVO::getMarketPrice));
         // sku 单价最低的商品的成本价格
         spu.setCostPrice(getMinValue(skus, ProductSkuCreateOrUpdateReqVO::getCostPrice));
-        // sku 单价最低的商品的条形码
-        spu.setBarCode(getMinValue(skus, ProductSkuCreateOrUpdateReqVO::getBarCode));
+        // sku 单价最低的商品的条形码 TODO 芋艿：条形码字段，是不是可以删除
+        spu.setBarCode("");
+//        spu.setBarCode(getMinValue(skus, ProductSkuCreateOrUpdateReqVO::getBarCode));
         // skus 库存总数
         spu.setStock(getSumValue(skus, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
         // 若是 spu 已有状态则不处理

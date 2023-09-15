@@ -31,6 +31,14 @@ public interface BargainActivityService {
     void updateBargainActivity(@Valid BargainActivityUpdateReqVO updateReqVO);
 
     /**
+     * 更新砍价活动库存
+     *
+     * @param id    砍价活动编号
+     * @param count 购买数量
+     */
+    void updateBargainActivityStock(Long id, Integer count);
+
+    /**
      * 删除砍价活动
      *
      * @param id 编号
@@ -52,6 +60,5 @@ public interface BargainActivityService {
      * @return 砍价活动分页
      */
     PageResult<BargainActivityDO> getBargainActivityPage(BargainActivityPageReqVO pageReqVO);
-
 
 }

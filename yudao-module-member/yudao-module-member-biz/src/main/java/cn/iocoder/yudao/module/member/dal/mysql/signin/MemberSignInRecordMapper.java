@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.member.dal.mysql.signin;
 
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 用户签到积分 Mapper
+ * 签到记录 Mapper
  *
  * @author 芋道源码
  */
@@ -21,8 +22,15 @@ public interface MemberSignInRecordMapper extends BaseMapperX<MemberSignInRecord
     default PageResult<MemberSignInRecordDO> selectPage(MemberSignInRecordPageReqVO reqVO, Set<Long> userIds) {
         return selectPage(reqVO, new LambdaQueryWrapperX<MemberSignInRecordDO>()
                 .inIfPresent(MemberSignInRecordDO::getUserId, userIds)
+                .eqIfPresent(MemberSignInRecordDO::getUserId, reqVO.getUserId())
                 .eqIfPresent(MemberSignInRecordDO::getDay, reqVO.getDay())
                 .betweenIfPresent(MemberSignInRecordDO::getCreateTime, reqVO.getCreateTime())
+                .orderByDesc(MemberSignInRecordDO::getId));
+    }
+
+    default PageResult<MemberSignInRecordDO> selectPage(Long userId, PageParam pageParam) {
+        return selectPage(pageParam, new LambdaQueryWrapperX<MemberSignInRecordDO>()
+                .eq(MemberSignInRecordDO::getUserId, userId)
                 .orderByDesc(MemberSignInRecordDO::getId));
     }
 

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.controller.admin.comment.vo;
 
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -7,6 +8,7 @@ import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "管理后台 - 商品评价 Response VO")
 @Data
@@ -23,10 +25,10 @@ public class ProductCommentRespVO extends ProductCommentBaseVO {
     @Schema(description = "交易订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "24428")
     private Long orderId;
 
-    @Schema(description = "是否可见：[true:显示 false:隐藏]", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "是否可见", requiredMode = Schema.RequiredMode.REQUIRED)
     private Boolean visible;
 
-    @Schema(description = "商家是否回复：[1:回复 0:未回复]", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "商家是否回复", requiredMode = Schema.RequiredMode.REQUIRED)
     private Boolean replyStatus;
 
     @Schema(description = "回复管理员编号", example = "9527")
@@ -51,5 +53,11 @@ public class ProductCommentRespVO extends ProductCommentBaseVO {
     @Schema(description = "商品 SPU 名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "赵六")
     @NotNull(message = "商品 SPU 名称不能为空")
     private String spuName;
+
+    @Schema(description = "商品 SKU 图片地址", example = "https://www.iocoder.cn/yudao.jpg")
+    private String skuPicUrl;
+
+    @Schema(description = "商品 SKU 规格值数组")
+    private List<ProductSkuBaseVO.Property> skuProperties;
 
 }

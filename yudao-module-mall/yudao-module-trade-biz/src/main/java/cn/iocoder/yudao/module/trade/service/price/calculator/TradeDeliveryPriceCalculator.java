@@ -42,6 +42,7 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
 
     @Override
     public void calculate(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result) {
+        // TODO @芋艿：如果门店自提，需要校验是否开启；
         // 1.1 判断配送方式
         if (param.getDeliveryType() == null || DeliveryTypeEnum.PICK_UP.getMode().equals(param.getDeliveryType())) {
             return;

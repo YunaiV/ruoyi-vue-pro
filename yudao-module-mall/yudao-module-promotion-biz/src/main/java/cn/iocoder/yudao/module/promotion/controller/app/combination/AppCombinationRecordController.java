@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.promotion.controller.app.combination;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.util.date.DateUtils;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordDetailRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordSummaryRespVO;
@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.Max;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -41,7 +41,7 @@ public class AppCombinationRecordController {
         summary.getAvatars().add("https://thirdwx.qlogo.cn/mmopen/vi_32/ouwtwJycbic2JrCoZjETict0klxd1uRuicRneKk00ewMcCClxVcVHQT91Sh9MJGtwibf1fOicD1WpwSP4icJM6eQq1AA/132");
         summary.getAvatars().add("https://thirdwx.qlogo.cn/mmopen/vi_32/RpUrhwens58qc99OcGs993xL4M5QPOe05ekqF9Eia440kRicAlicicIdQWicHBmy2bzLgHzHguWEzHHxnIgeictL7bLA/132");
         summary.getAvatars().add("https://thirdwx.qlogo.cn/mmopen/vi_32/S4tfqmxc8GZGsKc1K4mnhpvtG16gtMrLnTQfDibhr7jJich9LRI5RQKZDoqEjZM3azMib5nic7F4ZXKMEgYyLO08KA/132");
-        summary.getAvatars().add("https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKXMYJOomfp7cebz3cIeb8sHk3GGSIJtWEgREe3j7J1WoAbTvIOicpcNdFkWAziatBSMod8b5RyS4CQ/132");
+        summary.getAvatars().add("https://static.iocoder.cn/mall/132.jpeg");
         return success(summary);
     }
 
@@ -58,10 +58,10 @@ public class AppCombinationRecordController {
             record.setId((long) i);
             record.setNickname("用户" + i);
             record.setAvatar("头像" + i);
-            record.setExpireTime(new Date());
+            record.setExpireTime(LocalDateTime.now());
             record.setUserSize(10);
             record.setUserCount(i);
-            record.setPicUrl("https://demo26.crmeb.net/uploads/attach/2021/11/15/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
+            record.setPicUrl("https://static.iocoder.cn/mall/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
             record.setActivityId(1L);
             record.setSpuName("活动：" + i);
             list.add(record);
@@ -79,12 +79,12 @@ public class AppCombinationRecordController {
         headRecord.setId(1L);
         headRecord.setNickname("用户" + 1);
         headRecord.setAvatar("头像" + 1);
-        headRecord.setExpireTime(DateUtils.addTime(Duration.ofDays(1)));
+        headRecord.setExpireTime(LocalDateTimeUtils.addTime(Duration.ofDays(1)));
         headRecord.setUserSize(10);
         headRecord.setUserCount(3);
         headRecord.setStatus(1);
         headRecord.setActivityId(10L);
-        headRecord.setPicUrl("https://demo26.crmeb.net/uploads/attach/2021/11/15/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
+        headRecord.setPicUrl("https://static.iocoder.cn/mall/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
         headRecord.setCombinationPrice(100);
         detail.setHeadRecord(headRecord);
         // 团员
@@ -94,7 +94,7 @@ public class AppCombinationRecordController {
             record.setId((long) i);
             record.setNickname("用户" + i);
             record.setAvatar("头像" + i);
-            record.setExpireTime(new Date());
+            record.setExpireTime(LocalDateTime.now());
             record.setUserSize(10);
             record.setUserCount(i);
             record.setStatus(1);

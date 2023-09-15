@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.trade.controller.app.order;
 
+import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
-import cn.iocoder.yudao.module.product.api.property.ProductPropertyValueApi;
-import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.*;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemRespVO;
@@ -13,8 +12,11 @@ import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderOperateTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
+import cn.iocoder.yudao.module.trade.framework.order.core.annotations.TradeOrderLog;
+import cn.iocoder.yudao.module.trade.framework.order.core.utils.TradeOrderLogUtils;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
@@ -51,9 +53,6 @@ public class AppTradeOrderController {
     private DeliveryExpressService deliveryExpressService;
 
     @Resource
-    private ProductPropertyValueApi productPropertyValueApi;
-
-    @Resource
     private TradeOrderProperties tradeOrderProperties;
 
     @GetMapping("/settlement")
@@ -66,7 +65,10 @@ public class AppTradeOrderController {
     @PostMapping("/create")
     @Operation(summary = "创建订单")
     @PreAuthenticated
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.TEST)
     public CommonResult<AppTradeOrderCreateRespVO> createOrder(@RequestBody AppTradeOrderCreateReqVO createReqVO) {
+        TradeOrderLogUtils.setOrderInfo(10L, 1, 2,
+                MapUtil.<String, Object>builder().put("nickname", "小明").put("thing", "种土豆").build());
         TradeOrderDO order = tradeOrderUpdateService.createOrder(getLoginUserId(), getClientIP(), createReqVO);
         return success(new AppTradeOrderCreateRespVO().setId(order.getId()).setPayOrderId(order.getPayOrderId()));
     }
@@ -79,6 +81,7 @@ public class AppTradeOrderController {
         return success(true);
     }
 
+    // TODO @芋艿：如果拼团活动、秒杀活动、砍价活动时，是不是要额外在返回活动之类的信息；
     @GetMapping("/get-detail")
     @Operation(summary = "获得交易订单")
     @Parameter(name = "id", description = "交易订单编号")
@@ -91,15 +94,12 @@ public class AppTradeOrderController {
 
         // 查询订单项
         List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(order.getId());
-        // 查询商品属性
-        List<ProductPropertyValueDetailRespDTO> propertyValueDetails = productPropertyValueApi
-                .getPropertyValueDetailList(TradeOrderConvert.INSTANCE.convertPropertyValueIds(orderItems));
         // 查询物流公司
         DeliveryExpressDO express = order.getLogisticsId() != null && order.getLogisticsId() > 0 ?
                 deliveryExpressService.getDeliveryExpress(order.getLogisticsId()) : null;
+        // TODO @puhui999：如果门店自提，信息的拼接；
         // 最终组合
-        return success(TradeOrderConvert.INSTANCE.convert02(order, orderItems,
-                propertyValueDetails, tradeOrderProperties, express));
+        return success(TradeOrderConvert.INSTANCE.convert02(order, orderItems, tradeOrderProperties, express));
     }
 
     @GetMapping("/get-express-track-list")
@@ -146,7 +146,7 @@ public class AppTradeOrderController {
     @PutMapping("/receive")
     @Operation(summary = "确认交易订单收货")
     @Parameter(name = "id", description = "交易订单编号")
-    public CommonResult<Boolean> takeOrder(@RequestParam("id") Long id) {
+    public CommonResult<Boolean> receiveOrder(@RequestParam("id") Long id) {
         tradeOrderUpdateService.receiveOrder(getLoginUserId(), id);
         return success(true);
     }
@@ -155,7 +155,7 @@ public class AppTradeOrderController {
     @Operation(summary = "取消交易订单")
     @Parameter(name = "id", description = "交易订单编号")
     public CommonResult<Boolean> cancelOrder(@RequestParam("id") Long id) {
-        // TODO @芋艿：未实现，mock 用
+        tradeOrderUpdateService.cancelOrder(getLoginUserId(), id);
         return success(true);
     }
 

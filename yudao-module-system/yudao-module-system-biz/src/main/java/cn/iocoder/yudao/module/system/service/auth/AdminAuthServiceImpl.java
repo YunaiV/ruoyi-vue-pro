@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialUserRespDTO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.*;
 import cn.iocoder.yudao.module.system.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
@@ -155,14 +156,14 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     @Override
     public AuthLoginRespVO socialLogin(AuthSocialLoginReqVO reqVO) {
         // 使用 code 授权码，进行登录。然后，获得到绑定的用户编号
-        Long userId = socialUserService.getBindUserId(UserTypeEnum.ADMIN.getValue(), reqVO.getType(),
+        SocialUserRespDTO socialUser = socialUserService.getSocialUser(UserTypeEnum.ADMIN.getValue(), reqVO.getType(),
                 reqVO.getCode(), reqVO.getState());
-        if (userId == null) {
+        if (socialUser == null) {
             throw exception(AUTH_THIRD_LOGIN_NOT_BIND);
         }
 
         // 获得用户
-        AdminUserDO user = userService.getUser(userId);
+        AdminUserDO user = userService.getUser(socialUser.getUserId());
         if (user == null) {
             throw exception(USER_NOT_EXISTS);
         }

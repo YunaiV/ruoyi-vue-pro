@@ -23,6 +23,8 @@ public class DateUtils {
      */
     public static final long SECOND_MILLIS = 1000;
 
+    public static final String FORMAT_YEAR_MONTH_DAY = "yyyy-MM-dd";
+
     public static final String FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND = "yyyy-MM-dd HH:mm:ss";
 
     public static final String FORMAT_HOUR_MINUTE_SECOND = "HH:mm:ss";
@@ -34,6 +36,9 @@ public class DateUtils {
      * @return LocalDateTime
      */
     public static Date of(LocalDateTime date) {
+        if (date == null) {
+            return null;
+        }
         // 将此日期时间与时区相结合以创建 ZonedDateTime
         ZonedDateTime zonedDateTime = date.atZone(ZoneId.systemDefault());
         // 本地时间线 LocalDateTime 到即时时间线 Instant 时间戳
@@ -49,6 +54,9 @@ public class DateUtils {
      * @return LocalDateTime
      */
     public static LocalDateTime of(Date date) {
+        if (date == null) {
+            return null;
+        }
         // 转为时间戳
         Instant instant = date.toInstant();
         // UTC时间(世界协调时间,UTC + 00:00)转北京(北京,UTC + 8:00)时间

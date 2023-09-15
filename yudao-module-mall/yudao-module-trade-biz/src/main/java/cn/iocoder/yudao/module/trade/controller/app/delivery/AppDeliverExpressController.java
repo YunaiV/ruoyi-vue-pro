@@ -31,7 +31,7 @@ public class AppDeliverExpressController {
     @GetMapping("/list")
     @Operation(summary = "获得快递公司列表")
     public CommonResult<List<AppDeliveryExpressRespVO>> getDeliveryExpressList() {
-        List<DeliveryExpressDO> list = deliveryExpressService.getDeliveryExpressList(CommonStatusEnum.ENABLE.getStatus());
+        List<DeliveryExpressDO> list = deliveryExpressService.getDeliveryExpressListByStatus(CommonStatusEnum.ENABLE.getStatus());
         list.sort(Comparator.comparing(DeliveryExpressDO::getSort));
         return success(DeliveryExpressConvert.INSTANCE.convertList03(list));
     }

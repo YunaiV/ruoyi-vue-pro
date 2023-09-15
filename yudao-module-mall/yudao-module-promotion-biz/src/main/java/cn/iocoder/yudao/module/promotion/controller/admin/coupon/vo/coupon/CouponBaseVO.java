@@ -26,7 +26,7 @@ public class CouponBaseVO {
     // ========== 基本信息 BEGIN ==========
     @Schema(description = "优惠劵模板编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "优惠劵模板编号不能为空")
-    private Integer templateId;
+    private Long templateId;
 
     @Schema(description = "优惠劵名", requiredMode = Schema.RequiredMode.REQUIRED, example = "春节送送送")
     @NotNull(message = "优惠劵名不能为空")
@@ -67,8 +67,8 @@ public class CouponBaseVO {
     @InEnum(PromotionProductScopeEnum.class)
     private Integer productScope;
 
-    @Schema(description = "商品 SPU 编号的数组", example = "1,3")
-    private List<Long> productSpuIds;
+    @Schema(description = "商品范围编号的数组", example = "1,3")
+    private List<Long> productScopeValues;
     // ========== 使用规则 END ==========
 
     // ========== 使用效果 BEGIN ==========

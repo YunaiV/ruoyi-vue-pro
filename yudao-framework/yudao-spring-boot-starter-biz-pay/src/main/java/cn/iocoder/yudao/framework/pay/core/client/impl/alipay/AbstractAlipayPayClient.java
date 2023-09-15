@@ -27,6 +27,7 @@ import com.alipay.api.request.AlipayTradeRefundRequest;
 import com.alipay.api.response.AlipayTradeFastpayRefundQueryResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.alipay.api.response.AlipayTradeRefundResponse;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,6 +48,7 @@ import static cn.hutool.core.date.DatePattern.NORM_DATETIME_FORMATTER;
 @Slf4j
 public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPayClientConfig> {
 
+    @Getter // 仅用于单测场景
     protected DefaultAlipayClient client;
 
     public AbstractAlipayPayClient(Long channelId, String channelCode, AlipayPayClientConfig config) {

@@ -219,7 +219,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
 
         // 调用，并断言异常
         assertServiceException(() -> refundService.createPayRefund(reqDTO),
-                ORDER_NOT_FOUND);
+                PAY_ORDER_NOT_FOUND);
     }
 
     @Test
@@ -245,7 +245,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
 
         // 调用，并断言异常
         assertServiceException(() -> refundService.createPayRefund(reqDTO),
-                ORDER_REFUND_FAIL_STATUS_ERROR);
+                PAY_ORDER_REFUND_FAIL_STATUS_ERROR);
     }
 
     @Test

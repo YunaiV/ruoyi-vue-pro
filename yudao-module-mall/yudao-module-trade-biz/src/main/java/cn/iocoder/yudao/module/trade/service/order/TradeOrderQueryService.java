@@ -66,13 +66,21 @@ public interface TradeOrderQueryService {
     Long getOrderCount(Long userId, Integer status, Boolean commonStatus);
 
     /**
-     * 获得订单的物流轨迹
+     * 【前台】获得订单的物流轨迹
      *
      * @param id 订单编号
      * @param userId 用户编号
      * @return 物流轨迹数组
      */
     List<ExpressTrackRespDTO> getExpressTrackList(Long id, Long userId);
+
+    /**
+     * 【后台】获得订单的物流轨迹
+     *
+     * @param id 订单编号
+     * @return 物流轨迹数组
+     */
+    List<ExpressTrackRespDTO> getExpressTrackList(Long id);
 
     // =================== Order Item ===================
 
@@ -110,5 +118,14 @@ public interface TradeOrderQueryService {
      * @return 交易订单项数组
      */
     List<TradeOrderItemDO> getOrderItemListByOrderId(Collection<Long> orderIds);
+
+    /**
+     * 获取订单项商品购买数量总和
+     *
+     * @param orderIds 订单编号
+     * @param skuIds   sku 编号
+     * @return 订单项商品购买数量总和
+     */
+    Integer getOrderItemCountSumByOrderIdAndSkuId(Collection<Long> orderIds, Collection<Long> skuIds);
 
 }

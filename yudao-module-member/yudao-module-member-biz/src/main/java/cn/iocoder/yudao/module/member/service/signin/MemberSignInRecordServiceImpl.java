@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.member.service.signin;
 
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
@@ -26,7 +27,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 /**
- * 用户签到积分 Service 实现类
+ * 签到记录 Service 实现类
  *
  * @author 芋道源码
  */
@@ -35,6 +36,8 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 public class MemberSignInRecordServiceImpl implements MemberSignInRecordService {
 
     @Resource
+    private MemberSignInRecordMapper memberSignInRecordMapper;
+
     private MemberSignInRecordMapper signInRecordMapper;
     @Resource
     private MemberSignInConfigMapper signInConfigMapper;
@@ -98,7 +101,13 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
             }
             userIds = convertSet(users, MemberUserRespDTO::getId);
         }
-        return signInRecordMapper.selectPage(pageReqVO, userIds);
+        // 分页查询
+        return memberSignInRecordMapper.selectPage(pageReqVO, userIds);
+    }
+
+    @Override
+    public PageResult<MemberSignInRecordDO> getSignRecordPage(Long userId, PageParam pageParam) {
+        return memberSignInRecordMapper.selectPage(userId, pageParam);
     }
 
     @Override

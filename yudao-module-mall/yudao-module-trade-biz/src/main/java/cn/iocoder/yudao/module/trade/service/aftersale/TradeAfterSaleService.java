@@ -43,6 +43,14 @@ public interface TradeAfterSaleService {
     TradeAfterSaleDO getAfterSale(Long userId, Long id);
 
     /**
+     * 【管理员】获得售后单
+     *
+     * @param id 售后编号
+     * @return 售后订单
+     */
+    TradeAfterSaleDO getAfterSale(Long id);
+
+    /**
      * 【会员】创建售后订单
      *
      * @param userId 会员用户编号
@@ -107,5 +115,13 @@ public interface TradeAfterSaleService {
      * @param id 售后编号
      */
     void cancelAfterSale(Long userId, Long id);
+
+    /**
+     * 【会员】获得正在进行中的售后订单数量
+     *
+     * @param userId
+     * @return 数量
+     */
+    Long getApplyingAfterSaleCount(Long userId);
 
 }

@@ -42,5 +42,13 @@ public class TradeAfterSaleLogCreateReqDTO {
      * 操作明细
      */
     private String content;
+    /**
+     * 售前状态
+     */
+    private Integer beforeStatus;
+    /**
+     * 售后状态
+     */
+    private Integer afterStatus;
 
 }

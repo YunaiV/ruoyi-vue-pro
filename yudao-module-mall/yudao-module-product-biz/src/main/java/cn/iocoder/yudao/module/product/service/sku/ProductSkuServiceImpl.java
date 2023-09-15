@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.product.service.sku;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
@@ -74,6 +75,9 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 
     @Override
     public List<ProductSkuDO> getSkuList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return ListUtil.empty();
+        }
         return productSkuMapper.selectBatchIds(ids);
     }
 

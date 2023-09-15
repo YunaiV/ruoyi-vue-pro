@@ -17,13 +17,13 @@ public interface MemberPointConfigService {
      *
      * @param saveReqVO 更新信息
      */
-    void saveConfig(@Valid MemberPointConfigSaveReqVO saveReqVO);
+    void savePointConfig(@Valid MemberPointConfigSaveReqVO saveReqVO);
 
     /**
      * 获得会员积分配置
      *
      * @return 积分配置
      */
-    MemberPointConfigDO getConfig();
+    MemberPointConfigDO getPointConfig();
 
 }

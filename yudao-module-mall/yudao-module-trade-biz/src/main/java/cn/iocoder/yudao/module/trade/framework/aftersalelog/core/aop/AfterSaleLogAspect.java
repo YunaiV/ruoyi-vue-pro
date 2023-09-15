@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.trade.framework.aftersalelog.core.aop;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.util.spring.SpringExpressionUtils;
+import cn.iocoder.yudao.framework.operatelog.core.service.OperateLog;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.annotations.AfterSaleLog;
 import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.dto.TradeAfterSaleLogCreateReqDTO;
@@ -33,9 +34,26 @@ public class AfterSaleLogAspect {
 
     @Resource
     private AfterSaleLogService afterSaleLogService;
-
-    // TODO chenchen: 这个分 3 行把；
-    private final static String OPERATE_TYPE = "operateType", ID = "id", CONTENT = "content";
+    /**
+     * 售前状态
+     */
+    private static final ThreadLocal<Integer> BEFORE_STATUS = new ThreadLocal<>();
+    /**
+     * 售后状态
+     */
+    private static final ThreadLocal<Integer> AFTER_STATUS = new ThreadLocal<>();
+    /**
+     * 操作类型
+     */
+    private final static String OPERATE_TYPE = "operateType";
+    /**
+     * ID
+     */
+    private final static String ID = "id";
+    /**
+     * 操作明细
+     */
+    private final static String CONTENT = "content";
 
     /**
      * 切面存入日志
@@ -52,11 +70,15 @@ public class AfterSaleLogAspect {
                     .setUserType(userType)
                     .setAfterSaleId(MapUtil.getLong(formatObj, ID))
                     .setOperateType(MapUtil.getStr(formatObj, OPERATE_TYPE))
+                    .setBeforeStatus(BEFORE_STATUS.get())
+                    .setAfterStatus(AFTER_STATUS.get())
                     .setContent(MapUtil.getStr(formatObj, CONTENT));
             // 异步存入数据库
             afterSaleLogService.createLog(dto);
         } catch (Exception exception) {
             log.error("[doAfterReturning][afterSaleLog({}) 日志记录错误]", toJsonString(afterSaleLog), exception);
+        }finally {
+            clearThreadLocal();
         }
     }
 
@@ -83,6 +105,19 @@ public class AfterSaleLogAspect {
         }
         result.put(CONTENT, content);
         return result;
+    }
+
+    public static void setBeforeStatus(Integer beforestatus) {
+        BEFORE_STATUS.set(beforestatus);
+    }
+
+    public static void setAfterStatus(Integer afterStatus) {
+        AFTER_STATUS.set(afterStatus);
+    }
+
+    private static void clearThreadLocal() {
+        AFTER_STATUS.remove();
+        BEFORE_STATUS.remove();
     }
 
 }

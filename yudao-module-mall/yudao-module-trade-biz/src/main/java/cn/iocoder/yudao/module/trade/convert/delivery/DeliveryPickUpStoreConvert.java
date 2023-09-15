@@ -1,19 +1,18 @@
 package cn.iocoder.yudao.module.trade.convert.delivery;
 
-import java.util.*;
-
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.DeliveryPickUpStoreCreateReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.DeliveryPickUpStoreExcelVO;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.DeliveryPickUpStoreRespVO;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.DeliveryPickUpStoreSimpleRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.DeliveryPickUpStoreUpdateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryPickUpStoreDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 @Mapper
 public interface DeliveryPickUpStoreConvert {
@@ -30,13 +29,12 @@ public interface DeliveryPickUpStoreConvert {
 
     PageResult<DeliveryPickUpStoreRespVO> convertPage(PageResult<DeliveryPickUpStoreDO> page);
 
-    List<DeliveryPickUpStoreExcelVO> convertList02(List<DeliveryPickUpStoreDO> list);
+    List<DeliveryPickUpStoreSimpleRespVO> convertList1(List<DeliveryPickUpStoreDO> list);
+    @Mapping(source = "areaId", target = "areaName", qualifiedByName = "convertAreaIdToAreaName")
+    DeliveryPickUpStoreSimpleRespVO convert02(DeliveryPickUpStoreDO bean);
 
-    @Mapping(source = "areaId", target = "areaName",  qualifiedByName = "convertAreaIdToName")
-    DeliveryPickUpStoreExcelVO convert2(DeliveryPickUpStoreDO bean);
-
-    @Named("convertAreaIdToName")
-    default String convertAreaIdToName(Integer areaId) {
+    @Named("convertAreaIdToAreaName")
+    default String convertAreaIdToAreaName(Integer areaId) {
         return AreaUtils.format(areaId);
     }
 

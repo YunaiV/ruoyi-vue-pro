@@ -27,6 +27,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class TradeOrderDO extends BaseDO {
 
+    /**
+     * 发货物流公司编号 - 空（无需发货）
+     */
+    public static final Long LOGISTICS_ID_NULL = 0L;
+
     // ========== 订单基本信息 ==========
     /**
      * 订单编号，主键自增

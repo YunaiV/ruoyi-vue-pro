@@ -5,16 +5,18 @@ import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInConfigDO
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * 积分签到规则 Mapper
+ * 签到规则 Mapper
  *
  * @author QingX
  */
 @Mapper
 public interface MemberSignInConfigMapper extends BaseMapperX<MemberSignInConfigDO> {
 
-
     default MemberSignInConfigDO selectByDay(Integer day) {
         return selectOne(MemberSignInConfigDO::getDay, day);
     }
 
+    default List<MemberSignInConfigDO> selectListByStatus(Integer status) {
+        return selectList(MemberSignInConfigDO::getStatus, status);
+    }
 }

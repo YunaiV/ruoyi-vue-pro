@@ -1,14 +1,21 @@
 package cn.iocoder.yudao.module.member.dal.dataobject.user;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.ip.core.Area;
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.group.MemberGroupDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
+import cn.iocoder.yudao.module.system.enums.common.SexEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 会员用户 DO
@@ -26,26 +33,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class MemberUserDO extends TenantBaseDO {
 
+    // ========== 账号信息 ==========
+
     /**
      * 用户ID
      */
     @TableId
     private Long id;
-    /**
-     * 用户昵称
-     */
-    private String nickname;
-    /**
-     * 用户头像
-     */
-    private String avatar;
-    /**
-     * 帐号状态
-     *
-     * 枚举 {@link CommonStatusEnum}
-     */
-    private Integer status;
-
     /**
      * 手机
      */
@@ -56,6 +50,12 @@ public class MemberUserDO extends TenantBaseDO {
      * 因为目前使用 {@link BCryptPasswordEncoder} 加密器，所以无需自己处理 salt 盐
      */
     private String password;
+    /**
+     * 帐号状态
+     *
+     * 枚举 {@link CommonStatusEnum}
+     */
+    private Integer status;
     /**
      * 注册 IP
      */
@@ -69,10 +69,71 @@ public class MemberUserDO extends TenantBaseDO {
      */
     private LocalDateTime loginDate;
 
-    // TODO 芋艿：name 真实名字；
-    // TODO 芋艿：email 邮箱；
-    // TODO 芋艿：gender 性别；
-    // TODO 芋艿：score 积分；
-    // TODO 芋艿：payPassword 支付密码；
+    // ========== 基础信息 ==========
+
+    /**
+     * 用户昵称
+     */
+    private String nickname;
+    /**
+     * 用户头像
+     */
+    private String avatar;
+
+    /**
+     * 真实名字
+     */
+    private String name;
+    /**
+     * 性别
+     *
+     * 枚举 {@link SexEnum}
+     */
+    private Integer sex;
+    /**
+     * 出生日期
+     */
+    private LocalDateTime birthday;
+    /**
+     * 所在地
+     *
+     * 关联 {@link Area#getId()} 字段
+     */
+    private Integer areaId;
+    /**
+     * 用户备注
+     */
+    private String mark;
+
+    // ========== 其它信息 ==========
+
+    /**
+     * 积分
+     */
+    private Integer point;
+    // TODO 芋艿：增加一个 totalPoint；个人信息接口要返回
+
+    /**
+     * 会员标签列表，以逗号分隔
+     */
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> tagIds;
+
+    /**
+     * 会员级别编号
+     *
+     * 关联 {@link MemberLevelDO#getId()} 字段
+     */
+    private Long levelId;
+    /**
+     * 会员经验
+     */
+    private Integer experience;
+    /**
+     * 用户分组编号
+     *
+     * 关联 {@link MemberGroupDO#getId()} 字段
+     */
+    private Long groupId;
 
 }

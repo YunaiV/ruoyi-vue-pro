@@ -5,7 +5,7 @@ import lombok.*;
 
 import javax.validation.constraints.*;
 
-@Schema(description = "管理后台 - 积分签到规则更新 Request VO")
+@Schema(description = "管理后台 - 签到规则更新 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

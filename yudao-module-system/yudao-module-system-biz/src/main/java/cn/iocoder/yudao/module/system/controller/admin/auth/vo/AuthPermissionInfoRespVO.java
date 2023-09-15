@@ -25,7 +25,7 @@ public class AuthPermissionInfoRespVO {
     @Schema(description = "操作权限数组", requiredMode = Schema.RequiredMode.REQUIRED)
     private Set<String> permissions;
 
-    @Schema(description = "菜单树", required = true)
+    @Schema(description = "菜单树", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<MenuVO> menus;
 
     @Schema(description = "用户信息 VO")
@@ -53,13 +53,13 @@ public class AuthPermissionInfoRespVO {
     @Builder
     public static class MenuVO {
 
-        @Schema(description = "菜单名称", required = true, example = "芋道")
+        @Schema(description = "菜单名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
         private Long id;
 
-        @Schema(description = "父菜单 ID", required = true, example = "1024")
+        @Schema(description = "父菜单 ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
         private Long parentId;
 
-        @Schema(description = "菜单名称", required = true, example = "芋道")
+        @Schema(description = "菜单名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
         private String name;
 
         @Schema(description = "路由地址,仅菜单类型为菜单或者目录时，才需要传", example = "post")
@@ -74,10 +74,10 @@ public class AuthPermissionInfoRespVO {
         @Schema(description = "菜单图标,仅菜单类型为菜单或者目录时，才需要传", example = "/menu/list")
         private String icon;
 
-        @Schema(description = "是否可见", required = true, example = "false")
+        @Schema(description = "是否可见", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
         private Boolean visible;
 
-        @Schema(description = "是否缓存", required = true, example = "false")
+        @Schema(description = "是否缓存", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
         private Boolean keepAlive;
 
         @Schema(description = "是否总是显示", example = "false")
