@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.sms.core.client.SmsClient;
-import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
 import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsSendRespDTO;
@@ -51,9 +50,6 @@ public class SmsSendServiceImplTest extends BaseMockitoUnitTest {
     private SmsLogService smsLogService;
     @Mock
     private SmsProducer smsProducer;
-
-    @Mock
-    private SmsClientFactory smsClientFactory;
 
     @Test
     public void testSendSingleSmsToAdmin() {
@@ -253,7 +249,7 @@ public class SmsSendServiceImplTest extends BaseMockitoUnitTest {
         SmsSendMessage message = randomPojo(SmsSendMessage.class);
         // mock SmsClientFactory 的方法
         SmsClient smsClient = spy(SmsClient.class);
-        when(smsClientFactory.getSmsClient(eq(message.getChannelId()))).thenReturn(smsClient);
+        when(smsChannelService.getSmsClient(eq(message.getChannelId()))).thenReturn(smsClient);
         // mock SmsClient 的方法
         SmsCommonResult<SmsSendRespDTO> sendResult = randomPojo(SmsCommonResult.class, SmsSendRespDTO.class);
         sendResult.setData(randomPojo(SmsSendRespDTO.class));
@@ -275,7 +271,7 @@ public class SmsSendServiceImplTest extends BaseMockitoUnitTest {
         String text = randomString();
         // mock SmsClientFactory 的方法
         SmsClient smsClient = spy(SmsClient.class);
-        when(smsClientFactory.getSmsClient(eq(channelCode))).thenReturn(smsClient);
+        when(smsChannelService.getSmsClient(eq(channelCode))).thenReturn(smsClient);
         // mock SmsClient 的方法
         List<SmsReceiveRespDTO> receiveResults = randomPojoList(SmsReceiveRespDTO.class);
 
