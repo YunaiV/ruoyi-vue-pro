@@ -26,6 +26,7 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>lock4j-redisson-spring-boot-starter</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
