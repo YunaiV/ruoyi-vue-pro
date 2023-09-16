@@ -233,14 +233,38 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testGetFileClient() {
+        // mock 数据
+        FileConfigDO fileConfig = randomFileConfigDO().setMaster(false);
+        fileConfigMapper.insert(fileConfig);
         // 准备参数
-        Long id = randomLongId();
+        Long id = fileConfig.getId();
         // mock 获得 Client
         FileClient fileClient = new LocalFileClient(id, new LocalFileClientConfig());
         when(fileClientFactory.getFileClient(eq(id))).thenReturn(fileClient);
 
         // 调用，并断言
         assertSame(fileClient, fileConfigService.getFileClient(id));
+        // 断言缓存
+        verify(fileClientFactory).createOrUpdateFileClient(eq(id), eq(fileConfig.getStorage()),
+                eq(fileConfig.getConfig()));
+    }
+
+    @Test
+    public void testGetMasterFileClient() {
+        // mock 数据
+        FileConfigDO fileConfig = randomFileConfigDO().setMaster(true);
+        fileConfigMapper.insert(fileConfig);
+        // 准备参数
+        Long id = fileConfig.getId();
+        // mock 获得 Client
+        FileClient fileClient = new LocalFileClient(id, new LocalFileClientConfig());
+        when(fileClientFactory.getFileClient(eq(0L))).thenReturn(fileClient);
+
+        // 调用，并断言
+        assertSame(fileClient, fileConfigService.getMasterFileClient());
+        // 断言缓存
+        verify(fileClientFactory).createOrUpdateFileClient(eq(0L), eq(fileConfig.getStorage()),
+                eq(fileConfig.getConfig()));
     }
 
     private FileConfigDO randomFileConfigDO() {

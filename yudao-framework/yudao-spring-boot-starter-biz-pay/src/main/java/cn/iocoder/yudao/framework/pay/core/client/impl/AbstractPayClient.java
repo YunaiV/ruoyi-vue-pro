@@ -48,7 +48,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
      */
     public final void init() {
         doInit();
-        log.info("[init][客户端({}) 初始化完成]", getId());
+        log.debug("[init][客户端({}) 初始化完成]", getId());
     }
 
     /**

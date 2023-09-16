@@ -18,6 +18,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.PostConstruct;
@@ -41,6 +42,11 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SENSITIVE_
 @Slf4j
 @Validated
 public class SensitiveWordServiceImpl implements SensitiveWordService {
+
+    /**
+     * 是否开启敏感词功能
+     */
+    private static final Boolean ENABLED = false;
 
     /**
      * 敏感词列表缓存
@@ -75,6 +81,10 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
      */
     @PostConstruct
     public void initLocalCache() {
+        if (!ENABLED) {
+            return;
+        }
+
         // 第一步：查询数据
         List<SensitiveWordDO> sensitiveWords = sensitiveWordMapper.selectList();
         log.info("[initLocalCache][缓存敏感词，数量为:{}]", sensitiveWords.size());
@@ -216,6 +226,9 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
 
     @Override
     public List<String> validateText(String text, List<String> tags) {
+        Assert.isTrue(ENABLED, "敏感词功能未开启，请将 ENABLED 设置为 true");
+
+        // 无标签时，默认所有
         if (CollUtil.isEmpty(tags)) {
             return defaultSensitiveWordTrie.validate(text);
         }
@@ -233,6 +246,9 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
 
     @Override
     public boolean isTextValid(String text, List<String> tags) {
+        Assert.isTrue(ENABLED, "敏感词功能未开启，请将 ENABLED 设置为 true");
+
+        // 无标签时，默认所有
         if (CollUtil.isEmpty(tags)) {
             return defaultSensitiveWordTrie.isValid(text);
         }
