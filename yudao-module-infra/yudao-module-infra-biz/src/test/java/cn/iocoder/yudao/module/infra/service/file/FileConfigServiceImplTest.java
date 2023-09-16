@@ -60,31 +60,6 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
     private FileClientFactory fileClientFactory;
 
     @Test
-    public void testInitLocalCache() {
-        // mock 数据
-        FileConfigDO configDO1 = randomFileConfigDO().setId(1L).setMaster(true);
-        fileConfigMapper.insert(configDO1);
-        FileConfigDO configDO2 = randomFileConfigDO().setId(2L).setMaster(false);
-        fileConfigMapper.insert(configDO2);
-        // mock fileClientFactory 获得 master
-        FileClient masterFileClient = mock(FileClient.class);
-        when(fileClientFactory.getFileClient(eq(1L))).thenReturn(masterFileClient);
-
-        // 调用
-        fileConfigService.initLocalCache();
-        // 断言 fileClientFactory 调用
-        verify(fileClientFactory).createOrUpdateFileClient(eq(1L),
-                eq(configDO1.getStorage()), eq(configDO1.getConfig()));
-        verify(fileClientFactory).createOrUpdateFileClient(eq(2L),
-                eq(configDO2.getStorage()), eq(configDO2.getConfig()));
-        assertSame(masterFileClient, fileConfigService.getMasterFileClient());
-        // 断言 fileConfigCache 缓存
-        assertEquals(2, fileConfigService.getFileConfigCache().size());
-        assertEquals(configDO1, fileConfigService.getFileConfigCache().get(0));
-        assertEquals(configDO2, fileConfigService.getFileConfigCache().get(1));
-    }
-
-    @Test
     public void testCreateFileConfig_success() {
         // 准备参数
         Map<String, Object> config = MapUtil.<String, Object>builder().put("basePath", "/yunai")
@@ -102,6 +77,8 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
         assertFalse(fileConfig.getMaster());
         assertEquals("/yunai", ((LocalFileClientConfig) fileConfig.getConfig()).getBasePath());
         assertEquals("https://www.iocoder.cn", ((LocalFileClientConfig) fileConfig.getConfig()).getDomain());
+        // 验证 cache
+        assertNull(fileConfigService.getClientCache().getIfPresent(fileConfigId));
     }
 
     @Test
@@ -125,6 +102,8 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
         assertPojoEquals(reqVO, fileConfig, "config");
         assertEquals("/yunai2", ((LocalFileClientConfig) fileConfig.getConfig()).getBasePath());
         assertEquals("https://doc.iocoder.cn", ((LocalFileClientConfig) fileConfig.getConfig()).getDomain());
+        // 验证 cache
+        assertNull(fileConfigService.getClientCache().getIfPresent(fileConfig.getId()));
     }
 
     @Test
@@ -149,6 +128,8 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
         // 断言数据
         assertTrue(fileConfigMapper.selectById(dbFileConfig.getId()).getMaster());
         assertFalse(fileConfigMapper.selectById(masterFileConfig.getId()).getMaster());
+        // 验证 cache
+        assertNull(fileConfigService.getClientCache().getIfPresent(0L));
     }
 
     @Test
@@ -169,6 +150,8 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
         fileConfigService.deleteFileConfig(id);
        // 校验数据不存在了
        assertNull(fileConfigMapper.selectById(id));
+        // 验证 cache
+        assertNull(fileConfigService.getClientCache().getIfPresent(id));
     }
 
     @Test

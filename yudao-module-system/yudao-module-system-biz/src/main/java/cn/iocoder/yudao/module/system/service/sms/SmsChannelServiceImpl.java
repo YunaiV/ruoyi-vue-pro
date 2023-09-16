@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.system.service.sms;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.cache.CacheUtils;
 import cn.iocoder.yudao.framework.sms.core.client.SmsClient;
 import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
 import cn.iocoder.yudao.framework.sms.core.property.SmsChannelProperties;
@@ -15,7 +14,6 @@ import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsChannelMapper;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +22,7 @@ import java.time.Duration;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.cache.CacheUtils.buildAsyncReloadingCache;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SMS_CHANNEL_HAS_CHILDREN;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SMS_CHANNEL_NOT_EXISTS;
 
@@ -40,7 +39,7 @@ public class SmsChannelServiceImpl implements SmsChannelService {
      * {@link SmsClient} 缓存，通过它异步刷新 smsClientFactory
      */
     @Getter
-    private final LoadingCache<Long, SmsClient> idClientCache = CacheUtils.buildAsyncReloadingCache(Duration.ofSeconds(10L),
+    private final LoadingCache<Long, SmsClient> idClientCache = buildAsyncReloadingCache(Duration.ofSeconds(10L),
             new CacheLoader<Long, SmsClient>() {
 
                 @Override
@@ -60,7 +59,7 @@ public class SmsChannelServiceImpl implements SmsChannelService {
      * {@link SmsClient} 缓存，通过它异步刷新 smsClientFactory
      */
     @Getter
-    private final LoadingCache<String, SmsClient> codeClientCache = CacheUtils.buildAsyncReloadingCache(Duration.ofSeconds(60L),
+    private final LoadingCache<String, SmsClient> codeClientCache = buildAsyncReloadingCache(Duration.ofSeconds(60L),
             new CacheLoader<String, SmsClient>() {
 
                 @Override
@@ -87,12 +86,8 @@ public class SmsChannelServiceImpl implements SmsChannelService {
 
     @Override
     public Long createSmsChannel(SmsChannelCreateReqVO createReqVO) {
-        // 插入
         SmsChannelDO channel = SmsChannelConvert.INSTANCE.convert(createReqVO);
         smsChannelMapper.insert(channel);
-
-        // 清空缓存
-        clearCache(channel.getId(), null);
         return channel.getId();
     }
 
@@ -127,6 +122,7 @@ public class SmsChannelServiceImpl implements SmsChannelService {
      * 清空指定渠道编号的缓存
      *
      * @param id 渠道编号
+     * @param code 渠道编码
      */
     private void clearCache(Long id, String code) {
         idClientCache.invalidate(id);
