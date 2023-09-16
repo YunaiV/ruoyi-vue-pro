@@ -59,7 +59,6 @@
         <commons-net.version>3.9.0</commons-net.version>
         <jsch.version>0.1.55</jsch.version>
         <tika-core.version>2.7.0</tika-core.version>
-        <netty-all.version>4.1.90.Final</netty-all.version>
         <ip2region.version>2.7.0</ip2region.version>
         <!-- 三方云服务相关 -->
         <okio.version>3.0.0</okio.version>
@@ -343,6 +342,12 @@
                 <groupId>de.codecentric</groupId>
                 <artifactId>spring-boot-admin-starter-server</artifactId> <!-- 实现 Spring Boot Admin Server 服务端 -->
                 <version>${spring-boot-admin.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>de.codecentric</groupId>
+                        <artifactId>spring-boot-admin-server-cloud</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>de.codecentric</groupId>
@@ -523,12 +528,6 @@
                 <groupId>com.jcraft</groupId>
                 <artifactId>jsch</artifactId> <!-- 解决 sftp 连接 -->
                 <version>${jsch.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.netty</groupId>
-                <artifactId>netty-all</artifactId>
-                <version>${netty-all.version}</version>
             </dependency>
 
             <dependency>
