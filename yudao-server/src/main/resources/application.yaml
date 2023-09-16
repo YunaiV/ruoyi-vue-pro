@@ -73,9 +73,13 @@ mybatis-plus:
 #      id-type: ASSIGN_ID # 分配 ID，默认使用雪花算法。注意，Oracle、PostgreSQL、Kingbase、DB2、H2 数据库时，需要去除实体类上的 @KeySequence 注解
       logic-delete-value: 1 # 逻辑已删除值(默认为 1)
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
+    banner: false # 关闭控制台的 Banner 打印
   type-aliases-package: ${yudao.info.base-package}.module.*.dal.dataobject
   encryptor:
     password: XDV71a+xqStEA3WH # 加解密的秘钥，可使用 https://www.imaegoo.com/2020/aes-key-generator/ 网站生成
+
+mybatis-plus-join:
+  banner: false # 关闭控制台的 Banner 打印
 
 # Spring Data Redis 配置
 spring:
@@ -83,7 +87,6 @@ spring:
     redis:
       repositories:
         enabled: false # 项目未使用到 Spring Data Redis 的 Repository，所以直接禁用，保证启动速度
-
 --- #################### 验证码相关配置 ####################
 
 aj:
