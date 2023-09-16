@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.system.api.notify;
 
 import cn.iocoder.yudao.module.system.api.notify.dto.NotifySendSingleToUserReqDTO;
-import cn.iocoder.yudao.module.system.api.notify.dto.NotifyTemplateReqDTO;
 
 import javax.validation.Valid;
 
@@ -28,8 +27,4 @@ public interface NotifyMessageSendApi {
      */
     Long sendSingleMessageToMember(@Valid NotifySendSingleToUserReqDTO reqDTO);
 
-
-    boolean validateNotifyTemplate(String orderDelivery);
-
-    void createNotifyTemplate(NotifyTemplateReqDTO templateReqDTO);
 }

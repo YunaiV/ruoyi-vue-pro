@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.system.api.notify;
 
 import cn.iocoder.yudao.module.system.api.notify.dto.NotifySendSingleToUserReqDTO;
-import cn.iocoder.yudao.module.system.api.notify.dto.NotifyTemplateReqDTO;
 import cn.iocoder.yudao.module.system.service.notify.NotifySendService;
 import org.springframework.stereotype.Service;
 
@@ -28,16 +27,6 @@ public class NotifyMessageSendApiImpl implements NotifyMessageSendApi {
     public Long sendSingleMessageToMember(NotifySendSingleToUserReqDTO reqDTO) {
         return notifySendService.sendSingleNotifyToMember(reqDTO.getUserId(),
                 reqDTO.getTemplateCode(), reqDTO.getTemplateParams());
-    }
-
-    @Override
-    public boolean validateNotifyTemplate(String orderDelivery) {
-        return false;
-    }
-
-    @Override
-    public void createNotifyTemplate(NotifyTemplateReqDTO templateReqDTO) {
-
     }
 
 }
