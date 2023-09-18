@@ -16,6 +16,7 @@ public interface PayWalletRechargeConvert {
 
     PayWalletRechargeDO convert(AppPayWalletRechargeCreateReqVO vo);
 
+    // TODO @jason：好像 price 相加，可以写个表达式的，通过 @Mapping
     default PayWalletRechargeDO convert(Long walletId, AppPayWalletRechargeCreateReqVO vo) {
         PayWalletRechargeDO walletRecharge = convert(vo);
         return walletRecharge.setWalletId(walletId)

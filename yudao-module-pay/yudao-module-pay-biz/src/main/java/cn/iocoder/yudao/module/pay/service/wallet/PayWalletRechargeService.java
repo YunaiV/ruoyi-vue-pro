@@ -11,19 +11,22 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletRechargeDO;
 public interface PayWalletRechargeService {
 
     /**
-     * 创建钱包充值记录
+     * 创建钱包充值记录（发起充值）
+     *
      * @param userId 用户 id
      * @param userType 用户类型
-     * @param vo 钱包充值请求 vo
+     * @param createReqVO 钱包充值请求 VO
      * @return 钱包充值记录
      */
-    PayWalletRechargeDO createWalletRecharge(Long userId, Integer userType, AppPayWalletRechargeCreateReqVO vo);
-
+    PayWalletRechargeDO createWalletRecharge(Long userId, Integer userType,
+                                             AppPayWalletRechargeCreateReqVO createReqVO);
 
     /**
      * 更新钱包充值成功
-     * @param walletRechargeId 钱包充值 id
+     *
+     * @param id 钱包充值记录 id
      * @param payOrderId 支付订单 id
      */
-    void updateWalletRechargerPaid(Long walletRechargeId, Long payOrderId);
+    void updateWalletRechargerPaid(Long id, Long payOrderId);
+
 }

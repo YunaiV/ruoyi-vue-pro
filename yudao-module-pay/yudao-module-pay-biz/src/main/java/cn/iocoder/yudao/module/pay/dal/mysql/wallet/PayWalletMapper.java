@@ -14,6 +14,8 @@ public interface PayWalletMapper extends BaseMapperX<PayWalletDO> {
                 PayWalletDO::getUserType, userType);
     }
 
+    // TODO @jason：下面几个更新方法，把 id 放前面哈。一般来说，重要参数放前面；
+
     /**
      * 当消费退款时候， 更新钱包
      *
@@ -55,6 +57,7 @@ public interface PayWalletMapper extends BaseMapperX<PayWalletDO> {
                 .eq(PayWalletDO::getId, id);
         return update(null, lambdaUpdateWrapper);
     }
+    
 }
 
 
