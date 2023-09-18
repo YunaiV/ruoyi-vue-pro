@@ -18,7 +18,7 @@ public interface MemberSignInConfigMapper extends BaseMapperX<MemberSignInConfig
         return selectOne(MemberSignInConfigDO::getDay, day);
     }
 
-    default List<MemberSignInConfigDO> selectListByStatus(Integer status) {
+    default List <MemberSignInConfigDO> selectListByStatus(Integer status) {
         return selectList(MemberSignInConfigDO::getStatus, status);
     }
 }

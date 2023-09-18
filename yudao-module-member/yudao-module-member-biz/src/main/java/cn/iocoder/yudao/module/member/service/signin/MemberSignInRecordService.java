@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.member.service.signin;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.signin.vo.record.MemberSignInRecordPageReqVO;
+import cn.iocoder.yudao.module.member.controller.app.signin.vo.AppMemberSignInRecordRespVO;
+import cn.iocoder.yudao.module.member.controller.app.signin.vo.AppMemberSignInSummaryRespVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInRecordDO;
 
 /**
@@ -28,5 +30,19 @@ public interface MemberSignInRecordService {
      * @return 签到记录分页
      */
     PageResult<MemberSignInRecordDO> getSignRecordPage(Long userId, PageParam pageParam);
+
+
+    MemberSignInRecordDO create(Long userId);
+
+    /**
+     *
+     *功能描述: 根据用户id获取个人签到信息
+     * @param userId
+     * @return
+     * @author xiaqing
+     * @date 2023-09-15 14:21:01
+     */
+    AppMemberSignInSummaryRespVO getUserSummary(Long userId);
+
 
 }
