@@ -37,27 +37,27 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 public class MemberSignInRecordServiceImpl implements MemberSignInRecordService {
 
     @Resource
-    private MemberSignInRecordMapper memberSignInRecordMapper;
-    @Resource
     private MemberSignInRecordMapper signInRecordMapper;
     @Resource
     private MemberSignInConfigMapper signInConfigMapper;
+
     @Resource
     private MemberUserApi memberUserApi;
 
-
     @Override
-    public AppMemberSignInSummaryRespVO getUserSummary(Long userId) {
+    public AppMemberSignInSummaryRespVO getSignInRecordSummary(Long userId) {
         AppMemberSignInSummaryRespVO vo  = new AppMemberSignInSummaryRespVO();
         vo.setTotalDay(0);
         vo.setContinuousDay(0);
         vo.setTodaySignIn(false);
         //获取用户签到的记录，按照天数倒序获取
         List <MemberSignInRecordDO> signInRecordDOList = signInRecordMapper.selectListByUserId(userId);
+        // TODO @xiaqing：if 空的时候，直接 return；这样括号少，逻辑更简洁；
         if(!CollectionUtils.isEmpty(signInRecordDOList)){
             //设置总签到天数
-            vo.setTotalDay(signInRecordDOList.size());
+            vo.setTotalDay(signInRecordDOList.size()); // TODO @xiaqing：是不是不用读取 signInRecordDOList 所有的，而是 count下，然后另外再读取一条最后一条；
             //判断当天是否有签到复用校验方法
+            // TODO @xiaqing：不要用异常实现逻辑；还是判断哈；
             try {
                 validSignDay(signInRecordDOList.get(0));
                 vo.setTodaySignIn(false);
@@ -69,6 +69,7 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
                 //下方计算连续签到从2天开始，此处直接设置一天连续签到
                 vo.setContinuousDay(1);
                 //判断连续签到天数
+                // TODO @xiaqing：这里逻辑，想想怎么在简化下，可读性可以在提升下哈；
                 for (int i = 1; i < signInRecordDOList.size(); i++) {
                     //前一天减1等于当前天数则说明连续，继续循环
                     LocalDate cur = signInRecordDOList.get(i).getCreateTime().toLocalDate();
@@ -103,47 +104,50 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
             userIds = convertSet(users, MemberUserRespDTO::getId);
         }
         // 分页查询
-        return memberSignInRecordMapper.selectPage(pageReqVO, userIds);
+        return signInRecordMapper.selectPage(pageReqVO, userIds);
     }
 
     @Override
     public PageResult<MemberSignInRecordDO> getSignRecordPage(Long userId, PageParam pageParam) {
-        return memberSignInRecordMapper.selectPage(userId, pageParam);
+        return signInRecordMapper.selectPage(userId, pageParam);
     }
 
     @Override
-    public MemberSignInRecordDO create(Long userId) {
-        //获取当前用户签到的最大天数
+    public MemberSignInRecordDO createSignRecord(Long userId) {
+        // 获取当前用户签到的最大天数
+        // TODO @xiaqing：db 操作，dou封装到 mapper 中；
+        // TODO @xiaqing：maxSignDay，是不是变量叫 lastRecord 会更容易理解哈；
         MemberSignInRecordDO maxSignDay = signInRecordMapper.selectOne(new LambdaQueryWrapperX <MemberSignInRecordDO>()
                 .eq(MemberSignInRecordDO::getUserId, userId)
                 .orderByDesc(MemberSignInRecordDO::getDay)
                 .last("limit 1"));
-        //判断是否重复签到
+        // 判断是否重复签到
         validSignDay(maxSignDay);
 
+        // TODO @xiaqing：可以使用 // 进行注释
         /**1.查询出当前签到的天数**/
-        MemberSignInRecordDO sign = new MemberSignInRecordDO();
-        sign.setUserId(userId);
-        //设置签到初始化天数
-        sign.setDay(1);
-        //设置签到分数默认为0
-        sign.setPoint(0);
-        //如果不为空则修改当前签到对应的天数
+        MemberSignInRecordDO sign = new MemberSignInRecordDO().setUserId(userId); // TODO @xiaqing：应该使用 record 变量，会更合适
+        sign.setDay(1); // 设置签到初始化天数
+        sign.setPoint(0);  // 设置签到分数默认为 0
+        // 如果不为空则修改当前签到对应的天数
+        // TODO @xiaqing：应该是要判断连续哈，就是昨天；
         if (maxSignDay != null) {
             sign.setDay(maxSignDay.getDay() + 1);
         }
         /**2.获取签到对应的分数**/
-        //获取所有的签到规则，按照天数排序，只获取启用的
+        // 获取所有的签到规则，按照天数排序，只获取启用的 TODO @xiaqing：不要使用 signInConfigMapper 直接查询，而是要通过 SigninConfigService；
         List <MemberSignInConfigDO> configDOList = signInConfigMapper.selectList(new LambdaQueryWrapperX <MemberSignInConfigDO>()
                 .eq(MemberSignInConfigDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
                 .orderByAsc(MemberSignInConfigDO::getDay));
-        //如果签到的天数大于最大启用的规则天数，直接给最大签到的分数
+        // 如果签到的天数大于最大启用的规则天数，直接给最大签到的分数
+        // TODO @xiaqing：超过最大配置的天数，应该直接重置到第一天哈；
         MemberSignInConfigDO lastConfig = configDOList.get(configDOList.size() - 1);
         if (sign.getDay() > lastConfig.getDay()) {
             sign.setPoint(lastConfig.getPoint());
         } else {
             configDOList.forEach(el -> {
-                //循环匹配对应天数，设置对应分数
+                // 循环匹配对应天数，设置对应分数
+                // TODO @xiaqing：使用 equals；另外，这种不应该去遍历比较，从可读性来说，应该  CollUtil.findOne()
                 if (el.getDay() == sign.getDay()) {
                     sign.setPoint(el.getPoint());
                 }
@@ -151,18 +155,21 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
             });
         }
 
-        //3.插入当前签到获取的分数
+        // 3. 插入当前签到获取的分数
         signInRecordMapper.insert(sign);
-        //4.返回给用户
         return sign;
     }
 
-    void validSignDay(MemberSignInRecordDO signInRecordDO) {
+    // TODO @xiaqing：校验使用 validate 动词哈；可以改成 validateSigned
+    private void validSignDay(MemberSignInRecordDO signInRecordDO) {
+        // TODO @xiaqing：代码格式：if () {} 要有括号哈
         if (signInRecordDO == null)
             return;
+        // TODO @xiaqing：可以直接使用  DateUtils.isToday()
         LocalDate today = LocalDate.now();
         if (today.equals(signInRecordDO.getCreateTime().toLocalDate())) {
-            throw exception(ErrorCodeConstants.SIGN_IN_RECORD_EXISTS);
+            throw exception(ErrorCodeConstants.SIGN_IN_RECORD_TODAY_EXISTS);
         }
     }
+
 }
