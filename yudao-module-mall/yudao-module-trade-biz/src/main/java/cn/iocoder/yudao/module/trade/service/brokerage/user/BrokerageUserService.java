@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.trade.service.brokerage.user;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.user.vo.BrokerageUserPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.user.BrokerageUserDO;
-import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageUserTypeEnum;
 
+import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -91,10 +93,25 @@ public interface BrokerageUserService {
      * 获得推广用户数量
      *
      * @param bindUserId 绑定的推广员编号
-     * @param userType   用户类型
+     * @param level      推广用户等级
      * @return 推广用户数量
      */
-    Long getBrokerageUserCountByBindUserId(Long bindUserId, BrokerageUserTypeEnum userType);
+    Long getBrokerageUserCountByBindUserId(Long bindUserId, Integer level);
+
+    /**
+     * 【会员】绑定推广员
+     *
+     * @param userId       用户编号
+     * @param bindUserId   推广员编号
+     * @param registerTime 用户注册时间
+     * @return 是否绑定
+     */
+    default boolean bindBrokerageUser(@NotNull Long userId, @NotNull Long bindUserId, @NotNull LocalDateTime registerTime) {
+        // 注册时间在30秒内的，都算新用户
+        boolean isNewUser = LocalDateTimeUtils.afterNow(registerTime.minusSeconds(30));
+        return bindBrokerageUser(userId, bindUserId, isNewUser);
+    }
+
 
     /**
      * 【会员】绑定推广员

@@ -100,6 +100,13 @@ public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
         return betweenIfPresent(column, val1, val2);
     }
 
+    public LambdaQueryWrapperX<T> findInSetIfPresent(SFunction<T, ?> column, Object val) {
+        if (val != null) {
+            return (LambdaQueryWrapperX<T>) super.apply("FIND_IN_SET({0}, " + columnToString(column) + ")", val);
+        }
+        return this;
+    }
+
     // ========== 重写父类方法，方便链式调用 ==========
 
     @Override

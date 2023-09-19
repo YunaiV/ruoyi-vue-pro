@@ -15,7 +15,6 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.record.BrokerageRecordMapper;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
-import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageUserTypeEnum;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
 import cn.iocoder.yudao.module.trade.service.brokerage.user.BrokerageUserService;
@@ -29,6 +28,7 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 佣金记录 Service 实现类
@@ -74,7 +74,7 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
         }
         // 1.2 计算一级分佣
         addBrokerage(firstUser, list, memberConfig.getBrokerageFrozenDays(), memberConfig.getBrokerageFirstPercent(),
-                bizType, BrokerageUserTypeEnum.FIRST);
+                bizType, 1);
 
         // 2.1 获得二级推广员
         if (firstUser.getBindUserId() == null) {
@@ -86,7 +86,7 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
         }
         // 2.2 计算二级分佣
         addBrokerage(secondUser, list, memberConfig.getBrokerageFrozenDays(), memberConfig.getBrokerageSecondPercent(),
-                bizType, BrokerageUserTypeEnum.SECOND);
+                bizType, 2);
     }
 
     @Override
@@ -142,10 +142,10 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
      * @param brokerageFrozenDays 冻结天数
      * @param brokeragePercent    佣金比例
      * @param bizType             业务类型
-     * @param sourceUserType      来源用户类型
+     * @param sourceUserLevel     来源用户等级
      */
     private void addBrokerage(BrokerageUserDO user, List<BrokerageAddReqBO> list, Integer brokerageFrozenDays,
-                              Integer brokeragePercent, BrokerageRecordBizTypeEnum bizType, BrokerageUserTypeEnum sourceUserType) {
+                              Integer brokeragePercent, BrokerageRecordBizTypeEnum bizType, Integer sourceUserLevel) {
         // 1.1 处理冻结时间
         LocalDateTime unfreezeTime = null;
         if (brokerageFrozenDays != null && brokerageFrozenDays > 0) {
@@ -157,12 +157,12 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
         for (BrokerageAddReqBO item : list) {
             // 计算金额
             Integer fixedPrice;
-            if (BrokerageUserTypeEnum.FIRST.equals(sourceUserType)) {
+            if (Objects.equals(sourceUserLevel, 1)) {
                 fixedPrice = item.getFirstFixedPrice();
-            } else if (BrokerageUserTypeEnum.SECOND.equals(sourceUserType)) {
+            } else if (Objects.equals(sourceUserLevel, 2)) {
                 fixedPrice = item.getSecondFixedPrice();
             } else {
-                throw new IllegalArgumentException(StrUtil.format("来源用户({}) 不合法", sourceUserType));
+                throw new IllegalArgumentException(StrUtil.format("用户等级({}) 不合法", sourceUserLevel));
             }
             int brokeragePrice = calculatePrice(item.getBasePrice(), brokeragePercent, fixedPrice);
             if (brokeragePrice <= 0) {
@@ -172,7 +172,7 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
             // 创建记录实体
             records.add(BrokerageRecordConvert.INSTANCE.convert(user, bizType, item.getBizId(),
                     brokerageFrozenDays, brokeragePrice, unfreezeTime, item.getTitle(),
-                    item.getSourceUserId(), sourceUserType.getType()));
+                    item.getSourceUserId(), sourceUserLevel));
         }
         if (CollUtil.isEmpty(records)) {
             return;

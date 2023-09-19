@@ -57,8 +57,8 @@ public class BrokerageRecordBaseVO {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime unfreezeTime;
 
-    @Schema(description = "来源用户类型")
-    private Integer sourceUserType;
+    @Schema(description = "来源用户等级")
+    private Integer sourceUserLevel;
 
     @Schema(description = "来源用户编号")
     private Long sourceUserId;
