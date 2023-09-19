@@ -64,14 +64,14 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 
     @Override
     public ${table.className}DO get${simpleClassName}(${primaryColumn.javaType} id) {
-        if (CollUtil.isEmpty(ids)) {
-            return ListUtil.empty();
-        }
         return ${classNameVar}Mapper.selectById(id);
     }
 
     @Override
     public List<${table.className}DO> get${simpleClassName}List(Collection<${primaryColumn.javaType}> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return ListUtil.empty();
+        }
         return ${classNameVar}Mapper.selectBatchIds(ids);
     }
 
