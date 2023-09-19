@@ -63,19 +63,22 @@ public interface BargainActivityService {
      */
     PageResult<BargainActivityDO> getBargainActivityPage(BargainActivityPageReqVO pageReqVO);
 
+    // TODO @puhui999：这里可以改成进行中的活动；尽量避免专门为 app 定制，或者类似的名字哈；mapper 那也是
+
     /**
      * 获取 APP 端活动分页数据
      *
      * @param pageReqVO 分页请求
      * @return 砍价活动分页
      */
-    PageResult<BargainActivityDO> getBargainActivityAppPage(PageParam pageReqVO);
+    PageResult<BargainActivityDO> getBargainActivityPageForApp(PageParam pageReqVO);
 
     /**
      * 获取 APP 端活动展示数据
      *
      * @param count 需要的数量
-     * @return
+     * @return 砍价活动分页
      */
-    List<BargainActivityDO> getBargainActivityAppList(Integer count);
+    List<BargainActivityDO> getBargainActivityListForApp(Integer count);
+
 }

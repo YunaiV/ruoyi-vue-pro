@@ -42,9 +42,11 @@ public interface BargainActivityConvert {
 
     default PageResult<BargainActivityRespVO> convertPage(PageResult<BargainActivityDO> page, List<ProductSpuRespDTO> spuList) {
         PageResult<BargainActivityRespVO> result = convertPage(page);
+        // 拼接关联属性
         Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
         List<BargainActivityRespVO> list = CollectionUtils.convertList(result.getList(), item -> {
             findAndThen(spuMap, item.getSpuId(), spu -> {
+                // TODO @puhui999：这里可以使用链式哈
                 item.setPicUrl(spu.getPicUrl());
                 item.setSpuName(spu.getName());
             });
@@ -56,7 +58,7 @@ public interface BargainActivityConvert {
 
     AppBargainActivityDetailRespVO convert1(BargainActivityDO bean);
 
-    default AppBargainActivityDetailRespVO convert1(BargainActivityDO bean, ProductSpuRespDTO spu) {
+    default AppBargainActivityDetailRespVO convert(BargainActivityDO bean, ProductSpuRespDTO spu) {
         AppBargainActivityDetailRespVO detail = convert1(bean);
         if (spu != null) {
             detail.setPicUrl(spu.getPicUrl());
@@ -70,9 +72,11 @@ public interface BargainActivityConvert {
 
     default PageResult<AppBargainActivityRespVO> convertAppPage(PageResult<BargainActivityDO> page, List<ProductSpuRespDTO> spuList) {
         PageResult<AppBargainActivityRespVO> result = convertAppPage(page);
+        // 拼接关联属性
         Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
         List<AppBargainActivityRespVO> list = CollectionUtils.convertList(result.getList(), item -> {
             findAndThen(spuMap, item.getSpuId(), spu -> {
+                // TODO @puhui999：这里可以使用链式哈
                 item.setPicUrl(spu.getPicUrl());
                 item.setMarketPrice(spu.getMarketPrice());
             });
@@ -89,6 +93,7 @@ public interface BargainActivityConvert {
         Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
         return CollectionUtils.convertList(activityList, item -> {
             findAndThen(spuMap, item.getSpuId(), spu -> {
+                // TODO @puhui999：这里可以使用链式哈
                 item.setPicUrl(spu.getPicUrl());
                 item.setMarketPrice(spu.getMarketPrice());
             });

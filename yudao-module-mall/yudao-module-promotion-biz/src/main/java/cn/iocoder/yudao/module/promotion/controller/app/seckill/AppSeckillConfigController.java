@@ -32,19 +32,12 @@ public class AppSeckillConfigController {
     @Operation(summary = "获得秒杀时间段列表")
     public CommonResult<List<AppSeckillConfigRespVO>> getSeckillConfigList() {
         List<SeckillConfigDO> list = configService.getSeckillConfigListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        // TODO @puhui999：如果这种，不用判空也问题不大；
         if (CollectionUtil.isEmpty(list)) {
             return success(Collections.emptyList());
         }
 
         return success(SeckillConfigConvert.INSTANCE.convertList2(list));
-        //return success(Arrays.asList(
-        //        new AppSeckillConfigRespVO().setId(1L).setStartTime("00:00").setEndTime("09:59")
-        //                .setSliderPicUrls(Arrays.asList("https://static.iocoder.cn/mall/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg",
-        //                        "https://static.iocoder.cn/mall/132.jpeg")),
-        //        new AppSeckillConfigRespVO().setId(2L).setStartTime("10:00").setEndTime("12:59"),
-        //        new AppSeckillConfigRespVO().setId(2L).setStartTime("13:00").setEndTime("22:59"),
-        //        new AppSeckillConfigRespVO().setId(2L).setStartTime("23:00").setEndTime("23:59")
-        //));
     }
 
 }

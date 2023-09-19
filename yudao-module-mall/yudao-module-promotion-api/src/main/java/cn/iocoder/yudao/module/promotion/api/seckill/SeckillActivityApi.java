@@ -7,6 +7,7 @@ package cn.iocoder.yudao.module.promotion.api.seckill;
  */
 public interface SeckillActivityApi {
 
+    // TODO @puhui999：activityId 改成 id 好点哈；
     /**
      * 更新秒杀库存
      *

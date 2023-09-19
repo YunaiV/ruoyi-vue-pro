@@ -74,6 +74,7 @@ public interface CombinationActivityService {
 
     /**
      * 校验是否满足拼团条件
+     * 如果不满足，会抛出异常
      *
      * @param activityId 活动编号
      * @param userId     用户编号
