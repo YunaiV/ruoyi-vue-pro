@@ -88,4 +88,9 @@ public interface ErrorCodeConstants {
     ErrorCode BROKERAGE_BIND_OVERRIDE = new ErrorCode(1011007006, "已绑定了推广人");
     ErrorCode BROKERAGE_BIND_LOOP = new ErrorCode(1011007007, "下级不能绑定自己的上级");
 
+
+    // ========== 分销提现 模块 1011008000 ==========
+    ErrorCode BROKERAGE_WITHDRAW_NOT_EXISTS = new ErrorCode(1011008000, "佣金提现记录不存在");
+    ErrorCode BROKERAGE_WITHDRAW_STATUS_NOT_AUDITING = new ErrorCode(1011008001, "佣金提现记录状态不是审核中");
+
 }
