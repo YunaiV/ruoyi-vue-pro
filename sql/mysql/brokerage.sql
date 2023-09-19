@@ -148,12 +148,12 @@ values ('brokerage_record_status', '待结算', 0, 0),
 
 insert into system_dict_type(type, name)
 values ('brokerage_withdraw_status', '佣金提现状态');
-insert into system_dict_data(dict_type, label, value, sort)
-values ('brokerage_withdraw_status', '审核中', 0, 0),
-       ('brokerage_withdraw_status', '审核通过', 10, 10),
-       ('brokerage_withdraw_status', '提现成功', 11, 11),
-       ('brokerage_withdraw_status', '审核不通过', 20, 20),
-       ('brokerage_withdraw_status', '提现失败', 21, 21);
+insert into system_dict_data(dict_type, label, value, sort, color_type)
+values ('brokerage_withdraw_status', '审核中', 0, 0, ''),
+       ('brokerage_withdraw_status', '审核通过', 10, 10, 'success'),
+       ('brokerage_withdraw_status', '提现成功', 11, 11, 'success'),
+       ('brokerage_withdraw_status', '审核不通过', 20, 20, 'danger'),
+       ('brokerage_withdraw_status', '提现失败', 21, 21, 'danger');
 
 insert into system_dict_type(type, name)
 values ('brokerage_bank_name', '佣金提现银行');
@@ -230,3 +230,9 @@ INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, com
 VALUES ('佣金提现查询', 'trade:brokerage-withdraw:query', 3, 1, @parentId, '', '', '', 0);
 INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
 VALUES ('佣金提现审核', 'trade:brokerage-withdraw:audit', 3, 2, @parentId, '', '', '', 0);
+
+-- 站内信模板
+INSERT INTO `ruoyi-vue-pro`.system_notify_template (name, code, nickname, content, type, params, status)
+VALUES
+    ('佣金提现（审核通过）', 'brokerage_withdraw_audit_approve', 'system', '您在{createTime}提现￥{price}元的申请已通过审核', 2, '["createTime","price"]', 0),
+    ('佣金提现（审核不通过）', 'brokerage_withdraw_audit_reject', 'system', '您在{createTime}提现￥{price}元的申请未通过审核，原因：{reason}', 2, '["createTime","price","reason"]', 0);
