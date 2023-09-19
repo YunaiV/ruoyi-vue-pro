@@ -33,4 +33,5 @@ public interface BrokerageWithdrawMapper extends BaseMapperX<BrokerageWithdrawDO
                 .eq(BrokerageWithdrawDO::getId, id)
                 .eq(BrokerageWithdrawDO::getStatus, status));
     }
+
 }

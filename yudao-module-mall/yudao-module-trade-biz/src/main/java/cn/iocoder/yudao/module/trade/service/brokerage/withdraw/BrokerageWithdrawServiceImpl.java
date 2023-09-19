@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.trade.service.brokerage.withdraw;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.api.notify.NotifyMessageSendApi;
 import cn.iocoder.yudao.module.system.api.notify.dto.NotifySendSingleToUserReqDTO;
@@ -19,8 +18,6 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -48,15 +45,14 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void auditBrokerageWithdraw(Integer id, BrokerageWithdrawStatusEnum status, String auditReason) {
-
-        // 校验存在
-        BrokerageWithdrawDO withdrawDO = validateBrokerageWithdrawExists(id);
-        // 校验状态为审核中
-        if (!BrokerageWithdrawStatusEnum.AUDITING.getStatus().equals(withdrawDO.getStatus())) {
+        // 1.1 校验存在
+        BrokerageWithdrawDO withdraw = validateBrokerageWithdrawExists(id);
+        // 1.2 校验状态为审核中
+        if (ObjectUtil.notEqual(BrokerageWithdrawStatusEnum.AUDITING.getStatus(), withdraw.getStatus())) {
             throw exception(BROKERAGE_WITHDRAW_STATUS_NOT_AUDITING);
         }
 
-        // 更新
+        // 2. 更新
         BrokerageWithdrawDO updateObj = new BrokerageWithdrawDO()
                 .setStatus(status.getStatus())
                 .setAuditReason(auditReason)
@@ -66,46 +62,38 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
             throw exception(BROKERAGE_WITHDRAW_STATUS_NOT_AUDITING);
         }
 
-        // 驳回时需要退还用户佣金
+        // 3. 驳回时需要退还用户佣金
         String templateCode = MessageTemplateConstants.BROKERAGE_WITHDRAW_AUDIT_APPROVE;
         if (BrokerageWithdrawStatusEnum.AUDIT_FAIL.equals(status)) {
             templateCode = MessageTemplateConstants.BROKERAGE_WITHDRAW_AUDIT_REJECT;
 
             // todo @owen
-//            brokerageRecordService.addBrokerage(withdrawDO.getUserId(), BrokerageRecordBizTypeEnum.WITHDRAW, withdrawDO.getPrice(), "");
+//            brokerageRecordService.addBrokerage(withdraw.getUserId(), BrokerageRecordBizTypeEnum.WITHDRAW, withdraw.getPrice(), "");
         }
 
-        // 通知用户
+        // 4. 通知用户
         Map<String, Object> templateParams = MapUtil.<String, Object>builder()
-                .put("createTime", LocalDateTimeUtil.formatNormal(withdrawDO.getCreateTime()))
-                .put("price", String.format("%.2f", withdrawDO.getPrice() / 100d))
-                .put("reason", withdrawDO.getAuditReason())
+                .put("createTime", LocalDateTimeUtil.formatNormal(withdraw.getCreateTime()))
+                .put("price", String.format("%.2f", withdraw.getPrice() / 100d))
+                .put("reason", withdraw.getAuditReason())
                 .build();
         NotifySendSingleToUserReqDTO reqDTO = new NotifySendSingleToUserReqDTO()
-                .setUserId(withdrawDO.getUserId())
+                .setUserId(withdraw.getUserId())
                 .setTemplateCode(templateCode).setTemplateParams(templateParams);
         notifyMessageSendApi.sendSingleMessageToMember(reqDTO);
     }
 
     private BrokerageWithdrawDO validateBrokerageWithdrawExists(Integer id) {
-        BrokerageWithdrawDO withdrawDO = brokerageWithdrawMapper.selectById(id);
-        if (withdrawDO == null) {
+        BrokerageWithdrawDO withdraw = brokerageWithdrawMapper.selectById(id);
+        if (withdraw == null) {
             throw exception(BROKERAGE_WITHDRAW_NOT_EXISTS);
         }
-        return withdrawDO;
+        return withdraw;
     }
 
     @Override
     public BrokerageWithdrawDO getBrokerageWithdraw(Integer id) {
         return brokerageWithdrawMapper.selectById(id);
-    }
-
-    @Override
-    public List<BrokerageWithdrawDO> getBrokerageWithdrawList(Collection<Integer> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return ListUtil.empty();
-        }
-        return brokerageWithdrawMapper.selectBatchIds(ids);
     }
 
     @Override

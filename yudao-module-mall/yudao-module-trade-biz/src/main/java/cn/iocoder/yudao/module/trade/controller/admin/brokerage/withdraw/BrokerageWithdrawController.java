@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
-import cn.iocoder.yudao.module.trade.controller.admin.brokerage.withdraw.vo.BrokerageWithdrawAuditReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.brokerage.withdraw.vo.BrokerageWithdrawRejectReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.withdraw.vo.BrokerageWithdrawPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.withdraw.vo.BrokerageWithdrawRespVO;
 import cn.iocoder.yudao.module.trade.convert.brokerage.withdraw.BrokerageWithdrawConvert;
@@ -20,9 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-
 import java.util.Map;
-import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -40,7 +38,7 @@ public class BrokerageWithdrawController {
     private MemberUserApi memberUserApi;
 
     @PutMapping("/approve")
-    @Operation(summary = "佣金提现 - 通过申请")
+    @Operation(summary = "通过申请")
     @PreAuthorize("@ss.hasPermission('trade:brokerage-withdraw:audit')")
     public CommonResult<Boolean> approveBrokerageWithdraw(@RequestParam("id") Integer id) {
         brokerageWithdrawService.auditBrokerageWithdraw(id, BrokerageWithdrawStatusEnum.AUDIT_SUCCESS, "");
@@ -48,9 +46,9 @@ public class BrokerageWithdrawController {
     }
 
     @PutMapping("/reject")
-    @Operation(summary = "审核佣金提现 - 驳回申请")
+    @Operation(summary = "驳回申请")
     @PreAuthorize("@ss.hasPermission('trade:brokerage-withdraw:audit')")
-    public CommonResult<Boolean> rejectBrokerageWithdraw(@Valid @RequestBody BrokerageWithdrawAuditReqVO reqVO) {
+    public CommonResult<Boolean> rejectBrokerageWithdraw(@Valid @RequestBody BrokerageWithdrawRejectReqVO reqVO) {
         brokerageWithdrawService.auditBrokerageWithdraw(reqVO.getId(), BrokerageWithdrawStatusEnum.AUDIT_FAIL, reqVO.getAuditReason());
         return success(true);
     }
@@ -71,11 +69,9 @@ public class BrokerageWithdrawController {
         // 分页查询
         PageResult<BrokerageWithdrawDO> pageResult = brokerageWithdrawService.getBrokerageWithdrawPage(pageVO);
 
-        // 涉及到的用户
-        Set<Long> userIds = convertSet(pageResult.getList(), BrokerageWithdrawDO::getUserId);
-        // 查询用户信息
-        Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(userIds);
-
+        // 拼接信息
+        Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(
+                convertSet(pageResult.getList(), BrokerageWithdrawDO::getUserId));
         return success(BrokerageWithdrawConvert.INSTANCE.convertPage(pageResult, userMap));
     }
 

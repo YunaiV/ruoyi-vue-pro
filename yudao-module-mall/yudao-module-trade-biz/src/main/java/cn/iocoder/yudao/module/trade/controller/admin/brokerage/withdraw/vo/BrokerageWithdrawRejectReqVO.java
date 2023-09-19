@@ -7,10 +7,10 @@ import lombok.ToString;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-@Schema(description = "管理后台 - 佣金提现审核 Request VO")
+@Schema(description = "管理后台 - 驳回申请 Request VO")
 @Data
 @ToString(callSuper = true)
-public class BrokerageWithdrawAuditReqVO {
+public class BrokerageWithdrawRejectReqVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "7161")
     @NotNull(message = "编号不能为空")

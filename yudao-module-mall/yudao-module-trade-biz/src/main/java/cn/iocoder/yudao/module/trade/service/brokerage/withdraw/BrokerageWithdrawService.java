@@ -5,9 +5,6 @@ import cn.iocoder.yudao.module.trade.controller.admin.brokerage.withdraw.vo.Brok
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.withdraw.BrokerageWithdrawDO;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum;
 
-import java.util.Collection;
-import java.util.List;
-
 /**
  * 佣金提现 Service 接口
  *
@@ -32,14 +29,6 @@ public interface BrokerageWithdrawService {
      * @return 佣金提现
      */
     BrokerageWithdrawDO getBrokerageWithdraw(Integer id);
-
-    /**
-     * 获得佣金提现列表
-     *
-     * @param ids 编号
-     * @return 佣金提现列表
-     */
-    List<BrokerageWithdrawDO> getBrokerageWithdrawList(Collection<Integer> ids);
 
     /**
      * 获得佣金提现分页

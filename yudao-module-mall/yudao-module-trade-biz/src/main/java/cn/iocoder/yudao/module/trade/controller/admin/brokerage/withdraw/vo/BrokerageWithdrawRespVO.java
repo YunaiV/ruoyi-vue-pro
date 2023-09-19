@@ -19,7 +19,7 @@ public class BrokerageWithdrawRespVO extends BrokerageWithdrawBaseVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
-    @Schema(description = "用户昵称")
+    @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
     private String userNickname;
 
 }

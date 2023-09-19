@@ -32,18 +32,21 @@ public class BrokerageWithdrawDO extends BaseDO {
     private Integer id;
     /**
      * 用户编号
+     *
+     * 关联 MemberUserDO 的 id 字段
      */
     private Long userId;
+
     /**
-     * 提现金额
+     * 提现金额，单位：分
      */
     private Integer price;
     /**
-     * 提现手续费
+     * 提现手续费，单位：分
      */
     private Integer feePrice;
     /**
-     * 当前总佣金
+     * 当前总佣金，单位：分
      */
     private Integer totalPrice;
     /**
@@ -52,6 +55,7 @@ public class BrokerageWithdrawDO extends BaseDO {
      * 枚举 {@link BrokerageWithdrawTypeEnum}
      */
     private Integer type;
+
     /**
      * 真实姓名
      */
