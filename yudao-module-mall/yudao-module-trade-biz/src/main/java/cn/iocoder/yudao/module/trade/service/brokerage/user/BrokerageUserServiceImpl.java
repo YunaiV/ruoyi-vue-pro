@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.trade.service.brokerage.user;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.BooleanUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.user.vo.BrokerageUserPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.user.BrokerageUserDO;
@@ -9,17 +12,13 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.user.BrokerageUserMapper;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageBindModeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageEnabledConditionEnum;
-import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageUserTypeEnum;
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
@@ -51,7 +50,8 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
 
     @Override
     public PageResult<BrokerageUserDO> getBrokerageUserPage(BrokerageUserPageReqVO pageReqVO) {
-        return brokerageUserMapper.selectPage(pageReqVO);
+        List<Integer> levels = buildUserQueryLevels(pageReqVO.getBindUserId(), pageReqVO.getLevel());
+        return brokerageUserMapper.selectPage(pageReqVO, levels);
     }
 
     @Override
@@ -66,10 +66,14 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
             return;
         }
 
+        // 绑定关系未发生变化
+        if (Objects.equals(brokerageUser.getBindUserId(), bindUserId)) {
+            return;
+        }
+
         // 情况二：修改推广员
         validateCanBindUser(brokerageUser, bindUserId);
-        brokerageUserMapper.updateById(new BrokerageUserDO().setId(id)
-                .setBindUserId(bindUserId).setBindUserTime(LocalDateTime.now()));
+        brokerageUserMapper.updateById(fillBindUserData(bindUserId, new BrokerageUserDO().setId(id)));
     }
 
     @Override
@@ -132,19 +136,12 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     }
 
     @Override
-    public Long getBrokerageUserCountByBindUserId(Long bindUserId, BrokerageUserTypeEnum userType) {
-        switch (userType) {
-            case ALL: // TODO @疯狂：ALL 是不是不用搞个枚举，默认为空就是不过滤哈~
-                Long firstCount = brokerageUserMapper.selectCountByBindUserId(bindUserId);
-                Long secondCount = brokerageUserMapper.selectCountByBindUserIdInBindUserId(bindUserId);
-                return firstCount + secondCount;
-            case FIRST:
-                return brokerageUserMapper.selectCountByBindUserId(bindUserId);
-            case SECOND:
-                return brokerageUserMapper.selectCountByBindUserIdInBindUserId(bindUserId);
-            default:
-                return 0L;
+    public Long getBrokerageUserCountByBindUserId(Long bindUserId, Integer level) {
+        List<Integer> levels = buildUserQueryLevels(bindUserId, level);
+        if (CollUtil.isEmpty(levels)) {
+            return 0L;
         }
+        return brokerageUserMapper.selectCountByBindUserIdAndLevelIn(bindUserId, levels);
     }
 
     @Override
@@ -171,12 +168,28 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
                 brokerageUser.setBrokerageEnabled(true).setBrokerageTime(LocalDateTime.now());
             }
             brokerageUser.setBindUserId(bindUserId).setBindUserTime(LocalDateTime.now());
-            brokerageUserMapper.insert(brokerageUser);
+            brokerageUserMapper.insert(fillBindUserData(bindUserId, brokerageUser));
         } else {
-            brokerageUserMapper.updateById(new BrokerageUserDO().setId(userId)
-                    .setBindUserId(bindUserId).setBindUserTime(LocalDateTime.now()));
+            brokerageUserMapper.updateById(fillBindUserData(bindUserId, new BrokerageUserDO().setId(userId)));
         }
         return true;
+    }
+
+    private BrokerageUserDO fillBindUserData(Long bindUserId, BrokerageUserDO brokerageUser) {
+        BrokerageUserDO bindUser = getBrokerageUser(bindUserId);
+
+        Integer bindUserLevel = 0;
+        String bindUserPath = "";
+        if (bindUser != null) {
+            bindUserLevel = ObjectUtil.defaultIfNull(bindUser.getLevel(), 0);
+            bindUserPath = bindUser.getPath();
+        }
+
+        String path = StrUtil.isEmpty(bindUserPath)
+                ? String.valueOf(bindUserId)
+                : String.format("%s,%s", bindUserPath, bindUserId);
+        return brokerageUser.setBindUserId(bindUserId).setBindUserTime(LocalDateTime.now())
+                .setLevel(bindUserLevel + 1).setPath(path);
     }
 
     @Override
@@ -231,11 +244,29 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
             throw exception(BROKERAGE_BIND_SELF);
         }
 
-        // TODO @疯狂：这块是不是一直查询到根节点，中间不允许出现自己；就是不能形成环。虽然目前是 2 级，但是未来可能会改多级； = = 环的话，就会存在问题哈
-        // A->B->A：下级不能绑定自己的上级,   A->B->C->A可以!!
-        if (Objects.equals(user.getId(), bindUser.getBindUserId())) {
+        // 下级不能绑定自己的上级
+        if (StrUtil.split(bindUser.getPath(), ",").contains(String.valueOf(user.getId()))) {
             throw exception(BROKERAGE_BIND_LOOP);
         }
+    }
+
+    private List<Integer> buildUserQueryLevels(Long bindUserId, Integer level) {
+        List<Integer> levels = new ArrayList<>(2);
+
+        BrokerageUserDO bindUser = getBrokerageUser(bindUserId);
+        if (bindUser == null) {
+            return levels;
+        }
+
+        if (level == null) {
+            // 默认查两层
+            levels.add(bindUser.getLevel() + 1);
+            levels.add(bindUser.getLevel() + 2);
+        } else {
+            levels.add(bindUser.getLevel() + level);
+        }
+        return levels;
+
     }
 
 }

@@ -1,17 +1,15 @@
 package cn.iocoder.yudao.module.trade.dal.mysql.brokerage.user;
 
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.user.vo.BrokerageUserPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.user.BrokerageUserDO;
-import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageUserTypeEnum;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 /**
  * 分销用户 Mapper
@@ -21,33 +19,14 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
 
-    default PageResult<BrokerageUserDO> selectPage(BrokerageUserPageReqVO reqVO) {
+    default PageResult<BrokerageUserDO> selectPage(BrokerageUserPageReqVO reqVO, List<Integer> levels) {
         return selectPage(reqVO, new LambdaQueryWrapperX<BrokerageUserDO>()
                 .eqIfPresent(BrokerageUserDO::getBrokerageEnabled, reqVO.getBrokerageEnabled())
                 .betweenIfPresent(BrokerageUserDO::getCreateTime, reqVO.getCreateTime())
                 .betweenIfPresent(BrokerageUserDO::getBindUserTime, reqVO.getBindUserTime())
-                .and(reqVO.getBindUserId() != null, w -> buildBindUserCondition(reqVO, w))
+                .findInSetIfPresent(BrokerageUserDO::getPath, reqVO.getBindUserId())
+                .inIfPresent(BrokerageUserDO::getLevel, levels)
                 .orderByDesc(BrokerageUserDO::getId));
-    }
-
-    static void buildBindUserCondition(BrokerageUserPageReqVO reqVO, LambdaQueryWrapper<BrokerageUserDO> wrapper) {
-        if (BrokerageUserTypeEnum.FIRST.getType().equals(reqVO.getUserType())) {
-            buildFirstBindUserCondition(reqVO.getBindUserId(), wrapper);
-        } else if (BrokerageUserTypeEnum.SECOND.getType().equals(reqVO.getUserType())) {
-            buildSecondBindUserCondition(reqVO.getBindUserId(), wrapper);
-        } else {
-            // TODO @疯狂：要不要把这个逻辑，挪到 Service 里，算出子用户有哪些，然后 IN？
-            buildFirstBindUserCondition(reqVO.getBindUserId(), wrapper);
-            buildSecondBindUserCondition(reqVO.getBindUserId(), wrapper.or()); // 通过 or 实现多个条件
-        }
-    }
-
-    static void buildFirstBindUserCondition(Long bindUserId, LambdaQueryWrapper<BrokerageUserDO> wrapper) {
-        wrapper.eq(BrokerageUserDO::getBindUserId, bindUserId);
-    }
-
-    static void buildSecondBindUserCondition(Long bindUserId, LambdaQueryWrapper<BrokerageUserDO> wrapper) {
-        wrapper.inSql(BrokerageUserDO::getBindUserId, StrUtil.format("SELECT id FROM trade_brokerage_user WHERE bind_user_id = {}", bindUserId));
     }
 
     /**
@@ -128,7 +107,8 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
     default void updateBindUserIdAndBindUserTimeToNull(Long id) {
         update(null, new LambdaUpdateWrapper<BrokerageUserDO>()
                 .eq(BrokerageUserDO::getId, id)
-                .set(BrokerageUserDO::getBindUserId, null).set(BrokerageUserDO::getBindUserTime, null));
+                .set(BrokerageUserDO::getBindUserId, null).set(BrokerageUserDO::getBindUserTime, null)
+                .set(BrokerageUserDO::getLevel, 1).set(BrokerageUserDO::getPath, ""));
     }
 
     default void updateEnabledFalseAndBrokerageTimeToNull(Long id) {
@@ -137,11 +117,10 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
                 .set(BrokerageUserDO::getBrokerageEnabled, false).set(BrokerageUserDO::getBrokerageTime, null));
     }
 
-    default Long selectCountByBindUserId(Long bindUserId) {
-        return selectCount(BrokerageUserDO::getBindUserId, bindUserId);
+    default Long selectCountByBindUserIdAndLevelIn(Long bindUserId, List<Integer> levels) {
+        return selectCount(new LambdaQueryWrapperX<BrokerageUserDO>()
+                .findInSetIfPresent(BrokerageUserDO::getPath, bindUserId)
+                .inIfPresent(BrokerageUserDO::getLevel, levels));
     }
-
-    @Select("SELECT COUNT(1) from trade_brokerage_user WHERE bind_user_id IN (SELECT id FROM trade_brokerage_user WHERE bind_user_id = #{bindUserId})")
-    Long selectCountByBindUserIdInBindUserId(Long bindUserId);
 
 }

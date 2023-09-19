@@ -2,41 +2,50 @@
 create table trade_config
 (
     id                           bigint auto_increment comment '自增主键' primary key,
-    brokerage_enabled            bit                                    default 1                 not null comment '是否启用分佣',
-    brokerage_enabled_condition  tinyint                                default 0                 not null comment '分佣模式：1-人人分销 2-指定分销',
-    brokerage_bind_mode          tinyint                                default 0                 not null comment '分销关系绑定模式: 1-没有推广人，2-新用户, 3-扫码覆盖',
-    brokerage_post_urls          varchar(2000)                          default ''                null comment '分销海报图地址数组',
-    brokerage_first_percent      int                                    default 0                 not null comment '一级返佣比例',
-    brokerage_second_percent     int                                    default 0                 not null comment '二级返佣比例',
-    brokerage_withdraw_min_price int                                    default 0                 not null comment '用户提现最低金额',
-    brokerage_bank_names         varchar(200)                           default ''                not null comment '提现银行（字典类型=brokerage_bank_name）',
-    brokerage_frozen_days        int                                    default 7                 not null comment '佣金冻结时间(天)',
-    brokerage_withdraw_type      varchar(32)                            default '1,2,3,4'         not null comment '提现方式：1-钱包；2-银行卡；3-微信；4-支付宝',
-    creator                      varchar(64) collate utf8mb4_unicode_ci default ''                null comment '创建者',
-    create_time                  datetime                               default CURRENT_TIMESTAMP not null comment '创建时间',
-    updater                      varchar(64) collate utf8mb4_unicode_ci default ''                null comment '更新者',
-    update_time                  datetime                               default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
-    deleted                      bit                                    default b'0'              not null comment '是否删除',
-    tenant_id                    bigint                                 default 0                 not null comment '租户编号'
+    brokerage_enabled            bit           default 1                 not null comment '是否启用分佣',
+    brokerage_enabled_condition  tinyint       default 0                 not null comment '分佣模式：1-人人分销 2-指定分销',
+    brokerage_bind_mode          tinyint       default 0                 not null comment '分销关系绑定模式: 1-没有推广人，2-新用户, 3-扫码覆盖',
+    brokerage_post_urls          varchar(2000) default ''                null comment '分销海报图地址数组',
+    brokerage_first_percent      int           default 0                 not null comment '一级返佣比例',
+    brokerage_second_percent     int           default 0                 not null comment '二级返佣比例',
+    brokerage_withdraw_min_price int           default 0                 not null comment '用户提现最低金额',
+    brokerage_bank_names         varchar(200)  default ''                not null comment '提现银行（字典类型=brokerage_bank_name）',
+    brokerage_frozen_days        int           default 7                 not null comment '佣金冻结时间(天)',
+    brokerage_withdraw_type      varchar(32)   default '1,2,3,4'         not null comment '提现方式：1-钱包；2-银行卡；3-微信；4-支付宝',
+    creator                      varchar(64)   default ''                null comment '创建者',
+    create_time                  datetime      default CURRENT_TIMESTAMP not null comment '创建时间',
+    updater                      varchar(64)   default ''                null comment '更新者',
+    update_time                  datetime      default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    deleted                      bit           default b'0'              not null comment '是否删除',
+    tenant_id                    bigint        default 0                 not null comment '租户编号'
 ) comment '交易中心配置';
+
+# alter table trade_brokerage_user
+#     add level int not null default 1 comment '等级' after frozen_price;
+# alter table trade_brokerage_user
+#     add path varchar(2000) null comment '路径' after level;
+
 
 -- 增加分销用户扩展表
 create table trade_brokerage_user
 (
     id                bigint auto_increment comment '用户编号' primary key,
-    bind_user_id      bigint                                                           null comment '推广员编号',
-    bind_user_time    datetime                                                         null comment '推广员绑定时间',
-    brokerage_enabled bit                                    default 1                 not null comment '是否成为推广员',
-    brokerage_time    datetime                                                         null comment '成为分销员时间',
-    price             int                                    default 0                 not null comment '可用佣金',
-    frozen_price      int                                    default 0                 not null comment '冻结佣金',
-    creator           varchar(64) collate utf8mb4_unicode_ci default ''                null comment '创建者',
-    create_time       datetime                               default CURRENT_TIMESTAMP not null comment '创建时间',
-    updater           varchar(64) collate utf8mb4_unicode_ci default ''                null comment '更新者',
-    update_time       datetime                               default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
-    deleted           bit                                    default b'0'              not null comment '是否删除',
-    tenant_id         bigint                                 default 0                 not null comment '租户编号'
-) comment '分销用户';
+    bind_user_id      bigint                                null comment '推广员编号',
+    bind_user_time    datetime                              null comment '推广员绑定时间',
+    brokerage_enabled bit         default 1                 not null comment '是否成为推广员',
+    brokerage_time    datetime                              null comment '成为分销员时间',
+    price             int         default 0                 not null comment '可用佣金',
+    frozen_price      int         default 0                 not null comment '冻结佣金',
+    level             int         default 1                 not null comment '等级',
+    path              varchar(2000)                         null comment '路径',
+    creator           varchar(64) default ''                null comment '创建者',
+    create_time       datetime    default CURRENT_TIMESTAMP not null comment '创建时间',
+    updater           varchar(64) default ''                null comment '更新者',
+    update_time       datetime    default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    deleted           bit         default b'0'              not null comment '是否删除',
+    tenant_id         bigint      default 0                 not null comment '租户编号'
+)
+    comment '分销用户';
 
 create index idx_invite_user_id on trade_brokerage_user (bind_user_id) comment '推广员编号';
 create index idx_agent on trade_brokerage_user (brokerage_enabled) comment '是否成为推广员';
@@ -44,26 +53,26 @@ create index idx_agent on trade_brokerage_user (brokerage_enabled) comment '是�
 
 create table trade_brokerage_record
 (
-    id               int auto_increment comment '编号'
+    id                int auto_increment comment '编号'
         primary key,
-    user_id          bigint                                                           not null comment '用户编号',
-    biz_id           varchar(64)                            default ''                not null comment '业务编号',
-    biz_type         tinyint                                default 0                 not null comment '业务类型：1-订单，2-提现',
-    title            varchar(64)                            default ''                not null comment '标题',
-    price            int                                    default 0                 not null comment '金额',
-    total_price      int                                    default 0                 not null comment '当前总佣金',
-    description      varchar(500)                           default ''                not null comment '说明',
-    status           tinyint                                default 0                 not null comment '状态：0-待结算，1-已结算，2-已取消',
-    frozen_days      int                                    default 0                 not null comment '冻结时间（天）',
-    unfreeze_time    datetime                                                         null comment '解冻时间',
-    source_user_type tinyint                                                          not null comment '来源用户类型：1-一级推广用户，2-二级推广用户',
-    source_user_id   bigint                                                           not null comment '来源用户编号',
-    creator          varchar(64) collate utf8mb4_general_ci default ''                null comment '创建者',
-    create_time      datetime                               default CURRENT_TIMESTAMP not null comment '创建时间',
-    updater          varchar(64) collate utf8mb4_general_ci default ''                null comment '更新者',
-    update_time      datetime                               default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
-    deleted          bit                                    default b'0'              not null comment '是否删除',
-    tenant_id        bigint                                 default 0                 not null comment '租户编号'
+    user_id           bigint                                 not null comment '用户编号',
+    biz_id            varchar(64)  default ''                not null comment '业务编号',
+    biz_type          tinyint      default 0                 not null comment '业务类型：1-订单，2-提现',
+    title             varchar(64)  default ''                not null comment '标题',
+    price             int          default 0                 not null comment '金额',
+    total_price       int          default 0                 not null comment '当前总佣金',
+    description       varchar(500) default ''                not null comment '说明',
+    status            tinyint      default 0                 not null comment '状态：0-待结算，1-已结算，2-已取消',
+    frozen_days       int          default 0                 not null comment '冻结时间（天）',
+    unfreeze_time     datetime                               null comment '解冻时间',
+    source_user_level int                                    not null comment '来源用户等级',
+    source_user_id    bigint                                 not null comment '来源用户编号',
+    creator           varchar(64)  default ''                null comment '创建者',
+    create_time       datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updater           varchar(64)  default ''                null comment '更新者',
+    update_time       datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    deleted           bit          default b'0'              not null comment '是否删除',
+    tenant_id         bigint       default 0                 not null comment '租户编号'
 )
     comment '佣金记录';
 
@@ -76,26 +85,26 @@ create table trade_brokerage_withdraw
 (
     id                  int auto_increment comment '编号'
         primary key,
-    user_id             bigint                                                           not null comment '用户编号',
-    price               int                                    default 0                 not null comment '提现金额',
-    fee_price           int                                    default 0                 not null comment '提现手续费',
-    total_price         int                                    default 0                 not null comment '当前总佣金',
-    type                tinyint                                default 0                 not null comment '提现类型：1-钱包；2-银行卡；3-微信；4-支付宝',
-    name                varchar(64)                                                      null comment '真实姓名',
-    account_no          varchar(64)                                                      null comment '账号',
-    bank_name           varchar(100)                                                     null comment '银行名称',
-    bank_address        varchar(200)                                                     null comment '开户地址',
-    account_qr_code_url varchar(512)                                                     null comment '收款码',
-    status              tinyint(2)                             default 0                 not null comment '状态：0-审核中，10-审核通过 20-审核不通过；预留：11 - 提现成功；21-提现失败',
-    audit_reason        varchar(128)                                                     null comment '审核驳回原因',
-    audit_time          datetime                                                         null comment '审核时间',
-    remark              varchar(500)                                                     null comment '备注',
-    creator             varchar(64) collate utf8mb4_general_ci default ''                null comment '创建者',
-    create_time         datetime                               default CURRENT_TIMESTAMP not null comment '创建时间',
-    updater             varchar(64) collate utf8mb4_general_ci default ''                null comment '更新者',
-    update_time         datetime                               default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
-    deleted             bit                                    default b'0'              not null comment '是否删除',
-    tenant_id           bigint                                 default 0                 not null comment '租户编号'
+    user_id             bigint                                not null comment '用户编号',
+    price               int         default 0                 not null comment '提现金额',
+    fee_price           int         default 0                 not null comment '提现手续费',
+    total_price         int         default 0                 not null comment '当前总佣金',
+    type                tinyint     default 0                 not null comment '提现类型：1-钱包；2-银行卡；3-微信；4-支付宝',
+    name                varchar(64)                           null comment '真实姓名',
+    account_no          varchar(64)                           null comment '账号',
+    bank_name           varchar(100)                          null comment '银行名称',
+    bank_address        varchar(200)                          null comment '开户地址',
+    account_qr_code_url varchar(512)                          null comment '收款码',
+    status              tinyint(2)  default 0                 not null comment '状态：0-审核中，10-审核通过 20-审核不通过；预留：11 - 提现成功；21-提现失败',
+    audit_reason        varchar(128)                          null comment '审核驳回原因',
+    audit_time          datetime                              null comment '审核时间',
+    remark              varchar(500)                          null comment '备注',
+    creator             varchar(64) default ''                null comment '创建者',
+    create_time         datetime    default CURRENT_TIMESTAMP not null comment '创建时间',
+    updater             varchar(64) default ''                null comment '更新者',
+    update_time         datetime    default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    deleted             bit         default b'0'              not null comment '是否删除',
+    tenant_id           bigint      default 0                 not null comment '租户编号'
 )
     comment '佣金提现';
 
