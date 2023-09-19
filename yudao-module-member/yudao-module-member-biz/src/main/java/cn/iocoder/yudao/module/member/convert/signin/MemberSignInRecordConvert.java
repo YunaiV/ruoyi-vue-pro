@@ -36,4 +36,6 @@ public interface MemberSignInRecordConvert {
 
     PageResult<AppMemberSignInRecordRespVO> convertPage02(PageResult<MemberSignInRecordDO> pageResult);
 
+    AppMemberSignInRecordRespVO coverRecordToAppRecordVo(MemberSignInRecordDO memberSignInRecordDO);
+
 }

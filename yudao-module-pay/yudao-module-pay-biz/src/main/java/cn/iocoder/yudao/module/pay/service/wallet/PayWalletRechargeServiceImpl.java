@@ -42,57 +42,61 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
 
     @Resource
     private PayWalletRechargeMapper walletRechargeMapper;
+
     @Resource
     private PayWalletService payWalletService;
     @Resource
     private PayOrderService payOrderService;
 
-
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public PayWalletRechargeDO createWalletRecharge(Long userId, Integer userType, AppPayWalletRechargeCreateReqVO vo) {
-        // 1. 获取钱包
+    public PayWalletRechargeDO createWalletRecharge(Long userId, Integer userType,
+                                                    AppPayWalletRechargeCreateReqVO createReqVO) {
+        // 1. 新增钱包充值记录
         PayWalletDO wallet = payWalletService.getOrCreateWallet(userId, userType);
-        // 2. 新增钱包充值记录
-        PayWalletRechargeDO walletRecharge = PayWalletRechargeConvert.INSTANCE.convert(wallet.getId(), vo);
+        PayWalletRechargeDO walletRecharge = PayWalletRechargeConvert.INSTANCE.convert(wallet.getId(), createReqVO);
         walletRechargeMapper.insert(walletRecharge);
-        // 3.创建支付单
+
+        // 2.1 创建支付单
         Long payOrderId = payOrderService.createOrder(new PayOrderCreateReqDTO()
                 .setAppId(WALLET_PAY_APP_ID).setUserIp(getClientIP())
                 .setMerchantOrderId(walletRecharge.getId().toString()) // 业务的订单编号
                 .setSubject(WALLET_RECHARGE_ORDER_SUBJECT).setBody("").setPrice(walletRecharge.getPayPrice())
                 .setExpireTime(addTime(Duration.ofHours(2L))));
-        // 4.更新钱包充值记录中支付订单
+        // 2.2 更新钱包充值记录中支付订单
         walletRechargeMapper.updateById(new PayWalletRechargeDO().setPayOrderId(payOrderId)
                 .setId(walletRecharge.getId()));
+        // TODO @jason：是不是你直接返回就好啦；然后 payOrderId 设置下；
         return walletRechargeMapper.selectById(walletRecharge.getId());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateWalletRechargerPaid(Long walletRechargeId, Long payOrderId) {
-        // 1. 获取钱包充值记录
-        PayWalletRechargeDO walletRecharge = walletRechargeMapper.selectById(walletRechargeId);
+    public void updateWalletRechargerPaid(Long id, Long payOrderId) {
+        // 1.1 获取钱包充值记录
+        PayWalletRechargeDO walletRecharge = walletRechargeMapper.selectById(id);
         if (walletRecharge == null) {
-            log.error("[updateWalletRechargerPaid]，钱包充值记录不存在，钱包充值 Id:{} ", walletRechargeId);
+            log.error("[updateWalletRechargerPaid][钱包充值记录不存在，钱包充值记录 id({})]", id);
             throw exception(WALLET_RECHARGE_NOT_FOUND);
         }
-        // 2. 校验钱包充值是否可以支付
+        // 1.2 校验钱包充值是否可以支付
         PayOrderDO payOrderDO = validateWalletRechargerCanPaid(walletRecharge, payOrderId);
-        // 3. 更新钱包充值的支付状态
-        int updateCount = walletRechargeMapper.updateByIdAndPaid(walletRechargeId,false, new PayWalletRechargeDO().setId(walletRechargeId)
-                .setPayStatus(true).setPayTime(LocalDateTime.now())
+
+        // 2. 更新钱包充值的支付状态
+        int updateCount = walletRechargeMapper.updateByIdAndPaid(id,false,
+                new PayWalletRechargeDO().setId(id).setPayStatus(true).setPayTime(LocalDateTime.now())
                 .setPayChannelCode(payOrderDO.getChannelCode()));
         if (updateCount == 0) {
             throw exception(WALLET_RECHARGE_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
-        // 4. 更新钱包余额
-        payWalletService.addWalletBalance(walletRecharge.getWalletId(), String.valueOf(walletRechargeId),
+
+        // 3. 更新钱包余额
+        // TODO @jason：这样的话，未来提现会不会把充值的，也提现走哈。类似先充 100，送 110；然后提现 110；
+        payWalletService.addWalletBalance(walletRecharge.getWalletId(), String.valueOf(id),
                 PayWalletBizTypeEnum.RECHARGE, walletRecharge.getPrice());
     }
 
     private PayOrderDO validateWalletRechargerCanPaid(PayWalletRechargeDO walletRecharge, Long payOrderId) {
-
         // 1.1 校验充值记录的支付状态
         if (walletRecharge.getPayStatus()) {
             log.error("[validateWalletRechargerCanPaid][钱包({}) 不处于未支付状态!  钱包数据是：{}]",
@@ -105,6 +109,7 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
                     walletRecharge.getId(), payOrderId, toJsonString(walletRecharge));
             throw exception(WALLET_RECHARGE_UPDATE_PAID_PAY_ORDER_ID_ERROR);
         }
+
         // 2.1 校验支付单是否存在
         PayOrderDO payOrder = payOrderService.getOrder(payOrderId);
         if (payOrder == null) {
@@ -132,4 +137,5 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
         }
         return payOrder;
     }
+
 }

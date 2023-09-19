@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletMapper;
 import cn.iocoder.yudao.module.pay.enums.member.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
-import cn.iocoder.yudao.module.pay.service.wallet.bo.CreateWalletTransactionBO;
+import cn.iocoder.yudao.module.pay.service.wallet.bo.WalletTransactionCreateReqBO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -84,6 +84,7 @@ public class PayWalletServiceImpl implements  PayWalletService {
         Long walletId = validateWalletCanRefund(payRefund.getId(), payRefund.getChannelOrderNo(),  refundPrice);
         PayWalletDO wallet = walletMapper.selectById(walletId);
         Assert.notNull(wallet, "钱包 {} 不存在", walletId);
+
         // 2. 增加余额
         return addWalletBalance(walletId, String.valueOf(payRefund.getId()), PAYMENT_REFUND, refundPrice);
     }
@@ -137,42 +138,39 @@ public class PayWalletServiceImpl implements  PayWalletService {
         }
         // 2.2 生成钱包流水
         Integer afterBalance = payWallet.getBalance() - price;
-        CreateWalletTransactionBO bo = new CreateWalletTransactionBO().setWalletId(payWallet.getId())
+        WalletTransactionCreateReqBO bo = new WalletTransactionCreateReqBO().setWalletId(payWallet.getId())
                 .setPrice(-price).setBalance(afterBalance).setBizId(String.valueOf(bizId))
                 .setBizType(bizType.getType()).setTitle(bizType.getDescription());
         return walletTransactionService.createWalletTransaction(bo);
     }
 
     @Override
-    public PayWalletTransactionDO addWalletBalance(Long walletId,
-                                                   String bizId, PayWalletBizTypeEnum bizType, Integer price) {
-        // 1. 获取钱包
+    public PayWalletTransactionDO addWalletBalance(Long walletId, String bizId,
+                                                   PayWalletBizTypeEnum bizType, Integer price) {
+        // 1.1 获取钱包
         PayWalletDO payWallet = getWallet(walletId);
-
         if (payWallet == null) {
             log.error("[addWalletBalance]，用户钱包({})不存在.", walletId);
             throw exception(WALLET_NOT_FOUND);
         }
-
+        // 1.2 更新钱包金额
         switch (bizType) {
-            case PAYMENT_REFUND: {
-                // 退款更新
+            case PAYMENT_REFUND: { // 退款更新
                 walletMapper.updateWhenConsumptionRefund(price, payWallet.getId());
                 break;
             }
-            case RECHARGE: {
-                // 充值更新
+            case RECHARGE: { // 充值更新
                 walletMapper.updateWhenRecharge(price, payWallet.getId());
                 break;
             }
-            // TODO 其它类型
+            // TODO 其它类型；这里可以先跑异常；避免有业务搞错；
         }
 
         // 2. 生成钱包流水
-        CreateWalletTransactionBO bo = new CreateWalletTransactionBO().setWalletId(payWallet.getId())
-                .setPrice(price).setBalance(payWallet.getBalance()+price).setBizId(bizId)
-                .setBizType(bizType.getType()).setTitle(bizType.getDescription());
-        return walletTransactionService.createWalletTransaction(bo);
+        WalletTransactionCreateReqBO transactionCreateReqBO = new WalletTransactionCreateReqBO()
+                .setWalletId(payWallet.getId()).setPrice(price).setBalance(payWallet.getBalance() + price)
+                .setBizId(bizId).setBizType(bizType.getType()).setTitle(bizType.getDescription());
+        return walletTransactionService.createWalletTransaction(transactionCreateReqBO);
     }
 
 }

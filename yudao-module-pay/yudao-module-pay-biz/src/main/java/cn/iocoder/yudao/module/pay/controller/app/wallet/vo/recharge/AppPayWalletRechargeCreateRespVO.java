@@ -12,4 +12,5 @@ public class AppPayWalletRechargeCreateRespVO {
 
     @Schema(description = "支付订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
     private Long payOrderId;
+
 }

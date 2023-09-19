@@ -39,7 +39,7 @@ public interface ErrorCodeConstants {
     ErrorCode SIGN_IN_CONFIG_EXISTS = new ErrorCode(1004009001, "签到天数规则已存在");
 
     //========== 签到配置 1004010000 ==========
-
+    ErrorCode SIGN_IN_RECORD_TODAY_EXISTS = new ErrorCode(1004010000,"今日已签到，请勿重复签到");
 
     //========== 用户等级 1004011000 ==========
     ErrorCode LEVEL_NOT_EXISTS = new ErrorCode(1004011000, "用户等级不存在");

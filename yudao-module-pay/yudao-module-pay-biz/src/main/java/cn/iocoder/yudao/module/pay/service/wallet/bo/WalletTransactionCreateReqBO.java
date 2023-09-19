@@ -9,7 +9,7 @@ import lombok.Data;
  * @author jason
  */
 @Data
-public class CreateWalletTransactionBO {
+public class WalletTransactionCreateReqBO {
 
     // TODO @jason：bo 的话，最好加个参数校验哈；
 

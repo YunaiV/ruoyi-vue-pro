@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.member.controller.admin.signin.vo.record.MemberSi
 import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInRecordDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -31,6 +32,14 @@ public interface MemberSignInRecordMapper extends BaseMapperX<MemberSignInRecord
         return selectPage(pageParam, new LambdaQueryWrapperX<MemberSignInRecordDO>()
                 .eq(MemberSignInRecordDO::getUserId, userId)
                 .orderByDesc(MemberSignInRecordDO::getId));
+    }
+
+
+    //获取用户的签到记录列表信息,根据签到时间倒序
+    default List<MemberSignInRecordDO> selectListByUserId(Long userId){
+        return selectList(new LambdaQueryWrapperX <MemberSignInRecordDO>()
+                .eq(MemberSignInRecordDO::getUserId, userId)
+                .orderByDesc(MemberSignInRecordDO::getCreateTime));
     }
 
 }
