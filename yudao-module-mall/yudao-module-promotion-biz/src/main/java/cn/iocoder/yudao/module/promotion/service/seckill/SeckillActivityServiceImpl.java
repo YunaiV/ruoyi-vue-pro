@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.promotion.service.seckill;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
@@ -11,6 +12,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.Se
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.product.SeckillProductBaseVO;
+import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.convert.seckill.seckillactivity.SeckillActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillProductDO;
@@ -262,6 +264,17 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     @Override
     public List<SeckillProductDO> getSeckillProductListByActivityId(Collection<Long> activityIds) {
         return seckillProductMapper.selectListByActivityId(activityIds);
+    }
+
+    @Override
+    public List<SeckillActivityDO> getSeckillActivityListByConfigIds(Collection<Long> ids) {
+        return CollectionUtils.filterList(seckillActivityMapper.selectList(),
+                item -> CollectionUtils.anyMatch(item.getConfigIds(), ids::contains));
+    }
+
+    @Override
+    public PageResult<SeckillActivityDO> getSeckillActivityAppPageByConfigId(AppSeckillActivityPageReqVO pageReqVO) {
+        return seckillActivityMapper.selectPage(pageReqVO, CommonStatusEnum.ENABLE.getStatus());
     }
 
 }

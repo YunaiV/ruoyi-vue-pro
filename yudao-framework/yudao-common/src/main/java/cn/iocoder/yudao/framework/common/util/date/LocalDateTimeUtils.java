@@ -43,6 +43,16 @@ public class LocalDateTimeUtils {
         return LocalDateTime.of(year, mouth, day, 0, 0, 0);
     }
 
+    /**
+     * 创建指定时间
+     *
+     * @param timeStr 时间字符串
+     * @return 指定时间
+     */
+    public static LocalDateTime buildTime(String timeStr) {
+        return LocalDateTime.of(LocalDate.now(), LocalTime.parse(timeStr));
+    }
+
     public static LocalDateTime[] buildBetweenTime(int year1, int mouth1, int day1,
                                                    int year2, int mouth2, int day2) {
         return new LocalDateTime[]{buildTime(year1, mouth1, day1), buildTime(year2, mouth2, day2)};
@@ -60,6 +70,22 @@ public class LocalDateTimeUtils {
             return false;
         }
         return LocalDateTimeUtil.isIn(LocalDateTime.now(), startTime, endTime);
+    }
+
+    /**
+     * 判断当前时间是否在该时间范围内
+     *
+     * @param startTime 开始时间
+     * @param endTime   结束时间
+     * @return 是否
+     */
+    public static boolean isBetween(String startTime, String endTime) {
+        if (startTime == null || endTime == null) {
+            return false;
+        }
+        LocalDate nowDate = LocalDate.now();
+        return LocalDateTimeUtil.isIn(LocalDateTime.now(), LocalDateTime.of(nowDate, LocalTime.parse(startTime)),
+                LocalDateTime.of(nowDate, LocalTime.parse(endTime)));
     }
 
     /**

@@ -87,7 +87,7 @@ public class SeckillActivityDO extends BaseDO {
      */
     private Integer singleLimitCount;
     /**
-     * 秒杀库存
+     * 秒杀库存(剩余库存秒杀时扣减)
      */
     private Integer stock;
     /**
