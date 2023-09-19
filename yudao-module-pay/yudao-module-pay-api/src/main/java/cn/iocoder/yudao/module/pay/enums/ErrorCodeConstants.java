@@ -47,6 +47,14 @@ public interface ErrorCodeConstants {
     ErrorCode WALLET_REFUND_AMOUNT_ERROR = new ErrorCode(1007007003, "钱包退款金额不对");
     ErrorCode WALLET_REFUND_EXIST = new ErrorCode(1007007004, "已经存在钱包退款");
 
+    // TODO @jason：把钱包充值，单独搞个错误码段哈；
+
+    ErrorCode WALLET_RECHARGE_NOT_FOUND = new ErrorCode(1007007005, "钱包充值记录不存在");
+    ErrorCode WALLET_RECHARGE_UPDATE_PAID_STATUS_NOT_UNPAID = new ErrorCode(1007007006, "钱包充值更新支付状态失败，钱包充值记录不是【未支付】状态");
+    ErrorCode WALLET_RECHARGE_UPDATE_PAID_PAY_ORDER_ID_ERROR = new ErrorCode(1007007007, "钱包充值更新支付状态失败，支付单编号不匹配");
+    ErrorCode WALLET_RECHARGE_UPDATE_PAID_PAY_ORDER_STATUS_NOT_SUCCESS = new ErrorCode(1007007008, "钱包充值更新支付状态失败，支付单状态不是【支付成功】状态");
+    ErrorCode WALLET_RECHARGE_UPDATE_PAID_PAY_PRICE_NOT_MATCH = new ErrorCode(1007007009, "钱包充值更新支付状态失败，支付单金额不匹配");
+
     // ========== 示例订单 1007900000 ==========
     ErrorCode DEMO_ORDER_NOT_FOUND = new ErrorCode(1007900000, "示例订单不存在");
     ErrorCode DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID = new ErrorCode(1007900001, "示例订单更新支付状态失败，订单不是【未支付】状态");

@@ -21,6 +21,7 @@ import cn.iocoder.yudao.module.promotion.dal.mysql.combination.CombinationActivi
 import cn.iocoder.yudao.module.promotion.dal.mysql.combination.CombinationProductMapper;
 import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.api.order.TradeOrderApi;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -50,7 +51,9 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     private CombinationActivityMapper combinationActivityMapper;
     @Resource
     private CombinationProductMapper combinationProductMapper;
+
     @Resource
+    @Lazy // TODO @puhui999：我感觉 validateCombination 可以挪到 CombinationRecordServiceImpl 中，因为它更偏向能不能创建拼团记录；
     private CombinationRecordService combinationRecordService;
 
     @Resource
