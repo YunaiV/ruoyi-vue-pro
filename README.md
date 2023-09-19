@@ -68,7 +68,7 @@
 
 |       | JDK 8 完整版                                                 | JDK 8 精简版                                                          | JDK 17 完整版                                                                  |
 |-------|-----------------------------------------------------------|--------------------------------------------------------------------|-----------------------------------------------------------------------------|
-| 分支    | [`master`](https://gitee.com/zhijiantianya/ruoyi-vue-pro) | [`mini`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/mini/) | [`boot-dev`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/boot3-dev/) |
+| 分支    | [`master`](https://gitee.com/zhijiantianya/ruoyi-vue-pro) | [`mini`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/mini/) | [`boot-dev`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/feature%2Fboot3/) |
 | 说明    | 包括所有功能                                                    | 只保留核心功能                                                            | 适配 Spring Boot 3.X                                                          |
 | 系统功能  | √                                                         | √                                                                  | √                                                                           |
 | 基础设施  | √                                                         | √                                                                  | √                                                                           |
