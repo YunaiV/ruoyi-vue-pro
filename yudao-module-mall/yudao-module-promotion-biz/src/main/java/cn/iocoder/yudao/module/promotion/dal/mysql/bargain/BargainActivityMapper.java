@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.dal.mysql.bargain;
 
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -8,6 +9,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityD
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -39,8 +41,15 @@ public interface BargainActivityMapper extends BaseMapperX<BargainActivityDO> {
     default int updateActivityStock(Long id, int count) {
         return update(null, new LambdaUpdateWrapper<BargainActivityDO>()
                 .eq(BargainActivityDO::getId, id)
-                .gt(BargainActivityDO::getStock, 0) // TODO @puhui999：不是 > 0，是要大于 count 哈
+                .gt(BargainActivityDO::getStock, count)
                 .setSql("stock = stock - " + count));
+    }
+
+    default PageResult<BargainActivityDO> selectAppPage(PageParam pageReqVO, Integer status, LocalDateTime now) {
+        return selectPage(pageReqVO, new LambdaQueryWrapperX<BargainActivityDO>()
+                .eq(BargainActivityDO::getStatus, status)
+                .le(BargainActivityDO::getStartTime, now)
+                .ge(BargainActivityDO::getEndTime, now));
     }
 
 }

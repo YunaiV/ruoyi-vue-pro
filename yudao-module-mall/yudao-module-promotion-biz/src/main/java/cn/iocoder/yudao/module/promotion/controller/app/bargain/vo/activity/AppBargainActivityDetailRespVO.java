@@ -45,7 +45,7 @@ public class AppBargainActivityDetailRespVO {
     @Schema(description = "商品单位", required = true, example = "个") // 从 SPU 的 unit 读取，然后转换
     private String unitName;
 
-    @Schema(description = "砍价最低金额，单位：分", required = true, example = "100") // 从砍价商品里取最低价
+    @Schema(description = "砍价最低金额，单位：分", required = true, example = "100")
     private Integer bargainPrice;
 
     @Schema(description = "砍价成功数量", required = true, example = "100")

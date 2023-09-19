@@ -3,6 +3,9 @@ package cn.iocoder.yudao.module.promotion.controller.admin.bargain;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityRespVO;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -30,6 +34,8 @@ public class BargainActivityController {
 
     @Resource
     private BargainActivityService activityService;
+    @Resource
+    private ProductSpuApi spuApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建砍价活动")
@@ -73,7 +79,8 @@ public class BargainActivityController {
         if (CollUtil.isEmpty(pageResult.getList())) {
             return success(PageResult.empty(pageResult.getTotal()));
         }
-        return success(BargainActivityConvert.INSTANCE.convertPage(activityService.getBargainActivityPage(pageVO)));
+        List<ProductSpuRespDTO> spuList = spuApi.getSpuList(CollectionUtils.convertList(pageResult.getList(), BargainActivityDO::getSpuId));
+        return success(BargainActivityConvert.INSTANCE.convertPage(pageResult, spuList));
     }
 
 }

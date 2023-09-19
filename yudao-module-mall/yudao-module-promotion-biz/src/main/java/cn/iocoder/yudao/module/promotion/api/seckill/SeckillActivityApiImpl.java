@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.promotion.api.seckill;
 
-import cn.iocoder.yudao.module.promotion.api.seckill.dto.SeckillActivityUpdateStockReqDTO;
 import cn.iocoder.yudao.module.promotion.service.seckill.SeckillActivityService;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +17,8 @@ public class SeckillActivityApiImpl implements SeckillActivityApi {
     private SeckillActivityService activityService;
 
     @Override
-    public void updateSeckillStock(SeckillActivityUpdateStockReqDTO updateStockReqDTO) {
-        activityService.updateSeckillStock(updateStockReqDTO);
+    public void updateSeckillStock(Long activityId, Long skuId, Integer count) {
+        activityService.updateSeckillStock(activityId, skuId, count);
     }
 
 }

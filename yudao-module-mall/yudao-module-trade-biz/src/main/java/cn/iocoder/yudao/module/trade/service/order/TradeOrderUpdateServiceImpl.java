@@ -184,9 +184,10 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Transactional(rollbackFor = Exception.class)
     public TradeOrderDO createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO) {
         // 1、执行订单创建前置处理器
-        // TODO @puhui999：最好也抽个 beforeOrderCreate 方法；
+        // TODO @puhui999：最好也抽个 beforeOrderCreate 方法；不要 BO 各自处理参数岂不美哉？
         TradeBeforeOrderCreateReqBO beforeOrderCreateReqBO = TradeOrderConvert.INSTANCE.convert(createReqVO);
         beforeOrderCreateReqBO.setOrderType(validateActivity(createReqVO));
+        beforeOrderCreateReqBO.setUserId(userId);
         beforeOrderCreateReqBO.setCount(getSumValue(createReqVO.getItems(), AppTradeOrderSettlementReqVO.Item::getCount, Integer::sum));
         // TODO @puhui999：这里有个纠结点；handler 的定义是只处理指定类型的订单的拓展逻辑；还是通用的 handler，类似可以处理优惠劵等等
         tradeOrderHandlers.forEach(handler -> handler.beforeOrderCreate(beforeOrderCreateReqBO));
@@ -730,7 +731,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         }
 
         // TODO 活动相关库存回滚需要活动 id，活动 id 怎么获取？app 端能否传过来
-        tradeOrderHandlers.forEach(handler -> handler.rollbackStock());
+        tradeOrderHandlers.forEach(handler -> handler.rollback());
 
         // 2.回滚库存
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(id);

@@ -31,7 +31,6 @@ public class AppSeckillActivityRespVO {
     private Integer totalStock;
 
     @Schema(description = "秒杀金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
-    // 从秒杀商品里取最低价
     private Integer seckillPrice;
 
 }

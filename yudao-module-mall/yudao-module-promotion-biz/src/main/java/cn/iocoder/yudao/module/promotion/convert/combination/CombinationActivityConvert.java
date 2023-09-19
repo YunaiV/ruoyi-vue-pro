@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.promotion.convert.combination;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordRespDTO;
@@ -91,6 +93,19 @@ public interface CombinationActivityConvert {
     }
 
     CombinationRecordDO convert(CombinationRecordCreateReqDTO reqDTO);
+
+    default CombinationRecordDO convert1(CombinationRecordCreateReqDTO reqDTO, CombinationActivityDO activity, MemberUserRespDTO user,
+                                         ProductSpuRespDTO spu, ProductSkuRespDTO sku) {
+        CombinationRecordDO record = convert(reqDTO);
+        record.setVirtualGroup(false);
+        record.setExpireTime(record.getStartTime().plusHours(activity.getLimitDuration()));
+        record.setUserSize(activity.getUserSize());
+        record.setNickname(user.getNickname());
+        record.setAvatar(user.getAvatar());
+        record.setSpuName(spu.getName());
+        record.setPicUrl(sku.getPicUrl());
+        return record;
+    }
 
     List<CombinationRecordRespDTO> convert(List<CombinationRecordDO> bean);
 

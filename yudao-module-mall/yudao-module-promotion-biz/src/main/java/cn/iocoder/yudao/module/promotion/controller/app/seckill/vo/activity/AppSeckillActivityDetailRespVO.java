@@ -19,7 +19,7 @@ public class AppSeckillActivityDetailRespVO {
     @Schema(description = "活动状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer status;
 
-    // TODO @芋艿：开始时间、结束时间，要和场次结合起来；就是要算到当前场次，是几点哈；
+    // TODO @芋艿：开始时间、结束时间，要和场次结合起来；就是要算到当前场次，是几点哈;
 
     @Schema(description = "活动开始时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime startTime;

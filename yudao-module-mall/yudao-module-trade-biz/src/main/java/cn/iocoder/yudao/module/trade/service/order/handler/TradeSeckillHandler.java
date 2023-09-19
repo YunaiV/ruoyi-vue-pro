@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.trade.service.order.handler;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.module.promotion.api.seckill.SeckillActivityApi;
-import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.order.bo.TradeAfterOrderCreateReqBO;
 import cn.iocoder.yudao.module.trade.service.order.bo.TradeBeforeOrderCreateReqBO;
@@ -28,7 +27,7 @@ public class TradeSeckillHandler implements TradeOrderHandler {
             return;
         }
 
-        seckillActivityApi.updateSeckillStock(TradeOrderConvert.INSTANCE.convert(reqBO));
+        seckillActivityApi.updateSeckillStock(reqBO.getSeckillActivityId(), reqBO.getSkuId(), reqBO.getCount());
     }
 
     @Override
@@ -37,7 +36,7 @@ public class TradeSeckillHandler implements TradeOrderHandler {
     }
 
     @Override
-    public void rollbackStock() {
+    public void rollback() {
 
     }
 

@@ -81,11 +81,11 @@ public class ProductSkuDO extends BaseDO {
     /**
      * 一级分销的佣金，单位：分
      */
-    private Integer firstBrokerageRecord;
+    private Integer firstBrokeragePrice;
     /**
      * 二级分销的佣金，单位：分
      */
-    private Integer secondBrokerageRecord;
+    private Integer secondBrokeragePrice;
 
     // ========== 营销相关字段 =========
 

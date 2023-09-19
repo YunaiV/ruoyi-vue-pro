@@ -1,12 +1,19 @@
 package cn.iocoder.yudao.module.promotion.controller.app.bargain;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.app.bargain.vo.activity.AppBargainActivityDetailRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.bargain.vo.activity.AppBargainActivityRespVO;
+import cn.iocoder.yudao.module.promotion.convert.bargain.BargainActivityConvert;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityDO;
+import cn.iocoder.yudao.module.promotion.service.bargain.BargainActivityService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,8 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Duration;
-import java.util.ArrayList;
+import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -25,86 +31,49 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RequestMapping("/promotion/bargain-activity")
 @Validated
 public class AppBargainActivityController {
+    @Resource
+    private BargainActivityService bargainActivityService;
+    @Resource
+    private ProductSpuApi spuApi;
 
     @GetMapping("/page")
-    @Operation(summary = "获得砍价活动活动") // TODO 芋艿：只查询进行中，且在时间范围内的
-    // TODO 芋艿：缺少 swagger 注解
+    @Operation(summary = "获得砍价活动分页")
     public CommonResult<PageResult<AppBargainActivityRespVO>> getBargainActivityPage(PageParam pageReqVO) {
-        List<AppBargainActivityRespVO> activityList = new ArrayList<>();
-        AppBargainActivityRespVO activity1 = new AppBargainActivityRespVO();
-        activity1.setId(1L);
-        activity1.setName("618 大砍价");
-        activity1.setSpuId(2048L);
-        activity1.setPicUrl("https://static.iocoder.cn/mall/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
-        activity1.setMarketPrice(50);
-        activity1.setBargainPrice(100);
-        activity1.setStartTime(LocalDateTimeUtils.addTime(Duration.ofDays(-2)));
-        activity1.setEndTime(LocalDateTimeUtils.addTime(Duration.ofDays(1)));
-        activity1.setStock(10);
-        activityList.add(activity1);
+        PageResult<BargainActivityDO> result = bargainActivityService.getBargainActivityAppPage(pageReqVO);
+        if (CollUtil.isEmpty(result.getList())) {
+            return success(PageResult.empty(result.getTotal()));
+        }
 
-        AppBargainActivityRespVO activity2 = new AppBargainActivityRespVO();
-        activity2.setId(2L);
-        activity2.setName("双十一砍价");
-        activity2.setSpuId(4096L);
-        activity2.setPicUrl("https://static.iocoder.cn/mall/132.jpeg");
-        activity2.setMarketPrice(100);
-        activity2.setBargainPrice(200);
-        activity2.setStartTime(LocalDateTimeUtils.addTime(Duration.ofDays(-2)));
-        activity2.setEndTime(LocalDateTimeUtils.addTime(Duration.ofDays(1)));
-        activity2.setStock(0);
-        activityList.add(activity2);
-
-        return success(new PageResult<>(activityList, 10L));
+        List<ProductSpuRespDTO> spuList = spuApi.getSpuList(CollectionUtils.convertList(result.getList(), BargainActivityDO::getSpuId));
+        return success(BargainActivityConvert.INSTANCE.convertAppPage(result, spuList));
     }
 
     @GetMapping("/list")
     @Operation(summary = "获得砍价活动列表", description = "用于小程序首页")
-    // TODO 芋艿：增加 Spring Cache
-    // TODO 芋艿：缺少 swagger 注解
+    @Parameter(name = "count", description = "需要展示的数量", example = "6")
     public CommonResult<List<AppBargainActivityRespVO>> getBargainActivityList(
             @RequestParam(name = "count", defaultValue = "6") Integer count) {
-        List<AppBargainActivityRespVO> activityList = new ArrayList<>();
-        AppBargainActivityRespVO activity1 = new AppBargainActivityRespVO();
-        activity1.setId(1L);
-        activity1.setName("618 大砍价");
-        activity1.setSpuId(2048L);
-        activity1.setPicUrl("https://static.iocoder.cn/mall/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
-        activity1.setMarketPrice(50);
-        activity1.setBargainPrice(100);
-        activityList.add(activity1);
+        List<BargainActivityDO> list = bargainActivityService.getBargainActivityAppList(count);
+        if (CollUtil.isEmpty(list)) {
+            return success(BargainActivityConvert.INSTANCE.convertAppList(list));
+        }
 
-        AppBargainActivityRespVO activity2 = new AppBargainActivityRespVO();
-        activity2.setId(2L);
-        activity2.setName("双十一砍价");
-        activity2.setSpuId(4096L);
-        activity2.setPicUrl("https://static.iocoder.cn/mall/132.jpeg");
-        activity2.setMarketPrice(100);
-        activity2.setBargainPrice(200);
-        activityList.add(activity2);
-
-        return success(activityList);
+        List<ProductSpuRespDTO> spuList = spuApi.getSpuList(CollectionUtils.convertList(list, BargainActivityDO::getSpuId));
+        // TODO 芋艿：增加 Spring Cache
+        return success(BargainActivityConvert.INSTANCE.convertAppList(list, spuList));
     }
 
     @GetMapping("/get-detail")
     @Operation(summary = "获得砍价活动详情")
-    // TODO 芋艿：缺少 swagger 注解
+    @Parameter(name = "id", description = "活动编号", example = "1")
     public CommonResult<AppBargainActivityDetailRespVO> getBargainActivityDetail(@RequestParam("id") Long id) {
-        AppBargainActivityDetailRespVO activity = new AppBargainActivityDetailRespVO();
-        activity.setId(2L);
-        activity.setName("618 大砍价");
-        activity.setSpuId(2048L);
-        activity.setPicUrl("https://static.iocoder.cn/mall/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
-        activity.setMarketPrice(50);
-        activity.setBargainPrice(100);
-        activity.setStock(10);
-        activity.setUnitName("件");
-        activity.setPrice(40);
-        activity.setStartTime(LocalDateTimeUtils.addTime(Duration.ofDays(-2)));
-        activity.setEndTime(LocalDateTimeUtils.addTime(Duration.ofDays(-10)));
-        activity.setDescription("我吃西红柿");
-        activity.setSuccessCount(10);
-        return success(activity);
+        BargainActivityDO activity = bargainActivityService.getBargainActivity(id);
+        if (activity == null) {
+            return success(null);
+        }
+
+        ProductSpuRespDTO spu = spuApi.getSpu(activity.getSpuId());
+        return success(BargainActivityConvert.INSTANCE.convert1(activity, spu));
     }
 
 }
