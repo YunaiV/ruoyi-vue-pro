@@ -21,7 +21,7 @@
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>2.7.14</spring.boot.version>
+        <spring.boot.version>2.7.15</spring.boot.version>
     </properties>
 
     <dependencyManagement>
@@ -52,7 +52,7 @@
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
-            <version>5.8.20</version>
+            <version>5.8.21</version>
         </dependency>
 
         <dependency>

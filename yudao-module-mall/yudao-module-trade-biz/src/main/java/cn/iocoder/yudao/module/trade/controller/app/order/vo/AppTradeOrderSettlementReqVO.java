@@ -25,12 +25,12 @@ public class AppTradeOrderSettlementReqVO {
     @Schema(description = "优惠劵编号", example = "1024")
     private Long couponId;
 
-    @Schema(description = "是否使用积分", required = true, example = "true")
+    @Schema(description = "是否使用积分", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     @NotNull(message = "是否使用积分不能为空")
     private Boolean pointStatus;
 
     // ========== 配送相关相关字段 ==========
-    @Schema(description = "配送方式", required = true, example = "1")
+    @Schema(description = "配送方式", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @InEnum(value = DeliveryTypeEnum.class, message = "配送方式不正确")
     private Integer deliveryType;
 

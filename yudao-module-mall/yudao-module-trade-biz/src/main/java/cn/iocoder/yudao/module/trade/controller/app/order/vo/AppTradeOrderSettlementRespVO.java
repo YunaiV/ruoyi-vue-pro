@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 public class AppTradeOrderSettlementRespVO {
 
-    @Schema(description = "交易类型", required = true, example = "1") // 对应 TradeOrderTypeEnum 枚举
+    @Schema(description = "交易类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1") // 对应 TradeOrderTypeEnum 枚举
     private Integer type = 1; // TODO 芋艿：改成计算
 
     @Schema(description = "购物项数组", requiredMode = Schema.RequiredMode.REQUIRED)
