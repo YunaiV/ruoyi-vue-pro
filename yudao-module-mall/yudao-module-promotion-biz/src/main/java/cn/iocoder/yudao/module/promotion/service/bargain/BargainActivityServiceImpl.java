@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.promotion.service.bargain;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -113,9 +115,9 @@ public class BargainActivityServiceImpl implements BargainActivityService {
         // 校验存在
         BargainActivityDO activityDO = validateBargainActivityExists(id);
         // 校验状态
-        if (ObjectUtil.equal(activityDO.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
-            throw exception(BARGAIN_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END);
-        }
+        //if (ObjectUtil.equal(activityDO.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+        //    throw exception(BARGAIN_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END);
+        //}
 
         // 删除
         bargainActivityMapper.deleteById(id);
@@ -137,6 +139,22 @@ public class BargainActivityServiceImpl implements BargainActivityService {
     @Override
     public PageResult<BargainActivityDO> getBargainActivityPage(BargainActivityPageReqVO pageReqVO) {
         return bargainActivityMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public PageResult<BargainActivityDO> getBargainActivityAppPage(PageParam pageReqVO) {
+        // 只查询进行中，且在时间范围内的
+        return bargainActivityMapper.selectAppPage(pageReqVO, CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now());
+
+    }
+
+    @Override
+    public List<BargainActivityDO> getBargainActivityAppList(Integer count) {
+        if (count == null) {
+            count = 6;
+        }
+        PageResult<BargainActivityDO> result = bargainActivityMapper.selectAppPage(new PageParam().setPageSize(count), CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now());
+        return result.getList();
     }
 
 }

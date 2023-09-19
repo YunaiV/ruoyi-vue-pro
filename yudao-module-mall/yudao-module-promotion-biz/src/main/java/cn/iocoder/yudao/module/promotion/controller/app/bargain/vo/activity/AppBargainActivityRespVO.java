@@ -36,7 +36,7 @@ public class AppBargainActivityRespVO {
     @Schema(description = "商品市场价，单位：分", required = true, example = "50") // 从 SPU 的 marketPrice 读取
     private Integer marketPrice;
 
-    @Schema(description = "砍价最低金额，单位：分", required = true, example = "100") // 从砍价商品里取最低价
+    @Schema(description = "砍价最低金额，单位：分", required = true, example = "100")
     private Integer bargainPrice;
 
 }
