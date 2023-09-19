@@ -56,4 +56,5 @@ public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
     UserBrokerageSummaryBO selectCountAndSumPriceByUserIdAndBizTypeAndStatus(@Param("userId") Long userId,
                                                                              @Param("bizType") Integer bizType,
                                                                              @Param("status") Integer status);
+
 }

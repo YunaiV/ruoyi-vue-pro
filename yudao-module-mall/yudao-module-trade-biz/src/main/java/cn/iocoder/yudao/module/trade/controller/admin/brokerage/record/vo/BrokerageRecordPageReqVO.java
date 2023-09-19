@@ -30,7 +30,7 @@ public class BrokerageRecordPageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 
-    @Schema(description = "用户类型")
+    @Schema(description = "用户类型", example = "1")
     private Integer sourceUserLevel;
 
 }

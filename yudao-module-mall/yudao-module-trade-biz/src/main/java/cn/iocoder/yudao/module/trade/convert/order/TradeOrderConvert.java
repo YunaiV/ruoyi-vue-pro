@@ -299,6 +299,7 @@ public interface TradeOrderConvert {
             @Mapping(target = "userId", source = "userId"),
             @Mapping(target = "payPrice", source = "tradeOrderDO.payPrice"),
     })
-    TradeAfterOrderCreateReqBO convert(Long userId, AppTradeOrderCreateReqVO createReqVO, TradeOrderDO tradeOrderDO, TradeOrderItemDO orderItem);
+    TradeAfterOrderCreateReqBO convert(Long userId, AppTradeOrderCreateReqVO createReqVO,
+                                       TradeOrderDO tradeOrderDO, TradeOrderItemDO orderItem);
 
 }

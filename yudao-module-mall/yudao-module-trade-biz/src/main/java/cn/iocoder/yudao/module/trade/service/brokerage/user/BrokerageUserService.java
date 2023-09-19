@@ -112,7 +112,6 @@ public interface BrokerageUserService {
         return bindBrokerageUser(userId, bindUserId, isNewUser);
     }
 
-
     /**
      * 【会员】绑定推广员
      *

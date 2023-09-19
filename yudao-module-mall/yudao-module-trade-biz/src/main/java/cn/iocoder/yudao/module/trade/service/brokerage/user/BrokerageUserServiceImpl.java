@@ -67,6 +67,7 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         }
 
         // 绑定关系未发生变化
+        // TODO @疯狂：这个放到“情况一”之前，貌似也没关系？
         if (Objects.equals(brokerageUser.getBindUserId(), bindUserId)) {
             return;
         }
@@ -250,6 +251,7 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         }
     }
 
+    // TODO @芋艿：这个层级，要微信讨论下；
     private List<Integer> buildUserQueryLevels(Long bindUserId, Integer level) {
         List<Integer> levels = new ArrayList<>(2);
 
