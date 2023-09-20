@@ -18,12 +18,12 @@ public enum DeliveryTypeEnum implements IntArrayValuable {
     EXPRESS(1, "快递发货"),
     PICK_UP(2, "用户自提"),;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(DeliveryTypeEnum::getMode).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(DeliveryTypeEnum::getType).toArray();
 
     /**
      * 配送方式
      */
-    private final Integer mode;
+    private final Integer type;
     /**
      * 状态名
      */

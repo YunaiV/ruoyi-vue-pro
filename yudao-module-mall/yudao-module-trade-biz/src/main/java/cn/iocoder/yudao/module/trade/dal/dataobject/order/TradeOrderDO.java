@@ -224,6 +224,10 @@ public class TradeOrderDO extends BaseDO {
      * 关联 {@link DeliveryPickUpStoreDO#getId()}
      */
     private Long pickUpStoreId;
+    /**
+     * 自提核销码
+     */
+    private String pickUpVerifyCode;
 
     // ========== 售后基本信息 ==========
     /**

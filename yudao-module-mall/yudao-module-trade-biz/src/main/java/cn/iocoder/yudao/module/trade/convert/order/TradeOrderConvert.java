@@ -65,14 +65,10 @@ public interface TradeOrderConvert {
             @Mapping(source = "calculateRespBO.price.deliveryPrice", target = "deliveryPrice"),
             @Mapping(source = "calculateRespBO.price.couponPrice", target = "couponPrice"),
             @Mapping(source = "calculateRespBO.price.pointPrice", target = "pointPrice"),
-            @Mapping(source = "calculateRespBO.price.payPrice", target = "payPrice"),
-            @Mapping(source = "address.name", target = "receiverName"),
-            @Mapping(source = "address.mobile", target = "receiverMobile"),
-            @Mapping(source = "address.areaId", target = "receiverAreaId"),
-            @Mapping(source = "address.detailAddress", target = "receiverDetailAddress"),
+            @Mapping(source = "calculateRespBO.price.payPrice", target = "payPrice")
     })
     TradeOrderDO convert(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO,
-                         TradePriceCalculateRespBO calculateRespBO, AddressRespDTO address);
+                         TradePriceCalculateRespBO calculateRespBO);
 
     TradeOrderRespDTO convert(TradeOrderDO orderDO);
 
@@ -215,6 +211,7 @@ public interface TradeOrderConvert {
         TradePriceCalculateReqBO reqBO = new TradePriceCalculateReqBO().setUserId(userId)
                 .setCouponId(settlementReqVO.getCouponId()).setPointStatus(settlementReqVO.getPointStatus())
                 .setDeliveryType(settlementReqVO.getDeliveryType()).setAddressId(settlementReqVO.getAddressId())
+                .setPickUpStoreId(settlementReqVO.getPickUpStoreId())
                 .setItems(new ArrayList<>(settlementReqVO.getItems().size()));
         // 商品项的构建
         Map<Long, CartDO> cartMap = convertMap(cartList, CartDO::getId);

@@ -50,9 +50,9 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
         if (param.getDeliveryType() == null) {
             return;
         }
-        if (DeliveryTypeEnum.PICK_UP.getMode().equals(param.getDeliveryType())) {
+        if (DeliveryTypeEnum.PICK_UP.getType().equals(param.getDeliveryType())) {
             calculateByPickUp(param, result);
-        } else if (DeliveryTypeEnum.EXPRESS.getMode().equals(param.getDeliveryType())) {
+        } else if (DeliveryTypeEnum.EXPRESS.getType().equals(param.getDeliveryType())) {
             calculateExpress(param, result);
         }
     }

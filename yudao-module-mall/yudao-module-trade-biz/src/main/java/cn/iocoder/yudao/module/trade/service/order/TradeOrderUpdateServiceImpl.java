@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.trade.service.order;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
@@ -42,7 +43,6 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderItemMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
 import cn.iocoder.yudao.module.trade.dal.redis.no.TradeOrderNoRedisDAO;
-import cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.*;
@@ -203,44 +203,30 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     // TODO @puhui999：订单超时，自动取消；
 
-    /**
-     * 校验收件地址是否存在
-     *
-     * @param userId    用户编号
-     * @param addressId 收件地址编号
-     * @return 收件地址
-     */
-    private AddressRespDTO validateAddress(Long userId, Long addressId) {
-        AddressRespDTO address = addressApi.getAddress(addressId, userId);
-        if (address == null) {
-            throw exception(ErrorCodeConstants.ORDER_CREATE_ADDRESS_NOT_FOUND);
-        }
-        return address;
-    }
-
     private TradeOrderDO createTradeOrder(Long userId, String clientIp, AppTradeOrderCreateReqVO createReqVO,
                                           TradePriceCalculateRespBO calculateRespBO) {
-        // 用户选择物流配送的时候才需要填写收货地址
-        AddressRespDTO address = new AddressRespDTO();
-        if (Objects.equals(createReqVO.getDeliveryType(), DeliveryTypeEnum.EXPRESS.getMode())) {
-            // 用户收件地址的校验
-            address = validateAddress(userId, createReqVO.getAddressId());
-        }
-        TradeOrderDO order = TradeOrderConvert.INSTANCE.convert(userId, clientIp, createReqVO, calculateRespBO, address);
+        TradeOrderDO order = TradeOrderConvert.INSTANCE.convert(userId, clientIp, createReqVO, calculateRespBO);
         order.setType(calculateRespBO.getType());
         order.setNo(orderNoRedisDAO.generate(TradeOrderNoRedisDAO.TRADE_ORDER_NO_PREFIX));
         order.setStatus(TradeOrderStatusEnum.UNPAID.getStatus());
         order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus());
         order.setProductCount(getSumValue(calculateRespBO.getItems(), TradePriceCalculateRespBO.OrderItem::getCount, Integer::sum));
         order.setTerminal(TerminalEnum.H5.getTerminal()); // todo 数据来源?
-        // 支付信息
+        // 支付 + 退款信息
         order.setAdjustPrice(0).setPayStatus(false);
+        order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus()).setRefundPrice(0);
         // 物流信息
         order.setDeliveryType(createReqVO.getDeliveryType());
-        // 退款信息
-        order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus()).setRefundPrice(0);
+        if (Objects.equals(createReqVO.getDeliveryType(), DeliveryTypeEnum.EXPRESS.getType())) {
+            AddressRespDTO address = addressApi.getAddress(createReqVO.getAddressId(), userId);
+            Assert.notNull(address, "地址({}) 不能为空", createReqVO.getAddressId()); // 价格计算时，已经计算
+            order.setReceiverName(address.getName()).setReceiverMobile(address.getMobile())
+                    .setReceiverAreaId(address.getAreaId()).setReceiverDetailAddress(address.getDetailAddress());
+        } else if (Objects.equals(createReqVO.getDeliveryType(), DeliveryTypeEnum.PICK_UP.getType())) {
+            order.setReceiverName(createReqVO.getReceiverName()).setReceiverMobile(createReqVO.getReceiverMobile());
+            order.setPickUpVerifyCode(RandomUtil.randomNumbers(8)); // 随机一个核销码，长度为 8 位
+        }
         tradeOrderMapper.insert(order);
-        // TODO @puhui999：如果是门店订单，则需要生成核销码；
         return order;
     }
 
@@ -423,7 +409,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 1.1 校验并获得交易订单（可发货）
         TradeOrderDO order = validateOrderDeliverable(deliveryReqVO.getId());
         // 1.2 校验 deliveryType 是否为快递，是快递才可以发货
-        if (ObjectUtil.notEqual(order.getDeliveryType(), DeliveryTypeEnum.EXPRESS.getMode())) {
+        if (ObjectUtil.notEqual(order.getDeliveryType(), DeliveryTypeEnum.EXPRESS.getType())) {
             throw exception(ORDER_DELIVERY_FAIL_DELIVERY_TYPE_NOT_EXPRESS);
         }
 

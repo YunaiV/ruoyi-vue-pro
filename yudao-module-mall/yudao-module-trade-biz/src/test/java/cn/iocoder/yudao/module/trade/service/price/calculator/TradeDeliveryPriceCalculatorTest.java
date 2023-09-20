@@ -50,7 +50,7 @@ public class TradeDeliveryPriceCalculatorTest  extends BaseMockitoUnitTest {
     public void init(){
         // 准备参数
         reqBO = new TradePriceCalculateReqBO()
-                .setDeliveryType(DeliveryTypeEnum.EXPRESS.getMode())
+                .setDeliveryType(DeliveryTypeEnum.EXPRESS.getType())
                 .setAddressId(10L)
                 .setUserId(1L)
                 .setItems(asList(

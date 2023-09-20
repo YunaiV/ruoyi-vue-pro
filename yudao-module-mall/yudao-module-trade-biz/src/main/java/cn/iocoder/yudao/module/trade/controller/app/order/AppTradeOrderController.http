@@ -8,7 +8,7 @@ GET {{appApi}}/trade/order/settlement?type=0&items[0].cartId=50&couponId=1
 Authorization: Bearer {{appToken}}
 tenant-id: {{appTenentId}}
 
-### /trade-order/create 创建订单（基于商品）
+### /trade-order/create 创建订单（基于商品）【快递】
 POST {{appApi}}/trade/order/create
 Content-Type: application/json
 Authorization: Bearer {{appToken}}
@@ -25,6 +25,27 @@ tenant-id: {{appTenentId}}
     }
   ],
   "remark": "我是备注"
+}
+
+### /trade-order/create 创建订单（基于商品）【自提】
+POST {{appApi}}/trade/order/create
+Content-Type: application/json
+Authorization: Bearer {{appToken}}
+tenant-id: {{appTenentId}}
+
+{
+  "pointStatus": true,
+  "deliveryType": 2,
+  "pickUpStoreId": 1,
+  "items": [
+    {
+      "skuId": 1,
+      "count": 2
+    }
+  ],
+  "remark": "我是备注",
+  "receiverName": "土豆",
+  "receiverMobile": "15601691300"
 }
 
 ### 获得订单交易的分页
