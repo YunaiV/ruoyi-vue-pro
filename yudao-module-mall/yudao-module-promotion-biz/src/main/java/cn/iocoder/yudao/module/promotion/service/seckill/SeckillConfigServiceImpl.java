@@ -20,6 +20,8 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.findFirst;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.isBetween;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 
 /**
@@ -65,6 +67,12 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
 
         // 更新状态
         seckillConfigMapper.updateById(new SeckillConfigDO().setId(id).setStatus(status));
+    }
+
+    @Override
+    public SeckillConfigDO getSeckillConfigListByStatusOnCurrentTime(Integer status) {
+        return findFirst(seckillConfigMapper.selectList(SeckillConfigDO::getStatus, status),
+                config -> isBetween(config.getStartTime(), config.getEndTime()));
     }
 
     @Override

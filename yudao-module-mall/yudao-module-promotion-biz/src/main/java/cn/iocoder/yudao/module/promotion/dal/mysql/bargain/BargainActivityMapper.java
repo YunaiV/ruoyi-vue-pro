@@ -45,11 +45,34 @@ public interface BargainActivityMapper extends BaseMapperX<BargainActivityDO> {
                 .setSql("stock = stock - " + count));
     }
 
-    default PageResult<BargainActivityDO> selectAppPage(PageParam pageReqVO, Integer status, LocalDateTime now) {
+    /**
+     * 查询处在 now 日期时间且是 status 状态的活动分页
+     *
+     * @param pageReqVO 分页参数
+     * @param status    状态
+     * @param now       当前日期时间
+     * @return 活动分页
+     */
+    default PageResult<BargainActivityDO> selectPage(PageParam pageReqVO, Integer status, LocalDateTime now) {
         return selectPage(pageReqVO, new LambdaQueryWrapperX<BargainActivityDO>()
                 .eq(BargainActivityDO::getStatus, status)
                 .le(BargainActivityDO::getStartTime, now)
                 .ge(BargainActivityDO::getEndTime, now));
+    }
+
+    /**
+     * 查询处在 now 日期时间且是 status 状态的活动分页
+     *
+     * @param status 状态
+     * @param now    当前日期时间
+     * @return 活动分页
+     */
+    default List<BargainActivityDO> selectList(Integer count, Integer status, LocalDateTime now) {
+        return selectList(new LambdaQueryWrapperX<BargainActivityDO>()
+                .eq(BargainActivityDO::getStatus, status)
+                .le(BargainActivityDO::getStartTime, now)
+                .ge(BargainActivityDO::getEndTime, now)
+                .apply("LIMIT " + count));
     }
 
 }

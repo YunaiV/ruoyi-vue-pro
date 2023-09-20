@@ -553,41 +553,49 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         tradeOrderMapper.updateById(update);
         // TODO @芋艿：改价时，赠送的积分，要不要做改动？？？
 
-        // TODO @puhui999：应该是按照 payPrice 分配；并且要考虑取余问题；payPrice 也要考虑，item 里的
-        // TODO：先按 adjustPrice 实现，没明白 payPrice 怎么搞哈哈哈
-        // TODO @puhui999：就是对比新老 adjustPrice 的差值，然后计算补充的 adjustPrice 最终值；另外，可以不用区分 items.size 是不是 > 1 哈；应该是一致的逻辑；分摊的逻辑，有点类似 dividePrice 方法噢；
         // 5、更新 TradeOrderItem
-        if (items.size() > 1) {
-            // TradeOrderItemDO 需要做 adjustPrice 的分摊
-            int price = reqVO.getAdjustPrice() / items.size();
-            int remainderPrice = reqVO.getAdjustPrice() % items.size();
-            List<TradeOrderItemDO> orders = new ArrayList<>();
-            for (int i = 0; i < items.size(); i++) {
-                // 把平摊后剩余的金额加到第一个订单项
-                if (remainderPrice != 0 && i == 0) {
-                    orders.add(convertOrderItemPrice(items.get(i), price + remainderPrice));
-                }
-                orders.add(convertOrderItemPrice(items.get(i), price));
-            }
-            tradeOrderItemMapper.updateBatch(orders);
-        } else {
-            TradeOrderItemDO orderItem = items.get(0);
-            TradeOrderItemDO updateItem = convertOrderItemPrice(orderItem, reqVO.getAdjustPrice());
-            tradeOrderItemMapper.updateById(updateItem);
+        // TradeOrderItemDO 需要做 adjustPrice 的分摊
+        List<Integer> dividePrices = dividePrice(items, orderPayPrice);
+        List<TradeOrderItemDO> updateItems = new ArrayList<>();
+        for (int i = 0; i < items.size(); i++) {
+            TradeOrderItemDO item = items.get(i);
+            Integer adjustPrice = item.getPrice() - dividePrices.get(i); // 计算调整的金额
+            updateItems.add(new TradeOrderItemDO().setId(item.getId()).setAdjustPrice(adjustPrice)
+                    .setPayPrice(item.getPayPrice() - adjustPrice));
         }
+        tradeOrderItemMapper.updateBatch(updateItems);
+
 
         // 6、更新支付订单
         payOrderApi.updatePayOrderPrice(order.getPayOrderId(), update.getPayPrice());
     }
 
-    private TradeOrderItemDO convertOrderItemPrice(TradeOrderItemDO orderItem, Integer price) {
-        TradeOrderItemDO newOrderItem = new TradeOrderItemDO();
-        newOrderItem.setId(orderItem.getId());
-        newOrderItem.setAdjustPrice(price);
-        int payPrice = orderItem.getAdjustPrice() != null ? (orderItem.getPayPrice() - orderItem.getAdjustPrice())
-                + price : orderItem.getPayPrice() + price;
-        newOrderItem.setPayPrice(payPrice);
-        return newOrderItem;
+    /**
+     * 计算订单调价价格分摊
+     *
+     * @param items         订单项
+     * @param orderPayPrice 订单支付金额
+     * @return 分摊金额数组，和传入的 orderItems 一一对应
+     */
+    private List<Integer> dividePrice(List<TradeOrderItemDO> items, Integer orderPayPrice) {
+        Integer total = getSumValue(items, TradeOrderItemDO::getPrice, Integer::sum);
+        assert total != null;
+        // 遍历每一个，进行分摊
+        List<Integer> prices = new ArrayList<>(items.size());
+        int remainPrice = orderPayPrice;
+        for (int i = 0; i < items.size(); i++) {
+            TradeOrderItemDO orderItem = items.get(i);
+            int partPrice;
+            if (i < items.size() - 1) { // 减一的原因，是因为拆分时，如果按照比例，可能会出现.所以最后一个，使用反减
+                partPrice = (int) (orderPayPrice * (1.0D * orderItem.getPayPrice() / total));
+                remainPrice -= partPrice;
+            } else {
+                partPrice = remainPrice;
+            }
+            Assert.isTrue(partPrice >= 0, "分摊金额必须大于等于 0");
+            prices.add(partPrice);
+        }
+        return prices;
     }
 
     @Override

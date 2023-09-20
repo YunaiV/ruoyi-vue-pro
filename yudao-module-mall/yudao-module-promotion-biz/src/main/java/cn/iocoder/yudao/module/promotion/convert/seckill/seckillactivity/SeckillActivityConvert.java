@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.convert.seckill.seckillactivity;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
@@ -29,7 +30,6 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 
 /**
  * 秒杀活动 Convert
@@ -98,10 +98,9 @@ public interface SeckillActivityConvert {
         Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
         respVO.setActivities(CollectionUtils.convertList(convertList3(activityList), item -> {
             findAndThen(spuMap, item.getSpuId(), spu -> {
-                // TODO @puhui999：可以尝试链式 set 哈；
-                item.setPicUrl(spu.getPicUrl());
-                item.setMarketPrice(spu.getMarketPrice());
-                item.setUnitName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.PRODUCT_UNIT, spu.getUnit()));
+                item.setPicUrl(spu.getPicUrl())
+                        .setMarketPrice(spu.getMarketPrice())
+                        .setUnitName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.PRODUCT_UNIT, spu.getUnit()));
             });
             return item;
         }));
@@ -115,10 +114,9 @@ public interface SeckillActivityConvert {
         Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
         List<AppSeckillActivityRespVO> list = CollectionUtils.convertList(result.getList(), item -> {
             findAndThen(spuMap, item.getSpuId(), spu -> {
-                // TODO @puhui999：可以尝试链式 set 哈；
-                item.setPicUrl(spu.getPicUrl());
-                item.setMarketPrice(spu.getMarketPrice());
-                item.setUnitName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.PRODUCT_UNIT, spu.getUnit()));
+                item.setPicUrl(spu.getPicUrl())
+                        .setMarketPrice(spu.getMarketPrice())
+                        .setUnitName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.PRODUCT_UNIT, spu.getUnit()));
             });
             return item;
         });
@@ -131,12 +129,12 @@ public interface SeckillActivityConvert {
     List<AppSeckillActivityDetailRespVO.Product> convertList1(List<SeckillProductDO> products);
 
     default AppSeckillActivityDetailRespVO convert3(SeckillActivityDO seckillActivity, List<SeckillProductDO> products, SeckillConfigDO filteredConfig) {
-        AppSeckillActivityDetailRespVO respVO = convert2(seckillActivity);
-        respVO.setProducts(convertList1(products));
-        // TODO @puhui999：可以尝试链式 set 哈；
-        respVO.setStartTime(buildTime(filteredConfig.getStartTime()));
-        respVO.setEndTime(buildTime(filteredConfig.getEndTime()));
-        return respVO;
+        return convert2(seckillActivity)
+                .setProducts(convertList1(products))
+                .setStartTime(LocalDateTimeUtil.parse(LocalDateTimeUtil.format(seckillActivity.getStartTime(), "yyyy-MM-dd") + " " + filteredConfig.getStartTime(),
+                        "yyyy-MM-dd HH:mm:ss")) // 活动开始日期和时段结合
+                .setEndTime(LocalDateTimeUtil.parse(LocalDateTimeUtil.format(seckillActivity.getEndTime(), "yyyy-MM-dd") + " " + filteredConfig.getEndTime(),
+                        "yyyy-MM-dd HH:mm:ss")); // 活动结束日期和时段结合
     }
 
 }

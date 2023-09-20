@@ -62,8 +62,7 @@ public interface CombinationActivityConvert {
         PageResult<CombinationActivityRespVO> pageResult = convertPage(page);
         pageResult.getList().forEach(item -> {
             MapUtils.findAndThen(spuMap, item.getSpuId(), spu -> {
-                item.setSpuName(spu.getName());
-                item.setPicUrl(spu.getPicUrl());
+                item.setSpuName(spu.getName()).setPicUrl(spu.getPicUrl());
             });
             item.setProducts(convertList2(productList));
         });
@@ -100,16 +99,15 @@ public interface CombinationActivityConvert {
     default CombinationRecordDO convert(CombinationRecordCreateReqDTO reqDTO,
                                         CombinationActivityDO activity, MemberUserRespDTO user,
                                         ProductSpuRespDTO spu, ProductSkuRespDTO sku) {
-        // TODO @puhui999：搞成链式的 set；这样会更规整一点；
-        CombinationRecordDO record = convert(reqDTO);
-        record.setVirtualGroup(false);
-        record.setExpireTime(record.getStartTime().plusHours(activity.getLimitDuration()));
-        record.setUserSize(activity.getUserSize());
-        record.setNickname(user.getNickname());
-        record.setAvatar(user.getAvatar());
-        record.setSpuName(spu.getName());
-        record.setPicUrl(sku.getPicUrl());
-        return record;
+        // TODO @puhui999：订单付款后需要设置开始时间和结束时间；
+        return convert(reqDTO)
+                .setVirtualGroup(false)
+                .setExpireTime(activity.getStartTime().plusHours(activity.getLimitDuration()))
+                .setUserSize(activity.getUserSize())
+                .setNickname(user.getNickname())
+                .setAvatar(user.getAvatar())
+                .setSpuName(spu.getName())
+                .setPicUrl(sku.getPicUrl());
     }
 
     List<CombinationRecordRespDTO> convert(List<CombinationRecordDO> bean);
@@ -121,8 +119,7 @@ public interface CombinationActivityConvert {
         Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
         return CollectionUtils.convertList(activityList, item -> {
             findAndThen(spuMap, item.getSpuId(), spu -> {
-                item.setPicUrl(spu.getPicUrl());
-                item.setMarketPrice(spu.getMarketPrice());
+                item.setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice());
             });
             return item;
         });
@@ -135,8 +132,7 @@ public interface CombinationActivityConvert {
         Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
         List<AppCombinationActivityRespVO> list = CollectionUtils.convertList(appPage.getList(), item -> {
             findAndThen(spuMap, item.getSpuId(), spu -> {
-                item.setPicUrl(spu.getPicUrl());
-                item.setMarketPrice(spu.getMarketPrice());
+                item.setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice());
             });
             return item;
         });
@@ -149,9 +145,7 @@ public interface CombinationActivityConvert {
     List<AppCombinationActivityDetailRespVO.Product> convertList1(List<CombinationProductDO> products);
 
     default AppCombinationActivityDetailRespVO convert3(CombinationActivityDO combinationActivity, List<CombinationProductDO> products) {
-        AppCombinationActivityDetailRespVO detailRespVO = convert2(combinationActivity);
-        detailRespVO.setProducts(convertList1(products));
-        return detailRespVO;
+        return convert2(combinationActivity).setProducts(convertList1(products));
     }
 
 }

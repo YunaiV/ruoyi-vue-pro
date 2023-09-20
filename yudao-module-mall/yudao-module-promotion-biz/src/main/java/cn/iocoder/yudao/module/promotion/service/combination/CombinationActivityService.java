@@ -85,19 +85,19 @@ public interface CombinationActivityService {
     void validateCombination(Long activityId, Long userId, Long skuId, Integer count);
 
     /**
-     * 获取 APP 端活动展示数据
+     * 获取正在进行的活动分页数据
      *
      * @param count 需要的数量
-     * @return 活动列表
+     * @return 拼团活动分页
      */
-    List<CombinationActivityDO> getCombinationActivityAppList(Integer count);
+    List<CombinationActivityDO> getCombinationActivityListByCount(Integer count);
 
     /**
-     * 获取 APP 端活动分页数据
+     * 获取正在进行的活动分页数据
      *
-     * @param pageParam 分页参数
-     * @return 活动分页数据
+     * @param pageParam 分页请求
+     * @return 拼团活动分页
      */
-    PageResult<CombinationActivityDO> getCombinationActivityAppPage(PageParam pageParam);
+    PageResult<CombinationActivityDO> getCombinationActivityPage(PageParam pageParam);
 
 }

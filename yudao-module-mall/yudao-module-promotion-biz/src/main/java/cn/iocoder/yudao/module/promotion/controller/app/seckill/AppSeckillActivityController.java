@@ -27,13 +27,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.isBetween;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.SECKILL_ACTIVITY_APP_STATUS_CLOSED;
 
 @Tag(name = "用户 App - 秒杀活动")
@@ -54,22 +52,17 @@ public class AppSeckillActivityController {
     @Operation(summary = "获得当前秒杀活动", description = "获取当前正在进行的活动，提供给首页使用")
     public CommonResult<AppSeckillActivityNowRespVO> getNowSeckillActivity() {
         // 1. 获取当前时间处在哪个秒杀阶段
-        // TODO @puhui999：可以考虑在 service 写个方法；这样 controller 不用关注过多逻辑
-        List<SeckillConfigDO> configList = configService.getSeckillConfigList();
-        SeckillConfigDO filteredConfig = findFirst(configList, config -> ObjectUtil.equal(config.getStatus(),
-                CommonStatusEnum.ENABLE.getStatus()) && isBetween(config.getStartTime(), config.getEndTime()));
-        if (filteredConfig == null) { // 时段不存在直接返回 null
+        SeckillConfigDO configList = configService.getSeckillConfigListByStatusOnCurrentTime(CommonStatusEnum.ENABLE.getStatus());
+        if (configList == null) { // 时段不存在直接返回 null
             return success(null);
         }
 
         // 2. 查询满足当前阶段的活动
-        // TODO @puhui999：最好直接返回开启的；不多查询数据
-        List<SeckillActivityDO> activityList = activityService.getSeckillActivityListByConfigIds(Arrays.asList(filteredConfig.getId()));
-        List<SeckillActivityDO> filteredList = filterList(activityList, item -> ObjectUtil.equal(item.getStatus(), CommonStatusEnum.ENABLE.getStatus()));
+        List<SeckillActivityDO> activityList = activityService.getSeckillActivityListByConfigIdAndStatus(configList.getId(), CommonStatusEnum.ENABLE.getStatus());
         // 3 获取 spu 信息
-        List<ProductSpuRespDTO> spuList = spuApi.getSpuList(convertList(filteredList, SeckillActivityDO::getSpuId));
+        List<ProductSpuRespDTO> spuList = spuApi.getSpuList(convertList(activityList, SeckillActivityDO::getSpuId));
         // TODO 芋艿：需要增加 spring cache
-        return success(SeckillActivityConvert.INSTANCE.convert(filteredConfig, filteredList, spuList));
+        return success(SeckillActivityConvert.INSTANCE.convert(configList, activityList, spuList));
     }
 
     @GetMapping("/page")
@@ -87,12 +80,9 @@ public class AppSeckillActivityController {
     @Operation(summary = "获得秒杀活动明细")
     @Parameter(name = "id", description = "活动编号", required = true, example = "1024")
     public CommonResult<AppSeckillActivityDetailRespVO> getSeckillActivity(@RequestParam("id") Long id) {
-        // 1、获取当前时间处在哪个秒杀阶段
-        // TODO puhui999：这里，和 58 行是雷同的
-        List<SeckillConfigDO> configList = configService.getSeckillConfigList();
-        SeckillConfigDO filteredConfig = findFirst(configList, config -> ObjectUtil.equal(config.getStatus(),
-                CommonStatusEnum.ENABLE.getStatus()) && isBetween(config.getStartTime(), config.getEndTime()));
-        if (filteredConfig == null) { // 时段不存在直接返回 null
+        // 1. 获取当前时间处在哪个秒杀阶段
+        SeckillConfigDO configList = configService.getSeckillConfigListByStatusOnCurrentTime(CommonStatusEnum.ENABLE.getStatus());
+        if (configList == null) { // 时段不存在直接返回 null
             return success(null);
         }
 
@@ -107,7 +97,7 @@ public class AppSeckillActivityController {
 
         // 3. 拼接数据
         List<SeckillProductDO> products = activityService.getSeckillProductListByActivityId(seckillActivity.getId());
-        return success(SeckillActivityConvert.INSTANCE.convert3(seckillActivity, products, filteredConfig));
+        return success(SeckillActivityConvert.INSTANCE.convert3(seckillActivity, products, configList));
     }
 
 }

@@ -27,6 +27,7 @@ import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 
+import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -49,7 +50,7 @@ public class AppCombinationActivityController {
     @Parameter(name = "count", description = "需要展示的数量", example = "6")
     public CommonResult<List<AppCombinationActivityRespVO>> getCombinationActivityList(
             @RequestParam(name = "count", defaultValue = "6") Integer count) {
-        List<CombinationActivityDO> list = activityService.getCombinationActivityAppList(count);
+        List<CombinationActivityDO> list = activityService.getCombinationActivityListByCount(defaultIfNull(count, 6));
         if (CollUtil.isEmpty(list)) {
             return success(CombinationActivityConvert.INSTANCE.convertAppList(list));
         }
@@ -62,7 +63,7 @@ public class AppCombinationActivityController {
     @GetMapping("/page")
     @Operation(summary = "获得拼团活动分页")
     public CommonResult<PageResult<AppCombinationActivityRespVO>> getCombinationActivityPage(PageParam pageParam) {
-        PageResult<CombinationActivityDO> result = activityService.getCombinationActivityAppPage(pageParam);
+        PageResult<CombinationActivityDO> result = activityService.getCombinationActivityPage(pageParam);
         if (CollUtil.isEmpty(result.getList())) {
             return success(PageResult.empty(result.getTotal()));
         }

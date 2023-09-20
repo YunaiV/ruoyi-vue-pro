@@ -224,8 +224,7 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
             throw exception(COMBINATION_ACTIVITY_STATUS_DISABLE);
         }
         // 1.3 校验是否超出单次限购数量
-        // TODO puhui999：count > activity.getSingleLimitCount() 会更好理解点；
-        if (activity.getSingleLimitCount() < count) {
+        if (count > activity.getSingleLimitCount()) {
             throw exception(COMBINATION_RECORD_FAILED_SINGLE_LIMIT_COUNT_EXCEED);
         }
 
@@ -247,19 +246,13 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     }
 
     @Override
-    public List<CombinationActivityDO> getCombinationActivityAppList(Integer count) {
-        if (count == null) {
-            count = 6;
-        }
-
-        PageResult<CombinationActivityDO> result = combinationActivityMapper.selectAppPage(new PageParam().setPageSize(count),
-                CommonStatusEnum.ENABLE.getStatus());
-        return result.getList();
+    public List<CombinationActivityDO> getCombinationActivityListByCount(Integer count) {
+        return combinationActivityMapper.selectList(CommonStatusEnum.ENABLE.getStatus(), count);
     }
 
     @Override
-    public PageResult<CombinationActivityDO> getCombinationActivityAppPage(PageParam pageParam) {
-        return combinationActivityMapper.selectAppPage(pageParam, CommonStatusEnum.ENABLE.getStatus());
+    public PageResult<CombinationActivityDO> getCombinationActivityPage(PageParam pageParam) {
+        return combinationActivityMapper.selectPage(pageParam, CommonStatusEnum.ENABLE.getStatus());
     }
 
 }
