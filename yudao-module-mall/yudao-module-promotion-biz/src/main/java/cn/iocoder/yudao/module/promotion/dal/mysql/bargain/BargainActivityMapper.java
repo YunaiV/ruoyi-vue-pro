@@ -72,7 +72,7 @@ public interface BargainActivityMapper extends BaseMapperX<BargainActivityDO> {
                 .eq(BargainActivityDO::getStatus, status)
                 .le(BargainActivityDO::getStartTime, now)
                 .ge(BargainActivityDO::getEndTime, now)
-                .apply("LIMIT " + count));
+                .last("LIMIT " + count));
     }
 
 }

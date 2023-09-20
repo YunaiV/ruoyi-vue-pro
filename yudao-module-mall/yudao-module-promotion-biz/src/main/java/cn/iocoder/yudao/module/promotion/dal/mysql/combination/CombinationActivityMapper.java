@@ -51,7 +51,7 @@ public interface CombinationActivityMapper extends BaseMapperX<CombinationActivi
     default List<CombinationActivityDO> selectList(Integer status, Integer count) {
         return selectList(new LambdaQueryWrapperX<CombinationActivityDO>()
                 .eq(CombinationActivityDO::getStatus, status)
-                .apply("LIMIT " + count));
+                .last("LIMIT " + count));
     }
 
 }
