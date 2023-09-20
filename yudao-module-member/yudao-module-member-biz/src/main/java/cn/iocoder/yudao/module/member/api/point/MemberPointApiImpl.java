@@ -31,4 +31,13 @@ public class MemberPointApiImpl implements MemberPointApi {
         memberPointRecordService.createPointRecord(userId, point, bizTypeEnum, bizId);
     }
 
+    @Override
+    public void reducePoint(Long userId, Integer point, Integer bizType, String bizId) {
+        MemberPointBizTypeEnum bizTypeEnum = MemberPointBizTypeEnum.getByType(bizType);
+        if (bizTypeEnum == null) {
+            throw exception(POINT_RECORD_BIZ_NOT_SUPPORT);
+        }
+        memberPointRecordService.createPointRecord(userId, point, bizTypeEnum, bizId);
+    }
+
 }

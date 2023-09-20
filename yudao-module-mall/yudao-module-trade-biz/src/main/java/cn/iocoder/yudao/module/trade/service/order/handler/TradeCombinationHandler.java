@@ -37,6 +37,11 @@ public class TradeCombinationHandler implements TradeOrderHandler {
 
     @Override
     public void afterOrderCreate(TradeAfterOrderCreateReqBO reqBO) {
+        // TODO @puhui999：需要判断下；
+        if (true) {
+            return;
+        }
+
         // 创建砍价记录
         combinationRecordApi.createCombinationRecord(TradeOrderConvert.INSTANCE.convert(reqBO));
     }

@@ -15,7 +15,8 @@ Authorization: Bearer {{appToken}}
 tenant-id: {{appTenentId}}
 
 {
-  "type": 0,
+  "pointStatus": true,
+  "deliveryType": 1,
   "addressId": 21,
   "items": [
     {

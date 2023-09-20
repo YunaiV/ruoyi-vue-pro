@@ -56,6 +56,7 @@ public interface TradeOrderConvert {
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
+            @Mapping(source = "userId", target = "userId"),
             @Mapping(source = "createReqVO.couponId", target = "couponId"),
             @Mapping(target = "remark", ignore = true),
             @Mapping(source = "createReqVO.remark", target = "userRemark"),
@@ -89,22 +90,15 @@ public interface TradeOrderConvert {
     TradeOrderItemDO convert(TradePriceCalculateRespBO.OrderItem item);
 
     default ProductSkuUpdateStockReqDTO convert(List<TradeOrderItemDO> list) {
-        return new ProductSkuUpdateStockReqDTO(TradeOrderConvert.INSTANCE.convertList(list));
-    }
-
-    default ProductSkuUpdateStockReqDTO convertNegative(List<TradeOrderItemDO> list) {
-        List<ProductSkuUpdateStockReqDTO.Item> items = TradeOrderConvert.INSTANCE.convertList(list);
-        items.forEach(item -> item.setIncrCount(-item.getIncrCount()));
+        List<ProductSkuUpdateStockReqDTO.Item> items = CollectionUtils.convertList(list, item ->
+                new ProductSkuUpdateStockReqDTO.Item().setId(item.getSkuId()).setIncrCount(-item.getCount()));
         return new ProductSkuUpdateStockReqDTO(items);
     }
-
-    List<ProductSkuUpdateStockReqDTO.Item> convertList(List<TradeOrderItemDO> list);
-
-    @Mappings({
-            @Mapping(source = "skuId", target = "id"),
-            @Mapping(source = "count", target = "incrCount"),
-    })
-    ProductSkuUpdateStockReqDTO.Item convert(TradeOrderItemDO bean);
+    default ProductSkuUpdateStockReqDTO convertNegative(List<AppTradeOrderSettlementReqVO.Item> list) {
+        List<ProductSkuUpdateStockReqDTO.Item> items = CollectionUtils.convertList(list, item ->
+                new ProductSkuUpdateStockReqDTO.Item().setId(item.getSkuId()).setIncrCount(-item.getCount()));
+        return new ProductSkuUpdateStockReqDTO(items);
+    }
 
     default PayOrderCreateReqDTO convert(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
                                          TradePriceCalculateRespBO calculateRespBO, TradeOrderProperties orderProperties) {
@@ -218,8 +212,9 @@ public interface TradeOrderConvert {
 
     default TradePriceCalculateReqBO convert(Long userId, AppTradeOrderSettlementReqVO settlementReqVO,
                                              List<CartDO> cartList) {
-        TradePriceCalculateReqBO reqBO = new TradePriceCalculateReqBO();
-        reqBO.setUserId(userId).setCouponId(settlementReqVO.getCouponId()).setAddressId(settlementReqVO.getAddressId())
+        TradePriceCalculateReqBO reqBO = new TradePriceCalculateReqBO().setUserId(userId)
+                .setCouponId(settlementReqVO.getCouponId()).setPointStatus(settlementReqVO.getPointStatus())
+                .setDeliveryType(settlementReqVO.getDeliveryType()).setAddressId(settlementReqVO.getAddressId())
                 .setItems(new ArrayList<>(settlementReqVO.getItems().size()));
         // 商品项的构建
         Map<Long, CartDO> cartMap = convertMap(cartList, CartDO::getId);

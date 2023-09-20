@@ -49,6 +49,11 @@ public class TradePriceCalculateRespBO {
     private Long couponId;
 
     /**
+     * 使用的积分
+     */
+    private Integer usePoint;
+
+    /**
      * 订单价格
      */
     @Data

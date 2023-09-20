@@ -2,11 +2,14 @@ package cn.iocoder.yudao.module.trade.service.price.calculator;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryPickUpStoreDO;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryExpressChargeModeEnum;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressTemplateService;
+import cn.iocoder.yudao.module.trade.service.delivery.DeliveryPickUpStoreService;
 import cn.iocoder.yudao.module.trade.service.delivery.bo.DeliveryExpressTemplateRespBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
@@ -22,8 +25,7 @@ import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PRICE_CALCULATE_DELIVERY_PRICE_USER_ADDR_IS_EMPTY;
-import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PRICE_CALCULATE_DELIVERY_PRICE_TEMPLATE_NOT_FOUND;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
 /**
  * 运费的 {@link TradePriceCalculator} 实现类
@@ -37,20 +39,41 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
 
     @Resource
     private AddressApi addressApi;
+
+    @Resource
+    private DeliveryPickUpStoreService deliveryPickUpStoreService;
     @Resource
     private DeliveryExpressTemplateService deliveryExpressTemplateService;
 
     @Override
     public void calculate(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result) {
-        // TODO @芋艿：如果门店自提，需要校验是否开启；
-        // 1.1 判断配送方式
-        if (param.getDeliveryType() == null || DeliveryTypeEnum.PICK_UP.getMode().equals(param.getDeliveryType())) {
+        if (param.getDeliveryType() == null) {
             return;
         }
-        if (param.getAddressId() == null) {
-            throw exception(PRICE_CALCULATE_DELIVERY_PRICE_USER_ADDR_IS_EMPTY);
+        if (DeliveryTypeEnum.PICK_UP.getMode().equals(param.getDeliveryType())) {
+            calculateByPickUp(param, result);
+        } else if (DeliveryTypeEnum.EXPRESS.getMode().equals(param.getDeliveryType())) {
+            calculateExpress(param, result);
         }
-        // 1.2 得到收件地址区域
+    }
+
+    private void calculateByPickUp(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result) {
+        if (param.getPickUpStoreId() == null) {
+            throw exception(PRICE_CALCULATE_DELIVERY_PRICE_PICK_UP_STORE_IS_EMPTY);
+        }
+        DeliveryPickUpStoreDO pickUpStore = deliveryPickUpStoreService.getDeliveryPickUpStore(param.getPickUpStoreId());
+        if (pickUpStore == null || CommonStatusEnum.DISABLE.getStatus().equals(pickUpStore.getStatus())) {
+            throw exception(PICK_UP_STORE_NOT_EXISTS);
+        }
+    }
+
+    // ========= 快递发货 ==========
+
+    private void calculateExpress(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result) {
+        // 1. 得到收件地址区域
+        if (param.getAddressId() == null) {
+            throw exception(PRICE_CALCULATE_DELIVERY_PRICE_USER_ADDRESS_IS_EMPTY);
+        }
         AddressRespDTO address = addressApi.getAddress(param.getAddressId(), param.getUserId());
         Assert.notNull(address, "收件人({})的地址，不能为空", param.getUserId());
 
@@ -89,8 +112,12 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
             for (OrderItem orderItem : orderItems) {
                 totalCount  += orderItem.getCount();
                 totalPrice  += orderItem.getPayPrice();
-                totalWeight += totalWeight + orderItem.getWeight() * orderItem.getCount();
-                totalVolume += totalVolume + orderItem.getVolume() * orderItem.getCount();
+                if (orderItem.getWeight() != null) {
+                    totalWeight += totalWeight + orderItem.getWeight() * orderItem.getCount();
+                }
+                if (orderItem.getVolume() != null) {
+                    totalVolume += totalVolume + orderItem.getVolume() * orderItem.getCount();
+                }
             }
             // 优先判断是否包邮. 如果包邮不计算快递运费
             if (isExpressFree(templateBO.getChargeMode(), totalCount, totalWeight,

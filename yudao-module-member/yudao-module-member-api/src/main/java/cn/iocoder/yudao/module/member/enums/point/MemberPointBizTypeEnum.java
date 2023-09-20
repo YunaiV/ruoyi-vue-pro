@@ -17,8 +17,10 @@ import java.util.Objects;
 public enum MemberPointBizTypeEnum implements IntArrayValuable {
 
     SIGN(1, "签到", "签到获得 {} 积分", true),
-    ORDER_BUY(10, "订单消费", "下单获得 {} 积分", true),
-    ORDER_CANCEL(11, "订单取消", "退单获得 {} 积分", false); // 退回积分
+    ORDER_REWARD(10, "订单奖励", "下单获得 {} 积分", true),
+    ORDER_CANCEL(11, "订单取消", "退单获得 {} 积分", false), // 退回积分
+    ORDER_USE(12, "订单使用", "下单使用 {} 积分", false), // 扣减积分
+    ;
 
     /**
      * 类型
