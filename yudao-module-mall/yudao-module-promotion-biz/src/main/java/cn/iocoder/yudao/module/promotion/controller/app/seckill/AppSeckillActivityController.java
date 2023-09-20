@@ -53,19 +53,20 @@ public class AppSeckillActivityController {
     @GetMapping("/get-now")
     @Operation(summary = "获得当前秒杀活动", description = "获取当前正在进行的活动，提供给首页使用")
     public CommonResult<AppSeckillActivityNowRespVO> getNowSeckillActivity() {
-        // 1、获取当前时间处在哪个秒杀阶段
+        // 1. 获取当前时间处在哪个秒杀阶段
+        // TODO @puhui999：可以考虑在 service 写个方法；这样 controller 不用关注过多逻辑
         List<SeckillConfigDO> configList = configService.getSeckillConfigList();
         SeckillConfigDO filteredConfig = findFirst(configList, config -> ObjectUtil.equal(config.getStatus(),
                 CommonStatusEnum.ENABLE.getStatus()) && isBetween(config.getStartTime(), config.getEndTime()));
-        // 1、1 时段不存在直接返回 null
-        if (filteredConfig == null) {
+        if (filteredConfig == null) { // 时段不存在直接返回 null
             return success(null);
         }
 
-        // 2、查询满足当前阶段的活动
+        // 2. 查询满足当前阶段的活动
+        // TODO @puhui999：最好直接返回开启的；不多查询数据
         List<SeckillActivityDO> activityList = activityService.getSeckillActivityListByConfigIds(Arrays.asList(filteredConfig.getId()));
         List<SeckillActivityDO> filteredList = filterList(activityList, item -> ObjectUtil.equal(item.getStatus(), CommonStatusEnum.ENABLE.getStatus()));
-        // 2、1 获取 spu 信息
+        // 3 获取 spu 信息
         List<ProductSpuRespDTO> spuList = spuApi.getSpuList(convertList(filteredList, SeckillActivityDO::getSpuId));
         // TODO 芋艿：需要增加 spring cache
         return success(SeckillActivityConvert.INSTANCE.convert(filteredConfig, filteredList, spuList));
@@ -74,9 +75,10 @@ public class AppSeckillActivityController {
     @GetMapping("/page")
     @Operation(summary = "获得秒杀活动分页")
     public CommonResult<PageResult<AppSeckillActivityRespVO>> getSeckillActivityPage(AppSeckillActivityPageReqVO pageReqVO) {
-        // 1、查询满足当前阶段的活动
+        // 1. 查询满足当前阶段的活动
         PageResult<SeckillActivityDO> pageResult = activityService.getSeckillActivityAppPageByConfigId(pageReqVO);
-        // 1、1 获取 spu 信息
+
+        // 2. 拼接数据
         List<ProductSpuRespDTO> spuList = spuApi.getSpuList(convertList(pageResult.getList(), SeckillActivityDO::getSpuId));
         return success(SeckillActivityConvert.INSTANCE.convertPage(pageResult, spuList));
     }
@@ -86,15 +88,15 @@ public class AppSeckillActivityController {
     @Parameter(name = "id", description = "活动编号", required = true, example = "1024")
     public CommonResult<AppSeckillActivityDetailRespVO> getSeckillActivity(@RequestParam("id") Long id) {
         // 1、获取当前时间处在哪个秒杀阶段
+        // TODO puhui999：这里，和 58 行是雷同的
         List<SeckillConfigDO> configList = configService.getSeckillConfigList();
         SeckillConfigDO filteredConfig = findFirst(configList, config -> ObjectUtil.equal(config.getStatus(),
                 CommonStatusEnum.ENABLE.getStatus()) && isBetween(config.getStartTime(), config.getEndTime()));
-        // 1、1 时段不存在直接返回 null
-        if (filteredConfig == null) {
+        if (filteredConfig == null) { // 时段不存在直接返回 null
             return success(null);
         }
 
-        // 2、获取活动
+        // 2. 获取活动
         SeckillActivityDO seckillActivity = activityService.getSeckillActivity(id);
         if (seckillActivity == null) {
             return success(null);
@@ -103,7 +105,7 @@ public class AppSeckillActivityController {
             throw exception(SECKILL_ACTIVITY_APP_STATUS_CLOSED);
         }
 
-        // 3、获取活动商品
+        // 3. 拼接数据
         List<SeckillProductDO> products = activityService.getSeckillProductListByActivityId(seckillActivity.getId());
         return success(SeckillActivityConvert.INSTANCE.convert3(seckillActivity, products, filteredConfig));
     }

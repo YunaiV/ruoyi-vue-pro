@@ -142,18 +142,20 @@ public class BargainActivityServiceImpl implements BargainActivityService {
     }
 
     @Override
-    public PageResult<BargainActivityDO> getBargainActivityAppPage(PageParam pageReqVO) {
+    public PageResult<BargainActivityDO> getBargainActivityPageForApp(PageParam pageReqVO) {
         // 只查询进行中，且在时间范围内的
         return bargainActivityMapper.selectAppPage(pageReqVO, CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now());
-
     }
 
     @Override
-    public List<BargainActivityDO> getBargainActivityAppList(Integer count) {
+    public List<BargainActivityDO> getBargainActivityListForApp(Integer count) {
+        // TODO @puhui999：这种 default count 的逻辑，可以放到 controller 哈；然后可以使用 ObjectUtils.default 方法
         if (count == null) {
             count = 6;
         }
-        PageResult<BargainActivityDO> result = bargainActivityMapper.selectAppPage(new PageParam().setPageSize(count), CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now());
+        // TODO @puhui999：这种不要用 page；会浪费一次 count；
+        PageResult<BargainActivityDO> result = bargainActivityMapper.selectAppPage(new PageParam().setPageSize(count),
+                CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now());
         return result.getList();
     }
 

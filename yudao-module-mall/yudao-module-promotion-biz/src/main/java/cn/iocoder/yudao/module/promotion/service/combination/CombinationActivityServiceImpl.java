@@ -224,6 +224,7 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
             throw exception(COMBINATION_ACTIVITY_STATUS_DISABLE);
         }
         // 1.3 校验是否超出单次限购数量
+        // TODO puhui999：count > activity.getSingleLimitCount() 会更好理解点；
         if (activity.getSingleLimitCount() < count) {
             throw exception(COMBINATION_RECORD_FAILED_SINGLE_LIMIT_COUNT_EXCEED);
         }
@@ -243,7 +244,6 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
         if (activity.getTotalLimitCount() < countSum) {
             throw exception(COMBINATION_RECORD_FAILED_TOTAL_LIMIT_COUNT_EXCEED);
         }
-
     }
 
     @Override

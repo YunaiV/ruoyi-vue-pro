@@ -132,7 +132,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         MemberUserRespDTO user = memberUserApi.getUser(reqDTO.getUserId());
         ProductSpuRespDTO spu = productSpuApi.getSpu(reqDTO.getSpuId());
         ProductSkuRespDTO sku = productSkuApi.getSku(reqDTO.getSkuId());
-        recordMapper.insert(CombinationActivityConvert.INSTANCE.convert1(reqDTO, activity, user, spu, sku));
+        recordMapper.insert(CombinationActivityConvert.INSTANCE.convert(reqDTO, activity, user, spu, sku));
     }
 
     @Override

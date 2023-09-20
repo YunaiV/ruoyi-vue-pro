@@ -98,6 +98,7 @@ public interface SeckillActivityConvert {
         Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
         respVO.setActivities(CollectionUtils.convertList(convertList3(activityList), item -> {
             findAndThen(spuMap, item.getSpuId(), spu -> {
+                // TODO @puhui999：可以尝试链式 set 哈；
                 item.setPicUrl(spu.getPicUrl());
                 item.setMarketPrice(spu.getMarketPrice());
                 item.setUnitName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.PRODUCT_UNIT, spu.getUnit()));
@@ -114,6 +115,7 @@ public interface SeckillActivityConvert {
         Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
         List<AppSeckillActivityRespVO> list = CollectionUtils.convertList(result.getList(), item -> {
             findAndThen(spuMap, item.getSpuId(), spu -> {
+                // TODO @puhui999：可以尝试链式 set 哈；
                 item.setPicUrl(spu.getPicUrl());
                 item.setMarketPrice(spu.getMarketPrice());
                 item.setUnitName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.PRODUCT_UNIT, spu.getUnit()));
@@ -131,6 +133,7 @@ public interface SeckillActivityConvert {
     default AppSeckillActivityDetailRespVO convert3(SeckillActivityDO seckillActivity, List<SeckillProductDO> products, SeckillConfigDO filteredConfig) {
         AppSeckillActivityDetailRespVO respVO = convert2(seckillActivity);
         respVO.setProducts(convertList1(products));
+        // TODO @puhui999：可以尝试链式 set 哈；
         respVO.setStartTime(buildTime(filteredConfig.getStartTime()));
         respVO.setEndTime(buildTime(filteredConfig.getEndTime()));
         return respVO;

@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.record.vo.BrokerageRecordPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.record.BrokerageRecordDO;
-import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageUserTypeEnum;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -24,14 +23,12 @@ import java.util.List;
 public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
 
     default PageResult<BrokerageRecordDO> selectPage(BrokerageRecordPageReqVO reqVO) {
-        boolean sourceUserTypeCondition = reqVO.getSourceUserType() != null &&
-                !BrokerageUserTypeEnum.ALL.getType().equals(reqVO.getSourceUserType());
         // 分页查询
         return selectPage(reqVO, new LambdaQueryWrapperX<BrokerageRecordDO>()
                 .eqIfPresent(BrokerageRecordDO::getUserId, reqVO.getUserId())
                 .eqIfPresent(BrokerageRecordDO::getBizType, reqVO.getBizType())
                 .eqIfPresent(BrokerageRecordDO::getStatus, reqVO.getStatus())
-                .eq(sourceUserTypeCondition, BrokerageRecordDO::getSourceUserType, reqVO.getSourceUserType())
+                .eqIfPresent(BrokerageRecordDO::getSourceUserLevel, reqVO.getSourceUserLevel())
                 .betweenIfPresent(BrokerageRecordDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(BrokerageRecordDO::getId));
     }
@@ -59,4 +56,5 @@ public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
     UserBrokerageSummaryBO selectCountAndSumPriceByUserIdAndBizTypeAndStatus(@Param("userId") Long userId,
                                                                              @Param("bizType") Integer bizType,
                                                                              @Param("status") Integer status);
+
 }

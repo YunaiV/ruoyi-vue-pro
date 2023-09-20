@@ -27,7 +27,6 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.cart.CartDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
-import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressTrackRespDTO;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
@@ -274,10 +273,10 @@ public interface TradeOrderConvert {
 
     TradeOrderDO convert(TradeOrderRemarkReqVO reqVO);
 
-    default BrokerageAddReqBO convert(TradeOrderItemDO item, ProductSkuRespDTO sku) {
+    default BrokerageAddReqBO convert(MemberUserRespDTO user, TradeOrderItemDO item, ProductSkuRespDTO sku) {
         return new BrokerageAddReqBO().setBizId(String.valueOf(item.getId())).setSourceUserId(item.getUserId())
                 .setBasePrice(item.getPayPrice() * item.getCount())
-                .setTitle(BrokerageRecordBizTypeEnum.ORDER.getTitle()) // TODO @疯狂：标题类似：木晴冰雪成功购买云时代的JVM原理与实战；茫农成功购买深入拆解消息队列47讲
+                .setTitle(StrUtil.format("{}成功购买{}", user.getNickname(), item.getSpuName()))
                 .setFirstFixedPrice(sku.getFirstBrokeragePrice()).setSecondFixedPrice(sku.getSecondBrokeragePrice());
     }
 
@@ -292,6 +291,7 @@ public interface TradeOrderConvert {
             @Mapping(target = "userId", source = "userId"),
             @Mapping(target = "payPrice", source = "tradeOrderDO.payPrice"),
     })
-    TradeAfterOrderCreateReqBO convert(Long userId, AppTradeOrderCreateReqVO createReqVO, TradeOrderDO tradeOrderDO, TradeOrderItemDO orderItem);
+    TradeAfterOrderCreateReqBO convert(Long userId, AppTradeOrderCreateReqVO createReqVO,
+                                       TradeOrderDO tradeOrderDO, TradeOrderItemDO orderItem);
 
 }

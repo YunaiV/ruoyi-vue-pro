@@ -14,6 +14,8 @@ import javax.validation.constraints.NotNull;
 @Data
 public class TradeBeforeOrderCreateReqBO {
 
+    // TODO @puhui999：注释也写下哈；bo 还是写注释噢
+
     @NotNull(message = "订单类型不能为空")
     private Integer orderType;
 

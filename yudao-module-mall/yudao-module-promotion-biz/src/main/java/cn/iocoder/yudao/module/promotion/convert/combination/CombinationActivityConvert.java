@@ -97,8 +97,10 @@ public interface CombinationActivityConvert {
 
     CombinationRecordDO convert(CombinationRecordCreateReqDTO reqDTO);
 
-    default CombinationRecordDO convert1(CombinationRecordCreateReqDTO reqDTO, CombinationActivityDO activity, MemberUserRespDTO user,
-                                         ProductSpuRespDTO spu, ProductSkuRespDTO sku) {
+    default CombinationRecordDO convert(CombinationRecordCreateReqDTO reqDTO,
+                                        CombinationActivityDO activity, MemberUserRespDTO user,
+                                        ProductSpuRespDTO spu, ProductSkuRespDTO sku) {
+        // TODO @puhui999：搞成链式的 set；这样会更规整一点；
         CombinationRecordDO record = convert(reqDTO);
         record.setVirtualGroup(false);
         record.setExpireTime(record.getStartTime().plusHours(activity.getLimitDuration()));

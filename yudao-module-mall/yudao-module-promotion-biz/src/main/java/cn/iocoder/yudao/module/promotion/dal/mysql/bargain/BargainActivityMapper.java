@@ -41,7 +41,7 @@ public interface BargainActivityMapper extends BaseMapperX<BargainActivityDO> {
     default int updateActivityStock(Long id, int count) {
         return update(null, new LambdaUpdateWrapper<BargainActivityDO>()
                 .eq(BargainActivityDO::getId, id)
-                .gt(BargainActivityDO::getStock, count)
+                .ge(BargainActivityDO::getStock, count)
                 .setSql("stock = stock - " + count));
     }
 
