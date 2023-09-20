@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.promotion.service.combination;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
@@ -243,6 +244,22 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
             throw exception(COMBINATION_RECORD_FAILED_TOTAL_LIMIT_COUNT_EXCEED);
         }
 
+    }
+
+    @Override
+    public List<CombinationActivityDO> getCombinationActivityAppList(Integer count) {
+        if (count == null) {
+            count = 6;
+        }
+
+        PageResult<CombinationActivityDO> result = combinationActivityMapper.selectAppPage(new PageParam().setPageSize(count),
+                CommonStatusEnum.ENABLE.getStatus());
+        return result.getList();
+    }
+
+    @Override
+    public PageResult<CombinationActivityDO> getCombinationActivityAppPage(PageParam pageParam) {
+        return combinationActivityMapper.selectAppPage(pageParam, CommonStatusEnum.ENABLE.getStatus());
     }
 
 }

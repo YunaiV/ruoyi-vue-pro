@@ -13,6 +13,8 @@ import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activit
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.product.CombinationProductBaseVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.product.CombinationProductRespVO;
+import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.activity.AppCombinationActivityDetailRespVO;
+import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.activity.AppCombinationActivityRespVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
@@ -25,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 
 /**
  * 拼团活动 Convert
@@ -108,5 +111,45 @@ public interface CombinationActivityConvert {
     }
 
     List<CombinationRecordRespDTO> convert(List<CombinationRecordDO> bean);
+
+    List<AppCombinationActivityRespVO> convertAppList(List<CombinationActivityDO> list);
+
+    default List<AppCombinationActivityRespVO> convertAppList(List<CombinationActivityDO> list, List<ProductSpuRespDTO> spuList) {
+        List<AppCombinationActivityRespVO> activityList = convertAppList(list);
+        Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
+        return CollectionUtils.convertList(activityList, item -> {
+            findAndThen(spuMap, item.getSpuId(), spu -> {
+                item.setPicUrl(spu.getPicUrl());
+                item.setMarketPrice(spu.getMarketPrice());
+            });
+            return item;
+        });
+    }
+
+    PageResult<AppCombinationActivityRespVO> convertAppPage(PageResult<CombinationActivityDO> result);
+
+    default PageResult<AppCombinationActivityRespVO> convertAppPage(PageResult<CombinationActivityDO> result, List<ProductSpuRespDTO> spuList) {
+        PageResult<AppCombinationActivityRespVO> appPage = convertAppPage(result);
+        Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
+        List<AppCombinationActivityRespVO> list = CollectionUtils.convertList(appPage.getList(), item -> {
+            findAndThen(spuMap, item.getSpuId(), spu -> {
+                item.setPicUrl(spu.getPicUrl());
+                item.setMarketPrice(spu.getMarketPrice());
+            });
+            return item;
+        });
+        appPage.setList(list);
+        return appPage;
+    }
+
+    AppCombinationActivityDetailRespVO convert2(CombinationActivityDO combinationActivity);
+
+    List<AppCombinationActivityDetailRespVO.Product> convertList1(List<CombinationProductDO> products);
+
+    default AppCombinationActivityDetailRespVO convert3(CombinationActivityDO combinationActivity, List<CombinationProductDO> products) {
+        AppCombinationActivityDetailRespVO detailRespVO = convert2(combinationActivity);
+        detailRespVO.setProducts(convertList1(products));
+        return detailRespVO;
+    }
 
 }

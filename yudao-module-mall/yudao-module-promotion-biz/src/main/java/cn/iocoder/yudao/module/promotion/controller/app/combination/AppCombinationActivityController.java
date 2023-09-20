@@ -1,10 +1,19 @@
 package cn.iocoder.yudao.module.promotion.controller.app.combination;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.activity.AppCombinationActivityDetailRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.activity.AppCombinationActivityRespVO;
+import cn.iocoder.yudao.module.promotion.convert.combination.CombinationActivityConvert;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
+import cn.iocoder.yudao.module.promotion.service.combination.CombinationActivityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,11 +23,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.COMBINATION_ACTIVITY_APP_STATUS_DISABLE;
 
 @Tag(name = "用户 APP - 拼团活动")
 @RestController
@@ -26,104 +38,55 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @Validated
 public class AppCombinationActivityController {
 
+    @Resource
+    private CombinationActivityService activityService;
+    @Resource
+    private ProductSpuApi spuApi;
+
+
     @GetMapping("/list")
     @Operation(summary = "获得拼团活动列表", description = "用于小程序首页")
-    // TODO 芋艿：增加 Spring Cache
-    // TODO 芋艿：缺少 swagger 注解
+    @Parameter(name = "count", description = "需要展示的数量", example = "6")
     public CommonResult<List<AppCombinationActivityRespVO>> getCombinationActivityList(
             @RequestParam(name = "count", defaultValue = "6") Integer count) {
-        List<AppCombinationActivityRespVO> activityList = new ArrayList<>();
-        AppCombinationActivityRespVO activity1 = new AppCombinationActivityRespVO();
-        activity1.setId(1L);
-        activity1.setName("618 大拼团");
-        activity1.setUserSize(3);
-        activity1.setSpuId(2048L);
-        activity1.setPicUrl("https://static.iocoder.cn/mall/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
-        activity1.setMarketPrice(50);
-        activity1.setCombinationPrice(100);
-        activityList.add(activity1);
+        List<CombinationActivityDO> list = activityService.getCombinationActivityAppList(count);
+        if (CollUtil.isEmpty(list)) {
+            return success(CombinationActivityConvert.INSTANCE.convertAppList(list));
+        }
 
-        AppCombinationActivityRespVO activity2 = new AppCombinationActivityRespVO();
-        activity2.setId(2L);
-        activity2.setName("双十一拼团");
-        activity2.setUserSize(5);
-        activity2.setSpuId(4096L);
-        activity2.setPicUrl("https://static.iocoder.cn/mall/132.jpeg");
-        activity2.setMarketPrice(100);
-        activity2.setCombinationPrice(200);
-        activityList.add(activity2);
-
-        return success(activityList);
+        List<ProductSpuRespDTO> spuList = spuApi.getSpuList(convertList(list, CombinationActivityDO::getSpuId));
+        // TODO 芋艿：增加 Spring Cache
+        return success(CombinationActivityConvert.INSTANCE.convertAppList(list, spuList));
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得拼团活动分页")
     public CommonResult<PageResult<AppCombinationActivityRespVO>> getCombinationActivityPage(PageParam pageParam) {
-        List<AppCombinationActivityRespVO> activityList = new ArrayList<>();
-        AppCombinationActivityRespVO activity1 = new AppCombinationActivityRespVO();
-        activity1.setId(1L);
-        activity1.setName("618 大拼团");
-        activity1.setUserSize(3);
-        activity1.setSpuId(2048L);
-        activity1.setPicUrl("商品图片地址");
-        activity1.setMarketPrice(50);
-        activity1.setCombinationPrice(100);
-        activityList.add(activity1);
+        PageResult<CombinationActivityDO> result = activityService.getCombinationActivityAppPage(pageParam);
+        if (CollUtil.isEmpty(result.getList())) {
+            return success(PageResult.empty(result.getTotal()));
+        }
 
-        AppCombinationActivityRespVO activity2 = new AppCombinationActivityRespVO();
-        activity2.setId(2L);
-        activity2.setName("双十一拼团");
-        activity2.setUserSize(5);
-        activity2.setSpuId(4096L);
-        activity2.setPicUrl("商品图片地址");
-        activity2.setMarketPrice(100);
-        activity2.setCombinationPrice(200);
-        activityList.add(activity2);
-
-        return success(new PageResult<>(activityList, 2L));
+        List<ProductSpuRespDTO> spuList = spuApi.getSpuList(convertList(result.getList(), CombinationActivityDO::getSpuId));
+        return success(CombinationActivityConvert.INSTANCE.convertAppPage(result, spuList));
     }
 
     @GetMapping("/get-detail")
     @Operation(summary = "获得拼团活动明细")
     @Parameter(name = "id", description = "活动编号", required = true, example = "1024")
     public CommonResult<AppCombinationActivityDetailRespVO> getCombinationActivityDetail(@RequestParam("id") Long id) {
-        // TODO 芋艿：如果禁用的时候，需要抛出异常；
-        AppCombinationActivityDetailRespVO obj = new AppCombinationActivityDetailRespVO();
-        // 设置其属性的值
-        obj.setId(id);
-        obj.setName("晚九点限时秒杀");
-        obj.setStatus(1);
-        obj.setStartTime(LocalDateTime.of(2023, 6, 15, 0, 0, 0));
-        obj.setEndTime(LocalDateTime.of(2023, 6, 20, 23, 59, 0));
-        obj.setUserSize(2);
-        obj.setSuccessCount(100);
-        obj.setSpuId(633L);
-        obj.setSingleLimitCount(2);
-        obj.setTotalLimitCount(3);
+        // 1、获取活动
+        CombinationActivityDO combinationActivity = activityService.getCombinationActivity(id);
+        if (combinationActivity == null) {
+            return success(null);
+        }
+        if (ObjectUtil.equal(combinationActivity.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
+            throw exception(COMBINATION_ACTIVITY_APP_STATUS_DISABLE);
+        }
 
-        // 创建一个Product对象的列表
-        List<AppCombinationActivityDetailRespVO.Product> productList = new ArrayList<>();
-        // 创建三个新的Product对象并设置其属性的值
-        AppCombinationActivityDetailRespVO.Product product1 = new AppCombinationActivityDetailRespVO.Product();
-        product1.setSkuId(1L);
-        product1.setCombinationPrice(100);
-        // 将第一个Product对象添加到列表中
-        productList.add(product1);
-        // 创建第二个Product对象并设置其属性的值
-        AppCombinationActivityDetailRespVO.Product product2 = new AppCombinationActivityDetailRespVO.Product();
-        product2.setSkuId(2L);
-        product2.setCombinationPrice(200);
-        // 将第二个Product对象添加到列表中
-        productList.add(product2);
-        // 创建第三个Product对象并设置其属性的值
-        AppCombinationActivityDetailRespVO.Product product3 = new AppCombinationActivityDetailRespVO.Product();
-        product3.setSkuId(3L);
-        product3.setCombinationPrice(300);
-        // 将第三个Product对象添加到列表中
-        productList.add(product3);
-        // 将Product列表设置为对象的属性值
-        obj.setProducts(productList);
-        return success(obj);
+        // 2、获取活动商品
+        List<CombinationProductDO> products = activityService.getCombinationProductsByActivityIds(Arrays.asList(combinationActivity.getId()));
+        return success(CombinationActivityConvert.INSTANCE.convert3(combinationActivity, products));
     }
 
 }

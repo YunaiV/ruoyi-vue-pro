@@ -75,7 +75,8 @@ public interface BargainActivityService {
      * 获取 APP 端活动展示数据
      *
      * @param count 需要的数量
-     * @return
+     * @return 活动列表
      */
     List<BargainActivityDO> getBargainActivityAppList(Integer count);
+
 }

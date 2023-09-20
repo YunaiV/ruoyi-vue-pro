@@ -4,7 +4,6 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityDetailRespVO;
@@ -33,10 +32,9 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.findFirst;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.isBetween;
-import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.SECKILL_ACTIVITY_FAIL_STATUS_CLOSED;
+import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.SECKILL_ACTIVITY_APP_STATUS_CLOSED;
 
 @Tag(name = "用户 App - 秒杀活动")
 @RestController
@@ -53,8 +51,7 @@ public class AppSeckillActivityController {
     private ProductSpuApi spuApi;
 
     @GetMapping("/get-now")
-    @Operation(summary = "获得当前秒杀活动") // 提供给首页使用
-    // TODO 芋艿：需要增加 spring cache
+    @Operation(summary = "获得当前秒杀活动", description = "获取当前正在进行的活动，提供给首页使用")
     public CommonResult<AppSeckillActivityNowRespVO> getNowSeckillActivity() {
         // 1、获取当前时间处在哪个秒杀阶段
         List<SeckillConfigDO> configList = configService.getSeckillConfigList();
@@ -69,7 +66,8 @@ public class AppSeckillActivityController {
         List<SeckillActivityDO> activityList = activityService.getSeckillActivityListByConfigIds(Arrays.asList(filteredConfig.getId()));
         List<SeckillActivityDO> filteredList = filterList(activityList, item -> ObjectUtil.equal(item.getStatus(), CommonStatusEnum.ENABLE.getStatus()));
         // 2、1 获取 spu 信息
-        List<ProductSpuRespDTO> spuList = spuApi.getSpuList(CollectionUtils.convertList(filteredList, SeckillActivityDO::getSpuId));
+        List<ProductSpuRespDTO> spuList = spuApi.getSpuList(convertList(filteredList, SeckillActivityDO::getSpuId));
+        // TODO 芋艿：需要增加 spring cache
         return success(SeckillActivityConvert.INSTANCE.convert(filteredConfig, filteredList, spuList));
     }
 
@@ -79,7 +77,7 @@ public class AppSeckillActivityController {
         // 1、查询满足当前阶段的活动
         PageResult<SeckillActivityDO> pageResult = activityService.getSeckillActivityAppPageByConfigId(pageReqVO);
         // 1、1 获取 spu 信息
-        List<ProductSpuRespDTO> spuList = spuApi.getSpuList(CollectionUtils.convertList(pageResult.getList(), SeckillActivityDO::getSpuId));
+        List<ProductSpuRespDTO> spuList = spuApi.getSpuList(convertList(pageResult.getList(), SeckillActivityDO::getSpuId));
         return success(SeckillActivityConvert.INSTANCE.convertPage(pageResult, spuList));
     }
 
@@ -101,9 +99,8 @@ public class AppSeckillActivityController {
         if (seckillActivity == null) {
             return success(null);
         }
-        // TODO 芋艿：如果禁用的时候，需要抛出异常；
         if (ObjectUtil.equal(seckillActivity.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
-            throw exception(SECKILL_ACTIVITY_FAIL_STATUS_CLOSED);
+            throw exception(SECKILL_ACTIVITY_APP_STATUS_CLOSED);
         }
 
         // 3、获取活动商品
