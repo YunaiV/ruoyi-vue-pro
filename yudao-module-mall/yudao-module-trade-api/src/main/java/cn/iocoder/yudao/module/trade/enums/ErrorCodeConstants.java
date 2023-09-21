@@ -58,8 +58,9 @@ public interface ErrorCodeConstants {
 
     // ========== Price 相关 1011003000 ============
     ErrorCode PRICE_CALCULATE_PAY_PRICE_ILLEGAL = new ErrorCode(1011003000, "支付价格计算异常，原因：价格小于等于 0");
-    ErrorCode PRICE_CALCULATE_DELIVERY_PRICE_USER_ADDR_IS_EMPTY = new ErrorCode(1011003001, "计算快递运费异常，收件人地址编号为空");
+    ErrorCode PRICE_CALCULATE_DELIVERY_PRICE_USER_ADDRESS_IS_EMPTY = new ErrorCode(1011003001, "计算快递运费异常，收件人地址编号为空");
     ErrorCode PRICE_CALCULATE_DELIVERY_PRICE_TEMPLATE_NOT_FOUND = new ErrorCode(1011003002, "计算快递运费异常，找不到对应的运费模板");
+    ErrorCode PRICE_CALCULATE_DELIVERY_PRICE_PICK_UP_STORE_IS_EMPTY = new ErrorCode(1011003003, "计算快递运费异常，自提点为空");
 
     // ========== 物流 Express 模块 1011004000 ==========
     ErrorCode EXPRESS_NOT_EXISTS = new ErrorCode(1011004000, "快递公司不存在");
@@ -87,5 +88,10 @@ public interface ErrorCodeConstants {
     ErrorCode BROKERAGE_BIND_MODE_REGISTER = new ErrorCode(1011007005, "只有在注册时可以绑定");
     ErrorCode BROKERAGE_BIND_OVERRIDE = new ErrorCode(1011007006, "已绑定了推广人");
     ErrorCode BROKERAGE_BIND_LOOP = new ErrorCode(1011007007, "下级不能绑定自己的上级");
+
+
+    // ========== 分销提现 模块 1011008000 ==========
+    ErrorCode BROKERAGE_WITHDRAW_NOT_EXISTS = new ErrorCode(1011008000, "佣金提现记录不存在");
+    ErrorCode BROKERAGE_WITHDRAW_STATUS_NOT_AUDITING = new ErrorCode(1011008001, "佣金提现记录状态不是审核中");
 
 }

@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityPageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillActivityDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -24,7 +25,7 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
                 .likeIfPresent(SeckillActivityDO::getName, reqVO.getName())
                 .eqIfPresent(SeckillActivityDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(SeckillActivityDO::getCreateTime, reqVO.getCreateTime())
-                .apply(ObjectUtil.isNotNull(reqVO.getConfigId()), "FIND_IN_SET(" + reqVO.getConfigId() + ",time_ids) > 0")
+                .apply(ObjectUtil.isNotNull(reqVO.getConfigId()), "FIND_IN_SET(" + reqVO.getConfigId() + ", config_ids) > 0")
                 .orderByDesc(SeckillActivityDO::getId));
     }
 
@@ -46,6 +47,13 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
                 .gt(SeckillActivityDO::getTotalStock, 0)
                 .setSql("stock = stock + " + count)
                 .setSql("totalStock = totalStock - " + count));
+    }
+
+    default PageResult<SeckillActivityDO> selectPage(AppSeckillActivityPageReqVO pageReqVO, Integer status) {
+        return selectPage(pageReqVO, new LambdaQueryWrapperX<SeckillActivityDO>()
+                .eqIfPresent(SeckillActivityDO::getStatus, status)
+                // TODO 芋艿：对 find in set 的想法；
+                .apply(ObjectUtil.isNotNull(pageReqVO.getConfigId()), "FIND_IN_SET(" + pageReqVO.getConfigId() + ",config_ids) > 0"));
     }
 
 }

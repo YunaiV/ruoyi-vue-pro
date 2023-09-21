@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.Seck
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigSimpleRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.config.AppSeckillConfigRespVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillconfig.SeckillConfigDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -33,4 +34,7 @@ public interface SeckillConfigConvert {
 
     PageResult<SeckillConfigRespVO> convertPage(PageResult<SeckillConfigDO> page);
 
+    List<AppSeckillConfigRespVO> convertList2(List<SeckillConfigDO> list);
+
+    AppSeckillConfigRespVO convert1(SeckillConfigDO filteredConfig);
 }

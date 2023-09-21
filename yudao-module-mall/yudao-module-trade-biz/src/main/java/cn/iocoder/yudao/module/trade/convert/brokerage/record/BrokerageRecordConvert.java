@@ -35,7 +35,7 @@ public interface BrokerageRecordConvert {
 
     default BrokerageRecordDO convert(BrokerageUserDO user, BrokerageRecordBizTypeEnum bizType, String bizId,
                                       Integer brokerageFrozenDays, int brokeragePrice, LocalDateTime unfreezeTime,
-                                      String title, Long sourceUserId, Integer sourceUserType) {
+                                      String title, Long sourceUserId, Integer sourceUserLevel) {
         brokerageFrozenDays = ObjectUtil.defaultIfNull(brokerageFrozenDays, 0);
         // 不冻结时，佣金直接就是结算状态
         Integer status = brokerageFrozenDays > 0
@@ -47,7 +47,7 @@ public interface BrokerageRecordConvert {
                 .setTitle(title)
                 .setDescription(StrUtil.format(bizType.getDescription(), String.format("￥%.2f", brokeragePrice / 100d)))
                 .setStatus(status).setFrozenDays(brokerageFrozenDays).setUnfreezeTime(unfreezeTime)
-                .setSourceUserType(sourceUserType).setSourceUserId(sourceUserId);
+                .setSourceUserLevel(sourceUserLevel).setSourceUserId(sourceUserId);
     }
 
     default PageResult<BrokerageRecordRespVO> convertPage(PageResult<BrokerageRecordDO> pageResult, Map<Long, MemberUserRespDTO> userMap) {

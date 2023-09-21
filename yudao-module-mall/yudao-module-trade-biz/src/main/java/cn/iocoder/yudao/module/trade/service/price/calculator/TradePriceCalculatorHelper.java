@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 
@@ -28,7 +29,7 @@ public class TradePriceCalculatorHelper {
                                                                List<ProductSpuRespDTO> spuList, List<ProductSkuRespDTO> skuList) {
         // 创建 PriceCalculateRespDTO 对象
         TradePriceCalculateRespBO result = new TradePriceCalculateRespBO();
-        result.setType(param.getType());
+        result.setType(getOrderType(param));
         result.setPromotions(new ArrayList<>());
 
         // 创建它的 OrderItem 属性
@@ -67,6 +68,23 @@ public class TradePriceCalculatorHelper {
         result.setPrice(new TradePriceCalculateRespBO.Price());
         recountAllPrice(result);
         return result;
+    }
+
+    /**
+     * 计算订单类型
+     *
+     * @param param 计算参数
+     * @return 订单类型
+     */
+    private static Integer getOrderType(TradePriceCalculateReqBO param) {
+        if (param.getSeckillActivityId() != null) {
+            return TradeOrderTypeEnum.SECKILL.getType();
+        }
+        if (param.getCombinationActivityId() != null) {
+            return TradeOrderTypeEnum.COMBINATION.getType();
+        }
+        // TODO 砍价敬请期待
+        return TradeOrderTypeEnum.NORMAL.getType();
     }
 
     /**

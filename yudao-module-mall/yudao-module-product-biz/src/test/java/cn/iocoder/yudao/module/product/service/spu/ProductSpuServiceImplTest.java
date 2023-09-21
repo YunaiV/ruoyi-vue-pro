@@ -92,8 +92,8 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
             o.setMarketPrice(generaInt());
             o.setStock(generaInt());
             o.setWarnStock(10);
-            o.setFirstBrokerageRecord(generaInt());
-            o.setSecondBrokerageRecord(generaInt());
+            o.setFirstBrokeragePrice(generaInt());
+            o.setSecondBrokeragePrice(generaInt());
             // 限制分数为两位数
             o.setWeight(RandomUtil.randomDouble(10,2, RoundingMode.HALF_UP));
             o.setVolume(RandomUtil.randomDouble(10,2, RoundingMode.HALF_UP));
@@ -143,8 +143,8 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
             o.setMarketPrice(generaInt());
             o.setStock(generaInt());
             o.setWarnStock(10);
-            o.setFirstBrokerageRecord(generaInt());
-            o.setSecondBrokerageRecord(generaInt());
+            o.setFirstBrokeragePrice(generaInt());
+            o.setSecondBrokeragePrice(generaInt());
             // 限制分数为两位数
             o.setWeight(RandomUtil.randomDouble(10,2, RoundingMode.HALF_UP));
             o.setVolume(RandomUtil.randomDouble(10,2, RoundingMode.HALF_UP));
