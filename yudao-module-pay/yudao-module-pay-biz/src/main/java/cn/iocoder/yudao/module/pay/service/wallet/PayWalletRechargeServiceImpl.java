@@ -66,8 +66,9 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
         // 2.2 更新钱包充值记录中支付订单
         walletRechargeMapper.updateById(new PayWalletRechargeDO().setPayOrderId(payOrderId)
                 .setId(walletRecharge.getId()));
-        // TODO @jason：是不是你直接返回就好啦；然后 payOrderId 设置下；
-        return walletRechargeMapper.selectById(walletRecharge.getId());
+
+        walletRecharge.setPayOrderId(payOrderId);
+        return walletRecharge;
     }
 
     @Override
@@ -92,8 +93,9 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
 
         // 3. 更新钱包余额
         // TODO @jason：这样的话，未来提现会不会把充值的，也提现走哈。类似先充 100，送 110；然后提现 110；
+        // TODO 需要钱包中加个可提现余额
         payWalletService.addWalletBalance(walletRecharge.getWalletId(), String.valueOf(id),
-                PayWalletBizTypeEnum.RECHARGE, walletRecharge.getPrice());
+                PayWalletBizTypeEnum.RECHARGE, walletRecharge.getTotalPrice());
     }
 
     private PayOrderDO validateWalletRechargerCanPaid(PayWalletRechargeDO walletRecharge, Long payOrderId) {

@@ -125,7 +125,7 @@ public class PayWalletServiceImpl implements  PayWalletService {
         int updateCounts = 0 ;
         switch (bizType) {
             case PAYMENT: {
-                updateCounts = walletMapper.updateWhenConsumption(price, payWallet.getId());
+                updateCounts = walletMapper.updateWhenConsumption(payWallet.getId(), price);
                 break;
             }
             case RECHARGE_REFUND: {
@@ -156,11 +156,11 @@ public class PayWalletServiceImpl implements  PayWalletService {
         // 1.2 更新钱包金额
         switch (bizType) {
             case PAYMENT_REFUND: { // 退款更新
-                walletMapper.updateWhenConsumptionRefund(price, payWallet.getId());
+                walletMapper.updateWhenConsumptionRefund(payWallet.getId(), price);
                 break;
             }
             case RECHARGE: { // 充值更新
-                walletMapper.updateWhenRecharge(price, payWallet.getId());
+                walletMapper.updateWhenRecharge(payWallet.getId(), price);
                 break;
             }
             // TODO 其它类型；这里可以先跑异常；避免有业务搞错；

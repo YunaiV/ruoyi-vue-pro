@@ -31,22 +31,21 @@ public class PayWalletRechargeDO extends BaseDO {
      */
     private Long walletId;
 
-    // TODO @jason：要不改成 totalPrice？
     /**
      * 用户实际到账余额
      *
      * 例如充 100 送 20，则该值是 120
      */
-    private Integer price;
+    private Integer totalPrice;
     /**
      * 实际支付金额
      */
     private Integer payPrice;
-    // TODO @jason：bonusPrice 哈，更统一一点；
+
     /**
      * 钱包赠送金额
      */
-    private Integer walletBonus;
+    private Integer bonusPrice;
 
     /**
      * 是否已支付
@@ -62,6 +61,7 @@ public class PayWalletRechargeDO extends BaseDO {
      * 关联 {@link PayOrderDO#getId()}
      */
     private Long payOrderId;
+
     /**
      * 支付成功的支付渠道
      *
@@ -79,20 +79,21 @@ public class PayWalletRechargeDO extends BaseDO {
      * 关联 {@link PayRefundDO#getId()}
      */
     private Long payRefundId;
-    // TODO @jason：要不改成 refundTotalPrice？
+
     /**
      * 退款金额，包含赠送金额
      */
-    private Integer refundPrice;
+    private Integer refundTotalPrice;
     /**
      * 退款支付金额
      */
     private Integer refundPayPrice;
-    // TODO @jason：要不改成 refundBonusPrice？
+
     /**
      * 退款钱包赠送金额
      */
-    private Integer refundWalletBonus;
+    private Integer refundBonusPrice;
+
     /**
      * 退款时间
      */
