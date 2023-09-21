@@ -114,7 +114,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
     public void deleteBargainActivity(Long id) {
         // 校验存在
         BargainActivityDO activityDO = validateBargainActivityExists(id);
-        // 校验状态
+        // 校验状态 TODO puhui: 测试完成后需要恢复校验
         //if (ObjectUtil.equal(activityDO.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
         //    throw exception(BARGAIN_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END);
         //}
