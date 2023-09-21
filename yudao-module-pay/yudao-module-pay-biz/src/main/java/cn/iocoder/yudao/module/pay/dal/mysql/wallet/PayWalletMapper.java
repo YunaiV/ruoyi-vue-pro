@@ -14,15 +14,13 @@ public interface PayWalletMapper extends BaseMapperX<PayWalletDO> {
                 PayWalletDO::getUserType, userType);
     }
 
-    // TODO @jason：下面几个更新方法，把 id 放前面哈。一般来说，重要参数放前面；
-
     /**
      * 当消费退款时候， 更新钱包
      *
-     * @param price 消费金额
      * @param id 钱包 id
+     * @param price 消费金额
      */
-    default int updateWhenConsumptionRefund(Integer price, Long id){
+    default int updateWhenConsumptionRefund(Long id, Integer price){
         LambdaUpdateWrapper<PayWalletDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<PayWalletDO>()
                 .setSql(" balance = balance + " + price
                         + ", total_expense = total_expense - " + price)
@@ -36,7 +34,7 @@ public interface PayWalletMapper extends BaseMapperX<PayWalletDO> {
      * @param price 消费金额
      * @param id 钱包 id
      */
-    default int updateWhenConsumption(Integer price, Long id){
+    default int updateWhenConsumption(Long id, Integer price){
         LambdaUpdateWrapper<PayWalletDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<PayWalletDO>()
                 .setSql(" balance = balance - " + price
                         + ", total_expense = total_expense + " + price)
@@ -47,10 +45,11 @@ public interface PayWalletMapper extends BaseMapperX<PayWalletDO> {
 
     /**
      * 当充值的时候，更新钱包
-     * @param price 钱包金额
+     *
      * @param id 钱包 id
+     * @param price 钱包金额
      */
-    default int updateWhenRecharge(Integer price, Long id){
+    default int updateWhenRecharge(Long id, Integer price){
         LambdaUpdateWrapper<PayWalletDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<PayWalletDO>()
                 .setSql(" balance = balance + " + price
                         + ", total_recharge = total_recharge + " + price)
