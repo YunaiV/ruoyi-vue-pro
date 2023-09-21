@@ -1,24 +1,28 @@
 -- 增加配置表
 create table trade_config
 (
-    id                           bigint auto_increment comment '自增主键' primary key,
-    brokerage_enabled            bit           default 1                 not null comment '是否启用分佣',
-    brokerage_enabled_condition  tinyint       default 0                 not null comment '分佣模式：1-人人分销 2-指定分销',
-    brokerage_bind_mode          tinyint       default 0                 not null comment '分销关系绑定模式: 1-没有推广人，2-新用户, 3-扫码覆盖',
-    brokerage_post_urls          varchar(2000) default ''                null comment '分销海报图地址数组',
-    brokerage_first_percent      int           default 0                 not null comment '一级返佣比例',
-    brokerage_second_percent     int           default 0                 not null comment '二级返佣比例',
-    brokerage_withdraw_min_price int           default 0                 not null comment '用户提现最低金额',
-    brokerage_bank_names         varchar(200)  default ''                not null comment '提现银行（字典类型=brokerage_bank_name）',
-    brokerage_frozen_days        int           default 7                 not null comment '佣金冻结时间(天)',
-    brokerage_withdraw_type      varchar(32)   default '1,2,3,4'         not null comment '提现方式：1-钱包；2-银行卡；3-微信；4-支付宝',
-    creator                      varchar(64)   default ''                null comment '创建者',
-    create_time                  datetime      default CURRENT_TIMESTAMP not null comment '创建时间',
-    updater                      varchar(64)   default ''                null comment '更新者',
-    update_time                  datetime      default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
-    deleted                      bit           default b'0'              not null comment '是否删除',
-    tenant_id                    bigint        default 0                 not null comment '租户编号'
+    id                             bigint auto_increment comment '自增主键' primary key,
+    brokerage_enabled              bit           default 1                 not null comment '是否启用分佣',
+    brokerage_enabled_condition    tinyint       default 0                 not null comment '分佣模式：1-人人分销 2-指定分销',
+    brokerage_bind_mode            tinyint       default 0                 not null comment '分销关系绑定模式: 1-没有推广人，2-新用户, 3-扫码覆盖',
+    brokerage_post_urls            varchar(2000) default ''                null comment '分销海报图地址数组',
+    brokerage_first_percent        int           default 0                 not null comment '一级返佣比例',
+    brokerage_second_percent       int           default 0                 not null comment '二级返佣比例',
+    brokerage_withdraw_min_price   int           default 0                 not null comment '用户提现最低金额',
+    brokerage_withdraw_fee_percent int           default 0                 not null comment '提现手续费百分比',
+    brokerage_bank_names           varchar(200)  default ''                not null comment '提现银行（字典类型=brokerage_bank_name）',
+    brokerage_frozen_days          int           default 7                 not null comment '佣金冻结时间(天)',
+    brokerage_withdraw_type        varchar(32)   default '1,2,3,4'         not null comment '提现方式：1-钱包；2-银行卡；3-微信；4-支付宝',
+    creator                        varchar(64)   default ''                null comment '创建者',
+    create_time                    datetime      default CURRENT_TIMESTAMP not null comment '创建时间',
+    updater                        varchar(64)   default ''                null comment '更新者',
+    update_time                    datetime      default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    deleted                        bit           default b'0'              not null comment '是否删除',
+    tenant_id                      bigint        default 0                 not null comment '租户编号'
 ) comment '交易中心配置';
+
+# alter table trade_config
+#     add brokerage_withdraw_fee_percent int default 0 not null comment '提现手续费百分比' after brokerage_withdraw_min_price;
 
 # alter table trade_brokerage_user
 #     add level int not null default 1 comment '等级' after frozen_price;
@@ -83,7 +87,7 @@ create index idx_status on trade_brokerage_record (status) comment '状态';
 
 create table trade_brokerage_withdraw
 (
-    id                  int auto_increment comment '编号'
+    id                  bigint auto_increment comment '编号'
         primary key,
     user_id             bigint                                not null comment '用户编号',
     price               int         default 0                 not null comment '提现金额',
@@ -137,7 +141,8 @@ insert into system_dict_type(type, name)
 values ('brokerage_record_biz_type', '佣金记录业务类型');
 insert into system_dict_data(dict_type, label, value, sort)
 values ('brokerage_record_biz_type', '订单返佣', 1, 1),
-       ('brokerage_record_biz_type', '申请提现', 2, 2);
+       ('brokerage_record_biz_type', '申请提现', 2, 2),
+       ('brokerage_record_biz_type', '申请提现驳回', 3, 3);
 
 insert into system_dict_type(type, name)
 values ('brokerage_record_status', '佣金记录状态');

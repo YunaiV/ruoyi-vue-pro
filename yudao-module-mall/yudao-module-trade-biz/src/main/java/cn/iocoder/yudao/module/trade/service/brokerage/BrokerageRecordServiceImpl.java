@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.trade.service.brokerage;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.math.Money;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -28,6 +29,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.BROKERAGE_WITHDRAW_USER_BALANCE_NOT_ENOUGH;
 
 /**
  * 佣金记录 Service 实现类
@@ -215,6 +220,29 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
     public UserBrokerageSummaryBO getUserBrokerageSummaryByUserId(Long userId, Integer bizType, Integer status) {
         UserBrokerageSummaryBO summaryBO = brokerageRecordMapper.selectCountAndSumPriceByUserIdAndBizTypeAndStatus(userId, bizType, status);
         return summaryBO != null ? summaryBO : new UserBrokerageSummaryBO(0, 0);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void addBrokerage(Long userId, BrokerageRecordBizTypeEnum bizType, String bizId, int brokeragePrice, String title) {
+        // 校验佣金余额
+        BrokerageUserDO user = brokerageUserService.getBrokerageUser(userId);
+        int balance = Optional.of(user)
+                .map(BrokerageUserDO::getBrokeragePrice).orElse(0);
+        if (balance < brokeragePrice) {
+            throw exception(BROKERAGE_WITHDRAW_USER_BALANCE_NOT_ENOUGH, new Money(0, balance));
+        }
+
+        // 扣减佣金余额
+        boolean success = brokerageUserService.updateUserPrice(userId, brokeragePrice);
+        if (!success) {
+            throw exception(BROKERAGE_WITHDRAW_USER_BALANCE_NOT_ENOUGH, new Money(0, balance));
+        }
+
+        // 新增记录
+        BrokerageRecordDO record = BrokerageRecordConvert.INSTANCE.convert(user, bizType, bizId, 0, brokeragePrice,
+                null, title, null, null);
+        brokerageRecordMapper.insert(record);
     }
 
     @Transactional(rollbackFor = Exception.class)

@@ -38,7 +38,7 @@ public class AppBrokerageUserController {
     public CommonResult<AppBrokerageUserRespVO> getBrokerageUser() {
         AppBrokerageUserRespVO respVO = new AppBrokerageUserRespVO()
                 .setBrokerageEnabled(true)
-                .setPrice(2000)
+                .setBrokeragePrice(2000)
                 .setFrozenPrice(3000);
         return success(respVO);
     }

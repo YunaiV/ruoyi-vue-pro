@@ -43,6 +43,17 @@ public interface BrokerageRecordService {
     void addBrokerage(Long userId, BrokerageRecordBizTypeEnum bizType, @Valid List<BrokerageAddReqBO> list);
 
     /**
+     * 增加佣金
+     *
+     * @param userId         会员编号
+     * @param bizType        业务类型
+     * @param bizId          业务编号
+     * @param brokeragePrice 佣金
+     * @param title          标题
+     */
+    void addBrokerage(Long userId, BrokerageRecordBizTypeEnum bizType, String bizId, int brokeragePrice, String title);
+
+    /**
      * 取消佣金：将佣金记录，状态修改为已失效
      *
      * @param userId  会员编号

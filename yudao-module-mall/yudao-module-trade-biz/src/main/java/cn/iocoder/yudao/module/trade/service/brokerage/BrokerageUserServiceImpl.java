@@ -110,12 +110,13 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     }
 
     @Override
-    public void updateUserPrice(Long id, Integer price) {
+    public boolean updateUserPrice(Long id, Integer price) {
         if (price > 0) {
             brokerageUserMapper.updatePriceIncr(id, price);
         } else if (price < 0) {
-            brokerageUserMapper.updatePriceDecr(id, price);
+            return brokerageUserMapper.updatePriceDecr(id, price) > 0;
         }
+        return true;
     }
 
     @Override

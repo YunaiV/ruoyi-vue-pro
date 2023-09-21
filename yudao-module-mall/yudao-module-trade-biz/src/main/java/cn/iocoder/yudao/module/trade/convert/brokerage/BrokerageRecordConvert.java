@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.convert.brokerage;
 
+import cn.hutool.core.math.Money;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -45,7 +46,7 @@ public interface BrokerageRecordConvert {
                 .setBizType(bizType.getType()).setBizId(bizId)
                 .setPrice(brokeragePrice).setTotalPrice(user.getBrokeragePrice())
                 .setTitle(title)
-                .setDescription(StrUtil.format(bizType.getDescription(), String.format("￥%.2f", brokeragePrice / 100d)))
+                .setDescription(StrUtil.format(bizType.getDescription(), new Money(0, Math.abs(brokeragePrice))))
                 .setStatus(status).setFrozenDays(brokerageFrozenDays).setUnfreezeTime(unfreezeTime)
                 .setSourceUserLevel(sourceUserLevel).setSourceUserId(sourceUserId);
     }

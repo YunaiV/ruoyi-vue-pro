@@ -93,5 +93,7 @@ public interface ErrorCodeConstants {
     // ========== 分销提现 模块 1011008000 ==========
     ErrorCode BROKERAGE_WITHDRAW_NOT_EXISTS = new ErrorCode(1011008000, "佣金提现记录不存在");
     ErrorCode BROKERAGE_WITHDRAW_STATUS_NOT_AUDITING = new ErrorCode(1011008001, "佣金提现记录状态不是审核中");
+    ErrorCode BROKERAGE_WITHDRAW_MIN_PRICE = new ErrorCode(1011008002, "提现金额不能低于{}元");
+    ErrorCode BROKERAGE_WITHDRAW_USER_BALANCE_NOT_ENOUGH = new ErrorCode(1011008003, "您当前最多可提现{}元");
 
 }

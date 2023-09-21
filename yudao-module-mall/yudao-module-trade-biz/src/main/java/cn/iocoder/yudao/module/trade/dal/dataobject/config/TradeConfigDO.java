@@ -82,6 +82,10 @@ public class TradeConfigDO extends BaseDO {
      */
     private Integer brokerageWithdrawMinPrice;
     /**
+     * 用户提现手续费百分比
+     */
+    private Integer brokerageWithdrawFeePercent;
+    /**
      * 提现银行
      */
     @TableField(typeHandler = IntegerListTypeHandler.class)

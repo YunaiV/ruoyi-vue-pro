@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.trade.service.brokerage;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.withdraw.BrokerageWithdrawPageReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.withdraw.AppBrokerageWithdrawCreateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageWithdrawDO;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum;
 
@@ -13,7 +14,7 @@ import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum
 public interface BrokerageWithdrawService {
 
     /**
-     * 审核佣金提现
+     * 【管理员】审核佣金提现
      *
      * @param id          佣金编号
      * @param status      审核状态
@@ -37,4 +38,13 @@ public interface BrokerageWithdrawService {
      * @return 佣金提现分页
      */
     PageResult<BrokerageWithdrawDO> getBrokerageWithdrawPage(BrokerageWithdrawPageReqVO pageReqVO);
+
+    /**
+     * 【会员】创建佣金提现
+     *
+     * @param createReqVO 创建信息
+     * @param userId      会员用户编号
+     * @return 佣金提现编号
+     */
+    Long createBrokerageWithdraw(AppBrokerageWithdrawCreateReqVO createReqVO, Long userId);
 }

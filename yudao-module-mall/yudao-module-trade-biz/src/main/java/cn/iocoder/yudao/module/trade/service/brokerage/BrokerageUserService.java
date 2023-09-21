@@ -70,8 +70,9 @@ public interface BrokerageUserService {
      *
      * @param id    用户编号
      * @param price 用户可用佣金
+     * @return 更新结果
      */
-    void updateUserPrice(Long id, Integer price);
+    boolean updateUserPrice(Long id, Integer price);
 
     /**
      * 更新用户冻结佣金

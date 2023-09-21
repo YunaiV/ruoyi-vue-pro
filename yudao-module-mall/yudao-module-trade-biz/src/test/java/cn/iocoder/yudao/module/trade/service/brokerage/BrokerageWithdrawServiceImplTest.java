@@ -2,14 +2,18 @@ package cn.iocoder.yudao.module.trade.service.brokerage;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.module.system.api.notify.NotifyMessageSendApi;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.withdraw.BrokerageWithdrawPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageWithdrawDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.BrokerageWithdrawMapper;
+import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import javax.validation.Validator;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
@@ -31,6 +35,19 @@ public class BrokerageWithdrawServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private BrokerageWithdrawMapper brokerageWithdrawMapper;
+
+    @MockBean
+    private BrokerageRecordService brokerageRecordService;
+    @MockBean
+    private BrokerageUserService brokerageUserService;
+    @MockBean
+    private TradeConfigService tradeConfigService;
+
+    @MockBean
+    private NotifyMessageSendApi notifyMessageSendApi;
+
+    @Resource
+    private Validator validator;
 
     @Test
     @Disabled  // TODO 请修改 null 为需要的值，然后删除 @Disabled 注解
@@ -84,4 +101,17 @@ public class BrokerageWithdrawServiceImplTest extends BaseDbUnitTest {
         assertPojoEquals(dbBrokerageWithdraw, pageResult.getList().get(0));
     }
 
+    @Test
+    public void testCalculateFeePrice() {
+        Integer withdrawPrice = 100;
+        // 测试手续费比例未设置
+        Integer percent = null;
+        assertEquals(brokerageWithdrawService.calculateFeePrice(withdrawPrice, percent), 0);
+        // 测试手续费给为0
+        percent = 0;
+        assertEquals(brokerageWithdrawService.calculateFeePrice(withdrawPrice, percent), 0);
+        // 测试手续费
+        percent = 1;
+        assertEquals(brokerageWithdrawService.calculateFeePrice(withdrawPrice, percent), 1);
+    }
 }
