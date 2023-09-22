@@ -91,7 +91,7 @@ public class TradeDeliveryPriceCalculatorTest  extends BaseMockitoUnitTest {
                 item -> item.setFreeCount(20).setFreePrice(100));
         // 准备 SP 运费模板数据
         templateRespBO = randomPojo(DeliveryExpressTemplateRespBO.class,
-                item -> item.setChargeMode(DeliveryExpressChargeModeEnum.PIECE.getType())
+                item -> item.setChargeMode(DeliveryExpressChargeModeEnum.COUNT.getType())
                         .setCharge(chargeBO).setFree(freeBO));
     }
 
@@ -144,11 +144,11 @@ public class TradeDeliveryPriceCalculatorTest  extends BaseMockitoUnitTest {
         // 断言：SKU1
         assertThat(resultBO.getItems().get(0))
                 .extracting("price", "count","discountPrice" ,"couponPrice", "pointPrice","deliveryPrice","payPrice")
-                .containsExactly(100, 2, 0, 0, 0, 1500, 1700);
+                .containsExactly(100, 2, 0, 0, 0, 500, 700);
         // 断言：SKU2
         assertThat(resultBO.getItems().get(1))
                 .extracting("price", "count","discountPrice" ,"couponPrice", "pointPrice","deliveryPrice","payPrice")
-                .containsExactly(200, 10, 0, 0, 0, 1500, 3500);
+                .containsExactly(200, 10, 0, 0, 0, 2500, 4500);
         // 断言：SKU3 未选中
         assertThat(resultBO.getItems().get(2))
                 .extracting("price", "count","discountPrice" ,"couponPrice", "pointPrice","deliveryPrice","payPrice")

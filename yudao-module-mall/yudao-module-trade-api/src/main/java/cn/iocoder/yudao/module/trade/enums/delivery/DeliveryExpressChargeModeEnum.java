@@ -16,7 +16,7 @@ import java.util.Arrays;
 @Getter
 public enum DeliveryExpressChargeModeEnum implements IntArrayValuable {
 
-    PIECE(1, "按件"),
+    COUNT(1, "按件"),
     WEIGHT(2,"按重量"),
     VOLUME(3, "按体积");
 

@@ -43,6 +43,11 @@ public class PayWalletDO extends BaseDO {
     private Integer balance;
 
     /**
+     * 冻结金额，单位分
+     */
+    private Integer freezePrice;
+
+    /**
      * 累计支出，单位分
      */
     private Integer totalExpense;

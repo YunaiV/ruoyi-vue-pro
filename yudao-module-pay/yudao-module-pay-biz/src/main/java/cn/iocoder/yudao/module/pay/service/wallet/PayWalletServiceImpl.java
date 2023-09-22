@@ -68,8 +68,9 @@ public class PayWalletServiceImpl implements  PayWalletService {
         if (orderExtension == null) {
             throw exception(PAY_ORDER_EXTENSION_NOT_FOUND);
         }
+        PayWalletDO wallet = getOrCreateWallet(userId, userType);
         // 2. 扣减余额
-        return reduceWalletBalance(userId, userType, orderExtension.getOrderId(), PAYMENT, price);
+        return reduceWalletBalance(wallet.getId(), orderExtension.getOrderId(), PAYMENT, price);
     }
 
     @Override
@@ -116,10 +117,14 @@ public class PayWalletServiceImpl implements  PayWalletService {
     }
 
     @Override
-    public PayWalletTransactionDO reduceWalletBalance(Long userId, Integer userType,
-                                                      Long bizId, PayWalletBizTypeEnum bizType, Integer price) {
+    public PayWalletTransactionDO reduceWalletBalance(Long walletId, Long bizId,
+                                                      PayWalletBizTypeEnum bizType, Integer price) {
         // 1. 获取钱包
-        PayWalletDO payWallet = getOrCreateWallet(userId, userType);
+        PayWalletDO payWallet = getWallet(walletId);
+        if (payWallet == null) {
+            log.error("[reduceWalletBalance]，用户钱包({})不存在.", walletId);
+            throw exception(WALLET_NOT_FOUND);
+        }
 
         // 2.1 扣除余额
         int updateCounts = 0 ;
@@ -129,8 +134,12 @@ public class PayWalletServiceImpl implements  PayWalletService {
                 break;
             }
             case RECHARGE_REFUND: {
-                // TODO
+                updateCounts = walletMapper.updateWhenRechargeRefund(payWallet.getId(), price);
                 break;
+            }
+            default: {
+                // TODO 其它类型待实现
+                throw new UnsupportedOperationException("待实现");
             }
         }
         if (updateCounts == 0) {
@@ -163,7 +172,10 @@ public class PayWalletServiceImpl implements  PayWalletService {
                 walletMapper.updateWhenRecharge(payWallet.getId(), price);
                 break;
             }
-            // TODO 其它类型；这里可以先跑异常；避免有业务搞错；
+            default: {
+                // TODO 其它类型待实现
+                throw new UnsupportedOperationException("待实现");
+            }
         }
 
         // 2. 生成钱包流水
@@ -171,6 +183,22 @@ public class PayWalletServiceImpl implements  PayWalletService {
                 .setWalletId(payWallet.getId()).setPrice(price).setBalance(payWallet.getBalance() + price)
                 .setBizId(bizId).setBizType(bizType.getType()).setTitle(bizType.getDescription());
         return walletTransactionService.createWalletTransaction(transactionCreateReqBO);
+    }
+
+    @Override
+    public void freezePrice(Long id, Integer price) {
+        int updateCounts = walletMapper.freezePrice(id, price);
+        if (updateCounts == 0) {
+            throw exception(WALLET_BALANCE_NOT_ENOUGH);
+        }
+    }
+
+    @Override
+    public void unFreezePrice(Long id, Integer price) {
+        int updateCounts = walletMapper.unFreezePrice(id, price);
+        if (updateCounts == 0) {
+            throw exception(WALLET_FREEZE_PRICE_NOT_ENOUGH);
+        }
     }
 
 }

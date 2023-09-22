@@ -50,15 +50,14 @@ public interface PayWalletService {
     /**
      * 扣减钱包余额
      *
-     * @param userId  用户 id
-     * @param userType 用户类型
+     * @param walletId  钱包 id
      * @param bizId 业务关联 id
      * @param bizType 业务关联分类
      * @param price 扣减金额
      * @return 钱包流水
      */
-    PayWalletTransactionDO reduceWalletBalance(Long userId, Integer userType,
-                                               Long bizId, PayWalletBizTypeEnum bizType, Integer price);
+    PayWalletTransactionDO reduceWalletBalance(Long walletId, Long bizId,
+                                               PayWalletBizTypeEnum bizType, Integer price);
 
     /**
      * 增加钱包余额
@@ -72,4 +71,18 @@ public interface PayWalletService {
     PayWalletTransactionDO addWalletBalance(Long walletId, String bizId,
                                             PayWalletBizTypeEnum bizType, Integer price);
 
+    /**
+     * 冻结钱包部分余额
+     *
+     * @param id  钱包编号
+     * @param price 冻结金额
+     */
+    void freezePrice(Long id, Integer price);
+
+    /**
+     * 解冻钱包余额
+     * @param id 钱包编号
+     * @param price 解冻金额
+     */
+    void unFreezePrice(Long id, Integer price);
 }
