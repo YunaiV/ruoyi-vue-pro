@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.trade.dal.mysql.brokerage.BrokerageUserMapper">
+
+    <select id="selectSummaryPageByUserId"
+            resultType="cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserChildSummaryRespVO">
+        SELECT bu.id, bu.bind_user_time AS brokerageTime,
+        u.nickname, u.avatar,
+        (SELECT SUM(price) FROM trade_brokerage_record r
+        WHERE r.user_id = u.id AND biz_type = 1 AND r.status = 1 AND r.deleted = FALSE) AS brokeragePrice,
+        (SELECT COUNT(1) FROM trade_brokerage_record r
+        WHERE r.user_id = u.id AND biz_type = 1 AND r.status = 1 AND r.deleted = FALSE) AS brokerageOrderCount,
+        (SELECT COUNT(1) FROM trade_brokerage_user c
+        WHERE c.bind_user_id = u.id AND c.deleted = FALSE) AS brokerageUserCount
+        FROM member_user AS u
+        JOIN trade_brokerage_user AS bu ON bu.id = u.id
+        <where>
+            <if test="param.nickname != null and param.nickname != ''">
+                AND u.nickname LIKE concat('', #{param.nickname}, '')
+            </if>
+            <if test="param.level == 1">
+                AND bu.bind_user_id = #{userId}
+            </if>
+            <if test="param.level == 2">
+                AND bu.bind_user_id = (SELECT id FROM trade_brokerage_user c WHERE c.bind_user_id =
+                #{userId})
+            </if>
+        </where>
+        <choose>
+            <when test="param.sortingField.field == 'userCount'">
+                ORDER BY brokerageUserCount ${param.sortingField.order}
+            </when>
+            <when test="param.sortingField.field == 'orderCount'">
+                ORDER BY brokerageOrderCount ${param.sortingField.order}
+            </when>
+            <when test="param.sortingField.field == 'price'">
+                ORDER BY brokeragePrice ${param.sortingField.order}
+            </when>
+            <otherwise>
+                ORDER BY bu.bind_user_time DESC
+            </otherwise>
+        </choose>
+    </select>
+</mapper>

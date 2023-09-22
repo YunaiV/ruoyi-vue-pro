@@ -27,7 +27,7 @@ public class AppBrokerageUserChildSummaryRespVO {
     @Schema(description = "分销用户数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "30")
     private Integer brokerageUserCount;
 
-    @Schema(description = "成为分销员时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "绑定推广员的时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime brokerageTime;
 
 }

@@ -33,7 +33,6 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
-import static java.util.Arrays.asList;
 
 @Tag(name = "用户 APP - 分销用户")
 @RestController
@@ -113,21 +112,14 @@ public class AppBrokerageUserController {
         return success(BrokerageRecordConvert.INSTANCE.convertPage03(pageResult, userMap));
     }
 
-    // TODO 芋艿：临时 mock =>
     @GetMapping("/child-summary-page")
     @Operation(summary = "获得下级分销统计分页")
     @PreAuthenticated
     public CommonResult<PageResult<AppBrokerageUserChildSummaryRespVO>> getBrokerageUserChildSummaryPage(
             AppBrokerageUserChildSummaryPageReqVO pageReqVO) {
-        AppBrokerageUserChildSummaryRespVO vo1 = new AppBrokerageUserChildSummaryRespVO()
-                .setId(1L).setNickname("芋1**艿").setAvatar("http://www.iocoder.cn/images/common/wechat_mp_2017_07_31_bak.jpg")
-                .setBrokeragePrice(10).setBrokeragePrice(20).setBrokerageOrderCount(30)
-                .setBrokerageTime(LocalDateTime.now());
-        AppBrokerageUserChildSummaryRespVO vo2 = new AppBrokerageUserChildSummaryRespVO()
-                .setId(1L).setNickname("芋2**艿").setAvatar("http://www.iocoder.cn/images/common/wechat_mp_2017_07_31_bak.jpg")
-                .setBrokeragePrice(20).setBrokeragePrice(30).setBrokerageOrderCount(40)
-                .setBrokerageTime(LocalDateTime.now());
-        return success(new PageResult<>(asList(vo1, vo2), 10L));
+        // 分页查询
+        PageResult<AppBrokerageUserChildSummaryRespVO> pageResult = brokerageUserService.getBrokerageUserChildSummaryPage(pageReqVO, getLoginUserId());
+        return success(pageResult);
     }
 
     @GetMapping("/get-rank-by-price")

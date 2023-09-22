@@ -5,6 +5,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.user.BrokerageUserPageReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserChildSummaryPageReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserChildSummaryRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankByUserCountRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -138,4 +140,8 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
     IPage<AppBrokerageUserRankByUserCountRespVO> selectCountPageGroupByBindUserId(Page<?> page,
                                                                                   @Param("beginTime") LocalDateTime beginTime,
                                                                                   @Param("endTime") LocalDateTime endTime);
+
+    IPage<AppBrokerageUserChildSummaryRespVO> selectSummaryPageByUserId(Page<?> page,
+                                                                        @Param("param") AppBrokerageUserChildSummaryPageReqVO param,
+                                                                        @Param("userId") Long userId);
 }
