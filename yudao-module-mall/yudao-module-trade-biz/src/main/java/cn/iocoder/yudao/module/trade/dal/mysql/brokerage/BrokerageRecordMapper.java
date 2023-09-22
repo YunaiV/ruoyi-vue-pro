@@ -4,9 +4,11 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.record.BrokerageRecordPageReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankByPriceRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageRecordDO;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -63,4 +65,14 @@ public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
                                                                      @Param("bizType") Integer bizType,
                                                                      @Param("beginTime") LocalDateTime beginTime,
                                                                      @Param("endTime") LocalDateTime endTime);
+
+    @Select("SELECT user_id AS id, SUM(price) AS brokeragePrice FROM trade_brokerage_record " +
+            "WHERE biz_type = #{bizType} AND status = #{status} AND create_time BETWEEN #{beginTime} AND #{endTime} " +
+            "GROUP BY user_id " +
+            "ORDER BY SUM(price) DESC")
+    IPage<AppBrokerageUserRankByPriceRespVO> selectSummaryPricePageGroupByUserId(IPage<?> page,
+                                                                                 @Param("bizType") Integer bizType,
+                                                                                 @Param("status") Integer status,
+                                                                                 @Param("beginTime") LocalDateTime beginTime,
+                                                                                 @Param("endTime") LocalDateTime endTime);
 }

@@ -4,7 +4,10 @@ import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
+import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.*;
+import cn.iocoder.yudao.module.trade.convert.brokerage.BrokerageRecordConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum;
@@ -22,9 +25,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static java.util.Arrays.asList;
@@ -41,6 +46,9 @@ public class AppBrokerageUserController {
     private BrokerageRecordService brokerageRecordService;
     @Resource
     private BrokerageWithdrawService brokerageWithdrawService;
+
+    @Resource
+    private MemberUserApi memberUserApi;
 
     @GetMapping("/get")
     @Operation(summary = "获得个人分销信息")
@@ -102,24 +110,15 @@ public class AppBrokerageUserController {
         return success(new PageResult<>(asList(vo1, vo2, vo3, vo4), 10L));
     }
 
-    // TODO 芋艿：临时 mock =>
     @GetMapping("/rank-page-by-price")
     @Operation(summary = "获得分销用户排行分页（基于佣金）")
     @PreAuthenticated
     public CommonResult<PageResult<AppBrokerageUserRankByPriceRespVO>> getBrokerageUserChildSummaryPageByPrice(AppBrokerageUserRankPageReqVO pageReqVO) {
-        AppBrokerageUserRankByPriceRespVO vo1 = new AppBrokerageUserRankByPriceRespVO()
-                .setId(1L).setNickname("芋1**艿").setAvatar("http://www.iocoder.cn/images/common/wechat_mp_2017_07_31_bak.jpg")
-                .setBrokeragePrice(10);
-        AppBrokerageUserRankByPriceRespVO vo2 = new AppBrokerageUserRankByPriceRespVO()
-                .setId(2L).setNickname("芋2**艿").setAvatar("http://www.iocoder.cn/images/common/wechat_mp_2017_07_31_bak.jpg")
-                .setBrokeragePrice(6);
-        AppBrokerageUserRankByPriceRespVO vo3 = new AppBrokerageUserRankByPriceRespVO()
-                .setId(3L).setNickname("芋3**艿").setAvatar("http://www.iocoder.cn/images/common/wechat_mp_2017_07_31_bak.jpg")
-                .setBrokeragePrice(4);
-        AppBrokerageUserRankByPriceRespVO vo4 = new AppBrokerageUserRankByPriceRespVO()
-                .setId(3L).setNickname("芋3**艿").setAvatar("http://www.iocoder.cn/images/common/wechat_mp_2017_07_31_bak.jpg")
-                .setBrokeragePrice(4);
-        return success(new PageResult<>(asList(vo1, vo2, vo3, vo4), 10L));
+        // 分页查询
+        PageResult<AppBrokerageUserRankByPriceRespVO> pageResult = brokerageRecordService.getBrokerageUserChildSummaryPageByPrice(pageReqVO);
+        // 拼接数据
+        Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(convertSet(pageResult.getList(), AppBrokerageUserRankByPriceRespVO::getId));
+        return success(BrokerageRecordConvert.INSTANCE.convertPage03(pageResult, userMap));
     }
 
     // TODO 芋艿：临时 mock =>
@@ -139,13 +138,12 @@ public class AppBrokerageUserController {
         return success(new PageResult<>(asList(vo1, vo2), 10L));
     }
 
-    // TODO 芋艿：临时 mock =>
     @GetMapping("/get-rank-by-price")
     @Operation(summary = "获得分销用户排行（基于佣金）")
     @Parameter(name = "times", description = "时间段", required = true)
-    public CommonResult<Integer> bindBrokerageUser(
+    public CommonResult<Integer> getRankByPrice(
             @RequestParam("times") @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND) LocalDateTime[] times) {
-        return success(1);
+        return success(brokerageRecordService.getUserRankByPrice(getLoginUserId(), times));
     }
 
 }

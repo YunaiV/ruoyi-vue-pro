@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.trade.service.brokerage;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.record.BrokerageRecordPageReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankByPriceRespVO;
+import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageRecordDO;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
@@ -90,4 +92,20 @@ public interface BrokerageRecordService {
      * @return 用户佣金合计
      */
     Integer getSummaryPriceByUserId(Long userId, Integer bizType, LocalDateTime beginTime, LocalDateTime endTime);
+
+    /**
+     * 获得用户佣金排行分页列表（基于佣金总数）
+     * @param pageReqVO 分页查询
+     * @return 排行榜分页
+     */
+    PageResult<AppBrokerageUserRankByPriceRespVO> getBrokerageUserChildSummaryPageByPrice(AppBrokerageUserRankPageReqVO pageReqVO);
+
+    /**
+     * 获取用户的排名（基于佣金总数）
+     *
+     * @param userId 用户编号
+     * @param times  时间范围
+     * @return 用户的排名
+     */
+    Integer getUserRankByPrice(Long userId, LocalDateTime[] times);
 }

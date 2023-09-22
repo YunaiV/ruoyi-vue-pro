@@ -2,13 +2,17 @@ package cn.iocoder.yudao.module.trade.service.brokerage;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.math.Money;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
+import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.record.BrokerageRecordPageReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankByPriceRespVO;
+import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankPageReqVO;
 import cn.iocoder.yudao.module.trade.convert.brokerage.BrokerageRecordConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageRecordDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
@@ -19,6 +23,7 @@ import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -225,6 +230,26 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
     @Override
     public Integer getSummaryPriceByUserId(Long userId, Integer bizType, LocalDateTime beginTime, LocalDateTime endTime) {
         return brokerageRecordMapper.selectSummaryPriceByUserIdAndBizTypeAndCreateTimeBetween(userId, bizType, beginTime, endTime);
+    }
+
+    @Override
+    public PageResult<AppBrokerageUserRankByPriceRespVO> getBrokerageUserChildSummaryPageByPrice(AppBrokerageUserRankPageReqVO pageReqVO) {
+        IPage<AppBrokerageUserRankByPriceRespVO> pageResult = brokerageRecordMapper.selectSummaryPricePageGroupByUserId(MyBatisUtils.buildPage(pageReqVO),
+                BrokerageRecordBizTypeEnum.ORDER.getType(), BrokerageRecordStatusEnum.SETTLEMENT.getStatus(),
+                ArrayUtil.get(pageReqVO.getTimes(), 0), ArrayUtil.get(pageReqVO.getTimes(), 1));
+        return new PageResult<>(pageResult.getRecords(), pageResult.getTotal());
+    }
+
+    @Override
+    public Integer getUserRankByPrice(Long userId, LocalDateTime[] times) {
+        AppBrokerageUserRankPageReqVO pageParam = new AppBrokerageUserRankPageReqVO().setTimes(times);
+        // 取前100名
+        pageParam.setPageSize(100);
+        PageResult<AppBrokerageUserRankByPriceRespVO> pageResult = getBrokerageUserChildSummaryPageByPrice(pageParam);
+        // 获得索引
+        int index = CollUtil.indexOf(pageResult.getList(), user -> Objects.equals(userId, user.getId()));
+        // 获得排名
+        return index + 1;
     }
 
     @Override

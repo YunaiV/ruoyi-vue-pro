@@ -9,11 +9,13 @@ import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.record.Broker
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.record.BrokerageRecordRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.record.AppBrokerageRecordPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.record.AppBrokerageRecordRespVO;
+import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankByPriceRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageRecordDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
 import java.time.LocalDateTime;
@@ -68,4 +70,13 @@ public interface BrokerageRecordConvert {
     BrokerageRecordPageReqVO convert(AppBrokerageRecordPageReqVO pageReqVO, Long userId);
 
     PageResult<AppBrokerageRecordRespVO> convertPage02(PageResult<BrokerageRecordDO> pageResult);
+
+    default PageResult<AppBrokerageUserRankByPriceRespVO> convertPage03(PageResult<AppBrokerageUserRankByPriceRespVO> pageResult, Map<Long, MemberUserRespDTO> userMap) {
+        for (AppBrokerageUserRankByPriceRespVO vo : pageResult.getList()) {
+            copyTo(userMap.get(vo.getId()), vo);
+        }
+        return pageResult;
+    }
+
+    void copyTo(MemberUserRespDTO from, @MappingTarget AppBrokerageUserRankByPriceRespVO to);
 }
