@@ -229,12 +229,12 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addBrokerage(Long userId, BrokerageRecordBizTypeEnum bizType, String bizId, int brokeragePrice, String title) {
+    public void addBrokerage(Long userId, BrokerageRecordBizTypeEnum bizType, String bizId, Integer brokeragePrice, String title) {
         // 校验佣金余额
         BrokerageUserDO user = brokerageUserService.getBrokerageUser(userId);
         int balance = Optional.of(user)
                 .map(BrokerageUserDO::getBrokeragePrice).orElse(0);
-        if (balance < brokeragePrice) {
+        if (balance + brokeragePrice < 0) {
             throw exception(BROKERAGE_WITHDRAW_USER_BALANCE_NOT_ENOUGH, new Money(0, balance));
         }
 

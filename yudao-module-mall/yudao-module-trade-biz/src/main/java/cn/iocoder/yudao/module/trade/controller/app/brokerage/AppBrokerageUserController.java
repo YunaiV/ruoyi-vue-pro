@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.*;
+import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum;
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageRecordService;
@@ -41,15 +42,15 @@ public class AppBrokerageUserController {
     @Resource
     private BrokerageWithdrawService brokerageWithdrawService;
 
-    // TODO 芋艿：临时 mock =>
     @GetMapping("/get")
     @Operation(summary = "获得个人分销信息")
     @PreAuthenticated
     public CommonResult<AppBrokerageUserRespVO> getBrokerageUser() {
+        Optional<BrokerageUserDO> user = Optional.ofNullable(brokerageUserService.getBrokerageUser(getLoginUserId()));
         AppBrokerageUserRespVO respVO = new AppBrokerageUserRespVO()
-                .setBrokerageEnabled(true)
-                .setBrokeragePrice(2000)
-                .setFrozenPrice(3000);
+                .setBrokerageEnabled(user.map(BrokerageUserDO::getBrokerageEnabled).orElse(false))
+                .setBrokeragePrice(user.map(BrokerageUserDO::getBrokeragePrice).orElse(0))
+                .setFrozenPrice(user.map(BrokerageUserDO::getFrozenPrice).orElse(0));
         return success(respVO);
     }
 

@@ -43,7 +43,7 @@ public class AppBrokerageWithdrawCreateReqVO {
     @NotBlank(message = "持卡人姓名不能为空", groups = {Bank.class})
     private String name;
     @Schema(description = "提现银行", example = "1")
-    @NotBlank(message = "提现银行不能为空", groups = {Bank.class})
+    @NotNull(message = "提现银行不能为空", groups = {Bank.class})
     private Integer bankName;
     @Schema(description = "开户地址", example = "海淀支行")
     private String bankAddress;

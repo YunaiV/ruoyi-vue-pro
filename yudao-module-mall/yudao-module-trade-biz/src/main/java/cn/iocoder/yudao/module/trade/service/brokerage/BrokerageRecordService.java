@@ -52,7 +52,7 @@ public interface BrokerageRecordService {
      * @param brokeragePrice 佣金
      * @param title          标题
      */
-    void addBrokerage(Long userId, BrokerageRecordBizTypeEnum bizType, String bizId, int brokeragePrice, String title);
+    void addBrokerage(Long userId, BrokerageRecordBizTypeEnum bizType, String bizId, Integer brokeragePrice, String title);
 
     /**
      * 取消佣金：将佣金记录，状态修改为已失效
