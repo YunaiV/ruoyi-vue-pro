@@ -22,6 +22,7 @@ public enum BrokerageWithdrawStatusEnum implements IntArrayValuable {
     WITHDRAW_FAIL(21, "提现失败"),
     ;
 
+    public static final String DICT_TYPE = "BROKERAGE_WITHDRAW_STATUS";
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BrokerageWithdrawStatusEnum::getStatus).toArray();
 
     /**

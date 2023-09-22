@@ -32,6 +32,6 @@ public class AppDictDataController {
     @Operation(summary = "根据字典类型查询字典数据信息")
     public CommonResult<List<AppDictDataRespVO>> getDicts(@PathVariable String dictType) {
         List<DictDataDO> list = dictDataService.getDictDataList(new DictDataExportReqVO().setDictType(dictType));
-        return success(DictDataConvert.INSTANCE.convertList2(list));
+        return success(DictDataConvert.INSTANCE.convertList03(list));
     }
 }
