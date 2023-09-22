@@ -12,12 +12,6 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 public interface ErrorCodeConstants {
 
     // ========== Order 模块 1011000000 ==========
-    ErrorCode ORDER_CREATE_SKU_NOT_FOUND = new ErrorCode(1011000001, "商品 SKU 不存在");
-    ErrorCode ORDER_CREATE_SPU_NOT_SALE = new ErrorCode(1011000002, "商品 SPU 不可售卖");
-    ErrorCode ORDER_CREATE_SKU_STOCK_NOT_ENOUGH = new ErrorCode(1011000004, "商品 SKU 库存不足");
-    ErrorCode ORDER_CREATE_SPU_NOT_FOUND = new ErrorCode(1011000005, "商品 SPU 不可售卖");
-    ErrorCode ORDER_CREATE_ADDRESS_NOT_FOUND = new ErrorCode(1011000006, "收货地址不存在");
-
     ErrorCode ORDER_ITEM_NOT_FOUND = new ErrorCode(1011000010, "交易订单项不存在");
     ErrorCode ORDER_NOT_FOUND = new ErrorCode(1011000011, "交易订单不存在");
     ErrorCode ORDER_ITEM_UPDATE_AFTER_SALE_STATUS_FAIL = new ErrorCode(1011000012, "交易订单项更新售后状态失败，请重试");
@@ -61,6 +55,7 @@ public interface ErrorCodeConstants {
     ErrorCode PRICE_CALCULATE_DELIVERY_PRICE_USER_ADDRESS_IS_EMPTY = new ErrorCode(1011003001, "计算快递运费异常，收件人地址编号为空");
     ErrorCode PRICE_CALCULATE_DELIVERY_PRICE_TEMPLATE_NOT_FOUND = new ErrorCode(1011003002, "计算快递运费异常，找不到对应的运费模板");
     ErrorCode PRICE_CALCULATE_DELIVERY_PRICE_PICK_UP_STORE_IS_EMPTY = new ErrorCode(1011003003, "计算快递运费异常，自提点为空");
+    ErrorCode PRICE_CALCULATE_COUPON_NOT_MATCH_NORMAL_ORDER = new ErrorCode(1011003004, "参与秒杀、拼团、砍价的营销商品，无法使用优惠劵");
 
     // ========== 物流 Express 模块 1011004000 ==========
     ErrorCode EXPRESS_NOT_EXISTS = new ErrorCode(1011004000, "快递公司不存在");
