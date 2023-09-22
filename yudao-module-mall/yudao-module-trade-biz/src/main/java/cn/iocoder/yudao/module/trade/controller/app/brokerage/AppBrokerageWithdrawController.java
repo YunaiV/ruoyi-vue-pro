@@ -4,8 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
-import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.withdraw.BrokerageWithdrawPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.withdraw.AppBrokerageWithdrawCreateReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.withdraw.AppBrokerageWithdrawPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.withdraw.AppBrokerageWithdrawRespVO;
 import cn.iocoder.yudao.module.trade.convert.brokerage.BrokerageWithdrawConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageWithdrawDO;
@@ -39,10 +39,10 @@ public class AppBrokerageWithdrawController {
     @GetMapping("/page")
     @Operation(summary = "获得分销提现分页")
     @PreAuthenticated
-    public CommonResult<PageResult<AppBrokerageWithdrawRespVO>> getBrokerageWithdrawPage(BrokerageWithdrawPageReqVO pageReqVO) {
+    public CommonResult<PageResult<AppBrokerageWithdrawRespVO>> getBrokerageWithdrawPage(AppBrokerageWithdrawPageReqVO pageReqVO) {
         // 分页查询
-        pageReqVO.setUserId(getLoginUserId());
-        PageResult<BrokerageWithdrawDO> pageResult = brokerageWithdrawService.getBrokerageWithdrawPage(pageReqVO);
+        PageResult<BrokerageWithdrawDO> pageResult = brokerageWithdrawService.getBrokerageWithdrawPage(
+                BrokerageWithdrawConvert.INSTANCE.convert(pageReqVO, getLoginUserId()));
         // 拼接信息
         Map<String, String> statusNameMap = dictDataApi.getDictDataLabelMap(BrokerageWithdrawStatusEnum.DICT_TYPE);
         return success(BrokerageWithdrawConvert.INSTANCE.convertPage02(pageResult, statusNameMap));
