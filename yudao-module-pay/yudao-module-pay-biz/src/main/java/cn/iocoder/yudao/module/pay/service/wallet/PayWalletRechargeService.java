@@ -29,4 +29,17 @@ public interface PayWalletRechargeService {
      */
     void updateWalletRechargerPaid(Long id, Long payOrderId);
 
+    /**
+     * 发起钱包充值退款
+     * @param id 钱包充值编号
+     * @param userIp 用户 ip 地址
+     */
+    void refundWalletRecharge(Long id, String userIp);
+
+    /**
+     * 更新钱包充值记录为已退款
+     * @param id  钱包充值 id
+     * @param payRefundId 退款单id
+     */
+    void updateWalletRechargeRefunded(Long id, Long payRefundId);
 }

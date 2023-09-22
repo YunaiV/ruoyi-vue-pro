@@ -46,6 +46,7 @@ public interface ErrorCodeConstants {
     ErrorCode WALLET_TRANSACTION_NOT_FOUND = new ErrorCode(1007007002, "未找到对应的钱包交易");
     ErrorCode WALLET_REFUND_AMOUNT_ERROR = new ErrorCode(1007007003, "钱包退款金额不对");
     ErrorCode WALLET_REFUND_EXIST = new ErrorCode(1007007004, "已经存在钱包退款");
+    ErrorCode WALLET_FREEZE_PRICE_NOT_ENOUGH = new ErrorCode(1007007005, "钱包冻结余额不足");
 
     // TODO @jason：把钱包充值，单独搞个错误码段哈；
 
@@ -54,7 +55,12 @@ public interface ErrorCodeConstants {
     ErrorCode WALLET_RECHARGE_UPDATE_PAID_PAY_ORDER_ID_ERROR = new ErrorCode(1007007007, "钱包充值更新支付状态失败，支付单编号不匹配");
     ErrorCode WALLET_RECHARGE_UPDATE_PAID_PAY_ORDER_STATUS_NOT_SUCCESS = new ErrorCode(1007007008, "钱包充值更新支付状态失败，支付单状态不是【支付成功】状态");
     ErrorCode WALLET_RECHARGE_UPDATE_PAID_PAY_PRICE_NOT_MATCH = new ErrorCode(1007007009, "钱包充值更新支付状态失败，支付单金额不匹配");
-
+    ErrorCode WALLET_RECHARGE_REFUND_FAIL_NOT_PAID = new ErrorCode(1007900010, "钱包发起退款失败，钱包充值订单未支付");
+    ErrorCode WALLET_RECHARGE_REFUND_FAIL_REFUNDED = new ErrorCode(1007900011, "钱包发起退款失败，钱包充值订单已退款");
+    ErrorCode WALLET_RECHARGE_REFUND_BALANCE_NOT_ENOUGH = new ErrorCode(1007900012, "钱包发起退款失败，钱包余额不足");
+    ErrorCode WALLET_RECHARGE_REFUND_FAIL_REFUND_ORDER_ID_ERROR = new ErrorCode(1007900013, "钱包退款更新失败，钱包退款单编号不匹配");
+    ErrorCode WALLET_RECHARGE_REFUND_FAIL_REFUND_NOT_FOUND = new ErrorCode(1007900014, "钱包退款更新失败，退款订单不存在");
+    ErrorCode WALLET_RECHARGE_REFUND_FAIL_REFUND_PRICE_NOT_MATCH = new ErrorCode(1007900015, "钱包退款更新失败，退款单金额不匹配");
     // ========== 示例订单 1007900000 ==========
     ErrorCode DEMO_ORDER_NOT_FOUND = new ErrorCode(1007900000, "示例订单不存在");
     ErrorCode DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID = new ErrorCode(1007900001, "示例订单更新支付状态失败，订单不是【未支付】状态");

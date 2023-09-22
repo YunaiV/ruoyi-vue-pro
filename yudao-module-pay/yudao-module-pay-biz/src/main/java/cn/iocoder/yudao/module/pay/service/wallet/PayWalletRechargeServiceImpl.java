@@ -1,15 +1,21 @@
 package cn.iocoder.yudao.module.pay.service.wallet;
 
+import cn.hutool.core.lang.Assert;
+import cn.iocoder.yudao.framework.pay.core.enums.refund.PayRefundStatusRespEnum;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
+import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.recharge.AppPayWalletRechargeCreateReqVO;
 import cn.iocoder.yudao.module.pay.convert.wallet.PayWalletRechargeConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletRechargeDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletRechargeMapper;
 import cn.iocoder.yudao.module.pay.enums.member.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
+import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
+import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +30,7 @@ import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.add
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum.*;
 
 /**
  * 钱包充值 Service 实现类
@@ -47,6 +54,8 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
     private PayWalletService payWalletService;
     @Resource
     private PayOrderService payOrderService;
+    @Resource
+    private PayRefundService payRefundService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -96,6 +105,113 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
         // TODO 需要钱包中加个可提现余额
         payWalletService.addWalletBalance(walletRecharge.getWalletId(), String.valueOf(id),
                 PayWalletBizTypeEnum.RECHARGE, walletRecharge.getTotalPrice());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void refundWalletRecharge(Long id, String userIp) {
+        // 1.1 获取钱包充值记录
+        PayWalletRechargeDO walletRecharge = walletRechargeMapper.selectById(id);
+        if (walletRecharge == null) {
+            log.error("[refundWalletRecharge][钱包充值记录不存在，钱包充值记录 id({})]", id);
+            throw exception(WALLET_RECHARGE_NOT_FOUND);
+        }
+        // 1.2 校验钱包充值是否可以发起退款
+        PayWalletDO wallet = validateWalletRechargeCanRefund(walletRecharge);
+        // 2 冻结退款的余额，  暂时只处理赠送的余额也全部退回
+        payWalletService.freezePrice(wallet.getId(), walletRecharge.getTotalPrice());
+        // 3 创建退款单
+        String walletRechargeId = String.valueOf(id);
+        String refundId = walletRechargeId + "-refund";
+        Long payRefundId =  payRefundService.createPayRefund(new PayRefundCreateReqDTO()
+                .setAppId(WALLET_PAY_APP_ID).setUserIp(userIp)
+                .setMerchantOrderId(walletRechargeId)
+                .setMerchantRefundId(refundId)
+                .setReason("想退钱").setPrice(walletRecharge.getPayPrice()));
+        // 4 更新充值记录退款单号
+        walletRechargeMapper.updateById(new PayWalletRechargeDO().setPayRefundId(payRefundId)
+                .setRefundStatus(WAITING.getStatus()).setId(walletRecharge.getId()));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateWalletRechargeRefunded(Long id, Long payRefundId) {
+        // 1.1 获取钱包充值记录
+        PayWalletRechargeDO walletRecharge = walletRechargeMapper.selectById(id);
+        if (walletRecharge == null) {
+            log.error("[updateWalletRechargerPaid][钱包充值记录不存在，钱包充值记录 id({})]", id);
+            throw exception(WALLET_RECHARGE_NOT_FOUND);
+        }
+        // 1.2 校验钱包充值是否可以更新已退款
+        PayRefundDO payRefund = validateWalletRechargeCanRefunded(walletRecharge, payRefundId);
+
+        PayWalletRechargeDO updateObj = new PayWalletRechargeDO().setId(id);
+        // 退款成功
+        if (PayRefundStatusEnum.isSuccess(payRefund.getStatus())) {
+            // 2.1 更新钱包余额
+            payWalletService.reduceWalletBalance(walletRecharge.getWalletId(), id,
+                    PayWalletBizTypeEnum.RECHARGE_REFUND, walletRecharge.getTotalPrice());
+
+            updateObj.setRefundStatus(SUCCESS.getStatus()).setRefundTime(payRefund.getSuccessTime())
+                    .setRefundTotalPrice(walletRecharge.getTotalPrice()).setRefundPayPrice(walletRecharge.getPayPrice())
+                    .setRefundBonusPrice(walletRecharge.getBonusPrice());
+        }
+        // 退款失败
+        if (PayRefundStatusRespEnum.isFailure(payRefund.getStatus())) {
+            // 2.2 解冻余额
+            payWalletService.unFreezePrice(walletRecharge.getWalletId(), walletRecharge.getTotalPrice());
+
+            updateObj.setRefundStatus(FAILURE.getStatus());
+        }
+        // 3. 更新钱包充值的退款字段
+        walletRechargeMapper.updateByIdAndRefunded(id, WAITING.getStatus(), updateObj);
+    }
+
+    private PayRefundDO validateWalletRechargeCanRefunded(PayWalletRechargeDO walletRecharge, Long payRefundId) {
+        // 1. 校验退款订单匹配
+        if (notEqual(walletRecharge.getPayRefundId(), payRefundId)) {
+            log.error("[validateWalletRechargeCanRefunded][钱包充值({}) 退款单不匹配({})，请进行处理！钱包充值的数据是：{}]",
+                    walletRecharge.getId(), payRefundId, toJsonString(walletRecharge));
+            throw exception(WALLET_RECHARGE_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
+        }
+
+        // 2.1 校验退款订单
+        PayRefundDO payRefund = payRefundService.getRefund(payRefundId);
+        if (payRefund == null) {
+            log.error("[validateWalletRechargeCanRefunded][payRefund({})不存在]", payRefundId);
+            throw exception(WALLET_RECHARGE_REFUND_FAIL_REFUND_NOT_FOUND);
+        }
+        // 2.2 校验退款金额一致
+        if (notEqual(payRefund.getRefundPrice(), walletRecharge.getPayPrice())) {
+            log.error("[validateWalletRechargeCanRefunded][钱包({}) payRefund({}) 退款金额不匹配，请进行处理！钱包数据是：{}，payRefund 数据是：{}]",
+                    walletRecharge.getId(), payRefundId, toJsonString(walletRecharge), toJsonString(payRefund));
+            throw exception(WALLET_RECHARGE_REFUND_FAIL_REFUND_PRICE_NOT_MATCH);
+        }
+        // 2.3 校验退款订单商户订单是否匹配
+        if (notEqual(payRefund.getMerchantOrderId(), walletRecharge.getId().toString())) {
+            log.error("[validateWalletRechargeCanRefunded][钱包({}) 退款单不匹配({})，请进行处理！payRefund 数据是：{}]",
+                    walletRecharge.getId(), payRefundId, toJsonString(payRefund));
+            throw exception(WALLET_RECHARGE_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
+        }
+        return payRefund;
+    }
+
+    private PayWalletDO validateWalletRechargeCanRefund(PayWalletRechargeDO walletRecharge) {
+        // 校验充值订单是否支付
+        if (!walletRecharge.getPayStatus()) {
+            throw exception(WALLET_RECHARGE_REFUND_FAIL_NOT_PAID);
+        }
+        // 校验充值订单是否已退款
+        if (walletRecharge.getPayRefundId() != null) {
+            throw exception(WALLET_RECHARGE_REFUND_FAIL_REFUNDED);
+        }
+        // 校验钱包余额是否足够
+        PayWalletDO wallet = payWalletService.getWallet(walletRecharge.getWalletId());
+        Assert.notNull(wallet, "用户钱包({}) 不存在", wallet.getId());
+        if (wallet.getBalance() < walletRecharge.getTotalPrice()) {
+            throw exception(WALLET_RECHARGE_REFUND_BALANCE_NOT_ENOUGH);
+        }
+        return wallet;
     }
 
     private PayOrderDO validateWalletRechargerCanPaid(PayWalletRechargeDO walletRecharge, Long payOrderId) {

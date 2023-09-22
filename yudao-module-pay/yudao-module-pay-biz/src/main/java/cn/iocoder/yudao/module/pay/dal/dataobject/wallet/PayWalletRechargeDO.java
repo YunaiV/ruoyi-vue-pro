@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.pay.dal.dataobject.wallet;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
+import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -98,5 +99,12 @@ public class PayWalletRechargeDO extends BaseDO {
      * 退款时间
      */
     private LocalDateTime refundTime;
+
+    /**
+     * 退款状态
+     *
+     * 枚举 {@link PayRefundStatusEnum}
+     */
+    private Integer refundStatus;
 
 }
