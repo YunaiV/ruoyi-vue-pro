@@ -40,8 +40,6 @@ create table trade_brokerage_user
     brokerage_time    datetime                              null comment '成为分销员时间',
     price             int         default 0                 not null comment '可用佣金',
     frozen_price      int         default 0                 not null comment '冻结佣金',
-    level             int         default 1                 not null comment '等级',
-    path              varchar(2000)                         null comment '路径',
     creator           varchar(64) default ''                null comment '创建者',
     create_time       datetime    default CURRENT_TIMESTAMP not null comment '创建时间',
     updater           varchar(64) default ''                null comment '更新者',

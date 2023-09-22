@@ -27,13 +27,12 @@ import java.util.List;
 @Mapper
 public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
 
-    default PageResult<BrokerageUserDO> selectPage(BrokerageUserPageReqVO reqVO, List<Integer> levels) {
+    default PageResult<BrokerageUserDO> selectPage(BrokerageUserPageReqVO reqVO, List<Long> bindUserIds) {
         return selectPage(reqVO, new LambdaQueryWrapperX<BrokerageUserDO>()
                 .eqIfPresent(BrokerageUserDO::getBrokerageEnabled, reqVO.getBrokerageEnabled())
                 .betweenIfPresent(BrokerageUserDO::getCreateTime, reqVO.getCreateTime())
                 .betweenIfPresent(BrokerageUserDO::getBindUserTime, reqVO.getBindUserTime())
-                .findInSetIfPresent(BrokerageUserDO::getPath, reqVO.getBindUserId())
-                .inIfPresent(BrokerageUserDO::getLevel, levels)
+                .inIfPresent(BrokerageUserDO::getBindUserId, bindUserIds)
                 .orderByDesc(BrokerageUserDO::getId));
     }
 
@@ -116,8 +115,7 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
     default void updateBindUserIdAndBindUserTimeToNull(Long id) {
         update(null, new LambdaUpdateWrapper<BrokerageUserDO>()
                 .eq(BrokerageUserDO::getId, id)
-                .set(BrokerageUserDO::getBindUserId, null).set(BrokerageUserDO::getBindUserTime, null)
-                .set(BrokerageUserDO::getLevel, 1).set(BrokerageUserDO::getPath, ""));
+                .set(BrokerageUserDO::getBindUserId, null).set(BrokerageUserDO::getBindUserTime, null));
     }
 
     default void updateEnabledFalseAndBrokerageTimeToNull(Long id) {
@@ -126,10 +124,9 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
                 .set(BrokerageUserDO::getBrokerageEnabled, false).set(BrokerageUserDO::getBrokerageTime, null));
     }
 
-    default Long selectCountByBindUserIdAndLevelIn(Long bindUserId, List<Integer> levels) {
+    default Long selectCountByBindUserIdIn(List<Long> bindUserIds) {
         return selectCount(new LambdaQueryWrapperX<BrokerageUserDO>()
-                .findInSetIfPresent(BrokerageUserDO::getPath, bindUserId)
-                .inIfPresent(BrokerageUserDO::getLevel, levels));
+                .inIfPresent(BrokerageUserDO::getBindUserId, bindUserIds));
     }
 
     @Select("SELECT bind_user_id AS id, COUNT(1) AS brokerageUserCount FROM trade_brokerage_user " +
@@ -144,4 +141,8 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
     IPage<AppBrokerageUserChildSummaryRespVO> selectSummaryPageByUserId(Page<?> page,
                                                                         @Param("param") AppBrokerageUserChildSummaryPageReqVO param,
                                                                         @Param("userId") Long userId);
+
+    default List<BrokerageUserDO> selectListByBindUserId(Long bindUserId) {
+        return selectList(BrokerageUserDO::getBindUserId, bindUserId);
+    }
 }

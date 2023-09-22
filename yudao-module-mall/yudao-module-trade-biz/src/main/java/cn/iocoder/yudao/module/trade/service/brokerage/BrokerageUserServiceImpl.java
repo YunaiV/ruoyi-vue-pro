@@ -4,8 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.BooleanUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.user.BrokerageUserPageReqVO;
@@ -25,9 +23,13 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
 /**
@@ -57,8 +59,8 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
 
     @Override
     public PageResult<BrokerageUserDO> getBrokerageUserPage(BrokerageUserPageReqVO pageReqVO) {
-        List<Integer> levels = buildUserQueryLevels(pageReqVO.getBindUserId(), pageReqVO.getLevel());
-        return brokerageUserMapper.selectPage(pageReqVO, levels);
+        List<Long> bindUserIds = buildBindUserIdsByLevel(pageReqVO.getBindUserId(), pageReqVO.getLevel());
+        return brokerageUserMapper.selectPage(pageReqVO, bindUserIds);
     }
 
     @Override
@@ -66,16 +68,15 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         // 校验存在
         BrokerageUserDO brokerageUser = validateBrokerageUserExists(id);
 
+        // 绑定关系未发生变化
+        if (Objects.equals(brokerageUser.getBindUserId(), bindUserId)) {
+            return;
+        }
+
         // 情况一：清除推广员
         if (bindUserId == null) {
             // 清除推广员
             brokerageUserMapper.updateBindUserIdAndBindUserTimeToNull(id);
-            return;
-        }
-
-        // 绑定关系未发生变化
-        // TODO @疯狂：这个放到“情况一”之前，貌似也没关系？
-        if (Objects.equals(brokerageUser.getBindUserId(), bindUserId)) {
             return;
         }
 
@@ -146,11 +147,11 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
 
     @Override
     public Long getBrokerageUserCountByBindUserId(Long bindUserId, Integer level) {
-        List<Integer> levels = buildUserQueryLevels(bindUserId, level);
-        if (CollUtil.isEmpty(levels)) {
+        List<Long> bindUserIds = buildBindUserIdsByLevel(bindUserId, level);
+        if (CollUtil.isEmpty(bindUserIds)) {
             return 0L;
         }
-        return brokerageUserMapper.selectCountByBindUserIdAndLevelIn(bindUserId, levels);
+        return brokerageUserMapper.selectCountByBindUserIdIn(bindUserIds);
     }
 
     @Override
@@ -185,20 +186,7 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     }
 
     private BrokerageUserDO fillBindUserData(Long bindUserId, BrokerageUserDO brokerageUser) {
-        BrokerageUserDO bindUser = getBrokerageUser(bindUserId);
-
-        Integer bindUserLevel = 0;
-        String bindUserPath = "";
-        if (bindUser != null) {
-            bindUserLevel = ObjectUtil.defaultIfNull(bindUser.getLevel(), 0);
-            bindUserPath = bindUser.getPath();
-        }
-
-        String path = StrUtil.isEmpty(bindUserPath)
-                ? String.valueOf(bindUserId)
-                : String.format("%s,%s", bindUserPath, bindUserId);
-        return brokerageUser.setBindUserId(bindUserId).setBindUserTime(LocalDateTime.now())
-                .setLevel(bindUserLevel + 1).setPath(path);
+        return brokerageUser.setBindUserId(bindUserId).setBindUserTime(LocalDateTime.now());
     }
 
     @Override
@@ -267,28 +255,25 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         }
 
         // 下级不能绑定自己的上级
-        if (StrUtil.split(bindUser.getPath(), ",").contains(String.valueOf(user.getId()))) {
-            throw exception(BROKERAGE_BIND_LOOP);
+        for (int i = 0; i <= Short.MAX_VALUE; i++) {
+            if (Objects.equals(bindUser.getBindUserId(), user.getId())) {
+                throw exception(BROKERAGE_BIND_LOOP);
+            }
+            bindUser = getBrokerageUser(bindUser.getBindUserId());
         }
     }
 
-    // TODO @芋艿：这个层级，要微信讨论下；
-    private List<Integer> buildUserQueryLevels(Long bindUserId, Integer level) {
-        List<Integer> levels = new ArrayList<>(2);
-
-        BrokerageUserDO bindUser = getBrokerageUser(bindUserId);
-        if (bindUser == null) {
-            return levels;
+    private List<Long> buildBindUserIdsByLevel(Long bindUserId, Integer level) {
+        List<Long> bindUserIds = CollUtil.newArrayList();
+        if (level == null || level == 1) {
+            bindUserIds.add(bindUserId);
+        }
+        if (level == null || level == 2) {
+            List<Long> firstUserIds = convertList(brokerageUserMapper.selectListByBindUserId(bindUserId), BrokerageUserDO::getId);
+            bindUserIds.addAll(firstUserIds);
         }
 
-        if (level == null) {
-            // 默认查两层
-            levels.add(bindUser.getLevel() + 1);
-            levels.add(bindUser.getLevel() + 2);
-        } else {
-            levels.add(bindUser.getLevel() + level);
-        }
-        return levels;
+        return bindUserIds;
 
     }
 

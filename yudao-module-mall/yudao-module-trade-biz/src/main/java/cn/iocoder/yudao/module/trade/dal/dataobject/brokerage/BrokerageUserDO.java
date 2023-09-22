@@ -59,13 +59,4 @@ public class BrokerageUserDO extends BaseDO {
      * 冻结佣金
      */
     private Integer frozenPrice;
-
-    /**
-     * 等级
-     */
-    private Integer level;
-    /**
-     * 路径
-     */
-    private String path;
 }
