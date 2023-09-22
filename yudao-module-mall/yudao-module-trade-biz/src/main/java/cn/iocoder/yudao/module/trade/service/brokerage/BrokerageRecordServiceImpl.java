@@ -223,6 +223,11 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
     }
 
     @Override
+    public Integer getSummaryPriceByUserId(Long userId, Integer bizType, LocalDateTime beginTime, LocalDateTime endTime) {
+        return brokerageRecordMapper.selectSummaryPriceByUserIdAndBizTypeAndCreateTimeBetween(userId, bizType, beginTime, endTime);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void addBrokerage(Long userId, BrokerageRecordBizTypeEnum bizType, String bizId, int brokeragePrice, String title) {
         // 校验佣金余额

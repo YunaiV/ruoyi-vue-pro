@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.withdraw.Brok
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageWithdrawDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * 佣金提现 Mapper
@@ -34,4 +36,6 @@ public interface BrokerageWithdrawMapper extends BaseMapperX<BrokerageWithdrawDO
                 .eq(BrokerageWithdrawDO::getStatus, status));
     }
 
+    @Select("SELECT SUM(price) FROM trade_brokerage_withdraw WHERE user_id = #{userId} AND status = #{status}")
+    Integer selectSummaryPriceByUserIdAndStatus(@Param("userId") Long userId, @Param("status") Integer status);
 }

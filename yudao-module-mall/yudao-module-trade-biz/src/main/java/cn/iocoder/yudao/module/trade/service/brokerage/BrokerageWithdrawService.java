@@ -47,4 +47,14 @@ public interface BrokerageWithdrawService {
      * @return 佣金提现编号
      */
     Long createBrokerageWithdraw(AppBrokerageWithdrawCreateReqVO createReqVO, Long userId);
+
+    /**
+     * 获得用户已提现金额
+     *
+     * @param userId 用户编号
+     * @param status 状态
+     * @return 用户已提现金额
+     */
+    Integer getSummaryPriceByUserIdAndStatus(Long userId, Integer status);
+
 }

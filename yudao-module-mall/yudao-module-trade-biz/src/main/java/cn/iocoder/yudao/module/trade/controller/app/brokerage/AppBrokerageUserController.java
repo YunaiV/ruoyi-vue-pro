@@ -1,10 +1,15 @@
 package cn.iocoder.yudao.module.trade.controller.app.brokerage;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.*;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum;
+import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageRecordService;
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageUserService;
+import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageWithdrawService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -30,6 +36,10 @@ import static java.util.Arrays.asList;
 public class AppBrokerageUserController {
     @Resource
     private BrokerageUserService brokerageUserService;
+    @Resource
+    private BrokerageRecordService brokerageRecordService;
+    @Resource
+    private BrokerageWithdrawService brokerageWithdrawService;
 
     // TODO 芋艿：临时 mock =>
     @GetMapping("/get")
@@ -50,18 +60,24 @@ public class AppBrokerageUserController {
         return success(brokerageUserService.bindBrokerageUser(getLoginUserId(), reqVO.getBindUserId(), false));
     }
 
-    // TODO 芋艿：临时 mock =>
     @GetMapping("/get-summary")
     @Operation(summary = "获得个人分销统计")
     @PreAuthenticated
     public CommonResult<AppBrokerageUserMySummaryRespVO> getBrokerageUserSummary() {
+        Long userId = getLoginUserId();
+        LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
+        LocalDateTime beginTime = LocalDateTimeUtil.beginOfDay(yesterday);
+        LocalDateTime endTime = LocalDateTimeUtil.endOfDay(yesterday);
+
         AppBrokerageUserMySummaryRespVO respVO = new AppBrokerageUserMySummaryRespVO()
-                .setYesterdayPrice(1)
-                .setBrokeragePrice(2)
-                .setFrozenPrice(3)
-                .setWithdrawPrice(4)
-                .setFirstBrokerageUserCount(166)
-                .setSecondBrokerageUserCount(233);
+                .setYesterdayPrice(brokerageRecordService.getSummaryPriceByUserId(userId, BrokerageRecordBizTypeEnum.ORDER.getType(), beginTime, endTime))
+                .setWithdrawPrice(brokerageWithdrawService.getSummaryPriceByUserIdAndStatus(userId, BrokerageWithdrawStatusEnum.AUDIT_SUCCESS.getStatus()))
+                .setBrokeragePrice(0)
+                .setFrozenPrice(0)
+                .setFirstBrokerageUserCount(brokerageUserService.getBrokerageUserCountByBindUserId(userId, 1))
+                .setSecondBrokerageUserCount(brokerageUserService.getBrokerageUserCountByBindUserId(userId, 2));
+        Optional.ofNullable(brokerageUserService.getBrokerageUser(userId))
+                .ifPresent(user -> respVO.setBrokeragePrice(user.getBrokeragePrice()).setFrozenPrice(user.getFrozenPrice()));
         return success(respVO);
     }
 

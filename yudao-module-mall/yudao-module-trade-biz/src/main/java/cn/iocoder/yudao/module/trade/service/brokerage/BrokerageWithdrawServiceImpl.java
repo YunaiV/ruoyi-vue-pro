@@ -141,6 +141,11 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
         return withdraw.getId();
     }
 
+    @Override
+    public Integer getSummaryPriceByUserIdAndStatus(Long userId, Integer status) {
+        return brokerageWithdrawMapper.selectSummaryPriceByUserIdAndStatus(userId, status);
+    }
+
     /**
      * 计算提现手续费
      *

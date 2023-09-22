@@ -57,4 +57,10 @@ public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
                                                                              @Param("bizType") Integer bizType,
                                                                              @Param("status") Integer status);
 
+    @Select("SELECT SUM(price) FROM trade_brokerage_record WHERE user_id = #{userId} AND biz_type = #{bizType} " +
+            "AND create_time BETWEEN #{beginTime} AND #{endTime}")
+    Integer selectSummaryPriceByUserIdAndBizTypeAndCreateTimeBetween(@Param("userId") Long userId,
+                                                                     @Param("bizType") Integer bizType,
+                                                                     @Param("beginTime") LocalDateTime beginTime,
+                                                                     @Param("endTime") LocalDateTime endTime);
 }

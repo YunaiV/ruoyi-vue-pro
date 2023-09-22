@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -78,4 +79,15 @@ public interface BrokerageRecordService {
      * @return 用户佣金汇总
      */
     UserBrokerageSummaryBO getUserBrokerageSummaryByUserId(Long userId, Integer bizType, Integer status);
+
+    /**
+     * 获得用户佣金合计
+     *
+     * @param userId    用户编号
+     * @param bizType   业务类型
+     * @param beginTime 开始时间
+     * @param endTime   截止时间
+     * @return 用户佣金合计
+     */
+    Integer getSummaryPriceByUserId(Long userId, Integer bizType, LocalDateTime beginTime, LocalDateTime endTime);
 }
