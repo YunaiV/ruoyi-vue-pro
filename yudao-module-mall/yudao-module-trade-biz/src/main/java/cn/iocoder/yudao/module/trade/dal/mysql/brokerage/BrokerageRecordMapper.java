@@ -67,9 +67,10 @@ public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
                                                                      @Param("endTime") LocalDateTime endTime);
 
     @Select("SELECT user_id AS id, SUM(price) AS brokeragePrice FROM trade_brokerage_record " +
-            "WHERE biz_type = #{bizType} AND status = #{status} AND create_time BETWEEN #{beginTime} AND #{endTime} " +
+            "WHERE biz_type = #{bizType} AND status = #{status} AND deleted = FALSE " +
+            "AND unfreeze_time BETWEEN #{beginTime} AND #{endTime} " +
             "GROUP BY user_id " +
-            "ORDER BY SUM(price) DESC")
+            "ORDER BY brokeragePrice DESC")
     IPage<AppBrokerageUserRankByPriceRespVO> selectSummaryPricePageGroupByUserId(IPage<?> page,
                                                                                  @Param("bizType") Integer bizType,
                                                                                  @Param("status") Integer status,

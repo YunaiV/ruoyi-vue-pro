@@ -4,9 +4,11 @@ import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.user.BrokerageUserRespVO;
+import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankByUserCountRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -55,4 +57,13 @@ public interface BrokerageUserConvert {
                 user -> target.setNickname(user.getNickname()).setAvatar(user.getAvatar()));
         return target;
     }
+
+    default PageResult<AppBrokerageUserRankByUserCountRespVO> convertPage03(PageResult<AppBrokerageUserRankByUserCountRespVO> pageResult, Map<Long, MemberUserRespDTO> userMap) {
+        for (AppBrokerageUserRankByUserCountRespVO vo : pageResult.getList()) {
+            copyTo(userMap.get(vo.getId()), vo);
+        }
+        return pageResult;
+    }
+
+    void copyTo(MemberUserRespDTO from, @MappingTarget AppBrokerageUserRankByUserCountRespVO to);
 }

@@ -5,10 +5,16 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.user.BrokerageUserPageReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankByUserCountRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -124,4 +130,12 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
                 .inIfPresent(BrokerageUserDO::getLevel, levels));
     }
 
+    @Select("SELECT bind_user_id AS id, COUNT(1) AS brokerageUserCount FROM trade_brokerage_user " +
+            "WHERE bind_user_id IS NOT NULL AND deleted = FALSE " +
+            "AND bind_user_time BETWEEN #{beginTime} AND #{endTime} " +
+            "GROUP BY bind_user_id " +
+            "ORDER BY brokerageUserCount DESC")
+    IPage<AppBrokerageUserRankByUserCountRespVO> selectCountPageGroupByBindUserId(Page<?> page,
+                                                                                  @Param("beginTime") LocalDateTime beginTime,
+                                                                                  @Param("endTime") LocalDateTime endTime);
 }

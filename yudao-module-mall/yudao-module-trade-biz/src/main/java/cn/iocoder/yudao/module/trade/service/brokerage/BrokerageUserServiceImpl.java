@@ -2,17 +2,22 @@ package cn.iocoder.yudao.module.trade.service.brokerage;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.user.BrokerageUserPageReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankByUserCountRespVO;
+import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.BrokerageUserMapper;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageBindModeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageEnabledConditionEnum;
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -206,6 +211,13 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         return Optional.ofNullable(getBrokerageUser(userId))
                 .map(BrokerageUserDO::getBrokerageEnabled)
                 .orElse(false);
+    }
+
+    @Override
+    public PageResult<AppBrokerageUserRankByUserCountRespVO> getBrokerageUserRankPageByUserCount(AppBrokerageUserRankPageReqVO pageReqVO) {
+        IPage<AppBrokerageUserRankByUserCountRespVO> pageResult = brokerageUserMapper.selectCountPageGroupByBindUserId(MyBatisUtils.buildPage(pageReqVO),
+                ArrayUtil.get(pageReqVO.getTimes(), 0), ArrayUtil.get(pageReqVO.getTimes(), 1));
+        return new PageResult<>(pageResult.getRecords(), pageResult.getTotal());
     }
 
     private boolean isUserCanBind(BrokerageUserDO user, Boolean isNewUser) {

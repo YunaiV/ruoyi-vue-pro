@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.trade.service.brokerage;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.user.BrokerageUserPageReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankByUserCountRespVO;
+import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
 
 import javax.validation.constraints.NotNull;
@@ -130,4 +132,12 @@ public interface BrokerageUserService {
      * @return 是否有分销资格
      */
     Boolean getUserBrokerageEnabled(Long userId);
+
+    /**
+     * 获得推广人排行
+     *
+     * @param pageReqVO 分页查询
+     * @return 推广人排行
+     */
+    PageResult<AppBrokerageUserRankByUserCountRespVO> getBrokerageUserRankPageByUserCount(AppBrokerageUserRankPageReqVO pageReqVO);
 }
