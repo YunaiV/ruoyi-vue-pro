@@ -19,6 +19,17 @@ import java.util.List;
  */
 @Data
 public class TradeConfigBaseVO {
+    /**
+     * 是否启用全场包邮
+     */
+    @Schema(description = "是否启用全场包邮", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
+    @NotNull(message = "是否启用全场包邮不能为空")
+    private Boolean deliveryExpressFreeEnabled;
+
+    @Schema(description = "全场包邮的最小金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "1000")
+    @NotNull(message = "全场包邮的最小金额不能为空")
+    @PositiveOrZero(message = "全场包邮的最小金额不能是负数")
+    private Integer deliveryExpressFreePrice;
 
     // ========== 分销相关 ==========
 
@@ -53,6 +64,11 @@ public class TradeConfigBaseVO {
     @NotNull(message = "用户提现最低金额不能为空")
     @PositiveOrZero(message = "用户提现最低金额不能是负数")
     private Integer brokerageWithdrawMinPrice;
+
+    @Schema(description = "用户提现手续费百分比", requiredMode = Schema.RequiredMode.REQUIRED, example = "1000")
+    @NotNull(message = "用户提现手续费百分比不能为空")
+    @PositiveOrZero(message = "用户提现手续费百分比不能是负数")
+    private Integer brokerageWithdrawFeePercent;
 
     @Schema(description = "提现银行", requiredMode = Schema.RequiredMode.REQUIRED, example = "[0, 1]")
     @NotEmpty(message = "提现银行不能为空")

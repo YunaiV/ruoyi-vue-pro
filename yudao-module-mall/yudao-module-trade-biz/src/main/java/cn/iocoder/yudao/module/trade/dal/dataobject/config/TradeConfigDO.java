@@ -36,7 +36,7 @@ public class TradeConfigDO extends BaseDO {
     private Long id;
 
     // ========== 配送相关 ==========
-    // TODO 芋艿：未配置
+
     /**
      * 是否启用全场包邮
      */

@@ -3,8 +3,8 @@ create table trade_config
 (
     id                             bigint auto_increment comment '自增主键' primary key,
     brokerage_enabled              bit           default 1                 not null comment '是否启用分佣',
-    brokerage_enabled_condition    tinyint       default 0                 not null comment '分佣模式：1-人人分销 2-指定分销',
-    brokerage_bind_mode            tinyint       default 0                 not null comment '分销关系绑定模式: 1-没有推广人，2-新用户, 3-扫码覆盖',
+    brokerage_enabled_condition    tinyint       default 1                 not null comment '分佣模式：1-人人分销 2-指定分销',
+    brokerage_bind_mode            tinyint       default 1                 not null comment '分销关系绑定模式: 1-没有推广人，2-新用户, 3-扫码覆盖',
     brokerage_post_urls            varchar(2000) default ''                null comment '分销海报图地址数组',
     brokerage_first_percent        int           default 0                 not null comment '一级返佣比例',
     brokerage_second_percent       int           default 0                 not null comment '二级返佣比例',
