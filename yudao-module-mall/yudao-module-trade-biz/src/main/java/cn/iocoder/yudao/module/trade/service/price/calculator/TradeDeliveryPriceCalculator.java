@@ -5,9 +5,11 @@ import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryPickUpStoreDO;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryExpressChargeModeEnum;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
+import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressTemplateService;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryPickUpStoreService;
 import cn.iocoder.yudao.module.trade.service.delivery.bo.DeliveryExpressTemplateRespBO;
@@ -44,6 +46,8 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
     private DeliveryPickUpStoreService deliveryPickUpStoreService;
     @Resource
     private DeliveryExpressTemplateService deliveryExpressTemplateService;
+    @Resource
+    private TradeConfigService tradeConfigService;
 
     @Override
     public void calculate(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result) {
@@ -70,24 +74,44 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
     // ========= 快递发货 ==========
 
     private void calculateExpress(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result) {
-        // 1. 得到收件地址区域
+        // 0. 得到收件地址区域
         if (param.getAddressId() == null) {
             throw exception(PRICE_CALCULATE_DELIVERY_PRICE_USER_ADDRESS_IS_EMPTY);
         }
         AddressRespDTO address = addressApi.getAddress(param.getAddressId(), param.getUserId());
         Assert.notNull(address, "收件人({})的地址，不能为空", param.getUserId());
 
-        // 2. 过滤出已选中的商品SKU
+        // 情况一：全局包邮
+        if (isGlobalExpressFree(param, result)) {
+            return;
+        }
+
+        // 情况二：
+        // 2.1 过滤出已选中的商品SKU
         List<OrderItem> selectedItem = filterList(result.getItems(), OrderItem::getSelected);
         Set<Long> deliveryTemplateIds = convertSet(selectedItem, OrderItem::getDeliveryTemplateId);
         Map<Long, DeliveryExpressTemplateRespBO> expressTemplateMap =
                 deliveryExpressTemplateService.getExpressTemplateMapByIdsAndArea(deliveryTemplateIds, address.getAreaId());
-        // 3. 计算配送费用
+        // 2.2 计算配送费用
         if (CollUtil.isEmpty(expressTemplateMap)) {
             log.error("[calculate][找不到商品 templateIds {} areaId{} 对应的运费模板]", deliveryTemplateIds, address.getAreaId());
             throw exception(PRICE_CALCULATE_DELIVERY_PRICE_TEMPLATE_NOT_FOUND);
         }
         calculateDeliveryPrice(selectedItem, expressTemplateMap, result);
+    }
+
+    /**
+     * 是否全局包邮
+     *
+     * @param param 计算信息
+     * @param result 计算结果
+     * @return 是否包邮
+     */
+    private boolean isGlobalExpressFree(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result) {
+        TradeConfigDO config = tradeConfigService.getTradeConfig();
+        return config != null
+                && Boolean.TRUE.equals(config.getDeliveryExpressFreeEnabled()) // 开启包邮
+                && result.getPrice().getPayPrice() >= config.getDeliveryExpressFreePrice(); // 满足包邮的价格
     }
 
     private void calculateDeliveryPrice(List<OrderItem> selectedSkus,

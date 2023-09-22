@@ -35,6 +35,17 @@ public class TradeConfigDO extends BaseDO {
     @TableId
     private Long id;
 
+    // ========== 配送相关 ==========
+    // TODO 芋艿：未配置
+    /**
+     * 是否启用全场包邮
+     */
+    private Boolean deliveryExpressFreeEnabled;
+    /**
+     * 全场包邮的最小金额，单位：分
+     */
+    private Integer deliveryExpressFreePrice;
+
     // ========== 分销相关 ==========
 
     /**
