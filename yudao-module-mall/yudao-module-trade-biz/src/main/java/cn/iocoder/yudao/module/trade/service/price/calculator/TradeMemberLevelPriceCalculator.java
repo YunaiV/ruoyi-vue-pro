@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.trade.service.price.calculator;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.module.member.api.level.MemberLevelApi;
 import cn.iocoder.yudao.module.member.api.level.dto.MemberLevelRespDTO;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import org.springframework.core.annotation.Order;
@@ -30,6 +32,10 @@ public class TradeMemberLevelPriceCalculator implements TradePriceCalculator {
 
     @Override
     public void calculate(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result) {
+        // 0. 只有【普通】订单，才计算该优惠
+        if (ObjectUtil.notEqual(result.getType(), TradeOrderTypeEnum.NORMAL.getType())) {
+            return;
+        }
         // 1. 获得用户的会员等级
         MemberUserRespDTO user = memberUserApi.getUser(param.getUserId());
         if (user.getLevelId() == null || user.getLevelId() <= 0) {

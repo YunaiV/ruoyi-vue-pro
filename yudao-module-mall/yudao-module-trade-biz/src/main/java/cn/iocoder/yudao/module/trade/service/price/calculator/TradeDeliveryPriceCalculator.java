@@ -64,7 +64,8 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
 
     private void calculateByPickUp(TradePriceCalculateReqBO param) {
         if (param.getPickUpStoreId() == null) {
-            throw exception(PRICE_CALCULATE_DELIVERY_PRICE_PICK_UP_STORE_IS_EMPTY);
+            // 价格计算时，如果为空就不算~最终下单，会校验该字段不允许空
+            return;
         }
         DeliveryPickUpStoreDO pickUpStore = deliveryPickUpStoreService.getDeliveryPickUpStore(param.getPickUpStoreId());
         if (pickUpStore == null || CommonStatusEnum.DISABLE.getStatus().equals(pickUpStore.getStatus())) {
@@ -77,7 +78,8 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
     private void calculateExpress(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result) {
         // 0. 得到收件地址区域
         if (param.getAddressId() == null) {
-            throw exception(PRICE_CALCULATE_DELIVERY_PRICE_USER_ADDRESS_IS_EMPTY);
+            // 价格计算时，如果为空就不算~最终下单，会校验该字段不允许空
+            return;
         }
         AddressRespDTO address = addressApi.getAddress(param.getAddressId(), param.getUserId());
         Assert.notNull(address, "收件人({})的地址，不能为空", param.getUserId());

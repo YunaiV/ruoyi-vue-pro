@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.product.convert.propertyvalue;
+package cn.iocoder.yudao.module.product.convert.property;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;

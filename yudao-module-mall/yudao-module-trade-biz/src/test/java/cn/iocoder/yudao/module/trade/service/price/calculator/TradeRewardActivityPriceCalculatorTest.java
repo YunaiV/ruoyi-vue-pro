@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.promotion.api.reward.RewardActivityApi;
 import cn.iocoder.yudao.module.promotion.api.reward.dto.RewardActivityMatchRespDTO;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionConditionTypeEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import org.junit.jupiter.api.Test;
@@ -44,6 +45,7 @@ public class TradeRewardActivityPriceCalculatorTest extends BaseMockitoUnitTest 
                         new TradePriceCalculateReqBO.Item().setSkuId(30L).setCount(4).setSelected(true) // 匹配活动 2
                 ));
         TradePriceCalculateRespBO result = new TradePriceCalculateRespBO()
+                .setType(TradeOrderTypeEnum.NORMAL.getType())
                 .setPrice(new TradePriceCalculateRespBO.Price())
                 .setPromotions(new ArrayList<>())
                 .setItems(asList(
@@ -157,6 +159,7 @@ public class TradeRewardActivityPriceCalculatorTest extends BaseMockitoUnitTest 
                         new TradePriceCalculateReqBO.Item().setSkuId(30L).setCount(4).setSelected(true)
                 ));
         TradePriceCalculateRespBO result = new TradePriceCalculateRespBO()
+                .setType(TradeOrderTypeEnum.NORMAL.getType())
                 .setPrice(new TradePriceCalculateRespBO.Price())
                 .setPromotions(new ArrayList<>())
                 .setItems(asList(

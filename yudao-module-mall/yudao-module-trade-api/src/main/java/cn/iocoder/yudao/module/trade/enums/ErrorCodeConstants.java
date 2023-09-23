@@ -53,9 +53,7 @@ public interface ErrorCodeConstants {
 
     // ========== Price 相关 1011003000 ============
     ErrorCode PRICE_CALCULATE_PAY_PRICE_ILLEGAL = new ErrorCode(1011003000, "支付价格计算异常，原因：价格小于等于 0");
-    ErrorCode PRICE_CALCULATE_DELIVERY_PRICE_USER_ADDRESS_IS_EMPTY = new ErrorCode(1011003001, "计算快递运费异常，收件人地址编号为空");
     ErrorCode PRICE_CALCULATE_DELIVERY_PRICE_TEMPLATE_NOT_FOUND = new ErrorCode(1011003002, "计算快递运费异常，找不到对应的运费模板");
-    ErrorCode PRICE_CALCULATE_DELIVERY_PRICE_PICK_UP_STORE_IS_EMPTY = new ErrorCode(1011003003, "计算快递运费异常，自提点为空");
     ErrorCode PRICE_CALCULATE_COUPON_NOT_MATCH_NORMAL_ORDER = new ErrorCode(1011003004, "参与秒杀、拼团、砍价的营销商品，无法使用优惠劵");
 
     // ========== 物流 Express 模块 1011004000 ==========
