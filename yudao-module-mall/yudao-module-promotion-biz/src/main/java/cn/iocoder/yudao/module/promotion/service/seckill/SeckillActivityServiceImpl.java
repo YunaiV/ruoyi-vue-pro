@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.promotion.service.seckill;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
@@ -31,6 +30,7 @@ import java.util.Map;
 import static cn.hutool.core.collection.CollUtil.isNotEmpty;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.isBetween;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
@@ -148,16 +148,16 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateSeckillStock(Long activityId, Long skuId, Integer count) {
+    public void updateSeckillStock(Long id, Long skuId, Integer count) {
         // 1、校验秒杀活动是否存在
-        SeckillActivityDO seckillActivity = getSeckillActivity(activityId);
+        SeckillActivityDO seckillActivity = getSeckillActivity(id);
         // 1.1、校验库存是否充足
         if (seckillActivity.getTotalStock() < count) {
             throw exception(SECKILL_ACTIVITY_UPDATE_STOCK_FAIL);
         }
 
         // 2、获取活动商品
-        List<SeckillProductDO> products = getSeckillProductListByActivityId(activityId);
+        List<SeckillProductDO> products = getSeckillProductListByActivityId(id);
         // 2.1、过滤出购买的商品
         SeckillProductDO product = findFirst(products, item -> ObjectUtil.equal(skuId, item.getSkuId()));
         // 2.2、检查活动商品库存是否充足
@@ -268,8 +268,15 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
 
     @Override
     public List<SeckillActivityDO> getSeckillActivityListByConfigIds(Collection<Long> ids) {
-        return CollectionUtils.filterList(seckillActivityMapper.selectList(),
-                item -> CollectionUtils.anyMatch(item.getConfigIds(), ids::contains));
+        return filterList(seckillActivityMapper.selectList(),
+                item -> anyMatch(item.getConfigIds(), ids::contains));
+    }
+
+    @Override
+    public List<SeckillActivityDO> getSeckillActivityListByConfigIdAndStatus(Long configId, Integer status) {
+        return filterList(seckillActivityMapper.selectList(SeckillActivityDO::getStatus, status),
+                item -> anyMatch(item.getConfigIds(), id -> ObjectUtil.equal(id, configId)) // 校验时段
+                        && isBetween(item.getStartTime(), item.getEndTime())); // 追加当前日期是否处在活动日期之间的校验条件
     }
 
     @Override

@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
-// TODO @puhui999：这个是不是应该搞成 vo 啊？
 /**
  * 贸易售后日志详情 DTO
  *
@@ -17,7 +16,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TradeAfterSaleLogRespDTO {
+public class TradeAfterSaleLogRespVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "20669")
     private Long id;

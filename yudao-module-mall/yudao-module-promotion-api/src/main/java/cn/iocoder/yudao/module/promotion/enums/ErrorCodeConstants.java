@@ -56,7 +56,7 @@ public interface ErrorCodeConstants {
     ErrorCode SECKILL_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1013008004, "秒杀活动未关闭或未结束，不能删除");
     ErrorCode SECKILL_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1013008005, "秒杀活动已关闭，不能重复关闭");
     ErrorCode SECKILL_ACTIVITY_UPDATE_STOCK_FAIL = new ErrorCode(1013008006, "秒杀失败，原因秒杀库存不足");
-    ErrorCode SECKILL_ACTIVITY_FAIL_STATUS_CLOSED = new ErrorCode(1013008007, "秒杀活动已关闭");
+    ErrorCode SECKILL_ACTIVITY_APP_STATUS_CLOSED = new ErrorCode(1013008007, "秒杀活动已关闭");
 
     // ========== 秒杀时段 1013009000 ==========
     ErrorCode SECKILL_CONFIG_NOT_EXISTS = new ErrorCode(1013009000, "秒杀时段不存在");
@@ -69,6 +69,7 @@ public interface ErrorCodeConstants {
     ErrorCode COMBINATION_ACTIVITY_STATUS_DISABLE_NOT_UPDATE = new ErrorCode(1013010002, "拼团活动已关闭不能修改");
     ErrorCode COMBINATION_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1013010003, "拼团活动未关闭或未结束，不能删除");
     ErrorCode COMBINATION_ACTIVITY_STATUS_DISABLE = new ErrorCode(1013010004, "拼团失败，原因：拼团活动已关闭");
+    ErrorCode COMBINATION_ACTIVITY_APP_STATUS_DISABLE = new ErrorCode(1013010005, "拼团活动已关闭");
 
     // ========== 拼团记录 1013011000 ==========
     ErrorCode COMBINATION_RECORD_NOT_EXISTS = new ErrorCode(1013011000, "拼团不存在");

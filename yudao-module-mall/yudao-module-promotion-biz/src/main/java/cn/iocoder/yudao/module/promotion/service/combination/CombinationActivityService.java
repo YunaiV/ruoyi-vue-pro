@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.service.combination;
 
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityPageReqVO;
@@ -82,5 +83,21 @@ public interface CombinationActivityService {
      * @param count      数量
      */
     void validateCombination(Long activityId, Long userId, Long skuId, Integer count);
+
+    /**
+     * 获取正在进行的活动分页数据
+     *
+     * @param count 需要的数量
+     * @return 拼团活动分页
+     */
+    List<CombinationActivityDO> getCombinationActivityListByCount(Integer count);
+
+    /**
+     * 获取正在进行的活动分页数据
+     *
+     * @param pageParam 分页请求
+     * @return 拼团活动分页
+     */
+    PageResult<CombinationActivityDO> getCombinationActivityPage(PageParam pageParam);
 
 }

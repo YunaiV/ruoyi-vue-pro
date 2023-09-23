@@ -1,11 +1,9 @@
 package cn.iocoder.yudao.module.promotion.controller.app.seckill;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.config.AppSeckillConfigRespVO;
 import cn.iocoder.yudao.module.promotion.convert.seckill.seckillconfig.SeckillConfigConvert;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillconfig.SeckillConfigDO;
 import cn.iocoder.yudao.module.promotion.service.seckill.SeckillConfigService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -31,13 +28,7 @@ public class AppSeckillConfigController {
     @GetMapping("/list")
     @Operation(summary = "获得秒杀时间段列表")
     public CommonResult<List<AppSeckillConfigRespVO>> getSeckillConfigList() {
-        List<SeckillConfigDO> list = configService.getSeckillConfigListByStatus(CommonStatusEnum.ENABLE.getStatus());
-        // TODO @puhui999：如果这种，不用判空也问题不大；
-        if (CollectionUtil.isEmpty(list)) {
-            return success(Collections.emptyList());
-        }
-
-        return success(SeckillConfigConvert.INSTANCE.convertList2(list));
+        return success(SeckillConfigConvert.INSTANCE.convertList2(configService.getSeckillConfigListByStatus(CommonStatusEnum.ENABLE.getStatus())));
     }
 
 }

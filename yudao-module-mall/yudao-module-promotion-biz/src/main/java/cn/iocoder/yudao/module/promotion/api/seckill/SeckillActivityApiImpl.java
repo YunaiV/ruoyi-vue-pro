@@ -17,8 +17,8 @@ public class SeckillActivityApiImpl implements SeckillActivityApi {
     private SeckillActivityService activityService;
 
     @Override
-    public void updateSeckillStock(Long activityId, Long skuId, Integer count) {
-        activityService.updateSeckillStock(activityId, skuId, count);
+    public void updateSeckillStock(Long id, Long skuId, Integer count) {
+        activityService.updateSeckillStock(id, skuId, count);
     }
 
 }

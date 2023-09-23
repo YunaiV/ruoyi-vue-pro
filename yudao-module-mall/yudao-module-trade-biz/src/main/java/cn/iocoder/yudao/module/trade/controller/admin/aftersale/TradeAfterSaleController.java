@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.trade.convert.aftersale.TradeAfterSaleConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
-import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.dto.TradeAfterSaleLogRespDTO;
+import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.dto.TradeAfterSaleLogRespVO;
 import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.service.AfterSaleLogService;
 import cn.iocoder.yudao.module.trade.service.aftersale.TradeAfterSaleService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
@@ -87,13 +87,13 @@ public class TradeAfterSaleController {
         // 拼接数据
         MemberUserRespDTO user = memberUserApi.getUser(afterSale.getUserId());
         // 获取售后日志
-        List<TradeAfterSaleLogRespDTO> logs = afterSaleLogService.getLog(afterSale.getId());
+        List<TradeAfterSaleLogRespVO> logs = afterSaleLogService.getLog(afterSale.getId());
         // TODO 方便测试看效果，review 后移除
         if (logs == null) {
             logs = new ArrayList<>();
         }
         for (int i = 1; i <= 6; i++) {
-            TradeAfterSaleLogRespDTO respVO = new TradeAfterSaleLogRespDTO();
+            TradeAfterSaleLogRespVO respVO = new TradeAfterSaleLogRespVO();
             respVO.setId((long) i);
             respVO.setUserId((long) i);
             respVO.setUserType(i % 2 == 0 ? 2 : 1);

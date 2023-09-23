@@ -7,14 +7,13 @@ package cn.iocoder.yudao.module.promotion.api.seckill;
  */
 public interface SeckillActivityApi {
 
-    // TODO @puhui999：activityId 改成 id 好点哈；
     /**
      * 更新秒杀库存
      *
-     * @param activityId 活动编号
+     * @param id 活动编号
      * @param skuId      sku 编号
      * @param count      数量
      */
-    void updateSeckillStock(Long activityId, Long skuId, Integer count);
+    void updateSeckillStock(Long id, Long skuId, Integer count);
 
 }

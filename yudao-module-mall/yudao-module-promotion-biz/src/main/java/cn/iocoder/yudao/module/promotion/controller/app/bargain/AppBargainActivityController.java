@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import java.util.List;
 
+import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
@@ -39,7 +40,7 @@ public class AppBargainActivityController {
     @GetMapping("/page")
     @Operation(summary = "获得砍价活动分页")
     public CommonResult<PageResult<AppBargainActivityRespVO>> getBargainActivityPage(PageParam pageReqVO) {
-        PageResult<BargainActivityDO> result = bargainActivityService.getBargainActivityPageForApp(pageReqVO);
+        PageResult<BargainActivityDO> result = bargainActivityService.getBargainActivityPage(pageReqVO);
         if (CollUtil.isEmpty(result.getList())) {
             return success(PageResult.empty(result.getTotal()));
         }
@@ -54,7 +55,7 @@ public class AppBargainActivityController {
     @Parameter(name = "count", description = "需要展示的数量", example = "6")
     public CommonResult<List<AppBargainActivityRespVO>> getBargainActivityList(
             @RequestParam(name = "count", defaultValue = "6") Integer count) {
-        List<BargainActivityDO> list = bargainActivityService.getBargainActivityListForApp(count);
+        List<BargainActivityDO> list = bargainActivityService.getBargainActivityListByCount(defaultIfNull(count, 6));
         if (CollUtil.isEmpty(list)) {
             return success(BargainActivityConvert.INSTANCE.convertAppList(list));
         }
