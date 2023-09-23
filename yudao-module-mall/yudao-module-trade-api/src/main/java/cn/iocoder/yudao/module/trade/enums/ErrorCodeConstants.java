@@ -31,6 +31,7 @@ public interface ErrorCodeConstants {
     ErrorCode ORDER_UPDATE_PRICE_FAIL_PAID = new ErrorCode(1011000026, "支付订单调价失败，原因：支付订单已付款,不能调价");
     ErrorCode ORDER_UPDATE_PRICE_FAIL_EQUAL = new ErrorCode(1011000027, "支付订单调价失败，原因：价格没有变化");
     ErrorCode ORDER_UPDATE_PRICE_FAIL_NOT_ITEM = new ErrorCode(1011000028, "支付订单调价失败，原因：订单项不存在");
+    ErrorCode ORDER_DELETE_FAIL_STATUS_NOT_CANCEL = new ErrorCode(1011000029, "交易订单删除失败，订单不是【已取消】状态");
 
     // ========== After Sale 模块 1011000100 ==========
     ErrorCode AFTER_SALE_NOT_FOUND = new ErrorCode(1011000100, "售后单不存在");

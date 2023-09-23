@@ -716,17 +716,17 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Transactional(rollbackFor = Exception.class)
     @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_CANCEL)
     public void cancelOrder(Long userId, Long id) {
-        // 校验存在
+        // 1.1 校验存在
         TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(id, userId);
         if (order == null) {
             throw exception(ORDER_NOT_FOUND);
         }
-        // 校验状态
+        // 1.2 校验状态
         if (ObjectUtil.notEqual(order.getStatus(), TradeOrderStatusEnum.UNPAID.getStatus())) {
             throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
         }
 
-        // 1. 更新 TradeOrderDO 状态为已取消
+        // 2. 更新 TradeOrderDO 状态为已取消
         int updateCount = tradeOrderMapper.updateByIdAndStatus(id, order.getStatus(),
                 new TradeOrderDO().setStatus(TradeOrderStatusEnum.CANCELED.getStatus())
                         .setCancelTime(LocalDateTime.now())
@@ -735,23 +735,44 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
         }
 
-        // TODO 活动相关库存回滚需要活动 id，活动 id 怎么获取？app 端能否传过来；回复：从订单里拿呀
+        // 3. TODO 活动相关库存回滚需要活动 id，活动 id 怎么获取？app 端能否传过来；回复：从订单里拿呀
         tradeOrderHandlers.forEach(handler -> handler.rollback());
 
-        // 2. 回滚库存
+        // 4. 回滚库存
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(id);
         productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convert(orderItems));
 
-        // 3. 回滚优惠券
+        // 5. 回滚优惠券
         if (order.getCouponId() > 0) {
             couponApi.returnUsedCoupon(order.getCouponId());
         }
 
-        // 4. 回滚积分：积分是支付成功后才增加的吧？ 回复：每个项目不同，目前看下来，确认收货貌似更合适，我再看看其它项目的业务选择；
+        // 6. 回滚积分：积分是支付成功后才增加的吧？ 回复：每个项目不同，目前看下来，确认收货貌似更合适，我再看看其它项目的业务选择；
         // TODO @疯狂：有赞是可配置（支付 or 确认收货），我们按照支付好列；然后这里的退积分，指的是下单时的积分抵扣。
 
-        // 5. 增加订单日志
+        // 7. 增加订单日志
         TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.CANCELED.getStatus());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_DELETE)
+    public void deleteOrder(Long userId, Long id) {
+        // 1.1 校验存在
+        TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(id, userId);
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+        // 1.2 校验状态
+        if (ObjectUtil.notEqual(order.getStatus(), TradeOrderStatusEnum.CANCELED.getStatus())) {
+            throw exception(ORDER_DELETE_FAIL_STATUS_NOT_CANCEL);
+        }
+
+        // 2. 删除订单
+        tradeOrderMapper.deleteById(id);
+
+        // 3. 记录日志
+        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), order.getStatus());
     }
 
     /**

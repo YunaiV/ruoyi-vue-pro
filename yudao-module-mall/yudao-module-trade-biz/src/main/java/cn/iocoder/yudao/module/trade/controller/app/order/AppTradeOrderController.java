@@ -156,7 +156,7 @@ public class AppTradeOrderController {
     @Operation(summary = "删除交易订单")
     @Parameter(name = "id", description = "交易订单编号")
     public CommonResult<Boolean> deleteOrder(@RequestParam("id") Long id) {
-        // TODO @芋艿：未实现，mock 用
+        tradeOrderUpdateService.deleteOrder(getLoginUserId(), id);
         return success(true);
     }
 
