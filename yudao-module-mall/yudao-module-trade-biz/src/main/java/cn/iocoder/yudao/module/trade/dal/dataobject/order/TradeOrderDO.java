@@ -168,6 +168,7 @@ public class TradeOrderDO extends BaseDO {
      * - {@link #discountPrice}
      * + {@link #deliveryPrice}
      * + {@link #adjustPrice}
+     * - {@link #vipPrice}
      */
     private Integer payPrice;
 
@@ -269,5 +270,9 @@ public class TradeOrderDO extends BaseDO {
 //     * 奖励的积分 TODO 疯狂：可以使用这个字段哈；
 //     */
 //    private Integer rewardPoint;
+    /**
+     * VIP 减免金额，单位：分
+     */
+    private Integer vipPrice;
 
 }

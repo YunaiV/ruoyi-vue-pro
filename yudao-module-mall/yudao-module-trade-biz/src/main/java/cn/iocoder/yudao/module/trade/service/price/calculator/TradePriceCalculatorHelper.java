@@ -52,7 +52,7 @@ public class TradePriceCalculatorHelper {
                     .setCount(item.getCount()).setCartId(item.getCartId()).setSelected(item.getSelected());
             // sku 价格
             orderItem.setPrice(sku.getPrice()).setPayPrice(sku.getPrice() * item.getCount())
-                    .setDiscountPrice(0).setDeliveryPrice(0).setCouponPrice(0).setPointPrice(0);
+                    .setDiscountPrice(0).setDeliveryPrice(0).setCouponPrice(0).setPointPrice(0).setVipPrice(0);
             // sku 信息
             orderItem.setPicUrl(sku.getPicUrl()).setProperties(sku.getProperties())
                     .setWeight(sku.getWeight()).setVolume(sku.getVolume());
@@ -96,7 +96,7 @@ public class TradePriceCalculatorHelper {
         // 先重置
         TradePriceCalculateRespBO.Price price = result.getPrice();
         price.setTotalPrice(0).setDiscountPrice(0).setDeliveryPrice(0)
-                .setCouponPrice(0).setPointPrice(0).setPayPrice(0);
+                .setCouponPrice(0).setPointPrice(0).setVipPrice(0).setPayPrice(0);
         // 再合计 item
         result.getItems().forEach(item -> {
             if (!item.getSelected()) {
@@ -107,6 +107,7 @@ public class TradePriceCalculatorHelper {
             price.setDeliveryPrice(price.getDeliveryPrice() + item.getDeliveryPrice());
             price.setCouponPrice(price.getCouponPrice() + item.getCouponPrice());
             price.setPointPrice(price.getPointPrice() + item.getPointPrice());
+            price.setVipPrice(price.getVipPrice() + item.getVipPrice());
             price.setPayPrice(price.getPayPrice() + item.getPayPrice());
         });
     }
@@ -121,7 +122,9 @@ public class TradePriceCalculatorHelper {
                 - orderItem.getDiscountPrice()
                 + orderItem.getDeliveryPrice()
                 - orderItem.getCouponPrice()
-                - orderItem.getPointPrice());
+                - orderItem.getPointPrice()
+                - orderItem.getVipPrice()
+        );
     }
 
     /**
@@ -144,6 +147,9 @@ public class TradePriceCalculatorHelper {
             }
             if (orderItem.getPointPrice() == null) {
                 orderItem.setPointPrice(0);
+            }
+            if (orderItem.getVipPrice() == null) {
+                orderItem.setVipPrice(0);
             }
             recountPayPrice(orderItem);
         });
