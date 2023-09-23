@@ -75,4 +75,19 @@ public class BpmTaskController {
         return success(true);
     }
 
+    @GetMapping("/get-return-list")
+    @Operation(summary = "获取所有可回退的节点", description = "用于【流程详情】的【回退】按钮")
+    @PreAuthorize("@ss.hasPermission('bpm:task:rollback')")
+    public CommonResult<List<BpmTaskRollbackRespVO>> getReturnList(String taskId) {
+        return success(taskService.findReturnTaskList(taskId));
+    }
+
+    @PutMapping("/rollback")
+    @Operation(summary = "回退任务", description = "用于【流程详情】的【回退】按钮")
+    @PreAuthorize("@ss.hasPermission('bpm:task:rollback')")
+    public CommonResult<Boolean> getReturnList(@Valid @RequestBody BpmTaskRollbackReqVO reqVO) {
+        taskService.taskReturn(reqVO);
+        return success(true);
+    }
+
 }

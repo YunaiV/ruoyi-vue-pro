@@ -8,21 +8,33 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
+import cn.iocoder.yudao.framework.flowable.core.util.ModelUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.task.BpmTaskExtMapper;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceDeleteReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
+import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.module.bpm.service.message.BpmMessageService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.flowable.bpmn.constants.BpmnXMLConstants;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.UserTask;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.HistoryService;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
@@ -39,8 +51,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 
 /**
@@ -68,12 +79,17 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     private BpmTaskExtMapper taskExtMapper;
     @Resource
     private BpmMessageService messageService;
+    @Resource
+    private BpmModelService bpmModelService;
+    @Resource
+    private RuntimeService runtimeService;
+
 
     @Override
     public PageResult<BpmTaskTodoPageItemRespVO> getTodoTaskPage(Long userId, BpmTaskTodoPageReqVO pageVO) {
         // 查询待办任务
         TaskQuery taskQuery = taskService.createTaskQuery().taskAssignee(String.valueOf(userId)) // 分配给自己
-            .orderByTaskCreateTime().desc(); // 创建时间倒序
+                .orderByTaskCreateTime().desc(); // 创建时间倒序
         if (StrUtil.isNotBlank(pageVO.getName())) {
             taskQuery.taskNameLike("%" + pageVO.getName() + "%");
         }
@@ -91,21 +107,21 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 获得 ProcessInstance Map
         Map<String, ProcessInstance> processInstanceMap =
-            processInstanceService.getProcessInstanceMap(convertSet(tasks, Task::getProcessInstanceId));
+                processInstanceService.getProcessInstanceMap(convertSet(tasks, Task::getProcessInstanceId));
         // 获得 User Map
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
-            convertSet(processInstanceMap.values(), instance -> Long.valueOf(instance.getStartUserId())));
+                convertSet(processInstanceMap.values(), instance -> Long.valueOf(instance.getStartUserId())));
         // 拼接结果
         return new PageResult<>(BpmTaskConvert.INSTANCE.convertList1(tasks, processInstanceMap, userMap),
-            taskQuery.count());
+                taskQuery.count());
     }
 
     @Override
     public PageResult<BpmTaskDonePageItemRespVO> getDoneTaskPage(Long userId, BpmTaskDonePageReqVO pageVO) {
         // 查询已办任务
         HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery().finished() // 已完成
-            .taskAssignee(String.valueOf(userId)) // 分配给自己
-            .orderByHistoricTaskInstanceEndTime().desc(); // 审批时间倒序
+                .taskAssignee(String.valueOf(userId)) // 分配给自己
+                .orderByHistoricTaskInstanceEndTime().desc(); // 审批时间倒序
         if (StrUtil.isNotBlank(pageVO.getName())) {
             taskQuery.taskNameLike("%" + pageVO.getName() + "%");
         }
@@ -123,19 +139,19 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 获得 TaskExtDO Map
         List<BpmTaskExtDO> bpmTaskExtDOs =
-            taskExtMapper.selectListByTaskIds(convertSet(tasks, HistoricTaskInstance::getId));
+                taskExtMapper.selectListByTaskIds(convertSet(tasks, HistoricTaskInstance::getId));
         Map<String, BpmTaskExtDO> bpmTaskExtDOMap = convertMap(bpmTaskExtDOs, BpmTaskExtDO::getTaskId);
         // 获得 ProcessInstance Map
         Map<String, HistoricProcessInstance> historicProcessInstanceMap =
-            processInstanceService.getHistoricProcessInstanceMap(
-                convertSet(tasks, HistoricTaskInstance::getProcessInstanceId));
+                processInstanceService.getHistoricProcessInstanceMap(
+                        convertSet(tasks, HistoricTaskInstance::getProcessInstanceId));
         // 获得 User Map
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
-            convertSet(historicProcessInstanceMap.values(), instance -> Long.valueOf(instance.getStartUserId())));
+                convertSet(historicProcessInstanceMap.values(), instance -> Long.valueOf(instance.getStartUserId())));
         // 拼接结果
         return new PageResult<>(
-            BpmTaskConvert.INSTANCE.convertList2(tasks, bpmTaskExtDOMap, historicProcessInstanceMap, userMap),
-            taskQuery.count());
+                BpmTaskConvert.INSTANCE.convertList2(tasks, bpmTaskExtDOMap, historicProcessInstanceMap, userMap),
+                taskQuery.count());
     }
 
     @Override
@@ -189,8 +205,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 更新任务拓展表为通过
         taskExtMapper.updateByTaskId(
-            new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.APPROVE.getResult())
-                .setReason(reqVO.getReason()));
+                new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.APPROVE.getResult())
+                        .setReason(reqVO.getReason()));
     }
 
     @Override
@@ -208,8 +224,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 更新任务拓展表为不通过
         taskExtMapper.updateByTaskId(
-            new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.REJECT.getResult())
-                    .setEndTime(LocalDateTime.now()).setReason(reqVO.getReason()));
+                new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.REJECT.getResult())
+                        .setEndTime(LocalDateTime.now()).setReason(reqVO.getReason()));
     }
 
     @Override
@@ -245,7 +261,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     @Override
     public void createTaskExt(Task task) {
         BpmTaskExtDO taskExtDO =
-            BpmTaskConvert.INSTANCE.convert2TaskExt(task).setResult(BpmProcessInstanceResultEnum.PROCESS.getResult());
+                BpmTaskConvert.INSTANCE.convert2TaskExt(task).setResult(BpmProcessInstanceResultEnum.PROCESS.getResult());
         taskExtMapper.insert(taskExtDO);
     }
 
@@ -293,17 +309,17 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     @Override
     public void updateTaskExtAssign(Task task) {
         BpmTaskExtDO taskExtDO =
-            new BpmTaskExtDO().setAssigneeUserId(NumberUtils.parseLong(task.getAssignee())).setTaskId(task.getId());
+                new BpmTaskExtDO().setAssigneeUserId(NumberUtils.parseLong(task.getAssignee())).setTaskId(task.getId());
         taskExtMapper.updateByTaskId(taskExtDO);
         // 发送通知。在事务提交时，批量执行操作，所以直接查询会无法查询到 ProcessInstance，所以这里是通过监听事务的提交来实现。
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
                 ProcessInstance processInstance =
-                    processInstanceService.getProcessInstance(task.getProcessInstanceId());
+                        processInstanceService.getProcessInstance(task.getProcessInstanceId());
                 AdminUserRespDTO startUser = adminUserApi.getUser(Long.valueOf(processInstance.getStartUserId()));
                 messageService.sendMessageWhenTaskAssigned(
-                    BpmTaskConvert.INSTANCE.convert(processInstance, startUser, task));
+                        BpmTaskConvert.INSTANCE.convert(processInstance, startUser, task));
             }
         });
     }
@@ -314,6 +330,146 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     private HistoricTaskInstance getHistoricTask(String id) {
         return historyService.createHistoricTaskInstanceQuery().taskId(id).singleResult();
+    }
+
+    @Override
+    public List<BpmTaskRollbackRespVO> findReturnTaskList(String taskId) {
+        // 当前任务 task
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        // 根据流程定义获取流程模型信息
+        BpmnModel bpmnModel = bpmModelService.getBpmnModelByDefinitionId(task.getProcessDefinitionId());
+        // 查询该任务的前置任务节点的key集合
+        Set<String> historyTaksDefinitionKeySet = getPreTaskByCurrentTask(task, bpmnModel);
+        if (CollUtil.isEmpty(historyTaksDefinitionKeySet)) {
+            return Collections.emptyList();
+        }
+        // 获取当前任务节点元素
+        FlowElement source = ModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
+        List<FlowElement> elementList = new ArrayList<>();
+        for (String activityId : historyTaksDefinitionKeySet) {
+            FlowElement target = ModelUtils.getFlowElementById(bpmnModel, activityId);
+            //不支持串行和子流程
+            boolean isSequential = ModelUtils.isSequentialReachable(source, target, new HashSet<>());
+            if (isSequential) {
+                elementList.add(target);
+            }
+        }
+        return BpmTaskConvert.INSTANCE.convertList(elementList);
+    }
+
+    /**
+     * 查询当前流程实例符合条件可回退的 taskDefinitionKey 集合
+     *
+     * @param task      当前任务
+     * @param bpmnModel 当前流程定义对应的流程模型
+     * @return 符合条件的已去重的 taskDefinitionKey集合
+     */
+    private Set<String> getPreTaskByCurrentTask(Task task, BpmnModel bpmnModel) {
+        // 获取当前任务节点元素
+        FlowElement source = ModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
+        //拿到当前任务节点的前置节点集合
+        List<UserTask> preUserTaskList = ModelUtils.getPreUserTaskList(source, null, null);
+        //需要保证这些节点都是在该source节点之前的
+        if (CollUtil.isNotEmpty(preUserTaskList)) {
+            return convertSet(preUserTaskList, UserTask::getId);
+        }
+        return Collections.emptySet();
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void taskReturn(BpmTaskRollbackReqVO reqVO) {
+        // 当前任务 task
+        Task task = validateRollback(reqVO.getId());
+        // 校验源头和目标节点的关系，并返回目标元素
+        FlowElement targetElement = validateRollbackProcessDefinition(task.getTaskDefinitionKey(), reqVO.getTargetDefinitionKey(), task.getProcessDefinitionId());
+        //调用flowable框架的回退逻辑
+        this.handlerRollback(task, targetElement, reqVO);
+        // 更新任务扩展表
+        taskExtMapper.updateByTaskId(
+                new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.BACK.getResult())
+                        .setEndTime(LocalDateTime.now()).setReason(reqVO.getReason()));
+    }
+
+    /**
+     * 校验当前流程是否可以操作回退
+     *
+     * @param taskId 当前任务ID
+     * @return
+     */
+    private Task validateRollback(String taskId) {
+        // 当前任务 task
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        if (null == task) {
+            throw exception(TASK_NOT_EXISTS);
+        }
+        if (task.isSuspended()) {
+            throw exception(TASK_IS_NOT_ACTIVITY);
+        }
+        return task;
+    }
+
+    /**
+     * 回退流程节点时，校验源头节点和目标节点的关系
+     *
+     * @param sourceKey           当前任务节点Key
+     * @param targetKey           目标任务节点key
+     * @param processDefinitionId 当前流程定义ID
+     * @return 目标元素
+     */
+    private FlowElement validateRollbackProcessDefinition(String sourceKey, String targetKey, String processDefinitionId) {
+        // 获取流程模型信息
+        BpmnModel bpmnModel = bpmModelService.getBpmnModelByDefinitionId(processDefinitionId);
+        // 获取当前任务节点元素
+        FlowElement source = ModelUtils.getFlowElementById(bpmnModel, sourceKey);
+        // 获取跳转的节点元素
+        FlowElement target = ModelUtils.getFlowElementById(bpmnModel, targetKey);
+        if (null == target) {
+            throw exception(TASK_TARGET_NODE_NOT_EXISTS);
+        }
+        // 从当前节点向前扫描，判断当前节点与目标节点是否属于串行，若目标节点是在并行网关上或非同一路线上，不可跳转
+        boolean isSequential = ModelUtils.isSequentialReachable(source, target, new HashSet<>());
+        if (!isSequential) {
+            throw exception(TASK_SOURCE_TARGET_ERROR);
+        }
+        return target;
+    }
+
+    /**
+     * 处理回退逻辑
+     *
+     * @param task          当前回退的任务
+     * @param targetElement 需要回退到的目标任务
+     * @param reqVO         前端参数封装
+     */
+    public void handlerRollback(Task task, FlowElement targetElement, BpmTaskRollbackReqVO reqVO) {
+        // 获取所有正常进行的任务节点 Key，这些任务不能直接使用，需要找出其中需要撤回的任务
+        List<Task> runTaskList = taskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).list();
+        List<String> runTaskKeyList = convertList(runTaskList, Task::getTaskDefinitionKey);
+        // 通过 targetElement 的出口连线，结合 runTaskList 比对，获取需要撤回的任务 key
+        List<UserTask> rollbackUserTaskList = ModelUtils.iteratorFindChildUserTasks(targetElement, runTaskKeyList, null, null);
+        // 需退回任务 key
+        List<String> rollbackTaskDefinitionKeyList = convertList(rollbackUserTaskList, UserTask::getId);
+
+        // 通过 key 和 runTaskList 中的key对比，拿到任务ID，设置设置回退意见
+        List<String> currentTaskIds = new ArrayList<>();
+        rollbackTaskDefinitionKeyList.forEach(currentId -> runTaskList.forEach(runTask -> {
+            if (currentId.equals(runTask.getTaskDefinitionKey())) {
+                currentTaskIds.add(runTask.getId());
+            }
+        }));
+        if (CollUtil.isEmpty(currentTaskIds)) {
+            throw exception(TASK_ROLLBACK_FAIL);
+        }
+        // 设置回退意见
+        for (String currentTaskId : currentTaskIds) {
+            taskService.addComment(currentTaskId, task.getProcessInstanceId(), BpmProcessInstanceResultEnum.BACK.getResult().toString(), reqVO.getReason());
+        }
+        // 1 对 1 或 多 对 1 情况，currentIds 当前要跳转的节点列表(1或多)，targetKey 跳转到的节点(1)
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(task.getProcessInstanceId())
+                .moveActivityIdsToSingleActivityId(rollbackTaskDefinitionKeyList, reqVO.getTargetDefinitionKey())
+                .changeState();
     }
 
 }

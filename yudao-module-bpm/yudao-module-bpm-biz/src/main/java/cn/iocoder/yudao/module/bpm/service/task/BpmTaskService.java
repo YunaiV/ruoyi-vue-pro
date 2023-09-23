@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.bpm.service.task;
 
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
@@ -127,5 +126,18 @@ public interface BpmTaskService {
      * @param task 任务实体
      */
     void updateTaskExtAssign(Task task);
+
+    /**
+     * 获取当前人物的可回退的流程集合
+     * @param taskId 当前的任务ID
+     * @return 可以回退的节点列表
+     */
+    List<BpmTaskRollbackRespVO> findReturnTaskList(String taskId);
+
+    /**
+     * 将任务回退到指定的 targetDefinitionKey 位置
+     * @param reqVO 回退的任务key和当前所在的任务ID
+     */
+    void taskReturn(BpmTaskRollbackReqVO reqVO);
 
 }
