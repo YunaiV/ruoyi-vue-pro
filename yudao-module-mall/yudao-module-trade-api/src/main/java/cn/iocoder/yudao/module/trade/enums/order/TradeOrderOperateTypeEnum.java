@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 public enum TradeOrderOperateTypeEnum {
 
     MEMBER_CREATE(1, "用户下单"),
-    TEST(2, "用户({nickname})做了({thing})"),
+    MEMBER_RECEIVE(30, "用户已收货")
     ;
 
     /**

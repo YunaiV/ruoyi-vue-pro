@@ -48,6 +48,7 @@ import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.*;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import cn.iocoder.yudao.module.trade.framework.order.core.annotations.TradeOrderLog;
+import cn.iocoder.yudao.module.trade.framework.order.core.utils.TradeOrderLogUtils;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
 import cn.iocoder.yudao.module.trade.service.brokerage.record.BrokerageRecordService;
 import cn.iocoder.yudao.module.trade.service.cart.CartService;
@@ -299,6 +300,9 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 5. 生成预支付
         createPayOrder(order, orderItems, calculateRespBO);
 
+        // 6. 插入订单日志
+        TradeOrderLogUtils.setOrderInfo(order.getId(), null, order.getStatus());
+
         // TODO @LeeYan9: 是可以思考下, 订单的营销优惠记录, 应该记录在哪里, 微信讨论起来!
     }
 
@@ -343,7 +347,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // TODO 芋艿：OrderLog
 
         // 增加用户积分
-        getSelf().addUserPointAsync(order.getUserId(), order.getPayPrice(), order.getId());
+        getSelf().addMemberPointAsync(order.getUserId(), order.getPayPrice(), order.getId());
         // 增加用户经验
         getSelf().addUserExperienceAsync(order.getUserId(), order.getPayPrice(), order.getId());
         // 增加用户佣金
@@ -492,7 +496,6 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         if (updateCount == 0) {
             throw exception(ORDER_RECEIVE_FAIL_STATUS_NOT_DELIVERED);
         }
-        // TODO 芋艿：OrderLog
 
         // TODO 芋艿：lili 发送订单变化的消息
 
@@ -500,7 +503,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
         // TODO 芋艿：销售佣金的记录；
 
-        // TODO 芋艿：获得积分；
+        // 插入订单日志
+        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.COMPLETED.getStatus());
     }
 
     @Override
@@ -664,7 +668,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         }
 
         // 扣减用户积分
-        getSelf().reduceUserPointAsync(order.getUserId(), orderRefundPrice, afterSaleId);
+        getSelf().reduceMemberPointAsync(order.getUserId(), orderRefundPrice, afterSaleId);
         // 扣减用户经验
         getSelf().reduceUserExperienceAsync(order.getUserId(), orderRefundPrice, afterSaleId);
         // 更新分佣记录为已失效
@@ -768,29 +772,54 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         memberLevelApi.addExperience(userId, -refundPrice, bizType, String.valueOf(afterSaleId));
     }
 
+    /**
+     * 添加用户积分
+     *
+     * 目前是支付成功后，就会创建积分记录。
+     *
+     * 业内还有两种做法，可以根据自己的业务调整：
+     *  1. 确认收货后，才创建积分记录
+     *  2. 支付 or 下单成功时，创建积分记录（冻结），确认收货解冻或者 n 天后解冻
+     *
+     * @param userId 用户编号
+     * @param payPrice 支付金额
+     * @param orderId 订单编号
+     */
     @Async
-    protected void addUserPointAsync(Long userId, Integer payPrice, Long orderId) {
+    protected void addMemberPointAsync(Long userId, Integer payPrice, Long orderId) {
         // TODO @疯狂：具体多少积分，需要分成 2 不分：1. 支付金额；2. 商品金额
         int bizType = MemberPointBizTypeEnum.ORDER_REWARD.getType();
         memberPointApi.addPoint(userId, payPrice, bizType, String.valueOf(orderId));
     }
 
     @Async
-    protected void reduceUserPointAsync(Long userId, Integer refundPrice, Long afterSaleId) {
+    protected void reduceMemberPointAsync(Long userId, Integer refundPrice, Long afterSaleId) {
         // TODO @疯狂：退款时，按照金额比例，退还积分；https://help.youzan.com/displaylist/detail_4_4-1-49185
         int bizType = MemberPointBizTypeEnum.ORDER_CANCEL.getType();
         memberPointApi.addPoint(userId, -refundPrice, bizType, String.valueOf(afterSaleId));
     }
 
+    /**
+     * 创建分销记录
+     *
+     * 目前是支付成功后，就会创建分销记录。
+     *
+     * 业内还有两种做法，可以根据自己的业务调整：
+     *  1. 确认收货后，才创建分销记录
+     *  2. 支付 or 下单成功时，创建分销记录（冻结），确认收货解冻或者 n 天后解冻
+     *
+     * @param userId 用户编号
+     * @param orderId 订单编号
+     */
     @Async
     protected void addBrokerageAsync(Long userId, Long orderId) {
         MemberUserRespDTO user = memberUserApi.getUser(userId);
         Assert.notNull(user);
-
+        // 每一个订单项，都会去生成分销记录
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(orderId);
-        List<BrokerageAddReqBO> list = convertList(orderItems,
+        List<BrokerageAddReqBO> addList = convertList(orderItems,
                 item -> TradeOrderConvert.INSTANCE.convert(user, item, productSkuApi.getSku(item.getSkuId())));
-        brokerageRecordService.addBrokerage(userId, BrokerageRecordBizTypeEnum.ORDER, list);
+        brokerageRecordService.addBrokerage(userId, BrokerageRecordBizTypeEnum.ORDER, addList);
     }
 
     @Async
