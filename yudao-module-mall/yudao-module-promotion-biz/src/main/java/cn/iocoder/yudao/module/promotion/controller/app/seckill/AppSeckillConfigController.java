@@ -28,7 +28,8 @@ public class AppSeckillConfigController {
     @GetMapping("/list")
     @Operation(summary = "获得秒杀时间段列表")
     public CommonResult<List<AppSeckillConfigRespVO>> getSeckillConfigList() {
-        return success(SeckillConfigConvert.INSTANCE.convertList2(configService.getSeckillConfigListByStatus(CommonStatusEnum.ENABLE.getStatus())));
+        return success(SeckillConfigConvert.INSTANCE.convertList2(
+                configService.getSeckillConfigListByStatus(CommonStatusEnum.ENABLE.getStatus())));
     }
 
 }

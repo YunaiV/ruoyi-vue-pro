@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.controller.app.seckill;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -29,10 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
-import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.SECKILL_ACTIVITY_APP_STATUS_CLOSED;
 
 @Tag(name = "用户 App - 秒杀活动")
 @RestController
@@ -48,6 +47,7 @@ public class AppSeckillActivityController {
     @Resource
     private ProductSpuApi spuApi;
 
+    // TODO 芋艿：需要增加 spring cache
     @GetMapping("/get-now")
     @Operation(summary = "获得当前秒杀活动", description = "获取当前正在进行的活动，提供给首页使用")
     public CommonResult<AppSeckillActivityNowRespVO> getNowSeckillActivity() {
@@ -61,7 +61,6 @@ public class AppSeckillActivityController {
         List<SeckillActivityDO> activityList = activityService.getSeckillActivityListByConfigIdAndStatus(configList.getId(), CommonStatusEnum.ENABLE.getStatus());
         // 3 获取 spu 信息
         List<ProductSpuRespDTO> spuList = spuApi.getSpuList(convertList(activityList, SeckillActivityDO::getSpuId));
-        // TODO 芋艿：需要增加 spring cache
         return success(SeckillActivityConvert.INSTANCE.convert(configList, activityList, spuList));
     }
 
@@ -70,7 +69,9 @@ public class AppSeckillActivityController {
     public CommonResult<PageResult<AppSeckillActivityRespVO>> getSeckillActivityPage(AppSeckillActivityPageReqVO pageReqVO) {
         // 1. 查询满足当前阶段的活动
         PageResult<SeckillActivityDO> pageResult = activityService.getSeckillActivityAppPageByConfigId(pageReqVO);
-
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty(pageResult.getTotal()));
+        }
         // 2. 拼接数据
         List<ProductSpuRespDTO> spuList = spuApi.getSpuList(convertList(pageResult.getList(), SeckillActivityDO::getSpuId));
         return success(SeckillActivityConvert.INSTANCE.convertPage(pageResult, spuList));
@@ -88,16 +89,14 @@ public class AppSeckillActivityController {
 
         // 2. 获取活动
         SeckillActivityDO seckillActivity = activityService.getSeckillActivity(id);
-        if (seckillActivity == null) {
+        if (seckillActivity == null
+                || ObjectUtil.equal(seckillActivity.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
             return success(null);
-        }
-        if (ObjectUtil.equal(seckillActivity.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
-            throw exception(SECKILL_ACTIVITY_APP_STATUS_CLOSED);
         }
 
         // 3. 拼接数据
-        List<SeckillProductDO> products = activityService.getSeckillProductListByActivityId(seckillActivity.getId());
-        return success(SeckillActivityConvert.INSTANCE.convert3(seckillActivity, products, configList));
+        List<SeckillProductDO> productList = activityService.getSeckillProductListByActivityId(seckillActivity.getId());
+        return success(SeckillActivityConvert.INSTANCE.convert3(seckillActivity, productList, configList));
     }
 
 }
