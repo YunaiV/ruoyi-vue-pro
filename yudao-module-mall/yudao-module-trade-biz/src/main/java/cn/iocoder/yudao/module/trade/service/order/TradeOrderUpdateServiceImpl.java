@@ -486,6 +486,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_RECEIVE)
     public void receiveOrder(Long userId, Long id) {
         // 校验并获得交易订单（可收货）
         TradeOrderDO order = validateOrderReceivable(userId, id);
@@ -677,6 +678,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_COMMENT)
     public Long createOrderItemComment(Long userId, AppTradeOrderItemCommentCreateReqVO createReqVO) {
         // 先通过订单项 ID，查询订单项是否存在
         TradeOrderItemDO orderItem = tradeOrderItemMapper.selectByIdAndUserId(createReqVO.getOrderItemId(), userId);
@@ -704,12 +706,15 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(order.getId());
         if (!anyMatch(orderItems, item -> Objects.equals(item.getCommentStatus(), Boolean.FALSE))) {
             tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId()).setCommentStatus(Boolean.TRUE));
-            // TODO 待实现：已完成评价，要不要写一条订单日志？目前 crmeb 会写，有赞可以研究下
+            // 增加订单日志
+            TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), order.getStatus());
         }
         return comment;
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_CANCEL)
     public void cancelOrder(Long userId, Long id) {
         // 校验存在
         TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(id, userId);
@@ -721,7 +726,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
         }
 
-        // 1.更新 TradeOrderDO 状态为已取消
+        // 1. 更新 TradeOrderDO 状态为已取消
         int updateCount = tradeOrderMapper.updateByIdAndStatus(id, order.getStatus(),
                 new TradeOrderDO().setStatus(TradeOrderStatusEnum.CANCELED.getStatus())
                         .setCancelTime(LocalDateTime.now())
@@ -730,22 +735,23 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
         }
 
-        // TODO 活动相关库存回滚需要活动 id，活动 id 怎么获取？app 端能否传过来
+        // TODO 活动相关库存回滚需要活动 id，活动 id 怎么获取？app 端能否传过来；回复：从订单里拿呀
         tradeOrderHandlers.forEach(handler -> handler.rollback());
 
-        // 2.回滚库存
+        // 2. 回滚库存
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(id);
         productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convert(orderItems));
 
-        // 3.回滚优惠券
-        couponApi.returnUsedCoupon(order.getCouponId());
+        // 3. 回滚优惠券
+        if (order.getCouponId() > 0) {
+            couponApi.returnUsedCoupon(order.getCouponId());
+        }
 
-        // 4.回滚积分：积分是支付成功后才增加的吧？ 回复：每个项目不同，目前看下来，确认收货貌似更合适，我再看看其它项目的业务选择；
+        // 4. 回滚积分：积分是支付成功后才增加的吧？ 回复：每个项目不同，目前看下来，确认收货貌似更合适，我再看看其它项目的业务选择；
         // TODO @疯狂：有赞是可配置（支付 or 确认收货），我们按照支付好列；然后这里的退积分，指的是下单时的积分抵扣。
 
-        // TODO 芋艿：OrderLog
-
-        // TODO 芋艿：lili 发送订单变化的消息
+        // 5. 增加订单日志
+        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.CANCELED.getStatus());
     }
 
     /**
