@@ -149,31 +149,25 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateSeckillStock(Long id, Long skuId, Integer count) {
-        // 1、校验秒杀活动是否存在
+        // 1.1 校验活动库存是否充足
         SeckillActivityDO seckillActivity = getSeckillActivity(id);
-        // 1.1、校验库存是否充足
-        if (seckillActivity.getTotalStock() < count) {
+        if (count > seckillActivity.getTotalStock()) {
+            throw exception(SECKILL_ACTIVITY_UPDATE_STOCK_FAIL);
+        }
+        // 1.2 校验商品库存是否充足
+        SeckillProductDO product = seckillProductMapper.selectByActivityIdAndSkuId(id, skuId);
+        if (product == null || count > product.getStock()) {
             throw exception(SECKILL_ACTIVITY_UPDATE_STOCK_FAIL);
         }
 
-        // 2、获取活动商品
-        List<SeckillProductDO> products = getSeckillProductListByActivityId(id);
-        // 2.1、过滤出购买的商品
-        SeckillProductDO product = findFirst(products, item -> ObjectUtil.equal(skuId, item.getSkuId()));
-        // 2.2、检查活动商品库存是否充足
-        boolean isSufficient = product == null || (product.getStock() == 0 || (product.getStock() < count) || (product.getStock() - count) < 0);
-        if (isSufficient) {
-            throw exception(SECKILL_ACTIVITY_UPDATE_STOCK_FAIL);
-        }
-
-        // 3、更新活动商品库存
-        int updateCount = seckillProductMapper.updateActivityStock(product.getId(), count);
+        // 2.1 更新活动商品库存
+        int updateCount = seckillProductMapper.updateStock(product.getId(), count);
         if (updateCount == 0) {
             throw exception(SECKILL_ACTIVITY_UPDATE_STOCK_FAIL);
         }
 
-        // 4、更新活动库存
-        updateCount = seckillActivityMapper.updateActivityStock(seckillActivity.getId(), count);
+        // 2.2 更新活动库存
+        updateCount = seckillActivityMapper.updateStock(seckillActivity.getId(), count);
         if (updateCount == 0) {
             throw exception(SECKILL_ACTIVITY_UPDATE_STOCK_FAIL);
         }

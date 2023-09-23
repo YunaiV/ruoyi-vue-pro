@@ -20,13 +20,17 @@ public class TradeSeckillHandler implements TradeOrderHandler {
     @Resource
     private SeckillActivityApi seckillActivityApi;
 
+    // TODO @puhui999：先临时写在这里；在价格计算时，如果是秒杀商品，需要校验如下条件：
+    // 1. 商品存在、库存充足、单次限购；
+    // 2. 活动进行中、时间段符合
+
     @Override
     public void beforeOrderCreate(TradeBeforeOrderCreateReqBO reqBO) {
         // 如果是秒杀订单：额外扣减秒杀的库存；
         if (ObjectUtil.notEqual(TradeOrderTypeEnum.SECKILL.getType(), reqBO.getOrderType())) {
             return;
         }
-
+        // 扣减秒杀活动的库存
         seckillActivityApi.updateSeckillStock(reqBO.getSeckillActivityId(), reqBO.getSkuId(), reqBO.getCount());
     }
 

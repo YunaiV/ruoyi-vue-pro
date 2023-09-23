@@ -106,7 +106,7 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
         if (order == null) {
             throw exception(ORDER_NOT_FOUND);
         }
-
+        // 查询物流
         return getExpressTrackList(order);
     }
 
@@ -117,7 +117,7 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
         if (order == null) {
             throw exception(ORDER_NOT_FOUND);
         }
-
+        // 查询物流
         return getExpressTrackList(order);
     }
 
