@@ -23,6 +23,10 @@ public interface TradePriceCalculator {
      * 放在各种营销活动、优惠劵后面 TODO
      */
     int ORDER_DELIVERY = 50;
+    /**
+     * 赠送积分，放最后
+     */
+    int ORDER_POINT_GIVE = 999;
 
     void calculate(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result);
 

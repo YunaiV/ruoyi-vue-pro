@@ -1,6 +1,10 @@
 package cn.iocoder.yudao.module.member.api.point;
 
+import cn.hutool.core.lang.Assert;
+import cn.iocoder.yudao.module.member.api.point.dto.MemberPointConfigRespDTO;
+import cn.iocoder.yudao.module.member.convert.point.MemberPointConfigConvert;
 import cn.iocoder.yudao.module.member.enums.point.MemberPointBizTypeEnum;
+import cn.iocoder.yudao.module.member.service.point.MemberPointConfigService;
 import cn.iocoder.yudao.module.member.service.point.MemberPointRecordService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -21,9 +25,17 @@ public class MemberPointApiImpl implements MemberPointApi {
 
     @Resource
     private MemberPointRecordService memberPointRecordService;
+    @Resource
+    private MemberPointConfigService memberPointConfigService;
+
+    @Override
+    public MemberPointConfigRespDTO getConfig() {
+        return MemberPointConfigConvert.INSTANCE.convert01(memberPointConfigService.getPointConfig());
+    }
 
     @Override
     public void addPoint(Long userId, Integer point, Integer bizType, String bizId) {
+        Assert.isTrue(point > 0);
         MemberPointBizTypeEnum bizTypeEnum = MemberPointBizTypeEnum.getByType(bizType);
         if (bizTypeEnum == null) {
             throw exception(POINT_RECORD_BIZ_NOT_SUPPORT);
@@ -33,11 +45,12 @@ public class MemberPointApiImpl implements MemberPointApi {
 
     @Override
     public void reducePoint(Long userId, Integer point, Integer bizType, String bizId) {
+        Assert.isTrue(point > 0);
         MemberPointBizTypeEnum bizTypeEnum = MemberPointBizTypeEnum.getByType(bizType);
         if (bizTypeEnum == null) {
             throw exception(POINT_RECORD_BIZ_NOT_SUPPORT);
         }
-        memberPointRecordService.createPointRecord(userId, point, bizTypeEnum, bizId);
+        memberPointRecordService.createPointRecord(userId, -point, bizTypeEnum, bizId);
     }
 
 }

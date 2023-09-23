@@ -29,7 +29,7 @@ public class TradePriceCalculateReqBO {
      * 对应 CouponDO 的 id 编号
      */
     private Long couponId;
-    // TODO @疯狂：需要增加一个 PriceCalculator 实现积分扣减的计算；写回到 TradePriceCalculateRespBO 的 usePoint
+
     /**
      * 是否使用积分
      */

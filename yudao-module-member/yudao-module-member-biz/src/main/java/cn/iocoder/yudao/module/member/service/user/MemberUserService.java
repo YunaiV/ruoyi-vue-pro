@@ -164,6 +164,7 @@ public interface MemberUserService {
      *
      * @param userId 用户编号
      * @param point  积分数量
+     * @return 更新结果
      */
-    void updateUserPoint(Long userId, Integer point);
+    boolean updateUserPoint(Long userId, Integer point);
 }

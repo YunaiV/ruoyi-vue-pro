@@ -260,8 +260,13 @@ public class MemberUserServiceImpl implements MemberUserService {
     }
 
     @Override
-    public void updateUserPoint(Long userId, Integer point) {
-        memberUserMapper.updateById(new MemberUserDO().setId(userId).setPoint(point));
+    public boolean updateUserPoint(Long id, Integer point) {
+        if (point > 0) {
+            memberUserMapper.updatePointIncr(id, point);
+        } else if (point < 0) {
+            return memberUserMapper.updatePointDecr(id, point) > 0;
+        }
+        return true;
     }
 
 }

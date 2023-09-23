@@ -33,5 +33,8 @@ public class MemberUserRespDTO {
      * 手机
      */
     private String mobile;
-
+    /**
+     * 积分
+     */
+    private Integer point;
 }

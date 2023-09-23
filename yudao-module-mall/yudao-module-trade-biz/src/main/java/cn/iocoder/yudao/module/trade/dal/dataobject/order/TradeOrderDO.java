@@ -265,9 +265,13 @@ public class TradeOrderDO extends BaseDO {
      * 对应 taobao 的 trade.point_fee 字段
      */
     private Integer pointPrice;
-//    /**
-//     * 奖励的积分 TODO 疯狂：可以使用这个字段哈；
-//     */
-//    private Integer rewardPoint;
+    /**
+     * 赠送的积分
+     */
+    private Integer givePoint;
+    /**
+     * 退还的使用的积分
+     */
+    private Integer refundPoint;
 
 }
