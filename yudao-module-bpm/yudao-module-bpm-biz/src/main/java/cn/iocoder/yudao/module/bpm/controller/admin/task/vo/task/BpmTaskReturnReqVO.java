@@ -7,17 +7,17 @@ import javax.validation.constraints.NotEmpty;
 
 @Schema(description = "管理后台 - 回退流程任务的 Request VO")
 @Data
-public class BpmTaskRollbackReqVO {
+public class BpmTaskReturnReqVO {
 
     @Schema(description = "任务编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotEmpty(message = "任务编号不能为空")
     private String id;
 
-    @Schema(description = "回退到的任务Key", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "回退到的任务 Key", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotEmpty(message = "回退到的任务Key不能为空")
     private String targetDefinitionKey;
 
-    @Schema(description = "回退意见")
+    @Schema(description = "回退意见", example = "")
     private String reason;
 
 }

@@ -46,10 +46,10 @@ public interface ErrorCodeConstants {
     ErrorCode TASK_COMPLETE_FAIL_NOT_EXISTS = new ErrorCode(1_009_005_000, "审批任务失败，原因：该任务不处于未审批");
     ErrorCode TASK_COMPLETE_FAIL_ASSIGN_NOT_SELF = new ErrorCode(1_009_005_001, "审批任务失败，原因：该任务的审批人不是你");
     ErrorCode TASK_NOT_EXISTS = new ErrorCode(1_009_005_002, "流程任务不存在");
-    ErrorCode TASK_IS_NOT_ACTIVITY = new ErrorCode(1_009_005_003, "当前任务不属于活动状态，不能操作");
-    ErrorCode TASK_SOURCE_TARGET_ERROR = new ErrorCode(1_009_005_004, " 当前节点相对于目标节点，不属于串行关系，无法回退");
+    ErrorCode TASK_IS_PENDING = new ErrorCode(1_009_005_003, "当前任务处于挂起状态，不能操作");
+    ErrorCode TASK_SOURCE_TARGET_ERROR = new ErrorCode(1_009_005_004, "目标节点是在并行网关上或非同一路线上，不可跳转");
     ErrorCode TASK_TARGET_NODE_NOT_EXISTS = new ErrorCode(1_009_005_005, " 目标节点不存在");
-    ErrorCode TASK_ROLLBACK_FAIL = new ErrorCode(1_009_005_006, "回退任务失败，选择回退的节点没有需要回滚的任务！请重新选择其他任务节点");
+    ErrorCode TASK_RETURN_FAIL = new ErrorCode(1_009_005_006, "回退任务失败，选择回退的节点没有需要回滚的任务！请重新选择其他任务节点");
     // ========== 流程任务分配规则 1-009-006-000 ==========
     ErrorCode TASK_ASSIGN_RULE_EXISTS = new ErrorCode(1_009_006_000, "流程({}) 的任务({}) 已经存在分配规则");
     ErrorCode TASK_ASSIGN_RULE_NOT_EXISTS = new ErrorCode(1_009_006_001, "流程任务分配规则不存在");

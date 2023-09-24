@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskDonePageItemRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRollbackRespVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskSimpleRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskTodoPageItemRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenTaskCreatedReqDTO;
@@ -141,9 +141,9 @@ public interface BpmTaskConvert {
     }
 
     @Mapping(source = "taskDefinitionKey", target = "id")
-    default List<BpmTaskRollbackRespVO> convertList(List<FlowElement> elementList) {
-        return CollectionUtils.convertList(elementList, element -> new BpmTaskRollbackRespVO()
+    default List<BpmTaskSimpleRespVO> convertList(List<FlowElement> elementList) {
+        return CollectionUtils.convertList(elementList, element -> new BpmTaskSimpleRespVO()
                 .setName(element.getName())
-                .setTaskDefinitionKey(element.getId()));
+                .setDefinitionKey(element.getId()));
     }
 }
