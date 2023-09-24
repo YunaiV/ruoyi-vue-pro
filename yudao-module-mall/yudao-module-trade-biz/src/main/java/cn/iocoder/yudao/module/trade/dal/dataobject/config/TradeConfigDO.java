@@ -100,6 +100,6 @@ public class TradeConfigDO extends BaseDO {
      * 枚举 {@link BrokerageWithdrawTypeEnum 对应的类}
      */
     @TableField(typeHandler = IntegerListTypeHandler.class)
-    private List<Integer> brokerageWithdrawType;
+    private List<Integer> brokerageWithdrawTypes;
 
 }
