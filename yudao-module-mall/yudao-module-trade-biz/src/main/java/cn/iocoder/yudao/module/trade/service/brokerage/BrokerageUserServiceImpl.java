@@ -187,7 +187,7 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     /**
      * 补全绑定用户的字段
      *
-     * @param bindUserId 绑定的用户编号
+     * @param bindUserId    绑定的用户编号
      * @param brokerageUser update 对象
      * @return 补全后的 update 对象
      */
@@ -261,12 +261,15 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         }
 
         // 下级不能绑定自己的上级
-        // TODO @疯狂：这里是不是查询不到的时候，应该有个 break 结束循环哈
         for (int i = 0; i <= Short.MAX_VALUE; i++) {
             if (Objects.equals(bindUser.getBindUserId(), user.getId())) {
                 throw exception(BROKERAGE_BIND_LOOP);
             }
             bindUser = getBrokerageUser(bindUser.getBindUserId());
+            // 找到根节点，结束循环
+            if (bindUser == null || bindUser.getBindUserId() == null) {
+                break;
+            }
         }
     }
 
@@ -274,8 +277,8 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
      * 根据绑定用户编号，获得绑定用户编号列表
      *
      * @param bindUserId 绑定用户编号
-     * @param level 绑定用户的层级。
-     *              如果 level 为空，则查询 1+2 两个层级
+     * @param level      绑定用户的层级。
+     *                   如果 level 为空，则查询 1+2 两个层级
      * @return 绑定用户编号列表
      */
     private List<Long> buildBindUserIdsByLevel(Long bindUserId, Integer level) {

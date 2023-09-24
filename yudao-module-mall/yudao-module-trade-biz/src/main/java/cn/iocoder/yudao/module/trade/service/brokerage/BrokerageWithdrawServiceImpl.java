@@ -93,7 +93,7 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
         // 4. 通知用户
         Map<String, Object> templateParams = MapUtil.<String, Object>builder()
                 .put("createTime", LocalDateTimeUtil.formatNormal(withdraw.getCreateTime()))
-                .put("price", new Money(0, withdraw.getPrice()).toString())
+                .put("price", MoneyUtils.fenToYuanStr(withdraw.getPrice()))
                 .put("reason", withdraw.getAuditReason())
                 .build();
         NotifySendSingleToUserReqDTO reqDTO = new NotifySendSingleToUserReqDTO()
@@ -170,7 +170,7 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
     TradeConfigDO validateWithdrawPrice(Integer withdrawPrice) {
         TradeConfigDO tradeConfig = tradeConfigService.getTradeConfig();
         if (tradeConfig.getBrokerageWithdrawMinPrice() != null && withdrawPrice < tradeConfig.getBrokerageWithdrawMinPrice()) {
-            throw exception(BROKERAGE_WITHDRAW_MIN_PRICE, new Money(0, tradeConfig.getBrokerageWithdrawMinPrice()));
+            throw exception(BROKERAGE_WITHDRAW_MIN_PRICE, MoneyUtils.fenToYuanStr(tradeConfig.getBrokerageWithdrawMinPrice()));
         }
         return tradeConfig;
     }

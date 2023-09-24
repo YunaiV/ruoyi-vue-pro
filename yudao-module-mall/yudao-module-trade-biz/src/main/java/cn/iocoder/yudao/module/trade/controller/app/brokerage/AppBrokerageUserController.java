@@ -67,8 +67,8 @@ public class AppBrokerageUserController {
     @Operation(summary = "绑定推广员")
     @PreAuthenticated
     public CommonResult<Boolean> bindBrokerageUser(@Valid @RequestBody AppBrokerageUserBindReqVO reqVO) {
-        // TODO @疯狂：是不是 isNewUser 不用传递哈，交给 service 自己计算出来？
-        return success(brokerageUserService.bindBrokerageUser(getLoginUserId(), reqVO.getBindUserId(), false));
+        MemberUserRespDTO user = memberUserApi.getUser(getLoginUserId());
+        return success(brokerageUserService.bindBrokerageUser(user.getId(), reqVO.getBindUserId(), user.getCreateTime()));
     }
 
     @GetMapping("/get-summary")
