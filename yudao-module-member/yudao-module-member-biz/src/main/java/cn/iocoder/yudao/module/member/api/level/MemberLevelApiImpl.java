@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.member.api.level;
 
+import cn.iocoder.yudao.module.member.api.level.dto.MemberLevelRespDTO;
+import cn.iocoder.yudao.module.member.convert.level.MemberLevelConvert;
 import cn.iocoder.yudao.module.member.enums.MemberExperienceBizTypeEnum;
 import cn.iocoder.yudao.module.member.service.level.MemberLevelService;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,11 @@ public class MemberLevelApiImpl implements MemberLevelApi {
 
     @Resource
     private MemberLevelService memberLevelService;
+
+    @Override
+    public MemberLevelRespDTO getMemberLevel(Long id) {
+        return MemberLevelConvert.INSTANCE.convert02(memberLevelService.getLevel(id));
+    }
 
     @Override
     public void addExperience(Long userId, Integer experience, Integer bizType, String bizId) {

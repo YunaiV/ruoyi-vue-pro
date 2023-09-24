@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
  */
 public interface TradePriceCalculator {
 
+    int ORDER_MEMBER_LEVEL = 5;
     int ORDER_DISCOUNT_ACTIVITY = 10;
     int ORDER_REWARD_ACTIVITY = 20;
     int ORDER_COUPON = 30;

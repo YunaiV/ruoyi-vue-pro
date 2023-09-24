@@ -49,6 +49,7 @@ import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.*;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import cn.iocoder.yudao.module.trade.framework.order.core.annotations.TradeOrderLog;
+import cn.iocoder.yudao.module.trade.framework.order.core.utils.TradeOrderLogUtils;
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageRecordService;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
 import cn.iocoder.yudao.module.trade.service.cart.CartService;
@@ -299,6 +300,9 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 5. 生成预支付
         createPayOrder(order, orderItems, calculateRespBO);
 
+        // 6. 插入订单日志
+        TradeOrderLogUtils.setOrderInfo(order.getId(), null, order.getStatus());
+
         // TODO @LeeYan9: 是可以思考下, 订单的营销优惠记录, 应该记录在哪里, 微信讨论起来!
     }
 
@@ -482,6 +486,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_RECEIVE)
     public void receiveOrder(Long userId, Long id) {
         // 校验并获得交易订单（可收货）
         TradeOrderDO order = validateOrderReceivable(userId, id);
@@ -492,7 +497,6 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         if (updateCount == 0) {
             throw exception(ORDER_RECEIVE_FAIL_STATUS_NOT_DELIVERED);
         }
-        // TODO 芋艿：OrderLog
 
         // TODO 芋艿：lili 发送订单变化的消息
 
@@ -500,7 +504,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
         // TODO 芋艿：销售佣金的记录；
 
-        // TODO 芋艿：获得积分；
+        // 插入订单日志
+        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.COMPLETED.getStatus());
     }
 
     @Override
@@ -541,41 +546,49 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         tradeOrderMapper.updateById(update);
         // TODO @芋艿：改价时，赠送的积分，要不要做改动？？？
 
-        // TODO @puhui999：应该是按照 payPrice 分配；并且要考虑取余问题；payPrice 也要考虑，item 里的
-        // TODO：先按 adjustPrice 实现，没明白 payPrice 怎么搞哈哈哈
-        // TODO @puhui999：就是对比新老 adjustPrice 的差值，然后计算补充的 adjustPrice 最终值；另外，可以不用区分 items.size 是不是 > 1 哈；应该是一致的逻辑；分摊的逻辑，有点类似 dividePrice 方法噢；
         // 5、更新 TradeOrderItem
-        if (items.size() > 1) {
-            // TradeOrderItemDO 需要做 adjustPrice 的分摊
-            int price = reqVO.getAdjustPrice() / items.size();
-            int remainderPrice = reqVO.getAdjustPrice() % items.size();
-            List<TradeOrderItemDO> orders = new ArrayList<>();
-            for (int i = 0; i < items.size(); i++) {
-                // 把平摊后剩余的金额加到第一个订单项
-                if (remainderPrice != 0 && i == 0) {
-                    orders.add(convertOrderItemPrice(items.get(i), price + remainderPrice));
-                }
-                orders.add(convertOrderItemPrice(items.get(i), price));
-            }
-            tradeOrderItemMapper.updateBatch(orders);
-        } else {
-            TradeOrderItemDO orderItem = items.get(0);
-            TradeOrderItemDO updateItem = convertOrderItemPrice(orderItem, reqVO.getAdjustPrice());
-            tradeOrderItemMapper.updateById(updateItem);
+        // TradeOrderItemDO 需要做 adjustPrice 的分摊
+        List<Integer> dividePrices = dividePrice(items, orderPayPrice);
+        List<TradeOrderItemDO> updateItems = new ArrayList<>();
+        for (int i = 0; i < items.size(); i++) {
+            TradeOrderItemDO item = items.get(i);
+            Integer adjustPrice = item.getPrice() - dividePrices.get(i); // 计算调整的金额
+            updateItems.add(new TradeOrderItemDO().setId(item.getId()).setAdjustPrice(adjustPrice)
+                    .setPayPrice(item.getPayPrice() - adjustPrice));
         }
+        tradeOrderItemMapper.updateBatch(updateItems);
+
 
         // 6、更新支付订单
         payOrderApi.updatePayOrderPrice(order.getPayOrderId(), update.getPayPrice());
     }
 
-    private TradeOrderItemDO convertOrderItemPrice(TradeOrderItemDO orderItem, Integer price) {
-        TradeOrderItemDO newOrderItem = new TradeOrderItemDO();
-        newOrderItem.setId(orderItem.getId());
-        newOrderItem.setAdjustPrice(price);
-        int payPrice = orderItem.getAdjustPrice() != null ? (orderItem.getPayPrice() - orderItem.getAdjustPrice())
-                + price : orderItem.getPayPrice() + price;
-        newOrderItem.setPayPrice(payPrice);
-        return newOrderItem;
+    /**
+     * 计算订单调价价格分摊
+     *
+     * @param items         订单项
+     * @param orderPayPrice 订单支付金额
+     * @return 分摊金额数组，和传入的 orderItems 一一对应
+     */
+    private List<Integer> dividePrice(List<TradeOrderItemDO> items, Integer orderPayPrice) {
+        Integer total = getSumValue(items, TradeOrderItemDO::getPrice, Integer::sum);
+        assert total != null;
+        // 遍历每一个，进行分摊
+        List<Integer> prices = new ArrayList<>(items.size());
+        int remainPrice = orderPayPrice;
+        for (int i = 0; i < items.size(); i++) {
+            TradeOrderItemDO orderItem = items.get(i);
+            int partPrice;
+            if (i < items.size() - 1) { // 减一的原因，是因为拆分时，如果按照比例，可能会出现.所以最后一个，使用反减
+                partPrice = (int) (orderPayPrice * (1.0D * orderItem.getPayPrice() / total));
+                remainPrice -= partPrice;
+            } else {
+                partPrice = remainPrice;
+            }
+            Assert.isTrue(partPrice >= 0, "分摊金额必须大于等于 0");
+            prices.add(partPrice);
+        }
+        return prices;
     }
 
     @Override
@@ -671,6 +684,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_COMMENT)
     public Long createOrderItemComment(Long userId, AppTradeOrderItemCommentCreateReqVO createReqVO) {
         // 先通过订单项 ID，查询订单项是否存在
         TradeOrderItemDO orderItem = tradeOrderItemMapper.selectByIdAndUserId(createReqVO.getOrderItemId(), userId);
@@ -698,24 +712,27 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(order.getId());
         if (!anyMatch(orderItems, item -> Objects.equals(item.getCommentStatus(), Boolean.FALSE))) {
             tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId()).setCommentStatus(Boolean.TRUE));
-            // TODO 待实现：已完成评价，要不要写一条订单日志？目前 crmeb 会写，有赞可以研究下
+            // 增加订单日志
+            TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), order.getStatus());
         }
         return comment;
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_CANCEL)
     public void cancelOrder(Long userId, Long id) {
-        // 校验存在
+        // 1.1 校验存在
         TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(id, userId);
         if (order == null) {
             throw exception(ORDER_NOT_FOUND);
         }
-        // 校验状态
+        // 1.2 校验状态
         if (ObjectUtil.notEqual(order.getStatus(), TradeOrderStatusEnum.UNPAID.getStatus())) {
             throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
         }
 
-        // 1.更新 TradeOrderDO 状态为已取消
+        // 2. 更新 TradeOrderDO 状态为已取消
         int updateCount = tradeOrderMapper.updateByIdAndStatus(id, order.getStatus(),
                 new TradeOrderDO().setStatus(TradeOrderStatusEnum.CANCELED.getStatus())
                         .setCancelTime(LocalDateTime.now())
@@ -724,22 +741,43 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
         }
 
-        // TODO 活动相关库存回滚需要活动 id，活动 id 怎么获取？app 端能否传过来
+        // 3. TODO 活动相关库存回滚需要活动 id，活动 id 怎么获取？app 端能否传过来；回复：从订单里拿呀
         tradeOrderHandlers.forEach(handler -> handler.rollback());
 
-        // 2.回滚库存
+        // 4. 回滚库存
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(id);
         productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convert(orderItems));
 
-        // 3.回滚优惠券
-        couponApi.returnUsedCoupon(order.getCouponId());
+        // 5. 回滚优惠券
+        if (order.getCouponId() > 0) {
+            couponApi.returnUsedCoupon(order.getCouponId());
+        }
 
-        // 4.回滚积分（抵扣的）
+        // 6. 回滚积分（抵扣的）
         addUserPoint(order.getUserId(), order.getUsePoint(), MemberPointBizTypeEnum.ORDER_CANCEL, order.getId());
 
-        // TODO 芋艿：OrderLog
+        // 7. 增加订单日志
+        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.CANCELED.getStatus());
+    }
 
-        // TODO 芋艿：lili 发送订单变化的消息
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_DELETE)
+    public void deleteOrder(Long userId, Long id) {
+        // 1.1 校验存在
+        TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(id, userId);
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+        // 1.2 校验状态
+        if (ObjectUtil.notEqual(order.getStatus(), TradeOrderStatusEnum.CANCELED.getStatus())) {
+            throw exception(ORDER_DELETE_FAIL_STATUS_NOT_CANCEL);
+        }
+        // 2. 删除订单
+        tradeOrderMapper.deleteById(id);
+
+        // 3. 记录日志
+        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), order.getStatus());
     }
 
     /**
@@ -766,6 +804,20 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         memberLevelApi.addExperience(userId, -refundPrice, bizType, String.valueOf(afterSaleId));
     }
 
+    /**
+     * 添加用户积分
+     * <p>
+     * 目前是支付成功后，就会创建积分记录。
+     * <p>
+     * 业内还有两种做法，可以根据自己的业务调整：
+     * 1. 确认收货后，才创建积分记录
+     * 2. 支付 or 下单成功时，创建积分记录（冻结），确认收货解冻或者 n 天后解冻
+     *
+     * @param userId  用户编号
+     * @param point   增加积分数量
+     * @param bizType 业务编号
+     * @param bizId   业务编号
+     */
     protected void addUserPoint(Long userId, Integer point, MemberPointBizTypeEnum bizType, Long bizId) {
         if (point != null && point > 0) {
             memberPointApi.addPoint(userId, point, bizType.getType(), String.valueOf(bizId));
@@ -778,15 +830,27 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         }
     }
 
+    /**
+     * 创建分销记录
+     *
+     * 目前是支付成功后，就会创建分销记录。
+     *
+     * 业内还有两种做法，可以根据自己的业务调整：
+     *  1. 确认收货后，才创建分销记录
+     *  2. 支付 or 下单成功时，创建分销记录（冻结），确认收货解冻或者 n 天后解冻
+     *
+     * @param userId 用户编号
+     * @param orderId 订单编号
+     */
     @Async
     protected void addBrokerageAsync(Long userId, Long orderId) {
         MemberUserRespDTO user = memberUserApi.getUser(userId);
         Assert.notNull(user);
-
+        // 每一个订单项，都会去生成分销记录
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(orderId);
-        List<BrokerageAddReqBO> list = convertList(orderItems,
+        List<BrokerageAddReqBO> addList = convertList(orderItems,
                 item -> TradeOrderConvert.INSTANCE.convert(user, item, productSkuApi.getSku(item.getSkuId())));
-        brokerageRecordService.addBrokerage(userId, BrokerageRecordBizTypeEnum.ORDER, list);
+        brokerageRecordService.addBrokerage(userId, BrokerageRecordBizTypeEnum.ORDER, addList);
     }
 
     @Async

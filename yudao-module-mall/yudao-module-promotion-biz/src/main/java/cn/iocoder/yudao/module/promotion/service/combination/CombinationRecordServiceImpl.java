@@ -96,12 +96,15 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         return recordDO;
     }
 
+    // TODO @puhui999：有一个应该在创建那要做下；就是当前 activityId 已经有未支付的订单，不允许在发起新的；要么支付，要么去掉先；
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {
         // 1.1 校验拼团活动
         CombinationActivityDO activity = combinationActivityService.validateCombinationActivityExists(reqDTO.getActivityId());
         // 1.2 需要校验下，他当前是不是已经参加了该拼团；
+        // TODO @puhui999：拼团应该可以重复参加；应该去校验总共的上限哈，就是 activity.totalLimitCount
         CombinationRecordDO recordDO = recordMapper.selectByUserIdAndOrderId(reqDTO.getUserId(), reqDTO.getOrderId());
         if (recordDO != null) {
             throw exception(COMBINATION_RECORD_EXISTS);
@@ -111,6 +114,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         if (CollUtil.isNotEmpty(recordDOList)) {
             throw exception(COMBINATION_RECORD_FAILED_HAVE_JOINED);
         }
+        // TODO @puhui999：有个开始时间未校验
         // 1.4 校验当前活动是否过期
         if (LocalDateTime.now().isAfter(activity.getEndTime())) {
             throw exception(COMBINATION_RECORD_FAILED_TIME_END);
@@ -127,6 +131,8 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
                 throw exception(COMBINATION_RECORD_USER_FULL);
             }
         }
+
+        // TODO @puhui999：单次限购
 
         // 2. 创建拼团记录
         MemberUserRespDTO user = memberUserApi.getUser(reqDTO.getUserId());

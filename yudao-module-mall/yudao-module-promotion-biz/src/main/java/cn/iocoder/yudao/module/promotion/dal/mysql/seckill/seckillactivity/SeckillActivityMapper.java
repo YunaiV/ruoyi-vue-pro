@@ -41,7 +41,7 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
      * @param count 扣减的库存数量
      * @return 影响的行数
      */
-    default int updateActivityStock(Long id, int count) {
+    default int updateStock(Long id, int count) {
         return update(null, new LambdaUpdateWrapper<SeckillActivityDO>()
                 .eq(SeckillActivityDO::getId, id)
                 .gt(SeckillActivityDO::getTotalStock, 0)

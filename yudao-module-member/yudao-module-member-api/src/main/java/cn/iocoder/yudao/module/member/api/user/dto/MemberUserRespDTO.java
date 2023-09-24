@@ -33,6 +33,14 @@ public class MemberUserRespDTO {
      * 手机
      */
     private String mobile;
+
+    // ========== 其它信息 ==========
+
+    /**
+     * 会员级别编号
+     */
+    private Long levelId;
+
     /**
      * 积分
      */
