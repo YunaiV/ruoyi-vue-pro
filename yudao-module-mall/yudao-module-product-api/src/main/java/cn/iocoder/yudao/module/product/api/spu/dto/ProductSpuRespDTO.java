@@ -111,6 +111,11 @@ public class ProductSpuRespDTO {
     // ========== 物流相关字段 =========
 
     /**
+     * 赠送积分
+     */
+    private Integer giveIntegral;
+
+    /**
      * 物流配置模板编号
      *
      * 对应 TradeDeliveryExpressTemplateDO 的 id 编号

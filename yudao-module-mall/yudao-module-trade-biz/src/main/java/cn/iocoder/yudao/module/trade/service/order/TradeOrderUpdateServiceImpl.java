@@ -24,6 +24,7 @@ import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.product.api.comment.ProductCommentApi;
 import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
+import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.promotion.api.bargain.BargainRecordApi;
 import cn.iocoder.yudao.module.promotion.api.combination.CombinationRecordApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
@@ -49,8 +50,8 @@ import cn.iocoder.yudao.module.trade.enums.order.*;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import cn.iocoder.yudao.module.trade.framework.order.core.annotations.TradeOrderLog;
 import cn.iocoder.yudao.module.trade.framework.order.core.utils.TradeOrderLogUtils;
+import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageRecordService;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
-import cn.iocoder.yudao.module.trade.service.brokerage.record.BrokerageRecordService;
 import cn.iocoder.yudao.module.trade.service.cart.CartService;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
 import cn.iocoder.yudao.module.trade.service.message.TradeMessageService;
@@ -106,6 +107,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Resource
     private TradeMessageService tradeMessageService;
 
+    @Resource
+    private ProductSpuApi productSpuApi;
     @Resource
     private ProductSkuApi productSkuApi;
     @Resource
@@ -241,8 +244,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     /**
      * 订单创建前，执行前置逻辑
      *
-     * @param userId 用户编号
-     * @param createReqVO 创建订单请求
+     * @param userId          用户编号
+     * @param createReqVO     创建订单请求
      * @param calculateRespBO 订单价格计算结果
      */
     private void beforeCreateTradeOrder(Long userId, AppTradeOrderCreateReqVO createReqVO,
@@ -261,12 +264,12 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     /**
      * 订单创建后，执行后置逻辑
-     *
+     * <p>
      * 例如说：优惠劵的扣减、积分的扣减、支付单的创建等等
      *
      * @param userId          用户编号
      * @param createReqVO     创建订单请求
-     * @param order    交易订单
+     * @param order           交易订单
      * @param calculateRespBO 订单价格计算结果
      */
     private void afterCreateTradeOrder(Long userId, AppTradeOrderCreateReqVO createReqVO,
@@ -284,12 +287,9 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                     .setOrderId(order.getId()));
         }
 
-        // 3. 扣减积分
+        // 3. 扣减积分（抵扣）
         // 不在前置扣减的原因，是因为积分扣减时，需要记录关联业务
-        if (order.getUsePoint() != null && order.getUsePoint() > 0) {
-            memberPointApi.reducePoint(userId, calculateRespBO.getUsePoint(),
-                    MemberPointBizTypeEnum.ORDER_USE.getType(), String.valueOf(order.getId()));
-        }
+        reduceUserPoint(order.getUserId(), order.getUsePoint(), MemberPointBizTypeEnum.ORDER_USE, order.getId());
 
         // 4. 删除购物车商品
         Set<Long> cartIds = convertSet(createReqVO.getItems(), AppTradeOrderSettlementReqVO.Item::getCartId);
@@ -346,8 +346,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
         // TODO 芋艿：OrderLog
 
-        // 增加用户积分
-        getSelf().addMemberPointAsync(order.getUserId(), order.getPayPrice(), order.getId());
+        // 增加用户积分（赠送）
+        addUserPoint(order.getUserId(), order.getGivePoint(), MemberPointBizTypeEnum.ORDER_REWARD, order.getId());
         // 增加用户经验
         getSelf().addUserExperienceAsync(order.getUserId(), order.getPayPrice(), order.getId());
         // 增加用户佣金
@@ -653,11 +653,12 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             return;
         }
         // 计算总的退款金额
-        TradeOrderDO order = tradeOrderMapper.selectById(tradeOrderItemMapper.selectById(id).getOrderId());
+        TradeOrderItemDO orderItem = tradeOrderItemMapper.selectById(id);
+        TradeOrderDO order = tradeOrderMapper.selectById(orderItem.getOrderId());
         Integer orderRefundPrice = order.getRefundPrice() + refundPrice;
         if (isAllOrderItemAfterSaleSuccess(order.getId())) { // 如果都售后成功，则需要取消订单
             tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId())
-                    .setRefundStatus(TradeOrderRefundStatusEnum.ALL.getStatus()).setRefundPrice(orderRefundPrice)
+                    .setRefundStatus(TradeOrderRefundStatusEnum.ALL.getStatus()).setRefundPrice(orderRefundPrice).setRefundPoint(order.getRefundPoint() + orderItem.getUsePoint())
                     .setCancelType(TradeOrderCancelTypeEnum.AFTER_SALE_CLOSE.getType()).setCancelTime(LocalDateTime.now()));
 
             // TODO 芋艿：记录订单日志
@@ -668,12 +669,17 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                     .setRefundStatus(TradeOrderRefundStatusEnum.PART.getStatus()).setRefundPrice(orderRefundPrice));
         }
 
-        // 扣减用户积分
-        getSelf().reduceMemberPointAsync(order.getUserId(), orderRefundPrice, afterSaleId);
-        // 扣减用户经验
-        getSelf().reduceUserExperienceAsync(order.getUserId(), orderRefundPrice, afterSaleId);
-        // 更新分佣记录为已失效
-        getSelf().cancelBrokerageAsync(order.getUserId(), id);
+        // 售后成功后，执行数据回滚逻辑
+        if (Objects.equals(newAfterSaleStatus, TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus())) {
+            // 扣减用户积分（赠送的）
+            reduceUserPoint(order.getUserId(), orderItem.getGivePoint(), MemberPointBizTypeEnum.AFTER_SALE_DEDUCT_GIVE, afterSaleId);
+            // 增加用户积分（返还抵扣）
+            addUserPoint(order.getUserId(), orderItem.getUsePoint(), MemberPointBizTypeEnum.AFTER_SALE_REFUND_USED, afterSaleId);
+            // 扣减用户经验
+            getSelf().reduceUserExperienceAsync(order.getUserId(), orderRefundPrice, afterSaleId);
+            // 更新分佣记录为已失效
+            getSelf().cancelBrokerageAsync(order.getUserId(), id);
+        }
     }
 
     @Override
@@ -747,8 +753,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             couponApi.returnUsedCoupon(order.getCouponId());
         }
 
-        // 6. 回滚积分：积分是支付成功后才增加的吧？ 回复：每个项目不同，目前看下来，确认收货貌似更合适，我再看看其它项目的业务选择；
-        // TODO @疯狂：有赞是可配置（支付 or 确认收货），我们按照支付好列；然后这里的退积分，指的是下单时的积分抵扣。
+        // 6. 回滚积分（抵扣的）
+        addUserPoint(order.getUserId(), order.getUsePoint(), MemberPointBizTypeEnum.ORDER_CANCEL, order.getId());
 
         // 7. 增加订单日志
         TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.CANCELED.getStatus());
@@ -767,7 +773,6 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         if (ObjectUtil.notEqual(order.getStatus(), TradeOrderStatusEnum.CANCELED.getStatus())) {
             throw exception(ORDER_DELETE_FAIL_STATUS_NOT_CANCEL);
         }
-
         // 2. 删除订单
         tradeOrderMapper.deleteById(id);
 
@@ -801,29 +806,28 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     /**
      * 添加用户积分
-     *
+     * <p>
      * 目前是支付成功后，就会创建积分记录。
-     *
+     * <p>
      * 业内还有两种做法，可以根据自己的业务调整：
-     *  1. 确认收货后，才创建积分记录
-     *  2. 支付 or 下单成功时，创建积分记录（冻结），确认收货解冻或者 n 天后解冻
+     * 1. 确认收货后，才创建积分记录
+     * 2. 支付 or 下单成功时，创建积分记录（冻结），确认收货解冻或者 n 天后解冻
      *
-     * @param userId 用户编号
-     * @param payPrice 支付金额
-     * @param orderId 订单编号
+     * @param userId  用户编号
+     * @param point   增加积分数量
+     * @param bizType 业务编号
+     * @param bizId   业务编号
      */
-    @Async
-    protected void addMemberPointAsync(Long userId, Integer payPrice, Long orderId) {
-        // TODO @疯狂：具体多少积分，需要分成 2 不分：1. 支付金额；2. 商品金额
-        int bizType = MemberPointBizTypeEnum.ORDER_REWARD.getType();
-        memberPointApi.addPoint(userId, payPrice, bizType, String.valueOf(orderId));
+    protected void addUserPoint(Long userId, Integer point, MemberPointBizTypeEnum bizType, Long bizId) {
+        if (point != null && point > 0) {
+            memberPointApi.addPoint(userId, point, bizType.getType(), String.valueOf(bizId));
+        }
     }
 
-    @Async
-    protected void reduceMemberPointAsync(Long userId, Integer refundPrice, Long afterSaleId) {
-        // TODO @疯狂：退款时，按照金额比例，退还积分；https://help.youzan.com/displaylist/detail_4_4-1-49185
-        int bizType = MemberPointBizTypeEnum.ORDER_CANCEL.getType();
-        memberPointApi.addPoint(userId, -refundPrice, bizType, String.valueOf(afterSaleId));
+    protected void reduceUserPoint(Long userId, Integer point, MemberPointBizTypeEnum bizType, Long bizId) {
+        if (point != null && point > 0) {
+            memberPointApi.reducePoint(userId, point, bizType.getType(), String.valueOf(bizId));
+        }
     }
 
     /**

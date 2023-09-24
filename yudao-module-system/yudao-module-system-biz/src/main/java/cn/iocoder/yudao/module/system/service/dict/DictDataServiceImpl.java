@@ -49,7 +49,7 @@ public class DictDataServiceImpl implements DictDataService {
 
     @Override
     public List<DictDataDO> getDictDataList() {
-        List<DictDataDO> list = dictDataMapper.selectList();
+        List<DictDataDO> list = dictDataMapper.selectList(DictDataDO::getStatus, CommonStatusEnum.ENABLE.getStatus());
         list.sort(COMPARATOR_TYPE_AND_SORT);
         return list;
     }

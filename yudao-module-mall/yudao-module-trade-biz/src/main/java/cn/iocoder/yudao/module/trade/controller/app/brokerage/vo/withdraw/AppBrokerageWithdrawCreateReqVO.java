@@ -8,8 +8,9 @@ import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
 import javax.validation.Validator;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 
 @Schema(description = "用户 App - 分销提现创建 Request VO")
 @Data
@@ -20,7 +21,8 @@ public class AppBrokerageWithdrawCreateReqVO {
     private Integer type;
 
     @Schema(description = "提现金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1000")
-    @Min(value = 1, message = "提现金额不能小于 1")
+    @PositiveOrZero(message = "提现金额不能小于 0")
+    @NotNull(message = "提现金额不能为空")
     private Integer price;
 
     // ========== 银行卡、微信、支付宝 提现相关字段 ==========
@@ -41,7 +43,7 @@ public class AppBrokerageWithdrawCreateReqVO {
     @NotBlank(message = "持卡人姓名不能为空", groups = {Bank.class})
     private String name;
     @Schema(description = "提现银行", example = "1")
-    @NotBlank(message = "提现银行不能为空", groups = {Bank.class})
+    @NotNull(message = "提现银行不能为空", groups = {Bank.class})
     private Integer bankName;
     @Schema(description = "开户地址", example = "海淀支行")
     private String bankAddress;

@@ -23,7 +23,8 @@ public enum PromotionTypeEnum implements IntArrayValuable {
     REWARD_ACTIVITY(5, "满减送"),
 
     MEMBER_LEVEL(6, "会员折扣"),
-    COUPON(7, "优惠劵")
+    COUPON(7, "优惠劵"),
+    POINT(8, "积分")
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(PromotionTypeEnum::getType).toArray();

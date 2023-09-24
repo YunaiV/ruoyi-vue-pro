@@ -54,6 +54,11 @@ public class TradePriceCalculateRespBO {
     private Integer usePoint;
 
     /**
+     * 使用的积分
+     */
+    private Integer givePoint;
+
+    /**
      * 订单价格
      */
     @Data
@@ -164,6 +169,10 @@ public class TradePriceCalculateRespBO {
          */
         private Integer pointPrice;
         /**
+         * 使用的积分
+         */
+        private Integer usePoint;
+        /**
          * VIP 减免金额，单位：分
          */
         private Integer vipPrice;
@@ -214,6 +223,11 @@ public class TradePriceCalculateRespBO {
          * 商品属性数组
          */
         private List<ProductPropertyValueDetailRespDTO> properties;
+
+        /**
+         * 使用的积分
+         */
+        private Integer givePoint;
 
     }
 

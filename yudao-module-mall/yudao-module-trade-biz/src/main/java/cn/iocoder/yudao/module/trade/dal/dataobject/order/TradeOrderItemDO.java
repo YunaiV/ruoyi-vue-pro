@@ -145,6 +145,14 @@ public class TradeOrderItemDO extends BaseDO {
      */
     private Integer pointPrice;
     /**
+     * 使用的积分
+     */
+    private Integer usePoint;
+    /**
+     * 赠送的积分
+     */
+    private Integer givePoint;
+    /**
      * VIP 减免金额，单位：分
      */
     private Integer vipPrice;

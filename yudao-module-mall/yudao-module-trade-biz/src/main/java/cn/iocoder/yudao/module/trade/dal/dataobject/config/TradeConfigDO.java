@@ -36,7 +36,7 @@ public class TradeConfigDO extends BaseDO {
     private Long id;
 
     // ========== 配送相关 ==========
-    // TODO 芋艿：未配置
+
     /**
      * 是否启用全场包邮
      */
@@ -81,6 +81,10 @@ public class TradeConfigDO extends BaseDO {
      * 用户提现最低金额
      */
     private Integer brokerageWithdrawMinPrice;
+    /**
+     * 用户提现手续费百分比
+     */
+    private Integer brokerageWithdrawFeePercent;
     /**
      * 提现银行
      */

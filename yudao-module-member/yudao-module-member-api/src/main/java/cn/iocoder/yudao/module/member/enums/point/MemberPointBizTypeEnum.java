@@ -18,8 +18,10 @@ public enum MemberPointBizTypeEnum implements IntArrayValuable {
 
     SIGN(1, "签到", "签到获得 {} 积分", true),
     ORDER_REWARD(10, "订单奖励", "下单获得 {} 积分", true),
-    ORDER_CANCEL(11, "订单取消", "退单获得 {} 积分", false), // 退回积分
+    ORDER_CANCEL(11, "订单取消", "订单取消，退还 {} 积分", true), // 退回积分
     ORDER_USE(12, "订单使用", "下单使用 {} 积分", false), // 扣减积分
+    AFTER_SALE_REFUND_USED(13, "订单退款", "订单退款，退还 {} 积分", true), // 退回积分
+    AFTER_SALE_DEDUCT_GIVE(14, "订单退款", "订单退款，扣除赠送的 {} 积分", false), // 扣减积分
     ;
 
     /**
