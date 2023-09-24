@@ -6,11 +6,13 @@ import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskDonePageItemRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskSimpleRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskTodoPageItemRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenTaskCreatedReqDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import org.flowable.bpmn.model.FlowElement;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -55,8 +57,8 @@ public interface BpmTaskConvert {
     }
 
     default List<BpmTaskDonePageItemRespVO> convertList2(List<HistoricTaskInstance> tasks,
-        Map<String, BpmTaskExtDO> bpmTaskExtDOMap, Map<String, HistoricProcessInstance> historicProcessInstanceMap,
-        Map<Long, AdminUserRespDTO> userMap) {
+                                                         Map<String, BpmTaskExtDO> bpmTaskExtDOMap, Map<String, HistoricProcessInstance> historicProcessInstanceMap,
+                                                         Map<Long, AdminUserRespDTO> userMap) {
         return CollectionUtils.convertList(tasks, task -> {
             BpmTaskDonePageItemRespVO respVO = convert2(task);
             BpmTaskExtDO taskExtDO = bpmTaskExtDOMap.get(task.getId());
@@ -82,8 +84,8 @@ public interface BpmTaskConvert {
     BpmTaskTodoPageItemRespVO.ProcessInstance convert(ProcessInstance processInstance, AdminUserRespDTO startUser);
 
     default List<BpmTaskRespVO> convertList3(List<HistoricTaskInstance> tasks,
-        Map<String, BpmTaskExtDO> bpmTaskExtDOMap, HistoricProcessInstance processInstance,
-        Map<Long, AdminUserRespDTO> userMap, Map<Long, DeptRespDTO> deptMap) {
+                                             Map<String, BpmTaskExtDO> bpmTaskExtDOMap, HistoricProcessInstance processInstance,
+                                             Map<Long, AdminUserRespDTO> userMap, Map<Long, DeptRespDTO> deptMap) {
         return CollectionUtils.convertList(tasks, task -> {
             BpmTaskRespVO respVO = convert3(task);
             BpmTaskExtDO taskExtDO = bpmTaskExtDOMap.get(task.getId());
@@ -113,29 +115,35 @@ public interface BpmTaskConvert {
     void copyTo(BpmTaskExtDO from, @MappingTarget BpmTaskDonePageItemRespVO to);
 
     @Mappings({@Mapping(source = "processInstance.id", target = "id"),
-        @Mapping(source = "processInstance.name", target = "name"),
-        @Mapping(source = "processInstance.startUserId", target = "startUserId"),
-        @Mapping(source = "processInstance.processDefinitionId", target = "processDefinitionId"),
-        @Mapping(source = "startUser.nickname", target = "startUserNickname")})
+            @Mapping(source = "processInstance.name", target = "name"),
+            @Mapping(source = "processInstance.startUserId", target = "startUserId"),
+            @Mapping(source = "processInstance.processDefinitionId", target = "processDefinitionId"),
+            @Mapping(source = "startUser.nickname", target = "startUserNickname")})
     BpmTaskTodoPageItemRespVO.ProcessInstance convert(HistoricProcessInstance processInstance,
-        AdminUserRespDTO startUser);
+                                                      AdminUserRespDTO startUser);
 
     default BpmTaskExtDO convert2TaskExt(Task task) {
         BpmTaskExtDO taskExtDO = new BpmTaskExtDO().setTaskId(task.getId())
-            .setAssigneeUserId(NumberUtils.parseLong(task.getAssignee())).setName(task.getName())
-            .setProcessDefinitionId(task.getProcessDefinitionId()).setProcessInstanceId(task.getProcessInstanceId());
+                .setAssigneeUserId(NumberUtils.parseLong(task.getAssignee())).setName(task.getName())
+                .setProcessDefinitionId(task.getProcessDefinitionId()).setProcessInstanceId(task.getProcessInstanceId());
         taskExtDO.setCreateTime(LocalDateTimeUtil.of(task.getCreateTime()));
         return taskExtDO;
     }
 
     default BpmMessageSendWhenTaskCreatedReqDTO convert(ProcessInstance processInstance, AdminUserRespDTO startUser,
-        Task task) {
+                                                        Task task) {
         BpmMessageSendWhenTaskCreatedReqDTO reqDTO = new BpmMessageSendWhenTaskCreatedReqDTO();
         reqDTO.setProcessInstanceId(processInstance.getProcessInstanceId())
-            .setProcessInstanceName(processInstance.getName()).setStartUserId(startUser.getId())
-            .setStartUserNickname(startUser.getNickname()).setTaskId(task.getId()).setTaskName(task.getName())
-            .setAssigneeUserId(NumberUtils.parseLong(task.getAssignee()));
+                .setProcessInstanceName(processInstance.getName()).setStartUserId(startUser.getId())
+                .setStartUserNickname(startUser.getNickname()).setTaskId(task.getId()).setTaskName(task.getName())
+                .setAssigneeUserId(NumberUtils.parseLong(task.getAssignee()));
         return reqDTO;
     }
 
+    @Mapping(source = "taskDefinitionKey", target = "id")
+    default List<BpmTaskSimpleRespVO> convertList(List<FlowElement> elementList) {
+        return CollectionUtils.convertList(elementList, element -> new BpmTaskSimpleRespVO()
+                .setName(element.getName())
+                .setDefinitionKey(element.getId()));
+    }
 }
