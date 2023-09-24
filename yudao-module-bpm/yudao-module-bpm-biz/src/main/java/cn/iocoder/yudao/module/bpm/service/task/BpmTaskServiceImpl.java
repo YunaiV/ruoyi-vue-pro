@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
-import cn.iocoder.yudao.framework.flowable.core.util.ModelUtils;
+import cn.iocoder.yudao.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
@@ -61,22 +61,23 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     private TaskService taskService;
     @Resource
     private HistoryService historyService;
+    @Resource
+    private RuntimeService runtimeService;
 
     @Resource
     private BpmProcessInstanceService processInstanceService;
     @Resource
+    private BpmModelService bpmModelService;
+    @Resource
+    private BpmMessageService messageService;
+
+    @Resource
     private AdminUserApi adminUserApi;
     @Resource
     private DeptApi deptApi;
+
     @Resource
     private BpmTaskExtMapper taskExtMapper;
-    @Resource
-    private BpmMessageService messageService;
-    @Resource
-    private BpmModelService bpmModelService;
-    @Resource
-    private RuntimeService runtimeService;
-
 
     @Override
     public PageResult<BpmTaskTodoPageItemRespVO> getTodoTaskPage(Long userId, BpmTaskTodoPageReqVO pageVO) {
@@ -351,18 +352,18 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             throw exception(TASK_NOT_EXISTS);
         }
         BpmnModel bpmnModel = bpmModelService.getBpmnModelByDefinitionId(task.getProcessDefinitionId());
-        FlowElement source = ModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
+        FlowElement source = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
         if (source == null) {
             throw exception(TASK_NOT_EXISTS);
         }
 
         // 2.1 查询该任务的前置任务节点的 key 集合
-        List<UserTask> previousUserList = ModelUtils.getPreUserTaskList(source, null, null);
+        List<UserTask> previousUserList = BpmnModelUtils.getPreviousUserTaskList(source, null, null);
         if (CollUtil.isEmpty(previousUserList)) {
             return Collections.emptyList();
         }
         // 2.2 过滤：只有串行可到达的节点，才可以回退。类似非串行、子流程无法退回
-        previousUserList.removeIf(userTask -> !ModelUtils.isSequentialReachable(source, userTask, null));
+        previousUserList.removeIf(userTask -> !BpmnModelUtils.isSequentialReachable(source, userTask, null));
         return BpmTaskConvert.INSTANCE.convertList(previousUserList);
     }
 
@@ -395,15 +396,15 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 1.1 获取流程模型信息
         BpmnModel bpmnModel = bpmModelService.getBpmnModelByDefinitionId(processDefinitionId);
         // 1.3 获取当前任务节点元素
-        FlowElement source = ModelUtils.getFlowElementById(bpmnModel, sourceKey);
+        FlowElement source = BpmnModelUtils.getFlowElementById(bpmnModel, sourceKey);
         // 1.3 获取跳转的节点元素
-        FlowElement target = ModelUtils.getFlowElementById(bpmnModel, targetKey);
+        FlowElement target = BpmnModelUtils.getFlowElementById(bpmnModel, targetKey);
         if (target == null) {
             throw exception(TASK_TARGET_NODE_NOT_EXISTS);
         }
 
         // 2.2 只有串行可到达的节点，才可以回退。类似非串行、子流程无法退回
-        if (!ModelUtils.isSequentialReachable(source, target, null)) {
+        if (!BpmnModelUtils.isSequentialReachable(source, target, null)) {
             throw exception(TASK_RETURN_FAIL_SOURCE_TARGET_ERROR);
         }
         return target;
@@ -423,7 +424,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         List<String> runTaskKeyList = convertList(taskList, Task::getTaskDefinitionKey);
         // 1.2 通过 targetElement 的出口连线，计算在 runTaskKeyList 有哪些 key 需要被撤回
         // 为什么不直接使用 runTaskKeyList 呢？因为可能存在多个审批分支，例如说：A -> B -> C 和 D -> F，而只要 C 撤回到 A，需要排除掉 F
-        List<UserTask> returnUserTaskList = ModelUtils.iteratorFindChildUserTasks(targetElement, runTaskKeyList, null, null);
+        List<UserTask> returnUserTaskList = BpmnModelUtils.iteratorFindChildUserTasks(targetElement, runTaskKeyList, null, null);
         List<String> returnTaskKeyList = convertList(returnUserTaskList, UserTask::getId);
 
         // 2. 给当前要被回退的 task 数组，设置回退意见
