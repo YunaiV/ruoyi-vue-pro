@@ -1,13 +1,12 @@
 package cn.iocoder.yudao.framework.flowable.core.util;
 
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
-import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
-import org.flowable.common.engine.impl.util.io.StringStreamSource;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 流程模型转操作工具类
@@ -55,7 +54,6 @@ public class ModelUtils {
         Process process = model.getMainProcess();
         return process.getFlowElement(flowElementId);
     }
-
 
     /**
      * 找到 source 节点之前的所有用户任务节点

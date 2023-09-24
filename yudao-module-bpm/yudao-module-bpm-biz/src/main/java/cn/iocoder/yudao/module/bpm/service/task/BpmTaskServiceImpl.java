@@ -327,49 +327,25 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     public List<BpmTaskSimpleRespVO> getReturnTaskList(String taskId) {
-        // 当前任务 task
+        // 1. 校验当前任务 task 存在
         Task task = getTask(taskId);
-        if (null == task) {
+        if (task == null) {
             throw exception(TASK_NOT_EXISTS);
         }
-        // 根据流程定义获取流程模型信息
         BpmnModel bpmnModel = bpmModelService.getBpmnModelByDefinitionId(task.getProcessDefinitionId());
-        // 查询该任务的前置任务节点的key集合
-        Set<String> historyTaksDefinitionKeySet = getPreTaskByCurrentTask(task, bpmnModel);
-        if (CollUtil.isEmpty(historyTaksDefinitionKeySet)) {
+        FlowElement source = ModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
+        if (source == null) {
+            throw exception(TASK_NOT_EXISTS);
+        }
+
+        // 2.1 查询该任务的前置任务节点的 key 集合
+        List<UserTask> previousUserList = ModelUtils.getPreUserTaskList(source, null, null);
+        if (CollUtil.isEmpty(previousUserList)) {
             return Collections.emptyList();
         }
-        // 获取当前任务节点元素
-        FlowElement source = ModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
-        List<FlowElement> elementList = new ArrayList<>();
-        for (String activityId : historyTaksDefinitionKeySet) {
-            FlowElement target = ModelUtils.getFlowElementById(bpmnModel, activityId);
-            //非 串行和子流程则加入返回节点 elementList
-            boolean isSequential = ModelUtils.isSequentialReachable(source, target, new HashSet<>());
-            if (isSequential) {
-                elementList.add(target);
-            }
-        }
-        return BpmTaskConvert.INSTANCE.convertList(elementList);
-    }
-
-    /**
-     * 查询当前流程实例符合条件可回退的 taskDefinitionKey 集合
-     *
-     * @param task      当前任务
-     * @param bpmnModel 当前流程定义对应的流程模型
-     * @return 符合条件的已去重的 taskDefinitionKey集合
-     */
-    private Set<String> getPreTaskByCurrentTask(Task task, BpmnModel bpmnModel) {
-        // 获取当前任务节点元素
-        FlowElement source = ModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
-        //拿到当前任务节点的前置节点集合
-        List<UserTask> preUserTaskList = ModelUtils.getPreUserTaskList(source, null, null);
-        //需要保证这些节点都是在该source节点之前的
-        if (CollUtil.isNotEmpty(preUserTaskList)) {
-            return convertSet(preUserTaskList, UserTask::getId);
-        }
-        return Collections.emptySet();
+        // 2.2 过滤：只有串行可到达的节点，才可以回退。类似非串行、子流程无法退回
+        previousUserList.removeIf(userTask -> ModelUtils.isSequentialReachable(source, userTask, null));
+        return BpmTaskConvert.INSTANCE.convertList(previousUserList);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -426,7 +402,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 从当前节点向前扫描，判断当前节点与目标节点是否属于串行，若目标节点是在并行网关上或非同一路线上，不可跳转
         boolean isSequential = ModelUtils.isSequentialReachable(source, target, new HashSet<>());
         if (!isSequential) {
-            throw exception(TASK_SOURCE_TARGET_ERROR);
+            throw exception(TASK_RETURN_FAIL_SOURCE_TARGET_ERROR);
         }
         return target;
     }
@@ -455,7 +431,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             }
         }));
         if (CollUtil.isEmpty(currentTaskIds)) {
-            throw exception(TASK_RETURN_FAIL);
+            throw exception(TASK_RETURN_FAIL_NO_RETURN_TASK);
         }
         // 设置回退意见
         for (String currentTaskId : currentTaskIds) {
