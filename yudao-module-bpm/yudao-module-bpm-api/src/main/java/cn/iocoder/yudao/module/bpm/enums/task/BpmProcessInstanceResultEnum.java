@@ -20,7 +20,9 @@ public enum BpmProcessInstanceResultEnum {
 
     // ========== 流程任务独有的状态 ==========
 
-    BACK(5, "退回/驳回");
+    BACK(5, "退回/驳回"),
+
+    DELEGATE(6, "委派");
 
     /**
      * 结果

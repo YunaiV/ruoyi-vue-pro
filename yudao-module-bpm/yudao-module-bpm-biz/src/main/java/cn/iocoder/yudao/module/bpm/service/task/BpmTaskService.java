@@ -137,4 +137,10 @@ public interface BpmTaskService {
      */
     void returnTask(BpmTaskReturnReqVO reqVO);
 
+    /**
+     * 将指定任务委派给其他人处理，等接收人处理后再回到原审批人手中审批
+     *
+     * @param reqVO 接收人和被委派的任务编号理由参数
+     */
+    void delegateTask(BpmTaskDelegateReqVO reqVO);
 }
