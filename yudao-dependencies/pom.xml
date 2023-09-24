@@ -48,7 +48,7 @@
         <jsoup.version>1.15.4</jsoup.version>
         <lombok.version>1.18.28</lombok.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
-        <hutool.version>5.8.21</hutool.version>
+        <hutool.version>5.8.22</hutool.version>
         <easyexcel.verion>3.3.2</easyexcel.verion>
         <velocity.version>2.3</velocity.version>
         <screw.version>1.0.5</screw.version>
