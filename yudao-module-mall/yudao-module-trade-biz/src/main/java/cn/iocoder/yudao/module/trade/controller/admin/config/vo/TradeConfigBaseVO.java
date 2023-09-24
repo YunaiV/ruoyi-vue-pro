@@ -48,7 +48,7 @@ public class TradeConfigBaseVO {
     private Integer brokerageBindMode;
 
     @Schema(description = "分销海报图地址数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "[https://www.iocoder.cn/yudao.jpg]")
-    private List<String> brokeragePostUrls;
+    private List<String> brokeragePosterUrls;
 
     @Schema(description = "一级返佣比例", requiredMode = Schema.RequiredMode.REQUIRED, example = "5")
     @NotNull(message = "一级返佣比例不能为空")

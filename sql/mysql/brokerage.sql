@@ -5,7 +5,7 @@ CREATE TABLE trade_config
     brokerage_enabled              BIT           DEFAULT 1                 NOT NULL COMMENT '是否启用分佣',
     brokerage_enabled_condition    TINYINT       DEFAULT 1                 NOT NULL COMMENT '分佣模式：1-人人分销 2-指定分销',
     brokerage_bind_mode            TINYINT       DEFAULT 1                 NOT NULL COMMENT '分销关系绑定模式: 1-没有推广人，2-新用户, 3-扫码覆盖',
-    brokerage_post_urls            VARCHAR(2000) DEFAULT ''                NULL COMMENT '分销海报图地址数组',
+    brokerage_poster_urls          VARCHAR(2000) DEFAULT ''                NULL COMMENT '分销海报图地址数组',
     brokerage_first_percent        INT           DEFAULT 0                 NOT NULL COMMENT '一级返佣比例',
     brokerage_second_percent       INT           DEFAULT 0                 NOT NULL COMMENT '二级返佣比例',
     brokerage_withdraw_min_price   INT           DEFAULT 0                 NOT NULL COMMENT '用户提现最低金额',
