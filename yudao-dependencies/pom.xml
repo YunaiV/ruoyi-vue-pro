@@ -44,9 +44,9 @@
         <!-- Bpm 工作流相关 -->
         <flowable.version>6.8.0</flowable.version>
         <!-- 工具类相关 -->
-        <captcha-plus.version>1.0.7</captcha-plus.version>
+        <captcha-plus.version>1.0.8</captcha-plus.version>
         <jsoup.version>1.15.4</jsoup.version>
-        <lombok.version>1.18.28</lombok.version>
+        <lombok.version>1.18.30</lombok.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <hutool.version>5.8.22</hutool.version>
         <easyexcel.verion>3.3.2</easyexcel.verion>
