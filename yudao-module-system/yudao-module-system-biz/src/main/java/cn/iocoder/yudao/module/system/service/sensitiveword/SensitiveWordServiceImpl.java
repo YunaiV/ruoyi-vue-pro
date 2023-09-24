@@ -46,7 +46,7 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
     /**
      * 是否开启敏感词功能
      */
-    private static final Boolean ENABLED = false;
+    public static Boolean ENABLED = false;
 
     /**
      * 敏感词列表缓存
