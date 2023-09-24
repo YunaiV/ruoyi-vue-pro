@@ -240,10 +240,11 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
         return new PageResult<>(pageResult.getRecords(), pageResult.getTotal());
     }
 
+    // TODO @疯狂：这个求出来，应该是不准的？例如说超过 100+ 名后？
     @Override
     public Integer getUserRankByPrice(Long userId, LocalDateTime[] times) {
         AppBrokerageUserRankPageReqVO pageParam = new AppBrokerageUserRankPageReqVO().setTimes(times);
-        // 取前100名
+        // 取前 100 名
         pageParam.setPageSize(100);
         PageResult<AppBrokerageUserRankByPriceRespVO> pageResult = getBrokerageUserChildSummaryPageByPrice(pageParam);
         // 获得索引
@@ -255,21 +256,23 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addBrokerage(Long userId, BrokerageRecordBizTypeEnum bizType, String bizId, Integer brokeragePrice, String title) {
-        // 校验佣金余额
+        // 1. 校验佣金余额
         BrokerageUserDO user = brokerageUserService.getBrokerageUser(userId);
         int balance = Optional.of(user)
                 .map(BrokerageUserDO::getBrokeragePrice).orElse(0);
         if (balance + brokeragePrice < 0) {
+            // TODO @疯狂：要不 MoneyUtils 那，统一搞个 format 金额的方法？然后把分到元的字符串，统一收口掉；
             throw exception(BROKERAGE_WITHDRAW_USER_BALANCE_NOT_ENOUGH, new Money(0, balance));
         }
 
-        // 扣减佣金余额
+        // 2. 更新佣金余额
         boolean success = brokerageUserService.updateUserPrice(userId, brokeragePrice);
         if (!success) {
+            // 失败时，则抛出异常。只会出现扣减佣金时，余额不足的情况
             throw exception(BROKERAGE_WITHDRAW_USER_BALANCE_NOT_ENOUGH, new Money(0, balance));
         }
 
-        // 新增记录
+        // 3. 新增记录
         BrokerageRecordDO record = BrokerageRecordConvert.INSTANCE.convert(user, bizType, bizId, 0, brokeragePrice,
                 null, title, null, null);
         brokerageRecordMapper.insert(record);

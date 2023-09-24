@@ -28,10 +28,12 @@ public class AppDictDataController {
     @Resource
     private DictDataService dictDataService;
 
+    // TODO @疯狂：暂时不用 path 参数哈；主要考虑一些中间件支持的一般，例如说链路追踪之类的；还是作为一个参数噶；
     @GetMapping("/type/{dictType}")
     @Operation(summary = "根据字典类型查询字典数据信息")
-    public CommonResult<List<AppDictDataRespVO>> getDicts(@PathVariable String dictType) {
+    public CommonResult<List<AppDictDataRespVO>> getDictDataList(@PathVariable String dictType) {
         List<DictDataDO> list = dictDataService.getDictDataList(new DictDataExportReqVO().setDictType(dictType));
         return success(DictDataConvert.INSTANCE.convertList03(list));
     }
+
 }

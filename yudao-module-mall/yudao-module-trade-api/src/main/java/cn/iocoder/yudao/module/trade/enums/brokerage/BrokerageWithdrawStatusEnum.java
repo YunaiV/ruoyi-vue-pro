@@ -22,7 +22,9 @@ public enum BrokerageWithdrawStatusEnum implements IntArrayValuable {
     WITHDRAW_FAIL(21, "提现失败"),
     ;
 
+    // TODO @疯狂：字典现在枚举在每个模块的 DictTypeConstants 里哈；可以创建一个出来；主要是想，治理每个模块到底有多少个枚举；
     public static final String DICT_TYPE = "BROKERAGE_WITHDRAW_STATUS";
+
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BrokerageWithdrawStatusEnum::getStatus).toArray();
 
     /**

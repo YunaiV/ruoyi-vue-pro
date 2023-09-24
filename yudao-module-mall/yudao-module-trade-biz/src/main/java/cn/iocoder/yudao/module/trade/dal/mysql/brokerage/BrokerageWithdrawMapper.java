@@ -36,6 +36,8 @@ public interface BrokerageWithdrawMapper extends BaseMapperX<BrokerageWithdrawDO
                 .eq(BrokerageWithdrawDO::getStatus, status));
     }
 
-    @Select("SELECT SUM(price) FROM trade_brokerage_withdraw WHERE user_id = #{userId} AND status = #{status}")
+    @Select("SELECT SUM(price) FROM trade_brokerage_withdraw " +
+            "WHERE user_id = #{userId} AND status = #{status}")
     Integer selectSummaryPriceByUserIdAndStatus(@Param("userId") Long userId, @Param("status") Integer status);
+    
 }

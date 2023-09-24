@@ -55,6 +55,7 @@ public class AppBrokerageUserController {
     @PreAuthenticated
     public CommonResult<AppBrokerageUserRespVO> getBrokerageUser() {
         Optional<BrokerageUserDO> user = Optional.ofNullable(brokerageUserService.getBrokerageUser(getLoginUserId()));
+        // 返回数据
         AppBrokerageUserRespVO respVO = new AppBrokerageUserRespVO()
                 .setBrokerageEnabled(user.map(BrokerageUserDO::getBrokerageEnabled).orElse(false))
                 .setBrokeragePrice(user.map(BrokerageUserDO::getBrokeragePrice).orElse(0))
@@ -66,6 +67,7 @@ public class AppBrokerageUserController {
     @Operation(summary = "绑定推广员")
     @PreAuthenticated
     public CommonResult<Boolean> bindBrokerageUser(@Valid @RequestBody AppBrokerageUserBindReqVO reqVO) {
+        // TODO @疯狂：是不是 isNewUser 不用传递哈，交给 service 自己计算出来？
         return success(brokerageUserService.bindBrokerageUser(getLoginUserId(), reqVO.getBindUserId(), false));
     }
 
@@ -74,17 +76,17 @@ public class AppBrokerageUserController {
     @PreAuthenticated
     public CommonResult<AppBrokerageUserMySummaryRespVO> getBrokerageUserSummary() {
         Long userId = getLoginUserId();
+        // 统计 yesterdayPrice、withdrawPrice、firstBrokerageUserCount、secondBrokerageUserCount 字段
         LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
         LocalDateTime beginTime = LocalDateTimeUtil.beginOfDay(yesterday);
         LocalDateTime endTime = LocalDateTimeUtil.endOfDay(yesterday);
-
         AppBrokerageUserMySummaryRespVO respVO = new AppBrokerageUserMySummaryRespVO()
                 .setYesterdayPrice(brokerageRecordService.getSummaryPriceByUserId(userId, BrokerageRecordBizTypeEnum.ORDER.getType(), beginTime, endTime))
                 .setWithdrawPrice(brokerageWithdrawService.getSummaryPriceByUserIdAndStatus(userId, BrokerageWithdrawStatusEnum.AUDIT_SUCCESS.getStatus()))
-                .setBrokeragePrice(0)
-                .setFrozenPrice(0)
+                .setBrokeragePrice(0).setFrozenPrice(0)
                 .setFirstBrokerageUserCount(brokerageUserService.getBrokerageUserCountByBindUserId(userId, 1))
                 .setSecondBrokerageUserCount(brokerageUserService.getBrokerageUserCountByBindUserId(userId, 2));
+        // 设置 brokeragePrice、frozenPrice 字段
         Optional.ofNullable(brokerageUserService.getBrokerageUser(userId))
                 .ifPresent(user -> respVO.setBrokeragePrice(user.getBrokeragePrice()).setFrozenPrice(user.getFrozenPrice()));
         return success(respVO);
@@ -117,7 +119,6 @@ public class AppBrokerageUserController {
     @PreAuthenticated
     public CommonResult<PageResult<AppBrokerageUserChildSummaryRespVO>> getBrokerageUserChildSummaryPage(
             AppBrokerageUserChildSummaryPageReqVO pageReqVO) {
-        // 分页查询
         PageResult<AppBrokerageUserChildSummaryRespVO> pageResult = brokerageUserService.getBrokerageUserChildSummaryPage(pageReqVO, getLoginUserId());
         return success(pageResult);
     }

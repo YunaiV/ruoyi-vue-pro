@@ -67,7 +67,6 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     public void updateBrokerageUserId(Long id, Long bindUserId) {
         // 校验存在
         BrokerageUserDO brokerageUser = validateBrokerageUserExists(id);
-
         // 绑定关系未发生变化
         if (Objects.equals(brokerageUser.getBindUserId(), bindUserId)) {
             return;
@@ -185,6 +184,13 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         return true;
     }
 
+    /**
+     * 补全绑定用户的字段
+     *
+     * @param bindUserId 绑定的用户编号
+     * @param brokerageUser update 对象
+     * @return 补全后的 update 对象
+     */
     private BrokerageUserDO fillBindUserData(Long bindUserId, BrokerageUserDO brokerageUser) {
         return brokerageUser.setBindUserId(bindUserId).setBindUserTime(LocalDateTime.now());
     }
@@ -255,6 +261,7 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         }
 
         // 下级不能绑定自己的上级
+        // TODO @疯狂：这里是不是查询不到的时候，应该有个 break 结束循环哈
         for (int i = 0; i <= Short.MAX_VALUE; i++) {
             if (Objects.equals(bindUser.getBindUserId(), user.getId())) {
                 throw exception(BROKERAGE_BIND_LOOP);
@@ -263,18 +270,24 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         }
     }
 
+    /**
+     * 根据绑定用户编号，获得绑定用户编号列表
+     *
+     * @param bindUserId 绑定用户编号
+     * @param level 绑定用户的层级。
+     *              如果 level 为空，则查询 1+2 两个层级
+     * @return 绑定用户编号列表
+     */
     private List<Long> buildBindUserIdsByLevel(Long bindUserId, Integer level) {
+        Assert.isTrue(level == null || level <= 2, "目前只支持 level 小于等于 2");
         List<Long> bindUserIds = CollUtil.newArrayList();
         if (level == null || level == 1) {
             bindUserIds.add(bindUserId);
         }
         if (level == null || level == 2) {
-            List<Long> firstUserIds = convertList(brokerageUserMapper.selectListByBindUserId(bindUserId), BrokerageUserDO::getId);
-            bindUserIds.addAll(firstUserIds);
+            bindUserIds.addAll(convertList(brokerageUserMapper.selectListByBindUserId(bindUserId), BrokerageUserDO::getId));
         }
-
         return bindUserIds;
-
     }
 
 }

@@ -37,7 +37,7 @@ public interface BrokerageRecordService {
     PageResult<BrokerageRecordDO> getBrokerageRecordPage(BrokerageRecordPageReqVO pageReqVO);
 
     /**
-     * 增加佣金
+     * 增加佣金【多级分佣】
      *
      * @param userId  会员编号
      * @param bizType 业务类型
@@ -46,7 +46,7 @@ public interface BrokerageRecordService {
     void addBrokerage(Long userId, BrokerageRecordBizTypeEnum bizType, @Valid List<BrokerageAddReqBO> list);
 
     /**
-     * 增加佣金
+     * 增加佣金【只针对自己】
      *
      * @param userId         会员编号
      * @param bizType        业务类型
@@ -95,6 +95,7 @@ public interface BrokerageRecordService {
 
     /**
      * 获得用户佣金排行分页列表（基于佣金总数）
+     *
      * @param pageReqVO 分页查询
      * @return 排行榜分页
      */
@@ -108,4 +109,5 @@ public interface BrokerageRecordService {
      * @return 用户的排名
      */
     Integer getUserRankByPrice(Long userId, LocalDateTime[] times);
+
 }

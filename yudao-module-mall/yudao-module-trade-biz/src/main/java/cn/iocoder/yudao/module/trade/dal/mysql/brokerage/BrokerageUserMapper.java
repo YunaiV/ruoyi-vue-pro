@@ -145,4 +145,5 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
     default List<BrokerageUserDO> selectListByBindUserId(Long bindUserId) {
         return selectList(BrokerageUserDO::getBindUserId, bindUserId);
     }
+
 }

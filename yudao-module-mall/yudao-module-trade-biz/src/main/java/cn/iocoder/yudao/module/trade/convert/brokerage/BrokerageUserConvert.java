@@ -58,12 +58,12 @@ public interface BrokerageUserConvert {
         return target;
     }
 
-    default PageResult<AppBrokerageUserRankByUserCountRespVO> convertPage03(PageResult<AppBrokerageUserRankByUserCountRespVO> pageResult, Map<Long, MemberUserRespDTO> userMap) {
-        for (AppBrokerageUserRankByUserCountRespVO vo : pageResult.getList()) {
-            copyTo(userMap.get(vo.getId()), vo);
-        }
+    default PageResult<AppBrokerageUserRankByUserCountRespVO> convertPage03(PageResult<AppBrokerageUserRankByUserCountRespVO> pageResult,
+                                                                            Map<Long, MemberUserRespDTO> userMap) {
+        pageResult.getList().forEach(vo -> copyTo(userMap.get(vo.getId()), vo));
         return pageResult;
     }
 
     void copyTo(MemberUserRespDTO from, @MappingTarget AppBrokerageUserRankByUserCountRespVO to);
+
 }

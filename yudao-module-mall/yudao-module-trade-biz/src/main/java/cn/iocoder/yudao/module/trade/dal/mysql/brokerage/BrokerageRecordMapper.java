@@ -25,7 +25,6 @@ import java.util.List;
 public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
 
     default PageResult<BrokerageRecordDO> selectPage(BrokerageRecordPageReqVO reqVO) {
-        // 分页查询
         return selectPage(reqVO, new LambdaQueryWrapperX<BrokerageRecordDO>()
                 .eqIfPresent(BrokerageRecordDO::getUserId, reqVO.getUserId())
                 .eqIfPresent(BrokerageRecordDO::getBizType, reqVO.getBizType())
@@ -59,7 +58,8 @@ public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
                                                                              @Param("bizType") Integer bizType,
                                                                              @Param("status") Integer status);
 
-    @Select("SELECT SUM(price) FROM trade_brokerage_record WHERE user_id = #{userId} AND biz_type = #{bizType} " +
+    @Select("SELECT SUM(price) FROM trade_brokerage_record " +
+            "WHERE user_id = #{userId} AND biz_type = #{bizType} " +
             "AND create_time BETWEEN #{beginTime} AND #{endTime}")
     Integer selectSummaryPriceByUserIdAndBizTypeAndCreateTimeBetween(@Param("userId") Long userId,
                                                                      @Param("bizType") Integer bizType,
@@ -76,4 +76,5 @@ public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
                                                                                  @Param("status") Integer status,
                                                                                  @Param("beginTime") LocalDateTime beginTime,
                                                                                  @Param("endTime") LocalDateTime endTime);
+
 }

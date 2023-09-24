@@ -30,6 +30,7 @@ import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLogi
 @Validated
 @Slf4j
 public class AppBrokerageWithdrawController {
+
     @Resource
     private BrokerageWithdrawService brokerageWithdrawService;
 
@@ -44,6 +45,7 @@ public class AppBrokerageWithdrawController {
         PageResult<BrokerageWithdrawDO> pageResult = brokerageWithdrawService.getBrokerageWithdrawPage(
                 BrokerageWithdrawConvert.INSTANCE.convert(pageReqVO, getLoginUserId()));
         // 拼接信息
+        // TODO @疯狂：后端可以直接用 DictFrameworkUtils.getDictDataLabel() 去渲染哈；这样就不用 getDictDataLabelMap 方法了；
         Map<String, String> statusNameMap = dictDataApi.getDictDataLabelMap(BrokerageWithdrawStatusEnum.DICT_TYPE);
         return success(BrokerageWithdrawConvert.INSTANCE.convertPage02(pageResult, statusNameMap));
     }

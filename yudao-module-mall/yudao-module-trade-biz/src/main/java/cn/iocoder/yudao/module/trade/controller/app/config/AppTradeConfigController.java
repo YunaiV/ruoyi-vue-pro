@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.trade.controller.app.config.vo.AppTradeConfigRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,13 +25,15 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @Validated
 @Slf4j
 public class AppTradeConfigController {
+
     @Resource
     private TradeConfigService tradeConfigService;
 
     @GetMapping("/get")
+    @Operation(summary = "获得交易配置")
     public CommonResult<AppTradeConfigRespVO> getTradeConfig() {
         TradeConfigDO tradeConfig = ObjUtil.defaultIfNull(tradeConfigService.getTradeConfig(), new TradeConfigDO());
-
+        // TODO @疯狂：是不是直接 convert 就好啦；
         AppTradeConfigRespVO respVO = new AppTradeConfigRespVO()
                 .setBrokeragePosterUrls(tradeConfig.getBrokeragePostUrls())
                 .setBrokerageFrozenDays(tradeConfig.getBrokerageFrozenDays())

@@ -45,6 +45,7 @@ public class AppBrokerageRecordController {
         return success(BrokerageRecordConvert.INSTANCE.convertPage02(pageResult));
     }
 
+    // TODO @疯狂：这里还有一个漏网之鱼~
     @GetMapping("/get-product-brokerage-price")
     @Operation(summary = "获得商品的分销金额")
     public CommonResult<AppBrokerageProductPriceRespVO> getProductBrokeragePrice(@RequestParam("spuId") Long spuId) {

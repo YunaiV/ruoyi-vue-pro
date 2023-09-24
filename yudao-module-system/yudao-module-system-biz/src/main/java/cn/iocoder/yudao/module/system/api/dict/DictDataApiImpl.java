@@ -38,6 +38,7 @@ public class DictDataApiImpl implements DictDataApi {
 
     @Override
     public List<DictDataRespDTO> getDictDataList(String type) {
+        // TODO @疯狂：不用 DictDataExportReqVO 哈；可以考虑直接加个允许传递 type 传递的
         List<DictDataDO> list = dictDataService.getDictDataList(new DictDataExportReqVO().setDictType(type));
         return DictDataConvert.INSTANCE.convertList04(list);
     }
