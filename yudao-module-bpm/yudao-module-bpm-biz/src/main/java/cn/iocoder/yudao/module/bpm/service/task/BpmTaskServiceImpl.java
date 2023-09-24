@@ -321,6 +321,24 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         return taskService.createTaskQuery().taskId(id).singleResult();
     }
 
+    /**
+     * 校验任务是否合法
+     *
+     * @param taskId 任务编号
+     * @return 任务
+     */
+    private Task validateTask(String taskId) {
+        // 当前任务 task
+        Task task = getTask(taskId);
+        if (task == null) {
+            throw exception(TASK_NOT_EXISTS);
+        }
+        if (task.isSuspended()) {
+            throw exception(TASK_IS_PENDING);
+        }
+        return task;
+    }
+
     private HistoricTaskInstance getHistoricTask(String id) {
         return historyService.createHistoricTaskInstanceQuery().taskId(id).singleResult();
     }
@@ -344,103 +362,85 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             return Collections.emptyList();
         }
         // 2.2 过滤：只有串行可到达的节点，才可以回退。类似非串行、子流程无法退回
-        previousUserList.removeIf(userTask -> ModelUtils.isSequentialReachable(source, userTask, null));
+        previousUserList.removeIf(userTask -> !ModelUtils.isSequentialReachable(source, userTask, null));
         return BpmTaskConvert.INSTANCE.convertList(previousUserList);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void returnTask(BpmTaskReturnReqVO reqVO) {
-        // 当前任务 task
-        Task task = validateReturnTask(reqVO.getId());
-        // 校验源头和目标节点的关系，并返回目标元素
-        FlowElement targetElement = validateReturnProcessDefinition(task.getTaskDefinitionKey(), reqVO.getTargetDefinitionKey(), task.getProcessDefinitionId());
-        //调用flowable框架的回退逻辑
-        this.handlerReturn(task, targetElement, reqVO);
-        // 更新任务扩展表
-        taskExtMapper.updateByTaskId(
-                new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.BACK.getResult())
-                        .setEndTime(LocalDateTime.now()).setReason(reqVO.getReason()));
+        // 1.1 当前任务 task
+        Task task = validateTask(reqVO.getId());
+        // 1.2 校验源头和目标节点的关系，并返回目标元素
+        FlowElement targetElement = validateTargetTaskCanReturn(task.getTaskDefinitionKey(), reqVO.getTargetDefinitionKey(), task.getProcessDefinitionId());
+
+        // 2. 调用 flowable 框架的回退逻辑
+        returnTask0(task, targetElement, reqVO);
+
+        // 3. 更新任务扩展表
+        taskExtMapper.updateByTaskId(new BpmTaskExtDO().setTaskId(task.getId())
+                .setResult(BpmProcessInstanceResultEnum.BACK.getResult())
+                .setEndTime(LocalDateTime.now()).setReason(reqVO.getReason()));
     }
 
     /**
-     * 校验当前流程是否可以操作回退
+     * 回退流程节点时，校验目标任务节点是否可回退
      *
-     * @param taskId 当前任务ID
-     * @return
+     * @param sourceKey           当前任务节点 Key
+     * @param targetKey           目标任务节点 key
+     * @param processDefinitionId 当前流程定义 ID
+     * @return 目标任务节点元素
      */
-    private Task validateReturnTask(String taskId) {
-        // 当前任务 task
-        Task task = getTask(taskId);
-        if (null == task) {
-            throw exception(TASK_NOT_EXISTS);
-        }
-        if (task.isSuspended()) {
-            throw exception(TASK_IS_PENDING);
-        }
-        return task;
-    }
-
-    /**
-     * 回退流程节点时，校验源头节点和目标节点的关系
-     *
-     * @param sourceKey           当前任务节点Key
-     * @param targetKey           目标任务节点key
-     * @param processDefinitionId 当前流程定义ID
-     * @return 目标元素
-     */
-    private FlowElement validateReturnProcessDefinition(String sourceKey, String targetKey, String processDefinitionId) {
-        // 获取流程模型信息
+    private FlowElement validateTargetTaskCanReturn(String sourceKey, String targetKey, String processDefinitionId) {
+        // 1.1 获取流程模型信息
         BpmnModel bpmnModel = bpmModelService.getBpmnModelByDefinitionId(processDefinitionId);
-        // 获取当前任务节点元素
+        // 1.3 获取当前任务节点元素
         FlowElement source = ModelUtils.getFlowElementById(bpmnModel, sourceKey);
-        // 获取跳转的节点元素
+        // 1.3 获取跳转的节点元素
         FlowElement target = ModelUtils.getFlowElementById(bpmnModel, targetKey);
-        if (null == target) {
+        if (target == null) {
             throw exception(TASK_TARGET_NODE_NOT_EXISTS);
         }
-        // 从当前节点向前扫描，判断当前节点与目标节点是否属于串行，若目标节点是在并行网关上或非同一路线上，不可跳转
-        boolean isSequential = ModelUtils.isSequentialReachable(source, target, new HashSet<>());
-        if (!isSequential) {
+
+        // 2.2 只有串行可到达的节点，才可以回退。类似非串行、子流程无法退回
+        if (!ModelUtils.isSequentialReachable(source, target, null)) {
             throw exception(TASK_RETURN_FAIL_SOURCE_TARGET_ERROR);
         }
         return target;
     }
 
     /**
-     * 处理回退逻辑
+     * 执行回退逻辑
      *
-     * @param task          当前回退的任务
+     * @param currentTask          当前回退的任务
      * @param targetElement 需要回退到的目标任务
      * @param reqVO         前端参数封装
      */
-    public void handlerReturn(Task task, FlowElement targetElement, BpmTaskReturnReqVO reqVO) {
-        // 获取所有正常进行的任务节点 Key，这些任务不能直接使用，需要找出其中需要撤回的任务
-        List<Task> runTaskList = taskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).list();
-        List<String> runTaskKeyList = convertList(runTaskList, Task::getTaskDefinitionKey);
-        // 通过 targetElement 的出口连线，结合 runTaskList 比对，获取需要撤回的任务 key
+    public void returnTask0(Task currentTask, FlowElement targetElement, BpmTaskReturnReqVO reqVO) {
+        // 1. 获得所有需要回撤的任务 taskDefinitionKey，用于稍后的 moveActivityIdsToSingleActivityId 回撤
+        // 1.1 获取所有正常进行的任务节点 Key
+        List<Task> taskList = taskService.createTaskQuery().processInstanceId(currentTask.getProcessInstanceId()).list();
+        List<String> runTaskKeyList = convertList(taskList, Task::getTaskDefinitionKey);
+        // 1.2 通过 targetElement 的出口连线，计算在 runTaskKeyList 有哪些 key 需要被撤回
+        // 为什么不直接使用 runTaskKeyList 呢？因为可能存在多个审批分支，例如说：A -> B -> C 和 D -> F，而只要 C 撤回到 A，需要排除掉 F
         List<UserTask> returnUserTaskList = ModelUtils.iteratorFindChildUserTasks(targetElement, runTaskKeyList, null, null);
-        // 需退回任务 key
-        List<String> returnTaskDefinitionKeyList = convertList(returnUserTaskList, UserTask::getId);
+        List<String> returnTaskKeyList = convertList(returnUserTaskList, UserTask::getId);
 
-        // 通过 key 和 runTaskList 中的key对比，拿到任务ID，设置设置回退意见
-        List<String> currentTaskIds = new ArrayList<>();
-        returnTaskDefinitionKeyList.forEach(currentId -> runTaskList.forEach(runTask -> {
-            if (currentId.equals(runTask.getTaskDefinitionKey())) {
-                currentTaskIds.add(runTask.getId());
+        // 2. 给当前要被回退的 task 数组，设置回退意见
+        taskList.forEach(task -> {
+            // 需要排除掉，不需要设置回退意见的任务
+            if (!returnTaskKeyList.contains(task.getTaskDefinitionKey())) {
+                return;
             }
-        }));
-        if (CollUtil.isEmpty(currentTaskIds)) {
-            throw exception(TASK_RETURN_FAIL_NO_RETURN_TASK);
-        }
-        // 设置回退意见
-        for (String currentTaskId : currentTaskIds) {
-            taskService.addComment(currentTaskId, task.getProcessInstanceId(), BpmProcessInstanceResultEnum.BACK.getResult().toString(), reqVO.getReason());
-        }
-        // 1 对 1 或 多 对 1 情况，currentIds 当前要跳转的节点列表(1或多)，targetKey 跳转到的节点(1)
+            taskService.addComment(task.getId(), currentTask.getProcessInstanceId(),
+                    BpmProcessInstanceResultEnum.BACK.getResult().toString(), reqVO.getReason());
+        });
+
+        // 3. 执行驳回
         runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(task.getProcessInstanceId())
-                .moveActivityIdsToSingleActivityId(returnTaskDefinitionKeyList, reqVO.getTargetDefinitionKey())
+                .processInstanceId(currentTask.getProcessInstanceId())
+                .moveActivityIdsToSingleActivityId(returnTaskKeyList, // 当前要跳转的节点列表( 1 或多)
+                        reqVO.getTargetDefinitionKey()) // targetKey 跳转到的节点(1)
                 .changeState();
     }
 
