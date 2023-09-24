@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.trade.service.brokerage;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -9,7 +10,12 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
+import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
+import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.record.BrokerageRecordPageReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.record.AppBrokerageProductPriceRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankByPriceRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankPageReqVO;
 import cn.iocoder.yudao.module.trade.convert.brokerage.BrokerageRecordConvert;
@@ -36,6 +42,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getMaxValue;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getMinValue;
+import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.BROKERAGE_WITHDRAW_USER_BALANCE_NOT_ENOUGH;
 
 /**
@@ -54,6 +63,11 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
     private TradeConfigService tradeConfigService;
     @Resource
     private BrokerageUserService brokerageUserService;
+
+    @Resource
+    private ProductSpuApi productSpuApi;
+    @Resource
+    private ProductSkuApi productSkuApi;
 
     @Override
     public BrokerageRecordDO getBrokerageRecord(Integer id) {
@@ -291,6 +305,50 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
         brokerageUserService.updateFrozenPriceDecrAndPriceIncr(record.getUserId(), -record.getPrice());
         log.info("[unfreezeRecord][record({}) 更新为已结算成功]", record.getId());
         return true;
+    }
+
+    @Override
+    public AppBrokerageProductPriceRespVO calculateProductBrokeragePrice(Long spuId, Long userId) {
+        // 1. 构建默认的返回值
+        AppBrokerageProductPriceRespVO respVO = new AppBrokerageProductPriceRespVO().setEnabled(false)
+                .setBrokerageMinPrice(0).setBrokerageMaxPrice(0);
+
+        // 2.1 校验分销功能是否开启
+        TradeConfigDO tradeConfig = tradeConfigService.getTradeConfig();
+        if (tradeConfig == null || !BooleanUtil.isTrue(tradeConfig.getBrokerageEnabled())) {
+            return respVO;
+        }
+
+        // 2.2 校验用户是否有分销资格
+        respVO.setEnabled(brokerageUserService.getUserBrokerageEnabled(getLoginUserId()));
+        if (!BooleanUtil.isTrue(respVO.getEnabled())) {
+            return respVO;
+        }
+
+        Integer fixedMinPrice = 0;
+        Integer fixedMaxPrice = 0;
+        Integer spuMinPrice = 0;
+        Integer spuMaxPrice = 0;
+        // 2.3 校验商品是否存在
+        ProductSpuRespDTO spu = productSpuApi.getSpu(spuId);
+        if (spu == null) {
+            return respVO;
+        }
+
+        List<ProductSkuRespDTO> skuList = productSkuApi.getSkuListBySpuId(ListUtil.of(spuId));
+        if (BooleanUtil.isTrue(spu.getSubCommissionType())) {
+            // 3.1 商品单独分佣模式
+            fixedMinPrice = getMinValue(skuList, ProductSkuRespDTO::getFirstBrokeragePrice);
+            fixedMaxPrice = getMaxValue(skuList, ProductSkuRespDTO::getFirstBrokeragePrice);
+        } else {
+            // 3.2 全局分佣模式（根据商品价格比例计算）
+            spuMinPrice = getMinValue(skuList, ProductSkuRespDTO::getPrice);
+            spuMaxPrice = getMaxValue(skuList, ProductSkuRespDTO::getPrice);
+        }
+
+        respVO.setBrokerageMinPrice(calculatePrice(spuMinPrice, tradeConfig.getBrokerageFirstPercent(), fixedMinPrice));
+        respVO.setBrokerageMaxPrice(calculatePrice(spuMaxPrice, tradeConfig.getBrokerageFirstPercent(), fixedMaxPrice));
+        return respVO;
     }
 
     /**

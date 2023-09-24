@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.record.AppBroke
 import cn.iocoder.yudao.module.trade.convert.brokerage.BrokerageRecordConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageRecordDO;
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageRecordService;
-import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -32,8 +31,6 @@ import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLogi
 @Slf4j
 public class AppBrokerageRecordController {
     @Resource
-    private BrokerageUserService brokerageUserService;
-    @Resource
     private BrokerageRecordService brokerageRecordService;
 
     @GetMapping("/page")
@@ -45,15 +42,10 @@ public class AppBrokerageRecordController {
         return success(BrokerageRecordConvert.INSTANCE.convertPage02(pageResult));
     }
 
-    // TODO @疯狂：这里还有一个漏网之鱼~
     @GetMapping("/get-product-brokerage-price")
     @Operation(summary = "获得商品的分销金额")
     public CommonResult<AppBrokerageProductPriceRespVO> getProductBrokeragePrice(@RequestParam("spuId") Long spuId) {
-        AppBrokerageProductPriceRespVO respVO = new AppBrokerageProductPriceRespVO();
-        respVO.setEnabled(brokerageUserService.getUserBrokerageEnabled(getLoginUserId()));
-        respVO.setBrokerageMinPrice(1);
-        respVO.setBrokerageMaxPrice(2);
-        return success(respVO);
+        return success(brokerageRecordService.calculateProductBrokeragePrice(spuId, getLoginUserId()));
     }
 
 }

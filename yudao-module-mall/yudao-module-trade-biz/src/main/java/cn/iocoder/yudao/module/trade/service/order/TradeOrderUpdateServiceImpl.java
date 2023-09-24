@@ -849,7 +849,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 每一个订单项，都会去生成分销记录
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(orderId);
         List<BrokerageAddReqBO> addList = convertList(orderItems,
-                item -> TradeOrderConvert.INSTANCE.convert(user, item, productSkuApi.getSku(item.getSkuId())));
+                item -> TradeOrderConvert.INSTANCE.convert(user, item,
+                        productSpuApi.getSpu(item.getSpuId()), productSkuApi.getSku(item.getSkuId())));
         brokerageRecordService.addBrokerage(userId, BrokerageRecordBizTypeEnum.ORDER, addList);
     }
 
