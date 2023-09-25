@@ -87,14 +87,15 @@ public class BpmTaskController {
     @Operation(summary = "回退任务", description = "用于【流程详情】的【回退】按钮")
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
     public CommonResult<Boolean> returnTask(@Valid @RequestBody BpmTaskReturnReqVO reqVO) {
-        taskService.returnTask(reqVO);
+        taskService.returnTask(getLoginUserId(), reqVO);
         return success(true);
     }
 
     @PutMapping("/delegate")
-    @Operation(summary = "委派任务", description = "用于【流程详情】的【委派】按钮，和向前加签有点像，和向前加签的唯一的区别是没有单独创立任务")
-    @PreAuthorize("@ss.hasPermission('bpm:task:delegate')")
+    @Operation(summary = "委派任务", description = "用于【流程详情】的【委派】按钮。和向前【加签】有点像，唯一区别是【委托】没有单独创立任务")
+    @PreAuthorize("@ss.hasPermission('bpm:task:update')")
     public CommonResult<Boolean> delegateTask(@Valid @RequestBody BpmTaskDelegateReqVO reqVO) {
+        // TODO @海：, 后面要有空格
         taskService.delegateTask(reqVO,getLoginUserId());
         return success(true);
     }

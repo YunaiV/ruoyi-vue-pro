@@ -133,15 +133,18 @@ public interface BpmTaskService {
     /**
      * 将任务回退到指定的 targetDefinitionKey 位置
      *
+     * @param userId 用户编号
      * @param reqVO 回退的任务key和当前所在的任务ID
      */
-    void returnTask(BpmTaskReturnReqVO reqVO);
+    void returnTask(Long userId, BpmTaskReturnReqVO reqVO);
 
+    // TODO @海：userId 放前面
     /**
      * 将指定任务委派给其他人处理，等接收人处理后再回到原审批人手中审批
      *
      * @param reqVO  被委派人和被委派的任务编号理由参数
-     * @param userId 委派人ID
+     * @param userId 用户编号
      */
     void delegateTask(BpmTaskDelegateReqVO reqVO, Long userId);
+
 }
