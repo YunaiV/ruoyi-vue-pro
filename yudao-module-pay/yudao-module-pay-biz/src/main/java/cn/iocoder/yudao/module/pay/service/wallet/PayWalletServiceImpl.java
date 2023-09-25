@@ -82,7 +82,7 @@ public class PayWalletServiceImpl implements  PayWalletService {
             throw exception(REFUND_NOT_FOUND);
         }
         // 1.2 校验是否可以退款
-        Long walletId = validateWalletCanRefund(payRefund.getId(), payRefund.getChannelOrderNo(),  refundPrice);
+        Long walletId = validateWalletCanRefund(payRefund.getId(), payRefund.getChannelOrderNo());
         PayWalletDO wallet = walletMapper.selectById(walletId);
         Assert.notNull(wallet, "钱包 {} 不存在", walletId);
 
@@ -96,17 +96,11 @@ public class PayWalletServiceImpl implements  PayWalletService {
      * @param refundId 支付退款单 id
      * @param walletPayNo 钱包支付 no
      */
-    private Long validateWalletCanRefund(Long refundId, String walletPayNo, Integer refundPrice) {
+    private Long validateWalletCanRefund(Long refundId, String walletPayNo) {
         // 1. 校验钱包支付交易存在
         PayWalletTransactionDO walletTransaction = walletTransactionService.getWalletTransactionByNo(walletPayNo);
         if (walletTransaction == null) {
             throw exception(WALLET_TRANSACTION_NOT_FOUND);
-        }
-        // 原来的支付金额
-        // TODO @jason：应该允许多次退款哈；
-        int amount = - walletTransaction.getPrice();
-        if (refundPrice != amount) {
-            throw exception(WALLET_REFUND_AMOUNT_ERROR);
         }
         PayWalletTransactionDO refundTransaction = walletTransactionService.getWalletTransaction(
                 String.valueOf(refundId), PAYMENT_REFUND);
