@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.withdraw.Brok
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.withdraw.AppBrokerageWithdrawCreateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageWithdrawDO;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum;
+import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserWithdrawSummaryBO;
 
 /**
  * 佣金提现 Service 接口
@@ -48,12 +49,12 @@ public interface BrokerageWithdrawService {
     Long createBrokerageWithdraw(AppBrokerageWithdrawCreateReqVO createReqVO, Long userId);
 
     /**
-     * 获得用户已提现金额
+     * 汇总用户提现
      *
      * @param userId 用户编号
-     * @param status 状态
-     * @return 用户已提现金额
+     * @param status 提现状态
+     * @return 用户提现汇总
      */
-    Integer getSummaryPriceByUserIdAndStatus(Long userId, Integer status);
+    UserWithdrawSummaryBO getWithdrawSummaryByUserId(Long userId, BrokerageWithdrawStatusEnum status);
 
 }

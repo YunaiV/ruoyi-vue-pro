@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageRecordService;
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageUserService;
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageWithdrawService;
+import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserWithdrawSummaryBO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -82,7 +83,7 @@ public class AppBrokerageUserController {
         LocalDateTime endTime = LocalDateTimeUtil.endOfDay(yesterday);
         AppBrokerageUserMySummaryRespVO respVO = new AppBrokerageUserMySummaryRespVO()
                 .setYesterdayPrice(brokerageRecordService.getSummaryPriceByUserId(userId, BrokerageRecordBizTypeEnum.ORDER.getType(), beginTime, endTime))
-                .setWithdrawPrice(brokerageWithdrawService.getSummaryPriceByUserIdAndStatus(userId, BrokerageWithdrawStatusEnum.AUDIT_SUCCESS.getStatus()))
+                .setWithdrawPrice(Optional.ofNullable(brokerageWithdrawService.getWithdrawSummaryByUserId(userId, BrokerageWithdrawStatusEnum.AUDIT_SUCCESS)).map(UserWithdrawSummaryBO::getPrice).orElse(0))
                 .setBrokeragePrice(0).setFrozenPrice(0)
                 .setFirstBrokerageUserCount(brokerageUserService.getBrokerageUserCountByBindUserId(userId, 1))
                 .setSecondBrokerageUserCount(brokerageUserService.getBrokerageUserCountByBindUserId(userId, 2));

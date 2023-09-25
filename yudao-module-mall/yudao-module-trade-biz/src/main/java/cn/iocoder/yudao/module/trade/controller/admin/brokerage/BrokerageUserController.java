@@ -9,9 +9,12 @@ import cn.iocoder.yudao.module.trade.convert.brokerage.BrokerageUserConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum;
+import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageWithdrawService;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageRecordService;
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageUserService;
+import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserWithdrawSummaryBO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,6 +41,8 @@ public class BrokerageUserController {
     private BrokerageUserService brokerageUserService;
     @Resource
     private BrokerageRecordService brokerageRecordService;
+    @Resource
+    private BrokerageWithdrawService brokerageWithdrawService;
 
     @Resource
     private MemberUserApi memberUserApi;
@@ -97,9 +102,12 @@ public class BrokerageUserController {
                 userId -> userId,
                 userId -> brokerageUserService.getBrokerageUserCountByBindUserId(userId, null));
 
-        // todo 合计提现
+        // 合计提现
+        Map<Long, UserWithdrawSummaryBO> withdrawMap = convertMap(userIds,
+                userId -> userId,
+                userId -> brokerageWithdrawService.getWithdrawSummaryByUserId(userId, BrokerageWithdrawStatusEnum.AUDIT_SUCCESS));
 
-        return success(BrokerageUserConvert.INSTANCE.convertPage(pageResult, userMap, brokerageUserCountMap, userOrderSummaryMap));
+        return success(BrokerageUserConvert.INSTANCE.convertPage(pageResult, userMap, brokerageUserCountMap, userOrderSummaryMap, withdrawMap));
     }
 
 }

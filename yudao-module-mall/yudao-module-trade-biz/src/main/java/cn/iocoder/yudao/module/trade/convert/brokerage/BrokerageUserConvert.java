@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.user.Brokerag
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankByUserCountRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
+import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserWithdrawSummaryBO;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
@@ -29,13 +30,14 @@ public interface BrokerageUserConvert {
 
     List<BrokerageUserRespVO> convertList(List<BrokerageUserDO> list);
 
-    PageResult<BrokerageUserRespVO> convertPage(PageResult<BrokerageUserDO> page);
+    PageResult<BrokerageUserRespVO> convertPage(PageResult<BrokerageUserDO> page, Map<Long, MemberUserRespDTO> userMap, Map<Long, Long> brokerageUserCountMap, Map<Long, UserBrokerageSummaryBO> userOrderSummaryMap);
 
     default PageResult<BrokerageUserRespVO> convertPage(PageResult<BrokerageUserDO> pageResult,
                                                         Map<Long, MemberUserRespDTO> userMap,
                                                         Map<Long, Long> brokerageUserCountMap,
-                                                        Map<Long, UserBrokerageSummaryBO> userOrderSummaryMap) {
-        PageResult<BrokerageUserRespVO> result = convertPage(pageResult);
+                                                        Map<Long, UserBrokerageSummaryBO> userOrderSummaryMap,
+                                                        Map<Long, UserWithdrawSummaryBO> withdrawMap) {
+        PageResult<BrokerageUserRespVO> result = convertPage(pageResult, userMap, brokerageUserCountMap, userOrderSummaryMap);
         for (BrokerageUserRespVO userVO : result.getList()) {
             // 用户信息
             copyTo(userMap.get(userVO.getId()), userVO);
@@ -46,7 +48,10 @@ public interface BrokerageUserConvert {
             Optional<UserBrokerageSummaryBO> orderSummaryOptional = Optional.ofNullable(userOrderSummaryMap.get(userVO.getId()));
             userVO.setBrokerageOrderCount(orderSummaryOptional.map(UserBrokerageSummaryBO::getCount).orElse(0))
                     .setBrokerageOrderPrice(orderSummaryOptional.map(UserBrokerageSummaryBO::getPrice).orElse(0));
-            // todo 已提现次数、已提现金额
+            // 已提现次数、已提现金额
+            Optional<UserWithdrawSummaryBO> withdrawSummaryOptional = Optional.ofNullable(withdrawMap.get(userVO.getId()));
+            userVO.setWithdrawCount(withdrawSummaryOptional.map(UserWithdrawSummaryBO::getCount).orElse(0))
+                    .setWithdrawPrice(withdrawSummaryOptional.map(UserWithdrawSummaryBO::getPrice).orElse(0));
             userVO.setWithdrawCount(0).setWithdrawPrice(0);
         }
         return result;
