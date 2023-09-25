@@ -17,7 +17,7 @@
         <revision>1.8.2-snapshot</revision>
         <flatten-maven-plugin.version>1.5.0</flatten-maven-plugin.version>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>2.7.15</spring.boot.version>
+        <spring.boot.version>2.7.16</spring.boot.version>
         <!-- Web 相关 -->
         <springdoc.version>1.7.0</springdoc.version>
         <knife4j.version>4.3.0</knife4j.version>
@@ -44,16 +44,16 @@
         <!-- Bpm 工作流相关 -->
         <flowable.version>6.8.0</flowable.version>
         <!-- 工具类相关 -->
-        <captcha-plus.version>1.0.7</captcha-plus.version>
-        <jsoup.version>1.15.4</jsoup.version>
-        <lombok.version>1.18.28</lombok.version>
+        <captcha-plus.version>1.0.8</captcha-plus.version>
+        <jsoup.version>1.16.1</jsoup.version>
+        <lombok.version>1.18.30</lombok.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
-        <hutool.version>5.8.21</hutool.version>
+        <hutool.version>5.8.22</hutool.version>
         <easyexcel.verion>3.3.2</easyexcel.verion>
         <velocity.version>2.3</velocity.version>
         <screw.version>1.0.5</screw.version>
         <fastjson.version>1.2.83</fastjson.version>
-        <guava.version>32.0.1-jre</guava.version>
+        <guava.version>32.1.2-jre</guava.version>
         <guice.version>5.1.0</guice.version>
         <transmittable-thread-local.version>2.14.2</transmittable-thread-local.version>
         <commons-net.version>3.9.0</commons-net.version>
@@ -61,14 +61,14 @@
         <tika-core.version>2.7.0</tika-core.version>
         <ip2region.version>2.7.0</ip2region.version>
         <!-- 三方云服务相关 -->
-        <okio.version>3.0.0</okio.version>
-        <okhttp3.version>4.10.0</okhttp3.version>
+        <okio.version>3.5.0</okio.version>
+        <okhttp3.version>4.11.0</okhttp3.version>
         <commons-io.version>2.11.0</commons-io.version>
-        <minio.version>8.5.5</minio.version>
-        <aliyun-java-sdk-core.version>4.6.3</aliyun-java-sdk-core.version>
+        <minio.version>8.5.6</minio.version>
+        <aliyun-java-sdk-core.version>4.6.4</aliyun-java-sdk-core.version>
         <aliyun-java-sdk-dysmsapi.version>2.2.1</aliyun-java-sdk-dysmsapi.version>
-        <tencentcloud-sdk-java.version>3.1.758</tencentcloud-sdk-java.version>
-        <justauth.version>1.0.4</justauth.version>
+        <tencentcloud-sdk-java.version>3.1.853</tencentcloud-sdk-java.version>
+        <justauth.version>1.0.5</justauth.version>
         <jimureport.version>1.6.1</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
         <weixin-java.version>4.5.0</weixin-java.version>
