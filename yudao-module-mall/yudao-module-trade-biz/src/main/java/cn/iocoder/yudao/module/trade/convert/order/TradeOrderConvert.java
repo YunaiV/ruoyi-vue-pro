@@ -90,7 +90,7 @@ public interface TradeOrderConvert {
 
     default ProductSkuUpdateStockReqDTO convert(List<TradeOrderItemDO> list) {
         List<ProductSkuUpdateStockReqDTO.Item> items = CollectionUtils.convertList(list, item ->
-                new ProductSkuUpdateStockReqDTO.Item().setId(item.getSkuId()).setIncrCount(-item.getCount()));
+                new ProductSkuUpdateStockReqDTO.Item().setId(item.getSkuId()).setIncrCount(item.getCount()));
         return new ProductSkuUpdateStockReqDTO(items);
     }
     default ProductSkuUpdateStockReqDTO convertNegative(List<AppTradeOrderSettlementReqVO.Item> list) {

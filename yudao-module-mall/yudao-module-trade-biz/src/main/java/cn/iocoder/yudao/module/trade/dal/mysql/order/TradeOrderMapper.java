@@ -9,6 +9,8 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Mapper
@@ -58,4 +60,11 @@ public interface TradeOrderMapper extends BaseMapperX<TradeOrderDO> {
                 .eq(TradeOrderDO::getId, orderId)
                 .eq(TradeOrderDO::getUserId, loginUserId));
     }
+
+    default List<TradeOrderDO> selectListByStatusAndCreateTimeLt(Integer status, LocalDateTime expireTime) {
+        return selectList(new LambdaUpdateWrapper<TradeOrderDO>()
+                .eq(TradeOrderDO::getStatus, status)
+                .lt(TradeOrderDO::getCreateTime, expireTime));
+    }
+
 }

@@ -71,6 +71,13 @@ public interface TradeOrderUpdateService {
     void cancelOrder(Long userId, Long id);
 
     /**
+     * 【系统】自动取消订单
+     *
+     * @return 取消数量
+     */
+    int autoCancelOrder();
+
+    /**
      * 【会员】删除订单
      *
      * @param userId 用户编号

@@ -76,6 +76,7 @@ import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.addTime;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
 /**
@@ -629,6 +630,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    // TODO 芋艿：
     public void updateOrderItemAfterSaleStatus(Long id, Integer oldAfterSaleStatus, Integer newAfterSaleStatus,
                                                Long afterSaleId, Integer refundPrice) {
         // 如果退款成功，则 refundPrice 非空
@@ -663,12 +665,15 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
             // TODO 芋艿：记录订单日志
 
+            // TODO 芋艿：要不要退优惠劵
+
             // TODO 芋艿：站内信？
         } else { // 如果部分售后，则更新退款金额
             tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId())
                     .setRefundStatus(TradeOrderRefundStatusEnum.PART.getStatus()).setRefundPrice(orderRefundPrice));
         }
 
+        // TODO 芋艿：这块扣减规则，需要在考虑下
         // 售后成功后，执行数据回滚逻辑
         if (Objects.equals(newAfterSaleStatus, TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus())) {
             // 扣减用户积分（赠送的）
@@ -732,31 +737,76 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
         }
 
-        // 2. 更新 TradeOrderDO 状态为已取消
+        // 2. 取消订单
+        cancelOrder0(order, TradeOrderCancelTypeEnum.MEMBER_CANCEL);
+    }
+
+    @Override
+    public int autoCancelOrder() {
+        // 1. 查询过期的待支付订单
+        LocalDateTime expireTime = addTime(tradeOrderProperties.getExpireTime());
+        List<TradeOrderDO> orders = tradeOrderMapper.selectListByStatusAndCreateTimeLt(
+                TradeOrderStatusEnum.UNPAID.getStatus(), expireTime);
+        if (CollUtil.isEmpty(orders)) {
+            return 0;
+        }
+
+        // 2. 遍历执行，逐个取消
+        int count = 0;
+        for (TradeOrderDO order : orders) {
+            try {
+                getSelf().autoCancelOrder(order);
+                count ++;
+            } catch (Throwable e) {
+                log.error("[autoCancelOrder][order({}) 过期订单异常]", order.getId(), e);
+            }
+        }
+        return count;
+    }
+
+    /**
+     * 自动取消单个订单
+     *
+     * @param order 订单
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.SYSTEM_CANCEL)
+    public void autoCancelOrder(TradeOrderDO order) {
+        cancelOrder0(order, TradeOrderCancelTypeEnum.PAY_TIMEOUT);
+    }
+
+    /**
+     * 取消订单的核心实现
+     *
+     * @param order 订单
+     * @param cancelType 取消类型
+     */
+    private void cancelOrder0(TradeOrderDO order, TradeOrderCancelTypeEnum cancelType) {
+        Long id = order.getId();
+        // 1. 更新 TradeOrderDO 状态为已取消
         int updateCount = tradeOrderMapper.updateByIdAndStatus(id, order.getStatus(),
                 new TradeOrderDO().setStatus(TradeOrderStatusEnum.CANCELED.getStatus())
-                        .setCancelTime(LocalDateTime.now())
-                        .setCancelType(TradeOrderCancelTypeEnum.MEMBER_CANCEL.getType()));
+                        .setCancelType(cancelType.getType()).setCancelTime(LocalDateTime.now()));
         if (updateCount == 0) {
             throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
         }
 
-        // 3. TODO 活动相关库存回滚需要活动 id，活动 id 怎么获取？app 端能否传过来；回复：从订单里拿呀
+        // 2. TODO 活动相关库存回滚需要活动 id，活动 id 怎么获取？app 端能否传过来；回复：从订单里拿呀
         tradeOrderHandlers.forEach(handler -> handler.rollback());
 
-        // 4. 回滚库存
+        // 3. 回滚库存
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(id);
         productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convert(orderItems));
 
-        // 5. 回滚优惠券
-        if (order.getCouponId() > 0) {
+        // 4. 回滚优惠券
+        if (order.getCouponId() != null && order.getCouponId() > 0) {
             couponApi.returnUsedCoupon(order.getCouponId());
         }
 
-        // 6. 回滚积分（抵扣的）
+        // 5. 回滚积分（抵扣的）
         addUserPoint(order.getUserId(), order.getUsePoint(), MemberPointBizTypeEnum.ORDER_CANCEL, order.getId());
 
-        // 7. 增加订单日志
+        // 6. 增加订单日志
         TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.CANCELED.getStatus());
     }
 

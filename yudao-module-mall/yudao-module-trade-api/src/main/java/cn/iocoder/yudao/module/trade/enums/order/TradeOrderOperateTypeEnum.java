@@ -16,8 +16,10 @@ public enum TradeOrderOperateTypeEnum {
     MEMBER_CREATE(1, "用户下单"),
     MEMBER_RECEIVE(30, "用户已收货"),
     MEMBER_COMMENT(31, "用户评价"),
-    MEMBER_CANCEL(40, "取消订单"),
-    MEMBER_DELETE(41, "删除订单"),
+    MEMBER_CANCEL(40, "手动取消订单"),
+    SYSTEM_CANCEL(41, "系统取消订单"),
+    // 42 预留：管理员取消订单
+    MEMBER_DELETE(43, "删除订单"),
     ;
 
     /**
