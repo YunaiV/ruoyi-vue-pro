@@ -8,4 +8,5 @@ package cn.iocoder.yudao.module.trade.enums;
 public interface DictTypeConstants {
 
     String BROKERAGE_WITHDRAW_STATUS = "brokerage_withdraw_status"; // 佣金提现状态
+
 }

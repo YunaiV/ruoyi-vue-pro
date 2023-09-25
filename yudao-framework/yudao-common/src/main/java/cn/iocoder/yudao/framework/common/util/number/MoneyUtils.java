@@ -61,10 +61,13 @@ public class MoneyUtils {
     /**
      * 分转元（字符串）
      *
+     * 例如说 fen 为 1 时，则结果为 0.01
+     *
      * @param fen 分
      * @return 元
      */
     public static String fenToYuanStr(int fen) {
         return new Money(0, fen).toString();
     }
+
 }

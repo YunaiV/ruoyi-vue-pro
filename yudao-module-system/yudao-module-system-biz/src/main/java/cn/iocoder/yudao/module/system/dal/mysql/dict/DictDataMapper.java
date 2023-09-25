@@ -50,6 +50,8 @@ public interface DictDataMapper extends BaseMapperX<DictDataDO> {
 
     default List<DictDataDO> selectListByTypeAndStatus(String dictType, Integer status) {
         return selectList(new LambdaQueryWrapper<DictDataDO>()
-                .eq(DictDataDO::getDictType, dictType).eq(DictDataDO::getStatus, status));
+                .eq(DictDataDO::getDictType, dictType)
+                .eq(DictDataDO::getStatus, status));
     }
+
 }

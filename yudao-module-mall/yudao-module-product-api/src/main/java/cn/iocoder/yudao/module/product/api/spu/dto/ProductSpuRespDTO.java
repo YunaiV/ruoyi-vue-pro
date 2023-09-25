@@ -147,4 +147,5 @@ public class ProductSpuRespDTO {
      * true - 自行设置
      */
     private Boolean subCommissionType;
+
 }

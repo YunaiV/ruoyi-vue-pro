@@ -31,7 +31,7 @@ public class AppDictDataController {
     @GetMapping("/type")
     @Operation(summary = "根据字典类型查询字典数据信息")
     @Parameter(name = "type", description = "字典类型", required = true, example = "common_status")
-    public CommonResult<List<AppDictDataRespVO>> getDictDataListByType(@RequestParam String type) {
+    public CommonResult<List<AppDictDataRespVO>> getDictDataListByType(@RequestParam("type") String type) {
         List<DictDataDO> list = dictDataService.getEnabledDictDataListByType(type);
         return success(DictDataConvert.INSTANCE.convertList03(list));
     }

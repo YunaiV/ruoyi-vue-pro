@@ -315,37 +315,34 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
 
         // 2.1 校验分销功能是否开启
         TradeConfigDO tradeConfig = tradeConfigService.getTradeConfig();
-        if (tradeConfig == null || !BooleanUtil.isTrue(tradeConfig.getBrokerageEnabled())) {
+        if (tradeConfig == null || BooleanUtil.isFalse(tradeConfig.getBrokerageEnabled())) {
             return respVO;
         }
-
         // 2.2 校验用户是否有分销资格
         respVO.setEnabled(brokerageUserService.getUserBrokerageEnabled(getLoginUserId()));
-        if (!BooleanUtil.isTrue(respVO.getEnabled())) {
+        if (BooleanUtil.isFalse(respVO.getEnabled())) {
             return respVO;
         }
-
-        Integer fixedMinPrice = 0;
-        Integer fixedMaxPrice = 0;
-        Integer spuMinPrice = 0;
-        Integer spuMaxPrice = 0;
         // 2.3 校验商品是否存在
         ProductSpuRespDTO spu = productSpuApi.getSpu(spuId);
         if (spu == null) {
             return respVO;
         }
 
+        // 3.1 商品单独分佣模式
+        Integer fixedMinPrice = 0;
+        Integer fixedMaxPrice = 0;
+        Integer spuMinPrice = 0;
+        Integer spuMaxPrice = 0;
         List<ProductSkuRespDTO> skuList = productSkuApi.getSkuListBySpuId(ListUtil.of(spuId));
         if (BooleanUtil.isTrue(spu.getSubCommissionType())) {
-            // 3.1 商品单独分佣模式
             fixedMinPrice = getMinValue(skuList, ProductSkuRespDTO::getFirstBrokeragePrice);
             fixedMaxPrice = getMaxValue(skuList, ProductSkuRespDTO::getFirstBrokeragePrice);
+        // 3.2 全局分佣模式（根据商品价格比例计算）
         } else {
-            // 3.2 全局分佣模式（根据商品价格比例计算）
             spuMinPrice = getMinValue(skuList, ProductSkuRespDTO::getPrice);
             spuMaxPrice = getMaxValue(skuList, ProductSkuRespDTO::getPrice);
         }
-
         respVO.setBrokerageMinPrice(calculatePrice(spuMinPrice, tradeConfig.getBrokerageFirstPercent(), fixedMinPrice));
         respVO.setBrokerageMaxPrice(calculatePrice(spuMaxPrice, tradeConfig.getBrokerageFirstPercent(), fixedMaxPrice));
         return respVO;

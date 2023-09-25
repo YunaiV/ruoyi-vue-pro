@@ -236,6 +236,7 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
 
         // 校验分销关系绑定模式
         if (BrokerageBindModeEnum.REGISTER.getMode().equals(tradeConfig.getBrokerageBindMode())) {
+            // TODO @疯狂：是不是把 isNewUser 挪到这里好点呀？
             if (!BooleanUtil.isTrue(isNewUser)) {
                 throw exception(BROKERAGE_BIND_MODE_REGISTER); // 只有在注册时可以绑定
             }

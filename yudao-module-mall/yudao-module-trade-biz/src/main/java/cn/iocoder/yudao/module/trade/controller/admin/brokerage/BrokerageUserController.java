@@ -92,6 +92,7 @@ public class BrokerageUserController {
         Set<Long> userIds = convertSet(pageResult.getList(), BrokerageUserDO::getId);
         // 查询用户信息
         Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(userIds);
+        // TODO @疯狂：看看下面两个 getBrokerageUserCountByBindUserId、getWithdrawSummaryByUserId 有没可能一次性出结果，不然 n 次有点太花性能了；
         // 合计分佣订单
         Map<Long, UserBrokerageSummaryBO> userOrderSummaryMap = convertMap(userIds,
                 userId -> userId,
@@ -101,13 +102,13 @@ public class BrokerageUserController {
         Map<Long, Long> brokerageUserCountMap = convertMap(userIds,
                 userId -> userId,
                 userId -> brokerageUserService.getBrokerageUserCountByBindUserId(userId, null));
-
         // 合计提现
         Map<Long, UserWithdrawSummaryBO> withdrawMap = convertMap(userIds,
                 userId -> userId,
                 userId -> brokerageWithdrawService.getWithdrawSummaryByUserId(userId, BrokerageWithdrawStatusEnum.AUDIT_SUCCESS));
-
-        return success(BrokerageUserConvert.INSTANCE.convertPage(pageResult, userMap, brokerageUserCountMap, userOrderSummaryMap, withdrawMap));
+        // 拼接返回
+        return success(BrokerageUserConvert.INSTANCE.convertPage(pageResult, userMap, brokerageUserCountMap,
+                userOrderSummaryMap, withdrawMap));
     }
 
 }

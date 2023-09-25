@@ -77,13 +77,15 @@ public class AppBrokerageUserController {
     @PreAuthenticated
     public CommonResult<AppBrokerageUserMySummaryRespVO> getBrokerageUserSummary() {
         Long userId = getLoginUserId();
+        // TODO @疯狂：后面这种，要不也改成 convert；感觉 controller 这样更容易看到整体；核心其实是 86、8/87、9/90、9/91 这阶段
         // 统计 yesterdayPrice、withdrawPrice、firstBrokerageUserCount、secondBrokerageUserCount 字段
         LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
         LocalDateTime beginTime = LocalDateTimeUtil.beginOfDay(yesterday);
         LocalDateTime endTime = LocalDateTimeUtil.endOfDay(yesterday);
         AppBrokerageUserMySummaryRespVO respVO = new AppBrokerageUserMySummaryRespVO()
                 .setYesterdayPrice(brokerageRecordService.getSummaryPriceByUserId(userId, BrokerageRecordBizTypeEnum.ORDER.getType(), beginTime, endTime))
-                .setWithdrawPrice(Optional.ofNullable(brokerageWithdrawService.getWithdrawSummaryByUserId(userId, BrokerageWithdrawStatusEnum.AUDIT_SUCCESS)).map(UserWithdrawSummaryBO::getPrice).orElse(0))
+                .setWithdrawPrice(Optional.ofNullable(brokerageWithdrawService.getWithdrawSummaryByUserId(userId, BrokerageWithdrawStatusEnum.AUDIT_SUCCESS))
+                        .map(UserWithdrawSummaryBO::getPrice).orElse(0))
                 .setBrokeragePrice(0).setFrozenPrice(0)
                 .setFirstBrokerageUserCount(brokerageUserService.getBrokerageUserCountByBindUserId(userId, 1))
                 .setSecondBrokerageUserCount(brokerageUserService.getBrokerageUserCountByBindUserId(userId, 2));

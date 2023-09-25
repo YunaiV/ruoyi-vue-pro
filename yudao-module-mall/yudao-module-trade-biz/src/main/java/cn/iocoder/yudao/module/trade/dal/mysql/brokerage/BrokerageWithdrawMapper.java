@@ -41,4 +41,5 @@ public interface BrokerageWithdrawMapper extends BaseMapperX<BrokerageWithdrawDO
             "WHERE user_id = #{userId} AND status = #{status} AND deleted = FALSE")
     UserWithdrawSummaryBO selectCountAndSumPriceByUserIdAndStatus(@Param("userId") Long userId,
                                                                   @Param("status") Integer status);
+
 }
