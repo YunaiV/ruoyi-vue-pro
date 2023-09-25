@@ -54,6 +54,11 @@ public class TradePriceCalculateRespBO {
     private Integer usePoint;
 
     /**
+     * 使用的积分
+     */
+    private Integer givePoint;
+
+    /**
      * 订单价格
      */
     @Data
@@ -90,6 +95,10 @@ public class TradePriceCalculateRespBO {
          */
         private Integer pointPrice;
         /**
+         * VIP 减免金额，单位：分
+         */
+        private Integer vipPrice;
+        /**
          * 最终购买金额（总），单位：分
          *
          * = {@link #totalPrice}
@@ -97,6 +106,7 @@ public class TradePriceCalculateRespBO {
          * - {@link #pointPrice}
          * - {@link #discountPrice}
          * + {@link #deliveryPrice}
+         * - {@link #vipPrice}
          */
         private Integer payPrice;
 
@@ -159,6 +169,14 @@ public class TradePriceCalculateRespBO {
          */
         private Integer pointPrice;
         /**
+         * 使用的积分
+         */
+        private Integer usePoint;
+        /**
+         * VIP 减免金额，单位：分
+         */
+        private Integer vipPrice;
+        /**
          * 应付金额（总），单位：分
          *
          * = {@link #price} * {@link #count}
@@ -166,6 +184,7 @@ public class TradePriceCalculateRespBO {
          * - {@link #pointPrice}
          * - {@link #discountPrice}
          * + {@link #deliveryPrice}
+         * - {@link #vipPrice}
          */
         private Integer payPrice;
 
@@ -204,6 +223,11 @@ public class TradePriceCalculateRespBO {
          * 商品属性数组
          */
         private List<ProductPropertyValueDetailRespDTO> properties;
+
+        /**
+         * 使用的积分
+         */
+        private Integer givePoint;
 
     }
 

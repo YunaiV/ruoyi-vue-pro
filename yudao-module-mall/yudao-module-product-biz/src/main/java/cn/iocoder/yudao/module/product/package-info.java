@@ -1,5 +1,5 @@
 /**
- * trade 模块，主要实现交易相关功能
+ * product 模块，主要实现交易相关功能
  * 例如：订单、退款、购物车等功能。
  *
  * 1. Controller URL：以 /product/ 开头，避免和其它 Module 冲突

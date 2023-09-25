@@ -36,7 +36,7 @@ public class TradeConfigDO extends BaseDO {
     private Long id;
 
     // ========== 配送相关 ==========
-    // TODO 芋艿：未配置
+
     /**
      * 是否启用全场包邮
      */
@@ -68,7 +68,7 @@ public class TradeConfigDO extends BaseDO {
      * 分销海报图地址数组
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<String> brokeragePostUrls;
+    private List<String> brokeragePosterUrls;
     /**
      * 一级返佣比例
      */
@@ -81,6 +81,10 @@ public class TradeConfigDO extends BaseDO {
      * 用户提现最低金额
      */
     private Integer brokerageWithdrawMinPrice;
+    /**
+     * 用户提现手续费百分比
+     */
+    private Integer brokerageWithdrawFeePercent;
     /**
      * 提现银行
      */
@@ -96,6 +100,6 @@ public class TradeConfigDO extends BaseDO {
      * 枚举 {@link BrokerageWithdrawTypeEnum 对应的类}
      */
     @TableField(typeHandler = IntegerListTypeHandler.class)
-    private List<Integer> brokerageWithdrawType;
+    private List<Integer> brokerageWithdrawTypes;
 
 }

@@ -16,8 +16,13 @@ import java.util.List;
 @Mapper
 public interface SeckillProductMapper extends BaseMapperX<SeckillProductDO> {
 
-    default List<SeckillProductDO> selectListByActivityId(Long id) {
-        return selectList(SeckillProductDO::getActivityId, id);
+    default List<SeckillProductDO> selectListByActivityId(Long activityId) {
+        return selectList(SeckillProductDO::getActivityId, activityId);
+    }
+
+    default SeckillProductDO selectByActivityIdAndSkuId(Long activityId, Long skuId) {
+        return selectOne(SeckillProductDO::getActivityId, activityId,
+                SeckillProductDO::getSkuId, skuId);
     }
 
     default List<SeckillProductDO> selectListByActivityId(Collection<Long> ids) {
@@ -31,7 +36,7 @@ public interface SeckillProductMapper extends BaseMapperX<SeckillProductDO> {
      * @param count 扣减的库存数量
      * @return 影响的行数
      */
-    default int updateActivityStock(Long id, int count) {
+    default int updateStock(Long id, int count) {
         return update(null, new LambdaUpdateWrapper<SeckillProductDO>()
                 .eq(SeckillProductDO::getId, id)
                 .gt(SeckillProductDO::getStock, count)

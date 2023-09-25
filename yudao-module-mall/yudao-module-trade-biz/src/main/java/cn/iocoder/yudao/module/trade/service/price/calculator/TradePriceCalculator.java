@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
  */
 public interface TradePriceCalculator {
 
+    int ORDER_MEMBER_LEVEL = 5;
     int ORDER_DISCOUNT_ACTIVITY = 10;
     int ORDER_REWARD_ACTIVITY = 20;
     int ORDER_COUPON = 30;
@@ -23,6 +24,10 @@ public interface TradePriceCalculator {
      * 放在各种营销活动、优惠劵后面 TODO
      */
     int ORDER_DELIVERY = 50;
+    /**
+     * 赠送积分，放最后
+     */
+    int ORDER_POINT_GIVE = 999;
 
     void calculate(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result);
 

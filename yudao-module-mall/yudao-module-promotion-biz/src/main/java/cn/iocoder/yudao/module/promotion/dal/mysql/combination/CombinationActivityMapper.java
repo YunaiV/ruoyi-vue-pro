@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.dal.mysql.combination;
 
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -26,6 +27,17 @@ public interface CombinationActivityMapper extends BaseMapperX<CombinationActivi
 
     default List<CombinationActivityDO> selectListByStatus(Integer status) {
         return selectList(CombinationActivityDO::getStatus, status);
+    }
+
+    default PageResult<CombinationActivityDO> selectPage(PageParam pageParam, Integer status) {
+        return selectPage(pageParam, new LambdaQueryWrapperX<CombinationActivityDO>()
+                .eq(CombinationActivityDO::getStatus, status));
+    }
+
+    default List<CombinationActivityDO> selectListByStatus(Integer status, Integer count) {
+        return selectList(new LambdaQueryWrapperX<CombinationActivityDO>()
+                .eq(CombinationActivityDO::getStatus, status)
+                .last("LIMIT " + count));
     }
 
 }

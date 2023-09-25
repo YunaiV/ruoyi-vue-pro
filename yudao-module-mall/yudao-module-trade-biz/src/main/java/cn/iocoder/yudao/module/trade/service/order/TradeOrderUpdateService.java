@@ -63,6 +63,22 @@ public interface TradeOrderUpdateService {
     void receiveOrder(Long userId, Long id);
 
     /**
+     * 【会员】取消订单
+     *
+     * @param userId 用户编号
+     * @param id     订单编号
+     */
+    void cancelOrder(Long userId, Long id);
+
+    /**
+     * 【会员】删除订单
+     *
+     * @param userId 用户编号
+     * @param id     订单编号
+     */
+    void deleteOrder(Long userId, Long id);
+
+    /**
      * 【管理员】交易订单备注
      *
      * @param reqVO 请求
@@ -117,11 +133,4 @@ public interface TradeOrderUpdateService {
      */
     Long createOrderItemComment(Long userId, AppTradeOrderItemCommentCreateReqVO createReqVO);
 
-    /**
-     * 【会员】取消订单
-     *
-     * @param userId 用户ID
-     * @param id     订单编号
-     */
-    void cancelOrder(Long userId, Long id);
 }

@@ -12,12 +12,6 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 public interface ErrorCodeConstants {
 
     // ========== Order 模块 1011000000 ==========
-    ErrorCode ORDER_CREATE_SKU_NOT_FOUND = new ErrorCode(1011000001, "商品 SKU 不存在");
-    ErrorCode ORDER_CREATE_SPU_NOT_SALE = new ErrorCode(1011000002, "商品 SPU 不可售卖");
-    ErrorCode ORDER_CREATE_SKU_STOCK_NOT_ENOUGH = new ErrorCode(1011000004, "商品 SKU 库存不足");
-    ErrorCode ORDER_CREATE_SPU_NOT_FOUND = new ErrorCode(1011000005, "商品 SPU 不可售卖");
-    ErrorCode ORDER_CREATE_ADDRESS_NOT_FOUND = new ErrorCode(1011000006, "收货地址不存在");
-
     ErrorCode ORDER_ITEM_NOT_FOUND = new ErrorCode(1011000010, "交易订单项不存在");
     ErrorCode ORDER_NOT_FOUND = new ErrorCode(1011000011, "交易订单不存在");
     ErrorCode ORDER_ITEM_UPDATE_AFTER_SALE_STATUS_FAIL = new ErrorCode(1011000012, "交易订单项更新售后状态失败，请重试");
@@ -37,6 +31,7 @@ public interface ErrorCodeConstants {
     ErrorCode ORDER_UPDATE_PRICE_FAIL_PAID = new ErrorCode(1011000026, "支付订单调价失败，原因：支付订单已付款,不能调价");
     ErrorCode ORDER_UPDATE_PRICE_FAIL_EQUAL = new ErrorCode(1011000027, "支付订单调价失败，原因：价格没有变化");
     ErrorCode ORDER_UPDATE_PRICE_FAIL_NOT_ITEM = new ErrorCode(1011000028, "支付订单调价失败，原因：订单项不存在");
+    ErrorCode ORDER_DELETE_FAIL_STATUS_NOT_CANCEL = new ErrorCode(1011000029, "交易订单删除失败，订单不是【已取消】状态");
 
     // ========== After Sale 模块 1011000100 ==========
     ErrorCode AFTER_SALE_NOT_FOUND = new ErrorCode(1011000100, "售后单不存在");
@@ -58,9 +53,8 @@ public interface ErrorCodeConstants {
 
     // ========== Price 相关 1011003000 ============
     ErrorCode PRICE_CALCULATE_PAY_PRICE_ILLEGAL = new ErrorCode(1011003000, "支付价格计算异常，原因：价格小于等于 0");
-    ErrorCode PRICE_CALCULATE_DELIVERY_PRICE_USER_ADDRESS_IS_EMPTY = new ErrorCode(1011003001, "计算快递运费异常，收件人地址编号为空");
     ErrorCode PRICE_CALCULATE_DELIVERY_PRICE_TEMPLATE_NOT_FOUND = new ErrorCode(1011003002, "计算快递运费异常，找不到对应的运费模板");
-    ErrorCode PRICE_CALCULATE_DELIVERY_PRICE_PICK_UP_STORE_IS_EMPTY = new ErrorCode(1011003003, "计算快递运费异常，自提点为空");
+    ErrorCode PRICE_CALCULATE_COUPON_NOT_MATCH_NORMAL_ORDER = new ErrorCode(1011003004, "参与秒杀、拼团、砍价的营销商品，无法使用优惠劵");
 
     // ========== 物流 Express 模块 1011004000 ==========
     ErrorCode EXPRESS_NOT_EXISTS = new ErrorCode(1011004000, "快递公司不存在");
@@ -93,5 +87,7 @@ public interface ErrorCodeConstants {
     // ========== 分销提现 模块 1011008000 ==========
     ErrorCode BROKERAGE_WITHDRAW_NOT_EXISTS = new ErrorCode(1011008000, "佣金提现记录不存在");
     ErrorCode BROKERAGE_WITHDRAW_STATUS_NOT_AUDITING = new ErrorCode(1011008001, "佣金提现记录状态不是审核中");
+    ErrorCode BROKERAGE_WITHDRAW_MIN_PRICE = new ErrorCode(1011008002, "提现金额不能低于 {} 元");
+    ErrorCode BROKERAGE_WITHDRAW_USER_BALANCE_NOT_ENOUGH = new ErrorCode(1011008003, "您当前最多可提现 {} 元");
 
 }

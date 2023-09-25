@@ -75,16 +75,18 @@ public class BargainActivityServiceImpl implements BargainActivityService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void updateBargainActivityStock(Long id, Integer count) {
         // 查询砍价活动
         BargainActivityDO activity = getBargainActivity(id);
         if (activity == null) {
             throw exception(BARGAIN_ACTIVITY_NOT_EXISTS);
         }
+        if (count > activity.getStock()) {
+            throw exception(BARGAIN_ACTIVITY_UPDATE_STOCK_FAIL);
+        }
 
         // 更新砍价库存
-        int updateCount = bargainActivityMapper.updateActivityStock(id, count);
+        int updateCount = bargainActivityMapper.updateStock(id, count);
         if (updateCount == 0) {
             throw exception(BARGAIN_ACTIVITY_UPDATE_STOCK_FAIL);
         }
@@ -114,7 +116,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
     public void deleteBargainActivity(Long id) {
         // 校验存在
         BargainActivityDO activityDO = validateBargainActivityExists(id);
-        // 校验状态
+        // 校验状态 TODO puhui: 测试完成后需要恢复校验
         //if (ObjectUtil.equal(activityDO.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
         //    throw exception(BARGAIN_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END);
         //}
@@ -142,21 +144,14 @@ public class BargainActivityServiceImpl implements BargainActivityService {
     }
 
     @Override
-    public PageResult<BargainActivityDO> getBargainActivityPageForApp(PageParam pageReqVO) {
+    public PageResult<BargainActivityDO> getBargainActivityPage(PageParam pageReqVO) {
         // 只查询进行中，且在时间范围内的
-        return bargainActivityMapper.selectAppPage(pageReqVO, CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now());
+        return bargainActivityMapper.selectPage(pageReqVO, CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now());
     }
 
     @Override
-    public List<BargainActivityDO> getBargainActivityListForApp(Integer count) {
-        // TODO @puhui999：这种 default count 的逻辑，可以放到 controller 哈；然后可以使用 ObjectUtils.default 方法
-        if (count == null) {
-            count = 6;
-        }
-        // TODO @puhui999：这种不要用 page；会浪费一次 count；
-        PageResult<BargainActivityDO> result = bargainActivityMapper.selectAppPage(new PageParam().setPageSize(count),
-                CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now());
-        return result.getList();
+    public List<BargainActivityDO> getBargainActivityListByCount(Integer count) {
+        return bargainActivityMapper.selectList(count, CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now());
     }
 
 }

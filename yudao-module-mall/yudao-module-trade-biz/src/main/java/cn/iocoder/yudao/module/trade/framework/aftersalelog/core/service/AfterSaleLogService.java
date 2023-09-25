@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.trade.framework.aftersalelog.core.service;
 
 
+import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.log.TradeAfterSaleLogRespVO;
 import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.dto.TradeAfterSaleLogCreateReqDTO;
-import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.dto.TradeAfterSaleLogRespDTO;
 
 import java.util.List;
 
@@ -29,6 +29,6 @@ public interface AfterSaleLogService {
      * @param afterSaleId 售后编号
      * @return 售后日志
      */
-    List<TradeAfterSaleLogRespDTO> getLog(Long afterSaleId);
+    List<TradeAfterSaleLogRespVO> getLog(Long afterSaleId);
 
 }

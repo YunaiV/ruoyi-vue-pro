@@ -52,13 +52,14 @@ public class TradePriceCalculatorHelper {
                     .setCount(item.getCount()).setCartId(item.getCartId()).setSelected(item.getSelected());
             // sku 价格
             orderItem.setPrice(sku.getPrice()).setPayPrice(sku.getPrice() * item.getCount())
-                    .setDiscountPrice(0).setDeliveryPrice(0).setCouponPrice(0).setPointPrice(0);
+                    .setDiscountPrice(0).setDeliveryPrice(0).setCouponPrice(0).setPointPrice(0).setVipPrice(0);
             // sku 信息
             orderItem.setPicUrl(sku.getPicUrl()).setProperties(sku.getProperties())
                     .setWeight(sku.getWeight()).setVolume(sku.getVolume());
             // spu 信息
             orderItem.setSpuName(spu.getName()).setCategoryId(spu.getCategoryId())
-                    .setDeliveryTemplateId(spu.getDeliveryTemplateId());
+                    .setDeliveryTemplateId(spu.getDeliveryTemplateId())
+                    .setGivePoint(spu.getGiveIntegral()).setUsePoint(0);
             if (orderItem.getPicUrl() == null) {
                 orderItem.setPicUrl(spu.getPicUrl());
             }
@@ -67,6 +68,7 @@ public class TradePriceCalculatorHelper {
         // 创建它的 Price 属性
         result.setPrice(new TradePriceCalculateRespBO.Price());
         recountAllPrice(result);
+        recountAllGivePoint(result);
         return result;
     }
 
@@ -96,7 +98,7 @@ public class TradePriceCalculatorHelper {
         // 先重置
         TradePriceCalculateRespBO.Price price = result.getPrice();
         price.setTotalPrice(0).setDiscountPrice(0).setDeliveryPrice(0)
-                .setCouponPrice(0).setPointPrice(0).setPayPrice(0);
+                .setCouponPrice(0).setPointPrice(0).setVipPrice(0).setPayPrice(0);
         // 再合计 item
         result.getItems().forEach(item -> {
             if (!item.getSelected()) {
@@ -107,8 +109,18 @@ public class TradePriceCalculatorHelper {
             price.setDeliveryPrice(price.getDeliveryPrice() + item.getDeliveryPrice());
             price.setCouponPrice(price.getCouponPrice() + item.getCouponPrice());
             price.setPointPrice(price.getPointPrice() + item.getPointPrice());
+            price.setVipPrice(price.getVipPrice() + item.getVipPrice());
             price.setPayPrice(price.getPayPrice() + item.getPayPrice());
         });
+    }
+
+    /**
+     * 基于订单项，重新计算赠送积分
+     *
+     * @param result 计算结果
+     */
+    public static void recountAllGivePoint(TradePriceCalculateRespBO result) {
+        result.setGivePoint(getSumValue(result.getItems(), item -> item.getSelected() ? item.getGivePoint() : 0, Integer::sum));
     }
 
     /**
@@ -117,11 +129,13 @@ public class TradePriceCalculatorHelper {
      * @param orderItem 订单项
      */
     public static void recountPayPrice(TradePriceCalculateRespBO.OrderItem orderItem) {
-        orderItem.setPayPrice(orderItem.getPrice()* orderItem.getCount()
+        orderItem.setPayPrice(orderItem.getPrice() * orderItem.getCount()
                 - orderItem.getDiscountPrice()
                 + orderItem.getDeliveryPrice()
                 - orderItem.getCouponPrice()
-                - orderItem.getPointPrice());
+                - orderItem.getPointPrice()
+                - orderItem.getVipPrice()
+        );
     }
 
     /**
@@ -144,6 +158,15 @@ public class TradePriceCalculatorHelper {
             }
             if (orderItem.getPointPrice() == null) {
                 orderItem.setPointPrice(0);
+            }
+            if (orderItem.getUsePoint() == null) {
+                orderItem.setUsePoint(0);
+            }
+            if (orderItem.getGivePoint() == null) {
+                orderItem.setGivePoint(0);
+            }
+            if (orderItem.getVipPrice() == null) {
+                orderItem.setVipPrice(0);
             }
             recountPayPrice(orderItem);
         });
@@ -169,7 +192,7 @@ public class TradePriceCalculatorHelper {
      */
     public static Integer calculateTotalCount(List<TradePriceCalculateRespBO.OrderItem> orderItems) {
         return getSumValue(orderItems,
-                orderItem -> orderItem.getSelected() ? orderItem.getCount() :  0, // 未选中的情况下，不计算数量
+                orderItem -> orderItem.getSelected() ? orderItem.getCount() : 0, // 未选中的情况下，不计算数量
                 Integer::sum);
     }
 
@@ -177,7 +200,7 @@ public class TradePriceCalculatorHelper {
      * 按照支付金额，返回每个订单项的分摊金额数组
      *
      * @param orderItems 订单项数组
-     * @param price 金额
+     * @param price      金额
      * @return 分摊金额数组，和传入的 orderItems 一一对应
      */
     public static List<Integer> dividePrice(List<TradePriceCalculateRespBO.OrderItem> orderItems, Integer price) {
@@ -210,12 +233,12 @@ public class TradePriceCalculatorHelper {
     /**
      * 添加【匹配】单个 OrderItem 的营销明细
      *
-     * @param result 价格计算结果
+     * @param result        价格计算结果
      * @param orderItem     单个订单商品 SKU
-     * @param id             营销编号
-     * @param name           营销名字
-     * @param description    满足条件的提示
-     * @param type           营销类型
+     * @param id            营销编号
+     * @param name          营销名字
+     * @param description   满足条件的提示
+     * @param type          营销类型
      * @param discountPrice 单个订单商品 SKU 的优惠价格（总）
      */
     public static void addPromotion(TradePriceCalculateRespBO result, TradePriceCalculateRespBO.OrderItem orderItem,
@@ -226,7 +249,7 @@ public class TradePriceCalculatorHelper {
     /**
      * 添加【匹配】多个 OrderItem 的营销明细
      *
-     * @param result 价格计算结果
+     * @param result         价格计算结果
      * @param orderItems     多个订单商品 SKU
      * @param id             营销编号
      * @param name           营销名字
@@ -235,7 +258,7 @@ public class TradePriceCalculatorHelper {
      * @param discountPrices 多个订单商品 SKU 的优惠价格（总），和 orderItems 一一对应
      */
     public static void addPromotion(TradePriceCalculateRespBO result, List<TradePriceCalculateRespBO.OrderItem> orderItems,
-                              Long id, String name, Integer type, String description, List<Integer> discountPrices) {
+                                    Long id, String name, Integer type, String description, List<Integer> discountPrices) {
         // 创建营销明细 Item
         List<TradePriceCalculateRespBO.PromotionItem> promotionItems = new ArrayList<>(discountPrices.size());
         for (int i = 0; i < orderItems.size(); i++) {
@@ -255,12 +278,12 @@ public class TradePriceCalculatorHelper {
     /**
      * 添加【不匹配】多个 OrderItem 的营销明细
      *
-     * @param result 价格计算结果
-     * @param orderItems     多个订单商品 SKU
-     * @param id             营销编号
-     * @param name           营销名字
-     * @param description    满足条件的提示
-     * @param type           营销类型
+     * @param result      价格计算结果
+     * @param orderItems  多个订单商品 SKU
+     * @param id          营销编号
+     * @param name        营销名字
+     * @param description 满足条件的提示
+     * @param type        营销类型
      */
     public static void addNotMatchPromotion(TradePriceCalculateRespBO result, List<TradePriceCalculateRespBO.OrderItem> orderItems,
                                             Long id, String name, Integer type, String description) {

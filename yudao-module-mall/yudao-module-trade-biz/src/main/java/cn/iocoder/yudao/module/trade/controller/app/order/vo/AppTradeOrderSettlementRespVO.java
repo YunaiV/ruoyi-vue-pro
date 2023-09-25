@@ -82,6 +82,9 @@ public class AppTradeOrderSettlementRespVO {
         @Schema(description = "积分抵扣的金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "50")
         private Integer pointPrice;
 
+        @Schema(description = "VIP 减免金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "30")
+        private Integer vipPrice;
+
         @Schema(description = "实际支付金额（总），单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "450")
         private Integer payPrice;
 

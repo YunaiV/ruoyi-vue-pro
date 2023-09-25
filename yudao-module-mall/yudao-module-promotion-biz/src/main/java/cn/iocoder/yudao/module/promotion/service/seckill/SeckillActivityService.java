@@ -37,11 +37,11 @@ public interface SeckillActivityService {
     /**
      * 更新秒杀库存
      *
-     * @param activityId 活动编号
+     * @param id 活动编号
      * @param skuId      sku 编号
      * @param count      数量
      */
-    void updateSeckillStock(Long activityId, Long skuId, Integer count);
+    void updateSeckillStock(Long id, Long skuId, Integer count);
 
     /**
      * 关闭秒杀活动
@@ -96,6 +96,15 @@ public interface SeckillActivityService {
      * @return 秒杀活动列表
      */
     List<SeckillActivityDO> getSeckillActivityListByConfigIds(Collection<Long> ids);
+
+    /**
+     * 通过活动时段编号获取指定 status 的秒杀活动
+     *
+     * @param configId 时段配置编号
+     * @param status   状态
+     * @return 秒杀活动列表
+     */
+    List<SeckillActivityDO> getSeckillActivityListByConfigIdAndStatus(Long configId, Integer status);
 
     /**
      * 通过活动时段获取秒杀活动

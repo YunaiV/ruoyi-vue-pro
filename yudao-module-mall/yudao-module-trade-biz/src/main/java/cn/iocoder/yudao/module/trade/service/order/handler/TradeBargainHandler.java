@@ -20,14 +20,17 @@ public class TradeBargainHandler implements TradeOrderHandler {
     @Resource
     private BargainActivityApi bargainActivityApi;
 
+    // TODO @puhui999：先临时写在这里；在价格计算时，如果是秒杀商品，需要校验如下条件：
+    // 1. 商品存在、库存充足、单次限购；
+    // 2. 活动进行中、时间段符合
+
     @Override
     public void beforeOrderCreate(TradeBeforeOrderCreateReqBO reqBO) {
         // 如果是砍价订单
         if (ObjectUtil.notEqual(TradeOrderTypeEnum.BARGAIN.getType(), reqBO.getOrderType())) {
             return;
         }
-
-        // 额外扣减砍价的库存
+        // 扣减砍价活动的库存
         bargainActivityApi.updateBargainActivityStock(reqBO.getBargainActivityId(), reqBO.getCount());
     }
 

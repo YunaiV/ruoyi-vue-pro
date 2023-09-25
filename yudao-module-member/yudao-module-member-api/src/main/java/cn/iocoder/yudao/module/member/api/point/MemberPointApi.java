@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.member.api.point;
 
+import cn.iocoder.yudao.module.member.api.point.dto.MemberPointConfigRespDTO;
 import cn.iocoder.yudao.module.member.enums.point.MemberPointBizTypeEnum;
 
 import javax.validation.constraints.Min;
@@ -10,6 +11,13 @@ import javax.validation.constraints.Min;
  * @author owen
  */
 public interface MemberPointApi {
+
+    /**
+     * 获得积分配置
+     *
+     * @return 积分配置
+     */
+    MemberPointConfigRespDTO getConfig();
 
     /**
      * 增加用户积分

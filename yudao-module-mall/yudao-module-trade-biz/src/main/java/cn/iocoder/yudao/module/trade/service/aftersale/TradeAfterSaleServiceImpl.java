@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleDisagreeReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSalePageReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleRefuseReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.log.TradeAfterSaleLogRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.convert.aftersale.TradeAfterSaleConvert;
@@ -26,7 +27,6 @@ import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleWayEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.dto.TradeAfterSaleLogCreateReqDTO;
-import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.dto.TradeAfterSaleLogRespDTO;
 import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.service.AfterSaleLogService;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
@@ -449,8 +449,9 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
         }
     }
 
+    // TODO @puhui999：应该返回 do 哈。
     @Override
-    public List<TradeAfterSaleLogRespDTO> getLog(Long afterSaleId) {
+    public List<TradeAfterSaleLogRespVO> getLog(Long afterSaleId) {
         // TODO 不熟悉流程先这么滴
         List<TradeAfterSaleLogDO> saleLogDOs = tradeAfterSaleLogMapper.selectList(TradeAfterSaleLogDO::getAfterSaleId, afterSaleId);
         return TradeAfterSaleConvert.INSTANCE.convertList(saleLogDOs);

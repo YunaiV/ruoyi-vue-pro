@@ -111,6 +111,11 @@ public class ProductSpuRespDTO {
     // ========== 物流相关字段 =========
 
     /**
+     * 赠送积分
+     */
+    private Integer giveIntegral;
+
+    /**
      * 物流配置模板编号
      *
      * 对应 TradeDeliveryExpressTemplateDO 的 id 编号
@@ -131,5 +136,16 @@ public class ProductSpuRespDTO {
      * 商品点击量
      */
     private Integer clickCount;
+
+
+    // ========== 分销相关字段 =========
+
+    /**
+     * 分销类型
+     *
+     * false - 默认
+     * true - 自行设置
+     */
+    private Boolean subCommissionType;
 
 }

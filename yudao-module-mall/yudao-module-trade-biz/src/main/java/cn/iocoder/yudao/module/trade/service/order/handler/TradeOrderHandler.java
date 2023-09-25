@@ -24,9 +24,12 @@ public interface TradeOrderHandler {
      */
     void afterOrderCreate(TradeAfterOrderCreateReqBO reqBO);
 
+    // TODO @puhui999：这个搞成订单取消
     /**
      * 回滚
      */
     void rollback();
+
+    // TODO @puhui999：再搞个订单项取消哈
 
 }

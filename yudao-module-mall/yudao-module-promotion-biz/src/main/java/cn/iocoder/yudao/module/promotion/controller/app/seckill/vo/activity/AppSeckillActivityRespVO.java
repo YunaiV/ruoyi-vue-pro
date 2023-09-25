@@ -25,6 +25,9 @@ public class AppSeckillActivityRespVO {
     // 从 SPU 的 marketPrice 读取
     private Integer marketPrice;
 
+    @Schema(description = "秒杀活动状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    private Integer status;
+
     @Schema(description = "秒杀库存（剩余）", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
     private Integer stock;
     @Schema(description = "秒杀库存（总共）", requiredMode = Schema.RequiredMode.REQUIRED, example = "200")
