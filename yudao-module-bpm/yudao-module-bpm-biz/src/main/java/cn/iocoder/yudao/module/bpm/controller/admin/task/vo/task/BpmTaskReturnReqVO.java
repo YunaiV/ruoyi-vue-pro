@@ -14,10 +14,11 @@ public class BpmTaskReturnReqVO {
     private String id;
 
     @Schema(description = "回退到的任务 Key", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @NotEmpty(message = "回退到的任务Key不能为空")
+    @NotEmpty(message = "回退到的任务 Key 不能为空")
     private String targetDefinitionKey;
 
-    @Schema(description = "回退意见", example = "")
+    @Schema(description = "回退意见", requiredMode = Schema.RequiredMode.REQUIRED, example = "我就是想驳回")
+    @NotEmpty(message = "回退意见不能为空")
     private String reason;
 
 }

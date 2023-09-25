@@ -140,8 +140,7 @@ public interface BpmTaskConvert {
         return reqDTO;
     }
 
-    @Mapping(source = "taskDefinitionKey", target = "id")
-    default List<BpmTaskSimpleRespVO> convertList(List<FlowElement> elementList) {
+    default List<BpmTaskSimpleRespVO> convertList(List<? extends FlowElement> elementList) {
         return CollectionUtils.convertList(elementList, element -> new BpmTaskSimpleRespVO()
                 .setName(element.getName())
                 .setDefinitionKey(element.getId()));

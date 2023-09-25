@@ -8,7 +8,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
-import cn.iocoder.yudao.framework.flowable.core.util.ModelUtils;
+import cn.iocoder.yudao.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
@@ -65,22 +65,23 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     private TaskService taskService;
     @Resource
     private HistoryService historyService;
+    @Resource
+    private RuntimeService runtimeService;
 
     @Resource
     private BpmProcessInstanceService processInstanceService;
     @Resource
+    private BpmModelService bpmModelService;
+    @Resource
+    private BpmMessageService messageService;
+
+    @Resource
     private AdminUserApi adminUserApi;
     @Resource
     private DeptApi deptApi;
+
     @Resource
     private BpmTaskExtMapper taskExtMapper;
-    @Resource
-    private BpmMessageService messageService;
-    @Resource
-    private BpmModelService bpmModelService;
-    @Resource
-    private RuntimeService runtimeService;
-
 
     @Override
     public PageResult<BpmTaskTodoPageItemRespVO> getTodoTaskPage(Long userId, BpmTaskTodoPageReqVO pageVO) {
@@ -359,144 +360,127 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         return task;
     }
 
-    private HistoricTaskInstance getHistoricTask(String id) {
-        return historyService.createHistoricTaskInstanceQuery().taskId(id).singleResult();
-    }
-
-    @Override
-    public List<BpmTaskSimpleRespVO> getReturnTaskList(String taskId) {
+    /**
+     * 校验任务是否合法
+     *
+     * @param taskId 任务编号
+     * @return 任务
+     */
+    private Task validateTask(String taskId) {
         // 当前任务 task
         Task task = getTask(taskId);
-        // 根据流程定义获取流程模型信息
-        BpmnModel bpmnModel = bpmModelService.getBpmnModelByDefinitionId(task.getProcessDefinitionId());
-        // 查询该任务的前置任务节点的key集合
-        Set<String> historyTaksDefinitionKeySet = getPreTaskByCurrentTask(task, bpmnModel);
-        if (CollUtil.isEmpty(historyTaksDefinitionKeySet)) {
-            return Collections.emptyList();
+        if (task == null) {
+            throw exception(TASK_NOT_EXISTS);
         }
-        // 获取当前任务节点元素
-        FlowElement source = ModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
-        List<FlowElement> elementList = new ArrayList<>();
-        for (String activityId : historyTaksDefinitionKeySet) {
-            FlowElement target = ModelUtils.getFlowElementById(bpmnModel, activityId);
-            //非 串行和子流程则加入返回节点 elementList
-            boolean isSequential = ModelUtils.isSequentialReachable(source, target, new HashSet<>());
-            if (isSequential) {
-                elementList.add(target);
-            }
-        }
-        return BpmTaskConvert.INSTANCE.convertList(elementList);
-    }
-
-    /**
-     * 查询当前流程实例符合条件可回退的 taskDefinitionKey 集合
-     *
-     * @param task      当前任务
-     * @param bpmnModel 当前流程定义对应的流程模型
-     * @return 符合条件的已去重的 taskDefinitionKey集合
-     */
-    private Set<String> getPreTaskByCurrentTask(Task task, BpmnModel bpmnModel) {
-        // 获取当前任务节点元素
-        FlowElement source = ModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
-        //拿到当前任务节点的前置节点集合
-        List<UserTask> preUserTaskList = ModelUtils.getPreUserTaskList(source, null, null);
-        //需要保证这些节点都是在该source节点之前的
-        if (CollUtil.isNotEmpty(preUserTaskList)) {
-            return convertSet(preUserTaskList, UserTask::getId);
-        }
-        return Collections.emptySet();
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void returnTask(BpmTaskReturnReqVO reqVO) {
-        // 当前任务 task
-        Task task = validateReturnTask(reqVO.getId());
-        // 校验源头和目标节点的关系，并返回目标元素
-        FlowElement targetElement = validateReturnProcessDefinition(task.getTaskDefinitionKey(), reqVO.getTargetDefinitionKey(), task.getProcessDefinitionId());
-        //调用flowable框架的回退逻辑
-        this.handlerReturn(task, targetElement, reqVO);
-        // 更新任务扩展表
-        taskExtMapper.updateByTaskId(
-                new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.BACK.getResult())
-                        .setEndTime(LocalDateTime.now()).setReason(reqVO.getReason()));
-    }
-
-    /**
-     * 校验当前流程是否可以操作回退
-     *
-     * @param taskId 当前任务ID
-     * @return
-     */
-    private Task validateReturnTask(String taskId) {
-        // 当前任务 task
-        Task task = getTask(taskId);
         if (task.isSuspended()) {
             throw exception(TASK_IS_PENDING);
         }
         return task;
     }
 
+    private HistoricTaskInstance getHistoricTask(String id) {
+        return historyService.createHistoricTaskInstanceQuery().taskId(id).singleResult();
+    }
+
+    @Override
+    public List<BpmTaskSimpleRespVO> getReturnTaskList(String taskId) {
+        // 1. 校验当前任务 task 存在
+        Task task = getTask(taskId);
+        if (task == null) {
+            throw exception(TASK_NOT_EXISTS);
+        }
+        // 根据流程定义获取流程模型信息
+        BpmnModel bpmnModel = bpmModelService.getBpmnModelByDefinitionId(task.getProcessDefinitionId());
+        FlowElement source = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
+        if (source == null) {
+            throw exception(TASK_NOT_EXISTS);
+        }
+
+        // 2.1 查询该任务的前置任务节点的 key 集合
+        List<UserTask> previousUserList = BpmnModelUtils.getPreviousUserTaskList(source, null, null);
+        if (CollUtil.isEmpty(previousUserList)) {
+            return Collections.emptyList();
+        }
+        // 2.2 过滤：只有串行可到达的节点，才可以回退。类似非串行、子流程无法退回
+        previousUserList.removeIf(userTask -> !BpmnModelUtils.isSequentialReachable(source, userTask, null));
+        return BpmTaskConvert.INSTANCE.convertList(previousUserList);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void returnTask(BpmTaskReturnReqVO reqVO) {
+        // 1.1 当前任务 task
+        Task task = validateTask(reqVO.getId());
+        // 1.2 校验源头和目标节点的关系，并返回目标元素
+        FlowElement targetElement = validateTargetTaskCanReturn(task.getTaskDefinitionKey(), reqVO.getTargetDefinitionKey(), task.getProcessDefinitionId());
+
+        // 2. 调用 flowable 框架的回退逻辑
+        returnTask0(task, targetElement, reqVO);
+
+        // 3. 更新任务扩展表
+        taskExtMapper.updateByTaskId(new BpmTaskExtDO().setTaskId(task.getId())
+                .setResult(BpmProcessInstanceResultEnum.BACK.getResult())
+                .setEndTime(LocalDateTime.now()).setReason(reqVO.getReason()));
+    }
+
     /**
-     * 回退流程节点时，校验源头节点和目标节点的关系
+     * 回退流程节点时，校验目标任务节点是否可回退
      *
-     * @param sourceKey           当前任务节点Key
-     * @param targetKey           目标任务节点key
-     * @param processDefinitionId 当前流程定义ID
-     * @return 目标元素
+     * @param sourceKey           当前任务节点 Key
+     * @param targetKey           目标任务节点 key
+     * @param processDefinitionId 当前流程定义 ID
+     * @return 目标任务节点元素
      */
-    private FlowElement validateReturnProcessDefinition(String sourceKey, String targetKey, String processDefinitionId) {
-        // 获取流程模型信息
+    private FlowElement validateTargetTaskCanReturn(String sourceKey, String targetKey, String processDefinitionId) {
+        // 1.1 获取流程模型信息
         BpmnModel bpmnModel = bpmModelService.getBpmnModelByDefinitionId(processDefinitionId);
-        // 获取当前任务节点元素
-        FlowElement source = ModelUtils.getFlowElementById(bpmnModel, sourceKey);
-        // 获取跳转的节点元素
-        FlowElement target = ModelUtils.getFlowElementById(bpmnModel, targetKey);
-        if (null == target) {
+        // 1.3 获取当前任务节点元素
+        FlowElement source = BpmnModelUtils.getFlowElementById(bpmnModel, sourceKey);
+        // 1.3 获取跳转的节点元素
+        FlowElement target = BpmnModelUtils.getFlowElementById(bpmnModel, targetKey);
+        if (target == null) {
             throw exception(TASK_TARGET_NODE_NOT_EXISTS);
         }
-        // 从当前节点向前扫描，判断当前节点与目标节点是否属于串行，若目标节点是在并行网关上或非同一路线上，不可跳转
-        boolean isSequential = ModelUtils.isSequentialReachable(source, target, new HashSet<>());
-        if (!isSequential) {
-            throw exception(TASK_SOURCE_TARGET_ERROR);
+
+        // 2.2 只有串行可到达的节点，才可以回退。类似非串行、子流程无法退回
+        if (!BpmnModelUtils.isSequentialReachable(source, target, null)) {
+            throw exception(TASK_RETURN_FAIL_SOURCE_TARGET_ERROR);
         }
         return target;
     }
 
     /**
-     * 处理回退逻辑
+     * 执行回退逻辑
      *
-     * @param task          当前回退的任务
+     * @param currentTask          当前回退的任务
      * @param targetElement 需要回退到的目标任务
      * @param reqVO         前端参数封装
      */
-    public void handlerReturn(Task task, FlowElement targetElement, BpmTaskReturnReqVO reqVO) {
-        // 获取所有正常进行的任务节点 Key，这些任务不能直接使用，需要找出其中需要撤回的任务
-        List<Task> runTaskList = taskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).list();
-        List<String> runTaskKeyList = convertList(runTaskList, Task::getTaskDefinitionKey);
-        // 通过 targetElement 的出口连线，结合 runTaskList 比对，获取需要撤回的任务 key
-        List<UserTask> returnUserTaskList = ModelUtils.iteratorFindChildUserTasks(targetElement, runTaskKeyList, null, null);
-        // 需退回任务 key
-        List<String> returnTaskDefinitionKeyList = convertList(returnUserTaskList, UserTask::getId);
+    public void returnTask0(Task currentTask, FlowElement targetElement, BpmTaskReturnReqVO reqVO) {
+        // 1. 获得所有需要回撤的任务 taskDefinitionKey，用于稍后的 moveActivityIdsToSingleActivityId 回撤
+        // 1.1 获取所有正常进行的任务节点 Key
+        List<Task> taskList = taskService.createTaskQuery().processInstanceId(currentTask.getProcessInstanceId()).list();
+        List<String> runTaskKeyList = convertList(taskList, Task::getTaskDefinitionKey);
+        // 1.2 通过 targetElement 的出口连线，计算在 runTaskKeyList 有哪些 key 需要被撤回
+        // 为什么不直接使用 runTaskKeyList 呢？因为可能存在多个审批分支，例如说：A -> B -> C 和 D -> F，而只要 C 撤回到 A，需要排除掉 F
+        List<UserTask> returnUserTaskList = BpmnModelUtils.iteratorFindChildUserTasks(targetElement, runTaskKeyList, null, null);
+        List<String> returnTaskKeyList = convertList(returnUserTaskList, UserTask::getId);
 
-        // 通过 key 和 runTaskList 中的key对比，拿到任务ID，设置设置回退意见
-        List<String> currentTaskIds = new ArrayList<>();
-        returnTaskDefinitionKeyList.forEach(currentId -> runTaskList.forEach(runTask -> {
-            if (currentId.equals(runTask.getTaskDefinitionKey())) {
-                currentTaskIds.add(runTask.getId());
+        // 2. 给当前要被回退的 task 数组，设置回退意见
+        taskList.forEach(task -> {
+            // 需要排除掉，不需要设置回退意见的任务
+            if (!returnTaskKeyList.contains(task.getTaskDefinitionKey())) {
+                return;
             }
-        }));
-        if (CollUtil.isEmpty(currentTaskIds)) {
-            throw exception(TASK_RETURN_FAIL);
-        }
-        // 设置回退意见
-        for (String currentTaskId : currentTaskIds) {
-            taskService.addComment(currentTaskId, task.getProcessInstanceId(), BpmProcessInstanceResultEnum.BACK.getResult().toString(), reqVO.getReason());
-        }
-        // 1 对 1 或 多 对 1 情况，currentIds 当前要跳转的节点列表(1或多)，targetKey 跳转到的节点(1)
+            taskService.addComment(task.getId(), currentTask.getProcessInstanceId(),
+                    BpmProcessInstanceResultEnum.BACK.getResult().toString(), reqVO.getReason());
+        });
+
+        // 3. 执行驳回
         runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(task.getProcessInstanceId())
-                .moveActivityIdsToSingleActivityId(returnTaskDefinitionKeyList, reqVO.getTargetDefinitionKey())
+                .processInstanceId(currentTask.getProcessInstanceId())
+                .moveActivityIdsToSingleActivityId(returnTaskKeyList, // 当前要跳转的节点列表( 1 或多)
+                        reqVO.getTargetDefinitionKey()) // targetKey 跳转到的节点(1)
                 .changeState();
     }
 
