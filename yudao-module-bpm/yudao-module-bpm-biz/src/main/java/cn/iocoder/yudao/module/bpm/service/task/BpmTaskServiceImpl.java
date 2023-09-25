@@ -492,6 +492,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 添加审批意见
         AdminUserRespDTO currentUser = adminUserApi.getUser(WebFrameworkUtils.getLoginUserId());
         AdminUserRespDTO receiveUser = adminUserApi.getUser(reqVO.getReceiveId());
+        if (receiveUser == null) {
+            throw exception(TASK_DELEGATE_RECEIVE_USER_NULL);
+        }
         String comment = String.format("[%s]将任务委派给[%s]，委派理由为:%s", currentUser.getNickname(),
                 receiveUser.getNickname(), reqVO.getReason());
         String taskId = reqVO.getId();
