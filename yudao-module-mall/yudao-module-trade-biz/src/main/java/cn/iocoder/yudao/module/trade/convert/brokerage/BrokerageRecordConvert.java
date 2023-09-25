@@ -4,6 +4,7 @@ import cn.hutool.core.math.Money;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.record.BrokerageRecordPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.record.BrokerageRecordRespVO;
@@ -51,7 +52,7 @@ public interface BrokerageRecordConvert {
                 .setBizType(bizType.getType()).setBizId(bizId)
                 .setPrice(brokeragePrice).setTotalPrice(user.getBrokeragePrice())
                 .setTitle(title)
-                .setDescription(StrUtil.format(bizType.getDescription(), new Money(0, Math.abs(brokeragePrice))))
+                .setDescription(StrUtil.format(bizType.getDescription(), MoneyUtils.fenToYuanStr(Math.abs(brokeragePrice))))
                 .setStatus(status).setFrozenDays(brokerageFrozenDays).setUnfreezeTime(unfreezeTime)
                 .setSourceUserLevel(sourceUserLevel).setSourceUserId(sourceUserId);
     }

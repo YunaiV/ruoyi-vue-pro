@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.trade.service.brokerage;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.math.Money;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
@@ -18,6 +17,7 @@ import cn.iocoder.yudao.module.trade.enums.MessageTemplateConstants;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawTypeEnum;
+import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserWithdrawSummaryBO;
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -93,7 +93,7 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
         // 4. 通知用户
         Map<String, Object> templateParams = MapUtil.<String, Object>builder()
                 .put("createTime", LocalDateTimeUtil.formatNormal(withdraw.getCreateTime()))
-                .put("price", new Money(0, withdraw.getPrice()).toString())
+                .put("price", MoneyUtils.fenToYuanStr(withdraw.getPrice()))
                 .put("reason", withdraw.getAuditReason())
                 .build();
         NotifySendSingleToUserReqDTO reqDTO = new NotifySendSingleToUserReqDTO()
@@ -142,8 +142,9 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
     }
 
     @Override
-    public Integer getSummaryPriceByUserIdAndStatus(Long userId, Integer status) {
-        return brokerageWithdrawMapper.selectSummaryPriceByUserIdAndStatus(userId, status);
+    public UserWithdrawSummaryBO getWithdrawSummaryByUserId(Long userId, BrokerageWithdrawStatusEnum status) {
+        UserWithdrawSummaryBO summaryBO = brokerageWithdrawMapper.selectCountAndSumPriceByUserIdAndStatus(userId, status.getStatus());
+        return summaryBO != null ? summaryBO : new UserWithdrawSummaryBO(0, 0);
     }
 
     /**
@@ -170,7 +171,7 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
     TradeConfigDO validateWithdrawPrice(Integer withdrawPrice) {
         TradeConfigDO tradeConfig = tradeConfigService.getTradeConfig();
         if (tradeConfig.getBrokerageWithdrawMinPrice() != null && withdrawPrice < tradeConfig.getBrokerageWithdrawMinPrice()) {
-            throw exception(BROKERAGE_WITHDRAW_MIN_PRICE, new Money(0, tradeConfig.getBrokerageWithdrawMinPrice()));
+            throw exception(BROKERAGE_WITHDRAW_MIN_PRICE, MoneyUtils.fenToYuanStr(tradeConfig.getBrokerageWithdrawMinPrice()));
         }
         return tradeConfig;
     }

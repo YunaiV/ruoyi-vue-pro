@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.convert.order;
 
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -14,6 +15,7 @@ import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDT
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.base.member.user.MemberUserRespVO;
@@ -266,11 +268,16 @@ public interface TradeOrderConvert {
 
     TradeOrderDO convert(TradeOrderRemarkReqVO reqVO);
 
-    default BrokerageAddReqBO convert(MemberUserRespDTO user, TradeOrderItemDO item, ProductSkuRespDTO sku) {
-        return new BrokerageAddReqBO().setBizId(String.valueOf(item.getId())).setSourceUserId(item.getUserId())
+    default BrokerageAddReqBO convert(MemberUserRespDTO user, TradeOrderItemDO item,
+                                      ProductSpuRespDTO spu, ProductSkuRespDTO sku) {
+        BrokerageAddReqBO bo = new BrokerageAddReqBO().setBizId(String.valueOf(item.getId())).setSourceUserId(item.getUserId())
                 .setBasePrice(item.getPayPrice() * item.getCount())
                 .setTitle(StrUtil.format("{}成功购买{}", user.getNickname(), item.getSpuName()))
-                .setFirstFixedPrice(sku.getFirstBrokeragePrice()).setSecondFixedPrice(sku.getSecondBrokeragePrice());
+                .setFirstFixedPrice(0).setSecondFixedPrice(0);
+        if (BooleanUtil.isTrue(spu.getSubCommissionType())) {
+            bo.setFirstFixedPrice(sku.getFirstBrokeragePrice()).setSecondFixedPrice(sku.getSecondBrokeragePrice());
+        }
+        return bo;
     }
 
     TradeBeforeOrderCreateReqBO convert(AppTradeOrderCreateReqVO createReqVO);

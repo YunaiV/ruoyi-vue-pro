@@ -53,14 +53,14 @@ public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
     }
 
     @Select("SELECT COUNT(1), SUM(price) FROM trade_brokerage_record " +
-            "WHERE user_id = #{userId} AND biz_type = #{bizType} AND status = #{status}")
+            "WHERE user_id = #{userId} AND biz_type = #{bizType} AND status = #{status} AND deleted = FALSE")
     UserBrokerageSummaryBO selectCountAndSumPriceByUserIdAndBizTypeAndStatus(@Param("userId") Long userId,
                                                                              @Param("bizType") Integer bizType,
                                                                              @Param("status") Integer status);
 
     @Select("SELECT SUM(price) FROM trade_brokerage_record " +
             "WHERE user_id = #{userId} AND biz_type = #{bizType} " +
-            "AND create_time BETWEEN #{beginTime} AND #{endTime}")
+            "AND create_time BETWEEN #{beginTime} AND #{endTime} AND deleted = FALSE")
     Integer selectSummaryPriceByUserIdAndBizTypeAndCreateTimeBetween(@Param("userId") Long userId,
                                                                      @Param("bizType") Integer bizType,
                                                                      @Param("beginTime") LocalDateTime beginTime,

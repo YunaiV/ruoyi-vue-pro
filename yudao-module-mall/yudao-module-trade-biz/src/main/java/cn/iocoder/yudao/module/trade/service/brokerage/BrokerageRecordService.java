@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.trade.service.brokerage;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.record.BrokerageRecordPageReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.record.AppBrokerageProductPriceRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankByPriceRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageRecordDO;
@@ -110,4 +111,12 @@ public interface BrokerageRecordService {
      */
     Integer getUserRankByPrice(Long userId, LocalDateTime[] times);
 
+    /**
+     * 计算商品被购买后，推广员可以得到的佣金
+     *
+     * @param spuId  商品编号
+     * @param userId 用户编号
+     * @return 用户佣金
+     */
+    AppBrokerageProductPriceRespVO calculateProductBrokeragePrice(Long spuId, Long userId);
 }

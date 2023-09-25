@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.withdraw.BrokerageWithdrawPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageWithdrawDO;
+import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserWithdrawSummaryBO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -36,8 +37,8 @@ public interface BrokerageWithdrawMapper extends BaseMapperX<BrokerageWithdrawDO
                 .eq(BrokerageWithdrawDO::getStatus, status));
     }
 
-    @Select("SELECT SUM(price) FROM trade_brokerage_withdraw " +
-            "WHERE user_id = #{userId} AND status = #{status}")
-    Integer selectSummaryPriceByUserIdAndStatus(@Param("userId") Long userId, @Param("status") Integer status);
-    
+    @Select("SELECT COUNT(1) AS count, SUM(price) AS price FROM trade_brokerage_withdraw " +
+            "WHERE user_id = #{userId} AND status = #{status} AND deleted = FALSE")
+    UserWithdrawSummaryBO selectCountAndSumPriceByUserIdAndStatus(@Param("userId") Long userId,
+                                                                  @Param("status") Integer status);
 }

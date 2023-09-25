@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.withdraw.AppBro
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.withdraw.AppBrokerageWithdrawRespVO;
 import cn.iocoder.yudao.module.trade.convert.brokerage.BrokerageWithdrawConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageWithdrawDO;
-import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum;
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageWithdrawService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
@@ -44,10 +42,7 @@ public class AppBrokerageWithdrawController {
         // 分页查询
         PageResult<BrokerageWithdrawDO> pageResult = brokerageWithdrawService.getBrokerageWithdrawPage(
                 BrokerageWithdrawConvert.INSTANCE.convert(pageReqVO, getLoginUserId()));
-        // 拼接信息
-        // TODO @疯狂：后端可以直接用 DictFrameworkUtils.getDictDataLabel() 去渲染哈；这样就不用 getDictDataLabelMap 方法了；
-        Map<String, String> statusNameMap = dictDataApi.getDictDataLabelMap(BrokerageWithdrawStatusEnum.DICT_TYPE);
-        return success(BrokerageWithdrawConvert.INSTANCE.convertPage02(pageResult, statusNameMap));
+        return success(BrokerageWithdrawConvert.INSTANCE.convertPage03(pageResult));
     }
 
     @PostMapping("/create")

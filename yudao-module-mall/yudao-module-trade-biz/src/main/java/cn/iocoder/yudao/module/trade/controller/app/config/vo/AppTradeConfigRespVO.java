@@ -18,8 +18,7 @@ public class AppTradeConfigRespVO {
     @Schema(description = "佣金提现最小金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
     private Integer brokerageWithdrawMinPrice;
 
-    // TODO @疯狂：如果是 list，要不加个 s，复数；
     @Schema(description = "提现方式", requiredMode = Schema.RequiredMode.REQUIRED, example = "[1, 2]")
-    private List<Integer> brokerageWithdrawType;
+    private List<Integer> brokerageWithdrawTypes;
 
 }

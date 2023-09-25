@@ -1,25 +1,25 @@
 -- 增加配置表
-create table trade_config
+CREATE TABLE trade_config
 (
-    id                             bigint auto_increment comment '自增主键' primary key,
-    brokerage_enabled              bit           default 1                 not null comment '是否启用分佣',
-    brokerage_enabled_condition    tinyint       default 1                 not null comment '分佣模式：1-人人分销 2-指定分销',
-    brokerage_bind_mode            tinyint       default 1                 not null comment '分销关系绑定模式: 1-没有推广人，2-新用户, 3-扫码覆盖',
-    brokerage_post_urls            varchar(2000) default ''                null comment '分销海报图地址数组',
-    brokerage_first_percent        int           default 0                 not null comment '一级返佣比例',
-    brokerage_second_percent       int           default 0                 not null comment '二级返佣比例',
-    brokerage_withdraw_min_price   int           default 0                 not null comment '用户提现最低金额',
-    brokerage_withdraw_fee_percent int           default 0                 not null comment '提现手续费百分比',
-    brokerage_bank_names           varchar(200)  default ''                not null comment '提现银行（字典类型=brokerage_bank_name）',
-    brokerage_frozen_days          int           default 7                 not null comment '佣金冻结时间(天)',
-    brokerage_withdraw_type        varchar(32)   default '1,2,3,4'         not null comment '提现方式：1-钱包；2-银行卡；3-微信；4-支付宝',
-    creator                        varchar(64)   default ''                null comment '创建者',
-    create_time                    datetime      default CURRENT_TIMESTAMP not null comment '创建时间',
-    updater                        varchar(64)   default ''                null comment '更新者',
-    update_time                    datetime      default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
-    deleted                        bit           default b'0'              not null comment '是否删除',
-    tenant_id                      bigint        default 0                 not null comment '租户编号'
-) comment '交易中心配置';
+    id                             BIGINT AUTO_INCREMENT COMMENT '自增主键' PRIMARY KEY,
+    brokerage_enabled              BIT           DEFAULT 1                 NOT NULL COMMENT '是否启用分佣',
+    brokerage_enabled_condition    TINYINT       DEFAULT 1                 NOT NULL COMMENT '分佣模式：1-人人分销 2-指定分销',
+    brokerage_bind_mode            TINYINT       DEFAULT 1                 NOT NULL COMMENT '分销关系绑定模式: 1-没有推广人，2-新用户, 3-扫码覆盖',
+    brokerage_poster_urls          VARCHAR(2000) DEFAULT ''                NULL COMMENT '分销海报图地址数组',
+    brokerage_first_percent        INT           DEFAULT 0                 NOT NULL COMMENT '一级返佣比例',
+    brokerage_second_percent       INT           DEFAULT 0                 NOT NULL COMMENT '二级返佣比例',
+    brokerage_withdraw_min_price   INT           DEFAULT 0                 NOT NULL COMMENT '用户提现最低金额',
+    brokerage_withdraw_fee_percent INT           DEFAULT 0                 NOT NULL COMMENT '提现手续费百分比',
+    brokerage_bank_names           VARCHAR(200)  DEFAULT ''                NOT NULL COMMENT '提现银行（字典类型=brokerage_bank_name）',
+    brokerage_frozen_days          INT           DEFAULT 7                 NOT NULL COMMENT '佣金冻结时间(天)',
+    brokerage_withdraw_types       VARCHAR(32)   DEFAULT '1,2,3,4'         NOT NULL COMMENT '提现方式：1-钱包；2-银行卡；3-微信；4-支付宝',
+    creator                        VARCHAR(64)   DEFAULT ''                NULL COMMENT '创建者',
+    create_time                    DATETIME      DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
+    updater                        VARCHAR(64)   DEFAULT ''                NULL COMMENT '更新者',
+    update_time                    DATETIME      DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted                        BIT           DEFAULT b'0'              NOT NULL COMMENT '是否删除',
+    tenant_id                      BIGINT        DEFAULT 0                 NOT NULL COMMENT '租户编号'
+) COMMENT '交易中心配置';
 
 # alter table trade_config
 #     add brokerage_withdraw_fee_percent int default 0 not null comment '提现手续费百分比' after brokerage_withdraw_min_price;

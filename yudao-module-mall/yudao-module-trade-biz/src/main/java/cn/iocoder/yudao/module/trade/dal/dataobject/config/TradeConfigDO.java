@@ -68,7 +68,7 @@ public class TradeConfigDO extends BaseDO {
      * 分销海报图地址数组
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<String> brokeragePostUrls;
+    private List<String> brokeragePosterUrls;
     /**
      * 一级返佣比例
      */
@@ -100,6 +100,6 @@ public class TradeConfigDO extends BaseDO {
      * 枚举 {@link BrokerageWithdrawTypeEnum 对应的类}
      */
     @TableField(typeHandler = IntegerListTypeHandler.class)
-    private List<Integer> brokerageWithdrawType;
+    private List<Integer> brokerageWithdrawTypes;
 
 }
