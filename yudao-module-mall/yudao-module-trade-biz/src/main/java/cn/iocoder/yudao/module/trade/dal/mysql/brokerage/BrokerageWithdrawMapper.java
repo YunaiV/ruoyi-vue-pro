@@ -38,6 +38,7 @@ public interface BrokerageWithdrawMapper extends BaseMapperX<BrokerageWithdrawDO
     }
 
     @Select("SELECT COUNT(1) AS count, SUM(price) AS price FROM trade_brokerage_withdraw " +
-            "WHERE user_id = #{userId} AND status = #{status}")
-    UserWithdrawSummaryBO selectCountAndSumPriceByUserIdAndStatus(Long userId, Integer status);
+            "WHERE user_id = #{userId} AND status = #{status} AND deleted = FALSE")
+    UserWithdrawSummaryBO selectCountAndSumPriceByUserIdAndStatus(@Param("userId") Long userId,
+                                                                  @Param("status") Integer status);
 }
