@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
@@ -14,7 +13,6 @@ import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.task.BpmTaskExtMapper;
-import cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceDeleteReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
@@ -41,6 +39,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -222,10 +221,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         AdminUserRespDTO currentUser = adminUserApi.getUser(WebFrameworkUtils.getLoginUserId());
         //原审批人
         AdminUserRespDTO sourceApproveUser = adminUserApi.getUser(NumberUtils.parseLong(task.getOwner()));
-        if (sourceApproveUser == null) {
-            throw exception(TASK_DELEGATE_APPROVE_FAIL);
-        }
-        String comment = String.format("[%s]完成委派任务，任务重新回到[%s]手中，审批意见为:%s", currentUser.getNickname(),
+        Assert.notNull(sourceApproveUser, "委派任务找不到原审批人，需要检查数据");
+        //添加审批意见
+        String comment = StrUtil.format("[{}]完成委派任务，任务重新回到[{}]手中，审批意见为:{}", currentUser.getNickname(),
                 sourceApproveUser.getNickname(), reqVO.getReason());
         taskService.addComment(reqVO.getId(), task.getProcessInstanceId(), BpmProcessInstanceResultEnum.DELEGATE.getResult().toString(), comment);
         //调用 resolveTask 完成任务，底层调用 TaskHelper.changeTaskAssignee(task, task.getOwner());
@@ -486,23 +484,23 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void delegateTask(BpmTaskDelegateReqVO reqVO) {
+    public void delegateTask(BpmTaskDelegateReqVO reqVO,Long userId) {
         // 校验任务
         Task task = this.validateTaskDelegate(reqVO);
         // 添加审批意见
-        AdminUserRespDTO currentUser = adminUserApi.getUser(WebFrameworkUtils.getLoginUserId());
-        AdminUserRespDTO receiveUser = adminUserApi.getUser(reqVO.getReceiveId());
-        if (receiveUser == null) {
-            throw exception(TASK_DELEGATE_RECEIVE_USER_NULL);
+        AdminUserRespDTO currentUser = adminUserApi.getUser(userId);
+        AdminUserRespDTO delegateUser = adminUserApi.getUser(reqVO.getDelegateUserId());
+        if (delegateUser == null) {
+            throw exception(TASK_DELEGATE_USER_NULL);
         }
-        String comment = String.format("[%s]将任务委派给[%s]，委派理由为:%s", currentUser.getNickname(),
-                receiveUser.getNickname(), reqVO.getReason());
+        String comment = StrUtil.format("[{}]将任务委派给[{}]，委派理由为:{}", currentUser.getNickname(),
+                delegateUser.getNickname(), reqVO.getReason());
         String taskId = reqVO.getId();
         taskService.addComment(taskId, task.getProcessInstanceId(), BpmProcessInstanceResultEnum.DELEGATE.getResult().toString(), comment);
         // 设置任务所有人 (owner) 为原任务的处理人 (assignee)
         taskService.setOwner(taskId, task.getAssignee());
         // 执行委派,将任务委派给  receiveId
-        taskService.delegateTask(taskId, reqVO.getReceiveId().toString());
+        taskService.delegateTask(taskId, reqVO.getDelegateUserId().toString());
         // 更新任务拓展表为【委派】
         taskExtMapper.updateByTaskId(
                 new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.DELEGATE.getResult())
@@ -519,7 +517,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 校验任务
         Task task = checkTask(WebFrameworkUtils.getLoginUserId(), reqVO.getId());
         //校验当前审批人和被委派人不是同一人
-        if (task.getAssignee().equals(reqVO.getReceiveId().toString())) {
+        if (task.getAssignee().equals(reqVO.getDelegateUserId().toString())) {
             throw exception(TASK_DELEGATE_USER_REPEAT);
         }
         return task;

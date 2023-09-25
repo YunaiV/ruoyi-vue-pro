@@ -50,9 +50,8 @@ public interface ErrorCodeConstants {
     ErrorCode TASK_TARGET_NODE_NOT_EXISTS = new ErrorCode(1_009_005_004, " 目标节点不存在");
     ErrorCode TASK_RETURN_FAIL_NO_RETURN_TASK = new ErrorCode(1_009_005_005, "回退任务失败，选择回退的节点没有需要回滚的任务！请重新选择其他任务节点");
     ErrorCode TASK_RETURN_FAIL_SOURCE_TARGET_ERROR = new ErrorCode(1_009_005_006, "回退任务失败，目标节点是在并行网关上或非同一路线上，不可跳转");
-    ErrorCode TASK_DELEGATE_APPROVE_FAIL = new ErrorCode(1_009_005_007, "任务审批失败：委派任务找不到原审批人");
-    ErrorCode TASK_DELEGATE_USER_REPEAT = new ErrorCode(1_009_005_008, "任务委派失败，委派人和当前审批人为同一人");
-    ErrorCode TASK_DELEGATE_RECEIVE_USER_NULL = new ErrorCode(1_009_005_009, "任务委派失败，接收人不存在");
+    ErrorCode TASK_DELEGATE_USER_REPEAT = new ErrorCode(1_009_005_007, "任务委派失败，委派人和当前审批人为同一人");
+    ErrorCode TASK_DELEGATE_USER_NULL = new ErrorCode(1_009_005_008, "任务委派失败，被委派人不存在");
 
     // ========== 流程任务分配规则 1-009-006-000 ==========
     ErrorCode TASK_ASSIGN_RULE_EXISTS = new ErrorCode(1_009_006_000, "流程({}) 的任务({}) 已经存在分配规则");

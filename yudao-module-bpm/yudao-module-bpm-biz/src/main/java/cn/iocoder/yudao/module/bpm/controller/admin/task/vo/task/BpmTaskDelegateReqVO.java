@@ -14,9 +14,9 @@ public class BpmTaskDelegateReqVO {
     @NotEmpty(message = "任务编号不能为空")
     private String id;
 
-    @Schema(description = "接收人ID", requiredMode = Schema.RequiredMode.REQUIRED,example = "1")
-    @NotNull(message = "接收人ID不能为空")
-    private Long receiveId;
+    @Schema(description = "被委派人ID", requiredMode = Schema.RequiredMode.REQUIRED,example = "1")
+    @NotNull(message = "被委派人ID不能为空")
+    private Long delegateUserId;
 
     @Schema(description = "委派原因", requiredMode = Schema.RequiredMode.REQUIRED,example = "做不了决定，需要你先帮忙瞅瞅")
     @NotEmpty(message = "委派原因不能为空")

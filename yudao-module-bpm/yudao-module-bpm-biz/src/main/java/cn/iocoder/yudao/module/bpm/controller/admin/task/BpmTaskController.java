@@ -95,7 +95,7 @@ public class BpmTaskController {
     @Operation(summary = "委派任务", description = "用于【流程详情】的【委派】按钮，和向前加签有点像，和向前加签的唯一的区别是没有单独创立任务")
     @PreAuthorize("@ss.hasPermission('bpm:task:delegate')")
     public CommonResult<Boolean> delegateTask(@Valid @RequestBody BpmTaskDelegateReqVO reqVO) {
-        taskService.delegateTask(reqVO);
+        taskService.delegateTask(reqVO,getLoginUserId());
         return success(true);
     }
 
