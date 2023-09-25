@@ -216,11 +216,11 @@ public interface TradeOrderConvert {
     })
     ProductCommentCreateReqDTO convert04(AppTradeOrderItemCommentCreateReqVO createReqVO, TradeOrderItemDO tradeOrderItemDO);
 
+    TradePriceCalculateReqBO convert(AppTradeOrderSettlementReqVO settlementReqVO);
+
     default TradePriceCalculateReqBO convert(Long userId, AppTradeOrderSettlementReqVO settlementReqVO,
                                              List<CartDO> cartList) {
-        TradePriceCalculateReqBO reqBO = new TradePriceCalculateReqBO();
-        reqBO.setUserId(userId).setCouponId(settlementReqVO.getCouponId()).setAddressId(settlementReqVO.getAddressId())
-                .setItems(new ArrayList<>(settlementReqVO.getItems().size()));
+        TradePriceCalculateReqBO reqBO = convert(settlementReqVO).setUserId(userId).setItems(new ArrayList<>(settlementReqVO.getItems().size()));
         // 商品项的构建
         Map<Long, CartDO> cartMap = convertMap(cartList, CartDO::getId);
         for (AppTradeOrderSettlementReqVO.Item item : settlementReqVO.getItems()) {

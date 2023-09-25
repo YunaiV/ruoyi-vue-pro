@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.trade.service.price.bo;
 
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.Valid;
@@ -51,6 +52,23 @@ public class TradePriceCalculateReqBO {
      * 枚举 {@link DeliveryTypeEnum}
      */
     private Integer deliveryType;
+
+    // ========== 秒杀活动相关字段 ==========
+    @Schema(description = "秒杀活动编号", example = "1024")
+    private Long seckillActivityId;
+
+    // ========== 拼团活动相关字段 ==========
+    // TODO @puhui999：是不是拼团记录的编号哈？
+    @Schema(description = "拼团活动编号", example = "1024")
+    private Long combinationActivityId;
+
+    @Schema(description = "拼团团长编号", example = "2048")
+    private Long combinationHeadId;
+
+    // ========== 砍价活动相关字段 ==========
+    // TODO @puhui999：是不是砍价记录的编号哈？
+    @Schema(description = "砍价活动编号", example = "123")
+    private Long bargainActivityId;
 
     /**
      * 商品 SKU 数组

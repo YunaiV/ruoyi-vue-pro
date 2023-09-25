@@ -84,6 +84,9 @@ public class TradePriceCalculatorHelper {
             if (!item.getSelected()) {
                 return;
             }
+            // TODO puhui: 需要在这里计算活动的价格
+            // ========== 一、活动情况 ==========
+            // ========== 二、正常情况 ==========
             price.setTotalPrice(price.getTotalPrice() + item.getPrice() * item.getCount());
             price.setDiscountPrice(price.getDiscountPrice() + item.getDiscountPrice());
             price.setDeliveryPrice(price.getDeliveryPrice() + item.getDeliveryPrice());
