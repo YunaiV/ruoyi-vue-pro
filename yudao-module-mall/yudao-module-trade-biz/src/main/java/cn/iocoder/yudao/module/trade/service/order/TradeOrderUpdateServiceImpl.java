@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.trade.service.order;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
@@ -23,6 +24,7 @@ import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.product.api.comment.ProductCommentApi;
 import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
+import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.promotion.api.bargain.BargainRecordApi;
 import cn.iocoder.yudao.module.promotion.api.combination.CombinationRecordApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
@@ -42,13 +44,14 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderItemMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
 import cn.iocoder.yudao.module.trade.dal.redis.no.TradeOrderNoRedisDAO;
-import cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.*;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
+import cn.iocoder.yudao.module.trade.framework.order.core.annotations.TradeOrderLog;
+import cn.iocoder.yudao.module.trade.framework.order.core.utils.TradeOrderLogUtils;
+import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageRecordService;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
-import cn.iocoder.yudao.module.trade.service.brokerage.record.BrokerageRecordService;
 import cn.iocoder.yudao.module.trade.service.cart.CartService;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
 import cn.iocoder.yudao.module.trade.service.message.TradeMessageService;
@@ -104,6 +107,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Resource
     private TradeMessageService tradeMessageService;
 
+    @Resource
+    private ProductSpuApi productSpuApi;
     @Resource
     private ProductSkuApi productSkuApi;
     @Resource
@@ -182,141 +187,127 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_CREATE)
     public TradeOrderDO createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO) {
-        // 1、执行订单创建前置处理器
-        // TODO @puhui999：最好也抽个 beforeOrderCreate 方法；不要 BO 各自处理参数岂不美哉？
-        TradeBeforeOrderCreateReqBO beforeOrderCreateReqBO = TradeOrderConvert.INSTANCE.convert(createReqVO);
-        beforeOrderCreateReqBO.setOrderType(validateActivity(createReqVO));
-        beforeOrderCreateReqBO.setUserId(userId);
-        beforeOrderCreateReqBO.setCount(getSumValue(createReqVO.getItems(), AppTradeOrderSettlementReqVO.Item::getCount, Integer::sum));
-        // TODO @puhui999：这里有个纠结点；handler 的定义是只处理指定类型的订单的拓展逻辑；还是通用的 handler，类似可以处理优惠劵等等
-        tradeOrderHandlers.forEach(handler -> handler.beforeOrderCreate(beforeOrderCreateReqBO));
-
-        // 2. 价格计算
+        // 0. 价格计算
         TradePriceCalculateRespBO calculateRespBO = calculatePrice(userId, createReqVO);
+
+        // 1. 订单创建前的逻辑
+        beforeCreateTradeOrder(userId, createReqVO, calculateRespBO);
 
         // 2.1 插入 TradeOrderDO 订单
         TradeOrderDO order = createTradeOrder(userId, userIp, createReqVO, calculateRespBO);
         // 2.2 插入 TradeOrderItemDO 订单项
         List<TradeOrderItemDO> orderItems = createTradeOrderItems(order, calculateRespBO);
 
-        // 3. 订单创建完后的逻辑
+        // 3. 订单创建后的逻辑
         afterCreateTradeOrder(userId, createReqVO, order, orderItems, calculateRespBO);
-
-        // TODO @LeeYan9: 是可以思考下, 订单的营销优惠记录, 应该记录在哪里, 微信讨论起来!
         return order;
     }
 
-
     // TODO @puhui999：订单超时，自动取消；
-
-    /**
-     * 校验收件地址是否存在
-     *
-     * @param userId    用户编号
-     * @param addressId 收件地址编号
-     * @return 收件地址
-     */
-    private AddressRespDTO validateAddress(Long userId, Long addressId) {
-        AddressRespDTO address = addressApi.getAddress(addressId, userId);
-        if (address == null) {
-            throw exception(ErrorCodeConstants.ORDER_CREATE_ADDRESS_NOT_FOUND);
-        }
-        return address;
-    }
 
     private TradeOrderDO createTradeOrder(Long userId, String clientIp, AppTradeOrderCreateReqVO createReqVO,
                                           TradePriceCalculateRespBO calculateRespBO) {
-        // 用户选择物流配送的时候才需要填写收货地址
-        AddressRespDTO address = new AddressRespDTO();
-        if (Objects.equals(createReqVO.getDeliveryType(), DeliveryTypeEnum.EXPRESS.getMode())) {
-            // 用户收件地址的校验
-            address = validateAddress(userId, createReqVO.getAddressId());
-        }
-        TradeOrderDO order = TradeOrderConvert.INSTANCE.convert(userId, clientIp, createReqVO, calculateRespBO, address);
-        String no = orderNoRedisDAO.generate(TradeOrderNoRedisDAO.TRADE_ORDER_NO_PREFIX);
-        order.setType(validateActivity(createReqVO));
-        order.setNo(no);
+        TradeOrderDO order = TradeOrderConvert.INSTANCE.convert(userId, clientIp, createReqVO, calculateRespBO);
+        order.setType(calculateRespBO.getType());
+        order.setNo(orderNoRedisDAO.generate(TradeOrderNoRedisDAO.TRADE_ORDER_NO_PREFIX));
         order.setStatus(TradeOrderStatusEnum.UNPAID.getStatus());
         order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus());
         order.setProductCount(getSumValue(calculateRespBO.getItems(), TradePriceCalculateRespBO.OrderItem::getCount, Integer::sum));
         order.setTerminal(TerminalEnum.H5.getTerminal()); // todo 数据来源?
-        // 支付信息
+        // 支付 + 退款信息
         order.setAdjustPrice(0).setPayStatus(false);
+        order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus()).setRefundPrice(0);
         // 物流信息
         order.setDeliveryType(createReqVO.getDeliveryType());
-        // 退款信息
-        order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus()).setRefundPrice(0);
+        if (Objects.equals(createReqVO.getDeliveryType(), DeliveryTypeEnum.EXPRESS.getType())) {
+            AddressRespDTO address = addressApi.getAddress(createReqVO.getAddressId(), userId);
+            Assert.notNull(address, "地址({}) 不能为空", createReqVO.getAddressId()); // 价格计算时，已经计算
+            order.setReceiverName(address.getName()).setReceiverMobile(address.getMobile())
+                    .setReceiverAreaId(address.getAreaId()).setReceiverDetailAddress(address.getDetailAddress());
+        } else if (Objects.equals(createReqVO.getDeliveryType(), DeliveryTypeEnum.PICK_UP.getType())) {
+            order.setReceiverName(createReqVO.getReceiverName()).setReceiverMobile(createReqVO.getReceiverMobile());
+            order.setPickUpVerifyCode(RandomUtil.randomNumbers(8)); // 随机一个核销码，长度为 8 位
+        }
         tradeOrderMapper.insert(order);
-        // TODO @puhui999：如果是门店订单，则需要生成核销码；
         return order;
     }
 
-    /**
-     * 校验活动，并返回订单类型
-     *
-     * @param createReqVO 请求参数
-     * @return 订单类型
-     */
-    private Integer validateActivity(AppTradeOrderCreateReqVO createReqVO) {
-        if (createReqVO.getSeckillActivityId() != null) {
-            return TradeOrderTypeEnum.SECKILL.getType();
-        }
-        if (createReqVO.getCombinationActivityId() != null) {
-            return TradeOrderTypeEnum.COMBINATION.getType();
-        }
-        // TODO 砍价敬请期待
-        return TradeOrderTypeEnum.NORMAL.getType();
-    }
-
-    private List<TradeOrderItemDO> createTradeOrderItems(TradeOrderDO tradeOrderDO, TradePriceCalculateRespBO calculateRespBO) {
+    private List<TradeOrderItemDO> createTradeOrderItems(TradeOrderDO tradeOrderDO,
+                                                         TradePriceCalculateRespBO calculateRespBO) {
         List<TradeOrderItemDO> orderItems = TradeOrderConvert.INSTANCE.convertList(tradeOrderDO, calculateRespBO);
         tradeOrderItemMapper.insertBatch(orderItems);
         return orderItems;
     }
 
     /**
-     * 执行创建完创建完订单后的逻辑
+     * 订单创建前，执行前置逻辑
      *
+     * @param userId          用户编号
+     * @param createReqVO     创建订单请求
+     * @param calculateRespBO 订单价格计算结果
+     */
+    private void beforeCreateTradeOrder(Long userId, AppTradeOrderCreateReqVO createReqVO,
+                                        TradePriceCalculateRespBO calculateRespBO) {
+        // 1. 执行订单创建前置处理器
+        TradeBeforeOrderCreateReqBO beforeOrderCreateReqBO = TradeOrderConvert.INSTANCE.convert(createReqVO);
+        beforeOrderCreateReqBO.setOrderType(calculateRespBO.getType());
+        beforeOrderCreateReqBO.setUserId(userId);
+        beforeOrderCreateReqBO.setCount(getSumValue(createReqVO.getItems(), AppTradeOrderSettlementReqVO.Item::getCount, Integer::sum));
+        // TODO @puhui999：这里有个纠结点；handler 的定义是只处理指定类型的订单的拓展逻辑；还是通用的 handler，类似可以处理优惠劵等等
+        tradeOrderHandlers.forEach(handler -> handler.beforeOrderCreate(beforeOrderCreateReqBO));
+
+        // 2. 下单时扣减商品库存
+        productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convertNegative(createReqVO.getItems()));
+    }
+
+    /**
+     * 订单创建后，执行后置逻辑
+     * <p>
      * 例如说：优惠劵的扣减、积分的扣减、支付单的创建等等
      *
      * @param userId          用户编号
      * @param createReqVO     创建订单请求
-     * @param tradeOrderDO    交易订单
+     * @param order           交易订单
      * @param calculateRespBO 订单价格计算结果
      */
     private void afterCreateTradeOrder(Long userId, AppTradeOrderCreateReqVO createReqVO,
-                                       TradeOrderDO tradeOrderDO, List<TradeOrderItemDO> orderItems,
+                                       TradeOrderDO order, List<TradeOrderItemDO> orderItems,
                                        TradePriceCalculateRespBO calculateRespBO) {
-        // 执行订单创建后置处理器
-        tradeOrderHandlers.forEach(handler -> handler.afterOrderCreate(TradeOrderConvert.INSTANCE.convert(userId, createReqVO, tradeOrderDO, orderItems.get(0))));
+        // 1. 执行订单创建后置处理器
+        // TODO @puhui999：从通用性来说，应该不用 orderItems.get(0)
+        tradeOrderHandlers.forEach(handler -> handler.afterOrderCreate(
+                TradeOrderConvert.INSTANCE.convert(userId, createReqVO, order, orderItems.get(0))));
 
-        // 扣减积分 TODO 芋艿：待实现，需要前置；
-        // 这个是不是应该放到支付成功之后？如果支付后的话，可能积分可以重复使用哈。资源类，都要预扣
-
-        // 有使用优惠券时更新 TODO 芋艿：需要前置；
+        // 2. 有使用优惠券时更新
+        // 不在前置扣减的原因，是因为优惠劵要记录使用的订单号
         if (createReqVO.getCouponId() != null) {
             couponApi.useCoupon(new CouponUseReqDTO().setId(createReqVO.getCouponId()).setUserId(userId)
-                    .setOrderId(tradeOrderDO.getId()));
+                    .setOrderId(order.getId()));
         }
 
-        // 下单时扣减商品库存
-        productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convertNegative(orderItems));
+        // 3. 扣减积分（抵扣）
+        // 不在前置扣减的原因，是因为积分扣减时，需要记录关联业务
+        reduceUserPoint(order.getUserId(), order.getUsePoint(), MemberPointBizTypeEnum.ORDER_USE, order.getId());
 
-        // 删除购物车商品
+        // 4. 删除购物车商品
         Set<Long> cartIds = convertSet(createReqVO.getItems(), AppTradeOrderSettlementReqVO.Item::getCartId);
         if (CollUtil.isNotEmpty(cartIds)) {
             cartService.deleteCart(userId, cartIds);
         }
 
-        // 生成预支付
-        createPayOrder(tradeOrderDO, orderItems, calculateRespBO);
+        // 5. 生成预支付
+        createPayOrder(order, orderItems, calculateRespBO);
 
-        // 增加订单日志 TODO 芋艿：待实现
+        // 6. 插入订单日志
+        TradeOrderLogUtils.setOrderInfo(order.getId(), null, order.getStatus());
+
+        // TODO @LeeYan9: 是可以思考下, 订单的营销优惠记录, 应该记录在哪里, 微信讨论起来!
     }
 
-
-    private void createPayOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems, TradePriceCalculateRespBO calculateRespBO) {
+    private void createPayOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
+                                TradePriceCalculateRespBO calculateRespBO) {
         // 创建支付单，用于后续的支付
         PayOrderCreateReqDTO payOrderCreateReqDTO = TradeOrderConvert.INSTANCE.convert(
                 order, orderItems, calculateRespBO, tradeOrderProperties);
@@ -344,6 +335,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         }
         // 校验活动
         // 1、拼团活动
+        // TODO @puhui999：这块也抽象到 handler 里
         if (Objects.equals(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
             // 更新拼团状态 TODO puhui999：订单支付失败或订单支付过期删除这条拼团记录
             combinationRecordApi.updateRecordStatusToInProgress(order.getUserId(), order.getId(), LocalDateTime.now());
@@ -354,8 +346,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
         // TODO 芋艿：OrderLog
 
-        // 增加用户积分
-        getSelf().addUserPointAsync(order.getUserId(), order.getPayPrice(), order.getId());
+        // 增加用户积分（赠送）
+        addUserPoint(order.getUserId(), order.getGivePoint(), MemberPointBizTypeEnum.ORDER_REWARD, order.getId());
         // 增加用户经验
         getSelf().addUserExperienceAsync(order.getUserId(), order.getPayPrice(), order.getId());
         // 增加用户佣金
@@ -421,7 +413,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 1.1 校验并获得交易订单（可发货）
         TradeOrderDO order = validateOrderDeliverable(deliveryReqVO.getId());
         // 1.2 校验 deliveryType 是否为快递，是快递才可以发货
-        if (ObjectUtil.notEqual(order.getDeliveryType(), DeliveryTypeEnum.EXPRESS.getMode())) {
+        if (ObjectUtil.notEqual(order.getDeliveryType(), DeliveryTypeEnum.EXPRESS.getType())) {
             throw exception(ORDER_DELIVERY_FAIL_DELIVERY_TYPE_NOT_EXPRESS);
         }
 
@@ -494,6 +486,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_RECEIVE)
     public void receiveOrder(Long userId, Long id) {
         // 校验并获得交易订单（可收货）
         TradeOrderDO order = validateOrderReceivable(userId, id);
@@ -504,7 +497,6 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         if (updateCount == 0) {
             throw exception(ORDER_RECEIVE_FAIL_STATUS_NOT_DELIVERED);
         }
-        // TODO 芋艿：OrderLog
 
         // TODO 芋艿：lili 发送订单变化的消息
 
@@ -512,7 +504,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
         // TODO 芋艿：销售佣金的记录；
 
-        // TODO 芋艿：获得积分；
+        // 插入订单日志
+        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.COMPLETED.getStatus());
     }
 
     @Override
@@ -660,11 +653,12 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             return;
         }
         // 计算总的退款金额
-        TradeOrderDO order = tradeOrderMapper.selectById(tradeOrderItemMapper.selectById(id).getOrderId());
+        TradeOrderItemDO orderItem = tradeOrderItemMapper.selectById(id);
+        TradeOrderDO order = tradeOrderMapper.selectById(orderItem.getOrderId());
         Integer orderRefundPrice = order.getRefundPrice() + refundPrice;
         if (isAllOrderItemAfterSaleSuccess(order.getId())) { // 如果都售后成功，则需要取消订单
             tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId())
-                    .setRefundStatus(TradeOrderRefundStatusEnum.ALL.getStatus()).setRefundPrice(orderRefundPrice)
+                    .setRefundStatus(TradeOrderRefundStatusEnum.ALL.getStatus()).setRefundPrice(orderRefundPrice).setRefundPoint(order.getRefundPoint() + orderItem.getUsePoint())
                     .setCancelType(TradeOrderCancelTypeEnum.AFTER_SALE_CLOSE.getType()).setCancelTime(LocalDateTime.now()));
 
             // TODO 芋艿：记录订单日志
@@ -675,16 +669,22 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                     .setRefundStatus(TradeOrderRefundStatusEnum.PART.getStatus()).setRefundPrice(orderRefundPrice));
         }
 
-        // 扣减用户积分
-        getSelf().reduceUserPointAsync(order.getUserId(), orderRefundPrice, afterSaleId);
-        // 扣减用户经验
-        getSelf().reduceUserExperienceAsync(order.getUserId(), orderRefundPrice, afterSaleId);
-        // 更新分佣记录为已失效
-        getSelf().cancelBrokerageAsync(order.getUserId(), id);
+        // 售后成功后，执行数据回滚逻辑
+        if (Objects.equals(newAfterSaleStatus, TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus())) {
+            // 扣减用户积分（赠送的）
+            reduceUserPoint(order.getUserId(), orderItem.getGivePoint(), MemberPointBizTypeEnum.AFTER_SALE_DEDUCT_GIVE, afterSaleId);
+            // 增加用户积分（返还抵扣）
+            addUserPoint(order.getUserId(), orderItem.getUsePoint(), MemberPointBizTypeEnum.AFTER_SALE_REFUND_USED, afterSaleId);
+            // 扣减用户经验
+            getSelf().reduceUserExperienceAsync(order.getUserId(), orderRefundPrice, afterSaleId);
+            // 更新分佣记录为已失效
+            getSelf().cancelBrokerageAsync(order.getUserId(), id);
+        }
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_COMMENT)
     public Long createOrderItemComment(Long userId, AppTradeOrderItemCommentCreateReqVO createReqVO) {
         // 先通过订单项 ID，查询订单项是否存在
         TradeOrderItemDO orderItem = tradeOrderItemMapper.selectByIdAndUserId(createReqVO.getOrderItemId(), userId);
@@ -712,24 +712,27 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(order.getId());
         if (!anyMatch(orderItems, item -> Objects.equals(item.getCommentStatus(), Boolean.FALSE))) {
             tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId()).setCommentStatus(Boolean.TRUE));
-            // TODO 待实现：已完成评价，要不要写一条订单日志？目前 crmeb 会写，有赞可以研究下
+            // 增加订单日志
+            TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), order.getStatus());
         }
         return comment;
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_CANCEL)
     public void cancelOrder(Long userId, Long id) {
-        // 校验存在
+        // 1.1 校验存在
         TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(id, userId);
         if (order == null) {
             throw exception(ORDER_NOT_FOUND);
         }
-        // 校验状态
+        // 1.2 校验状态
         if (ObjectUtil.notEqual(order.getStatus(), TradeOrderStatusEnum.UNPAID.getStatus())) {
             throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
         }
 
-        // 1.更新 TradeOrderDO 状态为已取消
+        // 2. 更新 TradeOrderDO 状态为已取消
         int updateCount = tradeOrderMapper.updateByIdAndStatus(id, order.getStatus(),
                 new TradeOrderDO().setStatus(TradeOrderStatusEnum.CANCELED.getStatus())
                         .setCancelTime(LocalDateTime.now())
@@ -738,21 +741,43 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
         }
 
-        // TODO 活动相关库存回滚需要活动 id，活动 id 怎么获取？app 端能否传过来
+        // 3. TODO 活动相关库存回滚需要活动 id，活动 id 怎么获取？app 端能否传过来；回复：从订单里拿呀
         tradeOrderHandlers.forEach(handler -> handler.rollback());
 
-        // 2.回滚库存
+        // 4. 回滚库存
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(id);
         productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convert(orderItems));
 
-        // 3.回滚优惠券
-        couponApi.returnUsedCoupon(order.getCouponId());
+        // 5. 回滚优惠券
+        if (order.getCouponId() > 0) {
+            couponApi.returnUsedCoupon(order.getCouponId());
+        }
 
-        // 4.回滚积分：积分是支付成功后才增加的吧？ 回复：每个项目不同，目前看下来，确认收货貌似更合适，我再看看其它项目的业务选择；
+        // 6. 回滚积分（抵扣的）
+        addUserPoint(order.getUserId(), order.getUsePoint(), MemberPointBizTypeEnum.ORDER_CANCEL, order.getId());
 
-        // TODO 芋艿：OrderLog
+        // 7. 增加订单日志
+        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.CANCELED.getStatus());
+    }
 
-        // TODO 芋艿：lili 发送订单变化的消息
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_DELETE)
+    public void deleteOrder(Long userId, Long id) {
+        // 1.1 校验存在
+        TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(id, userId);
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+        // 1.2 校验状态
+        if (ObjectUtil.notEqual(order.getStatus(), TradeOrderStatusEnum.CANCELED.getStatus())) {
+            throw exception(ORDER_DELETE_FAIL_STATUS_NOT_CANCEL);
+        }
+        // 2. 删除订单
+        tradeOrderMapper.deleteById(id);
+
+        // 3. 记录日志
+        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), order.getStatus());
     }
 
     /**
@@ -779,28 +804,54 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         memberLevelApi.addExperience(userId, -refundPrice, bizType, String.valueOf(afterSaleId));
     }
 
-    @Async
-    protected void addUserPointAsync(Long userId, Integer payPrice, Long orderId) {
-        int bizType = MemberPointBizTypeEnum.ORDER_BUY.getType();
-        memberPointApi.addPoint(userId, payPrice, bizType, String.valueOf(orderId));
+    /**
+     * 添加用户积分
+     * <p>
+     * 目前是支付成功后，就会创建积分记录。
+     * <p>
+     * 业内还有两种做法，可以根据自己的业务调整：
+     * 1. 确认收货后，才创建积分记录
+     * 2. 支付 or 下单成功时，创建积分记录（冻结），确认收货解冻或者 n 天后解冻
+     *
+     * @param userId  用户编号
+     * @param point   增加积分数量
+     * @param bizType 业务编号
+     * @param bizId   业务编号
+     */
+    protected void addUserPoint(Long userId, Integer point, MemberPointBizTypeEnum bizType, Long bizId) {
+        if (point != null && point > 0) {
+            memberPointApi.addPoint(userId, point, bizType.getType(), String.valueOf(bizId));
+        }
     }
 
-    @Async
-    protected void reduceUserPointAsync(Long userId, Integer refundPrice, Long afterSaleId) {
-        int bizType = MemberPointBizTypeEnum.ORDER_CANCEL.getType();
-        memberPointApi.addPoint(userId, -refundPrice, bizType, String.valueOf(afterSaleId));
+    protected void reduceUserPoint(Long userId, Integer point, MemberPointBizTypeEnum bizType, Long bizId) {
+        if (point != null && point > 0) {
+            memberPointApi.reducePoint(userId, point, bizType.getType(), String.valueOf(bizId));
+        }
     }
 
-
+    /**
+     * 创建分销记录
+     *
+     * 目前是支付成功后，就会创建分销记录。
+     *
+     * 业内还有两种做法，可以根据自己的业务调整：
+     *  1. 确认收货后，才创建分销记录
+     *  2. 支付 or 下单成功时，创建分销记录（冻结），确认收货解冻或者 n 天后解冻
+     *
+     * @param userId 用户编号
+     * @param orderId 订单编号
+     */
     @Async
     protected void addBrokerageAsync(Long userId, Long orderId) {
         MemberUserRespDTO user = memberUserApi.getUser(userId);
         Assert.notNull(user);
-
+        // 每一个订单项，都会去生成分销记录
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(orderId);
-        List<BrokerageAddReqBO> list = convertList(orderItems,
-                item -> TradeOrderConvert.INSTANCE.convert(user, item, productSkuApi.getSku(item.getSkuId())));
-        brokerageRecordService.addBrokerage(userId, BrokerageRecordBizTypeEnum.ORDER, list);
+        List<BrokerageAddReqBO> addList = convertList(orderItems,
+                item -> TradeOrderConvert.INSTANCE.convert(user, item,
+                        productSpuApi.getSpu(item.getSpuId()), productSkuApi.getSku(item.getSkuId())));
+        brokerageRecordService.addBrokerage(userId, BrokerageRecordBizTypeEnum.ORDER, addList);
     }
 
     @Async

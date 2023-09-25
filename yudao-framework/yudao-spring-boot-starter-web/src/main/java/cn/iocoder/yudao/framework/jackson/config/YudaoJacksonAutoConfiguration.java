@@ -1,18 +1,24 @@
 package cn.iocoder.yudao.framework.jackson.config;
 
-import cn.iocoder.yudao.framework.jackson.core.databind.NumberSerializer;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.jackson.core.databind.LocalDateTimeDeserializer;
 import cn.iocoder.yudao.framework.jackson.core.databind.LocalDateTimeSerializer;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.jackson.core.databind.NumberSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @AutoConfiguration
 @Slf4j
@@ -36,6 +42,10 @@ public class YudaoJacksonAutoConfiguration {
                 simpleModule
                         .addSerializer(Long.class, NumberSerializer.INSTANCE)
                         .addSerializer(Long.TYPE, NumberSerializer.INSTANCE)
+                        .addSerializer(LocalDate.class, LocalDateSerializer.INSTANCE)
+                        .addDeserializer(LocalDate.class, LocalDateDeserializer.INSTANCE)
+                        .addSerializer(LocalTime.class, LocalTimeSerializer.INSTANCE)
+                        .addDeserializer(LocalTime.class, LocalTimeDeserializer.INSTANCE)
                         .addSerializer(LocalDateTime.class, LocalDateTimeSerializer.INSTANCE)
                         .addDeserializer(LocalDateTime.class, LocalDateTimeDeserializer.INSTANCE);
 

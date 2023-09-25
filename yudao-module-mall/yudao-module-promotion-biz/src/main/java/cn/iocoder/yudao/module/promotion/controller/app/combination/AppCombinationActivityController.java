@@ -24,14 +24,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
-import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.COMBINATION_ACTIVITY_APP_STATUS_DISABLE;
 
 @Tag(name = "用户 APP - 拼团活动")
 @RestController
@@ -44,7 +42,7 @@ public class AppCombinationActivityController {
     @Resource
     private ProductSpuApi spuApi;
 
-
+    // TODO 芋艿：增加 Spring Cache
     @GetMapping("/list")
     @Operation(summary = "获得拼团活动列表", description = "用于小程序首页")
     @Parameter(name = "count", description = "需要展示的数量", example = "6")
@@ -52,11 +50,10 @@ public class AppCombinationActivityController {
             @RequestParam(name = "count", defaultValue = "6") Integer count) {
         List<CombinationActivityDO> list = activityService.getCombinationActivityListByCount(defaultIfNull(count, 6));
         if (CollUtil.isEmpty(list)) {
-            return success(CombinationActivityConvert.INSTANCE.convertAppList(list));
+            return success(Collections.emptyList());
         }
-
+        // 拼接返回
         List<ProductSpuRespDTO> spuList = spuApi.getSpuList(convertList(list, CombinationActivityDO::getSpuId));
-        // TODO 芋艿：增加 Spring Cache
         return success(CombinationActivityConvert.INSTANCE.convertAppList(list, spuList));
     }
 
@@ -67,7 +64,7 @@ public class AppCombinationActivityController {
         if (CollUtil.isEmpty(result.getList())) {
             return success(PageResult.empty(result.getTotal()));
         }
-
+        // 拼接返回
         List<ProductSpuRespDTO> spuList = spuApi.getSpuList(convertList(result.getList(), CombinationActivityDO::getSpuId));
         return success(CombinationActivityConvert.INSTANCE.convertAppPage(result, spuList));
     }
@@ -78,15 +75,12 @@ public class AppCombinationActivityController {
     public CommonResult<AppCombinationActivityDetailRespVO> getCombinationActivityDetail(@RequestParam("id") Long id) {
         // 1、获取活动
         CombinationActivityDO combinationActivity = activityService.getCombinationActivity(id);
-        if (combinationActivity == null) {
+        if (combinationActivity == null
+            || ObjectUtil.equal(combinationActivity.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
             return success(null);
         }
-        if (ObjectUtil.equal(combinationActivity.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
-            throw exception(COMBINATION_ACTIVITY_APP_STATUS_DISABLE);
-        }
-
         // 2、获取活动商品
-        List<CombinationProductDO> products = activityService.getCombinationProductsByActivityIds(Arrays.asList(combinationActivity.getId()));
+        List<CombinationProductDO> products = activityService.getCombinationProductsByActivityId(combinationActivity.getId());
         return success(CombinationActivityConvert.INSTANCE.convert3(combinationActivity, products));
     }
 

@@ -43,10 +43,15 @@ public class DictDataServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testGetDictDataList() {
         // mock 数据
-        DictDataDO dictDataDO01 = randomDictDataDO().setDictType("yunai").setSort(2);
+        DictDataDO dictDataDO01 = randomDictDataDO().setDictType("yunai").setSort(2)
+                .setStatus(CommonStatusEnum.ENABLE.getStatus());
         dictDataMapper.insert(dictDataDO01);
-        DictDataDO dictDataDO02 = randomDictDataDO().setDictType("yunai").setSort(1);
+        DictDataDO dictDataDO02 = randomDictDataDO().setDictType("yunai").setSort(1)
+                .setStatus(CommonStatusEnum.ENABLE.getStatus());
         dictDataMapper.insert(dictDataDO02);
+        DictDataDO dictDataDO03 = randomDictDataDO().setDictType("yunai").setSort(3)
+                .setStatus(CommonStatusEnum.DISABLE.getStatus());
+        dictDataMapper.insert(dictDataDO03);
         // 准备参数
 
         // 调用

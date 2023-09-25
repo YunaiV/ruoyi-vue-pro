@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationP
 
 import javax.validation.Valid;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -64,6 +65,16 @@ public interface CombinationActivityService {
      * @return 拼团活动分页
      */
     PageResult<CombinationActivityDO> getCombinationActivityPage(CombinationActivityPageReqVO pageReqVO);
+
+    /**
+     * 获得拼团活动商品列表
+     *
+     * @param activityId 拼团活动 id
+     * @return 拼团活动的商品列表
+     */
+    default List<CombinationProductDO> getCombinationProductsByActivityId(Long activityId) {
+        return getCombinationProductsByActivityIds(Collections.singletonList(activityId));
+    }
 
     /**
      * 获得拼团活动商品列表

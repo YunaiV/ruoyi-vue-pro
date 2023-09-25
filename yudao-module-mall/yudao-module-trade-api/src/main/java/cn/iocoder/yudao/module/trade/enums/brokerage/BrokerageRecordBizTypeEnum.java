@@ -17,6 +17,7 @@ public enum BrokerageRecordBizTypeEnum implements IntArrayValuable {
 
     ORDER(1, "获得推广佣金", "获得推广佣金 {}", true),
     WITHDRAW(2, "提现申请", "提现申请扣除佣金 {}", false),
+    WITHDRAW_REJECT(3, "提现申请驳回", "提现申请驳回返还佣金 {}", true),
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BrokerageRecordBizTypeEnum::getType).toArray();

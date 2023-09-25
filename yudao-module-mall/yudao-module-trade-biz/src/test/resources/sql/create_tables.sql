@@ -186,6 +186,6 @@ CREATE TABLE IF NOT EXISTS "trade_brokerage_withdraw"
     "updater"             varchar           DEFAULT '',
     "update_time"         datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     "deleted"             bit      NOT NULL DEFAULT FALSE,
-    "tenant_id"      bigint   not null default '0',目
+    "tenant_id"      bigint   not null default '0',
     PRIMARY KEY ("id")
 ) COMMENT '佣金提现';

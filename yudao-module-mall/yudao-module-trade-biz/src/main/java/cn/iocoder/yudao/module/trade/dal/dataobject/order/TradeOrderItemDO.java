@@ -126,6 +126,7 @@ public class TradeOrderItemDO extends BaseDO {
      * - {@link #discountPrice}
      * + {@link #deliveryPrice}
      * + {@link #adjustPrice}
+     * - {@link #vipPrice}
      */
     private Integer payPrice;
 
@@ -143,6 +144,18 @@ public class TradeOrderItemDO extends BaseDO {
      * 对应 taobao 的 trade.point_fee 字段
      */
     private Integer pointPrice;
+    /**
+     * 使用的积分
+     */
+    private Integer usePoint;
+    /**
+     * 赠送的积分
+     */
+    private Integer givePoint;
+    /**
+     * VIP 减免金额，单位：分
+     */
+    private Integer vipPrice;
     // TODO @芋艿：如果商品 vip 折扣时，到底是新增一个 vipPrice 记录优惠记录，还是 vipDiscountPrice，记录 vip 的优惠；还是直接使用 vipPrice；
     // 目前 crmeb 的选择，单独一个 vipPrice 记录优惠价格；感觉不一定合理，可以在看看有赞的；
 

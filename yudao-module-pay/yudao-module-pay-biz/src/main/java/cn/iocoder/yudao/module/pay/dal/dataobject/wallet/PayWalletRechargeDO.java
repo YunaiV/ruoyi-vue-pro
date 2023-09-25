@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.pay.dal.dataobject.wallet;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
+import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -31,22 +32,21 @@ public class PayWalletRechargeDO extends BaseDO {
      */
     private Long walletId;
 
-    // TODO @jason：要不改成 totalPrice？
     /**
      * 用户实际到账余额
      *
      * 例如充 100 送 20，则该值是 120
      */
-    private Integer price;
+    private Integer totalPrice;
     /**
      * 实际支付金额
      */
     private Integer payPrice;
-    // TODO @jason：bonusPrice 哈，更统一一点；
+
     /**
      * 钱包赠送金额
      */
-    private Integer walletBonus;
+    private Integer bonusPrice;
 
     /**
      * 是否已支付
@@ -62,6 +62,7 @@ public class PayWalletRechargeDO extends BaseDO {
      * 关联 {@link PayOrderDO#getId()}
      */
     private Long payOrderId;
+
     /**
      * 支付成功的支付渠道
      *
@@ -79,23 +80,31 @@ public class PayWalletRechargeDO extends BaseDO {
      * 关联 {@link PayRefundDO#getId()}
      */
     private Long payRefundId;
-    // TODO @jason：要不改成 refundTotalPrice？
+
     /**
      * 退款金额，包含赠送金额
      */
-    private Integer refundPrice;
+    private Integer refundTotalPrice;
     /**
      * 退款支付金额
      */
     private Integer refundPayPrice;
-    // TODO @jason：要不改成 refundBonusPrice？
+
     /**
      * 退款钱包赠送金额
      */
-    private Integer refundWalletBonus;
+    private Integer refundBonusPrice;
+
     /**
      * 退款时间
      */
     private LocalDateTime refundTime;
+
+    /**
+     * 退款状态
+     *
+     * 枚举 {@link PayRefundStatusEnum}
+     */
+    private Integer refundStatus;
 
 }

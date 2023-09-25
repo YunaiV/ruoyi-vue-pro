@@ -53,7 +53,4 @@ public class AppPayWalletRechargeController {
                 notifyReqDTO.getPayOrderId());
         return success(true);
     }
-
-    // TODO @jason：管理后台，是不是可以搞个发起退款；
-
 }

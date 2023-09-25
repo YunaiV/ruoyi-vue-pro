@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleDetailRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleRespPageItemVO;
+import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.log.TradeAfterSaleLogRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.base.member.user.MemberUserRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.base.product.property.ProductPropertyValueDetailRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderBaseVO;
@@ -15,7 +16,6 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleLogDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
-import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.dto.TradeAfterSaleLogRespVO;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -68,7 +68,7 @@ public interface TradeAfterSaleConvert {
     PageResult<AppTradeAfterSaleRespVO> convertPage02(PageResult<TradeAfterSaleDO> page);
 
     List<TradeAfterSaleLogRespVO> convertList(List<TradeAfterSaleLogDO> list);
-    
+
     default TradeAfterSaleDetailRespVO convert(TradeAfterSaleDO afterSale, TradeOrderDO order, List<TradeOrderItemDO> orderItems,
                                                MemberUserRespDTO user, List<TradeAfterSaleLogRespVO> logs) {
         TradeAfterSaleDetailRespVO respVO = convert(afterSale, orderItems);
@@ -81,7 +81,7 @@ public interface TradeAfterSaleConvert {
         return respVO;
     }
 
-    List<cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.log.TradeAfterSaleLogRespVO> convertList1(List<TradeAfterSaleLogRespVO> list);
+    List<TradeAfterSaleLogRespVO> convertList1(List<TradeAfterSaleLogRespVO> list);
     @Mapping(target = "id", source = "afterSale.id")
     TradeAfterSaleDetailRespVO convert(TradeAfterSaleDO afterSale, List<TradeOrderItemDO> orderItems);
     TradeOrderBaseVO convert(TradeOrderDO order);

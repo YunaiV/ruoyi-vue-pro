@@ -75,16 +75,18 @@ public class BargainActivityServiceImpl implements BargainActivityService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void updateBargainActivityStock(Long id, Integer count) {
         // 查询砍价活动
         BargainActivityDO activity = getBargainActivity(id);
         if (activity == null) {
             throw exception(BARGAIN_ACTIVITY_NOT_EXISTS);
         }
+        if (count > activity.getStock()) {
+            throw exception(BARGAIN_ACTIVITY_UPDATE_STOCK_FAIL);
+        }
 
         // 更新砍价库存
-        int updateCount = bargainActivityMapper.updateActivityStock(id, count);
+        int updateCount = bargainActivityMapper.updateStock(id, count);
         if (updateCount == 0) {
             throw exception(BARGAIN_ACTIVITY_UPDATE_STOCK_FAIL);
         }

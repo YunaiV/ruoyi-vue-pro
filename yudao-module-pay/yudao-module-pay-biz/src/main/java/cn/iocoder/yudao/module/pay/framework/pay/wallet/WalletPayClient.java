@@ -8,6 +8,8 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferRespDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.client.impl.NonePayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
@@ -174,4 +176,8 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
         throw new IllegalStateException(String.format("支付退款单[%s] 状态不正确", outRefundNo));
     }
 
+    @Override
+    public PayTransferRespDTO doUnifiedTransfer(PayTransferUnifiedReqDTO reqDTO) {
+        throw new UnsupportedOperationException("待实现");
+    }
 }

@@ -114,11 +114,8 @@ public interface SeckillActivityConvert {
         PageResult<AppSeckillActivityRespVO> result = convertPage1(pageResult);
         Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
         List<AppSeckillActivityRespVO> list = CollectionUtils.convertList(result.getList(), item -> {
-            findAndThen(spuMap, item.getSpuId(), spu -> {
-                item.setPicUrl(spu.getPicUrl())
-                        .setMarketPrice(spu.getMarketPrice())
-                        .setUnitName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.PRODUCT_UNIT, spu.getUnit()));
-            });
+            findAndThen(spuMap, item.getSpuId(), spu -> item.setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice())
+                    .setUnitName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.PRODUCT_UNIT, spu.getUnit())));
             return item;
         });
         result.setList(list);
@@ -132,6 +129,7 @@ public interface SeckillActivityConvert {
     default AppSeckillActivityDetailRespVO convert3(SeckillActivityDO seckillActivity, List<SeckillProductDO> products, SeckillConfigDO filteredConfig) {
         return convert2(seckillActivity)
                 .setProducts(convertList1(products))
+                // TODO @puhui999：要不要在里面 default 一个方法，处理这个事件；简洁一点；
                 .setStartTime(LocalDateTimeUtil.parse(LocalDateTimeUtil.format(seckillActivity.getStartTime(), "yyyy-MM-dd") + " " + filteredConfig.getStartTime(),
                         "yyyy-MM-dd HH:mm:ss")) // 活动开始日期和时段结合
                 .setEndTime(LocalDateTimeUtil.parse(LocalDateTimeUtil.format(seckillActivity.getEndTime(), "yyyy-MM-dd") + " " + filteredConfig.getEndTime(),

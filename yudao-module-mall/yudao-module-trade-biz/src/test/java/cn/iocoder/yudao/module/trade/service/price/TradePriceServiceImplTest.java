@@ -45,7 +45,7 @@ public class TradePriceServiceImplTest extends BaseMockitoUnitTest {
     public void testCalculatePrice() {
         // 准备参数
         TradePriceCalculateReqBO calculateReqBO = new TradePriceCalculateReqBO()
-                .setType(TradeOrderTypeEnum.NORMAL.getType()).setUserId(10L)
+                .setUserId(10L)
                 .setCouponId(20L).setAddressId(30L)
                 .setItems(Arrays.asList(
                         new TradePriceCalculateReqBO.Item().setSkuId(100L).setCount(1).setSelected(true),

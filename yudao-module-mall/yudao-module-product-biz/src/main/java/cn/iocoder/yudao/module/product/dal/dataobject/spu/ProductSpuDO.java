@@ -179,6 +179,7 @@ public class ProductSpuDO extends BaseDO {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<Long> giveCouponTemplateIds;
 
+    // TODO @puhui999：字段估计要改成 brokerageType
     /**
      * 分销类型
      *

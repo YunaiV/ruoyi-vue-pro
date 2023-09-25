@@ -38,7 +38,7 @@ public interface BargainActivityMapper extends BaseMapperX<BargainActivityDO> {
      * @param count 扣减的库存数量
      * @return 影响的行数
      */
-    default int updateActivityStock(Long id, int count) {
+    default int updateStock(Long id, int count) {
         return update(null, new LambdaUpdateWrapper<BargainActivityDO>()
                 .eq(BargainActivityDO::getId, id)
                 .ge(BargainActivityDO::getStock, count)

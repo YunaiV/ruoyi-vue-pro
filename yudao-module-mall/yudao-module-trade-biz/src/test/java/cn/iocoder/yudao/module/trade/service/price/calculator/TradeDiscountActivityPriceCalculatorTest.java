@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.promotion.api.discount.DiscountActivityApi;
 import cn.iocoder.yudao.module.promotion.api.discount.dto.DiscountProductRespDTO;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionDiscountTypeEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import org.junit.jupiter.api.Test;
@@ -42,6 +43,7 @@ public class TradeDiscountActivityPriceCalculatorTest extends BaseMockitoUnitTes
                         new TradePriceCalculateReqBO.Item().setSkuId(20L).setCount(3).setSelected(false) // 匹配活动，但未选中
                 ));
         TradePriceCalculateRespBO result = new TradePriceCalculateRespBO()
+                .setType(TradeOrderTypeEnum.NORMAL.getType())
                 .setPrice(new TradePriceCalculateRespBO.Price())
                 .setPromotions(new ArrayList<>())
                 .setItems(asList(

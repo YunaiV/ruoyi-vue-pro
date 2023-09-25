@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.product.api.property;
 
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
-import cn.iocoder.yudao.module.product.convert.propertyvalue.ProductPropertyValueConvert;
+import cn.iocoder.yudao.module.product.convert.property.ProductPropertyValueConvert;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;

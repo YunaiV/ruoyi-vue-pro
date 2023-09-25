@@ -13,6 +13,11 @@ public interface PayWalletRechargeMapper extends BaseMapperX<PayWalletRechargeDO
                 .eq(PayWalletRechargeDO::getId, id).eq(PayWalletRechargeDO::getPayStatus, wherePayStatus));
     }
 
+    default  int updateByIdAndRefunded(Long id, Integer whereRefundStatus, PayWalletRechargeDO updateObj){
+        return update(updateObj, new LambdaQueryWrapperX<PayWalletRechargeDO>()
+                .eq(PayWalletRechargeDO::getId, id).eq(PayWalletRechargeDO::getRefundStatus, whereRefundStatus));
+    }
+
 }
 
 

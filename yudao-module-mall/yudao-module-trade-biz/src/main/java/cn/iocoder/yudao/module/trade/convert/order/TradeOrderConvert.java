@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.convert.order;
 
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -14,6 +15,7 @@ import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDT
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.base.member.user.MemberUserRespVO;
@@ -56,6 +58,7 @@ public interface TradeOrderConvert {
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
+            @Mapping(source = "userId", target = "userId"),
             @Mapping(source = "createReqVO.couponId", target = "couponId"),
             @Mapping(target = "remark", ignore = true),
             @Mapping(source = "createReqVO.remark", target = "userRemark"),
@@ -64,14 +67,11 @@ public interface TradeOrderConvert {
             @Mapping(source = "calculateRespBO.price.deliveryPrice", target = "deliveryPrice"),
             @Mapping(source = "calculateRespBO.price.couponPrice", target = "couponPrice"),
             @Mapping(source = "calculateRespBO.price.pointPrice", target = "pointPrice"),
-            @Mapping(source = "calculateRespBO.price.payPrice", target = "payPrice"),
-            @Mapping(source = "address.name", target = "receiverName"),
-            @Mapping(source = "address.mobile", target = "receiverMobile"),
-            @Mapping(source = "address.areaId", target = "receiverAreaId"),
-            @Mapping(source = "address.detailAddress", target = "receiverDetailAddress"),
+            @Mapping(source = "calculateRespBO.price.vipPrice", target = "vipPrice"),
+            @Mapping(source = "calculateRespBO.price.payPrice", target = "payPrice")
     })
     TradeOrderDO convert(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO,
-                         TradePriceCalculateRespBO calculateRespBO, AddressRespDTO address);
+                         TradePriceCalculateRespBO calculateRespBO);
 
     TradeOrderRespDTO convert(TradeOrderDO orderDO);
 
@@ -89,22 +89,15 @@ public interface TradeOrderConvert {
     TradeOrderItemDO convert(TradePriceCalculateRespBO.OrderItem item);
 
     default ProductSkuUpdateStockReqDTO convert(List<TradeOrderItemDO> list) {
-        return new ProductSkuUpdateStockReqDTO(TradeOrderConvert.INSTANCE.convertList(list));
-    }
-
-    default ProductSkuUpdateStockReqDTO convertNegative(List<TradeOrderItemDO> list) {
-        List<ProductSkuUpdateStockReqDTO.Item> items = TradeOrderConvert.INSTANCE.convertList(list);
-        items.forEach(item -> item.setIncrCount(-item.getIncrCount()));
+        List<ProductSkuUpdateStockReqDTO.Item> items = CollectionUtils.convertList(list, item ->
+                new ProductSkuUpdateStockReqDTO.Item().setId(item.getSkuId()).setIncrCount(-item.getCount()));
         return new ProductSkuUpdateStockReqDTO(items);
     }
-
-    List<ProductSkuUpdateStockReqDTO.Item> convertList(List<TradeOrderItemDO> list);
-
-    @Mappings({
-            @Mapping(source = "skuId", target = "id"),
-            @Mapping(source = "count", target = "incrCount"),
-    })
-    ProductSkuUpdateStockReqDTO.Item convert(TradeOrderItemDO bean);
+    default ProductSkuUpdateStockReqDTO convertNegative(List<AppTradeOrderSettlementReqVO.Item> list) {
+        List<ProductSkuUpdateStockReqDTO.Item> items = CollectionUtils.convertList(list, item ->
+                new ProductSkuUpdateStockReqDTO.Item().setId(item.getSkuId()).setIncrCount(-item.getCount()));
+        return new ProductSkuUpdateStockReqDTO(items);
+    }
 
     default PayOrderCreateReqDTO convert(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
                                          TradePriceCalculateRespBO calculateRespBO, TradeOrderProperties orderProperties) {
@@ -220,7 +213,11 @@ public interface TradeOrderConvert {
 
     default TradePriceCalculateReqBO convert(Long userId, AppTradeOrderSettlementReqVO settlementReqVO,
                                              List<CartDO> cartList) {
-        TradePriceCalculateReqBO reqBO = convert(settlementReqVO).setUserId(userId).setItems(new ArrayList<>(settlementReqVO.getItems().size()));
+        TradePriceCalculateReqBO reqBO = new TradePriceCalculateReqBO().setUserId(userId)
+                .setCouponId(settlementReqVO.getCouponId()).setPointStatus(settlementReqVO.getPointStatus())
+                .setDeliveryType(settlementReqVO.getDeliveryType()).setAddressId(settlementReqVO.getAddressId())
+                .setPickUpStoreId(settlementReqVO.getPickUpStoreId())
+                .setItems(new ArrayList<>(settlementReqVO.getItems().size()));
         // 商品项的构建
         Map<Long, CartDO> cartMap = convertMap(cartList, CartDO::getId);
         for (AppTradeOrderSettlementReqVO.Item item : settlementReqVO.getItems()) {
@@ -273,11 +270,16 @@ public interface TradeOrderConvert {
 
     TradeOrderDO convert(TradeOrderRemarkReqVO reqVO);
 
-    default BrokerageAddReqBO convert(MemberUserRespDTO user, TradeOrderItemDO item, ProductSkuRespDTO sku) {
-        return new BrokerageAddReqBO().setBizId(String.valueOf(item.getId())).setSourceUserId(item.getUserId())
+    default BrokerageAddReqBO convert(MemberUserRespDTO user, TradeOrderItemDO item,
+                                      ProductSpuRespDTO spu, ProductSkuRespDTO sku) {
+        BrokerageAddReqBO bo = new BrokerageAddReqBO().setBizId(String.valueOf(item.getId())).setSourceUserId(item.getUserId())
                 .setBasePrice(item.getPayPrice() * item.getCount())
                 .setTitle(StrUtil.format("{}成功购买{}", user.getNickname(), item.getSpuName()))
-                .setFirstFixedPrice(sku.getFirstBrokeragePrice()).setSecondFixedPrice(sku.getSecondBrokeragePrice());
+                .setFirstFixedPrice(0).setSecondFixedPrice(0);
+        if (BooleanUtil.isTrue(spu.getSubCommissionType())) {
+            bo.setFirstFixedPrice(sku.getFirstBrokeragePrice()).setSecondFixedPrice(sku.getSecondBrokeragePrice());
+        }
+        return bo;
     }
 
     TradeBeforeOrderCreateReqBO convert(AppTradeOrderCreateReqVO createReqVO);

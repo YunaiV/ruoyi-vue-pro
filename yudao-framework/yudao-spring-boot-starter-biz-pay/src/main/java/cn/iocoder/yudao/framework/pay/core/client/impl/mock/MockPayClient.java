@@ -4,6 +4,8 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferRespDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.client.impl.NonePayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
@@ -64,4 +66,8 @@ public class MockPayClient extends AbstractPayClient<NonePayClientConfig> {
         throw new UnsupportedOperationException("模拟支付无支付回调");
     }
 
+    @Override
+    protected PayTransferRespDTO doUnifiedTransfer(PayTransferUnifiedReqDTO reqDTO) {
+        throw new UnsupportedOperationException("待实现");
+    }
 }

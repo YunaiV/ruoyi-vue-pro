@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.module.trade.service.price.bo;
 
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.Valid;
@@ -19,13 +17,6 @@ import java.util.List;
 public class TradePriceCalculateReqBO {
 
     /**
-     * 订单类型
-     *
-     * 枚举 {@link TradeOrderTypeEnum}
-     */
-    private Integer type;
-
-    /**
      * 用户编号
      *
      * 对应 MemberUserDO 的 id 编号
@@ -40,11 +31,10 @@ public class TradePriceCalculateReqBO {
     private Long couponId;
 
     /**
-     * 收货地址编号
-     *
-     * 对应 MemberAddressDO 的 id 编号
+     * 是否使用积分
      */
-    private Long addressId;
+    @NotNull(message = "是否使用积分不能为空")
+    private Boolean pointStatus;
 
     /**
      * 配送方式
@@ -52,29 +42,48 @@ public class TradePriceCalculateReqBO {
      * 枚举 {@link DeliveryTypeEnum}
      */
     private Integer deliveryType;
-
-    // ========== 秒杀活动相关字段 ==========
-    @Schema(description = "秒杀活动编号", example = "1024")
-    private Long seckillActivityId;
-
-    // ========== 拼团活动相关字段 ==========
-    // TODO @puhui999：是不是拼团记录的编号哈？
-    @Schema(description = "拼团活动编号", example = "1024")
-    private Long combinationActivityId;
-
-    @Schema(description = "拼团团长编号", example = "2048")
-    private Long combinationHeadId;
-
-    // ========== 砍价活动相关字段 ==========
-    // TODO @puhui999：是不是砍价记录的编号哈？
-    @Schema(description = "砍价活动编号", example = "123")
-    private Long bargainActivityId;
+    /**
+     * 收货地址编号
+     *
+     * 对应 MemberAddressDO 的 id 编号
+     */
+    private Long addressId;
+    /**
+     * 自提门店编号
+     *
+     * 对应 PickUpStoreDO 的 id 编号
+     */
+    private Long pickUpStoreId;
 
     /**
      * 商品 SKU 数组
      */
     @NotNull(message = "商品数组不能为空")
     private List<Item> items;
+
+    // ========== 秒杀活动相关字段 ==========
+    /**
+     * 秒杀活动编号
+     */
+    private Long seckillActivityId;
+
+    // ========== 拼团活动相关字段 ==========
+    // TODO @puhui999：是不是拼团记录的编号哈？
+    /**
+     * 拼团活动编号
+     */
+    private Long combinationActivityId;
+
+    /**
+     * 拼团团长编号
+     */
+    private Long combinationHeadId;
+
+    // ========== 砍价活动相关字段 ==========
+    /**
+     * 砍价活动编号
+     */
+    private Long bargainActivityId;
 
     /**
      * 商品 SKU

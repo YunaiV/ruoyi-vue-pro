@@ -73,9 +73,7 @@ public interface BargainActivityConvert {
         // 拼接关联属性
         Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
         List<AppBargainActivityRespVO> list = CollectionUtils.convertList(result.getList(), item -> {
-            findAndThen(spuMap, item.getSpuId(), spu -> {
-                item.setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice());
-            });
+            findAndThen(spuMap, item.getSpuId(), spu -> item.setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice()));
             return item;
         });
         result.setList(list);
@@ -88,9 +86,7 @@ public interface BargainActivityConvert {
         List<AppBargainActivityRespVO> activityList = convertAppList(list);
         Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
         return CollectionUtils.convertList(activityList, item -> {
-            findAndThen(spuMap, item.getSpuId(), spu -> {
-                item.setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice());
-            });
+            findAndThen(spuMap, item.getSpuId(), spu -> item.setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice()));
             return item;
         });
     }

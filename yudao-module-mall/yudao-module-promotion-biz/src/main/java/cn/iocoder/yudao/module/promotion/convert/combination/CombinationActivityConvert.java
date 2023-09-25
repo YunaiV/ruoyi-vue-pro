@@ -61,9 +61,7 @@ public interface CombinationActivityConvert {
         Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
         PageResult<CombinationActivityRespVO> pageResult = convertPage(page);
         pageResult.getList().forEach(item -> {
-            MapUtils.findAndThen(spuMap, item.getSpuId(), spu -> {
-                item.setSpuName(spu.getName()).setPicUrl(spu.getPicUrl());
-            });
+            MapUtils.findAndThen(spuMap, item.getSpuId(), spu -> item.setSpuName(spu.getName()).setPicUrl(spu.getPicUrl()));
             item.setProducts(convertList2(productList));
         });
         return pageResult;
@@ -118,9 +116,7 @@ public interface CombinationActivityConvert {
         List<AppCombinationActivityRespVO> activityList = convertAppList(list);
         Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
         return CollectionUtils.convertList(activityList, item -> {
-            findAndThen(spuMap, item.getSpuId(), spu -> {
-                item.setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice());
-            });
+            findAndThen(spuMap, item.getSpuId(), spu -> item.setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice()));
             return item;
         });
     }

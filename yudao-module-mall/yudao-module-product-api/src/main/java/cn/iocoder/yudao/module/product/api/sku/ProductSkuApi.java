@@ -39,7 +39,7 @@ public interface ProductSkuApi {
     List<ProductSkuRespDTO> getSkuListBySpuId(Collection<Long> spuIds);
 
     /**
-     * 更新 SKU 库存
+     * 更新 SKU 库存（增加 or 减少）
      *
      * @param updateStockReqDTO 更新请求
      */

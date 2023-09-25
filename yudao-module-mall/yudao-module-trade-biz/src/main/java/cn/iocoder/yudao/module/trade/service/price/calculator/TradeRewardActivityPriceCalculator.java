@@ -1,11 +1,13 @@
 package cn.iocoder.yudao.module.trade.service.price.calculator;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.promotion.api.reward.RewardActivityApi;
 import cn.iocoder.yudao.module.promotion.api.reward.dto.RewardActivityMatchRespDTO;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionConditionTypeEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import org.springframework.core.annotation.Order;
@@ -32,6 +34,10 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
 
     @Override
     public void calculate(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result) {
+        // 0. 只有【普通】订单，才计算该优惠
+        if (ObjectUtil.notEqual(result.getType(), TradeOrderTypeEnum.NORMAL.getType())) {
+            return;
+        }
         // 获得 SKU 对应的满减送活动
         List<RewardActivityMatchRespDTO> rewardActivities = rewardActivityApi.getMatchRewardActivityList(
                 convertSet(result.getItems(), TradePriceCalculateRespBO.OrderItem::getSpuId));

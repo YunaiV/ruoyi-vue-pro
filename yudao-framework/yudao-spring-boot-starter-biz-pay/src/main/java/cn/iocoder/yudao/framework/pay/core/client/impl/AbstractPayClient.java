@@ -8,6 +8,8 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferRespDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.exception.PayException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -179,6 +181,26 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
     }
 
     protected abstract PayRefundRespDTO doGetRefund(String outTradeNo, String outRefundNo)
+            throws Throwable;
+
+    @Override
+    public final PayTransferRespDTO unifiedTransfer(PayTransferUnifiedReqDTO reqDTO) {
+        ValidationUtils.validate(reqDTO);
+        PayTransferRespDTO resp;
+        try{
+            resp = doUnifiedTransfer(reqDTO);
+        }catch (ServiceException ex) { // 业务异常，都是实现类已经翻译，所以直接抛出即可
+            throw ex;
+        } catch (Throwable ex) {
+            // 系统异常，则包装成 PayException 异常抛出
+            log.error("[unifiedTransfer][客户端({}) request({}) 发起转账异常]",
+                    getId(), toJsonString(reqDTO), ex);
+            throw buildPayException(ex);
+        }
+        return resp;
+    }
+
+    protected abstract PayTransferRespDTO doUnifiedTransfer(PayTransferUnifiedReqDTO reqDTO)
             throws Throwable;
 
     // ========== 各种工具方法 ==========

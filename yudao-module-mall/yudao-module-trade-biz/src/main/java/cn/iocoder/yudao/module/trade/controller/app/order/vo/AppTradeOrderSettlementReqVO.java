@@ -30,7 +30,7 @@ public class AppTradeOrderSettlementReqVO {
     private Boolean pointStatus;
 
     // ========== 配送相关相关字段 ==========
-    @Schema(description = "配送方式", required = true, example = "1")
+    @Schema(description = "配送方式", example = "1")
     @InEnum(value = DeliveryTypeEnum.class, message = "配送方式不正确")
     private Integer deliveryType;
 
@@ -61,6 +61,8 @@ public class AppTradeOrderSettlementReqVO {
     // TODO @puhui999：是不是砍价记录的编号哈？
     @Schema(description = "砍价活动编号", example = "123")
     private Long bargainActivityId;
+
+    // TODO @puhui999：可以写个参数校验，如果 seckillActivityId 或 combinationActivityId 或 combinationHeadId 的情况，items 应该只有一个
 
     @Data
     @Schema(description = "用户 App - 商品项")
