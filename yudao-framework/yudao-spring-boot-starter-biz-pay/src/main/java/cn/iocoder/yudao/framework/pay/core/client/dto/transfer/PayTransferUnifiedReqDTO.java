@@ -51,7 +51,7 @@ public class PayTransferUnifiedReqDTO {
     private String title;
 
     /**
-     * 收款方信息，转账类型不同信息不同
+     * 收款方信息，转账类型不同，收款方信息不同
      */
     @NotEmpty(message = "收款方信息 不能为空")
     private Map<String, String> payeeInfo;

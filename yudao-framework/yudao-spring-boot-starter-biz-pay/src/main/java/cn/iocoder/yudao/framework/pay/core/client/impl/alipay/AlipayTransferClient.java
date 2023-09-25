@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
@@ -17,8 +18,6 @@ import com.alipay.api.domain.Participant;
 import com.alipay.api.request.AlipayFundTransUniTransferRequest;
 import com.alipay.api.response.AlipayFundTransUniTransferResponse;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
@@ -82,12 +81,11 @@ public class AlipayTransferClient extends AbstractAlipayPayClient {
                 // 处理结果
                 if (!response.isSuccess()) {
                     // 当出现 SYSTEM_ERROR, 转账可能成功也可能失败。 返回 WAIT 状态. 后续 job 会轮询
-                    if (Objects.equals(response.getSubCode(), "SYSTEM_ERROR")) {
+                    if (ObjectUtils.equalsAny(response.getSubCode(), "SYSTEM_ERROR", "ACQ.SYSTEM_ERROR")) {
                         return PayTransferRespDTO.waitingOf(null, reqDTO.getOutTransferNo(), response);
                     }
                     return PayTransferRespDTO.failureOf(response.getSubCode(), response.getSubMsg(),
                             reqDTO.getOutTransferNo(), response);
-
                 }
                 return  PayTransferRespDTO.successOf(response.getOrderId(), parseTime(response.getTransDate()),
                         response.getOutBizNo(), response);

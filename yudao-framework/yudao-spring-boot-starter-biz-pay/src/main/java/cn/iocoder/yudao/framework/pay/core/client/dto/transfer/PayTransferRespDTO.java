@@ -13,6 +13,11 @@ import java.time.LocalDateTime;
 @Data
 public class PayTransferRespDTO {
 
+    /**
+     * 转账状态
+     *
+     * 关联 {@link  PayTransferStatusRespEnum#getStatus()}
+     */
     private Integer status;
 
     /**
