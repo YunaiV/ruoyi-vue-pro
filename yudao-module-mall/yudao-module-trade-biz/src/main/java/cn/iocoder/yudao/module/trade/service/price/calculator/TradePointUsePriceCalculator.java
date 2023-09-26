@@ -20,6 +20,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 
+// TODO @疯狂：搞个单测，嘿嘿；
 /**
  * 使用积分的 {@link TradePriceCalculator} 实现类
  *
@@ -29,6 +30,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 @Order(TradePriceCalculator.ORDER_POINT_USE)
 @Slf4j
 public class TradePointUsePriceCalculator implements TradePriceCalculator {
+
     @Resource
     private MemberPointApi memberPointApi;
     @Resource
@@ -48,13 +50,14 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
         }
         // 1.3 校验用户积分余额
         MemberUserRespDTO user = memberUserApi.getUser(param.getUserId());
-        if (user.getPoint() == null || user.getPoint() < 0) {
+        if (user.getPoint() == null || user.getPoint() <= 0) {
             return;
         }
 
         // 2.1 计算积分优惠金额
+        // TODO @疯狂：如果计算出来，优惠金额为 0，那是不是不用执行后续逻辑哈
         int pointPrice = calculatePointPrice(config, user.getPoint(), result);
-        // 2.1 计算分摊的积分、抵扣金额
+        // 2.2 计算分摊的积分、抵扣金额
         List<TradePriceCalculateRespBO.OrderItem> orderItems = filterList(result.getItems(), TradePriceCalculateRespBO.OrderItem::getSelected);
         List<Integer> dividePointPrices = TradePriceCalculatorHelper.dividePrice(orderItems, pointPrice);
         List<Integer> divideUsePoints = TradePriceCalculatorHelper.dividePrice(orderItems, result.getUsePoint());
@@ -74,7 +77,9 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
         TradePriceCalculatorHelper.recountAllPrice(result);
     }
 
+    // TODO @疯狂：这个最好是 is 开头；因为 check 或者 validator，更多失败，会抛出异常；
     private boolean checkDeductPointEnable(MemberPointConfigRespDTO config) {
+        // TODO @疯狂：这个要不直接写成 return config != null && config .... 多行这样一个形式；
         if (config == null) {
             return false;
         }
@@ -93,7 +98,7 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
         }
         // 积分优惠金额（分）
         int pointPrice = usePoint * config.getTradeDeductUnitPrice();
-        // 0元购!!!：用户积分比较多时，积分可以抵扣的金额要大于支付金额， 这时需要根据支付金额反推使用多少积分
+        // 0 元购!!!：用户积分比较多时，积分可以抵扣的金额要大于支付金额，这时需要根据支付金额反推使用多少积分
         if (result.getPrice().getPayPrice() < pointPrice) {
             pointPrice = result.getPrice().getPayPrice();
             // 反推需要扣除的积分
@@ -103,7 +108,7 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
         }
         // 记录使用的积分
         result.setUsePoint(usePoint);
-
         return pointPrice;
     }
+
 }

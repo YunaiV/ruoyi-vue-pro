@@ -21,11 +21,13 @@ public interface TradePriceCalculator {
     /**
      * 快递运费的计算
      *
-     * 放在各种营销活动、优惠劵后面 TODO
+     * 放在各种营销活动、优惠劵后面
      */
     int ORDER_DELIVERY = 50;
     /**
      * 赠送积分，放最后
+     *
+     * 放在 {@link #ORDER_DELIVERY} 后面的原因，是运费也会产生费用，需要赠送对应积分
      */
     int ORDER_POINT_GIVE = 999;
 

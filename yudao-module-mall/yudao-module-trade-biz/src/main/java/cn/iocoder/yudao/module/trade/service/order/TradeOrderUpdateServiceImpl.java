@@ -348,7 +348,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // TODO 芋艿：OrderLog
 
         // 增加用户积分（赠送）
-        addUserPoint(order.getUserId(), order.getGivePoint(), MemberPointBizTypeEnum.ORDER_REWARD, order.getId());
+        addUserPoint(order.getUserId(), order.getGivePoint(), MemberPointBizTypeEnum.ORDER_GIVE, order.getId());
         // 增加用户经验
         getSelf().addUserExperienceAsync(order.getUserId(), order.getPayPrice(), order.getId());
         // 增加用户佣金
