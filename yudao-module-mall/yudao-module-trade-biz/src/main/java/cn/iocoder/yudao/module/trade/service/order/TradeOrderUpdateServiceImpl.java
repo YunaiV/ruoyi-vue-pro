@@ -74,7 +74,7 @@ import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.addTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.minusTime;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
 /**
@@ -496,7 +496,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Override
     public int receiveOrderBySystem() {
         // 1. 查询过期的待支付订单
-        LocalDateTime expireTime = addTime(tradeOrderProperties.getReceiveExpireTime());
+        LocalDateTime expireTime = minusTime(tradeOrderProperties.getReceiveExpireTime());
         List<TradeOrderDO> orders = tradeOrderMapper.selectListByStatusAndDeliveryTimeLt(
                 TradeOrderStatusEnum.DELIVERED.getStatus(), expireTime);
         if (CollUtil.isEmpty(orders)) {
@@ -510,7 +510,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                 getSelf().receiveOrderBySystem(order);
                 count++;
             } catch (Throwable e) {
-                log.error("[autoReceiveOrder][order({}) 自动收货订单异常]", order.getId(), e);
+                log.error("[receiveOrderBySystem][order({}) 自动收货订单异常]", order.getId(), e);
             }
         }
         return count;
@@ -587,7 +587,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Override
     public int cancelOrderBySystem() {
         // 1. 查询过期的待支付订单
-        LocalDateTime expireTime = addTime(tradeOrderProperties.getPayExpireTime());
+        LocalDateTime expireTime = minusTime(tradeOrderProperties.getPayExpireTime());
         List<TradeOrderDO> orders = tradeOrderMapper.selectListByStatusAndCreateTimeLt(
                 TradeOrderStatusEnum.UNPAID.getStatus(), expireTime);
         if (CollUtil.isEmpty(orders)) {
@@ -601,7 +601,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                 getSelf().cancelOrderBySystem(order);
                 count++;
             } catch (Throwable e) {
-                log.error("[autoCancelOrder][order({}) 过期订单异常]", order.getId(), e);
+                log.error("[cancelOrderBySystem][order({}) 过期订单异常]", order.getId(), e);
             }
         }
         return count;
@@ -722,7 +722,6 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                     .setPayPrice(item.getPayPrice() - adjustPrice));
         }
         tradeOrderItemMapper.updateBatch(updateItems);
-
 
         // 6、更新支付订单
         payOrderApi.updatePayOrderPrice(order.getPayOrderId(), update.getPayPrice());
@@ -845,41 +844,6 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         couponApi.returnUsedCoupon(order.getCouponId());
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_COMMENT)
-    public Long createOrderItemComment(Long userId, AppTradeOrderItemCommentCreateReqVO createReqVO) {
-        // 先通过订单项 ID，查询订单项是否存在
-        TradeOrderItemDO orderItem = tradeOrderItemMapper.selectByIdAndUserId(createReqVO.getOrderItemId(), userId);
-        if (orderItem == null) {
-            throw exception(ORDER_ITEM_NOT_FOUND);
-        }
-        // 校验订单相关状态
-        TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(orderItem.getOrderId(), userId);
-        if (order == null) {
-            throw exception(ORDER_NOT_FOUND);
-        }
-        if (ObjectUtil.notEqual(order.getStatus(), TradeOrderStatusEnum.COMPLETED.getStatus())) {
-            throw exception(ORDER_COMMENT_FAIL_STATUS_NOT_COMPLETED);
-        }
-        if (ObjectUtil.notEqual(order.getCommentStatus(), Boolean.FALSE)) {
-            throw exception(ORDER_COMMENT_STATUS_NOT_FALSE);
-        }
-
-        // 1. 创建评价
-        ProductCommentCreateReqDTO productCommentCreateReqDTO = TradeOrderConvert.INSTANCE.convert04(createReqVO, orderItem);
-        Long comment = productCommentApi.createComment(productCommentCreateReqDTO);
-
-        // 2. 更新订单项评价状态
-        tradeOrderItemMapper.updateById(new TradeOrderItemDO().setId(orderItem.getId()).setCommentStatus(Boolean.TRUE));
-        List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(order.getId());
-        if (!anyMatch(orderItems, item -> Objects.equals(item.getCommentStatus(), Boolean.FALSE))) {
-            tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId()).setCommentStatus(Boolean.TRUE));
-            // 增加订单日志
-            TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), order.getStatus());
-        }
-        return comment;
-    }
 
     /**
      * 判断指定订单的所有订单项，是不是都售后成功
@@ -891,6 +855,114 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(id);
         return orderItems.stream().allMatch(orderItem -> Objects.equals(orderItem.getAfterSaleStatus(),
                 TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus()));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_COMMENT)
+    public Long createOrderItemCommentByMember(Long userId, AppTradeOrderItemCommentCreateReqVO createReqVO) {
+        // 1.1 先通过订单项 ID，查询订单项是否存在
+        TradeOrderItemDO orderItem = tradeOrderItemMapper.selectByIdAndUserId(createReqVO.getOrderItemId(), userId);
+        if (orderItem == null) {
+            throw exception(ORDER_ITEM_NOT_FOUND);
+        }
+        // 1.2 校验订单相关状态
+        TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(orderItem.getOrderId(), userId);
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+        if (ObjectUtil.notEqual(order.getStatus(), TradeOrderStatusEnum.COMPLETED.getStatus())) {
+            throw exception(ORDER_COMMENT_FAIL_STATUS_NOT_COMPLETED);
+        }
+        if (ObjectUtil.notEqual(order.getCommentStatus(), Boolean.FALSE)) {
+            throw exception(ORDER_COMMENT_STATUS_NOT_FALSE);
+        }
+
+        // 2. 创建评价
+        Long commentId = createOrderItemComment0(orderItem, createReqVO);
+
+        // 3. 如果订单项都评论了，则更新订单评价状态
+        List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(order.getId());
+        if (!anyMatch(orderItems, item -> Objects.equals(item.getCommentStatus(), Boolean.FALSE))) {
+            tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId()).setCommentStatus(Boolean.TRUE)
+                    .setFinishTime(LocalDateTime.now()));
+            // 增加订单日志。注意：只有在所有订单项都评价后，才会增加
+            TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), order.getStatus());
+        }
+        return commentId;
+    }
+
+    @Override
+    public int createOrderItemCommentBySystem() {
+        // 1. 查询过期的待支付订单
+        LocalDateTime expireTime = minusTime(tradeOrderProperties.getCommentExpireTime());
+        List<TradeOrderDO> orders = tradeOrderMapper.selectListByStatusAndReceiveTimeLt(
+                TradeOrderStatusEnum.COMPLETED.getStatus(), expireTime, false);
+        if (CollUtil.isEmpty(orders)) {
+            return 0;
+        }
+
+        // 2. 遍历执行，逐个取消
+        int count = 0;
+        for (TradeOrderDO order : orders) {
+            try {
+                getSelf().createOrderItemCommentBySystemBySystem(order);
+                count ++;
+            } catch (Throwable e) {
+                log.error("[createOrderItemCommentBySystem][order({}) 过期订单异常]", order.getId(), e);
+            }
+        }
+        return count;
+    }
+
+    /**
+     * 创建单个订单的评论
+     *
+     * @param order 订单
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.SYSTEM_COMMENT)
+    public void createOrderItemCommentBySystemBySystem(TradeOrderDO order) {
+        // 1. 查询未评论的订单项
+        List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderIdAndCommentStatus(order.getId(), Boolean.FALSE);
+        if (CollUtil.isEmpty(orderItems)) {
+            return;
+        }
+
+        // 2. 逐个评论
+        for (TradeOrderItemDO orderItem : orderItems) {
+            // 2.1 创建评价
+            AppTradeOrderItemCommentCreateReqVO commentCreateReqVO = new AppTradeOrderItemCommentCreateReqVO()
+                    .setOrderItemId(orderItem.getId()).setAnonymous(false).setContent("")
+                    .setBenefitScores(5).setDescriptionScores(5);
+            createOrderItemComment0(orderItem, commentCreateReqVO);
+
+            // 2.2 更新订单项评价状态
+            tradeOrderItemMapper.updateById(new TradeOrderItemDO().setId(orderItem.getId()).setCommentStatus(Boolean.TRUE));
+        }
+
+        // 3. 所有订单项都评论了，则更新订单评价状态
+        tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId()).setCommentStatus(Boolean.TRUE)
+                .setFinishTime(LocalDateTime.now()));
+        // 增加订单日志。注意：只有在所有订单项都评价后，才会增加
+        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), order.getStatus());
+    }
+
+    /**
+     * 创建订单项的评论的核心实现
+     *
+     * @param orderItem 订单项
+     * @param createReqVO 评论内容
+     * @return 评论编号
+     */
+    private Long createOrderItemComment0(TradeOrderItemDO orderItem, AppTradeOrderItemCommentCreateReqVO createReqVO) {
+        // 1. 创建评价
+        ProductCommentCreateReqDTO productCommentCreateReqDTO = TradeOrderConvert.INSTANCE.convert04(createReqVO, orderItem);
+        Long commentId = productCommentApi.createComment(productCommentCreateReqDTO);
+
+        // 2. 更新订单项评价状态
+        tradeOrderItemMapper.updateById(new TradeOrderItemDO().setId(orderItem.getId()).setCommentStatus(Boolean.TRUE));
+        return commentId;
     }
 
     // =================== 营销相关的操作 ===================

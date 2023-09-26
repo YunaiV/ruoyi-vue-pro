@@ -173,7 +173,7 @@ public class AppTradeOrderController {
     @PostMapping("/item/create-comment")
     @Operation(summary = "创建交易订单项的评价")
     public CommonResult<Long> createOrderItemComment(@RequestBody AppTradeOrderItemCommentCreateReqVO createReqVO) {
-        return success(tradeOrderUpdateService.createOrderItemComment(getLoginUserId(), createReqVO));
+        return success(tradeOrderUpdateService.createOrderItemCommentByMember(getLoginUserId(), createReqVO));
     }
 
 }

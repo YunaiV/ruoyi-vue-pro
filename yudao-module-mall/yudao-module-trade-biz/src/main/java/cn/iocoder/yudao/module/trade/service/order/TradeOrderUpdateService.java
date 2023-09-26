@@ -142,12 +142,19 @@ public interface TradeOrderUpdateService {
     void updateOrderItemWhenAfterSaleCancel(@NotNull Long id);
 
     /**
-     * 创建订单项的评论
+     * 【会员】创建订单项的评论
      *
      * @param userId      用户编号
      * @param createReqVO 创建请求
      * @return 得到评价 id
      */
-    Long createOrderItemComment(Long userId, AppTradeOrderItemCommentCreateReqVO createReqVO);
+    Long createOrderItemCommentByMember(Long userId, AppTradeOrderItemCommentCreateReqVO createReqVO);
+
+    /**
+     * 【系统】创建订单项的评论
+     *
+     * @return 被评论的订单数
+     */
+    int createOrderItemCommentBySystem();
 
 }

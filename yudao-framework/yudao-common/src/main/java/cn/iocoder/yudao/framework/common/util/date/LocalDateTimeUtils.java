@@ -23,6 +23,10 @@ public class LocalDateTimeUtils {
         return LocalDateTime.now().plus(duration);
     }
 
+    public static LocalDateTime minusTime(Duration duration) {
+        return LocalDateTime.now().minus(duration);
+    }
+
     public static boolean beforeNow(LocalDateTime date) {
         return date.isBefore(LocalDateTime.now());
     }
