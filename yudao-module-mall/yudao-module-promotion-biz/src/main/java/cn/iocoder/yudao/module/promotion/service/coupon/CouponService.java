@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.promotion.service.coupon;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponMatchReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTakeTypeEnum;
 import cn.iocoder.yudao.module.promotion.service.coupon.bo.CouponTakeCountBO;
@@ -147,4 +148,13 @@ public interface CouponService {
      * @return 领取优惠券的数量
      */
     List<CouponTakeCountBO> getTakeCountListByTemplateIds(Collection<Long> templateIds, Long userId);
+
+    /**
+     * 获取用户匹配的优惠券列表
+     *
+     * @param userId     用户编号
+     * @param matchReqVO 匹配参数
+     * @return 优惠券列表
+     */
+    List<CouponDO> getMatchCouponList(Long userId, AppCouponMatchReqVO matchReqVO);
 }

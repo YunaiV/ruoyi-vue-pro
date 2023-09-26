@@ -1,11 +1,13 @@
 package cn.iocoder.yudao.module.promotion.dal.mysql.coupon;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
 import cn.iocoder.yudao.module.promotion.service.coupon.bo.CouponTakeCountBO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.yulichang.toolkit.MPJWrappers;
@@ -13,6 +15,8 @@ import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 优惠劵 Mapper
@@ -72,5 +76,22 @@ public interface CouponMapper extends BaseMapperX<CouponDO> {
                 .eq(CouponDO::getUserId, userId)
                 .in(CouponDO::getTemplateId, templateIds)
                 .groupBy(CouponDO::getTemplateId)), CouponTakeCountBO.class);
+    }
+
+    default List<CouponDO> selectListByUserIdAndStatusAndUsePriceLeAndProductScope(
+            Long userId, Integer status, Integer usePrice, List<Long> spuIds, List<Long> categoryIds) {
+
+        Function<List<Long>, String> productScopeValuesFindInSetFunc = ids -> ids.stream()
+                .map(id -> StrUtil.format("FIND_IN_SET({}, product_scope_values) ", id))
+                .collect(Collectors.joining(" OR "));
+        return selectList(new LambdaQueryWrapperX<CouponDO>()
+                .eq(CouponDO::getUserId, userId)
+                .eq(CouponDO::getStatus, status)
+                .le(CouponDO::getUsePrice, usePrice)
+                .and(w -> w.eq(CouponDO::getProductScope, PromotionProductScopeEnum.ALL.getScope())
+                        .or(ww -> ww.eq(CouponDO::getProductScope, PromotionProductScopeEnum.SPU.getScope())
+                                .apply(productScopeValuesFindInSetFunc.apply(spuIds)))
+                        .or(ww -> ww.eq(CouponDO::getProductScope, PromotionProductScopeEnum.CATEGORY.getScope())
+                                .apply(productScopeValuesFindInSetFunc.apply(categoryIds)))));
     }
 }

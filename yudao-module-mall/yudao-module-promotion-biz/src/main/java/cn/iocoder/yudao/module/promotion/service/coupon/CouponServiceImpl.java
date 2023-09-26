@@ -12,6 +12,7 @@ import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponMatchReqVO;
 import cn.iocoder.yudao.module.promotion.convert.coupon.CouponConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
@@ -184,6 +185,12 @@ public class CouponServiceImpl implements CouponService {
             return ListUtil.empty();
         }
         return couponMapper.selectCountByUserIdAndTemplateIdIn(userId, templateIds);
+    }
+
+    @Override
+    public List<CouponDO> getMatchCouponList(Long userId, AppCouponMatchReqVO matchReqVO) {
+        return couponMapper.selectListByUserIdAndStatusAndUsePriceLeAndProductScope(userId, CouponStatusEnum.UNUSED.getStatus(),
+                matchReqVO.getPrice(), matchReqVO.getSpuIds(), matchReqVO.getCategoryIds());
     }
 
     /**
