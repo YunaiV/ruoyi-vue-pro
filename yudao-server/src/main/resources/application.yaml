@@ -205,6 +205,7 @@ yudao:
       app-id: 1 # 商户编号
       pay-expire-time: 2h # 支付的过期时间
       receive-expire-time: 14d # 收货的过期时间
+      comment-expire-time: 7d # 评论的过期时间
     express:
       client: kd_niao
       kd-niao:

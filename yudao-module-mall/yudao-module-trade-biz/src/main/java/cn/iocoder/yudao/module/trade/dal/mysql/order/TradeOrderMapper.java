@@ -73,4 +73,12 @@ public interface TradeOrderMapper extends BaseMapperX<TradeOrderDO> {
                 .lt(TradeOrderDO::getDeliveryTime, deliveryTime));
     }
 
+    default List<TradeOrderDO> selectListByStatusAndReceiveTimeLt(Integer status, LocalDateTime receive,
+                                                                  Boolean commentStatus) {
+        return selectList(new LambdaUpdateWrapper<TradeOrderDO>()
+                .eq(TradeOrderDO::getStatus, status)
+                .lt(TradeOrderDO::getReceiveTime, receive)
+                .eq(TradeOrderDO::getCommentStatus, commentStatus));
+    }
+
 }
