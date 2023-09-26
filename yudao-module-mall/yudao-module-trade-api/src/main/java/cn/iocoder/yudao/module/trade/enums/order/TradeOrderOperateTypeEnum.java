@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 public enum TradeOrderOperateTypeEnum {
 
     MEMBER_CREATE(1, "用户下单"),
+    MEMBER_PAY(20, "用户付款成功"),
     MEMBER_RECEIVE(30, "用户已收货"),
     SYSTEM_RECEIVE(31, "到期未收货，系统自动确认收货"),
     MEMBER_COMMENT(33, "用户评价"),

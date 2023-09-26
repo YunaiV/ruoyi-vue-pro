@@ -8,6 +8,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
@@ -321,38 +322,39 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_PAY)
     public void updateOrderPaid(Long id, Long payOrderId) {
-        // 校验并获得交易订单（可支付）
+        // 1. 校验并获得交易订单（可支付）
         KeyValue<TradeOrderDO, PayOrderRespDTO> orderResult = validateOrderPayable(id, payOrderId);
         TradeOrderDO order = orderResult.getKey();
         PayOrderRespDTO payOrder = orderResult.getValue();
 
-        // 更新 TradeOrderDO 状态为已支付，等待发货
+        // 2. 更新 TradeOrderDO 状态为已支付，等待发货
         int updateCount = tradeOrderMapper.updateByIdAndStatus(id, order.getStatus(),
                 new TradeOrderDO().setStatus(TradeOrderStatusEnum.UNDELIVERED.getStatus()).setPayStatus(true)
                         .setPayTime(LocalDateTime.now()).setPayChannelCode(payOrder.getChannelCode()));
         if (updateCount == 0) {
             throw exception(ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
-        // 校验活动
+
+        // 3. 校验活动
         // 1、拼团活动
         // TODO @puhui999：这块也抽象到 handler 里
         if (Objects.equals(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
             // 更新拼团状态 TODO puhui999：订单支付失败或订单支付过期删除这条拼团记录
             combinationRecordApi.updateRecordStatusToInProgress(order.getUserId(), order.getId(), LocalDateTime.now());
         }
-        // TODO 芋艿：发送订单变化的消息
 
-        // TODO 芋艿：发送站内信
-
-        // TODO 芋艿：OrderLog
-
-        // 增加用户积分（赠送）
+        // 4.1 增加用户积分（赠送）
         addUserPoint(order.getUserId(), order.getGivePoint(), MemberPointBizTypeEnum.ORDER_GIVE, order.getId());
-        // 增加用户经验
+        // 4.2 增加用户经验
         getSelf().addUserExperienceAsync(order.getUserId(), order.getPayPrice(), order.getId());
-        // 增加用户佣金
+        // 4.3 增加用户佣金
         getSelf().addBrokerageAsync(order.getUserId(), order.getId());
+
+        // 5. 记录订单日志
+        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.UNDELIVERED.getStatus());
+        TradeOrderLogUtils.setUserInfo(order.getUserId(), UserTypeEnum.MEMBER.getValue());
     }
 
     /**
@@ -434,8 +436,6 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         if (updateCount == 0) {
             throw exception(ORDER_DELIVERY_FAIL_STATUS_NOT_UNDELIVERED);
         }
-
-        // TODO 芋艿：发送订单变化的消息
 
         // 发送站内信
         tradeMessageService.sendMessageWhenDeliveryOrder(new TradeOrderMessageWhenDeliveryOrderReqBO().setOrderId(order.getId())
