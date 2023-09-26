@@ -60,14 +60,14 @@ public interface TradeOrderUpdateService {
      * @param userId 用户编号
      * @param id     订单编号
      */
-    void receiveOrder(Long userId, Long id);
+    void receiveOrderByMember(Long userId, Long id);
 
     /**
      * 【系统】自动收货交易订单
      *
      * @return 收货数量
      */
-    int autoReceiveOrder();
+    int receiveOrderBySystem();
 
     /**
      * 【会员】取消交易订单
@@ -75,14 +75,14 @@ public interface TradeOrderUpdateService {
      * @param userId 用户编号
      * @param id     订单编号
      */
-    void cancelOrder(Long userId, Long id);
+    void cancelOrderByMember(Long userId, Long id);
 
     /**
      * 【系统】自动取消订单
      *
      * @return 取消数量
      */
-    int autoCancelOrder();
+    int cancelOrderBySystem();
 
     /**
      * 【会员】删除订单

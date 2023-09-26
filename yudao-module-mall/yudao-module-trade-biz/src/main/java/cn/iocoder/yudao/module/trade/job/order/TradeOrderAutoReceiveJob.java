@@ -21,7 +21,7 @@ public class TradeOrderAutoReceiveJob implements JobHandler {
 
     @Override
     public String execute(String param) {
-        int count = tradeOrderUpdateService.autoReceiveOrder();
+        int count = tradeOrderUpdateService.receiveOrderBySystem();
         return String.format("自动收货 %s 个", count);
     }
 

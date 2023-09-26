@@ -306,7 +306,7 @@ public class TradeOrderUpdateServiceTest extends BaseDbUnitTest {
         // mock 方法（支付单）
 
         // 调用
-        tradeOrderUpdateService.receiveOrder(userId, id);
+        tradeOrderUpdateService.receiveOrderByMember(userId, id);
         // 断言
         TradeOrderDO dbOrder = tradeOrderMapper.selectById(1L);
         assertEquals(dbOrder.getStatus(), TradeOrderStatusEnum.COMPLETED.getStatus());

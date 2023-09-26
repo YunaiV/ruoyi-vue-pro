@@ -21,7 +21,7 @@ public class TradeOrderAutoCancelJob implements JobHandler {
 
     @Override
     public String execute(String param) {
-        int count = tradeOrderUpdateService.autoCancelOrder();
+        int count = tradeOrderUpdateService.cancelOrderBySystem();
         return String.format("过期订单 %s 个", count);
     }
 

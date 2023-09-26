@@ -488,7 +488,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_RECEIVE)
-    public void receiveOrder(Long userId, Long id) {
+    public void receiveOrderByMember(Long userId, Long id) {
         // 校验并获得交易订单（可收货）
         TradeOrderDO order = validateOrderReceivable(userId, id);
 
@@ -497,7 +497,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     }
 
     @Override
-    public int autoReceiveOrder() {
+    public int receiveOrderBySystem() {
         // 1. 查询过期的待支付订单
         LocalDateTime expireTime = addTime(tradeOrderProperties.getReceiveExpireTime());
         List<TradeOrderDO> orders = tradeOrderMapper.selectListByStatusAndDeliveryTimeLt(
@@ -510,7 +510,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         int count = 0;
         for (TradeOrderDO order : orders) {
             try {
-                getSelf().autoReceiveOrder(order);
+                getSelf().receiveOrderBySystem(order);
                 count ++;
             } catch (Throwable e) {
                 log.error("[autoReceiveOrder][order({}) 自动收货订单异常]", order.getId(), e);
@@ -526,7 +526,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
      */
     @Transactional(rollbackFor = Exception.class)
     @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.SYSTEM_RECEIVE)
-    public void autoReceiveOrder(TradeOrderDO order) {
+    public void receiveOrderBySystem(TradeOrderDO order) {
         receiveOrder0(order);
     }
 
@@ -572,7 +572,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_CANCEL)
-    public void cancelOrder(Long userId, Long id) {
+    public void cancelOrderByMember(Long userId, Long id) {
         // 1.1 校验存在
         TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(id, userId);
         if (order == null) {
@@ -588,7 +588,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     }
 
     @Override
-    public int autoCancelOrder() {
+    public int cancelOrderBySystem() {
         // 1. 查询过期的待支付订单
         LocalDateTime expireTime = addTime(tradeOrderProperties.getPayExpireTime());
         List<TradeOrderDO> orders = tradeOrderMapper.selectListByStatusAndCreateTimeLt(
@@ -601,7 +601,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         int count = 0;
         for (TradeOrderDO order : orders) {
             try {
-                getSelf().autoCancelOrder(order);
+                getSelf().cancelOrderBySystem(order);
                 count ++;
             } catch (Throwable e) {
                 log.error("[autoCancelOrder][order({}) 过期订单异常]", order.getId(), e);
@@ -617,7 +617,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
      */
     @Transactional(rollbackFor = Exception.class)
     @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.SYSTEM_CANCEL)
-    public void autoCancelOrder(TradeOrderDO order) {
+    public void cancelOrderBySystem(TradeOrderDO order) {
         cancelOrder0(order, TradeOrderCancelTypeEnum.PAY_TIMEOUT);
     }
 
@@ -773,9 +773,11 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     // =================== Order Item ===================
 
+    // TODO 疯狂：帮我重构下：
+    // 1. updateOrderItemAfterSaleStatus 拆分成三个方法：发起；同意；拒绝。原因是，职责更清晰，操作日志也更容易记录；
+
     @Override
     @Transactional(rollbackFor = Exception.class)
-    // TODO 芋艿：
     public void updateOrderItemAfterSaleStatus(Long id, Integer oldAfterSaleStatus, Integer newAfterSaleStatus,
                                                Long afterSaleId, Integer refundPrice) {
         // 如果退款成功，则 refundPrice 非空
@@ -803,6 +805,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         TradeOrderItemDO orderItem = tradeOrderItemMapper.selectById(id);
         TradeOrderDO order = tradeOrderMapper.selectById(orderItem.getOrderId());
         Integer orderRefundPrice = order.getRefundPrice() + refundPrice;
+        // TODO @疯狂：809 到 817 改成：cancelOrderByAfterSale：相当于全部售后成功后，就是要取消胆子；
         if (isAllOrderItemAfterSaleSuccess(order.getId())) { // 如果都售后成功，则需要取消订单
             tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId())
                     .setRefundStatus(TradeOrderRefundStatusEnum.ALL.getStatus()).setRefundPrice(orderRefundPrice).setRefundPoint(order.getRefundPoint() + orderItem.getUsePoint())
@@ -812,7 +815,6 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
             // TODO 芋艿：要不要退优惠劵
 
-            // TODO 芋艿：站内信？
         } else { // 如果部分售后，则更新退款金额
             tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId())
                     .setRefundStatus(TradeOrderRefundStatusEnum.PART.getStatus()).setRefundPrice(orderRefundPrice));
@@ -821,6 +823,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // TODO 芋艿：这块扣减规则，需要在考虑下
         // 售后成功后，执行数据回滚逻辑
         if (Objects.equals(newAfterSaleStatus, TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus())) {
+            // TODO @疯狂：这里库存也要扣减下；
             // 扣减用户积分（赠送的）
             reduceUserPoint(order.getUserId(), orderItem.getGivePoint(), MemberPointBizTypeEnum.AFTER_SALE_DEDUCT_GIVE, afterSaleId);
             // 增加用户积分（返还抵扣）
@@ -879,6 +882,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         return orderItems.stream().allMatch(orderItem -> Objects.equals(orderItem.getAfterSaleStatus(),
                 TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus()));
     }
+
+    // =================== 营销相关的操作 ===================
 
     @Async
     protected void addUserExperienceAsync(Long userId, Integer payPrice, Long orderId) {
