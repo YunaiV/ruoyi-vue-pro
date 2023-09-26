@@ -61,10 +61,16 @@ public interface TradeOrderMapper extends BaseMapperX<TradeOrderDO> {
                 .eq(TradeOrderDO::getUserId, loginUserId));
     }
 
-    default List<TradeOrderDO> selectListByStatusAndCreateTimeLt(Integer status, LocalDateTime expireTime) {
+    default List<TradeOrderDO> selectListByStatusAndCreateTimeLt(Integer status, LocalDateTime createTime) {
         return selectList(new LambdaUpdateWrapper<TradeOrderDO>()
                 .eq(TradeOrderDO::getStatus, status)
-                .lt(TradeOrderDO::getCreateTime, expireTime));
+                .lt(TradeOrderDO::getCreateTime, createTime));
+    }
+
+    default List<TradeOrderDO> selectListByStatusAndDeliveryTimeLt(Integer status, LocalDateTime deliveryTime) {
+        return selectList(new LambdaUpdateWrapper<TradeOrderDO>()
+                .eq(TradeOrderDO::getStatus, status)
+                .lt(TradeOrderDO::getDeliveryTime, deliveryTime));
     }
 
 }

@@ -492,6 +492,50 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 校验并获得交易订单（可收货）
         TradeOrderDO order = validateOrderReceivable(userId, id);
 
+        // 收货订单
+        receiveOrder0(order);
+    }
+
+    @Override
+    public int autoReceiveOrder() {
+        // 1. 查询过期的待支付订单
+        LocalDateTime expireTime = addTime(tradeOrderProperties.getReceiveExpireTime());
+        List<TradeOrderDO> orders = tradeOrderMapper.selectListByStatusAndDeliveryTimeLt(
+                TradeOrderStatusEnum.DELIVERED.getStatus(), expireTime);
+        if (CollUtil.isEmpty(orders)) {
+            return 0;
+        }
+
+        // 2. 遍历执行，逐个取消
+        int count = 0;
+        for (TradeOrderDO order : orders) {
+            try {
+                getSelf().autoReceiveOrder(order);
+                count ++;
+            } catch (Throwable e) {
+                log.error("[autoReceiveOrder][order({}) 自动收货订单异常]", order.getId(), e);
+            }
+        }
+        return count;
+    }
+
+    /**
+     * 自动收货单个订单
+     *
+     * @param order 订单
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.SYSTEM_RECEIVE)
+    public void autoReceiveOrder(TradeOrderDO order) {
+        receiveOrder0(order);
+    }
+
+    /**
+     * 收货订单的核心实现
+     *
+     * @param order 订单
+     */
+    private void receiveOrder0(TradeOrderDO order) {
         // 更新 TradeOrderDO 状态为已完成
         int updateCount = tradeOrderMapper.updateByIdAndStatus(order.getId(), order.getStatus(),
                 new TradeOrderDO().setStatus(TradeOrderStatusEnum.COMPLETED.getStatus()).setReceiveTime(LocalDateTime.now()));
@@ -499,14 +543,137 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             throw exception(ORDER_RECEIVE_FAIL_STATUS_NOT_DELIVERED);
         }
 
-        // TODO 芋艿：lili 发送订单变化的消息
-
-        // TODO 芋艿：lili 发送商品被购买完成的数据
-
-        // TODO 芋艿：销售佣金的记录；
-
         // 插入订单日志
         TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.COMPLETED.getStatus());
+    }
+
+    /**
+     * 校验交易订单满足可售货的条件
+     *
+     * 1. 交易订单待收货
+     *
+     * @param userId 用户编号
+     * @param id     交易订单编号
+     * @return 交易订单
+     */
+    private TradeOrderDO validateOrderReceivable(Long userId, Long id) {
+        // 校验订单是否存在
+        TradeOrderDO order = tradeOrderMapper.selectByIdAndUserId(id, userId);
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+        // 校验订单是否是待收货状态
+        if (!TradeOrderStatusEnum.isDelivered(order.getStatus())) {
+            throw exception(ORDER_RECEIVE_FAIL_STATUS_NOT_DELIVERED);
+        }
+        return order;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_CANCEL)
+    public void cancelOrder(Long userId, Long id) {
+        // 1.1 校验存在
+        TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(id, userId);
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+        // 1.2 校验状态
+        if (ObjectUtil.notEqual(order.getStatus(), TradeOrderStatusEnum.UNPAID.getStatus())) {
+            throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
+        }
+
+        // 2. 取消订单
+        cancelOrder0(order, TradeOrderCancelTypeEnum.MEMBER_CANCEL);
+    }
+
+    @Override
+    public int autoCancelOrder() {
+        // 1. 查询过期的待支付订单
+        LocalDateTime expireTime = addTime(tradeOrderProperties.getPayExpireTime());
+        List<TradeOrderDO> orders = tradeOrderMapper.selectListByStatusAndCreateTimeLt(
+                TradeOrderStatusEnum.UNPAID.getStatus(), expireTime);
+        if (CollUtil.isEmpty(orders)) {
+            return 0;
+        }
+
+        // 2. 遍历执行，逐个取消
+        int count = 0;
+        for (TradeOrderDO order : orders) {
+            try {
+                getSelf().autoCancelOrder(order);
+                count ++;
+            } catch (Throwable e) {
+                log.error("[autoCancelOrder][order({}) 过期订单异常]", order.getId(), e);
+            }
+        }
+        return count;
+    }
+
+    /**
+     * 自动取消单个订单
+     *
+     * @param order 订单
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.SYSTEM_CANCEL)
+    public void autoCancelOrder(TradeOrderDO order) {
+        cancelOrder0(order, TradeOrderCancelTypeEnum.PAY_TIMEOUT);
+    }
+
+    /**
+     * 取消订单的核心实现
+     *
+     * @param order 订单
+     * @param cancelType 取消类型
+     */
+    private void cancelOrder0(TradeOrderDO order, TradeOrderCancelTypeEnum cancelType) {
+        Long id = order.getId();
+        // 1. 更新 TradeOrderDO 状态为已取消
+        int updateCount = tradeOrderMapper.updateByIdAndStatus(id, order.getStatus(),
+                new TradeOrderDO().setStatus(TradeOrderStatusEnum.CANCELED.getStatus())
+                        .setCancelType(cancelType.getType()).setCancelTime(LocalDateTime.now()));
+        if (updateCount == 0) {
+            throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
+        }
+
+        // 2. TODO 活动相关库存回滚需要活动 id，活动 id 怎么获取？app 端能否传过来；回复：从订单里拿呀
+        tradeOrderHandlers.forEach(handler -> handler.rollback());
+
+        // 3. 回滚库存
+        List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(id);
+        productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convert(orderItems));
+
+        // 4. 回滚优惠券
+        if (order.getCouponId() != null && order.getCouponId() > 0) {
+            couponApi.returnUsedCoupon(order.getCouponId());
+        }
+
+        // 5. 回滚积分（抵扣的）
+        addUserPoint(order.getUserId(), order.getUsePoint(), MemberPointBizTypeEnum.ORDER_CANCEL, order.getId());
+
+        // 6. 增加订单日志
+        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.CANCELED.getStatus());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_DELETE)
+    public void deleteOrder(Long userId, Long id) {
+        // 1.1 校验存在
+        TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(id, userId);
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+        // 1.2 校验状态
+        if (ObjectUtil.notEqual(order.getStatus(), TradeOrderStatusEnum.CANCELED.getStatus())) {
+            throw exception(ORDER_DELETE_FAIL_STATUS_NOT_CANCEL);
+        }
+        // 2. 删除订单
+        tradeOrderMapper.deleteById(id);
+
+        // 3. 记录日志
+        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), order.getStatus());
     }
 
     @Override
@@ -604,28 +771,6 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         tradeOrderMapper.updateById(update);
     }
 
-    /**
-     * 校验交易订单满足可售货的条件
-     *
-     * 1. 交易订单待收货
-     *
-     * @param userId 用户编号
-     * @param id     交易订单编号
-     * @return 交易订单
-     */
-    private TradeOrderDO validateOrderReceivable(Long userId, Long id) {
-        // 校验订单是否存在
-        TradeOrderDO order = tradeOrderMapper.selectByIdAndUserId(id, userId);
-        if (order == null) {
-            throw exception(ORDER_NOT_FOUND);
-        }
-        // 校验订单是否是待收货状态
-        if (!TradeOrderStatusEnum.isDelivered(order.getStatus())) {
-            throw exception(ORDER_RECEIVE_FAIL_STATUS_NOT_DELIVERED);
-        }
-        return order;
-    }
-
     // =================== Order Item ===================
 
     @Override
@@ -721,113 +866,6 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), order.getStatus());
         }
         return comment;
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_CANCEL)
-    public void cancelOrder(Long userId, Long id) {
-        // 1.1 校验存在
-        TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(id, userId);
-        if (order == null) {
-            throw exception(ORDER_NOT_FOUND);
-        }
-        // 1.2 校验状态
-        if (ObjectUtil.notEqual(order.getStatus(), TradeOrderStatusEnum.UNPAID.getStatus())) {
-            throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
-        }
-
-        // 2. 取消订单
-        cancelOrder0(order, TradeOrderCancelTypeEnum.MEMBER_CANCEL);
-    }
-
-    @Override
-    public int autoCancelOrder() {
-        // 1. 查询过期的待支付订单
-        LocalDateTime expireTime = addTime(tradeOrderProperties.getExpireTime());
-        List<TradeOrderDO> orders = tradeOrderMapper.selectListByStatusAndCreateTimeLt(
-                TradeOrderStatusEnum.UNPAID.getStatus(), expireTime);
-        if (CollUtil.isEmpty(orders)) {
-            return 0;
-        }
-
-        // 2. 遍历执行，逐个取消
-        int count = 0;
-        for (TradeOrderDO order : orders) {
-            try {
-                getSelf().autoCancelOrder(order);
-                count ++;
-            } catch (Throwable e) {
-                log.error("[autoCancelOrder][order({}) 过期订单异常]", order.getId(), e);
-            }
-        }
-        return count;
-    }
-
-    /**
-     * 自动取消单个订单
-     *
-     * @param order 订单
-     */
-    @Transactional(rollbackFor = Exception.class)
-    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.SYSTEM_CANCEL)
-    public void autoCancelOrder(TradeOrderDO order) {
-        cancelOrder0(order, TradeOrderCancelTypeEnum.PAY_TIMEOUT);
-    }
-
-    /**
-     * 取消订单的核心实现
-     *
-     * @param order 订单
-     * @param cancelType 取消类型
-     */
-    private void cancelOrder0(TradeOrderDO order, TradeOrderCancelTypeEnum cancelType) {
-        Long id = order.getId();
-        // 1. 更新 TradeOrderDO 状态为已取消
-        int updateCount = tradeOrderMapper.updateByIdAndStatus(id, order.getStatus(),
-                new TradeOrderDO().setStatus(TradeOrderStatusEnum.CANCELED.getStatus())
-                        .setCancelType(cancelType.getType()).setCancelTime(LocalDateTime.now()));
-        if (updateCount == 0) {
-            throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
-        }
-
-        // 2. TODO 活动相关库存回滚需要活动 id，活动 id 怎么获取？app 端能否传过来；回复：从订单里拿呀
-        tradeOrderHandlers.forEach(handler -> handler.rollback());
-
-        // 3. 回滚库存
-        List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(id);
-        productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convert(orderItems));
-
-        // 4. 回滚优惠券
-        if (order.getCouponId() != null && order.getCouponId() > 0) {
-            couponApi.returnUsedCoupon(order.getCouponId());
-        }
-
-        // 5. 回滚积分（抵扣的）
-        addUserPoint(order.getUserId(), order.getUsePoint(), MemberPointBizTypeEnum.ORDER_CANCEL, order.getId());
-
-        // 6. 增加订单日志
-        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.CANCELED.getStatus());
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_DELETE)
-    public void deleteOrder(Long userId, Long id) {
-        // 1.1 校验存在
-        TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(id, userId);
-        if (order == null) {
-            throw exception(ORDER_NOT_FOUND);
-        }
-        // 1.2 校验状态
-        if (ObjectUtil.notEqual(order.getStatus(), TradeOrderStatusEnum.CANCELED.getStatus())) {
-            throw exception(ORDER_DELETE_FAIL_STATUS_NOT_CANCEL);
-        }
-        // 2. 删除订单
-        tradeOrderMapper.deleteById(id);
-
-        // 3. 记录日志
-        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), order.getStatus());
     }
 
     /**

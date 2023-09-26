@@ -87,7 +87,7 @@ public class TradeOrderUpdateServiceTest extends BaseDbUnitTest {
     @BeforeEach
     public void setUp() {
         when(tradeOrderProperties.getAppId()).thenReturn(888L);
-        when(tradeOrderProperties.getExpireTime()).thenReturn(Duration.ofDays(1));
+        when(tradeOrderProperties.getPayExpireTime()).thenReturn(Duration.ofDays(1));
     }
 
     @Test

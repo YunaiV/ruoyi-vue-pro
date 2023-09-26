@@ -63,7 +63,14 @@ public interface TradeOrderUpdateService {
     void receiveOrder(Long userId, Long id);
 
     /**
-     * 【会员】取消订单
+     * 【系统】自动收货交易订单
+     *
+     * @return 收货数量
+     */
+    int autoReceiveOrder();
+
+    /**
+     * 【会员】取消交易订单
      *
      * @param userId 用户编号
      * @param id     订单编号
