@@ -7,6 +7,13 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageWithdrawD
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserWithdrawSummaryBO;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+
 /**
  * 佣金提现 Service 接口
  *
@@ -51,10 +58,20 @@ public interface BrokerageWithdrawService {
     /**
      * 汇总用户提现
      *
-     * @param userId 用户编号
-     * @param status 提现状态
+     * @param userIds 用户编号
+     * @param status  提现状态
      * @return 用户提现汇总
      */
-    UserWithdrawSummaryBO getWithdrawSummaryByUserId(Long userId, BrokerageWithdrawStatusEnum status);
+    List<UserWithdrawSummaryBO> getWithdrawSummaryByUserId(Collection<Long> userIds, BrokerageWithdrawStatusEnum status);
 
+    /**
+     * 汇总用户提现
+     *
+     * @param userIds 用户编号
+     * @param status  提现状态
+     * @return 用户提现汇总
+     */
+    default Map<Long, UserWithdrawSummaryBO> getWithdrawSummaryMapByUserId(Set<Long> userIds, BrokerageWithdrawStatusEnum status) {
+        return convertMap(getWithdrawSummaryByUserId(userIds, status), UserWithdrawSummaryBO::getUserId);
+    }
 }

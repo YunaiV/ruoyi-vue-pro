@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.dal.mysql.brokerage;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -7,9 +8,13 @@ import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.withdraw.Brok
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageWithdrawDO;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserWithdrawSummaryBO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.github.yulichang.toolkit.LambdaUtils;
+import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 佣金提现 Mapper
@@ -37,9 +42,23 @@ public interface BrokerageWithdrawMapper extends BaseMapperX<BrokerageWithdrawDO
                 .eq(BrokerageWithdrawDO::getStatus, status));
     }
 
-    @Select("SELECT COUNT(1) AS count, SUM(price) AS price FROM trade_brokerage_withdraw " +
-            "WHERE user_id = #{userId} AND status = #{status} AND deleted = FALSE")
-    UserWithdrawSummaryBO selectCountAndSumPriceByUserIdAndStatus(@Param("userId") Long userId,
-                                                                  @Param("status") Integer status);
+    default List<UserWithdrawSummaryBO> selectCountAndSumPriceByUserIdAndStatus(Collection<Long> userIds, Integer status) {
+        List<Map<String, Object>> list = selectMaps(new MPJLambdaWrapper<BrokerageWithdrawDO>()
+                .select(BrokerageWithdrawDO::getUserId)
+                .selectCount(BrokerageWithdrawDO::getId, LambdaUtils.getName(UserWithdrawSummaryBO::getCount))
+                .selectSum(BrokerageWithdrawDO::getPrice)
+                .in(BrokerageWithdrawDO::getUserId, userIds)
+                .eq(BrokerageWithdrawDO::getStatus, status)
+                .groupBy(BrokerageWithdrawDO::getUserId));
+        return BeanUtil.copyToList(list, UserWithdrawSummaryBO.class);
+        // selectJoinList有BUG，会与租户插件冲突：解析SQL时，发生异常 https://gitee.com/best_handsome/mybatis-plus-join/issues/I84GYW
+//        return selectJoinList(UserWithdrawSummaryBO.class, new MPJLambdaWrapper<BrokerageWithdrawDO>()
+//                .select(BrokerageWithdrawDO::getUserId)
+//                    .selectCount(BrokerageWithdrawDO::getId, LambdaUtils.getName(UserWithdrawSummaryBO::getCount))
+//                .selectSum(BrokerageWithdrawDO::getPrice)
+//                .in(BrokerageWithdrawDO::getUserId, userIds)
+//                .eq(BrokerageWithdrawDO::getStatus, status)
+//                .groupBy(BrokerageWithdrawDO::getUserId));
+    }
 
 }

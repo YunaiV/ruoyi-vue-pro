@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.BooleanUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.user.BrokerageUserPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserChildSummaryPageReqVO;
@@ -154,7 +155,7 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     }
 
     @Override
-    public boolean bindBrokerageUser(Long userId, Long bindUserId, Boolean isNewUser) {
+    public boolean bindBrokerageUser(Long userId, Long bindUserId, LocalDateTime registerTime) {
         // 1. 获得分销用户
         boolean isNewBrokerageUser = false;
         BrokerageUserDO brokerageUser = brokerageUserMapper.selectById(userId);
@@ -164,7 +165,7 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         }
 
         // 2.1 校验是否能绑定用户
-        boolean validated = isUserCanBind(brokerageUser, isNewUser);
+        boolean validated = isUserCanBind(brokerageUser, registerTime);
         if (!validated) {
             return false;
         }
@@ -222,7 +223,7 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         return new PageResult<>(pageResult.getRecords(), pageResult.getTotal());
     }
 
-    private boolean isUserCanBind(BrokerageUserDO user, Boolean isNewUser) {
+    private boolean isUserCanBind(BrokerageUserDO user, LocalDateTime registerTime) {
         // 校验分销功能是否启用
         TradeConfigDO tradeConfig = tradeConfigService.getTradeConfig();
         if (tradeConfig == null || !BooleanUtil.isTrue(tradeConfig.getBrokerageEnabled())) {
@@ -236,8 +237,9 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
 
         // 校验分销关系绑定模式
         if (BrokerageBindModeEnum.REGISTER.getMode().equals(tradeConfig.getBrokerageBindMode())) {
-            // TODO @疯狂：是不是把 isNewUser 挪到这里好点呀？
-            if (!BooleanUtil.isTrue(isNewUser)) {
+            // 判断是否为新用户：注册时间在30秒内的，都算新用户
+            boolean isNotNewUser = LocalDateTimeUtils.beforeNow(registerTime.plusSeconds(30));
+            if (isNotNewUser) {
                 throw exception(BROKERAGE_BIND_MODE_REGISTER); // 只有在注册时可以绑定
             }
         } else if (BrokerageBindModeEnum.ANYTIME.getMode().equals(tradeConfig.getBrokerageBindMode())) {

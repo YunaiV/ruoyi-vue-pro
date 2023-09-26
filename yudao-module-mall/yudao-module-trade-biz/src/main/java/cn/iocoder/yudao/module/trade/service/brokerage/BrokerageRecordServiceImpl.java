@@ -36,10 +36,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getMaxValue;
@@ -235,9 +232,8 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
     }
 
     @Override
-    public UserBrokerageSummaryBO getUserBrokerageSummaryByUserId(Long userId, Integer bizType, Integer status) {
-        UserBrokerageSummaryBO summaryBO = brokerageRecordMapper.selectCountAndSumPriceByUserIdAndBizTypeAndStatus(userId, bizType, status);
-        return summaryBO != null ? summaryBO : new UserBrokerageSummaryBO(0, 0);
+    public List<UserBrokerageSummaryBO> getUserBrokerageSummaryByUserId(Collection<Long> userIds, Integer bizType, Integer status) {
+        return brokerageRecordMapper.selectCountAndSumPriceByUserIdInAndBizTypeAndStatus(userIds, bizType, status);
     }
 
     @Override
@@ -338,7 +334,7 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
         if (BooleanUtil.isTrue(spu.getSubCommissionType())) {
             fixedMinPrice = getMinValue(skuList, ProductSkuRespDTO::getFirstBrokeragePrice);
             fixedMaxPrice = getMaxValue(skuList, ProductSkuRespDTO::getFirstBrokeragePrice);
-        // 3.2 全局分佣模式（根据商品价格比例计算）
+            // 3.2 全局分佣模式（根据商品价格比例计算）
         } else {
             spuMinPrice = getMinValue(skuList, ProductSkuRespDTO::getPrice);
             spuMaxPrice = getMaxValue(skuList, ProductSkuRespDTO::getPrice);

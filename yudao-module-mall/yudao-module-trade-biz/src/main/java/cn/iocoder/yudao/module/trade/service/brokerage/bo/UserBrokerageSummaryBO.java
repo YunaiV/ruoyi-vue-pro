@@ -13,7 +13,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserBrokerageSummaryBO {
-
+    /**
+     * 用户编号
+     */
+    private Long userId;
     /**
      * 佣金数量
      */

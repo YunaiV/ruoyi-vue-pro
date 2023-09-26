@@ -26,6 +26,8 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import javax.validation.Validator;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -142,9 +144,8 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
     }
 
     @Override
-    public UserWithdrawSummaryBO getWithdrawSummaryByUserId(Long userId, BrokerageWithdrawStatusEnum status) {
-        UserWithdrawSummaryBO summaryBO = brokerageWithdrawMapper.selectCountAndSumPriceByUserIdAndStatus(userId, status.getStatus());
-        return summaryBO != null ? summaryBO : new UserWithdrawSummaryBO(0, 0);
+    public List<UserWithdrawSummaryBO> getWithdrawSummaryByUserId(Collection<Long> userIds, BrokerageWithdrawStatusEnum status) {
+        return brokerageWithdrawMapper.selectCountAndSumPriceByUserIdAndStatus(userIds, status.getStatus());
     }
 
     /**
