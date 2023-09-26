@@ -80,16 +80,16 @@ public class CouponServiceImpl implements CouponService {
     @Override
     public PageResult<CouponDO> getCouponPage(CouponPageReqVO pageReqVO) {
         // 获得用户编号
-        Set<Long> userIds = null;
         if (StrUtil.isNotEmpty(pageReqVO.getNickname())) {
-            userIds = CollectionUtils.convertSet(memberUserApi.getUserListByNickname(pageReqVO.getNickname()),
+            Set<Long> userIds = CollectionUtils.convertSet(memberUserApi.getUserListByNickname(pageReqVO.getNickname()),
                     MemberUserRespDTO::getId);
             if (CollUtil.isEmpty(userIds)) {
                 return PageResult.empty();
             }
+            pageReqVO.setUserIds(userIds);
         }
         // 分页查询
-        return couponMapper.selectPage(pageReqVO, userIds);
+        return couponMapper.selectPage(pageReqVO);
     }
 
     @Override

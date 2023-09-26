@@ -22,11 +22,11 @@ import java.util.List;
 @Mapper
 public interface CouponMapper extends BaseMapperX<CouponDO> {
 
-    default PageResult<CouponDO> selectPage(CouponPageReqVO reqVO, Collection<Long> userIds) {
+    default PageResult<CouponDO> selectPage(CouponPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<CouponDO>()
                 .eqIfPresent(CouponDO::getTemplateId, reqVO.getTemplateId())
                 .eqIfPresent(CouponDO::getStatus, reqVO.getStatus())
-                .inIfPresent(CouponDO::getUserId, userIds)
+                .inIfPresent(CouponDO::getUserId, reqVO.getUserIds())
                 .betweenIfPresent(CouponDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(CouponDO::getId));
     }
