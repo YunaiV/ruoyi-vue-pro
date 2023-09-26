@@ -26,4 +26,25 @@ public interface CouponTemplateConvert {
 
     PageResult<CouponTemplateRespVO> convertPage(PageResult<CouponTemplateDO> page);
 
+    CouponTemplatePageReqVO convert(AppCouponTemplatePageReqVO pageReqVO, List<Integer> canTakeTypes, Integer productScope, Long productScopeValue);
+
+    PageResult<AppCouponTemplateRespVO> convertAppPage(PageResult<CouponTemplateDO> pageResult);
+
+    default PageResult<AppCouponTemplateRespVO> convertAppPage(PageResult<CouponTemplateDO> pageResult, Map<Long, Integer> couponTakeCountMap) {
+        PageResult<AppCouponTemplateRespVO> result = convertAppPage(pageResult);
+        if (MapUtil.isEmpty(couponTakeCountMap)) {
+            return result;
+        }
+
+        for (AppCouponTemplateRespVO vo : result.getList()) {
+            // 每人领取数量无限制
+            if (vo.getTakeLimitCount() == -1) {
+                vo.setTakeStatus(false);
+                continue;
+            }
+            // 检查已领取数量是否超过限领数量
+            vo.setTakeStatus(MapUtil.getInt(couponTakeCountMap, vo.getId(), 0) >= vo.getTakeLimitCount());
+        }
+        return result;
+    }
 }

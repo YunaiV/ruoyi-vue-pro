@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.promotion.service.coupon;
 
 import cn.hutool.core.collection.CollStreamUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -18,12 +19,14 @@ import cn.iocoder.yudao.module.promotion.dal.mysql.coupon.CouponMapper;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponStatusEnum;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTakeTypeEnum;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTemplateValidityTypeEnum;
+import cn.iocoder.yudao.module.promotion.service.coupon.bo.CouponTakeCountBO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -175,6 +178,14 @@ public class CouponServiceImpl implements CouponService {
         couponTemplateService.updateCouponTemplateTakeCount(templateId, userIds.size());
     }
 
+    @Override
+    public List<CouponTakeCountBO> getTakeCountListByTemplateIds(Collection<Long> templateIds, Long userId) {
+        if (CollUtil.isEmpty(templateIds)) {
+            return ListUtil.empty();
+        }
+        return couponMapper.selectCountByUserIdAndTemplateIdIn(userId, templateIds);
+    }
+
     /**
      * 校验优惠券是否可以领取
      *
@@ -211,7 +222,7 @@ public class CouponServiceImpl implements CouponService {
     /**
      * 过滤掉达到领取上线的用户
      *
-     * @param userIds 用户编号数组
+     * @param userIds        用户编号数组
      * @param couponTemplate 优惠劵模版
      */
     private void removeTakeLimitUser(Set<Long> userIds, CouponTemplateDO couponTemplate) {

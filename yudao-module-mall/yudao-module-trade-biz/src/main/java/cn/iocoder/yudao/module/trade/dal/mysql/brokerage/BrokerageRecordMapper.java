@@ -10,7 +10,6 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageRecordDO;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJWrappers;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -62,7 +61,7 @@ public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
                                                                                              Integer status) {
         List<Map<String, Object>> list = selectMaps(MPJWrappers.lambdaJoin(BrokerageRecordDO.class)
                 .select(BrokerageRecordDO::getUserId)
-                .selectCount(BrokerageRecordDO::getId, LambdaUtils.getName(UserBrokerageSummaryBO::getCount))
+                .selectCount(BrokerageRecordDO::getId, UserBrokerageSummaryBO::getCount)
                 .selectSum(BrokerageRecordDO::getPrice)
                 .in(BrokerageRecordDO::getUserId, userIds)
                 .eq(BrokerageRecordDO::getBizId, bizType)
@@ -71,7 +70,7 @@ public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
         return BeanUtil.copyToList(list, UserBrokerageSummaryBO.class);
 //            return selectJoinList(UserBrokerageSummaryBO.class, MPJWrappers.lambdaJoin(BrokerageRecordDO.class)
 //                    .select(BrokerageRecordDO::getUserId)
-//                    .selectCount(BrokerageRecordDO::getId, LambdaUtils.getName(UserBrokerageSummaryBO::getCount))
+//                    .selectCount(BrokerageRecordDO::getId, UserBrokerageSummaryBO::getCount)
 //                    .selectSum(BrokerageRecordDO::getPrice)
 //                    .in(BrokerageRecordDO::getUserId, userIds)
 //                    .eq(BrokerageRecordDO::getBizId, bizType)

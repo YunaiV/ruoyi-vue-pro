@@ -5,9 +5,14 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTakeTypeEnum;
+import cn.iocoder.yudao.module.promotion.service.coupon.bo.CouponTakeCountBO;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * 优惠劵 Service 接口
@@ -18,11 +23,11 @@ public interface CouponService {
 
     /**
      * 校验优惠劵，包括状态、有限期
-     *
+     * <p>
      * 1. 如果校验通过，则返回优惠劵信息
      * 2. 如果校验不通过，则直接抛出业务异常
      *
-     * @param id 优惠劵编号
+     * @param id     优惠劵编号
      * @param userId 用户编号
      * @return 优惠劵信息
      */
@@ -31,9 +36,8 @@ public interface CouponService {
     /**
      * 校验优惠劵，包括状态、有限期
      *
-     * @see #validCoupon(Long, Long) 逻辑相同，只是入参不同
-     *
      * @param coupon 优惠劵
+     * @see #validCoupon(Long, Long) 逻辑相同，只是入参不同
      */
     void validCoupon(CouponDO coupon);
 
@@ -124,4 +128,23 @@ public interface CouponService {
         takeCoupon(templateId, CollUtil.newHashSet(userId), CouponTakeTypeEnum.REGISTER);
     }
 
+    /**
+     * 统计会员领取优惠券的数量
+     *
+     * @param templateIds 优惠券模板编号列表
+     * @param userId      用户编号
+     * @return 领取优惠券的数量
+     */
+    default Map<Long, Integer> getTakeCountMapByTemplateIds(Collection<Long> templateIds, Long userId) {
+        return convertMap(getTakeCountListByTemplateIds(templateIds, userId), CouponTakeCountBO::getTemplateId, CouponTakeCountBO::getCount);
+    }
+
+    /**
+     * 统计会员领取优惠券的数量
+     *
+     * @param templateIds 优惠券模板编号列表
+     * @param userId      用户编号
+     * @return 领取优惠券的数量
+     */
+    List<CouponTakeCountBO> getTakeCountListByTemplateIds(Collection<Long> templateIds, Long userId);
 }

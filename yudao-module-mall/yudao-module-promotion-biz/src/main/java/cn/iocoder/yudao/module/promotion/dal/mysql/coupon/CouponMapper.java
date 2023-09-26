@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.module.promotion.dal.mysql.coupon;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
+import cn.iocoder.yudao.module.promotion.service.coupon.bo.CouponTakeCountBO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.github.yulichang.toolkit.MPJWrappers;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Collection;
@@ -62,4 +65,12 @@ public interface CouponMapper extends BaseMapperX<CouponDO> {
         );
     }
 
+    default List<CouponTakeCountBO> selectCountByUserIdAndTemplateIdIn(Long userId, Collection<Long> templateIds) {
+        return BeanUtil.copyToList(selectMaps(MPJWrappers.lambdaJoin(CouponDO.class)
+                .select(CouponDO::getTemplateId)
+                .selectCount(CouponDO::getId, CouponTakeCountBO::getCount)
+                .eq(CouponDO::getUserId, userId)
+                .in(CouponDO::getTemplateId, templateIds)
+                .groupBy(CouponDO::getTemplateId)), CouponTakeCountBO.class);
+    }
 }
