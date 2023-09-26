@@ -14,10 +14,12 @@ import lombok.RequiredArgsConstructor;
 public enum TradeOrderOperateTypeEnum {
 
     MEMBER_CREATE(1, "用户下单"),
+    MEMBER_PAY(20, "用户付款成功"),
     MEMBER_RECEIVE(30, "用户已收货"),
-    MEMBER_COMMENT(31, "用户评价"),
-    MEMBER_CANCEL(40, "手动取消订单"),
-    SYSTEM_CANCEL(41, "系统取消订单"),
+    SYSTEM_RECEIVE(31, "到期未收货，系统自动确认收货"),
+    MEMBER_COMMENT(33, "用户评价"),
+    MEMBER_CANCEL(40, "取消订单"),
+    SYSTEM_CANCEL(41, "到期未支付，系统自动取消订单"),
     // 42 预留：管理员取消订单
     MEMBER_DELETE(43, "删除订单"),
     ;

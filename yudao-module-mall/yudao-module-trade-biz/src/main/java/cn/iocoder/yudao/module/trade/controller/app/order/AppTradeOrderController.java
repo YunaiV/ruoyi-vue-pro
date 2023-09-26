@@ -140,7 +140,7 @@ public class AppTradeOrderController {
     @Operation(summary = "确认交易订单收货")
     @Parameter(name = "id", description = "交易订单编号")
     public CommonResult<Boolean> receiveOrder(@RequestParam("id") Long id) {
-        tradeOrderUpdateService.receiveOrder(getLoginUserId(), id);
+        tradeOrderUpdateService.receiveOrderByMember(getLoginUserId(), id);
         return success(true);
     }
 
@@ -148,7 +148,7 @@ public class AppTradeOrderController {
     @Operation(summary = "取消交易订单")
     @Parameter(name = "id", description = "交易订单编号")
     public CommonResult<Boolean> cancelOrder(@RequestParam("id") Long id) {
-        tradeOrderUpdateService.cancelOrder(getLoginUserId(), id);
+        tradeOrderUpdateService.cancelOrderByMember(getLoginUserId(), id);
         return success(true);
     }
 

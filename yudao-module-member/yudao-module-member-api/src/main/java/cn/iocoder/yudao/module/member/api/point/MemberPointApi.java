@@ -12,6 +12,7 @@ import javax.validation.constraints.Min;
  */
 public interface MemberPointApi {
 
+    // TODO @疯狂：这个我们要不要搞成通用的会员配置？MemberConfig？
     /**
      * 获得积分配置
      *

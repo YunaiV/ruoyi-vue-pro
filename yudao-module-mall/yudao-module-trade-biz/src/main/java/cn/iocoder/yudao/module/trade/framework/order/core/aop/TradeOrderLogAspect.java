@@ -32,6 +32,16 @@ import static java.util.Collections.emptyMap;
 public class TradeOrderLogAspect {
 
     /**
+     * 用户编号
+     *
+     * 目前的使用场景：支付回调时，需要强制设置下用户编号
+     */
+    private static final ThreadLocal<Long> USER_ID = new ThreadLocal<>();
+    /**
+     * 用户类型
+     */
+    private static final ThreadLocal<Integer> USER_TYPE = new ThreadLocal<>();
+    /**
      * 订单编号
      */
     private static final ThreadLocal<Long> ORDER_ID = new ThreadLocal<>();
@@ -110,6 +120,11 @@ public class TradeOrderLogAspect {
         BEFORE_STATUS.set(beforeStatus);
         AFTER_STATUS.set(afterStatus);
         EXTS.set(exts);
+    }
+
+    public static void setUserInfo(Long userId, Integer userType) {
+        USER_ID.set(userId);
+        USER_TYPE.set(userType);
     }
 
 }

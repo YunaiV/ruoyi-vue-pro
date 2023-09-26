@@ -199,6 +199,8 @@ public class TradePriceCalculatorHelper {
     /**
      * 按照支付金额，返回每个订单项的分摊金额数组
      *
+     * 实际上 price 不仅仅可以传递的是金额，也可以是积分。因为它的实现逻辑，就是根据 payPrice 做分摊而已
+     *
      * @param orderItems 订单项数组
      * @param price      金额
      * @return 分摊金额数组，和传入的 orderItems 一一对应

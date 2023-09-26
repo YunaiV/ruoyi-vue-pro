@@ -8,21 +8,21 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 
 /**
- * 交易订单的自动过期 Job
+ * 交易订单的自动收货 Job
  *
  * @author 芋道源码
  */
 @Component
 @TenantJob
-public class TradeOrderAutoCancelJob implements JobHandler {
+public class TradeOrderAutoReceiveJob implements JobHandler {
 
     @Resource
     private TradeOrderUpdateService tradeOrderUpdateService;
 
     @Override
     public String execute(String param) {
-        int count = tradeOrderUpdateService.cancelOrderBySystem();
-        return String.format("过期订单 %s 个", count);
+        int count = tradeOrderUpdateService.receiveOrderBySystem();
+        return String.format("自动收货 %s 个", count);
     }
 
 }
