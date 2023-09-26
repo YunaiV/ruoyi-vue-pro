@@ -1,22 +1,25 @@
 package cn.iocoder.yudao.module.promotion.controller.app.coupon;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
-import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponMatchReqVO;
-import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponMatchRespVO;
-import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponPageReqVO;
-import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponRespVO;
-import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.template.AppCouponTemplatePageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.*;
 import cn.iocoder.yudao.module.promotion.convert.coupon.CouponConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
+import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTakeTypeEnum;
 import cn.iocoder.yudao.module.promotion.service.coupon.CouponService;
+import cn.iocoder.yudao.module.promotion.service.coupon.CouponTemplateService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,12 +34,25 @@ public class AppCouponController {
 
     @Resource
     private CouponService couponService;
+    @Resource
+    private CouponTemplateService couponTemplateService;
 
-    // TODO 芋艿：待实现
     @PostMapping("/take")
     @Operation(summary = "领取优惠劵")
-    public CommonResult<Long> takeCoupon(@RequestBody AppCouponTemplatePageReqVO pageReqVO) {
-        return success(1L);
+    @Parameter(name = "templateId", description = "优惠券模板编号", required = true, example = "1024")
+    public CommonResult<Boolean> takeCoupon(@Valid @RequestBody AppCouponTakeReqVO reqVO) {
+        Long userId = getLoginUserId();
+        // 领取
+        couponService.takeCoupon(reqVO.getTemplateId(), CollUtil.newHashSet(userId), CouponTakeTypeEnum.USER);
+        // 检查是否可以继续领取
+        CouponTemplateDO couponTemplate = couponTemplateService.getCouponTemplate(reqVO.getTemplateId());
+        boolean canTakeAgain = true;
+        if (couponTemplate.getTakeLimitCount() != null && couponTemplate.getTakeLimitCount() > 0) {
+            Integer takeCount = MapUtil.getInt(couponService.getTakeCountMapByTemplateIds(
+                    Collections.singleton(reqVO.getTemplateId()), userId), reqVO.getTemplateId(), 0);
+            canTakeAgain = takeCount < couponTemplate.getTakeLimitCount();
+        }
+        return success(canTakeAgain);
     }
 
     @GetMapping("/match-list")
