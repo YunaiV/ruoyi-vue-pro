@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.trade.service.price.calculator;
 
 import cn.hutool.core.util.BooleanUtil;
-import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.member.api.point.MemberPointApi;
 import cn.iocoder.yudao.module.member.api.point.dto.MemberPointConfigRespDTO;
@@ -15,10 +14,11 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.math.RoundingMode;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PRICE_CALCULATE_PAY_PRICE_ILLEGAL;
 
 // TODO @疯狂：搞个单测，嘿嘿；
 /**
@@ -45,7 +45,7 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
         }
         // 1.2 校验积分抵扣是否开启
         MemberPointConfigRespDTO config = memberPointApi.getConfig();
-        if (!checkDeductPointEnable(config)) {
+        if (!isDeductPointEnable(config)) {
             return;
         }
         // 1.3 校验用户积分余额
@@ -55,7 +55,6 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
         }
 
         // 2.1 计算积分优惠金额
-        // TODO @疯狂：如果计算出来，优惠金额为 0，那是不是不用执行后续逻辑哈
         int pointPrice = calculatePointPrice(config, user.getPoint(), result);
         // 2.2 计算分摊的积分、抵扣金额
         List<TradePriceCalculateRespBO.OrderItem> orderItems = filterList(result.getItems(), TradePriceCalculateRespBO.OrderItem::getSelected);
@@ -77,18 +76,10 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
         TradePriceCalculatorHelper.recountAllPrice(result);
     }
 
-    // TODO @疯狂：这个最好是 is 开头；因为 check 或者 validator，更多失败，会抛出异常；
-    private boolean checkDeductPointEnable(MemberPointConfigRespDTO config) {
-        // TODO @疯狂：这个要不直接写成 return config != null && config .... 多行这样一个形式；
-        if (config == null) {
-            return false;
-        }
-        if (!BooleanUtil.isTrue(config.getTradeDeductEnable())) {
-            return false;
-        }
-
-        // 有没有配置：1 积分抵扣多少分
-        return config.getTradeDeductUnitPrice() != null && config.getTradeDeductUnitPrice() > 0;
+    private boolean isDeductPointEnable(MemberPointConfigRespDTO config) {
+        return config != null &&
+                !BooleanUtil.isTrue(config.getTradeDeductEnable()) &&  // 积分功能是否启用
+                config.getTradeDeductUnitPrice() != null && config.getTradeDeductUnitPrice() > 0; // 有没有配置：1 积分抵扣多少分
     }
 
     private Integer calculatePointPrice(MemberPointConfigRespDTO config, Integer usePoint, TradePriceCalculateRespBO result) {
@@ -98,14 +89,18 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
         }
         // 积分优惠金额（分）
         int pointPrice = usePoint * config.getTradeDeductUnitPrice();
-        // 0 元购!!!：用户积分比较多时，积分可以抵扣的金额要大于支付金额，这时需要根据支付金额反推使用多少积分
-        if (result.getPrice().getPayPrice() < pointPrice) {
-            pointPrice = result.getPrice().getPayPrice();
-            // 反推需要扣除的积分
-            usePoint = NumberUtil.toBigDecimal(pointPrice)
-                    .divide(NumberUtil.toBigDecimal(config.getTradeDeductUnitPrice()), 0, RoundingMode.HALF_UP)
-                    .intValue();
+        if (result.getPrice().getPayPrice() <= pointPrice) {
+            // 禁止0元购
+            throw exception(PRICE_CALCULATE_PAY_PRICE_ILLEGAL);
         }
+//        // 允许0 元购!!!：用户积分比较多时，积分可以抵扣的金额要大于支付金额，这时需要根据支付金额反推使用多少积分
+//        if (result.getPrice().getPayPrice() < pointPrice) {
+//            pointPrice = result.getPrice().getPayPrice();
+//            // 反推需要扣除的积分
+//            usePoint = NumberUtil.toBigDecimal(pointPrice)
+//                    .divide(NumberUtil.toBigDecimal(config.getTradeDeductUnitPrice()), 0, RoundingMode.HALF_UP)
+//                    .intValue();
+//        }
         // 记录使用的积分
         result.setUsePoint(usePoint);
         return pointPrice;
