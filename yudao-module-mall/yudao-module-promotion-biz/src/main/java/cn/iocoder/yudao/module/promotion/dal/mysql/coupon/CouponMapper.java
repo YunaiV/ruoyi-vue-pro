@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.yulichang.toolkit.MPJWrappers;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
@@ -93,5 +94,12 @@ public interface CouponMapper extends BaseMapperX<CouponDO> {
                                 .apply(productScopeValuesFindInSetFunc.apply(spuIds)))
                         .or(ww -> ww.eq(CouponDO::getProductScope, PromotionProductScopeEnum.CATEGORY.getScope())
                                 .apply(productScopeValuesFindInSetFunc.apply(categoryIds)))));
+    }
+
+    default List<CouponDO> selectListByStatusAndValidEndTimeLe(Integer status, LocalDateTime validEndTime) {
+        return selectList(new LambdaQueryWrapperX<CouponDO>()
+                .eq(CouponDO::getStatus, status)
+                .le(CouponDO::getValidEndTime, validEndTime)
+        );
     }
 }

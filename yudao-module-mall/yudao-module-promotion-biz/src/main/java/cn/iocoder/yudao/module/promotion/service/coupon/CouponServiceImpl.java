@@ -6,6 +6,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
@@ -21,6 +22,7 @@ import cn.iocoder.yudao.module.promotion.enums.coupon.CouponStatusEnum;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTakeTypeEnum;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTemplateValidityTypeEnum;
 import cn.iocoder.yudao.module.promotion.service.coupon.bo.CouponTakeCountBO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -43,6 +45,7 @@ import static java.util.Arrays.asList;
  *
  * @author 芋道源码
  */
+@Slf4j
 @Service
 @Validated
 public class CouponServiceImpl implements CouponService {
@@ -193,6 +196,43 @@ public class CouponServiceImpl implements CouponService {
                 matchReqVO.getPrice(), matchReqVO.getSpuIds(), matchReqVO.getCategoryIds());
     }
 
+    @Override
+    public int expireCoupon() {
+        // 1. 查询待过期的优惠券
+        List<CouponDO> list = couponMapper.selectListByStatusAndValidEndTimeLe(
+                CouponStatusEnum.UNUSED.getStatus(), LocalDateTime.now());
+        if (CollUtil.isEmpty(list)) {
+            return 0;
+        }
+
+        // 2. 遍历执行
+        int count = 0;
+        for (CouponDO coupon : list) {
+            try {
+                boolean success = getSelf().expireCoupon(coupon);
+                if (success) {
+                    count++;
+                }
+            } catch (Exception e) {
+                log.error("[expireCoupon][coupon({}) 更新为已过期失败]", coupon.getId(), e);
+            }
+        }
+        return count;
+    }
+
+    private boolean expireCoupon(CouponDO coupon) {
+        // 更新记录状态
+        CouponDO updateObj = new CouponDO().setStatus(CouponStatusEnum.EXPIRE.getStatus());
+        int updateRows = couponMapper.updateByIdAndStatus(coupon.getId(), CouponStatusEnum.UNUSED.getStatus(), updateObj);
+        if (updateRows == 0) {
+            log.error("[expireCoupon][coupon({}) 更新为已过期失败]", coupon.getId());
+            return false;
+        }
+
+        log.info("[expireCoupon][coupon({}) 更新为已过期成功]", coupon.getId());
+        return true;
+    }
+
     /**
      * 校验优惠券是否可以领取
      *
@@ -246,4 +286,12 @@ public class CouponServiceImpl implements CouponService {
         userIds.removeIf(userId -> MapUtil.getInt(userTakeCountMap, userId, 0) >= couponTemplate.getTakeLimitCount());
     }
 
+    /**
+     * 获得自身的代理对象，解决 AOP 生效问题
+     *
+     * @return 自己
+     */
+    private CouponServiceImpl getSelf() {
+        return SpringUtil.getBean(getClass());
+    }
 }

@@ -157,4 +157,11 @@ public interface CouponService {
      * @return 优惠券列表
      */
     List<CouponDO> getMatchCouponList(Long userId, AppCouponMatchReqVO matchReqVO);
+
+    /**
+     * 过期优惠券
+     *
+     * @return 过期数量
+     */
+    int expireCoupon();
 }
