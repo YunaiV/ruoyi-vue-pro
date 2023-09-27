@@ -360,7 +360,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     /**
      * 校验交易订单满足被支付的条件
-     *
+     * <p>
      * 1. 交易订单未支付
      * 2. 支付单已支付
      *
@@ -413,7 +413,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_CANCEL)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.ADMIN_DELIVERY)
     public void deliveryOrder(TradeOrderDeliveryReqVO deliveryReqVO) {
         // 1.1 校验并获得交易订单（可发货）
         TradeOrderDO order = validateOrderDeliverable(deliveryReqVO.getId());
@@ -452,7 +452,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     /**
      * 校验交易订单满足被发货的条件
-     *
+     * <p>
      * 1. 交易订单未发货
      *
      * @param id 交易订单编号
@@ -556,7 +556,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     /**
      * 校验交易订单满足可售货的条件
-     *
+     * <p>
      * 1. 交易订单待收货
      *
      * @param userId 用户编号
@@ -889,7 +889,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         for (TradeOrderDO order : orders) {
             try {
                 getSelf().createOrderItemCommentBySystemBySystem(order);
-                count ++;
+                count++;
             } catch (Throwable e) {
                 log.error("[createOrderItemCommentBySystem][order({}) 过期订单异常]", order.getId(), e);
             }
@@ -933,7 +933,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     /**
      * 创建订单项的评论的核心实现
      *
-     * @param orderItem 订单项
+     * @param orderItem   订单项
      * @param createReqVO 评论内容
      * @return 评论编号
      */
@@ -989,14 +989,14 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     /**
      * 创建分销记录
-     *
+     * <p>
      * 目前是支付成功后，就会创建分销记录。
-     *
+     * <p>
      * 业内还有两种做法，可以根据自己的业务调整：
-     *  1. 确认收货后，才创建分销记录
-     *  2. 支付 or 下单成功时，创建分销记录（冻结），确认收货解冻或者 n 天后解冻
+     * 1. 确认收货后，才创建分销记录
+     * 2. 支付 or 下单成功时，创建分销记录（冻结），确认收货解冻或者 n 天后解冻
      *
-     * @param userId 用户编号
+     * @param userId  用户编号
      * @param orderId 订单编号
      */
     @Async
