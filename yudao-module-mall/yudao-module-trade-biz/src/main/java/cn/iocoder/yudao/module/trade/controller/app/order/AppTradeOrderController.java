@@ -75,6 +75,7 @@ public class AppTradeOrderController {
     }
 
     // TODO @芋艿：如果拼团活动、秒杀活动、砍价活动时，是不是要额外在返回活动之类的信息；
+    // TODO @puhui999：需要的
     @GetMapping("/get-detail")
     @Operation(summary = "获得交易订单")
     @Parameter(name = "id", description = "交易订单编号")

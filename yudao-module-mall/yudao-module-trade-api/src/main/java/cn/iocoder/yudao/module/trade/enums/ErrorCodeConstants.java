@@ -29,8 +29,8 @@ public interface ErrorCodeConstants {
     ErrorCode ORDER_DELIVERY_FAIL_DELIVERY_TYPE_NOT_EXPRESS = new ErrorCode(1011000024, "交易订单发货失败，发货类型不是快递");
     ErrorCode ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID = new ErrorCode(1011000025, "交易订单取消失败，订单不是【待支付】状态");
     ErrorCode ORDER_UPDATE_PRICE_FAIL_PAID = new ErrorCode(1011000026, "支付订单调价失败，原因：支付订单已付款,不能调价");
-    ErrorCode ORDER_UPDATE_PRICE_FAIL_EQUAL = new ErrorCode(1011000027, "支付订单调价失败，原因：价格没有变化");
-    ErrorCode ORDER_UPDATE_PRICE_FAIL_NOT_ITEM = new ErrorCode(1011000028, "支付订单调价失败，原因：订单项不存在");
+    ErrorCode ORDER_UPDATE_PRICE_FAIL_ALREADY = new ErrorCode(1011000027, "支付订单调价失败，原因：已经修改过价格");
+    ErrorCode ORDER_UPDATE_PRICE_FAIL_PRICE_ERROR = new ErrorCode(1011000028, "支付订单调价失败，原因：调整后支付价格不能小于 0.01 元");
     ErrorCode ORDER_DELETE_FAIL_STATUS_NOT_CANCEL = new ErrorCode(1011000029, "交易订单删除失败，订单不是【已取消】状态");
 
     // ========== After Sale 模块 1011000100 ==========

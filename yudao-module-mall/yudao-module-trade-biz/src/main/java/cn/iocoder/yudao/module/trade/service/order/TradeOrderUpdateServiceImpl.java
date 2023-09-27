@@ -11,6 +11,7 @@ import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
 import cn.iocoder.yudao.module.member.api.level.MemberLevelApi;
@@ -64,6 +65,7 @@ import cn.iocoder.yudao.module.trade.service.order.handler.TradeOrderHandler;
 import cn.iocoder.yudao.module.trade.service.price.TradePriceService;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
+import cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculatorHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.scheduling.annotation.Async;
@@ -696,86 +698,58 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.ADMIN_UPDATE_PRICE)
     public void updateOrderPrice(TradeOrderUpdatePriceReqVO reqVO) {
-        // 1、校验交易订单
+        // 1.1 校验交易订单
         TradeOrderDO order = validateOrderExists(reqVO.getId());
         if (order.getPayStatus()) {
             throw exception(ORDER_UPDATE_PRICE_FAIL_PAID);
         }
-        // 2、校验订单项
-        List<TradeOrderItemDO> items = tradeOrderItemMapper.selectListByOrderId(order.getId());
-        if (CollUtil.isEmpty(items)) {
-            throw exception(ORDER_UPDATE_PRICE_FAIL_NOT_ITEM);
+        // 1.2 校验调价金额是否变化
+        if (order.getAdjustPrice() > 0) {
+            throw exception(ORDER_UPDATE_PRICE_FAIL_ALREADY);
         }
-        // 3、校验调价金额是否变化
-        if (ObjectUtil.equal(order.getAdjustPrice(), reqVO.getAdjustPrice())) {
-            throw exception(ORDER_UPDATE_PRICE_FAIL_EQUAL);
+        // 1.3 支付价格不能为 0
+        int newPayPrice = order.getPayPrice() + order.getAdjustPrice();
+        if (newPayPrice <= 0) {
+            throw exception(ORDER_UPDATE_PRICE_FAIL_PRICE_ERROR);
         }
 
-        // 4、更新订单
-        TradeOrderDO update = new TradeOrderDO();
-        update.setId(order.getId());
-        update.setAdjustPrice(reqVO.getAdjustPrice());
-        int orderPayPrice = order.getAdjustPrice() != null ? (order.getPayPrice() - order.getAdjustPrice())
-                + reqVO.getAdjustPrice() : order.getPayPrice() + reqVO.getAdjustPrice();
-        update.setPayPrice(orderPayPrice);
-        tradeOrderMapper.updateById(update);
-        // TODO @芋艿：改价时，赠送的积分，要不要做改动？？？
+        // 2. 更新订单
+        tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId())
+                .setAdjustPrice(reqVO.getAdjustPrice()).setPayPrice(newPayPrice));
 
-        // 5、更新 TradeOrderItem
-        // TradeOrderItemDO 需要做 adjustPrice 的分摊
-        List<Integer> dividePrices = dividePrice(items, orderPayPrice);
+        // 3. 更新 TradeOrderItem，需要做 adjustPrice 的分摊
+        List<TradeOrderItemDO> orderOrderItems = tradeOrderItemMapper.selectListByOrderId(order.getId());
+        List<Integer> dividePrices = TradePriceCalculatorHelper.dividePrice2(orderOrderItems, newPayPrice);
         List<TradeOrderItemDO> updateItems = new ArrayList<>();
-        for (int i = 0; i < items.size(); i++) {
-            TradeOrderItemDO item = items.get(i);
-            Integer adjustPrice = item.getPrice() - dividePrices.get(i); // 计算调整的金额
-            updateItems.add(new TradeOrderItemDO().setId(item.getId()).setAdjustPrice(adjustPrice)
-                    .setPayPrice(item.getPayPrice() - adjustPrice));
+        for (int i = 0; i < orderOrderItems.size(); i++) {
+            TradeOrderItemDO item = orderOrderItems.get(i);
+            updateItems.add(new TradeOrderItemDO().setId(item.getId()).setAdjustPrice(dividePrices.get(i))
+                    .setPayPrice(item.getPayPrice() + dividePrices.get(i)));
         }
         tradeOrderItemMapper.updateBatch(updateItems);
 
-        // 6、更新支付订单
-        payOrderApi.updatePayOrderPrice(order.getPayOrderId(), update.getPayPrice());
-    }
+        // 4. 更新支付订单
+        payOrderApi.updatePayOrderPrice(order.getPayOrderId(), newPayPrice);
 
-    /**
-     * 计算订单调价价格分摊
-     *
-     * @param items         订单项
-     * @param orderPayPrice 订单支付金额
-     * @return 分摊金额数组，和传入的 orderItems 一一对应
-     */
-    private List<Integer> dividePrice(List<TradeOrderItemDO> items, Integer orderPayPrice) {
-        Integer total = getSumValue(items, TradeOrderItemDO::getPrice, Integer::sum);
-        assert total != null;
-        // 遍历每一个，进行分摊
-        List<Integer> prices = new ArrayList<>(items.size());
-        int remainPrice = orderPayPrice;
-        for (int i = 0; i < items.size(); i++) {
-            TradeOrderItemDO orderItem = items.get(i);
-            int partPrice;
-            if (i < items.size() - 1) { // 减一的原因，是因为拆分时，如果按照比例，可能会出现.所以最后一个，使用反减
-                partPrice = (int) (orderPayPrice * (1.0D * orderItem.getPayPrice() / total));
-                remainPrice -= partPrice;
-            } else {
-                partPrice = remainPrice;
-            }
-            Assert.isTrue(partPrice >= 0, "分摊金额必须大于等于 0");
-            prices.add(partPrice);
-        }
-        return prices;
+        // 5. 记录订单日志
+        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), order.getStatus(),
+                MapUtil.<String, Object>builder().put("oldPayPrice", MoneyUtils.fenToYuanStr(order.getPayPrice()))
+                        .put("newPayPrice", MoneyUtils.fenToYuanStr(newPayPrice)).build());
     }
 
     @Override
     public void updateOrderAddress(TradeOrderUpdateAddressReqVO reqVO) {
         // 校验交易订单
         validateOrderExists(reqVO.getId());
-        // TODO 是否需要校验订单是否发货
+        // TODO @puhui999：是否需要校验订单是否发货
         // TODO 发货后是否支持修改收货地址
 
         // 更新
-        TradeOrderDO update = TradeOrderConvert.INSTANCE.convert(reqVO);
-        tradeOrderMapper.updateById(update);
+        tradeOrderMapper.updateById(TradeOrderConvert.INSTANCE.convert(reqVO));
+
+        // TODO @puhui999：操作日志
     }
 
     // =================== Order Item ===================
