@@ -80,7 +80,7 @@ public class TradeConfigBaseVO {
     private Integer brokerageFrozenDays;
 
     @Schema(description = "提现方式", requiredMode = Schema.RequiredMode.REQUIRED, example = "[0, 1]")
-    @NotNull(message = "提现方式不能为空")
+    @NotEmpty(message = "提现方式不能为空")
     @InEnum(value = BrokerageWithdrawTypeEnum.class, message = "提现方式必须是 {value}")
     private List<Integer> brokerageWithdrawTypes;
 
