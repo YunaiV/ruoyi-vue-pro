@@ -69,29 +69,27 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
         }
 
         // 2. 更新
-        BrokerageWithdrawDO updateObj = new BrokerageWithdrawDO()
-                .setStatus(status.getStatus())
-                .setAuditReason(auditReason)
-                .setAuditTime(LocalDateTime.now());
-        int rows = brokerageWithdrawMapper.updateByIdAndStatus(id, BrokerageWithdrawStatusEnum.AUDITING.getStatus(), updateObj);
+        int rows = brokerageWithdrawMapper.updateByIdAndStatus(id, BrokerageWithdrawStatusEnum.AUDITING.getStatus(),
+                new BrokerageWithdrawDO().setStatus(status.getStatus()).setAuditReason(auditReason).setAuditTime(LocalDateTime.now()));
         if (rows == 0) {
             throw exception(BROKERAGE_WITHDRAW_STATUS_NOT_AUDITING);
         }
 
-        String templateCode = MessageTemplateConstants.BROKERAGE_WITHDRAW_AUDIT_APPROVE;
+        String templateCode;
         if (BrokerageWithdrawStatusEnum.AUDIT_SUCCESS.equals(status)) {
+            templateCode = MessageTemplateConstants.BROKERAGE_WITHDRAW_AUDIT_APPROVE;
             // 3.1 通过时佣金转余额
             if (BrokerageWithdrawTypeEnum.WALLET.getType().equals(withdraw.getType())) {
-                // todo
+                // todo 疯狂：
             }
+            // TODO 疯狂：调用转账接口
         } else if (BrokerageWithdrawStatusEnum.AUDIT_FAIL.equals(status)) {
             templateCode = MessageTemplateConstants.BROKERAGE_WITHDRAW_AUDIT_REJECT;
-
             // 3.2 驳回时需要退还用户佣金
             brokerageRecordService.addBrokerage(withdraw.getUserId(), BrokerageRecordBizTypeEnum.WITHDRAW_REJECT,
                     String.valueOf(withdraw.getId()), withdraw.getPrice(), BrokerageRecordBizTypeEnum.WITHDRAW_REJECT.getTitle());
         } else {
-            throw new IllegalArgumentException("不支持的提现状态");
+            throw new IllegalArgumentException("不支持的提现状态：" + status);
         }
 
         // 4. 通知用户
@@ -100,10 +98,8 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
                 .put("price", MoneyUtils.fenToYuanStr(withdraw.getPrice()))
                 .put("reason", withdraw.getAuditReason())
                 .build();
-        NotifySendSingleToUserReqDTO reqDTO = new NotifySendSingleToUserReqDTO()
-                .setUserId(withdraw.getUserId())
-                .setTemplateCode(templateCode).setTemplateParams(templateParams);
-        notifyMessageSendApi.sendSingleMessageToMember(reqDTO);
+        notifyMessageSendApi.sendSingleMessageToMember(new NotifySendSingleToUserReqDTO()
+                .setUserId(withdraw.getUserId()).setTemplateCode(templateCode).setTemplateParams(templateParams));
     }
 
     private BrokerageWithdrawDO validateBrokerageWithdrawExists(Integer id) {
@@ -126,22 +122,22 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long createBrokerageWithdraw(AppBrokerageWithdrawCreateReqVO createReqVO, Long userId) {
-        // 校验提现金额
+    public Long createBrokerageWithdraw(Long userId, AppBrokerageWithdrawCreateReqVO createReqVO) {
+        // 1.1 校验提现金额
         TradeConfigDO tradeConfig = validateWithdrawPrice(createReqVO.getPrice());
-        // 校验提现参数
+        // 1.2 校验提现参数
         createReqVO.validate(validator);
 
-        // 计算手续费
+        // 2.1 计算手续费
         Integer feePrice = calculateFeePrice(createReqVO.getPrice(), tradeConfig.getBrokerageWithdrawFeePercent());
-        // 创建佣金提现记录
+        // 2.2 创建佣金提现记录
         BrokerageWithdrawDO withdraw = BrokerageWithdrawConvert.INSTANCE.convert(createReqVO, userId, feePrice);
         brokerageWithdrawMapper.insert(withdraw);
 
-        // 创建用户佣金记录
-        brokerageRecordService.addBrokerage(userId, BrokerageRecordBizTypeEnum.WITHDRAW, String.valueOf(withdraw.getId()),
-                -createReqVO.getPrice(), BrokerageRecordBizTypeEnum.WITHDRAW.getTitle());
-
+        // 3. 创建用户佣金记录
+        // 注意，佣金是否充足，reduceBrokerage 已经进行校验
+        brokerageRecordService.reduceBrokerage(userId, BrokerageRecordBizTypeEnum.WITHDRAW, String.valueOf(withdraw.getId()),
+                createReqVO.getPrice(), BrokerageRecordBizTypeEnum.WITHDRAW.getTitle());
         return withdraw.getId();
     }
 

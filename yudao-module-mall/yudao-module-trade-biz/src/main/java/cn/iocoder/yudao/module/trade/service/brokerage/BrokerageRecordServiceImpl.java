@@ -231,6 +231,30 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
         return count;
     }
 
+    /**
+     * 激动单条佣金记录
+     *
+     * @param record 佣金记录
+     * @return 解冻是否成功
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public boolean unfreezeRecord(BrokerageRecordDO record) {
+        // 更新记录状态
+        BrokerageRecordDO updateObj = new BrokerageRecordDO()
+                .setStatus(BrokerageRecordStatusEnum.SETTLEMENT.getStatus())
+                .setUnfreezeTime(LocalDateTime.now());
+        int updateRows = brokerageRecordMapper.updateByIdAndStatus(record.getId(), record.getStatus(), updateObj);
+        if (updateRows == 0) {
+            log.error("[unfreezeRecord][record({}) 更新为已结算失败]", record.getId());
+            return false;
+        }
+
+        // 更新用户冻结佣金
+        brokerageUserService.updateFrozenPriceDecrAndPriceIncr(record.getUserId(), -record.getPrice());
+        log.info("[unfreezeRecord][record({}) 更新为已结算成功]", record.getId());
+        return true;
+    }
+
     @Override
     public List<UserBrokerageSummaryRespBO> getUserBrokerageSummaryListByUserId(Collection<Long> userIds,
                                                                                 Integer bizType, Integer status) {
@@ -255,6 +279,7 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
         return new PageResult<>(pageResult.getRecords(), pageResult.getTotal());
     }
 
+    // TODO @疯狂：这个要不我们先做精准的？先查询自己的推广金额，然后查询比该金额多的有多少人？
     @Override
     public Integer getUserRankByPrice(Long userId, LocalDateTime[] times) {
         AppBrokerageUserRankPageReqVO pageParam = new AppBrokerageUserRankPageReqVO().setTimes(times);
@@ -291,26 +316,8 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
         brokerageRecordMapper.insert(record);
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public boolean unfreezeRecord(BrokerageRecordDO record) {
-        // 更新记录状态
-        BrokerageRecordDO updateObj = new BrokerageRecordDO()
-                .setStatus(BrokerageRecordStatusEnum.SETTLEMENT.getStatus())
-                .setUnfreezeTime(LocalDateTime.now());
-        int updateRows = brokerageRecordMapper.updateByIdAndStatus(record.getId(), record.getStatus(), updateObj);
-        if (updateRows == 0) {
-            log.error("[unfreezeRecord][record({}) 更新为已结算失败]", record.getId());
-            return false;
-        }
-
-        // 更新用户冻结佣金
-        brokerageUserService.updateFrozenPriceDecrAndPriceIncr(record.getUserId(), -record.getPrice());
-        log.info("[unfreezeRecord][record({}) 更新为已结算成功]", record.getId());
-        return true;
-    }
-
     @Override
-    public AppBrokerageProductPriceRespVO calculateProductBrokeragePrice(Long spuId, Long userId) {
+    public AppBrokerageProductPriceRespVO calculateProductBrokeragePrice(Long userId, Long spuId) {
         // 1. 构建默认的返回值
         AppBrokerageProductPriceRespVO respVO = new AppBrokerageProductPriceRespVO().setEnabled(false)
                 .setBrokerageMinPrice(0).setBrokerageMaxPrice(0);

@@ -62,6 +62,19 @@ public interface BrokerageRecordService {
     void addBrokerage(Long userId, BrokerageRecordBizTypeEnum bizType, String bizId, Integer brokeragePrice, String title);
 
     /**
+     * 减少佣金【只针对自己】
+     *
+     * @param userId         会员编号
+     * @param bizType        业务类型
+     * @param bizId          业务编号
+     * @param brokeragePrice 佣金
+     * @param title          标题
+     */
+    default void reduceBrokerage(Long userId, BrokerageRecordBizTypeEnum bizType, String bizId, Integer brokeragePrice, String title) {
+        addBrokerage(userId, bizType, bizId, -brokeragePrice, title);
+    }
+
+    /**
      * 取消佣金：将佣金记录，状态修改为已失效
      *
      * @param userId  会员编号
@@ -134,10 +147,10 @@ public interface BrokerageRecordService {
     /**
      * 计算商品被购买后，推广员可以得到的佣金
      *
-     * @param spuId  商品编号
      * @param userId 用户编号
+     * @param spuId  商品编号
      * @return 用户佣金
      */
-    AppBrokerageProductPriceRespVO calculateProductBrokeragePrice(Long spuId, Long userId);
+    AppBrokerageProductPriceRespVO calculateProductBrokeragePrice(Long userId, Long spuId);
 
 }

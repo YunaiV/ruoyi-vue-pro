@@ -49,11 +49,11 @@ public interface BrokerageWithdrawService {
     /**
      * 【会员】创建佣金提现
      *
-     * @param createReqVO 创建信息
      * @param userId      会员用户编号
+     * @param createReqVO 创建信息
      * @return 佣金提现编号
      */
-    Long createBrokerageWithdraw(AppBrokerageWithdrawCreateReqVO createReqVO, Long userId);
+    Long createBrokerageWithdraw(Long userId, AppBrokerageWithdrawCreateReqVO createReqVO);
 
     /**
      * 按照 userId，汇总每个用户的提现
@@ -62,7 +62,8 @@ public interface BrokerageWithdrawService {
      * @param status  提现状态
      * @return 用户提现汇总 List
      */
-    List<BrokerageWithdrawSummaryRespBO> getWithdrawSummaryListByUserId(Collection<Long> userIds, BrokerageWithdrawStatusEnum status);
+    List<BrokerageWithdrawSummaryRespBO> getWithdrawSummaryListByUserId(Collection<Long> userIds,
+                                                                        BrokerageWithdrawStatusEnum status);
 
     /**
      * 按照 userId，汇总每个用户的提现
