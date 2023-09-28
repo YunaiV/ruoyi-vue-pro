@@ -68,6 +68,7 @@ public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
                 .eq(BrokerageRecordDO::getStatus, status)
                 .groupBy(BrokerageRecordDO::getUserId));
         return BeanUtil.copyToList(list, UserBrokerageSummaryBO.class);
+        // selectJoinList有BUG，会与租户插件冲突：解析SQL时，发生异常 https://gitee.com/best_handsome/mybatis-plus-join/issues/I84GYW
 //            return selectJoinList(UserBrokerageSummaryBO.class, MPJWrappers.lambdaJoin(BrokerageRecordDO.class)
 //                    .select(BrokerageRecordDO::getUserId)
 //                    .selectCount(BrokerageRecordDO::getId, UserBrokerageSummaryBO::getCount)

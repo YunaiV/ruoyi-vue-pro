@@ -78,25 +78,25 @@ public interface BrokerageRecordService {
     int unfreezeRecord();
 
     /**
-     * 汇总用户佣金
+     * 按照 userId，汇总每个用户的佣金
      *
      * @param userIds 用户编号
      * @param bizType 业务类型
      * @param status  佣金状态
-     * @return 用户佣金汇总
+     * @return 用户佣金汇总 List
      */
-    List<UserBrokerageSummaryBO> getUserBrokerageSummaryByUserId(Collection<Long> userIds, Integer bizType, Integer status);
+    List<UserBrokerageSummaryBO> getUserBrokerageSummaryListByUserId(Collection<Long> userIds, Integer bizType, Integer status);
 
     /**
-     * 汇总用户佣金
+     * 按照 userId，汇总每个用户的佣金
      *
      * @param userIds 用户编号
      * @param bizType 业务类型
      * @param status  佣金状态
-     * @return 用户佣金汇总
+     * @return 用户佣金汇总 Map
      */
     default Map<Long, UserBrokerageSummaryBO> getUserBrokerageSummaryMapByUserId(Collection<Long> userIds, Integer bizType, Integer status) {
-        return convertMap(getUserBrokerageSummaryByUserId(userIds, bizType, status), UserBrokerageSummaryBO::getUserId);
+        return convertMap(getUserBrokerageSummaryListByUserId(userIds, bizType, status), UserBrokerageSummaryBO::getUserId);
     }
 
     /**

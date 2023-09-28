@@ -137,7 +137,8 @@ public interface CouponService {
      * @return 领取优惠券的数量
      */
     default Map<Long, Integer> getTakeCountMapByTemplateIds(Collection<Long> templateIds, Long userId) {
-        return convertMap(getTakeCountListByTemplateIds(templateIds, userId), CouponTakeCountBO::getTemplateId, CouponTakeCountBO::getCount);
+        return convertMap(getTakeCountListByTemplateIds(templateIds, userId),
+                CouponTakeCountBO::getTemplateId, CouponTakeCountBO::getCount);
     }
 
     /**

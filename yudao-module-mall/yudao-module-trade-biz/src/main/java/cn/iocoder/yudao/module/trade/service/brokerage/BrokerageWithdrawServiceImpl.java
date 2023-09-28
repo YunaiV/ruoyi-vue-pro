@@ -144,7 +144,7 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
     }
 
     @Override
-    public List<UserWithdrawSummaryBO> getWithdrawSummaryByUserId(Collection<Long> userIds, BrokerageWithdrawStatusEnum status) {
+    public List<UserWithdrawSummaryBO> getWithdrawSummaryListByUserId(Collection<Long> userIds, BrokerageWithdrawStatusEnum status) {
         return brokerageWithdrawMapper.selectCountAndSumPriceByUserIdAndStatus(userIds, status.getStatus());
     }
 

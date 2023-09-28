@@ -42,16 +42,16 @@ public interface CouponTemplateConvert {
         if (MapUtil.isEmpty(couponTakeCountMap)) {
             return result;
         }
-
-        for (AppCouponTemplateRespVO vo : result.getList()) {
+        for (AppCouponTemplateRespVO template : result.getList()) {
             // 每人领取数量无限制
-            if (vo.getTakeLimitCount() == -1) {
-                vo.setTakeStatus(false);
+            if (template.getTakeLimitCount() == -1) {
+                template.setTakeStatus(false);
                 continue;
             }
             // 检查已领取数量是否超过限领数量
-            vo.setTakeStatus(MapUtil.getInt(couponTakeCountMap, vo.getId(), 0) >= vo.getTakeLimitCount());
+            template.setTakeStatus(MapUtil.getInt(couponTakeCountMap, template.getId(), 0) >= template.getTakeLimitCount());
         }
         return result;
     }
+
 }

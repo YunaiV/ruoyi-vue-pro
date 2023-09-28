@@ -7,6 +7,8 @@ import cn.hutool.core.util.BooleanUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
+import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.user.BrokerageUserPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserChildSummaryPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserChildSummaryRespVO;
@@ -47,6 +49,9 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
 
     @Resource
     private TradeConfigService tradeConfigService;
+
+    @Resource
+    private MemberUserApi memberUserApi;
 
     @Override
     public BrokerageUserDO getBrokerageUser(Long id) {
@@ -155,7 +160,7 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     }
 
     @Override
-    public boolean bindBrokerageUser(Long userId, Long bindUserId, LocalDateTime registerTime) {
+    public boolean bindBrokerageUser(Long userId, Long bindUserId) {
         // 1. 获得分销用户
         boolean isNewBrokerageUser = false;
         BrokerageUserDO brokerageUser = brokerageUserMapper.selectById(userId);
@@ -165,7 +170,7 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         }
 
         // 2.1 校验是否能绑定用户
-        boolean validated = isUserCanBind(brokerageUser, registerTime);
+        boolean validated = isUserCanBind(brokerageUser);
         if (!validated) {
             return false;
         }
@@ -223,7 +228,7 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         return new PageResult<>(pageResult.getRecords(), pageResult.getTotal());
     }
 
-    private boolean isUserCanBind(BrokerageUserDO user, LocalDateTime registerTime) {
+    private boolean isUserCanBind(BrokerageUserDO user) {
         // 校验分销功能是否启用
         TradeConfigDO tradeConfig = tradeConfigService.getTradeConfig();
         if (tradeConfig == null || !BooleanUtil.isTrue(tradeConfig.getBrokerageEnabled())) {
@@ -237,9 +242,8 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
 
         // 校验分销关系绑定模式
         if (BrokerageBindModeEnum.REGISTER.getMode().equals(tradeConfig.getBrokerageBindMode())) {
-            // 判断是否为新用户：注册时间在30秒内的，都算新用户
-            boolean isNotNewUser = LocalDateTimeUtils.beforeNow(registerTime.plusSeconds(30));
-            if (isNotNewUser) {
+            // 判断是否为新用户：注册时间在 30 秒内的，都算新用户
+            if (!isNewRegisterUser(user.getId())) {
                 throw exception(BROKERAGE_BIND_MODE_REGISTER); // 只有在注册时可以绑定
             }
         } else if (BrokerageBindModeEnum.ANYTIME.getMode().equals(tradeConfig.getBrokerageBindMode())) {
@@ -247,14 +251,29 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
                 throw exception(BROKERAGE_BIND_OVERRIDE); // 已绑定了推广人
             }
         }
-
         return true;
+    }
+
+    /**
+     * 判断是否为新用户
+     *
+     * 标准：注册时间在 30 秒内的，都算新用户
+     *
+     * 疑问：为什么通过这样的方式实现？
+     * 回答：因为注册在 member 模块，希望它和 trade 模块解耦，所以只能用这种约定的逻辑。
+     *
+     * @param userId 用户编号
+     * @return 是否新用户
+     */
+    private boolean isNewRegisterUser(Long userId) {
+        MemberUserRespDTO user = memberUserApi.getUser(userId);
+        return user != null && LocalDateTimeUtils.beforeNow(user.getCreateTime().plusSeconds(30));
     }
 
     private void validateCanBindUser(BrokerageUserDO user, Long bindUserId) {
         // 校验要绑定的用户有无推广资格
         BrokerageUserDO bindUser = brokerageUserMapper.selectById(bindUserId);
-        if (bindUser == null || !BooleanUtil.isTrue(bindUser.getBrokerageEnabled())) {
+        if (bindUser == null || BooleanUtil.isFalse(bindUser.getBrokerageEnabled())) {
             throw exception(BROKERAGE_BIND_USER_NOT_ENABLED);
         }
 

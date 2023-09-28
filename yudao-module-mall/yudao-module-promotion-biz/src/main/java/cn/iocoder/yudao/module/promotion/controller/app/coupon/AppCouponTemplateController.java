@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.promotion.controller.app.coupon;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.template.AppCouponTemplatePageReqVO;
@@ -45,12 +46,14 @@ public class AppCouponTemplateController {
     @Operation(summary = "获得优惠劵模版分页")
     public CommonResult<PageResult<AppCouponTemplateRespVO>> getCouponTemplatePage(AppCouponTemplatePageReqVO pageReqVO) {
         // 1.1 处理查询条件：商品范围编号
-        Long productScopeValue = getaProductScopeValue(pageReqVO);
-        // 1.2 处理查询条件：领取方式=直接领取
+        Long productScopeValue = getProductScopeValue(pageReqVO);
+        // 1.2 处理查询条件：领取方式 = 直接领取
         List<Integer> canTakeTypes = Collections.singletonList(CouponTakeTypeEnum.USER.getValue());
+
         // 2. 分页查询
         PageResult<CouponTemplateDO> pageResult = couponTemplateService.getCouponTemplatePage(
                 CouponTemplateConvert.INSTANCE.convert(pageReqVO, canTakeTypes, pageReqVO.getProductScope(), productScopeValue));
+
         // 3.1 领取数量
         Map<Long, Integer> couponTakeCountMap = new HashMap<>(0);
         Long userId = getLoginUserId();
@@ -63,17 +66,24 @@ public class AppCouponTemplateController {
         return success(CouponTemplateConvert.INSTANCE.convertAppPage(pageResult, couponTakeCountMap));
     }
 
-    private Long getaProductScopeValue(AppCouponTemplatePageReqVO pageReqVO) {
-        Long productScopeValue = pageReqVO.getSpuId();
-        if (pageReqVO.getProductScope() == null || Objects.equals(pageReqVO.getProductScope(), PromotionProductScopeEnum.ALL.getScope())) {
-            // 通用券：清除商品范围
-            productScopeValue = null;
-        } else if (Objects.equals(pageReqVO.getProductScope(), PromotionProductScopeEnum.CATEGORY.getScope()) && pageReqVO.getSpuId() != null) {
-            // 品类券：查询商品的品类
-            productScopeValue = Optional.ofNullable(productSpuApi.getSpu(pageReqVO.getSpuId()))
+    /**
+     * 获得分页查询的商品范围
+     *
+     * @param pageReqVO 分页查询
+     * @return 商品范围
+     */
+    private Long getProductScopeValue(AppCouponTemplatePageReqVO pageReqVO) {
+        // 通用券：清除商品范围
+        if (pageReqVO.getProductScope() == null || ObjectUtils.equalsAny(pageReqVO.getProductScope(), PromotionProductScopeEnum.ALL.getScope(), null)) {
+            return null;
+        }
+        // 品类券：查询商品的品类
+        if (Objects.equals(pageReqVO.getProductScope(), PromotionProductScopeEnum.CATEGORY.getScope()) && pageReqVO.getSpuId() != null) {
+            return Optional.ofNullable(productSpuApi.getSpu(pageReqVO.getSpuId()))
                     .map(ProductSpuRespDTO::getCategoryId).orElse(null);
         }
-        return productScopeValue;
+        // 商品卷：直接返回
+        return pageReqVO.getSpuId();
     }
 
 }

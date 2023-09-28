@@ -753,6 +753,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     @Override
     public void updateOrderItemWhenAfterSaleCreate(Long id, Long afterSaleId) {
+        // TODO @疯狂：这个可以直接在接口上，写 @Null 参数校验；
         if (afterSaleId == null) {
             throw new IllegalArgumentException(StrUtil.format("id({}) 退款发起，售后单编号不能为空", id));
         }
@@ -765,6 +766,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateOrderItemWhenAfterSaleSuccess(Long id, Integer refundPrice) {
+        // TODO @疯狂：这个可以直接在接口上，写 @Null 参数校验；
         if (refundPrice == null) {
             throw new IllegalArgumentException(StrUtil.format("id({}) 退款成功，退款金额不能为空", id));
         }
@@ -787,15 +789,17 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         }
 
         // TODO 芋艿：这块扣减规则，需要在考虑下
-        // 3.1 回滚数据：增加 SKU 库存
+        // 3. 回滚数据：增加 SKU 库存
         productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convert(Collections.singletonList(orderItem)));
-        // 3.2 回滚数据：扣减用户积分（赠送的）
+
+        // 4.1 回滚数据：扣减用户积分（赠送的）
         reduceUserPoint(order.getUserId(), orderItem.getGivePoint(), MemberPointBizTypeEnum.AFTER_SALE_DEDUCT_GIVE, orderItem.getAfterSaleId());
-        // 3.3 回滚数据：增加用户积分（返还抵扣）
+        // 4.2 回滚数据：增加用户积分（返还抵扣）
         addUserPoint(order.getUserId(), orderItem.getUsePoint(), MemberPointBizTypeEnum.AFTER_SALE_REFUND_USED, orderItem.getAfterSaleId());
-        // 3.4 回滚数据：扣减用户经验
+        // 4.3 回滚数据：扣减用户经验
         getSelf().reduceUserExperienceAsync(order.getUserId(), orderRefundPrice, orderItem.getAfterSaleId());
-        // 3.5 回滚数据：更新分佣记录为已失效
+
+        // 5. 回滚数据：更新分佣记录为已失效
         getSelf().cancelBrokerageAsync(order.getUserId(), id);
     }
 
@@ -825,7 +829,6 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 2. 退还优惠券
         couponApi.returnUsedCoupon(order.getCouponId());
     }
-
 
     /**
      * 判断指定订单的所有订单项，是不是都售后成功

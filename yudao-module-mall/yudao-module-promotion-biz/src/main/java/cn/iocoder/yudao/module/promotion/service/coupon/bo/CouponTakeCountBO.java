@@ -9,6 +9,7 @@ import lombok.Data;
  */
 @Data
 public class CouponTakeCountBO {
+
     /**
      * 优惠劵模板编号
      */
@@ -17,4 +18,5 @@ public class CouponTakeCountBO {
      * 领取数量
      */
     private Integer count;
+
 }

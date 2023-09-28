@@ -56,22 +56,23 @@ public interface BrokerageWithdrawService {
     Long createBrokerageWithdraw(AppBrokerageWithdrawCreateReqVO createReqVO, Long userId);
 
     /**
-     * 汇总用户提现
+     * 按照 userId，汇总每个用户的提现
      *
      * @param userIds 用户编号
      * @param status  提现状态
-     * @return 用户提现汇总
+     * @return 用户提现汇总 List
      */
-    List<UserWithdrawSummaryBO> getWithdrawSummaryByUserId(Collection<Long> userIds, BrokerageWithdrawStatusEnum status);
+    List<UserWithdrawSummaryBO> getWithdrawSummaryListByUserId(Collection<Long> userIds, BrokerageWithdrawStatusEnum status);
 
     /**
-     * 汇总用户提现
+     * 按照 userId，汇总每个用户的提现
      *
      * @param userIds 用户编号
      * @param status  提现状态
-     * @return 用户提现汇总
+     * @return 用户提现汇总 Map
      */
     default Map<Long, UserWithdrawSummaryBO> getWithdrawSummaryMapByUserId(Set<Long> userIds, BrokerageWithdrawStatusEnum status) {
-        return convertMap(getWithdrawSummaryByUserId(userIds, status), UserWithdrawSummaryBO::getUserId);
+        return convertMap(getWithdrawSummaryListByUserId(userIds, status), UserWithdrawSummaryBO::getUserId);
     }
+
 }

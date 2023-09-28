@@ -232,7 +232,7 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
     }
 
     @Override
-    public List<UserBrokerageSummaryBO> getUserBrokerageSummaryByUserId(Collection<Long> userIds, Integer bizType, Integer status) {
+    public List<UserBrokerageSummaryBO> getUserBrokerageSummaryListByUserId(Collection<Long> userIds, Integer bizType, Integer status) {
         return brokerageRecordMapper.selectCountAndSumPriceByUserIdInAndBizTypeAndStatus(userIds, bizType, status);
     }
 

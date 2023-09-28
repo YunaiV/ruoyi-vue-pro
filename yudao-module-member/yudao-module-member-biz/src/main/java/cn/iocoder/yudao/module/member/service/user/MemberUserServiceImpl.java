@@ -190,7 +190,7 @@ public class MemberUserServiceImpl implements MemberUserService {
     @Transactional(rollbackFor = Exception.class)
     public void updateUser(MemberUserUpdateReqVO updateReqVO) {
         // 校验存在
-        MemberUserDO user = validateUserExists(updateReqVO.getId());
+        validateUserExists(updateReqVO.getId());
         // 校验手机唯一
         validateMobileUnique(updateReqVO.getId(), updateReqVO.getMobile());
 

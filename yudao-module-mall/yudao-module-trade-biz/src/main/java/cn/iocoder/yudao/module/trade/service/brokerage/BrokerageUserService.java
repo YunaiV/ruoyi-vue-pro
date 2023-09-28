@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokera
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
 
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -107,10 +106,9 @@ public interface BrokerageUserService {
      *
      * @param userId       用户编号
      * @param bindUserId   推广员编号
-     * @param registerTime 用户注册时间
      * @return 是否绑定
      */
-    boolean bindBrokerageUser(@NotNull Long userId, @NotNull Long bindUserId, @NotNull LocalDateTime registerTime);
+    boolean bindBrokerageUser(@NotNull Long userId, @NotNull Long bindUserId);
 
     /**
      * 获取用户是否有分销资格

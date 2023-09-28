@@ -87,10 +87,11 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
         if (config.getTradeDeductMaxPrice() != null && config.getTradeDeductMaxPrice() > 0) {
             usePoint = Math.min(usePoint, config.getTradeDeductMaxPrice());
         }
+        // TODO @疯狂：这里应该是，抵扣到只剩下 0.01；
         // 积分优惠金额（分）
         int pointPrice = usePoint * config.getTradeDeductUnitPrice();
         if (result.getPrice().getPayPrice() <= pointPrice) {
-            // 禁止0元购
+            // 禁止 0 元购
             throw exception(PRICE_CALCULATE_PAY_PRICE_ILLEGAL);
         }
 //        // 允许0 元购!!!：用户积分比较多时，积分可以抵扣的金额要大于支付金额，这时需要根据支付金额反推使用多少积分

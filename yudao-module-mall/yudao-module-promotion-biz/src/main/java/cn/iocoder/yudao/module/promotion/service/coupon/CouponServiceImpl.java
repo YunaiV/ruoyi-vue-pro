@@ -222,13 +222,12 @@ public class CouponServiceImpl implements CouponService {
 
     private boolean expireCoupon(CouponDO coupon) {
         // 更新记录状态
-        CouponDO updateObj = new CouponDO().setStatus(CouponStatusEnum.EXPIRE.getStatus());
-        int updateRows = couponMapper.updateByIdAndStatus(coupon.getId(), CouponStatusEnum.UNUSED.getStatus(), updateObj);
+        int updateRows = couponMapper.updateByIdAndStatus(coupon.getId(), CouponStatusEnum.UNUSED.getStatus(),
+                new CouponDO().setStatus(CouponStatusEnum.EXPIRE.getStatus()));
         if (updateRows == 0) {
             log.error("[expireCoupon][coupon({}) 更新为已过期失败]", coupon.getId());
             return false;
         }
-
         log.info("[expireCoupon][coupon({}) 更新为已过期成功]", coupon.getId());
         return true;
     }

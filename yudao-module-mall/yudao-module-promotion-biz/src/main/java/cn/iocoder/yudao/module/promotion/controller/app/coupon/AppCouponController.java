@@ -41,13 +41,15 @@ public class AppCouponController {
     @Operation(summary = "领取优惠劵")
     @Parameter(name = "templateId", description = "优惠券模板编号", required = true, example = "1024")
     public CommonResult<Boolean> takeCoupon(@Valid @RequestBody AppCouponTakeReqVO reqVO) {
-        Long userId = getLoginUserId();
         // 领取
+        Long userId = getLoginUserId();
         couponService.takeCoupon(reqVO.getTemplateId(), CollUtil.newHashSet(userId), CouponTakeTypeEnum.USER);
+
         // 检查是否可以继续领取
         CouponTemplateDO couponTemplate = couponTemplateService.getCouponTemplate(reqVO.getTemplateId());
         boolean canTakeAgain = true;
         if (couponTemplate.getTakeLimitCount() != null && couponTemplate.getTakeLimitCount() > 0) {
+            // TODO @疯狂：要不要搞个 getTakeCount 方法？
             Integer takeCount = MapUtil.getInt(couponService.getTakeCountMapByTemplateIds(
                     Collections.singleton(reqVO.getTemplateId()), userId), reqVO.getTemplateId(), 0);
             canTakeAgain = takeCount < couponTemplate.getTakeLimitCount();
@@ -58,7 +60,7 @@ public class AppCouponController {
     @GetMapping("/match-list")
     @Operation(summary = "获得匹配指定商品的优惠劵列表")
     public CommonResult<List<AppCouponMatchRespVO>> getMatchCouponList(AppCouponMatchReqVO matchReqVO) {
-        // todo: 优惠金额倒序
+        // todo: 优化：优惠金额倒序
         return success(CouponConvert.INSTANCE.convertList(couponService.getMatchCouponList(getLoginUserId(), matchReqVO)));
     }
 
