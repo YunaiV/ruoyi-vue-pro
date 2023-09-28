@@ -26,10 +26,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -304,6 +301,9 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
      * @return 绑定用户编号列表
      */
     private List<Long> buildBindUserIdsByLevel(Long bindUserId, Integer level) {
+        if (bindUserId == null) {
+            return Collections.emptyList();
+        }
         Assert.isTrue(level == null || level <= 2, "目前只支持 level 小于等于 2");
         List<Long> bindUserIds = CollUtil.newArrayList();
         if (level == null || level == 1) {

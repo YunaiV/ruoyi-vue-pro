@@ -15,7 +15,7 @@ import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageRecordService;
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageUserService;
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageWithdrawService;
-import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserWithdrawSummaryBO;
+import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageWithdrawSummaryRespBO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -88,7 +88,7 @@ public class AppBrokerageUserController {
         // 统计用户提现的佣金
         Integer withdrawPrice = brokerageWithdrawService.getWithdrawSummaryListByUserId(Collections.singleton(brokerageUser.getId()),
                         BrokerageWithdrawStatusEnum.AUDIT_SUCCESS).stream()
-                .findFirst().map(UserWithdrawSummaryBO::getPrice).orElse(0);
+                .findFirst().map(BrokerageWithdrawSummaryRespBO::getPrice).orElse(0);
         // 统计分销用户数量（一级）
         Long firstBrokerageUserCount = brokerageUserService.getBrokerageUserCountByBindUserId(brokerageUser.getId(), 1);
         // 统计分销用户数量（二级）

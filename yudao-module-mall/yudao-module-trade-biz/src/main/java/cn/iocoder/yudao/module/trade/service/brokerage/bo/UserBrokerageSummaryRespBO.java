@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserBrokerageSummaryBO {
+public class UserBrokerageSummaryRespBO {
 
     /**
      * 用户编号

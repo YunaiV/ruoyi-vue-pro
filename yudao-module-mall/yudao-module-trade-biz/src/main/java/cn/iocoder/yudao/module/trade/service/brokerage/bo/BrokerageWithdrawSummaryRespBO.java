@@ -5,14 +5,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 用户佣金提现合计 BO
+ * 佣金提现合计 BO
  *
  * @author owen
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserWithdrawSummaryBO {
+public class BrokerageWithdrawSummaryRespBO {
 
     /**
      * 用户编号

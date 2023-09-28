@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.record.BrokerageRecordPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankByPriceRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageRecordDO;
-import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
+import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryRespBO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.yulichang.toolkit.MPJWrappers;
@@ -56,18 +56,18 @@ public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
                 BrokerageRecordDO::getUserId, userId);
     }
 
-    default List<UserBrokerageSummaryBO> selectCountAndSumPriceByUserIdInAndBizTypeAndStatus(Collection<Long> userIds,
-                                                                                             Integer bizType,
-                                                                                             Integer status) {
+    default List<UserBrokerageSummaryRespBO> selectCountAndSumPriceByUserIdInAndBizTypeAndStatus(Collection<Long> userIds,
+                                                                                                 Integer bizType,
+                                                                                                 Integer status) {
         List<Map<String, Object>> list = selectMaps(MPJWrappers.lambdaJoin(BrokerageRecordDO.class)
                 .select(BrokerageRecordDO::getUserId)
-                .selectCount(BrokerageRecordDO::getId, UserBrokerageSummaryBO::getCount)
+                .selectCount(BrokerageRecordDO::getId, UserBrokerageSummaryRespBO::getCount)
                 .selectSum(BrokerageRecordDO::getPrice)
                 .in(BrokerageRecordDO::getUserId, userIds)
                 .eq(BrokerageRecordDO::getBizId, bizType)
                 .eq(BrokerageRecordDO::getStatus, status)
                 .groupBy(BrokerageRecordDO::getUserId));
-        return BeanUtil.copyToList(list, UserBrokerageSummaryBO.class);
+        return BeanUtil.copyToList(list, UserBrokerageSummaryRespBO.class);
         // selectJoinList有BUG，会与租户插件冲突：解析SQL时，发生异常 https://gitee.com/best_handsome/mybatis-plus-join/issues/I84GYW
 //            return selectJoinList(UserBrokerageSummaryBO.class, MPJWrappers.lambdaJoin(BrokerageRecordDO.class)
 //                    .select(BrokerageRecordDO::getUserId)

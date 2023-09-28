@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.withdraw.Brok
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.withdraw.AppBrokerageWithdrawCreateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageWithdrawDO;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum;
-import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserWithdrawSummaryBO;
+import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageWithdrawSummaryRespBO;
 
 import java.util.Collection;
 import java.util.List;
@@ -62,7 +62,7 @@ public interface BrokerageWithdrawService {
      * @param status  提现状态
      * @return 用户提现汇总 List
      */
-    List<UserWithdrawSummaryBO> getWithdrawSummaryListByUserId(Collection<Long> userIds, BrokerageWithdrawStatusEnum status);
+    List<BrokerageWithdrawSummaryRespBO> getWithdrawSummaryListByUserId(Collection<Long> userIds, BrokerageWithdrawStatusEnum status);
 
     /**
      * 按照 userId，汇总每个用户的提现
@@ -71,8 +71,9 @@ public interface BrokerageWithdrawService {
      * @param status  提现状态
      * @return 用户提现汇总 Map
      */
-    default Map<Long, UserWithdrawSummaryBO> getWithdrawSummaryMapByUserId(Set<Long> userIds, BrokerageWithdrawStatusEnum status) {
-        return convertMap(getWithdrawSummaryListByUserId(userIds, status), UserWithdrawSummaryBO::getUserId);
+    default Map<Long, BrokerageWithdrawSummaryRespBO> getWithdrawSummaryMapByUserId(Set<Long> userIds,
+                                                                                    BrokerageWithdrawStatusEnum status) {
+        return convertMap(getWithdrawSummaryListByUserId(userIds, status), BrokerageWithdrawSummaryRespBO::getUserId);
     }
 
 }

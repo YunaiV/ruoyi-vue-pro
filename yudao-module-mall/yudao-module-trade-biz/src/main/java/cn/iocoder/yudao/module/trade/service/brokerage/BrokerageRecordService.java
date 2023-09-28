@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokera
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageRecordDO;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
-import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
+import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryRespBO;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
@@ -85,7 +85,8 @@ public interface BrokerageRecordService {
      * @param status  佣金状态
      * @return 用户佣金汇总 List
      */
-    List<UserBrokerageSummaryBO> getUserBrokerageSummaryListByUserId(Collection<Long> userIds, Integer bizType, Integer status);
+    List<UserBrokerageSummaryRespBO> getUserBrokerageSummaryListByUserId(Collection<Long> userIds,
+                                                                         Integer bizType, Integer status);
 
     /**
      * 按照 userId，汇总每个用户的佣金
@@ -95,8 +96,10 @@ public interface BrokerageRecordService {
      * @param status  佣金状态
      * @return 用户佣金汇总 Map
      */
-    default Map<Long, UserBrokerageSummaryBO> getUserBrokerageSummaryMapByUserId(Collection<Long> userIds, Integer bizType, Integer status) {
-        return convertMap(getUserBrokerageSummaryListByUserId(userIds, bizType, status), UserBrokerageSummaryBO::getUserId);
+    default Map<Long, UserBrokerageSummaryRespBO> getUserBrokerageSummaryMapByUserId(Collection<Long> userIds,
+                                                                                     Integer bizType, Integer status) {
+        return convertMap(getUserBrokerageSummaryListByUserId(userIds, bizType, status),
+                UserBrokerageSummaryRespBO::getUserId);
     }
 
     /**
@@ -116,7 +119,8 @@ public interface BrokerageRecordService {
      * @param pageReqVO 分页查询
      * @return 排行榜分页
      */
-    PageResult<AppBrokerageUserRankByPriceRespVO> getBrokerageUserChildSummaryPageByPrice(AppBrokerageUserRankPageReqVO pageReqVO);
+    PageResult<AppBrokerageUserRankByPriceRespVO> getBrokerageUserChildSummaryPageByPrice(
+            AppBrokerageUserRankPageReqVO pageReqVO);
 
     /**
      * 获取用户的排名（基于佣金总数）
@@ -135,4 +139,5 @@ public interface BrokerageRecordService {
      * @return 用户佣金
      */
     AppBrokerageProductPriceRespVO calculateProductBrokeragePrice(Long spuId, Long userId);
+
 }

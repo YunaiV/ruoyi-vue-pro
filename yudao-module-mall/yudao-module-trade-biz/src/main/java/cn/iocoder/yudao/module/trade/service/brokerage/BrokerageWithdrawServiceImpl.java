@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.service.brokerage;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -17,7 +18,7 @@ import cn.iocoder.yudao.module.trade.enums.MessageTemplateConstants;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawTypeEnum;
-import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserWithdrawSummaryBO;
+import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageWithdrawSummaryRespBO;
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,7 @@ import javax.annotation.Resource;
 import javax.validation.Validator;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -144,7 +146,11 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
     }
 
     @Override
-    public List<UserWithdrawSummaryBO> getWithdrawSummaryListByUserId(Collection<Long> userIds, BrokerageWithdrawStatusEnum status) {
+    public List<BrokerageWithdrawSummaryRespBO> getWithdrawSummaryListByUserId(Collection<Long> userIds,
+                                                                               BrokerageWithdrawStatusEnum status) {
+        if (CollUtil.isEmpty(userIds)) {
+            return Collections.emptyList();
+        }
         return brokerageWithdrawMapper.selectCountAndSumPriceByUserIdAndStatus(userIds, status.getStatus());
     }
 
