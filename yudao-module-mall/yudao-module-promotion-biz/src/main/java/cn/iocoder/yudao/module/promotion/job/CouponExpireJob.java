@@ -14,13 +14,13 @@ import javax.annotation.Resource;
  * @author owen
  */
 @Component
-@TenantJob
 public class CouponExpireJob implements JobHandler {
 
     @Resource
     private CouponService couponService;
 
     @Override
+    @TenantJob
     public String execute(String param) {
         int count = couponService.expireCoupon();
         return StrUtil.format("过期优惠券 {} 个", count);

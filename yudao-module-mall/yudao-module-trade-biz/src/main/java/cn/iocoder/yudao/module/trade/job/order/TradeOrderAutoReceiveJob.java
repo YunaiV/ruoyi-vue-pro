@@ -13,13 +13,13 @@ import javax.annotation.Resource;
  * @author 芋道源码
  */
 @Component
-@TenantJob
 public class TradeOrderAutoReceiveJob implements JobHandler {
 
     @Resource
     private TradeOrderUpdateService tradeOrderUpdateService;
 
     @Override
+    @TenantJob
     public String execute(String param) {
         int count = tradeOrderUpdateService.receiveOrderBySystem();
         return String.format("自动收货 %s 个", count);
