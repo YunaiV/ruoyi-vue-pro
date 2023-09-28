@@ -37,6 +37,8 @@ public class AppTradeOrderSettlementRespVO {
 
         // ========== SPU 信息 ==========
 
+        @Schema(description = "品类编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
+        private Long categoryId;
         @Schema(description = "SPU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
         private Long spuId;
         @Schema(description = "SPU 名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "Apple iPhone 12")

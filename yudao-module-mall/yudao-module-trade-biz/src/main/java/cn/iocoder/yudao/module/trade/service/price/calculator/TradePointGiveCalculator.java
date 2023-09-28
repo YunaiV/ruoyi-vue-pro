@@ -56,7 +56,6 @@ public class TradePointGiveCalculator implements TradePriceCalculator {
             TradePriceCalculateRespBO.OrderItem orderItem = orderItems.get(i);
             // 商品可能赠送了积分，所以这里要加上
             orderItem.setGivePoint(orderItem.getGivePoint() + dividePoints.get(i));
-            TradePriceCalculatorHelper.recountPayPrice(orderItem); // TODO @疯狂：这个应该不用调用哇？不影响支付金额
         }
         // 3.3 更新订单赠送积分
         TradePriceCalculatorHelper.recountAllGivePoint(result);

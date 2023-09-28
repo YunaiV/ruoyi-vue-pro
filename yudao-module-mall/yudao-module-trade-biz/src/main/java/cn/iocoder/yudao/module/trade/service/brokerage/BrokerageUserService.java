@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.trade.service.brokerage;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.user.BrokerageUserPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserChildSummaryPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserChildSummaryRespVO;
@@ -111,21 +110,7 @@ public interface BrokerageUserService {
      * @param registerTime 用户注册时间
      * @return 是否绑定
      */
-    default boolean bindBrokerageUser(@NotNull Long userId, @NotNull Long bindUserId, @NotNull LocalDateTime registerTime) {
-        // 注册时间在30秒内的，都算新用户
-        boolean isNewUser = LocalDateTimeUtils.afterNow(registerTime.minusSeconds(30));
-        return bindBrokerageUser(userId, bindUserId, isNewUser);
-    }
-
-    /**
-     * 【会员】绑定推广员
-     *
-     * @param userId     用户编号
-     * @param bindUserId 推广员编号
-     * @param isNewUser  是否为新用户
-     * @return 是否绑定
-     */
-    boolean bindBrokerageUser(Long userId, Long bindUserId, Boolean isNewUser);
+    boolean bindBrokerageUser(@NotNull Long userId, @NotNull Long bindUserId, @NotNull LocalDateTime registerTime);
 
     /**
      * 获取用户是否有分销资格

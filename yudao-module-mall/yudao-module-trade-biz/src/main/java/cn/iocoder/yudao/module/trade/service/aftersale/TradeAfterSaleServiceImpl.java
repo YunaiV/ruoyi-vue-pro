@@ -85,7 +85,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
 
     @Override
     public TradeAfterSaleDO getAfterSale(Long userId, Long id) {
-         return tradeAfterSaleMapper.selectByIdAndUserId(id, userId);
+        return tradeAfterSaleMapper.selectByIdAndUserId(id, userId);
     }
 
     @Override
@@ -167,9 +167,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
         tradeAfterSaleMapper.insert(afterSale);
 
         // 更新交易订单项的售后状态
-        tradeOrderUpdateService.updateOrderItemAfterSaleStatus(orderItem.getId(),
-                TradeOrderItemAfterSaleStatusEnum.NONE.getStatus(), TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(),
-                afterSale.getId(), null);
+        tradeOrderUpdateService.updateOrderItemWhenAfterSaleCreate(orderItem.getId(), afterSale.getId());
 
         // 记录售后日志
         createAfterSaleLog(orderItem.getUserId(), UserTypeEnum.MEMBER.getValue(),
@@ -219,8 +217,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
         // TODO 发送售后消息
 
         // 更新交易订单项的售后状态为【未申请】
-        tradeOrderUpdateService.updateOrderItemAfterSaleStatus(afterSale.getOrderItemId(),
-                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), TradeOrderItemAfterSaleStatusEnum.NONE.getStatus());
+        tradeOrderUpdateService.updateOrderItemWhenAfterSaleCancel(afterSale.getOrderItemId());
     }
 
     /**
@@ -313,8 +310,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
         // TODO 发送售后消息
 
         // 更新交易订单项的售后状态为【未申请】
-        tradeOrderUpdateService.updateOrderItemAfterSaleStatus(afterSale.getOrderItemId(),
-                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), TradeOrderItemAfterSaleStatusEnum.NONE.getStatus());
+        tradeOrderUpdateService.updateOrderItemWhenAfterSaleCancel(afterSale.getOrderItemId());
     }
 
     /**
@@ -360,9 +356,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
         // TODO 发送售后消息
 
         // 更新交易订单项的售后状态为【已完成】
-        tradeOrderUpdateService.updateOrderItemAfterSaleStatus(afterSale.getOrderItemId(),
-                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus(),
-                null, afterSale.getRefundPrice());
+        tradeOrderUpdateService.updateOrderItemWhenAfterSaleSuccess(afterSale.getOrderItemId(), afterSale.getRefundPrice());
     }
 
     private void createPayRefund(String userIp, TradeAfterSaleDO afterSale) {
@@ -403,8 +397,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
         // TODO 发送售后消息
 
         // 更新交易订单项的售后状态为【未申请】
-        tradeOrderUpdateService.updateOrderItemAfterSaleStatus(afterSale.getOrderItemId(),
-                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), TradeOrderItemAfterSaleStatusEnum.NONE.getStatus());
+        tradeOrderUpdateService.updateOrderItemWhenAfterSaleCancel(afterSale.getOrderItemId());
     }
 
     @Override

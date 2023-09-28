@@ -1,24 +1,27 @@
 package cn.iocoder.yudao.module.promotion.controller.app.coupon;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
-import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponMatchReqVO;
-import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponMatchRespVO;
-import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponPageReqVO;
-import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponRespVO;
-import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.template.AppCouponTemplatePageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.*;
+import cn.iocoder.yudao.module.promotion.convert.coupon.CouponConvert;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
+import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTakeTypeEnum;
 import cn.iocoder.yudao.module.promotion.service.coupon.CouponService;
+import cn.iocoder.yudao.module.promotion.service.coupon.CouponTemplateService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import javax.validation.Valid;
+import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -31,73 +34,40 @@ public class AppCouponController {
 
     @Resource
     private CouponService couponService;
+    @Resource
+    private CouponTemplateService couponTemplateService;
 
-    // TODO 芋艿：待实现
     @PostMapping("/take")
     @Operation(summary = "领取优惠劵")
-    public CommonResult<Long> takeCoupon(@RequestBody AppCouponTemplatePageReqVO pageReqVO) {
-        return success(1L);
+    @Parameter(name = "templateId", description = "优惠券模板编号", required = true, example = "1024")
+    public CommonResult<Boolean> takeCoupon(@Valid @RequestBody AppCouponTakeReqVO reqVO) {
+        Long userId = getLoginUserId();
+        // 领取
+        couponService.takeCoupon(reqVO.getTemplateId(), CollUtil.newHashSet(userId), CouponTakeTypeEnum.USER);
+        // 检查是否可以继续领取
+        CouponTemplateDO couponTemplate = couponTemplateService.getCouponTemplate(reqVO.getTemplateId());
+        boolean canTakeAgain = true;
+        if (couponTemplate.getTakeLimitCount() != null && couponTemplate.getTakeLimitCount() > 0) {
+            Integer takeCount = MapUtil.getInt(couponService.getTakeCountMapByTemplateIds(
+                    Collections.singleton(reqVO.getTemplateId()), userId), reqVO.getTemplateId(), 0);
+            canTakeAgain = takeCount < couponTemplate.getTakeLimitCount();
+        }
+        return success(canTakeAgain);
     }
 
-    // TODO 芋艿：待实现
     @GetMapping("/match-list")
     @Operation(summary = "获得匹配指定商品的优惠劵列表")
     public CommonResult<List<AppCouponMatchRespVO>> getMatchCouponList(AppCouponMatchReqVO matchReqVO) {
-        List<AppCouponMatchRespVO> list = new ArrayList<>();
-        Random random = new Random();
-        for (int i = 0; i < 10; i++) {
-            AppCouponMatchRespVO vo = new AppCouponMatchRespVO();
-            vo.setId(i + 1L);
-            vo.setName("优惠劵" + (i + 1));
-            vo.setUsePrice(random.nextInt(100) * 100);
-            vo.setValidStartTime(LocalDateTime.now().plusDays(random.nextInt(10)));
-            vo.setValidEndTime(LocalDateTime.now().plusDays(random.nextInt(20) + 10));
-            vo.setDiscountType(random.nextInt(2) + 1);
-            if (vo.getDiscountType() == 1) {
-                vo.setDiscountPercent(null);
-                vo.setDiscountPrice(random.nextInt(50) * 100);
-                vo.setDiscountLimitPrice(null);
-            } else {
-                vo.setDiscountPercent(random.nextInt(90) + 10);
-                vo.setDiscountPrice(null);
-                vo.setDiscountLimitPrice(random.nextInt(200) * 100);
-            }
-            vo.setMatch(random.nextBoolean());
-            if (!vo.getMatch()) {
-                vo.setDescription("不符合条件噢");
-            }
-            list.add(vo);
-        }
-        return success(list);
+        // todo: 优惠金额倒序
+        return success(CouponConvert.INSTANCE.convertList(couponService.getMatchCouponList(getLoginUserId(), matchReqVO)));
     }
 
-    // TODO 芋艿：待实现
     @GetMapping("/page")
     @Operation(summary = "优惠劵列表", description = "我的优惠劵")
     public CommonResult<PageResult<AppCouponRespVO>> takeCoupon(AppCouponPageReqVO pageReqVO) {
-        List<AppCouponRespVO> list = new ArrayList<>();
-        Random random = new Random();
-        for (int i = 0; i < 10; i++) {
-            AppCouponRespVO vo = new AppCouponRespVO();
-            vo.setId(i + 1L);
-            vo.setName("优惠劵" + (i + 1));
-            vo.setStatus(pageReqVO.getStatus());
-            vo.setUsePrice(random.nextInt(100) * 100);
-            vo.setValidStartTime(LocalDateTime.now().plusDays(random.nextInt(10)));
-            vo.setValidEndTime(LocalDateTime.now().plusDays(random.nextInt(20) + 10));
-            vo.setDiscountType(random.nextInt(2) + 1);
-            if (vo.getDiscountType() == 1) {
-                vo.setDiscountPercent(null);
-                vo.setDiscountPrice(random.nextInt(50) * 100);
-                vo.setDiscountLimitPrice(null);
-            } else {
-                vo.setDiscountPercent(random.nextInt(90) + 10);
-                vo.setDiscountPrice(null);
-                vo.setDiscountLimitPrice(random.nextInt(200) * 100);
-            }
-            list.add(vo);
-        }
-        return success(new PageResult<>(list, 20L));
+        PageResult<CouponDO> pageResult = couponService.getCouponPage(
+                CouponConvert.INSTANCE.convert(pageReqVO, Collections.singleton(getLoginUserId())));
+        return success(CouponConvert.INSTANCE.convertAppPage(pageResult));
     }
 
     @GetMapping(value = "/get-unused-count")

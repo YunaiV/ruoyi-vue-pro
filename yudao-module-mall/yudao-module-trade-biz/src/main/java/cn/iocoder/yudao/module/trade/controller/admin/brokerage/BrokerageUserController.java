@@ -10,10 +10,10 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum;
-import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageWithdrawService;
-import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageRecordService;
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageUserService;
+import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageWithdrawService;
+import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserWithdrawSummaryBO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -92,20 +92,17 @@ public class BrokerageUserController {
         Set<Long> userIds = convertSet(pageResult.getList(), BrokerageUserDO::getId);
         // 查询用户信息
         Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(userIds);
-        // TODO @疯狂：看看下面两个 getBrokerageUserCountByBindUserId、getWithdrawSummaryByUserId 有没可能一次性出结果，不然 n 次有点太花性能了；
         // 合计分佣订单
-        Map<Long, UserBrokerageSummaryBO> userOrderSummaryMap = convertMap(userIds,
-                userId -> userId,
-                userId -> brokerageRecordService.getUserBrokerageSummaryByUserId(userId,
-                        BrokerageRecordBizTypeEnum.ORDER.getType(), BrokerageRecordStatusEnum.SETTLEMENT.getStatus()));
+        Map<Long, UserBrokerageSummaryBO> userOrderSummaryMap = brokerageRecordService.getUserBrokerageSummaryMapByUserId(
+                userIds, BrokerageRecordBizTypeEnum.ORDER.getType(), BrokerageRecordStatusEnum.SETTLEMENT.getStatus());
+        // TODO @芋艿：看看下面 getBrokerageUserCountByBindUserId 有没可能一次性出结果，不然 n 次有点太花性能了；
         // 合计推广用户数量
         Map<Long, Long> brokerageUserCountMap = convertMap(userIds,
                 userId -> userId,
                 userId -> brokerageUserService.getBrokerageUserCountByBindUserId(userId, null));
         // 合计提现
-        Map<Long, UserWithdrawSummaryBO> withdrawMap = convertMap(userIds,
-                userId -> userId,
-                userId -> brokerageWithdrawService.getWithdrawSummaryByUserId(userId, BrokerageWithdrawStatusEnum.AUDIT_SUCCESS));
+        Map<Long, UserWithdrawSummaryBO> withdrawMap = brokerageWithdrawService.getWithdrawSummaryMapByUserId(userIds,
+                BrokerageWithdrawStatusEnum.AUDIT_SUCCESS);
         // 拼接返回
         return success(BrokerageUserConvert.INSTANCE.convertPage(pageResult, userMap, brokerageUserCountMap,
                 userOrderSummaryMap, withdrawMap));

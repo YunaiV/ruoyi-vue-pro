@@ -74,10 +74,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -363,7 +360,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     /**
      * 校验交易订单满足被支付的条件
-     *
+     * <p>
      * 1. 交易订单未支付
      * 2. 支付单已支付
      *
@@ -416,7 +413,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_CANCEL)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.ADMIN_DELIVERY)
     public void deliveryOrder(TradeOrderDeliveryReqVO deliveryReqVO) {
         // 1.1 校验并获得交易订单（可发货）
         TradeOrderDO order = validateOrderDeliverable(deliveryReqVO.getId());
@@ -455,7 +452,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     /**
      * 校验交易订单满足被发货的条件
-     *
+     * <p>
      * 1. 交易订单未发货
      *
      * @param id 交易订单编号
@@ -521,7 +518,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         for (TradeOrderDO order : orders) {
             try {
                 getSelf().receiveOrderBySystem(order);
-                count ++;
+                count++;
             } catch (Throwable e) {
                 log.error("[receiveOrderBySystem][order({}) 自动收货订单异常]", order.getId(), e);
             }
@@ -559,7 +556,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     /**
      * 校验交易订单满足可售货的条件
-     *
+     * <p>
      * 1. 交易订单待收货
      *
      * @param userId 用户编号
@@ -612,7 +609,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         for (TradeOrderDO order : orders) {
             try {
                 getSelf().cancelOrderBySystem(order);
-                count ++;
+                count++;
             } catch (Throwable e) {
                 log.error("[cancelOrderBySystem][order({}) 过期订单异常]", order.getId(), e);
             }
@@ -634,7 +631,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     /**
      * 取消订单的核心实现
      *
-     * @param order 订单
+     * @param order      订单
      * @param cancelType 取消类型
      */
     private void cancelOrder0(TradeOrderDO order, TradeOrderCancelTypeEnum cancelType) {
@@ -754,66 +751,79 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     // =================== Order Item ===================
 
-    // TODO 疯狂：帮我重构下：
-    // 1. updateOrderItemAfterSaleStatus 拆分成三个方法：发起；同意；拒绝。原因是，职责更清晰，操作日志也更容易记录；
-
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateOrderItemAfterSaleStatus(Long id, Integer oldAfterSaleStatus, Integer newAfterSaleStatus,
-                                               Long afterSaleId, Integer refundPrice) {
-        // 如果退款成功，则 refundPrice 非空
-        if (Objects.equals(newAfterSaleStatus, TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus())
-                && refundPrice == null) {
-            throw new IllegalArgumentException(StrUtil.format("id({}) 退款成功，退款金额不能为空", id));
-        }
-        // 如果退款发起，则 afterSaleId 非空
-        if (Objects.equals(newAfterSaleStatus, TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus())
-                && afterSaleId == null) {
+    public void updateOrderItemWhenAfterSaleCreate(Long id, Long afterSaleId) {
+        if (afterSaleId == null) {
             throw new IllegalArgumentException(StrUtil.format("id({}) 退款发起，售后单编号不能为空", id));
         }
 
+        // 更新订单项
+        updateOrderItemAfterSaleStatus(id, TradeOrderItemAfterSaleStatusEnum.NONE.getStatus(),
+                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), afterSaleId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateOrderItemWhenAfterSaleSuccess(Long id, Integer refundPrice) {
+        if (refundPrice == null) {
+            throw new IllegalArgumentException(StrUtil.format("id({}) 退款成功，退款金额不能为空", id));
+        }
+
+        // 1. 更新订单项
+        updateOrderItemAfterSaleStatus(id, TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(),
+                TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus(), null);
+
+        // 2. 计算总的退款金额、退回积分
+        TradeOrderItemDO orderItem = tradeOrderItemMapper.selectById(id);
+        TradeOrderDO order = tradeOrderMapper.selectById(orderItem.getOrderId());
+        Integer orderRefundPrice = order.getRefundPrice() + refundPrice;
+        Integer orderRefundPoint = order.getRefundPoint() + orderItem.getUsePoint();
+        if (isAllOrderItemAfterSaleSuccess(order.getId())) { // 如果都售后成功，则需要取消订单
+            cancelOrderByAfterSale(order, orderRefundPrice, orderRefundPoint);
+        } else { // 如果部分售后，则更新退款金额
+            tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId())
+                    .setRefundStatus(TradeOrderRefundStatusEnum.PART.getStatus())
+                    .setRefundPrice(orderRefundPrice).setRefundPoint(orderRefundPoint));
+        }
+
+        // TODO 芋艿：这块扣减规则，需要在考虑下
+        // 3.1 回滚数据：增加 SKU 库存
+        productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convert(Collections.singletonList(orderItem)));
+        // 3.2 回滚数据：扣减用户积分（赠送的）
+        reduceUserPoint(order.getUserId(), orderItem.getGivePoint(), MemberPointBizTypeEnum.AFTER_SALE_DEDUCT_GIVE, orderItem.getAfterSaleId());
+        // 3.3 回滚数据：增加用户积分（返还抵扣）
+        addUserPoint(order.getUserId(), orderItem.getUsePoint(), MemberPointBizTypeEnum.AFTER_SALE_REFUND_USED, orderItem.getAfterSaleId());
+        // 3.4 回滚数据：扣减用户经验
+        getSelf().reduceUserExperienceAsync(order.getUserId(), orderRefundPrice, orderItem.getAfterSaleId());
+        // 3.5 回滚数据：更新分佣记录为已失效
+        getSelf().cancelBrokerageAsync(order.getUserId(), id);
+    }
+
+    @Override
+    public void updateOrderItemWhenAfterSaleCancel(Long id) {
+        // 更新订单项
+        updateOrderItemAfterSaleStatus(id, TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(),
+                TradeOrderItemAfterSaleStatusEnum.NONE.getStatus(), null);
+    }
+
+    private void updateOrderItemAfterSaleStatus(Long id, Integer oldAfterSaleStatus, Integer newAfterSaleStatus,
+                                                Long afterSaleId) {
         // 更新订单项
         int updateCount = tradeOrderItemMapper.updateAfterSaleStatus(id, oldAfterSaleStatus, newAfterSaleStatus, afterSaleId);
         if (updateCount <= 0) {
             throw exception(ORDER_ITEM_UPDATE_AFTER_SALE_STATUS_FAIL);
         }
+    }
 
-        // 如果有退款金额，则需要更新订单
-        if (refundPrice == null) {
-            return;
-        }
-        // 计算总的退款金额
-        TradeOrderItemDO orderItem = tradeOrderItemMapper.selectById(id);
-        TradeOrderDO order = tradeOrderMapper.selectById(orderItem.getOrderId());
-        Integer orderRefundPrice = order.getRefundPrice() + refundPrice;
-        // TODO @疯狂：809 到 817 改成：cancelOrderByAfterSale：相当于全部售后成功后，就是要取消胆子；
-        if (isAllOrderItemAfterSaleSuccess(order.getId())) { // 如果都售后成功，则需要取消订单
-            tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId())
-                    .setRefundStatus(TradeOrderRefundStatusEnum.ALL.getStatus()).setRefundPrice(orderRefundPrice).setRefundPoint(order.getRefundPoint() + orderItem.getUsePoint())
-                    .setCancelType(TradeOrderCancelTypeEnum.AFTER_SALE_CLOSE.getType()).setCancelTime(LocalDateTime.now()));
-
-            // TODO 芋艿：记录订单日志
-
-            // TODO 芋艿：要不要退优惠劵
-
-        } else { // 如果部分售后，则更新退款金额
-            tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId())
-                    .setRefundStatus(TradeOrderRefundStatusEnum.PART.getStatus()).setRefundPrice(orderRefundPrice));
-        }
-
-        // TODO 芋艿：这块扣减规则，需要在考虑下
-        // 售后成功后，执行数据回滚逻辑
-        if (Objects.equals(newAfterSaleStatus, TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus())) {
-            // TODO @疯狂：这里库存也要扣减下；
-            // 扣减用户积分（赠送的）
-            reduceUserPoint(order.getUserId(), orderItem.getGivePoint(), MemberPointBizTypeEnum.AFTER_SALE_DEDUCT_GIVE, afterSaleId);
-            // 增加用户积分（返还抵扣）
-            addUserPoint(order.getUserId(), orderItem.getUsePoint(), MemberPointBizTypeEnum.AFTER_SALE_REFUND_USED, afterSaleId);
-            // 扣减用户经验
-            getSelf().reduceUserExperienceAsync(order.getUserId(), orderRefundPrice, afterSaleId);
-            // 更新分佣记录为已失效
-            getSelf().cancelBrokerageAsync(order.getUserId(), id);
-        }
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_CANCEL)
+    private void cancelOrderByAfterSale(TradeOrderDO order, Integer orderRefundPrice, Integer refundPoint) {
+        // 1. 更新订单
+        tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId())
+                .setRefundStatus(TradeOrderRefundStatusEnum.ALL.getStatus())
+                .setRefundPrice(orderRefundPrice).setRefundPoint(refundPoint)
+                .setCancelType(TradeOrderCancelTypeEnum.AFTER_SALE_CLOSE.getType()).setCancelTime(LocalDateTime.now()));
+        // 2. 退还优惠券
+        couponApi.returnUsedCoupon(order.getCouponId());
     }
 
 
@@ -879,7 +889,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         for (TradeOrderDO order : orders) {
             try {
                 getSelf().createOrderItemCommentBySystemBySystem(order);
-                count ++;
+                count++;
             } catch (Throwable e) {
                 log.error("[createOrderItemCommentBySystem][order({}) 过期订单异常]", order.getId(), e);
             }
@@ -923,7 +933,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     /**
      * 创建订单项的评论的核心实现
      *
-     * @param orderItem 订单项
+     * @param orderItem   订单项
      * @param createReqVO 评论内容
      * @return 评论编号
      */
@@ -979,14 +989,14 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     /**
      * 创建分销记录
-     *
+     * <p>
      * 目前是支付成功后，就会创建分销记录。
-     *
+     * <p>
      * 业内还有两种做法，可以根据自己的业务调整：
-     *  1. 确认收货后，才创建分销记录
-     *  2. 支付 or 下单成功时，创建分销记录（冻结），确认收货解冻或者 n 天后解冻
+     * 1. 确认收货后，才创建分销记录
+     * 2. 支付 or 下单成功时，创建分销记录（冻结），确认收货解冻或者 n 天后解冻
      *
-     * @param userId 用户编号
+     * @param userId  用户编号
      * @param orderId 订单编号
      */
     @Async

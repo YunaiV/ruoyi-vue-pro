@@ -12,7 +12,11 @@ import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * 佣金记录 Service 接口
@@ -76,12 +80,24 @@ public interface BrokerageRecordService {
     /**
      * 汇总用户佣金
      *
-     * @param userId  用户编号
+     * @param userIds 用户编号
      * @param bizType 业务类型
      * @param status  佣金状态
      * @return 用户佣金汇总
      */
-    UserBrokerageSummaryBO getUserBrokerageSummaryByUserId(Long userId, Integer bizType, Integer status);
+    List<UserBrokerageSummaryBO> getUserBrokerageSummaryByUserId(Collection<Long> userIds, Integer bizType, Integer status);
+
+    /**
+     * 汇总用户佣金
+     *
+     * @param userIds 用户编号
+     * @param bizType 业务类型
+     * @param status  佣金状态
+     * @return 用户佣金汇总
+     */
+    default Map<Long, UserBrokerageSummaryBO> getUserBrokerageSummaryMapByUserId(Collection<Long> userIds, Integer bizType, Integer status) {
+        return convertMap(getUserBrokerageSummaryByUserId(userIds, bizType, status), UserBrokerageSummaryBO::getUserId);
+    }
 
     /**
      * 获得用户佣金合计

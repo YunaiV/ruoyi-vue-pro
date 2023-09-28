@@ -15,6 +15,11 @@ import lombok.NoArgsConstructor;
 public class UserWithdrawSummaryBO {
 
     /**
+     * 用户编号
+     */
+    private Long userId;
+
+    /**
      * 提现次数
      */
     private Integer count;

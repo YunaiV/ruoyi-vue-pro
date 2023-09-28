@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.module.trade.convert.brokerage;
 
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.user.BrokerageUserRespVO;
+import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserMySummaryRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankByUserCountRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
@@ -71,4 +73,18 @@ public interface BrokerageUserConvert {
 
     void copyTo(MemberUserRespDTO from, @MappingTarget AppBrokerageUserRankByUserCountRespVO to);
 
+    default AppBrokerageUserMySummaryRespVO convert(Integer yesterdayPrice, Integer withdrawPrice,
+                                                    Long firstBrokerageUserCount, Long secondBrokerageUserCount,
+                                                    BrokerageUserDO brokerageUser) {
+        AppBrokerageUserMySummaryRespVO respVO = new AppBrokerageUserMySummaryRespVO()
+                .setYesterdayPrice(ObjUtil.defaultIfNull(yesterdayPrice, 0))
+                .setWithdrawPrice(ObjUtil.defaultIfNull(withdrawPrice, 0))
+                .setBrokeragePrice(0).setFrozenPrice(0)
+                .setFirstBrokerageUserCount(ObjUtil.defaultIfNull(firstBrokerageUserCount, 0L))
+                .setSecondBrokerageUserCount(ObjUtil.defaultIfNull(secondBrokerageUserCount, 0L));
+        // 设置 brokeragePrice、frozenPrice 字段
+        Optional.ofNullable(brokerageUser)
+                .ifPresent(user -> respVO.setBrokeragePrice(user.getBrokeragePrice()).setFrozenPrice(user.getFrozenPrice()));
+        return respVO;
+    }
 }

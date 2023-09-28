@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.dal.mysql.brokerage;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -9,12 +10,15 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageRecordDO;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.yulichang.toolkit.MPJWrappers;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 佣金记录 Mapper
@@ -52,11 +56,27 @@ public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
                 BrokerageRecordDO::getUserId, userId);
     }
 
-    @Select("SELECT COUNT(1), SUM(price) FROM trade_brokerage_record " +
-            "WHERE user_id = #{userId} AND biz_type = #{bizType} AND status = #{status} AND deleted = FALSE")
-    UserBrokerageSummaryBO selectCountAndSumPriceByUserIdAndBizTypeAndStatus(@Param("userId") Long userId,
-                                                                             @Param("bizType") Integer bizType,
-                                                                             @Param("status") Integer status);
+    default List<UserBrokerageSummaryBO> selectCountAndSumPriceByUserIdInAndBizTypeAndStatus(Collection<Long> userIds,
+                                                                                             Integer bizType,
+                                                                                             Integer status) {
+        List<Map<String, Object>> list = selectMaps(MPJWrappers.lambdaJoin(BrokerageRecordDO.class)
+                .select(BrokerageRecordDO::getUserId)
+                .selectCount(BrokerageRecordDO::getId, UserBrokerageSummaryBO::getCount)
+                .selectSum(BrokerageRecordDO::getPrice)
+                .in(BrokerageRecordDO::getUserId, userIds)
+                .eq(BrokerageRecordDO::getBizId, bizType)
+                .eq(BrokerageRecordDO::getStatus, status)
+                .groupBy(BrokerageRecordDO::getUserId));
+        return BeanUtil.copyToList(list, UserBrokerageSummaryBO.class);
+//            return selectJoinList(UserBrokerageSummaryBO.class, MPJWrappers.lambdaJoin(BrokerageRecordDO.class)
+//                    .select(BrokerageRecordDO::getUserId)
+//                    .selectCount(BrokerageRecordDO::getId, UserBrokerageSummaryBO::getCount)
+//                    .selectSum(BrokerageRecordDO::getPrice)
+//                    .in(BrokerageRecordDO::getUserId, userIds)
+//                    .eq(BrokerageRecordDO::getBizId, bizType)
+//                    .eq(BrokerageRecordDO::getStatus, status)
+//                    .groupBy(BrokerageRecordDO::getUserId));
+    }
 
     @Select("SELECT SUM(price) FROM trade_brokerage_record " +
             "WHERE user_id = #{userId} AND biz_type = #{bizType} " +
