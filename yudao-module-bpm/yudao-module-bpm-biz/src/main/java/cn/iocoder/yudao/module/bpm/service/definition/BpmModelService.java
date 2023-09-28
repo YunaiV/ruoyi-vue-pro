@@ -74,4 +74,12 @@ public interface BpmModelService {
      */
     BpmnModel getBpmnModel(String id);
 
+    /**
+     * 获得流程定义编号对应的 BPMN Model
+     *
+     * @param processDefinitionId 流程定义编号
+     * @return BPMN Model
+     */
+    BpmnModel getBpmnModelByDefinitionId(String processDefinitionId);
+
 }

@@ -75,4 +75,29 @@ public class BpmTaskController {
         return success(true);
     }
 
+    @GetMapping("/get-return-list")
+    @Operation(summary = "获取所有可回退的节点", description = "用于【流程详情】的【回退】按钮")
+    @Parameter(name = "taskId", description = "当前任务ID", required = true)
+    @PreAuthorize("@ss.hasPermission('bpm:task:update')")
+    public CommonResult<List<BpmTaskSimpleRespVO>> getReturnList(@RequestParam("taskId") String taskId) {
+        return success(taskService.getReturnTaskList(taskId));
+    }
+
+    @PutMapping("/return")
+    @Operation(summary = "回退任务", description = "用于【流程详情】的【回退】按钮")
+    @PreAuthorize("@ss.hasPermission('bpm:task:update')")
+    public CommonResult<Boolean> returnTask(@Valid @RequestBody BpmTaskReturnReqVO reqVO) {
+        taskService.returnTask(getLoginUserId(), reqVO);
+        return success(true);
+    }
+
+    @PutMapping("/delegate")
+    @Operation(summary = "委派任务", description = "用于【流程详情】的【委派】按钮。和向前【加签】有点像，唯一区别是【委托】没有单独创立任务")
+    @PreAuthorize("@ss.hasPermission('bpm:task:update')")
+    public CommonResult<Boolean> delegateTask(@Valid @RequestBody BpmTaskDelegateReqVO reqVO) {
+        // TODO @海：, 后面要有空格
+        taskService.delegateTask(reqVO,getLoginUserId());
+        return success(true);
+    }
+
 }

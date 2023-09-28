@@ -1,7 +1,0 @@
-/unpackage/dist/*
-/unpackage/cache/*
-/unpackage/release/*
-/node_modules/*
-/.idea/*
-/.hbuilderx/
-/.vscode/

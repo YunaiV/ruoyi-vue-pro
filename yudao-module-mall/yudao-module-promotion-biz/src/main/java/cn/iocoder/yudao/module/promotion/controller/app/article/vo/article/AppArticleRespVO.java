@@ -9,41 +9,41 @@ import java.time.LocalDateTime;
 @Data
 public class AppArticleRespVO {
 
-    @Schema(description = "文章编号", required = true, example = "1")
+    @Schema(description = "文章编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
-    @Schema(description = "文章标题", required = true, example = "芋道源码 - 促销模块")
+    @Schema(description = "文章标题", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码 - 促销模块")
     private String title;
 
-    @Schema(description = "文章作者", required = true, example = "芋道源码")
+    @Schema(description = "文章作者", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
     private String author;
 
-    @Schema(description = "分类编号", required = true, example = "2048")
+    @Schema(description = "分类编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
     private Long categoryId;
 
-    @Schema(description = "图文封面", required = true, example = "https://www.iocoder.cn/1.png")
+    @Schema(description = "图文封面", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/1.png")
     private String picUrl;
 
-    @Schema(description = "文章简介", required = true, example = "我是简介")
+    @Schema(description = "文章简介", requiredMode = Schema.RequiredMode.REQUIRED, example = "我是简介")
     private String introduction;
 
-    @Schema(description = "文章内容", required = true, example = "我是详细")
+    @Schema(description = "文章内容", requiredMode = Schema.RequiredMode.REQUIRED, example = "我是详细")
     private String description;
 
-    @Schema(description = "发布时间", required = true)
+    @Schema(description = "发布时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
-    @Schema(description = "浏览量", required = true, example = "1024")
+    @Schema(description = "浏览量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer browseCount;
 
     @Schema(description = "关联的商品 SPU 编号", example = "1024")
     private Long spuId;
 
 // TODO 芋艿：下面 2 个字段，后端要存储，前端不用返回；
-//    @Schema(description = "是否热卖推荐", required = true, example = "true")
+//    @Schema(description = "是否热卖推荐", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
 //    private Boolean recommendHot;
 //
-//    @Schema(description = "是否 Banner 推荐", required = true, example = "true")
+//    @Schema(description = "是否 Banner 推荐", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
 //    private Boolean recommendBanner;
 
 }

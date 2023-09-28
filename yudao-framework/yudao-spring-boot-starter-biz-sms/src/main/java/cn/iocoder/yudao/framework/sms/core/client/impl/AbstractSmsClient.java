@@ -40,7 +40,7 @@ public abstract class AbstractSmsClient implements SmsClient {
      */
     public final void init() {
         doInit();
-        log.info("[init][配置({}) 初始化完成]", properties);
+        log.debug("[init][配置({}) 初始化完成]", properties);
     }
 
     /**

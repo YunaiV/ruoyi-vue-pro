@@ -1,4 +1,5 @@
-import { BasicColumn, FormSchema, useRender } from '@/components/Table'
+import type { BasicColumn, FormSchema } from '@/components/Table'
+import { useRender } from '@/components/Table'
 import { DICT_TYPE, getDictOptions } from '@/utils/dict'
 
 export const columns: BasicColumn[] = [
@@ -92,13 +93,13 @@ export const createFormSchema: FormSchema[] = [
   #elseif($column.htmlType == "imageUpload")## 图片上传
     component: 'FileUpload',
     componentProps: {
-      fileType: 'file',
+      fileType: 'image',
       maxCount: 1,
     },
   #elseif($column.htmlType == "fileUpload")## 文件上传
     component: 'FileUpload',
     componentProps: {
-      fileType: 'image',
+      fileType: 'file',
       maxCount: 1,
     },
   #elseif($column.htmlType == "editor")## 文本编辑器
@@ -132,6 +133,11 @@ export const createFormSchema: FormSchema[] = [
     },
   #elseif($column.htmlType == "datetime")## 时间框
     component: 'DatePicker',
+    componentProps: {
+      showTime: true,
+      format: 'YYYY-MM-DD HH:mm:ss',
+      valueFormat: 'x',
+    },
   #elseif($column.htmlType == "textarea")## 文本域
     component: 'InputTextArea',
   #end
@@ -154,7 +160,7 @@ export const updateFormSchema: FormSchema[] = [
 #set ($javaField = $column.javaField)
 #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
 #set ($comment = $column.columnComment)
-#if (!$column.primaryKey)## 忽略主键，不用在表单里
+  #if (!$column.primaryKey)## 忽略主键，不用在表单里
   {
     label: '${comment}',
     field: '${javaField}',
@@ -164,45 +170,57 @@ export const updateFormSchema: FormSchema[] = [
     #if ($column.htmlType == "input")
     component: 'Input',
     #elseif($column.htmlType == "imageUpload")## 图片上传
-    component: 'Upload',
+    component: 'FileUpload',
+    componentProps: {
+      fileType: 'image',
+      maxCount: 1,
+    },
     #elseif($column.htmlType == "fileUpload")## 文件上传
-    component: 'Upload',
-    #elseif($column.htmlType == "editor")## 文本编辑器
-    component: 'Editor',
+    component: 'FileUpload',
+    componentProps: {
+      fileType: 'file',
+      maxCount: 1,
+    },
+    #elseif($column.htmlType == "editor")## 文本编辑器component: 'Editor',
     #elseif($column.htmlType == "select")## 下拉框
     component: 'Select',
     componentProps: {
       #if ("" != $dictType)## 有数据字典
-        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number'),
+      options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number'),
       #else##没数据字典
-        options:[],
+      options:[],
       #end
     },
     #elseif($column.htmlType == "checkbox")## 多选框
     component: 'Checkbox',
     componentProps: {
       #if ("" != $dictType)## 有数据字典
-        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number'),
+      options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number'),
       #else##没数据字典
-        options:[],
+      options:[],
       #end
     },
     #elseif($column.htmlType == "radio")## 单选框
     component: 'RadioButtonGroup',
     componentProps: {
       #if ("" != $dictType)## 有数据字典
-        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number'),
+      options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number'),
       #else##没数据字典
-        options:[],
+      options:[],
       #end
     },
     #elseif($column.htmlType == "datetime")## 时间框
     component: 'DatePicker',
+    componentProps: {
+      showTime: true,
+      format: 'YYYY-MM-DD HH:mm:ss',
+      valueFormat: 'x',
+    },
     #elseif($column.htmlType == "textarea")## 文本域
     component: 'InputTextArea',
     #end
   },
-#end
+  #end
 #end
 #end
 ]

@@ -222,10 +222,10 @@ public class MemberUserServiceImpl implements MemberUserService {
         }
         // 如果 id 为空，说明不用比较是否为相同 id 的用户
         if (id == null) {
-            throw exception(USER_MOBILE_USED);
+            throw exception(USER_MOBILE_USED, mobile);
         }
         if (!user.getId().equals(id)) {
-            throw exception(USER_MOBILE_USED);
+            throw exception(USER_MOBILE_USED, mobile);
         }
     }
 

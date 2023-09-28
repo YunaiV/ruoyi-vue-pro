@@ -11,7 +11,6 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
-import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -33,6 +32,7 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.*;
 
@@ -82,9 +82,6 @@ public class GlobalExceptionHandler {
         }
         if (ex instanceof HttpRequestMethodNotSupportedException) {
             return httpRequestMethodNotSupportedExceptionHandler((HttpRequestMethodNotSupportedException) ex);
-        }
-        if (ex instanceof RequestNotPermitted) {
-            return requestNotPermittedExceptionHandler(request, (RequestNotPermitted) ex);
         }
         if (ex instanceof ServiceException) {
             return serviceExceptionHandler((ServiceException) ex);
@@ -186,8 +183,7 @@ public class GlobalExceptionHandler {
     /**
      * 处理 Resilience4j 限流抛出的异常
      */
-    @ExceptionHandler(value = RequestNotPermitted.class)
-    public CommonResult<?> requestNotPermittedExceptionHandler(HttpServletRequest req, RequestNotPermitted ex) {
+    public CommonResult<?> requestNotPermittedExceptionHandler(HttpServletRequest req, Throwable ex) {
         log.warn("[requestNotPermittedExceptionHandler][url({}) 访问过于频繁]", req.getRequestURL(), ex);
         return CommonResult.error(TOO_MANY_REQUESTS);
     }
@@ -226,7 +222,12 @@ public class GlobalExceptionHandler {
             return tableNotExistsResult;
         }
 
-        // 情况二：处理异常
+        // 情况二：部分特殊的库的处理
+        if (Objects.equals("io.github.resilience4j.ratelimiter.RequestNotPermitted", ex.getClass().getName())) {
+            return requestNotPermittedExceptionHandler(req, ex);
+        }
+
+        // 情况三：处理异常
         log.error("[defaultExceptionHandler]", ex);
         // 插入异常日志
         this.createExceptionLog(req, ex);

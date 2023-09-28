@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.service.sms;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.sms.core.client.SmsClient;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelUpdateReqVO;
@@ -13,14 +14,9 @@ import java.util.List;
  * 短信渠道 Service 接口
  *
  * @author zzf
- * @date 2021/1/25 9:24
+ * @since 2021/1/25 9:24
  */
 public interface SmsChannelService {
-
-    /**
-     * 初始化短信客户端
-     */
-    void initLocalCache();
 
     /**
      * 创建短信渠道
@@ -66,5 +62,21 @@ public interface SmsChannelService {
      * @return 短信渠道分页
      */
     PageResult<SmsChannelDO> getSmsChannelPage(SmsChannelPageReqVO pageReqVO);
+
+    /**
+     * 获得短信客户端
+     *
+     * @param id 编号
+     * @return 短信客户端
+     */
+    SmsClient getSmsClient(Long id);
+
+    /**
+     * 获得短信客户端
+     *
+     * @param code 编码
+     * @return 短信客户端
+     */
+    SmsClient getSmsClient(String code);
 
 }

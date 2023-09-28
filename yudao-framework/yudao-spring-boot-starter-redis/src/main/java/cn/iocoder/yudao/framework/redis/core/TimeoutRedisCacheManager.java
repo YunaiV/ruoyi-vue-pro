@@ -45,7 +45,7 @@ public class TimeoutRedisCacheManager extends RedisCacheManager {
             Duration duration = parseDuration(names[1]);
             cacheConfig = cacheConfig.entryTtl(duration);
         }
-        return super.createRedisCache(names[0], cacheConfig);
+        return super.createRedisCache(name, cacheConfig);
     }
 
     /**
