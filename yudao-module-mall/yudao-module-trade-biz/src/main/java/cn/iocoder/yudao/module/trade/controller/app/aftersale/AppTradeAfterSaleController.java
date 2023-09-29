@@ -71,7 +71,7 @@ public class AppTradeAfterSaleController {
 
     @PostMapping(value = "/create")
     @Operation(summary = "申请售后")
-    @AfterSaleLog(id = "#info.data", content = "'申请售后:售后编号['+#info.data+'],订单编号['+#createReqVO.orderItemId+'], '", operateType = AfterSaleOperateTypeEnum.APPLY)
+    @AfterSaleLog(id = "#info.data", content = "'申请售后:售后编号['+#info.data+'],订单编号['+#createReqVO.orderItemId+'], '", operateType = AfterSaleOperateTypeEnum.MEMBER_CREATE)
     public CommonResult<Long> createAfterSale(@RequestBody AppTradeAfterSaleCreateReqVO createReqVO) {
         AfterSaleLogUtils.setBeforeStatus(0);
         AfterSaleLogUtils.setAfterStatus(TradeAfterSaleStatusEnum.APPLY.getStatus());

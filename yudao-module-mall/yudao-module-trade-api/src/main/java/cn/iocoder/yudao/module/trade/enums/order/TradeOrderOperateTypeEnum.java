@@ -29,11 +29,11 @@ public enum TradeOrderOperateTypeEnum {
     ;
 
     /**
-     * 类型
+     * 操作类型
      */
     private final Integer type;
     /**
-     * 类型
+     * 操作描述
      */
     private final String content;
 
