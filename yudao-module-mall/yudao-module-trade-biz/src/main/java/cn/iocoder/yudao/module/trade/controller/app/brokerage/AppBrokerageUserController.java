@@ -15,7 +15,7 @@ import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageRecordService;
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageUserService;
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageWithdrawService;
-import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserWithdrawSummaryBO;
+import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageWithdrawSummaryRespBO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,6 +42,7 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 @Validated
 @Slf4j
 public class AppBrokerageUserController {
+
     @Resource
     private BrokerageUserService brokerageUserService;
     @Resource
@@ -69,8 +70,7 @@ public class AppBrokerageUserController {
     @Operation(summary = "绑定推广员")
     @PreAuthenticated
     public CommonResult<Boolean> bindBrokerageUser(@Valid @RequestBody AppBrokerageUserBindReqVO reqVO) {
-        MemberUserRespDTO user = memberUserApi.getUser(getLoginUserId());
-        return success(brokerageUserService.bindBrokerageUser(user.getId(), reqVO.getBindUserId(), user.getCreateTime()));
+        return success(brokerageUserService.bindBrokerageUser(getLoginUserId(), reqVO.getBindUserId()));
     }
 
     @GetMapping("/get-summary")
@@ -86,9 +86,9 @@ public class AppBrokerageUserController {
         Integer yesterdayPrice = brokerageRecordService.getSummaryPriceByUserId(brokerageUser.getId(),
                 BrokerageRecordBizTypeEnum.ORDER.getType(), beginTime, endTime);
         // 统计用户提现的佣金
-        Integer withdrawPrice = brokerageWithdrawService.getWithdrawSummaryByUserId(Collections.singleton(brokerageUser.getId()),
+        Integer withdrawPrice = brokerageWithdrawService.getWithdrawSummaryListByUserId(Collections.singleton(brokerageUser.getId()),
                         BrokerageWithdrawStatusEnum.AUDIT_SUCCESS).stream()
-                .findFirst().map(UserWithdrawSummaryBO::getPrice).orElse(0);
+                .findFirst().map(BrokerageWithdrawSummaryRespBO::getPrice).orElse(0);
         // 统计分销用户数量（一级）
         Long firstBrokerageUserCount = brokerageUserService.getBrokerageUserCountByBindUserId(brokerageUser.getId(), 1);
         // 统计分销用户数量（二级）

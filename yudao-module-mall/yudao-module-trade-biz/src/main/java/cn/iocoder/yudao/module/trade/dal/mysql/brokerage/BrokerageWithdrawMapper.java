@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.withdraw.BrokerageWithdrawPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageWithdrawDO;
-import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserWithdrawSummaryBO;
+import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageWithdrawSummaryRespBO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -41,15 +41,15 @@ public interface BrokerageWithdrawMapper extends BaseMapperX<BrokerageWithdrawDO
                 .eq(BrokerageWithdrawDO::getStatus, status));
     }
 
-    default List<UserWithdrawSummaryBO> selectCountAndSumPriceByUserIdAndStatus(Collection<Long> userIds, Integer status) {
+    default List<BrokerageWithdrawSummaryRespBO> selectCountAndSumPriceByUserIdAndStatus(Collection<Long> userIds, Integer status) {
         List<Map<String, Object>> list = selectMaps(new MPJLambdaWrapper<BrokerageWithdrawDO>()
                 .select(BrokerageWithdrawDO::getUserId)
-                .selectCount(BrokerageWithdrawDO::getId, UserWithdrawSummaryBO::getCount)
+                .selectCount(BrokerageWithdrawDO::getId, BrokerageWithdrawSummaryRespBO::getCount)
                 .selectSum(BrokerageWithdrawDO::getPrice)
                 .in(BrokerageWithdrawDO::getUserId, userIds)
                 .eq(BrokerageWithdrawDO::getStatus, status)
                 .groupBy(BrokerageWithdrawDO::getUserId));
-        return BeanUtil.copyToList(list, UserWithdrawSummaryBO.class);
+        return BeanUtil.copyToList(list, BrokerageWithdrawSummaryRespBO.class);
         // selectJoinList有BUG，会与租户插件冲突：解析SQL时，发生异常 https://gitee.com/best_handsome/mybatis-plus-join/issues/I84GYW
 //        return selectJoinList(UserWithdrawSummaryBO.class, new MPJLambdaWrapper<BrokerageWithdrawDO>()
 //                .select(BrokerageWithdrawDO::getUserId)

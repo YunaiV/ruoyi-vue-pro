@@ -233,6 +233,11 @@ public class BpmModelServiceImpl implements BpmModelService {
         return converter.convertToBpmnModel(new BytesStreamSource(bpmnBytes), true, true);
     }
 
+    @Override
+    public BpmnModel getBpmnModelByDefinitionId(String processDefinitionId) {
+        return repositoryService.getBpmnModel(processDefinitionId);
+    }
+
     private void checkKeyNCName(String key) {
         if (!ValidationUtils.isXmlNCName(key)) {
             throw exception(MODEL_KEY_VALID);

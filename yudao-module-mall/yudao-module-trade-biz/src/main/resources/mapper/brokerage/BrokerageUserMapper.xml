@@ -5,6 +5,7 @@
     <select id="selectSummaryPageByUserId"
             resultType="cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserChildSummaryRespVO">
         SELECT bu.id, bu.bind_user_time AS brokerageTime, u.nickname, u.avatar,
+        <!-- TODO @疯狂：biz_type、status 可以通过参数传入哇？ -->
         (SELECT SUM(price) FROM trade_brokerage_record r
             WHERE r.user_id = u.id AND biz_type = 1 AND r.status = 1 AND r.deleted = FALSE) AS brokeragePrice,
         (SELECT COUNT(1) FROM trade_brokerage_record r
@@ -13,7 +14,8 @@
             WHERE c.bind_user_id = u.id AND c.deleted = FALSE) AS brokerageUserCount
         FROM member_user AS u
         JOIN trade_brokerage_user AS bu ON bu.id = u.id
-        <where>
+       <!-- TODO @疯狂：1）bind_user_id 是不是可以先改成内存查询出 userId 的集合，然后去 in 哈？2）nickname 是不是可以基于查询出来的 userId 对应的 nickname 在内存里过滤，主要是避免和 member_user 链表 -->
+       <where>
             <if test="param.nickname != null and param.nickname != ''">
                 AND u.nickname LIKE concat('', #{param.nickname}, '')
             </if>

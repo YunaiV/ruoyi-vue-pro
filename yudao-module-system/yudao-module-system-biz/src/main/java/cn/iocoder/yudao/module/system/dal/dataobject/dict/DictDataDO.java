@@ -55,7 +55,7 @@ public class DictDataDO extends BaseDO {
     /**
      * css 样式
      */
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String cssClass;
     /**
      * 备注

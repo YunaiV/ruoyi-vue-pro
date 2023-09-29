@@ -44,4 +44,5 @@ public class CouponTemplatePageReqVO extends PageParam {
 
     @Schema(description = "商品范围编号", example = "1")
     private Long productScopeValue;
+
 }

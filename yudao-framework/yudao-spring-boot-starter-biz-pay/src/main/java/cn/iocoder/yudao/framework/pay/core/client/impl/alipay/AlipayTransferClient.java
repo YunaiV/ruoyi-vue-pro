@@ -51,7 +51,7 @@ public class AlipayTransferClient extends AbstractAlipayPayClient {
         model.setProductCode("TRANS_ACCOUNT_NO_PWD");    // 销售产品码。单笔无密转账固定为 TRANS_ACCOUNT_NO_PWD
         model.setBizScene("DIRECT_TRANSFER");           // 业务场景 单笔无密转账固定为 DIRECT_TRANSFER。
         model.setBusinessParams(JsonUtils.toJsonString(reqDTO.getChannelExtras()));
-        PayTransferTypeEnum transferType = PayTransferTypeEnum.valueOf(reqDTO.getType());
+        PayTransferTypeEnum transferType = PayTransferTypeEnum.ofType(reqDTO.getType());
         switch(transferType){
             case WX_BALANCE :
             case WALLET_BALANCE : {
@@ -84,7 +84,7 @@ public class AlipayTransferClient extends AbstractAlipayPayClient {
                     if (ObjectUtils.equalsAny(response.getSubCode(), "SYSTEM_ERROR", "ACQ.SYSTEM_ERROR")) {
                         return PayTransferRespDTO.waitingOf(null, reqDTO.getOutTransferNo(), response);
                     }
-                    return PayTransferRespDTO.failureOf(response.getSubCode(), response.getSubMsg(),
+                    return PayTransferRespDTO.closedOf(response.getSubCode(), response.getSubMsg(),
                             reqDTO.getOutTransferNo(), response);
                 }
                 return  PayTransferRespDTO.successOf(response.getOrderId(), parseTime(response.getTransDate()),

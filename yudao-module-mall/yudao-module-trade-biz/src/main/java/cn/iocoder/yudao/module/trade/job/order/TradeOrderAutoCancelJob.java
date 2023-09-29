@@ -13,13 +13,13 @@ import javax.annotation.Resource;
  * @author 芋道源码
  */
 @Component
-@TenantJob
 public class TradeOrderAutoCancelJob implements JobHandler {
 
     @Resource
     private TradeOrderUpdateService tradeOrderUpdateService;
 
     @Override
+    @TenantJob
     public String execute(String param) {
         int count = tradeOrderUpdateService.cancelOrderBySystem();
         return String.format("过期订单 %s 个", count);

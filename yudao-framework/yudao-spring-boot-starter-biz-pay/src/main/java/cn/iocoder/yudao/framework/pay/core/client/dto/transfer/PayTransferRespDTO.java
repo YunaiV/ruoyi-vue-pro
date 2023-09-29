@@ -64,12 +64,12 @@ public class PayTransferRespDTO {
     }
 
     /**
-     * 创建【FAILURE】状态的转账返回
+     * 创建【CLOSED】状态的转账返回
      */
-    public static PayTransferRespDTO failureOf(String channelErrorCode, String channelErrorMsg,
-                                             String outTransferNo, Object rawData) {
+    public static PayTransferRespDTO closedOf(String channelErrorCode, String channelErrorMsg,
+                                              String outTransferNo, Object rawData) {
         PayTransferRespDTO respDTO = new PayTransferRespDTO();
-        respDTO.status = PayTransferStatusRespEnum.FAILURE.getStatus();
+        respDTO.status = PayTransferStatusRespEnum.CLOSED.getStatus();
         respDTO.channelErrorCode = channelErrorCode;
         respDTO.channelErrorMsg = channelErrorMsg;
         // 相对通用的字段

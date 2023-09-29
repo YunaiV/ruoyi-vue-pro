@@ -20,4 +20,5 @@ public class AppCouponTemplatePageReqVO extends PageParam {
 
     @Schema(description = "商品标号", example = "1")
     private Long spuId;
+
 }

@@ -125,7 +125,6 @@ public interface TradeOrderUpdateService {
      */
     void updateOrderItemWhenAfterSaleCreate(@NotNull Long id, @NotNull Long afterSaleId);
 
-
     /**
      * 当售后完成后，更新交易订单项的售后状态
      *

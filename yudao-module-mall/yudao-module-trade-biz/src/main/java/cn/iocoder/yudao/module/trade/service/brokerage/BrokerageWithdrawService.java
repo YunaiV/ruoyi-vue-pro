@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.withdraw.Brok
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.withdraw.AppBrokerageWithdrawCreateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageWithdrawDO;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum;
-import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserWithdrawSummaryBO;
+import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageWithdrawSummaryRespBO;
 
 import java.util.Collection;
 import java.util.List;
@@ -49,29 +49,32 @@ public interface BrokerageWithdrawService {
     /**
      * 【会员】创建佣金提现
      *
-     * @param createReqVO 创建信息
      * @param userId      会员用户编号
+     * @param createReqVO 创建信息
      * @return 佣金提现编号
      */
-    Long createBrokerageWithdraw(AppBrokerageWithdrawCreateReqVO createReqVO, Long userId);
+    Long createBrokerageWithdraw(Long userId, AppBrokerageWithdrawCreateReqVO createReqVO);
 
     /**
-     * 汇总用户提现
+     * 按照 userId，汇总每个用户的提现
      *
      * @param userIds 用户编号
      * @param status  提现状态
-     * @return 用户提现汇总
+     * @return 用户提现汇总 List
      */
-    List<UserWithdrawSummaryBO> getWithdrawSummaryByUserId(Collection<Long> userIds, BrokerageWithdrawStatusEnum status);
+    List<BrokerageWithdrawSummaryRespBO> getWithdrawSummaryListByUserId(Collection<Long> userIds,
+                                                                        BrokerageWithdrawStatusEnum status);
 
     /**
-     * 汇总用户提现
+     * 按照 userId，汇总每个用户的提现
      *
      * @param userIds 用户编号
      * @param status  提现状态
-     * @return 用户提现汇总
+     * @return 用户提现汇总 Map
      */
-    default Map<Long, UserWithdrawSummaryBO> getWithdrawSummaryMapByUserId(Set<Long> userIds, BrokerageWithdrawStatusEnum status) {
-        return convertMap(getWithdrawSummaryByUserId(userIds, status), UserWithdrawSummaryBO::getUserId);
+    default Map<Long, BrokerageWithdrawSummaryRespBO> getWithdrawSummaryMapByUserId(Set<Long> userIds,
+                                                                                    BrokerageWithdrawStatusEnum status) {
+        return convertMap(getWithdrawSummaryListByUserId(userIds, status), BrokerageWithdrawSummaryRespBO::getUserId);
     }
+
 }

@@ -28,7 +28,4 @@ public interface PayChannelMapper extends BaseMapperX<PayChannelDO> {
                 .eq(PayChannelDO::getStatus, status));
     }
 
-    @Select("SELECT COUNT(*) FROM pay_channel WHERE update_time > #{maxUpdateTime}")
-    Long selectCountByUpdateTimeGt(LocalDateTime maxUpdateTime);
-
 }

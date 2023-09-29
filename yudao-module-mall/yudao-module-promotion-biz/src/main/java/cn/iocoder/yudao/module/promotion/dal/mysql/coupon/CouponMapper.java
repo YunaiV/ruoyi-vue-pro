@@ -70,6 +70,7 @@ public interface CouponMapper extends BaseMapperX<CouponDO> {
         );
     }
 
+    // TODO @疯狂：这个是不是搞个 Map 就可以呀？
     default List<CouponTakeCountBO> selectCountByUserIdAndTemplateIdIn(Long userId, Collection<Long> templateIds) {
         return BeanUtil.copyToList(selectMaps(MPJWrappers.lambdaJoin(CouponDO.class)
                 .select(CouponDO::getTemplateId)
@@ -81,18 +82,17 @@ public interface CouponMapper extends BaseMapperX<CouponDO> {
 
     default List<CouponDO> selectListByUserIdAndStatusAndUsePriceLeAndProductScope(
             Long userId, Integer status, Integer usePrice, List<Long> spuIds, List<Long> categoryIds) {
-
         Function<List<Long>, String> productScopeValuesFindInSetFunc = ids -> ids.stream()
                 .map(id -> StrUtil.format("FIND_IN_SET({}, product_scope_values) ", id))
                 .collect(Collectors.joining(" OR "));
         return selectList(new LambdaQueryWrapperX<CouponDO>()
                 .eq(CouponDO::getUserId, userId)
                 .eq(CouponDO::getStatus, status)
-                .le(CouponDO::getUsePrice, usePrice)
-                .and(w -> w.eq(CouponDO::getProductScope, PromotionProductScopeEnum.ALL.getScope())
-                        .or(ww -> ww.eq(CouponDO::getProductScope, PromotionProductScopeEnum.SPU.getScope())
+                .le(CouponDO::getUsePrice, usePrice) // 价格小于等于，满足价格使用条件
+                .and(w -> w.eq(CouponDO::getProductScope, PromotionProductScopeEnum.ALL.getScope()) // 商品范围一：全部
+                        .or(ww -> ww.eq(CouponDO::getProductScope, PromotionProductScopeEnum.SPU.getScope()) // 商品范围二：满足指定商品
                                 .apply(productScopeValuesFindInSetFunc.apply(spuIds)))
-                        .or(ww -> ww.eq(CouponDO::getProductScope, PromotionProductScopeEnum.CATEGORY.getScope())
+                        .or(ww -> ww.eq(CouponDO::getProductScope, PromotionProductScopeEnum.CATEGORY.getScope()) // 商品范围三：满足指定分类
                                 .apply(productScopeValuesFindInSetFunc.apply(categoryIds)))));
     }
 
@@ -102,4 +102,5 @@ public interface CouponMapper extends BaseMapperX<CouponDO> {
                 .le(CouponDO::getValidEndTime, validEndTime)
         );
     }
+
 }

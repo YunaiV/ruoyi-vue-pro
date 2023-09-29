@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import ${simpleClassName}Modal from './${simpleClassName}Modal.vue'
+import ${ simpleClassName }Modal from './${simpleClassName}Modal.vue'
 import { columns, searchFormSchema } from './${classNameVar}.data'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useModal } from '@/components/Modal'
 import { IconEnum } from '@/enums/appEnum'
 import { BasicTable, useTable, TableAction } from '@/components/Table'
-import { delete${simpleClassName}, export${simpleClassName}, get${simpleClassName}Page } from '@/api/${table.moduleName}/${classNameVar}'
+import { delete${ simpleClassName }, export${ simpleClassName }, get${ simpleClassName } Page } from '@/api/${table.moduleName}/${classNameVar}'
 
 defineOptions({ name: '${table.className}' })
 
@@ -16,17 +16,17 @@ const [registerModal, { openModal }] = useModal()
 
 const [registerTable, { getForm, reload }] = useTable({
   title: '${table.classComment}列表',
-  api: get${simpleClassName}Page,
-  columns,
-  formConfig: { labelWidth: 120, schemas: searchFormSchema },
-  useSearchForm: true,
-  showTableSetting: true,
-  actionColumn: {
-    width: 140,
-    title: t('common.action'),
-    dataIndex: 'action',
-    fixed: 'right',
-  },
+  api: get${ simpleClassName }Page,
+    columns,
+    formConfig: { labelWidth: 120, schemas: searchFormSchema },
+    useSearchForm: true,
+    showTableSetting: true,
+    actionColumn: {
+      width: 140,
+      title: t('common.action'),
+      dataIndex: 'action',
+      fixed: 'right',
+    },
 })
 
 function handleCreate() {
@@ -43,14 +43,14 @@ async function handleExport() {
     iconType: 'warning',
     content: t('common.exportMessage'),
     async onOk() {
-      await export${simpleClassName}(getForm().getFieldsValue())
+      await export${ simpleClassName } (getForm().getFieldsValue())
       createMessage.success(t('common.exportSuccessText'))
     },
   })
 }
 
 async function handleDelete(record: Recordable) {
-  await delete${simpleClassName}(record.id)
+  await delete${ simpleClassName } (record.id)
   createMessage.success(t('common.delSuccessText'))
   reload()
 }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.tenant.core.redis;
 
+import cn.iocoder.yudao.framework.redis.core.TimeoutRedisCacheManager;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
@@ -15,7 +16,7 @@ import org.springframework.data.redis.cache.RedisCacheWriter;
  * @author airhead
  */
 @Slf4j
-public class TenantRedisCacheManager extends RedisCacheManager {
+public class TenantRedisCacheManager extends TimeoutRedisCacheManager {
 
     public TenantRedisCacheManager(RedisCacheWriter cacheWriter,
                                    RedisCacheConfiguration defaultCacheConfiguration) {

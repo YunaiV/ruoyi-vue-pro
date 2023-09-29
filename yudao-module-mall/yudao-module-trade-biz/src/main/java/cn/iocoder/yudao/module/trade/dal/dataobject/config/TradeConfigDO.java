@@ -35,6 +35,19 @@ public class TradeConfigDO extends BaseDO {
     @TableId
     private Long id;
 
+    // ========== 售后相关 ==========
+
+    /**
+     * 售后的退款理由
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> afterSaleRefundReasons;
+    /**
+     * 售后的退货理由
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> afterSaleReturnReasons;
+
     // ========== 配送相关 ==========
 
     /**

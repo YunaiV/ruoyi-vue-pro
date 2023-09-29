@@ -29,6 +29,7 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
     @Resource
     private CouponTemplateMapper couponTemplateMapper;
 
+    // TODO @疯狂：新增/修改时，需要校验对应的商品、分类是否存在
     @Override
     public Long createCouponTemplate(CouponTemplateCreateReqVO createReqVO) {
         // 插入

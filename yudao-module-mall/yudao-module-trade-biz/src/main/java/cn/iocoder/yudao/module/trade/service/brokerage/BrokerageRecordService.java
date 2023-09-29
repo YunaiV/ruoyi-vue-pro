@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokera
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageRecordDO;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
-import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
+import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryRespBO;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
@@ -62,6 +62,19 @@ public interface BrokerageRecordService {
     void addBrokerage(Long userId, BrokerageRecordBizTypeEnum bizType, String bizId, Integer brokeragePrice, String title);
 
     /**
+     * 减少佣金【只针对自己】
+     *
+     * @param userId         会员编号
+     * @param bizType        业务类型
+     * @param bizId          业务编号
+     * @param brokeragePrice 佣金
+     * @param title          标题
+     */
+    default void reduceBrokerage(Long userId, BrokerageRecordBizTypeEnum bizType, String bizId, Integer brokeragePrice, String title) {
+        addBrokerage(userId, bizType, bizId, -brokeragePrice, title);
+    }
+
+    /**
      * 取消佣金：将佣金记录，状态修改为已失效
      *
      * @param userId  会员编号
@@ -78,25 +91,28 @@ public interface BrokerageRecordService {
     int unfreezeRecord();
 
     /**
-     * 汇总用户佣金
+     * 按照 userId，汇总每个用户的佣金
      *
      * @param userIds 用户编号
      * @param bizType 业务类型
      * @param status  佣金状态
-     * @return 用户佣金汇总
+     * @return 用户佣金汇总 List
      */
-    List<UserBrokerageSummaryBO> getUserBrokerageSummaryByUserId(Collection<Long> userIds, Integer bizType, Integer status);
+    List<UserBrokerageSummaryRespBO> getUserBrokerageSummaryListByUserId(Collection<Long> userIds,
+                                                                         Integer bizType, Integer status);
 
     /**
-     * 汇总用户佣金
+     * 按照 userId，汇总每个用户的佣金
      *
      * @param userIds 用户编号
      * @param bizType 业务类型
      * @param status  佣金状态
-     * @return 用户佣金汇总
+     * @return 用户佣金汇总 Map
      */
-    default Map<Long, UserBrokerageSummaryBO> getUserBrokerageSummaryMapByUserId(Collection<Long> userIds, Integer bizType, Integer status) {
-        return convertMap(getUserBrokerageSummaryByUserId(userIds, bizType, status), UserBrokerageSummaryBO::getUserId);
+    default Map<Long, UserBrokerageSummaryRespBO> getUserBrokerageSummaryMapByUserId(Collection<Long> userIds,
+                                                                                     Integer bizType, Integer status) {
+        return convertMap(getUserBrokerageSummaryListByUserId(userIds, bizType, status),
+                UserBrokerageSummaryRespBO::getUserId);
     }
 
     /**
@@ -116,7 +132,8 @@ public interface BrokerageRecordService {
      * @param pageReqVO 分页查询
      * @return 排行榜分页
      */
-    PageResult<AppBrokerageUserRankByPriceRespVO> getBrokerageUserChildSummaryPageByPrice(AppBrokerageUserRankPageReqVO pageReqVO);
+    PageResult<AppBrokerageUserRankByPriceRespVO> getBrokerageUserChildSummaryPageByPrice(
+            AppBrokerageUserRankPageReqVO pageReqVO);
 
     /**
      * 获取用户的排名（基于佣金总数）
@@ -130,9 +147,10 @@ public interface BrokerageRecordService {
     /**
      * 计算商品被购买后，推广员可以得到的佣金
      *
-     * @param spuId  商品编号
      * @param userId 用户编号
+     * @param spuId  商品编号
      * @return 用户佣金
      */
-    AppBrokerageProductPriceRespVO calculateProductBrokeragePrice(Long spuId, Long userId);
+    AppBrokerageProductPriceRespVO calculateProductBrokeragePrice(Long userId, Long spuId);
+
 }
