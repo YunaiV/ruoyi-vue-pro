@@ -40,6 +40,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 import static java.util.Arrays.asList;
 
+// TODO @疯狂：注册时，赠送用户优惠劵；为了解耦，可以考虑注册时发个 MQ 消息；然后营销这里监听后消费；
 /**
  * 优惠劵 Service 实现类
  *
@@ -192,7 +193,8 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     public List<CouponDO> getMatchCouponList(Long userId, AppCouponMatchReqVO matchReqVO) {
-        return couponMapper.selectListByUserIdAndStatusAndUsePriceLeAndProductScope(userId, CouponStatusEnum.UNUSED.getStatus(),
+        return couponMapper.selectListByUserIdAndStatusAndUsePriceLeAndProductScope(userId,
+                CouponStatusEnum.UNUSED.getStatus(),
                 matchReqVO.getPrice(), matchReqVO.getSpuIds(), matchReqVO.getCategoryIds());
     }
 
@@ -220,6 +222,12 @@ public class CouponServiceImpl implements CouponService {
         return count;
     }
 
+    /**
+     * 过期单个优惠劵
+     *
+     * @param coupon 优惠劵
+     * @return 是否过期成功
+     */
     private boolean expireCoupon(CouponDO coupon) {
         // 更新记录状态
         int updateRows = couponMapper.updateByIdAndStatus(coupon.getId(), CouponStatusEnum.UNUSED.getStatus(),

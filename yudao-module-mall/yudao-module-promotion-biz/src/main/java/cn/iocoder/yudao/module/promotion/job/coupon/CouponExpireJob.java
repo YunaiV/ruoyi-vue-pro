@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.job;
+package cn.iocoder.yudao.module.promotion.job.coupon;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
+// TODO 芋艿：配置一个 Job
 /**
  * 优惠券过期 Job
  *

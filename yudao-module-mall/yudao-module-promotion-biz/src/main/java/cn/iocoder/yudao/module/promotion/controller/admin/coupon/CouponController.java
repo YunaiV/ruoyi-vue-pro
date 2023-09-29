@@ -37,15 +37,6 @@ public class CouponController {
     @Resource
     private MemberUserApi memberUserApi;
 
-//    @GetMapping("/get")
-//    @Operation(summary = "获得优惠劵")
-//    @Parameter(name = "id", description = "编号", required = true, example = "1024")
-//    @PreAuthorize("@ss.hasPermission('promotion:coupon:query')")
-//    public CommonResult<CouponRespVO> getCoupon(@RequestParam("id") Long id) {
-//        CouponDO coupon = couponService.getCoupon(id);
-//        return success(CouponConvert.INSTANCE.convert(coupon));
-//    }
-
     @DeleteMapping("/delete")
     @Operation(summary = "回收优惠劵")
     @Parameter(name = "id", description = "编号", required = true)

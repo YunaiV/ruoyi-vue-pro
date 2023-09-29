@@ -40,12 +40,13 @@ public class AppCouponController {
     @PostMapping("/take")
     @Operation(summary = "领取优惠劵")
     @Parameter(name = "templateId", description = "优惠券模板编号", required = true, example = "1024")
+    @PreAuthenticated
     public CommonResult<Boolean> takeCoupon(@Valid @RequestBody AppCouponTakeReqVO reqVO) {
-        // 领取
+        // 1. 领取优惠劵
         Long userId = getLoginUserId();
         couponService.takeCoupon(reqVO.getTemplateId(), CollUtil.newHashSet(userId), CouponTakeTypeEnum.USER);
 
-        // 检查是否可以继续领取
+        // 2. 检查是否可以继续领取
         CouponTemplateDO couponTemplate = couponTemplateService.getCouponTemplate(reqVO.getTemplateId());
         boolean canTakeAgain = true;
         if (couponTemplate.getTakeLimitCount() != null && couponTemplate.getTakeLimitCount() > 0) {
@@ -58,15 +59,16 @@ public class AppCouponController {
     }
 
     @GetMapping("/match-list")
-    @Operation(summary = "获得匹配指定商品的优惠劵列表")
+    @Operation(summary = "获得匹配指定商品的优惠劵列表", description = "用于下单页，展示优惠劵列表")
     public CommonResult<List<AppCouponMatchRespVO>> getMatchCouponList(AppCouponMatchReqVO matchReqVO) {
         // todo: 优化：优惠金额倒序
         return success(CouponConvert.INSTANCE.convertList(couponService.getMatchCouponList(getLoginUserId(), matchReqVO)));
     }
 
     @GetMapping("/page")
-    @Operation(summary = "优惠劵列表", description = "我的优惠劵")
-    public CommonResult<PageResult<AppCouponRespVO>> takeCoupon(AppCouponPageReqVO pageReqVO) {
+    @Operation(summary = "我的优惠劵列表")
+    @PreAuthenticated
+    public CommonResult<PageResult<AppCouponRespVO>> getCouponPage(AppCouponPageReqVO pageReqVO) {
         PageResult<CouponDO> pageResult = couponService.getCouponPage(
                 CouponConvert.INSTANCE.convert(pageReqVO, Collections.singleton(getLoginUserId())));
         return success(CouponConvert.INSTANCE.convertAppPage(pageResult));

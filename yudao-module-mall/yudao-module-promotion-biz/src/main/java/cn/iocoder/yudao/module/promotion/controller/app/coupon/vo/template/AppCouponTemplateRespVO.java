@@ -23,14 +23,6 @@ public class AppCouponTemplateRespVO {
     // 单位：分；0 - 不限制
     private Integer usePrice;
 
-    // TODO 芋艿：这两要改的
-//    @Schema(description = "商品范围", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-//    @InEnum(PromotionProductScopeEnum.class)
-//    private Integer productScope;
-//
-//    @Schema(description = "商品范围编号的数组", example = "1,3")
-//    private List<Long> productScopeValues;
-
     @Schema(description = "生效日期类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer validityType;
 
