@@ -8,10 +8,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTakeTypeEnum;
 import cn.iocoder.yudao.module.promotion.service.coupon.bo.CouponTakeCountBO;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
@@ -127,6 +124,21 @@ public interface CouponService {
      */
     default void takeCouponByRegister(Long templateId, Long userId) {
         takeCoupon(templateId, CollUtil.newHashSet(userId), CouponTakeTypeEnum.REGISTER);
+    }
+
+    /**
+     * 获取会员领取指定优惠券的数量
+     *
+     * @param templateId 优惠券模板编号
+     * @param userId     用户编号
+     * @return 领取优惠券的数量
+     */
+    default Integer getTakeCount(Long templateId, Long userId) {
+        return CollUtil.emptyIfNull(getTakeCountListByTemplateIds(Collections.singleton(templateId), userId))
+                .stream()
+                .findFirst()
+                .map(CouponTakeCountBO::getCount)
+                .orElse(0);
     }
 
     /**

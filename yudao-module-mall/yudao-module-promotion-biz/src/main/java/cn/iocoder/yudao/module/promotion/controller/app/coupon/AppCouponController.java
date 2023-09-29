@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.promotion.controller.app.coupon;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
@@ -50,9 +49,7 @@ public class AppCouponController {
         CouponTemplateDO couponTemplate = couponTemplateService.getCouponTemplate(reqVO.getTemplateId());
         boolean canTakeAgain = true;
         if (couponTemplate.getTakeLimitCount() != null && couponTemplate.getTakeLimitCount() > 0) {
-            // TODO @疯狂：要不要搞个 getTakeCount 方法？
-            Integer takeCount = MapUtil.getInt(couponService.getTakeCountMapByTemplateIds(
-                    Collections.singleton(reqVO.getTemplateId()), userId), reqVO.getTemplateId(), 0);
+            Integer takeCount = couponService.getTakeCount(reqVO.getTemplateId(), userId);
             canTakeAgain = takeCount < couponTemplate.getTakeLimitCount();
         }
         return success(canTakeAgain);

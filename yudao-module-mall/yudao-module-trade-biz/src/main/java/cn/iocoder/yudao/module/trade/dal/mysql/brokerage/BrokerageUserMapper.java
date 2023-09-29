@@ -2,10 +2,10 @@ package cn.iocoder.yudao.module.trade.dal.mysql.brokerage;
 
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.SortingField;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.user.BrokerageUserPageReqVO;
-import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserChildSummaryPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserChildSummaryRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankByUserCountRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
@@ -139,8 +139,11 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
                                                                                   @Param("endTime") LocalDateTime endTime);
 
     IPage<AppBrokerageUserChildSummaryRespVO> selectSummaryPageByUserId(Page<?> page,
-                                                                        @Param("param") AppBrokerageUserChildSummaryPageReqVO param,
-                                                                        @Param("userId") Long userId);
+                                                                        @Param("ids") List<Long> ids,
+                                                                        @Param("bizType") Integer bizType,
+                                                                        @Param("status") Integer status,
+                                                                        @Param("bindUserIds") List<Long> bindUserIds,
+                                                                        @Param("sortingField") SortingField sortingField);
 
     default List<BrokerageUserDO> selectListByBindUserId(Long bindUserId) {
         return selectList(BrokerageUserDO::getBindUserId, bindUserId);

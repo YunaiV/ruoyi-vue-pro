@@ -232,7 +232,7 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
     }
 
     /**
-     * 激动单条佣金记录
+     * 解冻单条佣金记录
      *
      * @param record 佣金记录
      * @return 解冻是否成功
@@ -258,9 +258,9 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
     @Override
     public List<UserBrokerageSummaryRespBO> getUserBrokerageSummaryListByUserId(Collection<Long> userIds,
                                                                                 Integer bizType, Integer status) {
-         if (CollUtil.isEmpty(userIds)) {
-             return Collections.emptyList();
-         }
+        if (CollUtil.isEmpty(userIds)) {
+            return Collections.emptyList();
+        }
         return brokerageRecordMapper.selectCountAndSumPriceByUserIdInAndBizTypeAndStatus(userIds, bizType, status);
     }
 

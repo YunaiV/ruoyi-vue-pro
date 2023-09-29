@@ -5,7 +5,6 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
@@ -667,7 +666,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
      * 如果金额全部被退款，则取消订单
      * 如果还有未被退款的金额，则无需取消订单
      *
-     * @param order           订单
+     * @param order       订单
      * @param refundPrice 退款金额
      */
     @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.ADMIN_CANCEL_AFTER_SALE)
@@ -774,11 +773,6 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     @Override
     public void updateOrderItemWhenAfterSaleCreate(Long id, Long afterSaleId) {
-        // TODO @疯狂：这个可以直接在接口上，写 @Null 参数校验；
-        if (afterSaleId == null) {
-            throw new IllegalArgumentException(StrUtil.format("id({}) 退款发起，售后单编号不能为空", id));
-        }
-
         // 更新订单项
         updateOrderItemAfterSaleStatus(id, TradeOrderItemAfterSaleStatusEnum.NONE.getStatus(),
                 TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), afterSaleId);
@@ -787,11 +781,6 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateOrderItemWhenAfterSaleSuccess(Long id, Integer refundPrice) {
-        // TODO @疯狂：这个可以直接在接口上，写 @Null 参数校验；
-        if (refundPrice == null) {
-            throw new IllegalArgumentException(StrUtil.format("id({}) 退款成功，退款金额不能为空", id));
-        }
-
         // 1. 更新订单项
         updateOrderItemAfterSaleStatus(id, TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(),
                 TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus(), null);
@@ -821,8 +810,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         addUserPoint(order.getUserId(), orderItem.getUsePoint(), MemberPointBizTypeEnum.AFTER_SALE_REFUND_USED, orderItem.getAfterSaleId());
 
         // 5. 回滚经验：扣减用户经验
-        // TODO @疯狂：orderRefundPrice 是不是改成 refundPrice？应该只退这个售后对应的经验
-        getSelf().reduceUserExperienceAsync(order.getUserId(), orderRefundPrice, orderItem.getAfterSaleId());
+        getSelf().reduceUserExperienceAsync(order.getUserId(), refundPrice, orderItem.getAfterSaleId());
 
         // 6. 回滚佣金：更新分佣记录为已失效
         getSelf().cancelBrokerageAsync(order.getUserId(), id);
