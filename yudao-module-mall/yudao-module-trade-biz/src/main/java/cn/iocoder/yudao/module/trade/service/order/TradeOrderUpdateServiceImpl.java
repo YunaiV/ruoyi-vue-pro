@@ -663,6 +663,27 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.CANCELED.getStatus());
     }
 
+    /**
+     * 如果金额全部被退款，则取消订单
+     * 如果还有未被退款的金额，则无需取消订单
+     *
+     * @param order           订单
+     * @param refundPrice 退款金额
+     */
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.ADMIN_CANCEL_AFTER_SALE)
+    public void cancelOrderByAfterSale(TradeOrderDO order, Integer refundPrice) {
+        // 1. 更新订单
+        if (refundPrice < order.getPayPrice()) {
+            return;
+        }
+        tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId())
+                .setStatus(TradeOrderStatusEnum.CANCELED.getStatus())
+                .setCancelType(TradeOrderCancelTypeEnum.AFTER_SALE_CLOSE.getType()).setCancelTime(LocalDateTime.now()));
+
+        // 2. 退还优惠券
+        couponApi.returnUsedCoupon(order.getCouponId());
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_DELETE)
@@ -775,31 +796,35 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         updateOrderItemAfterSaleStatus(id, TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(),
                 TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus(), null);
 
-        // 2. 计算总的退款金额、退回积分
+        // 2.1 更新订单的退款金额、积分
         TradeOrderItemDO orderItem = tradeOrderItemMapper.selectById(id);
         TradeOrderDO order = tradeOrderMapper.selectById(orderItem.getOrderId());
         Integer orderRefundPrice = order.getRefundPrice() + refundPrice;
         Integer orderRefundPoint = order.getRefundPoint() + orderItem.getUsePoint();
-        if (isAllOrderItemAfterSaleSuccess(order.getId())) { // 如果都售后成功，则需要取消订单
-            cancelOrderByAfterSale(order, orderRefundPrice, orderRefundPoint);
-        } else { // 如果部分售后，则更新退款金额
-            tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId())
-                    .setRefundStatus(TradeOrderRefundStatusEnum.PART.getStatus())
-                    .setRefundPrice(orderRefundPrice).setRefundPoint(orderRefundPoint));
-        }
+        Integer refundStatus = isAllOrderItemAfterSaleSuccess(order.getId()) ?
+                TradeOrderRefundStatusEnum.ALL.getStatus() // 如果都售后成功，则需要取消订单
+                : TradeOrderRefundStatusEnum.PART.getStatus();
+        tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId())
+                .setRefundStatus(refundStatus)
+                .setRefundPrice(orderRefundPrice).setRefundPoint(orderRefundPoint));
+        // 2.2 如果全部退款，则进行取消订单
+        getSelf().cancelOrderByAfterSale(order, orderRefundPrice);
 
-        // TODO 芋艿：这块扣减规则，需要在考虑下
-        // 3. 回滚数据：增加 SKU 库存
+        // TODO @puhui999：活动相关的回滚
+
+        // 3. 回滚库存
         productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convert(Collections.singletonList(orderItem)));
 
-        // 4.1 回滚数据：扣减用户积分（赠送的）
+        // 4.1 回滚积分：扣减用户积分（赠送的）
         reduceUserPoint(order.getUserId(), orderItem.getGivePoint(), MemberPointBizTypeEnum.AFTER_SALE_DEDUCT_GIVE, orderItem.getAfterSaleId());
-        // 4.2 回滚数据：增加用户积分（返还抵扣）
+        // 4.2 回滚积分：增加用户积分（返还抵扣）
         addUserPoint(order.getUserId(), orderItem.getUsePoint(), MemberPointBizTypeEnum.AFTER_SALE_REFUND_USED, orderItem.getAfterSaleId());
-        // 4.3 回滚数据：扣减用户经验
+
+        // 5. 回滚经验：扣减用户经验
+        // TODO @疯狂：orderRefundPrice 是不是改成 refundPrice？应该只退这个售后对应的经验
         getSelf().reduceUserExperienceAsync(order.getUserId(), orderRefundPrice, orderItem.getAfterSaleId());
 
-        // 5. 回滚数据：更新分佣记录为已失效
+        // 6. 回滚佣金：更新分佣记录为已失效
         getSelf().cancelBrokerageAsync(order.getUserId(), id);
     }
 
@@ -817,17 +842,6 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         if (updateCount <= 0) {
             throw exception(ORDER_ITEM_UPDATE_AFTER_SALE_STATUS_FAIL);
         }
-    }
-
-    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_CANCEL)
-    private void cancelOrderByAfterSale(TradeOrderDO order, Integer orderRefundPrice, Integer refundPoint) {
-        // 1. 更新订单
-        tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId())
-                .setRefundStatus(TradeOrderRefundStatusEnum.ALL.getStatus())
-                .setRefundPrice(orderRefundPrice).setRefundPoint(refundPoint)
-                .setCancelType(TradeOrderCancelTypeEnum.AFTER_SALE_CLOSE.getType()).setCancelTime(LocalDateTime.now()));
-        // 2. 退还优惠券
-        couponApi.returnUsedCoupon(order.getCouponId());
     }
 
     /**
