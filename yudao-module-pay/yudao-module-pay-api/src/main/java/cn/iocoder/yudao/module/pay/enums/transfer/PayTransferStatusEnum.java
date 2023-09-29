@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.pay.core.enums.transfer;
+package cn.iocoder.yudao.module.pay.enums.transfer;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,21 +6,17 @@ import lombok.Getter;
 import java.util.Objects;
 
 /**
- * 渠道的转账状态枚举
- *
  * @author jason
  */
 @Getter
 @AllArgsConstructor
-public enum PayTransferStatusRespEnum {
+public enum PayTransferStatusEnum {
 
-    WAITING(0, "转账中"),
-
+    WAITING(0, "待转账"),
     /**
      * TODO 转账到银行卡. 会有T+0 T+1 到账的请情况。 还未实现
      */
     IN_PROGRESS(10, "转账进行中"),
-
 
     SUCCESS(20, "转账成功"),
     /**
@@ -37,5 +33,16 @@ public enum PayTransferStatusRespEnum {
 
     public static boolean isClosed(Integer status) {
         return Objects.equals(status, CLOSED.getStatus());
+    }
+    public static boolean isWaiting(Integer status) {
+        return Objects.equals(status, WAITING.getStatus());
+    }
+
+    /**
+     * 是否处于待转账或者转账中的状态
+     * @param status 状态
+     */
+    public static boolean isPendingStatus(Integer status) {
+        return Objects.equals(status, WAITING.getStatus()) || Objects.equals(status, IN_PROGRESS.status);
     }
 }
