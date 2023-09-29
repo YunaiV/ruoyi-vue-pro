@@ -163,4 +163,17 @@ public interface BpmTaskService {
      */
     void addSign(BpmTaskAddSignReqVO reqVO, Long userId);
 
+    /**
+     * 减签
+     * @param bpmTaskSubSignReqVO 被减签的任务ID，理由
+     * @param loginUserId 当前用户ID
+     */
+    void subSign(BpmTaskSubSignReqVO bpmTaskSubSignReqVO, Long loginUserId);
+
+    /**
+     * 获取指定任务的子任务和审批人信息
+     * @param taskId 指定任务ID
+     * @return 子任务列表
+     */
+    List<BpmTaskSubSignRespVO> getChildrenTaskList(String taskId);
 }

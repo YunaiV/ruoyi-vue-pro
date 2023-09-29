@@ -103,8 +103,23 @@ public class BpmTaskController {
     @PutMapping("/add-sign")
     @Operation(summary = "加签", description = "before, after为前加签后加签")
     @PreAuthorize("@ss.hasPermission('bpm:task:add-sign')")
-    public CommonResult<Boolean> addSign(@RequestBody @Valid BpmTaskAddSignReqVO reqVO) {
+    public CommonResult<Boolean> addSign(@Valid @RequestBody BpmTaskAddSignReqVO reqVO) {
         taskService.addSign(reqVO,getLoginUserId());
         return success(true);
     }
+
+    @PutMapping("/sub-sign")
+    @Operation(summary = "减签", description = "")
+    @PreAuthorize("@ss.hasPermission('bpm:task:sub-sign')")
+    public CommonResult<Boolean> subSign(@Valid @RequestBody  BpmTaskSubSignReqVO bpmTaskSubSignReqVO) {
+        taskService.subSign(bpmTaskSubSignReqVO,getLoginUserId());
+        return success(true);
+    }
+    @GetMapping("/get-sub-sign")
+    @Operation(summary = "获取能被减签的任务", description = "")
+    @PreAuthorize("@ss.hasPermission('bpm:task:sub-sign')")
+    public CommonResult<List<BpmTaskSubSignRespVO>> getChildrenTaskList(@RequestParam("taskId") String taskId) {
+        return success(taskService.getChildrenTaskList(taskId));
+    }
+
 }

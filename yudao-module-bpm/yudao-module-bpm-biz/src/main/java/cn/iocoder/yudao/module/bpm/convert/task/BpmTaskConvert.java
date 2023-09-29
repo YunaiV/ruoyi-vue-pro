@@ -4,10 +4,7 @@ import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskDonePageItemRespVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskSimpleRespVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskTodoPageItemRespVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenTaskCreatedReqDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
@@ -161,5 +158,18 @@ public interface BpmTaskConvert {
         task.setPriority(parentTask.getPriority());
         task.setCreateTime(new Date());
         return task;
+    }
+
+    default List<BpmTaskSubSignRespVO> convertList(List<BpmTaskExtDO> bpmTaskExtDOList, Map<Long, AdminUserRespDTO> userMap){
+        return CollectionUtils.convertList(bpmTaskExtDOList, task->{
+            BpmTaskSubSignRespVO bpmTaskSubSignRespVO = new BpmTaskSubSignRespVO();
+            bpmTaskSubSignRespVO.setName(task.getName());
+            bpmTaskSubSignRespVO.setId(task.getTaskId());
+            AdminUserRespDTO assignUser = userMap.get(task.getAssigneeUserId());
+            if (assignUser != null) {
+                bpmTaskSubSignRespVO.setAssigneeUser(convert3(assignUser));
+            }
+            return bpmTaskSubSignRespVO;
+        });
     }
 }

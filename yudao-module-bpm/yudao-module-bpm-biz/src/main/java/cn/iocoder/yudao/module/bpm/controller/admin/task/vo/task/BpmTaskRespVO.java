@@ -19,6 +19,11 @@ public class BpmTaskRespVO extends BpmTaskDonePageItemRespVO {
      */
     private User assigneeUser;
 
+    /**
+     * 父任务ID
+     */
+    private String parentTaskId;
+
     @Schema(description = "用户信息")
     @Data
     public static class User {
