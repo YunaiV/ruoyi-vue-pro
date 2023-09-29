@@ -19,6 +19,19 @@ import java.util.List;
  */
 @Data
 public class TradeConfigBaseVO {
+
+    // ========== 售后相关 ==========
+
+    @Schema(description = "售后的退款理由", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotEmpty(message = "售后的退款理由不能为空")
+    private List<String> afterSaleRefundReasons;
+
+    @Schema(description = "售后的退货理由", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotEmpty(message = "售后的退货理由不能为空")
+    private List<String> afterSaleReturnReasons;
+
+    // ========== 配送相关 ==========
+
     /**
      * 是否启用全场包邮
      */

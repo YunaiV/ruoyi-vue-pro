@@ -125,12 +125,10 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
         if (orderItem == null) {
             throw exception(ORDER_ITEM_NOT_FOUND);
         }
-
         // 已申请售后，不允许再发起售后申请
         if (!TradeOrderItemAfterSaleStatusEnum.isNone(orderItem.getAfterSaleStatus())) {
             throw exception(AFTER_SALE_CREATE_FAIL_ORDER_ITEM_APPLIED);
         }
-
         // 申请的退款金额，不能超过商品的价格
         if (createReqVO.getRefundPrice() > orderItem.getPayPrice()) {
             throw exception(AFTER_SALE_CREATE_FAIL_REFUND_PRICE_ERROR);
