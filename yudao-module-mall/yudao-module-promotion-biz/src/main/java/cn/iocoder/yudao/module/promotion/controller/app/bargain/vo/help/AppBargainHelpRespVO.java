@@ -9,16 +9,16 @@ import java.time.LocalDateTime;
 @Data
 public class AppBargainHelpRespVO {
 
-    @Schema(description = "助力用户的昵称", required = true, example = "1024")
+    @Schema(description = "助力用户的昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private String nickname;
 
-    @Schema(description = "助力用户的头像", required = true, example = "1024")
+    @Schema(description = "助力用户的头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private String avatar;
 
-    @Schema(description = "助力用户的砍价金额", required = true, example = "1024")
+    @Schema(description = "助力用户的砍价金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer reducePrice;
 
-    @Schema(description = "创建时间", required = true, example = "1024")
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private LocalDateTime createTime;
 
 }

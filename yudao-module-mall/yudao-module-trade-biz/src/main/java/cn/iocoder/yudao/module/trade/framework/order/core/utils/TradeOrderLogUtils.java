@@ -20,4 +20,8 @@ public class TradeOrderLogUtils {
         TradeOrderLogAspect.setOrderInfo(id, beforeStatus, afterStatus, exts);
     }
 
+    public static void setUserInfo(Long userId, Integer userType) {
+        TradeOrderLogAspect.setUserInfo(userId, userType);
+    }
+
 }

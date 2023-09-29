@@ -9,6 +9,16 @@ import java.util.List;
 @Data
 public class AppTradeConfigRespVO {
 
+    // ========== 售后相关 ==========
+
+    @Schema(description = "售后的退款理由", requiredMode = Schema.RequiredMode.REQUIRED)
+    private List<String> afterSaleRefundReasons;
+
+    @Schema(description = "售后的退货理由", requiredMode = Schema.RequiredMode.REQUIRED)
+    private List<String> afterSaleReturnReasons;
+
+    // ========== 分销相关 ==========
+
     @Schema(description = "分销海报地址数组", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<String> brokeragePosterUrls;
 

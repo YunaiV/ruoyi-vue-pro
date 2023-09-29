@@ -32,8 +32,8 @@ public interface SmsChannelConvert {
 
     PageResult<SmsChannelRespVO> convertPage(PageResult<SmsChannelDO> page);
 
-    List<SmsChannelProperties> convertList02(List<SmsChannelDO> list);
-
     List<SmsChannelSimpleRespVO> convertList03(List<SmsChannelDO> list);
+
+    SmsChannelProperties convert02(SmsChannelDO channel);
 
 }

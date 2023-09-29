@@ -16,13 +16,13 @@ import javax.annotation.Resource;
  * @author 芋道源码
  */
 @Component
-@TenantJob
 public class PayRefundSyncJob implements JobHandler {
 
     @Resource
     private PayRefundService refundService;
 
     @Override
+    @TenantJob
     public String execute(String param) {
         int count = refundService.syncRefund();
         return StrUtil.format("同步退款订单 {} 个", count);

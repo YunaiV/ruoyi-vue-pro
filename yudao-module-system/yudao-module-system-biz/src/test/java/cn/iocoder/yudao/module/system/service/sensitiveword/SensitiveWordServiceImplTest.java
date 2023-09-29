@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.Sensitiv
 import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.SensitiveWordUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sensitiveword.SensitiveWordDO;
 import cn.iocoder.yudao.module.system.dal.mysql.sensitiveword.SensitiveWordMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
@@ -41,6 +42,11 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private SensitiveWordMapper sensitiveWordMapper;
+
+    @BeforeEach
+    public void setUp() {
+        SensitiveWordServiceImpl.ENABLED = true;
+    }
 
     @Test
     public void testInitLocalCache() {

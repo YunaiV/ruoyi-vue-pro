@@ -75,6 +75,7 @@ public class AppTradeOrderController {
     }
 
     // TODO @芋艿：如果拼团活动、秒杀活动、砍价活动时，是不是要额外在返回活动之类的信息；
+    // TODO @puhui999：需要的
     @GetMapping("/get-detail")
     @Operation(summary = "获得交易订单")
     @Parameter(name = "id", description = "交易订单编号")
@@ -140,7 +141,7 @@ public class AppTradeOrderController {
     @Operation(summary = "确认交易订单收货")
     @Parameter(name = "id", description = "交易订单编号")
     public CommonResult<Boolean> receiveOrder(@RequestParam("id") Long id) {
-        tradeOrderUpdateService.receiveOrder(getLoginUserId(), id);
+        tradeOrderUpdateService.receiveOrderByMember(getLoginUserId(), id);
         return success(true);
     }
 
@@ -148,7 +149,7 @@ public class AppTradeOrderController {
     @Operation(summary = "取消交易订单")
     @Parameter(name = "id", description = "交易订单编号")
     public CommonResult<Boolean> cancelOrder(@RequestParam("id") Long id) {
-        tradeOrderUpdateService.cancelOrder(getLoginUserId(), id);
+        tradeOrderUpdateService.cancelOrderByMember(getLoginUserId(), id);
         return success(true);
     }
 
@@ -173,7 +174,7 @@ public class AppTradeOrderController {
     @PostMapping("/item/create-comment")
     @Operation(summary = "创建交易订单项的评价")
     public CommonResult<Long> createOrderItemComment(@RequestBody AppTradeOrderItemCommentCreateReqVO createReqVO) {
-        return success(tradeOrderUpdateService.createOrderItemComment(getLoginUserId(), createReqVO));
+        return success(tradeOrderUpdateService.createOrderItemCommentByMember(getLoginUserId(), createReqVO));
     }
 
 }

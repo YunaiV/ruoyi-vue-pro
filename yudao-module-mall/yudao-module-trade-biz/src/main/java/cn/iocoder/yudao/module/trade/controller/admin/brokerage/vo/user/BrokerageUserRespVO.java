@@ -21,25 +21,25 @@ public class BrokerageUserRespVO extends BrokerageUserBaseVO {
 
     // ========== 用户信息 ==========
 
-    @Schema(description = "用户头像", example = "https://www.iocoder.cn/xxx.png")
+    @Schema(description = "用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xxx.png")
     private String avatar;
-    @Schema(description = "用户昵称", example = "李四")
+    @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "李四")
     private String nickname;
 
     // ========== 推广信息 ==========
 
-    @Schema(description = "推广用户数量", example = "20019")
+    @Schema(description = "推广用户数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "20019")
     private Integer brokerageUserCount;
-    @Schema(description = "推广订单数量", example = "20019")
+    @Schema(description = "推广订单数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "20019")
     private Integer brokerageOrderCount;
-    @Schema(description = "推广订单金额", example = "20019")
+    @Schema(description = "推广订单金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "20019")
     private Integer brokerageOrderPrice;
 
     // ========== 提现信息 ==========
 
-    @Schema(description = "已提现金额", example = "20019")
+    @Schema(description = "已提现金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "20019")
     private Integer withdrawPrice;
-    @Schema(description = "已提现次数", example = "20019")
+    @Schema(description = "已提现次数", requiredMode = Schema.RequiredMode.REQUIRED, example = "20019")
     private Integer withdrawCount;
 
 }

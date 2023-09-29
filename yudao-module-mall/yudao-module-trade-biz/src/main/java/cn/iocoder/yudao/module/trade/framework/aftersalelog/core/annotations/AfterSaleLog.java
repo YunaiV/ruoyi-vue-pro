@@ -21,7 +21,8 @@ public @interface AfterSaleLog {
     /**
      * 售后 ID
      */
-    String id();
+    @Deprecated
+    String id() default "";
 
     /**
      * 操作类型
@@ -31,6 +32,7 @@ public @interface AfterSaleLog {
     /**
      * 日志内容
      */
+    @Deprecated
     String content() default "";
 
 }

@@ -60,31 +60,6 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
     private FileClientFactory fileClientFactory;
 
     @Test
-    public void testInitLocalCache() {
-        // mock 数据
-        FileConfigDO configDO1 = randomFileConfigDO().setId(1L).setMaster(true);
-        fileConfigMapper.insert(configDO1);
-        FileConfigDO configDO2 = randomFileConfigDO().setId(2L).setMaster(false);
-        fileConfigMapper.insert(configDO2);
-        // mock fileClientFactory 获得 master
-        FileClient masterFileClient = mock(FileClient.class);
-        when(fileClientFactory.getFileClient(eq(1L))).thenReturn(masterFileClient);
-
-        // 调用
-        fileConfigService.initLocalCache();
-        // 断言 fileClientFactory 调用
-        verify(fileClientFactory).createOrUpdateFileClient(eq(1L),
-                eq(configDO1.getStorage()), eq(configDO1.getConfig()));
-        verify(fileClientFactory).createOrUpdateFileClient(eq(2L),
-                eq(configDO2.getStorage()), eq(configDO2.getConfig()));
-        assertSame(masterFileClient, fileConfigService.getMasterFileClient());
-        // 断言 fileConfigCache 缓存
-        assertEquals(2, fileConfigService.getFileConfigCache().size());
-        assertEquals(configDO1, fileConfigService.getFileConfigCache().get(0));
-        assertEquals(configDO2, fileConfigService.getFileConfigCache().get(1));
-    }
-
-    @Test
     public void testCreateFileConfig_success() {
         // 准备参数
         Map<String, Object> config = MapUtil.<String, Object>builder().put("basePath", "/yunai")
@@ -102,6 +77,8 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
         assertFalse(fileConfig.getMaster());
         assertEquals("/yunai", ((LocalFileClientConfig) fileConfig.getConfig()).getBasePath());
         assertEquals("https://www.iocoder.cn", ((LocalFileClientConfig) fileConfig.getConfig()).getDomain());
+        // 验证 cache
+        assertNull(fileConfigService.getClientCache().getIfPresent(fileConfigId));
     }
 
     @Test
@@ -125,6 +102,8 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
         assertPojoEquals(reqVO, fileConfig, "config");
         assertEquals("/yunai2", ((LocalFileClientConfig) fileConfig.getConfig()).getBasePath());
         assertEquals("https://doc.iocoder.cn", ((LocalFileClientConfig) fileConfig.getConfig()).getDomain());
+        // 验证 cache
+        assertNull(fileConfigService.getClientCache().getIfPresent(fileConfig.getId()));
     }
 
     @Test
@@ -149,6 +128,8 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
         // 断言数据
         assertTrue(fileConfigMapper.selectById(dbFileConfig.getId()).getMaster());
         assertFalse(fileConfigMapper.selectById(masterFileConfig.getId()).getMaster());
+        // 验证 cache
+        assertNull(fileConfigService.getClientCache().getIfPresent(0L));
     }
 
     @Test
@@ -169,6 +150,8 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
         fileConfigService.deleteFileConfig(id);
        // 校验数据不存在了
        assertNull(fileConfigMapper.selectById(id));
+        // 验证 cache
+        assertNull(fileConfigService.getClientCache().getIfPresent(id));
     }
 
     @Test
@@ -250,14 +233,38 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testGetFileClient() {
+        // mock 数据
+        FileConfigDO fileConfig = randomFileConfigDO().setMaster(false);
+        fileConfigMapper.insert(fileConfig);
         // 准备参数
-        Long id = randomLongId();
+        Long id = fileConfig.getId();
         // mock 获得 Client
         FileClient fileClient = new LocalFileClient(id, new LocalFileClientConfig());
         when(fileClientFactory.getFileClient(eq(id))).thenReturn(fileClient);
 
         // 调用，并断言
         assertSame(fileClient, fileConfigService.getFileClient(id));
+        // 断言缓存
+        verify(fileClientFactory).createOrUpdateFileClient(eq(id), eq(fileConfig.getStorage()),
+                eq(fileConfig.getConfig()));
+    }
+
+    @Test
+    public void testGetMasterFileClient() {
+        // mock 数据
+        FileConfigDO fileConfig = randomFileConfigDO().setMaster(true);
+        fileConfigMapper.insert(fileConfig);
+        // 准备参数
+        Long id = fileConfig.getId();
+        // mock 获得 Client
+        FileClient fileClient = new LocalFileClient(id, new LocalFileClientConfig());
+        when(fileClientFactory.getFileClient(eq(0L))).thenReturn(fileClient);
+
+        // 调用，并断言
+        assertSame(fileClient, fileConfigService.getMasterFileClient());
+        // 断言缓存
+        verify(fileClientFactory).createOrUpdateFileClient(eq(0L), eq(fileConfig.getStorage()),
+                eq(fileConfig.getConfig()));
     }
 
     private FileConfigDO randomFileConfigDO() {

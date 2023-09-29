@@ -7,10 +7,10 @@ import lombok.Data;
 @Data
 public class AppDeliveryExpressRespVO {
 
-    @Schema(description = "编号", required = true, example = "1")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
-    @Schema(description = "门店名称", required = true, example = "顺丰")
+    @Schema(description = "门店名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "顺丰")
     private String name;
 
 }

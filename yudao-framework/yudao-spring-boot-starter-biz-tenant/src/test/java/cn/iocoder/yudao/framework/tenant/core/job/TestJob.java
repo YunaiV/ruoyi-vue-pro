@@ -9,12 +9,12 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Component
-@TenantJob // 标记多租户
 public class TestJob implements JobHandler {
 
     private final List<Long> tenantIds = new CopyOnWriteArrayList<>();
 
     @Override
+    @TenantJob // 标记多租户
     public String execute(String param) throws Exception {
         tenantIds.add(TenantContextHolder.getTenantId());
         return "success";
@@ -24,4 +24,5 @@ public class TestJob implements JobHandler {
         CollUtil.sort(tenantIds, Long::compareTo);
         return tenantIds;
     }
+
 }

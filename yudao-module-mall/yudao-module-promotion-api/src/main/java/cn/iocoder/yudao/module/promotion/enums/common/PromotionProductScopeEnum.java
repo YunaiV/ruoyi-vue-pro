@@ -15,9 +15,9 @@ import java.util.Arrays;
 @AllArgsConstructor
 public enum PromotionProductScopeEnum implements IntArrayValuable {
 
-    ALL(1, "通用卷"), // 全部商品
-    SPU(2, "商品卷"), // 指定商品
-    CATEGORY(3, "品类卷"), // 指定商品
+    ALL(1, "通用券"), // 全部商品
+    SPU(2, "商品券"), // 指定商品
+    CATEGORY(3, "品类券"), // 指定品类
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(PromotionProductScopeEnum::getScope).toArray();
