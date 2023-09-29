@@ -5,7 +5,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
-import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
@@ -41,6 +40,7 @@ import static cn.iocoder.yudao.module.pay.enums.transfer.PayTransferStatusEnum.*
 @Service
 @Slf4j
 public class PayTransferServiceImpl implements PayTransferService {
+
     private static final String TRANSFER_NO_PREFIX = "T";
 
     @Resource
@@ -52,8 +52,6 @@ public class PayTransferServiceImpl implements PayTransferService {
     @Resource
     private PayChannelService channelService;
     @Resource
-    private PayClientFactory payClientFactory;
-    @Resource
     private PayNoRedisDAO noRedisDAO;
 
     @Override
@@ -64,7 +62,7 @@ public class PayTransferServiceImpl implements PayTransferService {
         validateChannelCodeAndTypeMatch(reqVO.getChannelCode(), transfer.getType());
         // 1.3 校验支付渠道是否有效
         PayChannelDO channel = validateChannelCanSubmit(transfer.getAppId(), reqVO.getChannelCode());
-        PayClient client = payClientFactory.getPayClient(channel.getId());
+        PayClient client = channelService.getPayClient(channel.getId());
 
         // 2 新增转账拓展单
         String no = noRedisDAO.generate(TRANSFER_NO_PREFIX);
@@ -232,7 +230,7 @@ public class PayTransferServiceImpl implements PayTransferService {
         appService.validPayApp(appId);
         // 校验支付渠道是否有效
         PayChannelDO channel = channelService.validPayChannel(appId, channelCode);
-        PayClient client = payClientFactory.getPayClient(channel.getId());
+        PayClient client = channelService.getPayClient(channel.getId());
         if (client == null) {
             log.error("[validateChannelCanSubmit][渠道编号({}) 找不到对应的支付客户端]", channel.getId());
             throw exception(CHANNEL_NOT_FOUND);
