@@ -100,4 +100,11 @@ public class BpmTaskController {
         return success(true);
     }
 
+    @PutMapping("/add-sign")
+    @Operation(summary = "加签", description = "before, after为前加签后加签")
+    @PreAuthorize("@ss.hasPermission('bpm:task:add-sign')")
+    public CommonResult<Boolean> addSign(@RequestBody @Valid BpmTaskAddSignReqVO reqVO) {
+        taskService.addSign(reqVO,getLoginUserId());
+        return success(true);
+    }
 }

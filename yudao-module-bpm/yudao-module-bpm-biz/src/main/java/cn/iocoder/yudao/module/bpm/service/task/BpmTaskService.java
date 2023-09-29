@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.bpm.service.task;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import org.flowable.task.api.Task;
 
 import javax.validation.Valid;
@@ -61,6 +62,14 @@ public interface BpmTaskService {
      * @return 流程任务列表
      */
     List<BpmTaskRespVO> getTaskListByProcessInstanceId(String processInstanceId);
+
+
+    /**
+     * 通过任务 ID 集合，获取任务扩展表信息集合
+     * @param taskIdList 任务 ID
+     * @return 任务列表
+     */
+    List<BpmTaskExtDO> getTaskListByTaskIdList(List<String> taskIdList);
 
     /**
      * 通过任务
@@ -146,5 +155,12 @@ public interface BpmTaskService {
      * @param userId 用户编号
      */
     void delegateTask(BpmTaskDelegateReqVO reqVO, Long userId);
+
+    /**
+     * 任务加签
+     * @param reqVO 被加签的用户和任务ID，加签类型
+     * @param userId 当前用户 ID
+     */
+    void addSign(BpmTaskAddSignReqVO reqVO, Long userId);
 
 }

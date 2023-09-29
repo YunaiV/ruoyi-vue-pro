@@ -18,9 +18,11 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -144,5 +146,20 @@ public interface BpmTaskConvert {
         return CollectionUtils.convertList(elementList, element -> new BpmTaskSimpleRespVO()
                 .setName(element.getName())
                 .setDefinitionKey(element.getId()));
+    }
+
+    default TaskEntityImpl convert(TaskEntityImpl task,TaskEntityImpl parentTask){
+        task.setCategory(parentTask.getCategory());
+        task.setDescription(parentTask.getDescription());
+        task.setTenantId(parentTask.getTenantId());
+        task.setName(parentTask.getName());
+        task.setParentTaskId(parentTask.getId());
+        task.setProcessDefinitionId(parentTask.getProcessDefinitionId());
+        task.setProcessInstanceId(parentTask.getProcessInstanceId());
+        task.setTaskDefinitionKey(parentTask.getTaskDefinitionKey());
+        task.setTaskDefinitionId(parentTask.getTaskDefinitionId());
+        task.setPriority(parentTask.getPriority());
+        task.setCreateTime(new Date());
+        return task;
     }
 }

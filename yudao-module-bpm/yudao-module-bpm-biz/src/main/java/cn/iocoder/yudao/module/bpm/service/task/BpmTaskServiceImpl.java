@@ -2,7 +2,9 @@ package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.enums.SymbolConstant;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
@@ -13,8 +15,7 @@ import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.task.BpmTaskExtMapper;
-import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceDeleteReasonEnum;
-import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
+import cn.iocoder.yudao.module.bpm.enums.task.*;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.module.bpm.service.message.BpmMessageService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -26,6 +27,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.HistoryService;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -35,6 +37,8 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -81,6 +85,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Resource
     private BpmTaskExtMapper taskExtMapper;
+
+    @Resource
+    private ManagementService managementService;
 
     @Override
     public PageResult<BpmTaskTodoPageItemRespVO> getTodoTaskPage(Long userId, BpmTaskTodoPageReqVO pageVO) {
@@ -187,6 +194,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
+    public List<BpmTaskExtDO> getTaskListByTaskIdList(List<String> taskIdList) {
+        return taskExtMapper.selectListByTaskIds(taskIdList);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void approveTask(Long userId, @Valid BpmTaskApproveReqVO reqVO) {
         // 1.1 校验任务存在
@@ -202,14 +214,151 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             approveDelegateTask(reqVO, task);
             return;
         }
-
-        // 情况二：自己审批的任务，调用 complete 去完成任务
+        // 情况二：后加签的任务
+        if(BpmTaskAddSignTypeEnum.AFTER.getType().equals(task.getScopeType())) {
+            //后加签处理
+            handleAfterSignTask(task, reqVO);
+            return;
+        }
+        // 情况三：自己审批的任务，调用 complete 去完成任务
         // 完成任务，审批通过
         taskService.complete(task.getId(), instance.getProcessVariables());
         // 更新任务拓展表为通过
         taskExtMapper.updateByTaskId(
                 new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.APPROVE.getResult())
                         .setReason(reqVO.getReason()));
+        //处理加签任务
+        this.approveTask0(task);
+    }
+
+    /**
+     * 当前任务存在后加签任务，则不能马上完成，需要一个中间状态，并激活剩余所有子任务
+     * @param task 当前任务
+     * @param reqVO 前端请求参数
+     */
+    private void handleAfterSignTask(Task task,BpmTaskApproveReqVO reqVO){
+        //1.有向后加签，则该任务状态临时设置为 等待后加签任务完成 状态
+        taskExtMapper.updateByTaskId(
+                new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.ADD_SIGN_AFTER.getResult())
+                        .setReason(reqVO.getReason()).setEndTime(LocalDateTime.now()));
+        //2. 激活子任务
+        List<String> childrenTaskIdList = getChildrenTaskIdList(task.getId());
+        for (String childrenTaskId : childrenTaskIdList) {
+            taskService.resolveTask(childrenTaskId);
+        }
+        //更新任务扩展表中子任务为进行中
+        taskExtMapper.updateBatchByTaskIdList(childrenTaskIdList,
+                new BpmTaskExtDO().setResult(BpmProcessInstanceResultEnum.PROCESS.getResult()));
+    }
+
+
+    /**
+     * 处理当前任务的父任务
+     *
+     * @param task 当前任务
+     */
+    private void approveTask0(Task task) {
+        String parentTaskId = task.getParentTaskId();
+        if (StrUtil.isNotBlank(parentTaskId)) {
+            //1. 判断当前任务的父任务是否还有子任务
+            long subTaskCount = getSubTaskCount(parentTaskId);
+            if (subTaskCount == 0) {
+                //2. 获取父任务
+                Task parentTask = getTask(parentTaskId);
+                String scopeType = parentTask.getScopeType();
+                //3. 处理向前加签
+                if (BpmTaskAddSignTypeEnum.BEFORE.getType().equals(scopeType)) {
+                    //3.1 如果是向前加签的任务，则调用 resolveTask 指派父任务，将 owner 重新赋值给父任务的 assignee
+                    taskService.resolveTask(parentTaskId);
+                    //3.2 更新任务拓展表为处理中
+                    taskExtMapper.updateByTaskId(
+                            new BpmTaskExtDO().setTaskId(parentTask.getId()).setResult(BpmProcessInstanceResultEnum.PROCESS.getResult()));
+                }
+                //4. 处理向后加签
+                if (BpmTaskAddSignTypeEnum.AFTER.getType().equals(scopeType)) {
+                    handleAfterSign(parentTask, parentTaskId);
+                }
+                //5. 子任务已处理完成，清空 scopeType 字段，修改 parentTask 信息，方便后续可以继续向前后向后加签
+                // 再查询一次的原因是避免报错：Task was updated by another transaction concurrently
+                // 因为前面处理后可能会导致 parentTask rev 字段被修改，需要重新获取最新的
+                parentTask = getTask(parentTaskId);
+                if(parentTask !=null){
+                    //为空的情况是：已经通过 handleAfterSign 方法将任务完成了，所以 ru_task 表会查不到数据
+                    clearTaskScopeTypeAndSave(parentTask);
+                }
+
+            }
+        }
+    }
+
+    /**
+     * 处理后加签任务
+     *
+     * @param parentTask   当前审批任务的父任务
+     * @param parentTaskId 当前审批任务的父ID
+     */
+    private void handleAfterSign(Task parentTask, String parentTaskId) {
+        //4.1 更新 parentTask 的任务拓展表为通过
+        BpmTaskExtDO currentTaskExt = taskExtMapper.selectByTaskId(parentTask.getId());
+        BpmTaskExtDO currentTaskUpdateEntity = new BpmTaskExtDO().setTaskId(parentTask.getId())
+                .setResult(BpmProcessInstanceResultEnum.APPROVE.getResult());
+        if (currentTaskExt.getEndTime() == null) {
+            //有这个判断是因为
+            //4.2 以前没设置过结束时间，才去设置
+            currentTaskUpdateEntity.setEndTime(LocalDateTime.now());
+        }
+        taskExtMapper.updateByTaskId(currentTaskUpdateEntity);
+        //5. 继续往上处理，父任务继续往上查询
+        if (StrUtil.isEmpty(parentTask.getParentTaskId())) {
+            //5.1 该父任务为最顶级的祖先任务（没有父级ID）， 则直接完成父任务流转到下一步
+            taskService.complete(parentTaskId);
+        } else {
+            //5.2 如果有父级，递归查询上级任务是否都已经完成
+            //判断整条链路的任务是否完成
+            //例如从 A 任务加签了一个 B 任务， B 任务又加签了一个 C 任务，C任务加签了 D 任务
+            //此时，D 任务完成，要一直往上找到祖先任务 A ，调用 complete 方法完成 A 任务
+            boolean allChildrenTaskFinish = true;
+            while (StrUtil.isNotBlank(parentTask.getParentTaskId())) {
+                parentTask = getTask(parentTask.getParentTaskId());
+                BpmTaskExtDO bpmTaskExtDO = taskExtMapper.selectByTaskId(parentTask.getId());
+                if (bpmTaskExtDO == null) {
+                    break;
+                }
+                //任务已完成
+                allChildrenTaskFinish = BpmProcessInstanceResultEnum.isEndResult(bpmTaskExtDO.getResult());
+                if (!allChildrenTaskFinish) {
+                    //有一个未完成，则退出循环
+                    break;
+                }
+            }
+            if (allChildrenTaskFinish) {
+                //完成最后的顶级祖先任务
+                taskService.complete(parentTask.getId());
+            }
+        }
+    }
+
+    /**
+     * 清空 scopeType 字段，用于任务没有子任务时使用该方法，方便任务可以再次被不同的方式加签
+     *
+     * @param task 需要被清空的任务
+     */
+    private void clearTaskScopeTypeAndSave(Task task) {
+        TaskEntityImpl taskImpl = (TaskEntityImpl) task;
+        taskImpl.setScopeType(null);
+        taskService.saveTask(task);
+    }
+
+    /**
+     * 获取子任务个数
+     *
+     * @param parentTaskId 父类ID
+     * @return 剩余子任务个数
+     */
+    private Long getSubTaskCount(String parentTaskId) {
+        String tableName = managementService.getTableName(TaskEntity.class);
+        String sql = "select count(1) from " + tableName + " where PARENT_TASK_ID_=#{parentTaskId}";
+        return taskService.createNativeTaskQuery().sql(sql).parameter("parentTaskId", parentTaskId).count();
     }
 
     /**
@@ -226,7 +375,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         String comment = StrUtil.format("[{}]完成委派任务，任务重新回到[{}]手中，审批意见为:{}", currentUser.getNickname(),
                 sourceApproveUser.getNickname(), reqVO.getReason());
         taskService.addComment(reqVO.getId(), task.getProcessInstanceId(),
-                BpmProcessInstanceResultEnum.DELEGATE.getResult().toString(), comment);
+                BpmCommentTypeEnum.DELEGATE.getDesc(), comment);
 
         // 2.1 调用 resolveTask 完成任务。
         // 底层调用 TaskHelper.changeTaskAssignee(task, task.getOwner())：将 owner 设置为 assignee
@@ -290,6 +439,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     public void createTaskExt(Task task) {
         BpmTaskExtDO taskExtDO =
                 BpmTaskConvert.INSTANCE.convert2TaskExt(task).setResult(BpmProcessInstanceResultEnum.PROCESS.getResult());
+        //向后加签生成的任务，状态不能为进行中，需要等前面父任务完成
+        if(BpmTaskAddSignTypeEnum.AFTER_CHILDREN_TASK.getType().equals(task.getScopeType())){
+            taskExtDO.setResult(BpmProcessInstanceResultEnum.WAIT_BEFORE_TASK.getResult());
+        }
         taskExtMapper.insert(taskExtDO);
     }
 
@@ -343,21 +496,19 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-                ProcessInstance processInstance =
-                        processInstanceService.getProcessInstance(task.getProcessInstanceId());
-                AdminUserRespDTO startUser = adminUserApi.getUser(Long.valueOf(processInstance.getStartUserId()));
-                messageService.sendMessageWhenTaskAssigned(
-                        BpmTaskConvert.INSTANCE.convert(processInstance, startUser, task));
+                if(StrUtil.isNotEmpty(task.getAssignee())){
+                    ProcessInstance processInstance =
+                            processInstanceService.getProcessInstance(task.getProcessInstanceId());
+                    AdminUserRespDTO startUser = adminUserApi.getUser(Long.valueOf(processInstance.getStartUserId()));
+                    messageService.sendMessageWhenTaskAssigned(
+                            BpmTaskConvert.INSTANCE.convert(processInstance, startUser, task));
+                }
             }
         });
     }
 
     private Task getTask(String id) {
-        Task task = taskService.createTaskQuery().taskId(id).singleResult();
-        if (null == task) {
-            throw exception(TASK_NOT_EXISTS);
-        }
-        return task;
+        return taskService.createTaskQuery().taskId(id).singleResult();
     }
 
     private HistoricTaskInstance getHistoricTask(String id) {
@@ -437,7 +588,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     /**
      * 执行回退逻辑
      *
-     * @param currentTask          当前回退的任务
+     * @param currentTask   当前回退的任务
      * @param targetElement 需要回退到的目标任务
      * @param reqVO         前端参数封装
      */
@@ -458,7 +609,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 return;
             }
             taskService.addComment(task.getId(), currentTask.getProcessInstanceId(),
-                    BpmProcessInstanceResultEnum.BACK.getResult().toString(), reqVO.getReason());
+                    BpmCommentTypeEnum.BACK.getDesc(), reqVO.getReason());
         });
 
         // 3. 执行驳回
@@ -485,9 +636,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         String comment = StrUtil.format("[{}]将任务委派给[{}]，委派理由为:{}", currentUser.getNickname(),
                 delegateUser.getNickname(), reqVO.getReason());
         String taskId = reqVO.getId();
-        // TODO 海：后面改；感觉 comment 应该 type 做个枚举；不和 result 耦合在一起；
         taskService.addComment(taskId, task.getProcessInstanceId(),
-                BpmProcessInstanceResultEnum.DELEGATE.getResult().toString(), comment);
+                BpmCommentTypeEnum.DELEGATE.getDesc(), comment);
 
         // 3.1 设置任务所有人 (owner) 为原任务的处理人 (assignee)
         taskService.setOwner(taskId, task.getAssignee());
@@ -503,7 +653,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      * 校验任务委派参数
      *
      * @param userId 用户编号
-     * @param reqVO 任务编号，接收人ID
+     * @param reqVO  任务编号，接收人ID
      * @return 当前任务信息
      */
     private Task validateTaskCanDelegate(Long userId, BpmTaskDelegateReqVO reqVO) {
@@ -516,4 +666,125 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         return task;
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void addSign(BpmTaskAddSignReqVO reqVO, Long userId) {
+        //1.获取和校验任务
+        TaskEntityImpl taskEntity = validateAddSign(userId, reqVO);
+        AdminUserRespDTO currentUser = adminUserApi.getUser(userId);
+        List<AdminUserRespDTO> userList = adminUserApi.getUserList(reqVO.getUserIdList());
+        if (CollUtil.isEmpty(userList)) {
+            throw exception(TASK_ADD_SIGN_USER_NOT_EXIST);
+        }
+        //2.处理当前任务
+        //2.1 开启计数功能
+        taskEntity.setCountEnabled(true);
+        boolean addSignToBefore = reqVO.getType().equals(BpmTaskAddSignTypeEnum.BEFORE.getType());
+        if (addSignToBefore) {
+            //2.2 向前加签，设置 owner ，置空 assign ,等子任务都完成后，再调用 resolveTask 重新将 owner 设置为 assign
+            //原因是：不能和向前加签的子任务一起审批，需要等前面的子任务都完成才能审批
+            taskEntity.setOwner(taskEntity.getAssignee());
+            taskEntity.setAssignee(null);
+            //2.3 更新扩展表状态
+            taskExtMapper.updateByTaskId(
+                    new BpmTaskExtDO().setTaskId(taskEntity.getId())
+                            .setResult(BpmProcessInstanceResultEnum.ADD_SIGN_BEFORE.getResult())
+                            .setReason(reqVO.getReason()));
+        }
+        //2.4 记录加签方式，完成任务时需要用到判断
+        taskEntity.setScopeType(reqVO.getType());
+        //2.5 保存当前任务修改后的值
+        taskService.saveTask(taskEntity);
+
+        //3. 处理加签任务
+        this.createSignSubTasks(convertList(reqVO.getUserIdList(), String::valueOf), taskEntity);
+        //4. 记录加签 comment，拼接结果为： [当前用户]向前加签/向后加签给了[多个用户],理由为：reason
+        String comment = StrUtil.format("[{}]{}给了[{}],理由为：{}", currentUser.getNickname(), BpmTaskAddSignTypeEnum.formatDesc(reqVO.getType()),
+                String.join(SymbolConstant.D, convertList(userList, AdminUserRespDTO::getNickname)), reqVO.getReason());
+        taskService.addComment(reqVO.getId(), taskEntity.getProcessInstanceId(),
+                BpmCommentTypeEnum.ADD_SIGN.getDesc(), comment);
+    }
+
+
+    /**
+     * 校验任务存在和 存在 向前加签 的任务，则不能 向后加签，存在 向后加签 则不能 向前加签
+     *
+     * @param userId 当前用户 ID
+     * @param reqVO  请求参数，包含任务 ID 和加签类型
+     * @return 当前任务
+     */
+    private TaskEntityImpl validateAddSign(Long userId, BpmTaskAddSignReqVO reqVO) {
+        TaskEntityImpl taskEntity = (TaskEntityImpl) validateTask(userId, reqVO.getId());
+        //向前加签和向后加签不能同时存在
+        if (StrUtil.isNotBlank(taskEntity.getScopeType())
+                && !BpmTaskAddSignTypeEnum.AFTER_CHILDREN_TASK.getDesc().equals(taskEntity.getScopeType())) {
+            if (!taskEntity.getScopeType().equals(reqVO.getType())) {
+                throw exception(TASK_ADD_SIGN_TYPE_ERROR,
+                        BpmTaskAddSignTypeEnum.formatDesc(taskEntity.getScopeType()), BpmTaskAddSignTypeEnum.formatDesc(reqVO.getType()));
+            }
+        }
+        //同一个 key 的任务，审批人不重复
+        List<Task> taskList = taskService.createTaskQuery().processInstanceId(taskEntity.getProcessInstanceId())
+                .taskDefinitionKey(taskEntity.getTaskDefinitionKey()).list();
+        List<String> currentAssigneeList = convertList(taskList, Task::getAssignee);
+        List<String> frontAssigneeList = convertList(reqVO.getUserIdList(), String::valueOf);
+        currentAssigneeList.retainAll(frontAssigneeList);
+        if (CollUtil.isNotEmpty(currentAssigneeList)) {
+            List<AdminUserRespDTO> userList = adminUserApi.getUserList(convertList(currentAssigneeList, NumberUtils::parseLong));
+            throw exception(TASK_ADD_SIGN_USER_REPEAT, String.join(SymbolConstant.D, convertList(userList, AdminUserRespDTO::getNickname)));
+        }
+        return taskEntity;
+    }
+
+    /**
+     * 创建加签子任务
+     *
+     * @param addSingUserIdList 被加签的用户ID
+     * @param taskEntity        被加签的任务
+     */
+    private void createSignSubTasks(List<String> addSingUserIdList, TaskEntityImpl taskEntity) {
+        if (CollUtil.isNotEmpty(addSingUserIdList)) {
+            // 创建加签人的新任务,全部基于 taskEntity 为父任务来创建
+            addSingUserIdList.forEach(addSignId -> {
+                if (StrUtil.isNotBlank(addSignId)) {
+                    this.createSubTask(taskEntity, addSignId);
+                }
+            });
+        }
+    }
+
+    /**
+     * 创建子任务
+     *
+     * @param parentTask 父任务
+     * @param assignee   子任务的执行人
+     * @return
+     */
+    private void createSubTask(TaskEntityImpl parentTask, String assignee) {
+        //1.生成子任务
+        TaskEntityImpl task = (TaskEntityImpl) taskService.newTask(IdUtil.fastSimpleUUID());
+        task = BpmTaskConvert.INSTANCE.convert(task,parentTask);
+        if (BpmTaskAddSignTypeEnum.BEFORE.getType().equals(parentTask.getScopeType())) {
+            // 2. 前加签，才设置审批人，否则设置 owner
+            task.setAssignee(assignee);
+        } else {
+            //2.2 设置 owner 不设置 assignee 是因为不能同时审批，需要等父任务完成
+            task.setOwner(assignee);
+            //2.3 设置向后加签任务的 scopeType 为 afterChildrenTask，用于设置任务扩展表的状态
+            task.setScopeType(BpmTaskAddSignTypeEnum.AFTER_CHILDREN_TASK.getType());
+        }
+        taskService.saveTask(task);
+    }
+
+    /**
+     * 获取指定父级任务的所有子任务 ID 集合
+     * @param parentTaskId 父任务 ID
+     * @return 所有子任务的 ID 集合
+     */
+    private List<String> getChildrenTaskIdList(String parentTaskId){
+        String tableName = managementService.getTableName(TaskEntity.class);
+        String sql = "select ID_ from " + tableName + " where PARENT_TASK_ID_=#{parentTaskId}";
+        List<Task> childrenTaskList = taskService.createNativeTaskQuery().sql(sql).parameter("parentTaskId", parentTaskId).list();
+        return convertList(childrenTaskList, Task::getId);
+    }
 }

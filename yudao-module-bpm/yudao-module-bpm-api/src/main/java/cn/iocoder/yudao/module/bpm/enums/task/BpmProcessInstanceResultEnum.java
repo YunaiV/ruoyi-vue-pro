@@ -21,11 +21,26 @@ public enum BpmProcessInstanceResultEnum {
     // ========== 流程任务独有的状态 ==========
 
     BACK(5, "驳回"), // 退回
-    DELEGATE(6, "委派");
+    DELEGATE(6, "委派"),
+    /**
+     * 源任务已经审批完成，但是它使用了后加签，后加签的任务未完成，源任务就会是这个状态
+     * 例如：A审批， A 后加签了 B ，并且审批通过了任务，但是 B 还未审批，则当前任务状态为 待后加签任务完成
+     */
+    ADD_SIGN_AFTER(7, "待后加签任务完成"),
+    /**
+     * 源任务未审批，但是向前加签了，所以源任务状态变为 待前加签任务完成
+     * 例如：A审批， A 前加签了 B ，B 还未审核
+     */
+    ADD_SIGN_BEFORE(8, "待前加签任务完成"),
+    /**
+     * 后加签任务被创建时的初始状态
+     * 因为需要源任务先完成，才能到后加签的人来审批，所以加了一个状态区分
+     */
+    WAIT_BEFORE_TASK(9, "待前置任务完成");
 
     /**
      * 结果
-     *
+     * <p>
      * 如果新增时，注意 {@link #isEndResult(Integer)} 是否需要变更
      */
     private final Integer result;
@@ -36,14 +51,16 @@ public enum BpmProcessInstanceResultEnum {
 
     /**
      * 判断该结果是否已经处于 End 最终结果
-     *
+     * <p>
      * 主要用于一些结果更新的逻辑，如果已经是最终结果，就不再进行更新
      *
      * @param result 结果
      * @return 是否
      */
     public static boolean isEndResult(Integer result) {
-        return ObjectUtils.equalsAny(result, APPROVE.getResult(), REJECT.getResult(), CANCEL.getResult(), BACK.getResult());
+        return ObjectUtils.equalsAny(result, APPROVE.getResult(), REJECT.getResult(),
+                CANCEL.getResult(), BACK.getResult(),
+                ADD_SIGN_AFTER.getResult());
     }
 
 }
