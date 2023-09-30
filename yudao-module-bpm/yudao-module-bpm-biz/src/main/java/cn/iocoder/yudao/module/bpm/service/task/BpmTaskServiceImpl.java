@@ -34,6 +34,7 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
@@ -49,6 +50,8 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -797,12 +800,13 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         //3. 修改扩展表状态为取消
         taskExtMapper.updateBatchByTaskIdList(allTaskIdList,new BpmTaskExtDO().setResult(BpmProcessInstanceResultEnum.CANCEL.getResult())
                 .setReason(StrUtil.format("由于{}操作[减签]，任务被取消",user.getNickname())));
-        //4. 处理当前任务的父任务
-        this.handleParentTask(task);
-        //5.记录日志到父任务中
+        //4.记录日志到父任务中 先记录日志是因为，通过 handleParentTask 方法之后，任务可能被完成了，并且不存在了，会报异常，所以先记录
         String comment = StrUtil.format("{}操作了【减签】,审批人{}的任务被取消",user.getNickname(),cancelUser.getNickname());
         taskService.addComment(task.getParentTaskId(),task.getProcessInstanceId(),
                 BpmCommentTypeEnum.SUB_SIGN.getResult().toString(),comment);
+        //5. 处理当前任务的父任务
+        this.handleParentTask(task);
+
     }
 
     /**
@@ -864,9 +868,20 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if(CollUtil.isEmpty(childrenTaskIdList)){
             return Collections.emptyList();
         }
-        List<BpmTaskExtDO> bpmTaskExtDOList = taskExtMapper.selectListByTaskIds(childrenTaskIdList);
-        Set<Long> assigneeUserIdSet = convertSet(bpmTaskExtDOList, BpmTaskExtDO::getAssigneeUserId);
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(assigneeUserIdSet);
-        return BpmTaskConvert.INSTANCE.convertList(bpmTaskExtDOList,userMap);
+        //1. 只查询进行中的任务
+        List<BpmTaskExtDO> bpmTaskExtDOList = taskExtMapper.selectProcessListByTaskIds(childrenTaskIdList);
+        //2. 后加签的任务，可能不存在 assignee,所以还需要查询 owner
+        List<Task> taskList = taskService.createTaskQuery().taskIds(childrenTaskIdList).list();
+        Map<String, Task> idTaskMap = convertMap(taskList, TaskInfo::getId);
+        //3. 将 owner 和 assignee 统一到一个集合中
+        List<Long> userIds = taskList.stream()
+                .flatMap(control ->
+                        Stream.of(control.getAssignee(), control.getOwner())
+                        .filter(Objects::nonNull))
+                .distinct()
+                .map(NumberUtils::parseLong)
+                .collect(Collectors.toList());
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
+        return BpmTaskConvert.INSTANCE.convertList(bpmTaskExtDOList,userMap,idTaskMap);
     }
 }

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.bpm.convert.task;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
@@ -160,12 +161,17 @@ public interface BpmTaskConvert {
         return task;
     }
 
-    default List<BpmTaskSubSignRespVO> convertList(List<BpmTaskExtDO> bpmTaskExtDOList, Map<Long, AdminUserRespDTO> userMap){
+    default List<BpmTaskSubSignRespVO> convertList(List<BpmTaskExtDO> bpmTaskExtDOList,
+                                                   Map<Long, AdminUserRespDTO> userMap,
+                                                   Map<String, Task> idTaskMap){
         return CollectionUtils.convertList(bpmTaskExtDOList, task->{
             BpmTaskSubSignRespVO bpmTaskSubSignRespVO = new BpmTaskSubSignRespVO();
             bpmTaskSubSignRespVO.setName(task.getName());
             bpmTaskSubSignRespVO.setId(task.getTaskId());
-            AdminUserRespDTO assignUser = userMap.get(task.getAssigneeUserId());
+            Task sourceTask = idTaskMap.get(task.getTaskId());
+            // 后加签任务不会直接设置 assignee ,所以不存在 assignee 的情况，则去取 owner
+            String assignee = StrUtil.isNotEmpty(sourceTask.getAssignee()) ? sourceTask.getAssignee() : sourceTask.getOwner();
+            AdminUserRespDTO assignUser = userMap.get(NumberUtils.parseLong(assignee));
             if (assignUser != null) {
                 bpmTaskSubSignRespVO.setAssigneeUser(convert3(assignUser));
             }

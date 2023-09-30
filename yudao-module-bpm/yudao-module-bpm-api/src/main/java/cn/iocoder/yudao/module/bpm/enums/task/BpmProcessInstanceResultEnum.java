@@ -4,6 +4,9 @@ import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * 流程实例的结果
  *
@@ -62,5 +65,10 @@ public enum BpmProcessInstanceResultEnum {
                 CANCEL.getResult(), BACK.getResult(),
                 ADD_SIGN_AFTER.getResult());
     }
+
+    /**
+     * 能被减签的状态
+     */
+    public static final List<Integer> CAN_SUB_SIGN_STATUS = Arrays.asList(PROCESS.result, WAIT_BEFORE_TASK.result);
 
 }
