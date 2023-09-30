@@ -40,6 +40,7 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettle
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
+import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.cart.CartDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
@@ -54,6 +55,7 @@ import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties
 import cn.iocoder.yudao.module.trade.framework.order.core.annotations.TradeOrderLog;
 import cn.iocoder.yudao.module.trade.framework.order.core.utils.TradeOrderLogUtils;
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageRecordService;
+import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageUserService;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
 import cn.iocoder.yudao.module.trade.service.cart.CartService;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
@@ -108,6 +110,10 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private DeliveryExpressService deliveryExpressService;
     @Resource
     private TradeMessageService tradeMessageService;
+    @Resource
+    private BrokerageUserService brokerageUserService;
+    @Resource
+    private BrokerageRecordService brokerageRecordService;
 
     @Resource
     private ProductSpuApi productSpuApi;
@@ -129,8 +135,6 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private MemberLevelApi memberLevelApi;
     @Resource
     private MemberPointApi memberPointApi;
-    @Resource
-    private BrokerageRecordService brokerageRecordService;
     @Resource
     private ProductCommentApi productCommentApi;
 
@@ -304,6 +308,12 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
         // 6. 插入订单日志
         TradeOrderLogUtils.setOrderInfo(order.getId(), null, order.getStatus());
+
+        // 7. 设置订单推广人
+        BrokerageUserDO brokerageUser = brokerageUserService.getBrokerageUser(order.getUserId());
+        if (brokerageUser != null && brokerageUser.getBindUserId() != null) {
+            tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId()).setBrokerageUserId(brokerageUser.getBindUserId()));
+        }
 
         // TODO @LeeYan9: 是可以思考下, 订单的营销优惠记录, 应该记录在哪里, 微信讨论起来!
     }

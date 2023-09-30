@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.trade.dal.dataobject.order;
 
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryPickUpStoreDO;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
@@ -105,7 +107,12 @@ public class TradeOrderDO extends BaseDO {
      */
     private Boolean commentStatus;
 
-    // TODO @疯狂：加一个推广人编号；
+    /**
+     * 推广人编号
+     * {@link BrokerageUserDO#getId()}
+     * {@link MemberUserRespDTO#getId()}
+     */
+    private Long brokerageUserId;
 
     // ========== 价格 + 支付基本信息 ==========
 
