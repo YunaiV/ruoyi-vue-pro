@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.BooleanUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
@@ -14,11 +15,14 @@ import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokera
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserChildSummaryRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankByUserCountRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankPageReqVO;
+import cn.iocoder.yudao.module.trade.convert.brokerage.BrokerageUserConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.BrokerageUserMapper;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageBindModeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageEnabledConditionEnum;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springframework.stereotype.Service;
@@ -221,7 +225,21 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
 
     @Override
     public PageResult<AppBrokerageUserChildSummaryRespVO> getBrokerageUserChildSummaryPage(AppBrokerageUserChildSummaryPageReqVO pageReqVO, Long userId) {
-        IPage<AppBrokerageUserChildSummaryRespVO> pageResult = brokerageUserMapper.selectSummaryPageByUserId(MyBatisUtils.buildPage(pageReqVO), pageReqVO, userId);
+        // 1.1 根据昵称过滤用户
+        List<Long> ids = StrUtil.isBlank(pageReqVO.getNickname())
+                ? Collections.emptyList()
+                : convertList(memberUserApi.getUserListByNickname(pageReqVO.getNickname()), MemberUserRespDTO::getId);
+        // 1.2 生成推广员编号列表
+        List<Long> bindUserIds = buildBindUserIdsByLevel(userId, pageReqVO.getLevel());
+        // 2. 分页查询
+        IPage<AppBrokerageUserChildSummaryRespVO> pageResult = brokerageUserMapper.selectSummaryPageByUserId(
+                MyBatisUtils.buildPage(pageReqVO), ids, BrokerageRecordBizTypeEnum.ORDER.getType(),
+                BrokerageRecordStatusEnum.SETTLEMENT.getStatus(), bindUserIds, pageReqVO.getSortingField()
+        );
+        // 3. 拼接数据并返回
+        List<Long> userIds = convertList(pageResult.getRecords(), AppBrokerageUserChildSummaryRespVO::getId);
+        Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(userIds);
+        BrokerageUserConvert.INSTANCE.copyTo(pageResult, userMap);
         return new PageResult<>(pageResult.getRecords(), pageResult.getTotal());
     }
 
@@ -253,9 +271,9 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
 
     /**
      * 判断是否为新用户
-     *
+     * <p>
      * 标准：注册时间在 30 秒内的，都算新用户
-     *
+     * <p>
      * 疑问：为什么通过这样的方式实现？
      * 回答：因为注册在 member 模块，希望它和 trade 模块解耦，所以只能用这种约定的逻辑。
      *

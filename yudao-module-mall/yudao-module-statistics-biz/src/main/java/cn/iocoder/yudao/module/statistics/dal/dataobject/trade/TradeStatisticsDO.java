@@ -1,6 +1,6 @@
-package cn.iocoder.yudao.module.statistics.dal.mysql.trade;
+package cn.iocoder.yudao.module.statistics.dal.dataobject.trade;
 
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 /**
  * 交易统计 DO
- *
+ * <p>
  * 以天为维度，统计全部的数据
  *
  * @author 芋道源码
@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TradeStatisticsDO extends BaseDO {
+public class TradeStatisticsDO extends TenantBaseDO {
 
     /**
      * 编号，主键自增
@@ -69,7 +69,7 @@ public class TradeStatisticsDO extends BaseDO {
 
     /**
      * 充值订单数
-     *
+     * <p>
      * 从 PayWalletRechargeDO 计算
      */
     private Integer rechargePayCount;
