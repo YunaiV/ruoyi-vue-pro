@@ -12,6 +12,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -48,4 +49,7 @@ public interface CouponTemplateMapper extends BaseMapperX<CouponTemplateDO> {
 
     void updateTakeCount(@Param("id") Long id, @Param("incrCount") Integer incrCount);
 
+    default List<CouponTemplateDO> selectListByTakeType(Integer takeType) {
+        return selectList(CouponTemplateDO::getTakeType, takeType);
+    }
 }

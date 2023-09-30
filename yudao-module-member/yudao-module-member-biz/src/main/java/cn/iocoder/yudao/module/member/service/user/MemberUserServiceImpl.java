@@ -18,6 +18,7 @@ import cn.iocoder.yudao.module.member.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
+import cn.iocoder.yudao.module.member.mq.producer.user.RegisterCouponProducer;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeUseReqDTO;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
@@ -58,6 +59,9 @@ public class MemberUserServiceImpl implements MemberUserService {
     @Resource
     private PasswordEncoder passwordEncoder;
 
+    @Resource
+    private RegisterCouponProducer registerCouponProducer;
+
     @Override
     public MemberUserDO getUserByMobile(String mobile) {
         return memberUserMapper.selectByMobile(mobile);
@@ -89,6 +93,9 @@ public class MemberUserServiceImpl implements MemberUserService {
         user.setPassword(encodePassword(password)); // 加密密码
         user.setRegisterIp(registerIp);
         memberUserMapper.insert(user);
+
+        // 发送 MQ 消息，发放新人券
+        registerCouponProducer.sendMailSendMessage(user.getId());
         return user;
     }
 

@@ -8,10 +8,13 @@ import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template.Cou
 import cn.iocoder.yudao.module.promotion.convert.coupon.CouponTemplateConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.coupon.CouponTemplateMapper;
+import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTakeTypeEnum;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.COUPON_TEMPLATE_NOT_EXISTS;
@@ -91,6 +94,11 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
     @Override
     public void updateCouponTemplateTakeCount(Long id, int incrCount) {
         couponTemplateMapper.updateTakeCount(id, incrCount);
+    }
+
+    @Override
+    public List<CouponTemplateDO> getCouponTemplateByTakeType(CouponTakeTypeEnum takeType) {
+        return couponTemplateMapper.selectListByTakeType(takeType.getValue());
     }
 
 }

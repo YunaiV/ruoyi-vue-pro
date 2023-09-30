@@ -119,12 +119,9 @@ public interface CouponService {
     /**
      * 【系统】给用户发送新人券
      *
-     * @param templateId 优惠券模板编号
-     * @param userId     用户编号列表
+     * @param userId 用户编号
      */
-    default void takeCouponByRegister(Long templateId, Long userId) {
-        takeCoupon(templateId, CollUtil.newHashSet(userId), CouponTakeTypeEnum.REGISTER);
-    }
+    void takeCouponByRegister(Long userId);
 
     /**
      * 获取会员领取指定优惠券的数量

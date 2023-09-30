@@ -40,7 +40,6 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 import static java.util.Arrays.asList;
 
-// TODO @疯狂：注册时，赠送用户优惠劵；为了解耦，可以考虑注册时发个 MQ 消息；然后营销这里监听后消费；
 /**
  * 优惠劵 Service 实现类
  *
@@ -181,6 +180,14 @@ public class CouponServiceImpl implements CouponService {
 
         // 3. 增加优惠劵模板的领取数量
         couponTemplateService.updateCouponTemplateTakeCount(templateId, userIds.size());
+    }
+
+    @Override
+    public void takeCouponByRegister(Long userId) {
+        List<CouponTemplateDO> templates = couponTemplateService.getCouponTemplateByTakeType(CouponTakeTypeEnum.REGISTER);
+        for (CouponTemplateDO template : templates) {
+            takeCoupon(template.getId(), CollUtil.newHashSet(userId), CouponTakeTypeEnum.REGISTER);
+        }
     }
 
     @Override
