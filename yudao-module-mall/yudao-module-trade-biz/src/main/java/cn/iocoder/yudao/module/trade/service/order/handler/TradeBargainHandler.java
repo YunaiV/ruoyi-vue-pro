@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.trade.service.order.handler;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.module.promotion.api.bargain.BargainActivityApi;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
-import cn.iocoder.yudao.module.trade.service.order.bo.TradeAfterOrderCreateReqBO;
 import cn.iocoder.yudao.module.trade.service.order.bo.TradeBeforeOrderCreateReqBO;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +14,7 @@ import javax.annotation.Resource;
  * @author HUIHUI
  */
 @Component
-public class TradeBargainHandler implements TradeOrderHandler {
+public class TradeBargainHandler extends TradeOrderDefaultHandler {
 
     @Resource
     private BargainActivityApi bargainActivityApi;
@@ -32,16 +31,6 @@ public class TradeBargainHandler implements TradeOrderHandler {
         }
         // 扣减砍价活动的库存
         bargainActivityApi.updateBargainActivityStock(reqBO.getBargainActivityId(), reqBO.getCount());
-    }
-
-    @Override
-    public void afterOrderCreate(TradeAfterOrderCreateReqBO reqBO) {
-
-    }
-
-    @Override
-    public void rollback() {
-
     }
 
 }
