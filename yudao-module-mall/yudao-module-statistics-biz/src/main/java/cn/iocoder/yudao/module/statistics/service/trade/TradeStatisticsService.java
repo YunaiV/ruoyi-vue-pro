@@ -26,7 +26,8 @@ public interface TradeStatisticsService {
      *
      * @return 统计数据对照
      */
-    TradeStatisticsComparisonRespVO<TradeTrendSummaryRespVO> getTradeTrendSummaryComparison(LocalDateTime beginTime, LocalDateTime endTime);
+    TradeStatisticsComparisonRespVO<TradeTrendSummaryRespVO> getTradeTrendSummaryComparison(
+            LocalDateTime beginTime, LocalDateTime endTime);
 
     /**
      * 获得交易状况明细
@@ -34,4 +35,5 @@ public interface TradeStatisticsService {
      * @return 统计数据列表
      */
     List<TradeTrendSummaryRespVO> getTradeStatisticsList(LocalDateTime beginTime, LocalDateTime endTime);
+
 }

@@ -39,4 +39,6 @@ public class MemberSignInRecordDO extends BaseDO {
      */
     private Integer point;
 
+    // TODO 疯狂：签到的经验
+
 }

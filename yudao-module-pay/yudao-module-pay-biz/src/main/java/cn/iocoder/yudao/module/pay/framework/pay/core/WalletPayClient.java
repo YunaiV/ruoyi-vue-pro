@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.pay.framework.pay.wallet;
+package cn.iocoder.yudao.module.pay.framework.pay.core;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;

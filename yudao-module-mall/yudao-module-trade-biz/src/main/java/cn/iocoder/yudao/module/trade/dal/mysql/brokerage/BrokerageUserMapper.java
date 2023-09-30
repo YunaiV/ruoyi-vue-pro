@@ -139,7 +139,7 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
                                                                                   @Param("endTime") LocalDateTime endTime);
 
     IPage<AppBrokerageUserChildSummaryRespVO> selectSummaryPageByUserId(Page<?> page,
-                                                                        @Param("ids") List<Long> ids,
+                                                                        @Param("ids") List<Long> ids, // BrokerageUser 的 ids 数组
                                                                         @Param("bizType") Integer bizType,
                                                                         @Param("status") Integer status,
                                                                         @Param("bindUserIds") List<Long> bindUserIds,

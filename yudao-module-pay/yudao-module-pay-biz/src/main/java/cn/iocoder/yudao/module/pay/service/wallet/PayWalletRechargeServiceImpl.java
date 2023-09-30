@@ -40,6 +40,7 @@ import static cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum.*;
 @Service
 @Slf4j
 public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
+    
     /**
      * TODO 放到 配置文件中
      */

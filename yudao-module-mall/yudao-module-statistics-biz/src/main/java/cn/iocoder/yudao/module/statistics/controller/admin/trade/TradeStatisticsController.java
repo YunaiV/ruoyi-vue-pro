@@ -32,6 +32,7 @@ public class TradeStatisticsController {
     @Resource
     private TradeStatisticsService tradeStatisticsService;
 
+    // TODO @疯狂：要不这个就是 /trend/summary 的特例，前端自己查询两次？
     @GetMapping("/summary")
     @Operation(summary = "获得交易统计")
     @PreAuthorize("@ss.hasPermission('statistics:trade:query')")
@@ -39,6 +40,7 @@ public class TradeStatisticsController {
         return success(tradeStatisticsService.getTradeSummaryComparison());
     }
 
+    // TODO @疯狂：直接 comparison？主要 trend 和 comparison 二选一，一个是数据趋势，一个是数据对比哈；
     @GetMapping("/trend/summary")
     @Operation(summary = "获得交易状况统计")
     @PreAuthorize("@ss.hasPermission('statistics:trade:query')")
