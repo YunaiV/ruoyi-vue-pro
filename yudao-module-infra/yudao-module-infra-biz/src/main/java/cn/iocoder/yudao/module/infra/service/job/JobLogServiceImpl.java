@@ -70,4 +70,5 @@ public class JobLogServiceImpl implements JobLogService {
         return jobLogMapper.selectList(exportReqVO);
     }
 
+    // TODO @小吉祥：每天 0 点的时候，清理超过 14 天的日志；
 }

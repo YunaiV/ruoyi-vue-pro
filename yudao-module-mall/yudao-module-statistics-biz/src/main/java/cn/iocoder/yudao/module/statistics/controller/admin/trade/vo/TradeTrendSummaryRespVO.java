@@ -36,4 +36,5 @@ public class TradeTrendSummaryRespVO {
 
     @Schema(description = "商品退款金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer orderRefundPrice;
+
 }
