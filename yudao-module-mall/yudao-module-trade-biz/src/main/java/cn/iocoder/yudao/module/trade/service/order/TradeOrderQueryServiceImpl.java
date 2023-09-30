@@ -121,6 +121,7 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
         return getExpressTrackList(order);
     }
 
+    // TODO @puhui999：可以加个 spring 缓存，30 分钟；主要考虑及时性要求不高，但是每次调用需要钱；
     /**
      * 获得订单的物流轨迹
      *

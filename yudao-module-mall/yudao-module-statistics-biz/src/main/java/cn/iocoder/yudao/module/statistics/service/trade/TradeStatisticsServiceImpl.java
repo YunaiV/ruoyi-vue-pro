@@ -79,6 +79,7 @@ public class TradeStatisticsServiceImpl implements TradeStatisticsService {
      * @return 交易数据
      */
     private TradeSummaryRespBO getTradeSummaryByMonths(int months) {
+        // TODO @疯狂：可以在 LocalDateUtils 封装方法；获得月份的开始；以及结束两个方法；然后这里就可以直接调用了
         // 月份开始时间
         LocalDateTime beginOfMonth = LocalDateTime.now()
                 .plusMonths(months)

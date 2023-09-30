@@ -19,4 +19,5 @@ public class TradeSummaryRespBO {
      * 合计
      */
     private Integer summary;
+
 }

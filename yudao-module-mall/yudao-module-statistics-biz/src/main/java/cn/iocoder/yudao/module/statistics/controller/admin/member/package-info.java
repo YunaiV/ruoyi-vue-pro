@@ -6,4 +6,4 @@
  * 4. 地域统计
  * 5. 会员概览
  */
-package cn.iocoder.yudao.module.statistics.controller.member;
+package cn.iocoder.yudao.module.statistics.controller.admin.member;

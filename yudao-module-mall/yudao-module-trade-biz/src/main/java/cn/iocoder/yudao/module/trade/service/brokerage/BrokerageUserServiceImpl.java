@@ -230,12 +230,15 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
                 ? Collections.emptyList()
                 : convertList(memberUserApi.getUserListByNickname(pageReqVO.getNickname()), MemberUserRespDTO::getId);
         // 1.2 生成推广员编号列表
+        // TODO @疯狂：是不是可以先 1.2 查询出来，然后查询对应的昵称，进行过滤？避免昵称过滤返回的 id 过多；
         List<Long> bindUserIds = buildBindUserIdsByLevel(userId, pageReqVO.getLevel());
+
         // 2. 分页查询
         IPage<AppBrokerageUserChildSummaryRespVO> pageResult = brokerageUserMapper.selectSummaryPageByUserId(
                 MyBatisUtils.buildPage(pageReqVO), ids, BrokerageRecordBizTypeEnum.ORDER.getType(),
                 BrokerageRecordStatusEnum.SETTLEMENT.getStatus(), bindUserIds, pageReqVO.getSortingField()
         );
+
         // 3. 拼接数据并返回
         List<Long> userIds = convertList(pageResult.getRecords(), AppBrokerageUserChildSummaryRespVO::getId);
         Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(userIds);

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.statistics.controller.product;
+package cn.iocoder.yudao.module.statistics.controller.admin.product;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
