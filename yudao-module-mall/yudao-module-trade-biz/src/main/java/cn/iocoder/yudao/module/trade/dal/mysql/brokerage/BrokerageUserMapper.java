@@ -138,12 +138,34 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
                                                                                   @Param("beginTime") LocalDateTime beginTime,
                                                                                   @Param("endTime") LocalDateTime endTime);
 
+    /**
+     * 下级分销统计（分页）
+     *
+     * @param bizType      业务类型
+     * @param status       状态
+     * @param bindUserIds  绑定用户编号列表
+     * @param sortingField 排序字段
+     * @return 下级分销统计分页列表
+     */
     IPage<AppBrokerageUserChildSummaryRespVO> selectSummaryPageByUserId(Page<?> page,
-                                                                        @Param("ids") List<Long> ids, // BrokerageUser 的 ids 数组
                                                                         @Param("bizType") Integer bizType,
                                                                         @Param("status") Integer status,
                                                                         @Param("bindUserIds") List<Long> bindUserIds,
                                                                         @Param("sortingField") SortingField sortingField);
+
+    /**
+     * 下级分销统计（不分页）
+     *
+     * @param bizType      业务类型
+     * @param status       状态
+     * @param bindUserIds  绑定用户编号列表
+     * @param sortingField 排序字段
+     * @return 下级分销统计列表
+     */
+    List<AppBrokerageUserChildSummaryRespVO> selectSummaryListByUserId(@Param("bizType") Integer bizType,
+                                                                       @Param("status") Integer status,
+                                                                       @Param("bindUserIds") List<Long> bindUserIds,
+                                                                       @Param("sortingField") SortingField sortingField);
 
     default List<BrokerageUserDO> selectListByBindUserId(Long bindUserId) {
         return selectList(BrokerageUserDO::getBindUserId, bindUserId);
