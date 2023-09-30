@@ -140,4 +140,5 @@ public class AppProductSpuController {
         return price - newPrice;
     }
 
+    // TODO 芋艿：商品的浏览记录；
 }

@@ -146,18 +146,20 @@ public class TradeOrderItemDO extends BaseDO {
     private Integer pointPrice;
     /**
      * 使用的积分
+     *
+     * 目的：用于后续取消或者售后订单时，需要归还赠送
      */
     private Integer usePoint;
     /**
      * 赠送的积分
+     *
+     * 目的：用于后续取消或者售后订单时，需要扣减赠送
      */
     private Integer givePoint;
     /**
      * VIP 减免金额，单位：分
      */
     private Integer vipPrice;
-    // TODO @芋艿：如果商品 vip 折扣时，到底是新增一个 vipPrice 记录优惠记录，还是 vipDiscountPrice，记录 vip 的优惠；还是直接使用 vipPrice；
-    // 目前 crmeb 的选择，单独一个 vipPrice 记录优惠价格；感觉不一定合理，可以在看看有赞的；
 
     // ========== 售后基本信息 ==========
 

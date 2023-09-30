@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.trade.framework.aftersalelog.core.aop;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.util.spring.SpringExpressionUtils;
-import cn.iocoder.yudao.framework.operatelog.core.service.OperateLog;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.annotations.AfterSaleLog;
 import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.dto.TradeAfterSaleLogCreateReqDTO;
@@ -96,7 +95,7 @@ public class AfterSaleLogAspect {
         String id = MapUtil.getStr(spelMap, afterSaleLogPoint.id());
         result.put(ID, id);
         // 操作类型
-        String operateType = afterSaleLogPoint.operateType().description();
+        String operateType = afterSaleLogPoint.operateType().getContent();
         result.put(OPERATE_TYPE, operateType);
         // 日志内容
         String content = MapUtil.getStr(spelMap, afterSaleLogPoint.content());

@@ -51,4 +51,5 @@ public class MemberUserRespDTO {
      * 积分
      */
     private Integer point;
+
 }

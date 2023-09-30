@@ -20,6 +20,9 @@ public enum PayTransferTypeEnum implements IntArrayValuable {
     BANK_CARD(3, "银行卡"),
     WALLET_BALANCE(4, "钱包余额");
 
+    public static final String ALIPAY_LOGON_ID = "ALIPAY_LOGON_ID";
+    public static final String ALIPAY_ACCOUNT_NAME = "ALIPAY_ACCOUNT_NAME";
+
     private final Integer type;
     private final String name;
 
@@ -30,7 +33,7 @@ public enum PayTransferTypeEnum implements IntArrayValuable {
         return ARRAYS;
     }
 
-    public static PayTransferTypeEnum valueOf(Integer type) {
+    public static PayTransferTypeEnum ofType(Integer type) {
         return ArrayUtil.firstMatch(item -> item.getType().equals(type), values());
     }
 }

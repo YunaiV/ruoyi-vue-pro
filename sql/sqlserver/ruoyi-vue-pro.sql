@@ -5815,8 +5815,7 @@ GO
 
 CREATE TABLE [dbo].[system_dict_type]
 (
-    [
-    id]
+    [id]
     bigint
     IDENTITY
 (

@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.trade.service.price.calculator;
 
 import cn.hutool.core.util.BooleanUtil;
-import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.member.api.point.MemberPointApi;
 import cn.iocoder.yudao.module.member.api.point.dto.MemberPointConfigRespDTO;
@@ -15,11 +14,13 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.math.RoundingMode;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PRICE_CALCULATE_PAY_PRICE_ILLEGAL;
 
+// TODO @疯狂：搞个单测，嘿嘿；
 /**
  * 使用积分的 {@link TradePriceCalculator} 实现类
  *
@@ -29,6 +30,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 @Order(TradePriceCalculator.ORDER_POINT_USE)
 @Slf4j
 public class TradePointUsePriceCalculator implements TradePriceCalculator {
+
     @Resource
     private MemberPointApi memberPointApi;
     @Resource
@@ -43,18 +45,18 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
         }
         // 1.2 校验积分抵扣是否开启
         MemberPointConfigRespDTO config = memberPointApi.getConfig();
-        if (!checkDeductPointEnable(config)) {
+        if (!isDeductPointEnable(config)) {
             return;
         }
         // 1.3 校验用户积分余额
         MemberUserRespDTO user = memberUserApi.getUser(param.getUserId());
-        if (user.getPoint() == null || user.getPoint() < 0) {
+        if (user.getPoint() == null || user.getPoint() <= 0) {
             return;
         }
 
         // 2.1 计算积分优惠金额
         int pointPrice = calculatePointPrice(config, user.getPoint(), result);
-        // 2.1 计算分摊的积分、抵扣金额
+        // 2.2 计算分摊的积分、抵扣金额
         List<TradePriceCalculateRespBO.OrderItem> orderItems = filterList(result.getItems(), TradePriceCalculateRespBO.OrderItem::getSelected);
         List<Integer> dividePointPrices = TradePriceCalculatorHelper.dividePrice(orderItems, pointPrice);
         List<Integer> divideUsePoints = TradePriceCalculatorHelper.dividePrice(orderItems, result.getUsePoint());
@@ -74,16 +76,10 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
         TradePriceCalculatorHelper.recountAllPrice(result);
     }
 
-    private boolean checkDeductPointEnable(MemberPointConfigRespDTO config) {
-        if (config == null) {
-            return false;
-        }
-        if (!BooleanUtil.isTrue(config.getTradeDeductEnable())) {
-            return false;
-        }
-
-        // 有没有配置：1 积分抵扣多少分
-        return config.getTradeDeductUnitPrice() != null && config.getTradeDeductUnitPrice() > 0;
+    private boolean isDeductPointEnable(MemberPointConfigRespDTO config) {
+        return config != null &&
+                !BooleanUtil.isTrue(config.getTradeDeductEnable()) &&  // 积分功能是否启用
+                config.getTradeDeductUnitPrice() != null && config.getTradeDeductUnitPrice() > 0; // 有没有配置：1 积分抵扣多少分
     }
 
     private Integer calculatePointPrice(MemberPointConfigRespDTO config, Integer usePoint, TradePriceCalculateRespBO result) {
@@ -91,19 +87,24 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
         if (config.getTradeDeductMaxPrice() != null && config.getTradeDeductMaxPrice() > 0) {
             usePoint = Math.min(usePoint, config.getTradeDeductMaxPrice());
         }
+        // TODO @疯狂：这里应该是，抵扣到只剩下 0.01；
         // 积分优惠金额（分）
         int pointPrice = usePoint * config.getTradeDeductUnitPrice();
-        // 0元购!!!：用户积分比较多时，积分可以抵扣的金额要大于支付金额， 这时需要根据支付金额反推使用多少积分
-        if (result.getPrice().getPayPrice() < pointPrice) {
-            pointPrice = result.getPrice().getPayPrice();
-            // 反推需要扣除的积分
-            usePoint = NumberUtil.toBigDecimal(pointPrice)
-                    .divide(NumberUtil.toBigDecimal(config.getTradeDeductUnitPrice()), 0, RoundingMode.HALF_UP)
-                    .intValue();
+        if (result.getPrice().getPayPrice() <= pointPrice) {
+            // 禁止 0 元购
+            throw exception(PRICE_CALCULATE_PAY_PRICE_ILLEGAL);
         }
+//        // 允许0 元购!!!：用户积分比较多时，积分可以抵扣的金额要大于支付金额，这时需要根据支付金额反推使用多少积分
+//        if (result.getPrice().getPayPrice() < pointPrice) {
+//            pointPrice = result.getPrice().getPayPrice();
+//            // 反推需要扣除的积分
+//            usePoint = NumberUtil.toBigDecimal(pointPrice)
+//                    .divide(NumberUtil.toBigDecimal(config.getTradeDeductUnitPrice()), 0, RoundingMode.HALF_UP)
+//                    .intValue();
+//        }
         // 记录使用的积分
         result.setUsePoint(usePoint);
-
         return pointPrice;
     }
+
 }

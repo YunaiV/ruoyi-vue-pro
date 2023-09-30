@@ -1,14 +1,16 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdateAddressReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdatePriceReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderRemarkReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdateAddressReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdatePriceReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * 交易订单【写】Service 接口
@@ -60,15 +62,29 @@ public interface TradeOrderUpdateService {
      * @param userId 用户编号
      * @param id     订单编号
      */
-    void receiveOrder(Long userId, Long id);
+    void receiveOrderByMember(Long userId, Long id);
 
     /**
-     * 【会员】取消订单
+     * 【系统】自动收货交易订单
+     *
+     * @return 收货数量
+     */
+    int receiveOrderBySystem();
+
+    /**
+     * 【会员】取消交易订单
      *
      * @param userId 用户编号
      * @param id     订单编号
      */
-    void cancelOrder(Long userId, Long id);
+    void cancelOrderByMember(Long userId, Long id);
+
+    /**
+     * 【系统】自动取消订单
+     *
+     * @return 取消数量
+     */
+    int cancelOrderBySystem();
 
     /**
      * 【会员】删除订单
@@ -102,35 +118,42 @@ public interface TradeOrderUpdateService {
     // =================== Order Item ===================
 
     /**
-     * 更新交易订单项的售后状态
+     * 当售后申请后，更新交易订单项的售后状态
      *
-     * @param id                 交易订单项编号
-     * @param oldAfterSaleStatus 当前售后状态；如果不符，更新后会抛出异常
-     * @param newAfterSaleStatus 目标售后状态
+     * @param id          交易订单项编号
+     * @param afterSaleId 售后单编号
      */
-    default void updateOrderItemAfterSaleStatus(Long id, Integer oldAfterSaleStatus, Integer newAfterSaleStatus) {
-        updateOrderItemAfterSaleStatus(id, oldAfterSaleStatus, newAfterSaleStatus, null, null);
-    }
+    void updateOrderItemWhenAfterSaleCreate(@NotNull Long id, @NotNull Long afterSaleId);
 
     /**
-     * 更新交易订单项的售后状态
+     * 当售后完成后，更新交易订单项的售后状态
      *
-     * @param id                 交易订单项编号
-     * @param oldAfterSaleStatus 当前售后状态；如果不符，更新后会抛出异常
-     * @param newAfterSaleStatus 目标售后状态
-     * @param afterSaleId        售后单编号；当订单项发起售后时，必须传递该字段
-     * @param refundPrice        退款金额；当订单项退款成功时，必须传递该值
+     * @param id          交易订单项编号
+     * @param refundPrice 退款金额
      */
-    void updateOrderItemAfterSaleStatus(Long id, Integer oldAfterSaleStatus, Integer newAfterSaleStatus,
-                                        Long afterSaleId, Integer refundPrice);
+    void updateOrderItemWhenAfterSaleSuccess(@NotNull Long id, @NotNull Integer refundPrice);
 
     /**
-     * 创建订单项的评论
+     * 当售后取消（用户取消、管理员驳回、管理员拒绝收货）后，更新交易订单项的售后状态
+     *
+     * @param id 交易订单项编号
+     */
+    void updateOrderItemWhenAfterSaleCancel(@NotNull Long id);
+
+    /**
+     * 【会员】创建订单项的评论
      *
      * @param userId      用户编号
      * @param createReqVO 创建请求
      * @return 得到评价 id
      */
-    Long createOrderItemComment(Long userId, AppTradeOrderItemCommentCreateReqVO createReqVO);
+    Long createOrderItemCommentByMember(Long userId, AppTradeOrderItemCommentCreateReqVO createReqVO);
+
+    /**
+     * 【系统】创建订单项的评论
+     *
+     * @return 被评论的订单数
+     */
+    int createOrderItemCommentBySystem();
 
 }

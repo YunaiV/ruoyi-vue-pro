@@ -1,15 +1,23 @@
 package cn.iocoder.yudao.module.promotion.dal.mysql.coupon;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
+import cn.iocoder.yudao.module.promotion.service.coupon.bo.CouponTakeCountBO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.github.yulichang.toolkit.MPJWrappers;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 优惠劵 Mapper
@@ -19,11 +27,11 @@ import java.util.List;
 @Mapper
 public interface CouponMapper extends BaseMapperX<CouponDO> {
 
-    default PageResult<CouponDO> selectPage(CouponPageReqVO reqVO, Collection<Long> userIds) {
+    default PageResult<CouponDO> selectPage(CouponPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<CouponDO>()
                 .eqIfPresent(CouponDO::getTemplateId, reqVO.getTemplateId())
                 .eqIfPresent(CouponDO::getStatus, reqVO.getStatus())
-                .inIfPresent(CouponDO::getUserId, userIds)
+                .inIfPresent(CouponDO::getUserId, reqVO.getUserIds())
                 .betweenIfPresent(CouponDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(CouponDO::getId));
     }
@@ -59,6 +67,39 @@ public interface CouponMapper extends BaseMapperX<CouponDO> {
         return selectList(new LambdaQueryWrapperX<CouponDO>()
                 .eq(CouponDO::getTemplateId, templateId)
                 .in(CouponDO::getUserId, userIds)
+        );
+    }
+
+    // TODO @疯狂：这个是不是搞个 Map 就可以呀？
+    default List<CouponTakeCountBO> selectCountByUserIdAndTemplateIdIn(Long userId, Collection<Long> templateIds) {
+        return BeanUtil.copyToList(selectMaps(MPJWrappers.lambdaJoin(CouponDO.class)
+                .select(CouponDO::getTemplateId)
+                .selectCount(CouponDO::getId, CouponTakeCountBO::getCount)
+                .eq(CouponDO::getUserId, userId)
+                .in(CouponDO::getTemplateId, templateIds)
+                .groupBy(CouponDO::getTemplateId)), CouponTakeCountBO.class);
+    }
+
+    default List<CouponDO> selectListByUserIdAndStatusAndUsePriceLeAndProductScope(
+            Long userId, Integer status, Integer usePrice, List<Long> spuIds, List<Long> categoryIds) {
+        Function<List<Long>, String> productScopeValuesFindInSetFunc = ids -> ids.stream()
+                .map(id -> StrUtil.format("FIND_IN_SET({}, product_scope_values) ", id))
+                .collect(Collectors.joining(" OR "));
+        return selectList(new LambdaQueryWrapperX<CouponDO>()
+                .eq(CouponDO::getUserId, userId)
+                .eq(CouponDO::getStatus, status)
+                .le(CouponDO::getUsePrice, usePrice) // 价格小于等于，满足价格使用条件
+                .and(w -> w.eq(CouponDO::getProductScope, PromotionProductScopeEnum.ALL.getScope()) // 商品范围一：全部
+                        .or(ww -> ww.eq(CouponDO::getProductScope, PromotionProductScopeEnum.SPU.getScope()) // 商品范围二：满足指定商品
+                                .apply(productScopeValuesFindInSetFunc.apply(spuIds)))
+                        .or(ww -> ww.eq(CouponDO::getProductScope, PromotionProductScopeEnum.CATEGORY.getScope()) // 商品范围三：满足指定分类
+                                .apply(productScopeValuesFindInSetFunc.apply(categoryIds)))));
+    }
+
+    default List<CouponDO> selectListByStatusAndValidEndTimeLe(Integer status, LocalDateTime validEndTime) {
+        return selectList(new LambdaQueryWrapperX<CouponDO>()
+                .eq(CouponDO::getStatus, status)
+                .le(CouponDO::getValidEndTime, validEndTime)
         );
     }
 

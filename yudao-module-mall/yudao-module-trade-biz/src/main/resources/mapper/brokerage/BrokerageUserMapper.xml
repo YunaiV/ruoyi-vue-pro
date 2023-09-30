@@ -4,35 +4,38 @@
 
     <select id="selectSummaryPageByUserId"
             resultType="cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserChildSummaryRespVO">
-        SELECT bu.id, bu.bind_user_time AS brokerageTime, u.nickname, u.avatar,
+        SELECT bu.id, bu.bind_user_time AS brokerageTime,
         (SELECT SUM(price) FROM trade_brokerage_record r
-            WHERE r.user_id = u.id AND biz_type = 1 AND r.status = 1 AND r.deleted = FALSE) AS brokeragePrice,
+        WHERE r.user_id = bu.id AND biz_type = #{bizType} AND r.status = #{status} AND r.deleted = FALSE) AS brokeragePrice,
         (SELECT COUNT(1) FROM trade_brokerage_record r
-            WHERE r.user_id = u.id AND biz_type = 1 AND r.status = 1 AND r.deleted = FALSE) AS brokerageOrderCount,
+        WHERE r.user_id = bu.id AND biz_type = #{bizType} AND r.status = #{status} AND r.deleted = FALSE) AS brokerageOrderCount,
         (SELECT COUNT(1) FROM trade_brokerage_user c
-            WHERE c.bind_user_id = u.id AND c.deleted = FALSE) AS brokerageUserCount
-        FROM member_user AS u
-        JOIN trade_brokerage_user AS bu ON bu.id = u.id
+        WHERE c.bind_user_id = bu.id AND c.deleted = FALSE) AS brokerageUserCount
+        FROM trade_brokerage_user AS bu
         <where>
-            <if test="param.nickname != null and param.nickname != ''">
-                AND u.nickname LIKE concat('', #{param.nickname}, '')
+            bu.deleted = false
+            <if test="ids != null and ids.size() > 0">
+                and bu.id in
+                <foreach collection="ids" open="(" item="id" separator="," close=")">
+                    #{id}
+                </foreach>
             </if>
-            <if test="param.level == 1">
-                AND bu.bind_user_id = #{userId}
-            </if>
-            <if test="param.level == 2">
-                AND bu.bind_user_id IN (SELECT id FROM trade_brokerage_user c WHERE c.bind_user_id = #{userId})
+            <if test="bindUserIds != null and bindUserIds.size() > 0">
+                and bu.bind_user_id in
+                <foreach collection="bindUserIds" open="(" item="bindUserId" separator="," close=")">
+                    #{bindUserId}
+                </foreach>
             </if>
         </where>
         <choose>
-            <when test="param.sortingField.field == 'userCount'">
-                ORDER BY brokerageUserCount ${param.sortingField.order}
+            <when test="sortingField.field == 'userCount'">
+                ORDER BY brokerageUserCount ${sortingField.order}
             </when>
-            <when test="param.sortingField.field == 'orderCount'">
-                ORDER BY brokerageOrderCount ${param.sortingField.order}
+            <when test="sortingField.field == 'orderCount'">
+                ORDER BY brokerageOrderCount ${sortingField.order}
             </when>
-            <when test="param.sortingField.field == 'price'">
-                ORDER BY brokeragePrice ${param.sortingField.order}
+            <when test="sortingField.field == 'price'">
+                ORDER BY brokeragePrice ${sortingField.order}
             </when>
             <otherwise>
                 ORDER BY bu.bind_user_time DESC

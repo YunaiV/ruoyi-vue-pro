@@ -4,18 +4,25 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.BooleanUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
+import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.user.BrokerageUserPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserChildSummaryPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserChildSummaryRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankByUserCountRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankPageReqVO;
+import cn.iocoder.yudao.module.trade.convert.brokerage.BrokerageUserConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.BrokerageUserMapper;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageBindModeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageEnabledConditionEnum;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springframework.stereotype.Service;
@@ -23,10 +30,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -46,6 +50,9 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
 
     @Resource
     private TradeConfigService tradeConfigService;
+
+    @Resource
+    private MemberUserApi memberUserApi;
 
     @Override
     public BrokerageUserDO getBrokerageUser(Long id) {
@@ -154,7 +161,7 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     }
 
     @Override
-    public boolean bindBrokerageUser(Long userId, Long bindUserId, Boolean isNewUser) {
+    public boolean bindBrokerageUser(Long userId, Long bindUserId) {
         // 1. 获得分销用户
         boolean isNewBrokerageUser = false;
         BrokerageUserDO brokerageUser = brokerageUserMapper.selectById(userId);
@@ -164,7 +171,7 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         }
 
         // 2.1 校验是否能绑定用户
-        boolean validated = isUserCanBind(brokerageUser, isNewUser);
+        boolean validated = isUserCanBind(brokerageUser);
         if (!validated) {
             return false;
         }
@@ -218,11 +225,25 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
 
     @Override
     public PageResult<AppBrokerageUserChildSummaryRespVO> getBrokerageUserChildSummaryPage(AppBrokerageUserChildSummaryPageReqVO pageReqVO, Long userId) {
-        IPage<AppBrokerageUserChildSummaryRespVO> pageResult = brokerageUserMapper.selectSummaryPageByUserId(MyBatisUtils.buildPage(pageReqVO), pageReqVO, userId);
+        // 1.1 根据昵称过滤用户
+        List<Long> ids = StrUtil.isBlank(pageReqVO.getNickname())
+                ? Collections.emptyList()
+                : convertList(memberUserApi.getUserListByNickname(pageReqVO.getNickname()), MemberUserRespDTO::getId);
+        // 1.2 生成推广员编号列表
+        List<Long> bindUserIds = buildBindUserIdsByLevel(userId, pageReqVO.getLevel());
+        // 2. 分页查询
+        IPage<AppBrokerageUserChildSummaryRespVO> pageResult = brokerageUserMapper.selectSummaryPageByUserId(
+                MyBatisUtils.buildPage(pageReqVO), ids, BrokerageRecordBizTypeEnum.ORDER.getType(),
+                BrokerageRecordStatusEnum.SETTLEMENT.getStatus(), bindUserIds, pageReqVO.getSortingField()
+        );
+        // 3. 拼接数据并返回
+        List<Long> userIds = convertList(pageResult.getRecords(), AppBrokerageUserChildSummaryRespVO::getId);
+        Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(userIds);
+        BrokerageUserConvert.INSTANCE.copyTo(pageResult, userMap);
         return new PageResult<>(pageResult.getRecords(), pageResult.getTotal());
     }
 
-    private boolean isUserCanBind(BrokerageUserDO user, Boolean isNewUser) {
+    private boolean isUserCanBind(BrokerageUserDO user) {
         // 校验分销功能是否启用
         TradeConfigDO tradeConfig = tradeConfigService.getTradeConfig();
         if (tradeConfig == null || !BooleanUtil.isTrue(tradeConfig.getBrokerageEnabled())) {
@@ -236,8 +257,8 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
 
         // 校验分销关系绑定模式
         if (BrokerageBindModeEnum.REGISTER.getMode().equals(tradeConfig.getBrokerageBindMode())) {
-            // TODO @疯狂：是不是把 isNewUser 挪到这里好点呀？
-            if (!BooleanUtil.isTrue(isNewUser)) {
+            // 判断是否为新用户：注册时间在 30 秒内的，都算新用户
+            if (!isNewRegisterUser(user.getId())) {
                 throw exception(BROKERAGE_BIND_MODE_REGISTER); // 只有在注册时可以绑定
             }
         } else if (BrokerageBindModeEnum.ANYTIME.getMode().equals(tradeConfig.getBrokerageBindMode())) {
@@ -245,14 +266,29 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
                 throw exception(BROKERAGE_BIND_OVERRIDE); // 已绑定了推广人
             }
         }
-
         return true;
+    }
+
+    /**
+     * 判断是否为新用户
+     * <p>
+     * 标准：注册时间在 30 秒内的，都算新用户
+     * <p>
+     * 疑问：为什么通过这样的方式实现？
+     * 回答：因为注册在 member 模块，希望它和 trade 模块解耦，所以只能用这种约定的逻辑。
+     *
+     * @param userId 用户编号
+     * @return 是否新用户
+     */
+    private boolean isNewRegisterUser(Long userId) {
+        MemberUserRespDTO user = memberUserApi.getUser(userId);
+        return user != null && LocalDateTimeUtils.beforeNow(user.getCreateTime().plusSeconds(30));
     }
 
     private void validateCanBindUser(BrokerageUserDO user, Long bindUserId) {
         // 校验要绑定的用户有无推广资格
         BrokerageUserDO bindUser = brokerageUserMapper.selectById(bindUserId);
-        if (bindUser == null || !BooleanUtil.isTrue(bindUser.getBrokerageEnabled())) {
+        if (bindUser == null || BooleanUtil.isFalse(bindUser.getBrokerageEnabled())) {
             throw exception(BROKERAGE_BIND_USER_NOT_ENABLED);
         }
 
@@ -283,6 +319,9 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
      * @return 绑定用户编号列表
      */
     private List<Long> buildBindUserIdsByLevel(Long bindUserId, Integer level) {
+        if (bindUserId == null) {
+            return Collections.emptyList();
+        }
         Assert.isTrue(level == null || level <= 2, "目前只支持 level 小于等于 2");
         List<Long> bindUserIds = CollUtil.newArrayList();
         if (level == null || level == 1) {

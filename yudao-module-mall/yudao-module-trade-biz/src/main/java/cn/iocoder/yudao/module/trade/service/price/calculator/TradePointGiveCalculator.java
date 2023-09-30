@@ -16,6 +16,7 @@ import java.util.Optional;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 
+// TODO @疯狂：这个可以搞个单测；
 /**
  * 赠送积分的 {@link TradePriceCalculator} 实现类
  *
@@ -25,6 +26,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 @Order(TradePriceCalculator.ORDER_POINT_GIVE)
 @Slf4j
 public class TradePointGiveCalculator implements TradePriceCalculator {
+
     @Resource
     private MemberPointApi memberPointApi;
 
@@ -54,9 +56,9 @@ public class TradePointGiveCalculator implements TradePriceCalculator {
             TradePriceCalculateRespBO.OrderItem orderItem = orderItems.get(i);
             // 商品可能赠送了积分，所以这里要加上
             orderItem.setGivePoint(orderItem.getGivePoint() + dividePoints.get(i));
-            TradePriceCalculatorHelper.recountPayPrice(orderItem);
         }
         // 3.3 更新订单赠送积分
         TradePriceCalculatorHelper.recountAllGivePoint(result);
     }
+
 }

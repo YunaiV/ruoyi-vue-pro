@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
@@ -202,6 +203,8 @@ public class TradePriceCalculatorHelper {
     /**
      * 按照支付金额，返回每个订单项的分摊金额数组
      *
+     * 实际上 price 不仅仅可以传递的是金额，也可以是积分。因为它的实现逻辑，就是根据 payPrice 做分摊而已
+     *
      * @param orderItems 订单项数组
      * @param price      金额
      * @return 分摊金额数组，和传入的 orderItems 一一对应
@@ -222,6 +225,36 @@ public class TradePriceCalculatorHelper {
             // 2. 如果选中，则按照百分比，进行分摊
             int partPrice;
             if (i < orderItems.size() - 1) { // 减一的原因，是因为拆分时，如果按照比例，可能会出现.所以最后一个，使用反减
+                partPrice = (int) (price * (1.0D * orderItem.getPayPrice() / total));
+                remainPrice -= partPrice;
+            } else {
+                partPrice = remainPrice;
+            }
+            Assert.isTrue(partPrice >= 0, "分摊金额必须大于等于 0");
+            prices.add(partPrice);
+        }
+        return prices;
+    }
+
+    /**
+     * 计算订单调价价格分摊
+     *
+     * 和 {@link #dividePrice(List, Integer)} 逻辑一致，只是传入的是 TradeOrderItemDO 对象
+     *
+     * @param items         订单项
+     * @param price 订单支付金额
+     * @return 分摊金额数组，和传入的 orderItems 一一对应
+     */
+    public static List<Integer> dividePrice2(List<TradeOrderItemDO> items, Integer price) {
+        Integer total = getSumValue(items, TradeOrderItemDO::getPrice, Integer::sum);
+        assert total != null;
+        // 遍历每一个，进行分摊
+        List<Integer> prices = new ArrayList<>(items.size());
+        int remainPrice = price;
+        for (int i = 0; i < items.size(); i++) {
+            TradeOrderItemDO orderItem = items.get(i);
+            int partPrice;
+            if (i < items.size() - 1) { // 减一的原因，是因为拆分时，如果按照比例，可能会出现.所以最后一个，使用反减
                 partPrice = (int) (price * (1.0D * orderItem.getPayPrice() / total));
                 remainPrice -= partPrice;
             } else {

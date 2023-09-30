@@ -14,13 +14,13 @@ import javax.annotation.Resource;
  * @author owen
  */
 @Component
-@TenantJob
 public class BrokerageRecordUnfreezeJob implements JobHandler {
 
     @Resource
     private BrokerageRecordService brokerageRecordService;
 
     @Override
+    @TenantJob
     public String execute(String param) {
         int count = brokerageRecordService.unfreezeRecord();
         return StrUtil.format("解冻佣金 {} 个", count);

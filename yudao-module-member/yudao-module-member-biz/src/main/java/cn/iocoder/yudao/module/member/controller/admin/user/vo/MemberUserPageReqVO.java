@@ -41,4 +41,8 @@ public class MemberUserPageReqVO extends PageParam {
     @Schema(description = "用户分组编号", example = "1")
     private Long groupId;
 
+    // TODO 芋艿：注册用户类型；
+
+    // TODO 芋艿：登录用户类型；
+
 }

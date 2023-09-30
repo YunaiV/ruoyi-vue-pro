@@ -105,6 +105,8 @@ public class TradeOrderDO extends BaseDO {
      */
     private Boolean commentStatus;
 
+    // TODO @疯狂：加一个推广人编号；
+
     // ========== 价格 + 支付基本信息 ==========
 
     // 价格文档 - 淘宝：https://open.taobao.com/docV3.htm?docId=108471&docType=1

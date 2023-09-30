@@ -16,13 +16,13 @@ import javax.annotation.Resource;
  * @author 芋道源码
  */
 @Component
-@TenantJob
 public class PayOrderExpireJob implements JobHandler {
 
     @Resource
     private PayOrderService orderService;
 
     @Override
+    @TenantJob
     public String execute(String param) {
         int count = orderService.expireOrder();
         return StrUtil.format("支付过期 {} 个", count);

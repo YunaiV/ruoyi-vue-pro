@@ -38,4 +38,10 @@ public interface TradeOrderItemMapper extends BaseMapperX<TradeOrderItemDO> {
                 .eq(TradeOrderItemDO::getUserId, loginUserId));
     }
 
+    default List<TradeOrderItemDO> selectListByOrderIdAndCommentStatus(Long orderId, Boolean commentStatus) {
+        return selectList(new LambdaQueryWrapperX<TradeOrderItemDO>()
+                .eq(TradeOrderItemDO::getOrderId, orderId)
+                .eq(TradeOrderItemDO::getCommentStatus, commentStatus));
+    }
+
 }

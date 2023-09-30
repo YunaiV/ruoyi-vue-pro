@@ -10,11 +10,11 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum;
-import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageWithdrawService;
-import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryBO;
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageRecordService;
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageUserService;
-import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserWithdrawSummaryBO;
+import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageWithdrawService;
+import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryRespBO;
+import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageWithdrawSummaryRespBO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -88,27 +88,24 @@ public class BrokerageUserController {
         // 分页查询
         PageResult<BrokerageUserDO> pageResult = brokerageUserService.getBrokerageUserPage(pageVO);
 
-        // 涉及到的用户
-        Set<Long> userIds = convertSet(pageResult.getList(), BrokerageUserDO::getId);
         // 查询用户信息
+        Set<Long> userIds = convertSet(pageResult.getList(), BrokerageUserDO::getId);
         Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(userIds);
-        // TODO @疯狂：看看下面两个 getBrokerageUserCountByBindUserId、getWithdrawSummaryByUserId 有没可能一次性出结果，不然 n 次有点太花性能了；
-        // 合计分佣订单
-        Map<Long, UserBrokerageSummaryBO> userOrderSummaryMap = convertMap(userIds,
-                userId -> userId,
-                userId -> brokerageRecordService.getUserBrokerageSummaryByUserId(userId,
-                        BrokerageRecordBizTypeEnum.ORDER.getType(), BrokerageRecordStatusEnum.SETTLEMENT.getStatus()));
-        // 合计推广用户数量
+        // 合计分佣的推广订单
+        Map<Long, UserBrokerageSummaryRespBO> brokerageOrderSummaryMap = brokerageRecordService.getUserBrokerageSummaryMapByUserId(
+                userIds, BrokerageRecordBizTypeEnum.ORDER.getType(), BrokerageRecordStatusEnum.SETTLEMENT.getStatus());
+        // 合计分佣的推广用户
+        // TODO @疯狂：转成 map 批量读取
         Map<Long, Long> brokerageUserCountMap = convertMap(userIds,
                 userId -> userId,
                 userId -> brokerageUserService.getBrokerageUserCountByBindUserId(userId, null));
-        // 合计提现
-        Map<Long, UserWithdrawSummaryBO> withdrawMap = convertMap(userIds,
-                userId -> userId,
-                userId -> brokerageWithdrawService.getWithdrawSummaryByUserId(userId, BrokerageWithdrawStatusEnum.AUDIT_SUCCESS));
+        // 合计分佣的提现
+        // TODO @疯狂：如果未来支持了打款这个动作，可能 status 会不对；
+        Map<Long, BrokerageWithdrawSummaryRespBO> withdrawMap = brokerageWithdrawService.getWithdrawSummaryMapByUserId(
+                userIds, BrokerageWithdrawStatusEnum.AUDIT_SUCCESS);
         // 拼接返回
         return success(BrokerageUserConvert.INSTANCE.convertPage(pageResult, userMap, brokerageUserCountMap,
-                userOrderSummaryMap, withdrawMap));
+                brokerageOrderSummaryMap, withdrawMap));
     }
 
 }

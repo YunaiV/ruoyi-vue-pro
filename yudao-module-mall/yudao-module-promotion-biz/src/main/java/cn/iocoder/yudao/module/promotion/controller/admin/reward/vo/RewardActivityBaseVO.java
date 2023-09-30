@@ -84,7 +84,7 @@ public class RewardActivityBaseVO {
         @Schema(description = "赠送的优惠劵编号的数组", example = "1,2,3")
         private List<Long> couponIds;
 
-        @Schema(description = "赠送的优惠卷数量的数组", example = "1,2,3")
+        @Schema(description = "赠送的优惠券数量的数组", example = "1,2,3")
         private List<Integer> couponCounts;
 
         @AssertTrue(message = "优惠劵和数量必须一一对应")

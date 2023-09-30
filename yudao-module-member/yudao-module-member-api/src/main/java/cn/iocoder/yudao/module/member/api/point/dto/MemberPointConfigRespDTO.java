@@ -9,6 +9,7 @@ import lombok.Data;
  */
 @Data
 public class MemberPointConfigRespDTO {
+
     /**
      * 积分抵扣开关
      */
@@ -27,4 +28,5 @@ public class MemberPointConfigRespDTO {
      * 1 元赠送多少分
      */
     private Integer tradeGivePoint;
+
 }

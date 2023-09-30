@@ -39,6 +39,9 @@ public interface CouponTemplateMapper extends BaseMapperX<CouponTemplateDO> {
                 .eqIfPresent(CouponTemplateDO::getStatus, reqVO.getStatus())
                 .eqIfPresent(CouponTemplateDO::getDiscountType, reqVO.getDiscountType())
                 .betweenIfPresent(CouponTemplateDO::getCreateTime, reqVO.getCreateTime())
+                .eqIfPresent(CouponTemplateDO::getProductScope, reqVO.getProductScope())
+                .and(reqVO.getProductScopeValue() != null, w -> w.apply("FIND_IN_SET({0}, product_scope_values)",
+                        reqVO.getProductScopeValue()))
                 .and(canTakeConsumer != null, canTakeConsumer)
                 .orderByDesc(CouponTemplateDO::getId));
     }

@@ -68,7 +68,7 @@ public class RewardActivityMatchRespDTO {
          */
         private List<Long> couponIds;
         /**
-         * 赠送的优惠卷数量的数组
+         * 赠送的优惠券数量的数组
          */
         private List<Integer> couponCounts;
 

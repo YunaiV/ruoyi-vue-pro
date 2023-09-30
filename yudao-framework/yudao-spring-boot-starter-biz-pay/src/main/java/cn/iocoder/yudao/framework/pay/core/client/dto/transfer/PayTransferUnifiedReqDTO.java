@@ -58,7 +58,6 @@ public class PayTransferUnifiedReqDTO {
 
     /**
      * 支付渠道的额外参数
-     *
      */
     private Map<String, String> channelExtras;
 

@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 public class AppTradeOrderSettlementRespVO {
 
-    @Schema(description = "交易类型", required = true, example = "1") // 对应 TradeOrderTypeEnum 枚举
+    @Schema(description = "交易类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1") // 对应 TradeOrderTypeEnum 枚举
     private Integer type = 1; // TODO 芋艿：改成计算
 
     @Schema(description = "购物项数组", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -37,6 +37,8 @@ public class AppTradeOrderSettlementRespVO {
 
         // ========== SPU 信息 ==========
 
+        @Schema(description = "品类编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
+        private Long categoryId;
         @Schema(description = "SPU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
         private Long spuId;
         @Schema(description = "SPU 名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "Apple iPhone 12")

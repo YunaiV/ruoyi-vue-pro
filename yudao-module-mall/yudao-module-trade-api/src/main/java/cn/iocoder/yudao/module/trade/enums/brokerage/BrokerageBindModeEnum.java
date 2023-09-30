@@ -18,15 +18,15 @@ public enum BrokerageBindModeEnum implements IntArrayValuable {
     /**
      * 只要用户没有推广人，随时都可以绑定分销关系
      */
-    ANYTIME(1, "没有推广人"),
+    ANYTIME(1, "首次绑定"),
     /**
      * 仅新用户注册时才能绑定推广关系
      */
-    REGISTER(2, "新用户"),
+    REGISTER(2, "注册绑定"),
     /**
      * 每次扫码都覆盖
      */
-    OVERRIDE(3, "扫码覆盖"),
+    OVERRIDE(3, "覆盖绑定"),
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BrokerageBindModeEnum::getMode).toArray();

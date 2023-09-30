@@ -8,10 +8,10 @@ import lombok.Data;
 @Data
 public class AppDeliveryConfigRespVO {
 
-    @Schema(description = "腾讯地图 KEY", required = true, example = "123456")
+    @Schema(description = "腾讯地图 KEY", requiredMode = Schema.RequiredMode.REQUIRED, example = "123456")
     private String tencentLbsKey;
 
-    @Schema(description = "是否开启自提", required = true, example = "true")
+    @Schema(description = "是否开启自提", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     private Boolean pickUpEnable;
 
 }

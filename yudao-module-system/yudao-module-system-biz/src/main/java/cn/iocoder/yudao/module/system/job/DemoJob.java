@@ -11,14 +11,14 @@ import javax.annotation.Resource;
 import java.util.List;
 
 @Component
-@TenantJob // 标记多租户
 public class DemoJob implements JobHandler {
 
     @Resource
     private AdminUserMapper adminUserMapper;
 
     @Override
-    public String execute(String param) throws Exception {
+    @TenantJob // 标记多租户
+    public String execute(String param) {
         System.out.println("当前租户：" + TenantContextHolder.getTenantId());
         List<AdminUserDO> users = adminUserMapper.selectList();
         return "用户数量：" + users.size();

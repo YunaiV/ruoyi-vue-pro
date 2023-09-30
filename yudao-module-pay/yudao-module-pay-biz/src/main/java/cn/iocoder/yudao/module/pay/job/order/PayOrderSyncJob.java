@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
  * @author 芋道源码
  */
 @Component
-@TenantJob
 public class PayOrderSyncJob implements JobHandler {
 
     /**
@@ -34,6 +33,7 @@ public class PayOrderSyncJob implements JobHandler {
     private PayOrderService orderService;
 
     @Override
+    @TenantJob
     public String execute(String param) {
         LocalDateTime minCreateTime = LocalDateTime.now().minus(CREATE_TIME_DURATION_BEFORE);
         int count = orderService.syncOrder(minCreateTime);

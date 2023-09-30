@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.pay.service.channel;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WxPayClientConfig;
@@ -12,29 +13,25 @@ import cn.iocoder.yudao.module.pay.controller.admin.channel.vo.PayChannelUpdateR
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.channel.PayChannelMapper;
 import com.alibaba.fastjson.JSON;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import javax.validation.Validator;
-
-import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.addTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 @Import({PayChannelServiceImpl.class})
 public class PayChannelServiceTest extends BaseDbUnitTest {
-
-    private static final String ALIPAY_SERVER_URL = "https://openapi.alipay.com/gateway.do";
 
     @Resource
     private PayChannelServiceImpl channelService;
@@ -46,45 +43,6 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
     private PayClientFactory payClientFactory;
     @MockBean
     private Validator validator;
-
-    @BeforeEach
-    public void setUp() {
-        channelService.setChannelCache(null);
-    }
-
-    @Test
-    public void testInitLocalCache() {
-        // mock 数据
-        PayChannelDO dbChannel = randomPojo(PayChannelDO.class,
-                o -> o.setConfig(randomWxPayClientConfig()));
-        channelMapper.insert(dbChannel);// @Sql: 先插入出一条存在的数据
-
-        // 调用
-        channelService.initLocalCache();
-        // 校验缓存
-        assertEquals(1, channelService.getChannelCache().size());
-        assertEquals(dbChannel, channelService.getChannelCache().get(0));
-    }
-
-    @Test
-    public void testRefreshLocalCache() {
-        // mock 数据 01
-        PayChannelDO dbChannel = randomPojo(PayChannelDO.class,
-                o -> o.setConfig(randomWxPayClientConfig()).setUpdateTime(addTime(Duration.ofMinutes(-2))));
-        channelMapper.insert(dbChannel);// @Sql: 先插入出一条存在的数据
-        channelService.initLocalCache();
-        // mock 数据 02
-        PayChannelDO dbChannel02 = randomPojo(PayChannelDO.class,
-                o -> o.setConfig(randomWxPayClientConfig()));
-        channelMapper.insert(dbChannel02);// @Sql: 先插入出一条存在的数据
-
-        // 调用
-        channelService.refreshLocalCache();
-        // 校验缓存
-        assertEquals(2, channelService.getChannelCache().size());
-        assertEquals(dbChannel, channelService.getChannelCache().get(0));
-        assertEquals(dbChannel02, channelService.getChannelCache().get(1));
-    }
 
     @Test
     public void testCreateChannel_success() {
@@ -103,8 +61,7 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         assertPojoEquals(reqVO, channel, "config");
         assertPojoEquals(config, channel.getConfig());
         // 校验缓存
-        assertEquals(1, channelService.getChannelCache().size());
-        assertEquals(channel, channelService.getChannelCache().get(0));
+        assertNull(channelService.getClientCache().getIfPresent(channelId));
     }
 
     @Test
@@ -146,8 +103,7 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         assertPojoEquals(reqVO, channel, "config");
         assertPojoEquals(config, channel.getConfig());
         // 校验缓存
-        assertEquals(1, channelService.getChannelCache().size());
-        assertEquals(channel, channelService.getChannelCache().get(0));
+        assertNull(channelService.getClientCache().getIfPresent(channel.getId()));
     }
 
     @Test
@@ -179,7 +135,7 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         // 校验数据不存在了
         assertNull(channelMapper.selectById(id));
         // 校验缓存
-        assertEquals(0, channelService.getChannelCache().size());
+        assertNull(channelService.getClientCache().getIfPresent(id));
     }
 
     @Test
@@ -342,6 +298,28 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         List<PayChannelDO> channel = channelService.getEnableChannelList(appId);
         // 断言异常
         assertPojoEquals(channel, dbChannel03);
+    }
+
+    @Test
+    public void testGetPayClient() {
+        // mock 数据
+        PayChannelDO channel = randomPojo(PayChannelDO.class, o -> {
+            o.setCode(PayChannelEnum.ALIPAY_APP.getCode());
+            o.setConfig(randomAlipayPayClientConfig());
+        });
+        channelMapper.insert(channel);
+        // mock 参数
+        Long id = channel.getId();
+        // mock 方法
+        PayClient mockClient = mock(PayClient.class);
+        when(payClientFactory.getPayClient(eq(id))).thenReturn(mockClient);
+
+        // 调用
+        PayClient client = channelService.getPayClient(id);
+        // 断言
+        assertSame(client, mockClient);
+        verify(payClientFactory).createOrUpdatePayClient(eq(id), eq(channel.getCode()),
+                eq(channel.getConfig()));
     }
 
     public WxPayClientConfig randomWxPayClientConfig() {

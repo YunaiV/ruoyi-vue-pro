@@ -73,7 +73,7 @@ public class TradeOrderController {
 
         // 查询订单项
         List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(id);
-        // orderLog
+        // TODO @puhui999：orderLog
         // 拼接数据
         MemberUserRespDTO user = memberUserApi.getUser(order.getUserId());
         return success(TradeOrderConvert.INSTANCE.convert(order, orderItems, user));
@@ -119,5 +119,7 @@ public class TradeOrderController {
         tradeOrderUpdateService.updateOrderAddress(reqVO);
         return success(true);
     }
+
+    // TODO ：核销逻辑
 
 }
