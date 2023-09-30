@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.statistics.service.trade;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeStatisticsComparisonRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeSummaryRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeTrendSummaryRespVO;
@@ -13,8 +14,6 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 /**
@@ -79,18 +78,9 @@ public class TradeStatisticsServiceImpl implements TradeStatisticsService {
      * @return 交易数据
      */
     private TradeSummaryRespBO getTradeSummaryByMonths(int months) {
-        // TODO @疯狂：可以在 LocalDateUtils 封装方法；获得月份的开始；以及结束两个方法；然后这里就可以直接调用了
-        // 月份开始时间
-        LocalDateTime beginOfMonth = LocalDateTime.now()
-                .plusMonths(months)
-                .with(TemporalAdjusters.firstDayOfMonth())
-                .with(LocalTime.MIN);
-        // 月份截止时间
-        LocalDateTime endOfToday = LocalDateTime.now()
-                .plusMonths(months)
-                .with(TemporalAdjusters.lastDayOfMonth())
-                .with(LocalTime.MAX);
-        return tradeStatisticsMapper.selectOrderCreateCountSumAndOrderPayPriceSumByTimeBetween(beginOfMonth, endOfToday);
+        LocalDateTime monthDate = LocalDateTime.now().plusMonths(months);
+        return tradeStatisticsMapper.selectOrderCreateCountSumAndOrderPayPriceSumByTimeBetween(
+                LocalDateTimeUtils.beginOfMonth(monthDate), LocalDateTimeUtils.endOfMonth(monthDate));
     }
 
 }
