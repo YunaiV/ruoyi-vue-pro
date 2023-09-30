@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponMatchReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTakeTypeEnum;
 import cn.iocoder.yudao.module.promotion.service.coupon.bo.CouponTakeCountBO;
 
@@ -174,5 +175,14 @@ public interface CouponService {
      * @return 过期数量
      */
     int expireCoupon();
+
+    /**
+     * 获取用户是否可以领取优惠券
+     *
+     * @param userId    用户编号
+     * @param templates 优惠券列表
+     * @return 是否可以领取
+     */
+    Map<Long, Boolean> getUserCanCanTakeMap(Long userId, List<CouponTemplateDO> templates);
 
 }

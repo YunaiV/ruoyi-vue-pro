@@ -78,4 +78,17 @@ public interface CouponTemplateService {
      * @return 优惠券模板列表
      */
     List<CouponTemplateDO> getCouponTemplateByTakeType(CouponTakeTypeEnum takeType);
+
+    /**
+     * 获得优惠券模板列表
+     *
+     * @param canTakeTypes      可领取的类型列表
+     * @param productScope      商品使用范围类型
+     * @param productScopeValue 商品使用范围编号
+     * @param count             查询数量
+     * @return 优惠券模板列表
+     */
+    List<CouponTemplateDO> getCouponTemplateList(List<Integer> canTakeTypes, Integer productScope,
+                                                 Long productScopeValue, Integer count);
+
 }

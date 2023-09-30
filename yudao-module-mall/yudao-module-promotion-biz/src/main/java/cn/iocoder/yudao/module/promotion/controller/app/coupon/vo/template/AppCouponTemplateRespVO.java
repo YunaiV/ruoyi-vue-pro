@@ -55,7 +55,7 @@ public class AppCouponTemplateRespVO {
 
     // ========== 用户相关字段 ==========
 
-    @Schema(description = "是否已领取", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
-    private Boolean takeStatus;
+    @Schema(description = "是否可以领取", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
+    private Boolean canTake;
 
 }

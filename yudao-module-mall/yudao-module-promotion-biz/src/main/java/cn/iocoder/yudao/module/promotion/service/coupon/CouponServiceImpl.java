@@ -36,7 +36,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 import static java.util.Arrays.asList;
 
@@ -227,6 +227,29 @@ public class CouponServiceImpl implements CouponService {
             }
         }
         return count;
+    }
+
+    @Override
+    public Map<Long, Boolean> getUserCanCanTakeMap(Long userId, List<CouponTemplateDO> templates) {
+        Map<Long, Boolean> userCanTakeMap = convertMap(templates, CouponTemplateDO::getId, templateId -> true);
+        // 未登录时，都显示可以领取
+        if (userId == null) {
+            return userCanTakeMap;
+        }
+
+        // 过滤领取数量无限制的
+        Set<Long> templateIds = convertSet(templates, CouponTemplateDO::getId, template -> template.getTakeLimitCount() != -1);
+
+        // 检查用户领取的数量是否超过限制
+        if (CollUtil.isNotEmpty(templateIds)) {
+            Map<Long, Integer> couponTakeCountMap = this.getTakeCountMapByTemplateIds(templateIds, userId);
+            for (CouponTemplateDO template : templates) {
+                Integer takeCount = couponTakeCountMap.get(template.getId());
+                userCanTakeMap.put(template.getId(), takeCount == null || takeCount < template.getTakeLimitCount());
+            }
+        }
+
+        return userCanTakeMap;
     }
 
     /**
