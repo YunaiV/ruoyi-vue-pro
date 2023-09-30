@@ -20,6 +20,10 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
                 CombinationRecordDO::getOrderId, orderId);
     }
 
+    default List<CombinationRecordDO> selectListByUserId(Long userId) {
+        return selectList(CombinationRecordDO::getUserId, userId);
+    }
+
     default List<CombinationRecordDO> selectListByUserIdAndStatus(Long userId, Integer status) {
         return selectList(new LambdaQueryWrapperX<CombinationRecordDO>()
                 .eq(CombinationRecordDO::getUserId, userId)

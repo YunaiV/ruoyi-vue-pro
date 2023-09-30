@@ -56,6 +56,7 @@ import cn.iocoder.yudao.module.trade.service.cart.CartService;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
 import cn.iocoder.yudao.module.trade.service.message.TradeMessageService;
 import cn.iocoder.yudao.module.trade.service.message.bo.TradeOrderMessageWhenDeliveryOrderReqBO;
+import cn.iocoder.yudao.module.trade.service.order.bo.TradeAfterPayOrderReqBO;
 import cn.iocoder.yudao.module.trade.service.order.bo.TradeBeforeOrderCreateReqBO;
 import cn.iocoder.yudao.module.trade.service.order.handler.TradeOrderHandler;
 import cn.iocoder.yudao.module.trade.service.price.TradePriceService;
@@ -333,13 +334,9 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         if (updateCount == 0) {
             throw exception(ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
-        // 校验活动
-        // 1、拼团活动
-        // TODO @puhui999：这块也抽象到 handler 里
-        if (Objects.equals(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
-            // 更新拼团状态 TODO puhui999：订单支付失败或订单支付过期删除这条拼团记录
-            combinationRecordApi.updateRecordStatusToInProgress(order.getUserId(), order.getId(), LocalDateTime.now());
-        }
+        // 订单支付成功后
+        tradeOrderHandlers.forEach(tradeOrderHandler -> tradeOrderHandler.afterPayOrder(new TradeAfterPayOrderReqBO()
+                .setOrderId(order.getId()).setOrderType(order.getType()).setUserId(order.getUserId()).setPayTime(LocalDateTime.now())));
         // TODO 芋艿：发送订单变化的消息
 
         // TODO 芋艿：发送站内信
@@ -742,7 +739,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         }
 
         // 3. TODO 活动相关库存回滚需要活动 id，活动 id 怎么获取？app 端能否传过来；回复：从订单里拿呀
-        tradeOrderHandlers.forEach(handler -> handler.rollback());
+        tradeOrderHandlers.forEach(handler -> handler.cancelOrder());
 
         // 4. 回滚库存
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(id);

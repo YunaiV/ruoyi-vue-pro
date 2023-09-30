@@ -16,7 +16,6 @@ import cn.iocoder.yudao.module.product.dal.mysql.comment.ProductCommentMapper;
 import cn.iocoder.yudao.module.product.enums.comment.ProductCommentScoresEnum;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
-import cn.iocoder.yudao.module.trade.api.order.TradeOrderApi;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -48,8 +47,6 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
     @Lazy
     private ProductCommentServiceImpl productCommentService;
 
-    @MockBean
-    private TradeOrderApi tradeOrderApi;
     @MockBean
     private ProductSpuService productSpuService;
     @MockBean

@@ -85,17 +85,6 @@ public interface CombinationActivityService {
     List<CombinationProductDO> getCombinationProductsByActivityIds(Collection<Long> activityIds);
 
     /**
-     * 校验是否满足拼团条件
-     * 如果不满足，会抛出异常
-     *
-     * @param activityId 活动编号
-     * @param userId     用户编号
-     * @param skuId      sku 编号
-     * @param count      数量
-     */
-    void validateCombination(Long activityId, Long userId, Long skuId, Integer count);
-
-    /**
      * 获取正在进行的活动分页数据
      *
      * @param count 需要的数量

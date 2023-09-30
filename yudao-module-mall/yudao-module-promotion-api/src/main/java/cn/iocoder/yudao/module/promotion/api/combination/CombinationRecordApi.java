@@ -15,6 +15,16 @@ import java.time.LocalDateTime;
 public interface CombinationRecordApi {
 
     /**
+     * 校验是否满足拼团条件
+     *
+     * @param activityId 活动编号
+     * @param userId     用户编号
+     * @param skuId      sku 编号
+     * @param count      数量
+     */
+    void validateCombinationRecord(Long activityId, Long userId, Long skuId, Integer count);
+
+    /**
      * 创建开团记录
      *
      * @param reqDTO 请求 DTO

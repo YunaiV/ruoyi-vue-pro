@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.module.trade.service.price.calculator;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.module.promotion.api.seckill.SeckillActivityApi;
 import cn.iocoder.yudao.module.promotion.api.seckill.dto.SeckillActivityProductRespDTO;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import org.springframework.core.annotation.Order;
@@ -31,7 +29,7 @@ public class TradeSeckillActivityPriceCalculator implements TradePriceCalculator
     @Override
     public void calculate(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result) {
         // 1、判断订单类型和是否具有秒杀活动编号
-        if (ObjectUtil.notEqual(param.getType(), TradeOrderTypeEnum.SECKILL.getType()) && param.getSeckillActivityId() == null) {
+        if (param.getSeckillActivityId() == null) {
             return;
         }
         // 2、获取秒杀活动商品信息
