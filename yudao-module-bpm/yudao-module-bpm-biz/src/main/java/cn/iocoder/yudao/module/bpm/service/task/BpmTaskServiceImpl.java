@@ -15,7 +15,6 @@ import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.task.BpmTaskExtMapper;
-import cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.bpm.enums.task.*;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.module.bpm.service.message.BpmMessageService;
@@ -229,7 +228,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.APPROVE.getResult())
                         .setReason(reqVO.getReason()));
         //处理加签任务
-        this.approveTask0(task);
+        this.handleParentTask(task);
     }
 
     /**
@@ -258,7 +257,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      *
      * @param task 当前任务
      */
-    private void approveTask0(Task task) {
+    private void handleParentTask(Task task) {
         String parentTaskId = task.getParentTaskId();
         if (StrUtil.isNotBlank(parentTaskId)) {
             //1. 判断当前任务的父任务是否还有子任务
@@ -274,10 +273,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     //3.2 更新任务拓展表为处理中
                     taskExtMapper.updateByTaskId(
                             new BpmTaskExtDO().setTaskId(parentTask.getId()).setResult(BpmProcessInstanceResultEnum.PROCESS.getResult()));
-                }
-                //4. 处理向后加签
-                if (BpmTaskAddSignTypeEnum.AFTER.getType().equals(scopeType)) {
-                    handleAfterSign(parentTask, parentTaskId);
+                }else if (BpmTaskAddSignTypeEnum.AFTER.getType().equals(scopeType)) {
+                    //4. 处理向后加签
+                    handleAfterSign(parentTask);
                 }
                 //5. 子任务已处理完成，清空 scopeType 字段，修改 parentTask 信息，方便后续可以继续向前后向后加签
                 // 再查询一次的原因是避免报错：Task was updated by another transaction concurrently
@@ -296,9 +294,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      * 处理后加签任务
      *
      * @param parentTask   当前审批任务的父任务
-     * @param parentTaskId 当前审批任务的父ID
      */
-    private void handleAfterSign(Task parentTask, String parentTaskId) {
+    private void handleAfterSign(Task parentTask) {
+        String parentTaskId = parentTask.getId();
         //4.1 更新 parentTask 的任务拓展表为通过
         BpmTaskExtDO currentTaskExt = taskExtMapper.selectByTaskId(parentTask.getId());
         BpmTaskExtDO currentTaskUpdateEntity = new BpmTaskExtDO().setTaskId(parentTask.getId())
@@ -799,22 +797,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         //3. 修改扩展表状态为取消
         taskExtMapper.updateBatchByTaskIdList(allTaskIdList,new BpmTaskExtDO().setResult(BpmProcessInstanceResultEnum.CANCEL.getResult())
                 .setReason(StrUtil.format("由于{}操作[减签]，任务被取消",user.getNickname())));
-        //4. 判断当前任务的父任务是否还有子任务
-        Task parentTask = validateTaskExist(task.getParentTaskId());
-        Long subTaskCount = getSubTaskCount(task.getParentTaskId());
-        if(subTaskCount == 0){
-            if(BpmTaskAddSignTypeEnum.BEFORE.getType().equals(parentTask.getScopeType())){
-                //4.1 父任务是往前加签的，则进入判断,将当前任务的状态设置为进行中，并将 owner 设置回 assignee
-                taskExtMapper.updateByTaskId(new BpmTaskExtDO().setResult(BpmProcessInstanceResultEnum.PROCESS.getResult()).setTaskId(task.getParentTaskId()));
-                parentTask.setAssignee(parentTask.getOwner());
-                parentTask.setOwner(null);
-            }
-            //4.2 清空 scopeType 字段，修改task
-            clearTaskScopeTypeAndSave(parentTask);
-        }
+        //4. 处理当前任务的父任务
+        this.handleParentTask(task);
         //5.记录日志到父任务中
         String comment = StrUtil.format("{}操作了【减签】,审批人{}的任务被取消",user.getNickname(),cancelUser.getNickname());
-        taskService.addComment(parentTask.getId(),parentTask.getProcessInstanceId(),
+        taskService.addComment(task.getParentTaskId(),task.getProcessInstanceId(),
                 BpmCommentTypeEnum.SUB_SIGN.getResult().toString(),comment);
     }
 
