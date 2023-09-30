@@ -80,10 +80,11 @@ public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
     }
 
     @Select("SELECT SUM(price) FROM trade_brokerage_record " +
-            "WHERE user_id = #{userId} AND biz_type = #{bizType} " +
-            "AND create_time BETWEEN #{beginTime} AND #{endTime} AND deleted = FALSE")
+            "WHERE user_id = #{userId} AND biz_type = #{bizType} AND status = #{status} " +
+            "AND unfreeze_time BETWEEN #{beginTime} AND #{endTime} AND deleted = FALSE")
     Integer selectSummaryPriceByUserIdAndBizTypeAndCreateTimeBetween(@Param("userId") Long userId,
                                                                      @Param("bizType") Integer bizType,
+                                                                     @Param("status") Integer status,
                                                                      @Param("beginTime") LocalDateTime beginTime,
                                                                      @Param("endTime") LocalDateTime endTime);
 
@@ -98,4 +99,13 @@ public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
                                                                                  @Param("beginTime") LocalDateTime beginTime,
                                                                                  @Param("endTime") LocalDateTime endTime);
 
+    @Select("SELECT COUNT(1) FROM trade_brokerage_record " +
+            "WHERE biz_type = #{bizType} AND status = #{status} AND deleted = FALSE " +
+            "AND unfreeze_time BETWEEN #{beginTime} AND #{endTime} " +
+            "GROUP BY user_id HAVING SUM(price) > #{brokeragePrice}")
+    Integer selectCountByPriceGt(@Param("brokeragePrice") Integer brokeragePrice,
+                                 @Param("bizType") Integer bizType,
+                                 @Param("status") Integer status,
+                                 @Param("beginTime") LocalDateTime beginTime,
+                                 @Param("endTime") LocalDateTime endTime);
 }

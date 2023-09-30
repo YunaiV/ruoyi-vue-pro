@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.trade.convert.brokerage.BrokerageRecordConvert;
 import cn.iocoder.yudao.module.trade.convert.brokerage.BrokerageUserConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum;
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageRecordService;
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageUserService;
@@ -84,7 +85,7 @@ public class AppBrokerageUserController {
         LocalDateTime beginTime = LocalDateTimeUtil.beginOfDay(yesterday);
         LocalDateTime endTime = LocalDateTimeUtil.endOfDay(yesterday);
         Integer yesterdayPrice = brokerageRecordService.getSummaryPriceByUserId(brokerageUser.getId(),
-                BrokerageRecordBizTypeEnum.ORDER.getType(), beginTime, endTime);
+                BrokerageRecordBizTypeEnum.ORDER, BrokerageRecordStatusEnum.SETTLEMENT, beginTime, endTime);
         // 统计用户提现的佣金
         Integer withdrawPrice = brokerageWithdrawService.getWithdrawSummaryListByUserId(Collections.singleton(brokerageUser.getId()),
                         BrokerageWithdrawStatusEnum.AUDIT_SUCCESS).stream()
