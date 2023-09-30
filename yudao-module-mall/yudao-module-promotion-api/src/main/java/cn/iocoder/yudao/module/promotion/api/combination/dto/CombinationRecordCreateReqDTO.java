@@ -29,6 +29,11 @@ public class CombinationRecordCreateReqDTO {
     @NotNull(message = "sku 编号不能为空")
     private Long skuId;
     /**
+     * 购买的商品数量
+     */
+    @NotNull(message = "购买数量不能为空")
+    private Integer count;
+    /**
      * 订单编号
      */
     @NotNull(message = "订单编号不能为空")

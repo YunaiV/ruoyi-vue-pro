@@ -29,8 +29,10 @@ public class TradeCombinationHandler extends TradeOrderDefaultHandler {
             return;
         }
 
+        // 获取商品信息
+        TradeBeforeOrderCreateReqBO.Item item = reqBO.getItems().get(0);
         // 校验是否满足拼团活动相关限制
-        combinationRecordApi.validateCombinationRecord(reqBO.getCombinationActivityId(), reqBO.getUserId(), reqBO.getSkuId(), reqBO.getCount());
+        combinationRecordApi.validateCombinationRecord(reqBO.getCombinationActivityId(), reqBO.getUserId(), item.getSkuId(), item.getCount());
     }
 
     @Override

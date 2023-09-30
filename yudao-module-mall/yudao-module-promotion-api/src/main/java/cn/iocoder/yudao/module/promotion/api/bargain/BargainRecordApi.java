@@ -20,13 +20,4 @@ public interface BargainRecordApi {
      */
     void createBargainRecord(@Valid BargainRecordCreateReqDTO reqDTO);
 
-    /**
-     * 查询砍价是否成功
-     *
-     * @param userId  用户编号
-     * @param orderId 订单编号
-     * @return 砍价是否成功
-     */
-    boolean isBargainRecordSuccess(Long userId, Long orderId);
-
 }

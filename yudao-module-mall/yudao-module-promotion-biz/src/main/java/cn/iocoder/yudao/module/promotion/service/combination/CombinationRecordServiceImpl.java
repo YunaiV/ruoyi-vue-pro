@@ -16,6 +16,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationR
 import cn.iocoder.yudao.module.promotion.dal.mysql.combination.CombinationRecordMapper;
 import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.api.order.TradeOrderApi;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +27,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 
 // TODO 芋艿：等拼团记录做完，完整 review 下
@@ -101,7 +102,6 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         return recordDO;
     }
 
-    // TODO @puhui999：有一个应该在创建那要做下；就是当前 activityId 已经有未支付的订单，不允许在发起新的；要么支付，要么去掉先；
     @Override
     public void validateCombinationRecord(Long activityId, Long userId, Long skuId, Integer count) {
         // 1.1 校验拼团活动是否存在
@@ -110,55 +110,69 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         if (ObjectUtil.equal(activity.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
             throw exception(COMBINATION_ACTIVITY_STATUS_DISABLE);
         }
-        // 1.3 校验是否超出单次限购数量
+        // 2 校验是否超出单次限购数量
         if (count > activity.getSingleLimitCount()) {
             throw exception(COMBINATION_RECORD_FAILED_SINGLE_LIMIT_COUNT_EXCEED);
         }
-
-        // 2. 校验是否超出总限购数量
+        // 3、校验是否有拼团记录
         List<CombinationRecordDO> recordList = getRecordListByUserIdAndActivityId(userId, activityId);
         if (CollUtil.isEmpty(recordList)) {
             return;
         }
-        // 过滤出拼团成功的
-        // TODO @puhui999：count 要不存一个在 record 里？
-        List<Long> skuIds = convertList(recordList, CombinationRecordDO::getSkuId,
-                item -> ObjectUtil.equals(item.getStatus(), CombinationRecordStatusEnum.SUCCESS.getStatus()));
-        Integer countSum = tradeOrderApi.getOrderItemCountSumByOrderIdAndSkuId(convertList(recordList,
-                CombinationRecordDO::getOrderId,
-                item -> ObjectUtil.equals(item.getStatus(), CombinationRecordStatusEnum.SUCCESS.getStatus())), skuIds);
-        if (activity.getTotalLimitCount() < countSum) {
+        // 4、校验是否超出总限购数量
+        Integer sumValue = getSumValue(convertList(recordList, CombinationRecordDO::getCount,
+                item -> ObjectUtil.equals(item.getStatus(), CombinationRecordStatusEnum.SUCCESS.getStatus())), i -> i, Integer::sum);
+        if ((sumValue + count) > activity.getTotalLimitCount()) {
             throw exception(COMBINATION_RECORD_FAILED_TOTAL_LIMIT_COUNT_EXCEED);
+        }
+        // 5、校验拼团记录是否存在未支付的订单（如果存在未支付的订单则不允许发起新的拼团）
+        CombinationRecordDO record = findFirst(recordList, item -> ObjectUtil.equals(item.getStatus(), null));
+        if (record == null) {
+            return;
+        }
+        // 5.1、查询关联的订单是否已经支付
+        // 当前 activityId 已经有未支付的订单，不允许在发起新的；要么支付，要么去掉先；
+        Integer orderStatus = tradeOrderApi.getOrderStatus(record.getOrderId());
+        if (ObjectUtil.equal(orderStatus, TradeOrderStatusEnum.UNPAID.getStatus())) {
+            throw exception(COMBINATION_RECORD_FAILED_ORDER_STATUS_UNPAID);
         }
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {
-        // 1.1 校验拼团活动
-        CombinationActivityDO activity = combinationActivityService.validateCombinationActivityExists(reqDTO.getActivityId());
-        // 1.2 需要校验下，他当前是不是已经参加了该拼团；
-        // TODO @puhui999：拼团应该可以重复参加；应该去校验总共的上限哈，就是 activity.totalLimitCount
-        List<CombinationRecordDO> records = recordMapper.selectListByUserId(reqDTO.getUserId());
-        List<Long> orderIds = convertList(records, CombinationRecordDO::getOrderId);
-        // 1.2.1 如果存在订单才去校验
-        if (CollUtil.isNotEmpty(orderIds)) {
 
+        // 1.1、 校验拼团活动
+        CombinationActivityDO activity = combinationActivityService.validateCombinationActivityExists(reqDTO.getActivityId());
+        // 1.2 校验是否超出单次限购数量
+        if (reqDTO.getCount() > activity.getSingleLimitCount()) {
+            throw exception(COMBINATION_RECORD_FAILED_SINGLE_LIMIT_COUNT_EXCEED);
         }
-        // 1.3 校验用户是否参加了其它拼团
+        // 1.3、校验是否有拼团记录
+        List<CombinationRecordDO> records = getRecordListByUserIdAndActivityId(reqDTO.getUserId(), reqDTO.getActivityId());
+        if (CollUtil.isEmpty(records)) {
+            return;
+        }
+        // 1.4、校验是否超出总限购数量
+        Integer sumValue = getSumValue(convertList(records, CombinationRecordDO::getCount,
+                item -> ObjectUtil.equals(item.getStatus(), CombinationRecordStatusEnum.SUCCESS.getStatus())), i -> i, Integer::sum);
+        if ((sumValue + reqDTO.getCount()) > activity.getTotalLimitCount()) {
+            throw exception(COMBINATION_RECORD_FAILED_TOTAL_LIMIT_COUNT_EXCEED);
+        }
+        // 2、 校验用户是否参加了其它拼团
         List<CombinationRecordDO> recordDOList = recordMapper.selectListByUserIdAndStatus(reqDTO.getUserId(), CombinationRecordStatusEnum.IN_PROGRESS.getStatus());
         if (CollUtil.isNotEmpty(recordDOList)) {
             throw exception(COMBINATION_RECORD_FAILED_HAVE_JOINED);
         }
-        // 1、4 校验活动是否开启
+        // 3、 校验活动是否开启
         if (LocalDateTime.now().isAfter(activity.getStartTime())) {
             throw exception(COMBINATION_RECORD_FAILED_TIME_NOT_START);
         }
-        // 1.5 校验当前活动是否过期
+        // 4、 校验当前活动是否过期
         if (LocalDateTime.now().isAfter(activity.getEndTime())) {
             throw exception(COMBINATION_RECORD_FAILED_TIME_END);
         }
-        // 1.6 父拼团是否存在,是否已经满了
+        // 5、 父拼团是否存在,是否已经满了
         if (reqDTO.getHeadId() != null) {
             // 查询进行中的父拼团
             CombinationRecordDO record = recordMapper.selectOneByHeadId(reqDTO.getHeadId(), CombinationRecordStatusEnum.IN_PROGRESS.getStatus());
@@ -170,8 +184,6 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
                 throw exception(COMBINATION_RECORD_USER_FULL);
             }
         }
-
-        // TODO @puhui999：单次限购
 
         // 2. 创建拼团记录
         MemberUserRespDTO user = memberUserApi.getUser(reqDTO.getUserId());

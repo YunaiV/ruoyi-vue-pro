@@ -29,8 +29,11 @@ public class TradeBargainHandler extends TradeOrderDefaultHandler {
         if (ObjectUtil.notEqual(TradeOrderTypeEnum.BARGAIN.getType(), reqBO.getOrderType())) {
             return;
         }
+
+        // 获取商品信息
+        TradeBeforeOrderCreateReqBO.Item item = reqBO.getItems().get(0);
         // 扣减砍价活动的库存
-        bargainActivityApi.updateBargainActivityStock(reqBO.getBargainActivityId(), reqBO.getCount());
+        bargainActivityApi.updateBargainActivityStock(reqBO.getBargainActivityId(), item.getCount());
     }
 
 }

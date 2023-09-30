@@ -26,12 +26,6 @@ public interface TradeOrderItemMapper extends BaseMapperX<TradeOrderItemDO> {
         return selectList(TradeOrderItemDO::getOrderId, orderIds);
     }
 
-    default List<TradeOrderItemDO> selectListByOrderIdAnSkuId(Collection<Long> orderIds, Collection<Long> skuIds) {
-        return selectList(new LambdaQueryWrapperX<TradeOrderItemDO>()
-                .in(TradeOrderItemDO::getOrderId, orderIds)
-                .in(TradeOrderItemDO::getSkuId, skuIds));
-    }
-
     default TradeOrderItemDO selectByIdAndUserId(Long orderItemId, Long loginUserId) {
         return selectOne(new LambdaQueryWrapperX<TradeOrderItemDO>()
                 .eq(TradeOrderItemDO::getId, orderItemId)

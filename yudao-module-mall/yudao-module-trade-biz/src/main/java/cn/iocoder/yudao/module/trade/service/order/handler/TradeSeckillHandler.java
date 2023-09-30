@@ -29,8 +29,11 @@ public class TradeSeckillHandler extends TradeOrderDefaultHandler {
         if (ObjectUtil.notEqual(TradeOrderTypeEnum.SECKILL.getType(), reqBO.getOrderType())) {
             return;
         }
+
+        // 获取商品信息
+        TradeBeforeOrderCreateReqBO.Item item = reqBO.getItems().get(0);
         // 扣减秒杀活动的库存
-        seckillActivityApi.updateSeckillStock(reqBO.getSeckillActivityId(), reqBO.getSkuId(), reqBO.getCount());
+        seckillActivityApi.updateSeckillStock(reqBO.getSeckillActivityId(), item.getSkuId(), item.getCount());
     }
 
 }

@@ -97,8 +97,8 @@ public interface CombinationActivityConvert {
     default CombinationRecordDO convert(CombinationRecordCreateReqDTO reqDTO,
                                         CombinationActivityDO activity, MemberUserRespDTO user,
                                         ProductSpuRespDTO spu, ProductSkuRespDTO sku) {
-        // TODO @puhui999：订单付款后需要设置开始时间和结束时间；
         return convert(reqDTO)
+                .setCount(reqDTO.getCount())
                 .setVirtualGroup(false)
                 .setExpireTime(activity.getStartTime().plusHours(activity.getLimitDuration()))
                 .setUserSize(activity.getUserSize())

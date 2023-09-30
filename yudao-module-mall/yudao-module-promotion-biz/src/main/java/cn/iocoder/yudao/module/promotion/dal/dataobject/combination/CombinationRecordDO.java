@@ -62,6 +62,10 @@ public class CombinationRecordDO extends BaseDO {
      * SKU 编号
      */
     private Long skuId;
+    /**
+     * 购买的商品数量
+     */
+    private Integer count;
 
     /**
      * 用户编号

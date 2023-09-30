@@ -60,7 +60,6 @@ import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
 import cn.iocoder.yudao.module.trade.service.message.TradeMessageService;
 import cn.iocoder.yudao.module.trade.service.message.bo.TradeOrderMessageWhenDeliveryOrderReqBO;
 import cn.iocoder.yudao.module.trade.service.order.bo.TradeAfterPayOrderReqBO;
-import cn.iocoder.yudao.module.trade.service.order.bo.TradeBeforeOrderCreateReqBO;
 import cn.iocoder.yudao.module.trade.service.order.handler.TradeOrderHandler;
 import cn.iocoder.yudao.module.trade.service.price.TradePriceService;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
@@ -254,12 +253,9 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private void beforeCreateTradeOrder(Long userId, AppTradeOrderCreateReqVO createReqVO,
                                         TradePriceCalculateRespBO calculateRespBO) {
         // 1. 执行订单创建前置处理器
-        TradeBeforeOrderCreateReqBO beforeOrderCreateReqBO = TradeOrderConvert.INSTANCE.convert(createReqVO);
-        beforeOrderCreateReqBO.setOrderType(calculateRespBO.getType());
-        beforeOrderCreateReqBO.setUserId(userId);
-        beforeOrderCreateReqBO.setCount(getSumValue(createReqVO.getItems(), AppTradeOrderSettlementReqVO.Item::getCount, Integer::sum));
         // TODO @puhui999：这里有个纠结点；handler 的定义是只处理指定类型的订单的拓展逻辑；还是通用的 handler，类似可以处理优惠劵等等
-        tradeOrderHandlers.forEach(handler -> handler.beforeOrderCreate(beforeOrderCreateReqBO));
+        tradeOrderHandlers.forEach(handler ->
+                handler.beforeOrderCreate(TradeOrderConvert.INSTANCE.convert(userId, createReqVO, calculateRespBO)));
 
         // 2. 下单时扣减商品库存
         productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convertNegative(createReqVO.getItems()));
@@ -279,9 +275,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                                        TradeOrderDO order, List<TradeOrderItemDO> orderItems,
                                        TradePriceCalculateRespBO calculateRespBO) {
         // 1. 执行订单创建后置处理器
-        // TODO @puhui999：从通用性来说，应该不用 orderItems.get(0)
         tradeOrderHandlers.forEach(handler -> handler.afterOrderCreate(
-                TradeOrderConvert.INSTANCE.convert(userId, createReqVO, order, orderItems.get(0))));
+                TradeOrderConvert.INSTANCE.convert(userId, createReqVO, order, orderItems)));
 
         // 2. 有使用优惠券时更新
         // 不在前置扣减的原因，是因为优惠劵要记录使用的订单号
@@ -467,14 +462,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                 throw exception(ORDER_DELIVERY_FAIL_COMBINATION_RECORD_STATUS_NOT_SUCCESS);
             }
         }
-        // 订单类类型：砍价
-        if (Objects.equals(TradeOrderTypeEnum.BARGAIN.getType(), order.getType())) {
-            // 校验订单砍价是否成功
-            // TODO @puhui999：砍价的话，应该不用校验。因为是砍价成功后，才可以下单
-            if (!bargainRecordApi.isBargainRecordSuccess(order.getUserId(), order.getId())) {
-                throw exception(ORDER_DELIVERY_FAIL_BARGAIN_RECORD_STATUS_NOT_SUCCESS);
-            }
-        }
+
         return order;
     }
 
@@ -641,8 +629,6 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         }
 
         // 2. TODO 活动相关库存回滚需要活动 id，活动 id 怎么获取？app 端能否传过来；回复：从订单里拿呀
-        tradeOrderHandlers.forEach(handler -> handler.rollback());
-        // 3. TODO 活动相关库存回滚需要活动 id，活动 id 怎么获取？app 端能否传过来；回复：从订单里拿呀
         tradeOrderHandlers.forEach(handler -> handler.cancelOrder());
 
         // 3. 回滚库存
