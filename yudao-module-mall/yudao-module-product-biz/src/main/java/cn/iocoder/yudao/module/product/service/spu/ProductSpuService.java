@@ -136,4 +136,14 @@ public interface ProductSpuService {
      */
     Long getSpuCountByCategoryId(Long categoryId);
 
+
+    /**
+     * 校验商品是否有效。如下情况，视为无效：
+     * 1. 商品编号不存在
+     * 2. 商品被禁用
+     *
+     * @param ids 商品编号数组
+     * @return 商品 SPU 列表
+     */
+    List<ProductSpuDO> validateSpuList(Collection<Long> ids);
 }

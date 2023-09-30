@@ -2,19 +2,22 @@ package cn.iocoder.yudao.module.promotion.service.coupon;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.product.api.category.ProductCategoryApi;
+import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template.CouponTemplateCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template.CouponTemplatePageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template.CouponTemplateUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.convert.coupon.CouponTemplateConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.coupon.CouponTemplateMapper;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTakeTypeEnum;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-
 import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.COUPON_TEMPLATE_NOT_EXISTS;
@@ -32,9 +35,15 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
     @Resource
     private CouponTemplateMapper couponTemplateMapper;
 
-    // TODO @疯狂：新增/修改时，需要校验对应的商品、分类是否存在
+    @Resource
+    private ProductCategoryApi productCategoryApi;
+    @Resource
+    private ProductSpuApi productSpuApi;
+
     @Override
     public Long createCouponTemplate(CouponTemplateCreateReqVO createReqVO) {
+        // 校验商品范围
+        validateProductScope(createReqVO.getProductScope(), createReqVO.getProductScopeValues());
         // 插入
         CouponTemplateDO couponTemplate = CouponTemplateConvert.INSTANCE.convert(createReqVO)
                 .setStatus(CommonStatusEnum.ENABLE.getStatus());
@@ -51,6 +60,8 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
         if (updateReqVO.getTotalCount() < couponTemplate.getTakeCount()) {
             throw exception(COUPON_TEMPLATE_TOTAL_COUNT_TOO_SMALL, couponTemplate.getTakeCount());
         }
+        // 校验商品范围
+        validateProductScope(updateReqVO.getProductScope(), updateReqVO.getProductScopeValues());
 
         // 更新
         CouponTemplateDO updateObj = CouponTemplateConvert.INSTANCE.convert(updateReqVO);
@@ -79,6 +90,14 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
             throw exception(COUPON_TEMPLATE_NOT_EXISTS);
         }
         return couponTemplate;
+    }
+
+    private void validateProductScope(Integer productScope, List<Long> productScopeValues) {
+        if (Objects.equals(PromotionProductScopeEnum.SPU.getScope(), productScope)) {
+            productSpuApi.validateSpuList(productScopeValues);
+        } else if (Objects.equals(PromotionProductScopeEnum.CATEGORY.getScope(), productScope)) {
+            productCategoryApi.validateCategoryList(productScopeValues);
+        }
     }
 
     @Override

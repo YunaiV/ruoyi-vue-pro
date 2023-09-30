@@ -22,10 +22,26 @@ public interface ProductSpuApi {
     List<ProductSpuRespDTO> getSpuList(Collection<Long> ids);
 
     /**
+     * 批量查询 SPU 数组，并且校验是否 SPU 是否有效
+     *
+     * @param ids SPU 编号列表
+     * @return SPU 数组
+     */
+    List<ProductSpuRespDTO> getSpuListAndValidate(Collection<Long> ids);
+
+    /**
      * 获得 SPU
      *
      * @return SPU
      */
     ProductSpuRespDTO getSpu(Long id);
 
+    /**
+     * 校验商品是否有效。如下情况，视为无效：
+     * 1. 商品编号不存在
+     * 2. 商品被禁用
+     *
+     * @param ids 商品编号数组
+     */
+    void validateSpuList(Collection<Long> ids);
 }
