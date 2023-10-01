@@ -146,8 +146,8 @@ public class ProductSpuServiceImpl implements ProductSpuService {
             return Collections.emptyList();
         }
         // 获得商品信息
-        List<ProductSpuDO> spuList = productSpuMapper.selectBatchIds(ids);
-        Map<Long, ProductSpuDO> spuMap = CollectionUtils.convertMap(spuList, ProductSpuDO::getId);
+        List<ProductSpuDO> list = productSpuMapper.selectBatchIds(ids);
+        Map<Long, ProductSpuDO> spuMap = CollectionUtils.convertMap(list, ProductSpuDO::getId);
         // 校验
         ids.forEach(id -> {
             ProductSpuDO spu = spuMap.get(id);
@@ -158,8 +158,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
                 throw exception(SPU_NOT_ENABLE, spu.getName());
             }
         });
-
-        return spuList;
+        return list;
     }
 
     @Override

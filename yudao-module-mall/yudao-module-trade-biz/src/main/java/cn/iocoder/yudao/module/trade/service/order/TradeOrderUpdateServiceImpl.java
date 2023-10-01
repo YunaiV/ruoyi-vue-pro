@@ -236,6 +236,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             order.setReceiverName(createReqVO.getReceiverName()).setReceiverMobile(createReqVO.getReceiverMobile());
             order.setPickUpVerifyCode(RandomUtil.randomNumbers(8)); // 随机一个核销码，长度为 8 位
         }
+        // TODO @疯狂：是不是可以在这里设置下推广人哈；
         tradeOrderMapper.insert(order);
         return order;
     }

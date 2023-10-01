@@ -19,4 +19,5 @@ public class PayWalletUserReqVO {
     @NotNull(message = "用户类型不能为空")
     @InEnum(value = UserTypeEnum.class, message = "用户类型必须是 {value}")
     private Integer userType;
+
 }

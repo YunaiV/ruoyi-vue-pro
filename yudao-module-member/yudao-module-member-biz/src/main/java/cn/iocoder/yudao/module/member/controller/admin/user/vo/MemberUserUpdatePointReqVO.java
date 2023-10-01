@@ -6,7 +6,7 @@ import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
 
-@Schema(description = "管理后台 - 会员用户 修改积分 Request VO")
+@Schema(description = "管理后台 - 用户修改积分 Request VO")
 @Data
 @ToString(callSuper = true)
 public class MemberUserUpdatePointReqVO {

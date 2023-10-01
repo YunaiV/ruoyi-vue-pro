@@ -116,7 +116,7 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
     }
 
     @Override
-    public List<CouponTemplateDO> getCouponTemplateByTakeType(CouponTakeTypeEnum takeType) {
+    public List<CouponTemplateDO> getCouponTemplateListByTakeType(CouponTakeTypeEnum takeType) {
         return couponTemplateMapper.selectListByTakeType(takeType.getValue());
     }
 

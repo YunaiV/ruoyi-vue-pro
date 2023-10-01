@@ -109,8 +109,8 @@ public class TradeOrderDO extends BaseDO {
 
     /**
      * 推广人编号
-     * {@link BrokerageUserDO#getId()}
-     * {@link MemberUserRespDTO#getId()}
+     *
+     * 关联 {@link BrokerageUserDO#getId()} 字段，即 {@link MemberUserRespDTO#getId()} 字段
      */
     private Long brokerageUserId;
 

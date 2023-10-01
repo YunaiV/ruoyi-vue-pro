@@ -229,6 +229,10 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         // 生成推广员编号列表
         List<Long> bindUserIds = buildBindUserIdsByLevel(userId, pageReqVO.getLevel());
 
+        // TODO @疯狂：情况一和情况二，可以合并哈；
+        //  如果有 nickname 的时候，相当于提前查询 users，然后 nickname 过滤掉 bindUserIds；
+        //  之后，继续使用 selectSummaryPageByUserId 里面 in bindUserIds 查询；
+
         // 情况一：没有昵称过滤条件时，直接使用数据库的分页查询
         if (StrUtil.isBlank(pageReqVO.getNickname())) {
             // 1.1 分页查询

@@ -38,6 +38,7 @@ public interface ErrorCodeConstants {
     //========== 签到配置 1-004-009-000 ==========
     ErrorCode SIGN_IN_CONFIG_NOT_EXISTS = new ErrorCode(1_004_009_000, "签到天数规则不存在");
     ErrorCode SIGN_IN_CONFIG_EXISTS = new ErrorCode(1_004_009_001, "签到天数规则已存在");
+    // TODO @疯狂：这个可以用 validator 去做；通过在 BaseVO 里，增加一个 @AssertTrue 注解的方式
     ErrorCode SIGN_IN_CONFIG_AWARD_EMPTY = new ErrorCode(1_004_009_002, "签到奖励积分和经验不能同时为空");
 
     //========== 签到配置 1-004-010-000 ==========

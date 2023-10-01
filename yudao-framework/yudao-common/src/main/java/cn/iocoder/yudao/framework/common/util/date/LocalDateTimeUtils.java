@@ -146,9 +146,7 @@ public class LocalDateTimeUtils {
      * @return 月份的开始时间
      */
     public static LocalDateTime beginOfMonth(LocalDateTime date) {
-        return date
-                .with(TemporalAdjusters.firstDayOfMonth())
-                .with(LocalTime.MIN);
+        return date.with(TemporalAdjusters.firstDayOfMonth()).with(LocalTime.MIN);
     }
 
     /**
@@ -159,8 +157,7 @@ public class LocalDateTimeUtils {
      * @return 月份的结束时间
      */
     public static LocalDateTime endOfMonth(LocalDateTime date) {
-        return date
-                .with(TemporalAdjusters.lastDayOfMonth())
-                .with(LocalTime.MAX);
+        return date.with(TemporalAdjusters.lastDayOfMonth()).with(LocalTime.MAX);
     }
+
 }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
+// TODO @疯狂：发 UserCreateMessage；解耦，然后优惠劵监听到，去发卷；
 /**
  * 新人券发放 Producer
  *

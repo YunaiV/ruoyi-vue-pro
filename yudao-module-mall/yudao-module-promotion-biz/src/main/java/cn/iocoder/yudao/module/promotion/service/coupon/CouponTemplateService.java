@@ -77,7 +77,7 @@ public interface CouponTemplateService {
      * @param takeType 领取方式
      * @return 优惠券模板列表
      */
-    List<CouponTemplateDO> getCouponTemplateByTakeType(CouponTakeTypeEnum takeType);
+    List<CouponTemplateDO> getCouponTemplateListByTakeType(CouponTakeTypeEnum takeType);
 
     /**
      * 获得优惠券模板列表

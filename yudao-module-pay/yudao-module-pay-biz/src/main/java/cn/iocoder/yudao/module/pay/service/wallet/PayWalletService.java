@@ -87,12 +87,4 @@ public interface PayWalletService {
      */
     void unFreezePrice(Long id, Integer price);
 
-    /**
-     * 获得用户的钱包明细
-     *
-     * @param userId   用户编号
-     * @param userType 用户类型
-     * @return 用户的钱包明细
-     */
-    PayWalletDO getWalletByUserIdAndType(Long userId, Integer userType);
 }

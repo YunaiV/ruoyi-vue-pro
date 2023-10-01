@@ -109,8 +109,8 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
             return;
         }
         // 获得商品分类信息
-        List<ProductCategoryDO> categoryList = productCategoryMapper.selectBatchIds(ids);
-        Map<Long, ProductCategoryDO> categoryMap = CollectionUtils.convertMap(categoryList, ProductCategoryDO::getId);
+        List<ProductCategoryDO> list = productCategoryMapper.selectBatchIds(ids);
+        Map<Long, ProductCategoryDO> categoryMap = CollectionUtils.convertMap(list, ProductCategoryDO::getId);
         // 校验
         ids.forEach(id -> {
             ProductCategoryDO category = categoryMap.get(id);

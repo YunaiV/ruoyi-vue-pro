@@ -178,8 +178,9 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
+    // TODO @疯狂：搞个事务；
     public void takeCouponByRegister(Long userId) {
-        List<CouponTemplateDO> templates = couponTemplateService.getCouponTemplateByTakeType(CouponTakeTypeEnum.REGISTER);
+        List<CouponTemplateDO> templates = couponTemplateService.getCouponTemplateListByTakeType(CouponTakeTypeEnum.REGISTER);
         for (CouponTemplateDO template : templates) {
             takeCoupon(template.getId(), CollUtil.newHashSet(userId), CouponTakeTypeEnum.REGISTER);
         }
@@ -226,16 +227,15 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     public Map<Long, Boolean> getUserCanCanTakeMap(Long userId, List<CouponTemplateDO> templates) {
+        // 1. 未登录时，都显示可以领取
         Map<Long, Boolean> userCanTakeMap = convertMap(templates, CouponTemplateDO::getId, templateId -> true);
-        // 未登录时，都显示可以领取
         if (userId == null) {
             return userCanTakeMap;
         }
 
-        // 过滤领取数量无限制的
+        // 2.1 过滤领取数量无限制的
         Set<Long> templateIds = convertSet(templates, CouponTemplateDO::getId, template -> template.getTakeLimitCount() != -1);
-
-        // 检查用户领取的数量是否超过限制
+        // 2.2 检查用户领取的数量是否超过限制
         if (CollUtil.isNotEmpty(templateIds)) {
             Map<Long, Integer> couponTakeCountMap = this.getTakeCountMapByTemplateIds(templateIds, userId);
             for (CouponTemplateDO template : templates) {
@@ -243,7 +243,6 @@ public class CouponServiceImpl implements CouponService {
                 userCanTakeMap.put(template.getId(), takeCount == null || takeCount < template.getTakeLimitCount());
             }
         }
-
         return userCanTakeMap;
     }
 

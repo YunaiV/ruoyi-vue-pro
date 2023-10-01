@@ -29,11 +29,12 @@ public class PayWalletController {
     @Resource
     private PayWalletService payWalletService;
 
-    @GetMapping("/user-wallet")
+    @GetMapping("/get")
     @PreAuthorize("@ss.hasPermission('pay:wallet:query')")
     @Operation(summary = "获得用户钱包明细")
-    public CommonResult<PayWalletRespVO> getByUser(PayWalletUserReqVO reqVO) {
-        PayWalletDO wallet = payWalletService.getWalletByUserIdAndType(reqVO.getUserId(), reqVO.getUserType());
+    public CommonResult<PayWalletRespVO> getWallet(PayWalletUserReqVO reqVO) {
+        PayWalletDO wallet = payWalletService.getOrCreateWallet(reqVO.getUserId(), reqVO.getUserType());
         return success(PayWalletConvert.INSTANCE.convert02(wallet));
     }
+
 }

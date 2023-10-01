@@ -95,6 +95,7 @@ public class MemberUserServiceImpl implements MemberUserService {
         memberUserMapper.insert(user);
 
         // 发送 MQ 消息，发放新人券
+        // TODO @疯狂：事务结束后，在发送 MQ 消息；避免出现消息已经发了，事务没提交，或者回滚了
         registerCouponProducer.sendMailSendMessage(user.getId());
         return user;
     }
