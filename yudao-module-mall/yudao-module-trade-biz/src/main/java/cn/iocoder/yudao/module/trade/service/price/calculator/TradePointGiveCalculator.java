@@ -16,7 +16,6 @@ import java.util.Optional;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 
-// TODO @疯狂：这个可以搞个单测；
 /**
  * 赠送积分的 {@link TradePriceCalculator} 实现类
  *
