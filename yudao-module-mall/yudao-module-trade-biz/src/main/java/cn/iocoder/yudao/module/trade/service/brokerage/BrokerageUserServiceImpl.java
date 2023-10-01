@@ -31,6 +31,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -225,25 +226,66 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
 
     @Override
     public PageResult<AppBrokerageUserChildSummaryRespVO> getBrokerageUserChildSummaryPage(AppBrokerageUserChildSummaryPageReqVO pageReqVO, Long userId) {
-        // 1.1 根据昵称过滤用户
-        List<Long> ids = StrUtil.isBlank(pageReqVO.getNickname())
-                ? Collections.emptyList()
-                : convertList(memberUserApi.getUserListByNickname(pageReqVO.getNickname()), MemberUserRespDTO::getId);
-        // 1.2 生成推广员编号列表
-        // TODO @疯狂：是不是可以先 1.2 查询出来，然后查询对应的昵称，进行过滤？避免昵称过滤返回的 id 过多；
+        // 生成推广员编号列表
         List<Long> bindUserIds = buildBindUserIdsByLevel(userId, pageReqVO.getLevel());
 
-        // 2. 分页查询
-        IPage<AppBrokerageUserChildSummaryRespVO> pageResult = brokerageUserMapper.selectSummaryPageByUserId(
-                MyBatisUtils.buildPage(pageReqVO), ids, BrokerageRecordBizTypeEnum.ORDER.getType(),
-                BrokerageRecordStatusEnum.SETTLEMENT.getStatus(), bindUserIds, pageReqVO.getSortingField()
-        );
+        // 情况一：没有昵称过滤条件时，直接使用数据库的分页查询
+        if (StrUtil.isBlank(pageReqVO.getNickname())) {
+            // 1.1 分页查询
+            IPage<AppBrokerageUserChildSummaryRespVO> pageResult = brokerageUserMapper.selectSummaryPageByUserId(
+                    MyBatisUtils.buildPage(pageReqVO), BrokerageRecordBizTypeEnum.ORDER.getType(),
+                    BrokerageRecordStatusEnum.SETTLEMENT.getStatus(), bindUserIds, pageReqVO.getSortingField()
+            );
 
-        // 3. 拼接数据并返回
-        List<Long> userIds = convertList(pageResult.getRecords(), AppBrokerageUserChildSummaryRespVO::getId);
-        Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(userIds);
-        BrokerageUserConvert.INSTANCE.copyTo(pageResult, userMap);
-        return new PageResult<>(pageResult.getRecords(), pageResult.getTotal());
+            // 1.2 拼接数据并返回
+            List<Long> userIds = convertList(pageResult.getRecords(), AppBrokerageUserChildSummaryRespVO::getId);
+            Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(userIds);
+            BrokerageUserConvert.INSTANCE.copyTo(pageResult.getRecords(), userMap);
+            return new PageResult<>(pageResult.getRecords(), pageResult.getTotal());
+        }
+
+        // 情况二：有昵称过滤条件时，需要跨模块（Member）过滤
+        // 2.1 查询所有匹配的分销用户
+        List<AppBrokerageUserChildSummaryRespVO> list = brokerageUserMapper.selectSummaryListByUserId(
+                BrokerageRecordBizTypeEnum.ORDER.getType(), BrokerageRecordStatusEnum.SETTLEMENT.getStatus(),
+                bindUserIds, pageReqVO.getSortingField()
+        );
+        if (CollUtil.isEmpty(list)) {
+            return PageResult.empty();
+        }
+
+        // 2.2 查出对应的用户信息
+        List<MemberUserRespDTO> users = memberUserApi.getUserList(convertList(list, AppBrokerageUserChildSummaryRespVO::getId));
+        if (CollUtil.isEmpty(users)) {
+            return PageResult.empty();
+        }
+
+        // 2.3 根据昵称过滤出用户编号
+        Map<Long, MemberUserRespDTO> userMap = users.stream()
+                .filter(user -> StrUtil.contains(user.getNickname(), pageReqVO.getNickname()))
+                .collect(Collectors.toMap(MemberUserRespDTO::getId, dto -> dto));
+        if (CollUtil.isEmpty(userMap)) {
+            return PageResult.empty();
+        }
+
+        // 2.4 根据用户编号过滤结果
+        list.removeIf(vo -> !userMap.containsKey(vo.getId()));
+        if (CollUtil.isEmpty(list)) {
+            return PageResult.empty();
+        }
+
+        // 2.5 处理分页
+        List<AppBrokerageUserChildSummaryRespVO> result = list.stream()
+                .skip((long) (pageReqVO.getPageNo() - 1) * pageReqVO.getPageSize())
+                .limit(pageReqVO.getPageSize())
+                .collect(Collectors.toList());
+        if (CollUtil.isEmpty(result)) {
+            return PageResult.empty();
+        }
+
+        // 2.6 拼接数据并返回
+        BrokerageUserConvert.INSTANCE.copyTo(result, userMap);
+        return new PageResult<>(result, (long) list.size());
     }
 
     private boolean isUserCanBind(BrokerageUserDO user) {

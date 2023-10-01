@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.service.spu;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -137,6 +138,28 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         if (categoryService.getCategoryLevel(id) < CATEGORY_LEVEL) {
             throw exception(SPU_SAVE_FAIL_CATEGORY_LEVEL_ERROR);
         }
+    }
+
+    @Override
+    public List<ProductSpuDO> validateSpuList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        // 获得商品信息
+        List<ProductSpuDO> spuList = productSpuMapper.selectBatchIds(ids);
+        Map<Long, ProductSpuDO> spuMap = CollectionUtils.convertMap(spuList, ProductSpuDO::getId);
+        // 校验
+        ids.forEach(id -> {
+            ProductSpuDO spu = spuMap.get(id);
+            if (spu == null) {
+                throw exception(SPU_NOT_EXISTS);
+            }
+            if (!ProductSpuStatusEnum.isEnable(spu.getStatus())) {
+                throw exception(SPU_NOT_ENABLE, spu.getName());
+            }
+        });
+
+        return spuList;
     }
 
     @Override

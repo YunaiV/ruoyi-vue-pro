@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.promotion.dal.mysql.coupon;
 
-import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
@@ -8,7 +8,6 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
-import cn.iocoder.yudao.module.promotion.service.coupon.bo.CouponTakeCountBO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.yulichang.toolkit.MPJWrappers;
 import org.apache.ibatis.annotations.Mapper;
@@ -16,8 +15,11 @@ import org.apache.ibatis.annotations.Mapper;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * 优惠劵 Mapper
@@ -70,14 +72,16 @@ public interface CouponMapper extends BaseMapperX<CouponDO> {
         );
     }
 
-    // TODO @疯狂：这个是不是搞个 Map 就可以呀？
-    default List<CouponTakeCountBO> selectCountByUserIdAndTemplateIdIn(Long userId, Collection<Long> templateIds) {
-        return BeanUtil.copyToList(selectMaps(MPJWrappers.lambdaJoin(CouponDO.class)
-                .select(CouponDO::getTemplateId)
-                .selectCount(CouponDO::getId, CouponTakeCountBO::getCount)
+    default Map<Long, Integer> selectCountByUserIdAndTemplateIdIn(Long userId, Collection<Long> templateIds) {
+        String templateIdAlias = "templateId";
+        String countAlias = "count";
+        List<Map<String, Object>> list = selectMaps(MPJWrappers.lambdaJoin(CouponDO.class)
+                .selectAs(CouponDO::getTemplateId, templateIdAlias)
+                .selectCount(CouponDO::getId, countAlias)
                 .eq(CouponDO::getUserId, userId)
                 .in(CouponDO::getTemplateId, templateIds)
-                .groupBy(CouponDO::getTemplateId)), CouponTakeCountBO.class);
+                .groupBy(CouponDO::getTemplateId));
+        return convertMap(list, map -> MapUtil.getLong(map, templateIdAlias), map -> MapUtil.getInt(map, countAlias));
     }
 
     default List<CouponDO> selectListByUserIdAndStatusAndUsePriceLeAndProductScope(

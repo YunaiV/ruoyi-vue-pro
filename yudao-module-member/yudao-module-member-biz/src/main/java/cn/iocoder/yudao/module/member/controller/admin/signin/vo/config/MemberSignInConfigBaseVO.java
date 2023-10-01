@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 
 /**
  * 签到规则 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -20,7 +21,13 @@ public class MemberSignInConfigBaseVO {
 
     @Schema(description = "奖励积分", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     @NotNull(message = "奖励积分不能为空")
+    @PositiveOrZero(message = "奖励积分不能小于 0")
     private Integer point;
+
+    @Schema(description = "奖励经验", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
+    @NotNull(message = "奖励经验不能为空")
+    @PositiveOrZero(message = "奖励经验不能小于 0")
+    private Integer experience;
 
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "状态不能为空")

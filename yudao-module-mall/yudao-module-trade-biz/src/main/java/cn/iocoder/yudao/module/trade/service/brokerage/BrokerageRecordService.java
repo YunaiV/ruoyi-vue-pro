@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokera
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageRecordDO;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryRespBO;
 
@@ -120,11 +121,13 @@ public interface BrokerageRecordService {
      *
      * @param userId    用户编号
      * @param bizType   业务类型
+     * @param status    状态
      * @param beginTime 开始时间
      * @param endTime   截止时间
      * @return 用户佣金合计
      */
-    Integer getSummaryPriceByUserId(Long userId, Integer bizType, LocalDateTime beginTime, LocalDateTime endTime);
+    Integer getSummaryPriceByUserId(Long userId, BrokerageRecordBizTypeEnum bizType, BrokerageRecordStatusEnum status,
+                                    LocalDateTime beginTime, LocalDateTime endTime);
 
     /**
      * 获得用户佣金排行分页列表（基于佣金总数）

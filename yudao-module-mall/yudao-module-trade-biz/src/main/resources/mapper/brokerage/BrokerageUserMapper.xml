@@ -2,8 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.iocoder.yudao.module.trade.dal.mysql.brokerage.BrokerageUserMapper">
 
-    <select id="selectSummaryPageByUserId"
-            resultType="cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserChildSummaryRespVO">
+    <sql id="selectSummaryListByUserId">
         SELECT bu.id, bu.bind_user_time AS brokerageTime,
         (SELECT SUM(price) FROM trade_brokerage_record r
         WHERE r.user_id = bu.id AND biz_type = #{bizType} AND r.status = #{status} AND r.deleted = FALSE) AS brokeragePrice,
@@ -14,12 +13,6 @@
         FROM trade_brokerage_user AS bu
         <where>
             bu.deleted = false
-            <if test="ids != null and ids.size() > 0">
-                and bu.id in
-                <foreach collection="ids" open="(" item="id" separator="," close=")">
-                    #{id}
-                </foreach>
-            </if>
             <if test="bindUserIds != null and bindUserIds.size() > 0">
                 and bu.bind_user_id in
                 <foreach collection="bindUserIds" open="(" item="bindUserId" separator="," close=")">
@@ -41,6 +34,15 @@
                 ORDER BY bu.bind_user_time DESC
             </otherwise>
         </choose>
+    </sql>
+
+    <select id="selectSummaryPageByUserId"
+            resultType="cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserChildSummaryRespVO">
+        <include refid="selectSummaryListByUserId" />
+    </select>
+    <select id="selectSummaryListByUserId"
+            resultType="cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserChildSummaryRespVO">
+        <include refid="selectSummaryListByUserId" />
     </select>
 
 </mapper>

@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.promotion.service.coupon;
 
 import cn.hutool.core.collection.CollStreamUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -21,7 +20,6 @@ import cn.iocoder.yudao.module.promotion.dal.mysql.coupon.CouponMapper;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponStatusEnum;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTakeTypeEnum;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTemplateValidityTypeEnum;
-import cn.iocoder.yudao.module.promotion.service.coupon.bo.CouponTakeCountBO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,18 +27,14 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 import static java.util.Arrays.asList;
 
-// TODO @疯狂：注册时，赠送用户优惠劵；为了解耦，可以考虑注册时发个 MQ 消息；然后营销这里监听后消费；
 /**
  * 优惠劵 Service 实现类
  *
@@ -184,9 +178,17 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    public List<CouponTakeCountBO> getTakeCountListByTemplateIds(Collection<Long> templateIds, Long userId) {
+    public void takeCouponByRegister(Long userId) {
+        List<CouponTemplateDO> templates = couponTemplateService.getCouponTemplateByTakeType(CouponTakeTypeEnum.REGISTER);
+        for (CouponTemplateDO template : templates) {
+            takeCoupon(template.getId(), CollUtil.newHashSet(userId), CouponTakeTypeEnum.REGISTER);
+        }
+    }
+
+    @Override
+    public Map<Long, Integer> getTakeCountMapByTemplateIds(Collection<Long> templateIds, Long userId) {
         if (CollUtil.isEmpty(templateIds)) {
-            return ListUtil.empty();
+            return Collections.emptyMap();
         }
         return couponMapper.selectCountByUserIdAndTemplateIdIn(userId, templateIds);
     }
@@ -220,6 +222,29 @@ public class CouponServiceImpl implements CouponService {
             }
         }
         return count;
+    }
+
+    @Override
+    public Map<Long, Boolean> getUserCanCanTakeMap(Long userId, List<CouponTemplateDO> templates) {
+        Map<Long, Boolean> userCanTakeMap = convertMap(templates, CouponTemplateDO::getId, templateId -> true);
+        // 未登录时，都显示可以领取
+        if (userId == null) {
+            return userCanTakeMap;
+        }
+
+        // 过滤领取数量无限制的
+        Set<Long> templateIds = convertSet(templates, CouponTemplateDO::getId, template -> template.getTakeLimitCount() != -1);
+
+        // 检查用户领取的数量是否超过限制
+        if (CollUtil.isNotEmpty(templateIds)) {
+            Map<Long, Integer> couponTakeCountMap = this.getTakeCountMapByTemplateIds(templateIds, userId);
+            for (CouponTemplateDO template : templates) {
+                Integer takeCount = couponTakeCountMap.get(template.getId());
+                userCanTakeMap.put(template.getId(), takeCount == null || takeCount < template.getTakeLimitCount());
+            }
+        }
+
+        return userCanTakeMap;
     }
 
     /**

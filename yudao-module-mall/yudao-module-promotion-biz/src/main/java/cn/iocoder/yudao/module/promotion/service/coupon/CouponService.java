@@ -1,16 +1,15 @@
 package cn.iocoder.yudao.module.promotion.service.coupon;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponMatchReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTakeTypeEnum;
-import cn.iocoder.yudao.module.promotion.service.coupon.bo.CouponTakeCountBO;
 
 import java.util.*;
-
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * 优惠劵 Service 接口
@@ -119,12 +118,9 @@ public interface CouponService {
     /**
      * 【系统】给用户发送新人券
      *
-     * @param templateId 优惠券模板编号
-     * @param userId     用户编号列表
+     * @param userId 用户编号
      */
-    default void takeCouponByRegister(Long templateId, Long userId) {
-        takeCoupon(templateId, CollUtil.newHashSet(userId), CouponTakeTypeEnum.REGISTER);
-    }
+    void takeCouponByRegister(Long userId);
 
     /**
      * 获取会员领取指定优惠券的数量
@@ -134,11 +130,8 @@ public interface CouponService {
      * @return 领取优惠券的数量
      */
     default Integer getTakeCount(Long templateId, Long userId) {
-        return CollUtil.emptyIfNull(getTakeCountListByTemplateIds(Collections.singleton(templateId), userId))
-                .stream()
-                .findFirst()
-                .map(CouponTakeCountBO::getCount)
-                .orElse(0);
+        Map<Long, Integer> map = getTakeCountMapByTemplateIds(Collections.singleton(templateId), userId);
+        return MapUtil.getInt(map, templateId, 0);
     }
 
     /**
@@ -148,19 +141,7 @@ public interface CouponService {
      * @param userId      用户编号
      * @return 领取优惠券的数量
      */
-    default Map<Long, Integer> getTakeCountMapByTemplateIds(Collection<Long> templateIds, Long userId) {
-        return convertMap(getTakeCountListByTemplateIds(templateIds, userId),
-                CouponTakeCountBO::getTemplateId, CouponTakeCountBO::getCount);
-    }
-
-    /**
-     * 统计会员领取优惠券的数量
-     *
-     * @param templateIds 优惠券模板编号列表
-     * @param userId      用户编号
-     * @return 领取优惠券的数量
-     */
-    List<CouponTakeCountBO> getTakeCountListByTemplateIds(Collection<Long> templateIds, Long userId);
+    Map<Long, Integer> getTakeCountMapByTemplateIds(Collection<Long> templateIds, Long userId);
 
     /**
      * 获取用户匹配的优惠券列表
@@ -177,5 +158,14 @@ public interface CouponService {
      * @return 过期数量
      */
     int expireCoupon();
+
+    /**
+     * 获取用户是否可以领取优惠券
+     *
+     * @param userId    用户编号
+     * @param templates 优惠券列表
+     * @return 是否可以领取
+     */
+    Map<Long, Boolean> getUserCanCanTakeMap(Long userId, List<CouponTemplateDO> templates);
 
 }

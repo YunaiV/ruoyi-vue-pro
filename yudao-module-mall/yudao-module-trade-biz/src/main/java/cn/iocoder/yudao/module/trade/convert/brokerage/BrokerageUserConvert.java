@@ -11,7 +11,6 @@ import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokera
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageWithdrawSummaryRespBO;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryRespBO;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
@@ -88,8 +87,8 @@ public interface BrokerageUserConvert {
         return respVO;
     }
 
-    default void copyTo(IPage<AppBrokerageUserChildSummaryRespVO> pageResult, Map<Long, MemberUserRespDTO> userMap) {
-        for (AppBrokerageUserChildSummaryRespVO vo : pageResult.getRecords()) {
+    default void copyTo(List<AppBrokerageUserChildSummaryRespVO> list, Map<Long, MemberUserRespDTO> userMap) {
+        for (AppBrokerageUserChildSummaryRespVO vo : list) {
             Optional.ofNullable(userMap.get(vo.getId())).ifPresent(user ->
                     vo.setNickname(user.getNickname()).setAvatar(user.getAvatar()));
         }

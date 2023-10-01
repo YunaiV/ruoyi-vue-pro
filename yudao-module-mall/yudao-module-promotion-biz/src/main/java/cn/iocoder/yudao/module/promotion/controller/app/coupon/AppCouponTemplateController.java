@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.promotion.controller.app.coupon;
 
-import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
@@ -25,11 +24,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
 
 @Tag(name = "用户 App - 优惠劵模板")
@@ -46,7 +43,6 @@ public class AppCouponTemplateController {
     @Resource
     private ProductSpuApi productSpuApi;
 
-    // TODO 疯狂：这里应该还有个 list 接口哈；获得优惠劵模版列表，用于首页、商品页的优惠劵
     @GetMapping("/list")
     @Operation(summary = "获得优惠劵模版列表")
     @Parameters({
@@ -56,46 +52,28 @@ public class AppCouponTemplateController {
     })
     public CommonResult<List<AppCouponTemplateRespVO>> getCouponTemplateList(
             @RequestParam(value = "spuId", required = false) Long spuId,
-            @RequestParam(value = "useType", required = false) Integer useType,
+            @RequestParam(value = "productScope", required = false) Integer productScope,
             @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
-        List<AppCouponTemplateRespVO> list = new ArrayList<>();
-        Random random = new Random();
-        for (int i = 0; i < 10; i++) {
-            AppCouponTemplateRespVO vo = new AppCouponTemplateRespVO();
-            vo.setId(i + 1L);
-            vo.setName("优惠劵" + (i + 1));
-            vo.setTakeLimitCount(random.nextInt(10) + 1);
-            vo.setUsePrice(random.nextInt(100) * 100);
-            vo.setValidityType(random.nextInt(2) + 1);
-            if (vo.getValidityType() == 1) {
-                vo.setValidStartTime(LocalDateTime.now().plusDays(random.nextInt(10)));
-                vo.setValidEndTime(LocalDateTime.now().plusDays(random.nextInt(20) + 10));
-            } else {
-                vo.setFixedStartTerm(random.nextInt(10));
-                vo.setFixedEndTerm(random.nextInt(10) + vo.getFixedStartTerm() + 1);
-            }
-            vo.setDiscountType(random.nextInt(2) + 1);
-            if (vo.getDiscountType() == 1) {
-                vo.setDiscountPercent(null);
-                vo.setDiscountPrice(random.nextInt(50) * 100);
-                vo.setDiscountLimitPrice(null);
-            } else {
-                vo.setDiscountPercent(random.nextInt(90) + 10);
-                vo.setDiscountPrice(null);
-                vo.setDiscountLimitPrice(random.nextInt(200) * 100);
-            }
-            // TODO @疯狂：是否已领取，要不在 TemplateService 搞个 static 方法，让它基于 countMap 这种去计算，这样好点？
-            vo.setTakeStatus(random.nextBoolean());
-            list.add(vo);
-        }
-        return success(list);
+        // 1.1 处理查询条件：商品范围编号
+        Long productScopeValue = getProductScopeValue(productScope, spuId);
+        // 1.2 处理查询条件：领取方式 = 直接领取
+        List<Integer> canTakeTypes = Collections.singletonList(CouponTakeTypeEnum.USER.getValue());
+
+        // 2. 查询
+        List<CouponTemplateDO> list = couponTemplateService.getCouponTemplateList(canTakeTypes, productScope,
+                productScopeValue, count);
+
+        // 3.1 领取数量
+        Map<Long, Boolean> canCanTakeMap = couponService.getUserCanCanTakeMap(getLoginUserId(), list);
+        // 3.2 拼接返回
+        return success(CouponTemplateConvert.INSTANCE.convertAppList(list, canCanTakeMap));
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得优惠劵模版分页")
     public CommonResult<PageResult<AppCouponTemplateRespVO>> getCouponTemplatePage(AppCouponTemplatePageReqVO pageReqVO) {
         // 1.1 处理查询条件：商品范围编号
-        Long productScopeValue = getProductScopeValue(pageReqVO);
+        Long productScopeValue = getProductScopeValue(pageReqVO.getProductScope(), pageReqVO.getSpuId());
         // 1.2 处理查询条件：领取方式 = 直接领取
         List<Integer> canTakeTypes = Collections.singletonList(CouponTakeTypeEnum.USER.getValue());
 
@@ -104,35 +82,30 @@ public class AppCouponTemplateController {
                 CouponTemplateConvert.INSTANCE.convert(pageReqVO, canTakeTypes, pageReqVO.getProductScope(), productScopeValue));
 
         // 3.1 领取数量
-        Map<Long, Integer> couponTakeCountMap = new HashMap<>(0);
-        Long userId = getLoginUserId();
-        if (userId != null) {
-            List<Long> templateIds = convertList(pageResult.getList(), CouponTemplateDO::getId,
-                    t -> ObjUtil.notEqual(t.getTakeLimitCount(), -1)); // 只查有设置“每人限领个数”的
-            couponTakeCountMap = couponService.getTakeCountMapByTemplateIds(templateIds, userId);
-        }
+        Map<Long, Boolean> canCanTakeMap = couponService.getUserCanCanTakeMap(getLoginUserId(), pageResult.getList());
         // 3.2 拼接返回
-        return success(CouponTemplateConvert.INSTANCE.convertAppPage(pageResult, couponTakeCountMap));
+        return success(CouponTemplateConvert.INSTANCE.convertAppPage(pageResult, canCanTakeMap));
     }
 
     /**
-     * 获得分页查询的商品范围
+     * 获得商品的使用范围编号
      *
-     * @param pageReqVO 分页查询
-     * @return 商品范围
+     * @param productScope 商品范围
+     * @param spuId        商品 SPU 编号
+     * @return 商品范围编号
      */
-    private Long getProductScopeValue(AppCouponTemplatePageReqVO pageReqVO) {
-        // 通用券：清除商品范围
-        if (pageReqVO.getProductScope() == null || ObjectUtils.equalsAny(pageReqVO.getProductScope(), PromotionProductScopeEnum.ALL.getScope(), null)) {
+    private Long getProductScopeValue(Integer productScope, Long spuId) {
+        // 通用券：没有商品范围
+        if (productScope == null || ObjectUtils.equalsAny(productScope, PromotionProductScopeEnum.ALL.getScope(), null)) {
             return null;
         }
-        // 品类券：查询商品的品类
-        if (Objects.equals(pageReqVO.getProductScope(), PromotionProductScopeEnum.CATEGORY.getScope()) && pageReqVO.getSpuId() != null) {
-            return Optional.ofNullable(productSpuApi.getSpu(pageReqVO.getSpuId()))
+        // 品类券：查询商品的品类编号
+        if (Objects.equals(productScope, PromotionProductScopeEnum.CATEGORY.getScope()) && spuId != null) {
+            return Optional.ofNullable(productSpuApi.getSpu(spuId))
                     .map(ProductSpuRespDTO::getCategoryId).orElse(null);
         }
         // 商品卷：直接返回
-        return pageReqVO.getSpuId();
+        return spuId;
     }
 
 }

@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
 
 /**
  * 时间工具类，用于 {@link java.time.LocalDateTime}
@@ -137,4 +138,29 @@ public class LocalDateTimeUtils {
 
     }
 
+    /**
+     * 获取指定日期所在的月份的开始时间
+     * 例如：2023-09-30 00:00:00,000
+     *
+     * @param date 日期
+     * @return 月份的开始时间
+     */
+    public static LocalDateTime beginOfMonth(LocalDateTime date) {
+        return date
+                .with(TemporalAdjusters.firstDayOfMonth())
+                .with(LocalTime.MIN);
+    }
+
+    /**
+     * 获取指定日期所在的月份的最后时间
+     * 例如：2023-09-30 23:59:59,999
+     *
+     * @param date 日期
+     * @return 月份的结束时间
+     */
+    public static LocalDateTime endOfMonth(LocalDateTime date) {
+        return date
+                .with(TemporalAdjusters.lastDayOfMonth())
+                .with(LocalTime.MAX);
+    }
 }

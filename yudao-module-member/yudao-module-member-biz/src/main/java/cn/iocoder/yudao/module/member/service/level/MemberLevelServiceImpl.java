@@ -239,7 +239,8 @@ public class MemberLevelServiceImpl implements MemberLevelService {
 
         // 1. 创建经验记录
         MemberUserDO user = memberUserService.getUser(userId);
-        int userExperience = NumberUtil.max(user.getExperience() + experience, 0); // 防止扣出负数
+        Integer userExperience = ObjUtil.defaultIfNull(user.getExperience(), 0);
+        userExperience = NumberUtil.max(userExperience + experience, 0); // 防止扣出负数
         MemberLevelRecordDO levelRecord = new MemberLevelRecordDO()
                 .setUserId(user.getId())
                 .setExperience(experience)

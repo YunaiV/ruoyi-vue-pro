@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.trade.service.price.calculator;
 
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.member.api.point.MemberPointApi;
-import cn.iocoder.yudao.module.member.api.point.dto.MemberPointConfigRespDTO;
+import cn.iocoder.yudao.module.member.api.config.MemberConfigApi;
+import cn.iocoder.yudao.module.member.api.config.dto.MemberConfigRespDTO;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
@@ -20,7 +20,6 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PRICE_CALCULATE_PAY_PRICE_ILLEGAL;
 
-// TODO @疯狂：搞个单测，嘿嘿；
 /**
  * 使用积分的 {@link TradePriceCalculator} 实现类
  *
@@ -32,19 +31,21 @@ import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PRICE_CALCU
 public class TradePointUsePriceCalculator implements TradePriceCalculator {
 
     @Resource
-    private MemberPointApi memberPointApi;
+    private MemberConfigApi memberConfigApi;
     @Resource
     private MemberUserApi memberUserApi;
 
     @Override
     public void calculate(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result) {
+        // 默认使用积分为 0
+        result.setUsePoint(0);
         // 1.1 校验是否使用积分
         if (!BooleanUtil.isTrue(param.getPointStatus())) {
             result.setUsePoint(0);
             return;
         }
         // 1.2 校验积分抵扣是否开启
-        MemberPointConfigRespDTO config = memberPointApi.getConfig();
+        MemberConfigRespDTO config = memberConfigApi.getConfig();
         if (!isDeductPointEnable(config)) {
             return;
         }
@@ -76,20 +77,20 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
         TradePriceCalculatorHelper.recountAllPrice(result);
     }
 
-    private boolean isDeductPointEnable(MemberPointConfigRespDTO config) {
+    private boolean isDeductPointEnable(MemberConfigRespDTO config) {
         return config != null &&
-                !BooleanUtil.isTrue(config.getTradeDeductEnable()) &&  // 积分功能是否启用
-                config.getTradeDeductUnitPrice() != null && config.getTradeDeductUnitPrice() > 0; // 有没有配置：1 积分抵扣多少分
+                BooleanUtil.isTrue(config.getPointTradeDeductEnable()) &&  // 积分功能是否启用
+                config.getPointTradeDeductUnitPrice() != null && config.getPointTradeDeductUnitPrice() > 0; // 有没有配置：1 积分抵扣多少分
     }
 
-    private Integer calculatePointPrice(MemberPointConfigRespDTO config, Integer usePoint, TradePriceCalculateRespBO result) {
+    private Integer calculatePointPrice(MemberConfigRespDTO config, Integer usePoint, TradePriceCalculateRespBO result) {
         // 每个订单最多可以使用的积分数量
-        if (config.getTradeDeductMaxPrice() != null && config.getTradeDeductMaxPrice() > 0) {
-            usePoint = Math.min(usePoint, config.getTradeDeductMaxPrice());
+        if (config.getPointTradeDeductMaxPrice() != null && config.getPointTradeDeductMaxPrice() > 0) {
+            usePoint = Math.min(usePoint, config.getPointTradeDeductMaxPrice());
         }
         // TODO @疯狂：这里应该是，抵扣到只剩下 0.01；
         // 积分优惠金额（分）
-        int pointPrice = usePoint * config.getTradeDeductUnitPrice();
+        int pointPrice = usePoint * config.getPointTradeDeductUnitPrice();
         if (result.getPrice().getPayPrice() <= pointPrice) {
             // 禁止 0 元购
             throw exception(PRICE_CALCULATE_PAY_PRICE_ILLEGAL);
@@ -99,7 +100,7 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
 //            pointPrice = result.getPrice().getPayPrice();
 //            // 反推需要扣除的积分
 //            usePoint = NumberUtil.toBigDecimal(pointPrice)
-//                    .divide(NumberUtil.toBigDecimal(config.getTradeDeductUnitPrice()), 0, RoundingMode.HALF_UP)
+//                    .divide(NumberUtil.toBigDecimal(config.getPointTradeDeductUnitPrice()), 0, RoundingMode.HALF_UP)
 //                    .intValue();
 //        }
         // 记录使用的积分

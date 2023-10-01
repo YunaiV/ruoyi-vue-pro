@@ -195,4 +195,9 @@ public class PayWalletServiceImpl implements  PayWalletService {
         }
     }
 
+    @Override
+    public PayWalletDO getWalletByUserIdAndType(Long userId, Integer userType) {
+        return walletMapper.selectByUserIdAndType(userId, userType);
+    }
+
 }

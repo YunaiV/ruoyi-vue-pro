@@ -11,10 +11,10 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.SIGN_IN_CONFIG_EXISTS;
-import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.SIGN_IN_CONFIG_NOT_EXISTS;
+import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.*;
 
 /**
  * 签到规则 Service 实现类
@@ -30,6 +30,8 @@ public class MemberSignInConfigServiceImpl implements MemberSignInConfigService 
 
     @Override
     public Long createSignInConfig(MemberSignInConfigCreateReqVO createReqVO) {
+        // 校验奖励积分、奖励经验
+        validatePointAndExperience(createReqVO.getPoint(), createReqVO.getExperience());
         // 判断是否重复插入签到天数
         validateSignInConfigDayDuplicate(createReqVO.getDay(), null);
 
@@ -42,6 +44,8 @@ public class MemberSignInConfigServiceImpl implements MemberSignInConfigService 
 
     @Override
     public void updateSignInConfig(MemberSignInConfigUpdateReqVO updateReqVO) {
+        // 校验奖励积分、奖励经验
+        validatePointAndExperience(updateReqVO.getPoint(), updateReqVO.getExperience());
         // 校验存在
         validateSignInConfigExists(updateReqVO.getId());
         // 判断是否重复插入签到天数
@@ -70,7 +74,7 @@ public class MemberSignInConfigServiceImpl implements MemberSignInConfigService 
      * 校验 day 是否重复
      *
      * @param day 天
-     * @param id 编号，只有更新的时候会传递
+     * @param id  编号，只有更新的时候会传递
      */
     private void validateSignInConfigDayDuplicate(Integer day, Long id) {
         MemberSignInConfigDO config = memberSignInConfigMapper.selectByDay(day);
@@ -84,13 +88,20 @@ public class MemberSignInConfigServiceImpl implements MemberSignInConfigService 
         }
     }
 
+    private void validatePointAndExperience(Integer point, Integer experience) {
+        // 奖励积分、经验 至少要配置一个，否则没有意义
+        if (Objects.equals(point, 0) && Objects.equals(experience, 0)) {
+            throw exception(SIGN_IN_CONFIG_AWARD_EMPTY);
+        }
+    }
+
     @Override
     public MemberSignInConfigDO getSignInConfig(Long id) {
         return memberSignInConfigMapper.selectById(id);
     }
 
     @Override
-    public List <MemberSignInConfigDO> getSignInConfigList() {
+    public List<MemberSignInConfigDO> getSignInConfigList() {
         List<MemberSignInConfigDO> list = memberSignInConfigMapper.selectList();
         list.sort(Comparator.comparing(MemberSignInConfigDO::getDay));
         return list;

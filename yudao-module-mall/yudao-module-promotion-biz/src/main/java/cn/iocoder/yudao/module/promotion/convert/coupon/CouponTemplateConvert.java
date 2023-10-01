@@ -37,21 +37,25 @@ public interface CouponTemplateConvert {
 
     PageResult<AppCouponTemplateRespVO> convertAppPage(PageResult<CouponTemplateDO> pageResult);
 
-    default PageResult<AppCouponTemplateRespVO> convertAppPage(PageResult<CouponTemplateDO> pageResult, Map<Long, Integer> couponTakeCountMap) {
+    List<AppCouponTemplateRespVO> convertAppList(List<CouponTemplateDO> list);
+
+    default PageResult<AppCouponTemplateRespVO> convertAppPage(PageResult<CouponTemplateDO> pageResult, Map<Long, Boolean> userCanTakeMap) {
         PageResult<AppCouponTemplateRespVO> result = convertAppPage(pageResult);
-        if (MapUtil.isEmpty(couponTakeCountMap)) {
-            return result;
-        }
-        for (AppCouponTemplateRespVO template : result.getList()) {
-            // 每人领取数量无限制
-            if (template.getTakeLimitCount() == -1) {
-                template.setTakeStatus(false);
-                continue;
-            }
-            // 检查已领取数量是否超过限领数量
-            template.setTakeStatus(MapUtil.getInt(couponTakeCountMap, template.getId(), 0) >= template.getTakeLimitCount());
-        }
+        copyTo(result.getList(), userCanTakeMap);
         return result;
+    }
+
+    default List<AppCouponTemplateRespVO> convertAppList(List<CouponTemplateDO> list, Map<Long, Boolean> userCanTakeMap) {
+        List<AppCouponTemplateRespVO> result = convertAppList(list);
+        copyTo(result, userCanTakeMap);
+        return result;
+    }
+
+    default void copyTo(List<AppCouponTemplateRespVO> list, Map<Long, Boolean> userCanTakeMap) {
+        for (AppCouponTemplateRespVO template : list) {
+            // 检查已领取数量是否超过限领数量
+            template.setCanTake(MapUtil.getBool(userCanTakeMap, template.getId(), false));
+        }
     }
 
 }

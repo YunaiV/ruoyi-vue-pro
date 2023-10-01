@@ -2,10 +2,7 @@ package cn.iocoder.yudao.module.trade.service.brokerage;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.BooleanUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.*;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
@@ -265,9 +262,10 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
     }
 
     @Override
-    public Integer getSummaryPriceByUserId(Long userId, Integer bizType, LocalDateTime beginTime, LocalDateTime endTime) {
-        return brokerageRecordMapper.selectSummaryPriceByUserIdAndBizTypeAndCreateTimeBetween(userId, bizType,
-                beginTime, endTime);
+    public Integer getSummaryPriceByUserId(Long userId, BrokerageRecordBizTypeEnum bizType, BrokerageRecordStatusEnum status,
+                                           LocalDateTime beginTime, LocalDateTime endTime) {
+        return brokerageRecordMapper.selectSummaryPriceByUserIdAndBizTypeAndCreateTimeBetween(userId,
+                bizType.getType(), status.getStatus(), beginTime, endTime);
     }
 
     @Override
@@ -279,17 +277,18 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
         return new PageResult<>(pageResult.getRecords(), pageResult.getTotal());
     }
 
-    // TODO @疯狂：这个要不我们先做精准的？先查询自己的推广金额，然后查询比该金额多的有多少人？
     @Override
     public Integer getUserRankByPrice(Long userId, LocalDateTime[] times) {
-        AppBrokerageUserRankPageReqVO pageParam = new AppBrokerageUserRankPageReqVO().setTimes(times);
-        // 取前 100 名
-        pageParam.setPageSize(100);
-        PageResult<AppBrokerageUserRankByPriceRespVO> pageResult = getBrokerageUserChildSummaryPageByPrice(pageParam);
-        // 获得索引
-        int index = CollUtil.indexOf(pageResult.getList(), user -> Objects.equals(userId, user.getId()));
+        // 用户的推广金额
+        Integer price = brokerageRecordMapper.selectSummaryPriceByUserIdAndBizTypeAndCreateTimeBetween(userId,
+                BrokerageRecordBizTypeEnum.ORDER.getType(), BrokerageRecordStatusEnum.SETTLEMENT.getStatus(),
+                ArrayUtil.get(times, 0), ArrayUtil.get(times, 1));
+        // 排在用户前面的人数
+        Integer greaterCount = brokerageRecordMapper.selectCountByPriceGt(price,
+                BrokerageRecordBizTypeEnum.ORDER.getType(), BrokerageRecordStatusEnum.SETTLEMENT.getStatus(),
+                ArrayUtil.get(times, 0), ArrayUtil.get(times, 1));
         // 获得排名
-        return index + 1;
+        return ObjUtil.defaultIfNull(greaterCount, 0) + 1;
     }
 
     @Override

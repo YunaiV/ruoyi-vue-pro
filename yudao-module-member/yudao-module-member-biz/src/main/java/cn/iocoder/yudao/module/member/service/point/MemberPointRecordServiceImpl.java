@@ -66,6 +66,9 @@ public class MemberPointRecordServiceImpl implements MemberPointRecordService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createPointRecord(Long userId, Integer point, MemberPointBizTypeEnum bizType, String bizId) {
+        if (point == 0) {
+            return;
+        }
         // 1. 校验用户积分余额
         MemberUserDO user = memberUserService.getUser(userId);
         Integer userPoint = ObjectUtil.defaultIfNull(user.getPoint(), 0);

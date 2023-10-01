@@ -38,6 +38,7 @@ public interface ErrorCodeConstants {
     //========== 签到配置 1-004-009-000 ==========
     ErrorCode SIGN_IN_CONFIG_NOT_EXISTS = new ErrorCode(1_004_009_000, "签到天数规则不存在");
     ErrorCode SIGN_IN_CONFIG_EXISTS = new ErrorCode(1_004_009_001, "签到天数规则已存在");
+    ErrorCode SIGN_IN_CONFIG_AWARD_EMPTY = new ErrorCode(1_004_009_002, "签到奖励积分和经验不能同时为空");
 
     //========== 签到配置 1-004-010-000 ==========
     ErrorCode SIGN_IN_RECORD_TODAY_EXISTS = new ErrorCode(1_004_010_000,"今日已签到，请勿重复签到");
