@@ -1,0 +1,20 @@
+package cn.iocoder.yudao.framework.quartz.core.job;
+
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+/**
+ * @Author: j-sentinel
+ * @Date: 2023/9/30 16:17
+ */
+@Data
+@ConfigurationProperties(prefix = "yudao.clean-job")
+public class LogJobProperties {
+
+    private int accessRetainDay = 7;
+
+    private int errorRetainDay = 8;
+
+    private int jobCleanRetainDay = 7;
+
+}

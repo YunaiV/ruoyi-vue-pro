@@ -41,4 +41,10 @@ public interface JobLogFrameworkService {
                                  @NotNull(message = "运行时长不能为空") Integer duration,
                                  boolean success, String result);
 
+    /**
+     * 清理 @param jobCleanRetainDay 天的访问日志
+     *
+     * @param jobCleanRetainDay 超过多少天就进行清理
+     */
+    Integer timingJobCleanLog(Integer jobCleanRetainDay);
 }

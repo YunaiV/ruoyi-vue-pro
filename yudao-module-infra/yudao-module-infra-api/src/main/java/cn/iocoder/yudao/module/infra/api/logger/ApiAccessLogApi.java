@@ -18,4 +18,10 @@ public interface ApiAccessLogApi {
      */
     void createApiAccessLog(@Valid ApiAccessLogCreateReqDTO createDTO);
 
+    /**
+     * 清理 @param accessLogJobDay 天的访问日志
+     *
+     * @param accessLogJobDay 超过多少天就进行清理
+     */
+    void jobCleanAccessLog(Integer accessLogJobDay);
 }

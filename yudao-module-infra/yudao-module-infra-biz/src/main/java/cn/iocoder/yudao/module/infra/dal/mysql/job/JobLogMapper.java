@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.infra.controller.admin.job.vo.log.JobLogExportReq
 import cn.iocoder.yudao.module.infra.controller.admin.job.vo.log.JobLogPageReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.job.JobLogDO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -40,4 +41,7 @@ public interface JobLogMapper extends BaseMapperX<JobLogDO> {
         );
     }
 
+    Integer timingJobCleanLog(@Param("jobCleanRetainDay") Integer jobCleanRetainDay);
+
+    void optimizeTable();
 }

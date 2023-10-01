@@ -213,6 +213,10 @@ yudao:
   error-code: # 错误码相关配置项
     enable: false
   demo: false # 关闭演示模式
+  clean-job:
+    access-retain-day: 7
+    error-retain-day: 8
+    job-clean-retain-day: 8
 
 justauth:
   enabled: true

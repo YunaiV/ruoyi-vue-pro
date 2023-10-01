@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.framework.apilog.config;
 
 import cn.iocoder.yudao.framework.apilog.core.filter.ApiAccessLogFilter;
+import cn.iocoder.yudao.framework.apilog.core.job.ApiAccessLogJobHandler;
+import cn.iocoder.yudao.framework.apilog.core.job.ApiErrorLogJobHandler;
 import cn.iocoder.yudao.framework.apilog.core.service.ApiAccessLogFrameworkService;
 import cn.iocoder.yudao.framework.apilog.core.service.ApiAccessLogFrameworkServiceImpl;
 import cn.iocoder.yudao.framework.apilog.core.service.ApiErrorLogFrameworkService;
 import cn.iocoder.yudao.framework.apilog.core.service.ApiErrorLogFrameworkServiceImpl;
 import cn.iocoder.yudao.framework.common.enums.WebFilterOrderEnum;
+import cn.iocoder.yudao.framework.quartz.core.job.LogJobProperties;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
 import cn.iocoder.yudao.framework.web.config.YudaoWebAutoConfiguration;
 import cn.iocoder.yudao.module.infra.api.logger.ApiAccessLogApi;
@@ -29,6 +32,16 @@ public class YudaoApiLogAutoConfiguration {
     @Bean
     public ApiErrorLogFrameworkService apiErrorLogFrameworkService(ApiErrorLogApi apiErrorLogApi) {
         return new ApiErrorLogFrameworkServiceImpl(apiErrorLogApi);
+    }
+
+    @Bean
+    public ApiAccessLogJobHandler apiAccessLogJobHandler(LogJobProperties logJobProperties) {
+        return new ApiAccessLogJobHandler(logJobProperties);
+    }
+
+    @Bean
+    public ApiErrorLogJobHandler apiErrorLogJobHandler(LogJobProperties logJobProperties) {
+        return new ApiErrorLogJobHandler(logJobProperties);
     }
 
     /**

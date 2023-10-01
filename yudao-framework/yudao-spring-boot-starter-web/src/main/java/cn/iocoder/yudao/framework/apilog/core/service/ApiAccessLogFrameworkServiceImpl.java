@@ -25,4 +25,9 @@ public class ApiAccessLogFrameworkServiceImpl implements ApiAccessLogFrameworkSe
         apiAccessLogApi.createApiAccessLog(reqDTO);
     }
 
+    @Override
+    public void jobCleanAccessLog(Integer accessLogJobDay) {
+        apiAccessLogApi.jobCleanAccessLog(accessLogJobDay);
+    }
+
 }
