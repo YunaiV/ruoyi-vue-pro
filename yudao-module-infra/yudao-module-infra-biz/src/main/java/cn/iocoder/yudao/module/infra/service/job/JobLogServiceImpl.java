@@ -52,10 +52,13 @@ public class JobLogServiceImpl implements JobLogService {
         }
     }
 
+    // TODO @j-sentinel：这个 job，也可以忽略租户哈；可以直接使用  @TenantIgnore 注解；
     @Override
     public Integer timingJobCleanLog(Integer jobCleanRetainDay) {
         Integer result = null;
         int count = 0;
+        // TODO @j-sentinel：一般我们在写逻辑时，尽量避免用 while true 这种“死循环”，而是  for (int i = 0; i < Short.MAX) 类似这种；避免里面真的发生一些意外的情况，无限执行；
+        // 然后 for 里面，可以有个 if count < 100 未到达删除的预期条数，说明已经到底，可以 break 了；
         while (result == null || DELETE_LIMIT.equals(result)){
             result = jobLogMapper.timingJobCleanLog(jobCleanRetainDay);
             count += result;

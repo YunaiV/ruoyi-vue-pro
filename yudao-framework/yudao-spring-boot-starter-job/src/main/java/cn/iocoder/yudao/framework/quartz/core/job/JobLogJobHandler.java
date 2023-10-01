@@ -7,7 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Resource;
 
+// TODO @j-sentinel：名字和项目里其它保持统一，可以叫 JobLogCleanJob，不用带 handler 哈
 /**
+ * // TODO @j-sentinel：要写下类注释噢，就是这个类要干啥；然后下面两个应该是 @author 和 @since
  * @Author: j-sentinel
  * @Date: 2023/9/30 20:40
  */

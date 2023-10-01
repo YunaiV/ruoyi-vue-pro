@@ -30,6 +30,7 @@ public class YudaoQuartzAutoConfiguration {
         return new SchedulerManager(scheduler.get());
     }
 
+    // TODO @j-sentinel：这个 job，先拿到 infra biz 里面实现哈；
     @Bean
     public JobLogJobHandler jobLogJobHandler(LogJobProperties logJobProperties){
         return new JobLogJobHandler(logJobProperties);

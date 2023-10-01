@@ -47,6 +47,7 @@ public class ApiAccessLogServiceImpl implements ApiAccessLogService {
     }
 
     @Override
+    // TODO j-sentinel：类似 JobLogServiceImpl 的建议
     public void jobCleanAccessLog(Integer accessLogJobDay) {
         TenantUtils.executeIgnore(() -> {
             Integer result = null;

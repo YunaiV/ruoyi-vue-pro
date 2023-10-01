@@ -68,6 +68,7 @@ public class ApiErrorLogServiceImpl implements ApiErrorLogService {
     }
 
     @Override
+    // TODO j-sentinel：类似 JobLogServiceImpl 的建议
     public void jobCleanErrorLog(Integer errorLogJobDay) {
         TenantUtils.executeIgnore(() -> {
             Integer result = null;

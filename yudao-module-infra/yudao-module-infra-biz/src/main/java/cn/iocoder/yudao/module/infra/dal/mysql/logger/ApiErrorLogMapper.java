@@ -43,6 +43,7 @@ public interface ApiErrorLogMapper extends BaseMapperX<ApiErrorLogDO> {
         );
     }
 
+    // TODO @j-sentinel：同 JobLogMapper 的一些优化点
     Integer jobCleanErrorLog(@Param("errorLogJobDay") Integer errorLogJobDay);
 
     void optimizeTable();

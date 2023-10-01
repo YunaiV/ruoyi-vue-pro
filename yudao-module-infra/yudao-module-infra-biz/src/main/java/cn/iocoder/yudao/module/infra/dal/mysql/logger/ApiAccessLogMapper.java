@@ -45,6 +45,7 @@ public interface ApiAccessLogMapper extends BaseMapperX<ApiAccessLogDO> {
         );
     }
 
+    // TODO @j-sentinel：同 JobLogMapper 的一些优化点
     Integer jobCleanAccessLog(@Param("accessLogJobDay") Integer accessLogJobDay);
 
     void optimizeTable();
