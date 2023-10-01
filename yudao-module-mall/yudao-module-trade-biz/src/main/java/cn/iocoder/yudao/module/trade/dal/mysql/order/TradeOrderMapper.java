@@ -37,7 +37,8 @@ public interface TradeOrderMapper extends BaseMapperX<TradeOrderDO> {
                 .eqIfPresent(TradeOrderDO::getTerminal, reqVO.getTerminal())
                 .eqIfPresent(TradeOrderDO::getLogisticsId, reqVO.getLogisticsId())
                 .inIfPresent(TradeOrderDO::getPickUpStoreId, reqVO.getPickUpStoreIds())
-                .betweenIfPresent(TradeOrderDO::getCreateTime, reqVO.getCreateTime()));
+                .betweenIfPresent(TradeOrderDO::getCreateTime, reqVO.getCreateTime())
+                .orderByDesc(TradeOrderDO::getId));
     }
 
     default PageResult<TradeOrderDO> selectPage(AppTradeOrderPageReqVO reqVO, Long userId) {
