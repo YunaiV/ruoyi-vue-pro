@@ -26,6 +26,8 @@ import java.util.List;
 @Slf4j
 public class JobLogServiceImpl implements JobLogService {
 
+    private static final Integer DELETE_LIMIT = 1;
+
     @Resource
     private JobLogMapper jobLogMapper;
 
@@ -48,6 +50,22 @@ public class JobLogServiceImpl implements JobLogService {
             log.error("[updateJobLogResultAsync][logId({}) endTime({}) duration({}) success({}) result({})]",
                     logId, endTime, duration, success, result);
         }
+    }
+
+    @Override
+    public Integer timingJobCleanLog(Integer jobCleanRetainDay) {
+        Integer result = null;
+        int count = 0;
+        while (result == null || DELETE_LIMIT.equals(result)){
+            result = jobLogMapper.timingJobCleanLog(jobCleanRetainDay);
+            count += result;
+        }
+        if(count > 0){
+            // ALTER TABLE...FORCE 会导致表重建发生,这会根据主键索引对表空间中的物理页进行排序。
+            // 它将行压缩到页面上并消除可用空间，同时确保数据处于主键查找的最佳顺序。
+            jobLogMapper.optimizeTable();
+        }
+        return count;
     }
 
     @Override

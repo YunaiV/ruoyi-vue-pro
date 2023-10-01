@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apiaccesslog.Api
 import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apiaccesslog.ApiAccessLogPageReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.logger.ApiAccessLogDO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -44,4 +45,7 @@ public interface ApiAccessLogMapper extends BaseMapperX<ApiAccessLogDO> {
         );
     }
 
+    Integer jobCleanAccessLog(@Param("accessLogJobDay") Integer accessLogJobDay);
+
+    void optimizeTable();
 }

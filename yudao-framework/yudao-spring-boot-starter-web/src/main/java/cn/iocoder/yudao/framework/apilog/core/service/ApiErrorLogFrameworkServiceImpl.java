@@ -25,4 +25,9 @@ public class ApiErrorLogFrameworkServiceImpl implements ApiErrorLogFrameworkServ
         apiErrorLogApi.createApiErrorLog(reqDTO);
     }
 
+    @Override
+    public void jobCleanErrorLog(Integer errorLogJobDay) {
+        apiErrorLogApi.jobCleanErrorLog(errorLogJobDay);
+    }
+
 }

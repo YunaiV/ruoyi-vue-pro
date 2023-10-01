@@ -24,4 +24,9 @@ public class ApiAccessLogApiImpl implements ApiAccessLogApi {
         apiAccessLogService.createApiAccessLog(createDTO);
     }
 
+    @Override
+    public void jobCleanAccessLog(Integer accessLogJobDay) {
+        apiAccessLogService.jobCleanAccessLog(accessLogJobDay);
+    }
+
 }

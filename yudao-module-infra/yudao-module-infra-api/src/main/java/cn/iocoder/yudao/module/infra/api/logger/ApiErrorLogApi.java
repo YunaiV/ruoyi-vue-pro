@@ -18,4 +18,10 @@ public interface ApiErrorLogApi {
      */
     void createApiErrorLog(@Valid ApiErrorLogCreateReqDTO createDTO);
 
+    /**
+     * 清理 @param errorLogJobDay 天的访问日志
+     *
+     * @param errorLogJobDay 超过多少天就进行清理
+     */
+    void jobCleanErrorLog(Integer errorLogJobDay);
 }

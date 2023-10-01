@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.infra.dal.mysql.logger.ApiAccessLogMapper">
+
+    <!--
+        一般情况下，尽可能使用 Mapper 进行 CRUD 增删改查即可。
+        无法满足的场景，例如说多表关联查询，才使用 XML 编写 SQL。
+        代码生成器暂时只生成 Mapper XML 文件本身，更多推荐 MybatisX 快速开发插件来生成查询。
+        文档可见：https://www.iocoder.cn/MyBatis/x-plugins/
+     -->
+
+    <delete id="jobCleanAccessLog" parameterType="integer">
+        DELETE FROM infra_api_access_log
+        WHERE id IN (
+        SELECT * FROM (
+          SELECT id FROM infra_api_access_log
+          WHERE create_time &lt; DATE_SUB(CURDATE(), INTERVAL #{accessLogJobDay} DAY)
+          ORDER BY id ASC LIMIT 100
+        ) AS a
+        )
+    </delete>
+
+    <select id="optimizeTable">
+        ALTER TABLE infra_job_log FORCE
+        /*
+        ALTER TABLE infra_job_log ENGINE = INNODB,
+        ALGORITHM = INPLACE,
+        LOCK = NONE
+        */
+    </select>
+
+</mapper>

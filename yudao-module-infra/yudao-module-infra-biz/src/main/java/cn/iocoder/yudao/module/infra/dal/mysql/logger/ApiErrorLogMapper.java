@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apierrorlog.ApiE
 import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apierrorlog.ApiErrorLogPageReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.logger.ApiErrorLogDO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -42,4 +43,7 @@ public interface ApiErrorLogMapper extends BaseMapperX<ApiErrorLogDO> {
         );
     }
 
+    Integer jobCleanErrorLog(@Param("errorLogJobDay") Integer errorLogJobDay);
+
+    void optimizeTable();
 }
