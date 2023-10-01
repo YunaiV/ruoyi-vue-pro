@@ -15,6 +15,9 @@ public class AppMemberSignInRecordRespVO {
     @Schema(description = "签到的分数", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     private Integer point;
 
+    @Schema(description = "签到的经验", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
+    private Integer experience;
+
     @Schema(description = "签到时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 

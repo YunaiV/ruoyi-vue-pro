@@ -788,7 +788,7 @@ CREATE TABLE `member_level_record`  (
   `user_id` bigint NOT NULL DEFAULT 0 COMMENT '用户编号',
   `level_id` bigint NOT NULL DEFAULT 0 COMMENT '等级编号',
   `level` int NOT NULL DEFAULT 0 COMMENT '会员等级',
-  `discount_percent` tinyint NOT NULL DEFAULT 100 COMMENT '享受折扣',
+  `discount_percent` int NOT NULL DEFAULT 100 COMMENT '享受折扣',
   `experience` int NOT NULL DEFAULT 0 COMMENT '升级经验',
   `user_experience` int NOT NULL DEFAULT 0 COMMENT '会员此时的经验',
   `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '备注',
@@ -888,7 +888,8 @@ DROP TABLE IF EXISTS `member_sign_in_config`;
 CREATE TABLE `member_sign_in_config`  (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '编号',
   `day` int NOT NULL COMMENT '第几天',
-  `point` int NOT NULL COMMENT '奖励积分',
+  `point` int NOT NULL DEFAULT 0 COMMENT '奖励积分',
+  `experience` int NOT NULL DEFAULT 0 COMMENT '奖励经验',
   `status` tinyint NOT NULL COMMENT '状态',
   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -903,18 +904,18 @@ CREATE TABLE `member_sign_in_config`  (
 -- Records of member_sign_in_config
 -- ----------------------------
 BEGIN;
-INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (1, 1, 10, 0, '', '2023-08-20 01:38:56', '', '2023-08-20 01:38:56', b'0', 0);
-INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (2, 2, 20, 0, '', '2023-08-20 01:38:56', '', '2023-08-20 01:38:56', b'0', 0);
-INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (3, 7, 1001, 0, '', '2023-08-20 01:38:56', '', '2023-08-20 01:38:56', b'0', 0);
-INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4, 6, 12121, 0, '', '2023-08-20 01:38:56', '', '2023-08-20 01:38:56', b'0', 0);
-INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (5, 2, 12, 0, '', '2023-08-20 01:38:56', '', '2023-08-20 01:38:56', b'0', 0);
-INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (6, 1, 10, 0, '1', '2023-08-20 19:20:42', '1', '2023-08-20 19:20:56', b'0', 1);
-INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (7, 7, 22, 0, '1', '2023-08-20 19:20:48', '1', '2023-08-20 19:20:48', b'0', 1);
-INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (8, 2, 3, 0, '1', '2023-08-21 20:22:44', '1', '2023-08-21 20:22:44', b'0', 1);
-INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (9, 3, 4, 0, '1', '2023-08-21 20:22:48', '1', '2023-08-21 20:22:48', b'0', 1);
-INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (10, 4, 5, 0, '1', '2023-08-21 20:22:51', '1', '2023-08-21 20:22:51', b'0', 1);
-INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (11, 5, 6, 0, '1', '2023-08-21 20:22:56', '1', '2023-08-21 20:22:56', b'0', 1);
-INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (12, 6, 7, 0, '1', '2023-08-21 20:22:59', '1', '2023-08-21 20:22:59', b'0', 1);
+INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `experience`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (1, 1, 10, 10, 0, '', '2023-08-20 01:38:56', '', '2023-08-20 01:38:56', b'0', 0);
+INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `experience`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (2, 2, 20, 20, 0, '', '2023-08-20 01:38:56', '', '2023-08-20 01:38:56', b'0', 0);
+INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `experience`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (3, 7, 1001, 1001, 0, '', '2023-08-20 01:38:56', '', '2023-08-20 01:38:56', b'0', 0);
+INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `experience`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4, 6, 12121, 12121, 0, '', '2023-08-20 01:38:56', '', '2023-08-20 01:38:56', b'0', 0);
+INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `experience`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (5, 3, 12, 12, 0, '', '2023-08-20 01:38:56', '', '2023-08-20 01:38:56', b'0', 0);
+INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `experience`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (6, 1, 10, 10, 0, '1', '2023-08-20 19:20:42', '1', '2023-08-20 19:20:56', b'0', 1);
+INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `experience`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (7, 7, 22, 22, 0, '1', '2023-08-20 19:20:48', '1', '2023-08-20 19:20:48', b'0', 1);
+INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `experience`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (8, 2, 3, 3, 0, '1', '2023-08-21 20:22:44', '1', '2023-08-21 20:22:44', b'0', 1);
+INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `experience`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (9, 3, 4, 4, 0, '1', '2023-08-21 20:22:48', '1', '2023-08-21 20:22:48', b'0', 1);
+INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `experience`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (10, 4, 5, 5, 0, '1', '2023-08-21 20:22:51', '1', '2023-08-21 20:22:51', b'0', 1);
+INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `experience`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (11, 5, 6, 6, 0, '1', '2023-08-21 20:22:56', '1', '2023-08-21 20:22:56', b'0', 1);
+INSERT INTO `member_sign_in_config` (`id`, `day`, `point`, `experience`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (12, 6, 7, 7, 0, '1', '2023-08-21 20:22:59', '1', '2023-08-21 20:22:59', b'0', 1);
 COMMIT;
 
 -- ----------------------------
@@ -925,7 +926,8 @@ CREATE TABLE `member_sign_in_record`  (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '签到自增id',
   `user_id` int NULL DEFAULT NULL COMMENT '签到用户',
   `day` int NULL DEFAULT NULL COMMENT '第几天签到',
-  `point` int NULL DEFAULT NULL COMMENT '签到的分数',
+  `point` int NOT NULL DEFAULT 0 COMMENT '签到的积分',
+  `experience` int NOT NULL DEFAULT 0 COMMENT '签到的经验',
   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
@@ -934,6 +936,8 @@ CREATE TABLE `member_sign_in_record`  (
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '签到记录';
+
+CREATE INDEX user_id_index ON member_sign_in_record (user_id);
 
 -- ----------------------------
 -- Records of member_sign_in_record
