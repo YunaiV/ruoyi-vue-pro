@@ -78,18 +78,18 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
 
     private boolean isDeductPointEnable(MemberConfigRespDTO config) {
         return config != null &&
-                !BooleanUtil.isTrue(config.getTradeDeductEnable()) &&  // 积分功能是否启用
-                config.getTradeDeductUnitPrice() != null && config.getTradeDeductUnitPrice() > 0; // 有没有配置：1 积分抵扣多少分
+                !BooleanUtil.isTrue(config.getPointTradeDeductEnable()) &&  // 积分功能是否启用
+                config.getPointTradeDeductUnitPrice() != null && config.getPointTradeDeductUnitPrice() > 0; // 有没有配置：1 积分抵扣多少分
     }
 
     private Integer calculatePointPrice(MemberConfigRespDTO config, Integer usePoint, TradePriceCalculateRespBO result) {
         // 每个订单最多可以使用的积分数量
-        if (config.getTradeDeductMaxPrice() != null && config.getTradeDeductMaxPrice() > 0) {
-            usePoint = Math.min(usePoint, config.getTradeDeductMaxPrice());
+        if (config.getPointTradeDeductMaxPrice() != null && config.getPointTradeDeductMaxPrice() > 0) {
+            usePoint = Math.min(usePoint, config.getPointTradeDeductMaxPrice());
         }
         // TODO @疯狂：这里应该是，抵扣到只剩下 0.01；
         // 积分优惠金额（分）
-        int pointPrice = usePoint * config.getTradeDeductUnitPrice();
+        int pointPrice = usePoint * config.getPointTradeDeductUnitPrice();
         if (result.getPrice().getPayPrice() <= pointPrice) {
             // 禁止 0 元购
             throw exception(PRICE_CALCULATE_PAY_PRICE_ILLEGAL);
@@ -99,7 +99,7 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
 //            pointPrice = result.getPrice().getPayPrice();
 //            // 反推需要扣除的积分
 //            usePoint = NumberUtil.toBigDecimal(pointPrice)
-//                    .divide(NumberUtil.toBigDecimal(config.getTradeDeductUnitPrice()), 0, RoundingMode.HALF_UP)
+//                    .divide(NumberUtil.toBigDecimal(config.getPointTradeDeductUnitPrice()), 0, RoundingMode.HALF_UP)
 //                    .intValue();
 //        }
         // 记录使用的积分

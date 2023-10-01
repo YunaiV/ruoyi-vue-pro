@@ -815,10 +815,10 @@ COMMIT;
 DROP TABLE IF EXISTS `member_config`;
 CREATE TABLE `member_config`  (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增主键',
-  `trade_deduct_enable` bit(1) NOT NULL COMMENT '是否开启积分抵扣',
-  `trade_deduct_unit_price` int NOT NULL COMMENT '积分抵扣(单位：分)',
-  `trade_deduct_max_price` int NULL DEFAULT NULL COMMENT '积分抵扣最大值',
-  `trade_give_point` bigint NULL DEFAULT NULL COMMENT '1 元赠送多少分',
+  `point_trade_deduct_enable` bit(1) NOT NULL COMMENT '是否开启积分抵扣',
+  `point_trade_deduct_unit_price` int NOT NULL COMMENT '积分抵扣(单位：分)',
+  `point_trade_deduct_max_price` int NULL DEFAULT NULL COMMENT '积分抵扣最大值',
+  `point_trade_give_point` bigint NULL DEFAULT NULL COMMENT '1 元赠送多少分',
   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
@@ -832,7 +832,7 @@ CREATE TABLE `member_config`  (
 -- Records of member_config
 -- ----------------------------
 BEGIN;
-INSERT INTO `member_config` (`id`, `trade_deduct_enable`, `trade_deduct_unit_price`, `trade_deduct_max_price`, `trade_give_point`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (5, b'1', 100, 2, 3, '1', '2023-08-20 09:54:42', '1', '2023-08-20 09:54:42', b'0', 1);
+INSERT INTO `member_config` (`id`, `point_trade_deduct_enable`, `point_trade_deduct_unit_price`, `point_trade_deduct_max_price`, `point_trade_give_point`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (5, b'1', 100, 2, 3, '1', '2023-08-20 09:54:42', '1', '2023-08-20 09:54:42', b'0', 1);
 COMMIT;
 
 -- ----------------------------

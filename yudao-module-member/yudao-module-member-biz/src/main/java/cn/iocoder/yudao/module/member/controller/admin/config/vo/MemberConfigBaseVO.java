@@ -14,18 +14,18 @@ public class MemberConfigBaseVO {
 
     @Schema(description = "积分抵扣开关", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     @NotNull(message = "积分抵扣开发不能为空")
-    private Boolean tradeDeductEnable;
+    private Boolean pointTradeDeductEnable;
 
     @Schema(description = "积分抵扣，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "13506")
     @NotNull(message = "积分抵扣不能为空")
-    private Integer tradeDeductUnitPrice;
+    private Integer pointTradeDeductUnitPrice;
 
     @Schema(description = "积分抵扣最大值", requiredMode = Schema.RequiredMode.REQUIRED, example = "32428")
     @NotNull(message = "积分抵扣最大值不能为空")
-    private Integer tradeDeductMaxPrice;
+    private Integer pointTradeDeductMaxPrice;
 
     @Schema(description = "1 元赠送多少分", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
     @NotNull(message = "1 元赠送积分不能为空")
-    private Integer tradeGivePoint;
+    private Integer pointTradeGivePoint;
 
 }

@@ -34,8 +34,8 @@ public class TradePointGiveCalculator implements TradePriceCalculator {
     public void calculate(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result) {
         // 1.1 校验积分功能是否开启
         int givePointPerYuan = Optional.ofNullable(memberConfigApi.getConfig())
-                .filter(config -> BooleanUtil.isTrue(config.getTradeDeductEnable()))
-                .map(MemberConfigRespDTO::getTradeGivePoint)
+                .filter(config -> BooleanUtil.isTrue(config.getPointTradeDeductEnable()))
+                .map(MemberConfigRespDTO::getPointTradeGivePoint)
                 .orElse(0);
         if (givePointPerYuan <= 0) {
             return;
