@@ -16,9 +16,4 @@ public class BargainRecordApiImpl implements BargainRecordApi {
 
     }
 
-    @Override
-    public boolean isBargainRecordSuccess(Long userId, Long orderId) {
-        return false;
-    }
-
 }

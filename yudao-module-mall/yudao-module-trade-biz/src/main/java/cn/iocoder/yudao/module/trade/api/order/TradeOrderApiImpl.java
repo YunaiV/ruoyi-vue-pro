@@ -1,15 +1,14 @@
 package cn.iocoder.yudao.module.trade.api.order;
 
-import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Collection;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.ORDER_ITEM_NOT_FOUND;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.ORDER_NOT_FOUND;
 
 /**
  * 订单 API 接口实现类
@@ -24,18 +23,12 @@ public class TradeOrderApiImpl implements TradeOrderApi {
     private TradeOrderQueryService tradeOrderQueryService;
 
     @Override
-    public Long validateOrder(Long userId, Long orderItemId) {
-        // 校验订单项，订单项存在订单就存在
-        TradeOrderItemDO item = tradeOrderQueryService.getOrderItem(userId, orderItemId);
-        if (item == null) {
-            throw exception(ORDER_ITEM_NOT_FOUND);
+    public Integer getOrderStatus(Long id) {
+        TradeOrderDO order = tradeOrderQueryService.getOrder(id);
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
         }
-        return item.getOrderId();
-    }
-
-    @Override
-    public Integer getOrderItemCountSumByOrderIdAndSkuId(Collection<Long> orderIds, Collection<Long> skuIds) {
-        return tradeOrderQueryService.getOrderItemCountSumByOrderIdAndSkuId(orderIds, skuIds);
+        return order.getStatus();
     }
 
 }

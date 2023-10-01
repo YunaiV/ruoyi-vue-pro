@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.service.seckill;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -276,6 +277,20 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     @Override
     public PageResult<SeckillActivityDO> getSeckillActivityAppPageByConfigId(AppSeckillActivityPageReqVO pageReqVO) {
         return seckillActivityMapper.selectPage(pageReqVO, CommonStatusEnum.ENABLE.getStatus());
+    }
+
+    @Override
+    public List<SeckillProductDO> getSeckillActivityProductList(Long id, Collection<Long> skuIds) {
+        // 1、校验秒杀活动是否存在
+        validateSeckillActivityExists(id);
+        // 2、校验活动商品是否存在
+        List<SeckillProductDO> productList = filterList(seckillProductMapper.selectListByActivityId(id),
+                item -> skuIds.contains(item.getSkuId()));
+        if (CollectionUtil.isEmpty(productList)) {
+            throw exception(SKU_NOT_EXISTS);
+        }
+
+        return productList;
     }
 
 }

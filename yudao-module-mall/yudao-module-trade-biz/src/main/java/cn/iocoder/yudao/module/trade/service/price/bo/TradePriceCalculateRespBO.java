@@ -99,8 +99,18 @@ public class TradePriceCalculateRespBO {
          */
         private Integer vipPrice;
         /**
+         * 秒杀、拼团、砍价活动商品的总金额，单位：分
+         *
+         * 基于 {@link OrderItem#getActivityPrice()} ()} * {@link OrderItem#getCount()} 求和
+         */
+        private Integer activityPrice;
+        /**
          * 最终购买金额（总），单位：分
          *
+         * ==========活动情况===========
+         * = {@link #activityPrice}
+         * + {@link #deliveryPrice}
+         * ==========正常情况===========
          * = {@link #totalPrice}
          * - {@link #couponPrice}
          * - {@link #pointPrice}
@@ -177,8 +187,15 @@ public class TradePriceCalculateRespBO {
          */
         private Integer vipPrice;
         /**
+         * 秒杀、拼团、砍价活动商品的金额，单位：分
+         */
+        private Integer activityPrice;
+        /**
          * 应付金额（总），单位：分
-         *
+         * ==========活动情况===========
+         * = {@link #activityPrice} * {@link #count}
+         * + {@link #deliveryPrice}
+         * ==========正常情况===========
          * = {@link #price} * {@link #count}
          * - {@link #couponPrice}
          * - {@link #pointPrice}

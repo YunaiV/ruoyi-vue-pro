@@ -75,9 +75,11 @@ public interface ErrorCodeConstants {
     ErrorCode COMBINATION_RECORD_HEAD_NOT_EXISTS = new ErrorCode(1_013_011_002, "拼团失败，父拼团不存在");
     ErrorCode COMBINATION_RECORD_USER_FULL = new ErrorCode(1_013_011_003, "拼团失败，拼团人数已满");
     ErrorCode COMBINATION_RECORD_FAILED_HAVE_JOINED = new ErrorCode(1_013_011_004, "拼团失败，已参与其它拼团");
-    ErrorCode COMBINATION_RECORD_FAILED_TIME_END = new ErrorCode(1_013_011_005, "拼团失败，活动已经结束");
-    ErrorCode COMBINATION_RECORD_FAILED_SINGLE_LIMIT_COUNT_EXCEED = new ErrorCode(1_013_011_006, "拼团失败，原因：单次限购超出");
-    ErrorCode COMBINATION_RECORD_FAILED_TOTAL_LIMIT_COUNT_EXCEED = new ErrorCode(1_013_011_007, "拼团失败，原因：超出总购买次数");
+    ErrorCode COMBINATION_RECORD_FAILED_TIME_NOT_START = new ErrorCode(1_013_011_005, "拼团失败，活动未开始");
+    ErrorCode COMBINATION_RECORD_FAILED_TIME_END = new ErrorCode(1_013_011_006, "拼团失败，活动已经结束");
+    ErrorCode COMBINATION_RECORD_FAILED_SINGLE_LIMIT_COUNT_EXCEED = new ErrorCode(1_013_011_007, "拼团失败，原因：单次限购超出");
+    ErrorCode COMBINATION_RECORD_FAILED_TOTAL_LIMIT_COUNT_EXCEED = new ErrorCode(1_013_011_008, "拼团失败，原因：超出总购买次数");
+    ErrorCode COMBINATION_RECORD_FAILED_ORDER_STATUS_UNPAID = new ErrorCode(1_013_011_009, "拼团失败，原因：存在未支付订单，请先支付");
 
     // ========== 砍价活动 1-013-012-000 ==========
     ErrorCode BARGAIN_ACTIVITY_NOT_EXISTS = new ErrorCode(1_013_012_000, "砍价活动不存在");

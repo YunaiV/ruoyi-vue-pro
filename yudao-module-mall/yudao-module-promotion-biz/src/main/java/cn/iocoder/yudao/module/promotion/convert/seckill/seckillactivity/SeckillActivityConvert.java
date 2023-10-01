@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.module.promotion.convert.seckill.seckillactivity;
 
-import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.product.enums.DictTypeConstants;
+import cn.iocoder.yudao.module.promotion.api.seckill.dto.SeckillActivityProductRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityDetailRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityRespVO;
@@ -128,11 +129,16 @@ public interface SeckillActivityConvert {
     default AppSeckillActivityDetailRespVO convert3(SeckillActivityDO seckillActivity, List<SeckillProductDO> products, SeckillConfigDO filteredConfig) {
         return convert2(seckillActivity)
                 .setProducts(convertList1(products))
-                // TODO @puhui999：要不要在里面 default 一个方法，处理这个事件；简洁一点；
-                .setStartTime(LocalDateTimeUtil.parse(LocalDateTimeUtil.format(seckillActivity.getStartTime(), "yyyy-MM-dd") + " " + filteredConfig.getStartTime(),
-                        "yyyy-MM-dd HH:mm:ss")) // 活动开始日期和时段结合
-                .setEndTime(LocalDateTimeUtil.parse(LocalDateTimeUtil.format(seckillActivity.getEndTime(), "yyyy-MM-dd") + " " + filteredConfig.getEndTime(),
-                        "yyyy-MM-dd HH:mm:ss")); // 活动结束日期和时段结合
+                .setStartTime(new LocalDateTimeUtils.BuilderDateTime()
+                        .withDate(seckillActivity.getStartTime())
+                        .withTime(filteredConfig.getStartTime())
+                        .build())// 活动开始日期和时段结合
+                .setEndTime(new LocalDateTimeUtils.BuilderDateTime()
+                        .withDate(seckillActivity.getEndTime())
+                        .withTime(filteredConfig.getEndTime())
+                        .build()); // 活动结束日期和时段结合
     }
+
+    List<SeckillActivityProductRespDTO> convertList4(List<SeckillProductDO> seckillActivityProductList);
 
 }

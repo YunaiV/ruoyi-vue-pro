@@ -97,4 +97,44 @@ public class LocalDateTimeUtils {
                 LocalDateTime.of(nowDate, startTime2), LocalDateTime.of(nowDate, endTime2));
     }
 
+    /**
+     * 构建日期时间 TODO 后面有需要的话再继续扩展
+     *
+     * @author HUIHUI
+     */
+    public static class BuilderDateTime {
+
+        /**
+         * 日期；2023-10-01
+         */
+        private String localDate;
+        /**
+         * 时间；10:01:00
+         */
+        private String localTime;
+
+        public BuilderDateTime() {
+        }
+
+        public BuilderDateTime withDate(String date) {
+            this.localDate = date;
+            return this;
+        }
+
+        public BuilderDateTime withDate(LocalDateTime date) {
+            this.localDate = LocalDateTimeUtil.format(date, "yyyy-MM-dd");
+            return this;
+        }
+
+        public BuilderDateTime withTime(String time) {
+            this.localTime = time;
+            return this;
+        }
+
+        public LocalDateTime build() {
+            return LocalDateTimeUtil.parse(this.localDate + " " + this.localTime, "yyyy-MM-dd HH:mm:ss");
+        }
+
+    }
+
 }

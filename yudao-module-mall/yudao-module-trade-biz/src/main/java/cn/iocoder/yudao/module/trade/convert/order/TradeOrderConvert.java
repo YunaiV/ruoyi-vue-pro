@@ -93,6 +93,7 @@ public interface TradeOrderConvert {
                 new ProductSkuUpdateStockReqDTO.Item().setId(item.getSkuId()).setIncrCount(item.getCount()));
         return new ProductSkuUpdateStockReqDTO(items);
     }
+
     default ProductSkuUpdateStockReqDTO convertNegative(List<AppTradeOrderSettlementReqVO.Item> list) {
         List<ProductSkuUpdateStockReqDTO.Item> items = CollectionUtils.convertList(list, item ->
                 new ProductSkuUpdateStockReqDTO.Item().setId(item.getSkuId()).setIncrCount(-item.getCount()));
@@ -209,6 +210,8 @@ public interface TradeOrderConvert {
     })
     ProductCommentCreateReqDTO convert04(AppTradeOrderItemCommentCreateReqVO createReqVO, TradeOrderItemDO tradeOrderItemDO);
 
+    TradePriceCalculateReqBO convert(AppTradeOrderSettlementReqVO settlementReqVO);
+
     default TradePriceCalculateReqBO convert(Long userId, AppTradeOrderSettlementReqVO settlementReqVO,
                                              List<CartDO> cartList) {
         TradePriceCalculateReqBO reqBO = new TradePriceCalculateReqBO().setUserId(userId)
@@ -249,17 +252,6 @@ public interface TradeOrderConvert {
 
     AppTradeOrderSettlementRespVO convert0(TradePriceCalculateRespBO calculate, AddressRespDTO address);
 
-    @Mappings({
-            @Mapping(target = "activityId", source = "afterOrderCreateReqBO.combinationActivityId"),
-            @Mapping(target = "spuId", source = "afterOrderCreateReqBO.spuId"),
-            @Mapping(target = "skuId", source = "afterOrderCreateReqBO.skuId"),
-            @Mapping(target = "orderId", source = "afterOrderCreateReqBO.orderId"),
-            @Mapping(target = "userId", source = "afterOrderCreateReqBO.userId"),
-            @Mapping(target = "headId", source = "afterOrderCreateReqBO.combinationHeadId"),
-            @Mapping(target = "combinationPrice", source = "afterOrderCreateReqBO.payPrice"),
-    })
-    CombinationRecordCreateReqDTO convert(TradeAfterOrderCreateReqBO afterOrderCreateReqBO);
-
     List<AppOrderExpressTrackRespDTO> convertList02(List<ExpressTrackRespDTO> list);
 
     TradeOrderDO convert(TradeOrderUpdateAddressReqVO reqVO);
@@ -280,18 +272,36 @@ public interface TradeOrderConvert {
         return bo;
     }
 
-    TradeBeforeOrderCreateReqBO convert(AppTradeOrderCreateReqVO createReqVO);
+    @Mappings({
+            @Mapping(target = "userId", source = "userId"),
+            @Mapping(target = "orderType", source = "calculateRespBO.type"),
+            @Mapping(target = "items", source = "createReqVO.items"),
+    })
+    TradeBeforeOrderCreateReqBO convert(Long userId, AppTradeOrderCreateReqVO createReqVO, TradePriceCalculateRespBO calculateRespBO);
+
+
+    List<TradeAfterOrderCreateReqBO.Item> convertList(List<TradeOrderItemDO> orderItems);
+
 
     @Mappings({
-            @Mapping(target = "combinationActivityId", source = "createReqVO.combinationActivityId"),
-            @Mapping(target = "combinationHeadId", source = "createReqVO.combinationHeadId"),
-            @Mapping(target = "spuId", source = "orderItem.spuId"),
-            @Mapping(target = "skuId", source = "orderItem.skuId"),
-            @Mapping(target = "orderId", source = "tradeOrderDO.id"),
             @Mapping(target = "userId", source = "userId"),
+            @Mapping(target = "orderId", source = "tradeOrderDO.id"),
             @Mapping(target = "payPrice", source = "tradeOrderDO.payPrice"),
+            @Mapping(target = "items", source = "orderItems"),
     })
     TradeAfterOrderCreateReqBO convert(Long userId, AppTradeOrderCreateReqVO createReqVO,
-                                       TradeOrderDO tradeOrderDO, TradeOrderItemDO orderItem);
+                                       TradeOrderDO tradeOrderDO, List<TradeOrderItemDO> orderItems);
+
+    @Mappings({
+            @Mapping(target = "activityId", source = "combinationActivityId"),
+            @Mapping(target = "spuId", expression = "java(reqBO.getItems().get(0).getSpuId())"),
+            @Mapping(target = "skuId", expression = "java(reqBO.getItems().get(0).getSkuId())"),// TODO 艿艿看看这里
+            @Mapping(target = "count", expression = "java(reqBO.getItems().get(0).getCount())"),
+            @Mapping(target = "orderId", source = "orderId"),
+            @Mapping(target = "userId", source = "userId"),
+            @Mapping(target = "headId", source = "combinationHeadId"),
+            @Mapping(target = "combinationPrice", source = "payPrice")
+    })
+    CombinationRecordCreateReqDTO convert(TradeAfterOrderCreateReqBO reqBO);
 
 }

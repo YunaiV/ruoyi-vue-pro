@@ -20,6 +20,11 @@ public class CombinationRecordApiImpl implements CombinationRecordApi {
     private CombinationRecordService recordService;
 
     @Override
+    public void validateCombinationRecord(Long activityId, Long userId, Long skuId, Integer count) {
+        recordService.validateCombinationRecord(activityId, userId, skuId, count);
+    }
+
+    @Override
     public void createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {
         recordService.createCombinationRecord(reqDTO);
     }
