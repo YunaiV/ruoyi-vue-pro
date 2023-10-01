@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.member.api.point.dto;
+package cn.iocoder.yudao.module.member.api.config.dto;
 
 import lombok.Data;
 
@@ -8,7 +8,7 @@ import lombok.Data;
  * @author 芋道源码
  */
 @Data
-public class MemberPointConfigRespDTO {
+public class MemberConfigRespDTO {
 
     /**
      * 积分抵扣开关

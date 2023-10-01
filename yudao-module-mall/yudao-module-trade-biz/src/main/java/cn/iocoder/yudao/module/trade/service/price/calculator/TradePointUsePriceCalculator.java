@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.trade.service.price.calculator;
 
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.member.api.point.MemberPointApi;
-import cn.iocoder.yudao.module.member.api.point.dto.MemberPointConfigRespDTO;
+import cn.iocoder.yudao.module.member.api.config.MemberConfigApi;
+import cn.iocoder.yudao.module.member.api.config.dto.MemberConfigRespDTO;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
@@ -32,7 +32,7 @@ import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PRICE_CALCU
 public class TradePointUsePriceCalculator implements TradePriceCalculator {
 
     @Resource
-    private MemberPointApi memberPointApi;
+    private MemberConfigApi memberConfigApi;
     @Resource
     private MemberUserApi memberUserApi;
 
@@ -44,7 +44,7 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
             return;
         }
         // 1.2 校验积分抵扣是否开启
-        MemberPointConfigRespDTO config = memberPointApi.getConfig();
+        MemberConfigRespDTO config = memberConfigApi.getConfig();
         if (!isDeductPointEnable(config)) {
             return;
         }
@@ -76,13 +76,13 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
         TradePriceCalculatorHelper.recountAllPrice(result);
     }
 
-    private boolean isDeductPointEnable(MemberPointConfigRespDTO config) {
+    private boolean isDeductPointEnable(MemberConfigRespDTO config) {
         return config != null &&
                 !BooleanUtil.isTrue(config.getTradeDeductEnable()) &&  // 积分功能是否启用
                 config.getTradeDeductUnitPrice() != null && config.getTradeDeductUnitPrice() > 0; // 有没有配置：1 积分抵扣多少分
     }
 
-    private Integer calculatePointPrice(MemberPointConfigRespDTO config, Integer usePoint, TradePriceCalculateRespBO result) {
+    private Integer calculatePointPrice(MemberConfigRespDTO config, Integer usePoint, TradePriceCalculateRespBO result) {
         // 每个订单最多可以使用的积分数量
         if (config.getTradeDeductMaxPrice() != null && config.getTradeDeductMaxPrice() > 0) {
             usePoint = Math.min(usePoint, config.getTradeDeductMaxPrice());
