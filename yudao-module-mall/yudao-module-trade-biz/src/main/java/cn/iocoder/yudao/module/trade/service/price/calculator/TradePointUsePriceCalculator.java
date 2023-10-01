@@ -20,7 +20,6 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PRICE_CALCULATE_PAY_PRICE_ILLEGAL;
 
-// TODO @疯狂：搞个单测，嘿嘿；
 /**
  * 使用积分的 {@link TradePriceCalculator} 实现类
  *
@@ -38,6 +37,8 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
 
     @Override
     public void calculate(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result) {
+        // 默认使用积分为 0
+        result.setUsePoint(0);
         // 1.1 校验是否使用积分
         if (!BooleanUtil.isTrue(param.getPointStatus())) {
             result.setUsePoint(0);
@@ -78,7 +79,7 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
 
     private boolean isDeductPointEnable(MemberConfigRespDTO config) {
         return config != null &&
-                !BooleanUtil.isTrue(config.getPointTradeDeductEnable()) &&  // 积分功能是否启用
+                BooleanUtil.isTrue(config.getPointTradeDeductEnable()) &&  // 积分功能是否启用
                 config.getPointTradeDeductUnitPrice() != null && config.getPointTradeDeductUnitPrice() > 0; // 有没有配置：1 积分抵扣多少分
     }
 

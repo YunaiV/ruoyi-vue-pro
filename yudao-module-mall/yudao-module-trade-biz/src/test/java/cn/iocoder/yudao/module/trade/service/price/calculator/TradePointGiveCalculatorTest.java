@@ -35,7 +35,7 @@ public class TradePointGiveCalculatorTest extends BaseMockitoUnitTest {
 
         // 准备参数
         TradePriceCalculateReqBO param = new TradePriceCalculateReqBO()
-                .setUserId(233L).setCouponId(1024L)
+                .setUserId(233L)
                 .setItems(asList(
                         new TradePriceCalculateReqBO.Item().setSkuId(10L).setCount(2).setSelected(true), // 全局积分
                         new TradePriceCalculateReqBO.Item().setSkuId(20L).setCount(3).setSelected(true), // 全局积分 + SKU 积分
@@ -61,8 +61,9 @@ public class TradePointGiveCalculatorTest extends BaseMockitoUnitTest {
         TradePriceCalculatorHelper.recountAllPrice(result);
 
         // mock 方法（积分配置 信息）
-        MemberConfigRespDTO memberConfig = randomPojo(MemberConfigRespDTO.class, o -> o.setPointTradeDeductEnable(true)
-                .setPointTradeGivePoint(100));
+        MemberConfigRespDTO memberConfig = randomPojo(MemberConfigRespDTO.class,
+                o -> o.setPointTradeDeductEnable(true)  // 启用积分折扣
+                        .setPointTradeGivePoint(100)); // 1 元赠送多少分
         when(memberConfigApi.getConfig()).thenReturn(memberConfig);
 
         // 调用
