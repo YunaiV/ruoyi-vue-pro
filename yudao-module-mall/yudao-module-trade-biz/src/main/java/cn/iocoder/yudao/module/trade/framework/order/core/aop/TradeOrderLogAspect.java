@@ -88,8 +88,9 @@ public class TradeOrderLogAspect {
                     .setOperateType(orderLog.operateType().getType()).setContent(content);
             orderLogService.createOrderLog(createBO);
         } catch (Exception ex) {
-            // todo 芋艿：清理上下文
             log.error("[doAfterReturning][orderLog({}) 订单日志错误]", toJsonString(orderLog), ex);
+        } finally {
+            clear();
         }
     }
 
@@ -125,6 +126,15 @@ public class TradeOrderLogAspect {
     public static void setUserInfo(Long userId, Integer userType) {
         USER_ID.set(userId);
         USER_TYPE.set(userType);
+    }
+
+    private static void clear() {
+        USER_ID.remove();
+        USER_TYPE.remove();
+        ORDER_ID.remove();
+        BEFORE_STATUS.remove();
+        AFTER_STATUS.remove();
+        EXTS.remove();
     }
 
 }

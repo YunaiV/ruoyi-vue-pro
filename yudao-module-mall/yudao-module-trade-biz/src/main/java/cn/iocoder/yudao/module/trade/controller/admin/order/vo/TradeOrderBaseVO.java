@@ -141,4 +141,8 @@ public class TradeOrderBaseVO {
 
     @Schema(description = "积分抵扣的金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
     private Integer pointPrice;
+
+    @Schema(description = "VIP 减免金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "888")
+    private Integer vipPrice;
+
 }

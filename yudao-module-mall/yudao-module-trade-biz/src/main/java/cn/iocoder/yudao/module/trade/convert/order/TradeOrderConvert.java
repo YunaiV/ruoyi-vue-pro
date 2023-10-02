@@ -29,6 +29,7 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.cart.CartDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderLogDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressTrackRespDTO;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
@@ -42,7 +43,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -115,7 +115,6 @@ public interface TradeOrderConvert {
         return createReqDTO;
     }
 
-    // TODO 芋艿：可简化
     default PageResult<TradeOrderPageItemRespVO> convertPage(PageResult<TradeOrderDO> pageResult,
                                                              List<TradeOrderItemDO> orderItems,
                                                              Map<Long, MemberUserRespDTO> memberUserMap) {
@@ -138,24 +137,19 @@ public interface TradeOrderConvert {
     ProductPropertyValueDetailRespVO convert(ProductPropertyValueDetailRespDTO bean);
 
     default TradeOrderDetailRespVO convert(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
-                                           MemberUserRespDTO user) {
+                                           List<TradeOrderLogDO> orderLogs,
+                                           MemberUserRespDTO user, MemberUserRespDTO brokerageUser) {
         TradeOrderDetailRespVO orderVO = convert2(order, orderItems);
         // 处理收货地址
         orderVO.setReceiverAreaName(AreaUtils.format(order.getReceiverAreaId()));
         // 处理用户信息
         orderVO.setUser(convert(user));
-        // TODO puhui999：模拟订单操作日志
-        ArrayList<TradeOrderDetailRespVO.OrderLog> orderLogs = new ArrayList<>();
-        for (int i = 0; i < 6; i++) {
-            TradeOrderDetailRespVO.OrderLog orderLog = new TradeOrderDetailRespVO.OrderLog();
-            orderLog.setContent("订单操作" + i);
-            orderLog.setCreateTime(LocalDateTime.now());
-            orderLog.setUserType(i % 2 == 0 ? 2 : 1);
-            orderLogs.add(orderLog);
-        }
-        orderVO.setLogs(orderLogs);
+        orderVO.setBrokerageUser(convert(brokerageUser));
+        // 处理日志
+        orderVO.setLogs(convertList03(orderLogs));
         return orderVO;
     }
+    List<TradeOrderDetailRespVO.OrderLog> convertList03(List<TradeOrderLogDO> orderLogs);
 
     TradeOrderDetailRespVO convert2(TradeOrderDO order, List<TradeOrderItemDO> items);
 
@@ -176,7 +170,6 @@ public interface TradeOrderConvert {
 
     AppProductPropertyValueDetailRespVO convert02(ProductPropertyValueDetailRespDTO bean);
 
-    // TODO 芋艿：可简化
     default AppTradeOrderDetailRespVO convert02(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
                                                 TradeOrderProperties tradeOrderProperties,
                                                 DeliveryExpressDO express) {
@@ -244,9 +237,6 @@ public interface TradeOrderConvert {
         if (address != null) {
             respVO.getAddress().setAreaName(AreaUtils.format(address.getAreaId()));
         }
-        // TODO 芋艿：积分的接入；
-        respVO.setUsedPoint(1);
-        respVO.setTotalPoint(100);
         return respVO;
     }
 

@@ -9,6 +9,8 @@ import cn.iocoder.yudao.module.trade.controller.admin.order.vo.*;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderLogDO;
+import cn.iocoder.yudao.module.trade.service.order.TradeOrderLogService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,6 +39,8 @@ public class TradeOrderController {
     private TradeOrderUpdateService tradeOrderUpdateService;
     @Resource
     private TradeOrderQueryService tradeOrderQueryService;
+    @Resource
+    private TradeOrderLogService tradeOrderLogService;
 
     @Resource
     private MemberUserApi memberUserApi;
@@ -70,13 +74,15 @@ public class TradeOrderController {
         if (order == null) {
             return success(null);
         }
-
         // 查询订单项
         List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(id);
-        // TODO @puhui999：orderLog
+
         // 拼接数据
         MemberUserRespDTO user = memberUserApi.getUser(order.getUserId());
-        return success(TradeOrderConvert.INSTANCE.convert(order, orderItems, user));
+        MemberUserRespDTO brokerageUser = order.getBrokerageUserId() != null ?
+                memberUserApi.getUser(order.getBrokerageUserId()) : null;
+        List<TradeOrderLogDO> orderLogs = tradeOrderLogService.getOrderLogListByOrderId(id);
+        return success(TradeOrderConvert.INSTANCE.convert(order, orderItems, orderLogs, user, brokerageUser));
     }
 
     @GetMapping("/get-express-track-list")

@@ -25,6 +25,9 @@ public class TradeMessageServiceImpl implements TradeMessageService {
 
     @Override
     public void sendMessageWhenDeliveryOrder(TradeOrderMessageWhenDeliveryOrderReqBO reqBO) {
+        if (true) {
+            return;
+        }
         // 1、构造消息
         Map<String, Object> msgMap = new HashMap<>(2);
         msgMap.put("orderId", reqBO.getOrderId());

@@ -1,7 +1,13 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
+import cn.iocoder.yudao.module.trade.convert.order.TradeOrderLogConvert;
+import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderLogDO;
+import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderLogMapper;
 import cn.iocoder.yudao.module.trade.service.order.bo.logger.TradeOrderLogCreateReqBO;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 交易下单日志 Service 实现类
@@ -12,10 +18,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class TradeOrderLogServiceImpl implements TradeOrderLogService {
 
+    @Resource
+    private TradeOrderLogMapper tradeOrderLogMapper;
+
     @Override
     public void createOrderLog(TradeOrderLogCreateReqBO createReqBO) {
-        // TODO 芋艿：存储还没搞
-        System.out.println();
+        tradeOrderLogMapper.insert(TradeOrderLogConvert.INSTANCE.convert(createReqBO));
+    }
+
+    @Override
+    public List<TradeOrderLogDO> getOrderLogListByOrderId(Long orderId) {
+        return tradeOrderLogMapper.selectListByOrderId(orderId);
     }
 
 }

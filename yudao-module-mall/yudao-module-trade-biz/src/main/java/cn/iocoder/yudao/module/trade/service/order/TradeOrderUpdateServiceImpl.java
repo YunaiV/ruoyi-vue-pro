@@ -211,8 +211,6 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         return order;
     }
 
-    // TODO @puhui999：订单超时，自动取消；
-
     private TradeOrderDO createTradeOrder(Long userId, String clientIp, AppTradeOrderCreateReqVO createReqVO,
                                           TradePriceCalculateRespBO calculateRespBO) {
         TradeOrderDO order = TradeOrderConvert.INSTANCE.convert(userId, clientIp, createReqVO, calculateRespBO);

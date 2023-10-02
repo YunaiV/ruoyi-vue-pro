@@ -12,23 +12,27 @@ import java.util.List;
 @Data
 public class TradeOrderDetailRespVO extends TradeOrderBaseVO {
 
-    @Schema(description = "收件人地区名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "上海 上海市 普陀区")
-    private String receiverAreaName;
-
     /**
      * 订单项列表
      */
     private List<Item> items;
 
     /**
-     * 用户信息
+     * 下单用户信息
      */
     private MemberUserRespVO user;
+    /**
+     * 推广用户信息
+     */
+    private MemberUserRespVO brokerageUser;
 
     /**
-     * TODO 订单操作日志, 先模拟一波
+     * 操作日志列表
      */
     private List<OrderLog> logs;
+
+    @Schema(description = "收件人地区名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "上海 上海市 普陀区")
+    private String receiverAreaName;
 
     @Schema(description = "管理后台 - 交易订单的操作日志")
     @Data

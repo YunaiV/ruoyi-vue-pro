@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.trade.service.order.bo.logger;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -42,10 +43,12 @@ public class TradeOrderLogCreateReqBO {
     /**
      * 操作类型
      */
+    @NotNull(message = "操作类型不能为空")
     private Integer operateType;
     /**
      * 操作明细
      */
+    @NotEmpty(message = "操作明细不能为空")
     private String content;
 
 }

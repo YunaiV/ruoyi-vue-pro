@@ -74,8 +74,6 @@ public class AppTradeOrderController {
         return success(true);
     }
 
-    // TODO @芋艿：如果拼团活动、秒杀活动、砍价活动时，是不是要额外在返回活动之类的信息；
-    // TODO @puhui999：需要的
     @GetMapping("/get-detail")
     @Operation(summary = "获得交易订单")
     @Parameter(name = "id", description = "交易订单编号")
@@ -91,7 +89,6 @@ public class AppTradeOrderController {
         // 查询物流公司
         DeliveryExpressDO express = order.getLogisticsId() != null && order.getLogisticsId() > 0 ?
                 deliveryExpressService.getDeliveryExpress(order.getLogisticsId()) : null;
-        // TODO @puhui999：如果门店自提，信息的拼接；
         // 最终组合
         return success(TradeOrderConvert.INSTANCE.convert02(order, orderItems, tradeOrderProperties, express));
     }

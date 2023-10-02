@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
+import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderLogDO;
 import cn.iocoder.yudao.module.trade.service.order.bo.logger.TradeOrderLogCreateReqBO;
 import org.springframework.scheduling.annotation.Async;
+
+import java.util.List;
 
 /**
  * 交易下单日志 Service 接口
@@ -20,5 +23,13 @@ public interface TradeOrderLogService {
      */
     @Async
     void createOrderLog(TradeOrderLogCreateReqBO logDTO);
+
+    /**
+     * 获得交易订单日志列表
+     *
+     * @param orderId 订单编号
+     * @return 交易订单日志列表
+     */
+    List<TradeOrderLogDO> getOrderLogListByOrderId(Long orderId);
 
 }
