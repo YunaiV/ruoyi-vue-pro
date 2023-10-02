@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.module.member.controller.admin.signin.vo.config;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 
@@ -34,4 +37,9 @@ public class MemberSignInConfigBaseVO {
     @InEnum(CommonStatusEnum.class)
     private Integer status;
 
+    @AssertTrue(message = "签到奖励积分和经验不能同时为空")
+    @JsonIgnore
+    public boolean isConfigAward() {
+        return ObjUtil.notEqual(point, 0) || ObjUtil.notEqual(experience, 0);
+    }
 }

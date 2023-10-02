@@ -7,13 +7,13 @@ import lombok.EqualsAndHashCode;
 import javax.validation.constraints.NotNull;
 
 /**
- * 新人券发放消息
+ * 会员用户创建消息
  *
  * @author owen
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class RegisterCouponSendMessage extends AbstractStreamMessage {
+public class UserCreateMessage extends AbstractStreamMessage {
 
     /**
      * 用户编号
@@ -23,7 +23,7 @@ public class RegisterCouponSendMessage extends AbstractStreamMessage {
 
     @Override
     public String getStreamKey() {
-        return "member.register-coupon.send";
+        return "member.create.send";
     }
 
 }

@@ -178,7 +178,7 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    // TODO @疯狂：搞个事务；
+    @Transactional(rollbackFor = Exception.class)
     public void takeCouponByRegister(Long userId) {
         List<CouponTemplateDO> templates = couponTemplateService.getCouponTemplateListByTakeType(CouponTakeTypeEnum.REGISTER);
         for (CouponTemplateDO template : templates) {

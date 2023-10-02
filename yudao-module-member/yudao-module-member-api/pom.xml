@@ -22,13 +22,6 @@
             <artifactId>yudao-common</artifactId>
         </dependency>
 
-        <!-- TODO @疯狂：biz 引入哈；api 保持低依赖 -->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-mq</artifactId>
-            <scope>compile</scope>
-        </dependency>
-
         <!-- 参数校验 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
