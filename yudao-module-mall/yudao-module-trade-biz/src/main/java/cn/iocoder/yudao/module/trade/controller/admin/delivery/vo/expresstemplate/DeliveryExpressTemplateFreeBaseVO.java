@@ -11,7 +11,7 @@ import java.util.List;
  * 快递运费模板包邮 Base VO，提供给添加运费模板使用
  */
 @Data
-public class ExpressTemplateFreeBaseVO {
+public class DeliveryExpressTemplateFreeBaseVO {
 
     @Schema(description = "区域编号列表", requiredMode = Schema.RequiredMode.REQUIRED, example = "[1,120000]")
     @NotEmpty(message = "区域编号列表不能为空")

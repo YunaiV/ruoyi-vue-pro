@@ -11,7 +11,10 @@ import java.util.List;
  * 快递运费模板运费设置 Base VO，提供给添加运费模板使用
  */
 @Data
-public class ExpressTemplateChargeBaseVO {
+public class DeliveryExpressTemplateChargeBaseVO {
+
+    @Schema(description = "编号", example = "6592", hidden = true) // 由于想简单一点，复用这个 VO 在更新操作，所以 hidden 为 false
+    private Long id;
 
     @Schema(description = "区域编号列表", requiredMode = Schema.RequiredMode.REQUIRED, example = "[1,120000]")
     @NotEmpty(message = "区域编号列表不能为空")

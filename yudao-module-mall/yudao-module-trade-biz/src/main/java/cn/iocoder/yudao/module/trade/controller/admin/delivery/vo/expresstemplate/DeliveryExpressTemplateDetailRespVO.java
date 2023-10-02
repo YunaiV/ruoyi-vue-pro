@@ -17,9 +17,9 @@ public class DeliveryExpressTemplateDetailRespVO extends DeliveryExpressTemplate
     private Long id;
 
     @Schema(description = "运费模板运费设置", requiredMode = Schema.RequiredMode.REQUIRED)
-    private List<ExpressTemplateChargeBaseVO> templateCharge;
+    private List<DeliveryExpressTemplateChargeBaseVO> charges;
 
     @Schema(description = "运费模板包邮区域", requiredMode = Schema.RequiredMode.REQUIRED)
-    private List<ExpressTemplateFreeBaseVO> templateFree;
+    private List<DeliveryExpressTemplateFreeBaseVO> frees;
 
 }
