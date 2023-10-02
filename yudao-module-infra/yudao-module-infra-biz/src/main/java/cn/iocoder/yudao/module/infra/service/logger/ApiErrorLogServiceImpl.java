@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.infra.service.logger;
 
+import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.infra.api.logger.dto.ApiErrorLogCreateReqDTO;
@@ -15,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -30,8 +32,6 @@ import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.API_ERROR_L
 @Service
 @Validated
 public class ApiErrorLogServiceImpl implements ApiErrorLogService {
-
-    private static final Integer DELETE_LIMIT = 100;
 
     @Resource
     private ApiErrorLogMapper apiErrorLogMapper;
@@ -68,22 +68,27 @@ public class ApiErrorLogServiceImpl implements ApiErrorLogService {
     }
 
     @Override
-    // TODO j-sentinel：类似 JobLogServiceImpl 的建议
-    public void jobCleanErrorLog(Integer errorLogJobDay) {
-        TenantUtils.executeIgnore(() -> {
-            Integer result = null;
-            int count = 0;
-            while (result == null || DELETE_LIMIT.equals(result)) {
-                result = apiErrorLogMapper.jobCleanErrorLog(errorLogJobDay);
-                count += result;
+    public Integer jobCleanErrorLog(Integer errorLogExceedDay,Integer deleteLimit) {
+        Integer result;
+        int count = 0;
+        Date currentDate = DateUtil.date();
+        // 计算过期日期：正数向未来偏移，负数向历史偏移
+        Date expireDate = DateUtil.offsetDay(currentDate, -errorLogExceedDay);
+        for (int i = 0; i < Short.MAX_VALUE; i++) {
+            result = apiErrorLogMapper.deleteByCreateTimeLt(expireDate,deleteLimit);
+            count += result;
+            if (result < deleteLimit) {
+                // 达到删除预期条数
+                break;
             }
-            if (count > 0) {
-                // ALTER TABLE...FORCE 会导致表重建发生,这会根据主键索引对表空间中的物理页进行排序。
-                // 它将行压缩到页面上并消除可用空间，同时确保数据处于主键查找的最佳顺序。
-                apiErrorLogMapper.optimizeTable();
-            }
-            log.info("定时执行清理错误日志数量({})个",count);
-        });
+        }
+        if(count > 0){
+            // ALTER TABLE...FORCE 会导致表重建发生,这会根据主键索引对表空间中的物理页进行排序。
+            // 它将行压缩到页面上并消除可用空间，同时确保数据处于主键查找的最佳顺序。
+            // 优化表语句官方文档：https://dev.mysql.com/doc/refman/8.0/en/optimize-table.html
+            apiErrorLogMapper.optimizeTable();
+        }
+        return count;
     }
 
 }

@@ -41,7 +41,8 @@ public interface ApiAccessLogService {
     /**
      * 清理 @param accessLogJobDay 天的访问日志
      *
-     * @param accessLogJobDay 超过多少天就进行清理
+     * @param accessLogExceedDay 超过多少天就进行清理
+     * @param deleteLimit 清理的间隔条数
      */
-    void jobCleanAccessLog(Integer accessLogJobDay);
+    Integer jobCleanAccessLog(Integer accessLogExceedDay,Integer deleteLimit);
 }

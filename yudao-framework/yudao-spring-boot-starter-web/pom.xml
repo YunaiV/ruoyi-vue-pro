@@ -61,12 +61,6 @@
             <artifactId>jsoup</artifactId>
         </dependency>
 
-        <!-- Job 定时任务相关 -->
-        <!-- TODO @j-sentinel：去掉这个依赖哈； -->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-job</artifactId>
-        </dependency>
     </dependencies>
 
 </project>

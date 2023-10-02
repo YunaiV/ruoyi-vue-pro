@@ -6,9 +6,12 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apierrorlog.ApiErrorLogExportReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apierrorlog.ApiErrorLogPageReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.logger.ApiErrorLogDO;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Update;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -43,8 +46,17 @@ public interface ApiErrorLogMapper extends BaseMapperX<ApiErrorLogDO> {
         );
     }
 
-    // TODO @j-sentinel：同 JobLogMapper 的一些优化点
-    Integer jobCleanErrorLog(@Param("errorLogJobDay") Integer errorLogJobDay);
+    /**
+     * 目前物理删除只能通过mybatis-plus的注解实现 or mybatis的xml实现
+     * 如果写xml的话就需要多写一个映射类
+     *
+     * @param errorLogExceedDay 时间限制
+     * @param deleteLimit 删除次数的限制
+     * @return
+     */
+    @Delete("DELETE FROM infra_api_error_log WHERE create_time < #{errorLogExceedDay} LIMIT #{deleteLimit}")
+    Integer deleteByCreateTimeLt(@Param("errorLogExceedDay") Date errorLogExceedDay,@Param("deleteLimit")Integer deleteLimit);
 
+    @Update("ALTER TABLE infra_api_error_log FORCE")
     void optimizeTable();
 }
