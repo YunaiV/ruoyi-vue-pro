@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.trade.dal.dataobject.order;
 
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.AfterSaleDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.cart.CartDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -166,7 +166,7 @@ public class TradeOrderItemDO extends BaseDO {
     /**
      * 售后单编号
      *
-     * 关联 {@link TradeAfterSaleDO#getId()} 字段
+     * 关联 {@link AfterSaleDO#getId()} 字段
      */
     private Long afterSaleId;
     /**

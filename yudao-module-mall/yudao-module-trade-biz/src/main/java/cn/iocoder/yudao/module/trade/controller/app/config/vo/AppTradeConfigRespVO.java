@@ -3,11 +3,21 @@ package cn.iocoder.yudao.module.trade.controller.app.config.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Schema(description = "用户 App - 交易配置 Response VO")
 @Data
 public class AppTradeConfigRespVO {
+
+    @Schema(description = "腾讯地图 KEY", requiredMode = Schema.RequiredMode.REQUIRED, example = "123456")
+    private String tencentLbsKey;
+
+    // ========== 配送相关 ==========
+
+    @Schema(description = "是否开启自提", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
+    @NotNull(message = "是否开启自提不能为空")
+    private Boolean deliveryPickUpEnabled;
 
     // ========== 售后相关 ==========
 

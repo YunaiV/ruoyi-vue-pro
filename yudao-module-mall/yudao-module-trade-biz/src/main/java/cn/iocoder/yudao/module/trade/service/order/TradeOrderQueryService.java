@@ -94,12 +94,12 @@ public interface TradeOrderQueryService {
     TradeOrderItemDO getOrderItem(Long userId, Long itemId);
 
     /**
-     * 根据交易订单项编号数组，查询交易订单项
+     * 获得交易订单项
      *
-     * @param ids 交易订单项编号数组
-     * @return 交易订单项数组
+     * @param id 交易订单项编号 itemId
+     * @return 交易订单项
      */
-    List<TradeOrderItemDO> getOrderItemList(Collection<Long> ids);
+    TradeOrderItemDO getOrderItem(Long id);
 
     /**
      * 根据交易订单编号，查询交易订单项
@@ -118,6 +118,5 @@ public interface TradeOrderQueryService {
      * @return 交易订单项数组
      */
     List<TradeOrderItemDO> getOrderItemListByOrderId(Collection<Long> orderIds);
-
 
 }

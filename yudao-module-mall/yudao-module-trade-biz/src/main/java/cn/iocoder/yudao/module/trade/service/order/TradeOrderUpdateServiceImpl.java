@@ -47,7 +47,7 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderItemMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
-import cn.iocoder.yudao.module.trade.dal.redis.no.TradeOrderNoRedisDAO;
+import cn.iocoder.yudao.module.trade.dal.redis.no.TradeNoRedisDAO;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.*;
@@ -97,7 +97,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Resource
     private TradeOrderItemMapper tradeOrderItemMapper;
     @Resource
-    private TradeOrderNoRedisDAO orderNoRedisDAO;
+    private TradeNoRedisDAO tradeNoRedisDAO;
 
     @Resource
     private List<TradeOrderHandler> tradeOrderHandlers;
@@ -215,7 +215,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                                           TradePriceCalculateRespBO calculateRespBO) {
         TradeOrderDO order = TradeOrderConvert.INSTANCE.convert(userId, clientIp, createReqVO, calculateRespBO);
         order.setType(calculateRespBO.getType());
-        order.setNo(orderNoRedisDAO.generate(TradeOrderNoRedisDAO.TRADE_ORDER_NO_PREFIX));
+        order.setNo(tradeNoRedisDAO.generate(TradeNoRedisDAO.TRADE_ORDER_NO_PREFIX));
         order.setStatus(TradeOrderStatusEnum.UNPAID.getStatus());
         order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus());
         order.setProductCount(getSumValue(calculateRespBO.getItems(), TradePriceCalculateRespBO.OrderItem::getCount, Integer::sum));

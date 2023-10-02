@@ -156,8 +156,8 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
     }
 
     @Override
-    public List<TradeOrderItemDO> getOrderItemList(Collection<Long> ids) {
-        return tradeOrderItemMapper.selectBatchIds(ids);
+    public TradeOrderItemDO getOrderItem(Long id) {
+        return tradeOrderItemMapper.selectById(id);
     }
 
     @Override

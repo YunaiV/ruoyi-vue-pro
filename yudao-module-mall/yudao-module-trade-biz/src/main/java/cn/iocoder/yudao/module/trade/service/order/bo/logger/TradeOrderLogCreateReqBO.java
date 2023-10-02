@@ -28,7 +28,7 @@ public class TradeOrderLogCreateReqBO {
     /**
      * 订单编号
      */
-    @NotNull(message = "订单编号")
+    @NotNull(message = "订单编号不能为空")
     private Long orderId;
     /**
      * 操作前状态

@@ -10,6 +10,6 @@ public interface TradeOrderLogConvert {
 
     TradeOrderLogConvert INSTANCE = Mappers.getMapper(TradeOrderLogConvert.class);
 
-    TradeOrderLogDO convert(TradeOrderLogCreateReqBO createReqBO);
+    TradeOrderLogDO convert(TradeOrderLogCreateReqBO bean);
 
 }

@@ -73,7 +73,7 @@ public class TradeOrderLogAspect {
             Long userId = getUserId();
             // 1.2 订单信息
             Long orderId = ORDER_ID.get();
-            if (orderId == null) { // 如果未设置，只有注解，说明不需要记录订单日志
+            if (orderId == null) { // 如果未设置，只有注解，说明不需要记录日志
                 return;
             }
             Integer beforeStatus = BEFORE_STATUS.get();
@@ -81,7 +81,7 @@ public class TradeOrderLogAspect {
             Map<String, Object> exts = ObjectUtil.defaultIfNull(EXTS.get(), emptyMap());
             String content = StrUtil.format(orderLog.operateType().getContent(), exts);
 
-            // 2.1 记录日志
+            // 2. 记录日志
             TradeOrderLogCreateReqBO createBO = new TradeOrderLogCreateReqBO()
                     .setUserId(userId).setUserType(userType)
                     .setOrderId(orderId).setBeforeStatus(beforeStatus).setAfterStatus(afterStatus)
