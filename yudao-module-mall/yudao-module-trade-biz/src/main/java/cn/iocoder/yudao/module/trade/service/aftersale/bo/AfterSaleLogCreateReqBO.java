@@ -1,18 +1,22 @@
-package cn.iocoder.yudao.module.trade.service.order.bo.logger;
+package cn.iocoder.yudao.module.trade.service.aftersale.bo;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 /**
- * 订单日志的创建 Request BO
+ * 售后日志的创建 Request BO
  *
  * @author 陈賝
- * @since 2023/7/6 15:27
+ * @since 2023/6/19 09:54
  */
 @Data
-public class TradeOrderLogCreateReqBO {
+@NoArgsConstructor
+@AllArgsConstructor
+public class AfterSaleLogCreateReqBO {
 
     /**
      * 用户编号
@@ -26,10 +30,10 @@ public class TradeOrderLogCreateReqBO {
     private Integer userType;
 
     /**
-     * 订单编号
+     * 售后编号
      */
-    @NotNull(message = "订单编号不能为空")
-    private Long orderId;
+    @NotNull(message = "售后编号不能为空")
+    private Long afterSaleId;
     /**
      * 操作前状态
      */
@@ -50,5 +54,4 @@ public class TradeOrderLogCreateReqBO {
      */
     @NotEmpty(message = "操作明细不能为空")
     private String content;
-
 }
