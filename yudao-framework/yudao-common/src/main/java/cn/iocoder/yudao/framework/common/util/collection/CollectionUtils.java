@@ -78,6 +78,13 @@ public class CollectionUtils {
         return from.stream().filter(filter).map(func).filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
+    public static <T, K> Map<K, T> convertMapByFilter(Collection<T> from, Predicate<T> filter, Function<T, K> keyFunc) {
+        if (CollUtil.isEmpty(from)) {
+            return new HashMap<>();
+        }
+        return from.stream().filter(filter).collect(Collectors.toMap(keyFunc, v -> v));
+    }
+
     public static <T, K> Map<K, T> convertMap(Collection<T> from, Function<T, K> keyFunc) {
         if (CollUtil.isEmpty(from)) {
             return new HashMap<>();

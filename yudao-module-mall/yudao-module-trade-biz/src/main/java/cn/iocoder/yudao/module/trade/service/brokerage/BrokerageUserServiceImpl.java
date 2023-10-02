@@ -31,10 +31,9 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMapByFilter;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
 /**
@@ -67,8 +66,12 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
 
     @Override
     public PageResult<BrokerageUserDO> getBrokerageUserPage(BrokerageUserPageReqVO pageReqVO) {
-        List<Long> bindUserIds = buildBindUserIdsByLevel(pageReqVO.getBindUserId(), pageReqVO.getLevel());
-        return brokerageUserMapper.selectPage(pageReqVO, bindUserIds);
+        List<Long> childIds = getChildUserIdsByLevel(pageReqVO.getBindUserId(), pageReqVO.getLevel());
+        // 有”绑定用户编号“查询条件时，没有查到下级会员，直接返回空
+        if (pageReqVO.getBindUserId() != null && CollUtil.isEmpty(childIds)) {
+            return PageResult.empty();
+        }
+        return brokerageUserMapper.selectPage(pageReqVO, childIds);
     }
 
     @Override
@@ -154,11 +157,8 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
 
     @Override
     public Long getBrokerageUserCountByBindUserId(Long bindUserId, Integer level) {
-        List<Long> bindUserIds = buildBindUserIdsByLevel(bindUserId, level);
-        if (CollUtil.isEmpty(bindUserIds)) {
-            return 0L;
-        }
-        return brokerageUserMapper.selectCountByBindUserIdIn(bindUserIds);
+        List<Long> childIds = getChildUserIdsByLevel(bindUserId, level);
+        return (long) CollUtil.size(childIds);
     }
 
     @Override
@@ -226,70 +226,29 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
 
     @Override
     public PageResult<AppBrokerageUserChildSummaryRespVO> getBrokerageUserChildSummaryPage(AppBrokerageUserChildSummaryPageReqVO pageReqVO, Long userId) {
-        // 生成推广员编号列表
-        List<Long> bindUserIds = buildBindUserIdsByLevel(userId, pageReqVO.getLevel());
-
-        // TODO @疯狂：情况一和情况二，可以合并哈；
-        //  如果有 nickname 的时候，相当于提前查询 users，然后 nickname 过滤掉 bindUserIds；
-        //  之后，继续使用 selectSummaryPageByUserId 里面 in bindUserIds 查询；
-
-        // 情况一：没有昵称过滤条件时，直接使用数据库的分页查询
-        if (StrUtil.isBlank(pageReqVO.getNickname())) {
-            // 1.1 分页查询
-            IPage<AppBrokerageUserChildSummaryRespVO> pageResult = brokerageUserMapper.selectSummaryPageByUserId(
-                    MyBatisUtils.buildPage(pageReqVO), BrokerageRecordBizTypeEnum.ORDER.getType(),
-                    BrokerageRecordStatusEnum.SETTLEMENT.getStatus(), bindUserIds, pageReqVO.getSortingField()
-            );
-
-            // 1.2 拼接数据并返回
-            List<Long> userIds = convertList(pageResult.getRecords(), AppBrokerageUserChildSummaryRespVO::getId);
-            Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(userIds);
-            BrokerageUserConvert.INSTANCE.copyTo(pageResult.getRecords(), userMap);
-            return new PageResult<>(pageResult.getRecords(), pageResult.getTotal());
-        }
-
-        // 情况二：有昵称过滤条件时，需要跨模块（Member）过滤
-        // 2.1 查询所有匹配的分销用户
-        List<AppBrokerageUserChildSummaryRespVO> list = brokerageUserMapper.selectSummaryListByUserId(
-                BrokerageRecordBizTypeEnum.ORDER.getType(), BrokerageRecordStatusEnum.SETTLEMENT.getStatus(),
-                bindUserIds, pageReqVO.getSortingField()
-        );
-        if (CollUtil.isEmpty(list)) {
+        // 1.1 查询下级用户编号列表
+        List<Long> childIds = getChildUserIdsByLevel(userId, pageReqVO.getLevel());
+        if (CollUtil.isEmpty(childIds)) {
             return PageResult.empty();
         }
 
-        // 2.2 查出对应的用户信息
-        List<MemberUserRespDTO> users = memberUserApi.getUserList(convertList(list, AppBrokerageUserChildSummaryRespVO::getId));
-        if (CollUtil.isEmpty(users)) {
-            return PageResult.empty();
-        }
-
-        // 2.3 根据昵称过滤出用户编号
-        Map<Long, MemberUserRespDTO> userMap = users.stream()
-                .filter(user -> StrUtil.contains(user.getNickname(), pageReqVO.getNickname()))
-                .collect(Collectors.toMap(MemberUserRespDTO::getId, dto -> dto));
+        // 1.2 根据昵称过滤下级用户
+        Map<Long, MemberUserRespDTO> userMap = convertMapByFilter(memberUserApi.getUserList(childIds),
+                user -> StrUtil.contains(user.getNickname(), pageReqVO.getNickname()),
+                MemberUserRespDTO::getId);
         if (CollUtil.isEmpty(userMap)) {
             return PageResult.empty();
         }
 
-        // 2.4 根据用户编号过滤结果
-        list.removeIf(vo -> !userMap.containsKey(vo.getId()));
-        if (CollUtil.isEmpty(list)) {
-            return PageResult.empty();
-        }
+        // 2 分页查询
+        IPage<AppBrokerageUserChildSummaryRespVO> pageResult = brokerageUserMapper.selectSummaryPageByUserId(
+                MyBatisUtils.buildPage(pageReqVO), BrokerageRecordBizTypeEnum.ORDER.getType(),
+                BrokerageRecordStatusEnum.SETTLEMENT.getStatus(), userMap.keySet(), pageReqVO.getSortingField()
+        );
 
-        // 2.5 处理分页
-        List<AppBrokerageUserChildSummaryRespVO> result = list.stream()
-                .skip((long) (pageReqVO.getPageNo() - 1) * pageReqVO.getPageSize())
-                .limit(pageReqVO.getPageSize())
-                .collect(Collectors.toList());
-        if (CollUtil.isEmpty(result)) {
-            return PageResult.empty();
-        }
-
-        // 2.6 拼接数据并返回
-        BrokerageUserConvert.INSTANCE.copyTo(result, userMap);
-        return new PageResult<>(result, (long) list.size());
+        // 3 拼接数据并返回
+        BrokerageUserConvert.INSTANCE.copyTo(pageResult.getRecords(), userMap);
+        return new PageResult<>(pageResult.getRecords(), pageResult.getTotal());
     }
 
     private boolean isUserCanBind(BrokerageUserDO user) {
@@ -360,24 +319,35 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     }
 
     /**
-     * 根据绑定用户编号，获得绑定用户编号列表
+     * 根据绑定用户编号，获得下级用户编号列表
      *
      * @param bindUserId 绑定用户编号
-     * @param level      绑定用户的层级。
+     * @param level      下级用户的层级。
      *                   如果 level 为空，则查询 1+2 两个层级
-     * @return 绑定用户编号列表
+     * @return 下级用户编号列表
      */
-    private List<Long> buildBindUserIdsByLevel(Long bindUserId, Integer level) {
+    private List<Long> getChildUserIdsByLevel(Long bindUserId, Integer level) {
         if (bindUserId == null) {
             return Collections.emptyList();
         }
-        Assert.isTrue(level == null || level <= 2, "目前只支持 level 小于等于 2");
-        List<Long> bindUserIds = CollUtil.newArrayList();
-        if (level == null || level == 1) {
-            bindUserIds.add(bindUserId);
+
+        // 先查第 1 级
+        List<Long> bindUserIds = brokerageUserMapper.selectIdListByBindUserIdIn(Collections.singleton(bindUserId));
+        if (CollUtil.isEmpty(bindUserIds)) {
+            return Collections.emptyList();
         }
-        if (level == null || level == 2) {
-            bindUserIds.addAll(convertList(brokerageUserMapper.selectListByBindUserId(bindUserId), BrokerageUserDO::getId));
+
+        if (level == null) {
+            // level 为空，再查第 2 级，并合并结果
+            bindUserIds.addAll(brokerageUserMapper.selectIdListByBindUserIdIn(bindUserIds));
+        } else if (level == 2) {
+            // 只查第 2 级
+            bindUserIds = brokerageUserMapper.selectIdListByBindUserIdIn(bindUserIds);
+        } else if (level == 1) {
+            // 只查第 1 级
+            return bindUserIds;
+        } else {
+            throw exception(BROKERAGE_USER_LEVEL_NOT_SUPPORT);
         }
         return bindUserIds;
     }
