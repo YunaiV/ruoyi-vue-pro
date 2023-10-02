@@ -11,10 +11,10 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.SIGN_IN_CONFIG_EXISTS;
+import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.SIGN_IN_CONFIG_NOT_EXISTS;
 
 /**
  * 签到规则 Service 实现类
@@ -30,8 +30,6 @@ public class MemberSignInConfigServiceImpl implements MemberSignInConfigService 
 
     @Override
     public Long createSignInConfig(MemberSignInConfigCreateReqVO createReqVO) {
-        // 校验奖励积分、奖励经验
-        validatePointAndExperience(createReqVO.getPoint(), createReqVO.getExperience());
         // 判断是否重复插入签到天数
         validateSignInConfigDayDuplicate(createReqVO.getDay(), null);
 
@@ -44,8 +42,6 @@ public class MemberSignInConfigServiceImpl implements MemberSignInConfigService 
 
     @Override
     public void updateSignInConfig(MemberSignInConfigUpdateReqVO updateReqVO) {
-        // 校验奖励积分、奖励经验
-        validatePointAndExperience(updateReqVO.getPoint(), updateReqVO.getExperience());
         // 校验存在
         validateSignInConfigExists(updateReqVO.getId());
         // 判断是否重复插入签到天数
@@ -85,13 +81,6 @@ public class MemberSignInConfigServiceImpl implements MemberSignInConfigService 
         // 2. 更新时，如果 config 非空，且 id 不相等，则说明重复
         if (id != null && config != null && !config.getId().equals(id)) {
             throw exception(SIGN_IN_CONFIG_EXISTS);
-        }
-    }
-
-    private void validatePointAndExperience(Integer point, Integer experience) {
-        // 奖励积分、经验 至少要配置一个，否则没有意义
-        if (Objects.equals(point, 0) && Objects.equals(experience, 0)) {
-            throw exception(SIGN_IN_CONFIG_AWARD_EMPTY);
         }
     }
 

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.member.service.user;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -18,7 +19,7 @@ import cn.iocoder.yudao.module.member.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
-import cn.iocoder.yudao.module.member.mq.producer.user.RegisterCouponProducer;
+import cn.iocoder.yudao.module.member.mq.producer.user.UserCreateProducer;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeUseReqDTO;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
@@ -27,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -60,7 +62,10 @@ public class MemberUserServiceImpl implements MemberUserService {
     private PasswordEncoder passwordEncoder;
 
     @Resource
-    private RegisterCouponProducer registerCouponProducer;
+    private UserCreateProducer registerCouponProducer;
+
+    @Resource
+    private TransactionTemplate transactionTemplate;
 
     @Override
     public MemberUserDO getUserByMobile(String mobile) {
@@ -92,11 +97,13 @@ public class MemberUserServiceImpl implements MemberUserService {
         user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
         user.setPassword(encodePassword(password)); // 加密密码
         user.setRegisterIp(registerIp);
-        memberUserMapper.insert(user);
 
-        // 发送 MQ 消息，发放新人券
-        // TODO @疯狂：事务结束后，在发送 MQ 消息；避免出现消息已经发了，事务没提交，或者回滚了
-        registerCouponProducer.sendMailSendMessage(user.getId());
+        Boolean success = transactionTemplate.execute(status -> memberUserMapper.insert(user) > 0);
+        if (BooleanUtil.isTrue(success)) {
+            // 发送 MQ 消息：用户创建
+            registerCouponProducer.sendUserCreateMessage(user.getId());
+        }
+
         return user;
     }
 

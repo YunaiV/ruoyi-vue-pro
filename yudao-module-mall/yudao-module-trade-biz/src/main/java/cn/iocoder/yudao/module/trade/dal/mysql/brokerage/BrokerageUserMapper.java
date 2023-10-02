@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.dal.mysql.brokerage;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.SortingField;
@@ -17,6 +18,8 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -27,12 +30,12 @@ import java.util.List;
 @Mapper
 public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
 
-    default PageResult<BrokerageUserDO> selectPage(BrokerageUserPageReqVO reqVO, List<Long> bindUserIds) {
+    default PageResult<BrokerageUserDO> selectPage(BrokerageUserPageReqVO reqVO, List<Long> ids) {
         return selectPage(reqVO, new LambdaQueryWrapperX<BrokerageUserDO>()
+                .inIfPresent(BrokerageUserDO::getId, ids)
                 .eqIfPresent(BrokerageUserDO::getBrokerageEnabled, reqVO.getBrokerageEnabled())
                 .betweenIfPresent(BrokerageUserDO::getCreateTime, reqVO.getCreateTime())
                 .betweenIfPresent(BrokerageUserDO::getBindUserTime, reqVO.getBindUserTime())
-                .inIfPresent(BrokerageUserDO::getBindUserId, bindUserIds)
                 .orderByDesc(BrokerageUserDO::getId));
     }
 
@@ -124,11 +127,6 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
                 .set(BrokerageUserDO::getBrokerageEnabled, false).set(BrokerageUserDO::getBrokerageTime, null));
     }
 
-    default Long selectCountByBindUserIdIn(List<Long> bindUserIds) {
-        return selectCount(new LambdaQueryWrapperX<BrokerageUserDO>()
-                .inIfPresent(BrokerageUserDO::getBindUserId, bindUserIds));
-    }
-
     @Select("SELECT bind_user_id AS id, COUNT(1) AS brokerageUserCount FROM trade_brokerage_user " +
             "WHERE bind_user_id IS NOT NULL AND deleted = FALSE " +
             "AND bind_user_time BETWEEN #{beginTime} AND #{endTime} " +
@@ -143,32 +141,21 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
      *
      * @param bizType      业务类型
      * @param status       状态
-     * @param bindUserIds  绑定用户编号列表
+     * @param ids          用户编号列表
      * @param sortingField 排序字段
      * @return 下级分销统计分页列表
      */
     IPage<AppBrokerageUserChildSummaryRespVO> selectSummaryPageByUserId(Page<?> page,
                                                                         @Param("bizType") Integer bizType,
                                                                         @Param("status") Integer status,
-                                                                        @Param("bindUserIds") List<Long> bindUserIds,
+                                                                        @Param("ids") Collection<Long> ids,
                                                                         @Param("sortingField") SortingField sortingField);
 
-    /**
-     * 下级分销统计（不分页）
-     *
-     * @param bizType      业务类型
-     * @param status       状态
-     * @param bindUserIds  绑定用户编号列表
-     * @param sortingField 排序字段
-     * @return 下级分销统计列表
-     */
-    List<AppBrokerageUserChildSummaryRespVO> selectSummaryListByUserId(@Param("bizType") Integer bizType,
-                                                                       @Param("status") Integer status,
-                                                                       @Param("bindUserIds") List<Long> bindUserIds,
-                                                                       @Param("sortingField") SortingField sortingField);
-
-    default List<BrokerageUserDO> selectListByBindUserId(Long bindUserId) {
-        return selectList(BrokerageUserDO::getBindUserId, bindUserId);
+    default List<Long> selectIdListByBindUserIdIn(Collection<Long> bindUserIds) {
+        return Convert.toList(Long.class,
+                selectObjs(new LambdaQueryWrapperX<BrokerageUserDO>()
+                        .select(Collections.singletonList(BrokerageUserDO::getId))
+                        .in(BrokerageUserDO::getBindUserId, bindUserIds)));
     }
 
 }
