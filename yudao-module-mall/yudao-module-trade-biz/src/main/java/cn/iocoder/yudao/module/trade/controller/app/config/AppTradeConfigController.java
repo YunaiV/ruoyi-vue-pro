@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,11 +31,14 @@ public class AppTradeConfigController {
     @Resource
     private TradeConfigService tradeConfigService;
 
+    @Value("${yudao.tencent-lbs-key}")
+    private String tencentLbsKey;
+
     @GetMapping("/get")
     @Operation(summary = "获得交易配置")
     public CommonResult<AppTradeConfigRespVO> getTradeConfig() {
-        TradeConfigDO tradeConfig = ObjUtil.defaultIfNull(tradeConfigService.getTradeConfig(), new TradeConfigDO());
-        return success(TradeConfigConvert.INSTANCE.convert02(tradeConfig));
+        TradeConfigDO config = ObjUtil.defaultIfNull(tradeConfigService.getTradeConfig(), new TradeConfigDO());
+        return success(TradeConfigConvert.INSTANCE.convert02(config).setTencentLbsKey(tencentLbsKey));
     }
 
 }
