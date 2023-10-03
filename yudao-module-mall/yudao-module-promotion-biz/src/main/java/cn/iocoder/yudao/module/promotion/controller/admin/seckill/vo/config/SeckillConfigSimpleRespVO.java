@@ -21,4 +21,10 @@ public class SeckillConfigSimpleRespVO {
     @NotNull(message = "秒杀时段名称不能为空")
     private String name;
 
+    @Schema(description = "开始时间点", requiredMode = Schema.RequiredMode.REQUIRED, example = "09:00:00")
+    private String startTime;
+
+    @Schema(description = "结束时间点", requiredMode = Schema.RequiredMode.REQUIRED, example = "16:00:00")
+    private String endTime;
+
 }

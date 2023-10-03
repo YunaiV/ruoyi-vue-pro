@@ -26,8 +26,6 @@ import java.util.List;
 @Slf4j
 public class JobLogServiceImpl implements JobLogService {
 
-    private static final Integer DELETE_LIMIT = 1;
-
     @Resource
     private JobLogMapper jobLogMapper;
 
@@ -52,21 +50,19 @@ public class JobLogServiceImpl implements JobLogService {
         }
     }
 
-    // TODO @j-sentinel：这个 job，也可以忽略租户哈；可以直接使用  @TenantIgnore 注解；
     @Override
-    public Integer timingJobCleanLog(Integer jobCleanRetainDay) {
-        Integer result = null;
+    @SuppressWarnings("DuplicatedCode")
+    public Integer cleanJobLog(Integer exceedDay, Integer deleteLimit) {
         int count = 0;
-        // TODO @j-sentinel：一般我们在写逻辑时，尽量避免用 while true 这种“死循环”，而是  for (int i = 0; i < Short.MAX) 类似这种；避免里面真的发生一些意外的情况，无限执行；
-        // 然后 for 里面，可以有个 if count < 100 未到达删除的预期条数，说明已经到底，可以 break 了；
-        while (result == null || DELETE_LIMIT.equals(result)){
-            result = jobLogMapper.timingJobCleanLog(jobCleanRetainDay);
-            count += result;
-        }
-        if(count > 0){
-            // ALTER TABLE...FORCE 会导致表重建发生,这会根据主键索引对表空间中的物理页进行排序。
-            // 它将行压缩到页面上并消除可用空间，同时确保数据处于主键查找的最佳顺序。
-            jobLogMapper.optimizeTable();
+        LocalDateTime expireDate = LocalDateTime.now().minusDays(exceedDay);
+        // 循环删除，直到没有满足条件的数据
+        for (int i = 0; i < Short.MAX_VALUE; i++) {
+            int deleteCount = jobLogMapper.deleteByCreateTimeLt(expireDate, deleteLimit);
+            count += deleteCount;
+            // 达到删除预期条数，说明到底了
+            if (deleteCount < deleteLimit) {
+                break;
+            }
         }
         return count;
     }
@@ -91,5 +87,4 @@ public class JobLogServiceImpl implements JobLogService {
         return jobLogMapper.selectList(exportReqVO);
     }
 
-    // TODO @小吉祥：每天 0 点的时候，清理超过 14 天的日志；
 }

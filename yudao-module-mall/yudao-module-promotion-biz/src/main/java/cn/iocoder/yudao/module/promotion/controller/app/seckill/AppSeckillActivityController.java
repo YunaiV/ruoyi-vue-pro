@@ -12,9 +12,9 @@ import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppS
 import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityRespVO;
 import cn.iocoder.yudao.module.promotion.convert.seckill.seckillactivity.SeckillActivityConvert;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillActivityDO;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillProductDO;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillconfig.SeckillConfigDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillActivityDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillProductDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillConfigDO;
 import cn.iocoder.yudao.module.promotion.service.seckill.SeckillActivityService;
 import cn.iocoder.yudao.module.promotion.service.seckill.SeckillConfigService;
 import io.swagger.v3.oas.annotations.Operation;

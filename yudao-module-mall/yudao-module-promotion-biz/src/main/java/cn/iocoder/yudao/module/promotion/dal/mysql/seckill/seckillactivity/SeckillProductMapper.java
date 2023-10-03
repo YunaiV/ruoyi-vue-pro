@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillactivity;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillProductDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillProductDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 

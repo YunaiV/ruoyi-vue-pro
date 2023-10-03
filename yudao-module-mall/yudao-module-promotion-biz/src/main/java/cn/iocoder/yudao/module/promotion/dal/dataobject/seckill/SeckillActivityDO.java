@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity;
+package cn.iocoder.yudao.module.promotion.dal.dataobject.seckill;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;

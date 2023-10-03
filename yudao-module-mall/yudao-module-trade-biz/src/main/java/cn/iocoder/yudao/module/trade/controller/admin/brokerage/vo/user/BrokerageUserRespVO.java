@@ -26,7 +26,7 @@ public class BrokerageUserRespVO extends BrokerageUserBaseVO {
     @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "李四")
     private String nickname;
 
-    // ========== 推广信息 ==========
+    // ========== 推广信息 ========== 注意：是包括 1 + 2 级的数据
 
     @Schema(description = "推广用户数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "20019")
     private Integer brokerageUserCount;
