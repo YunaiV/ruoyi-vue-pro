@@ -234,7 +234,13 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             order.setReceiverName(createReqVO.getReceiverName()).setReceiverMobile(createReqVO.getReceiverMobile());
             order.setPickUpVerifyCode(RandomUtil.randomNumbers(8)); // 随机一个核销码，长度为 8 位
         }
-        // TODO @疯狂：是不是可以在这里设置下推广人哈；
+
+        // 设置订单推广人
+        BrokerageUserDO brokerageUser = brokerageUserService.getBrokerageUser(order.getUserId());
+        if (brokerageUser != null && brokerageUser.getBindUserId() != null) {
+            order.setBrokerageUserId(brokerageUser.getBindUserId());
+        }
+
         tradeOrderMapper.insert(order);
         return order;
     }
@@ -303,12 +309,6 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
         // 6. 插入订单日志
         TradeOrderLogUtils.setOrderInfo(order.getId(), null, order.getStatus());
-
-        // 7. 设置订单推广人
-        BrokerageUserDO brokerageUser = brokerageUserService.getBrokerageUser(order.getUserId());
-        if (brokerageUser != null && brokerageUser.getBindUserId() != null) {
-            tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId()).setBrokerageUserId(brokerageUser.getBindUserId()));
-        }
 
         // TODO @LeeYan9: 是可以思考下, 订单的营销优惠记录, 应该记录在哪里, 微信讨论起来!
     }
