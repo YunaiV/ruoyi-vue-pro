@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.promotion.service.seckill;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.promotion.api.seckill.dto.SeckillValidateJoinRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityUpdateReqVO;
@@ -114,5 +115,16 @@ public interface SeckillActivityService {
      * @return 秒杀活动商品信息列表
      */
     List<SeckillProductDO> getSeckillActivityProductList(Long id, Collection<Long> skuIds);
+
+    /**
+     * 校验是否参与秒杀商品
+     *
+     * 如果校验失败，则抛出业务异常
+     *
+     * @param activityId 活动编号
+     * @param skuId SKU 编号
+     * @param count 数量
+     */
+    SeckillValidateJoinRespDTO validateJoinSeckill(Long activityId, Long skuId, Integer count);
 
 }

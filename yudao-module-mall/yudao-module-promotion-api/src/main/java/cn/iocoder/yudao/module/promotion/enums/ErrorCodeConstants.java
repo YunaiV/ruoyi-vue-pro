@@ -56,6 +56,10 @@ public interface ErrorCodeConstants {
     ErrorCode SECKILL_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1_013_008_004, "秒杀活动未关闭或未结束，不能删除");
     ErrorCode SECKILL_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_008_005, "秒杀活动已关闭，不能重复关闭");
     ErrorCode SECKILL_ACTIVITY_UPDATE_STOCK_FAIL = new ErrorCode(1_013_008_006, "秒杀失败，原因秒杀库存不足");
+    ErrorCode SECKILL_JOIN_ACTIVITY_TIME_ERROR = new ErrorCode(1_013_008_007, "秒杀失败，原因：不在活动时间范围内");
+    ErrorCode SECKILL_JOIN_ACTIVITY_STATUS_CLOSED = new ErrorCode(1_013_008_008, "秒杀失败，原因：秒杀活动已关闭");
+    ErrorCode SECKILL_JOIN_ACTIVITY_SINGLE_LIMIT_COUNT_EXCEED = new ErrorCode(1_013_008_009, "秒杀失败，原因：单次限购超出");
+    ErrorCode SECKILL_JOIN_ACTIVITY_PRODUCT_NOT_EXISTS = new ErrorCode(1_013_008_010, "秒杀失败，原因：商品不存在");
 
     // ========== 秒杀时段 1-013-009-000 ==========
     ErrorCode SECKILL_CONFIG_NOT_EXISTS = new ErrorCode(1_013_009_000, "秒杀时段不存在");

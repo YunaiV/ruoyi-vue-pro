@@ -4,10 +4,12 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
+import cn.iocoder.yudao.module.promotion.api.seckill.dto.SeckillValidateJoinRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityUpdateReqVO;
@@ -15,6 +17,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.product.Sec
 import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.convert.seckill.seckillactivity.SeckillActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillActivityDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillConfigDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillProductDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillactivity.SeckillActivityMapper;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillactivity.SeckillProductMapper;
@@ -277,8 +280,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
 
     @Override
     public List<SeckillProductDO> getSeckillActivityProductList(Long id, Collection<Long> skuIds) {
-        // 1、校验秒杀活动是否存在
-        validateSeckillActivityExists(id);
+
         // 2、校验活动商品是否存在
         List<SeckillProductDO> productList = filterList(seckillProductMapper.selectListByActivityId(id),
                 item -> skuIds.contains(item.getSkuId()));
@@ -286,6 +288,38 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
             throw exception(SKU_NOT_EXISTS);
         }
         return productList;
+    }
+
+    @Override
+    public SeckillValidateJoinRespDTO validateJoinSeckill(Long activityId, Long skuId, Integer count) {
+        // 1.1 校验秒杀活动是否存在
+        SeckillActivityDO activity = validateSeckillActivityExists(activityId);
+        if (ObjectUtil.notEqual(activity.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+            throw exception(SECKILL_JOIN_ACTIVITY_STATUS_CLOSED);
+        }
+        // 1.2 是否在活动时间范围内
+        if (!LocalDateTimeUtils.isBetween(activity.getStartTime(), activity.getEndTime())) {
+            throw exception(SECKILL_JOIN_ACTIVITY_TIME_ERROR);
+        }
+        SeckillConfigDO config = seckillConfigService.getCurrentSeckillConfig();
+        if (config == null || !CollectionUtil.contains(activity.getConfigIds(), config.getId())) {
+            throw exception(SECKILL_JOIN_ACTIVITY_TIME_ERROR);
+        }
+        // 1.3 超过单次购买限制
+        if (count > activity.getSingleLimitCount()) {
+            throw exception(SECKILL_JOIN_ACTIVITY_SINGLE_LIMIT_COUNT_EXCEED);
+        }
+
+        // 2.1 校验秒杀商品是否存在
+        SeckillProductDO product = seckillProductMapper.selectByActivityIdAndSkuId(activityId, skuId);
+        if (product == null) {
+            throw exception(SECKILL_JOIN_ACTIVITY_PRODUCT_NOT_EXISTS);
+        }
+        // 2.2 校验库存是否充足
+        if (count > product.getStock()) {
+            throw exception(SECKILL_ACTIVITY_UPDATE_STOCK_FAIL);
+        }
+        return SeckillActivityConvert.INSTANCE.convert02(activity, product);
     }
 
 }

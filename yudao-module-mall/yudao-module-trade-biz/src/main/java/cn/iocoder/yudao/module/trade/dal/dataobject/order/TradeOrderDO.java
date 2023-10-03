@@ -288,4 +288,11 @@ public class TradeOrderDO extends BaseDO {
      */
     private Integer vipPrice;
 
+    /**
+     * 秒杀活动编号
+     *
+     * 关联 SeckillActivityDO 的 id 字段
+     */
+    private Long seckillActivityId;
+
 }

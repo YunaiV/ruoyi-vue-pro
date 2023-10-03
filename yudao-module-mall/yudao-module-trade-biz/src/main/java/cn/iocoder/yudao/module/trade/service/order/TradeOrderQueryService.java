@@ -82,6 +82,15 @@ public interface TradeOrderQueryService {
      */
     List<ExpressTrackRespDTO> getExpressTrackList(Long id);
 
+    /**
+     * 【会员】在指定秒杀活动下，用户购买的商品数量
+     *
+     * @param userId 用户编号
+     * @param activityId 活动编号
+     * @return 秒杀商品数量
+     */
+    int getSeckillProductCount(Long userId, Long activityId);
+
     // =================== Order Item ===================
 
     /**

@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.product.enums.DictTypeConstants;
-import cn.iocoder.yudao.module.promotion.api.seckill.dto.SeckillActivityProductRespDTO;
+import cn.iocoder.yudao.module.promotion.api.seckill.dto.SeckillValidateJoinRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityDetailRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityRespVO;
@@ -140,6 +140,6 @@ public interface SeckillActivityConvert {
                 .setStartTime(startTime).setEndTime(endTime);
     }
 
-    List<SeckillActivityProductRespDTO> convertList4(List<SeckillProductDO> seckillActivityProductList);
+    SeckillValidateJoinRespDTO convert02(SeckillActivityDO activity, SeckillProductDO product);
 
 }
