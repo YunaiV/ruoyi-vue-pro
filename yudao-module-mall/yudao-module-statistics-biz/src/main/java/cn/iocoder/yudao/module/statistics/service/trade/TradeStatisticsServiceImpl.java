@@ -2,13 +2,22 @@ package cn.iocoder.yudao.module.statistics.service.trade;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
+import cn.iocoder.yudao.module.pay.api.wallet.PayWalletApi;
+import cn.iocoder.yudao.module.pay.api.wallet.dto.WalletSummaryRespDTO;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeStatisticsComparisonRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeSummaryRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeTrendSummaryRespVO;
 import cn.iocoder.yudao.module.statistics.convert.trade.TradeStatisticsConvert;
+import cn.iocoder.yudao.module.statistics.dal.dataobject.trade.TradeStatisticsDO;
 import cn.iocoder.yudao.module.statistics.dal.mysql.trade.TradeStatisticsMapper;
 import cn.iocoder.yudao.module.statistics.service.trade.bo.TradeSummaryRespBO;
+import cn.iocoder.yudao.module.trade.api.aftersale.TradeAfterSaleApi;
+import cn.iocoder.yudao.module.trade.api.aftersale.dto.AfterSaleSummaryRespDTO;
+import cn.iocoder.yudao.module.trade.api.brokerage.TradeBrokerageApi;
+import cn.iocoder.yudao.module.trade.api.order.TradeOrderApi;
+import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderSummaryRespDTO;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -27,6 +36,15 @@ public class TradeStatisticsServiceImpl implements TradeStatisticsService {
 
     @Resource
     private TradeStatisticsMapper tradeStatisticsMapper;
+
+    @Resource
+    private TradeOrderApi tradeOrderApi;
+    @Resource
+    private TradeAfterSaleApi tradeAfterSaleApi;
+    @Resource
+    private TradeBrokerageApi tradeBrokerageApi;
+    @Resource
+    private PayWalletApi payWalletApi;
 
     @Override
     public TradeStatisticsComparisonRespVO<TradeSummaryRespVO> getTradeSummaryComparison() {
@@ -57,6 +75,36 @@ public class TradeStatisticsServiceImpl implements TradeStatisticsService {
     @Override
     public List<TradeTrendSummaryRespVO> getTradeStatisticsList(LocalDateTime beginTime, LocalDateTime endTime) {
         return tradeStatisticsMapper.selectListByTimeBetween(beginTime, endTime);
+    }
+
+    @Override
+    public String statisticsYesterdayTrade() {
+        // 处理统计参数
+        LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
+        LocalDateTime beginTime = LocalDateTimeUtil.beginOfDay(yesterday);
+        LocalDateTime endTime = LocalDateTimeUtil.endOfDay(yesterday);
+        // 统计
+        StopWatch stopWatch = new StopWatch("交易统计");
+        stopWatch.start("统计订单");
+        TradeOrderSummaryRespDTO orderSummary = tradeOrderApi.getOrderSummary(beginTime, endTime);
+        stopWatch.stop();
+
+        stopWatch.start("统计售后");
+        AfterSaleSummaryRespDTO afterSaleSummary = tradeAfterSaleApi.getAfterSaleSummary(beginTime, endTime);
+        stopWatch.stop();
+
+        stopWatch.start("统计佣金");
+        Integer brokerageSettlementPrice = tradeBrokerageApi.getBrokerageSettlementPriceSummary(beginTime, endTime);
+        stopWatch.stop();
+
+        stopWatch.start("统计充值");
+        WalletSummaryRespDTO walletSummary = payWalletApi.getWalletSummary(beginTime, endTime);
+        stopWatch.stop();
+        // 插入数据
+        TradeStatisticsDO entity = TradeStatisticsConvert.INSTANCE.convert(yesterday, orderSummary, afterSaleSummary, brokerageSettlementPrice, walletSummary);
+        tradeStatisticsMapper.insert(entity);
+        // 返回计时结果
+        return stopWatch.prettyPrint();
     }
 
     /**

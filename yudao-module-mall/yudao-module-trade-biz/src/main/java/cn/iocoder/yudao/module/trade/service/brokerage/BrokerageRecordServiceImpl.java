@@ -356,6 +356,13 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
         return respVO;
     }
 
+    @Override
+    public Integer getBrokerageSettlementPriceSummary(LocalDateTime beginTime, LocalDateTime endTime) {
+        return brokerageRecordMapper.selectSummaryPriceByStatusAndUnfreezeTimeBetween(
+                BrokerageRecordBizTypeEnum.ORDER.getType(), BrokerageRecordStatusEnum.SETTLEMENT.getStatus(),
+                beginTime, endTime);
+    }
+
     /**
      * 获得自身的代理对象，解决 AOP 生效问题
      *

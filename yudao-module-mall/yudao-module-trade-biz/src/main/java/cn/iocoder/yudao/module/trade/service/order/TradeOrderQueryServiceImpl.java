@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
+import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderSummaryRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
@@ -20,6 +21,7 @@ import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -142,6 +144,14 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
                 new ExpressTrackQueryReqDTO().setExpressCode(express.getCode()).setLogisticsNo(order.getLogisticsNo())
                         .setPhone(order.getReceiverMobile()));
     }
+
+    @Override
+    public TradeOrderSummaryRespDTO getOrderSummary(LocalDateTime beginTime, LocalDateTime endTime) {
+        TradeOrderSummaryRespDTO dto = tradeOrderMapper.selectSummaryByPayTimeBetween(beginTime, endTime);
+        dto.setOrderCreateCount(tradeOrderMapper.selectCountByCreateTimeBetween(beginTime, endTime));
+        return dto;
+    }
+
 
     // =================== Order Item ===================
 

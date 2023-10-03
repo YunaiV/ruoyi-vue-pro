@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.trade.dal.mysql.brokerage;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -108,4 +110,14 @@ public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
                                  @Param("status") Integer status,
                                  @Param("beginTime") LocalDateTime beginTime,
                                  @Param("endTime") LocalDateTime endTime);
+
+    default Integer selectSummaryPriceByStatusAndUnfreezeTimeBetween(Integer bizType, Integer status,
+                                                                     LocalDateTime beginTime, LocalDateTime endTime) {
+        return Convert.toInt(CollUtil.getFirst(selectObjs(MPJWrappers.<BrokerageRecordDO>lambdaJoin()
+                .selectSum(BrokerageRecordDO::getPrice)
+                .eq(BrokerageRecordDO::getBizType, bizType)
+                .eq(BrokerageRecordDO::getStatus, status)
+                .between(BrokerageRecordDO::getUnfreezeTime, beginTime, endTime))), 0);
+    }
+
 }
