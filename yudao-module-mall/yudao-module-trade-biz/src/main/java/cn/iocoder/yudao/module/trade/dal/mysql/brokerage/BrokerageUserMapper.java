@@ -151,10 +151,16 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
                                                                         @Param("ids") Collection<Long> ids,
                                                                         @Param("sortingField") SortingField sortingField);
 
+    /**
+     * 获得被 bindUserIds 推广的用户编号数组
+     *
+     * @param bindUserIds 推广员编号数组
+     * @return 用户编号数组
+     */
     default List<Long> selectIdListByBindUserIdIn(Collection<Long> bindUserIds) {
         return Convert.toList(Long.class,
                 selectObjs(new LambdaQueryWrapperX<BrokerageUserDO>()
-                        .select(Collections.singletonList(BrokerageUserDO::getId))
+                        .select(Collections.singletonList(BrokerageUserDO::getId)) // 只查询 id 字段，加速返回速度
                         .in(BrokerageUserDO::getBindUserId, bindUserIds)));
     }
 

@@ -231,7 +231,6 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         if (CollUtil.isEmpty(childIds)) {
             return PageResult.empty();
         }
-
         // 1.2 根据昵称过滤下级用户
         Map<Long, MemberUserRespDTO> userMap = convertMapByFilter(memberUserApi.getUserList(childIds),
                 user -> StrUtil.contains(user.getNickname(), pageReqVO.getNickname()),
@@ -240,13 +239,13 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
             return PageResult.empty();
         }
 
-        // 2 分页查询
+        // 2. 分页查询
         IPage<AppBrokerageUserChildSummaryRespVO> pageResult = brokerageUserMapper.selectSummaryPageByUserId(
                 MyBatisUtils.buildPage(pageReqVO), BrokerageRecordBizTypeEnum.ORDER.getType(),
                 BrokerageRecordStatusEnum.SETTLEMENT.getStatus(), userMap.keySet(), pageReqVO.getSortingField()
         );
 
-        // 3 拼接数据并返回
+        // 3. 拼接数据并返回
         BrokerageUserConvert.INSTANCE.copyTo(pageResult.getRecords(), userMap);
         return new PageResult<>(pageResult.getRecords(), pageResult.getTotal());
     }

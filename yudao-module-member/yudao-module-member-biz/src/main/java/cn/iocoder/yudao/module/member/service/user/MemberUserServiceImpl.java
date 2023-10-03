@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.member.service.user;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -28,6 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
@@ -78,6 +79,7 @@ public class MemberUserServiceImpl implements MemberUserService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public MemberUserDO createUserIfAbsent(String mobile, String registerIp) {
         // 用户已经存在
         MemberUserDO user = memberUserMapper.selectByMobile(mobile);
@@ -85,7 +87,7 @@ public class MemberUserServiceImpl implements MemberUserService {
             return user;
         }
         // 用户不存在，则进行创建
-        return this.createUser(mobile, registerIp);
+        return createUser(mobile, registerIp);
     }
 
     private MemberUserDO createUser(String mobile, String registerIp) {
@@ -97,13 +99,17 @@ public class MemberUserServiceImpl implements MemberUserService {
         user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
         user.setPassword(encodePassword(password)); // 加密密码
         user.setRegisterIp(registerIp);
+        memberUserMapper.insert(user);
 
-        Boolean success = transactionTemplate.execute(status -> memberUserMapper.insert(user) > 0);
-        if (BooleanUtil.isTrue(success)) {
-            // 发送 MQ 消息：用户创建
-            registerCouponProducer.sendUserCreateMessage(user.getId());
-        }
+        // 发送 MQ 消息：用户创建
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 
+            @Override
+            public void afterCommit() {
+                registerCouponProducer.sendUserCreateMessage(user.getId());
+            }
+
+        });
         return user;
     }
 
