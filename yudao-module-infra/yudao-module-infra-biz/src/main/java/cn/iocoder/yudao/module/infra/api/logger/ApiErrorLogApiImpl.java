@@ -24,9 +24,4 @@ public class ApiErrorLogApiImpl implements ApiErrorLogApi {
         apiErrorLogService.createApiErrorLog(createDTO);
     }
 
-    @Override
-    public void jobCleanErrorLog(Integer errorLogJobDay) {
-        apiErrorLogService.jobCleanErrorLog(errorLogJobDay);
-    }
-
 }
