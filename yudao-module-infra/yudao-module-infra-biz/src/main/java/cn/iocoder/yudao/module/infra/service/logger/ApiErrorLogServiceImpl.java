@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.module.infra.service.logger;
 
-import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.infra.api.logger.dto.ApiErrorLogCreateReqDTO;
 import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apierrorlog.ApiErrorLogExportReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apierrorlog.ApiErrorLogPageReqVO;
@@ -16,7 +14,6 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -68,25 +65,18 @@ public class ApiErrorLogServiceImpl implements ApiErrorLogService {
     }
 
     @Override
-    public Integer jobCleanErrorLog(Integer errorLogExceedDay,Integer deleteLimit) {
-        Integer result;
+    @SuppressWarnings("DuplicatedCode")
+    public Integer cleanErrorLog(Integer exceedDay, Integer deleteLimit) {
         int count = 0;
-        Date currentDate = DateUtil.date();
-        // 计算过期日期：正数向未来偏移，负数向历史偏移
-        Date expireDate = DateUtil.offsetDay(currentDate, -errorLogExceedDay);
+        LocalDateTime expireDate = LocalDateTime.now().minusDays(exceedDay);
+        // 循环删除，直到没有满足条件的数据
         for (int i = 0; i < Short.MAX_VALUE; i++) {
-            result = apiErrorLogMapper.deleteByCreateTimeLt(expireDate,deleteLimit);
-            count += result;
-            if (result < deleteLimit) {
-                // 达到删除预期条数
+            int deleteCount = apiErrorLogMapper.deleteByCreateTimeLt(expireDate, deleteLimit);
+            count += deleteCount;
+            // 达到删除预期条数，说明到底了
+            if (deleteCount < deleteLimit) {
                 break;
             }
-        }
-        if(count > 0){
-            // ALTER TABLE...FORCE 会导致表重建发生,这会根据主键索引对表空间中的物理页进行排序。
-            // 它将行压缩到页面上并消除可用空间，同时确保数据处于主键查找的最佳顺序。
-            // 优化表语句官方文档：https://dev.mysql.com/doc/refman/8.0/en/optimize-table.html
-            apiErrorLogMapper.optimizeTable();
         }
         return count;
     }

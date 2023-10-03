@@ -49,10 +49,11 @@ public interface JobLogService extends JobLogFrameworkService {
     List<JobLogDO> getJobLogList(JobLogExportReqVO exportReqVO);
 
     /**
-     * 清理 @param jobCleanRetainDay 天的访问日志
+     * 清理 exceedDay 天前的任务日志
      *
-     * @param jobLogExceedDay 超过多少天就进行清理
+     * @param exceedDay 超过多少天就进行清理
      * @param deleteLimit 清理的间隔条数
      */
-    Integer timingJobCleanLog(Integer jobLogExceedDay,Integer deleteLimit);
+    Integer cleanJobLog(Integer exceedDay, Integer deleteLimit);
+
 }

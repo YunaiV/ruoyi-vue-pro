@@ -39,10 +39,11 @@ public interface ApiAccessLogService {
     List<ApiAccessLogDO> getApiAccessLogList(ApiAccessLogExportReqVO exportReqVO);
 
     /**
-     * 清理 @param accessLogJobDay 天的访问日志
+     * 清理 exceedDay 天前的访问日志
      *
-     * @param accessLogExceedDay 超过多少天就进行清理
+     * @param exceedDay 超过多少天就进行清理
      * @param deleteLimit 清理的间隔条数
      */
-    Integer jobCleanAccessLog(Integer accessLogExceedDay,Integer deleteLimit);
+    Integer cleanAccessLog(Integer exceedDay, Integer deleteLimit);
+
 }
