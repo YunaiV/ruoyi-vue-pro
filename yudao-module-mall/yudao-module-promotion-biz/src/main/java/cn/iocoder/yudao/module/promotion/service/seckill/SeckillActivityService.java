@@ -5,8 +5,8 @@ import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.Se
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityPageReqVO;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillActivityDO;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillProductDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillActivityDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillProductDO;
 
 import javax.validation.Valid;
 import java.util.Collection;

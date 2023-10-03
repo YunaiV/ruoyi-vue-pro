@@ -18,9 +18,9 @@ import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppS
 import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityNowRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityRespVO;
 import cn.iocoder.yudao.module.promotion.convert.seckill.seckillconfig.SeckillConfigConvert;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillActivityDO;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillProductDO;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillconfig.SeckillConfigDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillActivityDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillProductDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillConfigDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -61,7 +61,7 @@ public interface SeckillActivityConvert {
         pageResult.getList().forEach(item -> {
             item.setProducts(convertList2(seckillProducts));
             MapUtils.findAndThen(spuMap, item.getSpuId(),
-                    spu -> item.setSpuName(spu.getName()).setPicUrl(spu.getPicUrl()));
+                    spu -> item.setSpuName(spu.getName()).setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice()));
         });
         return pageResult;
     }

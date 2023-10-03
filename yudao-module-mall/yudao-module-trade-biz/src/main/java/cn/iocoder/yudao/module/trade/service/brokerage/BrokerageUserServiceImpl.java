@@ -329,26 +329,27 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         if (bindUserId == null) {
             return Collections.emptyList();
         }
-
         // 先查第 1 级
         List<Long> bindUserIds = brokerageUserMapper.selectIdListByBindUserIdIn(Collections.singleton(bindUserId));
         if (CollUtil.isEmpty(bindUserIds)) {
             return Collections.emptyList();
         }
 
+        // 情况一：level 为空，查询所有级别
         if (level == null) {
-            // level 为空，再查第 2 级，并合并结果
+            // 再查第 2 级，并合并结果
             bindUserIds.addAll(brokerageUserMapper.selectIdListByBindUserIdIn(bindUserIds));
-        } else if (level == 2) {
-            // 只查第 2 级
-            bindUserIds = brokerageUserMapper.selectIdListByBindUserIdIn(bindUserIds);
-        } else if (level == 1) {
-            // 只查第 1 级
             return bindUserIds;
-        } else {
-            throw exception(BROKERAGE_USER_LEVEL_NOT_SUPPORT);
         }
-        return bindUserIds;
+        // 情况二：level 为 1，只查询第 1 级
+        if (level == 1) {
+            return bindUserIds;
+        }
+        // 情况三：level 为 1，只查询第 2 级
+        if (level == 2) {
+            return brokerageUserMapper.selectIdListByBindUserIdIn(bindUserIds);
+        }
+        throw exception(BROKERAGE_USER_LEVEL_NOT_SUPPORT);
     }
 
 }
