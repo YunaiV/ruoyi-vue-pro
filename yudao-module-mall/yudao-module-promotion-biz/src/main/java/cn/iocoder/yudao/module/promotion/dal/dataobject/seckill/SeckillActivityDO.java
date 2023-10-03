@@ -66,18 +66,7 @@ public class SeckillActivityDO extends BaseDO {
      */
     @TableField(typeHandler = LongListTypeHandler.class)
     private List<Long> configIds;
-    /**
-     * 新增订单数
-     */
-    private Integer orderCount;
-    /**
-     * 付款人数
-     */
-    private Integer userCount;
-    /**
-     * 订单实付金额，单位：分
-     */
-    private Long totalPrice;
+
     /**
      * 总限购数量
      */
@@ -86,6 +75,7 @@ public class SeckillActivityDO extends BaseDO {
      * 单次限够数量
      */
     private Integer singleLimitCount;
+
     /**
      * 秒杀库存(剩余库存秒杀时扣减)
      */

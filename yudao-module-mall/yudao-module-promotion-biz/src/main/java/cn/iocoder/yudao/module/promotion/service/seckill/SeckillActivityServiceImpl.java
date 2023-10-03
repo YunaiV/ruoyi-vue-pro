@@ -18,7 +18,6 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillActivityD
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillProductDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillactivity.SeckillActivityMapper;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillactivity.SeckillProductMapper;
-import cn.iocoder.yudao.module.promotion.util.PromotionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -60,17 +59,18 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createSeckillActivity(SeckillActivityCreateReqVO createReqVO) {
-        // 校验商品秒杀时段是否冲突
+        // 1.1 校验商品秒杀时段是否冲突
         validateProductConflict(createReqVO.getConfigIds(), createReqVO.getSpuId(), null);
-        // 校验商品是否存在
+        // 1.2 校验商品是否存在
         validateProductExists(createReqVO.getSpuId(), createReqVO.getProducts());
 
-        // 插入秒杀活动
+        // 2.1 插入秒杀活动
         SeckillActivityDO activity = SeckillActivityConvert.INSTANCE.convert(createReqVO)
-                .setStatus(PromotionUtils.calculateActivityStatus(createReqVO.getEndTime()))
-                .setTotalStock(getSumValue(createReqVO.getProducts(), SeckillProductBaseVO::getStock, Integer::sum));
+                .setStatus(CommonStatusEnum.ENABLE.getStatus())
+                .setStock(getSumValue(createReqVO.getProducts(), SeckillProductBaseVO::getStock, Integer::sum));
+        activity.setTotalStock(activity.getStock());
         seckillActivityMapper.insert(activity);
-        // 插入商品
+        // 2.2 插入商品
         List<SeckillProductDO> products = SeckillActivityConvert.INSTANCE.convertList(createReqVO.getProducts(), activity);
         seckillProductMapper.insertBatch(products);
         return activity.getId();
@@ -128,22 +128,24 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateSeckillActivity(SeckillActivityUpdateReqVO updateReqVO) {
-        // 校验存在
-        SeckillActivityDO seckillActivity = validateSeckillActivityExists(updateReqVO.getId());
-        if (CommonStatusEnum.DISABLE.getStatus().equals(seckillActivity.getStatus())) {
+        // 1.1 校验存在
+        SeckillActivityDO activity = validateSeckillActivityExists(updateReqVO.getId());
+        if (CommonStatusEnum.DISABLE.getStatus().equals(activity.getStatus())) {
             throw exception(SECKILL_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED);
         }
-        // 校验商品是否冲突
+        // 1.2 校验商品是否冲突
         validateProductConflict(updateReqVO.getConfigIds(), updateReqVO.getSpuId(), updateReqVO.getId());
-        // 校验商品是否存在
+        // 1.3 校验商品是否存在
         validateProductExists(updateReqVO.getSpuId(), updateReqVO.getProducts());
 
-        // 更新活动
+        // 2.1 更新活动
         SeckillActivityDO updateObj = SeckillActivityConvert.INSTANCE.convert(updateReqVO)
-                .setStatus(PromotionUtils.calculateActivityStatus(updateReqVO.getEndTime()))
-                .setTotalStock(getSumValue(updateReqVO.getProducts(), SeckillProductBaseVO::getStock, Integer::sum));
+                .setStock(getSumValue(updateReqVO.getProducts(), SeckillProductBaseVO::getStock, Integer::sum));
+        if (updateObj.getStock() > activity.getTotalStock()) { // 如果更新的库存大于原来的库存，则更新总库存
+            updateObj.setTotalStock(updateObj.getStock());
+        }
         seckillActivityMapper.updateById(updateObj);
-        // 更新商品
+        // 2.2 更新商品
         updateSeckillProduct(updateObj, updateReqVO.getProducts());
     }
 
@@ -151,7 +153,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     @Transactional(rollbackFor = Exception.class)
     public void updateSeckillStock(Long id, Long skuId, Integer count) {
         // 1.1 校验活动库存是否充足
-        SeckillActivityDO seckillActivity = getSeckillActivity(id);
+        SeckillActivityDO seckillActivity = validateSeckillActivityExists(id);
         if (count > seckillActivity.getTotalStock()) {
             throw exception(SECKILL_ACTIVITY_UPDATE_STOCK_FAIL);
         }
@@ -243,7 +245,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
 
     @Override
     public SeckillActivityDO getSeckillActivity(Long id) {
-        return validateSeckillActivityExists(id);
+        return seckillActivityMapper.selectById(id);
     }
 
     @Override
@@ -259,12 +261,6 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     @Override
     public List<SeckillProductDO> getSeckillProductListByActivityId(Collection<Long> activityIds) {
         return seckillProductMapper.selectListByActivityId(activityIds);
-    }
-
-    @Override
-    public List<SeckillActivityDO> getSeckillActivityListByConfigIds(Collection<Long> ids) {
-        return filterList(seckillActivityMapper.selectList(),
-                item -> anyMatch(item.getConfigIds(), ids::contains));
     }
 
     @Override
@@ -289,7 +285,6 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         if (CollectionUtil.isEmpty(productList)) {
             throw exception(SKU_NOT_EXISTS);
         }
-
         return productList;
     }
 

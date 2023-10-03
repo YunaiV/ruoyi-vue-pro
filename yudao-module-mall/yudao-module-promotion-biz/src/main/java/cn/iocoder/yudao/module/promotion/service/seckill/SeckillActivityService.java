@@ -90,14 +90,6 @@ public interface SeckillActivityService {
     List<SeckillProductDO> getSeckillProductListByActivityId(Collection<Long> activityIds);
 
     /**
-     * 通过活动时段获取秒杀活动
-     *
-     * @param ids 时段配置编号
-     * @return 秒杀活动列表
-     */
-    List<SeckillActivityDO> getSeckillActivityListByConfigIds(Collection<Long> ids);
-
-    /**
      * 通过活动时段编号获取指定 status 的秒杀活动
      *
      * @param configId 时段配置编号
