@@ -14,7 +14,7 @@ import javax.annotation.Resource;
  * @author HUIHUI
  */
 @Component
-public class TradeBargainHandler extends TradeOrderDefaultHandler {
+public class TradeBargainHandler implements TradeOrderHandler {
 
     @Resource
     private BargainActivityApi bargainActivityApi;

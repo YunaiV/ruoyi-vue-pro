@@ -102,6 +102,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         return recordDO;
     }
 
+    // TODO @芋艿：在详细预览下；
     @Override
     public void validateCombinationRecord(Long activityId, Long userId, Long skuId, Integer count) {
         // 1.1 校验拼团活动是否存在
@@ -132,12 +133,14 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         }
         // 5.1、查询关联的订单是否已经支付
         // 当前 activityId 已经有未支付的订单，不允许在发起新的；要么支付，要么去掉先；
+        // TODO 芋艿：看看是不是可以删除掉；
         Integer orderStatus = tradeOrderApi.getOrderStatus(record.getOrderId());
         if (ObjectUtil.equal(orderStatus, TradeOrderStatusEnum.UNPAID.getStatus())) {
             throw exception(COMBINATION_RECORD_FAILED_ORDER_STATUS_UNPAID);
         }
     }
 
+    // TODO 芋艿：在详细 review 下；
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {

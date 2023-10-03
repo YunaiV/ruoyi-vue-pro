@@ -17,25 +17,25 @@ public interface TradeOrderHandler {
      *
      * @param reqBO 请求
      */
-    void beforeOrderCreate(TradeBeforeOrderCreateReqBO reqBO);
+    default void beforeOrderCreate(TradeBeforeOrderCreateReqBO reqBO) {}
 
     /**
      * 订单创建后
      *
      * @param reqBO 请求
      */
-    void afterOrderCreate(TradeAfterOrderCreateReqBO reqBO);
+    default void afterOrderCreate(TradeAfterOrderCreateReqBO reqBO) {}
 
     /**
      * 支付订单后
      *
      * @param reqBO 请求
      */
-    void afterPayOrder(TradeAfterPayOrderReqBO reqBO);
+    default void afterPayOrder(TradeAfterPayOrderReqBO reqBO) {}
 
     /**
      * 订单取消
      */
-    void cancelOrder();
+    default void cancelOrder() {}
 
 }

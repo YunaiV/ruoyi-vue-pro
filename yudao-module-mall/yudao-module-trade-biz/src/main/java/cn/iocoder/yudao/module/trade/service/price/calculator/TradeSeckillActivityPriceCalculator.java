@@ -46,7 +46,7 @@ public class TradeSeckillActivityPriceCalculator implements TradePriceCalculator
                 orderItem.getSkuId(), orderItem.getCount());
 
         // 3.1 记录优惠明细
-        Integer discountPrice = orderItem.getPayPrice() - seckillActivity.getSeckillPrice();
+        Integer discountPrice = orderItem.getPayPrice() - seckillActivity.getSeckillPrice() * orderItem.getCount();
         TradePriceCalculatorHelper.addPromotion(result, orderItem,
                 param.getSeckillActivityId(), seckillActivity.getName(), PromotionTypeEnum.SECKILL_ACTIVITY.getType(),
                 StrUtil.format("秒杀活动：省 {} 元", TradePriceCalculatorHelper.formatPrice(discountPrice)),
