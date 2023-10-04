@@ -36,4 +36,11 @@ public interface TradeStatisticsService {
      */
     List<TradeTrendSummaryRespVO> getTradeStatisticsList(LocalDateTime beginTime, LocalDateTime endTime);
 
+    /**
+     * 统计昨日交易
+     *
+     * @return 耗时
+     */
+    String statisticsYesterdayTrade();
+
 }

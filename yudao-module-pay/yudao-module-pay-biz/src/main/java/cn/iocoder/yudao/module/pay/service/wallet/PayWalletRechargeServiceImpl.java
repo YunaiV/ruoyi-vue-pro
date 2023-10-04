@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.pay.core.enums.refund.PayRefundStatusRespEnum;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
+import cn.iocoder.yudao.module.pay.api.wallet.dto.WalletSummaryRespDTO;
 import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.recharge.AppPayWalletRechargeCreateReqVO;
 import cn.iocoder.yudao.module.pay.convert.wallet.PayWalletRechargeConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
@@ -40,7 +41,7 @@ import static cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum.*;
 @Service
 @Slf4j
 public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
-    
+
     /**
      * TODO 放到 配置文件中
      */
@@ -94,9 +95,9 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
         PayOrderDO payOrderDO = validateWalletRechargerCanPaid(walletRecharge, payOrderId);
 
         // 2. 更新钱包充值的支付状态
-        int updateCount = walletRechargeMapper.updateByIdAndPaid(id,false,
+        int updateCount = walletRechargeMapper.updateByIdAndPaid(id, false,
                 new PayWalletRechargeDO().setId(id).setPayStatus(true).setPayTime(LocalDateTime.now())
-                .setPayChannelCode(payOrderDO.getChannelCode()));
+                        .setPayChannelCode(payOrderDO.getChannelCode()));
         if (updateCount == 0) {
             throw exception(WALLET_RECHARGE_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
@@ -124,7 +125,7 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
         // 3 创建退款单
         String walletRechargeId = String.valueOf(id);
         String refundId = walletRechargeId + "-refund";
-        Long payRefundId =  payRefundService.createPayRefund(new PayRefundCreateReqDTO()
+        Long payRefundId = payRefundService.createPayRefund(new PayRefundCreateReqDTO()
                 .setAppId(WALLET_PAY_APP_ID).setUserIp(userIp)
                 .setMerchantOrderId(walletRechargeId)
                 .setMerchantRefundId(refundId)
@@ -255,6 +256,17 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
             throw exception(WALLET_RECHARGE_UPDATE_PAID_PAY_ORDER_ID_ERROR);
         }
         return payOrder;
+    }
+
+    @Override
+    public WalletSummaryRespDTO getWalletSummary(LocalDateTime beginTime, LocalDateTime endTime) {
+        WalletSummaryRespDTO paySummary = walletRechargeMapper.selectRechargeSummaryByPayTimeBetween(beginTime, endTime);
+        WalletSummaryRespDTO refundSummary = walletRechargeMapper.selectRechargeSummaryByRefundTimeBetween(beginTime, endTime);
+
+        paySummary.setRechargeRefundCount(refundSummary.getRechargeRefundCount());
+        paySummary.setRechargeRefundPrice(refundSummary.getRechargeRefundPrice());
+
+        return paySummary;
     }
 
 }

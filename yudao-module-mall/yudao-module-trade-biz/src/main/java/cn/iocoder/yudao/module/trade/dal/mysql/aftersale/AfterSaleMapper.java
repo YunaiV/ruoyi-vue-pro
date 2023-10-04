@@ -1,14 +1,19 @@
 package cn.iocoder.yudao.module.trade.dal.mysql.aftersale;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.trade.api.aftersale.dto.AfterSaleSummaryRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.AfterSalePageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.AfterSaleDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.github.yulichang.toolkit.MPJWrappers;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 @Mapper
@@ -46,6 +51,14 @@ public interface AfterSaleMapper extends BaseMapperX<AfterSaleDO> {
         return selectCount(new LambdaQueryWrapperX<AfterSaleDO>()
                 .eq(AfterSaleDO::getUserId, userId)
                 .in(AfterSaleDO::getStatus, statuses));
+    }
+
+    default AfterSaleSummaryRespDTO selectSummaryByRefundTimeBetween(LocalDateTime beginTime, LocalDateTime endTime) {
+        return BeanUtil.copyProperties(CollUtil.get(selectMaps(MPJWrappers.<AfterSaleDO>lambdaJoin()
+                        .selectCount(AfterSaleDO::getId, AfterSaleSummaryRespDTO::getAfterSaleCount)
+                        .selectSum(AfterSaleDO::getRefundPrice, AfterSaleSummaryRespDTO::getAfterSaleRefundPrice)
+                        .between(AfterSaleDO::getRefundTime, beginTime, endTime)), 0),
+                AfterSaleSummaryRespDTO.class);
     }
 
 }

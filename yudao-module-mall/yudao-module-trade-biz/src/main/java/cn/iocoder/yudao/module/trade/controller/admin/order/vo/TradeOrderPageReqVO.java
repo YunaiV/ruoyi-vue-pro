@@ -40,6 +40,9 @@ public class TradeOrderPageReqVO extends PageParam {
     @Schema(description = "自提门店编号", example = "[1,2]")
     private List<Long> pickUpStoreIds;
 
+    @Schema(description = "自提核销码", example = "12345678")
+    private String pickUpVerifyCode;
+
     @Schema(description = "订单类型", example = "1")
     private Integer type;
 
