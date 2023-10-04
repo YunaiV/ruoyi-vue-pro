@@ -50,15 +50,15 @@ public class BargainRecordDO extends BaseDO {
     private Long skuId;
 
     /**
-     * 砍价底价，单位分
+     * 砍价底价，单位：分
      */
     private Integer bargainPrice;
     /**
-     * 商品原价，单位分
+     * 商品原价，单位：分
      */
     private Integer price;
     /**
-     * 应付金额，单位分
+     * 应付金额，单位：分
      */
     private Integer payPrice;
 

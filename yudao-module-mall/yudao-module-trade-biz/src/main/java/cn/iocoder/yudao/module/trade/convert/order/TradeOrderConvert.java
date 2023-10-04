@@ -209,7 +209,8 @@ public interface TradeOrderConvert {
                 .setDeliveryType(settlementReqVO.getDeliveryType()).setAddressId(settlementReqVO.getAddressId())
                 .setPickUpStoreId(settlementReqVO.getPickUpStoreId())
                 .setItems(new ArrayList<>(settlementReqVO.getItems().size()))
-                .setSeckillActivityId(settlementReqVO.getSeckillActivityId());
+                .setSeckillActivityId(settlementReqVO.getSeckillActivityId())
+                .setBargainRecordId(settlementReqVO.getBargainRecordId());
         // 商品项的构建
         Map<Long, CartDO> cartMap = convertMap(cartList, CartDO::getId);
         for (AppTradeOrderSettlementReqVO.Item item : settlementReqVO.getItems()) {
