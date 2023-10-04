@@ -3,6 +3,9 @@ package cn.iocoder.yudao.module.promotion.service.bargain;
 import cn.iocoder.yudao.module.promotion.controller.app.bargain.vo.help.AppBargainHelpCreateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainHelpDO;
 
+import java.util.Collection;
+import java.util.Map;
+
 /**
  * 砍价助力 Service 接口
  *
@@ -18,5 +21,13 @@ public interface BargainHelpService {
      * @return 砍价助力记录
      */
     BargainHelpDO createBargainHelp(Long userId, AppBargainHelpCreateReqVO reqVO);
+
+    /**
+     * 获得助力人数 Map
+     *
+     * @param activityIds 活动编号
+     * @return 助力人数 Map
+     */
+    Map<Long, Integer> getBargainHelpUserCountMap(Collection<Long> activityIds);
 
 }

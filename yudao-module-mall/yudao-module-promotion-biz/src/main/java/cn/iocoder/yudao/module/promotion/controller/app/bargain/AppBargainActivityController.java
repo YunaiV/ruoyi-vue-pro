@@ -32,6 +32,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 @RequestMapping("/promotion/bargain-activity")
 @Validated
 public class AppBargainActivityController {
+
     @Resource
     private BargainActivityService bargainActivityService;
     @Resource

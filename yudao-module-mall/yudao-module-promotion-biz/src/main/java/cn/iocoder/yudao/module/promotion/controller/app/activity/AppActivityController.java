@@ -22,6 +22,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @Validated
 public class AppActivityController {
 
+    // TODO @puhui999：可以实现下
     @GetMapping("/list-by-spu-id")
     @Operation(summary = "获得单个商品，近期参与的每个活动") // 每种活动，只返回一个
     @Parameter(name = "spuId", description = "商品编号", required = true)
@@ -41,6 +42,7 @@ public class AppActivityController {
         return success(randomList);
     }
 
+    // TODO @puhui999：可以实现下
     @GetMapping("/list-by-spu-ids")
     @Operation(summary = "获得多个商品，近期参与的每个活动") // 每种活动，只返回一个；key 为 SPU 编号
     @Parameter(name = "spuIds", description = "商品编号数组", required = true)

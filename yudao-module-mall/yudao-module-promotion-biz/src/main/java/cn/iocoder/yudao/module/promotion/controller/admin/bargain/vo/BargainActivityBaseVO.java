@@ -36,7 +36,7 @@ public class BargainActivityBaseVO {
 
     @Schema(description = "砍价底价", requiredMode = Schema.RequiredMode.REQUIRED, example = "23")
     @NotNull(message = "砍价底价不能为空")
-    private Integer bargainPrice;
+    private Integer bargainMinPrice;
 
     @Schema(description = "活动库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "23")
     @NotNull(message = "活动库存不能为空")

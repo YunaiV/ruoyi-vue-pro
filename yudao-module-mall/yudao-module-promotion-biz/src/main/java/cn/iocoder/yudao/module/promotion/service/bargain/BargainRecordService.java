@@ -5,6 +5,10 @@ import cn.iocoder.yudao.module.promotion.api.bargain.dto.BargainValidateJoinResp
 import cn.iocoder.yudao.module.promotion.controller.app.bargain.vo.record.AppBargainRecordCreateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainRecordDO;
 
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Map;
+
 /**
  * 砍价记录 service 接口
  *
@@ -54,5 +58,14 @@ public interface BargainRecordService {
      * @return 砍价记录
      */
     BargainRecordDO getBargainRecord(Long id);
+
+    /**
+     * 获得砍价人数 Map
+     *
+     * @param activityIds 活动编号
+     * @param status 砍价记录状态
+     * @return 砍价人数 Map
+     */
+    Map<Long, Integer> getBargainRecordUserCountMap(Collection<Long> activityIds, @Nullable Integer status);
 
 }

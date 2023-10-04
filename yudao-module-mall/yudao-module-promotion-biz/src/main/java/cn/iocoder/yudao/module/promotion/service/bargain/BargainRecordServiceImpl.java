@@ -12,7 +12,10 @@ import cn.iocoder.yudao.module.promotion.enums.bargain.BargainRecordStatusEnum;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Nullable;
 import javax.annotation.Resource;
+import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -90,6 +93,11 @@ public class BargainRecordServiceImpl implements BargainRecordService {
     @Override
     public BargainRecordDO getBargainRecord(Long id) {
         return bargainRecordMapper.selectById(id);
+    }
+
+    @Override
+    public Map<Long, Integer> getBargainRecordUserCountMap(Collection<Long> activityIds, @Nullable Integer status) {
+        return bargainRecordMapper.selectCountByActivityIdsAndStatus(activityIds, status);
     }
 
 }

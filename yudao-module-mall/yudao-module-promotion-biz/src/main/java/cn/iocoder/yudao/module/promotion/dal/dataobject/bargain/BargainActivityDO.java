@@ -67,10 +67,15 @@ public class BargainActivityDO extends BaseDO {
      * 砍价底价，单位：分
      */
     private Integer bargainMinPrice;
+
     /**
-     * 砍价活动库存
+     * 砍价库存(剩余库存砍价时扣减)
      */
     private Integer stock;
+    /**
+     * 砍价总库存
+     */
+    private Integer totalStock;
 
     /**
      * 砍价人数
@@ -98,12 +103,5 @@ public class BargainActivityDO extends BaseDO {
      * 用户每次砍价的最大金额，单位：分
      */
     private Integer randomMaxPrice;
-
-    // ========== 统计字段 ==========
-
-    /**
-     * 砍价成功数量
-     */
-    private Integer successCount;
 
 }

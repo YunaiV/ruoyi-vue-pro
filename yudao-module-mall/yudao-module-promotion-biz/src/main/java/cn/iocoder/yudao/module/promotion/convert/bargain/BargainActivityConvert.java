@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.product.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityBaseVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityPageItemRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.bargain.vo.activity.AppBargainActivityDetailRespVO;
@@ -38,19 +39,23 @@ public interface BargainActivityConvert {
 
     List<BargainActivityRespVO> convertList(List<BargainActivityDO> list);
 
-    PageResult<BargainActivityRespVO> convertPage(PageResult<BargainActivityDO> page);
+    PageResult<BargainActivityPageItemRespVO> convertPage(PageResult<BargainActivityDO> page);
 
-    default PageResult<BargainActivityRespVO> convertPage(PageResult<BargainActivityDO> page, List<ProductSpuRespDTO> spuList) {
-        PageResult<BargainActivityRespVO> result = convertPage(page);
+    default PageResult<BargainActivityPageItemRespVO> convertPage(PageResult<BargainActivityDO> page, List<ProductSpuRespDTO> spuList,
+                                                                  Map<Long, Integer> recordUserCountMap, Map<Long, Integer> recordSuccessUserCountMap,
+                                                                  Map<Long, Integer> helpUserCountMap) {
+        PageResult<BargainActivityPageItemRespVO> result = convertPage(page);
         // 拼接关联属性
         Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
-        List<BargainActivityRespVO> list = CollectionUtils.convertList(result.getList(), item -> {
+        result.getList().forEach(item -> {
             findAndThen(spuMap, item.getSpuId(), spu -> {
                 item.setPicUrl(spu.getPicUrl()).setSpuName(spu.getName());
             });
-            return item;
+            // 设置统计字段
+            item.setRecordUserCount(recordUserCountMap.getOrDefault(item.getId(), 0))
+                    .setRecordSuccessUserCount(recordSuccessUserCountMap.getOrDefault(item.getId(), 0))
+                    .setHelpUserCount(helpUserCountMap.getOrDefault(item.getId(), 0));
         });
-        result.setList(list);
         return result;
     }
 

@@ -52,7 +52,8 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 
         // 插入砍价活动
         BargainActivityDO activityDO = BargainActivityConvert.INSTANCE.convert(createReqVO)
-                .setStatus(CommonStatusEnum.ENABLE.getStatus()).setSuccessCount(0);
+                .setTotalStock(createReqVO.getStock())
+                .setStatus(CommonStatusEnum.ENABLE.getStatus());
         bargainActivityMapper.insert(activityDO);
         return activityDO.getId();
     }
@@ -61,9 +62,9 @@ public class BargainActivityServiceImpl implements BargainActivityService {
     @Transactional(rollbackFor = Exception.class)
     public void updateBargainActivity(BargainActivityUpdateReqVO updateReqVO) {
         // 校验存在
-        BargainActivityDO activityDO = validateBargainActivityExists(updateReqVO.getId());
+        BargainActivityDO activity = validateBargainActivityExists(updateReqVO.getId());
         // 校验状态
-        if (ObjectUtil.equal(activityDO.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
+        if (ObjectUtil.equal(activity.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
             throw exception(BARGAIN_ACTIVITY_STATUS_DISABLE);
         }
         // 校验商品冲突
@@ -73,6 +74,9 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 
         // 更新
         BargainActivityDO updateObj = BargainActivityConvert.INSTANCE.convert(updateReqVO);
+        if (updateObj.getStock() > activity.getTotalStock()) { // 如果更新的库存大于原来的库存，则更新总库存
+            updateObj.setTotalStock(updateObj.getStock());
+        }
         bargainActivityMapper.updateById(updateObj);
     }
 

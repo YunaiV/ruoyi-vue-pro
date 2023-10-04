@@ -15,6 +15,9 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 
+import java.util.Collection;
+import java.util.Map;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 
@@ -97,6 +100,11 @@ public class BargainHelpServiceImpl implements BargainHelpService {
             reducePrice = record.getBargainPrice() - activity.getBargainMinPrice();
         }
         return reducePrice;
+    }
+
+    @Override
+    public Map<Long, Integer> getBargainHelpUserCountMap(Collection<Long> activityIds) {
+        return bargainHelpMapper.selectCountByActivityId(activityIds);
     }
 
 }
