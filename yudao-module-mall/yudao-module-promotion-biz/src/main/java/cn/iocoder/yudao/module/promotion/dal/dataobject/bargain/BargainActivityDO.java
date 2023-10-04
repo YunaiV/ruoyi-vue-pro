@@ -60,24 +60,29 @@ public class BargainActivityDO extends BaseDO {
      */
     private Long skuId;
     /**
-     * 砍价起始价格，单位分
+     * 砍价起始价格，单位：分
      */
     private Integer bargainFirstPrice;
     /**
      * 砍价底价，单位：分
      */
-    private Integer bargainPrice;
+    private Integer bargainMinPrice;
     /**
      * 砍价活动库存
      */
     private Integer stock;
 
     /**
-     * 达到该人数，才能砍到低价
+     * 砍价人数
+     *
+     * 需要多少人，砍价才能成功，即 {@link BargainRecordDO#getStatus()} 更新为 {@link BargainRecordDO#getStatus()} 成功状态
      */
     private Integer userSize;
     /**
-     * 最大帮砍次数
+     * 帮砍次数
+     *
+     * 单个活动，用户可以帮砍的次数。
+     * 例如说：帮砍次数为 1 时，A 和 B 同时将该活动链接发给 C，C 只能帮其中一个人砍价。
      */
     private Integer bargainCount;
 
@@ -93,6 +98,9 @@ public class BargainActivityDO extends BaseDO {
      * 用户每次砍价的最大金额，单位：分
      */
     private Integer randomMaxPrice;
+
+    // ========== 统计字段 ==========
+
     /**
      * 砍价成功数量
      */

@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.promotion.service.bargain;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjUtil;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.promotion.api.bargain.dto.BargainValidateJoinRespDTO;
+import cn.iocoder.yudao.module.promotion.controller.app.bargain.vo.record.AppBargainRecordCreateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainRecordDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.bargain.BargainRecordMapper;
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -34,7 +33,30 @@ public class BargainRecordServiceImpl implements BargainRecordService {
     @Resource
     private BargainRecordMapper bargainRecordMapper;
 
-    // TODO puhui999：create 时，需要校验下限购数量；
+    @Override
+    public Long createBargainRecord(Long userId, AppBargainRecordCreateReqVO reqVO) {
+        // 1. 校验砍价活动
+        BargainActivityDO activity = bargainActivityService.validateBargainActivityCanJoin(reqVO.getActivityId());
+
+        // 2.1 校验当前是否已经有参与中的砍价活动
+        if (CollUtil.isNotEmpty(bargainRecordMapper.selectListByUserIdAndActivityIdAndStatus(
+                userId, reqVO.getActivityId(), BargainRecordStatusEnum.IN_PROGRESS.getStatus()))) {
+            throw exception(BARGAIN_RECORD_CREATE_FAIL_EXISTS);
+        }
+        // 2.2 是否超过参与的上限
+        if (bargainRecordMapper.selectCountByUserIdAndActivityIdAndStatus(
+                userId, reqVO.getActivityId(), BargainRecordStatusEnum.SUCCESS.getStatus()) >= activity.getTotalLimitCount()) {
+            throw exception(BARGAIN_RECORD_CREATE_FAIL_LIMIT);
+        }
+
+        // 3. 创建砍价记录
+        BargainRecordDO record = BargainRecordDO.builder().userId(userId)
+                .activityId(reqVO.getActivityId()).spuId(activity.getSpuId()).skuId(activity.getSkuId())
+                .bargainFirstPrice(activity.getBargainFirstPrice()).bargainPrice(activity.getBargainFirstPrice())
+                .status(BargainRecordStatusEnum.IN_PROGRESS.getStatus()).build();
+        bargainRecordMapper.insert(record);
+        return record.getId();
+    }
 
     @Override
     public BargainValidateJoinRespDTO validateJoinBargain(Long userId, Long bargainRecordId, Long skuId) {
@@ -45,28 +67,14 @@ public class BargainRecordServiceImpl implements BargainRecordService {
         }
         // 1.2 拼团记录未在进行中
         if (ObjUtil.notEqual(record.getStatus(), BargainRecordStatusEnum.IN_PROGRESS)) {
-            throw exception(BARGAIN_JOIN_RECORD_NOT_IN_PROGRESS);
+            throw exception(BARGAIN_JOIN_RECORD_NOT_SUCCESS);
         }
 
-        // 2.1 砍价活动不存在
-        BargainActivityDO activity = bargainActivityService.getBargainActivity(record.getActivityId());
-        if (activity == null) {
-            throw exception(BARGAIN_ACTIVITY_NOT_EXISTS);
-        }
-        if (ObjUtil.notEqual(activity.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
-            throw exception(BARGAIN_JOIN_ACTIVITY_STATUS_CLOSED);
-        }
+        // 2. 校验砍价活动
+        BargainActivityDO activity = bargainActivityService.validateBargainActivityCanJoin(record.getActivityId());
         Assert.isTrue(Objects.equals(skuId, activity.getSkuId()), "砍价商品不匹配"); // 防御性校验
-        // 2.2 活动已过期
-        if (LocalDateTimeUtils.isBetween(activity.getStartTime(), activity.getEndTime())) {
-            throw exception(BARGAIN_JOIN_FAILED_ACTIVITY_TIME_END);
-        }
-        // 2.3 库存不足
-        if (activity.getStock() <= 0) {
-            throw exception(BARGAIN_ACTIVITY_UPDATE_STOCK_FAIL);
-        }
         return new BargainValidateJoinRespDTO().setActivityId(activity.getId()).setName(activity.getName())
-                .setBargainPrice(record.getPayPrice());
+                .setBargainPrice(record.getBargainPrice());
     }
 
 }

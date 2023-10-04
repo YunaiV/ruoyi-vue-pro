@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.promotion.service.bargain;
 
 
 import cn.iocoder.yudao.module.promotion.api.bargain.dto.BargainValidateJoinRespDTO;
+import cn.iocoder.yudao.module.promotion.controller.app.bargain.vo.record.AppBargainRecordCreateReqVO;
 
 /**
  * 砍价记录 service 接口
@@ -9,6 +10,15 @@ import cn.iocoder.yudao.module.promotion.api.bargain.dto.BargainValidateJoinResp
  * @author HUIHUI
  */
 public interface BargainRecordService {
+
+    /**
+     * 【会员】创建砍价记录（参与参加活动）
+     *
+     * @param userId 用户编号
+     * @param reqVO 创建信息
+     * @return 砍价记录编号
+     */
+    Long createBargainRecord(Long userId, AppBargainRecordCreateReqVO reqVO);
 
     /**
      * 【下单前】校验是否参与砍价活动

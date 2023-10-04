@@ -4,25 +4,32 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.promotion.controller.app.bargain.vo.record.AppBargainRecordCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.bargain.vo.record.AppBargainRecordDetailRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.bargain.vo.record.AppBargainRecordRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.bargain.vo.record.AppBargainRecordSummaryRespVO;
+import cn.iocoder.yudao.module.promotion.service.bargain.BargainRecordService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.time.Duration;
 import java.util.ArrayList;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "用户 App - 砍价记录")
 @RestController
 @RequestMapping("/promotion/bargain-record")
 @Validated
 public class AppBargainRecordController {
+
+    @Resource
+    private BargainRecordService bargainRecordService;
 
     @GetMapping("/get-summary")
     @Operation(summary = "获得砍价记录的概要信息", description = "用于小程序首页")
@@ -137,9 +144,11 @@ public class AppBargainRecordController {
     }
 
     @PostMapping("/create")
-    @Operation(summary = "创建砍价记录", description = "参与拼团活动")
+    @Operation(summary = "创建砍价记录", description = "参与砍价活动")
+    @PreAuthenticated
     public CommonResult<Long> createBargainRecord(@RequestBody AppBargainRecordCreateReqVO reqVO) {
-         return success(1L);
+        Long recordId = bargainRecordService.createBargainRecord(getLoginUserId(), reqVO);
+        return success(recordId);
     }
 
 }

@@ -88,17 +88,16 @@ public interface ErrorCodeConstants {
     // ========== 砍价活动 1-013-012-000 ==========
     ErrorCode BARGAIN_ACTIVITY_NOT_EXISTS = new ErrorCode(1_013_012_000, "砍价活动不存在");
     ErrorCode BARGAIN_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1_013_012_001, "存在商品参加了其它砍价活动");
-    ErrorCode BARGAIN_ACTIVITY_STATUS_DISABLE = new ErrorCode(1_013_012_002, "砍价活动已关闭不能修改");
+    ErrorCode BARGAIN_ACTIVITY_STATUS_DISABLE = new ErrorCode(1_013_012_002, "砍价活动已关闭，不能修改");
     ErrorCode BARGAIN_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1_013_012_003, "砍价活动未关闭或未结束，不能删除");
-    ErrorCode BARGAIN_ACTIVITY_UPDATE_STOCK_FAIL = new ErrorCode(1_013_012_004, "砍价失败，原因：该砍价活动库存不足");
+    ErrorCode BARGAIN_ACTIVITY_STOCK_NOT_ENOUGH = new ErrorCode(1_013_012_004, "砍价活动库存不足");
+    ErrorCode BARGAIN_ACTIVITY_STATUS_CLOSED = new ErrorCode(1_013_012_005, "砍价活动已关闭");
+    ErrorCode BARGAIN_ACTIVITY_TIME_END = new ErrorCode(1_013_012_006, "砍价活动已经结束");
 
     // ========== 砍价记录 1-013-013-000 ==========
     ErrorCode BARGAIN_RECORD_NOT_EXISTS = new ErrorCode(1_013_013_000, "砍价记录不存在");
-    ErrorCode BARGAIN_RECORD_EXISTS = new ErrorCode(1_013_013_001, "砍价失败，已参与过该砍价");
-    ErrorCode BARGAIN_RECORD_HEAD_NOT_EXISTS = new ErrorCode(1_013_013_002, "砍价失败，父砍价不存在");
-    ErrorCode BARGAIN_RECORD_USER_FULL = new ErrorCode(1_013_013_003, "砍价失败，砍价人数已满");
-    ErrorCode BARGAIN_JOIN_RECORD_NOT_IN_PROGRESS = new ErrorCode(1_013_013_004, "砍价失败，砍价记录不在进行中");
-    ErrorCode BARGAIN_JOIN_FAILED_ACTIVITY_TIME_END = new ErrorCode(1_013_013_005, "砍价失败，活动已经结束");
-    ErrorCode BARGAIN_JOIN_ACTIVITY_STATUS_CLOSED = new ErrorCode(1_013_013_006, "砍价失败，原因：砍价活动已关闭");
+    ErrorCode BARGAIN_RECORD_CREATE_FAIL_EXISTS = new ErrorCode(1_013_013_001, "参与失败，您已经参与当前砍价活动");
+    ErrorCode BARGAIN_RECORD_CREATE_FAIL_LIMIT = new ErrorCode(1_013_013_002, "参与失败，您已达到当前砍价活动的参与上限");
+    ErrorCode BARGAIN_JOIN_RECORD_NOT_SUCCESS = new ErrorCode(1_013_013_004, "下单失败，砍价未成功");
 
 }

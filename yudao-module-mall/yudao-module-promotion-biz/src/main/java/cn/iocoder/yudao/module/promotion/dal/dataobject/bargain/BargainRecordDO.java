@@ -29,17 +29,17 @@ public class BargainRecordDO extends BaseDO {
      */
     @TableId
     private Long id;
-
-    /**
-     * 砍价活动编号
-     */
-    private Long activityId;
-
     /**
      * 用户编号
      */
     private Long userId;
 
+    /**
+     * 砍价活动编号
+     *
+     * 关联 {@link BargainActivityDO#getId()} 字段
+     */
+    private Long activityId;
     /**
      * 商品 SPU 编号
      */
@@ -50,17 +50,13 @@ public class BargainRecordDO extends BaseDO {
     private Long skuId;
 
     /**
-     * 砍价底价，单位：分
+     * 砍价起始价格，单位：分
+     */
+    private Integer bargainFirstPrice;
+    /**
+     * 当前砍价，单位：分
      */
     private Integer bargainPrice;
-    /**
-     * 商品原价，单位：分
-     */
-    private Integer price;
-    /**
-     * 应付金额，单位：分
-     */
-    private Integer payPrice;
 
     /**
      * 砍价状态
@@ -68,22 +64,14 @@ public class BargainRecordDO extends BaseDO {
      * 枚举 {@link BargainRecordStatusEnum}
      */
     private Integer status;
-
-    /**
-     * 订单编号
-     */
-    private Long orderId;
-
     /**
      * 结束时间
      */
     private LocalDateTime endTime;
 
     /**
-     * 过期时间
-     *
-     * 到达该时间时，其他用户无法帮助砍价，但是还是允许下单
+     * 订单编号
      */
-    private LocalDateTime expireTime;
+    private Long orderId;
 
 }

@@ -56,6 +56,14 @@ public interface BargainActivityService {
     BargainActivityDO getBargainActivity(Long id);
 
     /**
+     * 校验砍价活动，是否可以参与（发起砍价、下单、帮好友砍价）
+     *
+     * @param id 编号
+     * @return 砍价活动
+     */
+    BargainActivityDO validateBargainActivityCanJoin(Long id);
+
+    /**
      * 获得砍价活动分页
      *
      * @param pageReqVO 分页查询

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.service.bargain;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
@@ -82,13 +83,13 @@ public class BargainActivityServiceImpl implements BargainActivityService {
             throw exception(BARGAIN_ACTIVITY_NOT_EXISTS);
         }
         if (count > activity.getStock()) {
-            throw exception(BARGAIN_ACTIVITY_UPDATE_STOCK_FAIL);
+            throw exception(BARGAIN_ACTIVITY_STOCK_NOT_ENOUGH);
         }
 
         // 更新砍价库存
         int updateCount = bargainActivityMapper.updateStock(id, count);
         if (updateCount == 0) {
-            throw exception(BARGAIN_ACTIVITY_UPDATE_STOCK_FAIL);
+            throw exception(BARGAIN_ACTIVITY_STOCK_NOT_ENOUGH);
         }
     }
 
@@ -136,6 +137,21 @@ public class BargainActivityServiceImpl implements BargainActivityService {
     @Override
     public BargainActivityDO getBargainActivity(Long id) {
         return bargainActivityMapper.selectById(id);
+    }
+
+    @Override
+    public BargainActivityDO validateBargainActivityCanJoin(Long id) {
+        BargainActivityDO activity = bargainActivityMapper.selectById(id);
+        if (activity == null) {
+            throw exception(BARGAIN_ACTIVITY_NOT_EXISTS);
+        }
+        if (ObjUtil.notEqual(activity.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+            throw exception(BARGAIN_ACTIVITY_STATUS_CLOSED);
+        }
+        if (activity.getStock() <= 0) {
+            throw exception(BARGAIN_ACTIVITY_STOCK_NOT_ENOUGH);
+        }
+        return activity;
     }
 
     @Override
