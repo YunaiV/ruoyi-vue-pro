@@ -36,4 +36,10 @@ public interface BargainRecordMapper extends BaseMapperX<BargainRecordDO> {
                 .eq(BargainRecordDO::getStatus, status));
     }
 
+    default int updateByIdAndBargainPrice(Long id, Integer whereBargainPrice, BargainRecordDO updateObj) {
+        return update(updateObj, new LambdaQueryWrapper<>(BargainRecordDO.class)
+                .eq(BargainRecordDO::getId, id)
+                .eq(BargainRecordDO::getBargainPrice, whereBargainPrice));
+    }
+
 }

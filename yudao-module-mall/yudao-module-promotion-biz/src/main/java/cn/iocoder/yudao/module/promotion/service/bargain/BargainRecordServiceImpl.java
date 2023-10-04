@@ -59,6 +59,16 @@ public class BargainRecordServiceImpl implements BargainRecordService {
     }
 
     @Override
+    public Boolean updateBargainRecordBargainPrice(Long id, Integer whereBargainPrice,
+                                                   Integer reducePrice, Boolean success) {
+        BargainRecordDO updateObj = new BargainRecordDO().setBargainPrice(whereBargainPrice - reducePrice);
+        if (success) {
+            updateObj.setStatus(BargainRecordStatusEnum.SUCCESS.getStatus());
+        }
+        return bargainRecordMapper.updateByIdAndBargainPrice(id, whereBargainPrice, updateObj) > 0;
+    }
+
+    @Override
     public BargainValidateJoinRespDTO validateJoinBargain(Long userId, Long bargainRecordId, Long skuId) {
         // 1.1 拼团记录不存在
         BargainRecordDO record = bargainRecordMapper.selectByIdAndUserId(bargainRecordId, userId);
@@ -75,6 +85,11 @@ public class BargainRecordServiceImpl implements BargainRecordService {
         Assert.isTrue(Objects.equals(skuId, activity.getSkuId()), "砍价商品不匹配"); // 防御性校验
         return new BargainValidateJoinRespDTO().setActivityId(activity.getId()).setName(activity.getName())
                 .setBargainPrice(record.getBargainPrice());
+    }
+
+    @Override
+    public BargainRecordDO getBargainRecord(Long id) {
+        return bargainRecordMapper.selectById(id);
     }
 
 }

@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityCreateReqVO;
@@ -150,6 +151,9 @@ public class BargainActivityServiceImpl implements BargainActivityService {
         }
         if (activity.getStock() <= 0) {
             throw exception(BARGAIN_ACTIVITY_STOCK_NOT_ENOUGH);
+        }
+        if (LocalDateTimeUtils.isBetween(activity.getStartTime(), activity.getEndTime())) {
+            throw exception(BARGAIN_ACTIVITY_TIME_END);
         }
         return activity;
     }
