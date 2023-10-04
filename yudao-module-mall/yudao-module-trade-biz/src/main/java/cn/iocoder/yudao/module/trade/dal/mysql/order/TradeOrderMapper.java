@@ -41,6 +41,7 @@ public interface TradeOrderMapper extends BaseMapperX<TradeOrderDO> {
                 .eqIfPresent(TradeOrderDO::getTerminal, reqVO.getTerminal())
                 .eqIfPresent(TradeOrderDO::getLogisticsId, reqVO.getLogisticsId())
                 .inIfPresent(TradeOrderDO::getPickUpStoreId, reqVO.getPickUpStoreIds())
+                .likeIfPresent(TradeOrderDO::getPickUpVerifyCode, reqVO.getPickUpVerifyCode())
                 .betweenIfPresent(TradeOrderDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(TradeOrderDO::getId));
     }
@@ -103,6 +104,10 @@ public interface TradeOrderMapper extends BaseMapperX<TradeOrderDO> {
     default Long selectCountByCreateTimeBetween(LocalDateTime beginTime, LocalDateTime endTime) {
         return selectCount(new LambdaQueryWrapperX<TradeOrderDO>()
                 .between(TradeOrderDO::getCreateTime, beginTime, endTime));
+    }
+
+    default TradeOrderDO selectOneByPickUpVerifyCode(String pickUpVerifyCode) {
+        return selectOne(TradeOrderDO::getPickUpVerifyCode, pickUpVerifyCode);
     }
 
 }

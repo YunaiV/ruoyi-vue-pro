@@ -126,6 +126,12 @@ public class TradeOrderController {
         return success(true);
     }
 
-    // TODO ：核销逻辑
+    @PutMapping("/pick-up")
+    @Operation(summary = "订单核销")
+    @PreAuthorize("@ss.hasPermission('trade:order:pick-up')")
+    public CommonResult<Boolean> pickUpOrder(@RequestParam("id") Long id) {
+        tradeOrderUpdateService.pickUpOrder(id);
+        return success(true);
+    }
 
 }

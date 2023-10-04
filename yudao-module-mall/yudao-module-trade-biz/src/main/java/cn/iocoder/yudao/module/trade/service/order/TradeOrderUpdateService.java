@@ -115,6 +115,20 @@ public interface TradeOrderUpdateService {
      */
     void updateOrderAddress(TradeOrderUpdateAddressReqVO reqVO);
 
+    /**
+     * 【管理员】核销订单
+     *
+     * @param id 订单编号
+     */
+    void pickUpOrder(Long id);
+
+    /**
+     * 【管理员】核销订单
+     *
+     * @param pickUpVerifyCode 自提核销码
+     */
+    void pickUpOrder(String pickUpVerifyCode);
+
     // =================== Order Item ===================
 
     /**

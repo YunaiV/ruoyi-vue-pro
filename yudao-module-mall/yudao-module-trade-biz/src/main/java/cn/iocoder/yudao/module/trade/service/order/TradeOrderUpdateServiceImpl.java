@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.trade.service.order;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.extra.spring.SpringUtil;
@@ -761,6 +762,29 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         tradeOrderMapper.updateById(TradeOrderConvert.INSTANCE.convert(reqVO));
 
         // TODO @puhui999：操作日志
+    }
+
+    @Override
+    public void pickUpOrder(Long id) {
+        getSelf().pickUpOrder(tradeOrderMapper.selectById(id));
+    }
+
+    @Override
+    public void pickUpOrder(String pickUpVerifyCode) {
+        getSelf().pickUpOrder(tradeOrderMapper.selectOneByPickUpVerifyCode(pickUpVerifyCode));
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.PICK_UP_RECEIVE)
+    public void pickUpOrder(TradeOrderDO order) {
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+        if (ObjUtil.notEqual(DeliveryTypeEnum.PICK_UP.getType(), order.getDeliveryType())) {
+            throw exception(ORDER_RECEIVE_FAIL_DELIVERY_TYPE_NOT_PICK_UP);
+        }
+        // todo 校验核销操作人？
+        receiveOrder0(order);
     }
 
     // =================== Order Item ===================
