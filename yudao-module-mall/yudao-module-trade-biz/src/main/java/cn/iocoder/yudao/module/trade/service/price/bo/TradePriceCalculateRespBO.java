@@ -59,6 +59,11 @@ public class TradePriceCalculateRespBO {
     private Integer givePoint;
 
     /**
+     * 砍价活动编号
+     */
+    private Long bargainActivityId;
+
+    /**
      * 订单价格
      */
     @Data

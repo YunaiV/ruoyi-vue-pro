@@ -51,6 +51,7 @@ public class BargainRecordCreateReqDTO {
     @NotNull(message = "商品原价不能为空")
     private Integer price;
 
+    // TODO @puhui999：创建时，这个参数不应该传递哈；
     /**
      * 开团状态：进行中 砍价成功 砍价失败
      */

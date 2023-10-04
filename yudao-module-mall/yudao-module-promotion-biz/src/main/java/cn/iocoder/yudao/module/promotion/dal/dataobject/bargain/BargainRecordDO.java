@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.promotion.dal.dataobject.bargain;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.promotion.enums.bargain.BargainRecordStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -43,7 +44,6 @@ public class BargainRecordDO extends BaseDO {
      * 商品 SPU 编号
      */
     private Long spuId;
-
     /**
      * 商品 SKU 编号
      */
@@ -53,19 +53,19 @@ public class BargainRecordDO extends BaseDO {
      * 砍价底价，单位分
      */
     private Integer bargainPrice;
-
     /**
      * 商品原价，单位分
      */
     private Integer price;
-
     /**
      * 应付金额，单位分
      */
     private Integer payPrice;
 
     /**
-     * 状态1 - 砍价中；2- 砍价成功；3 - 砍价失败
+     * 砍价状态
+     *
+     * 枚举 {@link BargainRecordStatusEnum}
      */
     private Integer status;
 
@@ -81,7 +81,9 @@ public class BargainRecordDO extends BaseDO {
 
     /**
      * 过期时间
+     *
+     * 到达该时间时，其他用户无法帮助砍价，但是还是允许下单
      */
-    private Data expireTime;
+    private LocalDateTime expireTime;
 
 }

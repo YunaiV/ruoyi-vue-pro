@@ -19,13 +19,14 @@ public interface SeckillActivityApi {
     void updateSeckillStock(Long id, Long skuId, Integer count);
 
     /**
-     * 校验是否参与秒杀商品
+     * 【下单前】校验是否参与秒杀活动
      *
      * 如果校验失败，则抛出业务异常
      *
      * @param activityId 活动编号
      * @param skuId SKU 编号
      * @param count 数量
+     * @return 秒杀信息
      */
     SeckillValidateJoinRespDTO validateJoinSeckill(Long activityId, Long skuId, Integer count);
 

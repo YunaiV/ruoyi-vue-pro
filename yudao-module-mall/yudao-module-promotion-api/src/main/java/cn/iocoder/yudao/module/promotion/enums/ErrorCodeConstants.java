@@ -97,5 +97,8 @@ public interface ErrorCodeConstants {
     ErrorCode BARGAIN_RECORD_EXISTS = new ErrorCode(1_013_013_001, "砍价失败，已参与过该砍价");
     ErrorCode BARGAIN_RECORD_HEAD_NOT_EXISTS = new ErrorCode(1_013_013_002, "砍价失败，父砍价不存在");
     ErrorCode BARGAIN_RECORD_USER_FULL = new ErrorCode(1_013_013_003, "砍价失败，砍价人数已满");
+    ErrorCode BARGAIN_JOIN_RECORD_NOT_IN_PROGRESS = new ErrorCode(1_013_013_004, "砍价失败，砍价记录不在进行中");
+    ErrorCode BARGAIN_JOIN_FAILED_ACTIVITY_TIME_END = new ErrorCode(1_013_013_005, "砍价失败，活动已经结束");
+    ErrorCode BARGAIN_JOIN_ACTIVITY_STATUS_CLOSED = new ErrorCode(1_013_013_006, "砍价失败，原因：砍价活动已关闭");
 
 }

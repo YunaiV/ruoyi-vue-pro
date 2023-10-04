@@ -108,15 +108,6 @@ public interface SeckillActivityService {
     PageResult<SeckillActivityDO> getSeckillActivityAppPageByConfigId(AppSeckillActivityPageReqVO pageReqVO);
 
     /**
-     * 获取秒杀活动商品信息
-     *
-     * @param id     活动编号
-     * @param skuIds sku 编号
-     * @return 秒杀活动商品信息列表
-     */
-    List<SeckillProductDO> getSeckillActivityProductList(Long id, Collection<Long> skuIds);
-
-    /**
      * 校验是否参与秒杀商品
      *
      * 如果校验失败，则抛出业务异常
@@ -124,6 +115,7 @@ public interface SeckillActivityService {
      * @param activityId 活动编号
      * @param skuId SKU 编号
      * @param count 数量
+     * @return 秒杀信息
      */
     SeckillValidateJoinRespDTO validateJoinSeckill(Long activityId, Long skuId, Integer count);
 

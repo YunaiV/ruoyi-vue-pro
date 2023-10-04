@@ -81,9 +81,9 @@ public class TradePriceCalculateReqBO {
 
     // ========== 砍价活动相关字段 ==========
     /**
-     * 砍价活动编号
+     * 砍价记录编号
      */
-    private Long bargainActivityId;
+    private Long bargainRecordId;
 
     /**
      * 商品 SKU

@@ -279,18 +279,6 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     }
 
     @Override
-    public List<SeckillProductDO> getSeckillActivityProductList(Long id, Collection<Long> skuIds) {
-
-        // 2、校验活动商品是否存在
-        List<SeckillProductDO> productList = filterList(seckillProductMapper.selectListByActivityId(id),
-                item -> skuIds.contains(item.getSkuId()));
-        if (CollectionUtil.isEmpty(productList)) {
-            throw exception(SKU_NOT_EXISTS);
-        }
-        return productList;
-    }
-
-    @Override
     public SeckillValidateJoinRespDTO validateJoinSeckill(Long activityId, Long skuId, Integer count) {
         // 1.1 校验秒杀活动是否存在
         SeckillActivityDO activity = validateSeckillActivityExists(activityId);

@@ -16,7 +16,6 @@ import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDeta
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
-import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.base.member.user.MemberUserRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.base.product.property.ProductPropertyValueDetailRespVO;
@@ -34,8 +33,6 @@ import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEn
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressTrackRespDTO;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
-import cn.iocoder.yudao.module.trade.service.order.bo.TradeAfterOrderCreateReqBO;
-import cn.iocoder.yudao.module.trade.service.order.bo.TradeBeforeOrderCreateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import org.mapstruct.Mapper;
@@ -94,19 +91,19 @@ public interface TradeOrderConvert {
         return new ProductSkuUpdateStockReqDTO(items);
     }
 
-    default ProductSkuUpdateStockReqDTO convertNegative(List<AppTradeOrderSettlementReqVO.Item> list) {
+    default ProductSkuUpdateStockReqDTO convertNegative(List<TradeOrderItemDO> list) {
         List<ProductSkuUpdateStockReqDTO.Item> items = CollectionUtils.convertList(list, item ->
                 new ProductSkuUpdateStockReqDTO.Item().setId(item.getSkuId()).setIncrCount(-item.getCount()));
         return new ProductSkuUpdateStockReqDTO(items);
     }
 
     default PayOrderCreateReqDTO convert(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
-                                         TradePriceCalculateRespBO calculateRespBO, TradeOrderProperties orderProperties) {
+                                         TradeOrderProperties orderProperties) {
         PayOrderCreateReqDTO createReqDTO = new PayOrderCreateReqDTO()
                 .setAppId(orderProperties.getAppId()).setUserIp(order.getUserIp());
         // 商户相关字段
         createReqDTO.setMerchantOrderId(String.valueOf(order.getId()));
-        String subject = calculateRespBO.getItems().get(0).getSpuName();
+        String subject = orderItems.get(0).getSpuName();
         subject = StrUtils.maxLength(subject, PayOrderCreateReqDTO.SUBJECT_MAX_LENGTH); // 避免超过 32 位
         createReqDTO.setSubject(subject);
         createReqDTO.setBody(subject); // TODO 芋艿：临时写死
@@ -262,37 +259,5 @@ public interface TradeOrderConvert {
         }
         return bo;
     }
-
-    @Mappings({
-            @Mapping(target = "userId", source = "userId"),
-            @Mapping(target = "orderType", source = "calculateRespBO.type"),
-            @Mapping(target = "items", source = "createReqVO.items"),
-    })
-    TradeBeforeOrderCreateReqBO convert(Long userId, AppTradeOrderCreateReqVO createReqVO, TradePriceCalculateRespBO calculateRespBO);
-
-
-    List<TradeAfterOrderCreateReqBO.Item> convertList(List<TradeOrderItemDO> orderItems);
-
-
-    @Mappings({
-            @Mapping(target = "userId", source = "userId"),
-            @Mapping(target = "orderId", source = "tradeOrderDO.id"),
-            @Mapping(target = "payPrice", source = "tradeOrderDO.payPrice"),
-            @Mapping(target = "items", source = "orderItems"),
-    })
-    TradeAfterOrderCreateReqBO convert(Long userId, AppTradeOrderCreateReqVO createReqVO,
-                                       TradeOrderDO tradeOrderDO, List<TradeOrderItemDO> orderItems);
-
-    @Mappings({
-            @Mapping(target = "activityId", source = "combinationActivityId"),
-            @Mapping(target = "spuId", expression = "java(reqBO.getItems().get(0).getSpuId())"),
-            @Mapping(target = "skuId", expression = "java(reqBO.getItems().get(0).getSkuId())"),// TODO 艿艿看看这里
-            @Mapping(target = "count", expression = "java(reqBO.getItems().get(0).getCount())"),
-            @Mapping(target = "orderId", source = "orderId"),
-            @Mapping(target = "userId", source = "userId"),
-            @Mapping(target = "headId", source = "combinationHeadId"),
-            @Mapping(target = "combinationPrice", source = "payPrice")
-    })
-    CombinationRecordCreateReqDTO convert(TradeAfterOrderCreateReqBO reqBO);
 
 }

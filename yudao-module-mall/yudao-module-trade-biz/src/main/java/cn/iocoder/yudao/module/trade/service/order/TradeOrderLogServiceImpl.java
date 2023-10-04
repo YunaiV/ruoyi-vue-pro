@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.trade.service.order;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderLogConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderLogDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderLogMapper;
-import cn.iocoder.yudao.module.trade.service.order.bo.logger.TradeOrderLogCreateReqBO;
+import cn.iocoder.yudao.module.trade.service.order.bo.TradeOrderLogCreateReqBO;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

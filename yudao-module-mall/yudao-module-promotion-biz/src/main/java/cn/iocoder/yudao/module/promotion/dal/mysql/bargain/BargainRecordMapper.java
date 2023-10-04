@@ -12,4 +12,9 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface BargainRecordMapper extends BaseMapperX<BargainRecordDO> {
 
+    default BargainRecordDO selectByIdAndUserId(Long id, Long userId) {
+        return selectOne(BargainRecordDO::getId, id,
+                BargainRecordDO::getUserId, userId);
+    }
+
 }

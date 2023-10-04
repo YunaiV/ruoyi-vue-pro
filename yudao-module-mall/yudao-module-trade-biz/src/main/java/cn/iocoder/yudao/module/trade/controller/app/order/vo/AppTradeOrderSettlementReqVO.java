@@ -60,15 +60,14 @@ public class AppTradeOrderSettlementReqVO {
     private Long combinationHeadId;
 
     // ========== 砍价活动相关字段 ==========
-    // TODO @puhui999：是不是砍价记录的编号哈？
-    @Schema(description = "砍价活动编号", example = "123")
-    private Long bargainActivityId;
+    @Schema(description = "砍价记录编号", example = "123")
+    private Long bargainRecordId;
 
     @AssertTrue(message = "活动商品每次只能购买一种规格")
     @JsonIgnore
     public boolean isValidActivityItems() {
         // 校验是否是活动订单
-        if (ObjUtil.isAllEmpty(seckillActivityId, combinationActivityId, combinationHeadId)) {
+        if (ObjUtil.isAllEmpty(seckillActivityId, combinationActivityId, combinationHeadId, bargainRecordId)) {
             return true;
         }
         // 校验订单项是否超出

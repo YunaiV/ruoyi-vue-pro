@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.trade.service.order.bo.logger;
+package cn.iocoder.yudao.module.trade.service.order.bo;
 
 import lombok.Data;
 

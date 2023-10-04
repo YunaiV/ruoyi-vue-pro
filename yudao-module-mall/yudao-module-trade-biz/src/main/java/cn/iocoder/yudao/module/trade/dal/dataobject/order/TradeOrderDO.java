@@ -295,4 +295,17 @@ public class TradeOrderDO extends BaseDO {
      */
     private Long seckillActivityId;
 
+    /**
+     * 砍价活动编号
+     *
+     * 关联 BargainActivityDO 的 id 字段
+     */
+    private Long bargainActivityId;
+    /**
+     * 砍价记录编号
+     *
+     * 关联 BargainRecordDO 的 id 字段
+     */
+    private Long bargainRecordId;
+
 }

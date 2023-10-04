@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.trade.convert.order;
 
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderLogDO;
-import cn.iocoder.yudao.module.trade.service.order.bo.logger.TradeOrderLogCreateReqBO;
+import cn.iocoder.yudao.module.trade.service.order.bo.TradeOrderLogCreateReqBO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

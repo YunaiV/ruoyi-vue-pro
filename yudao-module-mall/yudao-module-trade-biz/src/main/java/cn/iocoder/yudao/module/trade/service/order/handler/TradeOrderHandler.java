@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.trade.service.order.handler;
 
-import cn.iocoder.yudao.module.trade.service.order.bo.TradeAfterOrderCreateReqBO;
-import cn.iocoder.yudao.module.trade.service.order.bo.TradeAfterPayOrderReqBO;
-import cn.iocoder.yudao.module.trade.service.order.bo.TradeBeforeOrderCreateReqBO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
+
+import java.util.List;
 
 /**
  * 订单活动特殊逻辑处理器 handler 接口
@@ -15,23 +16,25 @@ public interface TradeOrderHandler {
     /**
      * 订单创建前
      *
-     * @param reqBO 请求
+     * @param order 订单
+     * @param orderItems 订单项
      */
-    default void beforeOrderCreate(TradeBeforeOrderCreateReqBO reqBO) {}
+    default void beforeOrderCreate(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {}
 
     /**
      * 订单创建后
      *
-     * @param reqBO 请求
+     * @param order 订单
+     * @param orderItems 订单项
      */
-    default void afterOrderCreate(TradeAfterOrderCreateReqBO reqBO) {}
+    default void afterOrderCreate(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {}
 
     /**
      * 支付订单后
      *
-     * @param reqBO 请求
+     * @param order 订单
      */
-    default void afterPayOrder(TradeAfterPayOrderReqBO reqBO) {}
+    default void afterPayOrder(TradeOrderDO order) {}
 
     /**
      * 订单取消

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderLogDO;
-import cn.iocoder.yudao.module.trade.service.order.bo.logger.TradeOrderLogCreateReqBO;
+import cn.iocoder.yudao.module.trade.service.order.bo.TradeOrderLogCreateReqBO;
 import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;

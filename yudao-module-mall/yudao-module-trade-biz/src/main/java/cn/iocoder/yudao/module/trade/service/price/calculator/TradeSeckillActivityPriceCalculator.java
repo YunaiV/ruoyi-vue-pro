@@ -23,7 +23,7 @@ import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PRICE_CALCU
  * @author HUIHUI
  */
 @Component
-@Order(TradePriceCalculator.ORDER_DISCOUNT_ACTIVITY)
+@Order(TradePriceCalculator.ORDER_SECKILL_ACTIVITY)
 public class TradeSeckillActivityPriceCalculator implements TradePriceCalculator {
 
     @Resource
