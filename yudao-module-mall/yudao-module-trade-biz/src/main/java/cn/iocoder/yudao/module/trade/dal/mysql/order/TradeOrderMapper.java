@@ -86,6 +86,12 @@ public interface TradeOrderMapper extends BaseMapperX<TradeOrderDO> {
                 .eq(TradeOrderDO::getCommentStatus, commentStatus));
     }
 
+    default List<TradeOrderDO> selectListByUserIdAndSeckillActivityId(Long userId, Long seckillActivityId) {
+        return selectList(new LambdaUpdateWrapper<>(TradeOrderDO.class)
+                .eq(TradeOrderDO::getUserId, userId)
+                .eq(TradeOrderDO::getSeckillActivityId, seckillActivityId));
+    }
+
     default TradeOrderSummaryRespDTO selectSummaryByPayTimeBetween(LocalDateTime beginTime, LocalDateTime endTime) {
         return BeanUtil.copyProperties(CollUtil.get(selectMaps(MPJWrappers.<TradeOrderDO>lambdaJoin()
                         .selectCount(TradeOrderDO::getId, TradeOrderSummaryRespDTO::getOrderPayCount)

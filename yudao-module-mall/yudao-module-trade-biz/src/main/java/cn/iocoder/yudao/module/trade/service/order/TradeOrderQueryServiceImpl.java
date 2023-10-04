@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderItemMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.ExpressClientFactory;
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressTrackQueryReqDTO;
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressTrackRespDTO;
@@ -120,6 +121,18 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
         }
         // 查询物流
         return getExpressTrackList(order);
+    }
+
+    @Override
+    public int getSeckillProductCount(Long userId, Long activityId) {
+        // 获得订单列表
+        List<TradeOrderDO> orders = tradeOrderMapper.selectListByUserIdAndSeckillActivityId(userId, activityId);
+        orders.removeIf(order -> TradeOrderStatusEnum.isCanceled(order.getStatus())); // 过滤掉【已取消】的订单
+        if (CollUtil.isEmpty(orders)) {
+            return 0;
+        }
+        // 获得订单项列表
+        return tradeOrderItemMapper.selectProductSumByOrderId(convertSet(orders, TradeOrderDO::getId));
     }
 
     // TODO @puhui999：可以加个 spring 缓存，30 分钟；主要考虑及时性要求不高，但是每次调用需要钱；

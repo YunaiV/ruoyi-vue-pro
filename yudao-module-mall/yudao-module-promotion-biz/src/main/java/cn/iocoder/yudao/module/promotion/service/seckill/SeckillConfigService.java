@@ -54,7 +54,6 @@ public interface SeckillConfigService {
      */
     List<SeckillConfigDO> getSeckillConfigList();
 
-
     /**
      * 校验秒杀时段是否存在
      *
@@ -87,11 +86,12 @@ public interface SeckillConfigService {
     void updateSeckillConfigStatus(Long id, Integer status);
 
     /**
-     * 获取当前日期时间处于的秒杀时段且状态为 status
+     * 获得当前的秒杀时段
      *
-     * @param status 状态
+     * 要求必须处于开启状态、且在当前时间段内
+     *
      * @return 时段
      */
-    SeckillConfigDO getSeckillConfigListByStatusOnCurrentTime(Integer status);
+    SeckillConfigDO getCurrentSeckillConfig();
 
 }

@@ -1,9 +1,6 @@
 package cn.iocoder.yudao.module.promotion.api.seckill;
 
-import cn.iocoder.yudao.module.promotion.api.seckill.dto.SeckillActivityProductRespDTO;
-
-import java.util.Collection;
-import java.util.List;
+import cn.iocoder.yudao.module.promotion.api.seckill.dto.SeckillValidateJoinRespDTO;
 
 /**
  * 秒杀活动 API 接口
@@ -22,12 +19,14 @@ public interface SeckillActivityApi {
     void updateSeckillStock(Long id, Long skuId, Integer count);
 
     /**
-     * 获取秒杀活动商品信息
+     * 校验是否参与秒杀商品
      *
-     * @param id     活动编号
-     * @param skuIds sku 编号
-     * @return 秒杀活动商品信息列表
+     * 如果校验失败，则抛出业务异常
+     *
+     * @param activityId 活动编号
+     * @param skuId SKU 编号
+     * @param count 数量
      */
-    List<SeckillActivityProductRespDTO> getSeckillActivityProductList(Long id, Collection<Long> skuIds);
+    SeckillValidateJoinRespDTO validateJoinSeckill(Long activityId, Long skuId, Integer count);
 
 }

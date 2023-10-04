@@ -46,7 +46,7 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
                 .eq(SeckillActivityDO::getId, id)
                 .gt(SeckillActivityDO::getTotalStock, 0)
                 .setSql("stock = stock + " + count)
-                .setSql("totalStock = totalStock - " + count));
+                .setSql("total_stock = total_stock - " + count));
     }
 
     default PageResult<SeckillActivityDO> selectPage(AppSeckillActivityPageReqVO pageReqVO, Integer status) {

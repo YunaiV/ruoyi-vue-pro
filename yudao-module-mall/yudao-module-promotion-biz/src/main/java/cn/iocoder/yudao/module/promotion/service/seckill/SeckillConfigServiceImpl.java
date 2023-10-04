@@ -17,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.time.LocalTime;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -70,9 +71,9 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
     }
 
     @Override
-    public SeckillConfigDO getSeckillConfigListByStatusOnCurrentTime(Integer status) {
-        return findFirst(seckillConfigMapper.selectList(SeckillConfigDO::getStatus, status),
-                config -> isBetween(config.getStartTime(), config.getEndTime()));
+    public SeckillConfigDO getCurrentSeckillConfig() {
+        List<SeckillConfigDO> list = seckillConfigMapper.selectList(SeckillConfigDO::getStatus, CommonStatusEnum.ENABLE.getStatus());
+        return findFirst(list, config -> isBetween(config.getStartTime(), config.getEndTime()));
     }
 
     @Override
@@ -151,7 +152,9 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
 
     @Override
     public List<SeckillConfigDO> getSeckillConfigListByStatus(Integer status) {
-        return seckillConfigMapper.selectListByStatus(status);
+        List<SeckillConfigDO> list = seckillConfigMapper.selectListByStatus(status);
+        list.sort(Comparator.comparing(SeckillConfigDO::getStartTime));
+        return list;
     }
 
 }

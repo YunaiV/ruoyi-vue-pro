@@ -14,7 +14,7 @@ import javax.annotation.Resource;
  * @author HUIHUI
  */
 @Component
-public class TradeSeckillHandler extends TradeOrderDefaultHandler {
+public class TradeSeckillHandler implements TradeOrderHandler {
 
     @Resource
     private SeckillActivityApi seckillActivityApi;

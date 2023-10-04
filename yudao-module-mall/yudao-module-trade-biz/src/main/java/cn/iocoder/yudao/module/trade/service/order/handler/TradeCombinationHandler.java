@@ -17,7 +17,7 @@ import javax.annotation.Resource;
  * @author HUIHUI
  */
 @Component
-public class TradeCombinationHandler extends TradeOrderDefaultHandler {
+public class TradeCombinationHandler implements TradeOrderHandler {
 
     @Resource
     private CombinationRecordApi combinationRecordApi;

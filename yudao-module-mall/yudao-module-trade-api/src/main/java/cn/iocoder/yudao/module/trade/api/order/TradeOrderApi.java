@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
  */
 public interface TradeOrderApi {
 
+    // TODO 芋艿：看看是不是可以删除掉；
     /**
      * 获取订单状态
      *

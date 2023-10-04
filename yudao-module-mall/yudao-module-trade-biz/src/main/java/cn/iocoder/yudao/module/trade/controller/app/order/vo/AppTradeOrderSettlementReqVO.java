@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.controller.app.order.vo;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
@@ -67,7 +68,7 @@ public class AppTradeOrderSettlementReqVO {
     @JsonIgnore
     public boolean isValidActivityItems() {
         // 校验是否是活动订单
-        if (seckillActivityId == null && combinationActivityId == null && combinationHeadId == null) {
+        if (ObjUtil.isAllEmpty(seckillActivityId, combinationActivityId, combinationHeadId)) {
             return true;
         }
         // 校验订单项是否超出

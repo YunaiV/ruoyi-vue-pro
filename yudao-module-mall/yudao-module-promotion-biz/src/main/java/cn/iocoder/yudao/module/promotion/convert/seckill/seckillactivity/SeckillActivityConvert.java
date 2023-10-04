@@ -3,11 +3,10 @@ package cn.iocoder.yudao.module.promotion.convert.seckill.seckillactivity;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
-import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.product.enums.DictTypeConstants;
-import cn.iocoder.yudao.module.promotion.api.seckill.dto.SeckillActivityProductRespDTO;
+import cn.iocoder.yudao.module.promotion.api.seckill.dto.SeckillValidateJoinRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityDetailRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityRespVO;
@@ -19,17 +18,18 @@ import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppS
 import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityRespVO;
 import cn.iocoder.yudao.module.promotion.convert.seckill.seckillconfig.SeckillConfigConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillActivityDO;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillProductDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillConfigDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillProductDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 
 /**
@@ -93,16 +93,19 @@ public interface SeckillActivityConvert {
 
     List<AppSeckillActivityRespVO> convertList3(List<SeckillActivityDO> activityList);
 
-    default AppSeckillActivityNowRespVO convert(SeckillConfigDO filteredConfig, List<SeckillActivityDO> activityList, List<ProductSpuRespDTO> spuList) {
+    default AppSeckillActivityNowRespVO convert(SeckillConfigDO filteredConfig, List<SeckillActivityDO> activityList,
+                                                List<SeckillProductDO> productList, List<ProductSpuRespDTO> spuList) {
         AppSeckillActivityNowRespVO respVO = new AppSeckillActivityNowRespVO();
         respVO.setConfig(SeckillConfigConvert.INSTANCE.convert1(filteredConfig));
         Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
+        Map<Long, List<SeckillProductDO>> productMap = convertMultiMap(productList, SeckillProductDO::getActivityId);
         respVO.setActivities(CollectionUtils.convertList(convertList3(activityList), item -> {
-            findAndThen(spuMap, item.getSpuId(), spu -> {
-                item.setPicUrl(spu.getPicUrl())
-                        .setMarketPrice(spu.getMarketPrice())
-                        .setUnitName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.PRODUCT_UNIT, spu.getUnit()));
-            });
+            // product 信息
+            item.setSeckillPrice(getMinValue(productMap.get(item.getId()), SeckillProductDO::getSeckillPrice));
+            // spu 信息
+            findAndThen(spuMap, item.getSpuId(), spu ->
+                    item.setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice())
+                            .setUnitName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.PRODUCT_UNIT, spu.getUnit())));
             return item;
         }));
         return respVO;
@@ -110,10 +113,14 @@ public interface SeckillActivityConvert {
 
     PageResult<AppSeckillActivityRespVO> convertPage1(PageResult<SeckillActivityDO> pageResult);
 
-    default PageResult<AppSeckillActivityRespVO> convertPage(PageResult<SeckillActivityDO> pageResult, List<ProductSpuRespDTO> spuList) {
+    default PageResult<AppSeckillActivityRespVO> convertPage02(PageResult<SeckillActivityDO> pageResult, List<SeckillProductDO> productList, List<ProductSpuRespDTO> spuList) {
         PageResult<AppSeckillActivityRespVO> result = convertPage1(pageResult);
         Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
+        Map<Long, List<SeckillProductDO>> productMap = convertMultiMap(productList, SeckillProductDO::getActivityId);
         List<AppSeckillActivityRespVO> list = CollectionUtils.convertList(result.getList(), item -> {
+            // product 信息
+            item.setSeckillPrice(getMinValue(productMap.get(item.getId()), SeckillProductDO::getSeckillPrice));
+            // spu 信息
             findAndThen(spuMap, item.getSpuId(), spu -> item.setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice())
                     .setUnitName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.PRODUCT_UNIT, spu.getUnit())));
             return item;
@@ -126,19 +133,13 @@ public interface SeckillActivityConvert {
 
     List<AppSeckillActivityDetailRespVO.Product> convertList1(List<SeckillProductDO> products);
 
-    default AppSeckillActivityDetailRespVO convert3(SeckillActivityDO seckillActivity, List<SeckillProductDO> products, SeckillConfigDO filteredConfig) {
-        return convert2(seckillActivity)
+    default AppSeckillActivityDetailRespVO convert3(SeckillActivityDO activity, List<SeckillProductDO> products,
+                                                    LocalDateTime startTime, LocalDateTime endTime) {
+        return convert2(activity)
                 .setProducts(convertList1(products))
-                .setStartTime(new LocalDateTimeUtils.BuilderDateTime()
-                        .withDate(seckillActivity.getStartTime())
-                        .withTime(filteredConfig.getStartTime())
-                        .build())// 活动开始日期和时段结合
-                .setEndTime(new LocalDateTimeUtils.BuilderDateTime()
-                        .withDate(seckillActivity.getEndTime())
-                        .withTime(filteredConfig.getEndTime())
-                        .build()); // 活动结束日期和时段结合
+                .setStartTime(startTime).setEndTime(endTime);
     }
 
-    List<SeckillActivityProductRespDTO> convertList4(List<SeckillProductDO> seckillActivityProductList);
+    SeckillValidateJoinRespDTO convert02(SeckillActivityDO activity, SeckillProductDO product);
 
 }
