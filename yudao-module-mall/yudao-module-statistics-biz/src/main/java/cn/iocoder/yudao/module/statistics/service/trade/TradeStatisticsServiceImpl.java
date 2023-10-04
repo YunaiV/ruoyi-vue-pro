@@ -37,6 +37,10 @@ public class TradeStatisticsServiceImpl implements TradeStatisticsService {
     @Resource
     private TradeStatisticsMapper tradeStatisticsMapper;
 
+    // TODO @疯狂：统计逻辑，自己服务 mapper 去统计，不要调用其它服务 API；
+    // 主要的考虑点，其它服务是在线的业务，统计是离线业务，尽量不占用他们的 db 资源；
+    // 统计服务，从建议使用从库，或者从 mysql 抽取到单独的 clickhouse 或者其它的大数据组件；
+
     @Resource
     private TradeOrderApi tradeOrderApi;
     @Resource
