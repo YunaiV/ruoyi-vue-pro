@@ -164,22 +164,10 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     @Transactional(rollbackFor = Exception.class)
     public void createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {
         // 1.1、 校验拼团活动
-        CombinationActivityDO activity = combinationActivityService.validateCombinationActivityExists(reqDTO.getActivityId());
-        // 1.2 校验是否超出单次限购数量
-        if (reqDTO.getCount() > activity.getSingleLimitCount()) {
-            throw exception(COMBINATION_RECORD_FAILED_SINGLE_LIMIT_COUNT_EXCEED);
-        }
-        // 1.3、校验是否有拼团记录
-        List<CombinationRecordDO> records = getRecordListByUserIdAndActivityId(reqDTO.getUserId(), reqDTO.getActivityId());
-        if (CollUtil.isEmpty(records)) {
-            return;
-        }
-        // 1.4、校验是否超出总限购数量
-        Integer sumValue = getSumValue(convertList(records, CombinationRecordDO::getCount,
-                item -> ObjectUtil.equals(item.getStatus(), CombinationRecordStatusEnum.SUCCESS.getStatus())), i -> i, Integer::sum);
-        if ((sumValue + reqDTO.getCount()) > activity.getTotalLimitCount()) {
-            throw exception(COMBINATION_RECORD_FAILED_TOTAL_LIMIT_COUNT_EXCEED);
-        }
+        KeyValue<CombinationActivityDO, CombinationProductDO> keyValue = validateCombinationRecord(
+                reqDTO.getActivityId(), reqDTO.getUserId(), reqDTO.getSkuId(), reqDTO.getCount());
+        CombinationActivityDO activity = keyValue.getKey();
+
         // 2、 校验用户是否参加了其它拼团
         List<CombinationRecordDO> recordDOList = recordMapper.selectListByUserIdAndStatus(reqDTO.getUserId(), CombinationRecordStatusEnum.IN_PROGRESS.getStatus());
         if (CollUtil.isNotEmpty(recordDOList)) {
