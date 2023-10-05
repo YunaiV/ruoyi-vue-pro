@@ -65,35 +65,35 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     @Transactional(rollbackFor = Exception.class)
     public void updateCombinationRecordStatusByUserIdAndOrderId(Integer status, Long userId, Long orderId) {
         // 校验拼团是否存在
-        CombinationRecordDO recordDO = validateCombinationRecord(userId, orderId);
+        CombinationRecordDO record = validateCombinationRecord(userId, orderId);
 
         // 更新状态
-        recordDO.setStatus(status);
-        recordMapper.updateById(recordDO);
+        record.setStatus(status);
+        recordMapper.updateById(record);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateRecordStatusAndStartTimeByUserIdAndOrderId(Integer status, Long userId, Long orderId, LocalDateTime startTime) {
-        CombinationRecordDO recordDO = validateCombinationRecord(userId, orderId);
+        CombinationRecordDO record = validateCombinationRecord(userId, orderId);
         // 更新状态
-        recordDO.setStatus(status);
+        record.setStatus(status);
         // 更新开始时间
-        recordDO.setStartTime(startTime);
-        recordMapper.updateById(recordDO);
+        record.setStartTime(startTime);
+        recordMapper.updateById(record);
 
         // 更新拼团参入人数
-        List<CombinationRecordDO> recordDOs = recordMapper.selectListByHeadIdAndStatus(recordDO.getHeadId(), status);
-        if (CollUtil.isNotEmpty(recordDOs)) {
-            recordDOs.forEach(item -> {
-                item.setUserCount(recordDOs.size());
+        List<CombinationRecordDO> records = recordMapper.selectListByHeadIdAndStatus(record.getHeadId(), status);
+        if (CollUtil.isNotEmpty(records)) {
+            records.forEach(item -> {
+                item.setUserCount(records.size());
                 // 校验拼团是否满足要求
-                if (ObjectUtil.equal(recordDOs.size(), recordDO.getUserSize())) {
+                if (ObjectUtil.equal(records.size(), record.getUserSize())) {
                     item.setStatus(CombinationRecordStatusEnum.SUCCESS.getStatus());
                 }
             });
         }
-        recordMapper.updateBatch(recordDOs);
+        recordMapper.updateBatch(records);
     }
 
     private CombinationRecordDO validateCombinationRecord(Long userId, Long orderId) {
@@ -107,7 +107,8 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
 
     // TODO @芋艿：在详细预览下；
     @Override
-    public KeyValue<CombinationActivityDO, CombinationProductDO> validateCombinationRecord(Long activityId, Long userId, Long skuId, Integer count) {
+    public KeyValue<CombinationActivityDO, CombinationProductDO> validateCombinationRecord(
+            Long activityId, Long userId, Long skuId, Integer count) {
         // 1.1 校验拼团活动是否存在
         CombinationActivityDO activity = combinationActivityService.validateCombinationActivityExists(activityId);
         // 1.2 校验活动是否开启
@@ -163,38 +164,37 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {
-        // 1.1、 校验拼团活动
+        // 1、校验拼团活动
         KeyValue<CombinationActivityDO, CombinationProductDO> keyValue = validateCombinationRecord(
                 reqDTO.getActivityId(), reqDTO.getUserId(), reqDTO.getSkuId(), reqDTO.getCount());
         CombinationActivityDO activity = keyValue.getKey();
-
-        // 2、 校验用户是否参加了其它拼团
+        // 2、校验用户是否参加了其它拼团
         List<CombinationRecordDO> recordDOList = recordMapper.selectListByUserIdAndStatus(reqDTO.getUserId(), CombinationRecordStatusEnum.IN_PROGRESS.getStatus());
         if (CollUtil.isNotEmpty(recordDOList)) {
             throw exception(COMBINATION_RECORD_FAILED_HAVE_JOINED);
         }
-        // 3、 校验活动是否开启
+        // 3、校验活动是否开启
         if (LocalDateTime.now().isAfter(activity.getStartTime())) {
             throw exception(COMBINATION_RECORD_FAILED_TIME_NOT_START);
         }
-        // 4、 校验当前活动是否过期
+        // 4、校验当前活动是否过期
         if (LocalDateTime.now().isAfter(activity.getEndTime())) {
             throw exception(COMBINATION_RECORD_FAILED_TIME_END);
         }
-        // 5、 父拼团是否存在,是否已经满了
+        // 5、父拼团是否存在,是否已经满了
         if (reqDTO.getHeadId() != null) {
-            // 查询进行中的父拼团
+            // 5.1、查询进行中的父拼团
             CombinationRecordDO record = recordMapper.selectOneByHeadId(reqDTO.getHeadId(), CombinationRecordStatusEnum.IN_PROGRESS.getStatus());
             if (record == null) {
                 throw exception(COMBINATION_RECORD_HEAD_NOT_EXISTS);
             }
-            // 校验拼团是否满足要求
+            // 5.2、校验拼团是否满足要求
             if (ObjectUtil.equal(record.getUserCount(), record.getUserSize())) {
                 throw exception(COMBINATION_RECORD_USER_FULL);
             }
         }
 
-        // 2. 创建拼团记录
+        // 6. 创建拼团记录
         MemberUserRespDTO user = memberUserApi.getUser(reqDTO.getUserId());
         ProductSpuRespDTO spu = productSpuApi.getSpu(reqDTO.getSpuId());
         ProductSkuRespDTO sku = productSkuApi.getSku(reqDTO.getSkuId());
