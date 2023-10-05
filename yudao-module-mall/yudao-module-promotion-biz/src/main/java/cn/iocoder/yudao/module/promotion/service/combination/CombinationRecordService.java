@@ -20,8 +20,8 @@ public interface CombinationRecordService {
     /**
      * 更新拼团状态
      *
-     * @param status 状态
-     * @param userId 用户编号
+     * @param status  状态
+     * @param userId  用户编号
      * @param orderId 订单编号
      */
     void updateCombinationRecordStatusByUserIdAndOrderId(Integer status, Long userId, Long orderId);
@@ -48,9 +48,9 @@ public interface CombinationRecordService {
     /**
      * 更新拼团状态和开始时间
      *
-     * @param status 状态
-     * @param userId 用户编号
-     * @param orderId 订单编号
+     * @param status    状态
+     * @param userId    用户编号
+     * @param orderId   订单编号
      * @param startTime 开始时间
      */
     void updateRecordStatusAndStartTimeByUserIdAndOrderId(Integer status, Long userId, Long orderId, LocalDateTime startTime);
@@ -85,5 +85,46 @@ public interface CombinationRecordService {
      * @return 拼团信息
      */
     CombinationValidateJoinRespDTO validateJoinCombination(Long activityId, Long userId, Long skuId, Integer count);
+
+    /**
+     * 获取所有拼团记录数
+     *
+     * @return 记录数
+     */
+    Long getRecordsCount();
+
+    /**
+     * 获取最近的 count 条拼团记录
+     *
+     * @param count 限制数量
+     * @return 拼团记录列表
+     */
+    List<CombinationRecordDO> getLatestRecordList(int count);
+
+    /**
+     * 获得最近 n 条拼团记录（团长发起的）
+     *
+     * @param activityId 拼团活动编号
+     * @param status     状态
+     * @param count      数量
+     * @return 拼团记录列表
+     */
+    List<CombinationRecordDO> getRecordListWithHead(Long activityId, Integer status, Integer count);
+
+    /**
+     * 获取指定编号的拼团记录
+     *
+     * @param id 拼团记录编号
+     * @return 拼团记录
+     */
+    CombinationRecordDO getRecordById(Long id);
+
+    /**
+     * 获取指定团长编号的拼团记录
+     *
+     * @param headId 团长编号
+     * @return 拼团记录列表
+     */
+    List<CombinationRecordDO> getRecordListByHeadId(Long headId);
 
 }

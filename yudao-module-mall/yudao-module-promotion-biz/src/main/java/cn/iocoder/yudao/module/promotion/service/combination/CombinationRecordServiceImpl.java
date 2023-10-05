@@ -232,13 +232,29 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
                 .setCombinationPrice(keyValue.getValue().getCombinationPrice());
     }
 
-    /**
-     * APP 端获取开团记录
-     *
-     * @return 开团记录
-     */
-    public List<CombinationRecordDO> getRecordListByStatus(Integer status) {
-        return recordMapper.selectListByStatus(status);
+    @Override
+    public Long getRecordsCount() {
+        return recordMapper.selectCount();
+    }
+
+    @Override
+    public List<CombinationRecordDO> getLatestRecordList(int count) {
+        return recordMapper.selectLatestList(count);
+    }
+
+    @Override
+    public List<CombinationRecordDO> getRecordListWithHead(Long activityId, Integer status, Integer count) {
+        return recordMapper.selectList(activityId, status, count);
+    }
+
+    @Override
+    public CombinationRecordDO getRecordById(Long id) {
+        return recordMapper.selectById(id);
+    }
+
+    @Override
+    public List<CombinationRecordDO> getRecordListByHeadId(Long headId) {
+        return recordMapper.selectList(CombinationRecordDO::getHeadId, headId);
     }
 
 }
