@@ -2,8 +2,11 @@ package cn.iocoder.yudao.module.promotion.dal.mysql.bargain;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.help.BargainHelpPageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainHelpDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -33,7 +36,6 @@ public interface BargainHelpMapper extends BaseMapperX<BargainHelpDO> {
                 .eq(BargainHelpDO::getRecordId, recordId));
     }
 
-
     default Map<Long, Integer> selectCountByActivityId(Collection<Long> activityIds) {
         // SQL count 查询
         List<Map<String, Object>> result = selectMaps(new QueryWrapper<BargainHelpDO>()
@@ -62,6 +64,12 @@ public interface BargainHelpMapper extends BaseMapperX<BargainHelpDO> {
         return CollectionUtils.convertMap(result,
                 record -> MapUtil.getLong(record, "recordId"),
                 record -> MapUtil.getInt(record, "userCount" ));
+    }
+
+    default PageResult<BargainHelpDO> selectPage(BargainHelpPageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<BargainHelpDO>()
+                .eqIfPresent(BargainHelpDO::getRecordId, reqVO.getRecordId())
+                .orderByDesc(BargainHelpDO::getId));
     }
 
 }

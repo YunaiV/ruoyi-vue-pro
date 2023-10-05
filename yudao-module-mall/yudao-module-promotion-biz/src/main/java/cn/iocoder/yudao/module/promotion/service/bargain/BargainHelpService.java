@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.promotion.service.bargain;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.help.BargainHelpPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.bargain.vo.help.AppBargainHelpCreateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainHelpDO;
 
@@ -37,5 +39,13 @@ public interface BargainHelpService {
      * @return 助力人数 Map
      */
     Map<Long, Integer> getBargainHelpUserCountMapByRecord(Collection<Long> recordIds);
+
+    /**
+     * 获得砍价助力分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 砍价助力分页
+     */
+    PageResult<BargainHelpDO> getBargainHelpPage(BargainHelpPageReqVO pageReqVO);
 
 }
