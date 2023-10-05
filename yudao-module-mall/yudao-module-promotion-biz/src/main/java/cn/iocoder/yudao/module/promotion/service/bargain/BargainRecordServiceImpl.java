@@ -115,6 +115,13 @@ public class BargainRecordServiceImpl implements BargainRecordService {
     }
 
     @Override
+    public BargainRecordDO getInProgressBargainRecord(Long userId, Long activityId) {
+        List<BargainRecordDO> list = bargainRecordMapper.selectListByUserIdAndActivityIdAndStatus(
+                userId, activityId, BargainRecordStatusEnum.IN_PROGRESS.getStatus());
+        return CollUtil.getFirst(list);
+    }
+
+    @Override
     public Map<Long, Integer> getBargainRecordUserCountMap(Collection<Long> activityIds, @Nullable Integer status) {
         return bargainRecordMapper.selectUserCountByActivityIdsAndStatus(activityIds, status);
     }
@@ -122,6 +129,11 @@ public class BargainRecordServiceImpl implements BargainRecordService {
     @Override
     public Integer getBargainRecordUserCount(Integer status) {
         return bargainRecordMapper.selectUserCountByStatus(status);
+    }
+
+    @Override
+    public Integer getBargainRecordUserCount(Long activityId, Integer status) {
+        return bargainRecordMapper.selectUserCountByActivityIdAndStatus(activityId, status);
     }
 
     @Override

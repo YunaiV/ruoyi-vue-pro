@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.promotion.controller.app.bargain;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
@@ -19,16 +19,18 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityD
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainRecordDO;
 import cn.iocoder.yudao.module.promotion.enums.bargain.BargainRecordStatusEnum;
 import cn.iocoder.yudao.module.promotion.service.bargain.BargainActivityService;
+import cn.iocoder.yudao.module.promotion.service.bargain.BargainHelpService;
 import cn.iocoder.yudao.module.promotion.service.bargain.BargainRecordService;
 import cn.iocoder.yudao.module.trade.api.order.TradeOrderApi;
 import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +49,8 @@ public class AppBargainRecordController {
     private BargainRecordService bargainRecordService;
     @Resource
     private BargainActivityService bargainActivityService;
+    @Resource
+    private BargainHelpService bargainHelpService;
 
     @Resource
     private MemberUserApi memberUserApi;
@@ -78,23 +82,67 @@ public class AppBargainRecordController {
 
     @GetMapping("/get-detail")
     @Operation(summary = "获得砍价记录的明细")
-    // TODO 芋艿：swagger；id  和 activityId 二选一
+    @Parameters({
+            @Parameter(name = "id", description = "砍价记录编号", example = "111"), // 场景一：查看指定的砍价记录
+            @Parameter(name = "activityId", description = "砍价活动编号", example = "222") // 场景二：查看指定的砍价活动
+    })
     public CommonResult<AppBargainRecordDetailRespVO> getBargainRecordDetail(
             @RequestParam(value = "id", required = false) Long id,
             @RequestParam(value = "activityId", required = false) Long activityId) {
-        AppBargainRecordDetailRespVO detail = new AppBargainRecordDetailRespVO();
-        detail.setId(1L);
-        detail.setUserId(1L);
-        detail.setSpuId(1L);
-        detail.setSkuId(1L);
-        detail.setPrice(500);
-        detail.setActivityId(1L);
-        detail.setBargainPrice(150);
-        detail.setPrice(200);
-        detail.setPayPrice(180);
-        detail.setStatus(1);
-        detail.setExpireTime(LocalDateTimeUtils.addTime(Duration.ofDays(2)));
-        return success(detail);
+        // 1. 查询砍价记录 + 砍价活动
+        Assert.isTrue(id != null || activityId != null, "砍价记录编号和活动编号不能同时为空");
+        BargainRecordDO record = id != null ? bargainRecordService.getBargainRecord(id)
+                : bargainRecordService.getInProgressBargainRecord(getLoginUserId(), activityId);
+        if (activityId == null || record != null) {
+            activityId = record.getActivityId();
+        }
+        // 2. 查询助力记录
+        Integer helpAction = getHelpAction(record, activityId);
+        // 3. 如果是自己的订单，则查询订单信息
+        // TODO 继续查询别的字段
+
+        // 拼接返回
+        return success(BargainRecordConvert.INSTANCE.convert02(record, helpAction));
+//
+//        AppBargainRecordDetailRespVO detail = new AppBargainRecordDetailRespVO();
+//        detail.setId(1L);
+//        detail.setUserId(1L);
+//        detail.setSpuId(1L);
+//        detail.setSkuId(1L);
+//        detail.setPrice(500);
+//        detail.setActivityId(1L);
+//        detail.setBargainPrice(150);
+//        detail.setPrice(200);
+//        detail.setPayPrice(180);
+//        detail.setStatus(1);
+//        detail.setExpireTime(LocalDateTimeUtils.addTime(Duration.ofDays(2)));
+//        return success(detail);
+    }
+
+    private Integer getHelpAction(BargainRecordDO record, Long activityId) {
+        // 0.1 如果没有活动，无法帮砍
+        if (activityId == null) {
+            return null;
+        }
+        // 0.2 如果是自己的砍价记录，无法帮砍
+        Long userId = getLoginUserId();
+        if (record != null && record.getUserId().equals(userId)) {
+            return null;
+        }
+
+        // 1. 判断是否已经助力
+        if (record != null
+            && bargainHelpService.getBargainHelp(record.getId(), userId) != null) {
+            return AppBargainRecordDetailRespVO.HELP_ACTION_SUCCESS;
+        }
+        // 2. 判断是否满助力
+        BargainActivityDO activity = bargainActivityService.getBargainActivity(activityId);
+        if (activity != null
+            && bargainHelpService.getBargainHelpCountByActivity(activityId, userId) >= activity.getBargainCount()) {
+            return AppBargainRecordDetailRespVO.HELP_ACTION_FULL;
+        }
+
+        return AppBargainRecordDetailRespVO.HELP_ACTION_NONE;
     }
 
     @GetMapping("/page")

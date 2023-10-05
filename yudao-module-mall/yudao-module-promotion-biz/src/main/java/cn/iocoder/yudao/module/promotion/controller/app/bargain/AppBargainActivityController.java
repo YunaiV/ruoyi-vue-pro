@@ -10,7 +10,9 @@ import cn.iocoder.yudao.module.promotion.controller.app.bargain.vo.activity.AppB
 import cn.iocoder.yudao.module.promotion.controller.app.bargain.vo.activity.AppBargainActivityRespVO;
 import cn.iocoder.yudao.module.promotion.convert.bargain.BargainActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityDO;
+import cn.iocoder.yudao.module.promotion.enums.bargain.BargainRecordStatusEnum;
 import cn.iocoder.yudao.module.promotion.service.bargain.BargainActivityService;
+import cn.iocoder.yudao.module.promotion.service.bargain.BargainRecordService;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,6 +55,9 @@ public class AppBargainActivityController {
     @Resource
     private BargainActivityService bargainActivityService;
     @Resource
+    private BargainRecordService bargainRecordService;
+
+    @Resource
     private ProductSpuApi spuApi;
 
     @GetMapping("/list")
@@ -94,8 +99,9 @@ public class AppBargainActivityController {
             return success(null);
         }
         // 拼接数据
+        Integer successUserCount = bargainRecordService.getBargainRecordUserCount(id, BargainRecordStatusEnum.SUCCESS.getStatus());
         ProductSpuRespDTO spu = spuApi.getSpu(activity.getSpuId());
-        return success(BargainActivityConvert.INSTANCE.convert(activity, spu));
+        return success(BargainActivityConvert.INSTANCE.convert(activity, successUserCount, spu));
     }
 
 }

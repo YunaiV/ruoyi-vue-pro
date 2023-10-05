@@ -45,10 +45,13 @@ public class AppBargainActivityDetailRespVO {
     @Schema(description = "商品单位", requiredMode = Schema.RequiredMode.REQUIRED, example = "个") // 从 SPU 的 unit 读取，然后转换
     private String unitName;
 
+    @Schema(description = "砍价起始价格，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "200")
+    private Integer bargainFirstPrice;
+
     @Schema(description = "砍价最低金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
-    private Integer bargainPrice;
+    private Integer bargainMinPrice;
 
     @Schema(description = "砍价成功数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
-    private Integer successCount;
+    private Integer successUserCount;
 
 }

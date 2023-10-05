@@ -15,6 +15,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -71,8 +72,15 @@ public interface BargainRecordMapper extends BaseMapperX<BargainRecordDO> {
                 record -> MapUtil.getInt(record, "userCount" ));
     }
 
-    @Select("SELECT COUNT(DISTINCT(user_id)) FROM promotion_bargain_record WHERE status = #{status}")
+    @Select("SELECT COUNT(DISTINCT(user_id)) FROM promotion_bargain_record " +
+            "WHERE status = #{status}")
     Integer selectUserCountByStatus(@Param("status") Integer status);
+
+    @Select("SELECT COUNT(DISTINCT(user_id)) FROM promotion_bargain_record " +
+            "WHERE activity_id = #{activityId} " +
+            "AND status = #{status}")
+    Integer selectUserCountByActivityIdAndStatus(@Param("activityId") Long activityId,
+                                                 @Param("status") Integer status);
 
     default PageResult<BargainRecordDO> selectPage(BargainRecordPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<BargainRecordDO>()
@@ -101,7 +109,7 @@ public interface BargainRecordMapper extends BaseMapperX<BargainRecordDO> {
      * @return 更新数量
      */
     default int updateOrderIdById(Long id, Long orderId) {
-        return update(new BargainRecordDO().setOrderId(orderId),
+        return update(new BargainRecordDO().setOrderId(orderId).setEndTime(LocalDateTime.now()),
                 new LambdaQueryWrapper<>(BargainRecordDO.class)
                         .eq(BargainRecordDO::getId, id)
                         .isNull(BargainRecordDO::getOrderId));
