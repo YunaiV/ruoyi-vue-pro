@@ -16,6 +16,7 @@ import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDeta
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.base.member.user.MemberUserRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.base.product.property.ProductPropertyValueDetailRespVO;
@@ -262,5 +263,17 @@ public interface TradeOrderConvert {
     }
 
     List<TradeOrderRespDTO> convertList04(List<TradeOrderDO> list);
+
+    @Mappings({
+            @Mapping(target = "activityId", source = "order.combinationActivityId"),
+            @Mapping(target = "spuId", source = "item.spuId"),
+            @Mapping(target = "skuId", source = "item.skuId"),
+            @Mapping(target = "count", source = "item.count"),
+            @Mapping(target = "orderId", source = "order.id"),
+            @Mapping(target = "userId", source = "order.userId"),
+            @Mapping(target = "headId", source = "order.combinationRecordHeadId"),
+            @Mapping(target = "combinationPrice", source = "item.payPrice"),
+    })
+    CombinationRecordCreateReqDTO convert(TradeOrderDO order, TradeOrderItemDO item);
 
 }

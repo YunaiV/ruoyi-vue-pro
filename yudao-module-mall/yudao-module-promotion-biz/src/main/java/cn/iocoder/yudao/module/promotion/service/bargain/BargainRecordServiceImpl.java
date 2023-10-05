@@ -77,12 +77,12 @@ public class BargainRecordServiceImpl implements BargainRecordService {
 
     @Override
     public BargainValidateJoinRespDTO validateJoinBargain(Long userId, Long bargainRecordId, Long skuId) {
-        // 1.1 拼团记录不存在
+        // 1.1 砍价记录不存在
         BargainRecordDO record = bargainRecordMapper.selectByIdAndUserId(bargainRecordId, userId);
         if (record == null) {
             throw exception(BARGAIN_RECORD_NOT_EXISTS);
         }
-        // 1.2 拼团记录未在进行中
+        // 1.2 砍价记录未在进行中
         if (ObjUtil.notEqual(record.getStatus(), BargainRecordStatusEnum.IN_PROGRESS)) {
             throw exception(BARGAIN_JOIN_RECORD_NOT_SUCCESS);
         }

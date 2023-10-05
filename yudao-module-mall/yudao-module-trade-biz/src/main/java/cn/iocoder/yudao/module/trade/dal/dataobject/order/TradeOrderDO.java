@@ -7,7 +7,10 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryPickUpStoreDO;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
-import cn.iocoder.yudao.module.trade.enums.order.*;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderCancelTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -307,5 +310,18 @@ public class TradeOrderDO extends BaseDO {
      * 关联 BargainRecordDO 的 id 字段
      */
     private Long bargainRecordId;
+
+    /**
+     * 拼团活动编号 TODO puhui999：价格计算后设置
+     *
+     * 关联 CombinationActivityDO 的 id 字段
+     */
+    private Long combinationActivityId;
+    /**
+     * 团长编号
+     *
+     * 关联 CombinationRecordDO 的 id 字段
+     */
+    private Long combinationRecordHeadId;
 
 }
