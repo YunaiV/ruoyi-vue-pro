@@ -101,6 +101,7 @@ public interface ErrorCodeConstants {
     ErrorCode BARGAIN_RECORD_CREATE_FAIL_EXISTS = new ErrorCode(1_013_013_001, "参与失败，您已经参与当前砍价活动");
     ErrorCode BARGAIN_RECORD_CREATE_FAIL_LIMIT = new ErrorCode(1_013_013_002, "参与失败，您已达到当前砍价活动的参与上限");
     ErrorCode BARGAIN_JOIN_RECORD_NOT_SUCCESS = new ErrorCode(1_013_013_004, "下单失败，砍价未成功");
+    ErrorCode BARGAIN_JOIN_RECORD_ALREADY_ORDER = new ErrorCode(1_013_013_005, "下单失败，该砍价已经下单");
 
     // ========== 砍价助力 1-013-014-000 ==========
     ErrorCode BARGAIN_HELP_CREATE_FAIL_RECORD_NOT_IN_PROCESS = new ErrorCode(1_013_014_000, "助力失败，砍价记录不处于进行中");

@@ -17,13 +17,14 @@ public class BargainRecordApiImpl implements BargainRecordApi {
     @Resource
     private BargainRecordService bargainRecordService;
 
-    //@Override
-    //public void createBargainRecord(BargainRecordCreateReqDTO reqDTO) {
-    //}
-
     @Override
     public BargainValidateJoinRespDTO validateJoinBargain(Long userId, Long bargainRecordId, Long skuId) {
         return bargainRecordService.validateJoinBargain(userId, bargainRecordId, skuId);
+    }
+
+    @Override
+    public void updateBargainRecordOrderId(Long id, Long orderId) {
+        bargainRecordService.updateBargainRecordOrderId(id, orderId);
     }
 
 }

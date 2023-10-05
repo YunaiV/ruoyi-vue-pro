@@ -93,4 +93,18 @@ public interface BargainRecordMapper extends BaseMapperX<BargainRecordDO> {
                 .last("LIMIT " + count));
     }
 
+    /**
+     * 更新砍价的订单编号，前提是 orderId 原本是空的
+     *
+     * @param id 砍价记录编号
+     * @param orderId 订单编号
+     * @return 更新数量
+     */
+    default int updateOrderIdById(Long id, Long orderId) {
+        return update(new BargainRecordDO().setOrderId(orderId),
+                new LambdaQueryWrapper<>(BargainRecordDO.class)
+                        .eq(BargainRecordDO::getId, id)
+                        .isNull(BargainRecordDO::getOrderId));
+    }
+
 }
