@@ -27,7 +27,6 @@ import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.List;
 
-import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
@@ -48,7 +47,7 @@ public class AppCombinationActivityController {
     @Parameter(name = "count", description = "需要展示的数量", example = "6")
     public CommonResult<List<AppCombinationActivityRespVO>> getCombinationActivityList(
             @RequestParam(name = "count", defaultValue = "6") Integer count) {
-        List<CombinationActivityDO> list = activityService.getCombinationActivityListByCount(defaultIfNull(count, 6));
+        List<CombinationActivityDO> list = activityService.getCombinationActivityListByCount(6);
         if (CollUtil.isEmpty(list)) {
             return success(Collections.emptyList());
         }

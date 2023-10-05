@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.promotion.service.bargain;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.api.bargain.dto.BargainValidateJoinRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.recrod.BargainRecordPageReqVO;
@@ -17,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -99,12 +101,27 @@ public class BargainRecordServiceImpl implements BargainRecordService {
 
     @Override
     public Map<Long, Integer> getBargainRecordUserCountMap(Collection<Long> activityIds, @Nullable Integer status) {
-        return bargainRecordMapper.selectCountByActivityIdsAndStatus(activityIds, status);
+        return bargainRecordMapper.selectUserCountByActivityIdsAndStatus(activityIds, status);
+    }
+
+    @Override
+    public Integer getBargainRecordUserCount(Integer status) {
+        return bargainRecordMapper.selectUserCountByStatus(status);
     }
 
     @Override
     public PageResult<BargainRecordDO> getBargainRecordPage(BargainRecordPageReqVO pageReqVO) {
         return bargainRecordMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public PageResult<BargainRecordDO> getBargainRecordPage(Long userId, PageParam pageParam) {
+        return bargainRecordMapper.selectBargainRecordPage(userId, pageParam);
+    }
+
+    @Override
+    public List<BargainRecordDO> getBargainRecordList(Integer status, Integer count) {
+        return bargainRecordMapper.selectListByStatusAndCount(status, count);
     }
 
 }

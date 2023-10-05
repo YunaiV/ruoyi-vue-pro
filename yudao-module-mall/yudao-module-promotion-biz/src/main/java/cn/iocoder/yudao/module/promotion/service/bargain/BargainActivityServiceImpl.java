@@ -162,7 +162,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
         if (activity.getStock() <= 0) {
             throw exception(BARGAIN_ACTIVITY_STOCK_NOT_ENOUGH);
         }
-        if (LocalDateTimeUtils.isBetween(activity.getStartTime(), activity.getEndTime())) {
+        if (!LocalDateTimeUtils.isBetween(activity.getStartTime(), activity.getEndTime())) {
             throw exception(BARGAIN_ACTIVITY_TIME_END);
         }
         return activity;

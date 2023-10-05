@@ -74,7 +74,7 @@ public class AppSeckillActivityController {
     @GetMapping("/get-now")
     @Operation(summary = "获得当前秒杀活动", description = "获取当前正在进行的活动，提供给首页使用")
     public CommonResult<AppSeckillActivityNowRespVO> getNowSeckillActivity() {
-        return success(nowSeckillActivityCache.getUnchecked(""));
+        return success(nowSeckillActivityCache.getUnchecked("")); // 缓存
     }
 
     private AppSeckillActivityNowRespVO getNowSeckillActivity0() {

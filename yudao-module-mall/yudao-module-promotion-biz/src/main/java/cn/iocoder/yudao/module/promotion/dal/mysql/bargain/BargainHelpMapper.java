@@ -26,7 +26,7 @@ public interface BargainHelpMapper extends BaseMapperX<BargainHelpDO> {
                 .eq(BargainHelpDO::getActivityId, activityId));
     }
 
-    default Long selectCountByRecordId(Long recordId) {
+    default Long selectUserCountMapByRecordId(Long recordId) {
         return selectCount(BargainHelpDO::getRecordId, recordId);
     }
 
@@ -36,7 +36,7 @@ public interface BargainHelpMapper extends BaseMapperX<BargainHelpDO> {
                 .eq(BargainHelpDO::getRecordId, recordId));
     }
 
-    default Map<Long, Integer> selectCountByActivityId(Collection<Long> activityIds) {
+    default Map<Long, Integer> selectUserCountMapByActivityId(Collection<Long> activityIds) {
         // SQL count 查询
         List<Map<String, Object>> result = selectMaps(new QueryWrapper<BargainHelpDO>()
                 .select("COUNT(DISTINCT(user_id)) AS userCount, activity_id AS activityId")
@@ -51,7 +51,7 @@ public interface BargainHelpMapper extends BaseMapperX<BargainHelpDO> {
                 record -> MapUtil.getInt(record, "userCount" ));
     }
 
-    default Map<Long, Integer> selectCountByRecordId(Collection<Long> recordIds) {
+    default Map<Long, Integer> selectUserCountMapByRecordId(Collection<Long> recordIds) {
         // SQL count 查询
         List<Map<String, Object>> result = selectMaps(new QueryWrapper<BargainHelpDO>()
                 .select("COUNT(1) AS userCount, record_id AS recordId")

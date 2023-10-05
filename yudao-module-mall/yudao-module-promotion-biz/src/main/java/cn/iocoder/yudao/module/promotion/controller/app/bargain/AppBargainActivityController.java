@@ -11,6 +11,8 @@ import cn.iocoder.yudao.module.promotion.controller.app.bargain.vo.activity.AppB
 import cn.iocoder.yudao.module.promotion.convert.bargain.BargainActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityDO;
 import cn.iocoder.yudao.module.promotion.service.bargain.BargainActivityService;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,10 +23,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 
-import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.cache.CacheUtils.buildAsyncReloadingCache;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 @Tag(name = "用户 App - 砍价活动")
@@ -33,10 +37,41 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 @Validated
 public class AppBargainActivityController {
 
+    /**
+     * {@link AppBargainActivityRespVO} 缓存，通过它异步刷新 {@link #getBargainActivityList0(Integer)} 所要的首页数据
+     */
+    private final LoadingCache<Integer, List<AppBargainActivityRespVO>> bargainActivityListCache = buildAsyncReloadingCache(Duration.ofSeconds(10L),
+            new CacheLoader<Integer, List<AppBargainActivityRespVO>>() {
+
+                @Override
+                public List<AppBargainActivityRespVO> load(Integer count) {
+                    return getBargainActivityList0(count);
+                }
+
+            });
+
     @Resource
     private BargainActivityService bargainActivityService;
     @Resource
     private ProductSpuApi spuApi;
+
+    @GetMapping("/list")
+    @Operation(summary = "获得砍价活动列表", description = "用于小程序首页")
+    @Parameter(name = "count", description = "需要展示的数量", example = "6")
+    public CommonResult<List<AppBargainActivityRespVO>> getBargainActivityList(
+            @RequestParam(name = "count", defaultValue = "6") Integer count) {
+        return success(bargainActivityListCache.getUnchecked(count));
+    }
+
+    private List<AppBargainActivityRespVO>getBargainActivityList0(Integer count) {
+        List<BargainActivityDO> list = bargainActivityService.getBargainActivityListByCount(count);
+        if (CollUtil.isEmpty(list)) {
+            return Collections.emptyList();
+        }
+        // 拼接数据
+        List<ProductSpuRespDTO> spuList = spuApi.getSpuList(convertList(list, BargainActivityDO::getSpuId));
+        return BargainActivityConvert.INSTANCE.convertAppList(list, spuList);
+    }
 
     @GetMapping("/page")
     @Operation(summary = "获得砍价活动分页")
@@ -48,21 +83,6 @@ public class AppBargainActivityController {
         // 拼接数据
         List<ProductSpuRespDTO> spuList = spuApi.getSpuList(convertList(result.getList(), BargainActivityDO::getSpuId));
         return success(BargainActivityConvert.INSTANCE.convertAppPage(result, spuList));
-    }
-
-    // TODO 芋艿：增加 Spring Cache
-    @GetMapping("/list")
-    @Operation(summary = "获得砍价活动列表", description = "用于小程序首页")
-    @Parameter(name = "count", description = "需要展示的数量", example = "6")
-    public CommonResult<List<AppBargainActivityRespVO>> getBargainActivityList(
-            @RequestParam(name = "count", defaultValue = "6") Integer count) {
-        List<BargainActivityDO> list = bargainActivityService.getBargainActivityListByCount(defaultIfNull(count, 6));
-        if (CollUtil.isEmpty(list)) {
-            return success(BargainActivityConvert.INSTANCE.convertAppList(list));
-        }
-        // 拼接数据
-        List<ProductSpuRespDTO> spuList = spuApi.getSpuList(convertList(list, BargainActivityDO::getSpuId));
-        return success(BargainActivityConvert.INSTANCE.convertAppList(list, spuList));
     }
 
     @GetMapping("/get-detail")

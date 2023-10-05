@@ -261,4 +261,6 @@ public interface TradeOrderConvert {
         return bo;
     }
 
+    List<TradeOrderRespDTO> convertList04(List<TradeOrderDO> list);
+
 }

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.promotion.dal.mysql.bargain;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
@@ -11,6 +12,8 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainRecordDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -52,7 +55,7 @@ public interface BargainRecordMapper extends BaseMapperX<BargainRecordDO> {
                 .eq(BargainRecordDO::getBargainPrice, whereBargainPrice));
     }
 
-    default Map<Long, Integer> selectCountByActivityIdsAndStatus(Collection<Long> activityIds, Integer status) {
+    default Map<Long, Integer> selectUserCountByActivityIdsAndStatus(Collection<Long> activityIds, Integer status) {
         // SQL count 查询
         List<Map<String, Object>> result = selectMaps(new QueryWrapper<BargainRecordDO>()
                 .select("COUNT(DISTINCT(user_id)) AS userCount, activity_id AS activityId")
@@ -68,11 +71,26 @@ public interface BargainRecordMapper extends BaseMapperX<BargainRecordDO> {
                 record -> MapUtil.getInt(record, "userCount" ));
     }
 
+    @Select("SELECT COUNT(DISTINCT(user_id)) FROM promotion_bargain_record WHERE status = #{status}")
+    Integer selectUserCountByStatus(@Param("status") Integer status);
+
     default PageResult<BargainRecordDO> selectPage(BargainRecordPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<BargainRecordDO>()
                 .eqIfPresent(BargainRecordDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(BargainRecordDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(BargainRecordDO::getId));
+    }
+
+    default PageResult<BargainRecordDO> selectBargainRecordPage(Long userId, PageParam pageParam) {
+        return selectPage(pageParam, new LambdaQueryWrapperX<BargainRecordDO>()
+                .eq(BargainRecordDO::getUserId, userId)
+                .orderByDesc(BargainRecordDO::getId));
+    }
+
+    default List<BargainRecordDO> selectListByStatusAndCount(Integer status, Integer count) {
+        return selectList(new LambdaQueryWrapper<>(BargainRecordDO.class)
+                .eq(BargainRecordDO::getStatus, status)
+                .last("LIMIT " + count));
     }
 
 }

@@ -70,6 +70,14 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
     }
 
     @Override
+    public List<TradeOrderDO> getOrderList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return tradeOrderMapper.selectBatchIds(ids);
+    }
+
+    @Override
     public PageResult<TradeOrderDO> getOrderPage(TradeOrderPageReqVO reqVO) {
         // 获得 userId 相关的查询
         Set<Long> userIds = new HashSet<>();

@@ -10,10 +10,10 @@ import java.util.List;
 public class AppBargainRecordSummaryRespVO {
 
     @Schema(description = "砍价用户数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    private Integer userCount;
+    private Integer successUserCount;
 
     @Schema(description = "成功砍价的记录", requiredMode = Schema.RequiredMode.REQUIRED) // 只返回最近的 7 个
-    private List<Record> successRecords;
+    private List<Record> successList;
 
     @Schema(description = "成功砍价记录")
     @Data

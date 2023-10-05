@@ -84,4 +84,14 @@ public class TradeOrderRespDTO {
      */
     private Boolean commentStatus;
 
+    // ========== 价格 + 支付基本信息 ==========
+    /**
+     * 支付订单编号
+     */
+    private Long payOrderId;
+    /**
+     * 是否已支付
+     */
+    private Boolean payStatus;
+
 }

@@ -1,11 +1,6 @@
 package cn.iocoder.yudao.module.promotion.api.bargain;
 
-import cn.iocoder.yudao.module.promotion.api.bargain.dto.BargainRecordCreateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.bargain.dto.BargainValidateJoinRespDTO;
-
-import javax.validation.Valid;
-
-// TODO @芋艿：后面也再撸撸这几个接口
 
 /**
  * 砍价记录 API 接口
@@ -13,13 +8,6 @@ import javax.validation.Valid;
  * @author HUIHUI
  */
 public interface BargainRecordApi {
-
-    /**
-     * 创建砍价记录
-     *
-     * @param reqDTO 请求 DTO
-     */
-    void createBargainRecord(@Valid BargainRecordCreateReqDTO reqDTO);
 
     /**
      * 【下单前】校验是否参与砍价活动

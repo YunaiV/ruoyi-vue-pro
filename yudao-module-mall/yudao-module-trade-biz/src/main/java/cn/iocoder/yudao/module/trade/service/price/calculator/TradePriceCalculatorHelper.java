@@ -86,7 +86,9 @@ public class TradePriceCalculatorHelper {
         if (param.getCombinationActivityId() != null) {
             return TradeOrderTypeEnum.COMBINATION.getType();
         }
-        // TODO 砍价敬请期待
+        if (param.getBargainRecordId() != null) {
+            return TradeOrderTypeEnum.BARGAIN.getType();
+        }
         return TradeOrderTypeEnum.NORMAL.getType();
     }
 

@@ -41,6 +41,14 @@ public interface TradeOrderQueryService {
     TradeOrderDO getOrder(Long userId, Long id);
 
     /**
+     * 获得订单列表
+     *
+     * @param ids 订单编号数组
+     * @return 订单列表
+     */
+    List<TradeOrderDO> getOrderList(Collection<Long> ids);
+
+    /**
      * 【管理员】获得交易订单分页
      *
      * @param reqVO 分页请求

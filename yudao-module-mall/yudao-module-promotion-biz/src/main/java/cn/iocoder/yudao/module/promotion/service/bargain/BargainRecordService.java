@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.promotion.service.bargain;
 
 
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.api.bargain.dto.BargainValidateJoinRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.recrod.BargainRecordPageReqVO;
@@ -9,6 +10,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainRecordDO;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -71,11 +73,37 @@ public interface BargainRecordService {
     Map<Long, Integer> getBargainRecordUserCountMap(Collection<Long> activityIds, @Nullable Integer status);
 
     /**
-     * 获得砍价记录分页
+     * 获得砍价人数 Map
+     *
+     * @param status 砍价记录状态
+     * @return 砍价人数
+     */
+    Integer getBargainRecordUserCount(Integer status);
+
+    /**
+     * 【管理员】获得砍价记录分页
      *
      * @param pageReqVO 分页查询
      * @return 砍价记录分页
      */
     PageResult<BargainRecordDO> getBargainRecordPage(BargainRecordPageReqVO pageReqVO);
+
+    /**
+     * 【会员】获得砍价记录分页
+     *
+     * @param userId 用户编号
+     * @param pageParam 分页查询
+     * @return 砍价记录分页
+     */
+    PageResult<BargainRecordDO> getBargainRecordPage(Long userId, PageParam pageParam);
+
+    /**
+     * 获得砍价记录列表
+     *
+     * @param status 砍价记录状态
+     * @param count 条数
+     * @return 砍价记录列表
+     */
+    List<BargainRecordDO> getBargainRecordList(Integer status, Integer count);
 
 }
