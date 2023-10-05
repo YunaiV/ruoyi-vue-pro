@@ -14,6 +14,8 @@ import cn.iocoder.yudao.module.promotion.convert.combination.CombinationActivity
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
 import cn.iocoder.yudao.module.promotion.service.combination.CombinationActivityService;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,11 +26,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.cache.CacheUtils.buildAsyncReloadingCache;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 @Tag(name = "用户 APP - 拼团活动")
@@ -37,24 +41,40 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 @Validated
 public class AppCombinationActivityController {
 
+    /**
+     * {@link AppCombinationActivityRespVO} 缓存，通过它异步刷新 {@link #getCombinationActivityList0(Integer)} 所要的首页数据
+     */
+    private final LoadingCache<Integer, List<AppCombinationActivityRespVO>> combinationActivityListCache = buildAsyncReloadingCache(Duration.ofSeconds(10L),
+            new CacheLoader<Integer, List<AppCombinationActivityRespVO>>() {
+
+                @Override
+                public List<AppCombinationActivityRespVO> load(Integer count) {
+                    return getCombinationActivityList0(count);
+                }
+
+            });
+
     @Resource
     private CombinationActivityService activityService;
     @Resource
     private ProductSpuApi spuApi;
 
-    // TODO 芋艿：增加 Spring Cache
     @GetMapping("/list")
     @Operation(summary = "获得拼团活动列表", description = "用于小程序首页")
     @Parameter(name = "count", description = "需要展示的数量", example = "6")
     public CommonResult<List<AppCombinationActivityRespVO>> getCombinationActivityList(
             @RequestParam(name = "count", defaultValue = "6") Integer count) {
+        return success(combinationActivityListCache.getUnchecked(count));
+    }
+
+    private List<AppCombinationActivityRespVO> getCombinationActivityList0(Integer count) {
         List<CombinationActivityDO> list = activityService.getCombinationActivityListByCount(defaultIfNull(count, 6));
         if (CollUtil.isEmpty(list)) {
-            return success(Collections.emptyList());
+            return Collections.emptyList();
         }
         // 拼接返回
         List<ProductSpuRespDTO> spuList = spuApi.getSpuList(convertList(list, CombinationActivityDO::getSpuId));
-        return success(CombinationActivityConvert.INSTANCE.convertAppList(list, spuList));
+        return CombinationActivityConvert.INSTANCE.convertAppList(list, spuList);
     }
 
     @GetMapping("/page")
@@ -76,7 +96,7 @@ public class AppCombinationActivityController {
         // 1、获取活动
         CombinationActivityDO combinationActivity = activityService.getCombinationActivity(id);
         if (combinationActivity == null
-            || ObjectUtil.equal(combinationActivity.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
+                || ObjectUtil.equal(combinationActivity.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
             return success(null);
         }
         // 2、获取活动商品
