@@ -2,8 +2,11 @@ package cn.iocoder.yudao.module.promotion.dal.mysql.bargain;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.recrod.BargainRecordPageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainRecordDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -63,6 +66,13 @@ public interface BargainRecordMapper extends BaseMapperX<BargainRecordDO> {
         return CollectionUtils.convertMap(result,
                 record -> MapUtil.getLong(record, "activityId"),
                 record -> MapUtil.getInt(record, "userCount" ));
+    }
+
+    default PageResult<BargainRecordDO> selectPage(BargainRecordPageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<BargainRecordDO>()
+                .eqIfPresent(BargainRecordDO::getStatus, reqVO.getStatus())
+                .betweenIfPresent(BargainRecordDO::getCreateTime, reqVO.getCreateTime())
+                .orderByDesc(BargainRecordDO::getId));
     }
 
 }

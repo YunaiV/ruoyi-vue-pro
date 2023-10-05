@@ -49,4 +49,19 @@ public interface BargainHelpMapper extends BaseMapperX<BargainHelpDO> {
                 record -> MapUtil.getInt(record, "userCount" ));
     }
 
+    default Map<Long, Integer> selectCountByRecordId(Collection<Long> recordIds) {
+        // SQL count 查询
+        List<Map<String, Object>> result = selectMaps(new QueryWrapper<BargainHelpDO>()
+                .select("COUNT(1) AS userCount, record_id AS recordId")
+                .in("record_id", recordIds)
+                .groupBy("record_id"));
+        if (CollUtil.isEmpty(result)) {
+            return Collections.emptyMap();
+        }
+        // 转换数据
+        return CollectionUtils.convertMap(result,
+                record -> MapUtil.getLong(record, "recordId"),
+                record -> MapUtil.getInt(record, "userCount" ));
+    }
+
 }

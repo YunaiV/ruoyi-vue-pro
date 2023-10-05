@@ -3,7 +3,9 @@ package cn.iocoder.yudao.module.promotion.service.bargain;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.api.bargain.dto.BargainValidateJoinRespDTO;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.recrod.BargainRecordPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.bargain.vo.record.AppBargainRecordCreateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainRecordDO;
@@ -98,6 +100,11 @@ public class BargainRecordServiceImpl implements BargainRecordService {
     @Override
     public Map<Long, Integer> getBargainRecordUserCountMap(Collection<Long> activityIds, @Nullable Integer status) {
         return bargainRecordMapper.selectCountByActivityIdsAndStatus(activityIds, status);
+    }
+
+    @Override
+    public PageResult<BargainRecordDO> getBargainRecordPage(BargainRecordPageReqVO pageReqVO) {
+        return bargainRecordMapper.selectPage(pageReqVO);
     }
 
 }

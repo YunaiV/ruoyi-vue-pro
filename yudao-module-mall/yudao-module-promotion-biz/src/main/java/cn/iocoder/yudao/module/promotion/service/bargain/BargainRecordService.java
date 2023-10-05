@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.promotion.service.bargain;
 
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.api.bargain.dto.BargainValidateJoinRespDTO;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.recrod.BargainRecordPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.bargain.vo.record.AppBargainRecordCreateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainRecordDO;
 
@@ -67,5 +69,13 @@ public interface BargainRecordService {
      * @return 砍价人数 Map
      */
     Map<Long, Integer> getBargainRecordUserCountMap(Collection<Long> activityIds, @Nullable Integer status);
+
+    /**
+     * 获得砍价记录分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 砍价记录分页
+     */
+    PageResult<BargainRecordDO> getBargainRecordPage(BargainRecordPageReqVO pageReqVO);
 
 }

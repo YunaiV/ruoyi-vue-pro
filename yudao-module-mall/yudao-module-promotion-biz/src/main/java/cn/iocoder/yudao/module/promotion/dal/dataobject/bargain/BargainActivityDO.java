@@ -82,7 +82,7 @@ public class BargainActivityDO extends BaseDO {
      *
      * 需要多少人，砍价才能成功，即 {@link BargainRecordDO#getStatus()} 更新为 {@link BargainRecordDO#getStatus()} 成功状态
      */
-    private Integer userSize;
+    private Integer helpMaxCount;
     /**
      * 帮砍次数
      *

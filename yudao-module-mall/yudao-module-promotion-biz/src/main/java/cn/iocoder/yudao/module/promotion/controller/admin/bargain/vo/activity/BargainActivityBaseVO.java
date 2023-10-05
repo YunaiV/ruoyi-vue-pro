@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo;
+package cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -56,9 +56,9 @@ public class BargainActivityBaseVO {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime endTime;
 
-    @Schema(description = "砍价人数", requiredMode = Schema.RequiredMode.REQUIRED, example = "25222")
-    @NotNull(message = "砍价人数不能为空")
-    private Integer userSize;
+    @Schema(description = "最大助力次数", requiredMode = Schema.RequiredMode.REQUIRED, example = "25222")
+    @NotNull(message = "最大助力次数不能为空")
+    private Integer helpMaxCount;
 
     @Schema(description = "最大帮砍次数", requiredMode = Schema.RequiredMode.REQUIRED, example = "25222")
     @NotNull(message = "最大帮砍次数不能为空")

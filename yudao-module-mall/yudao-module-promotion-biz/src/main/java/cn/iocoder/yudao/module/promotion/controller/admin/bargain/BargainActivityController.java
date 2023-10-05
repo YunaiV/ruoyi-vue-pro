@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
-import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.*;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.*;
 import cn.iocoder.yudao.module.promotion.convert.bargain.BargainActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityDO;
 import cn.iocoder.yudao.module.promotion.enums.bargain.BargainRecordStatusEnum;
@@ -94,7 +94,7 @@ public class BargainActivityController {
         Map<Long, Integer> recordUserCountMap = bargainRecordService.getBargainRecordUserCountMap(activityIds, null);
         Map<Long, Integer> recordSuccessUserCountMap = bargainRecordService.getBargainRecordUserCountMap(activityIds,
                 BargainRecordStatusEnum.SUCCESS.getStatus());
-        Map<Long, Integer> helpUserCountMap = bargainHelpService.getBargainHelpUserCountMap(activityIds);
+        Map<Long, Integer> helpUserCountMap = bargainHelpService.getBargainHelpUserCountMapByActivity(activityIds);
         return success(BargainActivityConvert.INSTANCE.convertPage(pageResult, spuList,
                 recordUserCountMap, recordSuccessUserCountMap, helpUserCountMap));
     }

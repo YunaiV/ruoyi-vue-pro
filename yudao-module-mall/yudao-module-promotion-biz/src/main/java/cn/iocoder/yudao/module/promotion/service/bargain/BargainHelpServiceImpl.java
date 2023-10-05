@@ -81,7 +81,7 @@ public class BargainHelpServiceImpl implements BargainHelpService {
 
         // 5. 判断砍价记录是否完成
         Boolean success = record.getBargainPrice() - reducePrice <= activity.getBargainMinPrice() // 情况一：砍价已经砍到最低价
-                || bargainHelpMapper.selectCountByRecordId(reqVO.getRecordId()) >= activity.getTotalLimitCount(); // 情况二：砍价助力已经达到上限
+                || bargainHelpMapper.selectCountByRecordId(reqVO.getRecordId()) >= activity.getHelpMaxCount(); // 情况二：砍价助力已经达到上限
         if (!bargainRecordService.updateBargainRecordBargainPrice(
                 record.getId(), record.getBargainPrice(), reducePrice, success)) {
             // 多人一起砍价，需要重试
@@ -103,8 +103,13 @@ public class BargainHelpServiceImpl implements BargainHelpService {
     }
 
     @Override
-    public Map<Long, Integer> getBargainHelpUserCountMap(Collection<Long> activityIds) {
+    public Map<Long, Integer> getBargainHelpUserCountMapByActivity(Collection<Long> activityIds) {
         return bargainHelpMapper.selectCountByActivityId(activityIds);
+    }
+
+    @Override
+    public Map<Long, Integer> getBargainHelpUserCountMapByRecord(Collection<Long> recordIds) {
+        return bargainHelpMapper.selectCountByRecordId(recordIds);
     }
 
 }

@@ -23,11 +23,19 @@ public interface BargainHelpService {
     BargainHelpDO createBargainHelp(Long userId, AppBargainHelpCreateReqVO reqVO);
 
     /**
-     * 获得助力人数 Map
+     * 【砍价活动】获得助力人数 Map
      *
      * @param activityIds 活动编号
      * @return 助力人数 Map
      */
-    Map<Long, Integer> getBargainHelpUserCountMap(Collection<Long> activityIds);
+    Map<Long, Integer> getBargainHelpUserCountMapByActivity(Collection<Long> activityIds);
+
+    /**
+     * 【砍价记录】获得助力人数 Map
+     *
+     * @param recordIds 记录编号
+     * @return 助力人数 Map
+     */
+    Map<Long, Integer> getBargainHelpUserCountMapByRecord(Collection<Long> recordIds);
 
 }
