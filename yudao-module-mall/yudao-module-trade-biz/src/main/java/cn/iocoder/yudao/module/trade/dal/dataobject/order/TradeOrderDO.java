@@ -312,7 +312,7 @@ public class TradeOrderDO extends BaseDO {
     private Long bargainRecordId;
 
     /**
-     * 拼团活动编号 TODO puhui999：价格计算后设置
+     * 拼团活动编号
      *
      * 关联 CombinationActivityDO 的 id 字段
      */
@@ -322,6 +322,6 @@ public class TradeOrderDO extends BaseDO {
      *
      * 关联 CombinationRecordDO 的 id 字段
      */
-    private Long combinationRecordHeadId;
+    private Long combinationHeadId;
 
 }

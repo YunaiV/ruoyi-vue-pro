@@ -271,7 +271,7 @@ public interface TradeOrderConvert {
             @Mapping(target = "count", source = "item.count"),
             @Mapping(target = "orderId", source = "order.id"),
             @Mapping(target = "userId", source = "order.userId"),
-            @Mapping(target = "headId", source = "order.combinationRecordHeadId"),
+            @Mapping(target = "headId", source = "order.combinationHeadId"),
             @Mapping(target = "combinationPrice", source = "item.payPrice"),
     })
     CombinationRecordCreateReqDTO convert(TradeOrderDO order, TradeOrderItemDO item);

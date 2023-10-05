@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
-import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityUpdateReqVO;
@@ -107,8 +106,6 @@ public interface CombinationActivityConvert {
                 .setSpuName(spu.getName())
                 .setPicUrl(sku.getPicUrl());
     }
-
-    List<CombinationRecordRespDTO> convert(List<CombinationRecordDO> bean);
 
     List<AppCombinationActivityRespVO> convertAppList(List<CombinationActivityDO> list);
 

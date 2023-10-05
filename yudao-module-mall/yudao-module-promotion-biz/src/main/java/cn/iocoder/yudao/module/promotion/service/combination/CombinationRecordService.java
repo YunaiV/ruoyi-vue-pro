@@ -1,6 +1,10 @@
 package cn.iocoder.yudao.module.promotion.service.combination;
 
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationValidateJoinRespDTO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
 
 import java.time.LocalDateTime;
@@ -30,8 +34,9 @@ public interface CombinationRecordService {
      * @param userId     用户编号
      * @param skuId      sku 编号
      * @param count      数量
+     * @return 返回拼团活动和拼团活动商品
      */
-    void validateCombinationRecord(Long activityId, Long userId, Long skuId, Integer count);
+    KeyValue<CombinationActivityDO, CombinationProductDO> validateCombinationRecord(Long activityId, Long userId, Long skuId, Integer count);
 
     /**
      * 创建拼团记录
@@ -67,5 +72,18 @@ public interface CombinationRecordService {
      * @return 拼团记录列表
      */
     List<CombinationRecordDO> getRecordListByUserIdAndActivityId(Long userId, Long activityId);
+
+    /**
+     * 【下单前】校验是否满足拼团活动条件
+     *
+     * 如果校验失败，则抛出业务异常
+     *
+     * @param activityId 活动编号
+     * @param userId     用户编号
+     * @param skuId      sku 编号
+     * @param count      数量
+     * @return 拼团信息
+     */
+    CombinationValidateJoinRespDTO validateJoinCombination(Long activityId, Long userId, Long skuId, Integer count);
 
 }

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.promotion.service.combination;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
@@ -10,8 +11,10 @@ import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationValidateJoinRespDTO;
 import cn.iocoder.yudao.module.promotion.convert.combination.CombinationActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.combination.CombinationRecordMapper;
 import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
@@ -104,7 +107,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
 
     // TODO @芋艿：在详细预览下；
     @Override
-    public void validateCombinationRecord(Long activityId, Long userId, Long skuId, Integer count) {
+    public KeyValue<CombinationActivityDO, CombinationProductDO> validateCombinationRecord(Long activityId, Long userId, Long skuId, Integer count) {
         // 1.1 校验拼团活动是否存在
         CombinationActivityDO activity = combinationActivityService.validateCombinationActivityExists(activityId);
         // 1.2 校验活动是否开启
@@ -115,10 +118,24 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         if (count > activity.getSingleLimitCount()) {
             throw exception(COMBINATION_RECORD_FAILED_SINGLE_LIMIT_COUNT_EXCEED);
         }
+        // 2.1、校验活动商品是否存在
+        CombinationProductDO product = combinationActivityService.selectByActivityIdAndSkuId(activityId, skuId);
+        if (product == null) {
+            throw exception(COMBINATION_JOIN_ACTIVITY_PRODUCT_NOT_EXISTS);
+        }
+        // 2.2、校验 sku 是否存在
+        ProductSkuRespDTO sku = productSkuApi.getSku(skuId);
+        if (sku == null) {
+            throw exception(COMBINATION_JOIN_ACTIVITY_PRODUCT_NOT_EXISTS);
+        }
+        // 2.3、 校验库存是否充足
+        if (count > sku.getStock()) {
+            throw exception(COMBINATION_ACTIVITY_UPDATE_STOCK_FAIL);
+        }
         // 3、校验是否有拼团记录
         List<CombinationRecordDO> recordList = getRecordListByUserIdAndActivityId(userId, activityId);
         if (CollUtil.isEmpty(recordList)) {
-            return;
+            return new KeyValue<>(activity, product);
         }
         // 4、校验是否超出总限购数量
         Integer sumValue = getSumValue(convertList(recordList, CombinationRecordDO::getCount,
@@ -129,7 +146,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         // 5、校验拼团记录是否存在未支付的订单（如果存在未支付的订单则不允许发起新的拼团）
         CombinationRecordDO record = findFirst(recordList, item -> ObjectUtil.equals(item.getStatus(), null));
         if (record == null) {
-            return;
+            return new KeyValue<>(activity, product);
         }
         // 5.1、查询关联的订单是否已经支付
         // 当前 activityId 已经有未支付的订单，不允许在发起新的；要么支付，要么去掉先；
@@ -138,13 +155,14 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         if (ObjectUtil.equal(orderStatus, TradeOrderStatusEnum.UNPAID.getStatus())) {
             throw exception(COMBINATION_RECORD_FAILED_ORDER_STATUS_UNPAID);
         }
+
+        return new KeyValue<>(activity, product);
     }
 
     // TODO 芋艿：在详细 review 下；
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {
-
         // 1.1、 校验拼团活动
         CombinationActivityDO activity = combinationActivityService.validateCombinationActivityExists(reqDTO.getActivityId());
         // 1.2 校验是否超出单次限购数量
@@ -203,6 +221,15 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     @Override
     public List<CombinationRecordDO> getRecordListByUserIdAndActivityId(Long userId, Long activityId) {
         return recordMapper.selectListByUserIdAndActivityId(userId, activityId);
+    }
+
+    @Override
+    public CombinationValidateJoinRespDTO validateJoinCombination(Long activityId, Long userId, Long skuId, Integer count) {
+        KeyValue<CombinationActivityDO, CombinationProductDO> keyValue = validateCombinationRecord(activityId, userId, skuId, count);
+        return new CombinationValidateJoinRespDTO()
+                .setActivityId(keyValue.getKey().getId())
+                .setName(keyValue.getKey().getName())
+                .setCombinationPrice(keyValue.getValue().getCombinationPrice());
     }
 
     /**
