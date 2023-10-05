@@ -40,4 +40,11 @@ public interface CombinationActivityMapper extends BaseMapperX<CombinationActivi
                 .last("LIMIT " + count));
     }
 
+    default CombinationActivityDO selectOne(Long spuId) {
+        return selectOne(new LambdaQueryWrapperX<CombinationActivityDO>()
+                        .eq(CombinationActivityDO::getSpuId, spuId)
+                        .orderByDesc(CombinationActivityDO::getCreateTime)
+                , false);
+    }
+
 }

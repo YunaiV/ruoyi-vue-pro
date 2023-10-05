@@ -109,4 +109,12 @@ public interface CombinationActivityService {
      */
     CombinationProductDO selectByActivityIdAndSkuId(Long activityId, Long skuId);
 
+    /**
+     * 获取指定 spu 编号的活动
+     *
+     * @param spuId spu 编号
+     * @return 拼团商品
+     */
+    CombinationActivityDO getCombinationActivityBySpuId(Long spuId);
+
 }

@@ -223,4 +223,9 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
                 CombinationProductDO::getSkuId, skuId);
     }
 
+    @Override
+    public CombinationActivityDO getCombinationActivityBySpuId(Long spuId) {
+        return combinationActivityMapper.selectOne(spuId);
+    }
+
 }

@@ -119,4 +119,12 @@ public interface SeckillActivityService {
      */
     SeckillValidateJoinRespDTO validateJoinSeckill(Long activityId, Long skuId, Integer count);
 
+    /**
+     * 获取指定 spu 编号的活动
+     *
+     * @param spuId spu 编号
+     * @return 秒杀商品
+     */
+    SeckillActivityDO getSeckillActivityBySpuId(Long spuId);
+
 }
