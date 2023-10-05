@@ -113,7 +113,7 @@ public interface CombinationActivityService {
      * 获取指定 spu 编号的活动
      *
      * @param spuId spu 编号
-     * @return 拼团商品
+     * @return 拼团活动
      */
     CombinationActivityDO getCombinationActivityBySpuId(Long spuId);
 

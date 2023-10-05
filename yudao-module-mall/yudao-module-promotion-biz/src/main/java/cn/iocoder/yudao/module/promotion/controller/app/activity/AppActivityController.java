@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.promotion.controller.app.activity;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.promotion.controller.app.activity.vo.AppActivityRespVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityDO;
@@ -19,8 +21,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -41,6 +45,26 @@ public class AppActivityController {
     @Operation(summary = "获得单个商品，近期参与的每个活动") // 每种活动，只返回一个
     @Parameter(name = "spuId", description = "商品编号", required = true)
     public CommonResult<List<AppActivityRespVO>> getActivityListBySpuId(@RequestParam("spuId") Long spuId) {
+        return success(getAppActivityRespVOList(spuId));
+    }
+
+    @GetMapping("/list-by-spu-ids")
+    @Operation(summary = "获得多个商品，近期参与的每个活动") // 每种活动，只返回一个；key 为 SPU 编号
+    @Parameter(name = "spuIds", description = "商品编号数组", required = true)
+    public CommonResult<Map<Long, List<AppActivityRespVO>>> getActivityListBySpuIds(@RequestParam("spuIds") List<Long> spuIds) {
+
+        if (CollUtil.isEmpty(spuIds)) {
+            return success(MapUtil.empty());
+        }
+
+        Map<Long, List<AppActivityRespVO>> map = new HashMap<>(spuIds.size());
+        spuIds.forEach(spuId -> {
+            map.put(spuId, getAppActivityRespVOList(spuId));
+        });
+        return success(map);
+    }
+
+    private List<AppActivityRespVO> getAppActivityRespVOList(Long spuId) {
         List<AppActivityRespVO> respList = new ArrayList<>();
         CombinationActivityDO combination = combinationActivityService.getCombinationActivityBySpuId(spuId);
         if (combination != null) {
@@ -69,30 +93,7 @@ public class AppActivityController {
                     .setStartTime(bargain.getStartTime())
                     .setEndTime(bargain.getEndTime()));
         }
-        return success(respList);
-    }
-
-    // TODO @puhui999：可以实现下
-    @GetMapping("/list-by-spu-ids")
-    @Operation(summary = "获得多个商品，近期参与的每个活动") // 每种活动，只返回一个；key 为 SPU 编号
-    @Parameter(name = "spuIds", description = "商品编号数组", required = true)
-    public CommonResult<Map<Long, List<AppActivityRespVO>>> getActivityListBySpuIds(@RequestParam("spuIds") List<Long> spuIds) {
-        // TODO 芋艿，实现
-        List<AppActivityRespVO> randomList = new ArrayList<>();
-        Random random = new Random();
-        for (int i = 0; i < 5; i++) { // 生成5个随机对象
-            AppActivityRespVO vo = new AppActivityRespVO();
-            vo.setId(random.nextLong()); // 随机生成一个长整型 ID
-            vo.setType(random.nextInt(3)); // 随机生成一个介于0到2之间的整数，对应枚举类型的三种类型之一
-            vo.setName(String.format("活动%d", random.nextInt(100))); // 随机生成一个类似于“活动XX”的活动名称，XX为0到99之间的随机整数
-            vo.setStartTime(LocalDateTime.now()); // 随机生成一个在过去的一年内的开始时间（以毫秒为单位）
-            vo.setEndTime(LocalDateTime.now()); // 随机生成一个在未来的一年内的结束时间（以毫秒为单位）
-            randomList.add(vo);
-        }
-        Map<Long, List<AppActivityRespVO>> map = new HashMap<>();
-        map.put(109L, randomList);
-        map.put(2L, randomList);
-        return success(map);
+        return respList;
     }
 
 }

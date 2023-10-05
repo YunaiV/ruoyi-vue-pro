@@ -123,7 +123,7 @@ public interface SeckillActivityService {
      * 获取指定 spu 编号的活动
      *
      * @param spuId spu 编号
-     * @return 秒杀商品
+     * @return 秒杀活动
      */
     SeckillActivityDO getSeckillActivityBySpuId(Long spuId);
 
