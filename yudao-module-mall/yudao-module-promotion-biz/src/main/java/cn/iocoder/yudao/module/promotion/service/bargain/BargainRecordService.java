@@ -56,6 +56,16 @@ public interface BargainRecordService {
     BargainValidateJoinRespDTO validateJoinBargain(Long userId, Long bargainRecordId, Long skuId);
 
     /**
+     * 更新砍价记录的订单编号
+     *
+     * 在砍价成功后，用户发起订单后，会记录该订单编号
+     *
+     * @param id     砍价记录编号
+     * @param orderId 订单编号
+     */
+    void updateBargainRecordOrderId(Long id, Long orderId);
+
+    /**
      * 获得砍价记录
      *
      * @param id 砍价记录编号

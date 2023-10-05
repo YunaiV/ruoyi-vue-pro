@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.promotion.api.bargain;
 
-import cn.iocoder.yudao.module.promotion.api.bargain.dto.BargainRecordCreateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.bargain.dto.BargainValidateJoinRespDTO;
 import cn.iocoder.yudao.module.promotion.service.bargain.BargainRecordService;
 import org.springframework.stereotype.Service;
@@ -19,12 +18,13 @@ public class BargainRecordApiImpl implements BargainRecordApi {
     private BargainRecordService bargainRecordService;
 
     @Override
-    public void createBargainRecord(BargainRecordCreateReqDTO reqDTO) {
+    public BargainValidateJoinRespDTO validateJoinBargain(Long userId, Long bargainRecordId, Long skuId) {
+        return bargainRecordService.validateJoinBargain(userId, bargainRecordId, skuId);
     }
 
     @Override
-    public BargainValidateJoinRespDTO validateJoinBargain(Long userId, Long bargainRecordId, Long skuId) {
-        return bargainRecordService.validateJoinBargain(userId, bargainRecordId, skuId);
+    public void updateBargainRecordOrderId(Long id, Long orderId) {
+        bargainRecordService.updateBargainRecordOrderId(id, orderId);
     }
 
 }

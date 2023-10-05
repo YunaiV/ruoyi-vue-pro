@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.trade.service.order.handler;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.module.promotion.api.bargain.BargainActivityApi;
+import cn.iocoder.yudao.module.promotion.api.bargain.BargainRecordApi;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
@@ -20,6 +21,8 @@ public class TradeBargainHandler implements TradeOrderHandler {
 
     @Resource
     private BargainActivityApi bargainActivityApi;
+    @Resource
+    private BargainRecordApi bargainRecordApi;
 
     @Override
     public void beforeOrderCreate(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
@@ -28,7 +31,18 @@ public class TradeBargainHandler implements TradeOrderHandler {
         }
         // 扣减砍价活动的库存
         bargainActivityApi.updateBargainActivityStock(order.getBargainActivityId(),
-                orderItems.get(0).getCount());
+                -orderItems.get(0).getCount());
     }
+
+    @Override
+    public void afterOrderCreate(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
+        if (ObjectUtil.notEqual(TradeOrderTypeEnum.BARGAIN.getType(), order.getType())) {
+            return;
+        }
+        // 记录砍价记录对应的订单编号
+        bargainRecordApi.updateBargainRecordOrderId(order.getBargainRecordId(), order.getId());
+    }
+
+    // TODO 芋艿：取消订单时，需要增加库存
 
 }

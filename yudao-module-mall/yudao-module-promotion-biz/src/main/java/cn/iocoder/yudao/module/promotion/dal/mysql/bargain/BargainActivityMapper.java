@@ -39,6 +39,14 @@ public interface BargainActivityMapper extends BaseMapperX<BargainActivityDO> {
      * @return 影响的行数
      */
     default int updateStock(Long id, int count) {
+        // 情况一：增加库存
+        if (count > 0) {
+            return update(null, new LambdaUpdateWrapper<BargainActivityDO>()
+                    .eq(BargainActivityDO::getId, id)
+                    .setSql("stock = stock + " + count));
+        }
+        // 情况二：扣减库存
+        count = -count; // 取正
         return update(null, new LambdaUpdateWrapper<BargainActivityDO>()
                 .eq(BargainActivityDO::getId, id)
                 .ge(BargainActivityDO::getStock, count)

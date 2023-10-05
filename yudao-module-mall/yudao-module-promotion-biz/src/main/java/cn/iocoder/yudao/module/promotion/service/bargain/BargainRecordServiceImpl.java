@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainRecordDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.bargain.BargainRecordMapper;
 import cn.iocoder.yudao.module.promotion.enums.bargain.BargainRecordStatusEnum;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nullable;
@@ -42,7 +43,7 @@ public class BargainRecordServiceImpl implements BargainRecordService {
 
     @Override
     public Long createBargainRecord(Long userId, AppBargainRecordCreateReqVO reqVO) {
-        // 1. 校验砍价活动
+        // 1. 校验砍价活动（包括库存）
         BargainActivityDO activity = bargainActivityService.validateBargainActivityCanJoin(reqVO.getActivityId());
 
         // 2.1 校验当前是否已经有参与中的砍价活动
@@ -77,21 +78,35 @@ public class BargainRecordServiceImpl implements BargainRecordService {
 
     @Override
     public BargainValidateJoinRespDTO validateJoinBargain(Long userId, Long bargainRecordId, Long skuId) {
-        // 1.1 拼团记录不存在
+        // 1.1 砍价记录不存在
         BargainRecordDO record = bargainRecordMapper.selectByIdAndUserId(bargainRecordId, userId);
         if (record == null) {
             throw exception(BARGAIN_RECORD_NOT_EXISTS);
         }
-        // 1.2 拼团记录未在进行中
-        if (ObjUtil.notEqual(record.getStatus(), BargainRecordStatusEnum.IN_PROGRESS)) {
+        // 1.2 砍价记录未在进行中
+        if (ObjUtil.notEqual(record.getStatus(), BargainRecordStatusEnum.SUCCESS.getStatus())) {
             throw exception(BARGAIN_JOIN_RECORD_NOT_SUCCESS);
         }
+        // 1.3 砍价记录已经下单
+        if (record.getOrderId() != null) {
+            throw exception(BARGAIN_JOIN_RECORD_ALREADY_ORDER);
+        }
 
-        // 2. 校验砍价活动
+        // 2.1 校验砍价活动（包括库存）
         BargainActivityDO activity = bargainActivityService.validateBargainActivityCanJoin(record.getActivityId());
         Assert.isTrue(Objects.equals(skuId, activity.getSkuId()), "砍价商品不匹配"); // 防御性校验
         return new BargainValidateJoinRespDTO().setActivityId(activity.getId()).setName(activity.getName())
                 .setBargainPrice(record.getBargainPrice());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateBargainRecordOrderId(Long id, Long orderId) {
+        // 更新失败，说明已经下单
+        int updateCount = bargainRecordMapper.updateOrderIdById(id, orderId);
+        if (updateCount == 0) {
+            throw exception(BARGAIN_JOIN_RECORD_ALREADY_ORDER);
+        }
     }
 
     @Override
