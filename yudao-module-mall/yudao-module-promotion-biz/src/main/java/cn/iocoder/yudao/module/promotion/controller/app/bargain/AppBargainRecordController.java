@@ -92,40 +92,28 @@ public class AppBargainRecordController {
         // 1. 查询砍价记录 + 砍价活动
         Assert.isTrue(id != null || activityId != null, "砍价记录编号和活动编号不能同时为空");
         BargainRecordDO record = id != null ? bargainRecordService.getBargainRecord(id)
-                : bargainRecordService.getInProgressBargainRecord(getLoginUserId(), activityId);
+                : bargainRecordService.getLastBargainRecord(getLoginUserId(), activityId);
         if (activityId == null || record != null) {
             activityId = record.getActivityId();
         }
         // 2. 查询助力记录
-        Integer helpAction = getHelpAction(record, activityId);
+        Long userId = getLoginUserId();
+        Integer helpAction = getHelpAction(userId, record, activityId);
         // 3. 如果是自己的订单，则查询订单信息
+        TradeOrderRespDTO order = record != null && record.getOrderId() != null && record.getUserId().equals(getLoginUserId())
+                ? tradeOrderApi.getOrder(record.getOrderId()) : null;
         // TODO 继续查询别的字段
 
         // 拼接返回
-        return success(BargainRecordConvert.INSTANCE.convert02(record, helpAction));
-//
-//        AppBargainRecordDetailRespVO detail = new AppBargainRecordDetailRespVO();
-//        detail.setId(1L);
-//        detail.setUserId(1L);
-//        detail.setSpuId(1L);
-//        detail.setSkuId(1L);
-//        detail.setPrice(500);
-//        detail.setActivityId(1L);
-//        detail.setBargainPrice(150);
-//        detail.setPrice(200);
-//        detail.setPayPrice(180);
-//        detail.setStatus(1);
-//        detail.setExpireTime(LocalDateTimeUtils.addTime(Duration.ofDays(2)));
-//        return success(detail);
+        return success(BargainRecordConvert.INSTANCE.convert02(record, helpAction, order));
     }
 
-    private Integer getHelpAction(BargainRecordDO record, Long activityId) {
+    private Integer getHelpAction(Long userId, BargainRecordDO record, Long activityId) {
         // 0.1 如果没有活动，无法帮砍
         if (activityId == null) {
             return null;
         }
         // 0.2 如果是自己的砍价记录，无法帮砍
-        Long userId = getLoginUserId();
         if (record != null && record.getUserId().equals(userId)) {
             return null;
         }
@@ -141,7 +129,7 @@ public class AppBargainRecordController {
             && bargainHelpService.getBargainHelpCountByActivity(activityId, userId) >= activity.getBargainCount()) {
             return AppBargainRecordDetailRespVO.HELP_ACTION_FULL;
         }
-
+        // 3. 允许助力
         return AppBargainRecordDetailRespVO.HELP_ACTION_NONE;
     }
 

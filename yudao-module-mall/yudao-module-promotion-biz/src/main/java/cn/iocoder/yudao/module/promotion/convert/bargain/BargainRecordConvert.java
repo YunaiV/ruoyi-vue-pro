@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityD
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainRecordDO;
 import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderRespDTO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -83,6 +84,9 @@ public interface BargainRecordConvert {
         return summary;
     }
 
-    AppBargainRecordDetailRespVO convert02(BargainRecordDO record, Integer helpAction);
+    @Mapping(source = "record.id", target = "id")
+    @Mapping(source = "record.userId", target = "userId")
+    @Mapping(source = "record.status", target = "status")
+    AppBargainRecordDetailRespVO convert02(BargainRecordDO record, Integer helpAction, TradeOrderRespDTO order);
 
 }

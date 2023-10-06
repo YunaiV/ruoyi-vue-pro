@@ -74,15 +74,13 @@ public interface BargainRecordService {
     BargainRecordDO getBargainRecord(Long id);
 
     /**
-     * 获得用户当前正在【砍价中】+ 指定活动的砍价记录
-     *
-     * 因为一个用户，在一个砍价活动，【砍价中】只存在一条
+     * 获得用户在当前砍价活动中的最后一条砍价记录
      *
      * @param userId 用户编号
      * @param activityId 砍价记录编号
      * @return 砍价记录
      */
-    BargainRecordDO getInProgressBargainRecord(Long userId, Long activityId);
+    BargainRecordDO getLastBargainRecord(Long userId, Long activityId);
 
     /**
      * 获得砍价人数 Map

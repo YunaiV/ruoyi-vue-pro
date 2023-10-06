@@ -42,6 +42,14 @@ public interface BargainRecordMapper extends BaseMapperX<BargainRecordDO> {
                 .eq(BargainRecordDO::getStatus, status));
     }
 
+    default BargainRecordDO selectLastByUserIdAndActivityId(Long userId, Long activityId) {
+        return selectOne(new LambdaQueryWrapper<>(BargainRecordDO.class)
+                .eq(BargainRecordDO::getUserId, userId)
+                .eq(BargainRecordDO::getActivityId, activityId)
+                .orderByDesc(BargainRecordDO::getId)
+                .last("LIMIT 1"));
+    }
+
     default Long selectCountByUserIdAndActivityIdAndStatus(
             Long userId, Long activityId, Integer status) {
         return selectCount(new LambdaQueryWrapper<>(BargainRecordDO.class)
