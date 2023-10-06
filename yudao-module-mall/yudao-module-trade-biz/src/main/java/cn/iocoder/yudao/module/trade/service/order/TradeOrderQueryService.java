@@ -1,14 +1,12 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderSummaryRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressTrackRespDTO;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -95,7 +93,7 @@ public interface TradeOrderQueryService {
     /**
      * 【会员】在指定秒杀活动下，用户购买的商品数量
      *
-     * @param userId 用户编号
+     * @param userId     用户编号
      * @param activityId 活动编号
      * @return 秒杀商品数量
      */
@@ -137,14 +135,5 @@ public interface TradeOrderQueryService {
      * @return 交易订单项数组
      */
     List<TradeOrderItemDO> getOrderItemListByOrderId(Collection<Long> orderIds);
-
-    /**
-     * 获取订单统计
-     *
-     * @param beginTime 起始时间
-     * @param endTime   截止时间
-     * @return 订单统计结果
-     */
-    TradeOrderSummaryRespDTO getOrderSummary(LocalDateTime beginTime, LocalDateTime endTime);
 
 }

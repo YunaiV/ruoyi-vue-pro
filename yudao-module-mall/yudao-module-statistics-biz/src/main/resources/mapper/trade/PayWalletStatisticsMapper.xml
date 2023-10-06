@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.statistics.dal.mysql.trade.PayWalletStatisticsMapper">
+    <select id="selectRechargeSummaryByPayTimeBetween"
+            resultType="cn.iocoder.yudao.module.statistics.service.trade.bo.WalletSummaryRespBO">
+        SELECT COUNT(1)       AS rechargePayCount,
+               SUM(pay_price) AS rechargePayPrice
+        FROM pay_wallet_recharge
+        WHERE pay_status = #{payStatus}
+          AND deleted = FALSE
+          AND pay_time BETWEEN #{beginTime} AND #{endTime}
+    </select>
+
+    <select id="selectRechargeSummaryByRefundTimeBetween"
+            resultType="cn.iocoder.yudao.module.statistics.service.trade.bo.WalletSummaryRespBO">
+        SELECT COUNT(1)       AS rechargeRefundCount,
+               SUM(pay_price) AS rechargeRefundPrice
+        FROM pay_wallet_recharge
+        WHERE refund_status = #{refundStatus}
+          AND deleted = FALSE
+          AND refund_time BETWEEN #{beginTime} AND #{endTime}
+    </select>
+
+    <select id="selectPriceSummaryByBizTypeAndCreateTimeBetween" resultType="java.lang.Integer">
+        SELECT SUM(price)
+        FROM pay_wallet_transaction
+        WHERE biz_type = #{bizType}
+          AND deleted = FALSE
+          AND create_time BETWEEN #{beginTime} AND #{endTime}
+    </select>
+</mapper>

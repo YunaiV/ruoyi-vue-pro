@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.pay.service.wallet;
 
 import cn.hutool.core.lang.Assert;
-import cn.iocoder.yudao.module.pay.api.wallet.dto.WalletSummaryRespDTO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;

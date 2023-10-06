@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.statistics.dal.mysql.trade.TradeOrderStatisticsMapper">
+    <select id="selectSummaryByPayTimeBetween"
+            resultType="cn.iocoder.yudao.module.statistics.service.trade.bo.TradeOrderSummaryRespBO">
+        SELECT COUNT(1)                                                AS orderPayCount,
+               SUM(pay_price)                                          AS orderPayPrice,
+               (SELECT COUNT(1)
+                FROM trade_order
+                WHERE deleted = FALSE
+                  AND create_time BETWEEN #{beginTime} AND #{endTime}) AS orderPayPrice
+        FROM trade_order
+        WHERE deleted = FALSE
+          AND pay_time BETWEEN #{beginTime} AND #{endTime}
+    </select>
+</mapper>

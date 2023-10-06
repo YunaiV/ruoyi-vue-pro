@@ -1,16 +1,12 @@
 package cn.iocoder.yudao.module.trade.dal.mysql.order;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderSummaryRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.github.yulichang.toolkit.MPJWrappers;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDateTime;
@@ -91,19 +87,6 @@ public interface TradeOrderMapper extends BaseMapperX<TradeOrderDO> {
         return selectList(new LambdaUpdateWrapper<>(TradeOrderDO.class)
                 .eq(TradeOrderDO::getUserId, userId)
                 .eq(TradeOrderDO::getSeckillActivityId, seckillActivityId));
-    }
-
-    default TradeOrderSummaryRespDTO selectSummaryByPayTimeBetween(LocalDateTime beginTime, LocalDateTime endTime) {
-        return BeanUtil.copyProperties(CollUtil.get(selectMaps(MPJWrappers.<TradeOrderDO>lambdaJoin()
-                        .selectCount(TradeOrderDO::getId, TradeOrderSummaryRespDTO::getOrderPayCount)
-                        .selectSum(TradeOrderDO::getPayPrice, TradeOrderSummaryRespDTO::getOrderPayPrice)
-                        .between(TradeOrderDO::getPayTime, beginTime, endTime)), 0),
-                TradeOrderSummaryRespDTO.class);
-    }
-
-    default Long selectCountByCreateTimeBetween(LocalDateTime beginTime, LocalDateTime endTime) {
-        return selectCount(new LambdaQueryWrapperX<TradeOrderDO>()
-                .between(TradeOrderDO::getCreateTime, beginTime, endTime));
     }
 
     default TradeOrderDO selectOneByPickUpVerifyCode(String pickUpVerifyCode) {

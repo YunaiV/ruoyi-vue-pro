@@ -2,15 +2,12 @@ package cn.iocoder.yudao.module.trade.service.aftersale;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.trade.api.aftersale.dto.AfterSaleSummaryRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.AfterSaleDisagreeReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.AfterSalePageReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.AfterSaleRefuseReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppAfterSaleCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppAfterSaleDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.AfterSaleDO;
-
-import java.time.LocalDateTime;
 
 /**
  * 售后订单 Service 接口
@@ -126,14 +123,5 @@ public interface AfterSaleService {
      * @return 数量
      */
     Long getApplyingAfterSaleCount(Long userId);
-
-    /**
-     * 获取售后单统计
-     *
-     * @param beginTime 起始时间
-     * @param endTime   截止时间
-     * @return 售后统计结果
-     */
-    AfterSaleSummaryRespDTO getAfterSaleSummary(LocalDateTime beginTime, LocalDateTime endTime);
 
 }

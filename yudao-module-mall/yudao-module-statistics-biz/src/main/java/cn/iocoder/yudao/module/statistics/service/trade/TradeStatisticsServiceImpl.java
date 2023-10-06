@@ -2,8 +2,7 @@ package cn.iocoder.yudao.module.statistics.service.trade;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
-import cn.iocoder.yudao.module.pay.api.wallet.PayWalletApi;
-import cn.iocoder.yudao.module.pay.api.wallet.dto.WalletSummaryRespDTO;
+import cn.iocoder.yudao.module.statistics.service.trade.bo.WalletSummaryRespBO;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeStatisticsComparisonRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeSummaryRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeTrendSummaryRespVO;
@@ -11,11 +10,8 @@ import cn.iocoder.yudao.module.statistics.convert.trade.TradeStatisticsConvert;
 import cn.iocoder.yudao.module.statistics.dal.dataobject.trade.TradeStatisticsDO;
 import cn.iocoder.yudao.module.statistics.dal.mysql.trade.TradeStatisticsMapper;
 import cn.iocoder.yudao.module.statistics.service.trade.bo.TradeSummaryRespBO;
-import cn.iocoder.yudao.module.trade.api.aftersale.TradeAfterSaleApi;
-import cn.iocoder.yudao.module.trade.api.aftersale.dto.AfterSaleSummaryRespDTO;
-import cn.iocoder.yudao.module.trade.api.brokerage.TradeBrokerageApi;
-import cn.iocoder.yudao.module.trade.api.order.TradeOrderApi;
-import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderSummaryRespDTO;
+import cn.iocoder.yudao.module.statistics.service.trade.bo.AfterSaleSummaryRespBO;
+import cn.iocoder.yudao.module.statistics.service.trade.bo.TradeOrderSummaryRespBO;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 import org.springframework.validation.annotation.Validated;
@@ -37,18 +33,14 @@ public class TradeStatisticsServiceImpl implements TradeStatisticsService {
     @Resource
     private TradeStatisticsMapper tradeStatisticsMapper;
 
-    // TODO @疯狂：统计逻辑，自己服务 mapper 去统计，不要调用其它服务 API；
-    // 主要的考虑点，其它服务是在线的业务，统计是离线业务，尽量不占用他们的 db 资源；
-    // 统计服务，从建议使用从库，或者从 mysql 抽取到单独的 clickhouse 或者其它的大数据组件；
-
     @Resource
-    private TradeOrderApi tradeOrderApi;
+    private TradeOrderStatisticsService tradeOrderStatisticsService;
     @Resource
-    private TradeAfterSaleApi tradeAfterSaleApi;
+    private AfterSaleStatisticsService afterSaleStatisticsService;
     @Resource
-    private TradeBrokerageApi tradeBrokerageApi;
+    private BrokerageStatisticsService brokerageStatisticsService;
     @Resource
-    private PayWalletApi payWalletApi;
+    private PayWalletStatisticsService payWalletStatisticsService;
 
     @Override
     public TradeStatisticsComparisonRespVO<TradeSummaryRespVO> getTradeSummaryComparison() {
@@ -90,19 +82,19 @@ public class TradeStatisticsServiceImpl implements TradeStatisticsService {
         // 统计
         StopWatch stopWatch = new StopWatch("交易统计");
         stopWatch.start("统计订单");
-        TradeOrderSummaryRespDTO orderSummary = tradeOrderApi.getOrderSummary(beginTime, endTime);
+        TradeOrderSummaryRespBO orderSummary = tradeOrderStatisticsService.getOrderSummary(beginTime, endTime);
         stopWatch.stop();
 
         stopWatch.start("统计售后");
-        AfterSaleSummaryRespDTO afterSaleSummary = tradeAfterSaleApi.getAfterSaleSummary(beginTime, endTime);
+        AfterSaleSummaryRespBO afterSaleSummary = afterSaleStatisticsService.getAfterSaleSummary(beginTime, endTime);
         stopWatch.stop();
 
         stopWatch.start("统计佣金");
-        Integer brokerageSettlementPrice = tradeBrokerageApi.getBrokerageSettlementPriceSummary(beginTime, endTime);
+        Integer brokerageSettlementPrice = brokerageStatisticsService.getBrokerageSettlementPriceSummary(beginTime, endTime);
         stopWatch.stop();
 
         stopWatch.start("统计充值");
-        WalletSummaryRespDTO walletSummary = payWalletApi.getWalletSummary(beginTime, endTime);
+        WalletSummaryRespBO walletSummary = payWalletStatisticsService.getWalletSummary(beginTime, endTime);
         stopWatch.stop();
         // 插入数据
         TradeStatisticsDO entity = TradeStatisticsConvert.INSTANCE.convert(yesterday, orderSummary, afterSaleSummary, brokerageSettlementPrice, walletSummary);

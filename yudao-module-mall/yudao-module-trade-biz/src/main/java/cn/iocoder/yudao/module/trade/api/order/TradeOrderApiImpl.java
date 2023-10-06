@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.trade.api.order;
 
 import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderRespDTO;
-import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderSummaryRespDTO;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
@@ -9,8 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -41,11 +38,6 @@ public class TradeOrderApiImpl implements TradeOrderApi {
             throw exception(ORDER_NOT_FOUND);
         }
         return order.getStatus();
-    }
-
-    @Override
-    public TradeOrderSummaryRespDTO getOrderSummary(LocalDateTime beginTime, LocalDateTime endTime) {
-        return tradeOrderQueryService.getOrderSummary(beginTime, endTime);
     }
 
 }
