@@ -18,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -115,8 +116,23 @@ public class BargainHelpServiceImpl implements BargainHelpService {
     }
 
     @Override
+    public Long getBargainHelpCountByActivity(Long activityId, Long userId) {
+        return bargainHelpMapper.selectCountByUserIdAndActivityId(userId, activityId);
+    }
+
+    @Override
     public PageResult<BargainHelpDO> getBargainHelpPage(BargainHelpPageReqVO pageReqVO) {
         return bargainHelpMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<BargainHelpDO> getBargainHelpListByRecordId(Long recordId) {
+        return bargainHelpMapper.selectListByRecordId(recordId);
+    }
+
+    @Override
+    public BargainHelpDO getBargainHelp(Long recordId, Long userId) {
+        return bargainHelpMapper.selectByUserIdAndRecordId(userId, recordId);
     }
 
 }

@@ -72,4 +72,9 @@ public interface BargainHelpMapper extends BaseMapperX<BargainHelpDO> {
                 .orderByDesc(BargainHelpDO::getId));
     }
 
+    default List<BargainHelpDO> selectListByRecordId(Long recordId) {
+        return selectList(new LambdaQueryWrapperX<BargainHelpDO>()
+                .eq(BargainHelpDO::getRecordId, recordId));
+    }
+
 }

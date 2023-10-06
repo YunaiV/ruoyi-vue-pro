@@ -101,7 +101,7 @@ public interface CombinationActivityService {
     PageResult<CombinationActivityDO> getCombinationActivityPage(PageParam pageParam);
 
     /**
-     * 获取指定活动指定 sku 编号的商品
+     * 获取指定活动、指定 sku 编号的商品
      *
      * @param activityId 活动编号
      * @param skuId      sku 编号

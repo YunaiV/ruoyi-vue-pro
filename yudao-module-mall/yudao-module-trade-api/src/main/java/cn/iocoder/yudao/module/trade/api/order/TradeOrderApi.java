@@ -22,6 +22,14 @@ public interface TradeOrderApi {
      */
     List<TradeOrderRespDTO> getOrderList(Collection<Long> ids);
 
+    /**
+     * 获得订单
+     *
+     * @param id 订单编号
+     * @return 订单
+     */
+    TradeOrderRespDTO getOrder(Long id);
+
     // TODO 芋艿：看看是不是可以删除掉；
     /**
      * 获取订单状态

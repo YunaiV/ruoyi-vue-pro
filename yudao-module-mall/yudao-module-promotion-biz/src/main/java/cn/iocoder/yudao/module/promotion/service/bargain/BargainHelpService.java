@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.promotion.controller.app.bargain.vo.help.AppBarga
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainHelpDO;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,11 +42,37 @@ public interface BargainHelpService {
     Map<Long, Integer> getBargainHelpUserCountMapByRecord(Collection<Long> recordIds);
 
     /**
+     * 【砍价活动】获得用户的助力次数
+     *
+     * @param activityId 活动编号
+     * @param userId 用户编号
+     * @return 助力次数
+     */
+    Long getBargainHelpCountByActivity(Long activityId, Long userId);
+
+    /**
      * 获得砍价助力分页
      *
      * @param pageReqVO 分页查询
      * @return 砍价助力分页
      */
     PageResult<BargainHelpDO> getBargainHelpPage(BargainHelpPageReqVO pageReqVO);
+
+    /**
+     * 获得指定砍价记录编号，对应的砍价助力列表
+     *
+     * @param recordId 砍价记录编号
+     * @return 砍价助力列表
+     */
+    List<BargainHelpDO> getBargainHelpListByRecordId(Long recordId);
+
+    /**
+     * 获得助力记录
+     *
+     * @param recordId 砍价记录编号
+     * @param userId 用户编号
+     * @return 助力记录
+     */
+    BargainHelpDO getBargainHelp(Long recordId, Long userId);
 
 }

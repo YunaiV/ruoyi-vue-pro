@@ -29,6 +29,11 @@ import java.time.LocalDateTime;
 public class CombinationRecordDO extends BaseDO {
 
     /**
+     * 团长编号 - 团长
+     */
+    public static final Integer HEAD_ID_GROUP = 0;
+
+    /**
      * 编号，主键自增
      */
     @TableId
@@ -84,6 +89,8 @@ public class CombinationRecordDO extends BaseDO {
      * 团长编号
      *
      * 关联 {@link CombinationRecordDO#getId()}
+     *
+     * 如果是团长，则它的值是 {@link #HEAD_ID_GROUP}
      */
     private Long headId;
     /**

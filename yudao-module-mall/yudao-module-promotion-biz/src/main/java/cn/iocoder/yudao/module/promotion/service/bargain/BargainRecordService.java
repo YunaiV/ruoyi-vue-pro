@@ -74,6 +74,15 @@ public interface BargainRecordService {
     BargainRecordDO getBargainRecord(Long id);
 
     /**
+     * 获得用户在当前砍价活动中的最后一条砍价记录
+     *
+     * @param userId 用户编号
+     * @param activityId 砍价记录编号
+     * @return 砍价记录
+     */
+    BargainRecordDO getLastBargainRecord(Long userId, Long activityId);
+
+    /**
      * 获得砍价人数 Map
      *
      * @param activityIds 活动编号
@@ -83,12 +92,21 @@ public interface BargainRecordService {
     Map<Long, Integer> getBargainRecordUserCountMap(Collection<Long> activityIds, @Nullable Integer status);
 
     /**
-     * 获得砍价人数 Map
+     * 获得砍价人数
      *
      * @param status 砍价记录状态
      * @return 砍价人数
      */
     Integer getBargainRecordUserCount(Integer status);
+
+    /**
+     * 获得砍价人数
+     *
+     * @param activityId 砍价活动编号
+     * @param status 砍价记录状态
+     * @return 砍价人数
+     */
+    Integer getBargainRecordUserCount(Long activityId, Integer status);
 
     /**
      * 【管理员】获得砍价记录分页

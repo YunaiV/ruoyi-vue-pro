@@ -61,12 +61,11 @@ public interface BargainActivityConvert {
 
     AppBargainActivityDetailRespVO convert1(BargainActivityDO bean);
 
-    default AppBargainActivityDetailRespVO convert(BargainActivityDO bean, ProductSpuRespDTO spu) {
-        AppBargainActivityDetailRespVO detail = convert1(bean);
+    default AppBargainActivityDetailRespVO convert(BargainActivityDO bean, Integer successUserCount, ProductSpuRespDTO spu) {
+        AppBargainActivityDetailRespVO detail = convert1(bean).setSuccessUserCount(successUserCount);
         if (spu != null) {
-            detail.setPicUrl(spu.getPicUrl());
-            detail.setMarketPrice(spu.getMarketPrice());
-            detail.setUnitName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.PRODUCT_UNIT, spu.getUnit()));
+            detail.setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice())
+                    .setUnitName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.PRODUCT_UNIT, spu.getUnit()));
         }
         return detail;
     }

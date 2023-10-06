@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityPageItemRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.product.CombinationProductBaseVO;
@@ -54,19 +55,27 @@ public interface CombinationActivityConvert {
 
     List<CombinationActivityRespVO> convertList(List<CombinationActivityDO> list);
 
-    PageResult<CombinationActivityRespVO> convertPage(PageResult<CombinationActivityDO> page);
 
-    default PageResult<CombinationActivityRespVO> convertPage(PageResult<CombinationActivityDO> page,
-                                                              List<CombinationProductDO> productList,
-                                                              List<ProductSpuRespDTO> spuList) {
+    default PageResult<CombinationActivityPageItemRespVO> convertPage(PageResult<CombinationActivityDO> page,
+                                                                      List<CombinationProductDO> productList,
+                                                                      Map<Long, Integer> groupCountMap,
+                                                                      Map<Long, Integer> groupSuccessCountMap,
+                                                                      Map<Long, Integer> recordCountMap,
+                                                                      List<ProductSpuRespDTO> spuList) {
+        PageResult<CombinationActivityPageItemRespVO> pageResult = convertPage(page);
         Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
-        PageResult<CombinationActivityRespVO> pageResult = convertPage(page);
         pageResult.getList().forEach(item -> {
-            MapUtils.findAndThen(spuMap, item.getSpuId(), spu -> item.setSpuName(spu.getName()).setPicUrl(spu.getPicUrl()));
+            MapUtils.findAndThen(spuMap, item.getSpuId(), spu -> item.setSpuName(spu.getName()).setPicUrl(spu.getPicUrl())
+                    .setMarketPrice(spu.getMarketPrice()));
             item.setProducts(convertList2(productList));
+            // 设置统计字段
+            item.setGroupCount(groupCountMap.getOrDefault(item.getId(), 0))
+                    .setGroupSuccessCount(groupSuccessCountMap.getOrDefault(item.getId(), 0))
+                    .setRecordCount(recordCountMap.getOrDefault(item.getId(), 0));
         });
         return pageResult;
     }
+    PageResult<CombinationActivityPageItemRespVO> convertPage(PageResult<CombinationActivityDO> page);
 
     List<CombinationProductRespVO> convertList2(List<CombinationProductDO> productDOs);
 

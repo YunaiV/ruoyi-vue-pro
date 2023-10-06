@@ -65,13 +65,11 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
 
         // 插入拼团活动
         CombinationActivityDO activity = CombinationActivityConvert.INSTANCE.convert(createReqVO)
-                .setStatus(CommonStatusEnum.ENABLE.getStatus())
-                .setTotalCount(0).setSuccessCount(0).setOrderUserCount(0).setVirtualGroup(0);
+                .setStatus(CommonStatusEnum.ENABLE.getStatus());
         combinationActivityMapper.insert(activity);
         // 插入商品
         List<CombinationProductDO> products = CombinationActivityConvert.INSTANCE.convertList(createReqVO.getProducts(), activity);
         combinationProductMapper.insertBatch(products);
-        // 返回
         return activity.getId();
     }
 

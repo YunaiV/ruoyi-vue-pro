@@ -115,6 +115,11 @@ public class BargainRecordServiceImpl implements BargainRecordService {
     }
 
     @Override
+    public BargainRecordDO getLastBargainRecord(Long userId, Long activityId) {
+        return bargainRecordMapper.selectLastByUserIdAndActivityId(userId, activityId);
+    }
+
+    @Override
     public Map<Long, Integer> getBargainRecordUserCountMap(Collection<Long> activityIds, @Nullable Integer status) {
         return bargainRecordMapper.selectUserCountByActivityIdsAndStatus(activityIds, status);
     }
@@ -122,6 +127,11 @@ public class BargainRecordServiceImpl implements BargainRecordService {
     @Override
     public Integer getBargainRecordUserCount(Integer status) {
         return bargainRecordMapper.selectUserCountByStatus(status);
+    }
+
+    @Override
+    public Integer getBargainRecordUserCount(Long activityId, Integer status) {
+        return bargainRecordMapper.selectUserCountByActivityIdAndStatus(activityId, status);
     }
 
     @Override

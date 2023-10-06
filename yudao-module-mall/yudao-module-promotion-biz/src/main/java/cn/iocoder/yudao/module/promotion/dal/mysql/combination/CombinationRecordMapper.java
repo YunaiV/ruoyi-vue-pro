@@ -1,16 +1,23 @@
 package cn.iocoder.yudao.module.promotion.dal.mysql.combination;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPageVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 拼团记录 Mapper
@@ -93,6 +100,24 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
                 .eq(CombinationRecordDO::getHeadId, null) // TODO 团长的 headId 是不是 null 还是自己的记录编号来着？
                 .orderByDesc(CombinationRecordDO::getCreateTime)
                 .last("LIMIT " + count));
+    }
+
+    default Map<Long, Integer> selectCombinationRecordCountMapByActivityIdAndStatusAndHeadId(Collection<Long> activityIds,
+                                                                                             Integer status, Integer headId) {
+        // SQL count 查询
+        List<Map<String, Object>> result = selectMaps(new QueryWrapper<CombinationRecordDO>()
+                .select("COUNT(DISTINCT(user_id)) AS recordCount, activity_id AS activityId")
+                .in("activity_id", activityIds)
+                .eq(status != null, "status", status)
+                .eq(headId != null, "head_id", headId)
+                .groupBy("activity_id"));
+        if (CollUtil.isEmpty(result)) {
+            return Collections.emptyMap();
+        }
+        // 转换数据
+        return CollectionUtils.convertMap(result,
+                record -> MapUtil.getLong(record, "activityId"),
+                record -> MapUtil.getInt(record, "recordCount" ));
     }
 
     static LocalDateTime[] builderQueryTime(Integer dateType) {

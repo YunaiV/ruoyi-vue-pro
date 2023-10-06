@@ -15,8 +15,7 @@ public class CombinationActivityPageReqVO extends PageParam {
     @Schema(description = "拼团名称", example = "赵六")
     private String name;
 
-    @Schema(description = "活动状态：0开启 1关闭", example = "0")
+    @Schema(description = "活动状态", example = "0")
     private Integer status;
-
 
 }

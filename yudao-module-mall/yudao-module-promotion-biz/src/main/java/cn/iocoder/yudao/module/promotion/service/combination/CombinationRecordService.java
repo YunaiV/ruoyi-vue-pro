@@ -9,9 +9,13 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationA
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
 
+import javax.annotation.Nullable;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
+// todo @PUHUI：方法名，还是带下 Combination 哈
 /**
  * 拼团记录 Service 接口
  *
@@ -158,5 +162,17 @@ public interface CombinationRecordService {
      * @return 拼团记录分页数据
      */
     PageResult<CombinationRecordDO> getBargainRecordPage(CombinationRecordReqPageVO pageVO);
+
+    /**
+     * 【拼团活动】获得拼团记录数量 Map
+     *
+     * @param activityIds 活动记录编号数组
+     * @param status     拼团状态，允许空
+     * @param headId    团长编号，允许空。目的 headId 设置为 {@link CombinationRecordDO#HEAD_ID_GROUP} 时，可以设置
+     * @return 拼团记录数量 Map
+     */
+    Map<Long, Integer> getCombinationRecordCountMapByActivity(Collection<Long> activityIds,
+                                                              @Nullable Integer status,
+                                                              @Nullable Integer headId);
 
 }

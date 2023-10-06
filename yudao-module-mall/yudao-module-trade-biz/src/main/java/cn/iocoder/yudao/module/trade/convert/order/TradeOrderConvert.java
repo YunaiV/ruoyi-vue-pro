@@ -39,6 +39,7 @@ import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
+import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 import java.util.ArrayList;
@@ -262,6 +263,7 @@ public interface TradeOrderConvert {
         return bo;
     }
 
+    @Named("convertList04")
     List<TradeOrderRespDTO> convertList04(List<TradeOrderDO> list);
 
     @Mappings({
