@@ -2,13 +2,18 @@ package cn.iocoder.yudao.module.promotion.dal.mysql.combination;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPageVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -25,10 +30,6 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
     default CombinationRecordDO selectByUserIdAndOrderId(Long userId, Long orderId) {
         return selectOne(CombinationRecordDO::getUserId, userId,
                 CombinationRecordDO::getOrderId, orderId);
-    }
-
-    default List<CombinationRecordDO> selectListByUserId(Long userId) {
-        return selectList(CombinationRecordDO::getUserId, userId);
     }
 
     default List<CombinationRecordDO> selectListByUserIdAndStatus(Long userId, Integer status) {
@@ -113,6 +114,62 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
         return CollectionUtils.convertMap(result,
                 record -> MapUtil.getLong(record, "activityId"),
                 record -> MapUtil.getInt(record, "recordCount" ));
+    }
+
+    static LocalDateTime[] builderQueryTime(Integer dateType) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime[] createTime = null; // 全部时间段
+        // 今天-一天开始到结束
+        if (ObjectUtil.equal(dateType, CombinationRecordReqPageVO.TO_DAY)) {
+            createTime = new LocalDateTime[]{now.toLocalDate().atStartOfDay(), now.toLocalDate().atTime(LocalTime.MAX)};
+        }
+        // 昨天-昨天开始和结束
+        if (ObjectUtil.equal(dateType, CombinationRecordReqPageVO.YESTERDAY)) {
+            createTime = new LocalDateTime[]{now.minusDays(1).toLocalDate().atStartOfDay(),
+                    now.minusDays(1).toLocalDate().atTime(LocalTime.MAX)};
+        }
+        // 最近七天
+        if (ObjectUtil.equal(dateType, CombinationRecordReqPageVO.LAST_SEVEN_DAYS)) {
+            createTime = new LocalDateTime[]{now.minusDays(7).toLocalDate().atStartOfDay(),
+                    now.toLocalDate().atTime(LocalTime.MAX)};
+        }
+        // 最近 30 天
+        if (ObjectUtil.equal(dateType, CombinationRecordReqPageVO.LAST_30_DAYS)) {
+            createTime = new LocalDateTime[]{now.minusDays(30).toLocalDate().atStartOfDay(),
+                    now.toLocalDate().atTime(LocalTime.MAX)};
+        }
+        // 本月
+        if (ObjectUtil.equal(dateType, CombinationRecordReqPageVO.THIS_MONTH)) {
+            // 获取本月的开始时间
+            LocalDateTime startTime = now.withDayOfMonth(1).toLocalDate().atStartOfDay();
+            // 获取下个月的开始时间，然后减去一秒以获取本月的结束时间
+            LocalDateTime endTime = now.withDayOfMonth(1).plusMonths(1).toLocalDate().atStartOfDay().minusSeconds(1);
+            createTime = new LocalDateTime[]{startTime, endTime};
+        }
+        // 本年
+        if (ObjectUtil.equal(dateType, CombinationRecordReqPageVO.THIS_YEAR)) {
+            // 获取本年的开始时间
+            LocalDateTime startTime = now.withDayOfYear(1).toLocalDate().atStartOfDay();
+            // 获取下一年的开始时间，然后减去一秒以获取本年的结束时间
+            LocalDateTime endTime = now.withDayOfYear(1).plusYears(1).toLocalDate().atStartOfDay().minusSeconds(1);
+            createTime = new LocalDateTime[]{startTime, endTime};
+        }
+        return createTime;
+    }
+
+    default PageResult<CombinationRecordDO> selectPage(CombinationRecordReqPageVO pageVO) {
+        // 兼容自选时间段
+        if (pageVO.getDateType() != null) {
+            pageVO.setCreateTime(builderQueryTime(pageVO.getDateType()));
+        }
+        return selectPage(pageVO, new LambdaQueryWrapperX<CombinationRecordDO>()
+                .eqIfPresent(CombinationRecordDO::getStatus, pageVO.getStatus())
+                .betweenIfPresent(CombinationRecordDO::getCreateTime, pageVO.getCreateTime()));
+    }
+
+    default Long selectCount(Integer dateType) {
+        return selectCount(new LambdaQueryWrapperX<CombinationRecordDO>()
+                .betweenIfPresent(CombinationRecordDO::getCreateTime, builderQueryTime(dateType)));
     }
 
 }

@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.promotion.service.combination;
 
 import cn.iocoder.yudao.framework.common.core.KeyValue;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationValidateJoinRespDTO;
+import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPageVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
@@ -13,7 +15,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-// todo @PUHUI：方法名，还是带下 Combination 哈
 /**
  * 拼团记录 Service 接口
  *
@@ -60,11 +61,11 @@ public interface CombinationRecordService {
     void updateRecordStatusAndStartTimeByUserIdAndOrderId(Integer status, Long userId, Long orderId, LocalDateTime startTime);
 
     /**
-     * 获得拼团状态
+     * 获得拼团记录
      *
      * @param userId  用户编号
      * @param orderId 订单编号
-     * @return 拼团状态
+     * @return 拼团记录
      */
     CombinationRecordDO getCombinationRecord(Long userId, Long orderId);
 
@@ -75,7 +76,7 @@ public interface CombinationRecordService {
      * @param activityId 活动 id
      * @return 拼团记录列表
      */
-    List<CombinationRecordDO> getRecordListByUserIdAndActivityId(Long userId, Long activityId);
+    List<CombinationRecordDO> getCombinationRecordListByUserIdAndActivityId(Long userId, Long activityId);
 
     /**
      * 【下单前】校验是否满足拼团活动条件
@@ -95,7 +96,29 @@ public interface CombinationRecordService {
      *
      * @return 记录数
      */
-    Long getRecordsCount();
+    Long getCombinationRecordsCount();
+
+    /**
+     * 获取成功记录数
+     *
+     * @return 记录数
+     */
+    Long getCombinationRecordsSuccessCount();
+
+    /**
+     * 获取虚拟成团记录数
+     *
+     * @return 记录数
+     */
+    Long getRecordsVirtualGroupCount();
+
+    /**
+     * 获取指定日期类型的记录数，比如说获取最近七天的拼团记录数
+     *
+     * @param dateType 日期类型
+     * @return 记录数
+     */
+    Long getCombinationRecordsCountByDateType(Integer dateType);
 
     /**
      * 获取最近的 count 条拼团记录
@@ -103,7 +126,7 @@ public interface CombinationRecordService {
      * @param count 限制数量
      * @return 拼团记录列表
      */
-    List<CombinationRecordDO> getLatestRecordList(int count);
+    List<CombinationRecordDO> getLatestCombinationRecordList(int count);
 
     /**
      * 获得最近 n 条拼团记录（团长发起的）
@@ -113,7 +136,7 @@ public interface CombinationRecordService {
      * @param count      数量
      * @return 拼团记录列表
      */
-    List<CombinationRecordDO> getRecordListWithHead(Long activityId, Integer status, Integer count);
+    List<CombinationRecordDO> getCombinationRecordListWithHead(Long activityId, Integer status, Integer count);
 
     /**
      * 获取指定编号的拼团记录
@@ -121,7 +144,7 @@ public interface CombinationRecordService {
      * @param id 拼团记录编号
      * @return 拼团记录
      */
-    CombinationRecordDO getRecordById(Long id);
+    CombinationRecordDO getCombinationRecordById(Long id);
 
     /**
      * 获取指定团长编号的拼团记录
@@ -129,7 +152,15 @@ public interface CombinationRecordService {
      * @param headId 团长编号
      * @return 拼团记录列表
      */
-    List<CombinationRecordDO> getRecordListByHeadId(Long headId);
+    List<CombinationRecordDO> getCombinationRecordListByHeadId(Long headId);
+
+    /**
+     * 获取拼团记录分页数据
+     *
+     * @param pageVO 分页请求
+     * @return 拼团记录分页数据
+     */
+    PageResult<CombinationRecordDO> getCombinationRecordPage(CombinationRecordReqPageVO pageVO);
 
     /**
      * 【拼团活动】获得拼团记录数量 Map

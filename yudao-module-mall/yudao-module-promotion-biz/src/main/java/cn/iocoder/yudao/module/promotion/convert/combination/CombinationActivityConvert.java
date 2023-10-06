@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activit
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.product.CombinationProductBaseVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.product.CombinationProductRespVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.activity.AppCombinationActivityDetailRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.activity.AppCombinationActivityRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordRespVO;
@@ -154,5 +155,7 @@ public interface CombinationActivityConvert {
     List<AppCombinationRecordRespVO> convertList3(List<CombinationRecordDO> records);
 
     AppCombinationRecordRespVO convert(CombinationRecordDO record);
+
+    PageResult<CombinationRecordRespVO> convert(PageResult<CombinationRecordDO> result);
 
 }
