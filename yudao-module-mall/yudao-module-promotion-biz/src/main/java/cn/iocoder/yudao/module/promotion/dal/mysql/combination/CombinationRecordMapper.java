@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.promotion.dal.mysql.combination;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPageVO;
@@ -30,10 +30,6 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
     default CombinationRecordDO selectByUserIdAndOrderId(Long userId, Long orderId) {
         return selectOne(CombinationRecordDO::getUserId, userId,
                 CombinationRecordDO::getOrderId, orderId);
-    }
-
-    default List<CombinationRecordDO> selectListByUserId(Long userId) {
-        return selectList(CombinationRecordDO::getUserId, userId);
     }
 
     default List<CombinationRecordDO> selectListByUserIdAndStatus(Long userId, Integer status) {

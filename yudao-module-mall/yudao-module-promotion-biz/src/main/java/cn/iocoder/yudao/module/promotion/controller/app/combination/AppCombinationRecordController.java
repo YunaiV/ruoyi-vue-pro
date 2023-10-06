@@ -42,7 +42,7 @@ public class AppCombinationRecordController {
     // TODO 芋艿：增加 @Cache 缓存，1 分钟过期
     public CommonResult<AppCombinationRecordSummaryRespVO> getCombinationRecordSummary() {
         // 获取所有拼团记录
-        Long count = combinationRecordService.getRecordsCount();
+        Long count = combinationRecordService.getCombinationRecordsCount();
         AppCombinationRecordSummaryRespVO summary = new AppCombinationRecordSummaryRespVO();
         if (count == null || count == 0L) {
             summary.setAvatars(Collections.emptyList());
@@ -53,7 +53,7 @@ public class AppCombinationRecordController {
         summary.setUserCount(count);
         // TODO 只返回最近的 7 个
         int num = 7;
-        summary.setAvatars(convertList(combinationRecordService.getLatestRecordList(num), CombinationRecordDO::getAvatar));
+        summary.setAvatars(convertList(combinationRecordService.getLatestCombinationRecordList(num), CombinationRecordDO::getAvatar));
         return success(summary);
     }
 
@@ -69,7 +69,7 @@ public class AppCombinationRecordController {
             @RequestParam("status") Integer status,
             @RequestParam(value = "count", defaultValue = "20") @Max(20) Integer count) {
         return success(CombinationActivityConvert.INSTANCE.convertList3(
-                combinationRecordService.getRecordListWithHead(activityId, status, count)));
+                combinationRecordService.getCombinationRecordListWithHead(activityId, status, count)));
     }
 
     @GetMapping("/get-detail")
@@ -77,7 +77,7 @@ public class AppCombinationRecordController {
     @Parameter(name = "id", description = "拼团记录编号", required = true, example = "1024")
     public CommonResult<AppCombinationRecordDetailRespVO> getCombinationRecordDetail(@RequestParam("id") Long id) {
         // 1、查询这条记录
-        CombinationRecordDO record = combinationRecordService.getRecordById(id);
+        CombinationRecordDO record = combinationRecordService.getCombinationRecordById(id);
         if (record == null) {
             return success(null);
         }
@@ -88,17 +88,17 @@ public class AppCombinationRecordController {
         if (record.getHeadId() == null) {
             detail.setHeadRecord(CombinationActivityConvert.INSTANCE.convert(record));
             // 2.1、查找团员拼团记录
-            records = combinationRecordService.getRecordListByHeadId(record.getId());
+            records = combinationRecordService.getCombinationRecordListByHeadId(record.getId());
         } else {
             // 2.2、查找团长拼团记录
-            CombinationRecordDO headRecord = combinationRecordService.getRecordById(record.getHeadId());
+            CombinationRecordDO headRecord = combinationRecordService.getCombinationRecordById(record.getHeadId());
             if (headRecord == null) {
                 return success(null);
             }
 
             detail.setHeadRecord(CombinationActivityConvert.INSTANCE.convert(headRecord));
             // 2.3、查找团员拼团记录
-            records = combinationRecordService.getRecordListByHeadId(headRecord.getId());
+            records = combinationRecordService.getCombinationRecordListByHeadId(headRecord.getId());
 
         }
         detail.setMemberRecords(CombinationActivityConvert.INSTANCE.convertList3(records));

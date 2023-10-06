@@ -51,7 +51,7 @@ public class CombinationRecordController {
     @PreAuthorize("@ss.hasPermission('promotion:combination-record:query')")
     public CommonResult<PageResult<CombinationRecordRespVO>> getBargainRecordPage(@Valid CombinationRecordReqPageVO pageVO) {
         return success(CombinationActivityConvert.INSTANCE.convert(
-                combinationRecordService.getBargainRecordPage(pageVO)));
+                combinationRecordService.getCombinationRecordPage(pageVO)));
     }
 
     @GetMapping("/get-summary")
@@ -64,22 +64,22 @@ public class CombinationRecordController {
     @GetMapping("/get-count")
     @Operation(summary = "获得拼团记录分页 tab count")
     @PreAuthorize("@ss.hasPermission('promotion:combination-record:query')")
-    public CommonResult<Map<String, Long>> getSpuCount() {
+    public CommonResult<Map<String, Long>> getCombinationRecordCount() {
         Map<String, Long> hashMap = MapUtil.newHashMap(7);
-        hashMap.put("all", combinationRecordService.getRecordsCountByDateType(CombinationRecordReqPageVO.ALL));// 全部
-        hashMap.put("toDay", combinationRecordService.getRecordsCountByDateType(CombinationRecordReqPageVO.TO_DAY));// 今天
-        hashMap.put("yesterday", combinationRecordService.getRecordsCountByDateType(CombinationRecordReqPageVO.YESTERDAY));// 昨天
-        hashMap.put("lastSevenDays", combinationRecordService.getRecordsCountByDateType(CombinationRecordReqPageVO.LAST_SEVEN_DAYS));// 最近七天
-        hashMap.put("last30Days", combinationRecordService.getRecordsCountByDateType(CombinationRecordReqPageVO.LAST_30_DAYS));// 最近 30 天
-        hashMap.put("thisMonth", combinationRecordService.getRecordsCountByDateType(CombinationRecordReqPageVO.THIS_MONTH));// 本月
-        hashMap.put("thisYear", combinationRecordService.getRecordsCountByDateType(CombinationRecordReqPageVO.THIS_YEAR));// 本年
+        hashMap.put("all", combinationRecordService.getCombinationRecordsCountByDateType(CombinationRecordReqPageVO.ALL));// 全部
+        hashMap.put("toDay", combinationRecordService.getCombinationRecordsCountByDateType(CombinationRecordReqPageVO.TO_DAY));// 今天
+        hashMap.put("yesterday", combinationRecordService.getCombinationRecordsCountByDateType(CombinationRecordReqPageVO.YESTERDAY));// 昨天
+        hashMap.put("lastSevenDays", combinationRecordService.getCombinationRecordsCountByDateType(CombinationRecordReqPageVO.LAST_SEVEN_DAYS));// 最近七天
+        hashMap.put("last30Days", combinationRecordService.getCombinationRecordsCountByDateType(CombinationRecordReqPageVO.LAST_30_DAYS));// 最近 30 天
+        hashMap.put("thisMonth", combinationRecordService.getCombinationRecordsCountByDateType(CombinationRecordReqPageVO.THIS_MONTH));// 本月
+        hashMap.put("thisYear", combinationRecordService.getCombinationRecordsCountByDateType(CombinationRecordReqPageVO.THIS_YEAR));// 本年
         return success(hashMap);
     }
 
     private Map<String, Long> getCombinationRecordSummary0() {
         Map<String, Long> hashMap = MapUtil.newHashMap(3);
-        hashMap.put("userCount", combinationRecordService.getRecordsCount());// 获取所有拼团记录
-        hashMap.put("successCount", combinationRecordService.getRecordsSuccessCount());// 获取成团记录
+        hashMap.put("userCount", combinationRecordService.getCombinationRecordsCount());// 获取所有拼团记录
+        hashMap.put("successCount", combinationRecordService.getCombinationRecordsSuccessCount());// 获取成团记录
         hashMap.put("virtualGroupCount", combinationRecordService.getRecordsVirtualGroupCount());// 获取虚拟成团记录
         return hashMap;
     }

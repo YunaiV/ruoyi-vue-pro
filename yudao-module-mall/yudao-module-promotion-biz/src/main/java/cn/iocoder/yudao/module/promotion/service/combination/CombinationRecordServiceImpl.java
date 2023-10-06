@@ -139,7 +139,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
             throw exception(COMBINATION_ACTIVITY_UPDATE_STOCK_FAIL);
         }
         // 3、校验是否有拼团记录
-        List<CombinationRecordDO> recordList = getRecordListByUserIdAndActivityId(userId, activityId);
+        List<CombinationRecordDO> recordList = getCombinationRecordListByUserIdAndActivityId(userId, activityId);
         if (CollUtil.isEmpty(recordList)) {
             return new KeyValue<>(activity, product);
         }
@@ -213,7 +213,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     }
 
     @Override
-    public List<CombinationRecordDO> getRecordListByUserIdAndActivityId(Long userId, Long activityId) {
+    public List<CombinationRecordDO> getCombinationRecordListByUserIdAndActivityId(Long userId, Long activityId) {
         return recordMapper.selectListByUserIdAndActivityId(userId, activityId);
     }
 
@@ -227,12 +227,12 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     }
 
     @Override
-    public Long getRecordsCount() {
+    public Long getCombinationRecordsCount() {
         return recordMapper.selectCount();
     }
 
     @Override
-    public Long getRecordsSuccessCount() {
+    public Long getCombinationRecordsSuccessCount() {
         return recordMapper.selectCount(CombinationRecordDO::getStatus, CombinationRecordStatusEnum.SUCCESS.getStatus());
     }
 
@@ -242,32 +242,32 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     }
 
     @Override
-    public Long getRecordsCountByDateType(Integer dateType) {
+    public Long getCombinationRecordsCountByDateType(Integer dateType) {
         return recordMapper.selectCount(dateType);
     }
 
     @Override
-    public List<CombinationRecordDO> getLatestRecordList(int count) {
+    public List<CombinationRecordDO> getLatestCombinationRecordList(int count) {
         return recordMapper.selectLatestList(count);
     }
 
     @Override
-    public List<CombinationRecordDO> getRecordListWithHead(Long activityId, Integer status, Integer count) {
+    public List<CombinationRecordDO> getCombinationRecordListWithHead(Long activityId, Integer status, Integer count) {
         return recordMapper.selectList(activityId, status, count);
     }
 
     @Override
-    public CombinationRecordDO getRecordById(Long id) {
+    public CombinationRecordDO getCombinationRecordById(Long id) {
         return recordMapper.selectById(id);
     }
 
     @Override
-    public List<CombinationRecordDO> getRecordListByHeadId(Long headId) {
+    public List<CombinationRecordDO> getCombinationRecordListByHeadId(Long headId) {
         return recordMapper.selectList(CombinationRecordDO::getHeadId, headId);
     }
 
     @Override
-    public PageResult<CombinationRecordDO> getBargainRecordPage(CombinationRecordReqPageVO pageVO) {
+    public PageResult<CombinationRecordDO> getCombinationRecordPage(CombinationRecordReqPageVO pageVO) {
         return recordMapper.selectPage(pageVO);
     }
 
