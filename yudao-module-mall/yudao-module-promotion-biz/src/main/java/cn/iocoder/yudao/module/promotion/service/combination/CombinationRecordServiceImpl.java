@@ -25,9 +25,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -203,6 +206,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
 
     @Override
     public CombinationRecordDO getCombinationRecord(Long userId, Long orderId) {
+        // TODO puhui999:这里直接获得，不适合调用校验的接口；
         return validateCombinationRecord(userId, orderId);
     }
 
@@ -243,6 +247,12 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     @Override
     public List<CombinationRecordDO> getRecordListByHeadId(Long headId) {
         return recordMapper.selectList(CombinationRecordDO::getHeadId, headId);
+    }
+
+    @Override
+    public Map<Long, Integer> getCombinationRecordCountMapByActivity(Collection<Long> activityIds,
+                                                                     @Nullable Integer status, @Nullable Integer headId) {
+        return recordMapper.selectCombinationRecordCountMapByActivityIdAndStatusAndHeadId(activityIds, status, headId);
     }
 
 }

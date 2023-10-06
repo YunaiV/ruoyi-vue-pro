@@ -5,14 +5,14 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
-import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityPageReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityRespVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.*;
 import cn.iocoder.yudao.module.promotion.convert.combination.CombinationActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
+import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
 import cn.iocoder.yudao.module.promotion.service.combination.CombinationActivityService;
+import cn.iocoder.yudao.module.promotion.service.combination.CombinationRecordService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static cn.hutool.core.collection.CollectionUtil.newArrayList;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -36,6 +38,8 @@ public class CombinationActivityController {
 
     @Resource
     private CombinationActivityService combinationActivityService;
+    @Resource
+    private CombinationRecordService combinationRecordService;
 
     @Resource
     private ProductSpuApi productSpuApi;
@@ -77,7 +81,7 @@ public class CombinationActivityController {
     @GetMapping("/page")
     @Operation(summary = "获得拼团活动分页")
     @PreAuthorize("@ss.hasPermission('promotion:combination-activity:query')")
-    public CommonResult<PageResult<CombinationActivityRespVO>> getCombinationActivityPage(
+    public CommonResult<PageResult<CombinationActivityPageItemRespVO>> getCombinationActivityPage(
             @Valid CombinationActivityPageReqVO pageVO) {
         // 查询拼团活动
         PageResult<CombinationActivityDO> pageResult = combinationActivityService.getCombinationActivityPage(pageVO);
@@ -85,12 +89,21 @@ public class CombinationActivityController {
             return success(PageResult.empty(pageResult.getTotal()));
         }
 
+        // 统计数据
+        Set<Long> activityIds = convertSet(pageResult.getList(), CombinationActivityDO::getId);
+        Map<Long, Integer> groupCountMap = combinationRecordService.getCombinationRecordCountMapByActivity(
+                activityIds, null, CombinationRecordDO.HEAD_ID_GROUP);
+        Map<Long, Integer> groupSuccessCountMap = combinationRecordService.getCombinationRecordCountMapByActivity(
+                activityIds, CombinationRecordStatusEnum.SUCCESS.getStatus(), CombinationRecordDO.HEAD_ID_GROUP);
+        Map<Long, Integer> recordCountMap = combinationRecordService.getCombinationRecordCountMapByActivity(
+                activityIds, null, null);
         // 拼接数据
         List<CombinationProductDO> products = combinationActivityService.getCombinationProductsByActivityIds(
                 convertSet(pageResult.getList(), CombinationActivityDO::getId));
         List<ProductSpuRespDTO> spus = productSpuApi.getSpuList(
                 convertSet(pageResult.getList(), CombinationActivityDO::getSpuId));
-        return success(CombinationActivityConvert.INSTANCE.convertPage(pageResult, products, spus));
+        return success(CombinationActivityConvert.INSTANCE.convertPage(pageResult, products,
+                groupCountMap, groupSuccessCountMap, recordCountMap, spus));
     }
 
 }

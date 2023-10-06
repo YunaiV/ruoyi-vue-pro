@@ -18,16 +18,6 @@ public class SeckillActivityRespVO extends SeckillActivityBaseVO {
     @Schema(description = "秒杀活动 id", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
-    @Schema(description = "商品名称", requiredMode = Schema.RequiredMode.REQUIRED, // 从 SPU 的 name 读取
-            example = "618大促")
-    private String spuName;
-    @Schema(description = "商品主图", requiredMode = Schema.RequiredMode.REQUIRED, // 从 SPU 的 picUrl 读取
-            example = "https://www.iocoder.cn/xx.png")
-    private String picUrl;
-    @Schema(description = "商品市场价，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, // 从 SPU 的 marketPrice 读取
-            example = "50")
-    private Integer marketPrice;
-
     @Schema(description = "秒杀商品", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<SeckillProductRespVO> products;
 
@@ -51,5 +41,17 @@ public class SeckillActivityRespVO extends SeckillActivityBaseVO {
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
+
+    // ========== 商品字段 ==========
+
+    @Schema(description = "商品名称", requiredMode = Schema.RequiredMode.REQUIRED, // 从 SPU 的 name 读取
+            example = "618大促")
+    private String spuName;
+    @Schema(description = "商品主图", requiredMode = Schema.RequiredMode.REQUIRED, // 从 SPU 的 picUrl 读取
+            example = "https://www.iocoder.cn/xx.png")
+    private String picUrl;
+    @Schema(description = "商品市场价，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, // 从 SPU 的 marketPrice 读取
+            example = "50")
+    private Integer marketPrice;
 
 }
