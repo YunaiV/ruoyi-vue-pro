@@ -77,6 +77,7 @@ public interface CombinationRecordApi {
      * @param count      数量
      * @return 拼团信息
      */
+    // TODO @puhui：userId 放最前面；然后应该还有个 headId 参数；
     CombinationValidateJoinRespDTO validateJoinCombination(Long activityId, Long userId, Long skuId, Integer count);
 
 }

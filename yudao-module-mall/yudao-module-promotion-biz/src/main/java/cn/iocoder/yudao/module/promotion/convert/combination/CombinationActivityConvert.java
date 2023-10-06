@@ -108,7 +108,7 @@ public interface CombinationActivityConvert {
                                         CombinationActivityDO activity, MemberUserRespDTO user,
                                         ProductSpuRespDTO spu, ProductSkuRespDTO sku) {
         return convert(reqDTO)
-                .setCount(reqDTO.getCount())
+                .setCount(reqDTO.getCount()).setUserCount(1)
                 .setVirtualGroup(false)
                 .setExpireTime(activity.getStartTime().plusHours(activity.getLimitDuration()))
                 .setUserSize(activity.getUserSize())

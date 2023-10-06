@@ -47,7 +47,8 @@ public class TradeCombinationHandler implements TradeOrderHandler {
 
         // 获取商品信息
         TradeOrderItemDO item = orderItems.get(0);
-        // 创建砍价记录
+        // 创建拼团记录
+        // TODO puhui：这里应该先不创建；等支付好，才去创建；另外，创建好后，需要更新编号到订单；
         combinationRecordApi.createCombinationRecord(TradeOrderConvert.INSTANCE.convert(order, item));
     }
 

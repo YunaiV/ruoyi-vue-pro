@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
@@ -97,8 +98,8 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
                     item.setStatus(CombinationRecordStatusEnum.SUCCESS.getStatus());
                 }
             });
+            recordMapper.updateBatch(records);
         }
-        recordMapper.updateBatch(records);
     }
 
     private CombinationRecordDO validateCombinationRecord(Long userId, Long orderId) {
@@ -179,7 +180,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
             throw exception(COMBINATION_RECORD_FAILED_HAVE_JOINED);
         }
         // 3、校验活动是否开启
-        if (LocalDateTime.now().isAfter(activity.getStartTime())) {
+        if (!LocalDateTimeUtils.beforeNow(activity.getStartTime())) {
             throw exception(COMBINATION_RECORD_FAILED_TIME_NOT_START);
         }
         // 4、校验当前活动是否过期
