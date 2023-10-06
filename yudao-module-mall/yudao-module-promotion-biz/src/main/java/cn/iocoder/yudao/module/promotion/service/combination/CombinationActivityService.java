@@ -100,4 +100,21 @@ public interface CombinationActivityService {
      */
     PageResult<CombinationActivityDO> getCombinationActivityPage(PageParam pageParam);
 
+    /**
+     * 获取指定活动指定 sku 编号的商品
+     *
+     * @param activityId 活动编号
+     * @param skuId      sku 编号
+     * @return 活动商品信息
+     */
+    CombinationProductDO selectByActivityIdAndSkuId(Long activityId, Long skuId);
+
+    /**
+     * 获取指定 spu 编号的活动
+     *
+     * @param spuId spu 编号
+     * @return 拼团活动
+     */
+    CombinationActivityDO getCombinationActivityBySpuId(Long spuId);
+
 }

@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
-import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityUpdateReqVO;
@@ -15,6 +14,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.product
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.product.CombinationProductRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.activity.AppCombinationActivityDetailRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.activity.AppCombinationActivityRespVO;
+import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordRespVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
@@ -108,8 +108,6 @@ public interface CombinationActivityConvert {
                 .setPicUrl(sku.getPicUrl());
     }
 
-    List<CombinationRecordRespDTO> convert(List<CombinationRecordDO> bean);
-
     List<AppCombinationActivityRespVO> convertAppList(List<CombinationActivityDO> list);
 
     default List<AppCombinationActivityRespVO> convertAppList(List<CombinationActivityDO> list, List<ProductSpuRespDTO> spuList) {
@@ -143,5 +141,9 @@ public interface CombinationActivityConvert {
     default AppCombinationActivityDetailRespVO convert3(CombinationActivityDO combinationActivity, List<CombinationProductDO> products) {
         return convert2(combinationActivity).setProducts(convertList1(products));
     }
+
+    List<AppCombinationRecordRespVO> convertList3(List<CombinationRecordDO> records);
+
+    AppCombinationRecordRespVO convert(CombinationRecordDO record);
 
 }

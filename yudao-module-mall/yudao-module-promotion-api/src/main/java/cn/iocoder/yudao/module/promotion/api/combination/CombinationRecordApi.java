@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.promotion.api.combination;
 
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationValidateJoinRespDTO;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
@@ -64,5 +65,18 @@ public interface CombinationRecordApi {
      * @param startTime 开始时间
      */
     void updateRecordStatusToInProgress(Long userId, Long orderId, LocalDateTime startTime);
+
+    /**
+     * 【下单前】校验是否满足拼团活动条件
+     *
+     * 如果校验失败，则抛出业务异常
+     *
+     * @param activityId 活动编号
+     * @param userId     用户编号
+     * @param skuId      sku 编号
+     * @param count      数量
+     * @return 拼团信息
+     */
+    CombinationValidateJoinRespDTO validateJoinCombination(Long activityId, Long userId, Long skuId, Integer count);
 
 }

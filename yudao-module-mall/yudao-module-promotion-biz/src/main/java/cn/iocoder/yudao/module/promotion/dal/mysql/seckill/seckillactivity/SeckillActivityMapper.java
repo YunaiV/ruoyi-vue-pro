@@ -56,4 +56,11 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
                 .apply(ObjectUtil.isNotNull(pageReqVO.getConfigId()), "FIND_IN_SET(" + pageReqVO.getConfigId() + ",config_ids) > 0"));
     }
 
+    default SeckillActivityDO selectOne(Long spuId) {
+        return selectOne(new LambdaQueryWrapperX<SeckillActivityDO>()
+                        .eq(SeckillActivityDO::getSpuId, spuId)
+                        .orderByDesc(SeckillActivityDO::getCreateTime)
+                , false);
+    }
+
 }

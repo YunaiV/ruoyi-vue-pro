@@ -1,12 +1,17 @@
 package cn.iocoder.yudao.module.promotion.controller.app.combination;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordDetailRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordSummaryRespVO;
+import cn.iocoder.yudao.module.promotion.convert.combination.CombinationActivityConvert;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
+import cn.iocoder.yudao.module.promotion.service.combination.CombinationRecordService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,13 +19,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import javax.validation.constraints.Max;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "用户 APP - 拼团活动")
 @RestController
@@ -28,81 +34,78 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @Validated
 public class AppCombinationRecordController {
 
+    @Resource
+    private CombinationRecordService combinationRecordService;
+
     @GetMapping("/get-summary")
     @Operation(summary = "获得拼团记录的概要信息", description = "用于小程序首页")
     // TODO 芋艿：增加 @Cache 缓存，1 分钟过期
     public CommonResult<AppCombinationRecordSummaryRespVO> getCombinationRecordSummary() {
+        // 获取所有拼团记录
+        Long count = combinationRecordService.getRecordsCount();
         AppCombinationRecordSummaryRespVO summary = new AppCombinationRecordSummaryRespVO();
-        summary.setUserCount(1024);
-        summary.setAvatars(new ArrayList<>());
-        summary.getAvatars().add("https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLjFK35Wvia9lJKHoXfQuHhk0qZbvpPNxrAiaEKF7aL2k4I8kuqrdTWwliamdPHeyAA7DjAg725X2GIQ/132");
-        summary.getAvatars().add("https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTK1pXgdj5DvBMwrbe8v3tFibSWeQATEsAibt3fllD8XwJ460P2r6KS3WCQvDefuv1bVpDhNCle6CTCA/132");
-        summary.getAvatars().add("https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTL7KRGHBE62N0awFyBesmmxiaCicf1fJ7E7UCh6zA8GWlT1QC1zT01gG4OxI7BWDESkdPZ5o7tno4hA/132");
-        summary.getAvatars().add("https://thirdwx.qlogo.cn/mmopen/vi_32/ouwtwJycbic2JrCoZjETict0klxd1uRuicRneKk00ewMcCClxVcVHQT91Sh9MJGtwibf1fOicD1WpwSP4icJM6eQq1AA/132");
-        summary.getAvatars().add("https://thirdwx.qlogo.cn/mmopen/vi_32/RpUrhwens58qc99OcGs993xL4M5QPOe05ekqF9Eia440kRicAlicicIdQWicHBmy2bzLgHzHguWEzHHxnIgeictL7bLA/132");
-        summary.getAvatars().add("https://thirdwx.qlogo.cn/mmopen/vi_32/S4tfqmxc8GZGsKc1K4mnhpvtG16gtMrLnTQfDibhr7jJich9LRI5RQKZDoqEjZM3azMib5nic7F4ZXKMEgYyLO08KA/132");
-        summary.getAvatars().add("https://static.iocoder.cn/mall/132.jpeg");
+        if (count == null || count == 0L) {
+            summary.setAvatars(Collections.emptyList());
+            summary.setUserCount(count);
+            return success(summary);
+        }
+
+        summary.setUserCount(count);
+        // TODO 只返回最近的 7 个
+        int num = 7;
+        summary.setAvatars(convertList(combinationRecordService.getLatestRecordList(num), CombinationRecordDO::getAvatar));
         return success(summary);
     }
 
     @GetMapping("/get-head-list")
     @Operation(summary = "获得最近 n 条拼团记录（团长发起的）")
-    // TODO @芋艿：注解要补全
+    @Parameters({
+            @Parameter(name = "activityId", description = "拼团活动编号"),
+            @Parameter(name = "status", description = "状态"),
+            @Parameter(name = "count", description = "数量")
+    })
     public CommonResult<List<AppCombinationRecordRespVO>> getHeadCombinationRecordList(
             @RequestParam(value = "activityId", required = false) Long activityId,
             @RequestParam("status") Integer status,
             @RequestParam(value = "count", defaultValue = "20") @Max(20) Integer count) {
-        List<AppCombinationRecordRespVO> list = new ArrayList<>();
-        for (int i = 1; i <= count; i++) {
-            AppCombinationRecordRespVO record = new AppCombinationRecordRespVO();
-            record.setId((long) i);
-            record.setNickname("用户" + i);
-            record.setAvatar("头像" + i);
-            record.setExpireTime(LocalDateTime.now());
-            record.setUserSize(10);
-            record.setUserCount(i);
-            record.setPicUrl("https://static.iocoder.cn/mall/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
-            record.setActivityId(1L);
-            record.setSpuName("活动：" + i);
-            list.add(record);
-        }
-        return success(list);
+        return success(CombinationActivityConvert.INSTANCE.convertList3(
+                combinationRecordService.getRecordListWithHead(activityId, status, count)));
     }
 
     @GetMapping("/get-detail")
     @Operation(summary = "获得拼团记录明细")
     @Parameter(name = "id", description = "拼团记录编号", required = true, example = "1024")
     public CommonResult<AppCombinationRecordDetailRespVO> getCombinationRecordDetail(@RequestParam("id") Long id) {
-        AppCombinationRecordDetailRespVO detail = new AppCombinationRecordDetailRespVO();
-        // 团长
-        AppCombinationRecordRespVO headRecord = new AppCombinationRecordRespVO();
-        headRecord.setId(1L);
-        headRecord.setNickname("用户" + 1);
-        headRecord.setAvatar("头像" + 1);
-        headRecord.setExpireTime(LocalDateTimeUtils.addTime(Duration.ofDays(1)));
-        headRecord.setUserSize(10);
-        headRecord.setUserCount(3);
-        headRecord.setStatus(1);
-        headRecord.setActivityId(10L);
-        headRecord.setPicUrl("https://static.iocoder.cn/mall/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
-        headRecord.setCombinationPrice(100);
-        detail.setHeadRecord(headRecord);
-        // 团员
-        List<AppCombinationRecordRespVO> list = new ArrayList<>();
-        for (int i = 1; i <= 2; i++) {
-            AppCombinationRecordRespVO record = new AppCombinationRecordRespVO();
-            record.setId((long) i);
-            record.setNickname("用户" + i);
-            record.setAvatar("头像" + i);
-            record.setExpireTime(LocalDateTime.now());
-            record.setUserSize(10);
-            record.setUserCount(i);
-            record.setStatus(1);
-            list.add(record);
+        // 1、查询这条记录
+        CombinationRecordDO record = combinationRecordService.getRecordById(id);
+        if (record == null) {
+            return success(null);
         }
-        detail.setMemberRecords(list);
-        // 订单编号
-        detail.setOrderId(100L);
+
+        AppCombinationRecordDetailRespVO detail = new AppCombinationRecordDetailRespVO();
+        List<CombinationRecordDO> records;
+        // 2、判断是否为团长
+        if (record.getHeadId() == null) {
+            detail.setHeadRecord(CombinationActivityConvert.INSTANCE.convert(record));
+            // 2.1、查找团员拼团记录
+            records = combinationRecordService.getRecordListByHeadId(record.getId());
+        } else {
+            // 2.2、查找团长拼团记录
+            CombinationRecordDO headRecord = combinationRecordService.getRecordById(record.getHeadId());
+            if (headRecord == null) {
+                return success(null);
+            }
+
+            detail.setHeadRecord(CombinationActivityConvert.INSTANCE.convert(headRecord));
+            // 2.3、查找团员拼团记录
+            records = combinationRecordService.getRecordListByHeadId(headRecord.getId());
+
+        }
+        detail.setMemberRecords(CombinationActivityConvert.INSTANCE.convertList3(records));
+
+        // 3、获取当前用户参团记录订单编号
+        CombinationRecordDO userRecord = CollectionUtils.findFirst(records, r -> ObjectUtil.equal(r.getUserId(), getLoginUserId()));
+        detail.setOrderId(userRecord == null ? null : userRecord.getOrderId()); // 如果没参团，返回 null
         return success(detail);
     }
 

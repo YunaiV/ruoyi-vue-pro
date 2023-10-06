@@ -55,7 +55,7 @@ public interface ErrorCodeConstants {
     ErrorCode SECKILL_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_008_003, "秒杀活动已关闭，不能修改");
     ErrorCode SECKILL_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1_013_008_004, "秒杀活动未关闭或未结束，不能删除");
     ErrorCode SECKILL_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_008_005, "秒杀活动已关闭，不能重复关闭");
-    ErrorCode SECKILL_ACTIVITY_UPDATE_STOCK_FAIL = new ErrorCode(1_013_008_006, "秒杀失败，原因秒杀库存不足");
+    ErrorCode SECKILL_ACTIVITY_UPDATE_STOCK_FAIL = new ErrorCode(1_013_008_006, "秒杀失败，原因：秒杀库存不足");
     ErrorCode SECKILL_JOIN_ACTIVITY_TIME_ERROR = new ErrorCode(1_013_008_007, "秒杀失败，原因：不在活动时间范围内");
     ErrorCode SECKILL_JOIN_ACTIVITY_STATUS_CLOSED = new ErrorCode(1_013_008_008, "秒杀失败，原因：秒杀活动已关闭");
     ErrorCode SECKILL_JOIN_ACTIVITY_SINGLE_LIMIT_COUNT_EXCEED = new ErrorCode(1_013_008_009, "秒杀失败，原因：单次限购超出");
@@ -72,6 +72,8 @@ public interface ErrorCodeConstants {
     ErrorCode COMBINATION_ACTIVITY_STATUS_DISABLE_NOT_UPDATE = new ErrorCode(1_013_010_002, "拼团活动已关闭不能修改");
     ErrorCode COMBINATION_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1_013_010_003, "拼团活动未关闭或未结束，不能删除");
     ErrorCode COMBINATION_ACTIVITY_STATUS_DISABLE = new ErrorCode(1_013_010_004, "拼团失败，原因：拼团活动已关闭");
+    ErrorCode COMBINATION_JOIN_ACTIVITY_PRODUCT_NOT_EXISTS = new ErrorCode(1_013_010_005, "拼团失败，原因：拼团活动商品不存在");
+    ErrorCode COMBINATION_ACTIVITY_UPDATE_STOCK_FAIL = new ErrorCode(1_013_010_006, "拼团失败，原因：拼团活动商品库存不足");
 
     // ========== 拼团记录 1-013-011-000 ==========
     ErrorCode COMBINATION_RECORD_NOT_EXISTS = new ErrorCode(1_013_011_000, "拼团不存在");

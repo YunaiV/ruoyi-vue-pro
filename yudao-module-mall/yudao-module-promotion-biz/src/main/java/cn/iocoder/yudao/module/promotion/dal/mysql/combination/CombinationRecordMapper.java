@@ -29,6 +29,7 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
                 .eq(CombinationRecordDO::getUserId, userId)
                 .eq(CombinationRecordDO::getStatus, status));
     }
+
     /**
      * 查询拼团记录
      *
@@ -47,10 +48,6 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
                 .eq(CombinationRecordDO::getStatus, status));
     }
 
-    default List<CombinationRecordDO> selectListByStatus(Integer status) {
-        return selectList(CombinationRecordDO::getStatus, status);
-    }
-
     /**
      * 查询拼团记录
      *
@@ -63,4 +60,34 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
                 .eq(CombinationRecordDO::getUserId, userId)
                 .eq(CombinationRecordDO::getActivityId, activityId));
     }
+
+    /**
+     * 获取最近的 count 条数据
+     *
+     * @param count 数量
+     * @return 拼团记录列表
+     */
+    default List<CombinationRecordDO> selectLatestList(int count) {
+        return selectList(new LambdaQueryWrapperX<CombinationRecordDO>()
+                .orderByDesc(CombinationRecordDO::getCreateTime)
+                .last("LIMIT " + count));
+    }
+
+    /**
+     * 获得最近 count 条拼团记录（团长发起的）
+     *
+     * @param activityId 拼团活动编号
+     * @param status     记录状态
+     * @param count      数量
+     * @return 拼团记录列表
+     */
+    default List<CombinationRecordDO> selectList(Long activityId, Integer status, Integer count) {
+        return selectList(new LambdaQueryWrapperX<CombinationRecordDO>()
+                .eqIfPresent(CombinationRecordDO::getActivityId, activityId)
+                .eqIfPresent(CombinationRecordDO::getStatus, status)
+                .eq(CombinationRecordDO::getHeadId, null) // TODO 团长的 headId 是不是 null 还是自己的记录编号来着？
+                .orderByDesc(CombinationRecordDO::getCreateTime)
+                .last("LIMIT " + count));
+    }
+
 }
