@@ -77,7 +77,7 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
      */
     default List<CombinationRecordDO> selectLatestList(int count) {
         return selectList(new LambdaQueryWrapperX<CombinationRecordDO>()
-                .orderByDesc(CombinationRecordDO::getCreateTime)
+                .orderByDesc(CombinationRecordDO::getId)
                 .last("LIMIT " + count));
     }
 

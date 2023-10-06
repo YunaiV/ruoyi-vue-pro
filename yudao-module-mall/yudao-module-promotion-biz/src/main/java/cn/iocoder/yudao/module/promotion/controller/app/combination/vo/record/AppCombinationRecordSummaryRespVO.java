@@ -9,6 +9,11 @@ import java.util.List;
 @Data
 public class AppCombinationRecordSummaryRespVO {
 
+    /**
+     * 加载 {@link #avatars} 的数量
+     */
+    public static final Integer AVATAR_COUNT = 7;
+
     @Schema(description = "拼团用户数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long userCount;
 

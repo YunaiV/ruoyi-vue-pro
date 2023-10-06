@@ -74,7 +74,7 @@ public class CombinationActivityController {
     @PreAuthorize("@ss.hasPermission('promotion:combination-activity:query')")
     public CommonResult<CombinationActivityRespVO> getCombinationActivity(@RequestParam("id") Long id) {
         CombinationActivityDO activity = combinationActivityService.getCombinationActivity(id);
-        List<CombinationProductDO> products = combinationActivityService.getCombinationProductsByActivityIds(newArrayList(id));
+        List<CombinationProductDO> products = combinationActivityService.getCombinationProductListByActivityIds(newArrayList(id));
         return success(CombinationActivityConvert.INSTANCE.convert(activity, products));
     }
 
@@ -98,7 +98,7 @@ public class CombinationActivityController {
         Map<Long, Integer> recordCountMap = combinationRecordService.getCombinationRecordCountMapByActivity(
                 activityIds, null, null);
         // 拼接数据
-        List<CombinationProductDO> products = combinationActivityService.getCombinationProductsByActivityIds(
+        List<CombinationProductDO> products = combinationActivityService.getCombinationProductListByActivityIds(
                 convertSet(pageResult.getList(), CombinationActivityDO::getId));
         List<ProductSpuRespDTO> spus = productSpuApi.getSpuList(
                 convertSet(pageResult.getList(), CombinationActivityDO::getSpuId));

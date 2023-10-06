@@ -73,7 +73,7 @@ public interface CombinationActivityService {
      * @return 拼团活动的商品列表
      */
     default List<CombinationProductDO> getCombinationProductsByActivityId(Long activityId) {
-        return getCombinationProductsByActivityIds(Collections.singletonList(activityId));
+        return getCombinationProductListByActivityIds(Collections.singletonList(activityId));
     }
 
     /**
@@ -82,7 +82,7 @@ public interface CombinationActivityService {
      * @param activityIds 拼团活动 ids
      * @return 拼团活动的商品列表
      */
-    List<CombinationProductDO> getCombinationProductsByActivityIds(Collection<Long> activityIds);
+    List<CombinationProductDO> getCombinationProductListByActivityIds(Collection<Long> activityIds);
 
     /**
      * 获取正在进行的活动分页数据

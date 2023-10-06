@@ -200,7 +200,7 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     }
 
     @Override
-    public List<CombinationProductDO> getCombinationProductsByActivityIds(Collection<Long> activityIds) {
+    public List<CombinationProductDO> getCombinationProductListByActivityIds(Collection<Long> activityIds) {
         return combinationProductMapper.selectListByActivityIds(activityIds);
     }
 

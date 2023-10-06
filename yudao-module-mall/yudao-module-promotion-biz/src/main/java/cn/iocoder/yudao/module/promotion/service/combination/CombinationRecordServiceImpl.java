@@ -227,7 +227,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     }
 
     @Override
-    public Long getCombinationRecordsCount() {
+    public Long getCombinationRecordCount() {
         return recordMapper.selectCount();
     }
 

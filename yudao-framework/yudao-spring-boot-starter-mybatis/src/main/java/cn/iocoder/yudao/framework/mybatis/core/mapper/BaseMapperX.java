@@ -56,7 +56,7 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
     }
 
     default Long selectCount() {
-        return selectCount(new QueryWrapper<T>());
+        return selectCount(new QueryWrapper<>());
     }
 
     default Long selectCount(String field, Object value) {

@@ -39,21 +39,21 @@ public class AppCombinationRecordController {
 
     @GetMapping("/get-summary")
     @Operation(summary = "获得拼团记录的概要信息", description = "用于小程序首页")
-    // TODO 芋艿：增加 @Cache 缓存，1 分钟过期
     public CommonResult<AppCombinationRecordSummaryRespVO> getCombinationRecordSummary() {
-        // 获取所有拼团记录
-        Long count = combinationRecordService.getCombinationRecordsCount();
         AppCombinationRecordSummaryRespVO summary = new AppCombinationRecordSummaryRespVO();
-        if (count == null || count == 0L) {
+        // 1. 获得拼团记录数量
+        Long count = combinationRecordService.getCombinationRecordCount();
+        if (count == 0) {
             summary.setAvatars(Collections.emptyList());
             summary.setUserCount(count);
             return success(summary);
         }
-
         summary.setUserCount(count);
-        // TODO 只返回最近的 7 个
-        int num = 7;
-        summary.setAvatars(convertList(combinationRecordService.getLatestCombinationRecordList(num), CombinationRecordDO::getAvatar));
+
+        // 2. 获得拼团记录头像
+        List<CombinationRecordDO> records = combinationRecordService.getLatestCombinationRecordList(
+                AppCombinationRecordSummaryRespVO.AVATAR_COUNT);
+        summary.setAvatars(convertList(records, CombinationRecordDO::getAvatar));
         return success(summary);
     }
 

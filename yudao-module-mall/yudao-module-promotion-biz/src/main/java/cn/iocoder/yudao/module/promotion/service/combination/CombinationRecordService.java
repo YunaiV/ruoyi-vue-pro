@@ -96,7 +96,7 @@ public interface CombinationRecordService {
      *
      * @return 记录数
      */
-    Long getCombinationRecordsCount();
+    Long getCombinationRecordCount();
 
     /**
      * 获取成功记录数

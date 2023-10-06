@@ -78,7 +78,7 @@ public class CombinationRecordController {
 
     private Map<String, Long> getCombinationRecordSummary0() {
         Map<String, Long> hashMap = MapUtil.newHashMap(3);
-        hashMap.put("userCount", combinationRecordService.getCombinationRecordsCount());// 获取所有拼团记录
+        hashMap.put("userCount", combinationRecordService.getCombinationRecordCount());// 获取所有拼团记录
         hashMap.put("successCount", combinationRecordService.getCombinationRecordsSuccessCount());// 获取成团记录
         hashMap.put("virtualGroupCount", combinationRecordService.getRecordsVirtualGroupCount());// 获取虚拟成团记录
         return hashMap;
