@@ -216,4 +216,16 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
         return combinationActivityMapper.selectPage(pageParam, CommonStatusEnum.ENABLE.getStatus());
     }
 
+    @Override
+    public CombinationProductDO selectByActivityIdAndSkuId(Long activityId, Long skuId) {
+        return combinationProductMapper.selectOne(
+                CombinationProductDO::getActivityId, activityId,
+                CombinationProductDO::getSkuId, skuId);
+    }
+
+    @Override
+    public CombinationActivityDO getCombinationActivityBySpuId(Long spuId) {
+        return combinationActivityMapper.selectOne(spuId);
+    }
+
 }

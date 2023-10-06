@@ -175,4 +175,9 @@ public class BargainActivityServiceImpl implements BargainActivityService {
         return bargainActivityMapper.selectList(count, CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now());
     }
 
+    @Override
+    public BargainActivityDO getBargainActivityBySpuId(Long spuId) {
+        return bargainActivityMapper.selectOne(spuId);
+    }
+
 }

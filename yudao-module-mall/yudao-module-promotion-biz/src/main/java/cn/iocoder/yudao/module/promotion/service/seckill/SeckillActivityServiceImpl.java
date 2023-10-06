@@ -310,4 +310,9 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         return SeckillActivityConvert.INSTANCE.convert02(activity, product);
     }
 
+    @Override
+    public SeckillActivityDO getSeckillActivityBySpuId(Long spuId) {
+        return seckillActivityMapper.selectOne(spuId);
+    }
+
 }

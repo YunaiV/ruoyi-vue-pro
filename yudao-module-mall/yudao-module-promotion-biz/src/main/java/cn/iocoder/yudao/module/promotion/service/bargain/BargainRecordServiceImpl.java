@@ -115,10 +115,8 @@ public class BargainRecordServiceImpl implements BargainRecordService {
     }
 
     @Override
-    public BargainRecordDO getInProgressBargainRecord(Long userId, Long activityId) {
-        List<BargainRecordDO> list = bargainRecordMapper.selectListByUserIdAndActivityIdAndStatus(
-                userId, activityId, BargainRecordStatusEnum.IN_PROGRESS.getStatus());
-        return CollUtil.getFirst(list);
+    public BargainRecordDO getLastBargainRecord(Long userId, Long activityId) {
+        return bargainRecordMapper.selectLastByUserIdAndActivityId(userId, activityId);
     }
 
     @Override

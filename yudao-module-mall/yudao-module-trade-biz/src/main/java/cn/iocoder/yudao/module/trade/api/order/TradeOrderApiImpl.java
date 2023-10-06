@@ -32,6 +32,11 @@ public class TradeOrderApiImpl implements TradeOrderApi {
     }
 
     @Override
+    public TradeOrderRespDTO getOrder(Long id) {
+        return TradeOrderConvert.INSTANCE.convert(tradeOrderQueryService.getOrder(id));
+    }
+
+    @Override
     public Integer getOrderStatus(Long id) {
         TradeOrderDO order = tradeOrderQueryService.getOrder(id);
         if (order == null) {

@@ -83,4 +83,11 @@ public interface BargainActivityMapper extends BaseMapperX<BargainActivityDO> {
                 .last("LIMIT " + count));
     }
 
+    default BargainActivityDO selectOne(Long spuId) {
+        return selectOne(new LambdaQueryWrapperX<BargainActivityDO>()
+                        .eq(BargainActivityDO::getSpuId, spuId)
+                        .orderByDesc(BargainActivityDO::getCreateTime)
+                , false);
+    }
+
 }

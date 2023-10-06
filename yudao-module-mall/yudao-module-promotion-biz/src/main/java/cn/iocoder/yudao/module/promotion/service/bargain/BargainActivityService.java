@@ -98,4 +98,12 @@ public interface BargainActivityService {
      */
     List<BargainActivityDO> getBargainActivityListByCount(Integer count);
 
+    /**
+     * 获取指定 spu 编号的活动
+     *
+     * @param spuId spu 编号
+     * @return 砍价活动
+     */
+    BargainActivityDO getBargainActivityBySpuId(Long spuId);
+
 }
