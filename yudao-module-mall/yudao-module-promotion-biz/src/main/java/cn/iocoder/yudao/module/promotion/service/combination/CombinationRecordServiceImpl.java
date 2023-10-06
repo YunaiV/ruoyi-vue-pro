@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
@@ -12,6 +13,7 @@ import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationValidateJoinRespDTO;
+import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPageVO;
 import cn.iocoder.yudao.module.promotion.convert.combination.CombinationActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
@@ -226,6 +228,21 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     }
 
     @Override
+    public Long getRecordsSuccessCount() {
+        return recordMapper.selectCount(CombinationRecordDO::getStatus, CombinationRecordStatusEnum.SUCCESS.getStatus());
+    }
+
+    @Override
+    public Long getRecordsVirtualGroupCount() {
+        return recordMapper.selectCount(CombinationRecordDO::getVirtualGroup, true);
+    }
+
+    @Override
+    public Long getRecordsCountByDateType(Integer dateType) {
+        return recordMapper.selectCount(dateType);
+    }
+
+    @Override
     public List<CombinationRecordDO> getLatestRecordList(int count) {
         return recordMapper.selectLatestList(count);
     }
@@ -243,6 +260,11 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     @Override
     public List<CombinationRecordDO> getRecordListByHeadId(Long headId) {
         return recordMapper.selectList(CombinationRecordDO::getHeadId, headId);
+    }
+
+    @Override
+    public PageResult<CombinationRecordDO> getBargainRecordPage(CombinationRecordReqPageVO pageVO) {
+        return recordMapper.selectPage(pageVO);
     }
 
 }

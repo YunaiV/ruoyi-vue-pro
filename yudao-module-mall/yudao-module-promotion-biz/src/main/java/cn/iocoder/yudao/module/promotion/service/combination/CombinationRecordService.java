@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.promotion.service.combination;
 
 import cn.iocoder.yudao.framework.common.core.KeyValue;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationValidateJoinRespDTO;
+import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPageVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
@@ -94,6 +96,28 @@ public interface CombinationRecordService {
     Long getRecordsCount();
 
     /**
+     * 获取成功记录数
+     *
+     * @return 记录数
+     */
+    Long getRecordsSuccessCount();
+
+    /**
+     * 获取虚拟成团记录数
+     *
+     * @return 记录数
+     */
+    Long getRecordsVirtualGroupCount();
+
+    /**
+     * 获取指定日期类型的记录数，比如说获取最近七天的拼团记录数
+     *
+     * @param dateType 日期类型
+     * @return 记录数
+     */
+    Long getRecordsCountByDateType(Integer dateType);
+
+    /**
      * 获取最近的 count 条拼团记录
      *
      * @param count 限制数量
@@ -126,5 +150,13 @@ public interface CombinationRecordService {
      * @return 拼团记录列表
      */
     List<CombinationRecordDO> getRecordListByHeadId(Long headId);
+
+    /**
+     * 获取拼团记录分页数据
+     *
+     * @param pageVO 分页请求
+     * @return 拼团记录分页数据
+     */
+    PageResult<CombinationRecordDO> getBargainRecordPage(CombinationRecordReqPageVO pageVO);
 
 }
