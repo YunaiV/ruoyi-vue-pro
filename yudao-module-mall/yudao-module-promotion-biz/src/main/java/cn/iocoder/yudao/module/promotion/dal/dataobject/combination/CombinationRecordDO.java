@@ -76,6 +76,8 @@ public class CombinationRecordDO extends BaseDO {
      * 用户编号
      */
     private Long userId;
+
+    // TODO @puhui999：要不去掉这 2 个字段，通过读取解决？如果去掉，相关接口都要处理下哈；
     /**
      * 用户昵称
      */

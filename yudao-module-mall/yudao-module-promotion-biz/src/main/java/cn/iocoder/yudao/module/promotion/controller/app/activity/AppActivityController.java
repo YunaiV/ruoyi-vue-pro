@@ -52,11 +52,11 @@ public class AppActivityController {
     @Operation(summary = "获得多个商品，近期参与的每个活动") // 每种活动，只返回一个；key 为 SPU 编号
     @Parameter(name = "spuIds", description = "商品编号数组", required = true)
     public CommonResult<Map<Long, List<AppActivityRespVO>>> getActivityListBySpuIds(@RequestParam("spuIds") List<Long> spuIds) {
-
         if (CollUtil.isEmpty(spuIds)) {
             return success(MapUtil.empty());
         }
 
+        // TODO @puhui999：要避免这种 1+n 的查询
         Map<Long, List<AppActivityRespVO>> map = new HashMap<>(spuIds.size());
         spuIds.forEach(spuId -> {
             map.put(spuId, getAppActivityRespVOList(spuId));
@@ -65,35 +65,38 @@ public class AppActivityController {
     }
 
     private List<AppActivityRespVO> getAppActivityRespVOList(Long spuId) {
-        List<AppActivityRespVO> respList = new ArrayList<>();
+        List<AppActivityRespVO> activityList = new ArrayList<>();
+        // 拼团活动
         CombinationActivityDO combination = combinationActivityService.getCombinationActivityBySpuId(spuId);
         if (combination != null) {
-            respList.add(new AppActivityRespVO()
+            activityList.add(new AppActivityRespVO()
                     .setId(combination.getId())
                     .setType(PromotionTypeEnum.COMBINATION_ACTIVITY.getType())
                     .setName(combination.getName())
                     .setStartTime(combination.getStartTime())
                     .setEndTime(combination.getEndTime()));
         }
+        // 秒杀活动
         SeckillActivityDO seckill = seckillActivityService.getSeckillActivityBySpuId(spuId);
         if (seckill != null) {
-            respList.add(new AppActivityRespVO()
+            activityList.add(new AppActivityRespVO()
                     .setId(seckill.getId())
                     .setType(PromotionTypeEnum.SECKILL_ACTIVITY.getType())
                     .setName(seckill.getName())
                     .setStartTime(seckill.getStartTime())
                     .setEndTime(seckill.getEndTime()));
         }
+        // 秒杀活动
         BargainActivityDO bargain = bargainActivityService.getBargainActivityBySpuId(spuId);
         if (bargain != null) {
-            respList.add(new AppActivityRespVO()
+            activityList.add(new AppActivityRespVO()
                     .setId(bargain.getId())
                     .setType(PromotionTypeEnum.BARGAIN_ACTIVITY.getType())
                     .setName(bargain.getName())
                     .setStartTime(bargain.getStartTime())
                     .setEndTime(bargain.getEndTime()));
         }
-        return respList;
+        return activityList;
     }
 
 }

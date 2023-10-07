@@ -84,8 +84,8 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
     default List<CombinationRecordDO> selectListByActivityIdAndStatusAndHeadId(Long activityId, Integer status,
                                                                                Long headId, Integer count) {
         return selectList(new LambdaQueryWrapperX<CombinationRecordDO>()
-                .eq(CombinationRecordDO::getActivityId, activityId)
-                .eq(CombinationRecordDO::getStatus, status)
+                .eqIfPresent(CombinationRecordDO::getActivityId, activityId)
+                .eqIfPresent(CombinationRecordDO::getStatus, status)
                 .eq(CombinationRecordDO::getHeadId, headId)
                 .orderByDesc(CombinationRecordDO::getId)
                 .last("LIMIT " + count));

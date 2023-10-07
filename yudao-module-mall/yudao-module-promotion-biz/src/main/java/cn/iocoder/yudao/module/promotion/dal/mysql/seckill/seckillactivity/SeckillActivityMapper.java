@@ -56,6 +56,7 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
                 .apply(ObjectUtil.isNotNull(pageReqVO.getConfigId()), "FIND_IN_SET(" + pageReqVO.getConfigId() + ",config_ids) > 0"));
     }
 
+    // TODO @puhui999：需要开启状态；另外，是不是可以 limit1，不用 throwEx = false 处理呀？另外，时间要满足噢；
     default SeckillActivityDO selectOne(Long spuId) {
         return selectOne(new LambdaQueryWrapperX<SeckillActivityDO>()
                         .eq(SeckillActivityDO::getSpuId, spuId)

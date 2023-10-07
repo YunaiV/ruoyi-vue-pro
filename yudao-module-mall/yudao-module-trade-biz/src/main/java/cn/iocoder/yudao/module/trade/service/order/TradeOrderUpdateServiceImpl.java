@@ -738,19 +738,18 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     }
 
     @Override
-    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.SYSTEM_UP_ADDRESS)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.ADMIN_UPDATE_ADDRESS)
     public void updateOrderAddress(TradeOrderUpdateAddressReqVO reqVO) {
         // 校验交易订单
         TradeOrderDO order = validateOrderExists(reqVO.getId());
         // TODO @puhui999：是否需要校验订单是否发货
-        // TODO 发货后是否支持修改收货地址
+        // TODO 发货后是否支持修改收货地址；回答：发货后，不允许修改；
 
         // 更新
         tradeOrderMapper.updateById(TradeOrderConvert.INSTANCE.convert(reqVO));
 
         // 记录订单日志
-        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), order.getStatus(),
-                MapUtil.<String, Object>builder().put("orderId", order.getId()).build());
+        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), order.getStatus());
     }
 
     @Override

@@ -67,6 +67,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     @Resource
     private TradeOrderApi tradeOrderApi;
 
+    // TODO @芋艿：在详细预览下；
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateCombinationRecordStatusByUserIdAndOrderId(Integer status, Long userId, Long orderId) {
@@ -78,6 +79,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         recordMapper.updateById(record);
     }
 
+    // TODO @芋艿：在详细预览下；
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateRecordStatusAndStartTimeByUserIdAndOrderId(Integer status, Long userId, Long orderId, LocalDateTime startTime) {

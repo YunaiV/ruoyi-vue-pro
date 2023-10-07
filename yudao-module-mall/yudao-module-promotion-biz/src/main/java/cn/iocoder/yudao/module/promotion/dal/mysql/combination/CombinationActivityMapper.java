@@ -40,6 +40,7 @@ public interface CombinationActivityMapper extends BaseMapperX<CombinationActivi
                 .last("LIMIT " + count));
     }
 
+    // TODO @puhui999：需要开启状态；另外，是不是可以 limit1，不用 throwEx = false 处理呀？另外，时间要满足噢
     default CombinationActivityDO selectOne(Long spuId) {
         return selectOne(new LambdaQueryWrapperX<CombinationActivityDO>()
                         .eq(CombinationActivityDO::getSpuId, spuId)
