@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 
 // TODO @puhui999：单测可以后补下
+
 /**
  * 拼团活动的 {@link TradePriceCalculator} 实现类
  *
@@ -35,7 +36,7 @@ public class TradeCombinationActivityPriceCalculator implements TradePriceCalcul
         // 2. 校验是否可以参与拼团
         TradePriceCalculateRespBO.OrderItem orderItem = result.getItems().get(0);
         CombinationValidateJoinRespDTO combinationActivity = combinationRecordApi.validateJoinCombination(
-                param.getCombinationActivityId(), param.getUserId(),
+                param.getUserId(), param.getCombinationActivityId(), param.getCombinationHeadId(),
                 orderItem.getSkuId(), orderItem.getCount());
 
         // 3.1 记录优惠明细

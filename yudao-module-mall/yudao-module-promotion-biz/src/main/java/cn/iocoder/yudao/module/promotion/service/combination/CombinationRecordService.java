@@ -10,7 +10,6 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationP
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
 
 import javax.annotation.Nullable;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -32,16 +31,18 @@ public interface CombinationRecordService {
     void updateCombinationRecordStatusByUserIdAndOrderId(Integer status, Long userId, Long orderId);
 
     /**
-     * 校验是否满足拼团条件
-     * 如果不满足，会抛出异常
+     * 【下单前】校验是否满足拼团活动条件
      *
-     * @param activityId 活动编号
+     * 如果校验失败，则抛出业务异常
+     *
      * @param userId     用户编号
+     * @param activityId 活动编号
+     * @param headId     团长编号
      * @param skuId      sku 编号
      * @param count      数量
-     * @return 返回拼团活动和拼团活动商品
+     * @return 拼团信息
      */
-    KeyValue<CombinationActivityDO, CombinationProductDO> validateCombinationRecord(Long activityId, Long userId, Long skuId, Integer count);
+    KeyValue<CombinationActivityDO, CombinationProductDO> validateCombinationRecord(Long userId, Long activityId, Long headId, Long skuId, Integer count);
 
     /**
      * 创建拼团记录
@@ -49,16 +50,6 @@ public interface CombinationRecordService {
      * @param reqDTO 创建信息
      */
     void createCombinationRecord(CombinationRecordCreateReqDTO reqDTO);
-
-    /**
-     * 更新拼团状态和开始时间
-     *
-     * @param status    状态
-     * @param userId    用户编号
-     * @param orderId   订单编号
-     * @param startTime 开始时间
-     */
-    void updateRecordStatusAndStartTimeByUserIdAndOrderId(Integer status, Long userId, Long orderId, LocalDateTime startTime);
 
     /**
      * 获得拼团记录
@@ -83,13 +74,14 @@ public interface CombinationRecordService {
      *
      * 如果校验失败，则抛出业务异常
      *
-     * @param activityId 活动编号
      * @param userId     用户编号
+     * @param activityId 活动编号
+     * @param headId     团长编号
      * @param skuId      sku 编号
      * @param count      数量
      * @return 拼团信息
      */
-    CombinationValidateJoinRespDTO validateJoinCombination(Long activityId, Long userId, Long skuId, Integer count);
+    CombinationValidateJoinRespDTO validateJoinCombination(Long userId, Long activityId, Long headId, Long skuId, Integer count);
 
     /**
      * 获取所有拼团记录数
@@ -166,12 +158,32 @@ public interface CombinationRecordService {
      * 【拼团活动】获得拼团记录数量 Map
      *
      * @param activityIds 活动记录编号数组
-     * @param status     拼团状态，允许空
-     * @param headId    团长编号，允许空。目的 headId 设置为 {@link CombinationRecordDO#HEAD_ID_GROUP} 时，可以设置
+     * @param status      拼团状态，允许空
+     * @param headId      团长编号，允许空。目的 headId 设置为 {@link CombinationRecordDO#HEAD_ID_GROUP} 时，可以设置
      * @return 拼团记录数量 Map
      */
     Map<Long, Integer> getCombinationRecordCountMapByActivity(Collection<Long> activityIds,
                                                               @Nullable Integer status,
                                                               @Nullable Long headId);
+
+
+    /**
+     * 获取拼团记录
+     *
+     * @param userId 用户编号
+     * @param id     拼团记录编号
+     * @return 拼团记录
+     */
+    CombinationRecordDO getCombinationRecordByIdAndUser(Long userId, Long id);
+
+    /**
+     * 取消拼团
+     *
+     * @param userId 用户编号
+     * @param id     拼团记录编号
+     * @param headId 团长编号
+     */
+    void cancelCombinationRecord(Long userId, Long id, Long headId);
+
 
 }

@@ -25,6 +25,14 @@ public class CollectionUtils {
         return Arrays.stream(collections).anyMatch(CollectionUtil::isEmpty);
     }
 
+    public static <T, U extends Comparable<? super U>> List<T> sortedAsc(
+            Collection<T> from, Function<? super T, ? extends U> keyExtractor) {
+        // 按照升序排序
+        return from.stream()
+                .sorted(Comparator.comparing(keyExtractor))
+                .collect(Collectors.toList());
+    }
+
     public static <T> boolean anyMatch(Collection<T> from, Predicate<T> predicate) {
         return from.stream().anyMatch(predicate);
     }

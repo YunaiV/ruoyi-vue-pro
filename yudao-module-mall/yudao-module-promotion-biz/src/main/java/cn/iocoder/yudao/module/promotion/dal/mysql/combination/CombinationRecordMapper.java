@@ -32,12 +32,6 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
                 CombinationRecordDO::getOrderId, orderId);
     }
 
-    default List<CombinationRecordDO> selectListByUserIdAndStatus(Long userId, Integer status) {
-        return selectList(new LambdaQueryWrapperX<CombinationRecordDO>()
-                .eq(CombinationRecordDO::getUserId, userId)
-                .eq(CombinationRecordDO::getStatus, status));
-    }
-
     /**
      * 查询拼团记录
      *
@@ -106,7 +100,7 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
         // 转换数据
         return CollectionUtils.convertMap(result,
                 record -> MapUtil.getLong(record, "activityId"),
-                record -> MapUtil.getInt(record, "recordCount" ));
+                record -> MapUtil.getInt(record, "recordCount"));
     }
 
     static LocalDateTime[] builderQueryTime(Integer dateType) {
