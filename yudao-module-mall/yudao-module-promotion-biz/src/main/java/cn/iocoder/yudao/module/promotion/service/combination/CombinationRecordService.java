@@ -32,16 +32,18 @@ public interface CombinationRecordService {
     void updateCombinationRecordStatusByUserIdAndOrderId(Integer status, Long userId, Long orderId);
 
     /**
-     * 校验是否满足拼团条件
-     * 如果不满足，会抛出异常
+     * 【下单前】校验是否满足拼团活动条件
      *
-     * @param activityId 活动编号
+     * 如果校验失败，则抛出业务异常
+     *
      * @param userId     用户编号
+     * @param activityId 活动编号
+     * @param headId     团长编号
      * @param skuId      sku 编号
      * @param count      数量
-     * @return 返回拼团活动和拼团活动商品
+     * @return 拼团信息
      */
-    KeyValue<CombinationActivityDO, CombinationProductDO> validateCombinationRecord(Long activityId, Long userId, Long skuId, Integer count);
+    KeyValue<CombinationActivityDO, CombinationProductDO> validateCombinationRecord(Long userId, Long activityId, Long headId, Long skuId, Integer count);
 
     /**
      * 创建拼团记录
@@ -83,13 +85,14 @@ public interface CombinationRecordService {
      *
      * 如果校验失败，则抛出业务异常
      *
-     * @param activityId 活动编号
      * @param userId     用户编号
+     * @param activityId 活动编号
+     * @param headId     团长编号
      * @param skuId      sku 编号
      * @param count      数量
      * @return 拼团信息
      */
-    CombinationValidateJoinRespDTO validateJoinCombination(Long activityId, Long userId, Long skuId, Integer count);
+    CombinationValidateJoinRespDTO validateJoinCombination(Long userId, Long activityId, Long headId, Long skuId, Integer count);
 
     /**
      * 获取所有拼团记录数

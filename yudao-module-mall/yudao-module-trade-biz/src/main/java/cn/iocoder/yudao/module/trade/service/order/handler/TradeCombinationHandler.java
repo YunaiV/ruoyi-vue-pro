@@ -34,7 +34,8 @@ public class TradeCombinationHandler implements TradeOrderHandler {
         // 获取商品信息
         TradeOrderItemDO item = orderItems.get(0);
         // 校验是否满足拼团活动相关限制
-        combinationRecordApi.validateCombinationRecord(order.getCombinationActivityId(), order.getUserId(), item.getSkuId(), item.getCount());
+        combinationRecordApi.validateCombinationRecord(order.getUserId(), order.getCombinationActivityId(),
+                order.getCombinationHeadId(), item.getSkuId(), item.getCount());
     }
 
     @Override

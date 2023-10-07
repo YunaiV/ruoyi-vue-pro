@@ -113,7 +113,7 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
         // 转换数据
         return CollectionUtils.convertMap(result,
                 record -> MapUtil.getLong(record, "activityId"),
-                record -> MapUtil.getInt(record, "recordCount" ));
+                record -> MapUtil.getInt(record, "recordCount"));
     }
 
     static LocalDateTime[] builderQueryTime(Integer dateType) {
@@ -170,6 +170,22 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
     default Long selectCount(Integer dateType) {
         return selectCount(new LambdaQueryWrapperX<CombinationRecordDO>()
                 .betweenIfPresent(CombinationRecordDO::getCreateTime, builderQueryTime(dateType)));
+    }
+
+    /**
+     * 查询指定团长的拼团记录（包括团长）
+     *
+     * @param activityId 活动编号
+     * @param headId     团长编号
+     * @return 拼团记录
+     */
+    default List<CombinationRecordDO> selectList(Long activityId, Long headId) {
+        return selectList(new LambdaQueryWrapperX<CombinationRecordDO>()
+                .eq(CombinationRecordDO::getActivityId, activityId)
+                .eq(CombinationRecordDO::getHeadId, headId)
+                .or()
+                .eq(CombinationRecordDO::getId, headId));
+
     }
 
 }

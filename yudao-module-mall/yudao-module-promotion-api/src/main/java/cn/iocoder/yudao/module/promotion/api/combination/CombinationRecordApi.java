@@ -18,12 +18,13 @@ public interface CombinationRecordApi {
     /**
      * 校验是否满足拼团条件
      *
-     * @param activityId 活动编号
      * @param userId     用户编号
+     * @param activityId 活动编号
+     * @param headId     团长编号
      * @param skuId      sku 编号
      * @param count      数量
      */
-    void validateCombinationRecord(Long activityId, Long userId, Long skuId, Integer count);
+    void validateCombinationRecord(Long userId, Long activityId, Long headId, Long skuId, Integer count);
 
     /**
      * 创建开团记录
@@ -71,13 +72,13 @@ public interface CombinationRecordApi {
      *
      * 如果校验失败，则抛出业务异常
      *
-     * @param activityId 活动编号
      * @param userId     用户编号
+     * @param activityId 活动编号
+     * @param headId     团长编号
      * @param skuId      sku 编号
      * @param count      数量
      * @return 拼团信息
      */
-    // TODO @puhui：userId 放最前面；然后应该还有个 headId 参数；
-    CombinationValidateJoinRespDTO validateJoinCombination(Long activityId, Long userId, Long skuId, Integer count);
+    CombinationValidateJoinRespDTO validateJoinCombination(Long userId, Long activityId, Long headId, Long skuId, Integer count);
 
 }
