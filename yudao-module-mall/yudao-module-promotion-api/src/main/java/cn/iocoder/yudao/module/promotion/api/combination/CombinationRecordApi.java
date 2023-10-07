@@ -61,6 +61,7 @@ public interface CombinationRecordApi {
      * @param count      数量
      * @return 拼团信息
      */
-    CombinationValidateJoinRespDTO validateJoinCombination(Long userId, Long activityId, Long headId, Long skuId, Integer count);
+    CombinationValidateJoinRespDTO validateJoinCombination(Long userId, Long activityId, Long headId,
+                                                           Long skuId, Integer count);
 
 }

@@ -25,6 +25,7 @@ public class CollectionUtils {
         return Arrays.stream(collections).anyMatch(CollectionUtil::isEmpty);
     }
 
+    // TODO @puhui999：            list.sort(); 可以替代呀；
     public static <T, U extends Comparable<? super U>> List<T> sortedAsc(
             Collection<T> from, Function<? super T, ? extends U> keyExtractor) {
         // 按照升序排序

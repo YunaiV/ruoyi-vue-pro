@@ -43,7 +43,6 @@ public class TradeCombinationHandler implements TradeOrderHandler {
         if (TradeOrderTypeEnum.isCombination(order.getType())) {
             return;
         }
-
         Assert.isTrue(orderItems.size() == 1, "拼团时，只允许选择一个商品");
 
         // 获取商品信息

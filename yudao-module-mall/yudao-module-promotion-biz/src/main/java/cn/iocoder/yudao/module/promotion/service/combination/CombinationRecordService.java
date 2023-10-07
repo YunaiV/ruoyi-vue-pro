@@ -105,14 +105,6 @@ public interface CombinationRecordService {
     Long getRecordsVirtualGroupCount();
 
     /**
-     * 获取指定日期类型的记录数，比如说获取最近七天的拼团记录数
-     *
-     * @param dateType 日期类型
-     * @return 记录数
-     */
-    Long getCombinationRecordsCountByDateType(Integer dateType);
-
-    /**
      * 获取最近的 count 条拼团记录
      *
      * @param count 限制数量

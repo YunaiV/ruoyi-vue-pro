@@ -262,17 +262,14 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
 
     @Override
     public Long getCombinationRecordsSuccessCount() {
+        // TODO @puhui999：这个应该要多查询 headId
         return recordMapper.selectCount(CombinationRecordDO::getStatus, CombinationRecordStatusEnum.SUCCESS.getStatus());
     }
 
     @Override
     public Long getRecordsVirtualGroupCount() {
+        // TODO @puhui999：这个应该要多查询 headId；然后，recordMapper 要明确的查询哈，不要直接使用 mapper 来拼接查询条件
         return recordMapper.selectCount(CombinationRecordDO::getVirtualGroup, true);
-    }
-
-    @Override
-    public Long getCombinationRecordsCountByDateType(Integer dateType) {
-        return recordMapper.selectCount(dateType);
     }
 
     @Override

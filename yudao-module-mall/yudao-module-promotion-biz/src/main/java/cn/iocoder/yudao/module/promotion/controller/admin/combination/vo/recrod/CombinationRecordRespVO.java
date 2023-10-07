@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+// TODO @puhui999：可以参考 BargainRecordPageItemRespVO、BargainRecordRespVO 分成两个；一个给记录列表，一个给记录分页
 @Schema(description = "管理后台 - 拼团记录 Response VO")
 @Data
 public class CombinationRecordRespVO {

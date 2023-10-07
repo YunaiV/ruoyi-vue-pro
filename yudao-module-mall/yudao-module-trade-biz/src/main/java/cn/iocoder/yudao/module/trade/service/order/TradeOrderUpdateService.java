@@ -178,6 +178,7 @@ public interface TradeOrderUpdateService {
      * @param combinationRecordId 拼团记录编号
      * @param headId              团长编号
      */
+    // TODO 芋艿：再 review 拼团
     void updateOrderCombinationInfo(Long orderId, Long activityId, Long combinationRecordId, Long headId);
 
     /**

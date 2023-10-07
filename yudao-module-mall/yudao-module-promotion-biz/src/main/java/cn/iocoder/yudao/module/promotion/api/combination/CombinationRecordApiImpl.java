@@ -35,12 +35,11 @@ public class CombinationRecordApiImpl implements CombinationRecordApi {
 
     @Override
     public boolean isCombinationRecordSuccess(Long userId, Long orderId) {
-        CombinationRecordDO combinationRecord = recordService.getCombinationRecord(userId, orderId);
-        if (combinationRecord == null) {
+        CombinationRecordDO record = recordService.getCombinationRecord(userId, orderId);
+        if (record == null) {
             throw exception(COMBINATION_RECORD_NOT_EXISTS);
         }
-
-        return CombinationRecordStatusEnum.isSuccess(combinationRecord.getStatus());
+        return CombinationRecordStatusEnum.isSuccess(record.getStatus());
     }
 
     @Override

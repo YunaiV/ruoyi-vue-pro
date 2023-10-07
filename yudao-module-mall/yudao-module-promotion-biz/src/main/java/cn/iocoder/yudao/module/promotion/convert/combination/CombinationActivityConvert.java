@@ -108,6 +108,7 @@ public interface CombinationActivityConvert {
 
     CombinationRecordDO convert(CombinationRecordCreateReqDTO reqDTO);
 
+    // TODO @芋艿：在 convert 优化下；
     default CombinationRecordDO convert(CombinationRecordCreateReqDTO reqDTO,
                                         CombinationActivityDO activity, MemberUserRespDTO user,
                                         ProductSpuRespDTO spu, ProductSkuRespDTO sku) {
