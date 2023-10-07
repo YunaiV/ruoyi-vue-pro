@@ -625,12 +625,11 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
         }
 
-        // 2. TODO 活动相关库存回滚需要活动 id，活动 id 怎么获取？app 端能否传过来；回复：从订单里拿呀
-        tradeOrderHandlers.forEach(handler -> handler.cancelOrder());
-
-        // 3. 回滚库存
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(id);
+        // 3. 回滚库存
         productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convert(orderItems));
+        // 3.1、 活动相关的回滚
+        tradeOrderHandlers.forEach(handler -> handler.cancelOrder(order, orderItems));
 
         // 4. 回滚优惠券
         if (order.getCouponId() != null && order.getCouponId() > 0) {
@@ -807,10 +806,11 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 2.2 如果全部退款，则进行取消订单
         getSelf().cancelOrderByAfterSale(order, orderRefundPrice);
 
-        // TODO @puhui999：活动相关的回滚
 
         // 3. 回滚库存
         productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convert(Collections.singletonList(orderItem)));
+        // 3.1、 活动相关的回滚
+        tradeOrderHandlers.forEach(handler -> handler.cancelOrder(order, Collections.singletonList(orderItem)));
 
         // 4.1 回滚积分：扣减用户积分（赠送的）
         reduceUserPoint(order.getUserId(), orderItem.getGivePoint(), MemberPointBizTypeEnum.AFTER_SALE_DEDUCT_GIVE, orderItem.getAfterSaleId());

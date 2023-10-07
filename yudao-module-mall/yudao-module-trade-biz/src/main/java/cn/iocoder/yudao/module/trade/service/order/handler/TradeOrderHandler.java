@@ -40,7 +40,11 @@ public interface TradeOrderHandler {
 
     /**
      * 订单取消
+     *
+     * @param order 订单
+     * @param orderItems 订单项
      */
-    default void cancelOrder() {}
+    default void cancelOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
+    }
 
 }

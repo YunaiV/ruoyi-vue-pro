@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.trade.service.order.handler;
 
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.module.promotion.api.combination.CombinationRecordApi;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
@@ -26,7 +25,7 @@ public class TradeCombinationHandler implements TradeOrderHandler {
     @Override
     public void beforeOrderCreate(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
         // 如果不是拼团订单则结束
-        if (ObjectUtil.notEqual(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
+        if (TradeOrderTypeEnum.isCombination(order.getType())) {
             return;
         }
         Assert.isTrue(orderItems.size() == 1, "拼团时，只允许选择一个商品");
@@ -41,7 +40,7 @@ public class TradeCombinationHandler implements TradeOrderHandler {
     @Override
     public void afterPayOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
         // 如果不是拼团订单则结束
-        if (ObjectUtil.notEqual(TradeOrderTypeEnum.COMBINATION.getType(), order.getType())) {
+        if (TradeOrderTypeEnum.isCombination(order.getType())) {
             return;
         }
 
@@ -51,6 +50,13 @@ public class TradeCombinationHandler implements TradeOrderHandler {
         TradeOrderItemDO item = orderItems.get(0);
         // 创建拼团记录
         combinationRecordApi.createCombinationRecord(TradeOrderConvert.INSTANCE.convert(order, item));
+    }
+
+    @Override
+    public void cancelOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
+        if (TradeOrderTypeEnum.isCombination(order.getType())) {
+            return;
+        }
     }
 
 }
