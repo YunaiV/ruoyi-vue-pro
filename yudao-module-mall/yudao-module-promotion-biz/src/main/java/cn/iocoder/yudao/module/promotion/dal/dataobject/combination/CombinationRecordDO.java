@@ -31,7 +31,7 @@ public class CombinationRecordDO extends BaseDO {
     /**
      * 团长编号 - 团长
      */
-    public static final Integer HEAD_ID_GROUP = 0;
+    public static final Long HEAD_ID_GROUP = 0L;
 
     /**
      * 编号，主键自增

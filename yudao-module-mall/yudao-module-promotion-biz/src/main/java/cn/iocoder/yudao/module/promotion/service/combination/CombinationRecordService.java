@@ -139,7 +139,7 @@ public interface CombinationRecordService {
      * @param count      数量
      * @return 拼团记录列表
      */
-    List<CombinationRecordDO> getCombinationRecordListWithHead(Long activityId, Integer status, Integer count);
+    List<CombinationRecordDO> getHeadCombinationRecordList(Long activityId, Integer status, Integer count);
 
     /**
      * 获取指定编号的拼团记录
@@ -175,6 +175,6 @@ public interface CombinationRecordService {
      */
     Map<Long, Integer> getCombinationRecordCountMapByActivity(Collection<Long> activityIds,
                                                               @Nullable Integer status,
-                                                              @Nullable Integer headId);
+                                                              @Nullable Long headId);
 
 }
