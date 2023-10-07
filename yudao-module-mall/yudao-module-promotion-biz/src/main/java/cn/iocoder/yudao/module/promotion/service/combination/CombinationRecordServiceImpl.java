@@ -204,6 +204,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         MemberUserRespDTO user = memberUserApi.getUser(reqDTO.getUserId());
         ProductSpuRespDTO spu = productSpuApi.getSpu(reqDTO.getSpuId());
         ProductSkuRespDTO sku = productSkuApi.getSku(reqDTO.getSkuId());
+        // TODO @puhui999：status 未设置；headId 未设置
         recordMapper.insert(CombinationActivityConvert.INSTANCE.convert(reqDTO, activity, user, spu, sku));
     }
 
@@ -253,8 +254,9 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     }
 
     @Override
-    public List<CombinationRecordDO> getCombinationRecordListWithHead(Long activityId, Integer status, Integer count) {
-        return recordMapper.selectList(activityId, status, count);
+    public List<CombinationRecordDO> getHeadCombinationRecordList(Long activityId, Integer status, Integer count) {
+        return recordMapper.selectListByActivityIdAndStatusAndHeadId(activityId, status,
+                CombinationRecordDO.HEAD_ID_GROUP, count);
     }
 
     @Override
@@ -274,7 +276,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
 
     @Override
     public Map<Long, Integer> getCombinationRecordCountMapByActivity(Collection<Long> activityIds,
-                                                                     @Nullable Integer status, @Nullable Integer headId) {
+                                                                     @Nullable Integer status, @Nullable Long headId) {
         return recordMapper.selectCombinationRecordCountMapByActivityIdAndStatusAndHeadId(activityIds, status, headId);
     }
 

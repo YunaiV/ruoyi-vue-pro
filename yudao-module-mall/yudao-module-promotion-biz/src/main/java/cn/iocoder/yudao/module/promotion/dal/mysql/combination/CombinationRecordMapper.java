@@ -81,25 +81,18 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
                 .last("LIMIT " + count));
     }
 
-    /**
-     * 获得最近 count 条拼团记录（团长发起的）
-     *
-     * @param activityId 拼团活动编号
-     * @param status     记录状态
-     * @param count      数量
-     * @return 拼团记录列表
-     */
-    default List<CombinationRecordDO> selectList(Long activityId, Integer status, Integer count) {
+    default List<CombinationRecordDO> selectListByActivityIdAndStatusAndHeadId(Long activityId, Integer status,
+                                                                               Long headId, Integer count) {
         return selectList(new LambdaQueryWrapperX<CombinationRecordDO>()
-                .eqIfPresent(CombinationRecordDO::getActivityId, activityId)
-                .eqIfPresent(CombinationRecordDO::getStatus, status)
-                .eq(CombinationRecordDO::getHeadId, null) // TODO 团长的 headId 是不是 null 还是自己的记录编号来着？
-                .orderByDesc(CombinationRecordDO::getCreateTime)
+                .eq(CombinationRecordDO::getActivityId, activityId)
+                .eq(CombinationRecordDO::getStatus, status)
+                .eq(CombinationRecordDO::getHeadId, headId)
+                .orderByDesc(CombinationRecordDO::getId)
                 .last("LIMIT " + count));
     }
 
     default Map<Long, Integer> selectCombinationRecordCountMapByActivityIdAndStatusAndHeadId(Collection<Long> activityIds,
-                                                                                             Integer status, Integer headId) {
+                                                                                             Integer status, Long headId) {
         // SQL count 查询
         List<Map<String, Object>> result = selectMaps(new QueryWrapper<CombinationRecordDO>()
                 .select("COUNT(DISTINCT(user_id)) AS recordCount, activity_id AS activityId")

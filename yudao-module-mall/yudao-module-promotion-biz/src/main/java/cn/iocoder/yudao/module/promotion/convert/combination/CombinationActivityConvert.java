@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.convert.combination;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
@@ -16,6 +17,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.product
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.activity.AppCombinationActivityDetailRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.activity.AppCombinationActivityRespVO;
+import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordDetailRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordRespVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
@@ -167,5 +169,17 @@ public interface CombinationActivityConvert {
     AppCombinationRecordRespVO convert(CombinationRecordDO record);
 
     PageResult<CombinationRecordRespVO> convert(PageResult<CombinationRecordDO> result);
+
+    default AppCombinationRecordDetailRespVO convert(Long userId, CombinationRecordDO headRecord, List<CombinationRecordDO> memberRecords) {
+        AppCombinationRecordDetailRespVO respVO = new AppCombinationRecordDetailRespVO()
+                .setHeadRecord(convert(headRecord)).setMemberRecords(convertList3(memberRecords));
+        // 处理自己参与拼团的 orderId
+        CombinationRecordDO userRecord = CollectionUtils.findFirst(memberRecords, r -> ObjectUtil.equal(r.getUserId(), userId));
+        if (userRecord == null && ObjectUtil.equal(headRecord.getUserId(), userId)) {
+            userRecord = headRecord;
+        }
+        respVO.setOrderId(userRecord == null ? null : userRecord.getOrderId());
+        return respVO;
+    }
 
 }
