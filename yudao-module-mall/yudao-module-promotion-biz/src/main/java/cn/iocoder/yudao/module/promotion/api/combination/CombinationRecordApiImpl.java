@@ -8,7 +8,6 @@ import cn.iocoder.yudao.module.promotion.service.combination.CombinationRecordSe
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.COMBINATION_RECORD_NOT_EXISTS;
@@ -45,19 +44,8 @@ public class CombinationRecordApiImpl implements CombinationRecordApi {
     }
 
     @Override
-    public void updateRecordStatusToSuccess(Long userId, Long orderId) {
-        recordService.updateCombinationRecordStatusByUserIdAndOrderId(CombinationRecordStatusEnum.SUCCESS.getStatus(), userId, orderId);
-    }
-
-    @Override
     public void updateRecordStatusToFailed(Long userId, Long orderId) {
         recordService.updateCombinationRecordStatusByUserIdAndOrderId(CombinationRecordStatusEnum.FAILED.getStatus(), userId, orderId);
-    }
-
-    @Override
-    public void updateRecordStatusToInProgress(Long userId, Long orderId, LocalDateTime startTime) {
-        recordService.updateRecordStatusAndStartTimeByUserIdAndOrderId(CombinationRecordStatusEnum.IN_PROGRESS.getStatus(),
-                userId, orderId, startTime);
     }
 
     @Override

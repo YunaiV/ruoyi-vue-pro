@@ -4,7 +4,6 @@ import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCr
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationValidateJoinRespDTO;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
 
 // TODO @芋艿：后面也再撸撸这几个接口
 
@@ -43,29 +42,12 @@ public interface CombinationRecordApi {
     boolean isCombinationRecordSuccess(Long userId, Long orderId);
 
     /**
-     * 更新拼团状态为【成功】
-     *
-     * @param userId  用户编号
-     * @param orderId 订单编号
-     */
-    void updateRecordStatusToSuccess(Long userId, Long orderId);
-
-    /**
      * 更新拼团状态为【失败】
      *
      * @param userId  用户编号
      * @param orderId 订单编号
      */
     void updateRecordStatusToFailed(Long userId, Long orderId);
-
-    /**
-     * 更新拼团状态为 进行中
-     *
-     * @param userId    用户编号
-     * @param orderId   订单编号
-     * @param startTime 开始时间
-     */
-    void updateRecordStatusToInProgress(Long userId, Long orderId, LocalDateTime startTime);
 
     /**
      * 【下单前】校验是否满足拼团活动条件

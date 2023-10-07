@@ -33,8 +33,10 @@ public interface TradeOrderHandler {
      * 支付订单后
      *
      * @param order 订单
+     * @param orderItems 订单项
      */
-    default void afterPayOrder(TradeOrderDO order) {}
+    default void afterPayOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
+    }
 
     /**
      * 订单取消

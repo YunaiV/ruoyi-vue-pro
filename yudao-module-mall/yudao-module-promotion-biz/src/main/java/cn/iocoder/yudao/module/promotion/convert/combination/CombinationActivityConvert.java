@@ -22,11 +22,13 @@ import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.Ap
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
+import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -110,14 +112,19 @@ public interface CombinationActivityConvert {
                                         CombinationActivityDO activity, MemberUserRespDTO user,
                                         ProductSpuRespDTO spu, ProductSkuRespDTO sku) {
         return convert(reqDTO)
-                .setCount(reqDTO.getCount()).setUserCount(1)
+                .setHeadId(reqDTO.getHeadId()) // 显示性再设置一下
+                .setCount(reqDTO.getCount())
                 .setVirtualGroup(false)
+                .setStatus(CombinationRecordStatusEnum.IN_PROGRESS.getStatus()) // 创建后默认状态为进行中
+                .setStartTime(LocalDateTime.now())
                 .setExpireTime(activity.getStartTime().plusHours(activity.getLimitDuration()))
                 .setUserSize(activity.getUserSize())
+                .setUserCount(1) // 默认就是 1 插入后会接着更新一次所有的拼团记录
                 .setNickname(user.getNickname())
                 .setAvatar(user.getAvatar())
                 .setSpuName(spu.getName())
                 .setPicUrl(sku.getPicUrl());
+
     }
 
     List<AppCombinationActivityRespVO> convertAppList(List<CombinationActivityDO> list);

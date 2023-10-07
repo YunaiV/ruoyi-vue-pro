@@ -32,12 +32,6 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
                 CombinationRecordDO::getOrderId, orderId);
     }
 
-    default List<CombinationRecordDO> selectListByUserIdAndStatus(Long userId, Integer status) {
-        return selectList(new LambdaQueryWrapperX<CombinationRecordDO>()
-                .eq(CombinationRecordDO::getUserId, userId)
-                .eq(CombinationRecordDO::getStatus, status));
-    }
-
     /**
      * 查询拼团记录
      *

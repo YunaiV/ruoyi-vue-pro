@@ -30,15 +30,6 @@ public interface TradeOrderApi {
      */
     TradeOrderRespDTO getOrder(Long id);
 
-    // TODO 芋艿：看看是不是可以删除掉；
-    /**
-     * 获取订单状态
-     *
-     * @param id 订单编号
-     * @return 订单状态
-     */
-    Integer getOrderStatus(Long id);
-
     /**
      * 获取订单统计
      *
@@ -47,5 +38,15 @@ public interface TradeOrderApi {
      * @return 订单统计结果
      */
     TradeOrderSummaryRespDTO getOrderSummary(LocalDateTime beginTime, LocalDateTime endTime);
+
+    /**
+     * 更新拼团相关信息到订单
+     *
+     * @param orderId             订单编号
+     * @param activityId          拼团活动编号
+     * @param combinationRecordId 拼团记录编号
+     * @param headId              团长编号
+     */
+    void updateOrderCombinationInfo(Long orderId, Long activityId, Long combinationRecordId, Long headId);
 
 }

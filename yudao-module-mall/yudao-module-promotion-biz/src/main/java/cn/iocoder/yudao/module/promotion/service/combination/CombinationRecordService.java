@@ -10,7 +10,6 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationP
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
 
 import javax.annotation.Nullable;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -51,16 +50,6 @@ public interface CombinationRecordService {
      * @param reqDTO 创建信息
      */
     void createCombinationRecord(CombinationRecordCreateReqDTO reqDTO);
-
-    /**
-     * 更新拼团状态和开始时间
-     *
-     * @param status    状态
-     * @param userId    用户编号
-     * @param orderId   订单编号
-     * @param startTime 开始时间
-     */
-    void updateRecordStatusAndStartTimeByUserIdAndOrderId(Integer status, Long userId, Long orderId, LocalDateTime startTime);
 
     /**
      * 获得拼团记录
