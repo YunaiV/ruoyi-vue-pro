@@ -159,20 +159,4 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
                 .betweenIfPresent(CombinationRecordDO::getCreateTime, builderQueryTime(dateType)));
     }
 
-    /**
-     * 查询指定团长的拼团记录（包括团长）
-     *
-     * @param activityId 活动编号
-     * @param headId     团长编号
-     * @return 拼团记录
-     */
-    default List<CombinationRecordDO> selectList(Long activityId, Long headId) {
-        return selectList(new LambdaQueryWrapperX<CombinationRecordDO>()
-                .eq(CombinationRecordDO::getActivityId, activityId)
-                .eq(CombinationRecordDO::getHeadId, headId)
-                .or()
-                .eq(CombinationRecordDO::getId, headId));
-
-    }
-
 }

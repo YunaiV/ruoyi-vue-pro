@@ -918,6 +918,17 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                         .setCombinationRecordId(combinationRecordId).setCombinationHeadId(headId));
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void cancelPaidOrder(Long userId, Long orderId) {
+        TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(orderId, userId);
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+
+        cancelOrder0(order, TradeOrderCancelTypeEnum.MEMBER_CANCEL);
+    }
+
     /**
      * 创建单个订单的评论
      *

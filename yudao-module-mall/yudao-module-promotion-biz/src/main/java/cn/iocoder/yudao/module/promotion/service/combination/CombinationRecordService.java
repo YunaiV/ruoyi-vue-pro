@@ -158,12 +158,32 @@ public interface CombinationRecordService {
      * 【拼团活动】获得拼团记录数量 Map
      *
      * @param activityIds 活动记录编号数组
-     * @param status     拼团状态，允许空
-     * @param headId    团长编号，允许空。目的 headId 设置为 {@link CombinationRecordDO#HEAD_ID_GROUP} 时，可以设置
+     * @param status      拼团状态，允许空
+     * @param headId      团长编号，允许空。目的 headId 设置为 {@link CombinationRecordDO#HEAD_ID_GROUP} 时，可以设置
      * @return 拼团记录数量 Map
      */
     Map<Long, Integer> getCombinationRecordCountMapByActivity(Collection<Long> activityIds,
                                                               @Nullable Integer status,
                                                               @Nullable Long headId);
+
+
+    /**
+     * 获取拼团记录
+     *
+     * @param userId 用户编号
+     * @param id     拼团记录编号
+     * @return 拼团记录
+     */
+    CombinationRecordDO getCombinationRecordByIdAndUser(Long userId, Long id);
+
+    /**
+     * 取消拼团
+     *
+     * @param userId 用户编号
+     * @param id     拼团记录编号
+     * @param headId 团长编号
+     */
+    void cancelCombinationRecord(Long userId, Long id, Long headId);
+
 
 }

@@ -47,4 +47,9 @@ public class TradeOrderApiImpl implements TradeOrderApi {
         tradeOrderUpdateService.updateOrderCombinationInfo(orderId, activityId, combinationRecordId, headId);
     }
 
+    @Override
+    public void cancelPaidOrder(Long userId, Long orderId) {
+        tradeOrderUpdateService.cancelPaidOrder(userId, orderId);
+    }
+
 }

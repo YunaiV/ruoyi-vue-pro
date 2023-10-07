@@ -28,10 +28,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -180,7 +177,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         recordMapper.insert(recordDO);
 
         // 3、如果是团长需要设置 headId 为 CombinationRecordDO#HEAD_ID_GROUP
-        if (reqDTO.getHeadId() == null) {
+        if (ObjUtil.equal(CombinationRecordDO.HEAD_ID_GROUP, reqDTO.getHeadId())) {
             recordMapper.updateById(new CombinationRecordDO().setId(recordDO.getId()).setHeadId(CombinationRecordDO.HEAD_ID_GROUP));
             return;
         }
@@ -212,13 +209,17 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
      * @param headId   团长编号
      */
     private void updateCombinationRecords(CombinationActivityDO activity, Long headId) {
-        List<CombinationRecordDO> records = recordMapper.selectList(CombinationRecordDO::getHeadId, headId);
+        // 团长
+        CombinationRecordDO recordHead = recordMapper.selectById(headId);
+        // 团员
+        List<CombinationRecordDO> records = getCombinationRecordListByHeadId(headId);
+        // 需要更新的记录
         List<CombinationRecordDO> updateRecords = new ArrayList<>();
 
         if (CollUtil.isEmpty(records)) {
             return;
         }
-
+        records.add(recordHead); // 加入团长，团长也需要更新
         boolean isEqual = ObjUtil.equal(records.size(), activity.getUserSize());
         records.forEach(item -> {
             CombinationRecordDO recordDO = new CombinationRecordDO();
@@ -303,6 +304,61 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     public Map<Long, Integer> getCombinationRecordCountMapByActivity(Collection<Long> activityIds,
                                                                      @Nullable Integer status, @Nullable Long headId) {
         return recordMapper.selectCombinationRecordCountMapByActivityIdAndStatusAndHeadId(activityIds, status, headId);
+    }
+
+    @Override
+    public CombinationRecordDO getCombinationRecordByIdAndUser(Long userId, Long id) {
+        return recordMapper.selectOne(CombinationRecordDO::getUserId, userId, CombinationRecordDO::getId, id);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void cancelCombinationRecord(Long userId, Long id, Long headId) {
+        // 删除记录
+        recordMapper.deleteById(id);
+
+        // 需要更新的记录
+        List<CombinationRecordDO> updateRecords = new ArrayList<>();
+        // 如果它是团长，则顺序（下单时间）继承
+        if (Objects.equals(headId, CombinationRecordDO.HEAD_ID_GROUP)) { // 情况一：团长
+            // 团员
+            List<CombinationRecordDO> list = getCombinationRecordListByHeadId(id);
+            if (CollUtil.isEmpty(list)) {
+                return;
+            }
+            // 按照创建时间升序排序
+            List<CombinationRecordDO> recordsSort = sortedAsc(list, CombinationRecordDO::getCreateTime);
+            CombinationRecordDO newHead = recordsSort.get(0); // 新团长继位
+            recordsSort.forEach(item -> {
+                CombinationRecordDO recordDO = new CombinationRecordDO();
+                recordDO.setId(item.getId());
+                if (ObjUtil.equal(item.getId(), newHead.getId())) { // 新团长
+                    recordDO.setHeadId(CombinationRecordDO.HEAD_ID_GROUP);
+                } else {
+                    recordDO.setHeadId(newHead.getId());
+                }
+                recordDO.setUserCount(recordsSort.size());
+                updateRecords.add(recordDO);
+            });
+        } else { // 情况二：团员
+            // 团长
+            CombinationRecordDO recordHead = recordMapper.selectById(headId);
+            // 团员
+            List<CombinationRecordDO> records = getCombinationRecordListByHeadId(headId);
+            if (CollUtil.isEmpty(records)) {
+                return;
+            }
+            records.add(recordHead); // 加入团长，团长数据也需要更新
+            records.forEach(item -> {
+                CombinationRecordDO recordDO = new CombinationRecordDO();
+                recordDO.setId(item.getId());
+                recordDO.setUserCount(records.size());
+                updateRecords.add(recordDO);
+            });
+        }
+
+        // 更新拼团记录
+        recordMapper.updateBatch(updateRecords);
     }
 
 }

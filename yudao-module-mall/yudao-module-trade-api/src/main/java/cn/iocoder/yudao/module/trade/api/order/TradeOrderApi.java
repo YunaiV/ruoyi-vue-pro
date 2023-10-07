@@ -49,4 +49,12 @@ public interface TradeOrderApi {
      */
     void updateOrderCombinationInfo(Long orderId, Long activityId, Long combinationRecordId, Long headId);
 
+    /**
+     * 取消支付订单
+     *
+     * @param userId  用户编号
+     * @param orderId 订单编号
+     */
+    void cancelPaidOrder(Long userId, Long orderId);
+
 }
