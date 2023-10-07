@@ -179,9 +179,9 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         CombinationRecordDO recordDO = CombinationActivityConvert.INSTANCE.convert(reqDTO, keyValue.getKey(), user, spu, sku);
         recordMapper.insert(recordDO);
 
-        // 3、如果是团长需要设置 headId 为它自己
+        // 3、如果是团长需要设置 headId 为 CombinationRecordDO#HEAD_ID_GROUP
         if (reqDTO.getHeadId() == null) {
-            recordMapper.updateById(new CombinationRecordDO().setId(recordDO.getId()).setHeadId(recordDO.getId()));
+            recordMapper.updateById(new CombinationRecordDO().setId(recordDO.getId()).setHeadId(CombinationRecordDO.HEAD_ID_GROUP));
             return;
         }
 
