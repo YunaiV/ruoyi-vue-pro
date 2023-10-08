@@ -4,7 +4,6 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 
-// TODO @芋艿：这块要在看看
 /**
  * 拼团记录的创建 Request DTO
  *

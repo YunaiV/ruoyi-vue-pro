@@ -109,22 +109,19 @@ public interface CombinationActivityConvert {
 
     CombinationRecordDO convert(CombinationRecordCreateReqDTO reqDTO);
 
-    // TODO @芋艿：在 convert 优化下；
     default CombinationRecordDO convert(CombinationRecordCreateReqDTO reqDTO,
                                         CombinationActivityDO activity, MemberUserRespDTO user,
                                         ProductSpuRespDTO spu, ProductSkuRespDTO sku) {
-        return convert(reqDTO)
-                .setCount(reqDTO.getCount())
-                .setVirtualGroup(false) // 默认 false 拼团过期都还没有成功，则按照 CombinationActivityDO#virtualGroup 来如果为 true 则执行虚拟成团的逻辑
+        return convert(reqDTO).setVirtualGroup(false)
                 .setStatus(CombinationRecordStatusEnum.IN_PROGRESS.getStatus()) // 创建后默认状态为进行中
-                .setStartTime(LocalDateTime.now())
+                .setStartTime(LocalDateTime.now()) // TODO @puhui999：想了下，这个 startTime 应该是团长的；
+                // TODO @puhui999：有团长的情况下，expireTime 应该是团长的；
                 .setExpireTime(activity.getStartTime().plusHours(activity.getLimitDuration()))
-                .setUserSize(activity.getUserSize())
-                .setUserCount(1) // 默认就是 1 插入后会接着更新一次所有的拼团记录
-                .setNickname(user.getNickname())
-                .setAvatar(user.getAvatar())
-                .setSpuName(spu.getName())
-                .setPicUrl(sku.getPicUrl());
+                .setUserSize(activity.getUserSize()).setUserCount(1) // 默认就是 1 插入后会接着更新一次所有的拼团记录
+                // 用户信息
+                .setNickname(user.getNickname()).setAvatar(user.getAvatar())
+                // 商品信息
+                .setSpuName(spu.getName()).setPicUrl(sku.getPicUrl());
 
     }
 

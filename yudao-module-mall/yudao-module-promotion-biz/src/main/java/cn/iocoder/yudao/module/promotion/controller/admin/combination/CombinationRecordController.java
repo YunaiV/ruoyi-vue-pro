@@ -55,8 +55,8 @@ public class CombinationRecordController {
     public CommonResult<CombinationRecordSummaryVO> getCombinationRecordSummary() {
         CombinationRecordSummaryVO summaryVO = new CombinationRecordSummaryVO();
         summaryVO.setUserCount(combinationRecordService.getCombinationRecordCount(null, null)); // 获取所有拼团记录
-        summaryVO.setSuccessCount(combinationRecordService.getCombinationRecordCount(
-                CombinationRecordStatusEnum.SUCCESS.getStatus(), null));// 获取成团记录
+        summaryVO.setSuccessCount(combinationRecordService.getCombinationRecordCount( // 获取成团记录
+                CombinationRecordStatusEnum.SUCCESS.getStatus(), null));
         summaryVO.setVirtualGroupCount(combinationRecordService.getCombinationRecordCount(null, Boolean.TRUE));// 获取虚拟成团记录
         return success(summaryVO);
     }

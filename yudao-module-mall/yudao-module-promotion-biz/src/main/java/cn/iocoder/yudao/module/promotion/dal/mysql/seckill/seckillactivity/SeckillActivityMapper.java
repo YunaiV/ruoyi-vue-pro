@@ -58,6 +58,7 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
                 .apply(ObjectUtil.isNotNull(pageReqVO.getConfigId()), "FIND_IN_SET(" + pageReqVO.getConfigId() + ",config_ids) > 0"));
     }
 
+    // TODO @puhui999：类似 BargainActivityMapper
     /**
      * 获取指定 spu 编号最近参加的活动，每个 spuId 只返回一条记录
      *

@@ -169,19 +169,22 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         KeyValue<CombinationActivityDO, CombinationProductDO> keyValue = validateCombinationRecord(reqDTO.getUserId(),
                 reqDTO.getActivityId(), reqDTO.getHeadId(), reqDTO.getSkuId(), reqDTO.getCount());
 
-        // 2. 组合数据创建拼团记录
+        // 2.1 组合数据创建拼团记录
         MemberUserRespDTO user = memberUserApi.getUser(reqDTO.getUserId());
         ProductSpuRespDTO spu = productSpuApi.getSpu(reqDTO.getSpuId());
         ProductSkuRespDTO sku = productSkuApi.getSku(reqDTO.getSkuId());
         CombinationRecordDO record = CombinationActivityConvert.INSTANCE.convert(reqDTO, keyValue.getKey(), user, spu, sku);
-        // 3. 如果是团长需要设置 headId 为 CombinationRecordDO#HEAD_ID_GROUP
-        record.setHeadId(record.getHeadId() == null ? CombinationRecordDO.HEAD_ID_GROUP : record.getHeadId());
+        // 2.2 如果是团长需要设置 headId 为 CombinationRecordDO#HEAD_ID_GROUP
+        if (record.getHeadId() == null) {
+            record.setHeadId(CombinationRecordDO.HEAD_ID_GROUP);
+        }
         recordMapper.insert(record);
 
         if (ObjUtil.equal(CombinationRecordDO.HEAD_ID_GROUP, record.getHeadId())) {
             return record.getId();
         }
 
+        // TODO @puhui：是不是这里的更新，放到 order 模块那；支付完成后；
         // 4、更新拼团相关信息到订单
         tradeOrderApi.updateOrderCombinationInfo(record.getOrderId(), record.getActivityId(), record.getId(), record.getHeadId());
         // 4、更新拼团记录
@@ -239,7 +242,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
 
     @Override
     public Long getCombinationRecordCount(@Nullable Integer status, @Nullable Boolean virtualGroup) {
-        return recordMapper.selectRecordCount(status, virtualGroup);
+        return recordMapper.selectCountByHeadAndStatusAndVirtualGroup(status, virtualGroup);
     }
 
     @Override

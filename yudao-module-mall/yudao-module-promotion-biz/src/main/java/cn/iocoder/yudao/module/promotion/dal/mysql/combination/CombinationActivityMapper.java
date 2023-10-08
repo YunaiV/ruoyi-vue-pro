@@ -43,6 +43,7 @@ public interface CombinationActivityMapper extends BaseMapperX<CombinationActivi
                 .last("LIMIT " + count));
     }
 
+    // TODO @puhui999：类似 BargainActivityMapper
     /**
      * 获取指定 spu 编号最近参加的活动，每个 spuId 只返回一条记录
      *

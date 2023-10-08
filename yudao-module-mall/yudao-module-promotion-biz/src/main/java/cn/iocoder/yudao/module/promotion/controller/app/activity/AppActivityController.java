@@ -55,7 +55,6 @@ public class AppActivityController {
         if (CollUtil.isEmpty(spuIds)) {
             return success(MapUtil.empty());
         }
-
         // 每种活动，只返回一个；key 为 SPU 编号
         return success(convertMultiMap(getAppActivityRespVOList(spuIds), AppActivityRespVO::getSpuId));
     }
@@ -64,20 +63,15 @@ public class AppActivityController {
         if (CollUtil.isEmpty(spuIds)) {
             return new ArrayList<>();
         }
-
         List<AppActivityRespVO> activityList = new ArrayList<>();
         // 拼团活动
         List<CombinationActivityDO> combinationActivities = combinationActivityService.getCombinationActivityBySpuIdsAndStatus(
                 spuIds, CommonStatusEnum.ENABLE.getStatus());
         if (CollUtil.isNotEmpty(combinationActivities)) {
             combinationActivities.forEach(item -> {
-                activityList.add(new AppActivityRespVO()
-                        .setId(item.getId())
-                        .setType(PromotionTypeEnum.COMBINATION_ACTIVITY.getType())
-                        .setName(item.getName())
-                        .setSpuId(item.getSpuId())
-                        .setStartTime(item.getStartTime())
-                        .setEndTime(item.getEndTime()));
+                activityList.add(new AppActivityRespVO().setId(item.getId())
+                        .setType(PromotionTypeEnum.COMBINATION_ACTIVITY.getType()).setName(item.getName())
+                        .setSpuId(item.getSpuId()).setStartTime(item.getStartTime()).setEndTime(item.getEndTime()));
             });
         }
         // 秒杀活动
@@ -85,13 +79,9 @@ public class AppActivityController {
                 spuIds, CommonStatusEnum.ENABLE.getStatus());
         if (CollUtil.isNotEmpty(seckillActivities)) {
             seckillActivities.forEach(item -> {
-                activityList.add(new AppActivityRespVO()
-                        .setId(item.getId())
-                        .setType(PromotionTypeEnum.SECKILL_ACTIVITY.getType())
-                        .setName(item.getName())
-                        .setSpuId(item.getSpuId())
-                        .setStartTime(item.getStartTime())
-                        .setEndTime(item.getEndTime()));
+                activityList.add(new AppActivityRespVO().setId(item.getId())
+                        .setType(PromotionTypeEnum.SECKILL_ACTIVITY.getType()).setName(item.getName())
+                        .setSpuId(item.getSpuId()).setStartTime(item.getStartTime()).setEndTime(item.getEndTime()));
             });
         }
         // 砍价活动
@@ -99,13 +89,9 @@ public class AppActivityController {
                 spuIds, CommonStatusEnum.ENABLE.getStatus());
         if (CollUtil.isNotEmpty(bargainActivities)) {
             bargainActivities.forEach(item -> {
-                activityList.add(new AppActivityRespVO()
-                        .setId(item.getId())
-                        .setType(PromotionTypeEnum.BARGAIN_ACTIVITY.getType())
-                        .setName(item.getName())
-                        .setSpuId(item.getSpuId())
-                        .setStartTime(item.getStartTime())
-                        .setEndTime(item.getEndTime()));
+                activityList.add(new AppActivityRespVO().setId(item.getId())
+                        .setType(PromotionTypeEnum.BARGAIN_ACTIVITY.getType()).setName(item.getName())
+                        .setSpuId(item.getSpuId()).setStartTime(item.getStartTime()).setEndTime(item.getEndTime()));
             });
         }
         return activityList;

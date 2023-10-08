@@ -100,7 +100,8 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
                 .betweenIfPresent(CombinationRecordDO::getCreateTime, pageVO.getCreateTime()));
     }
 
-    default Long selectRecordCount(Integer status, Boolean virtualGroup) {
+    // TODO @puhui999：这个最好把 headId 也作为一个参数；因为有个要求 userCount，它要 DISTINCT 下；整体可以参考 selectCombinationRecordCountMapByActivityIdAndStatusAndHeadId
+    default Long selectCountByHeadAndStatusAndVirtualGroup(Integer status, Boolean virtualGroup) {
         return selectCount(new LambdaQueryWrapperX<CombinationRecordDO>()
                 .eq(status != null || virtualGroup != null,
                         CombinationRecordDO::getHeadId, CombinationRecordDO.HEAD_ID_GROUP) // 统计团信息则指定团长

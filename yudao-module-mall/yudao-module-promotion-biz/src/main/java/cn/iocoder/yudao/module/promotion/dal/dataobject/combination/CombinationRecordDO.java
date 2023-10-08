@@ -116,6 +116,9 @@ public class CombinationRecordDO extends BaseDO {
     private Integer userCount;
     /**
      * 是否虚拟成团
+     *
+     * 默认为 false。
+     * 拼团过期都还没有成功，如果 {@link CombinationActivityDO#getVirtualGroup()} 为 true，则执行虚拟成团的逻辑，才会更新该字段为 true
      */
     private Boolean virtualGroup;
 

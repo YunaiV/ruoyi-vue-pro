@@ -153,15 +153,15 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
      * @return 物流轨迹
      */
     private List<ExpressTrackRespDTO> getExpressTrackList(TradeOrderDO order) {
-        // 查询物流公司
         if (order.getLogisticsId() == null) {
             return Collections.emptyList();
         }
+        // 查询物流公司
         DeliveryExpressDO express = deliveryExpressService.getDeliveryExpress(order.getLogisticsId());
         if (express == null) {
             throw exception(EXPRESS_NOT_EXISTS);
         }
-
+        // 查询物流轨迹
         return getSelf().getExpressTrackList(express.getCode(), order.getLogisticsNo(), order.getReceiverMobile());
     }
 

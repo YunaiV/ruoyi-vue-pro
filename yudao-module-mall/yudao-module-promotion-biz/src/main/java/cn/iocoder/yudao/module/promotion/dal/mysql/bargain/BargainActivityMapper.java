@@ -85,6 +85,8 @@ public interface BargainActivityMapper extends BaseMapperX<BargainActivityDO> {
                 .last("LIMIT " + count));
     }
 
+    // TODO @puhui999：一个商品，在统一时间，不会参与多个活动；so 是不是不用 inner join 哈？
+    // PS：如果可以参与多个，其实可以这样写 select * from promotion_bargain_activity group by spu_id ORDER BY create_time DESC；通过 group 来过滤
     /**
      * 获取指定 spu 编号最近参加的活动，每个 spuId 只返回一条记录
      *
