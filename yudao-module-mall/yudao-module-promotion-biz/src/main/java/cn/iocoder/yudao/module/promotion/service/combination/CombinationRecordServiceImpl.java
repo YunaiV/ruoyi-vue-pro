@@ -31,7 +31,8 @@ import javax.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.findFirst;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getSumValue;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.afterNow;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.beforeNow;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
@@ -163,7 +164,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {
+    public Long createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {
         // 1. 校验拼团活动
         KeyValue<CombinationActivityDO, CombinationProductDO> keyValue = validateCombinationRecord(reqDTO.getUserId(),
                 reqDTO.getActivityId(), reqDTO.getHeadId(), reqDTO.getSkuId(), reqDTO.getCount());
@@ -173,34 +174,19 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         ProductSpuRespDTO spu = productSpuApi.getSpu(reqDTO.getSpuId());
         ProductSkuRespDTO sku = productSkuApi.getSku(reqDTO.getSkuId());
         CombinationRecordDO record = CombinationActivityConvert.INSTANCE.convert(reqDTO, keyValue.getKey(), user, spu, sku);
-        // TODO @puhui：有 head 的情况下，以 head 结束为准
+        // 3. 如果是团长需要设置 headId 为 CombinationRecordDO#HEAD_ID_GROUP
+        record.setHeadId(record.getHeadId() == null ? CombinationRecordDO.HEAD_ID_GROUP : record.getHeadId());
         recordMapper.insert(record);
 
-        // 3. 如果是团长需要设置 headId 为 CombinationRecordDO#HEAD_ID_GROUP
-        // TODO @puhui999：是不是只要是团长，record 设置了就好啦，不用 update。。。。
-        if (ObjUtil.equal(CombinationRecordDO.HEAD_ID_GROUP, reqDTO.getHeadId())) {
-            recordMapper.updateById(new CombinationRecordDO().setId(record.getId()).setHeadId(CombinationRecordDO.HEAD_ID_GROUP));
-            return;
+        if (ObjUtil.equal(CombinationRecordDO.HEAD_ID_GROUP, record.getHeadId())) {
+            return record.getId();
         }
 
-        // TODO 这里要不要弄成异步的；不用异步哈，就是事务好了；
         // 4、更新拼团相关信息到订单
-        updateOrderCombinationInfo(record.getOrderId(), record.getActivityId(), record.getId(), record.getHeadId());
+        tradeOrderApi.updateOrderCombinationInfo(record.getOrderId(), record.getActivityId(), record.getId(), record.getHeadId());
         // 4、更新拼团记录
         updateCombinationRecordWhenCreate(reqDTO.getHeadId(), keyValue.getKey());
-    }
-
-    // TODO @puhui999：这个更新，放到 trade 那就好了；createCombinationRecord 返回一个 recordId；
-    /**
-     * 更新拼团相关信息到订单
-     *
-     * @param orderId             订单编号
-     * @param activityId          拼团活动编号
-     * @param combinationRecordId 拼团记录编号
-     * @param headId              团长编号
-     */
-    private void updateOrderCombinationInfo(Long orderId, Long activityId, Long combinationRecordId, Long headId) {
-        tradeOrderApi.updateOrderCombinationInfo(orderId, activityId, combinationRecordId, headId);
+        return record.getId();
     }
 
     /**

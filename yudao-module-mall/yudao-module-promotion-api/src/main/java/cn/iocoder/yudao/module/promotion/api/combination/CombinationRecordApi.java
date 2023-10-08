@@ -29,8 +29,9 @@ public interface CombinationRecordApi {
      * 创建开团记录
      *
      * @param reqDTO 请求 DTO
+     * @return 开团记录编号
      */
-    void createCombinationRecord(@Valid CombinationRecordCreateReqDTO reqDTO);
+    Long createCombinationRecord(@Valid CombinationRecordCreateReqDTO reqDTO);
 
     /**
      * 查询拼团记录是否成功
