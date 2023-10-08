@@ -193,7 +193,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
 
         // 拼接数据
-        return BpmTaskConvert.INSTANCE.convertList3(tasks, bpmTaskExtDOMap, processInstance, userMap, deptMap);
+        List<BpmTaskRespVO> result = BpmTaskConvert.INSTANCE.convertList3(tasks, bpmTaskExtDOMap, processInstance, userMap, deptMap);
+        return BpmTaskConvert.INSTANCE.convertChildrenList(result);
     }
 
     @Override

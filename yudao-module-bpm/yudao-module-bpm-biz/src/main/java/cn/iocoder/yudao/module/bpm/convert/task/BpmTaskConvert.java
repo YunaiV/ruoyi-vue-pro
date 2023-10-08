@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.convert.task;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -177,5 +178,19 @@ public interface BpmTaskConvert {
             }
             return bpmTaskSubSignRespVO;
         });
+    }
+
+    /**
+     * 转换任务为父子级
+     * @param result
+     * @return
+     */
+    default List<BpmTaskRespVO> convertChildrenList(List<BpmTaskRespVO> result){
+        List<BpmTaskRespVO> childrenTaskList = CollectionUtils.filterList(result, r -> StrUtil.isNotEmpty(r.getParentTaskId()));
+        Map<String, List<BpmTaskRespVO>> parentChildrenTaskListMap = CollectionUtils.convertMultiMap(childrenTaskList, BpmTaskRespVO::getParentTaskId);
+        for (BpmTaskRespVO bpmTaskRespVO : result) {
+            bpmTaskRespVO.setChildren(parentChildrenTaskListMap.get(bpmTaskRespVO.getId()));
+        }
+        return CollectionUtils.filterList(result, r -> StrUtil.isEmpty(r.getParentTaskId()));
     }
 }
