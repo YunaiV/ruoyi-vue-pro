@@ -173,6 +173,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         ProductSpuRespDTO spu = productSpuApi.getSpu(reqDTO.getSpuId());
         ProductSkuRespDTO sku = productSkuApi.getSku(reqDTO.getSkuId());
         CombinationRecordDO record = CombinationActivityConvert.INSTANCE.convert(reqDTO, keyValue.getKey(), user, spu, sku);
+        // TODO @puhui：有 head 的情况下，以 head 结束为准
         recordMapper.insert(record);
 
         // 3. 如果是团长需要设置 headId 为 CombinationRecordDO#HEAD_ID_GROUP
