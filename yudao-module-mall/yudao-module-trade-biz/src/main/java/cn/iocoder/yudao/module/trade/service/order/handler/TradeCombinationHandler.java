@@ -30,11 +30,11 @@ public class TradeCombinationHandler implements TradeOrderHandler {
         }
         Assert.isTrue(orderItems.size() == 1, "拼团时，只允许选择一个商品");
 
-        // 获取商品信息
-        TradeOrderItemDO item = orderItems.get(0);
         // 校验是否满足拼团活动相关限制
+        TradeOrderItemDO item = orderItems.get(0);
         combinationRecordApi.validateCombinationRecord(order.getUserId(), order.getCombinationActivityId(),
                 order.getCombinationHeadId(), item.getSkuId(), item.getCount());
+        // TODO @puhui999：这里还要限制下，是不是已经 createOrder；就是还没支付的时候，重复下单了；需要校验下；不然的话，一个拼团可以下多个单子了；
     }
 
     @Override
