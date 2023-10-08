@@ -47,7 +47,7 @@ public class AppCombinationRecordController {
     public CommonResult<AppCombinationRecordSummaryRespVO> getCombinationRecordSummary() {
         AppCombinationRecordSummaryRespVO summary = new AppCombinationRecordSummaryRespVO();
         // 1. 获得拼团记录数量
-        Long count = combinationRecordService.getCombinationRecordCount();
+        Long count = combinationRecordService.getCombinationRecordCount(null, null);
         if (count == 0) {
             summary.setAvatars(Collections.emptyList());
             summary.setUserCount(count);

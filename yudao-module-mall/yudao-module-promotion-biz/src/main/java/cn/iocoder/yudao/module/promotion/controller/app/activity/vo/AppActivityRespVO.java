@@ -13,11 +13,13 @@ public class AppActivityRespVO {
     private Long id;
 
     @Schema(description = "活动类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    // 对应 PromotionTypeEnum 枚举
-    private Integer type;
+    private Integer type; // 对应 PromotionTypeEnum 枚举
 
     @Schema(description = "活动名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "618 大促")
     private String name;
+
+    @Schema(description = "spu 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "618")
+    private Long spuId;
 
     @Schema(description = "活动开始时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime startTime;

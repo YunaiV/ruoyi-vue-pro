@@ -311,8 +311,8 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     }
 
     @Override
-    public SeckillActivityDO getSeckillActivityBySpuId(Long spuId) {
-        return seckillActivityMapper.selectOne(spuId);
+    public List<SeckillActivityDO> getSeckillActivityBySpuIdsAndStatus(Collection<Long> spuIds, Integer status) {
+        return seckillActivityMapper.selectListBySpuIds(spuIds, status);
     }
 
 }

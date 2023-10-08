@@ -29,8 +29,8 @@ public class CombinationRecordApiImpl implements CombinationRecordApi {
     }
 
     @Override
-    public void createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {
-        recordService.createCombinationRecord(reqDTO);
+    public Long createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {
+        return recordService.createCombinationRecord(reqDTO);
     }
 
     @Override

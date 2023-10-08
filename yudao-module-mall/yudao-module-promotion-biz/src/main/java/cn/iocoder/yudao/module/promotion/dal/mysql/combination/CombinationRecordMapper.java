@@ -100,4 +100,12 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
                 .betweenIfPresent(CombinationRecordDO::getCreateTime, pageVO.getCreateTime()));
     }
 
+    default Long selectRecordCount(Integer status, Boolean virtualGroup) {
+        return selectCount(new LambdaQueryWrapperX<CombinationRecordDO>()
+                .eq(status != null || virtualGroup != null,
+                        CombinationRecordDO::getHeadId, CombinationRecordDO.HEAD_ID_GROUP) // 统计团信息则指定团长
+                .eqIfPresent(CombinationRecordDO::getStatus, status)
+                .eqIfPresent(CombinationRecordDO::getVirtualGroup, virtualGroup));
+    }
+
 }

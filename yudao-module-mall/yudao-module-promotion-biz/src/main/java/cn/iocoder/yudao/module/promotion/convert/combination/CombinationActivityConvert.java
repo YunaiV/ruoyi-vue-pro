@@ -14,7 +14,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activit
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.product.CombinationProductBaseVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.product.CombinationProductRespVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordRespVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordPageItemRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.activity.AppCombinationActivityDetailRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.activity.AppCombinationActivityRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordDetailRespVO;
@@ -79,6 +79,7 @@ public interface CombinationActivityConvert {
         });
         return pageResult;
     }
+
     PageResult<CombinationActivityPageItemRespVO> convertPage(PageResult<CombinationActivityDO> page);
 
     List<CombinationProductRespVO> convertList2(List<CombinationProductDO> productDOs);
@@ -113,9 +114,8 @@ public interface CombinationActivityConvert {
                                         CombinationActivityDO activity, MemberUserRespDTO user,
                                         ProductSpuRespDTO spu, ProductSkuRespDTO sku) {
         return convert(reqDTO)
-                .setHeadId(reqDTO.getHeadId()) // 显示性再设置一下
                 .setCount(reqDTO.getCount())
-                .setVirtualGroup(false)
+                .setVirtualGroup(false) // 默认 false 拼团过期都还没有成功，则按照 CombinationActivityDO#virtualGroup 来如果为 true 则执行虚拟成团的逻辑
                 .setStatus(CombinationRecordStatusEnum.IN_PROGRESS.getStatus()) // 创建后默认状态为进行中
                 .setStartTime(LocalDateTime.now())
                 .setExpireTime(activity.getStartTime().plusHours(activity.getLimitDuration()))
@@ -176,7 +176,20 @@ public interface CombinationActivityConvert {
 
     AppCombinationRecordRespVO convert(CombinationRecordDO record);
 
-    PageResult<CombinationRecordRespVO> convert(PageResult<CombinationRecordDO> result);
+    PageResult<CombinationRecordPageItemRespVO> convert(PageResult<CombinationRecordDO> result);
+
+    default PageResult<CombinationRecordPageItemRespVO> convert(PageResult<CombinationRecordDO> recordPage, List<CombinationActivityDO> activities) {
+        PageResult<CombinationRecordPageItemRespVO> result = convert(recordPage);
+        Map<Long, CombinationActivityDO> activityMap = convertMap(activities, CombinationActivityDO::getId);
+        result.setList(CollectionUtils.convertList(result.getList(), item -> {
+            findAndThen(activityMap, item.getActivityId(), activity -> {
+                item.setActivity(convert(activity));
+            });
+            return item;
+        }));
+        return result;
+    }
+
 
     default AppCombinationRecordDetailRespVO convert(Long userId, CombinationRecordDO headRecord, List<CombinationRecordDO> memberRecords) {
         AppCombinationRecordDetailRespVO respVO = new AppCombinationRecordDetailRespVO()
