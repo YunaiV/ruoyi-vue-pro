@@ -89,13 +89,13 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     @Override
     public KeyValue<CombinationActivityDO, CombinationProductDO> validateCombinationRecord(
             Long userId, Long activityId, Long headId, Long skuId, Integer count) {
-        // 1 校验拼团活动是否存在
+        // 1. 校验拼团活动是否存在
         CombinationActivityDO activity = combinationActivityService.validateCombinationActivityExists(activityId);
         // 1.1 校验活动是否开启
         if (ObjUtil.equal(activity.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
             throw exception(COMBINATION_ACTIVITY_STATUS_DISABLE);
         }
-        // 1.2、校验活动开始时间
+        // 1.2 校验活动开始时间
         if (afterNow(activity.getStartTime())) {
             throw exception(COMBINATION_RECORD_FAILED_TIME_NOT_START);
         }
@@ -104,69 +104,67 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
             throw exception(COMBINATION_RECORD_FAILED_SINGLE_LIMIT_COUNT_EXCEED);
         }
 
-        // 2、父拼团是否存在,是否已经满了
+        // 2. 父拼团是否存在,是否已经满了
         if (headId != null) {
-            // 2.1、查询进行中的父拼团
-            CombinationRecordDO record = recordMapper.selectOneByHeadId(headId, CombinationRecordStatusEnum.IN_PROGRESS.getStatus());
+            // 2.1. 查询进行中的父拼团
+            CombinationRecordDO record = recordMapper.selectByHeadId(headId, CombinationRecordStatusEnum.IN_PROGRESS.getStatus());
             if (record == null) {
                 throw exception(COMBINATION_RECORD_HEAD_NOT_EXISTS);
             }
-            // 2.2、校验拼团是否满足要求
+            // 2.2. 校验拼团是否已满
             if (ObjUtil.equal(record.getUserCount(), record.getUserSize())) {
                 throw exception(COMBINATION_RECORD_USER_FULL);
             }
-            // 2.3、校验拼团是否过期（有父拼团的时候只校验父拼团的过期时间）
+            // 2.3 校验拼团是否过期（有父拼团的时候只校验父拼团的过期时间）
             if (beforeNow(record.getExpireTime())) {
                 throw exception(COMBINATION_RECORD_FAILED_TIME_END);
             }
         } else {
-            // 3、校验当前活动是否结束(自己是父拼团的时候才校验活动是否结束)
+            // 3. 校验当前活动是否结束(自己是父拼团的时候才校验活动是否结束)
             if (beforeNow(activity.getEndTime())) {
                 throw exception(COMBINATION_RECORD_FAILED_TIME_END);
             }
         }
 
-        // 4、校验活动商品是否存在
+        // 4.1 校验活动商品是否存在
         CombinationProductDO product = combinationActivityService.selectByActivityIdAndSkuId(activityId, skuId);
         if (product == null) {
             throw exception(COMBINATION_JOIN_ACTIVITY_PRODUCT_NOT_EXISTS);
         }
-
-        // 5、校验 sku 是否存在
+        // 4.2 校验 sku 是否存在
         ProductSkuRespDTO sku = productSkuApi.getSku(skuId);
         if (sku == null) {
             throw exception(COMBINATION_JOIN_ACTIVITY_PRODUCT_NOT_EXISTS);
         }
-        // 5.1、校验库存是否充足
+        // 4.3 校验库存是否充足
         if (count > sku.getStock()) {
             throw exception(COMBINATION_ACTIVITY_UPDATE_STOCK_FAIL);
         }
 
-        // 6、校验是否有拼团记录
-        List<CombinationRecordDO> recordList = getCombinationRecordListByUserIdAndActivityId(userId, activityId);
-        if (CollUtil.isEmpty(recordList)) {
+        // 6.1 校验是否有拼团记录
+        List<CombinationRecordDO> recordList = recordMapper.selectListByUserIdAndActivityId(userId, activityId);
+        recordList.removeIf(record -> CombinationRecordStatusEnum.isFailed(record.getStatus())); // 取消的订单，不算数
+        if (CollUtil.isEmpty(recordList)) { // 如果为空，说明可以参与，直接返回
             return new KeyValue<>(activity, product);
         }
-        // 6.1、校验用户是否有该活动正在进行的拼团
-        List<CombinationRecordDO> filtered = filterList(recordList, record -> CombinationRecordStatusEnum.isInProgress(record.getStatus()));
-        if (CollUtil.isNotEmpty(filtered)) {
+        // 6.2 校验用户是否有该活动正在进行的拼团
+        CombinationRecordDO inProgressRecord = findFirst(recordList,
+                record -> CombinationRecordStatusEnum.isInProgress(record.getStatus()));
+        if (inProgressRecord != null) {
             throw exception(COMBINATION_RECORD_FAILED_HAVE_JOINED);
         }
-        // 6.2、校验是否超出总限购数量
-        Integer sumValue = getSumValue(convertList(recordList, CombinationRecordDO::getCount,
-                item -> CombinationRecordStatusEnum.isSuccess(item.getStatus())), i -> i, Integer::sum);
-        if ((sumValue + count) > activity.getTotalLimitCount()) {
+        // 6.3 校验是否超出总限购数量
+        Integer sumValue = getSumValue(recordList, CombinationRecordDO::getCount, Integer::sum);
+        if (sumValue != null && sumValue + count > activity.getTotalLimitCount()) {
             throw exception(COMBINATION_RECORD_FAILED_TOTAL_LIMIT_COUNT_EXCEED);
         }
-
         return new KeyValue<>(activity, product);
     }
 
-    // TODO 芋艿：在详细 review 下；
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {
-        // 1、校验拼团活动
+        // 1. 校验拼团活动
         KeyValue<CombinationActivityDO, CombinationProductDO> keyValue = validateCombinationRecord(reqDTO.getUserId(),
                 reqDTO.getActivityId(), reqDTO.getHeadId(), reqDTO.getSkuId(), reqDTO.getCount());
 
@@ -174,23 +172,24 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         MemberUserRespDTO user = memberUserApi.getUser(reqDTO.getUserId());
         ProductSpuRespDTO spu = productSpuApi.getSpu(reqDTO.getSpuId());
         ProductSkuRespDTO sku = productSkuApi.getSku(reqDTO.getSkuId());
-        CombinationRecordDO recordDO = CombinationActivityConvert.INSTANCE.convert(reqDTO, keyValue.getKey(), user, spu, sku);
-        recordMapper.insert(recordDO);
+        CombinationRecordDO record = CombinationActivityConvert.INSTANCE.convert(reqDTO, keyValue.getKey(), user, spu, sku);
+        recordMapper.insert(record);
 
-        // 3、如果是团长需要设置 headId 为 CombinationRecordDO#HEAD_ID_GROUP
+        // 3. 如果是团长需要设置 headId 为 CombinationRecordDO#HEAD_ID_GROUP
+        // TODO @puhui999：是不是只要是团长，record 设置了就好啦，不用 update。。。。
         if (ObjUtil.equal(CombinationRecordDO.HEAD_ID_GROUP, reqDTO.getHeadId())) {
-            recordMapper.updateById(new CombinationRecordDO().setId(recordDO.getId()).setHeadId(CombinationRecordDO.HEAD_ID_GROUP));
+            recordMapper.updateById(new CombinationRecordDO().setId(record.getId()).setHeadId(CombinationRecordDO.HEAD_ID_GROUP));
             return;
         }
 
-        // TODO 这里要不要弄成异步的
+        // TODO 这里要不要弄成异步的；不用异步哈，就是事务好了；
         // 4、更新拼团相关信息到订单
-        updateOrderCombinationInfo(recordDO.getOrderId(), recordDO.getActivityId(), recordDO.getId(), recordDO.getHeadId());
+        updateOrderCombinationInfo(record.getOrderId(), record.getActivityId(), record.getId(), record.getHeadId());
         // 4、更新拼团记录
-        updateCombinationRecords(keyValue.getKey(), reqDTO.getHeadId());
-
+        updateCombinationRecordWhenCreate(reqDTO.getHeadId(), keyValue.getKey());
     }
 
+    // TODO @puhui999：这个更新，放到 trade 那就好了；createCombinationRecord 返回一个 recordId；
     /**
      * 更新拼团相关信息到订单
      *
@@ -204,35 +203,31 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     }
 
     /**
-     * 更新拼团记录
+     * 当新增拼团时，更新拼团记录的进展
      *
-     * @param activity 活动
      * @param headId   团长编号
+     * @param activity 活动
      */
-    private void updateCombinationRecords(CombinationActivityDO activity, Long headId) {
-        // 团长
-        CombinationRecordDO recordHead = recordMapper.selectById(headId);
-        // 团员
+    private void updateCombinationRecordWhenCreate(Long headId, CombinationActivityDO activity) {
+        // 1. 团长 + 团员
         List<CombinationRecordDO> records = getCombinationRecordListByHeadId(headId);
-        // 需要更新的记录
-        List<CombinationRecordDO> updateRecords = new ArrayList<>();
-
         if (CollUtil.isEmpty(records)) {
             return;
         }
-        records.add(recordHead); // 加入团长，团长也需要更新
-        boolean isEqual = ObjUtil.equal(records.size(), activity.getUserSize());
-        records.forEach(item -> {
-            CombinationRecordDO recordDO = new CombinationRecordDO();
-            recordDO.setId(item.getId());
-            recordDO.setUserCount(records.size());
-            // 校验拼团是否满足要求
-            if (isEqual) {
-                recordDO.setStatus(CombinationRecordStatusEnum.SUCCESS.getStatus());
-            }
-            updateRecords.add(recordDO);
-        });
+        CombinationRecordDO headRecord = recordMapper.selectById(headId);
 
+        // 2. 批量更新记录
+        List<CombinationRecordDO> updateRecords = new ArrayList<>();
+        records.add(headRecord); // 加入团长，团长也需要更新
+        boolean isFull = records.size() >= activity.getUserSize();
+        records.forEach(item -> {
+            CombinationRecordDO updateRecord = new CombinationRecordDO();
+            updateRecord.setId(item.getId()).setUserCount(records.size());
+            if (isFull) {
+                updateRecord.setStatus(CombinationRecordStatusEnum.SUCCESS.getStatus());
+            }
+            updateRecords.add(updateRecord);
+        });
         recordMapper.updateBatch(updateRecords);
     }
 
@@ -247,12 +242,12 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     }
 
     @Override
-    public CombinationValidateJoinRespDTO validateJoinCombination(Long userId, Long activityId, Long headId, Long skuId, Integer count) {
-        KeyValue<CombinationActivityDO, CombinationProductDO> keyValue = validateCombinationRecord(userId, activityId, headId, skuId, count);
-        return new CombinationValidateJoinRespDTO()
-                .setActivityId(keyValue.getKey().getId())
-                .setName(keyValue.getKey().getName())
-                .setCombinationPrice(keyValue.getValue().getCombinationPrice());
+    public CombinationValidateJoinRespDTO validateJoinCombination(Long userId, Long activityId, Long headId,
+                                                                  Long skuId, Integer count) {
+        KeyValue<CombinationActivityDO, CombinationProductDO> keyValue = validateCombinationRecord(userId, activityId,
+                headId, skuId, count);
+        return new CombinationValidateJoinRespDTO().setActivityId(keyValue.getKey().getId())
+                .setName(keyValue.getKey().getName()).setCombinationPrice(keyValue.getValue().getCombinationPrice());
     }
 
     @Override

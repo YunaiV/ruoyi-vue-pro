@@ -35,7 +35,7 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
      * @param headId 团长编号
      * @return 拼团记录
      */
-    default CombinationRecordDO selectOneByHeadId(Long headId, Integer status) {
+    default CombinationRecordDO selectByHeadId(Long headId, Integer status) {
         return selectOne(new LambdaQueryWrapperX<CombinationRecordDO>()
                 .eq(CombinationRecordDO::getId, headId)
                 .eq(CombinationRecordDO::getStatus, status));

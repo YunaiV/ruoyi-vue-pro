@@ -42,7 +42,8 @@ public interface CombinationRecordService {
      * @param count      数量
      * @return 拼团信息
      */
-    KeyValue<CombinationActivityDO, CombinationProductDO> validateCombinationRecord(Long userId, Long activityId, Long headId, Long skuId, Integer count);
+    KeyValue<CombinationActivityDO, CombinationProductDO> validateCombinationRecord(Long userId, Long activityId, Long headId,
+                                                                                    Long skuId, Integer count);
 
     /**
      * 创建拼团记录
