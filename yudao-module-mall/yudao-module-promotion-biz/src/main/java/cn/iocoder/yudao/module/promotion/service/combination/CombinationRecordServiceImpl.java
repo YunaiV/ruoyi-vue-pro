@@ -177,8 +177,8 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         CombinationRecordDO recordDO = CombinationActivityConvert.INSTANCE.convert(reqDTO, keyValue.getKey(), user, spu, sku);
         recordMapper.insert(recordDO);
 
-        // 3、如果是团长需要设置 headId 为 CombinationRecordDO#HEAD_ID_GROUP
-        if (ObjUtil.equal(CombinationRecordDO.HEAD_ID_GROUP, reqDTO.getHeadId())) {
+        // 3、如果是团长(CombinationRecordCreateReqDTO#headId 为 null 时)需要设置 headId 为 CombinationRecordDO#HEAD_ID_GROUP
+        if (reqDTO.getHeadId() == null) {
             recordMapper.updateById(new CombinationRecordDO().setId(recordDO.getId()).setHeadId(CombinationRecordDO.HEAD_ID_GROUP));
             return;
         }
@@ -256,20 +256,8 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     }
 
     @Override
-    public Long getCombinationRecordCount() {
-        return recordMapper.selectCount();
-    }
-
-    @Override
-    public Long getCombinationRecordsSuccessCount() {
-        // TODO @puhui999：这个应该要多查询 headId
-        return recordMapper.selectCount(CombinationRecordDO::getStatus, CombinationRecordStatusEnum.SUCCESS.getStatus());
-    }
-
-    @Override
-    public Long getRecordsVirtualGroupCount() {
-        // TODO @puhui999：这个应该要多查询 headId；然后，recordMapper 要明确的查询哈，不要直接使用 mapper 来拼接查询条件
-        return recordMapper.selectCount(CombinationRecordDO::getVirtualGroup, true);
+    public Long getCombinationRecordCount(@Nullable Integer status, @Nullable Boolean virtualGroup) {
+        return recordMapper.selectRecordCount(status, virtualGroup);
     }
 
     @Override
@@ -325,9 +313,9 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
                 return;
             }
             // 按照创建时间升序排序
-            List<CombinationRecordDO> recordsSort = sortedAsc(list, CombinationRecordDO::getCreateTime);
-            CombinationRecordDO newHead = recordsSort.get(0); // 新团长继位
-            recordsSort.forEach(item -> {
+            list.sort(Comparator.comparing(CombinationRecordDO::getCreateTime)); // 影响原 list
+            CombinationRecordDO newHead = list.get(0); // 新团长继位
+            list.forEach(item -> {
                 CombinationRecordDO recordDO = new CombinationRecordDO();
                 recordDO.setId(item.getId());
                 if (ObjUtil.equal(item.getId(), newHead.getId())) { // 新团长
@@ -335,7 +323,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
                 } else {
                     recordDO.setHeadId(newHead.getId());
                 }
-                recordDO.setUserCount(recordsSort.size());
+                recordDO.setUserCount(list.size());
                 updateRecords.add(recordDO);
             });
         } else { // 情况二：团员

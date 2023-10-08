@@ -84,25 +84,13 @@ public interface CombinationRecordService {
     CombinationValidateJoinRespDTO validateJoinCombination(Long userId, Long activityId, Long headId, Long skuId, Integer count);
 
     /**
-     * 获取所有拼团记录数
+     * 获取拼团记录数
      *
+     * @param status 状态-允许为空
+     * @param virtualGroup 是否虚拟成团-允许为空
      * @return 记录数
      */
-    Long getCombinationRecordCount();
-
-    /**
-     * 获取成功记录数
-     *
-     * @return 记录数
-     */
-    Long getCombinationRecordsSuccessCount();
-
-    /**
-     * 获取虚拟成团记录数
-     *
-     * @return 记录数
-     */
-    Long getRecordsVirtualGroupCount();
+    Long getCombinationRecordCount(@Nullable Integer status, @Nullable Boolean virtualGroup);
 
     /**
      * 获取最近的 count 条拼团记录

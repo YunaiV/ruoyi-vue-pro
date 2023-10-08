@@ -85,6 +85,14 @@ public interface CombinationActivityService {
     List<CombinationProductDO> getCombinationProductListByActivityIds(Collection<Long> activityIds);
 
     /**
+     * 获得拼团活动列表
+     *
+     * @param ids 拼团活动 ids
+     * @return 拼团活动的列表
+     */
+    List<CombinationActivityDO> getCombinationActivityListByIds(Collection<Long> ids);
+
+    /**
      * 获取正在进行的活动分页数据
      *
      * @param count 需要的数量

@@ -205,6 +205,11 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     }
 
     @Override
+    public List<CombinationActivityDO> getCombinationActivityListByIds(Collection<Long> ids) {
+        return combinationActivityMapper.selectList(CombinationActivityDO::getId, ids);
+    }
+
+    @Override
     public List<CombinationActivityDO> getCombinationActivityListByCount(Integer count) {
         return combinationActivityMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus(), count);
     }

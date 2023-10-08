@@ -46,7 +46,6 @@ public class CombinationRecordCreateReqDTO {
     /**
      * 团长编号
      */
-    @NotNull(message = "团长编号不能为空")
     private Long headId;
     /**
      * 拼团商品单价
