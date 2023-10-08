@@ -118,11 +118,12 @@ public interface CombinationActivityService {
     CombinationProductDO selectByActivityIdAndSkuId(Long activityId, Long skuId);
 
     /**
-     * 获取指定 spu 编号的活动
+     * 获取指定 spu 编号最近参加的活动，每个 spuId 只返回一条记录
      *
-     * @param spuId spu 编号
-     * @return 拼团活动
+     * @param spuIds spu 编号
+     * @param status 状态
+     * @return 拼团活动列表
      */
-    CombinationActivityDO getCombinationActivityBySpuId(Long spuId);
+    List<CombinationActivityDO> getCombinationActivityBySpuIdsAndStatus(Collection<Long> spuIds, Integer status);
 
 }

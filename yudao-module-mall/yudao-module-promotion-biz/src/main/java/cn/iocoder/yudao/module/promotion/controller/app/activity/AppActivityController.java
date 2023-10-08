@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.promotion.controller.app.activity;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.promotion.controller.app.activity.vo.AppActivityRespVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityDO;
@@ -21,12 +22,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
 
 @Tag(name = "用户 APP - 营销活动") // 用于提供跨多个活动的 HTTP 接口
 @RestController
@@ -42,59 +41,72 @@ public class AppActivityController {
     private BargainActivityService bargainActivityService;
 
     @GetMapping("/list-by-spu-id")
-    @Operation(summary = "获得单个商品，近期参与的每个活动") // 每种活动，只返回一个
+    @Operation(summary = "获得单个商品，近期参与的每个活动")
     @Parameter(name = "spuId", description = "商品编号", required = true)
     public CommonResult<List<AppActivityRespVO>> getActivityListBySpuId(@RequestParam("spuId") Long spuId) {
-        return success(getAppActivityRespVOList(spuId));
+        // 每种活动，只返回一个
+        return success(getAppActivityRespVOList(Collections.singletonList(spuId)));
     }
 
     @GetMapping("/list-by-spu-ids")
-    @Operation(summary = "获得多个商品，近期参与的每个活动") // 每种活动，只返回一个；key 为 SPU 编号
+    @Operation(summary = "获得多个商品，近期参与的每个活动")
     @Parameter(name = "spuIds", description = "商品编号数组", required = true)
     public CommonResult<Map<Long, List<AppActivityRespVO>>> getActivityListBySpuIds(@RequestParam("spuIds") List<Long> spuIds) {
         if (CollUtil.isEmpty(spuIds)) {
             return success(MapUtil.empty());
         }
 
-        // TODO @puhui999：要避免这种 1+n 的查询
-        Map<Long, List<AppActivityRespVO>> map = new HashMap<>(spuIds.size());
-        spuIds.forEach(spuId -> {
-            map.put(spuId, getAppActivityRespVOList(spuId));
-        });
-        return success(map);
+        // 每种活动，只返回一个；key 为 SPU 编号
+        return success(convertMultiMap(getAppActivityRespVOList(spuIds), AppActivityRespVO::getSpuId));
     }
 
-    private List<AppActivityRespVO> getAppActivityRespVOList(Long spuId) {
+    private List<AppActivityRespVO> getAppActivityRespVOList(Collection<Long> spuIds) {
+        if (CollUtil.isEmpty(spuIds)) {
+            return new ArrayList<>();
+        }
+
         List<AppActivityRespVO> activityList = new ArrayList<>();
         // 拼团活动
-        CombinationActivityDO combination = combinationActivityService.getCombinationActivityBySpuId(spuId);
-        if (combination != null) {
-            activityList.add(new AppActivityRespVO()
-                    .setId(combination.getId())
-                    .setType(PromotionTypeEnum.COMBINATION_ACTIVITY.getType())
-                    .setName(combination.getName())
-                    .setStartTime(combination.getStartTime())
-                    .setEndTime(combination.getEndTime()));
+        List<CombinationActivityDO> combinationActivities = combinationActivityService.getCombinationActivityBySpuIdsAndStatus(
+                spuIds, CommonStatusEnum.ENABLE.getStatus());
+        if (CollUtil.isNotEmpty(combinationActivities)) {
+            combinationActivities.forEach(item -> {
+                activityList.add(new AppActivityRespVO()
+                        .setId(item.getId())
+                        .setType(PromotionTypeEnum.COMBINATION_ACTIVITY.getType())
+                        .setName(item.getName())
+                        .setSpuId(item.getSpuId())
+                        .setStartTime(item.getStartTime())
+                        .setEndTime(item.getEndTime()));
+            });
         }
         // 秒杀活动
-        SeckillActivityDO seckill = seckillActivityService.getSeckillActivityBySpuId(spuId);
-        if (seckill != null) {
-            activityList.add(new AppActivityRespVO()
-                    .setId(seckill.getId())
-                    .setType(PromotionTypeEnum.SECKILL_ACTIVITY.getType())
-                    .setName(seckill.getName())
-                    .setStartTime(seckill.getStartTime())
-                    .setEndTime(seckill.getEndTime()));
+        List<SeckillActivityDO> seckillActivities = seckillActivityService.getSeckillActivityBySpuIdsAndStatus(
+                spuIds, CommonStatusEnum.ENABLE.getStatus());
+        if (CollUtil.isNotEmpty(seckillActivities)) {
+            seckillActivities.forEach(item -> {
+                activityList.add(new AppActivityRespVO()
+                        .setId(item.getId())
+                        .setType(PromotionTypeEnum.SECKILL_ACTIVITY.getType())
+                        .setName(item.getName())
+                        .setSpuId(item.getSpuId())
+                        .setStartTime(item.getStartTime())
+                        .setEndTime(item.getEndTime()));
+            });
         }
-        // 秒杀活动
-        BargainActivityDO bargain = bargainActivityService.getBargainActivityBySpuId(spuId);
-        if (bargain != null) {
-            activityList.add(new AppActivityRespVO()
-                    .setId(bargain.getId())
-                    .setType(PromotionTypeEnum.BARGAIN_ACTIVITY.getType())
-                    .setName(bargain.getName())
-                    .setStartTime(bargain.getStartTime())
-                    .setEndTime(bargain.getEndTime()));
+        // 砍价活动
+        List<BargainActivityDO> bargainActivities = bargainActivityService.getBargainActivityBySpuIdsAndStatus(
+                spuIds, CommonStatusEnum.ENABLE.getStatus());
+        if (CollUtil.isNotEmpty(bargainActivities)) {
+            bargainActivities.forEach(item -> {
+                activityList.add(new AppActivityRespVO()
+                        .setId(item.getId())
+                        .setType(PromotionTypeEnum.BARGAIN_ACTIVITY.getType())
+                        .setName(item.getName())
+                        .setSpuId(item.getSpuId())
+                        .setStartTime(item.getStartTime())
+                        .setEndTime(item.getEndTime()));
+            });
         }
         return activityList;
     }

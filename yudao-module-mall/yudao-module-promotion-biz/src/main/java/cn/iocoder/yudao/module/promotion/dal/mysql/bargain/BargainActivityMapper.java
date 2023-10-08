@@ -8,8 +8,10 @@ import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.Ba
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -83,12 +85,23 @@ public interface BargainActivityMapper extends BaseMapperX<BargainActivityDO> {
                 .last("LIMIT " + count));
     }
 
-    // TODO @puhui999：需要开启状态；另外，是不是可以 limit1，不用 throwEx = false 处理呀？另外，时间要满足噢
-    default BargainActivityDO selectOne(Long spuId) {
-        return selectOne(new LambdaQueryWrapperX<BargainActivityDO>()
-                        .eq(BargainActivityDO::getSpuId, spuId)
-                        .orderByDesc(BargainActivityDO::getCreateTime)
-                , false);
-    }
+    /**
+     * 获取指定 spu 编号最近参加的活动，每个 spuId 只返回一条记录
+     *
+     * @param spuIds spu 编号
+     * @param status 状态
+     * @return 砍价活动列表
+     */
+    @Select("SELECT p1.* " +
+            "FROM promotion_bargain_activity p1 " +
+            "INNER JOIN ( " +
+            "  SELECT spu_id, MAX(DISTINCT(create_time)) AS max_create_time " +
+            "  FROM promotion_bargain_activity " +
+            "  WHERE spu_id IN #{spuIds} " +
+            "  GROUP BY spu_id " +
+            ") p2 " +
+            "ON p1.spu_id = p2.spu_id AND p1.create_time = p2.max_create_time AND p1.status = #{status} " +
+            "ORDER BY p1.create_time DESC;")
+    List<BargainActivityDO> selectListBySpuIds(Collection<Long> spuIds, Integer status);
 
 }

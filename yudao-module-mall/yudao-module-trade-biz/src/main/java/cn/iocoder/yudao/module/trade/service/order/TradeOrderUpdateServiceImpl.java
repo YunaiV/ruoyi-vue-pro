@@ -742,8 +742,10 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     public void updateOrderAddress(TradeOrderUpdateAddressReqVO reqVO) {
         // 校验交易订单
         TradeOrderDO order = validateOrderExists(reqVO.getId());
-        // TODO @puhui999：是否需要校验订单是否发货
-        // TODO 发货后是否支持修改收货地址；回答：发货后，不允许修改；
+        // 发货后，不允许修改；
+        if (TradeOrderStatusEnum.isDelivered(order.getStatus())) {
+            throw exception(ORDER_UPDATE_ADDRESS_FAIL_STATUS_NOT_DELIVERED);
+        }
 
         // 更新
         tradeOrderMapper.updateById(TradeOrderConvert.INSTANCE.convert(reqVO));

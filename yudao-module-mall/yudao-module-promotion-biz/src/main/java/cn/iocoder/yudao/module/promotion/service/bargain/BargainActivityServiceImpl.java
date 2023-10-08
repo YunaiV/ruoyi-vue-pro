@@ -20,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -176,8 +177,8 @@ public class BargainActivityServiceImpl implements BargainActivityService {
     }
 
     @Override
-    public BargainActivityDO getBargainActivityBySpuId(Long spuId) {
-        return bargainActivityMapper.selectOne(spuId);
+    public List<BargainActivityDO> getBargainActivityBySpuIdsAndStatus(Collection<Long> spuIds, Integer status) {
+        return bargainActivityMapper.selectListBySpuIds(spuIds, status);
     }
 
 }
