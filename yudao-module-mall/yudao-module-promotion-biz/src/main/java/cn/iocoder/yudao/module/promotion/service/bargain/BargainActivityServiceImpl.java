@@ -178,7 +178,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 
     @Override
     public List<BargainActivityDO> getBargainActivityBySpuIdsAndStatus(Collection<Long> spuIds, Integer status) {
-        return bargainActivityMapper.selectListBySpuIds(spuIds, status);
+        return bargainActivityMapper.selectListBySpuIdsAndStatus(spuIds, status);
     }
 
 }

@@ -228,7 +228,7 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
 
     @Override
     public List<CombinationActivityDO> getCombinationActivityBySpuIdsAndStatus(Collection<Long> spuIds, Integer status) {
-        return combinationActivityMapper.selectListBySpuIds(spuIds, status);
+        return combinationActivityMapper.selectListBySpuIdsAndStatus(spuIds, status);
     }
 
 }
