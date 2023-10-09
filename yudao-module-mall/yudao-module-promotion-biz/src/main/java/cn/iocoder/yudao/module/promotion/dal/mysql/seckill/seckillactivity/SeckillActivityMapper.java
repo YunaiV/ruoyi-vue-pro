@@ -7,13 +7,14 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillActivityDO;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 秒杀活动 Mapper
@@ -59,29 +60,24 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
                 .apply(ObjectUtil.isNotNull(pageReqVO.getConfigId()), "FIND_IN_SET(" + pageReqVO.getConfigId() + ",config_ids) > 0"));
     }
 
-    // TODO @puhui999：类似 BargainActivityMapper
-
     /**
-     * 获取指定 spu 编号最近参加的活动，每个 spuId 只返回一条记录
-     *
+     * 查询出指定 spuId 的 spu 参加的活动最接近现在的一条记录。多个的话，一个 spuId 对应一个最近的活动编号
      * @param spuIds spu 编号
      * @param status 状态
-     * @return 秒杀活动列表
+     * @return 包含 spuId 和 activityId 的 map 对象列表
      */
-    @Select("<script> " + "SELECT p1.* " +
-            "FROM promotion_seckill_activity p1 " +
-            "INNER JOIN ( " +
-            "  SELECT spu_id, MAX(DISTINCT create_time) AS max_create_time " +
-            "  FROM promotion_seckill_activity " +
-            "  WHERE spu_id IN " +
-            "<foreach collection='spuIds' item='spuId' open='(' separator=',' close=')'>" +
-            "    #{spuId}" +
-            "</foreach>" +
-            "  GROUP BY spu_id " +
-            ") p2 " +
-            "ON p1.spu_id = p2.spu_id AND p1.create_time = p2.max_create_time AND p1.status = #{status} " +
-            "ORDER BY p1.create_time DESC;" +
-            " </script>")
-    List<SeckillActivityDO> selectListBySpuIdsAndStatus(@Param("spuIds") Collection<Long> spuIds, @Param("status") Integer status);
+    default List<Map<String, Object>> selectSpuIdAndActivityIdMapsBySpuIdsAndStatus(@Param("spuIds") Collection<Long> spuIds, @Param("status") Integer status) {
+        return selectMaps(new QueryWrapper<SeckillActivityDO>()
+                .select("spu_id AS spuId, MAX(DISTINCT(id)) AS activityId") // 时间越大 id 也越大 直接用 id
+                .in("spu_id", spuIds)
+                .eq("status", status)
+                .groupBy("spu_id"));
+    }
+
+    default List<SeckillActivityDO> selectListByIds(Collection<Long> ids) {
+        return selectList(new LambdaQueryWrapperX<SeckillActivityDO>()
+                .in(SeckillActivityDO::getId, ids)
+                .orderByDesc(SeckillActivityDO::getCreateTime));
+    }
 
 }
