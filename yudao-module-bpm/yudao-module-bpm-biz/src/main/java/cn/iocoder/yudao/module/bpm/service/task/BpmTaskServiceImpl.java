@@ -312,10 +312,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
         taskExtMapper.updateByTaskId(currentTaskUpdateEntity);
         //5. 继续往上处理，父任务继续往上查询
-        if (StrUtil.isEmpty(parentTask.getParentTaskId())) {
-            //5.1 该父任务为最顶级的祖先任务（没有父级ID）， 则直接完成父任务流转到下一步
-            taskService.complete(parentTaskId);
-        } else {
+        //5.1 先完成自己
+        taskService.complete(parentTaskId);
+        if (StrUtil.isNotEmpty(parentTask.getParentTaskId())) {
             //5.2 如果有父级，递归查询上级任务是否都已经完成
             //判断整条链路的任务是否完成
             //例如从 A 任务加签了一个 B 任务， B 任务又加签了一个 C 任务，C任务加签了 D 任务
@@ -327,15 +326,33 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 if (bpmTaskExtDO == null) {
                     break;
                 }
-                //任务已完成
-                allChildrenTaskFinish = BpmProcessInstanceResultEnum.isEndResult(bpmTaskExtDO.getResult());
-                if (!allChildrenTaskFinish) {
-                    //有一个未完成，则退出循环
-                    break;
+                boolean currentTaskFinish = BpmProcessInstanceResultEnum.isEndResult(bpmTaskExtDO.getResult());
+                //5.3 如果 allChildrenTaskFinish 已经被赋值为 false ,则不会再赋值为 true，因为整个链路没有完成
+                if (allChildrenTaskFinish) {
+                    allChildrenTaskFinish = currentTaskFinish;
+                }
+                if (!currentTaskFinish) {
+                    //6 处理非完成状态的任务
+                    //6.1 判断当前任务的父任务是否还有子任务
+                    Long subTaskCount = getSubTaskCount(bpmTaskExtDO.getTaskId());
+                    if (subTaskCount == 0) {
+                        //6.2 没有子任务，判断当前任务状态是否为 ADD_SIGN_BEFORE 待前加签任务完成
+                        if (BpmProcessInstanceResultEnum.ADD_SIGN_BEFORE.getResult().equals(bpmTaskExtDO.getResult())) {
+                            //6.3 需要修改该任务状态为处理中
+                            taskService.resolveTask(bpmTaskExtDO.getTaskId());
+                            bpmTaskExtDO.setResult(BpmProcessInstanceResultEnum.PROCESS.getResult());
+                            taskExtMapper.updateByTaskId(bpmTaskExtDO);
+                        }
+                        //6.4 清空 scopeType 字段，用于任务没有子任务时使用该方法，方便任务可以再次被不同的方式加签
+                        parentTask = getTask(bpmTaskExtDO.getTaskId());
+                        if (parentTask != null) {
+                            clearTaskScopeTypeAndSave(parentTask);
+                        }
+                    }
                 }
             }
             if (allChildrenTaskFinish) {
-                //完成最后的顶级祖先任务
+                //7. 完成最后的顶级祖先任务
                 taskService.complete(parentTask.getId());
             }
         }
