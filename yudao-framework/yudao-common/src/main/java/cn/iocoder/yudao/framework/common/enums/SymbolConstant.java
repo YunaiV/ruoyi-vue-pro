@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.common.enums;
 
+// TODO 这种简单的，暂时不用枚举哈，直接代码里写死就好啦；
 /**
  * 符号常量
  */

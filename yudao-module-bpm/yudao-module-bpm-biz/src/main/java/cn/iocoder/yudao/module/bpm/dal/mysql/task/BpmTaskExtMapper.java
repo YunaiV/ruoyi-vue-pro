@@ -32,7 +32,8 @@ public interface BpmTaskExtMapper extends BaseMapperX<BpmTaskExtDO> {
         return selectOne(BpmTaskExtDO::getTaskId, taskId);
     }
 
-    default void updateBatchByTaskIdList(List<String> taskIdList, BpmTaskExtDO entity){
-        update(entity,new LambdaQueryWrapper<BpmTaskExtDO>().in(BpmTaskExtDO::getTaskId, taskIdList));
+    default void updateBatchByTaskIdList(List<String> taskIdList, BpmTaskExtDO updateObj) {
+        update(updateObj, new LambdaQueryWrapper<BpmTaskExtDO>().in(BpmTaskExtDO::getTaskId, taskIdList));
     }
+
 }

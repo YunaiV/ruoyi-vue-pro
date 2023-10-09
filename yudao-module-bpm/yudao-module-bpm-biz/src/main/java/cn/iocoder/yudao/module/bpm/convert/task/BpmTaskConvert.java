@@ -147,6 +147,7 @@ public interface BpmTaskConvert {
                 .setDefinitionKey(element.getId()));
     }
 
+    // TODO @海：可以使用 mapstruct 映射么？
     default TaskEntityImpl convert(TaskEntityImpl task,TaskEntityImpl parentTask){
         task.setCategory(parentTask.getCategory());
         task.setDescription(parentTask.getDescription());

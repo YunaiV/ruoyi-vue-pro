@@ -65,8 +65,8 @@ public interface BpmTaskService {
 
 
     /**
-     * 通过任务 ID 集合，获取任务扩展表信息集合
-     * @param taskIdList 任务 ID
+     * 通过任务 ID 集合，获取任务扩展表信息集合 // TODO @海洋：方法注释，和下面的参数，需要空一行
+     * @param taskIdList 任务 ID 集合
      * @return 任务列表
      */
     List<BpmTaskExtDO> getTaskListByTaskIdList(List<String> taskIdList);
@@ -158,22 +158,26 @@ public interface BpmTaskService {
 
     /**
      * 任务加签
-     * @param reqVO 被加签的用户和任务ID，加签类型
+     *
+     * @param reqVO 被加签的用户和任务 ID，加签类型
      * @param userId 当前用户 ID
      */
     void addSign(BpmTaskAddSignReqVO reqVO, Long userId);
 
     /**
-     * 减签
-     * @param bpmTaskSubSignReqVO 被减签的任务ID，理由
+     * 任务减签名
+     *
+     * @param bpmTaskSubSignReqVO 被减签的任务 ID，理由
      * @param loginUserId 当前用户ID
      */
     void subSign(BpmTaskSubSignReqVO bpmTaskSubSignReqVO, Long loginUserId);
 
     /**
      * 获取指定任务的子任务和审批人信息
+     *
      * @param taskId 指定任务ID
      * @return 子任务列表
      */
     List<BpmTaskSubSignRespVO> getChildrenTaskList(String taskId);
+
 }

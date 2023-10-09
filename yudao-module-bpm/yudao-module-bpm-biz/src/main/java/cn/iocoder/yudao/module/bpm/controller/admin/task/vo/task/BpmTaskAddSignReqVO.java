@@ -12,7 +12,7 @@ import java.util.Set;
 public class BpmTaskAddSignReqVO {
 
     @Schema(description = "加签的用户 ID")
-    @NotEmpty(message = "加签用户ID不能为空")
+    @NotEmpty(message = "加签用户 ID 不能为空")
     private Set<Long> userIdList;
 
     @Schema(description = "加签类型，before 向前加签，after 向后加签")
@@ -23,7 +23,9 @@ public class BpmTaskAddSignReqVO {
     @NotEmpty(message = "加签原因不能为空")
     private String reason;
 
+    // TODO @海：重要参数，可以放到最前面哈；
     @Schema(description = "需要加签的任务 ID")
     @NotEmpty(message = "任务编号不能为空")
     private String id;
+
 }

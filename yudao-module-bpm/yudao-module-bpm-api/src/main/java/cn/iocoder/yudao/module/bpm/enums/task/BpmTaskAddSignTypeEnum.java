@@ -36,5 +36,6 @@ public enum BpmTaskAddSignTypeEnum {
         }
         return null;
     }
+
 }
     
