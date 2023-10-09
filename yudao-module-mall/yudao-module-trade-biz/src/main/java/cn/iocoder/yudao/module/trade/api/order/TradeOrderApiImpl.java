@@ -49,13 +49,4 @@ public class TradeOrderApiImpl implements TradeOrderApi {
         tradeOrderUpdateService.cancelPaidOrder(userId, orderId);
     }
 
-    @Override
-    public Integer getOrderStatus(Long id) {
-        TradeOrderDO order = tradeOrderQueryService.getOrder(id);
-        if (order == null) {
-            throw exception(ORDER_NOT_FOUND);
-        }
-        return order.getStatus();
-    }
-
 }
