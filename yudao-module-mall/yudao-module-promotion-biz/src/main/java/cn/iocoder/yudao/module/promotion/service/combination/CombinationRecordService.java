@@ -49,9 +49,9 @@ public interface CombinationRecordService {
      * 创建拼团记录
      *
      * @param reqDTO 创建信息
-     * @return 开团记录编号
+     * @return key 开团记录编号 value 团长编号
      */
-    Long createCombinationRecord(CombinationRecordCreateReqDTO reqDTO);
+    KeyValue<Long, Long> createCombinationRecord(CombinationRecordCreateReqDTO reqDTO);
 
     /**
      * 获得拼团记录
@@ -90,9 +90,10 @@ public interface CombinationRecordService {
      *
      * @param status       状态-允许为空
      * @param virtualGroup 是否虚拟成团-允许为空
+     * @param headId       团长编号，允许空。目的 headId 设置为 {@link CombinationRecordDO#HEAD_ID_GROUP} 时，可以设置
      * @return 记录数
      */
-    Long getCombinationRecordCount(@Nullable Integer status, @Nullable Boolean virtualGroup);
+    Long getCombinationRecordCount(@Nullable Integer status, @Nullable Boolean virtualGroup, @Nullable Long headId);
 
     /**
      * 获取最近的 count 条拼团记录

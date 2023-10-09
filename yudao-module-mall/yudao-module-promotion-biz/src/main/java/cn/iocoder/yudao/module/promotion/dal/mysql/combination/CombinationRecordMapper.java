@@ -100,13 +100,21 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
                 .betweenIfPresent(CombinationRecordDO::getCreateTime, pageVO.getCreateTime()));
     }
 
-    // TODO @puhui999：这个最好把 headId 也作为一个参数；因为有个要求 userCount，它要 DISTINCT 下；整体可以参考 selectCombinationRecordCountMapByActivityIdAndStatusAndHeadId
-    default Long selectCountByHeadAndStatusAndVirtualGroup(Integer status, Boolean virtualGroup) {
-        return selectCount(new LambdaQueryWrapperX<CombinationRecordDO>()
-                .eq(status != null || virtualGroup != null,
-                        CombinationRecordDO::getHeadId, CombinationRecordDO.HEAD_ID_GROUP) // 统计团信息则指定团长
-                .eqIfPresent(CombinationRecordDO::getStatus, status)
-                .eqIfPresent(CombinationRecordDO::getVirtualGroup, virtualGroup));
+    /**
+     * 查询指定条件的记录数
+     * 如果参数都为 null 时则查询用户拼团记录（DISTINCT 去重），也就是说查询会员表中的用户有多少人参与过拼团活动每个人只统计一次
+     *
+     * @param status       状态，可为 null
+     * @param virtualGroup 是否虚拟成团，可为 null
+     * @param headId       团长编号，可为 null
+     * @return 记录数
+     */
+    default Long selectCountByHeadAndStatusAndVirtualGroup(Integer status, Boolean virtualGroup, Long headId) {
+        return selectCount(new QueryWrapper<CombinationRecordDO>()
+                .select(status == null && virtualGroup == null && headId == null, "COUNT(DISTINCT(user_id))")
+                .eq(status != null, "status", status)
+                .eq(virtualGroup != null, "virtual_group", virtualGroup)
+                .eq(headId != null, "head_id", headId));
     }
 
 }

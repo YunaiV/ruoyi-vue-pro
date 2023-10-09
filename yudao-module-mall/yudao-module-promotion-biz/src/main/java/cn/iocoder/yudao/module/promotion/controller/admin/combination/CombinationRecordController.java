@@ -54,10 +54,11 @@ public class CombinationRecordController {
     @PreAuthorize("@ss.hasPermission('promotion:combination-record:query')")
     public CommonResult<CombinationRecordSummaryVO> getCombinationRecordSummary() {
         CombinationRecordSummaryVO summaryVO = new CombinationRecordSummaryVO();
-        summaryVO.setUserCount(combinationRecordService.getCombinationRecordCount(null, null)); // 获取所有拼团记录
+        summaryVO.setUserCount(combinationRecordService.getCombinationRecordCount(null, null, null)); // 获取拼团用户参与数量
         summaryVO.setSuccessCount(combinationRecordService.getCombinationRecordCount( // 获取成团记录
-                CombinationRecordStatusEnum.SUCCESS.getStatus(), null));
-        summaryVO.setVirtualGroupCount(combinationRecordService.getCombinationRecordCount(null, Boolean.TRUE));// 获取虚拟成团记录
+                CombinationRecordStatusEnum.SUCCESS.getStatus(), null, CombinationRecordDO.HEAD_ID_GROUP));
+        summaryVO.setVirtualGroupCount(combinationRecordService.getCombinationRecordCount(// 获取虚拟成团记录
+                null, Boolean.TRUE, CombinationRecordDO.HEAD_ID_GROUP));
         return success(summaryVO);
     }
 

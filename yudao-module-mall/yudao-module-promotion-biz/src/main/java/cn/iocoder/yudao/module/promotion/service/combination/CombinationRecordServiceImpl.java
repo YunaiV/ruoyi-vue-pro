@@ -20,7 +20,6 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationP
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.combination.CombinationRecordMapper;
 import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
-import cn.iocoder.yudao.module.trade.api.order.TradeOrderApi;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +27,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -62,8 +62,6 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     @Resource
     @Lazy
     private ProductSkuApi productSkuApi;
-    @Resource
-    private TradeOrderApi tradeOrderApi;
 
     // TODO @芋艿：在详细预览下；
     @Override
@@ -164,32 +162,36 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {
-        // 1. 校验拼团活动
+    public KeyValue<Long, Long> createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {
+        // 1.校验拼团活动
         KeyValue<CombinationActivityDO, CombinationProductDO> keyValue = validateCombinationRecord(reqDTO.getUserId(),
                 reqDTO.getActivityId(), reqDTO.getHeadId(), reqDTO.getSkuId(), reqDTO.getCount());
 
-        // 2.1 组合数据创建拼团记录
+        // 2.组合数据创建拼团记录
         MemberUserRespDTO user = memberUserApi.getUser(reqDTO.getUserId());
         ProductSpuRespDTO spu = productSpuApi.getSpu(reqDTO.getSpuId());
         ProductSkuRespDTO sku = productSkuApi.getSku(reqDTO.getSkuId());
         CombinationRecordDO record = CombinationActivityConvert.INSTANCE.convert(reqDTO, keyValue.getKey(), user, spu, sku);
-        // 2.2 如果是团长需要设置 headId 为 CombinationRecordDO#HEAD_ID_GROUP
+        // 2.1.如果是团长需要设置 headId 为 CombinationRecordDO#HEAD_ID_GROUP
         if (record.getHeadId() == null) {
-            record.setHeadId(CombinationRecordDO.HEAD_ID_GROUP);
+            record.setStartTime(LocalDateTime.now())
+                    .setExpireTime(keyValue.getKey().getStartTime().plusHours(keyValue.getKey().getLimitDuration()))
+                    .setHeadId(CombinationRecordDO.HEAD_ID_GROUP);
+        } else {
+            // 2.2.有团长的情况下需要设置开始时间和过期时间为团长的
+            CombinationRecordDO headRecord = recordMapper.selectByHeadId(record.getHeadId(),
+                    CombinationRecordStatusEnum.IN_PROGRESS.getStatus()); // 查询进行中的父拼团
+            record.setStartTime(headRecord.getStartTime()).setExpireTime(headRecord.getExpireTime());
         }
         recordMapper.insert(record);
 
         if (ObjUtil.equal(CombinationRecordDO.HEAD_ID_GROUP, record.getHeadId())) {
-            return record.getId();
+            return new KeyValue<>(record.getId(), record.getHeadId());
         }
 
-        // TODO @puhui：是不是这里的更新，放到 order 模块那；支付完成后；
-        // 4、更新拼团相关信息到订单
-        tradeOrderApi.updateOrderCombinationInfo(record.getOrderId(), record.getActivityId(), record.getId(), record.getHeadId());
-        // 4、更新拼团记录
+        // 3、更新拼团记录
         updateCombinationRecordWhenCreate(reqDTO.getHeadId(), keyValue.getKey());
-        return record.getId();
+        return new KeyValue<>(record.getId(), record.getHeadId());
     }
 
     /**
@@ -241,8 +243,8 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     }
 
     @Override
-    public Long getCombinationRecordCount(@Nullable Integer status, @Nullable Boolean virtualGroup) {
-        return recordMapper.selectCountByHeadAndStatusAndVirtualGroup(status, virtualGroup);
+    public Long getCombinationRecordCount(@Nullable Integer status, @Nullable Boolean virtualGroup, @Nullable Long headId) {
+        return recordMapper.selectCountByHeadAndStatusAndVirtualGroup(status, virtualGroup, headId);
     }
 
     @Override

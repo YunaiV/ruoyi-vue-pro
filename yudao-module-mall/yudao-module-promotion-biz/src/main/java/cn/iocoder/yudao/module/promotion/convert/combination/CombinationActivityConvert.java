@@ -28,7 +28,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -114,9 +113,6 @@ public interface CombinationActivityConvert {
                                         ProductSpuRespDTO spu, ProductSkuRespDTO sku) {
         return convert(reqDTO).setVirtualGroup(false)
                 .setStatus(CombinationRecordStatusEnum.IN_PROGRESS.getStatus()) // 创建后默认状态为进行中
-                .setStartTime(LocalDateTime.now()) // TODO @puhui999：想了下，这个 startTime 应该是团长的；
-                // TODO @puhui999：有团长的情况下，expireTime 应该是团长的；
-                .setExpireTime(activity.getStartTime().plusHours(activity.getLimitDuration()))
                 .setUserSize(activity.getUserSize()).setUserCount(1) // 默认就是 1 插入后会接着更新一次所有的拼团记录
                 // 用户信息
                 .setNickname(user.getNickname()).setAvatar(user.getAvatar())
