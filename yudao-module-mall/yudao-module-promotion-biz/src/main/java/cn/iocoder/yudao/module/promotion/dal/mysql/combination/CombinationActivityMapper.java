@@ -44,6 +44,7 @@ public interface CombinationActivityMapper extends BaseMapperX<CombinationActivi
     }
 
     // TODO @puhui999：类似 BargainActivityMapper
+
     /**
      * 获取指定 spu 编号最近参加的活动，每个 spuId 只返回一条记录
      *
@@ -51,16 +52,21 @@ public interface CombinationActivityMapper extends BaseMapperX<CombinationActivi
      * @param status 状态
      * @return 拼团活动列表
      */
-    @Select("SELECT p1.* " +
+    @Select("<script> " + "SELECT p1.* " +
             "FROM promotion_combination_activity p1 " +
             "INNER JOIN ( " +
-            "  SELECT spu_id, MAX(DISTINCT(create_time)) AS max_create_time " +
+            "  SELECT spu_id, MAX(DISTINCT create_time) AS max_create_time " +
             "  FROM promotion_combination_activity " +
-            "  WHERE spu_id IN #{spuIds} " +
+            "  WHERE spu_id IN " +
+            "<foreach collection='spuIds' item='spuId' open='(' separator=',' close=')'>" +
+            "    #{spuId}" +
+            "</foreach>" +
             "  GROUP BY spu_id " +
             ") p2 " +
             "ON p1.spu_id = p2.spu_id AND p1.create_time = p2.max_create_time AND p1.status = #{status} " +
-            "ORDER BY p1.create_time DESC;")
-    List<CombinationActivityDO> selectListBySpuIds(@Param("spuIds") Collection<Long> spuIds, @Param("status") Integer status);
+            "ORDER BY p1.create_time DESC;" +
+            " </script>")
+    List<CombinationActivityDO> selectListBySpuIdsAndStatus(@Param("spuIds") Collection<Long> spuIds, @Param("status") Integer status);
+
 
 }

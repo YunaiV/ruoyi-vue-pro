@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppS
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillActivityDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.Collection;
@@ -59,6 +60,7 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
     }
 
     // TODO @puhui999：类似 BargainActivityMapper
+
     /**
      * 获取指定 spu 编号最近参加的活动，每个 spuId 只返回一条记录
      *
@@ -66,16 +68,20 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
      * @param status 状态
      * @return 秒杀活动列表
      */
-    @Select("SELECT p1.* " +
+    @Select("<script> " + "SELECT p1.* " +
             "FROM promotion_seckill_activity p1 " +
             "INNER JOIN ( " +
-            "  SELECT spu_id, MAX(DISTINCT(create_time)) AS max_create_time " +
+            "  SELECT spu_id, MAX(DISTINCT create_time) AS max_create_time " +
             "  FROM promotion_seckill_activity " +
-            "  WHERE spu_id IN #{spuIds} " +
+            "  WHERE spu_id IN " +
+            "<foreach collection='spuIds' item='spuId' open='(' separator=',' close=')'>" +
+            "    #{spuId}" +
+            "</foreach>" +
             "  GROUP BY spu_id " +
             ") p2 " +
             "ON p1.spu_id = p2.spu_id AND p1.create_time = p2.max_create_time AND p1.status = #{status} " +
-            "ORDER BY p1.create_time DESC;")
-    List<SeckillActivityDO> selectListBySpuIds(Collection<Long> spuIds, Integer status);
+            "ORDER BY p1.create_time DESC;" +
+            " </script>")
+    List<SeckillActivityDO> selectListBySpuIdsAndStatus(@Param("spuIds") Collection<Long> spuIds, @Param("status") Integer status);
 
 }
