@@ -111,9 +111,6 @@ public class CombinationActivityServiceImplTest extends BaseDbUnitTest {
             o.setStartTime(null);
             o.setEndTime(null);
             o.setUserSize(null);
-            o.setTotalCount(null);
-            o.setSuccessCount(null);
-            o.setOrderUserCount(null);
             o.setVirtualGroup(null);
             o.setStatus(null);
             o.setLimitDuration(null);
@@ -134,12 +131,6 @@ public class CombinationActivityServiceImplTest extends BaseDbUnitTest {
         combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setEndTime(null)));
         // 测试 userSize 不匹配
         combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setUserSize(null)));
-        // 测试 totalNum 不匹配
-        combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setTotalCount(null)));
-        // 测试 successNum 不匹配
-        combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setSuccessCount(null)));
-        // 测试 orderUserCount 不匹配
-        combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setOrderUserCount(null)));
         // 测试 virtualGroup 不匹配
         combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setVirtualGroup(null)));
         // 测试 status 不匹配
@@ -173,9 +164,6 @@ public class CombinationActivityServiceImplTest extends BaseDbUnitTest {
             o.setStartTime(null);
             o.setEndTime(null);
             o.setUserSize(null);
-            o.setTotalCount(null);
-            o.setSuccessCount(null);
-            o.setOrderUserCount(null);
             o.setVirtualGroup(null);
             o.setStatus(null);
             o.setLimitDuration(null);
@@ -196,12 +184,6 @@ public class CombinationActivityServiceImplTest extends BaseDbUnitTest {
         combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setEndTime(null)));
         // 测试 userSize 不匹配
         combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setUserSize(null)));
-        // 测试 totalNum 不匹配
-        combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setTotalCount(null)));
-        // 测试 successNum 不匹配
-        combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setSuccessCount(null)));
-        // 测试 orderUserCount 不匹配
-        combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setOrderUserCount(null)));
         // 测试 virtualGroup 不匹配
         combinationActivityMapper.insert(cloneIgnoreId(dbCombinationActivity, o -> o.setVirtualGroup(null)));
         // 测试 status 不匹配

@@ -73,7 +73,7 @@ public interface CombinationActivityService {
      * @return 拼团活动的商品列表
      */
     default List<CombinationProductDO> getCombinationProductsByActivityId(Long activityId) {
-        return getCombinationProductsByActivityIds(Collections.singletonList(activityId));
+        return getCombinationProductListByActivityIds(Collections.singletonList(activityId));
     }
 
     /**
@@ -82,7 +82,15 @@ public interface CombinationActivityService {
      * @param activityIds 拼团活动 ids
      * @return 拼团活动的商品列表
      */
-    List<CombinationProductDO> getCombinationProductsByActivityIds(Collection<Long> activityIds);
+    List<CombinationProductDO> getCombinationProductListByActivityIds(Collection<Long> activityIds);
+
+    /**
+     * 获得拼团活动列表
+     *
+     * @param ids 拼团活动 ids
+     * @return 拼团活动的列表
+     */
+    List<CombinationActivityDO> getCombinationActivityListByIds(Collection<Long> ids);
 
     /**
      * 获取正在进行的活动分页数据
@@ -101,7 +109,7 @@ public interface CombinationActivityService {
     PageResult<CombinationActivityDO> getCombinationActivityPage(PageParam pageParam);
 
     /**
-     * 获取指定活动指定 sku 编号的商品
+     * 获取指定活动、指定 sku 编号的商品
      *
      * @param activityId 活动编号
      * @param skuId      sku 编号
@@ -110,11 +118,12 @@ public interface CombinationActivityService {
     CombinationProductDO selectByActivityIdAndSkuId(Long activityId, Long skuId);
 
     /**
-     * 获取指定 spu 编号的活动
+     * 获取指定 spu 编号最近参加的活动，每个 spuId 只返回一条记录
      *
-     * @param spuId spu 编号
-     * @return 拼团活动
+     * @param spuIds spu 编号
+     * @param status 状态
+     * @return 拼团活动列表
      */
-    CombinationActivityDO getCombinationActivityBySpuId(Long spuId);
+    List<CombinationActivityDO> getCombinationActivityBySpuIdsAndStatus(Collection<Long> spuIds, Integer status);
 
 }

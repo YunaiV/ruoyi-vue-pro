@@ -68,7 +68,6 @@ public class TradePriceCalculateReqBO {
     private Long seckillActivityId;
 
     // ========== 拼团活动相关字段 ==========
-    // TODO @puhui999：是不是拼团记录的编号哈？
     /**
      * 拼团活动编号
      */

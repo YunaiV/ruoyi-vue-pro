@@ -4,7 +4,6 @@ import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCr
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationValidateJoinRespDTO;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
 
 // TODO @芋艿：后面也再撸撸这几个接口
 
@@ -18,19 +17,21 @@ public interface CombinationRecordApi {
     /**
      * 校验是否满足拼团条件
      *
-     * @param activityId 活动编号
      * @param userId     用户编号
+     * @param activityId 活动编号
+     * @param headId     团长编号
      * @param skuId      sku 编号
      * @param count      数量
      */
-    void validateCombinationRecord(Long activityId, Long userId, Long skuId, Integer count);
+    void validateCombinationRecord(Long userId, Long activityId, Long headId, Long skuId, Integer count);
 
     /**
      * 创建开团记录
      *
      * @param reqDTO 请求 DTO
+     * @return 开团记录编号
      */
-    void createCombinationRecord(@Valid CombinationRecordCreateReqDTO reqDTO);
+    Long createCombinationRecord(@Valid CombinationRecordCreateReqDTO reqDTO);
 
     /**
      * 查询拼团记录是否成功
@@ -42,14 +43,6 @@ public interface CombinationRecordApi {
     boolean isCombinationRecordSuccess(Long userId, Long orderId);
 
     /**
-     * 更新拼团状态为【成功】
-     *
-     * @param userId  用户编号
-     * @param orderId 订单编号
-     */
-    void updateRecordStatusToSuccess(Long userId, Long orderId);
-
-    /**
      * 更新拼团状态为【失败】
      *
      * @param userId  用户编号
@@ -58,25 +51,18 @@ public interface CombinationRecordApi {
     void updateRecordStatusToFailed(Long userId, Long orderId);
 
     /**
-     * 更新拼团状态为 进行中
-     *
-     * @param userId    用户编号
-     * @param orderId   订单编号
-     * @param startTime 开始时间
-     */
-    void updateRecordStatusToInProgress(Long userId, Long orderId, LocalDateTime startTime);
-
-    /**
      * 【下单前】校验是否满足拼团活动条件
      *
      * 如果校验失败，则抛出业务异常
      *
-     * @param activityId 活动编号
      * @param userId     用户编号
+     * @param activityId 活动编号
+     * @param headId     团长编号
      * @param skuId      sku 编号
      * @param count      数量
      * @return 拼团信息
      */
-    CombinationValidateJoinRespDTO validateJoinCombination(Long activityId, Long userId, Long skuId, Integer count);
+    CombinationValidateJoinRespDTO validateJoinCombination(Long userId, Long activityId, Long headId,
+                                                           Long skuId, Integer count);
 
 }

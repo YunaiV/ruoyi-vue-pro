@@ -4,6 +4,7 @@ import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderRespDTO;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
+import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -25,6 +26,8 @@ public class TradeOrderApiImpl implements TradeOrderApi {
 
     @Resource
     private TradeOrderQueryService tradeOrderQueryService;
+    @Resource
+    private TradeOrderUpdateService tradeOrderUpdateService;
 
     @Override
     public List<TradeOrderRespDTO> getOrderList(Collection<Long> ids) {
@@ -34,6 +37,16 @@ public class TradeOrderApiImpl implements TradeOrderApi {
     @Override
     public TradeOrderRespDTO getOrder(Long id) {
         return TradeOrderConvert.INSTANCE.convert(tradeOrderQueryService.getOrder(id));
+    }
+
+    @Override
+    public void updateOrderCombinationInfo(Long orderId, Long activityId, Long combinationRecordId, Long headId) {
+        tradeOrderUpdateService.updateOrderCombinationInfo(orderId, activityId, combinationRecordId, headId);
+    }
+
+    @Override
+    public void cancelPaidOrder(Long userId, Long orderId) {
+        tradeOrderUpdateService.cancelPaidOrder(userId, orderId);
     }
 
     @Override

@@ -86,7 +86,8 @@ public class AppSeckillActivityController {
 
         // 2.1 查询满足当前阶段的活动
         List<SeckillActivityDO> activityList = activityService.getSeckillActivityListByConfigIdAndStatus(config.getId(), CommonStatusEnum.ENABLE.getStatus());
-        List<SeckillProductDO> productList = activityService.getSeckillProductListByActivityId(convertList(activityList, SeckillActivityDO::getId));
+        List<SeckillProductDO> productList = activityService.getSeckillProductListByActivityId(
+                convertList(activityList, SeckillActivityDO::getId));
         // 2.2 获取 spu 信息
         List<ProductSpuRespDTO> spuList = spuApi.getSpuList(convertList(activityList, SeckillActivityDO::getSpuId));
         return SeckillActivityConvert.INSTANCE.convert(config, activityList, productList, spuList);

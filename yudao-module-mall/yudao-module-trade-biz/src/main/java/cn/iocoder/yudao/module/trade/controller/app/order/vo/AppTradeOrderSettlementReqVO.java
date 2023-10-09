@@ -52,7 +52,6 @@ public class AppTradeOrderSettlementReqVO {
     private Long seckillActivityId;
 
     // ========== 拼团活动相关字段 ==========
-    // TODO @puhui999：是不是拼团记录的编号哈？
     @Schema(description = "拼团活动编号", example = "1024")
     private Long combinationActivityId;
 

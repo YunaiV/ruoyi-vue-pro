@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.trade.service.order.handler;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.module.promotion.api.seckill.SeckillActivityApi;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
@@ -23,12 +22,21 @@ public class TradeSeckillHandler implements TradeOrderHandler {
 
     @Override
     public void beforeOrderCreate(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
-        if (ObjectUtil.notEqual(TradeOrderTypeEnum.SECKILL.getType(), order.getType())) {
+        if (TradeOrderTypeEnum.isSeckill(order.getType())) {
             return;
         }
+
         // 扣减秒杀活动的库存
         seckillActivityApi.updateSeckillStock(order.getSeckillActivityId(),
                 orderItems.get(0).getSkuId(), orderItems.get(0).getCount());
+    }
+
+    @Override
+    public void cancelOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
+        if (TradeOrderTypeEnum.isSeckill(order.getType())) {
+            return;
+        }
+
     }
 
 }

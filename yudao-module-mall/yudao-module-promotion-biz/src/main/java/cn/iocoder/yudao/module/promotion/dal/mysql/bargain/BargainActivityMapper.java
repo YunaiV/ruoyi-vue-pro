@@ -8,8 +8,10 @@ import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.Ba
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -83,11 +85,25 @@ public interface BargainActivityMapper extends BaseMapperX<BargainActivityDO> {
                 .last("LIMIT " + count));
     }
 
-    default BargainActivityDO selectOne(Long spuId) {
-        return selectOne(new LambdaQueryWrapperX<BargainActivityDO>()
-                        .eq(BargainActivityDO::getSpuId, spuId)
-                        .orderByDesc(BargainActivityDO::getCreateTime)
-                , false);
-    }
+    // TODO @puhui999：一个商品，在统一时间，不会参与多个活动；so 是不是不用 inner join 哈？
+    // PS：如果可以参与多个，其实可以这样写 select * from promotion_bargain_activity group by spu_id ORDER BY create_time DESC；通过 group 来过滤
+    /**
+     * 获取指定 spu 编号最近参加的活动，每个 spuId 只返回一条记录
+     *
+     * @param spuIds spu 编号
+     * @param status 状态
+     * @return 砍价活动列表
+     */
+    @Select("SELECT p1.* " +
+            "FROM promotion_bargain_activity p1 " +
+            "INNER JOIN ( " +
+            "  SELECT spu_id, MAX(DISTINCT(create_time)) AS max_create_time " +
+            "  FROM promotion_bargain_activity " +
+            "  WHERE spu_id IN #{spuIds} " +
+            "  GROUP BY spu_id " +
+            ") p2 " +
+            "ON p1.spu_id = p2.spu_id AND p1.create_time = p2.max_create_time AND p1.status = #{status} " +
+            "ORDER BY p1.create_time DESC;")
+    List<BargainActivityDO> selectListBySpuIds(Collection<Long> spuIds, Integer status);
 
 }

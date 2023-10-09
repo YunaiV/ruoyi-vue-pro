@@ -28,13 +28,22 @@ public interface TradeOrderApi {
      */
     TradeOrderRespDTO getOrder(Long id);
 
-    // TODO 芋艿：看看是不是可以删除掉；
     /**
-     * 获取订单状态
+     * 更新拼团相关信息到订单
      *
-     * @param id 订单编号
-     * @return 订单状态
+     * @param orderId             订单编号
+     * @param activityId          拼团活动编号
+     * @param combinationRecordId 拼团记录编号
+     * @param headId              团长编号
      */
-    Integer getOrderStatus(Long id);
+    void updateOrderCombinationInfo(Long orderId, Long activityId, Long combinationRecordId, Long headId);
+
+    /**
+     * 取消支付订单
+     *
+     * @param userId  用户编号
+     * @param orderId 订单编号
+     */
+    void cancelPaidOrder(Long userId, Long orderId);
 
 }

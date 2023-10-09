@@ -250,7 +250,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     /**
      * 订单创建前，执行前置逻辑
      *
-     * @param order 订单
+     * @param order      订单
      * @param orderItems 订单项
      */
     private void beforeCreateTradeOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
@@ -267,9 +267,9 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
      * <p>
      * 例如说：优惠劵的扣减、积分的扣减、支付单的创建等等
      *
-     * @param order           订单
-     * @param orderItems      订单项
-     * @param createReqVO     创建订单请求
+     * @param order       订单
+     * @param orderItems  订单项
+     * @param createReqVO 创建订单请求
      */
     private void afterCreateTradeOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
                                        AppTradeOrderCreateReqVO createReqVO) {
@@ -331,7 +331,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         }
 
         // 3、订单支付成功后
-        tradeOrderHandlers.forEach(handler -> handler.afterPayOrder(order));
+        List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(id);
+        tradeOrderHandlers.forEach(handler -> handler.afterPayOrder(order, orderItems));
 
         // 4.1 增加用户积分（赠送）
         addUserPoint(order.getUserId(), order.getGivePoint(), MemberPointBizTypeEnum.ORDER_GIVE, order.getId());
@@ -624,12 +625,11 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
         }
 
-        // 2. TODO 活动相关库存回滚需要活动 id，活动 id 怎么获取？app 端能否传过来；回复：从订单里拿呀
-        tradeOrderHandlers.forEach(handler -> handler.cancelOrder());
-
-        // 3. 回滚库存
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(id);
+        // 3. 回滚库存
         productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convert(orderItems));
+        // 3.1、 活动相关的回滚
+        tradeOrderHandlers.forEach(handler -> handler.cancelOrder(order, orderItems));
 
         // 4. 回滚优惠券
         if (order.getCouponId() != null && order.getCouponId() > 0) {
@@ -738,19 +738,21 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     }
 
     @Override
-    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.SYSTEM_UP_ADDRESS)
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.ADMIN_UPDATE_ADDRESS)
     public void updateOrderAddress(TradeOrderUpdateAddressReqVO reqVO) {
         // 校验交易订单
         TradeOrderDO order = validateOrderExists(reqVO.getId());
-        // TODO @puhui999：是否需要校验订单是否发货
-        // TODO 发货后是否支持修改收货地址
+        // 发货后，不允许修改；
+        // TODO @puhui999：只有待发货，可以执行 update
+        if (TradeOrderStatusEnum.isDelivered(order.getStatus())) {
+            throw exception(ORDER_UPDATE_ADDRESS_FAIL_STATUS_NOT_DELIVERED);
+        }
 
         // 更新
         tradeOrderMapper.updateById(TradeOrderConvert.INSTANCE.convert(reqVO));
 
         // 记录订单日志
-        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), order.getStatus(),
-                MapUtil.<String, Object>builder().put("orderId", order.getId()).build());
+        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), order.getStatus());
     }
 
     @Override
@@ -806,10 +808,11 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 2.2 如果全部退款，则进行取消订单
         getSelf().cancelOrderByAfterSale(order, orderRefundPrice);
 
-        // TODO @puhui999：活动相关的回滚
 
         // 3. 回滚库存
         productSkuApi.updateSkuStock(TradeOrderConvert.INSTANCE.convert(Collections.singletonList(orderItem)));
+        // 3.1、 活动相关的回滚
+        tradeOrderHandlers.forEach(handler -> handler.cancelOrder(order, Collections.singletonList(orderItem)));
 
         // 4.1 回滚积分：扣减用户积分（赠送的）
         reduceUserPoint(order.getUserId(), orderItem.getGivePoint(), MemberPointBizTypeEnum.AFTER_SALE_DEDUCT_GIVE, orderItem.getAfterSaleId());
@@ -907,6 +910,25 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             }
         }
         return count;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateOrderCombinationInfo(Long orderId, Long activityId, Long combinationRecordId, Long headId) {
+        tradeOrderMapper.updateById(
+                new TradeOrderDO().setId(orderId).setCombinationActivityId(activityId)
+                        .setCombinationRecordId(combinationRecordId).setCombinationHeadId(headId));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void cancelPaidOrder(Long userId, Long orderId) {
+        TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(orderId, userId);
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+
+        cancelOrder0(order, TradeOrderCancelTypeEnum.MEMBER_CANCEL);
     }
 
     /**

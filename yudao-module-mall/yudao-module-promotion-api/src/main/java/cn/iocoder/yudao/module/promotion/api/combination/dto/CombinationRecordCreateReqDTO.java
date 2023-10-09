@@ -4,7 +4,6 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 
-// TODO @芋艿：这块要在看看
 /**
  * 拼团记录的创建 Request DTO
  *
@@ -46,7 +45,6 @@ public class CombinationRecordCreateReqDTO {
     /**
      * 团长编号
      */
-    @NotNull(message = "团长编号不能为空")
     private Long headId;
     /**
      * 拼团商品单价

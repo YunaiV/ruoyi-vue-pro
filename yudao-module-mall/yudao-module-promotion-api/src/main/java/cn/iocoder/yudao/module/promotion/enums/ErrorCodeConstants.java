@@ -80,7 +80,7 @@ public interface ErrorCodeConstants {
     ErrorCode COMBINATION_RECORD_EXISTS = new ErrorCode(1_013_011_001, "拼团失败，已参与过该拼团");
     ErrorCode COMBINATION_RECORD_HEAD_NOT_EXISTS = new ErrorCode(1_013_011_002, "拼团失败，父拼团不存在");
     ErrorCode COMBINATION_RECORD_USER_FULL = new ErrorCode(1_013_011_003, "拼团失败，拼团人数已满");
-    ErrorCode COMBINATION_RECORD_FAILED_HAVE_JOINED = new ErrorCode(1_013_011_004, "拼团失败，已参与其它拼团");
+    ErrorCode COMBINATION_RECORD_FAILED_HAVE_JOINED = new ErrorCode(1_013_011_004, "拼团失败，原因：存在该活动正在进行的拼团记录");
     ErrorCode COMBINATION_RECORD_FAILED_TIME_NOT_START = new ErrorCode(1_013_011_005, "拼团失败，活动未开始");
     ErrorCode COMBINATION_RECORD_FAILED_TIME_END = new ErrorCode(1_013_011_006, "拼团失败，活动已经结束");
     ErrorCode COMBINATION_RECORD_FAILED_SINGLE_LIMIT_COUNT_EXCEED = new ErrorCode(1_013_011_007, "拼团失败，原因：单次限购超出");

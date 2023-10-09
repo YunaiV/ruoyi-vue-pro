@@ -65,13 +65,11 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
 
         // 插入拼团活动
         CombinationActivityDO activity = CombinationActivityConvert.INSTANCE.convert(createReqVO)
-                .setStatus(CommonStatusEnum.ENABLE.getStatus())
-                .setTotalCount(0).setSuccessCount(0).setOrderUserCount(0).setVirtualGroup(0);
+                .setStatus(CommonStatusEnum.ENABLE.getStatus());
         combinationActivityMapper.insert(activity);
         // 插入商品
         List<CombinationProductDO> products = CombinationActivityConvert.INSTANCE.convertList(createReqVO.getProducts(), activity);
         combinationProductMapper.insertBatch(products);
-        // 返回
         return activity.getId();
     }
 
@@ -202,8 +200,13 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     }
 
     @Override
-    public List<CombinationProductDO> getCombinationProductsByActivityIds(Collection<Long> activityIds) {
+    public List<CombinationProductDO> getCombinationProductListByActivityIds(Collection<Long> activityIds) {
         return combinationProductMapper.selectListByActivityIds(activityIds);
+    }
+
+    @Override
+    public List<CombinationActivityDO> getCombinationActivityListByIds(Collection<Long> ids) {
+        return combinationActivityMapper.selectList(CombinationActivityDO::getId, ids);
     }
 
     @Override
@@ -224,8 +227,8 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     }
 
     @Override
-    public CombinationActivityDO getCombinationActivityBySpuId(Long spuId) {
-        return combinationActivityMapper.selectOne(spuId);
+    public List<CombinationActivityDO> getCombinationActivityBySpuIdsAndStatus(Collection<Long> spuIds, Integer status) {
+        return combinationActivityMapper.selectListBySpuIds(spuIds, status);
     }
 
 }

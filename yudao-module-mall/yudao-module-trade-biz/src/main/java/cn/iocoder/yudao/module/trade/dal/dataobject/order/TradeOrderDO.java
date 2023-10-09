@@ -318,10 +318,16 @@ public class TradeOrderDO extends BaseDO {
      */
     private Long combinationActivityId;
     /**
-     * 团长编号
+     * 拼团团长编号
+     *
+     * 关联 CombinationRecordDO 的 headId 字段
+     */
+    private Long combinationHeadId;
+    /**
+     * 拼团记录编号
      *
      * 关联 CombinationRecordDO 的 id 字段
      */
-    private Long combinationHeadId;
+    private Long combinationRecordId;
 
 }

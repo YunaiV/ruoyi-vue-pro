@@ -207,12 +207,16 @@ public interface TradeOrderConvert {
     default TradePriceCalculateReqBO convert(Long userId, AppTradeOrderSettlementReqVO settlementReqVO,
                                              List<CartDO> cartList) {
         TradePriceCalculateReqBO reqBO = new TradePriceCalculateReqBO().setUserId(userId)
+                .setItems(new ArrayList<>(settlementReqVO.getItems().size()))
                 .setCouponId(settlementReqVO.getCouponId()).setPointStatus(settlementReqVO.getPointStatus())
+                // 物流信息
                 .setDeliveryType(settlementReqVO.getDeliveryType()).setAddressId(settlementReqVO.getAddressId())
                 .setPickUpStoreId(settlementReqVO.getPickUpStoreId())
-                .setItems(new ArrayList<>(settlementReqVO.getItems().size()))
+                // 各种活动
                 .setSeckillActivityId(settlementReqVO.getSeckillActivityId())
-                .setBargainRecordId(settlementReqVO.getBargainRecordId());
+                .setBargainRecordId(settlementReqVO.getBargainRecordId())
+                .setCombinationActivityId(settlementReqVO.getCombinationActivityId())
+                .setCombinationHeadId(settlementReqVO.getCombinationHeadId());
         // 商品项的构建
         Map<Long, CartDO> cartMap = convertMap(cartList, CartDO::getId);
         for (AppTradeOrderSettlementReqVO.Item item : settlementReqVO.getItems()) {
