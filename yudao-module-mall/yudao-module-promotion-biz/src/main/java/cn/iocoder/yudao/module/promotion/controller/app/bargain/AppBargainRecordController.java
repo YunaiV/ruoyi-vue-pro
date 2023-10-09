@@ -27,6 +27,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,18 +47,23 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 public class AppBargainRecordController {
 
     @Resource
+    private BargainHelpService bargainHelpService;
+    @Resource
+    @Lazy
     private BargainRecordService bargainRecordService;
     @Resource
+    @Lazy
     private BargainActivityService bargainActivityService;
-    @Resource
-    private BargainHelpService bargainHelpService;
+
 
     @Resource
+    private TradeOrderApi tradeOrderApi;
+    @Resource
+    @Lazy
     private MemberUserApi memberUserApi;
     @Resource
+    @Lazy
     private ProductSpuApi productSpuApi;
-    @Resource
-    private TradeOrderApi tradeOrderApi;
 
     @GetMapping("/get-summary")
     @Operation(summary = "获得砍价记录的概要信息", description = "用于小程序首页")

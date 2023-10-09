@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -27,11 +28,14 @@ import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.ORDER_CREAT
 public class TradeCombinationHandler implements TradeOrderHandler {
 
     @Resource
-    private TradeOrderQueryService orderQueryService;
-    @Resource
+    @Lazy
     private TradeOrderUpdateService orderUpdateService;
+    @Resource
+    @Lazy
+    private TradeOrderQueryService orderQueryService;
 
     @Resource
+    @Lazy
     private CombinationRecordApi combinationRecordApi;
 
     @Override
