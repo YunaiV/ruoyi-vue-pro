@@ -1,6 +1,7 @@
-package cn.iocoder.yudao.module.statistics.dal.mysql.trade;
+package cn.iocoder.yudao.module.statistics.dal.mysql.pay;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberSummaryRespVO;
 import cn.iocoder.yudao.module.statistics.service.trade.bo.WalletSummaryRespBO;
 import cn.iocoder.yudao.module.statistics.dal.dataobject.trade.TradeStatisticsDO;
 import org.apache.ibatis.annotations.Mapper;
@@ -27,4 +28,9 @@ public interface PayWalletStatisticsMapper extends BaseMapperX<TradeStatisticsDO
     Integer selectPriceSummaryByBizTypeAndCreateTimeBetween(@Param("beginTime") LocalDateTime beginTime,
                                                             @Param("endTime") LocalDateTime endTime,
                                                             @Param("bizType") Integer bizType);
+
+    MemberSummaryRespVO selectRechargeSummaryGroupByWalletId(@Param("beginTime") LocalDateTime beginTime,
+                                                             @Param("endTime") LocalDateTime endTime,
+                                                             @Param("payStatus") Boolean payStatus);
+
 }

@@ -28,16 +28,22 @@ CREATE INDEX trade_statistics_time_index
     ON trade_statistics (time);
 
 -- 菜单
-INSERT INTO `ruoyi-vue-pro`.system_menu (name, permission, type, sort, parent_id, path, icon, component, component_name)
+INSERT INTO system_menu (name, permission, type, sort, parent_id, path, icon, component, component_name)
 VALUES ('统计管理', '', 1, 4, 0, '/statistics', 'ep:data-line', '', '');
 SELECT @parentId := LAST_INSERT_ID();
-INSERT INTO `ruoyi-vue-pro`.system_menu (name, permission, type, sort, parent_id, path, icon, component, component_name)
-VALUES ('交易统计', '', 2, 4, @parentId, 'trade', 'fa-solid:credit-card', 'statistics/trade/index', 'TradeStatistics');
+-- 交易统计
+INSERT INTO system_menu (name, permission, type, sort, parent_id, path, icon, component, component_name)
+VALUES ('交易统计', '', 2, 1, @parentId, 'trade', 'fa-solid:credit-card', 'statistics/trade/index', 'TradeStatistics');
 SELECT @parentId := LAST_INSERT_ID();
--- 按钮
 INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
 VALUES ('交易统计查询', 'statistics:trade:query', 3, 1, @parentId, '', '', '', 0);
 INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
 VALUES ('交易统计导出', 'statistics:trade:export', 3, 2, @parentId, '', '', '', 0);
+-- 会员统计
+INSERT INTO system_menu (name, permission, type, sort, parent_id, path, icon, component, component_name)
+VALUES ('会员统计', '', 2, 2, @parentId, 'member', 'ep:avatar', 'statistics/member/index', 'MemberStatistics');
+SELECT @parentId := LAST_INSERT_ID();
+INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
+VALUES ('会员统计查询', 'statistics:member:query', 3, 1, @parentId, '', '', '', 0);
 
 

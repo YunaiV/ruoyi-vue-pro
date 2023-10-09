@@ -13,7 +13,7 @@ public class TradeOrderSummaryRespBO {
     /**
      * 创建订单数
      */
-    private Long orderCreateCount;
+    private Integer orderCreateCount;
     /**
      * 支付订单商品数
      */

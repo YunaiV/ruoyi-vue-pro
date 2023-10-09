@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.statistics.service.trade;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
+import cn.iocoder.yudao.module.statistics.service.pay.PayWalletStatisticsService;
 import cn.iocoder.yudao.module.statistics.service.trade.bo.WalletSummaryRespBO;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeStatisticsComparisonRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeSummaryRespVO;
@@ -66,6 +67,11 @@ public class TradeStatisticsServiceImpl implements TradeStatisticsService {
         LocalDateTime referenceBeginTime = beginTime.minus(Duration.between(beginTime, endTime));
         TradeTrendSummaryRespVO reference = tradeStatisticsMapper.selectByTimeBetween(referenceBeginTime, beginTime);
         return TradeStatisticsConvert.INSTANCE.convert(value, reference);
+    }
+
+    @Override
+    public Integer getExpensePrice(LocalDateTime beginTime, LocalDateTime endTime) {
+        return tradeStatisticsMapper.selectExpensePriceByTimeBetween(beginTime, endTime);
     }
 
     @Override
