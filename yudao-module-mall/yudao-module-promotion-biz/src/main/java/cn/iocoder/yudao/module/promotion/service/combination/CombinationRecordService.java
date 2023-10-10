@@ -168,5 +168,11 @@ public interface CombinationRecordService {
      */
     void cancelCombinationRecord(Long userId, Long id, Long headId);
 
+    /**
+     * 处理过期拼团
+     *
+     * @return key 过期拼团数量, value 虚拟成团数量
+     */
+    KeyValue<Integer, Integer> expireCombinationRecord();
 
 }

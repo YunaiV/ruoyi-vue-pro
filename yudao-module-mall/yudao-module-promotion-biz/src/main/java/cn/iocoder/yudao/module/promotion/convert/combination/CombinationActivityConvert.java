@@ -28,6 +28,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -194,6 +195,37 @@ public interface CombinationActivityConvert {
         }
         respVO.setOrderId(userRecord == null ? null : userRecord.getOrderId());
         return respVO;
+    }
+
+    /**
+     * 转换生成虚拟成团虚拟记录
+     *
+     * @param virtualGroupHeadRecords 虚拟成团团长记录列表
+     * @return 虚拟记录列表
+     */
+    default List<CombinationRecordDO> convertVirtualGroupList(List<CombinationRecordDO> virtualGroupHeadRecords) {
+        List<CombinationRecordDO> createRecords = new ArrayList<>();
+        virtualGroupHeadRecords.forEach(headRecord -> {
+            // 计算需要创建的虚拟成团记录数量
+            int count = headRecord.getUserSize() - headRecord.getUserCount();
+            for (int i = 0; i < count; i++) {
+                // 基础信息和团长保持一致
+                CombinationRecordDO newRecord = new CombinationRecordDO().setActivityId(headRecord.getActivityId())
+                        .setCombinationPrice(headRecord.getCombinationPrice()).setSpuId(headRecord.getSpuId()).setSpuName(headRecord.getSpuName())
+                        .setPicUrl(headRecord.getPicUrl()).setSkuId(headRecord.getSkuId()).setHeadId(headRecord.getId())
+                        .setStatus(headRecord.getStatus()) // 状态保持和创建时一致，创建完成后会接着处理
+                        .setVirtualGroup(headRecord.getVirtualGroup()).setExpireTime(headRecord.getExpireTime())
+                        .setStartTime(headRecord.getStartTime()).setUserSize(headRecord.getUserSize()).setUserCount(headRecord.getUserCount());
+                // 虚拟信息
+                newRecord.setCount(0);
+                newRecord.setUserId(0L);
+                newRecord.setNickname("");
+                newRecord.setAvatar("");
+                newRecord.setOrderId(0L);
+                createRecords.add(newRecord);
+            }
+        });
+        return createRecords;
     }
 
 }

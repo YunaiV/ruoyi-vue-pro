@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationR
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -115,6 +116,17 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
                 .eq(status != null, "status", status)
                 .eq(virtualGroup != null, "virtual_group", virtualGroup)
                 .eq(headId != null, "head_id", headId));
+    }
+
+    default List<CombinationRecordDO> selectListByHeadIdAndStatusAndExpireTimeLt(Long headId, Integer status, LocalDateTime dateTime) {
+        return selectList(new LambdaQueryWrapperX<CombinationRecordDO>()
+                .eq(CombinationRecordDO::getHeadId, headId)
+                .eq(CombinationRecordDO::getStatus, status)
+                .lt(CombinationRecordDO::getExpireTime, dateTime));
+    }
+
+    default List<CombinationRecordDO> selectListByHeadIds(Collection<Long> headIds) {
+        return selectList(new LambdaQueryWrapperX<CombinationRecordDO>().in(CombinationRecordDO::getHeadId, headIds));
     }
 
 }

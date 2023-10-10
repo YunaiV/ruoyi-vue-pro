@@ -64,6 +64,13 @@ public class CollectionUtils {
         return from.stream().filter(filter).map(func).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
+    public static <K, V> List<V> mergeValuesFromMap(Map<K, List<V>> map) {
+        return map.values()
+                .stream()
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+    }
+
     public static <T, U> Set<U> convertSet(Collection<T> from, Function<T, U> func) {
         if (CollUtil.isEmpty(from)) {
             return new HashSet<>();
