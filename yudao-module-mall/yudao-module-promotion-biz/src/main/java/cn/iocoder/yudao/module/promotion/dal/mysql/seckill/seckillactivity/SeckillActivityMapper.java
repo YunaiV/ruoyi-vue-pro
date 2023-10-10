@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillactivity;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
@@ -39,18 +40,34 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
     }
 
     /**
-     * 更新活动库存
+     * 更新活动库存(减少)
      *
      * @param id    活动编号
-     * @param count 扣减的库存数量
+     * @param count 扣减的库存数量(正数)
      * @return 影响的行数
      */
-    default int updateStock(Long id, int count) {
+    default int updateStockDecr(Long id, int count) {
+        Assert.isTrue(count > 0);
         return update(null, new LambdaUpdateWrapper<SeckillActivityDO>()
                 .eq(SeckillActivityDO::getId, id)
                 .gt(SeckillActivityDO::getTotalStock, 0)
                 .setSql("stock = stock + " + count)
                 .setSql("total_stock = total_stock - " + count));
+    }
+
+    /**
+     * 更新活动库存（增加）
+     *
+     * @param id    活动编号
+     * @param count 增加的库存数量(正数)
+     * @return 影响的行数
+     */
+    default int updateStockIncr(Long id, int count) {
+        Assert.isTrue(count > 0);
+        return update(null, new LambdaUpdateWrapper<SeckillActivityDO>()
+                .eq(SeckillActivityDO::getId, id)
+                .setSql("stock = stock - " + count)
+                .setSql("total_stock = total_stock + " + count));
     }
 
     default PageResult<SeckillActivityDO> selectPage(AppSeckillActivityPageReqVO pageReqVO, Integer status) {
@@ -62,6 +79,7 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
 
     /**
      * 查询出指定 spuId 的 spu 参加的活动最接近现在的一条记录。多个的话，一个 spuId 对应一个最近的活动编号
+     *
      * @param spuIds spu 编号
      * @param status 状态
      * @return 包含 spuId 和 activityId 的 map 对象列表

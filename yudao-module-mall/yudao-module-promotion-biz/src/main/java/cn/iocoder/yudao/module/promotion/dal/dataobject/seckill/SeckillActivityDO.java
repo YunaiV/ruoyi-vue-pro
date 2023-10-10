@@ -77,7 +77,8 @@ public class SeckillActivityDO extends BaseDO {
     private Integer singleLimitCount;
 
     /**
-     * 秒杀库存(剩余库存秒杀时扣减)
+     * 秒杀库存-秒杀下单时怎加，恢复库存是减少
+     * 也就是说这个是记录当前秒杀活动用户购买的商品数量和
      */
     private Integer stock;
     /**

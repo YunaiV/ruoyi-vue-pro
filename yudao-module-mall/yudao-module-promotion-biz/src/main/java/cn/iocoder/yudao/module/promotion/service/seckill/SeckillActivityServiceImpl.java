@@ -157,7 +157,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateSeckillStock(Long id, Long skuId, Integer count) {
+    public void updateSeckillStockDecr(Long id, Long skuId, Integer count) {
         // 1.1 校验活动库存是否充足
         SeckillActivityDO seckillActivity = validateSeckillActivityExists(id);
         if (count > seckillActivity.getTotalStock()) {
@@ -170,16 +170,26 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         }
 
         // 2.1 更新活动商品库存
-        int updateCount = seckillProductMapper.updateStock(product.getId(), count);
+        int updateCount = seckillProductMapper.updateStockDecr(product.getId(), count);
         if (updateCount == 0) {
             throw exception(SECKILL_ACTIVITY_UPDATE_STOCK_FAIL);
         }
 
         // 2.2 更新活动库存
-        updateCount = seckillActivityMapper.updateStock(seckillActivity.getId(), count);
+        updateCount = seckillActivityMapper.updateStockDecr(seckillActivity.getId(), count);
         if (updateCount == 0) {
             throw exception(SECKILL_ACTIVITY_UPDATE_STOCK_FAIL);
         }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateSeckillStockIncr(Long id, Long skuId, Integer count) {
+        SeckillProductDO product = seckillProductMapper.selectByActivityIdAndSkuId(id, skuId);
+        // 更新活动商品库存
+        seckillProductMapper.updateStockIncr(product.getId(), count);
+        // 更新活动库存
+        seckillActivityMapper.updateStockIncr(id, count);
     }
 
     /**
