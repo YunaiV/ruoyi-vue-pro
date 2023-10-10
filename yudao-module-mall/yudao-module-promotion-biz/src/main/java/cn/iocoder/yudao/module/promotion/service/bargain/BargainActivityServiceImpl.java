@@ -85,11 +85,16 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 
     @Override
     public void updateBargainActivityStock(Long id, Integer count) {
-        // 更新库存。如果更新失败，则抛出异常
-        int updateCount = bargainActivityMapper.updateStock(id, count);
-        if (updateCount == 0) {
-            throw exception(BARGAIN_ACTIVITY_STOCK_NOT_ENOUGH);
+        if (count < 0) {
+            // 更新库存。如果更新失败，则抛出异常
+            int updateCount = bargainActivityMapper.updateStock(id, count);
+            if (updateCount == 0) {
+                throw exception(BARGAIN_ACTIVITY_STOCK_NOT_ENOUGH);
+            }
+        } else if (count > 0) {
+            bargainActivityMapper.updateStock(id, count);
         }
+
     }
 
     private void validateBargainConflict(Long spuId, Long activityId) {
@@ -140,7 +145,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 
     @Override
     public List<BargainActivityDO> getBargainActivityList(Set<Long> ids) {
-         return bargainActivityMapper.selectBatchIds(ids);
+        return bargainActivityMapper.selectBatchIds(ids);
     }
 
     @Override

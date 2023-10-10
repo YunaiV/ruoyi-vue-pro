@@ -76,11 +76,4 @@ public class TradeCombinationHandler implements TradeOrderHandler {
                 recordIdAndHeadId.getKey(), recordIdAndHeadId.getValue());
     }
 
-    @Override
-    public void cancelOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
-        if (TradeOrderTypeEnum.isCombination(order.getType())) {
-            return;
-        }
-    }
-
 }
