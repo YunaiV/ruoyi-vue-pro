@@ -147,7 +147,8 @@ public interface BpmTaskConvert {
                 .setDefinitionKey(element.getId()));
     }
 
-    // TODO @海：可以使用 mapstruct 映射么？
+    //此处不用 mapstruct 映射，因为 TaskEntityImpl 还有很多其他属性，这里我们只设置我们需要的
+    //使用 mapstruct 会将里面嵌套的各个属性值都设置进去，会出现意想不到的问题
     default TaskEntityImpl convert(TaskEntityImpl task,TaskEntityImpl parentTask){
         task.setCategory(parentTask.getCategory());
         task.setDescription(parentTask.getDescription());
@@ -183,15 +184,15 @@ public interface BpmTaskConvert {
 
     /**
      * 转换任务为父子级
-     * @param result
-     * @return
+     * @param sourceList 原始数据
+     * @return 转换后的父子级数组
      */
-    default List<BpmTaskRespVO> convertChildrenList(List<BpmTaskRespVO> result){
-        List<BpmTaskRespVO> childrenTaskList = CollectionUtils.filterList(result, r -> StrUtil.isNotEmpty(r.getParentTaskId()));
+    default List<BpmTaskRespVO> convertChildrenList(List<BpmTaskRespVO> sourceList){
+        List<BpmTaskRespVO> childrenTaskList = CollectionUtils.filterList(sourceList, r -> StrUtil.isNotEmpty(r.getParentTaskId()));
         Map<String, List<BpmTaskRespVO>> parentChildrenTaskListMap = CollectionUtils.convertMultiMap(childrenTaskList, BpmTaskRespVO::getParentTaskId);
-        for (BpmTaskRespVO bpmTaskRespVO : result) {
+        for (BpmTaskRespVO bpmTaskRespVO : sourceList) {
             bpmTaskRespVO.setChildren(parentChildrenTaskListMap.get(bpmTaskRespVO.getId()));
         }
-        return CollectionUtils.filterList(result, r -> StrUtil.isEmpty(r.getParentTaskId()));
+        return CollectionUtils.filterList(sourceList, r -> StrUtil.isEmpty(r.getParentTaskId()));
     }
 }

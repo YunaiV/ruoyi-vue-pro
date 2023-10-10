@@ -4,16 +4,15 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -95,35 +94,29 @@ public class BpmTaskController {
     @Operation(summary = "委派任务", description = "用于【流程详情】的【委派】按钮。和向前【加签】有点像，唯一区别是【委托】没有单独创立任务")
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
     public CommonResult<Boolean> delegateTask(@Valid @RequestBody BpmTaskDelegateReqVO reqVO) {
-        // TODO @海：, 后面要有空格
-        taskService.delegateTask(reqVO,getLoginUserId());
+        taskService.delegateTask(getLoginUserId(), reqVO);
         return success(true);
     }
 
-    // TODO @海：权限统一使用 bpm:task:update；是否可以加减签，可以交给后续的权限配置实现；
     @PutMapping("/add-sign")
     @Operation(summary = "加签", description = "before 前加签，after 后加签")
-    @PreAuthorize("@ss.hasPermission('bpm:task:add-sign')")
-    public CommonResult<Boolean> addSign(@Valid @RequestBody BpmTaskAddSignReqVO reqVO) {
-        // TODO @海：userId 建议作为第一个参数；一般是，谁做了什么操作；另外，addSignTask，保持风格统一哈；
-        taskService.addSign(reqVO,getLoginUserId());
+    @PreAuthorize("@ss.hasPermission('bpm:task:update')")
+    public CommonResult<Boolean> addSignTask(@Valid @RequestBody BpmTaskAddSignReqVO reqVO) {
+        taskService.addSignTask(getLoginUserId(), reqVO);
         return success(true);
     }
 
-    // TODO @海：权限统一使用 bpm:task:update；是否可以加减签，可以交给后续的权限配置实现；
     @PutMapping("/sub-sign")
     @Operation(summary = "减签")
-    @PreAuthorize("@ss.hasPermission('bpm:task:sub-sign')")
-    // TODO @海： @RequestBody  BpmTaskSubSignReqVO 应该是一个空格；然后参数名可以简写成 reqVO；
-    public CommonResult<Boolean> subSign(@Valid @RequestBody  BpmTaskSubSignReqVO bpmTaskSubSignReqVO) {
-        taskService.subSign(bpmTaskSubSignReqVO,getLoginUserId());
+    @PreAuthorize("@ss.hasPermission('bpm:task:update')")
+    public CommonResult<Boolean> subSignTask(@Valid @RequestBody BpmTaskSubSignReqVO reqVO) {
+        taskService.subSignTask(getLoginUserId(), reqVO);
         return success(true);
     }
 
-    // TODO @海：是不是 url 和方法名，叫 get-child-task-list，更抽象和复用一些？
-    @GetMapping("/get-sub-sign")
+    @GetMapping("/get-children-task-list")
     @Operation(summary = "获取能被减签的任务")
-    @PreAuthorize("@ss.hasPermission('bpm:task:sub-sign')")
+    @PreAuthorize("@ss.hasPermission('bpm:task:update')")
     public CommonResult<List<BpmTaskSubSignRespVO>> getChildrenTaskList(@RequestParam("taskId") String taskId) {
         return success(taskService.getChildrenTaskList(taskId));
     }

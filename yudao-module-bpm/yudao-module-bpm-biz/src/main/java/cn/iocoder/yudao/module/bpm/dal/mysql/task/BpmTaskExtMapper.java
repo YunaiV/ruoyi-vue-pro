@@ -24,7 +24,7 @@ public interface BpmTaskExtMapper extends BaseMapperX<BpmTaskExtDO> {
     default List<BpmTaskExtDO> selectProcessListByTaskIds(Collection<String> taskIds) {
         return selectList(new LambdaQueryWrapperX<BpmTaskExtDO>()
                 .in(BpmTaskExtDO::getTaskId, taskIds)
-                .in(BpmTaskExtDO::getResult, BpmProcessInstanceResultEnum.CAN_SUB_SIGN_STATUS));
+                .in(BpmTaskExtDO::getResult, BpmProcessInstanceResultEnum.CAN_SUB_SIGN_STATUS_LIST));
     }
 
 
