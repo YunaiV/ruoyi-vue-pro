@@ -18,6 +18,7 @@ public interface MemberLevelApi {
      */
     MemberLevelRespDTO getMemberLevel(Long id);
 
+    // TODO 芋艿：后续增加一个减少接口；
     /**
      * 增加会员经验
      *

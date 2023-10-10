@@ -11,13 +11,16 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.ORDER_DELIVERY_FAIL_COMBINATION_RECORD_STATUS_NOT_SUCCESS;
+
 /**
- * 拼团订单 handler 接口实现类
+ * 拼团订单的 {@link TradeOrderHandler} 实现类
  *
  * @author HUIHUI
  */
 @Component
-public class TradeCombinationHandler implements TradeOrderHandler {
+public class TradeCombinationOrderHandler implements TradeOrderHandler {
 
     @Resource
     private CombinationRecordApi combinationRecordApi;
@@ -25,7 +28,7 @@ public class TradeCombinationHandler implements TradeOrderHandler {
     @Override
     public void beforeOrderCreate(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
         // 如果不是拼团订单则结束
-        if (TradeOrderTypeEnum.isCombination(order.getType())) {
+        if (!TradeOrderTypeEnum.isCombination(order.getType())) {
             return;
         }
         Assert.isTrue(orderItems.size() == 1, "拼团时，只允许选择一个商品");
@@ -40,22 +43,26 @@ public class TradeCombinationHandler implements TradeOrderHandler {
     @Override
     public void afterPayOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
         // 如果不是拼团订单则结束
-        if (TradeOrderTypeEnum.isCombination(order.getType())) {
+        if (!TradeOrderTypeEnum.isCombination(order.getType())) {
             return;
         }
         Assert.isTrue(orderItems.size() == 1, "拼团时，只允许选择一个商品");
 
-        // 获取商品信息
-        TradeOrderItemDO item = orderItems.get(0);
         // 创建拼团记录
+        TradeOrderItemDO item = orderItems.get(0);
         combinationRecordApi.createCombinationRecord(TradeOrderConvert.INSTANCE.convert(order, item));
     }
 
     @Override
-    public void cancelOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
-        if (TradeOrderTypeEnum.isCombination(order.getType())) {
+    public void beforeDeliveryOrder(TradeOrderDO order) {
+        if (!TradeOrderTypeEnum.isCombination(order.getType())) {
             return;
+        }
+        // 校验订单拼团是否成功
+        if (!combinationRecordApi.isCombinationRecordSuccess(order.getUserId(), order.getId())) {
+            throw exception(ORDER_DELIVERY_FAIL_COMBINATION_RECORD_STATUS_NOT_SUCCESS);
         }
     }
 
 }
+

@@ -10,33 +10,25 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 秒杀订单 handler 实现类
+ * 秒杀订单的 {@link TradeOrderHandler} 实现类
  *
  * @author HUIHUI
  */
 @Component
-public class TradeSeckillHandler implements TradeOrderHandler {
+public class TradeSeckillOrderHandler implements TradeOrderHandler {
 
     @Resource
     private SeckillActivityApi seckillActivityApi;
 
     @Override
     public void beforeOrderCreate(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
-        if (TradeOrderTypeEnum.isSeckill(order.getType())) {
+        if (!TradeOrderTypeEnum.isSeckill(order.getType())) {
             return;
         }
 
         // 扣减秒杀活动的库存
         seckillActivityApi.updateSeckillStock(order.getSeckillActivityId(),
                 orderItems.get(0).getSkuId(), orderItems.get(0).getCount());
-    }
-
-    @Override
-    public void cancelOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
-        if (TradeOrderTypeEnum.isSeckill(order.getType())) {
-            return;
-        }
-
     }
 
 }

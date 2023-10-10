@@ -11,12 +11,12 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 砍价订单 handler 实现类
+ * 砍价订单的 {@link TradeOrderHandler} 实现类
  *
  * @author HUIHUI
  */
 @Component
-public class TradeBargainHandler implements TradeOrderHandler {
+public class TradeBargainOrderHandler implements TradeOrderHandler {
 
     @Resource
     private BargainActivityApi bargainActivityApi;
@@ -25,7 +25,7 @@ public class TradeBargainHandler implements TradeOrderHandler {
 
     @Override
     public void beforeOrderCreate(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
-        if (TradeOrderTypeEnum.isBargain(order.getType())) {
+        if (!TradeOrderTypeEnum.isBargain(order.getType())) {
             return;
         }
 
@@ -36,20 +36,12 @@ public class TradeBargainHandler implements TradeOrderHandler {
 
     @Override
     public void afterOrderCreate(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
-        if (TradeOrderTypeEnum.isBargain(order.getType())) {
+        if (!TradeOrderTypeEnum.isBargain(order.getType())) {
             return;
         }
 
         // 记录砍价记录对应的订单编号
         bargainRecordApi.updateBargainRecordOrderId(order.getBargainRecordId(), order.getId());
-    }
-
-    @Override
-    public void cancelOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
-        if (TradeOrderTypeEnum.isBargain(order.getType())) {
-            return;
-        }
-        // TODO 芋艿：取消订单时，需要增加库存
     }
 
 }
