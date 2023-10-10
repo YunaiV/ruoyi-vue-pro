@@ -50,9 +50,8 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
         Assert.isTrue(count > 0);
         return update(null, new LambdaUpdateWrapper<SeckillActivityDO>()
                 .eq(SeckillActivityDO::getId, id)
-                .gt(SeckillActivityDO::getTotalStock, 0)
-                .setSql("stock = stock + " + count)
-                .setSql("total_stock = total_stock - " + count));
+                .gt(SeckillActivityDO::getStock, count)
+                .setSql("stock = stock - " + count));
     }
 
     /**
@@ -66,8 +65,7 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
         Assert.isTrue(count > 0);
         return update(null, new LambdaUpdateWrapper<SeckillActivityDO>()
                 .eq(SeckillActivityDO::getId, id)
-                .setSql("stock = stock - " + count)
-                .setSql("total_stock = total_stock + " + count));
+                .setSql("stock = stock + " + count));
     }
 
     default PageResult<SeckillActivityDO> selectPage(AppSeckillActivityPageReqVO pageReqVO, Integer status) {
