@@ -41,6 +41,16 @@ public interface TradeOrderQueryService {
     TradeOrderDO getOrder(Long userId, Long id);
 
     /**
+     * 获得指定用户，指定活动，指定状态的交易订单
+     *
+     * @param userId     用户编号
+     * @param activityId 活动编号
+     * @param status     订单状态
+     * @return 交易订单
+     */
+    TradeOrderDO getActivityOrderByUserIdAndActivityIdAndStatus(Long userId, Long activityId, Integer status);
+
+    /**
      * 获得订单列表
      *
      * @param ids 订单编号数组
@@ -95,7 +105,7 @@ public interface TradeOrderQueryService {
     /**
      * 【会员】在指定秒杀活动下，用户购买的商品数量
      *
-     * @param userId 用户编号
+     * @param userId     用户编号
      * @param activityId 活动编号
      * @return 秒杀商品数量
      */
