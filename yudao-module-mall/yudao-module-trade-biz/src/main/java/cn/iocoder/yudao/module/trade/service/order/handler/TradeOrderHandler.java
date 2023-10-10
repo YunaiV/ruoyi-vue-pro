@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.trade.service.order.handler;
 
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
 
 import java.util.List;
 
@@ -35,16 +37,42 @@ public interface TradeOrderHandler {
      * @param order 订单
      * @param orderItems 订单项
      */
-    default void afterPayOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
-    }
+    default void afterPayOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {}
 
     /**
-     * 订单取消
+     * 订单取消后
      *
      * @param order 订单
      * @param orderItems 订单项
      */
-    default void cancelOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
+    default void afterCancelOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {}
+
+    /**
+     * 订单项取消后
+     *
+     * @param order 订单
+     * @param orderItem 订单项
+     */
+    default void afterCancelOrderItem(TradeOrderDO order, TradeOrderItemDO orderItem) {}
+
+    /**
+     * 订单发货前
+     *
+     * @param order 订单
+     */
+    default void beforeDeliveryOrder(TradeOrderDO order) {}
+
+    // ========== 公用方法 ==========
+
+    /**
+     * 过滤“未售后”的订单项列表
+     *
+     * @param orderItems 订单项列表
+     * @return 过滤后的订单项列表
+     */
+    default List<TradeOrderItemDO> filterOrderItemListByNoneAfterSale(List<TradeOrderItemDO> orderItems) {
+        return CollectionUtils.filterList(orderItems,
+                item -> TradeOrderItemAfterSaleStatusEnum.isNone(item.getAfterSaleStatus()));
     }
 
 }
