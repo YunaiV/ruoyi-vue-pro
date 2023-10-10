@@ -6,11 +6,13 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPage2VO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPageVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -100,13 +102,40 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
                 .betweenIfPresent(CombinationRecordDO::getCreateTime, pageVO.getCreateTime()));
     }
 
-    // TODO @puhui999：这个最好把 headId 也作为一个参数；因为有个要求 userCount，它要 DISTINCT 下；整体可以参考 selectCombinationRecordCountMapByActivityIdAndStatusAndHeadId
-    default Long selectCountByHeadAndStatusAndVirtualGroup(Integer status, Boolean virtualGroup) {
-        return selectCount(new LambdaQueryWrapperX<CombinationRecordDO>()
-                .eq(status != null || virtualGroup != null,
-                        CombinationRecordDO::getHeadId, CombinationRecordDO.HEAD_ID_GROUP) // 统计团信息则指定团长
-                .eqIfPresent(CombinationRecordDO::getStatus, status)
-                .eqIfPresent(CombinationRecordDO::getVirtualGroup, virtualGroup));
+    default PageResult<CombinationRecordDO> selectPage(CombinationRecordReqPage2VO pageVO) {
+        return selectPage(pageVO, new LambdaQueryWrapperX<CombinationRecordDO>()
+                .eq(CombinationRecordDO::getId, pageVO.getHeadId())
+                .or()
+                .eq(CombinationRecordDO::getHeadId, pageVO.getHeadId()));
+    }
+
+    /**
+     * 查询指定条件的记录数
+     * 如果参数都为 null 时则查询用户拼团记录（DISTINCT 去重），也就是说查询会员表中的用户有多少人参与过拼团活动每个人只统计一次
+     *
+     * @param status       状态，可为 null
+     * @param virtualGroup 是否虚拟成团，可为 null
+     * @param headId       团长编号，可为 null
+     * @return 记录数
+     */
+    default Long selectCountByHeadAndStatusAndVirtualGroup(Integer status, Boolean virtualGroup, Long headId) {
+        return selectCount(new QueryWrapper<CombinationRecordDO>()
+                .select(status == null && virtualGroup == null && headId == null, "DISTINCT (user_id)")
+                .eq(status != null, "status", status)
+                .eq(virtualGroup != null, "virtual_group", virtualGroup)
+                .eq(headId != null, "head_id", headId)
+                .groupBy("user_id"));
+    }
+
+    default List<CombinationRecordDO> selectListByHeadIdAndStatusAndExpireTimeLt(Long headId, Integer status, LocalDateTime dateTime) {
+        return selectList(new LambdaQueryWrapperX<CombinationRecordDO>()
+                .eq(CombinationRecordDO::getHeadId, headId)
+                .eq(CombinationRecordDO::getStatus, status)
+                .lt(CombinationRecordDO::getExpireTime, dateTime));
+    }
+
+    default List<CombinationRecordDO> selectListByHeadIds(Collection<Long> headIds) {
+        return selectList(new LambdaQueryWrapperX<CombinationRecordDO>().in(CombinationRecordDO::getHeadId, headIds));
     }
 
 }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.service.order.handler;
 
+import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.module.promotion.api.bargain.BargainActivityApi;
 import cn.iocoder.yudao.module.promotion.api.bargain.BargainRecordApi;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
@@ -28,6 +29,8 @@ public class TradeBargainHandler implements TradeOrderHandler {
         if (TradeOrderTypeEnum.isBargain(order.getType())) {
             return;
         }
+        // 明确校验一下
+        Assert.isTrue(orderItems.size() == 1, "砍价时，只允许选择一个商品");
 
         // 扣减砍价活动的库存
         bargainActivityApi.updateBargainActivityStock(order.getBargainActivityId(),
@@ -39,6 +42,8 @@ public class TradeBargainHandler implements TradeOrderHandler {
         if (TradeOrderTypeEnum.isBargain(order.getType())) {
             return;
         }
+        // 明确校验一下
+        Assert.isTrue(orderItems.size() == 1, "砍价时，只允许选择一个商品");
 
         // 记录砍价记录对应的订单编号
         bargainRecordApi.updateBargainRecordOrderId(order.getBargainRecordId(), order.getId());
@@ -49,7 +54,12 @@ public class TradeBargainHandler implements TradeOrderHandler {
         if (TradeOrderTypeEnum.isBargain(order.getType())) {
             return;
         }
-        // TODO 芋艿：取消订单时，需要增加库存
+        // 明确校验一下
+        Assert.isTrue(orderItems.size() == 1, "砍价时，只允许选择一个商品");
+
+        // 恢复砍价活动的库存
+        bargainActivityApi.updateBargainActivityStock(order.getBargainActivityId(),
+                orderItems.get(0).getCount());
     }
 
 }
