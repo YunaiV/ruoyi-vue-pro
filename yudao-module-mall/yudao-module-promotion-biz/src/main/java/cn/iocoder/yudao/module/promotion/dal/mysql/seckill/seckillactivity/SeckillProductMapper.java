@@ -41,7 +41,7 @@ public interface SeckillProductMapper extends BaseMapperX<SeckillProductDO> {
         Assert.isTrue(count > 0);
         return update(null, new LambdaUpdateWrapper<SeckillProductDO>()
                 .eq(SeckillProductDO::getId, id)
-                .gt(SeckillProductDO::getStock, count)
+                .ge(SeckillProductDO::getStock, count)
                 .setSql("stock = stock - " + count));
     }
 

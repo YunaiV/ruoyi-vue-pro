@@ -45,8 +45,8 @@ public class TradeMemberPointOrderHandler implements TradeOrderHandler {
                 order.getId());
 
         // 增加用户经验
-        memberLevelApi.addExperience(order.getUserId(), order.getPayPrice(), MemberExperienceBizTypeEnum.ORDER.getType(),
-                String.valueOf(order.getId()));
+        memberLevelApi.addExperience(order.getUserId(), order.getPayPrice(),
+                MemberExperienceBizTypeEnum.ORDER_GIVE.getType(), String.valueOf(order.getId()));
     }
 
     @Override
@@ -59,36 +59,36 @@ public class TradeMemberPointOrderHandler implements TradeOrderHandler {
 
         // 增加（回滚）用户积分（订单抵扣）
         Integer usePoint = getSumValue(orderItems, TradeOrderItemDO::getUsePoint, Integer::sum);
-        addPoint(order.getUserId(), usePoint, MemberPointBizTypeEnum.ORDER_CANCEL,
+        addPoint(order.getUserId(), usePoint, MemberPointBizTypeEnum.ORDER_USE_CANCEL,
                 order.getId());
+
         // 如下的返还，需要经过支持，也就是经历 afterPayOrder 流程
         if (!order.getPayStatus()) {
             return;
         }
         // 扣减（回滚）积分（订单赠送）
         Integer givePoint = getSumValue(orderItems, TradeOrderItemDO::getGivePoint, Integer::sum);
-        reducePoint(order.getUserId(), givePoint, MemberPointBizTypeEnum.ORDER_CANCEL,
+        reducePoint(order.getUserId(), givePoint, MemberPointBizTypeEnum.ORDER_GIVE_CANCEL,
                 order.getId());
         // 扣减（回滚）用户经验
         int payPrice = order.getPayPrice() - order.getRefundPrice();
-        // TODO @疯狂：这里的 bizId 和 afterCancelOrderItem 不一致了，有什么建议的处理方案？
-        memberLevelApi.addExperience(order.getUserId(), -payPrice, MemberExperienceBizTypeEnum.REFUND.getType(),
-                String.valueOf(order.getId()));
+        memberLevelApi.addExperience(order.getUserId(), payPrice,
+                MemberExperienceBizTypeEnum.ORDER_GIVE_CANCEL.getType(), String.valueOf(order.getId()));
     }
 
     @Override
     public void afterCancelOrderItem(TradeOrderDO order, TradeOrderItemDO orderItem) {
         // 扣减（回滚）积分（订单赠送）
-        reducePoint(order.getUserId(), orderItem.getGivePoint(), MemberPointBizTypeEnum.AFTER_SALE_DEDUCT_GIVE,
-                orderItem.getAfterSaleId());
+        reducePoint(order.getUserId(), orderItem.getGivePoint(), MemberPointBizTypeEnum.ORDER_GIVE_CANCEL_ITEM,
+                orderItem.getId());
         // 增加（回滚）积分（订单抵扣）
-        addPoint(order.getUserId(), orderItem.getUsePoint(), MemberPointBizTypeEnum.AFTER_SALE_REFUND_USED,
-                orderItem.getAfterSaleId());
+        addPoint(order.getUserId(), orderItem.getUsePoint(), MemberPointBizTypeEnum.ORDER_USE_CANCEL_ITEM,
+                orderItem.getId());
 
         // 扣减（回滚）用户经验
         AfterSaleDO afterSale = afterSaleService.getAfterSale(orderItem.getAfterSaleId());
-        memberLevelApi.addExperience(order.getUserId(), -afterSale.getRefundPrice(), MemberExperienceBizTypeEnum.REFUND.getType(),
-                String.valueOf(orderItem.getAfterSaleId()));
+        memberLevelApi.reduceExperience(order.getUserId(), afterSale.getRefundPrice(),
+                MemberExperienceBizTypeEnum.ORDER_GIVE_CANCEL_ITEM.getType(), String.valueOf(orderItem.getId()));
     }
 
     /**
