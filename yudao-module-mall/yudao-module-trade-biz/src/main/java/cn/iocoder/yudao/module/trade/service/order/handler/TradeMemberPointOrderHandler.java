@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.service.order.handler;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.member.api.level.MemberLevelApi;
 import cn.iocoder.yudao.module.member.api.point.MemberPointApi;
 import cn.iocoder.yudao.module.member.enums.MemberExperienceBizTypeEnum;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getSumValue;
 
 /**
  * 会员积分、等级的 {@link TradeOrderHandler} 实现类
@@ -48,10 +51,29 @@ public class TradeMemberPointOrderHandler implements TradeOrderHandler {
 
     @Override
     public void afterCancelOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
-        // 扣减（回滚）用户积分（订单抵扣）
-        addPoint(order.getUserId(), order.getUsePoint(), MemberPointBizTypeEnum.ORDER_CANCEL,
+        // 售后的订单项，已经在 afterCancelOrderItem 回滚库存，所以这里不需要重复回滚
+        orderItems = filterOrderItemListByNoneAfterSale(orderItems);
+        if (CollUtil.isEmpty(orderItems)) {
+            return;
+        }
+
+        // 增加（回滚）用户积分（订单抵扣）
+        Integer usePoint = getSumValue(orderItems, TradeOrderItemDO::getUsePoint, Integer::sum);
+        addPoint(order.getUserId(), usePoint, MemberPointBizTypeEnum.ORDER_CANCEL,
                 order.getId());
-        // TODO 芋艿：需要校验；如果部分子订单已经售后退款，则不进行整单退；因为已经退了一部分积分了
+        // 如下的返还，需要经过支持，也就是经历 afterPayOrder 流程
+        if (!order.getPayStatus()) {
+            return;
+        }
+        // 扣减（回滚）积分（订单赠送）
+        Integer givePoint = getSumValue(orderItems, TradeOrderItemDO::getGivePoint, Integer::sum);
+        reducePoint(order.getUserId(), givePoint, MemberPointBizTypeEnum.ORDER_CANCEL,
+                order.getId());
+        // 扣减（回滚）用户经验
+        int payPrice = order.getPayPrice() - order.getRefundPrice();
+        // TODO @疯狂：这里的 bizId 和 afterCancelOrderItem 不一致了，有什么建议的处理方案？
+        memberLevelApi.addExperience(order.getUserId(), -payPrice, MemberExperienceBizTypeEnum.REFUND.getType(),
+                String.valueOf(order.getId()));
     }
 
     @Override
@@ -59,7 +81,7 @@ public class TradeMemberPointOrderHandler implements TradeOrderHandler {
         // 扣减（回滚）积分（订单赠送）
         reducePoint(order.getUserId(), orderItem.getGivePoint(), MemberPointBizTypeEnum.AFTER_SALE_DEDUCT_GIVE,
                 orderItem.getAfterSaleId());
-        // 扣减（回滚）积分：增加用户积分（返还抵扣）
+        // 增加（回滚）积分（订单抵扣）
         addPoint(order.getUserId(), orderItem.getUsePoint(), MemberPointBizTypeEnum.AFTER_SALE_REFUND_USED,
                 orderItem.getAfterSaleId());
 

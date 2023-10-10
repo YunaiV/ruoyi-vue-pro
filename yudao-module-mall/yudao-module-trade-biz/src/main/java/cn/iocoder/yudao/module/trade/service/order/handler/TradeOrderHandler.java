@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.trade.service.order.handler;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
 
 import java.util.List;
 
@@ -59,5 +61,18 @@ public interface TradeOrderHandler {
      * @param order 订单
      */
     default void beforeDeliveryOrder(TradeOrderDO order) {}
+
+    // ========== 公用方法 ==========
+
+    /**
+     * 过滤“未售后”的订单项列表
+     *
+     * @param orderItems 订单项列表
+     * @return 过滤后的订单项列表
+     */
+    default List<TradeOrderItemDO> filterOrderItemListByNoneAfterSale(List<TradeOrderItemDO> orderItems) {
+        CollUtil.filterNew(orderItems, item -> !TradeOrderItemAfterSaleStatusEnum.isNone(item.getAfterSaleStatus()));
+        return orderItems;
+    }
 
 }

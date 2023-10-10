@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.service.order.handler;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
@@ -53,21 +54,36 @@ public class TradeBrokerageOrderHandler implements TradeOrderHandler {
 
     @Override
     public void afterPayOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
-        if (order.getBrokerageUserId() != null) {
-            addBrokerage(order.getUserId(), orderItems);
+        if (order.getBrokerageUserId() == null) {
+            return;
         }
+        addBrokerage(order.getUserId(), orderItems);
     }
 
     @Override
     public void afterCancelOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
-        // TODO 芋艿：取消支付时，需要处理下；
+        // 如果是未支付的订单，不会产生分销结果，所以直接 return
+        if (!order.getPayStatus()) {
+            return;
+        }
+        if (order.getBrokerageUserId() == null) {
+            return;
+        }
+
+        // 售后的订单项，已经在 afterCancelOrderItem 回滚库存，所以这里不需要重复回滚
+        orderItems = filterOrderItemListByNoneAfterSale(orderItems);
+        if (CollUtil.isEmpty(orderItems)) {
+            return;
+        }
+        orderItems.forEach(orderItem -> afterCancelOrderItem(order, orderItem));
     }
 
     @Override
     public void afterCancelOrderItem(TradeOrderDO order, TradeOrderItemDO orderItem) {
-        if (order.getBrokerageUserId() != null) {
-            cancelBrokerage(order.getId(), orderItem.getOrderId());
+        if (order.getBrokerageUserId() == null) {
+            return;
         }
+        cancelBrokerage(order.getId(), orderItem.getOrderId());
     }
 
     /**
