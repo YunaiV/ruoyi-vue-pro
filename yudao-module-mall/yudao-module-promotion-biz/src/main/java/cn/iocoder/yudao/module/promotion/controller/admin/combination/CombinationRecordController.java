@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.promotion.controller.admin.combination;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordPageItemRespVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPage2VO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPageVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordSummaryVO;
 import cn.iocoder.yudao.module.promotion.convert.combination.CombinationActivityConvert;
@@ -44,6 +45,17 @@ public class CombinationRecordController {
     @PreAuthorize("@ss.hasPermission('promotion:combination-record:query')")
     public CommonResult<PageResult<CombinationRecordPageItemRespVO>> getBargainRecordPage(@Valid CombinationRecordReqPageVO pageVO) {
         PageResult<CombinationRecordDO> recordPage = combinationRecordService.getCombinationRecordPage(pageVO);
+        List<CombinationActivityDO> activities = combinationActivityService.getCombinationActivityListByIds(
+                convertSet(recordPage.getList(), CombinationRecordDO::getActivityId));
+        return success(CombinationActivityConvert.INSTANCE.convert(recordPage, activities));
+    }
+
+    @GetMapping("/page-by-headId")
+    @Operation(summary = "获得拼团记录分页")
+    @PreAuthorize("@ss.hasPermission('promotion:combination-record:query')")
+    public CommonResult<PageResult<CombinationRecordPageItemRespVO>> getBargainRecordPage(@Valid CombinationRecordReqPage2VO pageVO) {
+        // 包含团长和团员的分页记录
+        PageResult<CombinationRecordDO> recordPage = combinationRecordService.getCombinationRecordPage2(pageVO);
         List<CombinationActivityDO> activities = combinationActivityService.getCombinationActivityListByIds(
                 convertSet(recordPage.getList(), CombinationRecordDO::getActivityId));
         return success(CombinationActivityConvert.INSTANCE.convert(recordPage, activities));

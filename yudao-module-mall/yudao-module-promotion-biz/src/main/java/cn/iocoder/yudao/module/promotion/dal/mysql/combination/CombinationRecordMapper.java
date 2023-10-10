@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPage2VO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPageVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -101,6 +102,13 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
                 .betweenIfPresent(CombinationRecordDO::getCreateTime, pageVO.getCreateTime()));
     }
 
+    default PageResult<CombinationRecordDO> selectPage(CombinationRecordReqPage2VO pageVO) {
+        return selectPage(pageVO, new LambdaQueryWrapperX<CombinationRecordDO>()
+                .eq(CombinationRecordDO::getId, pageVO.getHeadId())
+                .or()
+                .eq(CombinationRecordDO::getHeadId, pageVO.getHeadId()));
+    }
+
     /**
      * 查询指定条件的记录数
      * 如果参数都为 null 时则查询用户拼团记录（DISTINCT 去重），也就是说查询会员表中的用户有多少人参与过拼团活动每个人只统计一次
@@ -112,10 +120,11 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
      */
     default Long selectCountByHeadAndStatusAndVirtualGroup(Integer status, Boolean virtualGroup, Long headId) {
         return selectCount(new QueryWrapper<CombinationRecordDO>()
-                .select(status == null && virtualGroup == null && headId == null, "COUNT(DISTINCT(user_id))")
+                .select(status == null && virtualGroup == null && headId == null, "DISTINCT (user_id)")
                 .eq(status != null, "status", status)
                 .eq(virtualGroup != null, "virtual_group", virtualGroup)
-                .eq(headId != null, "head_id", headId));
+                .eq(headId != null, "head_id", headId)
+                .groupBy("user_id"));
     }
 
     default List<CombinationRecordDO> selectListByHeadIdAndStatusAndExpireTimeLt(Long headId, Integer status, LocalDateTime dateTime) {

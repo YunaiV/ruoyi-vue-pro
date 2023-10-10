@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationValidateJoinRespDTO;
+import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPage2VO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPageVO;
 import cn.iocoder.yudao.module.promotion.convert.combination.CombinationActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
@@ -277,6 +278,11 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
 
     @Override
     public PageResult<CombinationRecordDO> getCombinationRecordPage(CombinationRecordReqPageVO pageVO) {
+        return combinationRecordMapper.selectPage(pageVO);
+    }
+
+    @Override
+    public PageResult<CombinationRecordDO> getCombinationRecordPage2(CombinationRecordReqPage2VO pageVO) {
         return combinationRecordMapper.selectPage(pageVO);
     }
 

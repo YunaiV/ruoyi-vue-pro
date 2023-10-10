@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationValidateJoinRespDTO;
+import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPage2VO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPageVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
@@ -136,6 +137,15 @@ public interface CombinationRecordService {
      * @return 拼团记录分页数据
      */
     PageResult<CombinationRecordDO> getCombinationRecordPage(CombinationRecordReqPageVO pageVO);
+
+    /**
+     * 获取拼团记录分页数据（通过团长查询）
+     *
+     * @param pageVO 分页请求
+     * @return 拼团记录分页数据（包括团长的）
+     */
+    PageResult<CombinationRecordDO> getCombinationRecordPage2(CombinationRecordReqPage2VO pageVO);
+
 
     /**
      * 【拼团活动】获得拼团记录数量 Map
