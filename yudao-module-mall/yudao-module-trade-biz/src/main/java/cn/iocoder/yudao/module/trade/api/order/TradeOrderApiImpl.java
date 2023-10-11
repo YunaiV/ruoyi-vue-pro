@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -25,9 +26,10 @@ import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.ORDER_NOT_F
 public class TradeOrderApiImpl implements TradeOrderApi {
 
     @Resource
-    private TradeOrderQueryService tradeOrderQueryService;
-    @Resource
     private TradeOrderUpdateService tradeOrderUpdateService;
+    @Resource
+    @Lazy
+    private TradeOrderQueryService tradeOrderQueryService;
 
     @Override
     public List<TradeOrderRespDTO> getOrderList(Collection<Long> ids) {

@@ -93,4 +93,16 @@ public interface TradeOrderMapper extends BaseMapperX<TradeOrderDO> {
         return selectOne(TradeOrderDO::getPickUpVerifyCode, pickUpVerifyCode);
     }
 
+    default TradeOrderDO selectByUserIdAndActivityIdAndStatus(Long userId, Long activityId, Integer status) {
+        return selectOne(new LambdaQueryWrapperX<TradeOrderDO>()
+                .and(q -> q.eq(TradeOrderDO::getUserId, userId)
+                        .eq(TradeOrderDO::getStatus, status))
+                .and(q -> q.eq(TradeOrderDO::getCombinationActivityId, activityId)
+                        .or()
+                        .eq(TradeOrderDO::getSeckillActivityId, activityId)
+                        .or()
+                        .eq(TradeOrderDO::getBargainActivityId, activityId))
+        );
+    }
+
 }

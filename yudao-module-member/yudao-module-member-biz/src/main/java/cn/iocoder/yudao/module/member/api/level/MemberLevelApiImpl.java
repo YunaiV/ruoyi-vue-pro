@@ -38,4 +38,9 @@ public class MemberLevelApiImpl implements MemberLevelApi {
         memberLevelService.addExperience(userId, experience, bizTypeEnum, bizId);
     }
 
+    @Override
+    public void reduceExperience(Long userId, Integer experience, Integer bizType, String bizId) {
+        addExperience(userId, -experience, bizType, bizId);
+    }
+
 }

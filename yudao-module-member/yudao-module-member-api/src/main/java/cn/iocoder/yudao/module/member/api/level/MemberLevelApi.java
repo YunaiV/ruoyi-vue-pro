@@ -28,4 +28,14 @@ public interface MemberLevelApi {
      */
     void addExperience(Long userId, Integer experience, Integer bizType, String bizId);
 
+    /**
+     * 扣减会员经验
+     *
+     * @param userId     会员ID
+     * @param experience 经验
+     * @param bizType    业务类型 {@link MemberExperienceBizTypeEnum}
+     * @param bizId      业务编号
+     */
+    void reduceExperience(Long userId, Integer experience, Integer bizType, String bizId);
+
 }

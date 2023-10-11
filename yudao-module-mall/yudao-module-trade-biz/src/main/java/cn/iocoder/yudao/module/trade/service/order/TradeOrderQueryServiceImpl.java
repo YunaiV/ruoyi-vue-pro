@@ -71,6 +71,11 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
     }
 
     @Override
+    public TradeOrderDO getActivityOrderByUserIdAndActivityIdAndStatus(Long userId, Long activityId, Integer status) {
+        return tradeOrderMapper.selectByUserIdAndActivityIdAndStatus(userId, activityId, status);
+    }
+
+    @Override
     public List<TradeOrderDO> getOrderList(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
