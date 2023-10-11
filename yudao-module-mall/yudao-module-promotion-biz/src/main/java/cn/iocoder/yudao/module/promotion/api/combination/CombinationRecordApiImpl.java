@@ -29,6 +29,7 @@ public class CombinationRecordApiImpl implements CombinationRecordApi {
         recordService.validateCombinationRecord(userId, activityId, headId, skuId, count);
     }
 
+    // TODO @puhui999：搞个创建的 RespDTO 哈；
     @Override
     public KeyValue<Long, Long> createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {
         return recordService.createCombinationRecord(reqDTO);

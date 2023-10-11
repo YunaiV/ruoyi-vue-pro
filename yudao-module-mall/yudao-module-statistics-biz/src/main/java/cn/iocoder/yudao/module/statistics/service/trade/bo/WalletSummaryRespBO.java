@@ -9,6 +9,7 @@ import lombok.Data;
  */
 @Data
 public class WalletSummaryRespBO {
+
     /**
      * 总支付金额（余额），单位：分
      */

@@ -94,7 +94,6 @@ public class BargainActivityServiceImpl implements BargainActivityService {
         } else if (count > 0) {
             bargainActivityMapper.updateStock(id, count);
         }
-
     }
 
     private void validateBargainConflict(Long spuId, Long activityId) {
@@ -184,12 +183,13 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 
     @Override
     public List<BargainActivityDO> getBargainActivityBySpuIdsAndStatus(Collection<Long> spuIds, Integer status) {
-        // 1.查询出指定 spuId 的 spu 参加的活动最接近现在的一条记录。多个的话，一个 spuId 对应一个最近的活动编号
+        // 1. 查询出指定 spuId 的 spu 参加的活动最接近现在的一条记录。多个的话，一个 spuId 对应一个最近的活动编号
+        // TODO @puhui999：我想了下，这种是不是只展示当前正在进行中的。已经结束、或者未开始的，可能没啥意义？
         List<Map<String, Object>> spuIdAndActivityIdMaps = bargainActivityMapper.selectSpuIdAndActivityIdMapsBySpuIdsAndStatus(spuIds, status);
         if (CollUtil.isEmpty(spuIdAndActivityIdMaps)) {
             return Collections.emptyList();
         }
-        // 2.查询活动详情
+        // 2. 查询活动详情
         return bargainActivityMapper.selectListByIds(convertSet(spuIdAndActivityIdMaps, map -> MapUtil.getLong(map, "activityId")));
     }
 

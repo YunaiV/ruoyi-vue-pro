@@ -45,16 +45,15 @@ public class TradeStatisticsServiceImpl implements TradeStatisticsService {
 
     @Override
     public TradeStatisticsComparisonRespVO<TradeSummaryRespVO> getTradeSummaryComparison() {
-        // 昨天的数据
+        // 1.1 昨天的数据
         TradeSummaryRespBO yesterdayData = getTradeSummaryByDays(-1);
-        // 前天的数据（用于对照昨天的数据）
+        // 1.2 前天的数据（用于对照昨天的数据）
         TradeSummaryRespBO beforeYesterdayData = getTradeSummaryByDays(-2);
-
-        // 本月数据;
+        // 2.1 本月数据
         TradeSummaryRespBO monthData = getTradeSummaryByMonths(0);
-        // 上月数据（用于对照本月的数据）
+        // 2.2 上月数据（用于对照本月的数据）
         TradeSummaryRespBO lastMonthData = getTradeSummaryByMonths(-1);
-
+        // 转换返回
         return TradeStatisticsConvert.INSTANCE.convert(yesterdayData, beforeYesterdayData, monthData, lastMonthData);
     }
 
@@ -81,31 +80,31 @@ public class TradeStatisticsServiceImpl implements TradeStatisticsService {
 
     @Override
     public String statisticsYesterdayTrade() {
-        // 处理统计参数
         LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
         LocalDateTime beginTime = LocalDateTimeUtil.beginOfDay(yesterday);
         LocalDateTime endTime = LocalDateTimeUtil.endOfDay(yesterday);
-        // 统计
+        // 1.1 统计订单
         StopWatch stopWatch = new StopWatch("交易统计");
         stopWatch.start("统计订单");
         TradeOrderSummaryRespBO orderSummary = tradeOrderStatisticsService.getOrderSummary(beginTime, endTime);
         stopWatch.stop();
-
+        // 1.2 统计售后
         stopWatch.start("统计售后");
         AfterSaleSummaryRespBO afterSaleSummary = afterSaleStatisticsService.getAfterSaleSummary(beginTime, endTime);
         stopWatch.stop();
-
+        // 1.3 统计佣金
         stopWatch.start("统计佣金");
         Integer brokerageSettlementPrice = brokerageStatisticsService.getBrokerageSettlementPriceSummary(beginTime, endTime);
         stopWatch.stop();
-
+        // 1.4 统计充值
         stopWatch.start("统计充值");
         WalletSummaryRespBO walletSummary = payWalletStatisticsService.getWalletSummary(beginTime, endTime);
         stopWatch.stop();
-        // 插入数据
-        TradeStatisticsDO entity = TradeStatisticsConvert.INSTANCE.convert(yesterday, orderSummary, afterSaleSummary, brokerageSettlementPrice, walletSummary);
+
+        // 2. 插入数据
+        TradeStatisticsDO entity = TradeStatisticsConvert.INSTANCE.convert(yesterday, orderSummary, afterSaleSummary,
+                brokerageSettlementPrice, walletSummary);
         tradeStatisticsMapper.insert(entity);
-        // 返回计时结果
         return stopWatch.prettyPrint();
     }
 

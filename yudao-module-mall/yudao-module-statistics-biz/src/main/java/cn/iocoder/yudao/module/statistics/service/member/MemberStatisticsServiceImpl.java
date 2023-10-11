@@ -24,7 +24,7 @@ import java.util.Optional;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
- * 会员统计 Service 实现类
+ * 会员信息的统计 Service 实现类
  *
  * @author owen
  */

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.statistics.service.infra;
 import java.time.LocalDateTime;
 
 /**
- * API 访问日志统计 Service 接口
+ * API 访问日志的统计 Service 接口
  *
  * @author owen
  */

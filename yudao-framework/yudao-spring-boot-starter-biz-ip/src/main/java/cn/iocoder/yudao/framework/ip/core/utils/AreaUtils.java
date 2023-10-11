@@ -132,7 +132,9 @@ public class AreaUtils {
         return convertList(areas.values(), func, area -> type.getType().equals(area.getType()));
     }
 
+    // TODO @疯狂：注释写下；
     public static Integer getParentIdByType(Integer id, @NonNull AreaTypeEnum type) {
+        // TODO @疯狂：这种不要用 while true；因为万一脏数据，可能会死循环；可以转换成 for (int i = 0; i < Byte.MAX; i++) 一般是优先层级；
         do {
             Area area = AreaUtils.getArea(id);
             if (area == null) {

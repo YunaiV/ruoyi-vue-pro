@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * 会员统计 Service 接口
+ * 会员信息的统计 Service 接口
  *
  * @author owen
  */

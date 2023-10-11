@@ -8,7 +8,7 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
 /**
- * API 访问日志统计 Service 实现类
+ * API 访问日志的统计 Service 实现类
  *
  * @author owen
  */

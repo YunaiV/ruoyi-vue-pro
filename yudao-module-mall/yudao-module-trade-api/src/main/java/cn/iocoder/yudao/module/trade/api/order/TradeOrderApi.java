@@ -28,16 +28,7 @@ public interface TradeOrderApi {
      */
     TradeOrderRespDTO getOrder(Long id);
 
-    /**
-     * 更新拼团相关信息到订单
-     *
-     * @param orderId             订单编号
-     * @param activityId          拼团活动编号
-     * @param combinationRecordId 拼团记录编号
-     * @param headId              团长编号
-     */
-    void updateOrderCombinationInfo(Long orderId, Long activityId, Long combinationRecordId, Long headId);
-
+    // TODO 芋艿：需要优化下；
     /**
      * 取消支付订单
      *

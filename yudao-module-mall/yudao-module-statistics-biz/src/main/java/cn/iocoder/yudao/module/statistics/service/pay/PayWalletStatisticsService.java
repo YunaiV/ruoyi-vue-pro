@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.statistics.service.trade.bo.WalletSummaryRespBO;
 import java.time.LocalDateTime;
 
 /**
- * 钱包统计 Service 接口
+ * 钱包的统计 Service 接口
  *
  * @author owen
  */

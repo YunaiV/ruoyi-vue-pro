@@ -8,6 +8,7 @@
         FROM member_user
         WHERE deleted = FALSE
         GROUP BY area_id
+        <!-- TODO @疯狂：order by 是不是交给内存哈 -->
         ORDER BY userCount DESC
     </select>
 
@@ -17,6 +18,7 @@
         FROM member_user
         WHERE deleted = FALSE
         GROUP BY sex
+        <!-- TODO @疯狂：order by 是不是交给内存哈 -->
         ORDER BY userCount DESC
     </select>
 
@@ -31,4 +33,5 @@
             AND create_time &lt;= #{endTime}
         </if>
     </select>
+
 </mapper>

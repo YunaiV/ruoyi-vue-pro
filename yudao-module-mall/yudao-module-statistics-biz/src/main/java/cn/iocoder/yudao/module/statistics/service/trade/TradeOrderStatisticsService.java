@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * 交易订单统计 Service 接口
+ * 交易订单的统计 Service 接口
  *
  * @author owen
  */

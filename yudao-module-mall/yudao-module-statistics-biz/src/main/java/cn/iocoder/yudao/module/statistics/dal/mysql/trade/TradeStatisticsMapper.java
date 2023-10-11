@@ -19,6 +19,7 @@ import java.util.List;
 @Mapper
 public interface TradeStatisticsMapper extends BaseMapperX<TradeStatisticsDO> {
 
+    // TODO @疯狂：这个要不要也挪到 xml 里，保持统一？
     @Select("SELECT IFNULL(SUM(order_create_count), 0) AS count, IFNULL(SUM(order_pay_price), 0) AS summary " +
             "FROM trade_statistics " +
             "WHERE time BETWEEN #{beginTime} AND #{endTime} AND deleted = FALSE")
@@ -33,4 +34,5 @@ public interface TradeStatisticsMapper extends BaseMapperX<TradeStatisticsDO> {
 
     Integer selectExpensePriceByTimeBetween(@Param("beginTime") LocalDateTime beginTime,
                                             @Param("endTime") LocalDateTime endTime);
+
 }

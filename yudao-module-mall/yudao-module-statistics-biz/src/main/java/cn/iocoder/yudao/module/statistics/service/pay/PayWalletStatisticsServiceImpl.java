@@ -12,7 +12,7 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
 /**
- * 钱包统计 Service 实现类
+ * 钱包的统计 Service 实现类
  *
  * @author owen
  */
@@ -31,11 +31,10 @@ public class PayWalletStatisticsServiceImpl implements PayWalletStatisticsServic
                 beginTime, endTime, PayRefundStatusEnum.SUCCESS.getStatus());
         Integer walletPayPrice = payWalletStatisticsMapper.selectPriceSummaryByBizTypeAndCreateTimeBetween(
                 beginTime, endTime, PayWalletBizTypeEnum.PAYMENT.getType());
-
-        paySummary.setOrderWalletPayPrice(walletPayPrice);
-        paySummary.setRechargeRefundCount(refundSummary.getRechargeRefundCount());
-        paySummary.setRechargeRefundPrice(refundSummary.getRechargeRefundPrice());
-
+        // 拼接
+        paySummary.setOrderWalletPayPrice(walletPayPrice)
+                .setRechargeRefundCount(refundSummary.getRechargeRefundCount())
+                .setRechargeRefundPrice(refundSummary.getRechargeRefundPrice());
         return paySummary;
     }
 

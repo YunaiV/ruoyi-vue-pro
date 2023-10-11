@@ -146,7 +146,6 @@ public interface CombinationRecordService {
      */
     PageResult<CombinationRecordDO> getCombinationRecordPage2(CombinationRecordReqPage2VO pageVO);
 
-
     /**
      * 【拼团活动】获得拼团记录数量 Map
      *
@@ -158,7 +157,6 @@ public interface CombinationRecordService {
     Map<Long, Integer> getCombinationRecordCountMapByActivity(Collection<Long> activityIds,
                                                               @Nullable Integer status,
                                                               @Nullable Long headId);
-
 
     /**
      * 获取拼团记录
