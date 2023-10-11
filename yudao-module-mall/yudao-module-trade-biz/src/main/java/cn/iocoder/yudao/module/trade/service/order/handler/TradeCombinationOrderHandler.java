@@ -10,7 +10,6 @@ import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -29,14 +28,11 @@ import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.ORDER_DELIV
 public class TradeCombinationOrderHandler implements TradeOrderHandler {
 
     @Resource
-    @Lazy
     private TradeOrderUpdateService orderUpdateService;
     @Resource
-    @Lazy
     private TradeOrderQueryService orderQueryService;
 
     @Resource
-    @Lazy
     private CombinationRecordApi combinationRecordApi;
 
     @Override
@@ -51,7 +47,9 @@ public class TradeCombinationOrderHandler implements TradeOrderHandler {
         TradeOrderItemDO item = orderItems.get(0);
         combinationRecordApi.validateCombinationRecord(order.getUserId(), order.getCombinationActivityId(),
                 order.getCombinationHeadId(), item.getSkuId(), item.getCount());
-        // 2. 校验该用户是否存在未支付的拼团活动订单；就是还没支付的时候，重复下单了；需要校验下；不然的话，一个拼团可以下多个单子了；
+
+        // 2. 校验该用户是否存在未支付的拼团活动订单，避免一个拼团可以下多个单子了
+        // TODO @puhui999：只校验未支付的拼团订单噢
         TradeOrderDO activityOrder = orderQueryService.getActivityOrderByUserIdAndActivityIdAndStatus(
                 order.getUserId(), order.getCombinationActivityId(), TradeOrderStatusEnum.UNPAID.getStatus());
         if (activityOrder != null) {

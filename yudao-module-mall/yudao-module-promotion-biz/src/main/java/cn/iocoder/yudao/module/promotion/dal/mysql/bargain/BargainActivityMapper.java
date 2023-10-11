@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityD
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -87,6 +86,7 @@ public interface BargainActivityMapper extends BaseMapperX<BargainActivityDO> {
                 .last("LIMIT " + count));
     }
 
+    // TODO @puhui999：是不是返回 BargainActivityDO 更干净哈？
     /**
      * 查询出指定 spuId 的 spu 参加的活动最接近现在的一条记录。多个的话，一个 spuId 对应一个最近的活动编号
      *
@@ -94,7 +94,7 @@ public interface BargainActivityMapper extends BaseMapperX<BargainActivityDO> {
      * @param status 状态
      * @return 包含 spuId 和 activityId 的 map 对象列表
      */
-    default List<Map<String, Object>> selectSpuIdAndActivityIdMapsBySpuIdsAndStatus(@Param("spuIds") Collection<Long> spuIds, @Param("status") Integer status) {
+    default List<Map<String, Object>> selectSpuIdAndActivityIdMapsBySpuIdsAndStatus(Collection<Long> spuIds, Integer status) {
         return selectMaps(new QueryWrapper<BargainActivityDO>()
                 .select("spu_id AS spuId, MAX(DISTINCT(id)) AS activityId") // 时间越大 id 也越大 直接用 id
                 .in("spu_id", spuIds)

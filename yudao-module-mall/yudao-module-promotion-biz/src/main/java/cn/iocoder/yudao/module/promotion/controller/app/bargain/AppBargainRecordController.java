@@ -27,7 +27,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,20 +48,15 @@ public class AppBargainRecordController {
     @Resource
     private BargainHelpService bargainHelpService;
     @Resource
-    @Lazy
     private BargainRecordService bargainRecordService;
     @Resource
-    @Lazy
     private BargainActivityService bargainActivityService;
-
 
     @Resource
     private TradeOrderApi tradeOrderApi;
     @Resource
-    @Lazy
     private MemberUserApi memberUserApi;
     @Resource
-    @Lazy
     private ProductSpuApi productSpuApi;
 
     @GetMapping("/get-summary")

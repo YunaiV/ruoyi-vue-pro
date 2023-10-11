@@ -22,7 +22,7 @@ public class CombinationRecordExpireJob implements JobHandler {
 
     @Override
     @TenantJob
-    public String execute(String param) throws Exception {
+    public String execute(String param) {
         KeyValue<Integer, Integer> keyValue = combinationRecordService.expireCombinationRecord();
         return StrUtil.format("过期拼团 {} 个, 虚拟成团 {} 个", keyValue.getKey(), keyValue.getValue());
     }

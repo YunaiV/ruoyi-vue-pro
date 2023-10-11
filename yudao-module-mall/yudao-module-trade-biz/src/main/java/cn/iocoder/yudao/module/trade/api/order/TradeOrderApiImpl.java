@@ -5,7 +5,6 @@ import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderSummaryRespDTO;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -26,7 +25,6 @@ public class TradeOrderApiImpl implements TradeOrderApi {
     @Resource
     private TradeOrderUpdateService tradeOrderUpdateService;
     @Resource
-    @Lazy
     private TradeOrderQueryService tradeOrderQueryService;
 
     @Override
@@ -42,11 +40,6 @@ public class TradeOrderApiImpl implements TradeOrderApi {
     @Override
     public TradeOrderSummaryRespDTO getOrderSummary(LocalDateTime beginTime, LocalDateTime endTime) {
         return tradeOrderQueryService.getOrderSummary(beginTime, endTime);
-    }
-
-    @Override
-    public void updateOrderCombinationInfo(Long orderId, Long activityId, Long combinationRecordId, Long headId) {
-        tradeOrderUpdateService.updateOrderCombinationInfo(orderId, activityId, combinationRecordId, headId);
     }
 
     @Override

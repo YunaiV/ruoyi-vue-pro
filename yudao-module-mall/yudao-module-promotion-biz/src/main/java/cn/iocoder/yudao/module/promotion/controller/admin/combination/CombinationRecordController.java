@@ -40,6 +40,9 @@ public class CombinationRecordController {
     @Lazy
     private CombinationRecordService combinationRecordService;
 
+    // TODO @puhui999：getBargainRecordPage 和 getBargainRecordPage 是不是可以合并；然后 CombinationRecordReqPageVO 加一个 headId；
+    // 然后如果 headId 非空，并且第一页，单独多查询一条 head ；放到第 0 个位置；相当于说，第一页特殊一点；
+
     @GetMapping("/page")
     @Operation(summary = "获得拼团记录分页")
     @PreAuthorize("@ss.hasPermission('promotion:combination-record:query')")
@@ -47,6 +50,7 @@ public class CombinationRecordController {
         PageResult<CombinationRecordDO> recordPage = combinationRecordService.getCombinationRecordPage(pageVO);
         List<CombinationActivityDO> activities = combinationActivityService.getCombinationActivityListByIds(
                 convertSet(recordPage.getList(), CombinationRecordDO::getActivityId));
+        // TODO @puhui999：商品没读取
         return success(CombinationActivityConvert.INSTANCE.convert(recordPage, activities));
     }
 

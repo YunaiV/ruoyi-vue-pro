@@ -120,6 +120,7 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
      */
     default Long selectCountByHeadAndStatusAndVirtualGroup(Integer status, Boolean virtualGroup, Long headId) {
         return selectCount(new QueryWrapper<CombinationRecordDO>()
+                // TODO @puhui999：这种偏逻辑性的，不要给 mapper 哈；可以考虑拆成 2 个 mapper，上层也是 2 个 service；
                 .select(status == null && virtualGroup == null && headId == null, "DISTINCT (user_id)")
                 .eq(status != null, "status", status)
                 .eq(virtualGroup != null, "virtual_group", virtualGroup)

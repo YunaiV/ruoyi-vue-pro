@@ -657,7 +657,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     public void updateOrderAddress(TradeOrderUpdateAddressReqVO reqVO) {
         // 校验交易订单
         TradeOrderDO order = validateOrderExists(reqVO.getId());
-        // 只有待发货状态才可以修改订单收货地址；
+        // 只有待发货状态，才可以修改订单收货地址；
         if (!TradeOrderStatusEnum.isUndelivered(order.getStatus())) {
             throw exception(ORDER_UPDATE_ADDRESS_FAIL_STATUS_NOT_DELIVERED);
         }
@@ -823,11 +823,11 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void cancelPaidOrder(Long userId, Long orderId) {
+        // TODO 芋艿：这里实现要优化下；
         TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(orderId, userId);
         if (order == null) {
             throw exception(ORDER_NOT_FOUND);
         }
-
         cancelOrder0(order, TradeOrderCancelTypeEnum.MEMBER_CANCEL);
     }
 
