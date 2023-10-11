@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.statistics.service.pay;
 
-import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberSummaryRespVO;
+import cn.iocoder.yudao.module.statistics.service.pay.bo.RechargeSummaryRespBO;
 import cn.iocoder.yudao.module.statistics.service.trade.bo.WalletSummaryRespBO;
 
 import java.time.LocalDateTime;
@@ -28,6 +28,6 @@ public interface PayWalletStatisticsService {
      * @param endTime   截止时间
      * @return 钱包充值统计
      */
-    MemberSummaryRespVO getUserRechargeSummary(LocalDateTime beginTime, LocalDateTime endTime);
+    RechargeSummaryRespBO getUserRechargeSummary(LocalDateTime beginTime, LocalDateTime endTime);
 
 }

@@ -8,8 +8,6 @@
         FROM member_user
         WHERE deleted = FALSE
         GROUP BY area_id
-        <!-- TODO @疯狂：order by 是不是交给内存哈 -->
-        ORDER BY userCount DESC
     </select>
 
     <select id="selectSummaryListBySex"
@@ -18,8 +16,6 @@
         FROM member_user
         WHERE deleted = FALSE
         GROUP BY sex
-        <!-- TODO @疯狂：order by 是不是交给内存哈 -->
-        ORDER BY userCount DESC
     </select>
 
     <select id="selectUserCount" resultType="java.lang.Integer">

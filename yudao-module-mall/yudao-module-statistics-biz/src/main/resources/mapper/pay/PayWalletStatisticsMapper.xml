@@ -30,7 +30,7 @@
     </select>
 
     <select id="selectRechargeSummaryGroupByWalletId"
-            resultType="cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberSummaryRespVO">
+            resultType="cn.iocoder.yudao.module.statistics.service.pay.bo.RechargeSummaryRespBO">
         SELECT COUNT(1)       AS rechargeUserCount,
                SUM(pay_price) AS rechargePrice
         FROM pay_wallet_recharge
