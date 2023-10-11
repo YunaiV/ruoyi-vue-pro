@@ -7,12 +7,16 @@ import cn.hutool.core.text.csv.CsvUtil;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.ip.core.Area;
 import cn.iocoder.yudao.framework.ip.core.enums.AreaTypeEnum;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 /**
  * 区域工具类
@@ -108,12 +112,43 @@ public class AreaUtils {
             // “递归”父节点
             area = area.getParent();
             if (area == null
-                || ObjectUtils.equalsAny(area.getId(), Area.ID_GLOBAL, Area.ID_CHINA)) { // 跳过父节点为中国的情况
+                    || ObjectUtils.equalsAny(area.getId(), Area.ID_GLOBAL, Area.ID_CHINA)) { // 跳过父节点为中国的情况
                 break;
             }
             sb.insert(0, separator);
         }
         return sb.toString();
+    }
+
+    /**
+     * 获取指定类型的区域列表
+     *
+     * @param type 区域类型
+     * @param func 转换函数
+     * @param <T>  结果类型
+     * @return 区域列表
+     */
+    public static <T> List<T> getByType(AreaTypeEnum type, Function<Area, T> func) {
+        return convertList(areas.values(), func, area -> type.getType().equals(area.getType()));
+    }
+
+    public static Integer getParentIdByType(Integer id, @NonNull AreaTypeEnum type) {
+        do {
+            Area area = AreaUtils.getArea(id);
+            if (area == null) {
+                return null;
+            }
+
+            if (type.getType().equals(area.getType())) {
+                return area.getId();
+            }
+
+            if (area.getParent() == null || area.getParent().getId() == null) {
+                return null;
+            }
+
+            id = area.getParent().getId();
+        } while (true);
     }
 
 }

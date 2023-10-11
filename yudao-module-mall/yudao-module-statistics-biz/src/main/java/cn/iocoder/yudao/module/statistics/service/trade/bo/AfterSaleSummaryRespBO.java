@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.trade.api.aftersale.dto;
+package cn.iocoder.yudao.module.statistics.service.trade.bo;
 
 import lombok.Data;
 
@@ -8,7 +8,7 @@ import lombok.Data;
  * @author owen
  */
 @Data
-public class AfterSaleSummaryRespDTO {
+public class AfterSaleSummaryRespBO {
 
     /**
      * 退款订单数

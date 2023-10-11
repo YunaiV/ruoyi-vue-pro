@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.pay.api.wallet.dto;
+package cn.iocoder.yudao.module.statistics.service.trade.bo;
 
 import lombok.Data;
 
@@ -8,7 +8,7 @@ import lombok.Data;
  * @author owen
  */
 @Data
-public class WalletSummaryRespDTO {
+public class WalletSummaryRespBO {
     /**
      * 总支付金额（余额），单位：分
      */

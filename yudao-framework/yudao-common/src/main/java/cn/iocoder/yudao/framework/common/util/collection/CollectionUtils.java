@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.common.util.collection;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ArrayUtil;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.*;
@@ -48,6 +49,13 @@ public class CollectionUtils {
             return new ArrayList<>();
         }
         return new ArrayList<>(convertMap(from, keyMapper, Function.identity(), cover).values());
+    }
+
+    public static <T, U> List<U> convertList(T[] from, Function<T, U> func) {
+        if (ArrayUtil.isEmpty(from)) {
+            return new ArrayList<>();
+        }
+        return convertList(Arrays.asList(from), func);
     }
 
     public static <T, U> List<U> convertList(Collection<T> from, Function<T, U> func) {
@@ -169,8 +177,8 @@ public class CollectionUtils {
     /**
      * 对比老、新两个列表，找出新增、修改、删除的数据
      *
-     * @param oldList 老列表
-     * @param newList 新列表
+     * @param oldList  老列表
+     * @param newList  新列表
      * @param sameFunc 对比函数，返回 true 表示相同，返回 false 表示不同
      *                 注意，same 是通过每个元素的“标识”，判断它们是不是同一个数据
      * @return [新增列表、修改列表、删除列表]

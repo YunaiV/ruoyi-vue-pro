@@ -1,19 +1,19 @@
-package cn.iocoder.yudao.module.trade.api.order.dto;
+package cn.iocoder.yudao.module.statistics.service.trade.bo;
 
 import lombok.Data;
 
 /**
- * 订单统计 Response DTO
+ * 订单统计 Response BO
  *
  * @author owen
  */
 @Data
-public class TradeOrderSummaryRespDTO {
+public class TradeOrderSummaryRespBO {
 
     /**
      * 创建订单数
      */
-    private Long orderCreateCount;
+    private Integer orderCreateCount;
     /**
      * 支付订单商品数
      */

@@ -4,7 +4,6 @@ import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.pay.core.enums.refund.PayRefundStatusRespEnum;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
-import cn.iocoder.yudao.module.pay.api.wallet.dto.WalletSummaryRespDTO;
 import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.recharge.AppPayWalletRechargeCreateReqVO;
 import cn.iocoder.yudao.module.pay.convert.wallet.PayWalletRechargeConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
@@ -256,17 +255,6 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
             throw exception(WALLET_RECHARGE_UPDATE_PAID_PAY_ORDER_ID_ERROR);
         }
         return payOrder;
-    }
-
-    @Override
-    public WalletSummaryRespDTO getWalletSummary(LocalDateTime beginTime, LocalDateTime endTime) {
-        WalletSummaryRespDTO paySummary = walletRechargeMapper.selectRechargeSummaryByPayTimeBetween(beginTime, endTime);
-        WalletSummaryRespDTO refundSummary = walletRechargeMapper.selectRechargeSummaryByRefundTimeBetween(beginTime, endTime);
-
-        paySummary.setRechargeRefundCount(refundSummary.getRechargeRefundCount());
-        paySummary.setRechargeRefundPrice(refundSummary.getRechargeRefundPrice());
-
-        return paySummary;
     }
 
 }

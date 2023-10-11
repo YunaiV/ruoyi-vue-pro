@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 
 /**
  * 钱包流水 Service 实现类
@@ -59,11 +58,6 @@ public class PayWalletTransactionServiceImpl implements PayWalletTransactionServ
     @Override
     public PayWalletTransactionDO getWalletTransaction(String bizId, PayWalletBizTypeEnum type) {
         return payWalletTransactionMapper.selectByBiz(bizId, type.getType());
-    }
-
-    @Override
-    public Integer getPriceSummary(PayWalletBizTypeEnum bizType, LocalDateTime beginTime, LocalDateTime endTime) {
-        return payWalletTransactionMapper.selectSummaryByBizTypeAndCreateTimeBetween(bizType.getType(), beginTime, endTime);
     }
 
 }

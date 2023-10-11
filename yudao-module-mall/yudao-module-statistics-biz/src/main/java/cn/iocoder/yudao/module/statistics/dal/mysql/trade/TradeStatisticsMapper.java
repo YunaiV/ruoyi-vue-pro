@@ -30,4 +30,7 @@ public interface TradeStatisticsMapper extends BaseMapperX<TradeStatisticsDO> {
 
     List<TradeTrendSummaryRespVO> selectListByTimeBetween(@Param("beginTime") LocalDateTime beginTime,
                                                           @Param("endTime") LocalDateTime endTime);
+
+    Integer selectExpensePriceByTimeBetween(@Param("beginTime") LocalDateTime beginTime,
+                                            @Param("endTime") LocalDateTime endTime);
 }

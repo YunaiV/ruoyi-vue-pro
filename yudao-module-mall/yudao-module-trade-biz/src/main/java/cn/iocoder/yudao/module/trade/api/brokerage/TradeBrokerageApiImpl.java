@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 
 /**
  * 订单 API 接口实现类
@@ -18,10 +17,5 @@ public class TradeBrokerageApiImpl implements TradeBrokerageApi {
 
     @Resource
     private BrokerageRecordService brokerageRecordService;
-
-    @Override
-    public Integer getBrokerageSettlementPriceSummary(LocalDateTime beginTime, LocalDateTime endTime) {
-        return brokerageRecordService.getBrokerageSettlementPriceSummary(beginTime, endTime);
-    }
 
 }
