@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import java.time.LocalDateTime;
 
 /**
- * 交易统计 Mapper
+ * 订单分销的统计 Mapper
  *
  * @author owen
  */

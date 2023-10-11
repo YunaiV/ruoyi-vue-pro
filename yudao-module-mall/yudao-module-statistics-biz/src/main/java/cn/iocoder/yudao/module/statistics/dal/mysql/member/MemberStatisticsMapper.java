@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * 会员统计 Mapper
+ * 会员信息的统计 Mapper
  *
  * @author owen
  */
@@ -21,6 +21,7 @@ public interface MemberStatisticsMapper extends BaseMapperX<Object> {
 
     List<MemberSexStatisticsRespVO> selectSummaryListBySex();
 
-    Integer selectUserCount(@Param("beginTime") LocalDateTime beginTime, @Param("endTime") LocalDateTime endTime);
+    Integer selectUserCount(@Param("beginTime") LocalDateTime beginTime,
+                            @Param("endTime") LocalDateTime endTime);
 
 }
