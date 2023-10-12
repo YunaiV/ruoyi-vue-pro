@@ -47,7 +47,11 @@ public class PayWalletRechargeDO extends BaseDO {
      * 钱包赠送金额
      */
     private Integer bonusPrice;
-    // TODO @jason：如果有赠送金额，需要关联下 PayWalletPackageDO 的 id 字段
+
+    /**
+     * 充值套餐编号
+     */
+    private Long  packageId;
 
     /**
      * 是否已支付

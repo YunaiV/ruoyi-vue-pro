@@ -6,11 +6,11 @@ import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.wallet.dto.WalletSummaryRespDTO;
 import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.recharge.AppPayWalletRechargeCreateReqVO;
-import cn.iocoder.yudao.module.pay.convert.wallet.PayWalletRechargeConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletRechargeDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletRechargePackageDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletRechargeMapper;
 import cn.iocoder.yudao.module.pay.enums.member.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
@@ -24,12 +24,14 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import static cn.hutool.core.util.ObjectUtil.notEqual;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.addTime;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
+import static cn.iocoder.yudao.module.pay.convert.wallet.PayWalletRechargeConvert.INSTANCE;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum.*;
 
@@ -58,14 +60,33 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
     private PayOrderService payOrderService;
     @Resource
     private PayRefundService payRefundService;
+    @Resource
+    private PayWalletRechargePackageService payWalletRechargePackageService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public PayWalletRechargeDO createWalletRecharge(Long userId, Integer userType,
-                                                    AppPayWalletRechargeCreateReqVO createReqVO) {
-        // 1. 新增钱包充值记录
+                                                    AppPayWalletRechargeCreateReqVO reqVO) {
+        // 1.1 校验参数
+        if (Objects.isNull(reqVO.getPayPrice()) && Objects.isNull(reqVO.getPackageId())) {
+            throw exception(WALLET_RECHARGE_PACKAGE_AND_PRICE_IS_EMPTY);
+        }
+        // 1.2 新增钱包充值记录
+        int payPrice ;
+        int bonusPrice = 0 ;
+        if (Objects.nonNull(reqVO.getPackageId())) {
+            PayWalletRechargePackageDO rechargePackage = payWalletRechargePackageService.getWalletRechargePackage(reqVO.getPackageId());
+            if (rechargePackage == null) {
+                throw exception(WALLET_RECHARGE_PACKAGE_NOT_FOUND);
+            }
+            payPrice = rechargePackage.getPayPrice();
+            bonusPrice = rechargePackage.getBonusPrice();
+        } else {
+            payPrice = reqVO.getPayPrice();
+        }
+
         PayWalletDO wallet = payWalletService.getOrCreateWallet(userId, userType);
-        PayWalletRechargeDO walletRecharge = PayWalletRechargeConvert.INSTANCE.convert(wallet.getId(), createReqVO);
+        PayWalletRechargeDO walletRecharge = INSTANCE.convert(wallet.getId(), payPrice, bonusPrice, reqVO.getPackageId());
         walletRechargeMapper.insert(walletRecharge);
 
         // 2.1 创建支付单
