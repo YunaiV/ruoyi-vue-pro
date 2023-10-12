@@ -24,20 +24,18 @@
     </select>
 
     <select id="selectUserCountByCreateTimeBetween" resultType="java.lang.Integer">
-        SELECT COUNT(1)
+        SELECT COUNT(DISTINCT(user_id))
         FROM trade_order
         WHERE deleted = FALSE
           AND create_time BETWEEN #{beginTime} AND #{endTime}
-        GROUP BY user_id
     </select>
 
     <select id="selectUserCountByPayTimeBetween" resultType="java.lang.Integer">
-        SELECT COUNT(1)
+        SELECT COUNT(DISTINCT(user_id))
         FROM trade_order
         WHERE pay_time BETWEEN #{beginTime} AND #{endTime}
           AND pay_status = TRUE
           AND deleted = FALSE
-        GROUP BY user_id
     </select>
 
     <select id="selectCountByCreateTimeBetween" resultType="java.lang.Integer">

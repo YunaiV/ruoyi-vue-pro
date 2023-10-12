@@ -16,6 +16,13 @@ import java.util.List;
 public interface MemberStatisticsService {
 
     /**
+     * 获取会员统计
+     *
+     * @return 会员统计
+     */
+    MemberSummaryRespVO getMemberSummary();
+
+    /**
      * 按照省份，获得会员统计列表
      *
      * @return 会员统计列表
@@ -37,12 +44,5 @@ public interface MemberStatisticsService {
      * @return 用户分析数据
      */
     MemberAnalyseRespVO getMemberAnalyse(LocalDateTime beginTime, LocalDateTime endTime);
-
-    /**
-     * 获取会员统计
-     *
-     * @return 会员统计
-     */
-    MemberSummaryRespVO getMemberSummary();
 
 }

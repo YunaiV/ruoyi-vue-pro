@@ -45,6 +45,18 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
     private ApiAccessLogStatisticsService apiAccessLogStatisticsService;
 
     @Override
+    public MemberSummaryRespVO getMemberSummary() {
+        MemberSummaryRespVO vo = payWalletStatisticsService.getUserRechargeSummary(null, null);
+        Integer expensePrice = tradeStatisticsService.getExpensePrice(null, null);
+        Integer userCount = memberStatisticsMapper.selectUserCount(null, null);
+        // 拼接数据
+        if (vo == null) {
+            vo = new MemberSummaryRespVO().setRechargeUserCount(0).setRechargePrice(0);
+        }
+        return vo.setUserCount(userCount).setExpensePrice(expensePrice);
+    }
+
+    @Override
     public List<MemberAreaStatisticsRespVO> getMemberAreaStatisticsList() {
         // 统计用户
         Map<Integer, Integer> userCountMap = convertMap(memberStatisticsMapper.selectSummaryListByAreaId(),
@@ -87,19 +99,6 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
                 .setPayUserCount(payUserCount)
                 .setAtv(atv)
                 .setComparison(new TradeStatisticsComparisonRespVO<>(vo, reference));
-    }
-
-    @Override
-    public MemberSummaryRespVO getMemberSummary() {
-        MemberSummaryRespVO vo = payWalletStatisticsService.getUserRechargeSummary(null, null);
-        Integer expensePrice = tradeStatisticsService.getExpensePrice(null, null);
-        Integer userCount = memberStatisticsMapper.selectUserCount(null, null);
-
-        if (vo == null) {
-            vo = new MemberSummaryRespVO().setRechargeUserCount(0).setRechargePrice(0);
-        }
-
-        return vo.setUserCount(userCount).setExpensePrice(expensePrice);
     }
 
     private MemberAnalyseComparisonRespVO getMemberAnalyseComparisonData(LocalDateTime beginTime, LocalDateTime endTime) {
