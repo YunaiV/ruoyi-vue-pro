@@ -22,12 +22,19 @@ public interface TradeStatisticsService {
     TradeStatisticsComparisonRespVO<TradeSummaryRespVO> getTradeSummaryComparison();
 
     /**
-     * 获得交易状况统计
+     * 获得交易状况统计对照
      *
      * @return 统计数据对照
      */
     TradeStatisticsComparisonRespVO<TradeTrendSummaryRespVO> getTradeTrendSummaryComparison(
             LocalDateTime beginTime, LocalDateTime endTime);
+
+    /**
+     * 获得交易状况统计
+     *
+     * @return 统计数据对照
+     */
+    Integer getExpensePrice(LocalDateTime beginTime, LocalDateTime endTime);
 
     /**
      * 获得交易状况明细

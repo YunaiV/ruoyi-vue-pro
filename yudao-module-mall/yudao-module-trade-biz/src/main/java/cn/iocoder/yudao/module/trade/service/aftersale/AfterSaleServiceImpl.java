@@ -7,7 +7,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
-import cn.iocoder.yudao.module.trade.api.aftersale.dto.AfterSaleSummaryRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.AfterSaleDisagreeReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.AfterSalePageReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.AfterSaleRefuseReqVO;
@@ -409,11 +408,6 @@ public class AfterSaleServiceImpl implements AfterSaleService {
     @Override
     public Long getApplyingAfterSaleCount(Long userId) {
         return tradeAfterSaleMapper.selectCountByUserIdAndStatus(userId, AfterSaleStatusEnum.APPLYING_STATUSES);
-    }
-
-    @Override
-    public AfterSaleSummaryRespDTO getAfterSaleSummary(LocalDateTime beginTime, LocalDateTime endTime) {
-        return tradeAfterSaleMapper.selectSummaryByRefundTimeBetween(beginTime,endTime);
     }
 
 }

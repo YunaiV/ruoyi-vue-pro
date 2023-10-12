@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.api.combination;
 
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationValidateJoinRespDTO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
@@ -28,8 +29,9 @@ public class CombinationRecordApiImpl implements CombinationRecordApi {
         recordService.validateCombinationRecord(userId, activityId, headId, skuId, count);
     }
 
+    // TODO @puhui999：搞个创建的 RespDTO 哈；
     @Override
-    public Long createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {
+    public KeyValue<Long, Long> createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {
         return recordService.createCombinationRecord(reqDTO);
     }
 

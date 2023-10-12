@@ -15,6 +15,7 @@ public class MemberSummaryRespVO {
 
     @Schema(description = "充值金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer rechargePrice;
+
     @Schema(description = "支出金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer expensePrice;
 

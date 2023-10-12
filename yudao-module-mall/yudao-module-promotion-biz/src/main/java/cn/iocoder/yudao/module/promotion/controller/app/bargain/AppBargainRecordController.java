@@ -46,18 +46,18 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 public class AppBargainRecordController {
 
     @Resource
+    private BargainHelpService bargainHelpService;
+    @Resource
     private BargainRecordService bargainRecordService;
     @Resource
     private BargainActivityService bargainActivityService;
-    @Resource
-    private BargainHelpService bargainHelpService;
 
+    @Resource
+    private TradeOrderApi tradeOrderApi;
     @Resource
     private MemberUserApi memberUserApi;
     @Resource
     private ProductSpuApi productSpuApi;
-    @Resource
-    private TradeOrderApi tradeOrderApi;
 
     @GetMapping("/get-summary")
     @Operation(summary = "获得砍价记录的概要信息", description = "用于小程序首页")

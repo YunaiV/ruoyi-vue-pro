@@ -156,13 +156,4 @@ public interface BrokerageRecordService {
      */
     AppBrokerageProductPriceRespVO calculateProductBrokeragePrice(Long userId, Long spuId);
 
-    /**
-     * 获取已结算的佣金金额
-     *
-     * @param beginTime 起始时间
-     * @param endTime   截止时间
-     * @return 已结算的佣金金额
-     */
-    Integer getBrokerageSettlementPriceSummary(LocalDateTime beginTime, LocalDateTime endTime);
-
 }

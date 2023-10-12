@@ -1,14 +1,14 @@
 package cn.iocoder.yudao.module.statistics.convert.trade;
 
-import cn.iocoder.yudao.module.pay.api.wallet.dto.WalletSummaryRespDTO;
+import cn.iocoder.yudao.module.statistics.service.trade.bo.WalletSummaryRespBO;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeStatisticsComparisonRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeSummaryRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeTrendSummaryExcelVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeTrendSummaryRespVO;
 import cn.iocoder.yudao.module.statistics.dal.dataobject.trade.TradeStatisticsDO;
+import cn.iocoder.yudao.module.statistics.service.trade.bo.TradeOrderSummaryRespBO;
 import cn.iocoder.yudao.module.statistics.service.trade.bo.TradeSummaryRespBO;
-import cn.iocoder.yudao.module.trade.api.aftersale.dto.AfterSaleSummaryRespDTO;
-import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderSummaryRespDTO;
+import cn.iocoder.yudao.module.statistics.service.trade.bo.AfterSaleSummaryRespBO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -46,8 +46,8 @@ public interface TradeStatisticsConvert {
 
     List<TradeTrendSummaryExcelVO> convertList02(List<TradeTrendSummaryRespVO> list);
 
-    TradeStatisticsDO convert(LocalDateTime time, TradeOrderSummaryRespDTO orderSummary,
-                              AfterSaleSummaryRespDTO afterSaleSummary, Integer brokerageSettlementPrice,
-                              WalletSummaryRespDTO walletSummary);
+    TradeStatisticsDO convert(LocalDateTime time, TradeOrderSummaryRespBO orderSummary,
+                              AfterSaleSummaryRespBO afterSaleSummary, Integer brokerageSettlementPrice,
+                              WalletSummaryRespBO walletSummary);
 
 }

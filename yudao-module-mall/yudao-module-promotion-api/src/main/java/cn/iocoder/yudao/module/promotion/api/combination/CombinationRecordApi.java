@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.promotion.api.combination;
 
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationValidateJoinRespDTO;
 
 import javax.validation.Valid;
-
-// TODO @芋艿：后面也再撸撸这几个接口
 
 /**
  * 拼团记录 API 接口
@@ -29,9 +28,9 @@ public interface CombinationRecordApi {
      * 创建开团记录
      *
      * @param reqDTO 请求 DTO
-     * @return 开团记录编号
+     * @return key 开团记录编号、value 团长编号
      */
-    Long createCombinationRecord(@Valid CombinationRecordCreateReqDTO reqDTO);
+    KeyValue<Long, Long> createCombinationRecord(@Valid CombinationRecordCreateReqDTO reqDTO);
 
     /**
      * 查询拼团记录是否成功

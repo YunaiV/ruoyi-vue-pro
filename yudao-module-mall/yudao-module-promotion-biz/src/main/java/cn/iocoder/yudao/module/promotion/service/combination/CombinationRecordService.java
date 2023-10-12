@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationValidateJoinRespDTO;
+import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPage2VO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPageVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
@@ -49,9 +50,9 @@ public interface CombinationRecordService {
      * 创建拼团记录
      *
      * @param reqDTO 创建信息
-     * @return 开团记录编号
+     * @return key 开团记录编号 value 团长编号
      */
-    Long createCombinationRecord(CombinationRecordCreateReqDTO reqDTO);
+    KeyValue<Long, Long> createCombinationRecord(CombinationRecordCreateReqDTO reqDTO);
 
     /**
      * 获得拼团记录
@@ -90,9 +91,10 @@ public interface CombinationRecordService {
      *
      * @param status       状态-允许为空
      * @param virtualGroup 是否虚拟成团-允许为空
+     * @param headId       团长编号，允许空。目的 headId 设置为 {@link CombinationRecordDO#HEAD_ID_GROUP} 时，可以设置
      * @return 记录数
      */
-    Long getCombinationRecordCount(@Nullable Integer status, @Nullable Boolean virtualGroup);
+    Long getCombinationRecordCount(@Nullable Integer status, @Nullable Boolean virtualGroup, @Nullable Long headId);
 
     /**
      * 获取最近的 count 条拼团记录
@@ -137,6 +139,14 @@ public interface CombinationRecordService {
     PageResult<CombinationRecordDO> getCombinationRecordPage(CombinationRecordReqPageVO pageVO);
 
     /**
+     * 获取拼团记录分页数据（通过团长查询）
+     *
+     * @param pageVO 分页请求
+     * @return 拼团记录分页数据（包括团长的）
+     */
+    PageResult<CombinationRecordDO> getCombinationRecordPage2(CombinationRecordReqPage2VO pageVO);
+
+    /**
      * 【拼团活动】获得拼团记录数量 Map
      *
      * @param activityIds 活动记录编号数组
@@ -147,7 +157,6 @@ public interface CombinationRecordService {
     Map<Long, Integer> getCombinationRecordCountMapByActivity(Collection<Long> activityIds,
                                                               @Nullable Integer status,
                                                               @Nullable Long headId);
-
 
     /**
      * 获取拼团记录
@@ -167,5 +176,11 @@ public interface CombinationRecordService {
      */
     void cancelCombinationRecord(Long userId, Long id, Long headId);
 
+    /**
+     * 处理过期拼团
+     *
+     * @return key 过期拼团数量, value 虚拟成团数量
+     */
+    KeyValue<Integer, Integer> expireCombinationRecord();
 
 }

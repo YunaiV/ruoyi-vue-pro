@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.pay.enums.member.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.wallet.bo.WalletTransactionCreateReqBO;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
 
 /**
  * 钱包余额流水 Service 接口
@@ -49,15 +48,5 @@ public interface PayWalletTransactionService {
      * @return 钱包流水
      */
     PayWalletTransactionDO getWalletTransaction(String bizId, PayWalletBizTypeEnum type);
-
-    /**
-     * 获取支付金额合计
-     *
-     * @param bizType   业务类型
-     * @param beginTime 开始时间
-     * @param endTime   结束时间
-     * @return 支付金额合计
-     */
-    Integer getPriceSummary(PayWalletBizTypeEnum bizType, LocalDateTime beginTime, LocalDateTime endTime);
 
 }
