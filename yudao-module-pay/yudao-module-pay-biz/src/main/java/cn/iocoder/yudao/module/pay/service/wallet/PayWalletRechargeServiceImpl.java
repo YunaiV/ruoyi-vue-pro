@@ -52,7 +52,6 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
 
     @Resource
     private PayWalletRechargeMapper walletRechargeMapper;
-
     @Resource
     private PayWalletService payWalletService;
     @Resource
@@ -74,10 +73,7 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
         int payPrice ;
         int bonusPrice = 0 ;
         if (Objects.nonNull(reqVO.getPackageId())) {
-            PayWalletRechargePackageDO rechargePackage = payWalletRechargePackageService.getWalletRechargePackage(reqVO.getPackageId());
-            if (rechargePackage == null) {
-                throw exception(WALLET_RECHARGE_PACKAGE_NOT_FOUND);
-            }
+            PayWalletRechargePackageDO rechargePackage = payWalletRechargePackageService.validWalletRechargePackage(reqVO.getPackageId());
             payPrice = rechargePackage.getPayPrice();
             bonusPrice = rechargePackage.getBonusPrice();
         } else {
