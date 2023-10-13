@@ -11,11 +11,6 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletRechargePackag
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-/**
- * 套餐充值 Convert
- *
- * @author 芋道源码
- */
 @Mapper
 public interface WalletRechargePackageConvert {
 
