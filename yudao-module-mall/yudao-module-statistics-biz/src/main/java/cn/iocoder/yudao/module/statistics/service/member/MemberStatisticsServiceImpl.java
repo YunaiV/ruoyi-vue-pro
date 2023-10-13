@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.statistics.convert.member.MemberStatisticsConvert
 import cn.iocoder.yudao.module.statistics.dal.mysql.member.MemberStatisticsMapper;
 import cn.iocoder.yudao.module.statistics.service.infra.ApiAccessLogStatisticsService;
 import cn.iocoder.yudao.module.statistics.service.pay.PayWalletStatisticsService;
+import cn.iocoder.yudao.module.statistics.service.pay.bo.RechargeSummaryRespBO;
 import cn.iocoder.yudao.module.statistics.service.trade.TradeOrderStatisticsService;
 import cn.iocoder.yudao.module.statistics.service.trade.TradeStatisticsService;
 import org.springframework.stereotype.Service;
@@ -43,18 +44,6 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
     private TradeOrderStatisticsService tradeOrderStatisticsService;
     @Resource
     private ApiAccessLogStatisticsService apiAccessLogStatisticsService;
-
-    @Override
-    public MemberSummaryRespVO getMemberSummary() {
-        MemberSummaryRespVO vo = payWalletStatisticsService.getUserRechargeSummary(null, null);
-        Integer expensePrice = tradeStatisticsService.getExpensePrice(null, null);
-        Integer userCount = memberStatisticsMapper.selectUserCount(null, null);
-        // 拼接数据
-        if (vo == null) {
-            vo = new MemberSummaryRespVO().setRechargeUserCount(0).setRechargePrice(0);
-        }
-        return vo.setUserCount(userCount).setExpensePrice(expensePrice);
-    }
 
     @Override
     public List<MemberAreaStatisticsRespVO> getMemberAreaStatisticsList() {
@@ -101,9 +90,18 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
                 .setComparison(new TradeStatisticsComparisonRespVO<>(vo, reference));
     }
 
+    @Override
+    public MemberSummaryRespVO getMemberSummary() {
+        RechargeSummaryRespBO rechargeSummary = payWalletStatisticsService.getUserRechargeSummary(null, null);
+        Integer expensePrice = tradeStatisticsService.getExpensePrice(null, null);
+        Integer userCount = memberStatisticsMapper.selectUserCount(null, null);
+
+        return MemberStatisticsConvert.INSTANCE.convert(rechargeSummary, expensePrice, userCount);
+    }
+
     private MemberAnalyseComparisonRespVO getMemberAnalyseComparisonData(LocalDateTime beginTime, LocalDateTime endTime) {
         Integer rechargeUserCount = Optional.ofNullable(payWalletStatisticsService.getUserRechargeSummary(beginTime, endTime))
-                .map(MemberSummaryRespVO::getRechargeUserCount).orElse(0);
+                .map(RechargeSummaryRespBO::getRechargeUserCount).orElse(0);
         return new MemberAnalyseComparisonRespVO()
                 .setUserCount(memberStatisticsMapper.selectUserCount(beginTime, endTime))
                 .setActiveUserCount(apiAccessLogStatisticsService.getActiveUserCount(beginTime, endTime))

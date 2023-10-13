@@ -2,6 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.iocoder.yudao.module.statistics.dal.mysql.trade.TradeStatisticsMapper">
 
+    <select id="selectOrderCreateCountSumAndOrderPayPriceSumByTimeBetween"
+            resultType="cn.iocoder.yudao.module.statistics.service.trade.bo.TradeSummaryRespBO">
+        SELECT IFNULL(SUM(order_create_count), 0) AS count,
+               IFNULL(SUM(order_pay_price), 0) AS summary
+        FROM trade_statistics
+        WHERE time BETWEEN #{beginTime} AND #{endTime}
+          AND deleted = FALSE
+    </select>
+
     <select id="selectByTimeBetween"
             resultType="cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeTrendSummaryRespVO">
         SELECT
