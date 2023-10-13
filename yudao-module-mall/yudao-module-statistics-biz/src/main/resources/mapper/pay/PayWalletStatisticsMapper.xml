@@ -31,6 +31,7 @@
 
     <select id="selectRechargeSummaryGroupByWalletId"
             resultType="cn.iocoder.yudao.module.statistics.service.pay.bo.RechargeSummaryRespBO">
+        <!-- TODO @疯狂：是不是不用 group by，而是通过 DISTINCT wallet_id 更合适哈？ -->
         SELECT COUNT(1)       AS rechargeUserCount,
                SUM(pay_price) AS rechargePrice
         FROM pay_wallet_recharge

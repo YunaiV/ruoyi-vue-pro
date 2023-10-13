@@ -17,6 +17,7 @@ import java.util.List;
 @Mapper
 public interface TradeOrderStatisticsMapper extends BaseMapperX<TradeStatisticsDO> {
 
+    // TODO 芋艿：已经 review
     List<MemberAreaStatisticsRespVO> selectSummaryListByAreaId();
 
     Integer selectCountByCreateTimeBetween(@Param("beginTime") LocalDateTime beginTime,
@@ -25,12 +26,15 @@ public interface TradeOrderStatisticsMapper extends BaseMapperX<TradeStatisticsD
     Integer selectCountByPayTimeBetween(@Param("beginTime") LocalDateTime beginTime,
                                         @Param("endTime") LocalDateTime endTime);
 
+    // TODO 芋艿：已经 review
     Integer selectSummaryPriceByPayTimeBetween(@Param("beginTime") LocalDateTime beginTime,
                                                @Param("endTime") LocalDateTime endTime);
 
+    // TODO 芋艿：已经 review
     Integer selectUserCountByCreateTimeBetween(@Param("beginTime") LocalDateTime beginTime,
                                                @Param("endTime") LocalDateTime endTime);
 
+    // TODO 芋艿：已经 review
     Integer selectUserCountByPayTimeBetween(@Param("beginTime") LocalDateTime beginTime,
                                             @Param("endTime") LocalDateTime endTime);
 

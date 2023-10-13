@@ -3,6 +3,7 @@
 <mapper namespace="cn.iocoder.yudao.module.statistics.dal.mysql.infra.ApiAccessLogStatisticsMapper">
 
     <select id="selectCountByIp" resultType="java.lang.Integer">
+        <!-- TODO @疯狂：distinct 会不会更合适哈 -->
         SELECT COUNT(1)
         FROM infra_api_access_log
         WHERE create_time BETWEEN #{beginTime} AND #{endTime}
@@ -11,6 +12,7 @@
     </select>
 
     <select id="selectCountByUserId" resultType="java.lang.Integer">
+        <!-- TODO @疯狂：distinct 会不会更合适哈 -->
         SELECT COUNT(1)
         FROM infra_api_access_log
         WHERE user_id > 0

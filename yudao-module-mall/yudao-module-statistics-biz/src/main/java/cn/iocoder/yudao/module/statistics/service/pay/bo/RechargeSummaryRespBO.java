@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.statistics.service.pay.bo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+// TODO @疯狂：BO 不用写 swagger 注解哈，写注释就好啦；
 @Schema(description = "管理后台 - 充值统计 Response VO")
 @Data
 public class RechargeSummaryRespBO {

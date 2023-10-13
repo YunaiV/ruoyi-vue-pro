@@ -145,18 +145,15 @@ public class AreaUtils {
             if (area == null) {
                 return null;
             }
-
-            // 匹配到
+            // 情况一：匹配到，返回它
             if (type.getType().equals(area.getType())) {
                 return area.getId();
             }
-
-            // 找到根节点，返回空
+            // 情况二：找到根节点，返回空
             if (area.getParent() == null || area.getParent().getId() == null) {
                 return null;
             }
-
-            // 继续向上查找
+            // 其它：继续向上查找
             id = area.getParent().getId();
         }
         return null;

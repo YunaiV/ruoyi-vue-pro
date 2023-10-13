@@ -49,7 +49,7 @@
     <select id="selectExpensePriceByTimeBetween" resultType="java.lang.Integer">
         SELECT -- 支出金额 = 余额支付金额 + 支付佣金金额 + 商品退款金额
                SUM(order_wallet_pay_price + brokerage_settlement_price + after_sale_refund_price) AS expensePrice
-          FROM trade_statistics
+        FROM trade_statistics
         WHERE deleted = FALSE
         <if test="beginTime != null">
             AND time >= #{beginTime}

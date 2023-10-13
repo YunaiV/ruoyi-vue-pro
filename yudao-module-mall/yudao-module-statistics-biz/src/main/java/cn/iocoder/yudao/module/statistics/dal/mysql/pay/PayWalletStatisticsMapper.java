@@ -29,6 +29,7 @@ public interface PayWalletStatisticsMapper extends BaseMapperX<TradeStatisticsDO
                                                             @Param("endTime") LocalDateTime endTime,
                                                             @Param("bizType") Integer bizType);
 
+    // TODO 芋艿：已经 review；
     RechargeSummaryRespBO selectRechargeSummaryGroupByWalletId(@Param("beginTime") LocalDateTime beginTime,
                                                                @Param("endTime") LocalDateTime endTime,
                                                                @Param("payStatus") Boolean payStatus);

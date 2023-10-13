@@ -18,8 +18,7 @@ public enum TerminalEnum implements IntArrayValuable {
     WECHAT_MINI_PROGRAM(10, "微信小程序"),
     WECHAT_WAP(11, "微信公众号"),
     H5(20, "H5 网页"),
-    IOS(31, "苹果 App"),
-    ANDROID(32, "安卓 App"),
+    APP(31, "手机 App"),
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(TerminalEnum::getTerminal).toArray();
