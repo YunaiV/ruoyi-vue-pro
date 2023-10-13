@@ -42,7 +42,7 @@
 
 ##  🐳 项目关系
 
-![架构演进](https://static.iocoder.cn/yudao-roadmap.png?imageView2/2/format/webp)
+![架构演进](/.image/common/yudao-roadmap.png)
 
 三个项目的功能对比，可见社区共同整理的 [国产开源项目对比](https://www.yuque.com/xiatian-bsgny/lm0ec1/wqf8mn) 表格。
 
