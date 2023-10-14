@@ -110,4 +110,7 @@ public interface ErrorCodeConstants {
     ErrorCode BARGAIN_HELP_CREATE_FAIL_CONFLICT = new ErrorCode(1_013_014_003, "助力失败，请重试");
     ErrorCode BARGAIN_HELP_CREATE_FAIL_HELP_EXISTS = new ErrorCode(1_013_014_004, "助力失败，您已经助力过了");
 
+    // ========== 文章分类 1-013-015-000 ==========
+    ErrorCode ARTICLE_CATEGORY_NOT_EXISTS = new ErrorCode(1_013_015_000, "分类不存在");
+
 }
