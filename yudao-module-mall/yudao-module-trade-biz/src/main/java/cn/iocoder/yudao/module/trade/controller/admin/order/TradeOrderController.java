@@ -126,11 +126,17 @@ public class TradeOrderController {
         return success(true);
     }
 
+    // TODO @疯狂：1、在【订单列表】界面，增加一个【核销按钮】。点击后，弹窗出一个核销码输入的窗口。
+    //
+    //2、输入核销码后，点击确认，基于 code 查询对应的订单，之后弹窗展示。
+    //
+    //3、新的弹窗，下面有个【确认核销】按钮。确认后，进行订单核销逻辑。注意，只有门店自提的订单，才可以核销。
+    // TODO 这里的 id 应该是 pickUpVerifyCode 参数哈；
     @PutMapping("/pick-up")
     @Operation(summary = "订单核销")
     @PreAuthorize("@ss.hasPermission('trade:order:pick-up')")
     public CommonResult<Boolean> pickUpOrder(@RequestParam("id") Long id) {
-        tradeOrderUpdateService.pickUpOrder(id);
+        tradeOrderUpdateService.pickUpOrderByMember(id);
         return success(true);
     }
 

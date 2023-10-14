@@ -670,17 +670,18 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     }
 
     @Override
-    public void pickUpOrder(Long id) {
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_PICK_UP_RECEIVE)
+    public void pickUpOrderByMember(Long id) {
         getSelf().pickUpOrder(tradeOrderMapper.selectById(id));
     }
 
     @Override
-    public void pickUpOrder(String pickUpVerifyCode) {
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.ADMIN_PICK_UP_RECEIVE)
+    public void pickUpOrderByAdmin(String pickUpVerifyCode) {
         getSelf().pickUpOrder(tradeOrderMapper.selectOneByPickUpVerifyCode(pickUpVerifyCode));
     }
 
     @Transactional(rollbackFor = Exception.class)
-    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.PICK_UP_RECEIVE)
     public void pickUpOrder(TradeOrderDO order) {
         if (order == null) {
             throw exception(ORDER_NOT_FOUND);
@@ -688,7 +689,6 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         if (ObjUtil.notEqual(DeliveryTypeEnum.PICK_UP.getType(), order.getDeliveryType())) {
             throw exception(ORDER_RECEIVE_FAIL_DELIVERY_TYPE_NOT_PICK_UP);
         }
-        // todo 校验核销操作人？
         receiveOrder0(order);
     }
 
