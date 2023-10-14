@@ -45,6 +45,7 @@ public interface TradeStatisticsService {
      */
     List<TradeTrendSummaryRespVO> getTradeStatisticsList(LocalDateTime beginTime, LocalDateTime endTime);
 
+    // TODO 芋艿：已经 review；
     /**
      * 统计昨日交易
      *

@@ -17,14 +17,17 @@ import java.time.LocalDateTime;
 @Mapper
 public interface PayWalletStatisticsMapper extends BaseMapperX<TradeStatisticsDO> {
 
+    // TODO 芋艿：已经 review；
     WalletSummaryRespBO selectRechargeSummaryByPayTimeBetween(@Param("beginTime") LocalDateTime beginTime,
                                                               @Param("endTime") LocalDateTime endTime,
                                                               @Param("payStatus") Boolean payStatus);
 
+    // TODO 芋艿：已经 review；
     WalletSummaryRespBO selectRechargeSummaryByRefundTimeBetween(@Param("beginTime") LocalDateTime beginTime,
                                                                  @Param("endTime") LocalDateTime endTime,
                                                                  @Param("refundStatus") Integer refundStatus);
 
+    // TODO 芋艿：已经 review；
     Integer selectPriceSummaryByBizTypeAndCreateTimeBetween(@Param("beginTime") LocalDateTime beginTime,
                                                             @Param("endTime") LocalDateTime endTime,
                                                             @Param("bizType") Integer bizType);

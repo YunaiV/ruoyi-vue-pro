@@ -20,9 +20,11 @@ public interface TradeOrderStatisticsMapper extends BaseMapperX<TradeStatisticsD
     // TODO 芋艿：已经 review
     List<MemberAreaStatisticsRespVO> selectSummaryListByAreaId();
 
+    // TODO 芋艿：已经 review
     Integer selectCountByCreateTimeBetween(@Param("beginTime") LocalDateTime beginTime,
                                            @Param("endTime") LocalDateTime endTime);
 
+    // TODO 芋艿：已经 review
     Integer selectCountByPayTimeBetween(@Param("beginTime") LocalDateTime beginTime,
                                         @Param("endTime") LocalDateTime endTime);
 
