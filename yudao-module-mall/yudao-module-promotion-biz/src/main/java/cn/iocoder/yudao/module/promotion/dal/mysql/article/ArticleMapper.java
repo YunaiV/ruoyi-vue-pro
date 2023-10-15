@@ -3,8 +3,9 @@ package cn.iocoder.yudao.module.promotion.dal.mysql.article;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.ArticleExportReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.ArticlePageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.ArticleExportReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.ArticlePageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.app.article.vo.article.AppArticlePageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleDO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -42,6 +43,17 @@ public interface ArticleMapper extends BaseMapperX<ArticleDO> {
                 .eqIfPresent(ArticleDO::getRecommendBanner, reqVO.getRecommendBanner())
                 .betweenIfPresent(ArticleDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(ArticleDO::getId));
+    }
+
+    default List<ArticleDO> selectList(Boolean recommendHot, Boolean recommendBanner) {
+        return selectList(new LambdaQueryWrapperX<ArticleDO>()
+                .eqIfPresent(ArticleDO::getRecommendHot, recommendHot)
+                .eqIfPresent(ArticleDO::getRecommendBanner, recommendBanner));
+    }
+
+    default PageResult<ArticleDO> selectPage(AppArticlePageReqVO pageReqVO) {
+        return selectPage(pageReqVO, new LambdaQueryWrapperX<ArticleDO>()
+                .eqIfPresent(ArticleDO::getCategoryId, pageReqVO.getCategoryId()));
     }
 
 }

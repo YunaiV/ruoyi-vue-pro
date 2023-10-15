@@ -3,10 +3,11 @@ package cn.iocoder.yudao.module.promotion.service.article;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.ArticleCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.ArticleExportReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.ArticlePageReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.ArticleUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.ArticleCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.ArticleExportReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.ArticlePageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.ArticleUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.app.article.vo.article.AppArticlePageReqVO;
 import cn.iocoder.yudao.module.promotion.convert.article.ArticleConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.article.ArticleMapper;
@@ -85,6 +86,16 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public List<ArticleDO> getArticleList(ArticleExportReqVO exportReqVO) {
         return articleMapper.selectList(exportReqVO);
+    }
+
+    @Override
+    public List<ArticleDO> getArticleCategoryListByRecommendHotAndRecommendBanner(Boolean recommendHot, Boolean recommendBanner) {
+        return articleMapper.selectList(recommendHot, recommendBanner);
+    }
+
+    @Override
+    public PageResult<ArticleDO> getArticlePage(AppArticlePageReqVO pageReqVO) {
+        return articleMapper.selectPage(pageReqVO);
     }
 
 }

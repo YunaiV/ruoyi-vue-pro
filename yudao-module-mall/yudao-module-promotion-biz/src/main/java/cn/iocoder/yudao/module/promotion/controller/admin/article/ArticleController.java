@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.*;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.*;
 import cn.iocoder.yudao.module.promotion.convert.article.ArticleConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleDO;
 import cn.iocoder.yudao.module.promotion.service.article.ArticleService;

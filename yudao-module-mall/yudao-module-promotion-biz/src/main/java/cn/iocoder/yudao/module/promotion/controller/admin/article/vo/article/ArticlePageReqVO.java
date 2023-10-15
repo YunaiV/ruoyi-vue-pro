@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.controller.admin.article.vo;
+package cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;

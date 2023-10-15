@@ -4,16 +4,19 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.app.article.vo.article.AppArticlePageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.article.vo.article.AppArticleRespVO;
+import cn.iocoder.yudao.module.promotion.convert.article.ArticleConvert;
+import cn.iocoder.yudao.module.promotion.service.article.ArticleService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import javax.annotation.Resource;
 import java.util.List;
-import java.util.Random;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -23,68 +26,33 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @Validated
 public class AppArticleController {
 
+    @Resource
+    private ArticleService articleService;
+
     @RequestMapping("/list")
-    // TODO @芋艿：swagger 注解
-    public CommonResult<List<AppArticleRespVO>> getArticleList(@RequestParam(value = "recommendHot", required = false) Boolean recommendHot,
-                                                               @RequestParam(value = "recommendBanner", required = false) Boolean recommendBanner) {
-        List<AppArticleRespVO> appArticleRespVOList = new ArrayList<>();
-        Random random = new Random();
-        for (int i = 0; i < 10; i++) {
-            AppArticleRespVO appArticleRespVO = new AppArticleRespVO();
-            appArticleRespVO.setId((long) (i + 1));
-            appArticleRespVO.setTitle("芋道源码 - " + i + "模块");
-            appArticleRespVO.setAuthor("芋道源码");
-            appArticleRespVO.setCategoryId((long) random.nextInt(10000));
-            appArticleRespVO.setPicUrl("https://www.iocoder.cn/" + (i + 1) + ".png");
-            appArticleRespVO.setIntroduction("我是简介");
-            appArticleRespVO.setDescription("我是详细");
-            appArticleRespVO.setCreateTime(LocalDateTime.now());
-            appArticleRespVO.setBrowseCount(random.nextInt(10000));
-            appArticleRespVO.setSpuId((long) random.nextInt(10000));
-            appArticleRespVOList.add(appArticleRespVO);
-        }
-        return success(appArticleRespVOList);
+    @Operation(summary = "获得文章详情列表")
+    @Parameters({
+            @Parameter(name = "recommendHot", description = "是否热门", example = "false"), // 场景一：查看指定的文章
+            @Parameter(name = "recommendBanner", description = "是否轮播图", example = "false") // 场景二：查看指定的文章
+    })
+    public CommonResult<List<AppArticleRespVO>> getArticleList(
+            @RequestParam(value = "recommendHot", required = false) Boolean recommendHot,
+            @RequestParam(value = "recommendBanner", required = false) Boolean recommendBanner) {
+        return success(ArticleConvert.INSTANCE.convertList03(
+                articleService.getArticleCategoryListByRecommendHotAndRecommendBanner(recommendHot, recommendBanner)));
     }
 
     @RequestMapping("/page")
-    // TODO @芋艿：swagger 注解
+    @Operation(summary = "获得文章详情分页")
     public CommonResult<PageResult<AppArticleRespVO>> getArticlePage(AppArticlePageReqVO pageReqVO) {
-        List<AppArticleRespVO> appArticleRespVOList = new ArrayList<>();
-        Random random = new Random();
-        for (int i = 0; i < 10; i++) {
-            AppArticleRespVO appArticleRespVO = new AppArticleRespVO();
-            appArticleRespVO.setId((long) (i + 1));
-            appArticleRespVO.setTitle("芋道源码 - " + i + "模块");
-            appArticleRespVO.setAuthor("芋道源码");
-            appArticleRespVO.setCategoryId((long) random.nextInt(10000));
-            appArticleRespVO.setPicUrl("https://www.iocoder.cn/" + (i + 1) + ".png");
-            appArticleRespVO.setIntroduction("我是简介");
-            appArticleRespVO.setDescription("我是详细");
-            appArticleRespVO.setCreateTime(LocalDateTime.now());
-            appArticleRespVO.setBrowseCount(random.nextInt(10000));
-            appArticleRespVO.setSpuId((long) random.nextInt(10000));
-            appArticleRespVOList.add(appArticleRespVO);
-        }
-        return success(new PageResult<>(appArticleRespVOList, 10L));
+        return success(ArticleConvert.INSTANCE.convertPage02(articleService.getArticlePage(pageReqVO)));
     }
 
     @RequestMapping("/get")
-    // TODO @芋艿：swagger 注解
+    @Operation(summary = "获得文章详情")
+    @Parameter(name = "id", description = "文章编号", example = "1024")
     public CommonResult<AppArticleRespVO> getArticlePage(@RequestParam("id") Long id) {
-        Random random = new Random();
-        AppArticleRespVO appArticleRespVO = new AppArticleRespVO();
-        appArticleRespVO.setId((long) (1));
-        appArticleRespVO.setTitle("芋道源码 - " + 0 + "模块");
-        appArticleRespVO.setAuthor("芋道源码");
-        appArticleRespVO.setCategoryId((long) random.nextInt(10000));
-        appArticleRespVO.setPicUrl("https://www.iocoder.cn/" + (0 + 1) + ".png");
-        appArticleRespVO.setIntroduction("我是简介");
-        appArticleRespVO.setDescription("我是详细");
-        appArticleRespVO.setCreateTime(LocalDateTime.now());
-        appArticleRespVO.setBrowseCount(random.nextInt(10000));
-        appArticleRespVO.setSpuId((long) random.nextInt(10000));
-        appArticleRespVO.setSpuId(633L);
-        return success(appArticleRespVO);
+        return success(ArticleConvert.INSTANCE.convert01(articleService.getArticle(id)));
     }
 
 }

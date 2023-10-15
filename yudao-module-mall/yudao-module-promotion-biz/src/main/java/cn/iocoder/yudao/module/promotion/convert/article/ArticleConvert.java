@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.module.promotion.convert.article;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.ArticleCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.ArticleExcelVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.ArticleRespVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.ArticleUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.ArticleCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.ArticleExcelVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.ArticleRespVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.ArticleUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.app.article.vo.article.AppArticleRespVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -32,5 +33,11 @@ public interface ArticleConvert {
     PageResult<ArticleRespVO> convertPage(PageResult<ArticleDO> page);
 
     List<ArticleExcelVO> convertList02(List<ArticleDO> list);
+
+    List<AppArticleRespVO> convertList03(List<ArticleDO> list);
+
+    AppArticleRespVO convert01(ArticleDO article);
+
+    PageResult<AppArticleRespVO> convertPage02(PageResult<ArticleDO> articlePage);
 
 }
