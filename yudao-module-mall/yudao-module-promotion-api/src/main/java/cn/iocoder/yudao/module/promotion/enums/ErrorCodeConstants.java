@@ -113,4 +113,7 @@ public interface ErrorCodeConstants {
     // ========== 文章分类 1-013-015-000 ==========
     ErrorCode ARTICLE_CATEGORY_NOT_EXISTS = new ErrorCode(1_013_015_000, "分类不存在");
 
+    // ========== 文章管理 1-013-016-000 ==========
+    ErrorCode ARTICLE_NOT_EXISTS = new ErrorCode(1_013_016_000, "文章管理不存在");
+
 }

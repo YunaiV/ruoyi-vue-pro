@@ -8,3 +8,5 @@ DELETE FROM "promotion_seckill_config";
 DELETE FROM "promotion_combination_activity";
 DELETE
 FROM "promotion_article_category";
+DELETE
+FROM "promotion_article";
