@@ -4,7 +4,6 @@ import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationValidateJoinRespDTO;
-import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPage2VO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPageVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
@@ -50,9 +49,9 @@ public interface CombinationRecordService {
      * 创建拼团记录
      *
      * @param reqDTO 创建信息
-     * @return key 开团记录编号 value 团长编号
+     * @return 团信息
      */
-    KeyValue<Long, Long> createCombinationRecord(CombinationRecordCreateReqDTO reqDTO);
+    CombinationRecordDO createCombinationRecord(CombinationRecordCreateReqDTO reqDTO);
 
     /**
      * 获得拼团记录
@@ -94,7 +93,14 @@ public interface CombinationRecordService {
      * @param headId       团长编号，允许空。目的 headId 设置为 {@link CombinationRecordDO#HEAD_ID_GROUP} 时，可以设置
      * @return 记录数
      */
-    Long getCombinationRecordCount(@Nullable Integer status, @Nullable Boolean virtualGroup, @Nullable Long headId);
+    Long getCombinationRecordCount(@Nullable Integer status, @Nullable Boolean virtualGroup, Long headId);
+
+    /**
+     * 查询用户拼团记录（DISTINCT 去重），也就是说查询会员表中的用户有多少人参与过拼团活动每个人只统计一次
+     *
+     * @return 参加过拼团的用户数
+     */
+    Long getCombinationUserCount();
 
     /**
      * 获取最近的 count 条拼团记录
@@ -137,14 +143,6 @@ public interface CombinationRecordService {
      * @return 拼团记录分页数据
      */
     PageResult<CombinationRecordDO> getCombinationRecordPage(CombinationRecordReqPageVO pageVO);
-
-    /**
-     * 获取拼团记录分页数据（通过团长查询）
-     *
-     * @param pageVO 分页请求
-     * @return 拼团记录分页数据（包括团长的）
-     */
-    PageResult<CombinationRecordDO> getCombinationRecordPage2(CombinationRecordReqPage2VO pageVO);
 
     /**
      * 【拼团活动】获得拼团记录数量 Map

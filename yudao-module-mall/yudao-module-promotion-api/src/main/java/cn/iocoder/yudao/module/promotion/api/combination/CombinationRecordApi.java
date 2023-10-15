@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.promotion.api.combination;
 
-import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateRespDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationValidateJoinRespDTO;
 
 import javax.validation.Valid;
@@ -28,9 +28,9 @@ public interface CombinationRecordApi {
      * 创建开团记录
      *
      * @param reqDTO 请求 DTO
-     * @return key 开团记录编号、value 团长编号
+     * @return 团信息
      */
-    KeyValue<Long, Long> createCombinationRecord(@Valid CombinationRecordCreateReqDTO reqDTO);
+    CombinationRecordCreateRespDTO createCombinationRecord(@Valid CombinationRecordCreateReqDTO reqDTO);
 
     /**
      * 查询拼团记录是否成功

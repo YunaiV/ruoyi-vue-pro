@@ -93,16 +93,19 @@ public interface TradeOrderMapper extends BaseMapperX<TradeOrderDO> {
         return selectOne(TradeOrderDO::getPickUpVerifyCode, pickUpVerifyCode);
     }
 
-    // TODO @hui999：是不是只针对 combinationActivityId 的查询呀？
+    /**
+     * 只针对 combinationActivityId 的查询
+     *
+     * @param userId     用户编号
+     * @param activityId 拼团活动编号
+     * @param status     订单状态
+     * @return 交易订单
+     */
     default TradeOrderDO selectByUserIdAndActivityIdAndStatus(Long userId, Long activityId, Integer status) {
         return selectOne(new LambdaQueryWrapperX<TradeOrderDO>()
-                .and(q -> q.eq(TradeOrderDO::getUserId, userId)
-                        .eq(TradeOrderDO::getStatus, status))
-                .and(q -> q.eq(TradeOrderDO::getCombinationActivityId, activityId)
-                        .or()
-                        .eq(TradeOrderDO::getSeckillActivityId, activityId)
-                        .or()
-                        .eq(TradeOrderDO::getBargainActivityId, activityId))
+                .eq(TradeOrderDO::getUserId, userId)
+                .eq(TradeOrderDO::getStatus, status)
+                .eq(TradeOrderDO::getCombinationActivityId, activityId)
         );
     }
 

@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.trade.service.order.handler;
 
 import cn.hutool.core.lang.Assert;
-import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.module.promotion.api.combination.CombinationRecordApi;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateRespDTO;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
@@ -49,7 +49,6 @@ public class TradeCombinationOrderHandler implements TradeOrderHandler {
                 order.getCombinationHeadId(), item.getSkuId(), item.getCount());
 
         // 2. 校验该用户是否存在未支付的拼团活动订单，避免一个拼团可以下多个单子了
-        // TODO @puhui999：只校验未支付的拼团订单噢
         TradeOrderDO activityOrder = orderQueryService.getActivityOrderByUserIdAndActivityIdAndStatus(
                 order.getUserId(), order.getCombinationActivityId(), TradeOrderStatusEnum.UNPAID.getStatus());
         if (activityOrder != null) {
@@ -67,13 +66,14 @@ public class TradeCombinationOrderHandler implements TradeOrderHandler {
 
         // 2. 创建拼团记录
         TradeOrderItemDO item = orderItems.get(0);
-        KeyValue<Long, Long> recordIdAndHeadId = combinationRecordApi.createCombinationRecord(
+        CombinationRecordCreateRespDTO combinationRecord = combinationRecordApi.createCombinationRecord(
                 TradeOrderConvert.INSTANCE.convert(order, item));
 
         // 3. 更新拼团相关信息到订单
-        // TODO 芋艿，只需要更新 record
+        // TODO 芋艿，只需要更新 record。 如果创建订单时自己是团长的情况下 combinationHeadId 是为 null 的，
+        //  设置团长编号这个操作时在订单是否后创建拼团记录时才设置的，所以支付完创建拼团记录后需要设置一下记录编号和团长编号
         orderUpdateService.updateOrderCombinationInfo(order.getId(), order.getCombinationActivityId(),
-                recordIdAndHeadId.getKey(), recordIdAndHeadId.getValue());
+                combinationRecord.getCombinationRecordId(), combinationRecord.getCombinationHeadId());
     }
 
     @Override
