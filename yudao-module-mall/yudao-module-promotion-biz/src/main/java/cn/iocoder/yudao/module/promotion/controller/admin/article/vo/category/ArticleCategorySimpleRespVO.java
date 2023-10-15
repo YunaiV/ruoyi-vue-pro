@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.controller.admin.articlecategory.vo;
+package cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

@@ -1,14 +1,14 @@
-package cn.iocoder.yudao.module.promotion.controller.admin.articlecategory;
+package cn.iocoder.yudao.module.promotion.controller.admin.article;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.promotion.controller.admin.articlecategory.vo.*;
-import cn.iocoder.yudao.module.promotion.convert.articlecategory.ArticleCategoryConvert;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.articlecategory.ArticleCategoryDO;
-import cn.iocoder.yudao.module.promotion.service.articlecategory.ArticleCategoryService;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.*;
+import cn.iocoder.yudao.module.promotion.convert.article.ArticleCategoryConvert;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleCategoryDO;
+import cn.iocoder.yudao.module.promotion.service.article.ArticleCategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

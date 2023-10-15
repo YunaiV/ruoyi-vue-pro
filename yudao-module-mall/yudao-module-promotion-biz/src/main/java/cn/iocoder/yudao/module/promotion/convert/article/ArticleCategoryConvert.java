@@ -1,8 +1,8 @@
-package cn.iocoder.yudao.module.promotion.convert.articlecategory;
+package cn.iocoder.yudao.module.promotion.convert.article;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.promotion.controller.admin.articlecategory.vo.*;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.articlecategory.ArticleCategoryDO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.*;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleCategoryDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

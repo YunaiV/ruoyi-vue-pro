@@ -1,15 +1,15 @@
-package cn.iocoder.yudao.module.promotion.service.articlecategory;
+package cn.iocoder.yudao.module.promotion.service.article;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.promotion.controller.admin.articlecategory.vo.ArticleCategoryCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.articlecategory.vo.ArticleCategoryExportReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.articlecategory.vo.ArticleCategoryPageReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.articlecategory.vo.ArticleCategoryUpdateReqVO;
-import cn.iocoder.yudao.module.promotion.convert.articlecategory.ArticleCategoryConvert;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.articlecategory.ArticleCategoryDO;
-import cn.iocoder.yudao.module.promotion.dal.mysql.articlecategory.ArticleCategoryMapper;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryExportReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryPageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.convert.article.ArticleCategoryConvert;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleCategoryDO;
+import cn.iocoder.yudao.module.promotion.dal.mysql.article.ArticleCategoryMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
