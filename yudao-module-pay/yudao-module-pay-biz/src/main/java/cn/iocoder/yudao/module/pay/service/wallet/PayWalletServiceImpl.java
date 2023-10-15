@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.pay.service.wallet;
 
 import cn.hutool.core.lang.Assert;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.balance.PayWalletPageReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
@@ -58,6 +60,11 @@ public class PayWalletServiceImpl implements  PayWalletService {
     @Override
     public PayWalletDO getWallet(Long walletId) {
         return walletMapper.selectById(walletId);
+    }
+
+    @Override
+    public PageResult<PayWalletDO> getWalletPage(PayWalletPageReqVO pageReqVO) {
+        return walletMapper.selectPage(pageReqVO);
     }
 
     @Override

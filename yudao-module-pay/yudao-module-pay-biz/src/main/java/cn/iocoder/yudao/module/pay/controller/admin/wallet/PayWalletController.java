@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.pay.controller.admin.wallet;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.PayWalletRespVO;
-import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.PayWalletUserReqVO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.balance.PayWalletPageReqVO;
+import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.balance.PayWalletRespVO;
+import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.balance.PayWalletUserReqVO;
 import cn.iocoder.yudao.module.pay.convert.wallet.PayWalletConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -35,6 +38,14 @@ public class PayWalletController {
     public CommonResult<PayWalletRespVO> getWallet(PayWalletUserReqVO reqVO) {
         PayWalletDO wallet = payWalletService.getOrCreateWallet(reqVO.getUserId(), reqVO.getUserType());
         return success(PayWalletConvert.INSTANCE.convert02(wallet));
+    }
+
+    @GetMapping("/page")
+    @Operation(summary = "获得会员钱包分页")
+    @PreAuthorize("@ss.hasPermission('pay:wallet:query')")
+    public CommonResult<PageResult<PayWalletRespVO>> getWalletPage(@Valid PayWalletPageReqVO pageVO) {
+        PageResult<PayWalletDO> pageResult = payWalletService.getWalletPage(pageVO);
+        return success(PayWalletConvert.INSTANCE.convertPage(pageResult));
     }
 
 }
