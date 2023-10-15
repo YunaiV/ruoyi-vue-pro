@@ -1,0 +1,4 @@
+### 请求 /crm/customer/test 接口 => 成功
+GET {{baseUrl}}/crm/customer/test
+tenant-id: 1
+Authorization: Bearer {{token}}
