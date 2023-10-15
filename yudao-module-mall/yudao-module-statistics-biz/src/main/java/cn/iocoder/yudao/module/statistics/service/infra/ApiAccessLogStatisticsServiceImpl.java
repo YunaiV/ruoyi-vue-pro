@@ -28,4 +28,5 @@ public class ApiAccessLogStatisticsServiceImpl implements ApiAccessLogStatistics
     public Integer getVisitorUserCount(LocalDateTime beginTime, LocalDateTime endTime) {
         return apiAccessLogStatisticsMapper.selectCountByIp(beginTime, endTime);
     }
+
 }

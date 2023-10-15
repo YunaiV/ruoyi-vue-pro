@@ -15,12 +15,23 @@ import java.util.List;
  */
 public interface MemberStatisticsService {
 
+    // TODO 芋艿：已经 review
     /**
-     * 获取会员统计
+     * 获取会员统计（实时统计）
      *
      * @return 会员统计
      */
     MemberSummaryRespVO getMemberSummary();
+
+    // TODO 芋艿：已经 review
+    /**
+     * 获取用户分析数据
+     *
+     * @param beginTime 起始时间
+     * @param endTime   截止时间
+     * @return 用户分析数据
+     */
+    MemberAnalyseRespVO getMemberAnalyse(LocalDateTime beginTime, LocalDateTime endTime);
 
     /**
      * 按照省份，获得会员统计列表
@@ -35,14 +46,5 @@ public interface MemberStatisticsService {
      * @return 会员统计列表
      */
     List<MemberSexStatisticsRespVO> getMemberSexStatisticsList();
-
-    /**
-     * 获取用户分析数据
-     *
-     * @param beginTime 起始时间
-     * @param endTime   截止时间
-     * @return 用户分析数据
-     */
-    MemberAnalyseRespVO getMemberAnalyse(LocalDateTime beginTime, LocalDateTime endTime);
 
 }

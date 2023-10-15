@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.statistics.service.pay;
 
 import cn.iocoder.yudao.module.pay.enums.member.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
-import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberSummaryRespVO;
 import cn.iocoder.yudao.module.statistics.dal.mysql.pay.PayWalletStatisticsMapper;
+import cn.iocoder.yudao.module.statistics.service.pay.bo.RechargeSummaryRespBO;
 import cn.iocoder.yudao.module.statistics.service.trade.bo.WalletSummaryRespBO;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -39,7 +39,7 @@ public class PayWalletStatisticsServiceImpl implements PayWalletStatisticsServic
     }
 
     @Override
-    public MemberSummaryRespVO getUserRechargeSummary(LocalDateTime beginTime, LocalDateTime endTime) {
+    public RechargeSummaryRespBO getUserRechargeSummary(LocalDateTime beginTime, LocalDateTime endTime) {
         return payWalletStatisticsMapper.selectRechargeSummaryGroupByWalletId(beginTime, endTime, true);
     }
 

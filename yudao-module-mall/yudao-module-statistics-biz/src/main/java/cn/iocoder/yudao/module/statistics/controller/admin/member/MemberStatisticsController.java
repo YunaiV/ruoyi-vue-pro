@@ -30,13 +30,15 @@ public class MemberStatisticsController {
     @Resource
     private MemberStatisticsService memberStatisticsService;
 
+    // TODO 芋艿：已经 review
     @GetMapping("/summary")
-    @Operation(summary = "获得会员统计")
+    @Operation(summary = "获得会员统计（实时统计）")
     @PreAuthorize("@ss.hasPermission('statistics:member:query')")
     public CommonResult<MemberSummaryRespVO> getMemberSummary() {
         return success(memberStatisticsService.getMemberSummary());
     }
 
+    // TODO 芋艿：已经 review
     @GetMapping("/analyse")
     @Operation(summary = "获得会员分析数据")
     @PreAuthorize("@ss.hasPermission('statistics:member:query')")
@@ -45,6 +47,7 @@ public class MemberStatisticsController {
                 ArrayUtil.get(reqVO.getTimes(), 0), ArrayUtil.get(reqVO.getTimes(), 1)));
     }
 
+    // TODO 芋艿：已经 review
     @GetMapping("/get-area-statistics-list")
     @Operation(summary = "按照省份，获得会员统计列表")
     @PreAuthorize("@ss.hasPermission('statistics:member:query')")
@@ -52,6 +55,7 @@ public class MemberStatisticsController {
         return success(memberStatisticsService.getMemberAreaStatisticsList());
     }
 
+    // TODO 芋艿：已经 review
     @GetMapping("/get-sex-statistics-list")
     @Operation(summary = "按照性别，获得会员统计列表")
     @PreAuthorize("@ss.hasPermission('statistics:member:query')")
@@ -64,6 +68,7 @@ public class MemberStatisticsController {
     @PreAuthorize("@ss.hasPermission('statistics:member:query')")
     public CommonResult<List<MemberTerminalStatisticsRespVO>> getMemberTerminalStatisticsList() {
         // TODO 疯狂：这个可以晚点写，因为 user = = 上还没记录 terminal
+        // TODO @疯狂：在 member_user 上，增加 registerTerminal 字段，基于它来统计哈；
         List<MemberTerminalStatisticsRespVO> list = convertList(TerminalEnum.values(),
                 t -> new MemberTerminalStatisticsRespVO()
                         .setTerminal(t.getTerminal()).setUserCount(t.getTerminal() * 100));

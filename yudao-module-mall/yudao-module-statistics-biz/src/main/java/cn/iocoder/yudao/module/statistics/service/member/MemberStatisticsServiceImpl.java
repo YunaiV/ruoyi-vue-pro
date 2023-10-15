@@ -5,14 +5,15 @@ import cn.iocoder.yudao.framework.ip.core.enums.AreaTypeEnum;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.*;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeStatisticsComparisonRespVO;
-import cn.iocoder.yudao.module.statistics.convert.member.MemberStatisticsConvert;
 import cn.iocoder.yudao.module.statistics.dal.mysql.member.MemberStatisticsMapper;
 import cn.iocoder.yudao.module.statistics.service.infra.ApiAccessLogStatisticsService;
 import cn.iocoder.yudao.module.statistics.service.pay.PayWalletStatisticsService;
+import cn.iocoder.yudao.module.statistics.service.pay.bo.RechargeSummaryRespBO;
 import cn.iocoder.yudao.module.statistics.service.trade.TradeOrderStatisticsService;
 import cn.iocoder.yudao.module.statistics.service.trade.TradeStatisticsService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import cn.iocoder.yudao.module.statistics.convert.member.MemberStatisticsConvert;
 
 import javax.annotation.Resource;
 import java.time.Duration;
@@ -46,19 +47,18 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
 
     @Override
     public MemberSummaryRespVO getMemberSummary() {
-        MemberSummaryRespVO vo = payWalletStatisticsService.getUserRechargeSummary(null, null);
+        RechargeSummaryRespBO rechargeSummary = payWalletStatisticsService.getUserRechargeSummary(null, null);
+        // TODO @疯狂：1）这里是实时统计，不好走走 TradeStatistics 表；2）因为这个放在商城下，所以只考虑订单数据，即按照 trade_order 的 pay_price 并且已支付来计算；
         Integer expensePrice = tradeStatisticsService.getExpensePrice(null, null);
         Integer userCount = memberStatisticsMapper.selectUserCount(null, null);
-        // 拼接数据
-        if (vo == null) {
-            vo = new MemberSummaryRespVO().setRechargeUserCount(0).setRechargePrice(0);
-        }
-        return vo.setUserCount(userCount).setExpensePrice(expensePrice);
+        return MemberStatisticsConvert.INSTANCE.convert(rechargeSummary, expensePrice, userCount);
     }
 
     @Override
     public List<MemberAreaStatisticsRespVO> getMemberAreaStatisticsList() {
         // 统计用户
+        // TODO @疯狂：要处理下，未知省份；就是没填写省份的情况；
+        // TODO @疯狂：可能得把每个省的用户，都查询出来，然后去 order 那边 in；因为要按照这些人为基础来计算；；用户规模量大可能不太好，但是暂时就先这样搞吧 = =
         Map<Integer, Integer> userCountMap = convertMap(memberStatisticsMapper.selectSummaryListByAreaId(),
                 vo -> AreaUtils.getParentIdByType(vo.getAreaId(), AreaTypeEnum.PROVINCE),
                 MemberAreaStatisticsRespVO::getUserCount, Integer::sum);
@@ -74,22 +74,22 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
         return MemberStatisticsConvert.INSTANCE.convertList(AreaUtils.getByType(AreaTypeEnum.PROVINCE, area -> area), userCountMap, orderMap);
     }
 
-    @Override
-    public List<MemberSexStatisticsRespVO> getMemberSexStatisticsList() {
-        return memberStatisticsMapper.selectSummaryListBySex();
-    }
-
+    // TODO @疯狂：这个方法，要不拆成：1）controller 调用 getMemberAnalyseComparisonData；2）tradeOrderStatisticsService.getPayUserCount；3）tradeOrderStatisticsService.getOrderPayPrice；4）。。。
+    // TODO 就是说：分析交给 controller 去组合；
     @Override
     public MemberAnalyseRespVO getMemberAnalyse(LocalDateTime beginTime, LocalDateTime endTime) {
         // 对照数据
         MemberAnalyseComparisonRespVO vo = getMemberAnalyseComparisonData(beginTime, endTime);
+        // TODO @疯狂：如果时间段这么处理，会不会 beginTime 重叠了。因为是 <= 一个时间；如果数据库插入的是 ，xxxx-yy-zz 00:00:00 的话，它既满足 >= ? 也满足 <= ；（如果不好理解，微信聊)
         LocalDateTime referenceBeginTime = beginTime.minus(Duration.between(beginTime, endTime));
         MemberAnalyseComparisonRespVO reference = getMemberAnalyseComparisonData(referenceBeginTime, beginTime);
 
-        Integer payUserCount = tradeOrderStatisticsService.getPayUserCount(beginTime, endTime);
         // 计算客单价
+        // TODO @疯狂：这个可能有点特殊，要按照 create_time 来查询；不然它的漏斗就不统一；因为是访问数量 > 今日下单人 > 今日支付人；是一个统一的维度；
+        Integer payUserCount = tradeOrderStatisticsService.getPayUserCount(beginTime, endTime);
         int atv = 0;
         if (payUserCount != null && payUserCount > 0) {
+            // TODO @疯狂：类似上面的 payUserCount
             Integer payPrice = tradeOrderStatisticsService.getOrderPayPrice(beginTime, endTime);
             atv = NumberUtil.div(payPrice, payUserCount).intValue();
         }
@@ -103,11 +103,17 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
 
     private MemberAnalyseComparisonRespVO getMemberAnalyseComparisonData(LocalDateTime beginTime, LocalDateTime endTime) {
         Integer rechargeUserCount = Optional.ofNullable(payWalletStatisticsService.getUserRechargeSummary(beginTime, endTime))
-                .map(MemberSummaryRespVO::getRechargeUserCount).orElse(0);
+                .map(RechargeSummaryRespBO::getRechargeUserCount).orElse(0);
         return new MemberAnalyseComparisonRespVO()
                 .setUserCount(memberStatisticsMapper.selectUserCount(beginTime, endTime))
                 .setActiveUserCount(apiAccessLogStatisticsService.getActiveUserCount(beginTime, endTime))
                 .setRechargeUserCount(rechargeUserCount);
+    }
+
+    @Override
+    public List<MemberSexStatisticsRespVO> getMemberSexStatisticsList() {
+        // TODO @疯狂：需要考虑，用户性别为空，则是“未知”
+        return memberStatisticsMapper.selectSummaryListBySex();
     }
 
 }

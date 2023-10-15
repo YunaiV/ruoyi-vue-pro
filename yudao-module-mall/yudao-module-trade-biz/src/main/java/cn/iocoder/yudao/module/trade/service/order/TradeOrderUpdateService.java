@@ -120,14 +120,14 @@ public interface TradeOrderUpdateService {
      *
      * @param id 订单编号
      */
-    void pickUpOrder(Long id);
+    void pickUpOrderByMember(Long id);
 
     /**
      * 【管理员】核销订单
      *
      * @param pickUpVerifyCode 自提核销码
      */
-    void pickUpOrder(String pickUpVerifyCode);
+    void pickUpOrderByAdmin(String pickUpVerifyCode);
 
     // =================== Order Item ===================
 
@@ -178,9 +178,9 @@ public interface TradeOrderUpdateService {
      * @param combinationRecordId 拼团记录编号
      * @param headId              团长编号
      */
-    // TODO 芋艿：再 review 拼团
     void updateOrderCombinationInfo(Long orderId, Long activityId, Long combinationRecordId, Long headId);
 
+    // TODO 芋艿：拼团取消，不调这个接口哈；
     /**
      * 取消支付订单
      *

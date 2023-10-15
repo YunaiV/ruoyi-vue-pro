@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+// TODO @疯狂：是不是搞成公用的哈；类似，controller/admin/common，下面直接放它
 @Schema(description = "管理后台 - 交易统计对照 Response VO")
 @Data
 @NoArgsConstructor
