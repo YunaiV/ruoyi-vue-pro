@@ -13,14 +13,17 @@ import java.time.LocalDateTime;
  * @author owen
  */
 @Mapper
-public interface ApiAccessLogStatisticsMapper extends BaseMapperX<Object> {
+@SuppressWarnings("rawtypes")
+public interface ApiAccessLogStatisticsMapper extends BaseMapperX {
 
-    // TODO @疯狂：是不是 selectIpCount
-    Integer selectCountByIp(@Param("beginTime") LocalDateTime beginTime,
-                            @Param("endTime") LocalDateTime endTime);
+    // TODO 芋艿：已经 review
+    Integer selectIpCountByUserTypeAndCreateTimeBetween(@Param("userType") Integer userType,
+                                                        @Param("beginTime") LocalDateTime beginTime,
+                                                        @Param("endTime") LocalDateTime endTime);
 
-    // TODO @疯狂：是不是 selectUserCount
-    Integer selectCountByUserId(@Param("beginTime") LocalDateTime beginTime,
-                                @Param("endTime") LocalDateTime endTime);
+    // TODO 芋艿：已经 review
+    Integer selectUserCountByUserTypeAndCreateTimeBetween(@Param("userType") Integer userType,
+                                                          @Param("beginTime") LocalDateTime beginTime,
+                                                          @Param("endTime") LocalDateTime endTime);
 
 }

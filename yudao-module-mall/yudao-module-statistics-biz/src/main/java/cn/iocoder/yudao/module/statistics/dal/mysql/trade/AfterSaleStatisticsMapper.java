@@ -20,4 +20,7 @@ public interface AfterSaleStatisticsMapper extends BaseMapperX<TradeStatisticsDO
     AfterSaleSummaryRespBO selectSummaryByRefundTimeBetween(@Param("beginTime") LocalDateTime beginTime,
                                                             @Param("endTime") LocalDateTime endTime);
 
+    // TODO 芋艿：已经 review
+    Long selectCountByStatus(@Param("status") Integer status);
+
 }

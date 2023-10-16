@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.statistics.service.trade;
 
 import cn.iocoder.yudao.module.statistics.service.trade.bo.AfterSaleSummaryRespBO;
+import cn.iocoder.yudao.module.trade.enums.aftersale.AfterSaleStatusEnum;
 
 import java.time.LocalDateTime;
 
@@ -20,5 +21,14 @@ public interface AfterSaleStatisticsService {
      * @return 售后统计结果
      */
     AfterSaleSummaryRespBO getAfterSaleSummary(LocalDateTime beginTime, LocalDateTime endTime);
+
+    // TODO 芋艿：已经 review
+    /**
+     * 获取指定状态的售后订单数量
+     *
+     * @param status 售后状态
+     * @return 售后订单数量
+     */
+    Long getCountByStatus(AfterSaleStatusEnum status);
 
 }

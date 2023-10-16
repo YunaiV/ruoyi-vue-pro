@@ -1,23 +1,22 @@
 package cn.iocoder.yudao.module.promotion.service.article;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryExportReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.convert.article.ArticleCategoryConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleCategoryDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.article.ArticleCategoryMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.ARTICLE_CATEGORY_DELETE_FAIL_HAVE_ARTICLES;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.ARTICLE_CATEGORY_NOT_EXISTS;
 
 /**
@@ -31,14 +30,16 @@ public class ArticleCategoryServiceImpl implements ArticleCategoryService {
 
     @Resource
     private ArticleCategoryMapper articleCategoryMapper;
+    @Resource
+    private ArticleService articleService;
 
     @Override
     public Long createArticleCategory(ArticleCategoryCreateReqVO createReqVO) {
         // 插入
-        ArticleCategoryDO articleCategory = ArticleCategoryConvert.INSTANCE.convert(createReqVO);
-        articleCategoryMapper.insert(articleCategory);
+        ArticleCategoryDO category = ArticleCategoryConvert.INSTANCE.convert(createReqVO);
+        articleCategoryMapper.insert(category);
         // 返回
-        return articleCategory.getId();
+        return category.getId();
     }
 
     @Override
@@ -54,6 +55,12 @@ public class ArticleCategoryServiceImpl implements ArticleCategoryService {
     public void deleteArticleCategory(Long id) {
         // 校验存在
         validateArticleCategoryExists(id);
+        // 校验是不是存在关联文章
+        List<ArticleDO> articleList = articleService.getArticleByCategoryId(id);
+        if (CollUtil.isNotEmpty(articleList)) {
+            throw exception(ARTICLE_CATEGORY_DELETE_FAIL_HAVE_ARTICLES);
+        }
+
         // 删除
         articleCategoryMapper.deleteById(id);
     }
@@ -70,21 +77,8 @@ public class ArticleCategoryServiceImpl implements ArticleCategoryService {
     }
 
     @Override
-    public List<ArticleCategoryDO> getArticleCategoryList(Collection<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return ListUtil.empty();
-        }
-        return articleCategoryMapper.selectBatchIds(ids);
-    }
-
-    @Override
     public PageResult<ArticleCategoryDO> getArticleCategoryPage(ArticleCategoryPageReqVO pageReqVO) {
         return articleCategoryMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public List<ArticleCategoryDO> getArticleCategoryList(ArticleCategoryExportReqVO exportReqVO) {
-        return articleCategoryMapper.selectList(exportReqVO);
     }
 
     @Override

@@ -101,7 +101,7 @@ public interface TradeOrderMapper extends BaseMapperX<TradeOrderDO> {
      * @param status     订单状态
      * @return 交易订单
      */
-    default TradeOrderDO selectByUserIdAndActivityIdAndStatus(Long userId, Long activityId, Integer status) {
+    default TradeOrderDO selectByUserIdAndCombinationActivityIdAndStatus(Long userId, Long activityId, Integer status) {
         return selectOne(new LambdaQueryWrapperX<TradeOrderDO>()
                 .eq(TradeOrderDO::getUserId, userId)
                 .eq(TradeOrderDO::getStatus, status)

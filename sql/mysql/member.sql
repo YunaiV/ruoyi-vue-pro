@@ -1,0 +1,1 @@
+ALTER TABLE member_user ADD COLUMN register_terminal tinyint NULL COMMENT '注册终端' AFTER register_ip;

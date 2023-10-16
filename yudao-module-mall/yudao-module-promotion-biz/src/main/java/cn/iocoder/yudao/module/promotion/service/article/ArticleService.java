@@ -1,25 +1,24 @@
 package cn.iocoder.yudao.module.promotion.service.article;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.ArticleCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.ArticleExportReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.ArticlePageReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.ArticleUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.ArticleCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.ArticlePageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.ArticleUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.app.article.vo.article.AppArticlePageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleDO;
 
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
 
 /**
- * 文章管理 Service 接口
+ * 文章详情 Service 接口
  *
  * @author HUIHUI
  */
 public interface ArticleService {
 
     /**
-     * 创建文章管理
+     * 创建文章详情
      *
      * @param createReqVO 创建信息
      * @return 编号
@@ -27,49 +26,58 @@ public interface ArticleService {
     Long createArticle(@Valid ArticleCreateReqVO createReqVO);
 
     /**
-     * 更新文章管理
+     * 更新文章详情
      *
      * @param updateReqVO 更新信息
      */
     void updateArticle(@Valid ArticleUpdateReqVO updateReqVO);
 
     /**
-     * 删除文章管理
+     * 删除文章详情
      *
      * @param id 编号
      */
     void deleteArticle(Long id);
 
     /**
-     * 获得文章管理
+     * 获得文章详情
      *
      * @param id 编号
-     * @return 文章管理
+     * @return 文章详情
      */
     ArticleDO getArticle(Long id);
 
     /**
-     * 获得文章管理列表
-     *
-     * @param ids 编号
-     * @return 文章管理列表
-     */
-    List<ArticleDO> getArticleList(Collection<Long> ids);
-
-    /**
-     * 获得文章管理分页
+     * 获得文章详情分页
      *
      * @param pageReqVO 分页查询
-     * @return 文章管理分页
+     * @return 文章详情分页
      */
     PageResult<ArticleDO> getArticlePage(ArticlePageReqVO pageReqVO);
 
     /**
-     * 获得文章管理列表, 用于 Excel 导出
+     * 获得文章详情列表
      *
-     * @param exportReqVO 查询条件
-     * @return 文章管理列表
+     * @param recommendHot    是否热门
+     * @param recommendBanner 是否轮播图
+     * @return 文章详情列表
      */
-    List<ArticleDO> getArticleList(ArticleExportReqVO exportReqVO);
+    List<ArticleDO> getArticleCategoryListByRecommendHotAndRecommendBanner(Boolean recommendHot, Boolean recommendBanner);
+
+    /**
+     * 获得文章详情分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 文章详情分页
+     */
+    PageResult<ArticleDO> getArticlePage(AppArticlePageReqVO pageReqVO);
+
+    /**
+     * 获得指定分类的文章列表
+     *
+     * @param categoryId 文章分类编号
+     * @return 文章列表
+     */
+    List<ArticleDO> getArticleByCategoryId(Long categoryId);
 
 }

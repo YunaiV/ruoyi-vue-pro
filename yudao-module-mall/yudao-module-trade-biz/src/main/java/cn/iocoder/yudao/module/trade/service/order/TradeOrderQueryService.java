@@ -46,7 +46,7 @@ public interface TradeOrderQueryService {
      * @param status     订单状态
      * @return 交易订单
      */
-    TradeOrderDO getActivityOrderByUserIdAndActivityIdAndStatus(Long userId, Long activityId, Integer status);
+    TradeOrderDO getCombinationActivityOrderByUserIdAndCombinationActivityIdAndStatus(Long userId, Long activityId, Integer status);
 
     /**
      * 获得订单列表

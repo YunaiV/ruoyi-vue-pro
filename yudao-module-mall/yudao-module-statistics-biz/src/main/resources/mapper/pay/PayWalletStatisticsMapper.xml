@@ -32,9 +32,8 @@
 
     <select id="selectRechargeSummaryGroupByWalletId"
             resultType="cn.iocoder.yudao.module.statistics.service.pay.bo.RechargeSummaryRespBO">
-        <!-- TODO @疯狂：是不是不用 group by，而是通过 DISTINCT wallet_id 更合适哈？ -->
-        SELECT COUNT(1)       AS rechargeUserCount,
-               SUM(pay_price) AS rechargePrice
+        SELECT COUNT(DISTINCT wallet_id) AS rechargeUserCount,
+               SUM(pay_price)            AS rechargePrice
         FROM pay_wallet_recharge
         WHERE pay_status = #{payStatus}
         <if test="beginTime != null">
@@ -44,7 +43,13 @@
             AND pay_time &lt;= #{endTime}
         </if>
             AND deleted = FALSE
-        GROUP BY wallet_id
+    </select>
+
+    <select id="selectRechargePriceSummary" resultType="java.lang.Integer">
+        SELECT IFNULL(SUM(pay_price), 0)
+        FROM pay_wallet_recharge
+        WHERE pay_status = #{payStatus}
+          AND deleted = FALSE
     </select>
 
 </mapper>
