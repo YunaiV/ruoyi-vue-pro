@@ -9,8 +9,6 @@ import java.time.LocalDateTime;
  */
 public interface ApiAccessLogStatisticsService {
 
-    // TODO @疯狂：需要传递 userType；因为访问日志，可能涉及多种用户类型；
-    // TODO @疯狂：方法名，要不改成 getUserCount；原因：让它更业务无关
     /**
      * 获取活跃用户数量
      *
@@ -19,10 +17,8 @@ public interface ApiAccessLogStatisticsService {
      * @param endTime   截止时间
      * @return 活跃用户数量
      */
-    Integer getActiveUserCount(Integer userType, LocalDateTime beginTime, LocalDateTime endTime);
+    Integer getUserCount(Integer userType, LocalDateTime beginTime, LocalDateTime endTime);
 
-    // TODO @疯狂：需要传递 userType；因为访问日志，可能涉及多种用户类型；
-    // TODO @疯狂：方法名，要不改成 getIpCount；原因：让它更业务无关
     /**
      * 获取访问用户数量
      *
@@ -31,6 +27,6 @@ public interface ApiAccessLogStatisticsService {
      * @param endTime   截止时间
      * @return 访问用户数量
      */
-    Integer getVisitorUserCount(Integer userType, LocalDateTime beginTime, LocalDateTime endTime);
+    Integer getIpCount(Integer userType, LocalDateTime beginTime, LocalDateTime endTime);
 
 }

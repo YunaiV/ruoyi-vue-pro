@@ -32,8 +32,8 @@ public interface MemberStatisticsConvert {
             return new MemberAreaStatisticsRespVO()
                     .setAreaId(area.getId()).setAreaName(area.getName())
                     .setUserCount(MapUtil.getInt(userCountMap, area.getId(), 0))
-                    .setOrderCreateCount(ObjUtil.defaultIfNull(orderVo.getOrderCreateCount(), 0))
-                    .setOrderPayCount(ObjUtil.defaultIfNull(orderVo.getOrderPayCount(), 0))
+                    .setOrderCreateUserCount(ObjUtil.defaultIfNull(orderVo.getOrderCreateUserCount(), 0))
+                    .setOrderPayUserCount(ObjUtil.defaultIfNull(orderVo.getOrderPayUserCount(), 0))
                     .setOrderPayPrice(ObjUtil.defaultIfNull(orderVo.getOrderPayPrice(), 0));
         });
     }

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.statistics.service.member;
 
+import cn.iocoder.yudao.module.statistics.controller.admin.common.vo.DataComparisonRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.*;
-import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeStatisticsComparisonRespVO;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -59,6 +59,6 @@ public interface MemberStatisticsService {
      *
      * @return 用户数量量统计对照
      */
-    TradeStatisticsComparisonRespVO<MemberCountRespVO> getUserCountComparison();
+    DataComparisonRespVO<MemberCountRespVO> getUserCountComparison();
 
 }

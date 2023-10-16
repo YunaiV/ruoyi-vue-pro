@@ -20,13 +20,13 @@ public class ApiAccessLogStatisticsServiceImpl implements ApiAccessLogStatistics
     private ApiAccessLogStatisticsMapper apiAccessLogStatisticsMapper;
 
     @Override
-    public Integer getActiveUserCount(Integer userType, LocalDateTime beginTime, LocalDateTime endTime) {
-        return apiAccessLogStatisticsMapper.selectUserCountByCreateTimeBetween(userType, beginTime, endTime);
+    public Integer getUserCount(Integer userType, LocalDateTime beginTime, LocalDateTime endTime) {
+        return apiAccessLogStatisticsMapper.selectUserCountByUserTypeAndCreateTimeBetween(userType, beginTime, endTime);
     }
 
     @Override
-    public Integer getVisitorUserCount(Integer userType, LocalDateTime beginTime, LocalDateTime endTime) {
-        return apiAccessLogStatisticsMapper.selectIpCountByCreateTimeBetween(userType, beginTime, endTime);
+    public Integer getIpCount(Integer userType, LocalDateTime beginTime, LocalDateTime endTime) {
+        return apiAccessLogStatisticsMapper.selectIpCountByUserTypeAndCreateTimeBetween(userType, beginTime, endTime);
     }
 
 }

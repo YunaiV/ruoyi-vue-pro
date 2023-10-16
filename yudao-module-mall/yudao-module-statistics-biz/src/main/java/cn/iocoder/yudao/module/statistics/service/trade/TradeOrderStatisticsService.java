@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.statistics.service.trade;
 
+import cn.iocoder.yudao.module.statistics.controller.admin.common.vo.DataComparisonRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberAreaStatisticsRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.*;
 import cn.iocoder.yudao.module.statistics.service.trade.bo.TradeOrderSummaryRespBO;
@@ -73,7 +74,7 @@ public interface TradeOrderStatisticsService {
      *
      * @return 销售额对照
      */
-    TradeStatisticsComparisonRespVO<TradeOrderSummaryRespVO> getOrderComparison();
+    DataComparisonRespVO<TradeOrderSummaryRespVO> getOrderComparison();
 
     /**
      * 获得订单量趋势统计
@@ -81,6 +82,6 @@ public interface TradeOrderStatisticsService {
      * @param reqVO 统计参数
      * @return 订单量趋势统计
      */
-    List<TradeStatisticsComparisonRespVO<TradeOrderTrendRespVO>> getOrderCountTrendComparison(TradeOrderTrendReqVO reqVO);
+    List<DataComparisonRespVO<TradeOrderTrendRespVO>> getOrderCountTrendComparison(TradeOrderTrendReqVO reqVO);
 
 }

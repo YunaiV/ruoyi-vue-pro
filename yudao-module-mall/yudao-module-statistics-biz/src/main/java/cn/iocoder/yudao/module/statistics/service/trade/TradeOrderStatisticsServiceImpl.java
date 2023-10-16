@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
+import cn.iocoder.yudao.module.statistics.controller.admin.common.vo.DataComparisonRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberAreaStatisticsRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.*;
 import cn.iocoder.yudao.module.statistics.dal.mysql.trade.TradeOrderStatisticsMapper;
@@ -71,8 +72,8 @@ public class TradeOrderStatisticsServiceImpl implements TradeOrderStatisticsServ
     }
 
     @Override
-    public TradeStatisticsComparisonRespVO<TradeOrderSummaryRespVO> getOrderComparison() {
-        return new TradeStatisticsComparisonRespVO<TradeOrderSummaryRespVO>()
+    public DataComparisonRespVO<TradeOrderSummaryRespVO> getOrderComparison() {
+        return new DataComparisonRespVO<TradeOrderSummaryRespVO>()
                 .setValue(getPayPriceSummary(LocalDateTime.now()))
                 .setReference(getPayPriceSummary(LocalDateTime.now().minusDays(1)));
     }
@@ -85,7 +86,7 @@ public class TradeOrderStatisticsServiceImpl implements TradeOrderStatisticsServ
     }
 
     @Override
-    public List<TradeStatisticsComparisonRespVO<TradeOrderTrendRespVO>> getOrderCountTrendComparison(TradeOrderTrendReqVO reqVO) {
+    public List<DataComparisonRespVO<TradeOrderTrendRespVO>> getOrderCountTrendComparison(TradeOrderTrendReqVO reqVO) {
         // 查询当前数据
         List<TradeOrderTrendRespVO> value = getOrderCountTrend(reqVO.getType(), reqVO.getBeginTime(), reqVO.getEndTime());
         // 查询对照数据
@@ -94,7 +95,7 @@ public class TradeOrderStatisticsServiceImpl implements TradeOrderStatisticsServ
         List<TradeOrderTrendRespVO> reference = getOrderCountTrend(reqVO.getType(), referenceBeginTime, referenceEndTime);
 
         return IntStream.range(0, value.size())
-                .mapToObj(index -> new TradeStatisticsComparisonRespVO<TradeOrderTrendRespVO>()
+                .mapToObj(index -> new DataComparisonRespVO<TradeOrderTrendRespVO>()
                         .setValue(CollUtil.get(value, index))
                         .setReference(CollUtil.get(reference, index)))
                 .collect(Collectors.toList());

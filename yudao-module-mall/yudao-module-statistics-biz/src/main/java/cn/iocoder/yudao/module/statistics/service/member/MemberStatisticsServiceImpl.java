@@ -5,11 +5,12 @@ import cn.hutool.core.util.NumberUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.ip.core.enums.AreaTypeEnum;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
+import cn.iocoder.yudao.module.statistics.controller.admin.common.vo.DataComparisonRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.*;
-import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeStatisticsComparisonRespVO;
 import cn.iocoder.yudao.module.statistics.convert.member.MemberStatisticsConvert;
 import cn.iocoder.yudao.module.statistics.dal.mysql.member.MemberStatisticsMapper;
 import cn.iocoder.yudao.module.statistics.service.infra.ApiAccessLogStatisticsService;
+import cn.iocoder.yudao.module.statistics.service.member.bo.MemberAreaStatisticsRespBO;
 import cn.iocoder.yudao.module.statistics.service.pay.PayWalletStatisticsService;
 import cn.iocoder.yudao.module.statistics.service.pay.bo.RechargeSummaryRespBO;
 import cn.iocoder.yudao.module.statistics.service.trade.TradeOrderStatisticsService;
@@ -63,14 +64,14 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
         // TODO @疯狂：可能得把每个省的用户，都查询出来，然后去 order 那边 in；因为要按照这些人为基础来计算；；用户规模量大可能不太好，但是暂时就先这样搞吧 = =
         Map<Integer, Integer> userCountMap = convertMap(memberStatisticsMapper.selectSummaryListByAreaId(),
                 vo -> AreaUtils.getParentIdByType(vo.getAreaId(), AreaTypeEnum.PROVINCE),
-                MemberAreaStatisticsRespVO::getUserCount, Integer::sum);
+                MemberAreaStatisticsRespBO::getUserCount, Integer::sum);
         // 统计订单
         Map<Integer, MemberAreaStatisticsRespVO> orderMap = convertMap(tradeOrderStatisticsService.getSummaryListByAreaId(),
                 vo -> AreaUtils.getParentIdByType(vo.getAreaId(), AreaTypeEnum.PROVINCE),
                 vo -> vo,
                 (a, b) -> new MemberAreaStatisticsRespVO()
-                        .setOrderCreateCount(a.getOrderCreateCount() + b.getOrderCreateCount())
-                        .setOrderPayCount(a.getOrderPayCount() + b.getOrderPayCount())
+                        .setOrderCreateUserCount(a.getOrderCreateUserCount() + b.getOrderCreateUserCount())
+                        .setOrderPayUserCount(a.getOrderPayUserCount() + b.getOrderPayUserCount())
                         .setOrderPayPrice(a.getOrderPayPrice() + b.getOrderPayPrice()));
         // 拼接数据
         return MemberStatisticsConvert.INSTANCE.convertList(AreaUtils.getByType(AreaTypeEnum.PROVINCE, area -> area), userCountMap, orderMap);
@@ -96,19 +97,19 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
             atv = NumberUtil.div(payPrice, payUserCount).intValue();
         }
         return new MemberAnalyseRespVO()
-                .setVisitorCount(apiAccessLogStatisticsService.getVisitorUserCount(UserTypeEnum.MEMBER.getValue(), beginTime, endTime))
+                .setVisitUserCount(apiAccessLogStatisticsService.getIpCount(UserTypeEnum.MEMBER.getValue(), beginTime, endTime))
                 .setOrderUserCount(tradeOrderStatisticsService.getOrderUserCount(beginTime, endTime))
                 .setPayUserCount(payUserCount)
                 .setAtv(atv)
-                .setComparison(new TradeStatisticsComparisonRespVO<>(vo, reference));
+                .setComparison(new DataComparisonRespVO<>(vo, reference));
     }
 
     private MemberAnalyseComparisonRespVO getMemberAnalyseComparisonData(LocalDateTime beginTime, LocalDateTime endTime) {
         Integer rechargeUserCount = Optional.ofNullable(payWalletStatisticsService.getUserRechargeSummary(beginTime, endTime))
                 .map(RechargeSummaryRespBO::getRechargeUserCount).orElse(0);
         return new MemberAnalyseComparisonRespVO()
-                .setUserCount(memberStatisticsMapper.selectUserCount(beginTime, endTime))
-                .setActiveUserCount(apiAccessLogStatisticsService.getActiveUserCount(UserTypeEnum.MEMBER.getValue(), beginTime, endTime))
+                .setRegisterUserCount(memberStatisticsMapper.selectUserCount(beginTime, endTime))
+                .setVisitUserCount(apiAccessLogStatisticsService.getUserCount(UserTypeEnum.MEMBER.getValue(), beginTime, endTime))
                 .setRechargeUserCount(rechargeUserCount);
     }
 
@@ -124,14 +125,14 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
     }
 
     @Override
-    public TradeStatisticsComparisonRespVO<MemberCountRespVO> getUserCountComparison() {
+    public DataComparisonRespVO<MemberCountRespVO> getUserCountComparison() {
         // 今日时间范围
         LocalDateTime beginOfToday = LocalDateTimeUtil.beginOfDay(LocalDateTime.now());
         LocalDateTime endOfToday = LocalDateTimeUtil.endOfDay(beginOfToday);
         // 昨日时间范围
         LocalDateTime beginOfYesterday = LocalDateTimeUtil.beginOfDay(beginOfToday.minusDays(1));
         LocalDateTime endOfYesterday = LocalDateTimeUtil.endOfDay(beginOfYesterday);
-        return new TradeStatisticsComparisonRespVO<MemberCountRespVO>()
+        return new DataComparisonRespVO<MemberCountRespVO>()
                 .setValue(getUserCount(beginOfToday, endOfToday))
                 .setReference(getUserCount(beginOfYesterday, endOfYesterday));
     }
@@ -139,7 +140,7 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
     private MemberCountRespVO getUserCount(LocalDateTime beginTime, LocalDateTime endTime) {
         return new MemberCountRespVO()
                 .setCreateUserCount(memberStatisticsMapper.selectUserCount(beginTime, endTime))
-                .setVisitUserCount(apiAccessLogStatisticsService.getVisitorUserCount(UserTypeEnum.MEMBER.getValue(), beginTime, endTime));
+                .setVisitUserCount(apiAccessLogStatisticsService.getIpCount(UserTypeEnum.MEMBER.getValue(), beginTime, endTime));
     }
 
 }

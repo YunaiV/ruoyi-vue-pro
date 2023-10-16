@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.statistics.dal.mysql.member;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberAreaStatisticsRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberRegisterCountRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberSexStatisticsRespVO;
+import cn.iocoder.yudao.module.statistics.service.member.bo.MemberAreaStatisticsRespBO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -19,9 +19,7 @@ import java.util.List;
 @SuppressWarnings("rawtypes")
 public interface MemberStatisticsMapper extends BaseMapperX {
 
-    // TODO @芋艿：已经 review
-    // TODO @疯狂：要不还是搞下 bo？虽然可能冗余了点~~
-    List<MemberAreaStatisticsRespVO> selectSummaryListByAreaId();
+    List<MemberAreaStatisticsRespBO> selectSummaryListByAreaId();
 
     List<MemberSexStatisticsRespVO> selectSummaryListBySex();
 

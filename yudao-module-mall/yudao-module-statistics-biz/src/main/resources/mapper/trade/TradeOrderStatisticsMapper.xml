@@ -4,14 +4,14 @@
     <select id="selectSummaryListByAreaId"
             resultType="cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberAreaStatisticsRespVO">
         SELECT receiver_area_id                                AS areaId,
-               (SELECT COUNT(1)
+               (SELECT COUNT(DISTINCT s.user_id)
                 FROM trade_order AS s
-                WHERE s.receiver_area_id = m.receiver_area_id) AS orderCreateCount,
-               (SELECT COUNT(1)
+                WHERE s.receiver_area_id = m.receiver_area_id) AS orderCreateUserCount,
+               (SELECT COUNT(DISTINCT s.user_id)
                 FROM trade_order AS s
                 WHERE s.receiver_area_id = m.receiver_area_id
                   AND s.pay_status = TRUE
-                  AND s.deleted = FALSE)                       AS orderPayCount,
+                  AND s.deleted = FALSE)                       AS orderPayUserCount,
                (SELECT SUM(s.pay_price)
                 FROM trade_order AS s
                 WHERE s.receiver_area_id = m.receiver_area_id

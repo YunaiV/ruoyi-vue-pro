@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.statistics.service.trade;
 
-import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeStatisticsComparisonRespVO;
-import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeSummaryRespVO;
+import cn.iocoder.yudao.module.statistics.controller.admin.common.vo.DataComparisonRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeTrendSummaryRespVO;
+import cn.iocoder.yudao.module.statistics.dal.dataobject.trade.TradeStatisticsDO;
+import cn.iocoder.yudao.module.statistics.service.trade.bo.TradeSummaryRespBO;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,18 +16,11 @@ import java.util.List;
 public interface TradeStatisticsService {
 
     /**
-     * 获得交易统计
-     *
-     * @return 统计数据对照
-     */
-    TradeStatisticsComparisonRespVO<TradeSummaryRespVO> getTradeSummaryComparison();
-
-    /**
      * 获得交易状况统计对照
      *
      * @return 统计数据对照
      */
-    TradeStatisticsComparisonRespVO<TradeTrendSummaryRespVO> getTradeTrendSummaryComparison(
+    DataComparisonRespVO<TradeTrendSummaryRespVO> getTradeTrendSummaryComparison(
             LocalDateTime beginTime, LocalDateTime endTime);
 
     /**
@@ -45,14 +39,30 @@ public interface TradeStatisticsService {
      * @param endTime   结束时间
      * @return 统计数据列表
      */
-    List<TradeTrendSummaryRespVO> getTradeStatisticsList(LocalDateTime beginTime, LocalDateTime endTime);
+    List<TradeStatisticsDO> getTradeStatisticsList(LocalDateTime beginTime, LocalDateTime endTime);
 
     // TODO 芋艿：已经 review；
     /**
-     * 统计昨日交易
+     * 统计指定天数的交易数据
      *
-     * @return 耗时
+     * @return 统计结果
      */
-    String statisticsYesterdayTrade();
+    String statisticsTrade(Integer days);
+
+    /**
+     * 统计指定日期的交易数据
+     *
+     * @param days 增加的天数
+     * @return 交易数据
+     */
+    TradeSummaryRespBO getTradeSummaryByDays(int days);
+
+    /**
+     * 统计指定月份的交易数据
+     *
+     * @param months 增加的月数
+     * @return 交易数据
+     */
+    TradeSummaryRespBO getTradeSummaryByMonths(int months);
 
 }

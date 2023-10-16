@@ -3,7 +3,7 @@
 <mapper namespace="cn.iocoder.yudao.module.statistics.dal.mysql.member.MemberStatisticsMapper">
 
     <select id="selectSummaryListByAreaId"
-            resultType="cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberAreaStatisticsRespVO">
+            resultType="cn.iocoder.yudao.module.statistics.service.member.bo.MemberAreaStatisticsRespBO">
         SELECT area_id, COUNT(1) AS userCount
         FROM member_user
         WHERE deleted = FALSE

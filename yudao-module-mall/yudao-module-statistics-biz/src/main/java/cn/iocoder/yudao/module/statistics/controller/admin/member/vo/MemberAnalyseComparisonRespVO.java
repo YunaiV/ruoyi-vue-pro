@@ -7,13 +7,11 @@ import lombok.Data;
 @Data
 public class MemberAnalyseComparisonRespVO {
 
-    // TODO @疯狂：这个字段，要不改成注册用户量；registerUserCount;
     @Schema(description = "会员数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    private Integer userCount;
+    private Integer registerUserCount;
 
-    // TODO @疯狂：这个字段，名字改成 visitUserCount；有访问，就算活跃；
     @Schema(description = "活跃用户数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    private Integer activeUserCount;
+    private Integer visitUserCount;
 
     @Schema(description = "充值会员数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "221")
     private Integer rechargeUserCount;

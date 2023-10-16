@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.statistics.controller.admin.member;
 import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.module.statistics.controller.admin.common.vo.DataComparisonRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.*;
-import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeStatisticsComparisonRespVO;
 import cn.iocoder.yudao.module.statistics.service.member.MemberStatisticsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -79,7 +79,7 @@ public class MemberStatisticsController {
     @GetMapping("/user-count-comparison")
     @Operation(summary = "获得用户数量对照")
     @PreAuthorize("@ss.hasPermission('statistics:member:query')")
-    public CommonResult<TradeStatisticsComparisonRespVO<MemberCountRespVO>> getUserCountComparison() {
+    public CommonResult<DataComparisonRespVO<MemberCountRespVO>> getUserCountComparison() {
         return success(memberStatisticsService.getUserCountComparison());
     }
 
