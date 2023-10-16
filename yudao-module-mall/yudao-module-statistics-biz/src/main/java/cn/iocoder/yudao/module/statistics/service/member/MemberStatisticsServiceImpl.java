@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.module.statistics.service.member;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.NumberUtil;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.ip.core.enums.AreaTypeEnum;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.*;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeStatisticsComparisonRespVO;
+import cn.iocoder.yudao.module.statistics.convert.member.MemberStatisticsConvert;
 import cn.iocoder.yudao.module.statistics.dal.mysql.member.MemberStatisticsMapper;
 import cn.iocoder.yudao.module.statistics.service.infra.ApiAccessLogStatisticsService;
 import cn.iocoder.yudao.module.statistics.service.pay.PayWalletStatisticsService;
@@ -13,7 +16,6 @@ import cn.iocoder.yudao.module.statistics.service.trade.TradeOrderStatisticsServ
 import cn.iocoder.yudao.module.statistics.service.trade.TradeStatisticsService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-import cn.iocoder.yudao.module.statistics.convert.member.MemberStatisticsConvert;
 
 import javax.annotation.Resource;
 import java.time.Duration;
@@ -94,7 +96,7 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
             atv = NumberUtil.div(payPrice, payUserCount).intValue();
         }
         return new MemberAnalyseRespVO()
-                .setVisitorCount(apiAccessLogStatisticsService.getVisitorUserCount(beginTime, endTime))
+                .setVisitorCount(apiAccessLogStatisticsService.getVisitorUserCount(UserTypeEnum.MEMBER.getValue(), beginTime, endTime))
                 .setOrderUserCount(tradeOrderStatisticsService.getOrderUserCount(beginTime, endTime))
                 .setPayUserCount(payUserCount)
                 .setAtv(atv)
@@ -106,7 +108,7 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
                 .map(RechargeSummaryRespBO::getRechargeUserCount).orElse(0);
         return new MemberAnalyseComparisonRespVO()
                 .setUserCount(memberStatisticsMapper.selectUserCount(beginTime, endTime))
-                .setActiveUserCount(apiAccessLogStatisticsService.getActiveUserCount(beginTime, endTime))
+                .setActiveUserCount(apiAccessLogStatisticsService.getActiveUserCount(UserTypeEnum.MEMBER.getValue(), beginTime, endTime))
                 .setRechargeUserCount(rechargeUserCount);
     }
 
@@ -114,6 +116,30 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
     public List<MemberSexStatisticsRespVO> getMemberSexStatisticsList() {
         // TODO @疯狂：需要考虑，用户性别为空，则是“未知”
         return memberStatisticsMapper.selectSummaryListBySex();
+    }
+
+    @Override
+    public List<MemberRegisterCountRespVO> getMemberRegisterCountList(LocalDateTime beginTime, LocalDateTime endTime) {
+        return memberStatisticsMapper.selectListByCreateTimeBetween(beginTime, endTime);
+    }
+
+    @Override
+    public TradeStatisticsComparisonRespVO<MemberCountRespVO> getUserCountComparison() {
+        // 今日时间范围
+        LocalDateTime beginOfToday = LocalDateTimeUtil.beginOfDay(LocalDateTime.now());
+        LocalDateTime endOfToday = LocalDateTimeUtil.endOfDay(beginOfToday);
+        // 昨日时间范围
+        LocalDateTime beginOfYesterday = LocalDateTimeUtil.beginOfDay(beginOfToday.minusDays(1));
+        LocalDateTime endOfYesterday = LocalDateTimeUtil.endOfDay(beginOfYesterday);
+        return new TradeStatisticsComparisonRespVO<MemberCountRespVO>()
+                .setValue(getUserCount(beginOfToday, endOfToday))
+                .setReference(getUserCount(beginOfYesterday, endOfYesterday));
+    }
+
+    private MemberCountRespVO getUserCount(LocalDateTime beginTime, LocalDateTime endTime) {
+        return new MemberCountRespVO()
+                .setCreateUserCount(memberStatisticsMapper.selectUserCount(beginTime, endTime))
+                .setVisitUserCount(apiAccessLogStatisticsService.getVisitorUserCount(UserTypeEnum.MEMBER.getValue(), beginTime, endTime));
     }
 
 }

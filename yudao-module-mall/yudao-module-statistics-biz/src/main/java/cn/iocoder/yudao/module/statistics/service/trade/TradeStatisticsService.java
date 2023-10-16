@@ -33,7 +33,7 @@ public interface TradeStatisticsService {
      * 获得交易状况统计
      *
      * @param beginTime 开始时间
-     * @param endTime 结束时间
+     * @param endTime   结束时间
      * @return 统计数据对照
      */
     Integer getExpensePrice(LocalDateTime beginTime, LocalDateTime endTime);
@@ -41,6 +41,8 @@ public interface TradeStatisticsService {
     /**
      * 获得交易状况明细
      *
+     * @param beginTime 开始时间
+     * @param endTime   结束时间
      * @return 统计数据列表
      */
     List<TradeTrendSummaryRespVO> getTradeStatisticsList(LocalDateTime beginTime, LocalDateTime endTime);

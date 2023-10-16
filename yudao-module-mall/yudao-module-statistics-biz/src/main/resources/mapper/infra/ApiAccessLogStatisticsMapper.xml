@@ -2,23 +2,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.iocoder.yudao.module.statistics.dal.mysql.infra.ApiAccessLogStatisticsMapper">
 
-    <select id="selectCountByIp" resultType="java.lang.Integer">
-        <!-- TODO @疯狂：distinct 会不会更合适哈 -->
-        SELECT COUNT(1)
+    <select id="selectIpCountByCreateTimeBetween" resultType="java.lang.Integer">
+        SELECT COUNT(DISTINCT user_ip)
         FROM infra_api_access_log
-        WHERE create_time BETWEEN #{beginTime} AND #{endTime}
-          AND deleted = FALSE
-        GROUP BY user_ip
+        WHERE user_type = #{userType}
+        AND create_time BETWEEN #{beginTime} AND #{endTime}
+        AND deleted = FALSE
     </select>
 
-    <select id="selectCountByUserId" resultType="java.lang.Integer">
-        <!-- TODO @疯狂：distinct 会不会更合适哈 -->
-        SELECT COUNT(1)
+    <select id="selectUserCountByCreateTimeBetween" resultType="java.lang.Integer">
+        SELECT COUNT(DISTINCT user_id)
         FROM infra_api_access_log
         WHERE user_id > 0
+          AND user_type = #{userType}
           AND create_time BETWEEN #{beginTime} AND #{endTime}
           AND deleted = FALSE
-        GROUP BY user_id
     </select>
 
 </mapper>

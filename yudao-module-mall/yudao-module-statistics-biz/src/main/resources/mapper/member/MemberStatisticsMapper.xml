@@ -30,4 +30,14 @@
         </if>
     </select>
 
+    <select id="selectListByCreateTimeBetween"
+            resultType="cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberRegisterCountRespVO">
+        SELECT DATE_FORMAT(create_time, '%Y-%m-%d') AS date,
+               count(1)                             AS count
+        FROM member_user
+        WHERE create_time BETWEEN #{beginTime} AND #{endTime}
+          AND deleted = FALSE
+        GROUP BY date
+    </select>
+
 </mapper>

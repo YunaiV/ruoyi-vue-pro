@@ -46,4 +46,11 @@
         GROUP BY wallet_id
     </select>
 
+    <select id="selectRechargePriceSummary" resultType="java.lang.Integer">
+        SELECT IFNULL(SUM(pay_price), 0)
+        FROM pay_wallet_recharge
+        WHERE pay_status = #{payStatus}
+          AND deleted = FALSE
+    </select>
+
 </mapper>

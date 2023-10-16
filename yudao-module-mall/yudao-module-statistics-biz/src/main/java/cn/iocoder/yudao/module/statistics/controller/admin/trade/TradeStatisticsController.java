@@ -5,7 +5,12 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.*;
 import cn.iocoder.yudao.module.statistics.convert.trade.TradeStatisticsConvert;
+import cn.iocoder.yudao.module.statistics.service.trade.AfterSaleStatisticsService;
+import cn.iocoder.yudao.module.statistics.service.trade.BrokerageStatisticsService;
+import cn.iocoder.yudao.module.statistics.service.trade.TradeOrderStatisticsService;
 import cn.iocoder.yudao.module.statistics.service.trade.TradeStatisticsService;
+import cn.iocoder.yudao.module.trade.enums.aftersale.AfterSaleStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
@@ -31,6 +37,12 @@ public class TradeStatisticsController {
 
     @Resource
     private TradeStatisticsService tradeStatisticsService;
+    @Resource
+    private TradeOrderStatisticsService tradeOrderStatisticsService;
+    @Resource
+    private AfterSaleStatisticsService afterSaleStatisticsService;
+    @Resource
+    private BrokerageStatisticsService brokerageStatisticsService;
 
     @GetMapping("/summary")
     @Operation(summary = "获得交易统计")
@@ -66,6 +78,30 @@ public class TradeStatisticsController {
         // 导出 Excel
         List<TradeTrendSummaryExcelVO> data = TradeStatisticsConvert.INSTANCE.convertList02(list);
         ExcelUtils.write(response, "交易状况.xls", "数据", TradeTrendSummaryExcelVO.class, data);
+    }
+
+    @GetMapping("/order-count")
+    @Operation(summary = "获得交易订单数量")
+    @PreAuthorize("@ss.hasPermission('statistics:trade:query')")
+    public CommonResult<TradeOrderCountRespVO> getOrderCount() {
+        TradeOrderCountRespVO vo = tradeOrderStatisticsService.getOrderCount();
+        vo.setAfterSaleApply(afterSaleStatisticsService.getCountByStatus(AfterSaleStatusEnum.APPLY))
+                .setAuditingWithdraw(brokerageStatisticsService.getWithdrawCountByStatus(BrokerageWithdrawStatusEnum.AUDITING));
+        return success(vo);
+    }
+
+    @GetMapping("/order-comparison")
+    @Operation(summary = "获得交易订单数量")
+    @PreAuthorize("@ss.hasPermission('statistics:trade:query')")
+    public CommonResult<TradeStatisticsComparisonRespVO<TradeOrderSummaryRespVO>> getOrderComparison() {
+        return success(tradeOrderStatisticsService.getOrderComparison());
+    }
+
+    @GetMapping("/order-count-trend")
+    @Operation(summary = "获得订单量趋势统计")
+    @PreAuthorize("@ss.hasPermission('statistics:trade:query')")
+    public CommonResult<List<TradeStatisticsComparisonRespVO<TradeOrderTrendRespVO>>> getOrderCountTrendComparison(@Valid TradeOrderTrendReqVO reqVO) {
+        return success(tradeOrderStatisticsService.getOrderCountTrendComparison(reqVO));
     }
 
 }

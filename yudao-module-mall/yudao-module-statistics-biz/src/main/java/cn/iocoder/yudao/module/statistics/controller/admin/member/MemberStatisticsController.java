@@ -4,6 +4,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.*;
+import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeStatisticsComparisonRespVO;
 import cn.iocoder.yudao.module.statistics.service.member.MemberStatisticsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -73,6 +74,21 @@ public class MemberStatisticsController {
                 t -> new MemberTerminalStatisticsRespVO()
                         .setTerminal(t.getTerminal()).setUserCount(t.getTerminal() * 100));
         return success(list);
+    }
+
+    @GetMapping("/user-count-comparison")
+    @Operation(summary = "获得用户数量对照")
+    @PreAuthorize("@ss.hasPermission('statistics:member:query')")
+    public CommonResult<TradeStatisticsComparisonRespVO<MemberCountRespVO>> getUserCountComparison() {
+        return success(memberStatisticsService.getUserCountComparison());
+    }
+
+    @GetMapping("/register-count-list")
+    @Operation(summary = "获得会员注册数量列表")
+    @PreAuthorize("@ss.hasPermission('statistics:member:query')")
+    public CommonResult<List<MemberRegisterCountRespVO>> getMemberRegisterCountList(MemberAnalyseReqVO reqVO) {
+        return success(memberStatisticsService.getMemberRegisterCountList(
+                ArrayUtil.get(reqVO.getTimes(), 0), ArrayUtil.get(reqVO.getTimes(), 1)));
     }
 
 }

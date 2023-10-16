@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.statistics.service.trade;
 
 import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberAreaStatisticsRespVO;
+import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.*;
 import cn.iocoder.yudao.module.statistics.service.trade.bo.TradeOrderSummaryRespBO;
 
 import java.time.LocalDateTime;
@@ -59,5 +60,27 @@ public interface TradeOrderStatisticsService {
      * @return 支付用户金额
      */
     Integer getOrderPayPrice(LocalDateTime beginTime, LocalDateTime endTime);
+
+    /**
+     * 获得交易订单数量
+     *
+     * @return 订单数量
+     */
+    TradeOrderCountRespVO getOrderCount();
+
+    /**
+     * 交易订单销售额对照
+     *
+     * @return 销售额对照
+     */
+    TradeStatisticsComparisonRespVO<TradeOrderSummaryRespVO> getOrderComparison();
+
+    /**
+     * 获得订单量趋势统计
+     *
+     * @param reqVO 统计参数
+     * @return 订单量趋势统计
+     */
+    List<TradeStatisticsComparisonRespVO<TradeOrderTrendRespVO>> getOrderCountTrendComparison(TradeOrderTrendReqVO reqVO);
 
 }
