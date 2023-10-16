@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.statistics.controller.admin.member.vo;
 
-import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeStatisticsComparisonRespVO;
+import cn.iocoder.yudao.module.statistics.controller.admin.common.vo.DataComparisonRespVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -8,9 +8,8 @@ import lombok.Data;
 @Data
 public class MemberAnalyseRespVO {
 
-    // TODO @疯狂：这个字段改成 visitUserCount，保持和 userCount 字段统一
     @Schema(description = "访客数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    private Integer visitorCount;
+    private Integer visitUserCount;
 
     @Schema(description = "下单用户数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer orderUserCount;
@@ -22,6 +21,6 @@ public class MemberAnalyseRespVO {
     private Integer atv;
 
     @Schema(description = "对照数据", requiredMode = Schema.RequiredMode.REQUIRED)
-    private TradeStatisticsComparisonRespVO<MemberAnalyseComparisonRespVO> comparison;
+    private DataComparisonRespVO<MemberAnalyseDataRespVO> comparison;
 
 }

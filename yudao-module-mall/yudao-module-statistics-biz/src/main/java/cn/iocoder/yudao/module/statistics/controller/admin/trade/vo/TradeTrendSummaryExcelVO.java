@@ -22,7 +22,7 @@ public class TradeTrendSummaryExcelVO {
     private LocalDate date;
 
     @ExcelProperty(value = "营业额", converter = MoneyConvert.class)
-    private Integer turnover;
+    private Integer turnoverPrice;
 
     @ExcelProperty(value = "商品支付金额", converter = MoneyConvert.class)
     private Integer orderPayPrice;
@@ -34,7 +34,7 @@ public class TradeTrendSummaryExcelVO {
     private Integer expensePrice;
 
     @ExcelProperty(value = "余额支付金额", converter = MoneyConvert.class)
-    private Integer balancePrice;
+    private Integer orderWalletPayPrice;
 
     @ExcelProperty(value = "支付佣金金额", converter = MoneyConvert.class)
     private Integer brokerageSettlementPrice;

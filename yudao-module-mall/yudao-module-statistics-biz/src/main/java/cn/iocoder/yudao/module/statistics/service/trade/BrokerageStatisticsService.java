@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.statistics.service.trade;
 
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum;
+
 import java.time.LocalDateTime;
 
 /**
@@ -18,5 +20,13 @@ public interface BrokerageStatisticsService {
      * @return 已结算的佣金金额
      */
     Integer getBrokerageSettlementPriceSummary(LocalDateTime beginTime, LocalDateTime endTime);
+
+    /**
+     * 获取指定状态的提现记录数量
+     *
+     * @param status 提现记录状态
+     * @return 提现记录数量
+     */
+    Long getWithdrawCountByStatus(BrokerageWithdrawStatusEnum status);
 
 }

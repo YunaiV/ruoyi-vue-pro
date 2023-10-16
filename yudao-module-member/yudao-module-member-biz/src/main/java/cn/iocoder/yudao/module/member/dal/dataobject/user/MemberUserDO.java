@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.member.dal.dataobject.user;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.ip.core.Area;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
@@ -60,6 +61,11 @@ public class MemberUserDO extends TenantBaseDO {
      * 注册 IP
      */
     private String registerIp;
+    /**
+     * 注册终端
+     * 枚举 {@link TerminalEnum}
+     */
+    private Integer registerTerminal;
     /**
      * 最后登录IP
      */
