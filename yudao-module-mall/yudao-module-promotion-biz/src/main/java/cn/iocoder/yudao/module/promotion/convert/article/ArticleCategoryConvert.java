@@ -29,8 +29,6 @@ public interface ArticleCategoryConvert {
 
     PageResult<ArticleCategoryRespVO> convertPage(PageResult<ArticleCategoryDO> page);
 
-    List<ArticleCategoryExcelVO> convertList02(List<ArticleCategoryDO> list);
-
     List<ArticleCategorySimpleRespVO> convertList03(List<ArticleCategoryDO> list);
 
     List<AppArticleCategoryRespVO> convertList04(List<ArticleCategoryDO> categoryList);

@@ -47,13 +47,13 @@ public class AppCombinationRecordController {
     public CommonResult<AppCombinationRecordSummaryRespVO> getCombinationRecordSummary() {
         AppCombinationRecordSummaryRespVO summary = new AppCombinationRecordSummaryRespVO();
         // 1. 获得拼团参与用户数量
-        Long count = combinationRecordService.getCombinationUserCount();
-        if (count == 0) {
+        Long userCount = combinationRecordService.getCombinationUserCount();
+        if (userCount == 0) {
             summary.setAvatars(Collections.emptyList());
-            summary.setUserCount(count);
+            summary.setUserCount(userCount);
             return success(summary);
         }
-        summary.setUserCount(count);
+        summary.setUserCount(userCount);
 
         // 2. 获得拼团记录头像
         List<CombinationRecordDO> records = combinationRecordService.getLatestCombinationRecordList(

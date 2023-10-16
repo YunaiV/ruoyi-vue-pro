@@ -192,7 +192,6 @@ public interface CombinationActivityConvert {
         return result;
     }
 
-
     default AppCombinationRecordDetailRespVO convert(Long userId, CombinationRecordDO headRecord, List<CombinationRecordDO> memberRecords) {
         AppCombinationRecordDetailRespVO respVO = new AppCombinationRecordDetailRespVO()
                 .setHeadRecord(convert(headRecord)).setMemberRecords(convertList3(memberRecords));

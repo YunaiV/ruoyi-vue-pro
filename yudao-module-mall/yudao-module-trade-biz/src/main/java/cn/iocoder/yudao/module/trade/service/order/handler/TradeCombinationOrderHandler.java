@@ -70,8 +70,8 @@ public class TradeCombinationOrderHandler implements TradeOrderHandler {
                 TradeOrderConvert.INSTANCE.convert(order, item));
 
         // 3. 更新拼团相关信息到订单
-        // TODO 芋艿，只需要更新 record。 如果创建订单时自己是团长的情况下 combinationHeadId 是为 null 的，
-        //  设置团长编号这个操作时在订单是否后创建拼团记录时才设置的，所以支付完创建拼团记录后需要设置一下记录编号和团长编号
+        // 为什么几个字段都要更新？原因是：
+        // 如果创建订单时自己是团长的情况下 combinationHeadId 是为 null 的，设置团长编号这个操作时在订单是否后创建拼团记录时才设置的。
         orderUpdateService.updateOrderCombinationInfo(order.getId(), order.getCombinationActivityId(),
                 combinationRecord.getCombinationRecordId(), combinationRecord.getCombinationHeadId());
     }

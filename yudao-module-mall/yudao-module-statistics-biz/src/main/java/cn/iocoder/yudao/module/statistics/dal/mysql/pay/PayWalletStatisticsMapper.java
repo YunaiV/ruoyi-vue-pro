@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.statistics.dal.mysql.pay;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.module.statistics.dal.dataobject.trade.TradeStatisticsDO;
 import cn.iocoder.yudao.module.statistics.service.pay.bo.RechargeSummaryRespBO;
 import cn.iocoder.yudao.module.statistics.service.trade.bo.WalletSummaryRespBO;
 import org.apache.ibatis.annotations.Mapper;
@@ -15,7 +14,8 @@ import java.time.LocalDateTime;
  * @author owen
  */
 @Mapper
-public interface PayWalletStatisticsMapper extends BaseMapperX<TradeStatisticsDO> {
+@SuppressWarnings("rawtypes")
+public interface PayWalletStatisticsMapper extends BaseMapperX {
 
     // TODO 芋艿：已经 review；
     WalletSummaryRespBO selectRechargeSummaryByPayTimeBetween(@Param("beginTime") LocalDateTime beginTime,
@@ -36,5 +36,7 @@ public interface PayWalletStatisticsMapper extends BaseMapperX<TradeStatisticsDO
     RechargeSummaryRespBO selectRechargeSummaryGroupByWalletId(@Param("beginTime") LocalDateTime beginTime,
                                                                @Param("endTime") LocalDateTime endTime,
                                                                @Param("payStatus") Boolean payStatus);
+
+    Integer selectRechargePriceSummary(@Param("payStatus") Integer payStatus);
 
 }

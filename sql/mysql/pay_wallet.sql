@@ -125,3 +125,58 @@ CREATE TABLE `pay_wallet_recharge`  (
     `tenant_id` bigint(0) NOT NULL DEFAULT 0 COMMENT '租户编号',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '会员钱包充值' ROW_FORMAT = Dynamic;
+
+-- 钱包充值套餐菜单脚本
+
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status, component_name
+)
+VALUES (
+           '钱包管理', '', 1, 5, 1117,
+           'wallet', 'ep:caret-right', '', 0, ''
+       );
+SELECT @parentId := LAST_INSERT_ID();
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status, component_name
+)
+VALUES (
+           '充值套餐', '', 2, 2, @parentId,
+           'wallet-recharge-package', 'fa:leaf', 'pay/wallet/rechargePackage/index', 0, 'WalletRechargePackage'
+       );
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+           '钱包充值套餐查询', 'pay:wallet-recharge-package:query', 3, 1, @parentId,
+           '', '', '', 0
+       );
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+           '钱包充值套餐创建', 'pay:wallet-recharge-package:create', 3, 2, @parentId,
+           '', '', '', 0
+       );
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+           '钱包充值套餐更新', 'pay:wallet-recharge-package:update', 3, 3, @parentId,
+           '', '', '', 0
+       );
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+           '钱包充值套餐删除', 'pay:wallet-recharge-package:delete', 3, 4, @parentId,
+           '', '', '', 0
+       );

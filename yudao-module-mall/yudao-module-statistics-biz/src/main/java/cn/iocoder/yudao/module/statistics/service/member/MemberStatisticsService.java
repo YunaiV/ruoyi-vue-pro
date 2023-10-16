@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.module.statistics.service.member;
 
-import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberAnalyseRespVO;
-import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberAreaStatisticsRespVO;
-import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberSexStatisticsRespVO;
-import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberSummaryRespVO;
+import cn.iocoder.yudao.module.statistics.controller.admin.common.vo.DataComparisonRespVO;
+import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,15 +21,15 @@ public interface MemberStatisticsService {
      */
     MemberSummaryRespVO getMemberSummary();
 
-    // TODO 芋艿：已经 review
     /**
-     * 获取用户分析数据
+     * 获取会员分析对照数据
      *
      * @param beginTime 起始时间
      * @param endTime   截止时间
-     * @return 用户分析数据
+     * @return 会员分析对照数据
      */
-    MemberAnalyseRespVO getMemberAnalyse(LocalDateTime beginTime, LocalDateTime endTime);
+    DataComparisonRespVO<MemberAnalyseDataRespVO> getMemberAnalyseComparisonData(LocalDateTime beginTime,
+                                                                                 LocalDateTime endTime);
 
     /**
      * 按照省份，获得会员统计列表
@@ -46,5 +44,28 @@ public interface MemberStatisticsService {
      * @return 会员统计列表
      */
     List<MemberSexStatisticsRespVO> getMemberSexStatisticsList();
+
+    /**
+     * 按照终端，获得会员统计列表
+     *
+     * @return 会员统计列表
+     */
+    List<MemberTerminalStatisticsRespVO> getRegisterTerminalStatisticsList();
+
+    /**
+     * 获取用户注册数量列表
+     *
+     * @param beginTime 起始时间
+     * @param endTime   截止时间
+     * @return 注册数量列表
+     */
+    List<MemberRegisterCountRespVO> getMemberRegisterCountList(LocalDateTime beginTime, LocalDateTime endTime);
+
+    /**
+     * 获得用户数量量统计对照
+     *
+     * @return 用户数量量统计对照
+     */
+    DataComparisonRespVO<MemberCountRespVO> getUserCountComparison();
 
 }

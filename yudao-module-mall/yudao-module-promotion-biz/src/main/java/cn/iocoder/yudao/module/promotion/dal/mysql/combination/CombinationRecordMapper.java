@@ -99,10 +99,10 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
         LambdaQueryWrapperX<CombinationRecordDO> queryWrapper = new LambdaQueryWrapperX<CombinationRecordDO>()
                 .eqIfPresent(CombinationRecordDO::getStatus, pageVO.getStatus())
                 .betweenIfPresent(CombinationRecordDO::getCreateTime, pageVO.getCreateTime());
+        // 如果 headId 非空，说明查询指定团的团长 + 团员的拼团记录
         if (pageVO.getHeadId() != null) {
-            queryWrapper.eq(CombinationRecordDO::getId, pageVO.getHeadId())
-                    .or()
-                    .eq(CombinationRecordDO::getHeadId, pageVO.getHeadId());
+            queryWrapper.eq(CombinationRecordDO::getId, pageVO.getHeadId()) // 团长
+                    .or().eq(CombinationRecordDO::getHeadId, pageVO.getHeadId()); // 团员
         }
         return selectPage(pageVO, queryWrapper);
     }
@@ -127,6 +127,7 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
      *
      * @return 参加过拼团的用户数
      */
+    // TODO @puhui999：1）方法名，直接 selectUserCount；2）COUNT(DISTINCT(user_id)) 就可以啦，不用 group by 哈
     default Long selectUserDistinctCount() {
         return selectCount(new QueryWrapper<CombinationRecordDO>()
                 .select("DISTINCT (user_id)")

@@ -2,9 +2,10 @@ package cn.iocoder.yudao.module.promotion.controller.admin.article;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.*;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.ArticleCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.ArticlePageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.ArticleRespVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.ArticleUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.convert.article.ArticleConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleDO;
 import cn.iocoder.yudao.module.promotion.service.article.ArticleService;
@@ -16,14 +17,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Tag(name = "管理后台 - 文章管理")
 @RestController
@@ -67,33 +63,12 @@ public class ArticleController {
         return success(ArticleConvert.INSTANCE.convert(article));
     }
 
-    @GetMapping("/list")
-    @Operation(summary = "获得文章管理列表")
-    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @PreAuthorize("@ss.hasPermission('promotion:article:query')")
-    public CommonResult<List<ArticleRespVO>> getArticleList(@RequestParam("ids") Collection<Long> ids) {
-        List<ArticleDO> list = articleService.getArticleList(ids);
-        return success(ArticleConvert.INSTANCE.convertList(list));
-    }
-
     @GetMapping("/page")
     @Operation(summary = "获得文章管理分页")
     @PreAuthorize("@ss.hasPermission('promotion:article:query')")
     public CommonResult<PageResult<ArticleRespVO>> getArticlePage(@Valid ArticlePageReqVO pageVO) {
         PageResult<ArticleDO> pageResult = articleService.getArticlePage(pageVO);
         return success(ArticleConvert.INSTANCE.convertPage(pageResult));
-    }
-
-    @GetMapping("/export-excel")
-    @Operation(summary = "导出文章管理 Excel")
-    @PreAuthorize("@ss.hasPermission('promotion:article:export')")
-    @OperateLog(type = EXPORT)
-    public void exportArticleExcel(@Valid ArticleExportReqVO exportReqVO,
-                                   HttpServletResponse response) throws IOException {
-        List<ArticleDO> list = articleService.getArticleList(exportReqVO);
-        // 导出 Excel
-        List<ArticleExcelVO> datas = ArticleConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "文章管理.xls", "数据", ArticleExcelVO.class, datas);
     }
 
 }

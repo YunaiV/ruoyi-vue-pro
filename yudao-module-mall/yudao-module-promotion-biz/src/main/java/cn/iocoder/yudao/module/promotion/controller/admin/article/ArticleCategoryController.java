@@ -3,8 +3,6 @@ package cn.iocoder.yudao.module.promotion.controller.admin.article;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.*;
 import cn.iocoder.yudao.module.promotion.convert.article.ArticleCategoryConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleCategoryDO;
@@ -17,15 +15,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Tag(name = "管理后台 - 文章分类")
 @RestController
@@ -65,23 +59,14 @@ public class ArticleCategoryController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('promotion:article-category:query')")
     public CommonResult<ArticleCategoryRespVO> getArticleCategory(@RequestParam("id") Long id) {
-        ArticleCategoryDO articleCategory = articleCategoryService.getArticleCategory(id);
-        return success(ArticleCategoryConvert.INSTANCE.convert(articleCategory));
-    }
-
-    @GetMapping("/list")
-    @Operation(summary = "获得文章分类列表")
-    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @PreAuthorize("@ss.hasPermission('promotion:article-category:query')")
-    public CommonResult<List<ArticleCategoryRespVO>> getArticleCategoryList(@RequestParam("ids") Collection<Long> ids) {
-        List<ArticleCategoryDO> list = articleCategoryService.getArticleCategoryList(ids);
-        return success(ArticleCategoryConvert.INSTANCE.convertList(list));
+        ArticleCategoryDO category = articleCategoryService.getArticleCategory(id);
+        return success(ArticleCategoryConvert.INSTANCE.convert(category));
     }
 
     @GetMapping("/list-all-simple")
     @Operation(summary = "获取文章分类精简信息列表", description = "只包含被开启的文章分类，主要用于前端的下拉选项")
     public CommonResult<List<ArticleCategorySimpleRespVO>> getSimpleDeptList() {
-        // 获得部门列表，只要开启状态的
+        // 获得分类列表，只要开启状态的
         List<ArticleCategoryDO> list = articleCategoryService.getArticleCategoryListByStatus(CommonStatusEnum.ENABLE.getStatus());
         // 降序排序后，返回给前端
         list.sort(Comparator.comparing(ArticleCategoryDO::getSort).reversed());
@@ -94,18 +79,6 @@ public class ArticleCategoryController {
     public CommonResult<PageResult<ArticleCategoryRespVO>> getArticleCategoryPage(@Valid ArticleCategoryPageReqVO pageVO) {
         PageResult<ArticleCategoryDO> pageResult = articleCategoryService.getArticleCategoryPage(pageVO);
         return success(ArticleCategoryConvert.INSTANCE.convertPage(pageResult));
-    }
-
-    @GetMapping("/export-excel")
-    @Operation(summary = "导出文章分类 Excel")
-    @PreAuthorize("@ss.hasPermission('promotion:article-category:export')")
-    @OperateLog(type = EXPORT)
-    public void exportArticleCategoryExcel(@Valid ArticleCategoryExportReqVO exportReqVO,
-                                           HttpServletResponse response) throws IOException {
-        List<ArticleCategoryDO> list = articleCategoryService.getArticleCategoryList(exportReqVO);
-        // 导出 Excel
-        List<ArticleCategoryExcelVO> datas = ArticleCategoryConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "文章分类.xls", "数据", ArticleCategoryExcelVO.class, datas);
     }
 
 }
