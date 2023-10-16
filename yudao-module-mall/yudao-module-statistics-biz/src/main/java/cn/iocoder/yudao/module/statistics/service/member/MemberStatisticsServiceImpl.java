@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.statistics.service.member;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.ip.core.Area;
 import cn.iocoder.yudao.framework.ip.core.enums.AreaTypeEnum;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.statistics.controller.admin.common.vo.DataComparisonRespVO;
@@ -60,7 +61,6 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
     @Override
     public List<MemberAreaStatisticsRespVO> getMemberAreaStatisticsList() {
         // 统计用户
-        // TODO @疯狂：要处理下，未知省份；就是没填写省份的情况；
         // TODO @疯狂：可能得把每个省的用户，都查询出来，然后去 order 那边 in；因为要按照这些人为基础来计算；；用户规模量大可能不太好，但是暂时就先这样搞吧 = =
         Map<Integer, Integer> userCountMap = convertMap(memberStatisticsMapper.selectSummaryListByAreaId(),
                 vo -> AreaUtils.getParentIdByType(vo.getAreaId(), AreaTypeEnum.PROVINCE),
@@ -74,7 +74,9 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
                         .setOrderPayUserCount(a.getOrderPayUserCount() + b.getOrderPayUserCount())
                         .setOrderPayPrice(a.getOrderPayPrice() + b.getOrderPayPrice()));
         // 拼接数据
-        return MemberStatisticsConvert.INSTANCE.convertList(AreaUtils.getByType(AreaTypeEnum.PROVINCE, area -> area), userCountMap, orderMap);
+        List<Area> areaList = AreaUtils.getByType(AreaTypeEnum.PROVINCE, area -> area);
+        areaList.add(new Area().setId(null).setName("未知"));
+        return MemberStatisticsConvert.INSTANCE.convertList(areaList, userCountMap, orderMap);
     }
 
     // TODO @疯狂：这个方法，要不拆成：1）controller 调用 getMemberAnalyseComparisonData；2）tradeOrderStatisticsService.getPayUserCount；3）tradeOrderStatisticsService.getOrderPayPrice；4）。。。
