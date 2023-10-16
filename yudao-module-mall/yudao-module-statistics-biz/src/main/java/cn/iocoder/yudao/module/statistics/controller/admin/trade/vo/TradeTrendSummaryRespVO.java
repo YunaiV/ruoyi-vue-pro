@@ -23,7 +23,7 @@ public class TradeTrendSummaryRespVO {
     private Integer orderPayPrice;
 
     @Schema(description = "余额支付金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    private Integer orderWalletPayPrice;
+    private Integer walletPayPrice;
 
     @Schema(description = "订单退款金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer afterSaleRefundPrice;

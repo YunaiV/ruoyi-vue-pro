@@ -66,7 +66,7 @@ public interface TradeStatisticsConvert {
                 // 营业额 = 商品支付金额 + 充值金额
                 .setTurnoverPrice(tradeStatistics.getOrderPayPrice() + tradeStatistics.getRechargePayPrice())
                 // 支出金额 = 余额支付金额 + 支付佣金金额 + 商品退款金额
-                .setExpensePrice(tradeStatistics.getOrderWalletPayPrice() + tradeStatistics.getBrokerageSettlementPrice() + tradeStatistics.getAfterSaleRefundPrice());
+                .setExpensePrice(tradeStatistics.getWalletPayPrice() + tradeStatistics.getBrokerageSettlementPrice() + tradeStatistics.getAfterSaleRefundPrice());
     }
 
     TradeOrderCountRespVO convert(Long undelivered, Long pickUp, Long afterSaleApply, Long auditingWithdraw);
