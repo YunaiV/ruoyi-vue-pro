@@ -117,7 +117,6 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
 
     @Override
     public List<MemberSexStatisticsRespVO> getMemberSexStatisticsList() {
-        // TODO @疯狂：需要考虑，用户性别为空，则是“未知”
         return memberStatisticsMapper.selectSummaryListBySex();
     }
 
