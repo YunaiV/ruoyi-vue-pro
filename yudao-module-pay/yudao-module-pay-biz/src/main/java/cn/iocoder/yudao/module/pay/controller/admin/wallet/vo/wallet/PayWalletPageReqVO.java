@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.balance;
+package cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.wallet;
 
 import lombok.*;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.pay.controller.admin.wallet;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.balance.PayWalletPageReqVO;
-import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.balance.PayWalletRespVO;
-import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.balance.PayWalletUserReqVO;
+import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.wallet.PayWalletPageReqVO;
+import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.wallet.PayWalletRespVO;
+import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.wallet.PayWalletUserReqVO;
 import cn.iocoder.yudao.module.pay.convert.wallet.PayWalletConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;

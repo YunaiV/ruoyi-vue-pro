@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.balance;
+package cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.wallet;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
