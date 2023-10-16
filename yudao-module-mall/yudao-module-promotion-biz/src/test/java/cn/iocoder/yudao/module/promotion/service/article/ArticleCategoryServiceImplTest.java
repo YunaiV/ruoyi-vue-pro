@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.promotion.service.article;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryExportReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleCategoryDO;
@@ -13,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
@@ -24,6 +22,7 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.ARTICLE_CATEGORY_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
 
+// TODO 芋艿：review 单测
 /**
  * {@link ArticleCategoryServiceImpl} 的单元测试类
  *
@@ -135,41 +134,6 @@ public class ArticleCategoryServiceImplTest extends BaseDbUnitTest {
         assertEquals(1, pageResult.getTotal());
         assertEquals(1, pageResult.getList().size());
         assertPojoEquals(dbArticleCategory, pageResult.getList().get(0));
-    }
-
-    @Test
-    @Disabled  // TODO 请修改 null 为需要的值，然后删除 @Disabled 注解
-    public void testGetArticleCategoryList() {
-        // mock 数据
-        ArticleCategoryDO dbArticleCategory = randomPojo(ArticleCategoryDO.class, o -> { // 等会查询到
-            o.setName(null);
-            o.setPicUrl(null);
-            o.setStatus(null);
-            o.setSort(null);
-            o.setCreateTime(null);
-        });
-        articleCategoryMapper.insert(dbArticleCategory);
-        // 测试 name 不匹配
-        articleCategoryMapper.insert(cloneIgnoreId(dbArticleCategory, o -> o.setName(null)));
-        // 测试 picUrl 不匹配
-        articleCategoryMapper.insert(cloneIgnoreId(dbArticleCategory, o -> o.setPicUrl(null)));
-        // 测试 status 不匹配
-        articleCategoryMapper.insert(cloneIgnoreId(dbArticleCategory, o -> o.setStatus(null)));
-        // 测试 sort 不匹配
-        articleCategoryMapper.insert(cloneIgnoreId(dbArticleCategory, o -> o.setSort(null)));
-        // 测试 createTime 不匹配
-        articleCategoryMapper.insert(cloneIgnoreId(dbArticleCategory, o -> o.setCreateTime(null)));
-        // 准备参数
-        ArticleCategoryExportReqVO reqVO = new ArticleCategoryExportReqVO();
-        reqVO.setName(null);
-        reqVO.setStatus(null);
-        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
-
-        // 调用
-        List<ArticleCategoryDO> list = articleCategoryService.getArticleCategoryList(reqVO);
-        // 断言
-        assertEquals(1, list.size());
-        assertPojoEquals(dbArticleCategory, list.get(0));
     }
 
 }

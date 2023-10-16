@@ -2,10 +2,10 @@ package cn.iocoder.yudao.module.promotion.service.article;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.ArticleCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.ArticleCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.ArticleExportReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.ArticlePageReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.ArticleUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.ArticlePageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.ArticleUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.article.ArticleMapper;
 import org.junit.jupiter.api.Disabled;

@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.module.promotion.service.article;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryExportReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.convert.article.ArticleCategoryConvert;
@@ -14,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -35,10 +31,10 @@ public class ArticleCategoryServiceImpl implements ArticleCategoryService {
     @Override
     public Long createArticleCategory(ArticleCategoryCreateReqVO createReqVO) {
         // 插入
-        ArticleCategoryDO articleCategory = ArticleCategoryConvert.INSTANCE.convert(createReqVO);
-        articleCategoryMapper.insert(articleCategory);
+        ArticleCategoryDO category = ArticleCategoryConvert.INSTANCE.convert(createReqVO);
+        articleCategoryMapper.insert(category);
         // 返回
-        return articleCategory.getId();
+        return category.getId();
     }
 
     @Override
@@ -54,6 +50,8 @@ public class ArticleCategoryServiceImpl implements ArticleCategoryService {
     public void deleteArticleCategory(Long id) {
         // 校验存在
         validateArticleCategoryExists(id);
+        // TODO @puhui999：需要校验下，是不是存在文章
+
         // 删除
         articleCategoryMapper.deleteById(id);
     }
@@ -70,21 +68,8 @@ public class ArticleCategoryServiceImpl implements ArticleCategoryService {
     }
 
     @Override
-    public List<ArticleCategoryDO> getArticleCategoryList(Collection<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return ListUtil.empty();
-        }
-        return articleCategoryMapper.selectBatchIds(ids);
-    }
-
-    @Override
     public PageResult<ArticleCategoryDO> getArticleCategoryPage(ArticleCategoryPageReqVO pageReqVO) {
         return articleCategoryMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public List<ArticleCategoryDO> getArticleCategoryList(ArticleCategoryExportReqVO exportReqVO) {
-        return articleCategoryMapper.selectList(exportReqVO);
     }
 
     @Override

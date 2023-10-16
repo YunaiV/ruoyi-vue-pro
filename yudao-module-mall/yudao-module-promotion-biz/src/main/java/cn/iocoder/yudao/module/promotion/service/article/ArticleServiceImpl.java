@@ -1,12 +1,9 @@
 package cn.iocoder.yudao.module.promotion.service.article;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.ArticleCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.ArticleExportReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.ArticlePageReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.ArticleUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.ArticleCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.ArticlePageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.ArticleUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.convert.article.ArticleConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.article.ArticleMapper;
@@ -14,8 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.ARTICLE_NOT_EXISTS;
@@ -34,6 +29,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public Long createArticle(ArticleCreateReqVO createReqVO) {
+        // TODO @puhui999：需要校验分类存在
         // 插入
         ArticleDO article = ArticleConvert.INSTANCE.convert(createReqVO);
         articleMapper.insert(article);
@@ -45,6 +41,8 @@ public class ArticleServiceImpl implements ArticleService {
     public void updateArticle(ArticleUpdateReqVO updateReqVO) {
         // 校验存在
         validateArticleExists(updateReqVO.getId());
+        // TODO @puhui999：需要校验分类存在
+
         // 更新
         ArticleDO updateObj = ArticleConvert.INSTANCE.convert(updateReqVO);
         articleMapper.updateById(updateObj);
@@ -70,21 +68,8 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public List<ArticleDO> getArticleList(Collection<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return ListUtil.empty();
-        }
-        return articleMapper.selectBatchIds(ids);
-    }
-
-    @Override
     public PageResult<ArticleDO> getArticlePage(ArticlePageReqVO pageReqVO) {
         return articleMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public List<ArticleDO> getArticleList(ArticleExportReqVO exportReqVO) {
-        return articleMapper.selectList(exportReqVO);
     }
 
 }
