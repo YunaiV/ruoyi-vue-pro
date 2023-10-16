@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.pay.controller.app.wallet.vo.transaction;
+package cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.transaction;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -7,7 +7,13 @@ import java.time.LocalDateTime;
 
 @Schema(description = "用户 APP - 钱包流水分页 Response VO")
 @Data
-public class AppPayWalletTransactionRespVO {
+public class PayWalletTransactionRespVO {
+
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    private Long id;
+
+    @Schema(description = "钱包编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "5")
+    private Long walletId;
 
     @Schema(description = "业务分类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer bizType;
@@ -20,5 +26,4 @@ public class AppPayWalletTransactionRespVO {
 
     @Schema(description = "交易时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
-
 }
