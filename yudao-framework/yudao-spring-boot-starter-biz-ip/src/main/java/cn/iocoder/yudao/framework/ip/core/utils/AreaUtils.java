@@ -132,25 +132,31 @@ public class AreaUtils {
         return convertList(areas.values(), func, area -> type.getType().equals(area.getType()));
     }
 
-    // TODO @疯狂：注释写下；
+    /**
+     * 根据区域编号、上级区域类型，获取上级区域编号
+     *
+     * @param id   区域编号
+     * @param type 区域类型
+     * @return 上级区域编号
+     */
     public static Integer getParentIdByType(Integer id, @NonNull AreaTypeEnum type) {
-        // TODO @疯狂：这种不要用 while true；因为万一脏数据，可能会死循环；可以转换成 for (int i = 0; i < Byte.MAX; i++) 一般是优先层级；
-        do {
+        for (int i = 0; i < Byte.MAX_VALUE; i++) {
             Area area = AreaUtils.getArea(id);
             if (area == null) {
                 return null;
             }
-
+            // 情况一：匹配到，返回它
             if (type.getType().equals(area.getType())) {
                 return area.getId();
             }
-
+            // 情况二：找到根节点，返回空
             if (area.getParent() == null || area.getParent().getId() == null) {
                 return null;
             }
-
+            // 其它：继续向上查找
             id = area.getParent().getId();
-        } while (true);
+        }
+        return null;
     }
 
 }

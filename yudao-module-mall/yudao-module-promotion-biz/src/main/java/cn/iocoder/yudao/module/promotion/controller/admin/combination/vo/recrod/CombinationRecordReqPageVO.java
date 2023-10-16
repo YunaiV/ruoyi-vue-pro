@@ -23,6 +23,9 @@ public class CombinationRecordReqPageVO extends PageParam {
     @InEnum(BargainRecordStatusEnum.class)
     private Integer status;
 
+    @Schema(description = "团长编号", example = "1024")
+    private Long headId;
+
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;

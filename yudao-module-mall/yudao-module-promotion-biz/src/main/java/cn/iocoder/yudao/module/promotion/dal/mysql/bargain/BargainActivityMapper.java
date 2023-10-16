@@ -86,7 +86,7 @@ public interface BargainActivityMapper extends BaseMapperX<BargainActivityDO> {
                 .last("LIMIT " + count));
     }
 
-    // TODO @puhui999：是不是返回 BargainActivityDO 更干净哈？
+    // TODO @puhui999：是不是返回 BargainActivityDO 更干净哈？分组后返回 DO 的话需要联表查询
     /**
      * 查询出指定 spuId 的 spu 参加的活动最接近现在的一条记录。多个的话，一个 spuId 对应一个最近的活动编号
      *

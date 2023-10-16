@@ -8,6 +8,7 @@ import lombok.Data;
 @Data
 public class MemberAnalyseRespVO {
 
+    // TODO @疯狂：这个字段改成 visitUserCount，保持和 userCount 字段统一
     @Schema(description = "访客数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer visitorCount;
 
@@ -17,7 +18,7 @@ public class MemberAnalyseRespVO {
     @Schema(description = "成交用户数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer payUserCount;
 
-    @Schema(description = "客单价", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    @Schema(description = "客单价，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer atv;
 
     @Schema(description = "对照数据", requiredMode = Schema.RequiredMode.REQUIRED)

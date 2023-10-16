@@ -48,6 +48,7 @@ public class TradeStatisticsDO extends TenantBaseDO {
      * 总支付金额，单位：分
      */
     private Integer orderPayPrice;
+    // TODO @疯狂：这个字段改成 walletPayPrice，然后挪到 rechargePayCount 前面；
     /**
      * 总支付金额（余额），单位：分
      */

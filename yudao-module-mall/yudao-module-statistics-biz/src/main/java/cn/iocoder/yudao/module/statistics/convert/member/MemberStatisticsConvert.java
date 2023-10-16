@@ -5,6 +5,8 @@ import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.ip.core.Area;
 import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberAreaStatisticsRespVO;
+import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberSummaryRespVO;
+import cn.iocoder.yudao.module.statistics.service.pay.bo.RechargeSummaryRespBO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -35,5 +37,7 @@ public interface MemberStatisticsConvert {
                     .setOrderPayPrice(ObjUtil.defaultIfNull(orderVo.getOrderPayPrice(), 0));
         });
     }
+
+    MemberSummaryRespVO convert(RechargeSummaryRespBO rechargeSummary, Integer expensePrice, Integer userCount);
 
 }
