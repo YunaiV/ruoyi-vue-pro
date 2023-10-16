@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @Mapper
 public interface AfterSaleStatisticsMapper extends BaseMapperX<TradeStatisticsDO> {
 
+    // TODO 芋艿：已 review
     AfterSaleSummaryRespBO selectSummaryByRefundTimeBetween(@Param("beginTime") LocalDateTime beginTime,
                                                             @Param("endTime") LocalDateTime endTime);
 

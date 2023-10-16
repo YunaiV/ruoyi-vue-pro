@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityPageItemRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityRespVO;
@@ -109,6 +110,11 @@ public interface CombinationActivityConvert {
 
     CombinationRecordDO convert(CombinationRecordCreateReqDTO reqDTO);
 
+    default CombinationRecordCreateRespDTO convert4(CombinationRecordDO combinationRecord) {
+        return new CombinationRecordCreateRespDTO().setCombinationActivityId(combinationRecord.getActivityId())
+                .setCombinationRecordId(combinationRecord.getId()).setCombinationHeadId(combinationRecord.getHeadId());
+    }
+
     default CombinationRecordDO convert(CombinationRecordCreateReqDTO reqDTO,
                                         CombinationActivityDO activity, MemberUserRespDTO user,
                                         ProductSpuRespDTO spu, ProductSkuRespDTO sku) {
@@ -172,18 +178,19 @@ public interface CombinationActivityConvert {
 
     PageResult<CombinationRecordPageItemRespVO> convert(PageResult<CombinationRecordDO> result);
 
-    default PageResult<CombinationRecordPageItemRespVO> convert(PageResult<CombinationRecordDO> recordPage, List<CombinationActivityDO> activities) {
+    default PageResult<CombinationRecordPageItemRespVO> convert(PageResult<CombinationRecordDO> recordPage, List<CombinationActivityDO> activities, List<CombinationProductDO> products) {
         PageResult<CombinationRecordPageItemRespVO> result = convert(recordPage);
+        // 拼接关联属性
         Map<Long, CombinationActivityDO> activityMap = convertMap(activities, CombinationActivityDO::getId);
+        Map<Long, List<CombinationProductDO>> productsMap = convertMultiMap(products, CombinationProductDO::getActivityId);
         result.setList(CollectionUtils.convertList(result.getList(), item -> {
             findAndThen(activityMap, item.getActivityId(), activity -> {
-                item.setActivity(convert(activity));
+                item.setActivity(convert(activity).setProducts(convertList2(productsMap.get(item.getActivityId()))));
             });
             return item;
         }));
         return result;
     }
-
 
     default AppCombinationRecordDetailRespVO convert(Long userId, CombinationRecordDO headRecord, List<CombinationRecordDO> memberRecords) {
         AppCombinationRecordDetailRespVO respVO = new AppCombinationRecordDetailRespVO()

@@ -43,6 +43,7 @@
         FROM trade_statistics
         WHERE time BETWEEN #{beginTime} AND #{endTime}
           AND deleted = FALSE
+        <!-- TODO @疯狂：已经不用 group by，它就是每天统计一条； -->
         GROUP BY date
     </select>
 

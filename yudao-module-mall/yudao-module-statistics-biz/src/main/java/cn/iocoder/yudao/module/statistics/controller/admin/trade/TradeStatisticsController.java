@@ -48,9 +48,11 @@ public class TradeStatisticsController {
     @Operation(summary = "获得交易统计")
     @PreAuthorize("@ss.hasPermission('statistics:trade:query')")
     public CommonResult<TradeStatisticsComparisonRespVO<TradeSummaryRespVO>> getTradeSummaryComparison() {
+        // TODO @疯狂：这个要不要 tradeStatisticsService 调用里面的多个方法，组合出最终的 TradeSummaryRespVO；
         return success(tradeStatisticsService.getTradeSummaryComparison());
     }
 
+    // TODO @疯狂：【晚点再改和讨论；等首页的接口出来】这个要不还是叫 analyse，对比选中的时间段，和上一个时间段；类似 MemberStatisticsController 的 getMemberAnalyse
     @GetMapping("/trend/summary")
     @Operation(summary = "获得交易状况统计")
     @PreAuthorize("@ss.hasPermission('statistics:trade:query')")
@@ -60,6 +62,8 @@ public class TradeStatisticsController {
                 ArrayUtil.get(reqVO.getTimes(), 1)));
     }
 
+    // TODO 芋艿：已经 review
+    // TODO @疯狂：这个要不直接叫 list；它即使就是把每条统计拿出来
     @GetMapping("/trend/list")
     @Operation(summary = "获得交易状况明细")
     @PreAuthorize("@ss.hasPermission('statistics:trade:query')")
@@ -69,6 +73,7 @@ public class TradeStatisticsController {
                 ArrayUtil.get(reqVO.getTimes(), 1)));
     }
 
+    // TODO @疯狂：这个要不直接叫 export；它即使就是把每条统计导出
     @GetMapping("/trend/export-excel")
     @Operation(summary = "导出获得交易状况明细 Excel")
     @PreAuthorize("@ss.hasPermission('statistics:trade:export')")

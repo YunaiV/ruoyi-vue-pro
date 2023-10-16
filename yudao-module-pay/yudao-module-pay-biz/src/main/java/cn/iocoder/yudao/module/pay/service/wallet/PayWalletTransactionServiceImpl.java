@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.pay.service.wallet;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.transaction.PayWalletTransactionPageReqVO;
 import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.transaction.AppPayWalletTransactionPageReqVO;
 import cn.iocoder.yudao.module.pay.convert.wallet.PayWalletTransactionConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
@@ -39,7 +40,12 @@ public class PayWalletTransactionServiceImpl implements PayWalletTransactionServ
     public PageResult<PayWalletTransactionDO> getWalletTransactionPage(Long userId, Integer userType,
                                                                        AppPayWalletTransactionPageReqVO pageVO) {
         PayWalletDO wallet = payWalletService.getOrCreateWallet(userId, userType);
-        return payWalletTransactionMapper.selectPage(wallet.getId(), pageVO);
+        return payWalletTransactionMapper.selectPage(wallet.getId(), pageVO.getType(), pageVO);
+    }
+
+    @Override
+    public PageResult<PayWalletTransactionDO> getWalletTransactionPage(PayWalletTransactionPageReqVO pageVO) {
+        return payWalletTransactionMapper.selectPage(pageVO.getWalletId(), null, pageVO);
     }
 
     @Override

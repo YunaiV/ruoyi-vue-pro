@@ -16,25 +16,26 @@ public class TradeTrendSummaryRespVO {
     @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY)
     private LocalDate date;
 
+    // TODO @疯狂，要不加个 turnoverPrice？
     @Schema(description = "营业额", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    private Integer turnover;
+    private Integer turnover; // 营业额 = 商品支付金额 + 充值金额
 
-    @Schema(description = "商品支付金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    @Schema(description = "订单支付金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer orderPayPrice;
+
+    @Schema(description = "订单退款金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    private Integer orderRefundPrice;
+
+    @Schema(description = "支付佣金金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    private Integer brokerageSettlementPrice;
 
     @Schema(description = "充值金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer rechargePrice;
 
     @Schema(description = "支出金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    private Integer expensePrice;
+    private Integer expensePrice; // 余额支付金额 + 支付佣金金额 + 商品退款金额
 
     @Schema(description = "余额支付金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    private Integer balancePrice;
-
-    @Schema(description = "支付佣金金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    private Integer brokerageSettlementPrice;
-
-    @Schema(description = "商品退款金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    private Integer orderRefundPrice;
+    private Integer balancePrice; // TODO @疯狂：这个字段要不改成：walletPayPrice
 
 }

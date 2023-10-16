@@ -57,6 +57,30 @@ public class TradeStatisticsServiceImpl implements TradeStatisticsService {
         return TradeStatisticsConvert.INSTANCE.convert(yesterdayData, beforeYesterdayData, monthData, lastMonthData);
     }
 
+    /**
+     * 统计指定日期的交易数据
+     *
+     * @param days 增加的天数
+     * @return 交易数据
+     */
+    private TradeSummaryRespBO getTradeSummaryByDays(int days) {
+        LocalDateTime date = LocalDateTime.now().plusDays(days);
+        return tradeStatisticsMapper.selectOrderCreateCountSumAndOrderPayPriceSumByTimeBetween(
+                LocalDateTimeUtil.beginOfDay(date), LocalDateTimeUtil.endOfDay(date));
+    }
+
+    /**
+     * 统计指定月份的交易数据
+     *
+     * @param months 增加的月数
+     * @return 交易数据
+     */
+    private TradeSummaryRespBO getTradeSummaryByMonths(int months) {
+        LocalDateTime monthDate = LocalDateTime.now().plusMonths(months);
+        return tradeStatisticsMapper.selectOrderCreateCountSumAndOrderPayPriceSumByTimeBetween(
+                LocalDateTimeUtils.beginOfMonth(monthDate), LocalDateTimeUtils.endOfMonth(monthDate));
+    }
+
     @Override
     public TradeStatisticsComparisonRespVO<TradeTrendSummaryRespVO> getTradeTrendSummaryComparison(LocalDateTime beginTime,
                                                                                                    LocalDateTime endTime) {
@@ -73,6 +97,7 @@ public class TradeStatisticsServiceImpl implements TradeStatisticsService {
         return tradeStatisticsMapper.selectExpensePriceByTimeBetween(beginTime, endTime);
     }
 
+    // TODO @疯狂：是不是直接返回 TradeStatisticsDO；上层在去聚合？
     @Override
     public List<TradeTrendSummaryRespVO> getTradeStatisticsList(LocalDateTime beginTime, LocalDateTime endTime) {
         return tradeStatisticsMapper.selectListByTimeBetween(beginTime, endTime);
@@ -80,6 +105,9 @@ public class TradeStatisticsServiceImpl implements TradeStatisticsService {
 
     @Override
     public String statisticsYesterdayTrade() {
+        // TODO @疯狂：如果已经统计，则跳过；
+        // TODO @疯狂：改成 statisticsTrade，然后传入 days，统计多少天；days 通过 job 传参；方便把历史给统计出来；或者大家有的时候要修复数据（会 fix 业务数据，然后清理统计表），重新统计的时候；
+        // 1. 从各个数据表，统计对应数据
         LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
         LocalDateTime beginTime = LocalDateTimeUtil.beginOfDay(yesterday);
         LocalDateTime endTime = LocalDateTimeUtil.endOfDay(yesterday);
@@ -106,30 +134,6 @@ public class TradeStatisticsServiceImpl implements TradeStatisticsService {
                 brokerageSettlementPrice, walletSummary);
         tradeStatisticsMapper.insert(entity);
         return stopWatch.prettyPrint();
-    }
-
-    /**
-     * 统计指定日期的交易数据
-     *
-     * @param days 增加的天数
-     * @return 交易数据
-     */
-    private TradeSummaryRespBO getTradeSummaryByDays(int days) {
-        LocalDateTime date = LocalDateTime.now().plusDays(days);
-        return tradeStatisticsMapper.selectOrderCreateCountSumAndOrderPayPriceSumByTimeBetween(
-                LocalDateTimeUtil.beginOfDay(date), LocalDateTimeUtil.endOfDay(date));
-    }
-
-    /**
-     * 统计指定月份的交易数据
-     *
-     * @param months 增加的月数
-     * @return 交易数据
-     */
-    private TradeSummaryRespBO getTradeSummaryByMonths(int months) {
-        LocalDateTime monthDate = LocalDateTime.now().plusMonths(months);
-        return tradeStatisticsMapper.selectOrderCreateCountSumAndOrderPayPriceSumByTimeBetween(
-                LocalDateTimeUtils.beginOfMonth(monthDate), LocalDateTimeUtils.endOfMonth(monthDate));
     }
 
 }

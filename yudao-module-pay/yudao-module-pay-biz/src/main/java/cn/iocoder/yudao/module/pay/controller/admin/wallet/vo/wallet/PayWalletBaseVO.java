@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.pay.controller.admin.wallet.vo;
+package cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.wallet;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -18,7 +18,7 @@ public class PayWalletBaseVO {
 
     @Schema(description = "用户类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "用户类型不能为空")
-    private Byte userType;
+    private Integer userType;
 
     @Schema(description = "余额，单位分", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "余额，单位分不能为空")

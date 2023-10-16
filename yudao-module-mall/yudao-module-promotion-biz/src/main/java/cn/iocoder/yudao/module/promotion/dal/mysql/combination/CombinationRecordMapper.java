@@ -6,7 +6,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPage2VO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPageVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -97,21 +96,19 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
     }
 
     default PageResult<CombinationRecordDO> selectPage(CombinationRecordReqPageVO pageVO) {
-        return selectPage(pageVO, new LambdaQueryWrapperX<CombinationRecordDO>()
+        LambdaQueryWrapperX<CombinationRecordDO> queryWrapper = new LambdaQueryWrapperX<CombinationRecordDO>()
                 .eqIfPresent(CombinationRecordDO::getStatus, pageVO.getStatus())
-                .betweenIfPresent(CombinationRecordDO::getCreateTime, pageVO.getCreateTime()));
-    }
-
-    default PageResult<CombinationRecordDO> selectPage(CombinationRecordReqPage2VO pageVO) {
-        return selectPage(pageVO, new LambdaQueryWrapperX<CombinationRecordDO>()
-                .eq(CombinationRecordDO::getId, pageVO.getHeadId())
-                .or()
-                .eq(CombinationRecordDO::getHeadId, pageVO.getHeadId()));
+                .betweenIfPresent(CombinationRecordDO::getCreateTime, pageVO.getCreateTime());
+        // 如果 headId 非空，说明查询指定团的团长 + 团员的拼团记录
+        if (pageVO.getHeadId() != null) {
+            queryWrapper.eq(CombinationRecordDO::getId, pageVO.getHeadId()) // 团长
+                    .or().eq(CombinationRecordDO::getHeadId, pageVO.getHeadId()); // 团员
+        }
+        return selectPage(pageVO, queryWrapper);
     }
 
     /**
      * 查询指定条件的记录数
-     * 如果参数都为 null 时则查询用户拼团记录（DISTINCT 去重），也就是说查询会员表中的用户有多少人参与过拼团活动每个人只统计一次
      *
      * @param status       状态，可为 null
      * @param virtualGroup 是否虚拟成团，可为 null
@@ -119,12 +116,21 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
      * @return 记录数
      */
     default Long selectCountByHeadAndStatusAndVirtualGroup(Integer status, Boolean virtualGroup, Long headId) {
+        return selectCount(new LambdaQueryWrapperX<CombinationRecordDO>()
+                .eqIfPresent(CombinationRecordDO::getStatus, status)
+                .eqIfPresent(CombinationRecordDO::getVirtualGroup, virtualGroup)
+                .eqIfPresent(CombinationRecordDO::getHeadId, headId));
+    }
+
+    /**
+     * 查询用户拼团记录（DISTINCT 去重），也就是说查询会员表中的用户有多少人参与过拼团活动每个人只统计一次
+     *
+     * @return 参加过拼团的用户数
+     */
+    // TODO @puhui999：1）方法名，直接 selectUserCount；2）COUNT(DISTINCT(user_id)) 就可以啦，不用 group by 哈
+    default Long selectUserDistinctCount() {
         return selectCount(new QueryWrapper<CombinationRecordDO>()
-                // TODO @puhui999：这种偏逻辑性的，不要给 mapper 哈；可以考虑拆成 2 个 mapper，上层也是 2 个 service；
-                .select(status == null && virtualGroup == null && headId == null, "DISTINCT (user_id)")
-                .eq(status != null, "status", status)
-                .eq(virtualGroup != null, "virtual_group", virtualGroup)
-                .eq(headId != null, "head_id", headId)
+                .select("DISTINCT (user_id)")
                 .groupBy("user_id"));
     }
 

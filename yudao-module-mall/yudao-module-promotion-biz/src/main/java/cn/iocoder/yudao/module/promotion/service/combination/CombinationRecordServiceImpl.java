@@ -14,7 +14,6 @@ import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationValidateJoinRespDTO;
-import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPage2VO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPageVO;
 import cn.iocoder.yudao.module.promotion.convert.combination.CombinationActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
@@ -23,7 +22,6 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationR
 import cn.iocoder.yudao.module.promotion.dal.mysql.combination.CombinationRecordMapper;
 import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.api.order.TradeOrderApi;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -72,9 +70,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         CombinationRecordDO record = validateCombinationRecord(userId, orderId);
 
         // 更新状态
-        // TODO @puhui999：不要整个更新，new 一个出来；why？例如说，两个线程都去更新，这样存在相互覆盖的问题
-        record.setStatus(status);
-        combinationRecordMapper.updateById(record);
+        combinationRecordMapper.updateById(new CombinationRecordDO().setId(record.getId()).setStatus(status));
     }
 
     private CombinationRecordDO validateCombinationRecord(Long userId, Long orderId) {
@@ -164,7 +160,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public KeyValue<Long, Long> createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {
+    public CombinationRecordDO createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {
         // 1. 校验拼团活动
         KeyValue<CombinationActivityDO, CombinationProductDO> keyValue = validateCombinationRecord(reqDTO.getUserId(),
                 reqDTO.getActivityId(), reqDTO.getHeadId(), reqDTO.getSkuId(), reqDTO.getCount());
@@ -191,7 +187,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         if (ObjUtil.notEqual(CombinationRecordDO.HEAD_ID_GROUP, record.getHeadId())) {
             updateCombinationRecordWhenCreate(reqDTO.getHeadId(), keyValue.getKey());
         }
-        return new KeyValue<>(record.getId(), record.getHeadId());
+        return record;
     }
 
     /**
@@ -250,6 +246,11 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     }
 
     @Override
+    public Long getCombinationUserCount() {
+        return combinationRecordMapper.selectUserDistinctCount();
+    }
+
+    @Override
     public List<CombinationRecordDO> getLatestCombinationRecordList(int count) {
         return combinationRecordMapper.selectLatestList(count);
     }
@@ -272,11 +273,6 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
 
     @Override
     public PageResult<CombinationRecordDO> getCombinationRecordPage(CombinationRecordReqPageVO pageVO) {
-        return combinationRecordMapper.selectPage(pageVO);
-    }
-
-    @Override
-    public PageResult<CombinationRecordDO> getCombinationRecordPage2(CombinationRecordReqPage2VO pageVO) {
         return combinationRecordMapper.selectPage(pageVO);
     }
 
@@ -343,8 +339,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
 
     @Override
     public KeyValue<Integer, Integer> expireCombinationRecord() {
-        // TODO @puhui999：数字一般是 1. 2. 这种格式哈
-        // 1。获取所有正在进行中的过期的父拼团
+        // 1. 获取所有正在进行中的过期的父拼团
         List<CombinationRecordDO> headExpireRecords = combinationRecordMapper.selectListByHeadIdAndStatusAndExpireTimeLt(
                 CombinationRecordDO.HEAD_ID_GROUP, CombinationRecordStatusEnum.IN_PROGRESS.getStatus(), LocalDateTime.now());
         if (CollUtil.isEmpty(headExpireRecords)) {
@@ -352,23 +347,21 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         }
 
         // 2. 获取拼团活动
-        // TODO @puhui999：在自己模块里，变量可以简略点；例如说 activityList
-        List<CombinationActivityDO> combinationActivities = combinationActivityService.getCombinationActivityListByIds(
+        List<CombinationActivityDO> activities = combinationActivityService.getCombinationActivityListByIds(
                 convertSet(headExpireRecords, CombinationRecordDO::getActivityId));
-        Map<Long, CombinationActivityDO> activityMap = convertMap(combinationActivities, CombinationActivityDO::getId);
+        Map<Long, CombinationActivityDO> activityMap = convertMap(activities, CombinationActivityDO::getId);
 
-        // TODO @puhui999：job 一般不建议异步跑；因为可能下次跑，结果上次还没跑完；
-        // TODO 这里，我们可以每个 record 处理下；然后按照是否需要虚拟拼团，各搞一个方法逻辑 + 事务；这样，保证 job 里面尽量不要大事务，而是 n 个独立小事务的处理。
+        // TODO @puhui999：这里可以改成“每个团”，处理一次哈；这样 handleExpireRecord、handleVirtualGroupRecord 都改成按团处理，每个是一个小事务；
         // 3. 校验是否虚拟成团
         List<CombinationRecordDO> virtualGroupHeadRecords = new ArrayList<>(); // 虚拟成团
         for (Iterator<CombinationRecordDO> iterator = headExpireRecords.iterator(); iterator.hasNext(); ) {
             CombinationRecordDO record = iterator.next();
-            // 3.1 不匹配，则直接跳过
+            // 3.1.不匹配，则直接跳过
             CombinationActivityDO activity = activityMap.get(record.getActivityId());
             if (activity == null || !activity.getVirtualGroup()) { // 取不到活动的或者不是虚拟拼团的
                 continue;
             }
-            // 3.2 匹配，则移除，添加到虚拟成团中，并结束寻找
+            // 3.2.匹配，则移除，添加到虚拟成团中，并结束寻找
             virtualGroupHeadRecords.add(record);
             iterator.remove();
             break;
@@ -381,8 +374,13 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         return new KeyValue<>(headExpireRecords.size(), virtualGroupHeadRecords.size());
     }
 
-    @Async
-    protected void handleExpireRecord(List<CombinationRecordDO> headExpireRecords) {
+    /**
+     * 处理过期拼团
+     *
+     * @param headExpireRecords 过期拼团团长记录列表
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void handleExpireRecord(List<CombinationRecordDO> headExpireRecords) {
         if (CollUtil.isEmpty(headExpireRecords)) {
             return;
         }
@@ -400,8 +398,13 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         });
     }
 
-    @Async
-    protected void handleVirtualGroupRecord(List<CombinationRecordDO> virtualGroupHeadRecords) {
+    /**
+     * 处理虚拟拼团
+     *
+     * @param virtualGroupHeadRecords 虚拟成团团长记录列表
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void handleVirtualGroupRecord(List<CombinationRecordDO> virtualGroupHeadRecords) {
         if (CollUtil.isEmpty(virtualGroupHeadRecords)) {
             return;
         }

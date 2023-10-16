@@ -196,8 +196,8 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     }
 
     @Override
-    public List<ProductSpuDO> getSpuList() {
-        return productSpuMapper.selectList();
+    public List<ProductSpuDO> getSpuListByStatus(Integer status) {
+        return productSpuMapper.selectList(ProductSpuDO::getStatus, status);
     }
 
     @Override
