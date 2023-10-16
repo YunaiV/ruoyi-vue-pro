@@ -22,7 +22,7 @@
             SUM(order_wallet_pay_price + brokerage_settlement_price + after_sale_refund_price) AS expensePrice,
             SUM(order_wallet_pay_price)                                                        AS orderWalletPayPrice,
             SUM(brokerage_settlement_price)                                                    AS brokerageSettlementPrice,
-            SUM(after_sale_refund_price)                                                       AS orderRefundPrice
+            SUM(after_sale_refund_price)                                                       AS afterSaleRefundPrice
         FROM trade_statistics
         WHERE time BETWEEN #{beginTime} AND #{endTime}
           AND deleted = FALSE

@@ -48,13 +48,12 @@ public interface MemberStatisticsService {
      */
     List<MemberSexStatisticsRespVO> getMemberSexStatisticsList();
 
-    // TODO @疯狂：这个要不要使用 getMemberTerminalStatisticsList；保持统一？
     /**
      * 按照终端，获得会员统计列表
      *
      * @return 会员统计列表
      */
-    List<MemberTerminalStatisticsRespVO> getRegisterTerminalStatisticsList();
+    List<MemberTerminalStatisticsRespVO> getMemberTerminalStatisticsList();
 
     // TODO 芋艿：已经 review
     /**

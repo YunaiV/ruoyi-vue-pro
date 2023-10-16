@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.statistics.dal.mysql.trade;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberAreaStatisticsRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderSummaryRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderTrendRespVO;
 import cn.iocoder.yudao.module.statistics.dal.dataobject.trade.TradeStatisticsDO;
+import cn.iocoder.yudao.module.statistics.service.member.bo.MemberAreaStatisticsRespBO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -20,7 +20,7 @@ import java.util.List;
 public interface TradeOrderStatisticsMapper extends BaseMapperX<TradeStatisticsDO> {
 
     // TODO 芋艿：已经 review
-    List<MemberAreaStatisticsRespVO> selectSummaryListByAreaId();
+    List<MemberAreaStatisticsRespBO> selectSummaryListByAreaId();
 
     // TODO 芋艿：已经 review
     Integer selectCountByCreateTimeBetween(@Param("beginTime") LocalDateTime beginTime,
@@ -65,10 +65,7 @@ public interface TradeOrderStatisticsMapper extends BaseMapperX<TradeStatisticsD
                                                                           @Param("endTime") LocalDateTime endTime);
 
     // TODO @芋艿：已经 review
-    Long selectCountByStatus(@Param("status") Integer status);
-
-    // TODO 芋艿：已经 review
-    Long selectCountByStatusAndPickUpStoreIdIsNotNull(@Param("status") Integer status);
+    Long selectCountByStatusAndDeliveryType(@Param("status") Integer status, @Param("deliveryType") Integer deliveryType);
 
     // TODO 芋艿：已经 review
     TradeOrderSummaryRespVO selectPaySummaryByStatusAndPayTimeBetween(@Param("status") Integer status,

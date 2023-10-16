@@ -83,9 +83,7 @@ public class TradeStatisticsServiceImpl implements TradeStatisticsService {
     @Override
     public String statisticsTrade(Integer days) {
         LocalDateTime today = LocalDateTime.now();
-        // TODO @疯狂：不用并发哈，因为租户可能会丢；然后，一般串行就好，对性能没绝对的要求哈，天数也不会多；
         return IntStream.rangeClosed(1, days)
-                .parallel()
                 .mapToObj(day -> statisticsTrade(today.minusDays(day)))
                 .sorted()
                 .collect(Collectors.joining("\n"));
@@ -131,7 +129,7 @@ public class TradeStatisticsServiceImpl implements TradeStatisticsService {
         entity = TradeStatisticsConvert.INSTANCE.convert(date, orderSummary, afterSaleSummary, brokerageSettlementPrice,
                 walletSummary);
         tradeStatisticsMapper.insert(entity);
-        // TODO @疯狂：这里是不是也要把日期带上？类似 108 那边
+        // TODO @疯狂：这里是不是也要把日期带上？类似 108 那边;  110 已经带上了
         return stopWatch.prettyPrint();
     }
 

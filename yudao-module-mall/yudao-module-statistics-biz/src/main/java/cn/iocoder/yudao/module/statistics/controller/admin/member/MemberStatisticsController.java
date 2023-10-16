@@ -77,8 +77,7 @@ public class MemberStatisticsController {
     }
 
     // TODO 芋艿：已经 review
-    // TODO @疯狂：要不 get 前缀去掉，和下面的 list 接口保持一致
-    @GetMapping("/get-area-statistics-list")
+    @GetMapping("/area-statistics-list")
     @Operation(summary = "按照省份，获得会员统计列表")
     @PreAuthorize("@ss.hasPermission('statistics:member:query')")
     public CommonResult<List<MemberAreaStatisticsRespVO>> getMemberAreaStatisticsList() {
@@ -86,8 +85,7 @@ public class MemberStatisticsController {
     }
 
     // TODO 芋艿：已经 review
-    // TODO @疯狂：要不 get 前缀去掉，和下面的 list 接口保持一致
-    @GetMapping("/get-sex-statistics-list")
+    @GetMapping("/sex-statistics-list")
     @Operation(summary = "按照性别，获得会员统计列表")
     @PreAuthorize("@ss.hasPermission('statistics:member:query')")
     public CommonResult<List<MemberSexStatisticsRespVO>> getMemberSexStatisticsList() {
@@ -95,12 +93,11 @@ public class MemberStatisticsController {
     }
 
     // TODO 芋艿：已经 review
-    // TODO @疯狂：要不 get 前缀去掉，和下面的 list 接口保持一致
-    @GetMapping("/get-terminal-statistics-list")
+    @GetMapping("/terminal-statistics-list")
     @Operation(summary = "按照终端，获得会员统计列表")
     @PreAuthorize("@ss.hasPermission('statistics:member:query')")
     public CommonResult<List<MemberTerminalStatisticsRespVO>> getMemberTerminalStatisticsList() {
-        return success(memberStatisticsService.getRegisterTerminalStatisticsList());
+        return success(memberStatisticsService.getMemberTerminalStatisticsList());
     }
 
     @GetMapping("/user-count-comparison")

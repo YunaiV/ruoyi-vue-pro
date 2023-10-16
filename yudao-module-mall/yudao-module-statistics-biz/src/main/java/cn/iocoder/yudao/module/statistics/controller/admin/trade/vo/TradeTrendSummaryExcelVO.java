@@ -40,5 +40,5 @@ public class TradeTrendSummaryExcelVO {
     private Integer brokerageSettlementPrice;
 
     @ExcelProperty(value = "商品退款金额", converter = MoneyConvert.class)
-    private Integer orderRefundPrice;
+    private Integer afterSaleRefundPrice;
 }

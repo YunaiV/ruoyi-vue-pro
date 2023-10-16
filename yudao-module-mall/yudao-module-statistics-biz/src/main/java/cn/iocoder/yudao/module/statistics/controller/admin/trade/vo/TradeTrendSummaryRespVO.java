@@ -26,7 +26,7 @@ public class TradeTrendSummaryRespVO {
     private Integer orderWalletPayPrice;
 
     @Schema(description = "订单退款金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    private Integer orderRefundPrice;
+    private Integer afterSaleRefundPrice;
 
     @Schema(description = "支付佣金金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer brokerageSettlementPrice;
