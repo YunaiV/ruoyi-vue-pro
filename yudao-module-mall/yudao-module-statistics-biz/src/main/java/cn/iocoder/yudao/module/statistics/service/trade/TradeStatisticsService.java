@@ -49,6 +49,7 @@ public interface TradeStatisticsService {
      */
     String statisticsTrade(Integer days);
 
+    // TODO 芋艿：已经 review
     /**
      * 统计指定日期的交易数据
      *
@@ -57,6 +58,7 @@ public interface TradeStatisticsService {
      */
     TradeSummaryRespBO getTradeSummaryByDays(int days);
 
+    // TODO 芋艿：已经 review
     /**
      * 统计指定月份的交易数据
      *

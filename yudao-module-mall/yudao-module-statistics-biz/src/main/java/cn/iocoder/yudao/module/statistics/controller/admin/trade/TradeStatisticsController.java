@@ -47,6 +47,7 @@ public class TradeStatisticsController {
     @Resource
     private BrokerageStatisticsService brokerageStatisticsService;
 
+    // TODO 芋艿：已经 review
     @GetMapping("/summary")
     @Operation(summary = "获得交易统计")
     @PreAuthorize("@ss.hasPermission('statistics:trade:query')")
@@ -55,6 +56,7 @@ public class TradeStatisticsController {
         TradeSummaryRespBO yesterdayData = tradeStatisticsService.getTradeSummaryByDays(-1);
         // 1.2 前天的数据（用于对照昨天的数据）
         TradeSummaryRespBO beforeYesterdayData = tradeStatisticsService.getTradeSummaryByDays(-2);
+
         // 2.1 本月数据
         TradeSummaryRespBO monthData = tradeStatisticsService.getTradeSummaryByMonths(0);
         // 2.2 上月数据（用于对照本月的数据）
@@ -73,6 +75,7 @@ public class TradeStatisticsController {
                 ArrayUtil.get(reqVO.getTimes(), 1)));
     }
 
+    // TODO 芋艿：已经 review
     @GetMapping("/list")
     @Operation(summary = "获得交易状况明细")
     @PreAuthorize("@ss.hasPermission('statistics:trade:query')")
@@ -82,6 +85,7 @@ public class TradeStatisticsController {
         return success(TradeStatisticsConvert.INSTANCE.convertList(list));
     }
 
+    // TODO 芋艿：已经 review
     @GetMapping("/export-excel")
     @Operation(summary = "导出获得交易状况明细 Excel")
     @PreAuthorize("@ss.hasPermission('statistics:trade:export')")
@@ -94,16 +98,20 @@ public class TradeStatisticsController {
         ExcelUtils.write(response, "交易状况.xls", "数据", TradeTrendSummaryExcelVO.class, data);
     }
 
+    // TODO 芋艿：已经 review
     @GetMapping("/order-count")
     @Operation(summary = "获得交易订单数量")
     @PreAuthorize("@ss.hasPermission('statistics:trade:query')")
     public CommonResult<TradeOrderCountRespVO> getOrderCount() {
+        // 订单统计
         TradeOrderCountRespVO vo = tradeOrderStatisticsService.getOrderCount();
+        // 售后统计
         vo.setAfterSaleApply(afterSaleStatisticsService.getCountByStatus(AfterSaleStatusEnum.APPLY))
                 .setAuditingWithdraw(brokerageStatisticsService.getWithdrawCountByStatus(BrokerageWithdrawStatusEnum.AUDITING));
         return success(vo);
     }
 
+    // TODO 芋艿：已经 review
     @GetMapping("/order-comparison")
     @Operation(summary = "获得交易订单数量")
     @PreAuthorize("@ss.hasPermission('statistics:trade:query')")
@@ -111,6 +119,7 @@ public class TradeStatisticsController {
         return success(tradeOrderStatisticsService.getOrderComparison());
     }
 
+    // TODO 芋艿：已经 review
     @GetMapping("/order-count-trend")
     @Operation(summary = "获得订单量趋势统计")
     @PreAuthorize("@ss.hasPermission('statistics:trade:query')")

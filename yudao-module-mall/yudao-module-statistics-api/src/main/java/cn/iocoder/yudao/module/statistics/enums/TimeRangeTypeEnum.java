@@ -35,9 +35,8 @@ public enum TimeRangeTypeEnum implements IntArrayValuable {
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(TimeRangeTypeEnum::getType).toArray();
 
-
     /**
-     * 状态
+     * 类型
      */
     private final Integer type;
 

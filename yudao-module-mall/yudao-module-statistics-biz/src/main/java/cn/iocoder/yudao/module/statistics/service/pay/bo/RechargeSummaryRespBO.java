@@ -6,7 +6,6 @@ import lombok.Data;
 /**
  * 充值统计 Response BO
  */
-@Schema(description = "管理后台 - ")
 @Data
 public class RechargeSummaryRespBO {
 

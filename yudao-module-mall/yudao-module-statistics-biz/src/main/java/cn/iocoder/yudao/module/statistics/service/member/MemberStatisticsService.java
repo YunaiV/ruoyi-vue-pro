@@ -21,6 +21,7 @@ public interface MemberStatisticsService {
      */
     MemberSummaryRespVO getMemberSummary();
 
+    // TODO 芋艿：已经 review
     /**
      * 获取会员分析对照数据
      *
@@ -31,6 +32,7 @@ public interface MemberStatisticsService {
     DataComparisonRespVO<MemberAnalyseDataRespVO> getMemberAnalyseComparisonData(LocalDateTime beginTime,
                                                                                  LocalDateTime endTime);
 
+    // TODO 芋艿：已经 review
     /**
      * 按照省份，获得会员统计列表
      *
@@ -38,6 +40,7 @@ public interface MemberStatisticsService {
      */
     List<MemberAreaStatisticsRespVO> getMemberAreaStatisticsList();
 
+    // TODO 芋艿：已经 review
     /**
      * 按照性别，获得会员统计列表
      *
@@ -45,6 +48,7 @@ public interface MemberStatisticsService {
      */
     List<MemberSexStatisticsRespVO> getMemberSexStatisticsList();
 
+    // TODO @疯狂：这个要不要使用 getMemberTerminalStatisticsList；保持统一？
     /**
      * 按照终端，获得会员统计列表
      *
@@ -52,6 +56,7 @@ public interface MemberStatisticsService {
      */
     List<MemberTerminalStatisticsRespVO> getRegisterTerminalStatisticsList();
 
+    // TODO 芋艿：已经 review
     /**
      * 获取用户注册数量列表
      *
@@ -61,6 +66,7 @@ public interface MemberStatisticsService {
      */
     List<MemberRegisterCountRespVO> getMemberRegisterCountList(LocalDateTime beginTime, LocalDateTime endTime);
 
+    // TODO 芋艿：已经 review
     /**
      * 获得用户数量量统计对照
      *

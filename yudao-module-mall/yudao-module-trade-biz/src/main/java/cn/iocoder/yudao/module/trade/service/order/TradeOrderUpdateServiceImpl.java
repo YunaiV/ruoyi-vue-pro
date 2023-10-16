@@ -187,6 +187,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         order.setStatus(TradeOrderStatusEnum.UNPAID.getStatus());
         order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus());
         order.setProductCount(getSumValue(calculateRespBO.getItems(), TradePriceCalculateRespBO.OrderItem::getCount, Integer::sum));
+        // TODO @疯狂：无状态，terminal 不从 servletuTILS 拿，而是通过 controller 传递给 service；
         order.setTerminal(ServletUtils.getTerminal());
         // 支付 + 退款信息
         order.setAdjustPrice(0).setPayStatus(false);

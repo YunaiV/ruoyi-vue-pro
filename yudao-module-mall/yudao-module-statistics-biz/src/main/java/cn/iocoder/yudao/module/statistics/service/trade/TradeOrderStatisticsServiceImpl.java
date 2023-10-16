@@ -63,9 +63,9 @@ public class TradeOrderStatisticsServiceImpl implements TradeOrderStatisticsServ
 
     @Override
     public TradeOrderCountRespVO getOrderCount() {
+        // TODO 疯狂：这个可以根据 status + delivertyType 来过滤呀；ps：是不是搞个 service 方法，交给上层去聚合，这样 TradeOrderCountRespVO 可以更明确返回，不用搞 bo；
         Long undeliveredCount = tradeOrderStatisticsMapper.selectCountByStatus(TradeOrderStatusEnum.UNDELIVERED.getStatus());
         Long pickUpCount = tradeOrderStatisticsMapper.selectCountByStatusAndPickUpStoreIdIsNotNull(TradeOrderStatusEnum.DELIVERED.getStatus());
-
         return new TradeOrderCountRespVO()
                 .setPickUp(ObjUtil.defaultIfNull(pickUpCount, 0L))
                 .setUndelivered(ObjUtil.defaultIfNull(undeliveredCount, 0L));
@@ -81,8 +81,8 @@ public class TradeOrderStatisticsServiceImpl implements TradeOrderStatisticsServ
     private TradeOrderSummaryRespVO getPayPriceSummary(LocalDateTime date) {
         LocalDateTime beginTime = LocalDateTimeUtil.beginOfDay(date);
         LocalDateTime endTime = LocalDateTimeUtil.beginOfDay(date);
-
-        return tradeOrderStatisticsMapper.selectPaySummaryByStatusAndPayTimeBetween(PayOrderStatusEnum.SUCCESS.getStatus(), beginTime, endTime);
+        return tradeOrderStatisticsMapper.selectPaySummaryByStatusAndPayTimeBetween(
+                PayOrderStatusEnum.SUCCESS.getStatus(), beginTime, endTime);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class TradeOrderStatisticsServiceImpl implements TradeOrderStatisticsServ
         LocalDateTime referenceEndTime = reqVO.getBeginTime().minusDays(1);
         LocalDateTime referenceBeginTime = referenceEndTime.minus(Duration.between(reqVO.getBeginTime(), reqVO.getEndTime()));
         List<TradeOrderTrendRespVO> reference = getOrderCountTrend(reqVO.getType(), referenceBeginTime, referenceEndTime);
-
+        // 顺序对比返回
         return IntStream.range(0, value.size())
                 .mapToObj(index -> new DataComparisonRespVO<TradeOrderTrendRespVO>()
                         .setValue(CollUtil.get(value, index))

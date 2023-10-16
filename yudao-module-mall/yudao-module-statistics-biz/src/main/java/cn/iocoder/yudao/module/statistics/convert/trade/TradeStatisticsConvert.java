@@ -52,6 +52,7 @@ public interface TradeStatisticsConvert {
 
     List<TradeTrendSummaryRespVO> convertList(List<TradeStatisticsDO> list);
 
+    // TODO @疯狂：要不要搞个默认的 convertA 方法，然后这个 convert 去调用 convertA，特殊字段再去 set？
     default TradeTrendSummaryRespVO convert(TradeStatisticsDO tradeStatistics) {
         return new TradeTrendSummaryRespVO()
                 .setDate(tradeStatistics.getTime().toLocalDate())

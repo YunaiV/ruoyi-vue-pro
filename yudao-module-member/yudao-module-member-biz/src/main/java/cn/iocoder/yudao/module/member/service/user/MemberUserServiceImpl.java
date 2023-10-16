@@ -100,6 +100,7 @@ public class MemberUserServiceImpl implements MemberUserService {
         user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
         user.setPassword(encodePassword(password)); // 加密密码
         user.setRegisterIp(registerIp);
+        // TODO @疯狂：无状态，terminal 不从 servletuTILS 拿，而是通过 controller 传递给 service；
         user.setRegisterTerminal(ServletUtils.getTerminal());
         memberUserMapper.insert(user);
 

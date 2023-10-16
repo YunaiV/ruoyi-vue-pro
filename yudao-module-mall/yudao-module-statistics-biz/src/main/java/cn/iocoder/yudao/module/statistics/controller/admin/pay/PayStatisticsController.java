@@ -24,6 +24,7 @@ public class PayStatisticsController {
     @Resource
     private PayWalletStatisticsService payWalletStatisticsService;
 
+    // TODO @疯狂：要不搞成 PaySummary？只是目前只有 rechargePrice 充值金额？
     @GetMapping("/wallet-recharge-price")
     @Operation(summary = "获取充值金额")
     public CommonResult<Integer> getWalletRechargePrice() {

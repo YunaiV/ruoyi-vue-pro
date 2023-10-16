@@ -62,6 +62,7 @@ public interface TradeOrderStatisticsService {
      */
     Integer getOrderPayPrice(LocalDateTime beginTime, LocalDateTime endTime);
 
+    // TODO 芋艿：已经 review
     /**
      * 获得交易订单数量
      *
@@ -69,6 +70,7 @@ public interface TradeOrderStatisticsService {
      */
     TradeOrderCountRespVO getOrderCount();
 
+    // TODO 芋艿：已经 review
     /**
      * 交易订单销售额对照
      *
@@ -76,6 +78,7 @@ public interface TradeOrderStatisticsService {
      */
     DataComparisonRespVO<TradeOrderSummaryRespVO> getOrderComparison();
 
+    // TODO 芋艿：已经 review
     /**
      * 获得订单量趋势统计
      *

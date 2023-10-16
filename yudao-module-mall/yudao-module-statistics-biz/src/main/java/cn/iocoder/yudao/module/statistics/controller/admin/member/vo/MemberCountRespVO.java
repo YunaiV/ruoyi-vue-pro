@@ -10,6 +10,7 @@ public class MemberCountRespVO {
     @Schema(description = "用户访问量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer visitUserCount;
 
+    // TODO @疯狂：要不改成 registerUserCount，注册
     @Schema(description = "新增用户数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer createUserCount;
 
