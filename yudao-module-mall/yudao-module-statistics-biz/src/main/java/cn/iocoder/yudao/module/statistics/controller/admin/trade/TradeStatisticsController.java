@@ -124,6 +124,7 @@ public class TradeStatisticsController {
     @Operation(summary = "获得订单量趋势统计")
     @PreAuthorize("@ss.hasPermission('statistics:trade:query')")
     public CommonResult<List<DataComparisonRespVO<TradeOrderTrendRespVO>>> getOrderCountTrendComparison(@Valid TradeOrderTrendReqVO reqVO) {
+        // TODO @疯狂：要注意 date 的排序；
         return success(tradeOrderStatisticsService.getOrderCountTrendComparison(reqVO));
     }
 

@@ -103,6 +103,8 @@ public class MemberStatisticsController {
         return success(memberStatisticsService.getRegisterTerminalStatisticsList());
     }
 
+    // TODO 芋艿：已经 review
+    // TODO @疯狂：要注意 date 的排序；
     @GetMapping("/user-count-comparison")
     @Operation(summary = "获得用户数量对照")
     @PreAuthorize("@ss.hasPermission('statistics:member:query')")

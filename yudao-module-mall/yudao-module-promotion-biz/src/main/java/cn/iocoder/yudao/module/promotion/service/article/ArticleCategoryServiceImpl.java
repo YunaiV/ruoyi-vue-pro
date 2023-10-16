@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.promotion.convert.article.ArticleCategoryConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleCategoryDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.article.ArticleCategoryMapper;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -30,7 +31,9 @@ public class ArticleCategoryServiceImpl implements ArticleCategoryService {
 
     @Resource
     private ArticleCategoryMapper articleCategoryMapper;
+
     @Resource
+    @Lazy // 延迟加载，解决循环依赖问题
     private ArticleService articleService;
 
     @Override
