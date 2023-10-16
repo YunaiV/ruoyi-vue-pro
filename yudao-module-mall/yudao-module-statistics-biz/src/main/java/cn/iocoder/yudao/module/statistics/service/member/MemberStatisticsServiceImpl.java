@@ -105,6 +105,11 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
     }
 
     @Override
+    public List<MemberTerminalStatisticsRespVO> getRegisterTerminalStatisticsList() {
+        return memberStatisticsMapper.selectSummaryListByRegisterTerminal();
+    }
+
+    @Override
     public List<MemberRegisterCountRespVO> getMemberRegisterCountList(LocalDateTime beginTime, LocalDateTime endTime) {
         return memberStatisticsMapper.selectListByCreateTimeBetween(beginTime, endTime);
     }

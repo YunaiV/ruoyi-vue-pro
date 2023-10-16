@@ -46,6 +46,13 @@ public interface MemberStatisticsService {
     List<MemberSexStatisticsRespVO> getMemberSexStatisticsList();
 
     /**
+     * 按照终端，获得会员统计列表
+     *
+     * @return 会员统计列表
+     */
+    List<MemberTerminalStatisticsRespVO> getRegisterTerminalStatisticsList();
+
+    /**
      * 获取用户注册数量列表
      *
      * @param beginTime 起始时间

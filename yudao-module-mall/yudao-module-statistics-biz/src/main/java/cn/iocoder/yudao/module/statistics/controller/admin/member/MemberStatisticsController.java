@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.statistics.controller.admin.member;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.NumberUtil;
-import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.statistics.controller.admin.common.vo.DataComparisonRespVO;
@@ -25,7 +24,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 @Tag(name = "管理后台 - 会员统计")
 @RestController
@@ -98,12 +96,7 @@ public class MemberStatisticsController {
     @Operation(summary = "按照终端，获得会员统计列表")
     @PreAuthorize("@ss.hasPermission('statistics:member:query')")
     public CommonResult<List<MemberTerminalStatisticsRespVO>> getMemberTerminalStatisticsList() {
-        // TODO 疯狂：这个可以晚点写，因为 user = = 上还没记录 terminal
-        // TODO @疯狂：在 member_user 上，增加 registerTerminal 字段，基于它来统计哈；
-        List<MemberTerminalStatisticsRespVO> list = convertList(TerminalEnum.values(),
-                t -> new MemberTerminalStatisticsRespVO()
-                        .setTerminal(t.getTerminal()).setUserCount(t.getTerminal() * 100));
-        return success(list);
+        return success(memberStatisticsService.getRegisterTerminalStatisticsList());
     }
 
     @GetMapping("/user-count-comparison")

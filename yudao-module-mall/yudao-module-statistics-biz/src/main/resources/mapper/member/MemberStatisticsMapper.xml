@@ -18,6 +18,14 @@
         GROUP BY sex
     </select>
 
+    <select id="selectSummaryListByRegisterTerminal"
+                         resultType="cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberTerminalStatisticsRespVO">
+        SELECT register_terminal as terminal, COUNT(1) AS userCount
+        FROM member_user
+        WHERE deleted = FALSE
+        GROUP BY register_terminal
+    </select>
+
     <select id="selectUserCount" resultType="java.lang.Integer">
         SELECT COUNT(1)
         FROM member_user
