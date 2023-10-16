@@ -210,6 +210,7 @@ public interface CombinationActivityConvert {
      * @param virtualGroupHeadRecord 虚拟成团团长记录
      * @return 虚拟记录列表
      */
+    // TODO @puhui999：1）方法名，建议改成 convertVirtualRecordList(CombinationRecordDO headRecord)；2）第 220 到 225 可以搞成 mapstruct 一个方法，默认都 copy 进去，然后 set 第 226 到 232 的字段
     default List<CombinationRecordDO> convertVirtualGroupList(CombinationRecordDO virtualGroupHeadRecord) {
         List<CombinationRecordDO> createRecords = new ArrayList<>();
         // 计算需要创建的虚拟成团记录数量

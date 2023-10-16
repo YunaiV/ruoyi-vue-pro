@@ -140,7 +140,7 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
     }
 
     default List<CombinationRecordDO> selectListByHeadId(Long headId) {
-        return selectList(new LambdaQueryWrapperX<CombinationRecordDO>().eq(CombinationRecordDO::getHeadId, headId));
+        return selectList(CombinationRecordDO::getHeadId, headId);
     }
 
 }

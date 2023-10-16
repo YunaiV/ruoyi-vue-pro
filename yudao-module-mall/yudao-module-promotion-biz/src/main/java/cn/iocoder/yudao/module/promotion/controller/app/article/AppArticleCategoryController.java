@@ -31,6 +31,7 @@ public class AppArticleCategoryController {
     public CommonResult<List<AppArticleCategoryRespVO>> getArticleCategoryList() {
         List<ArticleCategoryDO> categoryList = articleCategoryService.getArticleCategoryListByStatus(
                 CommonStatusEnum.ENABLE.getStatus());
+        // TODO @puhui999：排序下
         return success(ArticleCategoryConvert.INSTANCE.convertList04(categoryList));
     }
 

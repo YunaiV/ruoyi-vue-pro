@@ -39,7 +39,7 @@ public class AppArticleController {
             @RequestParam(value = "recommendHot", required = false) Boolean recommendHot,
             @RequestParam(value = "recommendBanner", required = false) Boolean recommendBanner) {
         return success(ArticleConvert.INSTANCE.convertList03(
-                articleService.getArticleCategoryListByRecommendHotAndRecommendBanner(recommendHot, recommendBanner)));
+                articleService.getArticleCategoryListByRecommend(recommendHot, recommendBanner)));
     }
 
     @RequestMapping("/page")
@@ -55,4 +55,5 @@ public class AppArticleController {
         return success(ArticleConvert.INSTANCE.convert01(articleService.getArticle(id)));
     }
 
+    // TODO @puhui999：增加浏览量，实现一个接口；先简单做，用户规模不大，只 +1 即可；ps：uniapp 那边也要接下噢
 }

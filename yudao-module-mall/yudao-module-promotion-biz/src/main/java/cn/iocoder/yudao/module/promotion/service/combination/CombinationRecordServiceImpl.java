@@ -351,9 +351,10 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
                 convertSet(headExpireRecords, CombinationRecordDO::getActivityId));
         Map<Long, CombinationActivityDO> activityMap = convertMap(activities, CombinationActivityDO::getId);
 
-        // 3. 改成“每个团”，处理一次哈；这样 handleExpireRecord、handleVirtualGroupRecord 都改成按团处理，每个是一个小事务；
+        // 3. 逐个处理拼团，过期 or 虚拟成团
         KeyValue<Integer, Integer> keyValue = new KeyValue<>(0, 0); // 统计过期拼团和虚拟成团
         for (CombinationRecordDO recordDO : headExpireRecords) {
+            // TODO @puhui999：recordDO 非必要的情况下，不用带 DO；直接 record;
             try {
                 CombinationActivityDO activity = activityMap.get(recordDO.getActivityId());
                 if (activity == null || !activity.getVirtualGroup()) { // 取不到活动的或者不是虚拟拼团的
@@ -366,9 +367,9 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
                     keyValue.setValue(keyValue.getValue() + 1);
                 }
             } catch (Exception ignored) { // 处理异常继续循环
+                // TODO @puhui999：需要打印异常日志
             }
         }
-
         return keyValue;
     }
 
@@ -379,6 +380,8 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void handleExpireRecord(CombinationRecordDO headExpireRecord) {
+        // TODO @puhui999：这里的 null 其实不用判断。真出现，应该要处个 npe，因为就是要错哈；
+        // TODO @puhui999：headExpireRecord 可以简化成 headRecord
         if (headExpireRecord == null) {
             return;
         }
@@ -386,14 +389,13 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         // 1.更新拼团记录
         List<CombinationRecordDO> headsAndRecords = updateBatchCombinationRecords(headExpireRecord,
                 CombinationRecordStatusEnum.FAILED);
+        // TODO @puhui999：这里的 null 其实不用判断。真出现，应该要处个 npe，因为就是要错哈；
         if (headsAndRecords == null) {
             return;
         }
 
         // 2.订单取消
-        headsAndRecords.forEach(item -> {
-            tradeOrderApi.cancelPaidOrder(item.getUserId(), item.getOrderId());
-        });
+        headsAndRecords.forEach(item -> tradeOrderApi.cancelPaidOrder(item.getUserId(), item.getOrderId()));
     }
 
     /**
@@ -403,6 +405,8 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void handleVirtualGroupRecord(CombinationRecordDO virtualGroupHeadRecord) {
+        // TODO @puhui999：这里的 null 其实不用判断。真出现，应该要处个 npe，因为就是要错哈；
+        // TODO @puhui999：headExpireRecord 可以简化成 headRecord
         if (virtualGroupHeadRecord == null) {
             return;
         }
@@ -413,18 +417,21 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         updateBatchCombinationRecords(virtualGroupHeadRecord, CombinationRecordStatusEnum.SUCCESS);
     }
 
+    // TODO @puhui999：写下方法注释；
     private List<CombinationRecordDO> updateBatchCombinationRecords(CombinationRecordDO headRecord, CombinationRecordStatusEnum status) {
         // 1. 查询团成员（包含团长）
         List<CombinationRecordDO> records = combinationRecordMapper.selectListByHeadId(headRecord.getId());
+        // TODO @puhui999：是不是不用判断空哈；例如说，就一个团长，然后过期。
         if (CollUtil.isEmpty(records)) {
             return null;
         }
         records.add(headRecord);// 把团长加进去
 
-        // 2.批量更新拼团记录 status 和 失败/成团时间
+        // 2. 批量更新拼团记录 status 和 endTime
         List<CombinationRecordDO> updateRecords = new ArrayList<>(records.size());
         LocalDateTime now = LocalDateTime.now();
         records.forEach(item -> {
+            // TODO @puhui999：record 改成 updateRecord
             CombinationRecordDO record = new CombinationRecordDO().setId(item.getId())
                     .setStatus(status.getStatus()).setEndTime(now);
             if (CombinationRecordStatusEnum.isSuccess(status.getStatus())) { // 虚拟成团完事更改状态成功后还需要把参与人数修改为成团需要人数

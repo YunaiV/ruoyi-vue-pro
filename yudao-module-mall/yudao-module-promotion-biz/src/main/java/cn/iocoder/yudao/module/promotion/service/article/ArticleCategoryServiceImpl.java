@@ -56,6 +56,7 @@ public class ArticleCategoryServiceImpl implements ArticleCategoryService {
         // 校验存在
         validateArticleCategoryExists(id);
         // 校验是不是存在关联文章
+        // TODO @puhui999：最好获得数量哈；
         List<ArticleDO> articleList = articleService.getArticleByCategoryId(id);
         if (CollUtil.isNotEmpty(articleList)) {
             throw exception(ARTICLE_CATEGORY_DELETE_FAIL_HAVE_ARTICLES);
@@ -83,6 +84,7 @@ public class ArticleCategoryServiceImpl implements ArticleCategoryService {
 
     @Override
     public List<ArticleCategoryDO> getArticleCategoryListByStatus(Integer status) {
+        // TODO @puhui999：selectListByStatus
         return articleCategoryMapper.selectList(ArticleCategoryDO::getStatus, status);
     }
 

@@ -30,6 +30,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Resource
     private ArticleMapper articleMapper;
+
     @Resource
     private ArticleCategoryService articleCategoryService;
 
@@ -89,7 +90,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public List<ArticleDO> getArticleCategoryListByRecommendHotAndRecommendBanner(Boolean recommendHot, Boolean recommendBanner) {
+    public List<ArticleDO> getArticleCategoryListByRecommend(Boolean recommendHot, Boolean recommendBanner) {
         return articleMapper.selectList(recommendHot, recommendBanner);
     }
 

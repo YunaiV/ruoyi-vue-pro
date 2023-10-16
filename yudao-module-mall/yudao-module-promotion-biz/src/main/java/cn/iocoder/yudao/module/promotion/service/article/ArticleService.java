@@ -62,7 +62,7 @@ public interface ArticleService {
      * @param recommendBanner 是否轮播图
      * @return 文章详情列表
      */
-    List<ArticleDO> getArticleCategoryListByRecommendHotAndRecommendBanner(Boolean recommendHot, Boolean recommendBanner);
+    List<ArticleDO> getArticleCategoryListByRecommend(Boolean recommendHot, Boolean recommendBanner);
 
     /**
      * 获得文章详情分页
