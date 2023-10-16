@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.controller.admin.article.vo;
+package cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -34,6 +34,7 @@ public class ArticleBaseVO {
     @Schema(description = "文章简介", requiredMode = Schema.RequiredMode.REQUIRED, example = "这是一个简介")
     private String introduction;
 
+    // TODO @puhui999：浏览量的字段，应该不是后端新增设置的哈；
     @Schema(description = "浏览次数", requiredMode = Schema.RequiredMode.REQUIRED, example = "111")
     private String browseCount;
 

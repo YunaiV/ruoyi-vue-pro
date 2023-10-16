@@ -2,13 +2,11 @@ package cn.iocoder.yudao.module.promotion.service.article;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryExportReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleCategoryDO;
 
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -49,28 +47,12 @@ public interface ArticleCategoryService {
     ArticleCategoryDO getArticleCategory(Long id);
 
     /**
-     * 获得文章分类列表
-     *
-     * @param ids 编号
-     * @return 文章分类列表
-     */
-    List<ArticleCategoryDO> getArticleCategoryList(Collection<Long> ids);
-
-    /**
      * 获得文章分类分页
      *
      * @param pageReqVO 分页查询
      * @return 文章分类分页
      */
     PageResult<ArticleCategoryDO> getArticleCategoryPage(ArticleCategoryPageReqVO pageReqVO);
-
-    /**
-     * 获得文章分类列表, 用于 Excel 导出
-     *
-     * @param exportReqVO 查询条件
-     * @return 文章分类列表
-     */
-    List<ArticleCategoryDO> getArticleCategoryList(ArticleCategoryExportReqVO exportReqVO);
 
     /**
      * 获得指定状态的文章分类列表
