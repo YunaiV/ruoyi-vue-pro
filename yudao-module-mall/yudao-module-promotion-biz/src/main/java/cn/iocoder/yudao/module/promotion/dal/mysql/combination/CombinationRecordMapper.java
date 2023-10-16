@@ -127,11 +127,9 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
      *
      * @return 参加过拼团的用户数
      */
-    // TODO @puhui999：1）方法名，直接 selectUserCount；2）COUNT(DISTINCT(user_id)) 就可以啦，不用 group by 哈
-    default Long selectUserDistinctCount() {
+    default Long selectUserCount() {
         return selectCount(new QueryWrapper<CombinationRecordDO>()
-                .select("DISTINCT (user_id)")
-                .groupBy("user_id"));
+                .select("DISTINCT (user_id)"));
     }
 
     default List<CombinationRecordDO> selectListByHeadIdAndStatusAndExpireTimeLt(Long headId, Integer status, LocalDateTime dateTime) {
@@ -141,8 +139,8 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
                 .lt(CombinationRecordDO::getExpireTime, dateTime));
     }
 
-    default List<CombinationRecordDO> selectListByHeadIds(Collection<Long> headIds) {
-        return selectList(new LambdaQueryWrapperX<CombinationRecordDO>().in(CombinationRecordDO::getHeadId, headIds));
+    default List<CombinationRecordDO> selectListByHeadId(Long headId) {
+        return selectList(new LambdaQueryWrapperX<CombinationRecordDO>().eq(CombinationRecordDO::getHeadId, headId));
     }
 
 }

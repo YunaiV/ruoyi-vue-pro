@@ -49,7 +49,7 @@ public class TradeCombinationOrderHandler implements TradeOrderHandler {
                 order.getCombinationHeadId(), item.getSkuId(), item.getCount());
 
         // 2. 校验该用户是否存在未支付的拼团活动订单，避免一个拼团可以下多个单子了
-        TradeOrderDO activityOrder = orderQueryService.getActivityOrderByUserIdAndActivityIdAndStatus(
+        TradeOrderDO activityOrder = orderQueryService.getCombinationActivityOrderByUserIdAndCombinationActivityIdAndStatus(
                 order.getUserId(), order.getCombinationActivityId(), TradeOrderStatusEnum.UNPAID.getStatus());
         if (activityOrder != null) {
             throw exception(ORDER_CREATE_FAIL_EXIST_UNPAID);
