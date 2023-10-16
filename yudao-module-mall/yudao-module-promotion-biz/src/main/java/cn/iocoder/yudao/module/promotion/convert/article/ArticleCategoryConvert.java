@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.promotion.convert.article;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.*;
+import cn.iocoder.yudao.module.promotion.controller.app.article.vo.category.AppArticleCategoryRespVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleCategoryDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -29,5 +30,7 @@ public interface ArticleCategoryConvert {
     PageResult<ArticleCategoryRespVO> convertPage(PageResult<ArticleCategoryDO> page);
 
     List<ArticleCategorySimpleRespVO> convertList03(List<ArticleCategoryDO> list);
+
+    List<AppArticleCategoryRespVO> convertList04(List<ArticleCategoryDO> categoryList);
 
 }
