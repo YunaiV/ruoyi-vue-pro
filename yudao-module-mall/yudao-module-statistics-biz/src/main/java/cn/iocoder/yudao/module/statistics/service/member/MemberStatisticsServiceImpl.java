@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.statistics.service.member;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
-import cn.hutool.core.util.NumberUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.ip.core.Area;
 import cn.iocoder.yudao.framework.ip.core.enums.AreaTypeEnum;
@@ -79,37 +78,22 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
         return MemberStatisticsConvert.INSTANCE.convertList(areaList, userCountMap, orderMap);
     }
 
-    // TODO @疯狂：这个方法，要不拆成：1）controller 调用 getMemberAnalyseComparisonData；2）tradeOrderStatisticsService.getPayUserCount；3）tradeOrderStatisticsService.getOrderPayPrice；4）。。。
-    // TODO 就是说：分析交给 controller 去组合；
     @Override
-    public MemberAnalyseRespVO getMemberAnalyse(LocalDateTime beginTime, LocalDateTime endTime) {
+    public DataComparisonRespVO<MemberAnalyseDataRespVO> getMemberAnalyseComparisonData(LocalDateTime beginTime, LocalDateTime endTime) {
+        // 当前数据
+        MemberAnalyseDataRespVO vo = getMemberAnalyseData(beginTime, endTime);
         // 对照数据
-        MemberAnalyseComparisonRespVO vo = getMemberAnalyseComparisonData(beginTime, endTime);
-        // TODO @疯狂：如果时间段这么处理，会不会 beginTime 重叠了。因为是 <= 一个时间；如果数据库插入的是 ，xxxx-yy-zz 00:00:00 的话，它既满足 >= ? 也满足 <= ；（如果不好理解，微信聊)
-        LocalDateTime referenceBeginTime = beginTime.minus(Duration.between(beginTime, endTime));
-        MemberAnalyseComparisonRespVO reference = getMemberAnalyseComparisonData(referenceBeginTime, beginTime);
-
-        // 计算客单价
-        // TODO @疯狂：这个可能有点特殊，要按照 create_time 来查询；不然它的漏斗就不统一；因为是访问数量 > 今日下单人 > 今日支付人；是一个统一的维度；
-        Integer payUserCount = tradeOrderStatisticsService.getPayUserCount(beginTime, endTime);
-        int atv = 0;
-        if (payUserCount != null && payUserCount > 0) {
-            // TODO @疯狂：类似上面的 payUserCount
-            Integer payPrice = tradeOrderStatisticsService.getOrderPayPrice(beginTime, endTime);
-            atv = NumberUtil.div(payPrice, payUserCount).intValue();
-        }
-        return new MemberAnalyseRespVO()
-                .setVisitUserCount(apiAccessLogStatisticsService.getIpCount(UserTypeEnum.MEMBER.getValue(), beginTime, endTime))
-                .setOrderUserCount(tradeOrderStatisticsService.getOrderUserCount(beginTime, endTime))
-                .setPayUserCount(payUserCount)
-                .setAtv(atv)
-                .setComparison(new DataComparisonRespVO<>(vo, reference));
+        LocalDateTime referenceEndDate = beginTime.minusDays(1); // 减少1天，防止出现时间重叠
+        LocalDateTime referenceBeginDate = referenceEndDate.minus(Duration.between(beginTime, endTime));
+        MemberAnalyseDataRespVO reference = getMemberAnalyseData(
+                LocalDateTimeUtil.beginOfDay(referenceBeginDate), LocalDateTimeUtil.endOfDay(referenceEndDate));
+        return new DataComparisonRespVO<>(vo, reference);
     }
 
-    private MemberAnalyseComparisonRespVO getMemberAnalyseComparisonData(LocalDateTime beginTime, LocalDateTime endTime) {
+    private MemberAnalyseDataRespVO getMemberAnalyseData(LocalDateTime beginTime, LocalDateTime endTime) {
         Integer rechargeUserCount = Optional.ofNullable(payWalletStatisticsService.getUserRechargeSummary(beginTime, endTime))
                 .map(RechargeSummaryRespBO::getRechargeUserCount).orElse(0);
-        return new MemberAnalyseComparisonRespVO()
+        return new MemberAnalyseDataRespVO()
                 .setRegisterUserCount(memberStatisticsMapper.selectUserCount(beginTime, endTime))
                 .setVisitUserCount(apiAccessLogStatisticsService.getUserCount(UserTypeEnum.MEMBER.getValue(), beginTime, endTime))
                 .setRechargeUserCount(rechargeUserCount);

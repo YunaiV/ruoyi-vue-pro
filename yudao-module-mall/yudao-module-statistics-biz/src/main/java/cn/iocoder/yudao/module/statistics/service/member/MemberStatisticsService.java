@@ -21,15 +21,15 @@ public interface MemberStatisticsService {
      */
     MemberSummaryRespVO getMemberSummary();
 
-    // TODO 芋艿：已经 review
     /**
-     * 获取用户分析数据
+     * 获取会员分析对照数据
      *
      * @param beginTime 起始时间
      * @param endTime   截止时间
-     * @return 用户分析数据
+     * @return 会员分析对照数据
      */
-    MemberAnalyseRespVO getMemberAnalyse(LocalDateTime beginTime, LocalDateTime endTime);
+    DataComparisonRespVO<MemberAnalyseDataRespVO> getMemberAnalyseComparisonData(LocalDateTime beginTime,
+                                                                                 LocalDateTime endTime);
 
     /**
      * 按照省份，获得会员统计列表

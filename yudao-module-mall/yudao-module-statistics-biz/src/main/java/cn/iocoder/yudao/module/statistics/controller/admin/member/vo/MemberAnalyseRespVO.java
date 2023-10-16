@@ -21,6 +21,6 @@ public class MemberAnalyseRespVO {
     private Integer atv;
 
     @Schema(description = "对照数据", requiredMode = Schema.RequiredMode.REQUIRED)
-    private DataComparisonRespVO<MemberAnalyseComparisonRespVO> comparison;
+    private DataComparisonRespVO<MemberAnalyseDataRespVO> comparison;
 
 }
