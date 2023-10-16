@@ -339,19 +339,20 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
 
     @Override
     public KeyValue<Integer, Integer> expireCombinationRecord() {
-        // 1.获取所有正在进行中的过期的父拼团
+        // 1. 获取所有正在进行中的过期的父拼团
         List<CombinationRecordDO> headExpireRecords = combinationRecordMapper.selectListByHeadIdAndStatusAndExpireTimeLt(
                 CombinationRecordDO.HEAD_ID_GROUP, CombinationRecordStatusEnum.IN_PROGRESS.getStatus(), LocalDateTime.now());
         if (CollUtil.isEmpty(headExpireRecords)) {
             return new KeyValue<>(0, 0);
         }
 
-        // 2.获取拼团活动
+        // 2. 获取拼团活动
         List<CombinationActivityDO> activities = combinationActivityService.getCombinationActivityListByIds(
                 convertSet(headExpireRecords, CombinationRecordDO::getActivityId));
         Map<Long, CombinationActivityDO> activityMap = convertMap(activities, CombinationActivityDO::getId);
 
-        // 3.校验是否虚拟成团
+        // TODO @puhui999：这里可以改成“每个团”，处理一次哈；这样 handleExpireRecord、handleVirtualGroupRecord 都改成按团处理，每个是一个小事务；
+        // 3. 校验是否虚拟成团
         List<CombinationRecordDO> virtualGroupHeadRecords = new ArrayList<>(); // 虚拟成团
         for (Iterator<CombinationRecordDO> iterator = headExpireRecords.iterator(); iterator.hasNext(); ) {
             CombinationRecordDO record = iterator.next();

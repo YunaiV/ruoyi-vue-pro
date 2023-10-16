@@ -40,8 +40,6 @@ public class CombinationRecordController {
     @Lazy
     private CombinationRecordService combinationRecordService;
 
-    // 然后如果 headId 非空，并且第一页，单独多查询一条 head ；放到第 0 个位置；相当于说，第一页特殊一点；
-
     @GetMapping("/page")
     @Operation(summary = "获得拼团记录分页")
     @PreAuthorize("@ss.hasPermission('promotion:combination-record:query')")

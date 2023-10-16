@@ -93,6 +93,7 @@ public interface TradeOrderMapper extends BaseMapperX<TradeOrderDO> {
         return selectOne(TradeOrderDO::getPickUpVerifyCode, pickUpVerifyCode);
     }
 
+    // TODO @puhui999：selectByUserIdAndCombinationActivityIdAndStatus，这样更容易理解哈。
     /**
      * 只针对 combinationActivityId 的查询
      *
