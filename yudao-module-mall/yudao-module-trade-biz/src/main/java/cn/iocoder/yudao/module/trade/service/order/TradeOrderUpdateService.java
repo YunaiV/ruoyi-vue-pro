@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
+import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderRemarkReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdateAddressReqVO;
@@ -37,9 +38,10 @@ public interface TradeOrderUpdateService {
      * @param userId      登录用户
      * @param userIp      用户 IP 地址
      * @param createReqVO 创建交易订单请求模型
+     * @param terminal    终端 {@link TerminalEnum}
      * @return 交易订单的
      */
-    TradeOrderDO createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO);
+    TradeOrderDO createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO, Integer terminal);
 
     /**
      * 更新交易订单已支付
