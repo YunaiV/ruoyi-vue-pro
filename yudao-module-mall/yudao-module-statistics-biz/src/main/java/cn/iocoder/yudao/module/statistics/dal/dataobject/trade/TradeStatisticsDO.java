@@ -63,11 +63,10 @@ public class TradeStatisticsDO extends TenantBaseDO {
      */
     private Integer brokerageSettlementPrice;
 
-    // TODO @疯狂：walletPayPrice，钱包支付金额
     /**
      * 总支付金额（余额），单位：分
      */
-    private Integer orderWalletPayPrice;
+    private Integer walletPayPrice;
     /**
      * 充值订单数
      * <p>

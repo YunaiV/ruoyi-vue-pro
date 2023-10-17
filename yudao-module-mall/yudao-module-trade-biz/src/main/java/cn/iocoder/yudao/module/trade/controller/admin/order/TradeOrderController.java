@@ -56,7 +56,7 @@ public class TradeOrderController {
         }
 
         // 查询用户信息
-        Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(convertSet(pageResult.getList(), TradeOrderDO::getUserId));;
+        Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(convertSet(pageResult.getList(), TradeOrderDO::getUserId));
         // 查询订单项
         List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(
                 convertSet(pageResult.getList(), TradeOrderDO::getId));
@@ -126,18 +126,31 @@ public class TradeOrderController {
         return success(true);
     }
 
-    // TODO @疯狂：1、在【订单列表】界面，增加一个【核销按钮】。点击后，弹窗出一个核销码输入的窗口。
-    //
-    //2、输入核销码后，点击确认，基于 code 查询对应的订单，之后弹窗展示。
-    //
-    //3、新的弹窗，下面有个【确认核销】按钮。确认后，进行订单核销逻辑。注意，只有门店自提的订单，才可以核销。
-    // TODO 这里的 id 应该是 pickUpVerifyCode 参数哈；
-    @PutMapping("/pick-up")
+    @PutMapping("/pick-up-by-id")
     @Operation(summary = "订单核销")
+    @Parameter(name = "id", description = "交易订单编号")
     @PreAuthorize("@ss.hasPermission('trade:order:pick-up')")
-    public CommonResult<Boolean> pickUpOrder(@RequestParam("id") Long id) {
+    public CommonResult<Boolean> pickUpOrderById(@RequestParam("id") Long id) {
         tradeOrderUpdateService.pickUpOrderByMember(id);
         return success(true);
+    }
+
+    @PutMapping("/pick-up-by-verify-code")
+    @Operation(summary = "订单核销")
+    @Parameter(name = "pickUpVerifyCode", description = "自提核销码")
+    @PreAuthorize("@ss.hasPermission('trade:order:pick-up')")
+    public CommonResult<Boolean> pickUpOrderByVerifyCode(@RequestParam("pickUpVerifyCode") String pickUpVerifyCode) {
+        tradeOrderUpdateService.pickUpOrderByAdmin(pickUpVerifyCode);
+        return success(true);
+    }
+
+    @GetMapping("/get-by-pick-up-verify-code")
+    @Operation(summary = "查询核销码对应的订单")
+    @Parameter(name = "pickUpVerifyCode", description = "自提核销码")
+    @PreAuthorize("@ss.hasPermission('trade:order:query')")
+    public CommonResult<TradeOrderDetailRespVO> getByPickUpVerifyCode(@RequestParam("pickUpVerifyCode") String pickUpVerifyCode) {
+        TradeOrderDO tradeOrder = tradeOrderUpdateService.getByPickUpVerifyCode(pickUpVerifyCode);
+        return success(TradeOrderConvert.INSTANCE.convert2(tradeOrder, null));
     }
 
 }

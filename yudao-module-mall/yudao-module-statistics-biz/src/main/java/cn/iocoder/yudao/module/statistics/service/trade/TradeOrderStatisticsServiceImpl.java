@@ -2,15 +2,15 @@ package cn.iocoder.yudao.module.statistics.service.trade;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
-import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.statistics.controller.admin.common.vo.DataComparisonRespVO;
-import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberAreaStatisticsRespVO;
-import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.*;
+import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderSummaryRespVO;
+import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderTrendReqVO;
+import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderTrendRespVO;
 import cn.iocoder.yudao.module.statistics.dal.mysql.trade.TradeOrderStatisticsMapper;
 import cn.iocoder.yudao.module.statistics.enums.TimeRangeTypeEnum;
+import cn.iocoder.yudao.module.statistics.service.member.bo.MemberAreaStatisticsRespBO;
 import cn.iocoder.yudao.module.statistics.service.trade.bo.TradeOrderSummaryRespBO;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -42,7 +42,7 @@ public class TradeOrderStatisticsServiceImpl implements TradeOrderStatisticsServ
     }
 
     @Override
-    public List<MemberAreaStatisticsRespVO> getSummaryListByAreaId() {
+    public List<MemberAreaStatisticsRespBO> getSummaryListByAreaId() {
         return tradeOrderStatisticsMapper.selectSummaryListByAreaId();
     }
 
@@ -62,13 +62,8 @@ public class TradeOrderStatisticsServiceImpl implements TradeOrderStatisticsServ
     }
 
     @Override
-    public TradeOrderCountRespVO getOrderCount() {
-        // TODO 疯狂：这个可以根据 status + delivertyType 来过滤呀；ps：是不是搞个 service 方法，交给上层去聚合，这样 TradeOrderCountRespVO 可以更明确返回，不用搞 bo；
-        Long undeliveredCount = tradeOrderStatisticsMapper.selectCountByStatus(TradeOrderStatusEnum.UNDELIVERED.getStatus());
-        Long pickUpCount = tradeOrderStatisticsMapper.selectCountByStatusAndPickUpStoreIdIsNotNull(TradeOrderStatusEnum.DELIVERED.getStatus());
-        return new TradeOrderCountRespVO()
-                .setPickUp(ObjUtil.defaultIfNull(pickUpCount, 0L))
-                .setUndelivered(ObjUtil.defaultIfNull(undeliveredCount, 0L));
+    public Long getCountByStatusAndDeliveryType(Integer status, Integer deliveryType) {
+        return tradeOrderStatisticsMapper.selectCountByStatusAndDeliveryType(status, deliveryType);
     }
 
     @Override

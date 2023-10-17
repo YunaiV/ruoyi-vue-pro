@@ -33,7 +33,7 @@ public class PayWalletStatisticsServiceImpl implements PayWalletStatisticsServic
         Integer walletPayPrice = payWalletStatisticsMapper.selectPriceSummaryByBizTypeAndCreateTimeBetween(
                 beginTime, endTime, PayWalletBizTypeEnum.PAYMENT.getType());
         // 拼接
-        paySummary.setOrderWalletPayPrice(walletPayPrice)
+        paySummary.setWalletPayPrice(walletPayPrice)
                 .setRechargeRefundCount(refundSummary.getRechargeRefundCount())
                 .setRechargeRefundPrice(refundSummary.getRechargeRefundPrice());
         return paySummary;

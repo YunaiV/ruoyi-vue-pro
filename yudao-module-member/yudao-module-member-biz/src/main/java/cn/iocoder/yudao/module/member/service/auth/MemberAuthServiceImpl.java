@@ -5,6 +5,7 @@ import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
@@ -78,13 +79,13 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     @Override
     @Transactional
-    public AppAuthLoginRespVO smsLogin(AppAuthSmsLoginReqVO reqVO) {
+    public AppAuthLoginRespVO smsLogin(AppAuthSmsLoginReqVO reqVO, Integer terminal) {
         // 校验验证码
         String userIp = getClientIP();
         smsCodeApi.useSmsCode(AuthConvert.INSTANCE.convert(reqVO, SmsSceneEnum.MEMBER_LOGIN.getScene(), userIp));
 
         // 获得获得注册用户
-        MemberUserDO user = userService.createUserIfAbsent(reqVO.getMobile(), userIp);
+        MemberUserDO user = userService.createUserIfAbsent(reqVO.getMobile(), userIp, terminal);
         Assert.notNull(user, "获取用户失败，结果为空");
 
         // 如果 socialType 非空，说明需要绑定社交用户
@@ -128,7 +129,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             throw exception(AUTH_WEIXIN_MINI_APP_PHONE_CODE_ERROR);
         }
         // 获得获得注册用户
-        MemberUserDO user = userService.createUserIfAbsent(phoneNumberInfo.getPurePhoneNumber(), getClientIP());
+        MemberUserDO user = userService.createUserIfAbsent(phoneNumberInfo.getPurePhoneNumber(), getClientIP(), TerminalEnum.WECHAT_MINI_PROGRAM.getTerminal());
         Assert.notNull(user, "获取用户失败，结果为空");
 
         // 绑定社交用户

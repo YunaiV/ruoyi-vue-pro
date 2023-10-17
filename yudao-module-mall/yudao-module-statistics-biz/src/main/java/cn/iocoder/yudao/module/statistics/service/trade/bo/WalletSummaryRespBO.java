@@ -13,7 +13,7 @@ public class WalletSummaryRespBO {
     /**
      * 总支付金额（余额），单位：分
      */
-    private Integer orderWalletPayPrice;
+    private Integer walletPayPrice;
 
     /**
      * 充值订单数
