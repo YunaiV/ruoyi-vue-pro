@@ -71,8 +71,8 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
     }
 
     @Override
-    public TradeOrderDO getActivityOrderByUserIdAndActivityIdAndStatus(Long userId, Long activityId, Integer status) {
-        return tradeOrderMapper.selectByUserIdAndActivityIdAndStatus(userId, activityId, status);
+    public TradeOrderDO getOrderByUserIdAndStatusAndCombination(Long userId, Long combinationActivityId, Integer status) {
+        return tradeOrderMapper.selectByUserIdAndCombinationActivityIdAndStatus(userId, combinationActivityId, status);
     }
 
     @Override
