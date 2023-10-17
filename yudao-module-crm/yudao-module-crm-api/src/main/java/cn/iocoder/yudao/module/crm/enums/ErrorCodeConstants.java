@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.crm.enums;
 
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
+
 /**
  * CRM 错误码枚举类
  * <p>
@@ -7,6 +9,7 @@ package cn.iocoder.yudao.module.crm.enums;
  */
 public interface ErrorCodeConstants {
 
-
+    // ========== 合同管理 1-020-000-000 ==========
+    ErrorCode CONTRACT_NOT_EXISTS = new ErrorCode(1_020_000_000, "合同不存在");
 
 }
