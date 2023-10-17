@@ -17,6 +17,7 @@ import java.util.List;
  */
 public interface SocialUserService {
 
+    // TODO @芋艿：需要传递 userType
     /**
      * 获得社交平台的授权 URL
      *

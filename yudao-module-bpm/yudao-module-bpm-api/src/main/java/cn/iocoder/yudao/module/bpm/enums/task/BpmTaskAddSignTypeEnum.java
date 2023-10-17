@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.bpm.enums.task;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-
 /**
  * 流程任务 -- 加签类型枚举类型
  */

@@ -74,6 +74,7 @@ public class BpmTaskController {
         return success(true);
     }
 
+    // TODO @海：/return-list，不用带 get；
     @GetMapping("/get-return-list")
     @Operation(summary = "获取所有可回退的节点", description = "用于【流程详情】的【回退】按钮")
     @Parameter(name = "taskId", description = "当前任务ID", required = true)
@@ -98,6 +99,7 @@ public class BpmTaskController {
         return success(true);
     }
 
+    // TODO @海：create-sign？创建加签任务；
     @PutMapping("/add-sign")
     @Operation(summary = "加签", description = "before 前加签，after 后加签")
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
@@ -106,6 +108,7 @@ public class BpmTaskController {
         return success(true);
     }
 
+    // TODO @海：delete-sign？删除加签任务；然后 @DeleteMapping；这样感觉可以保持统一；
     @PutMapping("/sub-sign")
     @Operation(summary = "减签")
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
@@ -114,6 +117,8 @@ public class BpmTaskController {
         return success(true);
     }
 
+    // TODO @海：/children-list，不用带 task 和 get；
+    // TODO @海：taskId 是不是改成 parentId？另外，它的 swagger 注解也加下哈；
     @GetMapping("/get-children-task-list")
     @Operation(summary = "获取能被减签的任务")
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")

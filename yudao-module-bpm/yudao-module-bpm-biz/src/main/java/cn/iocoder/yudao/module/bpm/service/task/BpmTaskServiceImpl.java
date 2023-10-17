@@ -240,6 +240,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         handleParentTask(task);
     }
 
+    // TODO @海：我们是不是加签统一认为是 SIGN，这样 SIGN_AFTER 就是后置；SIGN_BEFORE 就是前置；
     /**
      * 审批通过存在“后加签”的任务。
      * <p>
@@ -265,7 +266,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     /**
-     * 处理当前任务的父任务
+     * 处理当前任务的父任务，主要处理“加签”的情况
      *
      * @param task 当前任务
      */
@@ -274,25 +275,27 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (StrUtil.isBlank(parentTaskId)) {
             return;
         }
+        // TODO @海洋：279 这个判断就不需要啦；括号层级少一级噢；
         if (StrUtil.isNotBlank(parentTaskId)) {
             // 1. 判断当前任务的父任务是否还有子任务
             Long childrenTaskCount = getChildrenTaskCount(parentTaskId);
             if (childrenTaskCount > 0) {
                 return;
             }
+            // TODO @海：如果非向前、向后加签，就直接 return 掉；就是把 3. 那判断做次提前；万一有别的父子任务经过这个逻辑，其实我们是不处理的，对哇？
             // 2. 获取父任务
             Task parentTask = validateTaskExist(parentTaskId);
 
-            // 3. 情况一：处理向前加签
+            // 3.1 情况一：处理向前加签
             String scopeType = parentTask.getScopeType();
             if (BpmTaskAddSignTypeEnum.BEFORE.getType().equals(scopeType)) {
-                // 3.1 如果是向前加签的任务，则调用 resolveTask 指派父任务，将 owner 重新赋值给父任务的 assignee
+                // 3.1.1 如果是向前加签的任务，则调用 resolveTask 指派父任务，将 owner 重新赋值给父任务的 assignee，这样它就可以被审批
                 taskService.resolveTask(parentTaskId);
-                // 3.2 更新任务拓展表为处理中
+                // 3.1.2 更新任务拓展表为处理中
                 taskExtMapper.updateByTaskId(
                         new BpmTaskExtDO().setTaskId(parentTask.getId()).setResult(BpmProcessInstanceResultEnum.PROCESS.getResult()));
             } else if (BpmTaskAddSignTypeEnum.AFTER.getType().equals(scopeType)) {
-                // 3. 情况二：处理向后加签
+                // 3.2 情况二：处理向后加签
                 handleAfterSign(parentTask);
             }
 
@@ -308,42 +311,43 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
     }
 
+    // TODO @海：可以把这个方法名，改成 handleParentTaskForAfterSign。= = 虽然这个名字也有点丑，但是目的是体现出它是 handleParentTask 的一种衍生
     /**
      * 处理后加签任务
      *
      * @param parentTask 当前审批任务的父任务
      */
+    // TODO @海：这个逻辑，怎么感觉可以是 parentTask 的 parent，再去调用 handleParentTask 方法；可以微信聊下；
     private void handleAfterSign(Task parentTask) {
         String parentTaskId = parentTask.getId();
-        //1. 更新 parentTask 的任务拓展表为通过，并调用 complete 完成自己
+        // 1. 更新 parentTask 的任务拓展表为通过，并调用 complete 完成自己
         BpmTaskExtDO currentTaskExt = taskExtMapper.selectByTaskId(parentTask.getId());
-        BpmTaskExtDO currentTaskUpdateEntity = new BpmTaskExtDO().setTaskId(parentTask.getId())
+        BpmTaskExtDO currentTaskExtUpdateObj = new BpmTaskExtDO().setTaskId(parentTask.getId())
                 .setResult(BpmProcessInstanceResultEnum.APPROVE.getResult());
         if (currentTaskExt.getEndTime() == null) {
             // 1.1 有这个判断是因为,以前没设置过结束时间，才去设置
-            currentTaskUpdateEntity.setEndTime(LocalDateTime.now());
+            currentTaskExtUpdateObj.setEndTime(LocalDateTime.now());
         }
-        // 1.2 完成自己
-        taskExtMapper.updateByTaskId(currentTaskUpdateEntity);
+        taskExtMapper.updateByTaskId(currentTaskExtUpdateObj);
+        // 1.2 完成自己（因为它已经没有子任务，所以也可以完成）
         taskService.complete(parentTaskId);
 
         // 2. 如果有父级，递归查询上级任务是否都已经完成
         if (StrUtil.isEmpty(parentTask.getParentTaskId())) {
             return;
         }
-        // TODO @海：这块待讨论，脑子略乱；感觉 handleAfterSign 的后半段，和 handleParentTask 有点重叠？？？
         // 2.1 判断整条链路的任务是否完成
         // 例如从 A 任务加签了一个 B 任务，B 任务又加签了一个 C 任务，C 任务加签了 D 任务
         // 此时，D 任务完成，要一直往上找到祖先任务 A调用 complete 方法完成 A 任务
         boolean allChildrenTaskFinish = true;
         while (StrUtil.isNotBlank(parentTask.getParentTaskId())) {
             parentTask = validateTaskExist(parentTask.getParentTaskId());
-            BpmTaskExtDO bpmTaskExtDO = taskExtMapper.selectByTaskId(parentTask.getId());
-            if (bpmTaskExtDO == null) {
+            BpmTaskExtDO parentTaskExt = taskExtMapper.selectByTaskId(parentTask.getId());
+            if (parentTaskExt == null) {
                 break;
             }
-            boolean currentTaskFinish = BpmProcessInstanceResultEnum.isEndResult(bpmTaskExtDO.getResult());
-            // 2.2 如果 allChildrenTaskFinish 已经被赋值为 false ,则不会再赋值为 true，因为整个链路没有完成
+            boolean currentTaskFinish = BpmProcessInstanceResultEnum.isEndResult(parentTaskExt.getResult());
+            // 2.2 如果 allChildrenTaskFinish 已经被赋值为 false，则不会再赋值为 true，因为整个链路没有完成
             if (allChildrenTaskFinish) {
                 allChildrenTaskFinish = currentTaskFinish;
             }
@@ -354,19 +358,19 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
             // 3 处理非完成状态的任务
             // 3.1 判断当前任务的父任务是否还有子任务
-            Long childrenTaskCount = getChildrenTaskCount(bpmTaskExtDO.getTaskId());
+            Long childrenTaskCount = getChildrenTaskCount(parentTaskExt.getTaskId());
             if (childrenTaskCount > 0) {
                 continue;
             }
             // 3.2 没有子任务，判断当前任务状态是否为 ADD_SIGN_BEFORE 待前加签任务完成
-            if (BpmProcessInstanceResultEnum.ADD_SIGN_BEFORE.getResult().equals(bpmTaskExtDO.getResult())) {
+            if (BpmProcessInstanceResultEnum.ADD_SIGN_BEFORE.getResult().equals(parentTaskExt.getResult())) {
                 // 3.3 需要修改该任务状态为处理中
-                taskService.resolveTask(bpmTaskExtDO.getTaskId());
-                bpmTaskExtDO.setResult(BpmProcessInstanceResultEnum.PROCESS.getResult());
-                taskExtMapper.updateByTaskId(bpmTaskExtDO);
+                taskService.resolveTask(parentTaskExt.getTaskId());
+                parentTaskExt.setResult(BpmProcessInstanceResultEnum.PROCESS.getResult());
+                taskExtMapper.updateByTaskId(parentTaskExt);
             }
             // 3.4 清空 scopeType 字段，用于任务没有子任务时使用该方法，方便任务可以再次被不同的方式加签
-            parentTask = validateTaskExist(bpmTaskExtDO.getTaskId());
+            parentTask = validateTaskExist(parentTaskExt.getTaskId());
             clearTaskScopeTypeAndSave(parentTask);
         }
 
@@ -386,7 +390,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         taskImpl.setScopeType(null);
         taskService.saveTask(task);
     }
-
 
     /**
      * 获取子任务个数
@@ -741,8 +744,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 4. 记录加签 comment，拼接结果为： [当前用户]向前加签/向后加签给了[多个用户]，理由为：reason
         AdminUserRespDTO currentUser = adminUserApi.getUser(userId);
-        String comment = StrUtil.format(BpmCommentTypeEnum.ADD_SIGN.getTemplateComment(), currentUser.getNickname(), BpmTaskAddSignTypeEnum.formatDesc(reqVO.getType()),
-                String.join(",", convertList(userList, AdminUserRespDTO::getNickname)), reqVO.getReason());
+        String comment = StrUtil.format(BpmCommentTypeEnum.ADD_SIGN.getTemplateComment(), currentUser.getNickname(),
+                BpmTaskAddSignTypeEnum.formatDesc(reqVO.getType()), String.join(",", convertList(userList, AdminUserRespDTO::getNickname)), reqVO.getReason());
         taskService.addComment(reqVO.getId(), taskEntity.getProcessInstanceId(),
                 BpmCommentTypeEnum.ADD_SIGN.getType().toString(), comment);
     }
@@ -780,6 +783,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         return taskEntity;
     }
 
+    // TODO @海：方法名，要不改成 createSignTask；
     /**
      * 创建加签子任务
      *
@@ -799,19 +803,19 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
     }
 
+    // TODO @海：注释要不改成，创建加签子任务；然后方法名，就是 createSignTask；因为它还是在创建加签任务，目前哈；
     /**
      * 创建子任务
      *
      * @param parentTask 父任务
      * @param assignee   子任务的执行人
-     * @return
      */
     private void createChildrenTask(TaskEntityImpl parentTask, String assignee) {
         // 1. 生成子任务
         TaskEntityImpl task = (TaskEntityImpl) taskService.newTask(IdUtil.fastSimpleUUID());
         task = BpmTaskConvert.INSTANCE.convert(task, parentTask);
         if (BpmTaskAddSignTypeEnum.BEFORE.getType().equals(parentTask.getScopeType())) {
-            // 2.1 前加签，才设置审批人，否则设置 owner
+            // 2.1 前加签，设置审批人
             task.setAssignee(assignee);
         } else {
             // 2.2.1 设置 owner 不设置 assignee 是因为不能同时审批，需要等父任务完成
@@ -826,8 +830,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void subSignTask(Long userId, BpmTaskSubSignReqVO reqVO) {
+        // 1.1 校验 task 可以被减签
         Task task = validateSubSign(reqVO.getId());
+        // TODO @海：adminUserApi.getUser(userId) 是不是应该放到 3. 那；
         AdminUserRespDTO user = adminUserApi.getUser(userId);
+        // 1.2 校验取消人存在
         AdminUserRespDTO cancelUser = null;
         if (StrUtil.isNotBlank(task.getAssignee())) {
             cancelUser = adminUserApi.getUser(NumberUtils.parseLong(task.getAssignee()));
@@ -836,20 +843,22 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             cancelUser = adminUserApi.getUser(NumberUtils.parseLong(task.getOwner()));
         }
         Assert.notNull(cancelUser, "任务中没有所有者和审批人，数据错误");
-        //1. 获取所有需要删除的任务 ID ，包含当前任务和所有子任务
+
+        // TODO @海：1. 和 2. 可以写一行注释；其实就是删除任务，和它的子任务；本质上，1. 和 2. 还有 3. 是一块逻辑，写成 1.1 1.2 1.3 会更易懂
+        // 1. 获取所有需要删除的任务 ID ，包含当前任务和所有子任务
         List<String> allTaskIdList = getAllChildTaskIds(task.getId());
-        //2. 删除任务和所有子任务
+        // 2. 删除任务和所有子任务
         taskService.deleteTasks(allTaskIdList);
-        //3. 修改扩展表状态为取消
+        // 3. 修改扩展表状态为取消
         taskExtMapper.updateBatchByTaskIdList(allTaskIdList, new BpmTaskExtDO().setResult(BpmProcessInstanceResultEnum.CANCEL.getResult())
                 .setReason(StrUtil.format("由于{}操作[减签]，任务被取消", user.getNickname())));
-        //4.记录日志到父任务中 先记录日志是因为，通过 handleParentTask 方法之后，任务可能被完成了，并且不存在了，会报异常，所以先记录
+
+        // 4. 记录日志到父任务中。先记录日志是因为，通过 handleParentTask 方法之后，任务可能被完成了，并且不存在了，会报异常，所以先记录
         String comment = StrUtil.format(BpmCommentTypeEnum.SUB_SIGN.getTemplateComment(), user.getNickname(), cancelUser.getNickname());
         taskService.addComment(task.getParentTaskId(), task.getProcessInstanceId(),
                 BpmCommentTypeEnum.SUB_SIGN.getType().toString(), comment);
-        //5. 处理当前任务的父任务
-        this.handleParentTask(task);
-
+        // 5. 处理当前任务的父任务
+        handleParentTask(task);
     }
 
     /**
@@ -860,7 +869,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      */
     private Task validateSubSign(String id) {
         Task task = validateTaskExist(id);
-        //必须有parentId
+        // 必须有 parentId
+        // TODO @海：是不是通过 scopeType 去判断更合适哈？因为别的情况下，也可能有 parentId
         if (StrUtil.isEmpty(task.getParentTaskId())) {
             throw exception(TASK_SUB_SIGN_NO_PARENT);
         }
@@ -875,6 +885,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      */
     public List<String> getAllChildTaskIds(String parentTaskId) {
         List<String> allChildTaskIds = new ArrayList<>();
+        // TODO @海：这里可以把递归改成 for 循环，可以试试看哈；整体思路，是一层一层查询；然后判断某一层查不出来了，就是结束了；
+        //  最好不用无限递归，一般是 for （int i = 0; i < Short.MAX），避免脏数据导致无限递归；
         //1. 先将自己放入
         allChildTaskIds.add(parentTaskId);
         //2. 递归获取子级
@@ -896,6 +908,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
     }
 
+    // TODO @海：一般情况下，除非对性能特别有要求，才只查询 ID_ 单字段；一般层级不多，数据量不大；其实整查就好啦，无非是带宽稍微浪费电，但是基本看不出啥性能差距；
     /**
      * 获取指定父级任务的所有子任务 ID 集合
      *
@@ -911,16 +924,21 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     public List<BpmTaskSubSignRespVO> getChildrenTaskList(String taskId) {
+        // 1. 只查询进行中的任务
         List<String> childrenTaskIdList = getChildrenTaskIdList(taskId);
         if (CollUtil.isEmpty(childrenTaskIdList)) {
             return Collections.emptyList();
         }
-        //1. 只查询进行中的任务
+        // TODO @海：bpmTaskExtDOList 可以改成 taskExtList；因为当前已经在 bpm 模块，不用前缀；然后，DO 一般情况下不用带；
         List<BpmTaskExtDO> bpmTaskExtDOList = taskExtMapper.selectProcessListByTaskIds(childrenTaskIdList);
-        //2. 后加签的任务，可能不存在 assignee,所以还需要查询 owner
+
+        // 2. 后加签的任务，可能不存在 assignee，所以还需要查询 owner
+        // TODO @海：1. 和 2. 是不是有点重复哈；1. 先查询到了子节点，然后返回了 ids 集合；然后又去 in 查询了一次。。。。按道理，taskService 查询 taskList 就完事？
         List<Task> taskList = taskService.createTaskQuery().taskIds(childrenTaskIdList).list();
         Map<String, Task> idTaskMap = convertMap(taskList, TaskInfo::getId);
-        //3. 将 owner 和 assignee 统一到一个集合中
+
+        // 3. 将 owner 和 assignee 统一到一个集合中
+        // TODO @海：下面 userId 的获取，可以考虑抽个小方法；
         List<Long> userIds = taskList.stream()
                 .flatMap(control ->
                         Stream.of(control.getAssignee(), control.getOwner())
@@ -931,4 +949,5 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
         return BpmTaskConvert.INSTANCE.convertList(bpmTaskExtDOList, userMap, idTaskMap);
     }
+
 }

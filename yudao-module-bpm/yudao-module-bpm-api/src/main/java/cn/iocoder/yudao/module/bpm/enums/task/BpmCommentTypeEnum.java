@@ -20,15 +20,17 @@ public enum BpmCommentTypeEnum {
     ;
 
     /**
-     * 结果
+     * 操作类型
      */
     private final Integer type;
+    // TODO @海：desc 可以改成 name；相当于操作名；
     /**
-     * 描述
+     * 操作名字
      */
     private final String desc;
+    // TODO @海：直接改成 comment 哈；简单一点；
     /**
-     * 模板信息
+     * 操作描述
      */
     private final String templateComment;
 

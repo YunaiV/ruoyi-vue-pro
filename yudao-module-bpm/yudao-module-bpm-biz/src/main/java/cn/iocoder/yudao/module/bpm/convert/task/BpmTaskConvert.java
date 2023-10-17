@@ -167,13 +167,17 @@ public interface BpmTaskConvert {
     default List<BpmTaskSubSignRespVO> convertList(List<BpmTaskExtDO> bpmTaskExtDOList,
                                                    Map<Long, AdminUserRespDTO> userMap,
                                                    Map<String, Task> idTaskMap){
-        return CollectionUtils.convertList(bpmTaskExtDOList, task->{
+        return CollectionUtils.convertList(bpmTaskExtDOList, task -> {
+            // TODO @海：setId、name，可以链式调用
             BpmTaskSubSignRespVO bpmTaskSubSignRespVO = new BpmTaskSubSignRespVO();
             bpmTaskSubSignRespVO.setName(task.getName());
             bpmTaskSubSignRespVO.setId(task.getTaskId());
             Task sourceTask = idTaskMap.get(task.getTaskId());
+            // TODO @海：下面这行注释，应该放到 idTaskMap.get(task.getTaskId()) 上面；原因是，应该注释之后，下面的逻辑是个整体；
             // 后加签任务不会直接设置 assignee ,所以不存在 assignee 的情况，则去取 owner
+            // TODO @海：可以使用 ObjUtil.default 方法
             String assignee = StrUtil.isNotEmpty(sourceTask.getAssignee()) ? sourceTask.getAssignee() : sourceTask.getOwner();
+            // TODO @海：这里可以使用 MapUtils.findAndThen 写起来更简单一点；
             AdminUserRespDTO assignUser = userMap.get(NumberUtils.parseLong(assignee));
             if (assignUser != null) {
                 bpmTaskSubSignRespVO.setAssigneeUser(convert3(assignUser));
@@ -184,10 +188,11 @@ public interface BpmTaskConvert {
 
     /**
      * 转换任务为父子级
+     *
      * @param sourceList 原始数据
      * @return 转换后的父子级数组
      */
-    default List<BpmTaskRespVO> convertChildrenList(List<BpmTaskRespVO> sourceList){
+    default List<BpmTaskRespVO> convertChildrenList(List<BpmTaskRespVO> sourceList) {
         List<BpmTaskRespVO> childrenTaskList = CollectionUtils.filterList(sourceList, r -> StrUtil.isNotEmpty(r.getParentTaskId()));
         Map<String, List<BpmTaskRespVO>> parentChildrenTaskListMap = CollectionUtils.convertMultiMap(childrenTaskList, BpmTaskRespVO::getParentTaskId);
         for (BpmTaskRespVO bpmTaskRespVO : sourceList) {
@@ -195,4 +200,5 @@ public interface BpmTaskConvert {
         }
         return CollectionUtils.filterList(sourceList, r -> StrUtil.isEmpty(r.getParentTaskId()));
     }
+
 }
