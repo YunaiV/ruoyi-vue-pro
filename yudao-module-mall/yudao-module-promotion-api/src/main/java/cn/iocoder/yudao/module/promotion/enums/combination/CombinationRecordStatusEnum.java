@@ -40,4 +40,12 @@ public enum CombinationRecordStatusEnum implements IntArrayValuable {
         return ObjectUtil.equal(status, SUCCESS.getStatus());
     }
 
+    public static boolean isInProgress(Integer status) {
+        return ObjectUtil.equal(status, IN_PROGRESS.getStatus());
+    }
+
+    public static boolean isFailed(Integer status) {
+        return ObjectUtil.equal(status, FAILED.getStatus());
+    }
+
 }

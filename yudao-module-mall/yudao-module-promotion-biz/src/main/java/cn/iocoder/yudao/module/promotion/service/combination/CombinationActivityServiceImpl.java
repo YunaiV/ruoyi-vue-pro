@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.promotion.service.combination;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
@@ -24,12 +26,12 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
@@ -64,20 +66,18 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
 
         // 插入拼团活动
         CombinationActivityDO activity = CombinationActivityConvert.INSTANCE.convert(createReqVO)
-                .setStatus(CommonStatusEnum.ENABLE.getStatus())
-                .setTotalCount(0).setSuccessCount(0).setOrderUserCount(0).setVirtualGroup(0);
+                .setStatus(CommonStatusEnum.ENABLE.getStatus());
         combinationActivityMapper.insert(activity);
         // 插入商品
         List<CombinationProductDO> products = CombinationActivityConvert.INSTANCE.convertList(createReqVO.getProducts(), activity);
         combinationProductMapper.insertBatch(products);
-        // 返回
         return activity.getId();
     }
 
     /**
      * 校验拼团商品参与的活动是否存在冲突
      *
-     * @param spuId 商品 SPU 编号
+     * @param spuId      商品 SPU 编号
      * @param activityId 拼团活动编号
      */
     private void validateProductConflict(Long spuId, Long activityId) {
@@ -96,8 +96,8 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     /**
      * 校验拼团商品是否都存在
      *
-     * @param spuId 商品 SPU 编号
-     * @param products 秒杀商品
+     * @param spuId    商品 SPU 编号
+     * @param products 拼团商品
      */
     private void validateProductExists(Long spuId, List<CombinationProductBaseVO> products) {
         // 1. 校验商品 spu 是否存在
@@ -123,7 +123,7 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
         CombinationActivityDO activityDO = validateCombinationActivityExists(updateReqVO.getId());
         // 校验状态
         if (ObjectUtil.equal(activityDO.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
-            throw exception(COMBINATION_ACTIVITY_STATUS_DISABLE);
+            throw exception(COMBINATION_ACTIVITY_STATUS_DISABLE_NOT_UPDATE);
         }
         // 校验商品冲突
         validateProductConflict(updateReqVO.getSpuId(), updateReqVO.getId());
@@ -141,7 +141,7 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
      * 更新拼团商品
      *
      * @param activity 拼团活动
-     * @param products  该活动的最新商品配置
+     * @param products 该活动的最新商品配置
      */
     private void updateCombinationProduct(CombinationActivityDO activity, List<CombinationProductBaseVO> products) {
         // 第一步，对比新老数据，获得添加、修改、删除的列表
@@ -201,8 +201,41 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     }
 
     @Override
-    public List<CombinationProductDO> getCombinationProductsByActivityIds(Collection<Long> activityIds) {
+    public List<CombinationProductDO> getCombinationProductListByActivityIds(Collection<Long> activityIds) {
         return combinationProductMapper.selectListByActivityIds(activityIds);
+    }
+
+    @Override
+    public List<CombinationActivityDO> getCombinationActivityListByIds(Collection<Long> ids) {
+        return combinationActivityMapper.selectList(CombinationActivityDO::getId, ids);
+    }
+
+    @Override
+    public List<CombinationActivityDO> getCombinationActivityListByCount(Integer count) {
+        return combinationActivityMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus(), count);
+    }
+
+    @Override
+    public PageResult<CombinationActivityDO> getCombinationActivityPage(PageParam pageParam) {
+        return combinationActivityMapper.selectPage(pageParam, CommonStatusEnum.ENABLE.getStatus());
+    }
+
+    @Override
+    public CombinationProductDO selectByActivityIdAndSkuId(Long activityId, Long skuId) {
+        return combinationProductMapper.selectOne(
+                CombinationProductDO::getActivityId, activityId,
+                CombinationProductDO::getSkuId, skuId);
+    }
+
+    @Override
+    public List<CombinationActivityDO> getCombinationActivityBySpuIdsAndStatus(Collection<Long> spuIds, Integer status) {
+        // 1.查询出指定 spuId 的 spu 参加的活动最接近现在的一条记录。多个的话，一个 spuId 对应一个最近的活动编号
+        List<Map<String, Object>> spuIdAndActivityIdMaps = combinationActivityMapper.selectSpuIdAndActivityIdMapsBySpuIdsAndStatus(spuIds, status);
+        if (CollUtil.isEmpty(spuIdAndActivityIdMaps)) {
+            return Collections.emptyList();
+        }
+        // 2.查询活动详情
+        return combinationActivityMapper.selectListByIds(convertSet(spuIdAndActivityIdMaps, map -> MapUtil.getLong(map, "activityId")));
     }
 
 }

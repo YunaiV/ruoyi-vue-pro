@@ -150,6 +150,10 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
         // 2.1 执行请求
         AlipayTradeRefundResponse response = client.execute(request);
         if (!response.isSuccess()) {
+            // 当出现 ACQ.SYSTEM_ERROR, 退款可能成功也可能失败。 返回 WAIT 状态. 后续 job 会轮询
+            if (ObjectUtils.equalsAny(response.getSubCode(), "ACQ.SYSTEM_ERROR", "SYSTEM_ERROR")) {
+                return PayRefundRespDTO.waitingOf(null, reqDTO.getOutRefundNo(), response);
+            }
             return PayRefundRespDTO.failureOf(response.getSubCode(), response.getSubMsg(), reqDTO.getOutRefundNo(), response);
         }
         // 2.2 创建返回结果
@@ -197,6 +201,8 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
         }
         return PayRefundRespDTO.waitingOf(null, outRefundNo, response);
     }
+
+
 
     // ========== 各种工具方法 ==========
 

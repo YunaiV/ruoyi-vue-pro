@@ -42,36 +42,32 @@ public interface DeliveryExpressTemplateConvert {
                                                         List<DeliveryExpressTemplateChargeDO> chargeList,
                                                         List<DeliveryExpressTemplateFreeDO> freeList) {
         DeliveryExpressTemplateDetailRespVO respVO = convert2(bean);
-        respVO.setTemplateCharge(convertTemplateChargeList(chargeList));
-        respVO.setTemplateFree(convertTemplateFreeList(freeList));
+        respVO.setCharges(convertTemplateChargeList(chargeList));
+        respVO.setFrees(convertTemplateFreeList(freeList));
         return respVO;
     }
 
     // ========== Template Charge ==========
 
-    DeliveryExpressTemplateChargeDO convertTemplateCharge(Long templateId, Integer chargeMode, ExpressTemplateChargeBaseVO vo);
-
-    DeliveryExpressTemplateChargeDO convertTemplateCharge(DeliveryExpressTemplateUpdateReqVO.ExpressTemplateChargeUpdateVO vo);
+    DeliveryExpressTemplateChargeDO convertTemplateCharge(Long templateId, Integer chargeMode, DeliveryExpressTemplateChargeBaseVO vo);
 
     DeliveryExpressTemplateRespBO.Charge convertTemplateCharge(DeliveryExpressTemplateChargeDO bean);
 
-    default List<DeliveryExpressTemplateChargeDO> convertTemplateChargeList(Long templateId, Integer chargeMode, List<ExpressTemplateChargeBaseVO> list) {
+    default List<DeliveryExpressTemplateChargeDO> convertTemplateChargeList(Long templateId, Integer chargeMode, List<DeliveryExpressTemplateChargeBaseVO> list) {
         return CollectionUtils.convertList(list, vo -> convertTemplateCharge(templateId, chargeMode, vo));
     }
 
     // ========== Template Free ==========
 
-    DeliveryExpressTemplateFreeDO convertTemplateFree(Long templateId, ExpressTemplateFreeBaseVO vo);
-
-    DeliveryExpressTemplateFreeDO convertTemplateFree(DeliveryExpressTemplateUpdateReqVO.ExpressTemplateFreeUpdateVO vo);
+    DeliveryExpressTemplateFreeDO convertTemplateFree(Long templateId, DeliveryExpressTemplateFreeBaseVO vo);
 
     DeliveryExpressTemplateRespBO.Free convertTemplateFree(DeliveryExpressTemplateFreeDO bean);
 
-    List<ExpressTemplateChargeBaseVO> convertTemplateChargeList(List<DeliveryExpressTemplateChargeDO> list);
+    List<DeliveryExpressTemplateChargeBaseVO> convertTemplateChargeList(List<DeliveryExpressTemplateChargeDO> list);
 
-    List<ExpressTemplateFreeBaseVO> convertTemplateFreeList(List<DeliveryExpressTemplateFreeDO> list);
+    List<DeliveryExpressTemplateFreeBaseVO> convertTemplateFreeList(List<DeliveryExpressTemplateFreeDO> list);
 
-    default List<DeliveryExpressTemplateFreeDO> convertTemplateFreeList(Long templateId, List<ExpressTemplateFreeBaseVO> list) {
+    default List<DeliveryExpressTemplateFreeDO> convertTemplateFreeList(Long templateId, List<DeliveryExpressTemplateFreeBaseVO> list) {
         return CollectionUtils.convertList(list, vo -> convertTemplateFree(templateId, vo));
     }
 
@@ -93,4 +89,5 @@ public interface DeliveryExpressTemplateConvert {
         });
         return result;
     }
+
 }

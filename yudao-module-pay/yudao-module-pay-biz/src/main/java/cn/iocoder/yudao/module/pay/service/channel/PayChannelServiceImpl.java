@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.pay.controller.admin.channel.vo.PayChannelUpdateR
 import cn.iocoder.yudao.module.pay.convert.channel.PayChannelConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.channel.PayChannelMapper;
+import cn.iocoder.yudao.module.pay.framework.pay.core.WalletPayClient;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import lombok.Getter;
@@ -20,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.validation.Validator;
 import java.time.Duration;
@@ -67,6 +69,14 @@ public class PayChannelServiceImpl implements PayChannelService {
 
     @Resource
     private Validator validator;
+
+    /**
+     * 初始化，为了注册钱包
+     */
+    @PostConstruct
+    public void init() {
+        payClientFactory.registerPayClientClass(PayChannelEnum.WALLET, WalletPayClient.class);
+    }
 
     @Override
     public Long createChannel(PayChannelCreateReqVO reqVO) {

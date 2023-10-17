@@ -1,13 +1,18 @@
 package cn.iocoder.yudao.module.promotion.service.bargain;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
-import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityPageReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.BargainActivityCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.BargainActivityPageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.BargainActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.convert.bargain.BargainActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.bargain.BargainActivityMapper;
@@ -16,10 +21,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.anyMatch;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 
@@ -39,6 +46,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
     private ProductSkuApi productSkuApi;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Long createBargainActivity(BargainActivityCreateReqVO createReqVO) {
         // 校验商品 SPU 是否存在是否参加的别的活动
         validateBargainConflict(createReqVO.getSpuId(), null);
@@ -47,17 +55,19 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 
         // 插入砍价活动
         BargainActivityDO activityDO = BargainActivityConvert.INSTANCE.convert(createReqVO)
-                .setStatus(CommonStatusEnum.ENABLE.getStatus()).setSuccessCount(0);
+                .setTotalStock(createReqVO.getStock())
+                .setStatus(CommonStatusEnum.ENABLE.getStatus());
         bargainActivityMapper.insert(activityDO);
         return activityDO.getId();
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateBargainActivity(BargainActivityUpdateReqVO updateReqVO) {
         // 校验存在
-        BargainActivityDO activityDO = validateBargainActivityExists(updateReqVO.getId());
+        BargainActivityDO activity = validateBargainActivityExists(updateReqVO.getId());
         // 校验状态
-        if (ObjectUtil.equal(activityDO.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
+        if (ObjectUtil.equal(activity.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
             throw exception(BARGAIN_ACTIVITY_STATUS_DISABLE);
         }
         // 校验商品冲突
@@ -67,7 +77,23 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 
         // 更新
         BargainActivityDO updateObj = BargainActivityConvert.INSTANCE.convert(updateReqVO);
+        if (updateObj.getStock() > activity.getTotalStock()) { // 如果更新的库存大于原来的库存，则更新总库存
+            updateObj.setTotalStock(updateObj.getStock());
+        }
         bargainActivityMapper.updateById(updateObj);
+    }
+
+    @Override
+    public void updateBargainActivityStock(Long id, Integer count) {
+        if (count < 0) {
+            // 更新库存。如果更新失败，则抛出异常
+            int updateCount = bargainActivityMapper.updateStock(id, count);
+            if (updateCount == 0) {
+                throw exception(BARGAIN_ACTIVITY_STOCK_NOT_ENOUGH);
+            }
+        } else if (count > 0) {
+            bargainActivityMapper.updateStock(id, count);
+        }
     }
 
     private void validateBargainConflict(Long spuId, Long activityId) {
@@ -117,8 +143,54 @@ public class BargainActivityServiceImpl implements BargainActivityService {
     }
 
     @Override
+    public List<BargainActivityDO> getBargainActivityList(Set<Long> ids) {
+        return bargainActivityMapper.selectBatchIds(ids);
+    }
+
+    @Override
+    public BargainActivityDO validateBargainActivityCanJoin(Long id) {
+        BargainActivityDO activity = bargainActivityMapper.selectById(id);
+        if (activity == null) {
+            throw exception(BARGAIN_ACTIVITY_NOT_EXISTS);
+        }
+        if (ObjUtil.notEqual(activity.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+            throw exception(BARGAIN_ACTIVITY_STATUS_CLOSED);
+        }
+        if (activity.getStock() <= 0) {
+            throw exception(BARGAIN_ACTIVITY_STOCK_NOT_ENOUGH);
+        }
+        if (!LocalDateTimeUtils.isBetween(activity.getStartTime(), activity.getEndTime())) {
+            throw exception(BARGAIN_ACTIVITY_TIME_END);
+        }
+        return activity;
+    }
+
+    @Override
     public PageResult<BargainActivityDO> getBargainActivityPage(BargainActivityPageReqVO pageReqVO) {
         return bargainActivityMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public PageResult<BargainActivityDO> getBargainActivityPage(PageParam pageReqVO) {
+        // 只查询进行中，且在时间范围内的
+        return bargainActivityMapper.selectPage(pageReqVO, CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now());
+    }
+
+    @Override
+    public List<BargainActivityDO> getBargainActivityListByCount(Integer count) {
+        return bargainActivityMapper.selectList(count, CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now());
+    }
+
+    @Override
+    public List<BargainActivityDO> getBargainActivityBySpuIdsAndStatus(Collection<Long> spuIds, Integer status) {
+        // 1. 查询出指定 spuId 的 spu 参加的活动最接近现在的一条记录。多个的话，一个 spuId 对应一个最近的活动编号
+        // TODO @puhui999：我想了下，这种是不是只展示当前正在进行中的。已经结束、或者未开始的，可能没啥意义？
+        List<Map<String, Object>> spuIdAndActivityIdMaps = bargainActivityMapper.selectSpuIdAndActivityIdMapsBySpuIdsAndStatus(spuIds, status);
+        if (CollUtil.isEmpty(spuIdAndActivityIdMaps)) {
+            return Collections.emptyList();
+        }
+        // 2. 查询活动详情
+        return bargainActivityMapper.selectListByIds(convertSet(spuIdAndActivityIdMaps, map -> MapUtil.getLong(map, "activityId")));
     }
 
 }

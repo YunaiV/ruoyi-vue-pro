@@ -5,8 +5,10 @@ import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template.Cou
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template.CouponTemplatePageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template.CouponTemplateUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
+import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTakeTypeEnum;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 优惠劵模板 Service 接口
@@ -68,5 +70,25 @@ public interface CouponTemplateService {
      * @param incrCount 增加数量
      */
     void updateCouponTemplateTakeCount(Long id, int incrCount);
+
+    /**
+     * 获得指定领取方式的优惠券模板
+     *
+     * @param takeType 领取方式
+     * @return 优惠券模板列表
+     */
+    List<CouponTemplateDO> getCouponTemplateListByTakeType(CouponTakeTypeEnum takeType);
+
+    /**
+     * 获得优惠券模板列表
+     *
+     * @param canTakeTypes      可领取的类型列表
+     * @param productScope      商品使用范围类型
+     * @param productScopeValue 商品使用范围编号
+     * @param count             查询数量
+     * @return 优惠券模板列表
+     */
+    List<CouponTemplateDO> getCouponTemplateList(List<Integer> canTakeTypes, Integer productScope,
+                                                 Long productScopeValue, Integer count);
 
 }

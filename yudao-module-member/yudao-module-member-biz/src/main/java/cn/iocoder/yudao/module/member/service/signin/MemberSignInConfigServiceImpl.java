@@ -70,7 +70,7 @@ public class MemberSignInConfigServiceImpl implements MemberSignInConfigService 
      * 校验 day 是否重复
      *
      * @param day 天
-     * @param id 编号，只有更新的时候会传递
+     * @param id  编号，只有更新的时候会传递
      */
     private void validateSignInConfigDayDuplicate(Integer day, Long id) {
         MemberSignInConfigDO config = memberSignInConfigMapper.selectByDay(day);
@@ -90,7 +90,7 @@ public class MemberSignInConfigServiceImpl implements MemberSignInConfigService 
     }
 
     @Override
-    public List <MemberSignInConfigDO> getSignInConfigList() {
+    public List<MemberSignInConfigDO> getSignInConfigList() {
         List<MemberSignInConfigDO> list = memberSignInConfigMapper.selectList();
         list.sort(Comparator.comparing(MemberSignInConfigDO::getDay));
         return list;

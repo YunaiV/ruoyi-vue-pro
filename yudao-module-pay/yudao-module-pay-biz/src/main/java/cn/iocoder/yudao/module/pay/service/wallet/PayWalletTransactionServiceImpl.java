@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletTransactionMapper;
 import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
 import cn.iocoder.yudao.module.pay.enums.member.PayWalletBizTypeEnum;
-import cn.iocoder.yudao.module.pay.service.wallet.bo.CreateWalletTransactionBO;
+import cn.iocoder.yudao.module.pay.service.wallet.bo.WalletTransactionCreateReqBO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +43,7 @@ public class PayWalletTransactionServiceImpl implements PayWalletTransactionServ
     }
 
     @Override
-    public PayWalletTransactionDO createWalletTransaction(CreateWalletTransactionBO bo) {
+    public PayWalletTransactionDO createWalletTransaction(WalletTransactionCreateReqBO bo) {
         PayWalletTransactionDO transaction = PayWalletTransactionConvert.INSTANCE.convert(bo)
                 .setNo(noRedisDAO.generate(WALLET_NO_PREFIX));
         payWalletTransactionMapper.insert(transaction);

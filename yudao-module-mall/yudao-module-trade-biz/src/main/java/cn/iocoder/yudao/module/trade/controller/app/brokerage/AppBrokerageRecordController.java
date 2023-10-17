@@ -6,6 +6,9 @@ import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.record.AppBrokerageProductPriceRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.record.AppBrokerageRecordPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.record.AppBrokerageRecordRespVO;
+import cn.iocoder.yudao.module.trade.convert.brokerage.BrokerageRecordConvert;
+import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageRecordDO;
+import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageRecordService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -15,11 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static java.util.Arrays.asList;
+import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
 
 @Tag(name = "用户 APP - 分销用户")
 @RestController
@@ -27,29 +30,22 @@ import static java.util.Arrays.asList;
 @Validated
 @Slf4j
 public class AppBrokerageRecordController {
+    @Resource
+    private BrokerageRecordService brokerageRecordService;
 
-    // TODO 芋艿：临时 mock =>
     @GetMapping("/page")
     @Operation(summary = "获得分销记录分页")
     @PreAuthenticated
     public CommonResult<PageResult<AppBrokerageRecordRespVO>> getBrokerageRecordPage(@Valid AppBrokerageRecordPageReqVO pageReqVO) {
-        AppBrokerageRecordRespVO vo1 = new AppBrokerageRecordRespVO()
-                .setId(1L).setPrice(10).setTitle("收到钱").setCreateTime(LocalDateTime.now())
-                .setFinishTime(LocalDateTime.now());
-        AppBrokerageRecordRespVO vo2 = new AppBrokerageRecordRespVO()
-                .setId(2L).setPrice(-20).setTitle("提现钱").setCreateTime(LocalDateTime.now())
-                .setFinishTime(LocalDateTime.now());
-        return success(new PageResult<>(asList(vo1, vo2), 10L));
+        PageResult<BrokerageRecordDO> pageResult = brokerageRecordService.getBrokerageRecordPage(
+                BrokerageRecordConvert.INSTANCE.convert(pageReqVO, getLoginUserId()));
+        return success(BrokerageRecordConvert.INSTANCE.convertPage02(pageResult));
     }
 
     @GetMapping("/get-product-brokerage-price")
     @Operation(summary = "获得商品的分销金额")
     public CommonResult<AppBrokerageProductPriceRespVO> getProductBrokeragePrice(@RequestParam("spuId") Long spuId) {
-        AppBrokerageProductPriceRespVO respVO = new AppBrokerageProductPriceRespVO();
-        respVO.setEnabled(true); // TODO @疯狂：需要开启分销 + 人允许分销
-        respVO.setBrokerageMinPrice(1);
-        respVO.setBrokerageMaxPrice(2);
-        return success(respVO);
+        return success(brokerageRecordService.calculateProductBrokeragePrice(getLoginUserId(), spuId));
     }
 
 }

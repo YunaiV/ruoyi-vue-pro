@@ -1,11 +1,13 @@
 package cn.iocoder.yudao.module.promotion.service.seckill;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.promotion.api.seckill.dto.SeckillValidateJoinRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityUpdateReqVO;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillActivityDO;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillProductDO;
+import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityPageReqVO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillActivityDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillProductDO;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -34,18 +36,22 @@ public interface SeckillActivityService {
     void updateSeckillActivity(@Valid SeckillActivityUpdateReqVO updateReqVO);
 
     /**
-     * 更新秒杀活动
+     * 更新秒杀库存（减少）
      *
-     * @param activityDO 秒杀活动
+     * @param id    活动编号
+     * @param skuId sku 编号
+     * @param count 数量（正数）
      */
-    void updateSeckillActivity(SeckillActivityDO activityDO);
+    void updateSeckillStockDecr(Long id, Long skuId, Integer count);
 
     /**
-     * 更新秒杀活动商品
+     * 更新秒杀库存（增加）
      *
-     * @param productList 活动商品列表
+     * @param id    活动编号
+     * @param skuId sku 编号
+     * @param count 数量（正数）
      */
-    void updateSeckillActivityProductList(List<SeckillProductDO> productList);
+    void updateSeckillStockIncr(Long id, Long skuId, Integer count);
 
     /**
      * 关闭秒杀活动
@@ -92,5 +98,43 @@ public interface SeckillActivityService {
      * @return 活动商品列表
      */
     List<SeckillProductDO> getSeckillProductListByActivityId(Collection<Long> activityIds);
+
+    /**
+     * 通过活动时段编号获取指定 status 的秒杀活动
+     *
+     * @param configId 时段配置编号
+     * @param status   状态
+     * @return 秒杀活动列表
+     */
+    List<SeckillActivityDO> getSeckillActivityListByConfigIdAndStatus(Long configId, Integer status);
+
+    /**
+     * 通过活动时段获取秒杀活动
+     *
+     * @param pageReqVO 请求
+     * @return 秒杀活动列表
+     */
+    PageResult<SeckillActivityDO> getSeckillActivityAppPageByConfigId(AppSeckillActivityPageReqVO pageReqVO);
+
+    /**
+     * 校验是否参与秒杀商品
+     *
+     * 如果校验失败，则抛出业务异常
+     *
+     * @param activityId 活动编号
+     * @param skuId      SKU 编号
+     * @param count      数量
+     * @return 秒杀信息
+     */
+    SeckillValidateJoinRespDTO validateJoinSeckill(Long activityId, Long skuId, Integer count);
+
+    /**
+     * 获取指定 spu 编号最近参加的活动，每个 spuId 只返回一条记录
+     *
+     * @param spuIds spu 编号
+     * @param status 状态
+     * @return 秒杀活动列表
+     */
+    List<SeckillActivityDO> getSeckillActivityBySpuIdsAndStatus(Collection<Long> spuIds, Integer status);
 
 }

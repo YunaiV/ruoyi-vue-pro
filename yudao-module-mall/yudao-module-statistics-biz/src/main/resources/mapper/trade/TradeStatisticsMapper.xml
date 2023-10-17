@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.statistics.dal.mysql.trade.TradeStatisticsMapper">
+
+    <select id="selectByTimeBetween"
+            resultType="cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeTrendSummaryRespVO">
+        SELECT
+            -- 营业额 = 商品支付金额 + 充值金额
+            SUM(order_pay_price + recharge_pay_price)                                          AS turnover,
+            SUM(order_pay_price)                                                               AS orderPayPrice,
+            SUM(recharge_pay_price)                                                            AS rechargePrice,
+            -- 支出金额 = 余额支付金额 + 支付佣金金额 + 商品退款金额
+            SUM(order_wallet_pay_price + brokerage_settlement_price + after_sale_refund_price) AS expensePrice,
+            SUM(order_wallet_pay_price)                                                        AS balancePrice,
+            SUM(brokerage_settlement_price)                                                    AS brokerageSettlementPrice,
+            SUM(after_sale_refund_price)                                                       AS orderRefundPrice
+        FROM trade_statistics
+        WHERE time BETWEEN #{beginTime} AND #{endTime}
+          AND deleted = FALSE
+    </select>
+
+    <select id="selectListByTimeBetween"
+            resultType="cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeTrendSummaryRespVO">
+        SELECT DATE_FORMAT(time, '%Y-%m-%d')                                                      AS date,
+               -- 营业额 = 商品支付金额 + 充值金额
+               SUM(order_pay_price + recharge_pay_price)                                          AS turnover,
+               SUM(order_pay_price)                                                               AS orderPayPrice,
+               SUM(recharge_pay_price)                                                            AS rechargePrice,
+               -- 支出金额 = 余额支付金额 + 支付佣金金额 + 商品退款金额
+               SUM(order_wallet_pay_price + brokerage_settlement_price + after_sale_refund_price) AS expensePrice,
+               SUM(order_wallet_pay_price)                                                        AS balancePrice,
+               SUM(brokerage_settlement_price)                                                    AS brokerageSettlementPrice,
+               SUM(after_sale_refund_price)                                                       AS orderRefundPrice
+        FROM trade_statistics
+        WHERE time BETWEEN #{beginTime} AND #{endTime}
+          AND deleted = FALSE
+        GROUP BY date
+    </select>
+
+    <select id="selectExpensePriceByTimeBetween" resultType="java.lang.Integer">
+        SELECT -- 支出金额 = 余额支付金额 + 支付佣金金额 + 商品退款金额
+               SUM(order_wallet_pay_price + brokerage_settlement_price + after_sale_refund_price) AS expensePrice
+          FROM trade_statistics
+        WHERE deleted = FALSE
+        <if test="beginTime != null">
+            AND time >= #{beginTime}
+        </if>
+        <if test="endTime != null">
+            AND time &lt;= #{endTime}
+        </if>
+    </select>
+
+</mapper>

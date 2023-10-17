@@ -40,5 +40,4 @@ public interface JobLogFrameworkService {
                                  @NotNull(message = "结束时间不能为空") LocalDateTime endTime,
                                  @NotNull(message = "运行时长不能为空") Integer duration,
                                  boolean success, String result);
-
 }

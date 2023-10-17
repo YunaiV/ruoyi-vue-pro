@@ -1,13 +1,10 @@
 package cn.iocoder.yudao.module.promotion.api.combination;
 
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
-import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordRespDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationValidateJoinRespDTO;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
-import java.util.List;
-
-// TODO @芋艿：后面也再撸撸这几个接口
 
 /**
  * 拼团记录 API 接口
@@ -17,11 +14,23 @@ import java.util.List;
 public interface CombinationRecordApi {
 
     /**
+     * 校验是否满足拼团条件
+     *
+     * @param userId     用户编号
+     * @param activityId 活动编号
+     * @param headId     团长编号
+     * @param skuId      sku 编号
+     * @param count      数量
+     */
+    void validateCombinationRecord(Long userId, Long activityId, Long headId, Long skuId, Integer count);
+
+    /**
      * 创建开团记录
      *
      * @param reqDTO 请求 DTO
+     * @return key 开团记录编号、value 团长编号
      */
-    void createCombinationRecord(@Valid CombinationRecordCreateReqDTO reqDTO);
+    KeyValue<Long, Long> createCombinationRecord(@Valid CombinationRecordCreateReqDTO reqDTO);
 
     /**
      * 查询拼团记录是否成功
@@ -33,34 +42,7 @@ public interface CombinationRecordApi {
     boolean isCombinationRecordSuccess(Long userId, Long orderId);
 
     /**
-     * 获取拼团记录
-     *
-     * @param userId     用户编号
-     * @param activityId 活动编号
-     * @return 拼团记录列表
-     */
-    List<CombinationRecordRespDTO> getRecordListByUserIdAndActivityId(Long userId, Long activityId);
-
-    /**
-     * 验证组合限制数
-     * 校验是否满足限购要求
-     *
-     * @param count      本次购买数量
-     * @param sumCount   已购买数量合计
-     * @param activityId 活动编号
-     */
-    void validateCombinationLimitCount(Long activityId, Integer count, Integer sumCount);
-
-    /**
-     * 更新拼团状态为成功
-     *
-     * @param userId  用户编号
-     * @param orderId 订单编号
-     */
-    void updateRecordStatusToSuccess(Long userId, Long orderId);
-
-    /**
-     * 更新拼团状态为失败
+     * 更新拼团状态为【失败】
      *
      * @param userId  用户编号
      * @param orderId 订单编号
@@ -68,12 +50,18 @@ public interface CombinationRecordApi {
     void updateRecordStatusToFailed(Long userId, Long orderId);
 
     /**
-     * 更新拼团状态为 进行中
+     * 【下单前】校验是否满足拼团活动条件
      *
-     * @param userId    用户编号
-     * @param orderId   订单编号
-     * @param startTime 开始时间
+     * 如果校验失败，则抛出业务异常
+     *
+     * @param userId     用户编号
+     * @param activityId 活动编号
+     * @param headId     团长编号
+     * @param skuId      sku 编号
+     * @param count      数量
+     * @return 拼团信息
      */
-    void updateRecordStatusToInProgress(Long userId, Long orderId, LocalDateTime startTime);
+    CombinationValidateJoinRespDTO validateJoinCombination(Long userId, Long activityId, Long headId,
+                                                           Long skuId, Integer count);
 
 }

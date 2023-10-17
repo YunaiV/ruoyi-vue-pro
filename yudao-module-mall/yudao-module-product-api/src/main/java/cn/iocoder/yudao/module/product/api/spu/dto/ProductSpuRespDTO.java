@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.product.api.spu.dto;
 
-import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import lombok.Data;
 
@@ -31,6 +30,12 @@ public class ProductSpuRespDTO {
      * 关键字
      */
     private String keyword;
+    /**
+     * 单位
+     *
+     * 对应 product_unit 数据字典
+     */
+    private Integer unit;
     /**
      * 商品简介
      */
@@ -112,6 +117,13 @@ public class ProductSpuRespDTO {
      */
     private Long deliveryTemplateId;
 
+    // ========== 营销相关字段 =========
+
+    /**
+     * 赠送积分
+     */
+    private Integer giveIntegral;
+
     // ========== 统计相关字段 =========
 
     /**
@@ -126,5 +138,16 @@ public class ProductSpuRespDTO {
      * 商品点击量
      */
     private Integer clickCount;
+
+
+    // ========== 分销相关字段 =========
+
+    /**
+     * 分销类型
+     *
+     * false - 默认
+     * true - 自行设置
+     */
+    private Boolean subCommissionType;
 
 }

@@ -16,7 +16,6 @@ public class AppCombinationRecordDetailRespVO {
     private List<AppCombinationRecordRespVO> memberRecords;
 
     @Schema(description = "当前用户参团记录对应的订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    // 如果没参团，返回 null
     private Long orderId;
 
 }

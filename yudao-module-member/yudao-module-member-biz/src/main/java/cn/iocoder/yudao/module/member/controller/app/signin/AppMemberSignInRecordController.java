@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -50,16 +49,12 @@ public class AppMemberSignInRecordController {
         return success(respVO);
     }
 
-    // TODO 芋艿：临时 mock => UserSignController.info
     @PostMapping("/create")
     @Operation(summary = "签到")
     @PreAuthenticated
     public CommonResult<AppMemberSignInRecordRespVO> createSignInRecord() {
-        AppMemberSignInRecordRespVO respVO = new AppMemberSignInRecordRespVO()
-                .setPoint(10)
-                .setDay(10)
-                .setCreateTime(LocalDateTime.now());
-        return success(respVO);
+        MemberSignInRecordDO recordDO = signInRecordService.createSignRecord(getLoginUserId());
+        return success(MemberSignInRecordConvert.INSTANCE.coverRecordToAppRecordVo(recordDO));
     }
 
     @GetMapping("/page")

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.trade.service.order;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
@@ -13,10 +14,13 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderItemMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
+import cn.iocoder.yudao.module.trade.dal.redis.RedisKeyConstants;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.ExpressClientFactory;
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressTrackQueryReqDTO;
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressTrackRespDTO;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -67,6 +71,19 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
     }
 
     @Override
+    public TradeOrderDO getActivityOrderByUserIdAndActivityIdAndStatus(Long userId, Long activityId, Integer status) {
+        return tradeOrderMapper.selectByUserIdAndActivityIdAndStatus(userId, activityId, status);
+    }
+
+    @Override
+    public List<TradeOrderDO> getOrderList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return tradeOrderMapper.selectBatchIds(ids);
+    }
+
+    @Override
     public PageResult<TradeOrderDO> getOrderPage(TradeOrderPageReqVO reqVO) {
         // 获得 userId 相关的查询
         Set<Long> userIds = new HashSet<>();
@@ -105,7 +122,7 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
         if (order == null) {
             throw exception(ORDER_NOT_FOUND);
         }
-
+        // 查询物流
         return getExpressTrackList(order);
     }
 
@@ -116,8 +133,20 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
         if (order == null) {
             throw exception(ORDER_NOT_FOUND);
         }
-
+        // 查询物流
         return getExpressTrackList(order);
+    }
+
+    @Override
+    public int getSeckillProductCount(Long userId, Long activityId) {
+        // 获得订单列表
+        List<TradeOrderDO> orders = tradeOrderMapper.selectListByUserIdAndSeckillActivityId(userId, activityId);
+        orders.removeIf(order -> TradeOrderStatusEnum.isCanceled(order.getStatus())); // 过滤掉【已取消】的订单
+        if (CollUtil.isEmpty(orders)) {
+            return 0;
+        }
+        // 获得订单项列表
+        return tradeOrderItemMapper.selectProductSumByOrderId(convertSet(orders, TradeOrderDO::getId));
     }
 
     /**
@@ -127,20 +156,36 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
      * @return 物流轨迹
      */
     private List<ExpressTrackRespDTO> getExpressTrackList(TradeOrderDO order) {
-        // 查询物流公司
         if (order.getLogisticsId() == null) {
             return Collections.emptyList();
         }
+        // 查询物流公司
         DeliveryExpressDO express = deliveryExpressService.getDeliveryExpress(order.getLogisticsId());
         if (express == null) {
             throw exception(EXPRESS_NOT_EXISTS);
         }
+        // 查询物流轨迹
+        return getSelf().getExpressTrackList(express.getCode(), order.getLogisticsNo(), order.getReceiverMobile());
+    }
 
+    /**
+     * 查询物流轨迹
+     * 加个 spring 缓存，30 分钟；主要考虑及时性要求不高，但是每次调用需要钱；TODO @艿艿：这个时间不会搞了。。。交给你了哈哈哈
+     *
+     * @param code           快递公司编码
+     * @param logisticsNo    发货快递单号
+     * @param receiverMobile 收、寄件人的电话号码
+     * @return 物流轨迹
+     */
+    @Cacheable(cacheNames = RedisKeyConstants.EXPRESS_TRACK, key = "#code + '-' + #logisticsNo + '-' + #receiverMobile",
+            condition = "#result != null")
+    public List<ExpressTrackRespDTO> getExpressTrackList(String code, String logisticsNo, String receiverMobile) {
         // 查询物流轨迹
         return expressClientFactory.getDefaultExpressClient().getExpressTrackList(
-                new ExpressTrackQueryReqDTO().setExpressCode(express.getCode()).setLogisticsNo(order.getLogisticsNo())
-                        .setPhone(order.getReceiverMobile()));
+                new ExpressTrackQueryReqDTO().setExpressCode(code).setLogisticsNo(logisticsNo)
+                        .setPhone(receiverMobile));
     }
+
 
     // =================== Order Item ===================
 
@@ -155,8 +200,8 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
     }
 
     @Override
-    public List<TradeOrderItemDO> getOrderItemList(Collection<Long> ids) {
-        return tradeOrderItemMapper.selectBatchIds(ids);
+    public TradeOrderItemDO getOrderItem(Long id) {
+        return tradeOrderItemMapper.selectById(id);
     }
 
     @Override
@@ -165,6 +210,15 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
             return Collections.emptyList();
         }
         return tradeOrderItemMapper.selectListByOrderId(orderIds);
+    }
+
+    /**
+     * 获得自身的代理对象，解决 AOP 生效问题
+     *
+     * @return 自己
+     */
+    private TradeOrderQueryServiceImpl getSelf() {
+        return SpringUtil.getBean(getClass());
     }
 
 }

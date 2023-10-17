@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.common.util.collection;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ArrayUtil;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.*;
@@ -50,6 +51,13 @@ public class CollectionUtils {
         return new ArrayList<>(convertMap(from, keyMapper, Function.identity(), cover).values());
     }
 
+    public static <T, U> List<U> convertList(T[] from, Function<T, U> func) {
+        if (ArrayUtil.isEmpty(from)) {
+            return new ArrayList<>();
+        }
+        return convertList(Arrays.asList(from), func);
+    }
+
     public static <T, U> List<U> convertList(Collection<T> from, Function<T, U> func) {
         if (CollUtil.isEmpty(from)) {
             return new ArrayList<>();
@@ -64,6 +72,13 @@ public class CollectionUtils {
         return from.stream().filter(filter).map(func).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
+    public static <K, V> List<V> mergeValuesFromMap(Map<K, List<V>> map) {
+        return map.values()
+                .stream()
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+    }
+
     public static <T, U> Set<U> convertSet(Collection<T> from, Function<T, U> func) {
         if (CollUtil.isEmpty(from)) {
             return new HashSet<>();
@@ -76,6 +91,13 @@ public class CollectionUtils {
             return new HashSet<>();
         }
         return from.stream().filter(filter).map(func).filter(Objects::nonNull).collect(Collectors.toSet());
+    }
+
+    public static <T, K> Map<K, T> convertMapByFilter(Collection<T> from, Predicate<T> filter, Function<T, K> keyFunc) {
+        if (CollUtil.isEmpty(from)) {
+            return new HashMap<>();
+        }
+        return from.stream().filter(filter).collect(Collectors.toMap(keyFunc, v -> v));
     }
 
     public static <T, K> Map<K, T> convertMap(Collection<T> from, Function<T, K> keyFunc) {
@@ -155,8 +177,8 @@ public class CollectionUtils {
     /**
      * 对比老、新两个列表，找出新增、修改、删除的数据
      *
-     * @param oldList 老列表
-     * @param newList 新列表
+     * @param oldList  老列表
+     * @param newList  新列表
      * @param sameFunc 对比函数，返回 true 表示相同，返回 false 表示不同
      *                 注意，same 是通过每个元素的“标识”，判断它们是不是同一个数据
      * @return [新增列表、修改列表、删除列表]
@@ -225,7 +247,8 @@ public class CollectionUtils {
         return valueFunc.apply(t);
     }
 
-    public static <T, V extends Comparable<? super V>> V getSumValue(List<T> from, Function<T, V> valueFunc, BinaryOperator<V> accumulator) {
+    public static <T, V extends Comparable<? super V>> V getSumValue(List<T> from, Function<T, V> valueFunc,
+                                                                     BinaryOperator<V> accumulator) {
         if (CollUtil.isEmpty(from)) {
             return null;
         }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.member.api.point;
 
+import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.module.member.enums.point.MemberPointBizTypeEnum;
 import cn.iocoder.yudao.module.member.service.point.MemberPointRecordService;
 import org.springframework.stereotype.Service;
@@ -24,11 +25,22 @@ public class MemberPointApiImpl implements MemberPointApi {
 
     @Override
     public void addPoint(Long userId, Integer point, Integer bizType, String bizId) {
+        Assert.isTrue(point > 0);
         MemberPointBizTypeEnum bizTypeEnum = MemberPointBizTypeEnum.getByType(bizType);
         if (bizTypeEnum == null) {
             throw exception(POINT_RECORD_BIZ_NOT_SUPPORT);
         }
         memberPointRecordService.createPointRecord(userId, point, bizTypeEnum, bizId);
+    }
+
+    @Override
+    public void reducePoint(Long userId, Integer point, Integer bizType, String bizId) {
+        Assert.isTrue(point > 0);
+        MemberPointBizTypeEnum bizTypeEnum = MemberPointBizTypeEnum.getByType(bizType);
+        if (bizTypeEnum == null) {
+            throw exception(POINT_RECORD_BIZ_NOT_SUPPORT);
+        }
+        memberPointRecordService.createPointRecord(userId, -point, bizTypeEnum, bizId);
     }
 
 }

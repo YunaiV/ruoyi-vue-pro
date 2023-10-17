@@ -30,13 +30,14 @@ public class AppBargainActivityRespVO {
     @Schema(description = "砍价库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "512")
     private Integer stock;
 
-    @Schema(description = "商品图片", requiredMode = Schema.RequiredMode.REQUIRED, example = "4096") // 从 SPU 的 picUrl 读取
+    @Schema(description = "商品图片", requiredMode = Schema.RequiredMode.REQUIRED,  // 从 SPU 的 picUrl 读取
+            example = "4096")
     private String picUrl;
-
-    @Schema(description = "商品市场价，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "50") // 从 SPU 的 marketPrice 读取
+    @Schema(description = "商品市场价，单位：分", requiredMode = Schema.RequiredMode.REQUIRED,  // 从 SPU 的 marketPrice 读取
+            example = "50")
     private Integer marketPrice;
 
-    @Schema(description = "砍价最低金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "100") // 从砍价商品里取最低价
-    private Integer bargainPrice;
+    @Schema(description = "砍价最低金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
+    private Integer bargainMinPrice;
 
 }

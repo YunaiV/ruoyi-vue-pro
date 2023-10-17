@@ -79,8 +79,6 @@ public interface ProductSpuConvert {
             ProductSpuDO spu = list.get(i);
             AppProductSpuPageRespVO spuVO = voList.get(i);
             spuVO.setUnitName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.PRODUCT_UNIT, spu.getUnit()));
-            // 计算 vip 价格 TODO 芋艿：临时的逻辑，等 vip 支持后
-            spuVO.setVipPrice((int) (spuVO.getPrice() * 0.9));
         }
         return voList;
     }
@@ -95,11 +93,6 @@ public interface ProductSpuConvert {
                 .setUnitName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.PRODUCT_UNIT, spu.getUnit()));
         // 处理 SKU
         spuVO.setSkus(convertListForGetSpuDetail(skus));
-        // 计算 vip 价格 TODO 芋艿：临时的逻辑，等 vip 支持后
-        if (true) {
-            spuVO.setVipPrice((int) (spuVO.getPrice() * 0.9));
-            spuVO.getSkus().forEach(sku -> sku.setVipPrice((int) (sku.getPrice() * 0.9)));
-        }
         return spuVO;
     }
 

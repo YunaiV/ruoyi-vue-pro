@@ -9,6 +9,9 @@ import java.time.LocalDateTime;
 @Data
 public class AppBargainHelpRespVO {
 
+    @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    private Long userId;
+
     @Schema(description = "助力用户的昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private String nickname;
 

@@ -51,11 +51,15 @@ public interface ErrorCodeConstants {
 
     // ========== 秒杀活动 1-013-008-000 ==========
     ErrorCode SECKILL_ACTIVITY_NOT_EXISTS = new ErrorCode(1_013_008_000, "秒杀活动不存在");
-    ErrorCode SECKILL_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1_013_008_002, "存在商品参加了其它秒杀活动");
+    ErrorCode SECKILL_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1_013_008_002, "存在商品参加了其它秒杀活动，秒杀时段冲突");
     ErrorCode SECKILL_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_008_003, "秒杀活动已关闭，不能修改");
     ErrorCode SECKILL_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1_013_008_004, "秒杀活动未关闭或未结束，不能删除");
     ErrorCode SECKILL_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_008_005, "秒杀活动已关闭，不能重复关闭");
-    ErrorCode SECKILL_ACTIVITY_UPDATE_STOCK_FAIL = new ErrorCode(1013008006, "更新秒杀活动库存失败，原因秒杀库存不足");
+    ErrorCode SECKILL_ACTIVITY_UPDATE_STOCK_FAIL = new ErrorCode(1_013_008_006, "秒杀失败，原因：秒杀库存不足");
+    ErrorCode SECKILL_JOIN_ACTIVITY_TIME_ERROR = new ErrorCode(1_013_008_007, "秒杀失败，原因：不在活动时间范围内");
+    ErrorCode SECKILL_JOIN_ACTIVITY_STATUS_CLOSED = new ErrorCode(1_013_008_008, "秒杀失败，原因：秒杀活动已关闭");
+    ErrorCode SECKILL_JOIN_ACTIVITY_SINGLE_LIMIT_COUNT_EXCEED = new ErrorCode(1_013_008_009, "秒杀失败，原因：单次限购超出");
+    ErrorCode SECKILL_JOIN_ACTIVITY_PRODUCT_NOT_EXISTS = new ErrorCode(1_013_008_010, "秒杀失败，原因：商品不存在");
 
     // ========== 秒杀时段 1-013-009-000 ==========
     ErrorCode SECKILL_CONFIG_NOT_EXISTS = new ErrorCode(1_013_009_000, "秒杀时段不存在");
@@ -65,29 +69,45 @@ public interface ErrorCodeConstants {
     // ========== 拼团活动 1-013-010-000 ==========
     ErrorCode COMBINATION_ACTIVITY_NOT_EXISTS = new ErrorCode(1_013_010_000, "拼团活动不存在");
     ErrorCode COMBINATION_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1_013_010_001, "存在商品参加了其它拼团活动");
-    ErrorCode COMBINATION_ACTIVITY_STATUS_DISABLE = new ErrorCode(1_013_010_002, "拼团活动已关闭不能修改");
+    ErrorCode COMBINATION_ACTIVITY_STATUS_DISABLE_NOT_UPDATE = new ErrorCode(1_013_010_002, "拼团活动已关闭不能修改");
     ErrorCode COMBINATION_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1_013_010_003, "拼团活动未关闭或未结束，不能删除");
-    ErrorCode COMBINATION_RECORD_NOT_EXISTS = new ErrorCode(1_013_010_004, "拼团不存在");
+    ErrorCode COMBINATION_ACTIVITY_STATUS_DISABLE = new ErrorCode(1_013_010_004, "拼团失败，原因：拼团活动已关闭");
+    ErrorCode COMBINATION_JOIN_ACTIVITY_PRODUCT_NOT_EXISTS = new ErrorCode(1_013_010_005, "拼团失败，原因：拼团活动商品不存在");
+    ErrorCode COMBINATION_ACTIVITY_UPDATE_STOCK_FAIL = new ErrorCode(1_013_010_006, "拼团失败，原因：拼团活动商品库存不足");
 
     // ========== 拼团记录 1-013-011-000 ==========
-    ErrorCode COMBINATION_RECORD_EXISTS = new ErrorCode(1_013_011_000, "拼团失败，已参与过该拼团");
-    ErrorCode COMBINATION_RECORD_HEAD_NOT_EXISTS = new ErrorCode(1_013_011_001, "拼团失败，父拼团不存在");
-    ErrorCode COMBINATION_RECORD_USER_FULL = new ErrorCode(1_013_011_002, "拼团失败，拼团人数已满");
-    ErrorCode COMBINATION_RECORD_FAILED_HAVE_JOINED = new ErrorCode(1_013_011_003, "拼团失败，已参与其它拼团");
-    ErrorCode COMBINATION_RECORD_FAILED_TIME_END = new ErrorCode(1_013_011_004, "拼团失败，活动已经结束");
-    ErrorCode COMBINATION_RECORD_FAILED_SINGLE_LIMIT_COUNT_EXCEED = new ErrorCode(1_013_011_005, "拼团失败，单次限购超出");
-    ErrorCode COMBINATION_RECORD_FAILED_TOTAL_LIMIT_COUNT_EXCEED = new ErrorCode(1_013_011_006, "拼团失败，单次限购超出");
+    ErrorCode COMBINATION_RECORD_NOT_EXISTS = new ErrorCode(1_013_011_000, "拼团不存在");
+    ErrorCode COMBINATION_RECORD_EXISTS = new ErrorCode(1_013_011_001, "拼团失败，已参与过该拼团");
+    ErrorCode COMBINATION_RECORD_HEAD_NOT_EXISTS = new ErrorCode(1_013_011_002, "拼团失败，父拼团不存在");
+    ErrorCode COMBINATION_RECORD_USER_FULL = new ErrorCode(1_013_011_003, "拼团失败，拼团人数已满");
+    ErrorCode COMBINATION_RECORD_FAILED_HAVE_JOINED = new ErrorCode(1_013_011_004, "拼团失败，原因：存在该活动正在进行的拼团记录");
+    ErrorCode COMBINATION_RECORD_FAILED_TIME_NOT_START = new ErrorCode(1_013_011_005, "拼团失败，活动未开始");
+    ErrorCode COMBINATION_RECORD_FAILED_TIME_END = new ErrorCode(1_013_011_006, "拼团失败，活动已经结束");
+    ErrorCode COMBINATION_RECORD_FAILED_SINGLE_LIMIT_COUNT_EXCEED = new ErrorCode(1_013_011_007, "拼团失败，原因：单次限购超出");
+    ErrorCode COMBINATION_RECORD_FAILED_TOTAL_LIMIT_COUNT_EXCEED = new ErrorCode(1_013_011_008, "拼团失败，原因：超出总购买次数");
+    ErrorCode COMBINATION_RECORD_FAILED_ORDER_STATUS_UNPAID = new ErrorCode(1_013_011_009, "拼团失败，原因：存在未支付订单，请先支付");
 
     // ========== 砍价活动 1-013-012-000 ==========
     ErrorCode BARGAIN_ACTIVITY_NOT_EXISTS = new ErrorCode(1_013_012_000, "砍价活动不存在");
     ErrorCode BARGAIN_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1_013_012_001, "存在商品参加了其它砍价活动");
-    ErrorCode BARGAIN_ACTIVITY_STATUS_DISABLE = new ErrorCode(1_013_012_002, "砍价活动已关闭不能修改");
+    ErrorCode BARGAIN_ACTIVITY_STATUS_DISABLE = new ErrorCode(1_013_012_002, "砍价活动已关闭，不能修改");
     ErrorCode BARGAIN_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1_013_012_003, "砍价活动未关闭或未结束，不能删除");
+    ErrorCode BARGAIN_ACTIVITY_STOCK_NOT_ENOUGH = new ErrorCode(1_013_012_004, "砍价活动库存不足");
+    ErrorCode BARGAIN_ACTIVITY_STATUS_CLOSED = new ErrorCode(1_013_012_005, "砍价活动已关闭");
+    ErrorCode BARGAIN_ACTIVITY_TIME_END = new ErrorCode(1_013_012_006, "砍价活动已经结束");
 
     // ========== 砍价记录 1-013-013-000 ==========
     ErrorCode BARGAIN_RECORD_NOT_EXISTS = new ErrorCode(1_013_013_000, "砍价记录不存在");
-    ErrorCode BARGAIN_RECORD_EXISTS = new ErrorCode(1_013_013_001, "砍价失败，已参与过该砍价");
-    ErrorCode BARGAIN_RECORD_HEAD_NOT_EXISTS = new ErrorCode(1_013_013_002, "砍价失败，父砍价不存在");
-    ErrorCode BARGAIN_RECORD_USER_FULL = new ErrorCode(1_013_013_003, "砍价失败，砍价人数已满");
+    ErrorCode BARGAIN_RECORD_CREATE_FAIL_EXISTS = new ErrorCode(1_013_013_001, "参与失败，您已经参与当前砍价活动");
+    ErrorCode BARGAIN_RECORD_CREATE_FAIL_LIMIT = new ErrorCode(1_013_013_002, "参与失败，您已达到当前砍价活动的参与上限");
+    ErrorCode BARGAIN_JOIN_RECORD_NOT_SUCCESS = new ErrorCode(1_013_013_004, "下单失败，砍价未成功");
+    ErrorCode BARGAIN_JOIN_RECORD_ALREADY_ORDER = new ErrorCode(1_013_013_005, "下单失败，该砍价已经下单");
+
+    // ========== 砍价助力 1-013-014-000 ==========
+    ErrorCode BARGAIN_HELP_CREATE_FAIL_RECORD_NOT_IN_PROCESS = new ErrorCode(1_013_014_000, "助力失败，砍价记录不处于进行中");
+    ErrorCode BARGAIN_HELP_CREATE_FAIL_RECORD_SELF = new ErrorCode(1_013_014_001, "助力失败，不能助力自己");
+    ErrorCode BARGAIN_HELP_CREATE_FAIL_LIMIT = new ErrorCode(1_013_014_002, "助力失败，您已达到当前砍价活动的助力上限");
+    ErrorCode BARGAIN_HELP_CREATE_FAIL_CONFLICT = new ErrorCode(1_013_014_003, "助力失败，请重试");
+    ErrorCode BARGAIN_HELP_CREATE_FAIL_HELP_EXISTS = new ErrorCode(1_013_014_004, "助力失败，您已经助力过了");
 
 }

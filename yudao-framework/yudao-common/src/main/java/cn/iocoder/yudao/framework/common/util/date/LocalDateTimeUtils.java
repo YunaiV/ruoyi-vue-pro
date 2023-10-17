@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
 
 /**
  * 时间工具类，用于 {@link java.time.LocalDateTime}
@@ -21,6 +22,10 @@ public class LocalDateTimeUtils {
 
     public static LocalDateTime addTime(Duration duration) {
         return LocalDateTime.now().plus(duration);
+    }
+
+    public static LocalDateTime minusTime(Duration duration) {
+        return LocalDateTime.now().minus(duration);
     }
 
     public static boolean beforeNow(LocalDateTime date) {
@@ -63,6 +68,23 @@ public class LocalDateTimeUtils {
     }
 
     /**
+     * 判断当前时间是否在该时间范围内
+     *
+     * @param startTime 开始时间
+     * @param endTime   结束时间
+     * @return 是否
+     */
+    public static boolean isBetween(String startTime, String endTime) {
+        if (startTime == null || endTime == null) {
+            return false;
+        }
+        LocalDate nowDate = LocalDate.now();
+        return LocalDateTimeUtil.isIn(LocalDateTime.now(),
+                LocalDateTime.of(nowDate, LocalTime.parse(startTime)),
+                LocalDateTime.of(nowDate, LocalTime.parse(endTime)));
+    }
+
+    /**
      * 判断时间段是否重叠
      *
      * @param startTime1 开始 time1
@@ -75,6 +97,28 @@ public class LocalDateTimeUtils {
         LocalDate nowDate = LocalDate.now();
         return LocalDateTimeUtil.isOverlap(LocalDateTime.of(nowDate, startTime1), LocalDateTime.of(nowDate, endTime1),
                 LocalDateTime.of(nowDate, startTime2), LocalDateTime.of(nowDate, endTime2));
+    }
+
+    /**
+     * 获取指定日期所在的月份的开始时间
+     * 例如：2023-09-30 00:00:00,000
+     *
+     * @param date 日期
+     * @return 月份的开始时间
+     */
+    public static LocalDateTime beginOfMonth(LocalDateTime date) {
+        return date.with(TemporalAdjusters.firstDayOfMonth()).with(LocalTime.MIN);
+    }
+
+    /**
+     * 获取指定日期所在的月份的最后时间
+     * 例如：2023-09-30 23:59:59,999
+     *
+     * @param date 日期
+     * @return 月份的结束时间
+     */
+    public static LocalDateTime endOfMonth(LocalDateTime date) {
+        return date.with(TemporalAdjusters.lastDayOfMonth()).with(LocalTime.MAX);
     }
 
 }

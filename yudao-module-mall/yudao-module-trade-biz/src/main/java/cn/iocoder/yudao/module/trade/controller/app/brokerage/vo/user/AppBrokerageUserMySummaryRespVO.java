@@ -20,9 +20,9 @@ public class AppBrokerageUserMySummaryRespVO {
     private Integer frozenPrice;
 
     @Schema(description = "分销用户数量（一级）", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
-    private Integer firstBrokerageUserCount;
+    private Long firstBrokerageUserCount;
 
     @Schema(description = "分销用户数量（二级）", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
-    private Integer secondBrokerageUserCount;
+    private Long secondBrokerageUserCount;
 
 }

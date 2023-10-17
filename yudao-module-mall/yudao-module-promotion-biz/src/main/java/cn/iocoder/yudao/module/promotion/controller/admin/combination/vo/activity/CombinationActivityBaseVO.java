@@ -48,6 +48,10 @@ public class CombinationActivityBaseVO {
     @NotNull(message = "开团人数不能为空")
     private Integer userSize;
 
+    @Schema(description = "虚拟成团", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
+    @NotNull(message = "虚拟成团不能为空")
+    private Boolean virtualGroup;
+
     @Schema(description = "限制时长（小时）", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @NotNull(message = "限制时长不能为空")
     private Integer limitDuration;

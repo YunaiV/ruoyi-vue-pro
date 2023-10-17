@@ -38,7 +38,7 @@ public class KdNiaoExpressClientIntegrationTest {
     public void testGetExpressTrackList() {
         ExpressTrackQueryReqDTO reqDTO = new ExpressTrackQueryReqDTO();
         reqDTO.setExpressCode("STO");
-        reqDTO.setLogisticsNo("663220402764314");
+        reqDTO.setLogisticsNo("777168349863987");
         List<ExpressTrackRespDTO> tracks = client.getExpressTrackList(reqDTO);
         System.out.println(JsonUtils.toJsonPrettyString(tracks));
     }

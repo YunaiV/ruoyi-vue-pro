@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.Seck
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.convert.seckill.seckillconfig.SeckillConfigConvert;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillconfig.SeckillConfigDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillConfigDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillconfig.SeckillConfigMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -17,9 +17,12 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.time.LocalTime;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.findFirst;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.isBetween;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 
 /**
@@ -65,6 +68,12 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
 
         // 更新状态
         seckillConfigMapper.updateById(new SeckillConfigDO().setId(id).setStatus(status));
+    }
+
+    @Override
+    public SeckillConfigDO getCurrentSeckillConfig() {
+        List<SeckillConfigDO> list = seckillConfigMapper.selectList(SeckillConfigDO::getStatus, CommonStatusEnum.ENABLE.getStatus());
+        return findFirst(list, config -> isBetween(config.getStartTime(), config.getEndTime()));
     }
 
     @Override
@@ -143,7 +152,9 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
 
     @Override
     public List<SeckillConfigDO> getSeckillConfigListByStatus(Integer status) {
-        return seckillConfigMapper.selectListByStatus(status);
+        List<SeckillConfigDO> list = seckillConfigMapper.selectListByStatus(status);
+        list.sort(Comparator.comparing(SeckillConfigDO::getStartTime));
+        return list;
     }
 
 }

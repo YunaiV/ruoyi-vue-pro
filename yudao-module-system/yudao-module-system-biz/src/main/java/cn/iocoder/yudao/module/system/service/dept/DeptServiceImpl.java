@@ -176,7 +176,7 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
-    @DataPermission(enable = false) // 禁用数据权限，避免简历不正确的缓存
+    @DataPermission(enable = false) // 禁用数据权限，避免建立不正确的缓存
     @Cacheable(cacheNames = RedisKeyConstants.DEPT_CHILDREN_ID_LIST, key = "#id")
     public Set<Long> getChildDeptIdListFromCache(Long id) {
         List<DeptDO> children = getChildDeptList(id);

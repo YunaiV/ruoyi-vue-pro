@@ -35,6 +35,10 @@ public class MemberSignInConfigDO extends BaseDO {
      * 奖励积分
      */
     private Integer point;
+    /**
+     * 奖励经验
+     */
+    private Integer experience;
 
     /**
      * 状态

@@ -51,6 +51,23 @@ public class JobLogServiceImpl implements JobLogService {
     }
 
     @Override
+    @SuppressWarnings("DuplicatedCode")
+    public Integer cleanJobLog(Integer exceedDay, Integer deleteLimit) {
+        int count = 0;
+        LocalDateTime expireDate = LocalDateTime.now().minusDays(exceedDay);
+        // 循环删除，直到没有满足条件的数据
+        for (int i = 0; i < Short.MAX_VALUE; i++) {
+            int deleteCount = jobLogMapper.deleteByCreateTimeLt(expireDate, deleteLimit);
+            count += deleteCount;
+            // 达到删除预期条数，说明到底了
+            if (deleteCount < deleteLimit) {
+                break;
+            }
+        }
+        return count;
+    }
+
+    @Override
     public JobLogDO getJobLog(Long id) {
         return jobLogMapper.selectById(id);
     }

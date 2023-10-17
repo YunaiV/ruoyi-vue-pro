@@ -9,6 +9,8 @@ import cn.iocoder.yudao.module.trade.controller.admin.order.vo.*;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderLogDO;
+import cn.iocoder.yudao.module.trade.service.order.TradeOrderLogService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,6 +39,8 @@ public class TradeOrderController {
     private TradeOrderUpdateService tradeOrderUpdateService;
     @Resource
     private TradeOrderQueryService tradeOrderQueryService;
+    @Resource
+    private TradeOrderLogService tradeOrderLogService;
 
     @Resource
     private MemberUserApi memberUserApi;
@@ -67,17 +71,18 @@ public class TradeOrderController {
     public CommonResult<TradeOrderDetailRespVO> getOrderDetail(@RequestParam("id") Long id) {
         // 查询订单
         TradeOrderDO order = tradeOrderQueryService.getOrder(id);
-        // TODO @puhui999：这里建议改成，如果为 null，直接返回 success null；主要查询操作，尽量不要有非空的提示哈；交给前端处理；
-//        if (order == null) {
-//            return success(null, ORDER_NOT_FOUND.getMsg());
-//        }
-
+        if (order == null) {
+            return success(null);
+        }
         // 查询订单项
         List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(id);
-        // orderLog
+
         // 拼接数据
         MemberUserRespDTO user = memberUserApi.getUser(order.getUserId());
-        return success(TradeOrderConvert.INSTANCE.convert(order, orderItems, user));
+        MemberUserRespDTO brokerageUser = order.getBrokerageUserId() != null ?
+                memberUserApi.getUser(order.getBrokerageUserId()) : null;
+        List<TradeOrderLogDO> orderLogs = tradeOrderLogService.getOrderLogListByOrderId(id);
+        return success(TradeOrderConvert.INSTANCE.convert(order, orderItems, orderLogs, user, brokerageUser));
     }
 
     @GetMapping("/get-express-track-list")
@@ -118,6 +123,14 @@ public class TradeOrderController {
     @PreAuthorize("@ss.hasPermission('trade:order:update')")
     public CommonResult<Boolean> updateOrderAddress(@RequestBody TradeOrderUpdateAddressReqVO reqVO) {
         tradeOrderUpdateService.updateOrderAddress(reqVO);
+        return success(true);
+    }
+
+    @PutMapping("/pick-up")
+    @Operation(summary = "订单核销")
+    @PreAuthorize("@ss.hasPermission('trade:order:pick-up')")
+    public CommonResult<Boolean> pickUpOrder(@RequestParam("id") Long id) {
+        tradeOrderUpdateService.pickUpOrder(id);
         return success(true);
     }
 

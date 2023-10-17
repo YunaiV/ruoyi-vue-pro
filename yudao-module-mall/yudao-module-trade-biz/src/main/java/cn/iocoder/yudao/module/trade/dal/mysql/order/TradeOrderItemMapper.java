@@ -1,13 +1,19 @@
 package cn.iocoder.yudao.module.trade.dal.mysql.order;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Mapper
 public interface TradeOrderItemMapper extends BaseMapperX<TradeOrderItemDO> {
@@ -26,16 +32,25 @@ public interface TradeOrderItemMapper extends BaseMapperX<TradeOrderItemDO> {
         return selectList(TradeOrderItemDO::getOrderId, orderIds);
     }
 
-    default List<TradeOrderItemDO> selectListByOrderIdAnSkuId(Collection<Long> orderIds, Collection<Long> skuIds) {
-        return selectList(new LambdaQueryWrapperX<TradeOrderItemDO>()
-                .in(TradeOrderItemDO::getOrderId, orderIds)
-                .eq(TradeOrderItemDO::getSkuId, skuIds));
-    }
-
     default TradeOrderItemDO selectByIdAndUserId(Long orderItemId, Long loginUserId) {
         return selectOne(new LambdaQueryWrapperX<TradeOrderItemDO>()
                 .eq(TradeOrderItemDO::getId, orderItemId)
                 .eq(TradeOrderItemDO::getUserId, loginUserId));
+    }
+
+    default List<TradeOrderItemDO> selectListByOrderIdAndCommentStatus(Long orderId, Boolean commentStatus) {
+        return selectList(new LambdaQueryWrapperX<TradeOrderItemDO>()
+                .eq(TradeOrderItemDO::getOrderId, orderId)
+                .eq(TradeOrderItemDO::getCommentStatus, commentStatus));
+    }
+
+    default int selectProductSumByOrderId(@Param("orderIds") Set<Long> orderIds) {
+        // SQL sum 查询
+        List<Map<String, Object>> result = selectMaps(new QueryWrapper<TradeOrderItemDO>()
+                .select("SUM(count) AS sumCount")
+                .in("order_id", orderIds)); // 只计算选中的
+        // 获得数量
+        return CollUtil.getFirst(result) != null ? MapUtil.getInt(result.get(0), "sumCount") : 0;
     }
 
 }

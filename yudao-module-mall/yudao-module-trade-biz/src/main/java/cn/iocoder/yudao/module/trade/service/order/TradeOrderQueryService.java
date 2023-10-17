@@ -33,10 +33,28 @@ public interface TradeOrderQueryService {
      * 获得指定用户，指定的交易订单
      *
      * @param userId 用户编号
-     * @param id 交易订单编号
+     * @param id     交易订单编号
      * @return 交易订单
      */
     TradeOrderDO getOrder(Long userId, Long id);
+
+    /**
+     * 获得指定用户，指定活动，指定状态的交易订单
+     *
+     * @param userId     用户编号
+     * @param activityId 活动编号
+     * @param status     订单状态
+     * @return 交易订单
+     */
+    TradeOrderDO getActivityOrderByUserIdAndActivityIdAndStatus(Long userId, Long activityId, Integer status);
+
+    /**
+     * 获得订单列表
+     *
+     * @param ids 订单编号数组
+     * @return 订单列表
+     */
+    List<TradeOrderDO> getOrderList(Collection<Long> ids);
 
     /**
      * 【管理员】获得交易订单分页
@@ -50,7 +68,7 @@ public interface TradeOrderQueryService {
      * 【会员】获得交易订单分页
      *
      * @param userId 用户编号
-     * @param reqVO 分页请求
+     * @param reqVO  分页请求
      * @return 交易订单
      */
     PageResult<TradeOrderDO> getOrderPage(Long userId, AppTradeOrderPageReqVO reqVO);
@@ -68,7 +86,7 @@ public interface TradeOrderQueryService {
     /**
      * 【前台】获得订单的物流轨迹
      *
-     * @param id 订单编号
+     * @param id     订单编号
      * @param userId 用户编号
      * @return 物流轨迹数组
      */
@@ -82,6 +100,15 @@ public interface TradeOrderQueryService {
      */
     List<ExpressTrackRespDTO> getExpressTrackList(Long id);
 
+    /**
+     * 【会员】在指定秒杀活动下，用户购买的商品数量
+     *
+     * @param userId     用户编号
+     * @param activityId 活动编号
+     * @return 秒杀商品数量
+     */
+    int getSeckillProductCount(Long userId, Long activityId);
+
     // =================== Order Item ===================
 
     /**
@@ -94,12 +121,12 @@ public interface TradeOrderQueryService {
     TradeOrderItemDO getOrderItem(Long userId, Long itemId);
 
     /**
-     * 根据交易订单项编号数组，查询交易订单项
+     * 获得交易订单项
      *
-     * @param ids 交易订单项编号数组
-     * @return 交易订单项数组
+     * @param id 交易订单项编号 itemId
+     * @return 交易订单项
      */
-    List<TradeOrderItemDO> getOrderItemList(Collection<Long> ids);
+    TradeOrderItemDO getOrderItem(Long id);
 
     /**
      * 根据交易订单编号，查询交易订单项

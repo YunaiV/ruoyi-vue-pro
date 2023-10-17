@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.pay.controller.app.wallet.vo.wallet;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-@Schema(description = "用户 APP - 获取用户钱包 Response VO")
+@Schema(description = "用户 APP - 用户钱包 Response VO")
 @Data
 public class AppPayWalletRespVO {
 

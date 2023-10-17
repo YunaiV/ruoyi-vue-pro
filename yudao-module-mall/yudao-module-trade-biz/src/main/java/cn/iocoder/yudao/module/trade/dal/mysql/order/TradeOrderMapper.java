@@ -9,6 +9,8 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Mapper
@@ -27,16 +29,17 @@ public interface TradeOrderMapper extends BaseMapperX<TradeOrderDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<TradeOrderDO>()
                 .likeIfPresent(TradeOrderDO::getNo, reqVO.getNo())
                 .eqIfPresent(TradeOrderDO::getUserId, reqVO.getUserId())
+                .eqIfPresent(TradeOrderDO::getDeliveryType, reqVO.getDeliveryType())
                 .inIfPresent(TradeOrderDO::getUserId, userIds)
-                .likeIfPresent(TradeOrderDO::getReceiverName, reqVO.getReceiverName())
-                .likeIfPresent(TradeOrderDO::getReceiverMobile, reqVO.getReceiverMobile())
                 .eqIfPresent(TradeOrderDO::getType, reqVO.getType())
                 .eqIfPresent(TradeOrderDO::getStatus, reqVO.getStatus())
                 .eqIfPresent(TradeOrderDO::getPayChannelCode, reqVO.getPayChannelCode())
-                .eqIfPresent(TradeOrderDO::getTerminal,reqVO.getTerminal())
+                .eqIfPresent(TradeOrderDO::getTerminal, reqVO.getTerminal())
                 .eqIfPresent(TradeOrderDO::getLogisticsId, reqVO.getLogisticsId())
                 .inIfPresent(TradeOrderDO::getPickUpStoreId, reqVO.getPickUpStoreIds())
-                .betweenIfPresent(TradeOrderDO::getCreateTime, reqVO.getCreateTime()));
+                .likeIfPresent(TradeOrderDO::getPickUpVerifyCode, reqVO.getPickUpVerifyCode())
+                .betweenIfPresent(TradeOrderDO::getCreateTime, reqVO.getCreateTime())
+                .orderByDesc(TradeOrderDO::getId));
     }
 
     default PageResult<TradeOrderDO> selectPage(AppTradeOrderPageReqVO reqVO, Long userId) {
@@ -59,4 +62,48 @@ public interface TradeOrderMapper extends BaseMapperX<TradeOrderDO> {
                 .eq(TradeOrderDO::getId, orderId)
                 .eq(TradeOrderDO::getUserId, loginUserId));
     }
+
+    default List<TradeOrderDO> selectListByStatusAndCreateTimeLt(Integer status, LocalDateTime createTime) {
+        return selectList(new LambdaUpdateWrapper<TradeOrderDO>()
+                .eq(TradeOrderDO::getStatus, status)
+                .lt(TradeOrderDO::getCreateTime, createTime));
+    }
+
+    default List<TradeOrderDO> selectListByStatusAndDeliveryTimeLt(Integer status, LocalDateTime deliveryTime) {
+        return selectList(new LambdaUpdateWrapper<TradeOrderDO>()
+                .eq(TradeOrderDO::getStatus, status)
+                .lt(TradeOrderDO::getDeliveryTime, deliveryTime));
+    }
+
+    default List<TradeOrderDO> selectListByStatusAndReceiveTimeLt(Integer status, LocalDateTime receive,
+                                                                  Boolean commentStatus) {
+        return selectList(new LambdaUpdateWrapper<TradeOrderDO>()
+                .eq(TradeOrderDO::getStatus, status)
+                .lt(TradeOrderDO::getReceiveTime, receive)
+                .eq(TradeOrderDO::getCommentStatus, commentStatus));
+    }
+
+    default List<TradeOrderDO> selectListByUserIdAndSeckillActivityId(Long userId, Long seckillActivityId) {
+        return selectList(new LambdaUpdateWrapper<>(TradeOrderDO.class)
+                .eq(TradeOrderDO::getUserId, userId)
+                .eq(TradeOrderDO::getSeckillActivityId, seckillActivityId));
+    }
+
+    default TradeOrderDO selectOneByPickUpVerifyCode(String pickUpVerifyCode) {
+        return selectOne(TradeOrderDO::getPickUpVerifyCode, pickUpVerifyCode);
+    }
+
+    // TODO @hui999：是不是只针对 combinationActivityId 的查询呀？
+    default TradeOrderDO selectByUserIdAndActivityIdAndStatus(Long userId, Long activityId, Integer status) {
+        return selectOne(new LambdaQueryWrapperX<TradeOrderDO>()
+                .and(q -> q.eq(TradeOrderDO::getUserId, userId)
+                        .eq(TradeOrderDO::getStatus, status))
+                .and(q -> q.eq(TradeOrderDO::getCombinationActivityId, activityId)
+                        .or()
+                        .eq(TradeOrderDO::getSeckillActivityId, activityId)
+                        .or()
+                        .eq(TradeOrderDO::getBargainActivityId, activityId))
+        );
+    }
+
 }

@@ -60,21 +60,9 @@ public class CombinationActivityDO extends BaseDO {
      */
     private Integer userSize;
     /**
-     * 开团组数
-     */
-    private Integer totalCount;
-    /**
-     * 成团组数
-     */
-    private Integer successCount;
-    /**
-     * 参与人数
-     */
-    private Integer orderUserCount;
-    /**
      * 虚拟成团
      */
-    private Integer virtualGroup;
+    private Boolean virtualGroup;
     /**
      * 活动状态
      *

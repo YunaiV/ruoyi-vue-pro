@@ -13,5 +13,4 @@ public interface ApiAccessLogFrameworkService {
      * @param apiAccessLog API 访问日志
      */
     void createApiAccessLog(ApiAccessLog apiAccessLog);
-
 }
