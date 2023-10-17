@@ -131,6 +131,13 @@ public interface TradeOrderUpdateService {
      */
     void pickUpOrderByAdmin(String pickUpVerifyCode);
 
+    /**
+     * 【管理员】根据自提核销码，查询订单
+     *
+     * @param pickUpVerifyCode 自提核销码
+     */
+    TradeOrderDO getByPickUpVerifyCode(String pickUpVerifyCode);
+
     // =================== Order Item ===================
 
     /**
