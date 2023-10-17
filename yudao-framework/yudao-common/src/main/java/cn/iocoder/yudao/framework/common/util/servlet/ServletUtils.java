@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.framework.common.util.servlet;
 
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
@@ -89,18 +88,6 @@ public class ServletUtils {
         return ServletUtil.getClientIP(request);
     }
 
-    public static Integer getTerminal() {
-        return getHeaderInt("terminal");
-    }
-
-    public static String getHeader(String header) {
-        return getHeader(getRequest(), header);
-    }
-
-    public static Integer getHeaderInt(String header) {
-        return Convert.toInt(getHeader(header));
-    }
-
     public static boolean isJsonRequest(ServletRequest request) {
         return StrUtil.startWithIgnoreCase(request.getContentType(), MediaType.APPLICATION_JSON_VALUE);
     }
@@ -119,13 +106,6 @@ public class ServletUtils {
 
     public static Map<String, String> getParamMap(HttpServletRequest request) {
         return ServletUtil.getParamMap(request);
-    }
-
-    public static String getHeader(HttpServletRequest request, String header) {
-        if (request == null) {
-            return null;
-        }
-        return request.getHeader(header);
     }
 
 }

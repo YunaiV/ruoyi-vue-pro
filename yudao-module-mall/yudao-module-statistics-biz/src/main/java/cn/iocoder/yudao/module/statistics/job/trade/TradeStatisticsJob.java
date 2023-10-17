@@ -30,8 +30,10 @@ public class TradeStatisticsJob implements JobHandler {
     @Override
     @TenantJob
     public String execute(String param) {
-        // TODO @疯狂：要搞个默认的 1 哈；
-        if (NumberUtil.isInteger(param)) {
+        // 默认 昨日
+        if (StrUtil.isBlank(param)) {
+            param = "1";
+        } else if (!NumberUtil.isInteger(param)) {
             throw new RuntimeException("交易统计任务的参数只能为是正整数");
         }
         Integer days = Convert.toInt(param, 0);

@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.statistics.service.trade;
 
 import cn.iocoder.yudao.module.statistics.controller.admin.common.vo.DataComparisonRespVO;
-import cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberAreaStatisticsRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.*;
+import cn.iocoder.yudao.module.statistics.service.member.bo.MemberAreaStatisticsRespBO;
 import cn.iocoder.yudao.module.statistics.service.trade.bo.TradeOrderSummaryRespBO;
 
 import java.time.LocalDateTime;
@@ -30,7 +30,7 @@ public interface TradeOrderStatisticsService {
      *
      * @return 订单统计结果
      */
-    List<MemberAreaStatisticsRespVO> getSummaryListByAreaId();
+    List<MemberAreaStatisticsRespBO> getSummaryListByAreaId();
 
     // TODO 芋艿：已经 review
     /**
@@ -62,13 +62,12 @@ public interface TradeOrderStatisticsService {
      */
     Integer getOrderPayPrice(LocalDateTime beginTime, LocalDateTime endTime);
 
-    // TODO 芋艿：已经 review
     /**
-     * 获得交易订单数量
+     * 根据订单状态、物流类型，获得交易订单数量
      *
      * @return 订单数量
      */
-    TradeOrderCountRespVO getOrderCount();
+    Long getCountByStatusAndDeliveryType(Integer status, Integer deliveryType);
 
     // TODO 芋艿：已经 review
     /**

@@ -14,6 +14,8 @@ import cn.iocoder.yudao.module.statistics.service.trade.TradeStatisticsService;
 import cn.iocoder.yudao.module.statistics.service.trade.bo.TradeSummaryRespBO;
 import cn.iocoder.yudao.module.trade.enums.aftersale.AfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -104,11 +106,15 @@ public class TradeStatisticsController {
     @PreAuthorize("@ss.hasPermission('statistics:trade:query')")
     public CommonResult<TradeOrderCountRespVO> getOrderCount() {
         // 订单统计
-        TradeOrderCountRespVO vo = tradeOrderStatisticsService.getOrderCount();
+        Long undeliveredCount = tradeOrderStatisticsService.getCountByStatusAndDeliveryType(
+                TradeOrderStatusEnum.UNDELIVERED.getStatus(), DeliveryTypeEnum.EXPRESS.getType());
+        Long pickUpCount = tradeOrderStatisticsService.getCountByStatusAndDeliveryType(
+                TradeOrderStatusEnum.DELIVERED.getStatus(), DeliveryTypeEnum.PICK_UP.getType());
         // 售后统计
-        vo.setAfterSaleApply(afterSaleStatisticsService.getCountByStatus(AfterSaleStatusEnum.APPLY))
-                .setAuditingWithdraw(brokerageStatisticsService.getWithdrawCountByStatus(BrokerageWithdrawStatusEnum.AUDITING));
-        return success(vo);
+        Long afterSaleApplyCount = afterSaleStatisticsService.getCountByStatus(AfterSaleStatusEnum.APPLY);
+        Long auditingWithdrawCount = brokerageStatisticsService.getWithdrawCountByStatus(BrokerageWithdrawStatusEnum.AUDITING);
+        // 拼接返回
+        return success(TradeStatisticsConvert.INSTANCE.convert(undeliveredCount, pickUpCount, afterSaleApplyCount, auditingWithdrawCount));
     }
 
     // TODO 芋艿：已经 review
@@ -124,6 +130,7 @@ public class TradeStatisticsController {
     @Operation(summary = "获得订单量趋势统计")
     @PreAuthorize("@ss.hasPermission('statistics:trade:query')")
     public CommonResult<List<DataComparisonRespVO<TradeOrderTrendRespVO>>> getOrderCountTrendComparison(@Valid TradeOrderTrendReqVO reqVO) {
+        // TODO @疯狂：要注意 date 的排序；
         return success(tradeOrderStatisticsService.getOrderCountTrendComparison(reqVO));
     }
 

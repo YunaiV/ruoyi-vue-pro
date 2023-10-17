@@ -65,10 +65,10 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
                 vo -> AreaUtils.getParentIdByType(vo.getAreaId(), AreaTypeEnum.PROVINCE),
                 MemberAreaStatisticsRespBO::getUserCount, Integer::sum);
         // 统计订单
-        Map<Integer, MemberAreaStatisticsRespVO> orderMap = convertMap(tradeOrderStatisticsService.getSummaryListByAreaId(),
-                vo -> AreaUtils.getParentIdByType(vo.getAreaId(), AreaTypeEnum.PROVINCE),
-                vo -> vo,
-                (a, b) -> new MemberAreaStatisticsRespVO()
+        Map<Integer, MemberAreaStatisticsRespBO> orderMap = convertMap(tradeOrderStatisticsService.getSummaryListByAreaId(),
+                bo -> AreaUtils.getParentIdByType(bo.getAreaId(), AreaTypeEnum.PROVINCE),
+                bo -> bo,
+                (a, b) -> new MemberAreaStatisticsRespBO()
                         .setOrderCreateUserCount(a.getOrderCreateUserCount() + b.getOrderCreateUserCount())
                         .setOrderPayUserCount(a.getOrderPayUserCount() + b.getOrderPayUserCount())
                         .setOrderPayPrice(a.getOrderPayPrice() + b.getOrderPayPrice()));
@@ -105,7 +105,7 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
     }
 
     @Override
-    public List<MemberTerminalStatisticsRespVO> getRegisterTerminalStatisticsList() {
+    public List<MemberTerminalStatisticsRespVO> getMemberTerminalStatisticsList() {
         return memberStatisticsMapper.selectSummaryListByRegisterTerminal();
     }
 
@@ -129,7 +129,7 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
 
     private MemberCountRespVO getUserCount(LocalDateTime beginTime, LocalDateTime endTime) {
         return new MemberCountRespVO()
-                .setCreateUserCount(memberStatisticsMapper.selectUserCount(beginTime, endTime))
+                .setRegisterUserCount(memberStatisticsMapper.selectUserCount(beginTime, endTime))
                 .setVisitUserCount(apiAccessLogStatisticsService.getIpCount(UserTypeEnum.MEMBER.getValue(), beginTime, endTime));
     }
 

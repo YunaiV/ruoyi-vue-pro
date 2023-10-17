@@ -93,6 +93,9 @@ public class TradeOrderBaseVO {
     @Schema(description = "自提门店", example = "10")
     private Long pickUpStoreId;
 
+    @Schema(description = "自提核销码", example = "10")
+    private Long pickUpVerifyCode;
+
     @Schema(description = "配送模板编号", example = "1024")
     private Long deliveryTemplateId;
 
@@ -101,9 +104,6 @@ public class TradeOrderBaseVO {
 
     @Schema(description = "发货物流单号", example = "1024")
     private String logisticsNo;
-
-    @Schema(description = "发货状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    private Integer deliveryStatus;
 
     @Schema(description = "发货时间")
     private LocalDateTime deliveryTime;

@@ -34,11 +34,11 @@ public class TradeTrendSummaryExcelVO {
     private Integer expensePrice;
 
     @ExcelProperty(value = "余额支付金额", converter = MoneyConvert.class)
-    private Integer orderWalletPayPrice;
+    private Integer walletPayPrice;
 
     @ExcelProperty(value = "支付佣金金额", converter = MoneyConvert.class)
     private Integer brokerageSettlementPrice;
 
     @ExcelProperty(value = "商品退款金额", converter = MoneyConvert.class)
-    private Integer orderRefundPrice;
+    private Integer afterSaleRefundPrice;
 }
