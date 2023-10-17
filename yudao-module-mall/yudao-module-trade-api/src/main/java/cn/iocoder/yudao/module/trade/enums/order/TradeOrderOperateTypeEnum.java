@@ -21,7 +21,6 @@ public enum TradeOrderOperateTypeEnum {
     MEMBER_RECEIVE(30, "用户已收货"),
     SYSTEM_RECEIVE(31, "到期未收货，系统自动确认收货"),
     ADMIN_PICK_UP_RECEIVE(32, "管理员自提收货"),
-    MEMBER_PICK_UP_RECEIVE(32, "用户自提收货"),
     MEMBER_COMMENT(33, "用户评价"),
     SYSTEM_COMMENT(34, "到期未评价，系统自动评价"),
     MEMBER_CANCEL(40, "取消订单"),

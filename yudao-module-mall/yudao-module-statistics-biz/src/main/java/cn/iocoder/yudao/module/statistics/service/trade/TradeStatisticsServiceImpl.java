@@ -129,7 +129,6 @@ public class TradeStatisticsServiceImpl implements TradeStatisticsService {
         entity = TradeStatisticsConvert.INSTANCE.convert(date, orderSummary, afterSaleSummary, brokerageSettlementPrice,
                 walletSummary);
         tradeStatisticsMapper.insert(entity);
-        // TODO @疯狂：这里是不是也要把日期带上？类似 108 那边;  110 已经带上了
         return stopWatch.prettyPrint();
     }
 

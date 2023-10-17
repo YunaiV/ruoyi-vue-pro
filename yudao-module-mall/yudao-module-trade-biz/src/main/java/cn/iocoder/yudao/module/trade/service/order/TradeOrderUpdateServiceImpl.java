@@ -669,8 +669,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     }
 
     @Override
-    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_PICK_UP_RECEIVE)
-    public void pickUpOrderByMember(Long id) {
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.ADMIN_PICK_UP_RECEIVE)
+    public void pickUpOrderByAdmin(Long id) {
         getSelf().pickUpOrder(tradeOrderMapper.selectById(id));
     }
 

@@ -131,7 +131,7 @@ public class TradeOrderController {
     @Parameter(name = "id", description = "交易订单编号")
     @PreAuthorize("@ss.hasPermission('trade:order:pick-up')")
     public CommonResult<Boolean> pickUpOrderById(@RequestParam("id") Long id) {
-        tradeOrderUpdateService.pickUpOrderByMember(id);
+        tradeOrderUpdateService.pickUpOrderByAdmin(id);
         return success(true);
     }
 

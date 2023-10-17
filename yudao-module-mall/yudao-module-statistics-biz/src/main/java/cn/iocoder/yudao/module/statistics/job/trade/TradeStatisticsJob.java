@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.statistics.job.trade;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import cn.iocoder.yudao.framework.tenant.core.job.TenantJob;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
+// TODO 芋艿：缺个 Job 的配置；等和 Product 一起配置
 /**
  * 交易统计 Job
  *
@@ -30,10 +32,10 @@ public class TradeStatisticsJob implements JobHandler {
     @Override
     @TenantJob
     public String execute(String param) {
-        // 默认 昨日
-        if (StrUtil.isBlank(param)) {
-            param = "1";
-        } else if (!NumberUtil.isInteger(param)) {
+        // 默认昨日
+        param = ObjUtil.defaultIfBlank(param, "1");
+        // 校验参数的合理性
+        if (!NumberUtil.isInteger(param)) {
             throw new RuntimeException("交易统计任务的参数只能为是正整数");
         }
         Integer days = Convert.toInt(param, 0);
