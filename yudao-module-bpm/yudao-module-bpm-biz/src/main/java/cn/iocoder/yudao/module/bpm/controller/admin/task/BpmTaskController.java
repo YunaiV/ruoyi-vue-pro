@@ -4,16 +4,15 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -95,9 +94,31 @@ public class BpmTaskController {
     @Operation(summary = "委派任务", description = "用于【流程详情】的【委派】按钮。和向前【加签】有点像，唯一区别是【委托】没有单独创立任务")
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
     public CommonResult<Boolean> delegateTask(@Valid @RequestBody BpmTaskDelegateReqVO reqVO) {
-        // TODO @海：, 后面要有空格
-        taskService.delegateTask(reqVO,getLoginUserId());
+        taskService.delegateTask(getLoginUserId(), reqVO);
         return success(true);
+    }
+
+    @PutMapping("/add-sign")
+    @Operation(summary = "加签", description = "before 前加签，after 后加签")
+    @PreAuthorize("@ss.hasPermission('bpm:task:update')")
+    public CommonResult<Boolean> addSignTask(@Valid @RequestBody BpmTaskAddSignReqVO reqVO) {
+        taskService.addSignTask(getLoginUserId(), reqVO);
+        return success(true);
+    }
+
+    @PutMapping("/sub-sign")
+    @Operation(summary = "减签")
+    @PreAuthorize("@ss.hasPermission('bpm:task:update')")
+    public CommonResult<Boolean> subSignTask(@Valid @RequestBody BpmTaskSubSignReqVO reqVO) {
+        taskService.subSignTask(getLoginUserId(), reqVO);
+        return success(true);
+    }
+
+    @GetMapping("/get-children-task-list")
+    @Operation(summary = "获取能被减签的任务")
+    @PreAuthorize("@ss.hasPermission('bpm:task:update')")
+    public CommonResult<List<BpmTaskSubSignRespVO>> getChildrenTaskList(@RequestParam("taskId") String taskId) {
+        return success(taskService.getChildrenTaskList(taskId));
     }
 
 }

@@ -122,7 +122,7 @@ public interface TradeOrderUpdateService {
      *
      * @param id 订单编号
      */
-    void pickUpOrderByMember(Long id);
+    void pickUpOrderByAdmin(Long id);
 
     /**
      * 【管理员】核销订单

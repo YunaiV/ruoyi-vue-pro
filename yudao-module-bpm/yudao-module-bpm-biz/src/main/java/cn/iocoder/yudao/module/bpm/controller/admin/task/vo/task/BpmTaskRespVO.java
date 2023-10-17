@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.util.List;
+
 @Schema(description = "管理后台 - 流程任务的 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -18,6 +20,14 @@ public class BpmTaskRespVO extends BpmTaskDonePageItemRespVO {
      * 审核的用户信息
      */
     private User assigneeUser;
+
+    /**
+     * 父任务ID
+     */
+    private String parentTaskId;
+
+    @Schema(description = "子任务（由加签生成）", requiredMode = Schema.RequiredMode.REQUIRED, example = "childrenTask")
+    private List<BpmTaskRespVO> children;
 
     @Schema(description = "用户信息")
     @Data

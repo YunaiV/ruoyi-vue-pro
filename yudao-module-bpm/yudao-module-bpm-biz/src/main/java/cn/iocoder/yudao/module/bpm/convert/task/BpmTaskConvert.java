@@ -1,13 +1,12 @@
 package cn.iocoder.yudao.module.bpm.convert.task;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskDonePageItemRespVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskSimpleRespVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskTodoPageItemRespVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenTaskCreatedReqDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
@@ -18,9 +17,11 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -144,5 +145,54 @@ public interface BpmTaskConvert {
         return CollectionUtils.convertList(elementList, element -> new BpmTaskSimpleRespVO()
                 .setName(element.getName())
                 .setDefinitionKey(element.getId()));
+    }
+
+    //此处不用 mapstruct 映射，因为 TaskEntityImpl 还有很多其他属性，这里我们只设置我们需要的
+    //使用 mapstruct 会将里面嵌套的各个属性值都设置进去，会出现意想不到的问题
+    default TaskEntityImpl convert(TaskEntityImpl task,TaskEntityImpl parentTask){
+        task.setCategory(parentTask.getCategory());
+        task.setDescription(parentTask.getDescription());
+        task.setTenantId(parentTask.getTenantId());
+        task.setName(parentTask.getName());
+        task.setParentTaskId(parentTask.getId());
+        task.setProcessDefinitionId(parentTask.getProcessDefinitionId());
+        task.setProcessInstanceId(parentTask.getProcessInstanceId());
+        task.setTaskDefinitionKey(parentTask.getTaskDefinitionKey());
+        task.setTaskDefinitionId(parentTask.getTaskDefinitionId());
+        task.setPriority(parentTask.getPriority());
+        task.setCreateTime(new Date());
+        return task;
+    }
+
+    default List<BpmTaskSubSignRespVO> convertList(List<BpmTaskExtDO> bpmTaskExtDOList,
+                                                   Map<Long, AdminUserRespDTO> userMap,
+                                                   Map<String, Task> idTaskMap){
+        return CollectionUtils.convertList(bpmTaskExtDOList, task->{
+            BpmTaskSubSignRespVO bpmTaskSubSignRespVO = new BpmTaskSubSignRespVO();
+            bpmTaskSubSignRespVO.setName(task.getName());
+            bpmTaskSubSignRespVO.setId(task.getTaskId());
+            Task sourceTask = idTaskMap.get(task.getTaskId());
+            // 后加签任务不会直接设置 assignee ,所以不存在 assignee 的情况，则去取 owner
+            String assignee = StrUtil.isNotEmpty(sourceTask.getAssignee()) ? sourceTask.getAssignee() : sourceTask.getOwner();
+            AdminUserRespDTO assignUser = userMap.get(NumberUtils.parseLong(assignee));
+            if (assignUser != null) {
+                bpmTaskSubSignRespVO.setAssigneeUser(convert3(assignUser));
+            }
+            return bpmTaskSubSignRespVO;
+        });
+    }
+
+    /**
+     * 转换任务为父子级
+     * @param sourceList 原始数据
+     * @return 转换后的父子级数组
+     */
+    default List<BpmTaskRespVO> convertChildrenList(List<BpmTaskRespVO> sourceList){
+        List<BpmTaskRespVO> childrenTaskList = CollectionUtils.filterList(sourceList, r -> StrUtil.isNotEmpty(r.getParentTaskId()));
+        Map<String, List<BpmTaskRespVO>> parentChildrenTaskListMap = CollectionUtils.convertMultiMap(childrenTaskList, BpmTaskRespVO::getParentTaskId);
+        for (BpmTaskRespVO bpmTaskRespVO : sourceList) {
+            bpmTaskRespVO.setChildren(parentChildrenTaskListMap.get(bpmTaskRespVO.getId()));
+        }
+        return CollectionUtils.filterList(sourceList, r -> StrUtil.isEmpty(r.getParentTaskId()));
     }
 }
