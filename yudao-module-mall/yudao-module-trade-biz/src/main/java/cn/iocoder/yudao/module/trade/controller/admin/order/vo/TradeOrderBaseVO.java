@@ -145,4 +145,7 @@ public class TradeOrderBaseVO {
     @Schema(description = "VIP 减免金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "888")
     private Integer vipPrice;
 
+    @Schema(description = "推广人编号", example = "1")
+    private Long brokerageUserId;
+
 }
