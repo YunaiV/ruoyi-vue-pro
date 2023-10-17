@@ -19,7 +19,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -65,15 +64,6 @@ public class ContractController {
     public CommonResult<ContractRespVO> getContract(@RequestParam("id") Long id) {
         ContractDO contract = contractService.getContract(id);
         return success(ContractConvert.INSTANCE.convert(contract));
-    }
-
-    @GetMapping("/list")
-    @Operation(summary = "获得合同列表")
-    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @PreAuthorize("@ss.hasPermission('crm:contract:query')")
-    public CommonResult<List<ContractRespVO>> getContractList(@RequestParam("ids") Collection<Long> ids) {
-        List<ContractDO> list = contractService.getContractList(ids);
-        return success(ContractConvert.INSTANCE.convertList(list));
     }
 
     @GetMapping("/page")
