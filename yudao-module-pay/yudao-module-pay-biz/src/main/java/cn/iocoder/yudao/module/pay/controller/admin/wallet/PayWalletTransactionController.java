@@ -32,9 +32,11 @@ public class PayWalletTransactionController {
 
     @GetMapping("/page")
     @Operation(summary = "获得钱包流水分页")
+    // TODO @jason：权限校验，缺一个
     public CommonResult<PageResult<PayWalletTransactionRespVO>> getWalletTransactionPage(
             @Valid PayWalletTransactionPageReqVO pageReqVO) {
         PageResult<PayWalletTransactionDO> result = payWalletTransactionService.getWalletTransactionPage(pageReqVO);
         return success(PayWalletTransactionConvert.INSTANCE.convertPage2(result));
     }
+
 }

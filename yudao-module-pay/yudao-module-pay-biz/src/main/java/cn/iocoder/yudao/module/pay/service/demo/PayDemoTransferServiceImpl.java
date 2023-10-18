@@ -64,6 +64,7 @@ public class PayDemoTransferServiceImpl implements PayDemoTransferService {
         return demoTransfer.getId();
     }
 
+    // TODO @jason：可以参考 AppBrokerageWithdrawCreateReqVO 搞下字段哈，进行校验
     private void validatePayeeInfo(Integer transferType, Map<String, String> payeeInfo) {
         PayTransferTypeEnum transferTypeEnum = ofType(transferType);
         switch (transferTypeEnum) {
@@ -83,4 +84,5 @@ public class PayDemoTransferServiceImpl implements PayDemoTransferService {
             }
         }
     }
+
 }

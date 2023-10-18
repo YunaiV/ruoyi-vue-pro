@@ -77,7 +77,7 @@ ALTER TABLE `pay_channel`
     MODIFY COLUMN `config` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '支付渠道配置' AFTER `app_id`;
 
 -- ----------------------------
--- 套餐充值表
+-- 充值套餐表
 -- ----------------------------
 DROP TABLE IF EXISTS `pay_wallet_recharge_package`;
 CREATE TABLE `pay_wallet_recharge_package`
@@ -94,7 +94,7 @@ CREATE TABLE `pay_wallet_recharge_package`
     `deleted`              bit(1)       NOT NULL DEFAULT b'0' COMMENT '是否删除',
     `tenant_id`            bigint       NOT NULL DEFAULT 0 COMMENT '租户编号',
     PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB COMMENT='套餐充值表';
+) ENGINE=InnoDB COMMENT='充值套餐表';
 
 -- ----------------------------
 -- Table structure for pay_wallet_recharge

@@ -17,6 +17,7 @@ import java.util.Map;
 @Data
 public class PayDemoTransferCreateReqVO {
 
+    // TODO @jason：这个字段，是不是叫 type 就好了。
     @Schema(description = "转账类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "转账类型不能为空")
     @InEnum(PayTransferTypeEnum.class)
@@ -26,7 +27,9 @@ public class PayDemoTransferCreateReqVO {
     @Min(value = 1, message = "转账金额必须大于零")
     private Integer price;
 
+    // TODO @jason：感觉这个动态字段，晚点改；可能要讨论下怎么搞好；
     @Schema(description = "收款方信息", requiredMode = Schema.RequiredMode.REQUIRED, example = "{'ALIPAY_LOGON_ID':'xxxx'}")
     @NotEmpty(message = "收款方信息不能为空")
     private Map<String, String> payeeInfo;
+
 }

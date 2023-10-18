@@ -27,8 +27,6 @@ public interface ErrorCodeConstants {
     ErrorCode PAY_ORDER_IS_EXPIRED = new ErrorCode(1_007_002_003, "支付订单已经过期");
     ErrorCode PAY_ORDER_SUBMIT_CHANNEL_ERROR = new ErrorCode(1_007_002_004, "发起支付报错，错误码：{}，错误提示：{}");
     ErrorCode PAY_ORDER_REFUND_FAIL_STATUS_ERROR = new ErrorCode(1_007_002_005, "支付订单退款失败，原因：状态不是已支付或已退款");
-    ErrorCode ORDER_UPDATE_PRICE_FAIL_PAID = new ErrorCode(1_007_002_006, "支付订单调价失败，原因：支付订单已付款,不能调价");
-    ErrorCode ORDER_UPDATE_PRICE_FAIL_EQUAL = new ErrorCode(1_007_002_007, "支付订单调价失败，原因：价格没有变化");
 
     // ========== ORDER 模块(拓展单) 1-007-003-000 ==========
     ErrorCode PAY_ORDER_EXTENSION_NOT_FOUND = new ErrorCode(1_007_003_000, "支付交易拓展单不存在");
@@ -64,6 +62,7 @@ public interface ErrorCodeConstants {
     ErrorCode WALLET_RECHARGE_PACKAGE_AND_PRICE_IS_EMPTY = new ErrorCode(1_007_008_011, "充值金额和充钱套餐不能同时为空");
     ErrorCode WALLET_RECHARGE_PACKAGE_NOT_FOUND = new ErrorCode(1_007_008_012, "钱包充值套餐不存在");
     ErrorCode WALLET_RECHARGE_PACKAGE_IS_DISABLE = new ErrorCode(1_007_008_013, "钱包充值套餐已禁用");
+
     // ========== 转账模块 1-007-009-000 ==========
     ErrorCode PAY_TRANSFER_SUBMIT_CHANNEL_ERROR = new ErrorCode(1_007_009_000, "发起转账报错，错误码：{}，错误提示：{}");
     ErrorCode PAY_TRANSFER_ALIPAY_LOGIN_ID_IS_EMPTY = new ErrorCode(1_007_009_001, "支付宝登录 ID 不能为空");

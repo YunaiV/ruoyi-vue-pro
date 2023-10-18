@@ -180,4 +180,5 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
     public PayTransferRespDTO doUnifiedTransfer(PayTransferUnifiedReqDTO reqDTO) {
         throw new UnsupportedOperationException("待实现");
     }
+
 }
