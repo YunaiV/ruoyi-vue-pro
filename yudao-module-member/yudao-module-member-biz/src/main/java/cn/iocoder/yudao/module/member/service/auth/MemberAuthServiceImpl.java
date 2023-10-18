@@ -19,6 +19,7 @@ import cn.iocoder.yudao.module.system.api.oauth2.OAuth2TokenApi;
 import cn.iocoder.yudao.module.system.api.oauth2.dto.OAuth2AccessTokenCreateReqDTO;
 import cn.iocoder.yudao.module.system.api.oauth2.dto.OAuth2AccessTokenRespDTO;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
+import cn.iocoder.yudao.module.system.api.social.SocialClientApi;
 import cn.iocoder.yudao.module.system.api.social.SocialUserApi;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserRespDTO;
@@ -55,6 +56,8 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     private LoginLogApi loginLogApi;
     @Resource
     private SocialUserApi socialUserApi;
+    @Resource
+    private SocialClientApi socialClientApi;
     @Resource
     private OAuth2TokenApi oauth2TokenApi;
 
@@ -154,7 +157,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     @Override
     public String getSocialAuthorizeUrl(Integer type, String redirectUri) {
-        return socialUserApi.getAuthorizeUrl(type, redirectUri);
+        return socialClientApi.getAuthorizeUrl(type, UserTypeEnum.MEMBER.getValue(), redirectUri);
     }
 
     private MemberUserDO login0(String mobile, String password) {
