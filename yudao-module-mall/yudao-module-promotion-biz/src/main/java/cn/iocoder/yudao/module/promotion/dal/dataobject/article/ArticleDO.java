@@ -54,7 +54,7 @@ public class ArticleDO extends BaseDO {
     /**
      * 浏览次数
      */
-    private String browseCount;
+    private Integer browseCount;
     /**
      * 排序
      */

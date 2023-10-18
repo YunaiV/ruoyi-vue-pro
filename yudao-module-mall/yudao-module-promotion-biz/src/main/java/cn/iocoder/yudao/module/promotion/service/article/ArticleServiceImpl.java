@@ -42,6 +42,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         // 插入
         ArticleDO article = ArticleConvert.INSTANCE.convert(createReqVO);
+        article.setBrowseCount(0); // 初始浏览量
         articleMapper.insert(article);
         // 返回
         return article.getId();
