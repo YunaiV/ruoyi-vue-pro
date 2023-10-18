@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.clue;
 
+import com.sun.xml.bind.v2.TODO;
 import lombok.*;
 import java.util.*;
 import java.time.LocalDateTime;
@@ -70,7 +71,7 @@ public class CrmClueDO extends BaseDO {
      */
     private Long ownerUserId;
     /**
-     * 最后跟进时间
+     * 最后跟进时间 TODO 添加跟进记录时更新该值
      */
     private LocalDateTime contactLastTime;
     /**
