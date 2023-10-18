@@ -37,3 +37,27 @@ CREATE TABLE `crm_contract`
 ) ENGINE = InnoDB
   CHARACTER SET = utf8mb4
   COLLATE = utf8mb4_unicode_ci COMMENT ='合同表';
+
+
+DROP TABLE IF EXISTS `crm_clue`;
+CREATE TABLE `crm_clue`  (
+     `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，主键自增',
+     `transform_status` tinyint NOT NULL COMMENT '转化状态',
+     `follow_up_status` tinyint NOT NULL COMMENT '跟进状态',
+     `name` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '线索名称',
+     `customer_id` bigint NOT NULL COMMENT '客户id',
+     `contact_next_time` datetime NULL DEFAULT NULL COMMENT '下次联系时间',
+     `telephone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '电话',
+     `mobile` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '手机号',
+     `address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '地址',
+     `owner_user_id` bigint NULL DEFAULT NULL COMMENT '负责人的用户编号',
+     `contact_last_time` datetime NULL DEFAULT NULL COMMENT '最后跟进时间',
+     `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '备注',
+     `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+     `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+     `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+     `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+     PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '线索表' ROW_FORMAT = Dynamic;
