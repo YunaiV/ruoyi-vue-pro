@@ -258,9 +258,7 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
             if (trie == null) {
                 continue;
             }
-            if (!trie.isValid(text)) {
-                return false;
-            }
+            return trie.isValid(text);
         }
         return true;
     }
