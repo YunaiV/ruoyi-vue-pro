@@ -4,21 +4,33 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.util.cache.CacheUtils;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.social.core.YudaoAuthRequestFactory;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
 import cn.iocoder.yudao.module.system.dal.mysql.social.SocialClientMapper;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
+import com.binarywang.spring.starter.wxjava.mp.properties.WxMpProperties;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.xingyuv.jushauth.config.AuthConfig;
 import com.xingyuv.jushauth.model.AuthCallback;
 import com.xingyuv.jushauth.model.AuthResponse;
 import com.xingyuv.jushauth.model.AuthUser;
 import com.xingyuv.jushauth.request.AuthRequest;
 import com.xingyuv.jushauth.utils.AuthStateUtils;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import me.chanjar.weixin.common.bean.WxJsapiSignature;
+import me.chanjar.weixin.common.redis.RedisTemplateWxRedisOps;
+import me.chanjar.weixin.mp.api.WxMpService;
+import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
+import me.chanjar.weixin.mp.config.impl.WxMpRedisConfigImpl;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.Duration;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -36,6 +48,32 @@ public class SocialClientServiceImpl implements SocialClientService {
 
     @Resource // 由于自定义了 YudaoAuthRequestFactory 无法覆盖默认的 AuthRequestFactory，所以只能注入它
     private YudaoAuthRequestFactory yudaoAuthRequestFactory;
+
+    @Resource
+    private WxMpService mpService;
+    @Resource
+    private StringRedisTemplate stringRedisTemplate; // WxMpService 需要使用到，所以在 Service 注入了它
+    @Resource
+    private WxMpProperties mpProperties;
+    /**
+     * 缓存 WxMpService 对象
+     *
+     * key：使用微信公众号的 appId + secret 拼接，即 {@link SocialClientDO} 的 clientId 和 clientSecret 属性。
+     * 为什么 key 使用这种格式？因为 {@link SocialClientDO} 在管理后台可以变更，通过这个 key 存储它的单例。
+     *
+     * 为什么要做 WxMpService 缓存？因为 WxMpService 构建成本比较大，所以尽量保证它是单例。
+     */
+    private final LoadingCache<String, WxMpService> mpServiceCache = CacheUtils.buildAsyncReloadingCache(
+            Duration.ofSeconds(10L),
+            new CacheLoader<String, WxMpService>() {
+
+                @Override
+                public WxMpService load(String key) {
+                    String[] keys = key.split(":");
+                    return buildMpService(keys[0], keys[1]);
+                }
+
+            });
 
     @Resource
     private SocialClientMapper socialClientMapper;
@@ -89,6 +127,51 @@ public class SocialClientServiceImpl implements SocialClientService {
             ReflectUtil.setFieldValue(request, "config", newAuthConfig);
         }
         return request;
+    }
+
+    @Override
+    @SneakyThrows
+    public WxJsapiSignature createWxMpJsapiSignature(Integer userType, String url) {
+        WxMpService mpService = buildMpService(userType);
+        return mpService.createJsapiSignature(url);
+    }
+
+    /**
+     * 创建 clientId + clientSecret 对应的 WxMpService 对象
+     *
+     * @param userType 用户类型
+     * @return WxMpService 对象
+     */
+    private WxMpService buildMpService(Integer userType) {
+        // 第一步，查询 DB 的配置项，获得对应的 WxMpService 对象
+        SocialClientDO client = socialClientMapper.selectBySocialTypeAndUserType(
+                SocialTypeEnum.WECHAT_MP.getType(), userType);
+        if (client != null && Objects.equals(client.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+            return mpServiceCache.getUnchecked(client.getClientId() + ":" + client.getClientSecret());
+        }
+        // 第二步，不存在 DB 配置项，则使用 application-*.yaml 对应的 WxMpService 对象
+        return mpService;
+    }
+
+    /**
+     * 创建 clientId + clientSecret 对应的 WxMpService 对象
+     *
+     * @param clientId 微信公众号 appId
+     * @param clientSecret 微信公众号 secret
+     * @return WxMpService 对象
+     */
+    private WxMpService buildMpService(String clientId, String clientSecret) {
+        // 第一步，创建 WxMpRedisConfigImpl 对象
+        WxMpRedisConfigImpl configStorage = new WxMpRedisConfigImpl(
+                new RedisTemplateWxRedisOps(stringRedisTemplate),
+                mpProperties.getConfigStorage().getKeyPrefix());
+        configStorage.setAppId(clientId);
+        configStorage.setSecret(clientSecret);
+
+        // 第二步，创建 WxMpService 对象
+        WxMpService service = new WxMpServiceImpl();
+        service.setWxMpConfigStorage(configStorage);
+        return service;
     }
 
 }

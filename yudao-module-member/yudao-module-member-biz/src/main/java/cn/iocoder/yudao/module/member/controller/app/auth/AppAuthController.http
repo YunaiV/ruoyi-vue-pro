@@ -59,3 +59,8 @@ tenant-id: {{appTenentId}}
 POST {{appApi}}/member/auth/refresh-token?refreshToken=bc43d929094849a28b3a69f6e6940d70
 Content-Type: application/json
 tenant-id: {{appTenentId}}
+
+### 请求 /auth/create-weixin-jsapi-signature 接口 => 成功
+POST {{appApi}}/member/auth/create-weixin-jsapi-signature?url=http://www.iocoder.cn
+Authorization: Bearer {{appToken}}
+tenant-id: {{appTenentId}}

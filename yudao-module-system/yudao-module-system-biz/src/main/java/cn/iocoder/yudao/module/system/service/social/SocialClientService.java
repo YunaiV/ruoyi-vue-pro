@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.system.service.social;
 
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import com.xingyuv.jushauth.model.AuthUser;
+import me.chanjar.weixin.common.bean.WxJsapiSignature;
 
 /**
  * 社交应用 Service 接口
@@ -30,5 +31,14 @@ public interface SocialClientService {
      * @return 授权的用户
      */
     AuthUser getAuthUser(Integer socialType, Integer userType, String code, String state);
+
+    /**
+     * 创建微信 JS SDK 初始化所需的签名
+     *
+     * @param userType 用户类型
+     * @param url 访问的 URL 地址
+     * @return 签名
+     */
+    WxJsapiSignature createWxMpJsapiSignature(Integer userType, String url);
 
 }
