@@ -124,12 +124,16 @@ public interface TradeOrderConvert {
             TradeOrderPageItemRespVO orderVO = convert(order, xOrderItems);
             // 处理收货地址
             orderVO.setReceiverAreaName(AreaUtils.format(order.getReceiverAreaId()));
-            // 增加用户昵称
-            orderVO.setUser(memberUserMap.get(orderVO.getUserId()));
+            // 增加用户信息
+            orderVO.setUser(convertUser(memberUserMap.get(orderVO.getUserId())));
+            // 增加推广人信息
+            orderVO.setBrokerageUser(convertUser(memberUserMap.get(orderVO.getBrokerageUserId())));
             return orderVO;
         });
         return new PageResult<>(orderVOs, pageResult.getTotal());
     }
+
+    MemberUserRespVO convertUser(MemberUserRespDTO memberUserRespDTO);
 
     TradeOrderPageItemRespVO convert(TradeOrderDO order, List<TradeOrderItemDO> items);
 

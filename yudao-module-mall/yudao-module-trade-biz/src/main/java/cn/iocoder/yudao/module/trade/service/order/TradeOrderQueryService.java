@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.trade.service.order;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderSummaryRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
@@ -63,6 +64,14 @@ public interface TradeOrderQueryService {
      * @return 交易订单
      */
     PageResult<TradeOrderDO> getOrderPage(TradeOrderPageReqVO reqVO);
+
+    /**
+     * 获得订单统计
+     *
+     * @param reqVO 请求参数
+     * @return 订单统计
+     */
+    TradeOrderSummaryRespVO getOrderSummary(TradeOrderPageReqVO reqVO);
 
     /**
      * 【会员】获得交易订单分页
