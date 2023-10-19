@@ -109,6 +109,7 @@ public class PayWalletServiceImpl implements  PayWalletService {
         if (walletTransaction == null) {
             throw exception(WALLET_TRANSACTION_NOT_FOUND);
         }
+        // 2. 校验退款是否存在
         PayWalletTransactionDO refundTransaction = walletTransactionService.getWalletTransaction(
                 String.valueOf(refundId), PAYMENT_REFUND);
         if (refundTransaction != null) {
@@ -128,7 +129,7 @@ public class PayWalletServiceImpl implements  PayWalletService {
         }
 
         // 2.1 扣除余额
-        int updateCounts = 0 ;
+        int updateCounts;
         switch (bizType) {
             case PAYMENT: {
                 updateCounts = walletMapper.updateWhenConsumption(payWallet.getId(), price);

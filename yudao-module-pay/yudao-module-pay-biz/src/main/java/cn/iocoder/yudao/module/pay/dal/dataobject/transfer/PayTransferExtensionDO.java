@@ -10,6 +10,7 @@ import lombok.Data;
 
 import java.util.Map;
 
+// TODO @jason：转账是不是类似 refund，不用拓展单呀？支付做拓展单的原因，是因为它存在不确定性，可以切换多种；转账和退款，都是明确方式的；
 /**
  * 转账拓展单 DO
  *
@@ -61,4 +62,5 @@ public class PayTransferExtensionDO extends BaseDO {
      * 支付渠道异步通知的内容
      */
     private String channelNotifyData;
+
 }

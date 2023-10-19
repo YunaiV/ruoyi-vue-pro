@@ -18,4 +18,5 @@ public interface PayTransferApi {
      * @return 转账单编号
      */
     Long createTransfer(@Valid PayTransferCreateReqDTO reqDTO);
+
 }

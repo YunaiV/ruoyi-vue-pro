@@ -90,6 +90,7 @@ public interface PayWalletService {
      */
     void freezePrice(Long id, Integer price);
 
+    // TODO @jason：unfreeze 是单词哈，f 不用大写
     /**
      * 解冻钱包余额
      *

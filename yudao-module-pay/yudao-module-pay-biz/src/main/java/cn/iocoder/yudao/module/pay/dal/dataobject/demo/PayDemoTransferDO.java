@@ -20,6 +20,7 @@ import java.util.Map;
 @KeySequence("pay_demo_transfer_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 public class PayDemoTransferDO extends BaseDO {
+
     /**
      * 订单编号
      */
@@ -41,6 +42,7 @@ public class PayDemoTransferDO extends BaseDO {
      */
     private Integer type;
 
+    // TODO @jason：要不字段还是弄成正确的平铺开？
     /**
      * 收款人信息，不同类型和渠道不同
      */
@@ -66,4 +68,5 @@ public class PayDemoTransferDO extends BaseDO {
      * 转账支付时间
      */
     private LocalDateTime transferTime;
+
 }

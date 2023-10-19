@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
 
+// TODO @jason：看看能不能融合到 AbstractAlipayPayClient 中。
 /**
  * 支付宝转账的 PayClient 实现类
  *
@@ -29,6 +30,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
  */
 @Slf4j
 public class AlipayTransferClient extends AbstractAlipayPayClient {
+    // TODO @jason：方法之间，要有空格噢
     public AlipayTransferClient(Long channelId, AlipayPayClientConfig config) {
         super(channelId, PayChannelEnum.ALIPAY_TRANSFER.getCode(), config);
     }
@@ -49,16 +51,17 @@ public class AlipayTransferClient extends AbstractAlipayPayClient {
         model.setOrderTitle(reqDTO.getTitle());               // 转账业务的标题，用于在支付宝用户的账单里显示。
         model.setOutBizNo(reqDTO.getOutTransferNo());
         model.setProductCode("TRANS_ACCOUNT_NO_PWD");    // 销售产品码。单笔无密转账固定为 TRANS_ACCOUNT_NO_PWD
-        model.setBizScene("DIRECT_TRANSFER");           // 业务场景 单笔无密转账固定为 DIRECT_TRANSFER。
+        model.setBizScene("DIRECT_TRANSFER");           // 业务场景 单笔无密转账固定为 DIRECT_TRANSFER
         model.setBusinessParams(JsonUtils.toJsonString(reqDTO.getChannelExtras()));
         PayTransferTypeEnum transferType = PayTransferTypeEnum.ofType(reqDTO.getType());
-        switch(transferType){
-            case WX_BALANCE :
-            case WALLET_BALANCE : {
+        switch(transferType) {
+            case WX_BALANCE:
+            case WALLET_BALANCE: {
                 log.error("[doUnifiedTransfer],支付宝转账不支持的转账类型{}", transferType);
                 throw new UnsupportedOperationException(String.format("支付宝转账不支持转账类型: %s",transferType.getName()));
             }
-            case ALIPAY_BALANCE : {
+            // TODO @jason：是不是不用传递 transferType 参数哈？因为应该已经明确是支付宝啦？
+            case ALIPAY_BALANCE: {
                 // ② 个性化的参数
                 Participant payeeInfo = new Participant();
                 payeeInfo.setIdentityType("ALIPAY_LOGON_ID");
@@ -90,7 +93,7 @@ public class AlipayTransferClient extends AbstractAlipayPayClient {
                 return  PayTransferRespDTO.successOf(response.getOrderId(), parseTime(response.getTransDate()),
                         response.getOutBizNo(), response);
             }
-            case BANK_CARD : {
+            case BANK_CARD: {
                 Participant payeeInfo = new Participant();
                 payeeInfo.setIdentityType("BANKCARD_ACCOUNT");
                 throw new UnsupportedOperationException("待实现");
@@ -100,4 +103,5 @@ public class AlipayTransferClient extends AbstractAlipayPayClient {
             }
         }
     }
+
 }

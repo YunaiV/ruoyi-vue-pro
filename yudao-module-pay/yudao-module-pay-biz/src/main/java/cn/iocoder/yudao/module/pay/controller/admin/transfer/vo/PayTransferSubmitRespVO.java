@@ -9,4 +9,5 @@ public class PayTransferSubmitRespVO {
 
     @Schema(description = "转账状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1") // 参见 PayTransferStatusEnum 枚举
     private Integer status;
+
 }

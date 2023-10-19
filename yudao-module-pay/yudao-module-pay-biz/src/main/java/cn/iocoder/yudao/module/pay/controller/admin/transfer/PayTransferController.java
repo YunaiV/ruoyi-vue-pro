@@ -29,8 +29,10 @@ public class PayTransferController {
 
     @PostMapping("/submit")
     @Operation(summary = "提交转账订单")
+    // TODO @jason：权限的设置
     public CommonResult<PayTransferSubmitRespVO> submitPayTransfer(@Valid @RequestBody PayTransferSubmitReqVO reqVO) {
         PayTransferSubmitRespVO respVO = payTransferService.submitTransfer(reqVO, getClientIP());
         return success(respVO);
     }
+
 }
