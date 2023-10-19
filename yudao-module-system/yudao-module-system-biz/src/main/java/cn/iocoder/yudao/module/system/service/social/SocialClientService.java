@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.service.social;
 
+import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import com.xingyuv.jushauth.model.AuthUser;
 import me.chanjar.weixin.common.bean.WxJsapiSignature;
@@ -32,13 +33,26 @@ public interface SocialClientService {
      */
     AuthUser getAuthUser(Integer socialType, Integer userType, String code, String state);
 
+    // =================== 微信公众号独有 ===================
+
     /**
-     * 创建微信 JS SDK 初始化所需的签名
+     * 创建微信公众号的 JS SDK 初始化所需的签名
      *
      * @param userType 用户类型
      * @param url 访问的 URL 地址
      * @return 签名
      */
     WxJsapiSignature createWxMpJsapiSignature(Integer userType, String url);
+
+    // =================== 微信小程序独有 ===================
+
+    /**
+     * 获得微信小程序的手机信息
+     *
+     * @param userType 用户类型
+     * @param phoneCode 手机授权码
+     * @return 手机信息
+     */
+    WxMaPhoneNumberInfo getWxMaPhoneNumberInfo(Integer userType, String phoneCode);
 
 }

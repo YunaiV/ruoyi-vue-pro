@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.system.api.social;
 
+import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialWxJsapiSignatureRespDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxPhoneNumberInfoRespDTO;
 import cn.iocoder.yudao.module.system.convert.social.SocialClientConvert;
 import cn.iocoder.yudao.module.system.service.social.SocialClientService;
 import me.chanjar.weixin.common.bean.WxJsapiSignature;
@@ -30,6 +32,12 @@ public class SocialClientApiImpl implements SocialClientApi {
     public SocialWxJsapiSignatureRespDTO createWxMpJsapiSignature(Integer userType, String url) {
         WxJsapiSignature signature = socialClientService.createWxMpJsapiSignature(userType, url);
         return SocialClientConvert.INSTANCE.convert(signature);
+    }
+
+    @Override
+    public SocialWxPhoneNumberInfoRespDTO getWxMaPhoneNumberInfo(Integer userType, String phoneCode) {
+        WxMaPhoneNumberInfo info = socialClientService.getWxMaPhoneNumberInfo(userType, phoneCode);
+        return SocialClientConvert.INSTANCE.convert(info);
     }
 
 }

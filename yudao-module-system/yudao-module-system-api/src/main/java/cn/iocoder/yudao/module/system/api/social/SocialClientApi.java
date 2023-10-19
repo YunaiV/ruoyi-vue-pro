@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.api.social;
 
 import cn.iocoder.yudao.module.system.api.social.dto.SocialWxJsapiSignatureRespDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxPhoneNumberInfoRespDTO;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 
 /**
@@ -21,12 +22,21 @@ public interface SocialClientApi {
     String getAuthorizeUrl(Integer type, Integer userType, String redirectUri);
 
     /**
-     * 创建微信 JS SDK 初始化所需的签名
+     * 创建微信公众号 JS SDK 初始化所需的签名
      *
      * @param userType 用户类型
      * @param url 访问的 URL 地址
      * @return 签名
      */
     SocialWxJsapiSignatureRespDTO createWxMpJsapiSignature(Integer userType, String url);
+
+    /**
+     * 获得微信小程序的手机信息
+     *
+     * @param userType 用户类型
+     * @param phoneCode 手机授权码
+     * @return 手机信息
+     */
+    SocialWxPhoneNumberInfoRespDTO getWxMaPhoneNumberInfo(Integer userType, String phoneCode);
 
 }
