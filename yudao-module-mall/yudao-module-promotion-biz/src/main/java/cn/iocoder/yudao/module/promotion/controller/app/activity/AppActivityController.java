@@ -46,7 +46,7 @@ public class AppActivityController {
     @Parameter(name = "spuId", description = "商品编号", required = true)
     public CommonResult<List<AppActivityRespVO>> getActivityListBySpuId(@RequestParam("spuId") Long spuId) {
         // 每种活动，只返回一个
-        return success(getAppActivityRespVOList(Collections.singletonList(spuId)));
+        return success(getAppActivityList(Collections.singletonList(spuId)));
     }
 
     @GetMapping("/list-by-spu-ids")
@@ -57,16 +57,17 @@ public class AppActivityController {
             return success(MapUtil.empty());
         }
         // 每种活动，只返回一个；key 为 SPU 编号
-        return success(convertMultiMap(getAppActivityRespVOList(spuIds), AppActivityRespVO::getSpuId));
+        return success(convertMultiMap(getAppActivityList(spuIds), AppActivityRespVO::getSpuId));
     }
 
-    private List<AppActivityRespVO> getAppActivityRespVOList(Collection<Long> spuIds) {
+    private List<AppActivityRespVO> getAppActivityList(Collection<Long> spuIds) {
         if (CollUtil.isEmpty(spuIds)) {
             return new ArrayList<>();
         }
         LocalDateTime now = LocalDateTime.now();
         List<AppActivityRespVO> activityList = new ArrayList<>();
-        // 拼团活动-获取开启的且开始的且没有结束的活动
+
+        // 1. 拼团活动 - 获取开启的且开始的且没有结束的活动
         List<CombinationActivityDO> combinationActivities = combinationActivityService.getCombinationActivityBySpuIdsAndStatusAndDateTimeLt(
                 spuIds, CommonStatusEnum.ENABLE.getStatus(), now);
         if (CollUtil.isNotEmpty(combinationActivities)) {
@@ -76,7 +77,8 @@ public class AppActivityController {
                         .setSpuId(item.getSpuId()).setStartTime(item.getStartTime()).setEndTime(item.getEndTime()));
             });
         }
-        // 秒杀活动-获取开启的且开始的且没有结束的活动
+
+        // 2. 秒杀活动 - 获取开启的且开始的且没有结束的活动
         List<SeckillActivityDO> seckillActivities = seckillActivityService.getSeckillActivityBySpuIdsAndStatusAndDateTimeLt(
                 spuIds, CommonStatusEnum.ENABLE.getStatus(), now);
         if (CollUtil.isNotEmpty(seckillActivities)) {
@@ -86,7 +88,8 @@ public class AppActivityController {
                         .setSpuId(item.getSpuId()).setStartTime(item.getStartTime()).setEndTime(item.getEndTime()));
             });
         }
-        // 砍价活动-获取开启的且开始的且没有结束的活动
+
+        // 3. 砍价活动 - 获取开启的且开始的且没有结束的活动
         List<BargainActivityDO> bargainActivities = bargainActivityService.getBargainActivityBySpuIdsAndStatusAndDateTimeLt(
                 spuIds, CommonStatusEnum.ENABLE.getStatus(), now);
         if (CollUtil.isNotEmpty(bargainActivities)) {
