@@ -102,9 +102,19 @@ public interface BargainActivityMapper extends BaseMapperX<BargainActivityDO> {
                 .groupBy("spu_id"));
     }
 
-    default List<BargainActivityDO> selectListByIds(Collection<Long> ids) {
+    /**
+     * 获取指定活动编号的活动列表且
+     * 开始时间和结束时间小于给定时间 dateTime 的活动列表
+     *
+     * @param ids      活动编号
+     * @param dateTime 指定日期
+     * @return 活动列表
+     */
+    default List<BargainActivityDO> selectListByIdsAndDateTimeLt(Collection<Long> ids, LocalDateTime dateTime) {
         return selectList(new LambdaQueryWrapperX<BargainActivityDO>()
                 .in(BargainActivityDO::getId, ids)
+                .lt(BargainActivityDO::getStartTime, dateTime)
+                .lt(BargainActivityDO::getEndTime, dateTime)
                 .orderByDesc(BargainActivityDO::getCreateTime));
     }
 

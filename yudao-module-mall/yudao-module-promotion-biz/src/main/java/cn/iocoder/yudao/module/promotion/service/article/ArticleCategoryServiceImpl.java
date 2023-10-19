@@ -1,13 +1,11 @@
 package cn.iocoder.yudao.module.promotion.service.article;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.convert.article.ArticleCategoryConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleCategoryDO;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.article.ArticleCategoryMapper;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -59,9 +57,8 @@ public class ArticleCategoryServiceImpl implements ArticleCategoryService {
         // 校验存在
         validateArticleCategoryExists(id);
         // 校验是不是存在关联文章
-        // TODO @puhui999：最好获得数量哈；
-        List<ArticleDO> articleList = articleService.getArticleByCategoryId(id);
-        if (CollUtil.isNotEmpty(articleList)) {
+        Long count = articleService.getArticleCountByCategoryId(id);
+        if (count > 0) {
             throw exception(ARTICLE_CATEGORY_DELETE_FAIL_HAVE_ARTICLES);
         }
 
@@ -87,8 +84,7 @@ public class ArticleCategoryServiceImpl implements ArticleCategoryService {
 
     @Override
     public List<ArticleCategoryDO> getArticleCategoryListByStatus(Integer status) {
-        // TODO @puhui999：selectListByStatus
-        return articleCategoryMapper.selectList(ArticleCategoryDO::getStatus, status);
+        return articleCategoryMapper.selectListByStatus(status);
     }
 
 }

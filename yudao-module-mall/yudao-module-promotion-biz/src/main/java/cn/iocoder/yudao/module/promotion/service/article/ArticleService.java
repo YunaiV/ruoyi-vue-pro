@@ -80,4 +80,19 @@ public interface ArticleService {
      */
     List<ArticleDO> getArticleByCategoryId(Long categoryId);
 
+    /**
+     * 获得指定分类的文章数量
+     *
+     * @param categoryId 文章分类编号
+     * @return 文章数量
+     */
+    Long getArticleCountByCategoryId(Long categoryId);
+
+    /**
+     * 增加文章浏览量
+     *
+     * @param id 文章编号
+     */
+    void addBrowseCount(Long id);
+
 }

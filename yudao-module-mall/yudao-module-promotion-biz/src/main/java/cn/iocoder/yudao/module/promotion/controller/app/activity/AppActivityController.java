@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -63,10 +64,11 @@ public class AppActivityController {
         if (CollUtil.isEmpty(spuIds)) {
             return new ArrayList<>();
         }
+        LocalDateTime now = LocalDateTime.now();
         List<AppActivityRespVO> activityList = new ArrayList<>();
-        // 拼团活动
-        List<CombinationActivityDO> combinationActivities = combinationActivityService.getCombinationActivityBySpuIdsAndStatus(
-                spuIds, CommonStatusEnum.ENABLE.getStatus());
+        // 拼团活动-获取开启的且开始的且没有结束的活动
+        List<CombinationActivityDO> combinationActivities = combinationActivityService.getCombinationActivityBySpuIdsAndStatusAndDateTimeLt(
+                spuIds, CommonStatusEnum.ENABLE.getStatus(), now);
         if (CollUtil.isNotEmpty(combinationActivities)) {
             combinationActivities.forEach(item -> {
                 activityList.add(new AppActivityRespVO().setId(item.getId())
@@ -74,9 +76,9 @@ public class AppActivityController {
                         .setSpuId(item.getSpuId()).setStartTime(item.getStartTime()).setEndTime(item.getEndTime()));
             });
         }
-        // 秒杀活动
-        List<SeckillActivityDO> seckillActivities = seckillActivityService.getSeckillActivityBySpuIdsAndStatus(
-                spuIds, CommonStatusEnum.ENABLE.getStatus());
+        // 秒杀活动-获取开启的且开始的且没有结束的活动
+        List<SeckillActivityDO> seckillActivities = seckillActivityService.getSeckillActivityBySpuIdsAndStatusAndDateTimeLt(
+                spuIds, CommonStatusEnum.ENABLE.getStatus(), now);
         if (CollUtil.isNotEmpty(seckillActivities)) {
             seckillActivities.forEach(item -> {
                 activityList.add(new AppActivityRespVO().setId(item.getId())
@@ -84,9 +86,9 @@ public class AppActivityController {
                         .setSpuId(item.getSpuId()).setStartTime(item.getStartTime()).setEndTime(item.getEndTime()));
             });
         }
-        // 砍价活动
-        List<BargainActivityDO> bargainActivities = bargainActivityService.getBargainActivityBySpuIdsAndStatus(
-                spuIds, CommonStatusEnum.ENABLE.getStatus());
+        // 砍价活动-获取开启的且开始的且没有结束的活动
+        List<BargainActivityDO> bargainActivities = bargainActivityService.getBargainActivityBySpuIdsAndStatusAndDateTimeLt(
+                spuIds, CommonStatusEnum.ENABLE.getStatus(), now);
         if (CollUtil.isNotEmpty(bargainActivities)) {
             bargainActivities.forEach(item -> {
                 activityList.add(new AppActivityRespVO().setId(item.getId())
