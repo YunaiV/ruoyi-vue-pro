@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -324,14 +325,15 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     }
 
     @Override
-    public List<SeckillActivityDO> getSeckillActivityBySpuIdsAndStatus(Collection<Long> spuIds, Integer status) {
+    public List<SeckillActivityDO> getSeckillActivityBySpuIdsAndStatusAndDateTimeLt(Collection<Long> spuIds, Integer status, LocalDateTime dateTime) {
         // 1.查询出指定 spuId 的 spu 参加的活动最接近现在的一条记录。多个的话，一个 spuId 对应一个最近的活动编号
         List<Map<String, Object>> spuIdAndActivityIdMaps = seckillActivityMapper.selectSpuIdAndActivityIdMapsBySpuIdsAndStatus(spuIds, status);
         if (CollUtil.isEmpty(spuIdAndActivityIdMaps)) {
             return Collections.emptyList();
         }
         // 2.查询活动详情
-        return seckillActivityMapper.selectListByIds(convertSet(spuIdAndActivityIdMaps, map -> MapUtil.getLong(map, "activityId")));
+        return seckillActivityMapper.selectListByIdsAndDateTimeLt(
+                convertSet(spuIdAndActivityIdMaps, map -> MapUtil.getLong(map, "activityId")), dateTime);
     }
 
 }

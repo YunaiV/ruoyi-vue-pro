@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,5 +56,12 @@ public class AppArticleController {
         return success(ArticleConvert.INSTANCE.convert01(articleService.getArticle(id)));
     }
 
-    // TODO @puhui999：增加浏览量，实现一个接口；先简单做，用户规模不大，只 +1 即可；ps：uniapp 那边也要接下噢
+    @PutMapping("/add-browseCount")
+    @Operation(summary = "增加文章浏览量")
+    @Parameter(name = "id", description = "文章编号", example = "1024")
+    public CommonResult<Boolean> addBrowseCount(@RequestParam("id") Long id) {
+        articleService.addBrowseCount(id);
+        return success(true);
+    }
+
 }

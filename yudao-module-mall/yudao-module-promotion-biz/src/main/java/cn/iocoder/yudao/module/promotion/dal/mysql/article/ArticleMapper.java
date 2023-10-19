@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.ArticlePageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.article.vo.article.AppArticlePageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleDO;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -42,5 +43,10 @@ public interface ArticleMapper extends BaseMapperX<ArticleDO> {
                 .eqIfPresent(ArticleDO::getCategoryId, pageReqVO.getCategoryId()));
     }
 
+    default void updateBrowseCount(Long id) {
+        update(null, new LambdaUpdateWrapper<ArticleDO>()
+                .eq(ArticleDO::getId, id)
+                .setSql("browse_count = browse_count + 1"));
+    }
 
 }

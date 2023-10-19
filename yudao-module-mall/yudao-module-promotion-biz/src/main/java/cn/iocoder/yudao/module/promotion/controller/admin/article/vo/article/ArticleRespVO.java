@@ -16,6 +16,9 @@ public class ArticleRespVO extends ArticleBaseVO {
     @Schema(description = "文章编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "8606")
     private Long id;
 
+    @Schema(description = "浏览量", requiredMode = Schema.RequiredMode.REQUIRED, example = "99999")
+    private Integer browseCount;
+
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
