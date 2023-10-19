@@ -258,7 +258,10 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
             if (trie == null) {
                 continue;
             }
-            return trie.isValid(text);
+            // 如果有一个标签不合法，则返回 false 不合法
+            if (!trie.isValid(text)) {
+                return false;
+            }
         }
         return true;
     }

@@ -30,9 +30,10 @@ public class SimpleTrie {
      * @param strs 字符串数组
      */
     public SimpleTrie(Collection<String> strs) {
-        children = new HashMap<>();
+        // 排序，优先使用较短的前缀
+        strs = CollUtil.sort(strs, String::compareTo);
         // 构建树
-        strs = CollUtil.sort(strs, String::compareTo); // 排序，优先使用较短的前缀
+        children = new HashMap<>();
         for (String str : strs) {
             Map<Character, Object> child = children;
             // 遍历每个字符
@@ -60,7 +61,7 @@ public class SimpleTrie {
      */
     public boolean isValid(String text) {
         // 遍历 text，使用每一个 [i, n) 段的字符串，使用 children 前缀树匹配，是否包含敏感词
-        for (int i = 0; i < text.length() ; i++) {
+        for (int i = 0; i < text.length(); i++) {
             Map<Character, Object> child = (Map<Character, Object>) children.get(text.charAt(i));
             if (child == null) {
                 continue;
@@ -126,7 +127,7 @@ public class SimpleTrie {
      * @param index  开始未知
      * @param child  节点（当前遍历到的）
      * @param result 返回敏感词
-     * @return 是否无敏感词 true-无 false-有
+     * @return 是否有敏感词
      */
     @SuppressWarnings("unchecked")
     private static boolean recursionWithResult(String text, int index, Map<Character, Object> child, StringBuilder result) {

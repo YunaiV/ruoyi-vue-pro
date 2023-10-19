@@ -66,7 +66,7 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         // 调用
         sensitiveWordService.initLocalCache();
         // 断言 sensitiveWordTagsCache 缓存
-        assertEquals(SetUtils.asSet("论坛", "蔬菜","测试"), sensitiveWordService.getSensitiveWordTagSet());
+        assertEquals(SetUtils.asSet("论坛", "蔬菜", "测试"), sensitiveWordService.getSensitiveWordTagSet());
         // 断言 sensitiveWordCache
         assertEquals(4, sensitiveWordService.getSensitiveWordCache().size());
         assertPojoEquals(wordDO1, sensitiveWordService.getSensitiveWordCache().get(0));
@@ -239,7 +239,6 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         testInitLocalCache();
         // 准备参数
         String text = "你是傻瓜，你是笨蛋";
-
         // 调用
         List<String> result = sensitiveWordService.validateText(text, null);
         // 断言
@@ -247,7 +246,6 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
 
         // 准备参数
         String text2 = "你是傻瓜，你是笨蛋，你是白";
-
         // 调用
         List<String> result2 = sensitiveWordService.validateText(text2, null);
         // 断言
@@ -259,7 +257,6 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         testInitLocalCache();
         // 准备参数
         String text = "你是傻瓜，你是笨蛋";
-
         // 调用
         List<String> result = sensitiveWordService.validateText(text, singletonList("论坛"));
         // 断言
@@ -268,12 +265,10 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
 
         // 准备参数
         String text2 = "你是白";
-
         // 调用
         List<String> result2 = sensitiveWordService.validateText(text2, singletonList("测试"));
         // 断言
         assertEquals(singletonList("白"), result2);
-
     }
 
     @Test
@@ -281,13 +276,11 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         testInitLocalCache();
         // 准备参数
         String text = "你是傻瓜，你是笨蛋";
-
         // 调用，断言
         assertFalse(sensitiveWordService.isTextValid(text, null));
 
         // 准备参数
         String text2 = "你是白";
-
         // 调用，断言
         assertFalse(sensitiveWordService.isTextValid(text2, null));
     }
@@ -297,13 +290,11 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         testInitLocalCache();
         // 准备参数
         String text = "你是傻瓜，你是笨蛋";
-
         // 调用，断言
         assertFalse(sensitiveWordService.isTextValid(text, singletonList("论坛")));
 
         // 准备参数
         String text2 = "你是白";
-
         // 调用，断言
         assertFalse(sensitiveWordService.isTextValid(text2, singletonList("测试")));
     }

@@ -88,11 +88,11 @@ public interface SensitiveWordService {
     List<String> validateText(String text, List<String> tags);
 
     /**
-     * 判断文本是否合法
+     * 判断文本是否包含敏感词
      *
      * @param text 文本
      * @param tags 标签数组
-     * @return 是否合法 true-合法 false-不合法
+     * @return 是否包含敏感词
      */
     boolean isTextValid(String text, List<String> tags);
 
