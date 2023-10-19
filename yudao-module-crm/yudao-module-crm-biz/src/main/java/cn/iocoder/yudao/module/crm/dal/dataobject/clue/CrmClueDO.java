@@ -1,15 +1,15 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.clue;
 
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.sun.xml.bind.v2.TODO;
 import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
+import java.time.LocalDateTime;
+
+// TODO 芋艿：字段的顺序，需要整理下；
 /**
  * 线索 DO
  *
@@ -68,6 +68,8 @@ public class CrmClueDO extends BaseDO {
     private String address;
     /**
      * 负责人的用户编号
+     *
+     * 关联 AdminUserDO 的 id 字段
      */
     private Long ownerUserId;
     /**
@@ -78,5 +80,9 @@ public class CrmClueDO extends BaseDO {
      * 备注
      */
     private String remark;
+
+    // TODO 芋艿：客户级别；
+    // TODO 芋艿：线索来源；
+    // TODO 芋艿：客户行业；
 
 }
