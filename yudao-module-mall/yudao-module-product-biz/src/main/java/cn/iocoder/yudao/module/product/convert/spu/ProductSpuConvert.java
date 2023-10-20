@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.enums.DictTypeConstants;
+import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponTemplateRespDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -100,10 +101,14 @@ public interface ProductSpuConvert {
 
     List<AppProductSpuDetailRespVO.Sku> convertListForGetSpuDetail(List<ProductSkuDO> skus);
 
-    default ProductSpuDetailRespVO convertForSpuDetailRespVO(ProductSpuDO spu, List<ProductSkuDO> skus) {
-        ProductSpuDetailRespVO detailRespVO = convert03(spu);
-        detailRespVO.setSkus(ProductSkuConvert.INSTANCE.convertList(skus));
-        return detailRespVO;
+    List<ProductSpuDetailRespVO.GiveCouponTemplate> convertList04(List<CouponTemplateRespDTO> couponTemplateList);
+
+    default ProductSpuDetailRespVO convertForSpuDetailRespVO(ProductSpuDO spu, List<ProductSkuDO> skus,
+                                                             List<CouponTemplateRespDTO> couponTemplateList) {
+        ProductSpuDetailRespVO respVO = convert03(spu);
+        respVO.setSkus(ProductSkuConvert.INSTANCE.convertList(skus));
+        respVO.setGiveCouponTemplate(convertList04(couponTemplateList));
+        return respVO;
     }
 
     default List<ProductSpuDetailRespVO> convertForSpuDetailRespListVO(List<ProductSpuDO> spus, List<ProductSkuDO> skus) {

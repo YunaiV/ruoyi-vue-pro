@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -124,6 +125,11 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
     public List<CouponTemplateDO> getCouponTemplateList(List<Integer> canTakeTypes, Integer productScope,
                                                         Long productScopeValue, Integer count) {
         return couponTemplateMapper.selectList(canTakeTypes, productScope, productScopeValue, count);
+    }
+
+    @Override
+    public List<CouponTemplateDO> getCouponTemplateListByIds(Collection<Long> ids) {
+        return couponTemplateMapper.selectListByIds(ids);
     }
 
 }

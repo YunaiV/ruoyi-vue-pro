@@ -11,6 +11,8 @@ import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
+import cn.iocoder.yudao.module.promotion.api.coupon.CouponTemplateApi;
+import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponTemplateRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,6 +44,9 @@ public class ProductSpuController {
     private ProductSpuService productSpuService;
     @Resource
     private ProductSkuService productSkuService;
+
+    @Resource
+    private CouponTemplateApi couponTemplateApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建商品 SPU")
@@ -87,7 +92,10 @@ public class ProductSpuController {
         }
         // 查询商品 SKU
         List<ProductSkuDO> skus = productSkuService.getSkuListBySpuId(spu.getId());
-        return success(ProductSpuConvert.INSTANCE.convertForSpuDetailRespVO(spu, skus));
+        // 查询优惠卷
+        List<CouponTemplateRespDTO> couponTemplateList = couponTemplateApi.getCouponTemplateListByIds(
+                spu.getGiveCouponTemplateIds());
+        return success(ProductSpuConvert.INSTANCE.convertForSpuDetailRespVO(spu, skus, couponTemplateList));
     }
 
     @GetMapping("/list-all-simple")

@@ -16,8 +16,10 @@ import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import cn.iocoder.yudao.module.product.service.brand.ProductBrandService;
 import cn.iocoder.yudao.module.product.service.category.ProductCategoryService;
-import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
+import cn.iocoder.yudao.module.promotion.api.coupon.CouponTemplateApi;
+import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponTemplateRespDTO;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
 import com.google.common.collect.Maps;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -26,10 +28,10 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getMinValue;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getSumValue;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO.CATEGORY_LEVEL;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
 
@@ -52,9 +54,9 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     private ProductBrandService brandService;
     @Resource
     private ProductCategoryService categoryService;
+
     @Resource
-    @Lazy // 循环依赖，避免报错
-    private ProductPropertyValueService productPropertyValueService;
+    private CouponTemplateApi couponTemplateApi;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -62,6 +64,9 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         // 校验分类、品牌
         validateCategory(createReqVO.getCategoryId());
         brandService.validateProductBrand(createReqVO.getBrandId());
+        // 校验优惠券
+        Set<Long> giveCouponTemplateIds = convertSet(createReqVO.getGiveCouponTemplate(), ProductSpuCreateReqVO.GiveCouponTemplate::getId);
+        validateCouponTemplate(giveCouponTemplateIds);
         // 校验 SKU
         List<ProductSkuCreateOrUpdateReqVO> skuSaveReqList = createReqVO.getSkus();
         productSkuService.validateSkuList(skuSaveReqList, createReqVO.getSpecType());
@@ -69,6 +74,8 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         ProductSpuDO spu = ProductSpuConvert.INSTANCE.convert(createReqVO);
         // 初始化 SPU 中 SKU 相关属性
         initSpuFromSkus(spu, skuSaveReqList);
+        // 设置优惠券
+        spu.setGiveCouponTemplateIds(CollUtil.newArrayList(giveCouponTemplateIds));
         // 插入 SPU
         productSpuMapper.insert(spu);
         // 插入 SKU
@@ -85,6 +92,9 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         // 校验分类、品牌
         validateCategory(updateReqVO.getCategoryId());
         brandService.validateProductBrand(updateReqVO.getBrandId());
+        // 校验优惠券
+        Set<Long> giveCouponTemplateIds = convertSet(updateReqVO.getGiveCouponTemplate(), ProductSpuUpdateReqVO.GiveCouponTemplate::getId);
+        validateCouponTemplate(giveCouponTemplateIds);
         // 校验SKU
         List<ProductSkuCreateOrUpdateReqVO> skuSaveReqList = updateReqVO.getSkus();
         productSkuService.validateSkuList(skuSaveReqList, updateReqVO.getSpecType());
@@ -92,6 +102,8 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         // 更新 SPU
         ProductSpuDO updateObj = ProductSpuConvert.INSTANCE.convert(updateReqVO);
         initSpuFromSkus(updateObj, skuSaveReqList);
+        // 设置优惠券
+        updateObj.setGiveCouponTemplateIds(CollUtil.newArrayList(giveCouponTemplateIds));
         productSpuMapper.updateById(updateObj);
         // 批量更新 SKU
         productSkuService.updateSkuList(updateObj.getId(), updateReqVO.getSkus());
@@ -125,6 +137,10 @@ public class ProductSpuServiceImpl implements ProductSpuService {
             // 默认商品浏览量
             spu.setBrowseCount(0);
         }
+        // 如果活动顺序为空则默认初始化
+        if (CollUtil.isEmpty(spu.getActivityOrders())) {
+            spu.setActivityOrders(Arrays.stream(PromotionTypeEnum.ARRAYS).boxed().collect(Collectors.toList()));
+        }
     }
 
     /**
@@ -137,6 +153,13 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         // 校验层级
         if (categoryService.getCategoryLevel(id) < CATEGORY_LEVEL) {
             throw exception(SPU_SAVE_FAIL_CATEGORY_LEVEL_ERROR);
+        }
+    }
+
+    private void validateCouponTemplate(Collection<Long> ids) {
+        List<CouponTemplateRespDTO> couponTemplateList = couponTemplateApi.getCouponTemplateListByIds(ids);
+        if (couponTemplateList.size() != ids.size()) {
+            throw exception(SPU_SAVE_FAIL_COUPON_TEMPLATE_NOT_EXISTS);
         }
     }
 
