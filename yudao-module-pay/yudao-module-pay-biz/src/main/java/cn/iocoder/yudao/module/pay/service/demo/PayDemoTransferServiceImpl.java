@@ -66,7 +66,7 @@ public class PayDemoTransferServiceImpl implements PayDemoTransferService {
 
     // TODO @jason：可以参考 AppBrokerageWithdrawCreateReqVO 搞下字段哈，进行校验
     private void validatePayeeInfo(Integer transferType, Map<String, String> payeeInfo) {
-        PayTransferTypeEnum transferTypeEnum = ofType(transferType);
+        PayTransferTypeEnum transferTypeEnum = typeOf(transferType);
         switch (transferTypeEnum) {
             case ALIPAY_BALANCE: {
                 if (StrUtil.isEmpty(MapUtil.getStr(payeeInfo, ALIPAY_LOGON_ID))) {

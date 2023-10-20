@@ -34,8 +34,7 @@ public enum PayTransferTypeEnum implements IntArrayValuable {
         return ARRAYS;
     }
 
-    // TODO @jason：是不是 typeOf 更符合预期哈？
-    public static PayTransferTypeEnum ofType(Integer type) {
+    public static PayTransferTypeEnum typeOf(Integer type) {
         return ArrayUtil.firstMatch(item -> item.getType().equals(type), values());
     }
 
