@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.crm.controller.admin.clue.vo;
 
+import cn.iocoder.yudao.module.infra.enums.DictTypeConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
@@ -12,7 +13,6 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 
-
 /**
  * 线索 Excel VO
  *
@@ -21,20 +21,21 @@ import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 @Data
 public class CrmClueExcelVO {
 
-    @ExcelProperty("编号，主键自增")
+    @ExcelProperty("编号")
     private Long id;
 
     @ExcelProperty(value = "转化状态", converter = DictConvert.class)
-    @DictFormat("infra_boolean_string") // TODO 代码优化：建议设置到对应的 XXXDictTypeConstants 枚举类中
+    @DictFormat(DictTypeConstants.BOOLEAN_STRING)
     private Boolean transformStatus;
 
     @ExcelProperty(value = "跟进状态", converter = DictConvert.class)
-    @DictFormat("infra_boolean_string") // TODO 代码优化：建议设置到对应的 XXXDictTypeConstants 枚举类中
+    @DictFormat(DictTypeConstants.BOOLEAN_STRING)
     private Boolean followUpStatus;
 
     @ExcelProperty("线索名称")
     private String name;
 
+    // TODO 这里需要导出成客户名称
     @ExcelProperty("客户id")
     private Long customerId;
 
