@@ -61,3 +61,32 @@ CREATE TABLE `crm_clue`  (
      `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
      PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '线索表' ROW_FORMAT = Dynamic;
+
+DROP TABLE IF EXISTS `crm_business`;
+CREATE TABLE `crm_business` (
+                                `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+                                `name` varchar(100) NOT NULL COMMENT '商机名称',
+                                `status_type_id` bigint DEFAULT NULL COMMENT '商机状态类型编号',
+                                `status_id` bigint DEFAULT NULL COMMENT '商机状态编号',
+                                `contact_next_time` datetime DEFAULT NULL COMMENT '下次联系时间',
+                                `customer_id` bigint NOT NULL COMMENT '客户编号',
+                                `deal_time` datetime DEFAULT NULL COMMENT '预计成交日期',
+                                `price` decimal(18,2) DEFAULT NULL COMMENT '商机金额',
+                                `discount_percent` decimal(10,2) DEFAULT NULL COMMENT '整单折扣',
+                                `product_price` decimal(18,2) DEFAULT NULL COMMENT '产品总金额',
+                                `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+                                `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '创建人',
+                                `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT '' COMMENT '更新人',
+                                `owner_user_id` bigint DEFAULT NULL COMMENT '负责人的用户编号',
+                                `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+                                `ro_user_ids` longtext NOT NULL COMMENT '只读权限的用户编号数组',
+                                `rw_user_ids` longtext NOT NULL COMMENT '读写权限的用户编号数组',
+                                `end_status` int NOT NULL COMMENT '1赢单2输单3无效',
+                                `end_remark` varchar(500) DEFAULT NULL COMMENT '结束时的备注',
+                                `deleted` bit(1) DEFAULT b'0' COMMENT '逻辑删除',
+                                `contact_last_time` datetime DEFAULT NULL COMMENT '最后跟进时间',
+                                `follow_up_status` int DEFAULT NULL COMMENT '跟进状态',
+                                `tenant_id` bigint DEFAULT '0' COMMENT '租户ID',
+                                PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='商机表';
