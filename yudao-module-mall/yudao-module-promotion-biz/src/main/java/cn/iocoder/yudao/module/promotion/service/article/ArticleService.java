@@ -93,6 +93,6 @@ public interface ArticleService {
      *
      * @param id 文章编号
      */
-    void addBrowseCount(Long id);
+    void addArticleBrowseCount(Long id);
 
 }

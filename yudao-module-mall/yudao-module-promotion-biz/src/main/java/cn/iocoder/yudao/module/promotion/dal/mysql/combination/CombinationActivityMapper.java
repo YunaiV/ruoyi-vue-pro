@@ -71,7 +71,7 @@ public interface CombinationActivityMapper extends BaseMapperX<CombinationActivi
         return selectList(new LambdaQueryWrapperX<CombinationActivityDO>()
                 .in(CombinationActivityDO::getId, ids)
                 .lt(CombinationActivityDO::getStartTime, dateTime)
-                .lt(CombinationActivityDO::getEndTime, dateTime)
+                .gt(CombinationActivityDO::getEndTime, dateTime)// 开始时间 < 指定时间 < 结束时间，也就是说获取指定时间段的活动
                 .orderByDesc(CombinationActivityDO::getCreateTime));
     }
 

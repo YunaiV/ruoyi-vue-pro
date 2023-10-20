@@ -111,7 +111,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public void addBrowseCount(Long id) {
+    public void addArticleBrowseCount(Long id) {
         // 校验文章是否存在
         validateArticleExists(id);
         // 增加浏览次数
