@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.promotion.service.discount;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityBaseVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityCreateReqVO;
@@ -20,6 +21,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -41,8 +43,9 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
 
     @Override
     public List<DiscountProductDO> getMatchDiscountProductList(Collection<Long> skuIds) {
-        // TODO 芋艿：开启、满足 skuId、日期内
-        return null;
+        //  芋艿：开启、满足 skuId、日期内
+        List<DiscountProductDO> matchDiscountProductList = discountProductMapper.getMatchDiscountProductList(skuIds);
+        return matchDiscountProductList;
     }
 
     @Override
@@ -66,7 +69,7 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
     public void updateDiscountActivity(DiscountActivityUpdateReqVO updateReqVO) {
         // 校验存在
         DiscountActivityDO discountActivity = validateDiscountActivityExists(updateReqVO.getId());
-        if (discountActivity.getStatus().equals(PromotionActivityStatusEnum.CLOSE.getStatus())) { // 已关闭的活动，不能修改噢
+        if (discountActivity.getStatus().equals(CommonStatusEnum.DISABLE.getStatus())) { // 已关闭的活动，不能修改噢
             throw exception(DISCOUNT_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED);
         }
         // 校验商品是否冲突
@@ -99,7 +102,7 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
         }
     }
 
-    // TODO 芋艿：校验逻辑简化，只查询时间冲突的活动，开启状态的。
+    // 芋艿：校验逻辑简化，只查询时间冲突的活动，开启状态的。
     /**
      * 校验商品是否冲突
      *
@@ -111,27 +114,30 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
             return;
         }
         // 查询商品参加的活动
-        List<DiscountProductDO> discountActivityProductList = null;
+
+        List<DiscountProductDO> list = discountProductMapper.selectListByActivityId(id);
+        List<Long> skuIds = list.stream().map(item -> item.getSkuId()).collect(Collectors.toList());
+        List<DiscountProductDO> matchDiscountProductList = getMatchDiscountProductList(skuIds);
 //                getRewardProductListBySkuIds(
 //                convertSet(products, DiscountActivityBaseVO.Product::getSkuId),
 //                asList(PromotionActivityStatusEnum.WAIT.getStatus(), PromotionActivityStatusEnum.RUN.getStatus()));
         if (id != null) { // 排除自己这个活动
-            discountActivityProductList.removeIf(product -> id.equals(product.getActivityId()));
+            matchDiscountProductList.removeIf(product -> id.equals(product.getActivityId()));
         }
         // 如果非空，则说明冲突
-        if (CollUtil.isNotEmpty(discountActivityProductList)) {
+        if (CollUtil.isNotEmpty(matchDiscountProductList)) {
             throw exception(DISCOUNT_ACTIVITY_SPU_CONFLICTS);
         }
     }
 
     @Override
-    public void closeRewardActivity(Long id) {
+    public void closeDiscountActivity(Long id) {
         // 校验存在
         DiscountActivityDO dbDiscountActivity = validateDiscountActivityExists(id);
-        if (dbDiscountActivity.getStatus().equals(PromotionActivityStatusEnum.CLOSE.getStatus())) { // 已关闭的活动，不能关闭噢
+        if (dbDiscountActivity.getStatus().equals(CommonStatusEnum.DISABLE.getStatus())) { // 已关闭的活动，不能关闭噢
             throw exception(DISCOUNT_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED);
         }
-        if (dbDiscountActivity.getStatus().equals(PromotionActivityStatusEnum.END.getStatus())) { // 已关闭的活动，不能关闭噢
+        if (dbDiscountActivity.getStatus().equals(CommonStatusEnum.DISABLE.getStatus())) { // 已关闭的活动，不能关闭噢
             throw exception(DISCOUNT_ACTIVITY_CLOSE_FAIL_STATUS_END);
         }
 
@@ -144,7 +150,7 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
     public void deleteDiscountActivity(Long id) {
         // 校验存在
         DiscountActivityDO discountActivity = validateDiscountActivityExists(id);
-        if (!discountActivity.getStatus().equals(PromotionActivityStatusEnum.CLOSE.getStatus())) { // 未关闭的活动，不能删除噢
+        if (!discountActivity.getStatus().equals(CommonStatusEnum.ENABLE.getStatus())) { // 未关闭的活动，不能删除噢
             throw exception(DISCOUNT_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED);
         }
 
@@ -175,4 +181,8 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
         return discountProductMapper.selectListByActivityId(activityId);
     }
 
+    @Override
+    public List<DiscountProductDO> getDiscountProductsByActivityId(Collection<Long> activityIds) {
+        return discountProductMapper.selectList("activity_id", activityIds);
+    }
 }
