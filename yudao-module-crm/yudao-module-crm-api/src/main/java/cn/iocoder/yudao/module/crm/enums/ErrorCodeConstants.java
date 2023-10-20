@@ -14,5 +14,6 @@ public interface ErrorCodeConstants {
 
     // TODO @wanwan：要单独一个分段噢
     ErrorCode CLUE_NOT_EXISTS = new ErrorCode(1_020_000_001, "线索不存在");
+    ErrorCode CONTACT_NOT_EXISTS = new ErrorCode(1_020_000_002, "线索不存在");
 
 }
