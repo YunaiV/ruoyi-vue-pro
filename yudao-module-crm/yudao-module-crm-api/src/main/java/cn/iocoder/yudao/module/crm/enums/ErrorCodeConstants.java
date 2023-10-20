@@ -15,4 +15,7 @@ public interface ErrorCodeConstants {
     // TODO @wanwan：要单独一个分段噢
     ErrorCode CLUE_NOT_EXISTS = new ErrorCode(1_020_000_001, "线索不存在");
 
+    // ========== 商机管理 1-020-001-000 ==========
+    ErrorCode BUSINESS_NOT_EXISTS = new ErrorCode(1_020_001_000, "商机不存在");
+
 }
