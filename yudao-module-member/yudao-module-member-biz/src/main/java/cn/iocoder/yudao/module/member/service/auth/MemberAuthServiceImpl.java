@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.member.service.auth;
 
-import cn.binarywang.wx.miniapp.api.WxMaService;
-import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -19,9 +17,11 @@ import cn.iocoder.yudao.module.system.api.oauth2.OAuth2TokenApi;
 import cn.iocoder.yudao.module.system.api.oauth2.dto.OAuth2AccessTokenCreateReqDTO;
 import cn.iocoder.yudao.module.system.api.oauth2.dto.OAuth2AccessTokenRespDTO;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
+import cn.iocoder.yudao.module.system.api.social.SocialClientApi;
 import cn.iocoder.yudao.module.system.api.social.SocialUserApi;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserRespDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxPhoneNumberInfoRespDTO;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
 import cn.iocoder.yudao.module.system.enums.oauth2.OAuth2ClientConstants;
@@ -56,10 +56,9 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     @Resource
     private SocialUserApi socialUserApi;
     @Resource
-    private OAuth2TokenApi oauth2TokenApi;
-
+    private SocialClientApi socialClientApi;
     @Resource
-    private WxMaService wxMaService;
+    private OAuth2TokenApi oauth2TokenApi;
 
     @Override
     public AppAuthLoginRespVO login(AppAuthLoginReqVO reqVO) {
@@ -121,15 +120,13 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     @Override
     public AppAuthLoginRespVO weixinMiniAppLogin(AppAuthWeixinMiniAppLoginReqVO reqVO) {
         // 获得对应的手机号信息
-        // TODO @芋艿：需要弱化微信小程序的依赖，通过 system 获取手机号
-        WxMaPhoneNumberInfo phoneNumberInfo;
-        try {
-            phoneNumberInfo = wxMaService.getUserService().getPhoneNoInfo(reqVO.getPhoneCode());
-        } catch (Exception exception) {
-            throw exception(AUTH_WEIXIN_MINI_APP_PHONE_CODE_ERROR);
-        }
+        SocialWxPhoneNumberInfoRespDTO phoneNumberInfo = socialClientApi.getWxMaPhoneNumberInfo(
+                UserTypeEnum.MEMBER.getValue(), reqVO.getPhoneCode());
+        Assert.notNull(phoneNumberInfo, "获得手机信息失败，结果为空");
+
         // 获得获得注册用户
-        MemberUserDO user = userService.createUserIfAbsent(phoneNumberInfo.getPurePhoneNumber(), getClientIP(), TerminalEnum.WECHAT_MINI_PROGRAM.getTerminal());
+        MemberUserDO user = userService.createUserIfAbsent(phoneNumberInfo.getPurePhoneNumber(),
+                getClientIP(), TerminalEnum.WECHAT_MINI_PROGRAM.getTerminal());
         Assert.notNull(user, "获取用户失败，结果为空");
 
         // 绑定社交用户
@@ -154,7 +151,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     @Override
     public String getSocialAuthorizeUrl(Integer type, String redirectUri) {
-        return socialUserApi.getAuthorizeUrl(type, redirectUri);
+        return socialClientApi.getAuthorizeUrl(type, UserTypeEnum.MEMBER.getValue(), redirectUri);
     }
 
     private MemberUserDO login0(String mobile, String password) {

@@ -41,6 +41,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         // 插入
         ArticleDO article = ArticleConvert.INSTANCE.convert(createReqVO);
+        article.setBrowseCount(0); // 初始浏览量
         articleMapper.insert(article);
         // 返回
         return article.getId();
@@ -102,6 +103,19 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public List<ArticleDO> getArticleByCategoryId(Long categoryId) {
         return articleMapper.selectList(ArticleDO::getCategoryId, categoryId);
+    }
+
+    @Override
+    public Long getArticleCountByCategoryId(Long categoryId) {
+        return articleMapper.selectCount(ArticleDO::getCategoryId, categoryId);
+    }
+
+    @Override
+    public void addBrowseCount(Long id) {
+        // 校验文章是否存在
+        validateArticleExists(id);
+        // 增加浏览次数
+        articleMapper.updateBrowseCount(id);
     }
 
 }

@@ -24,8 +24,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Tag(name = "管理后台 - 交易订单")
@@ -56,12 +59,21 @@ public class TradeOrderController {
         }
 
         // 查询用户信息
-        Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(convertSet(pageResult.getList(), TradeOrderDO::getUserId));
+        Set<Long> userIds = CollUtil.unionDistinct(convertList(pageResult.getList(), TradeOrderDO::getUserId),
+                convertList(pageResult.getList(), TradeOrderDO::getBrokerageUserId, Objects::nonNull));
+        Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(userIds);
         // 查询订单项
         List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(
                 convertSet(pageResult.getList(), TradeOrderDO::getId));
         // 最终组合
         return success(TradeOrderConvert.INSTANCE.convertPage(pageResult, orderItems, userMap));
+    }
+
+    @GetMapping("/summary")
+    @Operation(summary = "获得交易订单统计")
+    @PreAuthorize("@ss.hasPermission('trade:order:query')")
+    public CommonResult<TradeOrderSummaryRespVO> getOrderSummary(TradeOrderPageReqVO reqVO) {
+        return success(tradeOrderQueryService.getOrderSummary(reqVO));
     }
 
     @GetMapping("/get-detail")

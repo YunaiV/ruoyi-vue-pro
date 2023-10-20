@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.Ar
 import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleCategoryDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * 文章分类 Mapper
  *
@@ -21,6 +23,10 @@ public interface ArticleCategoryMapper extends BaseMapperX<ArticleCategoryDO> {
                 .eqIfPresent(ArticleCategoryDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(ArticleCategoryDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(ArticleCategoryDO::getSort));
+    }
+
+    default List<ArticleCategoryDO> selectListByStatus(Integer status) {
+        return selectList(ArticleCategoryDO::getStatus, status);
     }
 
 }

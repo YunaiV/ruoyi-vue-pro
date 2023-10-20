@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.Comparator;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -31,7 +32,7 @@ public class AppArticleCategoryController {
     public CommonResult<List<AppArticleCategoryRespVO>> getArticleCategoryList() {
         List<ArticleCategoryDO> categoryList = articleCategoryService.getArticleCategoryListByStatus(
                 CommonStatusEnum.ENABLE.getStatus());
-        // TODO @puhui999：排序下
+        categoryList.sort(Comparator.comparing(ArticleCategoryDO::getSort)); // 按 sort 降序排列
         return success(ArticleCategoryConvert.INSTANCE.convertList04(categoryList));
     }
 

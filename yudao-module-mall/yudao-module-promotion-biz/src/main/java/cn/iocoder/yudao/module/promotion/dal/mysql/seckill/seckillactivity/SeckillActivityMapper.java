@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -90,9 +91,19 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
                 .groupBy("spu_id"));
     }
 
-    default List<SeckillActivityDO> selectListByIds(Collection<Long> ids) {
+    /**
+     * 获取指定活动编号的活动列表且
+     * 开始时间和结束时间小于给定时间 dateTime 的活动列表
+     *
+     * @param ids      活动编号
+     * @param dateTime 指定日期
+     * @return 活动列表
+     */
+    default List<SeckillActivityDO> selectListByIdsAndDateTimeLt(Collection<Long> ids, LocalDateTime dateTime) {
         return selectList(new LambdaQueryWrapperX<SeckillActivityDO>()
                 .in(SeckillActivityDO::getId, ids)
+                .lt(SeckillActivityDO::getStartTime, dateTime)
+                .lt(SeckillActivityDO::getEndTime, dateTime)
                 .orderByDesc(SeckillActivityDO::getCreateTime));
     }
 

@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -16,27 +15,6 @@ import java.util.List;
  * @author 芋道源码
  */
 public interface SocialUserService {
-
-    /**
-     * 获得社交平台的授权 URL
-     *
-     * @param type 社交平台的类型 {@link SocialTypeEnum}
-     * @param redirectUri 重定向 URL
-     * @return 社交平台的授权 URL
-     */
-    String getAuthorizeUrl(Integer type, String redirectUri);
-
-    /**
-     * 授权获得对应的社交用户
-     * 如果授权失败，则会抛出 {@link ServiceException} 异常
-     *
-     * @param type 社交平台的类型 {@link SocialTypeEnum}
-     * @param code 授权码
-     * @param state state
-     * @return 授权用户
-     */
-    @NotNull
-    SocialUserDO authSocialUser(Integer type, String code, String state);
 
     /**
      * 获得指定用户的社交用户列表
