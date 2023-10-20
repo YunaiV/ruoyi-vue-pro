@@ -19,7 +19,3 @@ public interface PayWalletRechargeMapper extends BaseMapperX<PayWalletRechargeDO
     }
 
 }
-
-
-
-

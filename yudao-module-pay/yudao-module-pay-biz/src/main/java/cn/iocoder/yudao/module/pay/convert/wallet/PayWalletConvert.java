@@ -14,7 +14,8 @@ public interface PayWalletConvert {
 
     AppPayWalletRespVO convert(PayWalletDO bean);
 
-    PayWalletRespVO convert02(PayWalletDO wallet);
+    PayWalletRespVO convert02(PayWalletDO bean);
 
     PageResult<PayWalletRespVO> convertPage(PageResult<PayWalletDO> page);
+
 }

@@ -57,6 +57,7 @@ public class PayWalletRechargePackageServiceImpl implements PayWalletRechargePac
         return walletRechargePackage.getId();
     }
 
+    // TODO @jason：校验下，套餐名唯一
     @Override
     public void updateWalletRechargePackage(WalletRechargePackageUpdateReqVO updateReqVO) {
         // 校验存在
@@ -78,14 +79,6 @@ public class PayWalletRechargePackageServiceImpl implements PayWalletRechargePac
         if (walletRechargePackageMapper.selectById(id) == null) {
             throw exception(WALLET_RECHARGE_PACKAGE_NOT_FOUND);
         }
-    }
-
-    @Override
-    public List<PayWalletRechargePackageDO> getWalletRechargePackageList(Collection<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return ListUtil.empty();
-        }
-        return walletRechargePackageMapper.selectBatchIds(ids);
     }
 
     @Override

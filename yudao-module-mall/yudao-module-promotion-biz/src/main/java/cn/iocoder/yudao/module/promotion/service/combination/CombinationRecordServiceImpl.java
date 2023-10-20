@@ -369,6 +369,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
                     keyValue.setValue(keyValue.getValue() + 1);
                 }
             } catch (Exception ignored) { // 处理异常继续循环
+                // TODO @puhui999：拼团过期 or 虚拟成团 可以改成 expireCombinationRecord；因为找方法更容易一些；
                 log.error("[拼团过期 or 虚拟成团][record({}) 处理异常，请进行处理！record 数据是：{}]",
                         record.getId(), JsonUtils.toJsonString(record));
             }
@@ -383,10 +384,10 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void handleExpireRecord(CombinationRecordDO headRecord) {
-        // 1.更新拼团记录
+        // 1. 更新拼团记录
         List<CombinationRecordDO> headAndRecords = updateBatchCombinationRecords(headRecord,
                 CombinationRecordStatusEnum.FAILED);
-        // 2.订单取消
+        // 2. 订单取消
         headAndRecords.forEach(item -> tradeOrderApi.cancelPaidOrder(item.getUserId(), item.getOrderId()));
     }
 

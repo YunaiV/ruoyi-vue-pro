@@ -70,4 +70,5 @@ public class MockPayClient extends AbstractPayClient<NonePayClientConfig> {
     protected PayTransferRespDTO doUnifiedTransfer(PayTransferUnifiedReqDTO reqDTO) {
         throw new UnsupportedOperationException("待实现");
     }
+
 }

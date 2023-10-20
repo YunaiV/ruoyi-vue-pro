@@ -37,7 +37,7 @@ public class SocialUserBindReqDTO {
      */
     @InEnum(SocialTypeEnum.class)
     @NotNull(message = "社交平台的类型不能为空")
-    private Integer type;
+    private Integer socialType;
     /**
      * 授权码
      */

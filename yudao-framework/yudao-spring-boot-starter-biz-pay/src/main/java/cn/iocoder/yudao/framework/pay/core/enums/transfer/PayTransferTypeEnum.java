@@ -15,6 +15,7 @@ import java.util.Arrays;
 @AllArgsConstructor
 @Getter
 public enum PayTransferTypeEnum implements IntArrayValuable {
+
     ALIPAY_BALANCE(1, "支付宝余额"),
     WX_BALANCE(2, "微信余额"),
     BANK_CARD(3, "银行卡"),
@@ -33,7 +34,9 @@ public enum PayTransferTypeEnum implements IntArrayValuable {
         return ARRAYS;
     }
 
+    // TODO @jason：是不是 typeOf 更符合预期哈？
     public static PayTransferTypeEnum ofType(Integer type) {
         return ArrayUtil.firstMatch(item -> item.getType().equals(type), values());
     }
+
 }

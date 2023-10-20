@@ -102,6 +102,7 @@ public interface BargainActivityMapper extends BaseMapperX<BargainActivityDO> {
                 .groupBy("spu_id"));
     }
 
+    // TODO @puhui999：是不是只要 endTime 小于就可以啦；
     /**
      * 获取指定活动编号的活动列表且
      * 开始时间和结束时间小于给定时间 dateTime 的活动列表

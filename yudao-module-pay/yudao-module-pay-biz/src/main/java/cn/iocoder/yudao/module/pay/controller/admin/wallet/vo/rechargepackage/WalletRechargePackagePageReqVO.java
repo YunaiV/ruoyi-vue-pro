@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@Schema(description = "管理后台 - 套餐充值分页 Request VO")
+@Schema(description = "管理后台 - 充值套餐分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -19,6 +19,8 @@ public class WalletRechargePackagePageReqVO extends PageParam {
 
     @Schema(description = "套餐名", example = "李四")
     private String name;
+
+    // TODO @jason：payPrice 和 bonusPrice 可以去掉。。。一般太少检索啦；
 
     @Schema(description = "支付金额", example = "16454")
     private Integer payPrice;

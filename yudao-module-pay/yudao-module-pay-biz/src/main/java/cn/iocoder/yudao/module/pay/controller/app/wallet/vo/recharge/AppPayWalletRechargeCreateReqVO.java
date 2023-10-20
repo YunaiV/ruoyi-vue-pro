@@ -13,7 +13,9 @@ public class AppPayWalletRechargeCreateReqVO {
     @Min(value = 1,  message = "支付金额必须大于零")
     private Integer payPrice;
 
-
     @Schema(description = "充值套餐编号", example = "1024")
     private Long packageId;
+
+    // TODO @jaosn：写个 AssertTrue 的校验方法，payPrice 和 packageId 必须二选一
+
 }

@@ -70,6 +70,7 @@ public interface PayWalletMapper extends BaseMapperX<PayWalletDO> {
 
     /**
      * 冻结钱包部分余额
+     *
      * @param id 钱包 id
      * @param price 冻结金额
      */
@@ -84,6 +85,7 @@ public interface PayWalletMapper extends BaseMapperX<PayWalletDO> {
 
     /**
      * 解冻钱包余额
+     *
      * @param id 钱包 id
      * @param price 解冻金额
      */
@@ -98,6 +100,7 @@ public interface PayWalletMapper extends BaseMapperX<PayWalletDO> {
 
     /**
      * 当充值退款时, 更新钱包
+     *
      * @param id 钱包 id
      * @param price 退款金额
      */

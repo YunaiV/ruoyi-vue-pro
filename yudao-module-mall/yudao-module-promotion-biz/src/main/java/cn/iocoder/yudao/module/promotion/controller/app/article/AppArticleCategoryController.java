@@ -32,7 +32,7 @@ public class AppArticleCategoryController {
     public CommonResult<List<AppArticleCategoryRespVO>> getArticleCategoryList() {
         List<ArticleCategoryDO> categoryList = articleCategoryService.getArticleCategoryListByStatus(
                 CommonStatusEnum.ENABLE.getStatus());
-        categoryList.sort(Comparator.comparing(ArticleCategoryDO::getSort).reversed()); // 按 sort 降序排列
+        categoryList.sort(Comparator.comparing(ArticleCategoryDO::getSort)); // 按 sort 降序排列
         return success(ArticleCategoryConvert.INSTANCE.convertList04(categoryList));
     }
 

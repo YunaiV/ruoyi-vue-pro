@@ -19,4 +19,6 @@ public class PayWalletRespVO extends PayWalletBaseVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
+    // TODO @jason：要不把用户昵称 + avatar 也读取下？
+
 }

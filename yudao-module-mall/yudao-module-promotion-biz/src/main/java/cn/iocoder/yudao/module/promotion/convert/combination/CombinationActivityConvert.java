@@ -204,9 +204,6 @@ public interface CombinationActivityConvert {
         return respVO;
     }
 
-    @Mapping(target = "id", ignore = true)
-    CombinationRecordDO convert5(CombinationRecordDO headRecord);
-
     /**
      * 转换生成虚拟成团虚拟记录
      *
@@ -214,21 +211,19 @@ public interface CombinationActivityConvert {
      * @return 虚拟记录列表
      */
     default List<CombinationRecordDO> convertVirtualRecordList(CombinationRecordDO headRecord) {
-        List<CombinationRecordDO> createRecords = new ArrayList<>();
-        // 计算需要创建的虚拟成团记录数量
         int count = headRecord.getUserSize() - headRecord.getUserCount();
+        List<CombinationRecordDO> createRecords = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
             // 基础信息和团长保持一致
             CombinationRecordDO newRecord = convert5(headRecord);
             // 虚拟信息
-            newRecord.setCount(0);
-            newRecord.setUserId(0L);
-            newRecord.setNickname("");
-            newRecord.setAvatar("");
-            newRecord.setOrderId(0L);
+            newRecord.setCount(0) // 会单独更新下，在后续的 Service 逻辑里
+                    .setUserId(0L).setNickname("").setAvatar("").setOrderId(0L);
             createRecords.add(newRecord);
         }
         return createRecords;
     }
+    @Mapping(target = "id", ignore = true)
+    CombinationRecordDO convert5(CombinationRecordDO headRecord);
 
 }

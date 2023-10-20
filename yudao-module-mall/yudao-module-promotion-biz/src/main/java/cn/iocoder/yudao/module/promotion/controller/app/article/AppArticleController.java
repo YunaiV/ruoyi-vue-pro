@@ -56,10 +56,12 @@ public class AppArticleController {
         return success(ArticleConvert.INSTANCE.convert01(articleService.getArticle(id)));
     }
 
+    // TODO @puhui999：add-browse-count 噢；前端 uniapp 也要接下；就是打开文章的时候，调用下这个接口；
     @PutMapping("/add-browseCount")
     @Operation(summary = "增加文章浏览量")
     @Parameter(name = "id", description = "文章编号", example = "1024")
     public CommonResult<Boolean> addBrowseCount(@RequestParam("id") Long id) {
+        // TODO @puhui999：addArticleBrowseCount
         articleService.addBrowseCount(id);
         return success(true);
     }

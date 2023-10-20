@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.wallet;
 
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
 import lombok.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
@@ -18,6 +20,7 @@ public class PayWalletPageReqVO extends PageParam {
     private Long userId;
 
     @Schema(description = "用户类型", example = "1")
+    @InEnum(UserTypeEnum.class)
     private Integer userType;
 
     @Schema(description = "创建时间")

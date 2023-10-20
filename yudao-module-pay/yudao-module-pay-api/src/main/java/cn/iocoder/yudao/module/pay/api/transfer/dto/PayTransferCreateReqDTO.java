@@ -23,6 +23,7 @@ public class PayTransferCreateReqDTO {
      * 类型
      */
     @NotNull(message = "转账类型不能为空")
+    // TODO @jason：枚举的校验
     private Integer type;
 
     /**
@@ -34,9 +35,11 @@ public class PayTransferCreateReqDTO {
     /**
      * 转账金额，单位：分
      */
+    // TODO @jason：这个金额是不是非空哈
     @Min(value = 1, message = "转账金额必须大于零")
     private Integer price;
 
+    // TODO @jason：这个标题，是不是不允许空呀
     /**
      * 转账标题
      */
@@ -44,4 +47,5 @@ public class PayTransferCreateReqDTO {
 
     @NotEmpty(message = "收款方信息不能为空")
     private Map<String, String> payeeInfo;
+
 }

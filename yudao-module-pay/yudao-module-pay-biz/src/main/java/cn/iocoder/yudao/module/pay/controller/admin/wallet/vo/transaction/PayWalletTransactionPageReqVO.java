@@ -10,4 +10,5 @@ public class PayWalletTransactionPageReqVO extends PageParam  {
 
     @Schema(description = "钱包编号",  example = "1")
     private Long walletId;
+
 }

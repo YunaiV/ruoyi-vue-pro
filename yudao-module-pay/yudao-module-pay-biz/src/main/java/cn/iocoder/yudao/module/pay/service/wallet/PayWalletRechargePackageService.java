@@ -31,7 +31,7 @@ public interface PayWalletRechargePackageService {
     PayWalletRechargePackageDO validWalletRechargePackage(Long packageId);
 
     /**
-     * 创建套餐充值
+     * 创建充值套餐
      *
      * @param createReqVO 创建信息
      * @return 编号
@@ -39,33 +39,25 @@ public interface PayWalletRechargePackageService {
     Long createWalletRechargePackage(@Valid WalletRechargePackageCreateReqVO createReqVO);
 
     /**
-     * 更新套餐充值
+     * 更新充值套餐
      *
      * @param updateReqVO 更新信息
      */
     void updateWalletRechargePackage(@Valid WalletRechargePackageUpdateReqVO updateReqVO);
 
-
     /**
-     * 删除套餐充值
+     * 删除充值套餐
      *
      * @param id 编号
      */
     void deleteWalletRechargePackage(Long id);
 
     /**
-     * 获得套餐充值列表
-     *
-     * @param ids 编号
-     * @return 套餐充值列表
-     */
-    List<PayWalletRechargePackageDO> getWalletRechargePackageList(Collection<Long> ids);
-
-    /**
-     * 获得套餐充值分页
+     * 获得充值套餐分页
      *
      * @param pageReqVO 分页查询
-     * @return 套餐充值分页
+     * @return 充值套餐分页
      */
     PageResult<PayWalletRechargePackageDO> getWalletRechargePackagePage(WalletRechargePackagePageReqVO pageReqVO);
+
 }

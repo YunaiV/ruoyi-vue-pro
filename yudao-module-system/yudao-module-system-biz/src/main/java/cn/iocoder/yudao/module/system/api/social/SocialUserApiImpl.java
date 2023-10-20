@@ -22,11 +22,6 @@ public class SocialUserApiImpl implements SocialUserApi {
     private SocialUserService socialUserService;
 
     @Override
-    public String getAuthorizeUrl(Integer type, String redirectUri) {
-        return socialUserService.getAuthorizeUrl(type, redirectUri);
-    }
-
-    @Override
     public String bindSocialUser(SocialUserBindReqDTO reqDTO) {
         return socialUserService.bindSocialUser(reqDTO);
     }
@@ -34,7 +29,7 @@ public class SocialUserApiImpl implements SocialUserApi {
     @Override
     public void unbindSocialUser(SocialUserUnbindReqDTO reqDTO) {
         socialUserService.unbindSocialUser(reqDTO.getUserId(), reqDTO.getUserType(),
-                reqDTO.getType(), reqDTO.getUnionId());
+                reqDTO.getSocialType(), reqDTO.getOpenid());
     }
 
     @Override
