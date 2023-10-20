@@ -97,7 +97,7 @@ public class ProductSpuBaseVO {
     private Integer giveIntegral;
 
     @Schema(description = "赠送的优惠劵数组包含优惠券编号和名称")
-    private List<GiveCouponTemplate> giveCouponTemplate;
+    private List<GiveCouponTemplate> giveCouponTemplates;
 
     @Schema(description = "分销类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     @NotNull(message = "商品分销类型不能为空")

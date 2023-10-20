@@ -56,6 +56,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     private ProductCategoryService categoryService;
 
     @Resource
+    @Lazy
     private CouponTemplateApi couponTemplateApi;
 
     @Override
@@ -65,7 +66,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         validateCategory(createReqVO.getCategoryId());
         brandService.validateProductBrand(createReqVO.getBrandId());
         // 校验优惠券
-        Set<Long> giveCouponTemplateIds = convertSet(createReqVO.getGiveCouponTemplate(), ProductSpuCreateReqVO.GiveCouponTemplate::getId);
+        Set<Long> giveCouponTemplateIds = convertSet(createReqVO.getGiveCouponTemplates(), ProductSpuCreateReqVO.GiveCouponTemplate::getId);
         validateCouponTemplate(giveCouponTemplateIds);
         // 校验 SKU
         List<ProductSkuCreateOrUpdateReqVO> skuSaveReqList = createReqVO.getSkus();
@@ -93,7 +94,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         validateCategory(updateReqVO.getCategoryId());
         brandService.validateProductBrand(updateReqVO.getBrandId());
         // 校验优惠券
-        Set<Long> giveCouponTemplateIds = convertSet(updateReqVO.getGiveCouponTemplate(), ProductSpuUpdateReqVO.GiveCouponTemplate::getId);
+        Set<Long> giveCouponTemplateIds = convertSet(updateReqVO.getGiveCouponTemplates(), ProductSpuUpdateReqVO.GiveCouponTemplate::getId);
         validateCouponTemplate(giveCouponTemplateIds);
         // 校验SKU
         List<ProductSkuCreateOrUpdateReqVO> skuSaveReqList = updateReqVO.getSkus();

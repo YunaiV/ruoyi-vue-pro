@@ -107,7 +107,7 @@ public interface ProductSpuConvert {
                                                              List<CouponTemplateRespDTO> couponTemplateList) {
         ProductSpuDetailRespVO respVO = convert03(spu);
         respVO.setSkus(ProductSkuConvert.INSTANCE.convertList(skus));
-        respVO.setGiveCouponTemplate(convertList04(couponTemplateList));
+        respVO.setGiveCouponTemplates(convertList04(couponTemplateList));
         return respVO;
     }
 
