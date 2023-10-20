@@ -10,7 +10,7 @@ import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.member.controller.admin.signin.vo.record.MemberSignInRecordPageReqVO;
-import cn.iocoder.yudao.module.member.controller.app.signin.vo.AppMemberSignInSummaryRespVO;
+import cn.iocoder.yudao.module.member.controller.app.signin.vo.record.AppMemberSignInRecordSummaryRespVO;
 import cn.iocoder.yudao.module.member.convert.signin.MemberSignInRecordConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInConfigDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInRecordDO;
@@ -56,9 +56,9 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
     private MemberUserApi memberUserApi;
 
     @Override
-    public AppMemberSignInSummaryRespVO getSignInRecordSummary(Long userId) {
+    public AppMemberSignInRecordSummaryRespVO getSignInRecordSummary(Long userId) {
         // 1. 初始化默认返回信息
-        AppMemberSignInSummaryRespVO vo = new AppMemberSignInSummaryRespVO();
+        AppMemberSignInRecordSummaryRespVO vo = new AppMemberSignInRecordSummaryRespVO();
         vo.setTotalDay(0);
         vo.setContinuousDay(0);
         vo.setTodaySignIn(false);
