@@ -12,6 +12,7 @@ public interface ErrorCodeConstants {
     // ========== 合同管理 1-020-000-000 ==========
     ErrorCode CONTRACT_NOT_EXISTS = new ErrorCode(1_020_000_000, "合同不存在");
 
+    // TODO @wanwan：要单独一个分段噢
     ErrorCode CLUE_NOT_EXISTS = new ErrorCode(1_020_000_001, "线索不存在");
 
 }
