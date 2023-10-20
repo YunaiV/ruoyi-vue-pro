@@ -17,4 +17,6 @@ public interface ErrorCodeConstants {
 
     ErrorCode RECEIVABLE_NOT_EXISTS = new ErrorCode(1_030_000_001, "回款管理不存在");
 
+    ErrorCode RECEIVABLE_PLAN_NOT_EXISTS = new ErrorCode(1_040_000_001, "回款计划不存在");
+
 }
