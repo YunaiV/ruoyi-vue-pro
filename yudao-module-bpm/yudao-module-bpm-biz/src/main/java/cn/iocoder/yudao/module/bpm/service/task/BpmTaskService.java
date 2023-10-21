@@ -176,9 +176,9 @@ public interface BpmTaskService {
     /**
      * 获取指定任务的子任务和审批人信息
      *
-     * @param taskId 指定任务ID
+     * @param parentId 指定任务ID
      * @return 子任务列表
      */
-    List<BpmTaskSubSignRespVO> getChildrenTaskList(String taskId);
+    List<BpmTaskSubSignRespVO> getChildrenTaskList(String parentId);
 
 }

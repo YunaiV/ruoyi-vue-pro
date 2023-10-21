@@ -3,11 +3,13 @@ package cn.iocoder.yudao.framework.common.util.collection;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 
@@ -267,4 +269,19 @@ public class CollectionUtils {
         return deptId == null ? Collections.emptyList() : Collections.singleton(deptId);
     }
 
+    public static <T, U> List<U> convertListByMultiAttr(Collection<T> from,
+                                                      Function<T, ? extends Stream<? extends U>> func) {
+        if (CollUtil.isEmpty(from)) {
+            return new ArrayList<>();
+        }
+        return from.stream().flatMap(func).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
+    public static <T, U> Set<U> convertSetByMultiAttr(Collection<T> from,
+                                                      Function<T, ? extends Stream<? extends U>> func) {
+        if (CollUtil.isEmpty(from)) {
+            return new HashSet<>();
+        }
+        return from.stream().flatMap(func).filter(Objects::nonNull).collect(Collectors.toSet());
+    }
 }
