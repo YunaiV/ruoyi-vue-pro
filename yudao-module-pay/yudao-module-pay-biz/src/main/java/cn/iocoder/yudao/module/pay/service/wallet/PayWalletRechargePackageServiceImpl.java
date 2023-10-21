@@ -48,6 +48,7 @@ public class PayWalletRechargePackageServiceImpl implements PayWalletRechargePac
     public Long createWalletRechargePackage(WalletRechargePackageCreateReqVO createReqVO) {
         // 校验套餐名是否唯一
         validateRechargePackageNameUnique(null, createReqVO.getName());
+
         // 插入
         PayWalletRechargePackageDO walletRechargePackage = WalletRechargePackageConvert.INSTANCE.convert(createReqVO);
         walletRechargePackageMapper.insert(walletRechargePackage);
@@ -61,6 +62,7 @@ public class PayWalletRechargePackageServiceImpl implements PayWalletRechargePac
         validateWalletRechargePackageExists(updateReqVO.getId());
         // 校验套餐名是否唯一
         validateRechargePackageNameUnique(updateReqVO.getId(), updateReqVO.getName());
+
         // 更新
         PayWalletRechargePackageDO updateObj = WalletRechargePackageConvert.INSTANCE.convert(updateReqVO);
         walletRechargePackageMapper.updateById(updateObj);

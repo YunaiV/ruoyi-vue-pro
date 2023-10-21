@@ -218,6 +218,7 @@ public class PayTransferServiceImpl implements PayTransferService {
         PayChannelEnum payChannel = PayChannelEnum.getByCode(channelCode);
         switch (transferType) {
             case ALIPAY_BALANCE: {
+                // TODO @jason：可以抽到 PayChannelEnum 里，isAlipay？ 类似这种哈
                 if (!payChannel.getCode().startsWith("alipay")) {
                     throw exception(PAY_TRANSFER_TYPE_AND_CHANNEL_NOT_MATCH);
                 }

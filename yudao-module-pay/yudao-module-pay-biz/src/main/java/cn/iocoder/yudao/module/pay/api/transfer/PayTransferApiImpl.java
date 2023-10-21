@@ -15,6 +15,7 @@ import javax.annotation.Resource;
 @Service
 @Validated
 public class PayTransferApiImpl implements PayTransferApi {
+
     @Resource
     private PayTransferService payTransferService;
 
@@ -22,4 +23,5 @@ public class PayTransferApiImpl implements PayTransferApi {
     public Long createTransfer(PayTransferCreateReqDTO reqDTO) {
         return payTransferService.createTransfer(reqDTO);
     }
+
 }

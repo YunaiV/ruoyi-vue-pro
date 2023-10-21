@@ -26,6 +26,7 @@ public interface PayWalletConvert {
         PageResult<PayWalletRespVO> pageResult = convertPage(page);
         pageResult.getList().forEach( wallet -> MapUtils.findAndThen(userMap, wallet.getUserId(),
                 user -> {
+            // TODO @jason：可以链式调用哈；
                     wallet.setNickname(user.getNickname());
                     wallet.setAvatar(user.getAvatar());
                 }));

@@ -19,7 +19,9 @@ public interface PayWalletRechargePackageMapper extends BaseMapperX<PayWalletRec
                 .orderByDesc(PayWalletRechargePackageDO::getPayPrice));
     }
 
+    // TODO @jason：这里要有空格哈；String name) {
     default PayWalletRechargePackageDO selectByName(String name){
         return selectOne(PayWalletRechargePackageDO::getName, name);
     }
+
 }

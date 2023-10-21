@@ -160,8 +160,7 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
 
         // 2.1 执行请求
         AlipayTradeRefundResponse response;
-        if (Objects.equals(config.getMode(), MODE_CERTIFICATE)) {
-            // 证书模式
+        if (Objects.equals(config.getMode(), MODE_CERTIFICATE)) {  // 证书模式
             response = client.certificateExecute(request);
         } else {
             response = client.execute(request);
@@ -203,8 +202,7 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
 
         // 2.1 执行请求
         AlipayTradeFastpayRefundQueryResponse response;
-        if (Objects.equals(config.getMode(), MODE_CERTIFICATE)) {
-            // 证书模式
+        if (Objects.equals(config.getMode(), MODE_CERTIFICATE)) { // 证书模式
             response = client.certificateExecute(request);
         } else {
             response = client.execute(request);
