@@ -27,6 +27,10 @@ public class BannerBaseVO {
     @NotNull(message = "图片地址不能为空")
     private String picUrl;
 
+    @Schema(description = "position", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "position 不能为空")
+    private Integer position;
+
     @Schema(description = "排序", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "排序不能为空")
     private Integer sort;
