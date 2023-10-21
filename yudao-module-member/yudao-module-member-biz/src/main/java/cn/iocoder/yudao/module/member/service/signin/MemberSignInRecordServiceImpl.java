@@ -58,6 +58,7 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
     @Override
     public AppMemberSignInRecordSummaryRespVO getSignInRecordSummary(Long userId) {
         // 1. 初始化默认返回信息
+        // TODO @puhui999：这里 vo 改成 summary 会更好理解；
         AppMemberSignInRecordSummaryRespVO vo = new AppMemberSignInRecordSummaryRespVO();
         vo.setTotalDay(0);
         vo.setContinuousDay(0);
@@ -71,6 +72,7 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
         vo.setTotalDay(signCount.intValue()); // 设置总签到天数
 
         // 3. 校验当天是否有签到
+        // TODO @puhui999：是不是 signInRecord 可以精简成 record 哈；另外，Desc 貌似可以去掉哈；最后一条了；
         MemberSignInRecordDO signInRecord = signInRecordMapper.selectLastRecordByUserIdDesc(userId);
         if (signInRecord == null) {
             return vo;
@@ -82,6 +84,7 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
             return vo;
         }
         // 4.1. 判断连续签到天数
+        // TODO @puhui999：连续签到，可以基于 signInRecord 的 day 和当前时间判断呀？
         List<MemberSignInRecordDO> signInRecords = signInRecordMapper.selectListByUserId(userId);
         vo.setContinuousDay(calculateConsecutiveDays(signInRecords));
         return vo;
@@ -164,7 +167,6 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
         if (!ObjectUtils.equalsAny(record.getExperience(), null, 0)) {
             memberLevelService.addExperience(userId, record.getExperience(), MemberExperienceBizTypeEnum.SIGN_IN, String.valueOf(record.getId()));
         }
-
         return record;
     }
 

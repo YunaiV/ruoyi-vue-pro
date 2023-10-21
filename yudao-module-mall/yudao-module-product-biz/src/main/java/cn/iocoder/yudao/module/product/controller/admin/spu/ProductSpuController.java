@@ -93,6 +93,7 @@ public class ProductSpuController {
         // 查询商品 SKU
         List<ProductSkuDO> skus = productSkuService.getSkuListBySpuId(spu.getId());
         // 查询优惠卷
+        // TODO @puhui999：优惠劵的信息，要不交给前端读取？主要是为了避免商品依赖 promotion 模块哈；
         List<CouponTemplateRespDTO> couponTemplateList = couponTemplateApi.getCouponTemplateListByIds(
                 spu.getGiveCouponTemplateIds());
         return success(ProductSpuConvert.INSTANCE.convertForSpuDetailRespVO(spu, skus, couponTemplateList));

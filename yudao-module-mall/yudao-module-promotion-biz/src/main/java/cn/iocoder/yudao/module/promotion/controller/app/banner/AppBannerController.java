@@ -26,8 +26,7 @@ import static cn.iocoder.yudao.framework.common.util.cache.CacheUtils.buildAsync
 @Validated
 public class AppBannerController {
 
-    @Resource
-    private BannerService bannerService;
+    // TODO @puhui999：这个目前不缓存，也没问题，因为首页没用到。
     /**
      * {@link AppBannerRespVO} 缓存，通过它异步刷新 {@link #getBannerList0(Integer)} 所要的首页数据
      */
@@ -40,6 +39,9 @@ public class AppBannerController {
                 }
 
             });
+
+    @Resource
+    private BannerService bannerService;
 
     @GetMapping("/list")
     @Operation(summary = "获得 banner 列表")

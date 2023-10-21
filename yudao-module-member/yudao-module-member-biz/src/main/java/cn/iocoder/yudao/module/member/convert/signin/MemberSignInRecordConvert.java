@@ -48,19 +48,20 @@ public interface MemberSignInRecordConvert {
         // 1. 计算今天是第几天签到
         long day = ChronoUnit.DAYS.between(firstRecord.getCreateTime(), LocalDateTime.now());
         // 2. 初始化签到信息
+        // TODO @puhui999：signInRecord=》record
         MemberSignInRecordDO signInRecord = new MemberSignInRecordDO().setUserId(userId)
-                .setDay(Integer.parseInt(Long.toString(day))) // 设置签到天数
-                .setPoint(0)  // 设置签到积分默认为 0
+                .setDay(Integer.parseInt(Long.toString(day))) // 设置签到天数 TODO @puhui999：day 应该跟着第几天签到走；不是累加哈；另外 long 转 int，应该 (int) day 就可以了。。。
+                .setPoint(0)  // 设置签到积分默认为
                 .setExperience(0);  // 设置签到经验默认为 0
-
-
         // 3. 获取签到对应的积分数
         MemberSignInConfigDO lastConfig = signInConfigs.get(signInConfigs.size() - 1); // 最大签到天数
         if (day > lastConfig.getDay()) { // 超出范围按第一天的经验计算
+            // TODO @puhui999：不能直接取 0，万一它 day 不匹配哈。就是第一天没奖励。。。
             signInRecord.setPoint(signInConfigs.get(0).getPoint());
             signInRecord.setExperience(signInConfigs.get(0).getExperience());
             return signInRecord;
         }
+        // TODO @puhui999：signInConfig 可以改成 config；
         MemberSignInConfigDO signInConfig = CollUtil.findOne(signInConfigs, config -> ObjUtil.equal(config.getDay(), day));
         if (signInConfig == null) {
             return signInRecord;

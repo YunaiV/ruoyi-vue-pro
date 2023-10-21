@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.promotion.enums.banner.BannerPositionEnum;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
+// TODO @puhui999：表名改成 promotion_banner，然后有序加下；另外，sql 给我下哈；还有那个 position 字典，嘿嘿。
 /**
  * banner DO
  *
@@ -60,7 +61,5 @@ public class BannerDO extends BaseDO {
      * 点击次数
      */
     private Integer browseCount;
-
-    // TODO 芋艿 其他数据相关
 
 }
