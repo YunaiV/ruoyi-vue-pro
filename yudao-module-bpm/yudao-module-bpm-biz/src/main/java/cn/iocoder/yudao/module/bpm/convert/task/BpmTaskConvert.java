@@ -2,8 +2,10 @@ package cn.iocoder.yudao.module.bpm.convert.task;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
@@ -168,20 +170,15 @@ public interface BpmTaskConvert {
                                                    Map<Long, AdminUserRespDTO> userMap,
                                                    Map<String, Task> idTaskMap){
         return CollectionUtils.convertList(bpmTaskExtDOList, task -> {
-            // TODO @海：setId、name，可以链式调用
-            BpmTaskSubSignRespVO bpmTaskSubSignRespVO = new BpmTaskSubSignRespVO();
-            bpmTaskSubSignRespVO.setName(task.getName());
-            bpmTaskSubSignRespVO.setId(task.getTaskId());
-            Task sourceTask = idTaskMap.get(task.getTaskId());
-            // TODO @海：下面这行注释，应该放到 idTaskMap.get(task.getTaskId()) 上面；原因是，应该注释之后，下面的逻辑是个整体；
+            BpmTaskSubSignRespVO bpmTaskSubSignRespVO = new BpmTaskSubSignRespVO()
+                    .setName(task.getName())
+                    .setId(task.getTaskId());
+
             // 后加签任务不会直接设置 assignee ,所以不存在 assignee 的情况，则去取 owner
-            // TODO @海：可以使用 ObjUtil.default 方法
-            String assignee = StrUtil.isNotEmpty(sourceTask.getAssignee()) ? sourceTask.getAssignee() : sourceTask.getOwner();
-            // TODO @海：这里可以使用 MapUtils.findAndThen 写起来更简单一点；
-            AdminUserRespDTO assignUser = userMap.get(NumberUtils.parseLong(assignee));
-            if (assignUser != null) {
-                bpmTaskSubSignRespVO.setAssigneeUser(convert3(assignUser));
-            }
+            Task sourceTask = idTaskMap.get(task.getTaskId());
+            String assignee = ObjectUtil.defaultIfBlank(sourceTask.getOwner(),sourceTask.getAssignee());
+            MapUtils.findAndThen(userMap,NumberUtils.parseLong(assignee),
+                    assignUser-> bpmTaskSubSignRespVO.setAssigneeUser(convert3(assignUser)));
             return bpmTaskSubSignRespVO;
         });
     }
