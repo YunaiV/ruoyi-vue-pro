@@ -103,7 +103,7 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
         return selectList(new LambdaQueryWrapperX<SeckillActivityDO>()
                 .in(SeckillActivityDO::getId, ids)
                 .lt(SeckillActivityDO::getStartTime, dateTime)
-                .lt(SeckillActivityDO::getEndTime, dateTime)
+                .gt(SeckillActivityDO::getEndTime, dateTime)// 开始时间 < 指定时间 < 结束时间，也就是说获取指定时间段的活动
                 .orderByDesc(SeckillActivityDO::getCreateTime));
     }
 

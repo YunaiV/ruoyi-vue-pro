@@ -25,7 +25,6 @@ public class BannerPageReqVO extends PageParam {
     @Schema(description = "标题")
     private String title;
 
-
     @Schema(description = "状态")
     @InEnum(CommonStatusEnum.class)
     private Integer status;
