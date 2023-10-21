@@ -1,15 +1,15 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.contact;
 
-import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
+
+import java.time.LocalDateTime;
 
 /**
- * crm联系人 DO
+ * crm 联系人 DO
  *
  * @author 芋道源码
  */
@@ -54,6 +54,8 @@ public class ContactDO extends BaseDO {
     private String post;
     /**
      * 客户编号
+     *
+     * TODO @zyna：关联的字段，也要写下
      */
     private Long customerId;
     /**
@@ -66,6 +68,8 @@ public class ContactDO extends BaseDO {
     private String remark;
     /**
      * 负责人用户编号
+     *
+     * TODO @zyna：关联的字段，也要写下
      */
     private Long ownerUserId;
     /**
