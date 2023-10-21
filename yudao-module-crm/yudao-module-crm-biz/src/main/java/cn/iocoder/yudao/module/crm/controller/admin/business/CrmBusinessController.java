@@ -19,7 +19,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -65,15 +64,6 @@ public class CrmBusinessController {
     public CommonResult<CrmBusinessRespVO> getBusiness(@RequestParam("id") Long id) {
         CrmBusinessDO business = businessService.getBusiness(id);
         return success(CrmBusinessConvert.INSTANCE.convert(business));
-    }
-
-    @GetMapping("/list")
-    @Operation(summary = "获得商机列表")
-    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @PreAuthorize("@ss.hasPermission('crm:business:query')")
-    public CommonResult<List<CrmBusinessRespVO>> getBusinessList(@RequestParam("ids") Collection<Long> ids) {
-        List<CrmBusinessDO> list = businessService.getBusinessList(ids);
-        return success(CrmBusinessConvert.INSTANCE.convertList(list));
     }
 
     @GetMapping("/page")

@@ -35,10 +35,14 @@ public class CrmBusinessDO extends BaseDO {
     private String name;
     /**
      * 商机状态类型编号
+     *
+     *  TODO @ljileo：这个字段，后续要写下关联的实体哈
      */
     private Long statusTypeId;
     /**
      * 商机状态编号
+     *
+     * TODO @ljileo：这个字段，后续要写下关联的实体哈
      */
     private Long statusId;
     /**
@@ -47,6 +51,8 @@ public class CrmBusinessDO extends BaseDO {
     private LocalDateTime contactNextTime;
     /**
      * 客户编号
+     *
+     * TODO @ljileo：这个字段，后续要写下关联的实体哈
      */
     private Long customerId;
     /**
@@ -55,14 +61,20 @@ public class CrmBusinessDO extends BaseDO {
     private LocalDateTime dealTime;
     /**
      * 商机金额
+     *
+     * TODO @lijie：Integer
      */
     private BigDecimal price;
     /**
      * 整单折扣
+     *
+     * TODO @lijie：Integer
      */
     private BigDecimal discountPercent;
     /**
      * 产品总金额
+     *
+     * TODO @lijie：Integer
      */
     private BigDecimal productPrice;
     /**
@@ -75,14 +87,20 @@ public class CrmBusinessDO extends BaseDO {
     private Long ownerUserId;
     /**
      * 只读权限的用户编号数组
+     *
+     * TODO @lijie：应该是 List<Long>，然后使用下对应的 typehandler
      */
     private String roUserIds;
     /**
      * 读写权限的用户编号数组
+     *
+     * TODO @lijie：应该是 List<Long>，然后使用下对应的 typehandler
      */
     private String rwUserIds;
     /**
      * 1赢单2输单3无效
+     *
+     * TODO @lijie：搞个枚举；
      */
     private Integer endStatus;
     /**
@@ -95,6 +113,8 @@ public class CrmBusinessDO extends BaseDO {
     private LocalDateTime contactLastTime;
     /**
      * 跟进状态
+     *
+     * TODO @lijie：目前就是 Boolean；是否跟进
      */
     private Integer followUpStatus;
 

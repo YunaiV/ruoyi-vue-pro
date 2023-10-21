@@ -18,6 +18,8 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class CrmBusinessPageReqVO extends PageParam {
 
+    // TODO @ljileo：目前就使用 name 检索即可；
+
     @Schema(description = "商机名称", example = "李四")
     private String name;
 
