@@ -900,35 +900,24 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         Stack<String> stack = new Stack<>();
         // 1.1 将根任务ID入栈
         stack.push(parentTaskId);
-        while (!stack.isEmpty()) {
+        //控制遍历的次数不超过 Byte.MAX_VALUE，避免脏数据造成死循环
+        int count = 0;
+        while (!stack.isEmpty() && count<Byte.MAX_VALUE) {
             // 1.2 弹出栈顶任务ID
             String taskId = stack.pop();
             // 1.3 将任务ID添加到结果集合中
             allChildTaskIds.add(taskId);
             // 1.4 获取该任务的子任务列表
             List<String> childrenTaskIdList = getChildrenTaskIdList(taskId);
-            if (childrenTaskIdList != null && !childrenTaskIdList.isEmpty()) {
+            if (CollUtil.isNotEmpty(childrenTaskIdList)) {
                 for (String childTaskId : childrenTaskIdList) {
                     // 1.5 将子任务ID入栈，以便后续处理
                     stack.push(childTaskId);
                 }
             }
+            count++;
         }
         return allChildTaskIds;
-    }
-
-    /**
-     * 递归处理子级任务
-     *
-     * @param taskId  当前任务ID
-     * @param taskIds 结果
-     */
-    private void recursiveGetChildTaskIds(String taskId, List<String> taskIds) {
-        List<String> childrenTaskIdList = getChildrenTaskIdList(taskId);
-        for (String childTaskId : childrenTaskIdList) {
-            taskIds.add(childTaskId); // 将子任务的ID添加到集合中
-            recursiveGetChildTaskIds(childTaskId, taskIds); // 递归获取子任务的子任务
-        }
     }
 
 
