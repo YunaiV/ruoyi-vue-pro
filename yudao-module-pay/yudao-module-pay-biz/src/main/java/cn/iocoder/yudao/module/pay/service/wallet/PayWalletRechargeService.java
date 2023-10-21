@@ -16,9 +16,10 @@ public interface PayWalletRechargeService {
      * @param userId      用户 id
      * @param userType    用户类型
      * @param createReqVO 钱包充值请求 VO
+     * @param userIp  用户Ip
      * @return 钱包充值记录
      */
-    PayWalletRechargeDO createWalletRecharge(Long userId, Integer userType,
+    PayWalletRechargeDO createWalletRecharge(Long userId, Integer userType, String userIp,
                                              AppPayWalletRechargeCreateReqVO createReqVO);
 
     /**

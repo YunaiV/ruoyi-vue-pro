@@ -12,14 +12,14 @@ import org.apache.ibatis.annotations.Mapper;
 public interface PayWalletRechargePackageMapper extends BaseMapperX<PayWalletRechargePackageDO> {
 
     default PageResult<PayWalletRechargePackageDO> selectPage(WalletRechargePackagePageReqVO reqVO) {
-        // TODO @jason：排序按照充值金额
         return selectPage(reqVO, new LambdaQueryWrapperX<PayWalletRechargePackageDO>()
                 .likeIfPresent(PayWalletRechargePackageDO::getName, reqVO.getName())
-                .eqIfPresent(PayWalletRechargePackageDO::getPayPrice, reqVO.getPayPrice())
-                .eqIfPresent(PayWalletRechargePackageDO::getBonusPrice, reqVO.getBonusPrice())
                 .eqIfPresent(PayWalletRechargePackageDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(PayWalletRechargePackageDO::getCreateTime, reqVO.getCreateTime())
-                .orderByDesc(PayWalletRechargePackageDO::getId));
+                .orderByDesc(PayWalletRechargePackageDO::getPayPrice));
     }
 
+    default PayWalletRechargePackageDO selectByName(String name){
+        return selectOne(PayWalletRechargePackageDO::getName, name);
+    }
 }

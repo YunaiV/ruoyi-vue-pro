@@ -29,7 +29,6 @@ import static cn.hutool.core.util.ObjectUtil.notEqual;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.addTime;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
-import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.module.pay.convert.wallet.PayWalletRechargeConvert.INSTANCE;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum.*;
@@ -63,13 +62,13 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public PayWalletRechargeDO createWalletRecharge(Long userId, Integer userType,
+    public PayWalletRechargeDO createWalletRecharge(Long userId, Integer userType, String userIp,
                                                     AppPayWalletRechargeCreateReqVO reqVO) {
-        // 1.1 校验参数 TODO @jason：AppPayWalletRechargeCreateReqVO 看下校验；
+
         if (Objects.isNull(reqVO.getPayPrice()) && Objects.isNull(reqVO.getPackageId())) {
+            //  TODO @jason @AssertTrue 貌似没有效果。需要查下原因
             throw exception(WALLET_RECHARGE_PACKAGE_AND_PRICE_IS_EMPTY);
         }
-
         // 1.1 计算充值金额
         int payPrice;
         int bonusPrice = 0;
@@ -87,7 +86,7 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
 
         // 2.1 创建支付单
         Long payOrderId = payOrderService.createOrder(new PayOrderCreateReqDTO()
-                .setAppId(WALLET_PAY_APP_ID).setUserIp(getClientIP()) // TODO @jason：clientIp 从 controller 传递进来噢
+                .setAppId(WALLET_PAY_APP_ID).setUserIp(userIp)
                 .setMerchantOrderId(recharge.getId().toString()) // 业务的订单编号
                 .setSubject(WALLET_RECHARGE_ORDER_SUBJECT).setBody("")
                 .setPrice(recharge.getPayPrice())
@@ -181,7 +180,7 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
         // 退款失败
         if (PayRefundStatusRespEnum.isFailure(payRefund.getStatus())) {
             // 2.2 解冻余额
-            payWalletService.unFreezePrice(walletRecharge.getWalletId(), walletRecharge.getTotalPrice());
+            payWalletService.unfreezePrice(walletRecharge.getWalletId(), walletRecharge.getTotalPrice());
 
             updateObj.setRefundStatus(FAILURE.getStatus());
         }

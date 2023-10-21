@@ -79,7 +79,7 @@ public class PayTransferServiceImpl implements PayTransferService {
         // 3. 调用三方渠道发起转账
         PayTransferUnifiedReqDTO transferUnifiedReq = new PayTransferUnifiedReqDTO()
                 .setOutTransferNo(transferExtension.getNo()).setPrice(transfer.getPrice())
-                .setType(transfer.getType()).setTitle(transfer.getTitle())
+                .setType(transfer.getType()).setTitle(transfer.getSubject())
                 .setPayeeInfo(transfer.getPayeeInfo()).setUserIp(userIp)
                 .setChannelExtras(reqVO.getChannelExtras());
         PayTransferRespDTO unifiedTransferResp = client.unifiedTransfer(transferUnifiedReq);
@@ -214,11 +214,11 @@ public class PayTransferServiceImpl implements PayTransferService {
     }
 
     private void validateChannelCodeAndTypeMatch(String channelCode, Integer type) {
-        PayTransferTypeEnum transferType = PayTransferTypeEnum.ofType(type);
+        PayTransferTypeEnum transferType = PayTransferTypeEnum.typeOf(type);
         PayChannelEnum payChannel = PayChannelEnum.getByCode(channelCode);
         switch (transferType) {
             case ALIPAY_BALANCE: {
-                if (payChannel != PayChannelEnum.ALIPAY_TRANSFER) {
+                if (!payChannel.getCode().startsWith("alipay")) {
                     throw exception(PAY_TRANSFER_TYPE_AND_CHANNEL_NOT_MATCH);
                 }
                 break;

@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.pay.service.wallet.PayWalletTransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,7 +33,7 @@ public class PayWalletTransactionController {
 
     @GetMapping("/page")
     @Operation(summary = "获得钱包流水分页")
-    // TODO @jason：权限校验，缺一个
+    @PreAuthorize("@ss.hasPermission('pay:wallet:query')")
     public CommonResult<PageResult<PayWalletTransactionRespVO>> getWalletTransactionPage(
             @Valid PayWalletTransactionPageReqVO pageReqVO) {
         PageResult<PayWalletTransactionDO> result = payWalletTransactionService.getWalletTransactionPage(pageReqVO);

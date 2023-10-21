@@ -64,11 +64,11 @@ public class PayTransferDO extends BaseDO {
      * 例如说，内部系统 A 的订单号，需要保证每个 PayAppDO 唯一
      */
     private String merchantOrderId;
-    // TODO @jason：这个字段，要不要改成 subject。。。和 payorderdo 保持一致；哈哈哈，我也忘记为啥当时选了这个名字了。。。
+
     /**
      * 转账标题
      */
-    private String title;
+    private String subject;
 
     // ========== 转账相关字段 ==========
     /**

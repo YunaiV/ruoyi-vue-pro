@@ -28,9 +28,6 @@ public enum PayChannelEnum {
     ALIPAY_APP("alipay_app", "支付宝App 支付", AlipayPayClientConfig.class),
     ALIPAY_QR("alipay_qr", "支付宝扫码支付", AlipayPayClientConfig.class),
     ALIPAY_BAR("alipay_bar", "支付宝条码支付", AlipayPayClientConfig.class),
-    // TODO @jason：是不是按照微信聊的，合并回 ALIPAY_PC；因为支付宝、微信都是多种支付方式，选择其中的一种即可；
-    ALIPAY_TRANSFER("alipay_transfer", "支付宝转账", AlipayPayClientConfig.class),
-
     MOCK("mock", "模拟支付", NonePayClientConfig.class),
 
     WALLET("wallet", "钱包支付", NonePayClientConfig.class);

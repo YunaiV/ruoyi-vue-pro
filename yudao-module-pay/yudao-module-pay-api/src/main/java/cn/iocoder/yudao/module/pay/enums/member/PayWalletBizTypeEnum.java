@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.pay.enums.member;
 
+import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import java.util.Arrays;
 
 /**
  * 钱包交易业务分类
@@ -10,7 +13,7 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
-public enum PayWalletBizTypeEnum {
+public enum PayWalletBizTypeEnum implements IntArrayValuable {
 
     RECHARGE(1, "充值"),
     RECHARGE_REFUND(2, "充值退款"),
@@ -28,4 +31,10 @@ public enum PayWalletBizTypeEnum {
      */
     private final String description;
 
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(PayWalletBizTypeEnum::getType).toArray();
+
+    @Override
+    public int[] array() {
+         return ARRAYS;
+    }
 }

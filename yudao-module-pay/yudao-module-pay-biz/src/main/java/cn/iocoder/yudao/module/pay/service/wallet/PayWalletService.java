@@ -37,7 +37,7 @@ public interface PayWalletService {
      * @param pageReqVO 分页查询
      * @return 会员钱包分页
      */
-    PageResult<PayWalletDO> getWalletPage(PayWalletPageReqVO pageReqVO);
+    PageResult<PayWalletDO> getWalletPage(Integer userType, PayWalletPageReqVO pageReqVO);
 
     /**
      * 钱包订单支付
@@ -90,13 +90,12 @@ public interface PayWalletService {
      */
     void freezePrice(Long id, Integer price);
 
-    // TODO @jason：unfreeze 是单词哈，f 不用大写
     /**
      * 解冻钱包余额
      *
      * @param id    钱包编号
      * @param price 解冻金额
      */
-    void unFreezePrice(Long id, Integer price);
+    void unfreezePrice(Long id, Integer price);
 
 }

@@ -17,10 +17,10 @@ public interface PayWalletMapper extends BaseMapperX<PayWalletDO> {
                 PayWalletDO::getUserType, userType);
     }
 
-    default PageResult<PayWalletDO> selectPage(PayWalletPageReqVO reqVO) {
+    default PageResult<PayWalletDO> selectPage(Integer userType, PayWalletPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<PayWalletDO>()
-                .eqIfPresent(PayWalletDO::getUserId, reqVO.getUserId())
-                .eqIfPresent(PayWalletDO::getUserType, reqVO.getUserType())
+                .inIfPresent(PayWalletDO::getUserId, reqVO.getUserIds())
+                .eqIfPresent(PayWalletDO::getUserType, userType)
                 .betweenIfPresent(PayWalletDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(PayWalletDO::getId));
     }
