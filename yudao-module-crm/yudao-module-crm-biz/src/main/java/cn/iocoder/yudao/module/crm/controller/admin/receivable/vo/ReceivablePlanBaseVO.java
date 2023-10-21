@@ -1,15 +1,11 @@
 package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
+import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import javax.validation.constraints.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -20,9 +16,11 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class ReceivablePlanBaseVO {
 
+    // TODO 芋艿：这个字段，在想想命名；
     @Schema(description = "期数")
     private Long indexNo;
 
+    // TODO @liuhongfeng：中英文之间，有个空格，这样更干净；
     @Schema(description = "回款ID", example = "19852")
     private Long receivableId;
 
@@ -30,12 +28,16 @@ public class ReceivablePlanBaseVO {
     //@NotNull(message = "完成状态不能为空")
     private Integer status;
 
+    // TODO @liuhongfeng：这个字段，可以写个枚举，然后 InEnum 去校验下；
+    // TODO @liuhongfeng：这个字段，应该不是前端传递的噢，而是后端自己生成的
     @Schema(description = "审批状态", example = "1")
     private String checkStatus;
 
+    // TODO @liuhongfeng：这个字段，应该不是前端传递的噢，而是后端自己生成的，所以不适合放在 base 里面；
     @Schema(description = "工作流编号", example = "8909")
     private Long processInstanceId;
 
+    // TODO @liuhongfeng：使用 Int 哈，分；
     @Schema(description = "计划回款金额", example = "29675")
     private BigDecimal price;
 
@@ -43,6 +45,7 @@ public class ReceivablePlanBaseVO {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime returnTime;
 
+    // TODO @liuhongfeng：这个字段，Integer
     @Schema(description = "提前几天提醒")
     private Long remindDays;
 
@@ -56,6 +59,7 @@ public class ReceivablePlanBaseVO {
     @Schema(description = "合同ID", example = "3473")
     private Long contractId;
 
+    // TODO @liuhongfeng：这个字段，应该不是前端传递的噢，而是后端自己生成的，所以不适合放在 base 里面；
     @Schema(description = "负责人", example = "17828")
     private Long ownerUserId;
 

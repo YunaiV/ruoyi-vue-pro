@@ -1,33 +1,30 @@
 package cn.iocoder.yudao.module.crm.service.receivable;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
-import javax.annotation.Resource;
-
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.ReceivablePlanCreateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.ReceivablePlanExportReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.ReceivablePlanPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.ReceivablePlanUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.ReceivablePlanDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.receivable.ReceivablePlanMapper;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import org.springframework.context.annotation.Import;
-import java.util.*;
-import java.time.LocalDateTime;
+import java.util.List;
 
-import static cn.hutool.core.util.RandomUtil.*;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.*;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.RECEIVABLE_PLAN_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
+// TODO 芋艿：后续，需要补充测试用例
 /**
  * {@link ReceivablePlanServiceImpl} 的单元测试类
  *

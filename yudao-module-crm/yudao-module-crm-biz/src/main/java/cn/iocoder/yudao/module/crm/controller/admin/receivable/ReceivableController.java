@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.crm.controller.admin.receivable;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.*;
@@ -18,9 +19,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
@@ -67,15 +67,6 @@ public class ReceivableController {
     public CommonResult<ReceivableRespVO> getReceivable(@RequestParam("id") Long id) {
         ReceivableDO receivable = receivableService.getReceivable(id);
         return success(ReceivableConvert.INSTANCE.convert(receivable));
-    }
-
-    @GetMapping("/list")
-    @Operation(summary = "获得回款管理列表")
-    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @PreAuthorize("@ss.hasPermission('crm:receivable:query')")
-    public CommonResult<List<ReceivableRespVO>> getReceivableList(@RequestParam("ids") Collection<Long> ids) {
-        List<ReceivableDO> list = receivableService.getReceivableList(ids);
-        return success(ReceivableConvert.INSTANCE.convertList(list));
     }
 
     @GetMapping("/page")

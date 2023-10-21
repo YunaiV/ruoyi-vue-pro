@@ -1,32 +1,28 @@
 package cn.iocoder.yudao.module.crm.controller.admin.receivable;
 
-import org.springframework.web.bind.annotation.*;
-import javax.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Operation;
-
-import javax.validation.constraints.*;
-import javax.validation.*;
-import javax.servlet.http.*;
-import java.util.*;
-import java.io.IOException;
-
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*;
-
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.*;
-import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.ReceivablePlanDO;
 import cn.iocoder.yudao.module.crm.convert.receivable.ReceivablePlanConvert;
+import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.ReceivablePlanDO;
 import cn.iocoder.yudao.module.crm.service.receivable.ReceivablePlanService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 /**
  * @author 赤焰
@@ -71,15 +67,6 @@ public class ReceivablePlanController {
     public CommonResult<ReceivablePlanRespVO> getReceivablePlan(@RequestParam("id") Long id) {
         ReceivablePlanDO receivablePlan = receivablePlanService.getReceivablePlan(id);
         return success(ReceivablePlanConvert.INSTANCE.convert(receivablePlan));
-    }
-
-    @GetMapping("/list")
-    @Operation(summary = "获得回款计划列表")
-    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @PreAuthorize("@ss.hasPermission('crm:receivable-plan:query')")
-    public CommonResult<List<ReceivablePlanRespVO>> getReceivablePlanList(@RequestParam("ids") Collection<Long> ids) {
-        List<ReceivablePlanDO> list = receivablePlanService.getReceivablePlanList(ids);
-        return success(ReceivablePlanConvert.INSTANCE.convertList(list));
     }
 
     @GetMapping("/page")

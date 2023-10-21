@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.receivable;
 
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
  * 回款管理 DO
@@ -35,14 +35,20 @@ public class ReceivableDO extends BaseDO {
     private String no;
     /**
      * 回款计划ID
+     *
+     * TODO @liuhongfeng：这个字段，后续要写下关联的实体哈
      */
     private Long planId;
     /**
      * 客户ID
+     *
+     * TODO @liuhongfeng：这个字段，后续要写下关联的实体哈
      */
     private Long customerId;
     /**
      * 合同ID
+     *
+     * TODO @liuhongfeng：这个字段，后续要写下关联的实体哈
      */
     private Long contractId;
     /**
@@ -53,6 +59,8 @@ public class ReceivableDO extends BaseDO {
     private Integer checkStatus;
     /**
      * 工作流编号
+     *
+     * TODO @liuhongfeng：这个字段，后续要写下关联的实体哈
      */
     private Long processInstanceId;
     /**
@@ -79,6 +87,7 @@ public class ReceivableDO extends BaseDO {
      * 显示顺序
      */
     private Integer sort;
+    // TODO 芋艿：dataScope、dataScopeDeptIds 在想下；
     /**
      * 数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限）
      */

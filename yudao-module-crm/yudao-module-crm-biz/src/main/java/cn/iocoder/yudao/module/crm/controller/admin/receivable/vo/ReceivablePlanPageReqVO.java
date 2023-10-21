@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo;
 
-import lombok.*;
-import java.util.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -14,6 +16,8 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ReceivablePlanPageReqVO extends PageParam {
+
+    // TODO 芋艿：筛选字段，需要去掉几个，在想想；
 
     @Schema(description = "期数")
     private Long indexNo;
