@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.promotion.dal.mysql.discount;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProductDO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 import java.util.List;
@@ -23,4 +24,10 @@ public interface DiscountProductMapper extends BaseMapperX<DiscountProductDO> {
         return selectList(DiscountProductDO::getActivityId, activityId);
     }
 
+    default List<DiscountProductDO> selectListByActivityId(Collection<Long> activityIds) {
+        return selectList(DiscountProductDO::getActivityId, activityIds);
+    }
+
+
+    List<DiscountProductDO> getMatchDiscountProductList(@Param("skuIds") Collection<Long> skuIds);
 }
