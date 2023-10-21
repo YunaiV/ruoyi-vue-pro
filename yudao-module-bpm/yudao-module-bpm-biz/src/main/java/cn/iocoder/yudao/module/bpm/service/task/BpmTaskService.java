@@ -163,7 +163,7 @@ public interface BpmTaskService {
      * @param userId 被加签的用户和任务 ID，加签类型
      * @param reqVO  当前用户 ID
      */
-    void addSignTask(Long userId, BpmTaskAddSignReqVO reqVO);
+    void createSignTask(Long userId, BpmTaskAddSignReqVO reqVO);
 
     /**
      * 任务减签名
@@ -171,7 +171,7 @@ public interface BpmTaskService {
      * @param userId 当前用户ID
      * @param reqVO  被减签的任务 ID，理由
      */
-    void subSignTask(Long userId, BpmTaskSubSignReqVO reqVO);
+    void deleteSignTask(Long userId, BpmTaskSubSignReqVO reqVO);
 
     /**
      * 获取指定任务的子任务和审批人信息

@@ -101,22 +101,22 @@ public class BpmTaskController {
     @PutMapping("/create-sign")
     @Operation(summary = "加签", description = "before 前加签，after 后加签")
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
-    public CommonResult<Boolean> addSignTask(@Valid @RequestBody BpmTaskAddSignReqVO reqVO) {
-        taskService.addSignTask(getLoginUserId(), reqVO);
+    public CommonResult<Boolean> createSignTask(@Valid @RequestBody BpmTaskAddSignReqVO reqVO) {
+        taskService.createSignTask(getLoginUserId(), reqVO);
         return success(true);
     }
 
     @DeleteMapping("/delete-sign")
     @Operation(summary = "减签")
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
-    public CommonResult<Boolean> subSignTask(@Valid @RequestBody BpmTaskSubSignReqVO reqVO) {
-        taskService.subSignTask(getLoginUserId(), reqVO);
+    public CommonResult<Boolean> deleteSignTask(@Valid @RequestBody BpmTaskSubSignReqVO reqVO) {
+        taskService.deleteSignTask(getLoginUserId(), reqVO);
         return success(true);
     }
 
     @GetMapping("children-list")
     @Operation(summary = "获取能被减签的任务")
-    @Parameter(name = "parentId", description = "父级任务ID", required = true)
+    @Parameter(name = "parentId", description = "父级任务 ID", required = true)
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
     public CommonResult<List<BpmTaskSubSignRespVO>> getChildrenTaskList(@RequestParam("parentId") String parentId) {
         return success(taskService.getChildrenTaskList(parentId));

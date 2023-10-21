@@ -711,7 +711,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addSignTask(Long userId, BpmTaskAddSignReqVO reqVO) {
+    public void createSignTask(Long userId, BpmTaskAddSignReqVO reqVO) {
         // 1. 获取和校验任务
         TaskEntityImpl taskEntity = validateAddSign(userId, reqVO);
         List<AdminUserRespDTO> userList = adminUserApi.getUserList(reqVO.getUserIdList());
@@ -826,7 +826,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void subSignTask(Long userId, BpmTaskSubSignReqVO reqVO) {
+    public void deleteSignTask(Long userId, BpmTaskSubSignReqVO reqVO) {
         // 1.1 校验 task 可以被减签
         Task task = validateSubSign(reqVO.getId());
         // 1.2 校验取消人存在
@@ -902,12 +902,14 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         stack.push(parentTaskId);
         //控制遍历的次数不超过 Byte.MAX_VALUE，避免脏数据造成死循环
         int count = 0;
+        // TODO @海：< 的前后空格，要注意哈；
         while (!stack.isEmpty() && count<Byte.MAX_VALUE) {
             // 1.2 弹出栈顶任务ID
             String taskId = stack.pop();
             // 1.3 将任务ID添加到结果集合中
             allChildTaskIds.add(taskId);
             // 1.4 获取该任务的子任务列表
+            // TODO @海：有个更高效的写法；一次性去 in 一层；不然每个节点，都去查询一次 db， 太浪费了；每次 in，最终就是 O(h) 查询，而不是 O(n) 查询；
             List<String> childrenTaskIdList = getChildrenTaskIdList(taskId);
             if (CollUtil.isNotEmpty(childrenTaskIdList)) {
                 for (String childTaskId : childrenTaskIdList) {
@@ -919,7 +921,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
         return allChildTaskIds;
     }
-
 
     /**
      * 获取指定父级任务的所有子任务 ID 集合
@@ -954,13 +955,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
         List<String> childrenTaskIdList = convertList(taskList, Task::getId);
 
-
-        // 2. 将 owner 和 assignee 统一到一个集合中
-        List<Long> userIds = convertListByMultiAttr(taskList,control ->
+        // 2.1 将 owner 和 assignee 统一到一个集合中
+        List<Long> userIds = convertListByFlatMap(taskList, control ->
                 Stream.of(NumberUtils.parseLong(control.getAssignee()), NumberUtils.parseLong(control.getOwner()))
                         .filter(Objects::nonNull));
-
-        // 3. 组装数据
+        // 2.2 组装数据
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
         List<BpmTaskExtDO> taskExtList = taskExtMapper.selectProcessListByTaskIds(childrenTaskIdList);
         Map<String, Task> idTaskMap = convertMap(taskList, TaskInfo::getId);
