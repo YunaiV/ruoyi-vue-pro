@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.pay.service.wallet;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.rechargepackage.WalletRechargePackageCreateReqVO;
@@ -13,9 +12,6 @@ import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletRechargePackageMapp
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-
-import java.util.Collection;
-import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
@@ -50,6 +46,8 @@ public class PayWalletRechargePackageServiceImpl implements PayWalletRechargePac
 
     @Override
     public Long createWalletRechargePackage(WalletRechargePackageCreateReqVO createReqVO) {
+        // 校验套餐名是否唯一
+        validateRechargePackageNameUnique(null, createReqVO.getName());
         // 插入
         PayWalletRechargePackageDO walletRechargePackage = WalletRechargePackageConvert.INSTANCE.convert(createReqVO);
         walletRechargePackageMapper.insert(walletRechargePackage);
@@ -57,14 +55,31 @@ public class PayWalletRechargePackageServiceImpl implements PayWalletRechargePac
         return walletRechargePackage.getId();
     }
 
-    // TODO @jason：校验下，套餐名唯一
     @Override
     public void updateWalletRechargePackage(WalletRechargePackageUpdateReqVO updateReqVO) {
         // 校验存在
         validateWalletRechargePackageExists(updateReqVO.getId());
+        // 校验套餐名是否唯一
+        validateRechargePackageNameUnique(updateReqVO.getId(), updateReqVO.getName());
         // 更新
         PayWalletRechargePackageDO updateObj = WalletRechargePackageConvert.INSTANCE.convert(updateReqVO);
         walletRechargePackageMapper.updateById(updateObj);
+    }
+
+    private void validateRechargePackageNameUnique(Long id, String name) {
+        if (StrUtil.isBlank(name)) {
+            return;
+        }
+        PayWalletRechargePackageDO rechargePackage = walletRechargePackageMapper.selectByName(name);
+        if (rechargePackage == null) {
+            return ;
+        }
+        if (id == null) {
+            throw exception(WALLET_RECHARGE_PACKAGE_NAME_EXISTS);
+        }
+        if (!id.equals(rechargePackage.getId())) {
+            throw exception(WALLET_RECHARGE_PACKAGE_NAME_EXISTS);
+        }
     }
 
     @Override

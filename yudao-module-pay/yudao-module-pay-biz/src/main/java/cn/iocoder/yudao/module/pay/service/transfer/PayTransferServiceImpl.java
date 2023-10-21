@@ -79,7 +79,7 @@ public class PayTransferServiceImpl implements PayTransferService {
         // 3. 调用三方渠道发起转账
         PayTransferUnifiedReqDTO transferUnifiedReq = new PayTransferUnifiedReqDTO()
                 .setOutTransferNo(transferExtension.getNo()).setPrice(transfer.getPrice())
-                .setType(transfer.getType()).setTitle(transfer.getTitle())
+                .setType(transfer.getType()).setTitle(transfer.getSubject())
                 .setPayeeInfo(transfer.getPayeeInfo()).setUserIp(userIp)
                 .setChannelExtras(reqVO.getChannelExtras());
         PayTransferRespDTO unifiedTransferResp = client.unifiedTransfer(transferUnifiedReq);

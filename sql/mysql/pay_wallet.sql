@@ -9,7 +9,7 @@ CREATE TABLE `pay_transfer`
     `app_id`               bigint       NOT NULL COMMENT '应用编号',
     `merchant_order_id`    varchar(64)  NOT NULL COMMENT '商户订单编号',
     `price`                int          NOT NULL COMMENT '转账金额，单位：分',
-    `title`                varchar(512) NOT NULL COMMENT '转账标题',
+    `subject`              varchar(512) NOT NULL COMMENT '转账标题',
     `payee_info`           varchar(512) NOT NULL COMMENT '收款人信息，不同类型和渠道不同',
     `status`               tinyint      NOT NULL COMMENT '转账状态',
     `success_time`         datetime     NULL COMMENT '转账成功时间',

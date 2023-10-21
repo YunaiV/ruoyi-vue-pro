@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.pay.enums.member.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.wallet.bo.WalletTransactionCreateReqBO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 
@@ -22,6 +23,7 @@ import javax.annotation.Resource;
  */
 @Service
 @Slf4j
+@Validated
 public class PayWalletTransactionServiceImpl implements PayWalletTransactionService {
 
     /**

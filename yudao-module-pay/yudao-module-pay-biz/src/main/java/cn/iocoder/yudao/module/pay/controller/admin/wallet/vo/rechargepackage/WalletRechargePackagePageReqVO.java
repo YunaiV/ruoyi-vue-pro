@@ -20,14 +20,6 @@ public class WalletRechargePackagePageReqVO extends PageParam {
     @Schema(description = "套餐名", example = "李四")
     private String name;
 
-    // TODO @jason：payPrice 和 bonusPrice 可以去掉。。。一般太少检索啦；
-
-    @Schema(description = "支付金额", example = "16454")
-    private Integer payPrice;
-
-    @Schema(description = "赠送金额", example = "20887")
-    private Integer bonusPrice;
-
     @Schema(description = "状态", example = "2")
     private Integer status;
 

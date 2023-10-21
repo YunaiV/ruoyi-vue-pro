@@ -63,8 +63,8 @@ public class PayWalletServiceImpl implements  PayWalletService {
     }
 
     @Override
-    public PageResult<PayWalletDO> getWalletPage(PayWalletPageReqVO pageReqVO) {
-        return walletMapper.selectPage(pageReqVO);
+    public PageResult<PayWalletDO> getWalletPage(Integer userType,PayWalletPageReqVO pageReqVO) {
+        return walletMapper.selectPage(userType, pageReqVO);
     }
 
     @Override
@@ -196,7 +196,7 @@ public class PayWalletServiceImpl implements  PayWalletService {
     }
 
     @Override
-    public void unFreezePrice(Long id, Integer price) {
+    public void unfreezePrice(Long id, Integer price) {
         int updateCounts = walletMapper.unFreezePrice(id, price);
         if (updateCounts == 0) {
             throw exception(WALLET_FREEZE_PRICE_NOT_ENOUGH);

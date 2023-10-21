@@ -11,9 +11,9 @@ import org.mapstruct.factory.Mappers;
 public interface PayTransferConvert {
 
     PayTransferConvert  INSTANCE = Mappers.getMapper(PayTransferConvert.class);
-
+    @Mapping(source = "title", target = "subject")
     PayTransferDO convert(PayTransferCreateReqDTO dto);
-    @Mapping(source = "transferType", target = "type")
+
     PayTransferCreateReqDTO convert(PayDemoTransferCreateReqVO vo);
 
 }
