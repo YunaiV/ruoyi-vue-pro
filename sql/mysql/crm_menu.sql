@@ -8,7 +8,7 @@ INSERT INTO system_menu(
     path, icon, component, status, component_name
 )
 VALUES (
-    '合同管理', '', 2, 0, 1254,
+    '合同管理', '', 2, 0, 2375,
     'contract', '', 'crm/contract/index', 0, 'Contract'
 );
 
@@ -175,5 +175,133 @@ INSERT INTO system_menu(
 )
 VALUES (
            '商机导出', 'crm:business:export', 3, 5, @parentId,
+           '', '', '', 0
+       );
+
+
+-- ----------------------------
+-- 客户管理菜单
+-- ----------------------------
+INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2375, '客户管理', '', 1, 0, 0, '/crm', 'ep:avatar', '', '', 0, b'1', b'1', b'1', '1', '2023-10-20 00:36:13', '1', '2023-10-19 16:37:24', b'0');
+
+
+-- ----------------------------
+-- 回款菜单
+-- ----------------------------
+
+-- 菜单 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status, component_name
+)
+VALUES (
+           '回款管理', '', 2, 0, 2375,
+           'receivable', '', 'crm/receivable/index', 0, 'Receivable'
+       );
+
+-- 按钮父菜单ID
+-- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+           '回款管理查询', 'crm:receivable:query', 3, 1, @parentId,
+           '', '', '', 0
+       );
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+           '回款管理创建', 'crm:receivable:create', 3, 2, @parentId,
+           '', '', '', 0
+       );
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+           '回款管理更新', 'crm:receivable:update', 3, 3, @parentId,
+           '', '', '', 0
+       );
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+           '回款管理删除', 'crm:receivable:delete', 3, 4, @parentId,
+           '', '', '', 0
+       );
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+           '回款管理导出', 'crm:receivable:export', 3, 5, @parentId,
+           '', '', '', 0
+       );
+
+
+-- ----------------------------
+-- 回款计划菜单
+-- ----------------------------
+
+-- 菜单 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status, component_name
+)
+VALUES (
+           '回款计划管理', '', 2, 0, 2375,
+           'receivable-plan', '', 'crm/receivablePlan/index', 0, 'ReceivablePlan'
+       );
+
+-- 按钮父菜单ID
+-- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+           '回款计划查询', 'crm:receivable-plan:query', 3, 1, @parentId,
+           '', '', '', 0
+       );
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+           '回款计划创建', 'crm:receivable-plan:create', 3, 2, @parentId,
+           '', '', '', 0
+       );
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+           '回款计划更新', 'crm:receivable-plan:update', 3, 3, @parentId,
+           '', '', '', 0
+       );
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+           '回款计划删除', 'crm:receivable-plan:delete', 3, 4, @parentId,
+           '', '', '', 0
+       );
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+           '回款计划导出', 'crm:receivable-plan:export', 3, 5, @parentId,
            '', '', '', 0
        );
