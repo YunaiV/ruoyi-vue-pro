@@ -1,22 +1,24 @@
 package cn.iocoder.yudao.module.crm.service.clue;
 
-import org.springframework.stereotype.Service;
-import javax.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-
-import java.util.*;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.*;
-import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
-import cn.iocoder.yudao.module.crm.convert.clue.CrmClueConvert;
-import cn.iocoder.yudao.module.crm.dal.mysql.clue.CrmClueMapper;
-
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
-
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueCreateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueExportReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueUpdateReqVO;
+import cn.iocoder.yudao.module.crm.convert.clue.CrmClueConvert;
+import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
+import cn.iocoder.yudao.module.crm.dal.mysql.clue.CrmClueMapper;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+
+import javax.annotation.Resource;
+import java.util.Collection;
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CLUE_NOT_EXISTS;
 
 /**
  * 线索 Service 实现类
@@ -32,6 +34,7 @@ public class CrmClueServiceImpl implements CrmClueService {
 
     @Override
     public Long createClue(CrmClueCreateReqVO createReqVO) {
+        // TODO @wanwan：校验客户是否存在；以及类似的逻辑哈；如果目前还缺对应的模块的 service，可以先给自己写 todo；
         // 插入
         CrmClueDO clue = CrmClueConvert.INSTANCE.convert(createReqVO);
         clueMapper.insert(clue);
@@ -41,8 +44,10 @@ public class CrmClueServiceImpl implements CrmClueService {
 
     @Override
     public void updateClue(CrmClueUpdateReqVO updateReqVO) {
+        // TODO @wanwan：校验客户是否存在；以及类似的逻辑哈；如果目前还缺对应的模块的 service，可以先给自己写 todo；
         // 校验存在
         validateClueExists(updateReqVO.getId());
+
         // 更新
         CrmClueDO updateObj = CrmClueConvert.INSTANCE.convert(updateReqVO);
         clueMapper.updateById(updateObj);

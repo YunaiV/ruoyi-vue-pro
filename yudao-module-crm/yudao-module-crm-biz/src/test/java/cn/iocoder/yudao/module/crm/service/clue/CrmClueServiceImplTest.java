@@ -144,17 +144,9 @@ public class CrmClueServiceImplTest extends BaseDbUnitTest {
        clueMapper.insert(cloneIgnoreId(dbClue, o -> o.setCreateTime(null)));
        // 准备参数
        CrmCluePageReqVO reqVO = new CrmCluePageReqVO();
-       reqVO.setTransformStatus(null);
-       reqVO.setFollowUpStatus(null);
        reqVO.setName(null);
-       reqVO.setCustomerId(null);
-       reqVO.setContactNextTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
        reqVO.setTelephone(null);
        reqVO.setMobile(null);
-       reqVO.setAddress(null);
-       reqVO.setOwnerUserId(null);
-       reqVO.setContactLastTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
-       reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
        // 调用
        PageResult<CrmClueDO> pageResult = clueService.getCluePage(reqVO);

@@ -4,7 +4,6 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.sun.xml.bind.v2.TODO;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -32,14 +31,10 @@ public class CrmClueDO extends BaseDO {
     private Long id;
     /**
      * 转化状态
-     *
-     * 枚举 {@link TODO infra_boolean_string 对应的类}
      */
     private Boolean transformStatus;
     /**
      * 跟进状态
-     *
-     * 枚举 {@link TODO infra_boolean_string 对应的类}
      */
     private Boolean followUpStatus;
     /**
@@ -47,7 +42,9 @@ public class CrmClueDO extends BaseDO {
      */
     private String name;
     /**
-     * 客户id
+     * 客户 id
+     *
+     * // TODO @wanwan：要写下关联的实体，以及对应的属性哈
      */
     private Long customerId;
     /**

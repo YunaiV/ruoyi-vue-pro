@@ -25,8 +25,6 @@ public interface CrmClueConvert {
 
     CrmClueRespVO convert(CrmClueDO bean);
 
-    List<CrmClueRespVO> convertList(List<CrmClueDO> list);
-
     PageResult<CrmClueRespVO> convertPage(PageResult<CrmClueDO> page);
 
     List<CrmClueExcelVO> convertList02(List<CrmClueDO> list);

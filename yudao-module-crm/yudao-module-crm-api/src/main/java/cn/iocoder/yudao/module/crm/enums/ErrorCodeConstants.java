@@ -15,8 +15,8 @@ public interface ErrorCodeConstants {
     // ========== 线索管理 1-020-001-000 ==========
     ErrorCode CLUE_NOT_EXISTS = new ErrorCode(1_020_001_000, "线索不存在");
 
-    // ========== 商机管理 1-020-001-000 ==========
-    ErrorCode BUSINESS_NOT_EXISTS = new ErrorCode(1_020_001_000, "商机不存在");
+    // ========== 商机管理 1-020-002-000 ==========
+    ErrorCode BUSINESS_NOT_EXISTS = new ErrorCode(1_020_002_000, "商机不存在");
 
     // TODO @liuhongfeng：错误码分段；
     ErrorCode RECEIVABLE_NOT_EXISTS = new ErrorCode(1_030_000_001, "回款管理不存在");

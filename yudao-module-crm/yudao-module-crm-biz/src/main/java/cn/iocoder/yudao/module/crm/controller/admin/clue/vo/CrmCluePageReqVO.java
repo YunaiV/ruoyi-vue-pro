@@ -11,6 +11,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class CrmCluePageReqVO extends PageParam {
+
     @Schema(description = "线索名称", example = "线索xxx")
     private String name;
 
@@ -19,4 +20,5 @@ public class CrmCluePageReqVO extends PageParam {
 
     @Schema(description = "手机号", example = "18000000000")
     private String mobile;
+
 }
