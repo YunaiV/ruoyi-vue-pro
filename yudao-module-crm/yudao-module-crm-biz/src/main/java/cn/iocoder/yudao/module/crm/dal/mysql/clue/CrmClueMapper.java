@@ -19,17 +19,9 @@ public interface CrmClueMapper extends BaseMapperX<CrmClueDO> {
 
     default PageResult<CrmClueDO> selectPage(CrmCluePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<CrmClueDO>()
-                .eqIfPresent(CrmClueDO::getTransformStatus, reqVO.getTransformStatus())
-                .eqIfPresent(CrmClueDO::getFollowUpStatus, reqVO.getFollowUpStatus())
                 .likeIfPresent(CrmClueDO::getName, reqVO.getName())
-                .eqIfPresent(CrmClueDO::getCustomerId, reqVO.getCustomerId())
-                .betweenIfPresent(CrmClueDO::getContactNextTime, reqVO.getContactNextTime())
                 .likeIfPresent(CrmClueDO::getTelephone, reqVO.getTelephone())
                 .likeIfPresent(CrmClueDO::getMobile, reqVO.getMobile())
-                .likeIfPresent(CrmClueDO::getAddress, reqVO.getAddress())
-                .eqIfPresent(CrmClueDO::getOwnerUserId, reqVO.getOwnerUserId())
-                .betweenIfPresent(CrmClueDO::getContactLastTime, reqVO.getContactLastTime())
-                .betweenIfPresent(CrmClueDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(CrmClueDO::getId));
     }
 
