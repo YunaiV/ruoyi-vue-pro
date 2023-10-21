@@ -36,6 +36,8 @@ public interface CombinationActivityService {
      */
     void updateCombinationActivity(@Valid CombinationActivityUpdateReqVO updateReqVO);
 
+    // TODO @puhui999：这里少了一个关闭活动的接口；因为关闭的活动，才可以删除
+
     /**
      * 删除拼团活动
      *

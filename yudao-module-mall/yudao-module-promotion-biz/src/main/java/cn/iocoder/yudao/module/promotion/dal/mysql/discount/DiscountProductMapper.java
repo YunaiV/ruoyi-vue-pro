@@ -28,6 +28,6 @@ public interface DiscountProductMapper extends BaseMapperX<DiscountProductDO> {
         return selectList(DiscountProductDO::getActivityId, activityIds);
     }
 
-
+    // TODO @zhangshuai：逻辑里，尽量避免写 join 语句哈，你可以看看这个查询，有什么办法优化？目前的一个思路，是分 2 次查询，性能也是 ok 的
     List<DiscountProductDO> getMatchDiscountProductList(@Param("skuIds") Collection<Long> skuIds);
 }

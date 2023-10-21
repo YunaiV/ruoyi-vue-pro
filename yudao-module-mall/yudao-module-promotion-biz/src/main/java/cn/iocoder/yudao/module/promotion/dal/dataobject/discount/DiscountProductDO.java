@@ -34,7 +34,6 @@ public class DiscountProductDO extends BaseDO {
      */
     private Long activityId;
 
-
     /**
      * 商品 SPU 编号
      *
@@ -67,7 +66,6 @@ public class DiscountProductDO extends BaseDO {
      */
     private Integer discountPrice;
 
-    // TODO 芋艿：这几个字段，要新增下；
     /**
      * 活动状态
      *

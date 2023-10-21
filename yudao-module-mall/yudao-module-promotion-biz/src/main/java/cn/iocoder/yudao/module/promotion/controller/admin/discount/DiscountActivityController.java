@@ -7,11 +7,8 @@ import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.*;
 import cn.iocoder.yudao.module.promotion.convert.discount.DiscountActivityConvert;
-import cn.iocoder.yudao.module.promotion.convert.seckill.seckillactivity.SeckillActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProductDO;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillActivityDO;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillProductDO;
 import cn.iocoder.yudao.module.promotion.service.discount.DiscountActivityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,8 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -94,7 +89,7 @@ public class DiscountActivityController {
     public CommonResult<PageResult<DiscountActivityRespVO>> getDiscountActivityPage(@Valid DiscountActivityPageReqVO pageVO) {
         PageResult<DiscountActivityDO> pageResult = discountActivityService.getDiscountActivityPage(pageVO);
 
-        if (CollUtil.isEmpty(pageResult.getList())) {
+        if (CollUtil.isEmpty(pageResult.getList())) { // TODO @zhangshuai：方法里的空行，目的是让代码分块，可以更清晰；所以上面这个空格可以不要，而下面判断之后的，空格，其实加下比较好；类似的还有 spuList、以及后面的 convert
             return success(PageResult.empty(pageResult.getTotal()));
         }
         // 拼接数据

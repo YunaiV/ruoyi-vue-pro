@@ -7,11 +7,8 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.discount.dto.DiscountProductRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.*;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityRespVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.product.SeckillProductRespVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProductDO;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillProductDO;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionDiscountTypeEnum;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -47,7 +44,7 @@ public interface DiscountActivityConvert {
                                                            List<ProductSpuRespDTO> spuList) {
         PageResult<DiscountActivityRespVO> pageResult = convertPage(page);
 
-        // 拼接商品
+        // 拼接商品 TODO @zhangshuai：类似空行的问题，也可以看看
         Map<Long, DiscountProductDO> discountActivityMap = CollectionUtils.convertMap(discountProductDOList, DiscountProductDO::getActivityId);
         Map<Long, ProductSpuRespDTO> spuMap = CollectionUtils.convertMap(spuList, ProductSpuRespDTO::getId);
         pageResult.getList().forEach(item -> {
