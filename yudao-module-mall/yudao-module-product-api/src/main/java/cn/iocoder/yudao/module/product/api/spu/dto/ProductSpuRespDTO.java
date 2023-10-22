@@ -3,8 +3,6 @@ package cn.iocoder.yudao.module.product.api.spu.dto;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import lombok.Data;
 
-import java.util.List;
-
 // TODO @LeeYan9: ProductSpuRespDTO
 /**
  * 商品 SPU 信息 Response DTO
@@ -27,54 +25,21 @@ public class ProductSpuRespDTO {
      */
     private String name;
     /**
-     * 关键字
-     */
-    private String keyword;
-    /**
      * 单位
      *
      * 对应 product_unit 数据字典
      */
     private Integer unit;
-    /**
-     * 商品简介
-     */
-    private String introduction;
-    /**
-     * 商品详情
-     */
-    private String description;
-    // TODO @芋艿：是不是要删除
-    /**
-     * 商品条码（一维码）
-     */
-    private String barCode;
 
     /**
      * 商品分类编号
      */
     private Long categoryId;
     /**
-     * 商品品牌编号
-     */
-    private Long brandId;
-    /**
      * 商品封面图
      */
     private String picUrl;
-    /**
-     * 商品轮播图
-     */
-    private List<String> sliderPicUrls;
-    /**
-     * 商品视频
-     */
-    private String videoUrl;
 
-    /**
-     * 排序字段
-     */
-    private Integer sort;
     /**
      * 商品状态
      * <p>
@@ -123,22 +88,6 @@ public class ProductSpuRespDTO {
      * 赠送积分
      */
     private Integer giveIntegral;
-
-    // ========== 统计相关字段 =========
-
-    /**
-     * 商品销量
-     */
-    private Integer salesCount;
-    /**
-     * 虚拟销量
-     */
-    private Integer virtualSalesCount;
-    /**
-     * 商品点击量
-     */
-    private Integer clickCount;
-
 
     // ========== 分销相关字段 =========
 
