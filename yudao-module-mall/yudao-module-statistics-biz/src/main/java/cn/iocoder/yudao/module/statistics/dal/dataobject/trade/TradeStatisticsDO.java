@@ -48,10 +48,6 @@ public class TradeStatisticsDO extends TenantBaseDO {
      * 总支付金额，单位：分
      */
     private Integer orderPayPrice;
-    /**
-     * 总支付金额（余额），单位：分
-     */
-    private Integer orderWalletPayPrice;
 
     /**
      * 退款订单数
@@ -67,6 +63,10 @@ public class TradeStatisticsDO extends TenantBaseDO {
      */
     private Integer brokerageSettlementPrice;
 
+    /**
+     * 总支付金额（余额），单位：分
+     */
+    private Integer walletPayPrice;
     /**
      * 充值订单数
      * <p>

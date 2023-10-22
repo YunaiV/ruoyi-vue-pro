@@ -152,7 +152,7 @@ public class TradeOrderUpdateServiceTest extends BaseDbUnitTest {
         }))).thenReturn(1000L);
 
         // 调用方法
-        TradeOrderDO order = tradeOrderUpdateService.createOrder(userId, userIp, reqVO);
+        TradeOrderDO order = tradeOrderUpdateService.createOrder(userId, userIp, reqVO, null);
         // 断言 TradeOrderDO 订单
         List<TradeOrderDO> tradeOrderDOs = tradeOrderMapper.selectList();
         assertEquals(tradeOrderDOs.size(), 1);

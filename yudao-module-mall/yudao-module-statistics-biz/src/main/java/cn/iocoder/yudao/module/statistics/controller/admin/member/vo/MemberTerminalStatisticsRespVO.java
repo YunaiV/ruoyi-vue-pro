@@ -10,6 +10,7 @@ public class MemberTerminalStatisticsRespVO {
     @Schema(description = "终端", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer terminal;
 
+    // TODO @疯狂：要不 orderCreateUserCount 和 orderPayUserCount 貌似更统一一些；
     @Schema(description = "会员数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer userCount;
 

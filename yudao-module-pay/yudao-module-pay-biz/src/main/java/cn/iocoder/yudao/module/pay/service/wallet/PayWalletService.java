@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.pay.service.wallet;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.wallet.PayWalletPageReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
 import cn.iocoder.yudao.module.pay.enums.member.PayWalletBizTypeEnum;
@@ -27,6 +29,15 @@ public interface PayWalletService {
      * @param walletId 钱包 id
      */
     PayWalletDO getWallet(Long walletId);
+
+
+    /**
+     * 获得会员钱包分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 会员钱包分页
+     */
+    PageResult<PayWalletDO> getWalletPage(Integer userType, PayWalletPageReqVO pageReqVO);
 
     /**
      * 钱包订单支付
@@ -85,6 +96,6 @@ public interface PayWalletService {
      * @param id    钱包编号
      * @param price 解冻金额
      */
-    void unFreezePrice(Long id, Integer price);
+    void unfreezePrice(Long id, Integer price);
 
 }

@@ -14,6 +14,7 @@ public interface PayTransferMapper extends BaseMapperX<PayTransferDO> {
         return update(updateObj, new LambdaQueryWrapper<PayTransferDO>()
                 .eq(PayTransferDO::getId, id).in(PayTransferDO::getStatus, status));
     }
+
 }
 
 

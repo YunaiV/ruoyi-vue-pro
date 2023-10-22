@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.pay.controller.admin.transfer.vo.PayTransferSubmi
 import javax.validation.Valid;
 
 /**
+ * 转账 Service 接口
+ *
  * @author jason
  */
 public interface PayTransferService {
@@ -29,4 +31,5 @@ public interface PayTransferService {
      * @return 转账单编号
      */
     Long createTransfer(@Valid PayTransferCreateReqDTO reqDTO);
+
 }

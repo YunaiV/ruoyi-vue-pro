@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.discount;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.*;
 import cn.iocoder.yudao.module.promotion.convert.discount.DiscountActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountActivityDO;
@@ -19,6 +22,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Tag(name = "管理后台 - 限时折扣活动")
 @RestController
@@ -28,6 +32,9 @@ public class DiscountActivityController {
 
     @Resource
     private DiscountActivityService discountActivityService;
+
+    @Resource
+    private ProductSpuApi productSpuApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建限时折扣活动")
@@ -49,7 +56,7 @@ public class DiscountActivityController {
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('promotion:discount-activity:close')")
     public CommonResult<Boolean> closeRewardActivity(@RequestParam("id") Long id) {
-        discountActivityService.closeRewardActivity(id);
+        discountActivityService.closeDiscountActivity(id);
         return success(true);
     }
 
@@ -81,7 +88,18 @@ public class DiscountActivityController {
     @PreAuthorize("@ss.hasPermission('promotion:discount-activity:query')")
     public CommonResult<PageResult<DiscountActivityRespVO>> getDiscountActivityPage(@Valid DiscountActivityPageReqVO pageVO) {
         PageResult<DiscountActivityDO> pageResult = discountActivityService.getDiscountActivityPage(pageVO);
-        return success(DiscountActivityConvert.INSTANCE.convertPage(pageResult));
+
+        if (CollUtil.isEmpty(pageResult.getList())) { // TODO @zhangshuai：方法里的空行，目的是让代码分块，可以更清晰；所以上面这个空格可以不要，而下面判断之后的，空格，其实加下比较好；类似的还有 spuList、以及后面的 convert
+            return success(PageResult.empty(pageResult.getTotal()));
+        }
+        // 拼接数据
+        List<DiscountProductDO> products = discountActivityService.getDiscountProductsByActivityId(
+                convertSet(pageResult.getList(), DiscountActivityDO::getId));
+
+        List<ProductSpuRespDTO> spuList = productSpuApi.getSpuList(
+                convertSet(products, DiscountProductDO::getSpuId));
+
+        return success(DiscountActivityConvert.INSTANCE.convertPage(pageResult, products, spuList));
     }
 
 }

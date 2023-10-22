@@ -19,6 +19,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserType;
 
@@ -35,9 +36,9 @@ public class AppPayWalletRechargeController {
     @PostMapping("/create")
     @Operation(summary = "创建钱包充值记录（发起充值）")
     public CommonResult<AppPayWalletRechargeCreateRespVO> createWalletRecharge(
-            @Valid @RequestBody AppPayWalletRechargeCreateReqVO reqVO) {
+            @Valid  @RequestBody  AppPayWalletRechargeCreateReqVO reqVO) {
         PayWalletRechargeDO walletRecharge = walletRechargeService.createWalletRecharge(
-                getLoginUserId(), getLoginUserType(), reqVO);
+                getLoginUserId(), getLoginUserType(), getClientIP(), reqVO);
         return success(PayWalletRechargeConvert.INSTANCE.convert(walletRecharge));
     }
 

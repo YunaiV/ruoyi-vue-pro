@@ -4,7 +4,6 @@ import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserRespDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserUnbindReqDTO;
-import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 
 import javax.validation.Valid;
 
@@ -14,15 +13,6 @@ import javax.validation.Valid;
  * @author 芋道源码
  */
 public interface SocialUserApi {
-
-    /**
-     * 获得社交平台的授权 URL
-     *
-     * @param type 社交平台的类型 {@link SocialTypeEnum}
-     * @param redirectUri 重定向 URL
-     * @return 社交平台的授权 URL
-     */
-    String getAuthorizeUrl(Integer type, String redirectUri);
 
     /**
      * 绑定社交用户

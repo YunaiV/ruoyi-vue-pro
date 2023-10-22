@@ -46,10 +46,10 @@ public class PayDemoTransferServiceImpl implements PayDemoTransferService {
     @Transactional(rollbackFor = Exception.class)
     public Long createDemoTransfer(Long userId, @Valid PayDemoTransferCreateReqVO vo) {
         // 1 校验收款账号
-        validatePayeeInfo(vo.getTransferType(), vo.getPayeeInfo());
+        validatePayeeInfo(vo.getType(), vo.getPayeeInfo());
 
         // 2 保存示例转账业务表
-        PayDemoTransferDO demoTransfer = new PayDemoTransferDO().setUserId(userId).setType(vo.getTransferType())
+        PayDemoTransferDO demoTransfer = new PayDemoTransferDO().setUserId(userId).setType(vo.getType())
                 .setPrice(vo.getPrice()).setPayeeInfo(vo.getPayeeInfo())
                 .setTransferStatus(WAITING.getStatus());
         demoTransferMapper.insert(demoTransfer);
@@ -64,8 +64,10 @@ public class PayDemoTransferServiceImpl implements PayDemoTransferService {
         return demoTransfer.getId();
     }
 
+    // TODO @jason：可以参考 AppBrokerageWithdrawCreateReqVO 搞下字段哈，进行校验
+    // @jason payeeinfo 字段确定改一下
     private void validatePayeeInfo(Integer transferType, Map<String, String> payeeInfo) {
-        PayTransferTypeEnum transferTypeEnum = ofType(transferType);
+        PayTransferTypeEnum transferTypeEnum = typeOf(transferType);
         switch (transferTypeEnum) {
             case ALIPAY_BALANCE: {
                 if (StrUtil.isEmpty(MapUtil.getStr(payeeInfo, ALIPAY_LOGON_ID))) {
@@ -83,4 +85,5 @@ public class PayDemoTransferServiceImpl implements PayDemoTransferService {
             }
         }
     }
+
 }

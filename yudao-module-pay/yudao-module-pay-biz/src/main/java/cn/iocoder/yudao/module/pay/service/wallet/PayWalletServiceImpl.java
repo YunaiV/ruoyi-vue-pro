@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.pay.service.wallet;
 
 import cn.hutool.core.lang.Assert;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.wallet.PayWalletPageReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
@@ -61,6 +63,11 @@ public class PayWalletServiceImpl implements  PayWalletService {
     }
 
     @Override
+    public PageResult<PayWalletDO> getWalletPage(Integer userType,PayWalletPageReqVO pageReqVO) {
+        return walletMapper.selectPage(userType, pageReqVO);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public PayWalletTransactionDO orderPay(Long userId, Integer userType, String outTradeNo, Integer price) {
         // 1. 判断支付交易拓展单是否存
@@ -102,6 +109,7 @@ public class PayWalletServiceImpl implements  PayWalletService {
         if (walletTransaction == null) {
             throw exception(WALLET_TRANSACTION_NOT_FOUND);
         }
+        // 2. 校验退款是否存在
         PayWalletTransactionDO refundTransaction = walletTransactionService.getWalletTransaction(
                 String.valueOf(refundId), PAYMENT_REFUND);
         if (refundTransaction != null) {
@@ -121,7 +129,7 @@ public class PayWalletServiceImpl implements  PayWalletService {
         }
 
         // 2.1 扣除余额
-        int updateCounts = 0 ;
+        int updateCounts;
         switch (bizType) {
             case PAYMENT: {
                 updateCounts = walletMapper.updateWhenConsumption(payWallet.getId(), price);
@@ -188,7 +196,7 @@ public class PayWalletServiceImpl implements  PayWalletService {
     }
 
     @Override
-    public void unFreezePrice(Long id, Integer price) {
+    public void unfreezePrice(Long id, Integer price) {
         int updateCounts = walletMapper.unFreezePrice(id, price);
         if (updateCounts == 0) {
             throw exception(WALLET_FREEZE_PRICE_NOT_ENOUGH);

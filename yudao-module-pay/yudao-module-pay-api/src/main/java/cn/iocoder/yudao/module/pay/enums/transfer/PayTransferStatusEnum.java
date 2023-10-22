@@ -24,7 +24,13 @@ public enum PayTransferStatusEnum {
      */
     CLOSED(30, "转账关闭");
 
+    /**
+     * 状态
+     */
     private final Integer status;
+    /**
+     * 状态名
+     */
     private final String name;
 
     public static boolean isSuccess(Integer status) {
@@ -45,4 +51,5 @@ public enum PayTransferStatusEnum {
     public static boolean isPendingStatus(Integer status) {
         return Objects.equals(status, WAITING.getStatus()) || Objects.equals(status, IN_PROGRESS.status);
     }
+
 }

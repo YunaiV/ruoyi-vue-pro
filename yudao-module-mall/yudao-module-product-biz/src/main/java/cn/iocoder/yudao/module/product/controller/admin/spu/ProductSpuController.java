@@ -8,8 +8,11 @@ import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
+import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
+import cn.iocoder.yudao.module.promotion.api.coupon.CouponTemplateApi;
+import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponTemplateRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +44,9 @@ public class ProductSpuController {
     private ProductSpuService productSpuService;
     @Resource
     private ProductSkuService productSkuService;
+
+    @Resource
+    private CouponTemplateApi couponTemplateApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建商品 SPU")
@@ -85,14 +92,20 @@ public class ProductSpuController {
         }
         // 查询商品 SKU
         List<ProductSkuDO> skus = productSkuService.getSkuListBySpuId(spu.getId());
-        return success(ProductSpuConvert.INSTANCE.convertForSpuDetailRespVO(spu, skus));
+        // 查询优惠卷
+        // TODO @puhui999：优惠劵的信息，要不交给前端读取？主要是为了避免商品依赖 promotion 模块哈；
+        List<CouponTemplateRespDTO> couponTemplateList = couponTemplateApi.getCouponTemplateListByIds(
+                spu.getGiveCouponTemplateIds());
+        return success(ProductSpuConvert.INSTANCE.convertForSpuDetailRespVO(spu, skus, couponTemplateList));
     }
 
-    @GetMapping("/get-simple-list")
+    @GetMapping("/list-all-simple")
     @Operation(summary = "获得商品 SPU 精简列表")
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
     public CommonResult<List<ProductSpuSimpleRespVO>> getSpuSimpleList() {
-        List<ProductSpuDO> list = productSpuService.getSpuList();
+        List<ProductSpuDO> list = productSpuService.getSpuListByStatus(ProductSpuStatusEnum.ENABLE.getStatus());
+        // 降序排序后，返回给前端
+        list.sort(Comparator.comparing(ProductSpuDO::getSort).reversed());
         return success(ProductSpuConvert.INSTANCE.convertList02(list));
     }
 

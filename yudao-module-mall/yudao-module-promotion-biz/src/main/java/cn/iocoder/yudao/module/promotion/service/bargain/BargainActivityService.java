@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.Ba
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityDO;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -102,10 +103,11 @@ public interface BargainActivityService {
     /**
      * 获取指定 spu 编号最近参加的活动，每个 spuId 只返回一条记录
      *
-     * @param spuIds spu 编号
-     * @param status 状态
+     * @param spuIds   spu 编号
+     * @param status   状态
+     * @param dateTime 日期时间
      * @return 砍价活动列表
      */
-    List<BargainActivityDO> getBargainActivityBySpuIdsAndStatus(Collection<Long> spuIds, Integer status);
+    List<BargainActivityDO> getBargainActivityBySpuIdsAndStatusAndDateTimeLt(Collection<Long> spuIds, Integer status, LocalDateTime dateTime);
 
 }

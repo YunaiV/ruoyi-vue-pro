@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.trade.service.order;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderSummaryRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
@@ -42,11 +43,11 @@ public interface TradeOrderQueryService {
      * 获得指定用户，指定活动，指定状态的交易订单
      *
      * @param userId     用户编号
-     * @param activityId 活动编号
+     * @param combinationActivityId 活动编号
      * @param status     订单状态
      * @return 交易订单
      */
-    TradeOrderDO getActivityOrderByUserIdAndActivityIdAndStatus(Long userId, Long activityId, Integer status);
+    TradeOrderDO getOrderByUserIdAndStatusAndCombination(Long userId, Long combinationActivityId, Integer status);
 
     /**
      * 获得订单列表
@@ -63,6 +64,14 @@ public interface TradeOrderQueryService {
      * @return 交易订单
      */
     PageResult<TradeOrderDO> getOrderPage(TradeOrderPageReqVO reqVO);
+
+    /**
+     * 获得订单统计
+     *
+     * @param reqVO 请求参数
+     * @return 订单统计
+     */
+    TradeOrderSummaryRespVO getOrderSummary(TradeOrderPageReqVO reqVO);
 
     /**
      * 【会员】获得交易订单分页

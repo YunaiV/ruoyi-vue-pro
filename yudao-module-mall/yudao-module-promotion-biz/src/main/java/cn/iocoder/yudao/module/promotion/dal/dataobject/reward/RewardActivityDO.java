@@ -38,7 +38,6 @@ public class RewardActivityDO extends BaseDO {
      * 活动标题
      */
     private String name;
-    // TODO @芋艿：改成开启、禁用两种状态
     /**
      * 状态
      *

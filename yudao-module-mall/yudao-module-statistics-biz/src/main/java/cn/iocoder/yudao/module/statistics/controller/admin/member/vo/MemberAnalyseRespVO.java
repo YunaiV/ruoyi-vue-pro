@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.statistics.controller.admin.member.vo;
 
-import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeStatisticsComparisonRespVO;
+import cn.iocoder.yudao.module.statistics.controller.admin.common.vo.DataComparisonRespVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -9,7 +9,7 @@ import lombok.Data;
 public class MemberAnalyseRespVO {
 
     @Schema(description = "访客数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    private Integer visitorCount;
+    private Integer visitUserCount;
 
     @Schema(description = "下单用户数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer orderUserCount;
@@ -17,10 +17,10 @@ public class MemberAnalyseRespVO {
     @Schema(description = "成交用户数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer payUserCount;
 
-    @Schema(description = "客单价", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    @Schema(description = "客单价，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer atv;
 
     @Schema(description = "对照数据", requiredMode = Schema.RequiredMode.REQUIRED)
-    private TradeStatisticsComparisonRespVO<MemberAnalyseComparisonRespVO> comparison;
+    private DataComparisonRespVO<MemberAnalyseDataRespVO> comparison;
 
 }
