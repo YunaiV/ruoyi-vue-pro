@@ -117,6 +117,61 @@ VALUES (
    '线索导出', 'crm:clue:export', 3, 5, @parentId,
    '', '', '', 0
 );
+-- 菜单 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status, component_name
+)
+VALUES (
+           '联系人', '', 2, 0, ${table.parentMenuId},
+           'contact', '', 'crm/contact/index', 0, 'Contact'
+       );
+
+-- 按钮父菜单ID
+-- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+           '联系人查询', 'crm:contact:query', 3, 1, @parentId,
+           '', '', '', 0
+       );
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+           '联系人创建', 'crm:contact:create', 3, 2, @parentId,
+           '', '', '', 0
+       );
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+           '联系人更新', 'crm:contact:update', 3, 3, @parentId,
+           '', '', '', 0
+       );
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+           '联系人删除', 'crm:contact:delete', 3, 4, @parentId,
+           '', '', '', 0
+       );
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+           '联系人导出', 'crm:contact:export', 3, 5, @parentId,
+           '', '', '', 0
+       );
 
 -- ----------------------------
 -- 合同菜单
