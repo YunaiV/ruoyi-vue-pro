@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class UserCreateMessage extends AbstractStreamMessage {
+public class MemberUserCreateMessage extends AbstractStreamMessage {
 
     /**
      * 用户编号
@@ -23,7 +23,7 @@ public class UserCreateMessage extends AbstractStreamMessage {
 
     @Override
     public String getStreamKey() {
-        return "member.create.send";
+        return "member.user.create";
     }
 
 }

@@ -4,11 +4,11 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
-import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.member.controller.admin.signin.vo.record.MemberSignInRecordRespVO;
 import cn.iocoder.yudao.module.member.controller.app.signin.vo.record.AppMemberSignInRecordRespVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInConfigDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInRecordDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -29,10 +29,10 @@ public interface MemberSignInRecordConvert {
 
     MemberSignInRecordConvert INSTANCE = Mappers.getMapper(MemberSignInRecordConvert.class);
 
-    default PageResult<MemberSignInRecordRespVO> convertPage(PageResult<MemberSignInRecordDO> pageResult, List<MemberUserRespDTO> users) {
+    default PageResult<MemberSignInRecordRespVO> convertPage(PageResult<MemberSignInRecordDO> pageResult, List<MemberUserDO> users) {
         PageResult<MemberSignInRecordRespVO> voPageResult = convertPage(pageResult);
         // user 拼接
-        Map<Long, MemberUserRespDTO> userMap = convertMap(users, MemberUserRespDTO::getId);
+        Map<Long, MemberUserDO> userMap = convertMap(users, MemberUserDO::getId);
         voPageResult.getList().forEach(record -> MapUtils.findAndThen(userMap, record.getUserId(),
                 memberUserRespDTO -> record.setNickname(memberUserRespDTO.getNickname())));
         return voPageResult;

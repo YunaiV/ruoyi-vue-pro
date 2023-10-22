@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.trade.service.order;
 
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.member.api.address.AddressApi;
-import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
+import cn.iocoder.yudao.module.member.api.address.MemberAddressApi;
+import cn.iocoder.yudao.module.member.api.address.dto.MemberAddressRespDTO;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
@@ -77,7 +77,7 @@ public class TradeOrderUpdateServiceTest extends BaseDbUnitTest {
     @MockBean
     private PayOrderApi payOrderApi;
     @MockBean
-    private AddressApi addressApi;
+    private MemberAddressApi addressApi;
     @MockBean
     private CouponApi couponApi;
 
@@ -116,7 +116,7 @@ public class TradeOrderUpdateServiceTest extends BaseDbUnitTest {
                 .setStatus(ProductSpuStatusEnum.ENABLE.getStatus()));
         when(productSpuApi.getSpuList(eq(asSet(11L, 21L)))).thenReturn(Arrays.asList(spu01, spu02));
         // mock 方法（用户收件地址的校验）
-        AddressRespDTO addressRespDTO = new AddressRespDTO().setId(10L).setUserId(userId).setName("芋艿")
+        MemberAddressRespDTO addressRespDTO = new MemberAddressRespDTO().setId(10L).setUserId(userId).setName("芋艿")
                 .setMobile("15601691300").setAreaId(3306).setDetailAddress("土豆村");
         when(addressApi.getAddress(eq(10L), eq(userId))).thenReturn(addressRespDTO);
         // mock 方法（价格计算）

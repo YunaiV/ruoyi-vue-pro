@@ -8,7 +8,7 @@ import lombok.Data;
  * @author 芋道源码
  */
 @Data
-public class AddressRespDTO {
+public class MemberAddressRespDTO {
 
     /**
      * 编号

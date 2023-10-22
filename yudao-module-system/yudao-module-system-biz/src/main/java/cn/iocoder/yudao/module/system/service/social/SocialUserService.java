@@ -16,7 +16,6 @@ import java.util.List;
  */
 public interface SocialUserService {
 
-    // TODO @芋艿：需要传递 userType
     /**
      * 获得指定用户的社交用户列表
      *
@@ -39,10 +38,10 @@ public interface SocialUserService {
      *
      * @param userId 用户编号
      * @param userType 全局用户类型
-     * @param type 社交平台的类型 {@link SocialTypeEnum}
+     * @param socialType 社交平台的类型 {@link SocialTypeEnum}
      * @param openid 社交平台的 openid
      */
-    void unbindSocialUser(Long userId, Integer userType, Integer type, String openid);
+    void unbindSocialUser(Long userId, Integer userType, Integer socialType, String openid);
 
     /**
      * 获得社交用户
@@ -50,11 +49,11 @@ public interface SocialUserService {
      * 在认证信息不正确的情况下，也会抛出 {@link ServiceException} 业务异常
      *
      * @param userType 用户类型
-     * @param type 社交平台的类型
+     * @param socialType 社交平台的类型
      * @param code 授权码
      * @param state state
      * @return 社交用户
      */
-    SocialUserRespDTO getSocialUser(Integer userType, Integer type, String code, String state);
+    SocialUserRespDTO getSocialUser(Integer userType, Integer socialType, String code, String state);
 
 }

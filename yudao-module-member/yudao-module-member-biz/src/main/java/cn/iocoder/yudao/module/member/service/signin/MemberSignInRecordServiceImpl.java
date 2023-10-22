@@ -7,18 +7,18 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
-import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.member.controller.admin.signin.vo.record.MemberSignInRecordPageReqVO;
 import cn.iocoder.yudao.module.member.controller.app.signin.vo.record.AppMemberSignInRecordSummaryRespVO;
 import cn.iocoder.yudao.module.member.convert.signin.MemberSignInRecordConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInConfigDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInRecordDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.signin.MemberSignInRecordMapper;
 import cn.iocoder.yudao.module.member.enums.MemberExperienceBizTypeEnum;
 import cn.iocoder.yudao.module.member.enums.point.MemberPointBizTypeEnum;
 import cn.iocoder.yudao.module.member.service.level.MemberLevelService;
 import cn.iocoder.yudao.module.member.service.point.MemberPointRecordService;
+import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,7 +53,7 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
     private MemberLevelService memberLevelService;
 
     @Resource
-    private MemberUserApi memberUserApi;
+    private MemberUserService memberUserService;
 
     @Override
     public AppMemberSignInRecordSummaryRespVO getSignInRecordSummary(Long userId) {
@@ -124,12 +124,12 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
         // 根据用户昵称查询出用户ids
         Set<Long> userIds = null;
         if (StringUtils.isNotBlank(pageReqVO.getNickname())) {
-            List<MemberUserRespDTO> users = memberUserApi.getUserListByNickname(pageReqVO.getNickname());
+            List<MemberUserDO> users = memberUserService.getUserListByNickname(pageReqVO.getNickname());
             // 如果查询用户结果为空直接返回无需继续查询
             if (CollUtil.isEmpty(users)) {
                 return PageResult.empty();
             }
-            userIds = convertSet(users, MemberUserRespDTO::getId);
+            userIds = convertSet(users, MemberUserDO::getId);
         }
         // 分页查询
         return signInRecordMapper.selectPage(pageReqVO, userIds);

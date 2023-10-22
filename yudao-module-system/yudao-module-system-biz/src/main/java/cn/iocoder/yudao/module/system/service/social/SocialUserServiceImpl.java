@@ -80,9 +80,9 @@ public class SocialUserServiceImpl implements SocialUserService {
     }
 
     @Override
-    public void unbindSocialUser(Long userId, Integer userType, Integer type, String openid) {
+    public void unbindSocialUser(Long userId, Integer userType, Integer socialType, String openid) {
         // 获得 openid 对应的 SocialUserDO 社交用户
-        SocialUserDO socialUser = socialUserMapper.selectByTypeAndOpenid(type, openid);
+        SocialUserDO socialUser = socialUserMapper.selectByTypeAndOpenid(socialType, openid);
         if (socialUser == null) {
             throw exception(SOCIAL_USER_NOT_FOUND);
         }
@@ -92,9 +92,9 @@ public class SocialUserServiceImpl implements SocialUserService {
     }
 
     @Override
-    public SocialUserRespDTO getSocialUser(Integer userType, Integer type, String code, String state) {
+    public SocialUserRespDTO getSocialUser(Integer userType, Integer socialType, String code, String state) {
         // 获得社交用户
-        SocialUserDO socialUser = authSocialUser(type, userType, code, state);
+        SocialUserDO socialUser = authSocialUser(socialType, userType, code, state);
         Assert.notNull(socialUser, "社交用户不能为空");
 
         // 如果未绑定的社交用户，则无法自动登录，进行报错
