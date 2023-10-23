@@ -59,10 +59,9 @@ public interface ErrorCodeConstants {
     ErrorCode WALLET_RECHARGE_REFUND_FAIL_REFUND_ORDER_ID_ERROR = new ErrorCode(1_007_008_008, "钱包退款更新失败，钱包退款单编号不匹配");
     ErrorCode WALLET_RECHARGE_REFUND_FAIL_REFUND_NOT_FOUND = new ErrorCode(1_007_008_009, "钱包退款更新失败，退款订单不存在");
     ErrorCode WALLET_RECHARGE_REFUND_FAIL_REFUND_PRICE_NOT_MATCH = new ErrorCode(1_007_008_010, "钱包退款更新失败，退款单金额不匹配");
-    ErrorCode WALLET_RECHARGE_PACKAGE_AND_PRICE_IS_EMPTY = new ErrorCode(1_007_008_011, "充值金额和充钱套餐不能同时为空");
-    ErrorCode WALLET_RECHARGE_PACKAGE_NOT_FOUND = new ErrorCode(1_007_008_012, "钱包充值套餐不存在");
-    ErrorCode WALLET_RECHARGE_PACKAGE_IS_DISABLE = new ErrorCode(1_007_008_013, "钱包充值套餐已禁用");
-    ErrorCode WALLET_RECHARGE_PACKAGE_NAME_EXISTS = new ErrorCode(1_007_008_014, "钱包充值套餐名称已存在");
+    ErrorCode WALLET_RECHARGE_PACKAGE_NOT_FOUND = new ErrorCode(1_007_008_011, "钱包充值套餐不存在");
+    ErrorCode WALLET_RECHARGE_PACKAGE_IS_DISABLE = new ErrorCode(1_007_008_012, "钱包充值套餐已禁用");
+    ErrorCode WALLET_RECHARGE_PACKAGE_NAME_EXISTS = new ErrorCode(1_007_008_013, "钱包充值套餐名称已存在");
 
     // ========== 转账模块 1-007-009-000 ==========
     ErrorCode PAY_TRANSFER_SUBMIT_CHANNEL_ERROR = new ErrorCode(1_007_009_000, "发起转账报错，错误码：{}，错误提示：{}");

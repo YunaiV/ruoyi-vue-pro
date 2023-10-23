@@ -64,11 +64,6 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
     @Transactional(rollbackFor = Exception.class)
     public PayWalletRechargeDO createWalletRecharge(Long userId, Integer userType, String userIp,
                                                     AppPayWalletRechargeCreateReqVO reqVO) {
-
-        if (Objects.isNull(reqVO.getPayPrice()) && Objects.isNull(reqVO.getPackageId())) {
-            //  TODO @jason @AssertTrue 貌似没有效果。需要查下原因
-            throw exception(WALLET_RECHARGE_PACKAGE_AND_PRICE_IS_EMPTY);
-        }
         // 1.1 计算充值金额
         int payPrice;
         int bonusPrice = 0;
