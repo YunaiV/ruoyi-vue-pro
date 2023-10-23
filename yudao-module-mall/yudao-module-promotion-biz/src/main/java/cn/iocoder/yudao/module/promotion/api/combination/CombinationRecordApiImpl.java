@@ -45,11 +45,6 @@ public class CombinationRecordApiImpl implements CombinationRecordApi {
     }
 
     @Override
-    public void updateRecordStatusToFailed(Long userId, Long orderId) {
-        recordService.updateCombinationRecordStatusByUserIdAndOrderId(CombinationRecordStatusEnum.FAILED.getStatus(), userId, orderId);
-    }
-
-    @Override
     public CombinationValidateJoinRespDTO validateJoinCombination(Long userId, Long activityId, Long headId, Long skuId, Integer count) {
         return recordService.validateJoinCombination(userId, activityId, headId, skuId, count);
     }

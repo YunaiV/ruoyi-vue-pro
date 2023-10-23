@@ -66,25 +66,6 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     @Resource
     private TradeOrderApi tradeOrderApi;
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateCombinationRecordStatusByUserIdAndOrderId(Integer status, Long userId, Long orderId) {
-        // 校验拼团是否存在
-        CombinationRecordDO record = validateCombinationRecord(userId, orderId);
-
-        // 更新状态
-        combinationRecordMapper.updateById(new CombinationRecordDO().setId(record.getId()).setStatus(status));
-    }
-
-    private CombinationRecordDO validateCombinationRecord(Long userId, Long orderId) {
-        // 校验拼团是否存在
-        CombinationRecordDO recordDO = combinationRecordMapper.selectByUserIdAndOrderId(userId, orderId);
-        if (recordDO == null) {
-            throw exception(COMBINATION_RECORD_NOT_EXISTS);
-        }
-        return recordDO;
-    }
-
     // TODO @芋艿：在详细预览下；
     @Override
     public KeyValue<CombinationActivityDO, CombinationProductDO> validateCombinationRecord(
@@ -227,11 +208,6 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     @Override
     public CombinationRecordDO getCombinationRecord(Long userId, Long orderId) {
         return combinationRecordMapper.selectByUserIdAndOrderId(userId, orderId);
-    }
-
-    @Override
-    public List<CombinationRecordDO> getCombinationRecordListByUserIdAndActivityId(Long userId, Long activityId) {
-        return combinationRecordMapper.selectListByUserIdAndActivityId(userId, activityId);
     }
 
     @Override
