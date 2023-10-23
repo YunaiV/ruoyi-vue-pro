@@ -123,8 +123,8 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         }
 
         // 2. 校验商品 sku 都存在
-        Map<Long, ProductSkuRespDTO> skuMap = convertMap(productSkuApi.getSkuListBySpuId(singletonList(spuId)),
-                ProductSkuRespDTO::getId);
+        List<ProductSkuRespDTO> skus = productSkuApi.getSkuListBySpuId(singletonList(spuId));
+        Map<Long, ProductSkuRespDTO> skuMap = convertMap(skus, ProductSkuRespDTO::getId);
         products.forEach(product -> {
             if (!skuMap.containsKey(product.getSkuId())) {
                 throw exception(SKU_NOT_EXISTS);

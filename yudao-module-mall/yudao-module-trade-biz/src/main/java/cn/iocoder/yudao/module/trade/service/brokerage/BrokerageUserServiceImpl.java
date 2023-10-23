@@ -232,7 +232,8 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
             return PageResult.empty();
         }
         // 1.2 根据昵称过滤下级用户
-        Map<Long, MemberUserRespDTO> userMap = convertMapByFilter(memberUserApi.getUserList(childIds),
+        List<MemberUserRespDTO> users = memberUserApi.getUserList(childIds);
+        Map<Long, MemberUserRespDTO> userMap = convertMapByFilter(users,
                 user -> StrUtil.contains(user.getNickname(), pageReqVO.getNickname()),
                 MemberUserRespDTO::getId);
         if (CollUtil.isEmpty(userMap)) {
