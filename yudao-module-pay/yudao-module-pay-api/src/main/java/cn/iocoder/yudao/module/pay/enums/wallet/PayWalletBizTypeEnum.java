@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.pay.enums.member;
+package cn.iocoder.yudao.module.pay.enums.wallet;
 
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
