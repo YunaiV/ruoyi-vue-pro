@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponTemplateRespDTO;
 import cn.iocoder.yudao.module.promotion.convert.coupon.CouponTemplateConvert;
 import cn.iocoder.yudao.module.promotion.service.coupon.CouponTemplateService;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.Collection;
@@ -17,6 +18,7 @@ import java.util.List;
  * @author HUIHUI
  */
 @Service
+@Validated
 public class CouponTemplateApiImpl implements CouponTemplateApi {
 
     @Resource

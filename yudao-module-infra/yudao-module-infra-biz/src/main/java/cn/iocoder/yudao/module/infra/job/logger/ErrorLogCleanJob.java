@@ -2,22 +2,23 @@ package cn.iocoder.yudao.module.infra.job.logger;
 
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
-import cn.iocoder.yudao.module.infra.service.job.JobLogService;
+import cn.iocoder.yudao.module.infra.service.logger.ApiErrorLogService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
 import javax.annotation.Resource;
 
 /**
- * 物理删除 N 天前的任务日志的 Job
+ * 物理删除 N 天前的错误日志的 Job
  *
  * @author j-sentinel
  */
 @Slf4j
 @Component
-public class JobLogCleanJob implements JobHandler {
+public class ErrorLogCleanJob implements JobHandler {
 
     @Resource
-    private JobLogService jobLogService;
+    private ApiErrorLogService apiErrorLogService;
 
     /**
      * 清理超过（14）天的日志
@@ -32,9 +33,9 @@ public class JobLogCleanJob implements JobHandler {
     @Override
     @TenantIgnore
     public String execute(String param) {
-        Integer count = jobLogService.cleanJobLog(JOB_CLEAN_RETAIN_DAY, DELETE_LIMIT);
-        log.info("[count][定时执行清理定时任务日志数量 ({}) 个]", count);
-        return String.format("定时执行清理定时任务日志数量 %s 个", count);
+        Integer count = apiErrorLogService.cleanErrorLog(JOB_CLEAN_RETAIN_DAY,DELETE_LIMIT);
+        log.info("[execute][定时执行清理错误日志数量 ({}) 个]", count);
+        return String.format("定时执行清理错误日志数量 %s 个", count);
     }
 
 }
