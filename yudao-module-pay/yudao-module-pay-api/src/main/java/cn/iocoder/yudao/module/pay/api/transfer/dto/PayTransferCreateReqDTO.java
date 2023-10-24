@@ -10,6 +10,8 @@ import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 /**
+ * 转账单创建 Request DTO
+ *
  * @author jason
  */
 @Data
