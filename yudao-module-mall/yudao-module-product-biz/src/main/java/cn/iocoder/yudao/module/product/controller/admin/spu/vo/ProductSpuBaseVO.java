@@ -96,9 +96,6 @@ public class ProductSpuBaseVO {
     @NotNull(message = "商品赠送积分不能为空")
     private Integer giveIntegral;
 
-    @Schema(description = "赠送的优惠劵数组包含优惠券编号和名称")
-    private List<GiveCouponTemplate> giveCouponTemplates;
-
     @Schema(description = "分销类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     @NotNull(message = "商品分销类型不能为空")
     private Boolean subCommissionType;
@@ -110,17 +107,5 @@ public class ProductSpuBaseVO {
 
     @Schema(description = "虚拟销量", example = "66")
     private Integer virtualSalesCount;
-
-    @Schema(description = "管理后台 - 商品 SPU 赠送的优惠卷")
-    @Data
-    public static class GiveCouponTemplate {
-
-        @Schema(description = "模板编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-        private Long id;
-
-        @Schema(description = "优惠劵名", requiredMode = Schema.RequiredMode.REQUIRED, example = "春节送送送")
-        private String name;
-
-    }
 
 }

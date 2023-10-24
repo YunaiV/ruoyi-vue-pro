@@ -119,7 +119,7 @@ public class OAuth2ClientServiceImpl implements OAuth2ClientService {
         if (client == null) {
             throw exception(OAUTH2_CLIENT_NOT_EXISTS);
         }
-        if (ObjectUtil.notEqual(client.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+        if (CommonStatusEnum.isDisable(client.getStatus())) {
             throw exception(OAUTH2_CLIENT_DISABLE);
         }
 

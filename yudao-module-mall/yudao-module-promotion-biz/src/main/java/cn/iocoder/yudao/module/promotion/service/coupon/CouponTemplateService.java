@@ -98,6 +98,6 @@ public interface CouponTemplateService {
      * @param ids 优惠券模版编号
      * @return 优惠券模版列表
      */
-    List<CouponTemplateDO> getCouponTemplateListByIds(Collection<Long> ids);
+    List<CouponTemplateDO> getCouponTemplateList(Collection<Long> ids);
 
 }

@@ -58,36 +58,38 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
     @Override
     public AppMemberSignInRecordSummaryRespVO getSignInRecordSummary(Long userId) {
         // 1. 初始化默认返回信息
-        // TODO @puhui999：这里 vo 改成 summary 会更好理解；
-        AppMemberSignInRecordSummaryRespVO vo = new AppMemberSignInRecordSummaryRespVO();
-        vo.setTotalDay(0);
-        vo.setContinuousDay(0);
-        vo.setTodaySignIn(false);
+        AppMemberSignInRecordSummaryRespVO summary = new AppMemberSignInRecordSummaryRespVO();
+        summary.setTotalDay(0);
+        summary.setContinuousDay(0);
+        summary.setTodaySignIn(false);
 
         // 2. 获取用户签到的记录数
         Long signCount = signInRecordMapper.selectCountByUserId(userId);
         if (ObjUtil.equal(signCount, 0L)) {
-            return vo;
+            return summary;
         }
-        vo.setTotalDay(signCount.intValue()); // 设置总签到天数
+        summary.setTotalDay(signCount.intValue()); // 设置总签到天数
 
         // 3. 校验当天是否有签到
-        // TODO @puhui999：是不是 signInRecord 可以精简成 record 哈；另外，Desc 貌似可以去掉哈；最后一条了；
-        MemberSignInRecordDO signInRecord = signInRecordMapper.selectLastRecordByUserIdDesc(userId);
-        if (signInRecord == null) {
-            return vo;
+        MemberSignInRecordDO lastRecord = signInRecordMapper.selectLastRecordByUserId(userId);
+        if (lastRecord == null) {
+            return summary;
         }
-        vo.setTodaySignIn(DateUtils.isToday(signInRecord.getCreateTime()));
+        summary.setTodaySignIn(DateUtils.isToday(lastRecord.getCreateTime()));
 
         // 4. 校验今天是否签到，没有签到则直接返回
-        if (!vo.getTodaySignIn()) {
-            return vo;
+        if (!summary.getTodaySignIn()) {
+            return summary;
         }
         // 4.1. 判断连续签到天数
-        // TODO @puhui999：连续签到，可以基于 signInRecord 的 day 和当前时间判断呀？
+        // TODO @puhui999：连续签到，可以基于 lastRecord 的 day 和当前时间判断呀？按 day 统计连续签到天数可能不准确
+        //      1. day 只是记录第几天签到的有可能不连续，比如第一次签到是周一，第二次签到是周三这样 lastRecord 的 day 为 2 但是并不是连续的两天
+        //      2. day 超出签到规则的最大天数会重置到从第一天开始签到（我理解为开始下一轮，类似一周签到七天七天结束下周又从周一开始签到）
+        // 1. 回复：周三签到，day 要归 1 呀。连续签到哈；
         List<MemberSignInRecordDO> signInRecords = signInRecordMapper.selectListByUserId(userId);
-        vo.setContinuousDay(calculateConsecutiveDays(signInRecords));
-        return vo;
+        signInRecords.sort(Comparator.comparing(MemberSignInRecordDO::getCreateTime).reversed()); // 根据签到时间倒序
+        summary.setContinuousDay(calculateConsecutiveDays(signInRecords));
+        return summary;
     }
 
     /**
@@ -144,17 +146,14 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
     @Transactional(rollbackFor = Exception.class)
     public MemberSignInRecordDO createSignRecord(Long userId) {
         // 1. 获取当前用户最近的签到
-        MemberSignInRecordDO lastRecord = signInRecordMapper.selectLastRecordByUserIdDesc(userId);
+        MemberSignInRecordDO lastRecord = signInRecordMapper.selectLastRecordByUserId(userId);
         // 1.1. 判断是否重复签到
         validateSigned(lastRecord);
 
-        // 2. 获取当前用户最早的一次前端记录，用于计算今天是第几天签到
-        MemberSignInRecordDO firstRecord = signInRecordMapper.selectLastRecordByUserIdAsc(userId);
         // 2.1. 获取所有的签到规则
         List<MemberSignInConfigDO> signInConfigs = signInConfigService.getSignInConfigList(CommonStatusEnum.ENABLE.getStatus());
-        signInConfigs.sort(Comparator.comparing(MemberSignInConfigDO::getDay));
         // 2.2. 组合数据
-        MemberSignInRecordDO record = MemberSignInRecordConvert.INSTANCE.convert(userId, firstRecord, signInConfigs);
+        MemberSignInRecordDO record = MemberSignInRecordConvert.INSTANCE.convert(userId, lastRecord, signInConfigs);
 
         // 3. 插入签到记录
         signInRecordMapper.insert(record);

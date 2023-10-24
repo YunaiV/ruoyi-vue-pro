@@ -6,13 +6,12 @@ import cn.iocoder.yudao.module.promotion.enums.banner.BannerPositionEnum;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-// TODO @puhui999：表名改成 promotion_banner，然后有序加下；另外，sql 给我下哈；还有那个 position 字典，嘿嘿。
 /**
  * banner DO
  *
  * @author xia
  */
-@TableName("market_banner")
+@TableName("promotion_banner")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

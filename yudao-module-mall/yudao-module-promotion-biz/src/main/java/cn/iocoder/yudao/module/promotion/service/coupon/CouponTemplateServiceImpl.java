@@ -128,8 +128,8 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
     }
 
     @Override
-    public List<CouponTemplateDO> getCouponTemplateListByIds(Collection<Long> ids) {
-        return couponTemplateMapper.selectListByIds(ids);
+    public List<CouponTemplateDO> getCouponTemplateList(Collection<Long> ids) {
+        return couponTemplateMapper.selectBatchIds(ids);
     }
 
 }

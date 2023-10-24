@@ -46,6 +46,13 @@ public interface BargainActivityService {
     void updateBargainActivityStock(Long id, Integer count);
 
     /**
+     * 关闭砍价活动
+     *
+     * @param id 砍价活动编号
+     */
+    void closeBargainActivityById(Long id);
+
+    /**
      * 删除砍价活动
      *
      * @param id 编号

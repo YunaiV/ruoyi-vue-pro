@@ -296,7 +296,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     public SeckillValidateJoinRespDTO validateJoinSeckill(Long activityId, Long skuId, Integer count) {
         // 1.1 校验秒杀活动是否存在
         SeckillActivityDO activity = validateSeckillActivityExists(activityId);
-        if (ObjectUtil.notEqual(activity.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+        if (CommonStatusEnum.isDisable(activity.getStatus())) {
             throw exception(SECKILL_JOIN_ACTIVITY_STATUS_CLOSED);
         }
         // 1.2 是否在活动时间范围内
