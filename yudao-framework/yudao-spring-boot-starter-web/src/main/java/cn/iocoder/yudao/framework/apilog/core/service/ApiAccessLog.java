@@ -5,7 +5,6 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
-// TODO @小吉祥：搞个 job，清理 14 天外的访问日志；
 /**
  * API 访问日志
  *
