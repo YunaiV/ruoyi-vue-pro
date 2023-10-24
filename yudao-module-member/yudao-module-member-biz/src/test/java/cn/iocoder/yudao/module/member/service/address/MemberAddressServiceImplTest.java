@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * @author 芋道源码
  */
 @Import(AddressServiceImpl.class)
-public class AddressServiceImplTest extends BaseDbUnitTest {
+public class MemberAddressServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private AddressServiceImpl addressService;

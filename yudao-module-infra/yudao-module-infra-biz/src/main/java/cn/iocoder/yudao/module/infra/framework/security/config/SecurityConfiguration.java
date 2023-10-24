@@ -29,8 +29,6 @@ public class SecurityConfiguration {
                         .antMatchers("/swagger-resources/**").anonymous()
                         .antMatchers("/webjars/**").anonymous()
                         .antMatchers("/*/api-docs").anonymous();
-                // 积木报表
-                registry.antMatchers("/jmreport/**").permitAll();
                 // Spring Boot Actuator 的安全配置
                 registry.antMatchers("/actuator").anonymous()
                         .antMatchers("/actuator/**").anonymous();
