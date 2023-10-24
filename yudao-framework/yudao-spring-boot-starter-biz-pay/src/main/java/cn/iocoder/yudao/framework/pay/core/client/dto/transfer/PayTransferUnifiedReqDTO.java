@@ -59,6 +59,26 @@ public class PayTransferUnifiedReqDTO {
     private Map<String, String> payeeInfo;
 
     /**
+     * 支付宝登录号
+     */
+    private String alipayLogonId;
+
+    /**
+     * 支付宝账号名称
+     */
+    private String alipayAccountName;
+
+    /**
+     * 微信 openId
+     */
+    private String openid;
+
+    /**
+     * 微信账号名称
+     */
+    private String wxAccountName;
+
+    /**
      * 支付渠道的额外参数
      */
     private Map<String, String> channelExtras;

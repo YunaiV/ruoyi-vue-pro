@@ -28,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
@@ -80,7 +79,7 @@ public class PayTransferServiceImpl implements PayTransferService {
         PayTransferUnifiedReqDTO transferUnifiedReq = new PayTransferUnifiedReqDTO()
                 .setOutTransferNo(transferExtension.getNo()).setPrice(transfer.getPrice())
                 .setType(transfer.getType()).setTitle(transfer.getSubject())
-                .setPayeeInfo(transfer.getPayeeInfo()).setUserIp(userIp)
+                .setUserIp(userIp)
                 .setChannelExtras(reqVO.getChannelExtras());
         PayTransferRespDTO unifiedTransferResp = client.unifiedTransfer(transferUnifiedReq);
 
@@ -139,10 +138,7 @@ public class PayTransferServiceImpl implements PayTransferService {
         if (transfer == null) {
             throw exception(PAY_TRANSFER_NOT_FOUND);
         }
-        if (isSuccess(transfer.getStatus()) && Objects.equals(transfer.getExtensionId(), transferExtension.getId())) {
-            log.info("[updateTransferSuccess][transfer({}) 已经是已转账，无需更新]", transfer.getId());
-            return true;
-        }
+
         if (!isPendingStatus(transfer.getStatus())) {
             throw exception(PAY_TRANSFER_STATUS_IS_NOT_PENDING);
         }
@@ -151,7 +147,7 @@ public class PayTransferServiceImpl implements PayTransferService {
                 CollUtil.newArrayList(WAITING.getStatus(), IN_PROGRESS.getStatus()),
                 new PayTransferDO().setStatus(SUCCESS.getStatus()).setSuccessTime(notify.getSuccessTime())
                         .setChannelId(channel.getId()).setChannelCode(channel.getCode())
-                        .setExtensionId(transferExtension.getId()).setNo(transferExtension.getNo()));
+                        .setNo(transferExtension.getNo()));
         if (updateCounts == 0) {
             throw exception(PAY_TRANSFER_STATUS_IS_NOT_PENDING);
         }
