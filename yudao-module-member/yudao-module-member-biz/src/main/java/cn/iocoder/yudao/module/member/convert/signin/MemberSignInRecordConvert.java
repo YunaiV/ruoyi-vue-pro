@@ -43,12 +43,13 @@ public interface MemberSignInRecordConvert {
 
     AppMemberSignInRecordRespVO coverRecordToAppRecordVo(MemberSignInRecordDO memberSignInRecordDO);
 
-    default MemberSignInRecordDO convert(Long userId, MemberSignInRecordDO lastRecord, List<MemberSignInConfigDO> signInConfigs) {
-        // 1. 获取最大签到天数积分配置
-        signInConfigs.sort(Comparator.comparing(MemberSignInConfigDO::getDay));
-        MemberSignInConfigDO lastConfig = signInConfigs.get(signInConfigs.size() - 1); // 最大签到天数配置
+    default MemberSignInRecordDO convert(Long userId, MemberSignInRecordDO lastRecord, List<MemberSignInConfigDO> configs) {
+        // 1. 计算是第几天签到
+        configs.sort(Comparator.comparing(MemberSignInConfigDO::getDay));
+        MemberSignInConfigDO lastConfig = CollUtil.getLast(configs); // 最大签到天数配置
         // 1.2. 计算今天是第几天签到
         int day = 1;
+        // TODO @puhui999：要判断是不是昨天签到的；是否是昨天的判断，可以抽个方法到 util 里
         if (lastRecord != null) {
             day = lastRecord.getDay() + 1;
         }
@@ -56,14 +57,12 @@ public interface MemberSignInRecordConvert {
         if (day > lastConfig.getDay()) {
             day = 1; // 超过最大配置的天数，重置到第一天。(也就是说开启下一轮签到)
         }
-        // 1.4 初始化签到信息
-        MemberSignInRecordDO record = new MemberSignInRecordDO().setUserId(userId)
-                .setDay(day) // 设置签到天数
-                .setPoint(0)  // 设置签到积分默认为 0
-                .setExperience(0);  // 设置签到经验默认为 0
 
-        // 2. 获取签到对应的积分
-        MemberSignInConfigDO config = CollUtil.findOne(signInConfigs, item -> ObjUtil.equal(item.getDay(), record.getDay()));
+        // 2.1 初始化签到信息
+        MemberSignInRecordDO record = new MemberSignInRecordDO().setUserId(userId)
+                .setDay(day).setPoint(0).setExperience(0);
+        // 2.2 获取签到对应的积分
+        MemberSignInConfigDO config = CollUtil.findOne(configs, item -> ObjUtil.equal(item.getDay(), record.getDay()));
         if (config == null) {
             return record;
         }

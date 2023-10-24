@@ -85,6 +85,7 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
         // TODO @puhui999：连续签到，可以基于 lastRecord 的 day 和当前时间判断呀？按 day 统计连续签到天数可能不准确
         //      1. day 只是记录第几天签到的有可能不连续，比如第一次签到是周一，第二次签到是周三这样 lastRecord 的 day 为 2 但是并不是连续的两天
         //      2. day 超出签到规则的最大天数会重置到从第一天开始签到（我理解为开始下一轮，类似一周签到七天七天结束下周又从周一开始签到）
+        // 1. 回复：周三签到，day 要归 1 呀。连续签到哈；
         List<MemberSignInRecordDO> signInRecords = signInRecordMapper.selectListByUserId(userId);
         signInRecords.sort(Comparator.comparing(MemberSignInRecordDO::getCreateTime).reversed()); // 根据签到时间倒序
         summary.setContinuousDay(calculateConsecutiveDays(signInRecords));

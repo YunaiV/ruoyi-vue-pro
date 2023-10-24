@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.promotion.convert.coupon;
 
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponTemplateRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template.CouponTemplateCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template.CouponTemplatePageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template.CouponTemplateRespVO;
@@ -58,7 +57,5 @@ public interface CouponTemplateConvert {
             template.setCanTake(MapUtil.getBool(userCanTakeMap, template.getId(), false));
         }
     }
-
-    List<CouponTemplateRespDTO> convertList(List<CouponTemplateDO> list);
 
 }

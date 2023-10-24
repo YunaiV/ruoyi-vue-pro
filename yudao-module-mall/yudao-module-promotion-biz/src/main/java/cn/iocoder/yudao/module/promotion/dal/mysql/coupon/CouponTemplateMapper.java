@@ -75,8 +75,4 @@ public interface CouponTemplateMapper extends BaseMapperX<CouponTemplateDO> {
         return canTakeConsumer;
     }
 
-    default List<CouponTemplateDO> selectListByIds(Collection<Long> ids) {
-        return selectList(new LambdaQueryWrapperX<CouponTemplateDO>().in(CouponTemplateDO::getId, ids));
-    }
-
 }
