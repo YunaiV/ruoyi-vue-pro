@@ -23,7 +23,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "管理后台 - Banner 管理")
 @RestController
-@RequestMapping("/market/banner")
+@RequestMapping("/promotion/banner")
 @Validated
 public class BannerController {
 
@@ -32,14 +32,14 @@ public class BannerController {
 
     @PostMapping("/create")
     @Operation(summary = "创建 Banner")
-    @PreAuthorize("@ss.hasPermission('market:banner:create')")
+    @PreAuthorize("@ss.hasPermission('promotion:banner:create')")
     public CommonResult<Long> createBanner(@Valid @RequestBody BannerCreateReqVO createReqVO) {
         return success(bannerService.createBanner(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新 Banner")
-    @PreAuthorize("@ss.hasPermission('market:banner:update')")
+    @PreAuthorize("@ss.hasPermission('promotion:banner:update')")
     public CommonResult<Boolean> updateBanner(@Valid @RequestBody BannerUpdateReqVO updateReqVO) {
         bannerService.updateBanner(updateReqVO);
         return success(true);
@@ -48,7 +48,7 @@ public class BannerController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除 Banner")
     @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('market:banner:delete')")
+    @PreAuthorize("@ss.hasPermission('promotion:banner:delete')")
     public CommonResult<Boolean> deleteBanner(@RequestParam("id") Long id) {
         bannerService.deleteBanner(id);
         return success(true);
@@ -57,7 +57,7 @@ public class BannerController {
     @GetMapping("/get")
     @Operation(summary = "获得 Banner")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('market:banner:query')")
+    @PreAuthorize("@ss.hasPermission('promotion:banner:query')")
     public CommonResult<BannerRespVO> getBanner(@RequestParam("id") Long id) {
         BannerDO banner = bannerService.getBanner(id);
         return success(BannerConvert.INSTANCE.convert(banner));
@@ -65,7 +65,7 @@ public class BannerController {
 
     @GetMapping("/page")
     @Operation(summary = "获得 Banner 分页")
-    @PreAuthorize("@ss.hasPermission('market:banner:query')")
+    @PreAuthorize("@ss.hasPermission('promotion:banner:query')")
     public CommonResult<PageResult<BannerRespVO>> getBannerPage(@Valid BannerPageReqVO pageVO) {
         PageResult<BannerDO> pageResult = bannerService.getBannerPage(pageVO);
         return success(BannerConvert.INSTANCE.convertPage(pageResult));

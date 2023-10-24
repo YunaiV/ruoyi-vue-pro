@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.promotion.service.bargain;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
@@ -96,6 +95,19 @@ public class BargainActivityServiceImpl implements BargainActivityService {
         }
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void closeBargainActivityById(Long id) {
+        // 校验砍价活动是否存在
+        BargainActivityDO activity = validateBargainActivityExists(id);
+        if (CommonStatusEnum.isDisable(activity.getStatus())) {
+            throw exception(BARGAIN_ACTIVITY_STATUS_DISABLE);
+        }
+
+        bargainActivityMapper.updateById(new BargainActivityDO().setId(id)
+                .setStatus(CommonStatusEnum.DISABLE.getStatus()));
+    }
+
     private void validateBargainConflict(Long spuId, Long activityId) {
         // 查询所有开启的砍价活动
         List<BargainActivityDO> activityList = bargainActivityMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus());
@@ -121,7 +133,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
         // 校验存在
         BargainActivityDO activityDO = validateBargainActivityExists(id);
         // 校验状态
-        if (ObjectUtil.equal(activityDO.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+        if (CommonStatusEnum.isEnable(activityDO.getStatus())) {
             throw exception(BARGAIN_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END);
         }
 
@@ -153,7 +165,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
         if (activity == null) {
             throw exception(BARGAIN_ACTIVITY_NOT_EXISTS);
         }
-        if (ObjUtil.notEqual(activity.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+        if (CommonStatusEnum.isDisable(activity.getStatus())) {
             throw exception(BARGAIN_ACTIVITY_STATUS_CLOSED);
         }
         if (activity.getStock() <= 0) {
