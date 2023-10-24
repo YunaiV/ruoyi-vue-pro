@@ -24,6 +24,7 @@ import cn.iocoder.yudao.module.promotion.dal.mysql.combination.CombinationRecord
 import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.api.order.TradeOrderApi;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -64,6 +65,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     private ProductSkuApi productSkuApi;
 
     @Resource
+    @Lazy
     private TradeOrderApi tradeOrderApi;
 
     // TODO @芋艿：在详细预览下；
