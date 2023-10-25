@@ -11,6 +11,7 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReq
 import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.exception.PayException;
+import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -185,7 +186,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
 
     @Override
     public final PayTransferRespDTO unifiedTransfer(PayTransferUnifiedReqDTO reqDTO) {
-        ValidationUtils.validate(reqDTO);
+        validatePayTransferReqDTO(reqDTO);
         PayTransferRespDTO resp;
         try{
             resp = doUnifiedTransfer(reqDTO);
@@ -198,6 +199,22 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
             throw buildPayException(ex);
         }
         return resp;
+    }
+    private void validatePayTransferReqDTO(PayTransferUnifiedReqDTO reqDTO) {
+        PayTransferTypeEnum transferType = PayTransferTypeEnum.typeOf(reqDTO.getType());
+        switch (transferType) {
+            case ALIPAY_BALANCE: {
+                ValidationUtils.validate(reqDTO,  PayTransferTypeEnum.Alipay.class);
+                break;
+            }
+            case WX_BALANCE: {
+                ValidationUtils.validate(reqDTO, PayTransferTypeEnum.WxPay.class);
+                break;
+            }
+            default: {
+                throw new UnsupportedOperationException("待实现");
+            }
+        }
     }
 
     protected abstract PayTransferRespDTO doUnifiedTransfer(PayTransferUnifiedReqDTO reqDTO)

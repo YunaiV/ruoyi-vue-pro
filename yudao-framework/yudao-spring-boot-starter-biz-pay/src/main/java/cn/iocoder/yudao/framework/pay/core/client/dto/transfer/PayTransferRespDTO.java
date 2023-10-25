@@ -29,7 +29,7 @@ public class PayTransferRespDTO {
     /**
      * 支付渠道编号
      */
-    private String channelOrderNo;
+    private String channelTransferNo;
 
     /**
      * 支付成功时间
@@ -57,7 +57,7 @@ public class PayTransferRespDTO {
                                              String outTransferNo, Object rawData) {
         PayTransferRespDTO respDTO = new PayTransferRespDTO();
         respDTO.status = PayTransferStatusRespEnum.WAITING.getStatus();
-        respDTO.channelOrderNo = channelOrderNo;
+        respDTO.channelTransferNo = channelOrderNo;
         respDTO.outTransferNo = outTransferNo;
         respDTO.rawData = rawData;
         return respDTO;
@@ -85,7 +85,7 @@ public class PayTransferRespDTO {
                                              String outTransferNo, Object rawData) {
         PayTransferRespDTO respDTO = new PayTransferRespDTO();
         respDTO.status = PayTransferStatusRespEnum.SUCCESS.getStatus();
-        respDTO.channelOrderNo = channelTransferNo;
+        respDTO.channelTransferNo = channelTransferNo;
         respDTO.successTime = successTime;
         // 相对通用的字段
         respDTO.outTransferNo = outTransferNo;

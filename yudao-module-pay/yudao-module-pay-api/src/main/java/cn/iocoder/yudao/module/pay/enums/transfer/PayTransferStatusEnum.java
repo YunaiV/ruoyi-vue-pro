@@ -49,7 +49,7 @@ public enum PayTransferStatusEnum {
      * @param status 状态
      */
     public static boolean isPendingStatus(Integer status) {
-        return Objects.equals(status, WAITING.getStatus()) || Objects.equals(status, IN_PROGRESS.status);
+        return Objects.equals(status, WAITING.getStatus()) || Objects.equals(status, IN_PROGRESS.getStatus());
     }
 
 }

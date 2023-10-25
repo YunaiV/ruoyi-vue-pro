@@ -61,11 +61,11 @@ public class PayTransferDO extends BaseDO {
 
     // ========== 商户相关字段 ==========
     /**
-     * 商户订单编号
+     * 商户转账单编号
      *
      * 例如说，内部系统 A 的订单号，需要保证每个 PayAppDO 唯一
      */
-    private String merchantOrderId;
+    private String merchantTransferId;
 
     // ========== 转账相关字段 ==========
 

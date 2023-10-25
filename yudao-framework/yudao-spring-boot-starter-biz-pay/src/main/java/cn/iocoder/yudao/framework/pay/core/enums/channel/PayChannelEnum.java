@@ -62,4 +62,7 @@ public enum PayChannelEnum {
         return ArrayUtil.firstMatch(o -> o.getCode().equals(code), values());
     }
 
+    public static boolean isAlipay(String channelCode) {
+        return channelCode != null && channelCode.startsWith("alipay");
+    }
 }

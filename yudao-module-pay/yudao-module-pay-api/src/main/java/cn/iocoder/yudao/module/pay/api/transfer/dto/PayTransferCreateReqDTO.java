@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.pay.enums.transfer.PayTransferTypeEnum;
 import lombok.Data;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Map;
@@ -21,6 +22,17 @@ public class PayTransferCreateReqDTO {
     @NotNull(message = "应用编号不能为空")
     private Long appId;
 
+    @NotEmpty(message = "转账渠道不能为空")
+    private String channelCode;
+
+    /**
+     * 转账渠道的额外参数
+     */
+    private Map<String, String> channelExtras;
+
+    @NotEmpty(message = "用户 IP 不能为空")
+    private String userIp;
+
     /**
      * 类型
      */
@@ -28,11 +40,12 @@ public class PayTransferCreateReqDTO {
     @InEnum(PayTransferTypeEnum.class)
     private Integer type;
 
+
     /**
-     * 商户订单编号
+     * 商户转账单编号
      */
-    @NotEmpty(message = "商户订单编号不能为空")
-    private String merchantOrderId;
+    @NotEmpty(message = "商户转账单编号能为空")
+    private String merchantTransferId;
 
     /**
      * 转账金额，单位：分
@@ -45,9 +58,21 @@ public class PayTransferCreateReqDTO {
      * 转账标题
      */
     @NotEmpty(message = "转账标题不能为空")
-    private String title;
+    private String subject;
 
     @NotEmpty(message = "收款方信息不能为空")
     private Map<String, String> payeeInfo;
+
+    @NotBlank(message = "支付宝登录号不能为空", groups = {PayTransferTypeEnum.Alipay.class})
+    private String alipayLogonId;
+
+    @NotBlank(message = "支付宝登录号不能为空", groups = {PayTransferTypeEnum.Alipay.class})
+    private String alipayAccountName;
+
+    // ========== 微信转账相关字段 ==========
+    @NotBlank(message = "微信 openId 不能为空", groups = {PayTransferTypeEnum.WxPay.class})
+    private String openid;
+
+    private String wxAccountName;
 
 }

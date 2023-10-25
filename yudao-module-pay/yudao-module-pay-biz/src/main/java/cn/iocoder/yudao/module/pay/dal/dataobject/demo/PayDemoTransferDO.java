@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.pay.dal.dataobject.demo;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum;
+import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -29,6 +30,13 @@ public class PayDemoTransferDO extends BaseDO {
      * 用户编号
      */
     private Long userId;
+
+    /**
+     * 应用编号
+     *
+     * 关联 {@link PayAppDO#getId()}
+     */
+    private Long appId;
 
     /**
      * 转账金额，单位：分

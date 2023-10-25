@@ -15,6 +15,14 @@ public interface PayTransferMapper extends BaseMapperX<PayTransferDO> {
                 .eq(PayTransferDO::getId, id).in(PayTransferDO::getStatus, status));
     }
 
+    default PayTransferDO selectByAppIdAndMerchantTransferId(Long appId, String merchantTransferId){
+        return selectOne(PayTransferDO::getAppId, appId,
+                    PayTransferDO::getMerchantTransferId, merchantTransferId);
+    }
+
+    default PayTransferDO selectByNo(String no){
+        return selectOne(PayTransferDO::getNo, no);
+    }
 }
 
 

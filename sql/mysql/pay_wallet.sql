@@ -9,17 +9,18 @@ CREATE TABLE `pay_transfer`
     `app_id`               bigint       NOT NULL COMMENT '应用编号',
     `channel_id`           bigint       NOT NULL  COMMENT '转账渠道编号',
     `channel_code`         varchar(32)  NOT NULL  COMMENT '转账渠道编码',
-    `merchant_order_id`    varchar(64)  NOT NULL COMMENT '商户订单编号',
+    `merchant_transfer_id` varchar(64)  NOT NULL COMMENT '商户转账单编号',
     `type`                 int          NOT NULL COMMENT '类型',
     `status`               tinyint      NOT NULL COMMENT '转账状态',
     `success_time`         datetime     NULL COMMENT '转账成功时间',
     `price`                int          NOT NULL COMMENT '转账金额，单位：分',
     `subject`              varchar(512) NOT NULL COMMENT '转账标题',
     `alipay_logon_id`      varchar(64)  NULL COMMENT '支付宝登录号',
-    `alipay_account_name`  varchar(64)  NULL COMMENT '支付宝账号名称',
-    `openid`               varchar(64)  NULL COMMENT '微信 openId',
-    `wx_account_name`      varchar(64)  NULL COMMENT '微信账号名称',
-    `notify_url`           varchar(64)  NULL COMMENT '异步通知商户地址',
+    `alipay_account_name`  varchar(64)   NULL COMMENT '支付宝账号名称',
+    `openid`               varchar(64)   NULL COMMENT '微信 openId',
+    `wx_account_name`      varchar(64)   NULL COMMENT '微信账号名称',
+    `notify_url`           varchar(1024) NOT NULL COMMENT '异步通知商户地址',
+    `user_ip`              varchar(50)   NOT NULL COMMENT '用户 IP',
     `channel_extras`       varchar(512) NULL DEFAULT NULL COMMENT '渠道的额外参数',
     `channel_transfer_no`  varchar(64)  NULL DEFAULT NULL COMMENT '渠道转账单号',
     `channel_error_code`   varchar(128) NULL DEFAULT NULL COMMENT '调用渠道的错误码',
@@ -64,6 +65,7 @@ DROP TABLE IF EXISTS `pay_demo_transfer`;
 CREATE TABLE `pay_demo_transfer`  (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '订单编号',
   `user_id` bigint UNSIGNED NOT NULL COMMENT '用户编号',
+  `app_id`  bigint NOT NULL COMMENT '应用编号',
   `price` int NOT NULL COMMENT '转账金额，单位：分',
   `type`  int NOT NULL COMMENT '转账类型',
   `alipay_logon_id`      varchar(64)  NULL COMMENT '支付宝登录号',
@@ -81,7 +83,7 @@ CREATE TABLE `pay_demo_transfer`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
    PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB  COMMENT = '示例业务转账订单\n';
+) ENGINE = InnoDB  COMMENT = '示例业务转账订单';
 
 
 ALTER TABLE `pay_channel`

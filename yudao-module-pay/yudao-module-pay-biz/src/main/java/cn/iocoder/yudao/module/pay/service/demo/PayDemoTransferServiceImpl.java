@@ -4,7 +4,6 @@ import cn.iocoder.yudao.module.pay.controller.admin.demo.vo.transfer.PayDemoTran
 import cn.iocoder.yudao.module.pay.convert.demo.PayDemoTransferConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.demo.PayDemoTransferDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.demo.PayDemoTransferMapper;
-import cn.iocoder.yudao.module.pay.service.transfer.PayTransferService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -33,8 +32,6 @@ public class PayDemoTransferServiceImpl implements PayDemoTransferService {
     @Resource
     private PayDemoTransferMapper demoTransferMapper;
     @Resource
-    private PayTransferService transferService;
-    @Resource
     private Validator validator;
 
     @Override
@@ -44,7 +41,7 @@ public class PayDemoTransferServiceImpl implements PayDemoTransferService {
         vo.validate(validator);
         // 2 保存示例转账业务表
         PayDemoTransferDO demoTransfer = PayDemoTransferConvert.INSTANCE.convert(vo)
-                .setUserId(userId).setTransferStatus(WAITING.getStatus());
+                .setUserId(userId).setAppId(TRANSFER_APP_ID).setTransferStatus(WAITING.getStatus());
         demoTransferMapper.insert(demoTransfer);
         return demoTransfer.getId();
     }

@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.pay.controller.admin.transfer;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.pay.controller.admin.transfer.vo.PayTransferSubmitReqVO;
-import cn.iocoder.yudao.module.pay.controller.admin.transfer.vo.PayTransferSubmitRespVO;
+import cn.iocoder.yudao.module.pay.controller.admin.transfer.vo.PayTransferCreateReqVO;
+import cn.iocoder.yudao.module.pay.controller.admin.transfer.vo.PayTransferCreateRespVO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.transfer.PayTransferDO;
 import cn.iocoder.yudao.module.pay.service.transfer.PayTransferService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,12 +28,12 @@ public class PayTransferController {
     @Resource
     private PayTransferService payTransferService;
 
-    @PostMapping("/submit")
-    @Operation(summary = "提交转账订单")
+    @PostMapping("/initiate")
+    @Operation(summary = "发起转账")
     // TODO @jason：权限的设置， 管理后台页面加的时候加一下
-    public CommonResult<PayTransferSubmitRespVO> submitPayTransfer(@Valid @RequestBody PayTransferSubmitReqVO reqVO) {
-        PayTransferSubmitRespVO respVO = payTransferService.submitTransfer(reqVO, getClientIP());
-        return success(respVO);
+    public CommonResult<PayTransferCreateRespVO> initiatePayTransfer(@Valid @RequestBody PayTransferCreateReqVO reqVO) {
+        PayTransferDO payTransfer = payTransferService.initiateTransfer(reqVO, getClientIP());
+        return success(new PayTransferCreateRespVO().setId(payTransfer.getId()).setStatus(payTransfer.getStatus()));
     }
 
 }

@@ -22,14 +22,10 @@ public interface PayWalletConvert {
 
     PageResult<PayWalletRespVO> convertPage(PageResult<PayWalletDO> page);
 
-    default PageResult<PayWalletRespVO> convertPage(PageResult<PayWalletDO> page, Map<Long, MemberUserRespDTO> userMap){
+    default PageResult<PayWalletRespVO> convertPage(PageResult<PayWalletDO> page, Map<Long, MemberUserRespDTO> userMap) {
         PageResult<PayWalletRespVO> pageResult = convertPage(page);
-        pageResult.getList().forEach( wallet -> MapUtils.findAndThen(userMap, wallet.getUserId(),
-                user -> {
-            // TODO @jason：可以链式调用哈；
-                    wallet.setNickname(user.getNickname());
-                    wallet.setAvatar(user.getAvatar());
-                }));
+        pageResult.getList().forEach(wallet -> MapUtils.findAndThen(userMap, wallet.getUserId(),
+                user -> wallet.setNickname(user.getNickname()).setAvatar(user.getAvatar())));
         return pageResult;
     }
 
