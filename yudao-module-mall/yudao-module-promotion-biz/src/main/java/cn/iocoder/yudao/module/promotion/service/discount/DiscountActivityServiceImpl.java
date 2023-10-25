@@ -147,8 +147,8 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
     @Override
     public void deleteDiscountActivity(Long id) {
         // 校验存在
-        DiscountActivityDO discountActivity = validateDiscountActivityExists(id);
-        if (!discountActivity.getStatus().equals(CommonStatusEnum.ENABLE.getStatus())) { // 未关闭的活动，不能删除噢
+        DiscountActivityDO activity = validateDiscountActivityExists(id);
+        if (CommonStatusEnum.isEnable(activity.getStatus())) { // 未关闭的活动，不能删除噢
             throw exception(DISCOUNT_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED);
         }
 

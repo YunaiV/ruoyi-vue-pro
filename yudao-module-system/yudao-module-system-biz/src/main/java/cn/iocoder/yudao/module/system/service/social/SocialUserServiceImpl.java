@@ -111,31 +111,31 @@ public class SocialUserServiceImpl implements SocialUserService {
      * 授权获得对应的社交用户
      * 如果授权失败，则会抛出 {@link ServiceException} 异常
      *
-     * @param type 社交平台的类型 {@link SocialTypeEnum}
+     * @param socialType 社交平台的类型 {@link SocialTypeEnum}
      * @param userType 用户类型
      * @param code 授权码
      * @param state state
      * @return 授权用户
      */
     @NotNull
-    public SocialUserDO authSocialUser(Integer type, Integer userType, String code, String state) {
+    public SocialUserDO authSocialUser(Integer socialType, Integer userType, String code, String state) {
         // 优先从 DB 中获取，因为 code 有且可以使用一次。
         // 在社交登录时，当未绑定 User 时，需要绑定登录，此时需要 code 使用两次
-        SocialUserDO socialUser = socialUserMapper.selectByTypeAndCodeAnState(type, code, state);
+        SocialUserDO socialUser = socialUserMapper.selectByTypeAndCodeAnState(socialType, code, state);
         if (socialUser != null) {
             return socialUser;
         }
 
         // 请求获取
-        AuthUser authUser = socialClientService.getAuthUser(type, userType, code, state);
+        AuthUser authUser = socialClientService.getAuthUser(socialType, userType, code, state);
         Assert.notNull(authUser, "三方用户不能为空");
 
         // 保存到 DB 中
-        socialUser = socialUserMapper.selectByTypeAndOpenid(type, authUser.getUuid());
+        socialUser = socialUserMapper.selectByTypeAndOpenid(socialType, authUser.getUuid());
         if (socialUser == null) {
             socialUser = new SocialUserDO();
         }
-        socialUser.setType(type).setCode(code).setState(state) // 需要保存 code + state 字段，保证后续可查询
+        socialUser.setType(socialType).setCode(code).setState(state) // 需要保存 code + state 字段，保证后续可查询
                 .setOpenid(authUser.getUuid()).setToken(authUser.getToken().getAccessToken()).setRawTokenInfo((toJsonString(authUser.getToken())))
                 .setNickname(authUser.getNickname()).setAvatar(authUser.getAvatar()).setRawUserInfo(toJsonString(authUser.getRawUserInfo()));
         if (socialUser.getId() == null) {

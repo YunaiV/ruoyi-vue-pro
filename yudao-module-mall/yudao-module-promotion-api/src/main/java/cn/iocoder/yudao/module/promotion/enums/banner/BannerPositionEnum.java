@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.promotion.enums.banner;
 
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
-import cn.iocoder.yudao.module.promotion.enums.bargain.BargainRecordStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -22,7 +21,8 @@ public enum BannerPositionEnum implements IntArrayValuable {
     DISCOUNT_POSITION(4, "限时折扣页"),
     REWARD_POSITION(5, "满减送页");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BargainRecordStatusEnum::getStatus).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BannerPositionEnum::getPosition).toArray();
+
     /**
      * 值
      */

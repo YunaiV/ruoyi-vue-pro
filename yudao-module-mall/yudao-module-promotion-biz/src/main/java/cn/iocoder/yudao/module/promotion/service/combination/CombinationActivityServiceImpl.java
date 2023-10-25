@@ -138,6 +138,20 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
         updateCombinationProduct(updateObj, updateReqVO.getProducts());
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void closeCombinationActivityById(Long id) {
+        // 校验活动是否存在
+        CombinationActivityDO activity = validateCombinationActivityExists(id);
+        if (CommonStatusEnum.isDisable(activity.getStatus())) {
+            throw exception(COMBINATION_ACTIVITY_STATUS_DISABLE_NOT_UPDATE);
+        }
+
+        // 关闭活动
+        combinationActivityMapper.updateById(new CombinationActivityDO().setId(id)
+                .setStatus(CommonStatusEnum.DISABLE.getStatus()));
+    }
+
     /**
      * 更新拼团商品
      *
@@ -172,9 +186,9 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     @Transactional(rollbackFor = Exception.class)
     public void deleteCombinationActivity(Long id) {
         // 校验存在
-        CombinationActivityDO activityDO = validateCombinationActivityExists(id);
+        CombinationActivityDO activity = validateCombinationActivityExists(id);
         // 校验状态
-        if (ObjectUtil.equal(activityDO.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+        if (CommonStatusEnum.isEnable(activity.getStatus())) {
             throw exception(COMBINATION_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END);
         }
 

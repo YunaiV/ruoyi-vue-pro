@@ -27,7 +27,6 @@ import org.springframework.util.Assert;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -144,7 +143,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
         if (channelDO == null) {
             throw exception(SMS_CHANNEL_NOT_EXISTS);
         }
-        if (!Objects.equals(channelDO.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+        if (CommonStatusEnum.isDisable(channelDO.getStatus())) {
             throw exception(SMS_CHANNEL_DISABLE);
         }
         return channelDO;

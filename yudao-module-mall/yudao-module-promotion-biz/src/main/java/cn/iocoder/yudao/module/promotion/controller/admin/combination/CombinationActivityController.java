@@ -59,6 +59,15 @@ public class CombinationActivityController {
         return success(true);
     }
 
+    @PutMapping("/close")
+    @Operation(summary = "关闭拼团活动")
+    @Parameter(name = "id", description = "编号", required = true)
+    @PreAuthorize("@ss.hasPermission('promotion:combination-activity:close')")
+    public CommonResult<Boolean> closeSeckillActivity(@RequestParam("id") Long id) {
+        combinationActivityService.closeCombinationActivityById(id);
+        return success(true);
+    }
+
     @DeleteMapping("/delete")
     @Operation(summary = "删除拼团活动")
     @Parameter(name = "id", description = "编号", required = true)

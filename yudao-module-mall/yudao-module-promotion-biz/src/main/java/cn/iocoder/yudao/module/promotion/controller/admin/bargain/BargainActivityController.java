@@ -59,6 +59,15 @@ public class BargainActivityController {
         return success(true);
     }
 
+    @PutMapping("/close")
+    @Operation(summary = "关闭砍价活动")
+    @Parameter(name = "id", description = "编号", required = true)
+    @PreAuthorize("@ss.hasPermission('promotion:bargain-activity:close')")
+    public CommonResult<Boolean> closeSeckillActivity(@RequestParam("id") Long id) {
+        bargainActivityService.closeBargainActivityById(id);
+        return success(true);
+    }
+
     @DeleteMapping("/delete")
     @Operation(summary = "删除砍价活动")
     @Parameter(name = "id", description = "编号", required = true)
