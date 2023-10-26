@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUser
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUserUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public interface SocialUserConvert {
 
     SocialUserConvert INSTANCE = Mappers.getMapper(SocialUserConvert.class);
 
+    @Mapping(target = "socialType", source = "reqVO.type")
     SocialUserBindReqDTO convert(Long userId, Integer userType, SocialUserBindReqVO reqVO);
 
     SocialUserUnbindReqDTO convert(Long userId, Integer userType, SocialUserUnbindReqVO reqVO);

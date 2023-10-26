@@ -24,13 +24,16 @@ public class SocialClientBaseVO {
     @NotNull(message = "用户类型不能为空")
     private Integer userType;
 
-    @Schema(description = "客户端编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "145442115")
+    @Schema(description = "客户端编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "wwd411c69a39ad2e54")
     @NotNull(message = "客户端编号不能为空")
     private String clientId;
 
-    @Schema(description = "客户端密钥", requiredMode = Schema.RequiredMode.REQUIRED, example = "215151515154446")
+    @Schema(description = "客户端密钥", requiredMode = Schema.RequiredMode.REQUIRED, example = "1wTb7hYxnpT2TUbIeHGXGo7T0odav1ic10mLdyyATOw")
     @NotNull(message = "客户端密钥不能为空")
     private String clientSecret;
+
+    @Schema(description = "授权方的网页应用编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2000045")
+    private String agentId;
 
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "状态不能为空")

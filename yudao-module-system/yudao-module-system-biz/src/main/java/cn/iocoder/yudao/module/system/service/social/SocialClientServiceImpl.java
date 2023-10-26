@@ -159,6 +159,9 @@ public class SocialClientServiceImpl implements SocialClientService {
             // 2.2 修改对应的 clientId + clientSecret 密钥
             newAuthConfig.setClientId(client.getClientId());
             newAuthConfig.setClientSecret(client.getClientSecret());
+            if (client.getAgentId() != null) { // 如果有 agentId 则修改 agentId
+                newAuthConfig.setAgentId(client.getAgentId());
+            }
             // 2.3 设置会 request 里，进行后续使用
             ReflectUtil.setFieldValue(request, "config", newAuthConfig);
         }

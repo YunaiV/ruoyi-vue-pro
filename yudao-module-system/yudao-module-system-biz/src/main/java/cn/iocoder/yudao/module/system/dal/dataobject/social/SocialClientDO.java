@@ -64,5 +64,9 @@ public class SocialClientDO extends TenantBaseDO {
      * 客户端 Secret
      */
     private String clientSecret;
+    /**
+     * 授权方的网页应用 ID
+     */
+    private String agentId;
 
 }
