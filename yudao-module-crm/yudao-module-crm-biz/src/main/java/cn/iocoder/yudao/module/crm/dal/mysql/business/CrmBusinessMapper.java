@@ -21,23 +21,6 @@ public interface CrmBusinessMapper extends BaseMapperX<CrmBusinessDO> {
     default PageResult<CrmBusinessDO> selectPage(CrmBusinessPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<CrmBusinessDO>()
                 .likeIfPresent(CrmBusinessDO::getName, reqVO.getName())
-                .eqIfPresent(CrmBusinessDO::getStatusTypeId, reqVO.getStatusTypeId())
-                .eqIfPresent(CrmBusinessDO::getStatusId, reqVO.getStatusId())
-                .betweenIfPresent(CrmBusinessDO::getContactNextTime, reqVO.getContactNextTime())
-                .eqIfPresent(CrmBusinessDO::getCustomerId, reqVO.getCustomerId())
-                .betweenIfPresent(CrmBusinessDO::getDealTime, reqVO.getDealTime())
-                .eqIfPresent(CrmBusinessDO::getPrice, reqVO.getPrice())
-                .eqIfPresent(CrmBusinessDO::getDiscountPercent, reqVO.getDiscountPercent())
-                .eqIfPresent(CrmBusinessDO::getProductPrice, reqVO.getProductPrice())
-                .eqIfPresent(CrmBusinessDO::getRemark, reqVO.getRemark())
-                .eqIfPresent(CrmBusinessDO::getOwnerUserId, reqVO.getOwnerUserId())
-                .betweenIfPresent(CrmBusinessDO::getCreateTime, reqVO.getCreateTime())
-                .eqIfPresent(CrmBusinessDO::getRoUserIds, reqVO.getRoUserIds())
-                .eqIfPresent(CrmBusinessDO::getRwUserIds, reqVO.getRwUserIds())
-                .eqIfPresent(CrmBusinessDO::getEndStatus, reqVO.getEndStatus())
-                .eqIfPresent(CrmBusinessDO::getEndRemark, reqVO.getEndRemark())
-                .betweenIfPresent(CrmBusinessDO::getContactLastTime, reqVO.getContactLastTime())
-                .eqIfPresent(CrmBusinessDO::getFollowUpStatus, reqVO.getFollowUpStatus())
                 .orderByDesc(CrmBusinessDO::getId));
     }
 

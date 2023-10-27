@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.business;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.businessstatus.CrmBusinessStatusDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.businessstatustype.CrmBusinessStatusTypeDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -36,13 +37,13 @@ public class CrmBusinessDO extends BaseDO {
     /**
      * 商机状态类型编号
      *
-     *  TODO @ljileo：这个字段，后续要写下关联的实体哈
+     *  关联 {@link CrmBusinessStatusTypeDO#getId()}
      */
     private Long statusTypeId;
     /**
      * 商机状态编号
      *
-     * TODO @ljileo：这个字段，后续要写下关联的实体哈
+     * 关联 {@link CrmBusinessStatusDO#getId()}
      */
     private Long statusId;
     /**
@@ -62,21 +63,18 @@ public class CrmBusinessDO extends BaseDO {
     /**
      * 商机金额
      *
-     * TODO @lijie：Integer
      */
-    private BigDecimal price;
+    private Integer price;
     /**
      * 整单折扣
      *
-     * TODO @lijie：Integer
      */
-    private BigDecimal discountPercent;
+    private Integer discountPercent;
     /**
      * 产品总金额
      *
-     * TODO @lijie：Integer
      */
-    private BigDecimal productPrice;
+    private Integer productPrice;
     /**
      * 备注
      */
