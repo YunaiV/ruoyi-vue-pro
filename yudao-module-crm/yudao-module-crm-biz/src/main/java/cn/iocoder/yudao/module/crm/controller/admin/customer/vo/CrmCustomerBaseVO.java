@@ -19,14 +19,16 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class CrmCustomerBaseVO {
 
-    @Schema(description = "客户名称", example = "赵六")
+    @Schema(description = "客户名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "赵六")
     @NotEmpty(message = "客户名称不能为空")
     private String name;
 
+    // TODO wanwan：这个字段应该只有 RespVO 会有；创建和修改不传递；
     @Schema(description = "跟进状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     @NotNull(message = "跟进状态不能为空")
     private Boolean followUpStatus;
 
+    // TODO wanwan：这个字段应该只有 RespVO 会有；创建和修改不传递；
     @Schema(description = "锁定状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     @NotNull(message = "锁定状态不能为空")
     private Boolean lockStatus;
@@ -45,6 +47,7 @@ public class CrmCustomerBaseVO {
     @Schema(description = "备注", example = "随便")
     private String remark;
 
+    // TODO wanwan：这个字段应该只有 RespVO 会有；创建和修改不传递；因为它会在“移交”里面做哈
     @Schema(description = "负责人的用户编号", example = "25682")
     @NotNull(message = "负责人不能为空")
     private Long ownerUserId;
@@ -55,12 +58,14 @@ public class CrmCustomerBaseVO {
     @Schema(description = "详细地址", example = "北京市海淀区")
     private String detailAddress;
 
+    // TODO @芋艿：longitude、latitude 这两个字段删除；
     @Schema(description = "地理位置经度", example = "116.40341")
     private String longitude;
 
     @Schema(description = "地理位置维度", example = "39.92409")
     private String latitude;
 
+    // TODO wanwan：这个字段应该只有 RespVO 会有；创建和修改不传递；
     @Schema(description = "最后跟进时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime contactLastTime;

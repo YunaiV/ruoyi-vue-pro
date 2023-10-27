@@ -4,11 +4,11 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.sun.xml.bind.v2.TODO;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
+// TODO 芋艿：调整下字段
 /**
  * 客户 DO
  *
@@ -35,20 +35,14 @@ public class CrmCustomerDO extends BaseDO {
     private String name;
     /**
      * 跟进状态
-     * <p>
-     * 枚举 {@link TODO infra_boolean_string 对应的类}
      */
     private Boolean followUpStatus;
     /**
      * 锁定状态
-     * <p>
-     * 枚举 {@link TODO infra_boolean_string 对应的类}
      */
     private Boolean lockStatus;
     /**
      * 成交状态
-     * <p>
-     * 枚举 {@link TODO infra_boolean_string 对应的类}
      */
     private Boolean dealStatus;
     /**
@@ -71,6 +65,7 @@ public class CrmCustomerDO extends BaseDO {
      * 负责人的用户编号
      */
     private Long ownerUserId;
+    // TODO @wanwan：下面两个字段，使用 List<Long>，然后使用 typeHandler = LongListTypeHandler 解决持久化的问题；注意类上需要加 autoResultMap = true
     /**
      * 只读权限的用户编号数组
      */
@@ -87,6 +82,7 @@ public class CrmCustomerDO extends BaseDO {
      * 详细地址
      */
     private String detailAddress;
+    // TODO @wanwan：下面两个字段：删除
     /**
      * 地理位置经度
      */

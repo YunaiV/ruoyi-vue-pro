@@ -25,8 +25,6 @@ public interface CrmCustomerConvert {
 
     CrmCustomerRespVO convert(CrmCustomerDO bean);
 
-    List<CrmCustomerRespVO> convertList(List<CrmCustomerDO> list);
-
     PageResult<CrmCustomerRespVO> convertPage(PageResult<CrmCustomerDO> page);
 
     List<CrmCustomerExcelVO> convertList02(List<CrmCustomerDO> list);

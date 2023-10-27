@@ -17,6 +17,7 @@ public class CrmCustomerUpdateReqVO extends CrmCustomerBaseVO {
     @NotNull(message = "编号不能为空")
     private Long id;
 
+    // TODO @wanwan：下面两个字段，同 CrmCustomerCreateReqVO
     @Schema(description = "只读权限的用户编号数组")
     private String roUserIds;
 

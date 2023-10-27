@@ -44,7 +44,8 @@ public class CrmClueDO extends BaseDO {
     private String name;
     /**
      * 客户 id
-     * 对应 {@link CrmCustomerDO#getId()}
+     *
+     * 关联 {@link CrmCustomerDO#getId()}
      */
     private Long customerId;
     /**

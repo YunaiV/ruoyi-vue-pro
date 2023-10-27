@@ -96,6 +96,7 @@ public class CrmClueServiceImpl implements CrmClueService {
         return clueMapper.selectList(exportReqVO);
     }
 
+    // TODO @wanwan：可以在 CrmClueServiceImpl 中，增加一个方法，用于校验客户是否存在；validateCustomer；然后其它方法可以调用它。不过要注意，需要把 CustomerDO 返回，因为其它模块可能要它的信息
     /**
      * 校验客户是否存在
      *
