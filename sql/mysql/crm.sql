@@ -62,6 +62,10 @@ CREATE TABLE `crm_clue`  (
                              PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB COMMENT = '线索表' ;
 
+-- ----------------------------
+-- 商机表
+-- ----------------------------
+
 DROP TABLE IF EXISTS `crm_business`;
 CREATE TABLE `crm_business` (
                                 `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -180,3 +184,64 @@ CREATE TABLE `crm_contact` (
                                `tenant_id` bigint DEFAULT NULL,
                                PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='crm联系人';
+
+-- ----------------------------
+-- 客户表
+-- ----------------------------
+CREATE TABLE `crm_customer` (
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，主键自增',
+    `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '客户名称',
+    `follow_up_status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '跟进状态',
+    `lock_status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '锁定状态',
+    `deal_status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '成交状态',
+    `mobile` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '手机',
+    `telephone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '电话',
+    `website` varchar(1024) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '网址',
+    `remark` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '备注',
+    `owner_user_id` bigint DEFAULT NULL COMMENT '负责人的用户编号',
+    `ro_user_ids` varchar(4096) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '只读权限的用户编号数组',
+    `rw_user_ids` varchar(4096) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '读写权限的用户编号数组',
+    `area_id` bigint DEFAULT NULL COMMENT '地区编号',
+    `detail_address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '详细地址',
+    `longitude` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '地理位置经度',
+    `latitude` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '地理位置维度',
+    `contact_last_time` datetime DEFAULT NULL COMMENT '最后跟进时间',
+    `contact_next_time` datetime DEFAULT NULL COMMENT '下次联系时间',
+    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+    `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+    PRIMARY KEY (`id`),
+    KEY `owner_user_id` (`owner_user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='客户表';
+-- ----------------------------
+-- 商机状态表
+-- ----------------------------
+DROP TABLE IF EXISTS `crm_business_status`;
+CREATE TABLE `crm_business_status` (
+                                       `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+                                       `type_id` bigint NOT NULL COMMENT '状态类型编号',
+                                       `name` varchar(100) NOT NULL COMMENT '状态名',
+                                       `percent` varchar(20) DEFAULT NULL COMMENT '赢单率',
+                                       `sort` int DEFAULT NULL COMMENT '排序',
+                                       `tenant_id` bigint DEFAULT '1' COMMENT '租户ID',
+                                       PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='商机状态表'
+
+-- ----------------------------
+-- 商机状态类型表
+-- ----------------------------
+DROP TABLE IF EXISTS `crm_business_status_type`;
+CREATE TABLE `crm_business_status_type` (
+                                            `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+                                            `name` varchar(100) NOT NULL COMMENT '状态类型名',
+                                            `dept_ids` varchar(200) NOT NULL COMMENT '使用的部门编号',
+                                            `status` bit(1) NOT NULL DEFAULT b'0' COMMENT '开启状态',
+                                            `creator` varchar(64) NOT NULL COMMENT '创建人',
+                                            `create_time` datetime NOT NULL COMMENT '创建时间',
+                                            `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+                                            `tenant_id` bigint DEFAULT '1' COMMENT '租户ID',
+                                            PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='商机状态类型表'

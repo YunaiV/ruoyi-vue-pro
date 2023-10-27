@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.clue;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -44,7 +45,7 @@ public class CrmClueDO extends BaseDO {
     /**
      * 客户 id
      *
-     * // TODO @wanwan：要写下关联的实体，以及对应的属性哈
+     * 关联 {@link CrmCustomerDO#getId()}
      */
     private Long customerId;
     /**
