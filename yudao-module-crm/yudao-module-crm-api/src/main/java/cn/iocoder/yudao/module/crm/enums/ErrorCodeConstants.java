@@ -26,4 +26,7 @@ public interface ErrorCodeConstants {
 
     ErrorCode RECEIVABLE_PLAN_NOT_EXISTS = new ErrorCode(1_040_000_001, "回款计划不存在");
 
+    // ========== 客户管理 1_020_006_000 ==========
+    ErrorCode CUSTOMER_NOT_EXISTS = new ErrorCode(1_020_006_000, "客户不存在");
+
 }
