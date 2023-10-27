@@ -34,6 +34,7 @@ public class CrmBusinessStatusTypeServiceImpl implements CrmBusinessStatusTypeSe
 
     @Override
     public Long createBusinessStatusType(CrmBusinessStatusTypeCreateReqVO createReqVO) {
+        // TODO ljlleo：name 应该需要唯一哈；
         // 插入
         CrmBusinessStatusTypeDO businessStatusType = CrmBusinessStatusTypeConvert.INSTANCE.convert(createReqVO);
         businessStatusTypeMapper.insert(businessStatusType);
@@ -43,6 +44,7 @@ public class CrmBusinessStatusTypeServiceImpl implements CrmBusinessStatusTypeSe
 
     @Override
     public void updateBusinessStatusType(CrmBusinessStatusTypeUpdateReqVO updateReqVO) {
+        // TODO ljlleo：name 应该需要唯一哈；
         // 校验存在
         validateBusinessStatusTypeExists(updateReqVO.getId());
         // 更新
@@ -54,6 +56,7 @@ public class CrmBusinessStatusTypeServiceImpl implements CrmBusinessStatusTypeSe
     public void deleteBusinessStatusType(Long id) {
         // 校验存在
         validateBusinessStatusTypeExists(id);
+        // TODO 艿艿：这里在看看，是不是要校验业务是否在使用；
         // 删除
         businessStatusTypeMapper.deleteById(id);
     }

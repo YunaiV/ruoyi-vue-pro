@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.module.crm.controller.admin.businessstatus.vo;
 
-import lombok.*;
-import java.util.*;
 import io.swagger.v3.oas.annotations.media.Schema;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import lombok.Data;
 
+// TODO @lilleo：这个暂时不需要；嘿嘿~不是每个模块都需要导出哈
 @Schema(description = "管理后台 - 商机状态 Excel 导出 Request VO，参数和 CrmBusinessStatusPageReqVO 是一致的")
 @Data
 public class CrmBusinessStatusExportReqVO {

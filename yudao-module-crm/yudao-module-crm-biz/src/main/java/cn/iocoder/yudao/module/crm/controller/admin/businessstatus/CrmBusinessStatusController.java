@@ -25,6 +25,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
+// TODO @lilleo：这个模块，可以挪到 business 下；这样我打开 business 包下，就知道，噢~原来里面有 business 商机、有 type 状态类型、status 具体状态；
 @Tag(name = "管理后台 - 商机状态")
 @RestController
 @RequestMapping("/crm/business-status")
@@ -67,6 +68,7 @@ public class CrmBusinessStatusController {
         return success(CrmBusinessStatusConvert.INSTANCE.convert(businessStatus));
     }
 
+    // TODO @lilleo：这个接口，暂时用不到，可以考虑先删除掉
     @GetMapping("/list")
     @Operation(summary = "获得商机状态列表")
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
@@ -96,6 +98,7 @@ public class CrmBusinessStatusController {
         ExcelUtils.write(response, "商机状态.xls", "数据", CrmBusinessStatusExcelVO.class, datas);
     }
 
+    // TODO 芋艿：后续再看看
     @GetMapping("/get-simple-list")
     @Operation(summary = "获得商机状态列表")
     @PreAuthorize("@ss.hasPermission('crm:business-status:query')")
@@ -104,6 +107,7 @@ public class CrmBusinessStatusController {
         return success(CrmBusinessStatusConvert.INSTANCE.convertList(list));
     }
 
+    // TODO 芋艿：后续再看看
     @GetMapping("/get-all-list")
     @Operation(summary = "获得商机状态列表")
     @PreAuthorize("@ss.hasPermission('crm:business-status:query')")

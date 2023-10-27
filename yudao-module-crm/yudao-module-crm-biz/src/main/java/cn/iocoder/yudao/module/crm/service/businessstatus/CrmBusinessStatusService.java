@@ -73,9 +73,9 @@ public interface CrmBusinessStatusService {
     List<CrmBusinessStatusDO> getBusinessStatusList(CrmBusinessStatusExportReqVO exportReqVO);
 
     /**
-     * 根据类型ID获得商机状态列表
+     * 根据类型 ID 获得商机状态列表
      *
-     * @param typeId 商机状态类型ID
+     * @param typeId 商机状态类型 ID
      * @return 商机状态列表
      */
     List<CrmBusinessStatusDO> getBusinessStatusListByTypeId(Integer typeId);

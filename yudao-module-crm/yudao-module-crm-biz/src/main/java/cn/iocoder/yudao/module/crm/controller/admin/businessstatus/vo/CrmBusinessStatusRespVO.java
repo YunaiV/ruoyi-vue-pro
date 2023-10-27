@@ -9,7 +9,7 @@ import lombok.*;
 @ToString(callSuper = true)
 public class CrmBusinessStatusRespVO extends CrmBusinessStatusBaseVO {
 
-    @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "6802")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "6802")
     private Long id;
 
 }

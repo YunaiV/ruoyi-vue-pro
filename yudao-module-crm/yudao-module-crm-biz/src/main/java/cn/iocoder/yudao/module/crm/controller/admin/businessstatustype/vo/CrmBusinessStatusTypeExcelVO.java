@@ -1,13 +1,11 @@
 package cn.iocoder.yudao.module.crm.controller.admin.businessstatustype.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-
 import com.alibaba.excel.annotation.ExcelProperty;
+import lombok.Data;
 
+import java.time.LocalDateTime;
+
+// TODO @lilleo：这个暂时不需要；嘿嘿~不是每个模块都需要导出哈
 /**
  * 商机状态类型 Excel VO
  *

@@ -26,6 +26,8 @@ public class CrmBusinessStatusDO {
     private Long id;
     /**
      * 状态类型编号
+     *
+     * // TODO @ljlleo：要写下关联字段噢
      */
     private Long typeId;
     /**

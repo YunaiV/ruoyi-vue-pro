@@ -17,6 +17,9 @@ public interface ErrorCodeConstants {
 
     // ========== 商机管理 1-020-002-000 ==========
     ErrorCode BUSINESS_NOT_EXISTS = new ErrorCode(1_020_002_000, "商机不存在");
+
+    // TODO @lilleo：商机状态、商机类型，都单独错误码段
+
     ErrorCode BUSINESS_STATUS_TYPE_NOT_EXISTS = new ErrorCode(1_020_002_001, "商机状态类型不存在");
     ErrorCode BUSINESS_STATUS_NOT_EXISTS = new ErrorCode(1_020_002_002, "商机状态不存在");
 

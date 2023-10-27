@@ -21,7 +21,7 @@ public interface CrmBusinessStatusTypeMapper extends BaseMapperX<CrmBusinessStat
     default PageResult<CrmBusinessStatusTypeDO> selectPage(CrmBusinessStatusTypePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<CrmBusinessStatusTypeDO>()
                 .likeIfPresent(CrmBusinessStatusTypeDO::getName, reqVO.getName())
-                .eqIfPresent(CrmBusinessStatusTypeDO::getDeptIds, reqVO.getDeptIds())
+//                .eqIfPresent(CrmBusinessStatusTypeDO::getDeptIds, reqVO.getDeptIds()) TODO 报错，临时注释掉
                 .eqIfPresent(CrmBusinessStatusTypeDO::getStatus, reqVO.getStatus())
                 .orderByDesc(CrmBusinessStatusTypeDO::getId));
     }
@@ -37,7 +37,5 @@ public interface CrmBusinessStatusTypeMapper extends BaseMapperX<CrmBusinessStat
     default List<CrmBusinessStatusTypeDO> getBusinessStatusTypeListByStatus(Integer status) {
         return selectList(CrmBusinessStatusTypeDO::getStatus, status.byteValue());
     }
-
-
 
 }

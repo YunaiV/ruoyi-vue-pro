@@ -28,6 +28,7 @@ public class CrmBusinessStatusTypeDO {
      * 状态类型名
      */
     private String name;
+    // TODO @ljlleo：List 存储哈
     /**
      * 使用的部门编号
      */
@@ -35,6 +36,7 @@ public class CrmBusinessStatusTypeDO {
     /**
      * 开启状态
      */
+    // TODO @ljlleo：这个字段，使用 Integer，对应 CommonStatus
     private Boolean status;
 
 }
