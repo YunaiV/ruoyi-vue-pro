@@ -2,14 +2,19 @@ package cn.iocoder.yudao.module.crm.service.receivable;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.ReceivableCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.ReceivableExportReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.ReceivablePageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.ReceivableUpdateReqVO;
 import cn.iocoder.yudao.module.crm.convert.receivable.ReceivableConvert;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contract.ContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.ReceivableDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.receivable.ReceivableMapper;
+import cn.iocoder.yudao.module.crm.enums.AuditStatusEnum;
+import cn.iocoder.yudao.module.crm.service.contract.ContractService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -18,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CONTRACT_NOT_EXISTS;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.RECEIVABLE_NOT_EXISTS;
 
 /**
@@ -31,6 +37,8 @@ public class ReceivableServiceImpl implements ReceivableService {
 
     @Resource
     private ReceivableMapper receivableMapper;
+    @Resource
+    private ContractService contractService;
 
     @Override
     public Long createReceivable(ReceivableCreateReqVO createReqVO) {
@@ -38,9 +46,27 @@ public class ReceivableServiceImpl implements ReceivableService {
         // TODO @liuhongfeng：其它类似 customerId、contractId 也需要去校验；
         // 插入
         ReceivableDO receivable = ReceivableConvert.INSTANCE.convert(createReqVO);
+
+        receivable.setCheckStatus(AuditStatusEnum.AUDIT_NEW.getValue());
+        //校验
+        checkReceivable(receivable);
+
         receivableMapper.insert(receivable);
         // 返回
         return receivable.getId();
+    }
+
+    private void checkReceivable(ReceivableDO receivable) {
+
+        if(ObjectUtil.isNull(receivable.getContractId())){
+            throw exception(CONTRACT_NOT_EXISTS);
+        }
+
+        ContractDO contract = contractService.getContract(receivable.getContractId());
+        if(ObjectUtil.isNull(contract)){
+            throw exception(CONTRACT_NOT_EXISTS);
+        }
+
     }
 
     @Override

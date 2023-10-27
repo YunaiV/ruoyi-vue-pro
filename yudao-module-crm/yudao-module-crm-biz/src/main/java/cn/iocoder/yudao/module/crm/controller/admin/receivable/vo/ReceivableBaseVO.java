@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo;
 
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.crm.enums.AuditStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -33,9 +35,8 @@ public class ReceivableBaseVO {
     @Schema(description = "合同ID", example = "30305")
     private Long contractId;
 
-    // TODO @liuhongfeng：这个字段，可以写个枚举，然后 InEnum 去校验下；
-    // TODO @liuhongfeng：这个字段，应该不是前端传递的噢，而是后端自己生成的
     @Schema(description = "审批状态", example = "1")
+    @InEnum(AuditStatusEnum.class)
     private Integer checkStatus;
 
     // TODO @liuhongfeng：这个字段，应该不是前端传递的噢，而是后端自己生成的，所以不适合放在 base 里面；
