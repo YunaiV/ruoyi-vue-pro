@@ -22,8 +22,6 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<CrmCustomerDO>()
                 .likeIfPresent(CrmCustomerDO::getName, reqVO.getName())
                 .eqIfPresent(CrmCustomerDO::getMobile, reqVO.getMobile())
-                .eqIfPresent(CrmCustomerDO::getTelephone, reqVO.getTelephone())
-                .likeIfPresent(CrmCustomerDO::getWebsite, reqVO.getWebsite())
                 .orderByDesc(CrmCustomerDO::getId));
     }
 
@@ -31,8 +29,6 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
         return selectList(new LambdaQueryWrapperX<CrmCustomerDO>()
                 .likeIfPresent(CrmCustomerDO::getName, reqVO.getName())
                 .eqIfPresent(CrmCustomerDO::getMobile, reqVO.getMobile())
-                .eqIfPresent(CrmCustomerDO::getTelephone, reqVO.getTelephone())
-                .likeIfPresent(CrmCustomerDO::getWebsite, reqVO.getWebsite())
                 .orderByDesc(CrmCustomerDO::getId));
     }
 

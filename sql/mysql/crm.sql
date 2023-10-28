@@ -203,8 +203,6 @@ CREATE TABLE `crm_customer` (
     `rw_user_ids` varchar(4096) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '读写权限的用户编号数组',
     `area_id` bigint DEFAULT NULL COMMENT '地区编号',
     `detail_address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '详细地址',
-    `longitude` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '地理位置经度',
-    `latitude` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '地理位置维度',
     `contact_last_time` datetime DEFAULT NULL COMMENT '最后跟进时间',
     `contact_next_time` datetime DEFAULT NULL COMMENT '下次联系时间',
     `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',

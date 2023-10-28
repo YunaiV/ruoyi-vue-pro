@@ -85,4 +85,18 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         return customerMapper.selectList(exportReqVO);
     }
 
+    /**
+     * 校验客户是否存在
+     *
+     * @param customerId 客户id
+     * @return
+     */
+    @Override
+    public CrmCustomerDO validateCustomer(Long customerId) {
+        CrmCustomerDO customer = getCustomer(customerId);
+        if (Objects.isNull(customer)) {
+            throw exception(CUSTOMER_NOT_EXISTS);
+        }
+        return customer;
+    }
 }

@@ -44,6 +44,18 @@ public class CrmCustomerExcelVO {
     @ExcelProperty("网址")
     private String website;
 
+    @ExcelProperty("QQ")
+    private String qq;
+
+    @ExcelProperty("wechat")
+    private String wechat;
+
+    @ExcelProperty("email")
+    private String email;
+
+    @ExcelProperty("客户描述")
+    private String description;
+
     @ExcelProperty("备注")
     private String remark;
 
@@ -55,12 +67,6 @@ public class CrmCustomerExcelVO {
 
     @ExcelProperty("详细地址")
     private String detailAddress;
-
-    @ExcelProperty("地理位置经度")
-    private String longitude;
-
-    @ExcelProperty("地理位置维度")
-    private String latitude;
 
     @ExcelProperty("最后跟进时间")
     private LocalDateTime contactLastTime;

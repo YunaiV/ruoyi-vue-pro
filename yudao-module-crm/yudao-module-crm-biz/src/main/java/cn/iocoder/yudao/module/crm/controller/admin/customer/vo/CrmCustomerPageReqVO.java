@@ -18,13 +18,5 @@ public class CrmCustomerPageReqVO extends PageParam {
     @Schema(description = "手机", example = "18000000000")
     private String mobile;
 
-    // TODO @wanwan：这个字段不需要哈
-    @Schema(description = "电话", example = "18000000000")
-    private String telephone;
-
-    // TODO @wanwan：这个字段不需要哈
-    @Schema(description = "网址", example = "https://www.baidu.com")
-    private String website;
-
     // TODO @芋艿：场景；
 }
