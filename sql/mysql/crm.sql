@@ -188,32 +188,42 @@ CREATE TABLE `crm_contact` (
 -- ----------------------------
 -- 客户表
 -- ----------------------------
-CREATE TABLE `crm_customer` (
-    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，主键自增',
-    `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '客户名称',
-    `follow_up_status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '跟进状态',
-    `lock_status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '锁定状态',
-    `deal_status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '成交状态',
-    `mobile` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '手机',
-    `telephone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '电话',
-    `website` varchar(1024) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '网址',
-    `remark` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '备注',
-    `owner_user_id` bigint DEFAULT NULL COMMENT '负责人的用户编号',
-    `ro_user_ids` varchar(4096) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '只读权限的用户编号数组',
-    `rw_user_ids` varchar(4096) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '读写权限的用户编号数组',
-    `area_id` bigint DEFAULT NULL COMMENT '地区编号',
-    `detail_address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '详细地址',
-    `contact_last_time` datetime DEFAULT NULL COMMENT '最后跟进时间',
-    `contact_next_time` datetime DEFAULT NULL COMMENT '下次联系时间',
-    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',
-    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
-    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-    `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
-    PRIMARY KEY (`id`),
-    KEY `owner_user_id` (`owner_user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='客户表';
+DROP TABLE IF EXISTS `crm_customer`;
+CREATE TABLE `crm_customer`  (
+ `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，主键自增',
+ `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '客户名称',
+ `follow_up_status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '跟进状态',
+ `lock_status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '锁定状态',
+ `deal_status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '成交状态',
+ `industry_id` int NULL DEFAULT NULL COMMENT '所属行业',
+ `level` int NULL DEFAULT NULL COMMENT '客户等级',
+ `source` int NULL DEFAULT NULL COMMENT '客户来源',
+ `mobile` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '手机',
+ `telephone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '电话',
+ `website` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '网址',
+ `qq` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'QQ',
+ `wechat` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '微信',
+ `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '邮箱',
+ `description` varchar(4096) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '客户描述',
+ `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '备注',
+ `owner_user_id` bigint NULL DEFAULT NULL COMMENT '负责人的用户编号',
+ `ro_user_ids` varchar(4096) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '只读权限的用户编号数组',
+ `rw_user_ids` varchar(4096) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '读写权限的用户编号数组',
+ `area_id` bigint NULL DEFAULT NULL COMMENT '地区编号',
+ `detail_address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '详细地址',
+ `longitude` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '地理位置经度',
+ `latitude` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '地理位置维度',
+ `contact_last_time` datetime NULL DEFAULT NULL COMMENT '最后跟进时间',
+ `contact_next_time` datetime NULL DEFAULT NULL COMMENT '下次联系时间',
+ `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+ `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+ `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+ `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+ `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+ `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+ PRIMARY KEY (`id`) USING BTREE,
+ INDEX `owner_user_id`(`owner_user_id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '客户表' ROW_FORMAT = Dynamic;
 -- ----------------------------
 -- 商机状态表
 -- ----------------------------

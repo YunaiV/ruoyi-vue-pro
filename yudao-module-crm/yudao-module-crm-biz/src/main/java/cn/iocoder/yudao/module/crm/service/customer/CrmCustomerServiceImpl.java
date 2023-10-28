@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.crm.service.customer;
 
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -29,6 +30,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Resource
     private CrmCustomerMapper customerMapper;
+    @Resource
+    private DeptApi deptApi;
 
     @Override
     public Long createCustomer(CrmCustomerCreateReqVO createReqVO) {

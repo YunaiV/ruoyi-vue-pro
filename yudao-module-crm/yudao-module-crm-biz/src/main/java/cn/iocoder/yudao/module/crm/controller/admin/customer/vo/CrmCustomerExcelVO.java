@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import cn.iocoder.yudao.module.infra.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -34,6 +35,18 @@ public class CrmCustomerExcelVO {
     @ExcelProperty(value = "成交状态", converter = DictConvert.class)
     @DictFormat(DictTypeConstants.BOOLEAN_STRING)
     private Boolean dealStatus;
+
+    @ExcelProperty(value = "所属行业", converter = DictConvert.class)
+    @DictFormat(cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_INDUSTRY)
+    private Integer industryId;
+
+    @ExcelProperty(value = "客户等级", converter = DictConvert.class)
+    @DictFormat(cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_LEVEL)
+    private Integer level;
+
+    @ExcelProperty(value = "客户来源", converter = DictConvert.class)
+    @DictFormat(cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_SOURCE)
+    private Integer source;
 
     @ExcelProperty("手机")
     private String mobile;
