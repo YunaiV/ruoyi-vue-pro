@@ -110,8 +110,8 @@ public class ContactServiceImpl implements ContactService {
         }
 
         // 3. 更新新的负责人
-        ContactDO updateContract = ContactConvert.INSTANCE.convert(contact, reqVO, userId);
-        contactMapper.updateById(updateContract);
+        ContactDO updateContact = ContactConvert.INSTANCE.convert(contact, reqVO, userId);
+        contactMapper.updateById(updateContact);
 
         // 4. TODO 记录联系人转移日志
 
