@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.*;
 import cn.iocoder.yudao.module.crm.convert.contract.ContractConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.ContractDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contract.ContractMapper;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -15,8 +17,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CONTRACT_NOT_EXISTS;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CONTRACT_TRANSFER_FAIL_PERMISSION_DENIED;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.crm.framework.utils.AuthUtil.isReadAndWrite;
 
 /**
@@ -30,6 +31,9 @@ public class ContractServiceImpl implements ContractService {
 
     @Resource
     private ContractMapper contractMapper;
+
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @Override
     public Long createContract(ContractCreateReqVO createReqVO) {
@@ -96,12 +100,17 @@ public class ContractServiceImpl implements ContractService {
         if (!isReadAndWrite(contract.getRwUserIds(), userId)) {
             throw exception(CONTRACT_TRANSFER_FAIL_PERMISSION_DENIED);
         }
+        // 2. 校验新负责人是否存在
+        AdminUserRespDTO user = adminUserApi.getUser(reqVO.getOwnerUserId());
+        if (user == null) {
+            throw exception(CONTRACT_TRANSFER_FAIL_OWNER_USER_NOT_EXISTS);
+        }
 
-        // 2. 更新新的负责人
+        // 3. 更新新的负责人
         ContractDO updateContract = ContractConvert.INSTANCE.convert(contract, reqVO, userId);
         contractMapper.updateById(updateContract);
 
-        // 3. TODO 记录合同转移日志
+        // 4. TODO 记录合同转移日志
 
     }
 
