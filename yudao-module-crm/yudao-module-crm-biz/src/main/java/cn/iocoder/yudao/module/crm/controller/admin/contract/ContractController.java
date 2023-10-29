@@ -95,5 +95,4 @@ public class ContractController {
         return success(true);
     }
 
-
 }

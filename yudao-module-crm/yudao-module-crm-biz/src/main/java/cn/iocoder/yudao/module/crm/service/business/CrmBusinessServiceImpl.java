@@ -92,26 +92,27 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         return businessMapper.selectList(exportReqVO);
     }
 
+    // TODO @puhui999：动名词哈。transferBusiness
     @Override
     public void businessTransfer(CrmBusinessTransferReqVO reqVO, Long userId) {
-        // 1. 校验商机是否存在
+        // 1.1 校验商机是否存在
         CrmBusinessDO business = validateBusinessExists(reqVO.getId());
-        // 1.2. 校验用户是否拥有读写权限
+        // 1.2 校验用户是否拥有读写权限
         if (!isReadAndWrite(business.getRwUserIds(), userId)) {
             throw exception(BUSINESS_TRANSFER_FAIL_PERMISSION_DENIED);
         }
-        // 2. 校验新负责人是否存在
+        // TODO @puhui999：如果已经是该负责人，抛个业务异常；
+        // 1.3 校验新负责人是否存在
         AdminUserRespDTO user = adminUserApi.getUser(reqVO.getOwnerUserId());
         if (user == null) {
             throw exception(BUSINESS_TRANSFER_FAIL_OWNER_USER_NOT_EXISTS);
         }
 
-        // 3. 更新新的负责人
+        // 2. 更新新的负责人
         CrmBusinessDO updateBusiness = CrmBusinessConvert.INSTANCE.convert(business, reqVO, userId);
         businessMapper.updateById(updateBusiness);
 
         // 4. TODO 记录商机转移日志
-
     }
 
 }
