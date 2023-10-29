@@ -32,6 +32,7 @@ public interface ContactConvert {
 
     List<ContactExcelVO> convertList02(List<ContactDO> list);
 
+    // TODO @puhui999：参考 CrmBusinessConvert 的修改建议
     default ContactDO convert(ContactDO contact, CrmContactTransferReqVO reqVO, Long userId) {
         Set<Long> rwUserIds = contact.getRwUserIds();
         rwUserIds.removeIf(item -> ObjUtil.equal(item, userId)); // 移除老负责人

@@ -32,6 +32,7 @@ public interface ContractConvert {
 
     List<ContractExcelVO> convertList02(List<ContractDO> list);
 
+    // TODO @puhui999：参考 CrmBusinessConvert 的修改建议
     default ContractDO convert(ContractDO contract, CrmContractTransferReqVO reqVO, Long userId) {
         Set<Long> rwUserIds = contract.getRwUserIds();
         rwUserIds.removeIf(item -> ObjUtil.equal(item, userId)); // 移除老负责人

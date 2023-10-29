@@ -15,6 +15,6 @@ public class CrmBusinessTransferReqVO {
 
     @Schema(description = "新负责人的用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
     @NotNull(message = "新负责人的用户编号不能为空")
-    private Long ownerUserId; // 新的负责人
+    private Long ownerUserId;
 
 }
