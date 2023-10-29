@@ -68,11 +68,9 @@ public interface ErrorCodeConstants {
     ErrorCode PAY_TRANSFER_NOT_FOUND = new ErrorCode(1_007_009_001, "转账交易单不存在");
     ErrorCode PAY_TRANSFER_STATUS_IS_SUCCESS = new ErrorCode(1_007_009_002, "转账单已成功转账");
     ErrorCode PAY_TRANSFER_EXISTS = new ErrorCode(1_007_009_003, "已经存在转账单");
-    ErrorCode PAY_MERCHANT_TRANSFER_EXISTS = new ErrorCode(1_007_009_004, "该笔业务的转账已经存在,请查询相关状态");
+    ErrorCode PAY_MERCHANT_TRANSFER_EXISTS = new ErrorCode(1_007_009_004, "该笔业务的转账已经存在,请查询转账订单相关状态");
     ErrorCode PAY_TRANSFER_STATUS_IS_NOT_WAITING = new ErrorCode(1_007_009_005, "转账单不处于待转账");
     ErrorCode PAY_TRANSFER_STATUS_IS_NOT_PENDING = new ErrorCode(1_007_009_006, "转账单不处于待转账或转账中");
-    ErrorCode PAY_TRANSFER_TYPE_AND_CHANNEL_NOT_MATCH = new ErrorCode(1_007_009_008, "转账类型和转账渠道不匹配");
-
     // ========== 示例订单 1-007-900-000 ==========
     ErrorCode DEMO_ORDER_NOT_FOUND = new ErrorCode(1_007_900_000, "示例订单不存在");
     ErrorCode DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID = new ErrorCode(1_007_900_001, "示例订单更新支付状态失败，订单不是【未支付】状态");

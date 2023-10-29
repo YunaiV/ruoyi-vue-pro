@@ -11,6 +11,8 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum.*;
+
 /**
  * 统一转账 Request DTO
  *
@@ -49,31 +51,25 @@ public class PayTransferUnifiedReqDTO {
      */
     @NotEmpty(message = "转账标题不能为空")
     @Length(max = 128, message = "转账标题不能超过 128")
-    private String title;
+    private String subject;
 
+    /**
+     * 收款人姓名
+     */
+    @NotBlank(message = "收款人姓名不能为空", groups = {Alipay.class})
+    private String userName;
 
     /**
      * 支付宝登录号
      */
-    @NotBlank(message = "支付宝登录号不能为空", groups = {PayTransferTypeEnum.Alipay.class})
+    @NotBlank(message = "支付宝登录号不能为空", groups = {Alipay.class})
     private String alipayLogonId;
-
-    /**
-     * 支付宝账号名称
-     */
-    @NotBlank(message = "支付宝账号名称不能为空", groups = {PayTransferTypeEnum.Alipay.class})
-    private String alipayAccountName;
 
     /**
      * 微信 openId
      */
-    @NotBlank(message = "微信 openId 不能为空", groups = {PayTransferTypeEnum.WxPay.class})
+    @NotBlank(message = "微信 openId 不能为空", groups = {WxPay.class})
     private String openid;
-
-    /**
-     * 微信账号名称
-     */
-    private String wxAccountName;
 
     /**
      * 支付渠道的额外参数

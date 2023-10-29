@@ -43,8 +43,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 import static cn.hutool.core.date.DatePattern.NORM_DATETIME_FORMATTER;
-import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
-import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.NOT_IMPLEMENTED;
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
 import static cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig.MODE_CERTIFICATE;
@@ -229,13 +228,13 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
     protected PayTransferRespDTO doUnifiedTransfer(PayTransferUnifiedReqDTO reqDTO) throws AlipayApiException {
         // 1.1 校验公钥类型 必须使用公钥证书模式
         if (!Objects.equals(config.getMode(), MODE_CERTIFICATE)) {
-            throw exception0(BAD_REQUEST.getCode(),"支付宝单笔转账必须使用公钥证书模式");
+            throw exception0(ERROR_CONFIGURATION.getCode(),"支付宝单笔转账必须使用公钥证书模式");
         }
         // 1.2 构建 AlipayFundTransUniTransferModel
         AlipayFundTransUniTransferModel model = new AlipayFundTransUniTransferModel();
         // ① 通用的参数
         model.setTransAmount(formatAmount(reqDTO.getPrice())); // 转账金额
-        model.setOrderTitle(reqDTO.getTitle());               // 转账业务的标题，用于在支付宝用户的账单里显示。
+        model.setOrderTitle(reqDTO.getSubject());               // 转账业务的标题，用于在支付宝用户的账单里显示。
         model.setOutBizNo(reqDTO.getOutTransferNo());
         model.setProductCode("TRANS_ACCOUNT_NO_PWD");    // 销售产品码。单笔无密转账固定为 TRANS_ACCOUNT_NO_PWD
         model.setBizScene("DIRECT_TRANSFER");           // 业务场景 单笔无密转账固定为 DIRECT_TRANSFER
@@ -249,7 +248,7 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
                 Participant payeeInfo = new Participant();
                 payeeInfo.setIdentityType("ALIPAY_LOGON_ID");
                 payeeInfo.setIdentity(reqDTO.getAlipayLogonId()); // 支付宝登录号
-                payeeInfo.setName(reqDTO.getAlipayAccountName()); // 支付宝账号姓名
+                payeeInfo.setName(reqDTO.getUserName()); // 支付宝账号姓名
                 model.setPayeeInfo(payeeInfo);
                 // 1.3 构建 AlipayFundTransUniTransferRequest
                 AlipayFundTransUniTransferRequest request = new AlipayFundTransUniTransferRequest();

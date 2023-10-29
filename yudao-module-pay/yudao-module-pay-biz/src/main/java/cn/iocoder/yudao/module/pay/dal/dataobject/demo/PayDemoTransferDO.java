@@ -27,21 +27,11 @@ public class PayDemoTransferDO extends BaseDO {
     private Long id;
 
     /**
-     * 用户编号
-     */
-    private Long userId;
-
-    /**
      * 应用编号
      *
      * 关联 {@link PayAppDO#getId()}
      */
     private Long appId;
-
-    /**
-     * 转账金额，单位：分
-     */
-    private Integer price;
 
     /**
      * 转账类型
@@ -51,14 +41,19 @@ public class PayDemoTransferDO extends BaseDO {
     private Integer type;
 
     /**
+     * 转账金额，单位：分
+     */
+    private Integer price;
+
+    /**
+     * 收款人姓名
+     */
+    private String userName;
+
+    /**
      * 支付宝登录号
      */
     private String alipayLogonId;
-
-    /**
-     * 支付宝账号名称
-     */
-    private String alipayAccountName;
 
     /**
      * 微信 openId
@@ -66,17 +61,12 @@ public class PayDemoTransferDO extends BaseDO {
     private String openid;
 
     /**
-     * 微信账号名称
-     */
-    private String wxAccountName;
-
-    /**
      * 转账状态
      */
     private Integer transferStatus;
 
     /**
-     * 转账订单编号
+     * 转账单编号
      */
     private Long payTransferId;
 

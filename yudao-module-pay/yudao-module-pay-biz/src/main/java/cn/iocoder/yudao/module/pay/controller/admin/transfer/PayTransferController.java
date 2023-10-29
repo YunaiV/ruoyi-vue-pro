@@ -28,11 +28,11 @@ public class PayTransferController {
     @Resource
     private PayTransferService payTransferService;
 
-    @PostMapping("/initiate")
-    @Operation(summary = "发起转账")
+    @PostMapping("/create")
+    @Operation(summary = "创建转账单，发起转账")
     // TODO @jason：权限的设置， 管理后台页面加的时候加一下
-    public CommonResult<PayTransferCreateRespVO> initiatePayTransfer(@Valid @RequestBody PayTransferCreateReqVO reqVO) {
-        PayTransferDO payTransfer = payTransferService.initiateTransfer(reqVO, getClientIP());
+    public CommonResult<PayTransferCreateRespVO> createPayTransfer(@Valid @RequestBody PayTransferCreateReqVO reqVO) {
+        PayTransferDO payTransfer = payTransferService.createTransfer(reqVO, getClientIP());
         return success(new PayTransferCreateRespVO().setId(payTransfer.getId()).setStatus(payTransfer.getStatus()));
     }
 

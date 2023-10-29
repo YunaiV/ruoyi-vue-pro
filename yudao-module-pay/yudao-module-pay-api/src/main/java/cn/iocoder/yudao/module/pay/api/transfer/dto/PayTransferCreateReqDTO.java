@@ -60,19 +60,16 @@ public class PayTransferCreateReqDTO {
     @NotEmpty(message = "转账标题不能为空")
     private String subject;
 
-    @NotEmpty(message = "收款方信息不能为空")
-    private Map<String, String> payeeInfo;
+    /**
+     * 收款人姓名
+     */
+    @NotBlank(message = "收款人姓名不能为空", groups = {PayTransferTypeEnum.Alipay.class})
+    private String userName;
 
     @NotBlank(message = "支付宝登录号不能为空", groups = {PayTransferTypeEnum.Alipay.class})
     private String alipayLogonId;
 
-    @NotBlank(message = "支付宝登录号不能为空", groups = {PayTransferTypeEnum.Alipay.class})
-    private String alipayAccountName;
-
     // ========== 微信转账相关字段 ==========
     @NotBlank(message = "微信 openId 不能为空", groups = {PayTransferTypeEnum.WxPay.class})
     private String openid;
-
-    private String wxAccountName;
-
 }

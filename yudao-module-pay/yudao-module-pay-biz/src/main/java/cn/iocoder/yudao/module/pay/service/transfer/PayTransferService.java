@@ -14,18 +14,18 @@ import javax.validation.Valid;
 public interface PayTransferService {
 
     /**
-     * 发起转账
+     * 创建转账单，并发起转账
      *
-     * 此时，会发起支付渠道的调用
+     * 此时，会发起转账渠道的调用
      *
      * @param reqVO 请求
      * @param userIp 用户 ip
      * @return 渠道的返回结果
      */
-    PayTransferDO initiateTransfer(@Valid PayTransferCreateReqVO reqVO, String userIp);
+    PayTransferDO createTransfer(@Valid PayTransferCreateReqVO reqVO, String userIp);
 
     /**
-     * 创建转账单
+     * 创建转账单，并发起转账
      *
      * @param reqDTO 创建请求
      * @return 转账单编号

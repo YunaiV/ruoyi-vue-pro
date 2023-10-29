@@ -11,6 +11,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import static cn.iocoder.yudao.module.pay.enums.transfer.PayTransferTypeEnum.*;
+
 /**
  * @author jason
  */
@@ -28,29 +30,22 @@ public class PayDemoTransferCreateReqVO {
     @Min(value = 1, message = "转账金额必须大于零")
     private Integer price;
 
+    @Schema(description = "收款人姓名", example = "test1")
+    @NotBlank(message = "收款人姓名不能为空", groups = {Alipay.class})
+    private String userName;
+
     // ========== 支付宝转账相关字段 ==========
     @Schema(description = "支付宝登录号,支持邮箱和手机号格式", example = "test1@@sandbox.com")
     @NotBlank(message = "支付宝登录号不能为空", groups = {Alipay.class})
     private String alipayLogonId;
-
-    @Schema(description = "支付宝账号名称", example = "test1")
-    @NotBlank(message = "支付宝账号名称不能为空", groups = {Alipay.class})
-    private String alipayAccountName;
 
     // ========== 微信转账相关字段 ==========
     @Schema(description = "微信 openId", example = "oLefc4g5Gxx")
     @NotBlank(message = "微信 openId 不能为空", groups = {WxPay.class})
     private String openid;
 
-    @Schema(description = "微信账号名称", example = "test2")
-    private String wxAccountName;
 
     // ========== 转账到银行卡和钱包相关字段 待补充 ==========
-    public interface WxPay {
-    }
-
-    public interface Alipay {
-    }
 
     public void validate(Validator validator) {
         PayTransferTypeEnum transferType = PayTransferTypeEnum.typeOf(type);

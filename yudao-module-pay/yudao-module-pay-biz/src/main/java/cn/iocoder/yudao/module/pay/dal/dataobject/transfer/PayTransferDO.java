@@ -85,6 +85,12 @@ public class PayTransferDO extends BaseDO {
      * 转账金额，单位：分
      */
     private Integer price;
+
+    /**
+     * 收款人姓名
+     */
+    private String userName;
+
     /**
      * 转账状态
      *
@@ -103,21 +109,12 @@ public class PayTransferDO extends BaseDO {
      */
     private String alipayLogonId;
 
-    /**
-     * 支付宝账号名称
-     */
-    private String alipayAccountName;
 
     // ========== 微信转账相关字段 ==========
     /**
      * 微信 openId
      */
     private String openid;
-
-    /**
-     * 微信账号名称
-     */
-    private String wxAccountName;
 
     // ========== 其它字段 ==========
 

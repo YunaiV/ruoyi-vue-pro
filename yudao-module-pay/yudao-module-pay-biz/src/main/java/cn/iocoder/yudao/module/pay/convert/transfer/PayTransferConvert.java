@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.pay.controller.admin.demo.vo.transfer.PayDemoTran
 import cn.iocoder.yudao.module.pay.controller.admin.transfer.vo.PayTransferCreateReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.transfer.PayTransferDO;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 @Mapper
@@ -16,7 +15,6 @@ public interface PayTransferConvert {
 
     PayTransferDO convert(PayTransferCreateReqDTO dto);
 
-    @Mapping(source = "subject", target = "title")
     PayTransferUnifiedReqDTO convert2(PayTransferCreateReqDTO dto);
 
     PayTransferCreateReqDTO convert(PayTransferCreateReqVO vo);

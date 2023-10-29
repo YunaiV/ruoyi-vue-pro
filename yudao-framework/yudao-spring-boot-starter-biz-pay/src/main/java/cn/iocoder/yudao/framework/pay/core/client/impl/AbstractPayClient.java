@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.NOT_IMPLEMENTED;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 
 /**
@@ -186,9 +188,9 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
 
     @Override
     public final PayTransferRespDTO unifiedTransfer(PayTransferUnifiedReqDTO reqDTO) {
-        validatePayTransferReqDTO(reqDTO);
         PayTransferRespDTO resp;
         try{
+            validatePayTransferReqDTO(reqDTO);
             resp = doUnifiedTransfer(reqDTO);
         }catch (ServiceException ex) { // 业务异常，都是实现类已经翻译，所以直接抛出即可
             throw ex;
@@ -212,7 +214,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
                 break;
             }
             default: {
-                throw new UnsupportedOperationException("待实现");
+                throw exception(NOT_IMPLEMENTED);
             }
         }
     }
