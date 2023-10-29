@@ -49,7 +49,7 @@ public class ReceivablePlanDO extends BaseDO {
      *
      * 枚举 {@link TODO crm_receivable_check_status 对应的类}
      */
-    private String checkStatus;
+    private Integer checkStatus;
     /**
      * 工作流编号
      */

@@ -17,7 +17,7 @@ public enum AuditStatusEnum implements IntArrayValuable {
     /**
      * 审核通过
      */
-	AUDIT_FINISH(0, "审核通过"),
+	AUDIT_FINISH(1, "审核通过"),
     /**
      * 审核拒绝
      */

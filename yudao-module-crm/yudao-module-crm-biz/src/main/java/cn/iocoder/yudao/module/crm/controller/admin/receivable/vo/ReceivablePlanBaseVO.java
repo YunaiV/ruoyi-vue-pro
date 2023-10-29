@@ -31,7 +31,7 @@ public class ReceivablePlanBaseVO {
     // TODO @liuhongfeng：这个字段，可以写个枚举，然后 InEnum 去校验下；
     // TODO @liuhongfeng：这个字段，应该不是前端传递的噢，而是后端自己生成的
     @Schema(description = "审批状态", example = "1")
-    private String checkStatus;
+    private Integer checkStatus;
 
     // TODO @liuhongfeng：这个字段，应该不是前端传递的噢，而是后端自己生成的，所以不适合放在 base 里面；
     @Schema(description = "工作流编号", example = "8909")

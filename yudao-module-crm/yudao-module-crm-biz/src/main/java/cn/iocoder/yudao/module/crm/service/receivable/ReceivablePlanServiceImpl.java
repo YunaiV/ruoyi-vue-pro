@@ -10,8 +10,14 @@ import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.ReceivablePlan
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.ReceivablePlanPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.ReceivablePlanUpdateReqVO;
 import cn.iocoder.yudao.module.crm.convert.receivable.ReceivablePlanConvert;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contract.ContractDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.ReceivableDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.ReceivablePlanDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.receivable.ReceivablePlanMapper;
+import cn.iocoder.yudao.module.crm.enums.AuditStatusEnum;
+import cn.iocoder.yudao.module.crm.service.contract.ContractService;
+import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -20,7 +26,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.RECEIVABLE_PLAN_NOT_EXISTS;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 
 /**
  * 回款计划 Service 实现类
@@ -33,18 +39,45 @@ public class ReceivablePlanServiceImpl implements ReceivablePlanService {
 
     @Resource
     private ReceivablePlanMapper receivablePlanMapper;
+    @Resource
+    private ContractService contractService;
+    @Resource
+    private CrmCustomerService crmCustomerService;
 
     @Override
     public Long createReceivablePlan(ReceivablePlanCreateReqVO createReqVO) {
         // 插入
         ReceivablePlanDO receivablePlan = ReceivablePlanConvert.INSTANCE.convert(createReqVO);
-        // TODO @liuhongfeng：空格要注释；if (ObjectUtil.isNull(receivablePlan.getStatus())) {
-        if(ObjectUtil.isNull(receivablePlan.getStatus())){
+        if (ObjectUtil.isNull(receivablePlan.getStatus())){
             receivablePlan.setStatus(CommonStatusEnum.ENABLE.getStatus());
         }
+        if (ObjectUtil.isNull(receivablePlan.getCheckStatus())){
+            receivablePlan.setCheckStatus(AuditStatusEnum.AUDIT_NEW.getValue());
+        }
+
+        checkReceivablePlan(receivablePlan);
+
         receivablePlanMapper.insert(receivablePlan);
         // 返回
         return receivablePlan.getId();
+    }
+
+    private void checkReceivablePlan(ReceivablePlanDO receivablePlan) {
+
+        if(ObjectUtil.isNull(receivablePlan.getContractId())){
+            throw exception(CONTRACT_NOT_EXISTS);
+        }
+
+        ContractDO contract = contractService.getContract(receivablePlan.getContractId());
+        if(ObjectUtil.isNull(contract)){
+            throw exception(CONTRACT_NOT_EXISTS);
+        }
+
+        CrmCustomerDO customer = crmCustomerService.getCustomer(receivablePlan.getCustomerId());
+        if(ObjectUtil.isNull(customer)){
+            throw exception(CUSTOMER_NOT_EXISTS);
+        }
+
     }
 
     @Override

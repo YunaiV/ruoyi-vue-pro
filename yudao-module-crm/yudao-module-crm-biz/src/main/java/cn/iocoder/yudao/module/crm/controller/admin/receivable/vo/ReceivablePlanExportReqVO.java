@@ -20,7 +20,7 @@ public class ReceivablePlanExportReqVO {
     private Integer status;
 
     @Schema(description = "审批状态", example = "1")
-    private String checkStatus;
+    private Integer checkStatus;
 
     @Schema(description = "计划回款日期")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

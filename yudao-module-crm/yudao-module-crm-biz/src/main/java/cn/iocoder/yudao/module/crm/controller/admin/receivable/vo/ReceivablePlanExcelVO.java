@@ -37,7 +37,7 @@ public class ReceivablePlanExcelVO {
 
     @ExcelProperty(value = "审批状态", converter = DictConvert.class)
     @DictFormat("crm_receivable_check_status") // TODO 代码优化：建议设置到对应的 XXXDictTypeConstants 枚举类中
-    private String checkStatus;
+    private Integer checkStatus;
 
     //@ExcelProperty("工作流编号")
     //private Long processInstanceId;
