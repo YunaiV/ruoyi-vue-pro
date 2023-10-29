@@ -258,12 +258,12 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
         Long id = fileConfig.getId();
         // mock 获得 Client
         FileClient fileClient = new LocalFileClient(id, new LocalFileClientConfig());
-        when(fileClientFactory.getFileClient(eq(0L))).thenReturn(fileClient);
+        when(fileClientFactory.getFileClient(eq(fileConfig.getId()))).thenReturn(fileClient);
 
         // 调用，并断言
         assertSame(fileClient, fileConfigService.getMasterFileClient());
         // 断言缓存
-        verify(fileClientFactory).createOrUpdateFileClient(eq(0L), eq(fileConfig.getStorage()),
+        verify(fileClientFactory).createOrUpdateFileClient(eq(fileConfig.getId()), eq(fileConfig.getStorage()),
                 eq(fileConfig.getConfig()));
     }
 

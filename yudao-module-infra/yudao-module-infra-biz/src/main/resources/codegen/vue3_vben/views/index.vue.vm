@@ -1,12 +1,10 @@
 <script lang="ts" setup>
-import ${ simpleClassName }Modal from './${simpleClassName}Modal.vue'
-import { columns, searchFormSchema } from './${classNameVar}.data'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useModal } from '@/components/Modal'
-import { IconEnum } from '@/enums/appEnum'
-import { BasicTable, useTable, TableAction } from '@/components/Table'
-import { delete${ simpleClassName }, export${ simpleClassName }, get${ simpleClassName } Page } from '@/api/${table.moduleName}/${classNameVar}'
+  import {columns, searchFormSchema} from './'
+  import {useI18n} from '@/hooks/web/useI18n'
+  import {useMessage} from '@/hooks/web/useMessage'
+  import {useModal} from '@/components/Modal'
+  import {useTable} from '@/components/Table'
+  import { delete${ simpleClassName }, export${ simpleClassName }, get${ simpleClassName } Page } from '@/api/${table.moduleName}/${classNameVar}'
 
 defineOptions({ name: '${table.className}' })
 
@@ -62,7 +60,7 @@ async function handleDelete(record: Recordable) {
         <a-button type="primary" v-auth="['${permissionPrefix}:create']" :preIcon="IconEnum.ADD" @click="handleCreate">
           {{ t('action.create') }}
         </a-button>
-        <a-button type="warning" v-auth="['${permissionPrefix}:export']" :preIcon="IconEnum.EXPORT" @click="handleExport">
+        <a-button v-auth="['${permissionPrefix}:export']" :preIcon="IconEnum.EXPORT" @click="handleExport">
           {{ t('action.export') }}
         </a-button>
       </template>

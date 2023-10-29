@@ -27,19 +27,27 @@ public enum BpmProcessInstanceResultEnum {
     DELEGATE(6, "委派"),
     /**
      * 【加签】源任务已经审批完成，但是它使用了后加签，后加签的任务未完成，源任务就会是这个状态
+     * 相当于是 通过 APPROVE 的特殊状态
      * 例如：A审批， A 后加签了 B，并且审批通过了任务，但是 B 还未审批，则当前任务状态为“待后加签任务完成”
      */
-    ADD_SIGN_AFTER(7, "待后加签任务完成"), // TODO @海：这个定义，是不是 通过（待后加签任务完成），相当于是 APPROVE 的特殊状态
+    SIGN_AFTER(7, "待后加签任务完成"),
     /**
      * 【加签】源任务未审批，但是向前加签了，所以源任务状态变为“待前加签任务完成”
+     * 相当于是 处理中 PROCESS 的特殊状态
      * 例如：A 审批， A 前加签了 B，B 还未审核
      */
-    ADD_SIGN_BEFORE(8, "待前加签任务完成"), // TODO @海：这个定义，是不是 处理中（待前加签任务审批），相当于是 PROCESS 的特殊状态
+    SIGN_BEFORE(8, "待前加签任务完成"),
     /**
      * 【加签】后加签任务被创建时的初始状态
+     * 相当于是 处理中 PROCESS 的特殊状态
      * 因为需要源任务先完成，才能到后加签的人来审批，所以加了一个状态区分
      */
-    WAIT_BEFORE_TASK(9, "待前置任务完成"); // TODO @海：这个定义，是不是 处理中（待前置任务审批），相当于是 PROCESS 的特殊状态
+    WAIT_BEFORE_TASK(9, "待前置任务完成");
+
+    /**
+     * 能被减签的状态
+     */
+    public static final List<Integer> CAN_SUB_SIGN_STATUS_LIST = Arrays.asList(PROCESS.result, WAIT_BEFORE_TASK.result);
 
     /**
      * 结果
@@ -63,13 +71,7 @@ public enum BpmProcessInstanceResultEnum {
     public static boolean isEndResult(Integer result) {
         return ObjectUtils.equalsAny(result, APPROVE.getResult(), REJECT.getResult(),
                 CANCEL.getResult(), BACK.getResult(),
-                ADD_SIGN_AFTER.getResult());
+                SIGN_AFTER.getResult());
     }
-
-    // TODO @海：静态变量，需要放到成员变量前面；另外，如果是复数，可以加 S(ES) 或者 LIST
-    /**
-     * 能被减签的状态
-     */
-    public static final List<Integer> CAN_SUB_SIGN_STATUS = Arrays.asList(PROCESS.result, WAIT_BEFORE_TASK.result);
 
 }

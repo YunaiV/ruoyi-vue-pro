@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.statistics.service.trade;
 import cn.iocoder.yudao.module.statistics.dal.mysql.trade.BrokerageStatisticsMapper;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -26,6 +27,11 @@ public class BrokerageStatisticsServiceImpl implements BrokerageStatisticsServic
         return brokerageStatisticsMapper.selectSummaryPriceByStatusAndUnfreezeTimeBetween(
                 BrokerageRecordBizTypeEnum.ORDER.getType(), BrokerageRecordStatusEnum.SETTLEMENT.getStatus(),
                 beginTime, endTime);
+    }
+
+    @Override
+    public Long getWithdrawCountByStatus(BrokerageWithdrawStatusEnum status) {
+        return brokerageStatisticsMapper.selectWithdrawCountByStatus(status.getStatus());
     }
 
 }

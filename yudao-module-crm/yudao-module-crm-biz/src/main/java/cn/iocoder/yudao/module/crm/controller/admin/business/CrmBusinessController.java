@@ -23,6 +23,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 商机")
 @RestController
@@ -80,11 +81,19 @@ public class CrmBusinessController {
     @PreAuthorize("@ss.hasPermission('crm:business:export')")
     @OperateLog(type = EXPORT)
     public void exportBusinessExcel(@Valid CrmBusinessExportReqVO exportReqVO,
-              HttpServletResponse response) throws IOException {
+                                    HttpServletResponse response) throws IOException {
         List<CrmBusinessDO> list = businessService.getBusinessList(exportReqVO);
         // 导出 Excel
         List<CrmBusinessExcelVO> datas = CrmBusinessConvert.INSTANCE.convertList02(list);
         ExcelUtils.write(response, "商机.xls", "数据", CrmBusinessExcelVO.class, datas);
+    }
+
+    @PutMapping("/transfer")
+    @Operation(summary = "商机转移")
+    @PreAuthorize("@ss.hasPermission('crm:business:update')")
+    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmBusinessTransferReqVO reqVO) {
+        businessService.businessTransfer(reqVO, getLoginUserId());
+        return success(true);
     }
 
 }

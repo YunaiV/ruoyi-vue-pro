@@ -58,10 +58,6 @@ public class TradeOrderLogAspect {
      */
     private static final ThreadLocal<Map<String, Object>> EXTS = new ThreadLocal<>();
 
-    public TradeOrderLogAspect() {
-        System.out.println();
-    }
-
     @Resource
     private TradeOrderLogService orderLogService;
 

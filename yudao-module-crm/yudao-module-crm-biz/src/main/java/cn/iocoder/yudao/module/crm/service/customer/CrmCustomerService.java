@@ -72,4 +72,12 @@ public interface CrmCustomerService {
      */
     List<CrmCustomerDO> getCustomerList(CrmCustomerExportReqVO exportReqVO);
 
+    /**
+     * 校验客户是否存在
+     *
+     * @param customerId 客户 id
+     * @return 客户
+     */
+    CrmCustomerDO validateCustomer(Long customerId);
+
 }

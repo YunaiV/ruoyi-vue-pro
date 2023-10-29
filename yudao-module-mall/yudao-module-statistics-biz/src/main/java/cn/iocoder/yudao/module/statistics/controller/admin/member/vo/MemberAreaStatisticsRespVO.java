@@ -15,10 +15,11 @@ public class MemberAreaStatisticsRespVO {
     @Schema(description = "会员数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer userCount;
 
-    @Schema(description = "订单创建数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    private Integer orderCreateCount;
-    @Schema(description = "订单支付数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "512")
-    private Integer orderPayCount;
+    @Schema(description = "下单的会员数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    private Integer orderCreateUserCount;
+    @Schema(description = "支付订单的会员数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "512")
+    private Integer orderPayUserCount;
+
     @Schema(description = "订单支付金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "622")
     private Integer orderPayPrice;
 

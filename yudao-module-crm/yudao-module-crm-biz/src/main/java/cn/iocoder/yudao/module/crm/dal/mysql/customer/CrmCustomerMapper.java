@@ -19,11 +19,10 @@ import java.util.List;
 public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
 
     default PageResult<CrmCustomerDO> selectPage(CrmCustomerPageReqVO reqVO) {
+        // TODO @Wanwan 填充负责人，所属部门字段；这个可以在 controller 填哈；
         return selectPage(reqVO, new LambdaQueryWrapperX<CrmCustomerDO>()
                 .likeIfPresent(CrmCustomerDO::getName, reqVO.getName())
                 .eqIfPresent(CrmCustomerDO::getMobile, reqVO.getMobile())
-                .eqIfPresent(CrmCustomerDO::getTelephone, reqVO.getTelephone())
-                .likeIfPresent(CrmCustomerDO::getWebsite, reqVO.getWebsite())
                 .orderByDesc(CrmCustomerDO::getId));
     }
 
@@ -31,8 +30,6 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
         return selectList(new LambdaQueryWrapperX<CrmCustomerDO>()
                 .likeIfPresent(CrmCustomerDO::getName, reqVO.getName())
                 .eqIfPresent(CrmCustomerDO::getMobile, reqVO.getMobile())
-                .eqIfPresent(CrmCustomerDO::getTelephone, reqVO.getTelephone())
-                .likeIfPresent(CrmCustomerDO::getWebsite, reqVO.getWebsite())
                 .orderByDesc(CrmCustomerDO::getId));
     }
 

@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.trade.service.price.calculator;
 
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
-import cn.iocoder.yudao.module.member.api.address.AddressApi;
-import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
+import cn.iocoder.yudao.module.member.api.address.MemberAddressApi;
+import cn.iocoder.yudao.module.member.api.address.dto.MemberAddressRespDTO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryExpressChargeModeEnum;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
@@ -38,7 +38,7 @@ public class TradeDeliveryPriceCalculatorTest  extends BaseMockitoUnitTest {
     private TradeDeliveryPriceCalculator calculator;
 
     @Mock
-    private AddressApi addressApi;
+    private MemberAddressApi addressApi;
 
     @Mock
     private DeliveryExpressTemplateService deliveryExpressTemplateService;
@@ -80,7 +80,7 @@ public class TradeDeliveryPriceCalculatorTest  extends BaseMockitoUnitTest {
         TradePriceCalculatorHelper.recountAllPrice(resultBO);
 
         // 准备收件地址数据
-        AddressRespDTO addressResp = randomPojo(AddressRespDTO.class, item -> item.setAreaId(10));
+        MemberAddressRespDTO addressResp = randomPojo(MemberAddressRespDTO.class, item -> item.setAreaId(10));
         when(addressApi.getAddress(eq(10L), eq(1L))).thenReturn(addressResp);
 
         // 准备运费模板费用配置数据

@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
+import java.util.Set;
 
 @Schema(description = "管理后台 - 合同更新 Request VO")
 @Data
@@ -18,9 +19,9 @@ public class ContractUpdateReqVO extends ContractBaseVO {
     private Long id;
 
     @Schema(description = "只读权限的用户编号数组")
-    private String roUserIds;
+    private Set<Long> roUserIds;
 
     @Schema(description = "读写权限的用户编号数组")
-    private String rwUserIds;
+    private Set<Long> rwUserIds;
 
 }

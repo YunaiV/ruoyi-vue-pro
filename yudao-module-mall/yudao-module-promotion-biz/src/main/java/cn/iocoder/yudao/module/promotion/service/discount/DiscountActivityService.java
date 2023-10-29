@@ -48,7 +48,7 @@ public interface DiscountActivityService {
      *
      * @param id 编号
      */
-    void closeRewardActivity(Long id);
+    void closeDiscountActivity(Long id);
 
     /**
      * 删除限时折扣活动
@@ -80,5 +80,13 @@ public interface DiscountActivityService {
      * @return 活动的商品列表
      */
     List<DiscountProductDO> getDiscountProductsByActivityId(Long activityId);
+
+    /**
+     * 获得活动编号，对应对应的商品列表
+     *
+     * @param activityIds 活动编号
+     * @return 活动的商品列表
+     */
+    List<DiscountProductDO> getDiscountProductsByActivityId(Collection<Long> activityIds);
 
 }

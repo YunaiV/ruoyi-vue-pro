@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.bpm.convert.task;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
@@ -24,6 +25,9 @@ import org.mapstruct.factory.Mappers;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 
 /**
  * Bpm 任务 Convert
@@ -147,7 +151,8 @@ public interface BpmTaskConvert {
                 .setDefinitionKey(element.getId()));
     }
 
-    // TODO @海：可以使用 mapstruct 映射么？
+    //此处不用 mapstruct 映射，因为 TaskEntityImpl 还有很多其他属性，这里我们只设置我们需要的
+    //使用 mapstruct 会将里面嵌套的各个属性值都设置进去，会出现意想不到的问题
     default TaskEntityImpl convert(TaskEntityImpl task,TaskEntityImpl parentTask){
         task.setCategory(parentTask.getCategory());
         task.setDescription(parentTask.getDescription());
@@ -166,32 +171,31 @@ public interface BpmTaskConvert {
     default List<BpmTaskSubSignRespVO> convertList(List<BpmTaskExtDO> bpmTaskExtDOList,
                                                    Map<Long, AdminUserRespDTO> userMap,
                                                    Map<String, Task> idTaskMap){
-        return CollectionUtils.convertList(bpmTaskExtDOList, task->{
-            BpmTaskSubSignRespVO bpmTaskSubSignRespVO = new BpmTaskSubSignRespVO();
-            bpmTaskSubSignRespVO.setName(task.getName());
-            bpmTaskSubSignRespVO.setId(task.getTaskId());
-            Task sourceTask = idTaskMap.get(task.getTaskId());
+        return CollectionUtils.convertList(bpmTaskExtDOList, task -> {
+            BpmTaskSubSignRespVO bpmTaskSubSignRespVO = new BpmTaskSubSignRespVO()
+                    .setId(task.getTaskId()).setName(task.getName());
             // 后加签任务不会直接设置 assignee ,所以不存在 assignee 的情况，则去取 owner
-            String assignee = StrUtil.isNotEmpty(sourceTask.getAssignee()) ? sourceTask.getAssignee() : sourceTask.getOwner();
-            AdminUserRespDTO assignUser = userMap.get(NumberUtils.parseLong(assignee));
-            if (assignUser != null) {
-                bpmTaskSubSignRespVO.setAssigneeUser(convert3(assignUser));
-            }
+            Task sourceTask = idTaskMap.get(task.getTaskId());
+            String assignee = ObjectUtil.defaultIfBlank(sourceTask.getOwner(),sourceTask.getAssignee());
+            MapUtils.findAndThen(userMap,NumberUtils.parseLong(assignee),
+                    assignUser-> bpmTaskSubSignRespVO.setAssigneeUser(convert3(assignUser)));
             return bpmTaskSubSignRespVO;
         });
     }
 
     /**
      * 转换任务为父子级
-     * @param result
-     * @return
+     *
+     * @param sourceList 原始数据
+     * @return 转换后的父子级数组
      */
-    default List<BpmTaskRespVO> convertChildrenList(List<BpmTaskRespVO> result){
-        List<BpmTaskRespVO> childrenTaskList = CollectionUtils.filterList(result, r -> StrUtil.isNotEmpty(r.getParentTaskId()));
-        Map<String, List<BpmTaskRespVO>> parentChildrenTaskListMap = CollectionUtils.convertMultiMap(childrenTaskList, BpmTaskRespVO::getParentTaskId);
-        for (BpmTaskRespVO bpmTaskRespVO : result) {
+    default List<BpmTaskRespVO> convertChildrenList(List<BpmTaskRespVO> sourceList) {
+        List<BpmTaskRespVO> childrenTaskList = filterList(sourceList, r -> StrUtil.isNotEmpty(r.getParentTaskId()));
+        Map<String, List<BpmTaskRespVO>> parentChildrenTaskListMap = convertMultiMap(childrenTaskList, BpmTaskRespVO::getParentTaskId);
+        for (BpmTaskRespVO bpmTaskRespVO : sourceList) {
             bpmTaskRespVO.setChildren(parentChildrenTaskListMap.get(bpmTaskRespVO.getId()));
         }
-        return CollectionUtils.filterList(result, r -> StrUtil.isEmpty(r.getParentTaskId()));
+        return filterList(sourceList, r -> StrUtil.isEmpty(r.getParentTaskId()));
     }
+
 }

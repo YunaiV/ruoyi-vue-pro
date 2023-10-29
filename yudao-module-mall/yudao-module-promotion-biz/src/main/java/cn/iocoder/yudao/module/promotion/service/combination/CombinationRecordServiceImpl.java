@@ -6,6 +6,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
@@ -14,7 +15,6 @@ import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationValidateJoinRespDTO;
-import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPage2VO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPageVO;
 import cn.iocoder.yudao.module.promotion.convert.combination.CombinationActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
@@ -23,7 +23,8 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationR
 import cn.iocoder.yudao.module.promotion.dal.mysql.combination.CombinationRecordMapper;
 import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.api.order.TradeOrderApi;
-import org.springframework.scheduling.annotation.Async;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -47,6 +48,7 @@ import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
  * @author HUIHUI
  */
 @Service
+@Slf4j
 @Validated
 public class CombinationRecordServiceImpl implements CombinationRecordService {
 
@@ -63,28 +65,8 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     private ProductSkuApi productSkuApi;
 
     @Resource
+    @Lazy
     private TradeOrderApi tradeOrderApi;
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateCombinationRecordStatusByUserIdAndOrderId(Integer status, Long userId, Long orderId) {
-        // 校验拼团是否存在
-        CombinationRecordDO record = validateCombinationRecord(userId, orderId);
-
-        // 更新状态
-        // TODO @puhui999：不要整个更新，new 一个出来；why？例如说，两个线程都去更新，这样存在相互覆盖的问题
-        record.setStatus(status);
-        combinationRecordMapper.updateById(record);
-    }
-
-    private CombinationRecordDO validateCombinationRecord(Long userId, Long orderId) {
-        // 校验拼团是否存在
-        CombinationRecordDO recordDO = combinationRecordMapper.selectByUserIdAndOrderId(userId, orderId);
-        if (recordDO == null) {
-            throw exception(COMBINATION_RECORD_NOT_EXISTS);
-        }
-        return recordDO;
-    }
 
     // TODO @芋艿：在详细预览下；
     @Override
@@ -164,7 +146,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public KeyValue<Long, Long> createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {
+    public CombinationRecordDO createCombinationRecord(CombinationRecordCreateReqDTO reqDTO) {
         // 1. 校验拼团活动
         KeyValue<CombinationActivityDO, CombinationProductDO> keyValue = validateCombinationRecord(reqDTO.getUserId(),
                 reqDTO.getActivityId(), reqDTO.getHeadId(), reqDTO.getSkuId(), reqDTO.getCount());
@@ -191,7 +173,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         if (ObjUtil.notEqual(CombinationRecordDO.HEAD_ID_GROUP, record.getHeadId())) {
             updateCombinationRecordWhenCreate(reqDTO.getHeadId(), keyValue.getKey());
         }
-        return new KeyValue<>(record.getId(), record.getHeadId());
+        return record;
     }
 
     /**
@@ -231,11 +213,6 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     }
 
     @Override
-    public List<CombinationRecordDO> getCombinationRecordListByUserIdAndActivityId(Long userId, Long activityId) {
-        return combinationRecordMapper.selectListByUserIdAndActivityId(userId, activityId);
-    }
-
-    @Override
     public CombinationValidateJoinRespDTO validateJoinCombination(Long userId, Long activityId, Long headId,
                                                                   Long skuId, Integer count) {
         KeyValue<CombinationActivityDO, CombinationProductDO> keyValue = validateCombinationRecord(userId, activityId,
@@ -247,6 +224,11 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     @Override
     public Long getCombinationRecordCount(@Nullable Integer status, @Nullable Boolean virtualGroup, @Nullable Long headId) {
         return combinationRecordMapper.selectCountByHeadAndStatusAndVirtualGroup(status, virtualGroup, headId);
+    }
+
+    @Override
+    public Long getCombinationUserCount() {
+        return combinationRecordMapper.selectUserCount();
     }
 
     @Override
@@ -272,11 +254,6 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
 
     @Override
     public PageResult<CombinationRecordDO> getCombinationRecordPage(CombinationRecordReqPageVO pageVO) {
-        return combinationRecordMapper.selectPage(pageVO);
-    }
-
-    @Override
-    public PageResult<CombinationRecordDO> getCombinationRecordPage2(CombinationRecordReqPage2VO pageVO) {
         return combinationRecordMapper.selectPage(pageVO);
     }
 
@@ -343,8 +320,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
 
     @Override
     public KeyValue<Integer, Integer> expireCombinationRecord() {
-        // TODO @puhui999：数字一般是 1. 2. 这种格式哈
-        // 1。获取所有正在进行中的过期的父拼团
+        // 1. 获取所有正在进行中的过期的父拼团
         List<CombinationRecordDO> headExpireRecords = combinationRecordMapper.selectListByHeadIdAndStatusAndExpireTimeLt(
                 CombinationRecordDO.HEAD_ID_GROUP, CombinationRecordStatusEnum.IN_PROGRESS.getStatus(), LocalDateTime.now());
         if (CollUtil.isEmpty(headExpireRecords)) {
@@ -352,91 +328,84 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         }
 
         // 2. 获取拼团活动
-        // TODO @puhui999：在自己模块里，变量可以简略点；例如说 activityList
-        List<CombinationActivityDO> combinationActivities = combinationActivityService.getCombinationActivityListByIds(
+        List<CombinationActivityDO> activities = combinationActivityService.getCombinationActivityListByIds(
                 convertSet(headExpireRecords, CombinationRecordDO::getActivityId));
-        Map<Long, CombinationActivityDO> activityMap = convertMap(combinationActivities, CombinationActivityDO::getId);
+        Map<Long, CombinationActivityDO> activityMap = convertMap(activities, CombinationActivityDO::getId);
 
-        // TODO @puhui999：job 一般不建议异步跑；因为可能下次跑，结果上次还没跑完；
-        // TODO 这里，我们可以每个 record 处理下；然后按照是否需要虚拟拼团，各搞一个方法逻辑 + 事务；这样，保证 job 里面尽量不要大事务，而是 n 个独立小事务的处理。
-        // 3. 校验是否虚拟成团
-        List<CombinationRecordDO> virtualGroupHeadRecords = new ArrayList<>(); // 虚拟成团
-        for (Iterator<CombinationRecordDO> iterator = headExpireRecords.iterator(); iterator.hasNext(); ) {
-            CombinationRecordDO record = iterator.next();
-            // 3.1 不匹配，则直接跳过
-            CombinationActivityDO activity = activityMap.get(record.getActivityId());
-            if (activity == null || !activity.getVirtualGroup()) { // 取不到活动的或者不是虚拟拼团的
-                continue;
+        // 3. 逐个处理拼团，过期 or 虚拟成团
+        KeyValue<Integer, Integer> keyValue = new KeyValue<>(0, 0); // 统计过期拼团和虚拟成团
+        for (CombinationRecordDO record : headExpireRecords) {
+            try {
+                CombinationActivityDO activity = activityMap.get(record.getActivityId());
+                if (activity == null || !activity.getVirtualGroup()) { // 取不到活动的或者不是虚拟拼团的
+                    // 3.1. 处理过期的拼团
+                    getSelf().handleExpireRecord(record);
+                    keyValue.setKey(keyValue.getKey() + 1);
+                } else {
+                    // 3.2. 处理虚拟成团
+                    getSelf().handleVirtualGroupRecord(record);
+                    keyValue.setValue(keyValue.getValue() + 1);
+                }
+            } catch (Exception ignored) { // 处理异常继续循环
+                log.error("[expireCombinationRecord][record({}) 处理异常，请进行处理！record 数据是：{}]",
+                        record.getId(), JsonUtils.toJsonString(record));
             }
-            // 3.2 匹配，则移除，添加到虚拟成团中，并结束寻找
-            virtualGroupHeadRecords.add(record);
-            iterator.remove();
-            break;
         }
-
-        // 4.处理过期的拼团
-        getSelf().handleExpireRecord(headExpireRecords);
-        // 5.虚拟成团
-        getSelf().handleVirtualGroupRecord(virtualGroupHeadRecords);
-        return new KeyValue<>(headExpireRecords.size(), virtualGroupHeadRecords.size());
+        return keyValue;
     }
 
-    @Async
-    protected void handleExpireRecord(List<CombinationRecordDO> headExpireRecords) {
-        if (CollUtil.isEmpty(headExpireRecords)) {
-            return;
-        }
-
-        // 1.更新拼团记录
-        List<CombinationRecordDO> headsAndRecords = updateBatchCombinationRecords(headExpireRecords,
+    /**
+     * 处理过期拼团
+     *
+     * @param headRecord 过期拼团团长记录
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void handleExpireRecord(CombinationRecordDO headRecord) {
+        // 1. 更新拼团记录
+        List<CombinationRecordDO> headAndRecords = updateBatchCombinationRecords(headRecord,
                 CombinationRecordStatusEnum.FAILED);
-        if (headsAndRecords == null) {
-            return;
-        }
-
-        // 2.订单取消 TODO 以现在的取消回滚逻辑好像只能循环了
-        headsAndRecords.forEach(item -> {
-            tradeOrderApi.cancelPaidOrder(item.getUserId(), item.getOrderId());
-        });
+        // 2. 订单取消
+        headAndRecords.forEach(item -> tradeOrderApi.cancelPaidOrder(item.getUserId(), item.getOrderId()));
     }
 
-    @Async
-    protected void handleVirtualGroupRecord(List<CombinationRecordDO> virtualGroupHeadRecords) {
-        if (CollUtil.isEmpty(virtualGroupHeadRecords)) {
-            return;
-        }
-
+    /**
+     * 处理虚拟拼团
+     *
+     * @param headRecord 虚拟成团团长记录
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void handleVirtualGroupRecord(CombinationRecordDO headRecord) {
         // 1. 团员补齐
-        combinationRecordMapper.insertBatch(CombinationActivityConvert.INSTANCE.convertVirtualGroupList(virtualGroupHeadRecords));
+        combinationRecordMapper.insertBatch(CombinationActivityConvert.INSTANCE.convertVirtualRecordList(headRecord));
         // 2. 更新拼团记录
-        updateBatchCombinationRecords(virtualGroupHeadRecords, CombinationRecordStatusEnum.SUCCESS);
+        updateBatchCombinationRecords(headRecord, CombinationRecordStatusEnum.SUCCESS);
     }
 
-    private List<CombinationRecordDO> updateBatchCombinationRecords(List<CombinationRecordDO> headRecords, CombinationRecordStatusEnum status) {
-        // 1. 查询团成员
-        List<CombinationRecordDO> records = combinationRecordMapper.selectListByHeadIds(
-                convertSet(headRecords, CombinationRecordDO::getId));
-        if (CollUtil.isEmpty(records)) {
-            return null;
-        }
-        Map<Long, List<CombinationRecordDO>> recordsMap = convertMultiMap(records, CombinationRecordDO::getHeadId);
-        headRecords.forEach(item -> {
-            recordsMap.get(item.getId()).add(item); // 把团长加进团里
-        });
-        // 2.批量更新拼团记录 status 和 失败/成团时间
-        List<CombinationRecordDO> headsAndRecords = mergeValuesFromMap(recordsMap);
-        List<CombinationRecordDO> updateRecords = new ArrayList<>(headsAndRecords.size());
+    /**
+     * 更新拼团记录
+     *
+     * @param headRecord 团长记录
+     * @param status     状态-拼团失败 FAILED 成功 SUCCESS
+     * @return 整团记录（包含团长和团成员）
+     */
+    private List<CombinationRecordDO> updateBatchCombinationRecords(CombinationRecordDO headRecord, CombinationRecordStatusEnum status) {
+        // 1. 查询团成员（包含团长）
+        List<CombinationRecordDO> records = combinationRecordMapper.selectListByHeadId(headRecord.getId());
+        records.add(headRecord);// 把团长加进去
+
+        // 2. 批量更新拼团记录 status 和 endTime
+        List<CombinationRecordDO> updateRecords = new ArrayList<>(records.size());
         LocalDateTime now = LocalDateTime.now();
-        headsAndRecords.forEach(item -> {
-            CombinationRecordDO record = new CombinationRecordDO().setId(item.getId())
+        records.forEach(item -> {
+            CombinationRecordDO updateRecord = new CombinationRecordDO().setId(item.getId())
                     .setStatus(status.getStatus()).setEndTime(now);
             if (CombinationRecordStatusEnum.isSuccess(status.getStatus())) { // 虚拟成团完事更改状态成功后还需要把参与人数修改为成团需要人数
-                record.setUserCount(record.getUserSize());
+                updateRecord.setUserCount(updateRecord.getUserSize());
             }
-            updateRecords.add(record);
+            updateRecords.add(updateRecord);
         });
         combinationRecordMapper.updateBatch(updateRecords);
-        return headsAndRecords;
+        return records;
     }
 
     /**

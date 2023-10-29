@@ -8,12 +8,11 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
-import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
-import cn.iocoder.yudao.module.member.api.address.AddressApi;
-import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
+import cn.iocoder.yudao.module.member.api.address.MemberAddressApi;
+import cn.iocoder.yudao.module.member.api.address.dto.MemberAddressRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
@@ -99,7 +98,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Resource
     private PayOrderApi payOrderApi;
     @Resource
-    private AddressApi addressApi;
+    private MemberAddressApi addressApi;
     @Resource
     private ProductCommentApi productCommentApi;
 
@@ -111,7 +110,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Override
     public AppTradeOrderSettlementRespVO settlementOrder(Long userId, AppTradeOrderSettlementReqVO settlementReqVO) {
         // 1. 获得收货地址
-        AddressRespDTO address = getAddress(userId, settlementReqVO.getAddressId());
+        MemberAddressRespDTO address = getAddress(userId, settlementReqVO.getAddressId());
         if (address != null) {
             settlementReqVO.setAddressId(address.getId());
         }
@@ -130,7 +129,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
      * @param addressId 地址编号
      * @return 地址
      */
-    private AddressRespDTO getAddress(Long userId, Long addressId) {
+    private MemberAddressRespDTO getAddress(Long userId, Long addressId) {
         if (addressId != null) {
             return addressApi.getAddress(addressId, userId);
         }
@@ -159,11 +158,11 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_CREATE)
-    public TradeOrderDO createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO) {
+    public TradeOrderDO createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO, Integer terminal) {
         // 1.1 价格计算
         TradePriceCalculateRespBO calculateRespBO = calculatePrice(userId, createReqVO);
         // 1.2 构建订单
-        TradeOrderDO order = buildTradeOrder(userId, userIp, createReqVO, calculateRespBO);
+        TradeOrderDO order = buildTradeOrder(userId, userIp, createReqVO, calculateRespBO, terminal);
         List<TradeOrderItemDO> orderItems = buildTradeOrderItems(order, calculateRespBO);
 
         // 2. 订单创建前的逻辑
@@ -180,21 +179,21 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     }
 
     private TradeOrderDO buildTradeOrder(Long userId, String clientIp, AppTradeOrderCreateReqVO createReqVO,
-                                         TradePriceCalculateRespBO calculateRespBO) {
+                                         TradePriceCalculateRespBO calculateRespBO, Integer terminal) {
         TradeOrderDO order = TradeOrderConvert.INSTANCE.convert(userId, clientIp, createReqVO, calculateRespBO);
         order.setType(calculateRespBO.getType());
         order.setNo(tradeNoRedisDAO.generate(TradeNoRedisDAO.TRADE_ORDER_NO_PREFIX));
         order.setStatus(TradeOrderStatusEnum.UNPAID.getStatus());
         order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus());
         order.setProductCount(getSumValue(calculateRespBO.getItems(), TradePriceCalculateRespBO.OrderItem::getCount, Integer::sum));
-        order.setTerminal(TerminalEnum.H5.getTerminal()); // todo 数据来源?
+        order.setTerminal(terminal);
         // 支付 + 退款信息
         order.setAdjustPrice(0).setPayStatus(false);
         order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus()).setRefundPrice(0);
         // 物流信息
         order.setDeliveryType(createReqVO.getDeliveryType());
         if (Objects.equals(createReqVO.getDeliveryType(), DeliveryTypeEnum.EXPRESS.getType())) {
-            AddressRespDTO address = addressApi.getAddress(createReqVO.getAddressId(), userId);
+            MemberAddressRespDTO address = addressApi.getAddress(createReqVO.getAddressId(), userId);
             Assert.notNull(address, "地址({}) 不能为空", createReqVO.getAddressId()); // 价格计算时，已经计算
             order.setReceiverName(address.getName()).setReceiverMobile(address.getMobile())
                     .setReceiverAreaId(address.getAreaId()).setReceiverDetailAddress(address.getDetailAddress());
@@ -670,17 +669,23 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     }
 
     @Override
-    public void pickUpOrder(Long id) {
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.ADMIN_PICK_UP_RECEIVE)
+    public void pickUpOrderByAdmin(Long id) {
         getSelf().pickUpOrder(tradeOrderMapper.selectById(id));
     }
 
     @Override
-    public void pickUpOrder(String pickUpVerifyCode) {
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.ADMIN_PICK_UP_RECEIVE)
+    public void pickUpOrderByAdmin(String pickUpVerifyCode) {
         getSelf().pickUpOrder(tradeOrderMapper.selectOneByPickUpVerifyCode(pickUpVerifyCode));
     }
 
+    @Override
+    public TradeOrderDO getByPickUpVerifyCode(String pickUpVerifyCode) {
+        return tradeOrderMapper.selectOneByPickUpVerifyCode(pickUpVerifyCode);
+    }
+
     @Transactional(rollbackFor = Exception.class)
-    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.PICK_UP_RECEIVE)
     public void pickUpOrder(TradeOrderDO order) {
         if (order == null) {
             throw exception(ORDER_NOT_FOUND);
@@ -688,7 +693,6 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         if (ObjUtil.notEqual(DeliveryTypeEnum.PICK_UP.getType(), order.getDeliveryType())) {
             throw exception(ORDER_RECEIVE_FAIL_DELIVERY_TYPE_NOT_PICK_UP);
         }
-        // todo 校验核销操作人？
         receiveOrder0(order);
     }
 

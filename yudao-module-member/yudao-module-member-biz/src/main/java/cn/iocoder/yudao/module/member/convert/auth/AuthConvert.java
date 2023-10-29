@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeUseReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeValidateReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserUnbindReqDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxJsapiSignatureRespDTO;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -28,5 +29,7 @@ public interface AuthConvert {
     AppAuthLoginRespVO convert(OAuth2AccessTokenRespDTO bean, String openid);
 
     SmsCodeValidateReqDTO convert(AppAuthSmsValidateReqVO bean);
+
+    SocialWxJsapiSignatureRespDTO convert(SocialWxJsapiSignatureRespDTO bean);
 
 }

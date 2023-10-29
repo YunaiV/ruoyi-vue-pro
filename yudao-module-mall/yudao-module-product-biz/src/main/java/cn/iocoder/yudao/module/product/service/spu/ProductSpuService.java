@@ -68,11 +68,12 @@ public interface ProductSpuService {
     }
 
     /**
-     * 获得所有商品 SPU 列表
+     * 获得指定状态的商品 SPU 列表
      *
+     * @param status 状态
      * @return 商品 SPU 列表
      */
-    List<ProductSpuDO> getSpuList();
+    List<ProductSpuDO> getSpuListByStatus(Integer status);
 
     /**
      * 获得所有商品 SPU 列表
@@ -146,4 +147,5 @@ public interface ProductSpuService {
      * @return 商品 SPU 列表
      */
     List<ProductSpuDO> validateSpuList(Collection<Long> ids);
+
 }

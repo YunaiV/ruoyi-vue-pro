@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.module.crm.service.business;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.CrmBusinessCreateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.CrmBusinessExportReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.CrmBusinessPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.CrmBusinessUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 
 import javax.validation.Valid;
@@ -72,4 +69,12 @@ public interface CrmBusinessService {
      */
     List<CrmBusinessDO> getBusinessList(CrmBusinessExportReqVO exportReqVO);
 
+    /**
+     * 商机转移
+     *
+     * @param reqVO  请求
+     * @param userId 用户编号
+     */
+    void businessTransfer(CrmBusinessTransferReqVO reqVO, Long userId);
+    
 }

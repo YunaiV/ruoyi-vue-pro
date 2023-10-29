@@ -47,17 +47,26 @@ public interface BannerService {
     BannerDO getBanner(Long id);
 
     /**
-     * 获得所有 Banner列表
-     * @return Banner列表
-     */
-    List<BannerDO> getBannerList();
-
-    /**
      * 获得 Banner 分页
      *
      * @param pageReqVO 分页查询
      * @return Banner分页
      */
     PageResult<BannerDO> getBannerPage(BannerPageReqVO pageReqVO);
+
+    /**
+     * 增加 Banner 点击量
+     *
+     * @param id Banner编号
+     */
+    void addBannerBrowseCount(Long id);
+
+    /**
+     * 获得 Banner 列表
+     *
+     * @param position 定位
+     * @return Banner 列表
+     */
+    List<BannerDO> getBannerListByPosition(Integer position);
 
 }

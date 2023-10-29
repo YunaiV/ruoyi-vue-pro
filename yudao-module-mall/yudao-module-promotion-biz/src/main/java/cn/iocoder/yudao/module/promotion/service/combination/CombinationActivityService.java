@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationA
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -34,6 +35,13 @@ public interface CombinationActivityService {
      * @param updateReqVO 更新信息
      */
     void updateCombinationActivity(@Valid CombinationActivityUpdateReqVO updateReqVO);
+
+    /**
+     * 关闭拼团活动
+     *
+     * @param id 拼团活动编号
+     */
+    void closeCombinationActivityById(Long id);
 
     /**
      * 删除拼团活动
@@ -120,10 +128,11 @@ public interface CombinationActivityService {
     /**
      * 获取指定 spu 编号最近参加的活动，每个 spuId 只返回一条记录
      *
-     * @param spuIds spu 编号
-     * @param status 状态
+     * @param spuIds   spu 编号
+     * @param status   状态
+     * @param dateTime 日期时间
      * @return 拼团活动列表
      */
-    List<CombinationActivityDO> getCombinationActivityBySpuIdsAndStatus(Collection<Long> spuIds, Integer status);
+    List<CombinationActivityDO> getCombinationActivityBySpuIdsAndStatusAndDateTimeLt(Collection<Long> spuIds, Integer status, LocalDateTime dateTime);
 
 }

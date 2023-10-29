@@ -33,7 +33,6 @@ public class DiscountActivityDO extends BaseDO {
      * 活动标题
      */
     private String name;
-    // TODO 芋艿：状态调整，只有开启和关闭；
     /**
      * 状态
      *

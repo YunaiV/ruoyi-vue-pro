@@ -58,9 +58,9 @@ public class FileConfigServiceImpl implements FileConfigService {
                     FileConfigDO config = Objects.equals(CACHE_MASTER_ID, id) ?
                             fileConfigMapper.selectByMaster() : fileConfigMapper.selectById(id);
                     if (config != null) {
-                        fileClientFactory.createOrUpdateFileClient(id, config.getStorage(), config.getConfig());
+                        fileClientFactory.createOrUpdateFileClient(config.getId(), config.getStorage(), config.getConfig());
                     }
-                    return fileClientFactory.getFileClient(id);
+                    return fileClientFactory.getFileClient(null == config ? id : config.getId());
                 }
 
              });

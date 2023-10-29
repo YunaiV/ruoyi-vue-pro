@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.pay.dal.mysql.wallet;
 
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.wallet.PayWalletPageReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -12,6 +15,14 @@ public interface PayWalletMapper extends BaseMapperX<PayWalletDO> {
     default PayWalletDO selectByUserIdAndType(Long userId, Integer userType) {
         return selectOne(PayWalletDO::getUserId, userId,
                 PayWalletDO::getUserType, userType);
+    }
+
+    default PageResult<PayWalletDO> selectPage(Integer userType, PayWalletPageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<PayWalletDO>()
+                .inIfPresent(PayWalletDO::getUserId, reqVO.getUserIds())
+                .eqIfPresent(PayWalletDO::getUserType, userType)
+                .betweenIfPresent(PayWalletDO::getCreateTime, reqVO.getCreateTime())
+                .orderByDesc(PayWalletDO::getId));
     }
 
     /**
@@ -59,6 +70,7 @@ public interface PayWalletMapper extends BaseMapperX<PayWalletDO> {
 
     /**
      * 冻结钱包部分余额
+     *
      * @param id 钱包 id
      * @param price 冻结金额
      */
@@ -73,6 +85,7 @@ public interface PayWalletMapper extends BaseMapperX<PayWalletDO> {
 
     /**
      * 解冻钱包余额
+     *
      * @param id 钱包 id
      * @param price 解冻金额
      */
@@ -87,6 +100,7 @@ public interface PayWalletMapper extends BaseMapperX<PayWalletDO> {
 
     /**
      * 当充值退款时, 更新钱包
+     *
      * @param id 钱包 id
      * @param price 退款金额
      */

@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.promotion.service.bargain;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
@@ -96,6 +95,19 @@ public class BargainActivityServiceImpl implements BargainActivityService {
         }
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void closeBargainActivityById(Long id) {
+        // 校验砍价活动是否存在
+        BargainActivityDO activity = validateBargainActivityExists(id);
+        if (CommonStatusEnum.isDisable(activity.getStatus())) {
+            throw exception(BARGAIN_ACTIVITY_STATUS_DISABLE);
+        }
+
+        bargainActivityMapper.updateById(new BargainActivityDO().setId(id)
+                .setStatus(CommonStatusEnum.DISABLE.getStatus()));
+    }
+
     private void validateBargainConflict(Long spuId, Long activityId) {
         // 查询所有开启的砍价活动
         List<BargainActivityDO> activityList = bargainActivityMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus());
@@ -121,7 +133,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
         // 校验存在
         BargainActivityDO activityDO = validateBargainActivityExists(id);
         // 校验状态
-        if (ObjectUtil.equal(activityDO.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+        if (CommonStatusEnum.isEnable(activityDO.getStatus())) {
             throw exception(BARGAIN_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END);
         }
 
@@ -153,7 +165,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
         if (activity == null) {
             throw exception(BARGAIN_ACTIVITY_NOT_EXISTS);
         }
-        if (ObjUtil.notEqual(activity.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+        if (CommonStatusEnum.isDisable(activity.getStatus())) {
             throw exception(BARGAIN_ACTIVITY_STATUS_CLOSED);
         }
         if (activity.getStock() <= 0) {
@@ -182,15 +194,15 @@ public class BargainActivityServiceImpl implements BargainActivityService {
     }
 
     @Override
-    public List<BargainActivityDO> getBargainActivityBySpuIdsAndStatus(Collection<Long> spuIds, Integer status) {
+    public List<BargainActivityDO> getBargainActivityBySpuIdsAndStatusAndDateTimeLt(Collection<Long> spuIds, Integer status, LocalDateTime dateTime) {
         // 1. 查询出指定 spuId 的 spu 参加的活动最接近现在的一条记录。多个的话，一个 spuId 对应一个最近的活动编号
-        // TODO @puhui999：我想了下，这种是不是只展示当前正在进行中的。已经结束、或者未开始的，可能没啥意义？
         List<Map<String, Object>> spuIdAndActivityIdMaps = bargainActivityMapper.selectSpuIdAndActivityIdMapsBySpuIdsAndStatus(spuIds, status);
         if (CollUtil.isEmpty(spuIdAndActivityIdMaps)) {
             return Collections.emptyList();
         }
         // 2. 查询活动详情
-        return bargainActivityMapper.selectListByIds(convertSet(spuIdAndActivityIdMaps, map -> MapUtil.getLong(map, "activityId")));
+        return bargainActivityMapper.selectListByIdsAndDateTimeLt(
+                convertSet(spuIdAndActivityIdMaps, map -> MapUtil.getLong(map, "activityId")), dateTime);
     }
 
 }

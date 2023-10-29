@@ -8,10 +8,11 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template.CouponTemplatePageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -39,7 +40,11 @@ public interface CouponTemplateMapper extends BaseMapperX<CouponTemplateDO> {
                 .orderByDesc(CouponTemplateDO::getId));
     }
 
-    void updateTakeCount(@Param("id") Long id, @Param("incrCount") Integer incrCount);
+    default void updateTakeCount(Long id, Integer incrCount) {
+        update(null, new LambdaUpdateWrapper<CouponTemplateDO>()
+                .eq(CouponTemplateDO::getId, id)
+                .setSql("take_count = take_count + " + incrCount));
+    }
 
     default List<CouponTemplateDO> selectListByTakeType(Integer takeType) {
         return selectList(CouponTemplateDO::getTakeType, takeType);

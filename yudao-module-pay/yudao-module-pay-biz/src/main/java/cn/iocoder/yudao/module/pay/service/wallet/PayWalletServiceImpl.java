@@ -1,12 +1,14 @@
 package cn.iocoder.yudao.module.pay.service.wallet;
 
 import cn.hutool.core.lang.Assert;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.wallet.PayWalletPageReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletMapper;
-import cn.iocoder.yudao.module.pay.enums.member.PayWalletBizTypeEnum;
+import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
 import cn.iocoder.yudao.module.pay.service.wallet.bo.WalletTransactionCreateReqBO;
@@ -20,8 +22,8 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.pay.enums.member.PayWalletBizTypeEnum.PAYMENT;
-import static cn.iocoder.yudao.module.pay.enums.member.PayWalletBizTypeEnum.PAYMENT_REFUND;
+import static cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum.PAYMENT;
+import static cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum.PAYMENT_REFUND;
 
 /**
  * 钱包 Service 实现类
@@ -58,6 +60,11 @@ public class PayWalletServiceImpl implements  PayWalletService {
     @Override
     public PayWalletDO getWallet(Long walletId) {
         return walletMapper.selectById(walletId);
+    }
+
+    @Override
+    public PageResult<PayWalletDO> getWalletPage(Integer userType,PayWalletPageReqVO pageReqVO) {
+        return walletMapper.selectPage(userType, pageReqVO);
     }
 
     @Override
@@ -102,6 +109,7 @@ public class PayWalletServiceImpl implements  PayWalletService {
         if (walletTransaction == null) {
             throw exception(WALLET_TRANSACTION_NOT_FOUND);
         }
+        // 2. 校验退款是否存在
         PayWalletTransactionDO refundTransaction = walletTransactionService.getWalletTransaction(
                 String.valueOf(refundId), PAYMENT_REFUND);
         if (refundTransaction != null) {
@@ -121,7 +129,7 @@ public class PayWalletServiceImpl implements  PayWalletService {
         }
 
         // 2.1 扣除余额
-        int updateCounts = 0 ;
+        int updateCounts;
         switch (bizType) {
             case PAYMENT: {
                 updateCounts = walletMapper.updateWhenConsumption(payWallet.getId(), price);
@@ -188,7 +196,7 @@ public class PayWalletServiceImpl implements  PayWalletService {
     }
 
     @Override
-    public void unFreezePrice(Long id, Integer price) {
+    public void unfreezePrice(Long id, Integer price) {
         int updateCounts = walletMapper.unFreezePrice(id, price);
         if (updateCounts == 0) {
             throw exception(WALLET_FREEZE_PRICE_NOT_ENOUGH);

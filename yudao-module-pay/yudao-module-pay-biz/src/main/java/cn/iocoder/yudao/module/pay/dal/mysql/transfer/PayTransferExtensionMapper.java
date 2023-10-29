@@ -14,10 +14,11 @@ public interface PayTransferExtensionMapper extends BaseMapperX<PayTransferExten
        return  selectOne(PayTransferExtensionDO::getNo, no);
     }
 
-    default int updateByIdAndStatus(Long id, List<Integer> status, PayTransferExtensionDO updateObj){
+    default int updateByIdAndStatus(Long id, List<Integer> whereStatuses, PayTransferExtensionDO updateObj) {
         return update(updateObj, new LambdaQueryWrapper<PayTransferExtensionDO>()
-                .eq(PayTransferExtensionDO::getId, id).in(PayTransferExtensionDO::getStatus, status));
+                .eq(PayTransferExtensionDO::getId, id).in(PayTransferExtensionDO::getStatus, whereStatuses));
     }
+
 }
 
 
