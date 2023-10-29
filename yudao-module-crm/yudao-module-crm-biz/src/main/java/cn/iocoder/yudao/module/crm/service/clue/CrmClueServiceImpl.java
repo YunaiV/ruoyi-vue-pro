@@ -39,7 +39,7 @@ public class CrmClueServiceImpl implements CrmClueService {
     @Override
     public Long createClue(CrmClueCreateReqVO createReqVO) {
         // 校验客户是否存在
-        validateCustomerExists(createReqVO.getCustomerId());
+        customerService.validateCustomer(createReqVO.getCustomerId());
         // 插入
         CrmClueDO clue = CrmClueConvert.INSTANCE.convert(createReqVO);
         clueMapper.insert(clue);
@@ -52,7 +52,7 @@ public class CrmClueServiceImpl implements CrmClueService {
         // 校验存在
         validateClueExists(updateReqVO.getId());
         // 校验客户是否存在
-        validateCustomerExists(updateReqVO.getCustomerId());
+        customerService.validateCustomer(updateReqVO.getCustomerId());
 
         // 更新
         CrmClueDO updateObj = CrmClueConvert.INSTANCE.convert(updateReqVO);
@@ -94,18 +94,6 @@ public class CrmClueServiceImpl implements CrmClueService {
     @Override
     public List<CrmClueDO> getClueList(CrmClueExportReqVO exportReqVO) {
         return clueMapper.selectList(exportReqVO);
-    }
-
-    // TODO @wanwan：可以在 CrmClueServiceImpl 中，增加一个方法，用于校验客户是否存在；validateCustomer；然后其它方法可以调用它。不过要注意，需要把 CustomerDO 返回，因为其它模块可能要它的信息
-    /**
-     * 校验客户是否存在
-     *
-     * @param customerId 客户id
-     */
-    private void validateCustomerExists(Long customerId) {
-        if (customerService.getCustomer(customerId) == null) {
-            throw exception(CUSTOMER_NOT_EXISTS);
-        }
     }
 
 }

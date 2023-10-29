@@ -113,8 +113,6 @@ CREATE TABLE IF NOT EXISTS "crm_customer" (
   "rw_user_ids" varchar,
   "area_id" bigint,
   "detail_address" varchar,
-  "longitude" varchar,
-  "latitude" varchar,
   "contact_last_time" varchar,
   "contact_next_time" varchar,
   "creator" varchar DEFAULT '',

@@ -1,20 +1,24 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.customer;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 // TODO 芋艿：调整下字段
+
 /**
  * 客户 DO
  *
  * @author Wanwan
  */
-@TableName("crm_customer")
+@TableName(value = "crm_customer", autoResultMap = true)
 @KeySequence("crm_customer_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -46,6 +50,21 @@ public class CrmCustomerDO extends BaseDO {
      */
     private Boolean dealStatus;
     /**
+     * 所属行业
+     * 对应字典 {@link cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_INDUSTRY}
+     */
+    private Integer industryId;
+    /**
+     * 客户等级
+     * 对应字典 {@link cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_LEVEL}
+     */
+    private Integer level;
+    /**
+     * 客户来源
+     * 对应字典 {@link cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_SOURCE}
+     */
+    private Integer source;
+    /**
      * 手机
      */
     private String mobile;
@@ -58,6 +77,22 @@ public class CrmCustomerDO extends BaseDO {
      */
     private String website;
     /**
+     * QQ
+     */
+    private String qq;
+    /**
+     * wechat
+     */
+    private String wechat;
+    /**
+     * email
+     */
+    private String email;
+    /**
+     * 客户描述
+     */
+    private String description;
+    /**
      * 备注
      */
     private String remark;
@@ -65,15 +100,16 @@ public class CrmCustomerDO extends BaseDO {
      * 负责人的用户编号
      */
     private Long ownerUserId;
-    // TODO @wanwan：下面两个字段，使用 List<Long>，然后使用 typeHandler = LongListTypeHandler 解决持久化的问题；注意类上需要加 autoResultMap = true
     /**
      * 只读权限的用户编号数组
      */
-    private String roUserIds;
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> roUserIds;
     /**
      * 读写权限的用户编号数组
      */
-    private String rwUserIds;
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> rwUserIds;
     /**
      * 地区编号
      */
@@ -82,15 +118,6 @@ public class CrmCustomerDO extends BaseDO {
      * 详细地址
      */
     private String detailAddress;
-    // TODO @wanwan：下面两个字段：删除
-    /**
-     * 地理位置经度
-     */
-    private String longitude;
-    /**
-     * 地理位置维度
-     */
-    private String latitude;
     /**
      * 最后跟进时间
      */

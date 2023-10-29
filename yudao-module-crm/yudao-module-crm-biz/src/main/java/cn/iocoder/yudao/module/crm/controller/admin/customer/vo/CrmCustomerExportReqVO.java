@@ -14,10 +14,4 @@ public class CrmCustomerExportReqVO {
     @Schema(description = "手机", example = "18000000000")
     private String mobile;
 
-    @Schema(description = "电话", example = "18000000000")
-    private String telephone;
-
-    @Schema(description = "网址", example = "https://www.baidu.com")
-    private String website;
-
 }
