@@ -1,18 +1,11 @@
 package cn.iocoder.yudao.module.crm.controller.admin.business.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.math.BigDecimal;
-import java.math.BigDecimal;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-
 import com.alibaba.excel.annotation.ExcelProperty;
+import lombok.Data;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Set;
 
 /**
  * 商机 Excel VO
@@ -62,10 +55,10 @@ public class CrmBusinessExcelVO {
     private LocalDateTime createTime;
 
     @ExcelProperty("只读权限的用户编号数组")
-    private String roUserIds;
+    private Set<Long> roUserIds;
 
     @ExcelProperty("读写权限的用户编号数组")
-    private String rwUserIds;
+    private Set<Long> rwUserIds;
 
     @ExcelProperty("1赢单2输单3无效")
     private Integer endStatus;
