@@ -7,6 +7,9 @@ import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.*;
 import cn.iocoder.yudao.module.crm.convert.contract.ContractConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.ContractDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contract.ContractMapper;
+import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
+import cn.iocoder.yudao.module.crm.framework.enums.CrmEnum;
+import cn.iocoder.yudao.module.crm.framework.enums.OperationTypeEnum;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.springframework.stereotype.Service;
@@ -18,7 +21,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.crm.framework.utils.AuthUtil.isReadAndWrite;
+import static cn.iocoder.yudao.module.crm.framework.utils.CrmPermissionUtils.isReadAndWrite;
 
 /**
  * 合同 Service 实现类
@@ -94,6 +97,7 @@ public class ContractServiceImpl implements ContractService {
 
     // TODO @puhui999：参考 CrmBusinessServiceImpl 修改建议
     @Override
+    @CrmPermission(crmType = CrmEnum.CRM_CONTRACT, operationType = OperationTypeEnum.TRANSFER)
     public void contractTransfer(CrmContractTransferReqVO reqVO, Long userId) {
         // 1. 校验合同是否存在
         ContractDO contract = validateContractExists(reqVO.getId());

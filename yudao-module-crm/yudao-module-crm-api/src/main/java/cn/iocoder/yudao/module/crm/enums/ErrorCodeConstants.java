@@ -19,8 +19,9 @@ public interface ErrorCodeConstants {
 
     // ========== 商机管理 1-020-002-000 ==========
     ErrorCode BUSINESS_NOT_EXISTS = new ErrorCode(1_020_002_000, "商机不存在");
-    ErrorCode BUSINESS_TRANSFER_FAIL_PERMISSION_DENIED = new ErrorCode(1_020_002_001, "商机转移失败，原因：没有转移权限"); // TODO @puhui999：这个搞成 “商机操作失败，原因：没有权限”
-    ErrorCode BUSINESS_TRANSFER_FAIL_OWNER_USER_NOT_EXISTS = new ErrorCode(1_020_002_002, "商机转移失败，原因：负责人不存在");
+    ErrorCode BUSINESS_TRANSFER_FAIL_PERMISSION_DENIED = new ErrorCode(1_020_002_001, "商机操作失败，原因：没有权限");
+    ErrorCode BUSINESS_TRANSFER_FAIL_OWNER_USER_NOT_EXISTS = new ErrorCode(1_020_002_002, "商机操作失败，原因：负责人不存在");
+    ErrorCode BUSINESS_TRANSFER_FAIL_OWNER_USER_EXISTS = new ErrorCode(1_020_002_003, "商机操作失败，原因：转移对象已经是该负责人");
 
     // TODO @lilleo：商机状态、商机类型，都单独错误码段
 

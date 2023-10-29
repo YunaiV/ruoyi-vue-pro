@@ -2,11 +2,15 @@ package cn.iocoder.yudao.module.crm.service.business;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.*;
 import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessMapper;
+import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
+import cn.iocoder.yudao.module.crm.framework.enums.CrmEnum;
+import cn.iocoder.yudao.module.crm.framework.enums.OperationTypeEnum;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.springframework.stereotype.Service;
@@ -18,7 +22,6 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.crm.framework.utils.AuthUtil.isReadAndWrite;
 
 /**
  * 商机 Service 实现类
@@ -70,6 +73,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
+    @CrmPermission(crmType = CrmEnum.CRM_BUSINESS, operationType = OperationTypeEnum.READ)
     public CrmBusinessDO getBusiness(Long id) {
         return businessMapper.selectById(id);
     }
@@ -92,17 +96,16 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         return businessMapper.selectList(exportReqVO);
     }
 
-    // TODO @puhui999：动名词哈。transferBusiness
     @Override
-    public void businessTransfer(CrmBusinessTransferReqVO reqVO, Long userId) {
+    @CrmPermission(crmType = CrmEnum.CRM_BUSINESS, operationType = OperationTypeEnum.TRANSFER)
+    public void businessTransfer(CrmTransferBusinessReqVO reqVO, Long userId) {
         // 1.1 校验商机是否存在
-        CrmBusinessDO business = validateBusinessExists(reqVO.getId());
-        // 1.2 校验用户是否拥有读写权限
-        if (!isReadAndWrite(business.getRwUserIds(), userId)) {
-            throw exception(BUSINESS_TRANSFER_FAIL_PERMISSION_DENIED);
+        CrmBusinessDO business = getBusiness(reqVO.getId());
+        // 1.3 校验转移对象是否已经是该负责人
+        if (ObjUtil.equal(business.getOwnerUserId(), reqVO.getOwnerUserId())) {
+            throw exception(BUSINESS_TRANSFER_FAIL_OWNER_USER_EXISTS);
         }
-        // TODO @puhui999：如果已经是该负责人，抛个业务异常；
-        // 1.3 校验新负责人是否存在
+        // 1.4 校验新负责人是否存在
         AdminUserRespDTO user = adminUserApi.getUser(reqVO.getOwnerUserId());
         if (user == null) {
             throw exception(BUSINESS_TRANSFER_FAIL_OWNER_USER_NOT_EXISTS);
@@ -112,7 +115,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         CrmBusinessDO updateBusiness = CrmBusinessConvert.INSTANCE.convert(business, reqVO, userId);
         businessMapper.updateById(updateBusiness);
 
-        // 4. TODO 记录商机转移日志
+        // 3. TODO 记录商机转移日志
     }
 
 }

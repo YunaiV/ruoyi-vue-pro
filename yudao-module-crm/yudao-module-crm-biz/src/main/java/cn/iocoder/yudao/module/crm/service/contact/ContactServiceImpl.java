@@ -18,7 +18,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.crm.framework.utils.AuthUtil.isReadAndWrite;
+import static cn.iocoder.yudao.module.crm.framework.utils.CrmPermissionUtils.isReadAndWrite;
 
 /**
  * crm联系人 Service 实现类

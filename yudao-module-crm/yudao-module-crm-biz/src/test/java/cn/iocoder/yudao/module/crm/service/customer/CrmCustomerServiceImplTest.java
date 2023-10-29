@@ -124,8 +124,8 @@ public class CrmCustomerServiceImplTest extends BaseDbUnitTest {
         CrmCustomerPageReqVO reqVO = new CrmCustomerPageReqVO();
         reqVO.setName(null);
         reqVO.setMobile(null);
-        reqVO.setTelephone(null);
-        reqVO.setWebsite(null);
+        //reqVO.setTelephone(null);
+        //reqVO.setWebsite(null);
 
         // 调用
         PageResult<CrmCustomerDO> pageResult = customerService.getCustomerPage(reqVO);
@@ -158,8 +158,8 @@ public class CrmCustomerServiceImplTest extends BaseDbUnitTest {
         CrmCustomerExportReqVO reqVO = new CrmCustomerExportReqVO();
         reqVO.setName(null);
         reqVO.setMobile(null);
-        reqVO.setTelephone(null);
-        reqVO.setWebsite(null);
+        //reqVO.setTelephone(null);
+        //reqVO.setWebsite(null);
 
         // 调用
         List<CrmCustomerDO> list = customerService.getCustomerList(reqVO);

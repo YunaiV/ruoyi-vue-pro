@@ -1,15 +1,12 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.contact;
 
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.framework.mybatis.core.type.JsonLongSetTypeHandler;
+import cn.iocoder.yudao.module.crm.framework.dataobject.CrmPermissionBaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
 /**
  * crm 联系人 DO
@@ -24,7 +21,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ContactDO extends BaseDO {
+public class ContactDO extends CrmPermissionBaseDO {
 
     /**
      * 主键
@@ -70,25 +67,8 @@ public class ContactDO extends BaseDO {
      */
     private String remark;
     /**
-     * 负责人用户编号
-     *
-     * TODO @zyna：关联的字段，也要写下
-     */
-    private Long ownerUserId;
-    /**
      * 最后跟进时间
      */
     private LocalDateTime lastTime;
-
-    /**
-     * 只读权限的用户编号数组
-     */
-    @TableField(typeHandler = JsonLongSetTypeHandler.class)
-    private Set<Long> roUserIds;
-    /**
-     * 读写权限的用户编号数组
-     */
-    @TableField(typeHandler = JsonLongSetTypeHandler.class)
-    private Set<Long> rwUserIds;
 
 }
