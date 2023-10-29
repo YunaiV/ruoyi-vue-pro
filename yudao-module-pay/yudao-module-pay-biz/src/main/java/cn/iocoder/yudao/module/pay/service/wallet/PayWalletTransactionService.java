@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.pay.service.wallet;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.transaction.PayWalletTransactionPageReqVO;
 import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.transaction.AppPayWalletTransactionPageReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
-import cn.iocoder.yudao.module.pay.enums.member.PayWalletBizTypeEnum;
+import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.wallet.bo.WalletTransactionCreateReqBO;
 
 import javax.validation.Valid;
@@ -24,6 +25,13 @@ public interface PayWalletTransactionService {
      */
     PageResult<PayWalletTransactionDO> getWalletTransactionPage(Long userId, Integer userType,
                                                                 AppPayWalletTransactionPageReqVO pageVO);
+
+    /**
+     * 查询钱包余额流水分页
+     *
+     * @param pageVO   分页查询参数
+     */
+    PageResult<PayWalletTransactionDO> getWalletTransactionPage(PayWalletTransactionPageReqVO pageVO);
 
     /**
      * 新增钱包余额流水

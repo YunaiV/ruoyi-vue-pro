@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -107,8 +108,8 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
         }
 
         // 2. 校验商品 sku 都存在
-        Map<Long, ProductSkuRespDTO> skuMap = convertMap(productSkuApi.getSkuListBySpuId(singletonList(spuId)),
-                ProductSkuRespDTO::getId);
+        List<ProductSkuRespDTO> skus = productSkuApi.getSkuListBySpuId(singletonList(spuId));
+        Map<Long, ProductSkuRespDTO> skuMap = convertMap(skus, ProductSkuRespDTO::getId);
         products.forEach(product -> {
             if (!skuMap.containsKey(product.getSkuId())) {
                 throw exception(SKU_NOT_EXISTS);
@@ -135,6 +136,20 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
         combinationActivityMapper.updateById(updateObj);
         // 更新商品
         updateCombinationProduct(updateObj, updateReqVO.getProducts());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void closeCombinationActivityById(Long id) {
+        // 校验活动是否存在
+        CombinationActivityDO activity = validateCombinationActivityExists(id);
+        if (CommonStatusEnum.isDisable(activity.getStatus())) {
+            throw exception(COMBINATION_ACTIVITY_STATUS_DISABLE_NOT_UPDATE);
+        }
+
+        // 关闭活动
+        combinationActivityMapper.updateById(new CombinationActivityDO().setId(id)
+                .setStatus(CommonStatusEnum.DISABLE.getStatus()));
     }
 
     /**
@@ -171,9 +186,9 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     @Transactional(rollbackFor = Exception.class)
     public void deleteCombinationActivity(Long id) {
         // 校验存在
-        CombinationActivityDO activityDO = validateCombinationActivityExists(id);
+        CombinationActivityDO activity = validateCombinationActivityExists(id);
         // 校验状态
-        if (ObjectUtil.equal(activityDO.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+        if (CommonStatusEnum.isEnable(activity.getStatus())) {
             throw exception(COMBINATION_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END);
         }
 
@@ -228,14 +243,15 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     }
 
     @Override
-    public List<CombinationActivityDO> getCombinationActivityBySpuIdsAndStatus(Collection<Long> spuIds, Integer status) {
+    public List<CombinationActivityDO> getCombinationActivityBySpuIdsAndStatusAndDateTimeLt(Collection<Long> spuIds, Integer status, LocalDateTime dateTime) {
         // 1.查询出指定 spuId 的 spu 参加的活动最接近现在的一条记录。多个的话，一个 spuId 对应一个最近的活动编号
         List<Map<String, Object>> spuIdAndActivityIdMaps = combinationActivityMapper.selectSpuIdAndActivityIdMapsBySpuIdsAndStatus(spuIds, status);
         if (CollUtil.isEmpty(spuIdAndActivityIdMaps)) {
             return Collections.emptyList();
         }
         // 2.查询活动详情
-        return combinationActivityMapper.selectListByIds(convertSet(spuIdAndActivityIdMaps, map -> MapUtil.getLong(map, "activityId")));
+        return combinationActivityMapper.selectListByIdsAndDateTimeLt(
+                convertSet(spuIdAndActivityIdMaps, map -> MapUtil.getLong(map, "activityId")), dateTime);
     }
 
 }

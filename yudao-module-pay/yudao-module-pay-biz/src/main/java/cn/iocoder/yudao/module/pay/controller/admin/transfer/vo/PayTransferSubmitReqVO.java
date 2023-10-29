@@ -21,4 +21,5 @@ public class PayTransferSubmitReqVO {
 
     @Schema(description = "转账渠道的额外参数")
     private Map<String, String> channelExtras;
+
 }

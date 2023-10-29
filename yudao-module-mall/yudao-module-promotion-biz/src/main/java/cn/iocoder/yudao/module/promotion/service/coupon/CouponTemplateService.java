@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTakeTypeEnum;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -90,5 +91,13 @@ public interface CouponTemplateService {
      */
     List<CouponTemplateDO> getCouponTemplateList(List<Integer> canTakeTypes, Integer productScope,
                                                  Long productScopeValue, Integer count);
+
+    /**
+     * 获得优惠券模版列表
+     *
+     * @param ids 优惠券模版编号
+     * @return 优惠券模版列表
+     */
+    List<CouponTemplateDO> getCouponTemplateList(Collection<Long> ids);
 
 }

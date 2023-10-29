@@ -101,9 +101,7 @@ public interface ProductSpuConvert {
     List<AppProductSpuDetailRespVO.Sku> convertListForGetSpuDetail(List<ProductSkuDO> skus);
 
     default ProductSpuDetailRespVO convertForSpuDetailRespVO(ProductSpuDO spu, List<ProductSkuDO> skus) {
-        ProductSpuDetailRespVO detailRespVO = convert03(spu);
-        detailRespVO.setSkus(ProductSkuConvert.INSTANCE.convertList(skus));
-        return detailRespVO;
+        return convert03(spu).setSkus(ProductSkuConvert.INSTANCE.convertList(skus));
     }
 
     default List<ProductSpuDetailRespVO> convertForSpuDetailRespListVO(List<ProductSpuDO> spus, List<ProductSkuDO> skus) {

@@ -14,8 +14,8 @@
     <name>${project.artifactId}</name>
 
     <description>
-        market模块，主要实现营销相关功能
-        例如：营销活动、banner广告、优惠券、优惠码等功能。
+        promotion 模块，主要实现营销相关功能
+        例如：营销活动、banner 广告、优惠券、优惠码等功能。
     </description>
 
     <dependencies>
@@ -48,10 +48,6 @@
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-biz-tenant</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-biz-weixin</artifactId>
         </dependency>
 
         <!-- Web 相关 -->

@@ -11,4 +11,11 @@
           AND deleted = FALSE
     </select>
 
+    <select id="selectWithdrawCountByStatus" resultType="java.lang.Long">
+        SELECT COUNT(1)
+        FROM trade_brokerage_withdraw
+        WHERE status = #{status}
+          AND deleted = FALSE
+    </select>
+
 </mapper>

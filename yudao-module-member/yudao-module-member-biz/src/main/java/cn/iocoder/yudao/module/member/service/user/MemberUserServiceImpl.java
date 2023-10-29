@@ -7,7 +7,6 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserResetPasswordReqVO;
@@ -18,7 +17,7 @@ import cn.iocoder.yudao.module.member.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
-import cn.iocoder.yudao.module.member.mq.producer.user.UserCreateProducer;
+import cn.iocoder.yudao.module.member.mq.producer.user.MemberUserProducer;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeUseReqDTO;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
@@ -29,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -55,18 +53,13 @@ public class MemberUserServiceImpl implements MemberUserService {
     private MemberUserMapper memberUserMapper;
 
     @Resource
-    private FileApi fileApi;
-    @Resource
     private SmsCodeApi smsCodeApi;
 
     @Resource
     private PasswordEncoder passwordEncoder;
 
     @Resource
-    private UserCreateProducer registerCouponProducer;
-
-    @Resource
-    private TransactionTemplate transactionTemplate;
+    private MemberUserProducer memberUserProducer;
 
     @Override
     public MemberUserDO getUserByMobile(String mobile) {
@@ -80,17 +73,17 @@ public class MemberUserServiceImpl implements MemberUserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public MemberUserDO createUserIfAbsent(String mobile, String registerIp) {
+    public MemberUserDO createUserIfAbsent(String mobile, String registerIp, Integer terminal) {
         // 用户已经存在
         MemberUserDO user = memberUserMapper.selectByMobile(mobile);
         if (user != null) {
             return user;
         }
         // 用户不存在，则进行创建
-        return createUser(mobile, registerIp);
+        return createUser(mobile, registerIp, terminal);
     }
 
-    private MemberUserDO createUser(String mobile, String registerIp) {
+    private MemberUserDO createUser(String mobile, String registerIp, Integer terminal) {
         // 生成密码
         String password = IdUtil.fastSimpleUUID();
         // 插入用户
@@ -99,6 +92,7 @@ public class MemberUserServiceImpl implements MemberUserService {
         user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
         user.setPassword(encodePassword(password)); // 加密密码
         user.setRegisterIp(registerIp);
+        user.setRegisterTerminal(terminal);
         memberUserMapper.insert(user);
 
         // 发送 MQ 消息：用户创建
@@ -106,7 +100,7 @@ public class MemberUserServiceImpl implements MemberUserService {
 
             @Override
             public void afterCommit() {
-                registerCouponProducer.sendUserCreateMessage(user.getId());
+                memberUserProducer.sendUserCreateMessage(user.getId());
             }
 
         });

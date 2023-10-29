@@ -56,20 +56,28 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         SensitiveWordDO wordDO2 = randomPojo(SensitiveWordDO.class, o -> o.setName("笨蛋")
                 .setTags(singletonList("蔬菜")).setStatus(CommonStatusEnum.ENABLE.getStatus()));
         sensitiveWordMapper.insert(wordDO2);
+        SensitiveWordDO wordDO3 = randomPojo(SensitiveWordDO.class, o -> o.setName("白")
+                .setTags(singletonList("测试")).setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        sensitiveWordMapper.insert(wordDO3);
+        SensitiveWordDO wordDO4 = randomPojo(SensitiveWordDO.class, o -> o.setName("白痴")
+                .setTags(singletonList("测试")).setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        sensitiveWordMapper.insert(wordDO4);
 
         // 调用
         sensitiveWordService.initLocalCache();
         // 断言 sensitiveWordTagsCache 缓存
-        assertEquals(SetUtils.asSet("论坛", "蔬菜"), sensitiveWordService.getSensitiveWordTagSet());
+        assertEquals(SetUtils.asSet("论坛", "蔬菜", "测试"), sensitiveWordService.getSensitiveWordTagSet());
         // 断言 sensitiveWordCache
-        assertEquals(2, sensitiveWordService.getSensitiveWordCache().size());
+        assertEquals(4, sensitiveWordService.getSensitiveWordCache().size());
         assertPojoEquals(wordDO1, sensitiveWordService.getSensitiveWordCache().get(0));
         assertPojoEquals(wordDO2, sensitiveWordService.getSensitiveWordCache().get(1));
+        assertPojoEquals(wordDO3, sensitiveWordService.getSensitiveWordCache().get(2));
         // 断言 tagSensitiveWordTries 缓存
         assertNotNull(sensitiveWordService.getDefaultSensitiveWordTrie());
-        assertEquals(2, sensitiveWordService.getTagSensitiveWordTries().size());
+        assertEquals(3, sensitiveWordService.getTagSensitiveWordTries().size());
         assertNotNull(sensitiveWordService.getTagSensitiveWordTries().get("论坛"));
         assertNotNull(sensitiveWordService.getTagSensitiveWordTries().get("蔬菜"));
+        assertNotNull(sensitiveWordService.getTagSensitiveWordTries().get("测试"));
     }
 
     @Test
@@ -231,11 +239,17 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         testInitLocalCache();
         // 准备参数
         String text = "你是傻瓜，你是笨蛋";
-
         // 调用
         List<String> result = sensitiveWordService.validateText(text, null);
         // 断言
         assertEquals(Arrays.asList("傻瓜", "笨蛋"), result);
+
+        // 准备参数
+        String text2 = "你是傻瓜，你是笨蛋，你是白";
+        // 调用
+        List<String> result2 = sensitiveWordService.validateText(text2, null);
+        // 断言
+        assertEquals(Arrays.asList("傻瓜", "笨蛋","白"), result2);
     }
 
     @Test
@@ -243,11 +257,18 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         testInitLocalCache();
         // 准备参数
         String text = "你是傻瓜，你是笨蛋";
-
         // 调用
         List<String> result = sensitiveWordService.validateText(text, singletonList("论坛"));
         // 断言
         assertEquals(singletonList("傻瓜"), result);
+
+
+        // 准备参数
+        String text2 = "你是白";
+        // 调用
+        List<String> result2 = sensitiveWordService.validateText(text2, singletonList("测试"));
+        // 断言
+        assertEquals(singletonList("白"), result2);
     }
 
     @Test
@@ -255,9 +276,13 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         testInitLocalCache();
         // 准备参数
         String text = "你是傻瓜，你是笨蛋";
-
         // 调用，断言
         assertFalse(sensitiveWordService.isTextValid(text, null));
+
+        // 准备参数
+        String text2 = "你是白";
+        // 调用，断言
+        assertFalse(sensitiveWordService.isTextValid(text2, null));
     }
 
     @Test
@@ -265,9 +290,13 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         testInitLocalCache();
         // 准备参数
         String text = "你是傻瓜，你是笨蛋";
-
         // 调用，断言
         assertFalse(sensitiveWordService.isTextValid(text, singletonList("论坛")));
+
+        // 准备参数
+        String text2 = "你是白";
+        // 调用，断言
+        assertFalse(sensitiveWordService.isTextValid(text2, singletonList("测试")));
     }
 
 }

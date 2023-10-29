@@ -23,7 +23,7 @@ public class UserCreateMessage extends AbstractStreamMessage {
 
     @Override
     public String getStreamKey() {
-        return "member.create.send";
+        return "member.user.create";
     }
 
 }

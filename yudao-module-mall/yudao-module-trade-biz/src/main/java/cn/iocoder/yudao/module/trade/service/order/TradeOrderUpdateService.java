@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
+import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderRemarkReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdateAddressReqVO;
@@ -37,9 +38,10 @@ public interface TradeOrderUpdateService {
      * @param userId      登录用户
      * @param userIp      用户 IP 地址
      * @param createReqVO 创建交易订单请求模型
+     * @param terminal    终端 {@link TerminalEnum}
      * @return 交易订单的
      */
-    TradeOrderDO createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO);
+    TradeOrderDO createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO, Integer terminal);
 
     /**
      * 更新交易订单已支付
@@ -120,14 +122,21 @@ public interface TradeOrderUpdateService {
      *
      * @param id 订单编号
      */
-    void pickUpOrder(Long id);
+    void pickUpOrderByAdmin(Long id);
 
     /**
      * 【管理员】核销订单
      *
      * @param pickUpVerifyCode 自提核销码
      */
-    void pickUpOrder(String pickUpVerifyCode);
+    void pickUpOrderByAdmin(String pickUpVerifyCode);
+
+    /**
+     * 【管理员】根据自提核销码，查询订单
+     *
+     * @param pickUpVerifyCode 自提核销码
+     */
+    TradeOrderDO getByPickUpVerifyCode(String pickUpVerifyCode);
 
     // =================== Order Item ===================
 
@@ -178,9 +187,9 @@ public interface TradeOrderUpdateService {
      * @param combinationRecordId 拼团记录编号
      * @param headId              团长编号
      */
-    // TODO 芋艿：再 review 拼团
     void updateOrderCombinationInfo(Long orderId, Long activityId, Long combinationRecordId, Long headId);
 
+    // TODO 芋艿：拼团取消，不调这个接口哈；
     /**
      * 取消支付订单
      *

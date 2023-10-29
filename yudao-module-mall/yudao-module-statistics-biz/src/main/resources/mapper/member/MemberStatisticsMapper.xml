@@ -3,13 +3,11 @@
 <mapper namespace="cn.iocoder.yudao.module.statistics.dal.mysql.member.MemberStatisticsMapper">
 
     <select id="selectSummaryListByAreaId"
-            resultType="cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberAreaStatisticsRespVO">
+            resultType="cn.iocoder.yudao.module.statistics.service.member.bo.MemberAreaStatisticsRespBO">
         SELECT area_id, COUNT(1) AS userCount
         FROM member_user
         WHERE deleted = FALSE
         GROUP BY area_id
-        <!-- TODO @疯狂：order by 是不是交给内存哈 -->
-        ORDER BY userCount DESC
     </select>
 
     <select id="selectSummaryListBySex"
@@ -18,8 +16,14 @@
         FROM member_user
         WHERE deleted = FALSE
         GROUP BY sex
-        <!-- TODO @疯狂：order by 是不是交给内存哈 -->
-        ORDER BY userCount DESC
+    </select>
+
+    <select id="selectSummaryListByRegisterTerminal"
+                         resultType="cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberTerminalStatisticsRespVO">
+        SELECT register_terminal as terminal, COUNT(1) AS userCount
+        FROM member_user
+        WHERE deleted = FALSE
+        GROUP BY register_terminal
     </select>
 
     <select id="selectUserCount" resultType="java.lang.Integer">
@@ -32,6 +36,16 @@
         <if test="endTime != null">
             AND create_time &lt;= #{endTime}
         </if>
+    </select>
+
+    <select id="selectListByCreateTimeBetween"
+            resultType="cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberRegisterCountRespVO">
+        SELECT DATE_FORMAT(create_time, '%Y-%m-%d') AS date,
+               count(1)                             AS count
+        FROM member_user
+        WHERE create_time BETWEEN #{beginTime} AND #{endTime}
+          AND deleted = FALSE
+        GROUP BY date
     </select>
 
 </mapper>

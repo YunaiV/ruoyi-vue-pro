@@ -34,7 +34,10 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.pay.enums.transfer.PayTransferStatusEnum.*;
 
+// TODO @jason：等彻底实现完，单测写写；
 /**
+ * 转账 Service 实现类
+ *
  * @author jason
  */
 @Service
@@ -47,10 +50,12 @@ public class PayTransferServiceImpl implements PayTransferService {
     private PayTransferMapper transferMapper;
     @Resource
     private PayTransferExtensionMapper transferExtensionMapper;
+
     @Resource
     private PayAppService appService;
     @Resource
     private PayChannelService channelService;
+
     @Resource
     private PayNoRedisDAO noRedisDAO;
 
@@ -64,7 +69,7 @@ public class PayTransferServiceImpl implements PayTransferService {
         PayChannelDO channel = validateChannelCanSubmit(transfer.getAppId(), reqVO.getChannelCode());
         PayClient client = channelService.getPayClient(channel.getId());
 
-        // 2 新增转账拓展单
+        // 2. 新增转账拓展单
         String no = noRedisDAO.generate(TRANSFER_NO_PREFIX);
         PayTransferExtensionDO transferExtension = new PayTransferExtensionDO().setNo(no)
                 .setTransferId(transfer.getId()).setChannelId(channel.getId())
@@ -74,7 +79,7 @@ public class PayTransferServiceImpl implements PayTransferService {
         // 3. 调用三方渠道发起转账
         PayTransferUnifiedReqDTO transferUnifiedReq = new PayTransferUnifiedReqDTO()
                 .setOutTransferNo(transferExtension.getNo()).setPrice(transfer.getPrice())
-                .setType(transfer.getType()).setTitle(transfer.getTitle())
+                .setType(transfer.getType()).setTitle(transfer.getSubject())
                 .setPayeeInfo(transfer.getPayeeInfo()).setUserIp(userIp)
                 .setChannelExtras(reqVO.getChannelExtras());
         PayTransferRespDTO unifiedTransferResp = client.unifiedTransfer(transferUnifiedReq);
@@ -112,8 +117,9 @@ public class PayTransferServiceImpl implements PayTransferService {
             notifyTransferClosed(channel, notify);
         }
         // WAITING 状态无需处理
-        // TODO IN_PROGRESS  待处理
+        // TODO IN_PROGRESS 待处理
     }
+
     private void notifyTransferSuccess(PayChannelDO channel, PayTransferRespDTO notify) {
         // 1. 更新 PayTransferExtensionDO 转账成功
         PayTransferExtensionDO transferExtension = updateTransferExtensionSuccess(notify);
@@ -121,7 +127,7 @@ public class PayTransferServiceImpl implements PayTransferService {
         // 2. 更新 PayTransferDO 转账成功
         Boolean transferred = updateTransferSuccess(channel,transferExtension, notify);
         if (transferred) {
-            return ;
+            return;
         }
         // 3. TODO 插入转账通知记录
     }
@@ -208,11 +214,12 @@ public class PayTransferServiceImpl implements PayTransferService {
     }
 
     private void validateChannelCodeAndTypeMatch(String channelCode, Integer type) {
-        PayTransferTypeEnum transferType = PayTransferTypeEnum.ofType(type);
+        PayTransferTypeEnum transferType = PayTransferTypeEnum.typeOf(type);
         PayChannelEnum payChannel = PayChannelEnum.getByCode(channelCode);
         switch (transferType) {
             case ALIPAY_BALANCE: {
-                if (payChannel != PayChannelEnum.ALIPAY_TRANSFER) {
+                // TODO @jason：可以抽到 PayChannelEnum 里，isAlipay？ 类似这种哈
+                if (!payChannel.getCode().startsWith("alipay")) {
                     throw exception(PAY_TRANSFER_TYPE_AND_CHANNEL_NOT_MATCH);
                 }
                 break;

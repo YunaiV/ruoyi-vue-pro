@@ -69,7 +69,7 @@
 <!--            <version>${revision}</version>-->
 <!--        </dependency>-->
 
-        <!-- 商城相关模块。默认注释，保证编译速度 -->
+<!--         商城相关模块。默认注释，保证编译速度-->
 <!--        <dependency>-->
 <!--            <groupId>cn.iocoder.boot</groupId>-->
 <!--            <artifactId>yudao-module-promotion-biz</artifactId>-->

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.promotion.api.combination;
 
-import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateRespDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationValidateJoinRespDTO;
 
 import javax.validation.Valid;
@@ -28,9 +28,9 @@ public interface CombinationRecordApi {
      * 创建开团记录
      *
      * @param reqDTO 请求 DTO
-     * @return key 开团记录编号、value 团长编号
+     * @return 拼团信息
      */
-    KeyValue<Long, Long> createCombinationRecord(@Valid CombinationRecordCreateReqDTO reqDTO);
+    CombinationRecordCreateRespDTO createCombinationRecord(@Valid CombinationRecordCreateReqDTO reqDTO);
 
     /**
      * 查询拼团记录是否成功
@@ -40,14 +40,6 @@ public interface CombinationRecordApi {
      * @return 拼团是否成功
      */
     boolean isCombinationRecordSuccess(Long userId, Long orderId);
-
-    /**
-     * 更新拼团状态为【失败】
-     *
-     * @param userId  用户编号
-     * @param orderId 订单编号
-     */
-    void updateRecordStatusToFailed(Long userId, Long orderId);
 
     /**
      * 【下单前】校验是否满足拼团活动条件
