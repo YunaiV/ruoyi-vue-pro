@@ -10,7 +10,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
@@ -49,20 +48,20 @@ public class CrmCustomerBaseVO {
     private String website;
 
     @Schema(description = "QQ", example = "123456789")
-    @Size(max = 20, message = "QQ长度不能超过20个字符")
+    @Size(max = 20, message = "QQ长度不能超过 20 个字符")
     private String qq;
 
     @Schema(description = "wechat", example = "123456789")
-    @Size(max = 255, message = "微信长度不能超过255个字符")
+    @Size(max = 255, message = "微信长度不能超过 255 个字符")
     private String wechat;
 
     @Schema(description = "email", example = "123456789@qq.com")
     @Email(message = "邮箱格式不正确")
-    @Size(max = 255, message = "邮箱长度不能超过255个字符")
+    @Size(max = 255, message = "邮箱长度不能超过 255 个字符")
     private String email;
 
     @Schema(description = "客户描述", example = "任意文字")
-    @Size(max = 4096, message = "客户描述长度不能超过255个字符")
+    @Size(max = 4096, message = "客户描述长度不能超过 4096 个字符")
     private String description;
 
     @Schema(description = "备注", example = "随便")

@@ -11,4 +11,6 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class CrmCustomerCreateReqVO extends CrmCustomerBaseVO {
 
+    // TODO @wanwan：负责人
+
 }

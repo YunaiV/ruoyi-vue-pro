@@ -51,17 +51,20 @@ public class CrmCustomerDO extends BaseDO {
     private Boolean dealStatus;
     /**
      * 所属行业
-     * 对应字典 {@link cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_INDUSTRY}
+     *
+     * 对应字典 {@link cn.iocoder.yudao.module.crm.enums.DictTypeConstants#CRM_CUSTOMER_INDUSTRY}
      */
     private Integer industryId;
     /**
      * 客户等级
-     * 对应字典 {@link cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_LEVEL}
+     *
+     * 对应字典 {@link cn.iocoder.yudao.module.crm.enums.DictTypeConstants#CRM_CUSTOMER_LEVEL}
      */
     private Integer level;
     /**
      * 客户来源
-     * 对应字典 {@link cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_SOURCE}
+     *
+     * 对应字典 {@link cn.iocoder.yudao.module.crm.enums.DictTypeConstants#CRM_CUSTOMER_SOURCE}
      */
     private Integer source;
     /**

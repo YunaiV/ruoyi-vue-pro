@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.crm.enums;
 
 /**
- * System 字典类型的枚举类
+ * CRM 字典类型的枚举类
  *
  * @author 芋道源码
  */
