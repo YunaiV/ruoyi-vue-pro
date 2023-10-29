@@ -23,6 +23,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 合同")
 @RestController
@@ -85,5 +86,14 @@ public class ContractController {
         List<ContractExcelVO> datas = ContractConvert.INSTANCE.convertList02(list);
         ExcelUtils.write(response, "合同.xls", "数据", ContractExcelVO.class, datas);
     }
+
+    @PutMapping("/transfer")
+    @Operation(summary = "合同转移")
+    @PreAuthorize("@ss.hasPermission('crm:contract:update')")
+    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmContractTransferReqVO reqVO) {
+        contractService.contractTransfer(reqVO, getLoginUserId());
+        return success(true);
+    }
+
 
 }

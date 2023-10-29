@@ -1,14 +1,17 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.business;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.JsonLongSetTypeHandler;
 import cn.iocoder.yudao.module.crm.dal.dataobject.businessstatus.CrmBusinessStatusDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.businessstatustype.CrmBusinessStatusTypeDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 /**
  * 商机 DO
@@ -85,16 +88,14 @@ public class CrmBusinessDO extends BaseDO {
     private Long ownerUserId;
     /**
      * 只读权限的用户编号数组
-     *
-     * TODO @lijie：应该是 List<Long>，然后使用下对应的 typehandler
      */
-    private String roUserIds;
+    @TableField(typeHandler = JsonLongSetTypeHandler.class)
+    private Set<Long> roUserIds;
     /**
      * 读写权限的用户编号数组
-     *
-     * TODO @lijie：应该是 List<Long>，然后使用下对应的 typehandler
      */
-    private String rwUserIds;
+    @TableField(typeHandler = JsonLongSetTypeHandler.class)
+    private Set<Long> rwUserIds;
     /**
      * 1赢单2输单3无效
      *

@@ -1,12 +1,15 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.contact;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.JsonLongSetTypeHandler;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 /**
  * crm 联系人 DO
@@ -76,5 +79,16 @@ public class ContactDO extends BaseDO {
      * 最后跟进时间
      */
     private LocalDateTime lastTime;
+
+    /**
+     * 只读权限的用户编号数组
+     */
+    @TableField(typeHandler = JsonLongSetTypeHandler.class)
+    private Set<Long> roUserIds;
+    /**
+     * 读写权限的用户编号数组
+     */
+    @TableField(typeHandler = JsonLongSetTypeHandler.class)
+    private Set<Long> rwUserIds;
 
 }

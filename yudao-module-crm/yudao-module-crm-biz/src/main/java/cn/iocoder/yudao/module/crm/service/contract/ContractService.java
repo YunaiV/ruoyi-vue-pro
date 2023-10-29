@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.module.crm.service.contract;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.ContractCreateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.ContractExportReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.ContractPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.ContractUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.ContractDO;
 
 import javax.validation.Valid;
@@ -71,5 +68,13 @@ public interface ContractService {
      * @return 合同列表
      */
     List<ContractDO> getContractList(ContractExportReqVO exportReqVO);
+
+    /**
+     * 合同转移
+     *
+     * @param reqVO  请求
+     * @param userId 用户编号
+     */
+    void contractTransfer(CrmContractTransferReqVO reqVO, Long userId);
 
 }
