@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@Schema(description = "管理后台 - 合同 Excel 导出 Request VO，参数和 ContractPageReqVO 是一致的")
+@Schema(description = "管理后台 - CRM 合同 Excel 导出 Request VO，参数和 ContractPageReqVO 是一致的")
 @Data
 public class ContractExportReqVO {
 

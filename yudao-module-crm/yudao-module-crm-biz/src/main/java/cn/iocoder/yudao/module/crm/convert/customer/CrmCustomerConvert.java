@@ -1,13 +1,15 @@
 package cn.iocoder.yudao.module.crm.convert.customer;
 
-import java.util.*;
-
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.TransferCrmPermissionBO;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
+import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 /**
  * 客户 Convert
@@ -28,5 +30,11 @@ public interface CrmCustomerConvert {
     PageResult<CrmCustomerRespVO> convertPage(PageResult<CrmCustomerDO> page);
 
     List<CrmCustomerExcelVO> convertList02(List<CrmCustomerDO> list);
+
+    @Mappings({
+            @Mapping(target = "userId", source = "userId"),
+            @Mapping(target = "crmDataId", source = "reqVO.id")
+    })
+    TransferCrmPermissionBO convert(CrmTransferCustomerReqVO reqVO, Long userId);
 
 }

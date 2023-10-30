@@ -14,7 +14,7 @@ import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 
 
 /**
- * 回款管理 Excel VO
+ * CRM 回款管理 Excel VO
  *
  * @author 赤焰
  */

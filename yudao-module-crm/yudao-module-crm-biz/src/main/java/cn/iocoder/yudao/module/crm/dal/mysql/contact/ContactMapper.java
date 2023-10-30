@@ -1,13 +1,14 @@
 package cn.iocoder.yudao.module.crm.dal.mysql.contact;
 
-import java.util.*;
-
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactExportReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactPageReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.ContactDO;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.*;
+
+import java.util.List;
 
 /**
  * crm联系人 Mapper
@@ -28,7 +29,6 @@ public interface ContactMapper extends BaseMapperX<ContactDO> {
                 .eqIfPresent(ContactDO::getCustomerId, reqVO.getCustomerId())
                 .eqIfPresent(ContactDO::getAddress, reqVO.getAddress())
                 .eqIfPresent(ContactDO::getRemark, reqVO.getRemark())
-                .eqIfPresent(ContactDO::getOwnerUserId, reqVO.getOwnerUserId())
                 .betweenIfPresent(ContactDO::getCreateTime, reqVO.getCreateTime())
                 .betweenIfPresent(ContactDO::getLastTime, reqVO.getLastTime())
                 .orderByDesc(ContactDO::getId));
@@ -45,7 +45,6 @@ public interface ContactMapper extends BaseMapperX<ContactDO> {
                 .eqIfPresent(ContactDO::getCustomerId, reqVO.getCustomerId())
                 .eqIfPresent(ContactDO::getAddress, reqVO.getAddress())
                 .eqIfPresent(ContactDO::getRemark, reqVO.getRemark())
-                .eqIfPresent(ContactDO::getOwnerUserId, reqVO.getOwnerUserId())
                 .betweenIfPresent(ContactDO::getCreateTime, reqVO.getCreateTime())
                 .betweenIfPresent(ContactDO::getLastTime, reqVO.getLastTime())
                 .orderByDesc(ContactDO::getId));

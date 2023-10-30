@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.module.crm.service.customer;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerCreateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerExportReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 
 import javax.validation.Valid;
@@ -22,9 +19,10 @@ public interface CrmCustomerService {
      * 创建客户
      *
      * @param createReqVO 创建信息
+     * @param userId      用户编号
      * @return 编号
      */
-    Long createCustomer(@Valid CrmCustomerCreateReqVO createReqVO);
+    Long createCustomer(@Valid CrmCustomerCreateReqVO createReqVO, Long userId);
 
     /**
      * 更新客户
@@ -79,5 +77,13 @@ public interface CrmCustomerService {
      * @return 客户
      */
     CrmCustomerDO validateCustomer(Long customerId);
+
+    /**
+     * 客户转移
+     *
+     * @param reqVO  请求
+     * @param userId 用户编号
+     */
+    void transferCustomer(CrmTransferCustomerReqVO reqVO, Long userId);
 
 }

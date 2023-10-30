@@ -1,0 +1,11 @@
+PUT {{baseUrl}}/crm/business/transfer
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+{
+  "id": 1,
+  "ownerUserId": 2,
+  "transferType": 2,
+  "permissionType": 2
+}

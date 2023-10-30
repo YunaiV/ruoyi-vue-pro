@@ -1,13 +1,14 @@
 package cn.iocoder.yudao.module.crm.dal.mysql.clue;
 
-import java.util.*;
-
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueExportReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.*;
+
+import java.util.List;
 
 /**
  * 线索 Mapper
@@ -35,7 +36,6 @@ public interface CrmClueMapper extends BaseMapperX<CrmClueDO> {
                 .likeIfPresent(CrmClueDO::getTelephone, reqVO.getTelephone())
                 .likeIfPresent(CrmClueDO::getMobile, reqVO.getMobile())
                 .likeIfPresent(CrmClueDO::getAddress, reqVO.getAddress())
-                .eqIfPresent(CrmClueDO::getOwnerUserId, reqVO.getOwnerUserId())
                 .betweenIfPresent(CrmClueDO::getContactLastTime, reqVO.getContactLastTime())
                 .betweenIfPresent(CrmClueDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(CrmClueDO::getId));

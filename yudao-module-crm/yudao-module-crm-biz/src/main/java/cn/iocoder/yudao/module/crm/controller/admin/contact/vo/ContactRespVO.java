@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.time.LocalDateTime;
 
-@Schema(description = "管理后台 - crm联系人 Response VO")
+@Schema(description = "管理后台 - CRM 联系人 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

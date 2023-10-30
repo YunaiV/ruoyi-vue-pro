@@ -115,7 +115,6 @@ public class CrmClueServiceImplTest extends BaseDbUnitTest {
            o.setTelephone(null);
            o.setMobile(null);
            o.setAddress(null);
-           o.setOwnerUserId(null);
            o.setContactLastTime(null);
            o.setCreateTime(null);
        });
@@ -136,8 +135,6 @@ public class CrmClueServiceImplTest extends BaseDbUnitTest {
        clueMapper.insert(cloneIgnoreId(dbClue, o -> o.setMobile(null)));
        // 测试 address 不匹配
        clueMapper.insert(cloneIgnoreId(dbClue, o -> o.setAddress(null)));
-       // 测试 ownerUserId 不匹配
-       clueMapper.insert(cloneIgnoreId(dbClue, o -> o.setOwnerUserId(null)));
        // 测试 contactLastTime 不匹配
        clueMapper.insert(cloneIgnoreId(dbClue, o -> o.setContactLastTime(null)));
        // 测试 createTime 不匹配
@@ -169,7 +166,6 @@ public class CrmClueServiceImplTest extends BaseDbUnitTest {
            o.setTelephone(null);
            o.setMobile(null);
            o.setAddress(null);
-           o.setOwnerUserId(null);
            o.setContactLastTime(null);
            o.setCreateTime(null);
        });
@@ -190,8 +186,6 @@ public class CrmClueServiceImplTest extends BaseDbUnitTest {
        clueMapper.insert(cloneIgnoreId(dbClue, o -> o.setMobile(null)));
        // 测试 address 不匹配
        clueMapper.insert(cloneIgnoreId(dbClue, o -> o.setAddress(null)));
-       // 测试 ownerUserId 不匹配
-       clueMapper.insert(cloneIgnoreId(dbClue, o -> o.setOwnerUserId(null)));
        // 测试 contactLastTime 不匹配
        clueMapper.insert(cloneIgnoreId(dbClue, o -> o.setContactLastTime(null)));
        // 测试 createTime 不匹配

@@ -11,16 +11,12 @@ public interface ErrorCodeConstants {
 
     // ========== 合同管理 1-020-000-000 ==========
     ErrorCode CONTRACT_NOT_EXISTS = new ErrorCode(1_020_000_000, "合同不存在");
-    ErrorCode CONTRACT_TRANSFER_FAIL_PERMISSION_DENIED = new ErrorCode(1_020_000_001, "合同转移失败，原因：没有转移权限"); // TODO @puhui999：这个搞成 “合同操作失败，原因：没有权限”
-    ErrorCode CONTRACT_TRANSFER_FAIL_OWNER_USER_NOT_EXISTS = new ErrorCode(1_020_000_002, "合同转移失败，原因：负责人不存在");
 
     // ========== 线索管理 1-020-001-000 ==========
     ErrorCode CLUE_NOT_EXISTS = new ErrorCode(1_020_001_000, "线索不存在");
 
     // ========== 商机管理 1-020-002-000 ==========
     ErrorCode BUSINESS_NOT_EXISTS = new ErrorCode(1_020_002_000, "商机不存在");
-    ErrorCode BUSINESS_TRANSFER_FAIL_PERMISSION_DENIED = new ErrorCode(1_020_002_001, "商机转移失败，原因：没有转移权限"); // TODO @puhui999：这个搞成 “商机操作失败，原因：没有权限”
-    ErrorCode BUSINESS_TRANSFER_FAIL_OWNER_USER_NOT_EXISTS = new ErrorCode(1_020_002_002, "商机转移失败，原因：负责人不存在");
 
     // TODO @lilleo：商机状态、商机类型，都单独错误码段
 
@@ -29,8 +25,6 @@ public interface ErrorCodeConstants {
 
     // ========== 联系人管理 1-020-003-000 ==========
     ErrorCode CONTACT_NOT_EXISTS = new ErrorCode(1_020_003_000, "联系人不存在");
-    ErrorCode CONTACT_TRANSFER_FAIL_PERMISSION_DENIED = new ErrorCode(1_020_003_001, "联系人转移失败，原因：没有转移权限"); // TODO @puhui999：这个搞成 “联系人操作失败，原因：没有权限”
-    ErrorCode CONTACT_TRANSFER_FAIL_OWNER_USER_NOT_EXISTS = new ErrorCode(1_020_003_002, "联系人转移失败，原因：负责人不存在");
 
     // ========== 回款管理 1-020-004-000 ==========
     ErrorCode RECEIVABLE_NOT_EXISTS = new ErrorCode(1_020_004_000, "回款管理不存在");
@@ -40,5 +34,13 @@ public interface ErrorCodeConstants {
 
     // ========== 客户管理 1_020_006_000 ==========
     ErrorCode CUSTOMER_NOT_EXISTS = new ErrorCode(1_020_006_000, "客户不存在");
+
+    // TODO @puhui999：权限管理？？？
+    // ========== 客户管理 1_020_007_000 ==========
+    ErrorCode CRM_PERMISSION_NOT_EXISTS = new ErrorCode(1_020_007_000, "数据权限不存在");
+    ErrorCode CRM_PERMISSION_DENIED = new ErrorCode(1_020_007_001, "{}操作失败，原因：没有权限");
+    ErrorCode CRM_PERMISSION_MODEL_NOT_EXISTS = new ErrorCode(1_020_007_002, "{}不存在");
+    ErrorCode CRM_PERMISSION_MODEL_TRANSFER_FAIL_OWNER_USER_NOT_EXISTS = new ErrorCode(1_020_007_003, "{}操作失败，原因：负责人不存在");
+    ErrorCode CRM_PERMISSION_MODEL_TRANSFER_FAIL_OWNER_USER_EXISTS = new ErrorCode(1_020_007_004, "{}操作失败，原因：转移对象已经是该负责人");
 
 }

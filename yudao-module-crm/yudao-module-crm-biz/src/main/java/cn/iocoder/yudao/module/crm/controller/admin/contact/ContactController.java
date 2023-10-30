@@ -26,7 +26,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
-@Tag(name = "管理后台 - crm联系人")
+@Tag(name = "管理后台 - CRM 联系人")
 @RestController
 @RequestMapping("/crm/contact")
 @Validated
@@ -39,7 +39,7 @@ public class ContactController {
     @Operation(summary = "创建crm联系人")
     @PreAuthorize("@ss.hasPermission('crm:contact:create')")
     public CommonResult<Long> createContact(@Valid @RequestBody ContactCreateReqVO createReqVO) {
-        return success(contactService.createContact(createReqVO));
+        return success(contactService.createContact(createReqVO, getLoginUserId()));
     }
 
     @PutMapping("/update")
@@ -100,8 +100,8 @@ public class ContactController {
     @PutMapping("/transfer")
     @Operation(summary = "联系人转移")
     @PreAuthorize("@ss.hasPermission('crm:contact:update')")
-    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmContactTransferReqVO reqVO) {
-        contactService.contactTransfer(reqVO, getLoginUserId());
+    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmTransferContactReqVO reqVO) {
+        contactService.transferContact(reqVO, getLoginUserId());
         return success(true);
     }
 
