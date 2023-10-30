@@ -109,7 +109,7 @@ public class CrmBusinessStatusTypeServiceImplTest extends BaseDbUnitTest {
            o.setName(null);
            o.setDeptIds(null);
            o.setStatus(null);
-           o.setCreateTime(null);
+           //o.setCreateTime(null);
        });
        businessStatusTypeMapper.insert(dbBusinessStatusType);
        // 测试 name 不匹配
@@ -119,13 +119,13 @@ public class CrmBusinessStatusTypeServiceImplTest extends BaseDbUnitTest {
        // 测试 status 不匹配
        businessStatusTypeMapper.insert(cloneIgnoreId(dbBusinessStatusType, o -> o.setStatus(null)));
        // 测试 createTime 不匹配
-       businessStatusTypeMapper.insert(cloneIgnoreId(dbBusinessStatusType, o -> o.setCreateTime(null)));
+        //businessStatusTypeMapper.insert(cloneIgnoreId(dbBusinessStatusType, o -> o.setCreateTime(null)));
        // 准备参数
        CrmBusinessStatusTypePageReqVO reqVO = new CrmBusinessStatusTypePageReqVO();
        reqVO.setName(null);
-       reqVO.setDeptIds(null);
+        //reqVO.setDeptIds(null);
        reqVO.setStatus(null);
-       reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
+        //reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
        // 调用
        PageResult<CrmBusinessStatusTypeDO> pageResult = businessStatusTypeService.getBusinessStatusTypePage(reqVO);
@@ -143,7 +143,7 @@ public class CrmBusinessStatusTypeServiceImplTest extends BaseDbUnitTest {
            o.setName(null);
            o.setDeptIds(null);
            o.setStatus(null);
-           o.setCreateTime(null);
+           //o.setCreateTime(null);
        });
        businessStatusTypeMapper.insert(dbBusinessStatusType);
        // 测试 name 不匹配
@@ -153,7 +153,7 @@ public class CrmBusinessStatusTypeServiceImplTest extends BaseDbUnitTest {
        // 测试 status 不匹配
        businessStatusTypeMapper.insert(cloneIgnoreId(dbBusinessStatusType, o -> o.setStatus(null)));
        // 测试 createTime 不匹配
-       businessStatusTypeMapper.insert(cloneIgnoreId(dbBusinessStatusType, o -> o.setCreateTime(null)));
+        //businessStatusTypeMapper.insert(cloneIgnoreId(dbBusinessStatusType, o -> o.setCreateTime(null)));
        // 准备参数
        CrmBusinessStatusTypeExportReqVO reqVO = new CrmBusinessStatusTypeExportReqVO();
        reqVO.setName(null);

@@ -19,9 +19,10 @@ public interface ContactService {
      * 创建crm联系人
      *
      * @param createReqVO 创建信息
+     * @param userId      用户编号
      * @return 编号
      */
-    Long createContact(@Valid ContactCreateReqVO createReqVO);
+    Long createContact(@Valid ContactCreateReqVO createReqVO, Long userId);
 
     /**
      * 更新crm联系人
@@ -75,6 +76,6 @@ public interface ContactService {
      * @param reqVO  请求
      * @param userId 用户编号
      */
-    void contactTransfer(CrmContactTransferReqVO reqVO, Long userId);
-    
+    void transferContact(CrmTransferContactReqVO reqVO, Long userId);
+
 }

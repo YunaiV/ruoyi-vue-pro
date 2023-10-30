@@ -1,15 +1,12 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.customer;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import com.baomidou.mybatisplus.annotation.KeySequence;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 // TODO 芋艿：调整下字段
 
@@ -99,20 +96,6 @@ public class CrmCustomerDO extends BaseDO {
      * 备注
      */
     private String remark;
-    /**
-     * 负责人的用户编号
-     */
-    private Long ownerUserId;
-    /**
-     * 只读权限的用户编号数组
-     */
-    @TableField(typeHandler = LongListTypeHandler.class)
-    private List<Long> roUserIds;
-    /**
-     * 读写权限的用户编号数组
-     */
-    @TableField(typeHandler = LongListTypeHandler.class)
-    private List<Long> rwUserIds;
     /**
      * 地区编号
      */

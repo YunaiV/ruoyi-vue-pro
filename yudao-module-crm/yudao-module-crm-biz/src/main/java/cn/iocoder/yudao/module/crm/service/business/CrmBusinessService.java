@@ -19,9 +19,10 @@ public interface CrmBusinessService {
      * 创建商机
      *
      * @param createReqVO 创建信息
+     * @param userId      用户编号
      * @return 编号
      */
-    Long createBusiness(@Valid CrmBusinessCreateReqVO createReqVO);
+    Long createBusiness(@Valid CrmBusinessCreateReqVO createReqVO, Long userId);
 
     /**
      * 更新商机
@@ -75,6 +76,6 @@ public interface CrmBusinessService {
      * @param reqVO  请求
      * @param userId 用户编号
      */
-    void businessTransfer(CrmBusinessTransferReqVO reqVO, Long userId);
-    
+    void transferBusiness(CrmTransferBusinessReqVO reqVO, Long userId);
+
 }

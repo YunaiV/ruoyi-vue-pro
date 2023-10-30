@@ -42,10 +42,6 @@ public class CrmClueBaseVO {
     @Schema(description = "地址", example = "北京市海淀区")
     private String address;
 
-    @Schema(description = "负责人的用户编号", example = "27199")
-    @NotNull(message = "负责人不能为空")
-    private Long ownerUserId;
-
     @Schema(description = "最后跟进时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime contactLastTime;

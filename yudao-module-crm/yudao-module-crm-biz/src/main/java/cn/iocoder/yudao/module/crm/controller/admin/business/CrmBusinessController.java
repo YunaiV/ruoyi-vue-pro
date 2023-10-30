@@ -38,7 +38,7 @@ public class CrmBusinessController {
     @Operation(summary = "创建商机")
     @PreAuthorize("@ss.hasPermission('crm:business:create')")
     public CommonResult<Long> createBusiness(@Valid @RequestBody CrmBusinessCreateReqVO createReqVO) {
-        return success(businessService.createBusiness(createReqVO));
+        return success(businessService.createBusiness(createReqVO, getLoginUserId()));
     }
 
     @PutMapping("/update")
@@ -91,8 +91,8 @@ public class CrmBusinessController {
     @PutMapping("/transfer")
     @Operation(summary = "商机转移")
     @PreAuthorize("@ss.hasPermission('crm:business:update')")
-    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmBusinessTransferReqVO reqVO) {
-        businessService.businessTransfer(reqVO, getLoginUserId());
+    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmTransferBusinessReqVO reqVO) {
+        businessService.transferBusiness(reqVO, getLoginUserId());
         return success(true);
     }
 

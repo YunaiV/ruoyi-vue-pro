@@ -65,12 +65,6 @@ public class CrmClueDO extends BaseDO {
      */
     private String address;
     /**
-     * 负责人的用户编号
-     *
-     * 关联 AdminUserDO 的 id 字段
-     */
-    private Long ownerUserId;
-    /**
      * 最后跟进时间 TODO 添加跟进记录时更新该值
      */
     private LocalDateTime contactLastTime;

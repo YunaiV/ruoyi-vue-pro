@@ -1,15 +1,12 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.contract;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.framework.mybatis.core.type.JsonLongSetTypeHandler;
 import com.baomidou.mybatisplus.annotation.KeySequence;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
 /**
  * 合同 DO
@@ -52,10 +49,6 @@ public class ContractDO extends BaseDO {
      */
     private LocalDateTime orderDate;
     /**
-     * 负责人的用户编号
-     */
-    private Long ownerUserId;
-    /**
      * 合同编号
      */
     private String no;
@@ -79,16 +72,6 @@ public class ContractDO extends BaseDO {
      * 产品总金额
      */
     private Integer productPrice;
-    /**
-     * 只读权限的用户编号数组
-     */
-    @TableField(typeHandler = JsonLongSetTypeHandler.class)
-    private Set<Long> roUserIds;
-    /**
-     * 读写权限的用户编号数组
-     */
-    @TableField(typeHandler = JsonLongSetTypeHandler.class)
-    private Set<Long> rwUserIds;
     /**
      * 联系人编号
      */
