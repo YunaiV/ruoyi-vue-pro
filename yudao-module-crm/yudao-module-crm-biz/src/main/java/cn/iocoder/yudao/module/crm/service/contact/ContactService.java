@@ -76,6 +76,6 @@ public interface ContactService {
      * @param reqVO  请求
      * @param userId 用户编号
      */
-    void contactTransfer(CrmContactTransferReqVO reqVO, Long userId);
+    void transferContact(CrmTransferContactReqVO reqVO, Long userId);
 
 }

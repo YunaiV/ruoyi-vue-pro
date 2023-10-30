@@ -92,7 +92,7 @@ public class CrmBusinessController {
     @Operation(summary = "商机转移")
     @PreAuthorize("@ss.hasPermission('crm:business:update')")
     public CommonResult<Boolean> transfer(@Valid @RequestBody CrmTransferBusinessReqVO reqVO) {
-        businessService.businessTransfer(reqVO, getLoginUserId());
+        businessService.transferBusiness(reqVO, getLoginUserId());
         return success(true);
     }
 

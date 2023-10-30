@@ -12,7 +12,6 @@ import cn.iocoder.yudao.module.crm.framework.enums.CrmEnum;
 import cn.iocoder.yudao.module.crm.framework.enums.OperationTypeEnum;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateBO;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -36,8 +35,6 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     @Resource
     private CrmBusinessMapper businessMapper;
 
-    @Resource
-    private AdminUserApi adminUserApi;
     @Resource
     private CrmPermissionService crmPermissionService;
 
@@ -111,7 +108,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void businessTransfer(CrmTransferBusinessReqVO reqVO, Long userId) {
+    public void transferBusiness(CrmTransferBusinessReqVO reqVO, Long userId) {
         // 1 校验商机是否存在
         validateBusinessExists(reqVO.getId());
 

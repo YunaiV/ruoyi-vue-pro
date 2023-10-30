@@ -16,6 +16,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
@@ -24,6 +25,7 @@ import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CUSTOMER_NOT_
 import static org.junit.jupiter.api.Assertions.*;
 
 // TODO 芋艿：单测后续补
+
 /**
  * {@link CrmCustomerServiceImpl} 的单元测试类
  *
@@ -44,7 +46,7 @@ public class CrmCustomerServiceImplTest extends BaseDbUnitTest {
         CrmCustomerCreateReqVO reqVO = randomPojo(CrmCustomerCreateReqVO.class);
 
         // 调用
-        Long customerId = customerService.createCustomer(reqVO);
+        Long customerId = customerService.createCustomer(reqVO, getLoginUserId());
         // 断言
         assertNotNull(customerId);
         // 校验记录的属性是否正确

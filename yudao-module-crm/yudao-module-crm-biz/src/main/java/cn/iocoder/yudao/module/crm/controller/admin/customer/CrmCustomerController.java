@@ -23,6 +23,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 客户")
 @RestController
@@ -37,7 +38,7 @@ public class CrmCustomerController {
     @Operation(summary = "创建客户")
     @PreAuthorize("@ss.hasPermission('crm:customer:create')")
     public CommonResult<Long> createCustomer(@Valid @RequestBody CrmCustomerCreateReqVO createReqVO) {
-        return success(customerService.createCustomer(createReqVO));
+        return success(customerService.createCustomer(createReqVO, getLoginUserId()));
     }
 
     @PutMapping("/update")
@@ -84,6 +85,14 @@ public class CrmCustomerController {
         // 导出 Excel
         List<CrmCustomerExcelVO> datas = CrmCustomerConvert.INSTANCE.convertList02(list);
         ExcelUtils.write(response, "客户.xls", "数据", CrmCustomerExcelVO.class, datas);
+    }
+
+    @PutMapping("/transfer")
+    @Operation(summary = "客户转移")
+    @PreAuthorize("@ss.hasPermission('crm:customer:update')")
+    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmTransferCustomerReqVO reqVO) {
+        customerService.transferCustomer(reqVO, getLoginUserId());
+        return success(true);
     }
 
 }

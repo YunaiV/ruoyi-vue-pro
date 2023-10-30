@@ -115,10 +115,7 @@ public class CrmBusinessServiceImplTest extends BaseDbUnitTest {
            o.setDiscountPercent(null);
            o.setProductPrice(null);
            o.setRemark(null);
-           o.setOwnerUserId(null);
            o.setCreateTime(null);
-           o.setRoUserIds(null);
-           o.setRwUserIds(null);
            o.setEndStatus(null);
            o.setEndRemark(null);
            o.setContactLastTime(null);
@@ -145,14 +142,8 @@ public class CrmBusinessServiceImplTest extends BaseDbUnitTest {
        businessMapper.insert(cloneIgnoreId(dbBusiness, o -> o.setProductPrice(null)));
        // 测试 remark 不匹配
        businessMapper.insert(cloneIgnoreId(dbBusiness, o -> o.setRemark(null)));
-       // 测试 ownerUserId 不匹配
-       businessMapper.insert(cloneIgnoreId(dbBusiness, o -> o.setOwnerUserId(null)));
        // 测试 createTime 不匹配
        businessMapper.insert(cloneIgnoreId(dbBusiness, o -> o.setCreateTime(null)));
-       // 测试 roUserIds 不匹配
-       businessMapper.insert(cloneIgnoreId(dbBusiness, o -> o.setRoUserIds(null)));
-       // 测试 rwUserIds 不匹配
-       businessMapper.insert(cloneIgnoreId(dbBusiness, o -> o.setRwUserIds(null)));
        // 测试 endStatus 不匹配
        businessMapper.insert(cloneIgnoreId(dbBusiness, o -> o.setEndStatus(null)));
        // 测试 endRemark 不匹配
@@ -205,10 +196,7 @@ public class CrmBusinessServiceImplTest extends BaseDbUnitTest {
            o.setDiscountPercent(null);
            o.setProductPrice(null);
            o.setRemark(null);
-           o.setOwnerUserId(null);
            o.setCreateTime(null);
-           o.setRoUserIds(null);
-           o.setRwUserIds(null);
            o.setEndStatus(null);
            o.setEndRemark(null);
            o.setContactLastTime(null);
@@ -235,14 +223,8 @@ public class CrmBusinessServiceImplTest extends BaseDbUnitTest {
        businessMapper.insert(cloneIgnoreId(dbBusiness, o -> o.setProductPrice(null)));
        // 测试 remark 不匹配
        businessMapper.insert(cloneIgnoreId(dbBusiness, o -> o.setRemark(null)));
-       // 测试 ownerUserId 不匹配
-       businessMapper.insert(cloneIgnoreId(dbBusiness, o -> o.setOwnerUserId(null)));
        // 测试 createTime 不匹配
        businessMapper.insert(cloneIgnoreId(dbBusiness, o -> o.setCreateTime(null)));
-       // 测试 roUserIds 不匹配
-       businessMapper.insert(cloneIgnoreId(dbBusiness, o -> o.setRoUserIds(null)));
-       // 测试 rwUserIds 不匹配
-       businessMapper.insert(cloneIgnoreId(dbBusiness, o -> o.setRwUserIds(null)));
        // 测试 endStatus 不匹配
        businessMapper.insert(cloneIgnoreId(dbBusiness, o -> o.setEndStatus(null)));
        // 测试 endRemark 不匹配

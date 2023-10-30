@@ -109,7 +109,7 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public void contactTransfer(CrmContactTransferReqVO reqVO, Long userId) {
+    public void transferContact(CrmTransferContactReqVO reqVO, Long userId) {
         // 1 校验联系人是否存在
         validateContactExists(reqVO.getId());
 

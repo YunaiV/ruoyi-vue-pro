@@ -76,6 +76,6 @@ public interface ContractService {
      * @param reqVO  请求
      * @param userId 用户编号
      */
-    void contractTransfer(CrmContractTransferReqVO reqVO, Long userId);
+    void transferContract(CrmTransferContractReqVO reqVO, Long userId);
 
 }
