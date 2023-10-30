@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.business;
 
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.businessstatus.CrmBusinessStatusDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.businessstatustype.CrmBusinessStatusTypeDO;
-import cn.iocoder.yudao.module.crm.framework.dataobject.CrmPermissionBaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CrmBusinessDO extends CrmPermissionBaseDO {
+public class CrmBusinessDO extends BaseDO {
 
     /**
      * 主键

@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.crm.controller.admin.business;
 
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
@@ -8,7 +7,6 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.*;
 import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
-import cn.iocoder.yudao.module.crm.framework.utils.CrmPermissionUtils;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -40,7 +38,7 @@ public class CrmBusinessController {
     @Operation(summary = "创建商机")
     @PreAuthorize("@ss.hasPermission('crm:business:create')")
     public CommonResult<Long> createBusiness(@Valid @RequestBody CrmBusinessCreateReqVO createReqVO) {
-        return success(businessService.createBusiness(createReqVO));
+        return success(businessService.createBusiness(createReqVO, getLoginUserId()));
     }
 
     @PutMapping("/update")
@@ -65,7 +63,6 @@ public class CrmBusinessController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('crm:business:query')")
     public CommonResult<CrmBusinessRespVO> getBusiness(@RequestParam("id") Long id) {
-        CrmPermissionUtils.setCrmTransferInfo(getLoginUserId(), UserTypeEnum.ADMIN.getValue());
         CrmBusinessDO business = businessService.getBusiness(id);
         return success(CrmBusinessConvert.INSTANCE.convert(business));
     }
@@ -95,7 +92,6 @@ public class CrmBusinessController {
     @Operation(summary = "商机转移")
     @PreAuthorize("@ss.hasPermission('crm:business:update')")
     public CommonResult<Boolean> transfer(@Valid @RequestBody CrmTransferBusinessReqVO reqVO) {
-        CrmPermissionUtils.setCrmTransferInfo(getLoginUserId(), UserTypeEnum.ADMIN.getValue(), reqVO);
         businessService.businessTransfer(reqVO, getLoginUserId());
         return success(true);
     }

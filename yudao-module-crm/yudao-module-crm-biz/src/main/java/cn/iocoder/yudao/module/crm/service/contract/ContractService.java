@@ -19,9 +19,10 @@ public interface ContractService {
      * 创建合同
      *
      * @param createReqVO 创建信息
+     * @param userId      用户编号
      * @return 编号
      */
-    Long createContract(@Valid ContractCreateReqVO createReqVO);
+    Long createContract(@Valid ContractCreateReqVO createReqVO, Long userId);
 
     /**
      * 更新合同

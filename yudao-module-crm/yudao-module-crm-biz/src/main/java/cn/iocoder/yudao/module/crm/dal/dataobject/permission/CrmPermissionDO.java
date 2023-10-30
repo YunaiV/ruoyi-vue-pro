@@ -36,9 +36,9 @@ public class CrmPermissionDO extends BaseDO {
      */
     private Integer crmType;
     /**
-     * 数据编号 关联 {@link CrmEnum} 对应模块 DO#id
+     * 数据编号 关联 {@link CrmEnum} 对应模块 DO#getId()
      */
-    private Integer crmDataId;
+    private Long crmDataId;
     /**
      * 负责人的用户编号 关联 AdminUser#id
      */

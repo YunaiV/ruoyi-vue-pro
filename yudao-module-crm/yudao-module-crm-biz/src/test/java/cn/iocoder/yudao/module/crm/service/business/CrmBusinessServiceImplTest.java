@@ -15,6 +15,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
@@ -42,7 +43,7 @@ public class CrmBusinessServiceImplTest extends BaseDbUnitTest {
         CrmBusinessCreateReqVO reqVO = randomPojo(CrmBusinessCreateReqVO.class);
 
         // 调用
-        Long businessId = businessService.createBusiness(reqVO);
+        Long businessId = businessService.createBusiness(reqVO, getLoginUserId());
         // 断言
         assertNotNull(businessId);
         // 校验记录的属性是否正确

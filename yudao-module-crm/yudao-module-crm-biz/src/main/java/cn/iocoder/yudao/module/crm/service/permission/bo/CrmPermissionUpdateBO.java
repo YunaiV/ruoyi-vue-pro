@@ -30,7 +30,7 @@ public class CrmPermissionUpdateBO {
      * 数据编号 关联 {@link CrmEnum} 对应模块 DO#getId()
      */
     @NotNull(message = "Crm 数据编号不能为空")
-    private Integer crmDataId;
+    private Long crmDataId;
     /**
      * 负责人的用户编号 关联 AdminUser#id, null 则为公海数据
      */

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.contact;
 
-import cn.iocoder.yudao.module.crm.framework.dataobject.CrmPermissionBaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ContactDO extends CrmPermissionBaseDO {
+public class ContactDO extends BaseDO {
 
     /**
      * 主键

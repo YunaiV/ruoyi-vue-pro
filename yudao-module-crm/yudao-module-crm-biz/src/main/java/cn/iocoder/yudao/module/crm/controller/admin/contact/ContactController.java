@@ -39,7 +39,7 @@ public class ContactController {
     @Operation(summary = "创建crm联系人")
     @PreAuthorize("@ss.hasPermission('crm:contact:create')")
     public CommonResult<Long> createContact(@Valid @RequestBody ContactCreateReqVO createReqVO) {
-        return success(contactService.createContact(createReqVO));
+        return success(contactService.createContact(createReqVO, getLoginUserId()));
     }
 
     @PutMapping("/update")

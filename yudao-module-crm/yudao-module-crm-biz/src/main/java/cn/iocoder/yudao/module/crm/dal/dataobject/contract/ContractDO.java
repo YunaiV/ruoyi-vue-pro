@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.contract;
 
-import cn.iocoder.yudao.module.crm.framework.dataobject.CrmPermissionBaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ContractDO extends CrmPermissionBaseDO {
+public class ContractDO extends BaseDO {
 
     /**
      * 合同编号

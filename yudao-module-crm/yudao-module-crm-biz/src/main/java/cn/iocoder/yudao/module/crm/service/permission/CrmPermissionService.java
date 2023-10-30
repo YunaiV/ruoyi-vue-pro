@@ -2,8 +2,10 @@ package cn.iocoder.yudao.module.crm.service.permission;
 
 
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
+import cn.iocoder.yudao.module.crm.framework.enums.CrmEnum;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionUpdateBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.TransferCrmPermissionBO;
 
 import javax.validation.Valid;
 
@@ -39,9 +41,17 @@ public interface CrmPermissionService {
     /**
      * 获得数据权限
      *
-     * @param id 编号
+     * @param crmType 数据类型 关联 {@link CrmEnum}
+     * @param crmDataId 数据编号 关联 {@link CrmEnum} 对应模块 DO#getId()
      * @return 数据权限
      */
-    CrmPermissionDO getCrmPermission(Long id);
+    CrmPermissionDO getCrmPermissionByCrmTypeAndCrmDataId(Integer crmType, Long crmDataId);
+
+    /**
+     * 数据权限转移
+     *
+     * @param transferCrmPermissionBO 数据权限转移请求
+     */
+    void transferCrmPermission(@Valid TransferCrmPermissionBO transferCrmPermissionBO);
 
 }

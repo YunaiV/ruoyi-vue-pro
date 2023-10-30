@@ -17,6 +17,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
@@ -44,7 +45,7 @@ public class ContractServiceImplTest extends BaseDbUnitTest {
         ContractCreateReqVO reqVO = randomPojo(ContractCreateReqVO.class);
 
         // 调用
-        Long contractId = contractService.createContract(reqVO);
+        Long contractId = contractService.createContract(reqVO, getLoginUserId());
         // 断言
         assertNotNull(contractId);
         // 校验记录的属性是否正确

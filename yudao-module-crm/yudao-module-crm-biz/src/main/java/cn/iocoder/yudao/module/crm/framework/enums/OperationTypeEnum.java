@@ -15,8 +15,7 @@ public enum OperationTypeEnum {
 
     DELETE(1, "删除"),
     UPDATE(2, "修改"),
-    READ(3, "查询"),
-    TRANSFER(4, "转移");
+    READ(3, "查询");
 
     /**
      * 类型
@@ -33,7 +32,7 @@ public enum OperationTypeEnum {
     }
 
     public static boolean isEdit(Integer type) {
-        return ObjUtil.equal(type, UPDATE.getType()) || ObjUtil.equal(type, DELETE.getType()) || ObjUtil.equal(type, TRANSFER.getType());
+        return ObjUtil.equal(type, UPDATE.getType()) || ObjUtil.equal(type, DELETE.getType());
     }
 
 }

@@ -17,4 +17,12 @@ public class CrmContactTransferReqVO {
     @NotNull(message = "新负责人的用户编号不能为空")
     private Long ownerUserId;
 
+    @Schema(description = "原负责人移除方式", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
+    @NotNull(message = "原负责人移除方式不能为空")
+    private Integer transferType;
+
+    @Schema(description = "权限类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
+    @NotNull(message = "权限类型不能为空")
+    private Integer permissionType;
+
 }

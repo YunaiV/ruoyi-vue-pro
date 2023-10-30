@@ -38,7 +38,7 @@ public class ContractController {
     @Operation(summary = "创建合同")
     @PreAuthorize("@ss.hasPermission('crm:contract:create')")
     public CommonResult<Long> createContract(@Valid @RequestBody ContractCreateReqVO createReqVO) {
-        return success(contractService.createContract(createReqVO));
+        return success(contractService.createContract(createReqVO, getLoginUserId()));
     }
 
     @PutMapping("/update")

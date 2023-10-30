@@ -10,9 +10,10 @@ import cn.iocoder.yudao.module.crm.dal.mysql.contract.ContractMapper;
 import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmEnum;
 import cn.iocoder.yudao.module.crm.framework.enums.OperationTypeEnum;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateBO;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -20,8 +21,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.crm.framework.utils.CrmPermissionUtils.isReadAndWrite;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CONTRACT_NOT_EXISTS;
 
 /**
  * 合同 Service 实现类
@@ -36,18 +36,25 @@ public class ContractServiceImpl implements ContractService {
     private ContractMapper contractMapper;
 
     @Resource
-    private AdminUserApi adminUserApi;
+    private CrmPermissionService crmPermissionService;
 
     @Override
-    public Long createContract(ContractCreateReqVO createReqVO) {
+    public Long createContract(ContractCreateReqVO createReqVO, Long userId) {
         // 插入
         ContractDO contract = ContractConvert.INSTANCE.convert(createReqVO);
         contractMapper.insert(contract);
+
+        // 创建数据权限
+        crmPermissionService.createCrmPermission(new CrmPermissionCreateBO().setCrmType(CrmEnum.CRM_CONTRACT.getType())
+                .setCrmDataId(contract.getId()).setOwnerUserId(userId)); // 设置当前操作的人为负责人
+
         // 返回
         return contract.getId();
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    @CrmPermission(crmType = CrmEnum.CRM_CONTRACT, operationType = OperationTypeEnum.DELETE)
     public void updateContract(ContractUpdateReqVO updateReqVO) {
         // 校验存在
         validateContractExists(updateReqVO.getId());
@@ -57,6 +64,8 @@ public class ContractServiceImpl implements ContractService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    @CrmPermission(crmType = CrmEnum.CRM_CONTRACT, operationType = OperationTypeEnum.DELETE)
     public void deleteContract(Long id) {
         // 校验存在
         validateContractExists(id);
@@ -73,6 +82,7 @@ public class ContractServiceImpl implements ContractService {
     }
 
     @Override
+    @CrmPermission(crmType = CrmEnum.CRM_CONTRACT, operationType = OperationTypeEnum.READ)
     public ContractDO getContract(Long id) {
         return contractMapper.selectById(id);
     }
@@ -95,27 +105,15 @@ public class ContractServiceImpl implements ContractService {
         return contractMapper.selectList(exportReqVO);
     }
 
-    // TODO @puhui999：参考 CrmBusinessServiceImpl 修改建议
     @Override
-    @CrmPermission(crmType = CrmEnum.CRM_CONTRACT, operationType = OperationTypeEnum.TRANSFER)
+    @Transactional(rollbackFor = Exception.class)
     public void contractTransfer(CrmContractTransferReqVO reqVO, Long userId) {
-        // 1. 校验合同是否存在
-        ContractDO contract = validateContractExists(reqVO.getId());
-        // 1.2. 校验用户是否拥有读写权限
-        if (!isReadAndWrite(contract.getRwUserIds(), userId)) {
-            throw exception(CONTRACT_TRANSFER_FAIL_PERMISSION_DENIED);
-        }
-        // 2. 校验新负责人是否存在
-        AdminUserRespDTO user = adminUserApi.getUser(reqVO.getOwnerUserId());
-        if (user == null) {
-            throw exception(CONTRACT_TRANSFER_FAIL_OWNER_USER_NOT_EXISTS);
-        }
+        // 1 校验合同是否存在
+        validateContractExists(reqVO.getId());
 
-        // 3. 更新新的负责人
-        ContractDO updateContract = ContractConvert.INSTANCE.convert(contract, reqVO, userId);
-        contractMapper.updateById(updateContract);
-
-        // 4. TODO 记录合同转移日志
+        // 2. 数据权限转移
+        crmPermissionService.transferCrmPermission(
+                ContractConvert.INSTANCE.convert(reqVO, userId).setCrmType(CrmEnum.CRM_CONTRACT.getType()));
 
     }
 

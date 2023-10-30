@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.crm.service.business;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.*;
 import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
@@ -11,9 +10,11 @@ import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessMapper;
 import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmEnum;
 import cn.iocoder.yudao.module.crm.framework.enums.OperationTypeEnum;
+import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -21,7 +22,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.BUSINESS_NOT_EXISTS;
 
 /**
  * 商机 Service 实现类
@@ -37,17 +38,27 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
     @Resource
     private AdminUserApi adminUserApi;
+    @Resource
+    private CrmPermissionService crmPermissionService;
 
     @Override
-    public Long createBusiness(CrmBusinessCreateReqVO createReqVO) {
+    @Transactional(rollbackFor = Exception.class)
+    public Long createBusiness(CrmBusinessCreateReqVO createReqVO, Long userId) {
         // 插入
         CrmBusinessDO business = CrmBusinessConvert.INSTANCE.convert(createReqVO);
         businessMapper.insert(business);
+
+        // 创建数据权限
+        crmPermissionService.createCrmPermission(new CrmPermissionCreateBO().setCrmType(CrmEnum.CRM_BUSINESS.getType())
+                .setCrmDataId(business.getId()).setOwnerUserId(userId)); // 设置当前操作的人为负责人
+
         // 返回
         return business.getId();
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    @CrmPermission(crmType = CrmEnum.CRM_BUSINESS, operationType = OperationTypeEnum.UPDATE)
     public void updateBusiness(CrmBusinessUpdateReqVO updateReqVO) {
         // 校验存在
         validateBusinessExists(updateReqVO.getId());
@@ -57,6 +68,8 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    @CrmPermission(crmType = CrmEnum.CRM_BUSINESS, operationType = OperationTypeEnum.DELETE)
     public void deleteBusiness(Long id) {
         // 校验存在
         validateBusinessExists(id);
@@ -97,25 +110,15 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
-    @CrmPermission(crmType = CrmEnum.CRM_BUSINESS, operationType = OperationTypeEnum.TRANSFER)
+    @Transactional(rollbackFor = Exception.class)
     public void businessTransfer(CrmTransferBusinessReqVO reqVO, Long userId) {
-        // 1.1 校验商机是否存在
-        CrmBusinessDO business = getBusiness(reqVO.getId());
-        // 1.3 校验转移对象是否已经是该负责人
-        if (ObjUtil.equal(business.getOwnerUserId(), reqVO.getOwnerUserId())) {
-            throw exception(BUSINESS_TRANSFER_FAIL_OWNER_USER_EXISTS);
-        }
-        // 1.4 校验新负责人是否存在
-        AdminUserRespDTO user = adminUserApi.getUser(reqVO.getOwnerUserId());
-        if (user == null) {
-            throw exception(BUSINESS_TRANSFER_FAIL_OWNER_USER_NOT_EXISTS);
-        }
+        // 1 校验商机是否存在
+        validateBusinessExists(reqVO.getId());
 
-        // 2. 更新新的负责人
-        CrmBusinessDO updateBusiness = CrmBusinessConvert.INSTANCE.convert(business, reqVO, userId);
-        businessMapper.updateById(updateBusiness);
+        // 2. 数据权限转移
+        crmPermissionService.transferCrmPermission(
+                CrmBusinessConvert.INSTANCE.convert(reqVO, userId).setCrmType(CrmEnum.CRM_BUSINESS.getType()));
 
-        // 3. TODO 记录商机转移日志
     }
 
 }
