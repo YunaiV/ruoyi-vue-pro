@@ -6,9 +6,9 @@ tenant-id: {{adminTenentId}}
 
 {
   "templateCode": "test_01",
-  "mobile": "156016913900",
-  "params": {
-    "key01": "value01",
-    "key02": "value02"
+  "mobile": "15601691390",
+  "templateParams": {
+    "operation": "value01",
+    "code": "value02"
   }
 }
