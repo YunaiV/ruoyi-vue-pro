@@ -20,7 +20,7 @@ public class ReceivablePlanPageReqVO extends PageParam {
     // TODO 芋艿：筛选字段，需要去掉几个，在想想；
 
     @Schema(description = "期数")
-    private Long indexNo;
+    private Integer period;
 
     @Schema(description = "完成状态", example = "2")
     private Integer status;

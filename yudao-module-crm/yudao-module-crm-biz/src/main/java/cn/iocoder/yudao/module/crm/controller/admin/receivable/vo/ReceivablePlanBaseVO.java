@@ -18,7 +18,7 @@ public class ReceivablePlanBaseVO {
 
     // TODO 芋艿：这个字段，在想想命名；
     @Schema(description = "期数")
-    private Long indexNo;
+    private Integer period;
 
     // TODO @liuhongfeng：中英文之间，有个空格，这样更干净；
     @Schema(description = "回款ID", example = "19852")

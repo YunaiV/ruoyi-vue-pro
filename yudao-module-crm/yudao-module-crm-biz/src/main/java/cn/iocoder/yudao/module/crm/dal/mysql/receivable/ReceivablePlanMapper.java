@@ -19,7 +19,7 @@ public interface ReceivablePlanMapper extends BaseMapperX<ReceivablePlanDO> {
 
     default PageResult<ReceivablePlanDO> selectPage(ReceivablePlanPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ReceivablePlanDO>()
-                .eqIfPresent(ReceivablePlanDO::getIndexNo, reqVO.getIndexNo())
+                .eqIfPresent(ReceivablePlanDO::getPeriod, reqVO.getPeriod())
                 .eqIfPresent(ReceivablePlanDO::getStatus, reqVO.getStatus())
                 .eqIfPresent(ReceivablePlanDO::getCheckStatus, reqVO.getCheckStatus())
                 .betweenIfPresent(ReceivablePlanDO::getReturnTime, reqVO.getReturnTime())
@@ -35,7 +35,7 @@ public interface ReceivablePlanMapper extends BaseMapperX<ReceivablePlanDO> {
 
     default List<ReceivablePlanDO> selectList(ReceivablePlanExportReqVO reqVO) {
         return selectList(new LambdaQueryWrapperX<ReceivablePlanDO>()
-                .eqIfPresent(ReceivablePlanDO::getIndexNo, reqVO.getIndexNo())
+                .eqIfPresent(ReceivablePlanDO::getPeriod, reqVO.getPeriod())
                 .eqIfPresent(ReceivablePlanDO::getStatus, reqVO.getStatus())
                 .eqIfPresent(ReceivablePlanDO::getCheckStatus, reqVO.getCheckStatus())
                 .betweenIfPresent(ReceivablePlanDO::getReturnTime, reqVO.getReturnTime())

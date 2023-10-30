@@ -107,7 +107,7 @@ public class ReceivablePlanServiceImplTest extends BaseDbUnitTest {
     public void testGetReceivablePlanPage() {
        // mock 数据
        ReceivablePlanDO dbReceivablePlan = randomPojo(ReceivablePlanDO.class, o -> { // 等会查询到
-           o.setIndexNo(null);
+           o.setPeriod(null);
            o.setStatus(null);
            o.setCheckStatus(null);
            o.setReturnTime(null);
@@ -120,8 +120,8 @@ public class ReceivablePlanServiceImplTest extends BaseDbUnitTest {
            o.setCreateTime(null);
        });
        receivablePlanMapper.insert(dbReceivablePlan);
-       // 测试 indexNo 不匹配
-       receivablePlanMapper.insert(cloneIgnoreId(dbReceivablePlan, o -> o.setIndexNo(null)));
+       // 测试 Period 不匹配
+       receivablePlanMapper.insert(cloneIgnoreId(dbReceivablePlan, o -> o.setPeriod(null)));
        // 测试 status 不匹配
        receivablePlanMapper.insert(cloneIgnoreId(dbReceivablePlan, o -> o.setStatus(null)));
        // 测试 checkStatus 不匹配
@@ -144,7 +144,7 @@ public class ReceivablePlanServiceImplTest extends BaseDbUnitTest {
        receivablePlanMapper.insert(cloneIgnoreId(dbReceivablePlan, o -> o.setCreateTime(null)));
        // 准备参数
        ReceivablePlanPageReqVO reqVO = new ReceivablePlanPageReqVO();
-       reqVO.setIndexNo(null);
+       reqVO.setPeriod(null);
        reqVO.setStatus(null);
        reqVO.setCheckStatus(null);
        reqVO.setReturnTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
@@ -169,7 +169,7 @@ public class ReceivablePlanServiceImplTest extends BaseDbUnitTest {
     public void testGetReceivablePlanList() {
        // mock 数据
        ReceivablePlanDO dbReceivablePlan = randomPojo(ReceivablePlanDO.class, o -> { // 等会查询到
-           o.setIndexNo(null);
+           o.setPeriod(null);
            o.setStatus(null);
            o.setCheckStatus(null);
            o.setReturnTime(null);
@@ -182,8 +182,8 @@ public class ReceivablePlanServiceImplTest extends BaseDbUnitTest {
            o.setCreateTime(null);
        });
        receivablePlanMapper.insert(dbReceivablePlan);
-       // 测试 indexNo 不匹配
-       receivablePlanMapper.insert(cloneIgnoreId(dbReceivablePlan, o -> o.setIndexNo(null)));
+       // 测试 Period 不匹配
+       receivablePlanMapper.insert(cloneIgnoreId(dbReceivablePlan, o -> o.setPeriod(null)));
        // 测试 status 不匹配
        receivablePlanMapper.insert(cloneIgnoreId(dbReceivablePlan, o -> o.setStatus(null)));
        // 测试 checkStatus 不匹配
@@ -206,7 +206,7 @@ public class ReceivablePlanServiceImplTest extends BaseDbUnitTest {
        receivablePlanMapper.insert(cloneIgnoreId(dbReceivablePlan, o -> o.setCreateTime(null)));
        // 准备参数
        ReceivablePlanExportReqVO reqVO = new ReceivablePlanExportReqVO();
-       reqVO.setIndexNo(null);
+       reqVO.setPeriod(null);
        reqVO.setStatus(null);
        reqVO.setCheckStatus(null);
        reqVO.setReturnTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));

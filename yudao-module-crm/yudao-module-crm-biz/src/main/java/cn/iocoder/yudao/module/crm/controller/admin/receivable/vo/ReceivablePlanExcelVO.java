@@ -1,12 +1,8 @@
 package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import java.util.*;
+
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
 import java.time.LocalDateTime;
 
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -26,7 +22,7 @@ public class ReceivablePlanExcelVO {
     private Long id;
 
     @ExcelProperty("期数")
-    private Long indexNo;
+    private Integer period;
 
     @ExcelProperty("回款ID")
     private Long receivableId;

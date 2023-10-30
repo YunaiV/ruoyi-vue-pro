@@ -1,12 +1,10 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.receivable;
 
 import lombok.*;
-import java.util.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
+
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
@@ -33,7 +31,7 @@ public class ReceivablePlanDO extends BaseDO {
     /**
      * 期数
      */
-    private Long indexNo;
+    private Integer period;
     /**
      * 回款ID
      */
