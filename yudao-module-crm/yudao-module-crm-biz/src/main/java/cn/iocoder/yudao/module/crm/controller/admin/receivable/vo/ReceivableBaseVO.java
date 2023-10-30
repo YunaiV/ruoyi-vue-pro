@@ -19,29 +19,21 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class ReceivableBaseVO {
 
-    // TODO @liuhongfeng：部分缺少 example 的字段，要补充下；
-    // TODO @liuhongfeng：部分字段，需要必传，要写 requiredMode = Schema.RequiredMode.REQUIRED，以及对应的 validator 非空校验
-
-    @Schema(description = "回款编号")
+    @Schema(description = "回款编号",requiredMode = Schema.RequiredMode.REQUIRED, example = "31177")
     private String no;
 
-    // TODO @liuhongfeng：中英文之间，有个空格，这样更干净；
-    @Schema(description = "回款计划ID", example = "31177")
+    @Schema(description = "回款计划", example = "31177")
     private Long planId;
 
-    @Schema(description = "客户ID", example = "4963")
+    @Schema(description = "客户名称", example = "4963")
     private Long customerId;
 
-    @Schema(description = "合同ID", example = "30305")
+    @Schema(description = "合同名称", example = "30305")
     private Long contractId;
 
     @Schema(description = "审批状态", example = "1")
     @InEnum(AuditStatusEnum.class)
     private Integer checkStatus;
-
-    // TODO @liuhongfeng：这个字段，应该不是前端传递的噢，而是后端自己生成的，所以不适合放在 base 里面；
-    @Schema(description = "工作流编号", example = "16568")
-    private Long processInstanceId;
 
     @Schema(description = "回款日期")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
@@ -50,9 +42,8 @@ public class ReceivableBaseVO {
     @Schema(description = "回款方式", example = "2")
     private String returnType;
 
-    // TODO @liuhongfeng：使用 Int 哈，分；
     @Schema(description = "回款金额", example = "31859")
-    private BigDecimal price;
+    private Integer price;
 
     @Schema(description = "负责人", example = "22202")
     private Long ownerUserId;
@@ -63,19 +54,7 @@ public class ReceivableBaseVO {
     @Schema(description = "显示顺序")
     private Integer sort;
 
-    // TODO @芋艿：这个字段在看看；dataScope、dataScopeDeptIds
-    @Schema(description = "数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限）")
-    private Integer dataScope;
-
-    @Schema(description = "数据范围(指定部门数组)")
-    private String dataScopeDeptIds;
-
-    // TODO @liuhongfeng：这个字段，这个字段，应该不是前端传递的噢，而是后端自己生成的，所以不适合放在 base 里面；
-    @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @NotNull(message = "状态不能为空")
-    private Integer status;
-
-    @Schema(description = "备注", example = "随便")
+    @Schema(description = "备注", example = "备注")
     private String remark;
 
 }

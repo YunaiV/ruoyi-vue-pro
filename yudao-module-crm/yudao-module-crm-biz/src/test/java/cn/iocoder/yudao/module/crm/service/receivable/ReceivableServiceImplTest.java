@@ -167,17 +167,11 @@ public class ReceivableServiceImplTest extends BaseDbUnitTest {
        reqVO.setCustomerId(null);
        reqVO.setContractId(null);
        reqVO.setCheckStatus(null);
-       reqVO.setProcessInstanceId(null);
        reqVO.setReturnTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
        reqVO.setReturnType(null);
        reqVO.setPrice(null);
        reqVO.setOwnerUserId(null);
-       reqVO.setBatchId(null);
-       reqVO.setSort(null);
-       reqVO.setDataScope(null);
-       reqVO.setDataScopeDeptIds(null);
        reqVO.setStatus(null);
-       reqVO.setRemark(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
        // 调用
@@ -253,15 +247,11 @@ public class ReceivableServiceImplTest extends BaseDbUnitTest {
        reqVO.setCustomerId(null);
        reqVO.setContractId(null);
        reqVO.setCheckStatus(null);
-       reqVO.setProcessInstanceId(null);
        reqVO.setReturnTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
        reqVO.setReturnType(null);
        reqVO.setPrice(null);
        reqVO.setOwnerUserId(null);
        reqVO.setBatchId(null);
-       reqVO.setSort(null);
-       reqVO.setDataScope(null);
-       reqVO.setDataScopeDeptIds(null);
        reqVO.setStatus(null);
        reqVO.setRemark(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));

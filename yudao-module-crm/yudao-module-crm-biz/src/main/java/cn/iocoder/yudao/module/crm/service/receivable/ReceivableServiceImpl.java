@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.crm.convert.receivable.ReceivableConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.ContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.ReceivableDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.ReceivablePlanDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.receivable.ReceivableMapper;
 import cn.iocoder.yudao.module.crm.enums.AuditStatusEnum;
 import cn.iocoder.yudao.module.crm.service.contract.ContractService;
@@ -43,10 +44,11 @@ public class ReceivableServiceImpl implements ReceivableService {
     private ContractService contractService;
     @Resource
     private CrmCustomerService crmCustomerService;
+    @Resource
+    private ReceivablePlanService receivablePlanService;
 
     @Override
     public Long createReceivable(ReceivableCreateReqVO createReqVO) {
-        // TODO @liuhongfeng：planId 是否存在，是否合法，需要去校验；
         // 插入
         ReceivableDO receivable = ReceivableConvert.INSTANCE.convert(createReqVO);
         if (ObjectUtil.isNull(receivable.getStatus())){
@@ -78,6 +80,11 @@ public class ReceivableServiceImpl implements ReceivableService {
         CrmCustomerDO customer = crmCustomerService.getCustomer(receivable.getCustomerId());
         if(ObjectUtil.isNull(customer)){
             throw exception(CUSTOMER_NOT_EXISTS);
+        }
+
+        ReceivablePlanDO receivablePlan = receivablePlanService.getReceivablePlan(receivable.getPlanId());
+        if(ObjectUtil.isNull(receivablePlan)){
+            throw exception(RECEIVABLE_PLAN_NOT_EXISTS);
         }
 
     }

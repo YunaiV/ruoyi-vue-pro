@@ -37,15 +37,15 @@ public class ReceivablePlanDO extends BaseDO {
      */
     private Long receivableId;
     /**
-     * 完成状态
+     * 状态
      *
-     * 枚举 {@link TODO common_status 对应的类}
+     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.CommonStatusEnum}
+     *
      */
     private Integer status;
     /**
      * 审批状态
-     *
-     * 枚举 {@link TODO crm_receivable_check_status 对应的类}
+     * 对应字典 {@link cn.iocoder.yudao.module.crm.enums.DictTypeConstants#CRM_RECEIVABLE_CHECK_STATUS}
      */
     private Integer checkStatus;
     /**
@@ -55,7 +55,7 @@ public class ReceivablePlanDO extends BaseDO {
     /**
      * 计划回款金额
      */
-    private BigDecimal price;
+    private Integer price;
     /**
      * 计划回款日期
      */
@@ -63,7 +63,7 @@ public class ReceivablePlanDO extends BaseDO {
     /**
      * 提前几天提醒
      */
-    private Long remindDays;
+    private Integer remindDays;
     /**
      * 提醒日期
      */

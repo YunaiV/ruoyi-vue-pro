@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo;
 
+import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
@@ -30,14 +31,14 @@ public class ReceivableExcelVO {
     @ExcelProperty("回款计划ID")
     private Long planId;
 
-    @ExcelProperty("客户ID")
+    @ExcelProperty("客户名称")
     private Long customerId;
 
-    @ExcelProperty("合同ID")
+    @ExcelProperty("合同名称")
     private Long contractId;
 
     @ExcelProperty(value = "审批状态", converter = DictConvert.class)
-    @DictFormat("crm_receivable_check_status") // TODO 代码优化：建议设置到对应的 XXXDictTypeConstants 枚举类中
+    @DictFormat(cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_RECEIVABLE_CHECK_STATUS)
     private Integer checkStatus;
 
     @ExcelProperty("工作流编号")
@@ -50,7 +51,7 @@ public class ReceivableExcelVO {
     private String returnType;
 
     @ExcelProperty("回款金额")
-    private BigDecimal price;
+    private Integer price;
 
     @ExcelProperty("负责人")
     private Long ownerUserId;
@@ -58,17 +59,8 @@ public class ReceivableExcelVO {
     @ExcelProperty("批次")
     private Long batchId;
 
-    //@ExcelProperty("显示顺序")
-    //private Integer sort;
-
-    //@ExcelProperty("数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限）")
-    //private Integer dataScope;
-
-    //@ExcelProperty("数据范围(指定部门数组)")
-    //private String dataScopeDeptIds;
-
     @ExcelProperty(value = "状态", converter = DictConvert.class)
-    @DictFormat("common_status") // TODO 代码优化：建议设置到对应的 XXXDictTypeConstants 枚举类中
+    @DictFormat(DictTypeConstants.COMMON_STATUS)
     private Integer status;
 
     @ExcelProperty("备注")

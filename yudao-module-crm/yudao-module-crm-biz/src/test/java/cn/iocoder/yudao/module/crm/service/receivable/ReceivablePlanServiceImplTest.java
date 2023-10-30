@@ -144,16 +144,13 @@ public class ReceivablePlanServiceImplTest extends BaseDbUnitTest {
        receivablePlanMapper.insert(cloneIgnoreId(dbReceivablePlan, o -> o.setCreateTime(null)));
        // 准备参数
        ReceivablePlanPageReqVO reqVO = new ReceivablePlanPageReqVO();
-       reqVO.setPeriod(null);
        reqVO.setStatus(null);
        reqVO.setCheckStatus(null);
        reqVO.setReturnTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
-       reqVO.setRemindDays(null);
        reqVO.setRemindTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
        reqVO.setCustomerId(null);
        reqVO.setContractId(null);
        reqVO.setOwnerUserId(null);
-       reqVO.setRemark(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
        // 调用
