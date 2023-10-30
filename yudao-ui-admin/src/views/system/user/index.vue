@@ -1,8 +1,5 @@
 <template>
   <div class="app-container">
-    <doc-alert title="用户体系" url="https://doc.iocoder.cn/user-center/" />
-    <doc-alert title="三方登陆" url="https://doc.iocoder.cn/social-user/" />
-    <doc-alert title="Excel 导入导出" url="https://doc.iocoder.cn/excel-import-and-export/" />
     <!-- 搜索工作栏 -->
     <el-row :gutter="20">
       <!--部门数据-->
@@ -479,6 +476,8 @@ export default {
       // 打开表单，并设置初始化
       this.open = true;
       this.title = "添加用户";
+      // 为部门增加默认值
+      this.form.deptId = this.queryParams.deptId;
       this.form.password = this.initPassword;
     },
     /** 修改按钮操作 */
