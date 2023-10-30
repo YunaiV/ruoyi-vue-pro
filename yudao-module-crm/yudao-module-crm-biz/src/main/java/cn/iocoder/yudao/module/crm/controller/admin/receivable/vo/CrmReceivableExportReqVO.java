@@ -11,9 +11,9 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 /**
  * @author 赤焰
  */
-@Schema(description = "管理后台 - CRM 回款 Excel 导出 Request VO，参数和 ReceivablePageReqVO 是一致的")
+@Schema(description = "管理后台 - CRM 回款 Excel 导出 Request VO，参数和 CrmReceivablePageReqVO 是一致的")
 @Data
-public class ReceivableExportReqVO {
+public class CrmReceivableExportReqVO {
 
     @Schema(description = "回款编号")
     private String no;

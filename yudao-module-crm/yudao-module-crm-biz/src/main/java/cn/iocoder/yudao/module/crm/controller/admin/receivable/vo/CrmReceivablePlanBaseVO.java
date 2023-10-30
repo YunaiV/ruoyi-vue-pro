@@ -15,7 +15,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
  * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
  */
 @Data
-public class ReceivablePlanBaseVO {
+public class CrmReceivablePlanBaseVO {
 
     @Schema(description = "期数", example = "1")
     private Integer period;

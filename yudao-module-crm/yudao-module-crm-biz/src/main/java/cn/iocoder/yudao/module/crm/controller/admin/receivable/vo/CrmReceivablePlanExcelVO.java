@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo;
 import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -17,7 +16,7 @@ import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
  * @author 芋道源码
  */
 @Data
-public class ReceivablePlanExcelVO {
+public class CrmReceivablePlanExcelVO {
 
     @ExcelProperty("ID")
     private Long id;

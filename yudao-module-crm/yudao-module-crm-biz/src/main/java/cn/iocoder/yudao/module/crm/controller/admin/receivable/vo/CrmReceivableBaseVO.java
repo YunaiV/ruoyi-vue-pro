@@ -6,8 +6,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -17,7 +15,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
  * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
  */
 @Data
-public class ReceivableBaseVO {
+public class CrmReceivableBaseVO {
 
     @Schema(description = "回款编号",requiredMode = Schema.RequiredMode.REQUIRED, example = "31177")
     private String no;
@@ -56,5 +54,8 @@ public class ReceivableBaseVO {
 
     @Schema(description = "备注", example = "备注")
     private String remark;
+
+    @Schema(description = "完成状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    private Integer status;
 
 }

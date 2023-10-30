@@ -4,7 +4,7 @@ import java.util.*;
 import javax.validation.*;
 
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.*;
-import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.ReceivableDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivableDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 /**
@@ -12,7 +12,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
  *
  * @author 赤焰
  */
-public interface ReceivableService {
+public interface CrmReceivableService {
 
     /**
      * 创建回款管理
@@ -20,14 +20,14 @@ public interface ReceivableService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createReceivable(@Valid ReceivableCreateReqVO createReqVO);
+    Long createReceivable(@Valid CrmReceivableCreateReqVO createReqVO);
 
     /**
      * 更新回款管理
      *
      * @param updateReqVO 更新信息
      */
-    void updateReceivable(@Valid ReceivableUpdateReqVO updateReqVO);
+    void updateReceivable(@Valid CrmReceivableUpdateReqVO updateReqVO);
 
     /**
      * 删除回款管理
@@ -42,7 +42,7 @@ public interface ReceivableService {
      * @param id 编号
      * @return 回款管理
      */
-    ReceivableDO getReceivable(Long id);
+    CrmReceivableDO getReceivable(Long id);
 
     /**
      * 获得回款管理列表
@@ -50,7 +50,7 @@ public interface ReceivableService {
      * @param ids 编号
      * @return 回款管理列表
      */
-    List<ReceivableDO> getReceivableList(Collection<Long> ids);
+    List<CrmReceivableDO> getReceivableList(Collection<Long> ids);
 
     /**
      * 获得回款管理分页
@@ -58,7 +58,7 @@ public interface ReceivableService {
      * @param pageReqVO 分页查询
      * @return 回款管理分页
      */
-    PageResult<ReceivableDO> getReceivablePage(ReceivablePageReqVO pageReqVO);
+    PageResult<CrmReceivableDO> getReceivablePage(CrmReceivablePageReqVO pageReqVO);
 
     /**
      * 获得回款管理列表, 用于 Excel 导出
@@ -66,6 +66,6 @@ public interface ReceivableService {
      * @param exportReqVO 查询条件
      * @return 回款管理列表
      */
-    List<ReceivableDO> getReceivableList(ReceivableExportReqVO exportReqVO);
+    List<CrmReceivableDO> getReceivableList(CrmReceivableExportReqVO exportReqVO);
 
 }

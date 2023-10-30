@@ -8,9 +8,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@Schema(description = "管理后台 - CRM 回款计划 Excel 导出 Request VO，参数和 ReceivablePlanPageReqVO 是一致的")
+@Schema(description = "管理后台 - CRM 回款计划 Excel 导出 Request VO，参数和 CrmReceivablePlanPageReqVO 是一致的")
 @Data
-public class ReceivablePlanExportReqVO {
+public class CrmReceivablePlanExportReqVO {
 
     @Schema(description = "期数")
     private Integer period;

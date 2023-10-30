@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReceivableDO extends BaseDO {
+public class CrmReceivableDO extends BaseDO {
 
     /**
      * ID
@@ -35,7 +35,7 @@ public class ReceivableDO extends BaseDO {
     /**
      * 回款计划
      *
-     * 对应实体 {@link cn.iocoder.yudao.module.crm.dal.dataobject.receivable.ReceivablePlanDO}
+     * 对应实体 {@link CrmReceivablePlanDO}
      */
     private Long planId;
     /**

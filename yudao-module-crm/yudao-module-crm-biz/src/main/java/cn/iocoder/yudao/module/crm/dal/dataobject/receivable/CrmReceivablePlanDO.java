@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.crm.dal.dataobject.receivable;
 
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.baomidou.mybatisplus.annotation.*;
@@ -21,7 +20,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReceivablePlanDO extends BaseDO {
+public class CrmReceivablePlanDO extends BaseDO {
 
     /**
      * ID

@@ -1,12 +1,8 @@
 package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo;
 
 import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+
 import java.time.LocalDateTime;
 
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -20,7 +16,7 @@ import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
  * @author 赤焰
  */
 @Data
-public class ReceivableExcelVO {
+public class CrmReceivableExcelVO {
 
     @ExcelProperty("ID")
     private Long id;
