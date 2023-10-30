@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.mq.core.message;
+package cn.iocoder.yudao.framework.mq.redis.core.message;
 
 import lombok.Data;
 

@@ -1,6 +1,6 @@
-package cn.iocoder.yudao.framework.mq.core.pubsub;
+package cn.iocoder.yudao.framework.mq.redis.core.pubsub;
 
-import cn.iocoder.yudao.framework.mq.core.message.AbstractRedisMessage;
+import cn.iocoder.yudao.framework.mq.redis.core.message.AbstractRedisMessage;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -11,11 +11,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public abstract class AbstractChannelMessage extends AbstractRedisMessage {
 
     /**
-     * 获得 Redis Channel
+     * 获得 Redis Channel，默认使用类名
      *
      * @return Channel
      */
     @JsonIgnore // 避免序列化。原因是，Redis 发布 Channel 消息的时候，已经会指定。
-    public abstract String getChannel();
+    public String getChannel() {
+        return getClass().getSimpleName();
+    }
 
 }

@@ -1,6 +1,6 @@
-package cn.iocoder.yudao.framework.mq.core.interceptor;
+package cn.iocoder.yudao.framework.mq.redis.core.interceptor;
 
-import cn.iocoder.yudao.framework.mq.core.message.AbstractRedisMessage;
+import cn.iocoder.yudao.framework.mq.redis.core.message.AbstractRedisMessage;
 
 /**
  * {@link AbstractRedisMessage} 消息拦截器

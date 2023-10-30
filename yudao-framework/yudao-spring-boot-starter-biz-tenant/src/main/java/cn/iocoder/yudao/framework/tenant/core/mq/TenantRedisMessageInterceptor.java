@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.framework.tenant.core.mq;
 
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.mq.core.interceptor.RedisMessageInterceptor;
-import cn.iocoder.yudao.framework.mq.core.message.AbstractRedisMessage;
+import cn.iocoder.yudao.framework.mq.redis.core.interceptor.RedisMessageInterceptor;
+import cn.iocoder.yudao.framework.mq.redis.core.message.AbstractRedisMessage;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_TENANT_ID;
