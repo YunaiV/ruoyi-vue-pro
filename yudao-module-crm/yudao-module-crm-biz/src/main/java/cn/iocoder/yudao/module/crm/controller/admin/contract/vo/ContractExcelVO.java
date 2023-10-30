@@ -6,7 +6,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 合同 Excel VO
+ * CRM 合同 Excel VO
  *
  * @author dhb52
  */

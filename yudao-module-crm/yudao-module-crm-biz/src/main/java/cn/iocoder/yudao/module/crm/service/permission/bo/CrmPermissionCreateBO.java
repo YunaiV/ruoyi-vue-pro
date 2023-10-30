@@ -6,6 +6,7 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
 
+// TODO @puhui999：，一个是 Crm 前缀，一个 Req 表示入参
 /**
  * crm 数据权限 Create BO
  *
@@ -13,6 +14,8 @@ import java.util.Set;
  */
 @Data
 public class CrmPermissionCreateBO {
+
+    // TODO @puhui999：如果是关联字段，换一行写它的注释；不然看着略乱哈
 
     /**
      * Crm 类型 关联 {@link CrmEnum}
@@ -24,6 +27,7 @@ public class CrmPermissionCreateBO {
      */
     @NotNull(message = "Crm 数据编号不能为空")
     private Long crmDataId;
+
     /**
      * 负责人的用户编号 关联 AdminUser#id, null 则为公海数据
      */

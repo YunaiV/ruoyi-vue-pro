@@ -16,6 +16,7 @@ import javax.validation.Valid;
  */
 public interface CrmPermissionService {
 
+    // TODO @puhui999：方法名上，不用 Crm
     /**
      * 创建数据权限
      *

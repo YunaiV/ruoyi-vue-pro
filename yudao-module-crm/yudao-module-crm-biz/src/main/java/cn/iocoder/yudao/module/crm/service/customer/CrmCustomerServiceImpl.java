@@ -115,8 +115,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     /**
      * 校验客户是否存在
      *
-     * @param customerId 客户id
-     * @return
+     * @param customerId 客户 id
+     * @return 客户
      */
     @Override
     public CrmCustomerDO validateCustomer(Long customerId) {
@@ -130,7 +130,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void transferCustomer(CrmTransferCustomerReqVO reqVO, Long userId) {
-        // 1 校验合同是否存在
+        // 1. 校验合同是否存在
         validateCustomer(reqVO.getId());
 
         // 2. 数据权限转移

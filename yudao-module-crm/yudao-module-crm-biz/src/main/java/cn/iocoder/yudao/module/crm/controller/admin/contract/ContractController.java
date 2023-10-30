@@ -25,7 +25,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
-@Tag(name = "管理后台 - 合同")
+@Tag(name = "管理后台 - CRM 合同")
 @RestController
 @RequestMapping("/crm/contract")
 @Validated

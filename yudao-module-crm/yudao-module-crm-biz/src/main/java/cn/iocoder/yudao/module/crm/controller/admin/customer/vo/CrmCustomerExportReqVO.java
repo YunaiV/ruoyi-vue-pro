@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 // TODO 芋艿：导出最后做，等基本确认的差不多之后；
-@Schema(description = "管理后台 - 客户 Excel 导出 Request VO，参数和 CrmCustomerPageReqVO 是一致的")
+@Schema(description = "管理后台 - CRM 客户 Excel 导出 Request VO，参数和 CrmCustomerPageReqVO 是一致的")
 @Data
 public class CrmCustomerExportReqVO {
 

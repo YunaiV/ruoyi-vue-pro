@@ -7,6 +7,7 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
 
+// TODO @puhui999：，一个是 Crm 前缀，一个 Req 表示入参
 /**
  * crm 数据权限 Update BO
  *
@@ -15,6 +16,7 @@ import java.util.Set;
 @Data
 public class CrmPermissionUpdateBO {
 
+    // TODO @puhui999：id 和 crmType + crmDataId 是不是重叠了；
     /**
      * 数据权限编号 {@link CrmPermissionDO#getId()}
      */

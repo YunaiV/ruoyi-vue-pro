@@ -5,7 +5,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 
-@Schema(description = "管理后台 - 客户转移 Request VO")
+@Schema(description = "管理后台 - CRM 客户转移 Request VO")
 @Data
 public class CrmTransferCustomerReqVO {
 

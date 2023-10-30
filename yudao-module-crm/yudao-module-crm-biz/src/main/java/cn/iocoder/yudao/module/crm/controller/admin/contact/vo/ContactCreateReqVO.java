@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-@Schema(description = "管理后台 - crm联系人创建 Request VO")
+@Schema(description = "管理后台 - CRM 联系人创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

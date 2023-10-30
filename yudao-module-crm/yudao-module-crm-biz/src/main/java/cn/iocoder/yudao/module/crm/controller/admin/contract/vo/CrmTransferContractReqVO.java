@@ -5,7 +5,8 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 
-@Schema(description = "管理后台 - 合同转移 Request VO")
+// TODO @puhui999：CrmContractTransferReqVO，模块名字要放前面；看看还有没其它类似的
+@Schema(description = "管理后台 - CRM 合同转移 Request VO")
 @Data
 public class CrmTransferContractReqVO {
 

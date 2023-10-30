@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+// TODO @puhui999：可以改成 CrmBizTypeEnum，CRM 业务类型枚举
 /**
  * Crm 类型枚举
  *

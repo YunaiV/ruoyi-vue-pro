@@ -12,7 +12,7 @@ import org.mapstruct.factory.Mappers;
 import java.util.List;
 
 /**
- * crm联系人 Convert
+ * crm 联系人 Convert
  *
  * @author 芋道源码
  */

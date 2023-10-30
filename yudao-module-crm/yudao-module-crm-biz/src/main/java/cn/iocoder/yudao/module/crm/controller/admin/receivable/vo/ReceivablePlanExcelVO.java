@@ -1,12 +1,8 @@
 package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import java.util.*;
+
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
 import java.time.LocalDateTime;
 
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -15,7 +11,7 @@ import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 
 
 /**
- * 回款计划 Excel VO
+ * CRM 回款计划 Excel VO
  *
  * @author 芋道源码
  */

@@ -34,6 +34,7 @@ public interface ErrorCodeConstants {
     // ========== 客户管理 1_020_006_000 ==========
     ErrorCode CUSTOMER_NOT_EXISTS = new ErrorCode(1_020_006_000, "客户不存在");
 
+    // TODO @puhui999：权限管理？？？
     // ========== 客户管理 1_020_007_000 ==========
     ErrorCode CRM_PERMISSION_NOT_EXISTS = new ErrorCode(1_020_007_000, "数据权限不存在");
     ErrorCode CRM_PERMISSION_DENIED = new ErrorCode(1_020_007_001, "{}操作失败，原因：没有权限");
