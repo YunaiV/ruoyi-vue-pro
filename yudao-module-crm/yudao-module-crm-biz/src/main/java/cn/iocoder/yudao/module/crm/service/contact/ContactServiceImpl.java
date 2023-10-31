@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -46,8 +46,8 @@ public class ContactServiceImpl implements ContactService {
         contactMapper.insert(contact);
 
         // 创建数据权限
-        crmPermissionService.createCrmPermission(new CrmPermissionCreateBO().setCrmType(CrmBizTypeEnum.CRM_BUSINESS.getType())
-                .setCrmDataId(contact.getId()).setOwnerUserId(userId)); // 设置当前操作的人为负责人
+        crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CONTACTS.getType())
+                .setBizId(contact.getId()).setUserId(userId).setPermissionLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
 
         // 返回
         return contact.getId();
@@ -55,7 +55,8 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACTS, permissionLevel = CrmPermissionLevelEnum.WRITE)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACTS, getIdFor = ContactUpdateReqVO.class,
+            permissionLevel = CrmPermissionLevelEnum.WRITE)
     public void updateContact(ContactUpdateReqVO updateReqVO) {
         // 校验存在
         validateContactExists(updateReqVO.getId());
@@ -117,6 +118,7 @@ public class ContactServiceImpl implements ContactService {
         crmPermissionService.transferCrmPermission(
                 ContactConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_CONTACTS.getType()));
 
+        // 3. TODO 记录转移日志
     }
 
 }

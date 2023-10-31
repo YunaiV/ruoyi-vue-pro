@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.crm.service.permission;
 
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateBO;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionUpdateBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionUpdateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmTransferPermissionReqBO;
 
 import javax.validation.Valid;
@@ -24,21 +24,21 @@ public interface CrmPermissionService {
      * @param createBO 创建信息
      * @return 编号
      */
-    Long createCrmPermission(@Valid CrmPermissionCreateBO createBO);
+    Long createPermission(@Valid CrmPermissionCreateReqBO createBO);
 
     /**
      * 更新数据权限
      *
      * @param updateBO 更新信息
      */
-    void updateCrmPermission(@Valid CrmPermissionUpdateBO updateBO);
+    void updatePermission(@Valid CrmPermissionUpdateReqBO updateBO);
 
     /**
      * 删除数据权限
      *
      * @param id 编号
      */
-    void deleteCrmPermission(Long id);
+    void deletePermission(Long id);
 
     /**
      * 获取用户数据权限通过 数据类型 x 某个数据 x 用户编号

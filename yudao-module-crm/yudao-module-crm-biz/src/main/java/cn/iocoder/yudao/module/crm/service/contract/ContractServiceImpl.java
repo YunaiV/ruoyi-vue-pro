@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -45,8 +45,8 @@ public class ContractServiceImpl implements ContractService {
         contractMapper.insert(contract);
 
         // 创建数据权限
-        crmPermissionService.createCrmPermission(new CrmPermissionCreateBO().setCrmType(CrmBizTypeEnum.CRM_CONTRACT.getType())
-                .setCrmDataId(contract.getId()).setOwnerUserId(userId)); // 设置当前操作的人为负责人
+        crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CONTRACT.getType())
+                .setBizId(contract.getId()).setUserId(userId).setPermissionLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
 
         // 返回
         return contract.getId();
@@ -54,7 +54,8 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, permissionLevel = CrmPermissionLevelEnum.WRITE)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, getIdFor = ContractUpdateReqVO.class,
+            permissionLevel = CrmPermissionLevelEnum.WRITE)
     public void updateContract(ContractUpdateReqVO updateReqVO) {
         // 校验存在
         validateContractExists(updateReqVO.getId());
@@ -115,6 +116,7 @@ public class ContractServiceImpl implements ContractService {
         crmPermissionService.transferCrmPermission(
                 ContractConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_CONTRACT.getType()));
 
+        // 3. TODO 记录转移日志
     }
 
 }

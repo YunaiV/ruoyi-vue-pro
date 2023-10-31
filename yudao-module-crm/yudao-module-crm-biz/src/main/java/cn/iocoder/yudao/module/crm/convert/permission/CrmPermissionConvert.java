@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.crm.convert.permission;
 
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateBO;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionUpdateBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionUpdateReqBO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -16,8 +16,8 @@ public interface CrmPermissionConvert {
 
     CrmPermissionConvert INSTANCE = Mappers.getMapper(CrmPermissionConvert.class);
 
-    CrmPermissionDO convert(CrmPermissionCreateBO createBO);
+    CrmPermissionDO convert(CrmPermissionCreateReqBO createBO);
 
-    CrmPermissionDO convert(CrmPermissionUpdateBO updateBO);
+    CrmPermissionDO convert(CrmPermissionUpdateReqBO updateBO);
 
 }

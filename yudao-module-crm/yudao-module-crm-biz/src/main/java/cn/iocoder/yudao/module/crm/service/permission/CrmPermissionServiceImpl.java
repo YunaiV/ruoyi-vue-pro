@@ -7,8 +7,8 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.permission.CrmPermissionMapper;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateBO;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionUpdateBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionUpdateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmTransferPermissionReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
@@ -40,7 +40,7 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long createCrmPermission(CrmPermissionCreateBO createBO) {
+    public Long createPermission(CrmPermissionCreateReqBO createBO) {
         CrmPermissionDO permission = CrmPermissionConvert.INSTANCE.convert(createBO);
         crmPermissionMapper.insert(permission);
         return permission.getId();
@@ -48,7 +48,7 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateCrmPermission(CrmPermissionUpdateBO updateBO) {
+    public void updatePermission(CrmPermissionUpdateReqBO updateBO) {
         validateCrmPermissionExists(updateBO.getId());
         // 更新操作
         CrmPermissionDO updateDO = CrmPermissionConvert.INSTANCE.convert(updateBO);
@@ -57,7 +57,7 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteCrmPermission(Long id) {
+    public void deletePermission(Long id) {
         validateCrmPermissionExists(id);
         // 删除
         crmPermissionMapper.deleteById(id);

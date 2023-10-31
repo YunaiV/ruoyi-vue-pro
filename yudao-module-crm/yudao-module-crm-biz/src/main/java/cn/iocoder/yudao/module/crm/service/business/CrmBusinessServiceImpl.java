@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -46,8 +46,8 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         businessMapper.insert(business);
 
         // 创建数据权限
-        crmPermissionService.createCrmPermission(new CrmPermissionCreateBO().setCrmType(CrmBizTypeEnum.CRM_BUSINESS.getType())
-                .setCrmDataId(business.getId()).setOwnerUserId(userId)); // 设置当前操作的人为负责人
+        crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType())
+                .setBizId(business.getId()).setUserId(userId).setPermissionLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
 
         // 返回
         return business.getId();
@@ -117,6 +117,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         crmPermissionService.transferCrmPermission(
                 CrmBusinessConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType()));
 
+        // 3. TODO 记录转移日志
     }
 
 }

@@ -81,7 +81,7 @@ public class CrmPermissionAspect {
             }
             if (isRead(permissionLevel)) { // 读权限
                 // 如果没有数据权限或没有负责人则表示此记录为公海数据所有人都有只读权限
-                if (CollUtil.isEmpty(bizPermissions) || !CollUtil.anyMatch(bizPermissions, item -> isOwner(item.getPermissionLevel()))) {
+                if (!CollUtil.anyMatch(bizPermissions, item -> isOwner(item.getPermissionLevel()))) {
                     return;
                 }
                 if (isRead(userPermission.getPermissionLevel())) { // 校验当前用户是否有读权限

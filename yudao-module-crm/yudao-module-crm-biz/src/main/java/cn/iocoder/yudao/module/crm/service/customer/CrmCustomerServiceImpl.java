@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,8 +48,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         customerMapper.insert(customer);
 
         // 创建数据权限
-        crmPermissionService.createCrmPermission(new CrmPermissionCreateBO().setCrmType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
-                .setCrmDataId(customer.getId()).setOwnerUserId(userId)); // 设置当前操作的人为负责人
+        crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
+                .setBizId(customer.getId()).setUserId(userId).setPermissionLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
 
         // 返回
         return customer.getId();
@@ -57,7 +57,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, permissionLevel = CrmPermissionLevelEnum.WRITE)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, getIdFor = CrmCustomerUpdateReqVO.class,
+            permissionLevel = CrmPermissionLevelEnum.WRITE)
     public void updateCustomer(CrmCustomerUpdateReqVO updateReqVO) {
         // 校验存在
         validateCustomerExists(updateReqVO.getId());
@@ -112,6 +113,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     }
 
     // TODO wanwan：service 接口已经注释，实现类就不需要了。
+
     /**
      * 校验客户是否存在
      *
@@ -136,6 +138,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         // 2. 数据权限转移
         crmPermissionService.transferCrmPermission(
                 CrmCustomerConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType()));
+
+        // 3. TODO 记录转移日志
     }
 
 }
