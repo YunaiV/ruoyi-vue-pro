@@ -8,8 +8,8 @@ import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessMapper;
 import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
-import cn.iocoder.yudao.module.crm.framework.enums.CrmEnum;
-import cn.iocoder.yudao.module.crm.framework.enums.OperationTypeEnum;
+import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateBO;
 import org.springframework.stereotype.Service;
@@ -46,7 +46,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         businessMapper.insert(business);
 
         // 创建数据权限
-        crmPermissionService.createCrmPermission(new CrmPermissionCreateBO().setCrmType(CrmEnum.CRM_BUSINESS.getType())
+        crmPermissionService.createCrmPermission(new CrmPermissionCreateBO().setCrmType(CrmBizTypeEnum.CRM_BUSINESS.getType())
                 .setCrmDataId(business.getId()).setOwnerUserId(userId)); // 设置当前操作的人为负责人
 
         // 返回
@@ -55,7 +55,8 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CrmPermission(crmType = CrmEnum.CRM_BUSINESS, operationType = OperationTypeEnum.UPDATE)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, getIdFor = CrmBusinessUpdateReqVO.class,
+            permissionLevel = CrmPermissionLevelEnum.WRITE)
     public void updateBusiness(CrmBusinessUpdateReqVO updateReqVO) {
         // 校验存在
         validateBusinessExists(updateReqVO.getId());
@@ -66,7 +67,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CrmPermission(crmType = CrmEnum.CRM_BUSINESS, operationType = OperationTypeEnum.DELETE)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, permissionLevel = CrmPermissionLevelEnum.WRITE)
     public void deleteBusiness(Long id) {
         // 校验存在
         validateBusinessExists(id);
@@ -83,7 +84,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
-    @CrmPermission(crmType = CrmEnum.CRM_BUSINESS, operationType = OperationTypeEnum.READ)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, permissionLevel = CrmPermissionLevelEnum.READ)
     public CrmBusinessDO getBusiness(Long id) {
         return businessMapper.selectById(id);
     }
@@ -114,7 +115,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
         // 2. 数据权限转移
         crmPermissionService.transferCrmPermission(
-                CrmBusinessConvert.INSTANCE.convert(reqVO, userId).setCrmType(CrmEnum.CRM_BUSINESS.getType()));
+                CrmBusinessConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType()));
 
     }
 

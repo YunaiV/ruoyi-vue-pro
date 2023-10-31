@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.crm.framework.enums;
 
 import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-// TODO @puhui999：可以改成 CrmBizTypeEnum，CRM 业务类型枚举
+import java.util.Arrays;
+
 /**
  * Crm 类型枚举
  *
@@ -12,7 +14,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 @Getter
-public enum CrmEnum {
+public enum CrmBizTypeEnum implements IntArrayValuable {
 
     CRM_LEADS(1, "线索"),
     CRM_CUSTOMER(2, "客户"),
@@ -20,6 +22,7 @@ public enum CrmEnum {
     CRM_BUSINESS(5, "商机"),
     CRM_CONTRACT(6, "合同");
 
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CrmBizTypeEnum::getType).toArray();
     /**
      * 类型
      */
@@ -30,12 +33,17 @@ public enum CrmEnum {
     private final String name;
 
     public static String getNameByType(Integer type) {
-        for (CrmEnum crmEnum : CrmEnum.values()) {
-            if (ObjUtil.equal(crmEnum.type, type)) {
-                return crmEnum.name;
+        for (CrmBizTypeEnum crmBizTypeEnum : CrmBizTypeEnum.values()) {
+            if (ObjUtil.equal(crmBizTypeEnum.type, type)) {
+                return crmBizTypeEnum.name;
             }
         }
         return "";
+    }
+
+    @Override
+    public int[] array() {
+        return ARRAYS;
     }
 
 }

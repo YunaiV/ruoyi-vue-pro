@@ -5,12 +5,11 @@ import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.module.crm.convert.permission.CrmPermissionConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.permission.CrmPermissionMapper;
-import cn.iocoder.yudao.module.crm.enums.common.PermissionTypeEnum;
-import cn.iocoder.yudao.module.crm.enums.common.TransferTypeEnum;
-import cn.iocoder.yudao.module.crm.framework.enums.CrmEnum;
+import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionUpdateBO;
-import cn.iocoder.yudao.module.crm.service.permission.bo.TransferCrmPermissionBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmTransferPermissionReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.springframework.stereotype.Service;
@@ -18,10 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Set;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum.isOwner;
 
 /**
  * crm 数据权限 Service 接口实现类
@@ -41,10 +41,9 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createCrmPermission(CrmPermissionCreateBO createBO) {
-        // TODO @puhui999：createDO 改成 permission，保持统一哈；
-        CrmPermissionDO createDO = CrmPermissionConvert.INSTANCE.convert(createBO);
-        crmPermissionMapper.insert(createDO);
-        return createDO.getId();
+        CrmPermissionDO permission = CrmPermissionConvert.INSTANCE.convert(createBO);
+        crmPermissionMapper.insert(permission);
+        return permission.getId();
     }
 
     @Override
@@ -64,64 +63,67 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
         crmPermissionMapper.deleteById(id);
     }
 
+    @Override
+    public CrmPermissionDO getPermissionByBizTypeAndBizIdAndUserId(Integer bizType, Long bizId, Long userId) {
+        return crmPermissionMapper.selectByBizTypeAndBizIdByUserId(bizType, bizId, userId);
+    }
+
+    @Override
+    public List<CrmPermissionDO> getPermissionByBizTypeAndBizId(Integer bizType, Long bizId) {
+        return crmPermissionMapper.selectByBizTypeAndBizId(bizType, bizId);
+    }
+
     private void validateCrmPermissionExists(Long id) {
         if (crmPermissionMapper.selectById(id) == null) {
             throw exception(CRM_PERMISSION_NOT_EXISTS);
         }
     }
 
-    @Override
-    public CrmPermissionDO getCrmPermissionByCrmTypeAndCrmDataId(Integer crmType, Long crmDataId) {
-        return crmPermissionMapper.selectByCrmTypeAndCrmDataId(crmType, crmDataId);
-    }
 
-    // TODO @puhui999：参数名，是不是 transferReqBO
     @Override
-    public void transferCrmPermission(TransferCrmPermissionBO transferCrmPermissionBO) {
-        // 1.1 校验商机是否存在
-        // TODO puhui999：这里直接调用 crmPermissionMapper 的 selectByCrmTypeAndCrmDataId 方法，会更简洁一点；
-        CrmPermissionDO permission = getCrmPermissionByCrmTypeAndCrmDataId(transferCrmPermissionBO.getCrmType(),
-                transferCrmPermissionBO.getCrmDataId());
-        String crmName = CrmEnum.getNameByType(transferCrmPermissionBO.getCrmType());
-        if (permission == null) {
-            throw exception(CRM_PERMISSION_MODEL_NOT_EXISTS, crmName);
-        }
-        // 1.2 校验转移对象是否已经是该负责人
-        if (ObjUtil.equal(permission.getOwnerUserId(), permission.getOwnerUserId())) {
-            // TODO @puhui999：是不是这个错误码不太对。。。
-            throw exception(CRM_PERMISSION_MODEL_TRANSFER_FAIL_OWNER_USER_NOT_EXISTS, crmName);
-        }
-        // 1.3 校验新负责人是否存在
-        AdminUserRespDTO user = adminUserApi.getUser(permission.getOwnerUserId());
-        if (user == null) {
-            throw exception(CRM_PERMISSION_MODEL_TRANSFER_FAIL_OWNER_USER_EXISTS, crmName);
-        }
-        // TODO 校验是否为超级管理员 || 1.4
-        // 1.4 校验是否有写权限
-        // TODO puhui999：CollUtil.contains 就够了，不用后面写个表达式；
-        if (!CollUtil.contains(permission.getRwUserIds(), id -> ObjUtil.equal(id, transferCrmPermissionBO.getUserId()))) {
+    public void transferCrmPermission(CrmTransferPermissionReqBO transferReqBO) {
+        // 1. 校验数据权限-是否是负责人，只有负责人才可以转移
+        CrmPermissionDO oldPermission = crmPermissionMapper.selectByBizTypeAndBizIdByUserId(transferReqBO.getBizType(),
+                transferReqBO.getBizId(), transferReqBO.getUserId());
+        String crmName = CrmBizTypeEnum.getNameByType(transferReqBO.getBizType());
+        // TODO 校验是否为超级管理员 || 1
+        if (oldPermission == null || !isOwner(oldPermission.getPermissionLevel())) {
             throw exception(CRM_PERMISSION_DENIED, crmName);
         }
 
-        // 2. 权限转移
-        CrmPermissionDO updateCrmPermission = new CrmPermissionDO().setId(permission.getId())
-                .setOwnerUserId(transferCrmPermissionBO.getOwnerUserId());
-        if (ObjUtil.equal(TransferTypeEnum.TEAM.getType(), transferCrmPermissionBO.getTransferType())) {
-            if (ObjUtil.equal(PermissionTypeEnum.READONLY.getType(), transferCrmPermissionBO.getPermissionType())) {
-                Set<Long> roUserIds = permission.getRoUserIds();
-                roUserIds.add(permission.getOwnerUserId()); // 老负责人加入团队有只读权限
-                updateCrmPermission.setRoUserIds(roUserIds);
-            }
-            if (ObjUtil.equal(PermissionTypeEnum.READ_AND_WRITE.getType(), transferCrmPermissionBO.getPermissionType())) {
-                Set<Long> rwUserIds = permission.getRwUserIds();
-                rwUserIds.add(permission.getOwnerUserId()); // 老负责人加入团队有读写权限
-                updateCrmPermission.setRoUserIds(rwUserIds);
-            }
+        // 2. 校验转移对象是否已经是该负责人
+        if (ObjUtil.equal(transferReqBO.getNewOwnerUserId(), oldPermission.getUserId())) {
+            throw exception(CRM_PERMISSION_MODEL_TRANSFER_FAIL_OWNER_USER_EXISTS, crmName);
         }
-        crmPermissionMapper.updateById(updateCrmPermission);
+        // 2.1 校验新负责人是否存在
+        AdminUserRespDTO user = adminUserApi.getUser(transferReqBO.getNewOwnerUserId());
+        if (user == null) {
+            throw exception(CRM_PERMISSION_MODEL_TRANSFER_FAIL_OWNER_USER_NOT_EXISTS, crmName);
+        }
 
-        // 3. TODO 记录机转移日志
-        // TODO @puhui999：是不是交给业务记录哈；
+        // 3. 权限转移
+        List<CrmPermissionDO> permissions = crmPermissionMapper.selectByBizTypeAndBizId(
+                transferReqBO.getBizType(), transferReqBO.getBizId()); // 获取所有团队成员
+        // 3.1 校验新负责人是否在团队成员中
+        CrmPermissionDO permission = CollUtil.findOne(permissions,
+                item -> ObjUtil.equal(item.getUserId(), transferReqBO.getNewOwnerUserId()));
+        if (permission == null) { // 不存在则以负责人的级别加入这个团队
+            crmPermissionMapper.insert(new CrmPermissionDO().setBizType(transferReqBO.getBizType())
+                    .setBizId(transferReqBO.getBizId()).setUserId(transferReqBO.getNewOwnerUserId())
+                    .setPermissionLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
+
+        } else { // 存在则修改权限级别
+            crmPermissionMapper.updateById(new CrmPermissionDO().setId(permission.getId())
+                    .setPermissionLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
+        }
+
+        // 4. 老负责人处理
+        if (transferReqBO.getJoinTeam()) { // 加入团队
+            crmPermissionMapper.updateById(new CrmPermissionDO().setId(oldPermission.getId())
+                    .setPermissionLevel(transferReqBO.getPermissionLevel())); // 设置加入团队后的级别
+            return;
+        }
+        crmPermissionMapper.deleteById(oldPermission.getId()); // 移除
     }
 
 }

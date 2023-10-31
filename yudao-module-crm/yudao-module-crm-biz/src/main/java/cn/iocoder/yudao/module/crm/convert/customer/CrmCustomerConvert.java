@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.crm.convert.customer;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-import cn.iocoder.yudao.module.crm.service.permission.bo.TransferCrmPermissionBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmTransferPermissionReqBO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -32,9 +32,9 @@ public interface CrmCustomerConvert {
     List<CrmCustomerExcelVO> convertList02(List<CrmCustomerDO> list);
 
     @Mappings({
-            @Mapping(target = "userId", source = "userId"),
-            @Mapping(target = "crmDataId", source = "reqVO.id")
+            @Mapping(target = "bizId", source = "reqVO.id"),
+            @Mapping(target = "newOwnerUserId", source = "reqVO.id")
     })
-    TransferCrmPermissionBO convert(CrmTransferCustomerReqVO reqVO, Long userId);
+    CrmTransferPermissionReqBO convert(CrmTransferCustomerReqVO reqVO, Long userId);
 
 }

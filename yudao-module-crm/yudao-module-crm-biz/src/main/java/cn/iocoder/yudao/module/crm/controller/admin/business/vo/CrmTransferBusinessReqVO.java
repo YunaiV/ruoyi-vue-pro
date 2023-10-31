@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.module.crm.controller.admin.business.vo;
 
-import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.crm.enums.common.PermissionTypeEnum;
-import cn.iocoder.yudao.module.crm.enums.common.TransferTypeEnum;
+import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -16,19 +14,25 @@ public class CrmTransferBusinessReqVO {
     @NotNull(message = "联系人编号不能为空")
     private Long id;
 
-    @Schema(description = "新负责人的用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
+    /**
+     * 新负责人的用户编号
+     */
     @NotNull(message = "新负责人的用户编号不能为空")
-    private Long ownerUserId;
+    @Schema(description = "商机编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
+    private Long newOwnerUserId;
 
-    @Schema(description = "原负责人移除方式", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
-    @InEnum(TransferTypeEnum.class)
-    @NotNull(message = "原负责人移除方式不能为空")
-    private Integer transferType;
+    /**
+     * 老负责人是否加入团队，是/否
+     */
+    @Schema(description = "老负责人是否加入团队", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
+    @NotNull(message = "老负责人是否加入团队不能为空")
+    private Boolean joinTeam;
 
-    @Schema(description = "权限类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
-    @InEnum(PermissionTypeEnum.class)
-    @NotNull(message = "权限类型不能为空")
-    private Integer permissionType;
-
+    /**
+     * 老负责人加入团队后的权限级别。如果 {@link #joinTeam} 为 false, permissionLevel 为 null
+     * 关联 {@link CrmPermissionLevelEnum}
+     */
+    @Schema(description = "老负责人加入团队后的权限级别", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    private Integer permissionLevel;
 
 }

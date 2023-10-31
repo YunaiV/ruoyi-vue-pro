@@ -8,8 +8,8 @@ import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.customer.CrmCustomerMapper;
 import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
-import cn.iocoder.yudao.module.crm.framework.enums.CrmEnum;
-import cn.iocoder.yudao.module.crm.framework.enums.OperationTypeEnum;
+import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateBO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -48,7 +48,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         customerMapper.insert(customer);
 
         // 创建数据权限
-        crmPermissionService.createCrmPermission(new CrmPermissionCreateBO().setCrmType(CrmEnum.CRM_CUSTOMER.getType())
+        crmPermissionService.createCrmPermission(new CrmPermissionCreateBO().setCrmType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
                 .setCrmDataId(customer.getId()).setOwnerUserId(userId)); // 设置当前操作的人为负责人
 
         // 返回
@@ -57,7 +57,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CrmPermission(crmType = CrmEnum.CRM_CUSTOMER, operationType = OperationTypeEnum.UPDATE)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, permissionLevel = CrmPermissionLevelEnum.WRITE)
     public void updateCustomer(CrmCustomerUpdateReqVO updateReqVO) {
         // 校验存在
         validateCustomerExists(updateReqVO.getId());
@@ -70,7 +70,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CrmPermission(crmType = CrmEnum.CRM_CUSTOMER, operationType = OperationTypeEnum.DELETE)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, permissionLevel = CrmPermissionLevelEnum.WRITE)
     public void deleteCustomer(Long id) {
         // 校验存在
         validateCustomerExists(id);
@@ -87,7 +87,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     }
 
     @Override
-    @CrmPermission(crmType = CrmEnum.CRM_CUSTOMER, operationType = OperationTypeEnum.READ)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, permissionLevel = CrmPermissionLevelEnum.READ)
     public CrmCustomerDO getCustomer(Long id) {
         return customerMapper.selectById(id);
     }
@@ -135,7 +135,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
         // 2. 数据权限转移
         crmPermissionService.transferCrmPermission(
-                CrmCustomerConvert.INSTANCE.convert(reqVO, userId).setCrmType(CrmEnum.CRM_CUSTOMER.getType()));
+                CrmCustomerConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType()));
     }
 
 }

@@ -8,8 +8,8 @@ import cn.iocoder.yudao.module.crm.convert.contract.ContractConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.ContractDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contract.ContractMapper;
 import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
-import cn.iocoder.yudao.module.crm.framework.enums.CrmEnum;
-import cn.iocoder.yudao.module.crm.framework.enums.OperationTypeEnum;
+import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateBO;
 import org.springframework.stereotype.Service;
@@ -45,7 +45,7 @@ public class ContractServiceImpl implements ContractService {
         contractMapper.insert(contract);
 
         // 创建数据权限
-        crmPermissionService.createCrmPermission(new CrmPermissionCreateBO().setCrmType(CrmEnum.CRM_CONTRACT.getType())
+        crmPermissionService.createCrmPermission(new CrmPermissionCreateBO().setCrmType(CrmBizTypeEnum.CRM_CONTRACT.getType())
                 .setCrmDataId(contract.getId()).setOwnerUserId(userId)); // 设置当前操作的人为负责人
 
         // 返回
@@ -54,7 +54,7 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CrmPermission(crmType = CrmEnum.CRM_CONTRACT, operationType = OperationTypeEnum.DELETE)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, permissionLevel = CrmPermissionLevelEnum.WRITE)
     public void updateContract(ContractUpdateReqVO updateReqVO) {
         // 校验存在
         validateContractExists(updateReqVO.getId());
@@ -65,7 +65,7 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CrmPermission(crmType = CrmEnum.CRM_CONTRACT, operationType = OperationTypeEnum.DELETE)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, permissionLevel = CrmPermissionLevelEnum.WRITE)
     public void deleteContract(Long id) {
         // 校验存在
         validateContractExists(id);
@@ -82,7 +82,7 @@ public class ContractServiceImpl implements ContractService {
     }
 
     @Override
-    @CrmPermission(crmType = CrmEnum.CRM_CONTRACT, operationType = OperationTypeEnum.READ)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, permissionLevel = CrmPermissionLevelEnum.READ)
     public ContractDO getContract(Long id) {
         return contractMapper.selectById(id);
     }
@@ -113,7 +113,7 @@ public class ContractServiceImpl implements ContractService {
 
         // 2. 数据权限转移
         crmPermissionService.transferCrmPermission(
-                ContractConvert.INSTANCE.convert(reqVO, userId).setCrmType(CrmEnum.CRM_CONTRACT.getType()));
+                ContractConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_CONTRACT.getType()));
 
     }
 
