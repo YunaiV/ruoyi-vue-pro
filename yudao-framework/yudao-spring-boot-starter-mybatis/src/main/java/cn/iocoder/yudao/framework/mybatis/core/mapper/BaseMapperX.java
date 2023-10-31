@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.toolkit.Db;
 import com.github.yulichang.base.MPJBaseMapper;
+import com.github.yulichang.interfaces.MPJBaseJoin;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
@@ -132,4 +133,10 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         Db.saveOrUpdateBatch(collection);
     }
 
+    default <DTO> PageResult<DTO> selectJoinPage(PageParam pageParam, @Param("resultTypeClass_Eg1sG") Class<DTO> var2, @Param("ew") MPJBaseJoin<T> queryWrapper) {
+        IPage<DTO> mpPage = MyBatisUtils.buildPage(pageParam);
+        selectJoinPage(mpPage, var2, queryWrapper);
+        // 转换返回
+        return new PageResult<>(mpPage.getRecords(), mpPage.getTotal());
+    }
 }

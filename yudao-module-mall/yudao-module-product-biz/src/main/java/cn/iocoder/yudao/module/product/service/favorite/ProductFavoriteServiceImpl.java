@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.module.product.service.favorite;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.product.controller.admin.favorite.vo.ProductFavoritePageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoritePageReqVO;
 import cn.iocoder.yudao.module.product.convert.favorite.ProductFavoriteConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.favorite.ProductFavoriteDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.favorite.ProductFavoriteDetailDO;
 import cn.iocoder.yudao.module.product.dal.mysql.favorite.ProductFavoriteMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -33,7 +35,6 @@ public class ProductFavoriteServiceImpl implements ProductFavoriteService {
         if (favorite != null) {
             throw exception(FAVORITE_EXISTS);
         }
-
         ProductFavoriteDO entity = ProductFavoriteConvert.INSTANCE.convert(userId, spuId);
         productFavoriteMapper.insert(entity);
         return entity.getId();
@@ -52,6 +53,11 @@ public class ProductFavoriteServiceImpl implements ProductFavoriteService {
     @Override
     public PageResult<ProductFavoriteDO> getFavoritePage(Long userId, @Valid AppFavoritePageReqVO reqVO) {
         return productFavoriteMapper.selectPageByUserAndType(userId, reqVO);
+    }
+
+    @Override
+    public PageResult<ProductFavoriteDetailDO> getFavoritePageByFilter(@Valid  ProductFavoritePageReqVO reqVO) {
+        return productFavoriteMapper.selectPageByUserAndFields(reqVO);
     }
 
     @Override

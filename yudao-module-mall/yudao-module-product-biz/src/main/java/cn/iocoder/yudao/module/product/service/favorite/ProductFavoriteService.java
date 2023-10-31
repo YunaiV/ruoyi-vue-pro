@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.product.service.favorite;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.product.controller.admin.favorite.vo.ProductFavoritePageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoritePageReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.favorite.ProductFavoriteDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.favorite.ProductFavoriteDetailDO;
 
 import javax.validation.Valid;
 
@@ -38,6 +40,13 @@ public interface ProductFavoriteService {
     PageResult<ProductFavoriteDO> getFavoritePage(Long userId, @Valid AppFavoritePageReqVO reqVO);
 
     /**
+     * 分页查询用户收藏列表
+     *
+     * @param reqVO 请求 vo
+     */
+    PageResult<ProductFavoriteDetailDO> getFavoritePageByFilter(@Valid ProductFavoritePageReqVO reqVO);
+
+    /**
      * 获取收藏过商品
      *
      * @param userId 用户编号
@@ -52,5 +61,4 @@ public interface ProductFavoriteService {
      * @return 数量
      */
     Long getFavoriteCount(Long userId);
-
 }

@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.product.convert.favorite;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.product.controller.admin.favorite.vo.ProductFavoriteRespVO;
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoriteRespVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.favorite.ProductFavoriteDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.favorite.ProductFavoriteDetailDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -34,4 +37,20 @@ public interface ProductFavoriteConvert {
         return resultList;
     }
 
+    @Mapping(target = "id", source = "favorite.id")
+    @Mapping(target = "userId", source = "favorite.userId")
+    @Mapping(target = "spuId", source = "favorite.spuId")
+    @Mapping(target = "createTime", source = "favorite.createTime")
+    @Mapping(target = "favoriteStatus", constant = "1")
+    ProductFavoriteRespVO convert2admin(ProductSpuDO spu, ProductFavoriteDO favorite);
+
+    default List<ProductFavoriteRespVO> convertList2admin(List<ProductFavoriteDetailDO> favorites) {
+        List<ProductFavoriteRespVO> resultList = new ArrayList<>(favorites.size());
+        for (ProductFavoriteDetailDO favorite : favorites) {
+            resultList.add(convert2admin(favorite.getSpuDO(), favorite));
+        }
+        return resultList;
+    }
+
+    PageResult<ProductFavoriteRespVO> convertPage(PageResult<ProductFavoriteDetailDO> page);
 }
