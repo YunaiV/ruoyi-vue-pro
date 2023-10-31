@@ -26,7 +26,4 @@ public class DiyPageBaseVO {
     @Schema(description = "预览图")
     private List<String> previewImageUrls;
 
-    @Schema(description = "页面属性", example = "[]")
-    private String property;
-
 }
