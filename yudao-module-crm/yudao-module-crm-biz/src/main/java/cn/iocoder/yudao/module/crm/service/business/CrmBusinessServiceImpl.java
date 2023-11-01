@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.*;
 import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessMapper;
 import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
@@ -19,8 +20,10 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.BUSINESS_NOT_EXISTS;
 
 /**
@@ -98,8 +101,18 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
-    public PageResult<CrmBusinessDO> getBusinessPage(CrmBusinessPageReqVO pageReqVO) {
-        return businessMapper.selectPage(pageReqVO);
+    public PageResult<CrmBusinessDO> getBusinessPage(CrmBusinessPageReqVO pageReqVO, Long userId) {
+        // 1. 获取当前用户能看的分页数据
+        PageResult<CrmPermissionDO> permissionPage = crmPermissionService.getPermissionPage(
+                CrmBusinessConvert.INSTANCE.convert(pageReqVO).setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType()).setUserId(userId));
+        Set<Long> ids = convertSet(permissionPage.getList(), CrmPermissionDO::getBizId);
+        if (CollUtil.isEmpty(ids)) { // 没得说明没有什么给他看的
+            return PageResult.empty();
+        }
+
+        // 2. 获取商机分页数据
+        List<CrmBusinessDO> businessList = businessMapper.selectList(pageReqVO, ids);
+        return new PageResult<>(businessList, (long) businessList.size());
     }
 
     @Override
@@ -114,7 +127,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         validateBusinessExists(reqVO.getId());
 
         // 2. 数据权限转移
-        crmPermissionService.transferCrmPermission(
+        crmPermissionService.transferPermission(
                 CrmBusinessConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType()));
 
         // 3. TODO 记录转移日志

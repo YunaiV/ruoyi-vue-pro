@@ -115,7 +115,7 @@ public class ContactServiceImpl implements ContactService {
         validateContactExists(reqVO.getId());
 
         // 2. 数据权限转移
-        crmPermissionService.transferCrmPermission(
+        crmPermissionService.transferPermission(
                 ContactConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_CONTACTS.getType()));
 
         // 3. TODO 记录转移日志

@@ -58,9 +58,10 @@ public interface CrmBusinessService {
      * 获得商机分页
      *
      * @param pageReqVO 分页查询
+     * @param userId    用户编号
      * @return 商机分页
      */
-    PageResult<CrmBusinessDO> getBusinessPage(CrmBusinessPageReqVO pageReqVO);
+    PageResult<CrmBusinessDO> getBusinessPage(CrmBusinessPageReqVO pageReqVO, Long userId);
 
     /**
      * 获得商机列表, 用于 Excel 导出

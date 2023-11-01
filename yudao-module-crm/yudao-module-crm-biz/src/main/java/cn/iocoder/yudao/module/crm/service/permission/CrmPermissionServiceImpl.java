@@ -2,12 +2,14 @@ package cn.iocoder.yudao.module.crm.service.permission;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.convert.permission.CrmPermissionConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.permission.CrmPermissionMapper;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionPageReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionUpdateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmTransferPermissionReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -86,7 +88,7 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
 
 
     @Override
-    public void transferCrmPermission(CrmTransferPermissionReqBO transferReqBO) {
+    public void transferPermission(CrmTransferPermissionReqBO transferReqBO) {
         // 1. 校验数据权限-是否是负责人，只有负责人才可以转移
         CrmPermissionDO oldPermission = crmPermissionMapper.selectByBizTypeAndBizIdByUserId(transferReqBO.getBizType(),
                 transferReqBO.getBizId(), transferReqBO.getUserId());
@@ -129,6 +131,11 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
             return;
         }
         crmPermissionMapper.deleteById(oldPermission.getId()); // 移除
+    }
+
+    @Override
+    public PageResult<CrmPermissionDO> getPermissionPage(CrmPermissionPageReqBO pageReqBO) {
+        return crmPermissionMapper.selectPage(pageReqBO);
     }
 
 }

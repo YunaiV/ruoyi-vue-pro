@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.module.crm.service.permission;
 
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionPageReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionUpdateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmTransferPermissionReqBO;
 
@@ -59,19 +61,18 @@ public interface CrmPermissionService {
     List<CrmPermissionDO> getPermissionByBizTypeAndBizId(Integer bizType, Long bizId);
 
     /**
-     * 获取数据权限列表，通过 数据类型 x 用户编号
-     *
-     * @param bizType 数据类型，关联 {@link CrmBizTypeEnum}
-     * @param userId  用户编号
-     * @return Crm 数据权限列表
-     */
-    List<CrmPermissionDO> getPermissionByBizTypeAndUserId(Integer bizType, Long userId);
-
-    /**
      * 数据权限转移
      *
      * @param crmTransferPermissionReqBO 数据权限转移请求
      */
-    void transferCrmPermission(@Valid CrmTransferPermissionReqBO crmTransferPermissionReqBO);
+    void transferPermission(@Valid CrmTransferPermissionReqBO crmTransferPermissionReqBO);
+
+    /**
+     * 获取数据权限分页数据
+     *
+     * @param pageReqBO 分页请求
+     * @return 数据权限分页数据
+     */
+    PageResult<CrmPermissionDO> getPermissionPage(CrmPermissionPageReqBO pageReqBO);
 
 }

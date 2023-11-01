@@ -71,8 +71,7 @@ public class CrmBusinessController {
     @Operation(summary = "获得商机分页")
     @PreAuthorize("@ss.hasPermission('crm:business:query')")
     public CommonResult<PageResult<CrmBusinessRespVO>> getBusinessPage(@Valid CrmBusinessPageReqVO pageVO) {
-        PageResult<CrmBusinessDO> pageResult = businessService.getBusinessPage(pageVO);
-
+        PageResult<CrmBusinessDO> pageResult = businessService.getBusinessPage(pageVO, getLoginUserId());
         return success(CrmBusinessConvert.INSTANCE.convertPage(pageResult));
     }
 

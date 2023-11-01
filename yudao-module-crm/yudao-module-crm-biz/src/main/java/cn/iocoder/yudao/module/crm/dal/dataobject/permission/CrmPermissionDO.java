@@ -24,6 +24,12 @@ import lombok.*;
 public class CrmPermissionDO extends BaseDO {
 
     /**
+     * 当数据变为公海数据时，也就是数据团队成员中没有负责人的时候，将原本的负责人 userId 设置为 POOL_USER_ID 方便查询公海数据。
+     * 也就是说每条数据到最后都有一个负责人，如果有人领取则 userId 为领取人
+     */
+    public static final Long POOL_USER_ID = 0L;
+
+    /**
      * ID
      */
     @TableId
@@ -38,12 +44,12 @@ public class CrmPermissionDO extends BaseDO {
     private Long bizId;
     /**
      * 团队成员，关联 AdminUser#id
+     * 如果为公海数据的话会干掉此数据的负责人后设置为 {@link #POOL_USER_ID}，领取人则上位负责人
+     * 例：客户放入公海后会干掉团队成员中的负责人，而其他团队成员则不受影响
      */
     private Long userId;
     /**
      * 权限级别，关联 {@link CrmPermissionLevelEnum}
-     * 如果为公海数据的话会干掉此数据的负责人，领取人则上位负责人
-     * 例：客户放入公海后会干掉团队成员中的负责人，而其他团队成员则不受影响
      */
     private Integer permissionLevel;
 

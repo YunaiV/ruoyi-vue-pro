@@ -136,7 +136,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         validateCustomer(reqVO.getId());
 
         // 2. 数据权限转移
-        crmPermissionService.transferCrmPermission(
+        crmPermissionService.transferPermission(
                 CrmCustomerConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType()));
 
         // 3. TODO 记录转移日志

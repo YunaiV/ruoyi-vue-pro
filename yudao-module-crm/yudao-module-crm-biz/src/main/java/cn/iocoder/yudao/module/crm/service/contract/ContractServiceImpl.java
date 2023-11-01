@@ -113,7 +113,7 @@ public class ContractServiceImpl implements ContractService {
         validateContractExists(reqVO.getId());
 
         // 2. 数据权限转移
-        crmPermissionService.transferCrmPermission(
+        crmPermissionService.transferPermission(
                 ContractConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_CONTRACT.getType()));
 
         // 3. TODO 记录转移日志
