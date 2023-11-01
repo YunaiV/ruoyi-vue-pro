@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  * @author 芋道源码
  */
-public abstract class AbstractChannelMessage extends AbstractRedisMessage {
+public abstract class AbstractRedisChannelMessage extends AbstractRedisMessage {
 
     /**
      * 获得 Redis Channel，默认使用类名

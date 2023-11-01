@@ -3,8 +3,8 @@ package cn.iocoder.yudao.framework.mq.redis.core;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mq.redis.core.interceptor.RedisMessageInterceptor;
 import cn.iocoder.yudao.framework.mq.redis.core.message.AbstractRedisMessage;
-import cn.iocoder.yudao.framework.mq.redis.core.pubsub.AbstractChannelMessage;
-import cn.iocoder.yudao.framework.mq.redis.core.stream.AbstractStreamMessage;
+import cn.iocoder.yudao.framework.mq.redis.core.pubsub.AbstractRedisChannelMessage;
+import cn.iocoder.yudao.framework.mq.redis.core.stream.AbstractRedisStreamMessage;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.data.redis.connection.stream.RecordId;
@@ -35,7 +35,7 @@ public class RedisMQTemplate {
      *
      * @param message 消息
      */
-    public <T extends AbstractChannelMessage> void send(T message) {
+    public <T extends AbstractRedisChannelMessage> void send(T message) {
         try {
             sendMessageBefore(message);
             // 发送消息
@@ -51,7 +51,7 @@ public class RedisMQTemplate {
      * @param message 消息
      * @return 消息记录的编号对象
      */
-    public <T extends AbstractStreamMessage> RecordId send(T message) {
+    public <T extends AbstractRedisStreamMessage> RecordId send(T message) {
         try {
             sendMessageBefore(message);
             // 发送消息

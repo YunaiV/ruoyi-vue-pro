@@ -22,7 +22,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-public abstract class AbstractStreamMessageListener<T extends AbstractStreamMessage>
+public abstract class AbstractRedisStreamMessageListener<T extends AbstractRedisStreamMessage>
         implements StreamListener<String, ObjectRecord<String, String>> {
 
     /**
@@ -48,7 +48,7 @@ public abstract class AbstractStreamMessageListener<T extends AbstractStreamMess
     private RedisMQTemplate redisMQTemplate;
 
     @SneakyThrows
-    protected AbstractStreamMessageListener() {
+    protected AbstractRedisStreamMessageListener() {
         this.messageType = getMessageClass();
         this.streamKey = messageType.getDeclaredConstructor().newInstance().getStreamKey();
     }

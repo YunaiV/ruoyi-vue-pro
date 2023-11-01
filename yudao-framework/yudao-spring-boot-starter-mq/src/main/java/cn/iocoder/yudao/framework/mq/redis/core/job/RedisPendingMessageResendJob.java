@@ -2,7 +2,7 @@ package cn.iocoder.yudao.framework.mq.redis.core.job;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.mq.redis.core.RedisMQTemplate;
-import cn.iocoder.yudao.framework.mq.redis.core.stream.AbstractStreamMessageListener;
+import cn.iocoder.yudao.framework.mq.redis.core.stream.AbstractRedisStreamMessageListener;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
@@ -33,7 +33,7 @@ public class RedisPendingMessageResendJob {
      */
     private static final int EXPIRE_TIME = 5 * 60;
 
-    private final List<AbstractStreamMessageListener<?>> listeners;
+    private final List<AbstractRedisStreamMessageListener<?>> listeners;
     private final RedisMQTemplate redisTemplate;
     private final String groupName;
     private final RedissonClient redissonClient;

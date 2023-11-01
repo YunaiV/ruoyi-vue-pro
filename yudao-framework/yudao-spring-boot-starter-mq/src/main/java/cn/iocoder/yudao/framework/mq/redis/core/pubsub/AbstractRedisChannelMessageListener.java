@@ -20,7 +20,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-public abstract class AbstractChannelMessageListener<T extends AbstractChannelMessage> implements MessageListener {
+public abstract class AbstractRedisChannelMessageListener<T extends AbstractRedisChannelMessage> implements MessageListener {
 
     /**
      * 消息类型
@@ -37,7 +37,7 @@ public abstract class AbstractChannelMessageListener<T extends AbstractChannelMe
     private RedisMQTemplate redisMQTemplate;
 
     @SneakyThrows
-    protected AbstractChannelMessageListener() {
+    protected AbstractRedisChannelMessageListener() {
         this.messageType = getMessageClass();
         this.channel = messageType.getDeclaredConstructor().newInstance().getChannel();
     }

@@ -7,8 +7,8 @@ import cn.iocoder.yudao.framework.common.enums.DocumentEnum;
 import cn.iocoder.yudao.framework.mq.redis.core.RedisMQTemplate;
 import cn.iocoder.yudao.framework.mq.redis.core.interceptor.RedisMessageInterceptor;
 import cn.iocoder.yudao.framework.mq.redis.core.job.RedisPendingMessageResendJob;
-import cn.iocoder.yudao.framework.mq.redis.core.pubsub.AbstractChannelMessageListener;
-import cn.iocoder.yudao.framework.mq.redis.core.stream.AbstractStreamMessageListener;
+import cn.iocoder.yudao.framework.mq.redis.core.pubsub.AbstractRedisChannelMessageListener;
+import cn.iocoder.yudao.framework.mq.redis.core.stream.AbstractRedisStreamMessageListener;
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
@@ -57,9 +57,9 @@ public class YudaoRedisMQAutoConfiguration {
      * 创建 Redis Pub/Sub 广播消费的容器
      */
     @Bean(initMethod = "start", destroyMethod = "stop")
-    @ConditionalOnBean(AbstractChannelMessageListener.class) // 只有 AbstractChannelMessageListener 存在的时候，才需要注册 Redis pubsub 监听
+    @ConditionalOnBean(AbstractRedisChannelMessageListener.class) // 只有 AbstractChannelMessageListener 存在的时候，才需要注册 Redis pubsub 监听
     public RedisMessageListenerContainer redisMessageListenerContainer(
-            RedisMQTemplate redisMQTemplate, List<AbstractChannelMessageListener<?>> listeners) {
+            RedisMQTemplate redisMQTemplate, List<AbstractRedisChannelMessageListener<?>> listeners) {
         // 创建 RedisMessageListenerContainer 对象
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         // 设置 RedisConnection 工厂。
@@ -78,8 +78,8 @@ public class YudaoRedisMQAutoConfiguration {
      * 创建 Redis Stream 重新消费的任务
      */
     @Bean
-    @ConditionalOnBean(AbstractStreamMessageListener.class) // 只有 AbstractStreamMessageListener 存在的时候，才需要注册 Redis pubsub 监听
-    public RedisPendingMessageResendJob redisPendingMessageResendJob(List<AbstractStreamMessageListener<?>> listeners,
+    @ConditionalOnBean(AbstractRedisStreamMessageListener.class) // 只有 AbstractStreamMessageListener 存在的时候，才需要注册 Redis pubsub 监听
+    public RedisPendingMessageResendJob redisPendingMessageResendJob(List<AbstractRedisStreamMessageListener<?>> listeners,
                                                                      RedisMQTemplate redisTemplate,
                                                                      @Value("${spring.application.name}") String groupName,
                                                                      RedissonClient redissonClient) {
@@ -92,9 +92,9 @@ public class YudaoRedisMQAutoConfiguration {
      * 基础知识：<a href="https://www.geek-book.com/src/docs/redis/redis/redis.io/commands/xreadgroup.html">Redis Stream 的 xreadgroup 命令</a>
      */
     @Bean(initMethod = "start", destroyMethod = "stop")
-    @ConditionalOnBean(AbstractStreamMessageListener.class) // 只有 AbstractStreamMessageListener 存在的时候，才需要注册 Redis pubsub 监听
+    @ConditionalOnBean(AbstractRedisStreamMessageListener.class) // 只有 AbstractStreamMessageListener 存在的时候，才需要注册 Redis pubsub 监听
     public StreamMessageListenerContainer<String, ObjectRecord<String, String>> redisStreamMessageListenerContainer(
-            RedisMQTemplate redisMQTemplate, List<AbstractStreamMessageListener<?>> listeners) {
+            RedisMQTemplate redisMQTemplate, List<AbstractRedisStreamMessageListener<?>> listeners) {
         RedisTemplate<String, ?> redisTemplate = redisMQTemplate.getRedisTemplate();
         checkRedisVersion(redisTemplate);
         // 第一步，创建 StreamMessageListenerContainer 容器
