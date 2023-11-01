@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.crm.service.business;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.*;
 import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
@@ -131,6 +132,16 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
                 CrmBusinessConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType()));
 
         // 3. TODO 记录转移日志
+    }
+
+    @Override
+    public boolean validateBizIdExists(Integer bizType, Long bizId) {
+        // 1. 校验模块类型
+        if (!ObjUtil.equal(CrmBizTypeEnum.CRM_BUSINESS.getType(), bizId)) {
+            return false;
+        }
+        // 2. 校验是否存在
+        return businessMapper.selectById(bizId) != null;
     }
 
 }
