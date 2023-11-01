@@ -118,9 +118,11 @@ public interface ErrorCodeConstants {
 
     // ========== 装修模板 1-013-017-000 ==========
     ErrorCode DIY_TEMPLATE_NOT_EXISTS = new ErrorCode(1_013_017_000, "装修模板不存在");
-    ErrorCode DIY_TEMPLATE_USED_CANNOT_DELETE = new ErrorCode(1_013_017_001, "不能删除正在使用的装修模板");
+    ErrorCode DIY_TEMPLATE_NAME_USED = new ErrorCode(1_013_017_001, "装修模板名称({})已经被使用");
+    ErrorCode DIY_TEMPLATE_USED_CANNOT_DELETE = new ErrorCode(1_013_017_002, "不能删除正在使用的装修模板");
 
     // ========== 装修页面 1-013-018-000 ==========
     ErrorCode DIY_PAGE_NOT_EXISTS = new ErrorCode(1_013_018_000, "装修页面不存在");
+    ErrorCode DIY_PAGE_NAME_USED = new ErrorCode(1_013_018_001, "装修页面名称({})已经被使用");
 
 }
