@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.tenant.core.mq;
+package cn.iocoder.yudao.framework.tenant.core.mq.redis;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.mq.redis.core.interceptor.RedisMessageInterceptor;
