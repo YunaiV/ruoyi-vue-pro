@@ -47,4 +47,13 @@ public enum CrmPermissionLevelEnum implements IntArrayValuable {
         return ObjUtil.equal(WRITE.level, level);
     }
 
+    public static String getNameByLevel(Integer level) {
+        for (CrmPermissionLevelEnum levelEnum : CrmPermissionLevelEnum.values()) {
+            if (ObjUtil.equal(levelEnum.level, level)) {
+                return levelEnum.name;
+            }
+        }
+        return "";
+    }
+
 }

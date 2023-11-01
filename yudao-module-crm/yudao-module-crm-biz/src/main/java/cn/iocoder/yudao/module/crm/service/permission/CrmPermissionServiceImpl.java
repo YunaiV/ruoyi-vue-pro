@@ -13,12 +13,12 @@ import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionPageReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionUpdateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmTransferPermissionReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -43,6 +43,10 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createPermission(CrmPermissionCreateReqBO createBO) {
+        // 1. 校验用户是否存在
+        adminUserApi.validateUserList(Collections.singletonList(createBO.getUserId()));
+
+        // 2. 创建
         CrmPermissionDO permission = CrmPermissionConvert.INSTANCE.convert(createBO);
         crmPermissionMapper.insert(permission);
         return permission.getId();
@@ -51,7 +55,11 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePermission(CrmPermissionUpdateReqBO updateBO) {
+        // 1. 校验用户是否存在
+        adminUserApi.validateUserList(Collections.singletonList(updateBO.getUserId()));
+        // 2. 校验存在
         validateCrmPermissionExists(updateBO.getId());
+
         // 更新操作
         CrmPermissionDO updateDO = CrmPermissionConvert.INSTANCE.convert(updateBO);
         crmPermissionMapper.updateById(updateDO);
@@ -60,7 +68,9 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deletePermission(Long id) {
+        // 校验存在
         validateCrmPermissionExists(id);
+
         // 删除
         crmPermissionMapper.deleteById(id);
     }
@@ -73,11 +83,6 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
     @Override
     public List<CrmPermissionDO> getPermissionByBizTypeAndBizId(Integer bizType, Long bizId) {
         return crmPermissionMapper.selectByBizTypeAndBizId(bizType, bizId);
-    }
-
-    @Override
-    public List<CrmPermissionDO> getPermissionByBizTypeAndUserId(Integer bizType, Long userId) {
-        return crmPermissionMapper.selectByBizTypeAndUserId(bizType, userId);
     }
 
     private void validateCrmPermissionExists(Long id) {
@@ -103,11 +108,7 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
             throw exception(CRM_PERMISSION_MODEL_TRANSFER_FAIL_OWNER_USER_EXISTS, crmName);
         }
         // 2.1 校验新负责人是否存在
-        AdminUserRespDTO user = adminUserApi.getUser(transferReqBO.getNewOwnerUserId());
-        if (user == null) {
-            throw exception(CRM_PERMISSION_MODEL_TRANSFER_FAIL_OWNER_USER_NOT_EXISTS, crmName);
-        }
-
+        adminUserApi.validateUserList(Collections.singletonList(transferReqBO.getNewOwnerUserId()));
         // 3. 权限转移
         List<CrmPermissionDO> permissions = crmPermissionMapper.selectByBizTypeAndBizId(
                 transferReqBO.getBizType(), transferReqBO.getBizId()); // 获取所有团队成员
