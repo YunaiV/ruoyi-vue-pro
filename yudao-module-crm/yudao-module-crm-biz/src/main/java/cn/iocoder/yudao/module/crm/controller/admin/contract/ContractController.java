@@ -90,7 +90,7 @@ public class ContractController {
     @PutMapping("/transfer")
     @Operation(summary = "合同转移")
     @PreAuthorize("@ss.hasPermission('crm:contract:update')")
-    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmTransferContractReqVO reqVO) {
+    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmContractTransferReqVO reqVO) {
         contractService.transferContract(reqVO, getLoginUserId());
         return success(true);
     }

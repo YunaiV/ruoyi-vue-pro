@@ -73,6 +73,11 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
         return crmPermissionMapper.selectByBizTypeAndBizId(bizType, bizId);
     }
 
+    @Override
+    public List<CrmPermissionDO> getPermissionByBizTypeAndUserId(Integer bizType, Long userId) {
+        return crmPermissionMapper.selectByBizTypeAndUserId(bizType, userId);
+    }
+
     private void validateCrmPermissionExists(Long id) {
         if (crmPermissionMapper.selectById(id) == null) {
             throw exception(CRM_PERMISSION_NOT_EXISTS);

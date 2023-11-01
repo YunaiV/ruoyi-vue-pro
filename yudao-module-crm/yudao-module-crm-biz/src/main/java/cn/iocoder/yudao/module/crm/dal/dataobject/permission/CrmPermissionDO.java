@@ -42,6 +42,8 @@ public class CrmPermissionDO extends BaseDO {
     private Long userId;
     /**
      * 权限级别，关联 {@link CrmPermissionLevelEnum}
+     * 如果为公海数据的话会干掉此数据的负责人，领取人则上位负责人
+     * 例：客户放入公海后会干掉团队成员中的负责人，而其他团队成员则不受影响
      */
     private Integer permissionLevel;
 

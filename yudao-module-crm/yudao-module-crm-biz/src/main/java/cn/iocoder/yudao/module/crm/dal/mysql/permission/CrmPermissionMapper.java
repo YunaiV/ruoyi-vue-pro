@@ -44,4 +44,17 @@ public interface CrmPermissionMapper extends BaseMapperX<CrmPermissionDO> {
                 .eq(CrmPermissionDO::getBizId, bizId));
     }
 
+    /**
+     * 获取数据权限列表通过 数据类型 x 用户编号。如果
+     *
+     * @param bizType 数据类型，关联 {@link CrmBizTypeEnum}
+     * @param userId
+     * @return Crm 数据权限列表
+     */
+    default List<CrmPermissionDO> selectByBizTypeAndUserId(Integer bizType, Long userId) {
+        return selectList(new LambdaQueryWrapperX<CrmPermissionDO>()
+                .eq(CrmPermissionDO::getBizType, bizType)
+                .eq(CrmPermissionDO::getUserId, userId));
+    }
+
 }

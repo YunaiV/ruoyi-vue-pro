@@ -131,7 +131,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void transferCustomer(CrmTransferCustomerReqVO reqVO, Long userId) {
+    public void transferCustomer(CrmCustomerTransferReqVO reqVO, Long userId) {
         // 1. 校验合同是否存在
         validateCustomer(reqVO.getId());
 

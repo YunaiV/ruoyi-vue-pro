@@ -37,6 +37,6 @@ public interface ContractConvert {
             @Mapping(target = "bizId", source = "reqVO.id"),
             @Mapping(target = "newOwnerUserId", source = "reqVO.id")
     })
-    CrmTransferPermissionReqBO convert(CrmTransferContractReqVO reqVO, Long userId);
+    CrmTransferPermissionReqBO convert(CrmContractTransferReqVO reqVO, Long userId);
 
 }

@@ -35,6 +35,6 @@ public interface CrmCustomerConvert {
             @Mapping(target = "bizId", source = "reqVO.id"),
             @Mapping(target = "newOwnerUserId", source = "reqVO.id")
     })
-    CrmTransferPermissionReqBO convert(CrmTransferCustomerReqVO reqVO, Long userId);
+    CrmTransferPermissionReqBO convert(CrmCustomerTransferReqVO reqVO, Long userId);
 
 }

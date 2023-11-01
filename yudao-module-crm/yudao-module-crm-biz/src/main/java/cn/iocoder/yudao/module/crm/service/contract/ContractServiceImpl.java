@@ -108,7 +108,7 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void transferContract(CrmTransferContractReqVO reqVO, Long userId) {
+    public void transferContract(CrmContractTransferReqVO reqVO, Long userId) {
         // 1 校验合同是否存在
         validateContractExists(reqVO.getId());
 

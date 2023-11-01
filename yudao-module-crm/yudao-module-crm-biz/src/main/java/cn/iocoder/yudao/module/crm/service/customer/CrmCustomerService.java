@@ -84,6 +84,6 @@ public interface CrmCustomerService {
      * @param reqVO  请求
      * @param userId 用户编号
      */
-    void transferCustomer(CrmTransferCustomerReqVO reqVO, Long userId);
+    void transferCustomer(CrmCustomerTransferReqVO reqVO, Long userId);
 
 }

@@ -76,6 +76,6 @@ public interface CrmBusinessService {
      * @param reqVO  请求
      * @param userId 用户编号
      */
-    void transferBusiness(CrmTransferBusinessReqVO reqVO, Long userId);
+    void transferBusiness(CrmBusinessTransferReqVO reqVO, Long userId);
 
 }

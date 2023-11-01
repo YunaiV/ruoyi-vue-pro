@@ -100,7 +100,7 @@ public class ContactController {
     @PutMapping("/transfer")
     @Operation(summary = "联系人转移")
     @PreAuthorize("@ss.hasPermission('crm:contact:update')")
-    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmTransferContactReqVO reqVO) {
+    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmContactTransferReqVO reqVO) {
         contactService.transferContact(reqVO, getLoginUserId());
         return success(true);
     }

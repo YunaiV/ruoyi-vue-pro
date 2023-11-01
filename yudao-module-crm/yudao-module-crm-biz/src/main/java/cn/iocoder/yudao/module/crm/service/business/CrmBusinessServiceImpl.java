@@ -109,7 +109,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void transferBusiness(CrmTransferBusinessReqVO reqVO, Long userId) {
+    public void transferBusiness(CrmBusinessTransferReqVO reqVO, Long userId) {
         // 1 校验商机是否存在
         validateBusinessExists(reqVO.getId());
 
