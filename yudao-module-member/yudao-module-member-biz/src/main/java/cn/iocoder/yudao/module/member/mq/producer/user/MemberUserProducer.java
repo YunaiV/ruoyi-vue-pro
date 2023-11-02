@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.member.mq.producer.user;
 
-import cn.iocoder.yudao.framework.mq.core.RedisMQTemplate;
-import cn.iocoder.yudao.module.member.mq.message.user.MemberUserCreateMessage;
+import cn.iocoder.yudao.module.member.message.user.MemberUserCreateMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -17,7 +17,7 @@ import javax.annotation.Resource;
 public class MemberUserProducer {
 
     @Resource
-    private RedisMQTemplate redisMQTemplate;
+    private ApplicationContext applicationContext;
 
     /**
      * 发送 {@link MemberUserCreateMessage} 消息
@@ -25,7 +25,7 @@ public class MemberUserProducer {
      * @param userId 用户编号
      */
     public void sendUserCreateMessage(Long userId) {
-        redisMQTemplate.send(new MemberUserCreateMessage().setUserId(userId));
+        applicationContext.publishEvent(new MemberUserCreateMessage().setUserId(userId));
     }
 
 }
