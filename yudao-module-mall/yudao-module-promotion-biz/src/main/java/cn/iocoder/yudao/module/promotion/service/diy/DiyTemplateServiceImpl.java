@@ -146,6 +146,11 @@ public class DiyTemplateServiceImpl implements DiyTemplateService {
         diyTemplateMapper.updateById(updateObj);
     }
 
+    @Override
+    public DiyTemplateDO getUsedTemplate() {
+        return diyTemplateMapper.selectByUsed(true);
+    }
+
     /**
      * 更新模板是否使用
      *

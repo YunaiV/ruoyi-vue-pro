@@ -68,4 +68,11 @@ public interface DiyTemplateService {
      */
     void updateDiyTemplateProperty(DiyTemplatePropertyUpdateRequestVO updateReqVO);
 
+    /**
+     * 获取使用中的装修模板
+     *
+     * @return 装修模板
+     */
+    DiyTemplateDO getUsedTemplate();
+
 }
