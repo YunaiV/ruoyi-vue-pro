@@ -20,6 +20,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.findFirst;
 
 @Tag(name = "用户 APP - 装修模板")
 @RestController
@@ -34,8 +35,8 @@ public class AppDiyTemplateController {
 
     @GetMapping("/used")
     @Operation(summary = "使用中的装修模板")
-    public CommonResult<AppDiyTemplatePropertyRespVO> getDiyTemplateProperty() {
-        DiyTemplateDO diyTemplate = diyTemplateService.getUsedTemplate();
+    public CommonResult<AppDiyTemplatePropertyRespVO> getUsedDiyTemplate() {
+        DiyTemplateDO diyTemplate = diyTemplateService.getUsedDiyTemplate();
         return success(buildVo(diyTemplate));
     }
 
@@ -53,8 +54,10 @@ public class AppDiyTemplateController {
         }
         // 查询模板下的页面
         List<DiyPageDO> pages = diyPageService.getDiyPageByTemplateId(diyTemplate.getId());
+        String home = findFirst(pages, page -> "首页".equals(page.getName()), DiyPageDO::getProperty);
+        String user = findFirst(pages, page -> "我的".equals(page.getName()), DiyPageDO::getProperty);
         // 拼接返回
-        return DiyTemplateConvert.INSTANCE.convertPropertyVo2(diyTemplate, pages);
+        return DiyTemplateConvert.INSTANCE.convertPropertyVo2(diyTemplate, home, user);
     }
 
 }

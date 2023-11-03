@@ -147,7 +147,7 @@ public class DiyTemplateServiceImpl implements DiyTemplateService {
     }
 
     @Override
-    public DiyTemplateDO getUsedTemplate() {
+    public DiyTemplateDO getUsedDiyTemplate() {
         return diyTemplateMapper.selectByUsed(true);
     }
 

@@ -32,7 +32,7 @@ public interface DiyTemplateConvert {
 
     DiyTemplatePropertyRespVO convertPropertyVo(DiyTemplateDO diyTemplate, List<DiyPageDO> pages);
 
-    AppDiyTemplatePropertyRespVO convertPropertyVo2(DiyTemplateDO diyTemplate, List<DiyPageDO> pages);
+    AppDiyTemplatePropertyRespVO convertPropertyVo2(DiyTemplateDO diyTemplate, String home, String user);
 
     DiyTemplateDO convert(DiyTemplatePropertyUpdateRequestVO updateReqVO);
 

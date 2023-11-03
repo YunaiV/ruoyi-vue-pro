@@ -1,11 +1,9 @@
 package cn.iocoder.yudao.module.promotion.controller.app.diy.vo;
 
-import cn.iocoder.yudao.module.promotion.controller.admin.diy.vo.page.DiyPagePropertyRespVO;
+import com.fasterxml.jackson.annotation.JsonRawValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.ToString;
-
-import java.util.List;
 
 @Schema(description = "用户 App - 装修模板属性 Response VO")
 @Data
@@ -18,10 +16,16 @@ public class AppDiyTemplatePropertyRespVO {
     @Schema(description = "模板名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "默认主题")
     private String name;
 
-    @Schema(description = "模板属性，JSON 格式", requiredMode = Schema.RequiredMode.REQUIRED, example = "{}")
+    @Schema(description = "模板属性", requiredMode = Schema.RequiredMode.REQUIRED, example = "{}")
+    @JsonRawValue
     private String property;
 
-    @Schema(description = "模板页面", requiredMode = Schema.RequiredMode.REQUIRED, example = "[]")
-    private List<DiyPagePropertyRespVO> pages;
+    @Schema(description = "首页", requiredMode = Schema.RequiredMode.REQUIRED, example = "{}")
+    @JsonRawValue
+    private String home;
+
+    @Schema(description = "我的", requiredMode = Schema.RequiredMode.REQUIRED, example = "{}")
+    @JsonRawValue
+    private String user;
 
 }
