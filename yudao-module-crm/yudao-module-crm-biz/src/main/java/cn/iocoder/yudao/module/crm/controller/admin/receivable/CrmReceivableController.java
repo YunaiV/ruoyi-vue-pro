@@ -5,9 +5,9 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.*;
-import cn.iocoder.yudao.module.crm.convert.receivable.ReceivableConvert;
-import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.ReceivableDO;
-import cn.iocoder.yudao.module.crm.service.receivable.ReceivableService;
+import cn.iocoder.yudao.module.crm.convert.receivable.CrmReceivableConvert;
+import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivableDO;
+import cn.iocoder.yudao.module.crm.service.receivable.CrmReceivableService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,23 +28,23 @@ import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.E
 @RestController
 @RequestMapping("/crm/receivable")
 @Validated
-public class ReceivableController {
+public class CrmReceivableController {
 
     @Resource
-    private ReceivableService receivableService;
+    private CrmReceivableService crmReceivableService;
 
     @PostMapping("/create")
     @Operation(summary = "创建回款管理")
     @PreAuthorize("@ss.hasPermission('crm:receivable:create')")
-    public CommonResult<Long> createReceivable(@Valid @RequestBody ReceivableCreateReqVO createReqVO) {
-        return success(receivableService.createReceivable(createReqVO));
+    public CommonResult<Long> createReceivable(@Valid @RequestBody CrmReceivableCreateReqVO createReqVO) {
+        return success(crmReceivableService.createReceivable(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新回款管理")
     @PreAuthorize("@ss.hasPermission('crm:receivable:update')")
-    public CommonResult<Boolean> updateReceivable(@Valid @RequestBody ReceivableUpdateReqVO updateReqVO) {
-        receivableService.updateReceivable(updateReqVO);
+    public CommonResult<Boolean> updateReceivable(@Valid @RequestBody CrmReceivableUpdateReqVO updateReqVO) {
+        crmReceivableService.updateReceivable(updateReqVO);
         return success(true);
     }
 
@@ -53,7 +53,7 @@ public class ReceivableController {
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('crm:receivable:delete')")
     public CommonResult<Boolean> deleteReceivable(@RequestParam("id") Long id) {
-        receivableService.deleteReceivable(id);
+        crmReceivableService.deleteReceivable(id);
         return success(true);
     }
 
@@ -61,29 +61,29 @@ public class ReceivableController {
     @Operation(summary = "获得回款管理")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('crm:receivable:query')")
-    public CommonResult<ReceivableRespVO> getReceivable(@RequestParam("id") Long id) {
-        ReceivableDO receivable = receivableService.getReceivable(id);
-        return success(ReceivableConvert.INSTANCE.convert(receivable));
+    public CommonResult<CrmReceivableRespVO> getReceivable(@RequestParam("id") Long id) {
+        CrmReceivableDO receivable = crmReceivableService.getReceivable(id);
+        return success(CrmReceivableConvert.INSTANCE.convert(receivable));
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得回款管理分页")
     @PreAuthorize("@ss.hasPermission('crm:receivable:query')")
-    public CommonResult<PageResult<ReceivableRespVO>> getReceivablePage(@Valid ReceivablePageReqVO pageVO) {
-        PageResult<ReceivableDO> pageResult = receivableService.getReceivablePage(pageVO);
-        return success(ReceivableConvert.INSTANCE.convertPage(pageResult));
+    public CommonResult<PageResult<CrmReceivableRespVO>> getReceivablePage(@Valid CrmReceivablePageReqVO pageVO) {
+        PageResult<CrmReceivableDO> pageResult = crmReceivableService.getReceivablePage(pageVO);
+        return success(CrmReceivableConvert.INSTANCE.convertPage(pageResult));
     }
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出回款管理 Excel")
     @PreAuthorize("@ss.hasPermission('crm:receivable:export')")
     @OperateLog(type = EXPORT)
-    public void exportReceivableExcel(@Valid ReceivableExportReqVO exportReqVO,
+    public void exportReceivableExcel(@Valid CrmReceivableExportReqVO exportReqVO,
               HttpServletResponse response) throws IOException {
-        List<ReceivableDO> list = receivableService.getReceivableList(exportReqVO);
+        List<CrmReceivableDO> list = crmReceivableService.getReceivableList(exportReqVO);
         // 导出 Excel
-        List<ReceivableExcelVO> datas = ReceivableConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "回款管理.xls", "数据", ReceivableExcelVO.class, datas);
+        List<CrmReceivableExcelVO> datas = CrmReceivableConvert.INSTANCE.convertList02(list);
+        ExcelUtils.write(response, "回款管理.xls", "数据", CrmReceivableExcelVO.class, datas);
     }
 
 }

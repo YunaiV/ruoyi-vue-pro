@@ -2,12 +2,12 @@ package cn.iocoder.yudao.module.crm.service.receivable;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.ReceivableCreateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.ReceivableExportReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.ReceivablePageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.ReceivableUpdateReqVO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.ReceivableDO;
-import cn.iocoder.yudao.module.crm.dal.mysql.receivable.ReceivableMapper;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.CrmReceivableCreateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.CrmReceivableExportReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.CrmReceivablePageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.CrmReceivableUpdateReqVO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivableDO;
+import cn.iocoder.yudao.module.crm.dal.mysql.receivable.CrmReceivableMapper;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
@@ -26,54 +26,54 @@ import static org.junit.jupiter.api.Assertions.*;
 
 // TODO 芋艿：等实现完，在校验下；
 /**
- * {@link ReceivableServiceImpl} 的单元测试类
+ * {@link CrmReceivableServiceImpl} 的单元测试类
  *
  * @author 赤焰
  */
-@Import(ReceivableServiceImpl.class)
-public class ReceivableServiceImplTest extends BaseDbUnitTest {
+@Import(CrmReceivableServiceImpl.class)
+public class CrmCrmReceivableServiceImplTest extends BaseDbUnitTest {
 
     @Resource
-    private ReceivableServiceImpl receivableService;
+    private CrmReceivableServiceImpl receivableService;
 
     @Resource
-    private ReceivableMapper receivableMapper;
+    private CrmReceivableMapper crmReceivableMapper;
 
     @Test
     public void testCreateReceivable_success() {
         // 准备参数
-        ReceivableCreateReqVO reqVO = randomPojo(ReceivableCreateReqVO.class);
+        CrmReceivableCreateReqVO reqVO = randomPojo(CrmReceivableCreateReqVO.class);
 
         // 调用
         Long receivableId = receivableService.createReceivable(reqVO);
         // 断言
         assertNotNull(receivableId);
         // 校验记录的属性是否正确
-        ReceivableDO receivable = receivableMapper.selectById(receivableId);
+        CrmReceivableDO receivable = crmReceivableMapper.selectById(receivableId);
         assertPojoEquals(reqVO, receivable);
     }
 
     @Test
     public void testUpdateReceivable_success() {
         // mock 数据
-        ReceivableDO dbReceivable = randomPojo(ReceivableDO.class);
-        receivableMapper.insert(dbReceivable);// @Sql: 先插入出一条存在的数据
+        CrmReceivableDO dbReceivable = randomPojo(CrmReceivableDO.class);
+        crmReceivableMapper.insert(dbReceivable);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        ReceivableUpdateReqVO reqVO = randomPojo(ReceivableUpdateReqVO.class, o -> {
+        CrmReceivableUpdateReqVO reqVO = randomPojo(CrmReceivableUpdateReqVO.class, o -> {
             o.setId(dbReceivable.getId()); // 设置更新的 ID
         });
 
         // 调用
         receivableService.updateReceivable(reqVO);
         // 校验是否更新正确
-        ReceivableDO receivable = receivableMapper.selectById(reqVO.getId()); // 获取最新的
+        CrmReceivableDO receivable = crmReceivableMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, receivable);
     }
 
     @Test
     public void testUpdateReceivable_notExists() {
         // 准备参数
-        ReceivableUpdateReqVO reqVO = randomPojo(ReceivableUpdateReqVO.class);
+        CrmReceivableUpdateReqVO reqVO = randomPojo(CrmReceivableUpdateReqVO.class);
 
         // 调用, 并断言异常
         assertServiceException(() -> receivableService.updateReceivable(reqVO), RECEIVABLE_NOT_EXISTS);
@@ -82,15 +82,15 @@ public class ReceivableServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testDeleteReceivable_success() {
         // mock 数据
-        ReceivableDO dbReceivable = randomPojo(ReceivableDO.class);
-        receivableMapper.insert(dbReceivable);// @Sql: 先插入出一条存在的数据
+        CrmReceivableDO dbReceivable = randomPojo(CrmReceivableDO.class);
+        crmReceivableMapper.insert(dbReceivable);// @Sql: 先插入出一条存在的数据
         // 准备参数
         Long id = dbReceivable.getId();
 
         // 调用
         receivableService.deleteReceivable(id);
        // 校验数据不存在了
-       assertNull(receivableMapper.selectById(id));
+       assertNull(crmReceivableMapper.selectById(id));
     }
 
     @Test
@@ -106,7 +106,7 @@ public class ReceivableServiceImplTest extends BaseDbUnitTest {
     @Disabled  // TODO 请修改 null 为需要的值，然后删除 @Disabled 注解
     public void testGetReceivablePage() {
        // mock 数据
-       ReceivableDO dbReceivable = randomPojo(ReceivableDO.class, o -> { // 等会查询到
+       CrmReceivableDO dbReceivable = randomPojo(CrmReceivableDO.class, o -> { // 等会查询到
            o.setNo(null);
            o.setPlanId(null);
            o.setCustomerId(null);
@@ -125,63 +125,57 @@ public class ReceivableServiceImplTest extends BaseDbUnitTest {
            o.setRemark(null);
            o.setCreateTime(null);
        });
-       receivableMapper.insert(dbReceivable);
+       crmReceivableMapper.insert(dbReceivable);
        // 测试 no 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setNo(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setNo(null)));
        // 测试 planId 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setPlanId(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setPlanId(null)));
        // 测试 customerId 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setCustomerId(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setCustomerId(null)));
        // 测试 contractId 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setContractId(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setContractId(null)));
        // 测试 checkStatus 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setCheckStatus(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setCheckStatus(null)));
        // 测试 processInstanceId 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setProcessInstanceId(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setProcessInstanceId(null)));
        // 测试 returnTime 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setReturnTime(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setReturnTime(null)));
        // 测试 returnType 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setReturnType(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setReturnType(null)));
        // 测试 price 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setPrice(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setPrice(null)));
        // 测试 ownerUserId 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setOwnerUserId(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setOwnerUserId(null)));
        // 测试 batchId 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setBatchId(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setBatchId(null)));
        // 测试 sort 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setSort(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setSort(null)));
        // 测试 dataScope 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setDataScope(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setDataScope(null)));
        // 测试 dataScopeDeptIds 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setDataScopeDeptIds(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setDataScopeDeptIds(null)));
        // 测试 status 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setStatus(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setStatus(null)));
        // 测试 remark 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setRemark(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setRemark(null)));
        // 测试 createTime 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setCreateTime(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setCreateTime(null)));
        // 准备参数
-       ReceivablePageReqVO reqVO = new ReceivablePageReqVO();
+       CrmReceivablePageReqVO reqVO = new CrmReceivablePageReqVO();
        reqVO.setNo(null);
        reqVO.setPlanId(null);
        reqVO.setCustomerId(null);
        reqVO.setContractId(null);
        reqVO.setCheckStatus(null);
-       reqVO.setProcessInstanceId(null);
        reqVO.setReturnTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
        reqVO.setReturnType(null);
        reqVO.setPrice(null);
        reqVO.setOwnerUserId(null);
-       reqVO.setBatchId(null);
-       reqVO.setSort(null);
-       reqVO.setDataScope(null);
-       reqVO.setDataScopeDeptIds(null);
        reqVO.setStatus(null);
-       reqVO.setRemark(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
        // 调用
-       PageResult<ReceivableDO> pageResult = receivableService.getReceivablePage(reqVO);
+       PageResult<CrmReceivableDO> pageResult = receivableService.getReceivablePage(reqVO);
        // 断言
        assertEquals(1, pageResult.getTotal());
        assertEquals(1, pageResult.getList().size());
@@ -192,7 +186,7 @@ public class ReceivableServiceImplTest extends BaseDbUnitTest {
     @Disabled  // TODO 请修改 null 为需要的值，然后删除 @Disabled 注解
     public void testGetReceivableList() {
        // mock 数据
-       ReceivableDO dbReceivable = randomPojo(ReceivableDO.class, o -> { // 等会查询到
+       CrmReceivableDO dbReceivable = randomPojo(CrmReceivableDO.class, o -> { // 等会查询到
            o.setNo(null);
            o.setPlanId(null);
            o.setCustomerId(null);
@@ -211,63 +205,59 @@ public class ReceivableServiceImplTest extends BaseDbUnitTest {
            o.setRemark(null);
            o.setCreateTime(null);
        });
-       receivableMapper.insert(dbReceivable);
+       crmReceivableMapper.insert(dbReceivable);
        // 测试 no 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setNo(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setNo(null)));
        // 测试 planId 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setPlanId(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setPlanId(null)));
        // 测试 customerId 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setCustomerId(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setCustomerId(null)));
        // 测试 contractId 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setContractId(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setContractId(null)));
        // 测试 checkStatus 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setCheckStatus(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setCheckStatus(null)));
        // 测试 processInstanceId 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setProcessInstanceId(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setProcessInstanceId(null)));
        // 测试 returnTime 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setReturnTime(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setReturnTime(null)));
        // 测试 returnType 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setReturnType(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setReturnType(null)));
        // 测试 price 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setPrice(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setPrice(null)));
        // 测试 ownerUserId 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setOwnerUserId(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setOwnerUserId(null)));
        // 测试 batchId 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setBatchId(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setBatchId(null)));
        // 测试 sort 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setSort(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setSort(null)));
        // 测试 dataScope 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setDataScope(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setDataScope(null)));
        // 测试 dataScopeDeptIds 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setDataScopeDeptIds(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setDataScopeDeptIds(null)));
        // 测试 status 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setStatus(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setStatus(null)));
        // 测试 remark 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setRemark(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setRemark(null)));
        // 测试 createTime 不匹配
-       receivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setCreateTime(null)));
+       crmReceivableMapper.insert(cloneIgnoreId(dbReceivable, o -> o.setCreateTime(null)));
        // 准备参数
-       ReceivableExportReqVO reqVO = new ReceivableExportReqVO();
+       CrmReceivableExportReqVO reqVO = new CrmReceivableExportReqVO();
        reqVO.setNo(null);
        reqVO.setPlanId(null);
        reqVO.setCustomerId(null);
        reqVO.setContractId(null);
        reqVO.setCheckStatus(null);
-       reqVO.setProcessInstanceId(null);
        reqVO.setReturnTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
        reqVO.setReturnType(null);
        reqVO.setPrice(null);
        reqVO.setOwnerUserId(null);
        reqVO.setBatchId(null);
-       reqVO.setSort(null);
-       reqVO.setDataScope(null);
-       reqVO.setDataScopeDeptIds(null);
        reqVO.setStatus(null);
        reqVO.setRemark(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
        // 调用
-       List<ReceivableDO> list = receivableService.getReceivableList(reqVO);
+       List<CrmReceivableDO> list = receivableService.getReceivableList(reqVO);
        // 断言
        assertEquals(1, list.size());
        assertPojoEquals(dbReceivable, list.get(0));

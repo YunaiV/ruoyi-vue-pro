@@ -1,12 +1,9 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.receivable;
 
 import lombok.*;
-import java.util.*;
-import java.math.BigDecimal;
+
 import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
+
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
@@ -23,7 +20,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReceivablePlanDO extends BaseDO {
+public class CrmReceivablePlanDO extends BaseDO {
 
     /**
      * ID
@@ -33,23 +30,23 @@ public class ReceivablePlanDO extends BaseDO {
     /**
      * 期数
      */
-    private Long indexNo;
+    private Integer period;
     /**
      * 回款ID
      */
     private Long receivableId;
     /**
-     * 完成状态
+     * 状态
      *
-     * 枚举 {@link TODO common_status 对应的类}
+     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.CommonStatusEnum}
+     *
      */
     private Integer status;
     /**
      * 审批状态
-     *
-     * 枚举 {@link TODO crm_receivable_check_status 对应的类}
+     * 对应字典 {@link cn.iocoder.yudao.module.crm.enums.DictTypeConstants#CRM_RECEIVABLE_CHECK_STATUS}
      */
-    private String checkStatus;
+    private Integer checkStatus;
     /**
      * 工作流编号
      */
@@ -57,7 +54,7 @@ public class ReceivablePlanDO extends BaseDO {
     /**
      * 计划回款金额
      */
-    private BigDecimal price;
+    private Integer price;
     /**
      * 计划回款日期
      */
@@ -65,7 +62,7 @@ public class ReceivablePlanDO extends BaseDO {
     /**
      * 提前几天提醒
      */
-    private Long remindDays;
+    private Integer remindDays;
     /**
      * 提醒日期
      */

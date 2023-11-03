@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -22,7 +21,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReceivableDO extends BaseDO {
+public class CrmReceivableDO extends BaseDO {
 
     /**
      * ID
@@ -34,27 +33,26 @@ public class ReceivableDO extends BaseDO {
      */
     private String no;
     /**
-     * 回款计划ID
+     * 回款计划
      *
-     * TODO @liuhongfeng：这个字段，后续要写下关联的实体哈
+     * 对应实体 {@link CrmReceivablePlanDO}
      */
     private Long planId;
     /**
      * 客户ID
      *
-     * TODO @liuhongfeng：这个字段，后续要写下关联的实体哈
+     * 对应实体 {@link cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO}
      */
     private Long customerId;
     /**
      * 合同ID
      *
-     * TODO @liuhongfeng：这个字段，后续要写下关联的实体哈
+     * 对应实体 {@link cn.iocoder.yudao.module.crm.dal.dataobject.contract.ContractDO}
      */
     private Long contractId;
     /**
      * 审批状态
-     *
-     * 枚举 {@link TODO crm_receivable_check_status 对应的类}
+     * 对应字典 {@link cn.iocoder.yudao.module.crm.enums.DictTypeConstants#CRM_RECEIVABLE_CHECK_STATUS}
      */
     private Integer checkStatus;
     /**
@@ -74,7 +72,7 @@ public class ReceivableDO extends BaseDO {
     /**
      * 回款金额
      */
-    private BigDecimal price;
+    private Integer price;
     /**
      * 负责人
      */
@@ -99,7 +97,8 @@ public class ReceivableDO extends BaseDO {
     /**
      * 状态
      *
-     * 枚举 {@link TODO common_status 对应的类}
+     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.CommonStatusEnum}
+     *
      */
     private Integer status;
     /**

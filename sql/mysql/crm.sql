@@ -41,7 +41,7 @@ CREATE TABLE `crm_receivable`  (
 DROP TABLE IF EXISTS `crm_receivable_plan`;
 CREATE TABLE `crm_receivable_plan`  (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',
-    `index_no` bigint(20) NULL DEFAULT NULL COMMENT '期数',
+    `period` tinyint(4) DEFAULT NULL COMMENT '期数',
     `receivable_id` bigint(20) NULL DEFAULT NULL COMMENT '回款ID',
     `status` tinyint(4) NOT NULL COMMENT '完成状态',
     `check_status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '审批状态',
