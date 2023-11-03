@@ -95,8 +95,9 @@ public class CrmCustomerController {
         return success(true);
     }
 
+    // TODO @Joey：单独建一个属于自己业务的 ReqVO；因为前端如果模拟请求，是不是可以更新其它字段了；
     @PutMapping("/lock")
-    @Operation(summary = "锁定/解锁")
+    @Operation(summary = "锁定/解锁客户")
     @PreAuthorize("@ss.hasPermission('crm:customer:update')")
     public CommonResult<Boolean> lockCustomer(@Valid @RequestBody CrmCustomerUpdateReqVO updateReqVO) {
         customerService.lockCustomer(updateReqVO);

@@ -87,7 +87,7 @@ public interface CrmCustomerService {
     void transferCustomer(CrmCustomerTransferReqVO reqVO, Long userId);
 
     /**
-     * 锁定客户 解锁客户
+     * 锁定/解锁客户
      *
      * @param updateReqVO 更新信息
      */

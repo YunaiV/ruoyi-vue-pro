@@ -146,6 +146,9 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     public void lockCustomer(CrmCustomerUpdateReqVO updateReqVO) {
         // 校验存在
         validateCustomerExists(updateReqVO.getId());
+        // TODO @Joey：可以校验下，如果已经对应的锁定状态，报个业务异常；原因是：后续这个业务会记录操作日志，会记录多了；
+        // TODO @芋艿：业务完善，增加锁定上限；
+
         // 更新
         CrmCustomerDO updateObj = CrmCustomerConvert.INSTANCE.convert(updateReqVO);
         customerMapper.updateById(updateObj);
