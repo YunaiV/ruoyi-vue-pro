@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.promotion.service.diy;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.diy.vo.template.DiyTemplateCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.diy.vo.template.DiyTemplatePageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.diy.vo.template.DiyTemplatePropertyUpdateRequestVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.diy.vo.template.DiyTemplateUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.diy.DiyTemplateDO;
 
@@ -59,5 +60,12 @@ public interface DiyTemplateService {
      * @param id 编号
      */
     void useDiyTemplate(Long id);
+
+    /**
+     * 更新装修模板属性
+     *
+     * @param updateReqVO 更新信息
+     */
+    void updateDiyTemplateProperty(DiyTemplatePropertyUpdateRequestVO updateReqVO);
 
 }

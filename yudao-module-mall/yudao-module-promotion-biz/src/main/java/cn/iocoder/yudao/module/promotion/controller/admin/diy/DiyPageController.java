@@ -2,10 +2,7 @@ package cn.iocoder.yudao.module.promotion.controller.admin.diy;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.promotion.controller.admin.diy.vo.page.DiyPageCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.diy.vo.page.DiyPagePageReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.diy.vo.page.DiyPageRespVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.diy.vo.page.DiyPageUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.diy.vo.page.*;
 import cn.iocoder.yudao.module.promotion.convert.diy.DiyPageConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.diy.DiyPageDO;
 import cn.iocoder.yudao.module.promotion.service.diy.DiyPageService;
@@ -80,6 +77,23 @@ public class DiyPageController {
     public CommonResult<PageResult<DiyPageRespVO>> getDiyPagePage(@Valid DiyPagePageReqVO pageVO) {
         PageResult<DiyPageDO> pageResult = diyPageService.getDiyPagePage(pageVO);
         return success(DiyPageConvert.INSTANCE.convertPage(pageResult));
+    }
+
+    @GetMapping("/get-property")
+    @Operation(summary = "获得装修页面属性")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('promotion:diy-page:query')")
+    public CommonResult<DiyPagePropertyRespVO> getDiyPageProperty(@RequestParam("id") Long id) {
+        DiyPageDO diyPage = diyPageService.getDiyPage(id);
+        return success(DiyPageConvert.INSTANCE.convertPropertyVo(diyPage));
+    }
+
+    @PutMapping("/update-property")
+    @Operation(summary = "更新装修页面属性")
+    @PreAuthorize("@ss.hasPermission('promotion:diy-page:update')")
+    public CommonResult<Boolean> updateDiyPageProperty(@Valid @RequestBody DiyPagePropertyUpdateRequestVO updateReqVO) {
+        diyPageService.updateDiyPageProperty(updateReqVO);
+        return success(true);
     }
 
 }

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.promotion.service.diy;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.diy.vo.page.DiyPageCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.diy.vo.page.DiyPagePageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.diy.vo.page.DiyPagePropertyUpdateRequestVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.diy.vo.page.DiyPageUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.diy.DiyPageDO;
 
@@ -62,5 +63,20 @@ public interface DiyPageService {
      * @return 装修页面分页
      */
     PageResult<DiyPageDO> getDiyPagePage(DiyPagePageReqVO pageReqVO);
+
+    /**
+     * 更新装修页面属性
+     *
+     * @param updateReqVO 更新信息
+     */
+    void updateDiyPageProperty(DiyPagePropertyUpdateRequestVO updateReqVO);
+
+    /**
+     * 获得模板所属的页面列表
+     *
+     * @param templateId 模板编号
+     * @return 装修页面列表
+     */
+    List<DiyPageDO> getDiyPageByTemplateId(Long templateId);
 
 }
