@@ -327,6 +327,9 @@ export default {
         nickname: [
           { required: true, message: "用户昵称不能为空", trigger: "blur" }
         ],
+        deptId: [
+          { required: true, message: "归属部门必选择", trigger: "blur" }
+        ],
         password: [
           { required: true, message: "用户密码不能为空", trigger: "blur" }
         ],
@@ -479,6 +482,8 @@ export default {
       // 打开表单，并设置初始化
       this.open = true;
       this.title = "添加用户";
+      // 为部门增加默认值
+      this.form.deptId = this.queryParams.deptId;
       this.form.password = this.initPassword;
     },
     /** 修改按钮操作 */
