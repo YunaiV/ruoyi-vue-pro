@@ -20,15 +20,19 @@ public class CrmReceivableBaseVO {
     @Schema(description = "回款编号",requiredMode = Schema.RequiredMode.REQUIRED, example = "31177")
     private String no;
 
+    // TODO @liuhongfeng：回款计划编号
     @Schema(description = "回款计划", example = "31177")
     private Long planId;
 
+    // TODO @liuhongfeng：客户编号
     @Schema(description = "客户名称", example = "4963")
     private Long customerId;
 
+    // TODO @liuhongfeng：客户编号
     @Schema(description = "合同名称", example = "30305")
     private Long contractId;
 
+    // TODO @liuhongfeng：这个字段，应该不是前端传递的噢，而是后端自己生成的
     @Schema(description = "审批状态", example = "1")
     @InEnum(AuditStatusEnum.class)
     private Integer checkStatus;
@@ -40,9 +44,10 @@ public class CrmReceivableBaseVO {
     @Schema(description = "回款方式", example = "2")
     private String returnType;
 
-    @Schema(description = "回款金额", example = "31859")
+    @Schema(description = "回款金额，单位：分", example = "31859")
     private Integer price;
 
+    // TODO @liuhongfeng：负责人编号
     @Schema(description = "负责人", example = "22202")
     private Long ownerUserId;
 
@@ -55,6 +60,7 @@ public class CrmReceivableBaseVO {
     @Schema(description = "备注", example = "备注")
     private String remark;
 
+    // TODO @liuhongfeng：这个字段，这个字段，应该不是前端传递的噢，而是后端自己生成的，所以不适合放在 base 里面；
     @Schema(description = "完成状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     private Integer status;
 

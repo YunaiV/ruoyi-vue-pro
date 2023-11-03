@@ -17,6 +17,8 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class CrmReceivablePageReqVO extends PageParam {
 
+    // TODO @liuhongfeng：可以根据需求，去除掉一些不要的过滤条件；另外，planId、customerId、contractId、ownerUserId 注释不正确，应该都是对应的编号
+
     @Schema(description = "回款编号")
     private String no;
 

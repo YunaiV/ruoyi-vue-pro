@@ -20,6 +20,7 @@ public class CrmReceivablePlanBaseVO {
     @Schema(description = "期数", example = "1")
     private Integer period;
 
+    // TODO @liuhongfeng：回款计划编号
     @Schema(description = "回款计划", example = "19852")
     private Long receivableId;
 
@@ -44,12 +45,15 @@ public class CrmReceivablePlanBaseVO {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime remindTime;
 
+    // TODO @liuhongfeng：客户编号
     @Schema(description = "客户名称", example = "18026")
     private Long customerId;
 
+    // TODO @liuhongfeng：合同编号
     @Schema(description = "合同名称", example = "3473")
     private Long contractId;
 
+    // TODO @liuhongfeng：负责人编号
     @Schema(description = "负责人", example = "17828")
     private Long ownerUserId;
 

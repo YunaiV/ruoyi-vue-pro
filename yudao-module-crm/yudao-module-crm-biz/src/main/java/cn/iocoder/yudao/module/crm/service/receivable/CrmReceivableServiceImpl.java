@@ -37,6 +37,7 @@ import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 @Validated
 public class CrmReceivableServiceImpl implements CrmReceivableService {
 
+    // TODO @liuhongfeng：crm 前缀，变量可以不带哈；
     @Resource
     private CrmReceivableMapper crmReceivableMapper;
     @Resource
@@ -46,10 +47,12 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
     @Resource
     private CrmReceivablePlanService crmReceivablePlanService;
 
+    // TODO @liuhongfeng：创建还款后，是不是什么时候，要更新 plan？
     @Override
     public Long createReceivable(CrmReceivableCreateReqVO createReqVO) {
         // 插入
         CrmReceivableDO receivable = CrmReceivableConvert.INSTANCE.convert(createReqVO);
+        // TODO @liuhongfeng：这里的括号要注意排版；
         if (ObjectUtil.isNull(receivable.getStatus())){
             receivable.setStatus(CommonStatusEnum.ENABLE.getStatus());
         }
@@ -57,16 +60,17 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
             receivable.setCheckStatus(AuditStatusEnum.AUDIT_NEW.getValue());
         }
 
-        //校验
+        // TODO @liuhongfeng：一般来说，逻辑的写法，是要先检查，后操作 db；所以，你这个 check 应该放到  CrmReceivableDO receivable 之前；
+        // 校验
         checkReceivable(receivable);
 
         crmReceivableMapper.insert(receivable);
-        // 返回
         return receivable.getId();
     }
 
+    // TODO @liuhongfeng：这里的括号要注意排版；
     private void checkReceivable(CrmReceivableDO receivable) {
-
+        // TODO @liuhongfeng：这个放在参数校验合适
         if(ObjectUtil.isNull(receivable.getContractId())){
             throw exception(CONTRACT_NOT_EXISTS);
         }

@@ -32,24 +32,28 @@ public class CrmReceivableDO extends BaseDO {
      * 回款编号
      */
     private String no;
+    // TODO @liuhongfeng：“对应实体”，参考别的模块，关联 {@link TableField.MetaInfo#getJdbcType()}
     /**
      * 回款计划
+     *
+     * TODO @liuhongfeng：这个字段什么时候更新，也可以写下
      *
      * 对应实体 {@link CrmReceivablePlanDO}
      */
     private Long planId;
     /**
-     * 客户ID
+     * 客户 ID
      *
      * 对应实体 {@link cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO}
      */
     private Long customerId;
     /**
-     * 合同ID
+     * 合同 ID
      *
      * 对应实体 {@link cn.iocoder.yudao.module.crm.dal.dataobject.contract.ContractDO}
      */
     private Long contractId;
+    // TODO @liuhongfeng：“对应字典”，参考别的模块，枚举 {@link XXXX}；另外，这个字段就叫 status，整体状态，不只审批
     /**
      * 审批状态
      * 对应字典 {@link cn.iocoder.yudao.module.crm.enums.DictTypeConstants#CRM_RECEIVABLE_CHECK_STATUS}
@@ -65,6 +69,7 @@ public class CrmReceivableDO extends BaseDO {
      * 回款日期
      */
     private LocalDateTime returnTime;
+    // TODO @liuhongfeng：少个枚举
     /**
      * 回款方式
      */
@@ -73,10 +78,12 @@ public class CrmReceivableDO extends BaseDO {
      * 回款金额
      */
     private Integer price;
+    // TODO @liuhongfeng：少关联实体；
     /**
      * 负责人
      */
     private Long ownerUserId;
+    // TODO @liuhongfeng：应该不需要 batchId 字段
     /**
      * 批次
      */

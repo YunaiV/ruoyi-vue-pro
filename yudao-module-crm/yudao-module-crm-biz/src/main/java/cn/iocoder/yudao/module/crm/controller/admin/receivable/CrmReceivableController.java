@@ -30,6 +30,7 @@ import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.E
 @Validated
 public class CrmReceivableController {
 
+    // TODO @liuhongfeng：crmReceivableService 可以使用 receivableService ；在自己模块里，相对简洁一点；
     @Resource
     private CrmReceivableService crmReceivableService;
 

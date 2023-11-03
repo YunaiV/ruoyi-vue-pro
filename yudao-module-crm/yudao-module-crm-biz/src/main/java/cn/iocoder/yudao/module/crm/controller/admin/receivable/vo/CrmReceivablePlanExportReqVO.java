@@ -1,13 +1,14 @@
 package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo;
 
-import lombok.*;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+// TODO liuhongfeng：导出可以等其它功能做完，统一在搞；
 @Schema(description = "管理后台 - CRM 回款计划 Excel 导出 Request VO，参数和 CrmReceivablePlanPageReqVO 是一致的")
 @Data
 public class CrmReceivablePlanExportReqVO {

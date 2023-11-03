@@ -1,20 +1,14 @@
 package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo;
 
+import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
+import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
-import lombok.*;
+import com.alibaba.excel.annotation.ExcelProperty;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
-import com.alibaba.excel.annotation.ExcelProperty;
-import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
-import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
-
-
-/**
- * CRM 回款管理 Excel VO
- *
- * @author 赤焰
- */
+// TODO liuhongfeng：导出可以等其它功能做完，统一在搞；
 @Data
 public class CrmReceivableExcelVO {
 

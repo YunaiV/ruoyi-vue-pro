@@ -8,9 +8,7 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-/**
- * @author 赤焰
- */
+// TODO liuhongfeng：导出可以等其它功能做完，统一在搞；
 @Schema(description = "管理后台 - CRM 回款 Excel 导出 Request VO，参数和 CrmReceivablePageReqVO 是一致的")
 @Data
 public class CrmReceivableExportReqVO {
