@@ -138,4 +138,13 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
                 CrmCustomerConvert.INSTANCE.convert(reqVO, userId).setCrmType(CrmEnum.CRM_CUSTOMER.getType()));
     }
 
+    @Override
+    public void lockCustomer(CrmCustomerUpdateReqVO updateReqVO) {
+        // 校验存在
+        validateCustomerExists(updateReqVO.getId());
+        // 更新
+        CrmCustomerDO updateObj = CrmCustomerConvert.INSTANCE.convert(updateReqVO);
+        customerMapper.updateById(updateObj);
+    }
+
 }
