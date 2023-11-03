@@ -97,9 +97,21 @@ public class CrmCustomerDO extends BaseDO {
      */
     private String remark;
     /**
+     * 负责人的用户编号
+     */
+    private Long ownerUserId;
+    /**
+     * 只读权限的用户编号数组
+     */
+    private String roUserIds;
+    /**
+     * 读写权限的用户编号数组
+     */
+    private String rwUserIds;
+    /**
      * 地区编号
      */
-    private Long areaId;
+    private Integer areaId;
     /**
      * 详细地址
      */

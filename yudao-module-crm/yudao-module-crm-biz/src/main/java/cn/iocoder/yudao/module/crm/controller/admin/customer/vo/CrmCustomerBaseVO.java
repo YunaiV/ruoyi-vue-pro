@@ -68,7 +68,7 @@ public class CrmCustomerBaseVO {
     private String remark;
 
     @Schema(description = "地区编号", example = "20158")
-    private Long areaId;
+    private Integer areaId;
 
     @Schema(description = "详细地址", example = "北京市海淀区")
     private String detailAddress;

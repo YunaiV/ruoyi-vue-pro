@@ -18,5 +18,14 @@ public class CrmCustomerPageReqVO extends PageParam {
     @Schema(description = "手机", example = "18000000000")
     private String mobile;
 
+    @Schema(description = "所属行业", example = "1")
+    private Integer industryId;
+
+    @Schema(description = "客户等级", example = "1")
+    private Integer level;
+
+    @Schema(description = "客户来源", example = "1")
+    private Integer source;
+
     // TODO @芋艿：场景；
 }

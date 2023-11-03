@@ -47,14 +47,6 @@ public interface CrmCustomerService {
     CrmCustomerDO getCustomer(Long id);
 
     /**
-     * 获得客户列表
-     *
-     * @param ids 编号
-     * @return 客户列表
-     */
-    List<CrmCustomerDO> getCustomerList(Collection<Long> ids);
-
-    /**
      * 获得客户分页
      *
      * @param pageReqVO 分页查询

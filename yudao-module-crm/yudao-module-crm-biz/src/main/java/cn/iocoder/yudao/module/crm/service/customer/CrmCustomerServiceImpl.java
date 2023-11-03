@@ -37,8 +37,6 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     @Resource
     private CrmCustomerMapper customerMapper;
     @Resource
-    private DeptApi deptApi; // TODO @wanwan：拼接数据，可以放到 controller；所以这里的引入，可以考虑放到 controller 哈；
-    @Resource
     private CrmPermissionService crmPermissionService;
 
     @Override
@@ -94,14 +92,6 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     }
 
     @Override
-    public List<CrmCustomerDO> getCustomerList(Collection<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return ListUtil.empty();
-        }
-        return customerMapper.selectBatchIds(ids);
-    }
-
-    @Override
     public PageResult<CrmCustomerDO> getCustomerPage(CrmCustomerPageReqVO pageReqVO) {
         // TODO 芋艿：数据权限，是否可以查询到；
         return customerMapper.selectPage(pageReqVO);
@@ -111,8 +101,6 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     public List<CrmCustomerDO> getCustomerList(CrmCustomerExportReqVO exportReqVO) {
         return customerMapper.selectList(exportReqVO);
     }
-
-    // TODO wanwan：service 接口已经注释，实现类就不需要了。
 
     /**
      * 校验客户是否存在

@@ -19,13 +19,12 @@ public enum CrmCustomerLevelEnum implements IntArrayValuable {
     GENERAL(2, "B（普通客户）"),
     LOW_PRIORITY(3, "C（非优先客户）");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CrmCustomerLevelEnum::getStatus).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CrmCustomerLevelEnum::getLevel).toArray();
 
-    // TODO @wanwan：这里的 status 字段，可以考虑改成 level
     /**
      * 状态
      */
-    private final Integer status;
+    private final Integer level;
     /**
      * 状态名
      */
