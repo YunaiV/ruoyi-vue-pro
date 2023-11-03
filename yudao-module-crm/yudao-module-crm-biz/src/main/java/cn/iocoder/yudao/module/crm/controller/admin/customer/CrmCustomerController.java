@@ -95,4 +95,12 @@ public class CrmCustomerController {
         return success(true);
     }
 
+    @PutMapping("/lock")
+    @Operation(summary = "锁定/解锁")
+    @PreAuthorize("@ss.hasPermission('crm:customer:update')")
+    public CommonResult<Boolean> lockCustomer(@Valid @RequestBody CrmCustomerUpdateReqVO updateReqVO) {
+        customerService.lockCustomer(updateReqVO);
+        return success(true);
+    }
+
 }

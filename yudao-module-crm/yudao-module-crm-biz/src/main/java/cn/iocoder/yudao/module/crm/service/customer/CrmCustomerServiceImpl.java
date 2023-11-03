@@ -142,4 +142,13 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         // 3. TODO 记录转移日志
     }
 
+    @Override
+    public void lockCustomer(CrmCustomerUpdateReqVO updateReqVO) {
+        // 校验存在
+        validateCustomerExists(updateReqVO.getId());
+        // 更新
+        CrmCustomerDO updateObj = CrmCustomerConvert.INSTANCE.convert(updateReqVO);
+        customerMapper.updateById(updateObj);
+    }
+
 }
