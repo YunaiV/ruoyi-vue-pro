@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.pay.service.transfer;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferRespDTO;
@@ -10,6 +11,7 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferUnifie
 import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferStatusRespEnum;
 import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.transfer.vo.PayTransferCreateReqVO;
+import cn.iocoder.yudao.module.pay.controller.admin.transfer.vo.PayTransferPageReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.transfer.PayTransferDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.transfer.PayTransferMapper;
@@ -113,6 +115,11 @@ public class PayTransferServiceImpl implements PayTransferService {
     @Override
     public PayTransferDO getTransfer(Long id) {
         return transferMapper.selectById(id);
+    }
+
+    @Override
+    public PageResult<PayTransferDO> getTransferPage(PayTransferPageReqVO pageReqVO) {
+        return transferMapper.selectPage(pageReqVO);
     }
 
     @Transactional(rollbackFor = Exception.class)

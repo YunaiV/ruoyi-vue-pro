@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.pay.service.transfer;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.transfer.vo.PayTransferCreateReqVO;
+import cn.iocoder.yudao.module.pay.controller.admin.transfer.vo.PayTransferPageReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.transfer.PayTransferDO;
 
 import javax.validation.Valid;
@@ -37,5 +39,13 @@ public interface PayTransferService {
      * @param id 转账单编号
      */
     PayTransferDO getTransfer(Long id);
+
+    /**
+     * 获得转账单分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 转账单分页
+     */
+    PageResult<PayTransferDO> getTransferPage(PayTransferPageReqVO pageReqVO);
 
 }
