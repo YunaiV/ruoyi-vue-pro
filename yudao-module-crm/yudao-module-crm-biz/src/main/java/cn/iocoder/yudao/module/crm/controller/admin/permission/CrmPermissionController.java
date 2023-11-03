@@ -48,9 +48,11 @@ public class CrmPermissionController {
     @Resource
     private List<CrmPermissionValidateService> permissionValidateServices;
 
+    // TODO @puhui999：这个能不能使用 CrmPermission 注解替代？
     private void validatePermission(Integer bizType, Long bizId) {
         // 1. TODO 校验是否为超级管理员
         // 2. 防御一手，如果是超级管理员不校验权限还是得校验一下数据是否存在
+        // TODO @puhui999：是不是不用校验每个业务方的数据是否存在；其实不是很关键哈；简单一点~ 说白了，负责人只要在，它的数据就是存在~
         permissionValidateServices.forEach(item -> {
             if (!item.validateBizIdExists(bizType, bizId)) {
                 throw exception(CRM_PERMISSION_MODEL_NOT_EXISTS, getNameByType(bizType));
@@ -90,9 +92,11 @@ public class CrmPermissionController {
         return success(true);
     }
 
+    // TODO @puhui999：deletemapping
     @GetMapping("/delete")
     @Operation(summary = "移除团队成员")
     @Parameter(name = "id", description = "团队成员编号", required = true)
+    // TODO @puhui999：是不是 id 参数就够了？
     @PreAuthorize("@ss.hasPermission('crm:permission:delete')")
     public CommonResult<Boolean> deletePermission(@RequestParam("bizType") Integer bizType,
                                                   @RequestParam("bizId") Long bizId,
@@ -105,6 +109,8 @@ public class CrmPermissionController {
         return success(true);
     }
 
+    // TODO @puhui999：这个是哪个地方使用到哈？
+    // TODO @puhui999：是不是 deletemapping 呀；
     @GetMapping("/quit")
     @Operation(summary = "退出团队")
     @Parameters({
@@ -114,9 +120,10 @@ public class CrmPermissionController {
     @PreAuthorize("@ss.hasPermission('crm:permission:delete')")
     public CommonResult<Boolean> quitPermission(@RequestParam("bizType") Integer bizType,
                                                 @RequestParam("bizId") Long bizId) {
+        // 没有就不是团队成员
         CrmPermissionDO permission = crmPermissionService.getPermissionByBizTypeAndBizIdAndUserId(
                 bizType, bizId, getLoginUserId());
-        if (permission == null) { // 没有就不是团队成员
+        if (permission == null) {
             return success(false);
         }
         crmPermissionService.deletePermission(permission.getId());
@@ -136,6 +143,7 @@ public class CrmPermissionController {
         if (CollUtil.isEmpty(permission)) {
             return success(Collections.emptyList());
         }
+        // TODO @puhui999：池子的逻辑；
         permission.removeIf(item -> ObjUtil.equal(item.getUserId(), CrmPermissionDO.POOL_USER_ID)); // 排除
 
         // 拼接数据

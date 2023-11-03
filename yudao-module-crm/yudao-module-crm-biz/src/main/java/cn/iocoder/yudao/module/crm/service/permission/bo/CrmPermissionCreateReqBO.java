@@ -27,16 +27,15 @@ public class CrmPermissionCreateReqBO {
     @NotNull(message = "Crm 类型不能为空")
     @InEnum(CrmBizTypeEnum.class)
     private Integer bizType;
-
     /**
      * 数据编号
      */
     @NotNull(message = "Crm 数据编号不能为空")
     private Long bizId;
 
+    // TODO @puhui999：简化成 level
     /**
      * 权限级别
-     * 关联 {@link CrmPermissionLevelEnum}
      */
     @NotNull(message = "权限级别不能为空")
     @InEnum(CrmPermissionLevelEnum.class)

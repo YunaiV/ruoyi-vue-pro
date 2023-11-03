@@ -33,6 +33,7 @@ public enum CrmBizTypeEnum implements IntArrayValuable {
     private final String name;
 
     public static String getNameByType(Integer type) {
+        // TODO @puhui999：可以 findone，更简洁；另外，不存在返回 null 即可啦；
         for (CrmBizTypeEnum crmBizTypeEnum : CrmBizTypeEnum.values()) {
             if (ObjUtil.equal(crmBizTypeEnum.type, type)) {
                 return crmBizTypeEnum.name;

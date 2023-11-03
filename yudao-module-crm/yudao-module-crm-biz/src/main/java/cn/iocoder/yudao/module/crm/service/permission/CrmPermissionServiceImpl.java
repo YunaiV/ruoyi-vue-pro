@@ -55,6 +55,7 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePermission(CrmPermissionUpdateReqBO updateBO) {
+        // TODO @puhui999：这里 1.1 1.2；下面 2.；这样更有序一点；
         // 1. 校验用户是否存在
         adminUserApi.validateUserList(Collections.singletonList(updateBO.getUserId()));
         // 2. 校验存在
@@ -91,7 +92,6 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
         }
     }
 
-
     @Override
     public void transferPermission(CrmTransferPermissionReqBO transferReqBO) {
         // 1. 校验数据权限-是否是负责人，只有负责人才可以转移
@@ -103,6 +103,7 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
             throw exception(CRM_PERMISSION_DENIED, crmName);
         }
 
+        // TODO @puhui999：这个顺序编号，看看调整下；2. 后面是 2.1 ，结果没 2.2 有点怪；
         // 2. 校验转移对象是否已经是该负责人
         if (ObjUtil.equal(transferReqBO.getNewOwnerUserId(), oldPermission.getUserId())) {
             throw exception(CRM_PERMISSION_MODEL_TRANSFER_FAIL_OWNER_USER_EXISTS, crmName);

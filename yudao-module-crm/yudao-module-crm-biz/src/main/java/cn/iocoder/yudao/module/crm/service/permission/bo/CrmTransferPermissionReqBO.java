@@ -7,6 +7,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 
+// TODO @puhui999：CrmPermissionTransferReqBO
 /**
  * 数据权限转移 Request BO
  *
@@ -27,7 +28,6 @@ public class CrmTransferPermissionReqBO {
     @NotNull(message = "Crm 类型不能为空")
     @InEnum(CrmBizTypeEnum.class)
     private Integer bizType;
-
     /**
      * 数据编号
      */
@@ -40,6 +40,7 @@ public class CrmTransferPermissionReqBO {
     @NotNull(message = "新负责人的用户编号不能为空")
     private Long newOwnerUserId;
 
+    // TODO @puhui999：joinTeam 可以合并成 permissionLevel 里；oldOwnerPermissionLevel；这样 null 说明移除，因为都换负责人啦；
     /**
      * 老负责人是否加入团队，是/否
      */

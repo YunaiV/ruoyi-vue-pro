@@ -21,6 +21,7 @@ public class CrmCustomerTransferReqVO {
     @Schema(description = "新负责人的用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
     private Long newOwnerUserId;
 
+    // TODO @puhui999：joinTeam 可以合并成 permissionLevel 里；oldOwnerPermissionLevel；这样 null 说明移除，因为都换负责人啦；
     /**
      * 老负责人是否加入团队，是/否
      */

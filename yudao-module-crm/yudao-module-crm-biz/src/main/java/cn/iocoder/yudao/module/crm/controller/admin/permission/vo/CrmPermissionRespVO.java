@@ -12,9 +12,11 @@ public class CrmPermissionRespVO extends CrmPermissionBaseVO {
     @Schema(description = "数据权限编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "13563")
     private Long id;
 
+    // TODO @puhui999：搞到字典里；
     @Schema(description = "团队级别", requiredMode = Schema.RequiredMode.REQUIRED, example = "负责人")
     private String permissionLevelName;
 
+    // TODO @puhui999：deptId、postIds 是不是要提供中文名哈；
     @Schema(description = "部门编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long deptId;
 

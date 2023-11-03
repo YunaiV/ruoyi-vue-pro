@@ -19,6 +19,7 @@ public enum CrmPermissionLevelEnum implements IntArrayValuable {
     OWNER(1, "负责人"),
     READ(2, "读"),
     WRITE(3, "写");
+
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CrmPermissionLevelEnum::getLevel).toArray();
 
     /**
@@ -48,6 +49,7 @@ public enum CrmPermissionLevelEnum implements IntArrayValuable {
     }
 
     public static String getNameByLevel(Integer level) {
+        // TODO @puhui999：可以 findone，更简洁；另外，不存在返回 null 即可啦；
         for (CrmPermissionLevelEnum levelEnum : CrmPermissionLevelEnum.values()) {
             if (ObjUtil.equal(levelEnum.level, level)) {
                 return levelEnum.name;

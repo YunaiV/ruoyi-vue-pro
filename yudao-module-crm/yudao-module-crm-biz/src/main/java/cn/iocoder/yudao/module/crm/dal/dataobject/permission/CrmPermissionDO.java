@@ -23,6 +23,7 @@ import lombok.*;
 @AllArgsConstructor
 public class CrmPermissionDO extends BaseDO {
 
+    // TODO puhui999：是不是公海的数据，就不插入了；
     /**
      * 当数据变为公海数据时，也就是数据团队成员中没有负责人的时候，将原本的负责人 userId 设置为 POOL_USER_ID 方便查询公海数据。
      * 也就是说每条数据到最后都有一个负责人，如果有人领取则 userId 为领取人
@@ -34,22 +35,35 @@ public class CrmPermissionDO extends BaseDO {
      */
     @TableId
     private Long id;
+
     /**
-     * 数据类型，关联 {@link CrmBizTypeEnum}
+     * 数据类型
+     *
+     * 枚举 {@link CrmBizTypeEnum}
      */
     private Integer bizType;
     /**
-     * 数据编号，关联 {@link CrmBizTypeEnum} 对应模块 DO#getId()
+     * 数据编号
+     *
+     * 关联 {@link CrmBizTypeEnum} 对应模块 DO 的 id 字段
      */
     private Long bizId;
+
     /**
-     * 团队成员，关联 AdminUser#id
+     * 团队成员
+     *
+     * 关联 AdminUser 的 id 字段
+     *
      * 如果为公海数据的话会干掉此数据的负责人后设置为 {@link #POOL_USER_ID}，领取人则上位负责人
      * 例：客户放入公海后会干掉团队成员中的负责人，而其他团队成员则不受影响
      */
     private Long userId;
+
+    // TODO @puhui999：是不是搞成 level 字段；简洁一点，主要表明已经 perssmion 实体里了；
     /**
-     * 权限级别，关联 {@link CrmPermissionLevelEnum}
+     * 权限级别
+     *
+     * 关联 {@link CrmPermissionLevelEnum}
      */
     private Integer permissionLevel;
 

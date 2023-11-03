@@ -18,6 +18,7 @@ import java.util.List;
 @Mapper
 public interface CrmPermissionMapper extends BaseMapperX<CrmPermissionDO> {
 
+    // TODO @puhui999：是不是不用谢这个注释；因为方法名，可以自解释；
     /**
      * 获取用户数据权限通过 数据类型 x 某个数据 x 用户编号
      *
@@ -33,6 +34,7 @@ public interface CrmPermissionMapper extends BaseMapperX<CrmPermissionDO> {
                 .eq(CrmPermissionDO::getUserId, userId));
     }
 
+    // TODO @puhui999：是不是不用谢这个注释；因为方法名，可以自解释；
     /**
      * 获取数据权限列表通过 数据类型 x 某个数据
      *

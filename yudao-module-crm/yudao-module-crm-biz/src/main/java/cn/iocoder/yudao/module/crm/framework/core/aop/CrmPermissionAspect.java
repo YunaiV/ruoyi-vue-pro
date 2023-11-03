@@ -43,6 +43,7 @@ public class CrmPermissionAspect {
         return WebFrameworkUtils.getLoginUserId();
     }
 
+    // TODO @puhui999：id，通过 spring el 表达式获取；
     private Long getBizId(JoinPoint joinPoint, CrmPermission crmPermission) throws NoSuchFieldException, IllegalAccessException {
         Object[] args = joinPoint.getArgs();
         for (Object arg : args) {
@@ -61,6 +62,7 @@ public class CrmPermissionAspect {
         return null;
     }
 
+    // TODO @puhui999：一般核心的方法，放到最前面，private 放后面。主要是，主次要分出来哈；
     @Before("@annotation(crmPermission)")
     public void doBefore(JoinPoint joinPoint, CrmPermission crmPermission) {
         try {
@@ -75,12 +77,17 @@ public class CrmPermissionAspect {
 
             // 1. 获取数据权限
             List<CrmPermissionDO> bizPermissions = crmPermissionService.getPermissionByBizTypeAndBizId(bizType, bizId);
+            // TODO puhui999：这种情况下，最好是 CrmPermissionLevelEnum.isOwner
+            // 2.1 情况一：如果自己是负责人，则默认有所有权限
+            // TODO @puhui999：会不会存在空指针的问题？
             CrmPermissionDO userPermission = CollUtil.findOne(bizPermissions, item -> ObjUtil.equal(item.getUserId(), getUserId()));
-            if (isOwner(userPermission.getPermissionLevel())) { // 校验自己是否是负责人
+            if (isOwner(userPermission.getPermissionLevel())) {
                 return;
             }
-            if (isRead(permissionLevel)) { // 读权限
+            // 2.2 情况二：校验自己是否有读权限
+            if (isRead(permissionLevel)) {
                 // 如果没有数据权限或没有负责人则表示此记录为公海数据所有人都有只读权限可以领取成为负责人（团队成员领取的）
+                // TODO @puhui999：89 到 92 这块的逻辑，感觉可以不用 @CrmPermission，公海那自己 check 即可；
                 if (CollUtil.isEmpty(bizPermissions) || CollUtil.anyMatch(bizPermissions,
                         item -> ObjUtil.equal(item.getUserId(), CrmPermissionDO.POOL_USER_ID))) { // 详见 CrmPermissionDO.POOL_USER_ID 注释
                     return;
@@ -88,20 +95,23 @@ public class CrmPermissionAspect {
                 if (isRead(userPermission.getPermissionLevel())) { // 校验当前用户是否有读权限
                     return;
                 }
-                //如果查询数据的话拥有写权限的也能查询
+                // 如果查询数据的话拥有写权限的也能查询
                 if (isWrite(userPermission.getPermissionLevel())) { // 校验当前用户是否有写权限
                     return;
                 }
             }
-            if (isWrite(permissionLevel)) { // 写权限
+            // 2.3 情况三：校验自己是否有写权限
+            if (isWrite(permissionLevel)) {
                 if (isWrite(userPermission.getPermissionLevel())) { // 校验当前用户是否有写权限
                     return;
                 }
             }
 
-            // 2. 没通过结束，报错 {}操作失败，原因：没有权限
+            // 3. 没通过结束，报错 {} 操作失败，原因：没有权限
+            // TODO @puhui999：这里打个 info 日志，方便后续排查问题、审计；
             throw exception(CRM_PERMISSION_DENIED, crmPermission.bizType().getName());
         } catch (Exception ex) {
+            // TODO @puhui999：不用 catch 掉，就是系统异常；
             log.error("[doBefore][crmPermission({}) 数据校验错误]", toJsonString(crmPermission), ex);
             // TODO 报错抛个什么异常好呢
             throw exception(CRM_PERMISSION_DENIED, crmPermission.bizType().getName());

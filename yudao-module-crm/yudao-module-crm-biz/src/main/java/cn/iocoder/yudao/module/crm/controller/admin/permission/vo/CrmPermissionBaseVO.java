@@ -30,6 +30,7 @@ public class CrmPermissionBaseVO {
     @NotNull(message = "Crm 类型数据编号不能为空")
     private Long bizId;
 
+    // TODO @puhui999：level；
     @Schema(description = "权限级别", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @InEnum(CrmPermissionLevelEnum.class)
     @NotNull(message = "权限级别不能为空")
