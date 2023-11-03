@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-  import {columns, searchFormSchema} from './'
-  import {useI18n} from '@/hooks/web/useI18n'
-  import {useMessage} from '@/hooks/web/useMessage'
-  import {useModal} from '@/components/Modal'
-  import {useTable} from '@/components/Table'
-  import { delete${ simpleClassName }, export${ simpleClassName }, get${ simpleClassName } Page } from '@/api/${table.moduleName}/${classNameVar}'
+import ${simpleClassName}Modal from './${simpleClassName}Modal.vue'
+import { columns, searchFormSchema } from './${classNameVar}.data'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useMessage } from '@/hooks/web/useMessage'
+import { useModal } from '@/components/Modal'
+import { useTable } from '@/components/Table'
+import { delete${simpleClassName}, export${simpleClassName}, get${simpleClassName}Page } from '@/api/${table.moduleName}/${classNameVar}'
 
 defineOptions({ name: '${table.className}' })
 
@@ -14,7 +15,7 @@ const [registerModal, { openModal }] = useModal()
 
 const [registerTable, { getForm, reload }] = useTable({
   title: '${table.classComment}列表',
-  api: get${ simpleClassName }Page,
+  api: get${simpleClassName}Page,
     columns,
     formConfig: { labelWidth: 120, schemas: searchFormSchema },
     useSearchForm: true,
@@ -41,14 +42,14 @@ async function handleExport() {
     iconType: 'warning',
     content: t('common.exportMessage'),
     async onOk() {
-      await export${ simpleClassName } (getForm().getFieldsValue())
+      await export${simpleClassName}(getForm().getFieldsValue())
       createMessage.success(t('common.exportSuccessText'))
     },
   })
 }
 
 async function handleDelete(record: Recordable) {
-  await delete${ simpleClassName } (record.id)
+  await delete${simpleClassName}(record.id)
   createMessage.success(t('common.delSuccessText'))
   reload()
 }

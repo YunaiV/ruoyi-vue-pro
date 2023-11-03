@@ -4,7 +4,7 @@ Content-Type: application/json
 tenant-id: {{appTenentId}}
 
 {
-  "mobile": "15601691300",
+  "mobile": "15601691388",
   "password": "admin123"
 }
 
@@ -14,7 +14,7 @@ Content-Type: application/json
 tenant-id: {{appTenentId}}
 
 {
-  "mobile": "15601691399",
+  "mobile": "15601691388",
   "scene": 1
 }
 
@@ -22,9 +22,10 @@ tenant-id: {{appTenentId}}
 POST {{appApi}}/member/auth/sms-login
 Content-Type: application/json
 tenant-id: {{appTenentId}}
+terminal: 30
 
 {
-  "mobile": "15601691301",
+  "mobile": "15601691388",
   "code": 9999
 }
 

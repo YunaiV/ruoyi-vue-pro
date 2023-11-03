@@ -27,9 +27,11 @@
         <mybatis-plus.version>3.5.4</mybatis-plus.version>
         <mybatis-plus-generator.version>3.5.4</mybatis-plus-generator.version>
         <dynamic-datasource.version>3.6.1</dynamic-datasource.version>
-        <mybatis-plus-join.version>1.4.6</mybatis-plus-join.version>
+        <mybatis-plus-join.version>1.4.7</mybatis-plus-join.version>
         <redisson.version>3.18.0</redisson.version>
         <dm8.jdbc.version>8.1.3.62</dm8.jdbc.version>
+        <!-- 消息队列 -->
+        <rocketmq-spring.version>2.2.3</rocketmq-spring.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.5</lock4j.version>
         <resilience4j.version>1.7.1</resilience4j.version>
@@ -94,11 +96,6 @@
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-operatelog</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.iocoder.boot</groupId>
-                <artifactId>yudao-spring-boot-starter-biz-trade</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
@@ -258,6 +255,12 @@
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-mq</artifactId>
                 <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.rocketmq</groupId>
+                <artifactId>rocketmq-spring-boot-starter</artifactId>
+                <version>${rocketmq-spring.version}</version>
             </dependency>
 
             <!-- 服务保障相关 -->
