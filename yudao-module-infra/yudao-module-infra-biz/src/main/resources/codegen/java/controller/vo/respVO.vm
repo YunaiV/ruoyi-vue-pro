@@ -1,0 +1,25 @@
+package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
+#foreach ($column in $columns)
+#if (${column.javaType} == "LocalDateTime")
+import java.time.LocalDateTime;
+#break
+#end
+#end
+
+@Schema(description = "${sceneEnum.name} - ${table.classComment} Response VO")
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class ${sceneEnum.prefixClass}${table.className}RespVO extends ${sceneEnum.prefixClass}${table.className}BaseVO {
+
+#foreach ($column in $columns)
+#if (${column.listOperationResult} && (!${column.createOperation} || !${column.updateOperation}))##不是通用字段
+    @Schema(description = "${column.columnComment}"#if (!${column.nullable}), requiredMode = Schema.RequiredMode.REQUIRED#end#if ("$!column.example" != ""), example = "${column.example}"#end)
+    private ${column.javaType} ${column.javaField};
+
+#end
+#end
+}

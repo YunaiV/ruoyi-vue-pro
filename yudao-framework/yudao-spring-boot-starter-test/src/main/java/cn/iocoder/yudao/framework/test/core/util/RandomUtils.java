@@ -1,14 +1,22 @@
 package cn.iocoder.yudao.framework.test.core.util;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
+import uk.co.jemos.podam.common.AttributeStrategy;
 
+import javax.validation.constraints.Email;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -22,7 +30,6 @@ public class RandomUtils {
 
     private static final int RANDOM_STRING_LENGTH = 10;
 
-    private static final Set<String> TINYINT_FIELDS = SetUtils.asSet("type", "category");
     private static final int TINYINT_MAX = 127;
 
     private static final int RANDOM_DATE_MAX = 30;
@@ -38,19 +45,23 @@ public class RandomUtils {
         // Integer
         PODAM_FACTORY.getStrategy().addOrReplaceTypeManufacturer(Integer.class, (dataProviderStrategy, attributeMetadata, map) -> {
             // 如果是 status 的字段，返回 0 或 1
-            if (attributeMetadata.getAttributeName().equals("status")) {
+            if ("status".equals(attributeMetadata.getAttributeName())) {
                 return RandomUtil.randomEle(CommonStatusEnum.values()).getStatus();
             }
-            // 针对部分字段，使用 tinyint 范围
-            if (TINYINT_FIELDS.contains(attributeMetadata.getAttributeName())) {
-                return RandomUtil.randomInt(1, TINYINT_MAX + 1);
+            // 如果是 type、status 结尾的字段，返回 tinyint 范围
+            if (StrUtil.endWithAnyIgnoreCase(attributeMetadata.getAttributeName(),
+                    "type", "status", "category", "scope", "result")) {
+                return RandomUtil.randomInt(0, TINYINT_MAX + 1);
             }
             return RandomUtil.randomInt();
         });
+        // LocalDateTime
+        PODAM_FACTORY.getStrategy().addOrReplaceTypeManufacturer(LocalDateTime.class,
+                (dataProviderStrategy, attributeMetadata, map) -> randomLocalDateTime());
         // Boolean
         PODAM_FACTORY.getStrategy().addOrReplaceTypeManufacturer(Boolean.class, (dataProviderStrategy, attributeMetadata, map) -> {
             // 如果是 deleted 的字段，返回非删除
-            if (attributeMetadata.getAttributeName().equals("deleted")) {
+            if ("deleted".equals(attributeMetadata.getAttributeName())) {
                 return false;
             }
             return RandomUtil.randomBoolean();
@@ -73,6 +84,11 @@ public class RandomUtils {
         return RandomUtil.randomDay(0, RANDOM_DATE_MAX);
     }
 
+    public static LocalDateTime randomLocalDateTime() {
+        // 设置 Nano 为零的原因，避免 MySQL、H2 存储不到时间戳
+        return LocalDateTimeUtil.of(randomDate()).withNano(0);
+    }
+
     public static Short randomShort() {
         return (short) RandomUtil.randomInt(0, Short.MAX_VALUE);
     }
@@ -84,6 +100,14 @@ public class RandomUtils {
 
     public static Integer randomCommonStatus() {
         return RandomUtil.randomEle(CommonStatusEnum.values()).getStatus();
+    }
+
+    public static String randomEmail() {
+        return randomString() + "@qq.com";
+    }
+
+    public static String randomURL() {
+        return "https://www.iocoder.cn/" + randomString();
     }
 
     @SafeVarargs

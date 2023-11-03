@@ -2,12 +2,16 @@
   <div class="navbar">
     <hamburger id="hamburger-container" :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
 
-    <breadcrumb id="breadcrumb-container" class="breadcrumb-container" />
+    <breadcrumb id="breadcrumb-container" class="breadcrumb-container" v-if="!topNav"/>
+    <top-nav id="topmenu-container" class="topmenu-container" v-if="topNav"/>
 
     <div class="right-menu">
       <template v-if="device!=='mobile'">
         <search id="header-search" class="right-menu-item" />
-        
+
+        <!-- 站内信 -->
+        <notify-message class="right-menu-item hover-effect" />
+
         <el-tooltip content="源码地址" effect="dark" placement="bottom">
           <ruo-yi-git id="ruoyi-git" class="right-menu-item hover-effect" />
         </el-tooltip>
@@ -27,6 +31,7 @@
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
           <img :src="avatar" class="user-avatar">
+          <span v-if="nickname" class="user-nickname">{{ nickname }}</span>
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown">
@@ -48,27 +53,33 @@
 <script>
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
+import TopNav from '@/components/TopNav'
 import Hamburger from '@/components/Hamburger'
 import Screenfull from '@/components/Screenfull'
 import SizeSelect from '@/components/SizeSelect'
 import Search from '@/components/HeaderSearch'
 import RuoYiGit from '@/components/RuoYi/Git'
 import RuoYiDoc from '@/components/RuoYi/Doc'
+import NotifyMessage from '@/layout/components/Message'
+import {getPath} from "@/utils/ruoyi";
 
 export default {
   components: {
     Breadcrumb,
+    TopNav,
     Hamburger,
     Screenfull,
     SizeSelect,
     Search,
     RuoYiGit,
-    RuoYiDoc
+    RuoYiDoc,
+    NotifyMessage
   },
   computed: {
     ...mapGetters([
       'sidebar',
       'avatar',
+      'nickname',
       'device'
     ]),
     setting: {
@@ -81,6 +92,11 @@ export default {
           value: val
         })
       }
+    },
+    topNav: {
+      get() {
+        return this.$store.state.settings.topNav
+      }
     }
   },
   methods: {
@@ -88,15 +104,11 @@ export default {
       this.$store.dispatch('app/toggleSideBar')
     },
     async logout() {
-      this.$confirm('确定注销并退出系统吗？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
+      this.$modal.confirm('确定注销并退出系统吗？', '提示').then(() => {
         this.$store.dispatch('LogOut').then(() => {
-          location.href = '/index';
+          location.href = getPath('/index');
         })
-      })
+      }).catch(() => {});
     }
   }
 }
@@ -125,6 +137,11 @@ export default {
 
   .breadcrumb-container {
     float: left;
+  }
+
+  .topmenu-container {
+    position: absolute;
+    left: 50px;
   }
 
   .errLog-container {
@@ -163,14 +180,20 @@ export default {
       margin-right: 30px;
 
       .avatar-wrapper {
-        margin-top: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         position: relative;
 
         .user-avatar {
           cursor: pointer;
-          width: 40px;
-          height: 40px;
-          border-radius: 10px;
+          width: 35px;
+          height: 35px;
+          border-radius: 50%;
+        }
+        .user-nickname{
+          margin-left: 5px;
+          font-size: 14px;
         }
 
         .el-icon-caret-bottom {

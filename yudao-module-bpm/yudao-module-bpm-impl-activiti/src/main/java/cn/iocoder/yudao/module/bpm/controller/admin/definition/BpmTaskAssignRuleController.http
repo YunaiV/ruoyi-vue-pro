@@ -1,4 +1,0 @@
-### 请求 /bpm/task-assign-rule/list 接口 => 成功
-GET {{baseUrl}}/bpm/task-assign-rule/list?processDefinitionId=leave:9:59689ba0-7284-11ec-965c-a2380e71991a
-tenant-id: 1
-Authorization: Bearer {{token}}

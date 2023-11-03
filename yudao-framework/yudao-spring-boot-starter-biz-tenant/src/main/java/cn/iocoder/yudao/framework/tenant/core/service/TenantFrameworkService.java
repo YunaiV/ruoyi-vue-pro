@@ -16,4 +16,11 @@ public interface TenantFrameworkService {
      */
     List<Long> getTenantIds();
 
+    /**
+     * 校验租户是否合法
+     *
+     * @param id 租户编号
+     */
+    void validTenant(Long id);
+
 }

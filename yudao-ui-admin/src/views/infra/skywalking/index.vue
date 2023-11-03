@@ -1,26 +1,30 @@
 <template>
-  <div v-loading="loading" :style="'height:'+ height">
-    <iframe :src="src" frameborder="no" style="width: 100%;height: 100%" scrolling="auto" />
+  <div>
+    <doc-alert title="服务监控" url="https://doc.iocoder.cn/server-monitor/" />
+    <i-frame v-if="!loading" :src="url" />
   </div>
 </template>
 <script>
+import iFrame from "@/components/iFrame/index";
+import { getConfigKey } from "@/api/infra/config";
 export default {
-  name: "SkyWalking",
+  name: "InfraSkyWalking",
+  components: { iFrame },
   data() {
     return {
-      src: "http://skywalking.shop.iocoder.cn/trace", // TODO 芋艿，后续改成配置读取
-      height: document.documentElement.clientHeight - 94.5 + "px;",
+      url: "http://skywalking.shop.iocoder.cn",
       loading: true
     };
   },
-  mounted: function() {
-    setTimeout(() => {
+  created() {
+    getConfigKey("url.skywalking").then(response => {
+      if (!response.data || response.data.length === 0) {
+        return
+      }
+      this.url = response.data;
+    }).finally(() => {
       this.loading = false;
-    }, 230);
-    const that = this;
-    window.onresize = function temp() {
-      that.height = document.documentElement.clientHeight - 94.5 + "px;";
-    };
+    })
   }
 };
 </script>

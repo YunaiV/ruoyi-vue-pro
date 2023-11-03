@@ -1,13 +1,11 @@
 package cn.iocoder.yudao.module.system.enums.social;
 
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * 社交平台的类型枚举
@@ -20,41 +18,44 @@ public enum SocialTypeEnum implements IntArrayValuable {
 
     /**
      * Gitee
-     * 文档链接：https://gitee.com/api/v5/oauth_doc#/
+     *
+     * @see <a href="https://gitee.com/api/v5/oauth_doc#/">接入文档</a>
      */
     GITEE(10, "GITEE"),
     /**
      * 钉钉
-     * 文档链接：https://developers.dingtalk.com/document/app/obtain-identity-credentials
+     *
+     * @see <a href="https://developers.dingtalk.com/document/app/obtain-identity-credentials">接入文档</a>
      */
     DINGTALK(20, "DINGTALK"),
 
     /**
      * 企业微信
-     * 文档链接：https://xkcoding.com/2019/08/06/use-justauth-integration-wechat-enterprise.html
+     *
+     * @see <a href="https://xkcoding.com/2019/08/06/use-justauth-integration-wechat-enterprise.html">接入文档</a>
      */
     WECHAT_ENTERPRISE(30, "WECHAT_ENTERPRISE"),
     /**
      * 微信公众平台 - 移动端 H5
-     * 文档链接：https://www.cnblogs.com/juewuzhe/p/11905461.html
+     *
+     * @see <a href="https://www.cnblogs.com/juewuzhe/p/11905461.html">接入文档</a>
      */
     WECHAT_MP(31, "WECHAT_MP"),
     /**
      * 微信开放平台 - 网站应用 PC 端扫码授权登录
-     * 文档链接：https://justauth.wiki/guide/oauth/wechat_open/#_2-申请开发者资质认证
+     *
+     * @see <a href="https://justauth.wiki/guide/oauth/wechat_open/#_2-申请开发者资质认证">接入文档</a>
      */
     WECHAT_OPEN(32, "WECHAT_OPEN"),
     /**
      * 微信小程序
-     * 文档链接：https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/login.html
+     *
+     * @see <a href="https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/login.html">接入文档</a>
      */
-    WECHAT_MINI_PROGRAM(33, "WECHAT_MINI_PROGRAM"),
+    WECHAT_MINI_APP(34, "WECHAT_MINI_APP"),
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(SocialTypeEnum::getType).toArray();
-
-    public static final List<Integer> WECHAT_ALL = ListUtil.toList(WECHAT_ENTERPRISE.type, WECHAT_MP.type, WECHAT_OPEN.type,
-            WECHAT_MINI_PROGRAM.type);
 
     /**
      * 类型
@@ -72,13 +73,6 @@ public enum SocialTypeEnum implements IntArrayValuable {
 
     public static SocialTypeEnum valueOfType(Integer type) {
         return ArrayUtil.firstMatch(o -> o.getType().equals(type), values());
-    }
-
-    public static List<Integer> getRelationTypes(Integer type) {
-        if (WECHAT_ALL.contains(type)) {
-            return WECHAT_ALL;
-        }
-        return ListUtil.toList(type);
     }
 
 }

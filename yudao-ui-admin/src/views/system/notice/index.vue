@@ -1,26 +1,24 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="公告标题" prop="title">
-        <el-input v-model="queryParams.title" placeholder="请输入公告标题" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.title" placeholder="请输入公告标题" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="操作人员" prop="createBy">
-        <el-input v-model="queryParams.createBy" placeholder="请输入操作人员" clearable size="small" @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="类型" prop="type">
-        <el-select v-model="queryParams.type" placeholder="公告类型" clearable size="small">
-          <el-option v-for="dict in noticeTypeDictDatas" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
+      <el-form-item label="公告状态" prop="status">
+        <el-select v-model="queryParams.status" placeholder="公告状态" clearable>
+          <el-option v-for="dict in statusDictDatas" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd" v-hasPermi="['system:notice:create']"s>新增</el-button>
+        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
+                   v-hasPermi="['system:notice:create']"s>新增</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -28,16 +26,24 @@
     <el-table v-loading="loading" :data="noticeList">
       <el-table-column label="序号" align="center" prop="id" width="100" />
       <el-table-column label="公告标题" align="center" prop="title" :show-overflow-tooltip="true"/>
-      <el-table-column label="公告类型" align="center" prop="type" :formatter="typeFormat" width="100"/>
-      <el-table-column label="状态" align="center" prop="status" :formatter="statusFormat" width="100"/>
+      <el-table-column label="公告类型" align="center" prop="type" width="100">
+        <template v-slot="scope">
+          <dict-tag :type="DICT_TYPE.SYSTEM_NOTICE_TYPE" :value="scope.row.type"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="状态" align="center" prop="status" width="100">
+        <template v-slot="scope">
+          <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
+        </template>
+      </el-table-column>
       <el-table-column label="创建者" align="center" prop="createBy" width="100" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="100">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['system:notice:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
@@ -101,10 +107,10 @@ import { listNotice, getNotice, delNotice, addNotice, updateNotice } from "@/api
 import Editor from '@/components/Editor';
 
 import {CommonStatusEnum} from '@/utils/constants'
-import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
+import { getDictDatas, DICT_TYPE } from '@/utils/dict'
 
 export default {
-  name: "Notice",
+  name: "SystemNotice",
   components: {
     Editor
   },
@@ -127,7 +133,6 @@ export default {
         pageNo: 1,
         pageSize: 10,
         title: undefined,
-        createBy: undefined,
         status: undefined
       },
       // 表单参数
@@ -161,14 +166,6 @@ export default {
         this.total = response.data.total;
         this.loading = false;
       });
-    },
-    // 公告状态字典翻译
-    statusFormat(row, column) {
-      return getDictDataLabel(DICT_TYPE.COMMON_STATUS, row.status)
-    },
-    // 公告状态字典翻译
-    typeFormat(row, column) {
-      return getDictDataLabel(DICT_TYPE.SYSTEM_NOTICE_TYPE, row.type)
     },
     // 取消按钮
     cancel() {
@@ -218,13 +215,13 @@ export default {
         if (valid) {
           if (this.form.id !== undefined) {
             updateNotice(this.form).then(response => {
-              this.msgSuccess("修改成功");
+              this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
             addNotice(this.form).then(response => {
-              this.msgSuccess("新增成功");
+              this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
             });
@@ -235,16 +232,12 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids
-      this.$confirm('是否确认删除公告编号为"' + ids + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('是否确认删除公告编号为"' + ids + '"的数据项?').then(function() {
           return delNotice(ids);
         }).then(() => {
           this.getList();
-          this.msgSuccess("删除成功");
-        })
+          this.$modal.msgSuccess("删除成功");
+      }).catch(() => {});
     }
   }
 };

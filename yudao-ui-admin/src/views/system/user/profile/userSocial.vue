@@ -1,13 +1,13 @@
 <template>
   <el-table :data="socialUsers" :show-header="false">
     <el-table-column label="社交平台" align="left" width="120">
-      <template slot-scope="scope">
+      <template v-slot="scope">
         <img style="height:20px;vertical-align: middle;" :src="scope.row.img" /> {{ scope.row.title }}
       </template>
     </el-table-column>
     <el-table-column label="操作" align="left" >
-      <template slot-scope="scope">
-        <div v-if="scope.row.unionId">
+      <template v-slot="scope">
+        <div v-if="scope.row.openid">
           已绑定
           <el-button size="large" type="text" @click="unbind(scope.row)">(解绑)</el-button>
         </div>
@@ -23,7 +23,8 @@
 <script>
 
 import {SystemUserSocialTypeEnum} from "@/utils/constants";
-import {socialAuthRedirect, socialBind, socialUnbind} from "@/api/login";
+import {socialAuthRedirect} from "@/api/login";
+import {socialBind, socialUnbind} from "@/api/system/socialUser";
 
 export default {
   props: {
@@ -50,7 +51,7 @@ export default {
         if (this.user.socialUsers) {
           for (const j in this.user.socialUsers) {
             if (socialUser.type === this.user.socialUsers[j].type) {
-              socialUser.unionId = this.user.socialUsers[j].unionId;
+              socialUser.openid = this.user.socialUsers[j].openid;
               break;
             }
           }
@@ -68,7 +69,7 @@ export default {
       return;
     }
     socialBind(type, code, state).then(resp => {
-      this.msgSuccess("绑定成功");
+      this.$modal.msgSuccess("绑定成功");
       this.$router.replace('/user/profile');
       // 调用父组件, 刷新
       this.getUser();
@@ -86,14 +87,13 @@ export default {
       });
     },
     unbind(socialUser) {
-      socialUnbind(socialUser.type, socialUser.unionId).then(resp => {
-        this.msgSuccess("解绑成功");
-        socialUser.unionId = undefined;
+      socialUnbind(socialUser.type, socialUser.openid).then(resp => {
+        this.$modal.msgSuccess("解绑成功");
+        socialUser.openid = undefined;
       });
     },
     close() {
-      this.$store.dispatch("tagsView/delView", this.$route);
-      this.$router.push({ path: "/index" });
+      this.$tab.closePage();
     }
   }
 };

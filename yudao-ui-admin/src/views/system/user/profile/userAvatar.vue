@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="user-info-head" @click="editCropper()"><img v-bind:src="options.img" title="点击上传头像" class="img-circle img-lg" /></div>
-    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body @opened="modalOpened">
+    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body @opened="modalOpened" @close="closeDialog()">
       <el-row>
         <el-col :xs="24" :md="12" :style="{height: '350px'}">
           <vue-cropper
@@ -109,8 +109,8 @@ export default {
     },
     // 上传预处理
     beforeUpload(file) {
-      if (file.type.indexOf("image/") == -1) {
-        this.msgError("文件格式错误，请上传图片类型,如：JPG，PNG后缀的文件。");
+      if (file.type.indexOf("image/") === -1) {
+        this.$modal.msgError("文件格式错误，请上传图片类型,如：JPG，PNG后缀的文件。");
       } else {
         const reader = new FileReader();
         reader.readAsDataURL(file);
@@ -128,7 +128,7 @@ export default {
           this.open = false;
           // this.options.img = process.env.VUE_APP_BASE_API + response.imgUrl;
           store.commit('SET_AVATAR', resp.data);
-          this.msgSuccess("修改成功");
+          this.$modal.msgSuccess("修改成功");
           this.visible = false;
         });
       });
@@ -136,6 +136,10 @@ export default {
     // 实时预览
     realTime(data) {
       this.previews = data;
+    },
+    // 取消截图，关闭对话框
+    closeDialog() {
+      this.options.img = store.getters.avatar
     }
   }
 };

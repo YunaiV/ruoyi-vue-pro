@@ -1,10 +1,11 @@
 <template>
   <div class="app-container">
+    <doc-alert title="工作流" url="https://doc.iocoder.cn/bpm" />
 
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="表单名" prop="name">
-        <el-input v-model="queryParams.name" placeholder="请输入表单名" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.name" placeholder="请输入表单名" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -26,18 +27,18 @@
       <el-table-column label="编号" align="center" prop="id" />
       <el-table-column label="表单名" align="center" prop="name" />
       <el-table-column label="开启状态" align="center" prop="status">
-        <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.COMMON_STATUS, scope.row.status) }}</span>
+        <template v-slot="scope">
+          <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
         </template>
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleDetail(scope.row)"
                      v-hasPermi="['bpm:form:query']">详情</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
@@ -66,7 +67,7 @@ import Parser from '@/components/parser/Parser'
 import {decodeFields} from "@/utils/formGenerator";
 
 export default {
-  name: "Form",
+  name: "BpmForm",
   components: {
     Parser
   },
@@ -100,10 +101,8 @@ export default {
     /** 查询列表 */
     getList() {
       this.loading = true;
-      // 处理查询参数
-      let params = {...this.queryParams};
       // 执行查询
-      getFormPage(params).then(response => {
+      getFormPage(this.queryParams).then(response => {
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;
@@ -135,13 +134,13 @@ export default {
     /** 新增按钮操作 */
     handleAdd() {
       this.$router.push({
-        path:"/bpm/manager/form/edit"
+        name: "BpmFormEditor"
       });
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.$router.push({
-        path:"/bpm/manager/form/edit",
+        name: "BpmFormEditor",
         query:{
           formId: row.id
         }
@@ -150,16 +149,12 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const id = row.id;
-      this.$confirm('是否确认删除工作流的编号为"' + id + '"的数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
+      this.$modal.confirm('是否确认删除工作表单的编号为"' + id + '"的数据项?').then(function() {
         return deleteForm(id);
       }).then(() => {
         this.getList();
-        this.msgSuccess("删除成功");
-      })
+        this.$modal.msgSuccess("删除成功");
+      }).catch(() => {});
     }
   }
 };

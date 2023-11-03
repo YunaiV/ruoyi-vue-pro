@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "crypto-js": "^4.0.0"
+  }
+}

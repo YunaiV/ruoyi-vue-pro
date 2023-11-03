@@ -5,7 +5,7 @@
       <div slot="header" class="clearfix">
         <span class="el-icon-picture-outline">审批任务【{{ item.name }}】</span>
       </div>
-      <el-col :span="16" :offset="6" >
+      <el-col :span="16" :offset="6">
         <el-form :ref="'form' + index" :model="auditForms[index]" :rules="auditRule" label-width="100px">
           <el-form-item label="流程名" v-if="processInstance && processInstance.name">
             {{ processInstance.name }}
@@ -14,16 +14,21 @@
             {{ processInstance.startUser.nickname }}
             <el-tag type="info" size="mini">{{ processInstance.startUser.deptName }}</el-tag>
           </el-form-item>
-          <el-form-item label="审批建议" prop="comment">
-            <el-input type="textarea" v-model="auditForms[index].comment" placeholder="请输入审批建议" />
+          <el-form-item label="审批建议" prop="reason">
+            <el-input type="textarea" v-model="auditForms[index].reason" placeholder="请输入审批建议"/>
           </el-form-item>
         </el-form>
         <div style="margin-left: 10%; margin-bottom: 20px; font-size: 14px;">
-          <el-button  icon="el-icon-edit-outline" type="success" size="mini" @click="handleAudit(item, true)">通过</el-button>
-          <el-button  icon="el-icon-circle-close" type="danger" size="mini" @click="handleAudit(item, false)">不通过</el-button>
-          <el-button  icon="el-icon-edit-outline" type="primary" size="mini" @click="handleUpdateAssignee(item)">转办</el-button>
-          <el-button icon="el-icon-edit-outline" type="primary" size="mini" @click="handleDelegate(item)">委派</el-button>
-          <el-button icon="el-icon-refresh-left" type="warning" size="mini" @click="handleBack(item)">退回</el-button>
+          <el-button icon="el-icon-edit-outline" type="success" size="mini" @click="handleAudit(item, true)">通过
+          </el-button>
+          <el-button icon="el-icon-circle-close" type="danger" size="mini" @click="handleAudit(item, false)">不通过
+          </el-button>
+          <el-button icon="el-icon-edit-outline" type="primary" size="mini" @click="handleUpdateAssignee(item)">转办
+          </el-button>
+          <el-button icon="el-icon-edit-outline" type="primary" size="mini" @click="handleDelegate(item)">委派
+          </el-button>
+          <el-button icon="el-icon-refresh-left" type="warning" size="mini" @click="handleBackList(item)">退回
+          </el-button>
         </div>
       </el-col>
     </el-card>
@@ -34,22 +39,21 @@
       </div>
       <el-col v-if="this.processInstance.processDefinition && this.processInstance.processDefinition.formType === 10"
               :span="16" :offset="6">
-        <div >
-          <parser :key="new Date().getTime()" :form-conf="detailForm" @submit="submitForm" />
+        <div>
+          <parser :key="new Date().getTime()" :form-conf="detailForm"/>
         </div>
       </el-col>
       <div v-if="this.processInstance.processDefinition && this.processInstance.processDefinition.formType === 20">
-        <router-link :to="this.processInstance.processDefinition.formCustomViewPath + '?id='
-                          + this.processInstance.businessKey">
-          <el-button type="primary">点击查看</el-button>
-        </router-link>
+        <async-biz-form-component :id="this.processInstance.businessKey"></async-biz-form-component>
       </div>
     </el-card>
+
+    <!-- 审批记录 -->
     <el-card class="box-card" v-loading="tasksLoad">
       <div slot="header" class="clearfix">
         <span class="el-icon-picture-outline">审批记录</span>
       </div>
-      <el-col :span="16" :offset="4" >
+      <el-col :span="16" :offset="4">
         <div class="block">
           <el-timeline>
             <el-timeline-item v-for="(item, index) in tasks" :key="index"
@@ -60,14 +64,17 @@
                   审批人：{{ item.assigneeUser.nickname }}
                   <el-tag type="info" size="mini">{{ item.assigneeUser.deptName }}</el-tag>
                 </label>
-                <label style="font-weight: normal">创建时间：</label>
+                <label style="font-weight: normal" v-if="item.createTime">创建时间：</label>
                 <label style="color:#8a909c; font-weight: normal">{{ parseTime(item.createTime) }}</label>
                 <label v-if="item.endTime" style="margin-left: 30px;font-weight: normal">审批时间：</label>
-                <label v-if="item.endTime" style="color:#8a909c;font-weight: normal"> {{ parseTime(item.endTime) }}</label>
+                <label v-if="item.endTime" style="color:#8a909c;font-weight: normal"> {{
+                    parseTime(item.endTime)
+                  }}</label>
                 <label v-if="item.durationInMillis" style="margin-left: 30px;font-weight: normal">耗时：</label>
-                <label v-if="item.durationInMillis" style="color:#8a909c;font-weight: normal"> {{ getDateStar(item.durationInMillis) }} </label>
-                <p v-if="item.comment">
-                  <el-tag :type="getTimelineItemType(item)">{{ item.comment }}</el-tag>
+                <label v-if="item.durationInMillis" style="color:#8a909c;font-weight: normal">
+                  {{ getDateStar(item.durationInMillis) }} </label>
+                <p v-if="item.reason">
+                  <el-tag :type="getTimelineItemType(item)">{{ item.reason }}</el-tag>
                 </p>
               </el-card>
             </el-timeline-item>
@@ -82,15 +89,16 @@
         <span class="el-icon-picture-outline">流程图</span>
       </div>
       <my-process-viewer key="designer" v-model="bpmnXML" v-bind="bpmnControlForm" :activityData="activityList"
-            :processInstanceData="processInstance" :taskData="tasks" />
+                         :processInstanceData="processInstance" :taskData="tasks"/>
     </el-card>
 
-    <!-- 对话框(转派审批人) -->
-    <el-dialog title="转派审批人" :visible.sync="updateAssignee.open" width="500px" append-to-body>
+    <!-- 对话框(转办审批人) -->
+    <el-dialog title="转办审批人" :visible.sync="updateAssignee.open" width="500px" append-to-body>
       <el-form ref="updateAssigneeForm" :model="updateAssignee.form" :rules="updateAssignee.rules" label-width="110px">
         <el-form-item label="新审批人" prop="assigneeUserId">
           <el-select v-model="updateAssignee.form.assigneeUserId" clearable style="width: 100%">
-            <el-option v-for="item in userOptions" :key="parseInt(item.id)" :label="item.nickname" :value="parseInt(item.id)" />
+            <el-option v-for="item in userOptions" :key="parseInt(item.id)" :label="item.nickname"
+                       :value="parseInt(item.id)"/>
           </el-select>
         </el-form-item>
       </el-form>
@@ -99,20 +107,68 @@
         <el-button @click="cancelUpdateAssigneeForm">取 消</el-button>
       </div>
     </el-dialog>
+    <!-- 对话框(委派审批人) -->
+    <el-dialog title="委派审批人" :visible.sync="updateDelegate.open" width="500px" append-to-body>
+      <el-form ref="updateDelegateForm" :model="updateDelegate.form" :rules="updateDelegate.rules" label-width="110px">
+        <el-form-item label="新审批人" prop="assigneeUserId">
+          <el-select v-model="updateDelegate.form.delegateUserId" clearable style="width: 100%">
+            <el-option v-for="item in userOptions" :key="parseInt(item.id)" :label="item.nickname"
+                       :value="parseInt(item.id)"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="委派理由" prop="reason">
+          <el-input v-model="updateDelegate.form.reason" clearable placeholder="请输入委派理由"/>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitUpdateDelegateForm">确 定</el-button>
+        <el-button @click="cancelUpdateDelegateForm">取 消</el-button>
+      </div>
+    </el-dialog>
+    <!--退回流程-->
+    <el-dialog title="退回流程" :visible.sync="returnOpen" width="40%" append-to-body>
+      <el-form ref="formRef" v-loading="formLoading" :model="formData" :rules="formRules" label-width="110px">
+        <el-form-item label="退回节点" prop="targetDefinitionKey">
+          <el-select v-model="formData.targetDefinitionKey" clearable style="width: 100%">
+            <el-option
+              v-for="item in returnList"
+              :key="item.definitionKey"
+              :label="item.name"
+              :value="item.definitionKey"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="回退理由" prop="reason">
+          <el-input v-model="formData.reason" clearable placeholder="请输入回退理由"/>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="returnOpen = false">取 消</el-button>
+        <el-button :disabled="formLoading" type="primary" @click="submitReturn">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import {getProcessDefinitionBpmnXML} from "@/api/bpm/definition";
-import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 import store from "@/store";
 import {decodeFields} from "@/utils/formGenerator";
 import Parser from '@/components/parser/Parser'
-import {createProcessInstance, getProcessInstance} from "@/api/bpm/processInstance";
-import {approveTask, getTaskListByProcessInstanceId, rejectTask, updateTaskAssignee} from "@/api/bpm/task";
+import {getProcessInstance} from "@/api/bpm/processInstance";
+import {
+  approveTask,
+  delegateTask,
+  getReturnList,
+  getTaskListByProcessInstanceId,
+  rejectTask,
+  returnTask,
+  updateTaskAssignee,
+} from "@/api/bpm/task";
 import {getDate} from "@/utils/dateUtils";
 import {listSimpleUsers} from "@/api/system/user";
 import {getActivityList} from "@/api/bpm/activity";
+import Vue from "vue";
 
 // 流程实例的详情页，可用于审批
 export default {
@@ -127,16 +183,27 @@ export default {
       // 流程实例
       id: undefined, // 流程实例的编号
       processInstance: {},
-
+      formLoading: false,
       // 流程表单详情
       detailForm: {
         fields: []
       },
-
+      //回退列表数据
+      returnList: [],
+      formData: {
+        id: '',
+        targetDefinitionKey: undefined,
+        reason: ''
+      },
+      formRules: {
+        targetDefinitionKey: [{required: true, message: '必须选择回退节点', trigger: 'change'}],
+        reason: [{required: true, message: '回退理由不能为空', trigger: 'blur'}]
+      },
+      returnOpen: false,
       // BPMN 数据
       bpmnXML: null,
       bpmnControlForm: {
-        prefix: "activiti"
+        prefix: "flowable"
       },
       activityList: [],
 
@@ -148,9 +215,8 @@ export default {
       runningTasks: [],
       auditForms: [],
       auditRule: {
-        comment: [{ required: true, message: "审批建议不能为空", trigger: "blur" }],
+        reason: [{required: true, message: "审批建议不能为空", trigger: "blur"}],
       },
-
       // 转派审批人
       userOptions: [],
       updateAssignee: {
@@ -159,12 +225,20 @@ export default {
           assigneeUserId: undefined,
         },
         rules: {
-          assigneeUserId: [{ required: true, message: "新审批人不能为空", trigger: "change" }],
+          assigneeUserId: [{required: true, message: "新审批人不能为空", trigger: "change"}],
         }
       },
-
-      // 数据字典
-      categoryDictDatas: getDictDatas(DICT_TYPE.BPM_MODEL_CATEGORY),
+      updateDelegate: {
+        open: false,
+        form: {
+          delegateUserId: undefined,
+          reason: ''
+        },
+        rules: {
+          delegateUserId: [{required: true, message: "新审批人不能为空", trigger: "change"}],
+          reason: [{required: true, message: '委派理由不能为空', trigger: 'blur'}]
+        }
+      }
     };
   },
   created() {
@@ -193,6 +267,12 @@ export default {
         }
         // 设置流程信息
         this.processInstance = response.data;
+
+        //将业务表单，注册为动态组件
+        const path = this.processInstance.processDefinition.formCustomViewPath;
+        Vue.component("async-biz-form-component", function (resolve) {
+          require([`@/views${path}`], resolve);
+        });
 
         // 设置表单信息
         if (this.processInstance.processDefinition.formType === 10) {
@@ -232,7 +312,13 @@ export default {
       this.auditForms = [];
       getTaskListByProcessInstanceId(this.id).then(response => {
         // 审批记录
-        this.tasks = response.data;
+        this.tasks = [];
+        // 移除已取消的审批
+        response.data.forEach(task => {
+          if (task.result !== 4) {
+            this.tasks.push(task);
+          }
+        });
         // 排序，将未完成的排在前面，已完成的排在后面；
         this.tasks.sort((a, b) => {
           // 有已完成的情况，按照完成时间倒序
@@ -251,7 +337,7 @@ export default {
         // 需要审核的记录
         const userId = store.getters.userId;
         this.tasks.forEach(task => {
-          if (task.result !== 1) { // 只有待处理才需要
+          if (task.result !== 1 && task.result !== 6) { // 只有待处理才需要
             return;
           }
           if (!task.assigneeUser || task.assigneeUser.id !== userId) { // 自己不是处理人
@@ -259,55 +345,13 @@ export default {
           }
           this.runningTasks.push({...task});
           this.auditForms.push({
-            comment: ''
+            reason: ''
           })
         });
 
         // 取消加载中
         this.tasksLoad = false;
       });
-    },
-    /** 处理选择流程的按钮操作 **/
-    handleSelect(row) {
-      // 设置选择的流程
-      this.selectProcessInstance = row;
-
-      // 流程表单
-      if (row.formId) {
-        // 设置对应的表单
-        this.detailForm = {
-          ...JSON.parse(row.formConf),
-          fields: decodeFields(row.formFields)
-        }
-      } else if (row.formCustomCreatePath) {
-        this.$router.push({ path: row.formCustomCreatePath});
-        // 这里暂时无需加载流程图，因为跳出到另外个 Tab；
-      }
-    },
-    /** 提交按钮 */
-    submitForm(params) {
-      if (!params) {
-        return;
-      }
-      // 设置表单禁用
-      const conf = params.conf;
-      conf.disabled = true; // 表单禁用
-      conf.formBtns = false; // 按钮隐藏
-
-      // 提交表单，创建流程
-      const variables = params.values;
-      createProcessInstance({
-        processDefinitionId: this.selectProcessInstance.id,
-        variables: variables
-      }).then(response => {
-        this.msgSuccess("发起流程成功");
-        // 关闭当前窗口
-        this.$store.dispatch("tagsView/delView", this.$route);
-        this.$router.go(-1);
-      }).catch(() => {
-        conf.disabled = false; // 表单开启
-        conf.formBtns = true; // 按钮展示
-      })
     },
     getDateStar(ms) {
       return getDate(ms);
@@ -325,6 +369,9 @@ export default {
       if (item.result === 4) {
         return 'el-icon-remove-outline';
       }
+      if (item.result === 5) {
+        return 'el-icon-back'
+      }
       return '';
     },
     getTimelineItemType(item) {
@@ -340,6 +387,12 @@ export default {
       if (item.result === 4) {
         return 'info';
       }
+      if (item.result === 5) {
+        return 'warning';
+      }
+      if (item.result === 6) {
+        return 'default'
+      }
       return '';
     },
     /** 处理审批通过和不通过的操作 */
@@ -351,22 +404,22 @@ export default {
         }
         const data = {
           id: task.id,
-          comment: this.auditForms[index].comment
+          reason: this.auditForms[index].reason
         }
         if (pass) {
           approveTask(data).then(response => {
-            this.msgSuccess("审批通过成功！");
+            this.$modal.msgSuccess("审批通过成功！");
             this.getDetail(); // 获得最新详情
           });
         } else {
           rejectTask(data).then(response => {
-            this.msgSuccess("审批不通过成功！");
+            this.$modal.msgSuccess("审批不通过成功！");
             this.getDetail(); // 获得最新详情
           });
         }
       });
     },
-    /** 处理转派审批人 */
+    /** 处理转办审批人 */
     handleUpdateAssignee(task) {
       // 设置表单
       this.resetUpdateAssigneeForm();
@@ -374,25 +427,25 @@ export default {
       // 设置为打开
       this.updateAssignee.open = true;
     },
-    /** 提交转派审批人 */
+    /** 提交转办审批人 */
     submitUpdateAssigneeForm() {
       this.$refs['updateAssigneeForm'].validate(valid => {
         if (!valid) {
           return;
         }
         updateTaskAssignee(this.updateAssignee.form).then(response => {
-          this.msgSuccess("转派任务成功！");
+          this.$modal.msgSuccess("转办任务成功！");
           this.updateAssignee.open = false;
           this.getDetail(); // 获得最新详情
         });
       });
     },
-    /** 取消转派审批人 */
+    /** 取消转办审批人 */
     cancelUpdateAssigneeForm() {
       this.updateAssignee.open = false;
       this.resetUpdateAssigneeForm();
     },
-    /** 重置转派审批人 */
+    /** 重置转办审批人 */
     resetUpdateAssigneeForm() {
       this.updateAssignee.form = {
         id: undefined,
@@ -400,13 +453,72 @@ export default {
       };
       this.resetForm("updateAssigneeForm");
     },
-    /** 处理审批退回的操作 */
+    /** 处理审批委派的操作 */
     handleDelegate(task) {
-      this.msgError("暂不支持【委派】功能，可以使用【转派】替代！");
+      //this.$modal.msgError("暂不支持【委派】功能，可以使用【转派】替代！");
+      this.resetUpdateDelegateForm();
+      this.updateDelegate.form.id = task.id;
+      // 设置为打开
+      this.updateDelegate.open = true;
+    },
+    /** 提交委派审批人 */
+    submitUpdateDelegateForm() {
+      this.$refs['updateDelegateForm'].validate(valid => {
+        if (!valid) {
+          return;
+        }
+        delegateTask(this.updateDelegate.form).then(response => {
+          this.$modal.msgSuccess("委派任务成功！");
+          this.updateDelegate.open = false;
+          this.getDetail(); // 获得最新详情
+        });
+      });
+    },
+    /** 取消委派审批人 */
+    cancelUpdateDelegateForm() {
+      this.updateDelegate.open = false;
+      this.resetUpdateDelegateForm();
+    },
+    /** 重置委派审批人 */
+    resetUpdateDelegateForm() {
+      this.updateDelegate.form = {
+        id: undefined,
+        delegateUserId: undefined,
+      };
+      this.resetForm("updateDelegateForm");
     },
     /** 处理审批退回的操作 */
-    handleBack(task) {
-      this.msgError("暂不支持【退回】功能！");
+    /** 返回退回节点列表 */
+    handleBackList(task) {
+      // 可参考 http://blog.wya1.com/article/636697030/details/7296
+      getReturnList(task.id).then(response => {
+        this.returnList = response.data;
+        if (this.returnList.length == 0) {
+          this.$modal.msgError("当前没有可回退的节点！");
+          return;
+        }
+        this.formData.id = task.id;
+        this.returnOpen = true;
+      });
+
+    },
+    /** 提交退回任务 */
+    submitReturn() {
+      if (!this.formData.targetDefinitionKey) {
+        this.$modal.msgError("请选择退回节点！");
+      }
+      this.$refs['formRef'].validate(valid => {
+        if (!valid) {
+          return;
+        }
+        returnTask(this.formData).then(res => {
+          if (res.data) {
+            this.$modal.msgSuccess("回退成功！");
+            this.returnOpen = false;
+            this.getDetail();
+          }
+        });
+      });
     }
   }
 };

@@ -49,14 +49,14 @@ export default function ContextPadProvider(
   }
 
   eventBus.on("create.end", 250, function(event) {
-    var context = event.context,
-      shape = context.shape;
+    const context = event.context,
+      shape = context.shape
 
     if (!hasPrimaryModifier(event) || !contextPad.isOpen(shape)) {
       return;
     }
 
-    var entries = contextPad.getEntries(shape);
+    const entries = contextPad.getEntries(shape)
 
     if (entries.replace) {
       entries.replace.action.click(event, shape);
@@ -81,7 +81,7 @@ ContextPadProvider.$inject = [
 ];
 
 ContextPadProvider.prototype.getContextPadEntries = function(element) {
-  var contextPad = this._contextPad,
+  const contextPad = this._contextPad,
     modeling = this._modeling,
     elementFactory = this._elementFactory,
     connect = this._connect,
@@ -90,15 +90,15 @@ ContextPadProvider.prototype.getContextPadEntries = function(element) {
     canvas = this._canvas,
     rules = this._rules,
     autoPlace = this._autoPlace,
-    translate = this._translate;
+    translate = this._translate
 
-  var actions = {};
+  const actions = {}
 
   if (element.type === "label") {
     return actions;
   }
 
-  var businessObject = element.businessObject;
+  const businessObject = element.businessObject
 
   function startConnect(event, element) {
     connect.start(event, element);
@@ -109,21 +109,21 @@ ContextPadProvider.prototype.getContextPadEntries = function(element) {
   }
 
   function getReplaceMenuPosition(element) {
-    var Y_OFFSET = 5;
+    const Y_OFFSET = 5
 
-    var diagramContainer = canvas.getContainer(),
-      pad = contextPad.getPad(element).html;
+    const diagramContainer = canvas.getContainer(),
+      pad = contextPad.getPad(element).html
 
-    var diagramRect = diagramContainer.getBoundingClientRect(),
-      padRect = pad.getBoundingClientRect();
+    const diagramRect = diagramContainer.getBoundingClientRect(),
+      padRect = pad.getBoundingClientRect()
 
-    var top = padRect.top - diagramRect.top;
-    var left = padRect.left - diagramRect.left;
+    const top = padRect.top - diagramRect.top
+    const left = padRect.left - diagramRect.left
 
-    var pos = {
+    const pos = {
       x: left,
       y: top + padRect.height + Y_OFFSET
-    };
+    }
 
     return pos;
   }
@@ -145,19 +145,19 @@ ContextPadProvider.prototype.getContextPadEntries = function(element) {
     }
 
     function appendStart(event, element) {
-      var shape = elementFactory.createShape(assign({ type: type }, options));
+      const shape = elementFactory.createShape(assign({ type: type }, options))
       create.start(event, shape, {
         source: element
       });
     }
 
-    var append = autoPlace
+    const append = autoPlace
       ? function(event, element) {
-          var shape = elementFactory.createShape(assign({ type: type }, options));
+        const shape = elementFactory.createShape(assign({ type: type }, options))
 
-          autoPlace.append(element, shape);
-        }
-      : appendStart;
+        autoPlace.append(element, shape)
+      }
+      : appendStart
 
     return {
       group: "model",
@@ -182,7 +182,7 @@ ContextPadProvider.prototype.getContextPadEntries = function(element) {
   }
 
   if (isAny(businessObject, ["bpmn:Lane", "bpmn:Participant"]) && isExpanded(businessObject)) {
-    var childLanes = getChildLanes(element);
+    const childLanes = getChildLanes(element)
 
     assign(actions, {
       "lane-insert-above": {
@@ -302,9 +302,9 @@ ContextPadProvider.prototype.getContextPadEntries = function(element) {
         title: translate("Change type"),
         action: {
           click: function(event, element) {
-            var position = assign(getReplaceMenuPosition(element), {
+            const position = assign(getReplaceMenuPosition(element), {
               cursor: { x: event.x, y: event.y }
-            });
+            })
 
             popupMenu.open(element, "bpmn-replace", position);
           }
@@ -350,7 +350,7 @@ ContextPadProvider.prototype.getContextPadEntries = function(element) {
   }
 
   // delete element entry, only show if allowed by rules
-  var deleteAllowed = rules.allowed("elements.delete", { elements: [element] });
+  let deleteAllowed = rules.allowed('elements.delete', { elements: [element] })
 
   if (isArray(deleteAllowed)) {
     // was the element returned as a deletion candidate?
@@ -376,10 +376,10 @@ ContextPadProvider.prototype.getContextPadEntries = function(element) {
 // helpers /////////
 
 function isEventType(eventBo, type, definition) {
-  var isType = eventBo.$instanceOf(type);
-  var isDefinition = false;
+  const isType = eventBo.$instanceOf(type)
+  let isDefinition = false
 
-  var definitions = eventBo.eventDefinitions || [];
+  const definitions = eventBo.eventDefinitions || []
   forEach(definitions, function(def) {
     if (def.$type === definition) {
       isDefinition = true;

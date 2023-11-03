@@ -1,5 +1,4 @@
 module.exports = {
-  title: '芋道管理系统',
 
   /**
    * 侧边栏主题 深色主题theme-dark，浅色主题theme-light
@@ -10,6 +9,11 @@ module.exports = {
    * 是否系统布局配置
    */
   showSettings: false,
+
+  /**
+   * 是否显示顶部导航
+   */
+  topNav: false,
 
   /**
    * 是否显示 tagsView
@@ -25,6 +29,11 @@ module.exports = {
    * 是否显示logo
    */
   sidebarLogo: true,
+
+  /**
+   * 是否显示动态标题
+   */
+  dynamicTitle: false,
 
   /**
    * @type {string | array} 'production' | ['production', 'development']

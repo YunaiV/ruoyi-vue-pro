@@ -54,8 +54,9 @@ public class LoginLogCreateReqDTO {
     private String userIp;
     /**
      * 浏览器 UserAgent
+     *
+     * 允许空，原因：Job 过期登出时，是无法传递 UserAgent 的
      */
-    @NotEmpty(message = "浏览器 UserAgent 不能为空")
     private String userAgent;
 
 }

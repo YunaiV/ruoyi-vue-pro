@@ -2,7 +2,7 @@
   <div class="app-container">
 
     <!-- 流程设计器，负责绘制流程等 -->
-    <my-process-designer :key="`designer-${reloadIndex}`" v-model="xmlString" v-bind="controlForm"
+    <my-process-designer v-if="xmlString !== undefined" :key="`designer-${reloadIndex}`" v-model="xmlString" v-bind="controlForm"
       keyboard ref="processDesigner" @init-finished="initModeler"
       @save="save"/>
 
@@ -26,11 +26,11 @@ import {createModel, getModel, updateModel} from "@/api/bpm/model";
 // import MyProcessPanel from "../package/process-panel/ProcessPanel";
 
 export default {
-  name: "App",
+  name: "BpmModelEditor",
   components: { MyProcessPalette },
   data() {
     return {
-      xmlString: "", // BPMN XML
+      xmlString: undefined, // BPMN XML
       modeler: null,
       reloadIndex: 0,
       controlDrawerVisible: false,
@@ -39,7 +39,7 @@ export default {
         simulation: true,
         labelEditing: false,
         labelVisible: false,
-        prefix: "activiti",
+        prefix: "flowable",
         headerButtonSize: "mini",
         additionalModel: [CustomContentPadProvider, CustomPaletteProvider]
       },
@@ -72,21 +72,6 @@ export default {
         console.log(modeler);
       }, 10);
     },
-    reloadProcessDesigner(deep) {
-      this.controlForm.additionalModel = [];
-      for (let key in this.addis) {
-        if (this.addis[key]) {
-          this.controlForm.additionalModel.push(this.addis[key]);
-        }
-      }
-      deep && (this.xmlString = undefined);
-      this.reloadIndex += 1;
-      this.modeler = null; // 避免 panel 异常
-      // if (deep) {
-      //   this.xmlString = undefined;
-      //   this.$refs.processDesigner.processRestart();
-      // }
-    },
     save(bpmnXml) {
       const data = {
         ...this.model,
@@ -96,7 +81,7 @@ export default {
       // 修改的提交
       if (data.id) {
         updateModel(data).then(response => {
-          this.msgSuccess("修改成功")
+          this.$modal.msgSuccess("修改成功")
           // 跳转回去
           this.close()
         })
@@ -104,15 +89,14 @@ export default {
       }
       // 添加的提交
       createModel(data).then(response => {
-        this.msgSuccess("保存成功")
+        this.$modal.msgSuccess("保存成功")
         // 跳转回去
         this.close()
       })
     },
     /** 关闭按钮 */
     close() {
-      this.$store.dispatch("tagsView/delView", this.$route);
-      this.$router.push({ path: "/bpm/manager/model", query: { t: Date.now()}})
+      this.$tab.closeOpenPage({ path: "/bpm/manager/model" });
     },
   }
 };

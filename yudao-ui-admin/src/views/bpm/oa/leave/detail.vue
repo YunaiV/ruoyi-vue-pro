@@ -1,10 +1,12 @@
 <template>
   <div class="app-container">
     <!-- 对话框(添加 / 修改) -->
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
+      <el-form ref="form" :model="form" label-width="100px">
         <el-form-item label="开始时间：" prop="startTime"> {{parseTime(form.startTime, '{y}-{m}-{d}')}} </el-form-item>
         <el-form-item label="结束时间：" prop="endTime"> {{parseTime(form.endTime, '{y}-{m}-{d}')}} </el-form-item>
-        <el-form-item label="请假类型：" prop="type">{{ typeFormat(form) }}</el-form-item>
+        <el-form-item label="请假类型：" prop="type">
+          <dict-tag :type="DICT_TYPE.BPM_OA_LEAVE_TYPE" :value="form.type"/>
+        </el-form-item>
         <el-form-item label="原因：" prop="reason"> {{ form.reason }}</el-form-item>
       </el-form>
   </div>
@@ -12,14 +14,20 @@
 
 <script>
 import { getLeave}  from "@/api/bpm/leave"
-import {getDictDatas, DICT_TYPE, getDictDataLabel} from '@/utils/dict'
+import {getDictDatas, DICT_TYPE} from '@/utils/dict'
 export default {
-  name: "LeaveDetail",
+  name: "BpmOALeaveDetail",
   components: {
+  },
+  props: {
+    id: {
+      type: [String, Number],
+      default: undefined
+    },
   },
   data() {
     return {
-      id: undefined, // 请假编号
+      leaveId: undefined, // 请假编号
       // 表单参数
       form: {
         startTime: undefined,
@@ -32,8 +40,8 @@ export default {
     };
   },
   created() {
-    this.id = this.$route.query.id;
-    if (!this.id) {
+    this.leaveId = this.id || this.$route.query.id;
+    if (!this.leaveId) {
       this.$message.error('未传递 id 参数，无法查看 OA 请假信息');
       return;
     }
@@ -42,13 +50,10 @@ export default {
   methods: {
     /** 获得请假信息 */
     getDetail() {
-      getLeave(this.id).then(response => {
+      getLeave(this.leaveId).then(response => {
         this.form = response.data;
       });
     },
-    typeFormat(row) {
-      return getDictDataLabel(DICT_TYPE.BPM_OA_LEAVE_TYPE, row.type)
-    }
   }
 };
 </script>

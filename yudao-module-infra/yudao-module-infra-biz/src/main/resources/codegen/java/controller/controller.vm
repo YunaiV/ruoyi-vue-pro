@@ -1,0 +1,111 @@
+package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName};
+
+import org.springframework.web.bind.annotation.*;
+import javax.annotation.Resource;
+import org.springframework.validation.annotation.Validated;
+#if ($sceneEnum.scene == 1)import org.springframework.security.access.prepost.PreAuthorize;#end
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Operation;
+
+import javax.validation.constraints.*;
+import javax.validation.*;
+import javax.servlet.http.*;
+import java.util.*;
+import java.io.IOException;
+
+import ${PageResultClassName};
+import ${CommonResultClassName};
+import static ${CommonResultClassName}.success;
+
+import ${ExcelUtilsClassName};
+
+import ${OperateLogClassName};
+import static ${OperateTypeEnumClassName}.*;
+
+import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
+import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
+import ${basePackage}.module.${table.moduleName}.convert.${table.businessName}.${table.className}Convert;
+import ${basePackage}.module.${table.moduleName}.service.${table.businessName}.${table.className}Service;
+
+@Tag(name = "${sceneEnum.name} - ${table.classComment}")
+@RestController
+##二级的 businessName 暂时不算在 HTTP 路径上，可以根据需要写
+@RequestMapping("/${table.moduleName}/${simpleClassName_strikeCase}")
+@Validated
+public class ${sceneEnum.prefixClass}${table.className}Controller {
+
+    @Resource
+    private ${table.className}Service ${classNameVar}Service;
+
+    @PostMapping("/create")
+    @Operation(summary = "创建${table.classComment}")
+#if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:create')")#end
+
+    public CommonResult<${primaryColumn.javaType}> create${simpleClassName}(@Valid @RequestBody ${sceneEnum.prefixClass}${table.className}CreateReqVO createReqVO) {
+        return success(${classNameVar}Service.create${simpleClassName}(createReqVO));
+    }
+
+    @PutMapping("/update")
+    @Operation(summary = "更新${table.classComment}")
+#if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:update')")#end
+
+    public CommonResult<Boolean> update${simpleClassName}(@Valid @RequestBody ${sceneEnum.prefixClass}${table.className}UpdateReqVO updateReqVO) {
+        ${classNameVar}Service.update${simpleClassName}(updateReqVO);
+        return success(true);
+    }
+
+    @DeleteMapping("/delete")
+    @Operation(summary = "删除${table.classComment}")
+    @Parameter(name = "id", description = "编号", required = true)
+#if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:delete')")#end
+
+    public CommonResult<Boolean> delete${simpleClassName}(@RequestParam("id") ${primaryColumn.javaType} id) {
+        ${classNameVar}Service.delete${simpleClassName}(id);
+        return success(true);
+    }
+
+    @GetMapping("/get")
+    @Operation(summary = "获得${table.classComment}")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+#if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")#end
+
+    public CommonResult<${sceneEnum.prefixClass}${table.className}RespVO> get${simpleClassName}(@RequestParam("id") ${primaryColumn.javaType} id) {
+        ${table.className}DO ${classNameVar} = ${classNameVar}Service.get${simpleClassName}(id);
+        return success(${table.className}Convert.INSTANCE.convert(${classNameVar}));
+    }
+
+    @GetMapping("/list")
+    @Operation(summary = "获得${table.classComment}列表")
+    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
+#if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")#end
+
+    public CommonResult<List<${sceneEnum.prefixClass}${table.className}RespVO>> get${simpleClassName}List(@RequestParam("ids") Collection<${primaryColumn.javaType}> ids) {
+        List<${table.className}DO> list = ${classNameVar}Service.get${simpleClassName}List(ids);
+        return success(${table.className}Convert.INSTANCE.convertList(list));
+    }
+
+    @GetMapping("/page")
+    @Operation(summary = "获得${table.classComment}分页")
+#if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")#end
+
+    public CommonResult<PageResult<${sceneEnum.prefixClass}${table.className}RespVO>> get${simpleClassName}Page(@Valid ${sceneEnum.prefixClass}${table.className}PageReqVO pageVO) {
+        PageResult<${table.className}DO> pageResult = ${classNameVar}Service.get${simpleClassName}Page(pageVO);
+        return success(${table.className}Convert.INSTANCE.convertPage(pageResult));
+    }
+
+    @GetMapping("/export-excel")
+    @Operation(summary = "导出${table.classComment} Excel")
+#if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:export')")#end
+
+    @OperateLog(type = EXPORT)
+    public void export${simpleClassName}Excel(@Valid ${sceneEnum.prefixClass}${table.className}ExportReqVO exportReqVO,
+              HttpServletResponse response) throws IOException {
+        List<${table.className}DO> list = ${classNameVar}Service.get${simpleClassName}List(exportReqVO);
+        // 导出 Excel
+        List<${sceneEnum.prefixClass}${table.className}ExcelVO> datas = ${table.className}Convert.INSTANCE.convertList02(list);
+        ExcelUtils.write(response, "${table.classComment}.xls", "数据", ${sceneEnum.prefixClass}${table.className}ExcelVO.class, datas);
+    }
+
+}

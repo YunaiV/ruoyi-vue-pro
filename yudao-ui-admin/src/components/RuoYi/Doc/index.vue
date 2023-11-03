@@ -9,7 +9,7 @@ export default {
   name: 'YudaoDoc',
   data() {
     return {
-      url: 'http://www.iocoder.cn/Yudao/build-debugger-environment/?yudao'
+      url: 'https://doc.iocoder.cn/'
     }
   },
   methods: {

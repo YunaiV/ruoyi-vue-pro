@@ -1,2 +1,0 @@
-### 请求 /login 接口 => 成功
-GET {{userServerUrl}}/wx/mp/get-jsapi-ticket

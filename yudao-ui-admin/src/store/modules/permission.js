@@ -1,55 +1,80 @@
-import { constantRoutes } from '@/router'
-import { getRouters } from '@/api/menu'
+import {constantRoutes} from '@/router'
 import Layout from '@/layout/index'
 import ParentView from '@/components/ParentView';
+import {toCamelCase} from "@/utils";
 
 const permission = {
   state: {
     routes: [],
     addRoutes: [],
-    sidebarRouters: []
+    sidebarRouters: [], // 左侧边菜单的路由，被 Sidebar/index.vue 使用
+    topbarRouters: [], // 顶部菜单的路由，被 TopNav/index.vue 使用
   },
   mutations: {
     SET_ROUTES: (state, routes) => {
       state.addRoutes = routes
       state.routes = constantRoutes.concat(routes)
     },
-    SET_SIDEBAR_ROUTERS: (state, routers) => {
-      state.sidebarRouters = constantRoutes.concat(routers)
+    SET_DEFAULT_ROUTES: (state, routes) => {
+      state.defaultRoutes = constantRoutes.concat(routes)
+    },
+    SET_TOPBAR_ROUTES: (state, routes) => {
+      state.topbarRouters = routes
+    },
+    SET_SIDEBAR_ROUTERS: (state, routes) => {
+      state.sidebarRouters = routes
     },
   },
   actions: {
-    // 生成路由
-    GenerateRoutes({ commit }) {
+    /**
+     * 生成路由
+     *
+     * @param commit commit 函数
+     * @param menus  路由参数
+     */
+    GenerateRoutes({commit}, menus) {
       return new Promise(resolve => {
-        // 向后端请求路由数据
-        getRouters().then(res => {
-          const sdata = JSON.parse(JSON.stringify(res.data))
-          const rdata = JSON.parse(JSON.stringify(res.data))
-          const sidebarRoutes = filterAsyncRouter(sdata)
-          const rewriteRoutes = filterAsyncRouter(rdata, true)
-          rewriteRoutes.push({ path: '*', redirect: '/404', hidden: true })
-          commit('SET_ROUTES', rewriteRoutes)
-          commit('SET_SIDEBAR_ROUTERS', sidebarRoutes)
-          resolve(rewriteRoutes)
-        })
+        // 将 menus 菜单，转换为 route 路由数组
+        const sdata = JSON.parse(JSON.stringify(menus)) // 【重要】用于菜单中的数据
+        const rdata = JSON.parse(JSON.stringify(menus)) // 用于最后添加到 Router 中的数据
+        const sidebarRoutes = filterAsyncRouter(sdata)
+        const rewriteRoutes = filterAsyncRouter(rdata, false, true)
+        rewriteRoutes.push({path: '*', redirect: '/404', hidden: true})
+        commit('SET_ROUTES', rewriteRoutes)
+        commit('SET_SIDEBAR_ROUTERS', constantRoutes.concat(sidebarRoutes))
+        commit('SET_DEFAULT_ROUTES', sidebarRoutes)
+        commit('SET_TOPBAR_ROUTES', sidebarRoutes)
+        resolve(rewriteRoutes)
       })
     }
   }
 }
 
 // 遍历后台传来的路由字符串，转换为组件对象
-function filterAsyncRouter(asyncRouterMap, isRewrite = false) {
+function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {
   return asyncRouterMap.filter(route => {
     // 将 ruoyi 后端原有耦合前端的逻辑，迁移到此处
     // 处理 meta 属性
     route.meta = {
       title: route.name,
-      icon: route.icon
+      icon: route.icon,
+      noCache: !route.keepAlive,
+    }
+    route.hidden = !route.visible
+    // 处理 name 属性
+    if (route.componentName && route.componentName.length > 0) {
+      route.name = route.componentName
+    } else {
+      // 路由地址转首字母大写驼峰，作为路由名称，适配 keepAlive
+      route.name = toCamelCase(route.path, true)
+      // 处理三级及以上菜单路由缓存问题，将 path 名字赋值给 name
+      if (route.path.indexOf("/") !== -1) {
+        const pathArr = route.path.split("/");
+        route.name = toCamelCase(pathArr[pathArr.length - 1], true)
+      }
     }
     // 处理 component 属性
     if (route.children) { // 父节点
-      // debugger
       if (route.parentId === 0) {
         route.component = Layout
       } else {
@@ -60,21 +85,25 @@ function filterAsyncRouter(asyncRouterMap, isRewrite = false) {
     }
 
     // filterChildren
-    if (isRewrite && route.children) {
+    if (type && route.children) {
       route.children = filterChildren(route.children)
     }
     if (route.children != null && route.children && route.children.length) {
-      route.children = filterAsyncRouter(route.children, route, isRewrite)
+      route.children = filterAsyncRouter(route.children, route, type)
+      route.alwaysShow = route.alwaysShow !== undefined ? route.alwaysShow  : true
+    } else {
+      delete route['children']
+      delete route['alwaysShow'] // 如果没有子菜单，就不需要考虑 alwaysShow 字段
     }
     return true
   })
 }
 
-function filterChildren(childrenMap) {
-  var children = []
+function filterChildren(childrenMap, lastRouter = false) {
+  let children = [];
   childrenMap.forEach((el, index) => {
     if (el.children && el.children.length) {
-      if (el.component === 'ParentView') {
+      if (!el.component && !lastRouter) {
         el.children.forEach(c => {
           c.path = el.path + '/' + c.path
           if (c.children && c.children.length) {
@@ -85,6 +114,9 @@ function filterChildren(childrenMap) {
         })
         return
       }
+    }
+    if (lastRouter) {
+      el.path = lastRouter.path + '/' + el.path
     }
     children = children.concat(el)
   })

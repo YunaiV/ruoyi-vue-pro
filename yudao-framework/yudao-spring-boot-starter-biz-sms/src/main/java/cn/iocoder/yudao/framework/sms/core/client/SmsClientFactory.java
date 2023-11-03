@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.sms.core.property.SmsChannelProperties;
  * 短信客户端的工厂接口
  *
  * @author zzf
- * @date 2021/1/28 14:01
+ * @since 2021/1/28 14:01
  */
 public interface SmsClientFactory {
 

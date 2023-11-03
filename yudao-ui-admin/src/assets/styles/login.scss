@@ -1,0 +1,387 @@
+/* ===== PC DESIGN ===== */
+$W: 1000;
+$H: 1920;
+$picW: 438;
+$picH: 560;
+$formW: 320;
+$tabW: $formW / 2;
+$rowH: 56;
+$buttonH: 50;
+
+// container
+$containerBgColor: #e6ebf2;
+$containerBgImage: '../assets/images/bg.png';
+// container-logo
+$logoWidth: 417px;
+$logoHeight: 64px;
+$logoImage: '../assets/logo/login-logo.png';
+// container-content
+$contentWidth: round($W / $H * 100) * 1vw;
+$contentHeight: round($picH / $W * 100) / 100 * $contentWidth;
+$contentBgColor: #ffffff;
+// container-content-pic
+$picWidth: round($picW / $H * 100) * 1vw;
+$picHeight: inherit;
+$picImage: '../assets/images/pic.png';
+// container-content-field
+$fieldWidth: $contentWidth - $picWidth;
+$fieldHeight: inherit;
+// container-content-field-form
+$formWidth: $formW * 1px;
+$tabWidth: $tabW * 1px;
+$rowHeight: $rowH * 1px;
+$buttonHeight: $buttonH * 1px;
+
+// - - - - - 页面基础设置
+.container {
+  .login-code {
+    width: 33%;
+    height: 38px;
+    float: right;
+    img {
+      cursor: pointer;
+      width:100%;max-width:100px; height:auto;
+      vertical-align: middle;
+    }
+  }
+  // 元素
+  width: inherit;
+  height: inherit;
+  min-width: 1080px;
+  min-height: 620px;
+  background-color: $containerBgColor;
+  background-image: url($containerBgImage);
+  background-size: cover;
+  // 定位
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  // 文字
+  font-size: 14px;
+  font-family: Microsoft YaHei;
+  font-weight: 400;
+  .logo {
+    // 元素
+    width: $logoWidth;
+    height: $logoHeight;
+    background-image: url($logoImage);
+    background-size: contain;
+    // 定位
+    position: absolute;
+    top: 50px;
+    left: 50%;
+    margin-left: -$logoWidth/2;
+  }
+  .content {
+    // 元素
+    width: $contentWidth;
+    height: $contentHeight;
+    background-color: #ffffff;
+    box-shadow: 0px 16px 40px rgba(0, 0, 0, 0.07);
+    border-radius: 20px;
+    // 定位
+    position: relative;
+    .pic {
+      // 元素
+      width: $picWidth;
+      height: $picHeight;
+      background-image: url($picImage);
+      background-repeat: no-repeat;
+      background-size: cover;
+      border-radius: 20px 0 0 20px;
+      // 定位
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    .field {
+      width: $fieldWidth;
+      height: $fieldHeight;
+      // 定位
+      position: absolute;
+      top: 0;
+      left: $picWidth;
+      display:flex;
+      justify-content: center;
+      align-items: center;
+      .pc-title{ width: 100%; clear: both;}
+      .mobile-title,
+      .mobile-switch {
+        display: none;
+      }
+      .form {
+        box-sizing: border-box;
+        width: $formWidth;
+        // - - - tab
+        :deep(.el-tabs__content) {
+          padding: 20px 0 0;
+        }
+        :deep(.el-tabs__item) {
+          // 元素
+          width: $tabWidth;
+          height: $rowHeight;
+          padding: 0;
+          // 文字
+          line-height: $rowHeight;
+          color: #666666;
+        }
+        :deep(.el-tabs__item.is-active) {
+          font-weight: bold;
+          color: #2F53EB;
+        }
+        :deep(.el-tabs__active-bar) {
+          height: 3px;
+          border-radius: 2px;
+        }
+        // - - - input
+        :deep(.el-input__inner) {
+          // 元素
+          width: 100%;
+          height: $rowHeight;
+          background: #f5f5f5;
+          border: 0;
+          border-radius: 28px;
+          // 文字
+          text-align: center;
+          line-height: 19px;
+          color: #262626;
+        }
+        .code:deep(.el-input__inner) {
+          padding: 0 24px;
+          // 文字
+          text-align: left;
+        }
+        :deep(.el-input__inner::-webkit-input-placeholder) { /* WebKit browsers */
+          font-weight: 400;
+          color: #8C8C8C;
+        }
+        :deep(.el-input__inner:-moz-placeholder) { /* Mozilla Firefox 4 to 18 */
+          font-weight: 400;
+          color: #8C8C8C;
+        }
+        :deep(.el-input__inner::-moz-placeholder) { /* Mozilla Firefox 19+ */
+          font-weight: 400;
+          color: #8C8C8C;
+          opacity:1;
+        }
+        :deep(.el-input__inner:-ms-input-placeholder) { /* Internet Explorer 10+ */
+          font-weight: 400;
+          color: #8C8C8C !important;
+        }
+        :deep(.el-form-item) {
+          position: relative;
+          .button-code {
+            // 元素
+            height: $rowHeight;
+            box-sizing: border-box;
+            // 定位
+            position: absolute;
+            top: 0;
+            right: 20px;
+            z-index: 1;
+            // 文字
+            line-height: 20px;
+            font-size: 14px;
+            font-family: PingFang SC;
+            font-weight: 400;
+            color: #2F53EB;
+            span {
+              padding-left: 15px;
+              border-left: 2px solid #D9D9D9;
+            }
+          }
+        }
+        :deep(.el-form-item__error) {
+          padding-left: 24px;
+        }
+        .button {
+          width: 100%;
+          height: $buttonHeight;
+          background: rgba(24, 144, 255, 0.2);
+          border: 0;
+          border-radius: 24px;
+          margin-bottom: 20px;
+          // 文字
+          line-height: 26px;
+          font-size: 20px;
+          color: #FFFFFF;
+        }
+        .button-active {
+          background: #2F53EB;
+          box-shadow: 0px 2px 8px rgba(0, 80, 184, 0.2);
+        }
+      }
+    }
+  }
+  .footer {
+    // 元素
+    height: 16px;
+    line-height: 16px;
+    font-size: 12px;
+    color: #8c8c8c;
+    // 定位
+    position: absolute;
+    bottom: 30px;
+    a,
+    a:hover,
+    a:active {
+      color: inherit;
+      text-decoration: none;
+    }
+  }
+}
+
+// - - - - - PC 最小尺寸设置
+@media screen and (min-width: 599px) and (max-width: 1366px) {
+  .container {
+    .content {
+      width: 710px;
+      height: 397px;
+      .pic {
+        width: 314px;
+      }
+      .field {
+        width: calc(710px - 314px);
+        left: 314px;
+        .form {
+          width: 320px;
+          :deep(.el-input__inner) {
+            width: 320px;
+            height: 56px;
+          }
+          .button {
+            height: 50px;
+          }
+        }
+      }
+    }
+  }
+}
+
+
+/* ===== MOBILE DESIGN ===== */
+$mobileW: 375;
+$mobileH: 812;
+$mobileContentW: 327;
+$mobileContentH: 376;
+$mobileFormW: 280;
+$mobileRowH: 48;
+$mobileButtonH: 48;
+
+// container
+$mobileContainerBgImage: '../assets/images/bg-mobile.png';
+// container-content
+$mobileContentWidth: round($mobileContentW / $mobileW * 100) * 1vw;
+$mobileContentHeight: round($mobileContentH / $mobileW * 100) / 100 * $mobileContentWidth;
+// container-content-field-form
+$mobileFormWidth: round($mobileFormW / $mobileW *100) * 1vw;
+$mobileRowHeight: $mobileRowH * 1px;
+$mobileButtonHeight: $mobileButtonH * 1px;
+$iconBgImage: '../assets/images/icon.png';
+
+// - - - - - 移动端设置
+@media screen and (max-width: 599px) {
+  .container {
+    // 元素
+    background-image: url($mobileContainerBgImage);
+    min-width: 280px;
+    min-height: 568px;
+    // 文字
+    font-size: 17px;
+    font-family: PingFang SC;
+    font-weight: bold;
+    .logo {
+      display: none;
+    }
+
+    .content {
+      // 元素
+      width: $mobileContentWidth;
+      height: $mobileContentHeight;
+      min-width: 250px;
+      min-height: 340px;
+      // 定位
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      .pic {
+        display: none;
+      }
+      .field {
+        // 元素
+        width: inherit;
+        min-height: inherit;
+        // 定位
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        .mobile-title {
+          // 元素
+          margin: 0 0 20px;
+          display: block;
+        }
+        .form {
+          width: $mobileFormWidth;
+          // - - - tab
+          :deep(.el-tabs__header) {
+            display: none;
+          }
+          :deep(.el-tabs__content) {
+            padding: 0;
+          }
+          // - - - input
+          :deep(.el-input__inner) {
+            height: $mobileRowHeight;
+            line-height: 24px;
+            // 文字
+            text-align: center;
+            color: #262626;
+          }
+          :deep(.el-form-item) {
+            .button-code {
+              // 元素
+              height: $mobileRowHeight;
+            }
+          }
+          .button {
+            height: $mobileButtonHeight;
+            line-height: 24px;
+            color: #FFFFFF;
+          }
+        }
+        .mobile-switch {
+          display: block;
+          line-height: 20px;
+          font-size: 14px;
+          font-weight: 400;
+          color: #595959;
+          margin: 0;
+          .icon {
+            width: 14px;
+            height: 14px;
+            display: inline-block;
+            background-image: url($iconBgImage);
+            background-size: cover;
+          }
+        }
+        .mobile-switch:hover {
+          cursor: pointer;
+        }
+      }
+    }
+    .footer {
+      // 元素
+      font-size: 12px;
+      font-family: PingFang SC;
+      font-weight: 400;
+      line-height: 17px;
+      color: #333333;
+      opacity: 0.6;
+      // 定位
+      position: absolute;
+      bottom: 20px;
+    }
+  }
+
+}

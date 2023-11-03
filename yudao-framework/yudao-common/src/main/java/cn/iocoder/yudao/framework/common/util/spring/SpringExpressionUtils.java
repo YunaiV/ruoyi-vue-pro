@@ -24,7 +24,13 @@ import java.util.Map;
  */
 public class SpringExpressionUtils {
 
+    /**
+     * spel表达式解析器
+     */
     private static final ExpressionParser EXPRESSION_PARSER = new SpelExpressionParser();
+    /**
+     * 参数名发现器
+     */
     private static final ParameterNameDiscoverer PARAMETER_NAME_DISCOVERER = new DefaultParameterNameDiscoverer();
 
     private SpringExpressionUtils() {
@@ -33,7 +39,7 @@ public class SpringExpressionUtils {
     /**
      * 从切面中，单个解析 EL 表达式的结果
      *
-     * @param joinPoint  切面点
+     * @param joinPoint        切面点
      * @param expressionString EL 表达式数组
      * @return 执行界面
      */
@@ -45,7 +51,7 @@ public class SpringExpressionUtils {
     /**
      * 从切面中，批量解析 EL 表达式的结果
      *
-     * @param joinPoint   切面点
+     * @param joinPoint         切面点
      * @param expressionStrings EL 表达式数组
      * @return 结果，key 为表达式，value 为对应值
      */
@@ -79,4 +85,5 @@ public class SpringExpressionUtils {
         });
         return result;
     }
+
 }

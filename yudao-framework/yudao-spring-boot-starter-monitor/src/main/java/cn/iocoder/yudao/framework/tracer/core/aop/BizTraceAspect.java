@@ -38,7 +38,7 @@ public class BizTraceAspect {
         String operationName = getOperationName(joinPoint, trace);
         Span span = tracer.buildSpan(operationName)
                 .withTag(Tags.COMPONENT.getKey(), "biz")
-                .startManual();
+                .start();
         try {
             // 执行原有方法
             return joinPoint.proceed();

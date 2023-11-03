@@ -20,7 +20,7 @@
 <script>
 // fuse is a lightweight fuzzy-search module
 // make search results more in line with expectations
-import Fuse from 'fuse.js'
+import Fuse from 'fuse.js/dist/fuse.min.js'
 import path from 'path'
 
 export default {
@@ -88,7 +88,6 @@ export default {
         threshold: 0.4,
         location: 0,
         distance: 100,
-        maxPatternLength: 32,
         minMatchCharLength: 1,
         keys: [{
           name: 'title',
@@ -167,7 +166,7 @@ export default {
     display: inline-block;
     vertical-align: middle;
 
-    ::v-deep .el-input__inner {
+    :deep(.el-input__inner) {
       border-radius: 0;
       border: 0;
       padding-left: 0;

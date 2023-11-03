@@ -50,7 +50,7 @@ public abstract class AbstractStreamMessageListener<T extends AbstractStreamMess
     @SneakyThrows
     protected AbstractStreamMessageListener() {
         this.messageType = getMessageClass();
-        this.streamKey = messageType.newInstance().getStreamKey();
+        this.streamKey = messageType.getDeclaredConstructor().newInstance().getStreamKey();
     }
 
     @Override

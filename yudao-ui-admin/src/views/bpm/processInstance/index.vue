@@ -1,39 +1,40 @@
 <template>
   <div class="app-container">
+    <doc-alert title="工作流" url="https://doc.iocoder.cn/bpm" />
 
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="流程名" prop="name">
-        <el-input v-model="queryParams.name" placeholder="请输入流程名" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.name" placeholder="请输入流程名" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="所属流程" prop="processDefinitionId">
-        <el-input v-model="queryParams.processDefinitionId" placeholder="请输入流程定义的编号" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.processDefinitionId" placeholder="请输入流程定义的编号" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="流程分类" prop="category">
-        <el-select v-model="queryParams.category" placeholder="请选择流程分类" clearable size="small">
+        <el-select v-model="queryParams.category" placeholder="请选择流程分类" clearable>
           <el-option v-for="dict in this.getDictDatas(DICT_TYPE.BPM_MODEL_CATEGORY)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="提交时间">
-        <el-date-picker v-model="dateRangeCreateTime" size="small" style="width: 240px" value-format="yyyy-MM-dd"
-                        type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
+      <el-form-item label="提交时间" prop="createTime">
+        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
       <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable size="small">
+        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
           <el-option v-for="dict in this.getDictDatas(DICT_TYPE.BPM_PROCESS_INSTANCE_STATUS)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
       <el-form-item label="结果" prop="result">
-        <el-select v-model="queryParams.result" placeholder="请选择流结果" clearable size="small">
+        <el-select v-model="queryParams.result" placeholder="请选择流结果" clearable>
           <el-option v-for="dict in this.getDictDatas(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
@@ -51,59 +52,39 @@
       <el-table-column label="编号" align="center" prop="id" width="320" />
       <el-table-column label="流程名" align="center" prop="name" />
       <el-table-column label="流程分类" align="center" prop="category">
-        <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.BPM_MODEL_CATEGORY, scope.row.category) }}</span>
+        <template v-slot="scope">
+          <dict-tag :type="DICT_TYPE.BPM_MODEL_CATEGORY" :value="scope.row.category" />
         </template>
       </el-table-column>
       <el-table-column label="当前审批任务" align="center" prop="tasks">
-        <template slot-scope="scope">
-          <el-button v-for="task in scope.row.tasks" type="text" @click="handleFormDetail(task.id)">
+        <template v-slot="scope">
+          <el-button v-for="task in scope.row.tasks" :key="task.id" type="text"">
             <span>{{ task.name }}</span>
           </el-button>
         </template>
       </el-table-column>
       <el-table-column label="状态" align="center" prop="status">
-        <template slot-scope="scope">
-          <span>
-            <el-tag type="primary" v-if="scope.row.status === 1"> <!-- 进行中 -->
-              {{ getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_STATUS, scope.row.status) }}
-            </el-tag>
-             <el-tag type="success" v-if="scope.row.status === 2"> <!-- 已结束 -->
-              {{ getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_STATUS, scope.row.status) }}
-            </el-tag>
-          </span>
+        <template v-slot="scope">
+          <dict-tag :type="DICT_TYPE.BPM_PROCESS_INSTANCE_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
       <el-table-column label="结果" align="center" prop="result">
-        <template slot-scope="scope">
-          <span>
-            <el-tag type="primary" v-if="scope.row.result === 1"> <!-- 进行中 -->
-              {{ getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT, scope.row.result) }}
-            </el-tag>
-             <el-tag type="success" v-if="scope.row.result === 2"> <!-- 通过 -->
-              {{ getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT, scope.row.result) }}
-            </el-tag>
-             <el-tag type="danger" v-if="scope.row.result === 3"> <!-- 不通过 -->
-              {{ getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT, scope.row.result) }}
-            </el-tag>
-             <el-tag type="info" v-if="scope.row.result === 4"> <!-- 撤回 -->
-              {{ getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT, scope.row.result) }}
-            </el-tag>
-          </span>
+        <template v-slot="scope">
+          <dict-tag :type="DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT" :value="scope.row.result"/>
         </template>
       </el-table-column>
       <el-table-column label="提交时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="结束时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.endTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button type="text" size="small" icon="el-icon-delete" v-if="scope.row.result === 1"
                      v-hasPermi="['bpm:process-instance:cancel']" @click="handleCancel(scope.row)">取消</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleDetail(scope.row)"
@@ -119,19 +100,10 @@
 </template>
 
 <script>
-import {
-  getMyProcessInstancePage,
-  createProcessInstanceExt,
-  updateProcessInstanceExt,
-  deleteProcessInstanceExt,
-  getProcessInstanceExt,
-  getProcessInstanceExtPage,
-  exportProcessInstanceExtExcel, cancelProcessInstance
-} from "@/api/bpm/processInstance";
-import {deleteErrorCode} from "@/api/system/errorCode";
+import { getMyProcessInstancePage, cancelProcessInstance } from "@/api/bpm/processInstance";
 
 export default {
-  name: "ProcessInstance",
+  name: "BpmProcessInstance",
   components: {
   },
   data() {
@@ -144,8 +116,6 @@ export default {
       total: 0,
       // 工作流的流程实例的拓展列表
       list: [],
-      // 是否显示弹出层
-      dateRangeCreateTime: [],
       // 查询参数
       queryParams: {
         pageNo: 1,
@@ -155,21 +125,22 @@ export default {
         category: null,
         status: null,
         result: null,
+        createTime: []
       }
     };
   },
   created() {
     this.getList();
   },
+  activated() {
+    this.getList();
+  },
   methods: {
     /** 查询列表 */
     getList() {
       this.loading = true;
-      // 处理查询参数
-      let params = {...this.queryParams};
-      this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行查询
-      getMyProcessInstancePage(params).then(response => {
+      getMyProcessInstancePage(this.queryParams).then(response => {
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;
@@ -182,13 +153,12 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRangeCreateTime = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },
     /** 新增按钮操作 **/
     handleAdd() {
-      this.$router.push({ path: "/bpm/process-instance/create"})
+      this.$router.push({ name: "BpmProcessInstanceCreate"})
     },
     /** 取消按钮操作 */
     handleCancel(row) {
@@ -197,18 +167,18 @@ export default {
         type: 'warning',
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        inputPattern: /^[\s\S]*.*[^\s][\s\S]*$/, // 判断非空，且非空格
+        inputPattern: /^[\s\S]*.*\S[\s\S]*$/, // 判断非空，且非空格
         inputErrorMessage: "取消原因不能为空",
       }).then(({ value }) => {
         return cancelProcessInstance(id, value);
       }).then(() => {
         this.getList();
-        this.msgSuccess("取消成功");
+        this.$modal.msgSuccess("取消成功");
       })
     },
     /** 处理详情按钮 */
     handleDetail(row) {
-      this.$router.push({ path: "/bpm/process-instance/detail", query: { id: row.id}});
+      this.$router.push({ name: "BpmProcessInstanceDetail", query: { id: row.id}});
     },
   }
 };

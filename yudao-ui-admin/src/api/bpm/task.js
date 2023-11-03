@@ -39,6 +39,13 @@ export function rejectTask(data) {
     data: data
   })
 }
+export function backTask(data) {
+  return request({
+    url: '/bpm/task/back',
+    method: 'PUT',
+    data: data
+  })
+}
 
 export function updateTaskAssignee(data) {
   return request({
@@ -52,5 +59,27 @@ export function getTaskListByProcessInstanceId(processInstanceId) {
   return request({
     url: '/bpm/task/list-by-process-instance-id?processInstanceId=' + processInstanceId,
     method: 'get',
+  })
+}
+export function getReturnList(taskId) {
+  return request({
+    url: '/bpm/task/get-return-list?taskId='+ taskId,
+    method: 'get',
+  })
+}
+
+
+export function returnTask(data) {
+  return request({
+    url: '/bpm/task/return',
+    method: 'PUT',
+    data: data
+  })
+}
+export function delegateTask(data) {
+  return request({
+    url: '/bpm/task/delegate',
+    method: 'PUT',
+    data: data
   })
 }

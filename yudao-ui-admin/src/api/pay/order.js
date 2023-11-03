@@ -1,23 +1,5 @@
 import request from '@/utils/request'
 
-// 创建支付订单
-export function createOrder(data) {
-  return request({
-    url: '/pay/order/create',
-    method: 'post',
-    data: data
-  })
-}
-
-// 更新支付订单
-export function updateOrder(data) {
-  return request({
-    url: '/pay/order/update',
-    method: 'put',
-    data: data
-  })
-}
-
 // 删除支付订单
 export function deleteOrder(id) {
   return request({
@@ -31,6 +13,23 @@ export function getOrder(id) {
   return request({
     url: '/pay/order/get?id=' + id,
     method: 'get'
+  })
+}
+
+// 获得支付订单的明细
+export function getOrderDetail(id) {
+  return request({
+    url: '/pay/order/get-detail?id=' + id,
+    method: 'get'
+  })
+}
+
+// 提交支付订单
+export function submitOrder(data) {
+  return request({
+    url: '/pay/order/submit',
+    method: 'post',
+    data: data
   })
 }
 

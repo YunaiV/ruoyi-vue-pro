@@ -143,8 +143,7 @@ export default {
     .card-panel-description {
       float: right;
       font-weight: bold;
-      margin: 26px;
-      margin-left: 0px;
+      margin: 26px 26px 26px 0;
 
       .card-panel-text {
         line-height: 18px;

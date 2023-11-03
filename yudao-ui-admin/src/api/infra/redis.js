@@ -7,11 +7,3 @@ export function getCache() {
     method: 'get'
   })
 }
-
-// TODO
-export function getKeyList() {
-  return request({
-    url: '/infra/redis/get-key-list',
-    method: 'get'
-  })
-}

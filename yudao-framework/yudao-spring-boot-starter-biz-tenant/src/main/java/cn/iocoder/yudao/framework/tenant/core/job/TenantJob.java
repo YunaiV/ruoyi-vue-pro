@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * 多租户 Job 注解
  */
-@Target({ElementType.TYPE})
+@Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TenantJob {
 }

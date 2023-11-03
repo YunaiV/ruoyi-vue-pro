@@ -1,20 +1,15 @@
 #!/bin/bash
 set -e
 
-# 基础
-# export JAVA_HOME=/work/programs/jdk/jdk1.8.0_181
-# export PATH=PATH=$PATH:$JAVA_HOME/bin
-# export CLASSPATH=$JAVA_HOME/jre/lib/rt.jar:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
-
 DATE=$(date +%Y%m%d%H%M)
 # 基础路径
-BASE_PATH=/media/pi/KINGTON/data/work/projects/yudao-admin-server
+BASE_PATH=/work/projects/yudao-server
 # 编译后 jar 的地址。部署时，Jenkins 会上传 jar 包到该目录下
 SOURCE_PATH=$BASE_PATH/build
 # 服务名称。同时约定部署服务的 jar 包名字也为它。
-SERVER_NAME=yudao-admin-server
+SERVER_NAME=yudao-server
 # 环境
-PROFILES_ACTIVE=dev
+PROFILES_ACTIVE=development
 # 健康检查 URL
 HEALTH_CHECK_URL=http://127.0.0.1:48080/actuator/health/
 
@@ -62,7 +57,7 @@ function transfer() {
     echo "[transfer] 转移 $SERVER_NAME.jar 完成"
 }
 
-# 停止
+# 停止：优雅关闭之前已经启动的服务
 function stop() {
     echo "[stop] 开始停止 $BASE_PATH/$SERVER_NAME"
     PID=$(ps -ef | grep $BASE_PATH/$SERVER_NAME | grep -v "grep" | awk '{print $2}')
@@ -71,8 +66,8 @@ function stop() {
         # 正常关闭
         echo "[stop] $BASE_PATH/$SERVER_NAME 运行中，开始 kill [$PID]"
         kill -15 $PID
-        # 等待最大 60 秒，直到关闭完成。
-        for ((i = 0; i < 60; i++))
+        # 等待最大 120 秒，直到关闭完成。
+        for ((i = 0; i < 120; i++))
             do
                 sleep 1
                 PID=$(ps -ef | grep $BASE_PATH/$SERVER_NAME | grep -v "grep" | awk '{print $2}')
@@ -95,7 +90,7 @@ function stop() {
     fi
 }
 
-# 启动
+# 启动：启动后端项目
 function start() {
     # 开启启动前，打印启动参数
     echo "[start] 开始启动 $BASE_PATH/$SERVER_NAME"
@@ -108,13 +103,13 @@ function start() {
     echo "[start] 启动 $BASE_PATH/$SERVER_NAME 完成"
 }
 
-# 健康检查
+# 健康检查：自动判断后端项目是否正常启动
 function healthCheck() {
     # 如果配置健康检查，则进行健康检查
     if [ -n "$HEALTH_CHECK_URL" ]; then
-        # 健康检查最大 60 秒，直到健康检查通过
+        # 健康检查最大 120 秒，直到健康检查通过
         echo "[healthCheck] 开始通过 $HEALTH_CHECK_URL 地址，进行健康检查";
-        for ((i = 0; i < 60; i++))
+        for ((i = 0; i < 120; i++))
             do
                 # 请求健康检查地址，只获取状态码。
                 result=`curl -I -m 10 -o /dev/null -s -w %{http_code} $HEALTH_CHECK_URL || echo "000"`
@@ -138,11 +133,11 @@ function healthCheck() {
         else
             tail -n 10 nohup.out
         fi
-    # 如果未配置健康检查，则 slepp 60 秒，人工看日志是否部署成功。
+    # 如果未配置健康检查，则 sleep 120 秒，人工看日志是否部署成功。
     else
-        echo "[healthCheck] HEALTH_CHECK_URL 未配置，开始 sleep 60 秒";
-        sleep 60
-        echo "[healthCheck] sleep 60 秒完成，查看日志，自行判断是否启动成功";
+        echo "[healthCheck] HEALTH_CHECK_URL 未配置，开始 sleep 120 秒";
+        sleep 120
+        echo "[healthCheck] sleep 120 秒完成，查看日志，自行判断是否启动成功";
         tail -n 50 nohup.out
     fi
 }
@@ -159,7 +154,7 @@ function deploy() {
     # 启动 Java 服务
     start
     # 健康检查
-#    healthCheck
+    healthCheck
 }
 
 deploy

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
+import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import lombok.Data;
 
@@ -9,8 +10,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
 
-// TODO 芋艿：参数校验
-
 /**
  * 支付宝的 PayClientConfig 实现类
  * 属性主要来自 {@link com.alipay.api.AlipayConfig} 的必要属性
@@ -19,15 +18,6 @@ import java.util.Set;
  */
 @Data
 public class AlipayPayClientConfig implements PayClientConfig {
-
-    /**
-     * 网关地址 - 线上
-     */
-    public static final String SERVER_URL_PROD = "https://openapi.alipay.com/gateway.do";
-    /**
-     * 网关地址 - 沙箱
-     */
-    public static final String SERVER_URL_SANDBOX = "https://openapi.alipaydev.com/gateway.do";
 
     /**
      * 公钥类型 - 公钥模式
@@ -45,8 +35,9 @@ public class AlipayPayClientConfig implements PayClientConfig {
 
     /**
      * 网关地址
-     * 1. {@link #SERVER_URL_PROD}
-     * 2. {@link #SERVER_URL_SANDBOX}
+     *
+     * 1. <a href="https://openapi.alipay.com/gateway.do">生产环境</a>
+     * 2. <a href="https://openapi-sandbox.dl.alipaydev.com/gateway.do">沙箱环境</a>
      */
     @NotBlank(message = "网关地址不能为空", groups = {ModePublicKey.class, ModeCertificate.class})
     private String serverUrl;
@@ -110,8 +101,9 @@ public class AlipayPayClientConfig implements PayClientConfig {
     }
 
     @Override
-    public Set<ConstraintViolation<PayClientConfig>> verifyParam(Validator validator) {
-        return validator.validate(this,
+    public void validate(Validator validator) {
+        ValidationUtils.validate(validator, this,
                 MODE_PUBLIC_KEY.equals(this.getMode()) ? ModePublicKey.class : ModeCertificate.class);
     }
+
 }

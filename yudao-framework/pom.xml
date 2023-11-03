@@ -11,36 +11,43 @@
     <packaging>pom</packaging>
     <modules>
         <module>yudao-common</module>
+        <module>yudao-spring-boot-starter-banner</module>
         <module>yudao-spring-boot-starter-mybatis</module>
         <module>yudao-spring-boot-starter-redis</module>
         <module>yudao-spring-boot-starter-web</module>
         <module>yudao-spring-boot-starter-security</module>
 
+        <module>yudao-spring-boot-starter-file</module>
         <module>yudao-spring-boot-starter-monitor</module>
         <module>yudao-spring-boot-starter-protection</module>
-        <module>yudao-spring-boot-starter-config</module>
         <module>yudao-spring-boot-starter-job</module>
         <module>yudao-spring-boot-starter-mq</module>
 
         <module>yudao-spring-boot-starter-excel</module>
         <module>yudao-spring-boot-starter-test</module>
-        <module>yudao-spring-boot-starter-extension</module>
 
         <module>yudao-spring-boot-starter-biz-operatelog</module>
         <module>yudao-spring-boot-starter-biz-dict</module>
         <module>yudao-spring-boot-starter-biz-sms</module>
-        <module>yudao-spring-boot-starter-activiti</module>
+
         <module>yudao-spring-boot-starter-biz-pay</module>
         <module>yudao-spring-boot-starter-biz-weixin</module>
         <module>yudao-spring-boot-starter-biz-social</module>
         <module>yudao-spring-boot-starter-biz-tenant</module>
         <module>yudao-spring-boot-starter-biz-data-permission</module>
+        <module>yudao-spring-boot-starter-biz-error-code</module>
+        <module>yudao-spring-boot-starter-biz-ip</module>
+
+        <module>yudao-spring-boot-starter-flowable</module>
+        <module>yudao-spring-boot-starter-captcha</module>
+        <module>yudao-spring-boot-starter-websocket</module>
+        <module>yudao-spring-boot-starter-desensitize</module>
     </modules>
 
     <artifactId>yudao-framework</artifactId>
     <description>
         该包是技术组件，每个子包，代表一个组件。每个组件包括两部分：
-            1. core 包：是该组件的核心分装
+            1. core 包：是该组件的核心封装
             2. config 包：是该组件基于 Spring 的配置
 
         技术组件，也分成两类：

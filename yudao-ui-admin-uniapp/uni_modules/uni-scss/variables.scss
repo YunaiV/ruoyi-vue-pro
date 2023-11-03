@@ -1,0 +1,62 @@
+@import './styles/setting/_variables.scss';
+// 间距基础倍数
+$uni-space-root: 2;
+// 边框半径默认值
+$uni-radius-root:5px;
+
+// 主色
+$uni-primary: #2979ff;
+$uni-primary-disable:mix(#fff,$uni-primary,50%);
+$uni-primary-light: mix(#fff,$uni-primary,80%);
+
+// 辅助色
+// 除了主色外的场景色，需要在不同的场景中使用（例如危险色表示危险的操作）。
+$uni-success: #18bc37;
+$uni-success-disable:mix(#fff,$uni-success,50%);
+$uni-success-light: mix(#fff,$uni-success,80%);
+
+$uni-warning: #f3a73f;
+$uni-warning-disable:mix(#fff,$uni-warning,50%);
+$uni-warning-light: mix(#fff,$uni-warning,80%);
+
+$uni-error: #e43d33;
+$uni-error-disable:mix(#fff,$uni-error,50%);
+$uni-error-light: mix(#fff,$uni-error,80%);
+
+$uni-info: #8f939c;
+$uni-info-disable:mix(#fff,$uni-info,50%);
+$uni-info-light: mix(#fff,$uni-info,80%);
+
+// 中性色
+// 中性色用于文本、背景和边框颜色。通过运用不同的中性色，来表现层次结构。
+$uni-main-color: #3a3a3a; 			// 主要文字
+$uni-base-color: #6a6a6a;			// 常规文字
+$uni-secondary-color: #909399;	// 次要文字
+$uni-extra-color: #c7c7c7;			// 辅助说明
+
+// 边框颜色
+$uni-border-1: #F0F0F0;
+$uni-border-2: #EDEDED;
+$uni-border-3: #DCDCDC;
+$uni-border-4: #B9B9B9;
+
+// 常规色
+$uni-black: #000000;
+$uni-white: #ffffff;
+$uni-transparent: rgba($color: #000000, $alpha: 0);
+
+// 背景色
+$uni-bg-color: #f7f7f7;
+
+/* 水平间距 */
+$uni-spacing-sm: 8px;
+$uni-spacing-base: 15px;
+$uni-spacing-lg: 30px;
+
+// 阴影
+$uni-shadow-sm:0 0 5px rgba($color: #d8d8d8, $alpha: 0.5);
+$uni-shadow-base:0 1px 8px 1px rgba($color: #a5a5a5, $alpha: 0.2);
+$uni-shadow-lg:0px 1px 10px 2px rgba($color: #a5a4a4, $alpha: 0.5);
+
+// 蒙版
+$uni-mask: rgba($color: #000000, $alpha: 0.4);

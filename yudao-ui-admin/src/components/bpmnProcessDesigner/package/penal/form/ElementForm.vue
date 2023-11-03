@@ -21,7 +21,7 @@
         <el-table-column label="字段类型" prop="type" min-width="80px" :formatter="row => fieldType[row.type] || row.type" show-overflow-tooltip />
         <el-table-column label="默认值" prop="defaultValue" min-width="80px" show-overflow-tooltip />
         <el-table-column label="操作" width="90px">
-          <template slot-scope="{ row, $index }">
+          <template v-slot="{ row, $index }">
             <el-button size="mini" type="text" @click="openFieldForm(row, $index)">编辑</el-button>
             <el-divider direction="vertical" />
             <el-button size="mini" type="text" style="color: #ff4d4f" @click="removeField(row, $index)">移除</el-button>
@@ -70,7 +70,7 @@
           <el-table-column label="枚举值编号" prop="id" min-width="100px" show-overflow-tooltip />
           <el-table-column label="枚举值名称" prop="name" min-width="100px" show-overflow-tooltip />
           <el-table-column label="操作" width="90px">
-            <template slot-scope="{ row, $index }">
+            <template v-slot="{ row, $index }">
               <el-button size="mini" type="text" @click="openFieldOptionForm(row, $index, 'enum')">编辑</el-button>
               <el-divider direction="vertical" />
               <el-button size="mini" type="text" style="color: #ff4d4f" @click="removeFieldOptionItem(row, $index, 'enum')">移除</el-button>
@@ -90,7 +90,7 @@
         <el-table-column label="约束名称" prop="name" min-width="100px" show-overflow-tooltip />
         <el-table-column label="约束配置" prop="config" min-width="100px" show-overflow-tooltip />
         <el-table-column label="操作" width="90px">
-          <template slot-scope="{ row, $index }">
+          <template v-slot="{ row, $index }">
             <el-button size="mini" type="text" @click="openFieldOptionForm(row, $index, 'constraint')">编辑</el-button>
             <el-divider direction="vertical" />
             <el-button size="mini" type="text" style="color: #ff4d4f" @click="removeFieldOptionItem(row, $index, 'constraint')">移除</el-button>
@@ -109,7 +109,7 @@
         <el-table-column label="属性编号" prop="id" min-width="100px" show-overflow-tooltip />
         <el-table-column label="属性值" prop="value" min-width="100px" show-overflow-tooltip />
         <el-table-column label="操作" width="90px">
-          <template slot-scope="{ row, $index }">
+          <template v-slot="{ row, $index }">
             <el-button size="mini" type="text" @click="openFieldOptionForm(row, $index, 'property')">编辑</el-button>
             <el-divider direction="vertical" />
             <el-button size="mini" type="text" style="color: #ff4d4f" @click="removeFieldOptionItem(row, $index, 'property')">移除</el-button>

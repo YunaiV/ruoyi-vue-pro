@@ -1,5 +1,9 @@
 <template>
   <div class="app-container">
+    <doc-alert title="用户体系" url="https://doc.iocoder.cn/user-center/" />
+    <doc-alert title="三方登陆" url="https://doc.iocoder.cn/social-user/" />
+    <doc-alert title="Excel 导入导出" url="https://doc.iocoder.cn/excel-import-and-export/" />
+    <!-- 搜索工作栏 -->
     <el-row :gutter="20">
       <!--部门数据-->
       <el-col :span="4" :xs="24">
@@ -8,38 +12,38 @@
         </div>
         <div class="head-container">
           <el-tree :data="deptOptions" :props="defaultProps" :expand-on-click-node="false" :filter-node-method="filterNode"
-                   ref="tree" default-expand-all @node-click="handleNodeClick"/>
+                   ref="tree" default-expand-all highlight-current @node-click="handleNodeClick"/>
         </div>
       </el-col>
       <!--用户数据-->
       <el-col :span="20" :xs="24">
-        <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+        <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
           <el-form-item label="用户名称" prop="username">
-            <el-input v-model="queryParams.username" placeholder="请输入用户名称" clearable size="small" style="width: 240px"
+            <el-input v-model="queryParams.username" placeholder="请输入用户名称" clearable style="width: 240px"
                       @keyup.enter.native="handleQuery"/>
           </el-form-item>
           <el-form-item label="手机号码" prop="mobile">
-            <el-input v-model="queryParams.mobile" placeholder="请输入手机号码" clearable size="small" style="width: 240px"
+            <el-input v-model="queryParams.mobile" placeholder="请输入手机号码" clearable style="width: 240px"
                       @keyup.enter.native="handleQuery"/>
           </el-form-item>
           <el-form-item label="状态" prop="status">
-            <el-select v-model="queryParams.status" placeholder="用户状态" clearable size="small" style="width: 240px">
+            <el-select v-model="queryParams.status" placeholder="用户状态" clearable style="width: 240px">
               <el-option v-for="dict in statusDictDatas" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
             </el-select>
           </el-form-item>
-          <el-form-item label="创建时间">
-            <el-date-picker v-model="dateRange" size="small" style="width: 240px" value-format="yyyy-MM-dd" type="daterange"
-              range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
+          <el-form-item label="创建时间" prop="createTime">
+            <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+              range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
           </el-form-item>
           <el-form-item>
-            <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-            <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+            <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+            <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
           </el-form-item>
         </el-form>
 
         <el-row :gutter="10" class="mb8">
           <el-col :span="1.5">
-            <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd"
+            <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
                        v-hasPermi="['system:user:create']">新增</el-button>
           </el-col>
           <el-col :span="1.5">
@@ -47,36 +51,35 @@
                        v-hasPermi="['system:user:import']">导入</el-button>
           </el-col>
           <el-col :span="1.5">
-            <el-button type="warning" icon="el-icon-download" size="mini" @click="handleExport"
+            <el-button type="warning" icon="el-icon-download" size="mini" @click="handleExport" :loading="exportLoading"
                        v-hasPermi="['system:user:export']">导出</el-button>
           </el-col>
-          <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+          <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" :columns="columns"></right-toolbar>
         </el-row>
 
         <el-table v-loading="loading" :data="userList">
-          <el-table-column label="用户编号" align="center" prop="id" />
-          <el-table-column label="用户名称" align="center" prop="username" :show-overflow-tooltip="true" />
-          <el-table-column label="用户昵称" align="center" prop="nickname" :show-overflow-tooltip="true" />
-          <el-table-column label="部门" align="center" prop="dept.name" :show-overflow-tooltip="true" />
-          <el-table-column label="手机号码" align="center" prop="mobile" width="120" />
-          <el-table-column label="状态" align="center">
-            <template slot-scope="scope">
+          <el-table-column label="用户编号" align="center" key="id" prop="id" v-if="columns[0].visible" />
+          <el-table-column label="用户名称" align="center" key="username" prop="username" v-if="columns[1].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="用户昵称" align="center" key="nickname" prop="nickname" v-if="columns[2].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="部门" align="center" key="deptName" prop="dept.name" v-if="columns[3].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="手机号码" align="center" key="mobile" prop="mobile" v-if="columns[4].visible" width="120" />
+          <el-table-column label="状态" key="status" v-if="columns[5].visible" align="center">
+            <template v-slot="scope">
               <el-switch v-model="scope.row.status" :active-value="0" :inactive-value="1" @change="handleStatusChange(scope.row)" />
             </template>
           </el-table-column>
-          <el-table-column label="创建时间" align="center" prop="createTime" width="160">
-            <template slot-scope="scope">
+          <el-table-column label="创建时间" align="center" prop="createTime" v-if="columns[6].visible" width="160">
+            <template v-slot="scope">
               <span>{{ parseTime(scope.row.createTime) }}</span>
             </template>
           </el-table-column>
           <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
-            <template slot-scope="scope">
-              <el-button size="large" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
+            <template v-slot="scope">
+              <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                          v-hasPermi="['system:user:update']">修改</el-button>
-              <el-dropdown  @command="(command) => handleCommand(command, scope.$index, scope.row)">
-                    <span class="el-dropdown-link">
-                      更多操作<i class="el-icon-arrow-down el-icon--right"></i>
-                    </span>
+              <el-dropdown  @command="(command) => handleCommand(command, scope.$index, scope.row)"
+                            v-hasPermi="['system:user:delete', 'system:user:update-password', 'system:permission:assign-user-role']">
+                <el-button size="mini" type="text" icon="el-icon-d-arrow-right">更多</el-button>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item command="handleDelete" v-if="scope.row.id !== 1" size="mini" type="text" icon="el-icon-delete"
                                     v-hasPermi="['system:user:delete']">删除</el-dropdown-item>
@@ -106,7 +109,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="归属部门" prop="deptId">
-              <treeselect v-model="form.deptId" :options="deptOptions" :show-count="true"
+              <treeselect v-model="form.deptId" :options="deptOptions" :show-count="true" :clearable="false"
                           placeholder="请选择归属部门" :normalizer="normalizer"/>
             </el-form-item>
           </el-col>
@@ -131,7 +134,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item v-if="form.id === undefined" label="用户密码" prop="password">
-              <el-input v-model="form.password" placeholder="请输入用户密码" type="password" />
+              <el-input v-model="form.password" placeholder="请输入用户密码" type="password" show-password />
             </el-form-item>
           </el-col>
         </el-row>
@@ -172,28 +175,18 @@
 
     <!-- 用户导入对话框 -->
     <el-dialog :title="upload.title" :visible.sync="upload.open" width="400px" append-to-body>
-      <el-upload
-        ref="upload"
-        :limit="1"
-        accept=".xlsx, .xls"
-        :headers="upload.headers"
-        :action="upload.url + '?updateSupport=' + upload.updateSupport"
-        :disabled="upload.isUploading"
-        :on-progress="handleFileUploadProgress"
-        :on-success="handleFileSuccess"
-        :auto-upload="false"
-        drag
-      >
+      <el-upload ref="upload" :limit="1" accept=".xlsx, .xls" :headers="upload.headers"
+        :action="upload.url + '?updateSupport=' + upload.updateSupport" :disabled="upload.isUploading"
+        :on-progress="handleFileUploadProgress" :on-success="handleFileSuccess" :auto-upload="false" drag>
         <i class="el-icon-upload"></i>
-        <div class="el-upload__text">
-          将文件拖到此处，或
-          <em>点击上传</em>
+        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+        <div class="el-upload__tip text-center" slot="tip">
+          <div class="el-upload__tip" slot="tip">
+            <el-checkbox v-model="upload.updateSupport" /> 是否更新已经存在的用户数据
+          </div>
+          <span>仅允许导入xls、xlsx格式文件。</span>
+          <el-link type="primary" :underline="false" style="font-size:12px;vertical-align: baseline;" @click="importTemplate">下载模板</el-link>
         </div>
-        <div class="el-upload__tip" slot="tip">
-          <el-checkbox v-model="upload.updateSupport" />是否更新已经存在的用户数据
-          <el-link type="info" style="font-size:12px" @click="importTemplate">下载模板</el-link>
-        </div>
-        <div class="el-upload__tip" style="color:red" slot="tip">提示：仅允许导入“xls”或“xlsx”格式文件！</div>
       </el-upload>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitFileForm">确 定</el-button>
@@ -242,7 +235,6 @@ import {
   resetUserPwd,
   updateUser
 } from "@/api/system/user";
-import {getToken} from "@/utils/auth";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
@@ -253,14 +245,17 @@ import {CommonStatusEnum} from "@/utils/constants";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 import {assignUserRole, listUserRoles} from "@/api/system/permission";
 import {listSimpleRoles} from "@/api/system/role";
+import {getBaseHeader} from "@/utils/request";
 
 export default {
-  name: "User",
+  name: "SystemUser",
   components: { Treeselect },
   data() {
     return {
       // 遮罩层
       loading: true,
+      // 导出遮罩层
+      exportLoading: false,
       // 显示搜索条件
       showSearch: true,
       // 总条数
@@ -277,10 +272,6 @@ export default {
       deptName: undefined,
       // 默认密码
       initPassword: undefined,
-      // 日期范围
-      dateRange: [],
-      // 状态数据字典
-      statusOptions: [],
       // 性别状态字典
       sexOptions: [],
       // 岗位选项
@@ -304,9 +295,9 @@ export default {
         // 是否更新已经存在的用户数据
         updateSupport: 0,
         // 设置上传的请求头部
-        headers: { Authorization: "Bearer " + getToken() },
+        headers: getBaseHeader(),
         // 上传的地址
-        url: process.env.VUE_APP_BASE_API + '/api/' + "/system/user/import"
+        url: process.env.VUE_APP_BASE_API + '/admin-api/system/user/import'
       },
       // 查询参数
       queryParams: {
@@ -315,8 +306,19 @@ export default {
         username: undefined,
         mobile: undefined,
         status: undefined,
-        deptId: undefined
+        deptId: undefined,
+        createTime: []
       },
+      // 列信息
+      columns: [
+        { key: 0, label: `用户编号`, visible: true },
+        { key: 1, label: `用户名称`, visible: true },
+        { key: 2, label: `用户昵称`, visible: true },
+        { key: 3, label: `部门`, visible: true },
+        { key: 4, label: `手机号码`, visible: true },
+        { key: 5, label: `状态`, visible: true },
+        { key: 6, label: `创建时间`, visible: true }
+      ],
       // 表单校验
       rules: {
         username: [
@@ -337,7 +339,7 @@ export default {
         ],
         mobile: [
           {
-            pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/,
+            pattern: /^(?:(?:\+|00)86)?1(?:3[\d]|4[5-79]|5[0-35-9]|6[5-7]|7[0-8]|8[\d]|9[189])\d{8}$/,
             message: "请输入正确的手机号码",
             trigger: "blur"
           }
@@ -362,9 +364,9 @@ export default {
   created() {
     this.getList();
     this.getTreeselect();
-    this.getConfigKey("sys.user.init-password").then(response => {
-      this.initPassword = response.msg;
-    });
+    // this.getConfigKey("sys.user.init-password").then(response => {
+    //   this.initPassword = response.msg;
+    // });
   },
   methods: {
     // 更多操作
@@ -389,10 +391,7 @@ export default {
     /** 查询用户列表 */
     getList() {
       this.loading = true;
-      listUser(this.addDateRange(this.queryParams, [
-        this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
-        this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
-      ])).then(response => {
+      listUser(this.queryParams).then(response => {
           this.userList = response.data.list;
           this.total = response.data.total;
           this.loading = false;
@@ -425,14 +424,10 @@ export default {
     // 用户状态修改
     handleStatusChange(row) {
       let text = row.status === CommonStatusEnum.ENABLE ? "启用" : "停用";
-      this.$confirm('确认要"' + text + '""' + row.username + '"用户吗?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('确认要"' + text + '""' + row.username + '"用户吗?').then(function() {
           return changeUserStatus(row.id, row.status);
         }).then(() => {
-          this.msgSuccess(text + "成功");
+          this.$modal.msgSuccess(text + "成功");
         }).catch(function() {
           row.status = row.status === CommonStatusEnum.ENABLE ? CommonStatusEnum.DISABLE
               : CommonStatusEnum.ENABLE;
@@ -473,7 +468,6 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRange = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },
@@ -506,7 +500,7 @@ export default {
         cancelButtonText: "取消"
       }).then(({ value }) => {
           resetUserPwd(row.id, value).then(response => {
-            this.msgSuccess("修改成功，新密码是：" + value);
+            this.$modal.msgSuccess("修改成功，新密码是：" + value);
           });
         }).catch(() => {});
     },
@@ -538,13 +532,13 @@ export default {
         if (valid) {
           if (this.form.id !== undefined) {
             updateUser(this.form).then(response => {
-              this.msgSuccess("修改成功");
+              this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
             addUser(this.form).then(response => {
-              this.msgSuccess("新增成功");
+              this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
             });
@@ -559,7 +553,7 @@ export default {
           userId: this.form.id,
           roleIds: this.form.roleIds,
         }).then(response => {
-          this.msgSuccess("分配角色成功");
+          this.$modal.msgSuccess("分配角色成功");
           this.openRole = false;
           this.getList();
         });
@@ -568,32 +562,26 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$confirm('是否确认删除用户编号为"' + ids + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('是否确认删除用户编号为"' + ids + '"的数据项?').then(function() {
           return delUser(ids);
         }).then(() => {
           this.getList();
-          this.msgSuccess("删除成功");
-        })
+          this.$modal.msgSuccess("删除成功");
+      }).catch(() => {});
     },
     /** 导出按钮操作 */
     handleExport() {
-      const queryParams = this.addDateRange(this.queryParams, [
-        this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
-        this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
-      ]);
-      this.$confirm('是否确认导出所有用户数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return exportUser(queryParams);
+      this.$modal.confirm('是否确认导出所有用户数据项?').then(() => {
+          // 处理查询参数
+          let params = {...this.queryParams};
+          params.pageNo = undefined;
+          params.pageSize = undefined;
+          this.exportLoading = true;
+          return exportUser(params);
         }).then(response => {
-          this.downloadExcel(response, '用户数据.xls');
-        })
+          this.$download.excel(response, '用户数据.xls');
+          this.exportLoading = false;
+      }).catch(() => {});
     },
     /** 导入按钮操作 */
     handleImport() {
@@ -603,7 +591,7 @@ export default {
     /** 下载模板操作 */
     importTemplate() {
       importTemplate().then(response => {
-        this.downloadExcel(response, '用户导入模板.xls');
+        this.$download.excel(response, '用户导入模板.xls');
       });
     },
     // 文件上传中处理
@@ -612,6 +600,10 @@ export default {
     },
     // 文件上传成功处理
     handleFileSuccess(response, file, fileList) {
+      if (response.code !== 0) {
+        this.$modal.msgError(response.msg)
+        return;
+      }
       this.upload.open = false;
       this.upload.isUploading = false;
       this.$refs.upload.clearFiles();
@@ -647,13 +639,3 @@ export default {
   }
 };
 </script>
-<style>
-  .el-dropdown-link {
-    cursor: pointer;
-    color: #1890ff;
-    margin-left: 5px;
-  }
-  .el-icon-arrow-down {
-    font-size: 14px;
-  }
-</style>

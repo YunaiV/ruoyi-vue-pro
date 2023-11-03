@@ -1,0 +1,18 @@
+### /promotion/decorate/save 保存页面装修组件
+POST {{baseUrl}}/promotion/decorate/save
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+{
+  "page": 1,
+  "code": "slide-show",
+  "status": 0,
+  "value": "null"
+}
+
+### /promotion/decorate/list 获取指定页面的组件列表
+GET {{baseUrl}}/promotion/decorate/list?page=1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.framework.web.core.filter;
 
-import cn.hutool.extra.servlet.ServletUtil;
+import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
@@ -25,7 +25,7 @@ public class CacheRequestBodyWrapper extends HttpServletRequestWrapper {
 
     public CacheRequestBodyWrapper(HttpServletRequest request) {
         super(request);
-        body = ServletUtil.getBodyBytes(request);
+        body = ServletUtils.getBodyBytes(request);
     }
 
     @Override
@@ -46,16 +46,21 @@ public class CacheRequestBodyWrapper extends HttpServletRequestWrapper {
 
             @Override
             public boolean isFinished() {
-                return true;
+                return false;
             }
 
             @Override
             public boolean isReady() {
-                return true;
+                return false;
             }
 
             @Override
             public void setReadListener(ReadListener readListener) {}
+
+            @Override
+            public int available() {
+                return body.length;
+            }
 
         };
     }

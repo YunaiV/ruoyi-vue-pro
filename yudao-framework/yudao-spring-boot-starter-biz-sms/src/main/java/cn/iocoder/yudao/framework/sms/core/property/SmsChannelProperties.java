@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
  * 短信渠道配置类
  *
  * @author zzf
- * @date 2021/1/25 17:01
+ * @since 2021/1/25 17:01
  */
 @Data
 @Validated
@@ -40,9 +40,9 @@ public class SmsChannelProperties {
     @NotEmpty(message = "短信 API 的账号不能为空")
     private String apiKey;
     /**
-     * 短信 API 的秘钥
+     * 短信 API 的密钥
      */
-    @NotEmpty(message = "短信 API 的秘钥不能为空")
+    @NotEmpty(message = "短信 API 的密钥不能为空")
     private String apiSecret;
     /**
      * 短信发送回调 URL

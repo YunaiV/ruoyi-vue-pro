@@ -1,0 +1,66 @@
+
+// TODO 暂时不需要 class ，需要用户使用变量实现 ，如果使用类名其实并不推荐
+// @mixin get-styles($k,$c) {
+// 	@if $k == size or $k == weight{
+// 		font-#{$k}:#{$c}
+// 	}@else{
+// 		#{$k}:#{$c}
+// 	}
+// }
+$uni-ui-color:(
+	// 主色
+	primary: $uni-primary,
+	primary-disable: $uni-primary-disable,
+	primary-light: $uni-primary-light,
+	// 辅助色
+	success: $uni-success,
+	success-disable: $uni-success-disable,
+	success-light: $uni-success-light,
+	warning: $uni-warning,
+	warning-disable: $uni-warning-disable,
+	warning-light: $uni-warning-light,
+	error: $uni-error,
+	error-disable: $uni-error-disable,
+	error-light: $uni-error-light,
+	info: $uni-info,
+	info-disable: $uni-info-disable,
+	info-light: $uni-info-light,
+	// 中性色
+	main-color: $uni-main-color,
+	base-color: $uni-base-color,
+	secondary-color: $uni-secondary-color,
+	extra-color: $uni-extra-color,
+	// 背景色
+	bg-color: $uni-bg-color,
+	// 边框颜色
+	border-1: $uni-border-1,
+	border-2: $uni-border-2,
+	border-3: $uni-border-3,
+	border-4: $uni-border-4,
+	// 黑色
+	black:$uni-black,
+	// 白色
+	white:$uni-white,
+	// 透明
+	transparent:$uni-transparent
+) !default;
+@each $key, $child in $uni-ui-color {
+	.uni-#{"" + $key} {
+		color: $child;
+	}
+	.uni-#{"" + $key}-bg {
+		background-color: $child;
+	}
+}
+.uni-shadow-sm {
+	box-shadow: $uni-shadow-sm;
+}
+.uni-shadow-base {
+	box-shadow: $uni-shadow-base;
+}
+.uni-shadow-lg {
+	box-shadow: $uni-shadow-lg;
+}
+.uni-mask {
+	background-color:$uni-mask;
+}

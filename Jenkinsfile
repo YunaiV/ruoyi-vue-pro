@@ -21,7 +21,7 @@ pipeline {
         // GitHub 账号名
         GITHUB_ACCOUNT = 'https://gitee.com/zhijiantianya/ruoyi-vue-pro'
         // 应用名称
-        APP_NAME = 'yudao-admin-server'
+        APP_NAME = 'yudao-server'
         // 应用部署路径
         APP_DEPLOY_BASE_DIR = '/media/pi/KINGTON/data/work/projects/'
     }

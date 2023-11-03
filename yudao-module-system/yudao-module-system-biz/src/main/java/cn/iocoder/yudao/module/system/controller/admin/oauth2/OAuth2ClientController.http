@@ -1,0 +1,23 @@
+### 请求 /login 接口 => 成功
+POST {{baseUrl}}/system/oauth2-client/create
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+{
+  "id": "1",
+  "secret": "admin123",
+  "name": "芋道源码",
+  "logo": "https://www.iocoder.cn/images/favicon.ico",
+  "description": "我是描述",
+  "status": 0,
+  "accessTokenValiditySeconds": 180,
+  "refreshTokenValiditySeconds": 8640,
+  "redirectUris": ["https://www.iocoder.cn"],
+  "autoApprove": true,
+  "authorizedGrantTypes": ["password"],
+  "scopes": ["user_info"],
+  "authorities": ["system:user:query"],
+  "resource_ids": ["1024"],
+  "additionalInformation": "{}"
+}

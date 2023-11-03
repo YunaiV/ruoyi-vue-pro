@@ -16,11 +16,11 @@ import java.util.Set;
  */
 public class JsonLongSetTypeHandler extends AbstractJsonTypeHandler<Object> {
 
-    private static final TypeReference<Set<Long>> typeReference = new TypeReference<Set<Long>>(){};
+    private static final TypeReference<Set<Long>> TYPE_REFERENCE = new TypeReference<Set<Long>>(){};
 
     @Override
     protected Object parse(String json) {
-        return JsonUtils.parseObject(json, typeReference);
+        return JsonUtils.parseObject(json, TYPE_REFERENCE);
     }
 
     @Override

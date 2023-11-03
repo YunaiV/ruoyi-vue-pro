@@ -1,0 +1,45 @@
+### 请求 /infra/file-config/create 接口 => 成功
+POST {{baseUrl}}/infra/file-config/create
+Content-Type: application/json
+tenant-id: {{adminTenentId}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "S3 - 七牛云",
+  "remark": "",
+  "storage": 20,
+  "config": {
+    "accessKey": "b7yvuhBSAGjmtPhMFcn9iMOxUOY_I06cA_p0ZUx8",
+    "accessSecret": "kXM1l5ia1RvSX3QaOEcwI3RLz3Y2rmNszWonKZtP",
+    "bucket": "ruoyi-vue-pro",
+    "endpoint": "s3-cn-south-1.qiniucs.com",
+    "domain": "http://test.yudao.iocoder.cn",
+    "region": "oss-cn-beijing"
+  }
+}
+
+### 请求 /infra/file-config/update 接口 => 成功
+PUT {{baseUrl}}/infra/file-config/update
+Content-Type: application/json
+tenant-id: {{adminTenentId}}
+Authorization: Bearer {{token}}
+
+{
+  "id": 2,
+  "name": "S3 - 七牛云",
+  "remark": "",
+  "config": {
+    "accessKey": "b7yvuhBSAGjmtPhMFcn9iMOxUOY_I06cA_p0ZUx8",
+    "accessSecret": "kXM1l5ia1RvSX3QaOEcwI3RLz3Y2rmNszWonKZtP",
+    "bucket": "ruoyi-vue-pro",
+    "endpoint": "s3-cn-south-1.qiniucs.com",
+    "domain": "http://test.yudao.iocoder.cn",
+    "region": "oss-cn-beijing"
+  }
+}
+
+### 请求 /infra/file-config/test 接口 => 成功
+GET {{baseUrl}}/infra/file-config/test?id=2
+Content-Type: application/json
+tenant-id: {{adminTenentId}}
+Authorization: Bearer {{token}}

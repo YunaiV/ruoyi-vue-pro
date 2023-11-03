@@ -1,0 +1,341 @@
+var MIN_DISTANCE = 10;
+
+/**
+ * 判断当前是否为H5、app-vue
+ */
+var IS_HTML5 = false
+if (typeof window === 'object') IS_HTML5 = true
+
+/**
+ * 监听页面内值的变化,主要用于动态开关swipe-action
+ * @param {Object} newValue
+ * @param {Object} oldValue
+ * @param {Object} ownerInstance
+ * @param {Object} instance
+ */
+function showWatch(newVal, oldVal, ownerInstance, instance) {
+	var state = instance.getState()
+	getDom(instance, ownerInstance)
+	if (newVal && newVal !== 'none') {
+		openState(newVal, instance, ownerInstance)
+		return
+	}
+
+	if (state.left) {
+		openState('none', instance, ownerInstance)
+	}
+	resetTouchStatus(instance)
+}
+
+/**
+ * 开始触摸操作
+ * @param {Object} e
+ * @param {Object} ins
+ */
+function touchstart(e, ownerInstance) {
+	var instance = e.instance;
+	var disabled = instance.getDataset().disabled
+	var state = instance.getState();
+	getDom(instance, ownerInstance)
+	// fix by mehaotian, TODO 兼容 app-vue 获取dataset为字符串 , h5 获取 为 undefined 的问题,待框架修复
+	disabled = (typeof(disabled) === 'string' ? JSON.parse(disabled) : disabled) || false;
+	if (disabled) return
+	// 开始触摸时移除动画类
+	instance.requestAnimationFrame(function() {
+		instance.removeClass('ani');
+		ownerInstance.callMethod('closeSwipe');
+	})
+
+	// 记录上次的位置
+	state.x = state.left || 0
+	// 计算滑动开始位置
+	stopTouchStart(e, ownerInstance)
+}
+
+/**
+ * 开始滑动操作
+ * @param {Object} e
+ * @param {Object} ownerInstance
+ */
+function touchmove(e, ownerInstance) {
+	var instance = e.instance;
+	var disabled = instance.getDataset().disabled
+	var state = instance.getState()
+	// fix by mehaotian, TODO 兼容 app-vue 获取dataset为字符串 , h5 获取 为 undefined 的问题,待框架修复
+	disabled = (typeof(disabled) === 'string' ? JSON.parse(disabled) : disabled) || false;
+	if (disabled) return
+	// 是否可以滑动页面
+	stopTouchMove(e);
+	if (state.direction !== 'horizontal') {
+		return;
+	}
+
+	if (e.preventDefault) {
+		// 阻止页面滚动
+		e.preventDefault()
+	}
+
+	move(state.x + state.deltaX, instance, ownerInstance)
+}
+
+/**
+ * 结束触摸操作
+ * @param {Object} e
+ * @param {Object} ownerInstance
+ */
+function touchend(e, ownerInstance) {
+	var instance = e.instance;
+	var disabled = instance.getDataset().disabled
+	var state = instance.getState()
+	// fix by mehaotian, TODO 兼容 app-vue 获取dataset为字符串 , h5 获取 为 undefined 的问题,待框架修复
+	disabled = (typeof(disabled) === 'string' ? JSON.parse(disabled) : disabled) || false;
+
+	if (disabled) return
+	// 滑动过程中触摸结束,通过阙值判断是开启还是关闭
+	// fixed by mehaotian 定时器解决点击按钮，touchend 触发比 click 事件时机早的问题 ，主要是 ios13
+	moveDirection(state.left, instance, ownerInstance)
+
+}
+
+/**
+ * 设置移动距离
+ * @param {Object} value
+ * @param {Object} instance
+ * @param {Object} ownerInstance
+ */
+function move(value, instance, ownerInstance) {
+	value = value || 0
+	var state = instance.getState()
+	var leftWidth = state.leftWidth
+	var rightWidth = state.rightWidth
+	// 获取可滑动范围
+	state.left = range(value, -rightWidth, leftWidth);
+	instance.requestAnimationFrame(function() {
+		instance.setStyle({
+			transform: 'translateX(' + state.left + 'px)',
+			'-webkit-transform': 'translateX(' + state.left + 'px)'
+		})
+	})
+
+}
+
+/**
+ * 获取元素信息
+ * @param {Object} instance
+ * @param {Object} ownerInstance
+ */
+function getDom(instance, ownerInstance) {
+	var state = instance.getState()
+	var leftDom = ownerInstance.selectComponent('.button-group--left')
+	var rightDom = ownerInstance.selectComponent('.button-group--right')
+	var leftStyles = {
+		width: 0
+	}
+	var rightStyles = {
+		width: 0
+	}
+	leftStyles = leftDom.getBoundingClientRect()
+	rightStyles = rightDom.getBoundingClientRect()
+
+	state.leftWidth = leftStyles.width || 0
+	state.rightWidth = rightStyles.width || 0
+	state.threshold = instance.getDataset().threshold
+}
+
+/**
+ * 获取范围
+ * @param {Object} num
+ * @param {Object} min
+ * @param {Object} max
+ */
+function range(num, min, max) {
+	return Math.min(Math.max(num, min), max);
+}
+
+
+/**
+ * 移动方向判断
+ * @param {Object} left
+ * @param {Object} value
+ * @param {Object} ownerInstance
+ * @param {Object} ins
+ */
+function moveDirection(left, ins, ownerInstance) {
+	var state = ins.getState()
+	var threshold = state.threshold
+	var position = state.position
+	var isopen = state.isopen || 'none'
+	var leftWidth = state.leftWidth
+	var rightWidth = state.rightWidth
+	if (state.deltaX === 0) {
+		openState('none', ins, ownerInstance)
+		return
+	}
+	if ((isopen === 'none' && rightWidth > 0 && -left > threshold) || (isopen !== 'none' && rightWidth > 0 &&
+			rightWidth +
+			left < threshold)) {
+		// right
+		openState('right', ins, ownerInstance)
+	} else if ((isopen === 'none' && leftWidth > 0 && left > threshold) || (isopen !== 'none' && leftWidth > 0 &&
+			leftWidth - left < threshold)) {
+		// left
+		openState('left', ins, ownerInstance)
+	} else {
+		// default
+		openState('none', ins, ownerInstance)
+	}
+}
+
+
+/**
+ * 开启状态
+ * @param {Boolean} type
+ * @param {Object} ins
+ * @param {Object} ownerInstance
+ */
+function openState(type, ins, ownerInstance) {
+	var state = ins.getState()
+	var leftWidth = state.leftWidth
+	var rightWidth = state.rightWidth
+	var left = ''
+	state.isopen = state.isopen ? state.isopen : 'none'
+	switch (type) {
+		case "left":
+			left = leftWidth
+			break
+		case "right":
+			left = -rightWidth
+			break
+		default:
+			left = 0
+	}
+
+	// && !state.throttle
+
+	if (state.isopen !== type) {
+		state.throttle = true
+		ownerInstance.callMethod('change', {
+			open: type
+		})
+
+	}
+
+	state.isopen = type
+	// 添加动画类
+	ins.requestAnimationFrame(function() {
+		ins.addClass('ani');
+		move(left, ins, ownerInstance)
+	})
+	// 设置最终移动位置,理论上只要进入到这个函数，肯定是要打开的
+}
+
+
+function getDirection(x, y) {
+	if (x > y && x > MIN_DISTANCE) {
+		return 'horizontal';
+	}
+	if (y > x && y > MIN_DISTANCE) {
+		return 'vertical';
+	}
+	return '';
+}
+
+/**
+ * 重置滑动状态
+ * @param {Object} event
+ */
+function resetTouchStatus(instance) {
+	var state = instance.getState();
+	state.direction = '';
+	state.deltaX = 0;
+	state.deltaY = 0;
+	state.offsetX = 0;
+	state.offsetY = 0;
+}
+
+/**
+ * 设置滑动开始位置
+ * @param {Object} event
+ */
+function stopTouchStart(event) {
+	var instance = event.instance;
+	var state = instance.getState();
+	resetTouchStatus(instance);
+	var touch = event.touches[0];
+	if (IS_HTML5 && isPC()) {
+		touch = event;
+	}
+	state.startX = touch.clientX;
+	state.startY = touch.clientY;
+}
+
+/**
+ * 滑动中，是否禁止打开
+ * @param {Object} event
+ */
+function stopTouchMove(event) {
+	var instance = event.instance;
+	var state = instance.getState();
+	var touch = event.touches[0];
+	if (IS_HTML5 && isPC()) {
+		touch = event;
+	}
+	state.deltaX = touch.clientX - state.startX;
+	state.deltaY = touch.clientY - state.startY;
+	state.offsetY = Math.abs(state.deltaY);
+	state.offsetX = Math.abs(state.deltaX);
+	state.direction = state.direction || getDirection(state.offsetX, state.offsetY);
+}
+
+function isPC() {
+	var userAgentInfo = navigator.userAgent;
+	var Agents = ["Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod"];
+	var flag = true;
+	for (var v = 0; v < Agents.length - 1; v++) {
+		if (userAgentInfo.indexOf(Agents[v]) > 0) {
+			flag = false;
+			break;
+		}
+	}
+	return flag;
+}
+
+var movable = false
+
+function mousedown(e, ins) {
+	if (!IS_HTML5) return
+	if (!isPC()) return
+	touchstart(e, ins)
+	movable = true
+}
+
+function mousemove(e, ins) {
+	if (!IS_HTML5) return
+	if (!isPC()) return
+	if (!movable) return
+	touchmove(e, ins)
+}
+
+function mouseup(e, ins) {
+	if (!IS_HTML5) return
+	if (!isPC()) return
+	touchend(e, ins)
+	movable = false
+}
+
+function mouseleave(e, ins) {
+	if (!IS_HTML5) return
+	if (!isPC()) return
+	movable = false
+}
+
+module.exports = {
+	showWatch: showWatch,
+	touchstart: touchstart,
+	touchmove: touchmove,
+	touchend: touchend,
+	mousedown: mousedown,
+	mousemove: mousemove,
+	mouseup: mouseup,
+	mouseleave: mouseleave
+}

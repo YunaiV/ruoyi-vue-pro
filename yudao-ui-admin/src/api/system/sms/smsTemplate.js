@@ -43,7 +43,7 @@ export function getSmsTemplatePage(query) {
   })
 }
 
-// 创建短信模板
+// 发送测试短信
 export function sendSms(data) {
   return request({
     url: '/system/sms-template/send-sms',

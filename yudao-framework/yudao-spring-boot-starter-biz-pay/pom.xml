@@ -52,14 +52,18 @@
         <dependency>
             <groupId>com.alipay.sdk</groupId>
             <artifactId>alipay-sdk-java</artifactId>
-            <version>4.17.9.ALL</version>
+            <version>4.35.79.ALL</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk15on</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.github.binarywang</groupId>
             <artifactId>weixin-java-pay</artifactId>
-            <version>4.1.9.B</version>
         </dependency>
-        <!-- TODO 芋艿：清理 -->
 
         <!-- Test 测试相关 -->
         <dependency>

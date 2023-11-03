@@ -5,6 +5,8 @@ import cn.iocoder.yudao.framework.mq.core.interceptor.RedisMessageInterceptor;
 import cn.iocoder.yudao.framework.mq.core.message.AbstractRedisMessage;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 
+import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_TENANT_ID;
+
 /**
  * 多租户 {@link AbstractRedisMessage} 拦截器
  *
@@ -14,8 +16,6 @@ import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
  * @author 芋道源码
  */
 public class TenantRedisMessageInterceptor implements RedisMessageInterceptor {
-
-    private static final String HEADER_TENANT_ID = "tenant-id";
 
     @Override
     public void sendMessageBefore(AbstractRedisMessage message) {
