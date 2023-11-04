@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.member.service.auth;
 
-import cn.binarywang.wx.miniapp.api.WxMaService;
+//import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
@@ -47,8 +47,8 @@ public class MemberAuthServiceTest extends BaseDbAndRedisUnitTest {
     private OAuth2TokenApi oauth2TokenApi;
     @MockBean
     private SocialUserApi socialUserApi;
-    @MockBean
-    private WxMaService wxMaService;
+    //@MockBean
+    //private WxMaService wxMaService;
     @MockBean
     private PasswordEncoder passwordEncoder;
 

@@ -5,12 +5,19 @@ import cn.binarywang.wx.miniapp.api.impl.WxMaServiceImpl;
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.binarywang.wx.miniapp.config.impl.WxMaRedisBetterConfigImpl;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.cache.CacheUtils;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.social.core.YudaoAuthRequestFactory;
+import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientCreateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientUpdateReqVO;
+import cn.iocoder.yudao.module.system.convert.social.SocialClientConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
 import cn.iocoder.yudao.module.system.dal.mysql.social.SocialClientMapper;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
@@ -37,12 +44,13 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.Duration;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SOCIAL_APP_WEIXIN_MINI_APP_PHONE_CODE_ERROR;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SOCIAL_USER_AUTH_FAILURE;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
 /**
  * 社交应用 Service 实现类
@@ -151,6 +159,9 @@ public class SocialClientServiceImpl implements SocialClientService {
             // 2.2 修改对应的 clientId + clientSecret 密钥
             newAuthConfig.setClientId(client.getClientId());
             newAuthConfig.setClientSecret(client.getClientSecret());
+            if (client.getAgentId() != null) { // 如果有 agentId 则修改 agentId
+                newAuthConfig.setAgentId(client.getAgentId());
+            }
             // 2.3 设置会 request 里，进行后续使用
             ReflectUtil.setFieldValue(request, "config", newAuthConfig);
         }
@@ -253,6 +264,58 @@ public class SocialClientServiceImpl implements SocialClientService {
         WxMaService service = new WxMaServiceImpl();
         service.setWxMaConfig(configStorage);
         return service;
+    }
+
+    // =================== 客户端管理 ===================
+
+    @Override
+    public Long createSocialClient(SocialClientCreateReqVO createReqVO) {
+        // 插入
+        SocialClientDO socialClient = SocialClientConvert.INSTANCE.convert(createReqVO);
+        socialClientMapper.insert(socialClient);
+        // 返回
+        return socialClient.getId();
+    }
+
+    @Override
+    public void updateSocialClient(SocialClientUpdateReqVO updateReqVO) {
+        // 校验存在
+        validateSocialClientExists(updateReqVO.getId());
+        // 更新
+        SocialClientDO updateObj = SocialClientConvert.INSTANCE.convert(updateReqVO);
+        socialClientMapper.updateById(updateObj);
+    }
+
+    @Override
+    public void deleteSocialClient(Long id) {
+        // 校验存在
+        validateSocialClientExists(id);
+        // 删除
+        socialClientMapper.deleteById(id);
+    }
+
+    private void validateSocialClientExists(Long id) {
+        if (socialClientMapper.selectById(id) == null) {
+            throw exception(SOCIAL_CLIENT_NOT_EXISTS);
+        }
+    }
+
+    @Override
+    public SocialClientDO getSocialClient(Long id) {
+        return socialClientMapper.selectById(id);
+    }
+
+    @Override
+    public List<SocialClientDO> getSocialClientList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return ListUtil.empty();
+        }
+        return socialClientMapper.selectBatchIds(ids);
+    }
+
+    @Override
+    public PageResult<SocialClientDO> getSocialClientPage(SocialClientPageReqVO pageReqVO) {
+        return socialClientMapper.selectPage(pageReqVO);
     }
 
 }
