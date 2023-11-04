@@ -63,3 +63,45 @@ CREATE TABLE `crm_receivable_plan`  (
     `tenant_id` bigint(20) NOT NULL DEFAULT 0 COMMENT '租户编号',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '回款计划' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- 产品表
+-- ----------------------------
+DROP TABLE IF EXISTS `crm_product`;
+CREATE TABLE `crm_product`
+(
+    `id`            bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+    `name`          varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '产品名称',
+    `no`            varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci  NOT NULL COMMENT '产品编码',
+    `unit`          varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '单位',
+    `price`         bigint(20) NULL DEFAULT 0 COMMENT '价格',
+    `status`        tinyint(2) NOT NULL DEFAULT 1 COMMENT '状态 1-上架 0-下架',
+    `category_id`   bigint(20) NOT NULL COMMENT '产品分类ID',
+    `description`   varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '产品描述',
+    `owner_user_id` bigint(20) NOT NULL COMMENT '负责人的用户编号',
+    `creator`       varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+    `create_time`   datetime                                                      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updater`       varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+    `update_time`   datetime                                                      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `tenant_id`     bigint(20) NOT NULL DEFAULT 0 COMMENT '租户编号',
+    `deleted`       bit(1)                                                        NOT NULL DEFAULT b'0' COMMENT '是否删除',
+    PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '产品表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- 产品分类表
+-- ----------------------------
+DROP TABLE IF EXISTS `crm_product_category`;
+CREATE TABLE `crm_product_category`
+(
+    `id`          bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+    `name`        varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '名称',
+    `parent_id`   bigint(20) NOT NULL COMMENT '父级id',
+    `creator`     varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+    `create_time` datetime                                                      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updater`     varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+    `update_time` datetime                                                      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `tenant_id`   bigint(20) NOT NULL DEFAULT 0 COMMENT '租户编号',
+    `deleted`     bit(1)                                                        NOT NULL DEFAULT b'0' COMMENT '是否删除',
+    PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '产品分类表' ROW_FORMAT = Dynamic;
