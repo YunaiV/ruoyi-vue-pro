@@ -30,10 +30,8 @@ public class CrmCustomerRespVO extends CrmCustomerBaseVO {
 
     @Schema(description = "负责人的用户编号", example = "25682")
     private Long ownerUserId;
-
     @Schema(description = "负责人名字", example = "25682")
     private String ownerUserName;
-
     @Schema(description = "负责人部门")
     private String ownerUserDept;
 
@@ -52,7 +50,7 @@ public class CrmCustomerRespVO extends CrmCustomerBaseVO {
 
     @Schema(description = "创建人")
     private String creator;
-
     @Schema(description = "创建人名字")
     private String creatorName;
+
 }

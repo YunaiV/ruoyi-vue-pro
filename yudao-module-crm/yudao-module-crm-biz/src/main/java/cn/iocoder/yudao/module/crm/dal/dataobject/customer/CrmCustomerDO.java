@@ -98,8 +98,11 @@ public class CrmCustomerDO extends BaseDO {
     private String remark;
     /**
      * 负责人的用户编号
+     *
+     * 关联 AdminUserDO 的 id 字段
      */
     private Long ownerUserId;
+    // TODO @puhui999：这块抽到 permission 里；
     /**
      * 只读权限的用户编号数组
      */

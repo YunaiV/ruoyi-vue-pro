@@ -65,6 +65,10 @@ public class CrmPermissionAspect {
     // TODO @puhui999：一般核心的方法，放到最前面，private 放后面。主要是，主次要分出来哈；
     @Before("@annotation(crmPermission)")
     public void doBefore(JoinPoint joinPoint, CrmPermission crmPermission) {
+        // TODO 芋艿：临时，方便大家调试
+        if (true) {
+            return;
+        }
         try {
             Long bizId = crmPermission.getIdFor().length > 0 ? getBizId(joinPoint, crmPermission) : (Long) joinPoint.getArgs()[0]; // 获取操作数据的编号
             Integer bizType = crmPermission.bizType().getType(); // 模块类型
