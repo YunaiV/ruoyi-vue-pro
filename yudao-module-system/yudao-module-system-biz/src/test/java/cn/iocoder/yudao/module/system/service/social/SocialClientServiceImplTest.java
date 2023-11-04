@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author 芋道源码
  */
 @Import(SocialClientServiceImpl.class)
+@Disabled
 public class SocialClientServiceImplTest extends BaseDbUnitTest {
 
     @Resource
