@@ -76,7 +76,7 @@ public class CrmCustomerExcelVO {
     private Long ownerUserId;
 
     @ExcelProperty("地区编号")
-    private Long areaId;
+    private Integer areaId;
 
     @ExcelProperty("详细地址")
     private String detailAddress;

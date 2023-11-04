@@ -1,13 +1,22 @@
 package cn.iocoder.yudao.module.crm.controller.admin.customer;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import com.google.common.collect.Lists;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,7 +28,9 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
@@ -33,6 +44,10 @@ public class CrmCustomerController {
 
     @Resource
     private CrmCustomerService customerService;
+    @Resource
+    private DeptApi deptApi;
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建客户")
@@ -64,7 +79,21 @@ public class CrmCustomerController {
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
     public CommonResult<CrmCustomerRespVO> getCustomer(@RequestParam("id") Long id) {
         CrmCustomerDO customer = customerService.getCustomer(id);
-        return success(CrmCustomerConvert.INSTANCE.convert(customer));
+        CrmCustomerRespVO customerRespVO = CrmCustomerConvert.INSTANCE.convert(customer);
+        if (ObjectUtil.isAllNotEmpty(customer, customer.getAreaId())) {
+            customerRespVO.setAreaName(AreaUtils.format(customer.getAreaId()));
+        }
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(CollUtil.removeNull(Lists.newArrayList(NumberUtil.parseLong(customerRespVO.getCreator()), customerRespVO.getOwnerUserId())));
+        customerRespVO.setCreatorName(Optional.ofNullable(userMap.get(NumberUtil.parseLong(customerRespVO.getCreator()))).map(AdminUserRespDTO::getNickname).orElse(null));
+        AdminUserRespDTO ownerUser = userMap.get(customer.getOwnerUserId());
+        if (Objects.nonNull(ownerUser)) {
+            customerRespVO.setOwnerUserName(ownerUser.getNickname());
+            DeptRespDTO dept = deptApi.getDept(ownerUser.getDeptId());
+            if (Objects.nonNull(dept)) {
+                customerRespVO.setOwnerUserDept(dept.getName());
+            }
+        }
+        return success(customerRespVO);
     }
 
     @GetMapping("/page")
@@ -72,7 +101,23 @@ public class CrmCustomerController {
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
     public CommonResult<PageResult<CrmCustomerRespVO>> getCustomerPage(@Valid CrmCustomerPageReqVO pageVO) {
         PageResult<CrmCustomerDO> pageResult = customerService.getCustomerPage(pageVO);
-        return success(CrmCustomerConvert.INSTANCE.convertPage(pageResult));
+        PageResult<CrmCustomerRespVO> pageVo = CrmCustomerConvert.INSTANCE.convertPage(pageResult);
+        Set<Long> userSet = pageVo.getList().stream().flatMap(i -> Stream.of(NumberUtil.parseLong(i.getCreator()), i.getOwnerUserId())).collect(Collectors.toSet());
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userSet);
+        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(userMap.values().stream().map(AdminUserRespDTO::getDeptId).collect(Collectors.toSet()));
+        pageVo.getList().forEach(customerRespVO -> {
+            customerRespVO.setAreaName(AreaUtils.format(customerRespVO.getAreaId()));
+            customerRespVO.setCreatorName(Optional.ofNullable(userMap.get(NumberUtil.parseLong(customerRespVO.getCreator()))).map(AdminUserRespDTO::getNickname).orElse(null));
+            AdminUserRespDTO ownerUser = userMap.get(customerRespVO.getOwnerUserId());
+            if (Objects.nonNull(ownerUser)) {
+                customerRespVO.setOwnerUserName(ownerUser.getNickname());
+                DeptRespDTO dept = deptMap.get(ownerUser.getDeptId());
+                if (Objects.nonNull(dept)) {
+                    customerRespVO.setOwnerUserDept(dept.getName());
+                }
+            }
+        });
+        return success(pageVo);
     }
 
     @GetMapping("/export-excel")

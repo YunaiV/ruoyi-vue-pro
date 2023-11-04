@@ -31,6 +31,15 @@ public class CrmCustomerRespVO extends CrmCustomerBaseVO {
     @Schema(description = "负责人的用户编号", example = "25682")
     private Long ownerUserId;
 
+    @Schema(description = "负责人名字", example = "25682")
+    private String ownerUserName;
+
+    @Schema(description = "负责人部门")
+    private String ownerUserDept;
+
+    @Schema(description = "地区名称", example = "北京市")
+    private String areaName;
+
     @Schema(description = "最后跟进时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime contactLastTime;
@@ -38,4 +47,12 @@ public class CrmCustomerRespVO extends CrmCustomerBaseVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
+    @Schema(description = "更新时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    private LocalDateTime updateTime;
+
+    @Schema(description = "创建人")
+    private String creator;
+
+    @Schema(description = "创建人名字")
+    private String creatorName;
 }
