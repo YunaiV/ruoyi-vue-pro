@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.system.api.social.dto.SocialUserUnbindReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.SocialUserBindReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.SocialUserUnbindReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUserRespVO;
-import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUserUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -23,8 +22,6 @@ public interface SocialUserConvert {
     SocialUserBindReqDTO convert(Long userId, Integer userType, SocialUserBindReqVO reqVO);
 
     SocialUserUnbindReqDTO convert(Long userId, Integer userType, SocialUserUnbindReqVO reqVO);
-
-    SocialUserDO convert(SocialUserUpdateReqVO bean);
 
     SocialUserRespVO convert(SocialUserDO bean);
 

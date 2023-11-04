@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -22,6 +21,7 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SOCIAL_CLIENT_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
 
+// TODO 芋艿：单测后续补充下；
 /**
  * {@link SocialClientServiceImpl} 的单元测试类
  *
@@ -133,9 +133,7 @@ public class SocialClientServiceImplTest extends BaseDbUnitTest {
         reqVO.setSocialType(null);
         reqVO.setUserType(null);
         reqVO.setClientId(null);
-        reqVO.setClientSecret(null);
         reqVO.setStatus(null);
-        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
         // 调用
         PageResult<SocialClientDO> pageResult = socialClientService.getSocialClientPage(reqVO);

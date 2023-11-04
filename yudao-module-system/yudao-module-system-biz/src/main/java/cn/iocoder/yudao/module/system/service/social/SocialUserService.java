@@ -5,12 +5,10 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserRespDTO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUserPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUserUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -63,34 +61,12 @@ public interface SocialUserService {
     // ==================== 社交用户 CRUD ====================
 
     /**
-     * 更新社交用户
-     *
-     * @param updateReqVO 更新信息
-     */
-    void updateSocialUser(@Valid SocialUserUpdateReqVO updateReqVO);
-
-    /**
-     * 删除社交用户
-     *
-     * @param id 编号
-     */
-    void deleteSocialUser(Long id);
-
-    /**
      * 获得社交用户
      *
      * @param id 编号
      * @return 社交用户
      */
     SocialUserDO getSocialUser(Long id);
-
-    /**
-     * 获得社交用户列表
-     *
-     * @param ids 编号
-     * @return 社交用户列表
-     */
-    List<SocialUserDO> getSocialUserList(Collection<Long> ids);
 
     /**
      * 获得社交用户分页

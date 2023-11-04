@@ -64,8 +64,12 @@ public class SocialClientDO extends TenantBaseDO {
      * 客户端 Secret
      */
     private String clientSecret;
+
     /**
-     * 授权方的网页应用 ID
+     * 代理编号
+     *
+     * 目前只有部分“社交类型”在使用：
+     * 1. 企业微信：对应授权方的网页应用 ID
      */
     private String agentId;
 

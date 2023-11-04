@@ -20,10 +20,10 @@ public class SocialUserBaseVO {
     @NotNull(message = "社交 openid不能为空")
     private String openid;
 
-    @Schema(description = "社交 token", example = "666")
+    @Schema(description = "社交 token", requiredMode = Schema.RequiredMode.REQUIRED, example = "666")
     private String token;
 
-    @Schema(description = "原始 Token 数据，一般是 JSON 格式", example = "{}")
+    @Schema(description = "原始 Token 数据，一般是 JSON 格式", requiredMode = Schema.RequiredMode.REQUIRED, example = "{}")
     private String rawTokenInfo;
 
     @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
@@ -33,13 +33,13 @@ public class SocialUserBaseVO {
     @Schema(description = "用户头像", example = "https://www.iocoder.cn/xxx.png")
     private String avatar;
 
-    @Schema(description = "原始用户数据，一般是 JSON 格式", example = "{}")
+    @Schema(description = "原始用户数据，一般是 JSON 格式", requiredMode = Schema.RequiredMode.REQUIRED, example = "{}")
     private String rawUserInfo;
 
-    @Schema(description = "最后一次的认证 code", example = "666666")
+    @Schema(description = "最后一次的认证 code", requiredMode = Schema.RequiredMode.REQUIRED, example = "666666")
     private String code;
 
-    @Schema(description = "最后一次的认证 state", example = "123456")
+    @Schema(description = "最后一次的认证 state", requiredMode = Schema.RequiredMode.REQUIRED, example = "123456")
     private String state;
 
 }

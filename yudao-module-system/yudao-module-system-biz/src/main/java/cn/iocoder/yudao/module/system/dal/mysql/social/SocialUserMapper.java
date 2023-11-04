@@ -28,6 +28,7 @@ public interface SocialUserMapper extends BaseMapperX<SocialUserDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<SocialUserDO>()
                 .eqIfPresent(SocialUserDO::getType, reqVO.getType())
                 .likeIfPresent(SocialUserDO::getNickname, reqVO.getNickname())
+                .likeIfPresent(SocialUserDO::getOpenid, reqVO.getOpenid())
                 .betweenIfPresent(SocialUserDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(SocialUserDO::getId));
     }

@@ -8,7 +8,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserRespDTO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUserPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUserUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.social.SocialUserConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserBindDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
@@ -154,39 +153,8 @@ public class SocialUserServiceImpl implements SocialUserService {
     // ==================== 社交用户 CRUD ====================
 
     @Override
-    public void updateSocialUser(SocialUserUpdateReqVO updateReqVO) {
-        // 校验存在
-        validateSocialUserExists(updateReqVO.getId());
-        // 更新
-        SocialUserDO updateObj = SocialUserConvert.INSTANCE.convert(updateReqVO);
-        socialUserMapper.updateById(updateObj);
-    }
-
-    @Override
-    public void deleteSocialUser(Long id) {
-        // 校验存在
-        validateSocialUserExists(id);
-        // 删除
-        socialUserMapper.deleteById(id);
-    }
-
-    private void validateSocialUserExists(Long id) {
-        if (socialUserMapper.selectById(id) == null) {
-            throw exception(SOCIAL_USER_NOT_EXISTS);
-        }
-    }
-
-    @Override
     public SocialUserDO getSocialUser(Long id) {
         return socialUserMapper.selectById(id);
-    }
-
-    @Override
-    public List<SocialUserDO> getSocialUserList(Collection<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return ListUtil.empty();
-        }
-        return socialUserMapper.selectBatchIds(ids);
     }
 
     @Override

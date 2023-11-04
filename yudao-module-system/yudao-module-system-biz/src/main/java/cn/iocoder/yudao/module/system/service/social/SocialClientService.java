@@ -11,8 +11,6 @@ import com.xingyuv.jushauth.model.AuthUser;
 import me.chanjar.weixin.common.bean.WxJsapiSignature;
 
 import javax.validation.Valid;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * 社交应用 Service 接口
@@ -95,14 +93,6 @@ public interface SocialClientService {
      * @return 社交客户端
      */
     SocialClientDO getSocialClient(Long id);
-
-    /**
-     * 获得社交客户端列表
-     *
-     * @param ids 编号
-     * @return 社交客户端列表
-     */
-    List<SocialClientDO> getSocialClientList(Collection<Long> ids);
 
     /**
      * 获得社交客户端分页

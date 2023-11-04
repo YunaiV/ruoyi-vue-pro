@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.system.controller.admin.socail.vo.SocialUserBindR
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.SocialUserUnbindReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUserPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUserRespVO;
-import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUserUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.social.SocialUserConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
 import cn.iocoder.yudao.module.system.service.social.SocialUserService;
@@ -48,23 +47,6 @@ public class SocialUserController {
     }
 
     // ==================== 社交用户 CRUD ====================
-
-    @PutMapping("/update")
-    @Operation(summary = "更新社交用户")
-    @PreAuthorize("@ss.hasPermission('system:social-user:update')")
-    public CommonResult<Boolean> updateSocialUser(@Valid @RequestBody SocialUserUpdateReqVO updateReqVO) {
-        socialUserService.updateSocialUser(updateReqVO);
-        return success(true);
-    }
-
-    @DeleteMapping("/delete")
-    @Operation(summary = "删除社交用户")
-    @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('system:social-user:delete')")
-    public CommonResult<Boolean> deleteSocialUser(@RequestParam("id") Long id) {
-        socialUserService.deleteSocialUser(id);
-        return success(true);
-    }
 
     @GetMapping("/get")
     @Operation(summary = "获得社交用户")
