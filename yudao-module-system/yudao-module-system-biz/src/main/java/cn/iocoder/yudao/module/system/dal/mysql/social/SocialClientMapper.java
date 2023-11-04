@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.module.system.dal.mysql.social;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -10,6 +13,18 @@ public interface SocialClientMapper extends BaseMapperX<SocialClientDO> {
     default SocialClientDO selectBySocialTypeAndUserType(Integer socialType, Integer userType) {
         return selectOne(SocialClientDO::getSocialType, socialType,
                 SocialClientDO::getUserType, userType);
+    }
+
+    default PageResult<SocialClientDO> selectPage(SocialClientPageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<SocialClientDO>()
+                .likeIfPresent(SocialClientDO::getName, reqVO.getName())
+                .eqIfPresent(SocialClientDO::getSocialType, reqVO.getSocialType())
+                .eqIfPresent(SocialClientDO::getUserType, reqVO.getUserType())
+                .eqIfPresent(SocialClientDO::getClientId, reqVO.getClientId())
+                .eqIfPresent(SocialClientDO::getClientSecret, reqVO.getClientSecret())
+                .eqIfPresent(SocialClientDO::getStatus, reqVO.getStatus())
+                .betweenIfPresent(SocialClientDO::getCreateTime, reqVO.getCreateTime())
+                .orderByDesc(SocialClientDO::getId));
     }
 
 }
