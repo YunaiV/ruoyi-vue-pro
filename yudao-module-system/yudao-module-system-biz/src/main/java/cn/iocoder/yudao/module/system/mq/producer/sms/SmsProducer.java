@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.system.mq.producer.sms;
 
 import cn.iocoder.yudao.framework.common.core.KeyValue;
-import cn.iocoder.yudao.framework.mq.core.RedisMQTemplate;
 import cn.iocoder.yudao.module.system.mq.message.sms.SmsSendMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -20,7 +20,7 @@ import java.util.List;
 public class SmsProducer {
 
     @Resource
-    private RedisMQTemplate redisMQTemplate;
+    private ApplicationContext applicationContext;
 
     /**
      * 发送 {@link SmsSendMessage} 消息
@@ -35,7 +35,7 @@ public class SmsProducer {
                                    Long channelId, String apiTemplateId, List<KeyValue<String, Object>> templateParams) {
         SmsSendMessage message = new SmsSendMessage().setLogId(logId).setMobile(mobile);
         message.setChannelId(channelId).setApiTemplateId(apiTemplateId).setTemplateParams(templateParams);
-        redisMQTemplate.send(message);
+        applicationContext.publishEvent(message);
     }
 
 }

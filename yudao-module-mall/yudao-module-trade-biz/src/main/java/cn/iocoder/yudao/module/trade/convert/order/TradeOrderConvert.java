@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
-import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
+import cn.iocoder.yudao.module.member.api.address.dto.MemberAddressRespDTO;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.enums.DictTypeConstants;
@@ -241,7 +241,7 @@ public interface TradeOrderConvert {
         return reqBO;
     }
 
-    default AppTradeOrderSettlementRespVO convert(TradePriceCalculateRespBO calculate, AddressRespDTO address) {
+    default AppTradeOrderSettlementRespVO convert(TradePriceCalculateRespBO calculate, MemberAddressRespDTO address) {
         AppTradeOrderSettlementRespVO respVO = convert0(calculate, address);
         if (address != null) {
             respVO.getAddress().setAreaName(AreaUtils.format(address.getAreaId()));
@@ -249,7 +249,7 @@ public interface TradeOrderConvert {
         return respVO;
     }
 
-    AppTradeOrderSettlementRespVO convert0(TradePriceCalculateRespBO calculate, AddressRespDTO address);
+    AppTradeOrderSettlementRespVO convert0(TradePriceCalculateRespBO calculate, MemberAddressRespDTO address);
 
     List<AppOrderExpressTrackRespDTO> convertList02(List<ExpressTrackRespDTO> list);
 

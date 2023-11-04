@@ -13,16 +13,16 @@
         <!-- Server 主项目 -->
         <module>yudao-server</module>
         <!-- 各种 module 拓展 -->
-        <module>yudao-module-member</module>
         <module>yudao-module-system</module>
         <module>yudao-module-infra</module>
-        <!--        <module>yudao-module-bpm</module>-->
+<!--        <module>yudao-module-member</module>-->
+<!--        <module>yudao-module-bpm</module>-->
 <!--        <module>yudao-module-report</module>-->
 <!--        <module>yudao-module-mp</module>-->
-        <module>yudao-module-pay</module>
-        <module>yudao-module-mall</module>
+<!--        <module>yudao-module-pay</module>-->
+<!--        <module>yudao-module-mall</module>-->
         <!-- 示例项目 -->
-        <module>yudao-example</module>
+<!--        <module>yudao-example</module>-->
     </modules>
 
     <name>${project.artifactId}</name>
@@ -30,7 +30,7 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>1.8.2-snapshot</revision>
+        <revision>1.8.3-snapshot</revision>
         <!-- Maven 相关 -->
         <java.version>1.8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -40,7 +40,7 @@
         <flatten-maven-plugin.version>1.5.0</flatten-maven-plugin.version>
         <!-- 看看咋放到 bom 里 -->
         <lombok.version>1.18.30</lombok.version>
-        <spring.boot.version>2.7.16</spring.boot.version>
+        <spring.boot.version>2.7.17</spring.boot.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

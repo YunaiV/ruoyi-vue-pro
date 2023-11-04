@@ -38,7 +38,8 @@ public interface MemberUserApi {
      * @return 会员用户 Map
      */
     default Map<Long, MemberUserRespDTO> getUserMap(Collection<Long> ids) {
-        return convertMap(getUserList(ids), MemberUserRespDTO::getId);
+        List<MemberUserRespDTO> list = getUserList(ids);
+        return convertMap(list, MemberUserRespDTO::getId);
     }
 
     /**

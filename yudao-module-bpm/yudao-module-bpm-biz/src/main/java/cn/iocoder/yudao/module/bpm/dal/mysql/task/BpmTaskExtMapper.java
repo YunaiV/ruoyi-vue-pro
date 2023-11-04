@@ -21,12 +21,12 @@ public interface BpmTaskExtMapper extends BaseMapperX<BpmTaskExtDO> {
         return selectList(BpmTaskExtDO::getTaskId, taskIds);
     }
 
+    // TODO @海：BpmProcessInstanceResultEnum.CAN_SUB_SIGN_STATUS_LIST) 应该作为条件，mapper 不要有业务
     default List<BpmTaskExtDO> selectProcessListByTaskIds(Collection<String> taskIds) {
         return selectList(new LambdaQueryWrapperX<BpmTaskExtDO>()
                 .in(BpmTaskExtDO::getTaskId, taskIds)
                 .in(BpmTaskExtDO::getResult, BpmProcessInstanceResultEnum.CAN_SUB_SIGN_STATUS_LIST));
     }
-
 
     default BpmTaskExtDO selectByTaskId(String taskId) {
         return selectOne(BpmTaskExtDO::getTaskId, taskId);

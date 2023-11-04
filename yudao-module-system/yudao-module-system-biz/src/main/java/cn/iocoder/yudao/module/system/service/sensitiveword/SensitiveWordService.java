@@ -91,8 +91,8 @@ public interface SensitiveWordService {
      * 判断文本是否包含敏感词
      *
      * @param text 文本
-     * @param tags 表述数组
-     * @return 是否包含
+     * @param tags 标签数组
+     * @return 是否包含敏感词
      */
     boolean isTextValid(String text, List<String> tags);
 

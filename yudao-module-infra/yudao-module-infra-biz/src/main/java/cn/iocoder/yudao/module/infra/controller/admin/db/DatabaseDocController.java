@@ -147,7 +147,7 @@ public class DatabaseDocController {
      */
     private static ProcessConfig buildProcessConfig() {
         return ProcessConfig.builder()
-                .ignoreTablePrefix(Arrays.asList("QRTZ_", "ACT_")) // 忽略表前缀
+                .ignoreTablePrefix(Arrays.asList("QRTZ_", "ACT_", "FLW_")) // 忽略表前缀
                 .build();
     }
 

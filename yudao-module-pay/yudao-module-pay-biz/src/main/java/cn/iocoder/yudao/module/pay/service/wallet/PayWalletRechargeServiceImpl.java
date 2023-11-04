@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletRechargeDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletRechargePackageDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletRechargeMapper;
-import cn.iocoder.yudao.module.pay.enums.member.PayWalletBizTypeEnum;
+import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
@@ -64,6 +64,7 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
     @Transactional(rollbackFor = Exception.class)
     public PayWalletRechargeDO createWalletRecharge(Long userId, Integer userType, String userIp,
                                                     AppPayWalletRechargeCreateReqVO reqVO) {
+
         // 1.1 计算充值金额
         int payPrice;
         int bonusPrice = 0;

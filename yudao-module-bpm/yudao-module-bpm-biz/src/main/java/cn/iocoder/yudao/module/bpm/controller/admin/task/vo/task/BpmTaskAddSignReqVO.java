@@ -6,6 +6,7 @@ import lombok.Data;
 import javax.validation.constraints.NotEmpty;
 import java.util.Set;
 
+// TODO @海洋：类名，应该是 create 哈
 @Schema(description = "管理后台 - 加签流程任务的 Request VO")
 @Data
 public class BpmTaskAddSignReqVO {

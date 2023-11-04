@@ -20,16 +20,16 @@ public enum BpmCommentTypeEnum {
     ;
 
     /**
-     * 结果
+     * 操作类型
      */
     private final Integer type;
     /**
-     * 描述
+     * 操作名字
      */
-    private final String desc;
+    private final String name;
     /**
-     * 模板信息
+     * 操作描述
      */
-    private final String templateComment;
+    private final String comment;
 
 }

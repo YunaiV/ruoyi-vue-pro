@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.pay.service.wallet.bo;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.pay.enums.member.PayWalletBizTypeEnum;
+import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;

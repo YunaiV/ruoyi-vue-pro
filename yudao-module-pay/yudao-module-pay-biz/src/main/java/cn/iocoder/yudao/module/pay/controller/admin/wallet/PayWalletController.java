@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.wallet.PayWalletPageReqVO;
@@ -26,12 +25,10 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.enums.UserTypeEnum.MEMBER;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 
 @Tag(name = "管理后台 - 用户钱包")
 @RestController
@@ -50,6 +47,7 @@ public class PayWalletController {
     @Operation(summary = "获得用户钱包明细")
     public CommonResult<PayWalletRespVO> getWallet(PayWalletUserReqVO reqVO) {
         PayWalletDO wallet = payWalletService.getOrCreateWallet(reqVO.getUserId(), MEMBER.getValue());
+        // TODO jason：如果为空，返回给前端只要 null 就可以了
         MemberUserRespDTO memberUser = memberUserApi.getUser(reqVO.getUserId());
         String nickname = memberUser == null ? "" : memberUser.getNickname();
         String avatar = memberUser == null ? "" : memberUser.getAvatar();
@@ -61,9 +59,8 @@ public class PayWalletController {
     @PreAuthorize("@ss.hasPermission('pay:wallet:query')")
     public CommonResult<PageResult<PayWalletRespVO>> getWalletPage(@Valid PayWalletPageReqVO pageVO) {
         if (StrUtil.isNotEmpty(pageVO.getNickname())) {
-            Set<Long> userIds = CollectionUtils.convertSet(memberUserApi.getUserListByNickname(pageVO.getNickname()),
-                    MemberUserRespDTO::getId);
-            pageVO.setUserIds(userIds);
+            List<MemberUserRespDTO> users = memberUserApi.getUserListByNickname(pageVO.getNickname());
+            pageVO.setUserIds(convertSet(users, MemberUserRespDTO::getId));
         }
         // TODO @jason：管理员也可以先查询下。。
         // 暂时支持查询 userType 会员类型。管理员类型还不知道使用场景
@@ -71,8 +68,8 @@ public class PayWalletController {
         if (CollectionUtil.isEmpty(pageResult.getList())) {
             return success(new PageResult<>(pageResult.getTotal()));
         }
-        List<Long> userIds = convertList(pageResult.getList(), PayWalletDO::getUserId);
-        Map<Long, MemberUserRespDTO> userMap = convertMap(memberUserApi.getUserList(userIds),MemberUserRespDTO::getId);
+        List<MemberUserRespDTO> users = memberUserApi.getUserList(convertList(pageResult.getList(), PayWalletDO::getUserId));
+        Map<Long, MemberUserRespDTO> userMap = convertMap(users, MemberUserRespDTO::getId);
         return success(PayWalletConvert.INSTANCE.convertPage(pageResult, userMap));
     }
 

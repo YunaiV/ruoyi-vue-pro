@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationR
 import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
 import cn.iocoder.yudao.module.promotion.service.combination.CombinationRecordService;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 
@@ -20,6 +21,7 @@ import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.COMBINA
  * @author HUIHUI
  */
 @Service
+@Validated
 public class CombinationRecordApiImpl implements CombinationRecordApi {
 
     @Resource
@@ -42,11 +44,6 @@ public class CombinationRecordApiImpl implements CombinationRecordApi {
             throw exception(COMBINATION_RECORD_NOT_EXISTS);
         }
         return CombinationRecordStatusEnum.isSuccess(record.getStatus());
-    }
-
-    @Override
-    public void updateRecordStatusToFailed(Long userId, Long orderId) {
-        recordService.updateCombinationRecordStatusByUserIdAndOrderId(CombinationRecordStatusEnum.FAILED.getStatus(), userId, orderId);
     }
 
     @Override
