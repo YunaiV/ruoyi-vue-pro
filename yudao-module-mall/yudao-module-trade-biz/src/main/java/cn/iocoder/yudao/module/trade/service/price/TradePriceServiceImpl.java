@@ -4,7 +4,6 @@ import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
-import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculator;
@@ -20,7 +19,8 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_NOT_EXISTS;
+import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_STOCK_NOT_ENOUGH;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PRICE_CALCULATE_PAY_PRICE_ILLEGAL;
 
 /**
@@ -41,7 +41,6 @@ public class TradePriceServiceImpl implements TradePriceService {
     @Resource
     private List<TradePriceCalculator> priceCalculators;
 
-    // TODO @疯狂：需要搞个 TradePriceCalculator，计算赠送积分；
     @Override
     public TradePriceCalculateRespBO calculatePrice(TradePriceCalculateReqBO calculateReqBO) {
         // 1.1 获得商品 SKU 数组
@@ -83,18 +82,7 @@ public class TradePriceServiceImpl implements TradePriceService {
 
     private List<ProductSpuRespDTO> checkSpuList(List<ProductSkuRespDTO> skuList) {
         // 获得商品 SPU 数组
-        List<ProductSpuRespDTO> spus = productSpuApi.getSpuList(convertSet(skuList, ProductSkuRespDTO::getSpuId));
-
-        // 校验商品 SPU
-        spus.forEach(spu -> {
-            if (spu == null) {
-                throw exception(SPU_NOT_EXISTS);
-            }
-            if (!ProductSpuStatusEnum.isEnable(spu.getStatus())) {
-                throw exception(SPU_NOT_ENABLE);
-            }
-        });
-        return spus;
+        return productSpuApi.validateSpuList(convertSet(skuList, ProductSkuRespDTO::getSpuId));
     }
 
 }

@@ -2,10 +2,12 @@ package cn.iocoder.yudao.module.trade.service.price.calculator;
 
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
-import cn.iocoder.yudao.module.member.api.address.AddressApi;
-import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
+import cn.iocoder.yudao.module.member.api.address.MemberAddressApi;
+import cn.iocoder.yudao.module.member.api.address.dto.MemberAddressRespDTO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryExpressChargeModeEnum;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
+import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressTemplateService;
 import cn.iocoder.yudao.module.trade.service.delivery.bo.DeliveryExpressTemplateRespBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
@@ -34,10 +36,14 @@ public class TradeDeliveryPriceCalculatorTest  extends BaseMockitoUnitTest {
 
     @InjectMocks
     private TradeDeliveryPriceCalculator calculator;
+
     @Mock
-    private AddressApi addressApi;
+    private MemberAddressApi addressApi;
+
     @Mock
     private DeliveryExpressTemplateService deliveryExpressTemplateService;
+    @Mock
+    private TradeConfigService tradeConfigService;
 
     private TradePriceCalculateReqBO reqBO;
     private TradePriceCalculateRespBO resultBO;
@@ -50,7 +56,7 @@ public class TradeDeliveryPriceCalculatorTest  extends BaseMockitoUnitTest {
     public void init(){
         // 准备参数
         reqBO = new TradePriceCalculateReqBO()
-                .setDeliveryType(DeliveryTypeEnum.EXPRESS.getMode())
+                .setDeliveryType(DeliveryTypeEnum.EXPRESS.getType())
                 .setAddressId(10L)
                 .setUserId(1L)
                 .setItems(asList(
@@ -74,7 +80,7 @@ public class TradeDeliveryPriceCalculatorTest  extends BaseMockitoUnitTest {
         TradePriceCalculatorHelper.recountAllPrice(resultBO);
 
         // 准备收件地址数据
-        AddressRespDTO addressResp = randomPojo(AddressRespDTO.class, item -> item.setAreaId(10));
+        MemberAddressRespDTO addressResp = randomPojo(MemberAddressRespDTO.class, item -> item.setAreaId(10));
         when(addressApi.getAddress(eq(10L), eq(1L))).thenReturn(addressResp);
 
         // 准备运费模板费用配置数据
@@ -85,13 +91,41 @@ public class TradeDeliveryPriceCalculatorTest  extends BaseMockitoUnitTest {
                 item -> item.setFreeCount(20).setFreePrice(100));
         // 准备 SP 运费模板数据
         templateRespBO = randomPojo(DeliveryExpressTemplateRespBO.class,
-                item -> item.setChargeMode(DeliveryExpressChargeModeEnum.PIECE.getType())
+                item -> item.setChargeMode(DeliveryExpressChargeModeEnum.COUNT.getType())
                         .setCharge(chargeBO).setFree(freeBO));
     }
 
     @Test
+    @DisplayName("全场包邮")
+    public void testCalculate_expressGlobalFree() {
+        // mock 方法（全场包邮）
+        when(tradeConfigService.getTradeConfig()).thenReturn(new TradeConfigDO().setDeliveryExpressFreeEnabled(true)
+                .setDeliveryExpressFreePrice(2200));
+
+        // 调用
+        calculator.calculate(reqBO, resultBO);
+        TradePriceCalculateRespBO.Price price = resultBO.getPrice();
+        assertThat(price)
+                .extracting("totalPrice","discountPrice","couponPrice","pointPrice","deliveryPrice","payPrice")
+                .containsExactly(2200, 0, 0, 0, 0,  2200);
+        assertThat(resultBO.getItems()).hasSize(3);
+        // 断言：SKU1
+        assertThat(resultBO.getItems().get(0))
+                .extracting("price", "count","discountPrice" ,"couponPrice", "pointPrice","deliveryPrice","payPrice")
+                .containsExactly(100, 2, 0, 0, 0, 0, 200);
+        // 断言：SKU2
+        assertThat(resultBO.getItems().get(1))
+                .extracting("price", "count","discountPrice" ,"couponPrice", "pointPrice","deliveryPrice","payPrice")
+                .containsExactly(200, 10, 0, 0, 0, 0, 2000);
+        // 断言：SKU3 未选中
+        assertThat(resultBO.getItems().get(2))
+                .extracting("price", "count","discountPrice" ,"couponPrice", "pointPrice","deliveryPrice","payPrice")
+                .containsExactly(300, 1, 0, 0, 0, 0, 300);
+    }
+
+    @Test
     @DisplayName("按件计算运费不包邮的情况")
-    public void testCalculateByExpressTemplateCharge() {
+    public void testCalculate_expressTemplateCharge() {
         // SKU 1 : 100 * 2  = 200
         // SKU 2 ：200 * 10 = 2000
         // 运费  首件 1000 +  续件 2000 = 3000
@@ -110,11 +144,11 @@ public class TradeDeliveryPriceCalculatorTest  extends BaseMockitoUnitTest {
         // 断言：SKU1
         assertThat(resultBO.getItems().get(0))
                 .extracting("price", "count","discountPrice" ,"couponPrice", "pointPrice","deliveryPrice","payPrice")
-                .containsExactly(100, 2, 0, 0, 0, 1500, 1700);
+                .containsExactly(100, 2, 0, 0, 0, 500, 700);
         // 断言：SKU2
         assertThat(resultBO.getItems().get(1))
                 .extracting("price", "count","discountPrice" ,"couponPrice", "pointPrice","deliveryPrice","payPrice")
-                .containsExactly(200, 10, 0, 0, 0, 1500, 3500);
+                .containsExactly(200, 10, 0, 0, 0, 2500, 4500);
         // 断言：SKU3 未选中
         assertThat(resultBO.getItems().get(2))
                 .extracting("price", "count","discountPrice" ,"couponPrice", "pointPrice","deliveryPrice","payPrice")
@@ -123,7 +157,7 @@ public class TradeDeliveryPriceCalculatorTest  extends BaseMockitoUnitTest {
 
     @Test
     @DisplayName("按件计算运费包邮的情况")
-    public void testCalculateByExpressTemplateFree() {
+    public void testCalculate_expressTemplateFree() {
         // SKU 1 : 100 * 2  = 200
         // SKU 2 ：200 * 10 = 2000
         // 运费  0

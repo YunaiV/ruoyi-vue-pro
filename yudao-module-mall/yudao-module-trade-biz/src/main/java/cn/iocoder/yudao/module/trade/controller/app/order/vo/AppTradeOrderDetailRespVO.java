@@ -113,6 +113,9 @@ public class AppTradeOrderDetailRespVO {
     @Schema(description = "自提门店编号", example = "1088")
     private Long pickUpStoreId;
 
+    @Schema(description = "自提核销码", example = "40964096")
+    private String pickUpVerifyCode;
+
     // ========== 售后基本信息 ==========
 
     // ========== 营销基本信息 ==========

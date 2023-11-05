@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.trade.convert.config;
 
 import cn.iocoder.yudao.module.trade.controller.admin.config.vo.TradeConfigRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.config.vo.TradeConfigSaveReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.config.vo.AppTradeConfigRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -20,4 +21,5 @@ public interface TradeConfigConvert {
 
     TradeConfigRespVO convert(TradeConfigDO bean);
 
+    AppTradeConfigRespVO convert02(TradeConfigDO tradeConfig);
 }

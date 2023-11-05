@@ -28,7 +28,6 @@ public class AppCombinationActivityRespVO {
     private Integer marketPrice;
 
     @Schema(description = "拼团金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
-    // 从拼团商品里取最低价
     private Integer combinationPrice;
 
 }

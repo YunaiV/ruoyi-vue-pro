@@ -51,10 +51,10 @@ public class ProductSkuBaseVO {
     private Double volume;
 
     @Schema(description = "一级分销的佣金，单位：分", example = "199")
-    private Integer subCommissionFirstPrice;
+    private Integer firstBrokeragePrice;
 
     @Schema(description = "二级分销的佣金，单位：分", example = "19")
-    private Integer subCommissionSecondPrice;
+    private Integer secondBrokeragePrice;
 
     @Schema(description = "属性数组")
     private List<Property> properties;

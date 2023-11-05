@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigUpdateReqVO;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillconfig.SeckillConfigDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillConfigDO;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -84,5 +84,14 @@ public interface SeckillConfigService {
      * @param status 状态
      */
     void updateSeckillConfigStatus(Long id, Integer status);
+
+    /**
+     * 获得当前的秒杀时段
+     *
+     * 要求必须处于开启状态、且在当前时间段内
+     *
+     * @return 时段
+     */
+    SeckillConfigDO getCurrentSeckillConfig();
 
 }

@@ -233,6 +233,10 @@ export default {
         return 'highlight-reject';
       } else if (result === 4) { // 已取消
         return 'highlight-cancel';
+      } else if (result === 5) { // 已退回
+        return 'highlight-back';
+      } else if (result === 6) { // 已委派
+        return 'highlight-todo';
       }
       return '';
     },
@@ -475,7 +479,33 @@ export default {
 :deep(.highlight-cancel.djs-connection > .djs-visual > path) {
   stroke: grey !important;
 }
+/**驳回 */
+.highlight-back.djs-connection > .djs-visual > path {
+  stroke: #FFBA00 !important;
+  stroke-dasharray: 4px !important;
+  fill-opacity: 0.2 !important;
+}
 
+.highlight-back.djs-shape .djs-visual > :nth-child(1) {
+  fill: #FFBA00 !important;
+  stroke: #FFBA00 !important;
+  stroke-dasharray: 4px !important;
+  fill-opacity: 0.2 !important;
+}
+
+:deep(.highlight-back.djs-connection > .djs-visual > path) {
+  stroke: #FFBA00 !important;
+  stroke-dasharray: 4px !important;
+  fill-opacity: 0.2 !important;
+  marker-end: url(#sequenceflow-end-_E7DFDF-_E7DFDF-803g1kf6zwzmcig1y2ulm5egr);
+}
+
+:deep(.highlight-back.djs-shape .djs-visual > :nth-child(1)) {
+  fill: #FFBA00 !important;
+  stroke: #FFBA00 !important;
+  stroke-dasharray: 4px !important;
+  fill-opacity: 0.2 !important;
+}
 .element-overlays {
   box-sizing: border-box;
   padding: 8px;

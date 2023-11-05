@@ -179,6 +179,7 @@ public class ProductSpuDO extends BaseDO {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<Long> giveCouponTemplateIds;
 
+    // TODO @puhui999：字段估计要改成 brokerageType
     /**
      * 分销类型
      *
@@ -193,7 +194,7 @@ public class ProductSpuDO extends BaseDO {
      * 对应 PromotionTypeEnum 枚举
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<Integer> activityOrders;
+    private List<Integer> activityOrders; // TODO @芋艿： 活动顺序字段长度需要增加
 
     // ========== 统计相关字段 =========
 

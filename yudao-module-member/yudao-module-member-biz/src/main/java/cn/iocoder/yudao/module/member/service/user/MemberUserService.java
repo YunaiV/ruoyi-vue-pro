@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.member.service.user;
 
+import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
@@ -43,9 +44,10 @@ public interface MemberUserService {
      *
      * @param mobile     手机号
      * @param registerIp 注册 IP
+     * @param terminal   终端 {@link TerminalEnum}
      * @return 用户对象
      */
-    MemberUserDO createUserIfAbsent(@Mobile String mobile, String registerIp);
+    MemberUserDO createUserIfAbsent(@Mobile String mobile, String registerIp, Integer terminal);
 
     /**
      * 更新用户的最后登陆信息
@@ -164,6 +166,7 @@ public interface MemberUserService {
      *
      * @param userId 用户编号
      * @param point  积分数量
+     * @return 更新结果
      */
-    void updateUserPoint(Long userId, Integer point);
+    boolean updateUserPoint(Long userId, Integer point);
 }

@@ -16,14 +16,17 @@ public class AppSeckillActivityRespVO {
     @Schema(description = "商品 SPU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
     private Long spuId;
 
-    @Schema(description = "商品图片", requiredMode = Schema.RequiredMode.REQUIRED, example = "4096")
-    // 从 SPU 的 picUrl 读取
+    @Schema(description = "商品图片", requiredMode = Schema.RequiredMode.REQUIRED, // 从 SPU 的 picUrl 读取
+            example = "https://www.iocoder.cn/xx.png")
     private String picUrl;
     @Schema(description = "单位名", requiredMode = Schema.RequiredMode.REQUIRED, example = "个")
     private String unitName;
-    @Schema(description = "商品市场价，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "50")
-    // 从 SPU 的 marketPrice 读取
+    @Schema(description = "商品市场价，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, // 从 SPU 的 marketPrice 读取
+            example = "50")
     private Integer marketPrice;
+
+    @Schema(description = "秒杀活动状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    private Integer status;
 
     @Schema(description = "秒杀库存（剩余）", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
     private Integer stock;
@@ -31,7 +34,6 @@ public class AppSeckillActivityRespVO {
     private Integer totalStock;
 
     @Schema(description = "秒杀金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
-    // 从秒杀商品里取最低价
     private Integer seckillPrice;
 
 }

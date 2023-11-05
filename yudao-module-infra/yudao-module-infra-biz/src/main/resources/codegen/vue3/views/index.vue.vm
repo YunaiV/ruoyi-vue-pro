@@ -132,20 +132,20 @@
         align="center"
         prop="${javaField}"
         :formatter="dateFormatter"
-        width="150px"
+        width="180px"
       />
         #elseif("" != $column.dictType)## 数据字典
-      <el-table-column label="${comment}" align="center" prop="${javaField}" width="150px">
+      <el-table-column label="${comment}" align="center" prop="${javaField}">
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="scope.row.${column.javaField}" />
         </template>
       </el-table-column>
         #else
-      <el-table-column label="${comment}" align="center" prop="${javaField}" width="150px" />
+      <el-table-column label="${comment}" align="center" prop="${javaField}" />
         #end
       #end
     #end
-      <el-table-column label="操作" align="center" width="150px">
+      <el-table-column label="操作" align="center">
         <template #default="scope">
           <el-button
             link

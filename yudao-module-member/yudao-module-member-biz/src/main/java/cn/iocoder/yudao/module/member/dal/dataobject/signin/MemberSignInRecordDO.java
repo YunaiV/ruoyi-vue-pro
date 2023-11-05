@@ -35,8 +35,12 @@ public class MemberSignInRecordDO extends BaseDO {
      */
     private Integer day;
     /**
-     * 签到的分数
+     * 签到的积分
      */
     private Integer point;
+    /**
+     * 签到的经验
+     */
+    private Integer experience;
 
 }

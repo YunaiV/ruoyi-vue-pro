@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCateg
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -75,4 +76,12 @@ public interface ProductCategoryService {
      */
     List<ProductCategoryDO> getEnableCategoryList();
 
+    /**
+     * 校验商品分类是否有效。如下情况，视为无效：
+     * 1. 商品分类编号不存在
+     * 2. 商品分类被禁用
+     *
+     * @param ids 商品分类编号数组
+     */
+    void validateCategoryList(Collection<Long> ids);
 }

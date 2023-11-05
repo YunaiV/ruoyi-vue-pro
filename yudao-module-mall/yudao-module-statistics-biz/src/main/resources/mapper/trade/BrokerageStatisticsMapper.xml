@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.statistics.dal.mysql.trade.BrokerageStatisticsMapper">
+
+    <select id="selectSummaryPriceByStatusAndUnfreezeTimeBetween" resultType="java.lang.Integer">
+        SELECT SUM(price)
+        FROM trade_brokerage_record
+        WHERE biz_type = #{bizType}
+          AND status = #{status}
+          AND unfreeze_time BETWEEN #{beginTime} AND #{endTime}
+          AND deleted = FALSE
+    </select>
+
+    <select id="selectWithdrawCountByStatus" resultType="java.lang.Long">
+        SELECT COUNT(1)
+        FROM trade_brokerage_withdraw
+        WHERE status = #{status}
+          AND deleted = FALSE
+    </select>
+
+</mapper>

@@ -42,7 +42,7 @@
 
 ##  🐳 项目关系
 
-![架构演进](https://static.iocoder.cn/yudao-roadmap.png?imageView2/2/format/webp)
+![架构演进](/.image/common/yudao-roadmap.png)
 
 三个项目的功能对比，可见社区共同整理的 [国产开源项目对比](https://www.yuque.com/xiatian-bsgny/lm0ec1/wqf8mn) 表格。
 
@@ -88,7 +88,7 @@
 
 ② 代码全部开源，不会像其他项目一样，只开源部分代码，让你无法了解整个项目的架构设计。[国产开源项目对比](https://www.yuque.com/xiatian-bsgny/lm0ec1/wqf8mn)
 
-![开源项目对比](https://static.iocoder.cn/project-vs.png?imageView2/2/format/webp/w/1280)
+![开源项目对比](/.image/common/project-vs.png)
 
 ③ 代码整洁、架构整洁，遵循《阿里巴巴 Java 开发手册》规范，代码注释详细，57000 行 Java 代码，22000 行代码注释。
 
@@ -256,7 +256,7 @@ _前端基于 crmeb uniapp 经过授权重构，优化代码实现，接入芋�
 
 | 框架                                                                                          | 说明               | 版本             | 学习指南                                                           |
 |---------------------------------------------------------------------------------------------|------------------|----------------|----------------------------------------------------------------|
-| [Spring Boot](https://spring.io/projects/spring-boot)                                       | 应用开发框架           | 2.7.16         | [文档](https://github.com/YunaiV/SpringBoot-Labs)                |
+| [Spring Boot](https://spring.io/projects/spring-boot)                                       | 应用开发框架           | 2.7.17         | [文档](https://github.com/YunaiV/SpringBoot-Labs)                |
 | [MySQL](https://www.mysql.com/cn/)                                                          | 数据库服务器           | 5.7 / 8.0+     |                                                                |
 | [Druid](https://github.com/alibaba/druid)                                                   | JDBC 连接池、监控组件    | 1.2.19         | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
 | [MyBatis Plus](https://mp.baomidou.com/)                                                    | MyBatis 增强工具包    | 3.5.3.2        | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao)         |

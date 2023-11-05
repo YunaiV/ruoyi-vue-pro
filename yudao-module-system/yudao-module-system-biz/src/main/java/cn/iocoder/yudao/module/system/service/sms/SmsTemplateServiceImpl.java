@@ -5,7 +5,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.sms.core.client.SmsClient;
-import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
 import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsTemplateRespDTO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateCreateReqVO;
@@ -27,7 +26,6 @@ import org.springframework.util.Assert;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -53,9 +51,6 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
 
     @Resource
     private SmsChannelService smsChannelService;
-
-    @Resource
-    private SmsClientFactory smsClientFactory;
 
     @Override
     public Long createSmsTemplate(SmsTemplateCreateReqVO createReqVO) {
@@ -144,7 +139,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
         if (channelDO == null) {
             throw exception(SMS_CHANNEL_NOT_EXISTS);
         }
-        if (!Objects.equals(channelDO.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+        if (CommonStatusEnum.isDisable(channelDO.getStatus())) {
             throw exception(SMS_CHANNEL_DISABLE);
         }
         return channelDO;
@@ -174,7 +169,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     @VisibleForTesting
     void validateApiTemplate(Long channelId, String apiTemplateId) {
         // 获得短信模板
-        SmsClient smsClient = smsClientFactory.getSmsClient(channelId);
+        SmsClient smsClient = smsChannelService.getSmsClient(channelId);
         Assert.notNull(smsClient, String.format("短信客户端(%d) 不存在", channelId));
         SmsCommonResult<SmsTemplateRespDTO> templateResult = smsClient.getSmsTemplate(apiTemplateId);
         // 校验短信模板是否正确

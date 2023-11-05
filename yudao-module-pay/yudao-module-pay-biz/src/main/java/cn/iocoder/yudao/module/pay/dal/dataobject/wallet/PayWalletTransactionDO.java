@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.pay.dal.dataobject.wallet;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.pay.enums.member.PayWalletBizTypeEnum;
+import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;

@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.product.service.category;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryListReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryUpdateReqVO;
@@ -13,7 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -97,6 +101,26 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         if (category == null) {
             throw exception(CATEGORY_NOT_EXISTS);
         }
+    }
+
+    @Override
+    public void validateCategoryList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        // 获得商品分类信息
+        List<ProductCategoryDO> list = productCategoryMapper.selectBatchIds(ids);
+        Map<Long, ProductCategoryDO> categoryMap = CollectionUtils.convertMap(list, ProductCategoryDO::getId);
+        // 校验
+        ids.forEach(id -> {
+            ProductCategoryDO category = categoryMap.get(id);
+            if (category == null) {
+                throw exception(CATEGORY_NOT_EXISTS);
+            }
+            if (!CommonStatusEnum.ENABLE.getStatus().equals(category.getStatus())) {
+                throw exception(CATEGORY_DISABLED, category.getName());
+            }
+        });
     }
 
     @Override

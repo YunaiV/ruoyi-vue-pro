@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.pay.service.refund;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
-import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
@@ -66,8 +65,6 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
 
     @MockBean
     private PayProperties payProperties;
-    @MockBean
-    private PayClientFactory payClientFactory;
     @MockBean
     private PayOrderService orderService;
     @MockBean
@@ -219,7 +216,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
 
         // 调用，并断言异常
         assertServiceException(() -> refundService.createPayRefund(reqDTO),
-                ORDER_NOT_FOUND);
+                PAY_ORDER_NOT_FOUND);
     }
 
     @Test
@@ -245,7 +242,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
 
         // 调用，并断言异常
         assertServiceException(() -> refundService.createPayRefund(reqDTO),
-                ORDER_REFUND_FAIL_STATUS_ERROR);
+                PAY_ORDER_REFUND_FAIL_STATUS_ERROR);
     }
 
     @Test
@@ -335,7 +332,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
         when(channelService.validPayChannel(eq(1L))).thenReturn(channel);
         // mock 方法（client）
         PayClient client = mock(PayClient.class);
-        when(payClientFactory.getPayClient(eq(10L))).thenReturn(client);
+        when(channelService.getPayClient(eq(10L))).thenReturn(client);
         // mock 数据（refund 已存在）
         PayRefundDO refund = randomPojo(PayRefundDO.class, o ->
                 o.setAppId(1L).setMerchantRefundId("200"));
@@ -367,7 +364,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
         when(channelService.validPayChannel(eq(10L))).thenReturn(channel);
         // mock 方法（client）
         PayClient client = mock(PayClient.class);
-        when(payClientFactory.getPayClient(eq(10L))).thenReturn(client);
+        when(channelService.getPayClient(eq(10L))).thenReturn(client);
         // mock 方法（client 调用发生异常）
         when(client.unifiedRefund(any(PayRefundUnifiedReqDTO.class))).thenThrow(new RuntimeException());
 
@@ -411,7 +408,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
             when(channelService.validPayChannel(eq(10L))).thenReturn(channel);
             // mock 方法（client）
             PayClient client = mock(PayClient.class);
-            when(payClientFactory.getPayClient(eq(10L))).thenReturn(client);
+            when(channelService.getPayClient(eq(10L))).thenReturn(client);
             // mock 方法（client 成功）
             PayRefundRespDTO refundRespDTO = randomPojo(PayRefundRespDTO.class);
             when(client.unifiedRefund(argThat(unifiedReqDTO -> {
@@ -668,7 +665,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
             refundMapper.insert(refund);
             // mock 方法（client）
             PayClient client = mock(PayClient.class);
-            when(payClientFactory.getPayClient(eq(10L))).thenReturn(client);
+            when(channelService.getPayClient(eq(10L))).thenReturn(client);
             // mock 方法（client 返回指定状态）
             PayRefundRespDTO respDTO = randomPojo(PayRefundRespDTO.class, o -> o.setStatus(status));
             when(client.getRefund(eq("P110"), eq("R220"))).thenReturn(respDTO);
@@ -690,7 +687,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
         refundMapper.insert(refund);
         // mock 方法（client）
         PayClient client = mock(PayClient.class);
-        when(payClientFactory.getPayClient(eq(10L))).thenReturn(client);
+        when(channelService.getPayClient(eq(10L))).thenReturn(client);
         // mock 方法（client 抛出异常）
         when(client.getRefund(eq("P110"), eq("R220"))).thenThrow(new RuntimeException());
 

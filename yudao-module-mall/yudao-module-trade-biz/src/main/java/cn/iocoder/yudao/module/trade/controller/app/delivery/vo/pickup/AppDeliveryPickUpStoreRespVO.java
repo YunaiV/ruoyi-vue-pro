@@ -34,7 +34,7 @@ public class AppDeliveryPickUpStoreRespVO {
     @Schema(description = "经度", requiredMode = Schema.RequiredMode.REQUIRED, example = "6.99")
     private Double longitude;
 
-    @Schema(description = "距离，单位：米", example = "100") // 只有在用户传递了经纬度时，才进行计算
-    private Integer distance;
+    @Schema(description = "距离，单位：千米", example = "100") // 只有在用户传递了经纬度时，才进行计算
+    private Double distance;
 
 }

@@ -10,6 +10,10 @@ import com.alipay.api.request.AlipayTradePrecreateRequest;
 import com.alipay.api.response.AlipayTradePrecreateResponse;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Objects;
+
+import static cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig.MODE_CERTIFICATE;
+
 /**
  * 支付宝【扫码支付】的 PayClient 实现类
  *
@@ -45,7 +49,13 @@ public class AlipayQrPayClient extends AbstractAlipayPayClient {
         request.setReturnUrl(reqDTO.getReturnUrl());
 
         // 2.1 执行请求
-        AlipayTradePrecreateResponse response = client.execute(request);
+        AlipayTradePrecreateResponse response;
+        if (Objects.equals(config.getMode(), MODE_CERTIFICATE)) {
+            // 证书模式
+            response = client.certificateExecute(request);
+        } else {
+            response = client.execute(request);
+        }
         // 2.2 处理结果
         if (!response.isSuccess()) {
             return buildClosedPayOrderRespDTO(reqDTO, response);
@@ -53,5 +63,4 @@ public class AlipayQrPayClient extends AbstractAlipayPayClient {
         return PayOrderRespDTO.waitingOf(displayMode, response.getQrCode(),
                 reqDTO.getOutTradeNo(), response);
     }
-
 }

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.statistics.dal.mysql.pay.PayWalletStatisticsMapper">
+
+    <select id="selectRechargeSummaryByPayTimeBetween"
+            resultType="cn.iocoder.yudao.module.statistics.service.trade.bo.WalletSummaryRespBO">
+        SELECT COUNT(1)       AS rechargePayCount,
+               SUM(pay_price) AS rechargePayPrice
+        FROM pay_wallet_recharge
+        WHERE pay_status = #{payStatus}
+          AND pay_time BETWEEN #{beginTime} AND #{endTime}
+          AND deleted = FALSE
+    </select>
+
+    <select id="selectRechargeSummaryByRefundTimeBetween"
+            resultType="cn.iocoder.yudao.module.statistics.service.trade.bo.WalletSummaryRespBO">
+        SELECT COUNT(1)       AS rechargeRefundCount,
+               SUM(pay_price) AS rechargeRefundPrice
+        FROM pay_wallet_recharge
+        WHERE refund_status = #{refundStatus}
+          AND refund_time BETWEEN #{beginTime} AND #{endTime}
+          AND deleted = FALSE
+    </select>
+
+    <select id="selectPriceSummaryByBizTypeAndCreateTimeBetween" resultType="java.lang.Integer">
+        SELECT SUM(price)
+        FROM pay_wallet_transaction
+        WHERE biz_type = #{bizType}
+          AND create_time BETWEEN #{beginTime} AND #{endTime}
+          AND deleted = FALSE
+    </select>
+
+    <select id="selectRechargeSummaryGroupByWalletId"
+            resultType="cn.iocoder.yudao.module.statistics.service.pay.bo.RechargeSummaryRespBO">
+        SELECT COUNT(DISTINCT wallet_id) AS rechargeUserCount,
+               SUM(pay_price)            AS rechargePrice
+        FROM pay_wallet_recharge
+        WHERE pay_status = #{payStatus}
+        <if test="beginTime != null">
+            AND pay_time >= #{beginTime}
+        </if>
+        <if test="endTime != null">
+            AND pay_time &lt;= #{endTime}
+        </if>
+            AND deleted = FALSE
+    </select>
+
+    <select id="selectRechargePriceSummary" resultType="java.lang.Integer">
+        SELECT IFNULL(SUM(pay_price), 0)
+        FROM pay_wallet_recharge
+        WHERE pay_status = #{payStatus}
+          AND deleted = FALSE
+    </select>
+
+</mapper>

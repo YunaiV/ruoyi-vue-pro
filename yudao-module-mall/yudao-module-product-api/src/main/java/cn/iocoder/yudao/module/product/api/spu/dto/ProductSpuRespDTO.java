@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.module.product.api.spu.dto;
 
-import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import lombok.Data;
-
-import java.util.List;
 
 // TODO @LeeYan9: ProductSpuRespDTO
 /**
@@ -28,48 +25,21 @@ public class ProductSpuRespDTO {
      */
     private String name;
     /**
-     * 关键字
+     * 单位
+     *
+     * 对应 product_unit 数据字典
      */
-    private String keyword;
-    /**
-     * 商品简介
-     */
-    private String introduction;
-    /**
-     * 商品详情
-     */
-    private String description;
-    // TODO @芋艿：是不是要删除
-    /**
-     * 商品条码（一维码）
-     */
-    private String barCode;
+    private Integer unit;
 
     /**
      * 商品分类编号
      */
     private Long categoryId;
     /**
-     * 商品品牌编号
-     */
-    private Long brandId;
-    /**
      * 商品封面图
      */
     private String picUrl;
-    /**
-     * 商品轮播图
-     */
-    private List<String> sliderPicUrls;
-    /**
-     * 商品视频
-     */
-    private String videoUrl;
 
-    /**
-     * 排序字段
-     */
-    private Integer sort;
     /**
      * 商品状态
      * <p>
@@ -112,19 +82,21 @@ public class ProductSpuRespDTO {
      */
     private Long deliveryTemplateId;
 
-    // ========== 统计相关字段 =========
+    // ========== 营销相关字段 =========
 
     /**
-     * 商品销量
+     * 赠送积分
      */
-    private Integer salesCount;
+    private Integer giveIntegral;
+
+    // ========== 分销相关字段 =========
+
     /**
-     * 虚拟销量
+     * 分销类型
+     *
+     * false - 默认
+     * true - 自行设置
      */
-    private Integer virtualSalesCount;
-    /**
-     * 商品点击量
-     */
-    private Integer clickCount;
+    private Boolean subCommissionType;
 
 }

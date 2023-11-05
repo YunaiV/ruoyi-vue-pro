@@ -61,8 +61,9 @@ public class AppTradeOrderController {
     @PostMapping("/create")
     @Operation(summary = "创建订单")
     @PreAuthenticated
-    public CommonResult<AppTradeOrderCreateRespVO> createOrder(@RequestBody AppTradeOrderCreateReqVO createReqVO) {
-        TradeOrderDO order = tradeOrderUpdateService.createOrder(getLoginUserId(), getClientIP(), createReqVO);
+    public CommonResult<AppTradeOrderCreateRespVO> createOrder(@Valid @RequestBody AppTradeOrderCreateReqVO createReqVO,
+                                                               @RequestHeader Integer terminal) {
+        TradeOrderDO order = tradeOrderUpdateService.createOrder(getLoginUserId(), getClientIP(), createReqVO, terminal);
         return success(new AppTradeOrderCreateRespVO().setId(order.getId()).setPayOrderId(order.getPayOrderId()));
     }
 
@@ -74,24 +75,21 @@ public class AppTradeOrderController {
         return success(true);
     }
 
-    // TODO @芋艿：如果拼团活动、秒杀活动、砍价活动时，是不是要额外在返回活动之类的信息；
     @GetMapping("/get-detail")
     @Operation(summary = "获得交易订单")
     @Parameter(name = "id", description = "交易订单编号")
     public CommonResult<AppTradeOrderDetailRespVO> getOrder(@RequestParam("id") Long id) {
         // 查询订单
         TradeOrderDO order = tradeOrderQueryService.getOrder(getLoginUserId(), id);
-        // TODO @puhui999：这里建议改成，如果为 null，直接返回 success null；主要查询操作，尽量不要有非空的提示哈；交给前端处理；
-//        if (order == null) {
-//            return success(null, ORDER_NOT_FOUND.getMsg());
-//        }
+        if (order == null) {
+            return success(null);
+        }
 
         // 查询订单项
         List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(order.getId());
         // 查询物流公司
         DeliveryExpressDO express = order.getLogisticsId() != null && order.getLogisticsId() > 0 ?
                 deliveryExpressService.getDeliveryExpress(order.getLogisticsId()) : null;
-        // TODO @puhui999：如果门店自提，信息的拼接；
         // 最终组合
         return success(TradeOrderConvert.INSTANCE.convert02(order, orderItems, tradeOrderProperties, express));
     }
@@ -141,7 +139,7 @@ public class AppTradeOrderController {
     @Operation(summary = "确认交易订单收货")
     @Parameter(name = "id", description = "交易订单编号")
     public CommonResult<Boolean> receiveOrder(@RequestParam("id") Long id) {
-        tradeOrderUpdateService.receiveOrder(getLoginUserId(), id);
+        tradeOrderUpdateService.receiveOrderByMember(getLoginUserId(), id);
         return success(true);
     }
 
@@ -149,7 +147,7 @@ public class AppTradeOrderController {
     @Operation(summary = "取消交易订单")
     @Parameter(name = "id", description = "交易订单编号")
     public CommonResult<Boolean> cancelOrder(@RequestParam("id") Long id) {
-        tradeOrderUpdateService.cancelOrder(getLoginUserId(), id);
+        tradeOrderUpdateService.cancelOrderByMember(getLoginUserId(), id);
         return success(true);
     }
 
@@ -157,7 +155,7 @@ public class AppTradeOrderController {
     @Operation(summary = "删除交易订单")
     @Parameter(name = "id", description = "交易订单编号")
     public CommonResult<Boolean> deleteOrder(@RequestParam("id") Long id) {
-        // TODO @芋艿：未实现，mock 用
+        tradeOrderUpdateService.deleteOrder(getLoginUserId(), id);
         return success(true);
     }
 
@@ -174,7 +172,7 @@ public class AppTradeOrderController {
     @PostMapping("/item/create-comment")
     @Operation(summary = "创建交易订单项的评价")
     public CommonResult<Long> createOrderItemComment(@RequestBody AppTradeOrderItemCommentCreateReqVO createReqVO) {
-        return success(tradeOrderUpdateService.createOrderItemComment(getLoginUserId(), createReqVO));
+        return success(tradeOrderUpdateService.createOrderItemCommentByMember(getLoginUserId(), createReqVO));
     }
 
 }

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.trade.service.price.calculator;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponRespDTO;
@@ -9,6 +10,7 @@ import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponValidReqDTO;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionDiscountTypeEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import org.springframework.core.annotation.Order;
@@ -22,6 +24,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.COUPON_NO_MATCH_MIN_PRICE;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.COUPON_NO_MATCH_SPU;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PRICE_CALCULATE_COUPON_NOT_MATCH_NORMAL_ORDER;
 
 /**
  * 优惠劵的 {@link TradePriceCalculator} 实现类
@@ -44,6 +47,10 @@ public class TradeCouponPriceCalculator implements TradePriceCalculator {
         CouponRespDTO coupon = couponApi.validateCoupon(new CouponValidReqDTO()
                 .setId(param.getCouponId()).setUserId(param.getUserId()));
         Assert.notNull(coupon, "校验通过的优惠劵({})，不能为空", param.getCouponId());
+        // 1.2 只有【普通】订单，才允许使用优惠劵
+        if (ObjectUtil.notEqual(result.getType(), TradeOrderTypeEnum.NORMAL.getType())) {
+            throw exception(PRICE_CALCULATE_COUPON_NOT_MATCH_NORMAL_ORDER);
+        }
 
         // 2.1 获得匹配的商品 SKU 数组
         List<TradePriceCalculateRespBO.OrderItem> orderItems = filterMatchCouponOrderItems(result, coupon);

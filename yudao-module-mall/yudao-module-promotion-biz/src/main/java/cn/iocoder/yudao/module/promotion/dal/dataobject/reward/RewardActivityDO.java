@@ -38,7 +38,6 @@ public class RewardActivityDO extends BaseDO {
      * 活动标题
      */
     private String name;
-    // TODO @芋艿：改成开启、禁用两种状态
     /**
      * 状态
      *
@@ -110,7 +109,7 @@ public class RewardActivityDO extends BaseDO {
          */
         private List<Long> couponIds;
         /**
-         * 赠送的优惠卷数量的数组
+         * 赠送的优惠券数量的数组
          */
         private List<Integer> couponCounts;
 

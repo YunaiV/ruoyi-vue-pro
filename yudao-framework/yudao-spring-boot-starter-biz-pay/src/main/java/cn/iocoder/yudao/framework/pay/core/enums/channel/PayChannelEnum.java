@@ -28,7 +28,6 @@ public enum PayChannelEnum {
     ALIPAY_APP("alipay_app", "支付宝App 支付", AlipayPayClientConfig.class),
     ALIPAY_QR("alipay_qr", "支付宝扫码支付", AlipayPayClientConfig.class),
     ALIPAY_BAR("alipay_bar", "支付宝条码支付", AlipayPayClientConfig.class),
-
     MOCK("mock", "模拟支付", NonePayClientConfig.class),
 
     WALLET("wallet", "钱包支付", NonePayClientConfig.class);
@@ -63,4 +62,7 @@ public enum PayChannelEnum {
         return ArrayUtil.firstMatch(o -> o.getCode().equals(code), values());
     }
 
+    public static boolean isAlipay(String channelCode) {
+        return channelCode != null && channelCode.startsWith("alipay");
+    }
 }

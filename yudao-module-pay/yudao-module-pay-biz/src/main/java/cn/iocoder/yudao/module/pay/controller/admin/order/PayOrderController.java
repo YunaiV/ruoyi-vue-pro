@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.pay.convert.order.PayOrderConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
-import cn.iocoder.yudao.module.pay.framework.pay.wallet.WalletPayClient;
+import cn.iocoder.yudao.module.pay.framework.pay.core.WalletPayClient;
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import com.google.common.collect.Maps;

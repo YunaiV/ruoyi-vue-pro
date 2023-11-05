@@ -1,6 +1,4 @@
 /**
- * 消息队列，基于 Redis 提供：
- * 1. 基于 Pub/Sub 实现广播消费
- * 2. 基于 Stream 实现集群消费
+ * 消息队列，支持 Redis、RocketMQ、RabbitMQ、Kafka 四种
  */
 package cn.iocoder.yudao.framework.mq;

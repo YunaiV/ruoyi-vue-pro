@@ -15,6 +15,9 @@ import ${basePackage}.module.${table.moduleName}.dal.mysql.${table.businessName}
 import static ${ServiceExceptionUtilClassName}.exception;
 import static ${basePackage}.module.${table.moduleName}.enums.ErrorCodeConstants.*;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
+
 /**
  * ${table.classComment} Service 实现类
  *
@@ -66,6 +69,9 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 
     @Override
     public List<${table.className}DO> get${simpleClassName}List(Collection<${primaryColumn.javaType}> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return ListUtil.empty();
+        }
         return ${classNameVar}Mapper.selectBatchIds(ids);
     }
 

@@ -3,17 +3,16 @@ package cn.iocoder.yudao.module.member.controller.admin.user;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserRespVO;
-import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateLevelReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.*;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.group.MemberGroupDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.tag.MemberTagDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
+import cn.iocoder.yudao.module.member.enums.point.MemberPointBizTypeEnum;
 import cn.iocoder.yudao.module.member.service.group.MemberGroupService;
 import cn.iocoder.yudao.module.member.service.level.MemberLevelService;
+import cn.iocoder.yudao.module.member.service.point.MemberPointRecordService;
 import cn.iocoder.yudao.module.member.service.tag.MemberTagService;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,6 +32,7 @@ import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 会员用户")
 @RestController
@@ -48,6 +48,8 @@ public class MemberUserController {
     private MemberLevelService memberLevelService;
     @Resource
     private MemberGroupService memberGroupService;
+    @Resource
+    private MemberPointRecordService memberPointRecordService;
 
     @PutMapping("/update")
     @Operation(summary = "更新会员用户")
@@ -62,6 +64,23 @@ public class MemberUserController {
     @PreAuthorize("@ss.hasPermission('member:user:update-level')")
     public CommonResult<Boolean> updateUserLevel(@Valid @RequestBody MemberUserUpdateLevelReqVO updateReqVO) {
         memberLevelService.updateUserLevel(updateReqVO);
+        return success(true);
+    }
+
+    @PutMapping("/update-point")
+    @Operation(summary = "更新会员用户积分")
+    @PreAuthorize("@ss.hasPermission('member:user:update-point')")
+    public CommonResult<Boolean> updateUserPoint(@Valid @RequestBody MemberUserUpdatePointReqVO updateReqVO) {
+        memberPointRecordService.createPointRecord(updateReqVO.getId(), updateReqVO.getPoint(),
+                MemberPointBizTypeEnum.ADMIN, String.valueOf(getLoginUserId()));
+        return success(true);
+    }
+
+    @PutMapping("/update-balance")
+    @Operation(summary = "更新会员用户余额")
+    @PreAuthorize("@ss.hasPermission('member:user:update-balance')")
+    public CommonResult<Boolean> updateUserBalance(@Valid @RequestBody Long id) {
+        // todo @jason：增加一个【修改余额】
         return success(true);
     }
 

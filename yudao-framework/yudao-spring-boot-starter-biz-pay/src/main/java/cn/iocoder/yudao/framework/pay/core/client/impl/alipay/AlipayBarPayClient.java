@@ -14,9 +14,11 @@ import com.alipay.api.response.AlipayTradePayResponse;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
+import static cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig.MODE_CERTIFICATE;
 
 /**
  * 支付宝【条码支付】的 PayClient 实现类
@@ -59,7 +61,13 @@ public class AlipayBarPayClient extends AbstractAlipayPayClient {
         request.setReturnUrl(reqDTO.getReturnUrl());
 
         // 2.1 执行请求
-        AlipayTradePayResponse response = client.execute(request);
+        AlipayTradePayResponse response;
+        if (Objects.equals(config.getMode(), MODE_CERTIFICATE)) {
+            // 证书模式
+            response = client.certificateExecute(request);
+        } else {
+            response = client.execute(request);
+        }
         // 2.2 处理结果
         if (!response.isSuccess()) {
             return buildClosedPayOrderRespDTO(reqDTO, response);
@@ -74,5 +82,4 @@ public class AlipayBarPayClient extends AbstractAlipayPayClient {
         return PayOrderRespDTO.waitingOf(displayMode, "",
                 reqDTO.getOutTradeNo(), response);
     }
-
 }

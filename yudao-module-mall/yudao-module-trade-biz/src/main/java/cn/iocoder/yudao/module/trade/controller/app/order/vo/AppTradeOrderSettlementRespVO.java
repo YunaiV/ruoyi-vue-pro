@@ -14,7 +14,7 @@ import java.util.List;
 public class AppTradeOrderSettlementRespVO {
 
     @Schema(description = "交易类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1") // 对应 TradeOrderTypeEnum 枚举
-    private Integer type = 1; // TODO 芋艿：改成计算
+    private Integer type;
 
     @Schema(description = "购物项数组", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<Item> items;
@@ -37,6 +37,8 @@ public class AppTradeOrderSettlementRespVO {
 
         // ========== SPU 信息 ==========
 
+        @Schema(description = "品类编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
+        private Long categoryId;
         @Schema(description = "SPU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
         private Long spuId;
         @Schema(description = "SPU 名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "Apple iPhone 12")
@@ -73,6 +75,9 @@ public class AppTradeOrderSettlementRespVO {
         @Schema(description = "商品原价（总），单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "500")
         private Integer totalPrice;
 
+        @Schema(description = "订单优惠（总），单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "66")
+        private Integer discountPrice;
+
         @Schema(description = "运费金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "50")
         private Integer deliveryPrice;
 
@@ -81,6 +86,9 @@ public class AppTradeOrderSettlementRespVO {
 
         @Schema(description = "积分抵扣的金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "50")
         private Integer pointPrice;
+
+        @Schema(description = "VIP 减免金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "30")
+        private Integer vipPrice;
 
         @Schema(description = "实际支付金额（总），单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "450")
         private Integer payPrice;

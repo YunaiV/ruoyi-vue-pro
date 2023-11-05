@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.convert.auth;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeSendReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeUseReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
@@ -46,6 +47,9 @@ public interface AuthConvert {
      * @return 菜单树
      */
     default List<AuthPermissionInfoRespVO.MenuVO> buildMenuTree(List<MenuDO> menuList) {
+        if (CollUtil.isEmpty(menuList)) {
+            return Collections.emptyList();
+        }
         // 移除按钮
         menuList.removeIf(menu -> menu.getType().equals(MenuTypeEnum.BUTTON.getType()));
         // 排序，保证菜单的有序性

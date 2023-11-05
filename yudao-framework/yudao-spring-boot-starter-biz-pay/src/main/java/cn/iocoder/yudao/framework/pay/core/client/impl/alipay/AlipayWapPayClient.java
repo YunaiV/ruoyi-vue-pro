@@ -55,5 +55,4 @@ public class AlipayWapPayClient extends AbstractAlipayPayClient {
         return PayOrderRespDTO.waitingOf(displayMode, response.getBody(),
                 reqDTO.getOutTradeNo(), response);
     }
-
 }

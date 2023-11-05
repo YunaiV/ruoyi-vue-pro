@@ -37,4 +37,7 @@ public class ProductSpuRespVO extends ProductSpuBaseVO {
     @Schema(description = "商品状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer status;
 
+    @Schema(description = "浏览量", requiredMode = Schema.RequiredMode.REQUIRED, example = "888")
+    private Integer browseCount;
+
 }

@@ -96,19 +96,16 @@ public class ProductSpuBaseVO {
     @NotNull(message = "商品赠送积分不能为空")
     private Integer giveIntegral;
 
-    @Schema(description = "赠送的优惠劵编号的数组", example = "[1, 10]") // TODO 这块前端还未实现
-    private List<Long> giveCouponTemplateIds;
-
     @Schema(description = "分销类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     @NotNull(message = "商品分销类型不能为空")
     private Boolean subCommissionType;
 
-    @Schema(description = "活动展示顺序", example = "[1, 3, 2, 4, 5]") // TODO 这块前端还未实现
+    @Schema(description = "活动展示顺序", example = "[1, 3, 2, 4, 5]")
     private List<Integer> activityOrders;
 
     // ========== 统计相关字段 =========
 
-    @Schema(description = "虚拟销量", example = "芋道")
+    @Schema(description = "虚拟销量", example = "66")
     private Integer virtualSalesCount;
 
 }

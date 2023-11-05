@@ -2,13 +2,13 @@ package cn.iocoder.yudao.module.member.controller.admin.signin;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
-import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.member.controller.admin.signin.vo.record.MemberSignInRecordPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.signin.vo.record.MemberSignInRecordRespVO;
 import cn.iocoder.yudao.module.member.convert.signin.MemberSignInRecordConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInRecordDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.service.signin.MemberSignInRecordService;
+import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,7 +35,7 @@ public class MemberSignInRecordController {
     private MemberSignInRecordService signInRecordService;
 
     @Resource
-    private MemberUserApi memberUserApi;
+    private MemberUserService memberUserService;
 
     @GetMapping("/page")
     @Operation(summary = "获得签到记录分页")
@@ -48,7 +48,7 @@ public class MemberSignInRecordController {
         }
 
         // 拼接结果返回
-        List<MemberUserRespDTO> users = memberUserApi.getUserList(
+        List<MemberUserDO> users = memberUserService.getUserList(
                 convertSet(pageResult.getList(), MemberSignInRecordDO::getUserId));
         return success(MemberSignInRecordConvert.INSTANCE.convertPage(pageResult, users));
     }

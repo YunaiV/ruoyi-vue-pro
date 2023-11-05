@@ -66,5 +66,4 @@ public class AlipayPcPayClient extends AbstractAlipayPayClient {
         return PayOrderRespDTO.waitingOf(displayMode, response.getBody(),
                 reqDTO.getOutTradeNo(), response);
     }
-
 }
