@@ -6,11 +6,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-/**
- * 产品分类 List VO
- *
- * @author ZanGe丶
- */
+// TODO 芋艿：这个导出最后搞；命名应该是按照 ProductExportReqVO 风格
 @Schema(description = "管理后台 - 产品分类列表 Request VO")
 @Data
 public class ProductCategoryListReqVO {
@@ -18,7 +14,7 @@ public class ProductCategoryListReqVO {
     @ExcelProperty("名称")
     private String name;
 
-    @ExcelProperty("父级id")
+    @ExcelProperty("父级 id")
     private Long parentId;
 
     @ExcelProperty("创建时间")

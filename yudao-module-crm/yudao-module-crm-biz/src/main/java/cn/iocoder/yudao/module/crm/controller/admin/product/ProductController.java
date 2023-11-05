@@ -1,32 +1,28 @@
 package cn.iocoder.yudao.module.crm.controller.admin.product;
 
-import org.springframework.web.bind.annotation.*;
-import javax.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Operation;
-
-import javax.validation.constraints.*;
-import javax.validation.*;
-import javax.servlet.http.*;
-import java.util.*;
-import java.io.IOException;
-
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*;
-
 import cn.iocoder.yudao.module.crm.controller.admin.product.vo.*;
-import cn.iocoder.yudao.module.crm.dal.dataobject.product.ProductDO;
 import cn.iocoder.yudao.module.crm.convert.product.ProductConvert;
+import cn.iocoder.yudao.module.crm.dal.dataobject.product.ProductDO;
 import cn.iocoder.yudao.module.crm.service.product.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Tag(name = "管理后台 - 产品")
 @RestController
@@ -68,15 +64,6 @@ public class ProductController {
     public CommonResult<ProductRespVO> getProduct(@RequestParam("id") Long id) {
         ProductDO product = productService.getProduct(id);
         return success(ProductConvert.INSTANCE.convert(product));
-    }
-
-    @GetMapping("/list")
-    @Operation(summary = "获得产品列表")
-    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @PreAuthorize("@ss.hasPermission('crm:product:query')")
-    public CommonResult<List<ProductRespVO>> getProductList(@RequestParam("ids") Collection<Long> ids) {
-        List<ProductDO> list = productService.getProductList(ids);
-        return success(ProductConvert.INSTANCE.convertList(list));
     }
 
     @GetMapping("/page")

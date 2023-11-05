@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.productcategory;
 
-import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
 
 /**
  * 产品分类 DO
@@ -32,7 +31,8 @@ public class ProductCategoryDO extends BaseDO {
      */
     private String name;
     /**
-     * 父级id
+     * 父级 id
+     * // TODO @zange：这个要写下关联 CategoryDO 的 id 字段；参考下别的模块哈
      */
     private Long parentId;
 

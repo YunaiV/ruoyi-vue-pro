@@ -36,8 +36,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Long createProduct(ProductCreateReqVO createReqVO) {
-        //校验产品编号是否存在
+        // 校验产品编号是否存在
         validateProductNo(createReqVO.getNo());
+        // TODO @zange：需要校验 categoryId 是否存在；
         // 插入
         ProductDO product = ProductConvert.INSTANCE.convert(createReqVO);
         productMapper.insert(product);
@@ -49,6 +50,7 @@ public class ProductServiceImpl implements ProductService {
     public void updateProduct(ProductUpdateReqVO updateReqVO) {
         // 校验存在
         validateProductExists(updateReqVO.getId(), updateReqVO.getNo());
+        // TODO @zange：需要校验 categoryId 是否存在；
         // 更新
         ProductDO updateObj = ProductConvert.INSTANCE.convert(updateReqVO);
         productMapper.updateById(updateObj);
@@ -62,6 +64,7 @@ public class ProductServiceImpl implements ProductService {
         productMapper.deleteById(id);
     }
 
+    // TODO @zange：validateProductExists 要不只校验是否存在；然后是否 no 重复，交给 validateProductNo，名字改成 validateProductNoDuplicate，和别的模块保持一致哈；
     private void validateProductExists(Long id, String no) {
         ProductDO product = productMapper.selectById(id);
         if (product == null) {
@@ -101,4 +104,5 @@ public class ProductServiceImpl implements ProductService {
             throw exception(PRODUCT_NO_EXISTS);
         }
     }
+
 }

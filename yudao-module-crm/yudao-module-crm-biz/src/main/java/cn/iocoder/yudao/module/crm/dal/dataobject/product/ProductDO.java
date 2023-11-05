@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.product;
 
-import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
 
 /**
  * 产品 DO
@@ -23,7 +22,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 public class ProductDO extends BaseDO {
 
     /**
-     * 主键id
+     * 主键 id
      */
     @TableId
     private Long id;
@@ -47,10 +46,12 @@ public class ProductDO extends BaseDO {
      * 状态
      *
      * 枚举 {@link TODO crm_product_status 对应的类}
+     * // TODO @zange：这个写个枚举类，然后 {@link关联下
      */
     private Integer status;
     /**
-     * 产品分类ID
+     * 产品分类 ID
+     * // TODO @zange：这个要写下关联 CategoryDO 的 id 字段；参考下别的模块哈
      */
     private Long categoryId;
     /**
