@@ -12,6 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -87,4 +88,9 @@ public class BpmProcessInstanceExtDO extends BaseDO {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private Map<String, Object> formVariables;
 
+    /**
+     * 提前设定好的审批人
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Map<String, List<Long>> assignee;
 }

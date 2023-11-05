@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.bpm.api.task.dto;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,4 +31,10 @@ public class BpmProcessInstanceCreateReqDTO {
      */
     @NotEmpty(message = "业务的唯一标识")
     private String businessKey;
+
+    /**
+     * 提前指派的审批人
+     * 例如： { taskKey1 :[1,2] }，则表示 taskKey1 这个任务，提前设定了，由 userId 为 1,2 的用户进行审批
+     */
+    private Map<String, List<Long>> assignee;
 }
