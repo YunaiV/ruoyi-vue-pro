@@ -37,8 +37,17 @@ public class TenantController {
     @Operation(summary = "使用租户名，获得租户编号", description = "登录界面，根据用户的租户名，获得租户编号")
     @Parameter(name = "name", description = "租户名", required = true, example = "1024")
     public CommonResult<Long> getTenantIdByName(@RequestParam("name") String name) {
-        TenantDO tenantDO = tenantService.getTenantByName(name);
-        return success(tenantDO != null ? tenantDO.getId() : null);
+        TenantDO tenant = tenantService.getTenantByName(name);
+        return success(tenant != null ? tenant.getId() : null);
+    }
+
+    @GetMapping("/get-by-website")
+    @PermitAll
+    @Operation(summary = "使用域名，获得租户信息", description = "登录界面，根据用户的域名，获得租户信息")
+    @Parameter(name = "website", description = "域名", required = true, example = "www.iocoder.cn")
+    public CommonResult<TenantSimpleRespVO> getTenantByWebsite(@RequestParam("website") String website) {
+        TenantDO tenant = tenantService.getTenantByWebsite(website);
+        return success(TenantConvert.INSTANCE.convert03(tenant));
     }
 
     @PostMapping("/create")
@@ -93,6 +102,5 @@ public class TenantController {
         List<TenantExcelVO> datas = TenantConvert.INSTANCE.convertList02(list);
         ExcelUtils.write(response, "租户.xls", "数据", TenantExcelVO.class, datas);
     }
-
 
 }

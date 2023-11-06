@@ -10595,7 +10595,7 @@ CREATE TABLE [dbo].[system_tenant] (
   [contact_name] nvarchar(30) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
   [contact_mobile] nvarchar(500) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
   [status] tinyint  NOT NULL,
-  [domain] nvarchar(256) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
+  [website] nvarchar(256) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
   [package_id] bigint  NOT NULL,
   [expire_time] datetime2(7)  NOT NULL,
   [account_count] int  NOT NULL,
@@ -10656,7 +10656,7 @@ EXEC sp_addextendedproperty
 'MS_Description', N'绑定域名',
 'SCHEMA', N'dbo',
 'TABLE', N'system_tenant',
-'COLUMN', N'domain'
+'COLUMN', N'website'
 GO
 
 EXEC sp_addextendedproperty
@@ -10731,13 +10731,13 @@ GO
 SET IDENTITY_INSERT [dbo].[system_tenant] ON
 GO
 
-INSERT INTO [dbo].[system_tenant] ([id], [name], [contact_user_id], [contact_name], [contact_mobile], [status], [domain], [package_id], [expire_time], [account_count], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1', N'芋道源码', NULL, N'芋艿', N'17321315478', N'0', N'https://www.iocoder.cn', N'0', N'2099-02-19 17:14:16.0000000', N'9999', N'1', N'2021-01-05 17:03:47.0000000', N'1', N'2022-02-23 12:15:11.0000000', N'0')
+INSERT INTO [dbo].[system_tenant] ([id], [name], [contact_user_id], [contact_name], [contact_mobile], [status], [website], [package_id], [expire_time], [account_count], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1', N'芋道源码', NULL, N'芋艿', N'17321315478', N'0', N'https://www.iocoder.cn', N'0', N'2099-02-19 17:14:16.0000000', N'9999', N'1', N'2021-01-05 17:03:47.0000000', N'1', N'2022-02-23 12:15:11.0000000', N'0')
 GO
 
-INSERT INTO [dbo].[system_tenant] ([id], [name], [contact_user_id], [contact_name], [contact_mobile], [status], [domain], [package_id], [expire_time], [account_count], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'121', N'小租户', N'110', N'小王2', N'15601691300', N'0', N'http://www.iocoder.cn', N'111', N'2024-03-11 00:00:00.0000000', N'20', N'1', N'2022-02-22 00:56:14.0000000', N'1', N'2022-03-19 18:37:20.0000000', N'0')
+INSERT INTO [dbo].[system_tenant] ([id], [name], [contact_user_id], [contact_name], [contact_mobile], [status], [website], [package_id], [expire_time], [account_count], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'121', N'小租户', N'110', N'小王2', N'15601691300', N'0', N'http://www.iocoder.cn', N'111', N'2024-03-11 00:00:00.0000000', N'20', N'1', N'2022-02-22 00:56:14.0000000', N'1', N'2022-03-19 18:37:20.0000000', N'0')
 GO
 
-INSERT INTO [dbo].[system_tenant] ([id], [name], [contact_user_id], [contact_name], [contact_mobile], [status], [domain], [package_id], [expire_time], [account_count], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'122', N'测试租户', N'113', N'芋道', N'15601691300', N'0', N'https://www.iocoder.cn', N'111', N'2022-04-30 00:00:00.0000000', N'50', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'0')
+INSERT INTO [dbo].[system_tenant] ([id], [name], [contact_user_id], [contact_name], [contact_mobile], [status], [website], [package_id], [expire_time], [account_count], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'122', N'测试租户', N'113', N'芋道', N'15601691300', N'0', N'https://www.iocoder.cn', N'111', N'2022-04-30 00:00:00.0000000', N'50', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'0')
 GO
 
 SET IDENTITY_INSERT [dbo].[system_tenant] OFF

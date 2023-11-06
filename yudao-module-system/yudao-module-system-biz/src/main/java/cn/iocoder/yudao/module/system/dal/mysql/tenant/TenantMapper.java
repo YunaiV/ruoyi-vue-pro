@@ -42,6 +42,10 @@ public interface TenantMapper extends BaseMapperX<TenantDO> {
         return selectOne(TenantDO::getName, name);
     }
 
+    default TenantDO selectByWebsite(String website) {
+        return selectOne(TenantDO::getWebsite, website);
+    }
+
     default Long selectCountByPackageId(Long packageId) {
         return selectCount(TenantDO::getPackageId, packageId);
     }
