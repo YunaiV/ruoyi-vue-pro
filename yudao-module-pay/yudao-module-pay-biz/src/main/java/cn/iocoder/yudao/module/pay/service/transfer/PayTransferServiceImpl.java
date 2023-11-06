@@ -12,12 +12,15 @@ import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferStatusRespE
 import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.transfer.vo.PayTransferCreateReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.transfer.vo.PayTransferPageReqVO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.transfer.PayTransferDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.transfer.PayTransferMapper;
 import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
+import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
+import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +54,8 @@ public class PayTransferServiceImpl implements PayTransferService {
     @Resource
     private PayChannelService channelService;
     @Resource
+    private PayNotifyService notifyService;
+    @Resource
     private PayNoRedisDAO noRedisDAO;
     @Resource
     private Validator validator;
@@ -73,7 +78,7 @@ public class PayTransferServiceImpl implements PayTransferService {
         // 1.1 校验转账单是否可以提交
         validateTransferCanCreate(reqDTO.getAppId(), reqDTO.getMerchantTransferId());
         // 1.2 校验 App
-        appService.validPayApp(reqDTO.getAppId());
+        PayAppDO payApp = appService.validPayApp(reqDTO.getAppId());
         // 1.3 校验支付渠道是否有效
         PayChannelDO channel = channelService.validPayChannel(reqDTO.getAppId(), reqDTO.getChannelCode());
         PayClient client = channelService.getPayClient(channel.getId());
@@ -86,7 +91,7 @@ public class PayTransferServiceImpl implements PayTransferService {
         PayTransferDO transfer = INSTANCE.convert(reqDTO)
                 .setChannelId(channel.getId())
                 .setNo(no).setStatus(WAITING.getStatus())
-                .setNotifyUrl("http://127.0.0.1:48080/admin-api/pay/todo"); // TODO 需要加个transfer Notify url
+                .setNotifyUrl(payApp.getTransferNotifyUrl());
         transferMapper.insert(transfer);
         PayTransferRespDTO unifiedTransferResp = null;
         try {
@@ -145,22 +150,13 @@ public class PayTransferServiceImpl implements PayTransferService {
     }
 
     private void notifyTransferSuccess(PayChannelDO channel, PayTransferRespDTO notify) {
-        // 1. 更新 PayTransferDO 转账成功
-        Boolean transferred = updateTransferSuccess(channel, notify);
-        if (transferred) {
-            return;
-        }
-        // 2. TODO 插入转账通知记录
-    }
-
-    private Boolean updateTransferSuccess(PayChannelDO channel, PayTransferRespDTO notify) {
         // 1.校验
         PayTransferDO transfer = transferMapper.selectByNo(notify.getOutTransferNo());
         if (transfer == null) {
             throw exception(PAY_TRANSFER_NOT_FOUND);
         }
         if (isSuccess(transfer.getStatus())) { // 如果已成功，直接返回，不用重复更新
-            return Boolean.TRUE;
+            return;
         }
         if (!isPendingStatus(transfer.getStatus())) {
             throw exception(PAY_TRANSFER_STATUS_IS_NOT_PENDING);
@@ -176,10 +172,13 @@ public class PayTransferServiceImpl implements PayTransferService {
             throw exception(PAY_TRANSFER_STATUS_IS_NOT_PENDING);
         }
         log.info("[updateTransferSuccess][transfer({}) 更新为已转账]", transfer.getId());
-        return Boolean.FALSE;
+
+        // 3. 插入转账通知记录
+        notifyService.createPayNotifyTask(PayNotifyTypeEnum.TRANSFER.getType(),
+                transfer.getId());
     }
 
-    private void updateTransferClosed(PayChannelDO channel, PayTransferRespDTO notify) {
+    private void notifyTransferClosed(PayChannelDO channel, PayTransferRespDTO notify) {
         // 1.校验
         PayTransferDO transfer = transferMapper.selectByNo(notify.getOutTransferNo());
         if (transfer == null) {
@@ -192,6 +191,7 @@ public class PayTransferServiceImpl implements PayTransferService {
         if (!isPendingStatus(transfer.getStatus())) {
             throw exception(PAY_TRANSFER_STATUS_IS_NOT_PENDING);
         }
+
         // 2.更新
         int updateCount = transferMapper.updateByIdAndStatus(transfer.getId(),
                 CollUtil.newArrayList(WAITING.getStatus(), IN_PROGRESS.getStatus()),
@@ -203,11 +203,11 @@ public class PayTransferServiceImpl implements PayTransferService {
             throw exception(PAY_TRANSFER_STATUS_IS_NOT_PENDING);
         }
         log.info("[updateTransferClosed][transfer({}) 更新为关闭状态]", transfer.getId());
-    }
 
-    private void notifyTransferClosed(PayChannelDO channel, PayTransferRespDTO notify) {
-        //  更新 PayTransferDO 转账关闭
-        updateTransferClosed(channel, notify);
+        // 3. 插入转账通知记录
+        notifyService.createPayNotifyTask(PayNotifyTypeEnum.TRANSFER.getType(),
+                transfer.getId());
+
     }
 
     /**
