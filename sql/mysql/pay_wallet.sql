@@ -60,8 +60,8 @@ CREATE TABLE `pay_demo_transfer`  (
 ) ENGINE = InnoDB  COMMENT = '示例业务转账订单';
 
 
-ALTER TABLE `pay_channel`
-    MODIFY COLUMN `config` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '支付渠道配置' AFTER `app_id`;
+-- ALTER TABLE `pay_channel`
+--   MODIFY COLUMN `config` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '支付渠道配置' AFTER `app_id`;
 
 -- ----------------------------
 -- 充值套餐表
