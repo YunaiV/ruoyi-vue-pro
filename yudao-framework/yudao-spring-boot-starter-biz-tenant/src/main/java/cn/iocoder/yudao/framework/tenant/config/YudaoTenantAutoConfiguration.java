@@ -6,7 +6,9 @@ import cn.iocoder.yudao.framework.redis.config.YudaoCacheProperties;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnoreAspect;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantDatabaseInterceptor;
 import cn.iocoder.yudao.framework.tenant.core.job.TenantJobAspect;
-import cn.iocoder.yudao.framework.tenant.core.mq.TenantRedisMessageInterceptor;
+import cn.iocoder.yudao.framework.tenant.core.mq.rabbitmq.TenantRabbitMQInitializer;
+import cn.iocoder.yudao.framework.tenant.core.mq.redis.TenantRedisMessageInterceptor;
+import cn.iocoder.yudao.framework.tenant.core.mq.rocketmq.TenantRocketMQInitializer;
 import cn.iocoder.yudao.framework.tenant.core.redis.TenantRedisCacheManager;
 import cn.iocoder.yudao.framework.tenant.core.security.TenantSecurityWebFilter;
 import cn.iocoder.yudao.framework.tenant.core.service.TenantFrameworkService;
@@ -18,6 +20,7 @@ import cn.iocoder.yudao.module.system.api.tenant.TenantApi;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -90,6 +93,18 @@ public class YudaoTenantAutoConfiguration {
     @Bean
     public TenantRedisMessageInterceptor tenantRedisMessageInterceptor() {
         return new TenantRedisMessageInterceptor();
+    }
+
+    @Bean
+    @ConditionalOnClass(name = "org.springframework.amqp.rabbit.core.RabbitTemplate")
+    public TenantRabbitMQInitializer tenantRabbitMQInitializer() {
+        return new TenantRabbitMQInitializer();
+    }
+
+    @Bean
+    @ConditionalOnClass(name = "org.apache.rocketmq.spring.core.RocketMQTemplate")
+    public TenantRocketMQInitializer tenantRocketMQInitializer() {
+        return new TenantRocketMQInitializer();
     }
 
     // ========== Job ==========

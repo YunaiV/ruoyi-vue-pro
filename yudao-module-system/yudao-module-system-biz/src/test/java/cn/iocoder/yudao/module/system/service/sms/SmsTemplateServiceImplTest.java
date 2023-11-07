@@ -6,7 +6,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.sms.core.client.SmsClient;
-import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
 import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsTemplateRespDTO;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
@@ -36,7 +35,7 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @Import(SmsTemplateServiceImpl.class)
 public class SmsTemplateServiceImplTest extends BaseDbUnitTest {
@@ -49,8 +48,6 @@ public class SmsTemplateServiceImplTest extends BaseDbUnitTest {
 
     @MockBean
     private SmsChannelService smsChannelService;
-    @MockBean
-    private SmsClientFactory smsClientFactory;
     @MockBean
     private SmsClient smsClient;
 
@@ -82,7 +79,7 @@ public class SmsTemplateServiceImplTest extends BaseDbUnitTest {
         });
         when(smsChannelService.getSmsChannel(eq(channelDO.getId()))).thenReturn(channelDO);
         // mock 获得 API 短信模板成功
-        when(smsClientFactory.getSmsClient(eq(reqVO.getChannelId()))).thenReturn(smsClient);
+        when(smsChannelService.getSmsClient(eq(reqVO.getChannelId()))).thenReturn(smsClient);
         when(smsClient.getSmsTemplate(eq(reqVO.getApiTemplateId()))).thenReturn(randomPojo(SmsCommonResult.class, SmsTemplateRespDTO.class,
                 o -> o.setCode(GlobalErrorCodeConstants.SUCCESS.getCode())));
 
@@ -117,7 +114,7 @@ public class SmsTemplateServiceImplTest extends BaseDbUnitTest {
         });
         when(smsChannelService.getSmsChannel(eq(channelDO.getId()))).thenReturn(channelDO);
         // mock 获得 API 短信模板成功
-        when(smsClientFactory.getSmsClient(eq(reqVO.getChannelId()))).thenReturn(smsClient);
+        when(smsChannelService.getSmsClient(eq(reqVO.getChannelId()))).thenReturn(smsClient);
         when(smsClient.getSmsTemplate(eq(reqVO.getApiTemplateId()))).thenReturn(randomPojo(SmsCommonResult.class, SmsTemplateRespDTO.class,
                 o -> o.setCode(GlobalErrorCodeConstants.SUCCESS.getCode())));
 

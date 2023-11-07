@@ -24,6 +24,7 @@ import cn.iocoder.yudao.module.promotion.dal.mysql.combination.CombinationRecord
 import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.api.order.TradeOrderApi;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -64,26 +65,8 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     private ProductSkuApi productSkuApi;
 
     @Resource
+    @Lazy
     private TradeOrderApi tradeOrderApi;
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateCombinationRecordStatusByUserIdAndOrderId(Integer status, Long userId, Long orderId) {
-        // 校验拼团是否存在
-        CombinationRecordDO record = validateCombinationRecord(userId, orderId);
-
-        // 更新状态
-        combinationRecordMapper.updateById(new CombinationRecordDO().setId(record.getId()).setStatus(status));
-    }
-
-    private CombinationRecordDO validateCombinationRecord(Long userId, Long orderId) {
-        // 校验拼团是否存在
-        CombinationRecordDO recordDO = combinationRecordMapper.selectByUserIdAndOrderId(userId, orderId);
-        if (recordDO == null) {
-            throw exception(COMBINATION_RECORD_NOT_EXISTS);
-        }
-        return recordDO;
-    }
 
     // TODO @芋艿：在详细预览下；
     @Override
@@ -227,11 +210,6 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     @Override
     public CombinationRecordDO getCombinationRecord(Long userId, Long orderId) {
         return combinationRecordMapper.selectByUserIdAndOrderId(userId, orderId);
-    }
-
-    @Override
-    public List<CombinationRecordDO> getCombinationRecordListByUserIdAndActivityId(Long userId, Long activityId) {
-        return combinationRecordMapper.selectListByUserIdAndActivityId(userId, activityId);
     }
 
     @Override

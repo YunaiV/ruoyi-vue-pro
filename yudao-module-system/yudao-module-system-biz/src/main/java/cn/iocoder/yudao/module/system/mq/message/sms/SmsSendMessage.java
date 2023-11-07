@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.module.system.mq.message.sms;
 
 import cn.iocoder.yudao.framework.common.core.KeyValue;
-import cn.iocoder.yudao.framework.mq.core.stream.AbstractStreamMessage;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -14,8 +12,7 @@ import java.util.List;
  * @author 芋道源码
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class SmsSendMessage extends AbstractStreamMessage {
+public class SmsSendMessage {
 
     /**
      * 短信日志编号
@@ -41,10 +38,5 @@ public class SmsSendMessage extends AbstractStreamMessage {
      * 短信模板参数
      */
     private List<KeyValue<String, Object>> templateParams;
-
-    @Override
-    public String getStreamKey() {
-        return "system.sms.send";
-    }
 
 }

@@ -42,14 +42,6 @@ public interface CombinationRecordApi {
     boolean isCombinationRecordSuccess(Long userId, Long orderId);
 
     /**
-     * 更新拼团状态为【失败】
-     *
-     * @param userId  用户编号
-     * @param orderId 订单编号
-     */
-    void updateRecordStatusToFailed(Long userId, Long orderId);
-
-    /**
      * 【下单前】校验是否满足拼团活动条件
      *
      * 如果校验失败，则抛出业务异常

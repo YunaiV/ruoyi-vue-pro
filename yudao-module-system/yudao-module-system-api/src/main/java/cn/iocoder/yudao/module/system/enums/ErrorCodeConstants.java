@@ -116,10 +116,11 @@ public interface ErrorCodeConstants {
 
     // ========== 社交用户 1-002-018-000 ==========
     ErrorCode SOCIAL_USER_AUTH_FAILURE = new ErrorCode(1_002_018_000, "社交授权失败，原因是：{}");
-    ErrorCode SOCIAL_USER_UNBIND_NOT_SELF = new ErrorCode(1_002_018_001, "社交解绑失败，非当前用户绑定");
-    ErrorCode SOCIAL_USER_NOT_FOUND = new ErrorCode(1_002_018_002, "社交授权失败，找不到对应的用户");
+    ErrorCode SOCIAL_USER_NOT_FOUND = new ErrorCode(1_002_018_001, "社交授权失败，找不到对应的用户");
 
-    ErrorCode SOCIAL_APP_WEIXIN_MINI_APP_PHONE_CODE_ERROR = new ErrorCode(1_002_018_103, "获得手机号失败");
+    ErrorCode SOCIAL_CLIENT_WEIXIN_MINI_APP_PHONE_CODE_ERROR = new ErrorCode(1_002_018_200, "获得手机号失败");
+    ErrorCode SOCIAL_CLIENT_NOT_EXISTS = new ErrorCode(1_002_018_201, "社交客户端不存在");
+    ErrorCode SOCIAL_CLIENT_UNIQUE = new ErrorCode(1_002_018_201, "社交客户端已存在配置");
 
     // ========== 系统敏感词 1-002-019-000 =========
     ErrorCode SENSITIVE_WORD_NOT_EXISTS = new ErrorCode(1_002_019_000, "系统敏感词在所有标签中都不存在");

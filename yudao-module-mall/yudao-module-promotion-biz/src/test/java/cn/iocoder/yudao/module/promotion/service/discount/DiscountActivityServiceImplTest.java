@@ -138,7 +138,7 @@ public class DiscountActivityServiceImplTest extends BaseDbUnitTest {
         Long id = dbDiscountActivity.getId();
 
         // 调用
-        discountActivityService.closeRewardActivity(id);
+        discountActivityService.closeDiscountActivity(id);
         // 校验状态
         DiscountActivityDO discountActivity = discountActivityMapper.selectById(id);
         assertEquals(discountActivity.getStatus(), PromotionActivityStatusEnum.CLOSE.getStatus());

@@ -4,8 +4,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.module.member.api.address.AddressApi;
-import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
+import cn.iocoder.yudao.module.member.api.address.MemberAddressApi;
+import cn.iocoder.yudao.module.member.api.address.dto.MemberAddressRespDTO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryPickUpStoreDO;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryExpressChargeModeEnum;
@@ -41,7 +41,7 @@ import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
 
     @Resource
-    private AddressApi addressApi;
+    private MemberAddressApi addressApi;
 
     @Resource
     private DeliveryPickUpStoreService deliveryPickUpStoreService;
@@ -81,7 +81,7 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
             // 价格计算时，如果为空就不算~最终下单，会校验该字段不允许空
             return;
         }
-        AddressRespDTO address = addressApi.getAddress(param.getAddressId(), param.getUserId());
+        MemberAddressRespDTO address = addressApi.getAddress(param.getAddressId(), param.getUserId());
         Assert.notNull(address, "收件人({})的地址，不能为空", param.getUserId());
 
         // 情况一：全局包邮

@@ -31,5 +31,4 @@ public interface DictDataConvert {
 
     List<AppDictDataRespVO> convertList03(List<DictDataDO> list);
 
-    List<DictDataRespDTO> convertList04(List<DictDataDO> list);
 }

@@ -22,15 +22,6 @@ import java.util.Map;
 public interface CombinationRecordService {
 
     /**
-     * 更新拼团状态
-     *
-     * @param status  状态
-     * @param userId  用户编号
-     * @param orderId 订单编号
-     */
-    void updateCombinationRecordStatusByUserIdAndOrderId(Integer status, Long userId, Long orderId);
-
-    /**
      * 【下单前】校验是否满足拼团活动条件
      *
      * 如果校验失败，则抛出业务异常
@@ -61,15 +52,6 @@ public interface CombinationRecordService {
      * @return 拼团记录
      */
     CombinationRecordDO getCombinationRecord(Long userId, Long orderId);
-
-    /**
-     * 获取拼团记录
-     *
-     * @param userId     用户 id
-     * @param activityId 活动 id
-     * @return 拼团记录列表
-     */
-    List<CombinationRecordDO> getCombinationRecordListByUserIdAndActivityId(Long userId, Long activityId);
 
     /**
      * 【下单前】校验是否满足拼团活动条件

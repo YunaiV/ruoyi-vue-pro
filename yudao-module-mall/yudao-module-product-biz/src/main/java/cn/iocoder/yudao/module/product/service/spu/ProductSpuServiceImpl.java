@@ -188,6 +188,9 @@ public class ProductSpuServiceImpl implements ProductSpuService {
 
     @Override
     public List<ProductSpuDO> getSpuList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
         return productSpuMapper.selectBatchIds(ids);
     }
 

@@ -148,7 +148,8 @@ public class AuthController {
     })
     public CommonResult<String> socialLogin(@RequestParam("type") Integer type,
                                             @RequestParam("redirectUri") String redirectUri) {
-        return success(socialClientService.getAuthorizeUrl(type, UserTypeEnum.ADMIN.getValue(), redirectUri));
+        return success(socialClientService.getAuthorizeUrl(
+                type, UserTypeEnum.ADMIN.getValue(), redirectUri));
     }
 
     @PostMapping("/social-login")
