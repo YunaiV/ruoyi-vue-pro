@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.crm.service.business;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.*;
 import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
@@ -51,7 +50,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
         // 创建数据权限
         crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType())
-                .setBizId(business.getId()).setUserId(userId).setPermissionLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
+                .setBizId(business.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
 
         // 返回
         return business.getId();
@@ -59,8 +58,8 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, getIdFor = CrmBusinessUpdateReqVO.class,
-            permissionLevel = CrmPermissionLevelEnum.WRITE)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#updateReqVO.id",
+            level = CrmPermissionLevelEnum.WRITE)
     public void updateBusiness(CrmBusinessUpdateReqVO updateReqVO) {
         // 校验存在
         validateBusinessExists(updateReqVO.getId());
@@ -71,7 +70,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, permissionLevel = CrmPermissionLevelEnum.WRITE)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, level = CrmPermissionLevelEnum.WRITE)
     public void deleteBusiness(Long id) {
         // 校验存在
         validateBusinessExists(id);
@@ -88,7 +87,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, permissionLevel = CrmPermissionLevelEnum.READ)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, level = CrmPermissionLevelEnum.READ)
     public CrmBusinessDO getBusiness(Long id) {
         return businessMapper.selectById(id);
     }
@@ -132,16 +131,6 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
                 CrmBusinessConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType()));
 
         // 3. TODO 记录转移日志
-    }
-
-    @Override
-    public boolean validateBizIdExists(Integer bizType, Long bizId) {
-        // 1. 校验模块类型
-        if (!ObjUtil.equal(CrmBizTypeEnum.CRM_BUSINESS.getType(), bizId)) {
-            return false;
-        }
-        // 2. 校验是否存在
-        return businessMapper.selectById(bizId) != null;
     }
 
 }

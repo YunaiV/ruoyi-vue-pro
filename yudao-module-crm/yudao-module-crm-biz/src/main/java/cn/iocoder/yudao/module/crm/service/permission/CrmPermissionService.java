@@ -6,8 +6,8 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionPageReqBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionUpdateReqBO;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmTransferPermissionReqBO;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -63,9 +63,9 @@ public interface CrmPermissionService {
     /**
      * 数据权限转移
      *
-     * @param crmTransferPermissionReqBO 数据权限转移请求
+     * @param crmPermissionTransferReqBO 数据权限转移请求
      */
-    void transferPermission(@Valid CrmTransferPermissionReqBO crmTransferPermissionReqBO);
+    void transferPermission(@Valid CrmPermissionTransferReqBO crmPermissionTransferReqBO);
 
     /**
      * 获取数据权限分页数据

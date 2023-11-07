@@ -8,8 +8,14 @@ import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionR
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionUpdateReqVO;
 import cn.iocoder.yudao.module.crm.convert.permission.CrmPermissionConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
-import cn.iocoder.yudao.module.crm.framework.core.service.CrmPermissionValidateService;
+import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
+import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.PostApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.system.api.dept.dto.PostRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,15 +30,12 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CRM_PERMISSION_DENIED;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CRM_PERMISSION_MODEL_NOT_EXISTS;
-import static cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum.getNameByType;
-import static cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum.isOwner;
 
 @Tag(name = "管理后台 - CRM 数据权限（数据团队成员操作）")
 @RestController
@@ -46,34 +49,16 @@ public class CrmPermissionController {
     @Resource
     private AdminUserApi adminUserApi;
     @Resource
-    private List<CrmPermissionValidateService> permissionValidateServices;
-
-    // TODO @puhui999：这个能不能使用 CrmPermission 注解替代？
-    private void validatePermission(Integer bizType, Long bizId) {
-        // 1. TODO 校验是否为超级管理员
-        // 2. 防御一手，如果是超级管理员不校验权限还是得校验一下数据是否存在
-        // TODO @puhui999：是不是不用校验每个业务方的数据是否存在；其实不是很关键哈；简单一点~ 说白了，负责人只要在，它的数据就是存在~
-        permissionValidateServices.forEach(item -> {
-            if (!item.validateBizIdExists(bizType, bizId)) {
-                throw exception(CRM_PERMISSION_MODEL_NOT_EXISTS, getNameByType(bizType));
-            }
-        });
-        // 3. 校验数据权限 （如果存在则表示 bizId 也存在）
-        CrmPermissionDO permission = crmPermissionService.getPermissionByBizTypeAndBizIdAndUserId(
-                bizType, bizId, getLoginUserId());
-        if (isOwner(permission.getPermissionLevel())) { // 只有负责人才可以操作团队成员
-            return;
-        }
-        throw exception(CRM_PERMISSION_DENIED, getNameByType(bizType));
-    }
+    private DeptApi deptApi;
+    @Resource
+    private PostApi postApi;
 
     @PutMapping("/add")
     @Operation(summary = "添加团队成员")
     @PreAuthorize("@ss.hasPermission('crm:permission:create')")
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PERMISSION, bizTypeValue = "#reqVO.bizType", bizId = "#reqVO.bizId"
+            , level = CrmPermissionLevelEnum.OWNER)
     public CommonResult<Boolean> addPermission(@Valid @RequestBody CrmPermissionCreateReqVO reqVO) {
-        // 1. 前置校验
-        validatePermission(reqVO.getBizType(), reqVO.getBizId());
-
         // 2. 加入成员
         crmPermissionService.createPermission(CrmPermissionConvert.INSTANCE.convert(reqVO));
         return success(true);
@@ -83,50 +68,27 @@ public class CrmPermissionController {
     @PutMapping("/update")
     @Operation(summary = "编辑团队成员")
     @PreAuthorize("@ss.hasPermission('crm:permission:update')")
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PERMISSION, bizTypeValue = "#updateReqVO.bizType", bizId = "#updateReqVO.bizId"
+            , level = CrmPermissionLevelEnum.WRITE)
     public CommonResult<Boolean> updatePermission(@Valid @RequestBody CrmPermissionUpdateReqVO updateReqVO) {
-        // 1. 前置校验
-        validatePermission(updateReqVO.getBizType(), updateReqVO.getBizId());
-
-        // 2. 编辑团队成员
         crmPermissionService.updatePermission(CrmPermissionConvert.INSTANCE.convert(updateReqVO));
         return success(true);
     }
 
-    // TODO @puhui999：deletemapping
-    @GetMapping("/delete")
+    @DeleteMapping("/delete")
     @Operation(summary = "移除团队成员")
-    @Parameter(name = "id", description = "团队成员编号", required = true)
-    // TODO @puhui999：是不是 id 参数就够了？
+    @Parameters({
+            @Parameter(name = "bizType", description = "CRM 类型", required = true, example = "2"),
+            @Parameter(name = "bizId", description = "CRM 类型数据编号", required = true, example = "1024"),
+            @Parameter(name = "id", description = "团队成员编号", required = true, example = "1024")
+    })
     @PreAuthorize("@ss.hasPermission('crm:permission:delete')")
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PERMISSION, bizTypeValue = "#bizType", bizId = "#bizId"
+            , level = CrmPermissionLevelEnum.OWNER)
     public CommonResult<Boolean> deletePermission(@RequestParam("bizType") Integer bizType,
                                                   @RequestParam("bizId") Long bizId,
                                                   @RequestParam("id") Long id) {
-        // 1. 前置校验
-        validatePermission(bizType, bizId);
-
-        // 2. 移除团队成员
         crmPermissionService.deletePermission(id);
-        return success(true);
-    }
-
-    // TODO @puhui999：这个是哪个地方使用到哈？
-    // TODO @puhui999：是不是 deletemapping 呀；
-    @GetMapping("/quit")
-    @Operation(summary = "退出团队")
-    @Parameters({
-            @Parameter(name = "bizType", description = "CRM 类型", required = true, example = "2"),
-            @Parameter(name = "bizId", description = "CRM 类型数据编号", required = true, example = "1024")
-    })
-    @PreAuthorize("@ss.hasPermission('crm:permission:delete')")
-    public CommonResult<Boolean> quitPermission(@RequestParam("bizType") Integer bizType,
-                                                @RequestParam("bizId") Long bizId) {
-        // 没有就不是团队成员
-        CrmPermissionDO permission = crmPermissionService.getPermissionByBizTypeAndBizIdAndUserId(
-                bizType, bizId, getLoginUserId());
-        if (permission == null) {
-            return success(false);
-        }
-        crmPermissionService.deletePermission(permission.getId());
         return success(true);
     }
 
@@ -148,7 +110,10 @@ public class CrmPermissionController {
 
         // 拼接数据
         List<AdminUserRespDTO> userList = adminUserApi.getUserList(convertSet(permission, CrmPermissionDO::getUserId));
-        return success(CrmPermissionConvert.INSTANCE.convert(permission, userList));
+        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userList, AdminUserRespDTO::getDeptId));
+        Set<Long> postIds = userList.stream().flatMap(item -> item.getPostIds().stream()).collect(Collectors.toSet());
+        Map<Long, PostRespDTO> postMap = postApi.getPostMap(postIds);
+        return success(CrmPermissionConvert.INSTANCE.convert(permission, userList, deptMap, postMap));
     }
 
 }

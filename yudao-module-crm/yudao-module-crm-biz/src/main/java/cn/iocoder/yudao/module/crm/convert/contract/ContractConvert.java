@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.crm.convert.contract;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.ContractDO;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmTransferPermissionReqBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -37,6 +37,6 @@ public interface ContractConvert {
             @Mapping(target = "bizId", source = "reqVO.id"),
             @Mapping(target = "newOwnerUserId", source = "reqVO.id")
     })
-    CrmTransferPermissionReqBO convert(CrmContractTransferReqVO reqVO, Long userId);
+    CrmPermissionTransferReqBO convert(CrmContractTransferReqVO reqVO, Long userId);
 
 }

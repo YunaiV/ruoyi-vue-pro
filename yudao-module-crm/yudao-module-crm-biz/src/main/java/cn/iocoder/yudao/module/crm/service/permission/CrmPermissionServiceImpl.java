@@ -10,8 +10,8 @@ import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionPageReqBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionUpdateReqBO;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmTransferPermissionReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,13 +55,12 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePermission(CrmPermissionUpdateReqBO updateBO) {
-        // TODO @puhui999：这里 1.1 1.2；下面 2.；这样更有序一点；
-        // 1. 校验用户是否存在
+        // 1.1 校验用户是否存在
         adminUserApi.validateUserList(Collections.singletonList(updateBO.getUserId()));
-        // 2. 校验存在
+        // 1.2 校验存在
         validateCrmPermissionExists(updateBO.getId());
 
-        // 更新操作
+        // 2. 更新操作
         CrmPermissionDO updateDO = CrmPermissionConvert.INSTANCE.convert(updateBO);
         crmPermissionMapper.updateById(updateDO);
     }
@@ -93,43 +92,41 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
     }
 
     @Override
-    public void transferPermission(CrmTransferPermissionReqBO transferReqBO) {
+    public void transferPermission(CrmPermissionTransferReqBO transferReqBO) {
         // 1. 校验数据权限-是否是负责人，只有负责人才可以转移
         CrmPermissionDO oldPermission = crmPermissionMapper.selectByBizTypeAndBizIdByUserId(transferReqBO.getBizType(),
                 transferReqBO.getBizId(), transferReqBO.getUserId());
         String crmName = CrmBizTypeEnum.getNameByType(transferReqBO.getBizType());
         // TODO 校验是否为超级管理员 || 1
-        if (oldPermission == null || !isOwner(oldPermission.getPermissionLevel())) {
+        if (oldPermission == null || !isOwner(oldPermission.getLevel())) {
             throw exception(CRM_PERMISSION_DENIED, crmName);
         }
-
-        // TODO @puhui999：这个顺序编号，看看调整下；2. 后面是 2.1 ，结果没 2.2 有点怪；
-        // 2. 校验转移对象是否已经是该负责人
+        // 1.1 校验转移对象是否已经是该负责人
         if (ObjUtil.equal(transferReqBO.getNewOwnerUserId(), oldPermission.getUserId())) {
             throw exception(CRM_PERMISSION_MODEL_TRANSFER_FAIL_OWNER_USER_EXISTS, crmName);
         }
-        // 2.1 校验新负责人是否存在
+        // 1.2 校验新负责人是否存在
         adminUserApi.validateUserList(Collections.singletonList(transferReqBO.getNewOwnerUserId()));
-        // 3. 权限转移
+
+        // 2. 权限转移
         List<CrmPermissionDO> permissions = crmPermissionMapper.selectByBizTypeAndBizId(
                 transferReqBO.getBizType(), transferReqBO.getBizId()); // 获取所有团队成员
-        // 3.1 校验新负责人是否在团队成员中
+        // 2.1 校验新负责人是否在团队成员中
         CrmPermissionDO permission = CollUtil.findOne(permissions,
                 item -> ObjUtil.equal(item.getUserId(), transferReqBO.getNewOwnerUserId()));
         if (permission == null) { // 不存在则以负责人的级别加入这个团队
             crmPermissionMapper.insert(new CrmPermissionDO().setBizType(transferReqBO.getBizType())
                     .setBizId(transferReqBO.getBizId()).setUserId(transferReqBO.getNewOwnerUserId())
-                    .setPermissionLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
+                    .setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
 
         } else { // 存在则修改权限级别
             crmPermissionMapper.updateById(new CrmPermissionDO().setId(permission.getId())
-                    .setPermissionLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
+                    .setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
         }
-
-        // 4. 老负责人处理
-        if (transferReqBO.getJoinTeam()) { // 加入团队
+        // 2.2. 老负责人处理
+        if (transferReqBO.getOldOwnerPermissionLevel() != null) { // 加入团队
             crmPermissionMapper.updateById(new CrmPermissionDO().setId(oldPermission.getId())
-                    .setPermissionLevel(transferReqBO.getPermissionLevel())); // 设置加入团队后的级别
+                    .setLevel(transferReqBO.getOldOwnerPermissionLevel())); // 设置加入团队后的级别
             return;
         }
         crmPermissionMapper.deleteById(oldPermission.getId()); // 移除

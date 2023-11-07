@@ -7,14 +7,13 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 
-// TODO @puhui999：CrmPermissionTransferReqBO
 /**
  * 数据权限转移 Request BO
  *
  * @author HUIHUI
  */
 @Data
-public class CrmTransferPermissionReqBO {
+public class CrmPermissionTransferReqBO {
 
     /**
      * 当前登录用户编号
@@ -40,17 +39,10 @@ public class CrmTransferPermissionReqBO {
     @NotNull(message = "新负责人的用户编号不能为空")
     private Long newOwnerUserId;
 
-    // TODO @puhui999：joinTeam 可以合并成 permissionLevel 里；oldOwnerPermissionLevel；这样 null 说明移除，因为都换负责人啦；
     /**
-     * 老负责人是否加入团队，是/否
-     */
-    @NotNull(message = "老负责人是否加入团队不能为空")
-    private Boolean joinTeam;
-
-    /**
-     * 老负责人加入团队后的权限级别。如果 {@link #joinTeam} 为 false, permissionLevel 为 null
+     * 老负责人加入团队后的权限级别。如果 null 说明移除
      * 关联 {@link CrmPermissionLevelEnum}
      */
-    private Integer permissionLevel;
+    private Integer oldOwnerPermissionLevel;
 
 }
