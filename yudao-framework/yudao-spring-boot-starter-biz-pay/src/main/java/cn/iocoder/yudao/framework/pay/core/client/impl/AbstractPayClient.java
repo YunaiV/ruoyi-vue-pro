@@ -188,11 +188,11 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
 
     @Override
     public final PayTransferRespDTO unifiedTransfer(PayTransferUnifiedReqDTO reqDTO) {
+        validatePayTransferReqDTO(reqDTO);
         PayTransferRespDTO resp;
-        try{
-            validatePayTransferReqDTO(reqDTO);
+        try {
             resp = doUnifiedTransfer(reqDTO);
-        }catch (ServiceException ex) { // 业务异常，都是实现类已经翻译，所以直接抛出即可
+        } catch (ServiceException ex) { // 业务异常，都是实现类已经翻译，所以直接抛出即可
             throw ex;
         } catch (Throwable ex) {
             // 系统异常，则包装成 PayException 异常抛出
@@ -219,7 +219,23 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
         }
     }
 
+    @Override
+    public final PayTransferRespDTO getTransfer(String outTradeNo, PayTransferTypeEnum type) {
+        try {
+            return doGetTransfer(outTradeNo, type);
+        } catch (ServiceException ex) { // 业务异常，都是实现类已经翻译，所以直接抛出即可
+            throw ex;
+        } catch (Throwable ex) {
+            log.error("[getTransfer][客户端({}) outTradeNo({}) type({}) 查询转账单异常]",
+                    getId(), outTradeNo, type, ex);
+            throw buildPayException(ex);
+        }
+    }
+
     protected abstract PayTransferRespDTO doUnifiedTransfer(PayTransferUnifiedReqDTO reqDTO)
+            throws Throwable;
+
+    protected abstract PayTransferRespDTO doGetTransfer(String outTradeNo, PayTransferTypeEnum type)
             throws Throwable;
 
     // ========== 各种工具方法 ==========
