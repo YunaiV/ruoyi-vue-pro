@@ -235,8 +235,16 @@ public class CodegenServiceImpl implements CodegenService {
             throw exception(CODEGEN_COLUMN_NOT_EXISTS);
         }
 
+        // 校验子表是否已经存在
+        CodegenTableDO subTable = null;
+        List<CodegenColumnDO> subColumns = null;
+        if (table.getSubTableId() != null) {
+            subTable = codegenTableMapper.selectById(table.getSubTableId());
+            subColumns = codegenColumnMapper.selectListByTableId(table.getSubTableId());
+        }
+
         // 执行生成
-        return codegenEngine.execute(table, columns);
+        return codegenEngine.execute(table, columns, subTable, subColumns);
     }
 
     @Override

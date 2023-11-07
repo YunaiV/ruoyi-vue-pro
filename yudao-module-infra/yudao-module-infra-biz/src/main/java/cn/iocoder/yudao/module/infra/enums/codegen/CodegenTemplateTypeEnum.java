@@ -14,6 +14,7 @@ public enum CodegenTemplateTypeEnum {
 
     CRUD(1), // 单表（增删改查）
     TREE(2), // 树表（增删改查）
+    MASTER_SUB(3), // 主子表
     ;
 
     /**

@@ -1,0 +1,88 @@
+package cn.iocoder.yudao.module.module.system.service.user;
+
+import org.springframework.stereotype.Service;
+import javax.annotation.Resource;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.*;
+import cn.iocoder.yudao.module.module.system.controller.admin.user.vo.*;
+import cn.iocoder.yudao.module.module.system.dal.dataobject.user.SystemUserDO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+
+import cn.iocoder.yudao.module.module.system.convert.user.SystemUserConvert;
+import cn.iocoder.yudao.module.module.system.dal.mysql.user.SystemUserMapper;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.module.system.enums.ErrorCodeConstants.*;
+
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
+
+/**
+ * 用户 Service 实现类
+ *
+ * @author 芋道源码
+ */
+@Service
+@Validated
+public class SystemUserServiceImpl implements SystemUserService {
+
+    @Resource
+    private SystemUserMapper userMapper;
+
+    @Override
+    public Long createUser(SystemUserCreateReqVO createReqVO) {
+        // 插入
+        SystemUserDO user = SystemUserConvert.INSTANCE.convert(createReqVO);
+        userMapper.insert(user);
+        // 返回
+        return user.getId();
+    }
+
+    @Override
+    public void updateUser(SystemUserUpdateReqVO updateReqVO) {
+        // 校验存在
+        validateUserExists(updateReqVO.getId());
+        // 更新
+        SystemUserDO updateObj = SystemUserConvert.INSTANCE.convert(updateReqVO);
+        userMapper.updateById(updateObj);
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        // 校验存在
+        validateUserExists(id);
+        // 删除
+        userMapper.deleteById(id);
+    }
+
+    private void validateUserExists(Long id) {
+        if (userMapper.selectById(id) == null) {
+            throw exception(USER_NOT_EXISTS);
+        }
+    }
+
+    @Override
+    public SystemUserDO getUser(Long id) {
+        return userMapper.selectById(id);
+    }
+
+    @Override
+    public List<SystemUserDO> getUserList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return ListUtil.empty();
+        }
+        return userMapper.selectBatchIds(ids);
+    }
+
+    @Override
+    public PageResult<SystemUserDO> getUserPage(SystemUserPageReqVO pageReqVO) {
+        return userMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<SystemUserDO> getUserList(SystemUserExportReqVO exportReqVO) {
+        return userMapper.selectList(exportReqVO);
+    }
+
+}

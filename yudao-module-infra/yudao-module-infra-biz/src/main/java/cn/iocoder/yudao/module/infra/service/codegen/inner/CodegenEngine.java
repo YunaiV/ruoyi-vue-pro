@@ -26,6 +26,7 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenFrontTypeEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
 import cn.iocoder.yudao.module.infra.framework.codegen.config.CodegenProperties;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
@@ -37,6 +38,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import static cn.hutool.core.map.MapUtil.getStr;
 import static cn.hutool.core.text.CharSequenceUtil.*;
@@ -149,7 +151,8 @@ public class CodegenEngine {
     }
 
     @PostConstruct
-    private void initGlobalBindingMap() {
+    @VisibleForTesting
+    void initGlobalBindingMap() {
         // 全局配置
         globalBindingMap.put("basePackage", codegenProperties.getBasePackage());
         globalBindingMap.put("baseFrameworkPackage", codegenProperties.getBasePackage()
@@ -176,13 +179,28 @@ public class CodegenEngine {
         globalBindingMap.put("OperateTypeEnumClassName", OperateTypeEnum.class.getName());
     }
 
-    public Map<String, String> execute(CodegenTableDO table, List<CodegenColumnDO> columns) {
+    /**
+     * 生成代码
+     *
+     * @param table 表定义
+     * @param columns table 的字段定义数组
+     * @param subTable 子表定义，当且仅当主子表时使用
+     * @param subColumns subTable 的字段定义数组
+     * @return 生成的代码，key 是路径，value 是对应代码
+     */
+    public Map<String, String> execute(CodegenTableDO table, List<CodegenColumnDO> columns,
+                                       CodegenTableDO subTable, List<CodegenColumnDO> subColumns) {
         // 创建 bindingMap
         Map<String, Object> bindingMap = new HashMap<>(globalBindingMap);
         bindingMap.put("table", table);
         bindingMap.put("columns", columns);
         bindingMap.put("primaryColumn", CollectionUtils.findFirst(columns, CodegenColumnDO::getPrimaryKey)); // 主键字段
         bindingMap.put("sceneEnum", CodegenSceneEnum.valueOf(table.getScene()));
+        if (subTable != null) {
+            bindingMap.put("subTable", subTable);
+            bindingMap.put("subColumns", subColumns);
+            bindingMap.put("subColumn", CollectionUtils.findFirst(subColumns, column -> column.getId().equals(table.getSubColumnId())));
+        }
 
         // className 相关
         // 去掉指定前缀，将 TestDictType 转换成 DictType. 因为在 create 等方法后，不需要带上 Test 前缀

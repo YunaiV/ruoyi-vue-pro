@@ -1,0 +1,70 @@
+package cn.iocoder.yudao.module.module.system.service.user;
+
+import java.util.*;
+import javax.validation.*;
+import cn.iocoder.yudao.module.module.system.controller.admin.user.vo.*;
+import cn.iocoder.yudao.module.module.system.dal.dataobject.user.SystemUserDO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+
+/**
+ * 用户 Service 接口
+ *
+ * @author 芋道源码
+ */
+public interface SystemUserService {
+
+    /**
+     * 创建用户
+     *
+     * @param createReqVO 创建信息
+     * @return 编号
+     */
+    Long createUser(@Valid SystemUserCreateReqVO createReqVO);
+
+    /**
+     * 更新用户
+     *
+     * @param updateReqVO 更新信息
+     */
+    void updateUser(@Valid SystemUserUpdateReqVO updateReqVO);
+
+    /**
+     * 删除用户
+     *
+     * @param id 编号
+     */
+    void deleteUser(Long id);
+
+    /**
+     * 获得用户
+     *
+     * @param id 编号
+     * @return 用户
+     */
+    SystemUserDO getUser(Long id);
+
+    /**
+     * 获得用户列表
+     *
+     * @param ids 编号
+     * @return 用户列表
+     */
+    List<SystemUserDO> getUserList(Collection<Long> ids);
+
+    /**
+     * 获得用户分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 用户分页
+     */
+    PageResult<SystemUserDO> getUserPage(SystemUserPageReqVO pageReqVO);
+
+    /**
+     * 获得用户列表, 用于 Excel 导出
+     *
+     * @param exportReqVO 查询条件
+     * @return 用户列表
+     */
+    List<SystemUserDO> getUserList(SystemUserExportReqVO exportReqVO);
+
+}

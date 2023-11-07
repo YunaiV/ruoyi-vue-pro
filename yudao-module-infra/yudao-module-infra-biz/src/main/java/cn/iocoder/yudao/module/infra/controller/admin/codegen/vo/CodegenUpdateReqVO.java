@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.column.CodegenColumnBaseVO;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.CodegenTableBaseVO;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
+import cn.iocoder.yudao.module.infra.enums.codegen.CodegenTemplateTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -41,6 +42,12 @@ public class CodegenUpdateReqVO {
             // 生成场景为管理后台时，必须设置上级菜单，不然生成的菜单 SQL 是无父级菜单的
             return ObjectUtil.notEqual(getScene(), CodegenSceneEnum.ADMIN.getScene())
                     || getParentMenuId() != null;
+        }
+
+        @AssertTrue(message = "关联的子表与字段不能为空")
+        public boolean isSubValid() {
+            return ObjectUtil.notEqual(getTemplateType(), CodegenTemplateTypeEnum.MASTER_SUB)
+                    || (getSubTableId() != null && getSubColumnId() != null);
         }
 
     }

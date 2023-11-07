@@ -116,4 +116,19 @@ public class CodegenTableDO extends BaseDO {
      */
     private Long parentMenuId;
 
+    // ========== 主子表相关字段 ==========
+
+    /**
+     * 子表的表编号
+     *
+     * 关联 {@link CodegenTableDO#getId()}
+     */
+    private Long subTableId;
+    /**
+     * 子表的关联字段编号
+     *
+     * 关联 {@link CodegenColumnDO#getId()}
+     */
+    private Long subColumnId;
+
 }
