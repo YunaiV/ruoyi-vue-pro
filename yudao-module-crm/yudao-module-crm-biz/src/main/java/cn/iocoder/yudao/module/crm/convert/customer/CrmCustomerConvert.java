@@ -1,11 +1,13 @@
 package cn.iocoder.yudao.module.crm.convert.customer;
 
+import cn.hutool.core.lang.tree.Node;
 import cn.hutool.core.util.NumberUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmTransferPermissionReqBO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
@@ -60,4 +62,7 @@ public interface CrmCustomerConvert {
     })
     CrmTransferPermissionReqBO convert(CrmCustomerTransferReqVO reqVO, Long userId);
 
+    CrmCustomerPoolConfigRespVO convert(CrmCustomerPoolConfigDO customerPoolConfig);
+
+    CrmCustomerPoolConfigDO convert(CrmCustomerPoolConfigUpdateReqVO updateReqVO);
 }
