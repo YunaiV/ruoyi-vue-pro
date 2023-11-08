@@ -2,14 +2,12 @@ package cn.iocoder.yudao.module.crm.service.permission;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.convert.permission.CrmPermissionConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.permission.CrmPermissionMapper;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionPageReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionUpdateReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -18,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -85,6 +84,11 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
         return crmPermissionMapper.selectByBizTypeAndBizId(bizType, bizId);
     }
 
+    @Override
+    public List<CrmPermissionDO> getPermissionByBizTypeAndBizIdsAndLevel(Integer bizType, Collection<Long> bizIds, Integer level) {
+        return crmPermissionMapper.selectListByBizTypeAndBizIdsAndLevel(bizType, bizIds, level);
+    }
+
     private void validateCrmPermissionExists(Long id) {
         if (crmPermissionMapper.selectById(id) == null) {
             throw exception(CRM_PERMISSION_NOT_EXISTS);
@@ -133,8 +137,8 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
     }
 
     @Override
-    public PageResult<CrmPermissionDO> getPermissionPage(CrmPermissionPageReqBO pageReqBO) {
-        return crmPermissionMapper.selectPage(pageReqBO);
+    public List<CrmPermissionDO> getPermissionListByBizTypeAndUserId(Integer bizType, Long userId) {
+        return crmPermissionMapper.selectListByBizTypeAndUserId(bizType, userId);
     }
 
 }

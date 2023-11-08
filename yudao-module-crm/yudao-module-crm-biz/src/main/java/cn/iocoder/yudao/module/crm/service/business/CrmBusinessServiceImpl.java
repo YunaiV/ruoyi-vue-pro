@@ -103,21 +103,20 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     @Override
     public PageResult<CrmBusinessDO> getBusinessPage(CrmBusinessPageReqVO pageReqVO, Long userId) {
         // 1. 获取当前用户能看的分页数据
-        PageResult<CrmPermissionDO> permissionPage = crmPermissionService.getPermissionPage(
-                CrmBusinessConvert.INSTANCE.convert(pageReqVO).setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType()).setUserId(userId));
-        Set<Long> ids = convertSet(permissionPage.getList(), CrmPermissionDO::getBizId);
+        List<CrmPermissionDO> permissions = crmPermissionService.getPermissionListByBizTypeAndUserId(
+                CrmBizTypeEnum.CRM_BUSINESS.getType(), userId);
+        Set<Long> ids = convertSet(permissions, CrmPermissionDO::getBizId);
         if (CollUtil.isEmpty(ids)) { // 没得说明没有什么给他看的
             return PageResult.empty();
         }
 
         // 2. 获取商机分页数据
-        List<CrmBusinessDO> businessList = businessMapper.selectList(pageReqVO, ids);
-        return new PageResult<>(businessList, (long) businessList.size());
+        return businessMapper.selectPage(pageReqVO, ids);
     }
 
     @Override
     public List<CrmBusinessDO> getBusinessList(CrmBusinessExportReqVO exportReqVO) {
-        return businessMapper.selectList(exportReqVO);
+        return businessMapper.selectPage(exportReqVO);
     }
 
     @Override

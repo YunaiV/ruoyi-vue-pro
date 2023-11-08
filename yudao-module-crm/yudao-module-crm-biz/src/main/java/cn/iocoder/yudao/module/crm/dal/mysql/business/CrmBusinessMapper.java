@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.crm.dal.mysql.business;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.CrmBusinessExportReqVO;
@@ -18,14 +19,14 @@ import java.util.List;
 @Mapper
 public interface CrmBusinessMapper extends BaseMapperX<CrmBusinessDO> {
 
-    default List<CrmBusinessDO> selectList(CrmBusinessPageReqVO reqVO, Collection<Long> ids) {
-        return selectList(new LambdaQueryWrapperX<CrmBusinessDO>()
+    default PageResult<CrmBusinessDO> selectPage(CrmBusinessPageReqVO reqVO, Collection<Long> ids) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<CrmBusinessDO>()
                 .in(CrmBusinessDO::getId, ids)
                 .likeIfPresent(CrmBusinessDO::getName, reqVO.getName())
                 .orderByDesc(CrmBusinessDO::getId));
     }
 
-    default List<CrmBusinessDO> selectList(CrmBusinessExportReqVO reqVO) {
+    default List<CrmBusinessDO> selectPage(CrmBusinessExportReqVO reqVO) {
         return selectList(new LambdaQueryWrapperX<CrmBusinessDO>()
                 .likeIfPresent(CrmBusinessDO::getName, reqVO.getName())
                 .eqIfPresent(CrmBusinessDO::getStatusTypeId, reqVO.getStatusTypeId())
