@@ -14,10 +14,11 @@ import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.client.impl.NonePayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.refund.PayRefundStatusRespEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
-import cn.iocoder.yudao.module.pay.enums.member.PayWalletBizTypeEnum;
+import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
@@ -178,6 +179,11 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
 
     @Override
     public PayTransferRespDTO doUnifiedTransfer(PayTransferUnifiedReqDTO reqDTO) {
+        throw new UnsupportedOperationException("待实现");
+    }
+
+    @Override
+    protected PayTransferRespDTO doGetTransfer(String outTradeNo, PayTransferTypeEnum type) {
         throw new UnsupportedOperationException("待实现");
     }
 

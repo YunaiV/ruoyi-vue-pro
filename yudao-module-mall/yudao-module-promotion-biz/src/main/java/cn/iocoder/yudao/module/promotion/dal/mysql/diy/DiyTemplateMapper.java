@@ -29,4 +29,8 @@ public interface DiyTemplateMapper extends BaseMapperX<DiyTemplateDO> {
         return selectOne(DiyTemplateDO::getUsed, used);
     }
 
+    default DiyTemplateDO selectByName(String name) {
+        return selectOne(DiyTemplateDO::getName, name);
+    }
+
 }

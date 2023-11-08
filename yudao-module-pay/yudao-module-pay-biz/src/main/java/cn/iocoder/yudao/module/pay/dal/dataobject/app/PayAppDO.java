@@ -54,4 +54,9 @@ public class PayAppDO extends BaseDO {
      */
     private String refundNotifyUrl;
 
+    /**
+     * 转账结果的回调地址
+     */
+    private String transferNotifyUrl;
+
 }

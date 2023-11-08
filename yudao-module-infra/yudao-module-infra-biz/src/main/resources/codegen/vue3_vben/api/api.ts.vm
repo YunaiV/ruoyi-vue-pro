@@ -28,5 +28,5 @@ export function delete${simpleClassName}(id: number) {
 
 // 导出${table.classComment} Excel
 export function export${simpleClassName}(params) {
-    return defHttp.download({ url: '${baseURL}/export-excel', params }, '${table.classComment}.xls')
+  return defHttp.download({ url: '${baseURL}/export-excel', params }, '${table.classComment}.xls')
 }

@@ -13,7 +13,7 @@
 
     <name>${project.artifactId}</name>
     <description>
-        market 模块 API，暴露给其它模块调用
+        promotion 模块 API，暴露给其它模块调用
     </description>
 
     <dependencies>

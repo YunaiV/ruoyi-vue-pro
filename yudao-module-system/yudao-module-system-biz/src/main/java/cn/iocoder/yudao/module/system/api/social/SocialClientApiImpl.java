@@ -24,8 +24,8 @@ public class SocialClientApiImpl implements SocialClientApi {
     private SocialClientService socialClientService;
 
     @Override
-    public String getAuthorizeUrl(Integer type, Integer userType, String redirectUri) {
-        return socialClientService.getAuthorizeUrl(type, userType, redirectUri);
+    public String getAuthorizeUrl(Integer socialType, Integer userType, String redirectUri) {
+        return socialClientService.getAuthorizeUrl(socialType, userType, redirectUri);
     }
 
     @Override

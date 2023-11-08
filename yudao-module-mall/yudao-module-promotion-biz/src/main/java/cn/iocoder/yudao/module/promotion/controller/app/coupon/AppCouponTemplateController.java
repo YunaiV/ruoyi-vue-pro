@@ -96,13 +96,13 @@ public class AppCouponTemplateController {
      */
     private Long getProductScopeValue(Integer productScope, Long spuId) {
         // 通用券：没有商品范围
-        if (productScope == null || ObjectUtils.equalsAny(productScope, PromotionProductScopeEnum.ALL.getScope(), null)) {
+        if (ObjectUtils.equalsAny(productScope, PromotionProductScopeEnum.ALL.getScope(), null)) {
             return null;
         }
         // 品类券：查询商品的品类编号
         if (Objects.equals(productScope, PromotionProductScopeEnum.CATEGORY.getScope()) && spuId != null) {
-            return Optional.ofNullable(productSpuApi.getSpu(spuId))
-                    .map(ProductSpuRespDTO::getCategoryId).orElse(null);
+            ProductSpuRespDTO spu = productSpuApi.getSpu(spuId);
+            return spu != null ? spu.getCategoryId() : null;
         }
         // 商品卷：直接返回
         return spuId;

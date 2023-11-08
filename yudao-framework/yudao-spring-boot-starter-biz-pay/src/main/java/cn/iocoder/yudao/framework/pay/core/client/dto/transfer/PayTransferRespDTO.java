@@ -53,11 +53,24 @@ public class PayTransferRespDTO {
     /**
      * 创建【WAITING】状态的转账返回
      */
-    public static PayTransferRespDTO waitingOf(String channelOrderNo,
+    public static PayTransferRespDTO waitingOf(String channelTransferNo,
                                              String outTransferNo, Object rawData) {
         PayTransferRespDTO respDTO = new PayTransferRespDTO();
         respDTO.status = PayTransferStatusRespEnum.WAITING.getStatus();
-        respDTO.channelTransferNo = channelOrderNo;
+        respDTO.channelTransferNo = channelTransferNo;
+        respDTO.outTransferNo = outTransferNo;
+        respDTO.rawData = rawData;
+        return respDTO;
+    }
+
+    /**
+     * 创建【IN_PROGRESS】状态的转账返回
+     */
+    public static PayTransferRespDTO dealingOf(String channelTransferNo,
+                                               String outTransferNo, Object rawData) {
+        PayTransferRespDTO respDTO = new PayTransferRespDTO();
+        respDTO.status = PayTransferStatusRespEnum.IN_PROGRESS.getStatus();
+        respDTO.channelTransferNo = channelTransferNo;
         respDTO.outTransferNo = outTransferNo;
         respDTO.rawData = rawData;
         return respDTO;

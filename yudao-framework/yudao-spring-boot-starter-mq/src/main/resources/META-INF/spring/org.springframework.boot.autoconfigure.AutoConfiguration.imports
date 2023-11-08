@@ -1,1 +1,2 @@
-cn.iocoder.yudao.framework.mq.config.YudaoMQAutoConfiguration
+cn.iocoder.yudao.framework.mq.redis.config.YudaoRedisMQAutoConfiguration
+cn.iocoder.yudao.framework.mq.rabbitmq.config.YudaoRabbitMQAutoConfiguration

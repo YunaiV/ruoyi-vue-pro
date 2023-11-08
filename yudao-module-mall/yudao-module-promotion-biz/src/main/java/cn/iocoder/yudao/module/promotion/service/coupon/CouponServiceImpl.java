@@ -7,7 +7,6 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
@@ -80,12 +79,11 @@ public class CouponServiceImpl implements CouponService {
     public PageResult<CouponDO> getCouponPage(CouponPageReqVO pageReqVO) {
         // 获得用户编号
         if (StrUtil.isNotEmpty(pageReqVO.getNickname())) {
-            Set<Long> userIds = CollectionUtils.convertSet(memberUserApi.getUserListByNickname(pageReqVO.getNickname()),
-                    MemberUserRespDTO::getId);
-            if (CollUtil.isEmpty(userIds)) {
+            List<MemberUserRespDTO> users = memberUserApi.getUserListByNickname(pageReqVO.getNickname());
+            if (CollUtil.isEmpty(users)) {
                 return PageResult.empty();
             }
-            pageReqVO.setUserIds(userIds);
+            pageReqVO.setUserIds(convertSet(users, MemberUserRespDTO::getId));
         }
         // 分页查询
         return couponMapper.selectPage(pageReqVO);

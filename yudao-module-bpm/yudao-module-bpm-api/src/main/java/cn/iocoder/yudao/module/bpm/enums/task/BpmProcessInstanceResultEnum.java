@@ -30,13 +30,13 @@ public enum BpmProcessInstanceResultEnum {
      * 相当于是 通过 APPROVE 的特殊状态
      * 例如：A审批， A 后加签了 B，并且审批通过了任务，但是 B 还未审批，则当前任务状态为“待后加签任务完成”
      */
-    ADD_SIGN_AFTER(7, "待后加签任务完成"),
+    SIGN_AFTER(7, "待后加签任务完成"),
     /**
      * 【加签】源任务未审批，但是向前加签了，所以源任务状态变为“待前加签任务完成”
      * 相当于是 处理中 PROCESS 的特殊状态
      * 例如：A 审批， A 前加签了 B，B 还未审核
      */
-    ADD_SIGN_BEFORE(8, "待前加签任务完成"),
+    SIGN_BEFORE(8, "待前加签任务完成"),
     /**
      * 【加签】后加签任务被创建时的初始状态
      * 相当于是 处理中 PROCESS 的特殊状态
@@ -71,7 +71,7 @@ public enum BpmProcessInstanceResultEnum {
     public static boolean isEndResult(Integer result) {
         return ObjectUtils.equalsAny(result, APPROVE.getResult(), REJECT.getResult(),
                 CANCEL.getResult(), BACK.getResult(),
-                ADD_SIGN_AFTER.getResult());
+                SIGN_AFTER.getResult());
     }
 
 }

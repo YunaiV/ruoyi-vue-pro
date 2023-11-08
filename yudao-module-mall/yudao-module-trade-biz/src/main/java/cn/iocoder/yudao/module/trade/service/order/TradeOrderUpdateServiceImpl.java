@@ -11,8 +11,8 @@ import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
-import cn.iocoder.yudao.module.member.api.address.AddressApi;
-import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
+import cn.iocoder.yudao.module.member.api.address.MemberAddressApi;
+import cn.iocoder.yudao.module.member.api.address.dto.MemberAddressRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
@@ -98,7 +98,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Resource
     private PayOrderApi payOrderApi;
     @Resource
-    private AddressApi addressApi;
+    private MemberAddressApi addressApi;
     @Resource
     private ProductCommentApi productCommentApi;
 
@@ -110,7 +110,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Override
     public AppTradeOrderSettlementRespVO settlementOrder(Long userId, AppTradeOrderSettlementReqVO settlementReqVO) {
         // 1. 获得收货地址
-        AddressRespDTO address = getAddress(userId, settlementReqVO.getAddressId());
+        MemberAddressRespDTO address = getAddress(userId, settlementReqVO.getAddressId());
         if (address != null) {
             settlementReqVO.setAddressId(address.getId());
         }
@@ -129,7 +129,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
      * @param addressId 地址编号
      * @return 地址
      */
-    private AddressRespDTO getAddress(Long userId, Long addressId) {
+    private MemberAddressRespDTO getAddress(Long userId, Long addressId) {
         if (addressId != null) {
             return addressApi.getAddress(addressId, userId);
         }
@@ -193,7 +193,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 物流信息
         order.setDeliveryType(createReqVO.getDeliveryType());
         if (Objects.equals(createReqVO.getDeliveryType(), DeliveryTypeEnum.EXPRESS.getType())) {
-            AddressRespDTO address = addressApi.getAddress(createReqVO.getAddressId(), userId);
+            MemberAddressRespDTO address = addressApi.getAddress(createReqVO.getAddressId(), userId);
             Assert.notNull(address, "地址({}) 不能为空", createReqVO.getAddressId()); // 价格计算时，已经计算
             order.setReceiverName(address.getName()).setReceiverMobile(address.getMobile())
                     .setReceiverAreaId(address.getAreaId()).setReceiverDetailAddress(address.getDetailAddress());

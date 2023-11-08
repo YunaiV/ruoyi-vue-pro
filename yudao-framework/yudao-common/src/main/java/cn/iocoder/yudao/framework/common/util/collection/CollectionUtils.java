@@ -8,6 +8,7 @@ import com.google.common.collect.ImmutableMap;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 
@@ -223,10 +224,14 @@ public class CollectionUtils {
     }
 
     public static <T> T findFirst(List<T> from, Predicate<T> predicate) {
+        return findFirst(from, predicate, Function.identity());
+    }
+
+    public static <T, U> U findFirst(List<T> from, Predicate<T> predicate, Function<T, U> func) {
         if (CollUtil.isEmpty(from)) {
             return null;
         }
-        return from.stream().filter(predicate).findFirst().orElse(null);
+        return from.stream().filter(predicate).findFirst().map(func).orElse(null);
     }
 
     public static <T, V extends Comparable<? super V>> V getMaxValue(Collection<T> from, Function<T, V> valueFunc) {
@@ -265,6 +270,22 @@ public class CollectionUtils {
 
     public static <T> Collection<T> singleton(T deptId) {
         return deptId == null ? Collections.emptyList() : Collections.singleton(deptId);
+    }
+
+    public static <T, U> List<U> convertListByFlatMap(Collection<T> from,
+                                                      Function<T, ? extends Stream<? extends U>> func) {
+        if (CollUtil.isEmpty(from)) {
+            return new ArrayList<>();
+        }
+        return from.stream().flatMap(func).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
+    public static <T, U> Set<U> convertSetByFlatMap(Collection<T> from,
+                                                    Function<T, ? extends Stream<? extends U>> func) {
+        if (CollUtil.isEmpty(from)) {
+            return new HashSet<>();
+        }
+        return from.stream().flatMap(func).filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
 }

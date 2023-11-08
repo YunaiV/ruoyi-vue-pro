@@ -16,6 +16,7 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferRespDT
 import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyV3Result;
 import com.github.binarywang.wxpay.bean.notify.WxPayRefundNotifyResult;
@@ -431,6 +432,12 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     protected PayTransferRespDTO doUnifiedTransfer(PayTransferUnifiedReqDTO reqDTO) {
        throw new UnsupportedOperationException("待实现");
     }
+
+    @Override
+    protected PayTransferRespDTO doGetTransfer(String outTradeNo, PayTransferTypeEnum type) {
+        throw new UnsupportedOperationException("待实现");
+    }
+
     // ========== 各种工具方法 ==========
 
     static String formatDateV2(LocalDateTime time) {
