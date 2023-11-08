@@ -13,6 +13,7 @@ import org.mapstruct.factory.Mappers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
@@ -41,13 +42,13 @@ public interface ProductFavoriteConvert {
     @Mapping(target = "userId", source = "favorite.userId")
     @Mapping(target = "spuId", source = "favorite.spuId")
     @Mapping(target = "createTime", source = "favorite.createTime")
-    @Mapping(target = "favoriteStatus", constant = "1")
     ProductFavoriteRespVO convert2admin(ProductSpuDO spu, ProductFavoriteDO favorite);
 
-    default List<ProductFavoriteRespVO> convertList2admin(List<ProductFavoriteDetailDO> favorites) {
-        List<ProductFavoriteRespVO> resultList = new ArrayList<>(favorites.size());
-        for (ProductFavoriteDetailDO favorite : favorites) {
-            resultList.add(convert2admin(favorite.getSpuDO(), favorite));
+    default List<ProductFavoriteRespVO> convertList2admin(List<ProductFavoriteDO> favorites, List<ProductSpuDO> spus) {
+        List<ProductFavoriteRespVO> resultList = new ArrayList<>(spus.size());
+        for (ProductFavoriteDO favorite : favorites) {
+            Optional<ProductSpuDO> spu =  spus.stream().filter(e -> e.getId().equals(favorite.getSpuId())).findFirst();
+            resultList.add(convert2admin(spu.get(), favorite));
         }
         return resultList;
     }

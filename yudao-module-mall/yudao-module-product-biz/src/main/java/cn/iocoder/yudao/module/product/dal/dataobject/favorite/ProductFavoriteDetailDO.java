@@ -12,5 +12,4 @@ import lombok.Data;
 public class ProductFavoriteDetailDO extends ProductFavoriteDO {
 
     ProductSpuDO spuDO;
-
 }

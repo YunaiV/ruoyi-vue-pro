@@ -133,9 +133,9 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         Db.saveOrUpdateBatch(collection);
     }
 
-    default <DTO> PageResult<DTO> selectJoinPage(PageParam pageParam, @Param("resultTypeClass_Eg1sG") Class<DTO> var2, @Param("ew") MPJBaseJoin<T> queryWrapper) {
+    default <DTO> PageResult<DTO> selectJoinPage(PageParam pageParam, Class<DTO> resultTypeClass, MPJBaseJoin<T> joinQueryWrapper) {
         IPage<DTO> mpPage = MyBatisUtils.buildPage(pageParam);
-        selectJoinPage(mpPage, var2, queryWrapper);
+        selectJoinPage(mpPage, resultTypeClass, joinQueryWrapper);
         // 转换返回
         return new PageResult<>(mpPage.getRecords(), mpPage.getTotal());
     }
