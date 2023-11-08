@@ -118,7 +118,7 @@ public class CodegenBuilder {
         table.setClassName(upperFirst(toCamelCase(subAfter(tableName, '_', false))));
         // 去除结尾的表，作为类描述
         table.setClassComment(StrUtil.removeSuffixIgnoreCase(table.getTableComment(), "表"));
-        table.setTemplateType(CodegenTemplateTypeEnum.CRUD.getType());
+        table.setTemplateType(CodegenTemplateTypeEnum.ONE.getType());
     }
 
     public List<CodegenColumnDO> buildColumns(Long tableId, List<TableField> tableFields) {

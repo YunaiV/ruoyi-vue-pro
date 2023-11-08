@@ -3,6 +3,7 @@ package ${basePackage}.module.${table.moduleName}.service.${table.businessName};
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
@@ -16,8 +17,9 @@ import ${PageResultClassName};
 import ${basePackage}.module.${table.moduleName}.convert.${table.businessName}.${table.className}Convert;
 import ${basePackage}.module.${table.moduleName}.dal.mysql.${table.businessName}.${table.className}Mapper;
 ## 特殊：主子表专属逻辑
-#if( $subTable )
-import ${basePackage}.module.${subTable.moduleName}.dal.mysql.${subTable.businessName}.${subClassNameVar}Mapper;
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+import ${basePackage}.module.${subTable.moduleName}.dal.mysql.${subTable.businessName}.${subTable.className}Mapper;
 #end
 
 import static ${ServiceExceptionUtilClassName}.exception;
@@ -38,40 +40,85 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
     @Resource
     private ${table.className}Mapper ${classNameVar}Mapper;
 ## 特殊：主子表专属逻辑
-#if( $subTable )
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
     @Resource
-    private ${subTable.className}Mapper ${subClassNameVar}Mapper;
+    private ${subTable.className}Mapper ${subClassNameVars.get($index)}Mapper;
 #end
 
     @Override
+## 特殊：主子表专属逻辑
+#if ( $subTables.size() > 0)
+    @Transactional(rollbackFor = Exception.class)
+#end
     public ${primaryColumn.javaType} create${simpleClassName}(${sceneEnum.prefixClass}${table.className}CreateReqVO createReqVO) {
         // 插入
         ${table.className}DO ${classNameVar} = ${table.className}Convert.INSTANCE.convert(createReqVO);
         ${classNameVar}Mapper.insert(${classNameVar});
 ## 特殊：主子表专属逻辑
-#if( $subTable )
-        // 插入子表
-        ${subClassNameVar}Mapper.insertBatch(createReqVO.get${subSimpleClassName}s);
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subJoinColumn = $subJoinColumns.get($index))##当前 join 字段
+#set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
+        // 插入子表（$subTable.classComment）
+    #if ( $subTable.subJoinMany)
+        createReqVO.get${subSimpleClassNames.get($index)}s().forEach(o -> o.set$SubJoinColumnName(${classNameVar}.getId()));
+        ${subClassNameVars.get($index)}Mapper.insertBatch(createReqVO.get${subSimpleClassNames.get($index)}s());
+    #else
+        createReqVO.get${subSimpleClassNames.get($index)}().set$SubJoinColumnName(${classNameVar}.getId());
+        ${subClassNameVars.get($index)}Mapper.insert(createReqVO.get${subSimpleClassNames.get($index)}());
+    #end
 #end
         // 返回
         return ${classNameVar}.getId();
     }
 
     @Override
+## 特殊：主子表专属逻辑
+#if ( $subTables.size() > 0)
+    @Transactional(rollbackFor = Exception.class)
+#end
     public void update${simpleClassName}(${sceneEnum.prefixClass}${table.className}UpdateReqVO updateReqVO) {
         // 校验存在
         validate${simpleClassName}Exists(updateReqVO.getId());
         // 更新
         ${table.className}DO updateObj = ${table.className}Convert.INSTANCE.convert(updateReqVO);
         ${classNameVar}Mapper.updateById(updateObj);
+## 特殊：主子表专属逻辑
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subJoinColumn = $subJoinColumns.get($index))##当前 join 字段
+#set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
+        // 更新子表（$subTable.classComment）
+    #if ( $subTable.subJoinMany)
+        ${subClassNameVars.get($index)}Mapper.deleteBy${SubJoinColumnName}(updateReqVO.getId());
+        updateReqVO.get${subSimpleClassNames.get($index)}s().forEach(o -> o.set$SubJoinColumnName(updateReqVO.getId()));
+        ${subClassNameVars.get($index)}Mapper.insertBatch(updateReqVO.get${subSimpleClassNames.get($index)}s());
+    #else
+        updateReqVO.get${subSimpleClassNames.get($index)}().set$SubJoinColumnName(updateReqVO.getId());
+        ${subClassNameVars.get($index)}Mapper.updateById(updateReqVO.get${subSimpleClassNames.get($index)}());
+    #end
+#end
     }
 
     @Override
+## 特殊：主子表专属逻辑
+#if ( $subTables.size() > 0)
+    @Transactional(rollbackFor = Exception.class)
+#end
     public void delete${simpleClassName}(${primaryColumn.javaType} id) {
         // 校验存在
         validate${simpleClassName}Exists(id);
         // 删除
         ${classNameVar}Mapper.deleteById(id);
+## 特殊：主子表专属逻辑
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subJoinColumn = $subJoinColumns.get($index))##当前 join 字段
+#set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
+        // 删除子表（$subTable.classComment）
+        ${subClassNameVars.get($index)}Mapper.deleteBy${SubJoinColumnName}(id);
+#end
     }
 
     private void validate${simpleClassName}Exists(${primaryColumn.javaType} id) {
@@ -83,14 +130,6 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
     @Override
     public ${table.className}DO get${simpleClassName}(${primaryColumn.javaType} id) {
         return ${classNameVar}Mapper.selectById(id);
-    }
-
-    @Override
-    public List<${table.className}DO> get${simpleClassName}List(Collection<${primaryColumn.javaType}> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return ListUtil.empty();
-        }
-        return ${classNameVar}Mapper.selectBatchIds(ids);
     }
 
     @Override

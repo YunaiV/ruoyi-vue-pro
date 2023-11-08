@@ -54,4 +54,7 @@ public interface ErrorCodeConstants {
     ErrorCode DATA_SOURCE_CONFIG_NOT_EXISTS = new ErrorCode(1_001_007_000, "数据源配置不存在");
     ErrorCode DATA_SOURCE_CONFIG_NOT_OK = new ErrorCode(1_001_007_001, "数据源配置不正确，无法进行连接");
 
+    // ========== 数据源配置 1-001-107-000 ==========
+    ErrorCode DEMO_STUDENT_NOT_EXISTS = new ErrorCode(1_001_107_000, "学生不存在");
+
 }

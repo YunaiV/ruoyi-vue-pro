@@ -44,9 +44,10 @@ public class CodegenUpdateReqVO {
                     || getParentMenuId() != null;
         }
 
+        // TODO 芋艿：这里有问题哈；
         @AssertTrue(message = "关联的子表与字段不能为空")
         public boolean isSubValid() {
-            return ObjectUtil.notEqual(getTemplateType(), CodegenTemplateTypeEnum.MASTER_SUB)
+            return ObjectUtil.notEqual(getTemplateType(), CodegenTemplateTypeEnum.SUB)
                     || (getSubTableId() != null && getSubColumnId() != null);
         }
 

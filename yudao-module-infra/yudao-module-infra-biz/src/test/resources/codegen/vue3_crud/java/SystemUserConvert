@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.module.system.convert.user;
+package cn.iocoder.yudao.module.system.convert.user;
 
 import java.util.*;
 
@@ -6,8 +6,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-import cn.iocoder.yudao.module.module.system.controller.admin.user.vo.*;
-import cn.iocoder.yudao.module.module.system.dal.dataobject.user.SystemUserDO;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.*;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.SystemUserDO;
 
 /**
  * 用户 Convert

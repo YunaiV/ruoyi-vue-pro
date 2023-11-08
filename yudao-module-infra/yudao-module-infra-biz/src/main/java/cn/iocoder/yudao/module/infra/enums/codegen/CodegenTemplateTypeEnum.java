@@ -12,9 +12,10 @@ import lombok.Getter;
 @Getter
 public enum CodegenTemplateTypeEnum {
 
-    CRUD(1), // 单表（增删改查）
+    ONE(1), // 单表（增删改查）
     TREE(2), // 树表（增删改查）
-    MASTER_SUB(3), // 主子表
+    MASTER(10), // 主子表 - 主表
+    SUB(11), // 主子表 - 子表
     ;
 
     /**

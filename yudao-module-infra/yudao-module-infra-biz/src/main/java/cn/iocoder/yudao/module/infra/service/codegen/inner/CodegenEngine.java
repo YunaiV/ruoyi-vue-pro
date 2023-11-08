@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.infra.service.codegen.inner;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
@@ -186,12 +187,12 @@ public class CodegenEngine {
      *
      * @param table 表定义
      * @param columns table 的字段定义数组
-     * @param subTable 子表定义，当且仅当主子表时使用
-     * @param subColumns subTable 的字段定义数组
+     * @param subTables 子表数组，当且仅当主子表时使用
+     * @param subColumnsList subTables 的字段定义数组
      * @return 生成的代码，key 是路径，value 是对应代码
      */
     public Map<String, String> execute(CodegenTableDO table, List<CodegenColumnDO> columns,
-                                       CodegenTableDO subTable, List<CodegenColumnDO> subColumns) {
+                                       List<CodegenTableDO> subTables, List<List<CodegenColumnDO>> subColumnsList) {
         // 创建 bindingMap
         Map<String, Object> bindingMap = new HashMap<>(globalBindingMap);
         bindingMap.put("table", table);
@@ -212,27 +213,51 @@ public class CodegenEngine {
         bindingMap.put("permissionPrefix", table.getModuleName() + ":" + simpleClassNameStrikeCase);
 
         // 特殊：主子表专属逻辑
-        if (subTable != null) {
+        if (CollUtil.isNotEmpty(subTables)) {
             // 创建 bindingMap
-            bindingMap.put("subTable", subTable);
-            bindingMap.put("subColumns", subColumns);
-            bindingMap.put("subColumn", CollectionUtils.findFirst(subColumns, // 关联的字段
-                    column -> Objects.equals(column.getId(), table.getSubColumnId())));
-            // className 相关
-            String subSimpleClassName = removePrefix(subTable.getClassName(), upperFirst(subTable.getModuleName()));
-            bindingMap.put("subSimpleClassName", subSimpleClassName);
-            bindingMap.put("subClassNameVar", lowerFirst(subSimpleClassName)); // 将 DictType 转换成 dictType，用于变量
+            bindingMap.put("subTables", subTables);
+            bindingMap.put("subColumnsList", subColumnsList);
+            List<CodegenColumnDO> subJoinColumns = new ArrayList<>();
+            List<String> subSimpleClassNames = new ArrayList<>();
+            List<String> subClassNameVars = new ArrayList<>();
+            for (int i = 0; i < subTables.size(); i++) {
+                CodegenTableDO subTable = subTables.get(i);
+                List<CodegenColumnDO> subColumns = subColumnsList.get(i);
+                subJoinColumns.add(CollectionUtils.findFirst(subColumns, // 关联的字段
+                        column -> Objects.equals(column.getId(), subTable.getSubJoinColumnId())));
+                // className 相关
+                String subSimpleClassName = removePrefix(subTable.getClassName(), upperFirst(subTable.getModuleName()));
+                subSimpleClassNames.add(subSimpleClassName);
+                subClassNameVars.add(lowerFirst(subSimpleClassName)); // 将 DictType 转换成 dictType，用于变量
+            }
+            bindingMap.put("subJoinColumns", subJoinColumns);
+            bindingMap.put("subSimpleClassNames", subSimpleClassNames);
+            bindingMap.put("subClassNameVars", subClassNameVars);
         }
 
         // 执行生成
         Map<String, String> templates = getTemplates(table.getTemplateType(), table.getFrontType());
         Map<String, String> result = Maps.newLinkedHashMapWithExpectedSize(templates.size()); // 有序
         templates.forEach((vmPath, filePath) -> {
-            filePath = formatFilePath(filePath, bindingMap);
-            String content = templateEngine.getTemplate(vmPath).render(bindingMap);
-            // 去除字段后面多余的 , 逗号
-            content = content.replaceAll(",\n}", "\n}").replaceAll(",\n  }", "\n  }");
-            result.put(filePath, content);
+            // 特殊：主子表专属逻辑
+            if (isSubTemplate(vmPath)) {
+                for (int i = 0; i < subTables.size(); i++) {
+                    bindingMap.put("subIndex", i);
+                    // TODO 芋艿：这块需要优化下逻辑
+                    String newFilePath = formatFilePath(filePath, bindingMap);
+                    String content = templateEngine.getTemplate(vmPath).render(bindingMap);
+                    // 去除字段后面多余的 , 逗号
+                    content = content.replaceAll(",\n}", "\n}").replaceAll(",\n  }", "\n  }");
+                    result.put(newFilePath, content);
+                    bindingMap.remove("subIndex");
+                }
+            } else {
+                filePath = formatFilePath(filePath, bindingMap);
+                String content = templateEngine.getTemplate(vmPath).render(bindingMap);
+                // 去除字段后面多余的 , 逗号
+                content = content.replaceAll(",\n}", "\n}").replaceAll(",\n  }", "\n  }");
+                result.put(filePath, content);
+            }
         });
         return result;
     }
@@ -242,7 +267,7 @@ public class CodegenEngine {
         templates.putAll(SERVER_TEMPLATES);
         templates.putAll(FRONT_TEMPLATES.row(frontType));
         // 特殊：主子表专属逻辑
-        if (ObjUtil.notEqual(templateType, CodegenTemplateTypeEnum.MASTER_SUB.getType())) {
+        if (ObjUtil.notEqual(templateType, CodegenTemplateTypeEnum.MASTER.getType())) {
             templates.remove(javaTemplatePath("dal/do_sub"));
             templates.remove(javaTemplatePath("dal/mapper_sub"));
         }
@@ -266,8 +291,11 @@ public class CodegenEngine {
         filePath = StrUtil.replace(filePath, "${table.businessName}", table.getBusinessName());
         filePath = StrUtil.replace(filePath, "${table.className}", table.getClassName());
         // 特殊：主子表专属逻辑
-        CodegenTableDO subTable = (CodegenTableDO) bindingMap.get("subTable");
-        if (subTable != null) {
+        Integer subIndex = (Integer) bindingMap.get("subIndex");
+        if (subIndex != null) {
+            CodegenTableDO subTable = ((List<CodegenTableDO>) bindingMap.get("subTables")).get(subIndex);
+            filePath = StrUtil.replace(filePath, "${subTable.moduleName}", subTable.getModuleName());
+            filePath = StrUtil.replace(filePath, "${subTable.businessName}", subTable.getBusinessName());
             filePath = StrUtil.replace(filePath, "${subTable.className}", subTable.getClassName());
         }
         return filePath;
@@ -335,5 +363,9 @@ public class CodegenEngine {
 
     private static String vue3VbenTemplatePath(String path) {
         return "codegen/vue3_vben/" + path + ".vm";
+    }
+
+    private static boolean isSubTemplate(String path) {
+        return path.contains("_sub");
     }
 }

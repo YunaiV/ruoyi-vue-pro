@@ -1,9 +1,9 @@
-package cn.iocoder.yudao.module.module.system.service.user;
+package cn.iocoder.yudao.module.system.service.user;
 
 import java.util.*;
 import javax.validation.*;
-import cn.iocoder.yudao.module.module.system.controller.admin.user.vo.*;
-import cn.iocoder.yudao.module.module.system.dal.dataobject.user.SystemUserDO;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.*;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.SystemUserDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 /**

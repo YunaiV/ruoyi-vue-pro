@@ -76,16 +76,6 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
         return success(${table.className}Convert.INSTANCE.convert(${classNameVar}));
     }
 
-    @GetMapping("/list")
-    @Operation(summary = "获得${table.classComment}列表")
-    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-#if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")#end
-
-    public CommonResult<List<${sceneEnum.prefixClass}${table.className}RespVO>> get${simpleClassName}List(@RequestParam("ids") Collection<${primaryColumn.javaType}> ids) {
-        List<${table.className}DO> list = ${classNameVar}Service.get${simpleClassName}List(ids);
-        return success(${table.className}Convert.INSTANCE.convertList(list));
-    }
-
     @GetMapping("/page")
     @Operation(summary = "获得${table.classComment}分页")
 #if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")#end

@@ -1,19 +1,19 @@
-package cn.iocoder.yudao.module.module.system.service.user;
+package cn.iocoder.yudao.module.system.service.user;
 
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.*;
-import cn.iocoder.yudao.module.module.system.controller.admin.user.vo.*;
-import cn.iocoder.yudao.module.module.system.dal.dataobject.user.SystemUserDO;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.*;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.SystemUserDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
-import cn.iocoder.yudao.module.module.system.convert.user.SystemUserConvert;
-import cn.iocoder.yudao.module.module.system.dal.mysql.user.SystemUserMapper;
+import cn.iocoder.yudao.module.system.convert.user.SystemUserConvert;
+import cn.iocoder.yudao.module.system.dal.mysql.user.SystemUserMapper;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.module.system.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;

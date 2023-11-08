@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.module.system.controller.admin.user.vo;
+package cn.iocoder.yudao.module.system.controller.admin.user.vo;
 
 import lombok.*;
 import java.util.*;

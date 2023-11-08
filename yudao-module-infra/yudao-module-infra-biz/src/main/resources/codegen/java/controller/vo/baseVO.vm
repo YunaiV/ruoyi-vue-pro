@@ -23,7 +23,7 @@ import static ${DateUtilsClassName}.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 #end
 #end
 ## 特殊：主子表专属逻辑
-#if ( $subTable )
+#foreach ($subTable in $subTables)
 import ${basePackage}.module.${subTable.moduleName}.dal.dataobject.${subTable.businessName}.${subTable.className}DO;
 #end
 
@@ -41,8 +41,14 @@ public class ${sceneEnum.prefixClass}${table.className}BaseVO {
 #end
 #end
 ## 特殊：主子表专属逻辑
-#if ( $subTable )
-    private List<${subTable.className}DO> ${subClassNameVar}s;
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+    #if ( $subTable.subJoinMany)
+    private List<${subTable.className}DO> ${subClassNameVars.get($index)}s;
 
+    #else
+    private ${subTable.className}DO ${subClassNameVars.get($index)};
+
+    #end
 #end
 }

@@ -1,3 +1,5 @@
+#set ($subTable = $subTables.get($subIndex))##当前表
+#set ($subColumns = $subColumnsList.get($subIndex))##当前字段数组
 package ${basePackage}.module.${subTable.moduleName}.dal.dataobject.${subTable.businessName};
 
 import lombok.*;

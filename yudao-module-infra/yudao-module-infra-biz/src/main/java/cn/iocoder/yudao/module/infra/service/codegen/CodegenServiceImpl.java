@@ -238,13 +238,14 @@ public class CodegenServiceImpl implements CodegenService {
         // 校验子表是否已经存在
         CodegenTableDO subTable = null;
         List<CodegenColumnDO> subColumns = null;
-        if (table.getSubTableId() != null) {
-            subTable = codegenTableMapper.selectById(table.getSubTableId());
-            subColumns = codegenColumnMapper.selectListByTableId(table.getSubTableId());
+        if (table.getMasterTableId() != null) {
+            subTable = codegenTableMapper.selectById(table.getMasterTableId());
+            subColumns = codegenColumnMapper.selectListByTableId(table.getMasterTableId());
         }
 
         // 执行生成
-        return codegenEngine.execute(table, columns, subTable, subColumns);
+//        return codegenEngine.execute(table, columns, subTable, subColumns);
+        return codegenEngine.execute(table, columns, null, null);
     }
 
     @Override

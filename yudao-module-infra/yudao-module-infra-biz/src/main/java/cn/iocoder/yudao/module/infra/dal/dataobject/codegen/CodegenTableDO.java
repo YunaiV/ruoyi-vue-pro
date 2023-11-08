@@ -119,16 +119,23 @@ public class CodegenTableDO extends BaseDO {
     // ========== 主子表相关字段 ==========
 
     /**
-     * 子表的表编号
+     * 主表的编号
      *
      * 关联 {@link CodegenTableDO#getId()}
      */
-    private Long subTableId;
+    private Long masterTableId;
     /**
-     * 子表的关联字段编号
+     * 【自己】子表关联主表的字段编号
      *
      * 关联 {@link CodegenColumnDO#getId()}
      */
-    private Long subColumnId;
+    private Long subJoinColumnId;
+    /**
+     * 主表与子表是否一对多
+     *
+     * true：一对多
+     * false：一对一
+     */
+    private Boolean subJoinMany;
 
 }
