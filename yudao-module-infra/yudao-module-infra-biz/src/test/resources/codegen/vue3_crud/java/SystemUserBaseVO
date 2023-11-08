@@ -24,6 +24,9 @@ public class SystemUserBaseVO {
     @Schema(description = "头像", example = "https://www.iocoder.cn/1.png")
     private String avatar;
 
+    @Schema(description = "视频", example = "https://www.iocoder.cn/1.mp4")
+    private String video;
+
     @Schema(description = "个人简介", example = "我是介绍")
     private String description;
 

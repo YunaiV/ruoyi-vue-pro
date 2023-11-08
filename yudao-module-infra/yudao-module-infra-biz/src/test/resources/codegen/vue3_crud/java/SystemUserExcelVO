@@ -28,6 +28,9 @@ public class SystemUserExcelVO {
     @ExcelProperty("头像")
     private String avatar;
 
+    @ExcelProperty("视频")
+    private String video;
+
     @ExcelProperty("个人简介")
     private String description;
 

@@ -1,9 +1,6 @@
 package cn.iocoder.yudao.module.infra.service.codegen.inner;
 
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
-import cn.hutool.core.util.ClassUtil;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
@@ -13,16 +10,14 @@ import org.apache.ibatis.type.JdbcType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Spy;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * {@link CodegenEngine} 的单元测试
@@ -118,7 +113,7 @@ public class CodegenEngineTest extends BaseMockitoUnitTest {
                 .setCreateOperation(true).setUpdateOperation(true).setListOperation(true)
                 .setListOperationCondition(CodegenColumnListConditionEnum.BETWEEN.getCondition()).setListOperationResult(true)
                 .setHtmlType(CodegenColumnHtmlTypeEnum.DATETIME.getType());
-        List<CodegenColumnDO> columns = Arrays.asList(idColumn, nameColumn, avatarColumn, descriptionColumn,
+        List<CodegenColumnDO> columns = Arrays.asList(idColumn, nameColumn, avatarColumn, videoColumn, descriptionColumn,
                 sex1Column, sex2Column, sex3Column, birthdayColumn, memoColumn, createTimeColumn);
 
         // 调用
@@ -168,14 +163,92 @@ public class CodegenEngineTest extends BaseMockitoUnitTest {
                 result, "yudao-ui-admin-vue3/src/views/system/user/UserForm.vue");
         assertPathContentEquals("vue3_crud/vue/api",
                 result, "yudao-ui-admin-vue3/src/api/system/user/index.ts");
-//        result.forEach(new BiConsumer<String, String>() {
-//            @Override
-//            public void accept(String s, String s2) {
-//                System.out.println(s);
-//                System.out.println(s2);
-//                System.out.println("=================");
-//            }
-//        });
+    }
+
+    @Test
+    public void testExecute_vue3_masterSub() {
+        // 准备请求参数
+        // 主表
+        CodegenTableDO table = new CodegenTableDO().setScene(CodegenSceneEnum.ADMIN.getScene())
+                .setTableName("system_user").setTableComment("用户表")
+                .setModuleName("system").setBusinessName("user").setClassName("SystemUser")
+                .setClassComment("用户").setAuthor("芋道源码")
+                .setTemplateType(CodegenTemplateTypeEnum.MASTER_SUB.getType()).setSubColumnId(100L)
+                .setFrontType(CodegenFrontTypeEnum.VUE3.getType())
+                .setParentMenuId(10L);
+        CodegenColumnDO idColumn = new CodegenColumnDO().setColumnName("id").setDataType(JdbcType.BIGINT.name())
+                .setColumnComment("编号").setNullable(false).setPrimaryKey(true).setAutoIncrement(true)
+                .setOrdinalPosition(1).setJavaType("Long").setJavaField("id").setExample("1024")
+                .setCreateOperation(false).setUpdateOperation(true).setListOperation(false)
+                .setListOperationResult(true);
+        List<CodegenColumnDO> columns = Collections.singletonList(idColumn);
+        // 子表
+        CodegenTableDO subTable = new CodegenTableDO().setScene(CodegenSceneEnum.ADMIN.getScene())
+                .setTableName("system_user_contact").setTableComment("用户联系人表")
+                .setModuleName("system").setBusinessName("user").setClassName("SystemUserContact")
+                .setClassComment("用户联系人").setAuthor("芋道源码")
+                .setTemplateType(CodegenTemplateTypeEnum.CRUD.getType())
+                .setFrontType(CodegenFrontTypeEnum.VUE3.getType());
+        CodegenColumnDO subIdColumn = new CodegenColumnDO().setColumnName("id").setDataType(JdbcType.BIGINT.name())
+                .setColumnComment("编号").setNullable(false).setPrimaryKey(true).setAutoIncrement(true)
+                .setOrdinalPosition(1).setJavaType("Long").setJavaField("id").setExample("1024")
+                .setCreateOperation(false).setUpdateOperation(true).setListOperation(false)
+                .setListOperationResult(true);
+        CodegenColumnDO userIdColumn = new CodegenColumnDO().setColumnName("user_id").setDataType(JdbcType.BIGINT.name())
+                .setColumnComment("用户编号").setNullable(false).setPrimaryKey(false)
+                .setOrdinalPosition(2).setJavaType("Long").setJavaField("userId").setExample("2048")
+                .setCreateOperation(false).setUpdateOperation(true).setListOperation(false)
+                .setListOperationResult(true)
+                .setId(100L);
+        List<CodegenColumnDO> subColumns = Arrays.asList(subIdColumn, userIdColumn);
+
+        // 调用
+        Map<String, String> result = codegenEngine.execute(table, columns, subTable, subColumns);
+
+        // 断言
+        assertEquals(23, result.size());
+//        // 断言 vo 类
+//        for (String vo : new String[]{"SystemUserBaseVO", "SystemUserCreateReqVO", "SystemUserUpdateReqVO", "SystemUserRespVO",
+//                "SystemUserPageReqVO", "SystemUserExportReqVO", "SystemUserExcelVO"}) {
+//            assertPathContentEquals("vue3_crud/java/" + vo,
+//                    result, "yudao-module-system/yudao-module-system-biz/src/main/java/cn/iocoder/yudao/module/module/system/controller/admin/user/vo/" + vo + ".java");
+//        }
+//        // 断言 controller 类
+//        assertPathContentEquals("vue3_crud/java/SystemUserController",
+//                result, "yudao-module-system/yudao-module-system-biz/src/main/java/cn/iocoder/yudao/module/module/system/controller/admin/user/SystemUserController.java");
+//        // 断言 service 类
+//        assertPathContentEquals("vue3_crud/java/SystemUserService",
+//                result, "yudao-module-system/yudao-module-system-biz/src/main/java/cn/iocoder/yudao/module/module/system/service/user/SystemUserService.java");
+//        assertPathContentEquals("vue3_crud/java/SystemUserServiceImpl",
+//                result, "yudao-module-system/yudao-module-system-biz/src/main/java/cn/iocoder/yudao/module/module/system/service/user/SystemUserServiceImpl.java");
+//        // 断言 convert 类
+//        assertPathContentEquals("vue3_crud/java/SystemUserConvert",
+//                result, "yudao-module-system/yudao-module-system-biz/src/main/java/cn/iocoder/yudao/module/module/system/convert/user/SystemUserConvert.java");
+//        // 断言 enums 类
+//        assertPathContentEquals("vue3_crud/java/ErrorCodeConstants",
+//                result, "yudao-module-system/yudao-module-system-api/src/main/java/cn/iocoder/yudao/module/module/system/enums/ErrorCodeConstants_手动操作.java");
+//        // 断言 dal 类
+//        assertPathContentEquals("vue3_crud/java/SystemUserDO",
+//                result, "yudao-module-system/yudao-module-system-biz/src/main/java/cn/iocoder/yudao/module/module/system/dal/dataobject/user/SystemUserDO.java");
+//        assertPathContentEquals("vue3_crud/java/SystemUserMapper",
+//                result, "yudao-module-system/yudao-module-system-biz/src/main/java/cn/iocoder/yudao/module/module/system/dal/mysql/user/SystemUserMapper.java");
+//        assertPathContentEquals("vue3_crud/java/SystemUserMapper_xml",
+//                result, "yudao-module-system/yudao-module-system-biz/src/main/resources/mapper/user/SystemUserMapper.xml");
+//        // 断言 test 类
+//        assertPathContentEquals("vue3_crud/java/SystemUserServiceImplTest",
+//                result, "yudao-module-system/yudao-module-system-biz/src/test/java/cn/iocoder/yudao/module/module/system/service/user/SystemUserServiceImplTest.java");
+//        // 断言 sql 语句
+//        assertPathContentEquals("vue3_crud/sql/h2",
+//                result, "sql/h2.sql");
+//        assertPathContentEquals("vue3_crud/sql/sql",
+//                result, "sql/sql.sql");
+//        // 断言 vue 语句
+//        assertPathContentEquals("vue3_crud/vue/index",
+//                result, "yudao-ui-admin-vue3/src/views/system/user/index.vue");
+//        assertPathContentEquals("vue3_crud/vue/form",
+//                result, "yudao-ui-admin-vue3/src/views/system/user/UserForm.vue");
+//        assertPathContentEquals("vue3_crud/vue/api",
+//                result, "yudao-ui-admin-vue3/src/api/system/user/index.ts");
     }
 
     private void assertPathContentEquals(String path, Map<String, String> result, String key) {

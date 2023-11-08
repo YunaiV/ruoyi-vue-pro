@@ -95,6 +95,11 @@
           <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="scope.row.avatar" />
         </template>
       </el-table-column>
+      <el-table-column label="视频" align="center" prop="video">
+        <template #default="scope">
+          <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="scope.row.video" />
+        </template>
+      </el-table-column>
       <el-table-column label="个人简介" align="center" prop="description">
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="scope.row.description" />

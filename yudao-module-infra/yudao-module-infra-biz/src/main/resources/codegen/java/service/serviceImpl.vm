@@ -7,10 +7,18 @@ import org.springframework.validation.annotation.Validated;
 import java.util.*;
 import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
 import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
+## 特殊：主子表专属逻辑
+#if( $subTable )
+import ${basePackage}.module.${subTable.moduleName}.dal.dataobject.${subTable.businessName}.${subTable.className}DO;
+#end
 import ${PageResultClassName};
 
 import ${basePackage}.module.${table.moduleName}.convert.${table.businessName}.${table.className}Convert;
 import ${basePackage}.module.${table.moduleName}.dal.mysql.${table.businessName}.${table.className}Mapper;
+## 特殊：主子表专属逻辑
+#if( $subTable )
+import ${basePackage}.module.${subTable.moduleName}.dal.mysql.${subTable.businessName}.${subClassNameVar}Mapper;
+#end
 
 import static ${ServiceExceptionUtilClassName}.exception;
 import static ${basePackage}.module.${table.moduleName}.enums.ErrorCodeConstants.*;
@@ -29,12 +37,22 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 
     @Resource
     private ${table.className}Mapper ${classNameVar}Mapper;
+## 特殊：主子表专属逻辑
+#if( $subTable )
+    @Resource
+    private ${subTable.className}Mapper ${subClassNameVar}Mapper;
+#end
 
     @Override
     public ${primaryColumn.javaType} create${simpleClassName}(${sceneEnum.prefixClass}${table.className}CreateReqVO createReqVO) {
         // 插入
         ${table.className}DO ${classNameVar} = ${table.className}Convert.INSTANCE.convert(createReqVO);
         ${classNameVar}Mapper.insert(${classNameVar});
+## 特殊：主子表专属逻辑
+#if( $subTable )
+        // 插入子表
+        ${subClassNameVar}Mapper.insertBatch(createReqVO.get${subSimpleClassName}s);
+#end
         // 返回
         return ${classNameVar}.getId();
     }

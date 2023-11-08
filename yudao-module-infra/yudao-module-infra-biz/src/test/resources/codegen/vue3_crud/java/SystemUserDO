@@ -36,6 +36,10 @@ public class SystemUserDO extends BaseDO {
      */
     private String avatar;
     /**
+     * 视频
+     */
+    private String video;
+    /**
      * 个人简介
      */
     private String description;

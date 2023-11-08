@@ -1,0 +1,26 @@
+package ${basePackage}.module.${subTable.moduleName}.dal.mysql.${subTable.businessName};
+
+import java.util.*;
+
+import ${BaseMapperClassName};
+import ${basePackage}.module.${subTable.moduleName}.dal.dataobject.${subTable.businessName}.${subTable.className}DO;
+import org.apache.ibatis.annotations.Mapper;
+
+#set ($SubColumnName = $subColumn.javaField.substring(0,1).toUpperCase() + ${subColumn.javaField.substring(1)})##首字母大写
+/**
+ * ${subTable.classComment} Mapper
+ *
+ * @author ${subTable.author}
+ */
+@Mapper
+public interface ${subTable.className}Mapper extends BaseMapperX<${subTable.className}DO> {
+
+    default List<${subTable.className}DO> selectListBy${SubColumnName}(${subColumn.javaType} ${subColumn.javaField}) {
+        return selectList(${subTable.className}DO::get${SubColumnName}, ${subColumn.javaField});
+    }
+
+    default List<${subTable.className}DO> selectListBy${SubColumnName}(List<${subColumn.javaType}> ${subColumn.javaField}s) {
+        return selectList(${subTable.className}DO::get${SubColumnName}, ${subColumn.javaField}s);
+    }
+
+}

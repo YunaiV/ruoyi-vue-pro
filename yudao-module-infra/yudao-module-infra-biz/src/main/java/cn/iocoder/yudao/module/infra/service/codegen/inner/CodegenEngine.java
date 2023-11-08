@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.infra.service.codegen.inner;
 
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
@@ -25,6 +26,7 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenFrontTypeEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
+import cn.iocoder.yudao.module.infra.enums.codegen.CodegenTemplateTypeEnum;
 import cn.iocoder.yudao.module.infra.framework.codegen.config.CodegenProperties;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableTable;
@@ -34,11 +36,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
+import java.util.*;
 
 import static cn.hutool.core.map.MapUtil.getStr;
 import static cn.hutool.core.text.CharSequenceUtil.*;
@@ -74,8 +72,12 @@ public class CodegenEngine {
                     javaModuleImplMainFilePath("convert/${table.businessName}/${table.className}Convert"))
             .put(javaTemplatePath("dal/do"),
                     javaModuleImplMainFilePath("dal/dataobject/${table.businessName}/${table.className}DO"))
+            .put(javaTemplatePath("dal/do_sub"), // 特殊：主子表专属逻辑
+                    javaModuleImplMainFilePath("dal/dataobject/${table.businessName}/${subTable.className}DO"))
             .put(javaTemplatePath("dal/mapper"),
                     javaModuleImplMainFilePath("dal/mysql/${table.businessName}/${table.className}Mapper"))
+            .put(javaTemplatePath("dal/mapper_sub"), // 特殊：主子表专属逻辑
+                    javaModuleImplMainFilePath("dal/mysql/${table.businessName}/${subTable.className}Mapper"))
             .put(javaTemplatePath("dal/mapper.xml"), mapperXmlFilePath())
             .put(javaTemplatePath("service/serviceImpl"),
                     javaModuleImplMainFilePath("service/${table.businessName}/${table.className}ServiceImpl"))
@@ -196,11 +198,6 @@ public class CodegenEngine {
         bindingMap.put("columns", columns);
         bindingMap.put("primaryColumn", CollectionUtils.findFirst(columns, CodegenColumnDO::getPrimaryKey)); // 主键字段
         bindingMap.put("sceneEnum", CodegenSceneEnum.valueOf(table.getScene()));
-        if (subTable != null) {
-            bindingMap.put("subTable", subTable);
-            bindingMap.put("subColumns", subColumns);
-            bindingMap.put("subColumn", CollectionUtils.findFirst(subColumns, column -> column.getId().equals(table.getSubColumnId())));
-        }
 
         // className 相关
         // 去掉指定前缀，将 TestDictType 转换成 DictType. 因为在 create 等方法后，不需要带上 Test 前缀
@@ -214,8 +211,21 @@ public class CodegenEngine {
         // permission 前缀
         bindingMap.put("permissionPrefix", table.getModuleName() + ":" + simpleClassNameStrikeCase);
 
+        // 特殊：主子表专属逻辑
+        if (subTable != null) {
+            // 创建 bindingMap
+            bindingMap.put("subTable", subTable);
+            bindingMap.put("subColumns", subColumns);
+            bindingMap.put("subColumn", CollectionUtils.findFirst(subColumns, // 关联的字段
+                    column -> Objects.equals(column.getId(), table.getSubColumnId())));
+            // className 相关
+            String subSimpleClassName = removePrefix(subTable.getClassName(), upperFirst(subTable.getModuleName()));
+            bindingMap.put("subSimpleClassName", subSimpleClassName);
+            bindingMap.put("subClassNameVar", lowerFirst(subSimpleClassName)); // 将 DictType 转换成 dictType，用于变量
+        }
+
         // 执行生成
-        Map<String, String> templates = getTemplates(table.getFrontType());
+        Map<String, String> templates = getTemplates(table.getTemplateType(), table.getFrontType());
         Map<String, String> result = Maps.newLinkedHashMapWithExpectedSize(templates.size()); // 有序
         templates.forEach((vmPath, filePath) -> {
             filePath = formatFilePath(filePath, bindingMap);
@@ -227,10 +237,15 @@ public class CodegenEngine {
         return result;
     }
 
-    private Map<String, String> getTemplates(Integer frontType) {
+    private Map<String, String> getTemplates(Integer templateType, Integer frontType) {
         Map<String, String> templates = new LinkedHashMap<>();
         templates.putAll(SERVER_TEMPLATES);
         templates.putAll(FRONT_TEMPLATES.row(frontType));
+        // 特殊：主子表专属逻辑
+        if (ObjUtil.notEqual(templateType, CodegenTemplateTypeEnum.MASTER_SUB.getType())) {
+            templates.remove(javaTemplatePath("dal/do_sub"));
+            templates.remove(javaTemplatePath("dal/mapper_sub"));
+        }
         return templates;
     }
 
@@ -250,6 +265,11 @@ public class CodegenEngine {
         filePath = StrUtil.replace(filePath, "${table.moduleName}", table.getModuleName());
         filePath = StrUtil.replace(filePath, "${table.businessName}", table.getBusinessName());
         filePath = StrUtil.replace(filePath, "${table.className}", table.getClassName());
+        // 特殊：主子表专属逻辑
+        CodegenTableDO subTable = (CodegenTableDO) bindingMap.get("subTable");
+        if (subTable != null) {
+            filePath = StrUtil.replace(filePath, "${subTable.className}", subTable.getClassName());
+        }
         return filePath;
     }
 

@@ -4,6 +4,7 @@ export interface UserVO {
   id: number
   name: string
   avatar: string
+  video: string
   description: string
   sex1: string
   sex2: number

@@ -132,4 +132,8 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         Db.saveOrUpdateBatch(collection);
     }
 
+    default int delete(String field, String value) {
+        return delete(new QueryWrapper<T>().eq(field, value));
+    }
+
 }
