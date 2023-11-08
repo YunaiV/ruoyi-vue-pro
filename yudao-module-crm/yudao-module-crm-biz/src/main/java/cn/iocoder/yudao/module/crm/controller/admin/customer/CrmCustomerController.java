@@ -175,7 +175,7 @@ public class CrmCustomerController {
         //判断参数不能为空
         if(ownerId==null || CollectionUtils.isEmpty(cIds))
             return error(GlobalErrorCodeConstants.BAD_REQUEST.getCode(),GlobalErrorCodeConstants.BAD_REQUEST.getMsg());
-
+        customerService.distributeByIds(cIds,ownerId);
         return success("分配成功");
     }
 
