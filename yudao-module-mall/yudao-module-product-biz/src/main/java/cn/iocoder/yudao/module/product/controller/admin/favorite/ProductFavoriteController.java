@@ -3,9 +3,7 @@ package cn.iocoder.yudao.module.product.controller.admin.favorite;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.product.controller.admin.favorite.vo.ProductFavoritePageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.favorite.vo.ProductFavoriteReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.favorite.vo.ProductFavoriteRespVO;
 import cn.iocoder.yudao.module.product.convert.favorite.ProductFavoriteConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.favorite.ProductFavoriteDO;
@@ -16,7 +14,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -37,21 +37,6 @@ public class ProductFavoriteController {
     @Resource
     private ProductSpuService productSpuService;
 
-    @PostMapping("/create")
-    @Operation(summary = "添加单个商品收藏")
-    @PreAuthorize("@ss.hasPermission('product:favorite:create')")
-    public CommonResult<Long> createFavorite(@Valid @RequestBody ProductFavoriteReqVO reqVO) {
-        return success(productFavoriteService.createFavorite(reqVO.getUserId(), reqVO.getSpuId()));
-    }
-
-    @DeleteMapping("/delete")
-    @Operation(summary = "取消单个商品收藏")
-    @PreAuthorize("@ss.hasPermission('product:favorite:delete')")
-    public CommonResult<Boolean> deleteFavorite(@Valid @RequestBody ProductFavoriteReqVO reqVO) {
-        productFavoriteService.deleteFavorite(reqVO.getUserId(), reqVO.getSpuId());
-        return success(Boolean.TRUE);
-    }
-
     @GetMapping("/page")
     @Operation(summary = "获得商品收藏分页")
     @PreAuthorize("@ss.hasPermission('product:favorite:query')")
@@ -71,13 +56,5 @@ public class ProductFavoriteController {
         pageResult.setList(favorites);
 
         return success(pageResult);
-    }
-
-    @PostMapping(value = "/exits")
-    @Operation(summary = "检查是否收藏过商品")
-    @PreAuthenticated
-    public CommonResult<Boolean> isFavoriteExists(@Valid @RequestBody ProductFavoriteReqVO reqVO) {
-        ProductFavoriteDO favorite = productFavoriteService.getFavorite(reqVO.getUserId(), reqVO.getSpuId());
-        return success(favorite != null);
     }
 }
