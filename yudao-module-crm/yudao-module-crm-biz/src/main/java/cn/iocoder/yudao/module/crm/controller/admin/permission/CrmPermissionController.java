@@ -32,10 +32,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.anyMatch;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - CRM 数据权限（数据团队成员操作）")
 @RestController
@@ -44,7 +47,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 public class CrmPermissionController {
 
     @Resource
-    private CrmPermissionService crmPermissionService;
+    private CrmPermissionService permissionService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -59,11 +62,27 @@ public class CrmPermissionController {
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_PERMISSION, bizTypeValue = "#reqVO.bizType", bizId = "#reqVO.bizId"
             , level = CrmPermissionLevelEnum.OWNER)
     public CommonResult<Boolean> addPermission(@Valid @RequestBody CrmPermissionCreateReqVO reqVO) {
-        // 2. 加入成员
-        crmPermissionService.createPermission(CrmPermissionConvert.INSTANCE.convert(reqVO));
+        permissionService.createPermission(CrmPermissionConvert.INSTANCE.convert(reqVO));
         return success(true);
     }
 
+    @PutMapping("/receive")
+    @Operation(summary = "领取公海数据")
+    @PreAuthorize("@ss.hasPermission('crm:permission:update')")
+    public CommonResult<Boolean> receive(@RequestParam("bizType") Integer bizType, @RequestParam("bizId") Long bizId) {
+        permissionService.receiveBiz(bizType, bizId, getLoginUserId());
+        return success(true);
+    }
+
+    @PutMapping("/put-pool")
+    @Operation(summary = "数据放入公海")
+    @PreAuthorize("@ss.hasPermission('crm:permission:update')")
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PERMISSION, bizTypeValue = "#bizType", bizId = "#bizId"
+            , level = CrmPermissionLevelEnum.OWNER)
+    public CommonResult<Boolean> putPool(@RequestParam(value = "bizType") Integer bizType, @RequestParam("bizId") Long bizId) {
+        permissionService.putPool(bizType, bizId, getLoginUserId());
+        return success(true);
+    }
 
     @PutMapping("/update")
     @Operation(summary = "编辑团队成员")
@@ -71,7 +90,7 @@ public class CrmPermissionController {
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_PERMISSION, bizTypeValue = "#updateReqVO.bizType", bizId = "#updateReqVO.bizId"
             , level = CrmPermissionLevelEnum.WRITE)
     public CommonResult<Boolean> updatePermission(@Valid @RequestBody CrmPermissionUpdateReqVO updateReqVO) {
-        crmPermissionService.updatePermission(CrmPermissionConvert.INSTANCE.convert(updateReqVO));
+        permissionService.updatePermission(CrmPermissionConvert.INSTANCE.convert(updateReqVO));
         return success(true);
     }
 
@@ -88,7 +107,7 @@ public class CrmPermissionController {
     public CommonResult<Boolean> deletePermission(@RequestParam("bizType") Integer bizType,
                                                   @RequestParam("bizId") Long bizId,
                                                   @RequestParam("id") Long id) {
-        crmPermissionService.deletePermission(id);
+        permissionService.deletePermission(id);
         return success(true);
     }
 
@@ -101,12 +120,16 @@ public class CrmPermissionController {
     @PreAuthorize("@ss.hasPermission('crm:permission:query')")
     public CommonResult<List<CrmPermissionRespVO>> getPermissionList(@RequestParam("bizType") Integer bizType,
                                                                      @RequestParam("bizId") Long bizId) {
-        List<CrmPermissionDO> permission = crmPermissionService.getPermissionByBizTypeAndBizId(bizType, bizId);
+        List<CrmPermissionDO> permission = permissionService.getPermissionByBizTypeAndBizId(bizType, bizId);
         if (CollUtil.isEmpty(permission)) {
             return success(Collections.emptyList());
         }
         // TODO @puhui999：池子的逻辑；
-        permission.removeIf(item -> ObjUtil.equal(item.getUserId(), CrmPermissionDO.POOL_USER_ID)); // 排除
+        // 判断是否是公海数据
+        Predicate<CrmPermissionDO> filter = item -> ObjUtil.equal(item.getUserId(), CrmPermissionDO.POOL_USER_ID);
+        if (anyMatch(permission, filter)) {
+            permission.removeIf(filter); // 排除
+        }
 
         // 拼接数据
         List<AdminUserRespDTO> userList = adminUserApi.getUserList(convertSet(permission, CrmPermissionDO::getUserId));

@@ -141,4 +141,24 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
         return crmPermissionMapper.selectListByBizTypeAndUserId(bizType, userId);
     }
 
+    @Override
+    public void receiveBiz(Integer bizType, Long bizId, Long userId) {
+        CrmPermissionDO permission = crmPermissionMapper.selectByBizTypeAndBizIdByUserId(bizType, bizId, CrmPermissionDO.POOL_USER_ID);
+        if (permission == null) { // 不存在则模块数据也不存在
+            throw exception(CRM_PERMISSION_MODEL_NOT_EXISTS, CrmBizTypeEnum.getNameByType(bizType));
+        }
+
+        crmPermissionMapper.updateById(new CrmPermissionDO().setId(permission.getId()).setUserId(userId));
+    }
+
+    @Override
+    public void putPool(Integer bizType, Long bizId, Long userId) {
+        CrmPermissionDO permission = crmPermissionMapper.selectByBizTypeAndBizIdByUserId(bizType, bizId, userId);
+        if (permission == null) { // 不存在则模块数据也不存在
+            throw exception(CRM_PERMISSION_MODEL_NOT_EXISTS, CrmBizTypeEnum.getNameByType(bizType));
+        }
+
+        crmPermissionMapper.updateById(new CrmPermissionDO().setId(permission.getId()).setUserId(CrmPermissionDO.POOL_USER_ID));
+    }
+
 }

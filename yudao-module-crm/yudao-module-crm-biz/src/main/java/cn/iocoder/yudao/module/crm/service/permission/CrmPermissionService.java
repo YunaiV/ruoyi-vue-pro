@@ -85,4 +85,22 @@ public interface CrmPermissionService {
      */
     List<CrmPermissionDO> getPermissionListByBizTypeAndUserId(Integer bizType, Long userId);
 
+    /**
+     * 领取公海数据
+     *
+     * @param bizType 数据类型，关联 {@link CrmBizTypeEnum}
+     * @param bizId   数据编号，关联 {@link CrmBizTypeEnum} 对应模块 DO#getId()
+     * @param userId  用户编号，AdminUser#id
+     */
+    void receiveBiz(Integer bizType, Long bizId, Long userId);
+
+    /**
+     * 数据放入公海
+     *
+     * @param bizType 数据类型，关联 {@link CrmBizTypeEnum}
+     * @param bizId   数据编号，关联 {@link CrmBizTypeEnum} 对应模块 DO#getId()
+     * @param userId  用户编号，AdminUser#id
+     */
+    void putPool(Integer bizType, Long bizId, Long userId);
+
 }
