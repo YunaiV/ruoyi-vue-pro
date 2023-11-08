@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.promotion.dal.dataobject.banner;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.promotion.enums.banner.BannerPositionEnum;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
@@ -9,7 +11,7 @@ import lombok.*;
  *
  * @author xia
  */
-@TableName("market_banner")
+@TableName("promotion_banner")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -40,14 +42,23 @@ public class BannerDO extends BaseDO {
     private Integer sort;
 
     /**
-     * 状态 {@link cn.iocoder.yudao.framework.common.enums.CommonStatusEnum}
+     * 状态 {@link CommonStatusEnum}
      */
     private Integer status;
+
+    /**
+     * 定位 {@link BannerPositionEnum}
+     */
+    private Integer position;
+
     /**
      * 备注
      */
     private String memo;
 
-    // TODO 芋艿 点击次数。&& 其他数据相关
+    /**
+     * 点击次数
+     */
+    private Integer browseCount;
 
 }

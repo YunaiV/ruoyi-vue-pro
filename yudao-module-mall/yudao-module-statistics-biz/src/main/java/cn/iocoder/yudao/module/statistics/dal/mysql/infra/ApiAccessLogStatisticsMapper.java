@@ -6,18 +6,24 @@ import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDateTime;
 
+// TODO @芋艿：api 访问日志，现在会清理，可能要单独有个偏业务的访问表；
 /**
  * API 访问日志的统计 Mapper
  *
  * @author owen
  */
 @Mapper
-public interface ApiAccessLogStatisticsMapper extends BaseMapperX<Object> {
+@SuppressWarnings("rawtypes")
+public interface ApiAccessLogStatisticsMapper extends BaseMapperX {
 
-    Integer selectCountByIp(@Param("beginTime") LocalDateTime beginTime,
-                            @Param("endTime") LocalDateTime endTime);
+    // TODO 芋艿：已经 review
+    Integer selectIpCountByUserTypeAndCreateTimeBetween(@Param("userType") Integer userType,
+                                                        @Param("beginTime") LocalDateTime beginTime,
+                                                        @Param("endTime") LocalDateTime endTime);
 
-    Integer selectCountByUserId(@Param("beginTime") LocalDateTime beginTime,
-                                @Param("endTime") LocalDateTime endTime);
+    // TODO 芋艿：已经 review
+    Integer selectUserCountByUserTypeAndCreateTimeBetween(@Param("userType") Integer userType,
+                                                          @Param("beginTime") LocalDateTime beginTime,
+                                                          @Param("endTime") LocalDateTime endTime);
 
 }

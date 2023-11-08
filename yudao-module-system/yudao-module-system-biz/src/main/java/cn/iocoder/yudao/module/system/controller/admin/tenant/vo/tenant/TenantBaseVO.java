@@ -29,7 +29,7 @@ public class TenantBaseVO {
     private Integer status;
 
     @Schema(description = "绑定域名", example = "https://www.iocoder.cn")
-    private String domain;
+    private String website;
 
     @Schema(description = "租户套餐编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "租户套餐编号不能为空")

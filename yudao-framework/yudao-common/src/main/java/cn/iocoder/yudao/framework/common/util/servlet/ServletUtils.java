@@ -27,7 +27,7 @@ public class ServletUtils {
      * 返回 JSON 字符串
      *
      * @param response 响应
-     * @param object 对象，会序列化成 JSON 字符串
+     * @param object   对象，会序列化成 JSON 字符串
      */
     @SuppressWarnings("deprecation") // 必须使用 APPLICATION_JSON_UTF8_VALUE，否则会乱码
     public static void writeJSON(HttpServletResponse response, Object object) {
@@ -40,7 +40,7 @@ public class ServletUtils {
      *
      * @param response 响应
      * @param filename 文件名
-     * @param content 附件内容
+     * @param content  附件内容
      */
     public static void writeAttachment(HttpServletResponse response, String filename, byte[] content) throws IOException {
         // 设置 header 和 contentType
@@ -88,6 +88,8 @@ public class ServletUtils {
         return ServletUtil.getClientIP(request);
     }
 
+    // TODO @疯狂：terminal 还是从 ServletUtils 里拿，更容易全局治理；
+
     public static boolean isJsonRequest(ServletRequest request) {
         return StrUtil.startWithIgnoreCase(request.getContentType(), MediaType.APPLICATION_JSON_VALUE);
     }
@@ -107,4 +109,5 @@ public class ServletUtils {
     public static Map<String, String> getParamMap(HttpServletRequest request) {
         return ServletUtil.getParamMap(request);
     }
+
 }

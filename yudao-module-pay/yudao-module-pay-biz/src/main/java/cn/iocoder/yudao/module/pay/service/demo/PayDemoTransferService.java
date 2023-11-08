@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.module.pay.service.demo;
 
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.controller.admin.demo.vo.transfer.PayDemoTransferCreateReqVO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.demo.PayDemoTransferDO;
 
 import javax.validation.Valid;
 
@@ -12,11 +15,17 @@ import javax.validation.Valid;
 public interface PayDemoTransferService {
 
     /**
-     * 创建转账单
+     * 创建转账业务示例订单
      *
-     * @param userId      用户编号
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createDemoTransfer(Long userId, @Valid PayDemoTransferCreateReqVO createReqVO);
+    Long createDemoTransfer(@Valid PayDemoTransferCreateReqVO createReqVO);
+
+    /**
+     * 获得转账业务示例订单分页
+     *
+     * @param pageVO 分页查询参数
+     */
+    PageResult<PayDemoTransferDO> getDemoTransferPage(PageParam pageVO);
 }

@@ -1,6 +1,11 @@
 package cn.iocoder.yudao.module.pay.dal.dataobject.transfer;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferStatusRespEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum;
+import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -28,19 +33,53 @@ public class PayTransferDO extends BaseDO {
     private Long id;
 
     /**
-     * 类型
+     * 转账单号
+     *
      */
-    private Integer type;
+    private String no;
 
     /**
      * 应用编号
+     *
+     * 关联 {@link PayAppDO#getId()}
      */
     private Long appId;
 
     /**
-     * 商户订单编号
+     * 转账渠道编号
+     *
+     * 关联 {@link PayChannelDO#getId()}
      */
-    private String merchantOrderId;
+    private Long channelId;
+
+    /**
+     * 转账渠道编码
+     *
+     * 枚举 {@link PayChannelEnum}
+     */
+    private String channelCode;
+
+    // ========== 商户相关字段 ==========
+    /**
+     * 商户转账单编号
+     *
+     * 例如说，内部系统 A 的订单号，需要保证每个 PayAppDO 唯一
+     */
+    private String merchantTransferId;
+
+    // ========== 转账相关字段 ==========
+
+    /**
+     * 类型
+     *
+     * 枚举 {@link PayTransferTypeEnum}
+     */
+    private Integer type;
+
+    /**
+     * 转账标题
+     */
+    private String subject;
 
     /**
      * 转账金额，单位：分
@@ -48,48 +87,71 @@ public class PayTransferDO extends BaseDO {
     private Integer price;
 
     /**
-     * 转账标题
+     * 收款人姓名
      */
-    private String title;
-
-    /**
-     * 收款人信息，不同类型和渠道不同
-     */
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private Map<String, String> payeeInfo;
+    private String userName;
 
     /**
      * 转账状态
+     *
+     * 枚举 {@link PayTransferStatusRespEnum}
      */
     private Integer status;
 
     /**
      * 订单转账成功时间
-     *
      */
     private LocalDateTime successTime;
 
+    // ========== 支付宝转账相关字段 ==========
     /**
-     * 转账成功的转账拓展单编号
+     * 支付宝登录号
+     */
+    private String alipayLogonId;
+
+
+    // ========== 微信转账相关字段 ==========
+    /**
+     * 微信 openId
+     */
+    private String openid;
+
+    // ========== 其它字段 ==========
+
+    /**
+     * 异步通知地址
+     */
+    private String notifyUrl;
+
+    /**
+     * 用户 IP
+     */
+    private String userIp;
+
+    /**
+     * 渠道的额外参数
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Map<String, String> channelExtras;
+
+    /**
+     * 渠道转账单号
+     */
+    private String channelTransferNo;
+
+    /**
+     * 调用渠道的错误码
+     */
+    private String channelErrorCode;
+    /**
+     * 调用渠道的错误提示
+     */
+    private String channelErrorMsg;
+
+    /**
+     * 渠道的同步/异步通知的内容
      *
-     * 关联 {@link PayTransferExtensionDO#getId()}
      */
-    private Long extensionId;
+    private String channelNotifyData;
 
-    /**
-     * 转账成功的转账拓展单号
-     *
-     * 关联 {@link PayTransferExtensionDO#getNo()}
-     */
-    private String no;
-
-    /**
-     * 转账渠道编号
-     */
-    private Long channelId;
-
-    /**
-     * 转账渠道编码
-     */
-    private String channelCode;
 }

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.promotion.api.bargain;
 
 import cn.iocoder.yudao.module.promotion.service.bargain.BargainActivityService;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 
@@ -11,6 +12,7 @@ import javax.annotation.Resource;
  * @author HUIHUI
  */
 @Service
+@Validated
 public class BargainActivityApiImpl implements BargainActivityApi {
 
     @Resource

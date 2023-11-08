@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.statistics.dal.dataobject.trade;
 
-import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TradeStatisticsDO extends TenantBaseDO {
+public class TradeStatisticsDO extends BaseDO {
 
     /**
      * 编号，主键自增
@@ -48,10 +48,6 @@ public class TradeStatisticsDO extends TenantBaseDO {
      * 总支付金额，单位：分
      */
     private Integer orderPayPrice;
-    /**
-     * 总支付金额（余额），单位：分
-     */
-    private Integer orderWalletPayPrice;
 
     /**
      * 退款订单数
@@ -67,6 +63,10 @@ public class TradeStatisticsDO extends TenantBaseDO {
      */
     private Integer brokerageSettlementPrice;
 
+    /**
+     * 总支付金额（余额），单位：分
+     */
+    private Integer walletPayPrice;
     /**
      * 充值订单数
      * <p>

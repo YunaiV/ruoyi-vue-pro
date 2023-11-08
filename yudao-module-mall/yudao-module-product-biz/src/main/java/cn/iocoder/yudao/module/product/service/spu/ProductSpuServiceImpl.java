@@ -16,7 +16,6 @@ import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import cn.iocoder.yudao.module.product.service.brand.ProductBrandService;
 import cn.iocoder.yudao.module.product.service.category.ProductCategoryService;
-import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import com.google.common.collect.Maps;
 import org.springframework.context.annotation.Lazy;
@@ -52,9 +51,6 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     private ProductBrandService brandService;
     @Resource
     private ProductCategoryService categoryService;
-    @Resource
-    @Lazy // 循环依赖，避免报错
-    private ProductPropertyValueService productPropertyValueService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -192,12 +188,15 @@ public class ProductSpuServiceImpl implements ProductSpuService {
 
     @Override
     public List<ProductSpuDO> getSpuList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
         return productSpuMapper.selectBatchIds(ids);
     }
 
     @Override
-    public List<ProductSpuDO> getSpuList() {
-        return productSpuMapper.selectList();
+    public List<ProductSpuDO> getSpuListByStatus(Integer status) {
+        return productSpuMapper.selectList(ProductSpuDO::getStatus, status);
     }
 
     @Override

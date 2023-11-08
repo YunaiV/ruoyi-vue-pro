@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.time.LocalDateTime;
+
 /**
  * 限时折扣商品 DO
  *
@@ -25,7 +27,6 @@ public class DiscountProductDO extends BaseDO {
     @TableId
     private Long id;
 
-    // TODO 芋艿：把 activity 所有的字段冗余过来
     /**
      * 限时折扣活动的编号
      *
@@ -64,5 +65,24 @@ public class DiscountProductDO extends BaseDO {
      * 当 {@link #discountType} 为 {@link PromotionDiscountTypeEnum#PRICE} 生效
      */
     private Integer discountPrice;
+
+    /**
+     * 活动状态
+     *
+     * 关联 {@link DiscountActivityDO#getStatus()}
+     */
+    private Integer activityStatus;
+    /**
+     * 活动开始时间点
+     *
+     * 冗余 {@link DiscountActivityDO#getStartTime()}
+     */
+    private LocalDateTime activityStartTime;
+    /**
+     * 活动结束时间点
+     *
+     * 冗余 {@link DiscountActivityDO#getEndTime()}
+     */
+    private LocalDateTime activityEndTime;
 
 }

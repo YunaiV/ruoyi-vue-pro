@@ -39,11 +39,4 @@ public class AppArticleRespVO {
     @Schema(description = "关联的商品 SPU 编号", example = "1024")
     private Long spuId;
 
-// TODO 芋艿：下面 2 个字段，后端要存储，前端不用返回；
-//    @Schema(description = "是否热卖推荐", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
-//    private Boolean recommendHot;
-//
-//    @Schema(description = "是否 Banner 推荐", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
-//    private Boolean recommendBanner;
-
 }

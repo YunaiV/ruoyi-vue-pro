@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.system.service.tenant;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -99,6 +100,8 @@ public class TenantServiceImpl implements TenantService {
     public Long createTenant(TenantCreateReqVO createReqVO) {
         // 校验租户名称是否重复
         validTenantNameDuplicate(createReqVO.getName(), null);
+        // 校验租户域名是否重复
+        validTenantWebsiteDuplicate(createReqVO.getWebsite(), null);
         // 校验套餐被禁用
         TenantPackageDO tenantPackage = tenantPackageService.validTenantPackage(createReqVO.getPackageId());
 
@@ -143,6 +146,8 @@ public class TenantServiceImpl implements TenantService {
         TenantDO tenant = validateUpdateTenant(updateReqVO.getId());
         // 校验租户名称是否重复
         validTenantNameDuplicate(updateReqVO.getName(), updateReqVO.getId());
+        // 校验租户域名是否重复
+        validTenantWebsiteDuplicate(updateReqVO.getWebsite(), updateReqVO.getId());
         // 校验套餐被禁用
         TenantPackageDO tenantPackage = tenantPackageService.validTenantPackage(updateReqVO.getPackageId());
 
@@ -166,6 +171,23 @@ public class TenantServiceImpl implements TenantService {
         }
         if (!tenant.getId().equals(id)) {
             throw exception(TENANT_NAME_DUPLICATE, name);
+        }
+    }
+
+    private void validTenantWebsiteDuplicate(String website, Long id) {
+        if (StrUtil.isEmpty(website)) {
+            return;
+        }
+        TenantDO tenant = tenantMapper.selectByWebsite(website);
+        if (tenant == null) {
+            return;
+        }
+        // 如果 id 为空，说明不用比较是否为相同名字的租户
+        if (id == null) {
+            throw exception(TENANT_WEBSITE_DUPLICATE, website);
+        }
+        if (!tenant.getId().equals(id)) {
+            throw exception(TENANT_WEBSITE_DUPLICATE, website);
         }
     }
 
@@ -232,6 +254,11 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public TenantDO getTenantByName(String name) {
         return tenantMapper.selectByName(name);
+    }
+
+    @Override
+    public TenantDO getTenantByWebsite(String website) {
+        return tenantMapper.selectByWebsite(website);
     }
 
     @Override

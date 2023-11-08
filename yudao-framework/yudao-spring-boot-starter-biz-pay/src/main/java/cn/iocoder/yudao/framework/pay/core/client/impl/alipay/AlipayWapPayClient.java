@@ -3,8 +3,6 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 import cn.hutool.http.Method;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferRespDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
 import com.alipay.api.AlipayApiException;
@@ -56,10 +54,5 @@ public class AlipayWapPayClient extends AbstractAlipayPayClient {
         }
         return PayOrderRespDTO.waitingOf(displayMode, response.getBody(),
                 reqDTO.getOutTradeNo(), response);
-    }
-
-    @Override
-    public PayTransferRespDTO doUnifiedTransfer(PayTransferUnifiedReqDTO reqDTO) {
-        throw new UnsupportedOperationException("支付宝【Wap 网站】不支持转账操作");
     }
 }

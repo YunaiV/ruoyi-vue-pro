@@ -74,8 +74,7 @@ public class BpmTaskController {
         return success(true);
     }
 
-    // TODO @海：/return-list，不用带 get；
-    @GetMapping("/get-return-list")
+    @GetMapping("/return-list")
     @Operation(summary = "获取所有可回退的节点", description = "用于【流程详情】的【回退】按钮")
     @Parameter(name = "taskId", description = "当前任务ID", required = true)
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
@@ -99,31 +98,28 @@ public class BpmTaskController {
         return success(true);
     }
 
-    // TODO @海：create-sign？创建加签任务；
-    @PutMapping("/add-sign")
+    @PutMapping("/create-sign")
     @Operation(summary = "加签", description = "before 前加签，after 后加签")
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
-    public CommonResult<Boolean> addSignTask(@Valid @RequestBody BpmTaskAddSignReqVO reqVO) {
-        taskService.addSignTask(getLoginUserId(), reqVO);
+    public CommonResult<Boolean> createSignTask(@Valid @RequestBody BpmTaskAddSignReqVO reqVO) {
+        taskService.createSignTask(getLoginUserId(), reqVO);
         return success(true);
     }
 
-    // TODO @海：delete-sign？删除加签任务；然后 @DeleteMapping；这样感觉可以保持统一；
-    @PutMapping("/sub-sign")
+    @DeleteMapping("/delete-sign")
     @Operation(summary = "减签")
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
-    public CommonResult<Boolean> subSignTask(@Valid @RequestBody BpmTaskSubSignReqVO reqVO) {
-        taskService.subSignTask(getLoginUserId(), reqVO);
+    public CommonResult<Boolean> deleteSignTask(@Valid @RequestBody BpmTaskSubSignReqVO reqVO) {
+        taskService.deleteSignTask(getLoginUserId(), reqVO);
         return success(true);
     }
 
-    // TODO @海：/children-list，不用带 task 和 get；
-    // TODO @海：taskId 是不是改成 parentId？另外，它的 swagger 注解也加下哈；
-    @GetMapping("/get-children-task-list")
+    @GetMapping("children-list")
     @Operation(summary = "获取能被减签的任务")
+    @Parameter(name = "parentId", description = "父级任务 ID", required = true)
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
-    public CommonResult<List<BpmTaskSubSignRespVO>> getChildrenTaskList(@RequestParam("taskId") String taskId) {
-        return success(taskService.getChildrenTaskList(taskId));
+    public CommonResult<List<BpmTaskSubSignRespVO>> getChildrenTaskList(@RequestParam("parentId") String parentId) {
+        return success(taskService.getChildrenTaskList(parentId));
     }
 
 }

@@ -1,6 +1,6 @@
-import type { BasicColumn, FormSchema } from '@/components/Table'
-import { useRender } from '@/components/Table'
-import { DICT_TYPE, getDictOptions } from '@/utils/dict'
+import type {BasicColumn, FormSchema} from '@/components/Table'
+import {useRender} from '@/components/Table'
+import {DICT_TYPE, getDictOptions} from '@/utils/dict'
 
 export const columns: BasicColumn[] = [
 #foreach($column in $columns)
@@ -50,8 +50,17 @@ export const searchFormSchema: FormSchema[] = [
     field: '${javaField}',
   #if ($column.htmlType == "input")
     component: 'Input',
-  #elseif ($column.htmlType == "select" || $column.htmlType == "radio")
+  #elseif ($column.htmlType == "select")
     component: 'Select',
+    componentProps: {
+      #if ("" != $dictType)## 设置了 dictType 数据字典的情况
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase()),
+      #else## 未设置 dictType 数据字典的情况
+        options: [],
+      #end
+    },
+  #elseif ($column.htmlType == "radio")
+    component: 'Radio',
     componentProps: {
       #if ("" != $dictType)## 设置了 dictType 数据字典的情况
         options: getDictOptions(DICT_TYPE.$dictType.toUpperCase()),
@@ -181,7 +190,8 @@ export const updateFormSchema: FormSchema[] = [
       fileType: 'file',
       maxCount: 1,
     },
-    #elseif($column.htmlType == "editor")## 文本编辑器component: 'Editor',
+    #elseif($column.htmlType == "editor")## 文本编辑器
+    component: 'Editor',
     #elseif($column.htmlType == "select")## 下拉框
     component: 'Select',
     componentProps: {

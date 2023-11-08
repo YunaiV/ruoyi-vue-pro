@@ -66,13 +66,21 @@ public class BannerServiceImpl implements BannerService {
     }
 
     @Override
-    public List<BannerDO> getBannerList() {
-        return bannerMapper.selectList();
+    public PageResult<BannerDO> getBannerPage(BannerPageReqVO pageReqVO) {
+        return bannerMapper.selectPage(pageReqVO);
     }
 
     @Override
-    public PageResult<BannerDO> getBannerPage(BannerPageReqVO pageReqVO) {
-        return bannerMapper.selectPage(pageReqVO);
+    public void addBannerBrowseCount(Long id) {
+        // 校验 Banner 是否存在
+        validateBannerExists(id);
+        // 增加点击次数
+        bannerMapper.updateBrowseCount(id);
+    }
+
+    @Override
+    public List<BannerDO> getBannerListByPosition(Integer position) {
+        return bannerMapper.selectBannerListByPosition(position);
     }
 
 }

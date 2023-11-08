@@ -1,12 +1,16 @@
 package cn.iocoder.yudao.module.member.controller.app.auth;
 
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.security.config.SecurityProperties;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
+import cn.iocoder.yudao.module.member.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.member.service.auth.MemberAuthService;
+import cn.iocoder.yudao.module.system.api.social.SocialClientApi;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxJsapiSignatureRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -32,6 +36,9 @@ public class AppAuthController {
 
     @Resource
     private MemberAuthService authService;
+
+    @Resource
+    private SocialClientApi socialClientApi;
 
     @Resource
     private SecurityProperties securityProperties;
@@ -65,8 +72,9 @@ public class AppAuthController {
 
     @PostMapping("/sms-login")
     @Operation(summary = "使用手机 + 验证码登录")
-    public CommonResult<AppAuthLoginRespVO> smsLogin(@RequestBody @Valid AppAuthSmsLoginReqVO reqVO) {
-        return success(authService.smsLogin(reqVO));
+    public CommonResult<AppAuthLoginRespVO> smsLogin(@RequestBody @Valid AppAuthSmsLoginReqVO reqVO,
+                                                     @RequestHeader Integer terminal) {
+        return success(authService.smsLogin(reqVO, terminal));
     }
 
     @PostMapping("/send-sms-code")
@@ -106,6 +114,15 @@ public class AppAuthController {
     @Operation(summary = "微信小程序的一键登录")
     public CommonResult<AppAuthLoginRespVO> weixinMiniAppLogin(@RequestBody @Valid AppAuthWeixinMiniAppLoginReqVO reqVO) {
         return success(authService.weixinMiniAppLogin(reqVO));
+    }
+
+    @PostMapping("/create-weixin-jsapi-signature")
+    @Operation(summary = "创建微信 JS SDK 初始化所需的签名",
+            description = "参考 https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html 文档")
+    public CommonResult<SocialWxJsapiSignatureRespDTO> createWeixinMpJsapiSignature(@RequestParam("url") String url) {
+        SocialWxJsapiSignatureRespDTO signature = socialClientApi.createWxMpJsapiSignature(
+                UserTypeEnum.MEMBER.getValue(), url);
+        return success(AuthConvert.INSTANCE.convert(signature));
     }
 
 }

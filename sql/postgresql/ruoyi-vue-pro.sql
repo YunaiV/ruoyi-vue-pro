@@ -6779,7 +6779,7 @@ CREATE TABLE "system_tenant"
     "contact_name"    varchar(30) COLLATE "pg_catalog"."default" NOT NULL,
     "contact_mobile"  varchar(500) COLLATE "pg_catalog"."default",
     "status"          int2                                       NOT NULL,
-    "domain"          varchar(256) COLLATE "pg_catalog"."default",
+    "website"          varchar(256) COLLATE "pg_catalog"."default",
     "package_id"      int8                                       NOT NULL,
     "expire_time"     timestamp(6)                               NOT NULL,
     "account_count"   int4                                       NOT NULL,
@@ -6803,7 +6803,7 @@ ON COLUMN "system_tenant"."contact_mobile" IS '联系手机';
 COMMENT
 ON COLUMN "system_tenant"."status" IS '租户状态（0正常 1停用）';
 COMMENT
-ON COLUMN "system_tenant"."domain" IS '绑定域名';
+ON COLUMN "system_tenant"."website" IS '绑定域名';
 COMMENT
 ON COLUMN "system_tenant"."package_id" IS '租户套餐编号';
 COMMENT
@@ -6827,17 +6827,17 @@ ON TABLE "system_tenant" IS '租户表';
 -- Records of system_tenant
 -- ----------------------------
 BEGIN;
-INSERT INTO "system_tenant" ("id", "name", "contact_user_id", "contact_name", "contact_mobile", "status", "domain",
+INSERT INTO "system_tenant" ("id", "name", "contact_user_id", "contact_name", "contact_mobile", "status", "website",
                              "package_id", "expire_time", "account_count", "creator", "create_time", "updater",
                              "update_time", "deleted")
 VALUES (1, '芋道源码', NULL, '芋艿', '17321315478', 0, 'https://www.iocoder.cn', 0, '2099-02-19 17:14:16', 9999, '1',
         '2021-01-05 17:03:47', '1', '2022-02-23 12:15:11', 0);
-INSERT INTO "system_tenant" ("id", "name", "contact_user_id", "contact_name", "contact_mobile", "status", "domain",
+INSERT INTO "system_tenant" ("id", "name", "contact_user_id", "contact_name", "contact_mobile", "status", "website",
                              "package_id", "expire_time", "account_count", "creator", "create_time", "updater",
                              "update_time", "deleted")
 VALUES (121, '小租户', 110, '小王2', '15601691300', 0, 'http://www.iocoder.cn', 111, '2024-03-11 00:00:00', 20, '1',
         '2022-02-22 00:56:14', '1', '2022-03-19 18:37:20', 0);
-INSERT INTO "system_tenant" ("id", "name", "contact_user_id", "contact_name", "contact_mobile", "status", "domain",
+INSERT INTO "system_tenant" ("id", "name", "contact_user_id", "contact_name", "contact_mobile", "status", "website",
                              "package_id", "expire_time", "account_count", "creator", "create_time", "updater",
                              "update_time", "deleted")
 VALUES (122, '测试租户', 113, '芋道', '15601691300', 0, 'https://www.iocoder.cn', 111, '2022-04-30 00:00:00', 50, '1',

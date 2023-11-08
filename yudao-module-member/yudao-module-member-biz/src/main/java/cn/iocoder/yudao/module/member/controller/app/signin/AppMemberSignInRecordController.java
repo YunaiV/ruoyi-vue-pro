@@ -31,22 +31,11 @@ public class AppMemberSignInRecordController {
     @Resource
     private MemberSignInRecordService signInRecordService;
 
-    // TODO 芋艿：临时 mock => UserSignController.getUserInfo
     @GetMapping("/get-summary")
     @Operation(summary = "获得个人签到统计")
     @PreAuthenticated
     public CommonResult<AppMemberSignInRecordSummaryRespVO> getSignInRecordSummary() {
-        AppMemberSignInRecordSummaryRespVO respVO = new AppMemberSignInRecordSummaryRespVO();
-        if (false) {
-            respVO.setTotalDay(100);
-            respVO.setContinuousDay(5);
-            respVO.setTodaySignIn(true);
-        } else {
-            respVO.setTotalDay(100);
-            respVO.setContinuousDay(10);
-            respVO.setTodaySignIn(false);
-        }
-        return success(respVO);
+        return success(signInRecordService.getSignInRecordSummary(getLoginUserId()));
     }
 
     @PostMapping("/create")

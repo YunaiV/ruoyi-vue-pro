@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityPageItemRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activity.CombinationActivityRespVO;
@@ -109,6 +110,11 @@ public interface CombinationActivityConvert {
 
     CombinationRecordDO convert(CombinationRecordCreateReqDTO reqDTO);
 
+    default CombinationRecordCreateRespDTO convert4(CombinationRecordDO combinationRecord) {
+        return new CombinationRecordCreateRespDTO().setCombinationActivityId(combinationRecord.getActivityId())
+                .setCombinationRecordId(combinationRecord.getId()).setCombinationHeadId(combinationRecord.getHeadId());
+    }
+
     default CombinationRecordDO convert(CombinationRecordCreateReqDTO reqDTO,
                                         CombinationActivityDO activity, MemberUserRespDTO user,
                                         ProductSpuRespDTO spu, ProductSkuRespDTO sku) {
@@ -172,18 +178,19 @@ public interface CombinationActivityConvert {
 
     PageResult<CombinationRecordPageItemRespVO> convert(PageResult<CombinationRecordDO> result);
 
-    default PageResult<CombinationRecordPageItemRespVO> convert(PageResult<CombinationRecordDO> recordPage, List<CombinationActivityDO> activities) {
+    default PageResult<CombinationRecordPageItemRespVO> convert(PageResult<CombinationRecordDO> recordPage, List<CombinationActivityDO> activities, List<CombinationProductDO> products) {
         PageResult<CombinationRecordPageItemRespVO> result = convert(recordPage);
+        // 拼接关联属性
         Map<Long, CombinationActivityDO> activityMap = convertMap(activities, CombinationActivityDO::getId);
+        Map<Long, List<CombinationProductDO>> productsMap = convertMultiMap(products, CombinationProductDO::getActivityId);
         result.setList(CollectionUtils.convertList(result.getList(), item -> {
             findAndThen(activityMap, item.getActivityId(), activity -> {
-                item.setActivity(convert(activity));
+                item.setActivity(convert(activity).setProducts(convertList2(productsMap.get(item.getActivityId()))));
             });
             return item;
         }));
         return result;
     }
-
 
     default AppCombinationRecordDetailRespVO convert(Long userId, CombinationRecordDO headRecord, List<CombinationRecordDO> memberRecords) {
         AppCombinationRecordDetailRespVO respVO = new AppCombinationRecordDetailRespVO()
@@ -200,32 +207,23 @@ public interface CombinationActivityConvert {
     /**
      * 转换生成虚拟成团虚拟记录
      *
-     * @param virtualGroupHeadRecords 虚拟成团团长记录列表
+     * @param headRecord 虚拟成团团长记录
      * @return 虚拟记录列表
      */
-    default List<CombinationRecordDO> convertVirtualGroupList(List<CombinationRecordDO> virtualGroupHeadRecords) {
-        List<CombinationRecordDO> createRecords = new ArrayList<>();
-        virtualGroupHeadRecords.forEach(headRecord -> {
-            // 计算需要创建的虚拟成团记录数量
-            int count = headRecord.getUserSize() - headRecord.getUserCount();
-            for (int i = 0; i < count; i++) {
-                // 基础信息和团长保持一致
-                CombinationRecordDO newRecord = new CombinationRecordDO().setActivityId(headRecord.getActivityId())
-                        .setCombinationPrice(headRecord.getCombinationPrice()).setSpuId(headRecord.getSpuId()).setSpuName(headRecord.getSpuName())
-                        .setPicUrl(headRecord.getPicUrl()).setSkuId(headRecord.getSkuId()).setHeadId(headRecord.getId())
-                        .setStatus(headRecord.getStatus()) // 状态保持和创建时一致，创建完成后会接着处理
-                        .setVirtualGroup(headRecord.getVirtualGroup()).setExpireTime(headRecord.getExpireTime())
-                        .setStartTime(headRecord.getStartTime()).setUserSize(headRecord.getUserSize()).setUserCount(headRecord.getUserCount());
-                // 虚拟信息
-                newRecord.setCount(0);
-                newRecord.setUserId(0L);
-                newRecord.setNickname("");
-                newRecord.setAvatar("");
-                newRecord.setOrderId(0L);
-                createRecords.add(newRecord);
-            }
-        });
+    default List<CombinationRecordDO> convertVirtualRecordList(CombinationRecordDO headRecord) {
+        int count = headRecord.getUserSize() - headRecord.getUserCount();
+        List<CombinationRecordDO> createRecords = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            // 基础信息和团长保持一致
+            CombinationRecordDO newRecord = convert5(headRecord);
+            // 虚拟信息
+            newRecord.setCount(0) // 会单独更新下，在后续的 Service 逻辑里
+                    .setUserId(0L).setNickname("").setAvatar("").setOrderId(0L);
+            createRecords.add(newRecord);
+        }
         return createRecords;
     }
+    @Mapping(target = "id", ignore = true)
+    CombinationRecordDO convert5(CombinationRecordDO headRecord);
 
 }

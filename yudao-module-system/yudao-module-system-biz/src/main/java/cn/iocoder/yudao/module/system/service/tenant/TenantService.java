@@ -78,10 +78,18 @@ public interface TenantService {
     /**
      * 获得名字对应的租户
      *
-     * @param name 组户名
+     * @param name 租户名
      * @return 租户
      */
     TenantDO getTenantByName(String name);
+
+    /**
+     * 获得域名对应的租户
+     *
+     * @param website 域名
+     * @return 租户
+     */
+    TenantDO getTenantByWebsite(String website);
 
     /**
      * 获得使用指定套餐的租户数量
@@ -128,4 +136,5 @@ public interface TenantService {
      * @param id 租户编号
      */
     void validTenant(Long id);
+
 }

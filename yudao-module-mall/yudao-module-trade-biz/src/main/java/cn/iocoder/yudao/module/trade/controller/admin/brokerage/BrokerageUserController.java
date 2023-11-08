@@ -77,6 +77,7 @@ public class BrokerageUserController {
     @PreAuthorize("@ss.hasPermission('trade:brokerage-user:query')")
     public CommonResult<BrokerageUserRespVO> getBrokerageUser(@RequestParam("id") Long id) {
         BrokerageUserDO brokerageUser = brokerageUserService.getBrokerageUser(id);
+        // TODO @疯狂：是不是搞成一个统一的 convert？
         BrokerageUserRespVO respVO = BrokerageUserConvert.INSTANCE.convert(brokerageUser);
         return success(BrokerageUserConvert.INSTANCE.copyTo(memberUserApi.getUser(id), respVO));
     }

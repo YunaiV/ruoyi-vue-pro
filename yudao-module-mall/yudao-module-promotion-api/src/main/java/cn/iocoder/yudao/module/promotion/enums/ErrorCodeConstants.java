@@ -15,7 +15,6 @@ public interface ErrorCodeConstants {
     ErrorCode DISCOUNT_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_001_002, "限时折扣活动已关闭，不能修改");
     ErrorCode DISCOUNT_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED = new ErrorCode(1_013_001_003, "限时折扣活动未关闭，不能删除");
     ErrorCode DISCOUNT_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_001_004, "限时折扣活动已关闭，不能重复关闭");
-    ErrorCode DISCOUNT_ACTIVITY_CLOSE_FAIL_STATUS_END = new ErrorCode(1_013_001_005, "限时折扣活动已结束，不能关闭");
 
     // ========== Banner 相关 1-013-002-000 ============
     ErrorCode BANNER_NOT_EXISTS = new ErrorCode(1_013_002_000, "Banner 不存在");
@@ -109,5 +108,21 @@ public interface ErrorCodeConstants {
     ErrorCode BARGAIN_HELP_CREATE_FAIL_LIMIT = new ErrorCode(1_013_014_002, "助力失败，您已达到当前砍价活动的助力上限");
     ErrorCode BARGAIN_HELP_CREATE_FAIL_CONFLICT = new ErrorCode(1_013_014_003, "助力失败，请重试");
     ErrorCode BARGAIN_HELP_CREATE_FAIL_HELP_EXISTS = new ErrorCode(1_013_014_004, "助力失败，您已经助力过了");
+
+    // ========== 文章分类 1-013-015-000 ==========
+    ErrorCode ARTICLE_CATEGORY_NOT_EXISTS = new ErrorCode(1_013_015_000, "文章分类不存在");
+    ErrorCode ARTICLE_CATEGORY_DELETE_FAIL_HAVE_ARTICLES = new ErrorCode(1_013_015_001, "文章分类删除失败，存在关联文章");
+
+    // ========== 文章管理 1-013-016-000 ==========
+    ErrorCode ARTICLE_NOT_EXISTS = new ErrorCode(1_013_016_000, "文章不存在");
+
+    // ========== 装修模板 1-013-017-000 ==========
+    ErrorCode DIY_TEMPLATE_NOT_EXISTS = new ErrorCode(1_013_017_000, "装修模板不存在");
+    ErrorCode DIY_TEMPLATE_NAME_USED = new ErrorCode(1_013_017_001, "装修模板名称({})已经被使用");
+    ErrorCode DIY_TEMPLATE_USED_CANNOT_DELETE = new ErrorCode(1_013_017_002, "不能删除正在使用的装修模板");
+
+    // ========== 装修页面 1-013-018-000 ==========
+    ErrorCode DIY_PAGE_NOT_EXISTS = new ErrorCode(1_013_018_000, "装修页面不存在");
+    ErrorCode DIY_PAGE_NAME_USED = new ErrorCode(1_013_018_001, "装修页面名称({})已经被使用");
 
 }
