@@ -3,11 +3,13 @@ package cn.iocoder.yudao.module.crm.service.customer;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.customer.CrmCustomerMapper;
+import cn.iocoder.yudao.module.crm.enums.customer.CrmCustomerSceneEnum;
 import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
@@ -100,6 +102,10 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         // 1.2 获取当前用户能看的分页数据
         List<CrmPermissionDO> permissions = crmPermissionService.getPermissionListByBizTypeAndUserId(
                 CrmBizTypeEnum.CRM_CUSTOMER.getType(), userId);
+        // 1.3 TODO 场景数据过滤
+        if (CrmCustomerSceneEnum.isOwner(pageReqVO.getSceneType())) { // 场景一：我负责的数据
+            permissions = CollectionUtils.filterList(permissions, item -> CrmPermissionLevelEnum.isOwner(item.getLevel()));
+        }
         Set<Long> ids = convertSet(permissions, CrmPermissionDO::getBizId);
         if (CollUtil.isEmpty(ids)) { // 没得说明没有什么给他看的
             return PageResult.empty();

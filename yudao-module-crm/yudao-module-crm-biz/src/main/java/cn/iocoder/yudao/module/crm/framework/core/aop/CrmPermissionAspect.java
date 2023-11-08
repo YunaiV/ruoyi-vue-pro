@@ -59,9 +59,9 @@ public class CrmPermissionAspect {
     @Before("@annotation(crmPermission)")
     public void doBefore(JoinPoint joinPoint, CrmPermission crmPermission) throws NoSuchMethodException {
         // TODO 芋艿：临时，方便大家调试
-        //if (true) {
-        //    return;
-        //}
+        if (true) {
+            return;
+        }
         KeyValue<Long, Integer> bizIdAndBizType = getBizIdAndBizType(joinPoint, crmPermission);
         Integer bizType = bizIdAndBizType.getValue(); // 模块类型
         Long bizId = bizIdAndBizType.getKey(); // 模块数据编号
