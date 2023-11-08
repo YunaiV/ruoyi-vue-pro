@@ -4,7 +4,7 @@
 
 ## 1. 覆盖 flowable，liquibase 相关代码
 
-把`flowable-patch/src`下的文件按文件结果添加到`yudao-server`项目对应目录中
+把`flowable-patch/src`下的文件按文件结果添加到`yudao-server`或者`yudao-module-bpm-biz`项目对应目录中，甚至你可以做个独立模块。
 
 ## 2. 修改相关 DAO
 

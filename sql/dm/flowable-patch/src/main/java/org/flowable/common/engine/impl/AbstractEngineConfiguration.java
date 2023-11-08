@@ -408,7 +408,7 @@ public abstract class AbstractEngineConfiguration {
         databaseTypeMappings.setProperty("DB2/2", DATABASE_TYPE_DB2);
         databaseTypeMappings.setProperty("DB2 UDB AS400", DATABASE_TYPE_DB2);
         databaseTypeMappings.setProperty(PRODUCT_NAME_CRDB, DATABASE_TYPE_COCKROACHDB);
-        databaseTypeMappings.setProperty("DM DBMS", DATABASE_TYPE_ORACLE);
+        databaseTypeMappings.setProperty("DM DBMS", DATABASE_TYPE_ORACLE); // dhb52: DM support
         return databaseTypeMappings;
     }
 
