@@ -60,4 +60,5 @@ public interface ProductFavoriteService {
      * @return 数量
      */
     Long getFavoriteCount(Long userId);
+
 }
