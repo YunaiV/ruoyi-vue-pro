@@ -34,6 +34,7 @@ public class ProductFavoriteServiceImpl implements ProductFavoriteService {
         if (favorite != null) {
             throw exception(FAVORITE_EXISTS);
         }
+
         ProductFavoriteDO entity = ProductFavoriteConvert.INSTANCE.convert(userId, spuId);
         productFavoriteMapper.insert(entity);
         return entity.getId();
