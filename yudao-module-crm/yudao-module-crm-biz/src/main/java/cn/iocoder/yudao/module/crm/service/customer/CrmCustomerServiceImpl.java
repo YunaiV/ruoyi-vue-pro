@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.crm.service.customer;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
@@ -18,12 +19,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CUSTOMER_NOT_EXISTS;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 
 /**
  * 客户 Service 实现类
@@ -141,5 +143,57 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         CrmCustomerDO updateObj = CrmCustomerConvert.INSTANCE.convert(updateReqVO);
         customerMapper.updateById(updateObj);
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void receive(List <Long> ids) {
+        transferCustomerOwner(ids,SecurityFrameworkUtils.getLoginUserId());
+    }
+
+    @Override
+    public void distributeByIds(List <Long> cIds, Long ownerId) {
+        transferCustomerOwner(cIds,ownerId);
+    }
+
+    private void transferCustomerOwner(List <Long> cIds, Long ownerId){
+        //先一次性校验完成客户是否可用
+        for (Long cId : cIds) {
+            //校验是否存在
+            validateCustomerExists(cId);
+            //todo 校验是否已有负责人
+            validCustomerOwnerExist(cId);
+            //todo 校验是否锁定
+            validCustomerIsLocked(cId);
+            //todo 校验成交状态
+            validCustomerDeal(cId);
+        }
+        List<CrmCustomerDO> updateDos = new ArrayList <>();
+        for (Long cId : cIds){
+            CrmCustomerDO customerDO = new CrmCustomerDO();
+            customerDO.setId(cId);
+            customerDO.setOwnerUserId(SecurityFrameworkUtils.getLoginUserId());
+        }
+        //统一修改状态
+        customerMapper.updateBatch(updateDos);
+    }
+
+    private void validCustomerOwnerExist(Long id) {
+        if (customerMapper.selectById(id).getOwnerUserId()!=null) {
+            throw exception(CUSTOMER_OWNER_EXISTS);
+        }
+    }
+
+    private void validCustomerIsLocked(Long id) {
+        if (customerMapper.selectById(id).getLockStatus() ==true) {
+            throw exception(CUSTOMER_LOCKED);
+        }
+    }
+
+    private void validCustomerDeal(Long id) {
+        if (customerMapper.selectById(id).getDealStatus() ==true) {
+            throw exception(CUSTOMER_DEALED);
+        }
+    }
+
 
 }

@@ -34,6 +34,10 @@ public interface ErrorCodeConstants {
 
     // ========== 客户管理 1_020_006_000 ==========
     ErrorCode CUSTOMER_NOT_EXISTS = new ErrorCode(1_020_006_000, "客户不存在");
+    ErrorCode CUSTOMER_OWNER_EXISTS = new ErrorCode(1_020_006_001, "客户已存在所属负责人");
+    ErrorCode CUSTOMER_LOCKED = new ErrorCode(1_020_006_002, "客户状态已锁定");
+    ErrorCode CUSTOMER_DEALED = new ErrorCode(1_020_006_003, "客户已交易");
+
 
     // ========== 权限管理 1_020_007_000 ==========
     ErrorCode CRM_PERMISSION_NOT_EXISTS = new ErrorCode(1_020_007_000, "数据权限不存在");
