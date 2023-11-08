@@ -16,6 +16,4 @@ public class ProductFavoriteBaseVO {
     @NotNull(message = "用户编号不能为空")
     private Long userId;
 
-
-
 }
