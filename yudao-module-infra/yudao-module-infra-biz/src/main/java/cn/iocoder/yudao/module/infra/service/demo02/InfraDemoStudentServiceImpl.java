@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import cn.iocoder.yudao.module.infra.controller.admin.demo02.vo.*;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo02.InfraDemoStudentDO;
+import cn.iocoder.yudao.module.infra.dal.dataobject.demo02.InfraDemoStudentContactDO;
+import cn.iocoder.yudao.module.infra.dal.dataobject.demo02.InfraDemoStudentAddressDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 import cn.iocoder.yudao.module.infra.convert.demo02.InfraDemoStudentConvert;
@@ -43,12 +45,10 @@ public class InfraDemoStudentServiceImpl implements InfraDemoStudentService {
         // 插入
         InfraDemoStudentDO demoStudent = InfraDemoStudentConvert.INSTANCE.convert(createReqVO);
         demoStudentMapper.insert(demoStudent);
-        // 插入子表（学生联系人）
-        createReqVO.getDemoStudentContacts().forEach(o -> o.setStudentId(demoStudent.getId()));
-        demoStudentContactMapper.insertBatch(createReqVO.getDemoStudentContacts());
-        // 插入子表（学生地址）
-        createReqVO.getDemoStudentAddress().setStudentId(demoStudent.getId());
-        demoStudentAddressMapper.insert(createReqVO.getDemoStudentAddress());
+
+        // 插入子表（$subTable.classComment）
+        createDemoStudentContactList(demoStudent.getId(), createReqVO.getDemoStudentContacts());
+        createDemoStudentAddress(demoStudent.getId(), createReqVO.getDemoStudentAddress());
         // 返回
         return demoStudent.getId();
     }
@@ -61,13 +61,10 @@ public class InfraDemoStudentServiceImpl implements InfraDemoStudentService {
         // 更新
         InfraDemoStudentDO updateObj = InfraDemoStudentConvert.INSTANCE.convert(updateReqVO);
         demoStudentMapper.updateById(updateObj);
-        // 更新子表（学生联系人）
-        demoStudentContactMapper.deleteByStudentId(updateReqVO.getId());
-        updateReqVO.getDemoStudentContacts().forEach(o -> o.setStudentId(updateReqVO.getId()));
-        demoStudentContactMapper.insertBatch(updateReqVO.getDemoStudentContacts());
-        // 更新子表（学生地址）
-        updateReqVO.getDemoStudentAddress().setStudentId(updateReqVO.getId());
-        demoStudentAddressMapper.updateById(updateReqVO.getDemoStudentAddress());
+
+        // 更新子表
+        updateDemoStudentContactList(updateReqVO.getId(), updateReqVO.getDemoStudentContacts());
+        updateDemoStudentAddress(updateReqVO.getId(), updateReqVO.getDemoStudentAddress());
     }
 
     @Override
@@ -77,10 +74,10 @@ public class InfraDemoStudentServiceImpl implements InfraDemoStudentService {
         validateDemoStudentExists(id);
         // 删除
         demoStudentMapper.deleteById(id);
-        // 删除子表（学生联系人）
-        demoStudentContactMapper.deleteByStudentId(id);
-        // 删除子表（学生地址）
-        demoStudentAddressMapper.deleteByStudentId(id);
+
+        // 删除子表
+        deleteDemoStudentContactByStudentId(id);
+        deleteDemoStudentAddressByStudentId(id);
     }
 
     private void validateDemoStudentExists(Long id) {
@@ -102,6 +99,48 @@ public class InfraDemoStudentServiceImpl implements InfraDemoStudentService {
     @Override
     public List<InfraDemoStudentDO> getDemoStudentList(InfraDemoStudentExportReqVO exportReqVO) {
         return demoStudentMapper.selectList(exportReqVO);
+    }
+
+    // ==================== 子表（学生联系人） ====================
+
+    @Override
+    public List<InfraDemoStudentContactDO> getDemoStudentContactListByStudentId(Long studentId) {
+        return demoStudentContactMapper.selectListByStudentId(studentId);
+    }
+
+    private void createDemoStudentContactList(Long studentId, List<InfraDemoStudentContactDO> list) {
+        list.forEach(o -> o.setStudentId(studentId));
+        demoStudentContactMapper.insertBatch(list);
+    }
+
+    private void updateDemoStudentContactList(Long studentId, List<InfraDemoStudentContactDO> list) {
+        deleteDemoStudentContactByStudentId(studentId);
+        createDemoStudentContactList(studentId, list);
+    }
+
+    private void deleteDemoStudentContactByStudentId(Long studentId) {
+        demoStudentContactMapper.deleteByStudentId(studentId);
+    }
+
+    // ==================== 子表（学生地址） ====================
+
+    @Override
+    public InfraDemoStudentAddressDO getDemoStudentAddressByStudentId(Long studentId) {
+        return demoStudentAddressMapper.selectByStudentId(studentId);
+    }
+
+    private void createDemoStudentAddress(Long studentId, InfraDemoStudentAddressDO demoStudentAddress) {
+        demoStudentAddress.setStudentId(studentId);
+        demoStudentAddressMapper.insert(demoStudentAddress);
+    }
+
+    private void updateDemoStudentAddress(Long studentId, InfraDemoStudentAddressDO demoStudentAddress) {
+        demoStudentAddress.setStudentId(studentId);
+        demoStudentAddressMapper.updateById(demoStudentAddress);
+    }
+
+    private void deleteDemoStudentAddressByStudentId(Long studentId) {
+        demoStudentAddressMapper.deleteByStudentId(studentId);
     }
 
 }

@@ -193,6 +193,44 @@ public class CodegenEngine {
      */
     public Map<String, String> execute(CodegenTableDO table, List<CodegenColumnDO> columns,
                                        List<CodegenTableDO> subTables, List<List<CodegenColumnDO>> subColumnsList) {
+        // 1.1 初始化 bindMap 上下文
+        Map<String, Object> bindingMap = initBindingMap(table, columns, subTables, subColumnsList);
+        // 1.2 获得模版
+        Map<String, String> templates = getTemplates(table.getFrontType());
+
+        // 2. 执行生成
+        Map<String, String> result = Maps.newLinkedHashMapWithExpectedSize(templates.size()); // 有序
+        templates.forEach((vmPath, filePath) -> {
+            // 2.1 特殊：主子表专属逻辑
+            if (isSubTemplate(vmPath)) {
+                if (CollUtil.isEmpty(subTables)) {
+                    return;
+                }
+                for (int i = 0; i < subTables.size(); i++) {
+                    bindingMap.put("subIndex", i);
+                    generateCode(result, vmPath, filePath, bindingMap);
+                }
+                bindingMap.remove("subIndex");
+                return;
+            }
+
+            // 2.2 默认生成
+            generateCode(result, vmPath, filePath, bindingMap);
+        });
+        return result;
+    }
+
+    private void generateCode(Map<String, String> result, String vmPath,
+                              String filePath, Map<String, Object> bindingMap) {
+        filePath = formatFilePath(filePath, bindingMap);
+        String content = templateEngine.getTemplate(vmPath).render(bindingMap);
+        // 去除字段后面多余的 , 逗号
+        content = content.replaceAll(",\n}", "\n}").replaceAll(",\n  }", "\n  }");
+        result.put(filePath, content);
+    }
+
+    private Map<String, Object> initBindingMap(CodegenTableDO table, List<CodegenColumnDO> columns,
+                                               List<CodegenTableDO> subTables, List<List<CodegenColumnDO>> subColumnsList) {
         // 创建 bindingMap
         Map<String, Object> bindingMap = new HashMap<>(globalBindingMap);
         bindingMap.put("table", table);
@@ -217,60 +255,40 @@ public class CodegenEngine {
             // 创建 bindingMap
             bindingMap.put("subTables", subTables);
             bindingMap.put("subColumnsList", subColumnsList);
+            List<CodegenColumnDO> subPrimaryColumns = new ArrayList<>();
             List<CodegenColumnDO> subJoinColumns = new ArrayList<>();
+            List<String> subJoinColumnStrikeCases = new ArrayList<>();
             List<String> subSimpleClassNames = new ArrayList<>();
             List<String> subClassNameVars = new ArrayList<>();
+            List<String> subSimpleClassNameStrikeCases = new ArrayList<>();
             for (int i = 0; i < subTables.size(); i++) {
                 CodegenTableDO subTable = subTables.get(i);
                 List<CodegenColumnDO> subColumns = subColumnsList.get(i);
-                subJoinColumns.add(CollectionUtils.findFirst(subColumns, // 关联的字段
-                        column -> Objects.equals(column.getId(), subTable.getSubJoinColumnId())));
+                subPrimaryColumns.add(CollectionUtils.findFirst(subColumns, CodegenColumnDO::getPrimaryKey)); //
+                CodegenColumnDO subColumn = CollectionUtils.findFirst(subColumns, // 关联的字段
+                        column -> Objects.equals(column.getId(), subTable.getSubJoinColumnId()));
+                subJoinColumns.add(subColumn);
+                subJoinColumnStrikeCases.add(toSymbolCase(subColumn.getJavaField(), '-')); // 将 DictType 转换成 dict-type
                 // className 相关
                 String subSimpleClassName = removePrefix(subTable.getClassName(), upperFirst(subTable.getModuleName()));
                 subSimpleClassNames.add(subSimpleClassName);
                 subClassNameVars.add(lowerFirst(subSimpleClassName)); // 将 DictType 转换成 dictType，用于变量
+                subSimpleClassNameStrikeCases.add(toSymbolCase(simpleClassName, '-')); // 将 DictType 转换成 dict-type
             }
+            bindingMap.put("subPrimaryColumns", subPrimaryColumns);
             bindingMap.put("subJoinColumns", subJoinColumns);
+            bindingMap.put("subJoinColumn_strikeCases", subJoinColumnStrikeCases);
             bindingMap.put("subSimpleClassNames", subSimpleClassNames);
             bindingMap.put("subClassNameVars", subClassNameVars);
+            bindingMap.put("subSimpleClassName_strikeCases", subSimpleClassNameStrikeCases);
         }
-
-        // 执行生成
-        Map<String, String> templates = getTemplates(table.getTemplateType(), table.getFrontType());
-        Map<String, String> result = Maps.newLinkedHashMapWithExpectedSize(templates.size()); // 有序
-        templates.forEach((vmPath, filePath) -> {
-            // 特殊：主子表专属逻辑
-            if (isSubTemplate(vmPath)) {
-                for (int i = 0; i < subTables.size(); i++) {
-                    bindingMap.put("subIndex", i);
-                    // TODO 芋艿：这块需要优化下逻辑
-                    String newFilePath = formatFilePath(filePath, bindingMap);
-                    String content = templateEngine.getTemplate(vmPath).render(bindingMap);
-                    // 去除字段后面多余的 , 逗号
-                    content = content.replaceAll(",\n}", "\n}").replaceAll(",\n  }", "\n  }");
-                    result.put(newFilePath, content);
-                    bindingMap.remove("subIndex");
-                }
-            } else {
-                filePath = formatFilePath(filePath, bindingMap);
-                String content = templateEngine.getTemplate(vmPath).render(bindingMap);
-                // 去除字段后面多余的 , 逗号
-                content = content.replaceAll(",\n}", "\n}").replaceAll(",\n  }", "\n  }");
-                result.put(filePath, content);
-            }
-        });
-        return result;
+        return bindingMap;
     }
 
-    private Map<String, String> getTemplates(Integer templateType, Integer frontType) {
+    private Map<String, String> getTemplates(Integer frontType) {
         Map<String, String> templates = new LinkedHashMap<>();
         templates.putAll(SERVER_TEMPLATES);
         templates.putAll(FRONT_TEMPLATES.row(frontType));
-        // 特殊：主子表专属逻辑
-        if (ObjUtil.notEqual(templateType, CodegenTemplateTypeEnum.MASTER.getType())) {
-            templates.remove(javaTemplatePath("dal/do_sub"));
-            templates.remove(javaTemplatePath("dal/mapper_sub"));
-        }
         return templates;
     }
 

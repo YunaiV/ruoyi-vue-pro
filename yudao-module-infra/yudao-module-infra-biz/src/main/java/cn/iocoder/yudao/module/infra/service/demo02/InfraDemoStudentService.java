@@ -1,15 +1,12 @@
 package cn.iocoder.yudao.module.infra.service.demo02;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.infra.controller.admin.demo02.vo.InfraDemoStudentCreateReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.demo02.vo.InfraDemoStudentExportReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.demo02.vo.InfraDemoStudentPageReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.demo02.vo.InfraDemoStudentUpdateReqVO;
+import java.util.*;
+import javax.validation.*;
+import cn.iocoder.yudao.module.infra.controller.admin.demo02.vo.*;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo02.InfraDemoStudentDO;
-
-import javax.validation.Valid;
-import java.util.Collection;
-import java.util.List;
+import cn.iocoder.yudao.module.infra.dal.dataobject.demo02.InfraDemoStudentContactDO;
+import cn.iocoder.yudao.module.infra.dal.dataobject.demo02.InfraDemoStudentAddressDO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 /**
  * 学生 Service 接口
@@ -64,5 +61,26 @@ public interface InfraDemoStudentService {
      */
     List<InfraDemoStudentDO> getDemoStudentList(InfraDemoStudentExportReqVO exportReqVO);
 
+
+    // ==================== 子表（学生联系人） ====================
+
+    /**
+     * 获得学生联系人列表
+     *
+     * @param studentId 学生编号
+     * @return 学生联系人列表
+     */
+    List<InfraDemoStudentContactDO> getDemoStudentContactListByStudentId(Long studentId);
+
+
+    // ==================== 子表（学生地址） ====================
+
+    /**
+     * 获得学生地址
+     *
+     * @param studentId 学生编号
+     * @return 学生地址
+     */
+    InfraDemoStudentAddressDO getDemoStudentAddressByStudentId(Long studentId);
 
 }

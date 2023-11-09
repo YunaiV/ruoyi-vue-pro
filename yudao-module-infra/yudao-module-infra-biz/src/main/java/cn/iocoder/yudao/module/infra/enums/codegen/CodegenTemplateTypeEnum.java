@@ -14,8 +14,11 @@ public enum CodegenTemplateTypeEnum {
 
     ONE(1), // 单表（增删改查）
     TREE(2), // 树表（增删改查）
-    MASTER(10), // 主子表 - 主表
-    SUB(11), // 主子表 - 子表
+
+    MASTER_NORMAL(10), // 主子表 - 主表 - 普通模式
+    MASTER_ERP(11), // 主子表 - 主表 - ERP 模式
+    MASTER_INNER(12), // 主子表 - 主表 - 内嵌模式
+    SUB(15), // 主子表 - 子表
     ;
 
     /**

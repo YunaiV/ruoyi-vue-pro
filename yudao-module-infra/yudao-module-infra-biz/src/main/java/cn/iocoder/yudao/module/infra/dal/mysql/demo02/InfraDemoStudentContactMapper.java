@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.infra.dal.mysql.demo02;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo02.InfraDemoStudentContactDO;
 import org.apache.ibatis.annotations.Mapper;

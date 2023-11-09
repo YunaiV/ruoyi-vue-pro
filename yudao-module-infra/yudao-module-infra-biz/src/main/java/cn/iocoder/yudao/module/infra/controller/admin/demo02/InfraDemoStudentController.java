@@ -1,29 +1,34 @@
 package cn.iocoder.yudao.module.infra.controller.admin.demo02;
 
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.infra.controller.admin.demo02.vo.*;
-import cn.iocoder.yudao.module.infra.convert.demo02.InfraDemoStudentConvert;
-import cn.iocoder.yudao.module.infra.dal.dataobject.demo02.InfraDemoStudentDO;
-import cn.iocoder.yudao.module.infra.service.demo02.InfraDemoStudentService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.security.access.prepost.PreAuthorize;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Operation;
 
+import javax.validation.constraints.*;
+import javax.validation.*;
+import javax.servlet.http.*;
+import java.util.*;
+import java.io.IOException;
+
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
+
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*;
+
+import cn.iocoder.yudao.module.infra.controller.admin.demo02.vo.*;
+import cn.iocoder.yudao.module.infra.dal.dataobject.demo02.InfraDemoStudentDO;
+import cn.iocoder.yudao.module.infra.dal.dataobject.demo02.InfraDemoStudentContactDO;
+import cn.iocoder.yudao.module.infra.dal.dataobject.demo02.InfraDemoStudentAddressDO;
+import cn.iocoder.yudao.module.infra.convert.demo02.InfraDemoStudentConvert;
+import cn.iocoder.yudao.module.infra.service.demo02.InfraDemoStudentService;
 
 @Tag(name = "管理后台 - 学生")
 @RestController
@@ -85,6 +90,26 @@ public class InfraDemoStudentController {
         // 导出 Excel
         List<InfraDemoStudentExcelVO> datas = InfraDemoStudentConvert.INSTANCE.convertList02(list);
         ExcelUtils.write(response, "学生.xls", "数据", InfraDemoStudentExcelVO.class, datas);
+    }
+
+    // ==================== 子表（学生联系人） ====================
+
+    @GetMapping("/demo-student/list-by-student-id")
+    @Operation(summary = "获得学生联系人列表")
+    @Parameter(name = "studentId", description = "学生编号")
+    @PreAuthorize("@ss.hasPermission('infra:demo-student:query')")
+    public CommonResult<List<InfraDemoStudentContactDO>> getDemoStudentContactListByStudentId(@RequestParam("studentId") Long studentId) {
+        return success(demoStudentService.getDemoStudentContactListByStudentId(studentId));
+    }
+
+    // ==================== 子表（学生地址） ====================
+
+    @GetMapping("/demo-student/get-by-student-id")
+    @Operation(summary = "获得学生地址")
+    @Parameter(name = "studentId", description = "学生编号")
+    @PreAuthorize("@ss.hasPermission('infra:demo-student:query')")
+    public CommonResult<InfraDemoStudentAddressDO> getDemoStudentAddressByStudentId(@RequestParam("studentId") Long studentId) {
+        return success(demoStudentService.getDemoStudentAddressByStudentId(studentId));
     }
 
 }
