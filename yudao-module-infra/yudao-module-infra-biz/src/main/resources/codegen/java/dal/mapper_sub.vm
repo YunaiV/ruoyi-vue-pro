@@ -6,6 +6,9 @@ package ${basePackage}.module.${subTable.moduleName}.dal.mysql.${subTable.busine
 
 import java.util.*;
 
+import ${PageResultClassName};
+import ${PageParamClassName};
+import ${QueryWrapperClassName};
 import ${BaseMapperClassName};
 import ${basePackage}.module.${subTable.moduleName}.dal.dataobject.${subTable.businessName}.${subTable.className}DO;
 import org.apache.ibatis.annotations.Mapper;
@@ -18,21 +21,29 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface ${subTable.className}Mapper extends BaseMapperX<${subTable.className}DO> {
 
-#if ( $subTable.subJoinMany)
+## 情况一：MASTER_ERP 时，需要分查询页子表
+#if ( $table.templateType == 11 )
+    default PageResult<${subTable.className}DO> selectPage(PageParam reqVO, ${subJoinColumn.javaType} ${subJoinColumn.javaField}) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<${subTable.className}DO>()
+            .eq(${subTable.className}DO::get${SubJoinColumnName}, ${subJoinColumn.javaField})
+            .orderByDesc(${subTable.className}DO::getId));## 大多数情况下，id 倒序
+
+    }
+
+## 情况二：非 MASTER_ERP 时，需要列表查询子表
+#else
+    #if ( $subTable.subJoinMany)
     default List<${subTable.className}DO> selectListBy${SubJoinColumnName}(${subJoinColumn.javaType} ${subJoinColumn.javaField}) {
         return selectList(${subTable.className}DO::get${SubJoinColumnName}, ${subJoinColumn.javaField});
     }
 
-#else
+    #else
     default ${subTable.className}DO selectBy${SubJoinColumnName}(${subJoinColumn.javaType} ${subJoinColumn.javaField}) {
         return selectOne(${subTable.className}DO::get${SubJoinColumnName}, ${subJoinColumn.javaField});
     }
 
-#end
-    default List<${subTable.className}DO> selectListBy${SubJoinColumnName}(List<${subJoinColumn.javaType}> ${subJoinColumn.javaField}s) {
-        return selectList(${subTable.className}DO::get${SubJoinColumnName}, ${subJoinColumn.javaField}s);
-    }
-
+    #end
+    #end
     default int deleteBy${SubJoinColumnName}(${subJoinColumn.javaType} ${subJoinColumn.javaField}) {
         return delete(${subTable.className}DO::get${SubJoinColumnName}, ${subJoinColumn.javaField});
     }
