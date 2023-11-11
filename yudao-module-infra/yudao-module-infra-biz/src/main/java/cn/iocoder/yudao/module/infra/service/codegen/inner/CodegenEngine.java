@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.infra.service.codegen.inner;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
@@ -27,6 +28,7 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenFrontTypeEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
+import cn.iocoder.yudao.module.infra.enums.codegen.CodegenTemplateTypeEnum;
 import cn.iocoder.yudao.module.infra.framework.codegen.config.CodegenProperties;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableTable;
@@ -111,6 +113,16 @@ public class CodegenEngine {
                     vue3FilePath("views/${table.moduleName}/${classNameVar}/index.vue"))
             .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/form.vue"),
                     vue3FilePath("views/${table.moduleName}/${classNameVar}/${simpleClassName}Form.vue"))
+            .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/components/form_sub_normal.vue"),  // 特殊：主子表专属逻辑
+                    vue3FilePath("views/${table.moduleName}/${classNameVar}/components/${subSimpleClassName}Form.vue"))
+            .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/components/form_sub_inner.vue"),  // 特殊：主子表专属逻辑
+                    vue3FilePath("views/${table.moduleName}/${classNameVar}/components/${subSimpleClassName}Form.vue"))
+            .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/components/form_sub_erp.vue"),  // 特殊：主子表专属逻辑
+                    vue3FilePath("views/${table.moduleName}/${classNameVar}/components/${subSimpleClassName}Form.vue"))
+            .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/components/list_sub_inner.vue"),  // 特殊：主子表专属逻辑
+                    vue3FilePath("views/${table.moduleName}/${classNameVar}/components/${subSimpleClassName}List.vue"))
+            .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/components/list_sub_erp.vue"),  // 特殊：主子表专属逻辑
+                    vue3FilePath("views/${table.moduleName}/${classNameVar}/components/${subSimpleClassName}List.vue"))
             .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("api/api.ts"),
                     vue3FilePath("api/${table.moduleName}/${classNameVar}/index.ts"))
             // Vue3 Schema 模版
@@ -202,17 +214,9 @@ public class CodegenEngine {
         templates.forEach((vmPath, filePath) -> {
             // 2.1 特殊：主子表专属逻辑
             if (isSubTemplate(vmPath)) {
-                if (CollUtil.isEmpty(subTables)) {
-                    return;
-                }
-                for (int i = 0; i < subTables.size(); i++) {
-                    bindingMap.put("subIndex", i);
-                    generateCode(result, vmPath, filePath, bindingMap);
-                }
-                bindingMap.remove("subIndex");
+                generateSubCode(table, subTables, result, vmPath, filePath, bindingMap);
                 return;
             }
-
             // 2.2 默认生成
             generateCode(result, vmPath, filePath, bindingMap);
         });
@@ -226,6 +230,35 @@ public class CodegenEngine {
         // 格式化代码
         content = prettyCode(content);
         result.put(filePath, content);
+    }
+
+    private void generateSubCode(CodegenTableDO table, List<CodegenTableDO> subTables,
+                                 Map<String, String> result, String vmPath,
+                                 String filePath, Map<String, Object> bindingMap) {
+        // 没有子表，所以不生成
+        if (CollUtil.isEmpty(subTables)) {
+            return;
+        }
+        // 主子表的模式匹配。目的：过滤掉个性化的模版
+        if (vmPath.contains("_normal")
+                && ObjectUtil.notEqual(table.getTemplateType(), CodegenTemplateTypeEnum.MASTER_NORMAL.getType())) {
+            return;
+        }
+        if (vmPath.contains("_erp")
+                && ObjectUtil.notEqual(table.getTemplateType(), CodegenTemplateTypeEnum.MASTER_ERP.getType())) {
+            return;
+        }
+        if (vmPath.contains("_inner")
+                && ObjectUtil.notEqual(table.getTemplateType(), CodegenTemplateTypeEnum.MASTER_INNER.getType())) {
+            return;
+        }
+
+        // 逐个生成
+        for (int i = 0; i < subTables.size(); i++) {
+            bindingMap.put("subIndex", i);
+            generateCode(result, vmPath, filePath, bindingMap);
+        }
+        bindingMap.remove("subIndex");
     }
 
     /**
@@ -323,6 +356,7 @@ public class CodegenEngine {
         return templates;
     }
 
+    @SuppressWarnings("unchecked")
     private String formatFilePath(String filePath, Map<String, Object> bindingMap) {
         filePath = StrUtil.replace(filePath, "${basePackage}",
                 getStr(bindingMap, "basePackage").replaceAll("\\.", "/"));
@@ -346,6 +380,8 @@ public class CodegenEngine {
             filePath = StrUtil.replace(filePath, "${subTable.moduleName}", subTable.getModuleName());
             filePath = StrUtil.replace(filePath, "${subTable.businessName}", subTable.getBusinessName());
             filePath = StrUtil.replace(filePath, "${subTable.className}", subTable.getClassName());
+            filePath = StrUtil.replace(filePath, "${subSimpleClassName}",
+                    ((List<String>) bindingMap.get("subSimpleClassNames")).get(subIndex));
         }
         return filePath;
     }
@@ -417,4 +453,5 @@ public class CodegenEngine {
     private static boolean isSubTemplate(String path) {
         return path.contains("_sub");
     }
+
 }

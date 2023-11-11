@@ -208,7 +208,63 @@ public class CodegenEngineTest extends BaseMockitoUnitTest {
                 .setCreateOperation(true).setUpdateOperation(true).setListOperation(true)
                 .setListOperationCondition(CodegenColumnListConditionEnum.LIKE.getCondition()).setListOperationResult(true)
                 .setHtmlType(CodegenColumnHtmlTypeEnum.INPUT.getType());
-        List<CodegenColumnDO> contactColumns = Arrays.asList(contactIdColumn, contactStudentIdColumn, contactNameColumn);
+        CodegenColumnDO contactsAvatarColumn = new CodegenColumnDO().setColumnName("avatar").setDataType(JdbcType.VARCHAR.name())
+                .setColumnComment("头像").setNullable(false).setPrimaryKey(false)
+                .setOrdinalPosition(4).setJavaType("String").setJavaField("avatar").setExample("https://www.iocoder.cn/1.png")
+                .setCreateOperation(true).setUpdateOperation(true).setListOperation(false)
+                .setListOperationResult(true)
+                .setHtmlType(CodegenColumnHtmlTypeEnum.UPLOAD_IMAGE.getType());
+        CodegenColumnDO contactVideoColumn = new CodegenColumnDO().setColumnName("video").setDataType(JdbcType.VARCHAR.name())
+                .setColumnComment("视频").setNullable(false).setPrimaryKey(false)
+                .setOrdinalPosition(5).setJavaType("String").setJavaField("video").setExample("https://www.iocoder.cn/1.mp4")
+                .setCreateOperation(true).setUpdateOperation(true).setListOperation(false)
+                .setListOperationResult(true)
+                .setHtmlType(CodegenColumnHtmlTypeEnum.UPLOAD_FILE.getType());
+        CodegenColumnDO contactDescriptionColumn = new CodegenColumnDO().setColumnName("description").setDataType(JdbcType.VARCHAR.name())
+                .setColumnComment("个人简介").setNullable(false).setPrimaryKey(false)
+                .setOrdinalPosition(6).setJavaType("String").setJavaField("description").setExample("我是介绍")
+                .setCreateOperation(true).setUpdateOperation(true).setListOperation(false)
+                .setListOperationResult(true)
+                .setHtmlType(CodegenColumnHtmlTypeEnum.EDITOR.getType());
+        CodegenColumnDO contactSex1Column = new CodegenColumnDO().setColumnName("sex1").setDataType(JdbcType.VARCHAR.name())
+                .setColumnComment("性别 1").setNullable(false).setPrimaryKey(false)
+                .setOrdinalPosition(7).setJavaType("String").setJavaField("sex1").setExample("男")
+                .setCreateOperation(true).setUpdateOperation(true).setListOperation(true)
+                .setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition()).setListOperationResult(true)
+                .setHtmlType(CodegenColumnHtmlTypeEnum.SELECT.getType()).setDictType("system_sex1");
+        CodegenColumnDO contactSex2Column = new CodegenColumnDO().setColumnName("sex2").setDataType(JdbcType.INTEGER.name())
+                .setColumnComment("性别 2").setNullable(false).setPrimaryKey(false)
+                .setOrdinalPosition(8).setJavaType("Integer").setJavaField("sex2").setExample("1")
+                .setCreateOperation(true).setUpdateOperation(true).setListOperation(true)
+                .setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition()).setListOperationResult(true)
+                .setHtmlType(CodegenColumnHtmlTypeEnum.CHECKBOX.getType()).setDictType("system_sex2");
+        CodegenColumnDO contactSex3Column = new CodegenColumnDO().setColumnName("sex3").setDataType(JdbcType.BOOLEAN.name())
+                .setColumnComment("性别 3").setNullable(false).setPrimaryKey(false)
+                .setOrdinalPosition(9).setJavaType("Boolean").setJavaField("sex3").setExample("true")
+                .setCreateOperation(true).setUpdateOperation(true).setListOperation(true)
+                .setListOperationResult(true)
+                .setHtmlType(CodegenColumnHtmlTypeEnum.RADIO.getType()).setDictType("system_sex3");
+        CodegenColumnDO contactBirthdayColumn = new CodegenColumnDO().setColumnName("birthday").setDataType(JdbcType.DATE.name())
+                .setColumnComment("出生日期").setNullable(false).setPrimaryKey(false)
+                .setOrdinalPosition(10).setJavaType("LocalDateTime").setJavaField("birthday")
+                .setCreateOperation(true).setUpdateOperation(true).setListOperation(true)
+                .setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition()).setListOperationResult(true)
+                .setHtmlType(CodegenColumnHtmlTypeEnum.DATETIME.getType());
+        CodegenColumnDO contactMemoColumn = new CodegenColumnDO().setColumnName("memo").setDataType(JdbcType.VARCHAR.name())
+                .setColumnComment("备注").setNullable(false).setPrimaryKey(false)
+                .setOrdinalPosition(11).setJavaType("String").setJavaField("memo").setExample("我是备注")
+                .setCreateOperation(true).setUpdateOperation(true).setListOperation(false)
+                .setListOperationResult(true)
+                .setHtmlType(CodegenColumnHtmlTypeEnum.TEXTAREA.getType());
+        CodegenColumnDO contactCreateTimeColumn = new CodegenColumnDO().setColumnName("create_time").setDataType(JdbcType.DATE.name())
+                .setColumnComment("创建时间").setNullable(false).setPrimaryKey(false)
+                .setOrdinalPosition(12).setJavaType("LocalDateTime").setJavaField("createTime")
+                .setCreateOperation(false).setUpdateOperation(false).setListOperation(true)
+                .setListOperationCondition(CodegenColumnListConditionEnum.BETWEEN.getCondition()).setListOperationResult(true)
+                .setHtmlType(CodegenColumnHtmlTypeEnum.DATETIME.getType());
+        List<CodegenColumnDO> contactColumns = Arrays.asList(contactIdColumn, contactStudentIdColumn,
+                contactNameColumn, contactsAvatarColumn, contactVideoColumn, contactDescriptionColumn,
+                contactSex1Column, contactSex2Column, contactSex3Column, contactBirthdayColumn, contactMemoColumn, contactCreateTimeColumn);
         // 子表（地址）
         CodegenTableDO addressTable = new CodegenTableDO().setScene(CodegenSceneEnum.ADMIN.getScene())
                 .setTableName("infra_demo_student_address").setTableComment("学生地址表")
@@ -222,26 +278,20 @@ public class CodegenEngineTest extends BaseMockitoUnitTest {
                 .setOrdinalPosition(1).setJavaType("Long").setJavaField("id").setExample("1024")
                 .setCreateOperation(false).setUpdateOperation(true).setListOperation(false)
                 .setListOperationResult(true);
-        CodegenColumnDO addressStudentColumn = new CodegenColumnDO().setColumnName("student_id").setDataType(JdbcType.BIGINT.name())
+        CodegenColumnDO addressStudentIdColumn = new CodegenColumnDO().setColumnName("student_id").setDataType(JdbcType.BIGINT.name())
                 .setColumnComment("学生编号").setNullable(false).setPrimaryKey(false)
                 .setOrdinalPosition(2).setJavaType("Long").setJavaField("studentId").setExample("2048")
                 .setCreateOperation(false).setUpdateOperation(true).setListOperation(false)
                 .setListOperationResult(true)
                 .setId(200L);
-        CodegenColumnDO addressDetailColumn = new CodegenColumnDO().setColumnName("detail").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("明细").setNullable(false).setPrimaryKey(false)
-                .setOrdinalPosition(3).setJavaType("String").setJavaField("detail").setExample("码头路 88 号")
-                .setCreateOperation(true).setUpdateOperation(true).setListOperation(true)
-                .setListOperationCondition(CodegenColumnListConditionEnum.LIKE.getCondition()).setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.INPUT.getType());
-        List<CodegenColumnDO> addressColumns = Arrays.asList(addressIdColumn, addressStudentColumn, addressDetailColumn);
+        List<CodegenColumnDO> addressColumns = Arrays.asList(addressIdColumn, addressStudentIdColumn);
 
         // 调用
         Map<String, String> result = codegenEngine.execute(table, columns,
                 Arrays.asList(contactTable, addressTable), Arrays.asList(contactColumns, addressColumns));
 
         // 断言
-        assertEquals(25, result.size());
+        assertEquals(27, result.size());
 
         for (Map.Entry<String, String> entry : result.entrySet()) {
             System.out.println(entry.getKey());
