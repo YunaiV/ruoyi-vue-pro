@@ -7,7 +7,6 @@
       label-width="100px"
       v-loading="formLoading"
     >
-#set ($dictMethods = [])## 使用到的 dict 字典方法
 #foreach($column in $columns)
     #if ($column.createOperation || $column.updateOperation)
         #set ($dictType = $column.dictType)
@@ -45,9 +44,6 @@
       <el-form-item label="${comment}" prop="${javaField}">
         <el-select v-model="formData.${javaField}" placeholder="请选择${comment}">
                 #if ("" != $dictType)## 有数据字典
-                    #if (!$dictMethods.contains($dictMethod))## 如果不存在，则添加到 dictMethods 数组中，后续好 import
-                      #set($ignore = $dictMethods.add($dictMethod) )
-                    #end
           <el-option
             v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
             :key="dict.value"
@@ -63,9 +59,6 @@
       <el-form-item label="${comment}" prop="${javaField}">
         <el-checkbox-group v-model="formData.${javaField}">
                 #if ("" != $dictType)## 有数据字典
-                    #if (!$dictMethods.contains($dictMethod))## 如果不存在，则添加到 dictMethods 数组中，后续好 import
-                      #set($ignore = $dictMethods.add($dictMethod) )
-                    #end
           <el-checkbox
             v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
             :key="dict.value"
@@ -82,9 +75,6 @@
       <el-form-item label="${comment}" prop="${javaField}">
         <el-radio-group v-model="formData.${javaField}">
                 #if ("" != $dictType)## 有数据字典
-                    #if (!$dictMethods.contains($dictMethod))## 如果不存在，则添加到 dictMethods 数组中，后续好 import
-                      #set($ignore = $dictMethods.add($dictMethod) )
-                    #end
           <el-radio
             v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
             :key="dict.value"
@@ -121,9 +111,7 @@
   </Dialog>
 </template>
 <script setup lang="ts">
-#if ($dictMethods.size() > 0)
-import { DICT_TYPE#foreach ($dictMethod in $dictMethods), ${dictMethod}#end } from '@/utils/dict'
-#end
+import { getIntDictOptions, getStrDictOptions, getBoolDictOptions, DICT_TYPE } from '@/utils/dict'
 import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${classNameVar}'
 
 const { t } = useI18n() // 国际化
@@ -134,33 +122,21 @@ const dialogTitle = ref('') // 弹窗的标题
 const formLoading = ref(false) // 表单的加载中：1）修改时的数据加载；2）提交的按钮禁用
 const formType = ref('') // 表单的类型：create - 新增；update - 修改
 const formData = ref({
-#set ($listOperationLastIndex = -1)## 求最后一个需要 , 的地方
-#foreach ($column in $columns)
-    #if ($column.createOperation || $column.updateOperation)
-        #set ($listOperationLastIndex = $foreach.index)
-    #end
-#end
 #foreach ($column in $columns)
     #if ($column.createOperation || $column.updateOperation)
         #if ($column.htmlType == "checkbox")
-  $column.javaField: []#if($foreach.index < $listOperationLastIndex),#end
+  $column.javaField: [],
         #else
-  $column.javaField: undefined#if($foreach.index < $listOperationLastIndex),#end
+  $column.javaField: undefined,
         #end
     #end
 #end
 })
 const formRules = reactive({
-#set ($listOperationLastIndex = -1)## 求最后一个需要 , 的地方
-#foreach ($column in $columns)
-    #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
-        #set ($listOperationLastIndex = $foreach.index)
-    #end
-#end
 #foreach ($column in $columns)
     #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
         #set($comment=$column.columnComment)
-  $column.javaField: [{ required: true, message: '${comment}不能为空', trigger: #if($column.htmlType == 'select')'change'#else'blur'#end }]#if($foreach.index < $listOperationLastIndex),#end
+  $column.javaField: [{ required: true, message: '${comment}不能为空', trigger: #if($column.htmlType == 'select')'change'#else'blur'#end }],
     #end
 #end
 })
@@ -188,9 +164,7 @@ defineExpose({ open }) // 提供 open 方法，用于打开弹窗
 const emit = defineEmits(['success']) // 定义 success 事件，用于操作成功后的回调
 const submitForm = async () => {
   // 校验表单
-  if (!formRef) return
-  const valid = await formRef.value.validate()
-  if (!valid) return
+  await formRef.value.validate()
   // 提交请求
   formLoading.value = true
   try {
@@ -213,18 +187,12 @@ const submitForm = async () => {
 /** 重置表单 */
 const resetForm = () => {
   formData.value = {
-#set ($listOperationLastIndex = -1)## 求最后一个需要 , 的地方
-#foreach ($column in $columns)
-  #if ($column.createOperation || $column.updateOperation)
-      #set ($listOperationLastIndex = $foreach.index)
-  #end
-#end
 #foreach ($column in $columns)
   #if ($column.createOperation || $column.updateOperation)
       #if ($column.htmlType == "checkbox")
-    $column.javaField: []#if($foreach.index < $listOperationLastIndex),#end
+    $column.javaField: [],
       #else
-    $column.javaField: undefined#if($foreach.index < $listOperationLastIndex),#end
+    $column.javaField: undefined,
       #end
   #end
 #end

@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.infra.service.codegen.inner;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
@@ -15,6 +14,7 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
@@ -27,7 +27,6 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenFrontTypeEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
-import cn.iocoder.yudao.module.infra.enums.codegen.CodegenTemplateTypeEnum;
 import cn.iocoder.yudao.module.infra.framework.codegen.config.CodegenProperties;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableTable;
@@ -224,9 +223,41 @@ public class CodegenEngine {
                               String filePath, Map<String, Object> bindingMap) {
         filePath = formatFilePath(filePath, bindingMap);
         String content = templateEngine.getTemplate(vmPath).render(bindingMap);
-        // 去除字段后面多余的 , 逗号
-        content = content.replaceAll(",\n}", "\n}").replaceAll(",\n  }", "\n  }");
+        // 格式化代码
+        content = prettyCode(content);
         result.put(filePath, content);
+    }
+
+    /**
+     * 格式化生成后的代码
+     *
+     * 因为尽量让 vm 模版简单，所以统一的处理都在这个方法。
+     * 如果不处理，Vue 的 Pretty 格式校验可能会报错
+     *
+     * @param content 格式化前的代码
+     * @return 格式化后的代码
+     */
+    private String prettyCode(String content) {
+        // Vue 界面：去除字段后面多余的 , 逗号，解决前端的 Pretty 代码格式检查的报错
+        content = content.replaceAll(",\n}", "\n}").replaceAll(",\n  }", "\n  }");
+        // Vue 界面：去除多的 dateFormatter，只有一个的情况下，说明没使用到
+        if (StrUtil.count(content, "dateFormatter") == 1) {
+            content = StrUtils.removeLineContains(content, "dateFormatter");
+        }
+        // Vue 界面：去除多的 dict 相关，只有一个的情况下，说明没使用到
+        if (StrUtil.count(content, "getIntDictOptions") == 1) {
+            content = content.replace("getIntDictOptions, ", "");
+        }
+        if (StrUtil.count(content, "getStrDictOptions") == 1) {
+            content = content.replace("getStrDictOptions, ", "");
+        }
+        if (StrUtil.count(content, "getBoolDictOptions") == 1) {
+            content = content.replace("getBoolDictOptions, ", "");
+        }
+        if (StrUtil.count(content, "DICT_TYPE.") == 0) {
+            content = StrUtils.removeLineContains(content, "DICT_TYPE");
+        }
+        return content;
     }
 
     private Map<String, Object> initBindingMap(CodegenTableDO table, List<CodegenColumnDO> columns,
