@@ -284,7 +284,69 @@ public class CodegenEngineTest extends BaseMockitoUnitTest {
                 .setCreateOperation(false).setUpdateOperation(true).setListOperation(false)
                 .setListOperationResult(true)
                 .setId(200L);
-        List<CodegenColumnDO> addressColumns = Arrays.asList(addressIdColumn, addressStudentIdColumn);
+        CodegenColumnDO addressNameColumn = new CodegenColumnDO().setColumnName("name").setDataType(JdbcType.VARCHAR.name())
+                .setColumnComment("名字").setNullable(false).setPrimaryKey(false)
+                .setOrdinalPosition(3).setJavaType("String").setJavaField("name").setExample("芋头")
+                .setCreateOperation(true).setUpdateOperation(true).setListOperation(true)
+                .setListOperationCondition(CodegenColumnListConditionEnum.LIKE.getCondition()).setListOperationResult(true)
+                .setHtmlType(CodegenColumnHtmlTypeEnum.INPUT.getType());
+        CodegenColumnDO addressAvatarColumn = new CodegenColumnDO().setColumnName("avatar").setDataType(JdbcType.VARCHAR.name())
+                .setColumnComment("头像").setNullable(false).setPrimaryKey(false)
+                .setOrdinalPosition(4).setJavaType("String").setJavaField("avatar").setExample("https://www.iocoder.cn/1.png")
+                .setCreateOperation(true).setUpdateOperation(true).setListOperation(false)
+                .setListOperationResult(true)
+                .setHtmlType(CodegenColumnHtmlTypeEnum.UPLOAD_IMAGE.getType());
+        CodegenColumnDO addressVideoColumn = new CodegenColumnDO().setColumnName("video").setDataType(JdbcType.VARCHAR.name())
+                .setColumnComment("视频").setNullable(false).setPrimaryKey(false)
+                .setOrdinalPosition(5).setJavaType("String").setJavaField("video").setExample("https://www.iocoder.cn/1.mp4")
+                .setCreateOperation(true).setUpdateOperation(true).setListOperation(false)
+                .setListOperationResult(true)
+                .setHtmlType(CodegenColumnHtmlTypeEnum.UPLOAD_FILE.getType());
+        CodegenColumnDO addressDescriptionColumn = new CodegenColumnDO().setColumnName("description").setDataType(JdbcType.VARCHAR.name())
+                .setColumnComment("个人简介").setNullable(false).setPrimaryKey(false)
+                .setOrdinalPosition(6).setJavaType("String").setJavaField("description").setExample("我是介绍")
+                .setCreateOperation(true).setUpdateOperation(true).setListOperation(false)
+                .setListOperationResult(true)
+                .setHtmlType(CodegenColumnHtmlTypeEnum.EDITOR.getType());
+        CodegenColumnDO addressSex1Column = new CodegenColumnDO().setColumnName("sex1").setDataType(JdbcType.VARCHAR.name())
+                .setColumnComment("性别 1").setNullable(false).setPrimaryKey(false)
+                .setOrdinalPosition(7).setJavaType("String").setJavaField("sex1").setExample("男")
+                .setCreateOperation(true).setUpdateOperation(true).setListOperation(true)
+                .setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition()).setListOperationResult(true)
+                .setHtmlType(CodegenColumnHtmlTypeEnum.SELECT.getType()).setDictType("system_sex1");
+        CodegenColumnDO addressSex2Column = new CodegenColumnDO().setColumnName("sex2").setDataType(JdbcType.INTEGER.name())
+                .setColumnComment("性别 2").setNullable(false).setPrimaryKey(false)
+                .setOrdinalPosition(8).setJavaType("Integer").setJavaField("sex2").setExample("1")
+                .setCreateOperation(true).setUpdateOperation(true).setListOperation(true)
+                .setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition()).setListOperationResult(true)
+                .setHtmlType(CodegenColumnHtmlTypeEnum.CHECKBOX.getType()).setDictType("system_sex2");
+        CodegenColumnDO addressSex3Column = new CodegenColumnDO().setColumnName("sex3").setDataType(JdbcType.BOOLEAN.name())
+                .setColumnComment("性别 3").setNullable(false).setPrimaryKey(false)
+                .setOrdinalPosition(9).setJavaType("Boolean").setJavaField("sex3").setExample("true")
+                .setCreateOperation(true).setUpdateOperation(true).setListOperation(true)
+                .setListOperationResult(true)
+                .setHtmlType(CodegenColumnHtmlTypeEnum.RADIO.getType()).setDictType("system_sex3");
+        CodegenColumnDO addressBirthdayColumn = new CodegenColumnDO().setColumnName("birthday").setDataType(JdbcType.DATE.name())
+                .setColumnComment("出生日期").setNullable(false).setPrimaryKey(false)
+                .setOrdinalPosition(10).setJavaType("LocalDateTime").setJavaField("birthday")
+                .setCreateOperation(true).setUpdateOperation(true).setListOperation(true)
+                .setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition()).setListOperationResult(true)
+                .setHtmlType(CodegenColumnHtmlTypeEnum.DATETIME.getType());
+        CodegenColumnDO addressMemoColumn = new CodegenColumnDO().setColumnName("memo").setDataType(JdbcType.VARCHAR.name())
+                .setColumnComment("备注").setNullable(false).setPrimaryKey(false)
+                .setOrdinalPosition(11).setJavaType("String").setJavaField("memo").setExample("我是备注")
+                .setCreateOperation(true).setUpdateOperation(true).setListOperation(false)
+                .setListOperationResult(true)
+                .setHtmlType(CodegenColumnHtmlTypeEnum.TEXTAREA.getType());
+        CodegenColumnDO addressCreateTimeColumn = new CodegenColumnDO().setColumnName("create_time").setDataType(JdbcType.DATE.name())
+                .setColumnComment("创建时间").setNullable(false).setPrimaryKey(false)
+                .setOrdinalPosition(12).setJavaType("LocalDateTime").setJavaField("createTime")
+                .setCreateOperation(false).setUpdateOperation(false).setListOperation(true)
+                .setListOperationCondition(CodegenColumnListConditionEnum.BETWEEN.getCondition()).setListOperationResult(true)
+                .setHtmlType(CodegenColumnHtmlTypeEnum.DATETIME.getType());
+        List<CodegenColumnDO> addressColumns = Arrays.asList(addressIdColumn, addressStudentIdColumn,
+                addressNameColumn, addressAvatarColumn, addressVideoColumn, addressDescriptionColumn,
+                addressSex1Column, addressSex2Column, addressSex3Column, addressBirthdayColumn, addressMemoColumn, addressCreateTimeColumn);
 
         // 调用
         Map<String, String> result = codegenEngine.execute(table, columns,

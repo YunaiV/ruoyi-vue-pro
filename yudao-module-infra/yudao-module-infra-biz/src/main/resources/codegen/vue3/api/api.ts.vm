@@ -75,7 +75,7 @@ export const get${subSimpleClassName}ListBy${SubJoinColumnName} = async (${subJo
 
 // 获得${subTable.classComment}
 export const get${subSimpleClassName}By${SubJoinColumnName} = async (${subJoinColumn.javaField}) => {
-  return await request.get({ url: `${baseURL}/${subSimpleClassName_strikeCase}/get-by-${subJoinColumn_strikeCase}`, ${subJoinColumn.javaField} })
+  return await request.get({ url: `${baseURL}/${subSimpleClassName_strikeCase}/get-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=` + ${subJoinColumn.javaField} })
 }
   #end
 #end

@@ -102,6 +102,21 @@
     #end
 #end
     </el-form>
+## 特殊：主子表专属逻辑
+#if ( $subTables && $subTables.size() > 0 )
+    <!-- 子表的表单 -->
+    <el-tabs v-model="subTabsName">
+    #foreach ($subTable in $subTables)
+      #set ($index = $foreach.count - 1)
+      #set ($subClassNameVar = $subClassNameVars.get($index))
+      #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+      #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
+      <el-tab-pane label="${subTable.classComment}" name="$subClassNameVar">
+        <${subSimpleClassName}Form ref="${subClassNameVar}FormRef" :${subJoinColumn_strikeCase}="formData.id" />
+      </el-tab-pane>
+    #end
+    </el-tabs>
+#end
     <template #footer>
       <el-button @click="submitForm" type="primary" :disabled="formLoading">确 定</el-button>
       <el-button @click="dialogVisible = false">取 消</el-button>
@@ -111,6 +126,10 @@
 <script setup lang="ts">
 import { getIntDictOptions, getStrDictOptions, getBoolDictOptions, DICT_TYPE } from '@/utils/dict'
 import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${classNameVar}'
+## 特殊：主子表专属逻辑
+#foreach ($subSimpleClassName in $subSimpleClassNames)
+import ${subSimpleClassName}Form from './components/${subSimpleClassName}Form.vue'
+#end
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
@@ -139,6 +158,15 @@ const formRules = reactive({
 #end
 })
 const formRef = ref() // 表单 Ref
+## 特殊：主子表专属逻辑
+#if ( $subTables && $subTables.size() > 0 )
+
+/** 子表的表单 */
+const subTabsName = ref('$subClassNameVars.get(0)')
+#foreach ($subClassNameVar in $subClassNameVars)
+const ${subClassNameVar}FormRef = ref()
+#end
+#end
 
 /** 打开弹窗 */
 const open = async (type: string, id?: number) => {
@@ -163,10 +191,33 @@ const emit = defineEmits(['success']) // 定义 success 事件，用于操作成
 const submitForm = async () => {
   // 校验表单
   await formRef.value.validate()
+## 特殊：主子表专属逻辑
+#if ( $subTables && $subTables.size() > 0 )
+  // 校验子表单
+  #foreach ($subTable in $subTables)
+  #set ($index = $foreach.count - 1)
+  #set ($subClassNameVar = $subClassNameVars.get($index))
+  try {
+    await ${subClassNameVar}FormRef.value.validate()
+  } catch (e) {
+    subTabsName.value = '${subClassNameVar}'
+    return
+  }
+  #end
+#end
   // 提交请求
   formLoading.value = true
   try {
     const data = formData.value as unknown as ${simpleClassName}Api.${simpleClassName}VO
+## 特殊：主子表专属逻辑
+#if ( $subTables && $subTables.size() > 0 )
+    // 拼接子表的数据
+  #foreach ($subTable in $subTables)
+  #set ($index = $foreach.count - 1)
+  #set ($subClassNameVar = $subClassNameVars.get($index))
+    data.${subClassNameVar}#if ( $subTable.subJoinMany)s#end = ${subClassNameVar}FormRef.value.getData()
+  #end
+#end
     if (formType.value === 'create') {
       await ${simpleClassName}Api.create${simpleClassName}(data)
       message.success(t('common.createSuccess'))
