@@ -444,6 +444,16 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     /**
+     * 获取所有用户列表
+     *
+     * @return 用户列表
+     */
+    @Override
+    public List<AdminUserDO> getUserList() {
+        return userMapper.selectList();
+    }
+
+    /**
      * 对密码进行加密
      *
      * @param password 密码

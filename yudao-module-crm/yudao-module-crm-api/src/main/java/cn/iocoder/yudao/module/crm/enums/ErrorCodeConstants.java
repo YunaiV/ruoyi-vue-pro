@@ -35,6 +35,7 @@ public interface ErrorCodeConstants {
     // ========== 客户管理 1_020_006_000 ==========
     ErrorCode CUSTOMER_NOT_EXISTS = new ErrorCode(1_020_006_000, "客户不存在");
     ErrorCode CUSTOMER_POOL_CONFIG_ERROR = new ErrorCode(1_020_006_001, "客户公海规则设置不正确");
+    ErrorCode CUSTOMER_LIMIT_CONFIG_NOT_EXISTS = new ErrorCode(1_020_006_002, "客户限制配置不存在");
 
     // ========== 权限管理 1_020_007_000 ==========
     ErrorCode CRM_PERMISSION_NOT_EXISTS = new ErrorCode(1_020_007_000, "数据权限不存在");
