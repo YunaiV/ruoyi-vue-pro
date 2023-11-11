@@ -1,18 +1,16 @@
 package cn.iocoder.yudao.module.crm.convert.contact;
 
+import java.util.*;
+
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.ContactDO;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmTransferPermissionReqBO;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
-import org.mapstruct.factory.Mappers;
-
-import java.util.List;
 
 /**
- * crm 联系人 Convert
+ * crm联系人 Convert
  *
  * @author 芋道源码
  */
@@ -32,11 +30,6 @@ public interface ContactConvert {
     PageResult<ContactRespVO> convertPage(PageResult<ContactDO> page);
 
     List<ContactExcelVO> convertList02(List<ContactDO> list);
-
-    @Mappings({
-            @Mapping(target = "bizId", source = "reqVO.id"),
-            @Mapping(target = "newOwnerUserId", source = "reqVO.id")
-    })
-    CrmTransferPermissionReqBO convert(CrmContactTransferReqVO reqVO, Long userId);
+    List<ContactSimpleRespVO> convertAllList(List<ContactDO> list);
 
 }

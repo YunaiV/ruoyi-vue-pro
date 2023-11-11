@@ -1,15 +1,17 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.contact;
 
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import com.baomidou.mybatisplus.annotation.KeySequence;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.util.*;
 import java.time.LocalDateTime;
+import java.time.LocalDateTime;
+import java.time.LocalDateTime;
+import com.baomidou.mybatisplus.annotation.*;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
- * crm 联系人 DO
+ * crm联系人 DO
  *
  * @author 芋道源码
  */
@@ -23,15 +25,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ContactDO extends BaseDO {
 
-    /**
-     * 主键
-     */
-    @TableId
-    private Long id;
-    /**
-     * 联系人名称
-     */
-    private String name;
     /**
      * 下次联系时间
      */
@@ -49,13 +42,7 @@ public class ContactDO extends BaseDO {
      */
     private String email;
     /**
-     * 职务
-     */
-    private String post;
-    /**
      * 客户编号
-     *
-     * TODO @zyna：关联的字段，也要写下
      */
     private Long customerId;
     /**
@@ -70,5 +57,42 @@ public class ContactDO extends BaseDO {
      * 最后跟进时间
      */
     private LocalDateTime lastTime;
+    /**
+     * 主键
+     */
+    @TableId
+    private Long id;
+    /**
+     * 直属上级
+     */
+    private Long parentId;
+    /**
+     * 姓名
+     */
+    private String name;
+    /**
+     * 职位
+     */
+    private String post;
+    /**
+     * QQ
+     */
+    private Long qq;
+    /**
+     * 微信
+     */
+    private String webchat;
+    /**
+     * 性别
+     */
+    private Integer sex;
+    /**
+     * 是否关键决策人
+     */
+    private Boolean policyMakers;
+    /**
+     * 负责人用户编号
+     */
+    private String ownerUserId;
 
 }

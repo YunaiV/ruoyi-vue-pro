@@ -1,12 +1,10 @@
 package cn.iocoder.yudao.module.crm.service.contact;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import java.util.*;
+import javax.validation.*;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.ContactDO;
-
-import javax.validation.Valid;
-import java.util.Collection;
-import java.util.List;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 /**
  * crm联系人 Service 接口
@@ -19,10 +17,9 @@ public interface ContactService {
      * 创建crm联系人
      *
      * @param createReqVO 创建信息
-     * @param userId      用户编号
      * @return 编号
      */
-    Long createContact(@Valid ContactCreateReqVO createReqVO, Long userId);
+    Long createContact(@Valid ContactCreateReqVO createReqVO);
 
     /**
      * 更新crm联系人
@@ -71,11 +68,8 @@ public interface ContactService {
     List<ContactDO> getContactList(ContactExportReqVO exportReqVO);
 
     /**
-     * 联系人编号
-     *
-     * @param reqVO  请求
-     * @param userId 用户编号
+     * 获取所有联系人列表，只返回姓名和id
+     * @return 所有联系人列表
      */
-    void transferContact(CrmContactTransferReqVO reqVO, Long userId);
-
+    List<ContactDO> allContactList();
 }
