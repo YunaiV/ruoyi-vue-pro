@@ -122,7 +122,7 @@
         :formatter="dateFormatter"
         width="180px"
       />
-        #elseif("" != $column.dictType)## 数据字典
+        #elseif($column.dictType && "" != $column.dictType)## 数据字典
       <el-table-column label="${comment}" align="center" prop="${javaField}">
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="scope.row.${column.javaField}" />
@@ -171,7 +171,7 @@
 import { getIntDictOptions, getStrDictOptions, getBoolDictOptions, DICT_TYPE } from '@/utils/dict'
 import { dateFormatter } from '@/utils/formatTime'
 import download from '@/utils/download'
-import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${classNameVar}'
+import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${table.businessName}'
 import ${simpleClassName}Form from './${simpleClassName}Form.vue'
 
 defineOptions({ name: '${table.className}' })

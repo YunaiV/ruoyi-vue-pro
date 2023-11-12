@@ -43,9 +43,6 @@ public interface ErrorCodeConstants {
     ErrorCode CODEGEN_TABLE_INFO_TABLE_COMMENT_IS_NULL = new ErrorCode(1_003_001_008, "数据库的表注释未填写");
     ErrorCode CODEGEN_TABLE_INFO_COLUMN_COMMENT_IS_NULL = new ErrorCode(1_003_001_009, "数据库的表字段({})注释未填写");
 
-    // ========== 字典类型（测试）1-001-005-000 ==========
-    ErrorCode TEST_DEMO_NOT_EXISTS = new ErrorCode(1_001_005_000, "测试示例不存在");
-
     // ========== 文件配置 1-001-006-000 ==========
     ErrorCode FILE_CONFIG_NOT_EXISTS = new ErrorCode(1_001_006_000, "文件配置不存在");
     ErrorCode FILE_CONFIG_DELETE_FAIL_MASTER = new ErrorCode(1_001_006_001, "该文件配置不允许删除，原因：它是主配置，删除会导致无法上传文件");
@@ -57,4 +54,6 @@ public interface ErrorCodeConstants {
     // ========== 数据源配置 1-001-107-000 ==========
     ErrorCode DEMO_STUDENT_NOT_EXISTS = new ErrorCode(1_001_107_000, "学生不存在");
 
+    // ========== 学生（CodegenTemplateTypeEnum.ONE 示例） 1-001-200-000 ==========
+    ErrorCode DEMO01_STUDENT_NOT_EXISTS = new ErrorCode(1_001_200_000, "学生不存在");
 }

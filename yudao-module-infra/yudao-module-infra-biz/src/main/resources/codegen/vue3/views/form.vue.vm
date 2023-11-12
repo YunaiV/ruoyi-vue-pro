@@ -31,11 +31,11 @@
         <UploadImg v-model="formData.${javaField}" />
       </el-form-item>
         #elseif($column.htmlType == "fileUpload")## 文件上传
-      <el-form-item label="${comment}">
+      <el-form-item label="${comment}" prop="${javaField}">
         <UploadFile v-model="formData.${javaField}" />
       </el-form-item>
         #elseif($column.htmlType == "editor")## 文本编辑器
-      <el-form-item label="${comment}">
+      <el-form-item label="${comment}" prop="${javaField}">
         <Editor v-model="formData.${javaField}" height="150px" />
       </el-form-item>
         #elseif($column.htmlType == "select")## 下拉框
@@ -125,7 +125,7 @@
 </template>
 <script setup lang="ts">
 import { getIntDictOptions, getStrDictOptions, getBoolDictOptions, DICT_TYPE } from '@/utils/dict'
-import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${classNameVar}'
+import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${table.businessName}'
 ## 特殊：主子表专属逻辑
 #foreach ($subSimpleClassName in $subSimpleClassNames)
 import ${subSimpleClassName}Form from './components/${subSimpleClassName}Form.vue'

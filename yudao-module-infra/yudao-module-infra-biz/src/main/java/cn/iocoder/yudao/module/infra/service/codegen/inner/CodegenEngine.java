@@ -110,21 +110,21 @@ public class CodegenEngine {
                     vueFilePath("api/${table.moduleName}/${classNameVar}.js"))
             // Vue3 标准模版
             .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/index.vue"),
-                    vue3FilePath("views/${table.moduleName}/${classNameVar}/index.vue"))
+                    vue3FilePath("views/${table.moduleName}/${table.businessName}/index.vue"))
             .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/form.vue"),
-                    vue3FilePath("views/${table.moduleName}/${classNameVar}/${simpleClassName}Form.vue"))
+                    vue3FilePath("views/${table.moduleName}/${table.businessName}/${simpleClassName}Form.vue"))
             .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/components/form_sub_normal.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${classNameVar}/components/${subSimpleClassName}Form.vue"))
+                    vue3FilePath("views/${table.moduleName}/${table.businessName}/components/${subSimpleClassName}Form.vue"))
             .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/components/form_sub_inner.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${classNameVar}/components/${subSimpleClassName}Form.vue"))
+                    vue3FilePath("views/${table.moduleName}/${table.businessName}/components/${subSimpleClassName}Form.vue"))
             .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/components/form_sub_erp.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${classNameVar}/components/${subSimpleClassName}Form.vue"))
+                    vue3FilePath("views/${table.moduleName}/${table.businessName}/components/${subSimpleClassName}Form.vue"))
             .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/components/list_sub_inner.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${classNameVar}/components/${subSimpleClassName}List.vue"))
+                    vue3FilePath("views/${table.moduleName}/${table.businessName}/components/${subSimpleClassName}List.vue"))
             .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/components/list_sub_erp.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${classNameVar}/components/${subSimpleClassName}List.vue"))
+                    vue3FilePath("views/${table.moduleName}/${table.businessName}/components/${subSimpleClassName}List.vue"))
             .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("api/api.ts"),
-                    vue3FilePath("api/${table.moduleName}/${classNameVar}/index.ts"))
+                    vue3FilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
             // Vue3 Schema 模版
             .put(CodegenFrontTypeEnum.VUE3_SCHEMA.getType(), vue3SchemaTemplatePath("views/data.ts"),
                     vue3FilePath("views/${table.moduleName}/${classNameVar}/${classNameVar}.data.ts"))
