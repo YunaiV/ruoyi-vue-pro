@@ -7,10 +7,14 @@ import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerLimit
 import cn.iocoder.yudao.module.crm.convert.customerlimitconfig.CrmCustomerLimitConfigConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customerlimitconfig.CrmCustomerLimitConfigDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.customerlimitconfig.CrmCustomerLimitConfigMapper;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+
+import java.util.Collection;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CUSTOMER_LIMIT_CONFIG_NOT_EXISTS;
@@ -26,9 +30,14 @@ public class CrmCustomerLimitConfigServiceImpl implements CrmCustomerLimitConfig
 
     @Resource
     private CrmCustomerLimitConfigMapper customerLimitConfigMapper;
+    @Resource
+    private DeptApi deptApi;
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @Override
     public Long createCustomerLimitConfig(CrmCustomerLimitConfigCreateReqVO createReqVO) {
+        validateUserAndDept(createReqVO.getUserIds(), createReqVO.getDeptIds());
         // 插入
         CrmCustomerLimitConfigDO customerLimitConfig = CrmCustomerLimitConfigConvert.INSTANCE.convert(createReqVO);
         customerLimitConfigMapper.insert(customerLimitConfig);
@@ -40,6 +49,7 @@ public class CrmCustomerLimitConfigServiceImpl implements CrmCustomerLimitConfig
     public void updateCustomerLimitConfig(CrmCustomerLimitConfigUpdateReqVO updateReqVO) {
         // 校验存在
         validateCustomerLimitConfigExists(updateReqVO.getId());
+        validateUserAndDept(updateReqVO.getUserIds(), updateReqVO.getDeptIds());
         // 更新
         CrmCustomerLimitConfigDO updateObj = CrmCustomerLimitConfigConvert.INSTANCE.convert(updateReqVO);
         customerLimitConfigMapper.updateById(updateObj);
@@ -67,6 +77,17 @@ public class CrmCustomerLimitConfigServiceImpl implements CrmCustomerLimitConfig
         if (customerLimitConfigMapper.selectById(id) == null) {
             throw exception(CUSTOMER_LIMIT_CONFIG_NOT_EXISTS);
         }
+    }
+
+    /**
+     * 校验入参的用户和部门
+     *
+     * @param userIds 用户 ids
+     * @param deptIds 部门 ids
+     */
+    private void validateUserAndDept(Collection<Long> userIds, Collection<Long> deptIds) {
+        deptApi.validateDeptList(deptIds);
+        adminUserApi.validateUserList(userIds);
     }
 
 }
