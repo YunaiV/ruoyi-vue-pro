@@ -54,6 +54,10 @@ public interface ErrorCodeConstants {
     // ========== 数据源配置 1-001-107-000 ==========
     ErrorCode DEMO_STUDENT_NOT_EXISTS = new ErrorCode(1_001_107_000, "学生不存在");
 
-    // ========== 学生（CodegenTemplateTypeEnum.ONE 示例） 1-001-200-000 ==========
+    // ========== 学生（CodegenTemplateTypeEnum.ONE 示例） 1-001-201-000 ==========
     ErrorCode DEMO01_STUDENT_NOT_EXISTS = new ErrorCode(1_001_200_000, "学生不存在");
+
+    // ========== 学生（CodegenTemplateTypeEnum.ONE 示例） 1-001-211-000 ==========
+    ErrorCode DEMO11_STUDENT_NOT_EXISTS = new ErrorCode(1_001_211_000, "学生不存在");
+
 }

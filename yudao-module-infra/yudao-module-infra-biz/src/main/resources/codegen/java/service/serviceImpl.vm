@@ -25,9 +25,6 @@ import ${basePackage}.module.${subTable.moduleName}.dal.mysql.${subTable.busines
 import static ${ServiceExceptionUtilClassName}.exception;
 import static ${basePackage}.module.${table.moduleName}.enums.ErrorCodeConstants.*;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
-
 /**
  * ${table.classComment} Service 实现类
  *
@@ -58,7 +55,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 ## 特殊：主子表专属逻辑
 #if ( $subTables && $subTables.size() > 0)
 
-        // 插入子表（$subTable.classComment）
+        // 插入子表
 #foreach ($subTable in $subTables)
 #set ($index = $foreach.count - 1)
 #set ($subSimpleClassName = $subSimpleClassNames.get($index))
@@ -210,18 +207,26 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 
     private void update${subSimpleClassName}List(${primaryColumn.javaType} ${subJoinColumn.javaField}, List<${subTable.className}DO> list) {
         delete${subSimpleClassName}By${SubJoinColumnName}(${subJoinColumn.javaField});
+		list.forEach(o -> o.setId(null).setUpdater(null).setUpdateTime(null)); // 解决更新情况下：1）id 冲突；2）updateTime 不更新
         create${subSimpleClassName}List(${subJoinColumn.javaField}, list);
     }
 
     #else
     private void create${subSimpleClassName}(${primaryColumn.javaType} ${subJoinColumn.javaField}, ${subTable.className}DO ${subClassNameVar}) {
+        if (${subClassNameVar} == null) {
+            return;
+        }
         ${subClassNameVar}.set$SubJoinColumnName(${subJoinColumn.javaField});
         ${subClassNameVars.get($index)}Mapper.insert(${subClassNameVar});
     }
 
     private void update${subSimpleClassName}(${primaryColumn.javaType} ${subJoinColumn.javaField}, ${subTable.className}DO ${subClassNameVar}) {
+        if (${subClassNameVar} == null) {
+			return;
+        }
         ${subClassNameVar}.set$SubJoinColumnName(${subJoinColumn.javaField});
-        ${subClassNameVars.get($index)}Mapper.updateById(${subClassNameVar});
+        ${subClassNameVar}.setUpdater(null).setUpdateTime(null); // 解决更新情况下：updateTime 不更新
+        ${subClassNameVars.get($index)}Mapper.insertOrUpdate(${subClassNameVar});
     }
 
     #end

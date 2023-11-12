@@ -253,6 +253,7 @@
       #end
   #end
 #end
+  </el-form>
 #end
 </template>
 <script setup lang="ts">
@@ -278,32 +279,36 @@ const formRef = ref() // 表单 Ref
 watch(
   () => props.${subJoinColumn.javaField},
   async (val) => {
-    // 情况一：val 为空，说明是新增，则置空
-    if (!val) {
+    // 1. 重置表单
 #if ( $subTable.subJoinMany )
-      formData.value = []
+    formData.value = []
 #else
-      formData.value = {
-      #foreach ($column in $subColumns)
-        #if ($column.createOperation || $column.updateOperation)
-          #if ($column.htmlType == "checkbox")
-        $column.javaField: [],
-          #else
-        $column.javaField: undefined,
-          #end
+    formData.value = {
+    #foreach ($column in $subColumns)
+      #if ($column.createOperation || $column.updateOperation)
+        #if ($column.htmlType == "checkbox")
+      $column.javaField: [],
+        #else
+      $column.javaField: undefined,
         #end
       #end
-      }
+    #end
+    }
 #end
+    // 2. val 非空，则加载数据
+    if (!val) {
       return;
     }
-    // 情况二：val 非空，说明是修改，则加载数据
     try {
       formLoading.value = true
 #if ( $subTable.subJoinMany )
       formData.value = await ${simpleClassName}Api.get${subSimpleClassName}ListBy${SubJoinColumnName}(val)
 #else
-      formData.value = await ${simpleClassName}Api.get${subSimpleClassName}By${SubJoinColumnName}(val)
+      const data = await ${simpleClassName}Api.get${subSimpleClassName}By${SubJoinColumnName}(val)
+      if (!data) {
+        return
+      }
+      formData.value = data
 #end
     } finally {
       formLoading.value = false

@@ -128,7 +128,11 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         Db.updateBatchById(entities, size);
     }
 
-    default void saveOrUpdateBatch(Collection<T> collection) {
+    default void insertOrUpdate(T entity) {
+        Db.saveOrUpdate(entity);
+    }
+
+    default void insertOrUpdateBatch(Collection<T> collection) {
         Db.saveOrUpdateBatch(collection);
     }
 
