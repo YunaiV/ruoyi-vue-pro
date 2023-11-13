@@ -15,6 +15,7 @@ import javax.servlet.http.*;
 import java.util.*;
 import java.io.IOException;
 
+import ${PageParamClassName};
 import ${PageResultClassName};
 import ${CommonResultClassName};
 import static ${CommonResultClassName}.success;
@@ -175,7 +176,7 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
 #if ($sceneEnum.scene == 1)
     @PreAuthorize("@ss.hasPermission('${permissionPrefix}:update')")
 #end
-    public CommonResult<Booealn> update${subSimpleClassName}(@Valid @RequestBody ${subTable.className}DO ${subClassNameVar}) {
+    public CommonResult<Boolean> update${subSimpleClassName}(@Valid @RequestBody ${subTable.className}DO ${subClassNameVar}) {
         ${classNameVar}Service.update${subSimpleClassName}(${subClassNameVar});
         return success(true);
     }
@@ -186,8 +187,8 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
 #if ($sceneEnum.scene == 1)
     @PreAuthorize("@ss.hasPermission('${permissionPrefix}:delete')")
 #end
-    public CommonResult<Booealn> delete${subSimpleClassName}(@RequestParam("id") ${subPrimaryColumn.javaType} id) {
-        ${classNameVar}Service.delete${subSimpleClassName}(${subClassNameVar});
+    public CommonResult<Boolean> delete${subSimpleClassName}(@RequestParam("id") ${subPrimaryColumn.javaType} id) {
+        ${classNameVar}Service.delete${subSimpleClassName}(id);
         return success(true);
     }
 

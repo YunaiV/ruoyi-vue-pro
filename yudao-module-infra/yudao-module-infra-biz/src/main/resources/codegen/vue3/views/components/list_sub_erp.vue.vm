@@ -7,6 +7,14 @@
 <template>
   <!-- 列表 -->
   <ContentWrap>
+    <el-button
+      type="primary"
+      plain
+      @click="openForm('create')"
+      v-hasPermi="['${permissionPrefix}:create']"
+    >
+      <Icon icon="ep:plus" class="mr-5px" /> 新增
+    </el-button>
     <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
       #foreach($column in $subColumns)
       #if ($column.listOperationResult)
@@ -66,27 +74,56 @@
     />
     #end
   </ContentWrap>
+
+    <!-- 表单弹窗：添加/修改 -->
+    <${subSimpleClassName}Form ref="formRef" @success="getList" />
 </template>
 
 <script setup lang="ts">
 import { getIntDictOptions, getStrDictOptions, getBoolDictOptions, DICT_TYPE } from '@/utils/dict'
 import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${table.businessName}'
+import ${subSimpleClassName}Form from './${subSimpleClassName}Form.vue'
+
+const { t } = useI18n() // 国际化
+const message = useMessage() // 消息弹窗
+
 const props = defineProps<{
   ${subJoinColumn.javaField}: undefined // ${subJoinColumn.columnComment}（主表的关联字段）
 }>()
-const loading = ref(true) // 列表的加载中
+const loading = ref(false) // 列表的加载中
 const list = ref([]) // 列表的数据
+#if ($table.templateType == 11)
+const total = ref(0) // 列表的总页数
+const queryParams = reactive({
+  pageNo: 1,
+  pageSize: 10,
+  ${subJoinColumn.javaField}: undefined
+})
+
+/** 监听主表的关联字段的变化，加载对应的子表数据 */
+watch(
+  () => props.${subJoinColumn.javaField},
+  (val) => {
+    queryParams.${subJoinColumn.javaField} = val
+    handleQuery()
+  },
+  { immediate: false }
+)
+#end
 
 /** 查询列表 */
 const getList = async () => {
   loading.value = true
   try {
 #if ($table.templateType == 11)
+    const data = await ${simpleClassName}Api.get${subSimpleClassName}Page(queryParams)
+    list.value = data.list
+    total.value = data.total
 #else
   #if ( $subTable.subJoinMany )
-    list.value = await ${simpleClassName}Api.get${subSimpleClassName}ListBy${SubJoinColumnName}(${subJoinColumn.javaField}.props)
+    list.value = await ${simpleClassName}Api.get${subSimpleClassName}ListBy${SubJoinColumnName}(props.${subJoinColumn.javaField})
   #else
-    const data = await ${simpleClassName}Api.get${subSimpleClassName}By${SubJoinColumnName}(${subJoinColumn.javaField}.props)
+    const data = await ${simpleClassName}Api.get${subSimpleClassName}By${SubJoinColumnName}(props.${subJoinColumn.javaField})
     if (!data) {
       return
     }
@@ -98,8 +135,41 @@ const getList = async () => {
   }
 }
 
+/** 搜索按钮操作 */
+const handleQuery = () => {
+  queryParams.pageNo = 1
+  getList()
+}
+#if ($table.templateType == 11)
+
+/** 添加/修改操作 */
+const formRef = ref()
+const openForm = (type: string, id?: number) => {
+  if (!props.${subJoinColumn.javaField}) {
+    message.error('请选择一个${table.classComment}')
+    return
+  }
+  formRef.value.open(type, id, props.${subJoinColumn.javaField})
+}
+
+/** 删除按钮操作 */
+const handleDelete = async (id: number) => {
+  try {
+    // 删除的二次确认
+    await message.delConfirm()
+    // 发起删除
+    await ${simpleClassName}Api.delete${subSimpleClassName}(id)
+    message.success(t('common.delSuccess'))
+    // 刷新列表
+    await getList()
+  } catch {}
+}
+#end
+#if ($table.templateType != 11)
+
 /** 初始化 **/
 onMounted(() => {
   getList()
 })
+#end
 </script>

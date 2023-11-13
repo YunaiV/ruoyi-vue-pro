@@ -13,6 +13,7 @@ import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.business
 import ${basePackage}.module.${subTable.moduleName}.dal.dataobject.${subTable.businessName}.${subTable.className}DO;
 #end
 import ${PageResultClassName};
+import ${PageParamClassName};
 
 import ${basePackage}.module.${table.moduleName}.convert.${table.businessName}.${table.className}Convert;
 import ${basePackage}.module.${table.moduleName}.dal.mysql.${table.businessName}.${table.className}Mapper;
@@ -44,16 +45,16 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #end
 
     @Override
-## 特殊：主子表专属逻辑
-#if ( $subTables && $subTables.size() > 0 )
+## 特殊：主子表专属逻辑（非 ERP 模式）
+#if ( $subTables && $subTables.size() > 0 && $table.templateType != 11 )
     @Transactional(rollbackFor = Exception.class)
 #end
     public ${primaryColumn.javaType} create${simpleClassName}(${sceneEnum.prefixClass}${table.className}CreateReqVO createReqVO) {
         // 插入
         ${table.className}DO ${classNameVar} = ${table.className}Convert.INSTANCE.convert(createReqVO);
         ${classNameVar}Mapper.insert(${classNameVar});
-## 特殊：主子表专属逻辑
-#if ( $subTables && $subTables.size() > 0)
+## 特殊：主子表专属逻辑（非 ERP 模式）
+#if ( $subTables && $subTables.size() > 0 && $table.templateType != 11 )
 
         // 插入子表
 #foreach ($subTable in $subTables)
@@ -73,8 +74,8 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
     }
 
     @Override
-## 特殊：主子表专属逻辑
-#if ( $subTables && $subTables.size() > 0)
+## 特殊：主子表专属逻辑（非 ERP 模式）
+#if ( $subTables && $subTables.size() > 0 && $table.templateType != 11 )
     @Transactional(rollbackFor = Exception.class)
 #end
     public void update${simpleClassName}(${sceneEnum.prefixClass}${table.className}UpdateReqVO updateReqVO) {
@@ -83,8 +84,8 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         // 更新
         ${table.className}DO updateObj = ${table.className}Convert.INSTANCE.convert(updateReqVO);
         ${classNameVar}Mapper.updateById(updateObj);
-## 特殊：主子表专属逻辑
-#if ( $subTables && $subTables.size() > 0)
+## 特殊：主子表专属逻辑（非 ERP 模式）
+#if ( $subTables && $subTables.size() > 0 && $table.templateType != 11)
 
         // 更新子表
 #foreach ($subTable in $subTables)
@@ -182,13 +183,13 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 ## 情况一：MASTER_ERP 时，支持单个的新增、修改、删除操作
 #if ( $table.templateType == 11 )
     @Override
-    public ${subPrimaryColumn.javaType} create${subSimpleClassName}(@Valid ${subTable.className}DO ${subClassNameVar}) {
+    public ${subPrimaryColumn.javaType} create${subSimpleClassName}(${subTable.className}DO ${subClassNameVar}) {
         ${subClassNameVars.get($index)}Mapper.insert(${subClassNameVar});
         return ${subClassNameVar}.getId();
     }
 
     @Override
-    public void update${subSimpleClassName}(@Valid ${subTable.className}DO ${subClassNameVar}) {
+    public void update${subSimpleClassName}(${subTable.className}DO ${subClassNameVar}) {
         ${subClassNameVars.get($index)}Mapper.updateById(${subClassNameVar});
     }
 
@@ -230,10 +231,10 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
     }
 
     #end
+#end
     private void delete${subSimpleClassName}By${SubJoinColumnName}(${primaryColumn.javaType} ${subJoinColumn.javaField}) {
         ${subClassNameVars.get($index)}Mapper.deleteBy${SubJoinColumnName}(${subJoinColumn.javaField});
     }
 
-#end
 #end
 }

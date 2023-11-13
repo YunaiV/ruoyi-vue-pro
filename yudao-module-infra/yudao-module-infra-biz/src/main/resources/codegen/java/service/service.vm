@@ -9,6 +9,7 @@ import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.business
 import ${basePackage}.module.${subTable.moduleName}.dal.dataobject.${subTable.businessName}.${subTable.className}DO;
 #end
 import ${PageResultClassName};
+import ${PageParamClassName};
 
 /**
  * ${table.classComment} Service 接口
@@ -83,7 +84,7 @@ public interface ${table.className}Service {
      * @param ${subJoinColumn.javaField} ${subJoinColumn.columnComment}
      * @return ${subTable.classComment}分页
      */
-    PageResult<${subTable.className}DO> get${subSimpleClassName}Page(PageParam pageReqVO, ${subJoinColumn.javaType} ${subJoinColumn.javaField})
+    PageResult<${subTable.className}DO> get${subSimpleClassName}Page(PageParam pageReqVO, ${subJoinColumn.javaType} ${subJoinColumn.javaField});
 
 ## 情况二：非 MASTER_ERP 时，需要列表查询子表
 #else

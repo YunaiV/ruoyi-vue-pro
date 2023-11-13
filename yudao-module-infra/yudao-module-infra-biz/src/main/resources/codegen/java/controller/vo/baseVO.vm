@@ -42,7 +42,9 @@ public class ${sceneEnum.prefixClass}${table.className}BaseVO {
 
 #end
 #end
-## 特殊：主子表专属逻辑
+## 特殊：主子表专属逻辑（非 ERP 模式）
+#if ( $subTables && $subTables.size() > 0 && $table.templateType != 11 )
+
 #foreach ($subTable in $subTables)
 #set ($index = $foreach.count - 1)
     #if ( $subTable.subJoinMany)
@@ -52,5 +54,6 @@ public class ${sceneEnum.prefixClass}${table.className}BaseVO {
     private ${subTable.className}DO ${subClassNameVars.get($index)};
 
     #end
+#end
 #end
 }

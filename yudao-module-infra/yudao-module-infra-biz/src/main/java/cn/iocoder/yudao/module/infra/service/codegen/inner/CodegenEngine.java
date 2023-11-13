@@ -337,7 +337,7 @@ public class CodegenEngine {
                 String subSimpleClassName = removePrefix(subTable.getClassName(), upperFirst(subTable.getModuleName()));
                 subSimpleClassNames.add(subSimpleClassName);
                 subClassNameVars.add(lowerFirst(subSimpleClassName)); // 将 DictType 转换成 dictType，用于变量
-                subSimpleClassNameStrikeCases.add(toSymbolCase(simpleClassName, '-')); // 将 DictType 转换成 dict-type
+                subSimpleClassNameStrikeCases.add(toSymbolCase(subSimpleClassName, '-')); // 将 DictType 转换成 dict-type
             }
             bindingMap.put("subPrimaryColumns", subPrimaryColumns);
             bindingMap.put("subJoinColumns", subJoinColumns);

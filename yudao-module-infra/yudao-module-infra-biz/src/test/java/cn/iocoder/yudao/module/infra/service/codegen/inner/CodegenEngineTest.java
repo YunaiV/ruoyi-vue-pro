@@ -469,7 +469,8 @@ public class CodegenEngineTest extends BaseMockitoUnitTest {
                 .setTableName("infra_demo12_student").setTableComment("学生表")
                 .setModuleName("infra").setBusinessName("demo12").setClassName("InfraDemo12Student")
                 .setClassComment("学生").setAuthor("芋道源码")
-                .setTemplateType(CodegenTemplateTypeEnum.MASTER_INNER.getType())
+//                .setTemplateType(CodegenTemplateTypeEnum.MASTER_INNER.getType())
+                .setTemplateType(CodegenTemplateTypeEnum.MASTER_ERP.getType())
                 .setFrontType(CodegenFrontTypeEnum.VUE3.getType());
         CodegenColumnDO idColumn = new CodegenColumnDO().setColumnName("id").setDataType(JdbcType.BIGINT.name())
                 .setId(100L)
