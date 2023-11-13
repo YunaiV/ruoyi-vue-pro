@@ -1,22 +1,145 @@
-#set ($subTable = $subTables.get($subIndex))##当前表
-#set ($subColumns = $subColumnsList.get($subIndex))##当前字段数组
-#set ($subJoinColumn = $subJoinColumns.get($subIndex))##当前 join 字段
-#set ($subSimpleClassName = $subSimpleClassNames.get($subIndex))
-#set ($subJoinColumn = $subJoinColumns.get($subIndex))##当前 join 字段
-#set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
 <template>
+  <ContentWrap>
+    <!-- 搜索工作栏 -->
+    <el-form
+      class="-mb-15px"
+      :model="queryParams"
+      ref="queryFormRef"
+      :inline="true"
+      label-width="68px"
+    >
+    #foreach($column in $columns)
+        #if ($column.listOperation)
+            #set ($dictType = $column.dictType)
+            #set ($javaField = $column.javaField)
+            #set ($javaType = $column.javaType)
+            #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+            #set ($comment = $column.columnComment)
+            #set ($dictMethod = "getDictOptions")## 计算使用哪个 dict 字典方法
+            #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+                #set ($dictMethod = "getIntDictOptions")
+            #elseif ($javaType == "String")
+                #set ($dictMethod = "getStrDictOptions")
+            #elseif ($javaType == "Boolean")
+                #set ($dictMethod = "getBoolDictOptions")
+            #end
+            #if ($column.htmlType == "input")
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-input
+          v-model="queryParams.${javaField}"
+          placeholder="请输入${comment}"
+          clearable
+          @keyup.enter="handleQuery"
+          class="!w-240px"
+        />
+      </el-form-item>
+            #elseif ($column.htmlType == "select" || $column.htmlType == "radio")
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-select
+          v-model="queryParams.${javaField}"
+          placeholder="请选择${comment}"
+          clearable
+          class="!w-240px"
+        >
+                #if ("" != $dictType)## 设置了 dictType 数据字典的情况
+          <el-option
+            v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+          />
+                #else## 未设置 dictType 数据字典的情况
+          <el-option label="请选择字典生成" value="" />
+                #end
+        </el-select>
+      </el-form-item>
+    #elseif($column.htmlType == "datetime")
+      #if ($column.listOperationCondition != "BETWEEN")## 非范围
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-date-picker
+          v-model="queryParams.${javaField}"
+          value-format="YYYY-MM-DD"
+          type="date"
+          placeholder="选择${comment}"
+          clearable
+          class="!w-240px"
+        />
+      </el-form-item>
+      #else## 范围
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-date-picker
+          v-model="queryParams.${javaField}"
+          value-format="YYYY-MM-DD HH:mm:ss"
+          type="daterange"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          :default-time="[new Date('1 00:00:00'), new Date('1 23:59:59')]"
+          class="!w-240px"
+        />
+      </el-form-item>
+      #end
+    #end
+    #end
+    #end
+      <el-form-item>
+        <el-button @click="handleQuery"><Icon icon="ep:search" class="mr-5px" /> 搜索</el-button>
+        <el-button @click="resetQuery"><Icon icon="ep:refresh" class="mr-5px" /> 重置</el-button>
+        <el-button
+          type="primary"
+          plain
+          @click="openForm('create')"
+          v-hasPermi="['${permissionPrefix}:create']"
+        >
+          <Icon icon="ep:plus" class="mr-5px" /> 新增
+        </el-button>
+        <el-button
+          type="success"
+          plain
+          @click="handleExport"
+          :loading="exportLoading"
+          v-hasPermi="['${permissionPrefix}:export']"
+        >
+          <Icon icon="ep:download" class="mr-5px" /> 导出
+        </el-button>
+      </el-form-item>
+    </el-form>
+  </ContentWrap>
+
   <!-- 列表 -->
   <ContentWrap>
-    <el-button
-      type="primary"
-      plain
-      @click="openForm('create')"
-      v-hasPermi="['${permissionPrefix}:create']"
+## 特殊：主子表专属逻辑
+#if ( $table.templateType == 11 && $subTables && $subTables.size() > 0 )
+    <el-table
+      v-loading="loading"
+      :data="list"
+      :stripe="true"
+      :show-overflow-tooltip="true"
+      highlight-current-row
+      @current-change="handleCurrentChange"
     >
-      <Icon icon="ep:plus" class="mr-5px" /> 新增
-    </el-button>
+#else
     <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
-      #foreach($column in $subColumns)
+#end
+## 特殊：主子表专属逻辑
+#if ( $table.templateType == 12 && $subTables && $subTables.size() > 0 )
+      <!-- 子表的列表 -->
+      <el-table-column type="expand">
+        <template #default="scope">
+          <el-tabs model-value="$subClassNameVars.get(0)">
+            #foreach ($subTable in $subTables)
+              #set ($index = $foreach.count - 1)
+              #set ($subClassNameVar = $subClassNameVars.get($index))
+              #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+              #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
+            <el-tab-pane label="${subTable.classComment}" name="$subClassNameVar">
+              <${subSimpleClassName}List :${subJoinColumn_strikeCase}="scope.row.id" />
+            </el-tab-pane>
+            #end
+          </el-tabs>
+        </template>
+      </el-table-column>
+#end
+      #foreach($column in $columns)
       #if ($column.listOperationResult)
         #set ($dictType=$column.dictType)
         #set ($javaField = $column.javaField)
@@ -41,7 +164,6 @@
         #end
       #end
     #end
-    #if ($table.templateType == 11)
       <el-table-column label="操作" align="center">
         <template #default="scope">
           <el-button
@@ -62,9 +184,7 @@
           </el-button>
         </template>
       </el-table-column>
-    #end
     </el-table>
-    #if ($table.templateType == 11)
     <!-- 分页 -->
     <Pagination
       :total="total"
@@ -72,64 +192,72 @@
       v-model:limit="queryParams.pageSize"
       @pagination="getList"
     />
-    #end
   </ContentWrap>
 
-    <!-- 表单弹窗：添加/修改 -->
-    <${subSimpleClassName}Form ref="formRef" @success="getList" />
+  <!-- 表单弹窗：添加/修改 -->
+  <${simpleClassName}Form ref="formRef" @success="getList" />
+## 特殊：主子表专属逻辑
+#if ( $table.templateType == 11 && $subTables && $subTables.size() > 0 )
+  <!-- 子表的列表 -->
+  <ContentWrap>
+    <el-tabs model-value="$subClassNameVars.get(0)">
+      #foreach ($subTable in $subTables)
+        #set ($index = $foreach.count - 1)
+        #set ($subClassNameVar = $subClassNameVars.get($index))
+        #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+        #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
+      <el-tab-pane label="${subTable.classComment}" name="$subClassNameVar">
+        <${subSimpleClassName}List :${subJoinColumn_strikeCase}="currentRow.id" />
+      </el-tab-pane>
+      #end
+    </el-tabs>
+  </ContentWrap>
+#end
 </template>
 
 <script setup lang="ts">
 import { getIntDictOptions, getStrDictOptions, getBoolDictOptions, DICT_TYPE } from '@/utils/dict'
+import { dateFormatter } from '@/utils/formatTime'
+import download from '@/utils/download'
 import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${table.businessName}'
-import ${subSimpleClassName}Form from './${subSimpleClassName}Form.vue'
+import ${simpleClassName}Form from './${simpleClassName}Form.vue'
+## 特殊：主子表专属逻辑
+#foreach ($subSimpleClassName in $subSimpleClassNames)
+import ${subSimpleClassName}List from './components/${subSimpleClassName}List.vue'
+#end
 
-const { t } = useI18n() // 国际化
+defineOptions({ name: '${table.className}' })
+
 const message = useMessage() // 消息弹窗
+const { t } = useI18n() // 国际化
 
-const props = defineProps<{
-  ${subJoinColumn.javaField}: undefined // ${subJoinColumn.columnComment}（主表的关联字段）
-}>()
-const loading = ref(false) // 列表的加载中
-const list = ref([]) // 列表的数据
-#if ($table.templateType == 11)
+const loading = ref(true) // 列表的加载中
 const total = ref(0) // 列表的总页数
+const list = ref([]) // 列表的数据
 const queryParams = reactive({
   pageNo: 1,
   pageSize: 10,
-  ${subJoinColumn.javaField}: undefined
+  #foreach ($column in $columns)
+    #if ($column.listOperation)
+      #if ($column.listOperationCondition != 'BETWEEN')
+  $column.javaField: null,
+  #end
+      #if ($column.htmlType == "datetime" || $column.listOperationCondition == "BETWEEN")
+  $column.javaField: [],
+      #end
+    #end
+  #end
 })
-
-/** 监听主表的关联字段的变化，加载对应的子表数据 */
-watch(
-  () => props.${subJoinColumn.javaField},
-  (val) => {
-    queryParams.${subJoinColumn.javaField} = val
-    handleQuery()
-  },
-  { immediate: false }
-)
-#end
+const queryFormRef = ref() // 搜索的表单
+const exportLoading = ref(false) // 导出的加载中
 
 /** 查询列表 */
 const getList = async () => {
   loading.value = true
   try {
-#if ($table.templateType == 11)
-    const data = await ${simpleClassName}Api.get${subSimpleClassName}Page(queryParams)
+    const data = await ${simpleClassName}Api.get${simpleClassName}Page(queryParams)
     list.value = data.list
     total.value = data.total
-#else
-  #if ( $subTable.subJoinMany )
-    list.value = await ${simpleClassName}Api.get${subSimpleClassName}ListBy${SubJoinColumnName}(props.${subJoinColumn.javaField})
-  #else
-    const data = await ${simpleClassName}Api.get${subSimpleClassName}By${SubJoinColumnName}(props.${subJoinColumn.javaField})
-    if (!data) {
-      return
-    }
-    list.value.push(data)
-  #end
-#end
   } finally {
     loading.value = false
   }
@@ -140,16 +268,17 @@ const handleQuery = () => {
   queryParams.pageNo = 1
   getList()
 }
-#if ($table.templateType == 11)
+
+/** 重置按钮操作 */
+const resetQuery = () => {
+  queryFormRef.value.resetFields()
+  handleQuery()
+}
 
 /** 添加/修改操作 */
 const formRef = ref()
 const openForm = (type: string, id?: number) => {
-  if (!props.${subJoinColumn.javaField}) {
-    message.error('请选择一个${table.classComment}')
-    return
-  }
-  formRef.value.open(type, id, props.${subJoinColumn.javaField})
+  formRef.value.open(type, id)
 }
 
 /** 删除按钮操作 */
@@ -158,18 +287,39 @@ const handleDelete = async (id: number) => {
     // 删除的二次确认
     await message.delConfirm()
     // 发起删除
-    await ${simpleClassName}Api.delete${subSimpleClassName}(id)
+    await ${simpleClassName}Api.delete${simpleClassName}(id)
     message.success(t('common.delSuccess'))
     // 刷新列表
     await getList()
   } catch {}
 }
+
+/** 导出按钮操作 */
+const handleExport = async () => {
+  try {
+    // 导出的二次确认
+    await message.exportConfirm()
+    // 发起导出
+    exportLoading.value = true
+    const data = await ${simpleClassName}Api.export${simpleClassName}(queryParams)
+    download.excel(data, '${table.classComment}.xls')
+  } catch {
+  } finally {
+    exportLoading.value = false
+  }
+}
+## 特殊：主子表专属逻辑
+#if ( $table.templateType == 11 )
+
+/** 选中行操作 */
+const currentRow = ref({}) // 选中行
+const handleCurrentChange = (row) => {
+  currentRow.value = row
+}
 #end
-#if ($table.templateType != 11)
 
 /** 初始化 **/
 onMounted(() => {
   getList()
 })
-#end
 </script>
