@@ -467,7 +467,7 @@ public class CodegenEngineTest extends BaseMockitoUnitTest {
         // 主表
         CodegenTableDO table = new CodegenTableDO().setScene(CodegenSceneEnum.ADMIN.getScene()).setParentMenuId(888L)
                 .setTableName("infra_demo12_student").setTableComment("学生表")
-                .setModuleName("infra").setBusinessName("demo12").setClassName("InfraDemo11Student")
+                .setModuleName("infra").setBusinessName("demo12").setClassName("InfraDemo12Student")
                 .setClassComment("学生").setAuthor("芋道源码")
                 .setTemplateType(CodegenTemplateTypeEnum.MASTER_INNER.getType())
                 .setFrontType(CodegenFrontTypeEnum.VUE3.getType());
@@ -549,7 +549,7 @@ public class CodegenEngineTest extends BaseMockitoUnitTest {
         // 子表（联系人）
         CodegenTableDO contactTable = new CodegenTableDO().setScene(CodegenSceneEnum.ADMIN.getScene())
                 .setTableName("infra_demo12_student_contact").setTableComment("学生联系人表")
-                .setModuleName("infra").setBusinessName("demo12").setClassName("InfraDemo11StudentContact")
+                .setModuleName("infra").setBusinessName("demo12").setClassName("InfraDemo12StudentContact")
                 .setClassComment("学生联系人").setAuthor("芋道源码")
                 .setTemplateType(CodegenTemplateTypeEnum.SUB.getType())
                 .setFrontType(CodegenFrontTypeEnum.VUE3.getType())
@@ -639,7 +639,7 @@ public class CodegenEngineTest extends BaseMockitoUnitTest {
         // 子表（班主任）
         CodegenTableDO teacherTable = new CodegenTableDO().setScene(CodegenSceneEnum.ADMIN.getScene())
                 .setTableName("infra_demo12_student_teacher").setTableComment("学生班主任表")
-                .setModuleName("infra").setBusinessName("demo12").setClassName("InfraDemo11StudentTeacher")
+                .setModuleName("infra").setBusinessName("demo12").setClassName("InfraDemo12StudentTeacher")
                 .setClassComment("学生班主任").setAuthor("芋道源码")
                 .setTemplateType(CodegenTemplateTypeEnum.SUB.getType())
                 .setFrontType(CodegenFrontTypeEnum.VUE3.getType())
