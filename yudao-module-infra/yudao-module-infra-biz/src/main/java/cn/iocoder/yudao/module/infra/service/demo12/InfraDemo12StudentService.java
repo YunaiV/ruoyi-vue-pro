@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.demo12.InfraDemo12StudentDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo12.InfraDemo12StudentContactDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo12.InfraDemo12StudentTeacherDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 
 /**
  * 学生 Service 接口
@@ -65,22 +66,84 @@ public interface InfraDemo12StudentService {
     // ==================== 子表（学生联系人） ====================
 
     /**
-     * 获得学生联系人列表
+     * 获得学生联系人分页
      *
+     * @param pageReqVO 分页查询
      * @param studentId 学生编号
-     * @return 学生联系人列表
+     * @return 学生联系人分页
      */
-    List<InfraDemo12StudentContactDO> getDemo12StudentContactListByStudentId(Long studentId);
+    PageResult<InfraDemo12StudentContactDO> getDemo12StudentContactPage(PageParam pageReqVO, Long studentId);
+
+    /**
+     * 创建学生联系人
+     *
+     * @param demo12StudentContact 创建信息
+     * @return 编号
+     */
+    Long createDemo12StudentContact(@Valid InfraDemo12StudentContactDO demo12StudentContact);
+
+    /**
+     * 更新学生联系人
+     *
+     * @param demo12StudentContact 更新信息
+     */
+    void updateDemo12StudentContact(@Valid InfraDemo12StudentContactDO demo12StudentContact);
+
+    /**
+     * 删除学生联系人
+     *
+     * @param id 编号
+     */
+    void deleteDemo12StudentContact(Long id);
+
+	/**
+	 * 获得学生联系人
+	 *
+	 * @param id 编号
+     * @return 学生联系人
+	 */
+    InfraDemo12StudentContactDO getDemo12StudentContact(Long id);
 
 
     // ==================== 子表（学生班主任） ====================
 
     /**
-     * 获得学生班主任
+     * 获得学生班主任分页
      *
+     * @param pageReqVO 分页查询
      * @param studentId 学生编号
-     * @return 学生班主任
+     * @return 学生班主任分页
      */
-    InfraDemo12StudentTeacherDO getDemo12StudentTeacherByStudentId(Long studentId);
+    PageResult<InfraDemo12StudentTeacherDO> getDemo12StudentTeacherPage(PageParam pageReqVO, Long studentId);
+
+    /**
+     * 创建学生班主任
+     *
+     * @param demo12StudentTeacher 创建信息
+     * @return 编号
+     */
+    Long createDemo12StudentTeacher(@Valid InfraDemo12StudentTeacherDO demo12StudentTeacher);
+
+    /**
+     * 更新学生班主任
+     *
+     * @param demo12StudentTeacher 更新信息
+     */
+    void updateDemo12StudentTeacher(@Valid InfraDemo12StudentTeacherDO demo12StudentTeacher);
+
+    /**
+     * 删除学生班主任
+     *
+     * @param id 编号
+     */
+    void deleteDemo12StudentTeacher(Long id);
+
+	/**
+	 * 获得学生班主任
+	 *
+	 * @param id 编号
+     * @return 学生班主任
+	 */
+    InfraDemo12StudentTeacherDO getDemo12StudentTeacher(Long id);
 
 }

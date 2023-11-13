@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.demo12.InfraDemo12StudentDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo12.InfraDemo12StudentContactDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo12.InfraDemo12StudentTeacherDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 
 import cn.iocoder.yudao.module.infra.convert.demo12.InfraDemo12StudentConvert;
 import cn.iocoder.yudao.module.infra.dal.mysql.demo12.InfraDemo12StudentMapper;
@@ -37,31 +38,21 @@ public class InfraDemo12StudentServiceImpl implements InfraDemo12StudentService 
     private InfraDemo12StudentTeacherMapper demo12StudentTeacherMapper;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public Long createDemo12Student(InfraDemo12StudentCreateReqVO createReqVO) {
         // 插入
         InfraDemo12StudentDO demo12Student = InfraDemo12StudentConvert.INSTANCE.convert(createReqVO);
         demo12StudentMapper.insert(demo12Student);
-
-        // 插入子表
-        createDemo12StudentContactList(demo12Student.getId(), createReqVO.getDemo12StudentContacts());
-        createDemo12StudentTeacher(demo12Student.getId(), createReqVO.getDemo12StudentTeacher());
         // 返回
         return demo12Student.getId();
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void updateDemo12Student(InfraDemo12StudentUpdateReqVO updateReqVO) {
         // 校验存在
         validateDemo12StudentExists(updateReqVO.getId());
         // 更新
         InfraDemo12StudentDO updateObj = InfraDemo12StudentConvert.INSTANCE.convert(updateReqVO);
         demo12StudentMapper.updateById(updateObj);
-
-        // 更新子表
-        updateDemo12StudentContactList(updateReqVO.getId(), updateReqVO.getDemo12StudentContacts());
-        updateDemo12StudentTeacher(updateReqVO.getId(), updateReqVO.getDemo12StudentTeacher());
     }
 
     @Override
@@ -101,20 +92,30 @@ public class InfraDemo12StudentServiceImpl implements InfraDemo12StudentService 
     // ==================== 子表（学生联系人） ====================
 
     @Override
-    public List<InfraDemo12StudentContactDO> getDemo12StudentContactListByStudentId(Long studentId) {
-        return demo12StudentContactMapper.selectListByStudentId(studentId);
+    public PageResult<InfraDemo12StudentContactDO> getDemo12StudentContactPage(PageParam pageReqVO, Long studentId) {
+        return demo12StudentContactMapper.selectPage(pageReqVO, studentId);
     }
 
-    private void createDemo12StudentContactList(Long studentId, List<InfraDemo12StudentContactDO> list) {
-        list.forEach(o -> o.setStudentId(studentId));
-        demo12StudentContactMapper.insertBatch(list);
+    @Override
+    public Long createDemo12StudentContact(InfraDemo12StudentContactDO demo12StudentContact) {
+        demo12StudentContactMapper.insert(demo12StudentContact);
+        return demo12StudentContact.getId();
     }
 
-    private void updateDemo12StudentContactList(Long studentId, List<InfraDemo12StudentContactDO> list) {
-        deleteDemo12StudentContactByStudentId(studentId);
-		list.forEach(o -> o.setId(null).setUpdater(null).setUpdateTime(null)); // 解决更新情况下：1）id 冲突；2）updateTime 不更新
-        createDemo12StudentContactList(studentId, list);
+    @Override
+    public void updateDemo12StudentContact(InfraDemo12StudentContactDO demo12StudentContact) {
+        demo12StudentContactMapper.updateById(demo12StudentContact);
     }
+
+    @Override
+    public void deleteDemo12StudentContact(Long id) {
+        demo12StudentContactMapper.deleteById(id);
+    }
+
+	@Override
+	public InfraDemo12StudentContactDO getDemo12StudentContact(Long id) {
+        return demo12StudentContactMapper.selectById(id);
+	}
 
     private void deleteDemo12StudentContactByStudentId(Long studentId) {
         demo12StudentContactMapper.deleteByStudentId(studentId);
@@ -123,26 +124,30 @@ public class InfraDemo12StudentServiceImpl implements InfraDemo12StudentService 
     // ==================== 子表（学生班主任） ====================
 
     @Override
-    public InfraDemo12StudentTeacherDO getDemo12StudentTeacherByStudentId(Long studentId) {
-        return demo12StudentTeacherMapper.selectByStudentId(studentId);
+    public PageResult<InfraDemo12StudentTeacherDO> getDemo12StudentTeacherPage(PageParam pageReqVO, Long studentId) {
+        return demo12StudentTeacherMapper.selectPage(pageReqVO, studentId);
     }
 
-    private void createDemo12StudentTeacher(Long studentId, InfraDemo12StudentTeacherDO demo12StudentTeacher) {
-        if (demo12StudentTeacher == null) {
-            return;
-        }
-        demo12StudentTeacher.setStudentId(studentId);
+    @Override
+    public Long createDemo12StudentTeacher(InfraDemo12StudentTeacherDO demo12StudentTeacher) {
         demo12StudentTeacherMapper.insert(demo12StudentTeacher);
+        return demo12StudentTeacher.getId();
     }
 
-    private void updateDemo12StudentTeacher(Long studentId, InfraDemo12StudentTeacherDO demo12StudentTeacher) {
-        if (demo12StudentTeacher == null) {
-			return;
-        }
-        demo12StudentTeacher.setStudentId(studentId);
-        demo12StudentTeacher.setUpdater(null).setUpdateTime(null); // 解决更新情况下：updateTime 不更新
-        demo12StudentTeacherMapper.insertOrUpdate(demo12StudentTeacher);
+    @Override
+    public void updateDemo12StudentTeacher(InfraDemo12StudentTeacherDO demo12StudentTeacher) {
+        demo12StudentTeacherMapper.updateById(demo12StudentTeacher);
     }
+
+    @Override
+    public void deleteDemo12StudentTeacher(Long id) {
+        demo12StudentTeacherMapper.deleteById(id);
+    }
+
+	@Override
+	public InfraDemo12StudentTeacherDO getDemo12StudentTeacher(Long id) {
+        return demo12StudentTeacherMapper.selectById(id);
+	}
 
     private void deleteDemo12StudentTeacherByStudentId(Long studentId) {
         demo12StudentTeacherMapper.deleteByStudentId(studentId);

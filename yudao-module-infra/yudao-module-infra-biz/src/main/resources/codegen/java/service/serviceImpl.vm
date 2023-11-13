@@ -198,6 +198,11 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         ${subClassNameVars.get($index)}Mapper.deleteById(id);
     }
 
+	@Override
+	public ${subTable.className}DO get${subSimpleClassName}(${subPrimaryColumn.javaType} id) {
+        return ${subClassNameVars.get($index)}Mapper.selectById(id);
+	}
+
 ## 情况二：非 MASTER_ERP 时，支持批量的新增、修改操作
 #else
     #if ( $subTable.subJoinMany)

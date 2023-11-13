@@ -1,34 +1,31 @@
 package cn.iocoder.yudao.module.infra.controller.admin.demo12;
 
-import org.springframework.web.bind.annotation.*;
-import javax.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Operation;
-
-import javax.validation.constraints.*;
-import javax.validation.*;
-import javax.servlet.http.*;
-import java.util.*;
-import java.io.IOException;
-
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*;
-
 import cn.iocoder.yudao.module.infra.controller.admin.demo12.vo.*;
-import cn.iocoder.yudao.module.infra.dal.dataobject.demo12.InfraDemo12StudentDO;
-import cn.iocoder.yudao.module.infra.dal.dataobject.demo12.InfraDemo12StudentContactDO;
-import cn.iocoder.yudao.module.infra.dal.dataobject.demo12.InfraDemo12StudentTeacherDO;
 import cn.iocoder.yudao.module.infra.convert.demo12.InfraDemo12StudentConvert;
+import cn.iocoder.yudao.module.infra.dal.dataobject.demo12.InfraDemo12StudentContactDO;
+import cn.iocoder.yudao.module.infra.dal.dataobject.demo12.InfraDemo12StudentDO;
+import cn.iocoder.yudao.module.infra.dal.dataobject.demo12.InfraDemo12StudentTeacherDO;
 import cn.iocoder.yudao.module.infra.service.demo12.InfraDemo12StudentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Tag(name = "管理后台 - 学生")
 @RestController
@@ -94,22 +91,88 @@ public class InfraDemo12StudentController {
 
     // ==================== 子表（学生联系人） ====================
 
-    @GetMapping("/demo12-student/list-by-student-id")
-    @Operation(summary = "获得学生联系人列表")
+    @GetMapping("/demo12-student-contact/page")
+    @Operation(summary = "获得学生联系人分页")
     @Parameter(name = "studentId", description = "学生编号")
     @PreAuthorize("@ss.hasPermission('infra:demo12-student:query')")
-    public CommonResult<List<InfraDemo12StudentContactDO>> getDemo12StudentContactListByStudentId(@RequestParam("studentId") Long studentId) {
-        return success(demo12StudentService.getDemo12StudentContactListByStudentId(studentId));
+    public CommonResult<PageResult<InfraDemo12StudentContactDO>> getDemo12StudentContactPage(PageParam pageReqVO,
+                                                                                        @RequestParam("studentId") Long studentId) {
+        return success(demo12StudentService.getDemo12StudentContactPage(pageReqVO, studentId));
     }
+
+    @PostMapping("/demo12-student-contact/create")
+    @Operation(summary = "创建学生联系人")
+    @PreAuthorize("@ss.hasPermission('infra:demo12-student:create')")
+    public CommonResult<Long> createDemo12StudentContact(@Valid @RequestBody InfraDemo12StudentContactDO demo12StudentContact) {
+        return success(demo12StudentService.createDemo12StudentContact(demo12StudentContact));
+    }
+
+    @PutMapping("/demo12-student-contact/update")
+    @Operation(summary = "更新学生联系人")
+    @PreAuthorize("@ss.hasPermission('infra:demo12-student:update')")
+    public CommonResult<Boolean> updateDemo12StudentContact(@Valid @RequestBody InfraDemo12StudentContactDO demo12StudentContact) {
+        demo12StudentService.updateDemo12StudentContact(demo12StudentContact);
+        return success(true);
+    }
+
+    @DeleteMapping("/demo12-student-contact/delete")
+    @Parameter(name = "id", description = "编号", required = true)
+    @Operation(summary = "删除学生联系人")
+    @PreAuthorize("@ss.hasPermission('infra:demo12-student:delete')")
+    public CommonResult<Boolean> deleteDemo12StudentContact(@RequestParam("id") Long id) {
+        demo12StudentService.deleteDemo12StudentContact(id);
+        return success(true);
+    }
+
+	@GetMapping("/demo12-student-contact/get")
+	@Operation(summary = "获得学生联系人")
+	@Parameter(name = "id", description = "编号", required = true)
+    @PreAuthorize("@ss.hasPermission('infra:demo12-student:query')")
+	public CommonResult<InfraDemo12StudentContactDO> getDemo12StudentContact(@RequestParam("id") Long id) {
+	    return success(demo12StudentService.getDemo12StudentContact(id));
+	}
 
     // ==================== 子表（学生班主任） ====================
 
-    @GetMapping("/demo12-student/get-by-student-id")
-    @Operation(summary = "获得学生班主任")
+    @GetMapping("/demo12-student-teacher/page")
+    @Operation(summary = "获得学生班主任分页")
     @Parameter(name = "studentId", description = "学生编号")
     @PreAuthorize("@ss.hasPermission('infra:demo12-student:query')")
-    public CommonResult<InfraDemo12StudentTeacherDO> getDemo12StudentTeacherByStudentId(@RequestParam("studentId") Long studentId) {
-        return success(demo12StudentService.getDemo12StudentTeacherByStudentId(studentId));
+    public CommonResult<PageResult<InfraDemo12StudentTeacherDO>> getDemo12StudentTeacherPage(PageParam pageReqVO,
+                                                                                        @RequestParam("studentId") Long studentId) {
+        return success(demo12StudentService.getDemo12StudentTeacherPage(pageReqVO, studentId));
     }
+
+    @PostMapping("/demo12-student-teacher/create")
+    @Operation(summary = "创建学生班主任")
+    @PreAuthorize("@ss.hasPermission('infra:demo12-student:create')")
+    public CommonResult<Long> createDemo12StudentTeacher(@Valid @RequestBody InfraDemo12StudentTeacherDO demo12StudentTeacher) {
+        return success(demo12StudentService.createDemo12StudentTeacher(demo12StudentTeacher));
+    }
+
+    @PutMapping("/demo12-student-teacher/update")
+    @Operation(summary = "更新学生班主任")
+    @PreAuthorize("@ss.hasPermission('infra:demo12-student:update')")
+    public CommonResult<Boolean> updateDemo12StudentTeacher(@Valid @RequestBody InfraDemo12StudentTeacherDO demo12StudentTeacher) {
+        demo12StudentService.updateDemo12StudentTeacher(demo12StudentTeacher);
+        return success(true);
+    }
+
+    @DeleteMapping("/demo12-student-teacher/delete")
+    @Parameter(name = "id", description = "编号", required = true)
+    @Operation(summary = "删除学生班主任")
+    @PreAuthorize("@ss.hasPermission('infra:demo12-student:delete')")
+    public CommonResult<Boolean> deleteDemo12StudentTeacher(@RequestParam("id") Long id) {
+        demo12StudentService.deleteDemo12StudentTeacher(id);
+        return success(true);
+    }
+
+	@GetMapping("/demo12-student-teacher/get")
+	@Operation(summary = "获得学生班主任")
+	@Parameter(name = "id", description = "编号", required = true)
+    @PreAuthorize("@ss.hasPermission('infra:demo12-student:query')")
+	public CommonResult<InfraDemo12StudentTeacherDO> getDemo12StudentTeacher(@RequestParam("id") Long id) {
+	    return success(demo12StudentService.getDemo12StudentTeacher(id));
+	}
 
 }

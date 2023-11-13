@@ -50,8 +50,4 @@ public class InfraDemo12StudentBaseVO {
     @NotEmpty(message = "备注不能为空")
     private String memo;
 
-    private List<InfraDemo12StudentContactDO> demo12StudentContacts;
-
-    private InfraDemo12StudentTeacherDO demo12StudentTeacher;
-
 }

@@ -17,8 +17,10 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface InfraDemo12StudentContactMapper extends BaseMapperX<InfraDemo12StudentContactDO> {
 
-    default List<InfraDemo12StudentContactDO> selectListByStudentId(Long studentId) {
-        return selectList(InfraDemo12StudentContactDO::getStudentId, studentId);
+    default PageResult<InfraDemo12StudentContactDO> selectPage(PageParam reqVO, Long studentId) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<InfraDemo12StudentContactDO>()
+            .eq(InfraDemo12StudentContactDO::getStudentId, studentId)
+            .orderByDesc(InfraDemo12StudentContactDO::getId));
     }
 
     default int deleteByStudentId(Long studentId) {

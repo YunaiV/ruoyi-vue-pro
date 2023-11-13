@@ -132,6 +132,14 @@ public interface ${table.className}Service {
      */
     void delete${subSimpleClassName}(${subPrimaryColumn.javaType} id);
 
+	/**
+	 * 获得${subTable.classComment}
+	 *
+	 * @param id 编号
+     * @return ${subTable.classComment}
+	 */
+    ${subTable.className}DO get${subSimpleClassName}(${subPrimaryColumn.javaType} id);
+
 #end
 #end
 }

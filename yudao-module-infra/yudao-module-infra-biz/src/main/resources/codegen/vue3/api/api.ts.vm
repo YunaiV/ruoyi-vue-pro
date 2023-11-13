@@ -95,5 +95,10 @@ export const update${subSimpleClassName} = async (data) => {
 export const delete${subSimpleClassName} = async (id: number) => {
   return await request.delete({ url: `${baseURL}/${subSimpleClassName_strikeCase}/delete?id=` + id })
 }
+
+// 获得${subTable.classComment}
+export const get${subSimpleClassName} = async (id: number) => {
+  return await request.get({ url: `${baseURL}/${subSimpleClassName_strikeCase}/get?id=` + id })
+}
 #end
 #end

@@ -192,6 +192,16 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
         return success(true);
     }
 
+	@GetMapping("/${subSimpleClassName_strikeCase}/get")
+	@Operation(summary = "获得${subTable.classComment}")
+	@Parameter(name = "id", description = "编号", required = true)
+#if ($sceneEnum.scene == 1)
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")
+#end
+	public CommonResult<${subTable.className}DO> get${subSimpleClassName}(@RequestParam("id") ${subPrimaryColumn.javaType} id) {
+	    return success(${classNameVar}Service.get${subSimpleClassName}(id));
+	}
+
 #end
 #end
 }
