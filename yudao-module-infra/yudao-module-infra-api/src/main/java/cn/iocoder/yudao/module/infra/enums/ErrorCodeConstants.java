@@ -42,6 +42,8 @@ public interface ErrorCodeConstants {
     ErrorCode CODEGEN_SYNC_NONE_CHANGE = new ErrorCode(1_003_001_007, "同步失败，不存在改变");
     ErrorCode CODEGEN_TABLE_INFO_TABLE_COMMENT_IS_NULL = new ErrorCode(1_003_001_008, "数据库的表注释未填写");
     ErrorCode CODEGEN_TABLE_INFO_COLUMN_COMMENT_IS_NULL = new ErrorCode(1_003_001_009, "数据库的表字段({})注释未填写");
+    ErrorCode CODEGEN_MASTER_TABLE_NOT_EXISTS = new ErrorCode(1_003_001_010, "主表(id={})定义不存在，请检查");
+    ErrorCode CODEGEN_SUB_COLUMN_NOT_EXISTS = new ErrorCode(1_003_001_011, "子表的字段(id={})不存在，请检查");
 
     // ========== 文件配置 1-001-006-000 ==========
     ErrorCode FILE_CONFIG_NOT_EXISTS = new ErrorCode(1_001_006_000, "文件配置不存在");

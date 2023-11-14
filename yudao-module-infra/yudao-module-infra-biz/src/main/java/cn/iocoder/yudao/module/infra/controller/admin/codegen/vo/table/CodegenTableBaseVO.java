@@ -58,9 +58,11 @@ public class CodegenTableBaseVO {
     @Schema(description = "父菜单编号", example = "1024")
     private Long parentMenuId;
 
-    @Schema(description = "子表的表编号", example = "2048")
-    private Long subTableId;
-    @Schema(description = "子表的关联字段编号", example = "4096")
-    private Long subColumnId;
+    @Schema(description = "主表的编号", example = "2048")
+    private Long masterTableId;
+    @Schema(description = "子表关联主表的字段编号", example = "4096")
+    private Long subJoinColumnId;
+    @Schema(description = "主表与子表是否一对多", example = "4096")
+    private Boolean subJoinMany;
 
 }

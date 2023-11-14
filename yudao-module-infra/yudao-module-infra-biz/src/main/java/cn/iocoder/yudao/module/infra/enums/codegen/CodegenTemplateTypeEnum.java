@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.infra.enums.codegen;
 
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -25,5 +26,16 @@ public enum CodegenTemplateTypeEnum {
      * 类型
      */
     private final Integer type;
+
+    /**
+     * 是否为主表
+     *
+     * @param type 类型
+     * @return 是否主表
+     */
+    public static boolean isMaster(Integer type) {
+        return ObjectUtils.equalsAny(type,
+                MASTER_NORMAL.type, MASTER_ERP.type, MASTER_INNER.type);
+    }
 
 }

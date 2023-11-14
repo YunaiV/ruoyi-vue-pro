@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.infra.enums.codegen.CodegenFrontTypeEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenTemplateTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
@@ -124,14 +123,12 @@ public class CodegenTableDO extends BaseDO {
      *
      * 关联 {@link CodegenTableDO#getId()}
      */
-    @TableField(exist = false)
     private Long masterTableId;
     /**
      * 【自己】子表关联主表的字段编号
      *
      * 关联 {@link CodegenColumnDO#getId()}
      */
-    @TableField(exist = false)
     private Long subJoinColumnId;
     /**
      * 主表与子表是否一对多
@@ -139,7 +136,6 @@ public class CodegenTableDO extends BaseDO {
      * true：一对多
      * false：一对一
      */
-    @TableField(exist = false)
     private Boolean subJoinMany;
 
 }
