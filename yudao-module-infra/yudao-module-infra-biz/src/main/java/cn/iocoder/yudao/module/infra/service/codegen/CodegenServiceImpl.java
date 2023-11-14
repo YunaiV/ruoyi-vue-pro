@@ -252,13 +252,25 @@ public class CodegenServiceImpl implements CodegenService {
         List<CodegenTableDO> subTables = null;
         List<List<CodegenColumnDO>> subColumnsList = null;
         if (CodegenTemplateTypeEnum.isMaster(table.getTemplateType())) {
-            subTables = codegenTableMapper.selectListByMasterTableId(tableId);
-            subTable = codegenTableMapper.selectById(table.getMasterTableId());
-            subColumns = codegenColumnMapper.selectListByTableId(table.getMasterTableId());
+            // 校验子表存在
+            subTables = codegenTableMapper.selectListByTemplateTypeAndMasterTableId(
+                    CodegenTemplateTypeEnum.SUB.getType(), tableId);
+            if (CollUtil.isEmpty(subTables)) {
+                throw exception(CODEGEN_MASTER_GENERATION_FAIL_NO_SUB_TABLE);
+            }
+            // 校验子表的关联字段存在
+            subColumnsList = new ArrayList<>();
+            for (CodegenTableDO subTable : subTables) {
+                List<CodegenColumnDO> subColumns = codegenColumnMapper.selectListByTableId(subTable.getId());
+                if (CollUtil.findOne(subColumns, column -> column.getId().equals(subTable.getSubJoinColumnId())) == null) {
+                    throw exception(CODEGEN_SUB_COLUMN_NOT_EXISTS, subTable.getId());
+                }
+                subColumnsList.add(subColumns);
+            }
         }
 
         // 执行生成
-        return codegenEngine.execute(table, columns, subTable, subColumns);
+        return codegenEngine.execute(table, columns, subTables, subColumnsList);
     }
 
     @Override

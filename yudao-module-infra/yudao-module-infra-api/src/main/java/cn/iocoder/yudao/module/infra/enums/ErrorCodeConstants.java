@@ -44,6 +44,8 @@ public interface ErrorCodeConstants {
     ErrorCode CODEGEN_TABLE_INFO_COLUMN_COMMENT_IS_NULL = new ErrorCode(1_003_001_009, "数据库的表字段({})注释未填写");
     ErrorCode CODEGEN_MASTER_TABLE_NOT_EXISTS = new ErrorCode(1_003_001_010, "主表(id={})定义不存在，请检查");
     ErrorCode CODEGEN_SUB_COLUMN_NOT_EXISTS = new ErrorCode(1_003_001_011, "子表的字段(id={})不存在，请检查");
+    ErrorCode CODEGEN_MASTER_GENERATION_FAIL_NO_SUB_TABLE = new ErrorCode(1_003_001_012, "主表生成代码失败，原因：它没有子表");
+    ErrorCode CODEGEN_MASTER_GENERATION_FAIL_NO_SUB_COLUMN = new ErrorCode(1_003_001_013, "主表生成代码失败，原因：它的子表({})没有字段");
 
     // ========== 文件配置 1-001-006-000 ==========
     ErrorCode FILE_CONFIG_NOT_EXISTS = new ErrorCode(1_001_006_000, "文件配置不存在");

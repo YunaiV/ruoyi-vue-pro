@@ -93,8 +93,13 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         return selectList(new LambdaQueryWrapper<T>().in(field, values));
     }
 
+    @Deprecated
     default List<T> selectList(SFunction<T, ?> leField, SFunction<T, ?> geField, Object value) {
         return selectList(new LambdaQueryWrapper<T>().le(leField, value).ge(geField, value));
+    }
+
+    default List<T> selectList(SFunction<T, ?> field1, Object value1, SFunction<T, ?> field2, Object value2) {
+        return selectList(new LambdaQueryWrapper<T>().eq(field1, value1).eq(field2, value2));
     }
 
     /**
