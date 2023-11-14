@@ -137,6 +137,8 @@ public class ${table.className}ServiceImplTest extends BaseDbUnitTest {
         assertServiceException(() -> ${classNameVar}Service.delete${simpleClassName}(id), ${simpleClassName_underlineCase.toUpperCase()}_NOT_EXISTS);
     }
 
+## 特殊：树表专属逻辑（树不需要分页接口）
+#if ( $table.templateType != 2 )
     @Test
     @Disabled  // TODO 请修改 null 为需要的值，然后删除 @Disabled 注解
     public void testGet${simpleClassName}Page() {
@@ -150,10 +152,11 @@ public class ${table.className}ServiceImplTest extends BaseDbUnitTest {
        assertPojoEquals(db${simpleClassName}, pageResult.getList().get(0));
     }
 
+#end
     @Test
     @Disabled  // TODO 请修改 null 为需要的值，然后删除 @Disabled 注解
     public void testGet${simpleClassName}List() {
-       #getPageCondition("ExportReqVO")
+       #getPageCondition("ListReqVO")
 
        // 调用
        List<${table.className}DO> list = ${classNameVar}Service.get${simpleClassName}List(reqVO);

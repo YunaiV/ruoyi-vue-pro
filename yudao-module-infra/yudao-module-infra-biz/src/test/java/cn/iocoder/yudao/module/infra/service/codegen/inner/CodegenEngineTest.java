@@ -43,6 +43,47 @@ public class CodegenEngineTest extends BaseMockitoUnitTest {
     }
 
     @Test
+    public void testExecute_vue3_tree() {
+        // 准备请求参数
+        CodegenTableDO table = new CodegenTableDO().setScene(CodegenSceneEnum.ADMIN.getScene()).setParentMenuId(888L)
+                .setTableName("infra_demo66_student").setTableComment("学生表")
+                .setModuleName("infra").setBusinessName("demo66").setClassName("InfraDemo66Student")
+                .setClassComment("学生").setAuthor("芋道源码")
+                .setTemplateType(CodegenTemplateTypeEnum.TREE.getType())
+                .setFrontType(CodegenFrontTypeEnum.VUE3.getType())
+                .setTreeParentColumnId(22L).setTreeNameColumnId(11L)
+                ;
+        CodegenColumnDO idColumn = new CodegenColumnDO().setColumnName("id").setDataType(JdbcType.BIGINT.name())
+                .setColumnComment("编号").setNullable(false).setPrimaryKey(true).setAutoIncrement(true)
+                .setJavaType("Long").setJavaField("id").setExample("1024")
+                .setCreateOperation(false).setUpdateOperation(true)
+                .setListOperation(false)
+                .setListOperationResult(true);
+        CodegenColumnDO nameColumn = new CodegenColumnDO().setColumnName("name").setDataType(JdbcType.VARCHAR.name())
+                .setId(11L)
+                .setColumnComment("名字").setNullable(false)
+                .setJavaType("String").setJavaField("name").setExample("芋头")
+                .setCreateOperation(true).setUpdateOperation(true)
+                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.LIKE.getCondition())
+                .setListOperationResult(true)
+                .setHtmlType(CodegenColumnHtmlTypeEnum.INPUT.getType());
+        CodegenColumnDO parentIdColumn = new CodegenColumnDO().setColumnName("description").setDataType(JdbcType.VARCHAR.name())
+                .setId(22L)
+                .setColumnComment("父编号").setNullable(false)
+                .setJavaType("Long").setJavaField("parentId").setExample("2048")
+                .setCreateOperation(true).setUpdateOperation(true)
+                .setListOperation(false)
+                .setListOperationResult(true);
+        List<CodegenColumnDO> columns = Arrays.asList(idColumn, nameColumn, parentIdColumn);
+
+        // 调用
+        Map<String, String> result = codegenEngine.execute(table, columns, null, null);
+
+        // 构建 zip 包
+        writeFile(result, "/Users/yunai/test/demo66.zip");
+    }
+
+    @Test
     public void testExecute_vue3_crud() {
         // 准备请求参数
         CodegenTableDO table = new CodegenTableDO().setScene(CodegenSceneEnum.ADMIN.getScene()).setParentMenuId(888L)

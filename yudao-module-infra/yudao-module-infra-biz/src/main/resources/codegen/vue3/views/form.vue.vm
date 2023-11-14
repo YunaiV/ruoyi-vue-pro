@@ -22,7 +22,22 @@
         #elseif ($javaType == "Boolean")
             #set ($dictMethod = "getBoolDictOptions")
         #end
-        #if ($column.htmlType == "input" && !$column.primaryKey)## 忽略主键，不用在表单里
+        #if ( $table.templateType == 2 && $column.id == $treeParentColumn.id )
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-tree-select
+          v-model="formData.${javaField}"
+          :data="${classNameVar}Tree"
+          #if ($treeNameColumn.javaField == "name")
+          :props="defaultProps"
+          #else
+          :props="{...defaultProps, label: '$treeNameColumn.javaField'}"
+          #end
+          check-strictly
+          default-expand-all
+          placeholder="请选择${comment}"
+        />
+      </el-form-item>
+        #elseif ($column.htmlType == "input" && !$column.primaryKey)## 忽略主键，不用在表单里
       <el-form-item label="${comment}" prop="${javaField}">
         <el-input v-model="formData.${javaField}" placeholder="请输入${comment}" />
       </el-form-item>
@@ -126,6 +141,10 @@
 <script setup lang="ts">
 import { getIntDictOptions, getStrDictOptions, getBoolDictOptions, DICT_TYPE } from '@/utils/dict'
 import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${table.businessName}'
+## 特殊：树表专属逻辑
+#if ( $table.templateType == 2 )
+import { defaultProps, handleTree } from '@/utils/tree'
+#end
 ## 特殊：主子表专属逻辑
 #foreach ($subSimpleClassName in $subSimpleClassNames)
 import ${subSimpleClassName}Form from './components/${subSimpleClassName}Form.vue'
@@ -158,6 +177,10 @@ const formRules = reactive({
 #end
 })
 const formRef = ref() // 表单 Ref
+## 特殊：树表专属逻辑
+#if ( $table.templateType == 2 )
+const ${classNameVar}Tree = ref() // 树形结构
+#end
 ## 特殊：主子表专属逻辑
 #if ( $subTables && $subTables.size() > 0 )
 
@@ -183,6 +206,10 @@ const open = async (type: string, id?: number) => {
       formLoading.value = false
     }
   }
+## 特殊：树表专属逻辑
+#if ( $table.templateType == 2 )
+  await get${simpleClassName}Tree()
+#end
 }
 defineExpose({ open }) // 提供 open 方法，用于打开弹窗
 
@@ -248,4 +275,16 @@ const resetForm = () => {
   }
   formRef.value?.resetFields()
 }
+## 特殊：树表专属逻辑
+#if ( $table.templateType == 2 )
+
+/** 获得${table.classComment}树 */
+const get${simpleClassName}Tree = async () => {
+  ${classNameVar}Tree.value = []
+  const data = await ${simpleClassName}Api.get${simpleClassName}List()
+  const root: Tree = { id: 0, name: '顶级${table.classComment}', children: [] }
+  root.children = handleTree(data, 'id', '${treeParentColumn.javaField}')
+  ${classNameVar}Tree.value.push(root)
+}
+#end
 </script>

@@ -26,8 +26,10 @@ public interface ${table.className}Convert {
     ${sceneEnum.prefixClass}${table.className}RespVO convert(${table.className}DO bean);
 
     List<${sceneEnum.prefixClass}${table.className}RespVO> convertList(List<${table.className}DO> list);
-
+## 特殊：树表专属逻辑（树不需要分页接口）
+#if ( $table.templateType != 2 )
     PageResult<${sceneEnum.prefixClass}${table.className}RespVO> convertPage(PageResult<${table.className}DO> page);
+#end
 
     List<${sceneEnum.prefixClass}${table.className}ExcelVO> convertList02(List<${table.className}DO> list);
 

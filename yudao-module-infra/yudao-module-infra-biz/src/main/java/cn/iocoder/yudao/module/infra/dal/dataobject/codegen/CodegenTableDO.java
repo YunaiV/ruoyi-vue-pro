@@ -138,4 +138,21 @@ public class CodegenTableDO extends BaseDO {
      */
     private Boolean subJoinMany;
 
+    // ========== 树表相关字段 ==========
+
+    /**
+     * 树表的父字段编号
+     *
+     * 关联 {@link CodegenColumnDO#getId()}
+     */
+    private Long treeParentColumnId;
+    /**
+     * 树表的名字字段编号
+     *
+     * 名字的用途：新增或修改时，select 框展示的字段
+     *
+     * 关联 {@link CodegenColumnDO#getId()}
+     */
+    private Long treeNameColumnId;
+
 }

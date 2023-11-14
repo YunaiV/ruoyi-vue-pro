@@ -4,6 +4,8 @@ import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Objects;
+
 /**
  * 代码生成模板类型
  *
@@ -36,6 +38,16 @@ public enum CodegenTemplateTypeEnum {
     public static boolean isMaster(Integer type) {
         return ObjectUtils.equalsAny(type,
                 MASTER_NORMAL.type, MASTER_ERP.type, MASTER_INNER.type);
+    }
+
+    /**
+     * 是否为树表
+     *
+     * @param type 类型
+     * @return 是否树表
+     */
+    public static boolean isTree(Integer type) {
+        return Objects.equals(type, TREE.type);
     }
 
 }

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.infra.service.codegen.inner;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Filter;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -67,7 +68,7 @@ public class CodegenEngine {
             .put(javaTemplatePath("controller/vo/pageReqVO"), javaModuleImplVOFilePath("PageReqVO"))
             .put(javaTemplatePath("controller/vo/respVO"), javaModuleImplVOFilePath("RespVO"))
             .put(javaTemplatePath("controller/vo/updateReqVO"), javaModuleImplVOFilePath("UpdateReqVO"))
-            .put(javaTemplatePath("controller/vo/exportReqVO"), javaModuleImplVOFilePath("ExportReqVO"))
+            .put(javaTemplatePath("controller/vo/listReqVO"), javaModuleImplVOFilePath("ListReqVO"))
             .put(javaTemplatePath("controller/vo/excelVO"), javaModuleImplVOFilePath("ExcelVO"))
             .put(javaTemplatePath("controller/controller"), javaModuleImplControllerFilePath())
             .put(javaTemplatePath("convert/convert"),
@@ -216,8 +217,14 @@ public class CodegenEngine {
             if (isSubTemplate(vmPath)) {
                 generateSubCode(table, subTables, result, vmPath, filePath, bindingMap);
                 return;
+                // 2.2 特殊：树表专属逻辑
+            } else if (isPageTemplate(vmPath)) {
+                // 减少多余的类生成，例如说 PageVO.java 类
+                if (CodegenTemplateTypeEnum.isTree(table.getTemplateType())) {
+                    return;
+                }
             }
-            // 2.2 默认生成
+            // 2.3 默认生成
             generateCode(result, vmPath, filePath, bindingMap);
         });
         return result;
@@ -313,6 +320,14 @@ public class CodegenEngine {
         bindingMap.put("simpleClassName_strikeCase", simpleClassNameStrikeCase);
         // permission 前缀
         bindingMap.put("permissionPrefix", table.getModuleName() + ":" + simpleClassNameStrikeCase);
+
+        // 特殊：树表专属逻辑
+        if (CodegenTemplateTypeEnum.isTree(table.getTemplateType())) {
+            bindingMap.put("treeParentColumn", CollUtil.findOne(columns,
+                    column -> Objects.equals(column.getId(), table.getTreeParentColumnId())));
+            bindingMap.put("treeNameColumn", CollUtil.findOne(columns,
+                    column -> Objects.equals(column.getId(), table.getTreeNameColumnId())));
+        }
 
         // 特殊：主子表专属逻辑
         if (CollUtil.isNotEmpty(subTables)) {
@@ -452,6 +467,10 @@ public class CodegenEngine {
 
     private static boolean isSubTemplate(String path) {
         return path.contains("_sub");
+    }
+
+    private static boolean isPageTemplate(String path) {
+        return path.contains("page");
     }
 
 }
