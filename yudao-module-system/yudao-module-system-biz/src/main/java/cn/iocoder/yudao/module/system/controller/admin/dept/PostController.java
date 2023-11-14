@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.system.controller.admin.dept;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
@@ -39,16 +40,16 @@ public class PostController {
     @PostMapping("/create")
     @Operation(summary = "创建岗位")
     @PreAuthorize("@ss.hasPermission('system:post:create')")
-    public CommonResult<Long> createPost(@Valid @RequestBody PostCreateReqVO reqVO) {
-        Long postId = postService.createPost(reqVO);
+    public CommonResult<Long> createPost(@Valid @RequestBody PostReqVO createReqVO) {
+        Long postId = postService.createPost(createReqVO);
         return success(postId);
     }
 
     @PutMapping("/update")
     @Operation(summary = "修改岗位")
     @PreAuthorize("@ss.hasPermission('system:post:update')")
-    public CommonResult<Boolean> updatePost(@Valid @RequestBody PostUpdateReqVO reqVO) {
-        postService.updatePost(reqVO);
+    public CommonResult<Boolean> updatePost(@Valid @RequestBody PostReqVO updateReqVO) {
+        postService.updatePost(updateReqVO);
         return success(true);
     }
 
@@ -69,13 +70,13 @@ public class PostController {
     }
 
     @GetMapping("/list-all-simple")
-    @Operation(summary = "获取岗位精简信息列表", description = "只包含被开启的岗位，主要用于前端的下拉选项")
-    public CommonResult<List<PostSimpleRespVO>> getSimplePostList() {
+    @Operation(summary = "获取岗位全列表", description = "只包含被开启的岗位，主要用于前端的下拉选项")
+    public CommonResult<List<PostRespVO>> getSimplePostList() {
         // 获得岗位列表，只要开启状态的
         List<PostDO> list = postService.getPostList(null, Collections.singleton(CommonStatusEnum.ENABLE.getStatus()));
         // 排序后，返回给前端
         list.sort(Comparator.comparing(PostDO::getSort));
-        return success(PostConvert.INSTANCE.convertList02(list));
+        return success(PostConvert.INSTANCE.convertList(list));
     }
 
     @GetMapping("/page")
@@ -89,11 +90,12 @@ public class PostController {
     @Operation(summary = "岗位管理")
     @PreAuthorize("@ss.hasPermission('system:post:export')")
     @OperateLog(type = EXPORT)
-    public void export(HttpServletResponse response, @Validated PostExportReqVO reqVO) throws IOException {
-        List<PostDO> posts = postService.getPostList(reqVO);
-        List<PostExcelVO> data = PostConvert.INSTANCE.convertList03(posts);
+    public void export(HttpServletResponse response, @Validated PostPageReqVO reqVO) throws IOException {
+        reqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        PageResult<PostDO> pageResult = postService.getPostPage(reqVO);
         // 输出
-        ExcelUtils.write(response, "岗位数据.xls", "岗位列表", PostExcelVO.class, data);
+        PageResult<PostRespVO> list = PostConvert.INSTANCE.convertPage(pageResult);
+        ExcelUtils.write(response, "岗位数据.xls", "岗位列表", PostRespVO.class, list.getList());
     }
 
 }

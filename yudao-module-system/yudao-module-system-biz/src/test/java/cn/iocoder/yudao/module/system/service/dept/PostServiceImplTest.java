@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostCreateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostUpdateReqVO;
@@ -44,7 +44,7 @@ public class PostServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreatePost_success() {
         // 准备参数
-        PostCreateReqVO reqVO = randomPojo(PostCreateReqVO.class,
+        PostReqVO reqVO = randomPojo(PostReqVO.class,
                 o -> o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()));
         // 调用
         Long postId = postService.createPost(reqVO);
@@ -103,7 +103,7 @@ public class PostServiceImplTest extends BaseDbUnitTest {
         PostDO postDO = randomPostDO();
         postMapper.insert(postDO);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        PostCreateReqVO reqVO = randomPojo(PostCreateReqVO.class,
+        PostReqVO reqVO = randomPojo(PostReqVO.class,
             // 模拟 name 重复
             o -> o.setName(postDO.getName()));
         assertServiceException(() -> postService.createPost(reqVO), POST_NAME_DUPLICATE);

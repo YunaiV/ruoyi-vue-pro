@@ -1,4 +1,7 @@
 package cn.iocoder.yudao.module.system.controller.admin.dept.vo.post;
+
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -6,16 +9,16 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-/**
- * 岗位 Base VO，提供给添加、修改、详细的子 VO 使用
- * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
- */
+@Schema(description = "管理后台 - 岗位创建/修改 Request VO")
 @Data
-public class PostBaseVO {
+public class PostReqVO {
 
-    @Schema(description = "岗位名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "小博主")
+    @Schema(description = "岗位编号", example = "1024")
+    private Long id;
+
+    @Schema(description = "岗位名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "小土豆")
     @NotBlank(message = "岗位名称不能为空")
-    @Size(max = 50, message = "岗位名称长度不能超过50个字符")
+    @Size(max = 50, message = "岗位名称长度不能超过 50 个字符")
     private String name;
 
     @Schema(description = "岗位编码", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudao")
@@ -27,7 +30,8 @@ public class PostBaseVO {
     @NotNull(message = "显示顺序不能为空")
     private Integer sort;
 
-    @Schema(description = "状态，参见 CommonStatusEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @InEnum(CommonStatusEnum.class)
     private Integer status;
 
     @Schema(description = "备注", example = "快乐的备注")

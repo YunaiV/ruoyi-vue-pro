@@ -3,10 +3,8 @@ package cn.iocoder.yudao.module.system.service.dept;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostReqVO;
 import cn.iocoder.yudao.module.system.convert.dept.PostConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dept.PostMapper;
@@ -35,23 +33,23 @@ public class PostServiceImpl implements PostService {
     private PostMapper postMapper;
 
     @Override
-    public Long createPost(PostCreateReqVO reqVO) {
+    public Long createPost(PostReqVO createReqVO) {
         // 校验正确性
-        validatePostForCreateOrUpdate(null, reqVO.getName(), reqVO.getCode());
+        validatePostForCreateOrUpdate(null, createReqVO.getName(), createReqVO.getCode());
 
         // 插入岗位
-        PostDO post = PostConvert.INSTANCE.convert(reqVO);
+        PostDO post = PostConvert.INSTANCE.convert(createReqVO);
         postMapper.insert(post);
         return post.getId();
     }
 
     @Override
-    public void updatePost(PostUpdateReqVO reqVO) {
+    public void updatePost(PostReqVO updateReqVO) {
         // 校验正确性
-        validatePostForCreateOrUpdate(reqVO.getId(), reqVO.getName(), reqVO.getCode());
+        validatePostForCreateOrUpdate(updateReqVO.getId(), updateReqVO.getName(), updateReqVO.getCode());
 
         // 更新岗位
-        PostDO updateObj = PostConvert.INSTANCE.convert(reqVO);
+        PostDO updateObj = PostConvert.INSTANCE.convert(updateReqVO);
         postMapper.updateById(updateObj);
     }
 
@@ -117,11 +115,6 @@ public class PostServiceImpl implements PostService {
     @Override
     public PageResult<PostDO> getPostPage(PostPageReqVO reqVO) {
         return postMapper.selectPage(reqVO);
-    }
-
-    @Override
-    public List<PostDO> getPostList(PostExportReqVO reqVO) {
-        return postMapper.selectList(reqVO);
     }
 
     @Override

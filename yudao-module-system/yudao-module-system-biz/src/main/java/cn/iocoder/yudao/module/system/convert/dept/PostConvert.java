@@ -13,16 +13,12 @@ public interface PostConvert {
 
     PostConvert INSTANCE = Mappers.getMapper(PostConvert.class);
 
-    List<PostSimpleRespVO> convertList02(List<PostDO> list);
+    List<PostRespVO> convertList(List<PostDO> list);
 
     PageResult<PostRespVO> convertPage(PageResult<PostDO> page);
 
-    PostRespVO convert(PostDO id);
+    PostRespVO convert(PostDO bean);
 
-    PostDO convert(PostCreateReqVO bean);
-
-    PostDO convert(PostUpdateReqVO reqVO);
-
-    List<PostExcelVO> convertList03(List<PostDO> list);
+    PostDO convert(PostReqVO bean);
 
 }
