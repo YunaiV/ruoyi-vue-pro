@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.crm.service.permission;
 
 
+import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionUpdateReqBO;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -29,16 +29,16 @@ public interface CrmPermissionService {
     /**
      * 更新数据权限
      *
-     * @param updateBO 更新信息
+     * @param updateReqVO 更新信息
      */
-    void updatePermission(@Valid CrmPermissionUpdateReqBO updateBO);
+    void updatePermission(CrmPermissionUpdateReqVO updateReqVO);
 
     /**
      * 删除数据权限
      *
-     * @param id 编号
+     * @param ids 编号
      */
-    void deletePermission(Long id);
+    void deletePermission(Collection<Long> ids);
 
     /**
      * 获取用户数据权限通过 数据类型 x 某个数据 x 用户编号
@@ -49,6 +49,15 @@ public interface CrmPermissionService {
      * @return Crm 数据权限
      */
     CrmPermissionDO getPermissionByBizTypeAndBizIdAndUserId(Integer bizType, Long bizId, Long userId);
+
+    /**
+     * 获取用户数据权限通过 权限编号 x 用户编号
+     *
+     * @param id     权限编号
+     * @param userId 用户编号
+     * @return 数据权限
+     */
+    CrmPermissionDO getPermissionByIdAndUserId(Long id, Long userId);
 
     /**
      * 获取数据权限列表，通过 数据类型 x 某个数据

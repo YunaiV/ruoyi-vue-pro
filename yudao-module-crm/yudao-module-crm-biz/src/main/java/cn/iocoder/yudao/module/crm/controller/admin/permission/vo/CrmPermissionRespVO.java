@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.crm.controller.admin.permission.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Schema(description = "管理后台 - CRM 数据权限（团队成员） Response VO")
@@ -20,5 +21,8 @@ public class CrmPermissionRespVO extends CrmPermissionBaseVO {
 
     @Schema(description = "岗位名称数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "[BOOS,经理]")
     private Set<String> postNames;
+
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "2023-01-01 00:00:00")
+    private LocalDateTime createTime;
 
 }

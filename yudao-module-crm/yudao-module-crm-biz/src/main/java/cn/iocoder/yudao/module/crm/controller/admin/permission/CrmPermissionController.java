@@ -28,17 +28,16 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.anyMatch;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CRM_PERMISSION_NOT_EXISTS;
 
 @Tag(name = "管理后台 - CRM 数据权限（数据团队成员操作）")
 @RestController
@@ -85,12 +84,12 @@ public class CrmPermissionController {
     }
 
     @PutMapping("/update")
-    @Operation(summary = "编辑团队成员")
+    @Operation(summary = "编辑团队成员权限")
     @PreAuthorize("@ss.hasPermission('crm:permission:update')")
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_PERMISSION, bizTypeValue = "#updateReqVO.bizType", bizId = "#updateReqVO.bizId"
-            , level = CrmPermissionLevelEnum.WRITE)
+            , level = CrmPermissionLevelEnum.OWNER)
     public CommonResult<Boolean> updatePermission(@Valid @RequestBody CrmPermissionUpdateReqVO updateReqVO) {
-        permissionService.updatePermission(CrmPermissionConvert.INSTANCE.convert(updateReqVO));
+        permissionService.updatePermission(updateReqVO);
         return success(true);
     }
 
@@ -99,15 +98,33 @@ public class CrmPermissionController {
     @Parameters({
             @Parameter(name = "bizType", description = "CRM 类型", required = true, example = "2"),
             @Parameter(name = "bizId", description = "CRM 类型数据编号", required = true, example = "1024"),
-            @Parameter(name = "id", description = "团队成员编号", required = true, example = "1024")
+            @Parameter(name = "ids", description = "团队成员编号", required = true, example = "1024")
     })
     @PreAuthorize("@ss.hasPermission('crm:permission:delete')")
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_PERMISSION, bizTypeValue = "#bizType", bizId = "#bizId"
-            , level = CrmPermissionLevelEnum.OWNER)
+            , level = CrmPermissionLevelEnum.OWNER) // 为了校验权限请求必须带上 bizType 和  bizId
     public CommonResult<Boolean> deletePermission(@RequestParam("bizType") Integer bizType,
                                                   @RequestParam("bizId") Long bizId,
-                                                  @RequestParam("id") Long id) {
-        permissionService.deletePermission(id);
+                                                  @RequestParam("ids") Collection<Long> ids) {
+        permissionService.deletePermission(ids);
+        return success(true);
+    }
+
+    @DeleteMapping("/quit-team")
+    @Operation(summary = "退出团队")
+    @Parameters({
+            @Parameter(name = "id", description = "团队成员编号", required = true, example = "1024")
+    })
+    @PreAuthorize("@ss.hasPermission('crm:permission:delete')")
+    public CommonResult<Boolean> deletePermission(@RequestParam("id") Long id) {
+        // 校验数据存在且是自己
+        CrmPermissionDO permission = permissionService.getPermissionByIdAndUserId(id, getLoginUserId());
+        if (permission == null) {
+            throw exception(CRM_PERMISSION_NOT_EXISTS);
+        }
+
+        // 删除
+        permissionService.deletePermission(Collections.singletonList(id));
         return success(true);
     }
 

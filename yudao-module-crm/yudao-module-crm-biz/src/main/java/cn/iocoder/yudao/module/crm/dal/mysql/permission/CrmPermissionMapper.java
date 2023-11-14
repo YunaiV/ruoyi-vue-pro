@@ -42,4 +42,9 @@ public interface CrmPermissionMapper extends BaseMapperX<CrmPermissionDO> {
                 .eq(CrmPermissionDO::getLevel, level));
     }
 
+    default CrmPermissionDO selectByIdAndUserId(Long id, Long userId) {
+        return selectOne(new LambdaQueryWrapperX<CrmPermissionDO>()
+                .eq(CrmPermissionDO::getId, id).eq(CrmPermissionDO::getUserId, userId));
+    }
+
 }
