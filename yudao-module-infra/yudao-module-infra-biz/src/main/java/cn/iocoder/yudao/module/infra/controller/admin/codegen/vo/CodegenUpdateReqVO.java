@@ -53,6 +53,13 @@ public class CodegenUpdateReqVO {
                     || (ObjectUtil.isAllNotEmpty(getMasterTableId(), getSubJoinColumnId(), getSubJoinMany()));
         }
 
+        @AssertTrue(message = "关联的树表信息不全")
+        @JsonIgnore
+        public boolean isTreeValid() {
+            return ObjectUtil.notEqual(getTemplateType(), CodegenTemplateTypeEnum.TREE)
+                    || (ObjectUtil.isAllNotEmpty(getTreeParentColumnId(), getTreeNameColumnId()));
+        }
+
     }
 
     @Schema(description = "更新表定义")

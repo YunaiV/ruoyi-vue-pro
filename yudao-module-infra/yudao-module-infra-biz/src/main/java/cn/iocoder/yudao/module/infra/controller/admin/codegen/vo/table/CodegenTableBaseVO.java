@@ -65,4 +65,9 @@ public class CodegenTableBaseVO {
     @Schema(description = "主表与子表是否一对多", example = "4096")
     private Boolean subJoinMany;
 
+    @Schema(description = "树表的父字段编号", example = "8192")
+    private Long treeParentColumnId;
+    @Schema(description = "树表的名字字段编号", example = "16384")
+    private Long treeNameColumnId;
+
 }

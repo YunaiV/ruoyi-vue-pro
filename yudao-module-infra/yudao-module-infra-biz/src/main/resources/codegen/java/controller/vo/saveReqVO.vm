@@ -34,8 +34,8 @@ public class ${sceneEnum.prefixClass}${table.className}SaveReqVO {
 #if (${column.createOperation} || ${column.updateOperation})
 ## 1. 处理 Swagger 注解
     @Schema(description = "${column.columnComment}"#if (!${column.nullable}), requiredMode = Schema.RequiredMode.REQUIRED#end#if ("$!column.example" != ""), example = "${column.example}"#end)
-#if (!${column.nullable})
 ## 2. 处理 Validator 参数校验
+#if (!${column.nullable} && !${column.primaryKey})
 #if (${column.javaType} == 'String')
     @NotEmpty(message = "${column.columnComment}不能为空")
 #else

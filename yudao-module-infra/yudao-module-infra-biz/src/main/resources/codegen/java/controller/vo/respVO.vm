@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 #end
 ## 处理 LocalDateTime 字段的引入
 #foreach ($column in $columns)
-#if (${table.listOperationResult} && ${column.javaType} == "LocalDateTime")
+#if (${column.listOperationResult} && ${column.javaType} == "LocalDateTime")
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 #break
