@@ -11,7 +11,7 @@ import javax.validation.constraints.Size;
 
 @Schema(description = "管理后台 - 岗位创建/修改 Request VO")
 @Data
-public class PostReqVO {
+public class PostSaveReqVO {
 
     @Schema(description = "岗位编号", example = "1024")
     private Long id;

@@ -4,15 +4,17 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.*;
-import cn.iocoder.yudao.module.system.convert.dept.PostConvert;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostSaveReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostRespVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +42,7 @@ public class PostController {
     @PostMapping("/create")
     @Operation(summary = "创建岗位")
     @PreAuthorize("@ss.hasPermission('system:post:create')")
-    public CommonResult<Long> createPost(@Valid @RequestBody PostReqVO createReqVO) {
+    public CommonResult<Long> createPost(@Valid @RequestBody PostSaveReqVO createReqVO) {
         Long postId = postService.createPost(createReqVO);
         return success(postId);
     }
@@ -48,7 +50,7 @@ public class PostController {
     @PutMapping("/update")
     @Operation(summary = "修改岗位")
     @PreAuthorize("@ss.hasPermission('system:post:update')")
-    public CommonResult<Boolean> updatePost(@Valid @RequestBody PostReqVO updateReqVO) {
+    public CommonResult<Boolean> updatePost(@Valid @RequestBody PostSaveReqVO updateReqVO) {
         postService.updatePost(updateReqVO);
         return success(true);
     }
@@ -66,7 +68,8 @@ public class PostController {
     @Parameter(name = "id", description = "岗位编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('system:post:query')")
     public CommonResult<PostRespVO> getPost(@RequestParam("id") Long id) {
-        return success(PostConvert.INSTANCE.convert(postService.getPost(id)));
+        PostDO post = postService.getPost(id);
+        return success(BeanUtils.toBean(post, PostRespVO.class));
     }
 
     @GetMapping("/list-all-simple")
@@ -76,14 +79,15 @@ public class PostController {
         List<PostDO> list = postService.getPostList(null, Collections.singleton(CommonStatusEnum.ENABLE.getStatus()));
         // 排序后，返回给前端
         list.sort(Comparator.comparing(PostDO::getSort));
-        return success(PostConvert.INSTANCE.convertList(list));
+        return success(BeanUtils.toBean(list, PostRespVO.class));
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得岗位分页列表")
     @PreAuthorize("@ss.hasPermission('system:post:query')")
-    public CommonResult<PageResult<PostRespVO>> getPostPage(@Validated PostPageReqVO reqVO) {
-        return success(PostConvert.INSTANCE.convertPage(postService.getPostPage(reqVO)));
+    public CommonResult<PageResult<PostRespVO>> getPostPage(@Validated PostPageReqVO pageReqVO) {
+        PageResult<PostDO> pageResult = postService.getPostPage(pageReqVO);
+        return success(BeanUtils.toBean(pageResult, PostRespVO.class));
     }
 
     @GetMapping("/export")
@@ -92,10 +96,10 @@ public class PostController {
     @OperateLog(type = EXPORT)
     public void export(HttpServletResponse response, @Validated PostPageReqVO reqVO) throws IOException {
         reqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        PageResult<PostDO> pageResult = postService.getPostPage(reqVO);
+        List<PostDO> list = postService.getPostPage(reqVO).getList();
         // 输出
-        PageResult<PostRespVO> list = PostConvert.INSTANCE.convertPage(pageResult);
-        ExcelUtils.write(response, "岗位数据.xls", "岗位列表", PostRespVO.class, list.getList());
+        ExcelUtils.write(response, "岗位数据.xls", "岗位列表", PostRespVO.class,
+                BeanUtils.toBean(list, PostRespVO.class));
     }
 
 }

@@ -3,9 +3,9 @@ package cn.iocoder.yudao.module.system.service.dept;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostReqVO;
-import cn.iocoder.yudao.module.system.convert.dept.PostConvert;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dept.PostMapper;
 import org.springframework.stereotype.Service;
@@ -33,23 +33,23 @@ public class PostServiceImpl implements PostService {
     private PostMapper postMapper;
 
     @Override
-    public Long createPost(PostReqVO createReqVO) {
+    public Long createPost(PostSaveReqVO createReqVO) {
         // 校验正确性
         validatePostForCreateOrUpdate(null, createReqVO.getName(), createReqVO.getCode());
 
         // 插入岗位
-        PostDO post = PostConvert.INSTANCE.convert(createReqVO);
+        PostDO post = BeanUtils.toBean(createReqVO, PostDO.class);
         postMapper.insert(post);
         return post.getId();
     }
 
     @Override
-    public void updatePost(PostReqVO updateReqVO) {
+    public void updatePost(PostSaveReqVO updateReqVO) {
         // 校验正确性
         validatePostForCreateOrUpdate(updateReqVO.getId(), updateReqVO.getName(), updateReqVO.getCode());
 
         // 更新岗位
-        PostDO updateObj = PostConvert.INSTANCE.convert(updateReqVO);
+        PostDO updateObj = BeanUtils.toBean(updateReqVO, PostDO.class);
         postMapper.updateById(updateObj);
     }
 

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.system.service.dept;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
 import org.springframework.lang.Nullable;
 
@@ -25,14 +25,14 @@ public interface PostService {
      * @param createReqVO 岗位信息
      * @return 岗位编号
      */
-    Long createPost(PostReqVO createReqVO);
+    Long createPost(PostSaveReqVO createReqVO);
 
     /**
      * 更新岗位
      *
      * @param updateReqVO 岗位信息
      */
-    void updatePost(PostReqVO updateReqVO);
+    void updatePost(PostSaveReqVO updateReqVO);
 
     /**
      * 删除岗位信息
