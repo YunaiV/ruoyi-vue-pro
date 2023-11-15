@@ -85,7 +85,7 @@ public class ${table.className}ServiceImplTest extends BaseDbUnitTest {
         assertNotNull(${classNameVar}Id);
         // 校验记录的属性是否正确
         ${table.className}DO ${classNameVar} = ${classNameVar}Mapper.selectById(${classNameVar}Id);
-        assertPojoEquals(createReqVO, ${classNameVar});
+        assertPojoEquals(createReqVO, ${classNameVar}, "id");
     }
 
     @Test
