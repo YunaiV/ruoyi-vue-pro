@@ -14,8 +14,8 @@ import ${basePackage}.module.${subTable.moduleName}.dal.dataobject.${subTable.bu
 #end
 import ${PageResultClassName};
 import ${PageParamClassName};
+import ${BeanUtils};
 
-import ${basePackage}.module.${table.moduleName}.convert.${table.businessName}.${table.className}Convert;
 import ${basePackage}.module.${table.moduleName}.dal.mysql.${table.businessName}.${table.className}Mapper;
 ## 特殊：主子表专属逻辑
 #foreach ($subTable in $subTables)
@@ -49,9 +49,9 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #if ( $subTables && $subTables.size() > 0 && $table.templateType != 11 )
     @Transactional(rollbackFor = Exception.class)
 #end
-    public ${primaryColumn.javaType} create${simpleClassName}(${sceneEnum.prefixClass}${table.className}CreateReqVO createReqVO) {
+    public ${primaryColumn.javaType} create${simpleClassName}(${sceneEnum.prefixClass}${table.className}SaveReqVO createReqVO) {
         // 插入
-        ${table.className}DO ${classNameVar} = ${table.className}Convert.INSTANCE.convert(createReqVO);
+        ${table.className}DO ${classNameVar} = BeanUtils.toBean(createReqVO, ${table.className}DO.class);
         ${classNameVar}Mapper.insert(${classNameVar});
 ## 特殊：主子表专属逻辑（非 ERP 模式）
 #if ( $subTables && $subTables.size() > 0 && $table.templateType != 11 )
@@ -78,11 +78,11 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #if ( $subTables && $subTables.size() > 0 && $table.templateType != 11 )
     @Transactional(rollbackFor = Exception.class)
 #end
-    public void update${simpleClassName}(${sceneEnum.prefixClass}${table.className}UpdateReqVO updateReqVO) {
+    public void update${simpleClassName}(${sceneEnum.prefixClass}${table.className}SaveReqVO updateReqVO) {
         // 校验存在
         validate${simpleClassName}Exists(updateReqVO.getId());
         // 更新
-        ${table.className}DO updateObj = ${table.className}Convert.INSTANCE.convert(updateReqVO);
+        ${table.className}DO updateObj = BeanUtils.toBean(updateReqVO, ${table.className}DO.class);
         ${classNameVar}Mapper.updateById(updateObj);
 ## 特殊：主子表专属逻辑（非 ERP 模式）
 #if ( $subTables && $subTables.size() > 0 && $table.templateType != 11)
@@ -151,12 +151,12 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
     public PageResult<${table.className}DO> get${simpleClassName}Page(${sceneEnum.prefixClass}${table.className}PageReqVO pageReqVO) {
         return ${classNameVar}Mapper.selectPage(pageReqVO);
     }
-
-#end
+#else
     @Override
     public List<${table.className}DO> get${simpleClassName}List(${sceneEnum.prefixClass}${table.className}ListReqVO listReqVO) {
         return ${classNameVar}Mapper.selectList(listReqVO);
     }
+#end
 
 ## 特殊：主子表专属逻辑
 #foreach ($subTable in $subTables)

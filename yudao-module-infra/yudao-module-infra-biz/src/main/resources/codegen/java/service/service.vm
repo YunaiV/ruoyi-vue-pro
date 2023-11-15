@@ -24,14 +24,14 @@ public interface ${table.className}Service {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    ${primaryColumn.javaType} create${simpleClassName}(@Valid ${sceneEnum.prefixClass}${table.className}CreateReqVO createReqVO);
+    ${primaryColumn.javaType} create${simpleClassName}(@Valid ${sceneEnum.prefixClass}${table.className}SaveReqVO createReqVO);
 
     /**
      * 更新${table.classComment}
      *
      * @param updateReqVO 更新信息
      */
-    void update${simpleClassName}(@Valid ${sceneEnum.prefixClass}${table.className}UpdateReqVO updateReqVO);
+    void update${simpleClassName}(@Valid ${sceneEnum.prefixClass}${table.className}SaveReqVO updateReqVO);
 
     /**
      * 删除${table.classComment}
@@ -57,8 +57,7 @@ public interface ${table.className}Service {
      * @return ${table.classComment}分页
      */
     PageResult<${table.className}DO> get${simpleClassName}Page(${sceneEnum.prefixClass}${table.className}PageReqVO pageReqVO);
-
-#end
+#else
     /**
      * 获得${table.classComment}列表
      *
@@ -66,6 +65,7 @@ public interface ${table.className}Service {
      * @return ${table.classComment}列表
      */
     List<${table.className}DO> get${simpleClassName}List(${sceneEnum.prefixClass}${table.className}ListReqVO listReqVO);
+#end
 
 ## 特殊：主子表专属逻辑
 #foreach ($subTable in $subTables)

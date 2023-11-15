@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.infra.service.codegen.inner;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.Filter;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -15,6 +14,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
@@ -63,16 +63,11 @@ public class CodegenEngine {
      */
     private static final Map<String, String> SERVER_TEMPLATES = MapUtil.<String, String>builder(new LinkedHashMap<>()) // 有序
             // Java module-biz Main
-            .put(javaTemplatePath("controller/vo/baseVO"), javaModuleImplVOFilePath("BaseVO"))
-            .put(javaTemplatePath("controller/vo/createReqVO"), javaModuleImplVOFilePath("CreateReqVO"))
             .put(javaTemplatePath("controller/vo/pageReqVO"), javaModuleImplVOFilePath("PageReqVO"))
-            .put(javaTemplatePath("controller/vo/respVO"), javaModuleImplVOFilePath("RespVO"))
-            .put(javaTemplatePath("controller/vo/updateReqVO"), javaModuleImplVOFilePath("UpdateReqVO"))
             .put(javaTemplatePath("controller/vo/listReqVO"), javaModuleImplVOFilePath("ListReqVO"))
-            .put(javaTemplatePath("controller/vo/excelVO"), javaModuleImplVOFilePath("ExcelVO"))
+            .put(javaTemplatePath("controller/vo/respVO"), javaModuleImplVOFilePath("RespVO"))
+            .put(javaTemplatePath("controller/vo/saveReqVO"), javaModuleImplVOFilePath("SaveReqVO"))
             .put(javaTemplatePath("controller/controller"), javaModuleImplControllerFilePath())
-            .put(javaTemplatePath("convert/convert"),
-                    javaModuleImplMainFilePath("convert/${table.businessName}/${table.className}Convert"))
             .put(javaTemplatePath("dal/do"),
                     javaModuleImplMainFilePath("dal/dataobject/${table.businessName}/${table.className}DO"))
             .put(javaTemplatePath("dal/do_sub"), // 特殊：主子表专属逻辑
@@ -192,6 +187,7 @@ public class CodegenEngine {
         globalBindingMap.put("DictConvertClassName", DictConvert.class.getName());
         globalBindingMap.put("OperateLogClassName", OperateLog.class.getName());
         globalBindingMap.put("OperateTypeEnumClassName", OperateTypeEnum.class.getName());
+        globalBindingMap.put("BeanUtils", BeanUtils.class.getName());
     }
 
     /**
@@ -218,9 +214,14 @@ public class CodegenEngine {
                 generateSubCode(table, subTables, result, vmPath, filePath, bindingMap);
                 return;
                 // 2.2 特殊：树表专属逻辑
-            } else if (isPageTemplate(vmPath)) {
+            } else if (isPageReqVOTemplate(vmPath)) {
                 // 减少多余的类生成，例如说 PageVO.java 类
                 if (CodegenTemplateTypeEnum.isTree(table.getTemplateType())) {
+                    return;
+                }
+            } else if (isListReqVOTemplate(vmPath)) {
+                // 减少多余的类生成，例如说 ListVO.java 类
+                if (!CodegenTemplateTypeEnum.isTree(table.getTemplateType())) {
                     return;
                 }
             }
@@ -469,8 +470,12 @@ public class CodegenEngine {
         return path.contains("_sub");
     }
 
-    private static boolean isPageTemplate(String path) {
-        return path.contains("page");
+    private static boolean isPageReqVOTemplate(String path) {
+        return path.contains("pageReqVO");
+    }
+
+    private static boolean isListReqVOTemplate(String path) {
+        return path.contains("listReqVO");
     }
 
 }

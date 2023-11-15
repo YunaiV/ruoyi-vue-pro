@@ -57,14 +57,14 @@ public interface ${table.className}Mapper extends BaseMapperX<${table.className}
                 .orderByDesc(${table.className}DO::getId));## 大多数情况下，id 倒序
 
     }
-
-#end
+#else
     default List<${table.className}DO> selectList(${sceneEnum.prefixClass}${table.className}ListReqVO reqVO) {
         return selectList(new LambdaQueryWrapperX<${table.className}DO>()
 			#listCondition()
                 .orderByDesc(${table.className}DO::getId));## 大多数情况下，id 倒序
 
     }
+#end
 
 ## 特殊：树表专属逻辑
 #if ( $table.templateType == 2 )
