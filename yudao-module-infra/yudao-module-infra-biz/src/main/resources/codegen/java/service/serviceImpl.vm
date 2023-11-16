@@ -207,7 +207,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         if (id == null) {
             throw exception(${simpleClassName_underlineCase.toUpperCase()}_${treeNameColumn_javaField_underlineCase.toUpperCase()}_DUPLICATE);
         }
-        if (ObjectUtil.notEqual(${classNameVar}.getId(), id)) {
+        if (!Objects.equals(${classNameVar}.getId(), id)) {
             throw exception(${simpleClassName_underlineCase.toUpperCase()}_${treeNameColumn_javaField_underlineCase.toUpperCase()}_DUPLICATE);
         }
     }
