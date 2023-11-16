@@ -324,10 +324,14 @@ public class CodegenEngine {
 
         // 特殊：树表专属逻辑
         if (CodegenTemplateTypeEnum.isTree(table.getTemplateType())) {
-            bindingMap.put("treeParentColumn", CollUtil.findOne(columns,
-                    column -> Objects.equals(column.getId(), table.getTreeParentColumnId())));
-            bindingMap.put("treeNameColumn", CollUtil.findOne(columns,
-                    column -> Objects.equals(column.getId(), table.getTreeNameColumnId())));
+            CodegenColumnDO treeParentColumn = CollUtil.findOne(columns,
+                    column -> Objects.equals(column.getId(), table.getTreeParentColumnId()));
+            bindingMap.put("treeParentColumn", treeParentColumn);
+            bindingMap.put("treeParentColumn_javaField_underlineCase", toUnderlineCase(treeParentColumn.getJavaField()));
+            CodegenColumnDO treeNameColumn = CollUtil.findOne(columns,
+                    column -> Objects.equals(column.getId(), table.getTreeNameColumnId()));
+            bindingMap.put("treeNameColumn", treeNameColumn);
+            bindingMap.put("treeNameColumn_javaField_underlineCase", toUnderlineCase(treeNameColumn.getJavaField()));
         }
 
         // 特殊：主子表专属逻辑

@@ -141,7 +141,7 @@ public class DeptServiceImpl implements DeptService {
         if (dept == null) {
             return;
         }
-        // 如果 id 为空，说明不用比较是否为相同 id 的岗位
+        // 如果 id 为空，说明不用比较是否为相同 id 的部门
         if (id == null) {
             throw exception(DEPT_NAME_DUPLICATE);
         }

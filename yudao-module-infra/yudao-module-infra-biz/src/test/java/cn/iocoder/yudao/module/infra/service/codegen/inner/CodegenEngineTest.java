@@ -51,8 +51,7 @@ public class CodegenEngineTest extends BaseMockitoUnitTest {
                 .setClassComment("学生").setAuthor("芋道源码")
                 .setTemplateType(CodegenTemplateTypeEnum.TREE.getType())
                 .setFrontType(CodegenFrontTypeEnum.VUE3.getType())
-                .setTreeParentColumnId(22L).setTreeNameColumnId(11L)
-                ;
+                .setTreeParentColumnId(22L).setTreeNameColumnId(11L);
         CodegenColumnDO idColumn = new CodegenColumnDO().setColumnName("id").setDataType(JdbcType.BIGINT.name())
                 .setColumnComment("编号").setNullable(false).setPrimaryKey(true).setAutoIncrement(true)
                 .setJavaType("Long").setJavaField("id").setExample("1024")

@@ -4,4 +4,7 @@ ErrorCode ${simpleClassName_underlineCase.toUpperCase()}_NOT_EXISTS = new ErrorC
 ## 特殊：树表专属逻辑
 #if ( $table.templateType == 2 )
 ErrorCode ${simpleClassName_underlineCase.toUpperCase()}_EXITS_CHILDREN = new ErrorCode(TODO 补充编号, "存在存在子${table.classComment}，无法删除");
+ErrorCode ${simpleClassName_underlineCase.toUpperCase()}_PARENT_NOT_EXITS = new ErrorCode(TODO 补充编号,"父级${table.classComment}不存在");
+ErrorCode ${simpleClassName_underlineCase.toUpperCase()}_PARENT_ERROR = new ErrorCode(TODO 补充编号, "不能设置自己为父${table.classComment}");
+ErrorCode ${simpleClassName_underlineCase.toUpperCase()}_${treeNameColumn_javaField_underlineCase.toUpperCase()}_DUPLICATE = new ErrorCode(TODO 补充编号, "已经存在该${treeNameColumn.columnComment}的${table.classComment}");
 #end

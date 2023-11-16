@@ -50,6 +50,16 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
     @Transactional(rollbackFor = Exception.class)
 #end
     public ${primaryColumn.javaType} create${simpleClassName}(${sceneEnum.prefixClass}${table.className}SaveReqVO createReqVO) {
+## 特殊：树表专属逻辑
+#if ( $table.templateType == 2 )
+#set ($TreeParentJavaField = $treeParentColumn.javaField.substring(0,1).toUpperCase() + ${treeParentColumn.javaField.substring(1)})##首字母大写
+#set ($TreeNameJavaField = $treeNameColumn.javaField.substring(0,1).toUpperCase() + ${treeNameColumn.javaField.substring(1)})##首字母大写
+        // 校验${treeParentColumn.columnComment}的有效性
+        validateParent${simpleClassName}(null, createReqVO.get${TreeParentJavaField}());
+        // 校验${treeNameColumn.columnComment}的唯一性
+        validate${simpleClassName}${TreeNameJavaField}Unique(null, createReqVO.get${TreeParentJavaField}(), createReqVO.get${TreeNameJavaField}());
+
+#end
         // 插入
         ${table.className}DO ${classNameVar} = BeanUtils.toBean(createReqVO, ${table.className}DO.class);
         ${classNameVar}Mapper.insert(${classNameVar});
@@ -81,6 +91,16 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
     public void update${simpleClassName}(${sceneEnum.prefixClass}${table.className}SaveReqVO updateReqVO) {
         // 校验存在
         validate${simpleClassName}Exists(updateReqVO.getId());
+## 特殊：树表专属逻辑
+#if ( $table.templateType == 2 )
+#set ($TreeParentJavaField = $treeParentColumn.javaField.substring(0,1).toUpperCase() + ${treeParentColumn.javaField.substring(1)})##首字母大写
+#set ($TreeNameJavaField = $treeNameColumn.javaField.substring(0,1).toUpperCase() + ${treeNameColumn.javaField.substring(1)})##首字母大写
+        // 校验${treeParentColumn.columnComment}的有效性
+        validateParent${simpleClassName}(updateReqVO.getId(), updateReqVO.get${TreeParentJavaField}());
+        // 校验${treeNameColumn.columnComment}的唯一性
+        validate${simpleClassName}${TreeNameJavaField}Unique(updateReqVO.getId(), updateReqVO.get${TreeParentJavaField}(), updateReqVO.get${TreeNameJavaField}());
+
+#end
         // 更新
         ${table.className}DO updateObj = BeanUtils.toBean(updateReqVO, ${table.className}DO.class);
         ${classNameVar}Mapper.updateById(updateObj);
@@ -140,6 +160,59 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         }
     }
 
+## 特殊：树表专属逻辑
+#if ( $table.templateType == 2 )
+#set ($TreeParentJavaField = $treeParentColumn.javaField.substring(0,1).toUpperCase() + ${treeParentColumn.javaField.substring(1)})##首字母大写
+#set ($TreeNameJavaField = $treeNameColumn.javaField.substring(0,1).toUpperCase() + ${treeNameColumn.javaField.substring(1)})##首字母大写
+    private void validateParent${simpleClassName}(Long id, Long ${treeParentColumn.javaField}) {
+        if (${treeParentColumn.javaField} == null || ${simpleClassName}DO.${treeParentColumn_javaField_underlineCase.toUpperCase()}_ROOT.equals(${treeParentColumn.javaField})) {
+            return;
+        }
+        // 1. 不能设置自己为父${table.classComment}
+        if (Objects.equals(id, ${treeParentColumn.javaField})) {
+            throw exception(${simpleClassName_underlineCase.toUpperCase()}_PARENT_ERROR);
+        }
+        // 2. 父${table.classComment}不存在
+        ${simpleClassName}DO parent${simpleClassName} = ${classNameVar}Mapper.selectById(${treeParentColumn.javaField});
+        if (parent${simpleClassName} == null) {
+            throw exception(${simpleClassName_underlineCase.toUpperCase()}_PARENT_NOT_EXITS);
+        }
+        // 3. 递归校验父${table.classComment}，如果父${table.classComment}是自己的子${table.classComment}，则报错，避免形成环路
+        if (id == null) { // id 为空，说明新增，不需要考虑环路
+            return;
+        }
+        for (int i = 0; i < Short.MAX_VALUE; i++) {
+            // 3.1 校验环路
+            ${treeParentColumn.javaField} = parent${simpleClassName}.get${TreeParentJavaField}();
+            if (Objects.equals(id, ${treeParentColumn.javaField})) {
+                throw exception(${simpleClassName_underlineCase.toUpperCase()}_PARENT_IS_CHILD);
+            }
+            // 3.2 继续递归下一级父${table.classComment}
+            if (${treeParentColumn.javaField} == null || ${simpleClassName}DO.${treeParentColumn_javaField_underlineCase.toUpperCase()}_ROOT.equals(${treeParentColumn.javaField})) {
+                break;
+            }
+            parent${simpleClassName} = ${classNameVar}Mapper.selectById(${treeParentColumn.javaField});
+            if (parent${simpleClassName} == null) {
+                break;
+            }
+        }
+    }
+
+    private void validate${simpleClassName}${TreeNameJavaField}Unique(Long id, Long ${treeParentColumn.javaField}, String ${treeNameColumn.javaField}) {
+        ${simpleClassName}DO ${classNameVar} = ${classNameVar}Mapper.selectBy${TreeParentJavaField}And${TreeNameJavaField}(${treeParentColumn.javaField}, ${treeNameColumn.javaField});
+        if (${classNameVar} == null) {
+            return;
+        }
+        // 如果 id 为空，说明不用比较是否为相同 id 的${table.classComment}
+        if (id == null) {
+            throw exception(${simpleClassName_underlineCase.toUpperCase()}_${treeNameColumn_javaField_underlineCase.toUpperCase()}_DUPLICATE);
+        }
+        if (ObjectUtil.notEqual(${classNameVar}.getId(), id)) {
+            throw exception(${simpleClassName_underlineCase.toUpperCase()}_${treeNameColumn_javaField_underlineCase.toUpperCase()}_DUPLICATE);
+        }
+    }
+
+#end
     @Override
     public ${table.className}DO get${simpleClassName}(${primaryColumn.javaType} id) {
         return ${classNameVar}Mapper.selectById(id);

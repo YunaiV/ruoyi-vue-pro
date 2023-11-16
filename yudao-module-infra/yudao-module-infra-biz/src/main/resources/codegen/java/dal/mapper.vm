@@ -68,9 +68,14 @@ public interface ${table.className}Mapper extends BaseMapperX<${table.className}
 
 ## 特殊：树表专属逻辑
 #if ( $table.templateType == 2 )
-#set ($ParentJavaField = $treeParentColumn.javaField.substring(0,1).toUpperCase() + ${treeParentColumn.javaField.substring(1)})##首字母大写
-    default Long selectCountBy${ParentJavaField}(${treeParentColumn.javaType} ${treeParentColumn.javaField}) {
-        return selectCount(${table.className}DO::get${ParentJavaField}, ${treeParentColumn.javaField});
+#set ($TreeParentJavaField = $treeParentColumn.javaField.substring(0,1).toUpperCase() + ${treeParentColumn.javaField.substring(1)})##首字母大写
+#set ($TreeNameJavaField = $treeNameColumn.javaField.substring(0,1).toUpperCase() + ${treeNameColumn.javaField.substring(1)})##首字母大写
+	default ${table.className}DO selectBy${TreeParentJavaField}And${TreeNameJavaField}(Long ${treeParentColumn.javaField}, String ${treeNameColumn.javaField}) {
+	    return selectOne(${table.className}DO::get${TreeParentJavaField}, ${treeParentColumn.javaField}, ${table.className}DO::get${TreeNameJavaField}, ${treeNameColumn.javaField});
+	}
+
+    default Long selectCountBy${TreeParentJavaField}(${treeParentColumn.javaType} ${treeParentColumn.javaField}) {
+        return selectCount(${table.className}DO::get${TreeParentJavaField}, ${treeParentColumn.javaField});
     }
 
 #end
