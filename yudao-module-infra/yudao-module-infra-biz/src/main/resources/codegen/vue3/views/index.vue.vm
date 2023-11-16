@@ -243,8 +243,10 @@ import download from '@/utils/download'
 import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${table.businessName}'
 import ${simpleClassName}Form from './${simpleClassName}Form.vue'
 ## 特殊：主子表专属逻辑
+#if ( $table.templateType != 10 )
 #foreach ($subSimpleClassName in $subSimpleClassNames)
 import ${subSimpleClassName}List from './components/${subSimpleClassName}List.vue'
+#end
 #end
 
 defineOptions({ name: '${table.className}' })

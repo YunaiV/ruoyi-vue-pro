@@ -31,8 +31,9 @@
         #elseif ($javaType == "Boolean")
             #set ($dictMethod = "getBoolDictOptions")
         #end
-        #if ($column.htmlType == "input" && !$column.primaryKey)## 忽略主键，不用在表单里 TODO 芋艿：这里要忽略下 join 字段；
-      <el-table-column label="${comment}" width="150">
+        #if ( $column.id == $subJoinColumn.id) ## 特殊：忽略主子表的 join 字段，不用填写
+        #elseif ($column.htmlType == "input" && !$column.primaryKey)## 忽略主键，不用在表单里
+      <el-table-column label="${comment}" min-width="150">
         <template #default="{ row, $index }">
           <el-form-item :prop="`${$index}.${javaField}`" :rules="formRules.${javaField}" class="mb-0px!">
             <el-input v-model="row.${javaField}" placeholder="请输入${comment}" />
@@ -40,7 +41,7 @@
         </template>
       </el-table-column>
         #elseif($column.htmlType == "imageUpload")## 图片上传
-      <el-table-column label="${comment}" width="200">
+      <el-table-column label="${comment}" min-width="200">
         <template #default="{ row, $index }">
           <el-form-item :prop="`${$index}.${javaField}`" :rules="formRules.${javaField}" class="mb-0px!">
             <UploadImg v-model="row.${javaField}" />
@@ -48,7 +49,7 @@
         </template>
       </el-table-column>
         #elseif($column.htmlType == "fileUpload")## 文件上传
-      <el-table-column label="${comment}" width="200">
+      <el-table-column label="${comment}" min-width="200">
         <template #default="{ row, $index }">
           <el-form-item :prop="`${$index}.${javaField}`" :rules="formRules.${javaField}" class="mb-0px!">
             <UploadFile v-model="row.${javaField}" />
@@ -56,7 +57,7 @@
         </template>
       </el-table-column>
         #elseif($column.htmlType == "editor")## 文本编辑器
-      <el-table-column label="${comment}" width="400">
+      <el-table-column label="${comment}" min-width="400">
         <template #default="{ row, $index }">
           <el-form-item :prop="`${$index}.${javaField}`" :rules="formRules.${javaField}" class="mb-0px!">
             <Editor v-model="row.${javaField}" height="150px" />
@@ -64,7 +65,7 @@
         </template>
       </el-table-column>
         #elseif($column.htmlType == "select")## 下拉框
-      <el-table-column label="${comment}" width="150">
+      <el-table-column label="${comment}" min-width="150">
         <template #default="{ row, $index }">
           <el-form-item :prop="`${$index}.${javaField}`" :rules="formRules.${javaField}" class="mb-0px!">
             <el-select v-model="row.${javaField}" placeholder="请选择${comment}">
@@ -83,7 +84,7 @@
         </template>
       </el-table-column>
         #elseif($column.htmlType == "checkbox")## 多选框
-      <el-table-column label="${comment}" width="150">
+      <el-table-column label="${comment}" min-width="150">
         <template #default="{ row, $index }">
           <el-form-item :prop="`${$index}.${javaField}`" :rules="formRules.${javaField}" class="mb-0px!">
             <el-checkbox-group v-model="row.${javaField}">
@@ -103,7 +104,7 @@
         </template>
       </el-table-column>
         #elseif($column.htmlType == "radio")## 单选框
-      <el-table-column label="${comment}" width="150">
+      <el-table-column label="${comment}" min-width="150">
         <template #default="{ row, $index }">
           <el-form-item :prop="`${$index}.${javaField}`" :rules="formRules.${javaField}" class="mb-0px!">
             <el-radio-group v-model="row.${javaField}">
@@ -123,7 +124,7 @@
         </template>
       </el-table-column>
         #elseif($column.htmlType == "datetime")## 时间框
-      <el-table-column label="${comment}" width="150">
+      <el-table-column label="${comment}" min-width="150">
         <template #default="{ row, $index }">
           <el-form-item :prop="`${$index}.${javaField}`" :rules="formRules.${javaField}" class="mb-0px!">
             <el-date-picker
@@ -136,7 +137,7 @@
         </template>
       </el-table-column>
         #elseif($column.htmlType == "textarea")## 文本框
-      <el-table-column label="${comment}" width="200">
+      <el-table-column label="${comment}" min-width="200">
         <template #default="{ row, $index }">
           <el-form-item :prop="`${$index}.${javaField}`" :rules="formRules.${javaField}" class="mb-0px!">
             <el-input v-model="row.${javaField}" type="textarea" placeholder="请输入${comment}" />
@@ -179,7 +180,8 @@
       #elseif ($javaType == "Boolean")
           #set ($dictMethod = "getBoolDictOptions")
       #end
-      #if ($column.htmlType == "input" && !$column.primaryKey)## 忽略主键，不用在表单里 TODO 芋艿：这里要忽略下 join 字段；
+      #if ( $column.id == $subJoinColumn.id) ## 特殊：忽略主子表的 join 字段，不用填写
+      #elseif ($column.htmlType == "input" && !$column.primaryKey)## 忽略主键，不用在表单里
     <el-form-item label="${comment}" prop="${javaField}">
       <el-input v-model="formData.${javaField}" placeholder="请输入${comment}" />
     </el-form-item>

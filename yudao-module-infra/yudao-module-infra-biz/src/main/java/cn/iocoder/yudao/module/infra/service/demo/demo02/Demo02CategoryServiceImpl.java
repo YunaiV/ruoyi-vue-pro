@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.infra.controller.admin.demo.demo02.vo.Demo02CategoryListReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.demo.demo02.vo.Demo02CategorySaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo02.Demo02CategoryDO;
-import cn.iocoder.yudao.module.infra.dal.mysql.demo02.Demo02CategoryMapper;
+import cn.iocoder.yudao.module.infra.dal.mysql.demo.demo02.Demo02CategoryMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 

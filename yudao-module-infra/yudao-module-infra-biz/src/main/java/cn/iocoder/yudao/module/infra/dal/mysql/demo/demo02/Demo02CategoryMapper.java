@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.infra.dal.mysql.demo02;
+package cn.iocoder.yudao.module.infra.dal.mysql.demo.demo02;
 
 import java.util.*;
 
