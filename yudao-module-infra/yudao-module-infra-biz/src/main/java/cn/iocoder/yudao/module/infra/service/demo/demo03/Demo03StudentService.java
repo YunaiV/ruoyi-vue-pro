@@ -1,12 +1,15 @@
 package cn.iocoder.yudao.module.infra.service.demo.demo03;
 
-import java.util.*;
-import javax.validation.*;
-import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.normal.vo.*;
-import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03StudentDO;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.vo.Demo03StudentPageReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.vo.Demo03StudentSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03CourseDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03GradeDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03StudentDO;
+
+import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 学生 Service 接口
@@ -64,6 +67,44 @@ public interface Demo03StudentService {
      */
     List<Demo03CourseDO> getDemo03CourseListByStudentId(Long studentId);
 
+    /**
+     * 获得学生课程分页
+     *
+     * @param pageReqVO 分页查询
+     * @param studentId 学生编号
+     * @return 学生课程分页
+     */
+    PageResult<Demo03CourseDO> getDemo03CoursePage(PageParam pageReqVO, Long studentId);
+
+    /**
+     * 创建学生课程
+     *
+     * @param demo03Course 创建信息
+     * @return 编号
+     */
+    Long createDemo03Course(@Valid Demo03CourseDO demo03Course);
+
+    /**
+     * 更新学生课程
+     *
+     * @param demo03Course 更新信息
+     */
+    void updateDemo03Course(@Valid Demo03CourseDO demo03Course);
+
+    /**
+     * 删除学生课程
+     *
+     * @param id 编号
+     */
+    void deleteDemo03Course(Long id);
+
+    /**
+     * 获得学生课程
+     *
+     * @param id 编号
+     * @return 学生课程
+     */
+    Demo03CourseDO getDemo03Course(Long id);
 
     // ==================== 子表（学生班级） ====================
 
@@ -74,5 +115,44 @@ public interface Demo03StudentService {
      * @return 学生班级
      */
     Demo03GradeDO getDemo03GradeByStudentId(Long studentId);
+
+    /**
+     * 获得学生班级分页
+     *
+     * @param pageReqVO 分页查询
+     * @param studentId 学生编号
+     * @return 学生班级分页
+     */
+    PageResult<Demo03GradeDO> getDemo03GradePage(PageParam pageReqVO, Long studentId);
+
+    /**
+     * 创建学生班级
+     *
+     * @param demo03Grade 创建信息
+     * @return 编号
+     */
+    Long createDemo03Grade(@Valid Demo03GradeDO demo03Grade);
+
+    /**
+     * 更新学生班级
+     *
+     * @param demo03Grade 更新信息
+     */
+    void updateDemo03Grade(@Valid Demo03GradeDO demo03Grade);
+
+    /**
+     * 删除学生班级
+     *
+     * @param id 编号
+     */
+    void deleteDemo03Grade(Long id);
+
+    /**
+     * 获得学生班级
+     *
+     * @param id 编号
+     * @return 学生班级
+     */
+    Demo03GradeDO getDemo03Grade(Long id);
 
 }

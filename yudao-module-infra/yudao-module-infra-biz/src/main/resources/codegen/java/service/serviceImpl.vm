@@ -235,6 +235,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #foreach ($subTable in $subTables)
 #set ($index = $foreach.count - 1)
 #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+#set ($simpleClassNameUnderlineCase = $simpleClassNameUnderlineCases.get($index))
 #set ($subPrimaryColumn = $subPrimaryColumns.get($index))##当前 primary 字段
 #set ($subJoinColumn = $subJoinColumns.get($index))##当前 join 字段
 #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
@@ -268,24 +269,44 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #if ( $table.templateType == 11 )
     @Override
     public ${subPrimaryColumn.javaType} create${subSimpleClassName}(${subTable.className}DO ${subClassNameVar}) {
+## 特殊：一对一时，需要保证只有一条，不能重复插入
+#if ( !$subTable.subJoinMany)
+        // 校验是否已经存在
+        if (${subClassNameVars.get($index)}Mapper.selectBy${SubJoinColumnName}(${subClassNameVar}.get${SubJoinColumnName}()) != null) {
+            throw exception(${simpleClassNameUnderlineCase.toUpperCase()}_EXISTS);
+        }
+        // 插入
+#end
         ${subClassNameVars.get($index)}Mapper.insert(${subClassNameVar});
         return ${subClassNameVar}.getId();
     }
 
     @Override
     public void update${subSimpleClassName}(${subTable.className}DO ${subClassNameVar}) {
+        // 校验存在
+        validate${subSimpleClassName}Exists(${subClassNameVar}.getId());
+        // 更新
         ${subClassNameVars.get($index)}Mapper.updateById(${subClassNameVar});
     }
 
     @Override
     public void delete${subSimpleClassName}(${subPrimaryColumn.javaType} id) {
+        // 校验存在
+        validate${subSimpleClassName}Exists(id);
+        // 删除
         ${subClassNameVars.get($index)}Mapper.deleteById(id);
     }
 
-	@Override
-	public ${subTable.className}DO get${subSimpleClassName}(${subPrimaryColumn.javaType} id) {
+    @Override
+    public ${subTable.className}DO get${subSimpleClassName}(${subPrimaryColumn.javaType} id) {
         return ${subClassNameVars.get($index)}Mapper.selectById(id);
-	}
+    }
+
+    private void validate${subSimpleClassName}Exists(${subPrimaryColumn.javaType} id) {
+        if (${subClassNameVar}Mapper.selectById(id) == null) {
+            throw exception(${simpleClassNameUnderlineCase.toUpperCase()}_NOT_EXISTS);
+        }
+    }
 
 ## 情况二：非 MASTER_ERP 时，支持批量的新增、修改操作
 #else

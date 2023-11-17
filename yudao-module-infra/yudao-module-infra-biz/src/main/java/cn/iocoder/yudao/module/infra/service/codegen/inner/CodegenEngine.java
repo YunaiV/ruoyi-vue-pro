@@ -344,6 +344,7 @@ public class CodegenEngine {
             List<String> subJoinColumnStrikeCases = new ArrayList<>();
             List<String> subSimpleClassNames = new ArrayList<>();
             List<String> subClassNameVars = new ArrayList<>();
+            List<String> simpleClassNameUnderlineCases = new ArrayList<>();
             List<String> subSimpleClassNameStrikeCases = new ArrayList<>();
             for (int i = 0; i < subTables.size(); i++) {
                 CodegenTableDO subTable = subTables.get(i);
@@ -356,6 +357,7 @@ public class CodegenEngine {
                 // className 相关
                 String subSimpleClassName = removePrefix(subTable.getClassName(), upperFirst(subTable.getModuleName()));
                 subSimpleClassNames.add(subSimpleClassName);
+                simpleClassNameUnderlineCases.add(toUnderlineCase(subSimpleClassName)); // 将 DictType 转换成 dict_type
                 subClassNameVars.add(lowerFirst(subSimpleClassName)); // 将 DictType 转换成 dictType，用于变量
                 subSimpleClassNameStrikeCases.add(toSymbolCase(subSimpleClassName, '-')); // 将 DictType 转换成 dict-type
             }
@@ -363,6 +365,7 @@ public class CodegenEngine {
             bindingMap.put("subJoinColumns", subJoinColumns);
             bindingMap.put("subJoinColumn_strikeCases", subJoinColumnStrikeCases);
             bindingMap.put("subSimpleClassNames", subSimpleClassNames);
+            bindingMap.put("simpleClassNameUnderlineCases", simpleClassNameUnderlineCases);
             bindingMap.put("subClassNameVars", subClassNameVars);
             bindingMap.put("subSimpleClassName_strikeCases", subSimpleClassNameStrikeCases);
         }

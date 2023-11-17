@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03StudentDO;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.normal.vo.*;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.vo.*;
 
 /**
  * 学生 Mapper

@@ -25,7 +25,8 @@
         #elseif ($javaType == "Boolean")
             #set ($dictMethod = "getBoolDictOptions")
         #end
-        #if ($column.htmlType == "input" && !$column.primaryKey)## 忽略主键，不用在表单里 TODO 芋艿：这里要忽略下 join 字段；
+        #if ( $column.id == $subJoinColumn.id) ## 特殊：忽略主子表的 join 字段，不用填写
+        #elseif ($column.htmlType == "input" && !$column.primaryKey)## 忽略主键，不用在表单里
       <el-form-item label="${comment}" prop="${javaField}">
         <el-input v-model="formData.${javaField}" placeholder="请输入${comment}" />
       </el-form-item>

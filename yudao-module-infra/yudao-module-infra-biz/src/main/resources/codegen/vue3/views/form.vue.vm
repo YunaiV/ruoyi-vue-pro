@@ -118,7 +118,7 @@
 #end
     </el-form>
 ## 特殊：主子表专属逻辑
-#if ( $subTables && $subTables.size() > 0 )
+#if ( $table.templateType == 10 || $table.templateType == 12 )
     <!-- 子表的表单 -->
     <el-tabs v-model="subTabsName">
     #foreach ($subTable in $subTables)
@@ -146,8 +146,10 @@ import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${table.busine
 import { defaultProps, handleTree } from '@/utils/tree'
 #end
 ## 特殊：主子表专属逻辑
+#if ( $table.templateType == 10 || $table.templateType == 12 )
 #foreach ($subSimpleClassName in $subSimpleClassNames)
 import ${subSimpleClassName}Form from './components/${subSimpleClassName}Form.vue'
+#end
 #end
 
 const { t } = useI18n() // 国际化
@@ -182,12 +184,14 @@ const formRef = ref() // 表单 Ref
 const ${classNameVar}Tree = ref() // 树形结构
 #end
 ## 特殊：主子表专属逻辑
+#if ( $table.templateType == 10 || $table.templateType == 12 )
 #if ( $subTables && $subTables.size() > 0 )
 
 /** 子表的表单 */
 const subTabsName = ref('$subClassNameVars.get(0)')
 #foreach ($subClassNameVar in $subClassNameVars)
 const ${subClassNameVar}FormRef = ref()
+#end
 #end
 #end
 
@@ -219,6 +223,7 @@ const submitForm = async () => {
   // 校验表单
   await formRef.value.validate()
 ## 特殊：主子表专属逻辑
+#if ( $table.templateType == 10 || $table.templateType == 12 )
 #if ( $subTables && $subTables.size() > 0 )
   // 校验子表单
   #foreach ($subTable in $subTables)
@@ -232,11 +237,13 @@ const submitForm = async () => {
   }
   #end
 #end
+#end
   // 提交请求
   formLoading.value = true
   try {
     const data = formData.value as unknown as ${simpleClassName}Api.${simpleClassName}VO
 ## 特殊：主子表专属逻辑
+#if ( $table.templateType == 10 || $table.templateType == 12 )
 #if ( $subTables && $subTables.size() > 0 )
     // 拼接子表的数据
   #foreach ($subTable in $subTables)
@@ -244,6 +251,7 @@ const submitForm = async () => {
   #set ($subClassNameVar = $subClassNameVars.get($index))
     data.${subClassNameVar}#if ( $subTable.subJoinMany)s#end = ${subClassNameVar}FormRef.value.getData()
   #end
+#end
 #end
     if (formType.value === 'create') {
       await ${simpleClassName}Api.create${simpleClassName}(data)
