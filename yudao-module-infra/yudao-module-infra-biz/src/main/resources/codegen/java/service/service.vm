@@ -75,7 +75,6 @@ public interface ${table.className}Service {
 #set ($subJoinColumn = $subJoinColumns.get($index))##当前 join 字段
 #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
 #set ($subClassNameVar = $subClassNameVars.get($index))
-
     // ==================== 子表（$subTable.classComment） ====================
 
 ## 情况一：MASTER_ERP 时，需要分查询页子表

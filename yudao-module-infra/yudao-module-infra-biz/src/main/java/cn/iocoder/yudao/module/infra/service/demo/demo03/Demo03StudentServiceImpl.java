@@ -1,21 +1,22 @@
 package cn.iocoder.yudao.module.infra.service.demo.demo03;
 
-import org.springframework.stereotype.Service;
-import javax.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
-import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.normal.vo.*;
-import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03StudentDO;
-import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03CourseDO;
-import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03GradeDO;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-
-import cn.iocoder.yudao.module.infra.dal.mysql.demo.demo03.Demo03StudentMapper;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.vo.Demo03StudentPageReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.vo.Demo03StudentSaveReqVO;
+import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03CourseDO;
+import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03GradeDO;
+import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03StudentDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.demo.demo03.Demo03CourseMapper;
 import cn.iocoder.yudao.module.infra.dal.mysql.demo.demo03.Demo03GradeMapper;
+import cn.iocoder.yudao.module.infra.dal.mysql.demo.demo03.Demo03StudentMapper;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+
+import javax.annotation.Resource;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.*;
@@ -101,7 +102,9 @@ public class Demo03StudentServiceImpl implements Demo03StudentService {
     }
 
     private void createDemo03CourseList(Long studentId, List<Demo03CourseDO> list) {
-        list.forEach(o -> o.setStudentId(studentId));
+        if (list != null) {
+            list.forEach(o -> o.setStudentId(studentId));
+        }
         demo03CourseMapper.insertBatch(list);
     }
 
@@ -113,6 +116,32 @@ public class Demo03StudentServiceImpl implements Demo03StudentService {
 
     private void deleteDemo03CourseByStudentId(Long studentId) {
         demo03CourseMapper.deleteByStudentId(studentId);
+    }
+
+    @Override
+    public PageResult<Demo03CourseDO> getDemo03CoursePage(PageParam pageReqVO, Long studentId) {
+        return demo03CourseMapper.selectPage(pageReqVO, studentId);
+    }
+
+    @Override
+    public Long createDemo03Course(Demo03CourseDO demo03Course) {
+        demo03CourseMapper.insert(demo03Course);
+        return demo03Course.getId();
+    }
+
+    @Override
+    public void updateDemo03Course(Demo03CourseDO demo03Course) {
+        demo03CourseMapper.updateById(demo03Course);
+    }
+
+    @Override
+    public void deleteDemo03Course(Long id) {
+        demo03CourseMapper.deleteById(id);
+    }
+
+    @Override
+    public Demo03CourseDO getDemo03Course(Long id) {
+        return demo03CourseMapper.selectById(id);
     }
 
     // ==================== 子表（学生班级） ====================
@@ -141,6 +170,48 @@ public class Demo03StudentServiceImpl implements Demo03StudentService {
 
     private void deleteDemo03GradeByStudentId(Long studentId) {
         demo03GradeMapper.deleteByStudentId(studentId);
+    }
+
+    @Override
+    public PageResult<Demo03GradeDO> getDemo03GradePage(PageParam pageReqVO, Long studentId) {
+        return demo03GradeMapper.selectPage(pageReqVO, studentId);
+    }
+
+    @Override
+    public Long createDemo03Grade(Demo03GradeDO demo03Grade) {
+        // 校验是否已经存在
+        if (demo03GradeMapper.selectByStudentId(demo03Grade.getStudentId()) != null) {
+            throw exception(DEMO03_GRADE_EXISTS);
+        }
+        demo03GradeMapper.insert(demo03Grade);
+        return demo03Grade.getId();
+    }
+
+    @Override
+    public void updateDemo03Grade(Demo03GradeDO demo03Grade) {
+        // 校验存在
+        validateDemo03GradeExists(demo03Grade.getId());
+        // 更新
+        demo03GradeMapper.updateById(demo03Grade);
+    }
+
+    @Override
+    public void deleteDemo03Grade(Long id) {
+        // 校验存在
+        validateDemo03GradeExists(id);
+        // 删除
+        demo03GradeMapper.deleteById(id);
+    }
+
+    @Override
+    public Demo03GradeDO getDemo03Grade(Long id) {
+        return demo03GradeMapper.selectById(id);
+    }
+
+    private void validateDemo03GradeExists(Long id) {
+        if (demo03GradeMapper.selectById(id) == null) {
+            throw exception(DEMO03_GRADE_NOT_EXISTS);
+        }
     }
 
 }
