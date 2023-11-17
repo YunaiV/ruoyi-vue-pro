@@ -62,6 +62,12 @@
   "contentPath" : "vue/StudentTeacherForm",
   "filePath" : "yudao-ui-admin-vue3/src/views/infra/demo/components/StudentTeacherForm.vue"
 }, {
+  "contentPath" : "vue/StudentContactList",
+  "filePath" : "yudao-ui-admin-vue3/src/views/infra/demo/components/StudentContactList.vue"
+}, {
+  "contentPath" : "vue/StudentTeacherList",
+  "filePath" : "yudao-ui-admin-vue3/src/views/infra/demo/components/StudentTeacherList.vue"
+}, {
   "contentPath" : "ts/index",
   "filePath" : "yudao-ui-admin-vue3/src/api/infra/demo/index.ts"
 } ]

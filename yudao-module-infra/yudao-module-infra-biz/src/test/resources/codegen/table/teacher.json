@@ -1,18 +1,15 @@
 {
   "table": {
-    "id": 1,
     "scene" : 1,
-    "parentMenuId" : 888,
-    "tableName" : "infra_student",
-    "tableComment" : "学生表",
+    "tableName" : "infra_student_teacher",
+    "tableComment" : "学生班主任表",
     "moduleName" : "infra",
     "businessName" : "demo",
-    "className" : "InfraStudent",
-    "classComment" : "学生",
+    "className" : "InfraStudentTeacher",
+    "classComment" : "学生班主任",
     "author" : "芋道源码"
   },
   "columns": [ {
-    "id" : 100,
     "columnName" : "id",
     "dataType" : "BIGINT",
     "columnComment" : "编号",
@@ -21,6 +18,17 @@
     "javaType" : "Long",
     "javaField" : "id",
     "example" : "1024",
+    "updateOperation" : true,
+    "listOperationResult" : true
+  }, {
+    "id" : 200,
+    "columnName" : "student_id",
+    "dataType" : "BIGINT",
+    "columnComment" : "学生编号",
+    "javaType" : "Long",
+    "javaField" : "studentId",
+    "example" : "2048",
+    "createOperation" : true,
     "updateOperation" : true,
     "listOperationResult" : true
   }, {
@@ -102,6 +110,7 @@
     "columnName" : "video",
     "dataType" : "VARCHAR",
     "columnComment" : "附件",
+    "nullable" : true,
     "javaType" : "String",
     "javaField" : "video",
     "example" : "https://www.iocoder.cn/1.mp4",

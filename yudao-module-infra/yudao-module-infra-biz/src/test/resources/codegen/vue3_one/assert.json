@@ -14,20 +14,8 @@
   "contentPath" : "java/InfraStudentDO",
   "filePath" : "yudao-module-infra/yudao-module-infra-biz/src/main/java/cn/iocoder/yudao/module/infra/dal/dataobject/demo/InfraStudentDO.java"
 }, {
-  "contentPath" : "java/InfraStudentContactDO",
-  "filePath" : "yudao-module-infra/yudao-module-infra-biz/src/main/java/cn/iocoder/yudao/module/infra/dal/dataobject/demo/InfraStudentContactDO.java"
-}, {
-  "contentPath" : "java/InfraStudentTeacherDO",
-  "filePath" : "yudao-module-infra/yudao-module-infra-biz/src/main/java/cn/iocoder/yudao/module/infra/dal/dataobject/demo/InfraStudentTeacherDO.java"
-}, {
   "contentPath" : "java/InfraStudentMapper",
   "filePath" : "yudao-module-infra/yudao-module-infra-biz/src/main/java/cn/iocoder/yudao/module/infra/dal/mysql/demo/InfraStudentMapper.java"
-}, {
-  "contentPath" : "java/InfraStudentContactMapper",
-  "filePath" : "yudao-module-infra/yudao-module-infra-biz/src/main/java/cn/iocoder/yudao/module/infra/dal/mysql/demo/InfraStudentContactMapper.java"
-}, {
-  "contentPath" : "java/InfraStudentTeacherMapper",
-  "filePath" : "yudao-module-infra/yudao-module-infra-biz/src/main/java/cn/iocoder/yudao/module/infra/dal/mysql/demo/InfraStudentTeacherMapper.java"
 }, {
   "contentPath" : "xml/InfraStudentMapper",
   "filePath" : "yudao-module-infra/yudao-module-infra-biz/src/main/resources/mapper/demo/InfraStudentMapper.xml"
@@ -55,12 +43,6 @@
 }, {
   "contentPath" : "vue/StudentForm",
   "filePath" : "yudao-ui-admin-vue3/src/views/infra/demo/StudentForm.vue"
-}, {
-  "contentPath" : "vue/StudentContactForm",
-  "filePath" : "yudao-ui-admin-vue3/src/views/infra/demo/components/StudentContactForm.vue"
-}, {
-  "contentPath" : "vue/StudentTeacherForm",
-  "filePath" : "yudao-ui-admin-vue3/src/views/infra/demo/components/StudentTeacherForm.vue"
 }, {
   "contentPath" : "ts/index",
   "filePath" : "yudao-ui-admin-vue3/src/api/infra/demo/index.ts"

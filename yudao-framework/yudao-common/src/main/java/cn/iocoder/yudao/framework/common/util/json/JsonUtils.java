@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.common.util.json;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -30,6 +31,7 @@ public class JsonUtils {
     static {
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL); // 忽略 null 值
         objectMapper.registerModules(new JavaTimeModule()); // 解决 LocalDateTime 的序列化
     }
 
@@ -65,6 +67,20 @@ public class JsonUtils {
         }
         try {
             return objectMapper.readValue(text, clazz);
+        } catch (IOException e) {
+            log.error("json parse err,json:{}", text, e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> T parseObject(String text, String path, Class<T> clazz) {
+        if (StrUtil.isEmpty(text)) {
+            return null;
+        }
+        try {
+            JsonNode treeNode = objectMapper.readTree(text);
+            JsonNode pathNode = treeNode.path(path);
+            return objectMapper.readValue(pathNode.toString(), clazz);
         } catch (IOException e) {
             log.error("json parse err,json:{}", text, e);
             throw new RuntimeException(e);
@@ -126,6 +142,20 @@ public class JsonUtils {
         }
         try {
             return objectMapper.readValue(text, objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
+        } catch (IOException e) {
+            log.error("json parse err,json:{}", text, e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> List<T> parseArray(String text, String path, Class<T> clazz) {
+        if (StrUtil.isEmpty(text)) {
+            return null;
+        }
+        try {
+            JsonNode treeNode = objectMapper.readTree(text);
+            JsonNode pathNode = treeNode.path(path);
+            return objectMapper.readValue(pathNode.toString(), objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
         } catch (IOException e) {
             log.error("json parse err,json:{}", text, e);
             throw new RuntimeException(e);
