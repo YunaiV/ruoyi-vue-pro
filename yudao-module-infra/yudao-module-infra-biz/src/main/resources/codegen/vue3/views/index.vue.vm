@@ -113,7 +113,7 @@
 
   <!-- 列表 -->
   <ContentWrap>
-## 特殊：主子表专属逻辑
+## 特殊：主子表专属逻辑  TODO puhui999: 普通模式
 #if ( $table.templateType == 11 && $subTables && $subTables.size() > 0 )
     <el-table
       v-loading="loading"
@@ -137,7 +137,7 @@
 #else
     <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
 #end
-## 特殊：主子表专属逻辑
+## 特殊：主子表专属逻辑  TODO puhui999: 内嵌模式
 #if ( $table.templateType == 12 && $subTables && $subTables.size() > 0 )
       <!-- 子表的列表 -->
       <el-table-column type="expand">
@@ -213,7 +213,7 @@
 
   <!-- 表单弹窗：添加/修改 -->
   <${simpleClassName}Form ref="formRef" @success="getList" />
-## 特殊：主子表专属逻辑
+## 特殊：主子表专属逻辑 TODO puhui999: ERP 模式
 #if ( $table.templateType == 11 && $subTables && $subTables.size() > 0 )
   <!-- 子表的列表 -->
   <ContentWrap>
@@ -243,7 +243,7 @@ import download from '@/utils/download'
 import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${table.businessName}'
 import ${simpleClassName}Form from './${simpleClassName}Form.vue'
 ## 特殊：主子表专属逻辑
-#if ( $table.templateType != 10 )
+#if ( $subTables && $subTables.size() > 0 )
 #foreach ($subSimpleClassName in $subSimpleClassNames)
 import ${subSimpleClassName}List from './components/${subSimpleClassName}List.vue'
 #end
@@ -343,9 +343,9 @@ const handleExport = async () => {
     exportLoading.value = false
   }
 }
-## 特殊：主子表专属逻辑
-#if ( $table.templateType == 11 )
 
+## 特殊：主子表专属逻辑
+#if ( $subTables && $subTables.size() > 0 )
 /** 选中行操作 */
 const currentRow = ref({}) // 选中行
 const handleCurrentChange = (row) => {
