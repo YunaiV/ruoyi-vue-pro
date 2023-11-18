@@ -101,7 +101,7 @@ public class CodegenEngine {
     private static final Table<Integer, String, String> FRONT_TEMPLATES = ImmutableTable.<Integer, String, String>builder()
             // Vue2 标准模版
             .put(CodegenFrontTypeEnum.VUE2.getType(), vueTemplatePath("views/index.vue"),
-                    vueFilePath("views/${table.moduleName}/${classNameVar}/index.vue"))
+                    vueFilePath("views/${table.moduleName}/${table.businessName}/index.vue"))
             .put(CodegenFrontTypeEnum.VUE2.getType(), vueTemplatePath("api/api.js"),
                     vueFilePath("api/${table.moduleName}/${classNameVar}.js"))
             // Vue3 标准模版
@@ -123,22 +123,22 @@ public class CodegenEngine {
                     vue3FilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
             // Vue3 Schema 模版
             .put(CodegenFrontTypeEnum.VUE3_SCHEMA.getType(), vue3SchemaTemplatePath("views/data.ts"),
-                    vue3FilePath("views/${table.moduleName}/${classNameVar}/${classNameVar}.data.ts"))
+                    vue3FilePath("views/${table.moduleName}/${table.businessName}/${classNameVar}.data.ts"))
             .put(CodegenFrontTypeEnum.VUE3_SCHEMA.getType(), vue3SchemaTemplatePath("views/index.vue"),
-                    vue3FilePath("views/${table.moduleName}/${classNameVar}/index.vue"))
+                    vue3FilePath("views/${table.moduleName}/${table.businessName}/index.vue"))
             .put(CodegenFrontTypeEnum.VUE3_SCHEMA.getType(), vue3SchemaTemplatePath("views/form.vue"),
-                    vue3FilePath("views/${table.moduleName}/${classNameVar}/${simpleClassName}Form.vue"))
+                    vue3FilePath("views/${table.moduleName}/${table.businessName}/${simpleClassName}Form.vue"))
             .put(CodegenFrontTypeEnum.VUE3_SCHEMA.getType(), vue3SchemaTemplatePath("api/api.ts"),
-                    vue3FilePath("api/${table.moduleName}/${classNameVar}/index.ts"))
+                    vue3FilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
             // Vue3 vben 模版
             .put(CodegenFrontTypeEnum.VUE3_VBEN.getType(), vue3VbenTemplatePath("views/data.ts"),
-                    vue3FilePath("views/${table.moduleName}/${classNameVar}/${classNameVar}.data.ts"))
+                    vue3FilePath("views/${table.moduleName}/${table.businessName}/${classNameVar}.data.ts"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN.getType(), vue3VbenTemplatePath("views/index.vue"),
-                    vue3FilePath("views/${table.moduleName}/${classNameVar}/index.vue"))
+                    vue3FilePath("views/${table.moduleName}/${table.businessName}/index.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN.getType(), vue3VbenTemplatePath("views/form.vue"),
-                    vue3FilePath("views/${table.moduleName}/${classNameVar}/${simpleClassName}Modal.vue"))
+                    vue3FilePath("views/${table.moduleName}/${table.businessName}/${simpleClassName}Modal.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN.getType(), vue3VbenTemplatePath("api/api.ts"),
-                    vue3FilePath("api/${table.moduleName}/${classNameVar}/index.ts"))
+                    vue3FilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
             .build();
 
     @Resource

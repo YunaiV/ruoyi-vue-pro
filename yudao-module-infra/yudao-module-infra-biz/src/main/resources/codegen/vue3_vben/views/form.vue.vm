@@ -5,7 +5,7 @@ import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { BasicForm, useForm } from '@/components/Form'
 import { BasicModal, useModalInner } from '@/components/Modal'
-import { create${simpleClassName}, get${simpleClassName}, update${simpleClassName} } from '@/api/${table.moduleName}/${classNameVar}'
+import { create${simpleClassName}, get${simpleClassName}, update${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
 
 defineOptions({ name: '${table.className}Modal' })
 
