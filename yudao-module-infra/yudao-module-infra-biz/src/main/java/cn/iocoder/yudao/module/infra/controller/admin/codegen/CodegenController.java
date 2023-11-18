@@ -60,10 +60,19 @@ public class CodegenController {
         return success(codegenService.getDatabaseTableList(dataSourceConfigId, name, comment));
     }
 
+    @GetMapping("/table/list")
+    @Operation(summary = "获得表定义列表")
+    @Parameter(name = "dataSourceConfigId", description = "数据源配置的编号", required = true, example = "1")
+    @PreAuthorize("@ss.hasPermission('infra:codegen:query')")
+    public CommonResult<List<CodegenTableRespVO>> getCodegenTableList(@RequestParam(value = "dataSourceConfigId") Long dataSourceConfigId) {
+        List<CodegenTableDO> list = codegenService.getCodegenTableList(dataSourceConfigId);
+        return success(CodegenConvert.INSTANCE.convertList05(list));
+    }
+
     @GetMapping("/table/page")
     @Operation(summary = "获得表定义分页")
     @PreAuthorize("@ss.hasPermission('infra:codegen:query')")
-    public CommonResult<PageResult<CodegenTableRespVO>> getCodeGenTablePage(@Valid CodegenTablePageReqVO pageReqVO) {
+    public CommonResult<PageResult<CodegenTableRespVO>> getCodegenTablePage(@Valid CodegenTablePageReqVO pageReqVO) {
         PageResult<CodegenTableDO> pageResult = codegenService.getCodegenTablePage(pageReqVO);
         return success(CodegenConvert.INSTANCE.convertPage(pageResult));
     }

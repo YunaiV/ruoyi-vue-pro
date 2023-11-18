@@ -42,9 +42,10 @@ public interface ErrorCodeConstants {
     ErrorCode CODEGEN_SYNC_NONE_CHANGE = new ErrorCode(1_003_001_007, "同步失败，不存在改变");
     ErrorCode CODEGEN_TABLE_INFO_TABLE_COMMENT_IS_NULL = new ErrorCode(1_003_001_008, "数据库的表注释未填写");
     ErrorCode CODEGEN_TABLE_INFO_COLUMN_COMMENT_IS_NULL = new ErrorCode(1_003_001_009, "数据库的表字段({})注释未填写");
-
-    // ========== 字典类型（测试）1-001-005-000 ==========
-    ErrorCode TEST_DEMO_NOT_EXISTS = new ErrorCode(1_001_005_000, "测试示例不存在");
+    ErrorCode CODEGEN_MASTER_TABLE_NOT_EXISTS = new ErrorCode(1_003_001_010, "主表(id={})定义不存在，请检查");
+    ErrorCode CODEGEN_SUB_COLUMN_NOT_EXISTS = new ErrorCode(1_003_001_011, "子表的字段(id={})不存在，请检查");
+    ErrorCode CODEGEN_MASTER_GENERATION_FAIL_NO_SUB_TABLE = new ErrorCode(1_003_001_012, "主表生成代码失败，原因：它没有子表");
+    ErrorCode CODEGEN_MASTER_GENERATION_FAIL_NO_SUB_COLUMN = new ErrorCode(1_003_001_013, "主表生成代码失败，原因：它的子表({})没有字段");
 
     // ========== 文件配置 1-001-006-000 ==========
     ErrorCode FILE_CONFIG_NOT_EXISTS = new ErrorCode(1_001_006_000, "文件配置不存在");
@@ -53,5 +54,20 @@ public interface ErrorCodeConstants {
     // ========== 数据源配置 1-001-007-000 ==========
     ErrorCode DATA_SOURCE_CONFIG_NOT_EXISTS = new ErrorCode(1_001_007_000, "数据源配置不存在");
     ErrorCode DATA_SOURCE_CONFIG_NOT_OK = new ErrorCode(1_001_007_001, "数据源配置不正确，无法进行连接");
+
+    // ========== 数据源配置 1-001-107-000 ==========
+    ErrorCode DEMO_STUDENT_NOT_EXISTS = new ErrorCode(1_001_107_000, "学生不存在");
+
+    // ========== 学生 1-001-201-000 ==========
+    ErrorCode DEMO01_CONTACT_NOT_EXISTS = new ErrorCode(1_001_201_000, "示例联系人不存在");
+    ErrorCode DEMO02_CATEGORY_NOT_EXISTS = new ErrorCode(1_001_201_001, "示例分类不存在");
+    ErrorCode DEMO02_CATEGORY_EXITS_CHILDREN = new ErrorCode(1_001_201_002, "存在存在子示例分类，无法删除");
+    ErrorCode DEMO02_CATEGORY_PARENT_NOT_EXITS = new ErrorCode(1_001_201_003,"父级示例分类不存在");
+    ErrorCode DEMO02_CATEGORY_PARENT_ERROR = new ErrorCode(1_001_201_004, "不能设置自己为父示例分类");
+    ErrorCode DEMO02_CATEGORY_NAME_DUPLICATE = new ErrorCode(1_001_201_005, "已经存在该名字的示例分类");
+    ErrorCode DEMO02_CATEGORY_PARENT_IS_CHILD = new ErrorCode(1_001_201_006, "不能设置自己的子示例分类为父示例分类");
+    ErrorCode DEMO03_STUDENT_NOT_EXISTS = new ErrorCode(1_001_201_007, "学生不存在");
+    ErrorCode DEMO03_GRADE_NOT_EXISTS = new ErrorCode(1_001_201_008, "学生班级不存在");
+    ErrorCode DEMO03_GRADE_EXISTS = new ErrorCode(1_001_201_009, "学生班级已存在");
 
 }

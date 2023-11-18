@@ -1,0 +1,15 @@
+package cn.iocoder.yudao.module.infra.controller.admin.demo.vo;
+
+import lombok.*;
+import java.util.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
+
+@Schema(description = "管理后台 - 分类列表 Request VO")
+@Data
+public class InfraCategoryListReqVO {
+
+    @Schema(description = "名字", example = "芋头")
+    private String name;
+
+}

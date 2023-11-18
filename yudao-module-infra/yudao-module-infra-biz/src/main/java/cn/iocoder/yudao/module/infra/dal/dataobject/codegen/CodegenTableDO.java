@@ -116,4 +116,43 @@ public class CodegenTableDO extends BaseDO {
      */
     private Long parentMenuId;
 
+    // ========== 主子表相关字段 ==========
+
+    /**
+     * 主表的编号
+     *
+     * 关联 {@link CodegenTableDO#getId()}
+     */
+    private Long masterTableId;
+    /**
+     * 【自己】子表关联主表的字段编号
+     *
+     * 关联 {@link CodegenColumnDO#getId()}
+     */
+    private Long subJoinColumnId;
+    /**
+     * 主表与子表是否一对多
+     *
+     * true：一对多
+     * false：一对一
+     */
+    private Boolean subJoinMany;
+
+    // ========== 树表相关字段 ==========
+
+    /**
+     * 树表的父字段编号
+     *
+     * 关联 {@link CodegenColumnDO#getId()}
+     */
+    private Long treeParentColumnId;
+    /**
+     * 树表的名字字段编号
+     *
+     * 名字的用途：新增或修改时，select 框展示的字段
+     *
+     * 关联 {@link CodegenColumnDO#getId()}
+     */
+    private Long treeNameColumnId;
+
 }

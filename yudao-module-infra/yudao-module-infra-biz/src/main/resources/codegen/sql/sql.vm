@@ -5,7 +5,7 @@ INSERT INTO system_menu(
 )
 VALUES (
     '${table.classComment}管理', '', 2, 0, ${table.parentMenuId},
-    '${simpleClassName_strikeCase}', '', '${table.moduleName}/${classNameVar}/index', 0, '${table.className}'
+    '${simpleClassName_strikeCase}', '', '${table.moduleName}/${table.businessName}/index', 0, '${table.className}'
 );
 
 -- 按钮父菜单ID
