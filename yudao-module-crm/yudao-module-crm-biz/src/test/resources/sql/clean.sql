@@ -7,3 +7,5 @@ DELETE FROM "crm_receivable";
 DELETE FROM "crm_receivable_plan";
 
 DELETE FROM "crm_customer";
+
+DELETE FROM "crm_customer_limit_config";

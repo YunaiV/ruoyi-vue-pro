@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.crm.service.customer;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
@@ -12,13 +10,11 @@ import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
-import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 

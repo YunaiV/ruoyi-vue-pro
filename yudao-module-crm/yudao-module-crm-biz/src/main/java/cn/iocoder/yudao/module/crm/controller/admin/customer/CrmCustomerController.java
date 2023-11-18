@@ -5,6 +5,8 @@ import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
@@ -101,25 +103,10 @@ public class CrmCustomerController {
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
     public CommonResult<PageResult<CrmCustomerRespVO>> getCustomerPage(@Valid CrmCustomerPageReqVO pageVO) {
         PageResult<CrmCustomerDO> pageResult = customerService.getCustomerPage(pageVO);
-        PageResult<CrmCustomerRespVO> pageVo = CrmCustomerConvert.INSTANCE.convertPage(pageResult);
-        // TODO @wanwan： 可以参考 CollectionUtils.convertListByFlatMap()，目的是简洁
-        Set<Long> userSet = pageVo.getList().stream().flatMap(i -> Stream.of(NumberUtil.parseLong(i.getCreator()), i.getOwnerUserId())).collect(Collectors.toSet());
+        Set<Long> userSet = CollectionUtils.convertSetByFlatMap(pageResult.getList(), i -> Stream.of(NumberUtil.parseLong(i.getCreator()), i.getOwnerUserId()));
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userSet);
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(userMap.values().stream().map(AdminUserRespDTO::getDeptId).collect(Collectors.toSet()));
-        // TODO @wanwan：这块可以形成一个 convertPage 方法，default 实现；
-        pageVo.getList().forEach(customerRespVO -> {
-            customerRespVO.setAreaName(AreaUtils.format(customerRespVO.getAreaId()));
-            customerRespVO.setCreatorName(Optional.ofNullable(userMap.get(NumberUtil.parseLong(customerRespVO.getCreator()))).map(AdminUserRespDTO::getNickname).orElse(null));
-            // TODO @wanwan：可以使用 MapUtils.findAndThen
-            AdminUserRespDTO ownerUser = userMap.get(customerRespVO.getOwnerUserId());
-            if (Objects.nonNull(ownerUser)) {
-                customerRespVO.setOwnerUserName(ownerUser.getNickname());
-                DeptRespDTO dept = deptMap.get(ownerUser.getDeptId());
-                if (Objects.nonNull(dept)) {
-                    customerRespVO.setOwnerUserDept(dept.getName());
-                }
-            }
-        });
+        PageResult<CrmCustomerRespVO> pageVo = CrmCustomerConvert.INSTANCE.convertPage(pageResult, userMap, deptMap);
         return success(pageVo);
     }
 
