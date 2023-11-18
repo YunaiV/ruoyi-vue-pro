@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.crm.framework.enums;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.Getter;
@@ -16,6 +17,7 @@ import java.util.Arrays;
 @Getter
 public enum CrmBizTypeEnum implements IntArrayValuable {
 
+    CRM_PERMISSION(0, "团队"), // CrmPermissionController 中使用
     CRM_LEADS(1, "线索"),
     CRM_CUSTOMER(2, "客户"),
     CRM_CONTACTS(3, "联系人"),
@@ -33,13 +35,9 @@ public enum CrmBizTypeEnum implements IntArrayValuable {
     private final String name;
 
     public static String getNameByType(Integer type) {
-        // TODO @puhui999：可以 findone，更简洁；另外，不存在返回 null 即可啦；
-        for (CrmBizTypeEnum crmBizTypeEnum : CrmBizTypeEnum.values()) {
-            if (ObjUtil.equal(crmBizTypeEnum.type, type)) {
-                return crmBizTypeEnum.name;
-            }
-        }
-        return "";
+        CrmBizTypeEnum typeEnum = CollUtil.findOne(CollUtil.newArrayList(CrmBizTypeEnum.values()),
+                item -> ObjUtil.equal(item.type, type));
+        return typeEnum == null ? null : typeEnum.getName();
     }
 
     @Override

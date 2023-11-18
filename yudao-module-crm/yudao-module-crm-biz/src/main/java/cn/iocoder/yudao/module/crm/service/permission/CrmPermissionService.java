@@ -1,15 +1,14 @@
 package cn.iocoder.yudao.module.crm.service.permission;
 
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionPageReqBO;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionUpdateReqBO;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmTransferPermissionReqBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -30,16 +29,16 @@ public interface CrmPermissionService {
     /**
      * 更新数据权限
      *
-     * @param updateBO 更新信息
+     * @param updateReqVO 更新信息
      */
-    void updatePermission(@Valid CrmPermissionUpdateReqBO updateBO);
+    void updatePermission(CrmPermissionUpdateReqVO updateReqVO);
 
     /**
      * 删除数据权限
      *
-     * @param id 编号
+     * @param ids 编号
      */
-    void deletePermission(Long id);
+    void deletePermission(Collection<Long> ids);
 
     /**
      * 获取用户数据权限通过 数据类型 x 某个数据 x 用户编号
@@ -52,6 +51,15 @@ public interface CrmPermissionService {
     CrmPermissionDO getPermissionByBizTypeAndBizIdAndUserId(Integer bizType, Long bizId, Long userId);
 
     /**
+     * 获取用户数据权限通过 权限编号 x 用户编号
+     *
+     * @param id     权限编号
+     * @param userId 用户编号
+     * @return 数据权限
+     */
+    CrmPermissionDO getPermissionByIdAndUserId(Long id, Long userId);
+
+    /**
      * 获取数据权限列表，通过 数据类型 x 某个数据
      *
      * @param bizType 数据类型，关联 {@link CrmBizTypeEnum}
@@ -61,18 +69,47 @@ public interface CrmPermissionService {
     List<CrmPermissionDO> getPermissionByBizTypeAndBizId(Integer bizType, Long bizId);
 
     /**
-     * 数据权限转移
+     * 获取数据权限列表，通过 数据类型 x 某个数据
      *
-     * @param crmTransferPermissionReqBO 数据权限转移请求
+     * @param bizType 数据类型，关联 {@link CrmBizTypeEnum}
+     * @param bizIds  数据编号，关联 {@link CrmBizTypeEnum} 对应模块 DO#getId()
+     * @param level   权限级别
+     * @return Crm 数据权限列表
      */
-    void transferPermission(@Valid CrmTransferPermissionReqBO crmTransferPermissionReqBO);
+    List<CrmPermissionDO> getPermissionByBizTypeAndBizIdsAndLevel(Integer bizType, Collection<Long> bizIds, Integer level);
 
     /**
-     * 获取数据权限分页数据
+     * 数据权限转移
      *
-     * @param pageReqBO 分页请求
-     * @return 数据权限分页数据
+     * @param crmPermissionTransferReqBO 数据权限转移请求
      */
-    PageResult<CrmPermissionDO> getPermissionPage(CrmPermissionPageReqBO pageReqBO);
+    void transferPermission(@Valid CrmPermissionTransferReqBO crmPermissionTransferReqBO);
+
+    /**
+     * 获取用户参与的模块数据列表
+     *
+     * @param bizType 模块类型
+     * @param userId  用户编号
+     * @return 模块数据列表
+     */
+    List<CrmPermissionDO> getPermissionListByBizTypeAndUserId(Integer bizType, Long userId);
+
+    /**
+     * 领取公海数据
+     *
+     * @param bizType 数据类型，关联 {@link CrmBizTypeEnum}
+     * @param bizId   数据编号，关联 {@link CrmBizTypeEnum} 对应模块 DO#getId()
+     * @param userId  用户编号，AdminUser#id
+     */
+    void receiveBiz(Integer bizType, Long bizId, Long userId);
+
+    /**
+     * 数据放入公海
+     *
+     * @param bizType 数据类型，关联 {@link CrmBizTypeEnum}
+     * @param bizId   数据编号，关联 {@link CrmBizTypeEnum} 对应模块 DO#getId()
+     * @param userId  用户编号，AdminUser#id
+     */
+    void putPool(Integer bizType, Long bizId, Long userId);
 
 }

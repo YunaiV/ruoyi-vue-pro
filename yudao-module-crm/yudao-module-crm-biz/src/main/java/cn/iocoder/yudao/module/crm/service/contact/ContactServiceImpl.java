@@ -37,11 +37,18 @@ public class ContactServiceImpl implements ContactService {
         // 插入
         ContactDO contact = ContactConvert.INSTANCE.convert(createReqVO);
         contactMapper.insert(contact);
+
+        // 创建数据权限
+        crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CONTACTS.getType())
+                .setBizId(contact.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
+
         // 返回
         return contact.getId();
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACTS, level = CrmPermissionLevelEnum.WRITE)
     public void updateContact(ContactUpdateReqVO updateReqVO) {
         // 校验存在
         validateContactExists(updateReqVO.getId());
@@ -51,6 +58,8 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACTS, level = CrmPermissionLevelEnum.WRITE)
     public void deleteContact(Long id) {
         // 校验存在
         validateContactExists(id);
@@ -65,6 +74,7 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACTS, level = CrmPermissionLevelEnum.READ)
     public ContactDO getContact(Long id) {
         return contactMapper.selectById(id);
     }

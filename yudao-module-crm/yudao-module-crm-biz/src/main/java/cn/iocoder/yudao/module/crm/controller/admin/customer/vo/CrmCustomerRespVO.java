@@ -33,7 +33,7 @@ public class CrmCustomerRespVO extends CrmCustomerBaseVO {
     @Schema(description = "负责人名字", example = "25682")
     private String ownerUserName;
     @Schema(description = "负责人部门")
-    private String ownerUserDept;
+    private String ownerUserDeptName;
 
     @Schema(description = "地区名称", example = "北京市")
     private String areaName;

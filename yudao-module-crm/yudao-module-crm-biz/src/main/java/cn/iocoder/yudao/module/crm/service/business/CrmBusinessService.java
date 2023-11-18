@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.crm.service.business;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
-import cn.iocoder.yudao.module.crm.framework.core.service.CrmPermissionValidateService;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -14,7 +13,7 @@ import java.util.List;
  *
  * @author ljlleo
  */
-public interface CrmBusinessService extends CrmPermissionValidateService {
+public interface CrmBusinessService {
 
     /**
      * 创建商机

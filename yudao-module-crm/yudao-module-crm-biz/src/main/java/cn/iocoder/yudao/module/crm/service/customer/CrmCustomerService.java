@@ -5,7 +5,6 @@ import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -50,9 +49,10 @@ public interface CrmCustomerService {
      * 获得客户分页
      *
      * @param pageReqVO 分页查询
+     * @param userId    用户编号
      * @return 客户分页
      */
-    PageResult<CrmCustomerDO> getCustomerPage(CrmCustomerPageReqVO pageReqVO);
+    PageResult<CrmCustomerDO> getCustomerPage(CrmCustomerPageReqVO pageReqVO, Long userId);
 
     /**
      * 获得客户列表, 用于 Excel 导出

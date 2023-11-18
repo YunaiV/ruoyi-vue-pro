@@ -46,7 +46,7 @@ public class ContractServiceImpl implements ContractService {
 
         // 创建数据权限
         crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CONTRACT.getType())
-                .setBizId(contract.getId()).setUserId(userId).setPermissionLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
+                .setBizId(contract.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
 
         // 返回
         return contract.getId();
@@ -54,8 +54,7 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, getIdFor = ContractUpdateReqVO.class,
-            permissionLevel = CrmPermissionLevelEnum.WRITE)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, level = CrmPermissionLevelEnum.WRITE)
     public void updateContract(ContractUpdateReqVO updateReqVO) {
         // 校验存在
         validateContractExists(updateReqVO.getId());
@@ -66,7 +65,7 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, permissionLevel = CrmPermissionLevelEnum.WRITE)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, level = CrmPermissionLevelEnum.WRITE)
     public void deleteContract(Long id) {
         // 校验存在
         validateContractExists(id);
@@ -83,7 +82,7 @@ public class ContractServiceImpl implements ContractService {
     }
 
     @Override
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, permissionLevel = CrmPermissionLevelEnum.READ)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, level = CrmPermissionLevelEnum.READ)
     public ContractDO getContract(Long id) {
         return contractMapper.selectById(id);
     }

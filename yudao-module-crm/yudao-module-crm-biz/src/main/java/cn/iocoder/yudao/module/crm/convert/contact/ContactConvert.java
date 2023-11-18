@@ -4,6 +4,9 @@ import java.util.*;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.*;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contact.ContactDO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.*;
@@ -30,6 +33,13 @@ public interface ContactConvert {
     PageResult<ContactRespVO> convertPage(PageResult<ContactDO> page);
 
     List<ContactExcelVO> convertList02(List<ContactDO> list);
+
     List<ContactSimpleRespVO> convertAllList(List<ContactDO> list);
+
+    @Mappings({
+            @Mapping(target = "bizId", source = "reqVO.id"),
+            @Mapping(target = "newOwnerUserId", source = "reqVO.id")
+    })
+    CrmPermissionTransferReqBO convert(CrmContactTransferReqVO reqVO, Long userId);
 
 }

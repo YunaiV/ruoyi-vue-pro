@@ -8,14 +8,16 @@ import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionU
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionUpdateReqBO;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.system.api.dept.dto.PostRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import com.google.common.collect.Multimaps;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum.getNameByLevel;
 
 /**
  * Crm 数据权限 Convert
@@ -37,15 +39,28 @@ public interface CrmPermissionConvert {
 
     List<CrmPermissionRespVO> convert(List<CrmPermissionDO> permission);
 
-    default List<CrmPermissionRespVO> convert(List<CrmPermissionDO> permission, List<AdminUserRespDTO> userList) {
+    default List<CrmPermissionRespVO> convert(List<CrmPermissionDO> permission, List<AdminUserRespDTO> userList,
+                                              Map<Long, DeptRespDTO> deptMap, Map<Long, PostRespDTO> postMap) {
         Map<Long, AdminUserRespDTO> userMap = CollectionUtils.convertMap(userList, AdminUserRespDTO::getId);
         return CollectionUtils.convertList(convert(permission), item -> {
             MapUtils.findAndThen(userMap, item.getId(), user -> {
-                item.setNickname(user.getNickname()).setDeptId(user.getDeptId()).setPostIds(user.getPostIds())
-                        .setPermissionLevelName(getNameByLevel(item.getPermissionLevel()));
+                item.setNickname(user.getNickname());
+                MapUtils.findAndThen(deptMap, user.getDeptId(), deptRespDTO -> {
+                    item.setDeptName(deptRespDTO.getName());
+                });
+                List<PostRespDTO> postRespList = MapUtils.getList(Multimaps.forMap(postMap), user.getPostIds());
+                item.setPostNames(CollectionUtils.convertSet(postRespList, PostRespDTO::getName));
             });
             return item;
         });
+    }
+
+    default List<CrmPermissionDO> convertList(CrmPermissionUpdateReqVO updateReqVO) {
+        List<CrmPermissionDO> permissions = new ArrayList<>();
+        updateReqVO.getIds().forEach(id -> {
+            permissions.add(new CrmPermissionDO().setId(id).setLevel(updateReqVO.getLevel()));
+        });
+        return permissions;
     }
 
 }

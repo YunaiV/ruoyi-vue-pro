@@ -26,17 +26,21 @@ public @interface CrmPermission {
      */
     CrmBizTypeEnum bizType();
 
-    // TODO @puhui999：id，通过 spring el 表达式获取；
     /**
-     * 数据编号获取来源类，确保数据 id 编号在此类中，不能在父类中。
-     * 例：如果在 baseVO 中需要把 id 弄到 updateVO 中。
+     * crm 类型扩展
+     * 用于 CrmPermissionController 团队权限校验
      */
-    Class<?>[] getIdFor() default {};
+    String bizTypeValue() default "";
 
-    // TODO @puhui999：是不是搞成 level 字段；简洁一点，主要表明已经 perssmion 实体里了；
     /**
-     * 操作类型
+     * 数据编号，通过 spring el 表达式获取
+     * TODO 数据权限完成后去除 default ""
      */
-    CrmPermissionLevelEnum permissionLevel();
+    String bizId() default "";
+
+    /**
+     * 操作所需权限级别
+     */
+    CrmPermissionLevelEnum level();
 
 }

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.customer;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.crm.enums.DictTypeConstants;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -49,19 +50,19 @@ public class CrmCustomerDO extends BaseDO {
     /**
      * 所属行业
      *
-     * 对应字典 {@link cn.iocoder.yudao.module.crm.enums.DictTypeConstants#CRM_CUSTOMER_INDUSTRY}
+     * 对应字典 {@link DictTypeConstants#CRM_CUSTOMER_INDUSTRY}
      */
     private Integer industryId;
     /**
      * 客户等级
      *
-     * 对应字典 {@link cn.iocoder.yudao.module.crm.enums.DictTypeConstants#CRM_CUSTOMER_LEVEL}
+     * 对应字典 {@link DictTypeConstants#CRM_CUSTOMER_LEVEL}
      */
     private Integer level;
     /**
      * 客户来源
      *
-     * 对应字典 {@link cn.iocoder.yudao.module.crm.enums.DictTypeConstants#CRM_CUSTOMER_SOURCE}
+     * 对应字典 {@link DictTypeConstants#CRM_CUSTOMER_SOURCE}
      */
     private Integer source;
     /**
@@ -96,21 +97,6 @@ public class CrmCustomerDO extends BaseDO {
      * 备注
      */
     private String remark;
-    /**
-     * 负责人的用户编号
-     *
-     * 关联 AdminUserDO 的 id 字段
-     */
-    private Long ownerUserId;
-    // TODO @puhui999：这块抽到 permission 里；
-    /**
-     * 只读权限的用户编号数组
-     */
-    private String roUserIds;
-    /**
-     * 读写权限的用户编号数组
-     */
-    private String rwUserIds;
     /**
      * 地区编号
      */

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.crm.controller.admin.customer.vo;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.module.crm.enums.customer.CrmCustomerSceneEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,5 +28,10 @@ public class CrmCustomerPageReqVO extends PageParam {
     @Schema(description = "客户来源", example = "1")
     private Integer source;
 
-    // TODO @芋艿：场景；
+    /**
+     * 场景类型，关联 {@link CrmCustomerSceneEnum}
+     */
+    @Schema(description = "场景类型", example = "1")
+    private Integer sceneType;
+
 }

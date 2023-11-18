@@ -3,8 +3,7 @@ package cn.iocoder.yudao.module.crm.convert.business;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionPageReqBO;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmTransferPermissionReqBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -36,8 +35,6 @@ public interface CrmBusinessConvert {
             @Mapping(target = "bizId", source = "reqVO.id"),
             @Mapping(target = "newOwnerUserId", source = "reqVO.id")
     })
-    CrmTransferPermissionReqBO convert(CrmBusinessTransferReqVO reqVO, Long userId);
-
-    CrmPermissionPageReqBO convert(CrmBusinessPageReqVO pageReqVO);
+    CrmPermissionTransferReqBO convert(CrmBusinessTransferReqVO reqVO, Long userId);
 
 }

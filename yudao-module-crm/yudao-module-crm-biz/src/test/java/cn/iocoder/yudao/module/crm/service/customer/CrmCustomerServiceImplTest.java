@@ -130,7 +130,7 @@ public class CrmCustomerServiceImplTest extends BaseDbUnitTest {
         //reqVO.setWebsite(null);
 
         // 调用
-        PageResult<CrmCustomerDO> pageResult = customerService.getCustomerPage(reqVO);
+        PageResult<CrmCustomerDO> pageResult = customerService.getCustomerPage(reqVO, 1L);
         // 断言
         assertEquals(1, pageResult.getTotal());
         assertEquals(1, pageResult.getList().size());
