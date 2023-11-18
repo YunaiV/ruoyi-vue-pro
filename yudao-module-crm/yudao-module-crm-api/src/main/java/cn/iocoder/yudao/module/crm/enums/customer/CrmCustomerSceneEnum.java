@@ -7,6 +7,7 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
+// TODO @puhui999：这个应该是 crm 全局的，不仅仅属于 customer 客户哈；
 /**
  * CRM 客户等级
  *

@@ -24,8 +24,9 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum.isOwner;
 
+// TODO @puhui999：尽量规避用“团队”这个词哈；这个只是我们给前端展示用的；
 /**
- * crm 数据权限 Service 接口实现类
+ * CRM 数据权限 Service 接口实现类
  *
  * @author HUIHUI
  */
@@ -117,6 +118,7 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
         // 1.2 校验新负责人是否存在
         adminUserApi.validateUserList(Collections.singletonList(transferReqBO.getNewOwnerUserId()));
 
+        // TODO @puhui999：2. 和 2.1 合并成 2；2.2 单独成 3；说白了，就是 2. 修改新负责人的权限；3. 修改老负责人的权限；这样整体注释会简洁一点，也清晰一点；
         // 2. 权限转移
         List<CrmPermissionDO> permissions = crmPermissionMapper.selectByBizTypeAndBizId(
                 transferReqBO.getBizType(), transferReqBO.getBizId()); // 获取所有团队成员
@@ -127,7 +129,6 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
             crmPermissionMapper.insert(new CrmPermissionDO().setBizType(transferReqBO.getBizType())
                     .setBizId(transferReqBO.getBizId()).setUserId(transferReqBO.getNewOwnerUserId())
                     .setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
-
         } else { // 存在则修改权限级别
             crmPermissionMapper.updateById(new CrmPermissionDO().setId(permission.getId())
                     .setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
@@ -138,7 +139,7 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
                     .setLevel(transferReqBO.getOldOwnerPermissionLevel())); // 设置加入团队后的级别
             return;
         }
-        crmPermissionMapper.deleteById(oldPermission.getId()); // 移除
+        crmPermissionMapper.deleteById(oldPermission.getId());
     }
 
     @Override
@@ -164,7 +165,7 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
         if (permission == null) { // 不存在则模块数据也不存在
             throw exception(CRM_PERMISSION_MODEL_NOT_EXISTS, CrmBizTypeEnum.getNameByType(bizType));
         }
-
+        // 更新
         crmPermissionMapper.updateById(new CrmPermissionDO().setId(permission.getId()).setUserId(CrmPermissionDO.POOL_USER_ID));
     }
 

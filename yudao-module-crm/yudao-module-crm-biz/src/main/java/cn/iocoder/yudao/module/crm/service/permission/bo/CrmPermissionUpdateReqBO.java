@@ -17,7 +17,7 @@ public class CrmPermissionUpdateReqBO {
     /**
      * 数据权限编号
      */
-    @NotNull(message = "Crm 数据权限编号不能为空")
+    @NotNull(message = "数据权限编号不能为空")
     private Long id;
 
     /**

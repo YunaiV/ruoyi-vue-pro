@@ -100,6 +100,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
             return customerMapper.selectPage(pageReqVO, Collections.emptyList());
         }
         // 1.2 获取当前用户能看的分页数据
+        // TODO @puhui999：如果业务的数据量比较大，in 太多可能有性能问题噢；看看是不是搞成 join 连表了；可以微信讨论下；
         List<CrmPermissionDO> permissions = crmPermissionService.getPermissionListByBizTypeAndUserId(
                 CrmBizTypeEnum.CRM_CUSTOMER.getType(), userId);
         // 1.3 TODO 场景数据过滤

@@ -55,16 +55,18 @@ public class CrmPermissionController {
     @Resource
     private PostApi postApi;
 
+    // TODO @puhui999：保持统一，create 噢；然后是 PostMapping
     @PutMapping("/add")
     @Operation(summary = "添加团队成员")
     @PreAuthorize("@ss.hasPermission('crm:permission:create')")
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PERMISSION, bizTypeValue = "#reqVO.bizType", bizId = "#reqVO.bizId"
-            , level = CrmPermissionLevelEnum.OWNER)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PERMISSION, bizTypeValue = "#reqVO.bizType", bizId = "#reqVO.bizId",
+            level = CrmPermissionLevelEnum.OWNER)
     public CommonResult<Boolean> addPermission(@Valid @RequestBody CrmPermissionCreateReqVO reqVO) {
         permissionService.createPermission(CrmPermissionConvert.INSTANCE.convert(reqVO));
         return success(true);
     }
 
+    // TODO @puhui999：领取公海客户，是不是放到客户那更合适哈？
     @PutMapping("/receive")
     @Operation(summary = "领取公海数据")
     @PreAuthorize("@ss.hasPermission('crm:permission:update')")
@@ -73,6 +75,7 @@ public class CrmPermissionController {
         return success(true);
     }
 
+    // TODO @puhui999：是不是放到客户那更合适哈？
     @PutMapping("/put-pool")
     @Operation(summary = "数据放入公海")
     @PreAuthorize("@ss.hasPermission('crm:permission:update')")
@@ -93,6 +96,7 @@ public class CrmPermissionController {
         return success(true);
     }
 
+    // TODO @puhui999：bizType 和 bizId 是不是不用啦；因为参数校验需要 bizType 和 bizId，可以先查询下，在直接调用方法；不一定都要注解哈；
     @DeleteMapping("/delete")
     @Operation(summary = "移除团队成员")
     @Parameters({
@@ -110,9 +114,11 @@ public class CrmPermissionController {
         return success(true);
     }
 
+    // TODO @puhui999：deleteSelfPermission；尽量归成 crud 这样的操作哈；
     @DeleteMapping("/quit-team")
     @Operation(summary = "退出团队")
     @Parameters({
+            // TODO @puhui999：这个可以拿出来，不用包在 @Parameters 里，在只有一个参数时哈；
             @Parameter(name = "id", description = "团队成员编号", required = true, example = "1024")
     })
     @PreAuthorize("@ss.hasPermission('crm:permission:delete')")
@@ -143,6 +149,7 @@ public class CrmPermissionController {
         }
         // TODO @puhui999：池子的逻辑；
         // 判断是否是公海数据
+        // TODO @puhui999：这段逻辑，可以删除么？
         Predicate<CrmPermissionDO> filter = item -> ObjUtil.equal(item.getUserId(), CrmPermissionDO.POOL_USER_ID);
         if (anyMatch(permission, filter)) {
             permission.removeIf(filter); // 排除
@@ -151,6 +158,7 @@ public class CrmPermissionController {
         // 拼接数据
         List<AdminUserRespDTO> userList = adminUserApi.getUserList(convertSet(permission, CrmPermissionDO::getUserId));
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userList, AdminUserRespDTO::getDeptId));
+        // TODO @puhui999：CollectionUtils.convertSetByFlatMap() 看看可以不
         Set<Long> postIds = userList.stream().flatMap(item -> item.getPostIds().stream()).collect(Collectors.toSet());
         Map<Long, PostRespDTO> postMap = postApi.getPostMap(postIds);
         return success(CrmPermissionConvert.INSTANCE.convert(permission, userList, deptMap, postMap));

@@ -103,6 +103,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     @Override
     public PageResult<CrmBusinessDO> getBusinessPage(CrmBusinessPageReqVO pageReqVO, Long userId) {
         // 1. 获取当前用户能看的分页数据
+        // TODO @puhui999：如果业务的数据量比较大，in 太多可能有性能问题噢；看看是不是搞成 join 连表了；可以微信讨论下；
         List<CrmPermissionDO> permissions = crmPermissionService.getPermissionListByBizTypeAndUserId(
                 CrmBizTypeEnum.CRM_BUSINESS.getType(), userId);
         Set<Long> ids = convertSet(permissions, CrmPermissionDO::getBizId);

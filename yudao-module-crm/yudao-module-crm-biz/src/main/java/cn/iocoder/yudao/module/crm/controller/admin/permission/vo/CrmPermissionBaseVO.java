@@ -21,13 +21,13 @@ public class CrmPermissionBaseVO {
     @NotNull(message = "用户编号不能为空")
     private Long userId;
 
-    @Schema(description = "Crm 类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @Schema(description = "CRM 类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @InEnum(CrmBizTypeEnum.class)
-    @NotNull(message = "Crm 类型不能为空")
+    @NotNull(message = "CRM 类型不能为空")
     private Integer bizType;
 
-    @Schema(description = "Crm 类型数据编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    @NotNull(message = "Crm 类型数据编号不能为空")
+    @Schema(description = "CRM 类型数据编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    @NotNull(message = "CRM 类型数据编号不能为空")
     private Long bizId;
 
     @Schema(description = "权限级别", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")

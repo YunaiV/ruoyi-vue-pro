@@ -17,6 +17,7 @@ import java.util.Arrays;
 @Getter
 public enum CrmBizTypeEnum implements IntArrayValuable {
 
+    // TODO @puhui999：如果类似 CrmBizPermission 的 bizType 需要为空，可以设置它是数组，参考 Telephone 的 payload
     CRM_PERMISSION(0, "团队"), // CrmPermissionController 中使用
     CRM_LEADS(1, "线索"),
     CRM_CUSTOMER(2, "客户"),

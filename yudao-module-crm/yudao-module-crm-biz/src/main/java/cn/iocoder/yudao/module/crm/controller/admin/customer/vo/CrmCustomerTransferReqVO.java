@@ -17,12 +17,13 @@ public class CrmCustomerTransferReqVO {
     /**
      * 新负责人的用户编号
      */
-    @NotNull(message = "新负责人的用户编号不能为空")
     @Schema(description = "新负责人的用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
+    @NotNull(message = "新负责人的用户编号不能为空")
     private Long newOwnerUserId;
 
     /**
      * 老负责人加入团队后的权限级别。如果 null 说明移除
+     *
      * 关联 {@link CrmPermissionLevelEnum}
      */
     @Schema(description = "老负责人加入团队后的权限级别", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")

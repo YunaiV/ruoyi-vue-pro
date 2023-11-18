@@ -12,7 +12,7 @@ import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.METHOD;
 
 /**
- * Crm 数据操作权限校验 AOP 注解
+ * CRM 数据操作权限校验 AOP 注解
  *
  * @author HUIHUI
  */
@@ -22,18 +22,19 @@ import static java.lang.annotation.ElementType.METHOD;
 public @interface CrmPermission {
 
     /**
-     * crm 类型
+     * CRM 类型
      */
     CrmBizTypeEnum bizType();
 
     /**
-     * crm 类型扩展
-     * 用于 CrmPermissionController 团队权限校验
+     * CRM 类型扩展，通过 Spring EL 表达式获取到 {@link #bizType()}
+     *
+     * 目的：用于 CrmPermissionController 团队权限校验
      */
     String bizTypeValue() default "";
 
     /**
-     * 数据编号，通过 spring el 表达式获取
+     * 数据编号，通过 Spring EL 表达式获取
      * TODO 数据权限完成后去除 default ""
      */
     String bizId() default "";

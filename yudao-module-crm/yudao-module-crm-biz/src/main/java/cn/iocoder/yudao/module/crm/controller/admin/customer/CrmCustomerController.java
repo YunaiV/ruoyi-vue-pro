@@ -106,6 +106,7 @@ public class CrmCustomerController {
         return success(CrmCustomerConvert.INSTANCE.convert(customer, ownerMap, userMap, deptMap));
     }
 
+    // TODO @puhui999：可以在 CrmCustomerPageReqVO 里面加个 pool 参数，为 true 时，代表来自公海客户的分页
     @GetMapping("/page")
     @Operation(summary = "获得客户分页")
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
@@ -115,7 +116,7 @@ public class CrmCustomerController {
             return success(PageResult.empty(pageResult.getTotal()));
         }
         // 拼接数据
-        // TODO 芋艿：需要 review 下；
+        // TODO @puhui999：这块的拼接逻辑，可以和 convertPage 合并下；
 //        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
 //                convertSetByFlatMap(pageResult.getList(), user -> Stream.of(NumberUtil.parseLong(user.getCreator()), user.getOwnerUserId())));
 //        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
@@ -123,6 +124,7 @@ public class CrmCustomerController {
         return convertPage(customerService.getCustomerPage(pageVO, getLoginUserId()));
     }
 
+    // TODO @puhui999：
     @GetMapping("/pool-page")
     @Operation(summary = "获得公海客户分页")
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")

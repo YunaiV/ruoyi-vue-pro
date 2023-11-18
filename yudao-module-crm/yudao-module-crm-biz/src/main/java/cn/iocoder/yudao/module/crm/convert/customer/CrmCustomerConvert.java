@@ -81,6 +81,7 @@ public interface CrmCustomerConvert {
 
     PageResult<CrmCustomerRespVO> convertPage(PageResult<CrmCustomerDO> page);
 
+    // TODO @puhui999：两个 convertPage 的逻辑，合并下；
     default PageResult<CrmCustomerRespVO> convertPage(PageResult<CrmCustomerDO> pageResult, Map<Long, CrmPermissionDO> ownerMap,
                                                       Map<Long, AdminUserRespDTO> userMap, Map<Long, DeptRespDTO> deptMap) {
         PageResult<CrmCustomerRespVO> result = convertPage(pageResult);

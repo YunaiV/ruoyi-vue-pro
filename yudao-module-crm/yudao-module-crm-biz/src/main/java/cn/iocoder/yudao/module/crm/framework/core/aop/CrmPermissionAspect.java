@@ -108,6 +108,8 @@ public class CrmPermissionAspect {
         throw exception(CRM_PERMISSION_DENIED, crmPermission.bizType().getName());
     }
 
+
+    // TODO @puhui999：这块看看能不能用 SpringExpressionUtils 工具类；
     private KeyValue<Long, Integer> getBizIdAndBizType(JoinPoint joinPoint, CrmPermission crmPermission) throws NoSuchMethodException {
         Method method = getMethod(joinPoint);
         // 1. 获取方法的参数值

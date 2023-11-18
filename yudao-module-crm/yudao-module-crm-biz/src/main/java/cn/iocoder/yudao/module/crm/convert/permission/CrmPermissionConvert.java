@@ -56,6 +56,7 @@ public interface CrmPermissionConvert {
     }
 
     default List<CrmPermissionDO> convertList(CrmPermissionUpdateReqVO updateReqVO) {
+        // TODO @puhui999：CollectionUtils.convert
         List<CrmPermissionDO> permissions = new ArrayList<>();
         updateReqVO.getIds().forEach(id -> {
             permissions.add(new CrmPermissionDO().setId(id).setLevel(updateReqVO.getLevel()));

@@ -22,7 +22,7 @@ public class CrmPermissionTransferReqBO {
     private Long userId;
 
     /**
-     * Crm 类型
+     * CRM 类型
      */
     @NotNull(message = "Crm 类型不能为空")
     @InEnum(CrmBizTypeEnum.class)
@@ -30,7 +30,7 @@ public class CrmPermissionTransferReqBO {
     /**
      * 数据编号
      */
-    @NotNull(message = "Crm 数据编号不能为空")
+    @NotNull(message = "CRM 数据编号不能为空")
     private Long bizId;
 
     /**
@@ -41,6 +41,7 @@ public class CrmPermissionTransferReqBO {
 
     /**
      * 老负责人加入团队后的权限级别。如果 null 说明移除
+     *
      * 关联 {@link CrmPermissionLevelEnum}
      */
     private Integer oldOwnerPermissionLevel;

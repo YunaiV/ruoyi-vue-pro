@@ -29,7 +29,9 @@ public class CrmCustomerPageReqVO extends PageParam {
     private Integer source;
 
     /**
-     * 场景类型，关联 {@link CrmCustomerSceneEnum}
+     * 场景类型
+     *
+     * 关联 {@link CrmCustomerSceneEnum}
      */
     @Schema(description = "场景类型", example = "1")
     private Integer sceneType;
