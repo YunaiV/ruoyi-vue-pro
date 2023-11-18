@@ -85,4 +85,20 @@ public interface CrmCustomerService {
      */
     void lockCustomer(@Valid CrmCustomerUpdateReqVO updateReqVO);
 
+    /**
+     * 描述    :接受公海客户
+     * Author :xiaqing
+     * Date   :2023-11-07 22:47:40
+     */
+    void receive(List<Long>ids);
+
+    /**
+     *
+     *功能描述: 分配负责人
+     * @param cIds 要分配的客户id
+     * @param ownerId 分配的负责人id
+     * @author xiaqing
+     * @date 2023-11-08 10:40:22
+     */
+    void distributeByIds(List<Long>cIds,Long ownerId);
 }

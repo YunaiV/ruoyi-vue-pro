@@ -1,6 +1,10 @@
 package cn.iocoder.yudao.module.crm.controller.admin.customer;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
+import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
@@ -21,6 +25,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.error;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -177,5 +183,29 @@ public class CrmCustomerController {
         customerService.lockCustomer(updateReqVO);
         return success(true);
     }
+
+    @PutMapping("/receive")
+    @Operation(summary = "根据客户id领取公海任务")
+    @PreAuthorize("@ss.hasPermission('crm:customer:receive')")
+    public CommonResult<String>  receiveByIds(List<Long> cIds){
+        // 判断是否为空
+        if(CollectionUtils.isEmpty(cIds))
+            return error(GlobalErrorCodeConstants.BAD_REQUEST.getCode(),GlobalErrorCodeConstants.BAD_REQUEST.getMsg());
+        // 领取公海任务
+        customerService.receive(cIds);
+        return success("领取成功");
+    }
+
+    @PutMapping("/distributeByIds")
+    @Operation(summary = "分配公海给对应负责人")
+    @PreAuthorize("@ss.hasPermission('crm:customer:distributeByIds')")
+    public CommonResult<String> distributeByIds(Long ownerId,List<Long>cIds){
+        //判断参数不能为空
+        if(ownerId==null || CollectionUtils.isEmpty(cIds))
+            return error(GlobalErrorCodeConstants.BAD_REQUEST.getCode(),GlobalErrorCodeConstants.BAD_REQUEST.getMsg());
+        customerService.distributeByIds(cIds,ownerId);
+        return success("分配成功");
+    }
+
 
 }
