@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.crm.controller.admin.customer;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
@@ -33,8 +34,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSetByFlatMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
@@ -111,16 +110,16 @@ public class CrmCustomerController {
     @Operation(summary = "获得客户分页")
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
     public CommonResult<PageResult<CrmCustomerRespVO>> getCustomerPage(@Valid CrmCustomerPageReqVO pageVO) {
-        PageResult<CrmCustomerDO> pageResult = customerService.getCustomerPage(pageVO);
+        PageResult<CrmCustomerDO> pageResult = customerService.getCustomerPage(pageVO, getLoginUserId());
         if (CollUtil.isEmpty(pageResult.getList())) {
             return success(PageResult.empty(pageResult.getTotal()));
         }
         // 拼接数据
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
-                convertSetByFlatMap(pageResult.getList(), user -> Stream.of(NumberUtil.parseLong(user.getCreator()), user.getOwnerUserId())));
-        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
-                convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
-        return success(CrmCustomerConvert.INSTANCE.convertPage(pageResult, userMap, deptMap));
+        // TODO 芋艿：需要 review 下；
+//        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
+//                convertSetByFlatMap(pageResult.getList(), user -> Stream.of(NumberUtil.parseLong(user.getCreator()), user.getOwnerUserId())));
+//        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
+//                convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
         return convertPage(customerService.getCustomerPage(pageVO, getLoginUserId()));
     }
 

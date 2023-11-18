@@ -1,16 +1,15 @@
 package cn.iocoder.yudao.module.crm.convert.contact;
 
-import java.util.*;
-
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.ContactDO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.*;
-import cn.iocoder.yudao.module.crm.dal.dataobject.contact.ContactDO;
+
+import java.util.List;
 
 /**
  * crm联系人 Convert

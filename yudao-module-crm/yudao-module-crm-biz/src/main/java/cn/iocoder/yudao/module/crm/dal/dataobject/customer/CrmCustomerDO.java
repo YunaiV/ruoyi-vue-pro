@@ -98,6 +98,12 @@ public class CrmCustomerDO extends BaseDO {
      */
     private String remark;
     /**
+     * 负责人的用户编号
+     *
+     * 关联 AdminUserDO 的 id 字段
+     */
+    private Long ownerUserId;
+    /**
      * 地区编号
      */
     private Integer areaId;

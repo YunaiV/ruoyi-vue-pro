@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 // TODO @zya：crm 所有的类，dou带 Crm 前缀，因为它的名字太通用了，可能和后续的 erp 之类的冲突
 @Tag(name = "管理后台 - CRM 联系人")
@@ -55,7 +56,7 @@ public class ContactController {
     @Operation(summary = "创建联系人")
     @PreAuthorize("@ss.hasPermission('crm:contact:create')")
     public CommonResult<Long> createContact(@Valid @RequestBody ContactCreateReqVO createReqVO) {
-        return success(contactService.createContact(createReqVO));
+        return success(contactService.createContact(createReqVO, getLoginUserId()));
     }
 
     @PutMapping("/update")

@@ -10,7 +10,13 @@ import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactUpdateReqV
 import cn.iocoder.yudao.module.crm.convert.contact.ContactConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.ContactDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contact.ContactMapper;
+import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
+import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -32,8 +38,11 @@ public class ContactServiceImpl implements ContactService {
     @Resource
     private ContactMapper contactMapper;
 
+    @Resource
+    private CrmPermissionService crmPermissionService;
+
     @Override // TODO @zyna：新增和修改时，关联字段要校验，例如说 直属上级，是不是真的存在；
-    public Long createContact(ContactCreateReqVO createReqVO) {
+    public Long createContact(ContactCreateReqVO createReqVO, Long userId) {
         // 插入
         ContactDO contact = ContactConvert.INSTANCE.convert(createReqVO);
         contactMapper.insert(contact);

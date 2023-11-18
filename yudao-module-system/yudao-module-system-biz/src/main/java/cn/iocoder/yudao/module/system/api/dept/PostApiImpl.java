@@ -1,7 +1,8 @@
 package cn.iocoder.yudao.module.system.api.dept;
 
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.api.dept.dto.PostRespDTO;
-import cn.iocoder.yudao.module.system.convert.dept.PostConvert;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,8 @@ public class PostApiImpl implements PostApi {
 
     @Override
     public List<PostRespDTO> getPostList(Collection<Long> ids) {
-        return PostConvert.INSTANCE.convert(postService.getPostList(ids));
+        List<PostDO> list = postService.getPostList(ids);
+        return BeanUtils.toBean(list, PostRespDTO.class);
     }
 
 }

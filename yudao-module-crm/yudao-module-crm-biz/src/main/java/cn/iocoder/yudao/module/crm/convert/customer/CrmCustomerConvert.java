@@ -4,13 +4,9 @@ import cn.hutool.core.util.NumberUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
-import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmTransferPermissionReqBO;
-import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
@@ -24,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
-import java.util.Map;
 
 /**
  * 客户 Convert
@@ -70,7 +65,7 @@ public interface CrmCustomerConvert {
             MapUtils.findAndThen(userMap, customerRespVO.getOwnerUserId(), ownerUser -> {
                 customerRespVO.setOwnerUserName(ownerUser.getNickname());
                 MapUtils.findAndThen(deptMap, ownerUser.getDeptId(), dept ->
-                        customerRespVO.setOwnerUserDept(dept.getName()));
+                        customerRespVO.setOwnerUserDeptName(dept.getName()));
             });
         });
         return result;
