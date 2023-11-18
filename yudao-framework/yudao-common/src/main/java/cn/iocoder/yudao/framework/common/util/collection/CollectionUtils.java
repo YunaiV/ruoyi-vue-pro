@@ -224,17 +224,21 @@ public class CollectionUtils {
     }
 
     public static <T> T findFirst(List<T> from, Predicate<T> predicate) {
+        return findFirst(from, predicate, Function.identity());
+    }
+
+    public static <T, U> U findFirst(List<T> from, Predicate<T> predicate, Function<T, U> func) {
         if (CollUtil.isEmpty(from)) {
             return null;
         }
-        return from.stream().filter(predicate).findFirst().orElse(null);
+        return from.stream().filter(predicate).findFirst().map(func).orElse(null);
     }
 
     public static <T, V extends Comparable<? super V>> V getMaxValue(Collection<T> from, Function<T, V> valueFunc) {
         if (CollUtil.isEmpty(from)) {
             return null;
         }
-        assert from.size() > 0; // 断言，避免告警
+        assert !from.isEmpty(); // 断言，避免告警
         T t = from.stream().max(Comparator.comparing(valueFunc)).get();
         return valueFunc.apply(t);
     }

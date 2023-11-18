@@ -1,0 +1,45 @@
+package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo;
+
+import lombok.*;
+import java.util.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+import ${PageParamClassName};
+#foreach ($column in $columns)
+#if (${column.javaType} == "BigDecimal")
+import java.math.BigDecimal;
+#break
+#end
+#end
+## 处理 LocalDateTime 字段的引入
+#foreach ($column in $columns)
+#if (${column.listOperation} && ${column.javaType} == "LocalDateTime")
+import java.time.LocalDateTime;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import static ${DateUtilsClassName}.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+#break
+#end
+#end
+## 字段模板
+#macro(columnTpl $prefix $prefixStr)
+    @Schema(description = "${prefixStr}${column.columnComment}"#if ("$!column.example" != ""), example = "${column.example}"#end)
+    private ${column.javaType}#if ("$!prefix" != "") ${prefix}${JavaField}#else ${column.javaField}#end;
+#end
+
+@Schema(description = "${sceneEnum.name} - ${table.classComment}列表 Request VO")
+@Data
+public class ${sceneEnum.prefixClass}${table.className}ListReqVO {
+
+#foreach ($column in $columns)
+#if (${column.listOperation})##查询操作
+#if (${column.listOperationCondition} == "BETWEEN")## 情况一，Between 的时候
+    @Schema(description = "${column.columnComment}"#if ("$!column.example" != ""), example = "${column.example}"#end)
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private ${column.javaType}[] ${column.javaField};
+#else##情况二，非 Between 的时间
+    #columnTpl('', '')
+#end
+
+#end
+#end
+}

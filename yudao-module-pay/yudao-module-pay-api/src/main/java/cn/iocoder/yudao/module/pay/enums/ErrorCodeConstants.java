@@ -59,23 +59,18 @@ public interface ErrorCodeConstants {
     ErrorCode WALLET_RECHARGE_REFUND_FAIL_REFUND_ORDER_ID_ERROR = new ErrorCode(1_007_008_008, "钱包退款更新失败，钱包退款单编号不匹配");
     ErrorCode WALLET_RECHARGE_REFUND_FAIL_REFUND_NOT_FOUND = new ErrorCode(1_007_008_009, "钱包退款更新失败，退款订单不存在");
     ErrorCode WALLET_RECHARGE_REFUND_FAIL_REFUND_PRICE_NOT_MATCH = new ErrorCode(1_007_008_010, "钱包退款更新失败，退款单金额不匹配");
-    ErrorCode WALLET_RECHARGE_PACKAGE_AND_PRICE_IS_EMPTY = new ErrorCode(1_007_008_011, "充值金额和充钱套餐不能同时为空");
-    ErrorCode WALLET_RECHARGE_PACKAGE_NOT_FOUND = new ErrorCode(1_007_008_012, "钱包充值套餐不存在");
-    ErrorCode WALLET_RECHARGE_PACKAGE_IS_DISABLE = new ErrorCode(1_007_008_013, "钱包充值套餐已禁用");
-    ErrorCode WALLET_RECHARGE_PACKAGE_NAME_EXISTS = new ErrorCode(1_007_008_014, "钱包充值套餐名称已存在");
+    ErrorCode WALLET_RECHARGE_PACKAGE_NOT_FOUND = new ErrorCode(1_007_008_011, "钱包充值套餐不存在");
+    ErrorCode WALLET_RECHARGE_PACKAGE_IS_DISABLE = new ErrorCode(1_007_008_012, "钱包充值套餐已禁用");
+    ErrorCode WALLET_RECHARGE_PACKAGE_NAME_EXISTS = new ErrorCode(1_007_008_013, "钱包充值套餐名称已存在");
 
     // ========== 转账模块 1-007-009-000 ==========
     ErrorCode PAY_TRANSFER_SUBMIT_CHANNEL_ERROR = new ErrorCode(1_007_009_000, "发起转账报错，错误码：{}，错误提示：{}");
-    ErrorCode PAY_TRANSFER_ALIPAY_LOGIN_ID_IS_EMPTY = new ErrorCode(1_007_009_001, "支付宝登录 ID 不能为空");
-    ErrorCode PAY_TRANSFER_ALIPAY_ACCOUNT_NAME_IS_EMPTY = new ErrorCode(1_007_009_002, "支付宝账号名称不能为空");
-    ErrorCode PAY_TRANSFER_NOT_FOUND = new ErrorCode(1_007_009_003, "转账交易单不存在");
-    ErrorCode PAY_TRANSFER_STATUS_IS_SUCCESS = new ErrorCode(1_007_009_004, "转账单已成功转账");
+    ErrorCode PAY_TRANSFER_NOT_FOUND = new ErrorCode(1_007_009_001, "转账交易单不存在");
+    ErrorCode PAY_TRANSFER_STATUS_IS_SUCCESS = new ErrorCode(1_007_009_002, "转账单已成功转账");
+    ErrorCode PAY_TRANSFER_EXISTS = new ErrorCode(1_007_009_003, "已经存在转账单");
+    ErrorCode PAY_MERCHANT_TRANSFER_EXISTS = new ErrorCode(1_007_009_004, "该笔业务的转账已经存在,请查询转账订单相关状态");
     ErrorCode PAY_TRANSFER_STATUS_IS_NOT_WAITING = new ErrorCode(1_007_009_005, "转账单不处于待转账");
     ErrorCode PAY_TRANSFER_STATUS_IS_NOT_PENDING = new ErrorCode(1_007_009_006, "转账单不处于待转账或转账中");
-    ErrorCode PAY_TRANSFER_EXTENSION_NOT_FOUND = new ErrorCode(1_007_009_007, "转账交易拓展单不存在");
-    ErrorCode PAY_TRANSFER_TYPE_AND_CHANNEL_NOT_MATCH = new ErrorCode(1_007_009_008, "转账类型和转账渠道不匹配");
-    ErrorCode PAY_TRANSFER_EXTENSION_STATUS_IS_NOT_PENDING = new ErrorCode(1_007_009_009, "转账拓展单不处于待转账或转账中");
-
     // ========== 示例订单 1-007-900-000 ==========
     ErrorCode DEMO_ORDER_NOT_FOUND = new ErrorCode(1_007_900_000, "示例订单不存在");
     ErrorCode DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID = new ErrorCode(1_007_900_001, "示例订单更新支付状态失败，订单不是【未支付】状态");

@@ -15,10 +15,17 @@ export interface ${simpleClassName}VO {
 #end
 }
 
-// 查询${table.classComment}列表
+#if ( $table.templateType != 2 )
+// 查询${table.classComment}分页
 export const get${simpleClassName}Page = async (params) => {
   return await request.get({ url: `${baseURL}/page`, params })
 }
+#else
+// 查询${table.classComment}列表
+export const get${simpleClassName}List = async (params) => {
+  return await request.get({ url: `${baseURL}/list`, params })
+}
+#end
 
 // 查询${table.classComment}详情
 export const get${simpleClassName} = async (id: number) => {
@@ -44,3 +51,61 @@ export const delete${simpleClassName} = async (id: number) => {
 export const export${simpleClassName} = async (params) => {
   return await request.download({ url: `${baseURL}/export-excel`, params })
 }
+## 特殊：主子表专属逻辑
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subSimpleClassName = $subSimpleClassNames.get($index))
+#set ($subPrimaryColumn = $subPrimaryColumns.get($index))##当前 primary 字段
+#set ($subJoinColumn = $subJoinColumns.get($index))##当前 join 字段
+#set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
+#set ($subSimpleClassName_strikeCase = $subSimpleClassName_strikeCases.get($index))
+#set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
+#set ($subClassNameVar = $subClassNameVars.get($index))
+
+// ==================== 子表（$subTable.classComment） ====================
+## 情况一：MASTER_ERP 时，需要分查询页子表
+#if ( $table.templateType == 11 )
+
+// 获得${subTable.classComment}分页
+export const get${subSimpleClassName}Page = async (params) => {
+  return await request.get({ url: `${baseURL}/${subSimpleClassName_strikeCase}/page`, params })
+}
+## 情况二：非 MASTER_ERP 时，需要列表查询子表
+#else
+  #if ( $subTable.subJoinMany )
+
+// 获得${subTable.classComment}列表
+export const get${subSimpleClassName}ListBy${SubJoinColumnName} = async (${subJoinColumn.javaField}) => {
+  return await request.get({ url: `${baseURL}/${subSimpleClassName_strikeCase}/list-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=` + ${subJoinColumn.javaField} })
+}
+  #else
+
+// 获得${subTable.classComment}
+export const get${subSimpleClassName}By${SubJoinColumnName} = async (${subJoinColumn.javaField}) => {
+  return await request.get({ url: `${baseURL}/${subSimpleClassName_strikeCase}/get-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=` + ${subJoinColumn.javaField} })
+}
+  #end
+#end
+## 特殊：MASTER_ERP 时，支持单个的新增、修改、删除操作
+#if ( $table.templateType == 11 )
+// 新增${subTable.classComment}
+export const create${subSimpleClassName} = async (data) => {
+  return await request.post({ url: `${baseURL}/${subSimpleClassName_strikeCase}/create`, data })
+}
+
+// 修改${subTable.classComment}
+export const update${subSimpleClassName} = async (data) => {
+  return await request.put({ url: `${baseURL}/${subSimpleClassName_strikeCase}/update`, data })
+}
+
+// 删除${subTable.classComment}
+export const delete${subSimpleClassName} = async (id: number) => {
+  return await request.delete({ url: `${baseURL}/${subSimpleClassName_strikeCase}/delete?id=` + id })
+}
+
+// 获得${subTable.classComment}
+export const get${subSimpleClassName} = async (id: number) => {
+  return await request.get({ url: `${baseURL}/${subSimpleClassName_strikeCase}/get?id=` + id })
+}
+#end
+#end

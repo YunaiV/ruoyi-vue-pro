@@ -54,7 +54,7 @@
 </template>
 <script setup lang="ts" name="${table.className}">
 import { allSchemas } from './${classNameVar}.data'
-import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${classNameVar}'
+import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${table.businessName}'
 import ${simpleClassName}Form from './${simpleClassName}Form.vue'
 
 // tableObject：表格的属性对象，可获得分页大小、条数等属性

@@ -56,7 +56,7 @@ public interface CodegenConvert {
 
     // ========== CodegenTableDO 相关 ==========
 
-//    List<CodegenTableRespVO> convertList02(List<CodegenTableDO> list);
+    List<CodegenTableRespVO> convertList05(List<CodegenTableDO> list);
 
     CodegenTableRespVO convert(CodegenTableDO bean);
 

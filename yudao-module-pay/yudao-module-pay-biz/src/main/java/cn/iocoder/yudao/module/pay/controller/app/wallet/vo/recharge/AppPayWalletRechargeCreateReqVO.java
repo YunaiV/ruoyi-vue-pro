@@ -19,7 +19,7 @@ public class AppPayWalletRechargeCreateReqVO {
     private Long packageId;
 
     @AssertTrue(message = "充值金额和充钱套餐不能同时为空")
-    public boolean isPayPriceAndPackageIdValid() {
+    public boolean isValidPayPriceAndPackageId() {
         return Objects.nonNull(payPrice) || Objects.nonNull(packageId);
     }
 }

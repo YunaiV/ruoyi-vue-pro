@@ -6,16 +6,23 @@ import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.binarywang.wx.miniapp.config.impl.WxMaRedisBetterConfigImpl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.cache.CacheUtils;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.social.core.YudaoAuthRequestFactory;
+import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientCreateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientUpdateReqVO;
+import cn.iocoder.yudao.module.system.convert.social.SocialClientConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
 import cn.iocoder.yudao.module.system.dal.mysql.social.SocialClientMapper;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import com.binarywang.spring.starter.wxjava.miniapp.properties.WxMaProperties;
 import com.binarywang.spring.starter.wxjava.mp.properties.WxMpProperties;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.xingyuv.jushauth.config.AuthConfig;
@@ -41,8 +48,7 @@ import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SOCIAL_APP_WEIXIN_MINI_APP_PHONE_CODE_ERROR;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SOCIAL_USER_AUTH_FAILURE;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
 /**
  * 社交应用 Service 实现类
@@ -151,6 +157,9 @@ public class SocialClientServiceImpl implements SocialClientService {
             // 2.2 修改对应的 clientId + clientSecret 密钥
             newAuthConfig.setClientId(client.getClientId());
             newAuthConfig.setClientSecret(client.getClientSecret());
+            if (client.getAgentId() != null) { // 如果有 agentId 则修改 agentId
+                newAuthConfig.setAgentId(client.getAgentId());
+            }
             // 2.3 设置会 request 里，进行后续使用
             ReflectUtil.setFieldValue(request, "config", newAuthConfig);
         }
@@ -213,7 +222,7 @@ public class SocialClientServiceImpl implements SocialClientService {
             return service.getUserService().getPhoneNoInfo(phoneCode);
         } catch (WxErrorException e) {
             log.error("[getPhoneNoInfo][userType({}) phoneCode({}) 获得手机号失败]", userType, phoneCode, e);
-            throw exception(SOCIAL_APP_WEIXIN_MINI_APP_PHONE_CODE_ERROR);
+            throw exception(SOCIAL_CLIENT_WEIXIN_MINI_APP_PHONE_CODE_ERROR);
         }
     }
 
@@ -253,6 +262,78 @@ public class SocialClientServiceImpl implements SocialClientService {
         WxMaService service = new WxMaServiceImpl();
         service.setWxMaConfig(configStorage);
         return service;
+    }
+
+    // =================== 客户端管理 ===================
+
+    @Override
+    public Long createSocialClient(SocialClientCreateReqVO createReqVO) {
+        // 校验重复
+        validateSocialClientUnique(null, createReqVO.getUserType(), createReqVO.getSocialType());
+
+        // 插入
+        SocialClientDO socialClient = SocialClientConvert.INSTANCE.convert(createReqVO);
+        socialClientMapper.insert(socialClient);
+        // 返回
+        return socialClient.getId();
+    }
+
+    @Override
+    public void updateSocialClient(SocialClientUpdateReqVO updateReqVO) {
+        // 校验存在
+        validateSocialClientExists(updateReqVO.getId());
+        // 校验重复
+        validateSocialClientUnique(updateReqVO.getId(), updateReqVO.getUserType(), updateReqVO.getSocialType());
+
+        // 更新
+        SocialClientDO updateObj = SocialClientConvert.INSTANCE.convert(updateReqVO);
+        socialClientMapper.updateById(updateObj);
+    }
+
+    @Override
+    public void deleteSocialClient(Long id) {
+        // 校验存在
+        validateSocialClientExists(id);
+        // 删除
+        socialClientMapper.deleteById(id);
+    }
+
+    private void validateSocialClientExists(Long id) {
+        if (socialClientMapper.selectById(id) == null) {
+            throw exception(SOCIAL_CLIENT_NOT_EXISTS);
+        }
+    }
+
+    /**
+     * 校验社交应用是否重复，需要保证 userType + socialType 唯一
+     *
+     * 原因是，不同端（userType）选择某个社交登录（socialType）时，需要通过 {@link #buildAuthRequest(Integer, Integer)} 构建对应的请求
+     *
+     * @param id 编号
+     * @param userType 用户类型
+     * @param socialType 社交类型
+     */
+    @VisibleForTesting
+    private void validateSocialClientUnique(Long id, Integer userType, Integer socialType) {
+        SocialClientDO client = socialClientMapper.selectBySocialTypeAndUserType(
+                socialType, userType);
+        if (client == null) {
+            return;
+        }
+        if (id == null // 新增时，说明重复
+                || ObjUtil.notEqual(id, client.getId())) { // 更新时，如果 id 不一致，说明重复
+            throw exception(SOCIAL_CLIENT_UNIQUE);
+        }
+    }
+
+    @Override
+    public SocialClientDO getSocialClient(Long id) {
+        return socialClientMapper.selectById(id);
+    }
+
+    @Override
+    public PageResult<SocialClientDO> getSocialClientPage(SocialClientPageReqVO pageReqVO) {
+        return socialClientMapper.selectPage(pageReqVO);
     }
 
 }

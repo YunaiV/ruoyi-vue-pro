@@ -29,4 +29,9 @@ public interface CodegenTableMapper extends BaseMapperX<CodegenTableDO> {
         return selectList(CodegenTableDO::getDataSourceConfigId, dataSourceConfigId);
     }
 
+    default List<CodegenTableDO> selectListByTemplateTypeAndMasterTableId(Integer templateType, Long masterTableId) {
+        return selectList(CodegenTableDO::getTemplateType, templateType,
+                CodegenTableDO::getMasterTableId, masterTableId);
+    }
+
 }

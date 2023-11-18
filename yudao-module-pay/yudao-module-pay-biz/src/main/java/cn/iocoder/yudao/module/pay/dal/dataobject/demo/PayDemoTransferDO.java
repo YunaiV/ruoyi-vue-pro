@@ -1,15 +1,14 @@
 package cn.iocoder.yudao.module.pay.dal.dataobject.demo;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum;
+import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
 /**
  * 示例转账订单
@@ -28,9 +27,18 @@ public class PayDemoTransferDO extends BaseDO {
     private Long id;
 
     /**
-     * 用户编号
+     * 应用编号
+     *
+     * 关联 {@link PayAppDO#getId()}
      */
-    private Long userId;
+    private Long appId;
+
+    /**
+     * 转账类型
+     * <p>
+     * 枚举 {@link PayTransferTypeEnum}
+     */
+    private Integer type;
 
     /**
      * 转账金额，单位：分
@@ -38,16 +46,19 @@ public class PayDemoTransferDO extends BaseDO {
     private Integer price;
 
     /**
-     * 转账类型
+     * 收款人姓名
      */
-    private Integer type;
+    private String userName;
 
-    // TODO @jason：要不字段还是弄成正确的平铺开？
     /**
-     * 收款人信息，不同类型和渠道不同
+     * 支付宝登录号
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private Map<String, String> payeeInfo;
+    private String alipayLogonId;
+
+    /**
+     * 微信 openId
+     */
+    private String openid;
 
     /**
      * 转账状态
@@ -55,7 +66,7 @@ public class PayDemoTransferDO extends BaseDO {
     private Integer transferStatus;
 
     /**
-     * 转账订单编号
+     * 转账单编号
      */
     private Long payTransferId;
 

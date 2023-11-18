@@ -6,9 +6,12 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Map;
+
+import static cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum.*;
 
 /**
  * 统一转账 Request DTO
@@ -48,19 +51,28 @@ public class PayTransferUnifiedReqDTO {
      */
     @NotEmpty(message = "转账标题不能为空")
     @Length(max = 128, message = "转账标题不能超过 128")
-    private String title;
+    private String subject;
 
     /**
-     * 收款方信息。
-     *
-     * 转账类型 {@link #type} 不同，收款方信息不同
+     * 收款人姓名
      */
-    @NotEmpty(message = "收款方信息 不能为空")
-    private Map<String, String> payeeInfo;
+    @NotBlank(message = "收款人姓名不能为空", groups = {Alipay.class})
+    private String userName;
+
+    /**
+     * 支付宝登录号
+     */
+    @NotBlank(message = "支付宝登录号不能为空", groups = {Alipay.class})
+    private String alipayLogonId;
+
+    /**
+     * 微信 openId
+     */
+    @NotBlank(message = "微信 openId 不能为空", groups = {WxPay.class})
+    private String openid;
 
     /**
      * 支付渠道的额外参数
      */
     private Map<String, String> channelExtras;
-
 }

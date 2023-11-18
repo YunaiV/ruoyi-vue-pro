@@ -21,8 +21,11 @@ public enum PayTransferTypeEnum implements IntArrayValuable {
     BANK_CARD(3, "银行卡"),
     WALLET_BALANCE(4, "钱包余额");
 
-    public static final String ALIPAY_LOGON_ID = "ALIPAY_LOGON_ID";
-    public static final String ALIPAY_ACCOUNT_NAME = "ALIPAY_ACCOUNT_NAME";
+    public interface WxPay {
+    }
+
+    public interface Alipay {
+    }
 
     private final Integer type;
     private final String name;

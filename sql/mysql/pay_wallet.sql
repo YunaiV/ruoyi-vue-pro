@@ -5,18 +5,26 @@ DROP TABLE IF EXISTS `pay_transfer`;
 CREATE TABLE `pay_transfer`
 (
     `id`                   bigint       NOT NULL AUTO_INCREMENT COMMENT '编号',
-    `type`                 int          NOT NULL COMMENT '类型',
+    `no`                   varchar(64)  NOT NULL COMMENT '转账单号',
     `app_id`               bigint       NOT NULL COMMENT '应用编号',
-    `merchant_order_id`    varchar(64)  NOT NULL COMMENT '商户订单编号',
-    `price`                int          NOT NULL COMMENT '转账金额，单位：分',
-    `subject`              varchar(512) NOT NULL COMMENT '转账标题',
-    `payee_info`           varchar(512) NOT NULL COMMENT '收款人信息，不同类型和渠道不同',
+    `channel_id`           bigint       NOT NULL  COMMENT '转账渠道编号',
+    `channel_code`         varchar(32)  NOT NULL  COMMENT '转账渠道编码',
+    `merchant_transfer_id` varchar(64)  NOT NULL COMMENT '商户转账单编号',
+    `type`                 int          NOT NULL COMMENT '类型',
     `status`               tinyint      NOT NULL COMMENT '转账状态',
     `success_time`         datetime     NULL COMMENT '转账成功时间',
-    `extension_id`         bigint       NULL  COMMENT '转账渠道编号',
-    `no`                   varchar(64)  NULL COMMENT '转账单号',
-    `channel_id`           bigint       NULL  COMMENT '转账渠道编号',
-    `channel_code`         varchar(32)  NULL  COMMENT '转账渠道编码',
+    `price`                int          NOT NULL COMMENT '转账金额，单位：分',
+    `subject`              varchar(512) NOT NULL COMMENT '转账标题',
+    `user_name`            varchar(64)  NULL COMMENT '收款人姓名',
+    `alipay_logon_id`      varchar(64)  NULL COMMENT '支付宝登录号',
+    `openid`               varchar(64)   NULL COMMENT '微信 openId',
+    `notify_url`           varchar(1024) NOT NULL COMMENT '异步通知商户地址',
+    `user_ip`              varchar(50)   NOT NULL COMMENT '用户 IP',
+    `channel_extras`       varchar(512) NULL DEFAULT NULL COMMENT '渠道的额外参数',
+    `channel_transfer_no`  varchar(64)  NULL DEFAULT NULL COMMENT '渠道转账单号',
+    `channel_error_code`   varchar(128) NULL DEFAULT NULL COMMENT '调用渠道的错误码',
+    `channel_error_msg`    varchar(256) NULL DEFAULT NULL COMMENT '调用渠道的错误提示',
+    `channel_notify_data`  varchar(4096) NULL DEFAULT NULL COMMENT '渠道的同步/异步通知的内容',
     `creator`              varchar(64)  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
     `create_time`          datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `updater`              varchar(64)  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
@@ -27,38 +35,17 @@ CREATE TABLE `pay_transfer`
 ) ENGINE=InnoDB COMMENT='转账单表';
 
 -- ----------------------------
--- 转账扩展单
--- ----------------------------
-DROP TABLE IF EXISTS `pay_transfer_extension`;
-CREATE TABLE `pay_transfer_extension`
-(
-    `id`                   bigint        NOT NULL AUTO_INCREMENT COMMENT '编号',
-    `no`                   varchar(64)   NOT NULL COMMENT '转账单号',
-    `transfer_id`          bigint        NOT NULL COMMENT '转账单编号',
-    `channel_id`           bigint        NOT NULL COMMENT '转账渠道编号',
-    `channel_code`         varchar(32)   NOT NULL COMMENT '转账渠道编码',
-    `channel_extras`       varchar(512)  NULL DEFAULT NULL COMMENT '支付渠道的额外参数',
-    `status`               tinyint       NOT NULL COMMENT '转账状态',
-    `channel_notify_data`  varchar(4096) NULL DEFAULT NULL COMMENT '支付渠道异步通知的内容',
-    `creator`              varchar(64)   NULL DEFAULT '' COMMENT '创建者',
-    `create_time`          datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `updater`              varchar(64)   NULL DEFAULT '' COMMENT '更新者',
-    `update_time`          datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `deleted`              bit(1)        NOT NULL DEFAULT b'0' COMMENT '是否删除',
-    `tenant_id`            bigint        NOT NULL DEFAULT 0 COMMENT '租户编号',
-    PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB COMMENT='转账拓展单表';
-
--- ----------------------------
 -- Table structure for pay_demo_transfer
 -- ----------------------------
 DROP TABLE IF EXISTS `pay_demo_transfer`;
 CREATE TABLE `pay_demo_transfer`  (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '订单编号',
-  `user_id` bigint UNSIGNED NOT NULL COMMENT '用户编号',
-  `price` int NOT NULL COMMENT '转账金额，单位：分',
+  `app_id`  bigint NOT NULL COMMENT '应用编号',
   `type`  int NOT NULL COMMENT '转账类型',
-  `payee_info` varchar(512) NOT NULL COMMENT '收款人信息，不同类型和渠道不同',
+  `price` int NOT NULL COMMENT '转账金额，单位：分',
+  `user_name`            varchar(64)  NULL COMMENT '收款人姓名',
+  `alipay_logon_id`      varchar(64)  NULL COMMENT '支付宝登录号',
+  `openid`               varchar(64)  NULL COMMENT '微信 openId',
   `transfer_status` tinyint      NOT NULL DEFAULT 0 COMMENT '转账状态',
   `pay_transfer_id` bigint NULL DEFAULT NULL COMMENT '转账订单编号',
   `pay_channel_code` varchar(16)  NULL DEFAULT NULL COMMENT '转账支付成功渠道',
@@ -70,11 +57,11 @@ CREATE TABLE `pay_demo_transfer`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
    PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB  COMMENT = '示例业务转账订单\n';
+) ENGINE = InnoDB  COMMENT = '示例业务转账订单';
 
 
-ALTER TABLE `pay_channel`
-    MODIFY COLUMN `config` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '支付渠道配置' AFTER `app_id`;
+-- ALTER TABLE `pay_channel`
+--   MODIFY COLUMN `config` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '支付渠道配置' AFTER `app_id`;
 
 -- ----------------------------
 -- 充值套餐表
@@ -203,3 +190,59 @@ VALUES (
            '', '', '', 0
        );
 
+-- 支付实战和转账实战数据库脚本
+
+update  system_menu set deleted = 1  where id = 2161;
+
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status, component_name
+)
+VALUES (
+           '接入示例', '', 1, 99, 1117,
+           'demo', 'ep:caret-right', '', 0, ''
+       );
+
+SELECT @parentId1 := LAST_INSERT_ID();
+
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status, component_name
+)
+VALUES (
+           '支付实战', '', 2, 1, @parentId1,
+           'demo-order', 'fa:leaf', 'pay/demo/order/index', 0, NULL
+       );
+
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status, component_name
+)
+VALUES (
+           '转账实战', '', 2, 1, @parentId1,
+           'demo-transfer', 'fa:leaf', 'pay/demo/transfer/index', 0, NULL
+       );
+
+-- 转账状态和转账类型数据字典
+INSERT INTO `system_dict_type`(`name`, `type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `deleted_time`) VALUES ('支付转账类型', 'pay_transfer_type', 0, '', '1', '2023-10-28 16:27:18', '1', '2023-10-28 16:27:18', b'0', '1970-01-01 00:00:00');
+INSERT INTO `system_dict_type`(`name`, `type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `deleted_time`) VALUES ('转账订单状态', 'pay_transfer_status', 0, '', '1', '2023-10-28 16:18:32', '1', '2023-10-28 16:18:32', b'0', '1970-01-01 00:00:00');
+
+INSERT INTO `system_dict_data`(`sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (4, '钱包余额', '4', 'pay_transfer_type', 0, 'info', '', '', '1', '2023-10-28 16:28:37', '1', '2023-10-28 16:28:37', b'0');
+INSERT INTO `system_dict_data`(`sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (3, '银行卡', '3', 'pay_transfer_type', 0, 'default', '', '', '1', '2023-10-28 16:28:21', '1', '2023-10-28 16:28:21', b'0');
+INSERT INTO `system_dict_data`(`sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2, '微信余额', '2', 'pay_transfer_type', 0, 'info', '', '', '1', '2023-10-28 16:28:07', '1', '2023-10-28 16:28:07', b'0');
+INSERT INTO `system_dict_data`(`sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1, '支付宝余额', '1', 'pay_transfer_type', 0, 'default', '', '', '1', '2023-10-28 16:27:44', '1', '2023-10-28 16:27:44', b'0');
+INSERT INTO `system_dict_data`(`sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (4, '转账失败', '30', 'pay_transfer_status', 0, 'warning', '', '', '1', '2023-10-28 16:24:16', '1', '2023-10-28 16:24:16', b'0');
+INSERT INTO `system_dict_data`(`sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (3, '转账成功', '20', 'pay_transfer_status', 0, 'success', '', '', '1', '2023-10-28 16:23:50', '1', '2023-10-28 16:23:50', b'0');
+INSERT INTO `system_dict_data`(`sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2, '转账进行中', '10', 'pay_transfer_status', 0, 'info', '', '', '1', '2023-10-28 16:23:12', '1', '2023-10-28 16:23:12', b'0');
+INSERT INTO `system_dict_data`(`sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1, '等待转账', '0', 'pay_transfer_status', 0, 'default', '', '', '1', '2023-10-28 16:21:43', '1', '2023-10-28 16:23:22', b'0');
+
+-- 转账订单菜单脚本
+
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status, component_name
+)
+VALUES (
+           '转账订单', '', 2, 3, 1117,
+           'transfer', 'ep:credit-card', 'pay/transfer/index', 0, 'PayTransfer'
+       );

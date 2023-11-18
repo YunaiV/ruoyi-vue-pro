@@ -43,7 +43,8 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 import static cn.hutool.core.date.DatePattern.NORM_DATETIME_FORMATTER;
-import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.*;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
 import static cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig.MODE_CERTIFICATE;
 
@@ -227,14 +228,13 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
     protected PayTransferRespDTO doUnifiedTransfer(PayTransferUnifiedReqDTO reqDTO) throws AlipayApiException {
         // 1.1 校验公钥类型 必须使用公钥证书模式
         if (!Objects.equals(config.getMode(), MODE_CERTIFICATE)) {
-            throw new IllegalStateException("支付宝单笔转账必须使用公钥证书模式");
+            throw exception0(ERROR_CONFIGURATION.getCode(),"支付宝单笔转账必须使用公钥证书模式");
         }
-
         // 1.2 构建 AlipayFundTransUniTransferModel
         AlipayFundTransUniTransferModel model = new AlipayFundTransUniTransferModel();
         // ① 通用的参数
         model.setTransAmount(formatAmount(reqDTO.getPrice())); // 转账金额
-        model.setOrderTitle(reqDTO.getTitle());               // 转账业务的标题，用于在支付宝用户的账单里显示。
+        model.setOrderTitle(reqDTO.getSubject());               // 转账业务的标题，用于在支付宝用户的账单里显示。
         model.setOutBizNo(reqDTO.getOutTransferNo());
         model.setProductCode("TRANS_ACCOUNT_NO_PWD");    // 销售产品码。单笔无密转账固定为 TRANS_ACCOUNT_NO_PWD
         model.setBizScene("DIRECT_TRANSFER");           // 业务场景 单笔无密转账固定为 DIRECT_TRANSFER
@@ -247,16 +247,8 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
                 // ② 个性化的参数
                 Participant payeeInfo = new Participant();
                 payeeInfo.setIdentityType("ALIPAY_LOGON_ID");
-                String logonId = MapUtil.getStr(reqDTO.getPayeeInfo(), "ALIPAY_LOGON_ID");
-                if (StrUtil.isEmpty(logonId)) {
-                    throw exception0(BAD_REQUEST.getCode(), "支付包登录 ID 不能为空");
-                }
-                String accountName = MapUtil.getStr(reqDTO.getPayeeInfo(), "ALIPAY_ACCOUNT_NAME");
-                if (StrUtil.isEmpty(accountName)) {
-                    throw exception0(BAD_REQUEST.getCode(), "支付包账户名称不能为空");
-                }
-                payeeInfo.setIdentity(logonId); // 支付宝登录号
-                payeeInfo.setName(accountName); // 支付宝账号姓名
+                payeeInfo.setIdentity(reqDTO.getAlipayLogonId()); // 支付宝登录号
+                payeeInfo.setName(reqDTO.getUserName()); // 支付宝账号姓名
                 model.setPayeeInfo(payeeInfo);
                 // 1.3 构建 AlipayFundTransUniTransferRequest
                 AlipayFundTransUniTransferRequest request = new AlipayFundTransUniTransferRequest();
@@ -279,10 +271,10 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
                 Participant payeeInfo = new Participant();
                 payeeInfo.setIdentityType("BANKCARD_ACCOUNT");
                 // TODO 待实现
-                throw new UnsupportedOperationException("待实现");
+                throw exception(NOT_IMPLEMENTED);
             }
             default: {
-                throw new IllegalStateException("不正确的转账类型: " + transferType);
+                throw exception0(BAD_REQUEST.getCode(),"不正确的转账类型: {}",transferType);
             }
         }
     }

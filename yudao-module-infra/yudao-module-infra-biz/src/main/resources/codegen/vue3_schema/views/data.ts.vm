@@ -1,10 +1,5 @@
 import type { CrudSchema } from '@/hooks/web/useCrudSchemas'
-#foreach ($column in $columns)
-    #if ($column.listOperationResult && $column.htmlType == "datetime")
 import { dateFormatter } from '@/utils/formatTime'
-    #break
-    #end
-#end
 
 // 表单校验
 export const rules = reactive({

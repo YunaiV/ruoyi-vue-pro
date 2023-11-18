@@ -28,6 +28,11 @@ import ${BaseDOClassName};
 @AllArgsConstructor
 public class ${table.className}DO extends BaseDO {
 
+## 特殊：树表专属逻辑
+#if ( $table.templateType == 2 )
+    public static final Long ${treeParentColumn_javaField_underlineCase.toUpperCase()}_ROOT = 0L;
+
+#end
 #foreach ($column in $columns)
 #if (!${baseDOFields.contains(${column.javaField})})##排除 BaseDO 的字段
     /**
