@@ -44,6 +44,7 @@ public class CrmCustomerPoolConfigServiceImpl implements CrmCustomerPoolConfigSe
      */
     @Override
     public void updateCustomerPoolConfig(CrmCustomerPoolConfigUpdateReqVO saveReqVO) {
+        // TODO @wanwan：看下 @AssertTrue 的逻辑；
         if (BooleanUtil.isTrue(saveReqVO.getEnabled()) && (ObjectUtil.hasNull(saveReqVO.getContactExpireDays(), saveReqVO.getDealExpireDays()))) {
             throw exception(CUSTOMER_POOL_CONFIG_ERROR);
         }
@@ -60,4 +61,5 @@ public class CrmCustomerPoolConfigServiceImpl implements CrmCustomerPoolConfigSe
         // 不存在，则进行插入
         customerPoolConfigMapper.insert(CrmCustomerConvert.INSTANCE.convert(saveReqVO));
     }
+
 }

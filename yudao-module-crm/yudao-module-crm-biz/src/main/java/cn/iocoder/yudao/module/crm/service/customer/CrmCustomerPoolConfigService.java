@@ -25,4 +25,5 @@ public interface CrmCustomerPoolConfigService {
      * @param saveReqVO 更新信息
      */
     void updateCustomerPoolConfig(@Valid CrmCustomerPoolConfigUpdateReqVO saveReqVO);
+
 }

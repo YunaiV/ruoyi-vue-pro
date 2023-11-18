@@ -6,6 +6,7 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
+// TODO @wanwan：vo 下，可以新建一个 limitconfig，放它的 vo；
 /**
  * 客户限制配置 Base VO，提供给添加、修改、详细的子 VO 使用
  * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成

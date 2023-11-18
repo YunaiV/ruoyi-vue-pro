@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.convert.customerlimitconfig;
+package cn.iocoder.yudao.module.crm.convert.customer;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerLimitConfigCreateReqVO;
@@ -57,9 +57,11 @@ public interface CrmCustomerLimitConfigConvert {
      * @param respVo 响应实体
      */
     static void fillNameField(Map<Long, AdminUserRespDTO> userMap, Map<Long, DeptRespDTO> deptMap, CrmCustomerLimitConfigRespVO respVo) {
+        // TODO wanwan：返回 list，具体怎么拼接叫给前端；
         respVo.setUserNames(respVo.getUserIds().stream().map(userMap::get)
                 .filter(Objects::nonNull).map(AdminUserRespDTO::getNickname).collect(Collectors.joining("，")));
         respVo.setDeptNames(respVo.getDeptIds().stream().map(deptMap::get)
                 .filter(Objects::nonNull).map(DeptRespDTO::getName).collect(Collectors.joining("，")));
     }
+
 }

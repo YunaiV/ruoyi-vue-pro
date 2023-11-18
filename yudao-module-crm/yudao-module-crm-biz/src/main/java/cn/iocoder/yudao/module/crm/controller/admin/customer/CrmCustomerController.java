@@ -5,8 +5,6 @@ import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
@@ -35,6 +33,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSetByFlatMap;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -46,6 +46,7 @@ public class CrmCustomerController {
 
     @Resource
     private CrmCustomerService customerService;
+
     @Resource
     private DeptApi deptApi;
     @Resource
@@ -103,11 +104,15 @@ public class CrmCustomerController {
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
     public CommonResult<PageResult<CrmCustomerRespVO>> getCustomerPage(@Valid CrmCustomerPageReqVO pageVO) {
         PageResult<CrmCustomerDO> pageResult = customerService.getCustomerPage(pageVO);
-        Set<Long> userSet = CollectionUtils.convertSetByFlatMap(pageResult.getList(), i -> Stream.of(NumberUtil.parseLong(i.getCreator()), i.getOwnerUserId()));
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userSet);
-        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(userMap.values().stream().map(AdminUserRespDTO::getDeptId).collect(Collectors.toSet()));
-        PageResult<CrmCustomerRespVO> pageVo = CrmCustomerConvert.INSTANCE.convertPage(pageResult, userMap, deptMap);
-        return success(pageVo);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty(pageResult.getTotal()));
+        }
+        // 拼接数据
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
+                convertSetByFlatMap(pageResult.getList(), user -> Stream.of(NumberUtil.parseLong(user.getCreator()), user.getOwnerUserId())));
+        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
+                convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
+        return success(CrmCustomerConvert.INSTANCE.convertPage(pageResult, userMap, deptMap));
     }
 
     @GetMapping("/export-excel")

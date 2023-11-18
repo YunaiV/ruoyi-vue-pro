@@ -34,6 +34,7 @@ public class CrmCustomerPoolConfigController {
         return success(CrmCustomerConvert.INSTANCE.convert(customerPoolConfig));
     }
 
+    // TODO @wanwan：这个请求，搞成 save 哈；
     @PutMapping("/update")
     @Operation(summary = "更新客户公海规则设置")
     @PreAuthorize("@ss.hasPermission('crm:customer-pool-config:update')")
@@ -41,4 +42,5 @@ public class CrmCustomerPoolConfigController {
         customerPoolConfigService.updateCustomerPoolConfig(updateReqVO);
         return success(true);
     }
+
 }

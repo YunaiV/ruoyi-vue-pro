@@ -109,6 +109,7 @@ public class UserController {
         return success(new PageResult<>(userList, pageResult.getTotal()));
     }
 
+    // TODO @芋艿：看看这里怎么统一调整下；客户的选择组件；
     @GetMapping("/all")
     @Operation(summary = "查询所有用户列表")
     public CommonResult<List<UserPageItemRespVO>> getAllUser() {

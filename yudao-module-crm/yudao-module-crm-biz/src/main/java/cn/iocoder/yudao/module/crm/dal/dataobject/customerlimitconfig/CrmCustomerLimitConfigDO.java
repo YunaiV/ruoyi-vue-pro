@@ -32,6 +32,8 @@ public class CrmCustomerLimitConfigDO extends BaseDO {
     private Long id;
     /**
      * 规则类型
+     *
+     * TODO @wanwan：搞个枚举哈；
      */
     private Integer type;
     /**
@@ -49,7 +51,9 @@ public class CrmCustomerLimitConfigDO extends BaseDO {
      */
     private Integer maxCount;
     /**
-     * 成交客户是否占有拥有客户数(当 type = 1 时)
+     * 成交客户是否占有拥有客户数
+     *
+     * 当且仅当 {@link #type} 为 1 时，进行使用
      */
     private Boolean dealCountEnabled;
 

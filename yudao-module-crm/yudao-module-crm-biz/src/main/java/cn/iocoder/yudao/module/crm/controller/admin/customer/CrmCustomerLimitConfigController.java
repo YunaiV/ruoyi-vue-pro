@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.module.crm.controller.admin.customer;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerLimitConfigCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerLimitConfigPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerLimitConfigRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerLimitConfigUpdateReqVO;
-import cn.iocoder.yudao.module.crm.convert.customerlimitconfig.CrmCustomerLimitConfigConvert;
+import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerLimitConfigConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customerlimitconfig.CrmCustomerLimitConfigDO;
 import cn.iocoder.yudao.module.crm.service.customerlimitconfig.CrmCustomerLimitConfigService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -24,12 +24,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSetByFlatMap;
 
 @Tag(name = "管理后台 - 客户限制配置")
 @RestController
@@ -39,6 +37,7 @@ public class CrmCustomerLimitConfigController {
 
     @Resource
     private CrmCustomerLimitConfigService customerLimitConfigService;
+
     @Resource
     private DeptApi deptApi;
     @Resource
@@ -74,8 +73,9 @@ public class CrmCustomerLimitConfigController {
     @PreAuthorize("@ss.hasPermission('crm:customer-limit-config:query')")
     public CommonResult<CrmCustomerLimitConfigRespVO> getCustomerLimitConfig(@RequestParam("id") Long id) {
         CrmCustomerLimitConfigDO customerLimitConfig = customerLimitConfigService.getCustomerLimitConfig(id);
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(new HashSet<>(customerLimitConfig.getUserIds()));
-        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(new HashSet<>(customerLimitConfig.getDeptIds()));
+        // 拼接数据
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(customerLimitConfig.getUserIds());
+        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(customerLimitConfig.getDeptIds());
         return success(CrmCustomerLimitConfigConvert.INSTANCE.convert(customerLimitConfig, userMap, deptMap));
     }
 
@@ -84,10 +84,14 @@ public class CrmCustomerLimitConfigController {
     @PreAuthorize("@ss.hasPermission('crm:customer-limit-config:query')")
     public CommonResult<PageResult<CrmCustomerLimitConfigRespVO>> getCustomerLimitConfigPage(@Valid CrmCustomerLimitConfigPageReqVO pageVO) {
         PageResult<CrmCustomerLimitConfigDO> pageResult = customerLimitConfigService.getCustomerLimitConfigPage(pageVO);
-        Set<Long> userIds = CollectionUtils.convertSetByFlatMap(pageResult.getList(), CrmCustomerLimitConfigDO::getUserIds, Collection::stream);
-        Set<Long> deptIds = CollectionUtils.convertSetByFlatMap(pageResult.getList(), CrmCustomerLimitConfigDO::getDeptIds, Collection::stream);
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
-        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(deptIds);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty(pageResult.getTotal()));
+        }
+        // 拼接数据
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
+                convertSetByFlatMap(pageResult.getList(), CrmCustomerLimitConfigDO::getUserIds, Collection::stream));
+        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
+                convertSetByFlatMap(pageResult.getList(), CrmCustomerLimitConfigDO::getDeptIds, Collection::stream));
         return success(CrmCustomerLimitConfigConvert.INSTANCE.convertPage(pageResult, userMap, deptMap));
     }
 

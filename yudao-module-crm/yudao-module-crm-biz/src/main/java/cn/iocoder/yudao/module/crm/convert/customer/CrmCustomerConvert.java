@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.crm.convert.customer;
 
-import cn.hutool.core.lang.tree.Node;
 import cn.hutool.core.util.NumberUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
@@ -18,8 +17,6 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * 客户 Convert
@@ -65,4 +62,5 @@ public interface CrmCustomerConvert {
     CrmCustomerPoolConfigRespVO convert(CrmCustomerPoolConfigDO customerPoolConfig);
 
     CrmCustomerPoolConfigDO convert(CrmCustomerPoolConfigUpdateReqVO updateReqVO);
+
 }

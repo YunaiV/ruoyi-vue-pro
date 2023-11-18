@@ -12,6 +12,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class CrmCustomerPoolConfigBaseVO {
 
+    // TODO @wanwan：参数校验
     @Schema(description = "是否启用客户公海", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     @NotNull(message = "是否启用客户公海不能为空")
     private Boolean enabled;
@@ -27,4 +28,5 @@ public class CrmCustomerPoolConfigBaseVO {
 
     @Schema(description = "提前提醒天数", example = "2")
     private Integer notifyDays;
+
 }

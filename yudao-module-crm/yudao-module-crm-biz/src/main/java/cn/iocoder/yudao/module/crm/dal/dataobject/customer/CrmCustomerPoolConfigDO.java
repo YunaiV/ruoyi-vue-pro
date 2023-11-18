@@ -46,4 +46,5 @@ public class CrmCustomerPoolConfigDO extends BaseDO {
      * 提前提醒天数
      */
     private Integer notifyDays;
+
 }
