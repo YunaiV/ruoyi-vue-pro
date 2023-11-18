@@ -1,22 +1,18 @@
 package cn.iocoder.yudao.module.crm.controller.admin.contact.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-
-import java.time.LocalDate;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-
 import com.alibaba.excel.annotation.ExcelProperty;
+import lombok.Data;
 
+import java.time.LocalDateTime;
+
+// TODO @zyna：参考新的 VO 结构，把 ContactExcelVO 融合到 ContactRespVO 中
 /**
  * crm联系人 Excel VO
  *
  * @author 芋道源码
  */
 @Data
+@Deprecated
 public class ContactExcelVO {
 
     @ExcelProperty("下次联系时间")

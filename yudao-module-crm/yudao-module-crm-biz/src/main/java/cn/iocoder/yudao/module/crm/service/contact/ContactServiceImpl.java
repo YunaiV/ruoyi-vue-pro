@@ -1,22 +1,24 @@
 package cn.iocoder.yudao.module.crm.service.contact;
 
-import org.springframework.stereotype.Service;
-import javax.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-
-import java.util.*;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.*;
-import cn.iocoder.yudao.module.crm.dal.dataobject.contact.ContactDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
-import cn.iocoder.yudao.module.crm.convert.contact.ContactConvert;
-import cn.iocoder.yudao.module.crm.dal.mysql.contact.ContactMapper;
-
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
-
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactCreateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactExportReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactUpdateReqVO;
+import cn.iocoder.yudao.module.crm.convert.contact.ContactConvert;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contact.ContactDO;
+import cn.iocoder.yudao.module.crm.dal.mysql.contact.ContactMapper;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+
+import javax.annotation.Resource;
+import java.util.Collection;
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CONTACT_NOT_EXISTS;
 
 /**
  * crm联系人 Service 实现类
@@ -30,7 +32,7 @@ public class ContactServiceImpl implements ContactService {
     @Resource
     private ContactMapper contactMapper;
 
-    @Override
+    @Override // TODO @zyna：新增和修改时，关联字段要校验，例如说 直属上级，是不是真的存在；
     public Long createContact(ContactCreateReqVO createReqVO) {
         // 插入
         ContactDO contact = ContactConvert.INSTANCE.convert(createReqVO);

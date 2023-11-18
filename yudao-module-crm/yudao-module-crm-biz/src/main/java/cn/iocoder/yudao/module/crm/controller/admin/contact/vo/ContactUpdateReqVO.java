@@ -1,11 +1,13 @@
 package cn.iocoder.yudao.module.crm.controller.admin.contact.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
-import javax.validation.constraints.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
-@Schema(description = "管理后台 - crm联系人更新 Request VO")
+import javax.validation.constraints.NotNull;
+
+@Schema(description = "管理后台 - CRM 联系人更新 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

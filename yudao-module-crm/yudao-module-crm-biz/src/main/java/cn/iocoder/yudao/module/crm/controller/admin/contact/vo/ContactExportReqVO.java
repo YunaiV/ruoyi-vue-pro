@@ -1,18 +1,17 @@
 package cn.iocoder.yudao.module.crm.controller.admin.contact.vo;
 
-import lombok.*;
-
-import java.time.LocalDate;
-import java.util.*;
 import io.swagger.v3.oas.annotations.media.Schema;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import java.time.LocalDateTime;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+// TODO @zyna：参考新的 VO 结构，使用 ContactPageReqVO 查询导出的数据
 @Schema(description = "管理后台 - crm联系人 Excel 导出 Request VO，参数和 ContactPageReqVO 是一致的")
 @Data
+@Deprecated
 public class ContactExportReqVO {
 
     @Schema(description = "下次联系时间")

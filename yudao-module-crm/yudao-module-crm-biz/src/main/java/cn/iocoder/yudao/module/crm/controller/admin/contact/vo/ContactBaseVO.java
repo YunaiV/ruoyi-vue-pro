@@ -1,25 +1,24 @@
 package cn.iocoder.yudao.module.crm.controller.admin.contact.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-
-import java.time.LocalDate;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import javax.validation.constraints.*;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+// TODO zyna：参考新的 vo，重新拆分下 VO
 /**
- * crm联系人 Base VO，提供给添加、修改、详细的子 VO 使用
+ * CRM 联系人 Base VO，提供给添加、修改、详细的子 VO 使用
  * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
  */
 @Data
 public class ContactBaseVO {
+
+    // TODO @zyna：example 最好都写下
+    // TODO @zyna：必要的字段校验，例如说 @Mobile，@Emal 等等
 
     @Schema(description = "下次联系时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY)

@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.crm.controller.admin.contact.vo;
 
-import lombok.*;
-
-import java.time.LocalDate;
-import java.util.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -16,6 +16,11 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ContactPageReqVO extends PageParam {
+
+    // TODO @zyna：筛选条件
+    // ●客户：
+    // ●姓名：
+    // ●手机、电话、座机、QQ、微信、邮箱
 
     @Schema(description = "下次联系时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
