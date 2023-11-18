@@ -1,0 +1,32 @@
+### 请求 /transfer
+PUT {{baseUrl}}/crm/business/transfer
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+{
+  "id": 1,
+  "ownerUserId": 2,
+  "transferType": 2,
+  "permissionType": 2
+}
+
+### 请求 /update
+PUT {{baseUrl}}/crm/business/update
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+{
+  "id": 1,
+  "name": "2",
+  "statusTypeId": 2,
+  "statusId": 2,
+  "customerId": 1
+}
+
+### 请求 /get
+GET {{baseUrl}}/crm/business/get?id=1024
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}

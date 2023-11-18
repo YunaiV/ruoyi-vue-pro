@@ -109,6 +109,29 @@ public class UserController {
         return success(new PageResult<>(userList, pageResult.getTotal()));
     }
 
+    // TODO @芋艿：看看这里怎么统一调整下；客户的选择组件；
+    @GetMapping("/all")
+    @Operation(summary = "查询所有用户列表")
+    public CommonResult<List<UserPageItemRespVO>> getAllUser() {
+        // 获得用户分页列表
+        List<AdminUserDO> pageResult = userService.getUserList();
+        if (CollUtil.isEmpty(pageResult)) {
+            return success(Collections.emptyList()); // 返回空
+        }
+
+        // 获得拼接需要的数据
+        Collection<Long> deptIds = convertList(pageResult, AdminUserDO::getDeptId);
+        Map<Long, DeptDO> deptMap = deptService.getDeptMap(deptIds);
+        // 拼接结果返回
+        List<UserPageItemRespVO> userList = new ArrayList<>(pageResult.size());
+        pageResult.forEach(user -> {
+            UserPageItemRespVO respVO = UserConvert.INSTANCE.convert(user);
+            respVO.setDept(UserConvert.INSTANCE.convert(deptMap.get(user.getDeptId())));
+            userList.add(respVO);
+        });
+        return success(userList);
+    }
+
     @GetMapping("/list-all-simple")
     @Operation(summary = "获取用户精简信息列表", description = "只包含被开启的用户，主要用于前端的下拉选项")
     public CommonResult<List<UserSimpleRespVO>> getSimpleUserList() {
