@@ -139,4 +139,5 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         // 转换返回
         return new PageResult<>(mpPage.getRecords(), mpPage.getTotal());
     }
+
 }

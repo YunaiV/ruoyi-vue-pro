@@ -41,20 +41,13 @@ public class ProductFavoriteController {
     @Operation(summary = "获得商品收藏分页")
     @PreAuthorize("@ss.hasPermission('product:favorite:query')")
     public CommonResult<PageResult<ProductFavoriteRespVO>> getFavoritePage(@Valid ProductFavoritePageReqVO pageVO) {
-        PageResult<ProductFavoriteDO> favoritePage = productFavoriteService.getFavoritePage(pageVO);
-        if (CollUtil.isEmpty(favoritePage.getList())) {
+        PageResult<ProductFavoriteDO> pageResult = productFavoriteService.getFavoritePage(pageVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
             return success(PageResult.empty());
         }
-
-        List<ProductSpuDO> list = productSpuService.getSpuList(convertSet(favoritePage.getList(), ProductFavoriteDO::getSpuId));
-
-        // 得到商品 spu 信息
-        List<ProductFavoriteRespVO> favorites =  ProductFavoriteConvert.INSTANCE.convertList2admin(favoritePage.getList(), list);
-
-        // 转换 VO 结果
-        PageResult<ProductFavoriteRespVO> pageResult = new PageResult<>(favoritePage.getTotal());
-        pageResult.setList(favorites);
-
-        return success(pageResult);
+        // 拼接数据
+        List<ProductSpuDO> spuList = productSpuService.getSpuList(convertSet(pageResult.getList(), ProductFavoriteDO::getSpuId));
+        return success(ProductFavoriteConvert.INSTANCE.convertPage(pageResult, spuList));
     }
+
 }

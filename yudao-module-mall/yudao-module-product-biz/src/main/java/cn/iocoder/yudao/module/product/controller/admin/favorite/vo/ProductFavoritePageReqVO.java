@@ -14,4 +14,5 @@ public class ProductFavoritePageReqVO extends PageParam {
 
     @Schema(description = "用户编号", example = "5036")
     private Long userId;
+
 }
