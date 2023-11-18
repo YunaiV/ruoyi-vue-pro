@@ -26,6 +26,12 @@ import java.util.List;
 public interface BaseMapperX<T> extends MPJBaseMapper<T> {
 
     default PageResult<T> selectPage(PageParam pageParam, @Param("ew") Wrapper<T> queryWrapper) {
+        // 特殊：不分页，直接查询全部
+        if (PageParam.PAGE_SIZE_NONE.equals(pageParam.getPageNo())) {
+            List<T> list = selectList(queryWrapper);
+            return new PageResult<>(list, (long) list.size());
+        }
+
         // MyBatis Plus 查询
         IPage<T> mpPage = MyBatisUtils.buildPage(pageParam);
         selectPage(mpPage, queryWrapper);
@@ -93,8 +99,13 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         return selectList(new LambdaQueryWrapper<T>().in(field, values));
     }
 
+    @Deprecated
     default List<T> selectList(SFunction<T, ?> leField, SFunction<T, ?> geField, Object value) {
         return selectList(new LambdaQueryWrapper<T>().le(leField, value).ge(geField, value));
+    }
+
+    default List<T> selectList(SFunction<T, ?> field1, Object value1, SFunction<T, ?> field2, Object value2) {
+        return selectList(new LambdaQueryWrapper<T>().eq(field1, value1).eq(field2, value2));
     }
 
     /**
@@ -128,8 +139,20 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         Db.updateBatchById(entities, size);
     }
 
-    default void saveOrUpdateBatch(Collection<T> collection) {
+    default void insertOrUpdate(T entity) {
+        Db.saveOrUpdate(entity);
+    }
+
+    default void insertOrUpdateBatch(Collection<T> collection) {
         Db.saveOrUpdateBatch(collection);
+    }
+
+    default int delete(String field, String value) {
+        return delete(new QueryWrapper<T>().eq(field, value));
+    }
+
+    default int delete(SFunction<T, ?> field, Object value) {
+        return delete(new LambdaQueryWrapper<T>().eq(field, value));
     }
 
 }

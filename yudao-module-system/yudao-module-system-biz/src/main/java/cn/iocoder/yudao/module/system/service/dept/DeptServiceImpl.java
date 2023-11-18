@@ -11,7 +11,6 @@ import cn.iocoder.yudao.module.system.convert.dept.DeptConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dept.DeptMapper;
 import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
-import cn.iocoder.yudao.module.system.enums.dept.DeptIdEnum;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -42,14 +41,17 @@ public class DeptServiceImpl implements DeptService {
     @Override
     @CacheEvict(cacheNames = RedisKeyConstants.DEPT_CHILDREN_ID_LIST,
             allEntries = true) // allEntries 清空所有缓存，因为操作一个部门，涉及到多个缓存
-    public Long createDept(DeptCreateReqVO reqVO) {
-        // 校验正确性
-        if (reqVO.getParentId() == null) {
-            reqVO.setParentId(DeptIdEnum.ROOT.getId());
+    public Long createDept(DeptCreateReqVO createReqVO) {
+        if (createReqVO.getParentId() == null) {
+            createReqVO.setParentId(DeptDO.PARENT_ID_ROOT);
         }
-        validateForCreateOrUpdate(null, reqVO.getParentId(), reqVO.getName());
+        // 校验父部门的有效性
+        validateParentDept(null, createReqVO.getParentId());
+        // 校验部门名的唯一性
+        validateDeptNameUnique(null, createReqVO.getParentId(), createReqVO.getName());
+
         // 插入部门
-        DeptDO dept = DeptConvert.INSTANCE.convert(reqVO);
+        DeptDO dept = DeptConvert.INSTANCE.convert(createReqVO);
         deptMapper.insert(dept);
         return dept.getId();
     }
@@ -57,14 +59,19 @@ public class DeptServiceImpl implements DeptService {
     @Override
     @CacheEvict(cacheNames = RedisKeyConstants.DEPT_CHILDREN_ID_LIST,
             allEntries = true) // allEntries 清空所有缓存，因为操作一个部门，涉及到多个缓存
-    public void updateDept(DeptUpdateReqVO reqVO) {
-        // 校验正确性
-        if (reqVO.getParentId() == null) {
-            reqVO.setParentId(DeptIdEnum.ROOT.getId());
+    public void updateDept(DeptUpdateReqVO updateReqVO) {
+        if (updateReqVO.getParentId() == null) {
+            updateReqVO.setParentId(DeptDO.PARENT_ID_ROOT);
         }
-        validateForCreateOrUpdate(reqVO.getId(), reqVO.getParentId(), reqVO.getName());
+        // 校验自己存在
+        validateDeptExists(updateReqVO.getId());
+        // 校验父部门的有效性
+        validateParentDept(updateReqVO.getId(), updateReqVO.getParentId());
+        // 校验部门名的唯一性
+        validateDeptNameUnique(updateReqVO.getId(), updateReqVO.getParentId(), updateReqVO.getName());
+
         // 更新部门
-        DeptDO updateObj = DeptConvert.INSTANCE.convert(reqVO);
+        DeptDO updateObj = DeptConvert.INSTANCE.convert(updateReqVO);
         deptMapper.updateById(updateObj);
     }
 
@@ -82,15 +89,6 @@ public class DeptServiceImpl implements DeptService {
         deptMapper.deleteById(id);
     }
 
-    private void validateForCreateOrUpdate(Long id, Long parentId, String name) {
-        // 校验自己存在
-        validateDeptExists(id);
-        // 校验父部门的有效性
-        validateParentDept(id, parentId);
-        // 校验部门名的唯一性
-        validateDeptNameUnique(id, parentId, name);
-    }
-
     @VisibleForTesting
     void validateDeptExists(Long id) {
         if (id == null) {
@@ -104,22 +102,36 @@ public class DeptServiceImpl implements DeptService {
 
     @VisibleForTesting
     void validateParentDept(Long id, Long parentId) {
-        if (parentId == null || DeptIdEnum.ROOT.getId().equals(parentId)) {
+        if (parentId == null || DeptDO.PARENT_ID_ROOT.equals(parentId)) {
             return;
         }
-        // 不能设置自己为父部门
-        if (parentId.equals(id)) {
+        // 1. 不能设置自己为父部门
+        if (Objects.equals(id, parentId)) {
             throw exception(DEPT_PARENT_ERROR);
         }
-        // 父岗位不存在
-        DeptDO dept = deptMapper.selectById(parentId);
-        if (dept == null) {
+        // 2. 父部门不存在
+        DeptDO parentDept = deptMapper.selectById(parentId);
+        if (parentDept == null) {
             throw exception(DEPT_PARENT_NOT_EXITS);
         }
-        // 父部门不能是原来的子部门
-        List<DeptDO> children = getChildDeptList(id);
-        if (children.stream().anyMatch(dept1 -> dept1.getId().equals(parentId))) {
-            throw exception(DEPT_PARENT_IS_CHILD);
+        // 3. 递归校验父部门，如果父部门是自己的子部门，则报错，避免形成环路
+        if (id == null) { // id 为空，说明新增，不需要考虑环路
+            return;
+        }
+        for (int i = 0; i < Short.MAX_VALUE; i++) {
+            // 3.1 校验环路
+            parentId = parentDept.getParentId();
+            if (Objects.equals(id, parentId)) {
+                throw exception(DEPT_PARENT_IS_CHILD);
+            }
+            // 3.2 继续递归下一级父部门
+            if (parentId == null || DeptDO.PARENT_ID_ROOT.equals(parentId)) {
+                break;
+            }
+            parentDept = deptMapper.selectById(parentId);
+            if (parentDept == null) {
+                break;
+            }
         }
     }
 
@@ -129,7 +141,7 @@ public class DeptServiceImpl implements DeptService {
         if (dept == null) {
             return;
         }
-        // 如果 id 为空，说明不用比较是否为相同 id 的岗位
+        // 如果 id 为空，说明不用比较是否为相同 id 的部门
         if (id == null) {
             throw exception(DEPT_NAME_DUPLICATE);
         }

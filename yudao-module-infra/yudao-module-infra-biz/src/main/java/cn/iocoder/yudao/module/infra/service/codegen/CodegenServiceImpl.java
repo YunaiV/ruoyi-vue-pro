@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.codegen.CodegenColumnMapper;
 import cn.iocoder.yudao.module.infra.dal.mysql.codegen.CodegenTableMapper;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
+import cn.iocoder.yudao.module.infra.enums.codegen.CodegenTemplateTypeEnum;
 import cn.iocoder.yudao.module.infra.framework.codegen.config.CodegenProperties;
 import cn.iocoder.yudao.module.infra.service.codegen.inner.CodegenBuilder;
 import cn.iocoder.yudao.module.infra.service.codegen.inner.CodegenEngine;
@@ -25,10 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
@@ -129,6 +127,16 @@ public class CodegenServiceImpl implements CodegenService {
         if (codegenTableMapper.selectById(updateReqVO.getTable().getId()) == null) {
             throw exception(CODEGEN_TABLE_NOT_EXISTS);
         }
+        // 校验主表字段存在
+        if (Objects.equals(updateReqVO.getTable().getTemplateType(), CodegenTemplateTypeEnum.SUB.getType())) {
+            if (codegenTableMapper.selectById(updateReqVO.getTable().getMasterTableId()) == null) {
+                throw exception(CODEGEN_MASTER_TABLE_NOT_EXISTS, updateReqVO.getTable().getMasterTableId());
+            }
+            if (CollUtil.findOne(updateReqVO.getColumns(),  // 关联主表的字段不存在
+                    column -> column.getId().equals(updateReqVO.getTable().getSubJoinColumnId())) == null) {
+                throw exception(CODEGEN_SUB_COLUMN_NOT_EXISTS, updateReqVO.getTable().getSubJoinColumnId());
+            }
+        }
 
         // 更新 table 表定义
         CodegenTableDO updateTableObj = CodegenConvert.INSTANCE.convert(updateReqVO.getTable());
@@ -209,6 +217,11 @@ public class CodegenServiceImpl implements CodegenService {
     }
 
     @Override
+    public List<CodegenTableDO> getCodegenTableList(Long dataSourceConfigId) {
+        return codegenTableMapper.selectListByDataSourceConfigId(dataSourceConfigId);
+    }
+
+    @Override
     public PageResult<CodegenTableDO> getCodegenTablePage(CodegenTablePageReqVO pageReqVO) {
         return codegenTableMapper.selectPage(pageReqVO);
     }
@@ -235,14 +248,34 @@ public class CodegenServiceImpl implements CodegenService {
             throw exception(CODEGEN_COLUMN_NOT_EXISTS);
         }
 
+        // 如果是主子表，则加载对应的子表信息
+        List<CodegenTableDO> subTables = null;
+        List<List<CodegenColumnDO>> subColumnsList = null;
+        if (CodegenTemplateTypeEnum.isMaster(table.getTemplateType())) {
+            // 校验子表存在
+            subTables = codegenTableMapper.selectListByTemplateTypeAndMasterTableId(
+                    CodegenTemplateTypeEnum.SUB.getType(), tableId);
+            if (CollUtil.isEmpty(subTables)) {
+                throw exception(CODEGEN_MASTER_GENERATION_FAIL_NO_SUB_TABLE);
+            }
+            // 校验子表的关联字段存在
+            subColumnsList = new ArrayList<>();
+            for (CodegenTableDO subTable : subTables) {
+                List<CodegenColumnDO> subColumns = codegenColumnMapper.selectListByTableId(subTable.getId());
+                if (CollUtil.findOne(subColumns, column -> column.getId().equals(subTable.getSubJoinColumnId())) == null) {
+                    throw exception(CODEGEN_SUB_COLUMN_NOT_EXISTS, subTable.getId());
+                }
+                subColumnsList.add(subColumns);
+            }
+        }
+
         // 执行生成
-        return codegenEngine.execute(table, columns);
+        return codegenEngine.execute(table, columns, subTables, subColumnsList);
     }
 
     @Override
     public List<DatabaseTableRespVO> getDatabaseTableList(Long dataSourceConfigId, String name, String comment) {
         List<TableInfo> tables = databaseTableService.getTableList(dataSourceConfigId, name, comment);
-        // 移除已经生成的表
         // 移除在 Codegen 中，已经存在的
         Set<String> existsTables = CollectionUtils.convertSet(
                 codegenTableMapper.selectListByDataSourceConfigId(dataSourceConfigId), CodegenTableDO::getTableName);

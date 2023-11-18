@@ -8,7 +8,6 @@ import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqV
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dept.DeptMapper;
-import cn.iocoder.yudao.module.system.enums.dept.DeptIdEnum;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
@@ -41,7 +40,7 @@ public class DeptServiceImplTest extends BaseDbUnitTest {
     public void testCreateDept() {
         // 准备参数
         DeptCreateReqVO reqVO = randomPojo(DeptCreateReqVO.class, o -> {
-            o.setParentId(DeptIdEnum.ROOT.getId());
+            o.setParentId(DeptDO.PARENT_ID_ROOT);
             o.setStatus(randomCommonStatus());
         });
 
@@ -62,7 +61,7 @@ public class DeptServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         DeptUpdateReqVO reqVO = randomPojo(DeptUpdateReqVO.class, o -> {
             // 设置更新的 ID
-            o.setParentId(DeptIdEnum.ROOT.getId());
+            o.setParentId(DeptDO.PARENT_ID_ROOT);
             o.setId(dbDeptDO.getId());
             o.setStatus(randomCommonStatus());
         });

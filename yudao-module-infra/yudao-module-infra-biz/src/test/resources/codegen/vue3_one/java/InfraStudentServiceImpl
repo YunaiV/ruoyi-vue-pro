@@ -1,0 +1,74 @@
+package cn.iocoder.yudao.module.infra.service.demo;
+
+import org.springframework.stereotype.Service;
+import javax.annotation.Resource;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.vo.*;
+import cn.iocoder.yudao.module.infra.dal.dataobject.demo.InfraStudentDO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+
+import cn.iocoder.yudao.module.infra.dal.mysql.demo.InfraStudentMapper;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.*;
+
+/**
+ * 学生 Service 实现类
+ *
+ * @author 芋道源码
+ */
+@Service
+@Validated
+public class InfraStudentServiceImpl implements InfraStudentService {
+
+    @Resource
+    private InfraStudentMapper studentMapper;
+
+    @Override
+    public Long createStudent(InfraStudentSaveReqVO createReqVO) {
+        // 插入
+        InfraStudentDO student = BeanUtils.toBean(createReqVO, InfraStudentDO.class);
+        studentMapper.insert(student);
+        // 返回
+        return student.getId();
+    }
+
+    @Override
+    public void updateStudent(InfraStudentSaveReqVO updateReqVO) {
+        // 校验存在
+        validateStudentExists(updateReqVO.getId());
+        // 更新
+        InfraStudentDO updateObj = BeanUtils.toBean(updateReqVO, InfraStudentDO.class);
+        studentMapper.updateById(updateObj);
+    }
+
+    @Override
+    public void deleteStudent(Long id) {
+        // 校验存在
+        validateStudentExists(id);
+        // 删除
+        studentMapper.deleteById(id);
+    }
+
+    private void validateStudentExists(Long id) {
+        if (studentMapper.selectById(id) == null) {
+            throw exception(STUDENT_NOT_EXISTS);
+        }
+    }
+
+    @Override
+    public InfraStudentDO getStudent(Long id) {
+        return studentMapper.selectById(id);
+    }
+
+    @Override
+    public PageResult<InfraStudentDO> getStudentPage(InfraStudentPageReqVO pageReqVO) {
+        return studentMapper.selectPage(pageReqVO);
+    }
+
+}
