@@ -1,12 +1,17 @@
 package cn.iocoder.yudao.module.crm.controller.admin.contact.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import lombok.*;
+
+import java.time.LocalDate;
+import java.util.*;
+import java.time.LocalDateTime;
+import java.time.LocalDateTime;
+import java.time.LocalDateTime;
+import javax.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
-
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
@@ -16,31 +21,19 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class ContactBaseVO {
 
-    // TODO @zyna：部分字段，缺少 example，需要补充；
-
-    @Schema(description = "联系人名称", example = "张三")
-    @NotNull(message = "姓名不能为空")
-    private String name;
-
     @Schema(description = "下次联系时间")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY)
     private LocalDateTime nextTime;
 
-    // TODO @zyna：缺少 validator 的校验
     @Schema(description = "手机号")
     private String mobile;
 
-    // TODO @zyna：缺少 validator 的校验
     @Schema(description = "电话")
     private String telephone;
 
-    // TODO @zyna：缺少 validator 的校验
     @Schema(description = "电子邮箱")
     private String email;
 
-    @Schema(description = "职务")
-    private String post;
-
-    // TODO @zyna：非空校验
     @Schema(description = "客户编号", example = "10795")
     private Long customerId;
 
@@ -50,12 +43,32 @@ public class ContactBaseVO {
     @Schema(description = "备注", example = "你说的对")
     private String remark;
 
-    // TODO @zyna：这个新建的时候，应该不会传递；而是后端默认设置自己为负责人；
-    @Schema(description = "负责人用户编号", example = "7648")
-    private Long ownerUserId;
-
     @Schema(description = "最后跟进时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime lastTime;
+
+    @Schema(description = "直属上级", example = "23457")
+    private Long parentId;
+
+    @Schema(description = "姓名", example = "芋艿")
+    private String name;
+
+    @Schema(description = "职位")
+    private String post;
+
+    @Schema(description = "QQ")
+    private Long qq;
+
+    @Schema(description = "微信")
+    private String webchat;
+
+    @Schema(description = "性别")
+    private Integer sex;
+
+    @Schema(description = "是否关键决策人")
+    private Boolean policyMakers;
+
+    @Schema(description = "负责人用户编号", example = "14334")
+    private String ownerUserId;
 
 }

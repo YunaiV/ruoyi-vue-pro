@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.crm.controller.admin.contact.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+
+import java.time.LocalDate;
 import java.util.*;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
@@ -17,12 +19,6 @@ import com.alibaba.excel.annotation.ExcelProperty;
 @Data
 public class ContactExcelVO {
 
-    @ExcelProperty("主键")
-    private Long id;
-
-    @ExcelProperty("联系人名称")
-    private String name;
-
     @ExcelProperty("下次联系时间")
     private LocalDateTime nextTime;
 
@@ -35,9 +31,6 @@ public class ContactExcelVO {
     @ExcelProperty("电子邮箱")
     private String email;
 
-    @ExcelProperty("职务")
-    private String post;
-
     @ExcelProperty("客户编号")
     private Long customerId;
 
@@ -47,13 +40,37 @@ public class ContactExcelVO {
     @ExcelProperty("备注")
     private String remark;
 
-    @ExcelProperty("负责人用户编号")
-    private Long ownerUserId;
-
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
     @ExcelProperty("最后跟进时间")
     private LocalDateTime lastTime;
+
+    @ExcelProperty("主键")
+    private Long id;
+
+    @ExcelProperty("直属上级")
+    private Long parentId;
+
+    @ExcelProperty("姓名")
+    private String name;
+
+    @ExcelProperty("职位")
+    private String post;
+
+    @ExcelProperty("QQ")
+    private Long qq;
+
+    @ExcelProperty("微信")
+    private String webchat;
+
+    @ExcelProperty("性别")
+    private Integer sex;
+
+    @ExcelProperty("是否关键决策人")
+    private Boolean policyMakers;
+
+    @ExcelProperty("负责人用户编号")
+    private String ownerUserId;
 
 }

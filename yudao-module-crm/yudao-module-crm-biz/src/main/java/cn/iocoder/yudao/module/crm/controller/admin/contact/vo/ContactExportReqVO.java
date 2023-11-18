@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.crm.controller.admin.contact.vo;
 
 import lombok.*;
+
+import java.time.LocalDate;
 import java.util.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
@@ -9,12 +11,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@Schema(description = "管理后台 - CRM 联系人 Excel 导出 Request VO，参数和 ContactPageReqVO 是一致的")
+@Schema(description = "管理后台 - crm联系人 Excel 导出 Request VO，参数和 ContactPageReqVO 是一致的")
 @Data
 public class ContactExportReqVO {
-
-    @Schema(description = "联系人名称", example = "张三")
-    private String name;
 
     @Schema(description = "下次联系时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
@@ -29,9 +28,6 @@ public class ContactExportReqVO {
     @Schema(description = "电子邮箱")
     private String email;
 
-    @Schema(description = "职务")
-    private String post;
-
     @Schema(description = "客户编号", example = "10795")
     private Long customerId;
 
@@ -41,9 +37,6 @@ public class ContactExportReqVO {
     @Schema(description = "备注", example = "你说的对")
     private String remark;
 
-    @Schema(description = "负责人用户编号", example = "7648")
-    private Long ownerUserId;
-
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
@@ -51,5 +44,29 @@ public class ContactExportReqVO {
     @Schema(description = "最后跟进时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] lastTime;
+
+    @Schema(description = "直属上级", example = "23457")
+    private Long parentId;
+
+    @Schema(description = "姓名", example = "芋艿")
+    private String name;
+
+    @Schema(description = "职位")
+    private String post;
+
+    @Schema(description = "QQ")
+    private Long qq;
+
+    @Schema(description = "微信")
+    private String webchat;
+
+    @Schema(description = "性别")
+    private Integer sex;
+
+    @Schema(description = "是否关键决策人")
+    private Boolean policyMakers;
+
+    @Schema(description = "负责人用户编号", example = "14334")
+    private String ownerUserId;
 
 }
