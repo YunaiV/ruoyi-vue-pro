@@ -239,12 +239,14 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
     @Override
     @DataPermission(enable = false) // 忽略数据权限，不然分配会存在问题
     public Set<Long> calculateTaskCandidateUsers(DelegateExecution execution) {
-        //1. 先从提前选好的审批人中获取
-        List<Long> assignee = processInstanceService.getAssigneeByProcessInstanceIdAndTaskDefinitionKey(execution.getProcessInstanceId(), execution.getCurrentActivityId());
-        if(CollUtil.isNotEmpty(assignee)){
+        // 1. 先从提前选好的审批人中获取
+        List<Long> assignee = processInstanceService.getAssigneeByProcessInstanceIdAndTaskDefinitionKey(
+                execution.getProcessInstanceId(), execution.getCurrentActivityId());
+        if (CollUtil.isNotEmpty(assignee)) {
+            // TODO @hai：new HashSet 即可
             return convertSet(assignee, Function.identity());
         }
-        //2. 通过分配规则，计算审批人
+        // 2. 通过分配规则，计算审批人
         BpmTaskAssignRuleDO rule = getTaskRule(execution);
         return calculateTaskCandidateUsers(execution, rule);
     }

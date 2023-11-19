@@ -88,9 +88,11 @@ public class BpmProcessInstanceExtDO extends BaseDO {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private Map<String, Object> formVariables;
 
+    // TODO @hai：assignees 复数
     /**
      * 提前设定好的审批人
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = JacksonTypeHandler.class, exist = false) // TODO 芋艿：临时 exist = false，避免 db 报错；
     private Map<String, List<Long>> assignee;
+
 }

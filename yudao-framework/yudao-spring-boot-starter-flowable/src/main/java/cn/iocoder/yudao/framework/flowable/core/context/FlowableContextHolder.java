@@ -36,4 +36,5 @@ public class FlowableContextHolder {
     public static void setAssignee(Map<String, List<Long>> assignee) {
         ASSIGNEE.set(assignee);
     }
+
 }
