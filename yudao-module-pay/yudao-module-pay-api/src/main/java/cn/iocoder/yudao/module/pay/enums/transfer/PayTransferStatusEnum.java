@@ -40,8 +40,12 @@ public enum PayTransferStatusEnum {
     public static boolean isClosed(Integer status) {
         return Objects.equals(status, CLOSED.getStatus());
     }
+
     public static boolean isWaiting(Integer status) {
         return Objects.equals(status, WAITING.getStatus());
+    }
+    public static boolean isInProgress(Integer status) {
+        return Objects.equals(status, IN_PROGRESS.getStatus());
     }
 
     /**
