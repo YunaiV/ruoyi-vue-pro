@@ -83,6 +83,11 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
             throw exception(CUSTOMER_NOT_EXISTS);
         }
     }
+    private void validateCustomerExists(CrmCustomerDO customerDO){
+        if (customerDO == null) {
+            throw exception(CUSTOMER_NOT_EXISTS);
+        }
+    }
 
     @Override
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#id", level = CrmPermissionLevelEnum.READ)
@@ -162,53 +167,52 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void receive(List <Long> ids) {
-        transferCustomerOwner(ids,SecurityFrameworkUtils.getLoginUserId());
+    public void receiveCustomer(List <Long> ids,Long ownerUserId) {
+        transferCustomerOwner(ids,ownerUserId);
     }
 
     @Override
-    public void distributeByIds(List <Long> cIds, Long ownerId) {
-        transferCustomerOwner(cIds,ownerId);
+    public void distributeCustomer(List <Long> ids, Long ownerUserId) {
+        transferCustomerOwner(ids,ownerUserId);
     }
 
-    private void transferCustomerOwner(List <Long> cIds, Long ownerId){
-        // 先一次性校验完成客户是否可用
-        // TODO @xiaqing：批量一次性加载客户列表，然后去逐个校验；
-        for (Long cId : cIds) {
-            //校验是否存在
-            validateCustomerExists(cId);
-            //todo 校验是否已有负责人
-            validCustomerOwnerExist(cId);
-            //todo 校验是否锁定
-            validCustomerIsLocked(cId);
-            //todo 校验成交状态
-            validCustomerDeal(cId);
+    private void transferCustomerOwner(List <Long> ids, Long ownerUserId) {
+        // 先一次性加载所有数据，校验客户是否可用
+        List <CrmCustomerDO> customerDOList = customerMapper.selectBatchIds(ids);
+        for (CrmCustomerDO customerDO : customerDOList) {
+            // 校验客户是否存在
+            validateCustomerExists(customerDO);
+            // 校验是否已有负责人
+            validCustomerOwnerExist(customerDO);
+            // 校验是否锁定
+            validCustomerIsLocked(customerDO);
+            // 校验成交状态
+            validCustomerDeal(customerDO);
         }
-        // TODO @xiaqing：每个客户更新的时候，where 条件，加上 owner_user_id is null，防止并发问题；
-        List<CrmCustomerDO> updateDos = new ArrayList <>();
-        for (Long cId : cIds){
-            CrmCustomerDO customerDO = new CrmCustomerDO();
-            customerDO.setId(cId);
-            customerDO.setOwnerUserId(SecurityFrameworkUtils.getLoginUserId());
-        }
+
         // 统一修改状态
-        customerMapper.updateBatch(updateDos);
+        CrmCustomerDO updateDo = new CrmCustomerDO();
+        updateDo.setOwnerUserId(ownerUserId);
+        for (Long id : ids) {
+            customerMapper.updateCustomerOwnerUser(id,updateDo);
+        }
+
     }
 
-    private void validCustomerOwnerExist(Long id) {
-        if (customerMapper.selectById(id).getOwnerUserId()!=null) {
+    private void validCustomerOwnerExist(CrmCustomerDO customerDO) {
+        if (customerDO.getOwnerUserId()!=null) {
             throw exception(CUSTOMER_OWNER_EXISTS);
         }
     }
 
-    private void validCustomerIsLocked(Long id) {
-        if (customerMapper.selectById(id).getLockStatus() ==true) {
+    private void validCustomerIsLocked(CrmCustomerDO customerDO) {
+        if (customerDO.getLockStatus() ==true) {
             throw exception(CUSTOMER_LOCKED);
         }
     }
 
-    private void validCustomerDeal(Long id) {
-        if (customerMapper.selectById(id).getDealStatus() ==true) {
+    private void validCustomerDeal(CrmCustomerDO customerDO) {
+        if (customerDO.getDealStatus() ==true) {
             throw exception(CUSTOMER_ALREADY_DEAL);
         }
     }
