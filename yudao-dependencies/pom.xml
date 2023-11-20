@@ -74,6 +74,7 @@
         <jimureport.version>1.6.1</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
         <weixin-java.version>4.5.0</weixin-java.version>
+        <ureport2.version>2.2.9</ureport2.version>
     </properties>
 
     <dependencyManagement>
@@ -651,6 +652,14 @@
                 <artifactId>spring-boot-starter-websocket</artifactId>
                 <version>${spring.boot.version}</version>
             </dependency>
+
+            <!--ureport2 报表-->
+            <dependency>
+                <groupId>com.bstek.ureport</groupId>
+                <artifactId>ureport2-console</artifactId>
+                <version>${ureport2.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
