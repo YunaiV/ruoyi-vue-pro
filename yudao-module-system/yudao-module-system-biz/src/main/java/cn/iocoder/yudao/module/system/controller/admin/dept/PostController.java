@@ -10,6 +10,7 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostSaveReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostSimpleRespVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -74,12 +75,12 @@ public class PostController {
 
     @GetMapping("/list-all-simple")
     @Operation(summary = "获取岗位全列表", description = "只包含被开启的岗位，主要用于前端的下拉选项")
-    public CommonResult<List<PostRespVO>> getSimplePostList() {
+    public CommonResult<List<PostSimpleRespVO>> getSimplePostList() {
         // 获得岗位列表，只要开启状态的
         List<PostDO> list = postService.getPostList(null, Collections.singleton(CommonStatusEnum.ENABLE.getStatus()));
         // 排序后，返回给前端
         list.sort(Comparator.comparing(PostDO::getSort));
-        return success(BeanUtils.toBean(list, PostRespVO.class));
+        return success(BeanUtils.toBean(list, PostSimpleRespVO.class));
     }
 
     @GetMapping("/page")

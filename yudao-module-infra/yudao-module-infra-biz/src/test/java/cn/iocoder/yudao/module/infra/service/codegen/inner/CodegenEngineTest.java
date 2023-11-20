@@ -3,7 +3,10 @@ package cn.iocoder.yudao.module.infra.service.codegen.inner;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
@@ -17,11 +20,10 @@ import org.mockito.Spy;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * {@link CodegenEngine} 的单元测试
@@ -43,759 +45,126 @@ public class CodegenEngineTest extends BaseMockitoUnitTest {
     }
 
     @Test
+    public void testExecute_vue3_one() {
+        // 准备参数
+        CodegenTableDO table = getTable("student")
+                .setFrontType(CodegenFrontTypeEnum.VUE3.getType())
+                .setTemplateType(CodegenTemplateTypeEnum.ONE.getType());
+        List<CodegenColumnDO> columns = getColumnList("student");
+
+        // 调用
+        Map<String, String> result = codegenEngine.execute(table, columns, null, null);
+        // 断言
+        assertResult(result, "codegen/vue3_one");
+//        writeResult(result, "/root/ruoyi-vue-pro/yudao-module-infra/yudao-module-infra-biz/src/test/resources/codegen/vue3_one");
+    }
+
+    @Test
     public void testExecute_vue3_tree() {
-        // 准备请求参数
-        CodegenTableDO table = new CodegenTableDO().setScene(CodegenSceneEnum.ADMIN.getScene()).setParentMenuId(888L)
-                .setTableName("infra_demo66_student").setTableComment("学生表")
-                .setModuleName("infra").setBusinessName("demo66").setClassName("InfraDemo66Student")
-                .setClassComment("学生").setAuthor("芋道源码")
-                .setTemplateType(CodegenTemplateTypeEnum.TREE.getType())
+        // 准备参数
+        CodegenTableDO table = getTable("category")
                 .setFrontType(CodegenFrontTypeEnum.VUE3.getType())
-                .setTreeParentColumnId(22L).setTreeNameColumnId(11L);
-        CodegenColumnDO idColumn = new CodegenColumnDO().setColumnName("id").setDataType(JdbcType.BIGINT.name())
-                .setColumnComment("编号").setNullable(false).setPrimaryKey(true).setAutoIncrement(true)
-                .setJavaType("Long").setJavaField("id").setExample("1024")
-                .setCreateOperation(false).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true);
-        CodegenColumnDO nameColumn = new CodegenColumnDO().setColumnName("name").setDataType(JdbcType.VARCHAR.name())
-                .setId(11L)
-                .setColumnComment("名字").setNullable(false)
-                .setJavaType("String").setJavaField("name").setExample("芋头")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.LIKE.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.INPUT.getType());
-        CodegenColumnDO parentIdColumn = new CodegenColumnDO().setColumnName("description").setDataType(JdbcType.VARCHAR.name())
-                .setId(22L)
-                .setColumnComment("父编号").setNullable(false)
-                .setJavaType("Long").setJavaField("parentId").setExample("2048")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true);
-        List<CodegenColumnDO> columns = Arrays.asList(idColumn, nameColumn, parentIdColumn);
+                .setTemplateType(CodegenTemplateTypeEnum.TREE.getType());
+        List<CodegenColumnDO> columns = getColumnList("category");
 
         // 调用
         Map<String, String> result = codegenEngine.execute(table, columns, null, null);
-
-        // 构建 zip 包
-        writeFile(result, "/Users/yunai/test/demo66.zip");
-    }
-
-    @Test
-    public void testExecute_vue3_crud() {
-        // 准备请求参数
-        CodegenTableDO table = new CodegenTableDO().setScene(CodegenSceneEnum.ADMIN.getScene()).setParentMenuId(888L)
-                .setTableName("infra_demo01_student").setTableComment("学生表")
-                .setModuleName("infra").setBusinessName("demo01").setClassName("InfraDemo01Student")
-                .setClassComment("学生").setAuthor("芋道源码")
-                .setTemplateType(CodegenTemplateTypeEnum.ONE.getType())
-                .setFrontType(CodegenFrontTypeEnum.VUE3.getType());
-        CodegenColumnDO idColumn = new CodegenColumnDO().setColumnName("id").setDataType(JdbcType.BIGINT.name())
-                .setColumnComment("编号").setNullable(false).setPrimaryKey(true).setAutoIncrement(true)
-                .setJavaType("Long").setJavaField("id").setExample("1024")
-                .setCreateOperation(false).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true);
-        CodegenColumnDO nameColumn = new CodegenColumnDO().setColumnName("name").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("名字").setNullable(false)
-                .setJavaType("String").setJavaField("name").setExample("芋头")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.LIKE.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.INPUT.getType());
-        CodegenColumnDO descriptionColumn = new CodegenColumnDO().setColumnName("description").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("简介").setNullable(false)
-                .setJavaType("String").setJavaField("description").setExample("我是介绍")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.TEXTAREA.getType());
-        CodegenColumnDO birthdayColumn = new CodegenColumnDO().setColumnName("birthday").setDataType(JdbcType.DATE.name())
-                .setColumnComment("出生日期").setNullable(false)
-                .setJavaType("LocalDateTime").setJavaField("birthday")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.DATETIME.getType());
-        CodegenColumnDO sexColumn = new CodegenColumnDO().setColumnName("sex").setDataType(JdbcType.INTEGER.name())
-                .setColumnComment("性别").setNullable(false)
-                .setJavaType("Integer").setJavaField("sex").setExample("1")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.SELECT.getType())
-                .setDictType("system_user_sex");
-        CodegenColumnDO enabledColumn = new CodegenColumnDO().setColumnName("enabled").setDataType(JdbcType.BOOLEAN.name())
-                .setColumnComment("是否有效").setNullable(false)
-                .setJavaType("Boolean").setJavaField("enabled").setExample("true")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.RADIO.getType())
-                .setDictType("infra_boolean_string");
-        CodegenColumnDO avatarColumn = new CodegenColumnDO().setColumnName("avatar").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("头像").setNullable(false)
-                .setJavaType("String").setJavaField("avatar").setExample("https://www.iocoder.cn/1.png")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.IMAGE_UPLOAD.getType());
-        CodegenColumnDO videoColumn = new CodegenColumnDO().setColumnName("video").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("附件").setNullable(true)
-                .setJavaType("String").setJavaField("video").setExample("https://www.iocoder.cn/1.mp4")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.FILE_UPLOAD.getType());
-        CodegenColumnDO memoColumn = new CodegenColumnDO().setColumnName("memo").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("备注").setNullable(false)
-                .setJavaType("String").setJavaField("memo").setExample("我是备注")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.EDITOR.getType());
-        CodegenColumnDO createTimeColumn = new CodegenColumnDO().setColumnName("create_time").setDataType(JdbcType.DATE.name())
-                .setColumnComment("创建时间").setNullable(true)
-                .setJavaType("LocalDateTime").setJavaField("createTime")
-                .setCreateOperation(false).setUpdateOperation(false)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.BETWEEN.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.DATETIME.getType());
-        List<CodegenColumnDO> columns = Arrays.asList(idColumn, nameColumn, descriptionColumn, birthdayColumn,
-                sexColumn, enabledColumn, avatarColumn, videoColumn, memoColumn, createTimeColumn);
-
-        // 调用
-        Map<String, String> result = codegenEngine.execute(table, columns, null, null);
-
-        // 构建 zip 包
-        writeFile(result, "/Users/yunai/test/demo01.zip");
-
         // 断言
-        assertEquals(21, result.size());
-        // 断言 vo 类
-        for (String vo : new String[]{"SystemUserBaseVO", "SystemUserCreateReqVO", "SystemUserUpdateReqVO", "SystemUserRespVO",
-                "SystemUserPageReqVO", "SystemUserExportReqVO", "SystemUserExcelVO"}) {
-            assertPathContentEquals("vue3_crud/java/" + vo,
-                    result, "yudao-module-system/yudao-module-system-biz/src/main/java/cn/iocoder/yudao/module/system/controller/admin/user/vo/" + vo + ".java");
-        }
-        // 断言 controller 类
-        assertPathContentEquals("vue3_crud/java/SystemUserController",
-                result, "yudao-module-system/yudao-module-system-biz/src/main/java/cn/iocoder/yudao/module/system/controller/admin/user/SystemUserController.java");
-        // 断言 service 类
-        assertPathContentEquals("vue3_crud/java/SystemUserService",
-                result, "yudao-module-system/yudao-module-system-biz/src/main/java/cn/iocoder/yudao/module/system/service/user/SystemUserService.java");
-        assertPathContentEquals("vue3_crud/java/SystemUserServiceImpl",
-                result, "yudao-module-system/yudao-module-system-biz/src/main/java/cn/iocoder/yudao/module/system/service/user/SystemUserServiceImpl.java");
-        // 断言 convert 类
-        assertPathContentEquals("vue3_crud/java/SystemUserConvert",
-                result, "yudao-module-system/yudao-module-system-biz/src/main/java/cn/iocoder/yudao/module/system/convert/user/SystemUserConvert.java");
-        // 断言 enums 类
-        assertPathContentEquals("vue3_crud/java/ErrorCodeConstants",
-                result, "yudao-module-system/yudao-module-system-api/src/main/java/cn/iocoder/yudao/module/system/enums/ErrorCodeConstants_手动操作.java");
-        // 断言 dal 类
-        assertPathContentEquals("vue3_crud/java/SystemUserDO",
-                result, "yudao-module-system/yudao-module-system-biz/src/main/java/cn/iocoder/yudao/module/system/dal/dataobject/user/SystemUserDO.java");
-        assertPathContentEquals("vue3_crud/java/SystemUserMapper",
-                result, "yudao-module-system/yudao-module-system-biz/src/main/java/cn/iocoder/yudao/module/system/dal/mysql/user/SystemUserMapper.java");
-        assertPathContentEquals("vue3_crud/java/SystemUserMapper_xml",
-                result, "yudao-module-system/yudao-module-system-biz/src/main/resources/mapper/user/SystemUserMapper.xml");
-        // 断言 test 类
-        assertPathContentEquals("vue3_crud/java/SystemUserServiceImplTest",
-                result, "yudao-module-system/yudao-module-system-biz/src/test/java/cn/iocoder/yudao/module/system/service/user/SystemUserServiceImplTest.java");
-        // 断言 sql 语句
-        assertPathContentEquals("vue3_crud/sql/h2",
-                result, "sql/h2.sql");
-        assertPathContentEquals("vue3_crud/sql/sql",
-                result, "sql/sql.sql");
-        // 断言 vue 语句
-        assertPathContentEquals("vue3_crud/vue/index",
-                result, "yudao-ui-admin-vue3/src/views/system/user/index.vue");
-        assertPathContentEquals("vue3_crud/vue/form",
-                result, "yudao-ui-admin-vue3/src/views/system/user/UserForm.vue");
-        assertPathContentEquals("vue3_crud/vue/api",
-                result, "yudao-ui-admin-vue3/src/api/system/user/index.ts");
+        assertResult(result, "codegen/vue3_tree");
+//        writeResult(result, "/root/ruoyi-vue-pro/yudao-module-infra/yudao-module-infra-biz/src/test/resources/codegen/vue3_tree");
+//        writeFile(result, "/Users/yunai/test/demo66.zip");
     }
 
     @Test
-    public void testExecute_vue3_masterNormal() {
-        // 准备请求参数
-        // 主表
-        CodegenTableDO table = new CodegenTableDO().setScene(CodegenSceneEnum.ADMIN.getScene()).setParentMenuId(888L)
-                .setTableName("infra_demo11_student").setTableComment("学生表")
-                .setModuleName("infra").setBusinessName("demo11").setClassName("InfraDemo11Student")
-                .setClassComment("学生").setAuthor("芋道源码")
-                .setTemplateType(CodegenTemplateTypeEnum.MASTER_NORMAL.getType())
-                .setFrontType(CodegenFrontTypeEnum.VUE3.getType());
-        CodegenColumnDO idColumn = new CodegenColumnDO().setColumnName("id").setDataType(JdbcType.BIGINT.name())
-                .setId(100L)
-                .setColumnComment("编号").setNullable(false).setPrimaryKey(true).setAutoIncrement(true)
-                .setJavaType("Long").setJavaField("id").setExample("1024")
-                .setCreateOperation(false).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true);
-        CodegenColumnDO nameColumn = new CodegenColumnDO().setColumnName("name").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("名字").setNullable(false)
-                .setJavaType("String").setJavaField("name").setExample("芋头")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.LIKE.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.INPUT.getType());
-        CodegenColumnDO descriptionColumn = new CodegenColumnDO().setColumnName("description").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("简介").setNullable(false)
-                .setJavaType("String").setJavaField("description").setExample("我是介绍")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.TEXTAREA.getType());
-        CodegenColumnDO birthdayColumn = new CodegenColumnDO().setColumnName("birthday").setDataType(JdbcType.DATE.name())
-                .setColumnComment("出生日期").setNullable(false)
-                .setJavaType("LocalDateTime").setJavaField("birthday")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.DATETIME.getType());
-        CodegenColumnDO sexColumn = new CodegenColumnDO().setColumnName("sex").setDataType(JdbcType.INTEGER.name())
-                .setColumnComment("性别").setNullable(false)
-                .setJavaType("Integer").setJavaField("sex").setExample("1")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.SELECT.getType())
-                .setDictType("system_user_sex");
-        CodegenColumnDO enabledColumn = new CodegenColumnDO().setColumnName("enabled").setDataType(JdbcType.BOOLEAN.name())
-                .setColumnComment("是否有效").setNullable(false)
-                .setJavaType("Boolean").setJavaField("enabled").setExample("true")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.RADIO.getType())
-                .setDictType("infra_boolean_string");
-        CodegenColumnDO avatarColumn = new CodegenColumnDO().setColumnName("avatar").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("头像").setNullable(false)
-                .setJavaType("String").setJavaField("avatar").setExample("https://www.iocoder.cn/1.png")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.IMAGE_UPLOAD.getType());
-        CodegenColumnDO videoColumn = new CodegenColumnDO().setColumnName("video").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("附件").setNullable(true)
-                .setJavaType("String").setJavaField("video").setExample("https://www.iocoder.cn/1.mp4")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.FILE_UPLOAD.getType());
-        CodegenColumnDO memoColumn = new CodegenColumnDO().setColumnName("memo").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("备注").setNullable(false)
-                .setJavaType("String").setJavaField("memo").setExample("我是备注")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.EDITOR.getType());
-        CodegenColumnDO createTimeColumn = new CodegenColumnDO().setColumnName("create_time").setDataType(JdbcType.DATE.name())
-                .setColumnComment("创建时间").setNullable(true)
-                .setJavaType("LocalDateTime").setJavaField("createTime")
-                .setCreateOperation(false).setUpdateOperation(false)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.BETWEEN.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.DATETIME.getType());
-        List<CodegenColumnDO> columns = Arrays.asList(idColumn, nameColumn, descriptionColumn, birthdayColumn,
-                sexColumn, enabledColumn, avatarColumn, videoColumn, memoColumn, createTimeColumn);
+    public void testExecute_vue3_master_normal() {
+        testExecute_vue3_master(CodegenTemplateTypeEnum.MASTER_NORMAL, "codegen/vue3_master_normal");
+    }
 
-        // 子表（联系人）
-        CodegenTableDO contactTable = new CodegenTableDO().setScene(CodegenSceneEnum.ADMIN.getScene())
-                .setTableName("infra_demo11_student_contact").setTableComment("学生联系人表")
-                .setModuleName("infra").setBusinessName("demo11").setClassName("InfraDemo11StudentContact")
-                .setClassComment("学生联系人").setAuthor("芋道源码")
+    @Test
+    public void testExecute_vue3_master_erp() {
+        testExecute_vue3_master(CodegenTemplateTypeEnum.MASTER_ERP, "codegen/vue3_master_erp");
+    }
+
+    @Test
+    public void testExecute_vue3_master_inner() {
+        testExecute_vue3_master(CodegenTemplateTypeEnum.MASTER_INNER, "codegen/vue3_master_inner");
+    }
+
+    private void testExecute_vue3_master(CodegenTemplateTypeEnum templateType,
+                                         String path) {
+        // 准备参数
+        CodegenTableDO table = getTable("student")
+                .setFrontType(CodegenFrontTypeEnum.VUE3.getType())
+                .setTemplateType(templateType.getType());
+        List<CodegenColumnDO> columns = getColumnList("student");
+        // 准备参数（子表）
+        CodegenTableDO contactTable = getTable("contact")
                 .setTemplateType(CodegenTemplateTypeEnum.SUB.getType())
                 .setFrontType(CodegenFrontTypeEnum.VUE3.getType())
                 .setSubJoinColumnId(100L).setSubJoinMany(true);
-        CodegenColumnDO contactIdColumn = new CodegenColumnDO().setColumnName("id").setDataType(JdbcType.BIGINT.name())
-                .setColumnComment("编号").setNullable(false).setPrimaryKey(true).setAutoIncrement(true)
-                .setJavaType("Long").setJavaField("id").setExample("1024")
-                .setCreateOperation(false).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true);
-        CodegenColumnDO contactStudentIdColumn = new CodegenColumnDO().setColumnName("student_id").setDataType(JdbcType.BIGINT.name())
-                .setColumnComment("学生编号").setNullable(false).setPrimaryKey(false)
-                .setJavaType("Long").setJavaField("studentId").setExample("2048")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setId(100L);
-        CodegenColumnDO contactNameColumn = new CodegenColumnDO().setColumnName("name").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("名字").setNullable(false)
-                .setJavaType("String").setJavaField("name").setExample("芋头")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.LIKE.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.INPUT.getType());
-        CodegenColumnDO contactDescriptionColumn = new CodegenColumnDO().setColumnName("description").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("简介").setNullable(false)
-                .setJavaType("String").setJavaField("description").setExample("我是介绍")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.TEXTAREA.getType());
-        CodegenColumnDO contactBirthdayColumn = new CodegenColumnDO().setColumnName("birthday").setDataType(JdbcType.DATE.name())
-                .setColumnComment("出生日期").setNullable(false)
-                .setJavaType("LocalDateTime").setJavaField("birthday")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.DATETIME.getType());
-        CodegenColumnDO contactSexColumn = new CodegenColumnDO().setColumnName("sex").setDataType(JdbcType.INTEGER.name())
-                .setColumnComment("性别").setNullable(false)
-                .setJavaType("Integer").setJavaField("sex").setExample("1")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.SELECT.getType())
-                .setDictType("system_user_sex");
-        CodegenColumnDO contactEnabledColumn = new CodegenColumnDO().setColumnName("enabled").setDataType(JdbcType.BOOLEAN.name())
-                .setColumnComment("是否有效").setNullable(false)
-                .setJavaType("Boolean").setJavaField("enabled").setExample("true")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.RADIO.getType())
-                .setDictType("infra_boolean_string");
-        CodegenColumnDO contactAvatarColumn = new CodegenColumnDO().setColumnName("avatar").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("头像").setNullable(false)
-                .setJavaType("String").setJavaField("avatar").setExample("https://www.iocoder.cn/1.png")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.IMAGE_UPLOAD.getType());
-        CodegenColumnDO contactVideoColumn = new CodegenColumnDO().setColumnName("video").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("附件").setNullable(true)
-                .setJavaType("String").setJavaField("video").setExample("https://www.iocoder.cn/1.mp4")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.FILE_UPLOAD.getType());
-        CodegenColumnDO contactMemoColumn = new CodegenColumnDO().setColumnName("memo").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("备注").setNullable(false)
-                .setJavaType("String").setJavaField("memo").setExample("我是备注")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.EDITOR.getType());
-        CodegenColumnDO contactCreateTimeColumn = new CodegenColumnDO().setColumnName("create_time").setDataType(JdbcType.DATE.name())
-                .setColumnComment("创建时间").setNullable(true)
-                .setJavaType("LocalDateTime").setJavaField("createTime")
-                .setCreateOperation(false).setUpdateOperation(false)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.BETWEEN.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.DATETIME.getType());
-        List<CodegenColumnDO> contactColumns = Arrays.asList(contactIdColumn, contactStudentIdColumn,
-                contactNameColumn, contactDescriptionColumn, contactBirthdayColumn,
-                contactSexColumn, contactEnabledColumn, contactAvatarColumn, contactVideoColumn, contactMemoColumn, contactCreateTimeColumn);
-
-        // 子表（班主任）
-        CodegenTableDO teacherTable = new CodegenTableDO().setScene(CodegenSceneEnum.ADMIN.getScene())
-                .setTableName("infra_demo11_student_teacher").setTableComment("学生班主任表")
-                .setModuleName("infra").setBusinessName("demo11").setClassName("InfraDemo11StudentTeacher")
-                .setClassComment("学生班主任").setAuthor("芋道源码")
+        List<CodegenColumnDO> contactColumns = getColumnList("contact");
+        // 准备参数（班主任）
+        CodegenTableDO teacherTable = getTable("teacher")
                 .setTemplateType(CodegenTemplateTypeEnum.SUB.getType())
                 .setFrontType(CodegenFrontTypeEnum.VUE3.getType())
                 .setSubJoinColumnId(200L).setSubJoinMany(false);
-        CodegenColumnDO teacherIdColumn = new CodegenColumnDO().setColumnName("id").setDataType(JdbcType.BIGINT.name())
-                .setColumnComment("编号").setNullable(false).setPrimaryKey(true).setAutoIncrement(true)
-                .setJavaType("Long").setJavaField("id").setExample("1024")
-                .setCreateOperation(false).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true);
-        CodegenColumnDO teacherStudentIdColumn = new CodegenColumnDO().setColumnName("student_id").setDataType(JdbcType.BIGINT.name())
-                .setColumnComment("学生编号").setNullable(false).setPrimaryKey(false)
-                .setJavaType("Long").setJavaField("studentId").setExample("2048")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setId(200L);
-        CodegenColumnDO teacherNameColumn = new CodegenColumnDO().setColumnName("name").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("名字").setNullable(false)
-                .setJavaType("String").setJavaField("name").setExample("芋头")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.LIKE.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.INPUT.getType());
-        CodegenColumnDO teacherDescriptionColumn = new CodegenColumnDO().setColumnName("description").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("简介").setNullable(false)
-                .setJavaType("String").setJavaField("description").setExample("我是介绍")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.TEXTAREA.getType());
-        CodegenColumnDO teacherBirthdayColumn = new CodegenColumnDO().setColumnName("birthday").setDataType(JdbcType.DATE.name())
-                .setColumnComment("出生日期").setNullable(false)
-                .setJavaType("LocalDateTime").setJavaField("birthday")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.DATETIME.getType());
-        CodegenColumnDO teacherSexColumn = new CodegenColumnDO().setColumnName("sex").setDataType(JdbcType.INTEGER.name())
-                .setColumnComment("性别").setNullable(false)
-                .setJavaType("Integer").setJavaField("sex").setExample("1")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.SELECT.getType())
-                .setDictType("system_user_sex");
-        CodegenColumnDO teacherEnabledColumn = new CodegenColumnDO().setColumnName("enabled").setDataType(JdbcType.BOOLEAN.name())
-                .setColumnComment("是否有效").setNullable(false)
-                .setJavaType("Boolean").setJavaField("enabled").setExample("true")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.RADIO.getType())
-                .setDictType("infra_boolean_string");
-        CodegenColumnDO teacherAvatarColumn = new CodegenColumnDO().setColumnName("avatar").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("头像").setNullable(false)
-                .setJavaType("String").setJavaField("avatar").setExample("https://www.iocoder.cn/1.png")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.IMAGE_UPLOAD.getType());
-        CodegenColumnDO teacherVideoColumn = new CodegenColumnDO().setColumnName("video").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("附件").setNullable(true)
-                .setJavaType("String").setJavaField("video").setExample("https://www.iocoder.cn/1.mp4")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.FILE_UPLOAD.getType());
-        CodegenColumnDO teacherMemoColumn = new CodegenColumnDO().setColumnName("memo").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("备注").setNullable(false)
-                .setJavaType("String").setJavaField("memo").setExample("我是备注")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.EDITOR.getType());
-        CodegenColumnDO teacherCreateTimeColumn = new CodegenColumnDO().setColumnName("create_time").setDataType(JdbcType.DATE.name())
-                .setColumnComment("创建时间").setNullable(true)
-                .setJavaType("LocalDateTime").setJavaField("createTime")
-                .setCreateOperation(false).setUpdateOperation(false)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.BETWEEN.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.DATETIME.getType());
-        List<CodegenColumnDO> teacherColumns = Arrays.asList(teacherIdColumn, teacherStudentIdColumn,
-                teacherNameColumn, teacherDescriptionColumn, teacherBirthdayColumn,
-                teacherSexColumn, teacherEnabledColumn, teacherAvatarColumn, teacherVideoColumn, teacherMemoColumn, teacherCreateTimeColumn);
+        List<CodegenColumnDO> teacherColumns = getColumnList("teacher");
 
         // 调用
         Map<String, String> result = codegenEngine.execute(table, columns,
                 Arrays.asList(contactTable, teacherTable), Arrays.asList(contactColumns, teacherColumns));
-
-        // 构建 zip 包
-        writeFile(result, "/Users/yunai/test/demo11.zip");
-
         // 断言
-        assertEquals(27, result.size());
-
-        for (Map.Entry<String, String> entry : result.entrySet()) {
-            System.out.println(entry.getKey());
-            System.out.println(entry.getValue());
-            System.out.println("");
-            System.out.println("");
-            System.out.println("");
-        }
+        assertResult(result, path);
+//        writeResult(result, "/root/ruoyi-vue-pro/yudao-module-infra/yudao-module-infra-biz/src/test/resources/" + path);
+//        writeFile(result, "/Users/yunai/test/demo11.zip");
     }
 
-    @Test
-    public void testExecute_vue3_masterInner() {
-        // 准备请求参数
-        // 主表
-        CodegenTableDO table = new CodegenTableDO().setScene(CodegenSceneEnum.ADMIN.getScene()).setParentMenuId(888L)
-                .setTableName("infra_demo12_student").setTableComment("学生表")
-                .setModuleName("infra").setBusinessName("demo12").setClassName("InfraDemo12Student")
-                .setClassComment("学生").setAuthor("芋道源码")
-//                .setTemplateType(CodegenTemplateTypeEnum.MASTER_INNER.getType())
-                .setTemplateType(CodegenTemplateTypeEnum.MASTER_ERP.getType())
-                .setFrontType(CodegenFrontTypeEnum.VUE3.getType());
-        CodegenColumnDO idColumn = new CodegenColumnDO().setColumnName("id").setDataType(JdbcType.BIGINT.name())
-                .setId(100L)
-                .setColumnComment("编号").setNullable(false).setPrimaryKey(true).setAutoIncrement(true)
-                .setJavaType("Long").setJavaField("id").setExample("1024")
-                .setCreateOperation(false).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true);
-        CodegenColumnDO nameColumn = new CodegenColumnDO().setColumnName("name").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("名字").setNullable(false)
-                .setJavaType("String").setJavaField("name").setExample("芋头")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.LIKE.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.INPUT.getType());
-        CodegenColumnDO descriptionColumn = new CodegenColumnDO().setColumnName("description").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("简介").setNullable(false)
-                .setJavaType("String").setJavaField("description").setExample("我是介绍")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.TEXTAREA.getType());
-        CodegenColumnDO birthdayColumn = new CodegenColumnDO().setColumnName("birthday").setDataType(JdbcType.DATE.name())
-                .setColumnComment("出生日期").setNullable(false)
-                .setJavaType("LocalDateTime").setJavaField("birthday")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.DATETIME.getType());
-        CodegenColumnDO sexColumn = new CodegenColumnDO().setColumnName("sex").setDataType(JdbcType.INTEGER.name())
-                .setColumnComment("性别").setNullable(false)
-                .setJavaType("Integer").setJavaField("sex").setExample("1")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.SELECT.getType())
-                .setDictType("system_user_sex");
-        CodegenColumnDO enabledColumn = new CodegenColumnDO().setColumnName("enabled").setDataType(JdbcType.BOOLEAN.name())
-                .setColumnComment("是否有效").setNullable(false)
-                .setJavaType("Boolean").setJavaField("enabled").setExample("true")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.RADIO.getType())
-                .setDictType("infra_boolean_string");
-        CodegenColumnDO avatarColumn = new CodegenColumnDO().setColumnName("avatar").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("头像").setNullable(false)
-                .setJavaType("String").setJavaField("avatar").setExample("https://www.iocoder.cn/1.png")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.IMAGE_UPLOAD.getType());
-        CodegenColumnDO videoColumn = new CodegenColumnDO().setColumnName("video").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("附件").setNullable(true)
-                .setJavaType("String").setJavaField("video").setExample("https://www.iocoder.cn/1.mp4")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.FILE_UPLOAD.getType());
-        CodegenColumnDO memoColumn = new CodegenColumnDO().setColumnName("memo").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("备注").setNullable(false)
-                .setJavaType("String").setJavaField("memo").setExample("我是备注")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.EDITOR.getType());
-        CodegenColumnDO createTimeColumn = new CodegenColumnDO().setColumnName("create_time").setDataType(JdbcType.DATE.name())
-                .setColumnComment("创建时间").setNullable(true)
-                .setJavaType("LocalDateTime").setJavaField("createTime")
-                .setCreateOperation(false).setUpdateOperation(false)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.BETWEEN.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.DATETIME.getType());
-        List<CodegenColumnDO> columns = Arrays.asList(idColumn, nameColumn, descriptionColumn, birthdayColumn,
-                sexColumn, enabledColumn, avatarColumn, videoColumn, memoColumn, createTimeColumn);
-
-        // 子表（联系人）
-        CodegenTableDO contactTable = new CodegenTableDO().setScene(CodegenSceneEnum.ADMIN.getScene())
-                .setTableName("infra_demo12_student_contact").setTableComment("学生联系人表")
-                .setModuleName("infra").setBusinessName("demo12").setClassName("InfraDemo12StudentContact")
-                .setClassComment("学生联系人").setAuthor("芋道源码")
-                .setTemplateType(CodegenTemplateTypeEnum.SUB.getType())
-                .setFrontType(CodegenFrontTypeEnum.VUE3.getType())
-                .setSubJoinColumnId(100L).setSubJoinMany(true);
-        CodegenColumnDO contactIdColumn = new CodegenColumnDO().setColumnName("id").setDataType(JdbcType.BIGINT.name())
-                .setColumnComment("编号").setNullable(false).setPrimaryKey(true).setAutoIncrement(true)
-                .setJavaType("Long").setJavaField("id").setExample("1024")
-                .setCreateOperation(false).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true);
-        CodegenColumnDO contactStudentIdColumn = new CodegenColumnDO().setColumnName("student_id").setDataType(JdbcType.BIGINT.name())
-                .setColumnComment("学生编号").setNullable(false).setPrimaryKey(false)
-                .setJavaType("Long").setJavaField("studentId").setExample("2048")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setId(100L);
-        CodegenColumnDO contactNameColumn = new CodegenColumnDO().setColumnName("name").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("名字").setNullable(false)
-                .setJavaType("String").setJavaField("name").setExample("芋头")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.LIKE.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.INPUT.getType());
-        CodegenColumnDO contactDescriptionColumn = new CodegenColumnDO().setColumnName("description").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("简介").setNullable(false)
-                .setJavaType("String").setJavaField("description").setExample("我是介绍")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.TEXTAREA.getType());
-        CodegenColumnDO contactBirthdayColumn = new CodegenColumnDO().setColumnName("birthday").setDataType(JdbcType.DATE.name())
-                .setColumnComment("出生日期").setNullable(false)
-                .setJavaType("LocalDateTime").setJavaField("birthday")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.DATETIME.getType());
-        CodegenColumnDO contactSexColumn = new CodegenColumnDO().setColumnName("sex").setDataType(JdbcType.INTEGER.name())
-                .setColumnComment("性别").setNullable(false)
-                .setJavaType("Integer").setJavaField("sex").setExample("1")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.SELECT.getType())
-                .setDictType("system_user_sex");
-        CodegenColumnDO contactEnabledColumn = new CodegenColumnDO().setColumnName("enabled").setDataType(JdbcType.BOOLEAN.name())
-                .setColumnComment("是否有效").setNullable(false)
-                .setJavaType("Boolean").setJavaField("enabled").setExample("true")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.RADIO.getType())
-                .setDictType("infra_boolean_string");
-        CodegenColumnDO contactAvatarColumn = new CodegenColumnDO().setColumnName("avatar").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("头像").setNullable(false)
-                .setJavaType("String").setJavaField("avatar").setExample("https://www.iocoder.cn/1.png")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.IMAGE_UPLOAD.getType());
-        CodegenColumnDO contactVideoColumn = new CodegenColumnDO().setColumnName("video").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("附件").setNullable(true)
-                .setJavaType("String").setJavaField("video").setExample("https://www.iocoder.cn/1.mp4")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.FILE_UPLOAD.getType());
-        CodegenColumnDO contactMemoColumn = new CodegenColumnDO().setColumnName("memo").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("备注").setNullable(false)
-                .setJavaType("String").setJavaField("memo").setExample("我是备注")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.EDITOR.getType());
-        CodegenColumnDO contactCreateTimeColumn = new CodegenColumnDO().setColumnName("create_time").setDataType(JdbcType.DATE.name())
-                .setColumnComment("创建时间").setNullable(true)
-                .setJavaType("LocalDateTime").setJavaField("createTime")
-                .setCreateOperation(false).setUpdateOperation(false)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.BETWEEN.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.DATETIME.getType());
-        List<CodegenColumnDO> contactColumns = Arrays.asList(contactIdColumn, contactStudentIdColumn,
-                contactNameColumn, contactDescriptionColumn, contactBirthdayColumn,
-                contactSexColumn, contactEnabledColumn, contactAvatarColumn, contactVideoColumn, contactMemoColumn, contactCreateTimeColumn);
-
-        // 子表（班主任）
-        CodegenTableDO teacherTable = new CodegenTableDO().setScene(CodegenSceneEnum.ADMIN.getScene())
-                .setTableName("infra_demo12_student_teacher").setTableComment("学生班主任表")
-                .setModuleName("infra").setBusinessName("demo12").setClassName("InfraDemo12StudentTeacher")
-                .setClassComment("学生班主任").setAuthor("芋道源码")
-                .setTemplateType(CodegenTemplateTypeEnum.SUB.getType())
-                .setFrontType(CodegenFrontTypeEnum.VUE3.getType())
-                .setSubJoinColumnId(200L).setSubJoinMany(false);
-        CodegenColumnDO teacherIdColumn = new CodegenColumnDO().setColumnName("id").setDataType(JdbcType.BIGINT.name())
-                .setColumnComment("编号").setNullable(false).setPrimaryKey(true).setAutoIncrement(true)
-                .setJavaType("Long").setJavaField("id").setExample("1024")
-                .setCreateOperation(false).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true);
-        CodegenColumnDO teacherStudentIdColumn = new CodegenColumnDO().setColumnName("student_id").setDataType(JdbcType.BIGINT.name())
-                .setColumnComment("学生编号").setNullable(false).setPrimaryKey(false)
-                .setJavaType("Long").setJavaField("studentId").setExample("2048")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setId(200L);
-        CodegenColumnDO teacherNameColumn = new CodegenColumnDO().setColumnName("name").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("名字").setNullable(false)
-                .setJavaType("String").setJavaField("name").setExample("芋头")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.LIKE.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.INPUT.getType());
-        CodegenColumnDO teacherDescriptionColumn = new CodegenColumnDO().setColumnName("description").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("简介").setNullable(false)
-                .setJavaType("String").setJavaField("description").setExample("我是介绍")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.TEXTAREA.getType());
-        CodegenColumnDO teacherBirthdayColumn = new CodegenColumnDO().setColumnName("birthday").setDataType(JdbcType.DATE.name())
-                .setColumnComment("出生日期").setNullable(false)
-                .setJavaType("LocalDateTime").setJavaField("birthday")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.DATETIME.getType());
-        CodegenColumnDO teacherSexColumn = new CodegenColumnDO().setColumnName("sex").setDataType(JdbcType.INTEGER.name())
-                .setColumnComment("性别").setNullable(false)
-                .setJavaType("Integer").setJavaField("sex").setExample("1")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.SELECT.getType())
-                .setDictType("system_user_sex");
-        CodegenColumnDO teacherEnabledColumn = new CodegenColumnDO().setColumnName("enabled").setDataType(JdbcType.BOOLEAN.name())
-                .setColumnComment("是否有效").setNullable(false)
-                .setJavaType("Boolean").setJavaField("enabled").setExample("true")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.RADIO.getType())
-                .setDictType("infra_boolean_string");
-        CodegenColumnDO teacherAvatarColumn = new CodegenColumnDO().setColumnName("avatar").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("头像").setNullable(false)
-                .setJavaType("String").setJavaField("avatar").setExample("https://www.iocoder.cn/1.png")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.IMAGE_UPLOAD.getType());
-        CodegenColumnDO teacherVideoColumn = new CodegenColumnDO().setColumnName("video").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("附件").setNullable(true)
-                .setJavaType("String").setJavaField("video").setExample("https://www.iocoder.cn/1.mp4")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.FILE_UPLOAD.getType());
-        CodegenColumnDO teacherMemoColumn = new CodegenColumnDO().setColumnName("memo").setDataType(JdbcType.VARCHAR.name())
-                .setColumnComment("备注").setNullable(false)
-                .setJavaType("String").setJavaField("memo").setExample("我是备注")
-                .setCreateOperation(true).setUpdateOperation(true)
-                .setListOperation(false)
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.EDITOR.getType());
-        CodegenColumnDO teacherCreateTimeColumn = new CodegenColumnDO().setColumnName("create_time").setDataType(JdbcType.DATE.name())
-                .setColumnComment("创建时间").setNullable(true)
-                .setJavaType("LocalDateTime").setJavaField("createTime")
-                .setCreateOperation(false).setUpdateOperation(false)
-                .setListOperation(true).setListOperationCondition(CodegenColumnListConditionEnum.BETWEEN.getCondition())
-                .setListOperationResult(true)
-                .setHtmlType(CodegenColumnHtmlTypeEnum.DATETIME.getType());
-        List<CodegenColumnDO> teacherColumns = Arrays.asList(teacherIdColumn, teacherStudentIdColumn,
-                teacherNameColumn, teacherDescriptionColumn, teacherBirthdayColumn,
-                teacherSexColumn, teacherEnabledColumn, teacherAvatarColumn, teacherVideoColumn, teacherMemoColumn, teacherCreateTimeColumn);
-
-        // 调用
-        Map<String, String> result = codegenEngine.execute(table, columns,
-                Arrays.asList(contactTable, teacherTable), Arrays.asList(contactColumns, teacherColumns));
-
-        // 构建 zip 包
-        writeFile(result, "/Users/yunai/test/demo12.zip");
-
-        // 断言
-        assertEquals(27, result.size());
-
-        for (Map.Entry<String, String> entry : result.entrySet()) {
-            System.out.println(entry.getKey());
-            System.out.println(entry.getValue());
-            System.out.println("");
-            System.out.println("");
-            System.out.println("");
-        }
+    private static CodegenTableDO getTable(String name) {
+        String content = ResourceUtil.readUtf8Str("codegen/table/" + name + ".json");
+        return JsonUtils.parseObject(content, "table", CodegenTableDO.class);
     }
 
-    private void assertPathContentEquals(String path, Map<String, String> result, String key) {
-        String pathContent = ResourceUtil.readUtf8Str("codegen/" + path);
-        String valueContent = result.get(key);
-        assertEquals(pathContent, valueContent);
+    private static List<CodegenColumnDO> getColumnList(String name) {
+        String content = ResourceUtil.readUtf8Str("codegen/table/" + name + ".json");
+        List<CodegenColumnDO> list = JsonUtils.parseArray(content, "columns", CodegenColumnDO.class);
+        list.forEach(column -> {
+            if (column.getNullable() == null) {
+                column.setNullable(false);
+            }
+            if (column.getCreateOperation() == null) {
+                column.setCreateOperation(false);
+            }
+            if (column.getUpdateOperation() == null) {
+                column.setUpdateOperation(false);
+            }
+            if (column.getListOperation() == null) {
+                column.setListOperation(false);
+            }
+            if (column.getListOperationResult() == null) {
+                column.setListOperationResult(false);
+            }
+        });
+        return list;
     }
+
+    @SuppressWarnings("rawtypes")
+    private static void assertResult(Map<String, String> result, String path) {
+        String assertContent = ResourceUtil.readUtf8Str(path + "/assert.json");
+        List<HashMap> asserts = JsonUtils.parseArray(assertContent, HashMap.class);
+        assertEquals(asserts.size(), result.size());
+        // 校验每个文件
+        asserts.forEach(assertMap -> {
+            String contentPath = (String) assertMap.get("contentPath");
+            String filePath = (String) assertMap.get("filePath");
+            String content = ResourceUtil.readUtf8Str(path + "/" + contentPath);
+            assertEquals(content, result.get(filePath), filePath + "：不匹配");
+        });
+    }
+
+    // ==================== 调试专用 ====================
 
     /**
-     * 将生成的代码，写入到文件
-     *
-     * 用途：方便本地调试
+     * 【调试使用】将生成的代码，写入到文件
      *
      * @param result 生成的代码
      * @param path 写入文件的路径
@@ -808,6 +177,27 @@ public class CodegenEngineTest extends BaseMockitoUnitTest {
         ZipUtil.zip(outputStream, paths, ins);
         // 写入文件
         FileUtil.writeBytes(outputStream.toByteArray(), path);
+    }
+
+    /**
+     * 【调试使用】将生成的结果，写入到文件
+     *
+     * @param result 生成的代码
+     * @param basePath 写入文件的路径（绝对路径）
+     */
+    private void writeResult(Map<String, String> result, String basePath) {
+        // 写入文件内容
+        List<Map<String, String>> asserts = new ArrayList<>();
+        result.forEach((filePath, fileContent) -> {
+            String lastFilePath = StrUtil.subAfter(filePath, '/', true);
+            String contentPath = StrUtil.subAfter(lastFilePath, '.', true)
+                    + '/' + StrUtil.subBefore(lastFilePath, '.', true);
+            asserts.add(MapUtil.<String, String>builder().put("filePath", filePath)
+                    .put("contentPath", contentPath).build());
+            FileUtil.writeUtf8String(fileContent, basePath + "/" + contentPath);
+        });
+        // 写入 assert.json 文件
+        FileUtil.writeUtf8String(JsonUtils.toJsonPrettyString(asserts), basePath +"/assert.json");
     }
 
 }

@@ -1,0 +1,53 @@
+{
+  "table": {
+    "id": 10,
+    "scene" : 1,
+    "parentMenuId" : 888,
+    "tableName" : "infra_category",
+    "tableComment" : "分类表",
+    "moduleName" : "infra",
+    "businessName" : "demo",
+    "className" : "InfraCategory",
+    "classComment" : "分类",
+    "author" : "芋道源码",
+    "treeParentColumnId" : 22,
+    "treeNameColumnId" : 11
+  },
+  "columns": [ {
+    "columnName" : "id",
+    "dataType" : "BIGINT",
+    "columnComment" : "编号",
+    "primaryKey" : true,
+    "autoIncrement" : true,
+    "javaType" : "Long",
+    "javaField" : "id",
+    "example" : "1024",
+    "updateOperation" : true,
+    "listOperationResult" : true
+  }, {
+    "id" : 11,
+    "columnName" : "name",
+    "dataType" : "VARCHAR",
+    "columnComment" : "名字",
+    "javaType" : "String",
+    "javaField" : "name",
+    "example" : "芋头",
+    "createOperation" : true,
+    "updateOperation" : true,
+    "listOperation" : true,
+    "listOperationCondition" : "LIKE",
+    "listOperationResult" : true,
+    "htmlType" : "input"
+  }, {
+    "id" : 22,
+    "columnName" : "description",
+    "dataType" : "VARCHAR",
+    "columnComment" : "父编号",
+    "javaType" : "Long",
+    "javaField" : "parentId",
+    "example" : "2048",
+    "createOperation" : true,
+    "updateOperation" : true,
+    "listOperationResult" : true
+  } ]
+}
