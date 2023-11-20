@@ -12,7 +12,6 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.cache.CacheUtils;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
-import cn.iocoder.yudao.framework.social.core.YudaoAuthRequestFactory;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientUpdateReqVO;
@@ -31,6 +30,7 @@ import com.xingyuv.jushauth.model.AuthResponse;
 import com.xingyuv.jushauth.model.AuthUser;
 import com.xingyuv.jushauth.request.AuthRequest;
 import com.xingyuv.jushauth.utils.AuthStateUtils;
+import com.xingyuv.justauth.AuthRequestFactory;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxJsapiSignature;
@@ -59,8 +59,8 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 @Slf4j
 public class SocialClientServiceImpl implements SocialClientService {
 
-    @Resource // 由于自定义了 YudaoAuthRequestFactory 无法覆盖默认的 AuthRequestFactory，所以只能注入它
-    private YudaoAuthRequestFactory yudaoAuthRequestFactory;
+    @Resource
+    private AuthRequestFactory authRequestFactory;
 
     @Resource
     private WxMpService wxMpService;
@@ -145,7 +145,7 @@ public class SocialClientServiceImpl implements SocialClientService {
      */
     private AuthRequest buildAuthRequest(Integer socialType, Integer userType) {
         // 1. 先查找默认的配置项，从 application-*.yaml 中读取
-        AuthRequest request = yudaoAuthRequestFactory.get(SocialTypeEnum.valueOfType(socialType).getSource());
+        AuthRequest request = authRequestFactory.get(SocialTypeEnum.valueOfType(socialType).getSource());
         Assert.notNull(request, String.format("社交平台(%d) 不存在", socialType));
         // 2. 查询 DB 的配置项，如果存在则进行覆盖
         SocialClientDO client = socialClientMapper.selectBySocialTypeAndUserType(socialType, userType);
