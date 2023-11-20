@@ -264,3 +264,16 @@ justauth:
     prefix: 'social_auth_state:' # 缓存前缀，目前只对 Redis 缓存生效，默认 JUSTAUTH::STATE::
     timeout: 24h # 超时时长，目前只对 Redis 缓存生效，默认 3 分钟
 
+#ureport配置
+#ureport:
+#  disableHttpSessionReportCache: true #是否禁用
+#  disableFileProvider: true #是否禁用
+#  debug: true
+#  fileStoreDir: D://ureport//files
+#  provider:
+#    database:
+#       disabled: true
+#    file:
+#       disabled: true
+
+
