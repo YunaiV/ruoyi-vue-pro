@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.sms.core.client.SmsClient;
-import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
@@ -244,15 +243,14 @@ public class SmsSendServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testDoSendSms() {
+    public void testDoSendSms() throws Throwable {
         // 准备参数
         SmsSendMessage message = randomPojo(SmsSendMessage.class);
         // mock SmsClientFactory 的方法
         SmsClient smsClient = spy(SmsClient.class);
         when(smsChannelService.getSmsClient(eq(message.getChannelId()))).thenReturn(smsClient);
         // mock SmsClient 的方法
-        SmsCommonResult<SmsSendRespDTO> sendResult = randomPojo(SmsCommonResult.class, SmsSendRespDTO.class);
-        sendResult.setData(randomPojo(SmsSendRespDTO.class));
+        SmsSendRespDTO sendResult = randomPojo(SmsSendRespDTO.class);
         when(smsClient.sendSms(eq(message.getLogId()), eq(message.getMobile()), eq(message.getApiTemplateId()),
                 eq(message.getTemplateParams()))).thenReturn(sendResult);
 
@@ -260,8 +258,8 @@ public class SmsSendServiceImplTest extends BaseMockitoUnitTest {
         smsService.doSendSms(message);
         // 断言
         verify(smsLogService).updateSmsSendResult(eq(message.getLogId()),
-                eq(sendResult.getCode()), eq(sendResult.getMsg()), eq(sendResult.getApiCode()),
-                eq(sendResult.getApiMsg()), eq(sendResult.getApiRequestId()), eq(sendResult.getData().getSerialNo()));
+                eq(sendResult.getSuccess()), eq(sendResult.getApiCode()),
+                eq(sendResult.getApiMsg()), eq(sendResult.getApiRequestId()), eq(sendResult.getSerialNo()));
     }
 
     @Test

@@ -1,13 +1,10 @@
 package cn.iocoder.yudao.framework.sms.core.client.impl.tencent;
 
 import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
-import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsTemplateRespDTO;
@@ -31,7 +28,6 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.when;
 
@@ -78,7 +74,7 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    public void testDoSendSms() throws Throwable {
+    public void testDoSendSms_success() throws Throwable {
         // 准备参数
         Long sendLogId = randomLongId();
         String mobile = randomString();
@@ -94,7 +90,7 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
             o.setSendStatusSet(sendStatuses);
             SendStatus sendStatus = new SendStatus();
             sendStatuses[0] = sendStatus;
-            sendStatus.setCode(TencentSmsClient.API_SUCCESS_CODE);
+            sendStatus.setCode(TencentSmsClient.API_CODE_SUCCESS);
             sendStatus.setMessage("send success");
             sendStatus.setSerialNo(serialNo);
         });
@@ -109,20 +105,58 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
         }))).thenReturn(response);
 
         // 调用
-        SmsCommonResult<SmsSendRespDTO> result = smsClient.doSendSms(sendLogId, mobile,
-                apiTemplateId, templateParams);
+        SmsSendRespDTO result = smsClient.sendSms(sendLogId, mobile, apiTemplateId, templateParams);
         // 断言
+        assertTrue(result.getSuccess());
+        assertEquals(response.getRequestId(), result.getApiRequestId());
         assertEquals(response.getSendStatusSet()[0].getCode(), result.getApiCode());
         assertEquals(response.getSendStatusSet()[0].getMessage(), result.getApiMsg());
-        assertEquals(GlobalErrorCodeConstants.SUCCESS.getCode(), result.getCode());
-        assertEquals(GlobalErrorCodeConstants.SUCCESS.getMsg(), result.getMsg());
-        assertEquals(response.getRequestId(), result.getApiRequestId());
-        // 断言结果
-        assertEquals(response.getSendStatusSet()[0].getSerialNo(), result.getData().getSerialNo());
+        assertEquals(response.getSendStatusSet()[0].getSerialNo(), result.getSerialNo());
     }
 
     @Test
-    public void testDoTParseSmsReceiveStatus() throws Throwable {
+    public void testDoSendSms_fail() throws Throwable {
+        // 准备参数
+        Long sendLogId = randomLongId();
+        String mobile = randomString();
+        String apiTemplateId = randomString();
+        List<KeyValue<String, Object>> templateParams = Lists.newArrayList(
+                new KeyValue<>("1", 1234), new KeyValue<>("2", "login"));
+        String requestId = randomString();
+        String serialNo = randomString();
+        // mock 方法
+        SendSmsResponse response = randomPojo(SendSmsResponse.class, o -> {
+            o.setRequestId(requestId);
+            SendStatus[] sendStatuses = new SendStatus[1];
+            o.setSendStatusSet(sendStatuses);
+            SendStatus sendStatus = new SendStatus();
+            sendStatuses[0] = sendStatus;
+            sendStatus.setCode("ERROR");
+            sendStatus.setMessage("send success");
+            sendStatus.setSerialNo(serialNo);
+        });
+        when(client.SendSms(argThat(request -> {
+            assertEquals(mobile, request.getPhoneNumberSet()[0]);
+            assertEquals(properties.getSignature(), request.getSignName());
+            assertEquals(apiTemplateId, request.getTemplateId());
+            assertEquals(toJsonString(ArrayUtils.toArray(new ArrayList<>(MapUtils.convertMap(templateParams).values()), String::valueOf)),
+                    toJsonString(request.getTemplateParamSet()));
+            assertEquals(sendLogId, ReflectUtil.getFieldValue(JsonUtils.parseObject(request.getSessionContext(), TencentSmsClient.SessionContext.class), "logId"));
+            return true;
+        }))).thenReturn(response);
+
+        // 调用
+        SmsSendRespDTO result = smsClient.sendSms(sendLogId, mobile, apiTemplateId, templateParams);
+        // 断言
+        assertFalse(result.getSuccess());
+        assertEquals(response.getRequestId(), result.getApiRequestId());
+        assertEquals(response.getSendStatusSet()[0].getCode(), result.getApiCode());
+        assertEquals(response.getSendStatusSet()[0].getMessage(), result.getApiMsg());
+        assertEquals(response.getSendStatusSet()[0].getSerialNo(), result.getSerialNo());
+    }
+
+    @Test
+    public void testParseSmsReceiveStatus() {
         // 准备参数
         String text = "[\n" +
                 "    {\n" +
@@ -139,7 +173,7 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
         // mock 方法
 
         // 调用
-        List<SmsReceiveRespDTO> statuses = smsClient.doParseSmsReceiveStatus(text);
+        List<SmsReceiveRespDTO> statuses = smsClient.parseSmsReceiveStatus(text);
         // 断言
         assertEquals(1, statuses.size());
         assertTrue(statuses.get(0).getSuccess());
@@ -152,7 +186,7 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    public void testDoGetSmsTemplate() throws Throwable {
+    public void testGetSmsTemplate() throws Throwable {
         // 准备参数
         Long apiTemplateId = randomLongId();
         String requestId = randomString();
@@ -173,50 +207,24 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
         }))).thenReturn(response);
 
         // 调用
-        SmsCommonResult<SmsTemplateRespDTO> result = smsClient.doGetSmsTemplate(apiTemplateId.toString());
+        SmsTemplateRespDTO result = smsClient.getSmsTemplate(apiTemplateId.toString());
         // 断言
-        assertEquals(TencentSmsClient.API_SUCCESS_CODE, result.getApiCode());
-        assertNull(result.getApiMsg());
-        assertEquals(GlobalErrorCodeConstants.SUCCESS.getCode(), result.getCode());
-        assertEquals(GlobalErrorCodeConstants.SUCCESS.getMsg(), result.getMsg());
-        assertEquals(response.getRequestId(), result.getApiRequestId());
-        // 断言结果
-        assertEquals(response.getDescribeTemplateStatusSet()[0].getTemplateId().toString(), result.getData().getId());
-        assertEquals(response.getDescribeTemplateStatusSet()[0].getTemplateContent(), result.getData().getContent());
-        assertEquals(SmsTemplateAuditStatusEnum.SUCCESS.getStatus(), result.getData().getAuditStatus());
-        assertEquals(response.getDescribeTemplateStatusSet()[0].getReviewReply(), result.getData().getAuditReason());
+        assertEquals(response.getDescribeTemplateStatusSet()[0].getTemplateId().toString(), result.getId());
+        assertEquals(response.getDescribeTemplateStatusSet()[0].getTemplateContent(), result.getContent());
+        assertEquals(SmsTemplateAuditStatusEnum.SUCCESS.getStatus(), result.getAuditStatus());
+        assertEquals(response.getDescribeTemplateStatusSet()[0].getReviewReply(), result.getAuditReason());
     }
 
     @Test
-    public void testConvertSuccessTemplateStatus() {
-        testTemplateStatus(SmsTemplateAuditStatusEnum.SUCCESS, 0L);
-    }
-
-    @Test
-    public void testConvertCheckingTemplateStatus() {
-        testTemplateStatus(SmsTemplateAuditStatusEnum.CHECKING, 1L);
-    }
-
-    @Test
-    public void testConvertFailTemplateStatus() {
-        testTemplateStatus(SmsTemplateAuditStatusEnum.FAIL, -1L);
-    }
-
-    @Test
-    public void testConvertUnknownTemplateStatus() {
-        DescribeTemplateListStatus templateStatus = new DescribeTemplateListStatus();
-        templateStatus.setStatusCode(3L);
-        Long templateId = randomLongId();
-        // 调用，并断言结果
-        assertThrows(IllegalStateException.class, () -> smsClient.convertTemplateStatusDTO(templateStatus),
-                StrUtil.format("不能解析短信模版审核状态[3]，模版id[{}]", templateId));
-    }
-
-    private void testTemplateStatus(SmsTemplateAuditStatusEnum expected, Long value) {
-        DescribeTemplateListStatus templateStatus = new DescribeTemplateListStatus();
-        templateStatus.setStatusCode(value);
-        SmsTemplateRespDTO result = smsClient.convertTemplateStatusDTO(templateStatus);
-        assertEquals(expected.getStatus(), result.getAuditStatus());
+    public void testConvertSmsTemplateAuditStatus() {
+        assertEquals(SmsTemplateAuditStatusEnum.SUCCESS.getStatus(),
+                smsClient.convertSmsTemplateAuditStatus(0));
+        assertEquals(SmsTemplateAuditStatusEnum.CHECKING.getStatus(),
+                smsClient.convertSmsTemplateAuditStatus(1));
+        assertEquals(SmsTemplateAuditStatusEnum.FAIL.getStatus(),
+                smsClient.convertSmsTemplateAuditStatus(-1));
+        assertThrows(IllegalArgumentException.class, () -> smsClient.convertSmsTemplateAuditStatus(3),
+                "未知审核状态(3)");
     }
 
 }
