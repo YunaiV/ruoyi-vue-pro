@@ -48,4 +48,10 @@ public interface PayTransferService {
      */
     PageResult<PayTransferDO> getTransferPage(PayTransferPageReqVO pageReqVO);
 
+    /**
+     * 同步渠道转账单状态
+     *
+     * @return 同步到状态的转账数量，包括转账成功、转账失败、转账中的
+     */
+    int syncTransfer();
 }

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.promotion.controller.admin.diy.vo.template;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 /**
@@ -14,7 +14,7 @@ import java.util.List;
 public class DiyTemplateBaseVO {
 
     @Schema(description = "模板名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "默认主题")
-    @NotNull(message = "模板名称不能为空")
+    @NotEmpty(message = "模板名称不能为空")
     private String name;
 
     @Schema(description = "备注", example = "默认主题")

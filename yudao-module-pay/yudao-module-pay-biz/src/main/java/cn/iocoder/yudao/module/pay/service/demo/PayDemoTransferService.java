@@ -28,4 +28,12 @@ public interface PayDemoTransferService {
      * @param pageVO 分页查询参数
      */
     PageResult<PayDemoTransferDO> getDemoTransferPage(PageParam pageVO);
+
+    /**
+     * 更新转账业务示例订单的转账状态
+     *
+     * @param id 编号
+     * @param payTransferId 转账单编号
+     */
+    void updateDemoTransferStatus(Long id, Long payTransferId);
 }

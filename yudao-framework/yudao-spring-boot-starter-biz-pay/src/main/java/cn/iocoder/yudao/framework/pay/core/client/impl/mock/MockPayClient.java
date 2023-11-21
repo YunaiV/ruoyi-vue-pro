@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferUnifie
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.client.impl.NonePayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -68,6 +69,11 @@ public class MockPayClient extends AbstractPayClient<NonePayClientConfig> {
 
     @Override
     protected PayTransferRespDTO doUnifiedTransfer(PayTransferUnifiedReqDTO reqDTO) {
+        throw new UnsupportedOperationException("待实现");
+    }
+
+    @Override
+    protected PayTransferRespDTO doGetTransfer(String outTradeNo, PayTransferTypeEnum type) {
         throw new UnsupportedOperationException("待实现");
     }
 

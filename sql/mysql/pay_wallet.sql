@@ -246,3 +246,11 @@ VALUES (
            '转账订单', '', 2, 3, 1117,
            'transfer', 'ep:credit-card', 'pay/transfer/index', 0, 'PayTransfer'
        );
+
+-- 转账通知脚本
+
+ALTER TABLE `pay_app`
+    ADD COLUMN `transfer_notify_url` varchar(1024) NOT NULL COMMENT '转账结果的回调地址' AFTER `refund_notify_url`;
+ALTER TABLE  `pay_notify_task`
+    MODIFY COLUMN `merchant_order_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '商户订单编号' AFTER `status`,
+    ADD COLUMN `merchant_transfer_id` varchar(64) COMMENT '商户转账单编号' AFTER `merchant_order_id`;

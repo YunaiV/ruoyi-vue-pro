@@ -42,7 +42,6 @@ public class DiyPageServiceImpl implements DiyPageService {
         DiyPageDO diyPage = DiyPageConvert.INSTANCE.convert(createReqVO);
         diyPage.setProperty("{}");
         diyPageMapper.insert(diyPage);
-        // 返回
         return diyPage.getId();
     }
 
@@ -57,6 +56,13 @@ public class DiyPageServiceImpl implements DiyPageService {
         diyPageMapper.updateById(updateObj);
     }
 
+    /**
+     * 校验 Page 页面，在一个 template 模版下的名字是唯一的
+     *
+     * @param id Page 编号
+     * @param templateId 模版编号
+     * @param name Page 名字
+     */
     void validateNameUnique(Long id, Long templateId, String name) {
         if (templateId != null || StrUtil.isBlank(name)) {
             return;
