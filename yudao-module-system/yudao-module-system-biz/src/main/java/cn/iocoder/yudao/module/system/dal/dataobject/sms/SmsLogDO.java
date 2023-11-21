@@ -114,20 +114,6 @@ public class SmsLogDO extends BaseDO {
      * 发送时间
      */
     private LocalDateTime sendTime;
-    // TODO 芋艿：短信
-//    /**
-//     * 发送结果的编码
-//     *
-//     * 枚举 {@link SmsFrameworkErrorCodeConstants}
-//     */
-//    private Integer sendCode;
-//    /**
-//     * 发送结果的提示
-//     *
-//     * 一般情况下，使用 {@link SmsFrameworkErrorCodeConstants}
-//     * 异常情况下，通过格式化 Exception 的提示存储
-//     */
-//    private String sendMsg;
     /**
      * 短信 API 发送结果的编码
      *
