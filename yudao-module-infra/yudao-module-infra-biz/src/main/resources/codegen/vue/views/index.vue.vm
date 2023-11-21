@@ -54,6 +54,7 @@
         <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport" :loading="exportLoading"
                    v-hasPermi="['${permissionPrefix}:export']">导出</el-button>
       </el-col>
+        ## 特殊：树表专属逻辑
         #if ( $table.templateType == 2 )
           <el-col :span="1.5">
             <el-button type="danger" plain icon="el-icon-sort" size="mini" @click="toggleExpandAll">
@@ -64,7 +65,7 @@
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-      ## 特殊：主子表专属逻辑 TODO puhui999: 普通模式
+      ## 特殊：主子表专属逻辑
       #if ( $table.templateType == 11 && $subTables && $subTables.size() > 0 )
       <el-table
           v-loading="loading"
@@ -89,7 +90,7 @@
       #else
       <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
       #end
-      ## 特殊：主子表专属逻辑 TODO puhui999: 内嵌模式
+      ## 特殊：主子表专属逻辑
       #if ( $table.templateType == 12 && $subTables && $subTables.size() > 0 )
         <!-- 子表的列表 -->
         <el-table-column type="expand">
@@ -140,13 +141,15 @@
         </template>
       </el-table-column>
     </el-table>
+## 特殊：树表专属逻辑（树不需要分页）
+#if ( $table.templateType != 2 )
     <!-- 分页组件 -->
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
-
+#end
     <!-- 对话框(添加 / 修改) -->
     <${simpleClassName}Form ref="formRef" @success="getList" />
-  ## 特殊：主子表专属逻辑  TODO puhui999: ERP 模式
+  ## 特殊：主子表专属逻辑
   #if ( $table.templateType == 11 && $subTables && $subTables.size() > 0 )
     <!-- 子表的列表 -->
       <el-tabs model-value="$subClassNameVars.get(0)">
@@ -177,20 +180,24 @@ import FileUpload from '@/components/FileUpload';
 import Editor from '@/components/Editor';
 #end
 ## 特殊：主子表专属逻辑
+#if ( $table.templateType != 10 )
 #if ( $subTables && $subTables.size() > 0 )
     #foreach ($subSimpleClassName in $subSimpleClassNames)
     import ${subSimpleClassName}List from './components/${subSimpleClassName}List.vue'
     #end
+#end
 #end
 export default {
   name: "${simpleClassName}",
   components: {
           ${simpleClassName}Form,
 ## 特殊：主子表专属逻辑
+#if ( $table.templateType != 10 )
 #if ( $subTables && $subTables.size() > 0 )
       #foreach ($subSimpleClassName in $subSimpleClassNames)
           ${subSimpleClassName}List,
       #end
+#end
 #end
 #if ($hasImageUploadColumn)
     ImageUpload,
@@ -210,9 +217,9 @@ export default {
       exportLoading: false,
       // 显示搜索条件
       showSearch: true,
-      // 总条数
       ## 特殊：树表专属逻辑（树不需要分页接口）
       #if ( $table.templateType != 2 )
+        // 总条数
         total: 0,
       #end
       // ${table.classComment}列表
@@ -235,7 +242,7 @@ export default {
         #if ($column.listOperationCondition != 'BETWEEN')
         $column.javaField: null,
         #end
-        #if ($column.htmlType == "datetime" || $column.listOperationCondition == "BETWEEN")
+        #if ($column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
         $column.javaField: [],
         #end
         #end
@@ -253,7 +260,7 @@ export default {
       this.loading = true;
       ## 特殊：树表专属逻辑（树不需要分页接口）
       #if ( $table.templateType == 2 )
-        ${simpleClassName}Api.get${simpleClassName}List(queryParams).then(response => {
+        ${simpleClassName}Api.get${simpleClassName}List(this.queryParams).then(response => {
           this.list = this.handleTree(response.data, 'id', '${treeParentColumn.javaField}');
         })
       #else
@@ -302,14 +309,14 @@ export default {
               return ${simpleClassName}Api.export${simpleClassName}Excel(params);
             }).then(response => {
               that.#[[$]]#download.excel(response, '${table.classComment}.xls');
-            }));
+            });
       } catch {
       } finally {
         that.exportLoading = false;
       }
     },
       ## 特殊：主子表专属逻辑
-      #if ( $subTables && $subTables.size() > 0 )
+      #if ( $table.templateType == 11 )
         /** 选中行操作 */
         handleCurrentChange(row) {
          this.currentRow = row
