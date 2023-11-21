@@ -63,12 +63,6 @@ public class SmsLogExcelVO {
     @ExcelProperty("发送时间")
     private LocalDateTime sendTime;
 
-    @ExcelProperty("发送结果的编码")
-    private Integer sendCode;
-
-    @ExcelProperty("发送结果的提示")
-    private String sendMsg;
-
     @ExcelProperty("短信 API 发送结果的编码")
     private String apiSendCode;
 

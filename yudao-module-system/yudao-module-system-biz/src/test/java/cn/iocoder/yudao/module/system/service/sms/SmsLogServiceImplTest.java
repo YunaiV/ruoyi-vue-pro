@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.system.service.sms;
 
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
@@ -172,22 +171,20 @@ public class SmsLogServiceImplTest extends BaseDbUnitTest {
         smsLogMapper.insert(dbSmsLog);
         // 准备参数
         Long id = dbSmsLog.getId();
-        Integer sendCode = randomInteger();
-        String sendMsg = randomString();
+        Boolean success = randomBoolean();
         String apiSendCode = randomString();
         String apiSendMsg = randomString();
         String apiRequestId = randomString();
         String apiSerialNo = randomString();
 
         // 调用
-        smsLogService.updateSmsSendResult(id, sendCode, sendMsg,
+        smsLogService.updateSmsSendResult(id, success,
                 apiSendCode, apiSendMsg, apiRequestId, apiSerialNo);
         // 断言
         dbSmsLog = smsLogMapper.selectById(id);
-        assertEquals(CommonResult.isSuccess(sendCode) ? SmsSendStatusEnum.SUCCESS.getStatus()
-                : SmsSendStatusEnum.FAILURE.getStatus(), dbSmsLog.getSendStatus());
+        assertEquals(success ? SmsSendStatusEnum.SUCCESS.getStatus() : SmsSendStatusEnum.FAILURE.getStatus(),
+                dbSmsLog.getSendStatus());
         assertNotNull(dbSmsLog.getSendTime());
-        assertEquals(sendMsg, dbSmsLog.getSendMsg());
         assertEquals(apiSendCode, dbSmsLog.getApiSendCode());
         assertEquals(apiSendMsg, dbSmsLog.getApiSendMsg());
         assertEquals(apiRequestId, dbSmsLog.getApiRequestId());
