@@ -1,3 +1,9 @@
+#set ($subTable = $subTables.get($subIndex))##当前表
+#set ($subColumns = $subColumnsList.get($subIndex))##当前字段数组
+#set ($subJoinColumn = $subJoinColumns.get($subIndex))##当前 join 字段
+#set ($subSimpleClassName = $subSimpleClassNames.get($subIndex))
+#set ($subJoinColumn = $subJoinColumns.get($subIndex))##当前 join 字段
+#set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
 <template>
   <div class="app-container">
 #if ($table.templateType == 11)
@@ -95,8 +101,10 @@
     watch:{/** 监听主表的关联字段的变化，加载对应的子表数据 */
         ${subJoinColumn.javaField}:{
             handler(val) {
-              this.queryParams.${subJoinColumn.javaField} = val
-              this.handleQuery()
+              this.queryParams.${subJoinColumn.javaField} = val;
+              if (val){
+                this.handleQuery();
+              }
             },
             immediate: true
       }
@@ -158,7 +166,7 @@
           }).catch(() => {});
         } catch {}
       },
-    }
 #end
+    }
   };
 </script>

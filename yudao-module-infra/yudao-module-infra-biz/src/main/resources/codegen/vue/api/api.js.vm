@@ -79,7 +79,7 @@ export function export${simpleClassName}Excel(params) {
   #if ( $table.templateType == 11 )
 
   // 获得${subTable.classComment}分页
-  export function get${simpleClassName}Page(params) {
+  export function get${subSimpleClassName}Page(params) {
     return request({
       url: '${baseURL}/${subSimpleClassName_strikeCase}/page',
       method: 'get',

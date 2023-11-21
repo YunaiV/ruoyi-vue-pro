@@ -5,6 +5,7 @@
 #set ($subJoinColumn = $subJoinColumns.get($subIndex))##当前 join 字段
 #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
 <template>
+  <div class="app-container">
     #if ( $subTable.subJoinMany )## 情况一：一对多，table + form
       <el-form
           ref="formRef"
@@ -216,6 +217,7 @@
           #end
       </el-form>
     #end
+  </div>
 </template>
 
 <script>

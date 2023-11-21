@@ -214,7 +214,7 @@
         this.title = "新增${table.classComment}";
         ## 特殊：树表专属逻辑
         #if ( $table.templateType == 2 )
-            this.get${simpleClassName}Tree()
+            this.get${simpleClassName}Tree();
         #end
       },
       /** 提交按钮 */
@@ -241,7 +241,7 @@
                 data.${subClassNameVar}#if ( $subTable.subJoinMany)s#end = that.getRef('${subClassNameVar}FormRef').getData();
               #end
             }).catch((err) => {
-                validate = false
+                validate = false;
                 that.subTabsName = err.replace("FormRef", ""); // 定位到没有校验通过的子表单
             })
         #end
@@ -266,11 +266,11 @@
             that.#[[$]]#emit('success');
           });
         }finally {
-          this.formLoading = false
+          this.formLoading = false;
         }
       },
-      getRef(refName){ // TODO puhui999: 获得表单 ref，提取出来的目的呢是解决 #[[$]]# 在 if 中 end闭合不了的问题，代码生成后可删除此方法
-        return this.#[[$]]#refs[refName]
+      getRef(refName){
+        return this.#[[$]]#refs[refName];
       },
 ## 特殊：主子表专属逻辑
 #if ( $table.templateType == 10 || $table.templateType == 12 )
@@ -278,12 +278,12 @@
       /** 校验子表单 */
       validateSubFrom(item) {
         return new Promise((resolve, reject) => {
-          this.$refs[item].validate()
+          this.getRef(item).validate()
           .then(() => {
-            resolve()
+            resolve();
           })
           .catch(() => {
-            reject(item)
+            reject(item);
           })
         })
       },
@@ -299,14 +299,14 @@
         ];
         const validArr = []; // 校验
         for (const item of validFormRefArr) {
-          validArr.push(this.validateSubFrom(item))
+          validArr.push(this.validateSubFrom(item));
         }
         return new Promise((resolve, reject) => {
           // 校验所有
           Promise.all(validArr).then(() => {
-            resolve()
+            resolve();
           }).catch((err) => {
-            reject(err)
+            reject(err);
           })
         })
       },

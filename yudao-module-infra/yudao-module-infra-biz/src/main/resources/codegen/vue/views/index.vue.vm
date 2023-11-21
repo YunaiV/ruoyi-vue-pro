@@ -152,14 +152,14 @@
   ## 特殊：主子表专属逻辑
   #if ( $table.templateType == 11 && $subTables && $subTables.size() > 0 )
     <!-- 子表的列表 -->
-      <el-tabs model-value="$subClassNameVars.get(0)">
+      <el-tabs v-model="subTabsName">
           #foreach ($subTable in $subTables)
               #set ($index = $foreach.count - 1)
               #set ($subClassNameVar = $subClassNameVars.get($index))
               #set ($subSimpleClassName = $subSimpleClassNames.get($index))
               #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
             <el-tab-pane label="${subTable.classComment}" name="$subClassNameVar">
-              <${subSimpleClassName}List :${subJoinColumn_strikeCase}="currentRow.id" />
+              <${subSimpleClassName}List v-if="currentRow.id" :${subJoinColumn_strikeCase}="currentRow.id" />
             </el-tab-pane>
           #end
       </el-tabs>
@@ -247,7 +247,14 @@ export default {
         #end
         #end
         #end
-      }
+      },
+        ## 特殊：主子表专属逻辑-erp
+        #if ( $table.templateType == 11)
+            #if ( $subTables && $subTables.size() > 0 )
+              /** 子表的列表 */
+              subTabsName: '$subClassNameVars.get(0)'
+            #end
+        #end
     };
   },
   created() {
@@ -285,7 +292,7 @@ export default {
     },
     /** 添加/修改操作 */
     openForm(id) {
-      this.#[[$]]#refs["formRef"].open(id)
+      this.#[[$]]#refs["formRef"].open(id);
     },
     /** 删除按钮操作 */
     handleDelete(row) {
@@ -319,7 +326,11 @@ export default {
       #if ( $table.templateType == 11 )
         /** 选中行操作 */
         handleCurrentChange(row) {
-         this.currentRow = row
+         this.currentRow = row;
+        #if ( $subTables && $subTables.size() > 0 )
+          /** 子表的列表 */
+          this.subTabsName = '$subClassNameVars.get(0)';
+        #end
         },
       #end
       ## 特殊：树表专属逻辑
