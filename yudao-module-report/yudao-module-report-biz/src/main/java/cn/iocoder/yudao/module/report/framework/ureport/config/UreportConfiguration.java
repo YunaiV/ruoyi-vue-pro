@@ -12,17 +12,15 @@ import javax.servlet.Servlet;
 /**
  * Ureport 配置类
  * 加载ureport对应的xml配置文件
+ * @author  赤焰
  */
-@PropertySource(value = {"classpath:ureport.properties"})
-@ImportResource("classpath:ureport-console-context.xml")
 @Configuration
-public class UreportConfig{
+@ImportResource({"classpath:ureport-console-context.xml"})
+@PropertySource(value = {"classpath:ureport.properties"})
+public class UreportConfiguration {
 
-    /**
-     * ureport2报表Servlet配置
-     */
     @Bean
-    public ServletRegistrationBean<Servlet> ureport2Servlet(){
+    public ServletRegistrationBean<Servlet> registrationBean() {
         return new ServletRegistrationBean<>(new UReportServlet(), "/ureport/*");
     }
 
