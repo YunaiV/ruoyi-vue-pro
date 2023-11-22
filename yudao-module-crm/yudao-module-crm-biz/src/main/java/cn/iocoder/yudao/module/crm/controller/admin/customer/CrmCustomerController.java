@@ -8,8 +8,6 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
-import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -103,23 +101,21 @@ public class CrmCustomerController {
         return success(CrmCustomerConvert.INSTANCE.convert(customer, userMap, deptMap));
     }
 
-    // TODO @puhui999：领取公海客户，是不是放到客户那更合适哈？
     @PutMapping("/receive")
-    @Operation(summary = "领取公海数据")
-    @PreAuthorize("@ss.hasPermission('crm:permission:update')")
-    public CommonResult<Boolean> receive(@RequestParam("bizType") Integer bizType, @RequestParam("bizId") Long bizId) {
-        permissionService.receiveBiz(bizType, bizId, getLoginUserId());
+    @Operation(summary = "领取客户公海数据")
+    @Parameter(name = "id", description = "客户编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('crm:customer:update')")
+    public CommonResult<Boolean> receive(@RequestParam("id") Long id) {
+        customerService.receive(id, getLoginUserId());
         return success(true);
     }
 
-    // TODO @puhui999：是不是放到客户那更合适哈？
     @PutMapping("/put-pool")
     @Operation(summary = "数据放入公海")
-    @PreAuthorize("@ss.hasPermission('crm:permission:update')")
-    @CrmPermission(bizTypeValue = "#bizType", bizId = "#bizId"
-            , level = CrmPermissionLevelEnum.OWNER)
-    public CommonResult<Boolean> putPool(@RequestParam(value = "bizType") Integer bizType, @RequestParam("bizId") Long bizId) {
-        permissionService.putPool(bizType, bizId, getLoginUserId());
+    @Parameter(name = "id", description = "客户编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('crm:customer:update')")
+    public CommonResult<Boolean> putPool(@RequestParam("id") Long id) {
+        customerService.putPool(id);
         return success(true);
     }
 

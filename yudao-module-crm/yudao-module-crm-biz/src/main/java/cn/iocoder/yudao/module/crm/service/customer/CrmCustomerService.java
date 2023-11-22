@@ -86,21 +86,38 @@ public interface CrmCustomerService {
     void lockCustomer(@Valid CrmCustomerUpdateReqVO updateReqVO);
 
     // TODO @xiaqing：根据 controller 的建议，改下
+
     /**
      * 领取公海客户
      *
      * @param ids 要领取的客户 id
      */
-    void receive(List<Long>ids);
+    void receive(List<Long> ids);
 
     // TODO @xiaqing：根据 controller 的建议，改下
+
     /**
      * 分配公海客户
      *
-     * @param cIds 要分配的客户 id
+     * @param cIds    要分配的客户 id
      * @param ownerId 分配的负责人id
      * @author xiaqing
      */
-    void distributeByIds(List<Long>cIds,Long ownerId);
+    void distributeByIds(List<Long> cIds, Long ownerId);
+
+    /**
+     * 领取公海客户
+     *
+     * @param id     编号
+     * @param userId 用户编号
+     */
+    void receive(Long id, Long userId);
+
+    /**
+     * 客户放入公海
+     *
+     * @param id 客户编号
+     */
+    void putPool(Long id);
 
 }

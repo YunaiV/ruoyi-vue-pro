@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -35,10 +34,10 @@ public interface CrmPermissionMapper extends BaseMapperX<CrmPermissionDO> {
                 .eq(CrmPermissionDO::getUserId, userId));
     }
 
-    default List<CrmPermissionDO> selectListByBizTypeAndBizIdsAndLevel(Integer bizType, Collection<Long> bizIds, Integer level) {
+    default List<CrmPermissionDO> selectListByBizTypeAndBizIdAndLevel(Integer bizType, Long bizId, Integer level) {
         return selectList(new LambdaQueryWrapperX<CrmPermissionDO>()
                 .eq(CrmPermissionDO::getBizType, bizType)
-                .in(CrmPermissionDO::getBizId, bizIds)
+                .eq(CrmPermissionDO::getBizId, bizId)
                 .eq(CrmPermissionDO::getLevel, level));
     }
 
