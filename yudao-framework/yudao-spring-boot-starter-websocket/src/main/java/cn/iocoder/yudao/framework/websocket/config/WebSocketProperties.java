@@ -15,15 +15,8 @@ import org.springframework.validation.annotation.Validated;
 public class WebSocketProperties {
 
     /**
-     * 路径
+     * WebSocket 的连接路径
      */
-    private String path = "";
-    /**
-     * 默认最多允许同时在线用户数
-     */
-    private int maxOnlineCount = 0;
-    /**
-     * 是否保存session
-     */
-    private boolean sessionMap = true;
+    private String path = "/ws";
+
 }
