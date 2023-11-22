@@ -69,6 +69,22 @@ public class AppCouponTemplateController {
         return success(CouponTemplateConvert.INSTANCE.convertAppList(list, canCanTakeMap));
     }
 
+    @GetMapping("/list-by-ids")
+    @Operation(summary = "获得优惠劵模版列表")
+    @Parameters({
+            @Parameter(name = "ids", description = "优惠券模板编号列表")
+    })
+    public CommonResult<List<AppCouponTemplateRespVO>> getCouponTemplateList(
+            @RequestParam(value = "ids", required = false) Set<Long> ids) {
+        // 1. 查询
+        List<CouponTemplateDO> list = couponTemplateService.getCouponTemplateList(ids);
+
+        // 2.1 领取数量
+        Map<Long, Boolean> canCanTakeMap = couponService.getUserCanCanTakeMap(getLoginUserId(), list);
+        // 2.2 拼接返回
+        return success(CouponTemplateConvert.INSTANCE.convertAppList(list, canCanTakeMap));
+    }
+
     @GetMapping("/page")
     @Operation(summary = "获得优惠劵模版分页")
     public CommonResult<PageResult<AppCouponTemplateRespVO>> getCouponTemplatePage(AppCouponTemplatePageReqVO pageReqVO) {

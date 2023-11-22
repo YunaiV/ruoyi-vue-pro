@@ -58,4 +58,6 @@ public interface CouponTemplateConvert {
         }
     }
 
+    List<CouponTemplateRespVO> convertList(List<CouponTemplateDO> list);
+
 }
