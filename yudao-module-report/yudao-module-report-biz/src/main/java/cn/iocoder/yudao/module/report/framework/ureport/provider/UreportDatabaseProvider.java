@@ -1,9 +1,11 @@
-/*
 package cn.iocoder.yudao.module.report.framework.ureport.provider;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.module.report.controller.admin.ureport.vo.UreportFileSaveReqVO;
 import cn.iocoder.yudao.module.report.dal.dataobject.ureport.UreportFileDO;
-import cn.iocoder.yudao.module.report.dal.mysql.ureport.UreportFileMapper;
+import cn.iocoder.yudao.module.report.service.ureport.UreportFileService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.bstek.ureport.provider.report.ReportFile;
 import com.bstek.ureport.provider.report.ReportProvider;
@@ -26,49 +28,43 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.report.enums.ErrorCodeConstants.UREPORT_FILE_EXISTS;
 import static cn.iocoder.yudao.module.report.enums.ErrorCodeConstants.UREPORT_FILE_NOT_EXISTS;
 
-*/
 /**
  * 提供数据库的存储方式
  * @author 赤焰
- *//*
-
+ */
 @Slf4j
+@Setter
 @Component
 @ConfigurationProperties(prefix = "ureport.provider.database")
 public class UreportDatabaseProvider implements ReportProvider{
 
-    private static final String NAME = "数据库存储系统";
+    private static final String NAME = "mysql-provider";
 
-    private String prefix = "db:";
+    private String prefix = "mysql:";
 
-    private boolean disabled;
-
+    private boolean disabled = false;
     @Resource
-    private UreportFileMapper ureportFileMapper;
+    private UreportFileService ureportFileService;
 
     @Override
     public InputStream loadReport(String file) {
-        LambdaQueryWrapper<UreportFileDO> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(UreportFileDO::getFileName, getCorrectName(file));
-        UreportFileDO reportDo = ureportFileMapper.selectOne(queryWrapper);
-        if (reportDo == null) {
+        Long reportDo = ureportFileService.checkExistByName(getCorrectName(file));
+        if (reportDo <=0) {
             throw exception(UREPORT_FILE_NOT_EXISTS);
         }
-        byte[] content = reportDo.getFileContent();
+        UreportFileDO ureportFileDO = ureportFileService.queryUreportFileDoByName(getCorrectName(file));
+        byte[] content = ureportFileDO.getFileContent();
         return new ByteArrayInputStream(content);
     }
 
     @Override
     public void deleteReport(String file) {
-        LambdaQueryWrapper<UreportFileDO> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(UreportFileDO::getFileName, getCorrectName(file));
-        ureportFileMapper.delete(queryWrapper);
+        ureportFileService.deleteReportFileByName(getCorrectName(file));
     }
 
     @Override
     public List<ReportFile> getReportFiles() {
-        LambdaQueryWrapper<UreportFileDO> reportFileQueryWrapper = new LambdaQueryWrapper<>();
-        List<UreportFileDO> list = ureportFileMapper.selectList(reportFileQueryWrapper);
+        List<UreportFileDO> list = ureportFileService.queryReportFileList();
         List<ReportFile> reportList = new ArrayList<>();
         if(CollUtil.isEmpty(list)){
             return reportList;
@@ -88,19 +84,23 @@ public class UreportDatabaseProvider implements ReportProvider{
         file = getCorrectName(file);
         LambdaQueryWrapper<UreportFileDO> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(UreportFileDO::getFileName, file);
-        Long count = ureportFileMapper.selectCount(queryWrapper);
+        Long count = ureportFileService.checkExistByName(file);
         if(count>1){
             throw exception(UREPORT_FILE_EXISTS);
         }
-        UreportFileDO ureportFileDO = ureportFileMapper.selectOne(queryWrapper);
+        UreportFileDO ureportFileDO = ureportFileService.queryUreportFileDoByName(file);
+        UreportFileSaveReqVO saveReqVO = new UreportFileSaveReqVO();
         if (ureportFileDO == null) {
-            ureportFileDO = new UreportFileDO();
-            ureportFileDO.setFileName(file);
-            ureportFileDO.setFileContent(content.getBytes());
-            ureportFileMapper.insert(ureportFileDO);
+            saveReqVO.setFileName(file);
+            saveReqVO.setFileContent(content);
+            saveReqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+            ureportFileService.createUreportFile(saveReqVO);
         } else {
-            ureportFileDO.setFileContent(content.getBytes());
-            ureportFileMapper.update(ureportFileDO, queryWrapper);
+            saveReqVO.setId(ureportFileDO.getId());
+            saveReqVO.setFileName(file);
+            saveReqVO.setFileContent(content);
+            saveReqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+            ureportFileService.updateUreportFile(saveReqVO);
         }
     }
 
@@ -120,10 +120,9 @@ public class UreportDatabaseProvider implements ReportProvider{
     }
 
     private String getCorrectName(String name) {
-        if (name.startsWith(prefix)) {
-            name = name.substring(prefix.length(), name.length());
+        if (name.startsWith(getPrefix())) {
+            name = name.substring(getPrefix().length());
         }
         return name;
     }
 }
-*/

@@ -1,21 +1,21 @@
 package cn.iocoder.yudao.module.report.service.ureport;
 
-import org.springframework.stereotype.Service;
-import javax.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
-import cn.iocoder.yudao.module.report.controller.admin.ureport.vo.*;
-import cn.iocoder.yudao.module.report.dal.dataobject.ureport.UreportFileDO;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-
+import cn.iocoder.yudao.module.report.controller.admin.ureport.vo.UreportFilePageReqVO;
+import cn.iocoder.yudao.module.report.controller.admin.ureport.vo.UreportFileSaveReqVO;
+import cn.iocoder.yudao.module.report.dal.dataobject.ureport.UreportFileDO;
 import cn.iocoder.yudao.module.report.dal.mysql.ureport.UreportFileMapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+
+import javax.annotation.Resource;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.report.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.report.enums.ErrorCodeConstants.UREPORT_FILE_NOT_EXISTS;
 
 /**
  * Ureport2报表 Service 实现类
@@ -71,4 +71,34 @@ public class UreportFileServiceImpl implements UreportFileService {
         return ureportFileMapper.selectPage(pageReqVO);
     }
 
+    @Override
+    public Long checkExistByName(String name) {
+        LambdaQueryWrapper<UreportFileDO> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(UreportFileDO::getFileName,name);
+        return ureportFileMapper.selectCount(queryWrapper);
+    }
+
+    @Override
+    public UreportFileDO queryUreportFileDoByName(String name) {
+        LambdaQueryWrapper<UreportFileDO> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(UreportFileDO::getFileName,name);
+        List<UreportFileDO> list = ureportFileMapper.selectList(queryWrapper);
+        if(CollectionUtil.isNotEmpty(list)){
+            return list.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public List<UreportFileDO> queryReportFileList() {
+        LambdaQueryWrapper<UreportFileDO> queryWrapper = new LambdaQueryWrapper<>();
+        return ureportFileMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public int deleteReportFileByName(String name) {
+        LambdaQueryWrapper<UreportFileDO> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(UreportFileDO::getFileName,name);
+        return ureportFileMapper.delete(queryWrapper);
+    }
 }

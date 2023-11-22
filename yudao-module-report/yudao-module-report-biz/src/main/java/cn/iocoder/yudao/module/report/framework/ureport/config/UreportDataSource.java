@@ -16,7 +16,7 @@ import java.sql.SQLException;
 @Component
 public class UreportDataSource implements BuildinDatasource {
 
-	private static final String NAME = "本机数据源";
+	private static final String NAME = "UreportDataSource";
 
 	@Resource
 	private DataSource dataSource;
