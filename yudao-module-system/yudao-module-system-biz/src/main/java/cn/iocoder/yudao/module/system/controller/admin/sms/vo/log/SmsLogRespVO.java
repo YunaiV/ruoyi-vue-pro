@@ -52,12 +52,6 @@ public class SmsLogRespVO {
     @Schema(description = "发送时间")
     private LocalDateTime sendTime;
 
-    @Schema(description = "发送结果的编码", example = "0")
-    private Integer sendCode;
-
-    @Schema(description = "发送结果的提示", example = "成功")
-    private String sendMsg;
-
     @Schema(description = "短信 API 发送结果的编码", example = "SUCCESS")
     private String apiSendCode;
 
