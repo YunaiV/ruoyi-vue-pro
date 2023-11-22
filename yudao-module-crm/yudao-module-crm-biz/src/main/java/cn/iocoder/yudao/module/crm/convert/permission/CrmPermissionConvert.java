@@ -15,9 +15,10 @@ import com.google.common.collect.Multimaps;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 
 /**
  * Crm 数据权限 Convert
@@ -43,9 +44,9 @@ public interface CrmPermissionConvert {
                                               Map<Long, DeptRespDTO> deptMap, Map<Long, PostRespDTO> postMap) {
         Map<Long, AdminUserRespDTO> userMap = CollectionUtils.convertMap(userList, AdminUserRespDTO::getId);
         return CollectionUtils.convertList(convert(permission), item -> {
-            MapUtils.findAndThen(userMap, item.getId(), user -> {
+            findAndThen(userMap, item.getUserId(), user -> {
                 item.setNickname(user.getNickname());
-                MapUtils.findAndThen(deptMap, user.getDeptId(), deptRespDTO -> {
+                findAndThen(deptMap, user.getDeptId(), deptRespDTO -> {
                     item.setDeptName(deptRespDTO.getName());
                 });
                 List<PostRespDTO> postRespList = MapUtils.getList(Multimaps.forMap(postMap), user.getPostIds());
@@ -56,12 +57,8 @@ public interface CrmPermissionConvert {
     }
 
     default List<CrmPermissionDO> convertList(CrmPermissionUpdateReqVO updateReqVO) {
-        // TODO @puhui999：CollectionUtils.convert
-        List<CrmPermissionDO> permissions = new ArrayList<>();
-        updateReqVO.getIds().forEach(id -> {
-            permissions.add(new CrmPermissionDO().setId(id).setLevel(updateReqVO.getLevel()));
-        });
-        return permissions;
+        return CollectionUtils.convertList(updateReqVO.getIds(),
+                id -> new CrmPermissionDO().setId(id).setLevel(updateReqVO.getLevel()));
     }
 
 }

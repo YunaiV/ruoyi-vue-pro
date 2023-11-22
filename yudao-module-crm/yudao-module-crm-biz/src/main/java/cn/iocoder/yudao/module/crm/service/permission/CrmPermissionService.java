@@ -78,6 +78,7 @@ public interface CrmPermissionService {
      */
     List<CrmPermissionDO> getPermissionByBizTypeAndBizIdsAndLevel(Integer bizType, Collection<Long> bizIds, Integer level);
 
+    List<CrmPermissionDO> getPermissionListByIds(Collection<Long> ids);
     /**
      * 数据权限转移
      *

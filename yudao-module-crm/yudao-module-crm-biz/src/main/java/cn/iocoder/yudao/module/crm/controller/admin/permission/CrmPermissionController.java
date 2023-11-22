@@ -3,13 +3,13 @@ package cn.iocoder.yudao.module.crm.controller.admin.permission;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionUpdateReqVO;
 import cn.iocoder.yudao.module.crm.convert.permission.CrmPermissionConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
-import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -29,17 +29,14 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.anyMatch;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CRM_PERMISSION_NOT_EXISTS;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 
-@Tag(name = "管理后台 - CRM 数据权限（数据团队成员操作）")
+@Tag(name = "管理后台 - CRM 数据权限")
 @RestController
 @RequestMapping("/crm/permission")
 @Validated
@@ -55,78 +52,69 @@ public class CrmPermissionController {
     @Resource
     private PostApi postApi;
 
-    // TODO @puhui999：保持统一，create 噢；然后是 PostMapping
-    @PutMapping("/add")
-    @Operation(summary = "添加团队成员")
+    @PostMapping("/create")
+    @Operation(summary = "创建数据权限")
     @PreAuthorize("@ss.hasPermission('crm:permission:create')")
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PERMISSION, bizTypeValue = "#reqVO.bizType", bizId = "#reqVO.bizId",
-            level = CrmPermissionLevelEnum.OWNER)
+    @CrmPermission(bizTypeValue = "#reqVO.bizType", bizId = "#reqVO.bizId", level = CrmPermissionLevelEnum.OWNER)
     public CommonResult<Boolean> addPermission(@Valid @RequestBody CrmPermissionCreateReqVO reqVO) {
         permissionService.createPermission(CrmPermissionConvert.INSTANCE.convert(reqVO));
         return success(true);
     }
 
-    // TODO @puhui999：领取公海客户，是不是放到客户那更合适哈？
-    @PutMapping("/receive")
-    @Operation(summary = "领取公海数据")
-    @PreAuthorize("@ss.hasPermission('crm:permission:update')")
-    public CommonResult<Boolean> receive(@RequestParam("bizType") Integer bizType, @RequestParam("bizId") Long bizId) {
-        permissionService.receiveBiz(bizType, bizId, getLoginUserId());
-        return success(true);
-    }
-
-    // TODO @puhui999：是不是放到客户那更合适哈？
-    @PutMapping("/put-pool")
-    @Operation(summary = "数据放入公海")
-    @PreAuthorize("@ss.hasPermission('crm:permission:update')")
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PERMISSION, bizTypeValue = "#bizType", bizId = "#bizId"
-            , level = CrmPermissionLevelEnum.OWNER)
-    public CommonResult<Boolean> putPool(@RequestParam(value = "bizType") Integer bizType, @RequestParam("bizId") Long bizId) {
-        permissionService.putPool(bizType, bizId, getLoginUserId());
-        return success(true);
-    }
-
     @PutMapping("/update")
-    @Operation(summary = "编辑团队成员权限")
+    @Operation(summary = "编辑数据权限")
     @PreAuthorize("@ss.hasPermission('crm:permission:update')")
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PERMISSION, bizTypeValue = "#updateReqVO.bizType", bizId = "#updateReqVO.bizId"
+    @CrmPermission(bizTypeValue = "#updateReqVO.bizType", bizId = "#updateReqVO.bizId"
             , level = CrmPermissionLevelEnum.OWNER)
     public CommonResult<Boolean> updatePermission(@Valid @RequestBody CrmPermissionUpdateReqVO updateReqVO) {
         permissionService.updatePermission(updateReqVO);
         return success(true);
     }
 
-    // TODO @puhui999：bizType 和 bizId 是不是不用啦；因为参数校验需要 bizType 和 bizId，可以先查询下，在直接调用方法；不一定都要注解哈；
     @DeleteMapping("/delete")
-    @Operation(summary = "移除团队成员")
-    @Parameters({
-            @Parameter(name = "bizType", description = "CRM 类型", required = true, example = "2"),
-            @Parameter(name = "bizId", description = "CRM 类型数据编号", required = true, example = "1024"),
-            @Parameter(name = "ids", description = "团队成员编号", required = true, example = "1024")
-    })
+    @Operation(summary = "删除数据权限")
+    @Parameter(name = "ids", description = "数据权限编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('crm:permission:delete')")
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PERMISSION, bizTypeValue = "#bizType", bizId = "#bizId"
-            , level = CrmPermissionLevelEnum.OWNER) // 为了校验权限请求必须带上 bizType 和  bizId
-    public CommonResult<Boolean> deletePermission(@RequestParam("bizType") Integer bizType,
-                                                  @RequestParam("bizId") Long bizId,
-                                                  @RequestParam("ids") Collection<Long> ids) {
+    public CommonResult<Boolean> deletePermission(@RequestParam("ids") Collection<Long> ids) {
+        List<CrmPermissionDO> permissions = permissionService.getPermissionListByIds(ids);
+        if (CollUtil.isEmpty(permissions)) {
+            throw exception(CRM_PERMISSION_NOT_EXISTS);
+        }
+        Set<Long> bizIds = convertSet(permissions, CrmPermissionDO::getBizId);
+        if (bizIds.size() > 1) { // 情况一：数据权限的模块数据编号是一致的不可能存在两个
+            throw exception(CRM_PERMISSION_DELETE_FAIL);
+        }
+        if (permissions.size() != ids.size()) { // 情况二：期望数量和实际结果不一致
+            throw exception(CRM_PERMISSION_NOT_EXISTS);
+        }
+        // 情况三：不能包含负责人
+        boolean isOwner = CollectionUtils.anyMatch(permissions, item -> ObjUtil.equal(item.getLevel(), CrmPermissionLevelEnum.OWNER.getLevel()));
+        if (isOwner) {
+            throw exception(CRM_PERMISSION_DELETE_FAIL_EXIST_OWNER);
+        }
+        // 校验操作人是否为负责人
+        CrmPermissionDO permission = permissionService.getPermissionByIdAndUserId(permissions.get(0).getBizId(), getLoginUserId());
+        if (!CrmPermissionLevelEnum.isOwner(permission.getLevel())) {
+            throw exception(CRM_PERMISSION_DELETE_DENIED);
+        }
+        // 删除数据权限
         permissionService.deletePermission(ids);
         return success(true);
     }
 
-    // TODO @puhui999：deleteSelfPermission；尽量归成 crud 这样的操作哈；
-    @DeleteMapping("/quit-team")
-    @Operation(summary = "退出团队")
-    @Parameters({
-            // TODO @puhui999：这个可以拿出来，不用包在 @Parameters 里，在只有一个参数时哈；
-            @Parameter(name = "id", description = "团队成员编号", required = true, example = "1024")
-    })
+    @DeleteMapping("/deleteSelfPermission")
+    @Operation(summary = "删除自己的数据权限")
+    @Parameter(name = "id", description = "数据权限编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('crm:permission:delete')")
     public CommonResult<Boolean> deletePermission(@RequestParam("id") Long id) {
         // 校验数据存在且是自己
         CrmPermissionDO permission = permissionService.getPermissionByIdAndUserId(id, getLoginUserId());
         if (permission == null) {
             throw exception(CRM_PERMISSION_NOT_EXISTS);
+        }
+        // 校验是否是负责人
+        if (CrmPermissionLevelEnum.isOwner(permission.getLevel())) {
+            throw exception(CRM_PERMISSION_DELETE_SELF_PERMISSION_FAIL_EXIST_OWNER);
         }
 
         // 删除
@@ -135,7 +123,7 @@ public class CrmPermissionController {
     }
 
     @GetMapping("/list")
-    @Operation(summary = "获取团队成员")
+    @Operation(summary = "获取数据权限列表")
     @Parameters({
             @Parameter(name = "bizType", description = "CRM 类型", required = true, example = "2"),
             @Parameter(name = "bizId", description = "CRM 类型数据编号", required = true, example = "1024")
@@ -147,19 +135,11 @@ public class CrmPermissionController {
         if (CollUtil.isEmpty(permission)) {
             return success(Collections.emptyList());
         }
-        // TODO @puhui999：池子的逻辑；
-        // 判断是否是公海数据
-        // TODO @puhui999：这段逻辑，可以删除么？
-        Predicate<CrmPermissionDO> filter = item -> ObjUtil.equal(item.getUserId(), CrmPermissionDO.POOL_USER_ID);
-        if (anyMatch(permission, filter)) {
-            permission.removeIf(filter); // 排除
-        }
 
         // 拼接数据
         List<AdminUserRespDTO> userList = adminUserApi.getUserList(convertSet(permission, CrmPermissionDO::getUserId));
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userList, AdminUserRespDTO::getDeptId));
-        // TODO @puhui999：CollectionUtils.convertSetByFlatMap() 看看可以不
-        Set<Long> postIds = userList.stream().flatMap(item -> item.getPostIds().stream()).collect(Collectors.toSet());
+        Set<Long> postIds = CollectionUtils.convertSetByFlatMap(userList, AdminUserRespDTO::getPostIds, Collection::stream);
         Map<Long, PostRespDTO> postMap = postApi.getPostMap(postIds);
         return success(CrmPermissionConvert.INSTANCE.convert(permission, userList, deptMap, postMap));
     }

@@ -1,5 +1,5 @@
 ### 请求 /add
-PUT {{baseUrl}}/crm/permission/add
+POST {{baseUrl}}/crm/permission/create
 Content-Type: application/json
 Authorization: Bearer {{token}}
 tenant-id: {{adminTenentId}}

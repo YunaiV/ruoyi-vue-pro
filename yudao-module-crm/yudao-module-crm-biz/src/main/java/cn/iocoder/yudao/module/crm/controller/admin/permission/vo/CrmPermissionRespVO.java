@@ -6,7 +6,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-@Schema(description = "管理后台 - CRM 数据权限（团队成员） Response VO")
+@Schema(description = "管理后台 - CRM 数据权限 Response VO")
 @Data
 public class CrmPermissionRespVO extends CrmPermissionBaseVO {
 
