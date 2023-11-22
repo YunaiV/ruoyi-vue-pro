@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.crm.controller.admin.customer.vo;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import cn.iocoder.yudao.module.crm.enums.customer.CrmCustomerSceneEnum;
+import cn.iocoder.yudao.module.crm.enums.common.CrmCustomerSceneEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

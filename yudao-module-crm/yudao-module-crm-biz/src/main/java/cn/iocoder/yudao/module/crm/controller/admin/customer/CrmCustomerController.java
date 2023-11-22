@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.crm.controller.admin.customer;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -9,8 +8,7 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
-import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
@@ -30,7 +28,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -94,19 +92,35 @@ public class CrmCustomerController {
         }
 
         // 2. 拼接数据
-        // 2.1 获取负责人
-        List<CrmPermissionDO> ownerList = permissionService.getPermissionByBizTypeAndBizIdsAndLevel(
-                CrmBizTypeEnum.CRM_CUSTOMER.getType(), Collections.singletonList(customer.getId()),
-                CrmPermissionLevelEnum.OWNER.getLevel());
-        Map<Long, CrmPermissionDO> ownerMap = convertMap(ownerList, CrmPermissionDO::getBizId);
-        // 2.2 获取负责人详情
-        Set<Long> userIds = convertSet(ownerList, CrmPermissionDO::getUserId);
+        // 2.1 获取负责人详情
+        Set<Long> userIds = new HashSet<>();
+        userIds.add(customer.getOwnerUserId()); // 负责人
         userIds.add(Long.parseLong(customer.getCreator())); // 加入创建者
         List<AdminUserRespDTO> userList = adminUserApi.getUserList(userIds);
         Map<Long, AdminUserRespDTO> userMap = convertMap(userList, AdminUserRespDTO::getId);
-        // 2.3 获取部门详情
+        // 2.2 获取部门详情
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userList, AdminUserRespDTO::getDeptId));
-        return success(CrmCustomerConvert.INSTANCE.convert(customer, ownerMap, userMap, deptMap));
+        return success(CrmCustomerConvert.INSTANCE.convert(customer, userMap, deptMap));
+    }
+
+    // TODO @puhui999：领取公海客户，是不是放到客户那更合适哈？
+    @PutMapping("/receive")
+    @Operation(summary = "领取公海数据")
+    @PreAuthorize("@ss.hasPermission('crm:permission:update')")
+    public CommonResult<Boolean> receive(@RequestParam("bizType") Integer bizType, @RequestParam("bizId") Long bizId) {
+        permissionService.receiveBiz(bizType, bizId, getLoginUserId());
+        return success(true);
+    }
+
+    // TODO @puhui999：是不是放到客户那更合适哈？
+    @PutMapping("/put-pool")
+    @Operation(summary = "数据放入公海")
+    @PreAuthorize("@ss.hasPermission('crm:permission:update')")
+    @CrmPermission(bizTypeValue = "#bizType", bizId = "#bizId"
+            , level = CrmPermissionLevelEnum.OWNER)
+    public CommonResult<Boolean> putPool(@RequestParam(value = "bizType") Integer bizType, @RequestParam("bizId") Long bizId) {
+        permissionService.putPool(bizType, bizId, getLoginUserId());
+        return success(true);
     }
 
     // TODO @puhui999：可以在 CrmCustomerPageReqVO 里面加个 pool 参数，为 true 时，代表来自公海客户的分页
@@ -114,42 +128,23 @@ public class CrmCustomerController {
     @Operation(summary = "获得客户分页")
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
     public CommonResult<PageResult<CrmCustomerRespVO>> getCustomerPage(@Valid CrmCustomerPageReqVO pageVO) {
-        PageResult<CrmCustomerDO> pageResult = customerService.getCustomerPage(pageVO, getLoginUserId());
-        if (CollUtil.isEmpty(pageResult.getList())) {
-            return success(PageResult.empty(pageResult.getTotal()));
-        }
+        //PageResult<CrmCustomerDO> pageResult = customerService.getCustomerPage(pageVO, getLoginUserId());
+        //if (CollUtil.isEmpty(pageResult.getList())) {
+        //    return success(PageResult.empty(pageResult.getTotal()));
+        //}
         // 拼接数据
-        // TODO @puhui999：这块的拼接逻辑，可以和 convertPage 合并下；
-//        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
-//                convertSetByFlatMap(pageResult.getList(), user -> Stream.of(NumberUtil.parseLong(user.getCreator()), user.getOwnerUserId())));
-//        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
-//                convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
         return convertPage(customerService.getCustomerPage(pageVO, getLoginUserId()));
     }
 
-    // TODO @puhui999：
-    @GetMapping("/pool-page")
-    @Operation(summary = "获得公海客户分页")
-    @PreAuthorize("@ss.hasPermission('crm:customer:query')")
-    public CommonResult<PageResult<CrmCustomerRespVO>> getPoolCustomerPage(@Valid CrmCustomerPageReqVO pageVO) {
-        return convertPage(customerService.getCustomerPage(pageVO, CrmPermissionDO.POOL_USER_ID));
-    }
-
     private CommonResult<PageResult<CrmCustomerRespVO>> convertPage(PageResult<CrmCustomerDO> pageResult) {
-        // 2. 拼接数据
-        Set<Long> ids = convertSet(pageResult.getList(), CrmCustomerDO::getId);
-        // 2.1 获取负责人
-        List<CrmPermissionDO> ownerList = permissionService.getPermissionByBizTypeAndBizIdsAndLevel(
-                CrmBizTypeEnum.CRM_CUSTOMER.getType(), ids, CrmPermissionLevelEnum.OWNER.getLevel());
-        Map<Long, CrmPermissionDO> ownerMap = convertMap(ownerList, CrmPermissionDO::getBizId);
-        // 2.2 获取负责人详情
-        Set<Long> userIds = convertSet(ownerList, CrmPermissionDO::getUserId);
+        // 1.1 获取负责人详情
+        Set<Long> userIds = convertSet(pageResult.getList(), CrmCustomerDO::getOwnerUserId);
         userIds.addAll(convertSet(pageResult.getList(), item -> Long.parseLong(item.getCreator()))); // 加入创建者
         List<AdminUserRespDTO> userList = adminUserApi.getUserList(userIds);
         Map<Long, AdminUserRespDTO> userMap = convertMap(userList, AdminUserRespDTO::getId);
-        // 2.3 获取部门详情
+        // 1.2 获取部门详情
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userList, AdminUserRespDTO::getDeptId));
-        return success(CrmCustomerConvert.INSTANCE.convertPage(pageResult, ownerMap, userMap, deptMap));
+        return success(CrmCustomerConvert.INSTANCE.convertPage(pageResult, userMap, deptMap));
     }
 
     @GetMapping("/export-excel")
@@ -185,10 +180,10 @@ public class CrmCustomerController {
     @Operation(summary = "领取公海客户")
     // TODO @xiaqing：1）receiveCustomer 方法名字；2）cIds 改成 ids，要加下 @RequestParam，还有 swagger 注解；3）参数非空，使用 validator 校验；4）返回 true 即可；
     @PreAuthorize("@ss.hasPermission('crm:customer:receive')")
-    public CommonResult<String> receiveByIds(List<Long> cIds){
+    public CommonResult<String> receiveByIds(List<Long> cIds) {
         // 判断是否为空
-        if(CollectionUtils.isEmpty(cIds))
-            return error(GlobalErrorCodeConstants.BAD_REQUEST.getCode(),GlobalErrorCodeConstants.BAD_REQUEST.getMsg());
+        if (CollectionUtils.isEmpty(cIds))
+            return error(GlobalErrorCodeConstants.BAD_REQUEST.getCode(), GlobalErrorCodeConstants.BAD_REQUEST.getMsg());
         // 领取公海任务
         // TODO @xiaqing：userid，通过 controller 传递给 service，不要在 service 里面获取，无状态
         customerService.receive(cIds);
@@ -199,11 +194,11 @@ public class CrmCustomerController {
     @PutMapping("/distributeByIds")
     @Operation(summary = "分配公海给对应负责人")
     @PreAuthorize("@ss.hasPermission('crm:customer:distributeByIds')")
-    public CommonResult<String> distributeByIds(Long ownerId,List<Long>cIds){
+    public CommonResult<String> distributeByIds(Long ownerId, List<Long> cIds) {
         //判断参数不能为空
-        if(ownerId==null || CollectionUtils.isEmpty(cIds))
-            return error(GlobalErrorCodeConstants.BAD_REQUEST.getCode(),GlobalErrorCodeConstants.BAD_REQUEST.getMsg());
-        customerService.distributeByIds(cIds,ownerId);
+        if (ownerId == null || CollectionUtils.isEmpty(cIds))
+            return error(GlobalErrorCodeConstants.BAD_REQUEST.getCode(), GlobalErrorCodeConstants.BAD_REQUEST.getMsg());
+        customerService.distributeByIds(cIds, ownerId);
         return success("分配成功");
     }
 

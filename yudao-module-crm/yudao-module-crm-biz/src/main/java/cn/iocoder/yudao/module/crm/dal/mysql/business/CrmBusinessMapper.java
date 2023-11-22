@@ -26,8 +26,7 @@ public interface CrmBusinessMapper extends BaseMapperX<CrmBusinessDO> {
                 .orderByDesc(CrmBusinessDO::getId));
     }
 
-    // TODO @puhui999：selectList 噢；
-    default List<CrmBusinessDO> selectPage(CrmBusinessExportReqVO reqVO) {
+    default List<CrmBusinessDO> selectList(CrmBusinessExportReqVO reqVO) {
         return selectList(new LambdaQueryWrapperX<CrmBusinessDO>()
                 .likeIfPresent(CrmBusinessDO::getName, reqVO.getName())
                 .eqIfPresent(CrmBusinessDO::getStatusTypeId, reqVO.getStatusTypeId())

@@ -1,0 +1,6 @@
+### 请求 /update
+GET {{baseUrl}}/crm/customer/page?pageNo=1&pageSize=10&name="张三"
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+

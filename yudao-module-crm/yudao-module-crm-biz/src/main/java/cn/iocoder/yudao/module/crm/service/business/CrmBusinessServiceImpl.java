@@ -117,7 +117,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
     @Override
     public List<CrmBusinessDO> getBusinessList(CrmBusinessExportReqVO exportReqVO) {
-        return businessMapper.selectPage(exportReqVO);
+        return businessMapper.selectList(exportReqVO);
     }
 
     @Override

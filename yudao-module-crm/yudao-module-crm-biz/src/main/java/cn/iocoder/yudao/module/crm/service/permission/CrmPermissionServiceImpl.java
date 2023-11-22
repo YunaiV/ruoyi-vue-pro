@@ -156,12 +156,13 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void receiveBiz(Integer bizType, Long bizId, Long userId) {
-        CrmPermissionDO permission = crmPermissionMapper.selectByBizTypeAndBizIdByUserId(bizType, bizId, CrmPermissionDO.POOL_USER_ID);
-        if (permission == null) { // 不存在则模块数据也不存在
-            throw exception(CRM_PERMISSION_MODEL_NOT_EXISTS, CrmBizTypeEnum.getNameByType(bizType));
-        }
-
-        crmPermissionMapper.updateById(new CrmPermissionDO().setId(permission.getId()).setUserId(userId));
+        //CrmPermissionDO permission = crmPermissionMapper.selectByBizTypeAndBizIdByUserId(bizType, bizId, CrmPermissionDO.POOL_USER_ID);
+        //if (permission == null) { // 不存在则模块数据也不存在
+        //    throw exception(CRM_PERMISSION_MODEL_NOT_EXISTS, CrmBizTypeEnum.getNameByType(bizType));
+        //}
+        //
+        //crmPermissionMapper.updateById(new CrmPermissionDO().setId(permission.getId()).setUserId(userId));
+        // TODO puhui999: 领取数据后需要创建一个负责人数据权限
     }
 
     @Override
@@ -171,8 +172,7 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
         if (permission == null) { // 不存在则模块数据也不存在
             throw exception(CRM_PERMISSION_MODEL_NOT_EXISTS, CrmBizTypeEnum.getNameByType(bizType));
         }
-        // 更新
-        crmPermissionMapper.updateById(new CrmPermissionDO().setId(permission.getId()).setUserId(CrmPermissionDO.POOL_USER_ID));
+        // TODO puhui999: 数据放入公海后删除负责人的数据权限，完事数据负责人设置为 null
     }
 
 }

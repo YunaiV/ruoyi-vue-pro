@@ -24,7 +24,7 @@ public @interface CrmPermission {
     /**
      * CRM 类型
      */
-    CrmBizTypeEnum bizType();
+    CrmBizTypeEnum[] bizType() default {};
 
     /**
      * CRM 类型扩展，通过 Spring EL 表达式获取到 {@link #bizType()}
