@@ -37,15 +37,15 @@ public interface SmsLogService {
      * 更新日志的发送结果
      *
      * @param id 日志编号
-     * @param sendCode 发送结果的编码
-     * @param sendMsg 发送结果的提示
+     * @param success 发送是否成功
      * @param apiSendCode 短信 API 发送结果的编码
      * @param apiSendMsg 短信 API 发送失败的提示
      * @param apiRequestId 短信 API 发送返回的唯一请求 ID
      * @param apiSerialNo 短信 API 发送返回的序号
      */
-    void updateSmsSendResult(Long id, Integer sendCode, String sendMsg,
-                             String apiSendCode, String apiSendMsg, String apiRequestId, String apiSerialNo);
+    void updateSmsSendResult(Long id, Boolean success,
+                             String apiSendCode, String apiSendMsg,
+                             String apiRequestId, String apiSerialNo);
 
     /**
      * 更新日志的接收结果
@@ -56,7 +56,8 @@ public interface SmsLogService {
      * @param apiReceiveCode API 接收结果的编码
      * @param apiReceiveMsg API 接收结果的说明
      */
-    void updateSmsReceiveResult(Long id, Boolean success, LocalDateTime receiveTime, String apiReceiveCode, String apiReceiveMsg);
+    void updateSmsReceiveResult(Long id, Boolean success,
+                                LocalDateTime receiveTime, String apiReceiveCode, String apiReceiveMsg);
 
     /**
      * 获得短信日志分页

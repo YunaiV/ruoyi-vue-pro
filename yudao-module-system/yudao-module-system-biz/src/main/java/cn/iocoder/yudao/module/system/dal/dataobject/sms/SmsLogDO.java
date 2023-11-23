@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.sms;
 
-import cn.iocoder.yudao.module.system.enums.sms.SmsReceiveStatusEnum;
-import cn.iocoder.yudao.module.system.enums.sms.SmsSendStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.framework.sms.core.enums.SmsFrameworkErrorCodeConstants;
+import cn.iocoder.yudao.module.system.enums.sms.SmsReceiveStatusEnum;
+import cn.iocoder.yudao.module.system.enums.sms.SmsSendStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -115,19 +114,6 @@ public class SmsLogDO extends BaseDO {
      * 发送时间
      */
     private LocalDateTime sendTime;
-    /**
-     * 发送结果的编码
-     *
-     * 枚举 {@link SmsFrameworkErrorCodeConstants}
-     */
-    private Integer sendCode;
-    /**
-     * 发送结果的提示
-     *
-     * 一般情况下，使用 {@link SmsFrameworkErrorCodeConstants}
-     * 异常情况下，通过格式化 Exception 的提示存储
-     */
-    private String sendMsg;
     /**
      * 短信 API 发送结果的编码
      *
