@@ -1,11 +1,13 @@
 package cn.iocoder.yudao.module.crm.controller.admin.customer.vo;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import cn.iocoder.yudao.module.crm.enums.common.CrmCustomerSceneEnum;
+import cn.iocoder.yudao.module.crm.enums.common.CrmSceneEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+
+import javax.validation.constraints.NotNull;
 
 @Schema(description = "管理后台 - CRM 客户分页 Request VO")
 @Data
@@ -31,9 +33,13 @@ public class CrmCustomerPageReqVO extends PageParam {
     /**
      * 场景类型
      *
-     * 关联 {@link CrmCustomerSceneEnum}
+     * 关联 {@link CrmSceneEnum}
      */
     @Schema(description = "场景类型", example = "1")
     private Integer sceneType;
+
+    @Schema(description = "是否为公海数据", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
+    @NotNull(message = "是否为公海数据不能为空")
+    private Boolean pool;
 
 }

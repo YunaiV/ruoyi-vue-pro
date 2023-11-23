@@ -17,13 +17,10 @@ public class CrmPermissionUtils {
      * @param bizTyp           模块类型
      * @param userId           用户
      */
-    public static void builderLeftJoinQuery(MPJLambdaWrapper<?> mpjLambdaWrapper, Integer bizTyp, Long userId) {
+    public static void builderRightJoinQuery(MPJLambdaWrapper<?> mpjLambdaWrapper, Integer bizTyp, Long userId) {
+        String querySql = "(SELECT t1.biz_id FROM crm_permission t1 WHERE (t1.biz_type = {} AND t1.user_id = {})) t2 on t.id = t2.biz_id";
         // 默认主表别名是 t
-        mpjLambdaWrapper.leftJoin(StrUtil.format("(" +
-                "select p.biz_id from crm_permission p" +
-                " where p.biz_type = {} and p.user_id = {}" +
-                ") t2" +
-                " on t.id = t2.biz_id", bizTyp, userId));
+        mpjLambdaWrapper.rightJoin(StrUtil.format(querySql, bizTyp, userId));
     }
 
 }

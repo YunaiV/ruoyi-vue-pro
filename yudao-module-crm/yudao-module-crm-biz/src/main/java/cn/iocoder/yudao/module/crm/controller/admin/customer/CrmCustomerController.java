@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.crm.controller.admin.customer;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -9,7 +10,6 @@ import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
-import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -51,8 +51,6 @@ public class CrmCustomerController {
     private DeptApi deptApi;
     @Resource
     private AdminUserApi adminUserApi;
-    @Resource
-    private CrmPermissionService permissionService;
 
     @PostMapping("/create")
     @Operation(summary = "创建客户")
@@ -119,20 +117,14 @@ public class CrmCustomerController {
         return success(true);
     }
 
-    // TODO @puhui999：可以在 CrmCustomerPageReqVO 里面加个 pool 参数，为 true 时，代表来自公海客户的分页
     @GetMapping("/page")
     @Operation(summary = "获得客户分页")
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
     public CommonResult<PageResult<CrmCustomerRespVO>> getCustomerPage(@Valid CrmCustomerPageReqVO pageVO) {
-        //PageResult<CrmCustomerDO> pageResult = customerService.getCustomerPage(pageVO, getLoginUserId());
-        //if (CollUtil.isEmpty(pageResult.getList())) {
-        //    return success(PageResult.empty(pageResult.getTotal()));
-        //}
-        // 拼接数据
-        return convertPage(customerService.getCustomerPage(pageVO, getLoginUserId()));
-    }
-
-    private CommonResult<PageResult<CrmCustomerRespVO>> convertPage(PageResult<CrmCustomerDO> pageResult) {
+        PageResult<CrmCustomerDO> pageResult = customerService.getCustomerPage(pageVO, getLoginUserId());
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty(pageResult.getTotal()));
+        }
         // 1.1 获取负责人详情
         Set<Long> userIds = convertSet(pageResult.getList(), CrmCustomerDO::getOwnerUserId);
         userIds.addAll(convertSet(pageResult.getList(), item -> Long.parseLong(item.getCreator()))); // 加入创建者
@@ -172,19 +164,19 @@ public class CrmCustomerController {
         return success(true);
     }
 
-    @PutMapping("/receive")
-    @Operation(summary = "领取公海客户")
-    // TODO @xiaqing：1）receiveCustomer 方法名字；2）cIds 改成 ids，要加下 @RequestParam，还有 swagger 注解；3）参数非空，使用 validator 校验；4）返回 true 即可；
-    @PreAuthorize("@ss.hasPermission('crm:customer:receive')")
-    public CommonResult<String> receiveByIds(List<Long> cIds) {
-        // 判断是否为空
-        if (CollectionUtils.isEmpty(cIds))
-            return error(GlobalErrorCodeConstants.BAD_REQUEST.getCode(), GlobalErrorCodeConstants.BAD_REQUEST.getMsg());
-        // 领取公海任务
-        // TODO @xiaqing：userid，通过 controller 传递给 service，不要在 service 里面获取，无状态
-        customerService.receive(cIds);
-        return success("领取成功");
-    }
+    //@PutMapping("/receive")
+    //@Operation(summary = "领取公海客户")
+    //// TODO @xiaqing：1）receiveCustomer 方法名字；2）cIds 改成 ids，要加下 @RequestParam，还有 swagger 注解；3）参数非空，使用 validator 校验；4）返回 true 即可；
+    //@PreAuthorize("@ss.hasPermission('crm:customer:receive')")
+    //public CommonResult<String> receiveByIds(List<Long> cIds) {
+    //    // 判断是否为空
+    //    if (CollectionUtils.isEmpty(cIds))
+    //        return error(GlobalErrorCodeConstants.BAD_REQUEST.getCode(), GlobalErrorCodeConstants.BAD_REQUEST.getMsg());
+    //    // 领取公海任务
+    //    // TODO @xiaqing：userid，通过 controller 传递给 service，不要在 service 里面获取，无状态
+    //    customerService.receive(cIds);
+    //    return success("领取成功");
+    //}
 
     // TODO @xiaqing：1）distributeCustomer 方法名；2）cIds 同上；3）参数校验，同上；4）ownerId 改成 ownerUserId，和别的模块统一；5）返回 true 即可；
     @PutMapping("/distributeByIds")

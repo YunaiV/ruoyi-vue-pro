@@ -8,18 +8,18 @@ import lombok.Getter;
 import java.util.Arrays;
 
 /**
- * CRM 客户等级
+ * CRM 列表检索场景
  *
- * @author Wanwan
+ * @author HUIHUI
  */
 @Getter
 @AllArgsConstructor
-public enum CrmCustomerSceneEnum implements IntArrayValuable {
+public enum CrmSceneEnum implements IntArrayValuable {
 
-    OWNER(1, "我负责的客户"),
-    FOLLOW(2, "我关注的客户");
+    OWNER(1, "我负责的"),
+    FOLLOW(2, "我关注的");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CrmCustomerSceneEnum::getType).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CrmSceneEnum::getType).toArray();
 
     /**
      * 场景类型
