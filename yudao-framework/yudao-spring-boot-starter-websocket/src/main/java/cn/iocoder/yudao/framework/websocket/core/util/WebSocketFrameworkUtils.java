@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.framework.websocket.core.util;
 
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import org.springframework.lang.Nullable;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.Map;
@@ -39,7 +38,6 @@ public class WebSocketFrameworkUtils {
      *
      * @return 用户编号
      */
-    @Nullable
     public static Long getLoginUserId(WebSocketSession session) {
         LoginUser loginUser = getLoginUser(session);
         return loginUser != null ? loginUser.getId() : null;
@@ -50,10 +48,20 @@ public class WebSocketFrameworkUtils {
      *
      * @return 用户编号
      */
-    @Nullable
     public static Integer getLoginUserType(WebSocketSession session) {
         LoginUser loginUser = getLoginUser(session);
         return loginUser != null ? loginUser.getUserType() : null;
+    }
+
+    /**
+     * 获得当前用户的租户编号
+     *
+     * @param session Session
+     * @return 租户编号
+     */
+    public static Long getTenantId(WebSocketSession session) {
+        LoginUser loginUser = getLoginUser(session);
+        return loginUser != null ? loginUser.getTenantId() : null;
     }
 
 }

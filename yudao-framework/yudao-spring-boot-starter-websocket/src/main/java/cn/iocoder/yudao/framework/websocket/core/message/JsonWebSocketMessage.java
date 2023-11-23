@@ -3,13 +3,15 @@ package cn.iocoder.yudao.framework.websocket.core.message;
 import cn.iocoder.yudao.framework.websocket.core.listener.WebSocketMessageListener;
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * JSON 格式的 WebSocket 消息帧
  *
  * @author 芋道源码
  */
 @Data
-public class JsonWebSocketMessage {
+public class JsonWebSocketMessage implements Serializable {
 
     /**
      * 消息类型
@@ -22,6 +24,6 @@ public class JsonWebSocketMessage {
      *
      * 要求 JSON 对象
      */
-    private String message;
+    private String content;
 
 }
