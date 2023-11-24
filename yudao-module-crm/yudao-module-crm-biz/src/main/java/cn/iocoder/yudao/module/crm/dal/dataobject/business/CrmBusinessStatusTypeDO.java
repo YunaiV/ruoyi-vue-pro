@@ -1,23 +1,29 @@
-package cn.iocoder.yudao.module.crm.dal.dataobject.businessstatustype;
+package cn.iocoder.yudao.module.crm.dal.dataobject.business;
 
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+
+import java.util.List;
 
 /**
  * 商机状态类型 DO
  *
  * @author ljlleo
  */
-@TableName("crm_business_status_type")
+@TableName(value = "crm_business_status_type", autoResultMap = true)
 @KeySequence("crm_business_status_type_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
+@EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CrmBusinessStatusTypeDO {
+public class CrmBusinessStatusTypeDO extends BaseDO {
 
     /**
      * 主键
@@ -28,15 +34,14 @@ public class CrmBusinessStatusTypeDO {
      * 状态类型名
      */
     private String name;
-    // TODO @ljlleo：List 存储哈
     /**
      * 使用的部门编号
      */
-    private String deptIds;
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> deptIds;
     /**
      * 开启状态
      */
-    // TODO @ljlleo：这个字段，使用 Integer，对应 CommonStatus
     private Boolean status;
 
 }

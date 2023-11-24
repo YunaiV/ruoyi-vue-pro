@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -102,5 +103,13 @@ public interface CrmCustomerService {
      * @author xiaqing
      */
     void distributeByIds(List<Long>cIds,Long ownerId);
+
+    /**
+     * 根据客户ID集合查询客户集合
+     * @param ids
+     * @author ljlleo
+     * @return
+     */
+    List<CrmCustomerDO> getCustomerList(Collection<Long> ids);
 
 }

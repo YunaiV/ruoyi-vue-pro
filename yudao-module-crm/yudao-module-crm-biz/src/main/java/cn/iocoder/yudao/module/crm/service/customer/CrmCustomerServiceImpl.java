@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.crm.service.customer;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -106,9 +105,9 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
             permissions = CollectionUtils.filterList(permissions, item -> CrmPermissionLevelEnum.isOwner(item.getLevel()));
         }
         Set<Long> ids = convertSet(permissions, CrmPermissionDO::getBizId);
-        if (CollUtil.isEmpty(ids)) { // 没得说明没有什么给他看的
-            return PageResult.empty();
-        }
+//        if (CollUtil.isEmpty(ids)) { // 没得说明没有什么给他看的
+//            return PageResult.empty();
+//        }
 
         // 2. 获取客户分页数据
         return customerMapper.selectPage(pageReqVO, ids);
@@ -211,6 +210,11 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         if (customerMapper.selectById(id).getDealStatus() ==true) {
             throw exception(CUSTOMER_ALREADY_DEAL);
         }
+    }
+
+    @Override
+    public List<CrmCustomerDO> getCustomerList(Collection<Long> ids) {
+        return customerMapper.selectList(ids);
     }
 
 }

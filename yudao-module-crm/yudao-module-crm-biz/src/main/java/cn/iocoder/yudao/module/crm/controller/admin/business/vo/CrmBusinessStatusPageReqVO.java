@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.controller.admin.businessstatus.vo;
+package cn.iocoder.yudao.module.crm.controller.admin.business.vo;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,8 +11,5 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class CrmBusinessStatusPageReqVO extends PageParam {
-
-    @Schema(description = "状态类型编号", example = "22882")
-    private Long typeId;
 
 }

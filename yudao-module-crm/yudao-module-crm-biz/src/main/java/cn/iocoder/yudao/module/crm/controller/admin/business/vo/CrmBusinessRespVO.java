@@ -16,4 +16,13 @@ public class CrmBusinessRespVO extends CrmBusinessBaseVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
+    @Schema(description = "客户名称")
+    private String customerName;
+
+    @Schema(description = "状态类型名称")
+    private String statusTypeName;
+
+    @Schema(description = "状态名称")
+    private String statusName;
+
 }

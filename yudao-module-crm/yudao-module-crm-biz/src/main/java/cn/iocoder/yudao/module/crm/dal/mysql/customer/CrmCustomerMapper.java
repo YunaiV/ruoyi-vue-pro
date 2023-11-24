@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * 客户 Mapper
@@ -25,6 +26,11 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
                 .eqIfPresent(CrmCustomerDO::getIndustryId, pageReqVO.getIndustryId())
                 .eqIfPresent(CrmCustomerDO::getLevel, pageReqVO.getLevel())
                 .eqIfPresent(CrmCustomerDO::getSource, pageReqVO.getSource()));
+    }
+
+    default List<CrmCustomerDO> selectList(Collection<Long> ids) {
+        return selectList(new LambdaQueryWrapperX<CrmCustomerDO>()
+                .inIfPresent(CrmCustomerDO::getId, ids));
     }
 
 }
