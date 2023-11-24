@@ -10,15 +10,16 @@ import org.springframework.context.annotation.PropertySource;
 import javax.servlet.Servlet;
 
 /**
- * Ureport 配置类
- * 加载ureport对应的xml配置文件
- * @author  赤焰
+ * UReport2 配置类
+ *
+ * @author 赤焰
  */
 @Configuration
-@ImportResource({"classpath:ureport-console-context.xml"})
-@PropertySource(value = {"classpath:ureport.properties"})
+@ImportResource({"classpath:ureport-console-context.xml"}) // Bean 配置
+@PropertySource(value = {"classpath:ureport.properties"}) // 配置文件
 public class UreportConfiguration {
 
+    // TODO @赤焰：bean 是不是取个和 ureport 相关的名字好点哈？
     @Bean
     public ServletRegistrationBean<Servlet> registrationBean() {
         return new ServletRegistrationBean<>(new UReportServlet(), "/ureport/*");

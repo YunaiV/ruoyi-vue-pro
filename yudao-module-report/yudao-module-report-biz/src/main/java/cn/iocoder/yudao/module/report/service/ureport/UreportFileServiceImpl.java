@@ -73,6 +73,7 @@ public class UreportFileServiceImpl implements UreportFileService {
 
     @Override
     public Long checkExistByName(String name) {
+        // TODO @赤焰：Service 处理业务逻辑，不能出现 Mapper 层的东西，收敛成 mapper 的一个操作方法
         LambdaQueryWrapper<UreportFileDO> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(UreportFileDO::getFileName,name);
         return ureportFileMapper.selectCount(queryWrapper);
@@ -80,8 +81,10 @@ public class UreportFileServiceImpl implements UreportFileService {
 
     @Override
     public UreportFileDO queryUreportFileDoByName(String name) {
+        // TODO @赤焰：Service 处理业务逻辑，不能出现 Mapper 层的东西，收敛成 mapper 的一个操作方法
         LambdaQueryWrapper<UreportFileDO> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(UreportFileDO::getFileName,name);
+        // TODO @赤焰：这里，可以用 selectByName 即可
         List<UreportFileDO> list = ureportFileMapper.selectList(queryWrapper);
         if(CollectionUtil.isNotEmpty(list)){
             return list.get(0);
@@ -91,14 +94,17 @@ public class UreportFileServiceImpl implements UreportFileService {
 
     @Override
     public List<UreportFileDO> queryReportFileList() {
+        // TODO @赤焰：Service 处理业务逻辑，不能出现 Mapper 层的东西，收敛成 mapper 的一个操作方法
         LambdaQueryWrapper<UreportFileDO> queryWrapper = new LambdaQueryWrapper<>();
         return ureportFileMapper.selectList(queryWrapper);
     }
 
     @Override
     public int deleteReportFileByName(String name) {
+        // TODO @赤焰：Service 处理业务逻辑，不能出现 Mapper 层的东西，收敛成 mapper 的一个操作方法
         LambdaQueryWrapper<UreportFileDO> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(UreportFileDO::getFileName,name);
         return ureportFileMapper.delete(queryWrapper);
     }
+
 }

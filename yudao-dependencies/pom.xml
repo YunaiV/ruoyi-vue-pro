@@ -653,7 +653,7 @@
                 <version>${spring.boot.version}</version>
             </dependency>
 
-            <!--ureport2 报表-->
+            <!-- UReport2 报表-->
             <dependency>
                 <groupId>com.bstek.ureport</groupId>
                 <artifactId>ureport2-console</artifactId>
