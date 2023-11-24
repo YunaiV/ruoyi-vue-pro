@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.crm.service.customer;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
@@ -16,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -249,48 +247,6 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         // 3. 删除负责人数据权限
         crmPermissionService.deletePermission(CrmBizTypeEnum.CRM_CUSTOMER.getType(), customer.getId(),
                 CrmPermissionLevelEnum.OWNER.getLevel());
-    }
-
-    private void transferCustomerOwner(List<Long> cIds, Long ownerId) {
-        // 先一次性校验完成客户是否可用
-        // TODO @xiaqing：批量一次性加载客户列表，然后去逐个校验；
-        for (Long cId : cIds) {
-            //校验是否存在
-            validateCustomerExists(cId);
-            //todo 校验是否已有负责人
-            validCustomerOwnerExist(cId);
-            //todo 校验是否锁定
-            validCustomerIsLocked(cId);
-            //todo 校验成交状态
-            validCustomerDeal(cId);
-        }
-        // TODO @xiaqing：每个客户更新的时候，where 条件，加上 owner_user_id is null，防止并发问题；
-        List<CrmCustomerDO> updateDos = new ArrayList<>();
-        for (Long cId : cIds) {
-            CrmCustomerDO customerDO = new CrmCustomerDO();
-            customerDO.setId(cId);
-            customerDO.setOwnerUserId(SecurityFrameworkUtils.getLoginUserId());
-        }
-        // 统一修改状态
-        customerMapper.updateBatch(updateDos);
-    }
-
-    private void validCustomerOwnerExist(Long id) {
-        if (customerMapper.selectById(id).getOwnerUserId() != null) {
-            throw exception(CUSTOMER_OWNER_EXISTS);
-        }
-    }
-
-    private void validCustomerIsLocked(Long id) {
-        if (customerMapper.selectById(id).getLockStatus() == true) {
-            throw exception(CUSTOMER_LOCKED);
-        }
-    }
-
-    private void validCustomerDeal(Long id) {
-        if (customerMapper.selectById(id).getDealStatus() == true) {
-            throw exception(CUSTOMER_ALREADY_DEAL);
-        }
     }
 
 }
