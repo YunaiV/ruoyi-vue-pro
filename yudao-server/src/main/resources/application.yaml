@@ -190,7 +190,7 @@ yudao:
       - /admin-api/system/sms/callback/* # 短信回调接口，无法带上租户编号
       - /admin-api/pay/notify/** # 支付回调通知，不携带租户编号
       - /jmreport/* # 积木报表，无法携带租户编号
-      - /ureport/* # ureport报表，无法携带租户编号
+      - /ureport/* # UReport 报表，无法携带租户编号
       - /admin-api/mp/open/** # 微信公众号开放平台，微信回调接口，无法携带租户编号
     ignore-tables:
       - system_tenant
@@ -259,11 +259,12 @@ yudao:
 
 debug: false
 
-#积木报表配置
+# 积木报表配置
 minidao :
   base-package: org.jeecg.modules.jmreport.desreport.dao*
   db-type: mysql
-#ureport配置
+
+# UReport 配置
 ureport:
   provider:
     database:

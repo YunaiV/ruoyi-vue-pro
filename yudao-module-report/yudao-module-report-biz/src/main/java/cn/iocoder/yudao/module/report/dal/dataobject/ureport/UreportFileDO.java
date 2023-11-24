@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.report.dal.dataobject.ureport;
 
-import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
 
 /**
  * Ureport2报表 DO
@@ -27,6 +26,7 @@ public class UreportFileDO extends BaseDO {
      */
     @TableId
     private Long id;
+    // TODO @赤焰：是不是用 name 就可以了。
     /**
      * 文件名称
      */
@@ -35,6 +35,7 @@ public class UreportFileDO extends BaseDO {
      * 状态
      */
     private Integer status;
+    // TODO @赤焰：是不是用 string 就可以了。然后字段名用 content？
     /**
      * 文件内容
      */

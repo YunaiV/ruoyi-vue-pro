@@ -10,7 +10,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * ureport内置数据源
+ * UReport 内置数据源
  */
 @Slf4j
 @Component
@@ -22,18 +22,17 @@ public class UreportDataSource implements BuildinDatasource {
 	private DataSource dataSource;
 
 	/**
-	 * 数据源名称
-	 *
-	 **/
+	 * @return 数据源名称
+	 */
 	@Override
 	public String name() {
 		return NAME;
 	}
 
+    // TODO @赤焰：这个方法，如果拿不到连接，是不是抛出异常比较好？
 	/**
-	 * * 获取连接
-	 *
-	 **/
+	 * @return 获取连接
+	 */
 	@Override
 	public Connection getConnection() {
 		try {
