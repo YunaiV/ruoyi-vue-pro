@@ -71,9 +71,7 @@ public class AppCouponTemplateController {
 
     @GetMapping("/list-by-ids")
     @Operation(summary = "获得优惠劵模版列表")
-    @Parameters({
-            @Parameter(name = "ids", description = "优惠券模板编号列表")
-    })
+    @Parameter(name = "ids", description = "优惠券模板编号列表")
     public CommonResult<List<AppCouponTemplateRespVO>> getCouponTemplateList(
             @RequestParam(value = "ids", required = false) Set<Long> ids) {
         // 1. 查询
