@@ -16,6 +16,7 @@ import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
@@ -164,30 +165,26 @@ public class CrmCustomerController {
         return success(true);
     }
 
-    //@PutMapping("/receive")
-    //@Operation(summary = "领取公海客户")
-    //// TODO @xiaqing：1）receiveCustomer 方法名字；2）cIds 改成 ids，要加下 @RequestParam，还有 swagger 注解；3）参数非空，使用 validator 校验；4）返回 true 即可；
-    //@PreAuthorize("@ss.hasPermission('crm:customer:receive')")
-    //public CommonResult<String> receiveByIds(List<Long> cIds) {
-    //    // 判断是否为空
-    //    if (CollectionUtils.isEmpty(cIds))
-    //        return error(GlobalErrorCodeConstants.BAD_REQUEST.getCode(), GlobalErrorCodeConstants.BAD_REQUEST.getMsg());
-    //    // 领取公海任务
-    //    // TODO @xiaqing：userid，通过 controller 传递给 service，不要在 service 里面获取，无状态
-    //    customerService.receive(cIds);
-    //    return success("领取成功");
-    //}
+    @PutMapping("/receive")
+    @Operation(summary = "领取公海客户")
+    @Parameter(name = "ids", description = "编号数组", required = true,example = "1,2,3")
+    @PreAuthorize("@ss.hasPermission('crm:customer:receive')")
+    public CommonResult<Boolean> receiveCustomer(@RequestParam(value = "ids") List<Long> ids){
+        customerService.receiveCustomer(ids, getLoginUserId());
+        return success(true);
+    }
 
-    // TODO @xiaqing：1）distributeCustomer 方法名；2）cIds 同上；3）参数校验，同上；4）ownerId 改成 ownerUserId，和别的模块统一；5）返回 true 即可；
-    @PutMapping("/distributeByIds")
+    @PutMapping("/distribute")
     @Operation(summary = "分配公海给对应负责人")
-    @PreAuthorize("@ss.hasPermission('crm:customer:distributeByIds')")
-    public CommonResult<String> distributeByIds(Long ownerId, List<Long> cIds) {
-        //判断参数不能为空
-        if (ownerId == null || CollectionUtils.isEmpty(cIds))
-            return error(GlobalErrorCodeConstants.BAD_REQUEST.getCode(), GlobalErrorCodeConstants.BAD_REQUEST.getMsg());
-        customerService.distributeByIds(cIds, ownerId);
-        return success("分配成功");
+    @Parameters({
+            @Parameter(name = "ownerUserId", description = "分配的负责人编号", required = true, example = "12345"),
+            @Parameter(name = "ids", description = "客户编号数组", required = true, example = "1,2,3")
+    })
+    @PreAuthorize("@ss.hasPermission('crm:customer:distribute')")
+    public CommonResult<Boolean> distributeCustomer(@RequestParam(value = "ownerUserId") Long ownerUserId,
+                                                    @RequestParam(value = "ids") List<Long> ids){
+        customerService.distributeCustomer(ids, ownerUserId);
+        return success(true);
     }
 
 }

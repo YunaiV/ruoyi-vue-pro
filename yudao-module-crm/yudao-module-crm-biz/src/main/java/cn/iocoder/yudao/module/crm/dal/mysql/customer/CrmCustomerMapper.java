@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmSceneEnum;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -105,6 +106,12 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
                 .eqIfPresent(CrmCustomerDO::getLevel, pageReqVO.getLevel())
                 .eqIfPresent(CrmCustomerDO::getSource, pageReqVO.getSource()));
         return new PageResult<>(mpPage.getRecords(), mpPage.getTotal());
+    }
+
+    default void updateCustomerByOwnerUserIdIsNull(Long id, CrmCustomerDO updateObj) {
+        update(updateObj, new LambdaUpdateWrapper<CrmCustomerDO>()
+                .eq(CrmCustomerDO::getId, id)
+                .isNull(CrmCustomerDO::getOwnerUserId));
     }
 
 }

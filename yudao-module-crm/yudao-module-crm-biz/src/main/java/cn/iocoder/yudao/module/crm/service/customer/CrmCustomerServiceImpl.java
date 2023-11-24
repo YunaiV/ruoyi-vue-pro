@@ -149,13 +149,61 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void receive(List<Long> ids) {
-        transferCustomerOwner(ids, SecurityFrameworkUtils.getLoginUserId());
+    public void receiveCustomer(List <Long> ids,Long ownerUserId) {
+        transferCustomerOwner(ids, ownerUserId);
     }
 
     @Override
-    public void distributeByIds(List<Long> cIds, Long ownerId) {
-        transferCustomerOwner(cIds, ownerId);
+    @Transactional(rollbackFor = Exception.class)
+    public void distributeCustomer(List <Long> ids, Long ownerUserId) {
+        transferCustomerOwner(ids, ownerUserId);
+    }
+
+    /**
+     * 转移客户负责人
+     *
+     * @param ids 客户编号数组
+     * @param ownerUserId 负责人编号
+     */
+    private void transferCustomerOwner(List <Long> ids, Long ownerUserId) {
+        // 先一次性加载所有数据，校验客户是否可用
+        List <CrmCustomerDO> customers = customerMapper.selectBatchIds(ids);
+        for (CrmCustomerDO customer : customers) {
+            // 校验是否已有负责人
+            validateCustomerOwnerExists(customer);
+            // 校验是否锁定
+            validateCustomerIsLocked(customer);
+            // 校验成交状态
+            validateCustomerDeal(customer);
+        }
+
+        // TODO @QingX：这里是不是改成一次性更新；不然，如果有 20 个客户，就要执行 20 次 SQL 了；
+        // 统一修改状态
+        CrmCustomerDO updateDo = new CrmCustomerDO();
+        updateDo.setOwnerUserId(ownerUserId);
+        // TODO @QingX：如果更新的数量不对，则应该抛出异常，回滚，并错误提示；
+        for (Long id : ids) {
+            customerMapper.updateCustomerByOwnerUserIdIsNull(id,updateDo);
+        }
+    }
+
+    // TODO @QingX：错误提示里面，可以把客户的名字带上哈；不然不知道是谁；
+    private void validateCustomerOwnerExists(CrmCustomerDO customer) {
+        if (customer.getOwnerUserId() != null) {
+            throw exception(CUSTOMER_OWNER_EXISTS);
+        }
+    }
+
+    private void validateCustomerIsLocked(CrmCustomerDO customer) {
+        if (customer.getLockStatus()) {
+            throw exception(CUSTOMER_LOCKED);
+        }
+    }
+
+    private void validateCustomerDeal(CrmCustomerDO customer) {
+        if (customer.getDealStatus()) {
+            throw exception(CUSTOMER_ALREADY_DEAL);
+        }
     }
 
     @Override
