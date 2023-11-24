@@ -28,10 +28,10 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
                 .eqIfPresent(CrmCustomerDO::getSource, pageReqVO.getSource()));
     }
 
-    default void updateCustomerOwnerUser(Long id,CrmCustomerDO customerDO){
-        update(customerDO,new LambdaUpdateWrapper <CrmCustomerDO>()
-                .eq(CrmCustomerDO::getId,id)
-                .isNull(CrmCustomerDO::getOwnerUserId)
-        );
+    default void updateCustomerByOwnerUserIdIsNull(Long id, CrmCustomerDO updateObj) {
+        update(updateObj, new LambdaUpdateWrapper<CrmCustomerDO>()
+                .eq(CrmCustomerDO::getId, id)
+                .isNull(CrmCustomerDO::getOwnerUserId));
     }
+
 }

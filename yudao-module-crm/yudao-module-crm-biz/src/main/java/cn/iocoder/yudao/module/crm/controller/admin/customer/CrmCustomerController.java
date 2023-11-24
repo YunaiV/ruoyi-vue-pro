@@ -1,12 +1,10 @@
 package cn.iocoder.yudao.module.crm.controller.admin.customer;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
@@ -24,7 +22,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.error;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -185,24 +181,23 @@ public class CrmCustomerController {
 
     @PutMapping("/receive")
     @Operation(summary = "领取公海客户")
-    @Parameter(name = "ids", description = "批量领取公海的客户id集合", required = true,example = "1,2,3")
+    @Parameter(name = "ids", description = "编号数组", required = true,example = "1,2,3")
     @PreAuthorize("@ss.hasPermission('crm:customer:receive')")
     public CommonResult<Boolean> receiveCustomer(@RequestParam(value = "ids") List<Long> ids){
-        // 领取公海任务
-        customerService.receiveCustomer(ids, SecurityFrameworkUtils.getLoginUserId());
+        customerService.receiveCustomer(ids, getLoginUserId());
         return success(true);
     }
 
-    @PutMapping("/distributeByIds")
+    @PutMapping("/distribute")
     @Operation(summary = "分配公海给对应负责人")
     @Parameters({
-            @Parameter(name = "ownerUserId", description = "分配的负责人id", required = true,example = "12345"),
-            @Parameter(name = "ids", description = "批量分配的公海的客户id集合", required = true,example = "1,2,3")
+            @Parameter(name = "ownerUserId", description = "分配的负责人编号", required = true, example = "12345"),
+            @Parameter(name = "ids", description = "客户编号数组", required = true, example = "1,2,3")
     })
     @PreAuthorize("@ss.hasPermission('crm:customer:distribute')")
     public CommonResult<Boolean> distributeCustomer(@RequestParam(value = "ownerUserId") Long ownerUserId,
-                                                    @RequestParam(value = "ids") List<Long>ids){
-        customerService.distributeCustomer(ids,ownerUserId);
+                                                    @RequestParam(value = "ids") List<Long> ids){
+        customerService.distributeCustomer(ids, ownerUserId);
         return success(true);
     }
 

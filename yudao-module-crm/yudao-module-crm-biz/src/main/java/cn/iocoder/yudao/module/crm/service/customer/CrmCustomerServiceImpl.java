@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
@@ -80,11 +79,6 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     private void validateCustomerExists(Long id) {
         if (customerMapper.selectById(id) == null) {
-            throw exception(CUSTOMER_NOT_EXISTS);
-        }
-    }
-    private void validateCustomerExists(CrmCustomerDO customerDO){
-        if (customerDO == null) {
             throw exception(CUSTOMER_NOT_EXISTS);
         }
     }
@@ -168,51 +162,58 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void receiveCustomer(List <Long> ids,Long ownerUserId) {
-        transferCustomerOwner(ids,ownerUserId);
+        transferCustomerOwner(ids, ownerUserId);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void distributeCustomer(List <Long> ids, Long ownerUserId) {
-        transferCustomerOwner(ids,ownerUserId);
+        transferCustomerOwner(ids, ownerUserId);
     }
 
+    /**
+     * 转移客户负责人
+     *
+     * @param ids 客户编号数组
+     * @param ownerUserId 负责人编号
+     */
     private void transferCustomerOwner(List <Long> ids, Long ownerUserId) {
         // 先一次性加载所有数据，校验客户是否可用
-        List <CrmCustomerDO> customerDOList = customerMapper.selectBatchIds(ids);
-        for (CrmCustomerDO customerDO : customerDOList) {
-            // 校验客户是否存在
-            validateCustomerExists(customerDO);
+        List <CrmCustomerDO> customers = customerMapper.selectBatchIds(ids);
+        for (CrmCustomerDO customer : customers) {
             // 校验是否已有负责人
-            validCustomerOwnerExist(customerDO);
+            validateCustomerOwnerExists(customer);
             // 校验是否锁定
-            validCustomerIsLocked(customerDO);
+            validateCustomerIsLocked(customer);
             // 校验成交状态
-            validCustomerDeal(customerDO);
+            validateCustomerDeal(customer);
         }
 
+        // TODO @QingX：这里是不是改成一次性更新；不然，如果有 20 个客户，就要执行 20 次 SQL 了；
         // 统一修改状态
         CrmCustomerDO updateDo = new CrmCustomerDO();
         updateDo.setOwnerUserId(ownerUserId);
+        // TODO @QingX：如果更新的数量不对，则应该抛出异常，回滚，并错误提示；
         for (Long id : ids) {
-            customerMapper.updateCustomerOwnerUser(id,updateDo);
+            customerMapper.updateCustomerByOwnerUserIdIsNull(id,updateDo);
         }
-
     }
 
-    private void validCustomerOwnerExist(CrmCustomerDO customerDO) {
-        if (customerDO.getOwnerUserId()!=null) {
+    // TODO @QingX：错误提示里面，可以把客户的名字带上哈；不然不知道是谁；
+    private void validateCustomerOwnerExists(CrmCustomerDO customer) {
+        if (customer.getOwnerUserId() != null) {
             throw exception(CUSTOMER_OWNER_EXISTS);
         }
     }
 
-    private void validCustomerIsLocked(CrmCustomerDO customerDO) {
-        if (customerDO.getLockStatus() ==true) {
+    private void validateCustomerIsLocked(CrmCustomerDO customer) {
+        if (customer.getLockStatus()) {
             throw exception(CUSTOMER_LOCKED);
         }
     }
 
-    private void validCustomerDeal(CrmCustomerDO customerDO) {
-        if (customerDO.getDealStatus() ==true) {
+    private void validateCustomerDeal(CrmCustomerDO customer) {
+        if (customer.getDealStatus()) {
             throw exception(CUSTOMER_ALREADY_DEAL);
         }
     }

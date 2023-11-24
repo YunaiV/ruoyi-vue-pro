@@ -88,17 +88,17 @@ public interface CrmCustomerService {
     /**
      * 领取公海客户
      *
-     * @param ids 要领取的客户 id
+     * @param ids 要领取的客户编号数组
      */
     void receiveCustomer(List<Long>ids, Long ownerUserId);
 
     /**
      * 分配公海客户
      *
-     * @param ids 要分配的客户 id
-     * @param ownerUserId 分配的负责人id
+     * @param ids 要分配的客户编号数组
+     * @param ownerUserId 分配的负责人编号
      * @author xiaqing
      */
-    void distributeCustomer(List<Long>ids,Long ownerUserId);
+    void distributeCustomer(List<Long>ids, Long ownerUserId);
 
 }
