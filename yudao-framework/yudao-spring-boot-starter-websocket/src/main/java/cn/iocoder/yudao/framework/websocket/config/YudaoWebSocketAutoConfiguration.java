@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.websocket.config;
 
+import cn.iocoder.yudao.framework.mq.redis.config.YudaoRedisMQConsumerAutoConfiguration;
 import cn.iocoder.yudao.framework.mq.redis.core.RedisMQTemplate;
 import cn.iocoder.yudao.framework.websocket.core.handler.JsonWebSocketMessageHandler;
 import cn.iocoder.yudao.framework.websocket.core.listener.WebSocketMessageListener;
@@ -38,7 +39,7 @@ import java.util.List;
  *
  * @author xingyu4j
  */
-@AutoConfiguration
+@AutoConfiguration(before = YudaoRedisMQConsumerAutoConfiguration.class) // before YudaoRedisMQConsumerAutoConfiguration 的原因是，需要保证 RedisWebSocketMessageConsumer 先创建，才能创建 RedisMessageListenerContainer
 @EnableWebSocket // 开启 websocket
 @ConditionalOnProperty(prefix = "yudao.websocket", value = "enable", matchIfMissing = true) // 允许使用 yudao.websocket.enable=false 禁用 websocket
 @EnableConfigurationProperties(WebSocketProperties.class)
@@ -98,7 +99,6 @@ public class YudaoWebSocketAutoConfiguration {
             return new RedisWebSocketMessageSender(sessionManager, redisMQTemplate);
         }
 
-        // TODO 芋艿：需要额外删除 YudaoRedisMQAutoConfiguration 的 RedisMessageListenerContainer Bean 上的 @ConditionalOnBean 注解。可能是 spring boot 的 bug！
         @Bean
         public RedisWebSocketMessageConsumer redisWebSocketMessageConsumer(
                 RedisWebSocketMessageSender redisWebSocketMessageSender) {

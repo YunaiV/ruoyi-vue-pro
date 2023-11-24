@@ -5,7 +5,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.system.SystemUtil;
 import cn.iocoder.yudao.framework.common.enums.DocumentEnum;
 import cn.iocoder.yudao.framework.mq.redis.core.RedisMQTemplate;
-import cn.iocoder.yudao.framework.mq.redis.core.interceptor.RedisMessageInterceptor;
 import cn.iocoder.yudao.framework.mq.redis.core.job.RedisPendingMessageResendJob;
 import cn.iocoder.yudao.framework.mq.redis.core.pubsub.AbstractRedisChannelMessageListener;
 import cn.iocoder.yudao.framework.mq.redis.core.stream.AbstractRedisStreamMessageListener;
@@ -23,7 +22,6 @@ import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
@@ -33,30 +31,19 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * 消息队列配置类
+ * Redis 消息队列 Consumer 配置类
  *
  * @author 芋道源码
  */
 @Slf4j
 @EnableScheduling // 启用定时任务，用于 RedisPendingMessageResendJob 重发消息
 @AutoConfiguration(after = YudaoRedisAutoConfiguration.class)
-public class YudaoRedisMQAutoConfiguration {
-
-    @Bean
-    public RedisMQTemplate redisMQTemplate(StringRedisTemplate redisTemplate,
-                                           List<RedisMessageInterceptor> interceptors) {
-        RedisMQTemplate redisMQTemplate = new RedisMQTemplate(redisTemplate);
-        // 添加拦截器
-        interceptors.forEach(redisMQTemplate::addInterceptor);
-        return redisMQTemplate;
-    }
-
-    // ========== 消费者相关 ==========
+public class YudaoRedisMQConsumerAutoConfiguration {
 
     /**
      * 创建 Redis Pub/Sub 广播消费的容器
      */
-    @Bean(initMethod = "start", destroyMethod = "stop")
+    @Bean
     @ConditionalOnBean(AbstractRedisChannelMessageListener.class) // 只有 AbstractChannelMessageListener 存在的时候，才需要注册 Redis pubsub 监听
     public RedisMessageListenerContainer redisMessageListenerContainer(
             RedisMQTemplate redisMQTemplate, List<AbstractRedisChannelMessageListener<?>> listeners) {
