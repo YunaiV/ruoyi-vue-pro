@@ -14,6 +14,9 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * 客户 Mapper
  *
@@ -112,6 +115,11 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
         update(updateObj, new LambdaUpdateWrapper<CrmCustomerDO>()
                 .eq(CrmCustomerDO::getId, id)
                 .isNull(CrmCustomerDO::getOwnerUserId));
+    }
+
+    default List<CrmCustomerDO> selectList(Collection<Long> ids) {
+        return selectList(new LambdaQueryWrapperX<CrmCustomerDO>()
+                .inIfPresent(CrmCustomerDO::getId, ids));
     }
 
 }

@@ -249,4 +249,9 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
                 CrmPermissionLevelEnum.OWNER.getLevel());
     }
 
+    @Override
+    public List<CrmCustomerDO> getCustomerList(Collection<Long> ids) {
+        return customerMapper.selectList(ids);
+    }
+
 }

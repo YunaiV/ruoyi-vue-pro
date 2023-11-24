@@ -7,7 +7,14 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.*;
 import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusTypeDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
+import cn.iocoder.yudao.module.crm.service.business.CrmBusinessStatusService;
+import cn.iocoder.yudao.module.crm.service.business.CrmBusinessStatusTypeService;
+import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,6 +27,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
@@ -33,6 +43,15 @@ public class CrmBusinessController {
 
     @Resource
     private CrmBusinessService businessService;
+
+    @Resource
+    private CrmCustomerService customerService;
+
+    @Resource
+    private CrmBusinessStatusTypeService businessStatusTypeService;
+
+    @Resource
+    private CrmBusinessStatusService businessStatusService;
 
     @PostMapping("/create")
     @Operation(summary = "创建商机")
@@ -72,7 +91,23 @@ public class CrmBusinessController {
     @PreAuthorize("@ss.hasPermission('crm:business:query')")
     public CommonResult<PageResult<CrmBusinessRespVO>> getBusinessPage(@Valid CrmBusinessPageReqVO pageVO) {
         PageResult<CrmBusinessDO> pageResult = businessService.getBusinessPage(pageVO, getLoginUserId());
-        return success(CrmBusinessConvert.INSTANCE.convertPage(pageResult));
+        //处理客户名称回显
+        Set<Long> customerIds = pageResult.getList().stream()
+                .map(CrmBusinessDO::getCustomerId).filter(Objects::nonNull).collect(Collectors.toSet());
+        List<CrmCustomerDO> customerList = customerService.getCustomerList(customerIds);
+        //处理商机状态类型名称回显
+        Set<Long> statusTypeIds = pageResult.getList().stream()
+                .map(CrmBusinessDO::getStatusTypeId).filter(Objects::nonNull).collect(Collectors.toSet());
+        CrmBusinessStatusTypeQueryVO queryStatusTypeVO = new CrmBusinessStatusTypeQueryVO();
+        queryStatusTypeVO.setIdList(statusTypeIds);
+        List<CrmBusinessStatusTypeDO> statusTypeList = businessStatusTypeService.selectList(queryStatusTypeVO);
+        //处理商机状态名称回显
+        Set<Long> statusIds = pageResult.getList().stream()
+                .map(CrmBusinessDO::getCustomerId).filter(Objects::nonNull).collect(Collectors.toSet());
+        CrmBusinessStatusQueryVO queryVO = new CrmBusinessStatusQueryVO();
+        queryVO.setIdList(statusIds);
+        List<CrmBusinessStatusDO> statusList = businessStatusService.selectList(queryVO);
+        return success(CrmBusinessConvert.INSTANCE.convertPage(pageResult, customerList, statusTypeList, statusList));
     }
 
     @GetMapping("/pool-page")

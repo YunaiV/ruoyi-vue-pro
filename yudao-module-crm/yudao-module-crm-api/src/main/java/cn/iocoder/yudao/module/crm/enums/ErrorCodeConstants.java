@@ -20,8 +20,6 @@ public interface ErrorCodeConstants {
 
     // TODO @lilleo：商机状态、商机类型，都单独错误码段
 
-    ErrorCode BUSINESS_STATUS_TYPE_NOT_EXISTS = new ErrorCode(1_020_002_001, "商机状态类型不存在");
-    ErrorCode BUSINESS_STATUS_NOT_EXISTS = new ErrorCode(1_020_002_002, "商机状态不存在");
 
     // ========== 联系人管理 1-020-003-000 ==========
     ErrorCode CONTACT_NOT_EXISTS = new ErrorCode(1_020_003_000, "联系人不存在");
@@ -60,5 +58,12 @@ public interface ErrorCodeConstants {
 
     // ========== 产品分类 1_020_009_000 ==========
     ErrorCode PRODUCT_CATEGORY_NOT_EXISTS = new ErrorCode(1_020_009_000, "产品分类不存在");
+
+    // ========== 商机状态类型 1_020_010_000 ==========
+    ErrorCode BUSINESS_STATUS_TYPE_NOT_EXISTS = new ErrorCode(1_020_010_000, "商机状态类型不存在");
+    ErrorCode BUSINESS_STATUS_TYPE_NAME_EXISTS = new ErrorCode(1_020_010_001, "商机状态类型名称已存在");
+
+    // ========== 商机状态 1_020_011_000 ==========
+    ErrorCode BUSINESS_STATUS_NOT_EXISTS = new ErrorCode(1_020_011_000, "商机状态不存在");
 
 }
