@@ -61,7 +61,7 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
         //CrmPermissionUtils.builderRightJoinQuery(mpjLambdaWrapperX, CrmBizTypeEnum.CRM_CUSTOMER.getType(), userId);
         mpjLambdaWrapperX
                 //.rightJoin("(SELECT t1.biz_id FROM crm_permission t1 WHERE (t1.biz_type = 1 AND t1.user_id = 1)) t2 on t.id = t2.biz_id");
-                .rightJoin(CrmPermissionDO.class, CrmPermissionDO::getBizId, CrmCustomerDO::getId)
+                .rightJoin(CrmPermissionDO.class, CrmPermissionDO::getBizId, CrmCustomerDO::getId) // TODO @puhui999：应该是 inner join？
                 .eq(CrmPermissionDO::getBizType, CrmBizTypeEnum.CRM_CUSTOMER.getType())
                 .eq(CrmPermissionDO::getUserId, userId);
         /** TODO @芋艿：

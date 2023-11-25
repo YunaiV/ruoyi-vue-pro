@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * Crm 数据权限 DO
+ * CRM 数据权限 DO
  *
  * @author HUIHUI
  */

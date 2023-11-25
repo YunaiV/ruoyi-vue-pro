@@ -92,7 +92,7 @@ public class CrmCustomerController {
     }
 
     // TODO @puhui999：合并到 receiveCustomer
-    @PutMapping("/receive")
+    @PutMapping("/receive-")
     @Operation(summary = "领取客户公海数据")
     @Parameter(name = "id", description = "客户编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('crm:customer:update')")
