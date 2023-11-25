@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.errorcode.core.loader;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.module.system.api.errorcode.ErrorCodeApi;
 import cn.iocoder.yudao.module.system.api.errorcode.dto.ErrorCodeRespDTO;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.LocalDateTime;
@@ -43,31 +45,38 @@ public class ErrorCodeLoaderImpl implements ErrorCodeLoader {
      */
     private LocalDateTime maxUpdateTime;
 
+    @Override
     @EventListener(ApplicationReadyEvent.class)
+    @Async // 异步，保证项目的启动过程，毕竟非关键流程
     public void loadErrorCodes() {
-        this.loadErrorCodes0();
+        loadErrorCodes0();
     }
 
+    @Override
     @Scheduled(fixedDelay = REFRESH_ERROR_CODE_PERIOD, initialDelay = REFRESH_ERROR_CODE_PERIOD)
     public void refreshErrorCodes() {
-        this.loadErrorCodes0();
+        loadErrorCodes0();
     }
 
     private void loadErrorCodes0() {
-        // 加载错误码
-        List<ErrorCodeRespDTO> errorCodeRespDTOs = errorCodeApi.getErrorCodeList(applicationName, maxUpdateTime);
-        if (CollUtil.isEmpty(errorCodeRespDTOs)) {
-            return;
-        }
-        log.info("[loadErrorCodes0][加载到 ({}) 个错误码]", errorCodeRespDTOs.size());
+        try {
+            // 加载错误码
+            List<ErrorCodeRespDTO> errorCodeRespDTOs = errorCodeApi.getErrorCodeList(applicationName, maxUpdateTime);
+            if (CollUtil.isEmpty(errorCodeRespDTOs)) {
+                return;
+            }
+            log.info("[loadErrorCodes0][加载到 ({}) 个错误码]", errorCodeRespDTOs.size());
 
-        // 刷新错误码的缓存
-        errorCodeRespDTOs.forEach(errorCodeRespDTO -> {
-            // 写入到错误码的缓存
-            putErrorCode(errorCodeRespDTO.getCode(), errorCodeRespDTO.getMessage());
-            // 记录下更新时间，方便增量更新
-            maxUpdateTime = DateUtils.max(maxUpdateTime, errorCodeRespDTO.getUpdateTime());
-        });
+            // 刷新错误码的缓存
+            errorCodeRespDTOs.forEach(errorCodeRespDTO -> {
+                // 写入到错误码的缓存
+                putErrorCode(errorCodeRespDTO.getCode(), errorCodeRespDTO.getMessage());
+                // 记录下更新时间，方便增量更新
+                maxUpdateTime = DateUtils.max(maxUpdateTime, errorCodeRespDTO.getUpdateTime());
+            });
+        } catch (Exception ex) {
+            log.error("[loadErrorCodes0][加载错误码失败({})]", ExceptionUtil.getRootCauseMessage(ex));
+        }
     }
 
 }
