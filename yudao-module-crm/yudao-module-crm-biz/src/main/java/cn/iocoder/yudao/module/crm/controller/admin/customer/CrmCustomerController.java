@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.mapstruct.ap.internal.util.Collections;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -25,14 +26,13 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSetByFlatMap;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -84,19 +84,14 @@ public class CrmCustomerController {
         if (customer == null) {
             return success(null);
         }
-
         // 2. 拼接数据
-        // 2.1 获取负责人详情
-        Set<Long> userIds = new HashSet<>();
-        userIds.add(customer.getOwnerUserId()); // 负责人
-        userIds.add(Long.parseLong(customer.getCreator())); // 加入创建者
-        List<AdminUserRespDTO> userList = adminUserApi.getUserList(userIds);
-        Map<Long, AdminUserRespDTO> userMap = convertMap(userList, AdminUserRespDTO::getId);
-        // 2.2 获取部门详情
-        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userList, AdminUserRespDTO::getDeptId));
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
+                Collections.asSet(Long.valueOf(customer.getCreator()), customer.getOwnerUserId()));
+        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
         return success(CrmCustomerConvert.INSTANCE.convert(customer, userMap, deptMap));
     }
 
+    // TODO @puhui999：合并到 receiveCustomer
     @PutMapping("/receive")
     @Operation(summary = "领取客户公海数据")
     @Parameter(name = "id", description = "客户编号", required = true, example = "1024")
@@ -106,30 +101,20 @@ public class CrmCustomerController {
         return success(true);
     }
 
-    @PutMapping("/put-pool")
-    @Operation(summary = "数据放入公海")
-    @Parameter(name = "id", description = "客户编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('crm:customer:update')")
-    public CommonResult<Boolean> putPool(@RequestParam("id") Long id) {
-        customerService.putPool(id);
-        return success(true);
-    }
-
     @GetMapping("/page")
     @Operation(summary = "获得客户分页")
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
     public CommonResult<PageResult<CrmCustomerRespVO>> getCustomerPage(@Valid CrmCustomerPageReqVO pageVO) {
+        // 1. 查询客户分页
         PageResult<CrmCustomerDO> pageResult = customerService.getCustomerPage(pageVO, getLoginUserId());
         if (CollUtil.isEmpty(pageResult.getList())) {
             return success(PageResult.empty(pageResult.getTotal()));
         }
-        // 1.1 获取负责人详情
-        Set<Long> userIds = convertSet(pageResult.getList(), CrmCustomerDO::getOwnerUserId);
-        userIds.addAll(convertSet(pageResult.getList(), item -> Long.parseLong(item.getCreator()))); // 加入创建者
-        List<AdminUserRespDTO> userList = adminUserApi.getUserList(userIds);
-        Map<Long, AdminUserRespDTO> userMap = convertMap(userList, AdminUserRespDTO::getId);
-        // 1.2 获取部门详情
-        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userList, AdminUserRespDTO::getDeptId));
+
+        // 2. 拼接数据
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
+                convertSetByFlatMap(pageResult.getList(), user -> Stream.of(Long.parseLong(user.getCreator()), user.getOwnerUserId())));
+        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
         return success(CrmCustomerConvert.INSTANCE.convertPage(pageResult, userMap, deptMap));
     }
 
@@ -162,6 +147,17 @@ public class CrmCustomerController {
         return success(true);
     }
 
+    // ==================== 公海相关操作 ====================
+
+    @PutMapping("/put-pool")
+    @Operation(summary = "数据放入公海")
+    @Parameter(name = "id", description = "客户编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('crm:customer:update')")
+    public CommonResult<Boolean> putCustomerPool(@RequestParam("id") Long id) {
+        customerService.putCustomerPool(id);
+        return success(true);
+    }
+
     @PutMapping("/receive")
     @Operation(summary = "领取公海客户")
     @Parameter(name = "ids", description = "编号数组", required = true,example = "1,2,3")
@@ -174,12 +170,12 @@ public class CrmCustomerController {
     @PutMapping("/distribute")
     @Operation(summary = "分配公海给对应负责人")
     @Parameters({
-            @Parameter(name = "ownerUserId", description = "分配的负责人编号", required = true, example = "12345"),
-            @Parameter(name = "ids", description = "客户编号数组", required = true, example = "1,2,3")
+            @Parameter(name = "ids", description = "客户编号数组", required = true, example = "1,2,3"),
+            @Parameter(name = "ownerUserId", description = "分配的负责人编号", required = true, example = "12345")
     })
     @PreAuthorize("@ss.hasPermission('crm:customer:distribute')")
-    public CommonResult<Boolean> distributeCustomer(@RequestParam(value = "ownerUserId") Long ownerUserId,
-                                                    @RequestParam(value = "ids") List<Long> ids){
+    public CommonResult<Boolean> distributeCustomer(@RequestParam(value = "ids") List<Long> ids,
+                                                    @RequestParam(value = "ownerUserId") Long ownerUserId){
         customerService.distributeCustomer(ids, ownerUserId);
         return success(true);
     }

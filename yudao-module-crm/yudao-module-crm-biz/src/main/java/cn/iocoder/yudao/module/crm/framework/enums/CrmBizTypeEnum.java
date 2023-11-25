@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 
 /**
- * Crm 类型枚举
+ * CRM 类型枚举
  *
  * @author HUIHUI
  */
@@ -24,6 +24,7 @@ public enum CrmBizTypeEnum implements IntArrayValuable {
     CRM_CONTRACT(5, "合同");
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CrmBizTypeEnum::getType).toArray();
+
     /**
      * 类型
      */

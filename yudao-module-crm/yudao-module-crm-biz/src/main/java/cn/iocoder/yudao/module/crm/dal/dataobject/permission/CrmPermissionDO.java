@@ -24,7 +24,7 @@ import lombok.*;
 public class CrmPermissionDO extends BaseDO {
 
     /**
-     * ID
+     * 编号，主键自增
      */
     @TableId
     private Long id;

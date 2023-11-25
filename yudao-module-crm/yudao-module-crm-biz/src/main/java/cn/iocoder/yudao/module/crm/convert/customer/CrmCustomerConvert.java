@@ -37,21 +37,17 @@ public interface CrmCustomerConvert {
     /**
      * 设置用户信息
      *
-     * @param respVO  CRM 客户 Response VO
+     * @param customer  CRM 客户 Response VO
      * @param userMap 用户信息 map
      * @param deptMap 用户部门信息 map
      */
-    static void setUserInfo(CrmCustomerRespVO respVO, Map<Long, AdminUserRespDTO> userMap, Map<Long, DeptRespDTO> deptMap) {
-        respVO.setAreaName(AreaUtils.format(respVO.getAreaId()));
-        findAndThen(userMap, respVO.getOwnerUserId(), user -> {
-            respVO.setOwnerUserName(user.getNickname());
-            findAndThen(deptMap, user.getDeptId(), dept -> {
-                respVO.setOwnerUserDeptName(dept.getName());
-            });
+    static void setUserInfo(CrmCustomerRespVO customer, Map<Long, AdminUserRespDTO> userMap, Map<Long, DeptRespDTO> deptMap) {
+        customer.setAreaName(AreaUtils.format(customer.getAreaId()));
+        findAndThen(userMap, customer.getOwnerUserId(), user -> {
+            customer.setOwnerUserName(user.getNickname());
+            findAndThen(deptMap, user.getDeptId(), dept -> customer.setOwnerUserDeptName(dept.getName()));
         });
-        findAndThen(userMap, Long.parseLong(respVO.getCreator()), user -> {
-            respVO.setCreatorName(user.getNickname());
-        });
+        findAndThen(userMap, Long.parseLong(customer.getCreator()), user -> customer.setCreatorName(user.getNickname()));
     }
 
     List<CrmCustomerExcelVO> convertList02(List<CrmCustomerDO> list);

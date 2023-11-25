@@ -47,6 +47,15 @@ public interface CrmCustomerService {
     CrmCustomerDO getCustomer(Long id);
 
     /**
+     * 获得客户列表
+     *
+     * @param ids 客户编号数组
+     * @author ljlleo
+     * @return 客户列表
+     */
+    List<CrmCustomerDO> getCustomerList(Collection<Long> ids);
+
+    /**
      * 获得客户分页
      *
      * @param pageReqVO 分页查询
@@ -86,6 +95,15 @@ public interface CrmCustomerService {
      */
     void lockCustomer(@Valid CrmCustomerUpdateReqVO updateReqVO);
 
+    // ==================== 公海相关操作 ====================
+
+    /**
+     * 客户放入公海
+     *
+     * @param id 客户编号
+     */
+    void putCustomerPool(Long id);
+
     /**
      * 领取公海客户
      *
@@ -109,20 +127,5 @@ public interface CrmCustomerService {
      * @param userId 用户编号
      */
     void receive(Long id, Long userId);
-
-    /**
-     * 客户放入公海
-     *
-     * @param id 客户编号
-     */
-    void putPool(Long id);
-
-    /**
-     * 根据客户ID集合查询客户集合
-     * @param ids
-     * @author ljlleo
-     * @return
-     */
-    List<CrmCustomerDO> getCustomerList(Collection<Long> ids);
 
 }

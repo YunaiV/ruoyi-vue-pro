@@ -55,27 +55,34 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePermission(CrmPermissionUpdateReqVO updateReqVO) {
-        // 校验存在
+        // 1. 校验存在
         validateCrmPermissionExists(updateReqVO.getIds());
-
+        // 2. 更新
         List<CrmPermissionDO> updateDO = CrmPermissionConvert.INSTANCE.convertList(updateReqVO);
         crmPermissionMapper.updateBatch(updateDO);
+    }
+
+    private void validateCrmPermissionExists(Collection<Long> ids) {
+        List<CrmPermissionDO> permissionList = crmPermissionMapper.selectBatchIds(ids);
+        if (ObjUtil.notEqual(permissionList.size(), ids.size())) {
+            throw exception(CRM_PERMISSION_NOT_EXISTS);
+        }
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void transferPermission(CrmPermissionTransferReqBO transferReqBO) {
-        // 1. 校验数据权限-是否是负责人，只有负责人才可以转移
-        CrmPermissionDO oldPermission = crmPermissionMapper.selectByBizTypeAndBizIdByUserId(transferReqBO.getBizType(),
-                transferReqBO.getBizId(), transferReqBO.getUserId());
-        String crmName = CrmBizTypeEnum.getNameByType(transferReqBO.getBizType());
+        // 1. 校验数据权限：是否是负责人，只有负责人才可以转移
+        CrmPermissionDO oldPermission = crmPermissionMapper.selectByBizTypeAndBizIdByUserId(
+                transferReqBO.getBizType(), transferReqBO.getBizId(), transferReqBO.getUserId());
+        String bizTypeName = CrmBizTypeEnum.getNameByType(transferReqBO.getBizType());
         // TODO 校验是否为超级管理员 || 1
         if (oldPermission == null || !isOwner(oldPermission.getLevel())) {
-            throw exception(CRM_PERMISSION_DENIED, crmName);
+            throw exception(CRM_PERMISSION_DENIED, bizTypeName);
         }
         // 1.1 校验转移对象是否已经是该负责人
         if (ObjUtil.equal(transferReqBO.getNewOwnerUserId(), oldPermission.getUserId())) {
-            throw exception(CRM_PERMISSION_MODEL_TRANSFER_FAIL_OWNER_USER_EXISTS, crmName);
+            throw exception(CRM_PERMISSION_MODEL_TRANSFER_FAIL_OWNER_USER_EXISTS, bizTypeName);
         }
         // 1.2 校验新负责人是否存在
         adminUserApi.validateUserList(Collections.singletonList(transferReqBO.getNewOwnerUserId()));
@@ -84,23 +91,23 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
         List<CrmPermissionDO> permissions = crmPermissionMapper.selectByBizTypeAndBizId(
                 transferReqBO.getBizType(), transferReqBO.getBizId()); // 获得所有数据权限
         CrmPermissionDO permission = CollUtil.findOne(permissions,
-                item -> ObjUtil.equal(item.getUserId(), transferReqBO.getNewOwnerUserId())); // 校验新负责人是否存在于数据权限列表
-        if (permission == null) { // 不存在则以负责人的级别加入
+                item -> ObjUtil.equal(item.getUserId(), transferReqBO.getNewOwnerUserId()));
+        if (permission == null) {
             crmPermissionMapper.insert(new CrmPermissionDO().setBizType(transferReqBO.getBizType())
                     .setBizId(transferReqBO.getBizId()).setUserId(transferReqBO.getNewOwnerUserId())
                     .setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
-        } else { // 存在则修改权限级别
+        } else {
             crmPermissionMapper.updateById(new CrmPermissionDO().setId(permission.getId())
                     .setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
         }
 
         // 3. 修改老负责人的权限
-        if (transferReqBO.getOldOwnerPermissionLevel() != null) { // 加入数据权限列表
+        if (transferReqBO.getOldOwnerPermissionLevel() != null) {
             crmPermissionMapper.updateById(new CrmPermissionDO().setId(oldPermission.getId())
-                    .setLevel(transferReqBO.getOldOwnerPermissionLevel())); // 设置权限级别
-            return;
+                    .setLevel(transferReqBO.getOldOwnerPermissionLevel()));
+        } else {
+            crmPermissionMapper.deleteById(oldPermission.getId());
         }
-        crmPermissionMapper.deleteById(oldPermission.getId());
     }
 
     @Override
@@ -116,7 +123,8 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deletePermission(Integer bizType, Long bizId, Integer level) {
-        List<CrmPermissionDO> permissions = crmPermissionMapper.selectListByBizTypeAndBizIdAndLevel(bizType, bizId, level);
+        List<CrmPermissionDO> permissions = crmPermissionMapper.selectListByBizTypeAndBizIdAndLevel(
+                bizType, bizId, level);
         // 校验存在
         if (CollUtil.isEmpty(permissions)) {
             throw exception(CRM_PERMISSION_NOT_EXISTS);
@@ -127,29 +135,21 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
     }
 
     @Override
-    public CrmPermissionDO getPermissionByIdAndUserId(Long id, Long userId) {
+    public CrmPermissionDO getPermission(Long id, Long userId) {
         return crmPermissionMapper.selectByIdAndUserId(id, userId);
     }
 
     @Override
-    public List<CrmPermissionDO> getPermissionByBizTypeAndBizId(Integer bizType, Long bizId) {
+    public List<CrmPermissionDO> getPermissionListByBiz(Integer bizType, Long bizId) {
         return crmPermissionMapper.selectByBizTypeAndBizId(bizType, bizId);
     }
 
     @Override
-    public List<CrmPermissionDO> getPermissionListByIds(Collection<Long> ids) {
+    public List<CrmPermissionDO> getPermissionList(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
         return crmPermissionMapper.selectBatchIds(ids);
-    }
-
-    private void validateCrmPermissionExists(Collection<Long> ids) {
-        List<CrmPermissionDO> permissionList = crmPermissionMapper.selectBatchIds(ids);
-        // 校验存在
-        if (ObjUtil.notEqual(permissionList.size(), ids.size())) {
-            throw exception(CRM_PERMISSION_NOT_EXISTS);
-        }
     }
 
     @Override

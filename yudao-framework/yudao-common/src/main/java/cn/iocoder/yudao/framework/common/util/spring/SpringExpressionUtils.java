@@ -25,7 +25,7 @@ import java.util.Map;
 public class SpringExpressionUtils {
 
     /**
-     * spel表达式解析器
+     * Spring EL 表达式解析器
      */
     private static final ExpressionParser EXPRESSION_PARSER = new SpelExpressionParser();
     /**

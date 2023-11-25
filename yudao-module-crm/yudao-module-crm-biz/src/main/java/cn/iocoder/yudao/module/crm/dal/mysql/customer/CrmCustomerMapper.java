@@ -14,9 +14,6 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.Collection;
-import java.util.List;
-
 /**
  * 客户 Mapper
  *
@@ -40,6 +37,7 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
                 .eqIfPresent(CrmCustomerDO::getSource, pageReqVO.getSource()));
     }
 
+    // TODO @puhui999：这个方法还要哇？
     default PageResult<CrmCustomerDO> selectPage1(CrmCustomerPageReqVO pageReqVO, Long userId) {
         LambdaQueryWrapperX<CrmCustomerDO> queryWrapperX = new LambdaQueryWrapperX<>();
         //queryWrapperX.sql
@@ -94,7 +92,7 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
          */
         if (pageReqVO.getPool()) { // 情况一：公海
             mpjLambdaWrapperX.isNull(CrmCustomerDO::getOwnerUserId);
-        } else {// 情况一：不是公海
+        } else { // 情况二：不是公海
             mpjLambdaWrapperX.isNotNull(CrmCustomerDO::getOwnerUserId);
         }
         // TODO 场景数据过滤
@@ -115,11 +113,6 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
         update(updateObj, new LambdaUpdateWrapper<CrmCustomerDO>()
                 .eq(CrmCustomerDO::getId, id)
                 .isNull(CrmCustomerDO::getOwnerUserId));
-    }
-
-    default List<CrmCustomerDO> selectList(Collection<Long> ids) {
-        return selectList(new LambdaQueryWrapperX<CrmCustomerDO>()
-                .inIfPresent(CrmCustomerDO::getId, ids));
     }
 
 }

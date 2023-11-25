@@ -73,6 +73,23 @@ public class CollectionUtils {
         return from.stream().filter(filter).map(func).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
+    public static <T, U> List<U> convertListByFlatMap(Collection<T> from,
+                                                      Function<T, ? extends Stream<? extends U>> func) {
+        if (CollUtil.isEmpty(from)) {
+            return new ArrayList<>();
+        }
+        return from.stream().flatMap(func).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
+    public static <T, U, R> List<R> convertListByFlatMap(Collection<T> from,
+                                                         Function<? super T, ? extends U> mapper,
+                                                         Function<U, ? extends Stream<? extends R>> func) {
+        if (CollUtil.isEmpty(from)) {
+            return new ArrayList<>();
+        }
+        return from.stream().map(mapper).flatMap(func).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
     public static <K, V> List<V> mergeValuesFromMap(Map<K, List<V>> map) {
         return map.values()
                 .stream()
@@ -99,6 +116,23 @@ public class CollectionUtils {
             return new HashMap<>();
         }
         return from.stream().filter(filter).collect(Collectors.toMap(keyFunc, v -> v));
+    }
+
+    public static <T, U> Set<U> convertSetByFlatMap(Collection<T> from,
+                                                    Function<T, ? extends Stream<? extends U>> func) {
+        if (CollUtil.isEmpty(from)) {
+            return new HashSet<>();
+        }
+        return from.stream().flatMap(func).filter(Objects::nonNull).collect(Collectors.toSet());
+    }
+
+    public static <T, U, R> Set<R> convertSetByFlatMap(Collection<T> from,
+                                                       Function<? super T, ? extends U> mapper,
+                                                       Function<U, ? extends Stream<? extends R>> func) {
+        if (CollUtil.isEmpty(from)) {
+            return new HashSet<>();
+        }
+        return from.stream().map(mapper).flatMap(func).filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
     public static <T, K> Map<K, T> convertMap(Collection<T> from, Function<T, K> keyFunc) {
@@ -270,40 +304,6 @@ public class CollectionUtils {
 
     public static <T> Collection<T> singleton(T deptId) {
         return deptId == null ? Collections.emptyList() : Collections.singleton(deptId);
-    }
-
-    public static <T, U> List<U> convertListByFlatMap(Collection<T> from,
-                                                      Function<T, ? extends Stream<? extends U>> func) {
-        if (CollUtil.isEmpty(from)) {
-            return new ArrayList<>();
-        }
-        return from.stream().flatMap(func).filter(Objects::nonNull).collect(Collectors.toList());
-    }
-
-    public static <T, U, R> List<R> convertListByFlatMap(Collection<T> from,
-                                                         Function<? super T, ? extends U> mapper,
-                                                         Function<U, ? extends Stream<? extends R>> func) {
-        if (CollUtil.isEmpty(from)) {
-            return new ArrayList<>();
-        }
-        return from.stream().map(mapper).flatMap(func).filter(Objects::nonNull).collect(Collectors.toList());
-    }
-
-    public static <T, U> Set<U> convertSetByFlatMap(Collection<T> from,
-                                                    Function<T, ? extends Stream<? extends U>> func) {
-        if (CollUtil.isEmpty(from)) {
-            return new HashSet<>();
-        }
-        return from.stream().flatMap(func).filter(Objects::nonNull).collect(Collectors.toSet());
-    }
-
-    public static <T, U, R> Set<R> convertSetByFlatMap(Collection<T> from,
-                                                       Function<? super T, ? extends U> mapper,
-                                                       Function<U, ? extends Stream<? extends R>> func) {
-        if (CollUtil.isEmpty(from)) {
-            return new HashSet<>();
-        }
-        return from.stream().map(mapper).flatMap(func).filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
 }

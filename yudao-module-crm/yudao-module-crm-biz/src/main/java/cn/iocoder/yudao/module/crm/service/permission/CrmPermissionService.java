@@ -64,7 +64,7 @@ public interface CrmPermissionService {
      * @param userId 用户编号
      * @return 数据权限
      */
-    CrmPermissionDO getPermissionByIdAndUserId(Long id, Long userId);
+    CrmPermissionDO getPermission(Long id, Long userId);
 
     /**
      * 获取数据权限列表，通过 数据类型 x 某个数据
@@ -73,7 +73,7 @@ public interface CrmPermissionService {
      * @param bizId   数据编号，关联 {@link CrmBizTypeEnum} 对应模块 DO#getId()
      * @return Crm 数据权限列表
      */
-    List<CrmPermissionDO> getPermissionByBizTypeAndBizId(Integer bizType, Long bizId);
+    List<CrmPermissionDO> getPermissionListByBiz(Integer bizType, Long bizId);
 
     /**
      * 获得数据权限列表
@@ -81,7 +81,7 @@ public interface CrmPermissionService {
      * @param ids 数据权限编号列表
      * @return 数据权限列表
      */
-    List<CrmPermissionDO> getPermissionListByIds(Collection<Long> ids);
+    List<CrmPermissionDO> getPermissionList(Collection<Long> ids);
 
     /**
      * 获取用户参与的模块数据列表
