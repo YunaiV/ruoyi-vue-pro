@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.crm.dal.mysql.business;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.CrmBusinessExportReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.CrmBusinessPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessExportReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessPageReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import org.apache.ibatis.annotations.Mapper;
 

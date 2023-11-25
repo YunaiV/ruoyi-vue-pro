@@ -1,16 +1,18 @@
 package cn.iocoder.yudao.module.crm.controller.admin.business;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.*;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.status.CrmBusinessStatusQueryVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypeQueryVO;
 import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusTypeDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessStatusService;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessStatusTypeService;
@@ -91,17 +93,21 @@ public class CrmBusinessController {
     @PreAuthorize("@ss.hasPermission('crm:business:query')")
     public CommonResult<PageResult<CrmBusinessRespVO>> getBusinessPage(@Valid CrmBusinessPageReqVO pageVO) {
         PageResult<CrmBusinessDO> pageResult = businessService.getBusinessPage(pageVO, getLoginUserId());
-        //处理客户名称回显
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty(pageResult.getTotal()));
+        }
+        // 处理客户名称回显
+        // TODO @ljlleo：可以使用 CollectionUtils.convertSet 替代常用的 stream 操作，更简洁一点；下面几个也是哈；
         Set<Long> customerIds = pageResult.getList().stream()
                 .map(CrmBusinessDO::getCustomerId).filter(Objects::nonNull).collect(Collectors.toSet());
         List<CrmCustomerDO> customerList = customerService.getCustomerList(customerIds);
-        //处理商机状态类型名称回显
+        // 处理商机状态类型名称回显
         Set<Long> statusTypeIds = pageResult.getList().stream()
                 .map(CrmBusinessDO::getStatusTypeId).filter(Objects::nonNull).collect(Collectors.toSet());
         CrmBusinessStatusTypeQueryVO queryStatusTypeVO = new CrmBusinessStatusTypeQueryVO();
         queryStatusTypeVO.setIdList(statusTypeIds);
         List<CrmBusinessStatusTypeDO> statusTypeList = businessStatusTypeService.selectList(queryStatusTypeVO);
-        //处理商机状态名称回显
+        // 处理商机状态名称回显
         Set<Long> statusIds = pageResult.getList().stream()
                 .map(CrmBusinessDO::getCustomerId).filter(Objects::nonNull).collect(Collectors.toSet());
         CrmBusinessStatusQueryVO queryVO = new CrmBusinessStatusQueryVO();

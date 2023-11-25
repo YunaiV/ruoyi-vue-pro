@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.crm.service.business;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.*;
 import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;

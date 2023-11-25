@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.crm.dal.mysql.business;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.CrmBusinessStatusPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.CrmBusinessStatusQueryVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.status.CrmBusinessStatusPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.status.CrmBusinessStatusQueryVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -31,8 +31,7 @@ public interface CrmBusinessStatusMapper extends BaseMapperX<CrmBusinessStatusDO
     }
 
     default int delete(Long typeId) {
-        return delete(new LambdaQueryWrapperX<CrmBusinessStatusDO>()
-                .eq(CrmBusinessStatusDO::getTypeId, typeId));
+        return delete(CrmBusinessStatusDO::getTypeId, typeId);
     }
 
 }

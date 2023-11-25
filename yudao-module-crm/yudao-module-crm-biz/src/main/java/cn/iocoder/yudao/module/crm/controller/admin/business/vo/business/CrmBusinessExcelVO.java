@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.controller.admin.business.vo;
+package cn.iocoder.yudao.module.crm.controller.admin.business.vo.business;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;

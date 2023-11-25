@@ -7,7 +7,12 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.status.CrmBusinessStatusQueryVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.status.CrmBusinessStatusRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypePageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypeQueryVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypeRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypeSaveReqVO;
 import cn.iocoder.yudao.module.crm.convert.businessstatus.CrmBusinessStatusConvert;
 import cn.iocoder.yudao.module.crm.convert.businessstatustype.CrmBusinessStatusTypeConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
@@ -81,7 +86,8 @@ public class CrmBusinessStatusTypeController {
     @PreAuthorize("@ss.hasPermission('crm:business-status-type:query')")
     public CommonResult<CrmBusinessStatusTypeRespVO> getBusinessStatusType(@RequestParam("id") Long id) {
         CrmBusinessStatusTypeDO businessStatusType = businessStatusTypeService.getBusinessStatusType(id);
-        //处理状态回显
+        // 处理状态回显
+        // TODO @ljlleo：可以使用 CollectionUtils.convertSet 替代常用的 stream 操作，更简洁一点；下面几个也是哈；
         CrmBusinessStatusQueryVO queryVO = new CrmBusinessStatusQueryVO();
         queryVO.setTypeId(id);
         List<CrmBusinessStatusDO> statusList = businessStatusService.selectList(queryVO);
@@ -93,7 +99,8 @@ public class CrmBusinessStatusTypeController {
     @PreAuthorize("@ss.hasPermission('crm:business-status-type:query')")
     public CommonResult<PageResult<CrmBusinessStatusTypeRespVO>> getBusinessStatusTypePage(@Valid CrmBusinessStatusTypePageReqVO pageReqVO) {
         PageResult<CrmBusinessStatusTypeDO> pageResult = businessStatusTypeService.getBusinessStatusTypePage(pageReqVO);
-        //处理部门回显
+        // 处理部门回显
+        // TODO @ljlleo：可以使用 CollectionUtils.convertSet 替代常用的 stream 操作，更简洁一点；下面几个也是哈；
         Set<Long> deptIds = pageResult.getList().stream()
                 .map(CrmBusinessStatusTypeDO::getDeptIds)
                 .filter(Objects::nonNull)
@@ -126,6 +133,7 @@ public class CrmBusinessStatusTypeController {
         return success(BeanUtils.toBean(list, CrmBusinessStatusTypeRespVO.class));
     }
 
+    // TODO @ljlleo 这个接口，是不是可以和 getBusinessStatusTypeList 合并成一个？
     @GetMapping("/get-status-list")
     @Operation(summary = "获得商机状态列表")
     @PreAuthorize("@ss.hasPermission('crm:business-status:query')")
@@ -135,4 +143,5 @@ public class CrmBusinessStatusTypeController {
         List<CrmBusinessStatusDO> list = businessStatusService.selectList(queryVO);
         return success(CrmBusinessStatusConvert.INSTANCE.convertList(list));
     }
+
 }

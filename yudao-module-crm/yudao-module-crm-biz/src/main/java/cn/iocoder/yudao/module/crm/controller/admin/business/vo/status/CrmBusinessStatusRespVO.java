@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.controller.admin.business.vo;
+package cn.iocoder.yudao.module.crm.controller.admin.business.vo.status;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -26,7 +26,7 @@ public class CrmBusinessStatusRespVO {
     @ExcelProperty("赢单率")
     private String percent;
 
-    @Schema(description = "排序")
+    @Schema(description = "排序", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @ExcelProperty("排序")
     private Integer sort;
 

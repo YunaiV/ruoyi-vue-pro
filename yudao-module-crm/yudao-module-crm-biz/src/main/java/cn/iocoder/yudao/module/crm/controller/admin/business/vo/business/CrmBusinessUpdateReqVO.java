@@ -1,5 +1,6 @@
-package cn.iocoder.yudao.module.crm.controller.admin.business.vo;
+package cn.iocoder.yudao.module.crm.controller.admin.business.vo.business;
 
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessBaseVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
