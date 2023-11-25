@@ -19,6 +19,13 @@ public class SecurityProperties {
      */
     @NotEmpty(message = "Token Header 不能为空")
     private String tokenHeader = "Authorization";
+    /**
+     * HTTP 请求时，访问令牌的请求参数
+     *
+     * 初始目的：解决 WebSocket 无法通过 header 传参，只能通过 token 参数拼接
+     */
+    @NotEmpty(message = "Token Parameter 不能为空")
+    private String tokenParameter = "token";
 
     /**
      * mock 模式的开关
