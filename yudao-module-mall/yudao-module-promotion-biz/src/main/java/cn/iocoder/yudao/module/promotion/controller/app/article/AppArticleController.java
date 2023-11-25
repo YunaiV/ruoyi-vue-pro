@@ -52,7 +52,7 @@ public class AppArticleController {
     @RequestMapping("/get")
     @Operation(summary = "获得文章详情")
     @Parameter(name = "id", description = "文章编号", example = "1024")
-    public CommonResult<AppArticleRespVO> getArticlePage(@RequestParam("id") Long id) {
+    public CommonResult<AppArticleRespVO> getArticle(@RequestParam("id") Long id) {
         return success(ArticleConvert.INSTANCE.convert01(articleService.getArticle(id)));
     }
 
