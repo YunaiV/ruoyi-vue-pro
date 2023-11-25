@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.module.crm.service.customer;
 
-import cn.hutool.core.util.BooleanUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPoolConfigUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.poolconfig.CrmCustomerPoolConfigUpdateReqVO;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.customer.CrmCustomerPoolConfigMapper;
@@ -12,9 +10,6 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.Objects;
-
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CUSTOMER_POOL_CONFIG_ERROR;
 
 /**
  * 客户公海配置 Service 实现类
@@ -44,14 +39,6 @@ public class CrmCustomerPoolConfigServiceImpl implements CrmCustomerPoolConfigSe
      */
     @Override
     public void updateCustomerPoolConfig(CrmCustomerPoolConfigUpdateReqVO saveReqVO) {
-        // TODO @wanwan：看下 @AssertTrue 的逻辑；
-        if (BooleanUtil.isTrue(saveReqVO.getEnabled()) && (ObjectUtil.hasNull(saveReqVO.getContactExpireDays(), saveReqVO.getDealExpireDays()))) {
-            throw exception(CUSTOMER_POOL_CONFIG_ERROR);
-        }
-        if (BooleanUtil.isTrue(saveReqVO.getNotifyEnabled()) && (Objects.isNull(saveReqVO.getNotifyDays()))) {
-            throw exception(CUSTOMER_POOL_CONFIG_ERROR);
-        }
-
         // 存在，则进行更新
         CrmCustomerPoolConfigDO dbConfig = getCustomerPoolConfig();
         if (Objects.nonNull(dbConfig)) {

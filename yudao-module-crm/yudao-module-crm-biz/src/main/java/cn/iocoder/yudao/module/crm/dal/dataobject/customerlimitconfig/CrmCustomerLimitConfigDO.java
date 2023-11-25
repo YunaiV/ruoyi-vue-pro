@@ -32,8 +32,8 @@ public class CrmCustomerLimitConfigDO extends BaseDO {
     private Long id;
     /**
      * 规则类型
-     *
-     * TODO @wanwan：搞个枚举哈；
+     * <p>
+     * 枚举 {@link cn.iocoder.yudao.module.crm.enums.customer.LimitConfigTypeEnum}
      */
     private Integer type;
     /**
