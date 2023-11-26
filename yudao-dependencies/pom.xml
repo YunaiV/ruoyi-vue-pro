@@ -73,7 +73,7 @@
         <justauth.version>1.0.8</justauth.version>
         <jimureport.version>1.6.1</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
-        <weixin-java.version>4.5.0</weixin-java.version>
+        <weixin-java.version>4.5.7.B</weixin-java.version>
     </properties>
 
     <dependencyManagement>
@@ -111,11 +111,6 @@
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-pay</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.iocoder.boot</groupId>
-                <artifactId>yudao-spring-boot-starter-biz-weixin</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
@@ -622,11 +617,6 @@
             <dependency>
                 <groupId>com.github.binarywang</groupId>
                 <artifactId>weixin-java-pay</artifactId>
-                <version>${weixin-java.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.binarywang</groupId>
-                <artifactId>weixin-java-mp</artifactId>
                 <version>${weixin-java.version}</version>
             </dependency>
             <dependency>
