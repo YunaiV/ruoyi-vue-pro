@@ -231,6 +231,11 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     }
 
     @Override
+    public List<CrmCustomerDO> getCustomerList() {
+        return customerMapper.selectList();
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void putCustomerPool(Long id) {

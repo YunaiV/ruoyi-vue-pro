@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.crm.service.contact;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactCreateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactExportReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.ContactDO;
@@ -71,11 +70,11 @@ public interface ContactService {
      * @param exportReqVO 查询条件
      * @return crm联系人列表
      */
-    List<ContactDO> getContactList(ContactExportReqVO exportReqVO);
+    List<ContactDO> getContactList(ContactPageReqVO exportReqVO);
 
     /**
      * 获取所有联系人列表，只返回姓名和id
      * @return 所有联系人列表
      */
-    List<ContactDO> allContactList();
+    List<ContactDO> getContactList();
 }

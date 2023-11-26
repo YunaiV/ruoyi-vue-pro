@@ -26,13 +26,13 @@ public class ContactPageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] nextTime;
 
-    @Schema(description = "手机号")
+    @Schema(description = "手机号",example = "13898273941")
     private String mobile;
 
-    @Schema(description = "电话")
+    @Schema(description = "电话",example = "021-383773")
     private String telephone;
 
-    @Schema(description = "电子邮箱")
+    @Schema(description = "电子邮箱",example = "111@22.com")
     private String email;
 
     @Schema(description = "客户编号", example = "10795")
@@ -61,19 +61,19 @@ public class ContactPageReqVO extends PageParam {
     @Schema(description = "职位")
     private String post;
 
-    @Schema(description = "QQ")
+    @Schema(description = "QQ",example = "3882872")
     private Long qq;
 
-    @Schema(description = "微信")
-    private String webchat;
+    @Schema(description = "微信",example = "zzZ98373")
+    private String wechat;
 
     @Schema(description = "性别")
     private Integer sex;
 
     @Schema(description = "是否关键决策人")
-    private Boolean policyMakers;
+    private Boolean master;
 
     @Schema(description = "负责人用户编号", example = "14334")
-    private String ownerUserId;
+    private Long ownerUserId;
 
 }
