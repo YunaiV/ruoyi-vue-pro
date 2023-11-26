@@ -32,14 +32,14 @@ public interface ContactMapper extends BaseMapperX<ContactDO> {
                 .likeIfPresent(ContactDO::getName, reqVO.getName())
                 .eqIfPresent(ContactDO::getPost, reqVO.getPost())
                 .eqIfPresent(ContactDO::getQq, reqVO.getQq())
-                .eqIfPresent(ContactDO::getWebchat, reqVO.getWebchat())
+                .eqIfPresent(ContactDO::getWechat, reqVO.getWechat())
                 .eqIfPresent(ContactDO::getSex, reqVO.getSex())
-                .eqIfPresent(ContactDO::getPolicyMakers, reqVO.getPolicyMakers())
+                .eqIfPresent(ContactDO::getMaster, reqVO.getMaster())
                 .eqIfPresent(ContactDO::getOwnerUserId, reqVO.getOwnerUserId())
                 .orderByDesc(ContactDO::getId));
     }
 
-    default List<ContactDO> selectList(ContactExportReqVO reqVO) {
+    default List<ContactDO> selectList(ContactPageReqVO reqVO) {
         return selectList(new LambdaQueryWrapperX<ContactDO>()
                 .betweenIfPresent(ContactDO::getNextTime, reqVO.getNextTime())
                 .eqIfPresent(ContactDO::getMobile, reqVO.getMobile())
@@ -54,9 +54,9 @@ public interface ContactMapper extends BaseMapperX<ContactDO> {
                 .likeIfPresent(ContactDO::getName, reqVO.getName())
                 .eqIfPresent(ContactDO::getPost, reqVO.getPost())
                 .eqIfPresent(ContactDO::getQq, reqVO.getQq())
-                .eqIfPresent(ContactDO::getWebchat, reqVO.getWebchat())
+                .eqIfPresent(ContactDO::getWechat, reqVO.getWechat())
                 .eqIfPresent(ContactDO::getSex, reqVO.getSex())
-                .eqIfPresent(ContactDO::getPolicyMakers, reqVO.getPolicyMakers())
+                .eqIfPresent(ContactDO::getMaster, reqVO.getMaster())
                 .eqIfPresent(ContactDO::getOwnerUserId, reqVO.getOwnerUserId())
                 .orderByDesc(ContactDO::getId));
     }

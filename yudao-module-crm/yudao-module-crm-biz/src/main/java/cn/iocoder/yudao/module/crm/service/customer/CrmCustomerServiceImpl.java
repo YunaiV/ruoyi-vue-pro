@@ -228,4 +228,57 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         }
     }
 
+    // TODO @puhui999：合并到 receiveCustomer 里
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void receive(Long id, Long userId) {
+        // 1. 校验存在
+        CrmCustomerDO customer = customerMapper.selectById(id);
+        if (customer == null) {
+            throw exception(CUSTOMER_NOT_EXISTS);
+        }
+        // 1.2. 校验是否为公海数据
+        if (customer.getOwnerUserId() != null) {
+            throw exception(CUSTOMER_NOT_IN_POOL);
+        }
+
+        // 2. 领取公海数据-设置负责人
+        customerMapper.updateById(new CrmCustomerDO().setId(customer.getId()).setOwnerUserId(userId));
+        // 3. 创建负责人数据权限
+        crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
+                .setBizId(customer.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
+    public void putCustomerPool(Long id) {
+        // 1. 校验存在
+        CrmCustomerDO customer = customerMapper.selectById(id);
+        if (customer == null) {
+            throw exception(CUSTOMER_NOT_EXISTS);
+        }
+        // TODO puhui999：校验合并到 validateCustomerOwnerExists、validateCustomerIsLocked
+        // 1.2. 校验是否为公海数据
+        if (customer.getOwnerUserId() == null) {
+            throw exception(CUSTOMER_IN_POOL);
+        }
+        // 1.3. 校验客户是否锁定
+        if (customer.getLockStatus()) {
+            throw exception(CUSTOMER_LOCKED_PUT_POOL_FAIL);
+        }
+
+        // 2. 设置负责人为 NULL
+        // TODO @puhui999：updateById 这么操作，是无法设置 null 的；
+        customerMapper.updateById(new CrmCustomerDO().setId(customer.getId()).setOwnerUserId(null));
+        // 3. 删除负责人数据权限
+        crmPermissionService.deletePermission(CrmBizTypeEnum.CRM_CUSTOMER.getType(), customer.getId(),
+                CrmPermissionLevelEnum.OWNER.getLevel());
+    }
+
+    @Override
+    public List<CrmCustomerDO> getCustomerList() {
+        return customerMapper.selectList();
+    }
+
 }

@@ -82,4 +82,6 @@ public interface CrmCustomerConvert {
 
     CrmCustomerPoolConfigDO convert(CrmCustomerPoolConfigSaveReqVO updateReqVO);
 
+    CrmCustomerQueryAllRespVO convertQueryAll(CrmCustomerDO crmCustomerDO);
+    List<CrmCustomerQueryAllRespVO> convertQueryAll(List<CrmCustomerDO> crmCustomerDO);
 }

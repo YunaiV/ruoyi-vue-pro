@@ -107,4 +107,10 @@ public interface CrmCustomerService {
      */
     void receiveCustomer(List<Long> ids, Long ownerUserId);
 
+    /**
+     * 获取客户列表
+     * @return 客户列表
+     * @author zyna
+     */
+    List<CrmCustomerDO> getCustomerList();
 }
