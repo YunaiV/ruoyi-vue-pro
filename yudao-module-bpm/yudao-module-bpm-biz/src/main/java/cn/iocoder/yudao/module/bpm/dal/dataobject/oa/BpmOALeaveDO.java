@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.bpm.dal.dataobject.oa;
 
-import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
-import lombok.*;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
+
+import java.time.LocalDateTime;
 
 /**
  * OA 请假申请 DO
@@ -37,7 +39,6 @@ public class BpmOALeaveDO extends BaseDO {
     /**
      * 请假类型
      */
-    @TableField("`type`")
     private String type;
     /**
      * 原因
