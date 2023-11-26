@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.crm.service.customer;
 
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPoolConfigUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.poolconfig.CrmCustomerPoolConfigUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
 
 import javax.validation.Valid;

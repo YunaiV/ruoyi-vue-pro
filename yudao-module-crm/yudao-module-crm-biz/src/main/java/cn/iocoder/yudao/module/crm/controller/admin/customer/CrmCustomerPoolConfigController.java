@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.crm.controller.admin.customer;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPoolConfigRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPoolConfigUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.poolconfig.CrmCustomerPoolConfigRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.poolconfig.CrmCustomerPoolConfigUpdateReqVO;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerPoolConfigService;
@@ -34,11 +34,10 @@ public class CrmCustomerPoolConfigController {
         return success(CrmCustomerConvert.INSTANCE.convert(customerPoolConfig));
     }
 
-    // TODO @wanwan：这个请求，搞成 save 哈；
-    @PutMapping("/update")
+    @PutMapping("/save")
     @Operation(summary = "更新客户公海规则设置")
     @PreAuthorize("@ss.hasPermission('crm:customer-pool-config:update')")
-    public CommonResult<Boolean> updateCustomerPoolConfig(@Valid @RequestBody CrmCustomerPoolConfigUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> saveCustomerPoolConfig(@Valid @RequestBody CrmCustomerPoolConfigUpdateReqVO updateReqVO) {
         customerPoolConfigService.updateCustomerPoolConfig(updateReqVO);
         return success(true);
     }

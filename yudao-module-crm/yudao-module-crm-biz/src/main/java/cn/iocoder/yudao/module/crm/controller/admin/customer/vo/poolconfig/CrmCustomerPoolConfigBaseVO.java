@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.controller.admin.customer.vo;
+package cn.iocoder.yudao.module.crm.controller.admin.customer.vo.poolconfig;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -12,7 +12,6 @@ import javax.validation.constraints.NotNull;
 @Data
 public class CrmCustomerPoolConfigBaseVO {
 
-    // TODO @wanwan：参数校验
     @Schema(description = "是否启用客户公海", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     @NotNull(message = "是否启用客户公海不能为空")
     private Boolean enabled;

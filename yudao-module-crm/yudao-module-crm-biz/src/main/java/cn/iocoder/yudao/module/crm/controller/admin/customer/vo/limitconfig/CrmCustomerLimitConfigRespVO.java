@@ -1,5 +1,7 @@
-package cn.iocoder.yudao.module.crm.controller.admin.customer.vo;
+package cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig;
 
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,10 +20,10 @@ public class CrmCustomerLimitConfigRespVO extends CrmCustomerLimitConfigBaseVO {
     private Long id;
 
     @Schema(description = "规则适用人群名称")
-    private String userNames;
+    private List<AdminUserRespDTO> users;
 
     @Schema(description = "规则适用部门名称")
-    private String deptNames;
+    private List<DeptRespDTO> depts;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
