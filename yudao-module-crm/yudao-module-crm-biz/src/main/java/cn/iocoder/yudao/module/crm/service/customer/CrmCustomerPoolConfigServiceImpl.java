@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.crm.service.customer;
 
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.poolconfig.CrmCustomerPoolConfigUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.poolconfig.CrmCustomerPoolConfigSaveReqVO;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.customer.CrmCustomerPoolConfigMapper;
@@ -38,7 +38,7 @@ public class CrmCustomerPoolConfigServiceImpl implements CrmCustomerPoolConfigSe
      * @param saveReqVO 更新信息
      */
     @Override
-    public void updateCustomerPoolConfig(CrmCustomerPoolConfigUpdateReqVO saveReqVO) {
+    public void saveCustomerPoolConfig(CrmCustomerPoolConfigSaveReqVO saveReqVO) {
         // 存在，则进行更新
         CrmCustomerPoolConfigDO dbConfig = getCustomerPoolConfig();
         if (Objects.nonNull(dbConfig)) {

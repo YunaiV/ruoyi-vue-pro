@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.crm.controller.admin.customer;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.poolconfig.CrmCustomerPoolConfigRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.poolconfig.CrmCustomerPoolConfigUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.poolconfig.CrmCustomerPoolConfigSaveReqVO;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerPoolConfigService;
@@ -37,8 +37,8 @@ public class CrmCustomerPoolConfigController {
     @PutMapping("/save")
     @Operation(summary = "更新客户公海规则设置")
     @PreAuthorize("@ss.hasPermission('crm:customer-pool-config:update')")
-    public CommonResult<Boolean> saveCustomerPoolConfig(@Valid @RequestBody CrmCustomerPoolConfigUpdateReqVO updateReqVO) {
-        customerPoolConfigService.updateCustomerPoolConfig(updateReqVO);
+    public CommonResult<Boolean> saveCustomerPoolConfig(@Valid @RequestBody CrmCustomerPoolConfigSaveReqVO updateReqVO) {
+        customerPoolConfigService.saveCustomerPoolConfig(updateReqVO);
         return success(true);
     }
 

@@ -8,8 +8,8 @@ import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmC
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigUpdateReqVO;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerLimitConfigConvert;
-import cn.iocoder.yudao.module.crm.dal.dataobject.customerlimitconfig.CrmCustomerLimitConfigDO;
-import cn.iocoder.yudao.module.crm.service.customerlimitconfig.CrmCustomerLimitConfigService;
+import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerLimitConfigDO;
+import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerLimitConfigService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -29,7 +29,7 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSetByFlatMap;
 
-@Tag(name = "管理后台 - 客户限制配置")
+@Tag(name = "管理后台 - CRM 客户限制配置")
 @RestController
 @RequestMapping("/crm/customer-limit-config")
 @Validated

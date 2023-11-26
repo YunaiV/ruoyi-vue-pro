@@ -13,7 +13,7 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum LimitConfigTypeEnum implements IntArrayValuable {
+public enum CrmCustomerLimitConfigTypeEnum implements IntArrayValuable {
 
     /**
      * 拥有客户数限制
@@ -25,7 +25,7 @@ public enum LimitConfigTypeEnum implements IntArrayValuable {
     CUSTOMER_LOCK_LIMIT(2, "锁定客户数限制"),
     ;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(LimitConfigTypeEnum::getCode).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CrmCustomerLimitConfigTypeEnum::getCode).toArray();
 
     /**
      * 状态
@@ -40,4 +40,5 @@ public enum LimitConfigTypeEnum implements IntArrayValuable {
     public int[] array() {
         return ARRAYS;
     }
+
 }

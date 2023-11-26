@@ -1,7 +1,8 @@
-package cn.iocoder.yudao.module.crm.dal.dataobject.customerlimitconfig;
+package cn.iocoder.yudao.module.crm.dal.dataobject.customer;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
+import cn.iocoder.yudao.module.crm.enums.customer.CrmCustomerLimitConfigTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -33,7 +34,7 @@ public class CrmCustomerLimitConfigDO extends BaseDO {
     /**
      * 规则类型
      * <p>
-     * 枚举 {@link cn.iocoder.yudao.module.crm.enums.customer.LimitConfigTypeEnum}
+     * 枚举 {@link CrmCustomerLimitConfigTypeEnum}
      */
     private Integer type;
     /**
