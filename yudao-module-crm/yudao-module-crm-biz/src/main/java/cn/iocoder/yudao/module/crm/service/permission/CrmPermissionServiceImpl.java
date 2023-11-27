@@ -19,6 +19,7 @@ import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -50,6 +51,16 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
         CrmPermissionDO permission = CrmPermissionConvert.INSTANCE.convert(createBO);
         crmPermissionMapper.insert(permission);
         return permission.getId();
+    }
+
+    @Override
+    public void createPermissionBatch(List<CrmPermissionCreateReqBO> createBOs) {
+        // 1. 校验用户是否存在
+        adminUserApi.validateUserList(convertSet(createBOs, CrmPermissionCreateReqBO::getUserId));
+
+        // 2. 创建
+        List<CrmPermissionDO> permissions = CrmPermissionConvert.INSTANCE.convertList(createBOs);
+        crmPermissionMapper.insertBatch(permissions);
     }
 
     @Override
@@ -112,16 +123,6 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deletePermission(Collection<Long> ids) {
-        // 校验存在
-        validateCrmPermissionExists(ids);
-
-        // 删除
-        crmPermissionMapper.deleteBatchIds(ids);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
     public void deletePermission(Integer bizType, Long bizId, Integer level) {
         List<CrmPermissionDO> permissions = crmPermissionMapper.selectListByBizTypeAndBizIdAndLevel(
                 bizType, bizId, level);
@@ -135,21 +136,44 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
     }
 
     @Override
-    public CrmPermissionDO getPermission(Long id, Long userId) {
-        return crmPermissionMapper.selectByIdAndUserId(id, userId);
+    public void deletePermissionBatch(Collection<Long> ids, Long userId) {
+        List<CrmPermissionDO> permissions = crmPermissionMapper.selectBatchIds(ids);
+        if (CollUtil.isEmpty(permissions)) {
+            throw exception(CRM_PERMISSION_NOT_EXISTS);
+        }
+        Set<Long> bizIds = convertSet(permissions, CrmPermissionDO::getBizId);
+        if (bizIds.size() > 1) { // 情况一：数据权限的模块数据编号是一致的不可能存在两个
+            throw exception(CRM_PERMISSION_DELETE_FAIL);
+        }
+        // 校验操作人是否为负责人
+        CrmPermissionDO permission = crmPermissionMapper.selectByIdAndUserId(permissions.get(0).getBizId(), userId);
+        if (!CrmPermissionLevelEnum.isOwner(permission.getLevel())) {
+            throw exception(CRM_PERMISSION_DELETE_DENIED);
+        }
+
+        // 删除数据权限
+        crmPermissionMapper.deleteBatchIds(ids);
+    }
+
+    @Override
+    public void deleteSelfPermission(Long id, Long userId) {
+        // 校验数据存在且是自己
+        CrmPermissionDO permission = crmPermissionMapper.selectByIdAndUserId(id, userId);
+        if (permission == null) {
+            throw exception(CRM_PERMISSION_NOT_EXISTS);
+        }
+        // 校验是否是负责人
+        if (CrmPermissionLevelEnum.isOwner(permission.getLevel())) {
+            throw exception(CRM_PERMISSION_DELETE_SELF_PERMISSION_FAIL_EXIST_OWNER);
+        }
+
+        // 删除
+        crmPermissionMapper.deleteById(id);
     }
 
     @Override
     public List<CrmPermissionDO> getPermissionListByBiz(Integer bizType, Long bizId) {
         return crmPermissionMapper.selectByBizTypeAndBizId(bizType, bizId);
-    }
-
-    @Override
-    public List<CrmPermissionDO> getPermissionList(Collection<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return Collections.emptyList();
-        }
-        return crmPermissionMapper.selectBatchIds(ids);
     }
 
     @Override

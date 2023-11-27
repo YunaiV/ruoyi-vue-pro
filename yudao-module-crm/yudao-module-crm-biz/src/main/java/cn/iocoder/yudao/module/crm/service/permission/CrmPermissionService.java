@@ -28,6 +28,13 @@ public interface CrmPermissionService {
     Long createPermission(@Valid CrmPermissionCreateReqBO createBO);
 
     /**
+     * 创建数据权限
+     *
+     * @param createBOs 创建信息
+     */
+    void createPermissionBatch(@Valid List<CrmPermissionCreateReqBO> createBOs);
+
+    /**
      * 更新数据权限
      *
      * @param updateReqVO 更新信息
@@ -44,13 +51,6 @@ public interface CrmPermissionService {
     /**
      * 删除数据权限
      *
-     * @param ids 编号
-     */
-    void deletePermission(Collection<Long> ids);
-
-    /**
-     * 删除数据权限
-     *
      * @param bizType 数据类型，关联 {@link CrmBizTypeEnum}
      * @param bizId   数据编号，关联 {@link CrmBizTypeEnum} 对应模块 DO#getId()
      * @param level   数据权限级别，关联 {@link CrmPermissionLevelEnum}
@@ -58,13 +58,19 @@ public interface CrmPermissionService {
     void deletePermission(Integer bizType, Long bizId, Integer level);
 
     /**
-     * 获取用户数据权限通过 权限编号 x 用户编号
+     * 批量删除数据权限
+     *
+     * @param ids 权限编号
+     */
+    void deletePermissionBatch(Collection<Long> ids, Long userId);
+
+    /**
+     * 删除指定用户数据权限
      *
      * @param id     权限编号
      * @param userId 用户编号
-     * @return 数据权限
      */
-    CrmPermissionDO getPermission(Long id, Long userId);
+    void deleteSelfPermission(Long id, Long userId);
 
     /**
      * 获取数据权限列表，通过 数据类型 x 某个数据
@@ -74,14 +80,6 @@ public interface CrmPermissionService {
      * @return Crm 数据权限列表
      */
     List<CrmPermissionDO> getPermissionListByBiz(Integer bizType, Long bizId);
-
-    /**
-     * 获得数据权限列表
-     *
-     * @param ids 数据权限编号列表
-     * @return 数据权限列表
-     */
-    List<CrmPermissionDO> getPermissionList(Collection<Long> ids);
 
     /**
      * 获取用户参与的模块数据列表

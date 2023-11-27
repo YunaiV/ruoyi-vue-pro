@@ -61,4 +61,6 @@ public interface CrmPermissionConvert {
                 id -> new CrmPermissionDO().setId(id).setLevel(updateReqVO.getLevel()));
     }
 
+    List<CrmPermissionDO> convertList(List<CrmPermissionCreateReqBO> createBOs);
+
 }
