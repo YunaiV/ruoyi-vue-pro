@@ -43,7 +43,7 @@
 </template>
 
 <script>
-  import * as StudentApi from '@/api/infra/demo'
+  import * as StudentApi from '@/api/infra/demo';
   import ImageUpload from '@/components/ImageUpload';
   import FileUpload from '@/components/FileUpload';
   import Editor from '@/components/Editor';
@@ -89,18 +89,16 @@
     },
     methods: {
       /** 打开弹窗 */
-     open(id) {
+     async open(id) {
         this.dialogVisible = true;
         this.reset();
-        const that = this;
         // 修改时，设置数据
         if (id) {
           this.formLoading = true;
           try {
-            StudentApi.getStudent(id).then(res=>{
-              that.formData = res.data;
-              that.title = "修改学生";
-            })
+            const res = await StudentApi.getStudent(id);
+            this.formData = res.data;
+            this.title = "修改学生";
           } finally {
             this.formLoading = false;
           }
@@ -108,41 +106,28 @@
         this.title = "新增学生";
               },
       /** 提交按钮 */
-      submitForm() {
-        this.formLoading = true;
+      async submitForm() {
+        // 校验主表
+        await this.$refs["formRef"].validate();
+                  this.formLoading = true;
         try {
-          const that = this;
-          let data = this.formData;
-          let validate = false;
-          // 校验主表
-          this.getRef("formRef").validate(valid => {
-            validate = valid;
-          });
-                  // 所有表单校验通过后方可提交
-          if (!validate) {
-            return;
-          }
-          // 修改的提交
+          const data = this.formData;
+                  // 修改的提交
           if (data.id) {
-                  StudentApi.updateStudent(data).then(response => {
-              that.$modal.msgSuccess("修改成功");
-              that.dialogVisible = false;
-              that.$emit('success');
-            });
+            await StudentApi.updateStudent(data);
+            this.$modal.msgSuccess("修改成功");
+            this.dialogVisible = false;
+            this.$emit('success');
             return;
           }
           // 添加的提交
-          StudentApi.createStudent(data).then(response => {
-            that.$modal.msgSuccess("新增成功");
-            that.dialogVisible = false;
-            that.$emit('success');
-          });
-        }finally {
+          await StudentApi.createStudent(data);
+          this.$modal.msgSuccess("新增成功");
+          this.dialogVisible = false;
+          this.$emit('success');
+        } finally {
           this.formLoading = false;
         }
-      },
-      getRef(refName){
-        return this.$refs[refName];
       },
                       /** 表单重置 */
       reset() {
@@ -158,7 +143,7 @@
                             memo: undefined,
         };
         this.resetForm("formRef");
-      },
+      }
     }
   };
 </script>

@@ -1,6 +1,5 @@
 <template>
   <div class="app-container">
-
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="名字" prop="name">
@@ -45,12 +44,12 @@
     </el-row>
 
             <el-table
-          v-loading="loading"
-          :data="list"
-          :stripe="true"
-          :highlight-current-row="true"
-          :show-overflow-tooltip="true"
-          @current-change="handleCurrentChange"
+        v-loading="loading"
+        :data="list"
+        :stripe="true"
+        :highlight-current-row="true"
+        :show-overflow-tooltip="true"
+        @current-change="handleCurrentChange"
       >
                       <el-table-column label="编号" align="center" prop="id">
         <template v-slot="scope">
@@ -131,8 +130,8 @@
 <script>
 import * as StudentApi from '@/api/infra/demo';
 import StudentForm from './StudentForm.vue';
-    import StudentContactList from './components/StudentContactList.vue'
-    import StudentTeacherList from './components/StudentTeacherList.vue'
+    import StudentContactList from './components/StudentContactList.vue';
+    import StudentTeacherList from './components/StudentTeacherList.vue';
 export default {
   name: "Student",
   components: {
@@ -177,13 +176,12 @@ export default {
   },
   methods: {
     /** 查询列表 */
-    getList() {
+    async getList() {
       try {
       this.loading = true;
-            StudentApi.getStudentPage(this.queryParams).then(response => {
-        this.list = response.data.list;
-        this.total = response.data.total;
-      });
+              const res = await StudentApi.getStudentPage(this.queryParams);
+        this.list = res.data.list;
+        this.total = res.data.total;
       } finally {
         this.loading = false;
       }
@@ -203,31 +201,25 @@ export default {
       this.$refs["formRef"].open(id);
     },
     /** 删除按钮操作 */
-    handleDelete(row) {
-      const that = this;
-      try {
+    async handleDelete(row) {
       const id = row.id;
-      this.$modal.confirm('是否确认删除学生编号为"' + id + '"的数据项?').then(()=>{
-          return StudentApi.deleteStudent(id);
-        }).then(() => {
-        that.getList();
-        that.$modal.msgSuccess("删除成功");
-        }).catch(() => {});
+      await this.$modal.confirm('是否确认删除学生编号为"' + id + '"的数据项?')
+      try {
+       await StudentApi.deleteStudent(id);
+       await this.getList();
+       this.$modal.msgSuccess("删除成功");
       } catch {}
     },
     /** 导出按钮操作 */
-    handleExport() {
-      const that = this;
+    async handleExport() {
+      await this.$modal.confirm('是否确认导出所有学生数据项?');
       try {
-          this.$modal.confirm('是否确认导出所有学生数据项?').then(() => {
-              that.exportLoading = true;
-              return StudentApi.exportStudentExcel(params);
-            }).then(response => {
-              that.$download.excel(response, '学生.xls');
-            });
+        this.exportLoading = true;
+        const res = await StudentApi.exportStudentExcel(this.queryParams);
+        this.$download.excel(res.data, '学生.xls');
       } catch {
       } finally {
-        that.exportLoading = false;
+        this.exportLoading = false;
       }
     },
               /** 选中行操作 */

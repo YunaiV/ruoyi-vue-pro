@@ -43,7 +43,7 @@
 </template>
 
 <script>
-  import * as StudentApi from '@/api/infra/demo'
+  import * as StudentApi from '@/api/infra/demo';
       import ImageUpload from '@/components/ImageUpload';
       import FileUpload from '@/components/FileUpload';
       import Editor from '@/components/Editor';
@@ -90,19 +90,17 @@
     },
     methods: {
       /** 打开弹窗 */
-      open(id, studentId) {
+      async open(id, studentId) {
         this.dialogVisible = true;
         this.reset();
-        const that = this;
         this.formData.studentId = studentId;
         // 修改时，设置数据
         if (id) {
           this.formLoading = true;
           try {
-              StudentApi.getStudentTeacher(id).then(res=>{
-              that.formData = res.data;
-              that.dialogTitle = "修改学生班主任";
-            })
+            const res = await StudentApi.getStudentTeacher(id);
+            this.formData = res.data;
+            this.dialogTitle = "修改学生班主任";
           } finally {
             this.formLoading = false;
           }
@@ -110,32 +108,26 @@
         this.dialogTitle = "新增学生班主任";
       },
       /** 提交按钮 */
-      submitForm() {
+      async submitForm() {
+        await this.$refs["formRef"].validate();
         this.formLoading = true;
         try {
-          let data = this.formData;
-          this.$refs["formRef"].validate(valid => {
-            if (!valid) {
-              return;
-            }
+            const data = this.formData;
             // 修改的提交
             if (data.id) {
-              StudentApi.updateStudentTeacher(data).then(response => {
-                this.$modal.msgSuccess("修改成功");
-                this.dialogVisible = false;
-                this.$emit('success');
-              });
+            await  StudentApi.updateStudentTeacher(data);
+            this.$modal.msgSuccess("修改成功");
+            this.dialogVisible = false;
+            this.$emit('success');
               return;
             }
             // 添加的提交
-            StudentApi.createStudentTeacher(data).then(response => {
+              await StudentApi.createStudentTeacher(data);
               this.$modal.msgSuccess("新增成功");
               this.dialogVisible = false;
               this.$emit('success');
-            });
-          });
         }finally {
-          this.formLoading = false
+          this.formLoading = false;
         }
       },
       /** 表单重置 */
