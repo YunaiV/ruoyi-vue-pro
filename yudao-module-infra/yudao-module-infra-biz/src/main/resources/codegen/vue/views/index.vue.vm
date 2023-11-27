@@ -1,6 +1,5 @@
 <template>
   <div class="app-container">
-
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
 #foreach($column in $columns)
@@ -68,24 +67,24 @@
       ## 特殊：主子表专属逻辑
       #if ( $table.templateType == 11 && $subTables && $subTables.size() > 0 )
       <el-table
-          v-loading="loading"
-          :data="list"
-          :stripe="true"
-          :highlight-current-row="true"
-          :show-overflow-tooltip="true"
-          @current-change="handleCurrentChange"
+        v-loading="loading"
+        :data="list"
+        :stripe="true"
+        :highlight-current-row="true"
+        :show-overflow-tooltip="true"
+        @current-change="handleCurrentChange"
       >
           ## 特殊：树表专属逻辑
       #elseif ( $table.templateType == 2 )
       <el-table
-          v-loading="loading"
-          :data="list"
-          :stripe="true"
-          :show-overflow-tooltip="true"
-          v-if="refreshTable"
-          row-key="id"
-          :default-expand-all="isExpandAll"
-          :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+        v-loading="loading"
+        :data="list"
+        :stripe="true"
+        :show-overflow-tooltip="true"
+        v-if="refreshTable"
+        row-key="id"
+        :default-expand-all="isExpandAll"
+        :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
       >
       #else
       <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
@@ -183,7 +182,7 @@ import Editor from '@/components/Editor';
 #if ( $table.templateType != 10 )
 #if ( $subTables && $subTables.size() > 0 )
     #foreach ($subSimpleClassName in $subSimpleClassNames)
-    import ${subSimpleClassName}List from './components/${subSimpleClassName}List.vue'
+    import ${subSimpleClassName}List from './components/${subSimpleClassName}List.vue';
     #end
 #end
 #end
@@ -298,7 +297,7 @@ export default {
       await this.#[[$modal]]#.confirm('是否确认删除${table.classComment}编号为"' + ${primaryColumn.javaField} + '"的数据项?')
       try {
        await ${simpleClassName}Api.delete${simpleClassName}(${primaryColumn.javaField});
-       this.getList();
+       await this.getList();
        this.#[[$modal]]#.msgSuccess("删除成功");
       } catch {}
     },

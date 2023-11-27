@@ -8,12 +8,12 @@
   <div class="app-container">
     #if ( $subTable.subJoinMany )## 情况一：一对多，table + form
       <el-form
-          ref="formRef"
-          :model="formData"
-          :rules="formRules"
-          v-loading="formLoading"
-          label-width="0px"
-          :inline-message="true"
+        ref="formRef"
+        :model="formData"
+        :rules="formRules"
+        v-loading="formLoading"
+        label-width="0px"
+        :inline-message="true"
       >
         <el-table :data="formData" class="-mt-10px">
           <el-table-column label="序号" type="index" width="100" />
@@ -137,11 +137,11 @@
       </el-row>
     #else## 情况二：一对一，form
       <el-form
-          ref="formRef"
-          :model="formData"
-          :rules="formRules"
-          label-width="100px"
-          v-loading="formLoading"
+        ref="formRef"
+        :model="formData"
+        :rules="formRules"
+        label-width="100px"
+        v-loading="formLoading"
       >
           #foreach($column in $subColumns)
               #if ($column.createOperation || $column.updateOperation)
@@ -221,7 +221,7 @@
 </template>
 
 <script>
-  import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${table.businessName}'
+  import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${table.businessName}';
       #if ($hasImageUploadColumn)
       import ImageUpload from '@/components/ImageUpload';
       #end

@@ -12,10 +12,10 @@
                   #if ( $table.templateType == 2 && $column.id == $treeParentColumn.id )
                     <el-form-item label="${comment}" prop="${javaField}">
                       <TreeSelect
-                          v-model="formData.${javaField}"
-                          :options="${classNameVar}Tree"
-                          :normalizer="normalizer"
-                          placeholder="请选择${comment}"
+                        v-model="formData.${javaField}"
+                        :options="${classNameVar}Tree"
+                        :normalizer="normalizer"
+                        placeholder="请选择${comment}"
                       />
                     </el-form-item>
                   #elseif ($column.htmlType == "input" && !$column.primaryKey)## 忽略主键，不用在表单里
@@ -107,7 +107,7 @@
 </template>
 
 <script>
-  import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${table.businessName}'
+  import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${table.businessName}';
   #if ($hasImageUploadColumn)
   import ImageUpload from '@/components/ImageUpload';
   #end
@@ -212,7 +212,7 @@
         this.title = "新增${table.classComment}";
         ## 特殊：树表专属逻辑
         #if ( $table.templateType == 2 )
-            this.get${simpleClassName}Tree();
+        await this.get${simpleClassName}Tree();
         #end
       },
       /** 提交按钮 */
@@ -263,7 +263,7 @@
           this.#[[$modal]]#.msgSuccess("新增成功");
           this.dialogVisible = false;
           this.#[[$]]#emit('success');
-        }finally {
+        } finally {
           this.formLoading = false;
         }
       },
