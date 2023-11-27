@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.crm.service.customer;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerCreateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTransferReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerUpdateReqVO;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.customer.CrmCustomerMapper;
@@ -15,8 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -95,18 +98,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     public PageResult<CrmCustomerDO> getCustomerPage(CrmCustomerPageReqVO pageReqVO, Long userId) {
         // 1.1. TODO 如果是超级管理员
         boolean admin = false;
-        if (admin) {
-            return customerMapper.selectPage(pageReqVO);
-        }
-        // 1.2. 获取当前用户能看的分页数据
-        return customerMapper.selectPage(pageReqVO, userId);
-    }
-
-    @Override
-    public List<CrmCustomerDO> getCustomerList(CrmCustomerExportReqVO exportReqVO) {
-        //return customerMapper.selectList(exportReqVO);
-        // TODO puhui999: 等数据权限完善后再实现
-        return Collections.emptyList();
+        return customerMapper.selectPage(pageReqVO, userId, admin);
     }
 
     /**
@@ -152,86 +144,6 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void receiveCustomer(List <Long> ids,Long ownerUserId) {
-        transferCustomerOwner(ids, ownerUserId);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void distributeCustomer(List <Long> ids, Long ownerUserId) {
-        transferCustomerOwner(ids, ownerUserId);
-    }
-
-    /**
-     * 转移客户负责人
-     *
-     * @param ids 客户编号数组
-     * @param ownerUserId 负责人编号
-     */
-    private void transferCustomerOwner(List <Long> ids, Long ownerUserId) {
-        // 先一次性加载所有数据，校验客户是否可用
-        List <CrmCustomerDO> customers = customerMapper.selectBatchIds(ids);
-        for (CrmCustomerDO customer : customers) {
-            // 校验是否已有负责人
-            validateCustomerOwnerExists(customer);
-            // 校验是否锁定
-            validateCustomerIsLocked(customer);
-            // 校验成交状态
-            validateCustomerDeal(customer);
-        }
-
-        // TODO @QingX：这里是不是改成一次性更新；不然，如果有 20 个客户，就要执行 20 次 SQL 了；
-        // 统一修改状态
-        CrmCustomerDO updateDo = new CrmCustomerDO();
-        updateDo.setOwnerUserId(ownerUserId);
-        // TODO @QingX：如果更新的数量不对，则应该抛出异常，回滚，并错误提示；
-        for (Long id : ids) {
-            customerMapper.updateCustomerByOwnerUserIdIsNull(id,updateDo);
-        }
-    }
-
-    // TODO @QingX：错误提示里面，可以把客户的名字带上哈；不然不知道是谁；
-    private void validateCustomerOwnerExists(CrmCustomerDO customer) {
-        if (customer.getOwnerUserId() != null) {
-            throw exception(CUSTOMER_OWNER_EXISTS);
-        }
-    }
-
-    private void validateCustomerIsLocked(CrmCustomerDO customer) {
-        if (customer.getLockStatus()) {
-            throw exception(CUSTOMER_LOCKED);
-        }
-    }
-
-    private void validateCustomerDeal(CrmCustomerDO customer) {
-        if (customer.getDealStatus()) {
-            throw exception(CUSTOMER_ALREADY_DEAL);
-        }
-    }
-
-    // TODO @puhui999：合并到 receiveCustomer 里
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void receive(Long id, Long userId) {
-        // 1. 校验存在
-        CrmCustomerDO customer = customerMapper.selectById(id);
-        if (customer == null) {
-            throw exception(CUSTOMER_NOT_EXISTS);
-        }
-        // 1.2. 校验是否为公海数据
-        if (customer.getOwnerUserId() != null) {
-            throw exception(CUSTOMER_NOT_IN_POOL);
-        }
-
-        // 2. 领取公海数据-设置负责人
-        customerMapper.updateById(new CrmCustomerDO().setId(customer.getId()).setOwnerUserId(userId));
-        // 3. 创建负责人数据权限
-        crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
-                .setBizId(customer.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void putCustomerPool(Long id) {
         // 1. 校验存在
@@ -239,22 +151,81 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         if (customer == null) {
             throw exception(CUSTOMER_NOT_EXISTS);
         }
-        // TODO puhui999：校验合并到 validateCustomerOwnerExists、validateCustomerIsLocked
         // 1.2. 校验是否为公海数据
-        if (customer.getOwnerUserId() == null) {
-            throw exception(CUSTOMER_IN_POOL);
-        }
+        validateCustomerOwnerExists(customer, true);
         // 1.3. 校验客户是否锁定
-        if (customer.getLockStatus()) {
-            throw exception(CUSTOMER_LOCKED_PUT_POOL_FAIL);
-        }
+        validateCustomerIsLocked(customer, true);
 
         // 2. 设置负责人为 NULL
-        // TODO @puhui999：updateById 这么操作，是无法设置 null 的；
-        customerMapper.updateById(new CrmCustomerDO().setId(customer.getId()).setOwnerUserId(null));
+        int updateOwnerUserIncr = customerMapper.updateOwnerUserIdById(customer.getId(), null);
+        if (updateOwnerUserIncr == 0) {
+            throw exception(CUSTOMER_UPDATE_OWNER_USER_FAIL);
+        }
         // 3. 删除负责人数据权限
         crmPermissionService.deletePermission(CrmBizTypeEnum.CRM_CUSTOMER.getType(), customer.getId(),
                 CrmPermissionLevelEnum.OWNER.getLevel());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void receiveCustomer(List<Long> ids, Long ownerUserId) {
+        // 1. 校验存在
+        List<CrmCustomerDO> customers = customerMapper.selectBatchIds(ids);
+        if (customers.size() != ids.size()) {
+            throw exception(CUSTOMER_NOT_EXISTS);
+        }
+        // 1.2. 校验状态
+        customers.forEach(customer -> {
+            // 校验是否已有负责人
+            validateCustomerOwnerExists(customer, false);
+            // 校验是否锁定
+            validateCustomerIsLocked(customer, false);
+            // 校验成交状态
+            validateCustomerDeal(customer);
+        });
+
+        // 2. 领取公海数据
+        List<CrmCustomerDO> updateCustomers = new ArrayList<>();
+        List<CrmPermissionCreateReqBO> createPermissions = new ArrayList<>();
+        customers.forEach(customer -> {
+            // 2.1. 设置负责人
+            updateCustomers.add(new CrmCustomerDO().setId(customer.getId()).setOwnerUserId(ownerUserId));
+            // 2.2. 创建负责人数据权限
+            createPermissions.add(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
+                    .setBizId(customer.getId()).setUserId(ownerUserId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
+        });
+
+        // 3.1 更新客户负责人
+        customerMapper.updateBatch(updateCustomers);
+        // 3.2 创建负责人数据权限
+        crmPermissionService.createPermissionBatch(createPermissions);
+    }
+
+    private void validateCustomerOwnerExists(CrmCustomerDO customer, Boolean pool) {
+        if (customer == null) { // 防御一下
+            throw exception(CUSTOMER_NOT_EXISTS);
+        }
+        // 校验是否为公海数据
+        if (pool && customer.getOwnerUserId() == null) {
+            throw exception(CUSTOMER_IN_POOL, customer.getName());
+        }
+        // 负责人已存在
+        if (customer.getOwnerUserId() != null) {
+            throw exception(CUSTOMER_OWNER_EXISTS, customer.getName());
+        }
+
+    }
+
+    private void validateCustomerIsLocked(CrmCustomerDO customer, Boolean pool) {
+        if (customer.getLockStatus()) {
+            throw exception(pool ? CUSTOMER_LOCKED_PUT_POOL_FAIL : CUSTOMER_LOCKED, customer.getName());
+        }
+    }
+
+    private void validateCustomerDeal(CrmCustomerDO customer) {
+        if (customer.getDealStatus()) {
+            throw exception(CUSTOMER_ALREADY_DEAL);
+        }
     }
 
 }

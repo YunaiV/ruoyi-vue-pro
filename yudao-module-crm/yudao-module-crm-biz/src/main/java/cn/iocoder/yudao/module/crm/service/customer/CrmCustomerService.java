@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.crm.service.customer;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerCreateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTransferReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 
 import javax.validation.Valid;
@@ -50,8 +53,8 @@ public interface CrmCustomerService {
      * 获得客户列表
      *
      * @param ids 客户编号数组
-     * @author ljlleo
      * @return 客户列表
+     * @author ljlleo
      */
     List<CrmCustomerDO> getCustomerList(Collection<Long> ids);
 
@@ -63,14 +66,6 @@ public interface CrmCustomerService {
      * @return 客户分页
      */
     PageResult<CrmCustomerDO> getCustomerPage(CrmCustomerPageReqVO pageReqVO, Long userId);
-
-    /**
-     * 获得客户列表, 用于 Excel 导出
-     *
-     * @param exportReqVO 查询条件
-     * @return 客户列表
-     */
-    List<CrmCustomerDO> getCustomerList(CrmCustomerExportReqVO exportReqVO);
 
     /**
      * 校验客户是否存在
@@ -107,25 +102,9 @@ public interface CrmCustomerService {
     /**
      * 领取公海客户
      *
-     * @param ids 要领取的客户编号数组
+     * @param ids         要领取的客户编号数组
+     * @param ownerUserId 负责人
      */
-    void receiveCustomer(List<Long>ids, Long ownerUserId);
-
-    /**
-     * 分配公海客户
-     *
-     * @param ids 要分配的客户编号数组
-     * @param ownerUserId 分配的负责人编号
-     * @author xiaqing
-     */
-    void distributeCustomer(List<Long>ids, Long ownerUserId);
-
-    /**
-     * 领取公海客户
-     *
-     * @param id     编号
-     * @param userId 用户编号
-     */
-    void receive(Long id, Long userId);
+    void receiveCustomer(List<Long> ids, Long ownerUserId);
 
 }

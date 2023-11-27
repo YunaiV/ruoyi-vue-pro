@@ -91,16 +91,6 @@ public class CrmCustomerController {
         return success(CrmCustomerConvert.INSTANCE.convert(customer, userMap, deptMap));
     }
 
-    // TODO @puhui999：合并到 receiveCustomer
-    @PutMapping("/receive-")
-    @Operation(summary = "领取客户公海数据")
-    @Parameter(name = "id", description = "客户编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('crm:customer:update')")
-    public CommonResult<Boolean> receive(@RequestParam("id") Long id) {
-        customerService.receive(id, getLoginUserId());
-        return success(true);
-    }
-
     @GetMapping("/page")
     @Operation(summary = "获得客户分页")
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
@@ -122,9 +112,9 @@ public class CrmCustomerController {
     @Operation(summary = "导出客户 Excel")
     @PreAuthorize("@ss.hasPermission('crm:customer:export')")
     @OperateLog(type = EXPORT)
-    public void exportCustomerExcel(@Valid CrmCustomerExportReqVO exportReqVO,
+    public void exportCustomerExcel(@Valid CrmCustomerPageReqVO pageVO,
                                     HttpServletResponse response) throws IOException {
-        List<CrmCustomerDO> list = customerService.getCustomerList(exportReqVO);
+        List<CrmCustomerDO> list = customerService.getCustomerPage(pageVO, getLoginUserId()).getList();
         // 导出 Excel
         List<CrmCustomerExcelVO> datas = CrmCustomerConvert.INSTANCE.convertList02(list);
         ExcelUtils.write(response, "客户.xls", "数据", CrmCustomerExcelVO.class, datas);
@@ -160,9 +150,9 @@ public class CrmCustomerController {
 
     @PutMapping("/receive")
     @Operation(summary = "领取公海客户")
-    @Parameter(name = "ids", description = "编号数组", required = true,example = "1,2,3")
+    @Parameter(name = "ids", description = "编号数组", required = true, example = "1,2,3")
     @PreAuthorize("@ss.hasPermission('crm:customer:receive')")
-    public CommonResult<Boolean> receiveCustomer(@RequestParam(value = "ids") List<Long> ids){
+    public CommonResult<Boolean> receiveCustomer(@RequestParam(value = "ids") List<Long> ids) {
         customerService.receiveCustomer(ids, getLoginUserId());
         return success(true);
     }
@@ -175,8 +165,11 @@ public class CrmCustomerController {
     })
     @PreAuthorize("@ss.hasPermission('crm:customer:distribute')")
     public CommonResult<Boolean> distributeCustomer(@RequestParam(value = "ids") List<Long> ids,
-                                                    @RequestParam(value = "ownerUserId") Long ownerUserId){
-        customerService.distributeCustomer(ids, ownerUserId);
+                                                    @RequestParam(value = "ownerUserId") Long ownerUserId) {
+        // 校验负责人是否存在
+        adminUserApi.validateUserList(java.util.Collections.singletonList(ownerUserId));
+        // 领取公海数据
+        customerService.receiveCustomer(ids, ownerUserId);
         return success(true);
     }
 

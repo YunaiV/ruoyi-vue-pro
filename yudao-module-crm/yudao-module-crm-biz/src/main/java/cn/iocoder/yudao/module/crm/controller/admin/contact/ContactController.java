@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.*;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerExportReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
 import cn.iocoder.yudao.module.crm.convert.contact.ContactConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.ContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -83,7 +84,7 @@ public class ContactController {
     public CommonResult<ContactRespVO> getContact(@RequestParam("id") Long id) {
         ContactDO contact = contactService.getContact(id);
         // TODO @zyna：需要考虑 null 的情况；
-        ContactRespVO contactRespVO  = ContactConvert.INSTANCE.convert(contact);
+        ContactRespVO contactRespVO = ContactConvert.INSTANCE.convert(contact);
         // TODO @zyna：可以把数据读完后，convert 统一交给 ContactConvert，让 controller 更简洁；而 convert 专门去做一些转换逻辑
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(CollUtil.removeNull(Lists.newArrayList(
                 NumberUtil.parseLong(contact.getCreator()))));
@@ -107,12 +108,14 @@ public class ContactController {
     @PreAuthorize("@ss.hasPermission('crm:contact:query')")
     public CommonResult<PageResult<ContactRespVO>> getContactPage(@Valid ContactPageReqVO pageVO) {
         PageResult<ContactDO> pageData = contactService.getContactPage(pageVO);
-        PageResult<ContactRespVO> pageResult =ContactConvert.INSTANCE.convertPage(pageData);
+        PageResult<ContactRespVO> pageResult = ContactConvert.INSTANCE.convertPage(pageData);
         // TODO @zyna：需要考虑 null 的情况；
         // TODO @zyna：可以把数据读完后，convert 统一交给 ContactConvert，让 controller 更简洁；而 convert 专门去做一些转换逻辑
         //待接口实现后修改
-        List<CrmCustomerDO> crmCustomerDOList = crmCustomerService.getCustomerList(new CrmCustomerExportReqVO());
-        Map<Long,CrmCustomerDO> crmCustomerDOMap = crmCustomerDOList.stream().collect(Collectors.toMap(CrmCustomerDO::getId,v->v));
+        CrmCustomerPageReqVO reqVO = new CrmCustomerPageReqVO();
+        reqVO.setPageSize(PAGE_SIZE_NONE);
+        List<CrmCustomerDO> crmCustomerDOList = crmCustomerService.getCustomerPage(reqVO, getLoginUserId()).getList();
+        Map<Long, CrmCustomerDO> crmCustomerDOMap = crmCustomerDOList.stream().collect(Collectors.toMap(CrmCustomerDO::getId, v -> v));
         pageResult.getList().forEach(item -> {
             item.setCustomerName(Optional.ofNullable(crmCustomerDOMap.get(item.getCustomerId())).map(CrmCustomerDO::getName).orElse(null));
         });
@@ -125,7 +128,7 @@ public class ContactController {
     @PreAuthorize("@ss.hasPermission('crm:contact:export')")
     @OperateLog(type = EXPORT)
     public void exportContactExcel(@Valid ContactExportReqVO exportReqVO,
-              HttpServletResponse response) throws IOException {
+                                   HttpServletResponse response) throws IOException {
         List<ContactDO> list = contactService.getContactList(exportReqVO);
         // 导出 Excel
         List<ContactExcelVO> datas = ContactConvert.INSTANCE.convertList02(list);

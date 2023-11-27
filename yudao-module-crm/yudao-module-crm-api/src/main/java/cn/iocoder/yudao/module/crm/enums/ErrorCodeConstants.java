@@ -32,12 +32,12 @@ public interface ErrorCodeConstants {
 
     // ========== 客户管理 1_020_006_000 ==========
     ErrorCode CUSTOMER_NOT_EXISTS = new ErrorCode(1_020_006_000, "客户不存在");
-    ErrorCode CUSTOMER_OWNER_EXISTS = new ErrorCode(1_020_006_001, "客户已存在所属负责人");
-    ErrorCode CUSTOMER_LOCKED = new ErrorCode(1_020_006_002, "客户状态已锁定");
+    ErrorCode CUSTOMER_OWNER_EXISTS = new ErrorCode(1_020_006_001, "客户【{}】已存在所属负责人");
+    ErrorCode CUSTOMER_LOCKED = new ErrorCode(1_020_006_002, "客户【{}】状态已锁定");
     ErrorCode CUSTOMER_ALREADY_DEAL = new ErrorCode(1_020_006_003, "客户已交易");
-    ErrorCode CUSTOMER_NOT_IN_POOL = new ErrorCode(1_020_006_004, "客户领取失败，原因：不是公海客户");
-    ErrorCode CUSTOMER_IN_POOL = new ErrorCode(1_020_006_005, "客户放入公海失败，原因：已经是公海客户");
-    ErrorCode CUSTOMER_LOCKED_PUT_POOL_FAIL = new ErrorCode(1_020_006_006, "客户放入公海失败，原因：客户已锁定");
+    ErrorCode CUSTOMER_IN_POOL = new ErrorCode(1_020_006_004, "客户【{}】放入公海失败，原因：已经是公海客户");
+    ErrorCode CUSTOMER_LOCKED_PUT_POOL_FAIL = new ErrorCode(1_020_006_005, "客户【{}】放入公海失败，原因：客户已锁定");
+    ErrorCode CUSTOMER_UPDATE_OWNER_USER_FAIL = new ErrorCode(1_020_006_006, "更新客户【{}】负责人失败, 原因：系统异常");
     // TODO @wanwan：这 2 个单独配置段噢
     ErrorCode CUSTOMER_POOL_CONFIG_ERROR = new ErrorCode(1_020_006_001, "客户公海规则设置不正确");
     ErrorCode CUSTOMER_LIMIT_CONFIG_NOT_EXISTS = new ErrorCode(1_020_006_002, "客户限制配置不存在");
@@ -47,7 +47,7 @@ public interface ErrorCodeConstants {
     ErrorCode CRM_PERMISSION_DENIED = new ErrorCode(1_020_007_001, "{}操作失败，原因：没有权限");
     ErrorCode CRM_PERMISSION_MODEL_NOT_EXISTS = new ErrorCode(1_020_007_002, "{}不存在");
     ErrorCode CRM_PERMISSION_MODEL_TRANSFER_FAIL_OWNER_USER_EXISTS = new ErrorCode(1_020_007_003, "{}操作失败，原因：转移对象已经是该负责人");
-    ErrorCode CRM_PERMISSION_DELETE_FAIL = new ErrorCode(1_020_007_004, "删除数据权限失败，原因：参数异常");
+    ErrorCode CRM_PERMISSION_DELETE_FAIL = new ErrorCode(1_020_007_004, "删除数据权限失败，原因：批量删除权限的时候，只能属于同一个 bizId 下");
     ErrorCode CRM_PERMISSION_DELETE_FAIL_EXIST_OWNER = new ErrorCode(1_020_007_005, "删除数据权限失败，原因：存在负责人");
     ErrorCode CRM_PERMISSION_DELETE_DENIED = new ErrorCode(1_020_007_006, "删除数据权限失败，原因：没有权限");
     ErrorCode CRM_PERMISSION_DELETE_SELF_PERMISSION_FAIL_EXIST_OWNER = new ErrorCode(1_020_007_007, "删除数据权限失败，原因：不能删除负责人");
