@@ -26,6 +26,8 @@ public class CrmBusinessStatusDO {
     private Long id;
     /**
      * 状态类型编号
+     *
+     * 关联 {@link CrmBusinessStatusTypeDO#getId()}
      */
     private Long typeId;
     /**
@@ -34,6 +36,8 @@ public class CrmBusinessStatusDO {
     private String name;
     /**
      * 赢单率
+     *
+     * TODO 这里是不是改成 Integer 存储，百分比 * 100 ；
      */
     private String percent;
     /**

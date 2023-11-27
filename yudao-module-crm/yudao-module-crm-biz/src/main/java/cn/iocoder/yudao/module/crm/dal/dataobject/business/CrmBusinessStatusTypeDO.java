@@ -41,6 +41,8 @@ public class CrmBusinessStatusTypeDO extends BaseDO {
     private List<Long> deptIds;
     /**
      * 开启状态
+     *
+     * TODO 改成 Integer，关联 CommonStatus
      */
     private Boolean status;
 

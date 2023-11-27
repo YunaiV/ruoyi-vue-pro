@@ -66,4 +66,7 @@ public interface ErrorCodeConstants {
     // ========== 商机状态 1_020_011_000 ==========
     ErrorCode BUSINESS_STATUS_NOT_EXISTS = new ErrorCode(1_020_011_000, "商机状态不存在");
 
+    // ========== 客户公海规则设置 1_020_011_000 ==========
+    ErrorCode CUSTOMER_LIMIT_CONFIG_NOT_EXISTS = new ErrorCode(1_020_012_000, "客户限制配置不存在");
+
 }

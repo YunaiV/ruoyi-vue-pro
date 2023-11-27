@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.crm.convert.business;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusTypeDO;
@@ -46,14 +46,14 @@ public interface CrmBusinessConvert {
     default PageResult<CrmBusinessRespVO> convertPage(PageResult<CrmBusinessDO> page, List<CrmCustomerDO> customerList,
                                                       List<CrmBusinessStatusTypeDO> statusTypeList, List<CrmBusinessStatusDO> statusList) {
         PageResult<CrmBusinessRespVO> result = convertPage(page);
+        // 拼接关联字段
         Map<Long, String> customerMap = convertMap(customerList, CrmCustomerDO::getId, CrmCustomerDO::getName);
         Map<Long, String> statusTypeMap = convertMap(statusTypeList, CrmBusinessStatusTypeDO::getId, CrmBusinessStatusTypeDO::getName);
         Map<Long, String> statusMap = convertMap(statusList, CrmBusinessStatusDO::getId, CrmBusinessStatusDO::getName);
-        result.getList().stream().forEach(t -> {
-            t.setCustomerName(customerMap.get(t.getCustomerId()));
-            t.setStatusTypeName(statusTypeMap.get(t.getStatusTypeId()));
-            t.setStatusName(statusMap.get(t.getStatusId()));
-        });
+        result.getList().forEach(type -> type
+                .setCustomerName(customerMap.get(type.getCustomerId()))
+                .setStatusTypeName(statusTypeMap.get(type.getStatusTypeId()))
+                .setStatusName(statusMap.get(type.getStatusId())));
         return result;
     }
 

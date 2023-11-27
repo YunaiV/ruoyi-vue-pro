@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.crm.convert.businessstatus;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.CrmBusinessStatusRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.CrmBusinessStatusSaveReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.status.CrmBusinessStatusRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.status.CrmBusinessStatusSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.crm.service.business;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 
 import javax.validation.Valid;

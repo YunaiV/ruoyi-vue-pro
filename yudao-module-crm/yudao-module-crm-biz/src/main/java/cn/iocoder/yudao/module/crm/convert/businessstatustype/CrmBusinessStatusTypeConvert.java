@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.crm.convert.businessstatustype;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.CrmBusinessStatusTypeRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.CrmBusinessStatusTypeSaveReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypeRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypeSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusTypeDO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
@@ -33,18 +33,17 @@ public interface CrmBusinessStatusTypeConvert {
 
     default PageResult<CrmBusinessStatusTypeRespVO> convertPage(PageResult<CrmBusinessStatusTypeDO> page, List<DeptRespDTO> deptList) {
         PageResult<CrmBusinessStatusTypeRespVO> pageResult = convertPage(page);
+        // 拼接关联字段
         Map<Long, String> deptMap = convertMap(deptList, DeptRespDTO::getId, DeptRespDTO::getName);
-        pageResult.getList().stream().forEach(r -> {
-            r.setDeptNames(convertList(r.getDeptIds(), deptMap::get));
-        });
+        pageResult.getList().forEach(type -> type.setDeptNames(convertList(type.getDeptIds(), deptMap::get)));
         return pageResult;
     }
 
     default CrmBusinessStatusTypeRespVO convert(CrmBusinessStatusTypeDO bean, List<CrmBusinessStatusDO> statusList) {
+        // TODO @ljlleo 可以链式赋值，简化成一行；
         CrmBusinessStatusTypeRespVO result = convert(bean);
         result.setStatusList(statusList);
         return result;
     }
-
 
 }

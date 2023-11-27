@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.crm.service.business;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.CrmBusinessStatusPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.CrmBusinessStatusQueryVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.CrmBusinessStatusSaveReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.status.CrmBusinessStatusPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.status.CrmBusinessStatusQueryVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.status.CrmBusinessStatusSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessStatusMapper;
 import org.springframework.stereotype.Service;
@@ -51,6 +51,7 @@ public class CrmBusinessStatusServiceImpl implements CrmBusinessStatusService {
     public void deleteBusinessStatus(Long id) {
         // 校验存在
         validateBusinessStatusExists(id);
+        // TODO @ljlleo 这里可以考虑，如果有商机在使用，不允许删除
         // 删除
         businessStatusMapper.deleteById(id);
     }

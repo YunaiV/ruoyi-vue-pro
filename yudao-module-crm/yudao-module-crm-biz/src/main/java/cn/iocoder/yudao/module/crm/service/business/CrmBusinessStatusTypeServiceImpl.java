@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.module.crm.service.business;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.CrmBusinessStatusTypePageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.CrmBusinessStatusTypeQueryVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.CrmBusinessStatusTypeSaveReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypePageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypeQueryVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypeSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusTypeDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessStatusMapper;
@@ -42,15 +43,14 @@ public class CrmBusinessStatusTypeServiceImpl implements CrmBusinessStatusTypeSe
     public Long createBusinessStatusType(CrmBusinessStatusTypeSaveReqVO createReqVO) {
         //检验名称是否存在
         validateBusinessStatusTypeExists(createReqVO.getName(), null);
-        // 插入
+        // 插入类型
         CrmBusinessStatusTypeDO businessStatusType = BeanUtils.toBean(createReqVO, CrmBusinessStatusTypeDO.class);
         businessStatusTypeMapper.insert(businessStatusType);
-        createReqVO.getStatusList().stream().forEach(status -> {
-            status.setTypeId(businessStatusType.getId());
-        });
-        //插入状态
-        businessStatusMapper.insertBatch(BeanUtils.toBean(createReqVO.getStatusList(), CrmBusinessStatusDO.class));
-        // 返回
+        // 插入状态
+        if (CollUtil.isNotEmpty(createReqVO.getStatusList())) {
+            createReqVO.getStatusList().forEach(status -> status.setTypeId(businessStatusType.getId()));
+            businessStatusMapper.insertBatch(BeanUtils.toBean(createReqVO.getStatusList(), CrmBusinessStatusDO.class));
+        }
         return businessStatusType.getId();
     }
 
@@ -61,29 +61,27 @@ public class CrmBusinessStatusTypeServiceImpl implements CrmBusinessStatusTypeSe
         validateBusinessStatusTypeExists(updateReqVO.getId());
         // 校验名称是否存在
         validateBusinessStatusTypeExists(updateReqVO.getName(), updateReqVO.getId());
-        // 更新
+        // 更新类型
         CrmBusinessStatusTypeDO updateObj = BeanUtils.toBean(updateReqVO, CrmBusinessStatusTypeDO.class);
         businessStatusTypeMapper.updateById(updateObj);
-        //删除状态
+        // 更新状态（删除 + 更新）
+        // TODO @ljlleo 可以参考 DeliveryExpressTemplateServiceImpl 的 updateExpressTemplateFree 方法；主要没变化的，还是不删除了哈。
         businessStatusMapper.delete(updateReqVO.getId());
-        //插入状态
-        updateReqVO.getStatusList().stream().forEach(status -> {
-            status.setTypeId(updateReqVO.getId());
-        });
+        updateReqVO.getStatusList().forEach(status -> status.setTypeId(updateReqVO.getId()));
         businessStatusMapper.insertBatch(BeanUtils.toBean(updateReqVO.getStatusList(), CrmBusinessStatusDO.class));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteBusinessStatusType(Long id) {
-        //TODO 待添加被引用校验
+        // TODO 待添加被引用校验
         //...
 
         // 校验存在
         validateBusinessStatusTypeExists(id);
-        // 删除
+        // 删除类型
         businessStatusTypeMapper.deleteById(id);
-        //删除状态
+        // 删除状态
         businessStatusMapper.delete(id);
     }
 
@@ -93,6 +91,7 @@ public class CrmBusinessStatusTypeServiceImpl implements CrmBusinessStatusTypeSe
         }
     }
 
+    // TODO @ljlleo 这个方法，这个参考 validateDeptNameUnique 实现。
     private void validateBusinessStatusTypeExists(String name, Long id) {
         LambdaQueryWrapper<CrmBusinessStatusTypeDO> wrapper = new LambdaQueryWrapperX<>();
         if(null != id) {
@@ -118,4 +117,5 @@ public class CrmBusinessStatusTypeServiceImpl implements CrmBusinessStatusTypeSe
     public List<CrmBusinessStatusTypeDO> selectList(CrmBusinessStatusTypeQueryVO queryVO) {
         return businessStatusTypeMapper.selectList(queryVO);
     }
+
 }

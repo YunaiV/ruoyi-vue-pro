@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.crm.service.business;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.CrmBusinessStatusTypePageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.CrmBusinessStatusTypeQueryVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.CrmBusinessStatusTypeSaveReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypePageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypeQueryVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypeSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusTypeDO;
 
 import javax.validation.Valid;
@@ -54,6 +54,7 @@ public interface CrmBusinessStatusTypeService {
      */
     PageResult<CrmBusinessStatusTypeDO> getBusinessStatusTypePage(CrmBusinessStatusTypePageReqVO pageReqVO);
 
+    // TODO @ljlleo 常用的 ids 之类的查询，可以封装单独的方法，不用走类似 QueryVO，用起来更方便。
     /**
      * 获得商机状态类型列表
      *
@@ -61,4 +62,5 @@ public interface CrmBusinessStatusTypeService {
      * @return 商机状态类型列表
      */
     List<CrmBusinessStatusTypeDO> selectList(CrmBusinessStatusTypeQueryVO queryVO);
+
 }

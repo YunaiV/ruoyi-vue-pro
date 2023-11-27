@@ -69,8 +69,7 @@ public class CrmBusinessDO extends BaseDO {
      */
     private Integer discountPercent;
     /**
-     * 产品总金额
-     *
+     * 产品总金额，单位：分
      */
     private Integer productPrice;
     /**

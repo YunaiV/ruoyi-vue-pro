@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.crm.convert.customer;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.poolconfig.CrmCustomerPoolConfigRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.poolconfig.CrmCustomerPoolConfigSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
@@ -78,6 +80,6 @@ public interface CrmCustomerConvert {
 
     CrmCustomerPoolConfigRespVO convert(CrmCustomerPoolConfigDO customerPoolConfig);
 
-    CrmCustomerPoolConfigDO convert(CrmCustomerPoolConfigUpdateReqVO updateReqVO);
+    CrmCustomerPoolConfigDO convert(CrmCustomerPoolConfigSaveReqVO updateReqVO);
 
 }
