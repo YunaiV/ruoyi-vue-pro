@@ -1,0 +1,141 @@
+import request from '@/utils/request'
+
+// 创建学生
+export function createStudent(data) {
+  return request({
+    url: '/infra/student/create',
+    method: 'post',
+    data: data
+  })
+}
+
+// 更新学生
+export function updateStudent(data) {
+  return request({
+    url: '/infra/student/update',
+    method: 'put',
+    data: data
+  })
+}
+
+// 删除学生
+export function deleteStudent(id) {
+  return request({
+    url: '/infra/student/delete?id=' + id,
+    method: 'delete'
+  })
+}
+
+// 获得学生
+export function getStudent(id) {
+  return request({
+    url: '/infra/student/get?id=' + id,
+    method: 'get'
+  })
+}
+
+// 获得学生分页
+export function getStudentPage(params) {
+  return request({
+    url: '/infra/student/page',
+    method: 'get',
+    params
+  })
+}
+// 导出学生 Excel
+export function exportStudentExcel(params) {
+  return request({
+    url: '/infra/student/export-excel',
+    method: 'get',
+    params,
+    responseType: 'blob'
+  })
+}
+
+// ==================== 子表（学生联系人） ====================
+  
+  // 获得学生联系人分页
+  export function getStudentContactPage(params) {
+    return request({
+      url: '/infra/student/student-contact/page',
+      method: 'get',
+      params
+    })
+  }
+        // 新增学生联系人
+  export function createStudentContact(data) {
+    return request({
+      url: `/infra/student/student-contact/create`,
+      method: 'post',
+      data
+    })
+  }
+
+  // 修改学生联系人
+  export function updateStudentContact(data) {
+    return request({
+      url: `/infra/student/student-contact/update`,
+      method: 'post',
+      data
+    })
+  }
+
+  // 删除学生联系人
+  export function deleteStudentContact(id) {
+    return request({
+      url: `/infra/student/student-contact/delete?id=` + id,
+      method: 'delete'
+    })
+  }
+
+  // 获得学生联系人
+  export function getStudentContact(id) {
+    return request({
+      url: `/infra/student/student-contact/get?id=` + id,
+      method: 'get'
+    })
+  }
+
+// ==================== 子表（学生班主任） ====================
+  
+  // 获得学生班主任分页
+  export function getStudentTeacherPage(params) {
+    return request({
+      url: '/infra/student/student-teacher/page',
+      method: 'get',
+      params
+    })
+  }
+        // 新增学生班主任
+  export function createStudentTeacher(data) {
+    return request({
+      url: `/infra/student/student-teacher/create`,
+      method: 'post',
+      data
+    })
+  }
+
+  // 修改学生班主任
+  export function updateStudentTeacher(data) {
+    return request({
+      url: `/infra/student/student-teacher/update`,
+      method: 'post',
+      data
+    })
+  }
+
+  // 删除学生班主任
+  export function deleteStudentTeacher(id) {
+    return request({
+      url: `/infra/student/student-teacher/delete?id=` + id,
+      method: 'delete'
+    })
+  }
+
+  // 获得学生班主任
+  export function getStudentTeacher(id) {
+    return request({
+      url: `/infra/student/student-teacher/get?id=` + id,
+      method: 'get'
+    })
+  }

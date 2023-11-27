@@ -1,0 +1,4 @@
+## 子表的 erp 和 inner 使用相似的 list 列表，差异主要两点：
+## 1）inner 使用 list 不分页，erp 使用 page 分页
+## 2）erp 支持单个子表的新增、修改、删除，inner 不支持
+#parse("codegen/vue/views/components/list_sub_erp.vue.vm")

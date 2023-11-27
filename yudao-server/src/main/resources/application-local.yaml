@@ -54,13 +54,13 @@ spring:
           #          url: jdbc:postgresql://127.0.0.1:5432/${spring.datasource.dynamic.datasource.master.name} # PostgreSQL 连接的示例
           #          url: jdbc:oracle:thin:@127.0.0.1:1521:xe # Oracle 连接的示例
           #          url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=${spring.datasource.dynamic.datasource.master.name} # SQLServer 连接的示例
-#          url: jdbc:dm://10.211.55.4:5236?schema=RUOYI_VUE_PRO # DM 连接的示例
+          #          url: jdbc:dm://10.211.55.4:5236?schema=RUOYI_VUE_PRO # DM 连接的示例
           username: root
           password: 123456
         #          username: sa
         #          password: JSm:g(*%lU4ZAkz06cd52KqT3)i1?H7W
-#          username: SYSDBA # DM 连接的示例
-#          password: SYSDBA # DM 连接的示例
+        #          username: SYSDBA # DM 连接的示例
+        #          password: SYSDBA # DM 连接的示例
         slave: # 模拟从库，可根据自己需要修改
           name: ruoyi-vue-pro
           lazy: true # 开启懒加载，保证启动速度
@@ -123,8 +123,8 @@ spring:
   rabbitmq:
     host: 127.0.0.1 # RabbitMQ 服务的地址
     port: 5672 # RabbitMQ 服务的端口
-    username: guest # RabbitMQ 服务的账号
-    password: guest # RabbitMQ 服务的密码
+    username: rabbit # RabbitMQ 服务的账号
+    password: rabbit # RabbitMQ 服务的密码
   # Kafka 配置项，对应 KafkaProperties 配置类
   kafka:
     bootstrap-servers: 127.0.0.1:9092 # 指定 Kafka Broker 地址，可以设置多个，以逗号分隔
