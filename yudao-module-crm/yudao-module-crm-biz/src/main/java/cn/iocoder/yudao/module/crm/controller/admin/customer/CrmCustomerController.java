@@ -35,6 +35,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSetByFlatMap;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static java.util.Collections.singletonList;
 
 @Tag(name = "管理后台 - CRM 客户")
 @RestController
@@ -114,6 +115,7 @@ public class CrmCustomerController {
     @OperateLog(type = EXPORT)
     public void exportCustomerExcel(@Valid CrmCustomerPageReqVO pageVO,
                                     HttpServletResponse response) throws IOException {
+        // TODO @puhui999：看看复用 getCustomerPage 方法；然后可以禁用下分页；
         List<CrmCustomerDO> list = customerService.getCustomerPage(pageVO, getLoginUserId()).getList();
         // 导出 Excel
         List<CrmCustomerExcelVO> datas = CrmCustomerConvert.INSTANCE.convertList02(list);
@@ -167,7 +169,8 @@ public class CrmCustomerController {
     public CommonResult<Boolean> distributeCustomer(@RequestParam(value = "ids") List<Long> ids,
                                                     @RequestParam(value = "ownerUserId") Long ownerUserId) {
         // 校验负责人是否存在
-        adminUserApi.validateUserList(java.util.Collections.singletonList(ownerUserId));
+        // TODO @puhui999：这个校验，是不是可以收到 validateUserList
+        adminUserApi.validateUserList(singletonList(ownerUserId));
         // 领取公海数据
         customerService.receiveCustomer(ids, ownerUserId);
         return success(true);

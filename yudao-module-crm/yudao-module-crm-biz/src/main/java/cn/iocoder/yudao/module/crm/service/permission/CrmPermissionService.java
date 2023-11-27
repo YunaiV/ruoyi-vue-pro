@@ -61,6 +61,7 @@ public interface CrmPermissionService {
      * 批量删除数据权限
      *
      * @param ids 权限编号
+     * @param userId 用户编号
      */
     void deletePermissionBatch(Collection<Long> ids, Long userId);
 

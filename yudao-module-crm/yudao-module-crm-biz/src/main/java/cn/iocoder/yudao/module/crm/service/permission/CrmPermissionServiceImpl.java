@@ -19,7 +19,6 @@ import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -141,8 +140,8 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
         if (CollUtil.isEmpty(permissions)) {
             throw exception(CRM_PERMISSION_NOT_EXISTS);
         }
-        Set<Long> bizIds = convertSet(permissions, CrmPermissionDO::getBizId);
-        if (bizIds.size() > 1) { // 情况一：数据权限的模块数据编号是一致的不可能存在两个
+        // 校验：数据权限的模块数据编号是一致的不可能存在两个
+        if (convertSet(permissions, CrmPermissionDO::getBizId).size() > 1) {
             throw exception(CRM_PERMISSION_DELETE_FAIL);
         }
         // 校验操作人是否为负责人
