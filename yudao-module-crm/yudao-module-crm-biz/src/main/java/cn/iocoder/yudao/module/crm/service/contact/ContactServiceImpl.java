@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.crm.service.contact;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactBaseVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactUpdateReqVO;
@@ -12,8 +13,10 @@ import cn.iocoder.yudao.module.crm.dal.mysql.contact.ContactMapper;
 import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -21,9 +24,12 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CONTACT_NOT_EXISTS;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CUSTOMER_NOT_EXISTS;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_EXISTS;
 
 /**
  * crm联系人 Service 实现类
@@ -38,10 +44,19 @@ public class ContactServiceImpl implements ContactService {
     private ContactMapper contactMapper;
 
     @Resource
+    private CrmCustomerService customerService;
+
+    @Resource
+    private AdminUserApi adminUserApi;
+
+    @Resource
     private CrmPermissionService crmPermissionService;
 
-    @Override // TODO @zyna：新增和修改时，关联字段要校验，例如说 直属上级，是不是真的存在；
+    @Override
     public Long createContact(ContactCreateReqVO createReqVO, Long userId) {
+        //@todo
+        //校验
+        validateDataExist(createReqVO);
         // 插入
         ContactDO contact = ContactConvert.INSTANCE.convert(createReqVO);
         contactMapper.insert(contact);
@@ -60,6 +75,7 @@ public class ContactServiceImpl implements ContactService {
     public void updateContact(ContactUpdateReqVO updateReqVO) {
         // 校验存在
         validateContactExists(updateReqVO.getId());
+        validateDataExist(updateReqVO);
         // 更新
         ContactDO updateObj = ContactConvert.INSTANCE.convert(updateReqVO);
         contactMapper.updateById(updateObj);
@@ -108,5 +124,20 @@ public class ContactServiceImpl implements ContactService {
     @Override
     public List<ContactDO> getContactList() {
         return contactMapper.selectList();
+    }
+
+    private void validateDataExist(ContactBaseVO contactBaseVO){
+        //1.校验客户
+        if (contactBaseVO.getCustomerId() != null) {
+            Optional.ofNullable(customerService.getCustomer(contactBaseVO.getCustomerId())).orElseThrow(() -> exception(CUSTOMER_NOT_EXISTS));
+        }
+        //2.校验负责人
+        if (contactBaseVO.getOwnerUserId() != null) {
+            Optional.ofNullable(adminUserApi.getUser(contactBaseVO.getOwnerUserId())).orElseThrow(() -> exception(USER_NOT_EXISTS));
+        }
+        //3.直属上级
+        if (contactBaseVO.getParentId() != null) {
+            Optional.ofNullable(contactMapper.selectById(contactBaseVO.getParentId())).orElseThrow(() -> exception(CONTACT_NOT_EXISTS));
+        }
     }
 }

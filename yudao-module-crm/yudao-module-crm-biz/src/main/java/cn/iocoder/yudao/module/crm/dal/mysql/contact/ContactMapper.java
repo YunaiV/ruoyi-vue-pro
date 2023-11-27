@@ -19,45 +19,25 @@ public interface ContactMapper extends BaseMapperX<ContactDO> {
 
     default PageResult<ContactDO> selectPage(ContactPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ContactDO>()
-                .betweenIfPresent(ContactDO::getNextTime, reqVO.getNextTime())
                 .eqIfPresent(ContactDO::getMobile, reqVO.getMobile())
                 .eqIfPresent(ContactDO::getTelephone, reqVO.getTelephone())
                 .eqIfPresent(ContactDO::getEmail, reqVO.getEmail())
                 .eqIfPresent(ContactDO::getCustomerId, reqVO.getCustomerId())
-                .eqIfPresent(ContactDO::getAddress, reqVO.getAddress())
-                .eqIfPresent(ContactDO::getRemark, reqVO.getRemark())
-                .betweenIfPresent(ContactDO::getCreateTime, reqVO.getCreateTime())
-                .betweenIfPresent(ContactDO::getLastTime, reqVO.getLastTime())
-                .eqIfPresent(ContactDO::getParentId, reqVO.getParentId())
                 .likeIfPresent(ContactDO::getName, reqVO.getName())
-                .eqIfPresent(ContactDO::getPost, reqVO.getPost())
                 .eqIfPresent(ContactDO::getQq, reqVO.getQq())
                 .eqIfPresent(ContactDO::getWechat, reqVO.getWechat())
-                .eqIfPresent(ContactDO::getSex, reqVO.getSex())
-                .eqIfPresent(ContactDO::getMaster, reqVO.getMaster())
-                .eqIfPresent(ContactDO::getOwnerUserId, reqVO.getOwnerUserId())
                 .orderByDesc(ContactDO::getId));
     }
 
     default List<ContactDO> selectList(ContactPageReqVO reqVO) {
         return selectList(new LambdaQueryWrapperX<ContactDO>()
-                .betweenIfPresent(ContactDO::getNextTime, reqVO.getNextTime())
                 .eqIfPresent(ContactDO::getMobile, reqVO.getMobile())
                 .eqIfPresent(ContactDO::getTelephone, reqVO.getTelephone())
                 .eqIfPresent(ContactDO::getEmail, reqVO.getEmail())
                 .eqIfPresent(ContactDO::getCustomerId, reqVO.getCustomerId())
-                .eqIfPresent(ContactDO::getAddress, reqVO.getAddress())
-                .eqIfPresent(ContactDO::getRemark, reqVO.getRemark())
-                .betweenIfPresent(ContactDO::getCreateTime, reqVO.getCreateTime())
-                .betweenIfPresent(ContactDO::getLastTime, reqVO.getLastTime())
-                .eqIfPresent(ContactDO::getParentId, reqVO.getParentId())
                 .likeIfPresent(ContactDO::getName, reqVO.getName())
-                .eqIfPresent(ContactDO::getPost, reqVO.getPost())
                 .eqIfPresent(ContactDO::getQq, reqVO.getQq())
                 .eqIfPresent(ContactDO::getWechat, reqVO.getWechat())
-                .eqIfPresent(ContactDO::getSex, reqVO.getSex())
-                .eqIfPresent(ContactDO::getMaster, reqVO.getMaster())
-                .eqIfPresent(ContactDO::getOwnerUserId, reqVO.getOwnerUserId())
                 .orderByDesc(ContactDO::getId));
     }
 
