@@ -72,9 +72,7 @@ public interface CrmCustomerConvert {
     default PageResult<CrmCustomerRespVO> convertPage(PageResult<CrmCustomerDO> pageResult, Map<Long, AdminUserRespDTO> userMap,
                                                       Map<Long, DeptRespDTO> deptMap) {
         PageResult<CrmCustomerRespVO> result = convertPage(pageResult);
-        result.getList().forEach(item -> {
-            setUserInfo(item, userMap, deptMap);
-        });
+        result.getList().forEach(item -> setUserInfo(item, userMap, deptMap));
         return result;
     }
 
@@ -82,6 +80,6 @@ public interface CrmCustomerConvert {
 
     CrmCustomerPoolConfigDO convert(CrmCustomerPoolConfigSaveReqVO updateReqVO);
 
-    CrmCustomerQueryAllRespVO convertQueryAll(CrmCustomerDO crmCustomerDO);
     List<CrmCustomerQueryAllRespVO> convertQueryAll(List<CrmCustomerDO> crmCustomerDO);
+
 }

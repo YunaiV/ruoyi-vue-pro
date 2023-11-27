@@ -4,7 +4,6 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -23,6 +22,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ContactDO extends BaseDO {
+
     /**
      * 主键
      */
@@ -61,7 +61,9 @@ public class ContactDO extends BaseDO {
      */
     private LocalDateTime lastTime;
     /**
-     * 直属上级 @link ContactDO#id
+     * 直属上级
+     *
+     * 关联 {@link ContactDO#id}
      */
     private Long parentId;
     /**
@@ -82,7 +84,8 @@ public class ContactDO extends BaseDO {
     private String wechat;
     /**
      * 性别
-     * @See 字典配置
+     *
+     * 枚举 {@link cn.iocoder.yudao.module.system.enums.common.SexEnum}
      */
     private Integer sex;
     /**
@@ -91,8 +94,16 @@ public class ContactDO extends BaseDO {
     private Boolean master;
     /**
      * 负责人用户编号
+     *
+     * 关联 AdminUserDO 的 id 字段
      */
     private Long ownerUserId;
 
+    /**
+     * 所在地
+     *
+     * 关联 {@link cn.iocoder.yudao.framework.ip.core.Area#getId()} 字段
+     */
     private Integer areaId;
+
 }
