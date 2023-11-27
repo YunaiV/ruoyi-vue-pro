@@ -262,19 +262,17 @@ export default {
   },
   methods: {
     /** 查询列表 */
-    getList() {
+    async getList() {
       try {
       this.loading = true;
       ## 特殊：树表专属逻辑（树不需要分页接口）
       #if ( $table.templateType == 2 )
-        ${simpleClassName}Api.get${simpleClassName}List(this.queryParams).then(response => {
-          this.list = this.handleTree(response.data, 'id', '${treeParentColumn.javaField}');
-        })
+       const res = await ${simpleClassName}Api.get${simpleClassName}List(this.queryParams);
+       this.list = this.handleTree(res.data, 'id', '${treeParentColumn.javaField}');
       #else
-      ${simpleClassName}Api.get${simpleClassName}Page(this.queryParams).then(response => {
-        this.list = response.data.list;
-        this.total = response.data.total;
-      });
+        const res = await ${simpleClassName}Api.get${simpleClassName}Page(this.queryParams);
+        this.list = res.data.list;
+        this.total = res.data.total;
       #end
       } finally {
         this.loading = false;
@@ -295,31 +293,25 @@ export default {
       this.#[[$]]#refs["formRef"].open(id);
     },
     /** 删除按钮操作 */
-    handleDelete(row) {
-      const that = this;
-      try {
+    async handleDelete(row) {
       const ${primaryColumn.javaField} = row.${primaryColumn.javaField};
-      this.#[[$modal]]#.confirm('是否确认删除${table.classComment}编号为"' + ${primaryColumn.javaField} + '"的数据项?').then(()=>{
-          return ${simpleClassName}Api.delete${simpleClassName}(${primaryColumn.javaField});
-        }).then(() => {
-        that.getList();
-        that.#[[$modal]]#.msgSuccess("删除成功");
-        }).catch(() => {});
+      await this.#[[$modal]]#.confirm('是否确认删除${table.classComment}编号为"' + ${primaryColumn.javaField} + '"的数据项?')
+      try {
+       await ${simpleClassName}Api.delete${simpleClassName}(${primaryColumn.javaField});
+       this.getList();
+       this.#[[$modal]]#.msgSuccess("删除成功");
       } catch {}
     },
     /** 导出按钮操作 */
-    handleExport() {
-      const that = this;
+    async handleExport() {
+      await this.#[[$modal]]#.confirm('是否确认导出所有${table.classComment}数据项?');
       try {
-          this.#[[$modal]]#.confirm('是否确认导出所有${table.classComment}数据项?').then(() => {
-              that.exportLoading = true;
-              return ${simpleClassName}Api.export${simpleClassName}Excel(params);
-            }).then(response => {
-              that.#[[$]]#download.excel(response, '${table.classComment}.xls');
-            });
+        this.exportLoading = true;
+        const res = await ${simpleClassName}Api.export${simpleClassName}Excel(this.queryParams);
+        this.#[[$]]#download.excel(res.data, '${table.classComment}.xls');
       } catch {
       } finally {
-        that.exportLoading = false;
+        this.exportLoading = false;
       }
     },
       ## 特殊：主子表专属逻辑

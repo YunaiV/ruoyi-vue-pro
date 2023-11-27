@@ -145,19 +145,17 @@
     },
     methods: {
       /** 打开弹窗 */
-      open(id, ${subJoinColumn.javaField}) {
+      async open(id, ${subJoinColumn.javaField}) {
         this.dialogVisible = true;
         this.reset();
-        const that = this;
         this.formData.${subJoinColumn.javaField} = ${subJoinColumn.javaField};
         // 修改时，设置数据
         if (id) {
           this.formLoading = true;
           try {
-              ${simpleClassName}Api.get${subSimpleClassName}(id).then(res=>{
-              that.formData = res.data;
-              that.dialogTitle = "修改${subTable.classComment}";
-            })
+            const res = await ${simpleClassName}Api.get${subSimpleClassName}(id);
+            this.formData = res.data;
+            this.dialogTitle = "修改${subTable.classComment}";
           } finally {
             this.formLoading = false;
           }
@@ -165,32 +163,26 @@
         this.dialogTitle = "新增${subTable.classComment}";
       },
       /** 提交按钮 */
-      submitForm() {
+      async submitForm() {
+        await this.#[[$]]#refs["formRef"].validate();
         this.formLoading = true;
         try {
-          let data = this.formData;
-          this.#[[$]]#refs["formRef"].validate(valid => {
-            if (!valid) {
-              return;
-            }
+            const data = this.formData;
             // 修改的提交
             if (data.${primaryColumn.javaField}) {
-              ${simpleClassName}Api.update${subSimpleClassName}(data).then(response => {
-                this.#[[$modal]]#.msgSuccess("修改成功");
-                this.dialogVisible = false;
-                this.#[[$]]#emit('success');
-              });
+            await  ${simpleClassName}Api.update${subSimpleClassName}(data);
+            this.#[[$modal]]#.msgSuccess("修改成功");
+            this.dialogVisible = false;
+            this.#[[$]]#emit('success');
               return;
             }
             // 添加的提交
-            ${simpleClassName}Api.create${subSimpleClassName}(data).then(response => {
+              await ${simpleClassName}Api.create${subSimpleClassName}(data);
               this.#[[$modal]]#.msgSuccess("新增成功");
               this.dialogVisible = false;
               this.#[[$]]#emit('success');
-            });
-          });
         }finally {
-          this.formLoading = false
+          this.formLoading = false;
         }
       },
       /** 表单重置 */

@@ -111,28 +111,24 @@
     },
     methods: {
       /** 查询列表 */
-      getList() {
+      async getList() {
         try {
           this.loading = true;
-          const that = this;
           #if ($table.templateType == 11)
-          ${simpleClassName}Api.get${subSimpleClassName}Page(this.queryParams).then(response => {
-            that.list = response.data.list;
-            that.total = response.data.total;
-          });
+            const res = await ${simpleClassName}Api.get${subSimpleClassName}Page(this.queryParams);
+            this.list = res.data.list;
+            this.total = res.data.total;
           #else
               #if ( $subTable.subJoinMany )
-                ${simpleClassName}Api.get${subSimpleClassName}ListBy${SubJoinColumnName}(this.${subJoinColumn.javaField}).then(response=>{
-                  that.list = response.data;
-              })
+                const res = await ${simpleClassName}Api.get${subSimpleClassName}ListBy${SubJoinColumnName}(this.${subJoinColumn.javaField});
+                this.list = res.data;
               #else
-                ${simpleClassName}Api.get${subSimpleClassName}By${SubJoinColumnName}(this.${subJoinColumn.javaField}).then(response=>{
-                  const data = response.data;
-                  if (!data) {
-                    return
-                  }
-                  that.list.push(data)
-              })
+                const res = await  ${simpleClassName}Api.get${subSimpleClassName}By${SubJoinColumnName}(this.${subJoinColumn.javaField});
+                const data = res.data;
+                if (!data) {
+                  return;
+                }
+                this.list.push(data);
               #end
           #end
         } finally {
@@ -148,22 +144,19 @@
       /** 添加/修改操作 */
       openForm(id) {
         if (!this.${subJoinColumn.javaField}) {
-          that.#[[$modal]]#.msgError('请选择一个${table.classComment}');
+          this.#[[$modal]]#.msgError('请选择一个${table.classComment}');
           return;
         }
         this.#[[$]]#refs["formRef"].open(id, this.${subJoinColumn.javaField});
       },
       /** 删除按钮操作 */
-      handleDelete(row) {
-        const that = this;
+      async handleDelete(row) {
+        const ${primaryColumn.javaField} = row.${primaryColumn.javaField};
+        await this.#[[$modal]]#.confirm('是否确认删除${table.classComment}编号为"' + ${primaryColumn.javaField} + '"的数据项?');
         try {
-          const ${primaryColumn.javaField} = row.${primaryColumn.javaField};
-          this.#[[$modal]]#.confirm('是否确认删除${table.classComment}编号为"' + ${primaryColumn.javaField} + '"的数据项?').then(()=>{
-            return ${simpleClassName}Api.delete${subSimpleClassName}(${primaryColumn.javaField});
-          }).then(() => {
-            that.getList();
-            that.#[[$modal]]#.msgSuccess("删除成功");
-          }).catch(() => {});
+          await ${simpleClassName}Api.delete${subSimpleClassName}(${primaryColumn.javaField});
+          await this.getList();
+          this.#[[$modal]]#.msgSuccess("删除成功");
         } catch {}
       },
 #end

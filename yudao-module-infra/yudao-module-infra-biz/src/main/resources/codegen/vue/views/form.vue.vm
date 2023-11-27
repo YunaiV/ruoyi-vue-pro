@@ -195,18 +195,16 @@
     },
     methods: {
       /** 打开弹窗 */
-     open(id) {
+     async open(id) {
         this.dialogVisible = true;
         this.reset();
-        const that = this;
         // 修改时，设置数据
         if (id) {
           this.formLoading = true;
           try {
-            ${simpleClassName}Api.get${simpleClassName}(id).then(res=>{
-              that.formData = res.data;
-              that.title = "修改${table.classComment}";
-            })
+            const res = await ${simpleClassName}Api.get${simpleClassName}(id);
+            this.formData = res.data;
+            this.title = "修改${table.classComment}";
           } finally {
             this.formLoading = false;
           }
@@ -218,111 +216,66 @@
         #end
       },
       /** 提交按钮 */
-      submitForm() {
+      async submitForm() {
+        // 校验主表
+        await this.$refs["formRef"].validate();
+          ## 特殊：主子表专属逻辑
+          #if ( $table.templateType == 10 || $table.templateType == 12 )
+              #if ( $subTables && $subTables.size() > 0 )
+                // 校验子表
+                  #foreach ($subTable in $subTables)
+                      #set ($index = $foreach.count - 1)
+                      #set ($subClassNameVar = $subClassNameVars.get($index))
+                    try {
+                      ## 代码生成后会替换为正确的 refs
+                      await this.refs['${subClassNameVar}FormRef'].validate();
+                    } catch (e) {
+                      this.subTabsName = '${subClassNameVar}';
+                      return;
+                    }
+                  #end
+              #end
+          #end
         this.formLoading = true;
         try {
-          const that = this;
-          let data = this.formData;
-          let validate = false;
-          // 校验主表
-          this.getRef("formRef").validate(valid => {
-            validate = valid;
-          });
+          const data = this.formData;
         ## 特殊：主子表专属逻辑
         #if ( $table.templateType == 10 || $table.templateType == 12 )
         #if ( $subTables && $subTables.size() > 0 )
-            // 校验子表
-            this.validateSubFrom01().then(() => {
-            // 全部校验通过-拼接子表的数据
             // 拼接子表的数据
-              #foreach ($subTable in $subTables)
-                  #set ($index = $foreach.count - 1)
-                  #set ($subClassNameVar = $subClassNameVars.get($index))
-                data.${subClassNameVar}#if ( $subTable.subJoinMany)s#end = that.getRef('${subClassNameVar}FormRef').getData();
-              #end
-            }).catch((err) => {
-                validate = false;
-                that.subTabsName = err.replace("FormRef", ""); // 定位到没有校验通过的子表单
-            })
+            #foreach ($subTable in $subTables)
+                #set ($index = $foreach.count - 1)
+                #set ($subClassNameVar = $subClassNameVars.get($index))
+              data.${subClassNameVar}#if ( $subTable.subJoinMany)s#end = this.refs['${subClassNameVar}FormRef'].getData();
+            #end
         #end
         #end
-          // 所有表单校验通过后方可提交
-          if (!validate) {
-            return;
-          }
           // 修改的提交
           if (data.${primaryColumn.javaField}) {
-                  ${simpleClassName}Api.update${simpleClassName}(data).then(response => {
-              that.#[[$modal]]#.msgSuccess("修改成功");
-              that.dialogVisible = false;
-              that.#[[$]]#emit('success');
-            });
+            await ${simpleClassName}Api.update${simpleClassName}(data);
+            this.#[[$modal]]#.msgSuccess("修改成功");
+            this.dialogVisible = false;
+            this.#[[$]]#emit('success');
             return;
           }
           // 添加的提交
-          ${simpleClassName}Api.create${simpleClassName}(data).then(response => {
-            that.#[[$modal]]#.msgSuccess("新增成功");
-            that.dialogVisible = false;
-            that.#[[$]]#emit('success');
-          });
+          await ${simpleClassName}Api.create${simpleClassName}(data);
+          this.#[[$modal]]#.msgSuccess("新增成功");
+          this.dialogVisible = false;
+          this.#[[$]]#emit('success');
         }finally {
           this.formLoading = false;
         }
       },
-      getRef(refName){
-        return this.#[[$]]#refs[refName];
-      },
-## 特殊：主子表专属逻辑
-#if ( $table.templateType == 10 || $table.templateType == 12 )
-#if ( $subTables && $subTables.size() > 0 )
-      /** 校验子表单 */
-      validateSubFrom(item) {
-        return new Promise((resolve, reject) => {
-          this.getRef(item).validate()
-          .then(() => {
-            resolve();
-          })
-          .catch(() => {
-            reject(item);
-          })
-        })
-      },
-      /** 校验所有子表单 */
-      validateSubFrom01() {
-        // 需要校验的表单 ref
-        const validFormRefArr = [
-            #foreach ($subTable in $subTables)
-                #set ($index = $foreach.count - 1)
-                #set ($subClassNameVar = $subClassNameVars.get($index))
-              "${subClassNameVar}FormRef",
-            #end
-        ];
-        const validArr = []; // 校验
-        for (const item of validFormRefArr) {
-          validArr.push(this.validateSubFrom(item));
-        }
-        return new Promise((resolve, reject) => {
-          // 校验所有
-          Promise.all(validArr).then(() => {
-            resolve();
-          }).catch((err) => {
-            reject(err);
-          })
-        })
-      },
-#end
-#end
         ## 特殊：树表专属逻辑
         #if ( $table.templateType == 2 )
           /** 获得${table.classComment}树 */
-          get${simpleClassName}Tree() {
-            const that = this;
-            that.${classNameVar}Tree = [];
-                  ${simpleClassName}Api.get${simpleClassName}List().then(res=>{
-              const root = { id: 0, name: '顶级${table.classComment}', children: [] };
-              root.children = this.handleTree(res.data, 'id', '${treeParentColumn.javaField}')
-              that.${classNameVar}Tree.push(root)
-            });
+         async get${simpleClassName}Tree() {
+            this.${classNameVar}Tree = [];
+            const res = await ${simpleClassName}Api.get${simpleClassName}List();
+            const root = { id: 0, name: '顶级${table.classComment}', children: [] };
+            root.children = this.handleTree(res.data, 'id', '${treeParentColumn.javaField}')
+            this.${classNameVar}Tree.push(root)
           },
         #end
         ## 特殊：树表专属逻辑
@@ -361,7 +314,7 @@
             #end
         };
         this.resetForm("formRef");
-      },
+      }
     }
   };
 </script>

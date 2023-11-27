@@ -289,13 +289,14 @@
           }
           try {
             this.formLoading = true;
+            // 这里还是需要获取一下 this 的不然取不到 formData
             const that = this;
             #if ( $subTable.subJoinMany )
-            ${simpleClassName}Api.get${subSimpleClassName}ListBy${SubJoinColumnName}(val).then(res=>{
+            ${simpleClassName}Api.get${subSimpleClassName}ListBy${SubJoinColumnName}(val).then(function (res){
               that.formData = res.data;
             })
             #else
-            ${simpleClassName}Api.get${subSimpleClassName}By${SubJoinColumnName}(val).then(res=>{
+            ${simpleClassName}Api.get${subSimpleClassName}By${SubJoinColumnName}(val).then(function (res){
               const data = res.data;
               if (!data) {
                 return
@@ -325,21 +326,21 @@
                     #end
                 #end
             }
-            row.${subJoinColumn.javaField} = this.${subJoinColumn.javaField}
-            this.formData.push(row)
+            row.${subJoinColumn.javaField} = this.${subJoinColumn.javaField};
+            this.formData.push(row);
           },
           /** 删除按钮操作 */
           handleDelete(index) {
-            this.formData.splice(index, 1)
+            this.formData.splice(index, 1);
           },
         #end
       /** 表单校验 */
       validate(){
-        return this.#[[$]]#refs["formRef"].validate()
+        return this.#[[$]]#refs["formRef"].validate();
       },
       /** 表单值 */
       getData(){
-        return this.formData
+        return this.formData;
       }
     }
   };
