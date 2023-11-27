@@ -179,5 +179,12 @@ public class CrmCustomerController {
         customerService.distributeCustomer(ids, ownerUserId);
         return success(true);
     }
-
+    @GetMapping("/query-all-list")
+    @Operation(summary = "查询客户列表")
+    @PreAuthorize("@ss.hasPermission('crm:customer:all')")
+    public CommonResult<List<CrmCustomerQueryAllRespVO>> queryAll(){
+        List<CrmCustomerDO> crmCustomerDOList = customerService.getCustomerList();
+        List<CrmCustomerQueryAllRespVO> data = CrmCustomerConvert.INSTANCE.convertQueryAll(crmCustomerDOList);
+        return success(data);
+    }
 }

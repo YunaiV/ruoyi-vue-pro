@@ -128,4 +128,10 @@ public interface CrmCustomerService {
      */
     void receive(Long id, Long userId);
 
+    /**
+     * 获取客户列表
+     * @return 客户列表
+     * @author zyna
+     */
+    List<CrmCustomerDO> getCustomerList();
 }

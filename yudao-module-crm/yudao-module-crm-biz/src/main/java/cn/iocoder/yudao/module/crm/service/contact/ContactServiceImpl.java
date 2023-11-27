@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactCreateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactExportReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactUpdateReqVO;
 import cn.iocoder.yudao.module.crm.convert.contact.ContactConvert;
@@ -57,7 +56,7 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACTS, level = CrmPermissionLevelEnum.WRITE)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACTS,bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateContact(ContactUpdateReqVO updateReqVO) {
         // 校验存在
         validateContactExists(updateReqVO.getId());
@@ -68,7 +67,7 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACTS, level = CrmPermissionLevelEnum.WRITE)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACTS,bizId = "#id", level = CrmPermissionLevelEnum.WRITE)
     public void deleteContact(Long id) {
         // 校验存在
         validateContactExists(id);
@@ -83,7 +82,7 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACTS, level = CrmPermissionLevelEnum.READ)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACTS,bizId = "#id", level = CrmPermissionLevelEnum.READ)
     public ContactDO getContact(Long id) {
         return contactMapper.selectById(id);
     }
@@ -102,13 +101,12 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public List<ContactDO> getContactList(ContactExportReqVO exportReqVO) {
+    public List<ContactDO> getContactList(ContactPageReqVO exportReqVO) {
         return contactMapper.selectList(exportReqVO);
     }
 
     @Override
-    public List<ContactDO> allContactList() {
+    public List<ContactDO> getContactList() {
         return contactMapper.selectList();
     }
-
 }

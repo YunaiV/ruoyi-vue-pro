@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -22,8 +23,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ContactDO extends BaseDO {
-
-    // TODO @zyna：这个字段的顺序，是不是整理下；
+    /**
+     * 主键
+     */
+    @TableId
+    private Long id;
     /**
      * 下次联系时间
      */
@@ -56,15 +60,8 @@ public class ContactDO extends BaseDO {
      * 最后跟进时间
      */
     private LocalDateTime lastTime;
-    // TODO @zyna：这个放在最前面吧
     /**
-     * 主键
-     */
-    @TableId
-    private Long id;
-    // TODO @zyna：直接上级，最好写下它关联的字段，例如说这个，应该关联 ContactDO 的 id 字段
-    /**
-     * 直属上级
+     * 直属上级 @link ContactDO#id
      */
     private Long parentId;
     /**
@@ -79,25 +76,23 @@ public class ContactDO extends BaseDO {
      * QQ
      */
     private Long qq;
-    // TODO @zyna：wechat
     /**
      * 微信
      */
-    private String webchat;
-    // TODO @zyna：关联的枚举
+    private String wechat;
     /**
      * 性别
+     * @See 字典配置
      */
     private Integer sex;
-    // TODO @zyna：这个字段改成 master 哈；
     /**
      * 是否关键决策人
      */
-    private Boolean policyMakers;
-    // TODO @zyna：应该是 Long
+    private Boolean master;
     /**
      * 负责人用户编号
      */
-    private String ownerUserId;
+    private Long ownerUserId;
 
+    private Integer areaId;
 }
