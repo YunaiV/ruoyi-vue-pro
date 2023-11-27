@@ -4,11 +4,11 @@ import cn.iocoder.yudao.framework.common.validation.Mobile;
 import cn.iocoder.yudao.framework.common.validation.Telephone;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
+import cn.iocoder.yudao.module.infra.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import org.apache.skywalking.apm.toolkit.trace.IgnoredException;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Email;
@@ -35,24 +35,23 @@ public class ContactBaseVO {
     @ExcelIgnore
     private Long customerId;
 
-    @ExcelProperty(value = "性别",converter = DictConvert.class ,order = 3)
+    @ExcelProperty(value = "性别", converter = DictConvert.class, order = 3)
     @DictFormat(cn.iocoder.yudao.module.system.enums.DictTypeConstants.USER_SEX)
     @Schema(description = "性别")
     private Integer sex;
 
     @Schema(description = "职位")
-    @ExcelProperty(value = "职位",order = 3)
+    @ExcelProperty(value = "职位", order = 3)
     private String post;
 
     @Schema(description = "是否关键决策人")
-    @ExcelProperty(value = "是否关键决策人",converter = DictConvert.class,order = 3)
-    @DictFormat(cn.iocoder.yudao.module.system.enums.DictTypeConstants.INFRA_BOOLEAN_STRING)
+    @ExcelProperty(value = "是否关键决策人", converter = DictConvert.class, order = 3)
+    @DictFormat(DictTypeConstants.BOOLEAN_STRING)
     private Boolean master;
 
     @Schema(description = "直属上级", example = "23457")
     @ExcelIgnore
     private Long parentId;
-
 
     @Schema(description = "手机号",example = "1387171766")
     @Mobile
@@ -98,7 +97,7 @@ public class ContactBaseVO {
 
     @Schema(description = "负责人用户编号", example = "14334")
     @NotNull(message = "负责人不能为空")
-    @ExcelIgnore
+    @ExcelIgnore // TODO @zyna：可以使用 ExcelIgnoreUnannotated
     private Long ownerUserId;
 
     @Schema(description = "地区编号", example = "20158")

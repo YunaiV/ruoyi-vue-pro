@@ -7,7 +7,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.*;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerExportReqVO;
 import cn.iocoder.yudao.module.crm.convert.contact.ContactConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.ContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
@@ -28,9 +27,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -86,24 +86,23 @@ public class ContactController {
     @PreAuthorize("@ss.hasPermission('crm:contact:query')")
     public CommonResult<ContactRespVO> getContact(@RequestParam("id") Long id) {
         ContactDO contact = contactService.getContact(id);
-        if(contact == null){
+        if (contact == null) {
             throw exception(ErrorCodeConstants.CONTACT_NOT_EXISTS);
         }
-        //1.获取用户名
+        // 1. 获取用户名
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(CollUtil.removeNull(Lists.newArrayList(
-                NumberUtil.parseLong(contact.getCreator()),contact.getOwnerUserId())));
-        //2.获取客户信息
-        List<CrmCustomerDO> crmCustomerDOList = crmCustomerService.getCustomerList(Collections.singletonList(contact.getCustomerId()));
-        //3.直属上级
-        List<ContactDO> contactList = contactService.getContactList(Collections.singletonList(contact.getParentId()));
-        ContactRespVO contactRespVO  = ContactConvert.INSTANCE.convert(contact,userMap,crmCustomerDOList,contactList);
-        return success(contactRespVO);
+                NumberUtil.parseLong(contact.getCreator()), contact.getOwnerUserId())));
+        // 2. 获取客户信息
+        List<CrmCustomerDO> customerList = crmCustomerService.getCustomerList(Collections.singletonList(contact.getCustomerId()));
+        // 3. 直属上级
+        List<ContactDO> parentContactList = contactService.getContactList(Collections.singletonList(contact.getParentId()));
+        return success(ContactConvert.INSTANCE.convert(contact, userMap, customerList, parentContactList));
     }
+
     @GetMapping("/simple-all-list")
     @Operation(summary = "获得联系人列表")
     @PreAuthorize("@ss.hasPermission('crm:contact:query')")
-    public CommonResult<List<ContactSimpleRespVO>> simpleAlllist() {
-        // TODO @zyna：方法名改成，getContactList；方法命名，要动名词，get 动词；all 可以去掉，因为没条件，自然是全部
+    public CommonResult<List<ContactSimpleRespVO>> getContactList() {
         List<ContactDO> list = contactService.getContactList();
         return success(ContactConvert.INSTANCE.convertAllList(list));
     }
@@ -112,11 +111,12 @@ public class ContactController {
     @Operation(summary = "获得联系人分页")
     @PreAuthorize("@ss.hasPermission('crm:contact:query')")
     public CommonResult<PageResult<ContactRespVO>> getContactPage(@Valid ContactPageReqVO pageVO) {
-        PageResult<ContactDO> pageData = contactService.getContactPage(pageVO);
-        List<ContactRespVO>  contactRespVOList = convertFieldValue2Name(pageData.getList());
-        PageResult<ContactRespVO> pageDataReturn = ContactConvert.INSTANCE.convertPage(pageData);
-        pageDataReturn.setList(contactRespVOList);
-        return success(pageDataReturn);
+        PageResult<ContactDO> pageResult = contactService.getContactPage(pageVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty(pageResult.getTotal()));
+        }
+        List<ContactRespVO> contactVOList = convertFieldValue2Name(pageResult.getList());
+        return success(new PageResult<>(contactVOList, pageResult.getTotal()));
     }
 
     // TODO @zyna：可以看下新的导出写法，这里调整下
@@ -127,27 +127,31 @@ public class ContactController {
     public void exportContactExcel(@Valid ContactPageReqVO exportReqVO,
               HttpServletResponse response) throws IOException {
         List<ContactDO> list = contactService.getContactList(exportReqVO);
+        // TODO @zya：可以改成直接调用 getContactPage 方法；只要把 ContactPageReqVO 设置成不分页，PAGE_SIZE_NONE
         // 导出 Excel
         List<ContactRespVO>  contactRespVOList = convertFieldValue2Name(list);
-        ExcelUtils.write(response, "crm联系人.xls", "数据", ContactRespVO.class, contactRespVOList);
+        ExcelUtils.write(response, "crm 联系人.xls", "数据", ContactRespVO.class, contactRespVOList);
     }
 
+    // TODO 芋艿：后续会合并下，
     /**
      * 翻译字段名称
      * @param contactDOList 联系人List
      * @return List<ContactRespVO>
      */
     private List<ContactRespVO> convertFieldValue2Name(List<ContactDO> contactDOList){
-        //1.获取客户列表
+        // 1. 获取客户列表
+        // TODO @zyna：简单的转换，可以使用 CollectionUtils.convertSet
         List<Long> customerIdList = contactDOList.stream().map(ContactDO::getCustomerId).distinct().collect(Collectors.toList());
         List<CrmCustomerDO> crmCustomerDOList = crmCustomerService.getCustomerList(customerIdList);
-        //2.获取创建人、责任人列表
+        // 2. 获取创建人、责任人列表
+        // TODO @zyna：简单的转换，可以使用 CollectionUtils.convertSetByFlatMap
         List<Long> userIdsList =  contactDOList.stream().flatMap(item-> Stream.of(Long.parseLong(item.getCreator()),item.getOwnerUserId()).distinct()).collect(Collectors.toList());
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIdsList);
-        //3.直属上级
+        // 3. 直属上级
         List<Long> contactIdsList =  contactDOList.stream().map(ContactDO::getParentId).distinct().collect(Collectors.toList());
         List<ContactDO> contactList = contactService.getContactList(contactIdsList);
-        List<ContactRespVO> pageResult =ContactConvert.INSTANCE.converList(contactDOList,userMap,crmCustomerDOList,contactList);
-        return pageResult;
+        return ContactConvert.INSTANCE.converList(contactDOList,userMap,crmCustomerDOList,contactList);
     }
+
 }

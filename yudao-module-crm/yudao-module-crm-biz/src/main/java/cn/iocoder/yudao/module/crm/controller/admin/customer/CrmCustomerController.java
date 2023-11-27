@@ -179,6 +179,8 @@ public class CrmCustomerController {
         customerService.distributeCustomer(ids, ownerUserId);
         return success(true);
     }
+
+    // TODO 芋艿：这个接口要调整下
     @GetMapping("/query-all-list")
     @Operation(summary = "查询客户列表")
     @PreAuthorize("@ss.hasPermission('crm:customer:all')")
@@ -187,4 +189,5 @@ public class CrmCustomerController {
         List<CrmCustomerQueryAllRespVO> data = CrmCustomerConvert.INSTANCE.convertQueryAll(crmCustomerDOList);
         return success(data);
     }
+
 }

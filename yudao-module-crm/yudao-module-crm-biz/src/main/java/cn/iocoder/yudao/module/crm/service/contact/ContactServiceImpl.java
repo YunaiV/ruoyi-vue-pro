@@ -56,7 +56,7 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACTS,bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACTS, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateContact(ContactUpdateReqVO updateReqVO) {
         // 校验存在
         validateContactExists(updateReqVO.getId());
@@ -67,7 +67,7 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACTS,bizId = "#id", level = CrmPermissionLevelEnum.WRITE)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACTS, bizId = "#id", level = CrmPermissionLevelEnum.WRITE)
     public void deleteContact(Long id) {
         // 校验存在
         validateContactExists(id);
@@ -82,7 +82,7 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACTS,bizId = "#id", level = CrmPermissionLevelEnum.READ)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACTS, bizId = "#id", level = CrmPermissionLevelEnum.READ)
     public ContactDO getContact(Long id) {
         return contactMapper.selectById(id);
     }

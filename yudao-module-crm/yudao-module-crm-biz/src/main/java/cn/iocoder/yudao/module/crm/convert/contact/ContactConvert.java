@@ -46,7 +46,8 @@ public interface ContactConvert {
     CrmPermissionTransferReqBO convert(CrmContactTransferReqVO reqVO, Long userId);
 
     /**
-     * 详情信息
+     * 转换详情信息
+     *
      * @param contactDO 联系人
      * @param userMap 用户列表
      * @param crmCustomerDOList 客户
@@ -54,26 +55,28 @@ public interface ContactConvert {
      */
     default  ContactRespVO convert(ContactDO contactDO, Map<Long, AdminUserRespDTO> userMap, List<CrmCustomerDO> crmCustomerDOList,
                                    List<ContactDO> contactList) {
-        ContactRespVO contactRespVO = convert(contactDO);
-        setUserInfo(contactRespVO,userMap);
-        Map<Long,CrmCustomerDO> crmCustomerDOMap = crmCustomerDOList.stream().collect(Collectors.toMap(CrmCustomerDO::getId,v->v));
-        Map<Long,ContactDO> contactDOMap = contactList.stream().collect(Collectors.toMap(ContactDO::getId,v->v));
-        findAndThen(crmCustomerDOMap,contactDO.getCustomerId(),customer -> {contactRespVO.setCustomerName(customer.getName());});
-        findAndThen(contactDOMap,contactDO.getParentId(),contactDOInner -> {contactRespVO.setParentName(contactDOInner.getName());});
-        return contactRespVO;
-    }
-    default  List<ContactRespVO> converList(List<ContactDO> contactDOList, Map<Long, AdminUserRespDTO> userMap,
-                                                   List<CrmCustomerDO> crmCustomerDOList , List<ContactDO> contactList){
-        List<ContactRespVO> result = convertList(contactDOList);
+        ContactRespVO contactVO = convert(contactDO);
+        setUserInfo(contactVO, userMap);
+        Map<Long,CrmCustomerDO> ustomerMap = crmCustomerDOList.stream().collect(Collectors.toMap(CrmCustomerDO::getId,v->v));
         Map<Long,ContactDO> contactMap = contactList.stream().collect(Collectors.toMap(ContactDO::getId,v->v));
-        Map<Long,CrmCustomerDO> customerMap = crmCustomerDOList.stream().collect(Collectors.toMap(CrmCustomerDO::getId,v->v));
+        findAndThen(ustomerMap, contactDO.getCustomerId(), customer -> contactVO.setCustomerName(customer.getName()));
+        findAndThen(contactMap, contactDO.getParentId(), contact -> contactVO.setParentName(contact.getName()));
+        return contactVO;
+    }
+    default  List<ContactRespVO> converList(List<ContactDO> contactList, Map<Long, AdminUserRespDTO> userMap,
+                                            List<CrmCustomerDO> customerList, List<ContactDO> parentContactList) {
+        List<ContactRespVO> result = convertList(contactList);
+        // TODO @zyna：简单的转换，可以使用 CollectionUtils.convertMap
+        Map<Long, ContactDO> parentContactMap = parentContactList.stream().collect(Collectors.toMap(ContactDO::getId,v->v));
+        Map<Long, CrmCustomerDO> customerMap = customerList.stream().collect(Collectors.toMap(CrmCustomerDO::getId,v->v));
         result.forEach(item -> {
             setUserInfo(item, userMap);
             findAndThen(customerMap,item.getCustomerId(),customer -> {item.setCustomerName(customer.getName());});
-            findAndThen(contactMap,item.getParentId(),contactDO -> {item.setParentName(contactDO.getName());});
+            findAndThen(parentContactMap,item.getParentId(),contactDO -> {item.setParentName(contactDO.getName());});
         });
         return result;
     }
+
     /**
      * 设置用户信息
      *
@@ -87,4 +90,5 @@ public interface ContactConvert {
         });
         findAndThen(userMap, Long.parseLong(contactRespVO.getCreator()), user -> contactRespVO.setCreatorName(user.getNickname()));
     }
+
 }
