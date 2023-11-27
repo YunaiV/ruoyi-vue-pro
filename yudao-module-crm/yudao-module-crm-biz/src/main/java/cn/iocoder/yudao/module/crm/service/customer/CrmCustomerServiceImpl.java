@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -25,6 +26,7 @@ import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
+import static java.util.Collections.singletonList;
 
 /**
  * 客户 Service 实现类
@@ -40,6 +42,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Resource
     private CrmPermissionService crmPermissionService;
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -174,7 +178,9 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         if (customers.size() != ids.size()) {
             throw exception(CUSTOMER_NOT_EXISTS);
         }
-        // 1.2. 校验状态
+        // 1.2. 校验负责人是否存在
+        adminUserApi.validateUserList(singletonList(ownerUserId));
+        // 1.3. 校验状态
         customers.forEach(customer -> {
             // 校验是否已有负责人
             validateCustomerOwnerExists(customer, false);
