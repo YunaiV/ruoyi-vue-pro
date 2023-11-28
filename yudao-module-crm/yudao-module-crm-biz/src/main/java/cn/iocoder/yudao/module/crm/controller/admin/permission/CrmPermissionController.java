@@ -80,7 +80,7 @@ public class CrmPermissionController {
     @DeleteMapping("/delete-self")
     @Operation(summary = "删除自己的数据权限")
     @Parameter(name = "id", description = "数据权限编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('crm:permission:delete')") // TODO puhui999: 数据权限在页面上只是已团队成员组件的形式出现，那么这个权限怎么分配？
+    @PreAuthorize("@ss.hasPermission('crm:permission:delete')")
     public CommonResult<Boolean> deleteSelfPermission(@RequestParam("id") Long id) {
         permissionService.deleteSelfPermission(id, getLoginUserId());
         return success(true);

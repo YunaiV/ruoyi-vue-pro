@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -25,6 +26,7 @@ import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
+import static java.util.Collections.singletonList;
 
 /**
  * 客户 Service 实现类
@@ -40,6 +42,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Resource
     private CrmPermissionService crmPermissionService;
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -96,9 +100,12 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     public PageResult<CrmCustomerDO> getCustomerPage(CrmCustomerPageReqVO pageReqVO, Long userId) {
-        // 1.1. TODO 如果是超级管理员
         boolean admin = false;
-        return customerMapper.selectPage(pageReqVO, userId, admin);
+        if (admin) { // 1.1. 情况一： TODO 如果是管理员
+            customerMapper.selectPageWithAdmin(pageReqVO, userId);
+        }
+        // 1.2. 情况二：获取当前用户能看的分页数据
+        return customerMapper.selectPage(pageReqVO, userId);
     }
 
     /**
@@ -174,7 +181,9 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         if (customers.size() != ids.size()) {
             throw exception(CUSTOMER_NOT_EXISTS);
         }
-        // 1.2. 校验状态
+        // 1.2. 校验负责人是否存在
+        adminUserApi.validateUserList(singletonList(ownerUserId));
+        // 1.3. 校验状态
         customers.forEach(customer -> {
             // 校验是否已有负责人
             validateCustomerOwnerExists(customer, false);

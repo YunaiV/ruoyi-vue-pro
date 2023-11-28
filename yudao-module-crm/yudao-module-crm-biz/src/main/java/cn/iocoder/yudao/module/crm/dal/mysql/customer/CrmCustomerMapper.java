@@ -25,47 +25,25 @@ import java.util.List;
 @Mapper
 public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
 
-    static void appendQueryParams(MPJLambdaWrapperX<CrmCustomerDO> mpjLambdaWrapperX, CrmCustomerPageReqVO pageReqVO, Long userId) {
-        if (pageReqVO.getPool()) { // 情况一：公海
-            mpjLambdaWrapperX.isNull(CrmCustomerDO::getOwnerUserId);
-        } else { // 情况二：不是公海
-            mpjLambdaWrapperX.isNotNull(CrmCustomerDO::getOwnerUserId);
-        }
-        // TODO 场景数据过滤
-        if (CrmSceneEnum.isOwner(pageReqVO.getSceneType())) { // 场景一：我负责的数据
-            mpjLambdaWrapperX.eq(CrmCustomerDO::getOwnerUserId, userId);
-        }
-    }
-
-    static void appendQueryParams(LambdaQueryWrapperX<CrmCustomerDO> lambdaQueryWrapperX, CrmCustomerPageReqVO pageReqVO, Long userId) {
-        if (pageReqVO.getPool()) { // 情况一：公海
-            lambdaQueryWrapperX.isNull(CrmCustomerDO::getOwnerUserId);
-        } else { // 情况二：不是公海
-            lambdaQueryWrapperX.isNotNull(CrmCustomerDO::getOwnerUserId);
-        }
-        // TODO 场景数据过滤
-        if (CrmSceneEnum.isOwner(pageReqVO.getSceneType())) { // 场景一：我负责的数据
-            lambdaQueryWrapperX.eq(CrmCustomerDO::getOwnerUserId, userId);
-        }
-    }
-
     default int updateOwnerUserIdById(Long id, Long ownerUserId) {
         return update(new LambdaUpdateWrapper<CrmCustomerDO>()
                 .eq(CrmCustomerDO::getId, id)
                 .set(CrmCustomerDO::getOwnerUserId, ownerUserId));
     }
 
-    default PageResult<CrmCustomerDO> selectPage(CrmCustomerPageReqVO pageReqVO, Long userId, Boolean admin) {
-        if (admin) { // 情况一：管理员查看
-            LambdaQueryWrapperX<CrmCustomerDO> queryWrapperX = new LambdaQueryWrapperX<>();
-            appendQueryParams(queryWrapperX, pageReqVO, userId);
-            return selectPage(pageReqVO, queryWrapperX
-                    .likeIfPresent(CrmCustomerDO::getName, pageReqVO.getName())
-                    .eqIfPresent(CrmCustomerDO::getMobile, pageReqVO.getMobile())
-                    .eqIfPresent(CrmCustomerDO::getIndustryId, pageReqVO.getIndustryId())
-                    .eqIfPresent(CrmCustomerDO::getLevel, pageReqVO.getLevel())
-                    .eqIfPresent(CrmCustomerDO::getSource, pageReqVO.getSource()));
-        }
+    default PageResult<CrmCustomerDO> selectPageWithAdmin(CrmCustomerPageReqVO pageReqVO, Long userId) {
+        // 情况一：管理员查看
+        LambdaQueryWrapperX<CrmCustomerDO> queryWrapperX = new LambdaQueryWrapperX<>();
+        appendQueryParams(queryWrapperX, pageReqVO, userId);
+        return selectPage(pageReqVO, queryWrapperX
+                .likeIfPresent(CrmCustomerDO::getName, pageReqVO.getName())
+                .eqIfPresent(CrmCustomerDO::getMobile, pageReqVO.getMobile())
+                .eqIfPresent(CrmCustomerDO::getIndustryId, pageReqVO.getIndustryId())
+                .eqIfPresent(CrmCustomerDO::getLevel, pageReqVO.getLevel())
+                .eqIfPresent(CrmCustomerDO::getSource, pageReqVO.getSource()));
+    }
+
+    default PageResult<CrmCustomerDO> selectPage(CrmCustomerPageReqVO pageReqVO, Long userId) {
         // 情况二：获取当前用户能看的分页数据
         IPage<CrmCustomerDO> mpPage = MyBatisUtils.buildPage(pageReqVO);
         MPJLambdaWrapperX<CrmCustomerDO> mpjLambdaWrapperX = new MPJLambdaWrapperX<>();
@@ -89,6 +67,30 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
         }
         mpPage = selectJoinPage(mpPage, CrmCustomerDO.class, mpjLambdaWrapperX);
         return new PageResult<>(mpPage.getRecords(), mpPage.getTotal());
+    }
+
+    static void appendQueryParams(MPJLambdaWrapperX<CrmCustomerDO> mpjLambdaWrapperX, CrmCustomerPageReqVO pageReqVO, Long userId) {
+        if (pageReqVO.getPool()) { // 情况一：公海
+            mpjLambdaWrapperX.isNull(CrmCustomerDO::getOwnerUserId);
+        } else { // 情况二：不是公海
+            mpjLambdaWrapperX.isNotNull(CrmCustomerDO::getOwnerUserId);
+        }
+        // TODO 场景数据过滤
+        if (CrmSceneEnum.isOwner(pageReqVO.getSceneType())) { // 场景一：我负责的数据
+            mpjLambdaWrapperX.eq(CrmCustomerDO::getOwnerUserId, userId);
+        }
+    }
+
+    static void appendQueryParams(LambdaQueryWrapperX<CrmCustomerDO> lambdaQueryWrapperX, CrmCustomerPageReqVO pageReqVO, Long userId) {
+        if (pageReqVO.getPool()) { // 情况一：公海
+            lambdaQueryWrapperX.isNull(CrmCustomerDO::getOwnerUserId);
+        } else { // 情况二：不是公海
+            lambdaQueryWrapperX.isNotNull(CrmCustomerDO::getOwnerUserId);
+        }
+        // TODO 场景数据过滤
+        if (CrmSceneEnum.isOwner(pageReqVO.getSceneType())) { // 场景一：我负责的数据
+            lambdaQueryWrapperX.eq(CrmCustomerDO::getOwnerUserId, userId);
+        }
     }
 
 }
