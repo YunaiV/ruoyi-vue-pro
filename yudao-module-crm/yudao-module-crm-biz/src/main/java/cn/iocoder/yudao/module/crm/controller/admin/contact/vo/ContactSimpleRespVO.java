@@ -14,6 +14,5 @@ public class ContactSimpleRespVO {
 
     @Schema(description = "姓名", example = "芋艿")
     private String name;
-
-
+    
 }

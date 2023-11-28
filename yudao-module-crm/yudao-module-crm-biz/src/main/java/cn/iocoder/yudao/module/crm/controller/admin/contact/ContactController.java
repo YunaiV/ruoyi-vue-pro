@@ -144,7 +144,7 @@ public class ContactController {
         List<CrmCustomerDO> crmCustomerDOList = crmCustomerService.getCustomerList(convertSet(contactDOList, ContactDO::getCustomerId));
         // 2. 获取创建人、责任人列表
         List<Long> userIdsList = convertListByFlatMap(contactDOList, item -> Stream.of(NumberUtils.parseLong(item.getCreator()), item.getOwnerUserId())
-                .filter(Objects::nonNull));
+                .filter(Objects::nonNull)); // TODO @zyna：里面已经忽略 null 啦
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIdsList);
         // 3. 直属上级
         Set<Long> contactIdsList = convertSet(contactDOList, ContactDO::getParentId);

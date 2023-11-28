@@ -45,12 +45,11 @@ public class ContactServiceImpl implements ContactService {
 
     @Resource
     private CrmCustomerService customerService;
+    @Resource
+    private CrmPermissionService crmPermissionService;
 
     @Resource
     private AdminUserApi adminUserApi;
-
-    @Resource
-    private CrmPermissionService crmPermissionService;
 
     @Override
     public Long createContact(ContactCreateReqVO createReqVO, Long userId) {
@@ -126,18 +125,20 @@ public class ContactServiceImpl implements ContactService {
         return contactMapper.selectList();
     }
 
+    // TODO 芋艿：后面在看下这个方法；
     private void validateDataExist(ContactBaseVO contactBaseVO){
-        //1.校验客户
+        // 1.校验客户
         if (contactBaseVO.getCustomerId() != null) {
             Optional.ofNullable(customerService.getCustomer(contactBaseVO.getCustomerId())).orElseThrow(() -> exception(CUSTOMER_NOT_EXISTS));
         }
-        //2.校验负责人
+        // 2.校验负责人
         if (contactBaseVO.getOwnerUserId() != null) {
             Optional.ofNullable(adminUserApi.getUser(contactBaseVO.getOwnerUserId())).orElseThrow(() -> exception(USER_NOT_EXISTS));
         }
-        //3.直属上级
+        // 3.直属上级
         if (contactBaseVO.getParentId() != null) {
             Optional.ofNullable(contactMapper.selectById(contactBaseVO.getParentId())).orElseThrow(() -> exception(CONTACT_NOT_EXISTS));
         }
     }
+
 }
