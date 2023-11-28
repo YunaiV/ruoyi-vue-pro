@@ -89,7 +89,7 @@
 </template>
 
 <script>
-  import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${table.businessName}'
+  import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${table.businessName}';
       #if ($hasImageUploadColumn)
       import ImageUpload from '@/components/ImageUpload';
       #end

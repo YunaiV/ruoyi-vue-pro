@@ -40,7 +40,7 @@
 </template>
 
 <script>
-  import * as StudentApi from '@/api/infra/demo'
+  import * as StudentApi from '@/api/infra/demo';
   export default {
     name: "StudentContactList",
     props:[
@@ -70,13 +70,11 @@
     },
     methods: {
       /** 查询列表 */
-      getList() {
+      async getList() {
         try {
           this.loading = true;
-          const that = this;
-                StudentApi.getStudentContactListByStudentId(this.studentId).then(response=>{
-                  that.list = response.data;
-              })
+                const res = await StudentApi.getStudentContactListByStudentId(this.studentId);
+                this.list = res.data;
         } finally {
           this.loading = false;
         }

@@ -1,6 +1,5 @@
 <template>
   <div class="app-container">
-
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="名字" prop="name">
@@ -31,14 +30,14 @@
     </el-row>
 
             <el-table
-          v-loading="loading"
-          :data="list"
-          :stripe="true"
-          :show-overflow-tooltip="true"
-          v-if="refreshTable"
-          row-key="id"
-          :default-expand-all="isExpandAll"
-          :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+        v-loading="loading"
+        :data="list"
+        :stripe="true"
+        :show-overflow-tooltip="true"
+        v-if="refreshTable"
+        row-key="id"
+        :default-expand-all="isExpandAll"
+        :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
       >
             <el-table-column label="编号" align="center" prop="id">
         <template v-slot="scope">
@@ -104,12 +103,11 @@ export default {
   },
   methods: {
     /** 查询列表 */
-    getList() {
+    async getList() {
       try {
       this.loading = true;
-              CategoryApi.getCategoryList(this.queryParams).then(response => {
-          this.list = this.handleTree(response.data, 'id', 'parentId');
-        })
+             const res = await CategoryApi.getCategoryList(this.queryParams);
+       this.list = this.handleTree(res.data, 'id', 'parentId');
       } finally {
         this.loading = false;
       }
@@ -129,31 +127,25 @@ export default {
       this.$refs["formRef"].open(id);
     },
     /** 删除按钮操作 */
-    handleDelete(row) {
-      const that = this;
-      try {
+    async handleDelete(row) {
       const id = row.id;
-      this.$modal.confirm('是否确认删除分类编号为"' + id + '"的数据项?').then(()=>{
-          return CategoryApi.deleteCategory(id);
-        }).then(() => {
-        that.getList();
-        that.$modal.msgSuccess("删除成功");
-        }).catch(() => {});
+      await this.$modal.confirm('是否确认删除分类编号为"' + id + '"的数据项?')
+      try {
+       await CategoryApi.deleteCategory(id);
+       await this.getList();
+       this.$modal.msgSuccess("删除成功");
       } catch {}
     },
     /** 导出按钮操作 */
-    handleExport() {
-      const that = this;
+    async handleExport() {
+      await this.$modal.confirm('是否确认导出所有分类数据项?');
       try {
-          this.$modal.confirm('是否确认导出所有分类数据项?').then(() => {
-              that.exportLoading = true;
-              return CategoryApi.exportCategoryExcel(params);
-            }).then(response => {
-              that.$download.excel(response, '分类.xls');
-            });
+        this.exportLoading = true;
+        const res = await CategoryApi.exportCategoryExcel(this.queryParams);
+        this.$download.excel(res.data, '分类.xls');
       } catch {
       } finally {
-        that.exportLoading = false;
+        this.exportLoading = false;
       }
     },
                     /** 展开/折叠操作 */

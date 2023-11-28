@@ -1,11 +1,11 @@
 <template>
   <div class="app-container">
       <el-form
-          ref="formRef"
-          :model="formData"
-          :rules="formRules"
-          label-width="100px"
-          v-loading="formLoading"
+        ref="formRef"
+        :model="formData"
+        :rules="formRules"
+        label-width="100px"
+        v-loading="formLoading"
       >
                      <el-form-item label="名字" prop="name">
                       <el-input v-model="formData.name" placeholder="请输入名字" />
@@ -42,7 +42,7 @@
 </template>
 
 <script>
-  import * as StudentApi from '@/api/infra/demo'
+  import * as StudentApi from '@/api/infra/demo';
       import ImageUpload from '@/components/ImageUpload';
       import FileUpload from '@/components/FileUpload';
       import Editor from '@/components/Editor';
@@ -97,8 +97,9 @@
           }
           try {
             this.formLoading = true;
+            // 这里还是需要获取一下 this 的不然取不到 formData
             const that = this;
-            StudentApi.getStudentTeacherByStudentId(val).then(res=>{
+            StudentApi.getStudentTeacherByStudentId(val).then(function (res){
               const data = res.data;
               if (!data) {
                 return
@@ -115,11 +116,11 @@
     methods: {
       /** 表单校验 */
       validate(){
-        return this.$refs["formRef"].validate()
+        return this.$refs["formRef"].validate();
       },
       /** 表单值 */
       getData(){
-        return this.formData
+        return this.formData;
       }
     }
   };

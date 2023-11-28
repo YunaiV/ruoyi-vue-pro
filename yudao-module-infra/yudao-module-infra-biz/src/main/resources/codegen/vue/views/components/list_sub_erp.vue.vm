@@ -61,9 +61,9 @@
 </template>
 
 <script>
-  import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${table.businessName}'
+  import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${table.businessName}';
   #if ($table.templateType == 11)
-  import ${subSimpleClassName}Form from './${subSimpleClassName}Form.vue'
+  import ${subSimpleClassName}Form from './${subSimpleClassName}Form.vue';
   #end
   export default {
     name: "${subSimpleClassName}List",
