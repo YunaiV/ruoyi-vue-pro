@@ -100,9 +100,12 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     public PageResult<CrmCustomerDO> getCustomerPage(CrmCustomerPageReqVO pageReqVO, Long userId) {
-        // 1.1. TODO 如果是超级管理员
         boolean admin = false;
-        return customerMapper.selectPage(pageReqVO, userId, admin);
+        if (admin) { // 1.1. 情况一： TODO 如果是管理员
+            customerMapper.selectPageWithAdmin(pageReqVO, userId);
+        }
+        // 1.2. 情况二：获取当前用户能看的分页数据
+        return customerMapper.selectPage(pageReqVO, userId);
     }
 
     /**

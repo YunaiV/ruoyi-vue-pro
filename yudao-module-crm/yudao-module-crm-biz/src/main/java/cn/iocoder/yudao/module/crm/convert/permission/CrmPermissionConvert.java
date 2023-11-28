@@ -23,7 +23,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAnd
 /**
  * Crm 数据权限 Convert
  *
- * @author Wanwan
+ * @author HUIHUI
  */
 @Mapper
 public interface CrmPermissionConvert {
