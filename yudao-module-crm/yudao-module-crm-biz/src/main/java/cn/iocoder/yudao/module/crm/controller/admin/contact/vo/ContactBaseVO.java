@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.validation.Telephone;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import cn.iocoder.yudao.module.infra.enums.DictTypeConstants;
-import com.alibaba.excel.annotation.ExcelIgnore;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -24,6 +24,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
  * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
  */
 @Data
+@ExcelIgnoreUnannotated
 public class ContactBaseVO {
 
     @ExcelProperty(value = "姓名",order = 1)
@@ -32,7 +33,6 @@ public class ContactBaseVO {
     private String name;
 
     @Schema(description = "客户编号", example = "10795")
-    @ExcelIgnore
     private Long customerId;
 
     @ExcelProperty(value = "性别", converter = DictConvert.class, order = 3)
@@ -50,7 +50,6 @@ public class ContactBaseVO {
     private Boolean master;
 
     @Schema(description = "直属上级", example = "23457")
-    @ExcelIgnore
     private Long parentId;
 
     @Schema(description = "手机号",example = "1387171766")
@@ -97,11 +96,9 @@ public class ContactBaseVO {
 
     @Schema(description = "负责人用户编号", example = "14334")
     @NotNull(message = "负责人不能为空")
-    @ExcelIgnore // TODO @zyna：可以使用 ExcelIgnoreUnannotated
     private Long ownerUserId;
 
     @Schema(description = "地区编号", example = "20158")
-    @ExcelIgnore
     private Integer areaId;
 
 }

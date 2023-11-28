@@ -11,10 +11,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
+
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 
 /**
@@ -37,6 +39,11 @@ public interface ContactConvert {
 
     PageResult<ContactRespVO> convertPage(PageResult<ContactDO> page);
 
+    default PageResult<ContactRespVO> convertPage(PageResult<ContactDO> pageResult, Map<Long, AdminUserRespDTO> userMap,
+                                                  List<CrmCustomerDO> customerList, List<ContactDO> parentContactList) {
+        List<ContactRespVO> list = converList(pageResult.getList(), userMap, customerList, parentContactList);
+        return convertPage(pageResult).setList(list);
+    }
     List<ContactSimpleRespVO> convertAllList(List<ContactDO> list);
 
     @Mappings({
@@ -48,31 +55,35 @@ public interface ContactConvert {
     /**
      * 转换详情信息
      *
-     * @param contactDO 联系人
-     * @param userMap 用户列表
+     * @param contactDO         联系人
+     * @param userMap           用户列表
      * @param crmCustomerDOList 客户
      * @return ContactRespVO
      */
-    default  ContactRespVO convert(ContactDO contactDO, Map<Long, AdminUserRespDTO> userMap, List<CrmCustomerDO> crmCustomerDOList,
-                                   List<ContactDO> contactList) {
+    default ContactRespVO convert(ContactDO contactDO, Map<Long, AdminUserRespDTO> userMap, List<CrmCustomerDO> crmCustomerDOList,
+                                  List<ContactDO> contactList) {
         ContactRespVO contactVO = convert(contactDO);
         setUserInfo(contactVO, userMap);
-        Map<Long,CrmCustomerDO> ustomerMap = crmCustomerDOList.stream().collect(Collectors.toMap(CrmCustomerDO::getId,v->v));
-        Map<Long,ContactDO> contactMap = contactList.stream().collect(Collectors.toMap(ContactDO::getId,v->v));
+        Map<Long, CrmCustomerDO> ustomerMap = crmCustomerDOList.stream().collect(Collectors.toMap(CrmCustomerDO::getId, v -> v));
+        Map<Long, ContactDO> contactMap = contactList.stream().collect(Collectors.toMap(ContactDO::getId, v -> v));
         findAndThen(ustomerMap, contactDO.getCustomerId(), customer -> contactVO.setCustomerName(customer.getName()));
         findAndThen(contactMap, contactDO.getParentId(), contact -> contactVO.setParentName(contact.getName()));
         return contactVO;
     }
-    default  List<ContactRespVO> converList(List<ContactDO> contactList, Map<Long, AdminUserRespDTO> userMap,
-                                            List<CrmCustomerDO> customerList, List<ContactDO> parentContactList) {
+
+    default List<ContactRespVO> converList(List<ContactDO> contactList, Map<Long, AdminUserRespDTO> userMap,
+                                           List<CrmCustomerDO> customerList, List<ContactDO> parentContactList) {
         List<ContactRespVO> result = convertList(contactList);
-        // TODO @zyna：简单的转换，可以使用 CollectionUtils.convertMap
-        Map<Long, ContactDO> parentContactMap = parentContactList.stream().collect(Collectors.toMap(ContactDO::getId,v->v));
-        Map<Long, CrmCustomerDO> customerMap = customerList.stream().collect(Collectors.toMap(CrmCustomerDO::getId,v->v));
+        Map<Long, ContactDO> parentContactMap = convertMap(parentContactList, ContactDO::getId);
+        Map<Long, CrmCustomerDO> customerMap = convertMap(customerList, CrmCustomerDO::getId);
         result.forEach(item -> {
             setUserInfo(item, userMap);
-            findAndThen(customerMap,item.getCustomerId(),customer -> {item.setCustomerName(customer.getName());});
-            findAndThen(parentContactMap,item.getParentId(),contactDO -> {item.setParentName(contactDO.getName());});
+            findAndThen(customerMap, item.getCustomerId(), customer -> {
+                item.setCustomerName(customer.getName());
+            });
+            findAndThen(parentContactMap, item.getParentId(), contactDO -> {
+                item.setParentName(contactDO.getName());
+            });
         });
         return result;
     }
@@ -80,13 +91,13 @@ public interface ContactConvert {
     /**
      * 设置用户信息
      *
-     * @param contactRespVO  联系人Response VO
-     * @param userMap 用户信息 map
+     * @param contactRespVO 联系人Response VO
+     * @param userMap       用户信息 map
      */
-    static void setUserInfo(ContactRespVO contactRespVO, Map<Long, AdminUserRespDTO> userMap){
+    static void setUserInfo(ContactRespVO contactRespVO, Map<Long, AdminUserRespDTO> userMap) {
         contactRespVO.setAreaName(AreaUtils.format(contactRespVO.getAreaId()));
         findAndThen(userMap, contactRespVO.getOwnerUserId(), user -> {
-            contactRespVO.setOwnerUserName(user == null?"":user.getNickname());
+            contactRespVO.setOwnerUserName(user == null ? "" : user.getNickname());
         });
         findAndThen(userMap, Long.parseLong(contactRespVO.getCreator()), user -> contactRespVO.setCreatorName(user.getNickname()));
     }

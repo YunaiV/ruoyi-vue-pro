@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.crm.controller.admin.contact.vo;
 
-import com.alibaba.excel.annotation.ExcelIgnore;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -10,18 +10,21 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
+@ExcelIgnoreUnannotated
 public class ContactRespVO extends ContactBaseVO {
 
     @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "3167")
-    @ExcelIgnore
     private Long id;
 
     @Schema(description = "创建时间")
     @ExcelProperty(value = "创建时间",order = 8)
     private LocalDateTime createTime;
 
+    @Schema(description = "更新时间")
+    @ExcelProperty(value = "更新时间",order = 8)
+    private LocalDateTime updateTime;
+
     @Schema(description = "创建人", example = "25682")
-    @ExcelIgnore
     private String creator;
 
     @Schema(description = "创建人名字", example = "test")
