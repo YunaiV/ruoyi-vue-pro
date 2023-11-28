@@ -111,7 +111,7 @@ public class CouponServiceImpl implements CouponService {
             throw exception(COUPON_NOT_EXISTS);
         }
         // 校验状态
-        if (ObjectUtil.notEqual(coupon.getTemplateId(), CouponStatusEnum.USED.getStatus())) {
+        if (ObjectUtil.notEqual(coupon.getStatus(), CouponStatusEnum.USED.getStatus())) {
             throw exception(COUPON_STATUS_NOT_USED);
         }
 
