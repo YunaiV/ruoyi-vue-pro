@@ -1,0 +1,55 @@
+package cn.iocoder.yudao.module.infra.service.demo;
+
+import java.util.*;
+import javax.validation.*;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.vo.*;
+import cn.iocoder.yudao.module.infra.dal.dataobject.demo.InfraStudentDO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
+
+/**
+ * 学生 Service 接口
+ *
+ * @author 芋道源码
+ */
+public interface InfraStudentService {
+
+    /**
+     * 创建学生
+     *
+     * @param createReqVO 创建信息
+     * @return 编号
+     */
+    Long createStudent(@Valid InfraStudentSaveReqVO createReqVO);
+
+    /**
+     * 更新学生
+     *
+     * @param updateReqVO 更新信息
+     */
+    void updateStudent(@Valid InfraStudentSaveReqVO updateReqVO);
+
+    /**
+     * 删除学生
+     *
+     * @param id 编号
+     */
+    void deleteStudent(Long id);
+
+    /**
+     * 获得学生
+     *
+     * @param id 编号
+     * @return 学生
+     */
+    InfraStudentDO getStudent(Long id);
+
+    /**
+     * 获得学生分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 学生分页
+     */
+    PageResult<InfraStudentDO> getStudentPage(InfraStudentPageReqVO pageReqVO);
+
+}
