@@ -42,6 +42,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Resource
     private CrmPermissionService crmPermissionService;
+
     @Resource
     private AdminUserApi adminUserApi;
 
@@ -101,7 +102,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     @Override
     public PageResult<CrmCustomerDO> getCustomerPage(CrmCustomerPageReqVO pageReqVO, Long userId) {
         boolean admin = false;
-        if (admin) { // 1.1. 情况一： TODO 如果是管理员
+        if (admin) { // 1.1. 情况一： TODO 如果是管理员; TODO @puhui999：要不如果是超管，就复用 selectPage；
             customerMapper.selectPageWithAdmin(pageReqVO, userId);
         }
         // 1.2. 情况二：获取当前用户能看的分页数据
@@ -176,7 +177,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void receiveCustomer(List<Long> ids, Long ownerUserId) {
-        // 1. 校验存在
+        // 1.1 校验存在
         List<CrmCustomerDO> customers = customerMapper.selectBatchIds(ids);
         if (customers.size() != ids.size()) {
             throw exception(CUSTOMER_NOT_EXISTS);
