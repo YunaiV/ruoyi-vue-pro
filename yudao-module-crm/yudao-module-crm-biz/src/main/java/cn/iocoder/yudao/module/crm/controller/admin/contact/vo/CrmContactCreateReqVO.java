@@ -9,6 +9,6 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class ContactCreateReqVO extends ContactBaseVO {
+public class CrmContactCreateReqVO extends CrmContactBaseVO {
 
 }

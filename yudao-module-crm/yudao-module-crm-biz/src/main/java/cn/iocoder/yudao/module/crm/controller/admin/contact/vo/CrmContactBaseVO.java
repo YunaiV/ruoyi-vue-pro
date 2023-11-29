@@ -25,7 +25,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
  */
 @Data
 @ExcelIgnoreUnannotated
-public class ContactBaseVO {
+public class CrmContactBaseVO {
 
     @ExcelProperty(value = "姓名",order = 1)
     @Schema(description = "姓名", example = "芋艿")

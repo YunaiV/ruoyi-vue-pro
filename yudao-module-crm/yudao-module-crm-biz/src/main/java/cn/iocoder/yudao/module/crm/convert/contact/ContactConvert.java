@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.crm.convert.contact;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.*;
-import cn.iocoder.yudao.module.crm.dal.dataobject.contact.ContactDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
@@ -20,7 +20,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 
 /**
- * crm联系人 Convert
+ * CRM 联系人 Convert
  *
  * @author 芋道源码
  */
@@ -29,22 +29,22 @@ public interface ContactConvert {
 
     ContactConvert INSTANCE = Mappers.getMapper(ContactConvert.class);
 
-    ContactDO convert(ContactCreateReqVO bean);
+    CrmContactDO convert(CrmContactCreateReqVO bean);
 
-    ContactDO convert(ContactUpdateReqVO bean);
+    CrmContactDO convert(CrmContactUpdateReqVO bean);
 
-    ContactRespVO convert(ContactDO bean);
+    CrmContactRespVO convert(CrmContactDO bean);
 
-    List<ContactRespVO> convertList(List<ContactDO> list);
+    List<CrmContactRespVO> convertList(List<CrmContactDO> list);
 
-    PageResult<ContactRespVO> convertPage(PageResult<ContactDO> page);
+    PageResult<CrmContactRespVO> convertPage(PageResult<CrmContactDO> page);
 
-    default PageResult<ContactRespVO> convertPage(PageResult<ContactDO> pageResult, Map<Long, AdminUserRespDTO> userMap,
-                                                  List<CrmCustomerDO> customerList, List<ContactDO> parentContactList) {
-        List<ContactRespVO> list = converList(pageResult.getList(), userMap, customerList, parentContactList);
+    default PageResult<CrmContactRespVO> convertPage(PageResult<CrmContactDO> pageResult, Map<Long, AdminUserRespDTO> userMap,
+                                                     List<CrmCustomerDO> customerList, List<CrmContactDO> parentContactList) {
+        List<CrmContactRespVO> list = converList(pageResult.getList(), userMap, customerList, parentContactList);
         return convertPage(pageResult).setList(list);
     }
-    List<ContactSimpleRespVO> convertAllList(List<ContactDO> list);
+    List<CrmContactSimpleRespVO> convertAllList(List<CrmContactDO> list);
 
     @Mappings({
             @Mapping(target = "bizId", source = "reqVO.id"),
@@ -60,21 +60,21 @@ public interface ContactConvert {
      * @param crmCustomerDOList 客户
      * @return ContactRespVO
      */
-    default ContactRespVO convert(ContactDO contactDO, Map<Long, AdminUserRespDTO> userMap, List<CrmCustomerDO> crmCustomerDOList,
-                                  List<ContactDO> contactList) {
-        ContactRespVO contactVO = convert(contactDO);
+    default CrmContactRespVO convert(CrmContactDO contactDO, Map<Long, AdminUserRespDTO> userMap, List<CrmCustomerDO> crmCustomerDOList,
+                                     List<CrmContactDO> contactList) {
+        CrmContactRespVO contactVO = convert(contactDO);
         setUserInfo(contactVO, userMap);
         Map<Long, CrmCustomerDO> ustomerMap = crmCustomerDOList.stream().collect(Collectors.toMap(CrmCustomerDO::getId, v -> v));
-        Map<Long, ContactDO> contactMap = contactList.stream().collect(Collectors.toMap(ContactDO::getId, v -> v));
+        Map<Long, CrmContactDO> contactMap = contactList.stream().collect(Collectors.toMap(CrmContactDO::getId, v -> v));
         findAndThen(ustomerMap, contactDO.getCustomerId(), customer -> contactVO.setCustomerName(customer.getName()));
         findAndThen(contactMap, contactDO.getParentId(), contact -> contactVO.setParentName(contact.getName()));
         return contactVO;
     }
 
-    default List<ContactRespVO> converList(List<ContactDO> contactList, Map<Long, AdminUserRespDTO> userMap,
-                                           List<CrmCustomerDO> customerList, List<ContactDO> parentContactList) {
-        List<ContactRespVO> result = convertList(contactList);
-        Map<Long, ContactDO> parentContactMap = convertMap(parentContactList, ContactDO::getId);
+    default List<CrmContactRespVO> converList(List<CrmContactDO> contactList, Map<Long, AdminUserRespDTO> userMap,
+                                              List<CrmCustomerDO> customerList, List<CrmContactDO> parentContactList) {
+        List<CrmContactRespVO> result = convertList(contactList);
+        Map<Long, CrmContactDO> parentContactMap = convertMap(parentContactList, CrmContactDO::getId);
         Map<Long, CrmCustomerDO> customerMap = convertMap(customerList, CrmCustomerDO::getId);
         result.forEach(item -> {
             setUserInfo(item, userMap);
@@ -94,7 +94,7 @@ public interface ContactConvert {
      * @param contactRespVO 联系人Response VO
      * @param userMap       用户信息 map
      */
-    static void setUserInfo(ContactRespVO contactRespVO, Map<Long, AdminUserRespDTO> userMap) {
+    static void setUserInfo(CrmContactRespVO contactRespVO, Map<Long, AdminUserRespDTO> userMap) {
         contactRespVO.setAreaName(AreaUtils.format(contactRespVO.getAreaId()));
         findAndThen(userMap, contactRespVO.getOwnerUserId(), user -> {
             contactRespVO.setOwnerUserName(user == null ? "" : user.getNickname());

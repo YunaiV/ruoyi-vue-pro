@@ -3,13 +3,13 @@ package cn.iocoder.yudao.module.crm.service.contact;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactBaseVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactCreateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactBaseVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactCreateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactUpdateReqVO;
 import cn.iocoder.yudao.module.crm.convert.contact.ContactConvert;
-import cn.iocoder.yudao.module.crm.dal.dataobject.contact.ContactDO;
-import cn.iocoder.yudao.module.crm.dal.mysql.contact.ContactMapper;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
+import cn.iocoder.yudao.module.crm.dal.mysql.contact.CrmContactMapper;
 import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
@@ -24,7 +24,6 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CONTACT_NOT_EXISTS;
@@ -32,16 +31,16 @@ import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CUSTOMER_NOT_
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_EXISTS;
 
 /**
- * crm联系人 Service 实现类
+ * CRM 联系人 Service 实现类
  *
  * @author 芋道源码
  */
 @Service
 @Validated
-public class ContactServiceImpl implements ContactService {
+public class CrmContactServiceImpl implements CrmContactService {
 
     @Resource
-    private ContactMapper contactMapper;
+    private CrmContactMapper contactMapper;
 
     @Resource
     private CrmCustomerService customerService;
@@ -52,36 +51,53 @@ public class ContactServiceImpl implements ContactService {
     private AdminUserApi adminUserApi;
 
     @Override
-    public Long createContact(ContactCreateReqVO createReqVO, Long userId) {
-        //@todo
-        //校验
-        validateDataExist(createReqVO);
-        // 插入
-        ContactDO contact = ContactConvert.INSTANCE.convert(createReqVO);
+    @Transactional(rollbackFor = Exception.class)
+    public Long createContact(CrmContactCreateReqVO createReqVO, Long userId) {
+        // 1.1 校验
+        validateRelationDataExists(createReqVO);
+        // 1.2 插入
+        CrmContactDO contact = ContactConvert.INSTANCE.convert(createReqVO);
         contactMapper.insert(contact);
 
-        // 创建数据权限
-        crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CONTACTS.getType())
-                .setBizId(contact.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
-
-        // 返回
+        // 2. 创建数据权限
+        crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setUserId(userId)
+                .setBizType(CrmBizTypeEnum.CRM_CONTACTS.getType()).setBizId(contact.getId())
+                .setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
         return contact.getId();
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACTS, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
-    public void updateContact(ContactUpdateReqVO updateReqVO) {
-        // 校验存在
+    public void updateContact(CrmContactUpdateReqVO updateReqVO) {
+        // 1. 校验存在
         validateContactExists(updateReqVO.getId());
-        validateDataExist(updateReqVO);
-        // 更新
-        ContactDO updateObj = ContactConvert.INSTANCE.convert(updateReqVO);
+        validateRelationDataExists(updateReqVO);
+        // 2. 更新
+        CrmContactDO updateObj = ContactConvert.INSTANCE.convert(updateReqVO);
         contactMapper.updateById(updateObj);
     }
 
+    /**
+     * 校验关联的数据都存在
+     *
+     * @param saveReqVO 新增/修改请求 VO
+     */
+    private void validateRelationDataExists(CrmContactBaseVO saveReqVO){
+        // 1. 校验客户
+        if (saveReqVO.getCustomerId() != null && customerService.getCustomer(saveReqVO.getCustomerId()) == null) {
+            throw exception(CUSTOMER_NOT_EXISTS);
+        }
+        // 2. 校验负责人
+        if (saveReqVO.getOwnerUserId() != null && adminUserApi.getUser(saveReqVO.getOwnerUserId()) == null) {
+            throw exception(USER_NOT_EXISTS);
+        }
+        // 3. 直属上级
+        if (saveReqVO.getParentId() != null && contactMapper.selectById(saveReqVO.getParentId()) == null) {
+            throw exception(CONTACT_NOT_EXISTS);
+        }
+    }
+
     @Override
-    @Transactional(rollbackFor = Exception.class)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACTS, bizId = "#id", level = CrmPermissionLevelEnum.WRITE)
     public void deleteContact(Long id) {
         // 校验存在
@@ -96,14 +112,15 @@ public class ContactServiceImpl implements ContactService {
         }
     }
 
+    // TODO 芋艿：是否要做数据权限的校验？？？
     @Override
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACTS, bizId = "#id", level = CrmPermissionLevelEnum.READ)
-    public ContactDO getContact(Long id) {
+    public CrmContactDO getContact(Long id) {
         return contactMapper.selectById(id);
     }
 
     @Override
-    public List<ContactDO> getContactList(Collection<Long> ids) {
+    public List<CrmContactDO> getContactList(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return ListUtil.empty();
         }
@@ -111,34 +128,20 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public PageResult<ContactDO> getContactPage(ContactPageReqVO pageReqVO) {
+    public PageResult<CrmContactDO> getContactPage(CrmContactPageReqVO pageReqVO) {
+        // TODO puhui999：后面要改成，基于数据权限的查询
         return contactMapper.selectPage(pageReqVO);
     }
 
     @Override
-    public List<ContactDO> getContactList(ContactPageReqVO exportReqVO) {
-        return contactMapper.selectList(exportReqVO);
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#pageVO.customerId", level = CrmPermissionLevelEnum.READ)
+    public PageResult<CrmContactDO> getContactPageByCustomer(CrmContactPageReqVO pageVO) {
+        return contactMapper.selectPageByCustomer(pageVO);
     }
 
     @Override
-    public List<ContactDO> getContactList() {
+    public List<CrmContactDO> getContactList() {
         return contactMapper.selectList();
-    }
-
-    // TODO 芋艿：后面在看下这个方法；
-    private void validateDataExist(ContactBaseVO contactBaseVO){
-        // 1.校验客户
-        if (contactBaseVO.getCustomerId() != null) {
-            Optional.ofNullable(customerService.getCustomer(contactBaseVO.getCustomerId())).orElseThrow(() -> exception(CUSTOMER_NOT_EXISTS));
-        }
-        // 2.校验负责人
-        if (contactBaseVO.getOwnerUserId() != null) {
-            Optional.ofNullable(adminUserApi.getUser(contactBaseVO.getOwnerUserId())).orElseThrow(() -> exception(USER_NOT_EXISTS));
-        }
-        // 3.直属上级
-        if (contactBaseVO.getParentId() != null) {
-            Optional.ofNullable(contactMapper.selectById(contactBaseVO.getParentId())).orElseThrow(() -> exception(CONTACT_NOT_EXISTS));
-        }
     }
 
 }

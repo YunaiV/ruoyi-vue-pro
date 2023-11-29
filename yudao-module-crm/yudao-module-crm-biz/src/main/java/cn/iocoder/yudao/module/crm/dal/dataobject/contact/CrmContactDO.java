@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ContactDO extends BaseDO {
+public class CrmContactDO extends BaseDO {
 
     /**
      * 主键
@@ -63,7 +63,7 @@ public class ContactDO extends BaseDO {
     /**
      * 直属上级
      *
-     * 关联 {@link ContactDO#id}
+     * 关联 {@link CrmContactDO#id}
      */
     private Long parentId;
     /**

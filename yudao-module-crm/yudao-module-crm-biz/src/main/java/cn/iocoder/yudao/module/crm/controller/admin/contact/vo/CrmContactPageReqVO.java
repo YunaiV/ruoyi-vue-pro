@@ -10,10 +10,8 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class ContactPageReqVO extends PageParam {
-    // ●客户：
-    // ●姓名：
-    // ●手机、电话、座机、QQ、微信、邮箱
+public class CrmContactPageReqVO extends PageParam {
+
     @Schema(description = "姓名", example = "芋艿")
     private String name;
 
@@ -34,4 +32,5 @@ public class ContactPageReqVO extends PageParam {
 
     @Schema(description = "微信", example = "zzZ98373")
     private String wechat;
+
 }
