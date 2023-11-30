@@ -93,7 +93,6 @@ public class CrmContactBaseVO {
     @ExcelProperty(value = "最后跟进时间",order = 6)
     private LocalDateTime lastTime;
 
-
     @Schema(description = "负责人用户编号", example = "14334")
     @NotNull(message = "负责人不能为空")
     private Long ownerUserId;

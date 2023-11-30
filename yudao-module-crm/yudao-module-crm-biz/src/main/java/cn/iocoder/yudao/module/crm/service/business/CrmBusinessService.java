@@ -1,8 +1,13 @@
 package cn.iocoder.yudao.module.crm.service.business;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.*;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessCreateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessTransferReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -57,6 +62,8 @@ public interface CrmBusinessService {
     /**
      * 获得商机分页
      *
+     * 数据权限：基于 {@link CrmBusinessDO}
+     *
      * @param pageReqVO 分页查询
      * @param userId    用户编号
      * @return 商机分页
@@ -64,12 +71,14 @@ public interface CrmBusinessService {
     PageResult<CrmBusinessDO> getBusinessPage(CrmBusinessPageReqVO pageReqVO, Long userId);
 
     /**
-     * 获得商机列表, 用于 Excel 导出
+     * 获得商机分页，基于指定客户
      *
-     * @param exportReqVO 查询条件
-     * @return 商机列表
+     * 数据权限：基于 {@link CrmCustomerDO} 读取
+     *
+     * @param pageReqVO 分页查询
+     * @return 联系人分页
      */
-    List<CrmBusinessDO> getBusinessList(CrmBusinessExportReqVO exportReqVO);
+    PageResult<CrmBusinessDO> getBusinessPageByCustomer(CrmContractPageReqVO pageReqVO);
 
     /**
      * 商机转移

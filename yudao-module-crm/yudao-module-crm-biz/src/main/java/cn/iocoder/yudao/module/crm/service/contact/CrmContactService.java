@@ -72,10 +72,10 @@ public interface CrmContactService {
      *
      * 数据权限：基于 {@link CrmCustomerDO} 读取
      *
-     * @param pageVO 分页查询
+     * @param pageReqVO 分页查询
      * @return 联系人分页
      */
-    PageResult<CrmContactDO> getContactPageByCustomer(CrmContactPageReqVO pageVO);
+    PageResult<CrmContactDO> getContactPageByCustomer(CrmContactPageReqVO pageReqVO);
 
     /**
      * 获取所有联系人列表
