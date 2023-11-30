@@ -28,7 +28,7 @@ public class CrmReceivableExcelVO {
     private Long contractId;
 
     @ExcelProperty(value = "审批状态", converter = DictConvert.class)
-    @DictFormat(cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_RECEIVABLE_CHECK_STATUS)
+    @DictFormat(cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_AUDIT_STATUS)
     private Integer checkStatus;
 
     @ExcelProperty("工作流编号")

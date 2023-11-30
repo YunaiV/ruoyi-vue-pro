@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.common.util.spring;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
-import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
@@ -25,7 +25,7 @@ import java.util.Map;
 public class SpringExpressionUtils {
 
     /**
-     * spel表达式解析器
+     * Spring EL 表达式解析器
      */
     private static final ExpressionParser EXPRESSION_PARSER = new SpelExpressionParser();
     /**
@@ -43,7 +43,7 @@ public class SpringExpressionUtils {
      * @param expressionString EL 表达式数组
      * @return 执行界面
      */
-    public static Object parseExpression(ProceedingJoinPoint joinPoint, String expressionString) {
+    public static Object parseExpression(JoinPoint joinPoint, String expressionString) {
         Map<String, Object> result = parseExpressions(joinPoint, Collections.singletonList(expressionString));
         return result.get(expressionString);
     }
@@ -55,7 +55,7 @@ public class SpringExpressionUtils {
      * @param expressionStrings EL 表达式数组
      * @return 结果，key 为表达式，value 为对应值
      */
-    public static Map<String, Object> parseExpressions(ProceedingJoinPoint joinPoint, List<String> expressionStrings) {
+    public static Map<String, Object> parseExpressions(JoinPoint joinPoint, List<String> expressionStrings) {
         // 如果为空，则不进行解析
         if (CollUtil.isEmpty(expressionStrings)) {
             return MapUtil.newHashMap();

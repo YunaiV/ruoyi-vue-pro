@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.receivable;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -50,13 +51,13 @@ public class CrmReceivableDO extends BaseDO {
     /**
      * 合同 ID
      *
-     * 对应实体 {@link cn.iocoder.yudao.module.crm.dal.dataobject.contract.ContractDO}
+     * 对应实体 {@link CrmContractDO}
      */
     private Long contractId;
     // TODO @liuhongfeng：“对应字典”，参考别的模块，枚举 {@link XXXX}；另外，这个字段就叫 status，整体状态，不只审批
     /**
      * 审批状态
-     * 对应字典 {@link cn.iocoder.yudao.module.crm.enums.DictTypeConstants#CRM_RECEIVABLE_CHECK_STATUS}
+     * 对应字典 {@link cn.iocoder.yudao.module.crm.enums.DictTypeConstants#CRM_AUDIT_STATUS}
      */
     private Integer checkStatus;
     /**

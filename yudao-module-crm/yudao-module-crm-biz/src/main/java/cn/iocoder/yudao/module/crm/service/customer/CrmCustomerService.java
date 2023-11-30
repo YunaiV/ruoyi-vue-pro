@@ -1,10 +1,14 @@
 package cn.iocoder.yudao.module.crm.service.customer;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerCreateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTransferReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -46,6 +50,15 @@ public interface CrmCustomerService {
     CrmCustomerDO getCustomer(Long id);
 
     /**
+     * 获得客户列表
+     *
+     * @param ids 客户编号数组
+     * @return 客户列表
+     * @author ljlleo
+     */
+    List<CrmCustomerDO> getCustomerList(Collection<Long> ids);
+
+    /**
      * 获得客户分页
      *
      * @param pageReqVO 分页查询
@@ -53,14 +66,6 @@ public interface CrmCustomerService {
      * @return 客户分页
      */
     PageResult<CrmCustomerDO> getCustomerPage(CrmCustomerPageReqVO pageReqVO, Long userId);
-
-    /**
-     * 获得客户列表, 用于 Excel 导出
-     *
-     * @param exportReqVO 查询条件
-     * @return 客户列表
-     */
-    List<CrmCustomerDO> getCustomerList(CrmCustomerExportReqVO exportReqVO);
 
     /**
      * 校验客户是否存在
@@ -85,22 +90,27 @@ public interface CrmCustomerService {
      */
     void lockCustomer(@Valid CrmCustomerUpdateReqVO updateReqVO);
 
-    // TODO @xiaqing：根据 controller 的建议，改下
+    // ==================== 公海相关操作 ====================
+
+    /**
+     * 客户放入公海
+     *
+     * @param id 客户编号
+     */
+    void putCustomerPool(Long id);
+
     /**
      * 领取公海客户
      *
-     * @param ids 要领取的客户 id
+     * @param ids         要领取的客户编号数组
+     * @param ownerUserId 负责人
      */
-    void receive(List<Long>ids);
+    void receiveCustomer(List<Long> ids, Long ownerUserId);
 
-    // TODO @xiaqing：根据 controller 的建议，改下
     /**
-     * 分配公海客户
-     *
-     * @param cIds 要分配的客户 id
-     * @param ownerId 分配的负责人id
-     * @author xiaqing
+     * 获取客户列表
+     * @return 客户列表
+     * @author zyna
      */
-    void distributeByIds(List<Long>cIds,Long ownerId);
-
+    List<CrmCustomerDO> getCustomerList();
 }

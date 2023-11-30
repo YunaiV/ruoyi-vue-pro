@@ -19,11 +19,10 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class BannerPageReqVO extends PageParam {
 
-    // TODO @puhui999：example
-    @Schema(description = "标题")
+    @Schema(description = "标题", example = "这是一个标题")
     private String title;
 
-    @Schema(description = "状态")
+    @Schema(description = "状态", example = "1")
     @InEnum(CommonStatusEnum.class)
     private Integer status;
 

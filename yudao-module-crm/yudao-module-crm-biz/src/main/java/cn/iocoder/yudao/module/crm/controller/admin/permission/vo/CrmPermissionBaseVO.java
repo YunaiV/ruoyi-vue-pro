@@ -1,15 +1,15 @@
 package cn.iocoder.yudao.module.crm.controller.admin.permission.vo;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
-import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 
 /**
- * 数据权限（团队成员） Base VO，提供给添加、修改、详细的子 VO 使用
+ * 数据权限 Base VO，提供给添加、修改、详细的子 VO 使用
  * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
  *
  * @author HUIHUI

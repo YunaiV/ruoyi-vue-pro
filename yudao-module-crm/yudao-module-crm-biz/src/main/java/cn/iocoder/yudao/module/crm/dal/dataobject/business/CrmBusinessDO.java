@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.business;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.businessstatus.CrmBusinessStatusDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.businessstatustype.CrmBusinessStatusTypeDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -71,8 +69,7 @@ public class CrmBusinessDO extends BaseDO {
      */
     private Integer discountPercent;
     /**
-     * 产品总金额
-     *
+     * 产品总金额，单位：分
      */
     private Integer productPrice;
     /**

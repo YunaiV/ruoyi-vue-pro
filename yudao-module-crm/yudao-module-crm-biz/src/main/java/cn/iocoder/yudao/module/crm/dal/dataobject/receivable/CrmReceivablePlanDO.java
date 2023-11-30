@@ -48,7 +48,7 @@ public class CrmReceivablePlanDO extends BaseDO {
     /**
      * 审批状态
      *
-     * 对应字典 {@link cn.iocoder.yudao.module.crm.enums.DictTypeConstants#CRM_RECEIVABLE_CHECK_STATUS}
+     * 对应字典 {@link cn.iocoder.yudao.module.crm.enums.DictTypeConstants#CRM_AUDIT_STATUS}
      * // TODO @liuhongfeng：关联的枚举
      */
     private Integer checkStatus;

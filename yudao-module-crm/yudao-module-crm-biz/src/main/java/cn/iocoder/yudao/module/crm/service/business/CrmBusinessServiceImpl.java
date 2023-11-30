@@ -3,14 +3,15 @@ package cn.iocoder.yudao.module.crm.service.business;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.*;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
 import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessMapper;
 import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
-import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
-import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import org.springframework.stereotype.Service;
@@ -116,8 +117,9 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
-    public List<CrmBusinessDO> getBusinessList(CrmBusinessExportReqVO exportReqVO) {
-        return businessMapper.selectPage(exportReqVO);
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#pageReqVO.customerId", level = CrmPermissionLevelEnum.READ)
+    public PageResult<CrmBusinessDO> getBusinessPageByCustomer(CrmContractPageReqVO pageReqVO) {
+        return businessMapper.selectPageByCustomer(pageReqVO);
     }
 
     @Override

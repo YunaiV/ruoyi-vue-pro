@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.crm.enums.AuditStatusEnum;
+import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -34,7 +34,7 @@ public class CrmReceivableBaseVO {
 
     // TODO @liuhongfeng：这个字段，应该不是前端传递的噢，而是后端自己生成的
     @Schema(description = "审批状态", example = "1")
-    @InEnum(AuditStatusEnum.class)
+    @InEnum(CrmAuditStatusEnum.class)
     private Integer checkStatus;
 
     @Schema(description = "回款日期")

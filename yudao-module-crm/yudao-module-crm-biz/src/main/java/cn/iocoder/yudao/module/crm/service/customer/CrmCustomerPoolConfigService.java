@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.crm.service.customer;
 
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPoolConfigUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.poolconfig.CrmCustomerPoolConfigSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
 
 import javax.validation.Valid;
@@ -24,6 +24,6 @@ public interface CrmCustomerPoolConfigService {
      *
      * @param saveReqVO 更新信息
      */
-    void updateCustomerPoolConfig(@Valid CrmCustomerPoolConfigUpdateReqVO saveReqVO);
+    void saveCustomerPoolConfig(@Valid CrmCustomerPoolConfigSaveReqVO saveReqVO);
 
 }

@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.module.crm.convert.businessstatus;
 
-import java.util.*;
-
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.status.CrmBusinessStatusRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.status.CrmBusinessStatusSaveReqVO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-import cn.iocoder.yudao.module.crm.controller.admin.businessstatus.vo.*;
-import cn.iocoder.yudao.module.crm.dal.dataobject.businessstatus.CrmBusinessStatusDO;
+
+import java.util.List;
 
 /**
  * 商机状态 Convert
@@ -19,16 +19,12 @@ public interface CrmBusinessStatusConvert {
 
     CrmBusinessStatusConvert INSTANCE = Mappers.getMapper(CrmBusinessStatusConvert.class);
 
-    CrmBusinessStatusDO convert(CrmBusinessStatusCreateReqVO bean);
-
-    CrmBusinessStatusDO convert(CrmBusinessStatusUpdateReqVO bean);
+    CrmBusinessStatusDO convert(CrmBusinessStatusSaveReqVO bean);
 
     CrmBusinessStatusRespVO convert(CrmBusinessStatusDO bean);
 
     List<CrmBusinessStatusRespVO> convertList(List<CrmBusinessStatusDO> list);
 
     PageResult<CrmBusinessStatusRespVO> convertPage(PageResult<CrmBusinessStatusDO> page);
-
-    List<CrmBusinessStatusExcelVO> convertList02(List<CrmBusinessStatusDO> list);
 
 }

@@ -1,13 +1,12 @@
 package cn.iocoder.yudao.module.crm.convert.customer;
 
-import cn.hutool.core.util.NumberUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.poolconfig.CrmCustomerPoolConfigRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.poolconfig.CrmCustomerPoolConfigSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
@@ -37,38 +36,20 @@ public interface CrmCustomerConvert {
 
     CrmCustomerRespVO convert(CrmCustomerDO bean);
 
-    default CrmCustomerRespVO convert(CrmCustomerDO customer, Map<Long, CrmPermissionDO> ownerMap,
-                                      Map<Long, AdminUserRespDTO> userMap, Map<Long, DeptRespDTO> deptMap) {
-        CrmCustomerRespVO customerResp = convert(customer);
-        findAndThen(ownerMap, customerResp.getId(), owner -> {
-            customerResp.setOwnerUserId(owner.getUserId());
-            customerResp.setAreaName(AreaUtils.format(customerResp.getAreaId()));
-            findAndThen(userMap, owner.getUserId(), user -> {
-                customerResp.setOwnerUserName(user.getNickname());
-            });
-            findAndThen(userMap, Long.parseLong(customerResp.getCreator()), user -> {
-                customerResp.setCreatorName(user.getNickname());
-            });
-            findAndThen(deptMap, customerResp.getOwnerUserId(), dept -> {
-                customerResp.setOwnerUserDeptName(dept.getName());
-            });
+    /**
+     * 设置用户信息
+     *
+     * @param customer  CRM 客户 Response VO
+     * @param userMap 用户信息 map
+     * @param deptMap 用户部门信息 map
+     */
+    static void setUserInfo(CrmCustomerRespVO customer, Map<Long, AdminUserRespDTO> userMap, Map<Long, DeptRespDTO> deptMap) {
+        customer.setAreaName(AreaUtils.format(customer.getAreaId()));
+        findAndThen(userMap, customer.getOwnerUserId(), user -> {
+            customer.setOwnerUserName(user.getNickname());
+            findAndThen(deptMap, user.getDeptId(), dept -> customer.setOwnerUserDeptName(dept.getName()));
         });
-        return customerResp;
-    }
-
-    default PageResult<CrmCustomerRespVO> convertPage(PageResult<CrmCustomerDO> page, Map<Long, AdminUserRespDTO> userMap, Map<Long, DeptRespDTO> deptMap) {
-        PageResult<CrmCustomerRespVO> result = convertPage(page);
-        result.getList().forEach(customerRespVO -> {
-            customerRespVO.setAreaName(AreaUtils.format(customerRespVO.getAreaId()));
-            MapUtils.findAndThen(userMap, NumberUtil.parseLong(customerRespVO.getCreator()), creator ->
-                    customerRespVO.setCreatorName(creator.getNickname()));
-            MapUtils.findAndThen(userMap, customerRespVO.getOwnerUserId(), ownerUser -> {
-                customerRespVO.setOwnerUserName(ownerUser.getNickname());
-                MapUtils.findAndThen(deptMap, ownerUser.getDeptId(), dept ->
-                        customerRespVO.setOwnerUserDeptName(dept.getName()));
-            });
-        });
-        return result;
+        findAndThen(userMap, Long.parseLong(customer.getCreator()), user -> customer.setCreatorName(user.getNickname()));
     }
 
     List<CrmCustomerExcelVO> convertList02(List<CrmCustomerDO> list);
@@ -81,30 +62,24 @@ public interface CrmCustomerConvert {
 
     PageResult<CrmCustomerRespVO> convertPage(PageResult<CrmCustomerDO> page);
 
-    // TODO @puhui999：两个 convertPage 的逻辑，合并下；
-    default PageResult<CrmCustomerRespVO> convertPage(PageResult<CrmCustomerDO> pageResult, Map<Long, CrmPermissionDO> ownerMap,
-                                                      Map<Long, AdminUserRespDTO> userMap, Map<Long, DeptRespDTO> deptMap) {
+    default CrmCustomerRespVO convert(CrmCustomerDO customer, Map<Long, AdminUserRespDTO> userMap,
+                                      Map<Long, DeptRespDTO> deptMap) {
+        CrmCustomerRespVO customerResp = convert(customer);
+        setUserInfo(customerResp, userMap, deptMap);
+        return customerResp;
+    }
+
+    default PageResult<CrmCustomerRespVO> convertPage(PageResult<CrmCustomerDO> pageResult, Map<Long, AdminUserRespDTO> userMap,
+                                                      Map<Long, DeptRespDTO> deptMap) {
         PageResult<CrmCustomerRespVO> result = convertPage(pageResult);
-        result.getList().forEach(item -> {
-            findAndThen(ownerMap, item.getId(), owner -> {
-                item.setOwnerUserId(owner.getUserId());
-                item.setAreaName(AreaUtils.format(item.getAreaId()));
-                findAndThen(userMap, owner.getUserId(), user -> {
-                    item.setOwnerUserName(user.getNickname());
-                });
-                findAndThen(userMap, Long.parseLong(item.getCreator()), user -> {
-                    item.setCreatorName(user.getNickname());
-                });
-                findAndThen(deptMap, item.getOwnerUserId(), dept -> {
-                    item.setOwnerUserDeptName(dept.getName());
-                });
-            });
-        });
+        result.getList().forEach(item -> setUserInfo(item, userMap, deptMap));
         return result;
     }
 
     CrmCustomerPoolConfigRespVO convert(CrmCustomerPoolConfigDO customerPoolConfig);
 
-    CrmCustomerPoolConfigDO convert(CrmCustomerPoolConfigUpdateReqVO updateReqVO);
+    CrmCustomerPoolConfigDO convert(CrmCustomerPoolConfigSaveReqVO updateReqVO);
+
+    List<CrmCustomerQueryAllRespVO> convertQueryAll(List<CrmCustomerDO> crmCustomerDO);
 
 }

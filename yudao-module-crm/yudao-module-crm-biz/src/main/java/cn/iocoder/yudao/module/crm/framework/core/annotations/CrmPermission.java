@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.crm.framework.core.annotations;
 
-import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
-import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -24,7 +24,7 @@ public @interface CrmPermission {
     /**
      * CRM 类型
      */
-    CrmBizTypeEnum bizType();
+    CrmBizTypeEnum[] bizType() default {};
 
     /**
      * CRM 类型扩展，通过 Spring EL 表达式获取到 {@link #bizType()}

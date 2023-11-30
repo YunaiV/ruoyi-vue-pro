@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.customer;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import com.baomidou.mybatisplus.annotation.KeySequence;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.*;
 
 /**
@@ -33,18 +31,22 @@ public class CrmCustomerPoolConfigDO extends BaseDO {
     /**
      * 未跟进放入公海天数
      */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private Integer contactExpireDays;
     /**
      * 未成交放入公海天数
      */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private Integer dealExpireDays;
     /**
      * 是否开启提前提醒
      */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private Boolean notifyEnabled;
     /**
      * 提前提醒天数
      */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private Integer notifyDays;
 
 }

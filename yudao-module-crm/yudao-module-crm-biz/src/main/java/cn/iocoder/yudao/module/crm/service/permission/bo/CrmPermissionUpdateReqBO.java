@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.crm.service.permission.bo;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
