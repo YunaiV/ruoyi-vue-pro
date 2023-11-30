@@ -32,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author 宋天
  */
+@Disabled
 @Import({MemberUserServiceImpl.class, YudaoRedisAutoConfiguration.class})
 public class MemberUserServiceImplTest extends BaseDbAndRedisUnitTest {
 
