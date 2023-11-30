@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionU
 import cn.iocoder.yudao.module.crm.convert.permission.CrmPermissionConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
-import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.PostApi;
@@ -87,7 +87,7 @@ public class CrmPermissionController {
     }
 
     @GetMapping("/list")
-    @Operation(summary = "获取数据权限列表")
+    @Operation(summary = "获得数据权限列表")
     @Parameters({
             @Parameter(name = "bizType", description = "CRM 类型", required = true, example = "2"),
             @Parameter(name = "bizId", description = "CRM 类型数据编号", required = true, example = "1024")

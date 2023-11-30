@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.crm.service.permission;
 
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
-import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
-import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 
@@ -22,17 +22,17 @@ public interface CrmPermissionService {
     /**
      * 创建数据权限
      *
-     * @param createBO 创建信息
+     * @param createReqBO 创建信息
      * @return 编号
      */
-    Long createPermission(@Valid CrmPermissionCreateReqBO createBO);
+    Long createPermission(@Valid CrmPermissionCreateReqBO createReqBO);
 
     /**
      * 创建数据权限
      *
-     * @param createBOs 创建信息
+     * @param createReqBOs 创建信息
      */
-    void createPermissionBatch(@Valid List<CrmPermissionCreateReqBO> createBOs);
+    void createPermissionBatch(@Valid List<CrmPermissionCreateReqBO> createReqBOs);
 
     /**
      * 更新数据权限

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.crm.framework.core.annotations;
 
-import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
-import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

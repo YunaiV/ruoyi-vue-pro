@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.crm.controller.admin.customer.vo;
 
-import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 

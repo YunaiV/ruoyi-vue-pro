@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageR
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmSceneEnum;
-import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;

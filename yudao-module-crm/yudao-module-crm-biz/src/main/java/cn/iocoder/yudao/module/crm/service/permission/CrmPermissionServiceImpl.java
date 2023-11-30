@@ -6,8 +6,8 @@ import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionU
 import cn.iocoder.yudao.module.crm.convert.permission.CrmPermissionConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.permission.CrmPermissionMapper;
-import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
-import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -23,7 +23,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum.isOwner;
+import static cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum.isOwner;
 
 /**
  * CRM 数据权限 Service 接口实现类
@@ -42,29 +42,32 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long createPermission(CrmPermissionCreateReqBO createBO) {
+    public Long createPermission(CrmPermissionCreateReqBO createReqBO) {
+        // TODO @puhui999：排重
         // 1. 校验用户是否存在
-        adminUserApi.validateUserList(Collections.singletonList(createBO.getUserId()));
+        adminUserApi.validateUserList(Collections.singletonList(createReqBO.getUserId()));
 
         // 2. 创建
-        CrmPermissionDO permission = CrmPermissionConvert.INSTANCE.convert(createBO);
+        CrmPermissionDO permission = CrmPermissionConvert.INSTANCE.convert(createReqBO);
         crmPermissionMapper.insert(permission);
         return permission.getId();
     }
 
     @Override
-    public void createPermissionBatch(List<CrmPermissionCreateReqBO> createBOs) {
+    public void createPermissionBatch(List<CrmPermissionCreateReqBO> createReqBOs) {
+        // TODO @puhui999：排重
         // 1. 校验用户是否存在
-        adminUserApi.validateUserList(convertSet(createBOs, CrmPermissionCreateReqBO::getUserId));
+        adminUserApi.validateUserList(convertSet(createReqBOs, CrmPermissionCreateReqBO::getUserId));
 
         // 2. 创建
-        List<CrmPermissionDO> permissions = CrmPermissionConvert.INSTANCE.convertList(createBOs);
+        List<CrmPermissionDO> permissions = CrmPermissionConvert.INSTANCE.convertList(createReqBOs);
         crmPermissionMapper.insertBatch(permissions);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePermission(CrmPermissionUpdateReqVO updateReqVO) {
+        // TODO @puhui999：排重
         // 1. 校验存在
         validateCrmPermissionExists(updateReqVO.getIds());
         // 2. 更新

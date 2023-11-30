@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.framework.enums;
+package cn.iocoder.yudao.module.crm.enums.common;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 
 /**
- * CRM 类型枚举
+ * CRM 业务类型枚举
  *
  * @author HUIHUI
  */

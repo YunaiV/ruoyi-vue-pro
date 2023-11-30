@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.framework.enums;
+package cn.iocoder.yudao.module.crm.enums.permission;
 
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
@@ -8,7 +8,7 @@ import lombok.Getter;
 import java.util.Arrays;
 
 /**
- * Crm 数据权限级别枚举
+ * CRM 数据权限级别枚举
  *
  * @author HUIHUI
  */
