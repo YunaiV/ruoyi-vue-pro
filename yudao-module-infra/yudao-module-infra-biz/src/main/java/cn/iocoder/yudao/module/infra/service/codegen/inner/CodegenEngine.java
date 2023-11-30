@@ -103,7 +103,7 @@ public class CodegenEngine {
             .put(CodegenFrontTypeEnum.VUE2.getType(), vueTemplatePath("views/index.vue"),
                     vueFilePath("views/${table.moduleName}/${table.businessName}/index.vue"))
             .put(CodegenFrontTypeEnum.VUE2.getType(), vueTemplatePath("api/api.js"),
-                    vueFilePath("api/${table.moduleName}/${classNameVar}.js"))
+                    vueFilePath("api/${table.moduleName}/${table.businessName}/index.js"))
             .put(CodegenFrontTypeEnum.VUE2.getType(), vueTemplatePath("views/form.vue"),
                     vueFilePath("views/${table.moduleName}/${table.businessName}/${simpleClassName}Form.vue"))
             .put(CodegenFrontTypeEnum.VUE2.getType(), vueTemplatePath("views/components/form_sub_normal.vue"),  // 特殊：主子表专属逻辑
