@@ -30,7 +30,7 @@ public interface CrmContactMapper extends BaseMapperX<CrmContactDO> {
 
     default PageResult<CrmContactDO> selectPageByCustomer(CrmContactPageReqVO pageVO) {
         return selectPage(pageVO, new LambdaQueryWrapperX<CrmContactDO>()
-                .eq(CrmContactDO::getCustomerId, pageVO.getCustomerId())
+                .eq(CrmContactDO::getCustomerId, pageVO.getCustomerId()) // 必须传递
                 .likeIfPresent(CrmContactDO::getName, pageVO.getName())
                 .eqIfPresent(CrmContactDO::getMobile, pageVO.getMobile())
                 .eqIfPresent(CrmContactDO::getTelephone, pageVO.getTelephone())

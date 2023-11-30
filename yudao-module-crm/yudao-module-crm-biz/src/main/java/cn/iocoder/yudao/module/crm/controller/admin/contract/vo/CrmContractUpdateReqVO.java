@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class ContractUpdateReqVO extends ContractBaseVO {
+public class CrmContractUpdateReqVO extends CrmContractBaseVO {
 
     @Schema(description = "合同编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
     @NotNull(message = "合同编号不能为空")

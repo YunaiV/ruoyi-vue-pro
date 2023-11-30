@@ -10,13 +10,13 @@ import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.CrmReceivableE
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.CrmReceivablePageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.CrmReceivableUpdateReqVO;
 import cn.iocoder.yudao.module.crm.convert.receivable.CrmReceivableConvert;
-import cn.iocoder.yudao.module.crm.dal.dataobject.contract.ContractDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivableDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivablePlanDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.receivable.CrmReceivableMapper;
-import cn.iocoder.yudao.module.crm.enums.AuditStatusEnum;
-import cn.iocoder.yudao.module.crm.service.contract.ContractService;
+import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
+import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -41,7 +41,7 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
     @Resource
     private CrmReceivableMapper crmReceivableMapper;
     @Resource
-    private ContractService contractService;
+    private CrmContractService contractService;
     @Resource
     private CrmCustomerService crmCustomerService;
     @Resource
@@ -57,7 +57,7 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
             receivable.setStatus(CommonStatusEnum.ENABLE.getStatus());
         }
         if (ObjectUtil.isNull(receivable.getCheckStatus())){
-            receivable.setCheckStatus(AuditStatusEnum.AUDIT_NEW.getValue());
+            receivable.setCheckStatus(CrmAuditStatusEnum.DRAFT.getStatus());
         }
 
         // TODO @liuhongfeng：一般来说，逻辑的写法，是要先检查，后操作 db；所以，你这个 check 应该放到  CrmReceivableDO receivable 之前；
@@ -75,7 +75,7 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
             throw exception(CONTRACT_NOT_EXISTS);
         }
 
-        ContractDO contract = contractService.getContract(receivable.getContractId());
+        CrmContractDO contract = contractService.getContract(receivable.getContractId());
         if(ObjectUtil.isNull(contract)){
             throw exception(CONTRACT_NOT_EXISTS);
         }

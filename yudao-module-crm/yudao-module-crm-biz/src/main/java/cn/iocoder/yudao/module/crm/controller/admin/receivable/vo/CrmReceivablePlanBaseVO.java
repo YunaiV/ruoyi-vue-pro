@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.crm.enums.AuditStatusEnum;
+import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -28,7 +28,7 @@ public class CrmReceivablePlanBaseVO {
     private Integer status;
 
     @Schema(description = "审批状态", example = "1")
-    @InEnum(AuditStatusEnum.class)
+    @InEnum(CrmAuditStatusEnum.class)
     private Integer checkStatus;
 
     @Schema(description = "计划回款金额", example = "29675")

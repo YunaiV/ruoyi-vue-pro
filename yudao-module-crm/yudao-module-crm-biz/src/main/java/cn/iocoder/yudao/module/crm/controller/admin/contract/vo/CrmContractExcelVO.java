@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  * @author dhb52
  */
 @Data
-public class ContractExcelVO {
+public class CrmContractExcelVO {
 
     @ExcelProperty("合同编号")
     private Long id;

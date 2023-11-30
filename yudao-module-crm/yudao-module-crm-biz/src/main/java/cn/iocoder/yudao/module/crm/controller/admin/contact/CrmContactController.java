@@ -151,7 +151,7 @@ public class CrmContactController {
         // 1. 获取客户列表
         List<CrmCustomerDO> crmCustomerDOList = customerService.getCustomerList(
                 convertSet(contactList, CrmContactDO::getCustomerId));
-        // 2. 获取创建人、责任人列表
+        // 2. 获取创建人、负责人列表
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(contactList,
                 contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getOwnerUserId())));
         // 3. 直属上级

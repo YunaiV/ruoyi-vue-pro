@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 
+// TODO 芋艿：convert 后面在梳理下，略微有点乱
 /**
  * CRM 联系人 Convert
  *
@@ -44,6 +45,7 @@ public interface ContactConvert {
         List<CrmContactRespVO> list = converList(pageResult.getList(), userMap, customerList, parentContactList);
         return convertPage(pageResult).setList(list);
     }
+
     List<CrmContactSimpleRespVO> convertAllList(List<CrmContactDO> list);
 
     @Mappings({

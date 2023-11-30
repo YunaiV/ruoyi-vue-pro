@@ -61,13 +61,13 @@ public class CrmContactServiceImpl implements CrmContactService {
 
         // 2. 创建数据权限
         crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setUserId(userId)
-                .setBizType(CrmBizTypeEnum.CRM_CONTACTS.getType()).setBizId(contact.getId())
+                .setBizType(CrmBizTypeEnum.CRM_CONTACT.getType()).setBizId(contact.getId())
                 .setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
         return contact.getId();
     }
 
     @Override
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACTS, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateContact(CrmContactUpdateReqVO updateReqVO) {
         // 1. 校验存在
         validateContactExists(updateReqVO.getId());
@@ -98,7 +98,7 @@ public class CrmContactServiceImpl implements CrmContactService {
     }
 
     @Override
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACTS, bizId = "#id", level = CrmPermissionLevelEnum.WRITE)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#id", level = CrmPermissionLevelEnum.WRITE)
     public void deleteContact(Long id) {
         // 校验存在
         validateContactExists(id);
@@ -114,7 +114,7 @@ public class CrmContactServiceImpl implements CrmContactService {
 
     // TODO 芋艿：是否要做数据权限的校验？？？
     @Override
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACTS, bizId = "#id", level = CrmPermissionLevelEnum.READ)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#id", level = CrmPermissionLevelEnum.READ)
     public CrmContactDO getContact(Long id) {
         return contactMapper.selectById(id);
     }
@@ -134,9 +134,9 @@ public class CrmContactServiceImpl implements CrmContactService {
     }
 
     @Override
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#pageVO.customerId", level = CrmPermissionLevelEnum.READ)
-    public PageResult<CrmContactDO> getContactPageByCustomer(CrmContactPageReqVO pageVO) {
-        return contactMapper.selectPageByCustomer(pageVO);
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#pageReqVO.customerId", level = CrmPermissionLevelEnum.READ)
+    public PageResult<CrmContactDO> getContactPageByCustomer(CrmContactPageReqVO pageReqVO) {
+        return contactMapper.selectPageByCustomer(pageReqVO);
     }
 
     @Override

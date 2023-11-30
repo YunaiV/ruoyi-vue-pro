@@ -19,7 +19,7 @@ public enum CrmBizTypeEnum implements IntArrayValuable {
 
     CRM_LEADS(1, "线索"),
     CRM_CUSTOMER(2, "客户"),
-    CRM_CONTACTS(3, "联系人"),
+    CRM_CONTACT(3, "联系人"),
     CRM_BUSINESS(4, "商机"),
     CRM_CONTRACT(5, "合同");
 

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.contract;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -8,8 +9,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+// TODO 芋艿：实体的梳理
 /**
- * 合同 DO
+ * CRM 合同 DO
  *
  * @author dhb52
  */
@@ -21,7 +23,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ContractDO extends BaseDO {
+public class CrmContractDO extends BaseDO {
 
     /**
      * 合同编号
@@ -88,5 +90,19 @@ public class ContractDO extends BaseDO {
      * 备注
      */
     private String remark;
+
+    /**
+     * 负责人的用户编号
+     *
+     * 关联 AdminUserDO 的 id 字段
+     */
+    private Long ownerUserId;
+
+    /**
+     * 审批状态
+     *
+     * 枚举 {@link CrmAuditStatusEnum}
+     */
+    private Integer auditStatus;
 
 }

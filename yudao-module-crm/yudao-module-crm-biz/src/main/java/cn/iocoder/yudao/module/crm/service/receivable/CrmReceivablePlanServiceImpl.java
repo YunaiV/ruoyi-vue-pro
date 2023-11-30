@@ -10,12 +10,12 @@ import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.CrmReceivableP
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.CrmReceivablePlanPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.CrmReceivablePlanUpdateReqVO;
 import cn.iocoder.yudao.module.crm.convert.receivable.CrmReceivablePlanConvert;
-import cn.iocoder.yudao.module.crm.dal.dataobject.contract.ContractDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivablePlanDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.receivable.CrmReceivablePlanMapper;
-import cn.iocoder.yudao.module.crm.enums.AuditStatusEnum;
-import cn.iocoder.yudao.module.crm.service.contract.ContractService;
+import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
+import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -40,7 +40,7 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
     @Resource
     private CrmReceivablePlanMapper crmReceivablePlanMapper;
     @Resource
-    private ContractService contractService;
+    private CrmContractService contractService;
     @Resource
     private CrmCustomerService crmCustomerService;
 
@@ -52,7 +52,7 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
             receivablePlan.setStatus(CommonStatusEnum.ENABLE.getStatus());
         }
         if (ObjectUtil.isNull(receivablePlan.getCheckStatus())){
-            receivablePlan.setCheckStatus(AuditStatusEnum.AUDIT_NEW.getValue());
+            receivablePlan.setCheckStatus(CrmAuditStatusEnum.DRAFT.getStatus());
         }
 
         checkReceivablePlan(receivablePlan);
@@ -68,7 +68,7 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
             throw exception(CONTRACT_NOT_EXISTS);
         }
 
-        ContractDO contract = contractService.getContract(receivablePlan.getContractId());
+        CrmContractDO contract = contractService.getContract(receivablePlan.getContractId());
         if(ObjectUtil.isNull(contract)){
             throw exception(CONTRACT_NOT_EXISTS);
         }

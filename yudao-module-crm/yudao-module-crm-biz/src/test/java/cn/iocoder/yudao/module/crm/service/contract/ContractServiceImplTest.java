@@ -2,12 +2,12 @@ package cn.iocoder.yudao.module.crm.service.contract;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.ContractCreateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.ContractExportReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.ContractPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.ContractUpdateReqVO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.contract.ContractDO;
-import cn.iocoder.yudao.module.crm.dal.mysql.contract.ContractMapper;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractUpdateReqVO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
+import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractMapper;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
@@ -26,54 +26,54 @@ import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CONTRACT_NOT_
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * {@link ContractServiceImpl} 的单元测试类
+ * {@link CrmContractServiceImpl} 的单元测试类
  *
  * @author dhb52
  */
-@Import(ContractServiceImpl.class)
+@Import(CrmContractServiceImpl.class)
 public class ContractServiceImplTest extends BaseDbUnitTest {
 
     @Resource
-    private ContractServiceImpl contractService;
+    private CrmContractServiceImpl contractService;
 
     @Resource
-    private ContractMapper contractMapper;
+    private CrmContractMapper contractMapper;
 
     @Test
     public void testCreateContract_success() {
         // 准备参数
-        ContractCreateReqVO reqVO = randomPojo(ContractCreateReqVO.class);
+        CrmContractCreateReqVO reqVO = randomPojo(CrmContractCreateReqVO.class);
 
         // 调用
         Long contractId = contractService.createContract(reqVO, getLoginUserId());
         // 断言
         assertNotNull(contractId);
         // 校验记录的属性是否正确
-        ContractDO contract = contractMapper.selectById(contractId);
+        CrmContractDO contract = contractMapper.selectById(contractId);
         assertPojoEquals(reqVO, contract);
     }
 
     @Test
     public void testUpdateContract_success() {
         // mock 数据
-        ContractDO dbContract = randomPojo(ContractDO.class);
+        CrmContractDO dbContract = randomPojo(CrmContractDO.class);
         contractMapper.insert(dbContract);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        ContractUpdateReqVO reqVO = randomPojo(ContractUpdateReqVO.class, o -> {
+        CrmContractUpdateReqVO reqVO = randomPojo(CrmContractUpdateReqVO.class, o -> {
             o.setId(dbContract.getId()); // 设置更新的 ID
         });
 
         // 调用
         contractService.updateContract(reqVO);
         // 校验是否更新正确
-        ContractDO contract = contractMapper.selectById(reqVO.getId()); // 获取最新的
+        CrmContractDO contract = contractMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, contract);
     }
 
     @Test
     public void testUpdateContract_notExists() {
         // 准备参数
-        ContractUpdateReqVO reqVO = randomPojo(ContractUpdateReqVO.class);
+        CrmContractUpdateReqVO reqVO = randomPojo(CrmContractUpdateReqVO.class);
 
         // 调用, 并断言异常
         assertServiceException(() -> contractService.updateContract(reqVO), CONTRACT_NOT_EXISTS);
@@ -82,7 +82,7 @@ public class ContractServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testDeleteContract_success() {
         // mock 数据
-        ContractDO dbContract = randomPojo(ContractDO.class);
+        CrmContractDO dbContract = randomPojo(CrmContractDO.class);
         contractMapper.insert(dbContract);// @Sql: 先插入出一条存在的数据
         // 准备参数
         Long id = dbContract.getId();
@@ -106,7 +106,7 @@ public class ContractServiceImplTest extends BaseDbUnitTest {
     @Disabled  // TODO 请修改 null 为需要的值，然后删除 @Disabled 注解
     public void testGetContractPage() {
         // mock 数据
-        ContractDO dbContract = randomPojo(ContractDO.class, o -> { // 等会查询到
+        CrmContractDO dbContract = randomPojo(CrmContractDO.class, o -> { // 等会查询到
             o.setName(null);
             o.setCustomerId(null);
             o.setBusinessId(null);
@@ -131,7 +131,7 @@ public class ContractServiceImplTest extends BaseDbUnitTest {
         // 测试 productPrice 不匹配
         contractMapper.insert(cloneIgnoreId(dbContract, o -> o.setProductPrice(null)));
         // 准备参数
-        ContractPageReqVO reqVO = new ContractPageReqVO();
+        CrmContractPageReqVO reqVO = new CrmContractPageReqVO();
         reqVO.setName(null);
         reqVO.setCustomerId(null);
         reqVO.setBusinessId(null);
@@ -141,7 +141,7 @@ public class ContractServiceImplTest extends BaseDbUnitTest {
         reqVO.setProductPrice(null);
 
         // 调用
-        PageResult<ContractDO> pageResult = contractService.getContractPage(reqVO);
+        PageResult<CrmContractDO> pageResult = contractService.getContractPage(reqVO);
         // 断言
         assertEquals(1, pageResult.getTotal());
         assertEquals(1, pageResult.getList().size());
@@ -152,7 +152,7 @@ public class ContractServiceImplTest extends BaseDbUnitTest {
     @Disabled  // TODO 请修改 null 为需要的值，然后删除 @Disabled 注解
     public void testGetContractList() {
         // mock 数据
-        ContractDO dbContract = randomPojo(ContractDO.class, o -> { // 等会查询到
+        CrmContractDO dbContract = randomPojo(CrmContractDO.class, o -> { // 等会查询到
             o.setName("合同名称");
             o.setCustomerId(null);
             o.setBusinessId(null);
@@ -187,7 +187,7 @@ public class ContractServiceImplTest extends BaseDbUnitTest {
         reqVO.setProductPrice(null);
 
         // 调用
-        List<ContractDO> list = contractService.getContractList(reqVO);
+        List<CrmContractDO> list = contractService.getContractList(reqVO);
         // 断言
         assertEquals(1, list.size());
         assertPojoEquals(dbContract, list.get(0));
