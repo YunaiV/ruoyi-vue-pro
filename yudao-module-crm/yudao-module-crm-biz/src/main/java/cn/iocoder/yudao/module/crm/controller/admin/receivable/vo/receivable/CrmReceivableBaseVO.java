@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo;
+package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * 回款管理 Base VO，提供给添加、修改、详细的子 VO 使用
+ * 回款 Base VO，提供给添加、修改、详细的子 VO 使用
  * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
  */
 @Data
@@ -60,8 +60,5 @@ public class CrmReceivableBaseVO {
     @Schema(description = "备注", example = "备注")
     private String remark;
 
-    // TODO @liuhongfeng：这个字段，这个字段，应该不是前端传递的噢，而是后端自己生成的，所以不适合放在 base 里面；
-    @Schema(description = "完成状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    private Integer status;
 
 }

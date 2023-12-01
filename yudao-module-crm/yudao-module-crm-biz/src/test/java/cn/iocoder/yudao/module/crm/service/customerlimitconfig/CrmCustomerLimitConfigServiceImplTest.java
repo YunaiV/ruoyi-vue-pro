@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmC
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerLimitConfigDO;
-import cn.iocoder.yudao.module.crm.dal.mysql.customerlimitconfig.CrmCustomerLimitConfigMapper;
+import cn.iocoder.yudao.module.crm.dal.mysql.customer.CrmCustomerLimitConfigMapper;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerLimitConfigServiceImpl;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

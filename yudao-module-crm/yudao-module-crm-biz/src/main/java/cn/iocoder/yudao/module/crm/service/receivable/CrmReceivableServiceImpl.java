@@ -5,10 +5,9 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.CrmReceivableCreateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.CrmReceivableExportReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.CrmReceivablePageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.CrmReceivableUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivableCreateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivablePageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivableUpdateReqVO;
 import cn.iocoder.yudao.module.crm.convert.receivable.CrmReceivableConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
@@ -16,6 +15,9 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivableDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivablePlanDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.receivable.CrmReceivableMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
+import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import org.springframework.stereotype.Service;
@@ -29,7 +31,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 
 /**
- * 回款管理 Service 实现类
+ * CRM 回款 Service 实现类
  *
  * @author 赤焰
  */
@@ -37,34 +39,31 @@ import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 @Validated
 public class CrmReceivableServiceImpl implements CrmReceivableService {
 
-    // TODO @liuhongfeng：crm 前缀，变量可以不带哈；
     @Resource
-    private CrmReceivableMapper crmReceivableMapper;
+    private CrmReceivableMapper receivableMapper;
+
     @Resource
     private CrmContractService contractService;
     @Resource
-    private CrmCustomerService crmCustomerService;
+    private CrmCustomerService customerService;
     @Resource
-    private CrmReceivablePlanService crmReceivablePlanService;
+    private CrmReceivablePlanService receivablePlanService;
 
     // TODO @liuhongfeng：创建还款后，是不是什么时候，要更新 plan？
     @Override
     public Long createReceivable(CrmReceivableCreateReqVO createReqVO) {
         // 插入
         CrmReceivableDO receivable = CrmReceivableConvert.INSTANCE.convert(createReqVO);
-        // TODO @liuhongfeng：这里的括号要注意排版；
-        if (ObjectUtil.isNull(receivable.getStatus())){
-            receivable.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        if (ObjectUtil.isNull(receivable.getAuditStatus())) {
+            receivable.setAuditStatus(CommonStatusEnum.ENABLE.getStatus());
         }
-        if (ObjectUtil.isNull(receivable.getCheckStatus())){
-            receivable.setCheckStatus(CrmAuditStatusEnum.DRAFT.getStatus());
-        }
+        receivable.setAuditStatus(CrmAuditStatusEnum.DRAFT.getStatus());
 
         // TODO @liuhongfeng：一般来说，逻辑的写法，是要先检查，后操作 db；所以，你这个 check 应该放到  CrmReceivableDO receivable 之前；
         // 校验
         checkReceivable(receivable);
 
-        crmReceivableMapper.insert(receivable);
+        receivableMapper.insert(receivable);
         return receivable.getId();
     }
 
@@ -80,12 +79,12 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
             throw exception(CONTRACT_NOT_EXISTS);
         }
 
-        CrmCustomerDO customer = crmCustomerService.getCustomer(receivable.getCustomerId());
+        CrmCustomerDO customer = customerService.getCustomer(receivable.getCustomerId());
         if(ObjectUtil.isNull(customer)){
             throw exception(CUSTOMER_NOT_EXISTS);
         }
 
-        CrmReceivablePlanDO receivablePlan = crmReceivablePlanService.getReceivablePlan(receivable.getPlanId());
+        CrmReceivablePlanDO receivablePlan = receivablePlanService.getReceivablePlan(receivable.getPlanId());
         if(ObjectUtil.isNull(receivablePlan)){
             throw exception(RECEIVABLE_PLAN_NOT_EXISTS);
         }
@@ -99,7 +98,7 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
 
         // 更新
         CrmReceivableDO updateObj = CrmReceivableConvert.INSTANCE.convert(updateReqVO);
-        crmReceivableMapper.updateById(updateObj);
+        receivableMapper.updateById(updateObj);
     }
 
     @Override
@@ -107,18 +106,19 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
         // 校验存在
         validateReceivableExists(id);
         // 删除
-        crmReceivableMapper.deleteById(id);
+        receivableMapper.deleteById(id);
     }
 
     private void validateReceivableExists(Long id) {
-        if (crmReceivableMapper.selectById(id) == null) {
+        if (receivableMapper.selectById(id) == null) {
             throw exception(RECEIVABLE_NOT_EXISTS);
         }
     }
 
+    // TODO @芋艿：数据权限
     @Override
     public CrmReceivableDO getReceivable(Long id) {
-        return crmReceivableMapper.selectById(id);
+        return receivableMapper.selectById(id);
     }
 
     @Override
@@ -126,17 +126,19 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
         if (CollUtil.isEmpty(ids)) {
             return ListUtil.empty();
         }
-        return crmReceivableMapper.selectBatchIds(ids);
+        return receivableMapper.selectBatchIds(ids);
     }
 
+    // TODO @芋艿：数据权限
     @Override
     public PageResult<CrmReceivableDO> getReceivablePage(CrmReceivablePageReqVO pageReqVO) {
-        return crmReceivableMapper.selectPage(pageReqVO);
+        return receivableMapper.selectPage(pageReqVO);
     }
 
     @Override
-    public List<CrmReceivableDO> getReceivableList(CrmReceivableExportReqVO exportReqVO) {
-        return crmReceivableMapper.selectList(exportReqVO);
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#pageReqVO.customerId", level = CrmPermissionLevelEnum.READ)
+    public PageResult<CrmReceivableDO> getReceivablePageByCustomer(CrmReceivablePageReqVO pageReqVO) {
+        return receivableMapper.selectPageByCustomer(pageReqVO);
     }
 
 }

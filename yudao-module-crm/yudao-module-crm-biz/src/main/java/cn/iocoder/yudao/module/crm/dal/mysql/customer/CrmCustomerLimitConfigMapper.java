@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.dal.mysql.customerlimitconfig;
+package cn.iocoder.yudao.module.crm.dal.mysql.customer;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;

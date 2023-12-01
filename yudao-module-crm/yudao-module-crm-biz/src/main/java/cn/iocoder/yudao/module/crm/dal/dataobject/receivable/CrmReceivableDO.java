@@ -10,7 +10,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 /**
- * 回款管理 DO
+ * 回款 DO
  *
  * @author 赤焰
  */
@@ -54,12 +54,6 @@ public class CrmReceivableDO extends BaseDO {
      * 对应实体 {@link CrmContractDO}
      */
     private Long contractId;
-    // TODO @liuhongfeng：“对应字典”，参考别的模块，枚举 {@link XXXX}；另外，这个字段就叫 status，整体状态，不只审批
-    /**
-     * 审批状态
-     * 对应字典 {@link cn.iocoder.yudao.module.crm.enums.DictTypeConstants#CRM_AUDIT_STATUS}
-     */
-    private Integer checkStatus;
     /**
      * 工作流编号
      *
@@ -84,31 +78,16 @@ public class CrmReceivableDO extends BaseDO {
      * 负责人
      */
     private Long ownerUserId;
-    // TODO @liuhongfeng：应该不需要 batchId 字段
-    /**
-     * 批次
-     */
-    private Long batchId;
     /**
      * 显示顺序
      */
     private Integer sort;
-    // TODO 芋艿：dataScope、dataScopeDeptIds 在想下；
     /**
-     * 数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限）
-     */
-    private Integer dataScope;
-    /**
-     * 数据范围(指定部门数组)
-     */
-    private String dataScopeDeptIds;
-    /**
-     * 状态
+     * 审核状态
      *
-     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.CommonStatusEnum}
-     *
+     * 枚举 {@link cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum}
      */
-    private Integer status;
+    private Integer auditStatus;
     /**
      * 备注
      */

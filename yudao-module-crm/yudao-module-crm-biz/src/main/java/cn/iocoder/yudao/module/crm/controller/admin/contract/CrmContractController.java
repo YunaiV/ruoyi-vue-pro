@@ -112,10 +112,10 @@ public class CrmContractController {
     }
 
     /**
-     * 转换成详细的联系人分页，即读取关联信息
+     * 转换成详细的合同分页，即读取关联信息
      *
-     * @param pageResult 联系人分页
-     * @return 详细的联系人分页
+     * @param pageResult 合同分页
+     * @return 详细的合同分页
      */
     private PageResult<ContractRespVO> convertDetailContractPage(PageResult<CrmContractDO> pageResult) {
         List<CrmContractDO> contactList = pageResult.getList();

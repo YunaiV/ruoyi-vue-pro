@@ -1,7 +1,7 @@
 
-INSERT INTO `system_dict_type` (`id`, `name`, `type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `deleted_time`) VALUES (184, '回款管理审批状态', 'crm_receivable_check_status', 0, '回款管理审批状态(0 未审核 1 审核通过 2 审核拒绝 3 审核中 4 已撤回)', '1', '2023-10-18 21:44:24', '1', '2023-10-18 21:44:24', b'0', '1970-01-01 00:00:00');
+INSERT INTO `system_dict_type` (`id`, `name`, `type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `deleted_time`) VALUES (184, '回款审批状态', 'crm_receivable_check_status', 0, '回款审批状态(0 未审核 1 审核通过 2 审核拒绝 3 审核中 4 已撤回)', '1', '2023-10-18 21:44:24', '1', '2023-10-18 21:44:24', b'0', '1970-01-01 00:00:00');
 
-INSERT INTO `system_dict_type` (`id`, `name`, `type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `deleted_time`) VALUES (185, '回款管理-回款方式', 'crm_return_type', 0, '回款管理-回款方式', '1', '2023-10-18 21:54:10', '1', '2023-10-18 21:54:10', b'0', '1970-01-01 00:00:00');
+INSERT INTO `system_dict_type` (`id`, `name`, `type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `deleted_time`) VALUES (185, '回款-回款方式', 'crm_return_type', 0, '回款-回款方式', '1', '2023-10-18 21:54:10', '1', '2023-10-18 21:54:10', b'0', '1970-01-01 00:00:00');
 
 
 INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1389, 0, '未审核', '0', 'crm_receivable_check_status', 0, 'default', '', '0 未审核 ', '1', '2023-10-18 21:46:00', '1', '2023-10-18 21:47:16', b'0');
