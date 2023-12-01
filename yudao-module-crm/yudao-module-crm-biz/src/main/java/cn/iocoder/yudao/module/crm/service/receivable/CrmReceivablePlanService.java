@@ -1,13 +1,18 @@
 package cn.iocoder.yudao.module.crm.service.receivable;
 
-import java.util.*;
-import javax.validation.*;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.*;
-import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivablePlanDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanCreateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanUpdateReqVO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivablePlanDO;
+
+import javax.validation.Valid;
+import java.util.Collection;
+import java.util.List;
 
 /**
- * 回款计划 Service 接口
+ * CRM 回款计划 Service 接口
  *
  * @author 芋道源码
  */
@@ -54,17 +59,21 @@ public interface CrmReceivablePlanService {
     /**
      * 获得回款计划分页
      *
+     * 数据权限：基于 {@link CrmReceivablePlanDO} 读取
+     *
      * @param pageReqVO 分页查询
      * @return 回款计划分页
      */
     PageResult<CrmReceivablePlanDO> getReceivablePlanPage(CrmReceivablePlanPageReqVO pageReqVO);
 
     /**
-     * 获得回款计划列表, 用于 Excel 导出
+     * 获得回款计划分页，基于指定客户
      *
-     * @param exportReqVO 查询条件
-     * @return 回款计划列表
+     * 数据权限：基于 {@link CrmCustomerDO} 读取
+     *
+     * @param pageReqVO 分页查询
+     * @return 回款计划分页
      */
-    List<CrmReceivablePlanDO> getReceivablePlanList(CrmReceivablePlanExportReqVO exportReqVO);
+    PageResult<CrmReceivablePlanDO> getReceivablePlanPageByCustomer(CrmReceivablePlanPageReqVO pageReqVO);
 
 }

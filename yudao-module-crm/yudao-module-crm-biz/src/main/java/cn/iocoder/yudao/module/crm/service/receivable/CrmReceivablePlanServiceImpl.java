@@ -3,18 +3,18 @@ package cn.iocoder.yudao.module.crm.service.receivable;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.CrmReceivablePlanCreateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.CrmReceivablePlanExportReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.CrmReceivablePlanPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.CrmReceivablePlanUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanCreateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanUpdateReqVO;
 import cn.iocoder.yudao.module.crm.convert.receivable.CrmReceivablePlanConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivablePlanDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.receivable.CrmReceivablePlanMapper;
-import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
+import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import org.springframework.stereotype.Service;
@@ -28,6 +28,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 
 // TODO @liuhongfeng：参考 CrmReceivableServiceImpl 写的 todo 哈；
+// TODO @puhui999：数据权限
 /**
  * 回款计划 Service 实现类
  *
@@ -38,26 +39,22 @@ import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
 
     @Resource
-    private CrmReceivablePlanMapper crmReceivablePlanMapper;
+    private CrmReceivablePlanMapper receivablePlanMapper;
+
     @Resource
     private CrmContractService contractService;
     @Resource
-    private CrmCustomerService crmCustomerService;
+    private CrmCustomerService customerService;
 
     @Override
     public Long createReceivablePlan(CrmReceivablePlanCreateReqVO createReqVO) {
         // 插入
         CrmReceivablePlanDO receivablePlan = CrmReceivablePlanConvert.INSTANCE.convert(createReqVO);
-        if (ObjectUtil.isNull(receivablePlan.getStatus())){
-            receivablePlan.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        }
-        if (ObjectUtil.isNull(receivablePlan.getCheckStatus())){
-            receivablePlan.setCheckStatus(CrmAuditStatusEnum.DRAFT.getStatus());
-        }
+        receivablePlan.setFinishStatus(false);
 
         checkReceivablePlan(receivablePlan);
 
-        crmReceivablePlanMapper.insert(receivablePlan);
+        receivablePlanMapper.insert(receivablePlan);
         // 返回
         return receivablePlan.getId();
     }
@@ -73,7 +70,7 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
             throw exception(CONTRACT_NOT_EXISTS);
         }
 
-        CrmCustomerDO customer = crmCustomerService.getCustomer(receivablePlan.getCustomerId());
+        CrmCustomerDO customer = customerService.getCustomer(receivablePlan.getCustomerId());
         if(ObjectUtil.isNull(customer)){
             throw exception(CUSTOMER_NOT_EXISTS);
         }
@@ -87,7 +84,7 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
 
         // 更新
         CrmReceivablePlanDO updateObj = CrmReceivablePlanConvert.INSTANCE.convert(updateReqVO);
-        crmReceivablePlanMapper.updateById(updateObj);
+        receivablePlanMapper.updateById(updateObj);
     }
 
     @Override
@@ -95,18 +92,18 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
         // 校验存在
         validateReceivablePlanExists(id);
         // 删除
-        crmReceivablePlanMapper.deleteById(id);
+        receivablePlanMapper.deleteById(id);
     }
 
     private void validateReceivablePlanExists(Long id) {
-        if (crmReceivablePlanMapper.selectById(id) == null) {
+        if (receivablePlanMapper.selectById(id) == null) {
             throw exception(RECEIVABLE_PLAN_NOT_EXISTS);
         }
     }
 
     @Override
     public CrmReceivablePlanDO getReceivablePlan(Long id) {
-        return crmReceivablePlanMapper.selectById(id);
+        return receivablePlanMapper.selectById(id);
     }
 
     @Override
@@ -114,17 +111,18 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
         if (CollUtil.isEmpty(ids)) {
             return ListUtil.empty();
         }
-        return crmReceivablePlanMapper.selectBatchIds(ids);
+        return receivablePlanMapper.selectBatchIds(ids);
     }
 
     @Override
     public PageResult<CrmReceivablePlanDO> getReceivablePlanPage(CrmReceivablePlanPageReqVO pageReqVO) {
-        return crmReceivablePlanMapper.selectPage(pageReqVO);
+        return receivablePlanMapper.selectPage(pageReqVO);
     }
 
     @Override
-    public List<CrmReceivablePlanDO> getReceivablePlanList(CrmReceivablePlanExportReqVO exportReqVO) {
-        return crmReceivablePlanMapper.selectList(exportReqVO);
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#pageReqVO.customerId", level = CrmPermissionLevelEnum.READ)
+    public PageResult<CrmReceivablePlanDO> getReceivablePlanPageByCustomer(CrmReceivablePlanPageReqVO pageReqVO) {
+        return receivablePlanMapper.selectPageByCustomer(pageReqVO);
     }
 
 }

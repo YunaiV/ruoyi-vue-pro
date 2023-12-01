@@ -99,7 +99,7 @@ public class CrmReceivableController {
 
     @GetMapping("/page-by-customer")
     @Operation(summary = "获得回款分页，基于指定客户")
-    public CommonResult<PageResult<CrmReceivableRespVO>> getContractPageByCustomer(@Valid CrmReceivablePageReqVO pageReqVO) {
+    public CommonResult<PageResult<CrmReceivableRespVO>> getReceivablePageByCustomer(@Valid CrmReceivablePageReqVO pageReqVO) {
         Assert.notNull(pageReqVO.getCustomerId(), "客户编号不能为空");
         PageResult<CrmReceivableDO> pageResult = receivableService.getReceivablePageByCustomer(pageReqVO);
         return success(convertDetailReceivablePage(pageResult));
@@ -125,19 +125,19 @@ public class CrmReceivableController {
      * @return 详细的回款分页
      */
     private PageResult<CrmReceivableRespVO> convertDetailReceivablePage(PageResult<CrmReceivableDO> pageResult) {
-        List<CrmReceivableDO> contactList = pageResult.getList();
-        if (CollUtil.isEmpty(contactList)) {
+        List<CrmReceivableDO> receivableList = pageResult.getList();
+        if (CollUtil.isEmpty(receivableList)) {
             return PageResult.empty(pageResult.getTotal());
         }
         // 1. 获取客户列表
         List<CrmCustomerDO> customerList = customerService.getCustomerList(
-                convertSet(contactList, CrmReceivableDO::getCustomerId));
+                convertSet(receivableList, CrmReceivableDO::getCustomerId));
         // 2. 获取创建人、负责人列表
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(contactList,
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(receivableList,
                 contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getOwnerUserId())));
         // 3. 获得合同列表
         List<CrmContractDO> contractList = contractService.getContractList(
-                convertSet(contactList, CrmReceivableDO::getContractId));
+                convertSet(receivableList, CrmReceivableDO::getContractId));
         return CrmReceivableConvert.INSTANCE.convertPage(pageResult, userMap, customerList, contractList);
     }
 

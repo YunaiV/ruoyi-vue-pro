@@ -42,7 +42,7 @@ public class CrmReceivableBaseVO {
     private LocalDateTime returnTime;
 
     @Schema(description = "回款方式", example = "2")
-    private String returnType;
+    private Integer returnType;
 
     @Schema(description = "回款金额，单位：分", example = "31859")
     private Integer price;
@@ -50,9 +50,6 @@ public class CrmReceivableBaseVO {
     // TODO @liuhongfeng：负责人编号
     @Schema(description = "负责人", example = "22202")
     private Long ownerUserId;
-
-    @Schema(description = "批次", example = "2539")
-    private Long batchId;
 
     @Schema(description = "显示顺序")
     private Integer sort;

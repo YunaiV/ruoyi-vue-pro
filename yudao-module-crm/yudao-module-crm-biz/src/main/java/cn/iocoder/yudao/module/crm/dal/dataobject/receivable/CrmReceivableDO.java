@@ -68,7 +68,7 @@ public class CrmReceivableDO extends BaseDO {
     /**
      * 回款方式
      */
-    private String returnType;
+    private Integer returnType;
     /**
      * 回款金额
      */

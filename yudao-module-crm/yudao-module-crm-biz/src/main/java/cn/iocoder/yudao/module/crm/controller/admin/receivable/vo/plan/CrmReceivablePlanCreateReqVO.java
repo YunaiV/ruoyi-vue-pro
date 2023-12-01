@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo;
+package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan;
 
 import lombok.*;
 import io.swagger.v3.oas.annotations.media.Schema;

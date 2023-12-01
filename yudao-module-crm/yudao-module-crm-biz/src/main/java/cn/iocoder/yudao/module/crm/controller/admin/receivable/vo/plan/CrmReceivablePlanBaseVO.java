@@ -1,7 +1,5 @@
-package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo;
+package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan;
 
-import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,16 +18,8 @@ public class CrmReceivablePlanBaseVO {
     @Schema(description = "期数", example = "1")
     private Integer period;
 
-    // TODO @liuhongfeng：回款计划编号
-    @Schema(description = "回款计划", example = "19852")
+    @Schema(description = "回款计划编号", example = "19852")
     private Long receivableId;
-
-    @Schema(description = "完成状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    private Integer status;
-
-    @Schema(description = "审批状态", example = "1")
-    @InEnum(CrmAuditStatusEnum.class)
-    private Integer checkStatus;
 
     @Schema(description = "计划回款金额", example = "29675")
     private Integer price;
@@ -45,16 +35,14 @@ public class CrmReceivablePlanBaseVO {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime remindTime;
 
-    // TODO @liuhongfeng：客户编号
     @Schema(description = "客户名称", example = "18026")
     private Long customerId;
 
-    // TODO @liuhongfeng：合同编号
-    @Schema(description = "合同名称", example = "3473")
+    @Schema(description = "合同编号", example = "3473")
     private Long contractId;
 
     // TODO @liuhongfeng：负责人编号
-    @Schema(description = "负责人", example = "17828")
+    @Schema(description = "负责人编号", example = "17828")
     private Long ownerUserId;
 
     @Schema(description = "显示顺序")

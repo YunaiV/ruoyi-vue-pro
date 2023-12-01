@@ -38,26 +38,10 @@ public class CrmReceivablePlanDO extends BaseDO {
      * TODO @liuhongfeng：少关联实体；
      */
     private Long receivableId;
-    // TODO @liuhongfeng：还款计划，没有 status 和 checkStatus，改成 finishStatus Boolean；是否完成
     /**
-     * 状态
-     *
-     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.CommonStatusEnum}
+     * 完成状态
      */
-    private Integer status;
-    /**
-     * 审批状态
-     *
-     * 对应字典 {@link cn.iocoder.yudao.module.crm.enums.DictTypeConstants#CRM_AUDIT_STATUS}
-     * // TODO @liuhongfeng：关联的枚举
-     */
-    private Integer checkStatus;
-    /**
-     * 工作流编号
-     *
-     * TODO @liuhongfeng：少关联实体；
-     */
-    private Long processInstanceId;
+    private Boolean finishStatus;
     /**
      * 计划回款金额，单位：分
      */
