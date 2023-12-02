@@ -1,13 +1,9 @@
 package cn.iocoder.yudao.module.system.convert.tenant;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.*;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantSaveReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserCreateReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-
-import java.util.List;
 
 /**
  * 租户 Convert
@@ -19,21 +15,7 @@ public interface TenantConvert {
 
     TenantConvert INSTANCE = Mappers.getMapper(TenantConvert.class);
 
-    TenantDO convert(TenantCreateReqVO bean);
-
-    TenantDO convert(TenantUpdateReqVO bean);
-
-    TenantRespVO convert(TenantDO bean);
-
-    TenantSimpleRespVO convert03(TenantDO bean);
-
-    List<TenantRespVO> convertList(List<TenantDO> list);
-
-    PageResult<TenantRespVO> convertPage(PageResult<TenantDO> page);
-
-    List<TenantExcelVO> convertList02(List<TenantDO> list);
-
-    default UserCreateReqVO convert02(TenantCreateReqVO bean) {
+    default UserCreateReqVO convert02(TenantSaveReqVO bean) {
         UserCreateReqVO reqVO = new UserCreateReqVO();
         reqVO.setUsername(bean.getUsername());
         reqVO.setPassword(bean.getPassword());

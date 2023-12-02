@@ -1,24 +1,28 @@
 package cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
 
-/**
- * 租户套餐 Base VO，提供给添加、修改、详细的子 VO 使用
- * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
- */
+@Schema(description = "管理后台 - 租户套餐创建/修改 Request VO")
 @Data
-public class TenantPackageBaseVO {
+public class TenantPackageSaveReqVO {
+
+    @Schema(description = "套餐编号", example = "1024")
+    private Long id;
 
     @Schema(description = "套餐名", requiredMode = Schema.RequiredMode.REQUIRED, example = "VIP")
-    @NotNull(message = "套餐名不能为空")
+    @NotEmpty(message = "套餐名不能为空")
     private String name;
 
     @Schema(description = "状态，参见 CommonStatusEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "状态不能为空")
+    @InEnum(value = CommonStatusEnum.class, message = "状态必须是 {value}")
     private Integer status;
 
     @Schema(description = "备注", example = "好")

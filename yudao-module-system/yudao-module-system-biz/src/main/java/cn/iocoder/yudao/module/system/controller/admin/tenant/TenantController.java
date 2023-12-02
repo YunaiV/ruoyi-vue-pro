@@ -1,16 +1,20 @@
 package cn.iocoder.yudao.module.system.controller.admin.tenant;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.*;
-import cn.iocoder.yudao.module.system.convert.tenant.TenantConvert;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantSaveReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantSimpleRespVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.module.system.service.tenant.TenantService;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,20 +51,20 @@ public class TenantController {
     @Parameter(name = "website", description = "域名", required = true, example = "www.iocoder.cn")
     public CommonResult<TenantSimpleRespVO> getTenantByWebsite(@RequestParam("website") String website) {
         TenantDO tenant = tenantService.getTenantByWebsite(website);
-        return success(TenantConvert.INSTANCE.convert03(tenant));
+        return success(BeanUtils.toBean(tenant, TenantSimpleRespVO.class));
     }
 
     @PostMapping("/create")
     @Operation(summary = "创建租户")
     @PreAuthorize("@ss.hasPermission('system:tenant:create')")
-    public CommonResult<Long> createTenant(@Valid @RequestBody TenantCreateReqVO createReqVO) {
+    public CommonResult<Long> createTenant(@Valid @RequestBody TenantSaveReqVO createReqVO) {
         return success(tenantService.createTenant(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新租户")
     @PreAuthorize("@ss.hasPermission('system:tenant:update')")
-    public CommonResult<Boolean> updateTenant(@Valid @RequestBody TenantUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateTenant(@Valid @RequestBody TenantSaveReqVO updateReqVO) {
         tenantService.updateTenant(updateReqVO);
         return success(true);
     }
@@ -80,7 +84,7 @@ public class TenantController {
     @PreAuthorize("@ss.hasPermission('system:tenant:query')")
     public CommonResult<TenantRespVO> getTenant(@RequestParam("id") Long id) {
         TenantDO tenant = tenantService.getTenant(id);
-        return success(TenantConvert.INSTANCE.convert(tenant));
+        return success(BeanUtils.toBean(tenant, TenantRespVO.class));
     }
 
     @GetMapping("/page")
@@ -88,19 +92,20 @@ public class TenantController {
     @PreAuthorize("@ss.hasPermission('system:tenant:query')")
     public CommonResult<PageResult<TenantRespVO>> getTenantPage(@Valid TenantPageReqVO pageVO) {
         PageResult<TenantDO> pageResult = tenantService.getTenantPage(pageVO);
-        return success(TenantConvert.INSTANCE.convertPage(pageResult));
+        return success(BeanUtils.toBean(pageResult, TenantRespVO.class));
     }
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出租户 Excel")
     @PreAuthorize("@ss.hasPermission('system:tenant:export')")
     @OperateLog(type = EXPORT)
-    public void exportTenantExcel(@Valid TenantExportReqVO exportReqVO,
+    public void exportTenantExcel(@Valid TenantPageReqVO exportReqVO,
                                   HttpServletResponse response) throws IOException {
-        List<TenantDO> list = tenantService.getTenantList(exportReqVO);
+        exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        List<TenantDO> list = tenantService.getTenantPage(exportReqVO).getList();
         // 导出 Excel
-        List<TenantExcelVO> datas = TenantConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "租户.xls", "数据", TenantExcelVO.class, datas);
+        ExcelUtils.write(response, "租户.xls", "数据", TenantRespVO.class,
+                BeanUtils.toBean(list, TenantRespVO.class));
     }
 
 }
