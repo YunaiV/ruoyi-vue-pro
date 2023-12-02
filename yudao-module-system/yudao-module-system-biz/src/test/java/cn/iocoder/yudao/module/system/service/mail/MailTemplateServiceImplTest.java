@@ -3,9 +3,8 @@ package cn.iocoder.yudao.module.system.service.mail;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplateCreateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplateSaveReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplatePageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplateUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailTemplateMapper;
 import org.junit.jupiter.api.Test;
@@ -43,7 +42,8 @@ public class MailTemplateServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateMailTemplate_success() {
         // 准备参数
-        MailTemplateCreateReqVO reqVO = randomPojo(MailTemplateCreateReqVO.class);
+        MailTemplateSaveReqVO reqVO = randomPojo(MailTemplateSaveReqVO.class)
+                .setId(null); // 防止 id 被赋值
 
         // 调用
         Long mailTemplateId = mailTemplateService.createMailTemplate(reqVO);
@@ -51,7 +51,7 @@ public class MailTemplateServiceImplTest extends BaseDbUnitTest {
         assertNotNull(mailTemplateId);
         // 校验记录的属性是否正确
         MailTemplateDO mailTemplate = mailTemplateMapper.selectById(mailTemplateId);
-        assertPojoEquals(reqVO, mailTemplate);
+        assertPojoEquals(reqVO, mailTemplate, "id");
     }
 
     @Test
@@ -60,7 +60,7 @@ public class MailTemplateServiceImplTest extends BaseDbUnitTest {
         MailTemplateDO dbMailTemplate = randomPojo(MailTemplateDO.class);
         mailTemplateMapper.insert(dbMailTemplate);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        MailTemplateUpdateReqVO reqVO = randomPojo(MailTemplateUpdateReqVO.class, o -> {
+        MailTemplateSaveReqVO reqVO = randomPojo(MailTemplateSaveReqVO.class, o -> {
             o.setId(dbMailTemplate.getId()); // 设置更新的 ID
         });
 
@@ -74,7 +74,7 @@ public class MailTemplateServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateMailTemplate_notExists() {
         // 准备参数
-        MailTemplateUpdateReqVO reqVO = randomPojo(MailTemplateUpdateReqVO.class);
+        MailTemplateSaveReqVO reqVO = randomPojo(MailTemplateSaveReqVO.class);
 
         // 调用, 并断言异常
         assertServiceException(() -> mailTemplateService.updateMailTemplate(reqVO), MAIL_TEMPLATE_NOT_EXISTS);
@@ -207,7 +207,7 @@ public class MailTemplateServiceImplTest extends BaseDbUnitTest {
         Long accountId = dbMailTemplate.getAccountId();
 
         // 调用
-        long count = mailTemplateService.countByAccountId(accountId);
+        long count = mailTemplateService.getMailTemplateCountByAccountId(accountId);
         // 断言
         assertEquals(1, count);
     }

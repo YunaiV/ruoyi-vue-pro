@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.system.service.mail;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplateCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplatePageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplateUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplateSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 
 import javax.validation.Valid;
@@ -24,14 +23,14 @@ public interface MailTemplateService {
      * @param createReqVO 邮件信息
      * @return 编号
      */
-    Long createMailTemplate(@Valid MailTemplateCreateReqVO createReqVO);
+    Long createMailTemplate(@Valid MailTemplateSaveReqVO createReqVO);
 
     /**
      * 邮件模版修改
      *
      * @param updateReqVO 邮件信息
      */
-    void updateMailTemplate(@Valid MailTemplateUpdateReqVO updateReqVO);
+    void updateMailTemplate(@Valid MailTemplateSaveReqVO updateReqVO);
 
     /**
      * 邮件模版删除
@@ -86,6 +85,6 @@ public interface MailTemplateService {
      * @param accountId 账号编号
      * @return 数量
      */
-    long countByAccountId(Long accountId);
+    long getMailTemplateCountByAccountId(Long accountId);
 
 }

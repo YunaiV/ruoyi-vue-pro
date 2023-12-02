@@ -62,7 +62,7 @@ public class DictDataController {
         return success(true);
     }
 
-    @GetMapping("/list-all-simple")
+    @GetMapping(value = {"/list-all-simple", "simple-list"})
     @Operation(summary = "获得全部字典数据列表", description = "一般用于管理后台缓存字典数据在本地")
     // 无需添加权限认证，因为前端全局都需要
     public CommonResult<List<DictDataSimpleRespVO>> getSimpleDictDataList() {

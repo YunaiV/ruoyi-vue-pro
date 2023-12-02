@@ -6,12 +6,12 @@ import lombok.Data;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 
-/**
- * 邮箱账号 Base VO，提供给添加、修改、详细的子 VO 使用
- * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
- */
+@Schema(description = "管理后台 - 邮箱账号创建/修改 Request VO")
 @Data
-public class MailAccountBaseVO {
+public class MailAccountSaveReqVO {
+
+    @Schema(description = "编号", example = "1024")
+    private Long id;
 
     @Schema(description = "邮箱", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudaoyuanma@123.com")
     @NotNull(message = "邮箱不能为空")
