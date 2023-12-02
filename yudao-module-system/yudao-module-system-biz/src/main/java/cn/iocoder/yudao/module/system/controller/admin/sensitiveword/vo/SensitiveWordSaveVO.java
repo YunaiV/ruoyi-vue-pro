@@ -6,12 +6,12 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-/**
- * 敏感词 Base VO，提供给添加、修改、详细的子 VO 使用
- * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
- */
+@Schema(description = "管理后台 - 敏感词创建/修改 Request VO")
 @Data
-public class SensitiveWordBaseVO {
+public class SensitiveWordSaveVO {
+
+    @Schema(description = "编号", example = "1")
+    private Long id;
 
     @Schema(description = "敏感词", requiredMode = Schema.RequiredMode.REQUIRED, example = "敏感词")
     @NotNull(message = "敏感词不能为空")

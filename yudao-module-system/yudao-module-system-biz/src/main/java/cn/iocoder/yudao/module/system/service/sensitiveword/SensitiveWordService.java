@@ -1,10 +1,8 @@
 package cn.iocoder.yudao.module.system.service.sensitiveword;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.SensitiveWordCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.SensitiveWordExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.SensitiveWordPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.SensitiveWordUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.SensitiveWordSaveVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sensitiveword.SensitiveWordDO;
 
 import javax.validation.Valid;
@@ -24,14 +22,14 @@ public interface SensitiveWordService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createSensitiveWord(@Valid SensitiveWordCreateReqVO createReqVO);
+    Long createSensitiveWord(@Valid SensitiveWordSaveVO createReqVO);
 
     /**
      * 更新敏感词
      *
      * @param updateReqVO 更新信息
      */
-    void updateSensitiveWord(@Valid SensitiveWordUpdateReqVO updateReqVO);
+    void updateSensitiveWord(@Valid SensitiveWordSaveVO updateReqVO);
 
     /**
      * 删除敏感词
@@ -62,14 +60,6 @@ public interface SensitiveWordService {
      * @return 敏感词分页
      */
     PageResult<SensitiveWordDO> getSensitiveWordPage(SensitiveWordPageReqVO pageReqVO);
-
-    /**
-     * 获得敏感词列表, 用于 Excel 导出
-     *
-     * @param exportReqVO 查询条件
-     * @return 敏感词列表
-     */
-    List<SensitiveWordDO> getSensitiveWordList(SensitiveWordExportReqVO exportReqVO);
 
     /**
      * 获得所有敏感词的标签数组
