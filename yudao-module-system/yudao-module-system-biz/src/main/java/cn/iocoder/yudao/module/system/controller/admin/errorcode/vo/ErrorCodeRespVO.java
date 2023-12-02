@@ -26,17 +26,14 @@ public class ErrorCodeRespVO {
     private Integer type;
 
     @Schema(description = "应用名", requiredMode = Schema.RequiredMode.REQUIRED, example = "dashboard")
-    @NotNull(message = "应用名不能为空")
     @ExcelProperty("应用名")
     private String applicationName;
 
     @Schema(description = "错误码编码", requiredMode = Schema.RequiredMode.REQUIRED, example = "1234")
-    @NotNull(message = "错误码编码不能为空")
     @ExcelProperty("错误码编码")
     private Integer code;
 
     @Schema(description = "错误码错误提示", requiredMode = Schema.RequiredMode.REQUIRED, example = "帅气")
-    @NotNull(message = "错误码错误提示不能为空")
     @ExcelProperty("错误码错误提示")
     private String message;
 
