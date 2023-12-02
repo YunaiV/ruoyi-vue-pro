@@ -7,12 +7,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-/**
- * 通知公告 Base VO，提供给添加、修改、详细的子 VO 使用
- * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
- */
+@Schema(description = "管理后台 - 通知公告创建/修改 Request VO")
 @Data
-public class NoticeBaseVO {
+public class NoticeSaveReqVO {
+
+    @Schema(description = "岗位公告编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    @NotNull(message = "岗位公告编号不能为空")
+    private Long id;
 
     @Schema(description = "公告标题", requiredMode = Schema.RequiredMode.REQUIRED, example = "小博主")
     @NotBlank(message = "公告标题不能为空")

@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.module.system.service.notice;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticeCreateReqVO;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticePageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticeUpdateReqVO;
-import cn.iocoder.yudao.module.system.convert.notice.NoticeConvert;
+import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticeSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notice.NoticeDO;
 import cn.iocoder.yudao.module.system.dal.mysql.notice.NoticeMapper;
 import com.google.common.annotations.VisibleForTesting;
@@ -27,18 +26,18 @@ public class NoticeServiceImpl implements NoticeService {
     private NoticeMapper noticeMapper;
 
     @Override
-    public Long createNotice(NoticeCreateReqVO reqVO) {
-        NoticeDO notice = NoticeConvert.INSTANCE.convert(reqVO);
+    public Long createNotice(NoticeSaveReqVO createReqVO) {
+        NoticeDO notice = BeanUtils.toBean(createReqVO, NoticeDO.class);
         noticeMapper.insert(notice);
         return notice.getId();
     }
 
     @Override
-    public void updateNotice(NoticeUpdateReqVO reqVO) {
+    public void updateNotice(NoticeSaveReqVO updateReqVO) {
         // 校验是否存在
-        validateNoticeExists(reqVO.getId());
+        validateNoticeExists(updateReqVO.getId());
         // 更新通知公告
-        NoticeDO updateObj = NoticeConvert.INSTANCE.convert(reqVO);
+        NoticeDO updateObj = BeanUtils.toBean(updateReqVO, NoticeDO.class);
         noticeMapper.updateById(updateObj);
     }
 
