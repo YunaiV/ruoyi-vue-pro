@@ -9,8 +9,6 @@ import javax.validation.constraints.NotNull;
 
 @Schema(description = "管理后台 - 菜单精简信息 Response VO")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class MenuSimpleRespVO {
 
     @Schema(description = "菜单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")

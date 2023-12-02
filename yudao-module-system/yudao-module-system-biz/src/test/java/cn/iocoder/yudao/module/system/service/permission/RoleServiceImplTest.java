@@ -4,10 +4,8 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RolePageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.RoleMapper;
 import cn.iocoder.yudao.module.system.enums.permission.DataScopeEnum;
@@ -52,13 +50,14 @@ public class RoleServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateRole() {
         // 准备参数
-        RoleCreateReqVO reqVO = randomPojo(RoleCreateReqVO.class);
+        RoleSaveReqVO reqVO = randomPojo(RoleSaveReqVO.class)
+                .setId(null); // 防止 id 被赋值
 
         // 调用
         Long roleId = roleService.createRole(reqVO, null);
         // 断言
         RoleDO roleDO = roleMapper.selectById(roleId);
-        assertPojoEquals(reqVO, roleDO);
+        assertPojoEquals(reqVO, roleDO, "id");
         assertEquals(RoleTypeEnum.CUSTOM.getType(), roleDO.getType());
         assertEquals(CommonStatusEnum.ENABLE.getStatus(), roleDO.getStatus());
         assertEquals(DataScopeEnum.ALL.getScope(), roleDO.getDataScope());
@@ -71,7 +70,7 @@ public class RoleServiceImplTest extends BaseDbUnitTest {
         roleMapper.insert(roleDO);
         // 准备参数
         Long id = roleDO.getId();
-        RoleUpdateReqVO reqVO = randomPojo(RoleUpdateReqVO.class, o -> o.setId(id));
+        RoleSaveReqVO reqVO = randomPojo(RoleSaveReqVO.class, o -> o.setId(id));
 
         // 调用
         roleService.updateRole(reqVO);
@@ -254,36 +253,6 @@ public class RoleServiceImplTest extends BaseDbUnitTest {
             assertEquals(1, list.size());
             assertPojoEquals(dbRole, list.get(0));
         }
-    }
-
-    @Test
-    public void testGetRoleList() {
-        // mock 数据
-        RoleDO dbRole = randomPojo(RoleDO.class, o -> { // 等会查询到
-            o.setName("土豆");
-            o.setCode("tudou");
-            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-            o.setCreateTime(buildTime(2022, 2, 8));
-        });
-        roleMapper.insert(dbRole);
-        // 测试 name 不匹配
-        roleMapper.insert(cloneIgnoreId(dbRole, o -> o.setName("红薯")));
-        // 测试 code 不匹配
-        roleMapper.insert(cloneIgnoreId(dbRole, o -> o.setCode("hong")));
-        // 测试 createTime 不匹配
-        roleMapper.insert(cloneIgnoreId(dbRole, o -> o.setCreateTime(buildTime(2022, 2, 16))));
-        // 准备参数
-        RoleExportReqVO reqVO = new RoleExportReqVO();
-        reqVO.setName("土豆");
-        reqVO.setCode("tu");
-        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setCreateTime(buildBetweenTime(2022, 2, 1, 2022, 2, 12));
-
-        // 调用
-        List<RoleDO> list = roleService.getRoleList(reqVO);
-        // 断言
-        assertEquals(1, list.size());
-        assertPojoEquals(dbRole, list.get(0));
     }
 
     @Test

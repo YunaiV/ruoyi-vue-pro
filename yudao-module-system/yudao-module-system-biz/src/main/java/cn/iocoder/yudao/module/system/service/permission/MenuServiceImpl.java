@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.module.system.service.permission;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuCreateReqVO;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuSaveVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuListReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuUpdateReqVO;
-import cn.iocoder.yudao.module.system.convert.permission.MenuConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.MenuMapper;
 import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
@@ -45,16 +44,16 @@ public class MenuServiceImpl implements MenuService {
     private TenantService tenantService;
 
     @Override
-    @CacheEvict(value = RedisKeyConstants.PERMISSION_MENU_ID_LIST, key = "#reqVO.permission",
-            condition = "#reqVO.permission != null")
-    public Long createMenu(MenuCreateReqVO reqVO) {
+    @CacheEvict(value = RedisKeyConstants.PERMISSION_MENU_ID_LIST, key = "#createReqVO.permission",
+            condition = "#createReqVO.permission != null")
+    public Long createMenu(MenuSaveVO createReqVO) {
         // 校验父菜单存在
-        validateParentMenu(reqVO.getParentId(), null);
+        validateParentMenu(createReqVO.getParentId(), null);
         // 校验菜单（自己）
-        validateMenu(reqVO.getParentId(), reqVO.getName(), null);
+        validateMenu(createReqVO.getParentId(), createReqVO.getName(), null);
 
         // 插入数据库
-        MenuDO menu = MenuConvert.INSTANCE.convert(reqVO);
+        MenuDO menu = BeanUtils.toBean(createReqVO, MenuDO.class);
         initMenuProperty(menu);
         menuMapper.insert(menu);
         // 返回
@@ -64,20 +63,20 @@ public class MenuServiceImpl implements MenuService {
     @Override
     @CacheEvict(value = RedisKeyConstants.PERMISSION_MENU_ID_LIST,
             allEntries = true) // allEntries 清空所有缓存，因为 permission 如果变更，涉及到新老两个 permission。直接清理，简单有效
-    public void updateMenu(MenuUpdateReqVO reqVO) {
+    public void updateMenu(MenuSaveVO updateReqVO) {
         // 校验更新的菜单是否存在
-        if (menuMapper.selectById(reqVO.getId()) == null) {
+        if (menuMapper.selectById(updateReqVO.getId()) == null) {
             throw exception(MENU_NOT_EXISTS);
         }
         // 校验父菜单存在
-        validateParentMenu(reqVO.getParentId(), reqVO.getId());
+        validateParentMenu(updateReqVO.getParentId(), updateReqVO.getId());
         // 校验菜单（自己）
-        validateMenu(reqVO.getParentId(), reqVO.getName(), reqVO.getId());
+        validateMenu(updateReqVO.getParentId(), updateReqVO.getName(), updateReqVO.getId());
 
         // 更新到数据库
-        MenuDO updateObject = MenuConvert.INSTANCE.convert(reqVO);
-        initMenuProperty(updateObject);
-        menuMapper.updateById(updateObject);
+        MenuDO updateObj = BeanUtils.toBean(updateReqVO, MenuDO.class);
+        initMenuProperty(updateObj);
+        menuMapper.updateById(updateObj);
     }
 
     @Override

@@ -7,12 +7,12 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-/**
- * 角色 Base VO，提供给添加、修改、详细的子 VO 使用
- * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
- */
+@Schema(description = "管理后台 - 角色创建 Request VO")
 @Data
-public class RoleBaseVO {
+public class RoleSaveReqVO {
+
+    @Schema(description = "角色编号", example = "1")
+    private Long id;
 
     @Schema(description = "角色名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "管理员")
     @NotBlank(message = "角色名称不能为空")

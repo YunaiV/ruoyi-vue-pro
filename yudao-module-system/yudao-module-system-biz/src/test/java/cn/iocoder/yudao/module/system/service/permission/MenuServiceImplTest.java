@@ -2,9 +2,8 @@ package cn.iocoder.yudao.module.system.service.permission;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuListReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuSaveVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.MenuMapper;
 import cn.iocoder.yudao.module.system.enums.permission.MenuTypeEnum;
@@ -14,7 +13,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
@@ -51,16 +51,16 @@ public class MenuServiceImplTest extends BaseDbUnitTest {
         menuMapper.insert(menuDO);
         Long parentId = menuDO.getId();
         // 准备参数
-        MenuCreateReqVO reqVO = randomPojo(MenuCreateReqVO.class, o -> {
+        MenuSaveVO reqVO = randomPojo(MenuSaveVO.class, o -> {
             o.setParentId(parentId);
             o.setName("testSonName");
             o.setType(MenuTypeEnum.MENU.getType());
-        });
+        }).setId(null); // 防止 id 被赋值
         Long menuId = menuService.createMenu(reqVO);
 
         // 校验记录的属性是否正确
         MenuDO dbMenu = menuMapper.selectById(menuId);
-        assertPojoEquals(reqVO, dbMenu);
+        assertPojoEquals(reqVO, dbMenu, "id");
     }
 
     @Test
@@ -69,7 +69,7 @@ public class MenuServiceImplTest extends BaseDbUnitTest {
         MenuDO sonMenuDO = createParentAndSonMenu();
         Long sonId = sonMenuDO.getId();
         // 准备参数
-        MenuUpdateReqVO reqVO = randomPojo(MenuUpdateReqVO.class, o -> {
+        MenuSaveVO reqVO = randomPojo(MenuSaveVO.class, o -> {
             o.setId(sonId);
             o.setName("testSonName"); // 修改名字
             o.setParentId(sonMenuDO.getParentId());
@@ -86,7 +86,7 @@ public class MenuServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateMenu_sonIdNotExist() {
         // 准备参数
-        MenuUpdateReqVO reqVO = randomPojo(MenuUpdateReqVO.class);
+        MenuSaveVO reqVO = randomPojo(MenuSaveVO.class);
         // 调用，并断言异常
         assertServiceException(() -> menuService.updateMenu(reqVO), MENU_NOT_EXISTS);
     }
