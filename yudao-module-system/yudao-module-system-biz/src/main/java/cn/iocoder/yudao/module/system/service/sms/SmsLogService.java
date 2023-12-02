@@ -1,13 +1,11 @@
 package cn.iocoder.yudao.module.system.service.sms;
 
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SmsLogExportReqVO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SmsLogPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsLogDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -66,13 +64,5 @@ public interface SmsLogService {
      * @return 短信日志分页
      */
     PageResult<SmsLogDO> getSmsLogPage(SmsLogPageReqVO pageReqVO);
-
-    /**
-     * 获得短信日志列表, 用于 Excel 导出
-     *
-     * @param exportReqVO 查询条件
-     * @return 短信日志列表
-     */
-    List<SmsLogDO> getSmsLogList(SmsLogExportReqVO exportReqVO);
 
 }

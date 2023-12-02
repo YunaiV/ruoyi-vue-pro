@@ -1,15 +1,16 @@
 package cn.iocoder.yudao.module.system.controller.admin.sms.vo.template;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 
-/**
-* 短信模板 Base VO，提供给添加、修改、详细的子 VO 使用
-* 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
-*/
+@Schema(description = "管理后台 - 短信模板创建/修改 Request VO")
 @Data
-public class SmsTemplateBaseVO {
+public class SmsTemplateSaveReqVO {
+
+    @Schema(description = "编号", example = "1024")
+    private Long id;
 
     @Schema(description = "短信类型，参见 SmsTemplateTypeEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "短信类型不能为空")

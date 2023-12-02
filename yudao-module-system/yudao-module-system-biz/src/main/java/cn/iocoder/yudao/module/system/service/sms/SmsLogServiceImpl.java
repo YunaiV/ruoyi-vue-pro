@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.system.service.sms;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SmsLogExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SmsLogPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsLogDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -76,11 +74,6 @@ public class SmsLogServiceImpl implements SmsLogService {
     @Override
     public PageResult<SmsLogDO> getSmsLogPage(SmsLogPageReqVO pageReqVO) {
         return smsLogMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public List<SmsLogDO> getSmsLogList(SmsLogExportReqVO exportReqVO) {
-        return smsLogMapper.selectList(exportReqVO);
     }
 
 }

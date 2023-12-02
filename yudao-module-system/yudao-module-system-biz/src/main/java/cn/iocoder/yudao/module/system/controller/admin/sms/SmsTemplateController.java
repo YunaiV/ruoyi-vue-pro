@@ -1,7 +1,8 @@
 package cn.iocoder.yudao.module.system.controller.admin.sms;
 
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.*;
-import cn.iocoder.yudao.module.system.convert.sms.SmsTemplateConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 import cn.iocoder.yudao.module.system.service.sms.SmsTemplateService;
 import cn.iocoder.yudao.module.system.service.sms.SmsSendService;
@@ -37,14 +38,14 @@ public class SmsTemplateController {
     @PostMapping("/create")
     @Operation(summary = "创建短信模板")
     @PreAuthorize("@ss.hasPermission('system:sms-template:create')")
-    public CommonResult<Long> createSmsTemplate(@Valid @RequestBody SmsTemplateCreateReqVO createReqVO) {
+    public CommonResult<Long> createSmsTemplate(@Valid @RequestBody SmsTemplateSaveReqVO createReqVO) {
         return success(smsTemplateService.createSmsTemplate(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新短信模板")
     @PreAuthorize("@ss.hasPermission('system:sms-template:update')")
-    public CommonResult<Boolean> updateSmsTemplate(@Valid @RequestBody SmsTemplateUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateSmsTemplate(@Valid @RequestBody SmsTemplateSaveReqVO updateReqVO) {
         smsTemplateService.updateSmsTemplate(updateReqVO);
         return success(true);
     }
@@ -63,8 +64,8 @@ public class SmsTemplateController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('system:sms-template:query')")
     public CommonResult<SmsTemplateRespVO> getSmsTemplate(@RequestParam("id") Long id) {
-        SmsTemplateDO smsTemplate = smsTemplateService.getSmsTemplate(id);
-        return success(SmsTemplateConvert.INSTANCE.convert(smsTemplate));
+        SmsTemplateDO template = smsTemplateService.getSmsTemplate(id);
+        return success(BeanUtils.toBean(template, SmsTemplateRespVO.class));
     }
 
     @GetMapping("/page")
@@ -72,19 +73,20 @@ public class SmsTemplateController {
     @PreAuthorize("@ss.hasPermission('system:sms-template:query')")
     public CommonResult<PageResult<SmsTemplateRespVO>> getSmsTemplatePage(@Valid SmsTemplatePageReqVO pageVO) {
         PageResult<SmsTemplateDO> pageResult = smsTemplateService.getSmsTemplatePage(pageVO);
-        return success(SmsTemplateConvert.INSTANCE.convertPage(pageResult));
+        return success(BeanUtils.toBean(pageResult, SmsTemplateRespVO.class));
     }
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出短信模板 Excel")
     @PreAuthorize("@ss.hasPermission('system:sms-template:export')")
     @OperateLog(type = EXPORT)
-    public void exportSmsTemplateExcel(@Valid SmsTemplateExportReqVO exportReqVO,
+    public void exportSmsTemplateExcel(@Valid SmsTemplatePageReqVO exportReqVO,
                                        HttpServletResponse response) throws IOException {
-        List<SmsTemplateDO> list = smsTemplateService.getSmsTemplateList(exportReqVO);
+        exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        List<SmsTemplateDO> list = smsTemplateService.getSmsTemplatePage(exportReqVO).getList();
         // 导出 Excel
-        List<SmsTemplateExcelVO> datas = SmsTemplateConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "短信模板.xls", "数据", SmsTemplateExcelVO.class, datas);
+        ExcelUtils.write(response, "短信模板.xls", "数据", SmsTemplateRespVO.class,
+                BeanUtils.toBean(list, SmsTemplateRespVO.class));
     }
 
     @PostMapping("/send-sms")

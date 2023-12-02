@@ -2,13 +2,12 @@ package cn.iocoder.yudao.module.system.service.sms;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.sms.core.client.SmsClient;
 import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
 import cn.iocoder.yudao.framework.sms.core.property.SmsChannelProperties;
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelUpdateReqVO;
-import cn.iocoder.yudao.module.system.convert.sms.SmsChannelConvert;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsChannelMapper;
 import com.google.common.cache.CacheLoader;
@@ -47,7 +46,7 @@ public class SmsChannelServiceImpl implements SmsChannelService {
                     // 查询，然后尝试刷新
                     SmsChannelDO channel = smsChannelMapper.selectById(id);
                     if (channel != null) {
-                        SmsChannelProperties properties = SmsChannelConvert.INSTANCE.convert02(channel);
+                        SmsChannelProperties properties = BeanUtils.toBean(channel, SmsChannelProperties.class);
                         smsClientFactory.createOrUpdateSmsClient(properties);
                     }
                     return smsClientFactory.getSmsClient(id);
@@ -67,7 +66,7 @@ public class SmsChannelServiceImpl implements SmsChannelService {
                     // 查询，然后尝试刷新
                     SmsChannelDO channel = smsChannelMapper.selectByCode(code);
                     if (channel != null) {
-                        SmsChannelProperties properties = SmsChannelConvert.INSTANCE.convert02(channel);
+                        SmsChannelProperties properties = BeanUtils.toBean(channel, SmsChannelProperties.class);
                         smsClientFactory.createOrUpdateSmsClient(properties);
                     }
                     return smsClientFactory.getSmsClient(code);
@@ -85,18 +84,18 @@ public class SmsChannelServiceImpl implements SmsChannelService {
     private SmsTemplateService smsTemplateService;
 
     @Override
-    public Long createSmsChannel(SmsChannelCreateReqVO createReqVO) {
-        SmsChannelDO channel = SmsChannelConvert.INSTANCE.convert(createReqVO);
+    public Long createSmsChannel(SmsChannelSaveReqVO createReqVO) {
+        SmsChannelDO channel = BeanUtils.toBean(createReqVO, SmsChannelDO.class);
         smsChannelMapper.insert(channel);
         return channel.getId();
     }
 
     @Override
-    public void updateSmsChannel(SmsChannelUpdateReqVO updateReqVO) {
+    public void updateSmsChannel(SmsChannelSaveReqVO updateReqVO) {
         // 校验存在
         SmsChannelDO channel = validateSmsChannelExists(updateReqVO.getId());
         // 更新
-        SmsChannelDO updateObj = SmsChannelConvert.INSTANCE.convert(updateReqVO);
+        SmsChannelDO updateObj = BeanUtils.toBean(updateReqVO, SmsChannelDO.class);
         smsChannelMapper.updateById(updateObj);
 
         // 清空缓存
@@ -108,7 +107,7 @@ public class SmsChannelServiceImpl implements SmsChannelService {
         // 校验存在
         SmsChannelDO channel = validateSmsChannelExists(id);
         // 校验是否有在使用该账号的模版
-        if (smsTemplateService.countByChannelId(id) > 0) {
+        if (smsTemplateService.getSmsTemplateCountByChannelId(id) > 0) {
             throw exception(SMS_CHANNEL_HAS_CHILDREN);
         }
         // 删除

@@ -85,7 +85,7 @@ public class RoleController {
         return success(BeanUtils.toBean(pageResult, RoleRespVO.class));
     }
 
-    @GetMapping("/list-all-simple")
+    @GetMapping({"/list-all-simple", "/simple-list"})
     @Operation(summary = "获取角色精简信息列表", description = "只包含被开启的角色，主要用于前端的下拉选项")
     public CommonResult<List<RoleSimpleRespVO>> getSimpleRoleList() {
         List<RoleDO> list = roleService.getRoleListByStatus(singleton(CommonStatusEnum.ENABLE.getStatus()));
