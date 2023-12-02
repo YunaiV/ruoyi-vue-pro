@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.module.system.controller.admin.errorcode;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.system.convert.errorcode.ErrorCodeConvert;
 import cn.iocoder.yudao.module.system.controller.admin.errorcode.vo.*;
 import cn.iocoder.yudao.module.system.dal.dataobject.errorcode.ErrorCodeDO;
 import cn.iocoder.yudao.module.system.service.errorcode.ErrorCodeService;
@@ -36,14 +37,14 @@ public class ErrorCodeController {
     @PostMapping("/create")
     @Operation(summary = "创建错误码")
     @PreAuthorize("@ss.hasPermission('system:error-code:create')")
-    public CommonResult<Long> createErrorCode(@Valid @RequestBody ErrorCodeCreateReqVO createReqVO) {
+    public CommonResult<Long> createErrorCode(@Valid @RequestBody ErrorCodeSaveReqVO createReqVO) {
         return success(errorCodeService.createErrorCode(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新错误码")
     @PreAuthorize("@ss.hasPermission('system:error-code:update')")
-    public CommonResult<Boolean> updateErrorCode(@Valid @RequestBody ErrorCodeUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateErrorCode(@Valid @RequestBody ErrorCodeSaveReqVO updateReqVO) {
         errorCodeService.updateErrorCode(updateReqVO);
         return success(true);
     }
@@ -63,7 +64,7 @@ public class ErrorCodeController {
     @PreAuthorize("@ss.hasPermission('system:error-code:query')")
     public CommonResult<ErrorCodeRespVO> getErrorCode(@RequestParam("id") Long id) {
         ErrorCodeDO errorCode = errorCodeService.getErrorCode(id);
-        return success(ErrorCodeConvert.INSTANCE.convert(errorCode));
+        return success(BeanUtils.toBean(errorCode, ErrorCodeRespVO.class));
     }
 
     @GetMapping("/page")
@@ -71,19 +72,20 @@ public class ErrorCodeController {
     @PreAuthorize("@ss.hasPermission('system:error-code:query')")
     public CommonResult<PageResult<ErrorCodeRespVO>> getErrorCodePage(@Valid ErrorCodePageReqVO pageVO) {
         PageResult<ErrorCodeDO> pageResult = errorCodeService.getErrorCodePage(pageVO);
-        return success(ErrorCodeConvert.INSTANCE.convertPage(pageResult));
+        return success(BeanUtils.toBean(pageResult, ErrorCodeRespVO.class));
     }
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出错误码 Excel")
     @PreAuthorize("@ss.hasPermission('system:error-code:export')")
     @OperateLog(type = EXPORT)
-    public void exportErrorCodeExcel(@Valid ErrorCodeExportReqVO exportReqVO,
+    public void exportErrorCodeExcel(@Valid ErrorCodePageReqVO exportReqVO,
               HttpServletResponse response) throws IOException {
-        List<ErrorCodeDO> list = errorCodeService.getErrorCodeList(exportReqVO);
+        exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        List<ErrorCodeDO> list = errorCodeService.getErrorCodePage(exportReqVO).getList();
         // 导出 Excel
-        List<ErrorCodeExcelVO> datas = ErrorCodeConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "错误码.xls", "数据", ErrorCodeExcelVO.class, datas);
+        ExcelUtils.write(response, "错误码.xls", "数据", ErrorCodeRespVO.class,
+                BeanUtils.toBean(list, ErrorCodeRespVO.class));
     }
 
 }
