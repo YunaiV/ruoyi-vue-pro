@@ -2,11 +2,10 @@ package cn.iocoder.yudao.module.system.controller.admin.socail;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientCreateReqVO;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientRespVO;
-import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientUpdateReqVO;
-import cn.iocoder.yudao.module.system.convert.social.SocialClientConvert;
+import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
 import cn.iocoder.yudao.module.system.service.social.SocialClientService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,14 +32,14 @@ public class SocialClientController {
     @PostMapping("/create")
     @Operation(summary = "创建社交客户端")
     @PreAuthorize("@ss.hasPermission('system:social-client:create')")
-    public CommonResult<Long> createSocialClient(@Valid @RequestBody SocialClientCreateReqVO createReqVO) {
+    public CommonResult<Long> createSocialClient(@Valid @RequestBody SocialClientSaveReqVO createReqVO) {
         return success(socialClientService.createSocialClient(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新社交客户端")
     @PreAuthorize("@ss.hasPermission('system:social-client:update')")
-    public CommonResult<Boolean> updateSocialClient(@Valid @RequestBody SocialClientUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateSocialClient(@Valid @RequestBody SocialClientSaveReqVO updateReqVO) {
         socialClientService.updateSocialClient(updateReqVO);
         return success(true);
     }
@@ -59,8 +58,8 @@ public class SocialClientController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('system:social-client:query')")
     public CommonResult<SocialClientRespVO> getSocialClient(@RequestParam("id") Long id) {
-        SocialClientDO socialClient = socialClientService.getSocialClient(id);
-        return success(SocialClientConvert.INSTANCE.convert(socialClient));
+        SocialClientDO client = socialClientService.getSocialClient(id);
+        return success(BeanUtils.toBean(client, SocialClientRespVO.class));
     }
 
     @GetMapping("/page")
@@ -68,7 +67,7 @@ public class SocialClientController {
     @PreAuthorize("@ss.hasPermission('system:social-client:query')")
     public CommonResult<PageResult<SocialClientRespVO>> getSocialClientPage(@Valid SocialClientPageReqVO pageVO) {
         PageResult<SocialClientDO> pageResult = socialClientService.getSocialClientPage(pageVO);
-        return success(SocialClientConvert.INSTANCE.convertPage(pageResult));
+        return success(BeanUtils.toBean(pageResult, SocialClientRespVO.class));
     }
 
 }

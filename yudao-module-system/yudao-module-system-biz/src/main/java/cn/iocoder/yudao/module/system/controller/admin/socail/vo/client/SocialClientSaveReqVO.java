@@ -13,12 +13,12 @@ import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
-/**
- * 社交客户端 Base VO，提供给添加、修改、详细的子 VO 使用
- * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
- */
+@Schema(description = "管理后台 - 社交客户端创建/修改 Request VO")
 @Data
-public class SocialClientBaseVO {
+public class SocialClientSaveReqVO {
+
+    @Schema(description = "编号", example = "27162")
+    private Long id;
 
     @Schema(description = "应用名", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudao商城")
     @NotNull(message = "应用名不能为空")
@@ -38,7 +38,7 @@ public class SocialClientBaseVO {
     @NotNull(message = "客户端编号不能为空")
     private String clientId;
 
-    @Schema(description = "客户端密钥", requiredMode = Schema.RequiredMode.REQUIRED, example = "1wTb7hYxnpT2TUbIeHGXGo7T0odav1ic10mLdyyATOw")
+    @Schema(description = "客户端密钥", requiredMode = Schema.RequiredMode.REQUIRED, example = "peter")
     @NotNull(message = "客户端密钥不能为空")
     private String clientSecret;
 
@@ -50,16 +50,12 @@ public class SocialClientBaseVO {
     @InEnum(CommonStatusEnum.class)
     private Integer status;
 
-    @SuppressWarnings("RedundantIfStatement")
     @AssertTrue(message = "agentId 不能为空")
     @JsonIgnore
     public boolean isAgentIdValid() {
         // 如果是企业微信，必须填写 agentId 属性
-        if (Objects.equals(socialType, SocialTypeEnum.WECHAT_ENTERPRISE.getType())
-                && StrUtil.isEmpty(agentId)) {
-            return false;
-        }
-        return true;
+        return !Objects.equals(socialType, SocialTypeEnum.WECHAT_ENTERPRISE.getType())
+                || !StrUtil.isEmpty(agentId);
     }
 
 }

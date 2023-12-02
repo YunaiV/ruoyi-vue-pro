@@ -2,9 +2,8 @@ package cn.iocoder.yudao.module.system.service.social;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
 import cn.iocoder.yudao.module.system.dal.mysql.social.SocialClientMapper;
 import org.junit.jupiter.api.Disabled;
@@ -40,7 +39,8 @@ public class SocialClientServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateSocialClient_success() {
         // 准备参数
-        SocialClientCreateReqVO reqVO = randomPojo(SocialClientCreateReqVO.class);
+        SocialClientSaveReqVO reqVO = randomPojo(SocialClientSaveReqVO.class)
+                .setId(null); // 防止 id 被赋值
 
         // 调用
         Long socialClientId = socialClientService.createSocialClient(reqVO);
@@ -48,7 +48,7 @@ public class SocialClientServiceImplTest extends BaseDbUnitTest {
         assertNotNull(socialClientId);
         // 校验记录的属性是否正确
         SocialClientDO socialClient = socialClientMapper.selectById(socialClientId);
-        assertPojoEquals(reqVO, socialClient);
+        assertPojoEquals(reqVO, socialClient, "id");
     }
 
     @Test
@@ -57,7 +57,7 @@ public class SocialClientServiceImplTest extends BaseDbUnitTest {
         SocialClientDO dbSocialClient = randomPojo(SocialClientDO.class);
         socialClientMapper.insert(dbSocialClient);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        SocialClientUpdateReqVO reqVO = randomPojo(SocialClientUpdateReqVO.class, o -> {
+        SocialClientSaveReqVO reqVO = randomPojo(SocialClientSaveReqVO.class, o -> {
             o.setId(dbSocialClient.getId()); // 设置更新的 ID
         });
 
@@ -71,7 +71,7 @@ public class SocialClientServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateSocialClient_notExists() {
         // 准备参数
-        SocialClientUpdateReqVO reqVO = randomPojo(SocialClientUpdateReqVO.class);
+        SocialClientSaveReqVO reqVO = randomPojo(SocialClientSaveReqVO.class);
 
         // 调用, 并断言异常
         assertServiceException(() -> socialClientService.updateSocialClient(reqVO), SOCIAL_CLIENT_NOT_EXISTS);

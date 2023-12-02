@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.controller.admin.socail.vo;
+package cn.iocoder.yudao.module.system.controller.admin.socail.vo.user;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
