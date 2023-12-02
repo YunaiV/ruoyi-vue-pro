@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.client;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import lombok.*;
 import org.hibernate.validator.constraints.URL;
 
 import javax.validation.constraints.AssertTrue;
@@ -11,12 +11,12 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-/**
-* OAuth2 客户端 Base VO，提供给添加、修改、详细的子 VO 使用
-* 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
-*/
+@Schema(description = "管理后台 - OAuth2 客户端创建/修改 Request VO")
 @Data
-public class OAuth2ClientBaseVO {
+public class OAuth2ClientSaveReqVO {
+
+    @Schema(description = "编号", example = "1024")
+    private Long id;
 
     @Schema(description = "客户端编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "tudou")
     @NotNull(message = "客户端编号不能为空")
@@ -52,8 +52,7 @@ public class OAuth2ClientBaseVO {
 
     @Schema(description = "可重定向的 URI 地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn")
     @NotNull(message = "可重定向的 URI 地址不能为空")
-    private List<@NotEmpty(message = "重定向的 URI 不能为空")
-        @URL(message = "重定向的 URI 格式不正确") String> redirectUris;
+    private List<@NotEmpty(message = "重定向的 URI 不能为空") @URL(message = "重定向的 URI 格式不正确") String> redirectUris;
 
     @Schema(description = "授权类型，参见 OAuth2GrantTypeEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "password")
     @NotNull(message = "授权类型不能为空")
