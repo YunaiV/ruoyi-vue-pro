@@ -1,21 +1,22 @@
 package cn.iocoder.yudao.module.system.controller.admin.user.vo.user;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.util.Set;
 
-/**
- * 用户 Base VO，提供给添加、修改、详细的子 VO 使用
- * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
- */
+@Schema(description = "管理后台 - 用户创建/修改 Request VO")
 @Data
-public class UserBaseVO {
+public class UserSaveReqVO {
+
+    @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    @NotNull(message = "用户编号不能为空")
+    private Long id;
 
     @Schema(description = "用户账号", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudao")
     @NotBlank(message = "用户账号不能为空")
@@ -50,5 +51,18 @@ public class UserBaseVO {
 
     @Schema(description = "用户头像", example = "https://www.iocoder.cn/xxx.png")
     private String avatar;
+
+    // ========== 仅【创建】时，需要传递的字段 ==========
+
+    @Schema(description = "密码", requiredMode = Schema.RequiredMode.REQUIRED, example = "123456")
+    @Length(min = 4, max = 16, message = "密码长度为 4-16 位")
+    private String password;
+
+    @AssertTrue(message = "密码不能为空")
+    @JsonIgnore
+    public boolean isPasswordValid() {
+        return id != null // 修改时，不需要传递
+                || (ObjectUtil.isAllNotEmpty(password)); // 新增时，必须都传递 password
+    }
 
 }

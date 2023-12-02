@@ -17,4 +17,9 @@ public class UserSimpleRespVO {
     @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
     private String nickname;
 
+    @Schema(description = "部门ID", example = "我是一个用户")
+    private Long deptId;
+    @Schema(description = "部门名称", example = "IT 部")
+    private String deptName;
+
 }
