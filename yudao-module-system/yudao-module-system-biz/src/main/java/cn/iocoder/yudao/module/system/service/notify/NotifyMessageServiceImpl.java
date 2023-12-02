@@ -14,8 +14,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-
 /**
  * 站内信 Service 实现类
  *

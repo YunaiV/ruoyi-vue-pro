@@ -25,4 +25,5 @@ public class NotifyTemplateSendReqVO {
 
     @Schema(description = "模板参数")
     private Map<String, Object> templateParams;
+
 }
