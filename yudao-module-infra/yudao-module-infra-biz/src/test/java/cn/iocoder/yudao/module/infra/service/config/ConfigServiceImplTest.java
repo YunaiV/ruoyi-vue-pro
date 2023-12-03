@@ -4,10 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.test.core.util.RandomUtils;
-import cn.iocoder.yudao.module.infra.controller.admin.config.vo.ConfigCreateReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.config.vo.ConfigExportReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.config.vo.ConfigPageReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.config.vo.ConfigUpdateReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.config.vo.ConfigSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.config.ConfigMapper;
 import cn.iocoder.yudao.module.infra.enums.config.ConfigTypeEnum;
@@ -15,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.List;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
@@ -40,7 +37,8 @@ public class ConfigServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateConfig_success() {
         // 准备参数
-        ConfigCreateReqVO reqVO = randomPojo(ConfigCreateReqVO.class);
+        ConfigSaveReqVO reqVO = randomPojo(ConfigSaveReqVO.class)
+                .setId(null); // 防止 id 被赋值，导致唯一性校验失败
 
         // 调用
         Long configId = configService.createConfig(reqVO);
@@ -48,7 +46,7 @@ public class ConfigServiceImplTest extends BaseDbUnitTest {
         assertNotNull(configId);
         // 校验记录的属性是否正确
         ConfigDO config = configMapper.selectById(configId);
-        assertPojoEquals(reqVO, config);
+        assertPojoEquals(reqVO, config, "id");
         assertEquals(ConfigTypeEnum.CUSTOM.getType(), config.getType());
     }
 
@@ -58,7 +56,7 @@ public class ConfigServiceImplTest extends BaseDbUnitTest {
         ConfigDO dbConfig = randomConfigDO();
         configMapper.insert(dbConfig);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        ConfigUpdateReqVO reqVO = randomPojo(ConfigUpdateReqVO.class, o -> {
+        ConfigSaveReqVO reqVO = randomPojo(ConfigSaveReqVO.class, o -> {
             o.setId(dbConfig.getId()); // 设置更新的 ID
         });
 
@@ -176,38 +174,6 @@ public class ConfigServiceImplTest extends BaseDbUnitTest {
         assertEquals(1, pageResult.getTotal());
         assertEquals(1, pageResult.getList().size());
         assertPojoEquals(dbConfig, pageResult.getList().get(0));
-    }
-
-    @Test
-    public void testGetConfigList() {
-        // mock 数据
-        ConfigDO dbConfig = randomConfigDO(o -> { // 等会查询到
-            o.setName("芋艿");
-            o.setConfigKey("yunai");
-            o.setType(ConfigTypeEnum.SYSTEM.getType());
-            o.setCreateTime(buildTime(2021, 2, 1));
-        });
-        configMapper.insert(dbConfig);
-        // 测试 name 不匹配
-        configMapper.insert(cloneIgnoreId(dbConfig, o -> o.setName("土豆")));
-        // 测试 key 不匹配
-        configMapper.insert(cloneIgnoreId(dbConfig, o -> o.setConfigKey("tudou")));
-        // 测试 type 不匹配
-        configMapper.insert(cloneIgnoreId(dbConfig, o -> o.setType(ConfigTypeEnum.CUSTOM.getType())));
-        // 测试 createTime 不匹配
-        configMapper.insert(cloneIgnoreId(dbConfig, o -> o.setCreateTime(buildTime(2021, 1, 1))));
-        // 准备参数
-        ConfigExportReqVO reqVO = new ConfigExportReqVO();
-        reqVO.setName("艿");
-        reqVO.setKey("nai");
-        reqVO.setType(ConfigTypeEnum.SYSTEM.getType());
-        reqVO.setCreateTime(buildBetweenTime(2021, 1, 15, 2021, 2, 15));
-
-        // 调用
-        List<ConfigDO> list = configService.getConfigList(reqVO);
-        // 断言
-        assertEquals(1, list.size());
-        assertPojoEquals(dbConfig, list.get(0));
     }
 
     @Test
