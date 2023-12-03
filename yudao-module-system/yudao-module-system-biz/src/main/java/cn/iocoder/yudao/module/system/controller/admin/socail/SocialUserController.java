@@ -3,8 +3,9 @@ package cn.iocoder.yudao.module.system.controller.admin.socail;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.socail.vo.SocialUserBindReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.socail.vo.SocialUserUnbindReqVO;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUserBindReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUserUnbindReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUserPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUserRespVO;
 import cn.iocoder.yudao.module.system.convert.social.SocialUserConvert;
@@ -35,7 +36,8 @@ public class SocialUserController {
     @PostMapping("/bind")
     @Operation(summary = "社交绑定，使用 code 授权码")
     public CommonResult<Boolean> socialBind(@RequestBody @Valid SocialUserBindReqVO reqVO) {
-        socialUserService.bindSocialUser(SocialUserConvert.INSTANCE.convert(getLoginUserId(), UserTypeEnum.ADMIN.getValue(), reqVO));
+        socialUserService.bindSocialUser(SocialUserConvert.INSTANCE.convert(
+                getLoginUserId(), UserTypeEnum.ADMIN.getValue(), reqVO));
         return CommonResult.success(true);
     }
 
@@ -54,7 +56,7 @@ public class SocialUserController {
     @PreAuthorize("@ss.hasPermission('system:social-user:query')")
     public CommonResult<SocialUserRespVO> getSocialUser(@RequestParam("id") Long id) {
         SocialUserDO socialUser = socialUserService.getSocialUser(id);
-        return success(SocialUserConvert.INSTANCE.convert(socialUser));
+        return success(BeanUtils.toBean(socialUser, SocialUserRespVO.class));
     }
 
     @GetMapping("/page")
@@ -62,7 +64,7 @@ public class SocialUserController {
     @PreAuthorize("@ss.hasPermission('system:social-user:query')")
     public CommonResult<PageResult<SocialUserRespVO>> getSocialUserPage(@Valid SocialUserPageReqVO pageVO) {
         PageResult<SocialUserDO> pageResult = socialUserService.getSocialUserPage(pageVO);
-        return success(SocialUserConvert.INSTANCE.convertPage(pageResult));
+        return success(BeanUtils.toBean(pageResult, SocialUserRespVO.class));
     }
 
 }

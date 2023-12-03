@@ -3,9 +3,8 @@ package cn.iocoder.yudao.module.system.service.notify;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplatePageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.notify.NotifyTemplateMapper;
 import org.junit.jupiter.api.Test;
@@ -41,8 +40,9 @@ public class NotifyTemplateServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateNotifyTemplate_success() {
         // 准备参数
-        NotifyTemplateCreateReqVO reqVO = randomPojo(NotifyTemplateCreateReqVO.class,
-                o -> o.setStatus(randomCommonStatus()));
+        NotifyTemplateSaveReqVO reqVO = randomPojo(NotifyTemplateSaveReqVO.class,
+                o -> o.setStatus(randomCommonStatus()))
+                .setId(null); // 防止 id 被赋值
 
         // 调用
         Long notifyTemplateId = notifyTemplateService.createNotifyTemplate(reqVO);
@@ -50,7 +50,7 @@ public class NotifyTemplateServiceImplTest extends BaseDbUnitTest {
         assertNotNull(notifyTemplateId);
         // 校验记录的属性是否正确
         NotifyTemplateDO notifyTemplate = notifyTemplateMapper.selectById(notifyTemplateId);
-        assertPojoEquals(reqVO, notifyTemplate);
+        assertPojoEquals(reqVO, notifyTemplate, "id");
     }
 
     @Test
@@ -59,7 +59,7 @@ public class NotifyTemplateServiceImplTest extends BaseDbUnitTest {
         NotifyTemplateDO dbNotifyTemplate = randomPojo(NotifyTemplateDO.class);
         notifyTemplateMapper.insert(dbNotifyTemplate);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        NotifyTemplateUpdateReqVO reqVO = randomPojo(NotifyTemplateUpdateReqVO.class, o -> {
+        NotifyTemplateSaveReqVO reqVO = randomPojo(NotifyTemplateSaveReqVO.class, o -> {
             o.setId(dbNotifyTemplate.getId()); // 设置更新的 ID
             o.setStatus(randomCommonStatus());
         });
@@ -74,7 +74,7 @@ public class NotifyTemplateServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateNotifyTemplate_notExists() {
         // 准备参数
-        NotifyTemplateUpdateReqVO reqVO = randomPojo(NotifyTemplateUpdateReqVO.class);
+        NotifyTemplateSaveReqVO reqVO = randomPojo(NotifyTemplateSaveReqVO.class);
 
         // 调用, 并断言异常
         assertServiceException(() -> notifyTemplateService.updateNotifyTemplate(reqVO), NOTIFY_TEMPLATE_NOT_EXISTS);

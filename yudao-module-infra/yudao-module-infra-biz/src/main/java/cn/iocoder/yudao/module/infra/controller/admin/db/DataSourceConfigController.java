@@ -1,15 +1,14 @@
 package cn.iocoder.yudao.module.infra.controller.admin.db;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigCreateReqVO;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigRespVO;
-import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigUpdateReqVO;
-import cn.iocoder.yudao.module.infra.convert.db.DataSourceConfigConvert;
+import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.db.DataSourceConfigDO;
 import cn.iocoder.yudao.module.infra.service.db.DataSourceConfigService;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -32,14 +31,14 @@ public class DataSourceConfigController {
     @PostMapping("/create")
     @Operation(summary = "创建数据源配置")
     @PreAuthorize("@ss.hasPermission('infra:data-source-config:create')")
-    public CommonResult<Long> createDataSourceConfig(@Valid @RequestBody DataSourceConfigCreateReqVO createReqVO) {
+    public CommonResult<Long> createDataSourceConfig(@Valid @RequestBody DataSourceConfigSaveReqVO createReqVO) {
         return success(dataSourceConfigService.createDataSourceConfig(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新数据源配置")
     @PreAuthorize("@ss.hasPermission('infra:data-source-config:update')")
-    public CommonResult<Boolean> updateDataSourceConfig(@Valid @RequestBody DataSourceConfigUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateDataSourceConfig(@Valid @RequestBody DataSourceConfigSaveReqVO updateReqVO) {
         dataSourceConfigService.updateDataSourceConfig(updateReqVO);
         return success(true);
     }
@@ -58,8 +57,8 @@ public class DataSourceConfigController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('infra:data-source-config:query')")
     public CommonResult<DataSourceConfigRespVO> getDataSourceConfig(@RequestParam("id") Long id) {
-        DataSourceConfigDO dataSourceConfig = dataSourceConfigService.getDataSourceConfig(id);
-        return success(DataSourceConfigConvert.INSTANCE.convert(dataSourceConfig));
+        DataSourceConfigDO config = dataSourceConfigService.getDataSourceConfig(id);
+        return success(BeanUtils.toBean(config, DataSourceConfigRespVO.class));
     }
 
     @GetMapping("/list")
@@ -67,7 +66,7 @@ public class DataSourceConfigController {
     @PreAuthorize("@ss.hasPermission('infra:data-source-config:query')")
     public CommonResult<List<DataSourceConfigRespVO>> getDataSourceConfigList() {
         List<DataSourceConfigDO> list = dataSourceConfigService.getDataSourceConfigList();
-        return success(DataSourceConfigConvert.INSTANCE.convertList(list));
+        return success(BeanUtils.toBean(list, DataSourceConfigRespVO.class));
     }
 
 }

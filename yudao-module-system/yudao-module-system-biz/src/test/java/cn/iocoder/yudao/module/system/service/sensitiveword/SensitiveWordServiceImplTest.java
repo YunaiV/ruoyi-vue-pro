@@ -4,10 +4,8 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.SensitiveWordCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.SensitiveWordExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.SensitiveWordPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.SensitiveWordUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.SensitiveWordSaveVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sensitiveword.SensitiveWordDO;
 import cn.iocoder.yudao.module.system.dal.mysql.sensitiveword.SensitiveWordMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -83,7 +81,8 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateSensitiveWord_success() {
         // 准备参数
-        SensitiveWordCreateReqVO reqVO = randomPojo(SensitiveWordCreateReqVO.class);
+        SensitiveWordSaveVO reqVO = randomPojo(SensitiveWordSaveVO.class)
+                .setId(null); // 防止 id 被赋值
 
         // 调用
         Long sensitiveWordId = sensitiveWordService.createSensitiveWord(reqVO);
@@ -91,7 +90,7 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         assertNotNull(sensitiveWordId);
         // 校验记录的属性是否正确
         SensitiveWordDO sensitiveWord = sensitiveWordMapper.selectById(sensitiveWordId);
-        assertPojoEquals(reqVO, sensitiveWord);
+        assertPojoEquals(reqVO, sensitiveWord, "id");
     }
 
     @Test
@@ -100,7 +99,7 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         SensitiveWordDO dbSensitiveWord = randomPojo(SensitiveWordDO.class);
         sensitiveWordMapper.insert(dbSensitiveWord);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        SensitiveWordUpdateReqVO reqVO = randomPojo(SensitiveWordUpdateReqVO.class, o -> {
+        SensitiveWordSaveVO reqVO = randomPojo(SensitiveWordSaveVO.class, o -> {
             o.setId(dbSensitiveWord.getId()); // 设置更新的 ID
         });
 
@@ -114,7 +113,7 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateSensitiveWord_notExists() {
         // 准备参数
-        SensitiveWordUpdateReqVO reqVO = randomPojo(SensitiveWordUpdateReqVO.class);
+        SensitiveWordSaveVO reqVO = randomPojo(SensitiveWordSaveVO.class);
 
         // 调用, 并断言异常
         assertServiceException(() -> sensitiveWordService.updateSensitiveWord(reqVO), SENSITIVE_WORD_NOT_EXISTS);
@@ -202,36 +201,6 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         assertEquals(1, pageResult.getTotal());
         assertEquals(1, pageResult.getList().size());
         assertPojoEquals(dbSensitiveWord, pageResult.getList().get(0));
-    }
-
-    @Test
-    public void testGetSensitiveWordList_export() {
-        // mock 数据
-        SensitiveWordDO dbSensitiveWord = randomPojo(SensitiveWordDO.class, o -> { // 等会查询到
-            o.setName("笨蛋");
-            o.setTags(Arrays.asList("论坛", "蔬菜"));
-            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-            o.setCreateTime(buildTime(2022, 2, 8));
-        });
-        sensitiveWordMapper.insert(dbSensitiveWord);
-        // 测试 name 不匹配
-        sensitiveWordMapper.insert(cloneIgnoreId(dbSensitiveWord, o -> o.setName("傻瓜")));
-        // 测试 tags 不匹配
-        sensitiveWordMapper.insert(cloneIgnoreId(dbSensitiveWord, o -> o.setTags(Arrays.asList("短信", "日用品"))));
-        // 测试 createTime 不匹配
-        sensitiveWordMapper.insert(cloneIgnoreId(dbSensitiveWord, o -> o.setCreateTime(buildTime(2022, 2, 16))));
-        // 准备参数
-        SensitiveWordExportReqVO reqVO = new SensitiveWordExportReqVO();
-        reqVO.setName("笨");
-        reqVO.setTag("论坛");
-        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setCreateTime(buildBetweenTime(2022, 2, 1, 2022, 2, 12));
-
-        // 调用
-        List<SensitiveWordDO> list = sensitiveWordService.getSensitiveWordList(reqVO);
-        // 断言
-        assertEquals(1, list.size());
-        assertPojoEquals(dbSensitiveWord, list.get(0));
     }
 
     @Test

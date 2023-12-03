@@ -3,10 +3,9 @@ package cn.iocoder.yudao.module.system.service.notify;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateCreateReqVO;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplatePageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateUpdateReqVO;
-import cn.iocoder.yudao.module.system.convert.notify.NotifyTemplateConvert;
+import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.notify.NotifyTemplateMapper;
 import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
@@ -45,12 +44,12 @@ public class NotifyTemplateServiceImpl implements NotifyTemplateService {
     private NotifyTemplateMapper notifyTemplateMapper;
 
     @Override
-    public Long createNotifyTemplate(NotifyTemplateCreateReqVO createReqVO) {
+    public Long createNotifyTemplate(NotifyTemplateSaveReqVO createReqVO) {
         // 校验站内信编码是否重复
         validateNotifyTemplateCodeDuplicate(null, createReqVO.getCode());
 
         // 插入
-        NotifyTemplateDO notifyTemplate = NotifyTemplateConvert.INSTANCE.convert(createReqVO);
+        NotifyTemplateDO notifyTemplate = BeanUtils.toBean(createReqVO, NotifyTemplateDO.class);
         notifyTemplate.setParams(parseTemplateContentParams(notifyTemplate.getContent()));
         notifyTemplateMapper.insert(notifyTemplate);
         return notifyTemplate.getId();
@@ -59,14 +58,14 @@ public class NotifyTemplateServiceImpl implements NotifyTemplateService {
     @Override
     @CacheEvict(cacheNames = RedisKeyConstants.NOTIFY_TEMPLATE,
             allEntries = true) // allEntries 清空所有缓存，因为可能修改到 code 字段，不好清理
-    public void updateNotifyTemplate(NotifyTemplateUpdateReqVO updateReqVO) {
+    public void updateNotifyTemplate(NotifyTemplateSaveReqVO updateReqVO) {
         // 校验存在
         validateNotifyTemplateExists(updateReqVO.getId());
         // 校验站内信编码是否重复
         validateNotifyTemplateCodeDuplicate(updateReqVO.getId(), updateReqVO.getCode());
 
         // 更新
-        NotifyTemplateDO updateObj = NotifyTemplateConvert.INSTANCE.convert(updateReqVO);
+        NotifyTemplateDO updateObj = BeanUtils.toBean(updateReqVO, NotifyTemplateDO.class);
         updateObj.setParams(parseTemplateContentParams(updateObj.getContent()));
         notifyTemplateMapper.updateById(updateObj);
     }
@@ -135,4 +134,5 @@ public class NotifyTemplateServiceImpl implements NotifyTemplateService {
     public String formatNotifyTemplateContent(String content, Map<String, Object> params) {
         return StrUtil.format(content, params);
     }
+
 }

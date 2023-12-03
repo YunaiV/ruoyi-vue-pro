@@ -1,10 +1,8 @@
 package cn.iocoder.yudao.module.system.service.dict;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
 
 import java.util.Collection;
@@ -20,17 +18,17 @@ public interface DictDataService {
     /**
      * 创建字典数据
      *
-     * @param reqVO 字典数据信息
+     * @param createReqVO 字典数据信息
      * @return 字典数据编号
      */
-    Long createDictData(DictDataCreateReqVO reqVO);
+    Long createDictData(DictDataSaveReqVO createReqVO);
 
     /**
      * 更新字典数据
      *
-     * @param reqVO 字典数据信息
+     * @param updateReqVO 字典数据信息
      */
-    void updateDictData(DictDataUpdateReqVO reqVO);
+    void updateDictData(DictDataSaveReqVO updateReqVO);
 
     /**
      * 删除字典数据
@@ -49,18 +47,10 @@ public interface DictDataService {
     /**
      * 获得字典数据分页列表
      *
-     * @param reqVO 分页请求
+     * @param pageReqVO 分页请求
      * @return 字典数据分页列表
      */
-    PageResult<DictDataDO> getDictDataPage(DictDataPageReqVO reqVO);
-
-    /**
-     * 获得字典数据列表
-     *
-     * @param reqVO 列表请求
-     * @return 字典数据列表
-     */
-    List<DictDataDO> getDictDataList(DictDataExportReqVO reqVO);
+    PageResult<DictDataDO> getDictDataPage(DictDataPageReqVO pageReqVO);
 
     /**
      * 获得字典数据列表

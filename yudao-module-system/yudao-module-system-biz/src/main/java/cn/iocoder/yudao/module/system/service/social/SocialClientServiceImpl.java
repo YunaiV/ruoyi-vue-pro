@@ -12,10 +12,9 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.cache.CacheUtils;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
-import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientCreateReqVO;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientUpdateReqVO;
-import cn.iocoder.yudao.module.system.convert.social.SocialClientConvert;
+import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
 import cn.iocoder.yudao.module.system.dal.mysql.social.SocialClientMapper;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
@@ -267,26 +266,25 @@ public class SocialClientServiceImpl implements SocialClientService {
     // =================== 客户端管理 ===================
 
     @Override
-    public Long createSocialClient(SocialClientCreateReqVO createReqVO) {
+    public Long createSocialClient(SocialClientSaveReqVO createReqVO) {
         // 校验重复
         validateSocialClientUnique(null, createReqVO.getUserType(), createReqVO.getSocialType());
 
         // 插入
-        SocialClientDO socialClient = SocialClientConvert.INSTANCE.convert(createReqVO);
-        socialClientMapper.insert(socialClient);
-        // 返回
-        return socialClient.getId();
+        SocialClientDO client = BeanUtils.toBean(createReqVO, SocialClientDO.class);
+        socialClientMapper.insert(client);
+        return client.getId();
     }
 
     @Override
-    public void updateSocialClient(SocialClientUpdateReqVO updateReqVO) {
+    public void updateSocialClient(SocialClientSaveReqVO updateReqVO) {
         // 校验存在
         validateSocialClientExists(updateReqVO.getId());
         // 校验重复
         validateSocialClientUnique(updateReqVO.getId(), updateReqVO.getUserType(), updateReqVO.getSocialType());
 
         // 更新
-        SocialClientDO updateObj = SocialClientConvert.INSTANCE.convert(updateReqVO);
+        SocialClientDO updateObj = BeanUtils.toBean(updateReqVO, SocialClientDO.class);
         socialClientMapper.updateById(updateObj);
     }
 

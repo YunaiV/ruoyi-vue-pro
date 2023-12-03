@@ -4,7 +4,6 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.infra.api.logger.dto.ApiErrorLogCreateReqDTO;
-import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apierrorlog.ApiErrorLogExportReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apierrorlog.ApiErrorLogPageReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.logger.ApiErrorLogDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.logger.ApiErrorLogMapper;
@@ -13,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
@@ -76,46 +74,6 @@ public class ApiErrorLogServiceImplTest extends BaseDbUnitTest {
         assertEquals(1, pageResult.getTotal());
         assertEquals(1, pageResult.getList().size());
         assertPojoEquals(apiErrorLogDO, pageResult.getList().get(0));
-    }
-
-    @Test
-    public void testGetApiErrorLogList() {
-        // mock 数据
-        ApiErrorLogDO apiErrorLogDO = randomPojo(ApiErrorLogDO.class, o -> {
-            o.setUserId(2233L);
-            o.setUserType(UserTypeEnum.ADMIN.getValue());
-            o.setApplicationName("yudao-test");
-            o.setRequestUrl("foo");
-            o.setExceptionTime(buildTime(2021, 3, 13));
-            o.setProcessStatus(ApiErrorLogProcessStatusEnum.INIT.getStatus());
-        });
-        apiErrorLogMapper.insert(apiErrorLogDO);
-        // 测试 userId 不匹配
-        apiErrorLogMapper.insert(cloneIgnoreId(apiErrorLogDO, o -> o.setUserId(3344L)));
-        // 测试 userType 不匹配
-        apiErrorLogMapper.insert(cloneIgnoreId(apiErrorLogDO, logDO -> logDO.setUserType(UserTypeEnum.MEMBER.getValue())));
-        // 测试 applicationName 不匹配
-        apiErrorLogMapper.insert(cloneIgnoreId(apiErrorLogDO, logDO -> logDO.setApplicationName("test")));
-        // 测试 requestUrl 不匹配
-        apiErrorLogMapper.insert(cloneIgnoreId(apiErrorLogDO, logDO -> logDO.setRequestUrl("bar")));
-        // 测试 exceptionTime 不匹配：构造一个早期时间 2021-02-06 00:00:00
-        apiErrorLogMapper.insert(cloneIgnoreId(apiErrorLogDO, logDO -> logDO.setExceptionTime(buildTime(2021, 2, 6))));
-        // 测试 progressStatus 不匹配
-        apiErrorLogMapper.insert(cloneIgnoreId(apiErrorLogDO, logDO -> logDO.setProcessStatus(ApiErrorLogProcessStatusEnum.DONE.getStatus())));
-        // 准备参数
-        ApiErrorLogExportReqVO reqVO = new ApiErrorLogExportReqVO();
-        reqVO.setUserId(2233L);
-        reqVO.setUserType(UserTypeEnum.ADMIN.getValue());
-        reqVO.setApplicationName("yudao-test");
-        reqVO.setRequestUrl("foo");
-        reqVO.setExceptionTime(buildBetweenTime(2021, 3, 1, 2021, 3, 31));
-        reqVO.setProcessStatus(ApiErrorLogProcessStatusEnum.INIT.getStatus());
-
-        // 调用
-        List<ApiErrorLogDO> list = apiErrorLogService.getApiErrorLogList(reqVO);
-        // 断言，只查到了一条符合条件的
-        assertEquals(1, list.size());
-        assertPojoEquals(apiErrorLogDO, list.get(0));
     }
 
     @Test

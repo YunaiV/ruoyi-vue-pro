@@ -1,13 +1,11 @@
 package cn.iocoder.yudao.module.infra.service.job;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.quartz.core.scheduler.SchedulerManager;
 import cn.iocoder.yudao.framework.quartz.core.util.CronUtils;
-import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobCreateReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobExportReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobPageReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobUpdateReqVO;
-import cn.iocoder.yudao.module.infra.convert.job.JobConvert;
+import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.job.JobDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.job.JobMapper;
 import cn.iocoder.yudao.module.infra.enums.job.JobStatusEnum;
@@ -21,8 +19,8 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.containsAny;
+import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.*;
 
 /**
  * 定时任务 Service 实现类
@@ -41,14 +39,14 @@ public class JobServiceImpl implements JobService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long createJob(JobCreateReqVO createReqVO) throws SchedulerException {
+    public Long createJob(JobSaveReqVO createReqVO) throws SchedulerException {
         validateCronExpression(createReqVO.getCronExpression());
         // 校验唯一性
         if (jobMapper.selectByHandlerName(createReqVO.getHandlerName()) != null) {
             throw exception(JOB_HANDLER_EXISTS);
         }
         // 插入
-        JobDO job = JobConvert.INSTANCE.convert(createReqVO);
+        JobDO job = BeanUtils.toBean(createReqVO, JobDO.class);
         job.setStatus(JobStatusEnum.INIT.getStatus());
         fillJobMonitorTimeoutEmpty(job);
         jobMapper.insert(job);
@@ -66,7 +64,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateJob(JobUpdateReqVO updateReqVO) throws SchedulerException {
+    public void updateJob(JobSaveReqVO updateReqVO) throws SchedulerException {
         validateCronExpression(updateReqVO.getCronExpression());
         // 校验存在
         JobDO job = validateJobExists(updateReqVO.getId());
@@ -75,7 +73,7 @@ public class JobServiceImpl implements JobService {
             throw exception(JOB_UPDATE_ONLY_NORMAL_STATUS);
         }
         // 更新
-        JobDO updateObj = JobConvert.INSTANCE.convert(updateReqVO);
+        JobDO updateObj = BeanUtils.toBean(updateReqVO, JobDO.class);
         fillJobMonitorTimeoutEmpty(updateObj);
         jobMapper.updateById(updateObj);
 
@@ -157,11 +155,6 @@ public class JobServiceImpl implements JobService {
     @Override
     public PageResult<JobDO> getJobPage(JobPageReqVO pageReqVO) {
 		return jobMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public List<JobDO> getJobList(JobExportReqVO exportReqVO) {
-		return jobMapper.selectList(exportReqVO);
     }
 
     private static void fillJobMonitorTimeoutEmpty(JobDO job) {

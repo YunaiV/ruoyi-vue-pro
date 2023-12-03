@@ -2,9 +2,8 @@ package cn.iocoder.yudao.module.system.service.sms;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.sms.core.client.SmsClient;
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 
 import javax.validation.Valid;
@@ -24,14 +23,14 @@ public interface SmsChannelService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createSmsChannel(@Valid SmsChannelCreateReqVO createReqVO);
+    Long createSmsChannel(@Valid SmsChannelSaveReqVO createReqVO);
 
     /**
      * 更新短信渠道
      *
      * @param updateReqVO 更新信息
      */
-    void updateSmsChannel(@Valid SmsChannelUpdateReqVO updateReqVO);
+    void updateSmsChannel(@Valid SmsChannelSaveReqVO updateReqVO);
 
     /**
      * 删除短信渠道

@@ -3,9 +3,8 @@ package cn.iocoder.yudao.module.system.service.notice;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticeCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticePageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticeUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticeSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notice.NoticeDO;
 import cn.iocoder.yudao.module.system.dal.mysql.notice.NoticeMapper;
 import org.junit.jupiter.api.Test;
@@ -72,14 +71,15 @@ class NoticeServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateNotice_success() {
         // 准备参数
-        NoticeCreateReqVO reqVO = randomPojo(NoticeCreateReqVO.class);
+        NoticeSaveReqVO reqVO = randomPojo(NoticeSaveReqVO.class)
+                .setId(null); // 避免 id 被赋值
 
         // 调用
         Long noticeId = noticeService.createNotice(reqVO);
         // 校验插入属性是否正确
         assertNotNull(noticeId);
         NoticeDO notice = noticeMapper.selectById(noticeId);
-        assertPojoEquals(reqVO, notice);
+        assertPojoEquals(reqVO, notice, "id");
     }
 
     @Test
@@ -89,7 +89,7 @@ class NoticeServiceImplTest extends BaseDbUnitTest {
         noticeMapper.insert(dbNoticeDO);
 
         // 准备更新参数
-        NoticeUpdateReqVO reqVO = randomPojo(NoticeUpdateReqVO.class, o -> o.setId(dbNoticeDO.getId()));
+        NoticeSaveReqVO reqVO = randomPojo(NoticeSaveReqVO.class, o -> o.setId(dbNoticeDO.getId()));
 
         // 更新
         noticeService.updateNotice(reqVO);
