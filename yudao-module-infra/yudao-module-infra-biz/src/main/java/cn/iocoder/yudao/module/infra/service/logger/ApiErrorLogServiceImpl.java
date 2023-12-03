@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.module.infra.service.logger;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.infra.api.logger.dto.ApiErrorLogCreateReqDTO;
-import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apierrorlog.ApiErrorLogExportReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apierrorlog.ApiErrorLogPageReqVO;
-import cn.iocoder.yudao.module.infra.convert.logger.ApiErrorLogConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.logger.ApiErrorLogDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.logger.ApiErrorLogMapper;
 import cn.iocoder.yudao.module.infra.enums.logger.ApiErrorLogProcessStatusEnum;
@@ -14,11 +13,9 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.API_ERROR_LOG_NOT_FOUND;
-import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.API_ERROR_LOG_PROCESSED;
+import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.*;
 
 /**
  * API 错误日志 Service 实现类
@@ -35,7 +32,7 @@ public class ApiErrorLogServiceImpl implements ApiErrorLogService {
 
     @Override
     public void createApiErrorLog(ApiErrorLogCreateReqDTO createDTO) {
-        ApiErrorLogDO apiErrorLog = ApiErrorLogConvert.INSTANCE.convert(createDTO)
+        ApiErrorLogDO apiErrorLog = BeanUtils.toBean(createDTO, ApiErrorLogDO.class)
                 .setProcessStatus(ApiErrorLogProcessStatusEnum.INIT.getStatus());
         apiErrorLogMapper.insert(apiErrorLog);
     }
@@ -43,11 +40,6 @@ public class ApiErrorLogServiceImpl implements ApiErrorLogService {
     @Override
     public PageResult<ApiErrorLogDO> getApiErrorLogPage(ApiErrorLogPageReqVO pageReqVO) {
         return apiErrorLogMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public List<ApiErrorLogDO> getApiErrorLogList(ApiErrorLogExportReqVO exportReqVO) {
-        return apiErrorLogMapper.selectList(exportReqVO);
     }
 
     @Override
