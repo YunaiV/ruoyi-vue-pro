@@ -40,10 +40,10 @@ public interface DictDataMapper extends BaseMapperX<DictDataDO> {
                 .orderByDesc(Arrays.asList(DictDataDO::getDictType, DictDataDO::getSort)));
     }
 
-    default List<DictDataDO> selectListByTypeAndStatus(String dictType, Integer status) {
-        return selectList(new LambdaQueryWrapper<DictDataDO>()
-                .eq(DictDataDO::getDictType, dictType)
-                .eq(DictDataDO::getStatus, status));
+    default List<DictDataDO> selectListByStatusAndDictType(Integer status, String dictType) {
+        return selectList(new LambdaQueryWrapperX<DictDataDO>()
+                .eqIfPresent(DictDataDO::getStatus, status)
+                .eqIfPresent(DictDataDO::getDictType, dictType));
     }
 
 }

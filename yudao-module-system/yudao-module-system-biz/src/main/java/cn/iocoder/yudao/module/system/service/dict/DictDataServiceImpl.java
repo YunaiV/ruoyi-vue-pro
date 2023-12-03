@@ -46,8 +46,8 @@ public class DictDataServiceImpl implements DictDataService {
     private DictDataMapper dictDataMapper;
 
     @Override
-    public List<DictDataDO> getDictDataList() {
-        List<DictDataDO> list = dictDataMapper.selectList(DictDataDO::getStatus, CommonStatusEnum.ENABLE.getStatus());
+    public List<DictDataDO> getDictDataList(Integer status, String dictType) {
+        List<DictDataDO> list = dictDataMapper.selectListByStatusAndDictType(status, dictType);
         list.sort(COMPARATOR_TYPE_AND_SORT);
         return list;
     }
@@ -55,13 +55,6 @@ public class DictDataServiceImpl implements DictDataService {
     @Override
     public PageResult<DictDataDO> getDictDataPage(DictDataPageReqVO pageReqVO) {
         return dictDataMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public List<DictDataDO> getEnabledDictDataListByType(String dictType) {
-        List<DictDataDO> list = dictDataMapper.selectListByTypeAndStatus(dictType, CommonStatusEnum.ENABLE.getStatus());
-        list.sort(COMPARATOR_TYPE_AND_SORT);
-        return list;
     }
 
     @Override
@@ -106,7 +99,7 @@ public class DictDataServiceImpl implements DictDataService {
     }
 
     @Override
-    public long countByDictType(String dictType) {
+    public long getDictDataCountByDictType(String dictType) {
         return dictDataMapper.selectCountByDictType(dictType);
     }
 

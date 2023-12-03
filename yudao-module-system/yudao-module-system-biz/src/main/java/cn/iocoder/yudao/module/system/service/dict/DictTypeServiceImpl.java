@@ -80,7 +80,7 @@ public class DictTypeServiceImpl implements DictTypeService {
         // 校验是否存在
         DictTypeDO dictType = validateDictTypeExists(id);
         // 校验是否有字典数据
-        if (dictDataService.countByDictType(dictType.getType()) > 0) {
+        if (dictDataService.getDictDataCountByDictType(dictType.getType()) > 0) {
             throw exception(DICT_TYPE_HAS_CHILDREN);
         }
         // 删除字典类型

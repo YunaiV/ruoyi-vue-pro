@@ -50,10 +50,15 @@ public class DictDataServiceImplTest extends BaseDbUnitTest {
         DictDataDO dictDataDO03 = randomDictDataDO().setDictType("yunai").setSort(3)
                 .setStatus(CommonStatusEnum.DISABLE.getStatus());
         dictDataMapper.insert(dictDataDO03);
+        DictDataDO dictDataDO04 = randomDictDataDO().setDictType("yunai2").setSort(3)
+                .setStatus(CommonStatusEnum.DISABLE.getStatus());
+        dictDataMapper.insert(dictDataDO04);
         // 准备参数
+        Integer status = CommonStatusEnum.ENABLE.getStatus();
+        String dictType = "yunai";
 
         // 调用
-        List<DictDataDO> dictDataDOList = dictDataService.getDictDataList();
+        List<DictDataDO> dictDataDOList = dictDataService.getDictDataList(status, dictType);
         // 断言
         assertEquals(2, dictDataDOList.size());
         assertPojoEquals(dictDataDO02, dictDataDOList.get(0));
@@ -236,7 +241,7 @@ public class DictDataServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testCountByDictType() {
+    public void testGetDictDataCountByDictType() {
         // mock 数据
         dictDataMapper.insert(randomDictDataDO(o -> o.setDictType("yunai")));
         dictDataMapper.insert(randomDictDataDO(o -> o.setDictType("tudou")));
@@ -245,7 +250,7 @@ public class DictDataServiceImplTest extends BaseDbUnitTest {
         String dictType = "yunai";
 
         // 调用
-        long count = dictDataService.countByDictType(dictType);
+        long count = dictDataService.getDictDataCountByDictType(dictType);
         // 校验
         assertEquals(2L, count);
     }

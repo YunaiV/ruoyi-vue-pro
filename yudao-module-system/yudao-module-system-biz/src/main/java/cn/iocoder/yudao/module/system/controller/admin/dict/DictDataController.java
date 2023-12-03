@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.controller.admin.dict;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -66,7 +67,8 @@ public class DictDataController {
     @Operation(summary = "获得全部字典数据列表", description = "一般用于管理后台缓存字典数据在本地")
     // 无需添加权限认证，因为前端全局都需要
     public CommonResult<List<DictDataSimpleRespVO>> getSimpleDictDataList() {
-        List<DictDataDO> list = dictDataService.getDictDataList();
+        List<DictDataDO> list = dictDataService.getDictDataList(
+                CommonStatusEnum.ENABLE.getStatus(), null);
         return success(BeanUtils.toBean(list, DictDataSimpleRespVO.class));
     }
 
