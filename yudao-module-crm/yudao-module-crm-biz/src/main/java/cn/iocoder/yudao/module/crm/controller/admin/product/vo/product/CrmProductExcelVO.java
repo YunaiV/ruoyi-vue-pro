@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.controller.admin.product.vo;
+package cn.iocoder.yudao.module.crm.controller.admin.product.vo.product;
 
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
@@ -7,14 +7,14 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-// TODO 芋艿：这个导出最后搞
+// TODO 芋艿：这个导出最后搞   那暂时就放着不动了哈
 /**
  * 产品 Excel VO
  *
  * @author ZanGe丶
  */
 @Data
-public class ProductExcelVO {
+public class CrmProductExcelVO {
 
     @ExcelProperty("主键id")
     private Long id;

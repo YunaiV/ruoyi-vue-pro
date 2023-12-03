@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.controller.admin.productcategory.vo;
+package cn.iocoder.yudao.module.crm.controller.admin.product.vo.productcategory;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class ProductCategoryUpdateReqVO extends ProductCategoryBaseVO {
+public class CrmProductCategoryUpdateReqVO extends CrmProductCategoryBaseVO {
 
     @Schema(description = "主键 id", requiredMode = Schema.RequiredMode.REQUIRED, example = "23902")
     @NotNull(message = "主键 id 不能为空")
