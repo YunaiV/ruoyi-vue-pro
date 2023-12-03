@@ -23,4 +23,8 @@ public class AppAuthWeixinMiniAppLoginReqVO {
     @NotEmpty(message = "登录 code 不能为空")
     private String loginCode;
 
+    @Schema(description = "state", requiredMode = Schema.RequiredMode.REQUIRED, example = "9b2ffbc1-7425-4155-9894-9d5c08541d62")
+    @NotEmpty(message = "state 不能为空")
+    private String state;
+
 }
