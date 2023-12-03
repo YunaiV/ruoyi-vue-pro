@@ -2,9 +2,8 @@ package cn.iocoder.yudao.module.infra.service.file;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.file.core.client.FileClient;
-import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigCreateReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigPageReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigUpdateReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileConfigDO;
 
 import javax.validation.Valid;
@@ -22,14 +21,14 @@ public interface FileConfigService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createFileConfig(@Valid FileConfigCreateReqVO createReqVO);
+    Long createFileConfig(@Valid FileConfigSaveReqVO createReqVO);
 
     /**
      * 更新文件配置
      *
      * @param updateReqVO 更新信息
      */
-    void updateFileConfig(@Valid FileConfigUpdateReqVO updateReqVO);
+    void updateFileConfig(@Valid FileConfigSaveReqVO updateReqVO);
 
     /**
      * 更新文件配置为 Master
