@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyTemplateDO;
 import org.assertj.core.util.Lists;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -172,5 +173,18 @@ class NotifySendServiceImplTest extends BaseMockitoUnitTest {
                 NOTIFY_SEND_TEMPLATE_PARAM_MISS, "code");
     }
 
+    @Test
+    public void testSendBatchNotify() {
+        // 准备参数
+        // mock 方法
+
+        // 调用
+        UnsupportedOperationException exception = Assertions.assertThrows(
+                UnsupportedOperationException.class,
+                () -> notifySendService.sendBatchNotify(null, null, null, null, null)
+        );
+        // 断言
+        assertEquals("暂时不支持该操作，感兴趣可以实现该功能哟！", exception.getMessage());
+    }
 
 }

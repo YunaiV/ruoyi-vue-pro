@@ -13,6 +13,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -183,6 +185,40 @@ public class MenuServiceImplTest extends BaseDbUnitTest {
         // 断言
         assertEquals(1, result.size());
         assertPojoEquals(menu100, result.get(0));
+    }
+
+    @Test
+    public void testGetMenuIdListByPermissionFromCache() {
+        // mock 数据
+        MenuDO menu100 = randomPojo(MenuDO.class);
+        menuMapper.insert(menu100);
+        MenuDO menu101 = randomPojo(MenuDO.class);
+        menuMapper.insert(menu101);
+        // 准备参数
+        String permission = menu100.getPermission();
+
+        // 调用
+        List<Long> ids = menuService.getMenuIdListByPermissionFromCache(permission);
+        // 断言
+        assertEquals(1, ids.size());
+        assertEquals(menu100.getId(), ids.get(0));
+    }
+
+    @Test
+    public void testGetMenuList_ids() {
+        // mock 数据
+        MenuDO menu100 = randomPojo(MenuDO.class);
+        menuMapper.insert(menu100);
+        MenuDO menu101 = randomPojo(MenuDO.class);
+        menuMapper.insert(menu101);
+        // 准备参数
+        Collection<Long> ids = Collections.singleton(menu100.getId());
+
+        // 调用
+        List<MenuDO> list = menuService.getMenuList(ids);
+        // 断言
+        assertEquals(1, list.size());
+        assertPojoEquals(menu100, list.get(0));
     }
 
     @Test
