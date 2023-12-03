@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.infra.service.db;
 
-import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigCreateReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigUpdateReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.db.DataSourceConfigDO;
 
 import javax.validation.Valid;
@@ -20,14 +19,14 @@ public interface DataSourceConfigService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createDataSourceConfig(@Valid DataSourceConfigCreateReqVO createReqVO);
+    Long createDataSourceConfig(@Valid DataSourceConfigSaveReqVO createReqVO);
 
     /**
      * 更新数据源配置
      *
      * @param updateReqVO 更新信息
      */
-    void updateDataSourceConfig(@Valid DataSourceConfigUpdateReqVO updateReqVO);
+    void updateDataSourceConfig(@Valid DataSourceConfigSaveReqVO updateReqVO);
 
     /**
      * 删除数据源配置
