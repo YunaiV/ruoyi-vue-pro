@@ -229,7 +229,7 @@ yudao:
       - jimu_report_link
       - jimu_report_map
       - jimu_report_share
-      - ureport_file
+      - report_ureport_data
       - rep_demo_dxtj
       - rep_demo_employee
       - rep_demo_gongsi
