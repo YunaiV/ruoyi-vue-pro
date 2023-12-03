@@ -13,15 +13,15 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class UreportFilePageReqVO extends PageParam {
+public class UReportDataPageReqVO extends PageParam {
 
-    @Schema(description = "文件名称", example = "赵六")
-    private String fileName;
+    @Schema(description = "文件名称", example = "李四")
+    private String name;
 
     @Schema(description = "状态", example = "1")
     private Integer status;
 
-    @Schema(description = "备注", example = "随便")
+    @Schema(description = "备注", example = "你猜")
     private String remark;
 
     @Schema(description = "创建时间")
