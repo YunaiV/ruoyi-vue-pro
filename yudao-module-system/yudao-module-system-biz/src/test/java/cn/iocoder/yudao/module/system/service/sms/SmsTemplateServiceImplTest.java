@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.service.sms;
 
+import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
@@ -8,8 +9,8 @@ import cn.iocoder.yudao.framework.sms.core.client.SmsClient;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsTemplateRespDTO;
 import cn.iocoder.yudao.framework.sms.core.enums.SmsTemplateAuditStatusEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateSaveReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplatePageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsTemplateMapper;
@@ -21,6 +22,7 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
@@ -47,6 +49,19 @@ public class SmsTemplateServiceImplTest extends BaseDbUnitTest {
     private SmsChannelService smsChannelService;
     @MockBean
     private SmsClient smsClient;
+
+    @Test
+    public void testFormatSmsTemplateContent() {
+        // 准备参数
+        String content = "正在进行登录操作{operation}，您的验证码是{code}";
+        Map<String, Object> params = MapUtil.<String, Object>builder("operation", "登录")
+                .put("code", "1234").build();
+
+        // 调用
+        String result = smsTemplateService.formatSmsTemplateContent(content, params);
+        // 断言
+        assertEquals("正在进行登录操作登录，您的验证码是1234", result);
+    }
 
     @Test
     public void testParseTemplateContentParams() {
@@ -157,6 +172,34 @@ public class SmsTemplateServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testGetSmsTemplate() {
+        // mock 数据
+        SmsTemplateDO dbSmsTemplate = randomSmsTemplateDO();
+        smsTemplateMapper.insert(dbSmsTemplate);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        Long id = dbSmsTemplate.getId();
+
+        // 调用
+        SmsTemplateDO smsTemplate = smsTemplateService.getSmsTemplate(id);
+        // 校验
+        assertPojoEquals(dbSmsTemplate, smsTemplate);
+    }
+
+    @Test
+    public void testGetSmsTemplateByCodeFromCache() {
+        // mock 数据
+        SmsTemplateDO dbSmsTemplate = randomSmsTemplateDO();
+        smsTemplateMapper.insert(dbSmsTemplate);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        String code = dbSmsTemplate.getCode();
+
+        // 调用
+        SmsTemplateDO smsTemplate = smsTemplateService.getSmsTemplateByCodeFromCache(code);
+        // 校验
+        assertPojoEquals(dbSmsTemplate, smsTemplate);
+    }
+
+    @Test
     public void testGetSmsTemplatePage() {
         // mock 数据
         SmsTemplateDO dbSmsTemplate = randomPojo(SmsTemplateDO.class, o -> { // 等会查询到
@@ -199,6 +242,22 @@ public class SmsTemplateServiceImplTest extends BaseDbUnitTest {
         assertEquals(1, pageResult.getTotal());
         assertEquals(1, pageResult.getList().size());
         assertPojoEquals(dbSmsTemplate, pageResult.getList().get(0));
+    }
+
+    @Test
+    public void testGetSmsTemplateCountByChannelId() {
+        // mock 数据
+        SmsTemplateDO dbSmsTemplate = randomPojo(SmsTemplateDO.class, o -> o.setChannelId(1L));
+        smsTemplateMapper.insert(dbSmsTemplate);
+        // 测试 channelId 不匹配
+        smsTemplateMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsTemplate, o -> o.setChannelId(2L)));
+        // 准备参数
+        Long channelId = 1L;
+
+        // 调用
+        Long count = smsTemplateService.getSmsTemplateCountByChannelId(channelId);
+        // 断言
+        assertEquals(1, count);
     }
 
     @Test

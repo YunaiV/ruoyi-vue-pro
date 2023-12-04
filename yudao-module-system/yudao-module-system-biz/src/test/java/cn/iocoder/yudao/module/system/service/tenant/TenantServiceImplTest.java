@@ -332,6 +332,18 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testGetTenantByWebsite() {
+        // mock 数据
+        TenantDO dbTenant = randomPojo(TenantDO.class, o -> o.setWebsite("https://www.iocoder.cn"));
+        tenantMapper.insert(dbTenant);// @Sql: 先插入出一条存在的数据
+
+        // 调用
+        TenantDO result = tenantService.getTenantByWebsite("https://www.iocoder.cn");
+        // 校验存在
+        assertPojoEquals(result, dbTenant);
+    }
+
+    @Test
     public void testGetTenantListByPackageId() {
         // mock 数据
         TenantDO dbTenant1 = randomPojo(TenantDO.class, o -> o.setPackageId(1L));

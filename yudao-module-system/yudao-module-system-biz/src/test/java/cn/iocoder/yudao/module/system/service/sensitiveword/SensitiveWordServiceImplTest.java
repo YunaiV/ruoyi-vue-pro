@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.system.service.sensitiveword;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.SensitiveWordPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.SensitiveWordSaveVO;
@@ -13,6 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -76,6 +79,35 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         assertNotNull(sensitiveWordService.getTagSensitiveWordTries().get("论坛"));
         assertNotNull(sensitiveWordService.getTagSensitiveWordTries().get("蔬菜"));
         assertNotNull(sensitiveWordService.getTagSensitiveWordTries().get("测试"));
+    }
+
+    @Test
+    public void testRefreshLocalCache() {
+        // mock 数据
+        SensitiveWordDO wordDO1 = randomPojo(SensitiveWordDO.class, o -> o.setName("傻瓜")
+                .setTags(singletonList("论坛")).setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        wordDO1.setUpdateTime(LocalDateTime.now());
+        sensitiveWordMapper.insert(wordDO1);
+        sensitiveWordService.initLocalCache();
+        // mock 数据 ②
+        SensitiveWordDO wordDO2 = randomPojo(SensitiveWordDO.class, o -> o.setName("笨蛋")
+                .setTags(singletonList("蔬菜")).setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        wordDO2.setUpdateTime(LocalDateTimeUtils.addTime(Duration.ofMinutes(1))); // 避免时间相同
+        sensitiveWordMapper.insert(wordDO2);
+
+        // 调用
+        sensitiveWordService.refreshLocalCache();
+        // 断言 sensitiveWordTagsCache 缓存
+        assertEquals(SetUtils.asSet("论坛", "蔬菜"), sensitiveWordService.getSensitiveWordTagSet());
+        // 断言 sensitiveWordCache
+        assertEquals(2, sensitiveWordService.getSensitiveWordCache().size());
+        assertPojoEquals(wordDO1, sensitiveWordService.getSensitiveWordCache().get(0));
+        assertPojoEquals(wordDO2, sensitiveWordService.getSensitiveWordCache().get(1));
+        // 断言 tagSensitiveWordTries 缓存
+        assertNotNull(sensitiveWordService.getDefaultSensitiveWordTrie());
+        assertEquals(2, sensitiveWordService.getTagSensitiveWordTries().size());
+        assertNotNull(sensitiveWordService.getTagSensitiveWordTries().get("论坛"));
+        assertNotNull(sensitiveWordService.getTagSensitiveWordTries().get("蔬菜"));
     }
 
     @Test
