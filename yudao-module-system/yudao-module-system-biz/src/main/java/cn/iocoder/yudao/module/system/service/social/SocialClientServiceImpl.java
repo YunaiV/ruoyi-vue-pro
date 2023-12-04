@@ -142,7 +142,8 @@ public class SocialClientServiceImpl implements SocialClientService {
      * @param userType 用户类型
      * @return AuthRequest 对象
      */
-    private AuthRequest buildAuthRequest(Integer socialType, Integer userType) {
+    @VisibleForTesting
+    AuthRequest buildAuthRequest(Integer socialType, Integer userType) {
         // 1. 先查找默认的配置项，从 application-*.yaml 中读取
         AuthRequest request = authRequestFactory.get(SocialTypeEnum.valueOfType(socialType).getSource());
         Assert.notNull(request, String.format("社交平台(%d) 不存在", socialType));
@@ -180,7 +181,8 @@ public class SocialClientServiceImpl implements SocialClientService {
      * @param userType 用户类型
      * @return WxMpService 对象
      */
-    private WxMpService getWxMpService(Integer userType) {
+    @VisibleForTesting
+    WxMpService getWxMpService(Integer userType) {
         // 第一步，查询 DB 的配置项，获得对应的 WxMpService 对象
         SocialClientDO client = socialClientMapper.selectBySocialTypeAndUserType(
                 SocialTypeEnum.WECHAT_MP.getType(), userType);
@@ -198,7 +200,7 @@ public class SocialClientServiceImpl implements SocialClientService {
      * @param clientSecret 微信公众号 secret
      * @return WxMpService 对象
      */
-    private WxMpService buildWxMpService(String clientId, String clientSecret) {
+    public WxMpService buildWxMpService(String clientId, String clientSecret) {
         // 第一步，创建 WxMpRedisConfigImpl 对象
         WxMpRedisConfigImpl configStorage = new WxMpRedisConfigImpl(
                 new RedisTemplateWxRedisOps(stringRedisTemplate),
@@ -231,7 +233,8 @@ public class SocialClientServiceImpl implements SocialClientService {
      * @param userType 用户类型
      * @return WxMpService 对象
      */
-    private WxMaService getWxMaService(Integer userType) {
+    @VisibleForTesting
+    WxMaService getWxMaService(Integer userType) {
         // 第一步，查询 DB 的配置项，获得对应的 WxMaService 对象
         SocialClientDO client = socialClientMapper.selectBySocialTypeAndUserType(
                 SocialTypeEnum.WECHAT_MINI_APP.getType(), userType);
@@ -311,7 +314,6 @@ public class SocialClientServiceImpl implements SocialClientService {
      * @param userType 用户类型
      * @param socialType 社交类型
      */
-    @VisibleForTesting
     private void validateSocialClientUnique(Long id, Integer userType, Integer socialType) {
         SocialClientDO client = socialClientMapper.selectBySocialTypeAndUserType(
                 socialType, userType);

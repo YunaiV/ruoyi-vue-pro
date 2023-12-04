@@ -361,13 +361,14 @@ CREATE TABLE IF NOT EXISTS "system_social_client" (
   "user_type" int NOT NULL,
   "client_id" varchar(255) NOT NULL,
   "client_secret" varchar(255) NOT NULL,
+  "agent_id" varchar(255) NOT NULL,
   "status" int NOT NULL,
   "creator" varchar(64) DEFAULT '',
   "create_time" datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updater" varchar(64) DEFAULT '',
   "update_time" datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   "deleted" bit NOT NULL DEFAULT FALSE,
-  "tenant_id" bigint NOT NULL,
+  "tenant_id" bigint not null default  '0',
   PRIMARY KEY ("id")
 ) COMMENT '社交客户端表';
 
