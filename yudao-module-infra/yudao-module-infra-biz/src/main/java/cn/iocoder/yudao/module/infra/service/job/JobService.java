@@ -7,8 +7,6 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.job.JobDO;
 import org.quartz.SchedulerException;
 
 import javax.validation.Valid;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * 定时任务 Service 接口
@@ -61,14 +59,6 @@ public interface JobService {
      * @return 定时任务
      */
     JobDO getJob(Long id);
-
-    /**
-     * 获得定时任务列表
-     *
-     * @param ids 编号
-     * @return 定时任务列表
-     */
-    List<JobDO> getJobList(Collection<Long> ids);
 
     /**
      * 获得定时任务分页

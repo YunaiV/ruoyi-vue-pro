@@ -12,10 +12,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.time.Duration;
+import java.util.List;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -137,6 +138,26 @@ public class ApiErrorLogServiceImplTest extends BaseDbUnitTest {
         assertServiceException(() ->
                 apiErrorLogService.updateApiErrorLogProcess(id, processStatus, processUserId),
                 API_ERROR_LOG_NOT_FOUND);
+    }
+
+    @Test
+    public void testCleanJobLog() {
+        // mock 数据
+        ApiErrorLogDO log01 = randomPojo(ApiErrorLogDO.class, o -> o.setCreateTime(addTime(Duration.ofDays(-3))));
+        apiErrorLogMapper.insert(log01);
+        ApiErrorLogDO log02 = randomPojo(ApiErrorLogDO.class, o -> o.setCreateTime(addTime(Duration.ofDays(-1))));
+        apiErrorLogMapper.insert(log02);
+        // 准备参数
+        Integer exceedDay = 2;
+        Integer deleteLimit = 1;
+
+        // 调用
+        Integer count = apiErrorLogService.cleanErrorLog(exceedDay, deleteLimit);
+        // 断言
+        assertEquals(1, count);
+        List<ApiErrorLogDO> logs = apiErrorLogMapper.selectList();
+        assertEquals(1, logs.size());
+        assertEquals(log02, logs.get(0));
     }
 
 }

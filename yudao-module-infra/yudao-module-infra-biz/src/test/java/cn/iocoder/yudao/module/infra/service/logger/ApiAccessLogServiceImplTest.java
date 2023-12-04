@@ -12,9 +12,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.time.Duration;
+import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
@@ -71,6 +72,26 @@ public class ApiAccessLogServiceImplTest extends BaseDbUnitTest {
         assertEquals(1, pageResult.getTotal());
         assertEquals(1, pageResult.getList().size());
         assertPojoEquals(apiAccessLogDO, pageResult.getList().get(0));
+    }
+
+    @Test
+    public void testCleanJobLog() {
+        // mock 数据
+        ApiAccessLogDO log01 = randomPojo(ApiAccessLogDO.class, o -> o.setCreateTime(addTime(Duration.ofDays(-3))));
+        apiAccessLogMapper.insert(log01);
+        ApiAccessLogDO log02 = randomPojo(ApiAccessLogDO.class, o -> o.setCreateTime(addTime(Duration.ofDays(-1))));
+        apiAccessLogMapper.insert(log02);
+        // 准备参数
+        Integer exceedDay = 2;
+        Integer deleteLimit = 1;
+
+        // 调用
+        Integer count = apiAccessLogService.cleanAccessLog(exceedDay, deleteLimit);
+        // 断言
+        assertEquals(1, count);
+        List<ApiAccessLogDO> logs = apiAccessLogMapper.selectList();
+        assertEquals(1, logs.size());
+        assertEquals(log02, logs.get(0));
     }
 
     @Test
