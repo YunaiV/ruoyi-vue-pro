@@ -51,13 +51,13 @@ public class ApiErrorLogServiceImplTest extends BaseDbUnitTest {
         // 测试 userId 不匹配
         apiErrorLogMapper.insert(cloneIgnoreId(apiErrorLogDO, o -> o.setUserId(3344L)));
         // 测试 userType 不匹配
-        apiErrorLogMapper.insert(cloneIgnoreId(apiErrorLogDO, logDO -> logDO.setUserType(UserTypeEnum.MEMBER.getValue())));
+        apiErrorLogMapper.insert(cloneIgnoreId(apiErrorLogDO, o -> o.setUserType(UserTypeEnum.MEMBER.getValue())));
         // 测试 applicationName 不匹配
-        apiErrorLogMapper.insert(cloneIgnoreId(apiErrorLogDO, logDO -> logDO.setApplicationName("test")));
+        apiErrorLogMapper.insert(cloneIgnoreId(apiErrorLogDO, o -> o.setApplicationName("test")));
         // 测试 requestUrl 不匹配
-        apiErrorLogMapper.insert(cloneIgnoreId(apiErrorLogDO, logDO -> logDO.setRequestUrl("bar")));
+        apiErrorLogMapper.insert(cloneIgnoreId(apiErrorLogDO, o -> o.setRequestUrl("bar")));
         // 测试 exceptionTime 不匹配：构造一个早期时间 2021-02-06 00:00:00
-        apiErrorLogMapper.insert(cloneIgnoreId(apiErrorLogDO, logDO -> logDO.setExceptionTime(buildTime(2021, 2, 6))));
+        apiErrorLogMapper.insert(cloneIgnoreId(apiErrorLogDO, o -> o.setExceptionTime(buildTime(2021, 2, 6))));
         // 测试 progressStatus 不匹配
         apiErrorLogMapper.insert(cloneIgnoreId(apiErrorLogDO, logDO -> logDO.setProcessStatus(ApiErrorLogProcessStatusEnum.DONE.getStatus())));
         // 准备参数
