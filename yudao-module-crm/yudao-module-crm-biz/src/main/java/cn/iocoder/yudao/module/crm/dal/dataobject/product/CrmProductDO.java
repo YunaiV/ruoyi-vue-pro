@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.product;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.crm.enums.product.CrmProductStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -19,7 +20,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductDO extends BaseDO {
+public class CrmProductDO extends BaseDO {
 
     /**
      * 主键 id
@@ -44,14 +45,12 @@ public class ProductDO extends BaseDO {
     private Long price;
     /**
      * 状态
-     *
-     * 枚举 {@link TODO crm_product_status 对应的类}
-     * // TODO @zange：这个写个枚举类，然后 {@link关联下
+     * 关联 {@link CrmProductStatusEnum}
      */
     private Integer status;
     /**
      * 产品分类 ID
-     * // TODO @zange：这个要写下关联 CategoryDO 的 id 字段；参考下别的模块哈
+     * 关联 {@link CrmProductCategoryDO#id}
      */
     private Long categoryId;
     /**

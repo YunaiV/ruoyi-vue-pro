@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.controller.admin.productcategory.vo;
+package cn.iocoder.yudao.module.crm.controller.admin.product.vo.productcategory;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class ProductCategoryRespVO extends ProductCategoryBaseVO {
+public class CrmProductCategoryRespVO extends CrmProductCategoryBaseVO {
 
     @Schema(description = "主键id", requiredMode = Schema.RequiredMode.REQUIRED, example = "23902")
     private Long id;
