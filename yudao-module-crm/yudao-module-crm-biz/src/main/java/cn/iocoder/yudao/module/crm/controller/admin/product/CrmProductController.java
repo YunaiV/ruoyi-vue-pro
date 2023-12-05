@@ -4,10 +4,10 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.crm.controller.admin.product.vo.*;
-import cn.iocoder.yudao.module.crm.convert.product.ProductConvert;
-import cn.iocoder.yudao.module.crm.dal.dataobject.product.ProductDO;
-import cn.iocoder.yudao.module.crm.service.product.ProductService;
+import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.*;
+import cn.iocoder.yudao.module.crm.convert.product.CrmProductConvert;
+import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
+import cn.iocoder.yudao.module.crm.service.product.CrmProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,22 +28,22 @@ import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.E
 @RestController
 @RequestMapping("/crm/product")
 @Validated
-public class ProductController {
+public class CrmProductController {
 
     @Resource
-    private ProductService productService;
+    private CrmProductService productService;
 
     @PostMapping("/create")
     @Operation(summary = "创建产品")
     @PreAuthorize("@ss.hasPermission('crm:product:create')")
-    public CommonResult<Long> createProduct(@Valid @RequestBody ProductCreateReqVO createReqVO) {
+    public CommonResult<Long> createProduct(@Valid @RequestBody CrmProductCreateReqVO createReqVO) {
         return success(productService.createProduct(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新产品")
     @PreAuthorize("@ss.hasPermission('crm:product:update')")
-    public CommonResult<Boolean> updateProduct(@Valid @RequestBody ProductUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateProduct(@Valid @RequestBody CrmProductUpdateReqVO updateReqVO) {
         productService.updateProduct(updateReqVO);
         return success(true);
     }
@@ -61,29 +61,29 @@ public class ProductController {
     @Operation(summary = "获得产品")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('crm:product:query')")
-    public CommonResult<ProductRespVO> getProduct(@RequestParam("id") Long id) {
-        ProductDO product = productService.getProduct(id);
-        return success(ProductConvert.INSTANCE.convert(product));
+    public CommonResult<CrmProductRespVO> getProduct(@RequestParam("id") Long id) {
+        CrmProductDO product = productService.getProduct(id);
+        return success(CrmProductConvert.INSTANCE.convert(product));
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得产品分页")
     @PreAuthorize("@ss.hasPermission('crm:product:query')")
-    public CommonResult<PageResult<ProductRespVO>> getProductPage(@Valid ProductPageReqVO pageVO) {
-        PageResult<ProductDO> pageResult = productService.getProductPage(pageVO);
-        return success(ProductConvert.INSTANCE.convertPage(pageResult));
+    public CommonResult<PageResult<CrmProductRespVO>> getProductPage(@Valid CrmProductPageReqVO pageVO) {
+        PageResult<CrmProductDO> pageResult = productService.getProductPage(pageVO);
+        return success(CrmProductConvert.INSTANCE.convertPage(pageResult));
     }
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出产品 Excel")
     @PreAuthorize("@ss.hasPermission('crm:product:export')")
     @OperateLog(type = EXPORT)
-    public void exportProductExcel(@Valid ProductExportReqVO exportReqVO,
+    public void exportProductExcel(@Valid CrmProductExportReqVO exportReqVO,
               HttpServletResponse response) throws IOException {
-        List<ProductDO> list = productService.getProductList(exportReqVO);
+        List<CrmProductDO> list = productService.getProductList(exportReqVO);
         // 导出 Excel
-        List<ProductExcelVO> datas = ProductConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "产品.xls", "数据", ProductExcelVO.class, datas);
+        List<CrmProductExcelVO> datas = CrmProductConvert.INSTANCE.convertList02(list);
+        ExcelUtils.write(response, "产品.xls", "数据", CrmProductExcelVO.class, datas);
     }
 
 }

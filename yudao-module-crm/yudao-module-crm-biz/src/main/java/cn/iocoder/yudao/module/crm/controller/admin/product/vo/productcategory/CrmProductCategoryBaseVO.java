@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.controller.admin.productcategory.vo;
+package cn.iocoder.yudao.module.crm.controller.admin.product.vo.productcategory;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
  * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
  */
 @Data
-public class ProductCategoryBaseVO {
+public class CrmProductCategoryBaseVO {
 
     @Schema(description = "名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "赵六")
     @NotNull(message = "名称不能为空")

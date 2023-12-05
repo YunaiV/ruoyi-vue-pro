@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.dal.dataobject.productcategory;
+package cn.iocoder.yudao.module.crm.dal.dataobject.product;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -19,7 +19,16 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductCategoryDO extends BaseDO {
+public class CrmProductCategoryDO extends BaseDO {
+
+    /**
+     * 父分类编号 - 根分类
+     */
+    public static final Long PARENT_ID_NULL = 0L;
+    /**
+     * 限定分类层级
+     */
+    public static final int CATEGORY_LEVEL = 2;
 
     /**
      * 主键id
@@ -32,7 +41,7 @@ public class ProductCategoryDO extends BaseDO {
     private String name;
     /**
      * 父级 id
-     * // TODO @zange：这个要写下关联 CategoryDO 的 id 字段；参考下别的模块哈
+     * // TODO @zange-ok：这个要写下关联 CategoryDO 的 id 字段；参考下别的模块哈
      */
     private Long parentId;
 
