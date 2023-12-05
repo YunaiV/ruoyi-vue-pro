@@ -21,7 +21,9 @@ public enum CrmBizTypeEnum implements IntArrayValuable {
     CRM_CUSTOMER(2, "客户"),
     CRM_CONTACT(3, "联系人"),
     CRM_BUSINESS(4, "商机"),
-    CRM_CONTRACT(5, "合同");
+    CRM_CONTRACT(5, "合同"),
+    CRM_PRODUCT(6, "产品")
+    ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CrmBizTypeEnum::getType).toArray();
 

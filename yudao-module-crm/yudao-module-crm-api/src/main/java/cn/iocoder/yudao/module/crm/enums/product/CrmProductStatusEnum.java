@@ -7,12 +7,15 @@ import lombok.Getter;
 import java.util.Arrays;
 
 /**
+ * CRM 商品状态
+ *
  * @author ZanGe丶
- * @create 2023-11-30 21:53
+ * @since 2023-11-30 21:53
  */
 @Getter
 @AllArgsConstructor
 public enum CrmProductStatusEnum implements IntArrayValuable {
+
     DISABLE(0, "下架"),
     ENABLE(1, "上架");
 
@@ -32,13 +35,4 @@ public enum CrmProductStatusEnum implements IntArrayValuable {
         return ARRAYS;
     }
 
-    /**
-     * 判断是否处于【上架】状态
-     *
-     * @param status 状态
-     * @return 是否处于【上架】状态
-     */
-    public static boolean isEnable(Integer status) {
-        return ENABLE.getStatus().equals(status);
-    }
 }

@@ -1,13 +1,22 @@
 package cn.iocoder.yudao.module.crm.controller.admin.product;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.*;
+import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductSaveReqVO;
 import cn.iocoder.yudao.module.crm.convert.product.CrmProductConvert;
+import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductCategoryDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
+import cn.iocoder.yudao.module.crm.service.product.CrmProductCategoryService;
 import cn.iocoder.yudao.module.crm.service.product.CrmProductService;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,12 +28,17 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSetByFlatMap;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-@Tag(name = "管理后台 - 产品")
+@Tag(name = "管理后台 - CRM 产品")
 @RestController
 @RequestMapping("/crm/product")
 @Validated
@@ -32,18 +46,23 @@ public class CrmProductController {
 
     @Resource
     private CrmProductService productService;
+    @Resource
+    private CrmProductCategoryService productCategoryService;
+
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建产品")
     @PreAuthorize("@ss.hasPermission('crm:product:create')")
-    public CommonResult<Long> createProduct(@Valid @RequestBody CrmProductCreateReqVO createReqVO) {
+    public CommonResult<Long> createProduct(@Valid @RequestBody CrmProductSaveReqVO createReqVO) {
         return success(productService.createProduct(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新产品")
     @PreAuthorize("@ss.hasPermission('crm:product:update')")
-    public CommonResult<Boolean> updateProduct(@Valid @RequestBody CrmProductUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateProduct(@Valid @RequestBody CrmProductSaveReqVO updateReqVO) {
         productService.updateProduct(updateReqVO);
         return success(true);
     }
@@ -63,7 +82,7 @@ public class CrmProductController {
     @PreAuthorize("@ss.hasPermission('crm:product:query')")
     public CommonResult<CrmProductRespVO> getProduct(@RequestParam("id") Long id) {
         CrmProductDO product = productService.getProduct(id);
-        return success(CrmProductConvert.INSTANCE.convert(product));
+        return success(BeanUtils.toBean(product, CrmProductRespVO.class));
     }
 
     @GetMapping("/page")
@@ -71,19 +90,31 @@ public class CrmProductController {
     @PreAuthorize("@ss.hasPermission('crm:product:query')")
     public CommonResult<PageResult<CrmProductRespVO>> getProductPage(@Valid CrmProductPageReqVO pageVO) {
         PageResult<CrmProductDO> pageResult = productService.getProductPage(pageVO);
-        return success(CrmProductConvert.INSTANCE.convertPage(pageResult));
+        return success(new PageResult<>(getProductDetailList(pageResult.getList()), pageResult.getTotal()));
     }
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出产品 Excel")
     @PreAuthorize("@ss.hasPermission('crm:product:export')")
     @OperateLog(type = EXPORT)
-    public void exportProductExcel(@Valid CrmProductExportReqVO exportReqVO,
+    public void exportProductExcel(@Valid CrmProductPageReqVO exportReqVO,
               HttpServletResponse response) throws IOException {
-        List<CrmProductDO> list = productService.getProductList(exportReqVO);
+        exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        List<CrmProductDO> list = productService.getProductPage(exportReqVO).getList();
         // 导出 Excel
-        List<CrmProductExcelVO> datas = CrmProductConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "产品.xls", "数据", CrmProductExcelVO.class, datas);
+        ExcelUtils.write(response, "产品.xls", "数据", CrmProductRespVO.class,
+                getProductDetailList(list));
+    }
+
+    private List<CrmProductRespVO> getProductDetailList(List<CrmProductDO> list) {
+        if (CollUtil.isEmpty(list)) {
+            return Collections.emptyList();
+        }
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
+                convertSetByFlatMap(list, user -> Stream.of(Long.valueOf(user.getCreator()), user.getOwnerUserId())));
+        List<CrmProductCategoryDO> productCategoryList = productCategoryService.getProductCategoryList(
+                convertSet(list, CrmProductDO::getCategoryId));
+        return CrmProductConvert.INSTANCE.convertList(list, userMap, productCategoryList);
     }
 
 }

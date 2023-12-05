@@ -3,27 +3,32 @@ package cn.iocoder.yudao.module.crm.service.product;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductCreateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductExportReqVO;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductUpdateReqVO;
-import cn.iocoder.yudao.module.crm.convert.product.CrmProductConvert;
+import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductCategoryDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.product.CrmProductMapper;
+import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 
+// TODO 芋艿：数据权限
 /**
- * 产品 Service 实现类
+ * CRM 产品 Service 实现类
  *
  * @author ZanGe丶
  */
@@ -31,33 +36,69 @@ import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 @Validated
 public class CrmProductServiceImpl implements CrmProductService {
 
-    @Resource
+    @Resource(name = "crmProductMapper")
     private CrmProductMapper productMapper;
+
     @Resource
     private CrmProductCategoryService productCategoryService;
+    @Resource
+    private CrmPermissionService permissionService;
+
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @Override
-    public Long createProduct(CrmProductCreateReqVO createReqVO) {
-        // 校验产品编号是否存在
-        validateProductNoDuplicate(createReqVO.getNo());
-        // TODO @zange-ok：需要校验 categoryId 是否存在；
+    public Long createProduct(CrmProductSaveReqVO createReqVO) {
+        // 校验产品
+        adminUserApi.validateUserList(Collections.singleton(createReqVO.getOwnerUserId()));
+        validateProductNoDuplicate(null, createReqVO.getNo());
         validateProductCategoryExists(createReqVO.getCategoryId());
-        // 插入
-        CrmProductDO product = CrmProductConvert.INSTANCE.convert(createReqVO);
+
+        // 插入产品
+        CrmProductDO product = BeanUtils.toBean(createReqVO, CrmProductDO.class);
         productMapper.insert(product);
-        // 返回
+
+        // 插入数据权限
+        permissionService.createPermission(new CrmPermissionCreateReqBO().setUserId(product.getOwnerUserId())
+                .setBizType(CrmBizTypeEnum.CRM_PRODUCT.getType()).setBizId(product.getId())
+                .setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
         return product.getId();
     }
 
     @Override
-    public void updateProduct(CrmProductUpdateReqVO updateReqVO) {
-        // 校验存在
+    public void updateProduct(CrmProductSaveReqVO updateReqVO) {
+        // 校验产品
+        updateReqVO.setOwnerUserId(null); // 不修改负责人
         validateProductExists(updateReqVO.getId());
-        // TODO @zange-ok：需要校验 categoryId 是否存在；
+        validateProductNoDuplicate(updateReqVO.getId(), updateReqVO.getNo());
         validateProductCategoryExists(updateReqVO.getCategoryId());
-        // 更新
-        CrmProductDO updateObj = CrmProductConvert.INSTANCE.convert(updateReqVO);
+
+        // 更新产品
+        CrmProductDO updateObj = BeanUtils.toBean(updateReqVO, CrmProductDO.class);
         productMapper.updateById(updateObj);
+    }
+
+    private void validateProductExists(Long id) {
+        CrmProductDO product = productMapper.selectById(id);
+        if (product == null) {
+            throw exception(PRODUCT_NOT_EXISTS);
+        }
+    }
+
+    private void validateProductNoDuplicate(Long id, String no) {
+        CrmProductDO product = productMapper.selectByNo(no);
+        if (product == null
+            || product.getId().equals(id)) {
+            return;
+        }
+        throw exception(PRODUCT_NO_EXISTS);
+    }
+
+    private void validateProductCategoryExists(Long categoryId) {
+        CrmProductCategoryDO category = productCategoryService.getProductCategory(categoryId);
+        if (category == null) {
+            throw exception(PRODUCT_CATEGORY_NOT_EXISTS);
+        }
     }
 
     @Override
@@ -66,21 +107,6 @@ public class CrmProductServiceImpl implements CrmProductService {
         validateProductExists(id);
         // 删除
         productMapper.deleteById(id);
-    }
-
-    // TODO @zange-ok：validateProductExists 要不只校验是否存在；然后是否 no 重复，交给 validateProductNo，名字改成 validateProductNoDuplicate，和别的模块保持一致哈；
-    private void validateProductExists(Long id) {
-        CrmProductDO product = productMapper.selectById(id);
-        if (product == null) {
-            throw exception(CRM_PRODUCT_NOT_EXISTS);
-        }
-    }
-
-    private void validateProductCategoryExists(Long categoryId) {
-        CrmProductCategoryDO productCategory = productCategoryService.getProductCategory(categoryId);
-        if (productCategory == null) {
-            throw exception(CRM_PRODUCT_CATEGORY_NOT_EXISTS);
-        }
     }
 
     @Override
@@ -102,20 +128,8 @@ public class CrmProductServiceImpl implements CrmProductService {
     }
 
     @Override
-    public List<CrmProductDO> getProductList(CrmProductExportReqVO exportReqVO) {
-        return productMapper.selectList(exportReqVO);
-    }
-
-    @Override
     public CrmProductDO getProductByCategoryId(Long categoryId) {
         return productMapper.selectOne(new LambdaQueryWrapper<CrmProductDO>().eq(CrmProductDO::getCategoryId, categoryId));
-    }
-
-    private void validateProductNoDuplicate(String no) {
-        CrmProductDO product = productMapper.selectOne(new LambdaQueryWrapper<CrmProductDO>().eq(CrmProductDO::getNo, no));
-        if (product != null) {
-            throw exception(CRM_PRODUCT_NO_EXISTS);
-        }
     }
 
 }

@@ -6,10 +6,11 @@ import cn.iocoder.yudao.module.crm.controller.admin.product.vo.productcategory.C
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductCategoryDO;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.List;
 
 /**
- * 产品分类 Service 接口
+ * CRM 产品分类 Service 接口
  *
  * @author ZanGe丶
  */
@@ -48,9 +49,17 @@ public interface CrmProductCategoryService {
     /**
      * 获得产品分类列表
      *
-     * @param ids 编号
+     * @param listReqVO 列表请求
      * @return 产品分类列表
      */
-    List<CrmProductCategoryDO> getProductCategoryList(CrmProductCategoryListReqVO treeListReqVO);
+    List<CrmProductCategoryDO> getProductCategoryList(CrmProductCategoryListReqVO listReqVO);
+
+    /**
+     * 获得产品分类列表
+     *
+     * @param ids 编号数组
+     * @return 产品分类列表
+     */
+    List<CrmProductCategoryDO> getProductCategoryList(Collection<Long> ids);
 
 }

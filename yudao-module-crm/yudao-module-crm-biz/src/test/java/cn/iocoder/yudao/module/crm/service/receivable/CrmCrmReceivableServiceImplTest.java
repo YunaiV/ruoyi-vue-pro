@@ -108,16 +108,12 @@ public class CrmCrmReceivableServiceImplTest extends BaseDbUnitTest {
            o.setPlanId(null);
            o.setCustomerId(null);
            o.setContractId(null);
-           o.setCheckStatus(null);
            o.setProcessInstanceId(null);
            o.setReturnTime(null);
            o.setReturnType(null);
            o.setPrice(null);
            o.setOwnerUserId(null);
-           o.setBatchId(null);
            o.setSort(null);
-           o.setDataScope(null);
-           o.setDataScopeDeptIds(null);
            o.setAuditStatus(null);
            o.setRemark(null);
            o.setCreateTime(null);

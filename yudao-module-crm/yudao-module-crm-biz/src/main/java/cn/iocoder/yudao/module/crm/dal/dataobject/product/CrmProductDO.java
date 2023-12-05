@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * 产品 DO
+ * CRM 产品 DO
  *
  * @author ZanGe丶
  */
@@ -23,7 +23,7 @@ import lombok.*;
 public class CrmProductDO extends BaseDO {
 
     /**
-     * 主键 id
+     * 编号
      */
     @TableId
     private Long id;
@@ -37,20 +37,24 @@ public class CrmProductDO extends BaseDO {
     private String no;
     /**
      * 单位
+     *
+     * 字典 {@link cn.iocoder.yudao.module.crm.enums.DictTypeConstants#CRM_PRODUCT_UNIT}
      */
-    private String unit;
+    private Integer unit;
     /**
-     * 价格
+     * 价格，单位：分
      */
     private Long price;
     /**
      * 状态
+     *
      * 关联 {@link CrmProductStatusEnum}
      */
     private Integer status;
     /**
      * 产品分类 ID
-     * 关联 {@link CrmProductCategoryDO#id}
+     *
+     * 关联 {@link CrmProductCategoryDO#getId()} 字段
      */
     private Long categoryId;
     /**
@@ -59,6 +63,8 @@ public class CrmProductDO extends BaseDO {
     private String description;
     /**
      * 负责人的用户编号
+     *
+     * 关联 AdminUserDO 的 id 字段
      */
     private Long ownerUserId;
 
