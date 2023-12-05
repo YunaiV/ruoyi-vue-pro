@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Admin 用户 API 接口
@@ -21,6 +22,14 @@ public interface AdminUserApi {
      * @return 用户对象信息
      */
     AdminUserRespDTO getUser(Long id);
+
+    /**
+     * 通过用户 ID 查询用户下属
+     *
+     * @param id 用户编号
+     * @return 用户下属用户编号列表
+     */
+    Set<Long> getSubordinateIds(Long id);
 
     /**
      * 通过用户 ID 查询用户们
