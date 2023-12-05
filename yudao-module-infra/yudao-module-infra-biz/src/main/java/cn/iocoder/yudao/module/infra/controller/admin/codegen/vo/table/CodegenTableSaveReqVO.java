@@ -1,16 +1,21 @@
 package cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
+import cn.iocoder.yudao.module.infra.enums.codegen.CodegenTemplateTypeEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 
-/**
- * 代码生成 Base VO，提供给添加、修改、详细的子 VO 使用
- * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
- */
+@Schema(description = "管理后台 - 代码生成表定义创建/修改 Response VO")
 @Data
-public class CodegenTableBaseVO {
+public class CodegenTableSaveReqVO {
+
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    private Long id;
 
     @Schema(description = "生成场景，参见 CodegenSceneEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "导入类型不能为空")
@@ -69,5 +74,27 @@ public class CodegenTableBaseVO {
     private Long treeParentColumnId;
     @Schema(description = "树表的名字字段编号", example = "16384")
     private Long treeNameColumnId;
+
+    @AssertTrue(message = "上级菜单不能为空，请前往 [修改生成配置 -> 生成信息] 界面，设置“上级菜单”字段")
+    @JsonIgnore
+    public boolean isParentMenuIdValid() {
+        // 生成场景为管理后台时，必须设置上级菜单，不然生成的菜单 SQL 是无父级菜单的
+        return ObjectUtil.notEqual(getScene(), CodegenSceneEnum.ADMIN.getScene())
+                || getParentMenuId() != null;
+    }
+
+    @AssertTrue(message = "关联的父表信息不全")
+    @JsonIgnore
+    public boolean isSubValid() {
+        return ObjectUtil.notEqual(getTemplateType(), CodegenTemplateTypeEnum.SUB)
+                || (ObjectUtil.isAllNotEmpty(masterTableId, subJoinColumnId, subJoinMany));
+    }
+
+    @AssertTrue(message = "关联的树表信息不全")
+    @JsonIgnore
+    public boolean isTreeValid() {
+        return ObjectUtil.notEqual(templateType, CodegenTemplateTypeEnum.TREE)
+                || (ObjectUtil.isAllNotEmpty(treeParentColumnId, treeNameColumnId));
+    }
 
 }

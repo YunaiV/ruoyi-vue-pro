@@ -234,6 +234,39 @@ public class RoleServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testGetRoleList() {
+        // mock 数据
+        RoleDO dbRole01 = randomPojo(RoleDO.class, o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        roleMapper.insert(dbRole01);
+        RoleDO dbRole02 = randomPojo(RoleDO.class, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus()));
+        roleMapper.insert(dbRole02);
+
+        // 调用
+        List<RoleDO> list = roleService.getRoleList();
+        // 断言
+        assertEquals(2, list.size());
+        assertPojoEquals(dbRole01, list.get(0));
+        assertPojoEquals(dbRole02, list.get(1));
+    }
+
+    @Test
+    public void testGetRoleList_ids() {
+        // mock 数据
+        RoleDO dbRole01 = randomPojo(RoleDO.class, o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        roleMapper.insert(dbRole01);
+        RoleDO dbRole02 = randomPojo(RoleDO.class, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus()));
+        roleMapper.insert(dbRole02);
+        // 准备参数
+        Collection<Long> ids = singleton(dbRole01.getId());
+
+        // 调用
+        List<RoleDO> list = roleService.getRoleList(ids);
+        // 断言
+        assertEquals(1, list.size());
+        assertPojoEquals(dbRole01, list.get(0));
+    }
+
+    @Test
     public void testGetRoleListFromCache() {
         try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
             springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(RoleServiceImpl.class)))

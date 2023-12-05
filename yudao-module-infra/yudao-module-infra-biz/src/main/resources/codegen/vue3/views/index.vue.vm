@@ -269,7 +269,7 @@ const queryParams = reactive({
   #foreach ($column in $columns)
     #if ($column.listOperation)
       #if ($column.listOperationCondition != 'BETWEEN')
-  $column.javaField: null,
+  $column.javaField: undefined,
   #end
       #if ($column.htmlType == "datetime" || $column.listOperationCondition == "BETWEEN")
   $column.javaField: [],

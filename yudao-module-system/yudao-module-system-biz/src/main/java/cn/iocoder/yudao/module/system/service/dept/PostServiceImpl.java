@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -105,6 +106,14 @@ public class PostServiceImpl implements PostService {
         if (postMapper.selectById(id) == null) {
             throw exception(POST_NOT_FOUND);
         }
+    }
+
+    @Override
+    public List<PostDO> getPostList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return postMapper.selectBatchIds(ids);
     }
 
     @Override

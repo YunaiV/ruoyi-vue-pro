@@ -14,8 +14,7 @@ import java.util.Set;
 @Data
 public class UserSaveReqVO {
 
-    @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    @NotNull(message = "用户编号不能为空")
+    @Schema(description = "用户编号", example = "1024")
     private Long id;
 
     @Schema(description = "用户账号", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudao")

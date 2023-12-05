@@ -158,7 +158,7 @@ public class DictTypeServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         Long id = dbDictType.getId();
         // mock 方法
-        when(dictDataService.countByDictType(eq(dbDictType.getType()))).thenReturn(1L);
+        when(dictDataService.getDictDataCountByDictType(eq(dbDictType.getType()))).thenReturn(1L);
 
         // 调用, 并断言异常
         assertServiceException(() -> dictTypeService.deleteDictType(id), DICT_TYPE_HAS_CHILDREN);

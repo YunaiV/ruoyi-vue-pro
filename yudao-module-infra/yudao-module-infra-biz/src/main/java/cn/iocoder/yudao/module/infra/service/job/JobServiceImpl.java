@@ -148,11 +148,6 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<JobDO> getJobList(Collection<Long> ids) {
-        return jobMapper.selectBatchIds(ids);
-    }
-
-    @Override
     public PageResult<JobDO> getJobPage(JobPageReqVO pageReqVO) {
 		return jobMapper.selectPage(pageReqVO);
     }

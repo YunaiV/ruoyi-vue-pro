@@ -156,6 +156,24 @@ public class PostServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testGetPostList() {
         // mock 数据
+        PostDO postDO01 = randomPojo(PostDO.class);
+        postMapper.insert(postDO01);
+        // 测试 id 不匹配
+        PostDO postDO02 = randomPojo(PostDO.class);
+        postMapper.insert(postDO02);
+        // 准备参数
+        List<Long> ids = singletonList(postDO01.getId());
+
+        // 调用
+        List<PostDO> list = postService.getPostList(ids);
+        // 断言
+        assertEquals(1, list.size());
+        assertPojoEquals(postDO01, list.get(0));
+    }
+
+    @Test
+    public void testGetPostList_idsAndStatus() {
+        // mock 数据
         PostDO postDO01 = randomPojo(PostDO.class, o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus()));
         postMapper.insert(postDO01);
         // 测试 status 不匹配

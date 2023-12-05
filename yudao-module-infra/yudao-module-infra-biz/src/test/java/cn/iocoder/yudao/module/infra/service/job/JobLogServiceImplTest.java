@@ -10,8 +10,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.addTime;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
@@ -90,6 +93,28 @@ public class JobLogServiceImplTest extends BaseDbUnitTest {
         assertEquals(duration, dbLog.getDuration());
         assertEquals(JobLogStatusEnum.FAILURE.getStatus(), dbLog.getStatus());
         assertEquals(result, dbLog.getResult());
+    }
+
+    @Test
+    public void testCleanJobLog() {
+        // mock 数据
+        JobLogDO log01 = randomPojo(JobLogDO.class, o -> o.setCreateTime(addTime(Duration.ofDays(-3))))
+                .setExecuteIndex(1);
+        jobLogMapper.insert(log01);
+        JobLogDO log02 = randomPojo(JobLogDO.class, o -> o.setCreateTime(addTime(Duration.ofDays(-1))))
+                .setExecuteIndex(1);
+        jobLogMapper.insert(log02);
+        // 准备参数
+        Integer exceedDay = 2;
+        Integer deleteLimit = 1;
+
+        // 调用
+        Integer count = jobLogService.cleanJobLog(exceedDay, deleteLimit);
+        // 断言
+        assertEquals(1, count);
+        List<JobLogDO> logs = jobLogMapper.selectList();
+        assertEquals(1, logs.size());
+        assertEquals(log02, logs.get(0));
     }
 
     @Test
