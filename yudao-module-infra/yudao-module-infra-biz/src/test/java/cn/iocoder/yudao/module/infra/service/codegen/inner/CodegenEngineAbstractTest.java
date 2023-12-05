@@ -31,6 +31,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
 
+    public String resourcesPath = "";  // 测试文件资源目录
+    public static final String OS_NAME = System.getProperty("os.name").toLowerCase().replace(" ", ""); // 操作系统名称
+
     @InjectMocks
     protected CodegenEngine codegenEngine;
 
@@ -41,6 +44,10 @@ public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
     @BeforeEach
     public void setUp() {
         codegenEngine.initGlobalBindingMap();
+        // 获取测试文件 resources 路径
+        String absolutePath = FileUtil.getAbsolutePath("application-unit-test.yaml");
+        // 系统不一样生成的文件也有差异，那就各自生成各自的
+        resourcesPath = absolutePath.split("/target")[0] + "/src/test/resources/codegen/" + OS_NAME;
     }
 
     protected static CodegenTableDO getTable(String name) {
@@ -73,14 +80,14 @@ public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
 
     @SuppressWarnings("rawtypes")
     protected static void assertResult(Map<String, String> result, String path) {
-        String assertContent = ResourceUtil.readUtf8Str(path + "/assert.json");
+        String assertContent = ResourceUtil.readUtf8Str("codegen/" + OS_NAME + path + "/assert.json");
         List<HashMap> asserts = JsonUtils.parseArray(assertContent, HashMap.class);
         assertEquals(asserts.size(), result.size());
         // 校验每个文件
         asserts.forEach(assertMap -> {
             String contentPath = (String) assertMap.get("contentPath");
             String filePath = (String) assertMap.get("filePath");
-            String content = ResourceUtil.readUtf8Str(path + "/" + contentPath);
+            String content = ResourceUtil.readUtf8Str("codegen/" + OS_NAME + path + "/" + contentPath);
             assertEquals(content, result.get(filePath), filePath + "：不匹配");
         });
     }
@@ -91,7 +98,7 @@ public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
      * 【调试使用】将生成的代码，写入到文件
      *
      * @param result 生成的代码
-     * @param path 写入文件的路径
+     * @param path   写入文件的路径
      */
     protected void writeFile(Map<String, String> result, String path) {
         // 生成压缩包
@@ -106,7 +113,7 @@ public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
     /**
      * 【调试使用】将生成的结果，写入到文件
      *
-     * @param result 生成的代码
+     * @param result   生成的代码
      * @param basePath 写入文件的路径（绝对路径）
      */
     protected void writeResult(Map<String, String> result, String basePath) {
@@ -121,7 +128,7 @@ public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
             FileUtil.writeUtf8String(fileContent, basePath + "/" + contentPath);
         });
         // 写入 assert.json 文件
-        FileUtil.writeUtf8String(JsonUtils.toJsonPrettyString(asserts), basePath +"/assert.json");
+        FileUtil.writeUtf8String(JsonUtils.toJsonPrettyString(asserts), basePath + "/assert.json");
     }
 
 }
