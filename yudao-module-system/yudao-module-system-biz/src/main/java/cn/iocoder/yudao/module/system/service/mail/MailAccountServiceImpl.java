@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.module.system.service.mail;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountCreateReqVO;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountUpdateReqVO;
-import cn.iocoder.yudao.module.system.convert.mail.MailAccountConvert;
+import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailAccountMapper;
 import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
@@ -39,21 +38,20 @@ public class MailAccountServiceImpl implements MailAccountService {
     private MailTemplateService mailTemplateService;
 
     @Override
-    public Long createMailAccount(MailAccountCreateReqVO createReqVO) {
-        // 插入
-        MailAccountDO account = MailAccountConvert.INSTANCE.convert(createReqVO);
+    public Long createMailAccount(MailAccountSaveReqVO createReqVO) {
+        MailAccountDO account = BeanUtils.toBean(createReqVO, MailAccountDO.class);
         mailAccountMapper.insert(account);
         return account.getId();
     }
 
     @Override
     @CacheEvict(value = RedisKeyConstants.MAIL_ACCOUNT, key = "#updateReqVO.id")
-    public void updateMailAccount(MailAccountUpdateReqVO updateReqVO) {
+    public void updateMailAccount(MailAccountSaveReqVO updateReqVO) {
         // 校验是否存在
         validateMailAccountExists(updateReqVO.getId());
 
         // 更新
-        MailAccountDO updateObj = MailAccountConvert.INSTANCE.convert(updateReqVO);
+        MailAccountDO updateObj = BeanUtils.toBean(updateReqVO, MailAccountDO.class);
         mailAccountMapper.updateById(updateObj);
     }
 
@@ -63,7 +61,7 @@ public class MailAccountServiceImpl implements MailAccountService {
         // 校验是否存在账号
         validateMailAccountExists(id);
         // 校验是否存在关联模版
-        if (mailTemplateService.countByAccountId(id) > 0) {
+        if (mailTemplateService.getMailTemplateCountByAccountId(id) > 0) {
             throw exception(MAIL_ACCOUNT_RELATE_TEMPLATE_EXISTS);
         }
 

@@ -58,27 +58,18 @@ public class UserProfileController {
     @GetMapping("/get")
     @Operation(summary = "获得登录用户信息")
     @DataPermission(enable = false) // 关闭数据权限，避免只查看自己时，查询不到部门。
-    public CommonResult<UserProfileRespVO> profile() {
+    public CommonResult<UserProfileRespVO> getUserProfile() {
         // 获得用户基本信息
         AdminUserDO user = userService.getUser(getLoginUserId());
-        UserProfileRespVO resp = UserConvert.INSTANCE.convert03(user);
         // 获得用户角色
         List<RoleDO> userRoles = roleService.getRoleListFromCache(permissionService.getUserRoleIdListByUserId(user.getId()));
-        resp.setRoles(UserConvert.INSTANCE.convertList(userRoles));
         // 获得部门信息
-        if (user.getDeptId() != null) {
-            DeptDO dept = deptService.getDept(user.getDeptId());
-            resp.setDept(UserConvert.INSTANCE.convert02(dept));
-        }
+        DeptDO dept = user.getDeptId() != null ? deptService.getDept(user.getDeptId()) : null;
         // 获得岗位信息
-        if (CollUtil.isNotEmpty(user.getPostIds())) {
-            List<PostDO> posts = postService.getPostList(user.getPostIds());
-            resp.setPosts(UserConvert.INSTANCE.convertList02(posts));
-        }
+        List<PostDO> posts = CollUtil.isNotEmpty(user.getPostIds()) ? postService.getPostList(user.getPostIds()) : null;
         // 获得社交用户信息
         List<SocialUserDO> socialUsers = socialService.getSocialUserList(user.getId(), UserTypeEnum.ADMIN.getValue());
-        resp.setSocialUsers(UserConvert.INSTANCE.convertList03(socialUsers));
-        return success(resp);
+        return success(UserConvert.INSTANCE.convert(user, userRoles, dept, posts, socialUsers));
     }
 
     @PutMapping("/update")
@@ -95,7 +86,8 @@ public class UserProfileController {
         return success(true);
     }
 
-    @RequestMapping(value = "/update-avatar", method = {RequestMethod.POST, RequestMethod.PUT}) // 解决 uni-app 不支持 Put 上传文件的问题
+    @RequestMapping(value = "/update-avatar",
+            method = {RequestMethod.POST, RequestMethod.PUT}) // 解决 uni-app 不支持 Put 上传文件的问题
     @Operation(summary = "上传用户个人头像")
     public CommonResult<String> updateUserAvatar(@RequestParam("avatarFile") MultipartFile file) throws Exception {
         if (file.isEmpty()) {

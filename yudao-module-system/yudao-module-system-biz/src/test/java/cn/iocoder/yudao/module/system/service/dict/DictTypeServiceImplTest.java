@@ -4,10 +4,8 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypeCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypeExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypePageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypeUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypeSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictTypeDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dict.DictTypeMapper;
 import org.junit.jupiter.api.Test;
@@ -75,38 +73,6 @@ public class DictTypeServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testGetDictTypeList_export() {
-        // mock 数据
-        DictTypeDO dbDictType = randomPojo(DictTypeDO.class, o -> { // 等会查询到
-            o.setName("yunai");
-            o.setType("芋艿");
-            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-            o.setCreateTime(buildTime(2021, 1, 15));
-        });
-        dictTypeMapper.insert(dbDictType);
-        // 测试 name 不匹配
-        dictTypeMapper.insert(cloneIgnoreId(dbDictType, o -> o.setName("tudou")));
-        // 测试 type 不匹配
-        dictTypeMapper.insert(cloneIgnoreId(dbDictType, o -> o.setType("土豆")));
-        // 测试 status 不匹配
-        dictTypeMapper.insert(cloneIgnoreId(dbDictType, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
-        // 测试 createTime 不匹配
-        dictTypeMapper.insert(cloneIgnoreId(dbDictType, o -> o.setCreateTime(buildTime(2021, 1, 1))));
-        // 准备参数
-        DictTypeExportReqVO reqVO = new DictTypeExportReqVO();
-        reqVO.setName("nai");
-        reqVO.setType("艿");
-        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setCreateTime(buildBetweenTime(2021, 1, 10, 2021, 1, 20));
-
-        // 调用
-        List<DictTypeDO> list = dictTypeService.getDictTypeList(reqVO);
-        // 断言
-        assertEquals(1, list.size());
-        assertPojoEquals(dbDictType, list.get(0));
-    }
-
-    @Test
     public void testGetDictType_id() {
         // mock 数据
         DictTypeDO dbDictType = randomDictTypeDO();
@@ -139,8 +105,9 @@ public class DictTypeServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateDictType_success() {
         // 准备参数
-        DictTypeCreateReqVO reqVO = randomPojo(DictTypeCreateReqVO.class,
-                o -> o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()));
+        DictTypeSaveReqVO reqVO = randomPojo(DictTypeSaveReqVO.class,
+                o -> o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()))
+                .setId(null); // 避免 id 被赋值
 
         // 调用
         Long dictTypeId = dictTypeService.createDictType(reqVO);
@@ -148,7 +115,7 @@ public class DictTypeServiceImplTest extends BaseDbUnitTest {
         assertNotNull(dictTypeId);
         // 校验记录的属性是否正确
         DictTypeDO dictType = dictTypeMapper.selectById(dictTypeId);
-        assertPojoEquals(reqVO, dictType);
+        assertPojoEquals(reqVO, dictType, "id");
     }
 
     @Test
@@ -157,7 +124,7 @@ public class DictTypeServiceImplTest extends BaseDbUnitTest {
         DictTypeDO dbDictType = randomDictTypeDO();
         dictTypeMapper.insert(dbDictType);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        DictTypeUpdateReqVO reqVO = randomPojo(DictTypeUpdateReqVO.class, o -> {
+        DictTypeSaveReqVO reqVO = randomPojo(DictTypeSaveReqVO.class, o -> {
             o.setId(dbDictType.getId()); // 设置更新的 ID
             o.setStatus(randomEle(CommonStatusEnum.values()).getStatus());
         });
@@ -191,7 +158,7 @@ public class DictTypeServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         Long id = dbDictType.getId();
         // mock 方法
-        when(dictDataService.countByDictType(eq(dbDictType.getType()))).thenReturn(1L);
+        when(dictDataService.getDictDataCountByDictType(eq(dbDictType.getType()))).thenReturn(1L);
 
         // 调用, 并断言异常
         assertServiceException(() -> dictTypeService.deleteDictType(id), DICT_TYPE_HAS_CHILDREN);

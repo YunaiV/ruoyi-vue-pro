@@ -14,7 +14,7 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>1.8.3-snapshot</revision>
+        <revision>1.9.0-snapshot</revision>
         <flatten-maven-plugin.version>1.5.0</flatten-maven-plugin.version>
         <!-- 统一依赖管理 -->
         <spring.boot.version>2.7.17</spring.boot.version>
@@ -70,10 +70,10 @@
         <aliyun-java-sdk-core.version>4.6.4</aliyun-java-sdk-core.version>
         <aliyun-java-sdk-dysmsapi.version>2.2.1</aliyun-java-sdk-dysmsapi.version>
         <tencentcloud-sdk-java.version>3.1.880</tencentcloud-sdk-java.version>
-        <justauth.version>1.0.7</justauth.version>
+        <justauth.version>1.0.8</justauth.version>
         <jimureport.version>1.6.1</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
-        <weixin-java.version>4.5.0</weixin-java.version>
+        <weixin-java.version>4.5.7.B</weixin-java.version>
     </properties>
 
     <dependencyManagement>
@@ -111,11 +111,6 @@
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-pay</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.iocoder.boot</groupId>
-                <artifactId>yudao-spring-boot-starter-biz-weixin</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
@@ -172,6 +167,12 @@
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-security</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-starter-websocket</artifactId>
                 <version>${revision}</version>
             </dependency>
 
@@ -605,16 +606,17 @@
                 <groupId>com.xingyuv</groupId>
                 <artifactId>spring-boot-starter-justauth</artifactId> <!-- 社交登陆（例如说，个人微信、企业微信等等） -->
                 <version>${justauth.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>cn.hutool</groupId>
+                        <artifactId>hutool-core</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
                 <groupId>com.github.binarywang</groupId>
                 <artifactId>weixin-java-pay</artifactId>
-                <version>${weixin-java.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.binarywang</groupId>
-                <artifactId>weixin-java-mp</artifactId>
                 <version>${weixin-java.version}</version>
             </dependency>
             <dependency>

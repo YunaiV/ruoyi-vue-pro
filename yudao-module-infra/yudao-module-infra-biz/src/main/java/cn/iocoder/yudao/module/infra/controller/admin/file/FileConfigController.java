@@ -2,16 +2,15 @@ package cn.iocoder.yudao.module.infra.controller.admin.file;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigCreateReqVO;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigPageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigRespVO;
-import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigUpdateReqVO;
-import cn.iocoder.yudao.module.infra.convert.file.FileConfigConvert;
+import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileConfigDO;
 import cn.iocoder.yudao.module.infra.service.file.FileConfigService;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -33,14 +32,14 @@ public class FileConfigController {
     @PostMapping("/create")
     @Operation(summary = "创建文件配置")
     @PreAuthorize("@ss.hasPermission('infra:file-config:create')")
-    public CommonResult<Long> createFileConfig(@Valid @RequestBody FileConfigCreateReqVO createReqVO) {
+    public CommonResult<Long> createFileConfig(@Valid @RequestBody FileConfigSaveReqVO createReqVO) {
         return success(fileConfigService.createFileConfig(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新文件配置")
     @PreAuthorize("@ss.hasPermission('infra:file-config:update')")
-    public CommonResult<Boolean> updateFileConfig(@Valid @RequestBody FileConfigUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateFileConfig(@Valid @RequestBody FileConfigSaveReqVO updateReqVO) {
         fileConfigService.updateFileConfig(updateReqVO);
         return success(true);
     }
@@ -67,8 +66,8 @@ public class FileConfigController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('infra:file-config:query')")
     public CommonResult<FileConfigRespVO> getFileConfig(@RequestParam("id") Long id) {
-        FileConfigDO fileConfig = fileConfigService.getFileConfig(id);
-        return success(FileConfigConvert.INSTANCE.convert(fileConfig));
+        FileConfigDO config = fileConfigService.getFileConfig(id);
+        return success(BeanUtils.toBean(config, FileConfigRespVO.class));
     }
 
     @GetMapping("/page")
@@ -76,7 +75,7 @@ public class FileConfigController {
     @PreAuthorize("@ss.hasPermission('infra:file-config:query')")
     public CommonResult<PageResult<FileConfigRespVO>> getFileConfigPage(@Valid FileConfigPageReqVO pageVO) {
         PageResult<FileConfigDO> pageResult = fileConfigService.getFileConfigPage(pageVO);
-        return success(FileConfigConvert.INSTANCE.convertPage(pageResult));
+        return success(BeanUtils.toBean(pageResult, FileConfigRespVO.class));
     }
 
     @GetMapping("/test")

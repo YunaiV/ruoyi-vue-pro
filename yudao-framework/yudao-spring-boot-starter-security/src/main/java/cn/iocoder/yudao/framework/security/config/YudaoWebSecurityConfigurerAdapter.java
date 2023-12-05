@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.security.config;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.security.core.filter.TokenAuthenticationFilter;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
 import com.google.common.collect.HashMultimap;
@@ -17,6 +18,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
@@ -129,8 +131,6 @@ public class YudaoWebSecurityConfigurerAdapter {
                 .antMatchers(buildAppApi("/**")).permitAll()
                 // 1.5 验证码captcha 允许匿名访问
                 .antMatchers("/captcha/get", "/captcha/check").permitAll()
-                // 1.6 webSocket 允许匿名访问
-                .antMatchers("/websocket/message").permitAll()
                 // ②：每个项目的自定义规则
                 .and().authorizeRequests(registry -> // 下面，循环设置自定义规则
                         authorizeRequestsCustomizers.forEach(customizer -> customizer.customize(registry)))
@@ -164,6 +164,15 @@ public class YudaoWebSecurityConfigurerAdapter {
                 continue;
             }
             Set<String> urls = entry.getKey().getPatternsCondition().getPatterns();
+            // 特殊：使用 @RequestMapping 注解，并且未写 method 属性，此时认为都需要免登录
+            Set<RequestMethod> methods = entry.getKey().getMethodsCondition().getMethods();
+            if (CollUtil.isEmpty(methods)) { //
+                result.putAll(HttpMethod.GET, urls);
+                result.putAll(HttpMethod.POST, urls);
+                result.putAll(HttpMethod.PUT, urls);
+                result.putAll(HttpMethod.DELETE, urls);
+                continue;
+            }
             // 根据请求方法，添加到 result 结果
             entry.getKey().getMethodsCondition().getMethods().forEach(requestMethod -> {
                 switch (requestMethod) {

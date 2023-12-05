@@ -3,10 +3,8 @@ package cn.iocoder.yudao.module.infra.service.job;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.quartz.core.scheduler.SchedulerManager;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobCreateReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobExportReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobPageReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobUpdateReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.job.JobDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.job.JobMapper;
 import cn.iocoder.yudao.module.infra.enums.job.JobStatusEnum;
@@ -16,17 +14,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.List;
 
-import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.*;
-import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -44,7 +38,7 @@ public class JobServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateJob_cronExpressionValid() {
         // 准备参数。Cron 表达式为 String 类型，默认随机字符串。
-        JobCreateReqVO reqVO = randomPojo(JobCreateReqVO.class);
+        JobSaveReqVO reqVO = randomPojo(JobSaveReqVO.class);
 
         // 调用，并断言异常
         assertServiceException(() -> jobService.createJob(reqVO), JOB_CRON_EXPRESSION_VALID);
@@ -53,7 +47,7 @@ public class JobServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateJob_jobHandlerExists() throws SchedulerException {
         // 准备参数 指定 Cron 表达式
-        JobCreateReqVO reqVO = randomPojo(JobCreateReqVO.class, o -> o.setCronExpression("0 0/1 * * * ? *"));
+        JobSaveReqVO reqVO = randomPojo(JobSaveReqVO.class, o -> o.setCronExpression("0 0/1 * * * ? *"));
 
         // 调用
         jobService.createJob(reqVO);
@@ -64,7 +58,8 @@ public class JobServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateJob_success() throws SchedulerException {
         // 准备参数 指定 Cron 表达式
-        JobCreateReqVO reqVO = randomPojo(JobCreateReqVO.class, o -> o.setCronExpression("0 0/1 * * * ? *"));
+        JobSaveReqVO reqVO = randomPojo(JobSaveReqVO.class, o -> o.setCronExpression("0 0/1 * * * ? *"))
+                .setId(null);
 
         // 调用
         Long jobId = jobService.createJob(reqVO);
@@ -72,7 +67,7 @@ public class JobServiceImplTest extends BaseDbUnitTest {
         assertNotNull(jobId);
         // 校验记录的属性是否正确
         JobDO job = jobMapper.selectById(jobId);
-        assertPojoEquals(reqVO, job);
+        assertPojoEquals(reqVO, job, "id");
         assertEquals(JobStatusEnum.NORMAL.getStatus(), job.getStatus());
         // 校验调用
         verify(schedulerManager).addJob(eq(job.getId()), eq(job.getHandlerName()), eq(job.getHandlerParam()),
@@ -82,7 +77,7 @@ public class JobServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateJob_jobNotExists(){
         // 准备参数
-        JobUpdateReqVO reqVO = randomPojo(JobUpdateReqVO.class, o -> o.setCronExpression("0 0/1 * * * ? *"));
+        JobSaveReqVO reqVO = randomPojo(JobSaveReqVO.class, o -> o.setCronExpression("0 0/1 * * * ? *"));
 
         // 调用，并断言异常
         assertServiceException(() -> jobService.updateJob(reqVO), JOB_NOT_EXISTS);
@@ -94,7 +89,7 @@ public class JobServiceImplTest extends BaseDbUnitTest {
         JobDO job = randomPojo(JobDO.class, o -> o.setStatus(JobStatusEnum.INIT.getStatus()));
         jobMapper.insert(job);
         // 准备参数
-        JobUpdateReqVO updateReqVO = randomPojo(JobUpdateReqVO.class, o -> {
+        JobSaveReqVO updateReqVO = randomPojo(JobSaveReqVO.class, o -> {
             o.setId(job.getId());
             o.setCronExpression("0 0/1 * * * ? *");
         });
@@ -110,7 +105,7 @@ public class JobServiceImplTest extends BaseDbUnitTest {
         JobDO job = randomPojo(JobDO.class, o -> o.setStatus(JobStatusEnum.NORMAL.getStatus()));
         jobMapper.insert(job);
         // 准备参数
-        JobUpdateReqVO updateReqVO = randomPojo(JobUpdateReqVO.class, o -> {
+        JobSaveReqVO updateReqVO = randomPojo(JobSaveReqVO.class, o -> {
             o.setId(job.getId());
             o.setCronExpression("0 0/1 * * * ? *");
         });
@@ -201,25 +196,6 @@ public class JobServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testGetJobList() {
-        // mock 数据
-        JobDO dbJob = randomPojo(JobDO.class, o -> {
-            o.setStatus(randomEle(JobStatusEnum.values()).getStatus()); // 保证 status 的范围
-        });
-        jobMapper.insert(dbJob);
-        // 测试 id 不匹配
-        jobMapper.insert(cloneIgnoreId(dbJob, o -> {}));
-
-        // 准备参数
-        Collection<Long> ids = singletonList(dbJob.getId());
-        // 调用
-        List<JobDO> list = jobService.getJobList(ids);
-        // 断言
-        assertEquals(1, list.size());
-        assertPojoEquals(dbJob, list.get(0));
-    }
-
-    @Test
     public void testGetJobPage() {
         // mock 数据
         JobDO dbJob = randomPojo(JobDO.class, o -> {
@@ -246,34 +222,6 @@ public class JobServiceImplTest extends BaseDbUnitTest {
         assertEquals(1, pageResult.getTotal());
         assertEquals(1, pageResult.getList().size());
         assertPojoEquals(dbJob, pageResult.getList().get(0));
-    }
-
-    @Test
-    public void testGetJobList_export() {
-        // mock 数据
-        JobDO dbJob = randomPojo(JobDO.class, o -> {
-            o.setName("定时任务测试");
-            o.setHandlerName("handlerName 单元测试");
-            o.setStatus(JobStatusEnum.INIT.getStatus());
-        });
-        jobMapper.insert(dbJob);
-        // 测试 name 不匹配
-        jobMapper.insert(cloneIgnoreId(dbJob, o -> o.setName("土豆")));
-        // 测试 status 不匹配
-        jobMapper.insert(cloneIgnoreId(dbJob, o -> o.setStatus(JobStatusEnum.NORMAL.getStatus())));
-        // 测试 handlerName 不匹配
-        jobMapper.insert(cloneIgnoreId(dbJob, o -> o.setHandlerName(randomString())));
-        // 准备参数
-        JobExportReqVO reqVo = new JobExportReqVO();
-        reqVo.setName("定时");
-        reqVo.setStatus(JobStatusEnum.INIT.getStatus());
-        reqVo.setHandlerName("单元");
-
-        // 调用
-        List<JobDO> list = jobService.getJobList(reqVo);
-        // 断言
-        assertEquals(1, list.size());
-        assertPojoEquals(dbJob, list.get(0));
     }
 
     @Test

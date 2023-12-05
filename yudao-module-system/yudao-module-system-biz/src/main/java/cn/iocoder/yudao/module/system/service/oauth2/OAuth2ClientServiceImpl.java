@@ -6,11 +6,10 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
-import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.client.OAuth2ClientCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.client.OAuth2ClientPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.client.OAuth2ClientUpdateReqVO;
-import cn.iocoder.yudao.module.system.convert.auth.OAuth2ClientConvert;
+import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.client.OAuth2ClientSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2ClientDO;
 import cn.iocoder.yudao.module.system.dal.mysql.oauth2.OAuth2ClientMapper;
 import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
@@ -41,25 +40,25 @@ public class OAuth2ClientServiceImpl implements OAuth2ClientService {
     private OAuth2ClientMapper oauth2ClientMapper;
 
     @Override
-    public Long createOAuth2Client(OAuth2ClientCreateReqVO createReqVO) {
+    public Long createOAuth2Client(OAuth2ClientSaveReqVO createReqVO) {
         validateClientIdExists(null, createReqVO.getClientId());
         // 插入
-        OAuth2ClientDO oauth2Client = OAuth2ClientConvert.INSTANCE.convert(createReqVO);
-        oauth2ClientMapper.insert(oauth2Client);
-        return oauth2Client.getId();
+        OAuth2ClientDO client = BeanUtils.toBean(createReqVO, OAuth2ClientDO.class);
+        oauth2ClientMapper.insert(client);
+        return client.getId();
     }
 
     @Override
     @CacheEvict(cacheNames = RedisKeyConstants.OAUTH_CLIENT,
             allEntries = true) // allEntries 清空所有缓存，因为可能修改到 clientId 字段，不好清理
-    public void updateOAuth2Client(OAuth2ClientUpdateReqVO updateReqVO) {
+    public void updateOAuth2Client(OAuth2ClientSaveReqVO updateReqVO) {
         // 校验存在
         validateOAuth2ClientExists(updateReqVO.getId());
         // 校验 Client 未被占用
         validateClientIdExists(updateReqVO.getId(), updateReqVO.getClientId());
 
         // 更新
-        OAuth2ClientDO updateObj = OAuth2ClientConvert.INSTANCE.convert(updateReqVO);
+        OAuth2ClientDO updateObj = BeanUtils.toBean(updateReqVO, OAuth2ClientDO.class);
         oauth2ClientMapper.updateById(updateObj);
     }
 

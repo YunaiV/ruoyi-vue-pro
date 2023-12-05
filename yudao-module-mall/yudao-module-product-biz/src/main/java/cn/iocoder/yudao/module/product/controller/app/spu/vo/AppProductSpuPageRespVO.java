@@ -15,6 +15,9 @@ public class AppProductSpuPageRespVO {
     @Schema(description = "商品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
     private String name;
 
+    @Schema(description = "商品简介", requiredMode = Schema.RequiredMode.REQUIRED, example = "清凉小短袖简介")
+    private String introduction;
+
     @Schema(description = "分类编号", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long categoryId;
 

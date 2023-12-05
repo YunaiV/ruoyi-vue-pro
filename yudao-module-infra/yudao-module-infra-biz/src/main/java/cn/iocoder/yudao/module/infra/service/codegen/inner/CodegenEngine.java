@@ -103,7 +103,19 @@ public class CodegenEngine {
             .put(CodegenFrontTypeEnum.VUE2.getType(), vueTemplatePath("views/index.vue"),
                     vueFilePath("views/${table.moduleName}/${table.businessName}/index.vue"))
             .put(CodegenFrontTypeEnum.VUE2.getType(), vueTemplatePath("api/api.js"),
-                    vueFilePath("api/${table.moduleName}/${classNameVar}.js"))
+                    vueFilePath("api/${table.moduleName}/${table.businessName}/index.js"))
+            .put(CodegenFrontTypeEnum.VUE2.getType(), vueTemplatePath("views/form.vue"),
+                    vueFilePath("views/${table.moduleName}/${table.businessName}/${simpleClassName}Form.vue"))
+            .put(CodegenFrontTypeEnum.VUE2.getType(), vueTemplatePath("views/components/form_sub_normal.vue"),  // 特殊：主子表专属逻辑
+                    vueFilePath("views/${table.moduleName}/${table.businessName}/components/${subSimpleClassName}Form.vue"))
+            .put(CodegenFrontTypeEnum.VUE2.getType(), vueTemplatePath("views/components/form_sub_inner.vue"),  // 特殊：主子表专属逻辑
+                    vueFilePath("views/${table.moduleName}/${table.businessName}/components/${subSimpleClassName}Form.vue"))
+            .put(CodegenFrontTypeEnum.VUE2.getType(), vueTemplatePath("views/components/form_sub_erp.vue"),  // 特殊：主子表专属逻辑
+                    vueFilePath("views/${table.moduleName}/${table.businessName}/components/${subSimpleClassName}Form.vue"))
+            .put(CodegenFrontTypeEnum.VUE2.getType(), vueTemplatePath("views/components/list_sub_inner.vue"),  // 特殊：主子表专属逻辑
+                    vueFilePath("views/${table.moduleName}/${table.businessName}/components/${subSimpleClassName}List.vue"))
+            .put(CodegenFrontTypeEnum.VUE2.getType(), vueTemplatePath("views/components/list_sub_erp.vue"),  // 特殊：主子表专属逻辑
+                    vueFilePath("views/${table.moduleName}/${table.businessName}/components/${subSimpleClassName}List.vue"))
             // Vue3 标准模版
             .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/index.vue"),
                     vue3FilePath("views/${table.moduleName}/${table.businessName}/index.vue"))
@@ -285,6 +297,10 @@ public class CodegenEngine {
         if (StrUtil.count(content, "dateFormatter") == 1) {
             content = StrUtils.removeLineContains(content, "dateFormatter");
         }
+        // Vue2 界面：修正 $refs
+        if (StrUtil.count(content, "this.refs") >= 1) {
+            content = content.replace("this.refs", "this.$refs");
+        }
         // Vue 界面：去除多的 dict 相关，只有一个的情况下，说明没使用到
         if (StrUtil.count(content, "getIntDictOptions") == 1) {
             content = content.replace("getIntDictOptions, ", "");
@@ -452,7 +468,7 @@ public class CodegenEngine {
     }
 
     private static String vueFilePath(String path) {
-        return "yudao-ui-${sceneEnum.basePackage}/" + // 顶级目录
+        return "yudao-ui-${sceneEnum.basePackage}-vue2/" + // 顶级目录
                 "src/" + path;
     }
 

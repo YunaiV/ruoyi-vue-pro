@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.pay.service.demo;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.pay.controller.admin.demo.vo.PayDemoOrderCreateReqVO;
+import cn.iocoder.yudao.module.pay.controller.admin.demo.vo.order.PayDemoOrderCreateReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.demo.PayDemoOrderDO;
 
 import javax.validation.Valid;

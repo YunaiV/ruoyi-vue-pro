@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.system.service.dict;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
+import org.springframework.lang.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -20,17 +19,17 @@ public interface DictDataService {
     /**
      * 创建字典数据
      *
-     * @param reqVO 字典数据信息
+     * @param createReqVO 字典数据信息
      * @return 字典数据编号
      */
-    Long createDictData(DictDataCreateReqVO reqVO);
+    Long createDictData(DictDataSaveReqVO createReqVO);
 
     /**
      * 更新字典数据
      *
-     * @param reqVO 字典数据信息
+     * @param updateReqVO 字典数据信息
      */
-    void updateDictData(DictDataUpdateReqVO reqVO);
+    void updateDictData(DictDataSaveReqVO updateReqVO);
 
     /**
      * 删除字典数据
@@ -42,33 +41,19 @@ public interface DictDataService {
     /**
      * 获得字典数据列表
      *
+     * @param status   状态
+     * @param dictType 字典类型
      * @return 字典数据全列表
      */
-    List<DictDataDO> getDictDataList();
+    List<DictDataDO> getDictDataList(@Nullable Integer status, @Nullable String dictType);
 
     /**
      * 获得字典数据分页列表
      *
-     * @param reqVO 分页请求
+     * @param pageReqVO 分页请求
      * @return 字典数据分页列表
      */
-    PageResult<DictDataDO> getDictDataPage(DictDataPageReqVO reqVO);
-
-    /**
-     * 获得字典数据列表
-     *
-     * @param reqVO 列表请求
-     * @return 字典数据列表
-     */
-    List<DictDataDO> getDictDataList(DictDataExportReqVO reqVO);
-
-    /**
-     * 获得字典数据列表
-     *
-     * @param dictType 字典类型
-     * @return 字典数据列表
-     */
-    List<DictDataDO> getEnabledDictDataListByType(String dictType);
+    PageResult<DictDataDO> getDictDataPage(DictDataPageReqVO pageReqVO);
 
     /**
      * 获得字典数据详情
@@ -84,7 +69,7 @@ public interface DictDataService {
      * @param dictType 字典类型
      * @return 数据数量
      */
-    long countByDictType(String dictType);
+    long getDictDataCountByDictType(String dictType);
 
     /**
      * 校验字典数据们是否有效。如下情况，视为无效：
@@ -113,4 +98,5 @@ public interface DictDataService {
      * @return 字典数据
      */
     DictDataDO parseDictData(String dictType, String label);
+
 }

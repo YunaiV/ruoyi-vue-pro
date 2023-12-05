@@ -18,7 +18,7 @@ public interface PayTransferConvert {
 
     PayTransferDO convert(PayTransferCreateReqDTO dto);
 
-    PayTransferUnifiedReqDTO convert2(PayTransferCreateReqDTO dto);
+    PayTransferUnifiedReqDTO convert2(PayTransferDO dto);
 
     PayTransferCreateReqDTO convert(PayTransferCreateReqVO vo);
 

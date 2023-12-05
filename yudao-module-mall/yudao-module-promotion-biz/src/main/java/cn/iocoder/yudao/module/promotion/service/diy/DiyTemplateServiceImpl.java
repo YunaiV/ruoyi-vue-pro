@@ -32,9 +32,11 @@ public class DiyTemplateServiceImpl implements DiyTemplateService {
 
     @Resource
     private DiyTemplateMapper diyTemplateMapper;
+
     @Resource
     private DiyPageService diyPageService;
 
+    // TODO @疯狂：事务；
     @Override
     public Long createDiyTemplate(DiyTemplateCreateReqVO createReqVO) {
         // 校验名称唯一
@@ -120,9 +122,11 @@ public class DiyTemplateServiceImpl implements DiyTemplateService {
     }
 
     @Override
+    // TODO @疯狂：事务；
     public void useDiyTemplate(Long id) {
         // 校验存在
         validateDiyTemplateExists(id);
+        // TODO @疯狂：要不已使用的情况，抛个业务异常？
         // 已使用的更新为未使用
         DiyTemplateDO used = diyTemplateMapper.selectByUsed(true);
         if (used != null) {
@@ -136,8 +140,8 @@ public class DiyTemplateServiceImpl implements DiyTemplateService {
         this.updateUsed(id, true, LocalDateTime.now());
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateDiyTemplateProperty(DiyTemplatePropertyUpdateRequestVO updateReqVO) {
         // 校验存在
         validateDiyTemplateExists(updateReqVO.getId());
@@ -151,6 +155,7 @@ public class DiyTemplateServiceImpl implements DiyTemplateService {
         return diyTemplateMapper.selectByUsed(true);
     }
 
+    // TODO @疯狂：挪到 useDiyTemplate 下面，改名 updateTemplateUsed 会不会好点哈；
     /**
      * 更新模板是否使用
      *

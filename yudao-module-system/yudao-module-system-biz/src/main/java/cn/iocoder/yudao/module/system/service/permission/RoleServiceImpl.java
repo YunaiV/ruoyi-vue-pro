@@ -6,11 +6,10 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleExportReqVO;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RolePageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleUpdateReqVO;
-import cn.iocoder.yudao.module.system.convert.permission.RoleConvert;
+import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.RoleMapper;
 import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
@@ -29,7 +28,6 @@ import javax.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
@@ -50,11 +48,11 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long createRole(RoleCreateReqVO reqVO, Integer type) {
+    public Long createRole(RoleSaveReqVO createReqVO, Integer type) {
         // 校验角色
-        validateRoleDuplicate(reqVO.getName(), reqVO.getCode(), null);
+        validateRoleDuplicate(createReqVO.getName(), createReqVO.getCode(), null);
         // 插入到数据库
-        RoleDO role = RoleConvert.INSTANCE.convert(reqVO);
+        RoleDO role = BeanUtils.toBean(createReqVO, RoleDO.class);
         role.setType(ObjectUtil.defaultIfNull(type, RoleTypeEnum.CUSTOM.getType()));
         role.setStatus(CommonStatusEnum.ENABLE.getStatus());
         role.setDataScope(DataScopeEnum.ALL.getScope()); // 默认可查看所有数据。原因是，可能一些项目不需要项目权限
@@ -64,15 +62,15 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    @CacheEvict(value = RedisKeyConstants.ROLE, key = "#reqVO.id")
-    public void updateRole(RoleUpdateReqVO reqVO) {
+    @CacheEvict(value = RedisKeyConstants.ROLE, key = "#updateReqVO.id")
+    public void updateRole(RoleSaveReqVO updateReqVO) {
         // 校验是否可以更新
-        validateRoleForUpdate(reqVO.getId());
+        validateRoleForUpdate(updateReqVO.getId());
         // 校验角色的唯一字段是否重复
-        validateRoleDuplicate(reqVO.getName(), reqVO.getCode(), reqVO.getId());
+        validateRoleDuplicate(updateReqVO.getName(), updateReqVO.getCode(), updateReqVO.getId());
 
         // 更新到数据库
-        RoleDO updateObj = RoleConvert.INSTANCE.convert(reqVO);
+        RoleDO updateObj = BeanUtils.toBean(updateReqVO, RoleDO.class);
         roleMapper.updateById(updateObj);
     }
 
@@ -200,17 +198,12 @@ public class RoleServiceImpl implements RoleService {
         }
         // 这里采用 for 循环从缓存中获取，主要考虑 Spring CacheManager 无法批量操作的问题
         RoleServiceImpl self = getSelf();
-        return convertList(ids, self::getRoleFromCache);
+        return CollectionUtils.convertList(ids, self::getRoleFromCache);
     }
 
     @Override
     public PageResult<RoleDO> getRolePage(RolePageReqVO reqVO) {
         return roleMapper.selectPage(reqVO);
-    }
-
-    @Override
-    public List<RoleDO> getRoleList(RoleExportReqVO reqVO) {
-        return roleMapper.selectList(reqVO);
     }
 
     @Override

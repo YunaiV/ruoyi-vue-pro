@@ -1,14 +1,11 @@
 package cn.iocoder.yudao.module.system.service.sms;
 
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateExportReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplatePageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateUpdateReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplatePageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateSaveReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,14 +22,14 @@ public interface SmsTemplateService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createSmsTemplate(@Valid SmsTemplateCreateReqVO createReqVO);
+    Long createSmsTemplate(@Valid SmsTemplateSaveReqVO createReqVO);
 
     /**
      * 更新短信模板
      *
      * @param updateReqVO 更新信息
      */
-    void updateSmsTemplate(@Valid SmsTemplateUpdateReqVO updateReqVO);
+    void updateSmsTemplate(@Valid SmsTemplateSaveReqVO updateReqVO);
 
     /**
      * 删除短信模板
@@ -66,21 +63,12 @@ public interface SmsTemplateService {
     PageResult<SmsTemplateDO> getSmsTemplatePage(SmsTemplatePageReqVO pageReqVO);
 
     /**
-     * 获得短信模板列表, 用于 Excel 导出
-     *
-     * @param exportReqVO 查询条件
-     * @return 短信模板分页
-     */
-    List<SmsTemplateDO> getSmsTemplateList(SmsTemplateExportReqVO exportReqVO);
-
-    /**
      * 获得指定短信渠道下的短信模板数量
      *
      * @param channelId 短信渠道编号
      * @return 数量
      */
-    Long countByChannelId(Long channelId);
-
+    Long getSmsTemplateCountByChannelId(Long channelId);
 
     /**
      * 格式化短信内容

@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.system.controller.admin.notify;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.*;
-import cn.iocoder.yudao.module.system.convert.notify.NotifyTemplateConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyTemplateDO;
 import cn.iocoder.yudao.module.system.service.notify.NotifySendService;
 import cn.iocoder.yudao.module.system.service.notify.NotifyTemplateService;
@@ -35,14 +35,14 @@ public class NotifyTemplateController {
     @PostMapping("/create")
     @Operation(summary = "创建站内信模版")
     @PreAuthorize("@ss.hasPermission('system:notify-template:create')")
-    public CommonResult<Long> createNotifyTemplate(@Valid @RequestBody NotifyTemplateCreateReqVO createReqVO) {
+    public CommonResult<Long> createNotifyTemplate(@Valid @RequestBody NotifyTemplateSaveReqVO createReqVO) {
         return success(notifyTemplateService.createNotifyTemplate(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新站内信模版")
     @PreAuthorize("@ss.hasPermission('system:notify-template:update')")
-    public CommonResult<Boolean> updateNotifyTemplate(@Valid @RequestBody NotifyTemplateUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateNotifyTemplate(@Valid @RequestBody NotifyTemplateSaveReqVO updateReqVO) {
         notifyTemplateService.updateNotifyTemplate(updateReqVO);
         return success(true);
     }
@@ -61,8 +61,8 @@ public class NotifyTemplateController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('system:notify-template:query')")
     public CommonResult<NotifyTemplateRespVO> getNotifyTemplate(@RequestParam("id") Long id) {
-        NotifyTemplateDO notifyTemplate = notifyTemplateService.getNotifyTemplate(id);
-        return success(NotifyTemplateConvert.INSTANCE.convert(notifyTemplate));
+        NotifyTemplateDO template = notifyTemplateService.getNotifyTemplate(id);
+        return success(BeanUtils.toBean(template, NotifyTemplateRespVO.class));
     }
 
     @GetMapping("/page")
@@ -70,7 +70,7 @@ public class NotifyTemplateController {
     @PreAuthorize("@ss.hasPermission('system:notify-template:query')")
     public CommonResult<PageResult<NotifyTemplateRespVO>> getNotifyTemplatePage(@Valid NotifyTemplatePageReqVO pageVO) {
         PageResult<NotifyTemplateDO> pageResult = notifyTemplateService.getNotifyTemplatePage(pageVO);
-        return success(NotifyTemplateConvert.INSTANCE.convertPage(pageResult));
+        return success(BeanUtils.toBean(pageResult, NotifyTemplateRespVO.class));
     }
 
     @PostMapping("/send-notify")

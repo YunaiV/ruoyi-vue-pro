@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.system.controller.app.dict;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.controller.app.dict.vo.AppDictDataRespVO;
-import cn.iocoder.yudao.module.system.convert.dict.DictDataConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
 import cn.iocoder.yudao.module.system.service.dict.DictDataService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,8 +33,9 @@ public class AppDictDataController {
     @Operation(summary = "根据字典类型查询字典数据信息")
     @Parameter(name = "type", description = "字典类型", required = true, example = "common_status")
     public CommonResult<List<AppDictDataRespVO>> getDictDataListByType(@RequestParam("type") String type) {
-        List<DictDataDO> list = dictDataService.getEnabledDictDataListByType(type);
-        return success(DictDataConvert.INSTANCE.convertList03(list));
+        List<DictDataDO> list = dictDataService.getDictDataList(
+                CommonStatusEnum.ENABLE.getStatus(), type);
+        return success(BeanUtils.toBean(list, AppDictDataRespVO.class));
     }
 
 }

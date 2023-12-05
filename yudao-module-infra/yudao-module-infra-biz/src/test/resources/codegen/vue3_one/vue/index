@@ -177,11 +177,11 @@ const total = ref(0) // 列表的总页数
 const queryParams = reactive({
   pageNo: 1,
   pageSize: 10,
-  name: null,
-  birthday: null,
+  name: undefined,
+  birthday: undefined,
   birthday: [],
-  sex: null,
-  enabled: null,
+  sex: undefined,
+  enabled: undefined,
   createTime: []
 })
 const queryFormRef = ref() // 搜索的表单

@@ -5,10 +5,8 @@ import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.system.api.errorcode.dto.ErrorCodeAutoGenerateReqDTO;
 import cn.iocoder.yudao.module.system.api.errorcode.dto.ErrorCodeRespDTO;
-import cn.iocoder.yudao.module.system.controller.admin.errorcode.vo.ErrorCodeCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.errorcode.vo.ErrorCodeExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.errorcode.vo.ErrorCodePageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.errorcode.vo.ErrorCodeUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.errorcode.vo.ErrorCodeSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.errorcode.ErrorCodeDO;
 import cn.iocoder.yudao.module.system.dal.mysql.errorcode.ErrorCodeMapper;
 import cn.iocoder.yudao.module.system.enums.errorcode.ErrorCodeTypeEnum;
@@ -44,7 +42,8 @@ public class ErrorCodeServiceTest extends BaseDbUnitTest {
     @Test
     public void testCreateErrorCode_success() {
         // 准备参数
-        ErrorCodeCreateReqVO reqVO = randomPojo(ErrorCodeCreateReqVO.class);
+        ErrorCodeSaveReqVO reqVO = randomPojo(ErrorCodeSaveReqVO.class)
+                .setId(null); // 防止 id 被赋值
 
         // 调用
         Long errorCodeId = errorCodeService.createErrorCode(reqVO);
@@ -52,7 +51,7 @@ public class ErrorCodeServiceTest extends BaseDbUnitTest {
         assertNotNull(errorCodeId);
         // 校验记录的属性是否正确
         ErrorCodeDO errorCode = errorCodeMapper.selectById(errorCodeId);
-        assertPojoEquals(reqVO, errorCode);
+        assertPojoEquals(reqVO, errorCode, "id");
         assertEquals(ErrorCodeTypeEnum.MANUAL_OPERATION.getType(), errorCode.getType());
     }
 
@@ -62,7 +61,7 @@ public class ErrorCodeServiceTest extends BaseDbUnitTest {
         ErrorCodeDO dbErrorCode = randomErrorCodeDO();
         errorCodeMapper.insert(dbErrorCode);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        ErrorCodeUpdateReqVO reqVO = randomPojo(ErrorCodeUpdateReqVO.class, o -> {
+        ErrorCodeSaveReqVO reqVO = randomPojo(ErrorCodeSaveReqVO.class, o -> {
             o.setId(dbErrorCode.getId()); // 设置更新的 ID
         });
 
@@ -131,25 +130,6 @@ public class ErrorCodeServiceTest extends BaseDbUnitTest {
         // 测试 createTime 不匹配
         errorCodeMapper.insert(cloneIgnoreId(dbErrorCode, o -> o.setCreateTime(buildTime(2020, 12, 12))));
         return dbErrorCode;
-    }
-
-    @Test
-    public void testGetErrorCodeList_export() {
-        // mock 数据
-        ErrorCodeDO dbErrorCode = initGetErrorCodePage();
-        // 准备参数
-        ErrorCodeExportReqVO reqVO = new ErrorCodeExportReqVO();
-        reqVO.setType(ErrorCodeTypeEnum.AUTO_GENERATION.getType());
-        reqVO.setApplicationName("tu");
-        reqVO.setCode(1);
-        reqVO.setMessage("ma");
-        reqVO.setCreateTime(buildBetweenTime(2020, 11, 1, 2020, 11, 30));
-
-        // 调用
-        List<ErrorCodeDO> list = errorCodeService.getErrorCodeList(reqVO);
-        // 断言
-        assertEquals(1, list.size());
-        assertPojoEquals(dbErrorCode, list.get(0));
     }
 
     @Test

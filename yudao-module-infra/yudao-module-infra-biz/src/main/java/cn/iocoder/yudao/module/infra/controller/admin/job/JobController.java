@@ -1,18 +1,21 @@
 package cn.iocoder.yudao.module.infra.controller.admin.job;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.quartz.core.util.CronUtils;
-import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.*;
-import cn.iocoder.yudao.module.infra.convert.job.JobConvert;
+import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobPageReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobRespVO;
+import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.job.JobDO;
 import cn.iocoder.yudao.module.infra.service.job.JobService;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.quartz.SchedulerException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -23,7 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -42,7 +44,7 @@ public class JobController {
     @PostMapping("/create")
     @Operation(summary = "创建定时任务")
     @PreAuthorize("@ss.hasPermission('infra:job:create')")
-    public CommonResult<Long> createJob(@Valid @RequestBody JobCreateReqVO createReqVO)
+    public CommonResult<Long> createJob(@Valid @RequestBody JobSaveReqVO createReqVO)
             throws SchedulerException {
         return success(jobService.createJob(createReqVO));
     }
@@ -50,7 +52,7 @@ public class JobController {
     @PutMapping("/update")
     @Operation(summary = "更新定时任务")
     @PreAuthorize("@ss.hasPermission('infra:job:update')")
-    public CommonResult<Boolean> updateJob(@Valid @RequestBody JobUpdateReqVO updateReqVO)
+    public CommonResult<Boolean> updateJob(@Valid @RequestBody JobSaveReqVO updateReqVO)
             throws SchedulerException {
         jobService.updateJob(updateReqVO);
         return success(true);
@@ -94,16 +96,7 @@ public class JobController {
     @PreAuthorize("@ss.hasPermission('infra:job:query')")
     public CommonResult<JobRespVO> getJob(@RequestParam("id") Long id) {
         JobDO job = jobService.getJob(id);
-        return success(JobConvert.INSTANCE.convert(job));
-    }
-
-    @GetMapping("/list")
-    @Operation(summary = "获得定时任务列表")
-    @Parameter(name = "ids", description = "编号列表", required = true)
-    @PreAuthorize("@ss.hasPermission('infra:job:query')")
-    public CommonResult<List<JobRespVO>> getJobList(@RequestParam("ids") Collection<Long> ids) {
-        List<JobDO> list = jobService.getJobList(ids);
-        return success(JobConvert.INSTANCE.convertList(list));
+        return success(BeanUtils.toBean(job, JobRespVO.class));
     }
 
     @GetMapping("/page")
@@ -111,19 +104,20 @@ public class JobController {
     @PreAuthorize("@ss.hasPermission('infra:job:query')")
     public CommonResult<PageResult<JobRespVO>> getJobPage(@Valid JobPageReqVO pageVO) {
         PageResult<JobDO> pageResult = jobService.getJobPage(pageVO);
-        return success(JobConvert.INSTANCE.convertPage(pageResult));
+        return success(BeanUtils.toBean(pageResult, JobRespVO.class));
     }
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出定时任务 Excel")
     @PreAuthorize("@ss.hasPermission('infra:job:export')")
     @OperateLog(type = EXPORT)
-    public void exportJobExcel(@Valid JobExportReqVO exportReqVO,
+    public void exportJobExcel(@Valid JobPageReqVO exportReqVO,
                                HttpServletResponse response) throws IOException {
-        List<JobDO> list = jobService.getJobList(exportReqVO);
+        exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        List<JobDO> list = jobService.getJobPage(exportReqVO).getList();
         // 导出 Excel
-        List<JobExcelVO> datas = JobConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "定时任务.xls", "数据", JobExcelVO.class, datas);
+        ExcelUtils.write(response, "定时任务.xls", "数据", JobRespVO.class,
+                BeanUtils.toBean(list, JobRespVO.class));
     }
 
     @GetMapping("/get_next_times")
@@ -133,8 +127,9 @@ public class JobController {
             @Parameter(name = "count", description = "数量", example = "5")
     })
     @PreAuthorize("@ss.hasPermission('infra:job:query')")
-    public CommonResult<List<LocalDateTime>> getJobNextTimes(@RequestParam("id") Long id,
-                                                   @RequestParam(value = "count", required = false, defaultValue = "5") Integer count) {
+    public CommonResult<List<LocalDateTime>> getJobNextTimes(
+            @RequestParam("id") Long id,
+            @RequestParam(value = "count", required = false, defaultValue = "5") Integer count) {
         JobDO job = jobService.getJob(id);
         if (job == null) {
             return success(Collections.emptyList());

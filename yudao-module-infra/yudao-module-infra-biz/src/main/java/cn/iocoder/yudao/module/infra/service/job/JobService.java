@@ -1,16 +1,12 @@
 package cn.iocoder.yudao.module.infra.service.job;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobCreateReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobExportReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobPageReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobUpdateReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.job.JobDO;
 import org.quartz.SchedulerException;
 
 import javax.validation.Valid;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * 定时任务 Service 接口
@@ -25,14 +21,14 @@ public interface JobService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createJob(@Valid JobCreateReqVO createReqVO) throws SchedulerException;
+    Long createJob(@Valid JobSaveReqVO createReqVO) throws SchedulerException;
 
     /**
      * 更新定时任务
      *
      * @param updateReqVO 更新信息
      */
-    void updateJob(@Valid JobUpdateReqVO updateReqVO) throws SchedulerException;
+    void updateJob(@Valid JobSaveReqVO updateReqVO) throws SchedulerException;
 
     /**
      * 更新定时任务的状态
@@ -65,27 +61,11 @@ public interface JobService {
     JobDO getJob(Long id);
 
     /**
-     * 获得定时任务列表
-     *
-     * @param ids 编号
-     * @return 定时任务列表
-     */
-    List<JobDO> getJobList(Collection<Long> ids);
-
-    /**
      * 获得定时任务分页
      *
      * @param pageReqVO 分页查询
      * @return 定时任务分页
      */
     PageResult<JobDO> getJobPage(JobPageReqVO pageReqVO);
-
-    /**
-     * 获得定时任务列表, 用于 Excel 导出
-     *
-     * @param exportReqVO 查询条件
-     * @return 定时任务分页
-     */
-    List<JobDO> getJobList(JobExportReqVO exportReqVO);
 
 }

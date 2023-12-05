@@ -21,4 +21,14 @@ public interface ErrorCodeLoader {
         ServiceExceptionUtil.put(code, msg);
     }
 
+    /**
+     * 刷新错误码
+     */
+    void refreshErrorCodes();
+
+    /**
+     * 加载错误码
+     */
+    void loadErrorCodes();
+
 }

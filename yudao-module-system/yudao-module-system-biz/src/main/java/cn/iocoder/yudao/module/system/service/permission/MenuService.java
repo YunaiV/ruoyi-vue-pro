@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.module.system.service.permission;
 
-import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuCreateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuSaveVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuListReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 
 import java.util.Collection;
@@ -18,17 +17,17 @@ public interface MenuService {
     /**
      * 创建菜单
      *
-     * @param reqVO 菜单信息
+     * @param createReqVO 菜单信息
      * @return 创建出来的菜单编号
      */
-    Long createMenu(MenuCreateReqVO reqVO);
+    Long createMenu(MenuSaveVO createReqVO);
 
     /**
      * 更新菜单
      *
-     * @param reqVO 菜单信息
+     * @param updateReqVO 菜单信息
      */
-    void updateMenu(MenuUpdateReqVO reqVO);
+    void updateMenu(MenuSaveVO updateReqVO);
 
     /**
      * 删除菜单

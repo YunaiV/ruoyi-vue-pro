@@ -3,11 +3,9 @@ package cn.iocoder.yudao.module.system.service.dict;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
-import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypeCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypeExportReqVO;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypePageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypeUpdateReqVO;
-import cn.iocoder.yudao.module.system.convert.dict.DictTypeConvert;
+import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypeSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictTypeDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dict.DictTypeMapper;
 import com.google.common.annotations.VisibleForTesting;
@@ -35,13 +33,8 @@ public class DictTypeServiceImpl implements DictTypeService {
     private DictTypeMapper dictTypeMapper;
 
     @Override
-    public PageResult<DictTypeDO> getDictTypePage(DictTypePageReqVO reqVO) {
-        return dictTypeMapper.selectPage(reqVO);
-    }
-
-    @Override
-    public List<DictTypeDO> getDictTypeList(DictTypeExportReqVO reqVO) {
-        return dictTypeMapper.selectList(reqVO);
+    public PageResult<DictTypeDO> getDictTypePage(DictTypePageReqVO pageReqVO) {
+        return dictTypeMapper.selectPage(pageReqVO);
     }
 
     @Override
@@ -55,24 +48,30 @@ public class DictTypeServiceImpl implements DictTypeService {
     }
 
     @Override
-    public Long createDictType(DictTypeCreateReqVO reqVO) {
-        // 校验正确性
-        validateDictTypeForCreateOrUpdate(null, reqVO.getName(), reqVO.getType());
+    public Long createDictType(DictTypeSaveReqVO createReqVO) {
+        // 校验字典类型的名字的唯一性
+        validateDictTypeNameUnique(null, createReqVO.getName());
+        // 校验字典类型的类型的唯一性
+        validateDictTypeUnique(null, createReqVO.getType());
 
         // 插入字典类型
-        DictTypeDO dictType = DictTypeConvert.INSTANCE.convert(reqVO)
-                .setDeletedTime(LocalDateTimeUtils.EMPTY); // 唯一索引，避免 null 值
+        DictTypeDO dictType = BeanUtils.toBean(createReqVO, DictTypeDO.class);
+        dictType.setDeletedTime(LocalDateTimeUtils.EMPTY); // 唯一索引，避免 null 值
         dictTypeMapper.insert(dictType);
         return dictType.getId();
     }
 
     @Override
-    public void updateDictType(DictTypeUpdateReqVO reqVO) {
-        // 校验正确性
-        validateDictTypeForCreateOrUpdate(reqVO.getId(), reqVO.getName(), null);
+    public void updateDictType(DictTypeSaveReqVO updateReqVO) {
+        // 校验自己存在
+        validateDictTypeExists(updateReqVO.getId());
+        // 校验字典类型的名字的唯一性
+        validateDictTypeNameUnique(updateReqVO.getId(), updateReqVO.getName());
+        // 校验字典类型的类型的唯一性
+        validateDictTypeUnique(updateReqVO.getId(), updateReqVO.getType());
 
         // 更新字典类型
-        DictTypeDO updateObj = DictTypeConvert.INSTANCE.convert(reqVO);
+        DictTypeDO updateObj = BeanUtils.toBean(updateReqVO, DictTypeDO.class);
         dictTypeMapper.updateById(updateObj);
     }
 
@@ -81,7 +80,7 @@ public class DictTypeServiceImpl implements DictTypeService {
         // 校验是否存在
         DictTypeDO dictType = validateDictTypeExists(id);
         // 校验是否有字典数据
-        if (dictDataService.countByDictType(dictType.getType()) > 0) {
+        if (dictDataService.getDictDataCountByDictType(dictType.getType()) > 0) {
             throw exception(DICT_TYPE_HAS_CHILDREN);
         }
         // 删除字典类型
@@ -91,15 +90,6 @@ public class DictTypeServiceImpl implements DictTypeService {
     @Override
     public List<DictTypeDO> getDictTypeList() {
         return dictTypeMapper.selectList();
-    }
-
-    private void validateDictTypeForCreateOrUpdate(Long id, String name, String type) {
-        // 校验自己存在
-        validateDictTypeExists(id);
-        // 校验字典类型的名字的唯一性
-        validateDictTypeNameUnique(id, name);
-        // 校验字典类型的类型的唯一性
-        validateDictTypeUnique(id, type);
     }
 
     @VisibleForTesting

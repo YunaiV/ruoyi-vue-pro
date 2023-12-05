@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.infra.controller.admin.config;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
@@ -38,15 +39,15 @@ public class ConfigController {
     @PostMapping("/create")
     @Operation(summary = "创建参数配置")
     @PreAuthorize("@ss.hasPermission('infra:config:create')")
-    public CommonResult<Long> createConfig(@Valid @RequestBody ConfigCreateReqVO reqVO) {
-        return success(configService.createConfig(reqVO));
+    public CommonResult<Long> createConfig(@Valid @RequestBody ConfigSaveReqVO createReqVO) {
+        return success(configService.createConfig(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "修改参数配置")
     @PreAuthorize("@ss.hasPermission('infra:config:update')")
-    public CommonResult<Boolean> updateConfig(@Valid @RequestBody ConfigUpdateReqVO reqVO) {
-        configService.updateConfig(reqVO);
+    public CommonResult<Boolean> updateConfig(@Valid @RequestBody ConfigSaveReqVO updateReqVO) {
+        configService.updateConfig(updateReqVO);
         return success(true);
     }
 
@@ -84,8 +85,8 @@ public class ConfigController {
     @GetMapping("/page")
     @Operation(summary = "获取参数配置分页")
     @PreAuthorize("@ss.hasPermission('infra:config:query')")
-    public CommonResult<PageResult<ConfigRespVO>> getConfigPage(@Valid ConfigPageReqVO reqVO) {
-        PageResult<ConfigDO> page = configService.getConfigPage(reqVO);
+    public CommonResult<PageResult<ConfigRespVO>> getConfigPage(@Valid ConfigPageReqVO pageReqVO) {
+        PageResult<ConfigDO> page = configService.getConfigPage(pageReqVO);
         return success(ConfigConvert.INSTANCE.convertPage(page));
     }
 
@@ -93,13 +94,13 @@ public class ConfigController {
     @Operation(summary = "导出参数配置")
     @PreAuthorize("@ss.hasPermission('infra:config:export')")
     @OperateLog(type = EXPORT)
-    public void exportConfig(@Valid ConfigExportReqVO reqVO,
+    public void exportConfig(@Valid ConfigPageReqVO exportReqVO,
                              HttpServletResponse response) throws IOException {
-        List<ConfigDO> list = configService.getConfigList(reqVO);
-        // 拼接数据
-        List<ConfigExcelVO> datas = ConfigConvert.INSTANCE.convertList(list);
+        exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        List<ConfigDO> list = configService.getConfigPage(exportReqVO).getList();
         // 输出
-        ExcelUtils.write(response, "参数配置.xls", "数据", ConfigExcelVO.class, datas);
+        ExcelUtils.write(response, "参数配置.xls", "数据", ConfigRespVO.class,
+                ConfigConvert.INSTANCE.convertList(list));
     }
 
 }

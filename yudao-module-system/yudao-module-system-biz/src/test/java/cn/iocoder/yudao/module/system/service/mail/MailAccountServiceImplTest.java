@@ -2,9 +2,8 @@ package cn.iocoder.yudao.module.system.service.mail;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailAccountMapper;
 import org.junit.jupiter.api.Test;
@@ -43,7 +42,8 @@ public class MailAccountServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateMailAccount_success() {
         // 准备参数
-        MailAccountCreateReqVO reqVO = randomPojo(MailAccountCreateReqVO.class, o -> o.setMail(randomEmail()));
+        MailAccountSaveReqVO reqVO = randomPojo(MailAccountSaveReqVO.class, o -> o.setMail(randomEmail()))
+                .setId(null); // 防止 id 被赋值
 
         // 调用
         Long mailAccountId = mailAccountService.createMailAccount(reqVO);
@@ -51,7 +51,7 @@ public class MailAccountServiceImplTest extends BaseDbUnitTest {
         assertNotNull(mailAccountId);
         // 校验记录的属性是否正确
         MailAccountDO mailAccount = mailAccountMapper.selectById(mailAccountId);
-        assertPojoEquals(reqVO, mailAccount);
+        assertPojoEquals(reqVO, mailAccount, "id");
     }
 
     @Test
@@ -60,7 +60,7 @@ public class MailAccountServiceImplTest extends BaseDbUnitTest {
         MailAccountDO dbMailAccount = randomPojo(MailAccountDO.class);
         mailAccountMapper.insert(dbMailAccount);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        MailAccountUpdateReqVO reqVO = randomPojo(MailAccountUpdateReqVO.class, o -> {
+        MailAccountSaveReqVO reqVO = randomPojo(MailAccountSaveReqVO.class, o -> {
             o.setId(dbMailAccount.getId()); // 设置更新的 ID
             o.setMail(randomEmail());
         });
@@ -75,7 +75,7 @@ public class MailAccountServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateMailAccount_notExists() {
         // 准备参数
-        MailAccountUpdateReqVO reqVO = randomPojo(MailAccountUpdateReqVO.class);
+        MailAccountSaveReqVO reqVO = randomPojo(MailAccountSaveReqVO.class);
 
         // 调用, 并断言异常
         assertServiceException(() -> mailAccountService.updateMailAccount(reqVO), MAIL_ACCOUNT_NOT_EXISTS);
@@ -89,7 +89,7 @@ public class MailAccountServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         Long id = dbMailAccount.getId();
         // mock 方法（无关联模版）
-        when(mailTemplateService.countByAccountId(eq(id))).thenReturn(0L);
+        when(mailTemplateService.getMailTemplateCountByAccountId(eq(id))).thenReturn(0L);
 
         // 调用
         mailAccountService.deleteMailAccount(id);

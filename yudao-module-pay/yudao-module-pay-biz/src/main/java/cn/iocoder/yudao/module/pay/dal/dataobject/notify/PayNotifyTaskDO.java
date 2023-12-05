@@ -67,6 +67,10 @@ public class PayNotifyTaskDO extends TenantBaseDO {
      */
     private String merchantOrderId;
     /**
+     * 商户转账单编号
+     */
+    private String merchantTransferId;
+    /**
      * 通知状态
      *
      * 外键 {@link PayNotifyStatusEnum}

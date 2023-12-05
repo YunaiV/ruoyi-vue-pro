@@ -2,9 +2,8 @@ package cn.iocoder.yudao.module.system.service.social;
 
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import com.xingyuv.jushauth.model.AuthUser;
@@ -70,14 +69,14 @@ public interface SocialClientService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createSocialClient(@Valid SocialClientCreateReqVO createReqVO);
+    Long createSocialClient(@Valid SocialClientSaveReqVO createReqVO);
 
     /**
      * 更新社交客户端
      *
      * @param updateReqVO 更新信息
      */
-    void updateSocialClient(@Valid SocialClientUpdateReqVO updateReqVO);
+    void updateSocialClient(@Valid SocialClientSaveReqVO updateReqVO);
 
     /**
      * 删除社交客户端

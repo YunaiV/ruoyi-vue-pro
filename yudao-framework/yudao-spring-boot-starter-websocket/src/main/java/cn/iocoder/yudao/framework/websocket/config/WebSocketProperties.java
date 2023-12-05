@@ -4,6 +4,9 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 /**
  * WebSocket 配置项
  *
@@ -15,15 +18,17 @@ import org.springframework.validation.annotation.Validated;
 public class WebSocketProperties {
 
     /**
-     * 路径
+     * WebSocket 的连接路径
      */
-    private String path = "";
+    @NotEmpty(message = "WebSocket 的连接路径不能为空")
+    private String path = "/ws";
+
     /**
-     * 默认最多允许同时在线用户数
+     * 消息发送器的类型
+     *
+     * 可选值：local、redis、rocketmq、kafka、rabbitmq
      */
-    private int maxOnlineCount = 0;
-    /**
-     * 是否保存session
-     */
-    private boolean sessionMap = true;
+    @NotNull(message = "WebSocket 的消息发送者不能为空")
+    private String senderType = "local";
+
 }

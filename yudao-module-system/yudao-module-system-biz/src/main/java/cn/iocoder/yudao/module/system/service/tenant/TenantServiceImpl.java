@@ -8,14 +8,13 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.tenant.config.TenantProperties;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
-import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantExportReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleSaveReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantSaveReqVO;
 import cn.iocoder.yudao.module.system.convert.tenant.TenantConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
@@ -97,7 +96,7 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     @DSTransactional // 多数据源，使用 @DSTransactional 保证本地事务，以及数据源的切换
-    public Long createTenant(TenantCreateReqVO createReqVO) {
+    public Long createTenant(TenantSaveReqVO createReqVO) {
         // 校验租户名称是否重复
         validTenantNameDuplicate(createReqVO.getName(), null);
         // 校验租户域名是否重复
@@ -106,9 +105,9 @@ public class TenantServiceImpl implements TenantService {
         TenantPackageDO tenantPackage = tenantPackageService.validTenantPackage(createReqVO.getPackageId());
 
         // 创建租户
-        TenantDO tenant = TenantConvert.INSTANCE.convert(createReqVO);
+        TenantDO tenant = BeanUtils.toBean(createReqVO, TenantDO.class);
         tenantMapper.insert(tenant);
-
+        // 创建租户的管理员
         TenantUtils.execute(tenant.getId(), () -> {
             // 创建角色
             Long roleId = createRole(tenantPackage);
@@ -120,7 +119,7 @@ public class TenantServiceImpl implements TenantService {
         return tenant.getId();
     }
 
-    private Long createUser(Long roleId, TenantCreateReqVO createReqVO) {
+    private Long createUser(Long roleId, TenantSaveReqVO createReqVO) {
         // 创建用户
         Long userId = userService.createUser(TenantConvert.INSTANCE.convert02(createReqVO));
         // 分配角色
@@ -130,7 +129,7 @@ public class TenantServiceImpl implements TenantService {
 
     private Long createRole(TenantPackageDO tenantPackage) {
         // 创建角色
-        RoleCreateReqVO reqVO = new RoleCreateReqVO();
+        RoleSaveReqVO reqVO = new RoleSaveReqVO();
         reqVO.setName(RoleCodeEnum.TENANT_ADMIN.getName()).setCode(RoleCodeEnum.TENANT_ADMIN.getCode())
                 .setSort(0).setRemark("系统自动生成");
         Long roleId = roleService.createRole(reqVO, RoleTypeEnum.SYSTEM.getType());
@@ -140,8 +139,8 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    @DSTransactional
-    public void updateTenant(TenantUpdateReqVO updateReqVO) {
+    @DSTransactional // 多数据源，使用 @DSTransactional 保证本地事务，以及数据源的切换
+    public void updateTenant(TenantSaveReqVO updateReqVO) {
         // 校验存在
         TenantDO tenant = validateUpdateTenant(updateReqVO.getId());
         // 校验租户名称是否重复
@@ -152,7 +151,7 @@ public class TenantServiceImpl implements TenantService {
         TenantPackageDO tenantPackage = tenantPackageService.validTenantPackage(updateReqVO.getPackageId());
 
         // 更新租户
-        TenantDO updateObj = TenantConvert.INSTANCE.convert(updateReqVO);
+        TenantDO updateObj = BeanUtils.toBean(updateReqVO, TenantDO.class);
         tenantMapper.updateById(updateObj);
         // 如果套餐发生变化，则修改其角色的权限
         if (ObjectUtil.notEqual(tenant.getPackageId(), updateReqVO.getPackageId())) {
@@ -244,11 +243,6 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public PageResult<TenantDO> getTenantPage(TenantPageReqVO pageReqVO) {
         return tenantMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public List<TenantDO> getTenantList(TenantExportReqVO exportReqVO) {
-        return tenantMapper.selectList(exportReqVO);
     }
 
     @Override

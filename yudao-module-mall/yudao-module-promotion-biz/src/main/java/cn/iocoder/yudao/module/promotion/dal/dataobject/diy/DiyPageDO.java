@@ -32,6 +32,8 @@ public class DiyPageDO extends BaseDO {
     private Long id;
     /**
      * 装修模板编号
+     *
+     * 关联 {@link DiyTemplateDO#getId()}
      */
     private Long templateId;
     /**

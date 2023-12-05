@@ -18,6 +18,7 @@ import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmTaskAssignRuleMapper;
 import cn.iocoder.yudao.module.bpm.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.script.BpmTaskAssignScript;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.PostApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
@@ -39,6 +40,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.*;
+import java.util.function.Function;
 
 import static cn.hutool.core.text.CharSequenceUtil.format;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -77,6 +79,9 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
     private DictDataApi dictDataApi;
     @Resource
     private PermissionApi permissionApi;
+    @Resource
+    @Lazy // 解决循环依赖
+    private BpmProcessInstanceService processInstanceService;
     /**
      * 任务分配脚本
      */
@@ -234,6 +239,14 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
     @Override
     @DataPermission(enable = false) // 忽略数据权限，不然分配会存在问题
     public Set<Long> calculateTaskCandidateUsers(DelegateExecution execution) {
+        // 1. 先从提前选好的审批人中获取
+        List<Long> assignee = processInstanceService.getAssigneeByProcessInstanceIdAndTaskDefinitionKey(
+                execution.getProcessInstanceId(), execution.getCurrentActivityId());
+        if (CollUtil.isNotEmpty(assignee)) {
+            // TODO @hai：new HashSet 即可
+            return convertSet(assignee, Function.identity());
+        }
+        // 2. 通过分配规则，计算审批人
         BpmTaskAssignRuleDO rule = getTaskRule(execution);
         return calculateTaskCandidateUsers(execution, rule);
     }

@@ -3,11 +3,10 @@ package cn.iocoder.yudao.module.system.service.dept;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
-import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptUpdateReqVO;
-import cn.iocoder.yudao.module.system.convert.dept.DeptConvert;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dept.DeptMapper;
 import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
@@ -41,7 +40,7 @@ public class DeptServiceImpl implements DeptService {
     @Override
     @CacheEvict(cacheNames = RedisKeyConstants.DEPT_CHILDREN_ID_LIST,
             allEntries = true) // allEntries 清空所有缓存，因为操作一个部门，涉及到多个缓存
-    public Long createDept(DeptCreateReqVO createReqVO) {
+    public Long createDept(DeptSaveReqVO createReqVO) {
         if (createReqVO.getParentId() == null) {
             createReqVO.setParentId(DeptDO.PARENT_ID_ROOT);
         }
@@ -51,7 +50,7 @@ public class DeptServiceImpl implements DeptService {
         validateDeptNameUnique(null, createReqVO.getParentId(), createReqVO.getName());
 
         // 插入部门
-        DeptDO dept = DeptConvert.INSTANCE.convert(createReqVO);
+        DeptDO dept = BeanUtils.toBean(createReqVO, DeptDO.class);
         deptMapper.insert(dept);
         return dept.getId();
     }
@@ -59,7 +58,7 @@ public class DeptServiceImpl implements DeptService {
     @Override
     @CacheEvict(cacheNames = RedisKeyConstants.DEPT_CHILDREN_ID_LIST,
             allEntries = true) // allEntries 清空所有缓存，因为操作一个部门，涉及到多个缓存
-    public void updateDept(DeptUpdateReqVO updateReqVO) {
+    public void updateDept(DeptSaveReqVO updateReqVO) {
         if (updateReqVO.getParentId() == null) {
             updateReqVO.setParentId(DeptDO.PARENT_ID_ROOT);
         }
@@ -71,7 +70,7 @@ public class DeptServiceImpl implements DeptService {
         validateDeptNameUnique(updateReqVO.getId(), updateReqVO.getParentId(), updateReqVO.getName());
 
         // 更新部门
-        DeptDO updateObj = DeptConvert.INSTANCE.convert(updateReqVO);
+        DeptDO updateObj = BeanUtils.toBean(updateReqVO, DeptDO.class);
         deptMapper.updateById(updateObj);
     }
 
@@ -165,7 +164,9 @@ public class DeptServiceImpl implements DeptService {
 
     @Override
     public List<DeptDO> getDeptList(DeptListReqVO reqVO) {
-        return deptMapper.selectList(reqVO);
+        List<DeptDO> list = deptMapper.selectList(reqVO);
+        list.sort(Comparator.comparing(DeptDO::getSort));
+        return list;
     }
 
     @Override

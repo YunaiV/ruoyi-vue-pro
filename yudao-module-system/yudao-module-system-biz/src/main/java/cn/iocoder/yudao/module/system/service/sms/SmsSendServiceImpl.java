@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.service.sms;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
@@ -8,7 +9,6 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.framework.sms.core.client.SmsClient;
-import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
@@ -19,6 +19,7 @@ import cn.iocoder.yudao.module.system.mq.producer.sms.SmsProducer;
 import cn.iocoder.yudao.module.system.service.member.MemberService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.google.common.annotations.VisibleForTesting;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -35,6 +36,7 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
  * @author 芋道源码
  */
 @Service
+@Slf4j
 public class SmsSendServiceImpl implements SmsSendService {
 
     @Resource
@@ -158,11 +160,17 @@ public class SmsSendServiceImpl implements SmsSendService {
         SmsClient smsClient = smsChannelService.getSmsClient(message.getChannelId());
         Assert.notNull(smsClient, "短信客户端({}) 不存在", message.getChannelId());
         // 发送短信
-        SmsCommonResult<SmsSendRespDTO> sendResult = smsClient.sendSms(message.getLogId(), message.getMobile(),
-                message.getApiTemplateId(), message.getTemplateParams());
-        smsLogService.updateSmsSendResult(message.getLogId(), sendResult.getCode(), sendResult.getMsg(),
-                sendResult.getApiCode(), sendResult.getApiMsg(), sendResult.getApiRequestId(),
-                sendResult.getData() != null ? sendResult.getData().getSerialNo() : null);
+        try {
+            SmsSendRespDTO sendResponse = smsClient.sendSms(message.getLogId(), message.getMobile(),
+                    message.getApiTemplateId(), message.getTemplateParams());
+            smsLogService.updateSmsSendResult(message.getLogId(), sendResponse.getSuccess(),
+                    sendResponse.getApiCode(), sendResponse.getApiMsg(),
+                    sendResponse.getApiRequestId(), sendResponse.getSerialNo());
+        } catch (Throwable ex) {
+            log.error("[doSendSms][发送短信异常，日志编号({})]", message.getLogId(), ex);
+            smsLogService.updateSmsSendResult(message.getLogId(), false,
+                    "EXCEPTION", ExceptionUtil.getRootCauseMessage(ex), null, null);
+        }
     }
 
     @Override

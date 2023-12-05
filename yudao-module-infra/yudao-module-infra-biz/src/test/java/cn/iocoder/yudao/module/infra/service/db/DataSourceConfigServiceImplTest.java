@@ -6,8 +6,7 @@ import cn.hutool.crypto.symmetric.AES;
 import cn.iocoder.yudao.framework.mybatis.core.type.EncryptTypeHandler;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigCreateReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigUpdateReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.db.DataSourceConfigDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.db.DataSourceConfigMapper;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DataSourceProperty;
@@ -70,7 +69,8 @@ public class DataSourceConfigServiceImplTest extends BaseDbUnitTest {
     public void testCreateDataSourceConfig_success() {
         try (MockedStatic<JdbcUtils> databaseUtilsMock = mockStatic(JdbcUtils.class)) {
             // 准备参数
-            DataSourceConfigCreateReqVO reqVO = randomPojo(DataSourceConfigCreateReqVO.class);
+            DataSourceConfigSaveReqVO reqVO = randomPojo(DataSourceConfigSaveReqVO.class)
+                    .setId(null); // 避免 id 被设置
             // mock 方法
             databaseUtilsMock.when(() -> JdbcUtils.isConnectionOK(eq(reqVO.getUrl()),
                     eq(reqVO.getUsername()), eq(reqVO.getPassword()))).thenReturn(true);
@@ -81,7 +81,7 @@ public class DataSourceConfigServiceImplTest extends BaseDbUnitTest {
             assertNotNull(dataSourceConfigId);
             // 校验记录的属性是否正确
             DataSourceConfigDO dataSourceConfig = dataSourceConfigMapper.selectById(dataSourceConfigId);
-            assertPojoEquals(reqVO, dataSourceConfig);
+            assertPojoEquals(reqVO, dataSourceConfig, "id");
         }
     }
 
@@ -92,7 +92,7 @@ public class DataSourceConfigServiceImplTest extends BaseDbUnitTest {
             DataSourceConfigDO dbDataSourceConfig = randomPojo(DataSourceConfigDO.class);
             dataSourceConfigMapper.insert(dbDataSourceConfig);// @Sql: 先插入出一条存在的数据
             // 准备参数
-            DataSourceConfigUpdateReqVO reqVO = randomPojo(DataSourceConfigUpdateReqVO.class, o -> {
+            DataSourceConfigSaveReqVO reqVO = randomPojo(DataSourceConfigSaveReqVO.class, o -> {
                 o.setId(dbDataSourceConfig.getId()); // 设置更新的 ID
             });
             // mock 方法
@@ -110,7 +110,7 @@ public class DataSourceConfigServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateDataSourceConfig_notExists() {
         // 准备参数
-        DataSourceConfigUpdateReqVO reqVO = randomPojo(DataSourceConfigUpdateReqVO.class);
+        DataSourceConfigSaveReqVO reqVO = randomPojo(DataSourceConfigSaveReqVO.class);
 
         // 调用, 并断言异常
         assertServiceException(() -> dataSourceConfigService.updateDataSourceConfig(reqVO), DATA_SOURCE_CONFIG_NOT_EXISTS);
