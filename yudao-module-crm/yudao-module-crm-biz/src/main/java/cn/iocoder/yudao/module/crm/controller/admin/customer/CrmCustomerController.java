@@ -36,7 +36,6 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSetByFlatMap;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
-import static java.util.Collections.singletonList;
 
 @Tag(name = "管理后台 - CRM 客户")
 @RestController
@@ -140,6 +139,24 @@ public class CrmCustomerController {
         return success(true);
     }
 
+    @PutMapping("/concern")
+    @Operation(summary = "关注客户")
+    @Parameter(name = "ids", description = "编号", required = true, example = "[1024]")
+    @PreAuthorize("@ss.hasPermission('crm:customer:update')")
+    public CommonResult<Boolean> concernCustomer(@RequestParam("ids") List<Long> ids) {
+        customerService.concernCustomer(ids, getLoginUserId());
+        return success(true);
+    }
+
+    @PutMapping("/cancel-concern")
+    @Operation(summary = "取消关注客户")
+    @Parameter(name = "ids", description = "编号", required = true, example = "[1024]")
+    @PreAuthorize("@ss.hasPermission('crm:customer:update')")
+    public CommonResult<Boolean> cancelConcernCustomer(@RequestParam("ids") List<Long> ids) {
+        customerService.cancelConcernCustomer(ids, getLoginUserId());
+        return success(true);
+    }
+
     // ==================== 公海相关操作 ====================
 
     @PutMapping("/put-pool")
@@ -178,7 +195,7 @@ public class CrmCustomerController {
     @GetMapping("/query-all-list")
     @Operation(summary = "查询客户列表")
     @PreAuthorize("@ss.hasPermission('crm:customer:all')")
-    public CommonResult<List<CrmCustomerQueryAllRespVO>> queryAll(){
+    public CommonResult<List<CrmCustomerQueryAllRespVO>> queryAll() {
         List<CrmCustomerDO> crmCustomerDOList = customerService.getCustomerList();
         List<CrmCustomerQueryAllRespVO> data = CrmCustomerConvert.INSTANCE.convertQueryAll(crmCustomerDOList);
         return success(data);

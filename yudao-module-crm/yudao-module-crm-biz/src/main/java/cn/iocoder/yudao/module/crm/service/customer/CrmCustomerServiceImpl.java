@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.crm.service.customer;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTransferReqVO;
@@ -9,9 +11,11 @@ import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerUpdat
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.customer.CrmCustomerMapper;
-import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
+import cn.iocoder.yudao.module.crm.service.concerned.CrmConcernedService;
+import cn.iocoder.yudao.module.crm.service.concerned.bo.CrmConcernedCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -23,6 +27,7 @@ import javax.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static java.util.Collections.singletonList;
 
@@ -40,6 +45,9 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Resource
     private CrmPermissionService crmPermissionService;
+
+    @Resource
+    private CrmConcernedService crmConcernedService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -149,6 +157,33 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         // 更新
         CrmCustomerDO updateObj = CrmCustomerConvert.INSTANCE.convert(updateReqVO);
         customerMapper.updateById(updateObj);
+    }
+
+    @Override
+    public void concernCustomer(List<Long> ids, Long userId) {
+        // 1. 校验客户是否存在
+        validateCustomerExists(ids);
+
+        // 2. 创建关注
+        List<CrmConcernedCreateReqBO> createReqBOs = BeanUtils.toBean(convertList(ids, id -> new CrmConcernedCreateReqBO()
+                .setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType()).setBizId(id).setUserId(userId)), CrmConcernedCreateReqBO.class);
+        crmConcernedService.createConcernedBatch(createReqBOs);
+    }
+
+    @Override
+    public void cancelConcernCustomer(List<Long> ids, Long userId) {
+        // 1. 校验客户是否存在
+        validateCustomerExists(ids);
+
+        // 2. 取消关注
+        crmConcernedService.deleteConcerned(CrmBizTypeEnum.CRM_CUSTOMER.getType(), ids, userId);
+    }
+
+    private void validateCustomerExists(List<Long> ids) {
+        List<CrmCustomerDO> customerList = customerMapper.selectBatchIds(ids);
+        if (ObjUtil.notEqual(ids.size(), customerList.size())) {
+            throw exception(CUSTOMER_NOT_EXISTS);
+        }
     }
 
     @Override
