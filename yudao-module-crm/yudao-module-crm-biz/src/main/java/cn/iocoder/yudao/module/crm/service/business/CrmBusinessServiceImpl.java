@@ -88,7 +88,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, level = CrmPermissionLevelEnum.READ)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS,bizId = "#id", level = CrmPermissionLevelEnum.READ)
     public CrmBusinessDO getBusiness(Long id) {
         return businessMapper.selectById(id);
     }

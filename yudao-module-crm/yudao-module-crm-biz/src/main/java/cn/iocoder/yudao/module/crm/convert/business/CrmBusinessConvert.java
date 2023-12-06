@@ -32,6 +32,7 @@ public interface CrmBusinessConvert {
     CrmBusinessDO convert(CrmBusinessUpdateReqVO bean);
 
     CrmBusinessRespVO convert(CrmBusinessDO bean);
+    List<CrmBusinessRespVO> convert(List<CrmBusinessDO> bean);
 
     PageResult<CrmBusinessRespVO> convertPage(PageResult<CrmBusinessDO> page);
 
