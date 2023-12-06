@@ -1,16 +1,16 @@
 package cn.iocoder.yudao.module.crm.service.contactbusinesslink;
 
-import java.util.*;
-import javax.validation.*;
-
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contactbusinesslink.vo.*;
-import cn.iocoder.yudao.module.crm.dal.dataobject.contactbusinesslink.CrmContactBusinessLinkDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contactbusinesslink.vo.CrmContactBusinessLinkPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contactbusinesslink.vo.CrmContactBusinessLinkSaveReqVO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contactbusinesslink.CrmContactBusinessLinkDO;
+
+import javax.validation.Valid;
+import java.util.List;
 
 /**
- * 联系人商机关联 Service 接口
+ * CRM 联系人商机关联 Service 接口
  *
  * @author 芋道源码
  */
@@ -23,13 +23,14 @@ public interface CrmContactBusinessLinkService {
      * @return 编号
      */
     Long createContactBusinessLink(@Valid CrmContactBusinessLinkSaveReqVO createReqVO);
+
     /**
      * 创建联系人商机关联
      *
      * @param createReqVO 创建信息
-     * @return 编号
      */
     void createContactBusinessLinkBatch(@Valid List<CrmContactBusinessLinkSaveReqVO> createReqVO);
+
     /**
      * 更新联系人商机关联
      *
@@ -51,6 +52,7 @@ public interface CrmContactBusinessLinkService {
      * @return 联系人商机关联
      */
     CrmContactBusinessLinkDO getContactBusinessLink(Long id);
+
     /**
      * 获得联系人商机关联分页
      *
@@ -58,6 +60,7 @@ public interface CrmContactBusinessLinkService {
      * @return 联系人商机关联
      */
     PageResult<CrmBusinessRespVO> getContactBusinessLinkPageByContact(CrmContactBusinessLinkPageReqVO pageReqVO);
+
     /**
      * 获得联系人商机关联分页
      *

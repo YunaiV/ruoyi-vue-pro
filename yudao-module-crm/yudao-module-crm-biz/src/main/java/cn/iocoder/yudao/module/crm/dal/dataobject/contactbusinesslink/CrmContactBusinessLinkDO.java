@@ -1,14 +1,16 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.contactbusinesslink;
 
-import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
 
+// TODO @zyna：可以放到 contact 包下
 /**
- * 联系人商机关联 DO
+ * CRM 联系人商机关联 DO
  *
  * @author 芋道源码
  */
@@ -28,11 +30,15 @@ public class CrmContactBusinessLinkDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 联系人id
+     * 联系人编号
+     *
+     * 关联 {@link CrmContactDO#getId()} 字段
      */
     private Long contactId;
     /**
-     * 商机id
+     * 商机编号
+     *
+     * 关联 {@link CrmBusinessDO#getId()} 字段
      */
     private Long businessId;
 

@@ -7,6 +7,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
+// TODO @zyna：使用 BeanUtils 慢慢替代现有的 mapstruct 哈
 @Mapper
 public interface CrmContactBusinessLinkConvert {
     CrmContactBusinessLinkConvert INSTANCE = Mappers.getMapper(CrmContactBusinessLinkConvert.class);
