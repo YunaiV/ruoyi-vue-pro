@@ -1,10 +1,8 @@
 package cn.iocoder.yudao.module.crm.service.product;
 
-import cn.hutool.core.util.ObjUtil;
-import cn.iocoder.yudao.module.crm.controller.admin.product.vo.productcategory.CrmProductCategoryCreateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.product.vo.productcategory.CrmProductCategoryListReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.product.vo.productcategory.CrmProductCategoryUpdateReqVO;
-import cn.iocoder.yudao.module.crm.convert.product.CrmProductCategoryConvert;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.crm.controller.admin.product.vo.category.CrmProductCategoryCreateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.product.vo.category.CrmProductCategoryListReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductCategoryDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.product.CrmProductCategoryMapper;
 import org.springframework.context.annotation.Lazy;
@@ -21,7 +19,7 @@ import static cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductCateg
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 
 /**
- * 产品分类 Service 实现类
+ * CRM 产品分类 Service 实现类
  *
  * @author ZanGe丶
  */
@@ -38,54 +36,27 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
 
     @Override
     public Long createProductCategory(CrmProductCategoryCreateReqVO createReqVO) {
-        // TODO zange：参考 mall： ProductCategoryServiceImpl 补充下必要的参数校验；
-        // 校验父分类存在
+        // 1.1 校验父分类存在
         validateParentProductCategory(createReqVO.getParentId());
-        // 分类名称是否存在
-        CrmProductCategoryDO dbProductCategory = productCategoryMapper.selectByName(createReqVO.getName());
-        if (dbProductCategory != null) {
-            return dbProductCategory.getId();
-        }
-        // 插入
-        CrmProductCategoryDO productCategory = CrmProductCategoryConvert.INSTANCE.convert(createReqVO);
-        productCategoryMapper.insert(productCategory);
-        // 返回
-        return productCategory.getId();
+        // 1.2 分类名称是否存在
+        validateProductNameExists(null, createReqVO.getParentId(), createReqVO.getName());
+        // 2. 插入
+        CrmProductCategoryDO category = BeanUtils.toBean(createReqVO, CrmProductCategoryDO.class);
+        productCategoryMapper.insert(category);
+        return category.getId();
     }
 
     @Override
-    public void updateProductCategory(CrmProductCategoryUpdateReqVO updateReqVO) {
-        // TODO zange：参考 mall： ProductCategoryServiceImpl 补充下必要的参数校验；
-        // 校验存在
+    public void updateProductCategory(CrmProductCategoryCreateReqVO updateReqVO) {
+        // 1.1 校验存在
         validateProductCategoryExists(updateReqVO.getId());
-        // 校验父分类存在
+        // 1.2 校验父分类存在
         validateParentProductCategory(updateReqVO.getParentId());
-        // 校验名字重复
-        CrmProductCategoryDO productCategoryDO = productCategoryMapper.selectByName(updateReqVO.getName());
-        if (productCategoryDO != null &&
-                ObjUtil.notEqual(productCategoryDO.getId(), updateReqVO.getId())) {
-            throw exception(PRODUCT_CATEGORY_EXISTS);
-        }
-        // 更新
-        CrmProductCategoryDO updateObj = CrmProductCategoryConvert.INSTANCE.convert(updateReqVO);
+        // 1.3 分类名称是否存在
+        validateProductNameExists(updateReqVO.getId(), updateReqVO.getParentId(), updateReqVO.getName());
+        // 2. 更新
+        CrmProductCategoryDO updateObj = BeanUtils.toBean(updateReqVO, CrmProductCategoryDO.class);
         productCategoryMapper.updateById(updateObj);
-    }
-
-    @Override
-    public void deleteProductCategory(Long id) {
-        // TODO zange：参考 mall： ProductCategoryServiceImpl 补充下必要的参数校验；
-        // 校验存在
-        validateProductCategoryExists(id);
-        // 校验是否还有子分类
-        if (productCategoryMapper.selectCountByParentId(id) > 0) {
-            throw exception(product_CATEGORY_EXISTS_CHILDREN);
-        }
-        // 校验是否被产品使用
-        if (crmProductService.getProductByCategoryId(id) !=null) {
-            throw exception(PRODUCT_CATEGORY_USED);
-        }
-        // 删除
-        productCategoryMapper.deleteById(id);
     }
 
     private void validateProductCategoryExists(Long id) {
@@ -108,6 +79,32 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
         if (!Objects.equals(category.getParentId(), PARENT_ID_NULL)) {
             throw exception(PRODUCT_CATEGORY_PARENT_NOT_FIRST_LEVEL);
         }
+    }
+
+    private void validateProductNameExists(Long id, Long parentId, String name) {
+        CrmProductCategoryDO category = productCategoryMapper.selectByParentIdAndName(parentId, name);
+        if (category == null
+            || category.getId().equals(id)) {
+            return;
+        }
+        throw exception(PRODUCT_CATEGORY_EXISTS);
+    }
+
+    @Override
+    public void deleteProductCategory(Long id) {
+        // TODO zange：参考 mall： ProductCategoryServiceImpl 补充下必要的参数校验；
+        // 校验存在
+        validateProductCategoryExists(id);
+        // 校验是否还有子分类
+        if (productCategoryMapper.selectCountByParentId(id) > 0) {
+            throw exception(product_CATEGORY_EXISTS_CHILDREN);
+        }
+        // 校验是否被产品使用
+        if (crmProductService.getProductByCategoryId(id) !=null) {
+            throw exception(PRODUCT_CATEGORY_USED);
+        }
+        // 删除
+        productCategoryMapper.deleteById(id);
     }
 
     @Override

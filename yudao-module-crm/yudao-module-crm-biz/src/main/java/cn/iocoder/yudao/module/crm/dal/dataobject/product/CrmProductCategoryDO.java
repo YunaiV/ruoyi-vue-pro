@@ -31,17 +31,18 @@ public class CrmProductCategoryDO extends BaseDO {
     public static final int CATEGORY_LEVEL = 2;
 
     /**
-     * 主键id
+     * 分类编号
      */
     @TableId
     private Long id;
     /**
-     * 名称
+     * 分类名称
      */
     private String name;
     /**
-     * 父级 id
-     * // TODO @zange-ok：这个要写下关联 CategoryDO 的 id 字段；参考下别的模块哈
+     * 父级编号
+     *
+     * 关联 {@link CrmProductCategoryDO#getId()}
      */
     private Long parentId;
 

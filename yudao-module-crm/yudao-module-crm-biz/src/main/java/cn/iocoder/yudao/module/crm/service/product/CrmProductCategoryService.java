@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.module.crm.service.product;
 
-import cn.iocoder.yudao.module.crm.controller.admin.product.vo.productcategory.CrmProductCategoryCreateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.product.vo.productcategory.CrmProductCategoryListReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.product.vo.productcategory.CrmProductCategoryUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.product.vo.category.CrmProductCategoryCreateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.product.vo.category.CrmProductCategoryListReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductCategoryDO;
 
 import javax.validation.Valid;
@@ -29,7 +28,7 @@ public interface CrmProductCategoryService {
      *
      * @param updateReqVO 更新信息
      */
-    void updateProductCategory(@Valid CrmProductCategoryUpdateReqVO updateReqVO);
+    void updateProductCategory(@Valid CrmProductCategoryCreateReqVO updateReqVO);
 
     /**
      * 删除产品分类

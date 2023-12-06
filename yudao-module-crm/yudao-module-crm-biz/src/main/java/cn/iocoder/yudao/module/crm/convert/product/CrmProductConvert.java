@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.crm.convert.product;
 
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductRespVO;
@@ -11,6 +12,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
@@ -27,14 +29,18 @@ public interface CrmProductConvert {
     default List<CrmProductRespVO> convertList(List<CrmProductDO> list,
                                                Map<Long, AdminUserRespDTO> userMap,
                                                List<CrmProductCategoryDO> categoryList) {
-        List<CrmProductRespVO> voList = BeanUtils.toBean(list, CrmProductRespVO.class);
         Map<Long, CrmProductCategoryDO> categoryMap = convertMap(categoryList, CrmProductCategoryDO::getId);
-        for (CrmProductRespVO vo : voList) {
-            MapUtils.findAndThen(categoryMap, vo.getCategoryId(), category -> vo.setCategoryName(category.getName()));
-            MapUtils.findAndThen(userMap, vo.getOwnerUserId(), user -> vo.setOwnerUserName(user.getNickname()));
-            MapUtils.findAndThen(userMap, Long.valueOf(vo.getCreator()), user -> vo.setCreatorName(user.getNickname()));
-        }
-        return voList;
+        return CollectionUtils.convertList(list,
+                product -> convert(product, userMap, categoryMap.get(product.getCategoryId())));
+    }
+
+    default CrmProductRespVO convert(CrmProductDO product,
+                                     Map<Long, AdminUserRespDTO> userMap, CrmProductCategoryDO category) {
+        CrmProductRespVO productVO = BeanUtils.toBean(product, CrmProductRespVO.class);
+        Optional.ofNullable(category).ifPresent(c -> productVO.setCategoryName(c.getName()));
+        MapUtils.findAndThen(userMap, productVO.getOwnerUserId(), user -> productVO.setOwnerUserName(user.getNickname()));
+        MapUtils.findAndThen(userMap, Long.valueOf(productVO.getCreator()), user -> productVO.setCreatorName(user.getNickname()));
+        return productVO;
     }
 
 }

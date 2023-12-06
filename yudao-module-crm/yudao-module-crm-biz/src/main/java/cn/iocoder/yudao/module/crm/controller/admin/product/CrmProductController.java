@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductPageReqVO;
@@ -82,7 +82,13 @@ public class CrmProductController {
     @PreAuthorize("@ss.hasPermission('crm:product:query')")
     public CommonResult<CrmProductRespVO> getProduct(@RequestParam("id") Long id) {
         CrmProductDO product = productService.getProduct(id);
-        return success(BeanUtils.toBean(product, CrmProductRespVO.class));
+        if (product == null) {
+            return success(null);
+        }
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
+                SetUtils.asSet( Long.valueOf(product.getCreator()), product.getOwnerUserId()));
+        CrmProductCategoryDO category = productCategoryService.getProductCategory(product.getCategoryId());
+        return success(CrmProductConvert.INSTANCE.convert(product, userMap, category));
     }
 
     @GetMapping("/page")
