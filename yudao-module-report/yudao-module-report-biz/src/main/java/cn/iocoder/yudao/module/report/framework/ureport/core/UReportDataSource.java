@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.report.framework.ureport.config;
+package cn.iocoder.yudao.module.report.framework.ureport.core;
 
 import com.bstek.ureport.definition.datasource.BuildinDatasource;
 import lombok.extern.slf4j.Slf4j;
@@ -10,10 +10,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.report.enums.ErrorCodeConstants.REPORT_DATABASE_NOT_EXISTS;
+import static cn.iocoder.yudao.module.report.enums.ErrorCodeConstants.UREPORT_DATABASE_NOT_EXISTS;
 
 /**
- * UReport 内置数据源
+ * UReport2 内置数据源
+ *
  * @author 赤焰
  */
 @Slf4j
@@ -41,8 +42,8 @@ public class UReportDataSource implements BuildinDatasource {
 		try {
 			return dataSource.getConnection();
 		} catch (SQLException e) {
-			log.error("UReportDataSource获取连接失败！");
-			throw exception(REPORT_DATABASE_NOT_EXISTS);
+			log.error("[getConnection][获取连接失败！]", e);
+			throw exception(UREPORT_DATABASE_NOT_EXISTS);
 		}
 	}
 

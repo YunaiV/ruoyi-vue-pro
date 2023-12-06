@@ -13,7 +13,7 @@ public interface ErrorCodeConstants {
     ErrorCode GO_VIEW_PROJECT_NOT_EXISTS = new ErrorCode(1_003_000_000, "GoView 项目不存在");
 
     // ========== UREPORT 模块 1-003-001-000 ==========
-    ErrorCode REPORT_DATA_NOT_EXISTS = new ErrorCode(1_003_001_001, "Ureport2报表不存在");
+    ErrorCode UREPORT_DATA_NOT_EXISTS = new ErrorCode(1_003_001_001, "Ureport2 报表不存在");
+    ErrorCode UREPORT_DATABASE_NOT_EXISTS = new ErrorCode(1_003_001_002, "Ureport2 报表数据源不存在");
 
-    ErrorCode REPORT_DATABASE_NOT_EXISTS = new ErrorCode(1_003_001_001, "Ureport2报表数据源不存在");
 }

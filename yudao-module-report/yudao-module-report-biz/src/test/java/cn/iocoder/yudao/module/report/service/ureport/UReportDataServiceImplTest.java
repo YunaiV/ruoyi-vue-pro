@@ -1,26 +1,27 @@
 package cn.iocoder.yudao.module.report.service.ureport;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.module.report.controller.admin.ureport.vo.UReportDataPageReqVO;
+import cn.iocoder.yudao.module.report.controller.admin.ureport.vo.UReportDataSaveReqVO;
+import cn.iocoder.yudao.module.report.dal.dataobject.ureport.UReportDataDO;
+import cn.iocoder.yudao.module.report.dal.mysql.ureport.UReportDataMapper;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 
-import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-
-import cn.iocoder.yudao.module.report.controller.admin.ureport.vo.*;
-import cn.iocoder.yudao.module.report.dal.dataobject.ureport.UReportDataDO;
-import cn.iocoder.yudao.module.report.dal.mysql.ureport.UReportDataMapper;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
-import org.springframework.context.annotation.Import;
-
-import static cn.iocoder.yudao.module.report.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.*;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.module.report.enums.ErrorCodeConstants.UREPORT_DATA_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
 
+// TODO 芋艿：最后搞单测
 /**
  * {@link UReportDataServiceImpl} 的单元测试类
  *
@@ -72,7 +73,7 @@ public class UReportDataServiceImplTest extends BaseDbUnitTest {
         UReportDataSaveReqVO updateReqVO = randomPojo(UReportDataSaveReqVO.class);
 
         // 调用, 并断言异常
-        assertServiceException(() -> uReportDataService.updateUReportData(updateReqVO), REPORT_DATA_NOT_EXISTS);
+        assertServiceException(() -> uReportDataService.updateUReportData(updateReqVO), UREPORT_DATA_NOT_EXISTS);
     }
 
     @Test
@@ -95,7 +96,7 @@ public class UReportDataServiceImplTest extends BaseDbUnitTest {
         Long id = randomLongId();
 
         // 调用, 并断言异常
-        assertServiceException(() -> uReportDataService.deleteUReportData(id), REPORT_DATA_NOT_EXISTS);
+        assertServiceException(() -> uReportDataService.deleteUReportData(id), UREPORT_DATA_NOT_EXISTS);
     }
 
     @Test

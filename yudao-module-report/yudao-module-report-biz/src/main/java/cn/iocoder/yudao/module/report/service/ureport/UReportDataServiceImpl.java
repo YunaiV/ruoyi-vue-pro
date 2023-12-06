@@ -1,20 +1,19 @@
 package cn.iocoder.yudao.module.report.service.ureport;
 
-import org.springframework.stereotype.Service;
-import javax.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-
-import cn.iocoder.yudao.module.report.controller.admin.ureport.vo.*;
-import cn.iocoder.yudao.module.report.dal.dataobject.ureport.UReportDataDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-
+import cn.iocoder.yudao.module.report.controller.admin.ureport.vo.UReportDataPageReqVO;
+import cn.iocoder.yudao.module.report.controller.admin.ureport.vo.UReportDataSaveReqVO;
+import cn.iocoder.yudao.module.report.dal.dataobject.ureport.UReportDataDO;
 import cn.iocoder.yudao.module.report.dal.mysql.ureport.UReportDataMapper;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.report.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.report.enums.ErrorCodeConstants.UREPORT_DATA_NOT_EXISTS;
 
 /**
  * Ureport2报表 Service 实现类
@@ -30,10 +29,9 @@ public class UReportDataServiceImpl implements UReportDataService {
 
     @Override
     public Long createUReportData(UReportDataSaveReqVO createReqVO) {
-        // 插入
+        // TODO @赤焰：名字不要重复的校验，要加下
         UReportDataDO uReportData = BeanUtils.toBean(createReqVO, UReportDataDO.class);
         uReportDataMapper.insert(uReportData);
-        // 返回
         return uReportData.getId();
     }
 
@@ -41,6 +39,7 @@ public class UReportDataServiceImpl implements UReportDataService {
     public void updateUReportData(UReportDataSaveReqVO updateReqVO) {
         // 校验存在
         validateUReportDataExists(updateReqVO.getId());
+        // TODO @赤焰：名字不要重复的校验，要加下
         // 更新
         UReportDataDO updateObj = BeanUtils.toBean(updateReqVO, UReportDataDO.class);
         uReportDataMapper.updateById(updateObj);
@@ -56,14 +55,14 @@ public class UReportDataServiceImpl implements UReportDataService {
 
     private void validateUReportDataExists(Long id) {
         if (uReportDataMapper.selectById(id) == null) {
-            throw exception(REPORT_DATA_NOT_EXISTS);
+            throw exception(UREPORT_DATA_NOT_EXISTS);
         }
     }
 
     @Override
     public void validateUReportDataExists(String name) {
-        if (uReportDataMapper.selectByName(name) == null) {
-            throw exception(REPORT_DATA_NOT_EXISTS);
+        if (uReportDataMapper.selectListByName(name) == null) {
+            throw exception(UREPORT_DATA_NOT_EXISTS);
         }
     }
 
@@ -84,11 +83,12 @@ public class UReportDataServiceImpl implements UReportDataService {
 
     @Override
     public UReportDataDO selectOneByName(String name) {
-        return uReportDataMapper.selectOneByName(name);
+        return uReportDataMapper.selectByName(name);
     }
 
     @Override
     public List<UReportDataDO> getReportDataList() {
         return uReportDataMapper.selectList();
     }
+
 }
