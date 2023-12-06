@@ -31,8 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
 
-    public String resourcesPath = "";  // 测试文件资源目录
-    public static final String OS_NAME = System.getProperty("os.name").toLowerCase().replace(" ", ""); // 操作系统名称
+    /**
+     * 测试文件资源目录
+     */
+    private String resourcesPath = "";
 
     @InjectMocks
     protected CodegenEngine codegenEngine;
@@ -47,7 +49,7 @@ public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
         // 获取测试文件 resources 路径
         String absolutePath = FileUtil.getAbsolutePath("application-unit-test.yaml");
         // 系统不一样生成的文件也有差异，那就各自生成各自的
-        resourcesPath = absolutePath.split("/target")[0] + "/src/test/resources/codegen/" + OS_NAME;
+        resourcesPath = absolutePath.split("/target")[0] + "/src/test/resources/codegen/";
     }
 
     protected static CodegenTableDO getTable(String name) {
@@ -80,14 +82,14 @@ public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
 
     @SuppressWarnings("rawtypes")
     protected static void assertResult(Map<String, String> result, String path) {
-        String assertContent = ResourceUtil.readUtf8Str("codegen/" + OS_NAME + path + "/assert.json");
+        String assertContent = ResourceUtil.readUtf8Str("codegen/" + path + "/assert.json");
         List<HashMap> asserts = JsonUtils.parseArray(assertContent, HashMap.class);
         assertEquals(asserts.size(), result.size());
         // 校验每个文件
         asserts.forEach(assertMap -> {
             String contentPath = (String) assertMap.get("contentPath");
             String filePath = (String) assertMap.get("filePath");
-            String content = ResourceUtil.readUtf8Str("codegen/" + OS_NAME + path + "/" + contentPath);
+            String content = ResourceUtil.readUtf8Str("codegen/" + path + "/" + contentPath);
             assertEquals(content, result.get(filePath), filePath + "：不匹配");
         });
     }
