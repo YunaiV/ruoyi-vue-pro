@@ -13,9 +13,7 @@ import lombok.EqualsAndHashCode;
 public class CrmBasePageReqVO extends PageParam {
 
     /**
-     * 场景类型, 为 null 时则表示全部
-     *
-     * 关联 {@link CrmSceneEnum}
+     * 场景类型，为 null 时则表示全部
      */
     @Schema(description = "场景类型", example = "1")
     @InEnum(CrmSceneEnum.class)

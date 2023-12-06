@@ -45,14 +45,14 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
         // 构建数据权限连表条件
         CrmQueryPageUtils.builderQuery(mpjLambdaWrapperX, pageReqVO, userId,
                 CrmBizTypeEnum.CRM_CUSTOMER.getType(), CrmCustomerDO::getId, subordinateIds, isAdmin);
-        mpjLambdaWrapperX
-                .selectAll(CrmCustomerDO.class)
+        mpjLambdaWrapperX.selectAll(CrmCustomerDO.class)
                 .likeIfPresent(CrmCustomerDO::getName, pageReqVO.getName())
                 .eqIfPresent(CrmCustomerDO::getMobile, pageReqVO.getMobile())
                 .eqIfPresent(CrmCustomerDO::getIndustryId, pageReqVO.getIndustryId())
                 .eqIfPresent(CrmCustomerDO::getLevel, pageReqVO.getLevel())
                 .eqIfPresent(CrmCustomerDO::getSource, pageReqVO.getSource());
         // 特殊：不分页，直接查询全部
+        // TODO @puhui999：下面这个，封装一个方法；从 56 到 61 这里哈；
         if (PageParam.PAGE_SIZE_NONE.equals(pageReqVO.getPageNo())) {
             List<CrmCustomerDO> list = selectJoinList(CrmCustomerDO.class, mpjLambdaWrapperX);
             return new PageResult<>(list, (long) list.size());

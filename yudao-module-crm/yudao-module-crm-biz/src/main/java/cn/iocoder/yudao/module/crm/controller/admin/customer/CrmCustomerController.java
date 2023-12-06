@@ -139,24 +139,6 @@ public class CrmCustomerController {
         return success(true);
     }
 
-    @PutMapping("/concern")
-    @Operation(summary = "关注客户")
-    @Parameter(name = "ids", description = "编号", required = true, example = "[1024]")
-    @PreAuthorize("@ss.hasPermission('crm:customer:update')")
-    public CommonResult<Boolean> concernCustomer(@RequestParam("ids") List<Long> ids) {
-        customerService.concernCustomer(ids, getLoginUserId());
-        return success(true);
-    }
-
-    @PutMapping("/cancel-concern")
-    @Operation(summary = "取消关注客户")
-    @Parameter(name = "ids", description = "编号", required = true, example = "[1024]")
-    @PreAuthorize("@ss.hasPermission('crm:customer:update')")
-    public CommonResult<Boolean> cancelConcernCustomer(@RequestParam("ids") List<Long> ids) {
-        customerService.cancelConcernCustomer(ids, getLoginUserId());
-        return success(true);
-    }
-
     // ==================== 公海相关操作 ====================
 
     @PutMapping("/put-pool")
