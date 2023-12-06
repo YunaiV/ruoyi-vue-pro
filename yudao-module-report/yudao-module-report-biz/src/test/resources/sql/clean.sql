@@ -1,2 +1,2 @@
 DELETE FROM "report_go_view_project";
-DELETE FROM "ureport_file";
+DELETE FROM "report_ureport_data";

@@ -9,14 +9,18 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.report.enums.ErrorCodeConstants.REPORT_DATABASE_NOT_EXISTS;
+
 /**
  * UReport 内置数据源
+ * @author 赤焰
  */
 @Slf4j
 @Component
-public class UreportDataSource implements BuildinDatasource {
+public class UReportDataSource implements BuildinDatasource {
 
-	private static final String NAME = "UreportDataSource";
+	private static final String NAME = "UReportDataSource";
 
 	@Resource
 	private DataSource dataSource;
@@ -29,7 +33,6 @@ public class UreportDataSource implements BuildinDatasource {
 		return NAME;
 	}
 
-    // TODO @赤焰：这个方法，如果拿不到连接，是不是抛出异常比较好？
 	/**
 	 * @return 获取连接
 	 */
@@ -38,10 +41,9 @@ public class UreportDataSource implements BuildinDatasource {
 		try {
 			return dataSource.getConnection();
 		} catch (SQLException e) {
-			log.error("Ureport 数据源 获取连接失败！");
-			e.printStackTrace();
+			log.error("UReportDataSource获取连接失败！");
+			throw exception(REPORT_DATABASE_NOT_EXISTS);
 		}
-		return null;
 	}
 
 }
