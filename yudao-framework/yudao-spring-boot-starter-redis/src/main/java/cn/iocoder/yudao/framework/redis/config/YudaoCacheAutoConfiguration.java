@@ -15,6 +15,7 @@ import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.util.StringUtils;
 
 import java.util.Objects;
 
@@ -39,7 +40,15 @@ public class YudaoCacheAutoConfiguration {
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig();
         // 设置使用 : 单冒号，而不是双 :: 冒号，避免 Redis Desktop Manager 多余空格
         // 详细可见 https://blog.csdn.net/chuixue24/article/details/103928965 博客
-        config = config.computePrefixWith(cacheName -> cacheName + StrUtil.COLON);
+        // 再次修复单冒号，而不是双 :: 冒号问题，Issues 详情：https://gitee.com/zhijiantianya/yudao-cloud/issues/I86VY2
+        config = config.computePrefixWith(cacheName -> {
+            String keyPrefix = cacheProperties.getRedis().getKeyPrefix();
+            if (StringUtils.hasText(keyPrefix)) {
+                keyPrefix = keyPrefix.lastIndexOf(StrUtil.COLON) == -1 ? keyPrefix + StrUtil.COLON : keyPrefix;
+                return keyPrefix + cacheName + StrUtil.COLON;
+            }
+            return cacheName + StrUtil.COLON;
+        });
         // 设置使用 JSON 序列化方式
         config = config.serializeValuesWith(
                 RedisSerializationContext.SerializationPair.fromSerializer(buildRedisSerializer()));
@@ -48,9 +57,6 @@ public class YudaoCacheAutoConfiguration {
         CacheProperties.Redis redisProperties = cacheProperties.getRedis();
         if (redisProperties.getTimeToLive() != null) {
             config = config.entryTtl(redisProperties.getTimeToLive());
-        }
-        if (redisProperties.getKeyPrefix() != null) {
-            config = config.prefixCacheNameWith(redisProperties.getKeyPrefix());
         }
         if (!redisProperties.isCacheNullValues()) {
             config = config.disableCachingNullValues();
