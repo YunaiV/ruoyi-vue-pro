@@ -10,7 +10,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@Schema(description = "管理后台 - Ureport2报表 Response VO")
+@Schema(description = "管理后台 - Ureport2 报表 Response VO")
 @Data
 @ExcelIgnoreUnannotated
 public class UReportDataRespVO {

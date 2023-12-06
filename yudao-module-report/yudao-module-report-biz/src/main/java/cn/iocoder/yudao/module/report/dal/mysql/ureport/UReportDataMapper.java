@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.module.report.dal.mysql.ureport;
 
-import java.util.*;
-
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.report.controller.admin.ureport.vo.UReportDataPageReqVO;
 import cn.iocoder.yudao.module.report.dal.dataobject.ureport.UReportDataDO;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.report.controller.admin.ureport.vo.*;
+
+import java.util.List;
 
 /**
  * Ureport2报表 Mapper
@@ -26,33 +26,17 @@ public interface UReportDataMapper extends BaseMapperX<UReportDataDO> {
                 .orderByDesc(UReportDataDO::getId));
     }
 
-    /**
-     * 根据名字查询报表
-     * @param name 报表名字
-     * @return
-     */
-    default List<UReportDataDO> selectByName(String name){
+    default List<UReportDataDO> selectListByName(String name) {
         return selectList(new LambdaQueryWrapperX<UReportDataDO>()
                 .eqIfPresent(UReportDataDO::getName,name));
     }
 
-    /**
-     * 根据名字查询报表
-     * @param name 报表名字
-     * @return
-     */
-    default UReportDataDO selectOneByName(String name){
+    default UReportDataDO selectByName(String name){
         return selectOne(new LambdaQueryWrapperX<UReportDataDO>()
                 .eqIfPresent(UReportDataDO::getName,name));
     }
 
-
-    /**
-     * 根据名字删除报表
-     * @param name 报表名字
-     * @return
-     */
-    default int deleteByName(String name){
+    default int deleteByName(String name) {
         return delete(new LambdaQueryWrapperX<UReportDataDO>()
                 .eqIfPresent(UReportDataDO::getName,name));
     }

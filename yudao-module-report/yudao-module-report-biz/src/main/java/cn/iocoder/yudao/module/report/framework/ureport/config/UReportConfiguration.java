@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.report.framework.ureport.config;
 
-import cn.iocoder.yudao.module.report.framework.security.config.UReportProperties;
 import com.bstek.ureport.console.UReportServlet;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -18,7 +17,7 @@ import javax.servlet.Servlet;
  */
 @Configuration
 @ImportResource({"classpath:ureport-console-context.xml"})
-@PropertySource(value = {"classpath:ureport.properties"})
+@PropertySource(value = {"classpath:ureport.properties"}) // TODO @赤焰：这个可以搞到 application.yaml 里么？
 @EnableConfigurationProperties({UReportProperties.class})
 public class UReportConfiguration {
 

@@ -7,8 +7,9 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
+// TODO @赤焰：这个是不是可以支持多租户？
 /**
- * Ureport2报表 DO
+ * Ureport2 报表 DO
  *
  * @author 芋道源码
  */
@@ -34,7 +35,7 @@ public class UReportDataDO extends BaseDO {
     /**
      * 状态
      *
-     * 枚举  {@link  CommonStatusEnum#getStatus()}
+     * 枚举 {@link  CommonStatusEnum#getStatus()}
      */
     private Integer status;
     /**

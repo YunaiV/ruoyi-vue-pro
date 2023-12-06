@@ -1,35 +1,33 @@
 package cn.iocoder.yudao.module.report.controller.admin.ureport;
 
-import org.springframework.web.bind.annotation.*;
-import javax.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Operation;
-
-import javax.validation.constraints.*;
-import javax.validation.*;
-import javax.servlet.http.*;
-import java.util.*;
-import java.io.IOException;
-
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*;
-
-import cn.iocoder.yudao.module.report.controller.admin.ureport.vo.*;
+import cn.iocoder.yudao.module.report.controller.admin.ureport.vo.UReportDataPageReqVO;
+import cn.iocoder.yudao.module.report.controller.admin.ureport.vo.UReportDataRespVO;
+import cn.iocoder.yudao.module.report.controller.admin.ureport.vo.UReportDataSaveReqVO;
 import cn.iocoder.yudao.module.report.dal.dataobject.ureport.UReportDataDO;
 import cn.iocoder.yudao.module.report.service.ureport.UReportDataService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "管理后台 - Ureport2报表")
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
+
+@Tag(name = "管理后台 - Ureport2 报表")
 @RestController
 @RequestMapping("/report/ureport-data")
 @Validated
@@ -39,14 +37,14 @@ public class UReportDataController {
     private UReportDataService uReportDataService;
 
     @PostMapping("/create")
-    @Operation(summary = "创建Ureport2报表")
+    @Operation(summary = "创建 Ureport2 报表")
     @PreAuthorize("@ss.hasPermission('report:ureport-data:create')")
     public CommonResult<Long> createUReportData(@Valid @RequestBody UReportDataSaveReqVO createReqVO) {
         return success(uReportDataService.createUReportData(createReqVO));
     }
 
     @PutMapping("/update")
-    @Operation(summary = "更新Ureport2报表")
+    @Operation(summary = "更新 Ureport2 报表")
     @PreAuthorize("@ss.hasPermission('report:ureport-data:update')")
     public CommonResult<Boolean> updateUReportData(@Valid @RequestBody UReportDataSaveReqVO updateReqVO) {
         uReportDataService.updateUReportData(updateReqVO);
@@ -54,7 +52,7 @@ public class UReportDataController {
     }
 
     @DeleteMapping("/delete")
-    @Operation(summary = "删除Ureport2报表")
+    @Operation(summary = "删除 Ureport2 报表")
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('report:ureport-data:delete')")
     public CommonResult<Boolean> deleteUReportData(@RequestParam("id") Long id) {
@@ -80,7 +78,7 @@ public class UReportDataController {
     }
 
     @GetMapping("/export-excel")
-    @Operation(summary = "导出Ureport2报表 Excel")
+    @Operation(summary = "导出 Ureport2 报表 Excel")
     @PreAuthorize("@ss.hasPermission('report:ureport-data:export')")
     @OperateLog(type = EXPORT)
     public void exportUReportDataExcel(@Valid UReportDataPageReqVO pageReqVO,
@@ -88,7 +86,7 @@ public class UReportDataController {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<UReportDataDO> list = uReportDataService.getUReportDataPage(pageReqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "Ureport2报表.xls", "数据", UReportDataRespVO.class,
+        ExcelUtils.write(response, "Ureport2 报表.xls", "数据", UReportDataRespVO.class,
                         BeanUtils.toBean(list, UReportDataRespVO.class));
     }
 
