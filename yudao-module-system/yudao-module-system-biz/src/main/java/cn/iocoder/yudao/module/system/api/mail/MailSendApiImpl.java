@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.system.service.mail.MailSendService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 
 /**
  * 邮件发送 API 实现类

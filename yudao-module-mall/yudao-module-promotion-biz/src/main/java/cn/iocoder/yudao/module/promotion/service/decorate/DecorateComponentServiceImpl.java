@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.decorate.DecorateCompone
 import cn.iocoder.yudao.module.promotion.dal.mysql.decorate.DecorateComponentMapper;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import java.util.List;
 
 /**

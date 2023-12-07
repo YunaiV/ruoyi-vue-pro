@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.member.controller.admin.signin.vo.config;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-import jakarta.validation.constraints.*;
+import javax.validation.constraints.*;
 
 @Schema(description = "管理后台 - 签到规则更新 Request VO")
 @Data

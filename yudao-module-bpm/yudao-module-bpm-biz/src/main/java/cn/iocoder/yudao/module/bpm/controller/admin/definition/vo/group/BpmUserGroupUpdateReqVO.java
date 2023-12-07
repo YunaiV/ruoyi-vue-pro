@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import jakarta.validation.constraints.*;
+import javax.validation.constraints.*;
 
 @Schema(description = "管理后台 - 用户组更新 Request VO")
 @Data

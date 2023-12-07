@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.infra.controller.admin.config.vo.ConfigPageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.config.vo.ConfigSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 /**
  * 参数配置 Service 接口

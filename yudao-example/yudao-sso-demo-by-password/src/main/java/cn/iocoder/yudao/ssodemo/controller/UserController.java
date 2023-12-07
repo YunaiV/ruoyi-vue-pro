@@ -6,7 +6,7 @@ import cn.iocoder.yudao.ssodemo.client.dto.user.UserInfoRespDTO;
 import cn.iocoder.yudao.ssodemo.client.dto.user.UserUpdateReqDTO;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 
 @RestController
 @RequestMapping("/user")

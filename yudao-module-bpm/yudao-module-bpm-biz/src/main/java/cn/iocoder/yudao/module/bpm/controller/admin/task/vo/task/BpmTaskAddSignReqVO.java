@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import jakarta.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 import java.util.Set;
 
 // TODO @海洋：类名，应该是 create 哈

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Schema(description = "管理后台 - 敏感词创建/修改 Request VO")

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-import jakarta.validation.constraints.*;
+import javax.validation.constraints.*;
 
 @Schema(description = "管理后台 - CRM 回款计划更新 Request VO")
 @Data
