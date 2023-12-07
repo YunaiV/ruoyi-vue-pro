@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.system.api.permission.dto.DeptDataPermissionRespD
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Collection;
 import java.util.Set;
 

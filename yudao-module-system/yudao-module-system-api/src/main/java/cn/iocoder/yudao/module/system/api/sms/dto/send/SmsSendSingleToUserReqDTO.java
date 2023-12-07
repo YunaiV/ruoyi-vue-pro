@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.system.api.sms.dto.send;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
 import lombok.Data;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.Map;
 
 /**

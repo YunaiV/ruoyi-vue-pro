@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;

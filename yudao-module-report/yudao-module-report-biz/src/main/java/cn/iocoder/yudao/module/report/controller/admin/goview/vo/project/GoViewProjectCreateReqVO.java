@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.report.controller.admin.goview.vo.project;
 
 import lombok.*;
 import io.swagger.v3.oas.annotations.media.Schema;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @Schema(description = "管理后台 - GoView 项目创建 Request VO")
 @Data

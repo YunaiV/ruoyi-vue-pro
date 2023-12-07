@@ -12,7 +12,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.util.Assert;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;

@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.promotion.service.seckill.SeckillActivityService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * 秒杀活动接口 Api 接口实现类

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.template;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Min;
 import java.time.LocalDateTime;
 
 @Schema(description = "用户 App - 优惠劵模板 Response VO")

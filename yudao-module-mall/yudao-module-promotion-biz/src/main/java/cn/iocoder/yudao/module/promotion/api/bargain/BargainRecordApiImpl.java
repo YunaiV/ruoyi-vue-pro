@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.promotion.service.bargain.BargainRecordService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * 砍价活动 API 实现类

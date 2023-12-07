@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.AssertTrue;
 
 @Schema(description = "管理后台 - 请假申请创建 Request VO")
 @Data

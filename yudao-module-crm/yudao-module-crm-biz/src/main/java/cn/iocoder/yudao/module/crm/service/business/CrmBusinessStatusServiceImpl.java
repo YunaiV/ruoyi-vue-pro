@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessStatusMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import java.util.List;
 

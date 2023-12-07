@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;

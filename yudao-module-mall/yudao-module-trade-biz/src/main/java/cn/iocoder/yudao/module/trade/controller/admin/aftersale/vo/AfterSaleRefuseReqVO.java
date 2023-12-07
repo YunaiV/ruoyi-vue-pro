@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "管理后台 - 交易售后拒绝收货 Request VO")
 @Data

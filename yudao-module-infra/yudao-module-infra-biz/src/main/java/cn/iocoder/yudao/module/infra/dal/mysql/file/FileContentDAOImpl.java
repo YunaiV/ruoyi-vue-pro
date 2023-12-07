@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileContentDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.stereotype.Repository;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Optional;
 

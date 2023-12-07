@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.system.service.social.SocialUserService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * 社交用户的 API 实现类

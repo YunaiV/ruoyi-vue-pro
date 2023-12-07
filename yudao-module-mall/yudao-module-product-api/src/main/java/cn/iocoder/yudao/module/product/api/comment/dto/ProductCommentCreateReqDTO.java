@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.product.api.comment.dto;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 /**

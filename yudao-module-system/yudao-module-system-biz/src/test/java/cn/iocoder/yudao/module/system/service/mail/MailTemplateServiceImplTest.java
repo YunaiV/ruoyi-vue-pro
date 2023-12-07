@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.system.dal.mysql.mail.MailTemplateMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

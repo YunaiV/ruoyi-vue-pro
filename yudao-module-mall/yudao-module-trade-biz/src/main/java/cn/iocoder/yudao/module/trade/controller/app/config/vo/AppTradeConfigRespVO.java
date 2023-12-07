@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.trade.controller.app.config.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 @Schema(description = "用户 App - 交易配置 Response VO")

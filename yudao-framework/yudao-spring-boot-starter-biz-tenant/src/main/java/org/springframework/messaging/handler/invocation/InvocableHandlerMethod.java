@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2021 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,11 @@
 
 package org.springframework.messaging.handler.invocation;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import org.springframework.core.DefaultParameterNameDiscoverer;
@@ -26,11 +31,6 @@ import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.HandlerMethod;
 import org.springframework.util.ObjectUtils;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.Arrays;
 
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_TENANT_ID;
 
@@ -50,9 +50,11 @@ public class InvocableHandlerMethod extends HandlerMethod {
 
     private static final Object[] EMPTY_ARGS = new Object[0];
 
+
     private HandlerMethodArgumentResolverComposite resolvers = new HandlerMethodArgumentResolverComposite();
 
     private ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
+
 
     /**
      * Create an instance from a {@code HandlerMethod}.
@@ -81,6 +83,7 @@ public class InvocableHandlerMethod extends HandlerMethod {
         super(bean, methodName, parameterTypes);
     }
 
+
     /**
      * Set {@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers} to use for resolving method argument values.
      */
@@ -91,11 +94,12 @@ public class InvocableHandlerMethod extends HandlerMethod {
     /**
      * Set the ParameterNameDiscoverer for resolving parameter names when needed
      * (e.g. default request attribute name).
-     * <p>Default is a {@link DefaultParameterNameDiscoverer}.
+     * <p>Default is a {@link org.springframework.core.DefaultParameterNameDiscoverer}.
      */
     public void setParameterNameDiscoverer(ParameterNameDiscoverer parameterNameDiscoverer) {
         this.parameterNameDiscoverer = parameterNameDiscoverer;
     }
+
 
     /**
      * Invoke the method after resolving its argument values in the context of the given message.
@@ -200,20 +204,21 @@ public class InvocableHandlerMethod extends HandlerMethod {
         }
         catch (IllegalArgumentException ex) {
             assertTargetBean(getBridgedMethod(), getBean(), args);
-            String text = (ex.getMessage() != null ? ex.getMessage() : "Illegal argument");
+            String text = (ex.getMessage() == null || ex.getCause() instanceof NullPointerException) ?
+                    "Illegal argument": ex.getMessage();
             throw new IllegalStateException(formatInvokeError(text, args), ex);
         }
         catch (InvocationTargetException ex) {
             // Unwrap for HandlerExceptionResolvers ...
             Throwable targetException = ex.getTargetException();
-            if (targetException instanceof RuntimeException) {
-                throw (RuntimeException) targetException;
+            if (targetException instanceof RuntimeException runtimeException) {
+                throw runtimeException;
             }
-            else if (targetException instanceof Error) {
-                throw (Error) targetException;
+            else if (targetException instanceof Error error) {
+                throw error;
             }
-            else if (targetException instanceof Exception) {
-                throw (Exception) targetException;
+            else if (targetException instanceof Exception exception) {
+                throw exception;
             }
             else {
                 throw new IllegalStateException(formatInvokeError("Invocation failure", args), targetException);
@@ -225,7 +230,8 @@ public class InvocableHandlerMethod extends HandlerMethod {
         return new AsyncResultMethodParameter(returnValue);
     }
 
-    private class AsyncResultMethodParameter extends HandlerMethodParameter {
+
+    private class AsyncResultMethodParameter extends AnnotatedMethodParameter {
 
         @Nullable
         private final Object returnValue;

@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.hibernate.validator.constraints.URL;
 
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 /**
 * 支付应用信息 Base VO，提供给添加、修改、详细的子 VO 使用

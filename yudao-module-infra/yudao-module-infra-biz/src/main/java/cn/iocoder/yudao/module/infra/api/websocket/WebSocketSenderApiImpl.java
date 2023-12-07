@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.infra.api.websocket;
 import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * WebSocket 发送器的 API 实现类

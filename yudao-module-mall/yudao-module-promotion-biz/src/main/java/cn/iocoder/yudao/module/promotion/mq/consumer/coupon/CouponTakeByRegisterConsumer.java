@@ -7,7 +7,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * 用户注册时，发送优惠劵的消费者，基 {@link MemberUserCreateMessage} 消息

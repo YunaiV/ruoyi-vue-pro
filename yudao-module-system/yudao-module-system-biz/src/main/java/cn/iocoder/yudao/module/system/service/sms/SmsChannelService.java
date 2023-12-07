@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannel
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 /**

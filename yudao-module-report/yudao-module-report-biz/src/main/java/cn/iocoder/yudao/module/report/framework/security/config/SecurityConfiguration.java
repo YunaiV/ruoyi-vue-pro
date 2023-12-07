@@ -8,10 +8,11 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * Report 模块的 Security 配置
@@ -25,16 +26,13 @@ public class SecurityConfiguration {
     @Bean("reportAuthorizeRequestsCustomizer")
     public AuthorizeRequestsCustomizer authorizeRequestsCustomizer() {
         return new AuthorizeRequestsCustomizer() {
-
             @Override
-            public void customize(ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry) {
-                registry.antMatchers("/jmreport/**").permitAll(); // 积木报表
-                registry.antMatchers("/ureport/**").permitAll(); // UReport 报表
+            public void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry) {
+                registry.requestMatchers("/jmreport/**").permitAll(); // 积木报表
+                registry.requestMatchers("/ureport/**").permitAll(); // UReport 报表
             }
-
         };
     }
-
 
     /**
      * 创建 UReportFilter 过滤器，响应 header 设置 token

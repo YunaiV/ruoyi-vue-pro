@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.jeecg.modules.jmreport.api.JmReportTokenServiceI;
 import org.springframework.http.HttpHeaders;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Objects;
 
 /**

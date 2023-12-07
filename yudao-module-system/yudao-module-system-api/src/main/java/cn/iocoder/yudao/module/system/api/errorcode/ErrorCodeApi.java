@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.system.api.errorcode;
 import cn.iocoder.yudao.module.system.api.errorcode.dto.ErrorCodeAutoGenerateReqDTO;
 import cn.iocoder.yudao.module.system.api.errorcode.dto.ErrorCodeRespDTO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 

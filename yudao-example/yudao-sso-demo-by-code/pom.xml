@@ -17,11 +17,11 @@
 
     <properties>
         <!-- Maven 相关 -->
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>2.7.17</spring.boot.version>
+        <spring.boot.version>3.2.0</spring.boot.version>
     </properties>
 
     <dependencyManagement>

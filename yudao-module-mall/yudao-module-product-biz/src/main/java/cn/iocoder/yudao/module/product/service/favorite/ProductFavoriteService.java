@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.product.controller.admin.favorite.vo.ProductFavor
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoritePageReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.favorite.ProductFavoriteDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * 商品收藏 Service 接口

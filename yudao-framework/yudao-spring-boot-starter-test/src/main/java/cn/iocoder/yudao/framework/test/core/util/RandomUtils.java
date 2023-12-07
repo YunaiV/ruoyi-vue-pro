@@ -7,10 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
-import uk.co.jemos.podam.common.AttributeStrategy;
 
-import javax.validation.constraints.Email;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.Arrays;

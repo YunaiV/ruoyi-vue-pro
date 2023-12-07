@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @Schema(description = "管理后台 - GoView 项目更新 Request VO")
 @Data

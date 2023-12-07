@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.service.aftersale.AfterSaleService;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getSumValue;

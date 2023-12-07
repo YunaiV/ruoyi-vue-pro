@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Collections;
 
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;

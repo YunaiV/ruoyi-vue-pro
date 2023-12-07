@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressCreate
 import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressUpdateReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.address.MemberAddressDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 /**

@@ -20,7 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * Spring Security 自动配置类，主要用于相关组件的配置

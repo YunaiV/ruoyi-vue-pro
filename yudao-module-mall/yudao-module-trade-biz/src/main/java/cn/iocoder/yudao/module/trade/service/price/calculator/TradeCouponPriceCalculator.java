@@ -16,7 +16,7 @@ import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.function.Predicate;
 

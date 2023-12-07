@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.Ar
 import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleCategoryDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 /**

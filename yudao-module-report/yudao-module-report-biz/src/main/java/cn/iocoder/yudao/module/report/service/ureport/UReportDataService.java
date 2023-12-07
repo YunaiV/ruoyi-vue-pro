@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.report.controller.admin.ureport.vo.UReportDataPag
 import cn.iocoder.yudao.module.report.controller.admin.ureport.vo.UReportDataSaveReqVO;
 import cn.iocoder.yudao.module.report.dal.dataobject.ureport.UReportDataDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 /**

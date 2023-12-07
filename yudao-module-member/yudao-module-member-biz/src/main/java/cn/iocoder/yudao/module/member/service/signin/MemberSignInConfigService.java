@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.member.controller.admin.signin.vo.config.MemberSi
 import cn.iocoder.yudao.module.member.controller.admin.signin.vo.config.MemberSignInConfigUpdateReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInConfigDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 /**

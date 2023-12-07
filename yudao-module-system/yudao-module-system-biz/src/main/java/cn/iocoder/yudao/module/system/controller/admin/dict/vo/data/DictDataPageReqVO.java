@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 @Schema(description = "管理后台 - 字典类型分页列表 Request VO")
 @Data

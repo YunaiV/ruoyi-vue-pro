@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * 支付单 API 实现类

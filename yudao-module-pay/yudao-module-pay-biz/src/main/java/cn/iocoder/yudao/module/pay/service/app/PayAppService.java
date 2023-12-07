@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.pay.controller.admin.app.vo.PayAppPageReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.app.vo.PayAppUpdateReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;

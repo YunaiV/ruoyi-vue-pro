@@ -2,10 +2,10 @@ package cn.iocoder.yudao.module.member.controller.admin.address.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import java.time.LocalDateTime;
+
 import java.time.LocalDateTime;
 import java.util.*;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 /**
  * 用户收件地址 Base VO，提供给添加、修改、详细的子 VO 使用

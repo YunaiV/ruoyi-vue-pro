@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.report.dal.mysql.goview.GoViewProjectMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.report.enums.ErrorCodeConstants.GO_VIEW_PROJECT_NOT_EXISTS;

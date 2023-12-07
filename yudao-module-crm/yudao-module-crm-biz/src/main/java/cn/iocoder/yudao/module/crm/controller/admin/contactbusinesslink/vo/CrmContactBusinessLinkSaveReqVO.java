@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.crm.controller.admin.contactbusinesslink.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "管理后台 - CRM 联系人商机关联新增/修改 Request VO")
 @Data

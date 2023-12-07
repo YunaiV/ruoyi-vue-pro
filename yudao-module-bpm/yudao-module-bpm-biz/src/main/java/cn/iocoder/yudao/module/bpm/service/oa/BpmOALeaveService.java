@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.bpm.controller.admin.oa.vo.BpmOALeaveCreateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.oa.vo.BpmOALeavePageReqVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.oa.BpmOALeaveDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * 请假申请 Service 接口

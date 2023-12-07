@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
-import javax.annotation.security.PermitAll;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.Resource;
+import jakarta.annotation.security.PermitAll;
+import jakarta.servlet.http.HttpServletRequest;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 

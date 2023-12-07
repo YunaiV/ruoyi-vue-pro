@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 import java.util.Map;
 

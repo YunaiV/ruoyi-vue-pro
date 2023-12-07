@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageR
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 

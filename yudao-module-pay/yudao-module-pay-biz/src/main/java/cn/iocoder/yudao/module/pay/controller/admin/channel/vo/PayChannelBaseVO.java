@@ -3,7 +3,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 /**
 * 支付渠道 Base VO，提供给添加、修改、详细的子 VO 使用

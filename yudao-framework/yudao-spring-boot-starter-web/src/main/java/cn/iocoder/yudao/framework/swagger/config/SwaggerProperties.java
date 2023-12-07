@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.swagger.config;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 
 /**
  * Swagger 配置属性

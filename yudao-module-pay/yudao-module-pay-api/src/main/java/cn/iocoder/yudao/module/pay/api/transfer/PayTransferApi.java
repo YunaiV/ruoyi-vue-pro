@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.pay.api.transfer;
 
 import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferCreateReqDTO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * 转账单 API 接口

@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.mp.controller.admin.material.vo.MpMaterialUploadT
 import cn.iocoder.yudao.module.mp.dal.dataobject.material.MpMaterialDO;
 import me.chanjar.weixin.common.api.WxConsts;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;

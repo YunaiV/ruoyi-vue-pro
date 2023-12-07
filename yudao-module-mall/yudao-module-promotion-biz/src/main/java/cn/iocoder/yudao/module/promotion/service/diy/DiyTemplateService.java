@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.diy.vo.template.DiyTem
 import cn.iocoder.yudao.module.promotion.controller.admin.diy.vo.template.DiyTemplateUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.diy.DiyTemplateDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * 装修模板 Service 接口

@@ -41,7 +41,7 @@ import me.chanjar.weixin.mp.config.impl.WxMpRedisConfigImpl;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.Duration;
 import java.util.Objects;
 

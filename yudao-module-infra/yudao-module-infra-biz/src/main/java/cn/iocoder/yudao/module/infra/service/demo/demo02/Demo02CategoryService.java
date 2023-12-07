@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.infra.service.demo.demo02;
 
 import java.util.*;
-import javax.validation.*;
+import jakarta.validation.*;
 
 import cn.iocoder.yudao.module.infra.controller.admin.demo.demo02.vo.Demo02CategoryListReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.demo.demo02.vo.Demo02CategorySaveReqVO;

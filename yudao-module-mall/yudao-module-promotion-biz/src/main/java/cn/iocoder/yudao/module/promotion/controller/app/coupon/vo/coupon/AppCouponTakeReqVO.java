@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "用户 App - 优惠劵领取 Request VO")
 @Data

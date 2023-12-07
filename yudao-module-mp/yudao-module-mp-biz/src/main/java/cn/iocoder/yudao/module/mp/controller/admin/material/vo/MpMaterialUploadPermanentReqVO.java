@@ -7,9 +7,9 @@ import lombok.Data;
 import me.chanjar.weixin.common.api.WxConsts;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "管理后台 - 公众号素材上传永久 Request VO")
 @Data

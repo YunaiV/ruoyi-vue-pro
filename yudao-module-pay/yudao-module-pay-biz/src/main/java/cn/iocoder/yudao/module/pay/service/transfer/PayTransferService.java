@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.pay.controller.admin.transfer.vo.PayTransferCreat
 import cn.iocoder.yudao.module.pay.controller.admin.transfer.vo.PayTransferPageReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.transfer.PayTransferDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * 转账 Service 接口

@@ -1,12 +1,8 @@
 package cn.iocoder.yudao.framework.pay.core.client;
 
-import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
-import java.util.Set;
+import jakarta.validation.Validator;
 
 /**
  * 支付客户端的配置，本质是支付渠道的配置

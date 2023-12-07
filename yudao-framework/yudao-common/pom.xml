@@ -60,7 +60,7 @@
 
         <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-ui</artifactId>
+            <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
             <scope>provided</scope> <!-- 设置为 provided，主要是 PageParam 使用到 -->
         </dependency>
 
@@ -125,6 +125,10 @@
 
         <dependency>
             <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.dromara.hutool</groupId>
             <artifactId>hutool-all</artifactId>
         </dependency>
 

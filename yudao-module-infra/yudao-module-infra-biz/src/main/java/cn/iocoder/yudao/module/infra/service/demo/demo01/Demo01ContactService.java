@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.infra.service.demo.demo01;
 
-import javax.validation.*;
+import jakarta.validation.*;
 
 import cn.iocoder.yudao.module.infra.controller.admin.demo.demo01.vo.Demo01ContactPageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.demo.demo01.vo.Demo01ContactSaveReqVO;

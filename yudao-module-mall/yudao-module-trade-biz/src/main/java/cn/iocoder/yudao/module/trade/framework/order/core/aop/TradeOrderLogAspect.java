@@ -14,7 +14,7 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;

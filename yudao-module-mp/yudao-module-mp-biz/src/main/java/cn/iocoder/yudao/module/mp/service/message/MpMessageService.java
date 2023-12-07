@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.mp.service.message.bo.MpMessageSendOutReqBO;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * 公众号消息 Service 接口

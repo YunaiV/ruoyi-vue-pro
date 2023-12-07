@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.article.Art
 import cn.iocoder.yudao.module.promotion.controller.app.article.vo.article.AppArticlePageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 /**

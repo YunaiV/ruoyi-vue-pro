@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.member.message.user;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * 会员用户创建消息

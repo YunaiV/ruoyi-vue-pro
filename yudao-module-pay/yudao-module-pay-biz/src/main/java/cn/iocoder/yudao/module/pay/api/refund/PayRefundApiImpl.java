@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * 退款单 API 实现类

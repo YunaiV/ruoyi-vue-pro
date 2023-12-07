@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.infra.service.demo.demo01;
 import cn.iocoder.yudao.module.infra.controller.admin.demo.demo01.vo.Demo01ContactPageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.demo.demo01.vo.Demo01ContactSaveReqVO;
 import org.springframework.stereotype.Service;
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo01.Demo01ContactDO;

@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponRespDTO;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponUseReqDTO;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponValidReqDTO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * 优惠劵 API 接口

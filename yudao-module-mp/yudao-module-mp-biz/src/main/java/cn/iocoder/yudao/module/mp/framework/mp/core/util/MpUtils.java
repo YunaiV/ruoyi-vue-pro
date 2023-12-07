@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.api.WxConsts;
 
-import javax.validation.Validator;
+import jakarta.validation.Validator;
 
 /**
  * 公众号工具类

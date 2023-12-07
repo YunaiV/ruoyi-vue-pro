@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "管理后台 - 商机转移 Request VO")
 @Data

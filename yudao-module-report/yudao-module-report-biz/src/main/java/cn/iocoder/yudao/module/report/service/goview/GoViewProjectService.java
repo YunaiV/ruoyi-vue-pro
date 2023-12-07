@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.report.controller.admin.goview.vo.project.GoViewP
 import cn.iocoder.yudao.module.report.controller.admin.goview.vo.project.GoViewProjectUpdateReqVO;
 import cn.iocoder.yudao.module.report.dal.dataobject.goview.GoViewProjectDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * GoView 项目 Service 接口

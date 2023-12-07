@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.product.controller.app.category.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Data
 @Schema(description = "用户 APP - 商品分类 Response VO")

@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.recrod.Barg
 import cn.iocoder.yudao.module.promotion.controller.app.bargain.vo.record.AppBargainRecordCreateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainRecordDO;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;

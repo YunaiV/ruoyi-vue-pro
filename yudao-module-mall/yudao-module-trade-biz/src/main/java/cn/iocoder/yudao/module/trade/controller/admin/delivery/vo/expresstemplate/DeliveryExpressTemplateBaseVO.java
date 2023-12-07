@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstempla
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
 * 快递运费模板 Base VO，提供给添加、修改、详细的子 VO 使用

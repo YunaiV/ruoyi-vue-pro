@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.io.InputStream;
 import java.util.*;
 

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.member.service.auth;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * 会员的认证 Service 接口

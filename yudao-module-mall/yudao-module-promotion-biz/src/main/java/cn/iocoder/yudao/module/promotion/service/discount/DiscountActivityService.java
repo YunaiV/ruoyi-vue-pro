@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountAc
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProductDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 

@@ -1,6 +1,6 @@
 ## AdoptOpenJDK 停止发布 OpenJDK 二进制，而 Eclipse Temurin 是它的延伸，提供更好的稳定性
 ## 感谢复旦核博士的建议！灰子哥，牛皮！
-FROM eclipse-temurin:8-jre
+FROM eclipse-temurin:21-jre
 
 ## 创建目录，并使用它作为工作目录
 RUN mkdir -p /yudao-server

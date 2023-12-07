@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettle
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * 交易订单【写】Service 接口

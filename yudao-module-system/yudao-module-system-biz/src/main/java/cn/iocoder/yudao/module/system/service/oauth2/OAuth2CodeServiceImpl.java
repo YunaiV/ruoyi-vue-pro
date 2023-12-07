@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.system.dal.mysql.oauth2.OAuth2CodeMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 

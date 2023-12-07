@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import org.flowable.task.api.Task;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 

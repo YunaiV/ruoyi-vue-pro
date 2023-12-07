@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * crm 数据权限 Update Req BO

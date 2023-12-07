@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.member.service.config.MemberConfigService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * 用户配置 API 实现类

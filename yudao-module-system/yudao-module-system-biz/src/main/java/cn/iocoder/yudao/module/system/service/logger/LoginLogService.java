@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.logger.vo.loginlog.LoginLogPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.logger.LoginLogDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * 登录日志 Service 接口

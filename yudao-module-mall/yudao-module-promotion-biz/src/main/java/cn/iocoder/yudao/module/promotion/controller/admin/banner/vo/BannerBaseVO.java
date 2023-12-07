@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.promotion.enums.banner.BannerPositionEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Banner Base VO，提供给添加、修改、详细的子 VO 使用

@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.member.dal.mysql.address.MemberAddressMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;

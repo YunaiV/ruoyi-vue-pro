@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.system.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.system.service.auth.AdminAuthService;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;

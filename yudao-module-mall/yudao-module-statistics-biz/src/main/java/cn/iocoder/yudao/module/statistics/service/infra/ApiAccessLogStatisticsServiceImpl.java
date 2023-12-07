@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.statistics.dal.mysql.infra.ApiAccessLogStatistics
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 
 /**

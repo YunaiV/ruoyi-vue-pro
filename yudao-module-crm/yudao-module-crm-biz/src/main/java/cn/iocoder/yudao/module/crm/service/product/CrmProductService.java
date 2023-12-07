@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProduc
 import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 

@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderLogMapper;
 import cn.iocoder.yudao.module.trade.service.order.bo.TradeOrderLogCreateReqBO;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 /**

@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantInfoHandler;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantMenuHandler;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Set;
 

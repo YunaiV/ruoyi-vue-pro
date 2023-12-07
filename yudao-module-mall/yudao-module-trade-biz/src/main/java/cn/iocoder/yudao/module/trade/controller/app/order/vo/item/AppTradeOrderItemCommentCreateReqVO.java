@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.trade.controller.app.order.vo.item;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.List;
 
 @Schema(description = "用户 App - 商品评价创建 Request VO")

@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.system.dal.mysql.notify.NotifyMessageMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;

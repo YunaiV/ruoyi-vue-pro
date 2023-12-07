@@ -7,9 +7,9 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.URL;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 /**
  * 会员等级 Base VO，提供给添加、修改、详细的子 VO 使用

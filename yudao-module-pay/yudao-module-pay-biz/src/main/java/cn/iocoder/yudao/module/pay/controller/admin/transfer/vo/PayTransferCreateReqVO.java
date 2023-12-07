@@ -7,8 +7,8 @@ import cn.iocoder.yudao.module.pay.enums.transfer.PayTransferTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.Validator;
-import javax.validation.constraints.*;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.*;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.NOT_IMPLEMENTED;

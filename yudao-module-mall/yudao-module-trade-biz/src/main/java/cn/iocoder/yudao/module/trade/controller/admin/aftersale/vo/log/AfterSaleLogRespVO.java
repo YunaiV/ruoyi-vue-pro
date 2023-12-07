@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.log;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - 交易售后日志 Response VO")

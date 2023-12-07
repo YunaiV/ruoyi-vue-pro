@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.system.enums.mail.MailSendStatusEnum;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Objects;

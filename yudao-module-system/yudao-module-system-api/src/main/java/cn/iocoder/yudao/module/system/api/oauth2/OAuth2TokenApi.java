@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.system.api.oauth2.dto.OAuth2AccessTokenCheckRespD
 import cn.iocoder.yudao.module.system.api.oauth2.dto.OAuth2AccessTokenCreateReqDTO;
 import cn.iocoder.yudao.module.system.api.oauth2.dto.OAuth2AccessTokenRespDTO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * OAuth2.0 Token API 接口

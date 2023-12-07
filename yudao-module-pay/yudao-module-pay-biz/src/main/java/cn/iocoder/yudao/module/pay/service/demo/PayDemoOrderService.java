@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.controller.admin.demo.vo.order.PayDemoOrderCreateReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.demo.PayDemoOrderDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * 示例订单 Service 接口

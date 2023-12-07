@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.system.enums.mail.MailSendStatusEnum;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Map;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.crm.controller.admin.product.vo.product;
 import lombok.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "管理后台 - CRM 产品创建/修改 Request VO")
 @Data

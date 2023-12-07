@@ -11,7 +11,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Set;
 
 /**

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.mp.controller.admin.open.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 
 @Schema(description = "管理后台 - 公众号校验签名 Request VO")
 @Data

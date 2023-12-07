@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.crm.framework.vo.CrmBasePageReqVO;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.Collection;
 
 /**

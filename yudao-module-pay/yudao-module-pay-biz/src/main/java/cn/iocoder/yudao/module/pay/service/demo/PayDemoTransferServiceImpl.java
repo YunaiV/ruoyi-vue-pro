@@ -13,9 +13,9 @@ import cn.iocoder.yudao.module.pay.service.transfer.PayTransferService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
-import javax.validation.Valid;
-import javax.validation.Validator;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
+import jakarta.validation.Validator;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;

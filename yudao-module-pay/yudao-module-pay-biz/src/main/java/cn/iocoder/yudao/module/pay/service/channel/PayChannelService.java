@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.pay.controller.admin.channel.vo.PayChannelCreateR
 import cn.iocoder.yudao.module.pay.controller.admin.channel.vo.PayChannelUpdateReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 

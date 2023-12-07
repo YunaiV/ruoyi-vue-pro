@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.trade.service.price;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * 价格计算 Service 接口

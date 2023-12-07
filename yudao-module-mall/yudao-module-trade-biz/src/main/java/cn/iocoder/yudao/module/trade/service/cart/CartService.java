@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.trade.service.cart;
 import cn.iocoder.yudao.module.trade.controller.app.cart.vo.*;
 import cn.iocoder.yudao.module.trade.dal.dataobject.cart.CartDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;

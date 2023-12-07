@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.system.dal.mysql.dept.PostMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;

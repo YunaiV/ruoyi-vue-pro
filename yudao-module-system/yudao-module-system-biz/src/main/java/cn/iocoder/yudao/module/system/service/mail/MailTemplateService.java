@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemp
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplateSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 

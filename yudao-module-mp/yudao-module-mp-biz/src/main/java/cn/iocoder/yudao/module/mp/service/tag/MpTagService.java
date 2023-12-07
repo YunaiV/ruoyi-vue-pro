@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.mp.controller.admin.tag.vo.MpTagPageReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.tag.vo.MpTagUpdateReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.tag.MpTagDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 /**

@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.activit
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;

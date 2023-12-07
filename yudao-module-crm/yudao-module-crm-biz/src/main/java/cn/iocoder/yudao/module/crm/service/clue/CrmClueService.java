@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.crm.service.clue;
 
 import java.util.*;
-import javax.validation.*;
+import jakarta.validation.*;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;

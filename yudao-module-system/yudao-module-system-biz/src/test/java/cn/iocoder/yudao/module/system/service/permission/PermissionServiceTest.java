@@ -21,7 +21,7 @@ import org.mockito.MockedStatic;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;

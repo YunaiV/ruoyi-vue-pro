@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.infra.api.logger;
 
 import cn.iocoder.yudao.module.infra.api.logger.dto.ApiErrorLogCreateReqDTO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * API 错误日志的 API 接口

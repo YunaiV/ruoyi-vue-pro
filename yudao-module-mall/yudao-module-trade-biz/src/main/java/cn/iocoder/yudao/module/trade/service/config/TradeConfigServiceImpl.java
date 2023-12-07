@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.trade.dal.mysql.config.TradeConfigMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 /**

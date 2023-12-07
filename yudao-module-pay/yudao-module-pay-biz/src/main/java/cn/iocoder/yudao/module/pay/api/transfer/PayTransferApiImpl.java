@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.pay.service.transfer.PayTransferService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * 转账单 API 实现类

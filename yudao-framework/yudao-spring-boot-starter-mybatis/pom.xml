@@ -56,20 +56,27 @@
 
         <dependency>
             <groupId>com.alibaba</groupId>
-            <artifactId>druid-spring-boot-starter</artifactId>
+            <artifactId>druid-spring-boot-3-starter</artifactId>
         </dependency>
         <dependency>
             <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
         </dependency>
         <dependency>
             <groupId>com.baomidou</groupId>
-            <artifactId>dynamic-datasource-spring-boot-starter</artifactId> <!-- 多数据源 -->
+            <artifactId>dynamic-datasource-spring-boot3-starter</artifactId> <!-- 多数据源 -->
         </dependency>
 
         <dependency>
             <groupId>com.github.yulichang</groupId>
             <artifactId>mybatis-plus-join-boot-starter</artifactId> <!-- MyBatis 联表查询 -->
+        </dependency>
+
+        <!-- TODO 芋艿：临时解决 spring boot 3.x 适配 -->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis-spring</artifactId>
+            <version>3.0.3</version>
         </dependency>
     </dependencies>
 

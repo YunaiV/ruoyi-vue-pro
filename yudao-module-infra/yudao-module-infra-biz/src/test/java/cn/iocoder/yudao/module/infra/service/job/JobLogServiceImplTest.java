@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.infra.enums.job.JobLogStatusEnum;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;

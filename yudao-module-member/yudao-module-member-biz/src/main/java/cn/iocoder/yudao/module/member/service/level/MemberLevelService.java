@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateL
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
 import cn.iocoder.yudao.module.member.enums.MemberExperienceBizTypeEnum;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 

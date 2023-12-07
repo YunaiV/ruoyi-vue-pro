@@ -14,10 +14,10 @@ import cn.iocoder.yudao.framework.web.core.filter.ApiRequestFilter;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.infra.controller.admin.file.vo.config;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.Map;
 
 @Schema(description = "管理后台 - 文件配置创建/修改 Request VO")

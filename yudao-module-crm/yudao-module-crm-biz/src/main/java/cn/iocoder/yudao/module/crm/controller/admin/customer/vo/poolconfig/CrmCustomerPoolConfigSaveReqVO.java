@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.AssertTrue;
 import java.util.Objects;
 
 @Schema(description = "管理后台 - CRM 客户公海配置的保存 Request VO")

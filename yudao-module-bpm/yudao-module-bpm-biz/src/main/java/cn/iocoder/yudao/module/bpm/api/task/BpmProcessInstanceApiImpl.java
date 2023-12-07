@@ -5,8 +5,8 @@ import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
-import javax.validation.Valid;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 
 /**
  * Flowable 流程实例 Api 实现类

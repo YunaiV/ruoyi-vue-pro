@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.member.controller.admin.group.vo.MemberGroupPageR
 import cn.iocoder.yudao.module.member.controller.admin.group.vo.MemberGroupUpdateReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.group.MemberGroupDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 

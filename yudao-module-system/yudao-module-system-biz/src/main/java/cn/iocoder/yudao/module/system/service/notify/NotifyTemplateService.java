@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.Notify
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyTemplateDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Map;
 
 /**

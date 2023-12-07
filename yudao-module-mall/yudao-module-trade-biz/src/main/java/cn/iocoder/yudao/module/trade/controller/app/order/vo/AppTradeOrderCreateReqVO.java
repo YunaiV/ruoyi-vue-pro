@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.AssertTrue;
 
 @Schema(description = "用户 App - 交易订单创建 Request VO")
 @Data

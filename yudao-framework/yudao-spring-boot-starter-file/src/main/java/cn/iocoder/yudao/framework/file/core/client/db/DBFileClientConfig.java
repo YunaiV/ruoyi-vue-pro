@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.file.core.client.FileClientConfig;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 
 /**
  * 基于 DB 存储的文件客户端的配置类

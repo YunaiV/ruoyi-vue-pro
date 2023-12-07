@@ -2,7 +2,7 @@ package cn.iocoder.yudao.framework.apilog.core.service;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 /**

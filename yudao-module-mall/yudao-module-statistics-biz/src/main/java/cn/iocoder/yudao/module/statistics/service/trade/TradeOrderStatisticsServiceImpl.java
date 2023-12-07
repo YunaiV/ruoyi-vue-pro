@@ -14,7 +14,7 @@ import cn.iocoder.yudao.module.statistics.service.trade.bo.TradeOrderSummaryResp
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;

@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;

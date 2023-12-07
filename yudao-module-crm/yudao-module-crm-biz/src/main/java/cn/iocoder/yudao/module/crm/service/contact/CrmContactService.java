@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactUpdateR
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 

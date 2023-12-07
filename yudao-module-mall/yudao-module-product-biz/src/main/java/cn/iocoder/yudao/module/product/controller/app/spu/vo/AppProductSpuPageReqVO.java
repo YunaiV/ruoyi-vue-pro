@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.AssertTrue;
 
 @Schema(description = "用户 App - 商品 SPU 分页 Request VO")
 @Data

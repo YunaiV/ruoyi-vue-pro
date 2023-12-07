@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.member.controller.admin.tag.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * 会员标签 Base VO，提供给添加、修改、详细的子 VO 使用

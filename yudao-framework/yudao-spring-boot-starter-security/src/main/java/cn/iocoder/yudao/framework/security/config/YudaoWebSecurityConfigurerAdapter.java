@@ -10,9 +10,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
@@ -23,8 +27,8 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import javax.annotation.Resource;
-import javax.annotation.security.PermitAll;
+import jakarta.annotation.Resource;
+import jakarta.annotation.security.PermitAll;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +39,7 @@ import java.util.Set;
  * @author 芋道源码
  */
 @AutoConfiguration
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+@EnableMethodSecurity(securedEnabled = true)
 public class YudaoWebSecurityConfigurerAdapter {
 
     @Resource
@@ -101,15 +105,15 @@ public class YudaoWebSecurityConfigurerAdapter {
         // 登出
         httpSecurity
                 // 开启跨域
-                .cors().and()
+                .cors(Customizer.withDefaults())
                 // CSRF 禁用，因为不使用 Session
-                .csrf().disable()
+                .csrf(AbstractHttpConfigurer::disable)
                 // 基于 token 机制，所以不需要 Session
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .headers().frameOptions().disable().and()
+                .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .headers(c -> c.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 // 一堆自定义的 Spring Security 处理器
-                .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
-                .accessDeniedHandler(accessDeniedHandler);
+                .exceptionHandling(c -> c.authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler));
         // 登录、登录暂时不使用 Spring Security 的拓展点，主要考虑一方面拓展多用户、多种登录方式相对复杂，一方面用户的学习成本较高
 
         // 获得 @PermitAll 带来的 URL 列表，免登录
@@ -117,27 +121,25 @@ public class YudaoWebSecurityConfigurerAdapter {
         // 设置每个请求的权限
         httpSecurity
                 // ①：全局共享规则
-                .authorizeRequests()
-                // 1.1 静态资源，可匿名访问
-                .antMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
-                // 1.2 设置 @PermitAll 无需认证
-                .antMatchers(HttpMethod.GET, permitAllUrls.get(HttpMethod.GET).toArray(new String[0])).permitAll()
-                .antMatchers(HttpMethod.POST, permitAllUrls.get(HttpMethod.POST).toArray(new String[0])).permitAll()
-                .antMatchers(HttpMethod.PUT, permitAllUrls.get(HttpMethod.PUT).toArray(new String[0])).permitAll()
-                .antMatchers(HttpMethod.DELETE, permitAllUrls.get(HttpMethod.DELETE).toArray(new String[0])).permitAll()
-                // 1.3 基于 yudao.security.permit-all-urls 无需认证
-                .antMatchers(securityProperties.getPermitAllUrls().toArray(new String[0])).permitAll()
-                // 1.4 设置 App API 无需认证
-                .antMatchers(buildAppApi("/**")).permitAll()
-                // 1.5 验证码captcha 允许匿名访问
-                .antMatchers("/captcha/get", "/captcha/check").permitAll()
+                .authorizeHttpRequests(c -> c
+                    // 1.1 静态资源，可匿名访问
+                    .requestMatchers(HttpMethod.GET, "/*.html", "/*.html", "/*.css", "/*.js").permitAll()
+                    // 1.1 设置 @PermitAll 无需认证
+                    .requestMatchers(HttpMethod.GET, permitAllUrls.get(HttpMethod.GET).toArray(new String[0])).permitAll()
+                    .requestMatchers(HttpMethod.POST, permitAllUrls.get(HttpMethod.POST).toArray(new String[0])).permitAll()
+                    .requestMatchers(HttpMethod.PUT, permitAllUrls.get(HttpMethod.PUT).toArray(new String[0])).permitAll()
+                    .requestMatchers(HttpMethod.DELETE, permitAllUrls.get(HttpMethod.DELETE).toArray(new String[0])).permitAll()
+                    .requestMatchers(HttpMethod.HEAD, permitAllUrls.get(HttpMethod.HEAD).toArray(new String[0])).permitAll()
+                    .requestMatchers(HttpMethod.PATCH, permitAllUrls.get(HttpMethod.PATCH).toArray(new String[0])).permitAll()
+                    // 1.2 基于 yudao.security.permit-all-urls 无需认证
+                    .requestMatchers(securityProperties.getPermitAllUrls().toArray(new String[0])).permitAll()
+                    // 1.3 设置 App API 无需认证
+                    .requestMatchers(buildAppApi("/**")).permitAll()
+                )
                 // ②：每个项目的自定义规则
-                .and().authorizeRequests(registry -> // 下面，循环设置自定义规则
-                        authorizeRequestsCustomizers.forEach(customizer -> customizer.customize(registry)))
+                .authorizeHttpRequests(c -> authorizeRequestsCustomizers.forEach(customizer -> customizer.customize(c)))
                 // ③：兜底规则，必须认证
-                .authorizeRequests()
-                .anyRequest().authenticated()
-        ;
+                .authorizeHttpRequests(c -> c.anyRequest().authenticated());
 
         // 添加 Token Filter
         httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
@@ -171,6 +173,8 @@ public class YudaoWebSecurityConfigurerAdapter {
                 result.putAll(HttpMethod.POST, urls);
                 result.putAll(HttpMethod.PUT, urls);
                 result.putAll(HttpMethod.DELETE, urls);
+                result.putAll(HttpMethod.HEAD, urls);
+                result.putAll(HttpMethod.PATCH, urls);
                 continue;
             }
             // 根据请求方法，添加到 result 结果
@@ -187,6 +191,12 @@ public class YudaoWebSecurityConfigurerAdapter {
                         break;
                     case DELETE:
                         result.putAll(HttpMethod.DELETE, urls);
+                        break;
+                    case HEAD:
+                        result.putAll(HttpMethod.HEAD, urls);
+                        break;
+                    case PATCH:
+                        result.putAll(HttpMethod.PATCH, urls);
                         break;
                 }
             });

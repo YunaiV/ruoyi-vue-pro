@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.bpm.api.task;
 
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * 流程实例 Api 接口
