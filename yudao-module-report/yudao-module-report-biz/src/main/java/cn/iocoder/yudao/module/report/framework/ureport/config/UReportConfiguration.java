@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.PropertySource;
 
-import jakarta.servlet.Servlet;
+import javax.servlet.Servlet;
 
 /**
  * UReport2 配置类

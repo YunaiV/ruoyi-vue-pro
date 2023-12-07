@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.*;
 import org.flowable.bpmn.model.BpmnModel;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 /**
  * Flowable流程模型接口

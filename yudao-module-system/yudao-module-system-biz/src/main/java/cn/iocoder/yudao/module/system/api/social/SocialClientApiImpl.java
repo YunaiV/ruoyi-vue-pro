@@ -9,7 +9,7 @@ import me.chanjar.weixin.common.bean.WxJsapiSignature;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 
 /**
  * 社交应用的 API 实现类

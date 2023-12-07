@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 /**
  * {@link BpmProcessInstanceResultEvent} 的生产者

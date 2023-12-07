@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import jakarta.validation.Validation;
+import javax.validation.Validation;
 
 public class S3FileClientTest {
 

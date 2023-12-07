@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
-import jakarta.validation.constraints.*;
+import javax.validation.constraints.*;
 import java.util.Set;
 
 @Schema(description = "管理后台 - 用户创建/修改 Request VO")

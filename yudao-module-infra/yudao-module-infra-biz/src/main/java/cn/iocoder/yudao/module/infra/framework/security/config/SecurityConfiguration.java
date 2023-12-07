@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 
 /**
@@ -22,24 +21,24 @@ public class SecurityConfiguration {
         return new AuthorizeRequestsCustomizer() {
 
             @Override
-            public void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry) {
+            public void customize(ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry) {
                 // Swagger 接口文档
-                registry.requestMatchers("/v3/api-docs/**").permitAll()
-                        .requestMatchers("/swagger-ui.html").permitAll()
-                        .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers("/swagger-resources/**").permitAll()
-                        .requestMatchers("/webjars/**").permitAll()
-                        .requestMatchers("/*/api-docs").permitAll();
+                registry.antMatchers("/v3/api-docs/**").permitAll()
+                        .antMatchers("/swagger-ui.html").permitAll()
+                        .antMatchers("/swagger-ui/**").permitAll()
+                        .antMatchers("/swagger-resources/**").anonymous()
+                        .antMatchers("/webjars/**").anonymous()
+                        .antMatchers("/*/api-docs").anonymous();
                 // Spring Boot Actuator 的安全配置
-                registry.requestMatchers("/actuator").permitAll()
-                        .requestMatchers("/actuator/**").permitAll();
+                registry.antMatchers("/actuator").anonymous()
+                        .antMatchers("/actuator/**").anonymous();
                 // Druid 监控
-                registry.requestMatchers("/druid/**").permitAll();
+                registry.antMatchers("/druid/**").anonymous();
                 // Spring Boot Admin Server 的安全配置
-                registry.requestMatchers(adminSeverContextPath).permitAll()
-                        .requestMatchers(adminSeverContextPath + "/**").permitAll();
+                registry.antMatchers(adminSeverContextPath).anonymous()
+                        .antMatchers(adminSeverContextPath + "/**").anonymous();
                 // 文件读取
-                registry.requestMatchers(buildAdminApi("/infra/file/*/get/**")).permitAll();
+                registry.antMatchers(buildAdminApi("/infra/file/*/get/**")).permitAll();
             }
 
         };
