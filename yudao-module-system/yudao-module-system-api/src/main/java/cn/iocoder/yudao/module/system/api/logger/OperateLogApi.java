@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.system.api.logger;
 
 import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogCreateReqDTO;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 /**
  * 操作日志 API 接口

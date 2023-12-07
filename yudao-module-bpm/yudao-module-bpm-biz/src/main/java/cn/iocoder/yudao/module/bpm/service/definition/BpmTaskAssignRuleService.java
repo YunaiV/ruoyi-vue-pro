@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO
 import org.flowable.engine.delegate.DelegateExecution;
 import org.springframework.lang.Nullable;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Set;
 

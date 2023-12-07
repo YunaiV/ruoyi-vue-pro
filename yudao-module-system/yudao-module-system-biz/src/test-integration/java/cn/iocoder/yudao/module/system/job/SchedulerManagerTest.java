@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.system.test.BaseDbUnitTest;
 import org.junit.jupiter.api.Test;
 import org.quartz.SchedulerException;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 
 public class SchedulerManagerTest extends BaseDbUnitTest {
 

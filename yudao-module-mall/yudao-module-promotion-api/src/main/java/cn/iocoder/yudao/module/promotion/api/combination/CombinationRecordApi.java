@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCr
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateRespDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationValidateJoinRespDTO;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 /**
  * 拼团记录 API 接口

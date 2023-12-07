@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.statistics.service.trade.bo.WalletSummaryRespBO;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
 /**

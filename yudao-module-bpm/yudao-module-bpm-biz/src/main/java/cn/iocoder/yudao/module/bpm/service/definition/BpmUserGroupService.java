@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.bpm.service.definition;
 
 import java.util.*;
-import jakarta.validation.*;
+import javax.validation.*;
 
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupCreateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupPageReqVO;
