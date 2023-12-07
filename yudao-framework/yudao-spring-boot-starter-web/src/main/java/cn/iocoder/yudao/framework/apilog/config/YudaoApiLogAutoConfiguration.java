@@ -16,7 +16,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 
-import jakarta.servlet.Filter;
+import javax.servlet.Filter;
 
 @AutoConfiguration(after = YudaoWebAutoConfiguration.class)
 public class YudaoApiLogAutoConfiguration {

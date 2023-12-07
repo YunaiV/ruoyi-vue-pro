@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.diy.vo.page.DiyPagePro
 import cn.iocoder.yudao.module.promotion.controller.admin.diy.vo.page.DiyPageUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.diy.DiyPageDO;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 

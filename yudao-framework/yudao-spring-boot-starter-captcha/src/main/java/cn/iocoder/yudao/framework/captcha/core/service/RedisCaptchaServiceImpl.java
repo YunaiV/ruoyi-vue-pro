@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
 /**

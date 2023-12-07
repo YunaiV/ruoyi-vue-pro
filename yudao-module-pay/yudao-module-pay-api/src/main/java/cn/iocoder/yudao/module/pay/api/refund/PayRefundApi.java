@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.pay.api.refund;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundRespDTO;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 /**
  * 退款单 API 接口

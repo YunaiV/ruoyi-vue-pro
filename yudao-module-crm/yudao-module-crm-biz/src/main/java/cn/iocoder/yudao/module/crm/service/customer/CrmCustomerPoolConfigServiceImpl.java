@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.crm.dal.mysql.customer.CrmCustomerPoolConfigMappe
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import java.util.Objects;
 
 /**

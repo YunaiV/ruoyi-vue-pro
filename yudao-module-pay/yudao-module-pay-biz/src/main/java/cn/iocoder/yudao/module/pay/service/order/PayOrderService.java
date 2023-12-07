@@ -10,8 +10,8 @@ import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitRespV
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.List;
 

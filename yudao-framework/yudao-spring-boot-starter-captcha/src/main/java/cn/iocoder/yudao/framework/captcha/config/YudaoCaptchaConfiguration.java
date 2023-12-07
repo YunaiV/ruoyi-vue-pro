@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 
 @AutoConfiguration
 public class YudaoCaptchaConfiguration {
