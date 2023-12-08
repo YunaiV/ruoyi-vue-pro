@@ -79,7 +79,7 @@ public class CrmQueryWrapperUtils {
         if (ObjUtil.notEqual(validateAdminUser(userId), Boolean.TRUE)) { // 管理员不需要数据权限
             queryMapper.innerJoin(CrmPermissionDO.class, on ->
                     on.eq(CrmPermissionDO::getBizType, bizType).in(CrmPermissionDO::getBizId, bizIds)
-                            .eq(CrmPermissionDO::getUserId, userId));
+                            .in(CollUtil.isNotEmpty(bizIds), CrmPermissionDO::getUserId, userId));
         }
     }
 
