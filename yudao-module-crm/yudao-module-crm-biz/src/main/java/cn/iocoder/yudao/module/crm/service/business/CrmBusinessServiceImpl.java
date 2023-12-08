@@ -71,12 +71,14 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, level = CrmPermissionLevelEnum.OWNER)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void deleteBusiness(Long id) {
         // 校验存在
         validateBusinessExists(id);
         // 删除
         businessMapper.deleteById(id);
+        // 删除数据权限
+        crmPermissionService.deletePermission(CrmBizTypeEnum.CRM_BUSINESS.getType(), id);
     }
 
     private CrmBusinessDO validateBusinessExists(Long id) {

@@ -78,6 +78,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
         // 删除
         customerMapper.deleteById(id);
+        // 删除数据权限
+        crmPermissionService.deletePermission(CrmBizTypeEnum.CRM_CUSTOMER.getType(), id);
     }
 
     private void validateCustomerExists(Long id) {
