@@ -36,6 +36,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -143,20 +144,13 @@ public class CrmBusinessController {
         return success(CrmBusinessConvert.INSTANCE.convertPage(pageResult, customerList, statusTypeList, statusList));
     }
 
-    @GetMapping("/pool-page")
-    @Operation(summary = "获得商机公海分页")
-    @PreAuthorize("@ss.hasPermission('crm:business:query')")
-    public CommonResult<PageResult<CrmBusinessRespVO>> getBusinessPoolPage(@Valid CrmBusinessPageReqVO pageVO) {
-        // TODO puhui999: 等数据权限完善后再实现
-        return null;
-    }
-
     @GetMapping("/export-excel")
     @Operation(summary = "导出商机 Excel")
     @PreAuthorize("@ss.hasPermission('crm:business:export')")
     @OperateLog(type = EXPORT)
     public void exportBusinessExcel(@Valid CrmBusinessPageReqVO exportReqVO,
                                     HttpServletResponse response) throws IOException {
+        exportReqVO.setPageSize(PAGE_SIZE_NONE);
         PageResult<CrmBusinessDO> pageResult = businessService.getBusinessPage(exportReqVO, getLoginUserId());
         // 导出 Excel
         ExcelUtils.write(response, "商机.xls", "数据", CrmBusinessExcelVO.class,

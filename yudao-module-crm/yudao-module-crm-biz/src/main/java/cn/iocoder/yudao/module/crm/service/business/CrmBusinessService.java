@@ -8,8 +8,8 @@ import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusi
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-
 import jakarta.validation.Valid;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -57,7 +57,7 @@ public interface CrmBusinessService {
      * @param ids 编号
      * @return 商机列表
      */
-    List<CrmBusinessDO> getBusinessList(Collection<Long> ids);
+    List<CrmBusinessDO> getBusinessList(Collection<Long> ids, Long userId);
 
     /**
      * 获得商机分页
