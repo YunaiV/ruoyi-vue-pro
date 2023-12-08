@@ -88,6 +88,8 @@
 * JDK 21 + Spring Boot 3.2.0 版本：<https://gitee.com/yudaocode/yudao-boot-mini> 的 `master` 分支
 * JDK 8 + Spring Boot 2.7.18 版本：<https://gitee.com/yudaocode/yudao-boot-mini> 的 `master-jdk8` 分支
 
+如果你想把【完整版】的功能，迁移到【精简版】，可以参考 [《迁移功能到精简版》](https://doc.iocoder.cn/migrate-module/) 文档。
+
 ## 😎 开源协议
 
 **为什么推荐使用本项目？**
