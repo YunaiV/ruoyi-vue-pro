@@ -22,14 +22,14 @@ import com.google.common.collect.Lists;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -95,7 +95,8 @@ public class CrmContactController {
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(CollUtil.removeNull(Lists.newArrayList(
                 NumberUtil.parseLong(contact.getCreator()), contact.getOwnerUserId())));
         // 2. 获取客户信息
-        List<CrmCustomerDO> customerList = customerService.getCustomerList(Collections.singletonList(contact.getCustomerId()));
+        List<CrmCustomerDO> customerList = customerService.getCustomerList(
+                Collections.singletonList(contact.getCustomerId()), getLoginUserId());
         // 3. 直属上级
         List<CrmContactDO> parentContactList = contactService.getContactList(Collections.singletonList(contact.getParentId()));
         return success(ContactConvert.INSTANCE.convert(contact, userMap, customerList, parentContactList));
@@ -150,7 +151,7 @@ public class CrmContactController {
         }
         // 1. 获取客户列表
         List<CrmCustomerDO> crmCustomerDOList = customerService.getCustomerList(
-                convertSet(contactList, CrmContactDO::getCustomerId));
+                convertSet(contactList, CrmContactDO::getCustomerId), getLoginUserId());
         // 2. 获取创建人、负责人列表
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(contactList,
                 contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getOwnerUserId())));

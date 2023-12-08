@@ -22,13 +22,13 @@ import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -102,7 +102,7 @@ public class CrmBusinessController {
         // TODO @ljlleo：可以使用 CollectionUtils.convertSet 替代常用的 stream 操作，更简洁一点；下面几个也是哈；
         Set<Long> customerIds = pageResult.getList().stream()
                 .map(CrmBusinessDO::getCustomerId).filter(Objects::nonNull).collect(Collectors.toSet());
-        List<CrmCustomerDO> customerList = customerService.getCustomerList(customerIds);
+        List<CrmCustomerDO> customerList = customerService.getCustomerList(customerIds, getLoginUserId());
         // 处理商机状态类型名称回显
         Set<Long> statusTypeIds = pageResult.getList().stream()
                 .map(CrmBusinessDO::getStatusTypeId).filter(Objects::nonNull).collect(Collectors.toSet());
@@ -127,7 +127,7 @@ public class CrmBusinessController {
         // TODO @ljlleo：可以使用 CollectionUtils.convertSet 替代常用的 stream 操作，更简洁一点；下面几个也是哈；
         Set<Long> customerIds = pageResult.getList().stream()
                 .map(CrmBusinessDO::getCustomerId).filter(Objects::nonNull).collect(Collectors.toSet());
-        List<CrmCustomerDO> customerList = customerService.getCustomerList(customerIds);
+        List<CrmCustomerDO> customerList = customerService.getCustomerList(customerIds, getLoginUserId());
         // 处理商机状态类型名称回显
         Set<Long> statusTypeIds = pageResult.getList().stream()
                 .map(CrmBusinessDO::getStatusTypeId).filter(Objects::nonNull).collect(Collectors.toSet());

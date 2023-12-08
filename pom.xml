@@ -21,7 +21,7 @@
 <!--        <module>yudao-module-mp</module>-->
 <!--        <module>yudao-module-pay</module>-->
 <!--        <module>yudao-module-mall</module>-->
-<!--        <module>yudao-module-crm</module>-->
+        <module>yudao-module-crm</module>
         <!-- 示例项目 -->
 <!--        <module>yudao-example</module>-->
     </modules>
