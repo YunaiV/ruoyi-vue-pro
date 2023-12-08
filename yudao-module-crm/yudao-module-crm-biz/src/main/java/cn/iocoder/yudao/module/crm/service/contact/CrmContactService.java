@@ -68,4 +68,15 @@ public interface CrmContactService {
      */
     PageResult<CrmContactDO> getContactPage(CrmContactPageReqVO pageReqVO, Long userId);
 
+    /**
+     * 获得联系人分页
+     *
+     * 数据权限：基于 {@link CrmContactDO}
+     *
+     * @param pageVO 分页查询
+     * @param userId 用户编号
+     * @return 联系人分页
+     */
+    PageResult<CrmContactDO> getContactPageByCustomerId(CrmContactPageReqVO pageVO, Long userId);
+
 }

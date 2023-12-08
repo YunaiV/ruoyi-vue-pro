@@ -33,7 +33,7 @@ public interface CrmBusinessMapper extends BaseMapperX<CrmBusinessDO> {
         CrmQueryWrapperUtils.builderPageQuery(mpjLambdaWrapperX, CrmBizTypeEnum.CRM_BUSINESS.getType(), CrmBusinessDO::getId,
                 userId, pageReqVO.getSceneType(), pageReqVO.getPool());
         mpjLambdaWrapperX.selectAll(CrmBusinessDO.class)
-                .eq(CrmBusinessDO::getCustomerId, pageReqVO.getCustomerId()) // 必须传递
+                .eqIfPresent(CrmBusinessDO::getCustomerId, pageReqVO.getCustomerId())  // 指定客户编号
                 .likeIfPresent(CrmBusinessDO::getName, pageReqVO.getName())
                 .orderByDesc(CrmBusinessDO::getId);
         return selectJoinPage(pageReqVO, CrmBusinessDO.class, mpjLambdaWrapperX);

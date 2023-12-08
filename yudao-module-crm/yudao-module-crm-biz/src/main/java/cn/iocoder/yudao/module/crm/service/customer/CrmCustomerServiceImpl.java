@@ -111,15 +111,18 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
      * 校验客户是否存在
      *
      * @param customerId 客户 id
-     * @return 客户
      */
     @Override
-    public CrmCustomerDO validateCustomer(Long customerId) {
-        CrmCustomerDO customer = getCustomer(customerId);
+    public void validateCustomer(Long customerId) {
+        // TODO puhui999: 不返回客户不走校验应该可行
+        // 校验客户是否存在
+        if (customerId == null) {
+            throw exception(CUSTOMER_NOT_EXISTS);
+        }
+        CrmCustomerDO customer = customerMapper.selectById(customerId);
         if (Objects.isNull(customer)) {
             throw exception(CUSTOMER_NOT_EXISTS);
         }
-        return customer;
     }
 
     @Override

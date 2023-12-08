@@ -87,7 +87,7 @@ public class CrmContractController {
     @Operation(summary = "获得合同分页")
     @PreAuthorize("@ss.hasPermission('crm:contract:query')")
     public CommonResult<PageResult<ContractRespVO>> getContractPage(@Valid CrmContractPageReqVO pageVO) {
-        PageResult<CrmContractDO> pageResult = contractService.getContractPage(pageVO);
+        PageResult<CrmContractDO> pageResult = contractService.getContractPage(pageVO, getLoginUserId());
         return success(convertDetailContractPage(pageResult));
     }
 
@@ -95,7 +95,7 @@ public class CrmContractController {
     @Operation(summary = "获得联系人分页，基于指定客户")
     public CommonResult<PageResult<ContractRespVO>> getContractPageByCustomer(@Valid CrmContractPageReqVO pageVO) {
         Assert.notNull(pageVO.getCustomerId(), "客户编号不能为空");
-        PageResult<CrmContractDO> pageResult = contractService.getContractPageByCustomer(pageVO);
+        PageResult<CrmContractDO> pageResult = contractService.getContractPageByCustomer(pageVO, getLoginUserId());
         return success(convertDetailContractPage(pageResult));
     }
 
@@ -105,7 +105,7 @@ public class CrmContractController {
     @OperateLog(type = EXPORT)
     public void exportContractExcel(@Valid CrmContractPageReqVO exportReqVO,
                                     HttpServletResponse response) throws IOException {
-        PageResult<CrmContractDO> pageResult = contractService.getContractPage(exportReqVO);
+        PageResult<CrmContractDO> pageResult = contractService.getContractPage(exportReqVO, getLoginUserId());
         // 导出 Excel
         ExcelUtils.write(response, "合同.xls", "数据", CrmContractExcelVO.class,
                 ContractConvert.INSTANCE.convertList02(pageResult.getList()));

@@ -147,7 +147,7 @@ public class CrmClueServiceImplTest extends BaseDbUnitTest {
         reqVO.setMobile(null);
 
         // 调用
-        PageResult<CrmClueDO> pageResult = clueService.getCluePage(reqVO, getLoginUserId());
+        PageResult<CrmClueDO> pageResult = clueService.getCluePage(reqVO, 1L);
         // 断言
         assertEquals(1, pageResult.getTotal());
         assertEquals(1, pageResult.getList().size());

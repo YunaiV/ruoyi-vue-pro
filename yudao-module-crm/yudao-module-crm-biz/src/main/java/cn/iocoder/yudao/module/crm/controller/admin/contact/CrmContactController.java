@@ -125,7 +125,7 @@ public class CrmContactController {
     @Operation(summary = "获得联系人分页，基于指定客户")
     public CommonResult<PageResult<CrmContactRespVO>> getContactPageByCustomer(@Valid CrmContactPageReqVO pageVO) {
         Assert.notNull(pageVO.getCustomerId(), "客户编号不能为空");
-        PageResult<CrmContactDO> pageResult = contactService.getContactPage(pageVO, getLoginUserId());
+        PageResult<CrmContactDO> pageResult = contactService.getContactPageByCustomerId(pageVO, getLoginUserId());
         return success(convertDetailContactPage(pageResult));
     }
 

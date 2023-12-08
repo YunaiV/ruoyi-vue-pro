@@ -7,13 +7,13 @@ import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusi
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessTransferReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessUpdateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
 import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
+import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import jakarta.annotation.Resource;
@@ -38,6 +38,8 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
     @Resource
     private CrmBusinessMapper businessMapper;
+    @Resource
+    private CrmCustomerService customerService;
 
     @Resource
     private CrmPermissionService crmPermissionService;
@@ -109,10 +111,11 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#pageReqVO.customerId", level = CrmPermissionLevelEnum.READ)
-    public PageResult<CrmBusinessDO> getBusinessPageByCustomer(CrmContractPageReqVO pageReqVO) {
-        //return businessMapper.selectPageByCustomer(pageReqVO);
-        return null; // TODO puhui999: 可以跟分页合并吗？
+    public PageResult<CrmBusinessDO> getBusinessPageByCustomer(CrmBusinessPageReqVO pageReqVO, Long userId) {
+        // 校验客户存在
+        customerService.validateCustomer(pageReqVO.getCustomerId());
+
+        return businessMapper.selectPage(pageReqVO, userId);
     }
 
     @Override

@@ -33,7 +33,7 @@ public interface CrmContactMapper extends BaseMapperX<CrmContactDO> {
         CrmQueryWrapperUtils.builderPageQuery(mpjLambdaWrapperX, CrmBizTypeEnum.CRM_CONTACT.getType(), CrmContactDO::getId,
                 userId, pageReqVO.getSceneType(), pageReqVO.getPool());
         mpjLambdaWrapperX.selectAll(CrmContactDO.class)
-                .eq(CrmContactDO::getCustomerId, pageReqVO.getCustomerId()) // 必须传递
+                .eqIfPresent(CrmContactDO::getCustomerId, pageReqVO.getCustomerId()) // 指定客户编号
                 .likeIfPresent(CrmContactDO::getName, pageReqVO.getName())
                 .eqIfPresent(CrmContactDO::getMobile, pageReqVO.getMobile())
                 .eqIfPresent(CrmContactDO::getTelephone, pageReqVO.getTelephone())

@@ -9,7 +9,6 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.*;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.status.CrmBusinessStatusQueryVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypeQueryVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
 import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
@@ -121,9 +120,9 @@ public class CrmBusinessController {
 
     @GetMapping("/page-by-customer")
     @Operation(summary = "获得商机分页，基于指定客户")
-    public CommonResult<PageResult<CrmBusinessRespVO>> getBusinessPageByCustomer(@Valid CrmContractPageReqVO pageReqVO) {
+    public CommonResult<PageResult<CrmBusinessRespVO>> getBusinessPageByCustomer(@Valid CrmBusinessPageReqVO pageReqVO) {
         Assert.notNull(pageReqVO.getCustomerId(), "客户编号不能为空");
-        PageResult<CrmBusinessDO> pageResult = businessService.getBusinessPageByCustomer(pageReqVO);
+        PageResult<CrmBusinessDO> pageResult = businessService.getBusinessPageByCustomer(pageReqVO, getLoginUserId());
         // 处理客户名称回显
         // TODO @ljlleo：可以使用 CollectionUtils.convertSet 替代常用的 stream 操作，更简洁一点；下面几个也是哈；
         Set<Long> customerIds = pageResult.getList().stream()

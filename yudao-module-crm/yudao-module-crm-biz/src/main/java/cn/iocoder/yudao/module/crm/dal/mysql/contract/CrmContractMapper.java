@@ -2,10 +2,16 @@ package cn.iocoder.yudao.module.crm.dal.mysql.contract;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
+import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.util.CrmQueryWrapperUtils;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * CRM 合同 Mapper
@@ -15,22 +21,32 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
 
-    default PageResult<CrmContractDO> selectPage(CrmContractPageReqVO reqVO) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<CrmContractDO>()
-            .likeIfPresent(CrmContractDO::getNo, reqVO.getNo())
-            .likeIfPresent(CrmContractDO::getName, reqVO.getName())
-            .eqIfPresent(CrmContractDO::getCustomerId, reqVO.getCustomerId())
-            .eqIfPresent(CrmContractDO::getBusinessId, reqVO.getBusinessId())
-            .orderByDesc(CrmContractDO::getId));
+    default int updateOwnerUserIdById(Long id, Long ownerUserId) {
+        return update(new LambdaUpdateWrapper<CrmContractDO>()
+                .eq(CrmContractDO::getId, id)
+                .set(CrmContractDO::getOwnerUserId, ownerUserId));
     }
 
-    default PageResult<CrmContractDO> selectPageByCustomer(CrmContractPageReqVO reqVO) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<CrmContractDO>()
-                .eq(CrmContractDO::getCustomerId, reqVO.getCustomerId()) // 必须传递
-                .likeIfPresent(CrmContractDO::getNo, reqVO.getNo())
-                .likeIfPresent(CrmContractDO::getName, reqVO.getName())
-                .eqIfPresent(CrmContractDO::getBusinessId, reqVO.getBusinessId())
-                .orderByDesc(CrmContractDO::getId));
+    default PageResult<CrmContractDO> selectPage(CrmContractPageReqVO pageReqVO, Long userId) {
+        MPJLambdaWrapperX<CrmContractDO> mpjLambdaWrapperX = new MPJLambdaWrapperX<>();
+        // 构建数据权限连表条件
+        CrmQueryWrapperUtils.builderPageQuery(mpjLambdaWrapperX, CrmBizTypeEnum.CRM_CONTACT.getType(), CrmContractDO::getId,
+                userId, pageReqVO.getSceneType(), pageReqVO.getPool());
+        mpjLambdaWrapperX.selectAll(CrmContractDO.class)
+                .eqIfPresent(CrmContractDO::getCustomerId, pageReqVO.getCustomerId())
+                .likeIfPresent(CrmContractDO::getNo, pageReqVO.getNo())
+                .likeIfPresent(CrmContractDO::getName, pageReqVO.getName())
+                .eqIfPresent(CrmContractDO::getCustomerId, pageReqVO.getCustomerId())
+                .eqIfPresent(CrmContractDO::getBusinessId, pageReqVO.getBusinessId())
+                .orderByDesc(CrmContractDO::getId);
+        return selectJoinPage(pageReqVO, CrmContractDO.class, mpjLambdaWrapperX);
+    }
+
+    default List<CrmContractDO> selectBatchIds(Collection<Long> ids, Long userId) {
+        MPJLambdaWrapperX<CrmContractDO> mpjLambdaWrapperX = new MPJLambdaWrapperX<>();
+        // 构建数据权限连表条件
+        CrmQueryWrapperUtils.builderListQueryBatch(mpjLambdaWrapperX, CrmBizTypeEnum.CRM_CONTACT.getType(), ids, userId);
+        return selectJoinList(CrmContractDO.class, mpjLambdaWrapperX);
     }
 
 }

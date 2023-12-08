@@ -133,4 +133,12 @@ public class CrmContactServiceImpl implements CrmContactService {
         return contactMapper.selectPage(pageReqVO, userId);
     }
 
+    @Override
+    public PageResult<CrmContactDO> getContactPageByCustomerId(CrmContactPageReqVO pageVO, Long userId) {
+        // 校验用户存在
+        customerService.validateCustomer(pageVO.getCustomerId());
+
+        return contactMapper.selectPage(pageVO, userId);
+    }
+
 }
