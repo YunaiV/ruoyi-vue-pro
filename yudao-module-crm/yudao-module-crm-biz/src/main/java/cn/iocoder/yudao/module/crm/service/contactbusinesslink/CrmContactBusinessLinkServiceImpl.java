@@ -12,14 +12,18 @@ import cn.iocoder.yudao.module.crm.convert.contactbusinessslink.CrmContactBusine
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contactbusinesslink.CrmContactBusinessLinkDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contactbusinesslink.CrmContactBusinessLinkMapper;
+import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CONTACT_BUSINESS_LINK_NOT_EXISTS;
 
 // TODO @puhui999：数据权限的校验；每个操作；
@@ -54,6 +58,7 @@ public class CrmContactBusinessLinkServiceImpl implements CrmContactBusinessLink
     }
 
     @Override
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateContactBusinessLink(CrmContactBusinessLinkSaveReqVO updateReqVO) {
         // 校验存在
         validateContactBusinessLinkExists(updateReqVO.getId());
@@ -80,6 +85,7 @@ public class CrmContactBusinessLinkServiceImpl implements CrmContactBusinessLink
     }
 
     @Override
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#id", level = CrmPermissionLevelEnum.READ)
     public CrmContactBusinessLinkDO getContactBusinessLink(Long id) {
         return contactBusinessLinkMapper.selectById(id);
     }
@@ -90,7 +96,7 @@ public class CrmContactBusinessLinkServiceImpl implements CrmContactBusinessLink
         crmContactBusinessLinkPageReqVO.setContactId(pageReqVO.getContactId());
         PageResult<CrmContactBusinessLinkDO> businessLinkDOS = contactBusinessLinkMapper.selectPageByContact(crmContactBusinessLinkPageReqVO);
         List<CrmBusinessDO> businessDOS = crmBusinessService.getBusinessList(CollectionUtils.convertList(businessLinkDOS.getList(),
-                CrmContactBusinessLinkDO::getBusinessId));
+                CrmContactBusinessLinkDO::getBusinessId), getLoginUserId());
         PageResult<CrmBusinessRespVO> pageResult = new PageResult<CrmBusinessRespVO>();
         pageResult.setList(CrmBusinessConvert.INSTANCE.convert(businessDOS));
         pageResult.setTotal(businessLinkDOS.getTotal());

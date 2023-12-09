@@ -15,11 +15,11 @@ import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -78,6 +78,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
         // 删除
         customerMapper.deleteById(id);
+        // 删除数据权限
+        crmPermissionService.deletePermission(CrmBizTypeEnum.CRM_CUSTOMER.getType(), id);
     }
 
     private void validateCustomerExists(Long id) {
@@ -93,32 +95,34 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     }
 
     @Override
-    public List<CrmCustomerDO> getCustomerList(Collection<Long> ids) {
+    public List<CrmCustomerDO> getCustomerList(Collection<Long> ids, Long userId) {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return customerMapper.selectBatchIds(ids);
+        return customerMapper.selectBatchIds(ids, userId);
     }
 
     @Override
     public PageResult<CrmCustomerDO> getCustomerPage(CrmCustomerPageReqVO pageReqVO, Long userId) {
-        boolean admin = false; // TODO 如果是管理员
-        return customerMapper.selectPage(pageReqVO, userId, adminUserApi.getSubordinateIds(userId), admin);
+        return customerMapper.selectPage(pageReqVO, userId);
     }
 
     /**
      * 校验客户是否存在
      *
      * @param customerId 客户 id
-     * @return 客户
      */
     @Override
-    public CrmCustomerDO validateCustomer(Long customerId) {
-        CrmCustomerDO customer = getCustomer(customerId);
+    public void validateCustomer(Long customerId) {
+        // TODO puhui999: 不返回客户不走校验应该可行
+        // 校验客户是否存在
+        if (customerId == null) {
+            throw exception(CUSTOMER_NOT_EXISTS);
+        }
+        CrmCustomerDO customer = customerMapper.selectById(customerId);
         if (Objects.isNull(customer)) {
             throw exception(CUSTOMER_NOT_EXISTS);
         }
-        return customer;
     }
 
     @Override
@@ -128,9 +132,11 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         // 1. 校验客户是否存在
         validateCustomer(reqVO.getId());
 
-        // 2. 数据权限转移
+        // 2.1 数据权限转移
         crmPermissionService.transferPermission(
                 CrmCustomerConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType()));
+        // 2.2 转移后重新设置负责人
+        customerMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
 
         // 3. TODO 记录转移日志
     }

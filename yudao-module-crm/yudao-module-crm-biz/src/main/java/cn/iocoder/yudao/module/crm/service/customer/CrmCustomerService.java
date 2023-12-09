@@ -6,8 +6,8 @@ import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageR
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTransferReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-
 import jakarta.validation.Valid;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -56,7 +56,7 @@ public interface CrmCustomerService {
      * @return 客户列表
      * @author ljlleo
      */
-    List<CrmCustomerDO> getCustomerList(Collection<Long> ids);
+    List<CrmCustomerDO> getCustomerList(Collection<Long> ids, Long userId);
 
     /**
      * 获得客户分页
@@ -71,9 +71,8 @@ public interface CrmCustomerService {
      * 校验客户是否存在
      *
      * @param customerId 客户 id
-     * @return 客户
      */
-    CrmCustomerDO validateCustomer(Long customerId);
+    void validateCustomer(Long customerId);
 
     /**
      * 客户转移

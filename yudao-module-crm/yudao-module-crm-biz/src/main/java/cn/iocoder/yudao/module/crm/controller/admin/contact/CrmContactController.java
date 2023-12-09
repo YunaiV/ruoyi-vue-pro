@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.NumberUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
@@ -22,14 +21,14 @@ import com.google.common.collect.Lists;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -38,6 +37,7 @@ import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertListByFlatMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
@@ -95,9 +95,11 @@ public class CrmContactController {
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(CollUtil.removeNull(Lists.newArrayList(
                 NumberUtil.parseLong(contact.getCreator()), contact.getOwnerUserId())));
         // 2. 获取客户信息
-        List<CrmCustomerDO> customerList = customerService.getCustomerList(Collections.singletonList(contact.getCustomerId()));
+        List<CrmCustomerDO> customerList = customerService.getCustomerList(
+                Collections.singletonList(contact.getCustomerId()), getLoginUserId());
         // 3. 直属上级
-        List<CrmContactDO> parentContactList = contactService.getContactList(Collections.singletonList(contact.getParentId()));
+        List<CrmContactDO> parentContactList = contactService.getContactList(
+                Collections.singletonList(contact.getParentId()), getLoginUserId());
         return success(ContactConvert.INSTANCE.convert(contact, userMap, customerList, parentContactList));
     }
 
@@ -105,7 +107,9 @@ public class CrmContactController {
     @Operation(summary = "获得联系人列表")
     @PreAuthorize("@ss.hasPermission('crm:contact:query')")
     public CommonResult<List<CrmContactSimpleRespVO>> getSimpleContactList() {
-        List<CrmContactDO> list = contactService.getContactList();
+        CrmContactPageReqVO pageReqVO = new CrmContactPageReqVO();
+        pageReqVO.setPageSize(PAGE_SIZE_NONE);
+        List<CrmContactDO> list = contactService.getContactPage(pageReqVO, getLoginUserId()).getList();
         return success(ContactConvert.INSTANCE.convertAllList(list));
     }
 
@@ -113,7 +117,7 @@ public class CrmContactController {
     @Operation(summary = "获得联系人分页")
     @PreAuthorize("@ss.hasPermission('crm:contact:query')")
     public CommonResult<PageResult<CrmContactRespVO>> getContactPage(@Valid CrmContactPageReqVO pageVO) {
-        PageResult<CrmContactDO> pageResult = contactService.getContactPage(pageVO);
+        PageResult<CrmContactDO> pageResult = contactService.getContactPage(pageVO, getLoginUserId());
         return success(convertDetailContactPage(pageResult));
     }
 
@@ -121,7 +125,7 @@ public class CrmContactController {
     @Operation(summary = "获得联系人分页，基于指定客户")
     public CommonResult<PageResult<CrmContactRespVO>> getContactPageByCustomer(@Valid CrmContactPageReqVO pageVO) {
         Assert.notNull(pageVO.getCustomerId(), "客户编号不能为空");
-        PageResult<CrmContactDO> pageResult = contactService.getContactPageByCustomer(pageVO);
+        PageResult<CrmContactDO> pageResult = contactService.getContactPageByCustomerId(pageVO, getLoginUserId());
         return success(convertDetailContactPage(pageResult));
     }
 
@@ -131,8 +135,8 @@ public class CrmContactController {
     @OperateLog(type = EXPORT)
     public void exportContactExcel(@Valid CrmContactPageReqVO exportReqVO,
                                    HttpServletResponse response) throws IOException {
-        exportReqVO.setPageNo(PageParam.PAGE_SIZE_NONE);
-        PageResult<CrmContactDO> pageResult = contactService.getContactPage(exportReqVO);
+        exportReqVO.setPageNo(PAGE_SIZE_NONE);
+        PageResult<CrmContactDO> pageResult = contactService.getContactPage(exportReqVO, getLoginUserId());
         ExcelUtils.write(response, "联系人.xls", "数据", CrmContactRespVO.class,
                 convertDetailContactPage(pageResult).getList());
     }
@@ -150,13 +154,13 @@ public class CrmContactController {
         }
         // 1. 获取客户列表
         List<CrmCustomerDO> crmCustomerDOList = customerService.getCustomerList(
-                convertSet(contactList, CrmContactDO::getCustomerId));
+                convertSet(contactList, CrmContactDO::getCustomerId), getLoginUserId());
         // 2. 获取创建人、负责人列表
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(contactList,
                 contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getOwnerUserId())));
         // 3. 直属上级
         List<CrmContactDO> parentContactList = contactService.getContactList(
-                convertSet(contactList, CrmContactDO::getParentId));
+                convertSet(contactList, CrmContactDO::getParentId), getLoginUserId());
         return ContactConvert.INSTANCE.convertPage(pageResult, userMap, crmCustomerDOList, parentContactList);
     }
 

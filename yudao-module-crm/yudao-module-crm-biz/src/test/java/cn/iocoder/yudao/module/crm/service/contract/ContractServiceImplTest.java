@@ -7,11 +7,10 @@ import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageR
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractMapper;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-
-import jakarta.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -127,7 +126,7 @@ public class ContractServiceImplTest extends BaseDbUnitTest {
         reqVO.setNo(null);
 
         // 调用
-        PageResult<CrmContractDO> pageResult = contractService.getContractPage(reqVO);
+        PageResult<CrmContractDO> pageResult = contractService.getContractPage(reqVO, getLoginUserId());
         // 断言
         assertEquals(1, pageResult.getTotal());
         assertEquals(1, pageResult.getList().size());

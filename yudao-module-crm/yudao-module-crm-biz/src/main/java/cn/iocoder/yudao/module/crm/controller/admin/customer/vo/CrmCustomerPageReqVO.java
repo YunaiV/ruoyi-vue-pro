@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.crm.controller.admin.customer.vo;
 
-import cn.iocoder.yudao.module.crm.framework.vo.CrmBasePageReqVO;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.crm.enums.common.CrmSceneTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,7 +12,7 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class CrmCustomerPageReqVO extends CrmBasePageReqVO {
+public class CrmCustomerPageReqVO extends PageParam {
 
     @Schema(description = "客户名称", example = "赵六")
     private String name;
@@ -26,5 +28,15 @@ public class CrmCustomerPageReqVO extends CrmBasePageReqVO {
 
     @Schema(description = "客户来源", example = "1")
     private Integer source;
+
+    /**
+     * 场景类型，为 null 时则表示全部
+     */
+    @Schema(description = "场景类型", example = "1")
+    @InEnum(CrmSceneTypeEnum.class)
+    private Integer sceneType;
+
+    @Schema(description = "是否为公海数据", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
+    private Boolean pool; // null 则表示为不是公海数据
 
 }

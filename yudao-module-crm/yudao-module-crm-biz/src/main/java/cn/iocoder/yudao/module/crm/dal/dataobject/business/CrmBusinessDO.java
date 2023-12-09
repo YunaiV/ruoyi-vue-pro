@@ -97,4 +97,11 @@ public class CrmBusinessDO extends BaseDO {
      */
     private Integer followUpStatus;
 
+    /**
+     * 负责人的用户编号
+     *
+     * 关联 AdminUserDO 的 id 字段
+     */
+    private Long ownerUserId;
+
 }

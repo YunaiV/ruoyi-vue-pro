@@ -35,9 +35,8 @@ public @interface CrmPermission {
 
     /**
      * 数据编号，通过 Spring EL 表达式获取
-     * TODO 数据权限完成后去除 default ""
      */
-    String bizId() default "";
+    String bizId();
 
     /**
      * 操作所需权限级别

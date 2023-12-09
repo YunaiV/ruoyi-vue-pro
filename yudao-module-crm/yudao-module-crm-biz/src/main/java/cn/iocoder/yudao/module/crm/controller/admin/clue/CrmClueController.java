@@ -11,18 +11,20 @@ import cn.iocoder.yudao.module.crm.service.clue.CrmClueService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 线索")
 @RestController
@@ -70,7 +72,7 @@ public class CrmClueController {
     @Operation(summary = "获得线索分页")
     @PreAuthorize("@ss.hasPermission('crm:clue:query')")
     public CommonResult<PageResult<CrmClueRespVO>> getCluePage(@Valid CrmCluePageReqVO pageVO) {
-        PageResult<CrmClueDO> pageResult = clueService.getCluePage(pageVO);
+        PageResult<CrmClueDO> pageResult = clueService.getCluePage(pageVO, getLoginUserId());
         return success(CrmClueConvert.INSTANCE.convertPage(pageResult));
     }
 
@@ -78,9 +80,9 @@ public class CrmClueController {
     @Operation(summary = "导出线索 Excel")
     @PreAuthorize("@ss.hasPermission('crm:clue:export')")
     @OperateLog(type = EXPORT)
-    public void exportClueExcel(@Valid CrmClueExportReqVO exportReqVO,
-              HttpServletResponse response) throws IOException {
-        List<CrmClueDO> list = clueService.getClueList(exportReqVO);
+    public void exportClueExcel(@Valid CrmCluePageReqVO pageReqVO, HttpServletResponse response) throws IOException {
+        pageReqVO.setPageSize(PAGE_SIZE_NONE);
+        List<CrmClueDO> list = clueService.getCluePage(pageReqVO, getLoginUserId()).getList();
         // 导出 Excel
         List<CrmClueExcelVO> datas = CrmClueConvert.INSTANCE.convertList02(list);
         ExcelUtils.write(response, "线索.xls", "数据", CrmClueExcelVO.class, datas);

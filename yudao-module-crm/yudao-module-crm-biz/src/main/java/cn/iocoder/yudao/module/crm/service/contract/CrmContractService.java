@@ -3,12 +3,12 @@ package cn.iocoder.yudao.module.crm.service.contract;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractUpdateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-
 import jakarta.validation.Valid;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -64,9 +64,10 @@ public interface CrmContractService {
      * 数据权限：基于 {@link CrmContractDO} 读取
      *
      * @param pageReqVO 分页查询
+     * @param userId    用户编号
      * @return 合同分页
      */
-    PageResult<CrmContractDO> getContractPage(CrmContractPageReqVO pageReqVO);
+    PageResult<CrmContractDO> getContractPage(CrmContractPageReqVO pageReqVO, Long userId);
 
     /**
      * 获得合同分页，基于指定客户
@@ -74,9 +75,12 @@ public interface CrmContractService {
      * 数据权限：基于 {@link CrmCustomerDO} 读取
      *
      * @param pageReqVO 分页查询
+     * @param userId    用户编号
      * @return 联系人分页
      */
-    PageResult<CrmContractDO> getContractPageByCustomer(CrmContractPageReqVO pageReqVO);
+    default PageResult<CrmContractDO> getContractPageByCustomer(CrmContractPageReqVO pageReqVO, Long userId) {
+        return getContractPage(pageReqVO, userId);
+    }
 
     /**
      * 合同转移
