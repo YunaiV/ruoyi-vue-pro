@@ -40,6 +40,12 @@ public interface ErrorCodeConstants {
     ErrorCode CUSTOMER_LOCKED_PUT_POOL_FAIL = new ErrorCode(1_020_006_005, "客户【{}】放入公海失败，原因：客户已锁定");
     ErrorCode CUSTOMER_UPDATE_OWNER_USER_FAIL = new ErrorCode(1_020_006_006, "更新客户【{}】负责人失败, 原因：系统异常");
 
+    ErrorCode CUSTOMER_UNLOCK_STATUS_NO_REPETITION = new ErrorCode(1_020_006_001, "无需重复操作锁定/解锁状态");
+
+    ErrorCode CUSTOMER_NO_DEPARTMENT_FOUND = new ErrorCode(1_020_006_002, "操作失败,请先绑定部门再进行操作");
+
+    ErrorCode CUSTOMER_EXCEED_LOCK_LIMIT = new ErrorCode(1_020_006_003, "操作失败,超出锁定规则上限");
+
     // ========== 权限管理 1_020_007_000 ==========
     ErrorCode CRM_PERMISSION_NOT_EXISTS = new ErrorCode(1_020_007_000, "数据权限不存在");
     ErrorCode CRM_PERMISSION_DENIED = new ErrorCode(1_020_007_001, "{}操作失败，原因：没有权限");

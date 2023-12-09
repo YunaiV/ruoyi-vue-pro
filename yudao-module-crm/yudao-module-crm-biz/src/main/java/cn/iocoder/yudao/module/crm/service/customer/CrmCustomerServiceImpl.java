@@ -2,12 +2,11 @@ package cn.iocoder.yudao.module.crm.service.customer;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerCreateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTransferReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigCreateReqVO;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerLimitConfigDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.customer.CrmCustomerMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
@@ -15,6 +14,7 @@ import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +23,10 @@ import org.springframework.validation.annotation.Validated;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CUSTOMER_EXCEED_LOCK_LIMIT;
+import static cn.iocoder.yudao.module.crm.enums.customer.CrmCustomerLimitConfigTypeEnum.CUSTOMER_LOCK_LIMIT;
 import static java.util.Collections.singletonList;
 
 /**
@@ -43,6 +46,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Resource
     private AdminUserApi adminUserApi;
+    @Resource
+    private CrmCustomerLimitConfigService crmCustomerLimitConfigService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -142,14 +147,47 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     }
 
     @Override
-    public void lockCustomer(CrmCustomerUpdateReqVO updateReqVO) {
-        // 校验存在
-        validateCustomerExists(updateReqVO.getId());
-        // TODO @Joey：可以校验下，如果已经对应的锁定状态，报个业务异常；原因是：后续这个业务会记录操作日志，会记录多了；
-        // TODO @芋艿：业务完善，增加锁定上限；
+    public void lockCustomer(CrmCustomerLockReqVO lockReqVO) {
+        // 校验当前客户是否存在
+        validateCustomerExists(lockReqVO.getId());
+
+        CrmCustomerDO customerDO = customerMapper.selectById(lockReqVO.getId());
+
+        // 校验当前是否重复操作锁定/解锁状态
+        if (customerDO.getLockStatus().equals(lockReqVO.getLockStatus())) {
+            throw exception(CUSTOMER_UNLOCK_STATUS_NO_REPETITION);
+        }
+
+        // 获取当前登录信息，开始校验锁定上限
+        AdminUserRespDTO userRespDTO = adminUserApi.getUser(getLoginUserId());
+
+        if (userRespDTO.getDeptId() == null || userRespDTO.getId() == null) {
+            // 如有入参为空，提示业务异常
+            throw exception(CUSTOMER_NO_DEPARTMENT_FOUND);
+        }
+
+        // 开始校验规则限制
+        List<Long> userDeptIds = Collections.singletonList(userRespDTO.getDeptId());
+
+        CrmCustomerLimitConfigCreateReqVO configReqVO = new CrmCustomerLimitConfigCreateReqVO();
+        configReqVO.setUserId(userRespDTO.getId());
+        configReqVO.setDeptIds(userDeptIds);
+        configReqVO.setType(CUSTOMER_LOCK_LIMIT.getCode());
+
+        CrmCustomerLimitConfigDO crmCustomerLimitConfigDO = crmCustomerLimitConfigService.selectByLimitConfig(configReqVO);
+
+        // 统计当前用户已锁定客户数量
+        List<CrmCustomerDO> crmCustomerDOS = customerMapper.selectList("owner_user_id", getLoginUserId());
+        long customerLockCount = crmCustomerDOS.stream().filter(CrmCustomerDO::getLockStatus).count();
+
+        // 锁定操作的时候校验当前用户可锁定客户的上限
+        if (crmCustomerLimitConfigDO != null && lockReqVO.getLockStatus() && customerLockCount >= crmCustomerLimitConfigDO.getMaxCount()) {
+            // 超出锁定数量上限，提示业务异常
+            throw exception(CUSTOMER_EXCEED_LOCK_LIMIT);
+        }
 
         // 更新
-        CrmCustomerDO updateObj = CrmCustomerConvert.INSTANCE.convert(updateReqVO);
+        CrmCustomerDO updateObj = CrmCustomerConvert.INSTANCE.convert(lockReqVO);
         customerMapper.updateById(updateObj);
     }
 

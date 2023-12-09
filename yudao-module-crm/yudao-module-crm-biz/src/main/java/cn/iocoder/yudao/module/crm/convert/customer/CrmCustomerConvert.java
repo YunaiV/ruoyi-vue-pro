@@ -79,4 +79,6 @@ public interface CrmCustomerConvert {
 
     List<CrmCustomerQueryAllRespVO> convertQueryAll(List<CrmCustomerDO> crmCustomerDO);
 
+    CrmCustomerDO convert(CrmCustomerLockReqVO lockReqVO);
+
 }

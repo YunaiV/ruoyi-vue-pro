@@ -53,4 +53,9 @@ public interface CrmCustomerLimitConfigService {
      */
     PageResult<CrmCustomerLimitConfigDO> getCustomerLimitConfigPage(CrmCustomerLimitConfigPageReqVO pageReqVO);
 
+    /**
+     * 查询当前登录人客户限制配置
+     */
+    CrmCustomerLimitConfigDO selectByLimitConfig(CrmCustomerLimitConfigCreateReqVO configReqVO);
+
 }
