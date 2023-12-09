@@ -1,10 +1,14 @@
 package cn.iocoder.yudao.module.crm.service.clue;
 
-import java.util.*;
-import jakarta.validation.*;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.*;
-import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueCreateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueUpdateReqVO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
+import jakarta.validation.Valid;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 线索 Service 接口
@@ -49,22 +53,15 @@ public interface CrmClueService {
      * @param ids 编号
      * @return 线索列表
      */
-    List<CrmClueDO> getClueList(Collection<Long> ids);
+    List<CrmClueDO> getClueList(Collection<Long> ids, Long userId);
 
     /**
      * 获得线索分页
      *
      * @param pageReqVO 分页查询
+     * @param userId    用户编号
      * @return 线索分页
      */
-    PageResult<CrmClueDO> getCluePage(CrmCluePageReqVO pageReqVO);
-
-    /**
-     * 获得线索列表, 用于 Excel 导出
-     *
-     * @param exportReqVO 查询条件
-     * @return 线索列表
-     */
-    List<CrmClueDO> getClueList(CrmClueExportReqVO exportReqVO);
+    PageResult<CrmClueDO> getCluePage(CrmCluePageReqVO pageReqVO, Long userId);
 
 }

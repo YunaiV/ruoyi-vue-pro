@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.api.user;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
@@ -7,13 +8,13 @@ import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
@@ -37,21 +38,31 @@ public class AdminUserApiImpl implements AdminUserApi {
     }
 
     @Override
-    public Set<Long> getSubordinateIds(Long id) {
-        AdminUserDO user = userService.getUser(id);
+    public List<AdminUserRespDTO> getUserListBySubordinate(Long userId) {
+        // 1.1 获取用户负责的部门
+        AdminUserDO user = userService.getUser(userId);
         if (user == null) {
-            return null;
+            return Collections.emptyList();
+        }
+        ArrayList<Long> deptIds = new ArrayList<>();
+        DeptDO dept = deptService.getDept(user.getDeptId());
+        if (dept == null) {
+            return Collections.emptyList();
+        }
+        if (ObjUtil.notEqual(dept.getLeaderUserId(), userId)) { // 校验为负责人
+            return Collections.emptyList();
+        }
+        deptIds.add(dept.getId());
+        // 1.2 获取所有子部门
+        List<DeptDO> childDeptList = deptService.getChildDeptList(dept.getId());
+        if (CollUtil.isNotEmpty(childDeptList)) {
+            deptIds.addAll(convertSet(childDeptList, DeptDO::getId));
         }
 
-        Set<Long> subordinateIds = null; // 下属用户编号
-        DeptDO dept = deptService.getDept(user.getDeptId());
-        // TODO @puhui999：需要递归查询到子部门；并且要排除到自己噢。
-        // TODO @puhui999：保持 if return 原则，这里其实要判断不等于，则返回 null；最好返回 空集合，上面也是
-        if (ObjUtil.equal(dept.getLeaderUserId(), id)) { // 校验是否是该部门的负责人
-            List<AdminUserDO> users = userService.getUserListByDeptIds(Collections.singletonList(dept.getId()));
-            subordinateIds = convertSet(users, AdminUserDO::getId);
-        }
-        return subordinateIds;
+        // 2. 获取部门对应的用户信息
+        List<AdminUserDO> users = userService.getUserListByDeptIds(deptIds);
+        users.removeIf(item -> ObjUtil.equal(item.getId(), userId)); // 排除自己
+        return BeanUtils.toBean(users, AdminUserRespDTO.class);
     }
 
     @Override

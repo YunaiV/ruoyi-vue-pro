@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.toolkit.Db;
 import com.github.yulichang.base.MPJBaseMapper;
 import com.github.yulichang.interfaces.MPJBaseJoin;
+import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
@@ -36,6 +37,20 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         // MyBatis Plus 查询
         IPage<T> mpPage = MyBatisUtils.buildPage(pageParam);
         selectPage(mpPage, queryWrapper);
+        // 转换返回
+        return new PageResult<>(mpPage.getRecords(), mpPage.getTotal());
+    }
+
+    default <D> PageResult<D> selectJoinPage(PageParam pageParam, Class<D> clazz, MPJLambdaWrapper<T> lambdaWrapper) {
+        // 特殊：不分页，直接查询全部
+        if (PageParam.PAGE_SIZE_NONE.equals(pageParam.getPageNo())) {
+            List<D> list = selectJoinList(clazz, lambdaWrapper);
+            return new PageResult<>(list, (long) list.size());
+        }
+
+        // MyBatis Plus Join 查询
+        IPage<D> mpPage = MyBatisUtils.buildPage(pageParam);
+        mpPage = selectJoinPage(mpPage, clazz, lambdaWrapper);
         // 转换返回
         return new PageResult<>(mpPage.getRecords(), mpPage.getTotal());
     }

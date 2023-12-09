@@ -38,10 +38,7 @@ public interface CrmBusinessConvert {
 
     List<CrmBusinessExcelVO> convertList02(List<CrmBusinessDO> list);
 
-    @Mappings({
-            @Mapping(target = "bizId", source = "reqVO.id"),
-            @Mapping(target = "newOwnerUserId", source = "reqVO.id")
-    })
+    @Mapping(target = "bizId", source = "reqVO.id")
     CrmPermissionTransferReqBO convert(CrmBusinessTransferReqVO reqVO, Long userId);
 
     default PageResult<CrmBusinessRespVO> convertPage(PageResult<CrmBusinessDO> page, List<CrmCustomerDO> customerList,

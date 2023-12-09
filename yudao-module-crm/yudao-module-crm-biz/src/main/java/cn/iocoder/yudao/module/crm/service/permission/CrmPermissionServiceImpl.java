@@ -11,11 +11,11 @@ import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -126,15 +126,27 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deletePermission(Integer bizType, Long bizId, Integer level) {
+        // 校验存在
         List<CrmPermissionDO> permissions = crmPermissionMapper.selectListByBizTypeAndBizIdAndLevel(
                 bizType, bizId, level);
-        // 校验存在
         if (CollUtil.isEmpty(permissions)) {
             throw exception(CRM_PERMISSION_NOT_EXISTS);
         }
 
         // 删除数据权限
         crmPermissionMapper.deleteBatchIds(convertSet(permissions, CrmPermissionDO::getId));
+    }
+
+    @Override
+    public void deletePermission(Integer bizType, Long bizId) {
+        // TODO @puhui999：这种直接写条件删除；不需要先查询，再删除
+        List<CrmPermissionDO> permissionList = crmPermissionMapper.selectByBizTypeAndBizId(bizType, bizId);
+        if (CollUtil.isEmpty(permissionList)) {
+            return;
+        }
+
+        // 删除数据权限
+        crmPermissionMapper.deleteBatchIds(convertSet(permissionList, CrmPermissionDO::getId));
     }
 
     @Override
