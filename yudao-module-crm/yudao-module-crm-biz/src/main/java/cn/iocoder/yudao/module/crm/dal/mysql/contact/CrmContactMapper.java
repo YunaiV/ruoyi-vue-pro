@@ -28,11 +28,12 @@ public interface CrmContactMapper extends BaseMapperX<CrmContactDO> {
     }
 
     default PageResult<CrmContactDO> selectPage(CrmContactPageReqVO pageReqVO, Long userId) {
-        MPJLambdaWrapperX<CrmContactDO> mpjLambdaWrapperX = new MPJLambdaWrapperX<>();
-        // 构建数据权限连表条件
-        CrmQueryWrapperUtils.builderPageQuery(mpjLambdaWrapperX, CrmBizTypeEnum.CRM_CONTACT.getType(), CrmContactDO::getId,
+        MPJLambdaWrapperX<CrmContactDO> query = new MPJLambdaWrapperX<>();
+        // 拼接数据权限的查询条件
+        CrmQueryWrapperUtils.builderPageQuery(query, CrmBizTypeEnum.CRM_CONTACT.getType(), CrmContactDO::getId,
                 userId, pageReqVO.getSceneType(), pageReqVO.getPool());
-        mpjLambdaWrapperX.selectAll(CrmContactDO.class)
+        // 拼接自身的查询条件
+        query.selectAll(CrmContactDO.class)
                 .eqIfPresent(CrmContactDO::getCustomerId, pageReqVO.getCustomerId()) // 指定客户编号
                 .likeIfPresent(CrmContactDO::getName, pageReqVO.getName())
                 .eqIfPresent(CrmContactDO::getMobile, pageReqVO.getMobile())
@@ -41,14 +42,14 @@ public interface CrmContactMapper extends BaseMapperX<CrmContactDO> {
                 .eqIfPresent(CrmContactDO::getQq, pageReqVO.getQq())
                 .eqIfPresent(CrmContactDO::getWechat, pageReqVO.getWechat())
                 .orderByDesc(CrmContactDO::getId);
-        return selectJoinPage(pageReqVO, CrmContactDO.class, mpjLambdaWrapperX);
+        return selectJoinPage(pageReqVO, CrmContactDO.class, query);
     }
 
     default List<CrmContactDO> selectBatchIds(Collection<Long> ids, Long userId) {
-        MPJLambdaWrapperX<CrmContactDO> mpjLambdaWrapperX = new MPJLambdaWrapperX<>();
-        // 构建数据权限连表条件
-        CrmQueryWrapperUtils.builderListQueryBatch(mpjLambdaWrapperX, CrmBizTypeEnum.CRM_CONTACT.getType(), ids, userId);
-        return selectJoinList(CrmContactDO.class, mpjLambdaWrapperX);
+        MPJLambdaWrapperX<CrmContactDO> query = new MPJLambdaWrapperX<>();
+        // 拼接数据权限的查询条件
+        CrmQueryWrapperUtils.builderListQueryBatch(query, CrmBizTypeEnum.CRM_CONTACT.getType(), ids, userId);
+        return selectJoinList(CrmContactDO.class, query);
     }
 
 }

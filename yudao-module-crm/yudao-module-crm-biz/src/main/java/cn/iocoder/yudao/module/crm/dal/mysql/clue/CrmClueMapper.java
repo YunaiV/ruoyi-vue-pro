@@ -28,23 +28,24 @@ public interface CrmClueMapper extends BaseMapperX<CrmClueDO> {
     }
 
     default PageResult<CrmClueDO> selectPage(CrmCluePageReqVO pageReqVO, Long userId) {
-        MPJLambdaWrapperX<CrmClueDO> mpjLambdaWrapperX = new MPJLambdaWrapperX<>();
-        // 构建数据权限连表条件
-        CrmQueryWrapperUtils.builderPageQuery(mpjLambdaWrapperX, CrmBizTypeEnum.CRM_LEADS.getType(), CrmClueDO::getId,
+        MPJLambdaWrapperX<CrmClueDO> query = new MPJLambdaWrapperX<>();
+        // 拼接数据权限的查询条件
+        CrmQueryWrapperUtils.builderPageQuery(query, CrmBizTypeEnum.CRM_LEADS.getType(), CrmClueDO::getId,
                 userId, pageReqVO.getSceneType(), pageReqVO.getPool());
-        mpjLambdaWrapperX.selectAll(CrmClueDO.class)
+        // 拼接自身的查询条件
+        query.selectAll(CrmClueDO.class)
                 .likeIfPresent(CrmClueDO::getName, pageReqVO.getName())
                 .likeIfPresent(CrmClueDO::getTelephone, pageReqVO.getTelephone())
                 .likeIfPresent(CrmClueDO::getMobile, pageReqVO.getMobile())
                 .orderByDesc(CrmClueDO::getId);
-        return selectJoinPage(pageReqVO, CrmClueDO.class, mpjLambdaWrapperX);
+        return selectJoinPage(pageReqVO, CrmClueDO.class, query);
     }
 
     default List<CrmClueDO> selectBatchIds(Collection<Long> ids, Long userId) {
-        MPJLambdaWrapperX<CrmClueDO> mpjLambdaWrapperX = new MPJLambdaWrapperX<>();
-        // 构建数据权限连表条件
-        CrmQueryWrapperUtils.builderListQueryBatch(mpjLambdaWrapperX, CrmBizTypeEnum.CRM_LEADS.getType(), ids, userId);
-        return selectJoinList(CrmClueDO.class, mpjLambdaWrapperX);
+        MPJLambdaWrapperX<CrmClueDO> query = new MPJLambdaWrapperX<>();
+        // 拼接数据权限的查询条件
+        CrmQueryWrapperUtils.builderListQueryBatch(query, CrmBizTypeEnum.CRM_LEADS.getType(), ids, userId);
+        return selectJoinList(CrmClueDO.class, query);
     }
 
 }

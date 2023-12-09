@@ -126,9 +126,9 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deletePermission(Integer bizType, Long bizId, Integer level) {
+        // 校验存在
         List<CrmPermissionDO> permissions = crmPermissionMapper.selectListByBizTypeAndBizIdAndLevel(
                 bizType, bizId, level);
-        // 校验存在
         if (CollUtil.isEmpty(permissions)) {
             throw exception(CRM_PERMISSION_NOT_EXISTS);
         }
@@ -139,6 +139,7 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
 
     @Override
     public void deletePermission(Integer bizType, Long bizId) {
+        // TODO @puhui999：这种直接写条件删除；不需要先查询，再删除
         List<CrmPermissionDO> permissionList = crmPermissionMapper.selectByBizTypeAndBizId(bizType, bizId);
         if (CollUtil.isEmpty(permissionList)) {
             return;

@@ -17,9 +17,8 @@ import java.util.Arrays;
 public enum CrmSceneTypeEnum implements IntArrayValuable {
 
     OWNER(1, "我负责的"),
-    FOLLOW(2, "我关注的"),
-    INVOLVED(3, "我参与的"),
-    SUBORDINATE(4, "下属负责的");
+    INVOLVED(2, "我参与的"),
+    SUBORDINATE(3, "下属负责的");
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CrmSceneTypeEnum::getType).toArray();
 
@@ -34,10 +33,6 @@ public enum CrmSceneTypeEnum implements IntArrayValuable {
 
     public static boolean isOwner(Integer type) {
         return ObjUtil.equal(OWNER.getType(), type);
-    }
-
-    public static boolean isFollow(Integer type) {
-        return ObjUtil.equal(FOLLOW.getType(), type);
     }
 
     public static boolean isInvolved(Integer type) {

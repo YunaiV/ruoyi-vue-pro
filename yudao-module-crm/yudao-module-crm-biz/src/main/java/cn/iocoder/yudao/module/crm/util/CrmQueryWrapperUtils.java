@@ -26,67 +26,74 @@ public class CrmQueryWrapperUtils {
     /**
      * 构造 CRM 数据类型数据分页查询条件
      *
-     * @param queryMapper 连表查询对象
+     * @param query 连表查询对象
      * @param bizType     数据类型 {@link CrmBizTypeEnum}
      * @param bizId       数据编号
      * @param userId      用户编号
      * @param sceneType   场景类型
      * @param pool        公海
      */
-    public static <T extends MPJLambdaWrapper<?>, S> void builderPageQuery(
-            T queryMapper, Integer bizType, SFunction<S, ?> bizId, Long userId, Integer sceneType, Boolean pool) {
+    // TODO @puhui999：bizId 直接传递会不会简单点
+    // TODO @puhui999：builderPageQuery 应该不仅仅适合于分页查询，应该适用于所有的查询；可以改成 appendPermissionCondition
+    public static <T extends MPJLambdaWrapper<?>, S> void builderPageQuery(T query, Integer bizType, SFunction<S, ?> bizId,
+                                                                           Long userId, Integer sceneType, Boolean pool) {
         // 1. 构建数据权限连表条件
         if (ObjUtil.notEqual(validateAdminUser(userId), Boolean.TRUE)) { // 管理员不需要数据权限
-            queryMapper.innerJoin(CrmPermissionDO.class, on ->
+            query.innerJoin(CrmPermissionDO.class, on ->
                     on.eq(CrmPermissionDO::getBizType, bizType).eq(CrmPermissionDO::getBizId, bizId)
                             .eq(CrmPermissionDO::getUserId, userId));
         }
-        // 1.2 场景一：我负责的数据
+        // 2.1 场景一：我负责的数据
         if (CrmSceneTypeEnum.isOwner(sceneType)) {
-            queryMapper.eq("owner_user_id", userId);
+            query.eq("owner_user_id", userId);
         }
-        // 1.3 场景一：我参与的数据
+        // 2.2 场景二：我参与的数据
+        // TODO @puhui999：参与，指的是有读写权限噢；可以把 1. 的合并到 2.2 里；因为 2.1 不需要；
         if (CrmSceneTypeEnum.isInvolved(sceneType)) {
-            queryMapper.ne("owner_user_id", userId);
+            query.ne("owner_user_id", userId);
         }
-        // 1.4 场景二：下属负责的数据
+        // 2.3 场景三：下属负责的数据
         if (CrmSceneTypeEnum.isSubordinate(sceneType)) {
             List<AdminUserRespDTO> subordinateUsers = getAdminUserApi().getUserListBySubordinate(userId);
+            // TODO @puhui999：如果为空，不拼接，就是查询了所有数据呀？
             if (CollUtil.isNotEmpty(subordinateUsers)) {
-                queryMapper.in("owner_user_id", convertSet(subordinateUsers, AdminUserRespDTO::getId));
+                query.in("owner_user_id", convertSet(subordinateUsers, AdminUserRespDTO::getId));
             }
         }
 
         // 2. 拼接公海的查询条件
         if (ObjUtil.equal(pool, Boolean.TRUE)) { // 情况一：公海
-            queryMapper.isNull("owner_user_id");
+            query.isNull("owner_user_id");
         } else { // 情况二：不是公海
-            queryMapper.isNotNull("owner_user_id");
+            query.isNotNull("owner_user_id");
         }
     }
 
     /**
      * 构造 CRM 数据类型批量数据查询条件
      *
-     * @param queryMapper 连表查询对象
+     * @param query 连表查询对象
      * @param bizType     数据类型 {@link CrmBizTypeEnum}
      * @param bizIds      数据编号
      * @param userId      用户编号
      */
-    public static <T extends MPJLambdaWrapper<?>, S> void builderListQueryBatch(
-            T queryMapper, Integer bizType, Collection<Long> bizIds, Long userId) {
-        // 1. 构建数据权限连表条件
+    // TODO @puhui999：可以改成 appendPermissionCondition
+    // TODO @puhui999：S 是不是可以删除
+    public static <T extends MPJLambdaWrapper<?>, S> void builderListQueryBatch(T query, Integer bizType, Collection<Long> bizIds, Long userId) {
+        // TODO @puhui999：这里先 if return 简单点
         if (ObjUtil.notEqual(validateAdminUser(userId), Boolean.TRUE)) { // 管理员不需要数据权限
-            queryMapper.innerJoin(CrmPermissionDO.class, on ->
+            query.innerJoin(CrmPermissionDO.class, on ->
                     on.eq(CrmPermissionDO::getBizType, bizType).in(CrmPermissionDO::getBizId, bizIds)
                             .in(CollUtil.isNotEmpty(bizIds), CrmPermissionDO::getUserId, userId));
         }
     }
 
+    // TODO @puhui999：需要加个变量，不用每次都拿哈；
     private static AdminUserApi getAdminUserApi() {
         return SpringUtil.getBean(AdminUserApi.class);
     }
 
+    // TODO @puhui999：需要实现；
     /**
      * 校验用户是否是管理员
      *

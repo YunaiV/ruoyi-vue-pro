@@ -28,24 +28,25 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
     }
 
     default PageResult<CrmCustomerDO> selectPage(CrmCustomerPageReqVO pageReqVO, Long userId) {
-        MPJLambdaWrapperX<CrmCustomerDO> mpjLambdaWrapperX = new MPJLambdaWrapperX<>();
-        // 构建数据权限连表条件
-        CrmQueryWrapperUtils.builderPageQuery(mpjLambdaWrapperX, CrmBizTypeEnum.CRM_CUSTOMER.getType(), CrmCustomerDO::getId,
+        MPJLambdaWrapperX<CrmCustomerDO> query = new MPJLambdaWrapperX<>();
+        // 拼接数据权限的查询条件
+        CrmQueryWrapperUtils.builderPageQuery(query, CrmBizTypeEnum.CRM_CUSTOMER.getType(), CrmCustomerDO::getId,
                 userId, pageReqVO.getSceneType(), pageReqVO.getPool());
-        mpjLambdaWrapperX.selectAll(CrmCustomerDO.class)
+        // 拼接自身的查询条件
+        query.selectAll(CrmCustomerDO.class)
                 .likeIfPresent(CrmCustomerDO::getName, pageReqVO.getName())
                 .eqIfPresent(CrmCustomerDO::getMobile, pageReqVO.getMobile())
                 .eqIfPresent(CrmCustomerDO::getIndustryId, pageReqVO.getIndustryId())
                 .eqIfPresent(CrmCustomerDO::getLevel, pageReqVO.getLevel())
                 .eqIfPresent(CrmCustomerDO::getSource, pageReqVO.getSource());
-        return selectJoinPage(pageReqVO, CrmCustomerDO.class, mpjLambdaWrapperX);
+        return selectJoinPage(pageReqVO, CrmCustomerDO.class, query);
     }
 
     default List<CrmCustomerDO> selectBatchIds(Collection<Long> ids, Long userId) {
-        MPJLambdaWrapperX<CrmCustomerDO> mpjLambdaWrapperX = new MPJLambdaWrapperX<>();
-        // 构建数据权限连表条件
-        CrmQueryWrapperUtils.builderListQueryBatch(mpjLambdaWrapperX, CrmBizTypeEnum.CRM_CUSTOMER.getType(), ids, userId);
-        return selectJoinList(CrmCustomerDO.class, mpjLambdaWrapperX);
+        MPJLambdaWrapperX<CrmCustomerDO> query = new MPJLambdaWrapperX<>();
+        // 拼接数据权限的查询条件
+        CrmQueryWrapperUtils.builderListQueryBatch(query, CrmBizTypeEnum.CRM_CUSTOMER.getType(), ids, userId);
+        return selectJoinList(CrmCustomerDO.class, query);
     }
 
 }

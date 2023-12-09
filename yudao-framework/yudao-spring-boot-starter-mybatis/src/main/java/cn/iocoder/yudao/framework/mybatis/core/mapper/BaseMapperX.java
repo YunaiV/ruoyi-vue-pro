@@ -48,8 +48,10 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
             return new PageResult<>(list, (long) list.size());
         }
 
+        // MyBatis Plus Join 查询
         IPage<D> mpPage = MyBatisUtils.buildPage(pageParam);
         mpPage = selectJoinPage(mpPage, clazz, lambdaWrapper);
+        // 转换返回
         return new PageResult<>(mpPage.getRecords(), mpPage.getTotal());
     }
 

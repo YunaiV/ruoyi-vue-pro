@@ -23,12 +23,9 @@ public class CrmCluePageReqVO extends PageParam {
     @Schema(description = "手机号", example = "18000000000")
     private String mobile;
 
-    /**
-     * 场景类型，为 null 时则表示全部
-     */
     @Schema(description = "场景类型", example = "1")
     @InEnum(CrmSceneTypeEnum.class)
-    private Integer sceneType;
+    private Integer sceneType; // 场景类型，为 null 时则表示全部
 
     @Schema(description = "是否为公海数据", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
     private Boolean pool; // null 则表示为不是公海数据

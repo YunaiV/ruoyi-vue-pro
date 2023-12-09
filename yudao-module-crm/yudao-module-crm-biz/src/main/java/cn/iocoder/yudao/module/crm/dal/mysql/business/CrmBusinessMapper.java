@@ -28,22 +28,23 @@ public interface CrmBusinessMapper extends BaseMapperX<CrmBusinessDO> {
     }
 
     default PageResult<CrmBusinessDO> selectPage(CrmBusinessPageReqVO pageReqVO, Long userId) {
-        MPJLambdaWrapperX<CrmBusinessDO> mpjLambdaWrapperX = new MPJLambdaWrapperX<>();
-        // 构建数据权限连表条件
-        CrmQueryWrapperUtils.builderPageQuery(mpjLambdaWrapperX, CrmBizTypeEnum.CRM_BUSINESS.getType(), CrmBusinessDO::getId,
+        MPJLambdaWrapperX<CrmBusinessDO> query = new MPJLambdaWrapperX<>();
+        // 拼接数据权限的查询条件
+        CrmQueryWrapperUtils.builderPageQuery(query, CrmBizTypeEnum.CRM_BUSINESS.getType(), CrmBusinessDO::getId,
                 userId, pageReqVO.getSceneType(), pageReqVO.getPool());
-        mpjLambdaWrapperX.selectAll(CrmBusinessDO.class)
+        // 拼接自身的查询条件
+        query.selectAll(CrmBusinessDO.class)
                 .eqIfPresent(CrmBusinessDO::getCustomerId, pageReqVO.getCustomerId())  // 指定客户编号
                 .likeIfPresent(CrmBusinessDO::getName, pageReqVO.getName())
                 .orderByDesc(CrmBusinessDO::getId);
-        return selectJoinPage(pageReqVO, CrmBusinessDO.class, mpjLambdaWrapperX);
+        return selectJoinPage(pageReqVO, CrmBusinessDO.class, query);
     }
 
     default List<CrmBusinessDO> selectBatchIds(Collection<Long> ids, Long userId) {
-        MPJLambdaWrapperX<CrmBusinessDO> mpjLambdaWrapperX = new MPJLambdaWrapperX<>();
-        // 构建数据权限连表条件
-        CrmQueryWrapperUtils.builderListQueryBatch(mpjLambdaWrapperX, CrmBizTypeEnum.CRM_BUSINESS.getType(), ids, userId);
-        return selectJoinList(CrmBusinessDO.class, mpjLambdaWrapperX);
+        MPJLambdaWrapperX<CrmBusinessDO> query = new MPJLambdaWrapperX<>();
+        // 拼接数据权限的查询条件
+        CrmQueryWrapperUtils.builderListQueryBatch(query, CrmBizTypeEnum.CRM_BUSINESS.getType(), ids, userId);
+        return selectJoinList(CrmBusinessDO.class, query);
     }
 
 }
