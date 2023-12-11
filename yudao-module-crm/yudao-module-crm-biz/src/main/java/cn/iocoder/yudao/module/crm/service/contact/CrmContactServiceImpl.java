@@ -134,11 +134,9 @@ public class CrmContactServiceImpl implements CrmContactService {
     }
 
     @Override
-    public PageResult<CrmContactDO> getContactPageByCustomerId(CrmContactPageReqVO pageVO, Long userId) {
-        // 校验用户存在
-        customerService.validateCustomer(pageVO.getCustomerId());
-        // TODO @puhui999：getBusinessPageByCustomer 同理
-        return contactMapper.selectPage(pageVO, userId);
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#pageVO.customerId", level = CrmPermissionLevelEnum.READ)
+    public PageResult<CrmContactDO> getContactPageByCustomerId(CrmContactPageReqVO pageVO) {
+        return contactMapper.selectPageByCustomerId(pageVO);
     }
 
 }

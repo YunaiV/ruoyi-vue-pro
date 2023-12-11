@@ -20,10 +20,10 @@ import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 
@@ -129,16 +129,15 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
         return receivableMapper.selectBatchIds(ids);
     }
 
-    // TODO @芋艿：数据权限
     @Override
-    public PageResult<CrmReceivableDO> getReceivablePage(CrmReceivablePageReqVO pageReqVO) {
-        return receivableMapper.selectPage(pageReqVO);
+    public PageResult<CrmReceivableDO> getReceivablePage(CrmReceivablePageReqVO pageReqVO, Long userId) {
+        return receivableMapper.selectPage(pageReqVO, userId);
     }
 
     @Override
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#pageReqVO.customerId", level = CrmPermissionLevelEnum.READ)
-    public PageResult<CrmReceivableDO> getReceivablePageByCustomer(CrmReceivablePageReqVO pageReqVO) {
-        return receivableMapper.selectPageByCustomer(pageReqVO);
+    public PageResult<CrmReceivableDO> getReceivablePageByCustomerId(CrmReceivablePageReqVO pageReqVO) {
+        return receivableMapper.selectPageByCustomerId(pageReqVO);
     }
 
 }

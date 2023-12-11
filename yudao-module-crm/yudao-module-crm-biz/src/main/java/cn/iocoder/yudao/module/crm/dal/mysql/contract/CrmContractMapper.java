@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.crm.dal.mysql.contract;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
@@ -27,13 +28,22 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
                 .set(CrmContractDO::getOwnerUserId, ownerUserId));
     }
 
+    default PageResult<CrmContractDO> selectPageByCustomerId(CrmContractPageReqVO pageReqVO) {
+        return selectPage(pageReqVO, new LambdaQueryWrapperX<CrmContractDO>()
+                .eq(CrmContractDO::getCustomerId, pageReqVO.getCustomerId())
+                .likeIfPresent(CrmContractDO::getNo, pageReqVO.getNo())
+                .likeIfPresent(CrmContractDO::getName, pageReqVO.getName())
+                .eqIfPresent(CrmContractDO::getCustomerId, pageReqVO.getCustomerId())
+                .eqIfPresent(CrmContractDO::getBusinessId, pageReqVO.getBusinessId())
+                .orderByDesc(CrmContractDO::getId));
+    }
+
     default PageResult<CrmContractDO> selectPage(CrmContractPageReqVO pageReqVO, Long userId) {
         MPJLambdaWrapperX<CrmContractDO> mpjLambdaWrapperX = new MPJLambdaWrapperX<>();
         // 构建数据权限连表条件
-        CrmQueryWrapperUtils.builderPageQuery(mpjLambdaWrapperX, CrmBizTypeEnum.CRM_CONTACT.getType(), CrmContractDO::getId,
-                userId, pageReqVO.getSceneType(), pageReqVO.getPool());
+        CrmQueryWrapperUtils.appendPermissionCondition(mpjLambdaWrapperX, CrmBizTypeEnum.CRM_CONTACT.getType(), CrmContractDO::getId,
+                userId, pageReqVO.getSceneType(), Boolean.FALSE);
         mpjLambdaWrapperX.selectAll(CrmContractDO.class)
-                .eqIfPresent(CrmContractDO::getCustomerId, pageReqVO.getCustomerId())
                 .likeIfPresent(CrmContractDO::getNo, pageReqVO.getNo())
                 .likeIfPresent(CrmContractDO::getName, pageReqVO.getName())
                 .eqIfPresent(CrmContractDO::getCustomerId, pageReqVO.getCustomerId())
@@ -45,7 +55,7 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
     default List<CrmContractDO> selectBatchIds(Collection<Long> ids, Long userId) {
         MPJLambdaWrapperX<CrmContractDO> mpjLambdaWrapperX = new MPJLambdaWrapperX<>();
         // 构建数据权限连表条件
-        CrmQueryWrapperUtils.builderListQueryBatch(mpjLambdaWrapperX, CrmBizTypeEnum.CRM_CONTACT.getType(), ids, userId);
+        CrmQueryWrapperUtils.appendPermissionCondition(mpjLambdaWrapperX, CrmBizTypeEnum.CRM_CONTACT.getType(), ids, userId);
         return selectJoinList(CrmContractDO.class, mpjLambdaWrapperX);
     }
 

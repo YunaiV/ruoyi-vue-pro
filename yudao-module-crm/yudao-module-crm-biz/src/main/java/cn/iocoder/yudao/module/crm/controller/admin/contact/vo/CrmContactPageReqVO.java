@@ -39,7 +39,4 @@ public class CrmContactPageReqVO extends PageParam {
     @InEnum(CrmSceneTypeEnum.class)
     private Integer sceneType; // 场景类型，为 null 时则表示全部
 
-    @Schema(description = "是否为公海数据", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
-    private Boolean pool; // null 则表示为不是公海数据
-
 }

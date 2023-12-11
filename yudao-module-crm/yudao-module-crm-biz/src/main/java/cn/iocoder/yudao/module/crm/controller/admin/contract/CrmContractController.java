@@ -95,7 +95,7 @@ public class CrmContractController {
     @Operation(summary = "获得联系人分页，基于指定客户")
     public CommonResult<PageResult<ContractRespVO>> getContractPageByCustomer(@Valid CrmContractPageReqVO pageVO) {
         Assert.notNull(pageVO.getCustomerId(), "客户编号不能为空");
-        PageResult<CrmContractDO> pageResult = contractService.getContractPageByCustomer(pageVO, getLoginUserId());
+        PageResult<CrmContractDO> pageResult = contractService.getContractPageByCustomerId(pageVO);
         return success(convertDetailContractPage(pageResult));
     }
 

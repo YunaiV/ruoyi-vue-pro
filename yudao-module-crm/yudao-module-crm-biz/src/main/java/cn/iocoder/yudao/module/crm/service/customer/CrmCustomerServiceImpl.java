@@ -114,7 +114,6 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
      */
     @Override
     public void validateCustomer(Long customerId) {
-        // TODO puhui999: 不返回客户不走校验应该可行
         // 校验客户是否存在
         if (customerId == null) {
             throw exception(CUSTOMER_NOT_EXISTS);

@@ -30,7 +30,7 @@ public interface CrmClueMapper extends BaseMapperX<CrmClueDO> {
     default PageResult<CrmClueDO> selectPage(CrmCluePageReqVO pageReqVO, Long userId) {
         MPJLambdaWrapperX<CrmClueDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
-        CrmQueryWrapperUtils.builderPageQuery(query, CrmBizTypeEnum.CRM_LEADS.getType(), CrmClueDO::getId,
+        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_LEADS.getType(), CrmClueDO::getId,
                 userId, pageReqVO.getSceneType(), pageReqVO.getPool());
         // 拼接自身的查询条件
         query.selectAll(CrmClueDO.class)
@@ -44,7 +44,7 @@ public interface CrmClueMapper extends BaseMapperX<CrmClueDO> {
     default List<CrmClueDO> selectBatchIds(Collection<Long> ids, Long userId) {
         MPJLambdaWrapperX<CrmClueDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
-        CrmQueryWrapperUtils.builderListQueryBatch(query, CrmBizTypeEnum.CRM_LEADS.getType(), ids, userId);
+        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_LEADS.getType(), ids, userId);
         return selectJoinList(CrmClueDO.class, query);
     }
 

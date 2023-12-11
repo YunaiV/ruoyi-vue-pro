@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferRe
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -48,10 +47,7 @@ public interface ContactConvert {
 
     List<CrmContactSimpleRespVO> convertAllList(List<CrmContactDO> list);
 
-    @Mappings({
-            @Mapping(target = "bizId", source = "reqVO.id"),
-            @Mapping(target = "newOwnerUserId", source = "reqVO.id")
-    })
+    @Mapping(target = "bizId", source = "reqVO.id")
     CrmPermissionTransferReqBO convert(CrmContactTransferReqVO reqVO, Long userId);
 
     /**

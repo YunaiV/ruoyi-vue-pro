@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertListByFlatMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
@@ -94,7 +95,7 @@ public class CrmReceivableController {
     @Operation(summary = "获得回款分页")
     @PreAuthorize("@ss.hasPermission('crm:receivable:query')")
     public CommonResult<PageResult<CrmReceivableRespVO>> getReceivablePage(@Valid CrmReceivablePageReqVO pageReqVO) {
-        PageResult<CrmReceivableDO> pageResult = receivableService.getReceivablePage(pageReqVO);
+        PageResult<CrmReceivableDO> pageResult = receivableService.getReceivablePage(pageReqVO, getLoginUserId());
         return success(convertDetailReceivablePage(pageResult));
     }
 
@@ -102,7 +103,7 @@ public class CrmReceivableController {
     @Operation(summary = "获得回款分页，基于指定客户")
     public CommonResult<PageResult<CrmReceivableRespVO>> getReceivablePageByCustomer(@Valid CrmReceivablePageReqVO pageReqVO) {
         Assert.notNull(pageReqVO.getCustomerId(), "客户编号不能为空");
-        PageResult<CrmReceivableDO> pageResult = receivableService.getReceivablePageByCustomer(pageReqVO);
+        PageResult<CrmReceivableDO> pageResult = receivableService.getReceivablePageByCustomerId(pageReqVO);
         return success(convertDetailReceivablePage(pageResult));
     }
 
@@ -113,7 +114,8 @@ public class CrmReceivableController {
     @OperateLog(type = EXPORT)
     public void exportReceivableExcel(@Valid CrmReceivablePageReqVO exportReqVO,
                                       HttpServletResponse response) throws IOException {
-        PageResult<CrmReceivableDO> pageResult = receivableService.getReceivablePage(exportReqVO);
+        exportReqVO.setPageSize(PAGE_SIZE_NONE);
+        PageResult<CrmReceivableDO> pageResult = receivableService.getReceivablePage(exportReqVO, getLoginUserId());
         // 导出 Excel
         ExcelUtils.write(response, "回款.xls", "数据", CrmReceivableRespVO.class,
                 convertDetailReceivablePage(pageResult).getList());

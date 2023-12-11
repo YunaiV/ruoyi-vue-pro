@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.crm.dal.mysql.contact;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactPageReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
@@ -27,14 +28,25 @@ public interface CrmContactMapper extends BaseMapperX<CrmContactDO> {
                 .set(CrmContactDO::getOwnerUserId, ownerUserId));
     }
 
+    default PageResult<CrmContactDO> selectPageByCustomerId(CrmContactPageReqVO pageVO) {
+        return selectPage(pageVO, new LambdaQueryWrapperX<CrmContactDO>()
+                .eq(CrmContactDO::getCustomerId, pageVO.getCustomerId()) // 指定客户编号
+                .likeIfPresent(CrmContactDO::getName, pageVO.getName())
+                .eqIfPresent(CrmContactDO::getMobile, pageVO.getMobile())
+                .eqIfPresent(CrmContactDO::getTelephone, pageVO.getTelephone())
+                .eqIfPresent(CrmContactDO::getEmail, pageVO.getEmail())
+                .eqIfPresent(CrmContactDO::getQq, pageVO.getQq())
+                .eqIfPresent(CrmContactDO::getWechat, pageVO.getWechat())
+                .orderByDesc(CrmContactDO::getId));
+    }
+
     default PageResult<CrmContactDO> selectPage(CrmContactPageReqVO pageReqVO, Long userId) {
         MPJLambdaWrapperX<CrmContactDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
-        CrmQueryWrapperUtils.builderPageQuery(query, CrmBizTypeEnum.CRM_CONTACT.getType(), CrmContactDO::getId,
-                userId, pageReqVO.getSceneType(), pageReqVO.getPool());
+        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTACT.getType(), CrmContactDO::getId,
+                userId, pageReqVO.getSceneType(), Boolean.FALSE);
         // 拼接自身的查询条件
         query.selectAll(CrmContactDO.class)
-                .eqIfPresent(CrmContactDO::getCustomerId, pageReqVO.getCustomerId()) // 指定客户编号
                 .likeIfPresent(CrmContactDO::getName, pageReqVO.getName())
                 .eqIfPresent(CrmContactDO::getMobile, pageReqVO.getMobile())
                 .eqIfPresent(CrmContactDO::getTelephone, pageReqVO.getTelephone())
@@ -48,7 +60,7 @@ public interface CrmContactMapper extends BaseMapperX<CrmContactDO> {
     default List<CrmContactDO> selectBatchIds(Collection<Long> ids, Long userId) {
         MPJLambdaWrapperX<CrmContactDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
-        CrmQueryWrapperUtils.builderListQueryBatch(query, CrmBizTypeEnum.CRM_CONTACT.getType(), ids, userId);
+        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTACT.getType(), ids, userId);
         return selectJoinList(CrmContactDO.class, query);
     }
 

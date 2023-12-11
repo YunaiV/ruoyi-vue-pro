@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactCreateR
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import jakarta.validation.Valid;
 
 import java.util.Collection;
@@ -71,12 +72,11 @@ public interface CrmContactService {
     /**
      * 获得联系人分页
      *
-     * 数据权限：基于 {@link CrmContactDO}
+     * 数据权限：基于 {@link CrmCustomerDO}
      *
      * @param pageVO 分页查询
-     * @param userId 用户编号
      * @return 联系人分页
      */
-    PageResult<CrmContactDO> getContactPageByCustomerId(CrmContactPageReqVO pageVO, Long userId);
+    PageResult<CrmContactDO> getContactPageByCustomerId(CrmContactPageReqVO pageVO);
 
 }

@@ -105,6 +105,12 @@ public class CrmContractServiceImpl implements CrmContractService {
     }
 
     @Override
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#pageReqVO.customerId", level = CrmPermissionLevelEnum.READ)
+    public PageResult<CrmContractDO> getContractPageByCustomerId(CrmContractPageReqVO pageReqVO) {
+        return contractMapper.selectPageByCustomerId(pageReqVO);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void transferContract(CrmContractTransferReqVO reqVO, Long userId) {
         // 1. 校验合同是否存在

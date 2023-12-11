@@ -30,7 +30,4 @@ public class CrmContractPageReqVO extends PageParam {
     @InEnum(CrmSceneTypeEnum.class)
     private Integer sceneType; // 场景类型，为 null 时则表示全部
 
-    @Schema(description = "是否为公海数据", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
-    private Boolean pool; // null 则表示为不是公海数据 TODO @puhui999：合同没有公海。目前只有【客户】【线索】有公海，其它都没
-
 }
