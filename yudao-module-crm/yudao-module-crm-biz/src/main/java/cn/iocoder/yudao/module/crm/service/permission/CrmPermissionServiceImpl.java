@@ -138,6 +138,7 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deletePermission(Integer bizType, Long bizId) {
         // 删除数据权限
         int deletedCol = crmPermissionMapper.deletePermission(bizType, bizId);
