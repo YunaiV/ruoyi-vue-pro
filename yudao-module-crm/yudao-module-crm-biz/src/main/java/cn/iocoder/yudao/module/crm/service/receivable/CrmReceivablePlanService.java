@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.crm.service.receivable;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanTransferReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivablePlanDO;
@@ -76,5 +77,13 @@ public interface CrmReceivablePlanService {
      * @return 回款计划分页
      */
     PageResult<CrmReceivablePlanDO> getReceivablePlanPageByCustomerId(CrmReceivablePlanPageReqVO pageReqVO);
+
+    /**
+     * 回款计划转移
+     *
+     * @param reqVO  请求
+     * @param userId 用户编号
+     */
+    void transferReceivablePlan(CrmReceivablePlanTransferReqVO reqVO, Long userId);
 
 }

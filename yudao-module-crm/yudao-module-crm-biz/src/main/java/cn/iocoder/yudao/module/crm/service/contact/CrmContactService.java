@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.crm.service.contact;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactTransferReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
@@ -78,5 +79,13 @@ public interface CrmContactService {
      * @return 联系人分页
      */
     PageResult<CrmContactDO> getContactPageByCustomerId(CrmContactPageReqVO pageVO);
+
+    /**
+     * 联系人转移
+     *
+     * @param reqVO  请求
+     * @param userId 用户编号
+     */
+    void transferContact(CrmContactTransferReqVO reqVO, Long userId);
 
 }

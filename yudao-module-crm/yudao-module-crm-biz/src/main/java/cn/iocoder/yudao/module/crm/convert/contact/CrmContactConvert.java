@@ -25,9 +25,9 @@ import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAnd
  * @author 芋道源码
  */
 @Mapper
-public interface ContactConvert {
+public interface CrmContactConvert {
 
-    ContactConvert INSTANCE = Mappers.getMapper(ContactConvert.class);
+    CrmContactConvert INSTANCE = Mappers.getMapper(CrmContactConvert.class);
 
     CrmContactDO convert(CrmContactCreateReqVO bean);
 

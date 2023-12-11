@@ -1,16 +1,16 @@
-package cn.iocoder.yudao.module.crm.controller.admin.customer.vo;
+package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable;
 
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-@Schema(description = "管理后台 - CRM 客户转移 Request VO")
+@Schema(description = "管理后台 - CRM 回款转移 Request VO")
 @Data
-public class CrmCustomerTransferReqVO {
+public class CrmReceivableTransferReqVO {
 
-    @Schema(description = "客户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
-    @NotNull(message = "客户编号不能为空")
+    @Schema(description = "回款编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
+    @NotNull(message = "回款编号不能为空")
     private Long id;
 
     /**

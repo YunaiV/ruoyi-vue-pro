@@ -8,7 +8,7 @@ import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.*;
-import cn.iocoder.yudao.module.crm.convert.contract.ContractConvert;
+import cn.iocoder.yudao.module.crm.convert.contract.CrmContractConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
@@ -80,7 +80,7 @@ public class CrmContractController {
     @PreAuthorize("@ss.hasPermission('crm:contract:query')")
     public CommonResult<ContractRespVO> getContract(@RequestParam("id") Long id) {
         CrmContractDO contract = contractService.getContract(id);
-        return success(ContractConvert.INSTANCE.convert(contract));
+        return success(CrmContractConvert.INSTANCE.convert(contract));
     }
 
     @GetMapping("/page")
@@ -108,7 +108,7 @@ public class CrmContractController {
         PageResult<CrmContractDO> pageResult = contractService.getContractPage(exportReqVO, getLoginUserId());
         // 导出 Excel
         ExcelUtils.write(response, "合同.xls", "数据", CrmContractExcelVO.class,
-                ContractConvert.INSTANCE.convertList02(pageResult.getList()));
+                CrmContractConvert.INSTANCE.convertList02(pageResult.getList()));
     }
 
     /**
@@ -128,7 +128,7 @@ public class CrmContractController {
         // 2. 获取创建人、负责人列表
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(contactList,
                 contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getOwnerUserId())));
-        return ContractConvert.INSTANCE.convertPage(pageResult, userMap, customerList);
+        return CrmContractConvert.INSTANCE.convertPage(pageResult, userMap, customerList);
     }
 
     @PutMapping("/transfer")

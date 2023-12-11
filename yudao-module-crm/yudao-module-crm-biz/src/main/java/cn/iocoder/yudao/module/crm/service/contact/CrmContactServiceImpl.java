@@ -3,11 +3,8 @@ package cn.iocoder.yudao.module.crm.service.contact;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactBaseVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactCreateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactUpdateReqVO;
-import cn.iocoder.yudao.module.crm.convert.contact.ContactConvert;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.*;
+import cn.iocoder.yudao.module.crm.convert.contact.CrmContactConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contact.CrmContactMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
@@ -56,7 +53,7 @@ public class CrmContactServiceImpl implements CrmContactService {
         // 1.1 校验
         validateRelationDataExists(createReqVO);
         // 1.2 插入
-        CrmContactDO contact = ContactConvert.INSTANCE.convert(createReqVO);
+        CrmContactDO contact = CrmContactConvert.INSTANCE.convert(createReqVO);
         contactMapper.insert(contact);
 
         // 2. 创建数据权限
@@ -73,7 +70,7 @@ public class CrmContactServiceImpl implements CrmContactService {
         validateContactExists(updateReqVO.getId());
         validateRelationDataExists(updateReqVO);
         // 2. 更新
-        CrmContactDO updateObj = ContactConvert.INSTANCE.convert(updateReqVO);
+        CrmContactDO updateObj = CrmContactConvert.INSTANCE.convert(updateReqVO);
         contactMapper.updateById(updateObj);
     }
 
@@ -137,6 +134,20 @@ public class CrmContactServiceImpl implements CrmContactService {
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#pageVO.customerId", level = CrmPermissionLevelEnum.READ)
     public PageResult<CrmContactDO> getContactPageByCustomerId(CrmContactPageReqVO pageVO) {
         return contactMapper.selectPageByCustomerId(pageVO);
+    }
+
+    @Override
+    public void transferContact(CrmContactTransferReqVO reqVO, Long userId) {
+        // 1 校验联系人是否存在
+        validateContactExists(reqVO.getId());
+
+        // 2.1 数据权限转移
+        crmPermissionService.transferPermission(
+                CrmContactConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_CONTACT.getType()));
+        // 2.2 设置新的负责人
+        contactMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
+
+        // 3. TODO 记录转移日志
     }
 
 }

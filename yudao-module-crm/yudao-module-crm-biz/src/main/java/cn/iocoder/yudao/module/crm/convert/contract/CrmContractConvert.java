@@ -22,9 +22,9 @@ import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAnd
  * @author dhb52
  */
 @Mapper
-public interface ContractConvert {
+public interface CrmContractConvert {
 
-    ContractConvert INSTANCE = Mappers.getMapper(ContractConvert.class);
+    CrmContractConvert INSTANCE = Mappers.getMapper(CrmContractConvert.class);
 
     CrmContractDO convert(CrmContractCreateReqVO bean);
 

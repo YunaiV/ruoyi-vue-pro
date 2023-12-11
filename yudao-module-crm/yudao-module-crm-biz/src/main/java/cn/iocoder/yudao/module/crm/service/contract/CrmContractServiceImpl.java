@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractCreat
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractUpdateReqVO;
-import cn.iocoder.yudao.module.crm.convert.contract.ContractConvert;
+import cn.iocoder.yudao.module.crm.convert.contract.CrmContractConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
@@ -44,7 +44,7 @@ public class CrmContractServiceImpl implements CrmContractService {
     @Override
     public Long createContract(CrmContractCreateReqVO createReqVO, Long userId) {
         // 插入
-        CrmContractDO contract = ContractConvert.INSTANCE.convert(createReqVO);
+        CrmContractDO contract = CrmContractConvert.INSTANCE.convert(createReqVO);
         contractMapper.insert(contract);
 
         // 创建数据权限
@@ -61,7 +61,7 @@ public class CrmContractServiceImpl implements CrmContractService {
         // 校验存在
         validateContractExists(updateReqVO.getId());
         // 更新
-        CrmContractDO updateObj = ContractConvert.INSTANCE.convert(updateReqVO);
+        CrmContractDO updateObj = CrmContractConvert.INSTANCE.convert(updateReqVO);
         contractMapper.updateById(updateObj);
     }
 
@@ -118,7 +118,7 @@ public class CrmContractServiceImpl implements CrmContractService {
 
         // 2.1 数据权限转移
         crmPermissionService.transferPermission(
-                ContractConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_CONTRACT.getType()));
+                CrmContractConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_CONTRACT.getType()));
         // 2.2 设置负责人
         contractMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
 

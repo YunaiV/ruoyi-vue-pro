@@ -6,6 +6,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanTransferReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanUpdateReqVO;
 import cn.iocoder.yudao.module.crm.convert.receivable.CrmReceivablePlanConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
@@ -133,6 +134,20 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#pageReqVO.customerId", level = CrmPermissionLevelEnum.READ)
     public PageResult<CrmReceivablePlanDO> getReceivablePlanPageByCustomerId(CrmReceivablePlanPageReqVO pageReqVO) {
         return receivablePlanMapper.selectPageByCustomerId(pageReqVO);
+    }
+
+    @Override
+    public void transferReceivablePlan(CrmReceivablePlanTransferReqVO reqVO, Long userId) {
+        // 1 校验回款计划是否存在
+        validateReceivablePlanExists(reqVO.getId());
+
+        // 2.1 数据权限转移
+        crmPermissionService.transferPermission(
+                CrmReceivablePlanConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_RECEIVABLE_PLAN.getType()));
+        // 2.2 设置新的负责人
+        receivablePlanMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
+
+        // 3. TODO 记录转移日志
     }
 
 }

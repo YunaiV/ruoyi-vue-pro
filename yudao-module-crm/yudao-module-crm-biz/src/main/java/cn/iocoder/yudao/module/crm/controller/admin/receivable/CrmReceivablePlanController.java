@@ -7,10 +7,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanCreateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.*;
 import cn.iocoder.yudao.module.crm.convert.receivable.CrmReceivablePlanConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
@@ -149,6 +146,14 @@ public class CrmReceivablePlanController {
         List<CrmReceivableDO> receivableList = receivableService.getReceivableList(
                 convertSet(receivablePlanList, CrmReceivablePlanDO::getReceivableId));
         return CrmReceivablePlanConvert.INSTANCE.convertPage(pageResult, userMap, customerList, contractList, receivableList);
+    }
+
+    @PutMapping("/transfer")
+    @Operation(summary = "回款计划转移")
+    @PreAuthorize("@ss.hasPermission('crm:receivable-plan:update')")
+    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmReceivablePlanTransferReqVO reqVO) {
+        receivablePlanService.transferReceivablePlan(reqVO, getLoginUserId());
+        return success(true);
     }
 
 }

@@ -5,6 +5,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTransferReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueUpdateReqVO;
 import cn.iocoder.yudao.module.crm.convert.clue.CrmClueConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
@@ -99,6 +100,20 @@ public class CrmClueServiceImpl implements CrmClueService {
     @Override
     public PageResult<CrmClueDO> getCluePage(CrmCluePageReqVO pageReqVO, Long userId) {
         return clueMapper.selectPage(pageReqVO, userId);
+    }
+
+    @Override
+    public void transferClue(CrmClueTransferReqVO reqVO, Long userId) {
+        // 1 校验线索是否存在
+        validateClueExists(reqVO.getId());
+
+        // 2.1 数据权限转移
+        crmPermissionService.transferPermission(
+                CrmClueConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_LEADS.getType()));
+        // 2.2 设置新的负责人
+        clueMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
+
+        // 3. TODO 记录转移日志
     }
 
 }
