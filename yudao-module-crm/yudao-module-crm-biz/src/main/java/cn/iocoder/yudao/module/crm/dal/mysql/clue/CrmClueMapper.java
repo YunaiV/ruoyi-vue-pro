@@ -30,8 +30,11 @@ public interface CrmClueMapper extends BaseMapperX<CrmClueDO> {
     default PageResult<CrmClueDO> selectPage(CrmCluePageReqVO pageReqVO, Long userId) {
         MPJLambdaWrapperX<CrmClueDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
-        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_LEADS.getType(), CrmClueDO::getId,
-                userId, pageReqVO.getSceneType(), pageReqVO.getPool());
+        boolean condition = CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_LEADS.getType(),
+                CrmClueDO::getId, userId, pageReqVO.getSceneType(), pageReqVO.getPool());
+        if (!condition) {
+            return PageResult.empty();
+        }
         // 拼接自身的查询条件
         query.selectAll(CrmClueDO.class)
                 .likeIfPresent(CrmClueDO::getName, pageReqVO.getName())

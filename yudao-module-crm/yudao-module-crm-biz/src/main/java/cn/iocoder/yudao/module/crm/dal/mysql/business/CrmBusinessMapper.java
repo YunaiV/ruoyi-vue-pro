@@ -38,8 +38,11 @@ public interface CrmBusinessMapper extends BaseMapperX<CrmBusinessDO> {
     default PageResult<CrmBusinessDO> selectPage(CrmBusinessPageReqVO pageReqVO, Long userId) {
         MPJLambdaWrapperX<CrmBusinessDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
-        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_BUSINESS.getType(), CrmBusinessDO::getId,
-                userId, pageReqVO.getSceneType(), Boolean.FALSE);
+        boolean condition = CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_BUSINESS.getType(),
+                CrmBusinessDO::getId, userId, pageReqVO.getSceneType(), Boolean.FALSE);
+        if (!condition) {
+            return PageResult.empty();
+        }
         // 拼接自身的查询条件
         query.selectAll(CrmBusinessDO.class)
                 .likeIfPresent(CrmBusinessDO::getName, pageReqVO.getName())

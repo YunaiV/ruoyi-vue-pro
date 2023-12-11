@@ -40,9 +40,13 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
 
     default PageResult<CrmContractDO> selectPage(CrmContractPageReqVO pageReqVO, Long userId) {
         MPJLambdaWrapperX<CrmContractDO> mpjLambdaWrapperX = new MPJLambdaWrapperX<>();
-        // 构建数据权限连表条件
-        CrmQueryWrapperUtils.appendPermissionCondition(mpjLambdaWrapperX, CrmBizTypeEnum.CRM_CONTACT.getType(), CrmContractDO::getId,
-                userId, pageReqVO.getSceneType(), Boolean.FALSE);
+        // 拼接数据权限的查询条件
+        boolean condition = CrmQueryWrapperUtils.appendPermissionCondition(mpjLambdaWrapperX, CrmBizTypeEnum.CRM_CONTACT.getType(),
+                CrmContractDO::getId, userId, pageReqVO.getSceneType(), Boolean.FALSE);
+        if (!condition) {
+            return PageResult.empty();
+        }
+        // 拼接自身的查询条件
         mpjLambdaWrapperX.selectAll(CrmContractDO.class)
                 .likeIfPresent(CrmContractDO::getNo, pageReqVO.getNo())
                 .likeIfPresent(CrmContractDO::getName, pageReqVO.getName())

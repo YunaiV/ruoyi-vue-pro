@@ -33,10 +33,11 @@ public class CrmQueryWrapperUtils {
      * @param userId    用户编号
      * @param sceneType 场景类型
      * @param pool      公海
+     * @return 是否 （是：需要执行查询，否：不需要查询调用方法直接返回空）
      */
     // TODO @puhui999：bizId 直接传递会不会简单点 回复：还是需要 SFunction 因为分页连表时不知道 bizId 是多少
-    public static <T extends MPJLambdaWrapper<?>, S> void appendPermissionCondition(T query, Integer bizType, SFunction<S, ?> bizId,
-                                                                                    Long userId, Integer sceneType, Boolean pool) {
+    public static <T extends MPJLambdaWrapper<?>, S> boolean appendPermissionCondition(T query, Integer bizType, SFunction<S, ?> bizId,
+                                                                                       Long userId, Integer sceneType, Boolean pool) {
         // 1. 构建数据权限连表条件
         if (ObjUtil.notEqual(validateAdminUser(userId), Boolean.TRUE)) { // 管理员不需要数据权限
             query.innerJoin(CrmPermissionDO.class, on ->
@@ -59,10 +60,10 @@ public class CrmQueryWrapperUtils {
         // 2.3 场景三：下属负责的数据
         if (CrmSceneTypeEnum.isSubordinate(sceneType)) {
             List<AdminUserRespDTO> subordinateUsers = getAdminUserApi().getUserListBySubordinate(userId);
-            // TODO @puhui999：如果为空，不拼接，就是查询了所有数据呀？
-            if (CollUtil.isNotEmpty(subordinateUsers)) {
-                query.in("owner_user_id", convertSet(subordinateUsers, AdminUserRespDTO::getId));
+            if (CollUtil.isEmpty(subordinateUsers)) {
+                return false;
             }
+            query.in("owner_user_id", convertSet(subordinateUsers, AdminUserRespDTO::getId));
         }
 
         // 3. 拼接公海的查询条件
@@ -71,6 +72,8 @@ public class CrmQueryWrapperUtils {
         } else { // 情况二：不是公海
             query.isNotNull("owner_user_id");
         }
+
+        return true;
     }
 
     /**
@@ -95,8 +98,6 @@ public class CrmQueryWrapperUtils {
         return AdminUserApiHolder.ADMIN_USER_API;
     }
 
-    // TODO @puhui999：需要实现；
-
     /**
      * 校验用户是否是管理员
      *
@@ -104,6 +105,15 @@ public class CrmQueryWrapperUtils {
      * @return 是/否
      */
     private static boolean validateAdminUser(Long userId) {
+        // TODO 查询权限配置表用户的角色信息
+        //CrmPermissionConfig permissionConfig = crmPermissionConfigService.getPermissionConfigByUserId(userId);
+        //if (permissionConfig == null) {
+        //    return false;
+        //}
+        //// 校验是否为管理员
+        //if (permissionConfig.getIsAdmin()){
+        //    return true;
+        //}
         return false;
     }
 

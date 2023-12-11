@@ -43,8 +43,11 @@ public interface CrmContactMapper extends BaseMapperX<CrmContactDO> {
     default PageResult<CrmContactDO> selectPage(CrmContactPageReqVO pageReqVO, Long userId) {
         MPJLambdaWrapperX<CrmContactDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
-        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTACT.getType(), CrmContactDO::getId,
-                userId, pageReqVO.getSceneType(), Boolean.FALSE);
+        boolean condition = CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTACT.getType(),
+                CrmContactDO::getId, userId, pageReqVO.getSceneType(), Boolean.FALSE);
+        if (!condition) {
+            return PageResult.empty();
+        }
         // 拼接自身的查询条件
         query.selectAll(CrmContactDO.class)
                 .likeIfPresent(CrmContactDO::getName, pageReqVO.getName())
