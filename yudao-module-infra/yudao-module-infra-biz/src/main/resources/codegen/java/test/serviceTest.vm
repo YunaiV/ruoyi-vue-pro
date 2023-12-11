@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import ${baseFrameworkPackage}.test.core.ut.BaseDbUnitTest;
 
@@ -13,7 +13,7 @@ import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.business
 import ${basePackage}.module.${table.moduleName}.dal.mysql.${table.businessName}.${table.className}Mapper;
 import ${PageResultClassName};
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Import;
 import java.util.*;
 import java.time.LocalDateTime;
