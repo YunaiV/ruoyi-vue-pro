@@ -1,12 +1,13 @@
-package cn.iocoder.yudao.module.system.framework.bizlog.service;
+package cn.iocoder.yudao.module.system.framework.bizlog.function;
 
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.mzt.logapi.service.IParseFunction;
-import lombok.RequiredArgsConstructor;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 /**
  * 自定义函数-通过用户编号获取用户信息
@@ -14,10 +15,11 @@ import lombok.extern.slf4j.Slf4j;
  * @author HUIHUI
  */
 @Slf4j
-@RequiredArgsConstructor
+@Component
 public class AdminUserParseFunction implements IParseFunction {
 
-    private final AdminUserApi adminUserApi;
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @Override
     public boolean executeBefore() {

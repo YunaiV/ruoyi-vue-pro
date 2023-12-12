@@ -135,7 +135,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     public void transferCustomer(CrmCustomerTransferReqVO reqVO, Long userId) {
         // 1. 校验客户是否存在
         validateCustomer(reqVO.getId());
-
+        // 添加 crmCustomer 到日志上下文
         LogRecordContext.putVariable("crmCustomer", customerMapper.selectById(reqVO.getId()));
         // 2.1 数据权限转移
         crmPermissionService.transferPermission(

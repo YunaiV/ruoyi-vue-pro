@@ -3,8 +3,9 @@ package cn.iocoder.yudao.module.system.framework.bizlog.service;
 import cn.iocoder.yudao.module.system.api.logger.OperateLogApi;
 import com.mzt.logapi.beans.LogRecord;
 import com.mzt.logapi.service.ILogRecordService;
-import lombok.RequiredArgsConstructor;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,10 +18,11 @@ import java.util.List;
  * @author HUIHUI
  */
 @Slf4j
-@RequiredArgsConstructor
+@Service
 public class ILogRecordServiceImpl implements ILogRecordService {
 
-    private final OperateLogApi operateLogApi;
+    @Resource
+    private OperateLogApi operateLogApi;
 
     @Override
     public void record(LogRecord logRecord) {
