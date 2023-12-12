@@ -8,14 +8,16 @@ import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogCreateReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.logger.vo.operatelog.OperateLogPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.logger.OperateLogDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.logger.OperateLogV2DO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.logger.OperateLogMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.logger.OperateLogV2Mapper;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.Collection;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -34,6 +36,8 @@ public class OperateLogServiceImpl implements OperateLogService {
 
     @Resource
     private OperateLogMapper operateLogMapper;
+    @Resource
+    private OperateLogV2Mapper operateLogV2Mapper;
 
     @Resource
     private AdminUserService userService;
@@ -44,6 +48,14 @@ public class OperateLogServiceImpl implements OperateLogService {
         log.setJavaMethodArgs(StrUtils.maxLength(log.getJavaMethodArgs(), JAVA_METHOD_ARGS_MAX_LENGTH));
         log.setResultData(StrUtils.maxLength(log.getResultData(), RESULT_MAX_LENGTH));
         operateLogMapper.insert(log);
+    }
+
+    @Override
+    public void createOperateLogV2(OperateLogCreateReqDTO createReqDTO) {
+        OperateLogV2DO log = BeanUtils.toBean(createReqDTO, OperateLogV2DO.class);
+        log.setJavaMethodArgs(StrUtils.maxLength(log.getJavaMethodArgs(), JAVA_METHOD_ARGS_MAX_LENGTH));
+        log.setResultData(StrUtils.maxLength(log.getResultData(), RESULT_MAX_LENGTH));
+        operateLogV2Mapper.insert(log);
     }
 
     @Override

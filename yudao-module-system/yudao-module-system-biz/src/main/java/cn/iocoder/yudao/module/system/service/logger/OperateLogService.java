@@ -20,6 +20,13 @@ public interface OperateLogService {
     void createOperateLog(OperateLogCreateReqDTO createReqDTO);
 
     /**
+     * 记录操作日志 V2
+     *
+     * @param createReqDTO 操作日志请求
+     */
+    void createOperateLogV2(OperateLogCreateReqDTO createReqDTO);
+
+    /**
      * 获得操作日志分页列表
      *
      * @param pageReqVO 分页条件

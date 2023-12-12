@@ -1,6 +1,13 @@
-### 请求 /update
-GET {{baseUrl}}/crm/customer/page?pageNo=1&pageSize=10&name="张三"
+### 请求 /transfer
+PUT {{baseUrl}}/crm/customer/transfer
+Content-Type: application/json
 Authorization: Bearer {{token}}
 tenant-id: {{adminTenentId}}
+
+{
+  "id": 11,
+  "newOwnerUserId": 127,
+  "oldOwnerPermissionLevel": 2
+}
 
 
