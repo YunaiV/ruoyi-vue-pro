@@ -1,29 +1,17 @@
-package cn.iocoder.yudao.module.system.dal.dataobject.logger;
+package cn.iocoder.yudao.module.system.service.logger.bo;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import com.baomidou.mybatisplus.annotation.KeySequence;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 /**
- * 操作日志表 V2
+ * 系统操作日志 Create Req BO
  *
- * @author 芋道源码
+ * @author HUIHUI
  */
-@TableName(value = "system_operate_log_v2", autoResultMap = true)
-@KeySequence("system_operate_log_seq_v2") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class OperateLogV2DO extends BaseDO {
+public class OperateLogV2CreateReqBO {
 
-    /**
-     * 日志主键
-     */
-    @TableId
-    private Long id;
     /**
      * 链路追踪编号
      *
@@ -35,46 +23,56 @@ public class OperateLogV2DO extends BaseDO {
      *
      * 关联 MemberUserDO 的 id 属性，或者 AdminUserDO 的 id 属性
      */
+    @NotEmpty(message = "用户编号不能为空")
     private Long userId;
     /**
      * 用户类型
      *
      * 关联 {@link  UserTypeEnum}
      */
+    @NotEmpty(message = "用户类型不能为空")
     private Integer userType;
     /**
      * 操作模块
      */
+    @NotEmpty(message = "操作模块不能为空")
     private String module;
     /**
      * 操作名
      */
+    @NotEmpty(message = "操作名不能为空")
     private String name;
     /**
      * 操作模块业务编号
      */
+    @NotEmpty(message = "操作模块业务编号不能为空")
     private Long bizId;
     /**
      * 操作内容，记录整个操作的明细
      * 例如说，修改编号为 1 的用户信息，将性别从男改成女，将姓名从芋道改成源码。
      */
+    @NotEmpty(message = "操作内容不能为空")
     private String content;
 
     /**
      * 请求方法名
      */
+    @NotEmpty(message = "请求方法名不能为空")
     private String requestMethod;
     /**
      * 请求地址
      */
+    @NotEmpty(message = "请求地址不能为空")
     private String requestUrl;
     /**
      * 用户 IP
      */
+    @NotEmpty(message = "用户 IP 不能为空")
     private String userIp;
     /**
      * 浏览器 UA
      */
+    @NotEmpty(message = "浏览器 UA 不能为空")
     private String userAgent;
 
 }

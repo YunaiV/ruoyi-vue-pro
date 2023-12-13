@@ -5,9 +5,8 @@ Authorization: Bearer {{token}}
 tenant-id: {{adminTenentId}}
 
 {
-  "id": 11,
-  "newOwnerUserId": 127,
-  "oldOwnerPermissionLevel": 2
+  "id": 10,
+  "newOwnerUserId": 127
 }
 
 

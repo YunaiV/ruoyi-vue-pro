@@ -34,11 +34,11 @@ public class AdminUserParseFunction implements IParseFunction {
     @Override
     public String apply(Object value) {
         if (value == null) {
-            log.warn("(getAdminUserById) 解析异常参数为 null");
+            //log.warn("(getAdminUserById) 解析异常参数为 null");
             return "";
         }
         if (StrUtil.isEmpty(value.toString())) {
-            log.warn("(getAdminUserById) 解析异常参数为空");
+            //log.warn("(getAdminUserById) 解析异常参数为空");
             return "";
         }
 
