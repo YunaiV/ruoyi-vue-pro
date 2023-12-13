@@ -99,6 +99,9 @@ public class AppActivityController {
                         .setSpuId(item.getSpuId()).setStartTime(item.getStartTime()).setEndTime(item.getEndTime()));
             });
         }
+
+        // TODO 芋艿：满减送活动
+        // TODO 芋艿：限时折扣活动
         return activityList;
     }
 

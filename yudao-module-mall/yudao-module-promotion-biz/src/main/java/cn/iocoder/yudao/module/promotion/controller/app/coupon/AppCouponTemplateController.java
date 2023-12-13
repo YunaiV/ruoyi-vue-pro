@@ -47,7 +47,7 @@ public class AppCouponTemplateController {
     @Operation(summary = "获得优惠劵模版列表")
     @Parameters({
             @Parameter(name = "spuId", description = "商品 SPU 编号"), // 目前主要给商品详情使用
-            @Parameter(name = "useType", description = "使用类型"),
+            @Parameter(name = "productScope", description = "使用类型"),
             @Parameter(name = "count", description = "数量", required = true)
     })
     public CommonResult<List<AppCouponTemplateRespVO>> getCouponTemplateList(
