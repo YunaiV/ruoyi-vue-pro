@@ -22,11 +22,6 @@ public class AdminUserParseFunction implements IParseFunction {
     private AdminUserApi adminUserApi;
 
     @Override
-    public boolean executeBefore() {
-        return true;
-    }
-
-    @Override
     public String functionName() {
         return "getAdminUserById";
     }

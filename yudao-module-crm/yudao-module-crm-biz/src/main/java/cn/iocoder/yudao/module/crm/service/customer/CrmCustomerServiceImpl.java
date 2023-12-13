@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.crm.service.customer;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTransferReqVO;
@@ -16,6 +17,7 @@ import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import com.mzt.logapi.context.LogRecordContext;
+import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -63,11 +65,14 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @LogRecord(success = "更新了客户{_DIFF{#updateReqVO}}", type = CRM_CUSTOMER, subType = "更新客户", bizNo = "{{#updateReqVO.id}}")
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateCustomer(CrmCustomerUpdateReqVO updateReqVO) {
         // 校验存在
-        validateCustomerExists(updateReqVO.getId());
+        CrmCustomerDO oldCustomerDO = validateCustomerExists(updateReqVO.getId());
 
+        // __DIFF 函数传递了一个参数，传递的参数是修改之后的对象，这种方式需要在方法内部向 LogRecordContext 中 put 一个变量，代表是之前的对象，这个对象可以是null
+        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldCustomerDO, CrmCustomerUpdateReqVO.class));
         // 更新
         CrmCustomerDO updateObj = CrmCustomerConvert.INSTANCE.convert(updateReqVO);
         customerMapper.updateById(updateObj);
@@ -86,10 +91,12 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         crmPermissionService.deletePermission(CrmBizTypeEnum.CRM_CUSTOMER.getType(), id);
     }
 
-    private void validateCustomerExists(Long id) {
-        if (customerMapper.selectById(id) == null) {
+    private CrmCustomerDO validateCustomerExists(Long id) {
+        CrmCustomerDO customerDO = customerMapper.selectById(id);
+        if (customerDO == null) {
             throw exception(CUSTOMER_NOT_EXISTS);
         }
+        return customerDO;
     }
 
     @Override
@@ -135,7 +142,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     public void transferCustomer(CrmCustomerTransferReqVO reqVO, Long userId) {
         // 1. 校验客户是否存在
         validateCustomer(reqVO.getId());
-        // 添加 crmCustomer 到日志上下文
+        // 添加 crmCustomer 到日志上下文 TODO 日志记录放在 service 里是因为已经过了权限校验查询时不用走两次校验
         LogRecordContext.putVariable("crmCustomer", customerMapper.selectById(reqVO.getId()));
         // 2.1 数据权限转移
         crmPermissionService.transferPermission(

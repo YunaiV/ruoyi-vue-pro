@@ -20,8 +20,7 @@ public interface LogRecordConstants {
 
     //======================= 客户转移操作日志 =======================
 
-    String TRANSFER_CUSTOMER_LOG_SUCCESS = "把客户【{{#crmCustomer == null ? '' : #crmCustomer.name}}】负责人从" +
-            "【{getAdminUserById{#crmCustomer == null ? '' : #crmCustomer.ownerUserId}}】变更为了【{getAdminUserById{#reqVO.newOwnerUserId}}】";
+    String TRANSFER_CUSTOMER_LOG_SUCCESS = "把客户【{{#crmCustomer.name}}】的负责人从【{getAdminUserById{#crmCustomer.ownerUserId}}】变更为了【{getAdminUserById{#reqVO.newOwnerUserId}}】";
     String TRANSFER_CUSTOMER_LOG_FAIL = "";
 
 }
