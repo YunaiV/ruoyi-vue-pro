@@ -1,29 +1,22 @@
-package cn.iocoder.yudao.module.system.dal.dataobject.logger;
+package cn.iocoder.yudao.module.system.api.logger.dto;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import com.baomidou.mybatisplus.annotation.KeySequence;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+
+import java.time.LocalDateTime;
+
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.TIME_ZONE_DEFAULT;
 
 /**
- * 操作日志表 V2
+ * 系统操作日志 Resp DTO
  *
- * @author 芋道源码
+ * @author HUIHUI
  */
-@TableName(value = "system_operate_log_v2", autoResultMap = true)
-@KeySequence("system_operate_log_seq_v2") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class OperateLogV2DO extends BaseDO {
+public class OperateLogV2RespDTO {
 
-    /**
-     * 日志主键
-     */
-    @TableId
-    private Long id;
     /**
      * 链路追踪编号
      *
@@ -64,6 +57,7 @@ public class OperateLogV2DO extends BaseDO {
      * 例如说，记录订单编号，{ orderId: "1"}
      */
     private String extra;
+
     /**
      * 请求方法名
      */
@@ -80,5 +74,20 @@ public class OperateLogV2DO extends BaseDO {
      * 浏览器 UA
      */
     private String userAgent;
+
+    /**
+     * 创建时间
+     */
+    // TODO puhui999: 木得效果怎么肥事
+    @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
+    private LocalDateTime createTime;
+    /**
+     * 创建者，关联 AdminUserDO#getId
+     */
+    private String creator;
+    /**
+     * 创建者名称
+     */
+    private String creatorName;
 
 }

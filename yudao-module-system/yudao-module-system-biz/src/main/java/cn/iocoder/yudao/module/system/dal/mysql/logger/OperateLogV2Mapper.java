@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.logger.OperateLogV2DO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Collection;
+import java.util.List;
 
 @Mapper
 public interface OperateLogV2Mapper extends BaseMapperX<OperateLogV2DO> {
@@ -18,6 +19,13 @@ public interface OperateLogV2Mapper extends BaseMapperX<OperateLogV2DO> {
                 .inIfPresent(OperateLogV2DO::getUserId, userIds);
         query.orderByDesc(OperateLogV2DO::getId); // 降序
         return selectPage(reqVO, query);
+    }
+
+    default List<OperateLogV2DO> selectListByModuleAndBizId(String module, Long bizId) {
+        return selectList(new LambdaQueryWrapperX<OperateLogV2DO>()
+                .eq(OperateLogV2DO::getModule, module)
+                .eq(OperateLogV2DO::getBizId, bizId)
+                .orderByDesc(OperateLogV2DO::getCreateTime));
     }
 
 }

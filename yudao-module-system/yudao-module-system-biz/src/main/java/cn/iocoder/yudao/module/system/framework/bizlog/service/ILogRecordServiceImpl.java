@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.system.framework.bizlog.service;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
-import cn.iocoder.yudao.module.system.api.logger.OperateLogApi;
+import cn.iocoder.yudao.module.system.service.logger.OperateLogService;
 import cn.iocoder.yudao.module.system.service.logger.bo.OperateLogV2CreateReqBO;
 import com.mzt.logapi.beans.LogRecord;
 import com.mzt.logapi.service.ILogRecordService;
@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * 操作日志 ILogRecordService 实现类
  *
- * 基于 {@link OperateLogApi} 实现，记录操作日志
+ * 基于 {@link OperateLogService} 实现，记录操作日志
  *
  * @author HUIHUI
  */
@@ -27,7 +27,7 @@ import java.util.List;
 public class ILogRecordServiceImpl implements ILogRecordService {
 
     @Resource
-    private OperateLogApi operateLogApi;
+    private OperateLogService operateLogService;
 
     @Override
     public void record(LogRecord logRecord) {
@@ -41,6 +41,7 @@ public class ILogRecordServiceImpl implements ILogRecordService {
         // 补全请求信息
         fillRequestFields(reqBO);
         // 异步记录日志
+        operateLogService.createOperateLogV2(reqBO);
         log.info("操作日志 ===> {}", reqBO);
     }
 
@@ -54,6 +55,7 @@ public class ILogRecordServiceImpl implements ILogRecordService {
         reqBO.setName(logRecord.getSubType());// 操作名称如 转移客户
         reqBO.setBizId(Long.parseLong(logRecord.getBizNo())); // 操作模块业务编号
         reqBO.setContent(logRecord.getAction());// 例如说，修改编号为 1 的用户信息，将性别从男改成女，将姓名从芋道改成源码。
+        reqBO.setExtra(logRecord.getExtra()); // 拓展字段，有些复杂的业务，需要记录一些字段 ( JSON 格式 )，例如说，记录订单编号，{ orderId: "1"}
     }
 
     private static void fillRequestFields(OperateLogV2CreateReqBO reqBO) {

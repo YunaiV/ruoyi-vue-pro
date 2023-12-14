@@ -53,6 +53,11 @@ public class OperateLogV2CreateReqBO {
      */
     @NotEmpty(message = "操作内容不能为空")
     private String content;
+    /**
+     * 拓展字段，有些复杂的业务，需要记录一些字段 ( JSON 格式 )
+     * 例如说，记录订单编号，{ orderId: "1"}
+     */
+    private String extra;
 
     /**
      * 请求方法名

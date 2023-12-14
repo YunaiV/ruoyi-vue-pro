@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.logger.OperateLogV2DO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.logger.OperateLogMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.logger.OperateLogV2Mapper;
+import cn.iocoder.yudao.module.system.service.logger.bo.OperateLogV2CreateReqBO;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.system.dal.dataobject.logger.OperateLogDO.JAVA_METHOD_ARGS_MAX_LENGTH;
@@ -51,12 +53,6 @@ public class OperateLogServiceImpl implements OperateLogService {
     }
 
     @Override
-    public void createOperateLogV2(OperateLogCreateReqDTO createReqDTO) {
-        OperateLogV2DO log = BeanUtils.toBean(createReqDTO, OperateLogV2DO.class);
-        operateLogV2Mapper.insert(log);
-    }
-
-    @Override
     public PageResult<OperateLogDO> getOperateLogPage(OperateLogPageReqVO pageReqVO) {
         // 处理基于用户昵称的查询
         Collection<Long> userIds = null;
@@ -68,6 +64,19 @@ public class OperateLogServiceImpl implements OperateLogService {
         }
         // 查询分页
         return operateLogMapper.selectPage(pageReqVO, userIds);
+    }
+
+    //======================= LOG V2 =======================
+
+    @Override
+    public void createOperateLogV2(OperateLogV2CreateReqBO createReqBO) {
+        OperateLogV2DO log = BeanUtils.toBean(createReqBO, OperateLogV2DO.class);
+        operateLogV2Mapper.insert(log);
+    }
+
+    @Override
+    public List<OperateLogV2DO> getOperateLogByModuleAndBizId(String module, Long bizId) {
+        return operateLogV2Mapper.selectListByModuleAndBizId(module, bizId);
     }
 
 }
