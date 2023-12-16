@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Bean 工具类
@@ -27,11 +28,19 @@ public class BeanUtils {
         return CollectionUtils.convertList(source, s -> toBean(s, targetType));
     }
 
-    public static  <S, T> PageResult<T> toBean(PageResult<S> source, Class<T> targetType) {
+    public static <S, T> PageResult<T> toBean(PageResult<S> source, Class<T> targetType) {
+        return toBean(source, targetType, null);
+    }
+
+    public static <S, T> PageResult<T> toBean(PageResult<S> source, Class<T> targetType, Consumer<T> peek) {
         if (source == null) {
             return null;
         }
-        return new PageResult<>(toBean(source.getList(), targetType), source.getTotal());
+        List<T> list = toBean(source.getList(), targetType);
+        if (peek != null) {
+            list.forEach(peek);
+        }
+        return new PageResult<>(list, source.getTotal());
     }
 
 }

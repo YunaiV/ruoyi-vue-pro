@@ -2,40 +2,90 @@ package cn.iocoder.yudao.module.statistics.controller.admin.product;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.statistics.dal.mysql.product.ProductSpuStatisticsDO;
-import cn.iocoder.yudao.module.statistics.dal.mysql.product.ProductStatisticsDO;
+import cn.iocoder.yudao.framework.common.pojo.SortablePageParam;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
+import cn.iocoder.yudao.module.statistics.controller.admin.common.vo.DataComparisonRespVO;
+import cn.iocoder.yudao.module.statistics.controller.admin.product.vo.ProductStatisticsReqVO;
+import cn.iocoder.yudao.module.statistics.controller.admin.product.vo.ProductStatisticsRespVO;
+import cn.iocoder.yudao.module.statistics.dal.dataobject.product.ProductStatisticsDO;
+import cn.iocoder.yudao.module.statistics.service.product.ProductStatisticsService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.extern.slf4j.Slf4j;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDateTime;
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Tag(name = "管理后台 - 商品统计")
 @RestController
 @RequestMapping("/statistics/product")
 @Validated
-@Slf4j
 public class ProductStatisticsController {
 
-    // TODO @麦子：返回 ProductStatisticsComparisonResp， 里面有两个字段，一个是选择的时间范围的合计结果，一个是对比的时间范围的合计结果；
-    // 例如说，选择时间范围是 2023-10-01 ~ 2023-10-02，那么对比就是 2023-09-30，再倒推 2 天；
-    public CommonResult<Object> getProductStatisticsComparison() {
-        return null;
+    @Resource
+    private ProductStatisticsService productStatisticsService;
+
+    @Resource
+    private ProductSpuApi productSpuApi;
+
+    @GetMapping("/analyse")
+    @Operation(summary = "获得商品统计分析")
+    @PreAuthorize("@ss.hasPermission('statistics:product:query')")
+    public CommonResult<DataComparisonRespVO<ProductStatisticsRespVO>> getProductStatisticsAnalyse(ProductStatisticsReqVO reqVO) {
+        return success(productStatisticsService.getProductStatisticsAnalyse(reqVO));
     }
 
-    // TODO @麦子：查询指定时间范围内的商品统计数据；DO 到时需要改成 VO 哈
-    public CommonResult<List<ProductStatisticsDO>> getProductStatisticsList(
-            LocalDateTime[] times) {
-        return null;
+    @GetMapping("/list")
+    @Operation(summary = "获得商品统计明细（日期维度）")
+    @PreAuthorize("@ss.hasPermission('statistics:product:query')")
+    public CommonResult<List<ProductStatisticsRespVO>> getProductStatisticsList(ProductStatisticsReqVO reqVO) {
+        List<ProductStatisticsDO> list = productStatisticsService.getProductStatisticsList(reqVO);
+        return success(BeanUtils.toBean(list, ProductStatisticsRespVO.class));
     }
 
-    // TODO @麦子：查询指定时间范围内的商品 SPU 统计数据；DO 到时需要改成 VO 哈
-    // 入参是分页参数 + 时间范围 + 排序字段
-    public CommonResult<PageResult<ProductSpuStatisticsDO>> getProductSpuStatisticsPage() {
-        return null;
+    @GetMapping("/export-excel")
+    @Operation(summary = "导出获得商品统计明细 Excel（日期维度）")
+    @PreAuthorize("@ss.hasPermission('statistics:product:export')")
+    public void exportProductStatisticsExcel(ProductStatisticsReqVO reqVO, HttpServletResponse response) throws IOException {
+        List<ProductStatisticsDO> list = productStatisticsService.getProductStatisticsList(reqVO);
+        // 导出 Excel
+        List<ProductStatisticsRespVO> voList = BeanUtils.toBean(list, ProductStatisticsRespVO.class);
+        ExcelUtils.write(response, "商品状况.xls", "数据", ProductStatisticsRespVO.class, voList);
+    }
+
+    @GetMapping("/rank-page")
+    @Operation(summary = "获得商品统计排行榜分页（商品维度）")
+    @PreAuthorize("@ss.hasPermission('statistics:product:query')")
+    public CommonResult<PageResult<ProductStatisticsRespVO>> getProductStatisticsRankPage(@Valid ProductStatisticsReqVO reqVO,
+                                                                                          @Valid SortablePageParam pageParam) {
+        PageResult<ProductStatisticsDO> pageResult = productStatisticsService.getProductStatisticsRankPage(reqVO, pageParam);
+        // 处理商品信息
+        Set<Long> spuIds = convertSet(pageResult.getList(), ProductStatisticsDO::getSpuId);
+        Map<Long, ProductSpuRespDTO> spuMap = convertMap(productSpuApi.getSpuList(spuIds), ProductSpuRespDTO::getId);
+        // 拼接返回
+        return success(BeanUtils.toBean(pageResult, ProductStatisticsRespVO.class,
+                // 拼接商品信息
+                item -> Optional.ofNullable(spuMap.get(item.getSpuId())).ifPresent(spu -> {
+                    item.setName(spu.getName());
+                    item.setPicUrl(spu.getPicUrl());
+                })));
     }
 
 }

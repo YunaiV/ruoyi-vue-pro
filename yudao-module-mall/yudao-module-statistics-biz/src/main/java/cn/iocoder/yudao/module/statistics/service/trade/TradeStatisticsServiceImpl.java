@@ -60,7 +60,7 @@ public class TradeStatisticsServiceImpl implements TradeStatisticsService {
     }
 
     @Override
-    public DataComparisonRespVO<TradeTrendSummaryRespVO> getTradeTrendSummaryComparison(LocalDateTime beginTime,
+    public DataComparisonRespVO<TradeTrendSummaryRespVO> getTradeStatisticsAnalyse(LocalDateTime beginTime,
                                                                                         LocalDateTime endTime) {
         // 统计数据
         TradeTrendSummaryRespVO value = tradeStatisticsMapper.selectVoByTimeBetween(beginTime, endTime);

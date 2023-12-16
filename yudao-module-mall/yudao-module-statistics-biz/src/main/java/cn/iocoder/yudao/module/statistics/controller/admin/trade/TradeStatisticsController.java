@@ -18,6 +18,9 @@ import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -25,9 +28,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
@@ -67,13 +67,11 @@ public class TradeStatisticsController {
         return success(TradeStatisticsConvert.INSTANCE.convert(yesterdayData, beforeYesterdayData, monthData, lastMonthData));
     }
 
-    // TODO @疯狂：【晚点再改和讨论；等首页的接口出来】这个要不还是叫 analyse，对比选中的时间段，和上一个时间段；类似 MemberStatisticsController 的 getMemberAnalyse
-    @GetMapping("/trend/summary")
+    @GetMapping("/analyse")
     @Operation(summary = "获得交易状况统计")
     @PreAuthorize("@ss.hasPermission('statistics:trade:query')")
-    public CommonResult<DataComparisonRespVO<TradeTrendSummaryRespVO>> getTradeTrendSummaryComparison(
-            TradeTrendReqVO reqVO) {
-        return success(tradeStatisticsService.getTradeTrendSummaryComparison(ArrayUtil.get(reqVO.getTimes(), 0),
+    public CommonResult<DataComparisonRespVO<TradeTrendSummaryRespVO>> getTradeStatisticsAnalyse(TradeTrendReqVO reqVO) {
+        return success(tradeStatisticsService.getTradeStatisticsAnalyse(ArrayUtil.get(reqVO.getTimes(), 0),
                 ArrayUtil.get(reqVO.getTimes(), 1)));
     }
 
