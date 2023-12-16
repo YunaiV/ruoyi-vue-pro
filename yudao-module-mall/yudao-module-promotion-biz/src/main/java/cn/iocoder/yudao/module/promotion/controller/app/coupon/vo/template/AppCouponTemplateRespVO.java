@@ -1,10 +1,14 @@
 package cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.template;
 
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import jakarta.validation.constraints.Min;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "用户 App - 优惠劵模板 Response VO")
 @Data
@@ -19,9 +23,14 @@ public class AppCouponTemplateRespVO {
     @Schema(description = "每人限领个数", requiredMode = Schema.RequiredMode.REQUIRED, example = "66") // -1 - 则表示不限制
     private Integer takeLimitCount;
 
-    @Schema(description = "是否设置满多少金额可用", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
-    // 单位：分；0 - 不限制
+    @Schema(description = "是否设置满多少金额可用", requiredMode = Schema.RequiredMode.REQUIRED, example = "100") // 单位：分；0 - 不限制
     private Integer usePrice;
+
+    @Schema(description = "商品范围", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    private Integer productScope;
+
+    @Schema(description = "商品范围编号的数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    private List<Long> productScopeValues;
 
     @Schema(description = "生效日期类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer validityType;

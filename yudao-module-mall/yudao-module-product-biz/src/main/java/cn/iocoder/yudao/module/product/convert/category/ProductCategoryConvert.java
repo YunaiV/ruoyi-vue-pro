@@ -28,5 +28,4 @@ public interface ProductCategoryConvert {
 
     List<ProductCategoryRespVO> convertList(List<ProductCategoryDO> list);
 
-    List<AppCategoryRespVO> convertList03(List<ProductCategoryDO> list);
 }

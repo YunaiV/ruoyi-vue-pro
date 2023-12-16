@@ -77,6 +77,14 @@ public interface ProductCategoryService {
     List<ProductCategoryDO> getEnableCategoryList();
 
     /**
+     * 获得开启状态的商品分类列表，指定编号
+     *
+     * @param ids 商品分类编号数组
+     * @return 商品分类列表
+     */
+    List<ProductCategoryDO> getEnableCategoryList(List<Long> ids);
+
+    /**
      * 校验商品分类是否有效。如下情况，视为无效：
      * 1. 商品分类编号不存在
      * 2. 商品分类被禁用
@@ -84,4 +92,5 @@ public interface ProductCategoryService {
      * @param ids 商品分类编号数组
      */
     void validateCategoryList(Collection<Long> ids);
+
 }
