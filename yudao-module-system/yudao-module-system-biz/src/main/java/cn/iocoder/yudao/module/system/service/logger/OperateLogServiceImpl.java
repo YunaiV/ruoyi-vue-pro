@@ -66,7 +66,7 @@ public class OperateLogServiceImpl implements OperateLogService {
         return operateLogMapper.selectPage(pageReqVO, userIds);
     }
 
-    //======================= LOG V2 =======================
+    // ======================= LOG V2 =======================
 
     @Override
     public void createOperateLogV2(OperateLogV2CreateReqBO createReqBO) {

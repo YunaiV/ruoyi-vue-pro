@@ -22,6 +22,7 @@
             <artifactId>yudao-common</artifactId>
         </dependency>
 
+        <!-- TODO @puhui999 & 芋艿：操作日志，要不要这么引入？ -->
         <!-- Springboot-注解-通用操作日志组件 -->
         <!-- 此组件解决的问题是： 「谁」在「什么时间」对「什么」做了「什么事」 -->
         <dependency>
@@ -29,6 +30,7 @@
             <artifactId>bizlog-sdk</artifactId>
         </dependency>
 
+        <!-- TODO @puhui999 & 芋艿：要不要移除掉 -->
         <!--工具类相关-->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

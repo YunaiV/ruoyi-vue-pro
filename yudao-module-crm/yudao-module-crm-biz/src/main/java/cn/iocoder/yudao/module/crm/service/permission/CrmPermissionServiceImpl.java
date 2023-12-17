@@ -138,11 +138,10 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class) // TODO @puhui999：这里不用加的，就一个操作哈；
     public void deletePermission(Integer bizType, Long bizId) {
-        // 删除数据权限
-        int deletedCol = crmPermissionMapper.deletePermission(bizType, bizId);
-        if (deletedCol == 0) {
+        int deletedCount = crmPermissionMapper.deletePermission(bizType, bizId);
+        if (deletedCount == 0) {
             throw exception(CRM_PERMISSION_NOT_EXISTS);
         }
     }

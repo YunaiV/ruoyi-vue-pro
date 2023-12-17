@@ -31,7 +31,7 @@ public interface OperateLogService {
      */
     PageResult<OperateLogDO> getOperateLogPage(OperateLogPageReqVO pageReqVO);
 
-    //======================= LOG V2 =======================
+    // ======================= LOG V2 =======================
 
     /**
      * 记录操作日志 V2
@@ -40,6 +40,7 @@ public interface OperateLogService {
      */
     void createOperateLogV2(OperateLogV2CreateReqBO createReqBO);
 
+    // TODO @puhui999：module 改成 type
     /**
      * 获取指定模块的指定数据的操作日志
      *

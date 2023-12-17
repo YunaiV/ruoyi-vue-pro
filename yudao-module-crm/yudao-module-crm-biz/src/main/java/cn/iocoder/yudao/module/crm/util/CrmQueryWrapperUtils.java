@@ -35,14 +35,14 @@ public class CrmQueryWrapperUtils {
      * @param pool      公海
      * @return 是否 （是：需要执行查询，否：不需要查询调用方法直接返回空）
      */
-    // TODO @puhui999：bizId 直接传递会不会简单点 回复：还是需要 SFunction 因为分页连表时不知道 bizId 是多少
+    // TODO @puhui999：bizId 直接传递会不会简单点 回复：还是需要 SFunction 因为分页连表时不知道 bizId 是多少；是不是把 bizId 传入就好啦？
     public static <T extends MPJLambdaWrapper<?>, S> boolean appendPermissionCondition(T query, Integer bizType, SFunction<S, ?> bizId,
                                                                                        Long userId, Integer sceneType, Boolean pool) {
         // 1. 构建数据权限连表条件
         if (ObjUtil.notEqual(validateAdminUser(userId), Boolean.TRUE)) { // 管理员不需要数据权限
-            query.innerJoin(CrmPermissionDO.class, on ->
-                    on.eq(CrmPermissionDO::getBizType, bizType).eq(CrmPermissionDO::getBizId, bizId)
-                            .eq(CrmPermissionDO::getUserId, userId));
+            query.innerJoin(CrmPermissionDO.class, on -> on.eq(CrmPermissionDO::getBizType, bizType)
+                    .eq(CrmPermissionDO::getBizId, bizId)
+                    .eq(CrmPermissionDO::getUserId, userId));
         }
         // 2.1 场景一：我负责的数据
         if (CrmSceneTypeEnum.isOwner(sceneType)) {
@@ -50,15 +50,15 @@ public class CrmQueryWrapperUtils {
         }
         // 2.2 场景二：我参与的数据
         if (CrmSceneTypeEnum.isInvolved(sceneType)) {
-            query
-                    .ne("owner_user_id", userId)
+            query.ne("owner_user_id", userId)
+                    // TODO @puhui999：IN 是不是更合适哈；
                     .and(q -> q.eq(CrmPermissionDO::getLevel, CrmPermissionLevelEnum.READ.getLevel())
                             .or()
                             .eq(CrmPermissionDO::getLevel, CrmPermissionLevelEnum.WRITE.getLevel()));
-
         }
         // 2.3 场景三：下属负责的数据
         if (CrmSceneTypeEnum.isSubordinate(sceneType)) {
+            // TODO @puhui999：要不如果没有下属，拼一个 owner_user_id in null，不返回结果就好啦；
             List<AdminUserRespDTO> subordinateUsers = getAdminUserApi().getUserListBySubordinate(userId);
             if (CollUtil.isEmpty(subordinateUsers)) {
                 return false;
@@ -72,7 +72,6 @@ public class CrmQueryWrapperUtils {
         } else { // 情况二：不是公海
             query.isNotNull("owner_user_id");
         }
-
         return true;
     }
 
@@ -106,6 +105,7 @@ public class CrmQueryWrapperUtils {
      */
     private static boolean validateAdminUser(Long userId) {
         // TODO 查询权限配置表用户的角色信息
+        // TODO @puhui999：查询用户的角色;CRM_ADMIN("crm_admin", "CRM 管理员"),
         //CrmPermissionConfig permissionConfig = crmPermissionConfigService.getPermissionConfigByUserId(userId);
         //if (permissionConfig == null) {
         //    return false;
