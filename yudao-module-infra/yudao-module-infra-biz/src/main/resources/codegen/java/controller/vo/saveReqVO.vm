@@ -3,9 +3,8 @@ package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePac
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 ## 处理 BigDecimal 字段的引入
-import java.util.*;
 #foreach ($column in $columns)
 #if (${column.javaType} == "BigDecimal")
 import java.math.BigDecimal;
