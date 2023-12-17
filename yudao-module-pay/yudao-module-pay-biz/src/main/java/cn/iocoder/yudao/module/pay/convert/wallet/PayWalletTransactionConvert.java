@@ -13,8 +13,6 @@ public interface PayWalletTransactionConvert {
 
     PayWalletTransactionConvert INSTANCE = Mappers.getMapper(PayWalletTransactionConvert.class);
 
-    PageResult<AppPayWalletTransactionRespVO> convertPage(PageResult<PayWalletTransactionDO> page);
-
     PageResult<PayWalletTransactionRespVO> convertPage2(PageResult<PayWalletTransactionDO> page);
 
     PayWalletTransactionDO convert(WalletTransactionCreateReqBO bean);
