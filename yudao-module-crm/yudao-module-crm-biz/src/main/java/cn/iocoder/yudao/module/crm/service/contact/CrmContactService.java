@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.module.crm.service.contact;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactBusinessLinkPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactUpdateReqVO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactBusinessLinkDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 
@@ -83,5 +85,13 @@ public interface CrmContactService {
      * @return 所有联系人列表
      */
     List<CrmContactDO> getContactList();
+
+
+    /**
+     * 获取联系人商机关联分页列表
+     * @param reqVO 联系人
+     * @return 商机联系人关联列表
+     */
+    PageResult<CrmContactBusinessLinkDO> selectBusinessPageByContact(CrmContactBusinessLinkPageReqVO reqVO);
 
 }

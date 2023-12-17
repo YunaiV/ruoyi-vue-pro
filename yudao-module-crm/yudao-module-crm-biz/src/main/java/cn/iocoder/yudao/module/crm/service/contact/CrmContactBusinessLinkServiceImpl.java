@@ -1,25 +1,31 @@
-package cn.iocoder.yudao.module.crm.service.contactbusinesslink;
+package cn.iocoder.yudao.module.crm.service.contact;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contactbusinesslink.vo.CrmContactBusinessLinkPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contactbusinesslink.vo.CrmContactBusinessLinkSaveReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactBusinessLinkPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactBusinessLinkSaveReqVO;
 import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
-import cn.iocoder.yudao.module.crm.convert.contactbusinessslink.CrmContactBusinessLinkConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.contactbusinesslink.CrmContactBusinessLinkDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactBusinessLinkDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contactbusinesslink.CrmContactBusinessLinkMapper;
+import cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.BUSINESS_NOT_EXISTS;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CONTACT_BUSINESS_LINK_NOT_EXISTS;
 
 // TODO @puhui999：数据权限的校验；每个操作；
@@ -37,6 +43,9 @@ public class CrmContactBusinessLinkServiceImpl implements CrmContactBusinessLink
     @Resource
     private CrmBusinessService crmBusinessService;
 
+    @Resource
+    private CrmContactService crmContactService;
+
     @Override
     public Long createContactBusinessLink(CrmContactBusinessLinkSaveReqVO createReqVO) {
         CrmContactBusinessLinkDO contactBusinessLink = BeanUtils.toBean(createReqVO, CrmContactBusinessLinkDO.class);
@@ -47,9 +56,22 @@ public class CrmContactBusinessLinkServiceImpl implements CrmContactBusinessLink
     @Override
     public void createContactBusinessLinkBatch(List<CrmContactBusinessLinkSaveReqVO> createReqVOList) {
         // 插入
-        // TODO @zyna：如果已经关联过，不用重复插入；
-        // TODO @zyna：contact 和 business 存在校验，挪到这里，Controller 不用 @Transactional 注解，添加到这里哈。尽量业务都在 Service；
-        List<CrmContactBusinessLinkDO> saveDoList = CrmContactBusinessLinkConvert.INSTANCE.convert(createReqVOList);
+        CrmContactDO contactDO = crmContactService.getContact(createReqVOList.stream().findFirst().get().getContactId());
+        Assert.notNull(contactDO,ErrorCodeConstants.CONTACT_NOT_EXISTS.getMsg());
+        List<CrmContactBusinessLinkDO> saveDoList = new ArrayList<CrmContactBusinessLinkDO>();
+        createReqVOList.forEach(item -> {
+            CrmBusinessDO crmBusinessDO = crmBusinessService.getBusiness(item.getBusinessId());
+            if(crmBusinessDO == null){
+                throw exception(BUSINESS_NOT_EXISTS);
+            }
+            // 判重
+            CrmContactBusinessLinkDO crmContactBusinessLinkDO = contactBusinessLinkMapper.selectOne(new LambdaQueryWrapper<CrmContactBusinessLinkDO>()
+                    .eq(CrmContactBusinessLinkDO::getBusinessId,item.getBusinessId())
+                    .eq(CrmContactBusinessLinkDO::getContactId,item.getContactId()));
+            if(crmContactBusinessLinkDO == null){
+                saveDoList.add(BeanUtils.toBean(item,CrmContactBusinessLinkDO.class));
+            }
+        });
         contactBusinessLinkMapper.insertBatch(saveDoList);
     }
 
@@ -63,14 +85,9 @@ public class CrmContactBusinessLinkServiceImpl implements CrmContactBusinessLink
     }
 
     @Override
-    public void deleteContactBusinessLink(List<CrmContactBusinessLinkSaveReqVO> createReqVO) {
+    public void deleteContactBusinessLink(List<Long> businessContactIds) {
         // 删除
-        createReqVO.forEach(item -> {
-            contactBusinessLinkMapper.delete(new LambdaQueryWrapperX<CrmContactBusinessLinkDO>()
-                    .eq(CrmContactBusinessLinkDO::getBusinessId,item.getBusinessId())
-                    .eq(CrmContactBusinessLinkDO::getContactId,item.getContactId())
-                    .eq(CrmContactBusinessLinkDO::getDeleted,0));
-        });
+        contactBusinessLinkMapper.deleteBatchIds(businessContactIds);
     }
 
     private void validateContactBusinessLinkExists(Long id) {

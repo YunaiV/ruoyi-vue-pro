@@ -3,13 +3,16 @@ package cn.iocoder.yudao.module.crm.service.contact;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactBaseVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactCreateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactUpdateReqVO;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.*;
+import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
 import cn.iocoder.yudao.module.crm.convert.contact.ContactConvert;
+import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactBusinessLinkDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contact.CrmContactMapper;
+import cn.iocoder.yudao.module.crm.dal.mysql.contactbusinesslink.CrmContactBusinessLinkMapper;
 import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
@@ -46,9 +49,11 @@ public class CrmContactServiceImpl implements CrmContactService {
     private CrmCustomerService customerService;
     @Resource
     private CrmPermissionService crmPermissionService;
-
     @Resource
     private AdminUserApi adminUserApi;
+
+    @Resource
+    private CrmContactBusinessLinkMapper contactBusinessLinkMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -144,4 +149,11 @@ public class CrmContactServiceImpl implements CrmContactService {
         return contactMapper.selectList();
     }
 
+    @Override
+    public PageResult<CrmContactBusinessLinkDO> selectBusinessPageByContact(CrmContactBusinessLinkPageReqVO pageReqVO) {
+        CrmContactBusinessLinkPageReqVO crmContactBusinessLinkPageReqVO = new CrmContactBusinessLinkPageReqVO();
+        crmContactBusinessLinkPageReqVO.setContactId(pageReqVO.getContactId());
+        return contactBusinessLinkMapper.selectPageByContact(crmContactBusinessLinkPageReqVO);
+
+    }
 }
