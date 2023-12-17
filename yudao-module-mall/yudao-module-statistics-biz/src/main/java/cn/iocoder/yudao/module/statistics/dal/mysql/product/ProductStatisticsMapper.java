@@ -3,12 +3,16 @@ package cn.iocoder.yudao.module.statistics.dal.mysql.product;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.SortablePageParam;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.statistics.controller.admin.product.vo.ProductStatisticsReqVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.product.vo.ProductStatisticsRespVO;
 import cn.iocoder.yudao.module.statistics.dal.dataobject.product.ProductStatisticsDO;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -55,6 +59,22 @@ public interface ProductStatisticsMapper extends BaseMapperX<ProductStatisticsDO
                 .selectSum(ProductStatisticsDO::getAfterSaleCount)
                 .selectSum(ProductStatisticsDO::getAfterSaleRefundPrice)
                 .selectAvg(ProductStatisticsDO::getBrowseConvertPercent);
+    }
+
+    /**
+     * 根据时间范围统计商品信息
+     *
+     * @param page      分页参数
+     * @param beginTime 起始时间
+     * @param endTime   截止时间
+     * @return 统计
+     */
+    IPage<ProductStatisticsDO> selectStatisticsResultPageByTimeBetween(IPage<ProductStatisticsDO> page,
+                                                                       @Param("beginTime") LocalDateTime beginTime,
+                                                                       @Param("endTime") LocalDateTime endTime);
+
+    default Long selectCountByTimeBetween(LocalDateTime beginTime, LocalDateTime endTime) {
+        return selectCount(new LambdaQueryWrapperX<ProductStatisticsDO>().between(ProductStatisticsDO::getTime, beginTime, endTime));
     }
 
 }

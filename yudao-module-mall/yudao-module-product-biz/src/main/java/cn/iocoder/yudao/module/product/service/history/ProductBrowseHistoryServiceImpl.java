@@ -32,8 +32,8 @@ public class ProductBrowseHistoryServiceImpl implements ProductBrowseHistoryServ
         if (historyDO != null) {
             browseHistoryMapper.deleteById(historyDO);
         } else {
-            // 情况二：限制每个用户的浏览记录的条数
-            Page<ProductBrowseHistoryDO> pageResult = browseHistoryMapper.selectPageByUserIdOrderByCreateTimeAsc(userId);
+            // 情况二：限制每个用户的浏览记录的条数（只查一条最早地记录、记录总数）
+            Page<ProductBrowseHistoryDO> pageResult = browseHistoryMapper.selectPageByUserIdOrderByCreateTimeAsc(userId, 1, 1);
             if (pageResult.getTotal() >= USER_STORE_MAXIMUM) {
                 // 删除最早的一条
                 browseHistoryMapper.deleteById(CollUtil.getFirst(pageResult.getRecords()));

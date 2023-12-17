@@ -99,7 +99,7 @@ public class TradeStatisticsServiceImpl implements TradeStatisticsService {
         // 1. 处理统计时间范围
         LocalDateTime beginTime = LocalDateTimeUtil.beginOfDay(date);
         LocalDateTime endTime = LocalDateTimeUtil.endOfDay(date);
-        String dateStr = DatePattern.NORM_DATE_FORMAT.format(date);
+        String dateStr = DatePattern.NORM_DATE_FORMATTER.format(date);
         // 2. 检查该日是否已经统计过
         TradeStatisticsDO entity = tradeStatisticsMapper.selectByTimeBetween(beginTime, endTime);
         if (entity != null) {

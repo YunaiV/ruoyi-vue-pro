@@ -17,14 +17,6 @@ import java.util.List;
 public interface ProductStatisticsService {
 
     /**
-     * 创建商品统计
-     *
-     * @param entity 创建信息
-     * @return 编号
-     */
-    Long createProductStatistics(ProductStatisticsDO entity);
-
-    /**
      * 获得商品统计排行榜分页
      *
      * @param reqVO     查询条件
@@ -48,5 +40,12 @@ public interface ProductStatisticsService {
      * @return 统计数据对照
      */
     List<ProductStatisticsDO> getProductStatisticsList(ProductStatisticsReqVO reqVO);
+
+    /**
+     * 统计指定天数的商品数据
+     *
+     * @return 统计结果
+     */
+    String statisticsProduct(Integer days);
 
 }

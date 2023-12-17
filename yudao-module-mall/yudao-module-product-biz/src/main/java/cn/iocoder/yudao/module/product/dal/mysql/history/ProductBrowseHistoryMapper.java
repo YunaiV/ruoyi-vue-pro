@@ -42,8 +42,8 @@ public interface ProductBrowseHistoryMapper extends BaseMapperX<ProductBrowseHis
                 .eqIfPresent(ProductBrowseHistoryDO::getUserDeleted, userDeleted));
     }
 
-    default Page<ProductBrowseHistoryDO> selectPageByUserIdOrderByCreateTimeAsc(Long userId) {
-        Page<ProductBrowseHistoryDO> page = Page.of(0, 1);
+    default Page<ProductBrowseHistoryDO> selectPageByUserIdOrderByCreateTimeAsc(Long userId, Integer pageNo, Integer pageSize) {
+        Page<ProductBrowseHistoryDO> page = Page.of(pageNo, pageSize);
         return selectPage(page, new LambdaQueryWrapperX<ProductBrowseHistoryDO>()
                 .eqIfPresent(ProductBrowseHistoryDO::getUserId, userId)
                 .orderByAsc(ProductBrowseHistoryDO::getCreateTime));
