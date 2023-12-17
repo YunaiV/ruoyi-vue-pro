@@ -3,11 +3,12 @@ package cn.iocoder.yudao.module.crm.service.receivable;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanTransferReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivablePlanDO;
-
 import jakarta.validation.Valid;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -24,7 +25,7 @@ public interface CrmReceivablePlanService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createReceivablePlan(@Valid CrmReceivablePlanCreateReqVO createReqVO);
+    Long createReceivablePlan(@Valid CrmReceivablePlanCreateReqVO createReqVO, Long userId);
 
     /**
      * 更新回款计划
@@ -62,9 +63,10 @@ public interface CrmReceivablePlanService {
      * 数据权限：基于 {@link CrmReceivablePlanDO} 读取
      *
      * @param pageReqVO 分页查询
+     * @param userId    用户编号
      * @return 回款计划分页
      */
-    PageResult<CrmReceivablePlanDO> getReceivablePlanPage(CrmReceivablePlanPageReqVO pageReqVO);
+    PageResult<CrmReceivablePlanDO> getReceivablePlanPage(CrmReceivablePlanPageReqVO pageReqVO, Long userId);
 
     /**
      * 获得回款计划分页，基于指定客户
@@ -74,6 +76,14 @@ public interface CrmReceivablePlanService {
      * @param pageReqVO 分页查询
      * @return 回款计划分页
      */
-    PageResult<CrmReceivablePlanDO> getReceivablePlanPageByCustomer(CrmReceivablePlanPageReqVO pageReqVO);
+    PageResult<CrmReceivablePlanDO> getReceivablePlanPageByCustomerId(CrmReceivablePlanPageReqVO pageReqVO);
+
+    /**
+     * 回款计划转移
+     *
+     * @param reqVO  请求
+     * @param userId 用户编号
+     */
+    void transferReceivablePlan(CrmReceivablePlanTransferReqVO reqVO, Long userId);
 
 }

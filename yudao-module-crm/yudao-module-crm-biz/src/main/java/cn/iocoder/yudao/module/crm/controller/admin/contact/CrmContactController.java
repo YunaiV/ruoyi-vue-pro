@@ -9,7 +9,7 @@ import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.*;
-import cn.iocoder.yudao.module.crm.convert.contact.ContactConvert;
+import cn.iocoder.yudao.module.crm.convert.contact.CrmContactConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants;
@@ -100,7 +100,7 @@ public class CrmContactController {
         // 3. 直属上级
         List<CrmContactDO> parentContactList = contactService.getContactList(
                 Collections.singletonList(contact.getParentId()), getLoginUserId());
-        return success(ContactConvert.INSTANCE.convert(contact, userMap, customerList, parentContactList));
+        return success(CrmContactConvert.INSTANCE.convert(contact, userMap, customerList, parentContactList));
     }
 
     @GetMapping("/simple-all-list")
@@ -110,7 +110,7 @@ public class CrmContactController {
         CrmContactPageReqVO pageReqVO = new CrmContactPageReqVO();
         pageReqVO.setPageSize(PAGE_SIZE_NONE);
         List<CrmContactDO> list = contactService.getContactPage(pageReqVO, getLoginUserId()).getList();
-        return success(ContactConvert.INSTANCE.convertAllList(list));
+        return success(CrmContactConvert.INSTANCE.convertAllList(list));
     }
 
     @GetMapping("/page")
@@ -125,7 +125,7 @@ public class CrmContactController {
     @Operation(summary = "获得联系人分页，基于指定客户")
     public CommonResult<PageResult<CrmContactRespVO>> getContactPageByCustomer(@Valid CrmContactPageReqVO pageVO) {
         Assert.notNull(pageVO.getCustomerId(), "客户编号不能为空");
-        PageResult<CrmContactDO> pageResult = contactService.getContactPageByCustomerId(pageVO, getLoginUserId());
+        PageResult<CrmContactDO> pageResult = contactService.getContactPageByCustomerId(pageVO);
         return success(convertDetailContactPage(pageResult));
     }
 
@@ -161,7 +161,15 @@ public class CrmContactController {
         // 3. 直属上级
         List<CrmContactDO> parentContactList = contactService.getContactList(
                 convertSet(contactList, CrmContactDO::getParentId), getLoginUserId());
-        return ContactConvert.INSTANCE.convertPage(pageResult, userMap, crmCustomerDOList, parentContactList);
+        return CrmContactConvert.INSTANCE.convertPage(pageResult, userMap, crmCustomerDOList, parentContactList);
+    }
+
+    @PutMapping("/transfer")
+    @Operation(summary = "联系人转移")
+    @PreAuthorize("@ss.hasPermission('crm:contact:update')")
+    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmContactTransferReqVO reqVO) {
+        contactService.transferContact(reqVO, getLoginUserId());
+        return success(true);
     }
 
 }

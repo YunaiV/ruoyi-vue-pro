@@ -75,12 +75,9 @@ public interface CrmContractService {
      * 数据权限：基于 {@link CrmCustomerDO} 读取
      *
      * @param pageReqVO 分页查询
-     * @param userId    用户编号
      * @return 联系人分页
      */
-    default PageResult<CrmContractDO> getContractPageByCustomer(CrmContractPageReqVO pageReqVO, Long userId) {
-        return getContractPage(pageReqVO, userId);
-    }
+    PageResult<CrmContractDO> getContractPageByCustomerId(CrmContractPageReqVO pageReqVO);
 
     /**
      * 合同转移

@@ -7,11 +7,10 @@ import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.Crm
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivableUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivableDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.receivable.CrmReceivableMapper;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-
-import jakarta.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
@@ -133,7 +132,7 @@ public class CrmCrmReceivableServiceImplTest extends BaseDbUnitTest {
        reqVO.setCustomerId(null);
 
        // 调用
-       PageResult<CrmReceivableDO> pageResult = receivableService.getReceivablePage(reqVO);
+        PageResult<CrmReceivableDO> pageResult = receivableService.getReceivablePage(reqVO, 1L);
        // 断言
        assertEquals(1, pageResult.getTotal());
        assertEquals(1, pageResult.getList().size());

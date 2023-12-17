@@ -2,16 +2,15 @@ package cn.iocoder.yudao.module.crm.controller.admin.customer.vo;
 
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 @Schema(description = "管理后台 - CRM 客户转移 Request VO")
 @Data
 public class CrmCustomerTransferReqVO {
 
     @Schema(description = "客户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
-    @NotNull(message = "联系人编号不能为空")
+    @NotNull(message = "客户编号不能为空")
     private Long id;
 
     /**

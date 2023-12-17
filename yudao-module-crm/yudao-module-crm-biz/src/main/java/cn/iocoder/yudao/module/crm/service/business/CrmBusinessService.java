@@ -75,10 +75,9 @@ public interface CrmBusinessService {
      * 数据权限：基于 {@link CrmCustomerDO} 读取
      *
      * @param pageReqVO 分页查询
-     * @param userId    用户编号
      * @return 联系人分页
      */
-    PageResult<CrmBusinessDO> getBusinessPageByCustomer(CrmBusinessPageReqVO pageReqVO, Long userId);
+    PageResult<CrmBusinessDO> getBusinessPageByCustomerId(CrmBusinessPageReqVO pageReqVO);
 
     /**
      * 商机转移

@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.module.member.controller.admin.signin.vo.record.MemberSignInRecordRespVO;
 import cn.iocoder.yudao.module.member.controller.app.signin.vo.record.AppMemberSignInRecordRespVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInConfigDO;
@@ -47,10 +48,9 @@ public interface MemberSignInRecordConvert {
         // 1. 计算是第几天签到
         configs.sort(Comparator.comparing(MemberSignInConfigDO::getDay));
         MemberSignInConfigDO lastConfig = CollUtil.getLast(configs); // 最大签到天数配置
-        // 1.2. 计算今天是第几天签到
+        // 1.2. 计算今天是第几天签到 (只有连续签到才加否则重置为 1)
         int day = 1;
-        // TODO @puhui999：要判断是不是昨天签到的；是否是昨天的判断，可以抽个方法到 util 里
-        if (lastRecord != null) {
+        if (lastRecord != null && DateUtils.isYesterday(lastRecord.getCreateTime())) {
             day = lastRecord.getDay() + 1;
         }
         // 1.3 判断是否超出了最大签到配置
