@@ -135,18 +135,22 @@ public class CrmCustomerController {
         return success(true);
     }
 
+    // TODO @puhui999：operate-log-list 或者 operate-log-page 如果分页
     @GetMapping("/operate-log")
     @Operation(summary = "获得客户操作日志")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
+    // TODO @puhui999：最好有读权限；方法名改成 getCustomerOperateLog
     public CommonResult<List<OperateLogV2RespDTO>> getOperateLog(@RequestParam("id") Long id) {
         // 1. 获取客户
+        // TODO @puhui999：这个校验可以去掉哈；
         CrmCustomerDO customer = customerService.getCustomer(id);
         if (customer == null) {
             return success(null);
         }
 
         // 2. 获取操作日志
+        // TODO @puhui999：操作日志，返回可能要分页哈；
         return success(operateLogApi.getOperateLogByModuleAndBizId(CRM_CUSTOMER, id));
     }
 

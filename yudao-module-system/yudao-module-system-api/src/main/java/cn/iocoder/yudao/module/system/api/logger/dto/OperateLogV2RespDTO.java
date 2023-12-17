@@ -19,20 +19,14 @@ public class OperateLogV2RespDTO {
 
     /**
      * 链路追踪编号
-     *
-     * 一般来说，通过链路追踪编号，可以将访问日志，错误日志，链路追踪日志，logger 打印日志等，结合在一起，从而进行排错。
      */
     private String traceId;
     /**
      * 用户编号
-     *
-     * 关联 MemberUserDO 的 id 属性，或者 AdminUserDO 的 id 属性
      */
     private Long userId;
     /**
      * 用户类型
-     *
-     * 关联 {@link  UserTypeEnum}
      */
     private Integer userType;
     /**
@@ -48,13 +42,11 @@ public class OperateLogV2RespDTO {
      */
     private Long bizId;
     /**
-     * 操作内容，记录整个操作的明细
-     * 例如说，修改编号为 1 的用户信息，将性别从男改成女，将姓名从芋道改成源码。
+     * 操作内容
      */
     private String content;
     /**
-     * 拓展字段，有些复杂的业务，需要记录一些字段 ( JSON 格式 )
-     * 例如说，记录订单编号，{ orderId: "1"}
+     * 拓展字段
      */
     private String extra;
 
@@ -81,8 +73,10 @@ public class OperateLogV2RespDTO {
     // TODO puhui999: 木得效果怎么肥事
     @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
     private LocalDateTime createTime;
+
+    // TODO @puhui999：下面 2 个字段不用返回；用 userId 哈；返回一个 userName
     /**
-     * 创建者，关联 AdminUserDO#getId
+     * 创建者
      */
     private String creator;
     /**

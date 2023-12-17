@@ -61,9 +61,9 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
 
         receivablePlanMapper.insert(receivablePlan);
         // 创建数据权限
-        crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_RECEIVABLE_PLAN.getType())
-                .setBizId(receivablePlan.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
-        // 返回
+        crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setUserId(userId)
+                .setBizType(CrmBizTypeEnum.CRM_RECEIVABLE_PLAN.getType()).setBizId(receivablePlan.getId())
+                .setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
         return receivablePlan.getId();
     }
 

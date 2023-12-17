@@ -9,6 +9,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+// TODO @puhui999：这个微信讨论下，function 叫啥好哈；
 /**
  * 自定义函数-通过用户编号获取用户信息
  *

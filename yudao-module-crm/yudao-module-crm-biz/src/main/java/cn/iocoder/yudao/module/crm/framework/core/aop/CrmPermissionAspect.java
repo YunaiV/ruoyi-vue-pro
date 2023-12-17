@@ -26,6 +26,7 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CRM_PERMISSION_DENIED;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CRM_PERMISSION_MODEL_NOT_EXISTS;
 
+// TODO 这个包，改成 permission，然后搞 config 和 core 包，这个类在 core 包里；目的是：framework 最好分类下
 /**
  * Crm 数据权限校验 AOP 切面
  *

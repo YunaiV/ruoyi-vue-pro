@@ -137,12 +137,14 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    // TODO @puhui999：@LogRecord(type = CRM_CUSTOMER, subType = "客户转移", bizNo = "{{#reqVO.id}}", success = TRANSFER_CUSTOMER_LOG_SUCCESS)
     @LogRecord(success = TRANSFER_CUSTOMER_LOG_SUCCESS, type = CRM_CUSTOMER, subType = "客户转移", bizNo = "{{#reqVO.id}}")
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#reqVO.id", level = CrmPermissionLevelEnum.OWNER)
     public void transferCustomer(CrmCustomerTransferReqVO reqVO, Long userId) {
         // 1. 校验客户是否存在
         validateCustomer(reqVO.getId());
         // 添加 crmCustomer 到日志上下文 TODO 日志记录放在 service 里是因为已经过了权限校验查询时不用走两次校验
+        // TODO @puhui999：customer 不用查询，从 1. 拿到哈；然后 put这个动作，可以放到 3.；这样逻辑结构就是，校验、逻辑、日志，更加清晰
         LogRecordContext.putVariable("crmCustomer", customerMapper.selectById(reqVO.getId()));
         // 2.1 数据权限转移
         crmPermissionService.transferPermission(
