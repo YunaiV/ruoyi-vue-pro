@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.controller.admin.contactbusinesslink.vo;
+package cn.iocoder.yudao.module.crm.controller.admin.contact.vo;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;

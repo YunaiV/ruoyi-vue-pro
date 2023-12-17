@@ -76,12 +76,12 @@ public interface CrmContactConvert {
         Map<Long, CrmCustomerDO> customerMap = convertMap(customerList, CrmCustomerDO::getId);
         result.forEach(item -> {
             setUserInfo(item, userMap);
-            findAndThen(customerMap, item.getCustomerId(), customer -> { // TODO @zyna：这里的 { 可以去掉
-                item.setCustomerName(customer.getName());
-            });
-            findAndThen(parentContactMap, item.getParentId(), contactDO -> {  // TODO @zyna：这里的 { 可以去掉
-                item.setParentName(contactDO.getName());
-            });
+            findAndThen(customerMap, item.getCustomerId(), customer ->
+                item.setCustomerName(customer.getName())
+            );
+            findAndThen(parentContactMap, item.getParentId(), contactDO ->
+                item.setParentName(contactDO.getName())
+            );
         });
         return result;
     }

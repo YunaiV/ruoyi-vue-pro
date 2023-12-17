@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.crm.convert.contact.CrmContactConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants;
+import cn.iocoder.yudao.module.crm.service.contact.CrmContactBusinessLinkService;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -29,6 +30,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -54,9 +59,11 @@ public class CrmContactController {
     private CrmContactService contactService;
     @Resource
     private CrmCustomerService customerService;
-
     @Resource
     private AdminUserApi adminUserApi;
+
+    @Resource
+    private CrmContactBusinessLinkService contactBusinessLinkService;
 
     @PostMapping("/create")
     @Operation(summary = "创建联系人")
@@ -139,6 +146,23 @@ public class CrmContactController {
         PageResult<CrmContactDO> pageResult = contactService.getContactPage(exportReqVO, getLoginUserId());
         ExcelUtils.write(response, "联系人.xls", "数据", CrmContactRespVO.class,
                 convertDetailContactPage(pageResult).getList());
+    }
+
+    @DeleteMapping("/delete-batch-business")
+    @Operation(summary = "批量删除联系人商机关联")
+    @PreAuthorize("@ss.hasPermission('crm:contact-business-link:delete')")
+    public CommonResult<Boolean> deleteContactBusinessLinkBatch(@Valid @RequestBody List<Long> businessContactIds) {
+        contactBusinessLinkService.deleteContactBusinessLink(businessContactIds);
+        return success(true);
+    }
+
+    @PostMapping("/create-batch-business")
+    @Operation(summary = "创建联系人商机关联")
+    @PreAuthorize("@ss.hasPermission('crm:contact-business-link:create')")
+    public CommonResult<Boolean> createContactBusinessLinkBatch(
+            @Valid @NotEmpty @RequestBody List<CrmContactBusinessLinkSaveReqVO> createReqVO) {
+        contactBusinessLinkService.createContactBusinessLinkBatch(createReqVO);
+        return success(true);
     }
 
     /**

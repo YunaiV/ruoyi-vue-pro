@@ -4,11 +4,14 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.*;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.status.CrmBusinessStatusQueryVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypeQueryVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactBusinessLinkPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
 import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
@@ -30,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -163,5 +167,34 @@ public class CrmBusinessController {
         businessService.transferBusiness(reqVO, getLoginUserId());
         return success(true);
     }
-
+    @GetMapping("/page-by-contact")
+    @Operation(summary = "获得联系人的商机分页")
+    @PreAuthorize("@ss.hasPermission('crm:business:query')")
+    public CommonResult<PageResult<CrmBusinessRespVO>> getBusinessContactPage(@Valid CrmContactBusinessLinkPageReqVO pageVO) {
+        PageResult<CrmBusinessRespVO> pageResult = businessService.getBusinessPageByContact(pageVO);
+        // 处理商机状态类型名称回显
+        Set<Long> statusTypeIds = pageResult.getList().stream()
+                .map(CrmBusinessRespVO::getStatusTypeId).filter(Objects::nonNull).collect(Collectors.toSet());
+        CrmBusinessStatusTypeQueryVO queryStatusTypeVO = new CrmBusinessStatusTypeQueryVO();
+        queryStatusTypeVO.setIdList(statusTypeIds);
+        List<CrmBusinessStatusTypeDO> statusTypeList = businessStatusTypeService.selectList(queryStatusTypeVO);
+        Map<Long,String> statusTypeMap = CollectionUtils.convertMap(statusTypeList,CrmBusinessStatusTypeDO::getId,CrmBusinessStatusTypeDO::getName);
+        // 处理商机状态名称回显
+        Set<Long> statusIds = pageResult.getList().stream()
+                .map(CrmBusinessRespVO::getStatusId).filter(Objects::nonNull).collect(Collectors.toSet());
+        CrmBusinessStatusQueryVO queryVO = new CrmBusinessStatusQueryVO();
+        queryVO.setIdList(statusIds);
+        List<CrmBusinessStatusDO> statusList = businessStatusService.selectList(queryVO);
+        Map<Long,String> statusMap = CollectionUtils.convertMap(statusList,CrmBusinessStatusDO::getId,CrmBusinessStatusDO::getName);
+        // 处理客户名称回显
+        Set<Long> customerIds = CollectionUtils.convertSet(pageResult.getList(),CrmBusinessRespVO::getCustomerId);
+        List<CrmCustomerDO> customerList = customerService.getCustomerList(customerIds);
+        Map<Long,String> customerMap = CollectionUtils.convertMap(customerList,CrmCustomerDO::getId,CrmCustomerDO::getName);
+        pageResult.getList().forEach(item -> {
+            item.setStatusTypeName(statusTypeMap.get(item.getStatusTypeId()));
+            item.setStatusName(statusMap.get(item.getStatusId()));
+            item.setCustomerName(customerMap.get(item.getCustomerId()));
+        });
+       return success(pageResult);
+    }
 }
