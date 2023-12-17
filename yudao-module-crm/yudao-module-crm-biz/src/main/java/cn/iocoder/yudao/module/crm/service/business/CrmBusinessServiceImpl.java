@@ -111,11 +111,9 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
-    public PageResult<CrmBusinessDO> getBusinessPageByCustomer(CrmBusinessPageReqVO pageReqVO, Long userId) {
-        // 校验客户存在 TODO @puhui999：这里不校验
-        customerService.validateCustomer(pageReqVO.getCustomerId());
-        // TODO @puhui999：感觉这里貌似不太复用用 selectPage，因为他可能没商机权限，只是因为能看 customer，所以可以看到列表
-        return businessMapper.selectPage(pageReqVO, userId);
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#pageReqVO.customerId", level = CrmPermissionLevelEnum.READ)
+    public PageResult<CrmBusinessDO> getBusinessPageByCustomerId(CrmBusinessPageReqVO pageReqVO) {
+        return businessMapper.selectPageByCustomerId(pageReqVO);
     }
 
     @Override
@@ -127,7 +125,6 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         // 2.1 数据权限转移
         crmPermissionService.transferPermission(
                 CrmBusinessConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType()));
-
         // 2.2 设置新的负责人
         businessMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
 

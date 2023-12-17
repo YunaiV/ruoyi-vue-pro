@@ -122,7 +122,7 @@ public class CrmBusinessController {
     @Operation(summary = "获得商机分页，基于指定客户")
     public CommonResult<PageResult<CrmBusinessRespVO>> getBusinessPageByCustomer(@Valid CrmBusinessPageReqVO pageReqVO) {
         Assert.notNull(pageReqVO.getCustomerId(), "客户编号不能为空");
-        PageResult<CrmBusinessDO> pageResult = businessService.getBusinessPageByCustomer(pageReqVO, getLoginUserId());
+        PageResult<CrmBusinessDO> pageResult = businessService.getBusinessPageByCustomerId(pageReqVO);
         // 处理客户名称回显
         // TODO @ljlleo：可以使用 CollectionUtils.convertSet 替代常用的 stream 操作，更简洁一点；下面几个也是哈；
         Set<Long> customerIds = pageResult.getList().stream()

@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferRe
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -26,9 +25,9 @@ import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAnd
  * @author 芋道源码
  */
 @Mapper
-public interface ContactConvert {
+public interface CrmContactConvert {
 
-    ContactConvert INSTANCE = Mappers.getMapper(ContactConvert.class);
+    CrmContactConvert INSTANCE = Mappers.getMapper(CrmContactConvert.class);
 
     CrmContactDO convert(CrmContactCreateReqVO bean);
 
@@ -48,10 +47,7 @@ public interface ContactConvert {
 
     List<CrmContactSimpleRespVO> convertAllList(List<CrmContactDO> list);
 
-    @Mappings({
-            @Mapping(target = "bizId", source = "reqVO.id"),
-            @Mapping(target = "newOwnerUserId", source = "reqVO.id")
-    })
+    @Mapping(target = "bizId", source = "reqVO.id")
     CrmPermissionTransferReqBO convert(CrmContactTransferReqVO reqVO, Long userId);
 
     /**

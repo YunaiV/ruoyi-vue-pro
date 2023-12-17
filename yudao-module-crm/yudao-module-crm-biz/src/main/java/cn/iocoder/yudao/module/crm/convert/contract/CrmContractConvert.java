@@ -8,7 +8,6 @@ import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferRe
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -23,9 +22,9 @@ import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAnd
  * @author dhb52
  */
 @Mapper
-public interface ContractConvert {
+public interface CrmContractConvert {
 
-    ContractConvert INSTANCE = Mappers.getMapper(ContractConvert.class);
+    CrmContractConvert INSTANCE = Mappers.getMapper(CrmContractConvert.class);
 
     CrmContractDO convert(CrmContractCreateReqVO bean);
 
@@ -39,10 +38,7 @@ public interface ContractConvert {
 
     List<CrmContractExcelVO> convertList02(List<CrmContractDO> list);
 
-    @Mappings({
-            @Mapping(target = "bizId", source = "reqVO.id"),
-            @Mapping(target = "newOwnerUserId", source = "reqVO.id")
-    })
+    @Mapping(target = "bizId", source = "reqVO.id")
     CrmPermissionTransferReqBO convert(CrmContractTransferReqVO reqVO, Long userId);
 
     default PageResult<ContractRespVO> convertPage(PageResult<CrmContractDO> pageResult, Map<Long, AdminUserRespDTO> userMap,

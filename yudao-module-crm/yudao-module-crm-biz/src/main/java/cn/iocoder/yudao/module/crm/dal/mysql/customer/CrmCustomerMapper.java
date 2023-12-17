@@ -30,8 +30,11 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
     default PageResult<CrmCustomerDO> selectPage(CrmCustomerPageReqVO pageReqVO, Long userId) {
         MPJLambdaWrapperX<CrmCustomerDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
-        CrmQueryWrapperUtils.builderPageQuery(query, CrmBizTypeEnum.CRM_CUSTOMER.getType(), CrmCustomerDO::getId,
-                userId, pageReqVO.getSceneType(), pageReqVO.getPool());
+        boolean condition = CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CUSTOMER.getType(),
+                CrmCustomerDO::getId, userId, pageReqVO.getSceneType(), pageReqVO.getPool());
+        if (!condition) {
+            return PageResult.empty();
+        }
         // 拼接自身的查询条件
         query.selectAll(CrmCustomerDO.class)
                 .likeIfPresent(CrmCustomerDO::getName, pageReqVO.getName())
@@ -45,7 +48,7 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
     default List<CrmCustomerDO> selectBatchIds(Collection<Long> ids, Long userId) {
         MPJLambdaWrapperX<CrmCustomerDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
-        CrmQueryWrapperUtils.builderListQueryBatch(query, CrmBizTypeEnum.CRM_CUSTOMER.getType(), ids, userId);
+        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CUSTOMER.getType(), ids, userId);
         return selectJoinList(CrmCustomerDO.class, query);
     }
 

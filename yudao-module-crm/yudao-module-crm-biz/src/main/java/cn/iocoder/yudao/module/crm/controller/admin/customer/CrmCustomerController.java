@@ -11,20 +11,22 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.system.api.logger.OperateLogApi;
+import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2RespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.mapstruct.ap.internal.util.Collections;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSetByFlatMap;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.CRM_CUSTOMER;
 
 @Tag(name = "管理后台 - CRM 客户")
 @RestController
@@ -50,6 +53,8 @@ public class CrmCustomerController {
     private DeptApi deptApi;
     @Resource
     private AdminUserApi adminUserApi;
+    @Resource
+    private OperateLogApi operateLogApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建客户")
@@ -59,7 +64,7 @@ public class CrmCustomerController {
     }
 
     @PutMapping("/update")
-    @Operation(summary = "更新客户")
+    //@Operation(summary = "更新客户")
     @PreAuthorize("@ss.hasPermission('crm:customer:update')")
     public CommonResult<Boolean> updateCustomer(@Valid @RequestBody CrmCustomerUpdateReqVO updateReqVO) {
         customerService.updateCustomer(updateReqVO);
@@ -123,11 +128,26 @@ public class CrmCustomerController {
     }
 
     @PutMapping("/transfer")
-    @Operation(summary = "客户转移")
+    //@Operation(summary = "客户转移")
     @PreAuthorize("@ss.hasPermission('crm:customer:update')")
     public CommonResult<Boolean> transfer(@Valid @RequestBody CrmCustomerTransferReqVO reqVO) {
         customerService.transferCustomer(reqVO, getLoginUserId());
         return success(true);
+    }
+
+    @GetMapping("/operate-log")
+    @Operation(summary = "获得客户操作日志")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('crm:customer:query')")
+    public CommonResult<List<OperateLogV2RespDTO>> getOperateLog(@RequestParam("id") Long id) {
+        // 1. 获取客户
+        CrmCustomerDO customer = customerService.getCustomer(id);
+        if (customer == null) {
+            return success(null);
+        }
+
+        // 2. 获取操作日志
+        return success(operateLogApi.getOperateLogByModuleAndBizId(CRM_CUSTOMER, id));
     }
 
     // TODO @Joey：单独建一个属于自己业务的 ReqVO；因为前端如果模拟请求，是不是可以更新其它字段了；

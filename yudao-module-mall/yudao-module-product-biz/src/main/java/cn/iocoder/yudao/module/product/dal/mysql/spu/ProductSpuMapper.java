@@ -84,6 +84,9 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
         } else if (Objects.equals(pageReqVO.getSortField(), AppProductSpuPageReqVO.SORT_FIELD_PRICE)) {
             query.orderBy(true, pageReqVO.getSortAsc(), ProductSpuDO::getPrice)
                     .orderByDesc(ProductSpuDO::getSort).orderByDesc(ProductSpuDO::getId);
+        } else if (Objects.equals(pageReqVO.getSortField(), AppProductSpuPageReqVO.SORT_FIELD_CREATE_TIME)) {
+            query.orderBy(true, pageReqVO.getSortAsc(), ProductSpuDO::getCreateTime)
+                    .orderByDesc(ProductSpuDO::getSort).orderByDesc(ProductSpuDO::getId);
         } else {
             query.orderByDesc(ProductSpuDO::getSort).orderByDesc(ProductSpuDO::getId);
         }

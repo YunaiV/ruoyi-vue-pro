@@ -6,6 +6,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanTransferReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanUpdateReqVO;
 import cn.iocoder.yudao.module.crm.convert.receivable.CrmReceivablePlanConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
@@ -17,10 +18,12 @@ import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
+import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 
@@ -28,7 +31,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 
 // TODO @liuhongfeng：参考 CrmReceivableServiceImpl 写的 todo 哈；
-// TODO @puhui999：数据权限
+
 /**
  * 回款计划 Service 实现类
  *
@@ -45,9 +48,11 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
     private CrmContractService contractService;
     @Resource
     private CrmCustomerService customerService;
+    @Resource
+    private CrmPermissionService crmPermissionService;
 
     @Override
-    public Long createReceivablePlan(CrmReceivablePlanCreateReqVO createReqVO) {
+    public Long createReceivablePlan(CrmReceivablePlanCreateReqVO createReqVO, Long userId) {
         // 插入
         CrmReceivablePlanDO receivablePlan = CrmReceivablePlanConvert.INSTANCE.convert(createReqVO);
         receivablePlan.setFinishStatus(false);
@@ -55,29 +60,33 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
         checkReceivablePlan(receivablePlan);
 
         receivablePlanMapper.insert(receivablePlan);
+        // 创建数据权限
+        crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_RECEIVABLE_PLAN.getType())
+                .setBizId(receivablePlan.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
         // 返回
         return receivablePlan.getId();
     }
 
     private void checkReceivablePlan(CrmReceivablePlanDO receivablePlan) {
 
-        if(ObjectUtil.isNull(receivablePlan.getContractId())){
+        if (ObjectUtil.isNull(receivablePlan.getContractId())) {
             throw exception(CONTRACT_NOT_EXISTS);
         }
 
         CrmContractDO contract = contractService.getContract(receivablePlan.getContractId());
-        if(ObjectUtil.isNull(contract)){
+        if (ObjectUtil.isNull(contract)) {
             throw exception(CONTRACT_NOT_EXISTS);
         }
 
         CrmCustomerDO customer = customerService.getCustomer(receivablePlan.getCustomerId());
-        if(ObjectUtil.isNull(customer)){
+        if (ObjectUtil.isNull(customer)) {
             throw exception(CUSTOMER_NOT_EXISTS);
         }
 
     }
 
     @Override
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_RECEIVABLE_PLAN, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateReceivablePlan(CrmReceivablePlanUpdateReqVO updateReqVO) {
         // 校验存在
         validateReceivablePlanExists(updateReqVO.getId());
@@ -88,6 +97,7 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
     }
 
     @Override
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_RECEIVABLE_PLAN, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void deleteReceivablePlan(Long id) {
         // 校验存在
         validateReceivablePlanExists(id);
@@ -102,6 +112,7 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
     }
 
     @Override
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_RECEIVABLE_PLAN, bizId = "#id", level = CrmPermissionLevelEnum.READ)
     public CrmReceivablePlanDO getReceivablePlan(Long id) {
         return receivablePlanMapper.selectById(id);
     }
@@ -115,14 +126,28 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
     }
 
     @Override
-    public PageResult<CrmReceivablePlanDO> getReceivablePlanPage(CrmReceivablePlanPageReqVO pageReqVO) {
-        return receivablePlanMapper.selectPage(pageReqVO);
+    public PageResult<CrmReceivablePlanDO> getReceivablePlanPage(CrmReceivablePlanPageReqVO pageReqVO, Long userId) {
+        return receivablePlanMapper.selectPage(pageReqVO, userId);
     }
 
     @Override
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#pageReqVO.customerId", level = CrmPermissionLevelEnum.READ)
-    public PageResult<CrmReceivablePlanDO> getReceivablePlanPageByCustomer(CrmReceivablePlanPageReqVO pageReqVO) {
-        return receivablePlanMapper.selectPageByCustomer(pageReqVO);
+    public PageResult<CrmReceivablePlanDO> getReceivablePlanPageByCustomerId(CrmReceivablePlanPageReqVO pageReqVO) {
+        return receivablePlanMapper.selectPageByCustomerId(pageReqVO);
+    }
+
+    @Override
+    public void transferReceivablePlan(CrmReceivablePlanTransferReqVO reqVO, Long userId) {
+        // 1 校验回款计划是否存在
+        validateReceivablePlanExists(reqVO.getId());
+
+        // 2.1 数据权限转移
+        crmPermissionService.transferPermission(
+                CrmReceivablePlanConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_RECEIVABLE_PLAN.getType()));
+        // 2.2 设置新的负责人
+        receivablePlanMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
+
+        // 3. TODO 记录转移日志
     }
 
 }

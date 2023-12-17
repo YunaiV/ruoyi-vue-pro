@@ -84,26 +84,27 @@ public interface ProductCommentConvert {
         return divide.intValue();
     }
 
-    ProductCommentDO convert(ProductCommentCreateReqDTO createReqDTO);
-
     @Mapping(target = "scores",
             expression = "java(convertScores(createReqDTO.getDescriptionScores(), createReqDTO.getBenefitScores()))")
-    default ProductCommentDO convert(ProductCommentCreateReqDTO createReqDTO, ProductSpuDO spuDO, ProductSkuDO skuDO, MemberUserRespDTO user) {
-        ProductCommentDO commentDO = convert(createReqDTO);
+    ProductCommentDO convert(ProductCommentCreateReqDTO createReqDTO);
+
+    default ProductCommentDO convert(ProductCommentCreateReqDTO createReqDTO,
+                                     ProductSpuDO spu, ProductSkuDO sku, MemberUserRespDTO user) {
+        ProductCommentDO comment = convert(createReqDTO).setReplyStatus(false);
         if (user != null) {
-            commentDO.setUserId(user.getId());
-            commentDO.setUserNickname(user.getNickname());
-            commentDO.setUserAvatar(user.getAvatar());
+            comment.setUserId(user.getId());
+            comment.setUserNickname(user.getNickname());
+            comment.setUserAvatar(user.getAvatar());
         }
-        if (spuDO != null) {
-            commentDO.setSpuId(spuDO.getId());
-            commentDO.setSpuName(spuDO.getName());
+        if (spu != null) {
+            comment.setSpuId(spu.getId());
+            comment.setSpuName(spu.getName());
         }
-        if (skuDO != null) {
-            commentDO.setSkuPicUrl(skuDO.getPicUrl());
-            commentDO.setSkuProperties(skuDO.getProperties());
+        if (sku != null) {
+            comment.setSkuPicUrl(sku.getPicUrl());
+            comment.setSkuProperties(sku.getProperties());
         }
-        return commentDO;
+        return comment;
     }
 
     @Mapping(target = "visible", constant = "true")

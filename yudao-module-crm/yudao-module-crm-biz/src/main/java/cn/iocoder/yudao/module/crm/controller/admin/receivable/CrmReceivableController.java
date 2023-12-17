@@ -7,10 +7,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivableCreateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivablePageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivableRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivableUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.*;
 import cn.iocoder.yudao.module.crm.convert.receivable.CrmReceivableConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
@@ -36,6 +33,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertListByFlatMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
@@ -94,7 +92,7 @@ public class CrmReceivableController {
     @Operation(summary = "获得回款分页")
     @PreAuthorize("@ss.hasPermission('crm:receivable:query')")
     public CommonResult<PageResult<CrmReceivableRespVO>> getReceivablePage(@Valid CrmReceivablePageReqVO pageReqVO) {
-        PageResult<CrmReceivableDO> pageResult = receivableService.getReceivablePage(pageReqVO);
+        PageResult<CrmReceivableDO> pageResult = receivableService.getReceivablePage(pageReqVO, getLoginUserId());
         return success(convertDetailReceivablePage(pageResult));
     }
 
@@ -102,7 +100,7 @@ public class CrmReceivableController {
     @Operation(summary = "获得回款分页，基于指定客户")
     public CommonResult<PageResult<CrmReceivableRespVO>> getReceivablePageByCustomer(@Valid CrmReceivablePageReqVO pageReqVO) {
         Assert.notNull(pageReqVO.getCustomerId(), "客户编号不能为空");
-        PageResult<CrmReceivableDO> pageResult = receivableService.getReceivablePageByCustomer(pageReqVO);
+        PageResult<CrmReceivableDO> pageResult = receivableService.getReceivablePageByCustomerId(pageReqVO);
         return success(convertDetailReceivablePage(pageResult));
     }
 
@@ -113,7 +111,8 @@ public class CrmReceivableController {
     @OperateLog(type = EXPORT)
     public void exportReceivableExcel(@Valid CrmReceivablePageReqVO exportReqVO,
                                       HttpServletResponse response) throws IOException {
-        PageResult<CrmReceivableDO> pageResult = receivableService.getReceivablePage(exportReqVO);
+        exportReqVO.setPageSize(PAGE_SIZE_NONE);
+        PageResult<CrmReceivableDO> pageResult = receivableService.getReceivablePage(exportReqVO, getLoginUserId());
         // 导出 Excel
         ExcelUtils.write(response, "回款.xls", "数据", CrmReceivableRespVO.class,
                 convertDetailReceivablePage(pageResult).getList());
@@ -140,6 +139,14 @@ public class CrmReceivableController {
         List<CrmContractDO> contractList = contractService.getContractList(
                 convertSet(receivableList, CrmReceivableDO::getContractId));
         return CrmReceivableConvert.INSTANCE.convertPage(pageResult, userMap, customerList, contractList);
+    }
+
+    @PutMapping("/transfer")
+    @Operation(summary = "回款转移")
+    @PreAuthorize("@ss.hasPermission('crm:receivable:update')")
+    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmReceivableTransferReqVO reqVO) {
+        receivableService.transferReceivable(reqVO, getLoginUserId());
+        return success(true);
     }
 
 }

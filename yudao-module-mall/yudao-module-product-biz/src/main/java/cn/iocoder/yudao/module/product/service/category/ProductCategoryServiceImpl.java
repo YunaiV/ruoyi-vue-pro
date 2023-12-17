@@ -170,4 +170,9 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         return productCategoryMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus());
     }
 
+    @Override
+    public List<ProductCategoryDO> getEnableCategoryList(List<Long> ids) {
+        return productCategoryMapper.selectListByIdAndStatus(ids, CommonStatusEnum.ENABLE.getStatus());
+    }
+
 }

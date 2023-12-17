@@ -78,9 +78,7 @@ public class AppProductSpuController {
 
     @GetMapping("/list-by-ids")
     @Operation(summary = "获得商品 SPU 列表")
-    @Parameters({
-            @Parameter(name = "ids", description = "编号列表", required = true)
-    })
+    @Parameter(name = "ids", description = "编号列表", required = true)
     public CommonResult<List<AppProductSpuPageRespVO>> getSpuList(@RequestParam("ids") Set<Long> ids) {
         List<ProductSpuDO> list = productSpuService.getSpuList(ids);
         if (CollUtil.isEmpty(list)) {

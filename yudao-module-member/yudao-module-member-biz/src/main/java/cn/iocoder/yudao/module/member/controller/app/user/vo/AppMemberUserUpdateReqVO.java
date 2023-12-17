@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.member.controller.app.user.vo;
 
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.system.enums.common.SexEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
@@ -14,5 +16,8 @@ public class AppMemberUserUpdateReqVO {
     @Schema(description = "头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/x.png")
     @URL(message = "头像必须是 URL 格式")
     private String avatar;
+
+    @Schema(description = "性别", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    private Integer sex;
 
 }

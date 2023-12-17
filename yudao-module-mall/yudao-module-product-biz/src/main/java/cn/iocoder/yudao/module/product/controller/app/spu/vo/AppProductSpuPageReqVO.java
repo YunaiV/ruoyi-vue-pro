@@ -18,6 +18,7 @@ public class AppProductSpuPageReqVO extends PageParam {
 
     public static final String SORT_FIELD_PRICE = "price";
     public static final String SORT_FIELD_SALES_COUNT = "salesCount";
+    public static final String SORT_FIELD_CREATE_TIME = "createTime";
 
     public static final String RECOMMEND_TYPE_HOT = "hot";
     public static final String RECOMMEND_TYPE_BENEFIT = "benefit";

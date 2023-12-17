@@ -5,6 +5,7 @@ import lombok.Data;
 
 import jakarta.validation.constraints.Min;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "用户 App - 优惠劵 Response VO")
 @Data
@@ -19,9 +20,14 @@ public class AppCouponRespVO {
     @Schema(description = "优惠劵状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1") // 参见 CouponStatusEnum 枚举
     private Integer status;
 
-    @Schema(description = "是否设置满多少金额可用", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
-    // 单位：分；0 - 不限制
+    @Schema(description = "是否设置满多少金额可用", requiredMode = Schema.RequiredMode.REQUIRED, example = "100") // 单位：分；0 - 不限制
     private Integer usePrice;
+
+    @Schema(description = "商品范围", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    private Integer productScope;
+
+    @Schema(description = "商品范围编号的数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    private List<Long> productScopeValues;
 
     @Schema(description = "固定日期 - 生效开始时间")
     private LocalDateTime validStartTime;
