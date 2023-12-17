@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
+import cn.iocoder.yudao.module.product.service.history.ProductBrowseHistoryService;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,6 +49,8 @@ public class AppProductSpuController {
     private ProductSpuService productSpuService;
     @Resource
     private ProductSkuService productSkuService;
+    @Resource
+    private ProductBrowseHistoryService productBrowseHistoryService;
 
     @Resource
     private MemberLevelApi memberLevelApi;
@@ -121,6 +124,11 @@ public class AppProductSpuController {
         if (!ProductSpuStatusEnum.isEnable(spu.getStatus())) {
             throw exception(SPU_NOT_ENABLE);
         }
+
+        // 增加浏览量
+        productSpuService.updateBrowseCount(id, 1);
+        // 保存浏览记录
+        productBrowseHistoryService.createBrowseHistory(getLoginUserId(), id);
 
         // 拼接返回
         List<ProductSkuDO> skus = productSkuService.getSkuListBySpuId(spu.getId());

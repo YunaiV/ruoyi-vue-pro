@@ -148,4 +148,12 @@ public interface ProductSpuService {
      */
     List<ProductSpuDO> validateSpuList(Collection<Long> ids);
 
+    /**
+     * 更新商品 SPU 浏览量
+     *
+     * @param id        商品 SPU 编号
+     * @param incrCount 增加的数量
+     */
+    void updateBrowseCount(Long id, int incrCount);
+
 }

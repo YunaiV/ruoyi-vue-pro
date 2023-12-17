@@ -158,6 +158,11 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     }
 
     @Override
+    public void updateBrowseCount(Long id, int incrCount) {
+        productSpuMapper.updateBrowseCount(id , incrCount);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteSpu(Long id) {
         // 校验存在
