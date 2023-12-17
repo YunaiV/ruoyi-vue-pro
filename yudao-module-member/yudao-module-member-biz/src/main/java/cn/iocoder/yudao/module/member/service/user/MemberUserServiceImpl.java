@@ -7,6 +7,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserResetPasswordReqVO;
@@ -128,8 +129,8 @@ public class MemberUserServiceImpl implements MemberUserService {
 
     @Override
     public void updateUser(Long userId, AppMemberUserUpdateReqVO reqVO) {
-        memberUserMapper.updateById(new MemberUserDO().setId(userId)
-                .setNickname(reqVO.getNickname()).setAvatar(reqVO.getAvatar()));
+        MemberUserDO updateObj = BeanUtils.toBean(reqVO, MemberUserDO.class).setId(userId);
+        memberUserMapper.updateById(updateObj);
     }
 
     @Override
