@@ -85,7 +85,7 @@
 <script setup lang="ts">
 import { getIntDictOptions, getStrDictOptions, getBoolDictOptions, DICT_TYPE } from '@/utils/dict'
 import { dateFormatter } from '@/utils/formatTime'
-import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${table.businessName}'
+import { ${simpleClassName}Api } from '@/api/${table.moduleName}/${table.businessName}'
 #if ($table.templateType == 11)
 import ${subSimpleClassName}Form from './${subSimpleClassName}Form.vue'
 #end

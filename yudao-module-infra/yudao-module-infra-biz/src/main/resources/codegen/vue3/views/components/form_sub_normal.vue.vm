@@ -265,7 +265,7 @@
 </template>
 <script setup lang="ts">
 import { getIntDictOptions, getStrDictOptions, getBoolDictOptions, DICT_TYPE } from '@/utils/dict'
-import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${table.businessName}'
+import { ${simpleClassName}Api } from '@/api/${table.moduleName}/${table.businessName}'
 
 const props = defineProps<{
   ${subJoinColumn.javaField}: undefined // ${subJoinColumn.columnComment}（主表的关联字段）
