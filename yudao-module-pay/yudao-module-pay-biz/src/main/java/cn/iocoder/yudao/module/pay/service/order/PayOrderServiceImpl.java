@@ -39,6 +39,8 @@ import org.springframework.validation.annotation.Validated;
 
 import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -81,6 +83,14 @@ public class PayOrderServiceImpl implements PayOrderService {
     @Override
     public PayOrderDO getOrder(Long appId, String merchantOrderId) {
         return orderMapper.selectByAppIdAndMerchantOrderId(appId, merchantOrderId);
+    }
+
+    @Override
+    public List<PayOrderDO> getOrderList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return orderMapper.selectBatchIds(ids);
     }
 
     @Override
