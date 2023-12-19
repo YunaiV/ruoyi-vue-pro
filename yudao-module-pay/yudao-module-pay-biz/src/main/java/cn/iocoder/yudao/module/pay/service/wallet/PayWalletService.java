@@ -30,7 +30,6 @@ public interface PayWalletService {
      */
     PayWalletDO getWallet(Long walletId);
 
-
     /**
      * 获得会员钱包分页
      *
