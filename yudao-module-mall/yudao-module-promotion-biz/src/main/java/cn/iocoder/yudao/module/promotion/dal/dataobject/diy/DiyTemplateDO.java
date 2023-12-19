@@ -50,13 +50,14 @@ public class DiyTemplateDO extends BaseDO {
      * 备注
      */
     private String remark;
+    // TODO @疯狂：这个字段要不改成 previewPicUrls，和别的模块一样用 pic 作为图片哇？
     /**
      * 预览图
      */
     @TableField(typeHandler = StringListTypeHandler.class)
     private List<String> previewImageUrls;
     /**
-     * 底部导航属性，JSON 格式
+     * uni-app 底部导航属性，JSON 格式
      */
     private String property;
 
