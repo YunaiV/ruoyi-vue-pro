@@ -12,9 +12,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 @Mapper
-public interface WalletRechargePackageConvert {
+public interface PayWalletRechargePackageConvert {
 
-    WalletRechargePackageConvert INSTANCE = Mappers.getMapper(WalletRechargePackageConvert.class);
+    PayWalletRechargePackageConvert INSTANCE = Mappers.getMapper(PayWalletRechargePackageConvert.class);
 
     PayWalletRechargePackageDO convert(WalletRechargePackageCreateReqVO bean);
 

@@ -7,13 +7,13 @@ import lombok.Data;
 @Data
 public class AppPayWalletRespVO {
 
-    @Schema(description = "钱包余额,单位分", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
+    @Schema(description = "钱包余额，单位分", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
     private Integer balance;
 
-    @Schema(description = "累计支出, 单位分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1000")
+    @Schema(description = "累计支出，单位分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1000")
     private Integer totalExpense;
 
-    @Schema(description = "累计充值, 单位分", requiredMode = Schema.RequiredMode.REQUIRED, example = "2000")
+    @Schema(description = "累计充值，单位分", requiredMode = Schema.RequiredMode.REQUIRED, example = "2000")
     private Integer totalRecharge;
 
 }

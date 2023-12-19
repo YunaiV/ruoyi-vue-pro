@@ -214,10 +214,16 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         }
         // 情况 2：如果是重置密码场景，需要校验手机号是存在的
         if (Objects.equals(reqVO.getScene(), SmsSceneEnum.MEMBER_RESET_PASSWORD.getScene())) {
-            MemberUserDO  user= userService.getUserByMobile(reqVO.getMobile());
+            MemberUserDO user = userService.getUserByMobile(reqVO.getMobile());
             if (user == null) {
                 throw exception(USER_MOBILE_NOT_EXISTS);
             }
+        }
+        // 情况 3：如果是修改密码场景，需要查询手机号，无需前端传递
+        if (Objects.equals(reqVO.getScene(), SmsSceneEnum.MEMBER_UPDATE_PASSWORD.getScene())) {
+            MemberUserDO user = userService.getUser(userId);
+            // TODO 芋艿：后续 member user 手机非强绑定，这块需要做下调整；
+            reqVO.setMobile(user.getMobile());
         }
 
         // 执行发送
