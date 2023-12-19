@@ -67,7 +67,7 @@ public class CrmCustomerController {
     }
 
     @PutMapping("/update")
-    //@Operation(summary = "更新客户")
+    @Operation(summary = "更新客户")
     @PreAuthorize("@ss.hasPermission('crm:customer:update')")
     public CommonResult<Boolean> updateCustomer(@Valid @RequestBody CrmCustomerUpdateReqVO updateReqVO) {
         customerService.updateCustomer(updateReqVO);
@@ -131,7 +131,7 @@ public class CrmCustomerController {
     }
 
     @PutMapping("/transfer")
-    //@Operation(summary = "客户转移")
+    @Operation(summary = "客户转移")
     @PreAuthorize("@ss.hasPermission('crm:customer:update')")
     public CommonResult<Boolean> transfer(@Valid @RequestBody CrmCustomerTransferReqVO reqVO) {
         customerService.transferCustomer(reqVO, getLoginUserId());

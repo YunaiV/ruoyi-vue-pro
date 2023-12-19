@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.system.api.logger.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 /**
  * 系统操作日志 Resp DTO
  *
@@ -65,8 +67,8 @@ public class OperateLogV2RespDTO {
     private String userAgent;
 
     /**
-     * 创建时间, 直接返回字符串
+     * 创建时间
      */
-    private String createTime;
+    private LocalDateTime createTime;
 
 }

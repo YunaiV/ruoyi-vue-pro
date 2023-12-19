@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogCreateReqDTO;
 import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2CreateReqDTO;
 import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2PageReqDTO;
 import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2RespDTO;
-import cn.iocoder.yudao.module.system.convert.logger.OperateLogConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.logger.OperateLogV2DO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.service.logger.OperateLogService;
@@ -63,7 +62,7 @@ public class OperateLogApiImpl implements OperateLogApi {
     private static List<OperateLogV2RespDTO> setUserInfo(List<OperateLogV2DO> logList, List<AdminUserDO> userList) {
         Map<Long, AdminUserDO> userMap = convertMap(userList, AdminUserDO::getId);
         return convertList(logList, item -> {
-            OperateLogV2RespDTO respDTO = OperateLogConvert.INSTANCE.convert(item);
+            OperateLogV2RespDTO respDTO = BeanUtils.toBean(item, OperateLogV2RespDTO.class);
             findAndThen(userMap, item.getUserId(), user -> {
                 respDTO.setUserName(user.getNickname());
             });

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.framework.bizlog.function;
+package cn.iocoder.yudao.module.crm.framework.operatelog.function;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import static cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_INDUSTRY;
 
-// TODO @puhui999：包名使用 operatelog 更合适哈；
 /**
  * 自定义函数-通过行业编号获取行业信息
  *
