@@ -3,8 +3,10 @@ package cn.iocoder.yudao.module.crm.controller.admin.customer;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.framework.operatelogv2.core.vo.OperateLogV2PageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
@@ -12,6 +14,7 @@ import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.logger.OperateLogApi;
+import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2PageReqDTO;
 import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2RespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
@@ -135,23 +138,14 @@ public class CrmCustomerController {
         return success(true);
     }
 
-    // TODO @puhui999：operate-log-list 或者 operate-log-page 如果分页
-    @GetMapping("/operate-log")
+    @GetMapping("/operate-log-page")
     @Operation(summary = "获得客户操作日志")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
-    // TODO @puhui999：最好有读权限；方法名改成 getCustomerOperateLog
-    public CommonResult<List<OperateLogV2RespDTO>> getOperateLog(@RequestParam("id") Long id) {
-        // 1. 获取客户
-        // TODO @puhui999：这个校验可以去掉哈；
-        CrmCustomerDO customer = customerService.getCustomer(id);
-        if (customer == null) {
-            return success(null);
-        }
-
-        // 2. 获取操作日志
-        // TODO @puhui999：操作日志，返回可能要分页哈；
-        return success(operateLogApi.getOperateLogByModuleAndBizId(CRM_CUSTOMER, id));
+    public CommonResult<PageResult<OperateLogV2RespDTO>> getCustomerOperateLog(OperateLogV2PageReqVO reqVO) {
+        reqVO.setPageSize(PAGE_SIZE_NONE); // 不分页
+        reqVO.setBizType(CRM_CUSTOMER);
+        return success(operateLogApi.getOperateLogPage(BeanUtils.toBean(reqVO, OperateLogV2PageReqDTO.class)));
     }
 
     // TODO @Joey：单独建一个属于自己业务的 ReqVO；因为前端如果模拟请求，是不是可以更新其它字段了；
