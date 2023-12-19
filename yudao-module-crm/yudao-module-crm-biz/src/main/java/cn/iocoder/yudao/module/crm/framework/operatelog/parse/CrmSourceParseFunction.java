@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.framework.operatelog.function;
+package cn.iocoder.yudao.module.crm.framework.operatelog.parse;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
@@ -6,16 +6,16 @@ import com.mzt.logapi.service.IParseFunction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import static cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_INDUSTRY;
+import static cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_SOURCE;
 
 /**
- * 自定义函数-通过行业编号获取行业信息
+ * 自定义函数-通过客户来源编号获取客户来源信息
  *
  * @author HUIHUI
  */
 @Slf4j
 @Component
-public class CrmIndustryParseFunction implements IParseFunction {
+public class CrmSourceParseFunction implements IParseFunction {
 
     @Override
     public boolean executeBefore() {
@@ -24,7 +24,7 @@ public class CrmIndustryParseFunction implements IParseFunction {
 
     @Override
     public String functionName() {
-        return "getIndustryById";
+        return "getSource";
     }
 
     @Override
@@ -36,9 +36,9 @@ public class CrmIndustryParseFunction implements IParseFunction {
             return "";
         }
 
-        // 获取行业信息
+        // 获取客户来源信息
         try {
-            return DictFrameworkUtils.getDictDataLabel(CRM_CUSTOMER_INDUSTRY, value.toString());
+            return DictFrameworkUtils.getDictDataLabel(CRM_CUSTOMER_SOURCE, value.toString());
         } catch (Exception ignored) {
         }
         return "";

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.crm.service.customer;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.operatelogv2.core.enums.OperateLogV2Constants;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTransferReqVO;
@@ -65,17 +66,21 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(success = "更新了客户{_DIFF{#updateReqVO}}", type = CRM_CUSTOMER, subType = "更新客户", bizNo = "{{#updateReqVO.id}}")
+    @LogRecord(type = CRM_CUSTOMER, bizNo = "{{#updateReqVO.id}}", success = "更新了客户{_DIFF{#updateReqVO}}")
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateCustomer(CrmCustomerUpdateReqVO updateReqVO) {
         // 校验存在
         CrmCustomerDO oldCustomerDO = validateCustomerExists(updateReqVO.getId());
 
-        // __DIFF 函数传递了一个参数，传递的参数是修改之后的对象，这种方式需要在方法内部向 LogRecordContext 中 put 一个变量，代表是之前的对象，这个对象可以是null
-        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldCustomerDO, CrmCustomerUpdateReqVO.class));
         // 更新
         CrmCustomerDO updateObj = CrmCustomerConvert.INSTANCE.convert(updateReqVO);
         customerMapper.updateById(updateObj);
+
+        // __DIFF 函数传递了一个参数，传递的参数是修改之后的对象，这种方式需要在方法内部向 LogRecordContext 中 put 一个变量，代表是之前的对象，这个对象可以是null
+        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldCustomerDO, CrmCustomerUpdateReqVO.class));
+        HashMap<String, Object> extra = new HashMap<>();
+        extra.put("tips", "随便记录一点啦");
+        LogRecordContext.putVariable(OperateLogV2Constants.EXTRA_KEY, extra);
     }
 
     @Override
@@ -125,27 +130,17 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
      */
     @Override
     public void validateCustomer(Long customerId) {
-        // 校验客户是否存在
-        if (customerId == null) {
-            throw exception(CUSTOMER_NOT_EXISTS);
-        }
-        CrmCustomerDO customer = customerMapper.selectById(customerId);
-        if (Objects.isNull(customer)) {
-            throw exception(CUSTOMER_NOT_EXISTS);
-        }
+        validateCustomerExists(customerId);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    // TODO @puhui999：@LogRecord(type = CRM_CUSTOMER, subType = "客户转移", bizNo = "{{#reqVO.id}}", success = TRANSFER_CUSTOMER_LOG_SUCCESS)
-    @LogRecord(success = TRANSFER_CUSTOMER_LOG_SUCCESS, type = CRM_CUSTOMER, subType = "客户转移", bizNo = "{{#reqVO.id}}")
+    @LogRecord(type = CRM_CUSTOMER, bizNo = "{{#reqVO.id}}", success = TRANSFER_CUSTOMER_LOG_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#reqVO.id", level = CrmPermissionLevelEnum.OWNER)
     public void transferCustomer(CrmCustomerTransferReqVO reqVO, Long userId) {
         // 1. 校验客户是否存在
-        validateCustomer(reqVO.getId());
-        // 添加 crmCustomer 到日志上下文 TODO 日志记录放在 service 里是因为已经过了权限校验查询时不用走两次校验
-        // TODO @puhui999：customer 不用查询，从 1. 拿到哈；然后 put这个动作，可以放到 3.；这样逻辑结构就是，校验、逻辑、日志，更加清晰
-        LogRecordContext.putVariable("crmCustomer", customerMapper.selectById(reqVO.getId()));
+        CrmCustomerDO customerDO = validateCustomerExists(reqVO.getId());
+
         // 2.1 数据权限转移
         crmPermissionService.transferPermission(
                 CrmCustomerConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType()));
@@ -153,6 +148,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         customerMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
 
         // 3. TODO 记录转移日志
+        LogRecordContext.putVariable("crmCustomer", customerDO);
     }
 
     @Override

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.system.api.logger.dto;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * 系统操作日志 Resp DTO
@@ -29,13 +30,13 @@ public class OperateLogV2RespDTO {
      */
     private Integer userType;
     /**
-     * 操作模块
+     * 操作模块类型
      */
-    private String module;
+    private String type;
     /**
      * 操作名
      */
-    private String name;
+    private String subType;
     /**
      * 操作模块业务编号
      */
@@ -47,7 +48,7 @@ public class OperateLogV2RespDTO {
     /**
      * 拓展字段
      */
-    private String extra;
+    private Map<String, Object> extra;
 
     /**
      * 请求方法名
@@ -65,6 +66,40 @@ public class OperateLogV2RespDTO {
      * 浏览器 UA
      */
     private String userAgent;
+
+    /**
+     * Java 方法名
+     */
+    private String javaMethod;
+    /**
+     * Java 方法的参数
+     */
+    private String javaMethodArgs;
+
+    /**
+     * 开始时间
+     */
+    private LocalDateTime startTime;
+
+    /**
+     * 执行时长，单位：毫秒
+     */
+    private Integer duration;
+
+    /**
+     * 结果码
+     */
+    private Integer resultCode;
+
+    /**
+     * 结果提示
+     */
+    private String resultMsg;
+
+    /**
+     * 结果数据
+     */
+    private String resultData;
 
     /**
      * 创建时间

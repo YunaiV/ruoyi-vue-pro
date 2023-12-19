@@ -16,7 +16,6 @@ import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2CreateReqDTO;
 import com.google.common.collect.Maps;
 import com.mzt.logapi.beans.LogRecord;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -46,7 +45,8 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 import static cn.iocoder.yudao.framework.operatelogv2.core.enums.OperateLogV2Constants.*;
 
 /**
- * 拦截使用 @Operation 注解
+ * 拦截使用 @Operation 注解, 获取操作类型、开始时间、持续时间、方法相关信息、执行结果等信息
+ * 对 mzt-biz-log 日志信息进行增强
  *
  * @author HUIHUI
  */
@@ -165,33 +165,33 @@ public class OperateLogV2Aspect {
         LogRecord logRecord = CONTENT.get();
         reqDTO.setBizId(Long.parseLong(logRecord.getBizNo())); // 操作模块业务编号
         reqDTO.setContent(logRecord.getAction());// 例如说，修改编号为 1 的用户信息，将性别从男改成女，将姓名从芋道改成源码。
-        if (EXTRA.get() != null) {
-            reqDTO.setExtra((Map<String, Object>) EXTRA.get().get(EXTRA_KEY)); // 拓展字段，有些复杂的业务，需要记录一些字段 ( JSON 格式 )，例如说，记录订单编号，{ orderId: "1"}
-        }
 
         // type 属性
-        if (logRecord.getType() != null) {
-            reqDTO.setType(logRecord.getType()); // 大模块类型如 crm 客户
-        }
-        if (StrUtil.isEmpty(reqDTO.getType())) {
-            Tag tag = getClassAnnotation(joinPoint, Tag.class);
-            if (tag != null) {
-                // 优先读取 @Tag 的 name 属性
-                if (StrUtil.isNotEmpty(tag.name())) {
-                    reqDTO.setType(tag.name());
-                }
-                // 没有的话，读取 @API 的 description 属性
-                if (StrUtil.isEmpty(reqDTO.getType()) && ArrayUtil.isNotEmpty(tag.description())) {
-                    reqDTO.setType(tag.description());
-                }
-            }
-        }
+        reqDTO.setType(logRecord.getType()); // 大模块类型如 crm 客户
         // subType 属性
         if (logRecord.getSubType() != null) {
             reqDTO.setSubType(logRecord.getSubType());// 操作名称如 转移客户
         }
         if (StrUtil.isEmpty(reqDTO.getSubType()) && operation != null) {
             reqDTO.setSubType(operation.summary());
+        }
+
+        // 拓展字段，有些复杂的业务，需要记录一些字段 ( JSON 格式 )，例如说，记录订单编号，{ orderId: "1"}
+        Map<String, Object> objectMap = EXTRA.get();
+        if (objectMap != null) {
+            Object object = objectMap.get(EXTRA_KEY);
+            if (object instanceof Map<?, ?> extraMap) {
+                if (extraMap.keySet().stream().allMatch(String.class::isInstance)) {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> extra = (Map<String, Object>) extraMap;
+                    reqDTO.setExtra(extra);
+                    return;
+                }
+            }
+            // 激进一点不是 map 直接当 value 处理
+            Map<String, Object> extra = Maps.newHashMapWithExpectedSize(1);
+            extra.put(EXTRA_KEY, object);
+            reqDTO.setExtra(extra);
         }
 
     }
