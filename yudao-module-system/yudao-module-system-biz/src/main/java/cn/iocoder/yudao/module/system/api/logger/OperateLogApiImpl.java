@@ -1,18 +1,22 @@
 package cn.iocoder.yudao.module.system.api.logger;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogCreateReqDTO;
+import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2CreateReqDTO;
+import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2PageReqDTO;
 import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2RespDTO;
+import cn.iocoder.yudao.module.system.convert.logger.OperateLogConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.logger.OperateLogV2DO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.service.logger.OperateLogService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import jakarta.annotation.Resource;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -39,21 +43,31 @@ public class OperateLogApiImpl implements OperateLogApi {
     }
 
     @Override
-    public List<OperateLogV2RespDTO> getOperateLogByModuleAndBizId(String module, Long bizId) {
-        List<OperateLogV2DO> logList = operateLogService.getOperateLogByModuleAndBizId(module, bizId);
-        if (CollUtil.isEmpty(logList)) {
-            return Collections.emptyList();
+    @Async
+    public void createOperateLogV2(OperateLogV2CreateReqDTO createReqDTO) {
+        operateLogService.createOperateLogV2(createReqDTO);
+    }
+
+    @Override
+    public PageResult<OperateLogV2RespDTO> getOperateLogPage(OperateLogV2PageReqDTO pageReqVO) {
+        PageResult<OperateLogV2DO> operateLogPage = operateLogService.getOperateLogPage(pageReqVO);
+        if (CollUtil.isEmpty(operateLogPage.getList())) {
+            return PageResult.empty();
         }
 
         // 获取用户
-        List<AdminUserDO> userList = adminUserService.getUserList(convertSet(logList, item -> Long.parseLong(item.getCreator())));
+        List<AdminUserDO> userList = adminUserService.getUserList(convertSet(operateLogPage.getList(), OperateLogV2DO::getUserId));
+        return BeanUtils.toBean(operateLogPage, OperateLogV2RespDTO.class).setList(setUserInfo(operateLogPage.getList(), userList));
+    }
+
+    private static List<OperateLogV2RespDTO> setUserInfo(List<OperateLogV2DO> logList, List<AdminUserDO> userList) {
         Map<Long, AdminUserDO> userMap = convertMap(userList, AdminUserDO::getId);
         return convertList(logList, item -> {
-            OperateLogV2RespDTO bean = BeanUtils.toBean(item, OperateLogV2RespDTO.class);
-            findAndThen(userMap, Long.parseLong(item.getCreator()), user -> {
-                bean.setCreatorName(user.getNickname());
+            OperateLogV2RespDTO respDTO = OperateLogConvert.INSTANCE.convert(item);
+            findAndThen(userMap, item.getUserId(), user -> {
+                respDTO.setUserName(user.getNickname());
             });
-            return bean;
+            return respDTO;
         });
     }
 

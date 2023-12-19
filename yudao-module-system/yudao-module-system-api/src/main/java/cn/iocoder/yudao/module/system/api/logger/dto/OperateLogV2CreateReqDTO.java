@@ -1,7 +1,8 @@
-package cn.iocoder.yudao.module.system.service.logger.bo;
+package cn.iocoder.yudao.module.system.api.logger.dto;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
@@ -10,7 +11,7 @@ import lombok.Data;
  * @author HUIHUI
  */
 @Data
-public class OperateLogV2CreateReqBO {
+public class OperateLogV2CreateReqDTO {
 
     /**
      * 链路追踪编号
@@ -23,29 +24,29 @@ public class OperateLogV2CreateReqBO {
      *
      * 关联 MemberUserDO 的 id 属性，或者 AdminUserDO 的 id 属性
      */
-    @NotEmpty(message = "用户编号不能为空")
+    @NotNull(message = "用户编号不能为空")
     private Long userId;
     /**
      * 用户类型
      *
      * 关联 {@link  UserTypeEnum}
      */
-    @NotEmpty(message = "用户类型不能为空")
+    @NotNull(message = "用户类型不能为空")
     private Integer userType;
     /**
-     * 操作模块
+     * 操作模块类型
      */
-    @NotEmpty(message = "操作模块不能为空")
-    private String module;
+    @NotEmpty(message = "操作模块类型不能为空")
+    private String type;
     /**
      * 操作名
      */
     @NotEmpty(message = "操作名不能为空")
-    private String name;
+    private String subType;
     /**
      * 操作模块业务编号
      */
-    @NotEmpty(message = "操作模块业务编号不能为空")
+    @NotNull(message = "操作模块业务编号不能为空")
     private Long bizId;
     /**
      * 操作内容，记录整个操作的明细

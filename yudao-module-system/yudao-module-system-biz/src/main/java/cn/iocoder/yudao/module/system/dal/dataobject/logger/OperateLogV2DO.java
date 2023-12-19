@@ -42,15 +42,14 @@ public class OperateLogV2DO extends BaseDO {
      * 关联 {@link  UserTypeEnum}
      */
     private Integer userType;
-    // TODO @puhui999：module 改成 type，name 改成 subType；
     /**
-     * 操作模块
+     * 操作模块类型
      */
-    private String module;
+    private String type;
     /**
      * 操作名
      */
-    private String name;
+    private String subType;
     /**
      * 操作模块业务编号
      */
