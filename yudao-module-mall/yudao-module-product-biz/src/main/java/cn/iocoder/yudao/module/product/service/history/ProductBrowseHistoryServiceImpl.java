@@ -27,6 +27,11 @@ public class ProductBrowseHistoryServiceImpl implements ProductBrowseHistoryServ
 
     @Override
     public Long createBrowseHistory(Long userId, Long spuId) {
+        // 用户未登录时不记录
+        if (userId == null) {
+            return null;
+        }
+
         // 情况一：同一个商品，只保留最新的一条记录
         ProductBrowseHistoryDO historyDO = browseHistoryMapper.selectOne(ProductBrowseHistoryDO::getUserId, userId, ProductBrowseHistoryDO::getSpuId, spuId);
         if (historyDO != null) {
