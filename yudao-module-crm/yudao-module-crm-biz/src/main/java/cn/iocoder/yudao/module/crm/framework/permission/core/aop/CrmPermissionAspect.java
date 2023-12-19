@@ -1,32 +1,34 @@
-package cn.iocoder.yudao.module.crm.framework.core.aop;
+package cn.iocoder.yudao.module.crm.framework.permission.core.aop;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.util.spring.SpringExpressionUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
-import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionRoleCodeEnum;
+import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
+import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.anyMatch;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CRM_PERMISSION_DENIED;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CRM_PERMISSION_MODEL_NOT_EXISTS;
 
-// TODO 这个包，改成 permission，然后搞 config 和 core 包，这个类在 core 包里；目的是：framework 最好分类下
 /**
  * Crm 数据权限校验 AOP 切面
  *
@@ -42,10 +44,6 @@ public class CrmPermissionAspect {
 
     @Before("@annotation(crmPermission)")
     public void doBefore(JoinPoint joinPoint, CrmPermission crmPermission) {
-        // TODO 芋艿：临时，方便大家调试
-        //if (true) {
-        //    return;
-        //}
         // 获取相关属性值
         Map<String, Object> expressionValues = parseExpressions(joinPoint, crmPermission);
         Integer bizType = StrUtil.isEmpty(crmPermission.bizTypeValue()) ?
@@ -53,16 +51,28 @@ public class CrmPermissionAspect {
         Long bizId = (Long) expressionValues.get(crmPermission.bizId()); // 模块数据编号
         Integer permissionLevel = crmPermission.level().getLevel(); // 需要的权限级别
 
-        // TODO 如果是超级管理员则直接通过
-        //if (superAdmin){
-        //    return;
-        //}
-
-        // 1. 获取数据权限
-        List<CrmPermissionDO> bizPermissions = crmPermissionService.getPermissionListByBiz(bizType, bizId);
-        if (CollUtil.isEmpty(bizPermissions)) { // 数据权限不存存那么数据也不存在
-            throw exception(CRM_PERMISSION_MODEL_NOT_EXISTS, CrmBizTypeEnum.getNameByType(bizType));
+        // 1.1 如果是超级管理员则直接通过
+        if (validateAdminUser(getUserId())) {
+            return;
         }
+        // 1.2 获取数据权限
+        List<CrmPermissionDO> bizPermissions = crmPermissionService.getPermissionListByBiz(bizType, bizId);
+        if (CollUtil.isEmpty(bizPermissions)) { // 没有数据权限的情况
+            // 公海数据如果没有团队成员大家也因该有读权限才对
+            if (CrmPermissionLevelEnum.isRead(permissionLevel)) {
+                return;
+            }
+
+            // 没有数据权限的情况下超出了读权限直接报错，避免后面校验空指针
+            throw exception(CRM_PERMISSION_DENIED, CrmBizTypeEnum.getNameByType(bizType));
+        } else { // 有数据权限但是没有负责人的情况
+            if (!anyMatch(bizPermissions, item -> CrmPermissionLevelEnum.isOwner(item.getLevel()))) {
+                if (CrmPermissionLevelEnum.isRead(permissionLevel)) {
+                    return;
+                }
+            }
+        }
+
         // 2.1 情况一：如果自己是负责人，则默认有所有权限
         CrmPermissionDO userPermission = CollUtil.findOne(bizPermissions, permission -> ObjUtil.equal(permission.getUserId(), getUserId()));
         if (userPermission != null) {
@@ -108,6 +118,31 @@ public class CrmPermissionAspect {
         }
         // 2. 执行解析
         return SpringExpressionUtils.parseExpressions(joinPoint, expressionStrings);
+    }
+
+    /**
+     * 校验用户是否是 CRM 管理员
+     *
+     * @param userId 用户编号
+     * @return 是/否
+     */
+    private static boolean validateAdminUser(Long userId) {
+        return SingletonManager.getPermissionApi().hasAnyRoles(userId, CrmPermissionRoleCodeEnum.CRM_ADMIN.getCode());
+    }
+
+    /**
+     * 静态内部类实现单例获取
+     *
+     * @author HUIHUI
+     */
+    private static class SingletonManager {
+
+        private static final PermissionApi PERMISSION_API = SpringUtil.getBean(PermissionApi.class);
+
+        public static PermissionApi getPermissionApi() {
+            return PERMISSION_API;
+        }
+
     }
 
 }
