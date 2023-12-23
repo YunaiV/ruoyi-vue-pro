@@ -147,7 +147,7 @@ public class SocialUserServiceImplTest extends BaseDbUnitTest {
         socialUserBindMapper.insert(socialUserBind);
 
         // 调用
-        SocialUserRespDTO socialUser = socialUserService.getSocialUser(userType, type, code, state);
+        SocialUserRespDTO socialUser = socialUserService.getSocialUserByCode(userType, type, code, state);
         // 断言
         assertEquals(userId, socialUser.getUserId());
         assertEquals(socialUserDO.getOpenid(), socialUser.getOpenid());
