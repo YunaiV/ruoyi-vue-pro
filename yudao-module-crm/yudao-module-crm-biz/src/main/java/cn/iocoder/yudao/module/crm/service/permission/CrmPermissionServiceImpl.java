@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.permission.CrmPermissionMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.framework.permission.core.util.CrmPermissionUtils;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -89,8 +90,7 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
         CrmPermissionDO oldPermission = crmPermissionMapper.selectByBizTypeAndBizIdByUserId(
                 transferReqBO.getBizType(), transferReqBO.getBizId(), transferReqBO.getUserId());
         String bizTypeName = CrmBizTypeEnum.getNameByType(transferReqBO.getBizType());
-        // TODO 校验是否为超级管理员 || 1
-        if (oldPermission == null || !isOwner(oldPermission.getLevel())) {
+        if (oldPermission == null || !isOwner(oldPermission.getLevel()) || !CrmPermissionUtils.validateAdminUser()) {
             throw exception(CRM_PERMISSION_DENIED, bizTypeName);
         }
         // 1.1 校验转移对象是否已经是该负责人

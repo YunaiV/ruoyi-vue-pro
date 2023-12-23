@@ -3,16 +3,14 @@ package cn.iocoder.yudao.module.crm.framework.permission.core.aop;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.util.spring.SpringExpressionUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
-import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionRoleCodeEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
+import cn.iocoder.yudao.module.crm.framework.permission.core.util.CrmPermissionUtils;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
-import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -52,7 +50,7 @@ public class CrmPermissionAspect {
         Integer permissionLevel = crmPermission.level().getLevel(); // 需要的权限级别
 
         // 1.1 如果是超级管理员则直接通过
-        if (validateAdminUser(getUserId())) {
+        if (CrmPermissionUtils.validateAdminUser()) {
             return;
         }
         // 1.2 获取数据权限
@@ -118,31 +116,6 @@ public class CrmPermissionAspect {
         }
         // 2. 执行解析
         return SpringExpressionUtils.parseExpressions(joinPoint, expressionStrings);
-    }
-
-    /**
-     * 校验用户是否是 CRM 管理员
-     *
-     * @param userId 用户编号
-     * @return 是/否
-     */
-    private static boolean validateAdminUser(Long userId) {
-        return SingletonManager.getPermissionApi().hasAnyRoles(userId, CrmPermissionRoleCodeEnum.CRM_ADMIN.getCode());
-    }
-
-    /**
-     * 静态内部类实现单例获取
-     *
-     * @author HUIHUI
-     */
-    private static class SingletonManager {
-
-        private static final PermissionApi PERMISSION_API = SpringUtil.getBean(PermissionApi.class);
-
-        public static PermissionApi getPermissionApi() {
-            return PERMISSION_API;
-        }
-
     }
 
 }

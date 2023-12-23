@@ -7,8 +7,7 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmSceneTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
-import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionRoleCodeEnum;
-import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
+import cn.iocoder.yudao.module.crm.framework.permission.core.util.CrmPermissionUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
@@ -41,7 +40,7 @@ public class CrmQueryWrapperUtils {
                                                                                     Long userId, Integer sceneType, Boolean pool) {
         final String ownerUserIdField = SingletonManager.getMybatisPlusJoinProperties().getTableAlias() + ".owner_user_id";
         // 1. 构建数据权限连表条件
-        if (ObjUtil.notEqual(validateAdminUser(userId), Boolean.TRUE) && ObjUtil.notEqual(pool, Boolean.TRUE)) { // 管理员，公海不需要数据权限
+        if (ObjUtil.notEqual(CrmPermissionUtils.validateAdminUser(), Boolean.TRUE) && ObjUtil.notEqual(pool, Boolean.TRUE)) { // 管理员，公海不需要数据权限
             query.innerJoin(CrmPermissionDO.class, on -> on.eq(CrmPermissionDO::getBizType, bizType)
                     .eq(CrmPermissionDO::getBizId, bizId) // 只能使用 SFunction 如果传 id 解析出来的 sql 不对
                     .eq(CrmPermissionDO::getUserId, userId));
@@ -82,23 +81,13 @@ public class CrmQueryWrapperUtils {
      * @param userId  用户编号
      */
     public static <T extends MPJLambdaWrapper<?>> void appendPermissionCondition(T query, Integer bizType, Collection<Long> bizIds, Long userId) {
-        if (ObjUtil.equal(validateAdminUser(userId), Boolean.TRUE)) {// 管理员不需要数据权限
+        if (ObjUtil.equal(CrmPermissionUtils.validateAdminUser(), Boolean.TRUE)) {// 管理员不需要数据权限
             return;
         }
 
         query.innerJoin(CrmPermissionDO.class, on ->
                 on.eq(CrmPermissionDO::getBizType, bizType).in(CrmPermissionDO::getBizId, bizIds)
                         .in(CollUtil.isNotEmpty(bizIds), CrmPermissionDO::getUserId, userId));
-    }
-
-    /**
-     * 校验用户是否是 CRM 管理员
-     *
-     * @param userId 用户编号
-     * @return 是/否
-     */
-    private static boolean validateAdminUser(Long userId) {
-        return SingletonManager.getPermissionApi().hasAnyRoles(userId, CrmPermissionRoleCodeEnum.CRM_ADMIN.getCode());
     }
 
     /**
@@ -109,15 +98,10 @@ public class CrmQueryWrapperUtils {
     private static class SingletonManager {
 
         private static final AdminUserApi ADMIN_USER_API = SpringUtil.getBean(AdminUserApi.class);
-        private static final PermissionApi PERMISSION_API = SpringUtil.getBean(PermissionApi.class);
         private static final MybatisPlusJoinProperties MYBATIS_PLUS_JOIN_PROPERTIES = SpringUtil.getBean(MybatisPlusJoinProperties.class);
 
         public static AdminUserApi getAdminUserApi() {
             return ADMIN_USER_API;
-        }
-
-        public static PermissionApi getPermissionApi() {
-            return PERMISSION_API;
         }
 
         public static MybatisPlusJoinProperties getMybatisPlusJoinProperties() {

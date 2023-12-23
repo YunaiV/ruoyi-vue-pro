@@ -129,6 +129,10 @@ public class OperateLogV2Aspect {
             if (EXTRA.get() != null && EXTRA.get().get(ENABLE) != null) {
                 return;
             }
+            if (CONTENT.get() == null) { // 没有值说明没有日志需要记录
+                return;
+            }
+
             // 真正记录操作日志
             this.log0(joinPoint, operation, startTime, result, exception);
         } catch (Throwable ex) {
@@ -146,7 +150,7 @@ public class OperateLogV2Aspect {
         // 补充用户信息
         fillUserFields(reqDTO);
         // 补全模块信息
-        fillModuleFields(reqDTO, joinPoint, operation);
+        fillModuleFields(reqDTO, operation);
         // 补全请求信息
         fillRequestFields(reqDTO);
         // 补全方法信息
@@ -161,7 +165,7 @@ public class OperateLogV2Aspect {
         reqDTO.setUserType(WebFrameworkUtils.getLoginUserType());
     }
 
-    private static void fillModuleFields(OperateLogV2CreateReqDTO reqDTO, ProceedingJoinPoint joinPoint, Operation operation) {
+    private static void fillModuleFields(OperateLogV2CreateReqDTO reqDTO, Operation operation) {
         LogRecord logRecord = CONTENT.get();
         reqDTO.setBizId(Long.parseLong(logRecord.getBizNo())); // 操作模块业务编号
         reqDTO.setContent(logRecord.getAction());// 例如说，修改编号为 1 的用户信息，将性别从男改成女，将姓名从芋道改成源码。

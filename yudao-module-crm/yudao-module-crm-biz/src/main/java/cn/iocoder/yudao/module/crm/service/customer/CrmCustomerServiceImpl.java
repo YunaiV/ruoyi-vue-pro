@@ -53,6 +53,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @LogRecord(type = CRM_CUSTOMER, bizNo = "{{#customerId}}", success = "创建了客户")
     public Long createCustomer(CrmCustomerCreateReqVO createReqVO, Long userId) {
         // 插入
         CrmCustomerDO customer = CrmCustomerConvert.INSTANCE.convert(createReqVO);
@@ -61,6 +62,9 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         // 创建数据权限
         crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
                 .setBizId(customer.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
+
+        // 添加日志上下文所需
+        LogRecordContext.putVariable("customerId", customer.getId());
         return customer.getId();
     }
 
@@ -85,6 +89,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @LogRecord(type = CRM_CUSTOMER, bizNo = "{{#id}}", success = "删除了客户")
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void deleteCustomer(Long id) {
         // 校验存在
@@ -152,6 +157,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     }
 
     @Override
+    @LogRecord(type = CRM_CUSTOMER, bizNo = "{{#updateReqVO.id}}", success = "锁定了客户")
     public void lockCustomer(CrmCustomerUpdateReqVO updateReqVO) {
         // 校验存在
         validateCustomerExists(updateReqVO.getId());
@@ -165,6 +171,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @LogRecord(type = CRM_CUSTOMER, bizNo = "{{#id}}", success = "将客户放入了公海")
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void putCustomerPool(Long id) {
         // 1. 校验存在
