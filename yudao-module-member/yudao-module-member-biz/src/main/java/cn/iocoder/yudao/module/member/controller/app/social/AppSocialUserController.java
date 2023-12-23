@@ -34,11 +34,11 @@ public class AppSocialUserController {
 
     @PostMapping("/bind")
     @Operation(summary = "社交绑定，使用 code 授权码")
-    public CommonResult<Boolean> socialBind(@RequestBody @Valid AppSocialUserBindReqVO reqVO) {
+    public CommonResult<String> socialBind(@RequestBody @Valid AppSocialUserBindReqVO reqVO) {
         SocialUserBindReqDTO reqDTO = new SocialUserBindReqDTO(getLoginUserId(), UserTypeEnum.MEMBER.getValue(),
                 reqVO.getType(), reqVO.getCode(), reqVO.getState());
-        socialUserApi.bindSocialUser(reqDTO);
-        return success(true);
+        String openid = socialUserApi.bindSocialUser(reqDTO);
+        return success(openid);
     }
 
     @DeleteMapping("/unbind")
