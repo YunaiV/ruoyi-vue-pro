@@ -100,21 +100,27 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     }
 
     @Override
+    @Transactional
     public AppAuthLoginRespVO socialLogin(AppAuthSocialLoginReqVO reqVO) {
         // 使用 code 授权码，进行登录。然后，获得到绑定的用户编号
         SocialUserRespDTO socialUser = socialUserApi.getSocialUser(UserTypeEnum.MEMBER.getValue(), reqVO.getType(),
                 reqVO.getCode(), reqVO.getState());
         if (socialUser == null) {
-            throw exception(AUTH_THIRD_LOGIN_NOT_BIND);
+            throw exception(AUTH_SOCIAL_USER_NOT_FOUND);
         }
 
-        // 情况一：已绑定，自动登录
-        MemberUserDO user = userService.getUser(socialUser.getUserId());
+        // 情况一：已绑定，直接读取用户信息
+        MemberUserDO user;
+        if (socialUser.getUserId() != null) {
+            user = userService.getUser(socialUser.getUserId());
+        // 情况二：未绑定，注册用户 + 绑定用户
+        } else {
+            user = userService.createUser(socialUser.getNickname(), socialUser.getAvatar(), getClientIP(), getTerminal());
+            socialUserApi.bindSocialUser(new SocialUserBindReqDTO(user.getId(), getUserType().getValue(),
+                    reqVO.getType(), reqVO.getCode(), reqVO.getState()));
+        }
         if (user == null) {
             throw exception(USER_NOT_EXISTS);
-        // 情况二：未绑定，注册登录
-        } else {
-            user = userService.createUser(user.getNickname(), user.getAvatar(), getClientIP(), getTerminal());
         }
 
         // 创建 Token 令牌，记录登录日志
