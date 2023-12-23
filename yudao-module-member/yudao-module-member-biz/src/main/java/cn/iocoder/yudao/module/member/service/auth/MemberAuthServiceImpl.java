@@ -36,6 +36,7 @@ import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
+import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getTerminal;
 import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.*;
 
 /**
@@ -78,13 +79,13 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     @Override
     @Transactional
-    public AppAuthLoginRespVO smsLogin(AppAuthSmsLoginReqVO reqVO, Integer terminal) {
+    public AppAuthLoginRespVO smsLogin(AppAuthSmsLoginReqVO reqVO) {
         // 校验验证码
         String userIp = getClientIP();
         smsCodeApi.useSmsCode(AuthConvert.INSTANCE.convert(reqVO, SmsSceneEnum.MEMBER_LOGIN.getScene(), userIp));
 
         // 获得获得注册用户
-        MemberUserDO user = userService.createUserIfAbsent(reqVO.getMobile(), userIp, terminal);
+        MemberUserDO user = userService.createUserIfAbsent(reqVO.getMobile(), userIp, getTerminal());
         Assert.notNull(user, "获取用户失败，结果为空");
 
         // 如果 socialType 非空，说明需要绑定社交用户
@@ -99,16 +100,25 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     }
 
     @Override
+    @Transactional
     public AppAuthLoginRespVO socialLogin(AppAuthSocialLoginReqVO reqVO) {
         // 使用 code 授权码，进行登录。然后，获得到绑定的用户编号
-        SocialUserRespDTO socialUser = socialUserApi.getSocialUser(UserTypeEnum.MEMBER.getValue(), reqVO.getType(),
+        SocialUserRespDTO socialUser = socialUserApi.getSocialUserByCode(UserTypeEnum.MEMBER.getValue(), reqVO.getType(),
                 reqVO.getCode(), reqVO.getState());
         if (socialUser == null) {
-            throw exception(AUTH_THIRD_LOGIN_NOT_BIND);
+            throw exception(AUTH_SOCIAL_USER_NOT_FOUND);
         }
 
-        // 自动登录
-        MemberUserDO user = userService.getUser(socialUser.getUserId());
+        // 情况一：已绑定，直接读取用户信息
+        MemberUserDO user;
+        if (socialUser.getUserId() != null) {
+            user = userService.getUser(socialUser.getUserId());
+        // 情况二：未绑定，注册用户 + 绑定用户
+        } else {
+            user = userService.createUser(socialUser.getNickname(), socialUser.getAvatar(), getClientIP(), getTerminal());
+            socialUserApi.bindSocialUser(new SocialUserBindReqDTO(user.getId(), getUserType().getValue(),
+                    reqVO.getType(), reqVO.getCode(), reqVO.getState()));
+        }
         if (user == null) {
             throw exception(USER_NOT_EXISTS);
         }

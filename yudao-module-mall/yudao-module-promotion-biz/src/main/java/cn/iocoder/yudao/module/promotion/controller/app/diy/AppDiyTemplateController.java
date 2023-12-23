@@ -33,6 +33,7 @@ public class AppDiyTemplateController {
     @Resource
     private DiyPageService diyPageService;
 
+    // TODO @疯狂：要不要把 used 和 get 接口合并哈；不传递 id，直接拿默认；
     @GetMapping("/used")
     @Operation(summary = "使用中的装修模板")
     public CommonResult<AppDiyTemplatePropertyRespVO> getUsedDiyTemplate() {
@@ -54,6 +55,7 @@ public class AppDiyTemplateController {
         }
         // 查询模板下的页面
         List<DiyPageDO> pages = diyPageService.getDiyPageByTemplateId(diyTemplate.getId());
+        // TODO @疯狂：首页、我的，要不枚举到 DiyPageDO 例如说 NAME_USER，NAME_HOME 类似这种哈；
         String home = findFirst(pages, page -> "首页".equals(page.getName()), DiyPageDO::getProperty);
         String user = findFirst(pages, page -> "我的".equals(page.getName()), DiyPageDO::getProperty);
         // 拼接返回

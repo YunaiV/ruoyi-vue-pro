@@ -2,9 +2,7 @@ package cn.iocoder.yudao.module.member.service.user;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -81,10 +79,17 @@ public class MemberUserServiceImpl implements MemberUserService {
             return user;
         }
         // 用户不存在，则进行创建
-        return createUser(mobile, registerIp, terminal);
+        return createUser(mobile, null, null, registerIp, terminal);
     }
 
-    private MemberUserDO createUser(String mobile, String registerIp, Integer terminal) {
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public MemberUserDO createUser(String nickname, String avtar, String registerIp, Integer terminal) {
+        return createUser(null, nickname, avtar, registerIp, terminal);
+    }
+
+    private MemberUserDO createUser(String mobile, String nickname, String avtar,
+                                    String registerIp, Integer terminal) {
         // 生成密码
         String password = IdUtil.fastSimpleUUID();
         // 插入用户
@@ -92,8 +97,12 @@ public class MemberUserServiceImpl implements MemberUserService {
         user.setMobile(mobile);
         user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
         user.setPassword(encodePassword(password)); // 加密密码
-        user.setRegisterIp(registerIp);
-        user.setRegisterTerminal(terminal);
+        user.setRegisterIp(registerIp).setRegisterTerminal(terminal);
+        user.setNickname(nickname).setAvatar(avtar); // 基础信息
+        if (StrUtil.isEmpty(nickname)) {
+            // 昵称为空时，随机一个名字，避免一些依赖 nickname 的逻辑报错，或者有点丑。例如说，短信发送有昵称时~
+            user.setNickname("用户" + RandomUtil.randomNumbers(6));
+        }
         memberUserMapper.insert(user);
 
         // 发送 MQ 消息：用户创建

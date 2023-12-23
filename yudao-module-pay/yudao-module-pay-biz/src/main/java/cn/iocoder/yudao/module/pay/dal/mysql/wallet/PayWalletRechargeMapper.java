@@ -24,7 +24,8 @@ public interface PayWalletRechargeMapper extends BaseMapperX<PayWalletRechargeDO
     default PageResult<PayWalletRechargeDO> selectPage(PageParam pageReqVO, Long walletId, Boolean payStatus) {
         return selectPage(pageReqVO, new LambdaQueryWrapperX<PayWalletRechargeDO>()
                 .eq(PayWalletRechargeDO::getWalletId, walletId)
-                .eq(PayWalletRechargeDO::getPayStatus, payStatus));
+                .eq(PayWalletRechargeDO::getPayStatus, payStatus)
+                .orderByDesc(PayWalletRechargeDO::getId));
     }
 
 }

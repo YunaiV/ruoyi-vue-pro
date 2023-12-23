@@ -15,9 +15,17 @@ import lombok.NoArgsConstructor;
 public class SocialUserRespDTO {
 
     /**
-     * 社交用户 openid
+     * 社交用户的 openid
      */
     private String openid;
+    /**
+     * 社交用户的昵称
+     */
+    private String nickname;
+    /**
+     * 社交用户的头像
+     */
+    private String avatar;
 
     /**
      * 关联的用户编号

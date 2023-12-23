@@ -82,6 +82,7 @@ public class DiyTemplateController {
         return success(DiyTemplateConvert.INSTANCE.convertPage(pageResult));
     }
 
+    // TODO @疯狂：这个要不和 getDiyTemplate 合并，然后 DiyTemplateRespVO 里面直接把 DiyPagePropertyRespVO 也加上。减少 VO 好了，管理后台 get 多返回点数据，也问题不大的。目的，还是想尽可能降低大家的理解成本哈；
     @GetMapping("/get-property")
     @Operation(summary = "获得装修模板属性")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
@@ -92,6 +93,7 @@ public class DiyTemplateController {
         return success(DiyTemplateConvert.INSTANCE.convertPropertyVo(diyTemplate, pages));
     }
 
+    // TODO @疯狂：这个接口，要不和 useDiyTemplate 合并成一个，然后 VO 改成我们新的 VO 规范。不改的字段，就不传递。
     @PutMapping("/update-property")
     @Operation(summary = "更新装修模板属性")
     @PreAuthorize("@ss.hasPermission('promotion:diy-template:update')")
