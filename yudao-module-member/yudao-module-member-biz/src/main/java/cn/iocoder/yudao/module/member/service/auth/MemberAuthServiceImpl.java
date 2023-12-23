@@ -36,6 +36,7 @@ import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
+import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getTerminal;
 import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.*;
 
 /**
@@ -78,13 +79,13 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     @Override
     @Transactional
-    public AppAuthLoginRespVO smsLogin(AppAuthSmsLoginReqVO reqVO, Integer terminal) {
+    public AppAuthLoginRespVO smsLogin(AppAuthSmsLoginReqVO reqVO) {
         // 校验验证码
         String userIp = getClientIP();
         smsCodeApi.useSmsCode(AuthConvert.INSTANCE.convert(reqVO, SmsSceneEnum.MEMBER_LOGIN.getScene(), userIp));
 
         // 获得获得注册用户
-        MemberUserDO user = userService.createUserIfAbsent(reqVO.getMobile(), userIp, terminal);
+        MemberUserDO user = userService.createUserIfAbsent(reqVO.getMobile(), userIp, getTerminal());
         Assert.notNull(user, "获取用户失败，结果为空");
 
         // 如果 socialType 非空，说明需要绑定社交用户
@@ -107,10 +108,13 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             throw exception(AUTH_THIRD_LOGIN_NOT_BIND);
         }
 
-        // 自动登录
+        // 情况一：已绑定，自动登录
         MemberUserDO user = userService.getUser(socialUser.getUserId());
         if (user == null) {
             throw exception(USER_NOT_EXISTS);
+        // 情况二：未绑定，注册登录
+        } else {
+            user = userService.createUser(user.getNickname(), user.getAvatar(), getClientIP(), getTerminal());
         }
 
         // 创建 Token 令牌，记录登录日志
