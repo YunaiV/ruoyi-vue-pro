@@ -44,6 +44,7 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.SUCCESS;
 import static cn.iocoder.yudao.framework.operatelogv2.core.enums.OperateLogV2Constants.*;
 
+// TODO @puhui999：这个类，是不是可以删除哈；简化简化
 /**
  * 拦截使用 @Operation 注解, 获取操作类型、开始时间、持续时间、方法相关信息、执行结果等信息
  * 对 mzt-biz-log 日志信息进行增强

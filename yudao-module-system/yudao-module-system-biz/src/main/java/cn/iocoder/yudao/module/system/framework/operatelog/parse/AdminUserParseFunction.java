@@ -27,6 +27,7 @@ public class AdminUserParseFunction implements IParseFunction {
         return "getAdminUserById";
     }
 
+    // TODO @puhui999：这个方法的实现优化下哈；
     @Override
     public String apply(Object value) {
         if (value == null) {

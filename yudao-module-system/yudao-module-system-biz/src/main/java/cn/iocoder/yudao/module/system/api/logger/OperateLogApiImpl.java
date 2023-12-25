@@ -59,13 +59,12 @@ public class OperateLogApiImpl implements OperateLogApi {
         return BeanUtils.toBean(operateLogPage, OperateLogV2RespDTO.class).setList(setUserInfo(operateLogPage.getList(), userList));
     }
 
+    // TODO @puhui999：这种 convert 还是放到 convert 类里，
     private static List<OperateLogV2RespDTO> setUserInfo(List<OperateLogV2DO> logList, List<AdminUserDO> userList) {
         Map<Long, AdminUserDO> userMap = convertMap(userList, AdminUserDO::getId);
         return convertList(logList, item -> {
             OperateLogV2RespDTO respDTO = BeanUtils.toBean(item, OperateLogV2RespDTO.class);
-            findAndThen(userMap, item.getUserId(), user -> {
-                respDTO.setUserName(user.getNickname());
-            });
+            findAndThen(userMap, item.getUserId(), user -> respDTO.setUserName(user.getNickname()));
             return respDTO;
         });
     }

@@ -23,16 +23,17 @@ public class ILogRecordServiceImpl implements ILogRecordService {
     public void record(LogRecord logRecord) {
         OperateLogV2Aspect.setContent(logRecord); // 操作日志
         OperateLogV2Aspect.addExtra(LogRecordContext.getVariables()); // 扩展信息
+        // TODO @puhui999：这里是不是调用 operateLogApi 进行记录哈
     }
 
     @Override
     public List<LogRecord> queryLog(String bizNo, String type) {
-        return Collections.emptyList();
+        throw new UnsupportedOperationException("不支持该操作，请使用 OperateLogApi 查询！");
     }
 
     @Override
     public List<LogRecord> queryLogByBizNo(String bizNo, String type, String subType) {
-        return Collections.emptyList();
+        throw new UnsupportedOperationException("不支持该操作，请使用 OperateLogApi 查询！");
     }
 
 }

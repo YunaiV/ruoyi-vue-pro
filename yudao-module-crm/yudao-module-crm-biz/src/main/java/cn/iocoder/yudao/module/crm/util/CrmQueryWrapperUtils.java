@@ -98,6 +98,7 @@ public class CrmQueryWrapperUtils {
     private static class SingletonManager {
 
         private static final AdminUserApi ADMIN_USER_API = SpringUtil.getBean(AdminUserApi.class);
+
         private static final MybatisPlusJoinProperties MYBATIS_PLUS_JOIN_PROPERTIES = SpringUtil.getBean(MybatisPlusJoinProperties.class);
 
         public static AdminUserApi getAdminUserApi() {

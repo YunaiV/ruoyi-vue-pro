@@ -68,6 +68,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         return customer.getId();
     }
 
+    // TODO @puhui999：测试下，能不能打出用户数据的变更。啊哈，可以打完微信发我下；
     @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_CUSTOMER, bizNo = "{{#updateReqVO.id}}", success = "更新了客户{_DIFF{#updateReqVO}}")

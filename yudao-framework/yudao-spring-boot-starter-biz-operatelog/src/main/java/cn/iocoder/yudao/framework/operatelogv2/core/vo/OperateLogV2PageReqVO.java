@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+// TODO @puhui999：这个最好每个模块自己弄哈，放这里有点怪可能
 @Schema(description = "管理后台 - 操作日志分页 Request VO")
 @Data
 public class OperateLogV2PageReqVO extends PageParam {

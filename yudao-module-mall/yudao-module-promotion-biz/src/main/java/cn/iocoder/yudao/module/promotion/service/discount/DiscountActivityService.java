@@ -98,6 +98,7 @@ public interface DiscountActivityService {
      * @param dateTime 当前日期时间
      * @return 折扣活动列表
      */
-    List<DiscountActivityDO> getDiscountActivityBySpuIdsAndStatusAndDateTimeLt(Collection<Long> spuIds, Integer status, LocalDateTime dateTime);
+    List<DiscountActivityDO> getDiscountActivityBySpuIdsAndStatusAndDateTimeLt(
+            Collection<Long> spuIds, Integer status, LocalDateTime dateTime);
 
 }

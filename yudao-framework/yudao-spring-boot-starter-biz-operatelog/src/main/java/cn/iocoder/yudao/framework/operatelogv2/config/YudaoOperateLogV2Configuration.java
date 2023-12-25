@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 
+// TODO @puhui999：思考了下，为了减少 starter 数量，在 security 组件里，增加一个 core/operatelog 包，然后 YudaoOperateLogV2Configuration 搞一个过去；
 /**
  * mzt-biz-log 配置类
  *

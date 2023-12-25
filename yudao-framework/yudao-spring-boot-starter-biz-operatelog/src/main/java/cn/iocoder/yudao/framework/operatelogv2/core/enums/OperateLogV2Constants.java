@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.operatelogv2.core.enums;
 
+// TODO @puhui999：这个类，是不是可以删除哈；
 /**
  * 操作日志常量接口
  *

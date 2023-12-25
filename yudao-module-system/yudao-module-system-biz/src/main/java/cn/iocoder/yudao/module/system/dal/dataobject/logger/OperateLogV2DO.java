@@ -70,6 +70,7 @@ public class OperateLogV2DO extends BaseDO {
      * 操作模块业务编号
      */
     private Long bizId;
+    // TODO @puhui999：content 改成 action，extra 换成 String。注释就直接用 mzt，和它完全对应好了。
     /**
      * 操作内容，记录整个操作的明细
      *
@@ -83,6 +84,7 @@ public class OperateLogV2DO extends BaseDO {
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private Map<String, Object> extra;
+
     /**
      * 请求方法名
      */
@@ -100,6 +102,7 @@ public class OperateLogV2DO extends BaseDO {
      */
     private String userAgent;
 
+    // TODO @puhui999：微信已经讨论，下面的字段都不要哈；
     /**
      * Java 方法名
      */

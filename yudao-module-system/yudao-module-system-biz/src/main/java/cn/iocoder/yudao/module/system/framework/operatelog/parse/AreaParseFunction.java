@@ -6,6 +6,7 @@ import com.mzt.logapi.service.IParseFunction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+// TODO @puhui999：还是放在 core 包下哈；
 /**
  * 自定义函数-通过区域编号获取区域信息
  *
@@ -36,4 +37,5 @@ public class AreaParseFunction implements IParseFunction {
 
         return AreaUtils.format(Integer.parseInt(value.toString()));
     }
+
 }

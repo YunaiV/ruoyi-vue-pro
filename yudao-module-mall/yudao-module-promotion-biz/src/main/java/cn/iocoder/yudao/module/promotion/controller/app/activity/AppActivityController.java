@@ -75,10 +75,9 @@ public class AppActivityController {
         if (CollUtil.isEmpty(spuIds)) {
             return new ArrayList<>();
         }
-
-        LocalDateTime now = LocalDateTime.now();
         // 获取开启的且开始的且没有结束的活动
         List<AppActivityRespVO> activityList = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
         // 1. 拼团活动
         getCombinationActivities(spuIds, now, activityList);
         // 2. 秒杀活动
@@ -99,6 +98,7 @@ public class AppActivityController {
             return;
         }
 
+        // TODO @puhui999：AppActivityRespVO 搞个构造方法，写起来更方便一些；这样后续万一加个属性，也可以处理下哈；
         combinationActivities.forEach(item -> {
             activityList.add(new AppActivityRespVO().setId(item.getId())
                     .setType(PromotionTypeEnum.COMBINATION_ACTIVITY.getType()).setName(item.getName())
@@ -144,11 +144,9 @@ public class AppActivityController {
         List<DiscountProductDO> products = discountActivityService.getDiscountProductsByActivityId(
                 convertSet(discountActivities, DiscountActivityDO::getId));
         Map<Long, Long> productMap = convertMap(products, DiscountProductDO::getActivityId, DiscountProductDO::getSpuId);
-        discountActivities.forEach(item -> {
-            activityList.add(new AppActivityRespVO().setId(item.getId())
-                    .setType(PromotionTypeEnum.DISCOUNT_ACTIVITY.getType()).setName(item.getName())
-                    .setSpuId(productMap.get(item.getId())).setStartTime(item.getStartTime()).setEndTime(item.getEndTime()));
-        });
+        discountActivities.forEach(item -> activityList.add(new AppActivityRespVO().setId(item.getId())
+                .setType(PromotionTypeEnum.DISCOUNT_ACTIVITY.getType()).setName(item.getName())
+                .setSpuId(productMap.get(item.getId())).setStartTime(item.getStartTime()).setEndTime(item.getEndTime())));
     }
 
     private void getRewardActivities(Collection<Long> spuIds, LocalDateTime now, List<AppActivityRespVO> activityList) {
