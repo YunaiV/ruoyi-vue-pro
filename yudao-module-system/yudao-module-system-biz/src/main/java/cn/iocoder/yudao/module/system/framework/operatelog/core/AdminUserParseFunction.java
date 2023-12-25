@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.framework.operatelog.parse;
+package cn.iocoder.yudao.module.system.framework.operatelog.core;
 
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
@@ -9,7 +9,6 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-// TODO @puhui999：这个微信讨论下，function 叫啥好哈；
 /**
  * 自定义函数-通过用户编号获取用户信息
  *
@@ -27,15 +26,12 @@ public class AdminUserParseFunction implements IParseFunction {
         return "getAdminUserById";
     }
 
-    // TODO @puhui999：这个方法的实现优化下哈；
     @Override
     public String apply(Object value) {
-        if (value == null) {
-            //log.warn("(getAdminUserById) 解析异常参数为 null");
+        if (ObjUtil.isEmpty(value)) {
             return "";
         }
         if (StrUtil.isEmpty(value.toString())) {
-            //log.warn("(getAdminUserById) 解析异常参数为空");
             return "";
         }
 
@@ -52,4 +48,5 @@ public class AdminUserParseFunction implements IParseFunction {
         }
         return nickname;
     }
+
 }

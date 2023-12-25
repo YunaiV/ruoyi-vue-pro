@@ -1,5 +1,6 @@
-package cn.iocoder.yudao.module.crm.framework.operatelog.parse;
+package cn.iocoder.yudao.module.crm.framework.operatelog.core;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
 import com.mzt.logapi.service.IParseFunction;
@@ -29,7 +30,7 @@ public class CrmLevelParseFunction implements IParseFunction {
 
     @Override
     public String apply(Object value) {
-        if (value == null) {
+        if (ObjUtil.isEmpty(value)) {
             return "";
         }
         if (StrUtil.isEmpty(value.toString())) {
@@ -37,10 +38,7 @@ public class CrmLevelParseFunction implements IParseFunction {
         }
 
         // 获取客户等级信息
-        try {
-            return DictFrameworkUtils.getDictDataLabel(CRM_CUSTOMER_LEVEL, value.toString());
-        } catch (Exception ignored) {
-        }
-        return "";
+        return DictFrameworkUtils.getDictDataLabel(CRM_CUSTOMER_LEVEL, value.toString());
     }
+
 }

@@ -1,12 +1,12 @@
-package cn.iocoder.yudao.module.system.framework.operatelog.parse;
+package cn.iocoder.yudao.module.system.framework.operatelog.core;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import com.mzt.logapi.service.IParseFunction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-// TODO @puhui999：还是放在 core 包下哈；
 /**
  * 自定义函数-通过区域编号获取区域信息
  *
@@ -28,7 +28,7 @@ public class AreaParseFunction implements IParseFunction {
 
     @Override
     public String apply(Object value) {
-        if (value == null) {
+        if (ObjUtil.isEmpty(value)) {
             return "";
         }
         if (StrUtil.isEmpty(value.toString())) {

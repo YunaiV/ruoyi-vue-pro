@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.crm.service.customer;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.operatelogv2.core.enums.OperateLogV2Constants;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTransferReqVO;
@@ -53,7 +52,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_CUSTOMER, bizNo = "{{#customerId}}", success = "创建了客户")
+    @LogRecord(type = CRM_CUSTOMER, subType = "创建客户", bizNo = "{{#customerId}}", success = "创建了客户")
     public Long createCustomer(CrmCustomerCreateReqVO createReqVO, Long userId) {
         // 插入
         CrmCustomerDO customer = CrmCustomerConvert.INSTANCE.convert(createReqVO);
@@ -71,7 +70,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     // TODO @puhui999：测试下，能不能打出用户数据的变更。啊哈，可以打完微信发我下；
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_CUSTOMER, bizNo = "{{#updateReqVO.id}}", success = "更新了客户{_DIFF{#updateReqVO}}")
+    @LogRecord(type = CRM_CUSTOMER, subType = "更新客户", bizNo = "{{#updateReqVO.id}}", success = "更新了客户{_DIFF{#updateReqVO}}", extra = "{{#extra}}")
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateCustomer(CrmCustomerUpdateReqVO updateReqVO) {
         // 校验存在
@@ -83,14 +82,15 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
         // __DIFF 函数传递了一个参数，传递的参数是修改之后的对象，这种方式需要在方法内部向 LogRecordContext 中 put 一个变量，代表是之前的对象，这个对象可以是null
         LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldCustomerDO, CrmCustomerUpdateReqVO.class));
+        // TODO 扩展信息测试
         HashMap<String, Object> extra = new HashMap<>();
         extra.put("tips", "随便记录一点啦");
-        LogRecordContext.putVariable(OperateLogV2Constants.EXTRA_KEY, extra);
+        LogRecordContext.putVariable("extra", extra);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_CUSTOMER, bizNo = "{{#id}}", success = "删除了客户")
+    @LogRecord(type = CRM_CUSTOMER, subType = "删除客户", bizNo = "{{#id}}", success = "删除了客户")
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void deleteCustomer(Long id) {
         // 校验存在
@@ -141,7 +141,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_CUSTOMER, bizNo = "{{#reqVO.id}}", success = TRANSFER_CUSTOMER_LOG_SUCCESS)
+    @LogRecord(type = CRM_CUSTOMER, subType = "客户转移", bizNo = "{{#reqVO.id}}", success = TRANSFER_CUSTOMER_LOG_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#reqVO.id", level = CrmPermissionLevelEnum.OWNER)
     public void transferCustomer(CrmCustomerTransferReqVO reqVO, Long userId) {
         // 1. 校验客户是否存在
@@ -158,7 +158,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     }
 
     @Override
-    @LogRecord(type = CRM_CUSTOMER, bizNo = "{{#updateReqVO.id}}", success = "锁定了客户")
+    @LogRecord(type = CRM_CUSTOMER, subType = "锁定/解锁客户", bizNo = "{{#updateReqVO.id}}", success = "锁定了客户")
     public void lockCustomer(CrmCustomerUpdateReqVO updateReqVO) {
         // 校验存在
         validateCustomerExists(updateReqVO.getId());
@@ -172,7 +172,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_CUSTOMER, bizNo = "{{#id}}", success = "将客户放入了公海")
+    @LogRecord(type = CRM_CUSTOMER, subType = "客户放入公海", bizNo = "{{#id}}", success = "将客户放入了公海")
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void putCustomerPool(Long id) {
         // 1. 校验存在

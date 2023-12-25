@@ -47,13 +47,6 @@
             <artifactId>guava</artifactId>
         </dependency>
 
-        <dependency>
-            <!-- Spring Boot 通用操作日志组件，基于注解实现 -->
-            <!-- 此组件解决的问题是：「谁」在「什么时间」对「什么」做了「什么事」 -->
-            <groupId>io.github.mouzt</groupId>
-            <artifactId>bizlog-sdk</artifactId>
-        </dependency>
-
     </dependencies>
 
 </project>
