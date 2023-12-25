@@ -5,10 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
-import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserResetPasswordReqVO;
-import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateMobileReqVO;
-import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdatePasswordReqVO;
-import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateReqVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.*;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 
 import jakarta.validation.Valid;
@@ -94,12 +91,20 @@ public interface MemberUserService {
     void updateUser(Long userId, AppMemberUserUpdateReqVO reqVO);
 
     /**
-     * 【会员】修改手机
+     * 【会员】修改手机，基于手机验证码
      *
      * @param userId 用户编号
      * @param reqVO  请求信息
      */
     void updateUserMobile(Long userId, AppMemberUserUpdateMobileReqVO reqVO);
+
+    /**
+     * 【会员】修改手机，基于微信小程序的授权码
+     *
+     * @param userId 用户编号
+     * @param reqVO 请求信息
+     */
+    void updateUserMobileByWeixin(Long userId, AppMemberUserUpdateMobileByWeixinReqVO reqVO);
 
     /**
      * 【会员】修改密码
@@ -181,4 +186,5 @@ public interface MemberUserService {
      * @return 更新结果
      */
     boolean updateUserPoint(Long userId, Integer point);
+
 }
