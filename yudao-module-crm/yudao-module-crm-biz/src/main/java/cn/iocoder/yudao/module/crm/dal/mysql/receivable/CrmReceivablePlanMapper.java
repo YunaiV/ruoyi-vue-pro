@@ -38,11 +38,8 @@ public interface CrmReceivablePlanMapper extends BaseMapperX<CrmReceivablePlanDO
     default PageResult<CrmReceivablePlanDO> selectPage(CrmReceivablePlanPageReqVO pageReqVO, Long userId) {
         MPJLambdaWrapperX<CrmReceivablePlanDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
-        boolean condition = CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_RECEIVABLE_PLAN.getType(),
+        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_RECEIVABLE_PLAN.getType(),
                 CrmReceivablePlanDO::getId, userId, pageReqVO.getSceneType(), Boolean.FALSE);
-        if (!condition) {
-            return PageResult.empty();
-        }
         // 拼接自身的查询条件
         query.selectAll(CrmReceivablePlanDO.class)
                 .eqIfPresent(CrmReceivablePlanDO::getCustomerId, pageReqVO.getCustomerId())

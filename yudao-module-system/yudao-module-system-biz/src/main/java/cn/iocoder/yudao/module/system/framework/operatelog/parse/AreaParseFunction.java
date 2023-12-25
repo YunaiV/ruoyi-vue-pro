@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.framework.bizlog.function;
+package cn.iocoder.yudao.module.system.framework.operatelog.parse;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;

@@ -1,8 +1,12 @@
-package cn.iocoder.yudao.module.system.service.logger.bo;
+package cn.iocoder.yudao.module.system.api.logger.dto;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * 系统操作日志 Create Req BO
@@ -10,7 +14,7 @@ import lombok.Data;
  * @author HUIHUI
  */
 @Data
-public class OperateLogV2CreateReqBO {
+public class OperateLogV2CreateReqDTO {
 
     /**
      * 链路追踪编号
@@ -23,29 +27,29 @@ public class OperateLogV2CreateReqBO {
      *
      * 关联 MemberUserDO 的 id 属性，或者 AdminUserDO 的 id 属性
      */
-    @NotEmpty(message = "用户编号不能为空")
+    @NotNull(message = "用户编号不能为空")
     private Long userId;
     /**
      * 用户类型
      *
      * 关联 {@link  UserTypeEnum}
      */
-    @NotEmpty(message = "用户类型不能为空")
+    @NotNull(message = "用户类型不能为空")
     private Integer userType;
     /**
-     * 操作模块
+     * 操作模块类型
      */
-    @NotEmpty(message = "操作模块不能为空")
-    private String module;
+    @NotEmpty(message = "操作模块类型不能为空")
+    private String type;
     /**
      * 操作名
      */
     @NotEmpty(message = "操作名不能为空")
-    private String name;
+    private String subType;
     /**
      * 操作模块业务编号
      */
-    @NotEmpty(message = "操作模块业务编号不能为空")
+    @NotNull(message = "操作模块业务编号不能为空")
     private Long bizId;
     /**
      * 操作内容，记录整个操作的明细
@@ -57,7 +61,7 @@ public class OperateLogV2CreateReqBO {
      * 拓展字段，有些复杂的业务，需要记录一些字段 ( JSON 格式 )
      * 例如说，记录订单编号，{ orderId: "1"}
      */
-    private String extra;
+    private Map<String, Object> extra;
 
     /**
      * 请求方法名
@@ -79,5 +83,39 @@ public class OperateLogV2CreateReqBO {
      */
     @NotEmpty(message = "浏览器 UA 不能为空")
     private String userAgent;
+
+    /**
+     * Java 方法名
+     */
+    private String javaMethod;
+    /**
+     * Java 方法的参数
+     */
+    private String javaMethodArgs;
+
+    /**
+     * 开始时间
+     */
+    private LocalDateTime startTime;
+
+    /**
+     * 执行时长，单位：毫秒
+     */
+    private Integer duration;
+
+    /**
+     * 结果码
+     */
+    private Integer resultCode;
+
+    /**
+     * 结果提示
+     */
+    private String resultMsg;
+
+    /**
+     * 结果数据
+     */
+    private String resultData;
 
 }

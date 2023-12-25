@@ -22,6 +22,5 @@ public interface LogRecordConstants {
     //======================= 客户转移操作日志 =======================
 
     String TRANSFER_CUSTOMER_LOG_SUCCESS = "把客户【{{#crmCustomer.name}}】的负责人从【{getAdminUserById{#crmCustomer.ownerUserId}}】变更为了【{getAdminUserById{#reqVO.newOwnerUserId}}】";
-    String TRANSFER_CUSTOMER_LOG_FAIL = ""; // TODO @puhui999：这个可以删除哈，一般不搞失败的日志
 
 }

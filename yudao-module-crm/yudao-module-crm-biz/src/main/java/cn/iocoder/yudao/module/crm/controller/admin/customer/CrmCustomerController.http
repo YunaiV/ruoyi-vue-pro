@@ -1,8 +1,8 @@
 ### 请求 /transfer
 PUT {{baseUrl}}/crm/customer/transfer
-Content-Type: application/json
+Content-Type: application/-id: {{adminTenentId}}json
 Authorization: Bearer {{token}}
-tenant-id: {{adminTenentId}}
+tenant
 
 {
   "id": 10,
