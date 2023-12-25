@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.framework.core.annotations;
+package cn.iocoder.yudao.module.crm.framework.permission.core.annotations;
 
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;

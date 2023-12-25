@@ -22,32 +22,12 @@
             <artifactId>yudao-common</artifactId>
         </dependency>
 
-        <!-- TODO @puhui999 & 芋艿：操作日志，要不要这么引入？ -->
-        <!-- Springboot-注解-通用操作日志组件 -->
-        <!-- 此组件解决的问题是： 「谁」在「什么时间」对「什么」做了「什么事」 -->
-        <dependency>
-            <groupId>io.github.mouzt</groupId>
-            <artifactId>bizlog-sdk</artifactId>
-        </dependency>
-
-        <!-- TODO @puhui999 & 芋艿：要不要移除掉 -->
-        <!--工具类相关-->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-        </dependency>
-
         <!-- 参数校验 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
             <optional>true</optional>
         </dependency>
-
     </dependencies>
 
 </project>

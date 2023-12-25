@@ -1,13 +1,9 @@
 package cn.iocoder.yudao.module.system.api.logger.dto;
 
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.TIME_ZONE_DEFAULT;
+import java.util.Map;
 
 /**
  * 系统操作日志 Resp DTO
@@ -26,17 +22,21 @@ public class OperateLogV2RespDTO {
      */
     private Long userId;
     /**
+     * 用户名称
+     */
+    private String userName;
+    /**
      * 用户类型
      */
     private Integer userType;
     /**
-     * 操作模块
+     * 操作模块类型
      */
-    private String module;
+    private String type;
     /**
      * 操作名
      */
-    private String name;
+    private String subType;
     /**
      * 操作模块业务编号
      */
@@ -48,7 +48,7 @@ public class OperateLogV2RespDTO {
     /**
      * 拓展字段
      */
-    private String extra;
+    private Map<String, Object> extra;
 
     /**
      * 请求方法名
@@ -68,20 +68,42 @@ public class OperateLogV2RespDTO {
     private String userAgent;
 
     /**
+     * Java 方法名
+     */
+    private String javaMethod;
+    /**
+     * Java 方法的参数
+     */
+    private String javaMethodArgs;
+
+    /**
+     * 开始时间
+     */
+    private LocalDateTime startTime;
+
+    /**
+     * 执行时长，单位：毫秒
+     */
+    private Integer duration;
+
+    /**
+     * 结果码
+     */
+    private Integer resultCode;
+
+    /**
+     * 结果提示
+     */
+    private String resultMsg;
+
+    /**
+     * 结果数据
+     */
+    private String resultData;
+
+    /**
      * 创建时间
      */
-    // TODO puhui999: 木得效果怎么肥事
-    @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
     private LocalDateTime createTime;
-
-    // TODO @puhui999：下面 2 个字段不用返回；用 userId 哈；返回一个 userName
-    /**
-     * 创建者
-     */
-    private String creator;
-    /**
-     * 创建者名称
-     */
-    private String creatorName;
 
 }

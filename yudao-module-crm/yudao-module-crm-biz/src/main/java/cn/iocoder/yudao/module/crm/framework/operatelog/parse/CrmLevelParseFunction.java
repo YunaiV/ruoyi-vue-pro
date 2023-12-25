@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.framework.bizlog.function;
+package cn.iocoder.yudao.module.crm.framework.operatelog.parse;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
