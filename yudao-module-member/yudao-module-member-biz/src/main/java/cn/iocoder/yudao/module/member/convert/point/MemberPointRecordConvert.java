@@ -34,6 +34,4 @@ public interface MemberPointRecordConvert {
     }
     PageResult<MemberPointRecordRespVO> convertPage(PageResult<MemberPointRecordDO> pageResult);
 
-    PageResult<AppMemberPointRecordRespVO> convertPage02(PageResult<MemberPointRecordDO> pageResult);
-
 }
