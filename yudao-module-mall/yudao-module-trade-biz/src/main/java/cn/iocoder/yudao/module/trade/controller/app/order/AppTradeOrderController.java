@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
+import cn.iocoder.yudao.module.trade.service.aftersale.AfterSaleService;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
@@ -47,6 +48,9 @@ public class AppTradeOrderController {
     private TradeOrderQueryService tradeOrderQueryService;
     @Resource
     private DeliveryExpressService deliveryExpressService;
+
+    @Resource
+    private AfterSaleService afterSaleService;
 
     @Resource
     private TradeOrderProperties tradeOrderProperties;
@@ -131,6 +135,8 @@ public class AppTradeOrderController {
         // 待评价
         orderCount.put("uncommentedCount", tradeOrderQueryService.getOrderCount(getLoginUserId(),
                 TradeOrderStatusEnum.COMPLETED.getStatus(), false));
+        // 售后数量
+        orderCount.put("afterSaleCount", afterSaleService.getApplyingAfterSaleCount(getLoginUserId()));
         return success(orderCount);
     }
 
