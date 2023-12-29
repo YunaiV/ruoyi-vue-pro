@@ -41,6 +41,7 @@ public abstract class AbstractSmsClient implements SmsClient {
             return;
         }
         log.info("[refresh][配置({})发生变化，重新初始化]", properties);
+        this.properties = properties;
         // 初始化
         this.init();
     }
