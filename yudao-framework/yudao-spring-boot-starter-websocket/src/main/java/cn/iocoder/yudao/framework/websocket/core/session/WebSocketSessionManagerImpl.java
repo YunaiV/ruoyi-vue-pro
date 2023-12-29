@@ -66,7 +66,7 @@ public class WebSocketSessionManagerImpl implements WebSocketSessionManager {
     @Override
     public void removeSession(WebSocketSession session) {
         // 移除从 idSessions 中
-        idSessions.remove(session.getId(), session);
+        idSessions.remove(session.getId());
         // 移除从 idSessions 中
         LoginUser user = WebSocketFrameworkUtils.getLoginUser(session);
         if (user == null) {

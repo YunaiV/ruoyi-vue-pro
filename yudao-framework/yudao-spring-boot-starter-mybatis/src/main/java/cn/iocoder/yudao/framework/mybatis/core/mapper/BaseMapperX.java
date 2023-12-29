@@ -121,8 +121,8 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
      *
      * @param entities 实体们
      */
-    default void insertBatch(Collection<T> entities) {
-        Db.saveBatch(entities);
+    default Boolean insertBatch(Collection<T> entities) {
+        return Db.saveBatch(entities);
     }
 
     /**
@@ -131,28 +131,28 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
      * @param entities 实体们
      * @param size     插入数量 Db.saveBatch 默认为 1000
      */
-    default void insertBatch(Collection<T> entities, int size) {
-        Db.saveBatch(entities, size);
+    default Boolean insertBatch(Collection<T> entities, int size) {
+        return Db.saveBatch(entities, size);
     }
 
-    default void updateBatch(T update) {
-        update(update, new QueryWrapper<>());
+    default int updateBatch(T update) {
+        return update(update, new QueryWrapper<>());
     }
 
-    default void updateBatch(Collection<T> entities) {
-        Db.updateBatchById(entities);
+    default Boolean updateBatch(Collection<T> entities) {
+        return Db.updateBatchById(entities);
     }
 
-    default void updateBatch(Collection<T> entities, int size) {
-        Db.updateBatchById(entities, size);
+    default Boolean updateBatch(Collection<T> entities, int size) {
+        return Db.updateBatchById(entities, size);
     }
 
-    default void insertOrUpdate(T entity) {
-        Db.saveOrUpdate(entity);
+    default Boolean insertOrUpdate(T entity) {
+        return  Db.saveOrUpdate(entity);
     }
 
-    default void insertOrUpdateBatch(Collection<T> collection) {
-        Db.saveOrUpdateBatch(collection);
+    default Boolean insertOrUpdateBatch(Collection<T> collection) {
+        return Db.saveOrUpdateBatch(collection);
     }
 
     default int delete(String field, String value) {
