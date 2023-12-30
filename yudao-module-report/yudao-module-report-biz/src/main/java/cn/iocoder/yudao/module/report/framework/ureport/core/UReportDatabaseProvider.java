@@ -29,7 +29,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
  * @author 赤焰
  */
 // TODO @赤焰：这个 bean 的注解，交给 UReportConfiguration 搞
-@Component
+//@Component
 @Slf4j
 @Setter
 public class UReportDatabaseProvider implements ReportProvider {
