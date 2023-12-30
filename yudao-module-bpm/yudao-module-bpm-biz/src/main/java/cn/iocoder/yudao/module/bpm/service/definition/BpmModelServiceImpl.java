@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
+import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.*;
 import cn.iocoder.yudao.module.bpm.convert.definition.BpmModelConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
@@ -71,7 +72,8 @@ public class BpmModelServiceImpl implements BpmModelService {
             modelQuery.modelCategory(pageVO.getCategory());
         }
         // 执行查询
-        List<Model> models = modelQuery.orderByCreateTime().desc()
+        List<Model> models = modelQuery.modelTenantId(TenantContextHolder.getTenantIdStr())
+                .orderByCreateTime().desc()
                 .listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
 
         // 获得 Form Map
@@ -107,6 +109,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 创建流程定义
         Model model = repositoryService.newModel();
         BpmModelConvert.INSTANCE.copy(model, createReqVO);
+        model.setTenantId(TenantContextHolder.getTenantIdStr());
         // 保存流程定义
         repositoryService.saveModel(model);
         // 保存 BPMN XML
