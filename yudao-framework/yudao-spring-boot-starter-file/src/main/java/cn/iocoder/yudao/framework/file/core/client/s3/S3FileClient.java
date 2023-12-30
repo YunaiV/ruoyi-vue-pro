@@ -81,7 +81,7 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
         }
         // 腾讯云必须有 region，否则会报错
         if (config.getEndpoint().contains(ENDPOINT_TENCENT)) {
-            return StrUtil.subAfter(config.getEndpoint(), ".cos.", false)
+            return StrUtil.subAfter(config.getEndpoint(), "cos.", false)
                     .replaceAll("." + ENDPOINT_TENCENT, ""); // 去除 Endpoint
         }
         return null;
