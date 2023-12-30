@@ -18,7 +18,7 @@ import static cn.iocoder.yudao.module.report.enums.ErrorCodeConstants.UREPORT_DA
  * @author 赤焰
  */
 @Slf4j
-@Component
+//@Component
 public class UReportDataSource implements BuildinDatasource {
 
 	private static final String NAME = "UReportDataSource";
