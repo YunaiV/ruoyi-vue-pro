@@ -1,6 +1,6 @@
 -- `ruoyi-vue-pro`.crm_contact_business_link definition
 
-CREATE TABLE `crm_contact_business_link` (
+CREATE TABLE `crm_contact_business` (
                                              `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
                                              `contact_id` int(11) DEFAULT NULL COMMENT '联系人id',
                                              `business_id` int(11) DEFAULT NULL COMMENT '商机id',
@@ -10,6 +10,5 @@ CREATE TABLE `crm_contact_business_link` (
                                              `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
                                              `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
                                              `tenant_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '租户编号',
-                                             PRIMARY KEY (`id`),
-                                             UNIQUE KEY `crm_contact_business_link_un` (`contact_id`,`business_id`,`deleted`,`tenant_id`)
+                                             PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='联系人商机关联表';

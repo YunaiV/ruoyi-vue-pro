@@ -1,10 +1,10 @@
-package cn.iocoder.yudao.module.crm.service.contactbusinesslink;
+package cn.iocoder.yudao.module.crm.service.contact;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contactbusinesslink.vo.CrmContactBusinessLinkPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contactbusinesslink.vo.CrmContactBusinessLinkSaveReqVO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.contactbusinesslink.CrmContactBusinessLinkDO;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactBusinessLinkPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactBusinessLinkSaveReqVO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactBusinessLinkDO;
 
 import jakarta.validation.Valid;
 import java.util.List;
@@ -41,9 +41,9 @@ public interface CrmContactBusinessLinkService {
     /**
      * 删除联系人商机关联
      *
-     * @param createReqVO  删除列表
+     * @param businessContactIds  删除列表
      */
-    void deleteContactBusinessLink(@Valid List<CrmContactBusinessLinkSaveReqVO> createReqVO);
+    void deleteContactBusinessLink(@Valid List<Long> businessContactIds);
 
     /**
      * 获得联系人商机关联
