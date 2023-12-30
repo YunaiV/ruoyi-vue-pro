@@ -51,7 +51,7 @@
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <hutool-5.version>5.8.23</hutool-5.version>
         <hutool-6.version>6.0.0-M8</hutool-6.version>
-        <easyexcel.verion>3.3.2</easyexcel.verion>
+        <easyexcel.verion>3.3.3</easyexcel.verion>
         <velocity.version>2.3</velocity.version>
         <screw.version>1.0.5</screw.version>
         <fastjson.version>1.2.83</fastjson.version>
