@@ -1,7 +1,7 @@
 package ${basePackage}.module.${table.moduleName}.service.${table.businessName};
 
 import java.util.*;
-import javax.validation.*;
+import jakarta.validation.*;
 import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
 import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
 ## 特殊：主子表专属逻辑

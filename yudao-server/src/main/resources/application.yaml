@@ -264,9 +264,9 @@ yudao:
 debug: false
 
 # 积木报表配置
-minidao :
-  base-package: org.jeecg.modules.jmreport.desreport.dao*
-  db-type: mysql
+jeecg:
+  jmreport:
+    saas-mode: tenant
 
 # UReport 配置
 ureport:

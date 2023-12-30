@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.tenant.core.context;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.DocumentEnum;
 import com.alibaba.ttl.TransmittableThreadLocal;
 
@@ -21,12 +22,22 @@ public class TenantContextHolder {
     private static final ThreadLocal<Boolean> IGNORE = new TransmittableThreadLocal<>();
 
     /**
-     * 获得租户编号。
+     * 获得租户编号
      *
      * @return 租户编号
      */
     public static Long getTenantId() {
         return TENANT_ID.get();
+    }
+
+    /**
+     * 获得租户编号 String
+     *
+     * @return 租户编号
+     */
+    public static String getTenantIdStr() {
+        Long tenantId = getTenantId();
+        return StrUtil.toStringOrNull(tenantId);
     }
 
     /**
