@@ -6,7 +6,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.framework.operatelogv2.core.vo.OperateLogV2PageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
@@ -61,6 +60,7 @@ public class CrmCustomerController {
 
     @PostMapping("/create")
     @Operation(summary = "创建客户")
+    @OperateLog(enable = false) // TODO 关闭原有日志记录
     @PreAuthorize("@ss.hasPermission('crm:customer:create')")
     public CommonResult<Long> createCustomer(@Valid @RequestBody CrmCustomerCreateReqVO createReqVO) {
         return success(customerService.createCustomer(createReqVO, getLoginUserId()));
@@ -68,6 +68,7 @@ public class CrmCustomerController {
 
     @PutMapping("/update")
     @Operation(summary = "更新客户")
+    @OperateLog(enable = false) // TODO 关闭原有日志记录
     @PreAuthorize("@ss.hasPermission('crm:customer:update')")
     public CommonResult<Boolean> updateCustomer(@Valid @RequestBody CrmCustomerUpdateReqVO updateReqVO) {
         customerService.updateCustomer(updateReqVO);
@@ -76,6 +77,7 @@ public class CrmCustomerController {
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除客户")
+    @OperateLog(enable = false) // TODO 关闭原有日志记录
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('crm:customer:delete')")
     public CommonResult<Boolean> deleteCustomer(@RequestParam("id") Long id) {
@@ -132,6 +134,7 @@ public class CrmCustomerController {
 
     @PutMapping("/transfer")
     @Operation(summary = "客户转移")
+    @OperateLog(enable = false) // TODO 关闭原有日志记录
     @PreAuthorize("@ss.hasPermission('crm:customer:update')")
     public CommonResult<Boolean> transfer(@Valid @RequestBody CrmCustomerTransferReqVO reqVO) {
         customerService.transferCustomer(reqVO, getLoginUserId());
@@ -140,9 +143,8 @@ public class CrmCustomerController {
 
     @GetMapping("/operate-log-page")
     @Operation(summary = "获得客户操作日志")
-    @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
-    public CommonResult<PageResult<OperateLogV2RespDTO>> getCustomerOperateLog(OperateLogV2PageReqVO reqVO) {
+    public CommonResult<PageResult<OperateLogV2RespDTO>> getCustomerOperateLog(CrmCustomerOperateLogPageReqVO reqVO) {
         reqVO.setPageSize(PAGE_SIZE_NONE); // 不分页
         reqVO.setBizType(CRM_CUSTOMER);
         return success(operateLogApi.getOperateLogPage(BeanUtils.toBean(reqVO, OperateLogV2PageReqDTO.class)));
@@ -151,6 +153,7 @@ public class CrmCustomerController {
     // TODO @Joey：单独建一个属于自己业务的 ReqVO；因为前端如果模拟请求，是不是可以更新其它字段了；
     @PutMapping("/lock")
     @Operation(summary = "锁定/解锁客户")
+    @OperateLog(enable = false) // TODO 关闭原有日志记录
     @PreAuthorize("@ss.hasPermission('crm:customer:update')")
     public CommonResult<Boolean> lockCustomer(@Valid @RequestBody CrmCustomerUpdateReqVO updateReqVO) {
         customerService.lockCustomer(updateReqVO);
@@ -161,6 +164,7 @@ public class CrmCustomerController {
 
     @PutMapping("/put-pool")
     @Operation(summary = "数据放入公海")
+    @OperateLog(enable = false) // TODO 关闭原有日志记录
     @Parameter(name = "id", description = "客户编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('crm:customer:update')")
     public CommonResult<Boolean> putCustomerPool(@RequestParam("id") Long id) {

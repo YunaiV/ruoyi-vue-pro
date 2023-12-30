@@ -71,8 +71,6 @@ public class OperateLogServiceImpl implements OperateLogService {
     @Override
     public void createOperateLogV2(OperateLogV2CreateReqDTO createReqBO) {
         OperateLogV2DO log = BeanUtils.toBean(createReqBO, OperateLogV2DO.class);
-        log.setJavaMethodArgs(StrUtils.maxLength(log.getJavaMethodArgs(), JAVA_METHOD_ARGS_MAX_LENGTH));
-        log.setResultData(StrUtils.maxLength(log.getResultData(), RESULT_MAX_LENGTH));
         operateLogV2Mapper.insert(log);
     }
 

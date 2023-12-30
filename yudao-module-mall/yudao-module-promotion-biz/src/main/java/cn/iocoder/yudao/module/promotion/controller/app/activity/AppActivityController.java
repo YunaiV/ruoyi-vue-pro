@@ -98,11 +98,9 @@ public class AppActivityController {
             return;
         }
 
-        // TODO @puhui999：AppActivityRespVO 搞个构造方法，写起来更方便一些；这样后续万一加个属性，也可以处理下哈；
         combinationActivities.forEach(item -> {
-            activityList.add(new AppActivityRespVO().setId(item.getId())
-                    .setType(PromotionTypeEnum.COMBINATION_ACTIVITY.getType()).setName(item.getName())
-                    .setSpuId(item.getSpuId()).setStartTime(item.getStartTime()).setEndTime(item.getEndTime()));
+            activityList.add(new AppActivityRespVO(item.getId(), PromotionTypeEnum.COMBINATION_ACTIVITY.getType(),
+                    item.getName(), item.getSpuId(), item.getStartTime(), item.getEndTime()));
         });
     }
 
@@ -114,9 +112,8 @@ public class AppActivityController {
         }
 
         seckillActivities.forEach(item -> {
-            activityList.add(new AppActivityRespVO().setId(item.getId())
-                    .setType(PromotionTypeEnum.SECKILL_ACTIVITY.getType()).setName(item.getName())
-                    .setSpuId(item.getSpuId()).setStartTime(item.getStartTime()).setEndTime(item.getEndTime()));
+            activityList.add(new AppActivityRespVO(item.getId(), PromotionTypeEnum.SECKILL_ACTIVITY.getType(),
+                    item.getName(), item.getSpuId(), item.getStartTime(), item.getEndTime()));
         });
     }
 
@@ -128,9 +125,8 @@ public class AppActivityController {
         }
 
         bargainActivities.forEach(item -> {
-            activityList.add(new AppActivityRespVO().setId(item.getId())
-                    .setType(PromotionTypeEnum.BARGAIN_ACTIVITY.getType()).setName(item.getName())
-                    .setSpuId(item.getSpuId()).setStartTime(item.getStartTime()).setEndTime(item.getEndTime()));
+            activityList.add(new AppActivityRespVO(item.getId(), PromotionTypeEnum.BARGAIN_ACTIVITY.getType(),
+                    item.getName(), item.getSpuId(), item.getStartTime(), item.getEndTime()));
         });
     }
 
@@ -144,9 +140,8 @@ public class AppActivityController {
         List<DiscountProductDO> products = discountActivityService.getDiscountProductsByActivityId(
                 convertSet(discountActivities, DiscountActivityDO::getId));
         Map<Long, Long> productMap = convertMap(products, DiscountProductDO::getActivityId, DiscountProductDO::getSpuId);
-        discountActivities.forEach(item -> activityList.add(new AppActivityRespVO().setId(item.getId())
-                .setType(PromotionTypeEnum.DISCOUNT_ACTIVITY.getType()).setName(item.getName())
-                .setSpuId(productMap.get(item.getId())).setStartTime(item.getStartTime()).setEndTime(item.getEndTime())));
+        discountActivities.forEach(item -> activityList.add(new AppActivityRespVO(item.getId(), PromotionTypeEnum.DISCOUNT_ACTIVITY.getType(),
+                item.getName(), productMap.get(item.getId()), item.getStartTime(), item.getEndTime())));
     }
 
     private void getRewardActivities(Collection<Long> spuIds, LocalDateTime now, List<AppActivityRespVO> activityList) {
@@ -168,9 +163,8 @@ public class AppActivityController {
             }
 
             RewardActivityDO rewardActivityDO = spuIdAndActivityMap.get(supId).get();
-            activityList.add(new AppActivityRespVO().setId(rewardActivityDO.getId())
-                    .setType(PromotionTypeEnum.REWARD_ACTIVITY.getType()).setName(rewardActivityDO.getName())
-                    .setSpuId(supId).setStartTime(rewardActivityDO.getStartTime()).setEndTime(rewardActivityDO.getEndTime()));
+            activityList.add(new AppActivityRespVO(rewardActivityDO.getId(), PromotionTypeEnum.REWARD_ACTIVITY.getType(),
+                    rewardActivityDO.getName(), supId, rewardActivityDO.getStartTime(), rewardActivityDO.getEndTime()));
         }
     }
 

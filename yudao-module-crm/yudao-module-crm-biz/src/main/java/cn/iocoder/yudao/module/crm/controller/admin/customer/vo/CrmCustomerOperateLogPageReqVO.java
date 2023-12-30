@@ -1,13 +1,12 @@
-package cn.iocoder.yudao.framework.operatelogv2.core.vo;
+package cn.iocoder.yudao.module.crm.controller.admin.customer.vo;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-// TODO @puhui999：这个最好每个模块自己弄哈，放这里有点怪可能
-@Schema(description = "管理后台 - 操作日志分页 Request VO")
+@Schema(description = "管理后台 - crm 客户操作日志分页 Request VO")
 @Data
-public class OperateLogV2PageReqVO extends PageParam {
+public class CrmCustomerOperateLogPageReqVO extends PageParam {
 
     @Schema(description = "模块数据编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long bizId;

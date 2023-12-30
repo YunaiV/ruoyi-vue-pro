@@ -50,7 +50,7 @@ public class CrmPermissionAspect {
         Integer permissionLevel = crmPermission.level().getLevel(); // 需要的权限级别
 
         // 1.1 如果是超级管理员则直接通过
-        if (CrmPermissionUtils.validateAdminUser()) {
+        if (CrmPermissionUtils.isCrmAdmin()) {
             return;
         }
         // 1.2 获取数据权限
