@@ -69,15 +69,14 @@ public class OperateLogServiceImpl implements OperateLogService {
     // ======================= LOG V2 =======================
 
     @Override
-    public void createOperateLogV2(OperateLogV2CreateReqDTO createReqBO) {
-        OperateLogV2DO log = BeanUtils.toBean(createReqBO, OperateLogV2DO.class);
+    public void createOperateLogV2(OperateLogV2CreateReqDTO createReqDTO) {
+        OperateLogV2DO log = BeanUtils.toBean(createReqDTO, OperateLogV2DO.class);
         operateLogV2Mapper.insert(log);
     }
 
-
     @Override
-    public PageResult<OperateLogV2DO> getOperateLogPage(OperateLogV2PageReqDTO pageReqVO) {
-        return operateLogV2Mapper.selectPage(pageReqVO);
+    public PageResult<OperateLogV2DO> getOperateLogPage(OperateLogV2PageReqDTO pageReqDTO) {
+        return operateLogV2Mapper.selectPage(pageReqDTO);
     }
 
 }

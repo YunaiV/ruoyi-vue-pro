@@ -8,9 +8,8 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 
-
 /**
- * mzt-biz-log 配置类
+ * 操作日志配置类
  *
  * @author HUIHUI
  */

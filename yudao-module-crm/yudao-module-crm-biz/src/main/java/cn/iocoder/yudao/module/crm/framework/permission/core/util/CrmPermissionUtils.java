@@ -13,7 +13,6 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
  */
 public class CrmPermissionUtils {
 
-
     /**
      * 校验用户是否是 CRM 管理员
      *

@@ -90,7 +90,8 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
         CrmPermissionDO oldPermission = crmPermissionMapper.selectByBizTypeAndBizIdByUserId(
                 transferReqBO.getBizType(), transferReqBO.getBizId(), transferReqBO.getUserId());
         String bizTypeName = CrmBizTypeEnum.getNameByType(transferReqBO.getBizType());
-        if (oldPermission == null || (!isOwner(oldPermission.getLevel()) && !CrmPermissionUtils.isCrmAdmin())) {  // 不是拥有者，并且不是超管
+        if (oldPermission == null // 不是拥有者，并且不是超管
+                || (!isOwner(oldPermission.getLevel()) && !CrmPermissionUtils.isCrmAdmin())) {
             throw exception(CRM_PERMISSION_DENIED, bizTypeName);
         }
         // 1.1 校验转移对象是否已经是该负责人

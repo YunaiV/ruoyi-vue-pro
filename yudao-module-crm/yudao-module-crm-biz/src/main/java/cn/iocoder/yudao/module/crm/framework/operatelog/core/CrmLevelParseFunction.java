@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.crm.framework.operatelog.core;
 
-import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
 import com.mzt.logapi.service.IParseFunction;
@@ -10,7 +9,7 @@ import org.springframework.stereotype.Component;
 import static cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_LEVEL;
 
 /**
- * 自定义函数-通过客户等级编号获取客户等级信息
+ * 客户等级的 {@link IParseFunction} 实现类
  *
  * @author HUIHUI
  */
@@ -30,14 +29,9 @@ public class CrmLevelParseFunction implements IParseFunction {
 
     @Override
     public String apply(Object value) {
-        if (ObjUtil.isEmpty(value)) {
+        if (StrUtil.isEmptyIfStr(value)) {
             return "";
         }
-        if (StrUtil.isEmpty(value.toString())) {
-            return "";
-        }
-
-        // 获取客户等级信息
         return DictFrameworkUtils.getDictDataLabel(CRM_CUSTOMER_LEVEL, value.toString());
     }
 

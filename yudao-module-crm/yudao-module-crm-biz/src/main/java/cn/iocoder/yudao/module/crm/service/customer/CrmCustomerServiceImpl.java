@@ -62,7 +62,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
                 .setBizId(customer.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
 
-        // 添加日志上下文所需
+        // 记录操作日志
         LogRecordContext.putVariable("customerId", customer.getId());
         return customer.getId();
     }
@@ -73,15 +73,15 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateCustomer(CrmCustomerUpdateReqVO updateReqVO) {
         // 校验存在
-        CrmCustomerDO oldCustomerDO = validateCustomerExists(updateReqVO.getId());
+        CrmCustomerDO oldCustomer = validateCustomerExists(updateReqVO.getId());
 
         // 更新
         CrmCustomerDO updateObj = CrmCustomerConvert.INSTANCE.convert(updateReqVO);
         customerMapper.updateById(updateObj);
 
-        // __DIFF 函数传递了一个参数，传递的参数是修改之后的对象，这种方式需要在方法内部向 LogRecordContext 中 put 一个变量，代表是之前的对象，这个对象可以是null
-        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldCustomerDO, CrmCustomerUpdateReqVO.class));
-        // TODO 扩展信息测试
+        // 记录操作日志
+        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldCustomer, CrmCustomerUpdateReqVO.class));
+        // TODO 扩展信息测试 @puhui999：看着没啥问题，可以删除啦；
         HashMap<String, Object> extra = new HashMap<>();
         extra.put("tips", "随便记录一点啦");
         LogRecordContext.putVariable("extra", extra);

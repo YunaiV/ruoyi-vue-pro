@@ -53,7 +53,8 @@ public class OperateLogApiImpl implements OperateLogApi {
         }
 
         // 获取用户
-        List<AdminUserDO> userList = adminUserService.getUserList(convertSet(operateLogPage.getList(), OperateLogV2DO::getUserId));
+        List<AdminUserDO> userList = adminUserService.getUserList(
+                convertSet(operateLogPage.getList(), OperateLogV2DO::getUserId));
         return OperateLogConvert.INSTANCE.convertPage(operateLogPage, userList);
     }
 

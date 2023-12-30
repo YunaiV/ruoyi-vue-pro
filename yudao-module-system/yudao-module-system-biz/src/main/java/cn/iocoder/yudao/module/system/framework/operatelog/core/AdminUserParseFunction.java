@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.system.framework.operatelog.core;
 
-import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
@@ -10,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * 自定义函数-通过用户编号获取用户信息
+ * 管理员名字的 {@link IParseFunction} 实现类
  *
  * @author HUIHUI
  */
@@ -28,25 +27,22 @@ public class AdminUserParseFunction implements IParseFunction {
 
     @Override
     public String apply(Object value) {
-        if (ObjUtil.isEmpty(value)) {
-            return "";
-        }
-        if (StrUtil.isEmpty(value.toString())) {
+        if (StrUtil.isEmptyIfStr(value)) {
             return "";
         }
 
         // 获取用户信息
         AdminUserRespDTO user = adminUserApi.getUser(Long.parseLong(value.toString()));
         if (user == null) {
-            log.warn("(getAdminUserById) 获取用户信息失败，参数为：{}", value);
+            log.warn("[apply][获取用户{{}}为空", value);
             return "";
         }
         // 返回格式 芋道源码(13888888888)
         String nickname = user.getNickname();
-        if (ObjUtil.isNotEmpty(user.getMobile())) {
-            return nickname.concat("(").concat(user.getMobile()).concat(")");
+        if (StrUtil.isEmpty(user.getMobile())) {
+            return nickname;
         }
-        return nickname;
+        return StrUtil.format("{}({})", nickname, user.getMobile());
     }
 
 }

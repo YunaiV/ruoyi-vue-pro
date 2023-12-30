@@ -60,7 +60,7 @@ public class CrmCustomerController {
 
     @PostMapping("/create")
     @Operation(summary = "创建客户")
-    @OperateLog(enable = false) // TODO 关闭原有日志记录
+    @OperateLog(enable = false) // TODO 关闭原有日志记录；@puhui999：注解都先删除。先记录，没关系。我们下个迭代，就都删除掉操作日志了；
     @PreAuthorize("@ss.hasPermission('crm:customer:create')")
     public CommonResult<Long> createCustomer(@Valid @RequestBody CrmCustomerCreateReqVO createReqVO) {
         return success(customerService.createCustomer(createReqVO, getLoginUserId()));
@@ -102,6 +102,7 @@ public class CrmCustomerController {
         return success(CrmCustomerConvert.INSTANCE.convert(customer, userMap, deptMap));
     }
 
+    // TODO @puhui999：这个查询会查出多个；微信发你图了
     @GetMapping("/page")
     @Operation(summary = "获得客户分页")
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
@@ -141,6 +142,7 @@ public class CrmCustomerController {
         return success(true);
     }
 
+    // TODO @puhui999：是不是接口只要传递 bizId，由 Controller 自己组装出 OperateLogV2PageReqDTO
     @GetMapping("/operate-log-page")
     @Operation(summary = "获得客户操作日志")
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")

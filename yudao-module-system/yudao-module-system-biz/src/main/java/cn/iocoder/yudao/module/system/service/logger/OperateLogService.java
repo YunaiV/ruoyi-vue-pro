@@ -35,9 +35,9 @@ public interface OperateLogService {
     /**
      * 记录操作日志 V2
      *
-     * @param createReqBO 创建请求
+     * @param createReqDTO 创建请求
      */
-    void createOperateLogV2(OperateLogV2CreateReqDTO createReqBO);
+    void createOperateLogV2(OperateLogV2CreateReqDTO createReqDTO);
 
     /**
      * 获得操作日志分页列表

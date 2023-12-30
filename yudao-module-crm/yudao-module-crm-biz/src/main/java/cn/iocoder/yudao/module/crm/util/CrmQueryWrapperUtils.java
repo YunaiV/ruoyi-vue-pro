@@ -40,7 +40,7 @@ public class CrmQueryWrapperUtils {
                                                                                     Long userId, Integer sceneType, Boolean pool) {
         final String ownerUserIdField = SingletonManager.getMybatisPlusJoinProperties().getTableAlias() + ".owner_user_id";
         // 1. 构建数据权限连表条件
-        if (ObjUtil.notEqual(CrmPermissionUtils.isCrmAdmin(), Boolean.TRUE) && ObjUtil.notEqual(pool, Boolean.TRUE)) { // 管理员，公海不需要数据权限
+        if (!CrmPermissionUtils.isCrmAdmin() && ObjUtil.notEqual(pool, Boolean.TRUE)) { // 管理员，公海不需要数据权限
             query.innerJoin(CrmPermissionDO.class, on -> on.eq(CrmPermissionDO::getBizType, bizType)
                     .eq(CrmPermissionDO::getBizId, bizId) // 只能使用 SFunction 如果传 id 解析出来的 sql 不对
                     .eq(CrmPermissionDO::getUserId, userId));
@@ -81,7 +81,7 @@ public class CrmQueryWrapperUtils {
      * @param userId  用户编号
      */
     public static <T extends MPJLambdaWrapper<?>> void appendPermissionCondition(T query, Integer bizType, Collection<Long> bizIds, Long userId) {
-        if (ObjUtil.equal(CrmPermissionUtils.isCrmAdmin(), Boolean.TRUE)) {// 管理员不需要数据权限
+        if (CrmPermissionUtils.isCrmAdmin()) {// 管理员不需要数据权限
             return;
         }
 
