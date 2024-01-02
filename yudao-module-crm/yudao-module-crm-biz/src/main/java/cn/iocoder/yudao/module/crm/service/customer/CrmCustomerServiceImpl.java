@@ -116,11 +116,11 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     }
 
     @Override
-    public List<CrmCustomerDO> getCustomerList(Collection<Long> ids, Long userId) {
+    public List<CrmCustomerDO> getCustomerList(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return customerMapper.selectBatchIds(ids, userId);
+        return customerMapper.selectBatchIds(ids);
     }
 
     @Override

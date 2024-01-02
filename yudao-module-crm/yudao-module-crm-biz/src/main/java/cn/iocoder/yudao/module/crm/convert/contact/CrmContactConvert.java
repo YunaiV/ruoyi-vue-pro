@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.crm.convert.contact;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
@@ -13,7 +14,6 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
@@ -55,16 +55,16 @@ public interface CrmContactConvert {
      *
      * @param contactDO         联系人
      * @param userMap           用户列表
-     * @param crmCustomerDOList 客户
+     * @param customerDOList 客户
      * @return ContactRespVO
      */
-    default CrmContactRespVO convert(CrmContactDO contactDO, Map<Long, AdminUserRespDTO> userMap, List<CrmCustomerDO> crmCustomerDOList,
-                                     List<CrmContactDO> contactList) {
+    default CrmContactRespVO convert(CrmContactDO contactDO, Map<Long, AdminUserRespDTO> userMap,
+                                     List<CrmCustomerDO> customerDOList, List<CrmContactDO> contactList) {
         CrmContactRespVO contactVO = convert(contactDO);
         setUserInfo(contactVO, userMap);
-        Map<Long, CrmCustomerDO> ustomerMap = crmCustomerDOList.stream().collect(Collectors.toMap(CrmCustomerDO::getId, v -> v));
-        Map<Long, CrmContactDO> contactMap = contactList.stream().collect(Collectors.toMap(CrmContactDO::getId, v -> v));
-        findAndThen(ustomerMap, contactDO.getCustomerId(), customer -> contactVO.setCustomerName(customer.getName()));
+        Map<Long, CrmCustomerDO> customerMap = CollectionUtils.convertMap(customerDOList, CrmCustomerDO::getId);
+        Map<Long, CrmContactDO> contactMap = CollectionUtils.convertMap(contactList, CrmContactDO::getId);
+        findAndThen(customerMap, contactDO.getCustomerId(), customer -> contactVO.setCustomerName(customer.getName()));
         findAndThen(contactMap, contactDO.getParentId(), contact -> contactVO.setParentName(contact.getName()));
         return contactVO;
     }

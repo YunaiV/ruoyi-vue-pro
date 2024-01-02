@@ -7,20 +7,14 @@ import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusi
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessTransferReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessUpdateReqVO;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.*;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactBusinessLinkPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
 import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactBusinessLinkDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
-import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
+import cn.iocoder.yudao.module.crm.service.contact.CrmContactBusinessService;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
@@ -31,10 +25,9 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.BUSINESS_NOT_EXISTS;
 
 /**
@@ -48,14 +41,13 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
     @Resource
     private CrmBusinessMapper businessMapper;
-    @Resource
-    private CrmCustomerService customerService;
 
     @Resource
-    private CrmPermissionService crmPermissionService;
-
+    private CrmPermissionService permissionService;
     @Resource
-    private CrmContactService crmContactService;
+    private CrmContactService contactService;
+    @Resource
+    private CrmContactBusinessService contactBusinessService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -65,7 +57,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         businessMapper.insert(business);
 
         // 创建数据权限
-        crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType())
+        permissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType())
                 .setBizId(business.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
 
         // 返回
@@ -93,7 +85,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         // 删除
         businessMapper.deleteById(id);
         // 删除数据权限
-        crmPermissionService.deletePermission(CrmBizTypeEnum.CRM_BUSINESS.getType(), id);
+        permissionService.deletePermission(CrmBizTypeEnum.CRM_BUSINESS.getType(), id);
     }
 
     private CrmBusinessDO validateBusinessExists(Long id) {
@@ -130,42 +122,32 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#pageReqVO.contactId", level = CrmPermissionLevelEnum.READ)
+    public PageResult<CrmBusinessDO> getBusinessPageByContact(CrmBusinessPageReqVO pageReqVO) {
+        // 1. 查询关联的商机编号
+        List<CrmContactBusinessDO> contactBusinessList = contactBusinessService.getContactBusinessListByContactId(
+                pageReqVO.getContactId());
+        if (CollUtil.isEmpty(contactBusinessList)) {
+            return PageResult.empty();
+        }
+        // 2. 查询商机分页
+        return businessMapper.selectPageByContactId(pageReqVO,
+                convertSet(contactBusinessList, CrmContactBusinessDO::getBusinessId));
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void transferBusiness(CrmBusinessTransferReqVO reqVO, Long userId) {
         // 1 校验商机是否存在
         validateBusinessExists(reqVO.getId());
 
         // 2.1 数据权限转移
-        crmPermissionService.transferPermission(
+        permissionService.transferPermission(
                 CrmBusinessConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType()));
         // 2.2 设置新的负责人
         businessMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
 
         // 3. TODO 记录转移日志
     }
-    @Override
-    public PageResult<CrmBusinessRespVO> getBusinessPageByContact(CrmContactBusinessLinkPageReqVO pageReqVO) {
-        CrmContactBusinessLinkPageReqVO crmContactBusinessLinkPageReqVO = new CrmContactBusinessLinkPageReqVO();
-        crmContactBusinessLinkPageReqVO.setContactId(pageReqVO.getContactId());
-        PageResult<CrmContactBusinessLinkDO> businessLinkDOS = crmContactService.selectBusinessPageByContact(crmContactBusinessLinkPageReqVO);
-        if (CollUtil.isEmpty(businessLinkDOS.getList())){
-            return PageResult.empty();
-        }
-        List<CrmBusinessDO> businessList = this.getBusinessList(CollectionUtils.convertList(businessLinkDOS.getList(),
-                CrmContactBusinessLinkDO::getBusinessId));
-        if (CollUtil.isEmpty(businessList)){
-            return PageResult.empty();
-        }
-        PageResult<CrmBusinessRespVO> pageResult = new PageResult<CrmBusinessRespVO>();
-        List<CrmBusinessRespVO> respVOList = BeanUtils.toBean(businessList,CrmBusinessRespVO.class);
-        Map<Long,Long> businessContactMap = CollectionUtils.convertMap(businessLinkDOS.getList(),
-                CrmContactBusinessLinkDO::getBusinessId,CrmContactBusinessLinkDO::getId);
-        respVOList.forEach(item -> {
-            item.setBusinessContactId(businessContactMap.get(item.getId()));
-        });
-        pageResult.setList(respVOList);
-        pageResult.setTotal(businessLinkDOS.getTotal());
-        return pageResult;
 
-    }
 }

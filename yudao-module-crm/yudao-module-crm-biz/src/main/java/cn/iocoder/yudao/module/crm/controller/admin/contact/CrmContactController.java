@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.crm.convert.contact.CrmContactConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants;
-import cn.iocoder.yudao.module.crm.service.contact.CrmContactBusinessLinkService;
+import cn.iocoder.yudao.module.crm.service.contact.CrmContactBusinessService;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -30,10 +30,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -63,7 +59,7 @@ public class CrmContactController {
     private AdminUserApi adminUserApi;
 
     @Resource
-    private CrmContactBusinessLinkService contactBusinessLinkService;
+    private CrmContactBusinessService contactBusinessLinkService;
 
     @PostMapping("/create")
     @Operation(summary = "创建联系人")
@@ -103,7 +99,7 @@ public class CrmContactController {
                 NumberUtil.parseLong(contact.getCreator()), contact.getOwnerUserId())));
         // 2. 获取客户信息
         List<CrmCustomerDO> customerList = customerService.getCustomerList(
-                Collections.singletonList(contact.getCustomerId()), getLoginUserId());
+                Collections.singletonList(contact.getCustomerId()));
         // 3. 直属上级
         List<CrmContactDO> parentContactList = contactService.getContactList(
                 Collections.singletonList(contact.getParentId()), getLoginUserId());
@@ -148,23 +144,6 @@ public class CrmContactController {
                 convertDetailContactPage(pageResult).getList());
     }
 
-    @DeleteMapping("/delete-batch-business")
-    @Operation(summary = "批量删除联系人商机关联")
-    @PreAuthorize("@ss.hasPermission('crm:contact-business-link:delete')")
-    public CommonResult<Boolean> deleteContactBusinessLinkBatch(@Valid @RequestBody List<Long> businessContactIds) {
-        contactBusinessLinkService.deleteContactBusinessLink(businessContactIds);
-        return success(true);
-    }
-
-    @PostMapping("/create-batch-business")
-    @Operation(summary = "创建联系人商机关联")
-    @PreAuthorize("@ss.hasPermission('crm:contact-business-link:create')")
-    public CommonResult<Boolean> createContactBusinessLinkBatch(
-            @Valid @NotEmpty @RequestBody List<CrmContactBusinessLinkSaveReqVO> createReqVO) {
-        contactBusinessLinkService.createContactBusinessLinkBatch(createReqVO);
-        return success(true);
-    }
-
     /**
      * 转换成详细的联系人分页，即读取关联信息
      *
@@ -178,7 +157,7 @@ public class CrmContactController {
         }
         // 1. 获取客户列表
         List<CrmCustomerDO> crmCustomerDOList = customerService.getCustomerList(
-                convertSet(contactList, CrmContactDO::getCustomerId), getLoginUserId());
+                convertSet(contactList, CrmContactDO::getCustomerId));
         // 2. 获取创建人、负责人列表
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(contactList,
                 contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getOwnerUserId())));
@@ -193,6 +172,24 @@ public class CrmContactController {
     @PreAuthorize("@ss.hasPermission('crm:contact:update')")
     public CommonResult<Boolean> transfer(@Valid @RequestBody CrmContactTransferReqVO reqVO) {
         contactService.transferContact(reqVO, getLoginUserId());
+        return success(true);
+    }
+
+    // ================== 关联/取关商机  ===================
+
+    @PostMapping("/create-business-list")
+    @Operation(summary = "创建联系人与商机的关联")
+    @PreAuthorize("@ss.hasPermission('crm:contact:create-business')")
+    public CommonResult<Boolean> createContactBusinessList(@Valid @RequestBody CrmContactBusinessReqVO createReqVO) {
+        contactBusinessLinkService.createContactBusinessList(createReqVO);
+        return success(true);
+    }
+
+    @DeleteMapping("/delete-business-list")
+    @Operation(summary = "删除联系人与商机的关联")
+    @PreAuthorize("@ss.hasPermission('crm:contact:delete-business')")
+    public CommonResult<Boolean> deleteContactBusinessList(@Valid @RequestBody CrmContactBusinessReqVO deleteReqVO) {
+        contactBusinessLinkService.deleteContactBusinessList(deleteReqVO);
         return success(true);
     }
 

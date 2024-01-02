@@ -25,6 +25,4 @@ public class CrmBusinessRespVO extends CrmBusinessBaseVO {
     @Schema(description = "状态名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "跟进中")
     private String statusName;
 
-    @Schema(description = "联系人商机关联ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "32129")
-    private Long businessContactId;
 }

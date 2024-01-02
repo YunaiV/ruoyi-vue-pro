@@ -56,7 +56,7 @@ public interface CrmCustomerService {
      * @return 客户列表
      * @author ljlleo
      */
-    List<CrmCustomerDO> getCustomerList(Collection<Long> ids, Long userId);
+    List<CrmCustomerDO> getCustomerList(Collection<Long> ids);
 
     /**
      * 获得客户分页

@@ -131,7 +131,7 @@ public class CrmReceivableController {
         }
         // 1. 获取客户列表
         List<CrmCustomerDO> customerList = customerService.getCustomerList(
-                convertSet(receivableList, CrmReceivableDO::getCustomerId), getLoginUserId());
+                convertSet(receivableList, CrmReceivableDO::getCustomerId));
         // 2. 获取创建人、负责人列表
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(receivableList,
                 contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getOwnerUserId())));

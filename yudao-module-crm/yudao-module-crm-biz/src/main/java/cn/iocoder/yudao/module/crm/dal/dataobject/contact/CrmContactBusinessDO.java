@@ -2,14 +2,13 @@ package cn.iocoder.yudao.module.crm.dal.dataobject.contact;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * CRM 联系人商机关联 DO
+ * CRM 联系人与商机的关联 DO
  *
  * @author 芋道源码
  */
@@ -21,7 +20,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CrmContactBusinessLinkDO extends BaseDO {
+public class CrmContactBusinessDO extends BaseDO {
 
     /**
      * 主键
