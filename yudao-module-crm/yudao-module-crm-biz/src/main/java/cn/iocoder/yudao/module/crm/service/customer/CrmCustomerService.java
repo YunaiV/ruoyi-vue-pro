@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.module.crm.service.customer;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerCreateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTransferReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import jakarta.validation.Valid;
 
@@ -85,9 +82,9 @@ public interface CrmCustomerService {
     /**
      * 锁定/解锁客户
      *
-     * @param updateReqVO 更新信息
+     * @param lockReqVO 更新信息
      */
-    void lockCustomer(@Valid CrmCustomerUpdateReqVO updateReqVO);
+    void lockCustomer(@Valid CrmCustomerLockReqVO lockReqVO);
 
     // ==================== 公海相关操作 ====================
 

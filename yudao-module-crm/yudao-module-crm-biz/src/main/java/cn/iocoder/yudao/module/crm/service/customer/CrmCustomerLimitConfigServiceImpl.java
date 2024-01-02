@@ -90,4 +90,9 @@ public class CrmCustomerLimitConfigServiceImpl implements CrmCustomerLimitConfig
         adminUserApi.validateUserList(userIds);
     }
 
+    @Override
+    public CrmCustomerLimitConfigDO selectByLimitConfig(CrmCustomerLimitConfigCreateReqVO configReqVO) {
+        return customerLimitConfigMapper.selectByLimitConfig(configReqVO);
+    }
+
 }

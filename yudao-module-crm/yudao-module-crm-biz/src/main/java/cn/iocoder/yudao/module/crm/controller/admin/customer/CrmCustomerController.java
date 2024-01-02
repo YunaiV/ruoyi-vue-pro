@@ -159,8 +159,8 @@ public class CrmCustomerController {
     @Operation(summary = "锁定/解锁客户")
     @OperateLog(enable = false) // TODO 关闭原有日志记录
     @PreAuthorize("@ss.hasPermission('crm:customer:update')")
-    public CommonResult<Boolean> lockCustomer(@Valid @RequestBody CrmCustomerUpdateReqVO updateReqVO) {
-        customerService.lockCustomer(updateReqVO);
+    public CommonResult<Boolean> lockCustomer(@Valid @RequestBody CrmCustomerLockReqVO lockReqVO) {
+        customerService.lockCustomer(lockReqVO);
         return success(true);
     }
 
