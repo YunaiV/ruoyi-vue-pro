@@ -58,6 +58,7 @@ public class CrmCustomerController {
     @Resource
     private OperateLogApi operateLogApi;
 
+    // TODO @puhui999：把 CrmCustomerCreateReqVO、CrmCustomerUpdateReqVO、CrmCustomerRespVO 按照新的规范，搞一下哈；
     @PostMapping("/create")
     @Operation(summary = "创建客户")
     @OperateLog(enable = false) // TODO 关闭原有日志记录；@puhui999：注解都先删除。先记录，没关系。我们下个迭代，就都删除掉操作日志了；
@@ -114,6 +115,7 @@ public class CrmCustomerController {
         }
 
         // 2. 拼接数据
+        // TODO @puhui999：距离进入公海的时间
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSetByFlatMap(pageResult.getList(), user -> Stream.of(Long.parseLong(user.getCreator()), user.getOwnerUserId())));
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));

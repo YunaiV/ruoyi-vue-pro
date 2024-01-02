@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -52,10 +53,13 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_CUSTOMER, subType = "创建客户", bizNo = "{{#customerId}}", success = "创建了客户")
+    @LogRecord(type = CRM_CUSTOMER, subType = "创建客户", bizNo = "{{#customerId}}", success = "创建了客户") // TODO @puhui999：客户名字，要记录进去；不然在展示操作日志的全列表，看不清楚是哪个客户哈；
     public Long createCustomer(CrmCustomerCreateReqVO createReqVO, Long userId) {
-        // 插入
-        CrmCustomerDO customer = CrmCustomerConvert.INSTANCE.convert(createReqVO);
+        // 插入客户
+        CrmCustomerDO customer = CrmCustomerConvert.INSTANCE.convert(createReqVO)
+                .setLockStatus(false).setDealStatus(false)
+                .setContactLastTime(LocalDateTime.now());
+        // TODO @puhui999：可能要加个 receiveTime 字段，记录最后接收时间
         customerMapper.insert(customer);
 
         // 创建数据权限
@@ -72,6 +76,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     @LogRecord(type = CRM_CUSTOMER, subType = "更新客户", bizNo = "{{#updateReqVO.id}}", success = "更新了客户{_DIFF{#updateReqVO}}", extra = "{{#extra}}")
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateCustomer(CrmCustomerUpdateReqVO updateReqVO) {
+        // TODO @puhui999：更新的时候，要把 updateReqVO 负责人设置为空，避免修改。
         // 校验存在
         CrmCustomerDO oldCustomer = validateCustomerExists(updateReqVO.getId());
 
