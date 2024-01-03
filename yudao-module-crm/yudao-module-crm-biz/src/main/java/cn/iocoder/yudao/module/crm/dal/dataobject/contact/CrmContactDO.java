@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.contact;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -29,9 +30,11 @@ public class CrmContactDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 下次联系时间
+     * 客户编号
+     *
+     * 关联 {@link CrmCustomerDO#getId()}
      */
-    private LocalDateTime nextTime;
+    private Long customerId;
     /**
      * 手机号
      */
@@ -45,21 +48,20 @@ public class CrmContactDO extends BaseDO {
      */
     private String email;
     /**
-     * 客户编号
+     * 所在地
+     *
+     * 关联 {@link cn.iocoder.yudao.framework.ip.core.Area#getId()} 字段
      */
-    private Long customerId;
+    private Integer areaId;
     /**
-     * 地址
+     * 详细地址
      */
-    private String address;
+    private String detailAddress;
     /**
      * 备注
      */
     private String remark;
-    /**
-     * 最后跟进时间
-     */
-    private LocalDateTime lastTime;
+
     /**
      * 直属上级
      *
@@ -100,10 +102,13 @@ public class CrmContactDO extends BaseDO {
     private Long ownerUserId;
 
     /**
-     * 所在地
-     *
-     * 关联 {@link cn.iocoder.yudao.framework.ip.core.Area#getId()} 字段
+     * 最后跟进时间
      */
-    private Integer areaId;
+    private LocalDateTime contactLastTime;
+    // TODO @puhui999：增加一个字段 contactLastContent；最后跟进内容
+    /**
+     * 下次联系时间
+     */
+    private LocalDateTime contactNextTime;
 
 }

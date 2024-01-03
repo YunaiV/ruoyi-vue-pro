@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 // TODO 芋艿：调整下字段
 
 /**
- * 客户 DO
+ * CRM 客户 DO
  *
  * @author Wanwan
  */
@@ -104,13 +104,16 @@ public class CrmCustomerDO extends BaseDO {
      */
     private Long ownerUserId;
     /**
-     * 地区编号
+     * 所在地
+     *
+     * 关联 {@link cn.iocoder.yudao.framework.ip.core.Area#getId()} 字段
      */
     private Integer areaId;
     /**
      * 详细地址
      */
     private String detailAddress;
+
     /**
      * 最后跟进时间
      */
