@@ -40,7 +40,7 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
         validateParentProductCategory(createReqVO.getParentId());
         // 1.2 分类名称是否存在
         validateProductNameExists(null, createReqVO.getParentId(), createReqVO.getName());
-        // 2. 插入
+        // 2. 插入分类
         CrmProductCategoryDO category = BeanUtils.toBean(createReqVO, CrmProductCategoryDO.class);
         productCategoryMapper.insert(category);
         return category.getId();
@@ -54,7 +54,7 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
         validateParentProductCategory(updateReqVO.getParentId());
         // 1.3 分类名称是否存在
         validateProductNameExists(updateReqVO.getId(), updateReqVO.getParentId(), updateReqVO.getName());
-        // 2. 更新
+        // 2. 更新分类
         CrmProductCategoryDO updateObj = BeanUtils.toBean(updateReqVO, CrmProductCategoryDO.class);
         productCategoryMapper.updateById(updateObj);
     }
@@ -92,18 +92,17 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
 
     @Override
     public void deleteProductCategory(Long id) {
-        // TODO zange：参考 mall： ProductCategoryServiceImpl 补充下必要的参数校验；
-        // 校验存在
+        // 1.1 校验存在
         validateProductCategoryExists(id);
-        // 校验是否还有子分类
+        // 1.2 校验是否还有子分类
         if (productCategoryMapper.selectCountByParentId(id) > 0) {
             throw exception(product_CATEGORY_EXISTS_CHILDREN);
         }
-        // 校验是否被产品使用
+        // 1.3 校验是否被产品使用
         if (crmProductService.getProductByCategoryId(id) !=null) {
             throw exception(PRODUCT_CATEGORY_USED);
         }
-        // 删除
+        // 2. 删除
         productCategoryMapper.deleteById(id);
     }
 

@@ -50,6 +50,7 @@ public class CrmBusinessController {
     @Resource
     private CrmBusinessStatusService businessStatusService;
 
+    // TODO @商机待定：CrmBusinessCreateReqVO、CrmBusinessUpdateReqVO、CrmBusinessRespVO 按照新的 VO 规范
     @PostMapping("/create")
     @Operation(summary = "创建商机")
     @PreAuthorize("@ss.hasPermission('crm:business:create')")
