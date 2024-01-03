@@ -123,10 +123,10 @@ public class CrmReceivablePlanController {
     }
 
     /**
-     * 转换成详细的回款计划分页，即读取关联信息
+     * 构建详细的回款计划分页结果
      *
-     * @param pageResult 回款计划分页
-     * @return 详细的回款计划分页
+     * @param pageResult 简单的回款计划分页结果
+     * @return 详细的回款计划分页结果
      */
     private PageResult<CrmReceivablePlanRespVO> convertDetailReceivablePlanPage(PageResult<CrmReceivablePlanDO> pageResult) {
         List<CrmReceivablePlanDO> receivablePlanList = pageResult.getList();

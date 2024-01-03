@@ -99,7 +99,6 @@ public class CrmBusinessController {
         return success(buildBusinessDetailPageResult(pageResult));
     }
 
-
     @GetMapping("/page-by-contact")
     @Operation(summary = "获得联系人的商机分页")
     @PreAuthorize("@ss.hasPermission('crm:business:query')")
@@ -121,6 +120,12 @@ public class CrmBusinessController {
                 buildBusinessDetailPageResult(pageResult).getList());
     }
 
+    /**
+     * 构建详细的商机分页结果
+     *
+     * @param pageResult 简单的商机分页结果
+     * @return 详细的商机分页结果
+     */
     private PageResult<CrmBusinessRespVO> buildBusinessDetailPageResult(PageResult<CrmBusinessDO> pageResult) {
         if (CollUtil.isEmpty(pageResult.getList())) {
             return PageResult.empty(pageResult.getTotal());

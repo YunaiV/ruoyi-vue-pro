@@ -105,11 +105,13 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     public void deleteCustomer(Long id) {
         // 校验存在
         validateCustomerExists(id);
+        // TODO @puhui999：如果有联系人、商机，则不允许删除；
 
         // 删除
         customerMapper.deleteById(id);
         // 删除数据权限
         permissionService.deletePermission(CrmBizTypeEnum.CRM_CUSTOMER.getType(), id);
+        // TODO @puhui999：删除跟进记录
     }
 
     private CrmCustomerDO validateCustomerExists(Long id) {
@@ -151,7 +153,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_CUSTOMER, subType = "客户转移", bizNo = "{{#reqVO.id}}", success = TRANSFER_CUSTOMER_LOG_SUCCESS)
+    @LogRecord(type = CRM_CUSTOMER, subType = "转移客户", bizNo = "{{#reqVO.id}}", success = TRANSFER_CUSTOMER_LOG_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#reqVO.id", level = CrmPermissionLevelEnum.OWNER)
     public void transferCustomer(CrmCustomerTransferReqVO reqVO, Long userId) {
         // 1.1 校验客户是否存在
@@ -235,7 +237,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_CUSTOMER, subType = "客户放入公海", bizNo = "{{#id}}", success = "将客户放入了公海")
+    @LogRecord(type = CRM_CUSTOMER, subType = "客户放入公海", bizNo = "{{#id}}", success = "将客户放入了公海") // TODO @puhui999：将客户【】放入了公海
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void putCustomerPool(Long id) {
         // 1. 校验存在
@@ -256,10 +258,16 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         // 3. 删除负责人数据权限
         permissionService.deletePermission(CrmBizTypeEnum.CRM_CUSTOMER.getType(), customer.getId(),
                 CrmPermissionLevelEnum.OWNER.getLevel());
+        // TODO @puhui999：联系人的负责人，也要设置为 null；这块和领取是对应的；因为领取后，负责人也要关联过来；
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    // TODO @puhui999：权限校验
+
+    // TODO @puhui999：如果是分配，操作日志是 “将客户【】分配给【】”
+    // TODO @puhui999：如果是领取，操作日志是“领取客户【】”；
+    // TODO @puhui999：如果是多条，则需要记录多条操作日志；不然 bizId 不好关联
     public void receiveCustomer(List<Long> ids, Long ownerUserId) {
         // 1.1 校验存在
         List<CrmCustomerDO> customers = customerMapper.selectBatchIds(ids);
@@ -280,7 +288,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         // 1.4  校验负责人是否到达上限
         validateCustomerExceedOwnerLimit(ownerUserId, customers.size());
 
-        // 2. 领取公海数据
+        // 2.1 领取公海数据
         List<CrmCustomerDO> updateCustomers = new ArrayList<>();
         List<CrmPermissionCreateReqBO> createPermissions = new ArrayList<>();
         customers.forEach(customer -> {
@@ -290,11 +298,11 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
             createPermissions.add(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
                     .setBizId(customer.getId()).setUserId(ownerUserId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
         });
-
-        // 3.1 更新客户负责人
+        // 2.2 更新客户负责人
         customerMapper.updateBatch(updateCustomers);
-        // 3.2 创建负责人数据权限
+        // 2.3 创建负责人数据权限
         permissionService.createPermissionBatch(createPermissions);
+        // TODO @芋艿：要不要处理关联的联系人？？？
     }
 
     private void validateCustomerOwnerExists(CrmCustomerDO customer, Boolean pool) {

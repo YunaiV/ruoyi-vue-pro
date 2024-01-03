@@ -136,7 +136,7 @@ public class CrmCustomerController {
     }
 
     @PutMapping("/transfer")
-    @Operation(summary = "客户转移")
+    @Operation(summary = "转移客户")
     @OperateLog(enable = false) // TODO 关闭原有日志记录
     @PreAuthorize("@ss.hasPermission('crm:customer:update')")
     public CommonResult<Boolean> transfer(@Valid @RequestBody CrmCustomerTransferReqVO reqVO) {
@@ -184,6 +184,7 @@ public class CrmCustomerController {
         return success(true);
     }
 
+    // TODO @puhui999：需要搞个 VO 类
     @PutMapping("/distribute")
     @Operation(summary = "分配公海给对应负责人")
     @Parameters({
@@ -193,7 +194,6 @@ public class CrmCustomerController {
     @PreAuthorize("@ss.hasPermission('crm:customer:distribute')")
     public CommonResult<Boolean> distributeCustomer(@RequestParam(value = "ids") List<Long> ids,
                                                     @RequestParam(value = "ownerUserId") Long ownerUserId) {
-        // 领取公海数据
         customerService.receiveCustomer(ids, ownerUserId);
         return success(true);
     }

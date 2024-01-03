@@ -121,7 +121,7 @@ public class CrmContactController {
     @PreAuthorize("@ss.hasPermission('crm:contact:query')")
     public CommonResult<PageResult<CrmContactRespVO>> getContactPage(@Valid CrmContactPageReqVO pageVO) {
         PageResult<CrmContactDO> pageResult = contactService.getContactPage(pageVO, getLoginUserId());
-        return success(convertDetailContactPage(pageResult));
+        return success(buildContactDetailPage(pageResult));
     }
 
     @GetMapping("/page-by-customer")
@@ -129,7 +129,7 @@ public class CrmContactController {
     public CommonResult<PageResult<CrmContactRespVO>> getContactPageByCustomer(@Valid CrmContactPageReqVO pageVO) {
         Assert.notNull(pageVO.getCustomerId(), "客户编号不能为空");
         PageResult<CrmContactDO> pageResult = contactService.getContactPageByCustomerId(pageVO);
-        return success(convertDetailContactPage(pageResult));
+        return success(buildContactDetailPage(pageResult));
     }
 
     @GetMapping("/export-excel")
@@ -141,16 +141,16 @@ public class CrmContactController {
         exportReqVO.setPageNo(PAGE_SIZE_NONE);
         PageResult<CrmContactDO> pageResult = contactService.getContactPage(exportReqVO, getLoginUserId());
         ExcelUtils.write(response, "联系人.xls", "数据", CrmContactRespVO.class,
-                convertDetailContactPage(pageResult).getList());
+                buildContactDetailPage(pageResult).getList());
     }
 
     /**
-     * 转换成详细的联系人分页，即读取关联信息
+     * 构建详细的联系人分页结果
      *
-     * @param pageResult 联系人分页
-     * @return 详细的联系人分页
+     * @param pageResult 简单的联系人分页结果
+     * @return 详细的联系人分页结果
      */
-    private PageResult<CrmContactRespVO> convertDetailContactPage(PageResult<CrmContactDO> pageResult) {
+    private PageResult<CrmContactRespVO> buildContactDetailPage(PageResult<CrmContactDO> pageResult) {
         List<CrmContactDO> contactList = pageResult.getList();
         if (CollUtil.isEmpty(contactList)) {
             return PageResult.empty(pageResult.getTotal());
@@ -175,10 +175,10 @@ public class CrmContactController {
         return success(true);
     }
 
-    // ================== 关联/取关商机  ===================
+    // ================== 关联/取关联系人  ===================
 
     @PostMapping("/create-business-list")
-    @Operation(summary = "创建联系人与商机的关联")
+    @Operation(summary = "创建联系人与联系人的关联")
     @PreAuthorize("@ss.hasPermission('crm:contact:create-business')")
     public CommonResult<Boolean> createContactBusinessList(@Valid @RequestBody CrmContactBusinessReqVO createReqVO) {
         contactBusinessLinkService.createContactBusinessList(createReqVO);
@@ -186,7 +186,7 @@ public class CrmContactController {
     }
 
     @DeleteMapping("/delete-business-list")
-    @Operation(summary = "删除联系人与商机的关联")
+    @Operation(summary = "删除联系人与联系人的关联")
     @PreAuthorize("@ss.hasPermission('crm:contact:delete-business')")
     public CommonResult<Boolean> deleteContactBusinessList(@Valid @RequestBody CrmContactBusinessReqVO deleteReqVO) {
         contactBusinessLinkService.deleteContactBusinessList(deleteReqVO);
