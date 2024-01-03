@@ -6,6 +6,7 @@ import cn.hutool.core.util.NumberUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.*;
@@ -61,6 +62,7 @@ public class CrmContactController {
     @Resource
     private CrmContactBusinessService contactBusinessLinkService;
 
+    // TODO @zyna：CrmContactCreateReqVO、CrmContactUpdateReqVO、CrmContactRespVO 按照新的 VO 规范搞哈；可以参考 dept 模块
     @PostMapping("/create")
     @Operation(summary = "创建联系人")
     @PreAuthorize("@ss.hasPermission('crm:contact:create')")
@@ -110,10 +112,11 @@ public class CrmContactController {
     @Operation(summary = "获得联系人列表")
     @PreAuthorize("@ss.hasPermission('crm:contact:query')")
     public CommonResult<List<CrmContactSimpleRespVO>> getSimpleContactList() {
+        // TODO @zyna：建议 contactService 单独搞个 list 接口哈
         CrmContactPageReqVO pageReqVO = new CrmContactPageReqVO();
         pageReqVO.setPageSize(PAGE_SIZE_NONE);
         List<CrmContactDO> list = contactService.getContactPage(pageReqVO, getLoginUserId()).getList();
-        return success(CrmContactConvert.INSTANCE.convertAllList(list));
+        return success(BeanUtils.toBean(list, CrmContactSimpleRespVO.class));
     }
 
     @GetMapping("/page")

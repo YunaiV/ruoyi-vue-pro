@@ -39,8 +39,6 @@ public interface CrmContactConvert {
 
     PageResult<CrmContactRespVO> convertPage(PageResult<CrmContactDO> page);
 
-    List<CrmContactSimpleRespVO> convertAllList(List<CrmContactDO> list);
-
     @Mapping(target = "bizId", source = "reqVO.id")
     CrmPermissionTransferReqBO convert(CrmContactTransferReqVO reqVO, Long userId);
 
