@@ -115,6 +115,7 @@ public class CrmCustomerDO extends BaseDO {
      * 最后跟进时间
      */
     private LocalDateTime contactLastTime;
+    // TODO @puhui999：增加一个字段 contactLastContent；最后跟进内容
     /**
      * 下次联系时间
      */
