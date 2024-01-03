@@ -13,6 +13,4 @@ public class CrmCustomerLockReqVO {
     @Schema(description = "客户锁定状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     private Boolean lockStatus;
 
-
-
 }

@@ -18,19 +18,19 @@ public enum CrmCustomerLimitConfigTypeEnum implements IntArrayValuable {
     /**
      * 拥有客户数限制
      */
-    CUSTOMER_QUANTITY_LIMIT(1, "拥有客户数限制"),
+    CUSTOMER_OWNER_LIMIT(1, "拥有客户数限制"),
     /**
      * 锁定客户数限制
      */
     CUSTOMER_LOCK_LIMIT(2, "锁定客户数限制"),
     ;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CrmCustomerLimitConfigTypeEnum::getCode).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CrmCustomerLimitConfigTypeEnum::getType).toArray();
 
     /**
      * 状态
      */
-    private final Integer code;
+    private final Integer type;
     /**
      * 状态名
      */

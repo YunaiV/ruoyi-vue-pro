@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.crm.dal.mysql.customer;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
@@ -9,6 +10,7 @@ import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.util.CrmQueryWrapperUtils;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.lang.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -20,6 +22,18 @@ import java.util.List;
  */
 @Mapper
 public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
+
+    default Long selectCountByLockStatusAndOwnerUserId(Boolean lockStatus, Long ownerUserId) {
+        return selectCount(new LambdaUpdateWrapper<CrmCustomerDO>()
+                .eq(CrmCustomerDO::getLockStatus, lockStatus)
+                .eq(CrmCustomerDO::getOwnerUserId, ownerUserId));
+    }
+
+    default Long selectCountByDealStatusAndOwnerUserId(@Nullable Boolean dealStatus, Long ownerUserId) {
+        return selectCount(new LambdaQueryWrapperX<CrmCustomerDO>()
+                .eqIfPresent(CrmCustomerDO::getDealStatus, dealStatus)
+                .eq(CrmCustomerDO::getOwnerUserId, ownerUserId));
+    }
 
     default int updateOwnerUserIdById(Long id, Long ownerUserId) {
         return update(new LambdaUpdateWrapper<CrmCustomerDO>()

@@ -154,13 +154,12 @@ public class CrmCustomerController {
         return success(operateLogApi.getOperateLogPage(BeanUtils.toBean(reqVO, OperateLogV2PageReqDTO.class)));
     }
 
-    // TODO @Joey：单独建一个属于自己业务的 ReqVO；因为前端如果模拟请求，是不是可以更新其它字段了；
     @PutMapping("/lock")
     @Operation(summary = "锁定/解锁客户")
     @OperateLog(enable = false) // TODO 关闭原有日志记录
     @PreAuthorize("@ss.hasPermission('crm:customer:update')")
     public CommonResult<Boolean> lockCustomer(@Valid @RequestBody CrmCustomerLockReqVO lockReqVO) {
-        customerService.lockCustomer(lockReqVO);
+        customerService.lockCustomer(lockReqVO, getLoginUserId());
         return success(true);
     }
 

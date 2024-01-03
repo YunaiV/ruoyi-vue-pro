@@ -5,16 +5,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.List;
-
 @Schema(description = "管理后台 - 客户限制配置创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class CrmCustomerLimitConfigCreateReqVO extends CrmCustomerLimitConfigBaseVO {
-
-
-    @Schema(description = "规则适用人群")
-    private Long userId;
 
 }

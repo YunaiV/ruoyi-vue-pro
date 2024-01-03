@@ -83,8 +83,9 @@ public interface CrmCustomerService {
      * 锁定/解锁客户
      *
      * @param lockReqVO 更新信息
+     * @param userId 用户编号
      */
-    void lockCustomer(@Valid CrmCustomerLockReqVO lockReqVO);
+    void lockCustomer(@Valid CrmCustomerLockReqVO lockReqVO, Long userId);
 
     // ==================== 公海相关操作 ====================
 
