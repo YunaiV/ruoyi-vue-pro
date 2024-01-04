@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.crm.controller.admin.customer;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
@@ -19,7 +18,6 @@ import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
@@ -58,28 +56,24 @@ public class CrmCustomerController {
     @Resource
     private OperateLogApi operateLogApi;
 
-    // TODO @puhui999：把 CrmCustomerCreateReqVO、CrmCustomerUpdateReqVO、CrmCustomerRespVO 按照新的规范，搞一下哈；
     @PostMapping("/create")
     @Operation(summary = "创建客户")
-    @OperateLog(enable = false) // TODO 关闭原有日志记录；@puhui999：注解都先删除。先记录，没关系。我们下个迭代，就都删除掉操作日志了；
     @PreAuthorize("@ss.hasPermission('crm:customer:create')")
-    public CommonResult<Long> createCustomer(@Valid @RequestBody CrmCustomerCreateReqVO createReqVO) {
+    public CommonResult<Long> createCustomer(@Valid @RequestBody CrmCustomerSaveReqVO createReqVO) {
         return success(customerService.createCustomer(createReqVO, getLoginUserId()));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新客户")
-    @OperateLog(enable = false) // TODO 关闭原有日志记录
     @PreAuthorize("@ss.hasPermission('crm:customer:update')")
-    public CommonResult<Boolean> updateCustomer(@Valid @RequestBody CrmCustomerUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateCustomer(@Valid @RequestBody CrmCustomerSaveReqVO updateReqVO) {
         customerService.updateCustomer(updateReqVO);
         return success(true);
     }
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除客户")
-    @OperateLog(enable = false) // TODO 关闭原有日志记录
-    @Parameter(name = "id", description = "编号", required = true)
+    @Parameter(name = "id", description = "客户编号", required = true)
     @PreAuthorize("@ss.hasPermission('crm:customer:delete')")
     public CommonResult<Boolean> deleteCustomer(@RequestParam("id") Long id) {
         customerService.deleteCustomer(id);
@@ -103,7 +97,6 @@ public class CrmCustomerController {
         return success(CrmCustomerConvert.INSTANCE.convert(customer, userMap, deptMap));
     }
 
-    // TODO @puhui999：这个查询会查出多个；微信发你图了
     @GetMapping("/page")
     @Operation(summary = "获得客户分页")
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
@@ -131,32 +124,32 @@ public class CrmCustomerController {
         pageVO.setPageSize(PAGE_SIZE_NONE); // 不分页
         List<CrmCustomerDO> list = customerService.getCustomerPage(pageVO, getLoginUserId()).getList();
         // 导出 Excel
-        List<CrmCustomerExcelVO> datas = CrmCustomerConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "客户.xls", "数据", CrmCustomerExcelVO.class, datas);
+        List<CrmCustomerRespVO> datas = CrmCustomerConvert.INSTANCE.convertList02(list);
+        ExcelUtils.write(response, "客户.xls", "数据", CrmCustomerRespVO.class, datas);
     }
 
     @PutMapping("/transfer")
     @Operation(summary = "转移客户")
-    @OperateLog(enable = false) // TODO 关闭原有日志记录
     @PreAuthorize("@ss.hasPermission('crm:customer:update')")
     public CommonResult<Boolean> transfer(@Valid @RequestBody CrmCustomerTransferReqVO reqVO) {
         customerService.transferCustomer(reqVO, getLoginUserId());
         return success(true);
     }
 
-    // TODO @puhui999：是不是接口只要传递 bizId，由 Controller 自己组装出 OperateLogV2PageReqDTO
     @GetMapping("/operate-log-page")
     @Operation(summary = "获得客户操作日志")
+    @Parameter(name = "id", description = "客户编号", required = true)
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
-    public CommonResult<PageResult<OperateLogV2RespDTO>> getCustomerOperateLog(CrmCustomerOperateLogPageReqVO reqVO) {
-        reqVO.setPageSize(PAGE_SIZE_NONE); // 不分页
-        reqVO.setBizType(CRM_CUSTOMER);
-        return success(operateLogApi.getOperateLogPage(BeanUtils.toBean(reqVO, OperateLogV2PageReqDTO.class)));
+    public CommonResult<PageResult<OperateLogV2RespDTO>> getCustomerOperateLog(@RequestParam("id") Long id) {
+        OperateLogV2PageReqDTO reqDTO = new OperateLogV2PageReqDTO();
+        reqDTO.setPageSize(PAGE_SIZE_NONE); // 不分页
+        reqDTO.setBizType(CRM_CUSTOMER);
+        reqDTO.setBizId(id);
+        return success(operateLogApi.getOperateLogPage(reqDTO));
     }
 
     @PutMapping("/lock")
     @Operation(summary = "锁定/解锁客户")
-    @OperateLog(enable = false) // TODO 关闭原有日志记录
     @PreAuthorize("@ss.hasPermission('crm:customer:update')")
     public CommonResult<Boolean> lockCustomer(@Valid @RequestBody CrmCustomerLockReqVO lockReqVO) {
         customerService.lockCustomer(lockReqVO, getLoginUserId());
@@ -167,7 +160,6 @@ public class CrmCustomerController {
 
     @PutMapping("/put-pool")
     @Operation(summary = "数据放入公海")
-    @OperateLog(enable = false) // TODO 关闭原有日志记录
     @Parameter(name = "id", description = "客户编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('crm:customer:update')")
     public CommonResult<Boolean> putCustomerPool(@RequestParam("id") Long id) {
@@ -184,28 +176,22 @@ public class CrmCustomerController {
         return success(true);
     }
 
-    // TODO @puhui999：需要搞个 VO 类
     @PutMapping("/distribute")
     @Operation(summary = "分配公海给对应负责人")
-    @Parameters({
-            @Parameter(name = "ids", description = "客户编号数组", required = true, example = "1,2,3"),
-            @Parameter(name = "ownerUserId", description = "分配的负责人编号", required = true, example = "12345")
-    })
     @PreAuthorize("@ss.hasPermission('crm:customer:distribute')")
-    public CommonResult<Boolean> distributeCustomer(@RequestParam(value = "ids") List<Long> ids,
-                                                    @RequestParam(value = "ownerUserId") Long ownerUserId) {
-        customerService.receiveCustomer(ids, ownerUserId);
+    public CommonResult<Boolean> distributeCustomer(@Valid @RequestBody CrmCustomerDistributeReqVO distributeReqVO) {
+        customerService.receiveCustomer(distributeReqVO.getIds(), distributeReqVO.getOwnerUserId());
         return success(true);
     }
 
     // TODO 芋艿：这个接口要调整下
-    @GetMapping("/query-all-list")
-    @Operation(summary = "查询客户列表")
-    @PreAuthorize("@ss.hasPermission('crm:customer:all')")
-    public CommonResult<List<CrmCustomerQueryAllRespVO>> queryAll() {
-        List<CrmCustomerDO> crmCustomerDOList = customerService.getCustomerList();
-        List<CrmCustomerQueryAllRespVO> data = CrmCustomerConvert.INSTANCE.convertQueryAll(crmCustomerDOList);
-        return success(data);
-    }
+    //@GetMapping("/query-all-list")
+    //@Operation(summary = "查询客户列表")
+    //@PreAuthorize("@ss.hasPermission('crm:customer:all')")
+    //public CommonResult<List<CrmCustomerQueryAllRespVO>> queryAll() {
+    //    List<CrmCustomerDO> crmCustomerDOList = customerService.getCustomerList();
+    //    List<CrmCustomerQueryAllRespVO> data = CrmCustomerConvert.INSTANCE.convertQueryAll(crmCustomerDOList);
+    //    return success(data);
+    //}
 
 }

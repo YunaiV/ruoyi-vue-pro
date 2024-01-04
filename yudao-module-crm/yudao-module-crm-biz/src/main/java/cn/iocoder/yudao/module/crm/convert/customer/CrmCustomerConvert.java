@@ -2,7 +2,9 @@ package cn.iocoder.yudao.module.crm.convert.customer;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerSaveReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTransferReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.poolconfig.CrmCustomerPoolConfigRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.poolconfig.CrmCustomerPoolConfigSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
@@ -29,9 +31,7 @@ public interface CrmCustomerConvert {
 
     CrmCustomerConvert INSTANCE = Mappers.getMapper(CrmCustomerConvert.class);
 
-    CrmCustomerDO convert(CrmCustomerCreateReqVO bean);
-
-    CrmCustomerDO convert(CrmCustomerUpdateReqVO bean);
+    CrmCustomerDO convert(CrmCustomerSaveReqVO bean);
 
     CrmCustomerRespVO convert(CrmCustomerDO bean);
 
@@ -51,7 +51,7 @@ public interface CrmCustomerConvert {
         findAndThen(userMap, Long.parseLong(customer.getCreator()), user -> customer.setCreatorName(user.getNickname()));
     }
 
-    List<CrmCustomerExcelVO> convertList02(List<CrmCustomerDO> list);
+    List<CrmCustomerRespVO> convertList02(List<CrmCustomerDO> list);
 
     @Mapping(target = "bizId", source = "reqVO.id")
     CrmPermissionTransferReqBO convert(CrmCustomerTransferReqVO reqVO, Long userId);
@@ -75,7 +75,5 @@ public interface CrmCustomerConvert {
     CrmCustomerPoolConfigRespVO convert(CrmCustomerPoolConfigDO customerPoolConfig);
 
     CrmCustomerPoolConfigDO convert(CrmCustomerPoolConfigSaveReqVO updateReqVO);
-
-    List<CrmCustomerQueryAllRespVO> convertQueryAll(List<CrmCustomerDO> crmCustomerDO);
 
 }

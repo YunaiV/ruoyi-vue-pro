@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.crm.service.customer;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerLockReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerSaveReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTransferReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import jakarta.validation.Valid;
 
@@ -22,14 +25,14 @@ public interface CrmCustomerService {
      * @param userId      用户编号
      * @return 编号
      */
-    Long createCustomer(@Valid CrmCustomerCreateReqVO createReqVO, Long userId);
+    Long createCustomer(@Valid CrmCustomerSaveReqVO createReqVO, Long userId);
 
     /**
      * 更新客户
      *
      * @param updateReqVO 更新信息
      */
-    void updateCustomer(@Valid CrmCustomerUpdateReqVO updateReqVO);
+    void updateCustomer(@Valid CrmCustomerSaveReqVO updateReqVO);
 
     /**
      * 删除客户

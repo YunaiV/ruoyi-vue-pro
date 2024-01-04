@@ -1,10 +1,14 @@
 package cn.iocoder.yudao.module.crm.service.customer;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerLockReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerSaveReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTransferReqVO;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerLimitConfigDO;
@@ -24,7 +28,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
@@ -56,8 +63,10 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_CUSTOMER, subType = "创建客户", bizNo = "{{#customerId}}", success = "创建了客户") // TODO @puhui999：创建了客户【客户名】，要记录进去；不然在展示操作日志的全列表，看不清楚是哪个客户哈；
-    public Long createCustomer(CrmCustomerCreateReqVO createReqVO, Long userId) {
+    @LogRecord(type = CRM_CUSTOMER, subType = "创建客户", bizNo = "{{#customerId}}", success = "创建了客户")
+    // TODO @puhui999：创建了客户【客户名】，要记录进去；不然在展示操作日志的全列表，看不清楚是哪个客户哈；
+    public Long createCustomer(CrmCustomerSaveReqVO createReqVO, Long userId) {
+        createReqVO.setId(null);
         // 1. 校验拥有客户是否到达上限
         validateCustomerExceedOwnerLimit(createReqVO.getOwnerUserId(), 1);
 
@@ -81,8 +90,10 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_CUSTOMER, subType = "更新客户", bizNo = "{{#updateReqVO.id}}", success = "更新了客户{_DIFF{#updateReqVO}}", extra = "{{#extra}}")
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
-    public void updateCustomer(CrmCustomerUpdateReqVO updateReqVO) {
-        // TODO @puhui999：更新的时候，要把 updateReqVO 负责人设置为空，避免修改。
+    public void updateCustomer(CrmCustomerSaveReqVO updateReqVO) {
+        Assert.notNull(updateReqVO.getId(), "客户编号不能为空");
+        // 更新的时候，要把 updateReqVO 负责人设置为空，避免修改。
+        updateReqVO.setOwnerUserId(null);
         // 1. 校验存在
         CrmCustomerDO oldCustomer = validateCustomerExists(updateReqVO.getId());
 
@@ -91,11 +102,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         customerMapper.updateById(updateObj);
 
         // 3. 记录操作日志
-        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldCustomer, CrmCustomerUpdateReqVO.class));
-        // TODO 扩展信息测试 @puhui999：看着没啥问题，可以删除啦；
-        HashMap<String, Object> extra = new HashMap<>();
-        extra.put("tips", "随便记录一点啦");
-        LogRecordContext.putVariable("extra", extra);
+        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldCustomer, CrmCustomerSaveReqVO.class));
     }
 
     @Override
@@ -197,7 +204,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     /**
      * 校验用户拥有的客户数量，是否到达上限
      *
-     * @param userId 用户编号
+     * @param userId   用户编号
      * @param newCount 附加数量
      */
     private void validateCustomerExceedOwnerLimit(Long userId, int newCount) {
@@ -237,7 +244,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_CUSTOMER, subType = "客户放入公海", bizNo = "{{#id}}", success = "将客户放入了公海") // TODO @puhui999：将客户【】放入了公海
+    @LogRecord(type = CRM_CUSTOMER, subType = "客户放入公海", bizNo = "{{#id}}", success = "将客户放入了公海")
+    // TODO @puhui999：将客户【】放入了公海
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void putCustomerPool(Long id) {
         // 1. 校验存在
