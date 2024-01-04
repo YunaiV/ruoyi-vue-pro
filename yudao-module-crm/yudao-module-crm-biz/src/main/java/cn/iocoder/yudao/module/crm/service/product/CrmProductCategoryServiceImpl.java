@@ -35,6 +35,7 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
     private CrmProductService crmProductService;
 
     @Override
+    // TODO @puhui999：操作日志
     public Long createProductCategory(CrmProductCategoryCreateReqVO createReqVO) {
         // 1.1 校验父分类存在
         validateParentProductCategory(createReqVO.getParentId());
@@ -47,6 +48,7 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
     }
 
     @Override
+    // TODO @puhui999：操作日志
     public void updateProductCategory(CrmProductCategoryCreateReqVO updateReqVO) {
         // 1.1 校验存在
         validateProductCategoryExists(updateReqVO.getId());
@@ -91,6 +93,7 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
     }
 
     @Override
+    // TODO @puhui999：操作日志
     public void deleteProductCategory(Long id) {
         // 1.1 校验存在
         validateProductCategoryExists(id);

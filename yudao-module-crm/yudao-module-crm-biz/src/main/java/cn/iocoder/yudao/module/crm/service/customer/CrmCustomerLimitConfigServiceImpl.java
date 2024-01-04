@@ -40,6 +40,7 @@ public class CrmCustomerLimitConfigServiceImpl implements CrmCustomerLimitConfig
     private AdminUserApi adminUserApi;
 
     @Override
+    // TODO @puhui999：操作日志
     public Long createCustomerLimitConfig(CrmCustomerLimitConfigCreateReqVO createReqVO) {
         validateUserAndDept(createReqVO.getUserIds(), createReqVO.getDeptIds());
         // 插入
@@ -50,6 +51,7 @@ public class CrmCustomerLimitConfigServiceImpl implements CrmCustomerLimitConfig
     }
 
     @Override
+    // TODO @puhui999：操作日志
     public void updateCustomerLimitConfig(CrmCustomerLimitConfigUpdateReqVO updateReqVO) {
         // 校验存在
         validateCustomerLimitConfigExists(updateReqVO.getId());
@@ -60,6 +62,7 @@ public class CrmCustomerLimitConfigServiceImpl implements CrmCustomerLimitConfig
     }
 
     @Override
+    // TODO @puhui999：操作日志
     public void deleteCustomerLimitConfig(Long id) {
         // 校验存在
         validateCustomerLimitConfigExists(id);
