@@ -123,10 +123,10 @@ public class CrmReceivablePlanController {
     }
 
     /**
-     * 转换成详细的回款计划分页，即读取关联信息
+     * 构建详细的回款计划分页结果
      *
-     * @param pageResult 回款计划分页
-     * @return 详细的回款计划分页
+     * @param pageResult 简单的回款计划分页结果
+     * @return 详细的回款计划分页结果
      */
     private PageResult<CrmReceivablePlanRespVO> convertDetailReceivablePlanPage(PageResult<CrmReceivablePlanDO> pageResult) {
         List<CrmReceivablePlanDO> receivablePlanList = pageResult.getList();
@@ -135,7 +135,7 @@ public class CrmReceivablePlanController {
         }
         // 1. 获取客户列表
         List<CrmCustomerDO> customerList = customerService.getCustomerList(
-                convertSet(receivablePlanList, CrmReceivablePlanDO::getCustomerId), getLoginUserId());
+                convertSet(receivablePlanList, CrmReceivablePlanDO::getCustomerId));
         // 2. 获取创建人、负责人列表
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(receivablePlanList,
                 contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getOwnerUserId())));

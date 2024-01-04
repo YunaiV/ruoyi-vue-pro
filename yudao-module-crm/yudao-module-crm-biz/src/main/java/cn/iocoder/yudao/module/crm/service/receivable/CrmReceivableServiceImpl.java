@@ -53,10 +53,10 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
     @Resource
     private CrmPermissionService crmPermissionService;
 
-    // TODO @liuhongfeng：创建还款后，是不是什么时候，要更新 plan？
     @Override
+    // TODO @puhui999：操作日志
     public Long createReceivable(CrmReceivableCreateReqVO createReqVO) {
-        // 插入
+        // 插入还款
         CrmReceivableDO receivable = CrmReceivableConvert.INSTANCE.convert(createReqVO);
         if (ObjectUtil.isNull(receivable.getAuditStatus())) {
             receivable.setAuditStatus(CommonStatusEnum.ENABLE.getStatus());
@@ -64,15 +64,17 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
         receivable.setAuditStatus(CrmAuditStatusEnum.DRAFT.getStatus());
 
         // TODO @liuhongfeng：一般来说，逻辑的写法，是要先检查，后操作 db；所以，你这个 check 应该放到  CrmReceivableDO receivable 之前；
-        // 校验
         checkReceivable(receivable);
 
         receivableMapper.insert(receivable);
+
+        // TODO @liuhongfeng：需要更新关联的 plan
         return receivable.getId();
     }
 
     // TODO @liuhongfeng：这里的括号要注意排版；
     private void checkReceivable(CrmReceivableDO receivable) {
+        // TODO @liuhongfeng：校验 no 的唯一性
         // TODO @liuhongfeng：这个放在参数校验合适
         if (ObjectUtil.isNull(receivable.getContractId())) {
             throw exception(CONTRACT_NOT_EXISTS);
@@ -96,17 +98,29 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
     }
 
     @Override
+    // TODO @puhui999：操作日志
+    // TODO @puhui999：权限校验
     public void updateReceivable(CrmReceivableUpdateReqVO updateReqVO) {
         // 校验存在
         validateReceivableExists(updateReqVO.getId());
+        // TODO @liuhongfeng：只有在草稿、审核中，可以提交修改
 
-        // 更新
+        // 更新还款
         CrmReceivableDO updateObj = CrmReceivableConvert.INSTANCE.convert(updateReqVO);
         receivableMapper.updateById(updateObj);
+
+        // TODO @liuhongfeng：需要更新关联的 plan
     }
 
+    // TODO @liuhongfeng：缺一个取消合同的接口；只有草稿、审批中可以取消；CrmAuditStatusEnum
+
+    // TODO @liuhongfeng：缺一个发起审批的接口；只有草稿可以发起审批；CrmAuditStatusEnum
+
     @Override
+    // TODO @puhui999：操作日志
+    // TODO @puhui999：权限校验
     public void deleteReceivable(Long id) {
+        // TODO @liuhongfeng：如果被 CrmReceivablePlanDO 所使用，则不允许删除
         // 校验存在
         validateReceivableExists(id);
         // 删除

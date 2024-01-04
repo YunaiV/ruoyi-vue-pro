@@ -48,6 +48,7 @@ public class CrmProductServiceImpl implements CrmProductService {
     private AdminUserApi adminUserApi;
 
     @Override
+    // TODO @puhui999：操作日志
     public Long createProduct(CrmProductSaveReqVO createReqVO) {
         // 校验产品
         adminUserApi.validateUserList(Collections.singleton(createReqVO.getOwnerUserId()));
@@ -66,6 +67,7 @@ public class CrmProductServiceImpl implements CrmProductService {
     }
 
     @Override
+    // TODO @puhui999：操作日志
     public void updateProduct(CrmProductSaveReqVO updateReqVO) {
         // 校验产品
         updateReqVO.setOwnerUserId(null); // 不修改负责人
@@ -102,6 +104,7 @@ public class CrmProductServiceImpl implements CrmProductService {
     }
 
     @Override
+    // TODO @puhui999：操作日志
     public void deleteProduct(Long id) {
         // 校验存在
         validateProductExists(id);

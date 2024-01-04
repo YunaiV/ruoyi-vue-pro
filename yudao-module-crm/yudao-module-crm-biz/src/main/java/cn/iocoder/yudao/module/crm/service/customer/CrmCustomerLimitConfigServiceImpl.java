@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.crm.service.customer;
 
+import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigPageReqVO;
@@ -9,12 +10,14 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerLimitConfi
 import cn.iocoder.yudao.module.crm.dal.mysql.customer.CrmCustomerLimitConfigMapper;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import jakarta.annotation.Resource;
 
 import java.util.Collection;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CUSTOMER_LIMIT_CONFIG_NOT_EXISTS;
@@ -30,12 +33,14 @@ public class CrmCustomerLimitConfigServiceImpl implements CrmCustomerLimitConfig
 
     @Resource
     private CrmCustomerLimitConfigMapper customerLimitConfigMapper;
+
     @Resource
     private DeptApi deptApi;
     @Resource
     private AdminUserApi adminUserApi;
 
     @Override
+    // TODO @puhui999：操作日志
     public Long createCustomerLimitConfig(CrmCustomerLimitConfigCreateReqVO createReqVO) {
         validateUserAndDept(createReqVO.getUserIds(), createReqVO.getDeptIds());
         // 插入
@@ -46,6 +51,7 @@ public class CrmCustomerLimitConfigServiceImpl implements CrmCustomerLimitConfig
     }
 
     @Override
+    // TODO @puhui999：操作日志
     public void updateCustomerLimitConfig(CrmCustomerLimitConfigUpdateReqVO updateReqVO) {
         // 校验存在
         validateCustomerLimitConfigExists(updateReqVO.getId());
@@ -56,6 +62,7 @@ public class CrmCustomerLimitConfigServiceImpl implements CrmCustomerLimitConfig
     }
 
     @Override
+    // TODO @puhui999：操作日志
     public void deleteCustomerLimitConfig(Long id) {
         // 校验存在
         validateCustomerLimitConfigExists(id);
@@ -88,6 +95,13 @@ public class CrmCustomerLimitConfigServiceImpl implements CrmCustomerLimitConfig
     private void validateUserAndDept(Collection<Long> userIds, Collection<Long> deptIds) {
         deptApi.validateDeptList(deptIds);
         adminUserApi.validateUserList(userIds);
+    }
+
+    @Override
+    public List<CrmCustomerLimitConfigDO> getCustomerLimitConfigListByUserId(Integer type, Long userId) {
+        AdminUserRespDTO user = adminUserApi.getUser(userId);
+        Assert.notNull(user, "用户({})不存在", userId);
+        return customerLimitConfigMapper.selectListByTypeAndUserIdAndDeptId(type, userId, user.getDeptId());
     }
 
 }

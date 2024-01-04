@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusi
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessTransferReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import jakarta.validation.Valid;
 
@@ -75,9 +76,19 @@ public interface CrmBusinessService {
      * 数据权限：基于 {@link CrmCustomerDO} 读取
      *
      * @param pageReqVO 分页查询
-     * @return 联系人分页
+     * @return 商机分页
      */
     PageResult<CrmBusinessDO> getBusinessPageByCustomerId(CrmBusinessPageReqVO pageReqVO);
+
+    /**
+     * 获得商机分页，基于指定联系人
+     *
+     * 数据权限：基于 {@link CrmContactDO} 读取
+     *
+     * @param pageReqVO 分页参数
+     * @return 商机分页
+     */
+    PageResult<CrmBusinessDO> getBusinessPageByContact(CrmBusinessPageReqVO pageReqVO);
 
     /**
      * 商机转移

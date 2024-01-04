@@ -88,7 +88,7 @@ public class CrmContractController {
     @PreAuthorize("@ss.hasPermission('crm:contract:query')")
     public CommonResult<PageResult<ContractRespVO>> getContractPage(@Valid CrmContractPageReqVO pageVO) {
         PageResult<CrmContractDO> pageResult = contractService.getContractPage(pageVO, getLoginUserId());
-        return success(convertDetailContractPage(pageResult));
+        return success(buildContractDetailPage(pageResult));
     }
 
     @GetMapping("/page-by-customer")
@@ -96,7 +96,7 @@ public class CrmContractController {
     public CommonResult<PageResult<ContractRespVO>> getContractPageByCustomer(@Valid CrmContractPageReqVO pageVO) {
         Assert.notNull(pageVO.getCustomerId(), "客户编号不能为空");
         PageResult<CrmContractDO> pageResult = contractService.getContractPageByCustomerId(pageVO);
-        return success(convertDetailContractPage(pageResult));
+        return success(buildContractDetailPage(pageResult));
     }
 
     @GetMapping("/export-excel")
@@ -112,19 +112,19 @@ public class CrmContractController {
     }
 
     /**
-     * 转换成详细的合同分页，即读取关联信息
+     * 构建详细的合同分页结果
      *
-     * @param pageResult 合同分页
-     * @return 详细的合同分页
+     * @param pageResult 简单的合同分页结果
+     * @return 详细的合同分页结果
      */
-    private PageResult<ContractRespVO> convertDetailContractPage(PageResult<CrmContractDO> pageResult) {
+    private PageResult<ContractRespVO> buildContractDetailPage(PageResult<CrmContractDO> pageResult) {
         List<CrmContractDO> contactList = pageResult.getList();
         if (CollUtil.isEmpty(contactList)) {
             return PageResult.empty(pageResult.getTotal());
         }
         // 1. 获取客户列表
         List<CrmCustomerDO> customerList = customerService.getCustomerList(
-                convertSet(contactList, CrmContractDO::getCustomerId), getLoginUserId());
+                convertSet(contactList, CrmContractDO::getCustomerId));
         // 2. 获取创建人、负责人列表
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(contactList,
                 contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getOwnerUserId())));
