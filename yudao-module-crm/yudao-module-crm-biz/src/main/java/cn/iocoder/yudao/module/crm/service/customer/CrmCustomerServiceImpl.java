@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.crm.service.customer;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -247,13 +248,15 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
             user = adminUserApi.getUser(ownerUserId);
         }
         for (CrmCustomerDO customer : customers) {
-            receiveCustomerLog(customer, user == null ? null : user.getNickname());
+            getSelf().receiveCustomerLog(customer, user == null ? null : user.getNickname());
         }
     }
 
     @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_RECEIVE_SUB_TYPE, bizNo = "{{#customer.id}}", success = CRM_CUSTOMER_RECEIVE_SUCCESS)
     public void receiveCustomerLog(CrmCustomerDO customer, String ownerUserName) {
-
+        // 记录操作日志上下文
+        LogRecordContext.putVariable("customer", customer);
+        LogRecordContext.putVariable("ownerUserName", ownerUserName);
     }
 
     //======================= 查询相关 =======================
@@ -362,6 +365,16 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         if (lockCount >= maxCount) {
             throw exception(CUSTOMER_LOCK_EXCEED_LIMIT);
         }
+    }
+
+
+    /**
+     * 获得自身的代理对象，解决 AOP 生效问题
+     *
+     * @return 自己
+     */
+    private CrmCustomerServiceImpl getSelf() {
+        return SpringUtil.getBean(getClass());
     }
 
 }

@@ -35,10 +35,12 @@ public interface OperateLogConvert {
         return BeanUtils.toBean(operateLogPage, OperateLogV2RespDTO.class).setList(setUserInfo(operateLogPage.getList(), userList));
     }
 
-    private static List<OperateLogV2RespDTO> setUserInfo(List<OperateLogV2DO> logList, List<AdminUserDO> userList) {
+    OperateLogV2RespDTO convert(OperateLogV2DO operateLogV2DO);
+
+    private List<OperateLogV2RespDTO> setUserInfo(List<OperateLogV2DO> logList, List<AdminUserDO> userList) {
         Map<Long, AdminUserDO> userMap = convertMap(userList, AdminUserDO::getId);
         return CollectionUtils.convertList(logList, item -> {
-            OperateLogV2RespDTO respDTO = BeanUtils.toBean(item, OperateLogV2RespDTO.class);
+            OperateLogV2RespDTO respDTO = convert(item);
             findAndThen(userMap, item.getUserId(), user -> respDTO.setUserName(user.getNickname()));
             return respDTO;
         });

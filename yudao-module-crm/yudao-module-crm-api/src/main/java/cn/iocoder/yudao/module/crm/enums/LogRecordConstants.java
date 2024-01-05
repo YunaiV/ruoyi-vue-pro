@@ -18,17 +18,17 @@ public interface LogRecordConstants {
     String CRM_CUSTOMER_CREATE_SUB_TYPE = "创建客户";
     String CRM_CUSTOMER_CREATE_SUCCESS = "创建了客户{{#customer.name}}";
     String CRM_CUSTOMER_UPDATE_SUB_TYPE = "更新客户";
-    String CRM_CUSTOMER_UPDATE_SUCCESS = "更新了客户【{{#customerName}}】{_DIFF{#updateReqVO}}";
+    String CRM_CUSTOMER_UPDATE_SUCCESS = "更新了客户【{{#customerName}}】: {_DIFF{#updateReqVO}}";
     String CRM_CUSTOMER_DELETE_SUB_TYPE = "删除客户";
     String CRM_CUSTOMER_DELETE_SUCCESS = "删除了客户【{{#customerName}}】";
     String CRM_CUSTOMER_TRANSFER_SUB_TYPE = "转移客户";
     String CRM_CUSTOMER_TRANSFER_SUCCESS = "将客户【{{#crmCustomer.name}}】的负责人从【{getAdminUserById{#crmCustomer.ownerUserId}}】变更为了【{getAdminUserById{#reqVO.newOwnerUserId}}】";
     String CRM_CUSTOMER_LOCK_SUB_TYPE = "{{#crmCustomer.lockStatus ? '锁定客户' : '解锁客户'}}";
-    String CRM_CUSTOMER_LOCK_SUCCESS = "{{#crmCustomer.lockStatus ? '将客户【#crmCustomer.name】锁定' : '将客户【#crmCustomer.name】解锁'}}";
+    String CRM_CUSTOMER_LOCK_SUCCESS = "{{#crmCustomer.lockStatus ? '将客户【' + #crmCustomer.name + '】锁定' : '将客户【' + #crmCustomer.name + '】解锁'}}";
     String CRM_CUSTOMER_POOL_SUB_TYPE = "客户放入公海";
     String CRM_CUSTOMER_POOL_SUCCESS = "将客户【{{#customerName}}】放入了公海";
     String CRM_CUSTOMER_RECEIVE_SUB_TYPE = "{{#ownerUserName != null ? '分配客户' : '领取客户'}}";
-    String CRM_CUSTOMER_RECEIVE_SUCCESS = "{{#ownerUserName != null ? '将客户【#customer.name】分配给【#ownerUserName】' : '领取客户【#customer.name】'}}";
+    String CRM_CUSTOMER_RECEIVE_SUCCESS = "{{#ownerUserName != null ? '将客户【' + #customer.name + '】分配给【' + #ownerUserName + '】' : '领取客户【' + #customer.name + '】'}}";
 
     // ======================= CRM_CONTACT 联系人 =======================
 
