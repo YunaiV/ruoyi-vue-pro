@@ -87,10 +87,6 @@ public class TradeConfigBaseVO {
     @PositiveOrZero(message = "用户提现手续费百分比不能是负数")
     private Integer brokerageWithdrawFeePercent;
 
-    @Schema(description = "提现银行", requiredMode = Schema.RequiredMode.REQUIRED, example = "[0, 1]")
-    @NotEmpty(message = "提现银行不能为空")
-    private List<Integer> brokerageBankNames;
-
     @Schema(description = "佣金冻结时间(天)", requiredMode = Schema.RequiredMode.REQUIRED, example = "7")
     @NotNull(message = "佣金冻结时间(天)不能为空")
     @PositiveOrZero(message = "佣金冻结时间不能是负数")

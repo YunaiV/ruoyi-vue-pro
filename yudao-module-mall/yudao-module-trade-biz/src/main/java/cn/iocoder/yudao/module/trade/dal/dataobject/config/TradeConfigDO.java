@@ -104,11 +104,6 @@ public class TradeConfigDO extends BaseDO {
      */
     private Integer brokerageWithdrawFeePercent;
     /**
-     * 提现银行
-     */
-    @TableField(typeHandler = IntegerListTypeHandler.class)
-    private List<Integer> brokerageBankNames;
-    /**
      * 佣金冻结时间(天)
      */
     private Integer brokerageFrozenDays;
