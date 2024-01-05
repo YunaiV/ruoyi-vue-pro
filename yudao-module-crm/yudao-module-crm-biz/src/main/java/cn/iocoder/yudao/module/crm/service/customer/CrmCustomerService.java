@@ -86,7 +86,7 @@ public interface CrmCustomerService {
      * 锁定/解锁客户
      *
      * @param lockReqVO 更新信息
-     * @param userId 用户编号
+     * @param userId    用户编号
      */
     void lockCustomer(@Valid CrmCustomerLockReqVO lockReqVO, Long userId);
 
@@ -104,15 +104,8 @@ public interface CrmCustomerService {
      *
      * @param ids         要领取的客户编号数组
      * @param ownerUserId 负责人
+     * @param isReceive   是/否领取
      */
-    void receiveCustomer(List<Long> ids, Long ownerUserId);
-
-    /**
-     * 获取客户列表
-     *
-     * @return 客户列表
-     * @author zyna
-     */
-    List<CrmCustomerDO> getCustomerList();
+    void receiveCustomer(List<Long> ids, Long ownerUserId, Boolean isReceive);
 
 }

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.crm.controller.admin.customer;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
@@ -38,7 +39,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSetByFlatMap;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
-import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.CRM_CUSTOMER;
+import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.CRM_CUSTOMER_TYPE;
 
 @Tag(name = "管理后台 - CRM 客户")
 @RestController
@@ -115,6 +116,15 @@ public class CrmCustomerController {
         return success(CrmCustomerConvert.INSTANCE.convertPage(pageResult, userMap, deptMap));
     }
 
+    @GetMapping(value = {"/list-all-simple"})
+    @Operation(summary = "获取客户精简信息列表", description = "只包含有读权限的客户，主要用于前端的下拉选项")
+    public CommonResult<List<CrmCustomerSimpleRespVO>> getSimpleDeptList() {
+        CrmCustomerPageReqVO reqVO = new CrmCustomerPageReqVO();
+        reqVO.setPageSize(PAGE_SIZE_NONE); // 不分页
+        List<CrmCustomerDO> list = customerService.getCustomerPage(reqVO, getLoginUserId()).getList();
+        return success(BeanUtils.toBean(list, CrmCustomerSimpleRespVO.class));
+    }
+
     @GetMapping("/export-excel")
     @Operation(summary = "导出客户 Excel")
     @PreAuthorize("@ss.hasPermission('crm:customer:export')")
@@ -143,7 +153,7 @@ public class CrmCustomerController {
     public CommonResult<PageResult<OperateLogV2RespDTO>> getCustomerOperateLog(@RequestParam("id") Long id) {
         OperateLogV2PageReqDTO reqDTO = new OperateLogV2PageReqDTO();
         reqDTO.setPageSize(PAGE_SIZE_NONE); // 不分页
-        reqDTO.setBizType(CRM_CUSTOMER);
+        reqDTO.setBizType(CRM_CUSTOMER_TYPE);
         reqDTO.setBizId(id);
         return success(operateLogApi.getOperateLogPage(reqDTO));
     }
@@ -172,7 +182,7 @@ public class CrmCustomerController {
     @Parameter(name = "ids", description = "编号数组", required = true, example = "1,2,3")
     @PreAuthorize("@ss.hasPermission('crm:customer:receive')")
     public CommonResult<Boolean> receiveCustomer(@RequestParam(value = "ids") List<Long> ids) {
-        customerService.receiveCustomer(ids, getLoginUserId());
+        customerService.receiveCustomer(ids, getLoginUserId(), Boolean.TRUE);
         return success(true);
     }
 
@@ -180,18 +190,8 @@ public class CrmCustomerController {
     @Operation(summary = "分配公海给对应负责人")
     @PreAuthorize("@ss.hasPermission('crm:customer:distribute')")
     public CommonResult<Boolean> distributeCustomer(@Valid @RequestBody CrmCustomerDistributeReqVO distributeReqVO) {
-        customerService.receiveCustomer(distributeReqVO.getIds(), distributeReqVO.getOwnerUserId());
+        customerService.receiveCustomer(distributeReqVO.getIds(), distributeReqVO.getOwnerUserId(), Boolean.FALSE);
         return success(true);
     }
-
-    // TODO 芋艿：这个接口要调整下
-    //@GetMapping("/query-all-list")
-    //@Operation(summary = "查询客户列表")
-    //@PreAuthorize("@ss.hasPermission('crm:customer:all')")
-    //public CommonResult<List<CrmCustomerQueryAllRespVO>> queryAll() {
-    //    List<CrmCustomerDO> crmCustomerDOList = customerService.getCustomerList();
-    //    List<CrmCustomerQueryAllRespVO> data = CrmCustomerConvert.INSTANCE.convertQueryAll(crmCustomerDOList);
-    //    return success(data);
-    //}
 
 }
