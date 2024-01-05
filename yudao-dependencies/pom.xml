@@ -26,7 +26,7 @@
         <mybatis-plus.version>3.5.4.1</mybatis-plus.version>
         <mybatis-plus-generator.version>3.5.4.1</mybatis-plus-generator.version>
         <dynamic-datasource.version>4.2.0</dynamic-datasource.version>
-        <mybatis-plus-join.version>1.4.7.2</mybatis-plus-join.version>
+        <mybatis-plus-join.version>1.4.8.1</mybatis-plus-join.version>
         <redisson.version>3.25.0</redisson.version>
         <dm8.jdbc.version>8.1.3.62</dm8.jdbc.version>
         <!-- 消息队列 -->
@@ -51,7 +51,7 @@
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <hutool-5.version>5.8.23</hutool-5.version>
         <hutool-6.version>6.0.0-M8</hutool-6.version>
-        <easyexcel.verion>3.3.2</easyexcel.verion>
+        <easyexcel.verion>3.3.3</easyexcel.verion>
         <velocity.version>2.3</velocity.version>
         <screw.version>1.0.5</screw.version>
         <fastjson.version>1.2.83</fastjson.version>
@@ -72,7 +72,7 @@
         <aliyun-java-sdk-dysmsapi.version>2.2.1</aliyun-java-sdk-dysmsapi.version>
         <tencentcloud-sdk-java.version>3.1.880</tencentcloud-sdk-java.version>
         <justauth.version>2.0.5</justauth.version>
-        <jimureport.version>1.6.1</jimureport.version>
+        <jimureport.version>1.6.6-beta2</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
         <weixin-java.version>4.5.7.B</weixin-java.version>
         <ureport2.version>2.2.9</ureport2.version>
@@ -651,7 +651,7 @@
             <!-- 积木报表-->
             <dependency>
                 <groupId>org.jeecgframework.jimureport</groupId>
-                <artifactId>jimureport-spring-boot-starter</artifactId>
+                <artifactId>jimureport-spring-boot3-starter</artifactId>
                 <version>${jimureport.version}</version>
                 <exclusions>
                     <exclusion>

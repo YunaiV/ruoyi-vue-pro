@@ -42,32 +42,31 @@ public class OperateLogV2DO extends BaseDO {
      * 关联 {@link  UserTypeEnum}
      */
     private Integer userType;
-    // TODO @puhui999：module 改成 type，name 改成 subType；
     /**
-     * 操作模块
+     * 操作模块类型
      */
-    private String module;
+    private String type;
     /**
      * 操作名
      */
-    private String name;
+    private String subType;
     /**
      * 操作模块业务编号
      */
     private Long bizId;
     /**
-     * 操作内容，记录整个操作的明细
+     * 日志内容，记录整个操作的明细
      *
      * 例如说，修改编号为 1 的用户信息，将性别从男改成女，将姓名从芋道改成源码。
      */
-    private String content;
+    private String action;
     /**
      * 拓展字段，有些复杂的业务，需要记录一些字段 ( JSON 格式 )
      *
      * 例如说，记录订单编号，{ orderId: "1"}
      */
-    // TODO @puhui999：看看能不能类似 exts 搞 json 格式；
     private String extra;
+
     /**
      * 请求方法名
      */
@@ -84,10 +83,5 @@ public class OperateLogV2DO extends BaseDO {
      * 浏览器 UA
      */
     private String userAgent;
-
-    // TODO @芋艿：requestUrl、requestMethod
-    // TODO @芋艿：javaMethod、javaMethodArgs
-    // TODO @芋艿：startTime、duration
-    // TODO @芋艿：resultMsg、resultData
 
 }

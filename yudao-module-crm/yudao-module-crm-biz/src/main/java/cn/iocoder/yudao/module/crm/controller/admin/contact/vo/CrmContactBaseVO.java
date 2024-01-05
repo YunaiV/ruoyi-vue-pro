@@ -8,11 +8,11 @@ import cn.iocoder.yudao.module.infra.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY;
@@ -75,29 +75,29 @@ public class CrmContactBaseVO {
     @ExcelProperty(value = "邮箱",order = 4)
     private String email;
 
+    @Schema(description = "地区编号", example = "20158")
+    private Integer areaId;
+
     @ExcelProperty(value = "地址",order = 5)
     @Schema(description = "地址")
-    private String address;
-
-    @Schema(description = "下次联系时间")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY)
-    @ExcelProperty(value = "下次联系时间",order = 6)
-    private LocalDateTime nextTime;
+    private String detailAddress;
 
     @Schema(description = "备注", example = "你说的对")
     @ExcelProperty(value = "备注",order = 6)
     private String remark;
 
-    @Schema(description = "最后跟进时间")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ExcelProperty(value = "最后跟进时间",order = 6)
-    private LocalDateTime lastTime;
-
     @Schema(description = "负责人用户编号", example = "14334")
     @NotNull(message = "负责人不能为空")
     private Long ownerUserId;
 
-    @Schema(description = "地区编号", example = "20158")
-    private Integer areaId;
+    @Schema(description = "最后跟进时间")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    @ExcelProperty(value = "最后跟进时间",order = 6)
+    private LocalDateTime contactLastTime;
+
+    @Schema(description = "下次联系时间")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY)
+    @ExcelProperty(value = "下次联系时间",order = 6)
+    private LocalDateTime contactNextTime;
 
 }

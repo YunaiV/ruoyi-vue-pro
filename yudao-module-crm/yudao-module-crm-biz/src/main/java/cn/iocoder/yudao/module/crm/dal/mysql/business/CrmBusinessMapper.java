@@ -30,7 +30,14 @@ public interface CrmBusinessMapper extends BaseMapperX<CrmBusinessDO> {
 
     default PageResult<CrmBusinessDO> selectPageByCustomerId(CrmBusinessPageReqVO pageReqVO) {
         return selectPage(pageReqVO, new LambdaQueryWrapperX<CrmBusinessDO>()
-                .eq(CrmBusinessDO::getCustomerId, pageReqVO.getCustomerId())  // 指定客户编号
+                .eq(CrmBusinessDO::getCustomerId, pageReqVO.getCustomerId()) // 指定客户编号
+                .likeIfPresent(CrmBusinessDO::getName, pageReqVO.getName())
+                .orderByDesc(CrmBusinessDO::getId));
+    }
+
+    default PageResult<CrmBusinessDO> selectPageByContactId(CrmBusinessPageReqVO pageReqVO, Collection<Long> businessIds) {
+        return selectPage(pageReqVO, new LambdaQueryWrapperX<CrmBusinessDO>()
+                .in(CrmBusinessDO::getId, businessIds) // 指定商机编号
                 .likeIfPresent(CrmBusinessDO::getName, pageReqVO.getName())
                 .orderByDesc(CrmBusinessDO::getId));
     }
@@ -38,11 +45,8 @@ public interface CrmBusinessMapper extends BaseMapperX<CrmBusinessDO> {
     default PageResult<CrmBusinessDO> selectPage(CrmBusinessPageReqVO pageReqVO, Long userId) {
         MPJLambdaWrapperX<CrmBusinessDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
-        boolean condition = CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_BUSINESS.getType(),
+        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_BUSINESS.getType(),
                 CrmBusinessDO::getId, userId, pageReqVO.getSceneType(), Boolean.FALSE);
-        if (!condition) {
-            return PageResult.empty();
-        }
         // 拼接自身的查询条件
         query.selectAll(CrmBusinessDO.class)
                 .likeIfPresent(CrmBusinessDO::getName, pageReqVO.getName())

@@ -26,6 +26,7 @@ public class CrmCustomerPoolConfigController {
     @Resource
     private CrmCustomerPoolConfigService customerPoolConfigService;
 
+    // TODO @puhui999：可以把 vo 改下哈
     @GetMapping("/get")
     @Operation(summary = "获取客户公海规则设置")
     @PreAuthorize("@ss.hasPermission('crm:customer-pool-config:query')")

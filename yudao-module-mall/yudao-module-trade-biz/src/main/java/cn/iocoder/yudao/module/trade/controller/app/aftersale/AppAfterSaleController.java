@@ -47,12 +47,6 @@ public class AppAfterSaleController {
         return success(AfterSaleConvert.INSTANCE.convert(afterSaleService.getAfterSale(getLoginUserId(), id)));
     }
 
-    @GetMapping(value = "/get-applying-count")
-    @Operation(summary = "获得进行中的售后订单数量")
-    public CommonResult<Long> getApplyingAfterSaleCount() {
-        return success(afterSaleService.getApplyingAfterSaleCount(getLoginUserId()));
-    }
-
     @PostMapping(value = "/create")
     @Operation(summary = "申请售后")
     public CommonResult<Long> createAfterSale(@RequestBody AppAfterSaleCreateReqVO createReqVO) {

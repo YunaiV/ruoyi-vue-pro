@@ -79,7 +79,11 @@ mybatis-plus:
     password: XDV71a+xqStEA3WH # 加解密的秘钥，可使用 https://www.imaegoo.com/2020/aes-key-generator/ 网站生成
 
 mybatis-plus-join:
-  banner: false # 关闭控制台的 Banner 打印
+  banner: false # 是否打印 mybatis plus join banner，默认true
+  sub-table-logic: true # 全局启用副表逻辑删除，默认true。关闭后关联查询不会加副表逻辑删除
+  ms-cache: true # 拦截器MappedStatement缓存，默认 true
+  table-alias: t # 表别名(默认 t)
+  logic-del-type: on # 副表逻辑删除条件的位置，支持 WHERE、ON，默认 ON
 
 # Spring Data Redis 配置
 spring:
@@ -260,9 +264,9 @@ yudao:
 debug: false
 
 # 积木报表配置
-minidao :
-  base-package: org.jeecg.modules.jmreport.desreport.dao*
-  db-type: mysql
+jeecg:
+  jmreport:
+    saas-mode: tenant
 
 # UReport 配置
 ureport:

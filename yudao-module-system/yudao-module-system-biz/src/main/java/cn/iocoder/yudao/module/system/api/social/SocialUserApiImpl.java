@@ -33,8 +33,13 @@ public class SocialUserApiImpl implements SocialUserApi {
     }
 
     @Override
-    public SocialUserRespDTO getSocialUser(Integer userType, Integer socialType, String code, String state) {
-       return socialUserService.getSocialUser(userType, socialType, code, state);
+    public SocialUserRespDTO getSocialUserByUserId(Integer userType, Long userId, Integer socialType) {
+        return socialUserService.getSocialUserByUserId(userType, userId, socialType);
+    }
+
+    @Override
+    public SocialUserRespDTO getSocialUserByCode(Integer userType, Integer socialType, String code, String state) {
+       return socialUserService.getSocialUserByCode(userType, socialType, code, state);
     }
 
 }

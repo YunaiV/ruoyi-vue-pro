@@ -20,6 +20,9 @@ public class CrmBusinessPageReqVO extends PageParam {
     @Schema(description = "客户编号", example = "10795")
     private Long customerId;
 
+    @Schema(description = "联系人编号", example = "10795")
+    private Long contactId;
+
     @Schema(description = "场景类型", example = "1")
     @InEnum(CrmSceneTypeEnum.class)
     private Integer sceneType; // 场景类型，为 null 时则表示全部

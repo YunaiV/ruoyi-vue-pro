@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.crm.enums;
 
-// TODO 芋艿：操作日志；看看这个类怎么搞个好点的规范；
 /**
  * CRM 操作日志枚举
  *
@@ -22,6 +21,13 @@ public interface LogRecordConstants {
     //======================= 客户转移操作日志 =======================
 
     String TRANSFER_CUSTOMER_LOG_SUCCESS = "把客户【{{#crmCustomer.name}}】的负责人从【{getAdminUserById{#crmCustomer.ownerUserId}}】变更为了【{getAdminUserById{#reqVO.newOwnerUserId}}】";
-    String TRANSFER_CUSTOMER_LOG_FAIL = ""; // TODO @puhui999：这个可以删除哈，一般不搞失败的日志
+
+    // TODO @puhui999：这里格式是不是可以这样;目的是：统一管理，也减少 Service 里各种“复杂”字符串
+    // ======================= Customer 客户 =======================
+    String CUSTOMER_TYPE = "CRM 客户";
+    String CUSTOMER_CREATE_SUB_TYPE = "创建客户";
+    String CUSTOMER_CREATE_SUCCESS = "更新了客户{_DIFF{#updateReqVO}}";
+
+    String CUSTOMER_UPDATE_SUB_TYPE = "更新客户";
 
 }

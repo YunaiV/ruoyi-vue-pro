@@ -1,11 +1,15 @@
 package cn.iocoder.yudao.module.promotion.controller.app.activity.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Schema(description = "用户 App - 营销活动 Response VO")
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class AppActivityRespVO {
 

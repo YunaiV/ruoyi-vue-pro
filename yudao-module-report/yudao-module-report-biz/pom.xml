@@ -66,7 +66,7 @@
         <!-- 积木报表-->
         <dependency>
             <groupId>org.jeecgframework.jimureport</groupId>
-            <artifactId>jimureport-spring-boot-starter</artifactId>
+            <artifactId>jimureport-spring-boot3-starter</artifactId>
         </dependency>
         <!-- 单独依赖升级版本，解决低版本validator失败问题 -->
         <dependency>

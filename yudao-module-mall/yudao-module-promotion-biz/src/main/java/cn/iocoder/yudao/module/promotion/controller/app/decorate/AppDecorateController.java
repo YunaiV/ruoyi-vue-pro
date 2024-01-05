@@ -25,6 +25,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RestController
 @RequestMapping("/promotion/decorate")
 @Validated
+@Deprecated // 废弃
 public class AppDecorateController {
 
     @Resource

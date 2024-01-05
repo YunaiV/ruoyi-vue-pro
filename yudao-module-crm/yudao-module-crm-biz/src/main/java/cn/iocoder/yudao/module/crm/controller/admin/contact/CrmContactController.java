@@ -6,6 +6,7 @@ import cn.hutool.core.util.NumberUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.*;
@@ -13,6 +14,7 @@ import cn.iocoder.yudao.module.crm.convert.contact.CrmContactConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants;
+import cn.iocoder.yudao.module.crm.service.contact.CrmContactBusinessService;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -54,10 +56,13 @@ public class CrmContactController {
     private CrmContactService contactService;
     @Resource
     private CrmCustomerService customerService;
-
     @Resource
     private AdminUserApi adminUserApi;
 
+    @Resource
+    private CrmContactBusinessService contactBusinessLinkService;
+
+    // TODO @zyna：CrmContactCreateReqVO、CrmContactUpdateReqVO、CrmContactRespVO 按照新的 VO 规范搞哈；可以参考 dept 模块
     @PostMapping("/create")
     @Operation(summary = "创建联系人")
     @PreAuthorize("@ss.hasPermission('crm:contact:create')")
@@ -96,7 +101,7 @@ public class CrmContactController {
                 NumberUtil.parseLong(contact.getCreator()), contact.getOwnerUserId())));
         // 2. 获取客户信息
         List<CrmCustomerDO> customerList = customerService.getCustomerList(
-                Collections.singletonList(contact.getCustomerId()), getLoginUserId());
+                Collections.singletonList(contact.getCustomerId()));
         // 3. 直属上级
         List<CrmContactDO> parentContactList = contactService.getContactList(
                 Collections.singletonList(contact.getParentId()), getLoginUserId());
@@ -107,10 +112,11 @@ public class CrmContactController {
     @Operation(summary = "获得联系人列表")
     @PreAuthorize("@ss.hasPermission('crm:contact:query')")
     public CommonResult<List<CrmContactSimpleRespVO>> getSimpleContactList() {
+        // TODO @zyna：建议 contactService 单独搞个 list 接口哈
         CrmContactPageReqVO pageReqVO = new CrmContactPageReqVO();
         pageReqVO.setPageSize(PAGE_SIZE_NONE);
         List<CrmContactDO> list = contactService.getContactPage(pageReqVO, getLoginUserId()).getList();
-        return success(CrmContactConvert.INSTANCE.convertAllList(list));
+        return success(BeanUtils.toBean(list, CrmContactSimpleRespVO.class));
     }
 
     @GetMapping("/page")
@@ -118,7 +124,7 @@ public class CrmContactController {
     @PreAuthorize("@ss.hasPermission('crm:contact:query')")
     public CommonResult<PageResult<CrmContactRespVO>> getContactPage(@Valid CrmContactPageReqVO pageVO) {
         PageResult<CrmContactDO> pageResult = contactService.getContactPage(pageVO, getLoginUserId());
-        return success(convertDetailContactPage(pageResult));
+        return success(buildContactDetailPage(pageResult));
     }
 
     @GetMapping("/page-by-customer")
@@ -126,7 +132,7 @@ public class CrmContactController {
     public CommonResult<PageResult<CrmContactRespVO>> getContactPageByCustomer(@Valid CrmContactPageReqVO pageVO) {
         Assert.notNull(pageVO.getCustomerId(), "客户编号不能为空");
         PageResult<CrmContactDO> pageResult = contactService.getContactPageByCustomerId(pageVO);
-        return success(convertDetailContactPage(pageResult));
+        return success(buildContactDetailPage(pageResult));
     }
 
     @GetMapping("/export-excel")
@@ -138,23 +144,23 @@ public class CrmContactController {
         exportReqVO.setPageNo(PAGE_SIZE_NONE);
         PageResult<CrmContactDO> pageResult = contactService.getContactPage(exportReqVO, getLoginUserId());
         ExcelUtils.write(response, "联系人.xls", "数据", CrmContactRespVO.class,
-                convertDetailContactPage(pageResult).getList());
+                buildContactDetailPage(pageResult).getList());
     }
 
     /**
-     * 转换成详细的联系人分页，即读取关联信息
+     * 构建详细的联系人分页结果
      *
-     * @param pageResult 联系人分页
-     * @return 详细的联系人分页
+     * @param pageResult 简单的联系人分页结果
+     * @return 详细的联系人分页结果
      */
-    private PageResult<CrmContactRespVO> convertDetailContactPage(PageResult<CrmContactDO> pageResult) {
+    private PageResult<CrmContactRespVO> buildContactDetailPage(PageResult<CrmContactDO> pageResult) {
         List<CrmContactDO> contactList = pageResult.getList();
         if (CollUtil.isEmpty(contactList)) {
             return PageResult.empty(pageResult.getTotal());
         }
         // 1. 获取客户列表
         List<CrmCustomerDO> crmCustomerDOList = customerService.getCustomerList(
-                convertSet(contactList, CrmContactDO::getCustomerId), getLoginUserId());
+                convertSet(contactList, CrmContactDO::getCustomerId));
         // 2. 获取创建人、负责人列表
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(contactList,
                 contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getOwnerUserId())));
@@ -169,6 +175,24 @@ public class CrmContactController {
     @PreAuthorize("@ss.hasPermission('crm:contact:update')")
     public CommonResult<Boolean> transfer(@Valid @RequestBody CrmContactTransferReqVO reqVO) {
         contactService.transferContact(reqVO, getLoginUserId());
+        return success(true);
+    }
+
+    // ================== 关联/取关联系人  ===================
+
+    @PostMapping("/create-business-list")
+    @Operation(summary = "创建联系人与联系人的关联")
+    @PreAuthorize("@ss.hasPermission('crm:contact:create-business')")
+    public CommonResult<Boolean> createContactBusinessList(@Valid @RequestBody CrmContactBusinessReqVO createReqVO) {
+        contactBusinessLinkService.createContactBusinessList(createReqVO);
+        return success(true);
+    }
+
+    @DeleteMapping("/delete-business-list")
+    @Operation(summary = "删除联系人与联系人的关联")
+    @PreAuthorize("@ss.hasPermission('crm:contact:delete-business')")
+    public CommonResult<Boolean> deleteContactBusinessList(@Valid @RequestBody CrmContactBusinessReqVO deleteReqVO) {
+        contactBusinessLinkService.deleteContactBusinessList(deleteReqVO);
         return success(true);
     }
 

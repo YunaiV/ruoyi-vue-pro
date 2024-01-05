@@ -15,7 +15,7 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivablePlanDO
 import cn.iocoder.yudao.module.crm.dal.mysql.receivable.CrmReceivablePlanMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
-import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
+import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
@@ -52,7 +52,10 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
     private CrmPermissionService crmPermissionService;
 
     @Override
+    // TODO @puhui999：操作日志
     public Long createReceivablePlan(CrmReceivablePlanCreateReqVO createReqVO, Long userId) {
+        // TODO @liuhongfeng：第几期的计算；基于是 contractId + contractDO 的第几个还款
+        // TODO @liuhongfeng contractId：校验合同是否存在
         // 插入
         CrmReceivablePlanDO receivablePlan = CrmReceivablePlanConvert.INSTANCE.convert(createReqVO);
         receivablePlan.setFinishStatus(false);
@@ -87,7 +90,9 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
 
     @Override
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_RECEIVABLE_PLAN, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
+    // TODO @puhui999：操作日志
     public void updateReceivablePlan(CrmReceivablePlanUpdateReqVO updateReqVO) {
+        // TODO @liuhongfeng：如果已经有对应的还款，则不允许编辑；
         // 校验存在
         validateReceivablePlanExists(updateReqVO.getId());
 
@@ -136,6 +141,7 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
         return receivablePlanMapper.selectPageByCustomerId(pageReqVO);
     }
 
+    // TODO @puhui999：这个没有 transfer 接口；可能是的哈
     @Override
     public void transferReceivablePlan(CrmReceivablePlanTransferReqVO reqVO, Long userId) {
         // 1 校验回款计划是否存在
