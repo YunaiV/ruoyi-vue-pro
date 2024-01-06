@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 
 /**
@@ -119,6 +120,10 @@ public class LocalDateTimeUtils {
      */
     public static LocalDateTime endOfMonth(LocalDateTime date) {
         return date.with(TemporalAdjusters.lastDayOfMonth()).with(LocalTime.MAX);
+    }
+
+    public static Long between(LocalDateTime dateTime) {
+        return LocalDateTimeUtil.between(dateTime, LocalDateTime.now(), ChronoUnit.DAYS);
     }
 
 }

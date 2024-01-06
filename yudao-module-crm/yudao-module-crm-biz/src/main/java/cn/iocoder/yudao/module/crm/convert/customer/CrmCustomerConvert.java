@@ -38,9 +38,9 @@ public interface CrmCustomerConvert {
     /**
      * 设置用户信息
      *
-     * @param customer  CRM 客户 Response VO
-     * @param userMap 用户信息 map
-     * @param deptMap 用户部门信息 map
+     * @param customer CRM 客户 Response VO
+     * @param userMap  用户信息 map
+     * @param deptMap  用户部门信息 map
      */
     static void setUserInfo(CrmCustomerRespVO customer, Map<Long, AdminUserRespDTO> userMap, Map<Long, DeptRespDTO> deptMap) {
         customer.setAreaName(AreaUtils.format(customer.getAreaId()));
@@ -66,9 +66,12 @@ public interface CrmCustomerConvert {
     }
 
     default PageResult<CrmCustomerRespVO> convertPage(PageResult<CrmCustomerDO> pageResult, Map<Long, AdminUserRespDTO> userMap,
-                                                      Map<Long, DeptRespDTO> deptMap) {
+                                                      Map<Long, DeptRespDTO> deptMap, Map<Long, Long> poolDayMap) {
         PageResult<CrmCustomerRespVO> result = convertPage(pageResult);
-        result.getList().forEach(item -> setUserInfo(item, userMap, deptMap));
+        result.getList().forEach(item -> {
+            setUserInfo(item, userMap, deptMap);
+            findAndThen(poolDayMap, item.getId(), item::setPoolDay);
+        });
         return result;
     }
 

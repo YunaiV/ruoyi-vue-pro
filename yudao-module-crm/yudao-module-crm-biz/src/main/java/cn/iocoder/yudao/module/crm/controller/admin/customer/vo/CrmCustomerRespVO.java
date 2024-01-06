@@ -132,4 +132,7 @@ public class CrmCustomerRespVO {
     @ExcelProperty("创建人名字")
     private String creatorName;
 
+    @Schema(description = "距离加入公海时间", example = "1")
+    private Long poolDay;
+
 }

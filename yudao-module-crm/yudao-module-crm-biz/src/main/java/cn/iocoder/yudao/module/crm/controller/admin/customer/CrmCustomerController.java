@@ -3,12 +3,15 @@ package cn.iocoder.yudao.module.crm.controller.admin.customer;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
+import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerPoolConfigService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
@@ -35,8 +38,7 @@ import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSetByFlatMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.CRM_CUSTOMER_TYPE;
@@ -49,7 +51,8 @@ public class CrmCustomerController {
 
     @Resource
     private CrmCustomerService customerService;
-
+    @Resource
+    private CrmCustomerPoolConfigService customerPoolConfigService;
     @Resource
     private DeptApi deptApi;
     @Resource
@@ -109,11 +112,28 @@ public class CrmCustomerController {
         }
 
         // 2. 拼接数据
-        // TODO @puhui999：距离进入公海的时间
+        // 距离进入公海的时间
+        Map<Long, Long> poolDayMap = getPoolDayMap(pageResult);
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSetByFlatMap(pageResult.getList(), user -> Stream.of(Long.parseLong(user.getCreator()), user.getOwnerUserId())));
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
-        return success(CrmCustomerConvert.INSTANCE.convertPage(pageResult, userMap, deptMap));
+        return success(CrmCustomerConvert.INSTANCE.convertPage(pageResult, userMap, deptMap, poolDayMap));
+    }
+
+    private Map<Long, Long> getPoolDayMap(PageResult<CrmCustomerDO> pageResult) {
+        Map<Long, Long> poolDayMap = null;
+        CrmCustomerPoolConfigDO customerPoolConfig = customerPoolConfigService.getCustomerPoolConfig();
+        if (customerPoolConfig != null && customerPoolConfig.getEnabled()) { // 有公海配置的情况
+            poolDayMap = convertMap(pageResult.getList(), CrmCustomerDO::getId, item -> {
+                long dealExpireDay = 0;
+                if (!item.getDealStatus()) { // 检查是否成交
+                    dealExpireDay = customerPoolConfig.getDealExpireDays() - LocalDateTimeUtils.between(item.getCreateTime());
+                }
+                long contactExpireDay = customerPoolConfig.getContactExpireDays() - LocalDateTimeUtils.between(item.getContactLastTime());
+                return dealExpireDay == 0 ? contactExpireDay : Math.min(dealExpireDay, contactExpireDay);
+            });
+        }
+        return poolDayMap;
     }
 
     @GetMapping(value = "/list-all-simple")
