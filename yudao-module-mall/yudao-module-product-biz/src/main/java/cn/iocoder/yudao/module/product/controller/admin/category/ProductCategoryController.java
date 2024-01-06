@@ -67,8 +67,8 @@ public class ProductCategoryController {
     @GetMapping("/list")
     @Operation(summary = "获得商品分类列表")
     @PreAuthorize("@ss.hasPermission('product:category:query')")
-    public CommonResult<List<ProductCategoryRespVO>> getCategoryList(@Valid ProductCategoryListReqVO treeListReqVO) {
-        List<ProductCategoryDO> list = categoryService.getEnableCategoryList(treeListReqVO);
+    public CommonResult<List<ProductCategoryRespVO>> getCategoryList(@Valid ProductCategoryListReqVO listReqVO) {
+        List<ProductCategoryDO> list = categoryService.getCategoryList(listReqVO);
         list.sort(Comparator.comparing(ProductCategoryDO::getSort));
         return success(ProductCategoryConvert.INSTANCE.convertList(list));
     }

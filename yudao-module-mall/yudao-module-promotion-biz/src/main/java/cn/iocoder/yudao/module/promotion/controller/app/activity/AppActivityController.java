@@ -145,6 +145,7 @@ public class AppActivityController {
     }
 
     private void getRewardActivities(Collection<Long> spuIds, LocalDateTime now, List<AppActivityRespVO> activityList) {
+        // TODO @puhui999：有 3 范围，不只 spuId，还有 categoryId，全部
         List<RewardActivityDO> rewardActivityList = rewardActivityService.getRewardActivityBySpuIdsAndStatusAndDateTimeLt(
                 spuIds, PromotionActivityStatusEnum.RUN.getStatus(), now);
         if (CollUtil.isEmpty(rewardActivityList)) {

@@ -67,7 +67,7 @@ public interface ProductCategoryService {
      * @param listReqVO 查询条件
      * @return 商品分类列表
      */
-    List<ProductCategoryDO> getEnableCategoryList(ProductCategoryListReqVO listReqVO);
+    List<ProductCategoryDO> getCategoryList(ProductCategoryListReqVO listReqVO);
 
     /**
      * 获得开启状态的商品分类列表
