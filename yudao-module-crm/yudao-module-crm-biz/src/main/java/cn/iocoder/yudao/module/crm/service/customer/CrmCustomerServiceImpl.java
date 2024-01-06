@@ -165,7 +165,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         // 2. 更新锁定状态
         customerMapper.updateById(BeanUtils.toBean(lockReqVO, CrmCustomerDO.class));
 
-        // 3. 记录操作日志上下文
+        // 3. 记录操作日志上下文. tips: 因为这里使用的是老的状态所以记录时反着记录，也就是 lockStatus 为 true 那么就是解锁反之为锁定
         LogRecordContext.putVariable("crmCustomer", customer);
     }
 
@@ -301,7 +301,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
             throw exception(CUSTOMER_IN_POOL, customer.getName());
         }
         // 负责人已存在
-        if (customer.getOwnerUserId() != null) {
+        if (!pool && customer.getOwnerUserId() != null) {
             throw exception(CUSTOMER_OWNER_EXISTS, customer.getName());
         }
     }

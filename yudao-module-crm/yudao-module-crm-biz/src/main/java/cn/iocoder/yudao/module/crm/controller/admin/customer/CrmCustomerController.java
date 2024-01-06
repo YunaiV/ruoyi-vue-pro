@@ -116,7 +116,7 @@ public class CrmCustomerController {
         return success(CrmCustomerConvert.INSTANCE.convertPage(pageResult, userMap, deptMap));
     }
 
-    @GetMapping(value = {"/list-all-simple"})
+    @GetMapping(value = "/list-all-simple")
     @Operation(summary = "获取客户精简信息列表", description = "只包含有读权限的客户，主要用于前端的下拉选项")
     public CommonResult<List<CrmCustomerSimpleRespVO>> getSimpleDeptList() {
         CrmCustomerPageReqVO reqVO = new CrmCustomerPageReqVO();
