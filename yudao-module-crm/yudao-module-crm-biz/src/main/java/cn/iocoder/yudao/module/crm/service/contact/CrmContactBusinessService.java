@@ -35,4 +35,7 @@ public interface CrmContactBusinessService {
      */
     List<CrmContactBusinessDO> getContactBusinessListByContactId(Long contactId);
 
+
+    void deleteContactBusinessByContactId(Long contactId);
+
 }

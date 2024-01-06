@@ -80,4 +80,9 @@ public class CrmContactBusinessServiceImpl implements CrmContactBusinessService 
         return contactBusinessMapper.selectListByContactId(contactId);
     }
 
+    @Override
+    public void deleteContactBusinessByContactId(Long contactId) {
+        contactBusinessMapper.delete(CrmContactBusinessDO::getContactId,contactId);
+    }
+
 }
