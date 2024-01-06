@@ -71,7 +71,7 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
             query.eq(ProductSpuDO::getRecommendBenefit, true);
         } else if (ObjUtil.equal(pageReqVO.getRecommendType(), AppProductSpuPageReqVO.RECOMMEND_TYPE_BEST)) {
             query.eq(ProductSpuDO::getRecommendBest, true);
-        }  else if (ObjUtil.equal(pageReqVO.getRecommendType(), AppProductSpuPageReqVO.RECOMMEND_TYPE_NEW)) {
+        } else if (ObjUtil.equal(pageReqVO.getRecommendType(), AppProductSpuPageReqVO.RECOMMEND_TYPE_NEW)) {
             query.eq(ProductSpuDO::getRecommendNew, true);
         } else if (ObjUtil.equal(pageReqVO.getRecommendType(), AppProductSpuPageReqVO.RECOMMEND_TYPE_GOOD)) {
             query.eq(ProductSpuDO::getRecommendGood, true);
@@ -141,8 +141,8 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
     /**
      * 添加后台 Tab 选项的查询条件
      *
-     * @param tabType      标签类型
-     * @param query 查询条件
+     * @param tabType 标签类型
+     * @param query   查询条件
      */
     static void appendTabQuery(Integer tabType, LambdaQueryWrapperX<ProductSpuDO> query) {
         // 出售中商品
@@ -167,6 +167,19 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
         if (ObjectUtil.equals(ProductSpuPageReqVO.RECYCLE_BIN, tabType)) {
             query.eqIfPresent(ProductSpuDO::getStatus, ProductSpuStatusEnum.RECYCLE.getStatus());
         }
+    }
+
+    /**
+     * 更新商品 SPU 浏览量
+     *
+     * @param id        商品 SPU 编号
+     * @param incrCount 增加的数量
+     */
+    default void updateBrowseCount(Long id, int incrCount) {
+        LambdaUpdateWrapper<ProductSpuDO> updateWrapper = new LambdaUpdateWrapper<ProductSpuDO>()
+                .setSql(" browse_count = browse_count +" + incrCount)
+                .eq(ProductSpuDO::getId, id);
+        update(null, updateWrapper);
     }
 
 }

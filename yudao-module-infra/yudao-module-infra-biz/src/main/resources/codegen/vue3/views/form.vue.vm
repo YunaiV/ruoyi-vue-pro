@@ -140,7 +140,7 @@
 </template>
 <script setup lang="ts">
 import { getIntDictOptions, getStrDictOptions, getBoolDictOptions, DICT_TYPE } from '@/utils/dict'
-import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${table.businessName}'
+import { ${simpleClassName}Api, ${simpleClassName}VO } from '@/api/${table.moduleName}/${table.businessName}'
 ## 特殊：树表专属逻辑
 #if ( $table.templateType == 2 )
 import { defaultProps, handleTree } from '@/utils/tree'
@@ -151,6 +151,9 @@ import { defaultProps, handleTree } from '@/utils/tree'
 import ${subSimpleClassName}Form from './components/${subSimpleClassName}Form.vue'
 #end
 #end
+
+/** ${table.classComment} 表单 */
+defineOptions({ name: '${simpleClassName}Form' })
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗

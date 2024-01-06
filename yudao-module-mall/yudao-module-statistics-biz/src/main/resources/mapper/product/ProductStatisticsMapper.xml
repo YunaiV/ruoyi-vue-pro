@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.statistics.dal.mysql.product.ProductStatisticsMapper">
+
+    <select id="selectStatisticsResultPageByTimeBetween"
+            resultType="cn.iocoder.yudao.module.statistics.dal.dataobject.product.ProductStatisticsDO">
+        SELECT spu.id                                                       AS spuId
+             -- 浏览量：一个用户可以有多次
+             , (SELECT COUNT(1)
+                FROM product_browse_history
+                WHERE spu_id = spu.id
+                  AND create_time BETWEEN #{beginTime} AND #{endTime})      AS browse_count
+             -- 访客量：按用户去重计数
+             , (SELECT COUNT(DISTINCT user_id)
+                FROM product_browse_history
+                WHERE spu_id = spu.id
+                  AND create_time BETWEEN #{beginTime} AND #{endTime})      AS browse_user_count
+             -- 收藏数量：按用户去重计数
+             , (SELECT COUNT(DISTINCT user_id)
+                FROM product_favorite
+                WHERE spu_id = spu.id
+                  AND create_time BETWEEN #{beginTime} AND #{endTime})      AS favorite_count
+             -- 加购数量：按用户去重计数
+             , (SELECT COUNT(DISTINCT user_id)
+                FROM trade_cart
+                WHERE spu_id = spu.id
+                  AND create_time BETWEEN #{beginTime} AND #{endTime})      AS cart_count
+             -- 下单件数
+             , (SELECT IFNULL(SUM(count), 0)
+                FROM trade_order_item
+                WHERE spu_id = spu.id
+                  AND create_time BETWEEN #{beginTime} AND #{endTime})      AS order_count
+             -- 支付件数
+             , (SELECT IFNULL(SUM(item.count), 0)
+                FROM trade_order_item item
+                         JOIN trade_order o ON item.order_id = o.id
+                WHERE spu_id = spu.id
+                  AND o.pay_status = TRUE
+                  AND item.create_time BETWEEN #{beginTime} AND #{endTime}) AS order_pay_count
+             -- 支付金额
+             , (SELECT IFNULL(SUM(item.pay_price), 0)
+                FROM trade_order_item item
+                         JOIN trade_order o ON item.order_id = o.id
+                WHERE spu_id = spu.id
+                  AND o.pay_status = TRUE
+                  AND item.create_time BETWEEN #{beginTime} AND #{endTime}) AS order_pay_price
+             -- 退款件数
+             , (SELECT IFNULL(SUM(count), 0)
+                FROM trade_after_sale
+                WHERE spu_id = spu.id
+                  AND refund_time IS NOT NULL
+                  AND create_time BETWEEN #{beginTime} AND #{endTime})      AS after_sale_count
+             -- 退款金额
+             , (SELECT IFNULL(SUM(refund_price), 0)
+                FROM trade_after_sale
+                WHERE spu_id = spu.id
+                  AND refund_time IS NOT NULL
+                  AND create_time BETWEEN #{beginTime} AND #{endTime})      AS after_sale_refund_price
+        FROM product_spu spu
+        WHERE spu.deleted = FALSE
+        ORDER BY spu.id
+    </select>
+
+</mapper>
