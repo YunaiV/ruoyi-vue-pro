@@ -30,6 +30,22 @@ public interface LogRecordConstants {
     String CRM_CUSTOMER_RECEIVE_SUB_TYPE = "{{#ownerUserName != null ? '分配客户' : '领取客户'}}";
     String CRM_CUSTOMER_RECEIVE_SUCCESS = "{{#ownerUserName != null ? '将客户【' + #customer.name + '】分配给【' + #ownerUserName + '】' : '领取客户【' + #customer.name + '】'}}";
 
+    // ======================= CRM_CUSTOMER_LIMIT_CONFIG 客户限制配置 =======================
+
+    String CRM_CUSTOMER_LIMIT_CONFIG_TYPE = "CRM 客户限制配置";
+    String CRM_CUSTOMER_LIMIT_CONFIG_CREATE_SUB_TYPE = "创建客户限制配置";
+    String CRM_CUSTOMER_LIMIT_CONFIG_CREATE_SUCCESS = "创建了【{{#limitType}}】类型的客户限制配置";
+    String CRM_CUSTOMER_LIMIT_CONFIG_UPDATE_SUB_TYPE = "更新客户限制配置";
+    String CRM_CUSTOMER_LIMIT_CONFIG_UPDATE_SUCCESS = "更新了客户限制配置: {_DIFF{#updateReqVO}}";
+    String CRM_CUSTOMER_LIMIT_CONFIG_DELETE_SUB_TYPE = "删除客户限制配置";
+    String CRM_CUSTOMER_LIMIT_CONFIG_DELETE_SUCCESS = "删除了【{{#limitType}}】类型的客户限制配置";
+
+    // ======================= CRM_CUSTOMER_POOL_CONFIG 客户公海规则 =======================
+
+    String CRM_CUSTOMER_POOL_CONFIG_TYPE = "CRM 客户公海规则";
+    String CRM_CUSTOMER_POOL_CONFIG_SUB_TYPE = "{{#isPoolConfigUpdate ? '更新客户公海规则' : '创建客户公海规则'}}";
+    String CRM_CUSTOMER_POOL_CONFIG_SUCCESS = "{{#isPoolConfigUpdate ? '更新了客户公海规则' : '创建了客户公海规则'}}";
+
     // ======================= CRM_CONTACT 联系人 =======================
 
     String CRM_CONTACT_TYPE = "CRM 联系人";

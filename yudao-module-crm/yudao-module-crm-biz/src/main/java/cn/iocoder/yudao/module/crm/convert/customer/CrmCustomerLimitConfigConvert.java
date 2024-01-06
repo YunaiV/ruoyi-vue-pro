@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.crm.convert.customer;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerLimitConfigDO;
@@ -23,8 +22,6 @@ import java.util.Map;
 public interface CrmCustomerLimitConfigConvert {
 
     CrmCustomerLimitConfigConvert INSTANCE = Mappers.getMapper(CrmCustomerLimitConfigConvert.class);
-
-    CrmCustomerLimitConfigDO convert(CrmCustomerLimitConfigCreateReqVO bean);
 
     CrmCustomerLimitConfigDO convert(CrmCustomerLimitConfigSaveReqVO bean);
 
