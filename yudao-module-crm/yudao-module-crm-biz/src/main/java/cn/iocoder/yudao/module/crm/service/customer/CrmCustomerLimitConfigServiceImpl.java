@@ -2,19 +2,17 @@ package cn.iocoder.yudao.module.crm.service.customer;
 
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigSaveReqVO;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerLimitConfigConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerLimitConfigDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.customer.CrmCustomerLimitConfigMapper;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-
-import jakarta.annotation.Resource;
 
 import java.util.Collection;
 import java.util.List;
@@ -41,7 +39,7 @@ public class CrmCustomerLimitConfigServiceImpl implements CrmCustomerLimitConfig
 
     @Override
     // TODO @puhui999：操作日志
-    public Long createCustomerLimitConfig(CrmCustomerLimitConfigCreateReqVO createReqVO) {
+    public Long createCustomerLimitConfig(CrmCustomerLimitConfigSaveReqVO createReqVO) {
         validateUserAndDept(createReqVO.getUserIds(), createReqVO.getDeptIds());
         // 插入
         CrmCustomerLimitConfigDO customerLimitConfig = CrmCustomerLimitConfigConvert.INSTANCE.convert(createReqVO);
@@ -52,7 +50,7 @@ public class CrmCustomerLimitConfigServiceImpl implements CrmCustomerLimitConfig
 
     @Override
     // TODO @puhui999：操作日志
-    public void updateCustomerLimitConfig(CrmCustomerLimitConfigUpdateReqVO updateReqVO) {
+    public void updateCustomerLimitConfig(CrmCustomerLimitConfigSaveReqVO updateReqVO) {
         // 校验存在
         validateCustomerLimitConfigExists(updateReqVO.getId());
         validateUserAndDept(updateReqVO.getUserIds(), updateReqVO.getDeptIds());
