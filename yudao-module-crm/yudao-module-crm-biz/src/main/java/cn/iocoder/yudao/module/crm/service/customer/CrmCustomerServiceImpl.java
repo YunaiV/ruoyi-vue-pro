@@ -65,7 +65,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_CREATE_SUB_TYPE, bizNo = "{{#customer.id}}", success = CRM_CUSTOMER_CREATE_SUCCESS)
+    @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_CREATE_SUB_TYPE, bizNo = "{{#customer.id}}",
+            success = CRM_CUSTOMER_CREATE_SUCCESS)
     public Long createCustomer(CrmCustomerSaveReqVO createReqVO, Long userId) {
         createReqVO.setId(null);
         // 1. 校验拥有客户是否到达上限
@@ -89,12 +90,12 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_UPDATE_SUB_TYPE, bizNo = "{{#updateReqVO.id}}", success = CRM_CUSTOMER_UPDATE_SUCCESS)
+    @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_UPDATE_SUB_TYPE, bizNo = "{{#updateReqVO.id}}",
+            success = CRM_CUSTOMER_UPDATE_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateCustomer(CrmCustomerSaveReqVO updateReqVO) {
         Assert.notNull(updateReqVO.getId(), "客户编号不能为空");
-        // 更新的时候，要把 updateReqVO 负责人设置为空，避免修改。
-        updateReqVO.setOwnerUserId(null);
+        updateReqVO.setOwnerUserId(null);  // 更新的时候，要把 updateReqVO 负责人设置为空，避免修改
         // 1. 校验存在
         CrmCustomerDO oldCustomer = validateCustomerExists(updateReqVO.getId());
 
@@ -109,7 +110,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_DELETE_SUB_TYPE, bizNo = "{{#id}}", success = CRM_CUSTOMER_DELETE_SUCCESS)
+    @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_DELETE_SUB_TYPE, bizNo = "{{#id}}",
+            success = CRM_CUSTOMER_DELETE_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void deleteCustomer(Long id) {
         // 校验存在
@@ -128,7 +130,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_TRANSFER_SUB_TYPE, bizNo = "{{#reqVO.id}}", success = CRM_CUSTOMER_TRANSFER_SUCCESS)
+    @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_TRANSFER_SUB_TYPE, bizNo = "{{#reqVO.id}}",
+            success = CRM_CUSTOMER_TRANSFER_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#reqVO.id", level = CrmPermissionLevelEnum.OWNER)
     public void transferCustomer(CrmCustomerTransferReqVO reqVO, Long userId) {
         // 1.1 校验客户是否存在
@@ -144,11 +147,13 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
         // 3. TODO 记录转移日志
         // 记录操作日志上下文
+        // TODO @puhui999：crmCustomer=》customer，也看看其他有没类似的情况哈
         LogRecordContext.putVariable("crmCustomer", customer);
     }
 
     @Override
-    @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_LOCK_SUB_TYPE, bizNo = "{{#lockReqVO.id}}", success = CRM_CUSTOMER_LOCK_SUCCESS)
+    @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_LOCK_SUB_TYPE, bizNo = "{{#lockReqVO.id}}",
+            success = CRM_CUSTOMER_LOCK_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#lockReqVO.id", level = CrmPermissionLevelEnum.OWNER)
     public void lockCustomer(CrmCustomerLockReqVO lockReqVO, Long userId) {
         // 1.1 校验当前客户是否存在
@@ -165,7 +170,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         // 2. 更新锁定状态
         customerMapper.updateById(BeanUtils.toBean(lockReqVO, CrmCustomerDO.class));
 
-        // 3. 记录操作日志上下文. tips: 因为这里使用的是老的状态所以记录时反着记录，也就是 lockStatus 为 true 那么就是解锁反之为锁定
+        // 3. 记录操作日志上下文
+        // tips: 因为这里使用的是老的状态所以记录时反着记录，也就是 lockStatus 为 true 那么就是解锁反之为锁定
         LogRecordContext.putVariable("crmCustomer", customer);
     }
 
@@ -173,7 +179,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_POOL_SUB_TYPE, bizNo = "{{#id}}", success = CRM_CUSTOMER_POOL_SUCCESS)
+    @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_POOL_SUB_TYPE, bizNo = "{{#id}}",
+            success = CRM_CUSTOMER_POOL_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void putCustomerPool(Long id) {
         // 1. 校验存在
@@ -252,7 +259,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         }
     }
 
-    @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_RECEIVE_SUB_TYPE, bizNo = "{{#customer.id}}", success = CRM_CUSTOMER_RECEIVE_SUCCESS)
+    @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_RECEIVE_SUB_TYPE, bizNo = "{{#customer.id}}",
+            success = CRM_CUSTOMER_RECEIVE_SUCCESS)
     public void receiveCustomerLog(CrmCustomerDO customer, String ownerUserName) {
         // 记录操作日志上下文
         LogRecordContext.putVariable("customer", customer);
@@ -280,7 +288,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         return customerMapper.selectPage(pageReqVO, userId);
     }
 
-    //======================= 校验相关 =======================
+    // ======================= 校验相关 =======================
 
     /**
      * 校验客户是否存在

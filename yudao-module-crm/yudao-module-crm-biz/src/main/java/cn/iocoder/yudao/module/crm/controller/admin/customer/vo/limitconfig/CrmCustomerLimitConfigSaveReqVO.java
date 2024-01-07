@@ -15,10 +15,11 @@ public class CrmCustomerLimitConfigSaveReqVO {
     private Long id;
 
     @Schema(description = "规则类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @DiffLogField(name = "规则类型")
     @NotNull(message = "规则类型不能为空")
+    @DiffLogField(name = "规则类型")
     private Integer type;
 
+    // TODO @puhui999：可以把 Function 那的 functionName 搞成 NAME 枚举，这里直接引用。这样后续改动更方便哈。
     @Schema(description = "规则适用人群")
     @DiffLogField(name = "规则适用人群", function = "getAdminUserById")
     private List<Long> userIds;
@@ -28,8 +29,8 @@ public class CrmCustomerLimitConfigSaveReqVO {
     private List<Long> deptIds;
 
     @Schema(description = "数量上限", requiredMode = Schema.RequiredMode.REQUIRED, example = "28384")
-    @DiffLogField(name = "数量上限")
     @NotNull(message = "数量上限不能为空")
+    @DiffLogField(name = "数量上限")
     private Integer maxCount;
 
     @Schema(description = "成交客户是否占有拥有客户数(当 type = 1 时)")

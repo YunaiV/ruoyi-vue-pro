@@ -112,37 +112,42 @@ public class CrmCustomerController {
         }
 
         // 2. 拼接数据
-        // 距离进入公海的时间
-        Map<Long, Long> poolDayMap = getPoolDayMap(pageResult);
+        Map<Long, Long> poolDayMap = getPoolDayMap(pageResult);  // 距离进入公海的时间
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSetByFlatMap(pageResult.getList(), user -> Stream.of(Long.parseLong(user.getCreator()), user.getOwnerUserId())));
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
         return success(CrmCustomerConvert.INSTANCE.convertPage(pageResult, userMap, deptMap, poolDayMap));
     }
 
+    // TODO @puhui999：加下注释哈；
     private Map<Long, Long> getPoolDayMap(PageResult<CrmCustomerDO> pageResult) {
         Map<Long, Long> poolDayMap = null;
         CrmCustomerPoolConfigDO customerPoolConfig = customerPoolConfigService.getCustomerPoolConfig();
+        // TODO @puhui999：if return 减少括号
         if (customerPoolConfig != null && customerPoolConfig.getEnabled()) { // 有公海配置的情况
+            // TODO @puhui999：item 改成 customer 更好，容易理解；
             poolDayMap = convertMap(pageResult.getList(), CrmCustomerDO::getId, item -> {
                 long dealExpireDay = 0;
                 if (!item.getDealStatus()) { // 检查是否成交
                     dealExpireDay = customerPoolConfig.getDealExpireDays() - LocalDateTimeUtils.between(item.getCreateTime());
                 }
+                // TODO @puhui999：需要考虑 contactLastTime 为空的情况哈；
                 long contactExpireDay = customerPoolConfig.getContactExpireDays() - LocalDateTimeUtils.between(item.getContactLastTime());
                 return dealExpireDay == 0 ? contactExpireDay : Math.min(dealExpireDay, contactExpireDay);
             });
+            // TODO @puhui999：需要考虑 lock 的情况么？
         }
         return poolDayMap;
     }
 
     @GetMapping(value = "/list-all-simple")
     @Operation(summary = "获取客户精简信息列表", description = "只包含有读权限的客户，主要用于前端的下拉选项")
-    public CommonResult<List<CrmCustomerSimpleRespVO>> getSimpleDeptList() {
+    public CommonResult<List<CrmCustomerRespVO>> getSimpleDeptList() {
         CrmCustomerPageReqVO reqVO = new CrmCustomerPageReqVO();
         reqVO.setPageSize(PAGE_SIZE_NONE); // 不分页
         List<CrmCustomerDO> list = customerService.getCustomerPage(reqVO, getLoginUserId()).getList();
-        return success(BeanUtils.toBean(list, CrmCustomerSimpleRespVO.class));
+        return success(convertList(list, customer -> // 只返回 id、name 精简字段
+                new CrmCustomerRespVO().setId(customer.getId()).setName(customer.getName())));
     }
 
     @GetMapping("/export-excel")
@@ -154,8 +159,8 @@ public class CrmCustomerController {
         pageVO.setPageSize(PAGE_SIZE_NONE); // 不分页
         List<CrmCustomerDO> list = customerService.getCustomerPage(pageVO, getLoginUserId()).getList();
         // 导出 Excel
-        List<CrmCustomerRespVO> datas = CrmCustomerConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "客户.xls", "数据", CrmCustomerRespVO.class, datas);
+        ExcelUtils.write(response, "客户.xls", "数据", CrmCustomerRespVO.class,
+                BeanUtils.toBean(list, CrmCustomerRespVO.class));
     }
 
     @PutMapping("/transfer")

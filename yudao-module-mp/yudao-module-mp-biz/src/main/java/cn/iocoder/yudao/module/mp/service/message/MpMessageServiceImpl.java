@@ -74,6 +74,7 @@ public class MpMessageServiceImpl implements MpMessageService {
         Assert.notNull(account, "公众号账号({}) 不存在", appId);
 
         // 订阅事件不记录，因为此时公众号粉丝表中还没有此粉丝的数据
+        // TODO @芋艿：这个修复，后续看看还有啥问题
         if (ObjUtil.equal(wxMessage.getEvent(), WxConsts.EventType.SUBSCRIBE)) {
             return;
         }

@@ -33,7 +33,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.CRM_CONTACT;
+import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.CRM_CONTACT_TYPE;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_EXISTS;
 import static java.util.Collections.singletonList;
 
@@ -65,7 +65,7 @@ public class CrmContactServiceImpl implements CrmContactService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_CONTACT, subType = "创建联系人", bizNo = "{{#contactId}}", success = "创建了联系人[{{#contactName}}]")
+    @LogRecord(type = CRM_CONTACT_TYPE, subType = "创建联系人", bizNo = "{{#contactId}}", success = "创建了联系人[{{#contactName}}]")
     public Long createContact(CrmContactSaveReqVO createReqVO, Long userId) {
         // 1. 校验
         validateRelationDataExists(createReqVO);
@@ -93,7 +93,7 @@ public class CrmContactServiceImpl implements CrmContactService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_CONTACT, subType = "更新联系人", bizNo = "{{#updateReqVO.id}}", success = "更新了联系人{_DIFF{#updateReqVO}}")
+    @LogRecord(type = CRM_CONTACT_TYPE, subType = "更新联系人", bizNo = "{{#updateReqVO.id}}", success = "更新了联系人{_DIFF{#updateReqVO}}")
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateContact(CrmContactSaveReqVO updateReqVO) {
         // 1. 校验存在

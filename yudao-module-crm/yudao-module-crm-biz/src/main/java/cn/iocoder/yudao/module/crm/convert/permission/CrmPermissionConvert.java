@@ -48,9 +48,7 @@ public interface CrmPermissionConvert {
         return CollectionUtils.convertList(convert(permission), item -> {
             findAndThen(userMap, item.getUserId(), user -> {
                 item.setNickname(user.getNickname());
-                findAndThen(deptMap, user.getDeptId(), deptRespDTO -> {
-                    item.setDeptName(deptRespDTO.getName());
-                });
+                findAndThen(deptMap, user.getDeptId(), deptRespDTO -> item.setDeptName(deptRespDTO.getName()));
                 List<PostRespDTO> postRespList = MapUtils.getList(Multimaps.forMap(postMap), user.getPostIds());
                 if (CollUtil.isEmpty(postRespList)) {
                     item.setPostNames(Collections.emptySet());

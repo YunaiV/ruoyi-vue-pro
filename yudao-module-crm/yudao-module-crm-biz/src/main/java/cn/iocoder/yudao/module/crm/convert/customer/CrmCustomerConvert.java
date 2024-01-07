@@ -16,7 +16,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
@@ -31,6 +30,7 @@ public interface CrmCustomerConvert {
 
     CrmCustomerConvert INSTANCE = Mappers.getMapper(CrmCustomerConvert.class);
 
+    // TODO @puhui999：可以清理掉可以用 BeanUtil 替代的方法哈
     CrmCustomerDO convert(CrmCustomerSaveReqVO bean);
 
     CrmCustomerRespVO convert(CrmCustomerDO bean);
@@ -50,8 +50,6 @@ public interface CrmCustomerConvert {
         });
         findAndThen(userMap, Long.parseLong(customer.getCreator()), user -> customer.setCreatorName(user.getNickname()));
     }
-
-    List<CrmCustomerRespVO> convertList02(List<CrmCustomerDO> list);
 
     @Mapping(target = "bizId", source = "reqVO.id")
     CrmPermissionTransferReqBO convert(CrmCustomerTransferReqVO reqVO, Long userId);

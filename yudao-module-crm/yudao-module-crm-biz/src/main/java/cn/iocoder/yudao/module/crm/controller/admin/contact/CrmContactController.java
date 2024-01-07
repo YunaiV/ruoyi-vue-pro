@@ -46,7 +46,7 @@ import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
-import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.CRM_CONTACT;
+import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.CRM_CONTACT_TYPE;
 
 @Tag(name = "管理后台 - CRM 联系人")
 @RestController
@@ -156,7 +156,7 @@ public class CrmContactController {
     public CommonResult<PageResult<OperateLogV2RespDTO>> getCustomerOperateLog(@RequestParam("bizId")Long bizId) {
         OperateLogV2PageReqDTO reqVO = new OperateLogV2PageReqDTO();
         reqVO.setPageSize(PAGE_SIZE_NONE); // 不分页
-        reqVO.setBizType(CRM_CONTACT);
+        reqVO.setBizType(CRM_CONTACT_TYPE);
         reqVO.setBizId(bizId);
         return success(operateLogApi.getOperateLogPage(BeanUtils.toBean(reqVO, OperateLogV2PageReqDTO.class)));
     }

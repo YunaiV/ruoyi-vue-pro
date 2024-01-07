@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -17,7 +16,6 @@ public class CrmCustomerLimitConfigRespVO {
     private Long id;
 
     @Schema(description = "规则类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @NotNull(message = "规则类型不能为空")
     private Integer type;
 
     @Schema(description = "规则适用人群")
@@ -27,10 +25,9 @@ public class CrmCustomerLimitConfigRespVO {
     private List<Long> deptIds;
 
     @Schema(description = "数量上限", requiredMode = Schema.RequiredMode.REQUIRED, example = "28384")
-    @NotNull(message = "数量上限不能为空")
     private Integer maxCount;
 
-    @Schema(description = "成交客户是否占有拥有客户数(当 type = 1 时)")
+    @Schema(description = "成交客户是否占有拥有客户数")
     private Boolean dealCountEnabled;
 
     @Schema(description = "规则适用人群名称")

@@ -34,6 +34,7 @@ public class CrmCustomerPoolConfigServiceImpl implements CrmCustomerPoolConfigSe
      */
     @Override
     public CrmCustomerPoolConfigDO getCustomerPoolConfig() {
+        // TODO @puhui999：这个要搞到 mapper 里噢。
         return customerPoolConfigMapper.selectOne(new LambdaQueryWrapperX<CrmCustomerPoolConfigDO>().last("LIMIT 1"));
     }
 
@@ -43,7 +44,8 @@ public class CrmCustomerPoolConfigServiceImpl implements CrmCustomerPoolConfigSe
      * @param saveReqVO 更新信息
      */
     @Override
-    @LogRecord(type = CRM_CUSTOMER_POOL_CONFIG_TYPE, subType = CRM_CUSTOMER_POOL_CONFIG_SUB_TYPE, bizNo = "{{#poolConfigId}}", success = CRM_CUSTOMER_POOL_CONFIG_SUCCESS)
+    @LogRecord(type = CRM_CUSTOMER_POOL_CONFIG_TYPE, subType = CRM_CUSTOMER_POOL_CONFIG_SUB_TYPE, bizNo = "{{#poolConfigId}}",
+            success = CRM_CUSTOMER_POOL_CONFIG_SUCCESS)
     public void saveCustomerPoolConfig(CrmCustomerPoolConfigSaveReqVO saveReqVO) {
         // 存在，则进行更新
         CrmCustomerPoolConfigDO dbConfig = getCustomerPoolConfig();

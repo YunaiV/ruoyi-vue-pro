@@ -11,7 +11,7 @@ import java.util.List;
 public class CrmCustomerDistributeReqVO {
 
     @Schema(description = "客户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "[1024]")
-    @NotNull(message = "客户编号不能为空")
+    @NotNull(message = "客户编号不能为空") // TODO @puhui999：list 是 @NotEmpty
     private List<Long> ids;
 
     @Schema(description = "负责人", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")

@@ -40,12 +40,12 @@ public class CrmPermissionAspect {
 
     @Before("@annotation(crmPermission)")
     public void doBefore(JoinPoint joinPoint, CrmPermission crmPermission) {
-        // 获取相关属性值
+        // 1.1 获取相关属性值
         Map<String, Object> expressionValues = parseExpressions(joinPoint, crmPermission);
         Integer bizType = StrUtil.isEmpty(crmPermission.bizTypeValue()) ?
                 crmPermission.bizType()[0].getType() : (Integer) expressionValues.get(crmPermission.bizTypeValue()); // 模块类型
-        // 处理兼容多个 bizId 的情况
-        Object object = expressionValues.get(crmPermission.bizId());// 模块数据编号
+        // 1.2 处理兼容多个 bizId 的情况
+        Object object = expressionValues.get(crmPermission.bizId()); // 模块数据编号
         Set<Long> bizIds = new HashSet<>();
         if (object instanceof Collection<?>) {
             bizIds.addAll(convertSet((Collection<?>) object, item -> Long.parseLong(item.toString())));
@@ -53,11 +53,11 @@ public class CrmPermissionAspect {
             bizIds.add(Long.parseLong(object.toString()));
         }
         Integer permissionLevel = crmPermission.level().getLevel(); // 需要的权限级别
+
+        // 2. 逐个校验权限
         List<CrmPermissionDO> permissionList = crmPermissionService.getPermissionListByBiz(bizType, bizIds);
         Map<Long, List<CrmPermissionDO>> multiMap = convertMultiMap(permissionList, CrmPermissionDO::getBizId);
-        bizIds.forEach(bizId -> {
-            validatePermission(bizType, multiMap.get(bizId), permissionLevel);
-        });
+        bizIds.forEach(bizId -> validatePermission(bizType, multiMap.get(bizId), permissionLevel));
     }
 
     private void validatePermission(Integer bizType, List<CrmPermissionDO> bizPermissions, Integer permissionLevel) {
@@ -71,7 +71,6 @@ public class CrmPermissionAspect {
             if (CrmPermissionLevelEnum.isRead(permissionLevel)) {
                 return;
             }
-
             // 没有数据权限的情况下超出了读权限直接报错，避免后面校验空指针
             throw exception(CRM_PERMISSION_DENIED, CrmBizTypeEnum.getNameByType(bizType));
         } else { // 1.2 有数据权限但是没有负责人的情况
@@ -102,9 +101,8 @@ public class CrmPermissionAspect {
                 }
             }
         }
-        // 2.4 没有权限！
-        // 打个 info 日志，方便后续排查问题、审计
-        log.info("[doBefore][userId({}) 要求权限({}) 实际权限({}) 数据校验错误]",
+        // 2.4 没有权限，抛出异常
+        log.info("[doBefore][userId({}) 要求权限({}) 实际权限({}) 数据校验错误]", // 打个 info 日志，方便后续排查问题、审计
                 getUserId(), permissionLevel, toJsonString(userPermission));
         throw exception(CRM_PERMISSION_DENIED, CrmBizTypeEnum.getNameByType(bizType));
     }

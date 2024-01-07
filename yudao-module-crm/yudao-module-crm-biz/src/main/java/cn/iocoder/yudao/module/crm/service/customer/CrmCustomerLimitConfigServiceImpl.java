@@ -44,7 +44,8 @@ public class CrmCustomerLimitConfigServiceImpl implements CrmCustomerLimitConfig
     private AdminUserApi adminUserApi;
 
     @Override
-    @LogRecord(type = CRM_CUSTOMER_LIMIT_CONFIG_TYPE, subType = CRM_CUSTOMER_LIMIT_CONFIG_CREATE_SUB_TYPE, bizNo = "{{#limitId}}", success = CRM_CUSTOMER_LIMIT_CONFIG_CREATE_SUCCESS)
+    @LogRecord(type = CRM_CUSTOMER_LIMIT_CONFIG_TYPE, subType = CRM_CUSTOMER_LIMIT_CONFIG_CREATE_SUB_TYPE, bizNo = "{{#limitId}}",
+            success = CRM_CUSTOMER_LIMIT_CONFIG_CREATE_SUCCESS)
     public Long createCustomerLimitConfig(CrmCustomerLimitConfigSaveReqVO createReqVO) {
         validateUserAndDept(createReqVO.getUserIds(), createReqVO.getDeptIds());
         // 插入
@@ -54,12 +55,12 @@ public class CrmCustomerLimitConfigServiceImpl implements CrmCustomerLimitConfig
         // 记录操作日志上下文
         LogRecordContext.putVariable("limitType", CrmCustomerLimitConfigTypeEnum.getNameByType(customerLimitConfig.getType()));
         LogRecordContext.putVariable("limitId", customerLimitConfig.getId());
-        // 返回
         return customerLimitConfig.getId();
     }
 
     @Override
-    @LogRecord(type = CRM_CUSTOMER_LIMIT_CONFIG_TYPE, subType = CRM_CUSTOMER_LIMIT_CONFIG_UPDATE_SUB_TYPE, bizNo = "{{#updateReqVO.id}}", success = CRM_CUSTOMER_LIMIT_CONFIG_UPDATE_SUCCESS)
+    @LogRecord(type = CRM_CUSTOMER_LIMIT_CONFIG_TYPE, subType = CRM_CUSTOMER_LIMIT_CONFIG_UPDATE_SUB_TYPE, bizNo = "{{#updateReqVO.id}}",
+            success = CRM_CUSTOMER_LIMIT_CONFIG_UPDATE_SUCCESS)
     public void updateCustomerLimitConfig(CrmCustomerLimitConfigSaveReqVO updateReqVO) {
         // 校验存在
         CrmCustomerLimitConfigDO oldLimitConfig = validateCustomerLimitConfigExists(updateReqVO.getId());
@@ -73,7 +74,8 @@ public class CrmCustomerLimitConfigServiceImpl implements CrmCustomerLimitConfig
     }
 
     @Override
-    @LogRecord(type = CRM_CUSTOMER_LIMIT_CONFIG_TYPE, subType = CRM_CUSTOMER_LIMIT_CONFIG_DELETE_SUB_TYPE, bizNo = "{{#id}}", success = CRM_CUSTOMER_LIMIT_CONFIG_DELETE_SUCCESS)
+    @LogRecord(type = CRM_CUSTOMER_LIMIT_CONFIG_TYPE, subType = CRM_CUSTOMER_LIMIT_CONFIG_DELETE_SUB_TYPE, bizNo = "{{#id}}",
+            success = CRM_CUSTOMER_LIMIT_CONFIG_DELETE_SUCCESS)
     public void deleteCustomerLimitConfig(Long id) {
         // 校验存在
         CrmCustomerLimitConfigDO limitConfigDO = validateCustomerLimitConfigExists(id);

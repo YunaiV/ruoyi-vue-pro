@@ -23,6 +23,7 @@ public interface CrmCustomerLimitConfigConvert {
 
     CrmCustomerLimitConfigConvert INSTANCE = Mappers.getMapper(CrmCustomerLimitConfigConvert.class);
 
+    // TODO @puhui999：可以把 convert 改成 BeanUtils
     CrmCustomerLimitConfigDO convert(CrmCustomerLimitConfigSaveReqVO bean);
 
     CrmCustomerLimitConfigRespVO convert(CrmCustomerLimitConfigDO bean);
