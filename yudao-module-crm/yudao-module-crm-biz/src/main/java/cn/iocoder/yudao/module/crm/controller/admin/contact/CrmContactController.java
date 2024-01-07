@@ -43,8 +43,7 @@ import java.util.stream.Stream;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertListByFlatMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.CRM_CONTACT;
@@ -61,13 +60,12 @@ public class CrmContactController {
     @Resource
     private CrmCustomerService customerService;
     @Resource
+    private CrmContactBusinessService contactBusinessLinkService;
+
+    @Resource
     private AdminUserApi adminUserApi;
     @Resource
     private OperateLogApi operateLogApi;
-
-    @Resource
-    private CrmContactBusinessService contactBusinessLinkService;
-
 
     @PostMapping("/create")
     @Operation(summary = "创建联系人")
@@ -116,10 +114,12 @@ public class CrmContactController {
     }
 
     @GetMapping("/simple-all-list")
-    @Operation(summary = "获得联系人列表")
+    @Operation(summary = "获得联系人的精简列表")
     @PreAuthorize("@ss.hasPermission('crm:contact:query')")
-    public CommonResult<List<CrmContactSimpleRespVO>> getSimpleContactList() {
-        return success(contactService.simpleContactList());
+    public CommonResult<List<CrmContactRespVO>> getSimpleContactList() {
+        List<CrmContactDO> list = contactService.getContactList();
+        return success(convertList(list, contact -> // 只返回 id、name 字段
+                new CrmContactRespVO().setId(contact.getId()).setName(contact.getName())));
     }
 
     @GetMapping("/page")
@@ -149,6 +149,7 @@ public class CrmContactController {
         ExcelUtils.write(response, "联系人.xls", "数据", CrmContactRespVO.class,
                 buildContactDetailPage(pageResult).getList());
     }
+
     @GetMapping("/operate-log-page")
     @Operation(summary = "获得客户操作日志")
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
@@ -159,6 +160,7 @@ public class CrmContactController {
         reqVO.setBizId(bizId);
         return success(operateLogApi.getOperateLogPage(BeanUtils.toBean(reqVO, OperateLogV2PageReqDTO.class)));
     }
+
     /**
      * 构建详细的联系人分页结果
      *

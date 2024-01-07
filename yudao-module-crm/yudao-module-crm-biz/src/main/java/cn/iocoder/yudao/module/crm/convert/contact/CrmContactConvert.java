@@ -29,8 +29,6 @@ public interface CrmContactConvert {
 
     CrmContactConvert INSTANCE = Mappers.getMapper(CrmContactConvert.class);
 
-    CrmContactDO convert(CrmContactSaveReqVO bean);
-
     CrmContactRespVO convert(CrmContactDO bean);
 
     List<CrmContactRespVO> convertList(List<CrmContactDO> list);

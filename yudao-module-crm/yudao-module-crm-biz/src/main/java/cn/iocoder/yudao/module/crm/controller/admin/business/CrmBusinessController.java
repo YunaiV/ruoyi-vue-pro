@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.module.crm.controller.admin.business;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
@@ -29,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -99,7 +96,7 @@ public class CrmBusinessController {
     @GetMapping("/page-by-customer")
     @Operation(summary = "获得商机分页，基于指定客户")
     public CommonResult<PageResult<CrmBusinessRespVO>> getBusinessPageByCustomer(@Valid CrmBusinessPageReqVO pageReqVO) {
-        if(pageReqVO.getCustomerId() == null){
+        if (pageReqVO.getCustomerId() == null) {
             throw exception(CUSTOMER_NOT_EXISTS);
         }
         PageResult<CrmBusinessDO> pageResult = businessService.getBusinessPageByCustomerId(pageReqVO);

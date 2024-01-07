@@ -1,10 +1,8 @@
 package cn.iocoder.yudao.module.crm.framework.operatelog.core;
 
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
 import com.mzt.logapi.service.IParseFunction;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +13,11 @@ import org.springframework.stereotype.Component;
  *
  * @author HUIHUI
  */
-@Slf4j
 @Component
+@Slf4j
 public class CrmSysUserParseFunction implements IParseFunction {
+
+    public static final String NAME = "getUserById";
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -29,7 +29,7 @@ public class CrmSysUserParseFunction implements IParseFunction {
 
     @Override
     public String functionName() {
-        return "getUserById";
+        return NAME;
     }
 
     @Override

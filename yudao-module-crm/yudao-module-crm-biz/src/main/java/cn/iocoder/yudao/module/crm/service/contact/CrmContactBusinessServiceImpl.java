@@ -76,13 +76,13 @@ public class CrmContactBusinessServiceImpl implements CrmContactBusinessService 
     }
 
     @Override
-    public List<CrmContactBusinessDO> getContactBusinessListByContactId(Long contactId) {
-        return contactBusinessMapper.selectListByContactId(contactId);
+    public void deleteContactBusinessByContactId(Long contactId) {
+        contactBusinessMapper.delete(CrmContactBusinessDO::getContactId,contactId);
     }
 
     @Override
-    public void deleteContactBusinessByContactId(Long contactId) {
-        contactBusinessMapper.delete(CrmContactBusinessDO::getContactId,contactId);
+    public List<CrmContactBusinessDO> getContactBusinessListByContactId(Long contactId) {
+        return contactBusinessMapper.selectListByContactId(contactId);
     }
 
 }

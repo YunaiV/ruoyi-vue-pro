@@ -57,6 +57,13 @@ public interface CrmContactService {
     List<CrmContactDO> getContactList(Collection<Long> ids, Long userId);
 
     /**
+     * 获得联系人列表
+     *
+     * @return 联系人列表
+     */
+    List<CrmContactDO> getContactList();
+
+    /**
      * 获得联系人分页
      *
      * 数据权限：基于 {@link CrmContactDO}
@@ -84,11 +91,5 @@ public interface CrmContactService {
      * @param userId 用户编号
      */
     void transferContact(CrmContactTransferReqVO reqVO, Long userId);
-
-    /**
-     * 获取联系人简单列表
-     * @return 联系人
-     */
-    List<CrmContactSimpleRespVO> simpleContactList();
 
 }

@@ -13,9 +13,11 @@ import static cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_L
  *
  * @author HUIHUI
  */
-@Slf4j
 @Component
+@Slf4j
 public class CrmLevelParseFunction implements IParseFunction {
+
+    public static final String NAME = "getLevel";
 
     @Override
     public boolean executeBefore() {
@@ -24,7 +26,7 @@ public class CrmLevelParseFunction implements IParseFunction {
 
     @Override
     public String functionName() {
-        return "getLevel";
+        return NAME;
     }
 
     @Override

@@ -28,14 +28,18 @@ public interface CrmContactBusinessService {
     void deleteContactBusinessList(@Valid CrmContactBusinessReqVO deleteReqVO);
 
     /**
+     * 删除联系人与商机的关联，基于联系人编号
+     *
+     * @param contactId 联系人编号
+     */
+    void deleteContactBusinessByContactId(Long contactId);
+
+    /**
      * 获得联系人与商机的关联列表，基于联系人编号
      *
      * @param contactId 联系人编号
      * @return 联系人商机关联
      */
     List<CrmContactBusinessDO> getContactBusinessListByContactId(Long contactId);
-
-
-    void deleteContactBusinessByContactId(Long contactId);
 
 }

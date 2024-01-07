@@ -60,4 +60,8 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
         return selectJoinList(CrmContractDO.class, mpjLambdaWrapperX);
     }
 
+    default Long selectCountByContactId(Long contactId) {
+        return selectCount(CrmContractDO::getContactId, contactId);
+    }
+
 }

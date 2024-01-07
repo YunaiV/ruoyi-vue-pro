@@ -5,6 +5,9 @@ import cn.iocoder.yudao.framework.common.validation.Mobile;
 import cn.iocoder.yudao.framework.common.validation.Telephone;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.module.crm.enums.customer.CrmCustomerLevelEnum;
+import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmIndustryParseFunction;
+import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmLevelParseFunction;
+import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmSourceParseFunction;
 import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
@@ -31,17 +34,17 @@ public class CrmCustomerBaseVO {
     private String name;
 
     @Schema(description = "所属行业", example = "1")
-    @DiffLogField(name = "所属行业", function = "getIndustryById")
+    @DiffLogField(name = "所属行业", function = CrmIndustryParseFunction.NAME)
     @DictFormat(CRM_CUSTOMER_INDUSTRY)
     private Integer industryId;
 
     @Schema(description = "客户等级", example = "2")
-    @DiffLogField(name = "客户等级", function = "getLevel")
+    @DiffLogField(name = "客户等级", function = CrmLevelParseFunction.NAME)
     @InEnum(CrmCustomerLevelEnum.class)
     private Integer level;
 
     @Schema(description = "客户来源", example = "3")
-    @DiffLogField(name = "客户来源", function = "getSource")
+    @DiffLogField(name = "客户来源", function = CrmSourceParseFunction.NAME)
     private Integer source;
 
     @Schema(description = "手机", example = "18000000000")

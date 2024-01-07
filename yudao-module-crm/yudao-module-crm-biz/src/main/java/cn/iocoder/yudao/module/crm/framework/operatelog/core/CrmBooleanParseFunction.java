@@ -12,9 +12,11 @@ import org.springframework.stereotype.Component;
  *
  * @author HUIHUI
  */
-@Slf4j
 @Component
+@Slf4j
 public class CrmBooleanParseFunction implements IParseFunction {
+
+    public static final String NAME = "getBooleanById";
 
     @Override
     public boolean executeBefore() {
@@ -23,7 +25,7 @@ public class CrmBooleanParseFunction implements IParseFunction {
 
     @Override
     public String functionName() {
-        return "getBooleanById";
+        return NAME;
     }
 
     @Override

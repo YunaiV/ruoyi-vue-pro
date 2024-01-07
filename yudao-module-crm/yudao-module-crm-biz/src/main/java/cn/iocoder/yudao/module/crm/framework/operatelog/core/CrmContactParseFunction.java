@@ -3,8 +3,6 @@ package cn.iocoder.yudao.module.crm.framework.operatelog.core;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.mzt.logapi.service.IParseFunction;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +13,11 @@ import org.springframework.stereotype.Component;
  *
  * @author HUIHUI
  */
-@Slf4j
 @Component
+@Slf4j
 public class CrmContactParseFunction implements IParseFunction {
+
+    public static final String NAME = "getContactById";
 
     @Resource
     private CrmContactService contactService;
@@ -29,7 +29,7 @@ public class CrmContactParseFunction implements IParseFunction {
 
     @Override
     public String functionName() {
-        return "getContactById";
+        return NAME;
     }
 
     @Override
