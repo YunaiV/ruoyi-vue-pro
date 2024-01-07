@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.crm.service.customer;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerLockReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerSaveReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTransferReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import jakarta.validation.Valid;
 
@@ -22,14 +25,14 @@ public interface CrmCustomerService {
      * @param userId      用户编号
      * @return 编号
      */
-    Long createCustomer(@Valid CrmCustomerCreateReqVO createReqVO, Long userId);
+    Long createCustomer(@Valid CrmCustomerSaveReqVO createReqVO, Long userId);
 
     /**
      * 更新客户
      *
      * @param updateReqVO 更新信息
      */
-    void updateCustomer(@Valid CrmCustomerUpdateReqVO updateReqVO);
+    void updateCustomer(@Valid CrmCustomerSaveReqVO updateReqVO);
 
     /**
      * 删除客户
@@ -83,7 +86,7 @@ public interface CrmCustomerService {
      * 锁定/解锁客户
      *
      * @param lockReqVO 更新信息
-     * @param userId 用户编号
+     * @param userId    用户编号
      */
     void lockCustomer(@Valid CrmCustomerLockReqVO lockReqVO, Long userId);
 
@@ -101,15 +104,8 @@ public interface CrmCustomerService {
      *
      * @param ids         要领取的客户编号数组
      * @param ownerUserId 负责人
+     * @param isReceive   是/否领取
      */
-    void receiveCustomer(List<Long> ids, Long ownerUserId);
-
-    /**
-     * 获取客户列表
-     *
-     * @return 客户列表
-     * @author zyna
-     */
-    List<CrmCustomerDO> getCustomerList();
+    void receiveCustomer(List<Long> ids, Long ownerUserId, Boolean isReceive);
 
 }

@@ -8,12 +8,11 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfig
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerPoolConfigService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -26,7 +25,6 @@ public class CrmCustomerPoolConfigController {
     @Resource
     private CrmCustomerPoolConfigService customerPoolConfigService;
 
-    // TODO @puhui999：可以把 vo 改下哈
     @GetMapping("/get")
     @Operation(summary = "获取客户公海规则设置")
     @PreAuthorize("@ss.hasPermission('crm:customer-pool-config:query')")

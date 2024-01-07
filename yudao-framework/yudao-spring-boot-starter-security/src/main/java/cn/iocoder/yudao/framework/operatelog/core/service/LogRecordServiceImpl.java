@@ -2,7 +2,8 @@ package cn.iocoder.yudao.framework.operatelog.core.service;
 
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
-import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.system.api.logger.OperateLogApi;
 import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2CreateReqDTO;
 import com.mzt.logapi.beans.LogRecord;
@@ -13,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
-// TODO @puhui999：LogRecordServiceImpl 改成这个名字哈
 /**
  * 操作日志 ILogRecordService 实现类
  *
@@ -22,7 +22,7 @@ import java.util.List;
  * @author HUIHUI
  */
 @Slf4j
-public class ILogRecordServiceImpl implements ILogRecordService {
+public class LogRecordServiceImpl implements ILogRecordService {
 
     @Resource
     private OperateLogApi operateLogApi;
@@ -46,9 +46,13 @@ public class ILogRecordServiceImpl implements ILogRecordService {
     }
 
     private static void fillUserFields(OperateLogV2CreateReqDTO reqDTO) {
-        // TODO @puhui999：使用 SecurityFrameworkUtils。因为要考虑，rpc、mq、job，它其实不是 web；
-        reqDTO.setUserId(WebFrameworkUtils.getLoginUserId());
-        reqDTO.setUserType(WebFrameworkUtils.getLoginUserType());
+        // 使用 SecurityFrameworkUtils。因为要考虑，rpc、mq、job，它其实不是 web；
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        if (loginUser == null) {
+            return;
+        }
+        reqDTO.setUserId(loginUser.getId());
+        reqDTO.setUserType(loginUser.getUserType());
     }
 
     public static void fillModuleFields(OperateLogV2CreateReqDTO reqDTO, LogRecord logRecord) {
