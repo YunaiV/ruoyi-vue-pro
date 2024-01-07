@@ -50,18 +50,12 @@ public class ProductBrowseHistoryServiceImpl implements ProductBrowseHistoryServ
                 .setUserId(userId)
                 .setSpuId(spuId);
         browseHistoryMapper.insert(browseHistory);
-        // 返回
         return browseHistory.getId();
     }
 
     @Override
     public void hideUserBrowseHistory(Long userId, Collection<Long> spuIds) {
         browseHistoryMapper.updateUserDeletedByUserId(userId, spuIds, true);
-    }
-
-    @Override
-    public ProductBrowseHistoryDO getBrowseHistory(Long id) {
-        return browseHistoryMapper.selectById(id);
     }
 
     @Override

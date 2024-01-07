@@ -28,6 +28,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
+// TODO 芋艿：后面再看
 @Tag(name = "用户 APP - 商品浏览记录")
 @RestController
 @RequestMapping("/product/browse-history")
@@ -65,10 +66,9 @@ public class AppProductBrowseHistoryController {
     @Operation(summary = "获得商品浏览记录分页")
     @PreAuthenticated
     public CommonResult<PageResult<AppProductBrowseHistoryRespVO>> getBrowseHistoryPage(AppProductBrowseHistoryPageReqVO reqVO) {
-        ProductBrowseHistoryPageReqVO pageReqVO = BeanUtils.toBean(reqVO, ProductBrowseHistoryPageReqVO.class);
-        pageReqVO.setUserId(getLoginUserId());
-        // 排除用户已删除的（隐藏的）
-        pageReqVO.setUserDeleted(false);
+        ProductBrowseHistoryPageReqVO pageReqVO = BeanUtils.toBean(reqVO, ProductBrowseHistoryPageReqVO.class)
+                .setUserId(getLoginUserId())
+                .setUserDeleted(false); // 排除用户已删除的（隐藏的）
         PageResult<ProductBrowseHistoryDO> pageResult = productBrowseHistoryService.getBrowseHistoryPage(pageReqVO);
         if (CollUtil.isEmpty(pageResult.getList())) {
             return success(PageResult.empty());
@@ -77,14 +77,9 @@ public class AppProductBrowseHistoryController {
         // 得到商品 spu 信息
         Set<Long> spuIds = convertSet(pageResult.getList(), ProductBrowseHistoryDO::getSpuId);
         Map<Long, ProductSpuDO> spuMap = convertMap(productSpuService.getSpuList(spuIds), ProductSpuDO::getId);
-
-        // 转换 VO 结果
-        PageResult<AppProductBrowseHistoryRespVO> result = BeanUtils.toBean(pageResult, AppProductBrowseHistoryRespVO.class,
-                vo -> Optional.ofNullable(spuMap.get(vo.getSpuId())).ifPresent(spu -> {
-                    vo.setSpuName(spu.getName());
-                    vo.setPicUrl(spu.getPicUrl());
-                }));
-        return success(result);
+        return success(BeanUtils.toBean(pageResult, AppProductBrowseHistoryRespVO.class,
+                vo -> Optional.ofNullable(spuMap.get(vo.getSpuId()))
+                        .ifPresent(spu -> vo.setSpuName(spu.getName()).setPicUrl(spu.getPicUrl()))));
     }
 
 }

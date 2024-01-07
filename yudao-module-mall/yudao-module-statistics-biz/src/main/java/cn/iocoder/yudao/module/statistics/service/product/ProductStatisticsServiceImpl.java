@@ -7,7 +7,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.SortablePageParam;
-import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
+import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.module.statistics.controller.admin.common.vo.DataComparisonRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.product.vo.ProductStatisticsReqVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.product.vo.ProductStatisticsRespVO;
@@ -42,8 +42,7 @@ public class ProductStatisticsServiceImpl implements ProductStatisticsService {
 
     @Override
     public PageResult<ProductStatisticsDO> getProductStatisticsRankPage(ProductStatisticsReqVO reqVO, SortablePageParam pageParam) {
-        // 默认浏览量倒序
-        MyBatisUtils.buildDefaultSortingField(pageParam, ProductStatisticsDO::getBrowseCount);
+        PageUtils.buildDefaultSortingField(pageParam, ProductStatisticsDO::getBrowseCount); // 默认浏览量倒序
         return productStatisticsMapper.selectPageGroupBySpuId(reqVO, pageParam);
     }
 
@@ -92,31 +91,26 @@ public class ProductStatisticsServiceImpl implements ProductStatisticsService {
             return dateStr + " 数据已存在，如果需要重新统计，请先删除对应的数据";
         }
 
-        // 3. 统计数据
         StopWatch stopWatch = new StopWatch(dateStr);
         stopWatch.start();
-
-        // 分页统计，避免商品表数据较多时，出现超时问题
+        // 4. 分页统计，避免商品表数据较多时，出现超时问题
         final int pageSize = 100;
-        for (int pageNo = 1; ; pageNo ++) {
+        for (int pageNo = 1; ; pageNo++) {
             IPage<ProductStatisticsDO> page = productStatisticsMapper.selectStatisticsResultPageByTimeBetween(
                     Page.of(pageNo, pageSize, false), beginTime, endTime);
             if (CollUtil.isEmpty(page.getRecords())) {
                 break;
             }
-
+            // 4.1 计算访客支付转化率（百分比）
             for (ProductStatisticsDO record : page.getRecords()) {
                 record.setTime(date.toLocalDate());
-                // 计算 访客支付转化率（百分比）
                 if (record.getBrowseUserCount() != null && ObjUtil.notEqual(record.getBrowseUserCount(), 0)) {
                     record.setBrowseConvertPercent(100 * record.getOrderPayCount() / record.getBrowseUserCount());
                 }
             }
-
-            // 4. 插入数据
+            // 4.2 插入数据
             productStatisticsMapper.insertBatch(page.getRecords());
         }
-
         return stopWatch.prettyPrint();
     }
 

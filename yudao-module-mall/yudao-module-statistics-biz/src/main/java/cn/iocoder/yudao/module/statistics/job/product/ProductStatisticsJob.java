@@ -45,4 +45,5 @@ public class ProductStatisticsJob implements JobHandler {
         String result = productStatisticsService.statisticsProduct(days);
         return StrUtil.format("商品统计:\n{}", result);
     }
+
 }

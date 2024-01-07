@@ -31,14 +31,6 @@ public interface ProductBrowseHistoryService {
     void hideUserBrowseHistory(Long userId, Collection<Long> spuId);
 
     /**
-     * 获得商品浏览记录
-     *
-     * @param id 编号
-     * @return 商品浏览记录
-     */
-    ProductBrowseHistoryDO getBrowseHistory(Long id);
-
-    /**
      * 获取用户记录数量
      *
      * @param userId      用户编号

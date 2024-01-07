@@ -33,7 +33,7 @@ public class ProductStatisticsDO extends BaseDO {
      */
     private LocalDate time;
     /**
-     * 商品SPU编号
+     * 商品 SPU 编号
      */
     private Long spuId;
     /**

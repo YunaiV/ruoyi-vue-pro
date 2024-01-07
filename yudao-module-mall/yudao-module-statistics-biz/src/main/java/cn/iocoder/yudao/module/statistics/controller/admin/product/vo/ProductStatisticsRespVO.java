@@ -27,7 +27,7 @@ public class ProductStatisticsRespVO {
     @ExcelProperty("商品SPU编号")
     private Long spuId;
 
-    //region 商品信息
+    // region 商品信息
 
     @Schema(description = "商品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "商品名称")
     @ExcelProperty("商品名称")
@@ -37,7 +37,7 @@ public class ProductStatisticsRespVO {
     @ExcelProperty("商品封面图")
     private String picUrl;
 
-    //endregion
+    // endregion
 
     @Schema(description = "浏览量", requiredMode = Schema.RequiredMode.REQUIRED, example = "17505")
     @ExcelProperty("浏览量")

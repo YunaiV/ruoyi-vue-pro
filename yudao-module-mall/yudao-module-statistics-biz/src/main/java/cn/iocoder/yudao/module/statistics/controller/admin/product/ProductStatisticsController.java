@@ -79,13 +79,9 @@ public class ProductStatisticsController {
         // 处理商品信息
         Set<Long> spuIds = convertSet(pageResult.getList(), ProductStatisticsDO::getSpuId);
         Map<Long, ProductSpuRespDTO> spuMap = convertMap(productSpuApi.getSpuList(spuIds), ProductSpuRespDTO::getId);
-        // 拼接返回
         return success(BeanUtils.toBean(pageResult, ProductStatisticsRespVO.class,
-                // 拼接商品信息
-                item -> Optional.ofNullable(spuMap.get(item.getSpuId())).ifPresent(spu -> {
-                    item.setName(spu.getName());
-                    item.setPicUrl(spu.getPicUrl());
-                })));
+                item -> Optional.ofNullable(spuMap.get(item.getSpuId()))
+                        .ifPresent(spu -> item.setName(spu.getName()).setPicUrl(spu.getPicUrl()))));
     }
 
 }
