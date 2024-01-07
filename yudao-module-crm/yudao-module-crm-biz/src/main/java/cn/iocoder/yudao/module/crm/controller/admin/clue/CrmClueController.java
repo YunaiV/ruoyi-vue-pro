@@ -96,4 +96,12 @@ public class CrmClueController {
         return success(true);
     }
 
+    @PostMapping("/transform")
+    @Operation(summary = "线索转化为客户")
+    @PreAuthorize("@ss.hasPermission('crm:clue:update')")
+    public CommonResult<Boolean> translate(@Valid @RequestBody CrmClueTransformReqVO reqVO) {
+        clueService.translate(reqVO, getLoginUserId());
+        return success(Boolean.TRUE);
+    }
+
 }

@@ -3,11 +3,9 @@ package cn.iocoder.yudao.module.crm.service.clue;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueCreateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTransferReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.*;
 import cn.iocoder.yudao.module.crm.convert.clue.CrmClueConvert;
+import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.clue.CrmClueMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
@@ -17,6 +15,7 @@ import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
@@ -108,12 +107,28 @@ public class CrmClueServiceImpl implements CrmClueService {
         validateClueExists(reqVO.getId());
 
         // 2.1 数据权限转移
-        crmPermissionService.transferPermission(
-                CrmClueConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_LEADS.getType()));
+        crmPermissionService.transferPermission(CrmClueConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_LEADS.getType()));
         // 2.2 设置新的负责人
         clueMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
 
         // 3. TODO 记录转移日志
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void translate(CrmClueTransformReqVO reqVO, Long userId) {
+        List<CrmClueDO> clues = getClueList(reqVO.getIds(), userId);
+        // 不存在抛出异常
+        if (CollUtil.isEmpty(clues)) {
+            throw exception(CLUE_NOT_EXISTS);
+        }
+        // 遍历线索，创建对应的客户
+        clues.forEach(clueDO -> {
+            // 创建客户
+            customerService.createCustomer(CrmCustomerConvert.INSTANCE.convert(clueDO), userId);
+            // 更新线索状态
+            clueDO.setTransformStatus(Boolean.TRUE);
+            clueMapper.updateById(clueDO);
+        });
+    }
 }
