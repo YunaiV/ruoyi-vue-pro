@@ -87,4 +87,11 @@ public interface CrmContractService {
      */
     void transferContract(CrmContractTransferReqVO reqVO, Long userId);
 
+    /**
+     * 查询合同，基于联系人
+     * @param contactId 联系人ID
+     * @return 合同
+     */
+    CrmContractDO getContractByContactId(Long contactId);
+
 }

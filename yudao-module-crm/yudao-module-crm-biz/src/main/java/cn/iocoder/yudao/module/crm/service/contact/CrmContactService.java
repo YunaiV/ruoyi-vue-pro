@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.module.crm.service.contact;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactCreateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactTransferReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import jakarta.validation.Valid;
@@ -26,14 +23,14 @@ public interface CrmContactService {
      * @param userId      用户编号
      * @return 编号
      */
-    Long createContact(@Valid CrmContactCreateReqVO createReqVO, Long userId);
+    Long createContact(@Valid CrmContactSaveReqVO createReqVO, Long userId);
 
     /**
      * 更新联系人
      *
      * @param updateReqVO 更新信息
      */
-    void updateContact(@Valid CrmContactUpdateReqVO updateReqVO);
+    void updateContact(@Valid CrmContactSaveReqVO updateReqVO);
 
     /**
      * 删除联系人
@@ -87,5 +84,11 @@ public interface CrmContactService {
      * @param userId 用户编号
      */
     void transferContact(CrmContactTransferReqVO reqVO, Long userId);
+
+    /**
+     * 获取联系人简单列表
+     * @return 联系人
+     */
+    List<CrmContactSimpleRespVO> simpleContactList();
 
 }

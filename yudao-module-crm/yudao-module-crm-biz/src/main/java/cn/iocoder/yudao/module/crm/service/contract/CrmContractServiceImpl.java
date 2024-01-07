@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.crm.service.contract;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
@@ -133,6 +134,11 @@ public class CrmContractServiceImpl implements CrmContractService {
                 CrmContractConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_CONTRACT.getType()));
         // 2.2 设置负责人
         contractMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
+    }
+
+    @Override
+    public CrmContractDO getContractByContactId(Long contactId) {
+        return contractMapper.selectOne(CrmContractDO::getContactId, contactId);
     }
 
     // TODO @合同待定：需要新增一个 ContractConfigDO 表，合同配置，重点是到期提醒；

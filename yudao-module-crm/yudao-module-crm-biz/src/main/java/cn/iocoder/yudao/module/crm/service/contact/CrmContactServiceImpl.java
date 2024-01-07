@@ -2,29 +2,43 @@ package cn.iocoder.yudao.module.crm.service.contact;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.*;
 import cn.iocoder.yudao.module.crm.convert.contact.CrmContactConvert;
+import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contact.CrmContactMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
+import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
+import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import com.mzt.logapi.context.LogRecordContext;
+import com.mzt.logapi.service.impl.DiffParseFunction;
+import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CONTACT_NOT_EXISTS;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CUSTOMER_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.CRM_CONTACT;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.ERROR_CODE_DUPLICATE;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_EXISTS;
 
 /**
@@ -38,45 +52,68 @@ public class CrmContactServiceImpl implements CrmContactService {
 
     @Resource
     private CrmContactMapper contactMapper;
-
     @Resource
     private CrmCustomerService customerService;
     @Resource
     private CrmPermissionService crmPermissionService;
     @Resource
     private AdminUserApi adminUserApi;
+    @Resource
+    private CrmContractService crmContractService;
+    @Resource
+    private CrmContactBusinessService contactBusinessService;
+    @Resource
+    private CrmBusinessService businessService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    // TODO @zyna：增加操作日志，可以参考 CustomerService；内容是 新建了联系人【名字】
-    public Long createContact(CrmContactCreateReqVO createReqVO, Long userId) {
+    @LogRecord(type = CRM_CONTACT, subType = "创建联系人[{{#contactName}}]", bizNo = "{{#contactId}}", success = "创建了联系人")
+    public Long createContact(CrmContactSaveReqVO createReqVO, Long userId) {
         // 1. 校验
         validateRelationDataExists(createReqVO);
 
         // 2. 插入联系人
         CrmContactDO contact = CrmContactConvert.INSTANCE.convert(createReqVO);
-        contactMapper.insert(contact);
+        int contactId = contactMapper.insert(contact);
 
         // 3. 创建数据权限
         crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setUserId(userId)
                 .setBizType(CrmBizTypeEnum.CRM_CONTACT.getType()).setBizId(contact.getId())
                 .setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
 
-        // TODO @zyna：特殊逻辑：如果在【商机】详情那，点击【新增联系人】时，可以自动绑定商机
+        //4.若传businessId自动关联商机
+        Optional.ofNullable(createReqVO.getBusinessId()).ifPresent(businessId -> {
+            CrmBusinessDO crmBusinessDO = businessService.getBusiness(createReqVO.getBusinessId());
+            if(crmBusinessDO == null){
+                throw exception(BUSINESS_NOT_EXISTS);
+            }
+            CrmContactBusinessReqVO crmContactBusinessReqVO = new CrmContactBusinessReqVO();
+            crmContactBusinessReqVO.setContactId(contact.getId());
+            crmContactBusinessReqVO.setBusinessIds(List.of(businessId));
+            contactBusinessService.createContactBusinessList(crmContactBusinessReqVO);
+        });
+
+        // 5. 记录操作日志
+        LogRecordContext.putVariable("contactId", contact.getId());
+        LogRecordContext.putVariable("contactName", contact.getName());
         return contact.getId();
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    @LogRecord(type = CRM_CONTACT, subType = "更新联系人", bizNo = "{{#updateReqVO.id}}", success = "更新了联系人{_DIFF{#updateReqVO}}")
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
-    // TODO @zyna：增加操作日志，可以参考 CustomerService；需要 diff 出字段
-    public void updateContact(CrmContactUpdateReqVO updateReqVO) {
+    public void updateContact(CrmContactSaveReqVO updateReqVO) {
         // 1. 校验存在
-        validateContactExists(updateReqVO.getId());
+        CrmContactDO contactDO = validateContactExists(updateReqVO.getId());
         validateRelationDataExists(updateReqVO);
 
         // 2. 更新联系人
         CrmContactDO updateObj = CrmContactConvert.INSTANCE.convert(updateReqVO);
         contactMapper.updateById(updateObj);
+
+        // 3. 记录操作日志
+        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(contactDO, CrmContactSaveReqVO.class));
     }
 
     /**
@@ -84,7 +121,7 @@ public class CrmContactServiceImpl implements CrmContactService {
      *
      * @param saveReqVO 新增/修改请求 VO
      */
-    private void validateRelationDataExists(CrmContactBaseVO saveReqVO) {
+    private void validateRelationDataExists(CrmContactSaveReqVO saveReqVO) {
         // 1. 校验客户
         if (saveReqVO.getCustomerId() != null && customerService.getCustomer(saveReqVO.getCustomerId()) == null) {
             throw exception(CUSTOMER_NOT_EXISTS);
@@ -101,24 +138,30 @@ public class CrmContactServiceImpl implements CrmContactService {
 
     @Override
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
+    @Transactional(rollbackFor = Exception.class)
     public void deleteContact(Long id) {
-        // 校验存在
+        //1. 校验存在
         validateContactExists(id);
-        // TODO @zyna：如果有关联的合同，不允许删除；Contract.contactId
-
-        // 删除
+        //2.校验是否关联合同
+        CrmContractDO crmContractDO = crmContractService.getContractByContactId(id);
+        if(crmContractDO != null){
+            throw exception(CONTACT_CONTRACT_LINK_EXISTS);
+        }
+        //3.删除联系人
         contactMapper.deleteById(id);
-        // 删除数据权限
+        //4.删除数据权限
         crmPermissionService.deletePermission(CrmBizTypeEnum.CRM_CONTACT.getType(), id);
-        // TODO @zyna：删除商机联系人关联
-
+        //5.删除商机关联
+        contactBusinessService.deleteContactBusinessByContactId(id);
         // TODO @puhui999：删除跟进记录
     }
 
-    private void validateContactExists(Long id) {
-        if (contactMapper.selectById(id) == null) {
+    private CrmContactDO validateContactExists(Long id) {
+        CrmContactDO contactDO = contactMapper.selectById(id);
+        if (contactDO == null) {
             throw exception(CONTACT_NOT_EXISTS);
         }
+        return contactDO;
     }
 
     @Override
@@ -160,6 +203,14 @@ public class CrmContactServiceImpl implements CrmContactService {
         contactMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
 
         // 3. TODO 记录转移日志
+    }
+
+    @Override
+    public List<CrmContactSimpleRespVO> simpleContactList() {
+        CrmContactPageReqVO pageReqVO = new CrmContactPageReqVO();
+        pageReqVO.setPageSize(PAGE_SIZE_NONE);
+        List<CrmContactDO> list =contactMapper.selectPage(pageReqVO, getLoginUserId()).getList();
+        return BeanUtils.toBean(list, CrmContactSimpleRespVO.class);
     }
 
 }
