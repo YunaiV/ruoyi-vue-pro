@@ -20,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CLUE_NOT_EXISTS;
@@ -43,11 +44,14 @@ public class CrmClueServiceImpl implements CrmClueService {
 
     @Override
     public Long createClue(CrmClueCreateReqVO createReqVO) {
-        // 校验客户是否存在
-        customerService.validateCustomer(createReqVO.getCustomerId());
+        // 如果传入客户，校验客户是否存在
+        if (Objects.nonNull(createReqVO.getCustomerId())) {
+            customerService.validateCustomer(createReqVO.getCustomerId());
+        }
         // 插入
         CrmClueDO clue = CrmClueConvert.INSTANCE.convert(createReqVO);
         clueMapper.insert(clue);
+        System.out.println(1);
         // 返回
         return clue.getId();
     }
@@ -57,8 +61,10 @@ public class CrmClueServiceImpl implements CrmClueService {
     public void updateClue(CrmClueUpdateReqVO updateReqVO) {
         // 校验存在
         validateClueExists(updateReqVO.getId());
-        // 校验客户是否存在
-        customerService.validateCustomer(updateReqVO.getCustomerId());
+        // 如果传入客户，校验客户是否存在
+        if (Objects.nonNull(updateReqVO.getCustomerId())) {
+            customerService.validateCustomer(updateReqVO.getCustomerId());
+        }
 
         // 更新
         CrmClueDO updateObj = CrmClueConvert.INSTANCE.convert(updateReqVO);
