@@ -42,12 +42,14 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
     @Override
     @LogRecord(type = CRM_PRODUCT_CATEGORY_TYPE, subType = CRM_PRODUCT_CATEGORY_CREATE_SUB_TYPE, bizNo = "{{#createReqVO.id}}",
             success = CRM_PRODUCT_CATEGORY_CREATE_SUCCESS)
+    // TODO @hao：产品分类，应该没数据权限。可以删除下哈；
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_PRODUCT, bizId = "#createReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public Long createProductCategory(CrmProductCategoryCreateReqVO createReqVO) {
         // 1.1 校验父分类存在
         validateParentProductCategory(createReqVO.getParentId());
         // 1.2 分类名称是否存在
         validateProductNameExists(null, createReqVO.getParentId(), createReqVO.getName());
+
         // 2. 插入分类
         CrmProductCategoryDO category = BeanUtils.toBean(createReqVO, CrmProductCategoryDO.class);
         productCategoryMapper.insert(category);
@@ -65,6 +67,7 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
         validateParentProductCategory(updateReqVO.getParentId());
         // 1.3 分类名称是否存在
         validateProductNameExists(updateReqVO.getId(), updateReqVO.getParentId(), updateReqVO.getName());
+
         // 2. 更新分类
         CrmProductCategoryDO updateObj = BeanUtils.toBean(updateReqVO, CrmProductCategoryDO.class);
         productCategoryMapper.updateById(updateObj);

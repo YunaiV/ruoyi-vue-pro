@@ -60,6 +60,7 @@ public interface LogRecordConstants {
 
     // ======================= CRM_PRODUCT 产品 =======================
 
+    // TODO @hao：可以把 CRM 产品、和 CRM 产品分类分开哈，量程两个 type；
     String CRM_PRODUCT_TYPE = "CRM 产品";
     String CRM_PRODUCT_CREATE_SUB_TYPE = "创建产品";
     String CRM_PRODUCT_CREATE_SUCCESS = "创建了产品【{{#createReqVO.name}}】";
