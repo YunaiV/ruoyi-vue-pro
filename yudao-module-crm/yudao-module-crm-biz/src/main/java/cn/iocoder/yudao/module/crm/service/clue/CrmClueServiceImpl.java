@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactSaveReqVO;
 import cn.iocoder.yudao.module.crm.convert.clue.CrmClueConvert;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
@@ -13,6 +14,7 @@ import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,8 @@ import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CLUE_NOT_EXISTS;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CUSTOMER_NOT_EXISTS;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_EXISTS;
 
 /**
  * 线索 Service 实现类
@@ -39,15 +43,18 @@ public class CrmClueServiceImpl implements CrmClueService {
 
     @Resource
     private CrmCustomerService customerService;
+
     @Resource
     private CrmPermissionService crmPermissionService;
 
+    @Resource
+    private AdminUserApi adminUserApi;
+
     @Override
-    public Long createClue(CrmClueCreateReqVO createReqVO) {
-        // 如果传入客户，校验客户是否存在
-        if (Objects.nonNull(createReqVO.getCustomerId())) {
-            customerService.validateCustomer(createReqVO.getCustomerId());
-        }
+    public Long createClue(CrmClueSaveReqVO createReqVO) {
+        // 校验关联数据
+        validateRelationDataExists(createReqVO);
+
         // 插入
         CrmClueDO clue = CrmClueConvert.INSTANCE.convert(createReqVO);
         clueMapper.insert(clue);
@@ -58,13 +65,11 @@ public class CrmClueServiceImpl implements CrmClueService {
 
     @Override
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_LEADS, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
-    public void updateClue(CrmClueUpdateReqVO updateReqVO) {
-        // 校验存在
+    public void updateClue(CrmClueSaveReqVO updateReqVO) {
+        // 校验线索是否存在
         validateClueExists(updateReqVO.getId());
-        // 如果传入客户，校验客户是否存在
-        if (Objects.nonNull(updateReqVO.getCustomerId())) {
-            customerService.validateCustomer(updateReqVO.getCustomerId());
-        }
+        // 校验关联数据
+        validateRelationDataExists(updateReqVO);
 
         // 更新
         CrmClueDO updateObj = CrmClueConvert.INSTANCE.convert(updateReqVO);
@@ -136,5 +141,19 @@ public class CrmClueServiceImpl implements CrmClueService {
             clueDO.setTransformStatus(Boolean.TRUE);
             clueMapper.updateById(clueDO);
         });
+    }
+
+    private void validateRelationDataExists(CrmClueSaveReqVO reqVO) {
+        // 校验客户
+        if (Objects.nonNull(reqVO.getCustomerId()) &&
+                Objects.isNull(customerService.getCustomer(reqVO.getCustomerId()))) {
+            throw exception(CUSTOMER_NOT_EXISTS);
+        }
+        // 校验负责人
+        // 2. 校验负责人
+        if (Objects.nonNull(reqVO.getOwnerUserId()) &&
+                Objects.isNull(adminUserApi.getUser(reqVO.getOwnerUserId()))) {
+            throw exception(USER_NOT_EXISTS);
+        }
     }
 }

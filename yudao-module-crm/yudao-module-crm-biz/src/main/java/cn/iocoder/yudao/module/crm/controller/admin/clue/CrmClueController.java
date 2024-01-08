@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactSaveReqVO;
 import cn.iocoder.yudao.module.crm.convert.clue.CrmClueConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
 import cn.iocoder.yudao.module.crm.service.clue.CrmClueService;
@@ -38,14 +39,14 @@ public class CrmClueController {
     @PostMapping("/create")
     @Operation(summary = "创建线索")
     @PreAuthorize("@ss.hasPermission('crm:clue:create')")
-    public CommonResult<Long> createClue(@Valid @RequestBody CrmClueCreateReqVO createReqVO) {
+    public CommonResult<Long> createClue(@Valid @RequestBody CrmClueSaveReqVO createReqVO) {
         return success(clueService.createClue(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新线索")
     @PreAuthorize("@ss.hasPermission('crm:clue:update')")
-    public CommonResult<Boolean> updateClue(@Valid @RequestBody CrmClueUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateClue(@Valid @RequestBody CrmClueSaveReqVO updateReqVO) {
         clueService.updateClue(updateReqVO);
         return success(true);
     }
