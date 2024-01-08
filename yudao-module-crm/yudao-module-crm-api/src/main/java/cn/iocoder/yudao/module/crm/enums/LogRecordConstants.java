@@ -61,6 +61,19 @@ public interface LogRecordConstants {
     // ======================= CRM_PRODUCT 产品 =======================
 
     String CRM_PRODUCT_TYPE = "CRM 产品";
+    String CRM_PRODUCT_CREATE_SUB_TYPE = "创建产品";
+    String CRM_PRODUCT_CREATE_SUCCESS = "创建了产品【{{#createReqVO.name}}】";
+    String CRM_PRODUCT_UPDATE_SUB_TYPE = "更新产品";
+    String CRM_PRODUCT_UPDATE_SUCCESS = "更新了产品【{{#updateReqVO.name}}】: {_DIFF{#updateReqVO}}";
+    String CRM_PRODUCT_DELETE_SUB_TYPE = "删除产品";
+    String CRM_PRODUCT_DELETE_SUCCESS = "删除了产品【{{#product.name}}】";
+    String CRM_PRODUCT_CATEGORY_TYPE = "CRM 产品分类";
+    String CRM_PRODUCT_CATEGORY_CREATE_SUB_TYPE = "创建产品分类";
+    String CRM_PRODUCT_CATEGORY_CREATE_SUCCESS = "创建了产品分类【{{#createReqVO.name}}】";
+    String CRM_PRODUCT_CATEGORY_UPDATE_SUB_TYPE = "更新产品分类";
+    String CRM_PRODUCT_CATEGORY_UPDATE_SUCCESS = "更新了产品分类【{{#updateReqVO.name}}】: {_DIFF{#updateReqVO}}";
+    String CRM_PRODUCT_CATEGORY_DELETE_SUB_TYPE = "删除产品分类";
+    String CRM_PRODUCT_CATEGORY_DELETE_SUCCESS = "删除了产品分类【{{#productCategory.name}}】";
 
     // ======================= CRM_RECEIVABLE 回款 =======================
 
