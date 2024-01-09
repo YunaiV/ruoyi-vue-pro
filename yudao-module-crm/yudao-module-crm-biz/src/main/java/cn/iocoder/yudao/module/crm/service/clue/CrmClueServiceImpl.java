@@ -135,6 +135,7 @@ public class CrmClueServiceImpl implements CrmClueService {
         if (CollUtil.isEmpty(clues)) {
             throw exception(CLUE_NOT_EXISTS);
         }
+        // TODO @min：如果已经转化，则不能重复转化
 
         // 遍历线索，创建对应的客户
         clues.forEach(clue -> {
@@ -142,6 +143,7 @@ public class CrmClueServiceImpl implements CrmClueService {
             customerService.createCustomer(CrmCustomerConvert.INSTANCE.convert(clue), userId);
             // 更新线索状态
             // TODO @min：新建一个 CrmClueDO 去更新。尽量规避直接用原本的对象去更新。因为这样万一并发更新，会存在覆盖的问题。
+            // TODO @puhui999：如果有跟进记录，需要一起转过去；
             clue.setTransformStatus(Boolean.TRUE);
             clueMapper.updateById(clue);
         });
