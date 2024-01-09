@@ -30,7 +30,6 @@ import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CLUE_NOT_EXISTS;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CUSTOMER_NOT_EXISTS;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_EXISTS;
 
 /**
@@ -156,13 +155,7 @@ public class CrmClueServiceImpl implements CrmClueService {
     }
 
     private void validateRelationDataExists(CrmClueSaveReqVO reqVO) {
-        // 校验客户
-        if (Objects.nonNull(reqVO.getCustomerId()) &&
-                Objects.isNull(customerService.getCustomer(reqVO.getCustomerId()))) {
-            throw exception(CUSTOMER_NOT_EXISTS);
-        }
         // 校验负责人
-        // 2. 校验负责人
         if (Objects.nonNull(reqVO.getOwnerUserId()) &&
                 Objects.isNull(adminUserApi.getUser(reqVO.getOwnerUserId()))) {
             throw exception(USER_NOT_EXISTS);

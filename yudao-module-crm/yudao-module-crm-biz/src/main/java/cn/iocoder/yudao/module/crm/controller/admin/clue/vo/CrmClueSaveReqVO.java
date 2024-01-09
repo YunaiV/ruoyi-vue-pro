@@ -22,10 +22,6 @@ public class CrmClueSaveReqVO {
     @NotEmpty(message = "线索名称不能为空")
     private String name;
 
-    // TODO @min：是不是不传递 customerId？
-    @Schema(description = "客户 id", example = "520")
-    private Long customerId;
-
     @Schema(description = "下次联系时间", example = "2023-10-18 01:00:00")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime contactNextTime;
