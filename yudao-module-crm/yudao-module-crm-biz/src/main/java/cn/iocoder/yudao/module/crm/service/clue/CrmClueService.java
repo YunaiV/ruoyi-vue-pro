@@ -79,6 +79,6 @@ public interface CrmClueService {
      * @param reqVO  线索编号
      * @param userId 用户编号
      */
-    void translate(CrmClueTransformReqVO reqVO, Long userId);
+    void translateCustomer(CrmClueTransformReqVO reqVO, Long userId);
 
 }

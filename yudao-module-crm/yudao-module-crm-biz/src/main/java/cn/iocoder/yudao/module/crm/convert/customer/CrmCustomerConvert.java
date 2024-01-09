@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerSaveR
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTransferReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.poolconfig.CrmCustomerPoolConfigRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.poolconfig.CrmCustomerPoolConfigSaveReqVO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
@@ -77,9 +76,5 @@ public interface CrmCustomerConvert {
     CrmCustomerPoolConfigRespVO convert(CrmCustomerPoolConfigDO customerPoolConfig);
 
     CrmCustomerPoolConfigDO convert(CrmCustomerPoolConfigSaveReqVO updateReqVO);
-
-    // TODO @min：使用 BeanUtils 拷贝哈。我们慢慢简单的对象，不再直接基于 convert 做啦。
-    @Mapping(ignore = true, target = "id")
-    CrmCustomerSaveReqVO convert(CrmClueDO bean);
 
 }
