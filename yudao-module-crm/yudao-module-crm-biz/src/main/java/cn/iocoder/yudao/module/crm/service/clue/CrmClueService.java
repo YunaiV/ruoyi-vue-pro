@@ -1,10 +1,8 @@
 package cn.iocoder.yudao.module.crm.service.clue;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueCreateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTransferReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
 import jakarta.validation.Valid;
 
@@ -24,14 +22,14 @@ public interface CrmClueService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createClue(@Valid CrmClueCreateReqVO createReqVO);
+    Long createClue(@Valid CrmClueSaveReqVO createReqVO);
 
     /**
      * 更新线索
      *
      * @param updateReqVO 更新信息
      */
-    void updateClue(@Valid CrmClueUpdateReqVO updateReqVO);
+    void updateClue(@Valid CrmClueSaveReqVO updateReqVO);
 
     /**
      * 删除线索
@@ -73,4 +71,11 @@ public interface CrmClueService {
      */
     void transferClue(CrmClueTransferReqVO reqVO, Long userId);
 
+    /**
+     * 线索转化为客户
+     *
+     * @param reqVO  线索编号
+     * @param userId 用户编号
+     */
+    void translate(CrmClueTransformReqVO reqVO, Long userId);
 }
