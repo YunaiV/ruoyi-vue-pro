@@ -2,10 +2,10 @@ package cn.iocoder.yudao.module.crm.controller.admin.clue;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.*;
-import cn.iocoder.yudao.module.crm.convert.clue.CrmClueConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
 import cn.iocoder.yudao.module.crm.service.clue.CrmClueService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -65,7 +65,7 @@ public class CrmClueController {
     @PreAuthorize("@ss.hasPermission('crm:clue:query')")
     public CommonResult<CrmClueRespVO> getClue(@RequestParam("id") Long id) {
         CrmClueDO clue = clueService.getClue(id);
-        return success(CrmClueConvert.INSTANCE.convert(clue));
+        return success(BeanUtils.toBean(clue, CrmClueRespVO.class));
     }
 
     @GetMapping("/page")
@@ -73,7 +73,7 @@ public class CrmClueController {
     @PreAuthorize("@ss.hasPermission('crm:clue:query')")
     public CommonResult<PageResult<CrmClueRespVO>> getCluePage(@Valid CrmCluePageReqVO pageVO) {
         PageResult<CrmClueDO> pageResult = clueService.getCluePage(pageVO, getLoginUserId());
-        return success(CrmClueConvert.INSTANCE.convertPage(pageResult));
+        return success(BeanUtils.toBean(pageResult, CrmClueRespVO.class));
     }
 
     @GetMapping("/export-excel")
@@ -84,7 +84,7 @@ public class CrmClueController {
         pageReqVO.setPageSize(PAGE_SIZE_NONE);
         List<CrmClueDO> list = clueService.getCluePage(pageReqVO, getLoginUserId()).getList();
         // 导出 Excel
-        List<CrmClueExcelVO> datas = CrmClueConvert.INSTANCE.convertList02(list);
+        List<CrmClueExcelVO> datas = BeanUtils.toBean(list, CrmClueExcelVO.class);
         ExcelUtils.write(response, "线索.xls", "数据", CrmClueExcelVO.class, datas);
     }
 

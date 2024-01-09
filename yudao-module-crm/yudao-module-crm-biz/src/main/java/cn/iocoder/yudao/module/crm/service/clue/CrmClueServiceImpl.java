@@ -60,7 +60,7 @@ public class CrmClueServiceImpl implements CrmClueService {
         validateRelationDataExists(createReqVO);
 
         // 插入
-        CrmClueDO clue = CrmClueConvert.INSTANCE.convert(createReqVO);
+        CrmClueDO clue = BeanUtils.toBean(createReqVO, CrmClueDO.class);
         clueMapper.insert(clue);
         // 返回
         return clue.getId();
@@ -75,7 +75,7 @@ public class CrmClueServiceImpl implements CrmClueService {
         validateRelationDataExists(updateReqVO);
 
         // 更新
-        CrmClueDO updateObj = CrmClueConvert.INSTANCE.convert(updateReqVO);
+        CrmClueDO updateObj = BeanUtils.toBean(updateReqVO, CrmClueDO.class);
         clueMapper.updateById(updateObj);
     }
 
