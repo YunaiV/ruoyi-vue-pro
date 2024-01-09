@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.bpm.service.candidate.sourceInfoProcessor;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
-import cn.iocoder.yudao.module.bpm.controller.admin.candidate.vo.BpmTaskCandidateVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.candidate.vo.BpmTaskCandidateRuleVO;
 import cn.iocoder.yudao.module.bpm.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.script.BpmTaskAssignScript;
@@ -51,8 +51,8 @@ public class BpmCandidateScriptApiSourceInfoProcessor implements BpmCandidateSou
     }
 
     @Override
-    public Set<Long> doProcess(BpmCandidateSourceInfo request, BpmTaskCandidateVO rule) {
-        return calculateTaskCandidateUsersByScript(request.getExecution(), rule.getOptions());
+    public Set<Long> doProcess(BpmCandidateSourceInfo request, BpmTaskCandidateRuleVO rule, DelegateExecution delegateExecution) {
+        return calculateTaskCandidateUsersByScript(delegateExecution, rule.getOptions());
     }
 
     private Set<Long> calculateTaskCandidateUsersByScript(DelegateExecution execution, Set<Long> options) {

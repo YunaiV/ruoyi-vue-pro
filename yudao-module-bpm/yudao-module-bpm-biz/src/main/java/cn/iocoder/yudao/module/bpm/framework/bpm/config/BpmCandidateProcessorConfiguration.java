@@ -41,7 +41,7 @@ public class BpmCandidateProcessorConfiguration {
 
     /**
      * 可以自己定制脚本，然后通过这里设置到处理器里面去
-     * @param scriptsOp
+     * @param scriptsOp 脚本包装对象
      * @return
      */
     @Bean

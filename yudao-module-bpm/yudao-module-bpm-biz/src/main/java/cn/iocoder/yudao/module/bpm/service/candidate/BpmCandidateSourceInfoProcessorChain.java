@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.bpm.service.candidate;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.module.bpm.controller.admin.candidate.vo.BpmTaskCandidateVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.candidate.vo.BpmTaskCandidateRuleVO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class BpmCandidateSourceInfoProcessorChain {
@@ -31,7 +31,7 @@ public class BpmCandidateSourceInfoProcessorChain {
     @Resource
     // 动态扩展处理节点
     public BpmCandidateSourceInfoProcessorChain addProcessor(ObjectProvider<BpmCandidateSourceInfoProcessor> processorOp) {
-        List<BpmCandidateSourceInfoProcessor> processor = processorOp.orderedStream().collect(Collectors.toList());
+        List<BpmCandidateSourceInfoProcessor> processor = ListUtil.toList(processorOp.iterator());
         if (null == processorList) {
             processorList = new ArrayList<>(processor.size());
         }
@@ -40,14 +40,14 @@ public class BpmCandidateSourceInfoProcessorChain {
     }
 
     // 获取处理器处理
-    public Set<Long> process(BpmCandidateSourceInfo sourceInfo) throws Exception {
+    public Set<Long> process(BpmCandidateSourceInfo sourceInfo, DelegateExecution execution) throws Exception {
         // Verify our parameters
         if (sourceInfo == null) {
             throw new IllegalArgumentException();
         }
         for (BpmCandidateSourceInfoProcessor processor : processorList) {
             try {
-                for (BpmTaskCandidateVO vo : sourceInfo.getRules()) {
+                for (BpmTaskCandidateRuleVO vo : sourceInfo.getRules()) {
                     processor.validRuleOptions(vo.getType(), vo.getOptions());
                 }
             } catch (Exception e) {
@@ -59,7 +59,7 @@ public class BpmCandidateSourceInfoProcessorChain {
         Exception saveException = null;
         for (BpmCandidateSourceInfoProcessor processor : processorList) {
             try {
-                saveResult = processor.process(sourceInfo, this);
+                saveResult = processor.process(sourceInfo, execution);
                 if (CollUtil.isNotEmpty(saveResult)) {
                     removeDisableUsers(saveResult);
                     break;
@@ -78,10 +78,9 @@ public class BpmCandidateSourceInfoProcessorChain {
     }
 
     public Set<Long> calculateTaskCandidateUsers(DelegateExecution execution, BpmCandidateSourceInfo sourceInfo) {
-        sourceInfo.setExecution(execution);
         Set<Long> results = Collections.emptySet();
         try {
-            results = process(sourceInfo);
+            results = process(sourceInfo, execution);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -90,6 +89,7 @@ public class BpmCandidateSourceInfoProcessorChain {
 
     /**
      * 移除禁用用户
+     *
      * @param assigneeUserIds
      */
     public void removeDisableUsers(Set<Long> assigneeUserIds) {

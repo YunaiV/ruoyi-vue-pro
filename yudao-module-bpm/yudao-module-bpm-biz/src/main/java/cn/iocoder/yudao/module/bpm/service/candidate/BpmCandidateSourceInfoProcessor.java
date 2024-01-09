@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.bpm.service.candidate;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.module.bpm.controller.admin.candidate.vo.BpmTaskCandidateVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.candidate.vo.BpmTaskCandidateRuleVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
+import org.flowable.engine.delegate.DelegateExecution;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -29,24 +30,24 @@ public interface BpmCandidateSourceInfoProcessor {
      * 默认的处理
      * 如果想去操作所有的规则，则可以覆盖此方法
      *
-     * @param request
-     * @param chain
+     * @param request           原始请求
+     * @param delegateExecution 审批过程中的对象
      * @return 必须包含的是用户ID，而不是其他的ID
      * @throws Exception
      */
-    default Set<Long> process(BpmCandidateSourceInfo request, BpmCandidateSourceInfoProcessorChain chain) throws Exception {
-        Set<BpmTaskCandidateVO> rules = request.getRules();
+    default Set<Long> process(BpmCandidateSourceInfo request, DelegateExecution delegateExecution) throws Exception {
+        Set<BpmTaskCandidateRuleVO> rules = request.getRules();
         Set<Long> results = new HashSet<>();
-        for (BpmTaskCandidateVO rule : rules) {
+        for (BpmTaskCandidateRuleVO rule : rules) {
             // 每个处理器都有机会处理自己支持的事件
             if (CollUtil.contains(getSupportedTypes(), rule.getType())) {
-                results.addAll(doProcess(request, rule));
+                results.addAll(doProcess(request, rule, delegateExecution));
             }
         }
         return results;
     }
 
-    default Set<Long> doProcess(BpmCandidateSourceInfo request, BpmTaskCandidateVO rule) {
+    default Set<Long> doProcess(BpmCandidateSourceInfo request, BpmTaskCandidateRuleVO rule, DelegateExecution delegateExecution) {
         return Collections.emptySet();
     }
 }

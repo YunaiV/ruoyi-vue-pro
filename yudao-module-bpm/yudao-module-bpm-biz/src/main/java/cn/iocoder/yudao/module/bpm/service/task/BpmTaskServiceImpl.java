@@ -19,6 +19,8 @@ import cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceDeleteReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskAddSignTypeEnum;
+import cn.iocoder.yudao.module.bpm.service.candidate.BpmCandidateSourceInfo;
+import cn.iocoder.yudao.module.bpm.service.cc.BpmProcessInstanceCopyService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.module.bpm.service.message.BpmMessageService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -93,6 +95,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Resource
     private ManagementService managementService;
+
+    @Resource
+    private BpmProcessInstanceCopyService processInstanceCopyService;
 
     @Override
     public PageResult<BpmTaskTodoPageItemRespVO> getTodoTaskPage(Long userId, BpmTaskTodoPageReqVO pageVO) {
@@ -237,6 +242,17 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                         .setReason(reqVO.getReason()));
         // 处理加签任务
         handleParentTask(task);
+
+        // 在能正常审批的情况下抄送流程
+        if (null != reqVO.getCcCandidateRule()) {
+            BpmCandidateSourceInfo sourceInfo = new BpmCandidateSourceInfo();
+            sourceInfo.setTaskId(reqVO.getId());
+            sourceInfo.setProcessInstanceId(instance.getId());
+            sourceInfo.addRule(reqVO.getCcCandidateRule());
+            if (!processInstanceCopyService.makeCopy(sourceInfo)) {
+                throw new RuntimeException("抄送任务失败");
+            }
+        }
     }
 
 

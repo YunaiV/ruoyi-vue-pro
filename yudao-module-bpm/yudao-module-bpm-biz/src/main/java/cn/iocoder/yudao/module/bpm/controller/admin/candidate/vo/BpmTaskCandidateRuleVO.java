@@ -14,7 +14,7 @@ import java.util.Set;
  * @see BpmTaskAssignRuleBaseVO
  */
 @Data
-public class BpmTaskCandidateVO {
+public class BpmTaskCandidateRuleVO {
 
     @Schema(description = "规则类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "bpm_task_assign_rule_type")
     @NotNull(message = "规则类型不能为空")

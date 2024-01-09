@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task;
 
+import cn.iocoder.yudao.module.bpm.controller.admin.candidate.vo.BpmTaskCandidateRuleVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -16,5 +17,8 @@ public class BpmTaskApproveReqVO {
     @Schema(description = "审批意见", requiredMode = Schema.RequiredMode.REQUIRED, example = "不错不错！")
     @NotEmpty(message = "审批意见不能为空")
     private String reason;
+
+    @Schema(description = "审批时流程抄送人", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private BpmTaskCandidateRuleVO ccCandidateRule;
 
 }

@@ -4,8 +4,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.bpm.controller.admin.candidate.vo.BpmTaskCandidateVO;
-import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
+import cn.iocoder.yudao.module.bpm.controller.admin.candidate.vo.BpmTaskCandidateRuleVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmUserGroupDO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskRuleScriptEnum;
@@ -13,10 +12,7 @@ import cn.iocoder.yudao.module.bpm.framework.bpm.config.BpmCandidateProcessorCon
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.script.BpmTaskAssignScript;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.script.impl.BpmTaskAssignLeaderX1Script;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.script.impl.BpmTaskAssignLeaderX2Script;
-import cn.iocoder.yudao.module.bpm.service.candidate.BpmCandidateSourceInfo;
-import cn.iocoder.yudao.module.bpm.service.candidate.BpmCandidateSourceInfoProcessorChain;
 import cn.iocoder.yudao.module.bpm.service.candidate.sourceInfoProcessor.BpmCandidateScriptApiSourceInfoProcessor;
-import cn.iocoder.yudao.module.bpm.service.definition.BpmTaskAssignRuleServiceImpl;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmUserGroupService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.PostApi;
@@ -28,7 +24,6 @@ import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
@@ -72,7 +67,7 @@ public class BpmCandidateSourceInfoProcessorChainTest extends BaseDbUnitTest {
     @Test
     public void testCalculateTaskCandidateUsers_Role() {
         // 准备参数
-        BpmTaskCandidateVO rule = new BpmTaskCandidateVO().setOptions(asSet(1L, 2L))
+        BpmTaskCandidateRuleVO rule = new BpmTaskCandidateRuleVO().setOptions(asSet(1L, 2L))
                 .setType(BpmTaskAssignRuleTypeEnum.ROLE.getType());
         // mock 方法
         when(permissionApi.getUserRoleIdListByRoleIds(eq(rule.getOptions())))
@@ -90,7 +85,7 @@ public class BpmCandidateSourceInfoProcessorChainTest extends BaseDbUnitTest {
     @Test
     public void testCalculateTaskCandidateUsers_DeptMember() {
         // 准备参数
-        BpmTaskCandidateVO rule = new BpmTaskCandidateVO().setOptions(asSet(1L, 2L))
+        BpmTaskCandidateRuleVO rule = new BpmTaskCandidateRuleVO().setOptions(asSet(1L, 2L))
                 .setType(BpmTaskAssignRuleTypeEnum.DEPT_MEMBER.getType());
         // mock 方法
         List<AdminUserRespDTO> users = CollectionUtils.convertList(asSet(11L, 22L),
@@ -109,7 +104,7 @@ public class BpmCandidateSourceInfoProcessorChainTest extends BaseDbUnitTest {
     @Test
     public void testCalculateTaskCandidateUsers_DeptLeader() {
         // 准备参数
-        BpmTaskCandidateVO rule = new BpmTaskCandidateVO().setOptions(asSet(1L, 2L))
+        BpmTaskCandidateRuleVO rule = new BpmTaskCandidateRuleVO().setOptions(asSet(1L, 2L))
                 .setType(BpmTaskAssignRuleTypeEnum.DEPT_LEADER.getType());
         // mock 方法
         DeptRespDTO dept1 = randomPojo(DeptRespDTO.class, o -> o.setLeaderUserId(11L));
@@ -128,7 +123,7 @@ public class BpmCandidateSourceInfoProcessorChainTest extends BaseDbUnitTest {
     @Test
     public void testCalculateTaskCandidateUsers_Post() {
         // 准备参数
-        BpmTaskCandidateVO rule = new BpmTaskCandidateVO().setOptions(asSet(1L, 2L))
+        BpmTaskCandidateRuleVO rule = new BpmTaskCandidateRuleVO().setOptions(asSet(1L, 2L))
                 .setType(BpmTaskAssignRuleTypeEnum.POST.getType());
         // mock 方法
         List<AdminUserRespDTO> users = CollectionUtils.convertList(asSet(11L, 22L),
@@ -147,7 +142,7 @@ public class BpmCandidateSourceInfoProcessorChainTest extends BaseDbUnitTest {
     @Test
     public void testCalculateTaskCandidateUsers_User() {
         // 准备参数
-        BpmTaskCandidateVO rule = new BpmTaskCandidateVO().setOptions(asSet(1L, 2L))
+        BpmTaskCandidateRuleVO rule = new BpmTaskCandidateRuleVO().setOptions(asSet(1L, 2L))
                 .setType(BpmTaskAssignRuleTypeEnum.USER.getType());
         // mock 方法
         mockGetUserMap(asSet(1L, 2L));
@@ -163,7 +158,7 @@ public class BpmCandidateSourceInfoProcessorChainTest extends BaseDbUnitTest {
     @Test
     public void testCalculateTaskCandidateUsers_UserGroup() {
         // 准备参数
-        BpmTaskCandidateVO rule = new BpmTaskCandidateVO().setOptions(asSet(1L, 2L))
+        BpmTaskCandidateRuleVO rule = new BpmTaskCandidateRuleVO().setOptions(asSet(1L, 2L))
                 .setType(BpmTaskAssignRuleTypeEnum.USER_GROUP.getType());
         // mock 方法
         BpmUserGroupDO userGroup1 = randomPojo(BpmUserGroupDO.class, o -> o.setMemberUserIds(asSet(11L, 12L)));
@@ -188,7 +183,7 @@ public class BpmCandidateSourceInfoProcessorChainTest extends BaseDbUnitTest {
     @Test
     public void testCalculateTaskCandidateUsers_Script() {
         // 准备参数
-        BpmTaskCandidateVO rule = new BpmTaskCandidateVO().setOptions(asSet(20L, 21L))
+        BpmTaskCandidateRuleVO rule = new BpmTaskCandidateRuleVO().setOptions(asSet(20L, 21L))
                 .setType(BpmTaskAssignRuleTypeEnum.SCRIPT.getType());
         // mock 方法
         BpmTaskAssignScript script1 = new BpmTaskAssignScript() {
