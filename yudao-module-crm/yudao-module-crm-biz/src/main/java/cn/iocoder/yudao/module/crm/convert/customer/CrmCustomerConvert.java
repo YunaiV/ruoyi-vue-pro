@@ -78,6 +78,8 @@ public interface CrmCustomerConvert {
 
     CrmCustomerPoolConfigDO convert(CrmCustomerPoolConfigSaveReqVO updateReqVO);
 
+    // TODO @min：使用 BeanUtils 拷贝哈。我们慢慢简单的对象，不再直接基于 convert 做啦。
     @Mapping(ignore = true, target = "id")
     CrmCustomerSaveReqVO convert(CrmClueDO bean);
+
 }

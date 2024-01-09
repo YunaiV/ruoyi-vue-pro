@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.crm.convert.clue;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.*;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactSaveReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueExcelVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueSaveReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTransferReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 import org.mapstruct.Mapper;
@@ -21,6 +23,7 @@ public interface CrmClueConvert {
 
     CrmClueConvert INSTANCE = Mappers.getMapper(CrmClueConvert.class);
 
+    // TODO @min：这几个 convert，都使用 BeanUtils 替代哈
     CrmClueDO convert(CrmClueSaveReqVO bean);
 
     CrmClueRespVO convert(CrmClueDO bean);

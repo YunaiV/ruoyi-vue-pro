@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.*;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactSaveReqVO;
 import cn.iocoder.yudao.module.crm.convert.clue.CrmClueConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
 import cn.iocoder.yudao.module.crm.service.clue.CrmClueService;
@@ -100,6 +99,7 @@ public class CrmClueController {
     @PostMapping("/transform")
     @Operation(summary = "线索转化为客户")
     @PreAuthorize("@ss.hasPermission('crm:clue:update')")
+    // TODO @min：方法改成 translateCustomer
     public CommonResult<Boolean> translate(@Valid @RequestBody CrmClueTransformReqVO reqVO) {
         clueService.translate(reqVO, getLoginUserId());
         return success(Boolean.TRUE);

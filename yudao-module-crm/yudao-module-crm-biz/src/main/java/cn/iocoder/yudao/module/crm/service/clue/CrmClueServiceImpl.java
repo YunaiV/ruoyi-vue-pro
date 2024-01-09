@@ -3,8 +3,10 @@ package cn.iocoder.yudao.module.crm.service.clue;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.*;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactSaveReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueSaveReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTransferReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTransformReqVO;
 import cn.iocoder.yudao.module.crm.convert.clue.CrmClueConvert;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
@@ -51,6 +53,7 @@ public class CrmClueServiceImpl implements CrmClueService {
     private AdminUserApi adminUserApi;
 
     @Override
+    // TODO @min：补充相关几个方法的操作日志；
     public Long createClue(CrmClueSaveReqVO createReqVO) {
         // 校验关联数据
         validateRelationDataExists(createReqVO);
@@ -58,7 +61,6 @@ public class CrmClueServiceImpl implements CrmClueService {
         // 插入
         CrmClueDO clue = CrmClueConvert.INSTANCE.convert(createReqVO);
         clueMapper.insert(clue);
-        System.out.println(1);
         // 返回
         return clue.getId();
     }
@@ -128,18 +130,20 @@ public class CrmClueServiceImpl implements CrmClueService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void translate(CrmClueTransformReqVO reqVO, Long userId) {
+        // 校验线索都存在
         List<CrmClueDO> clues = getClueList(reqVO.getIds(), userId);
-        // 不存在抛出异常
         if (CollUtil.isEmpty(clues)) {
             throw exception(CLUE_NOT_EXISTS);
         }
+
         // 遍历线索，创建对应的客户
-        clues.forEach(clueDO -> {
+        clues.forEach(clue -> {
             // 创建客户
-            customerService.createCustomer(CrmCustomerConvert.INSTANCE.convert(clueDO), userId);
+            customerService.createCustomer(CrmCustomerConvert.INSTANCE.convert(clue), userId);
             // 更新线索状态
-            clueDO.setTransformStatus(Boolean.TRUE);
-            clueMapper.updateById(clueDO);
+            // TODO @min：新建一个 CrmClueDO 去更新。尽量规避直接用原本的对象去更新。因为这样万一并发更新，会存在覆盖的问题。
+            clue.setTransformStatus(Boolean.TRUE);
+            clueMapper.updateById(clue);
         });
     }
 
@@ -156,4 +160,5 @@ public class CrmClueServiceImpl implements CrmClueService {
             throw exception(USER_NOT_EXISTS);
         }
     }
+
 }
