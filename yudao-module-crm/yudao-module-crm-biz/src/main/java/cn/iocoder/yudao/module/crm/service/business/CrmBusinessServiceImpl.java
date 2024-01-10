@@ -180,4 +180,9 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
                 convertSet(contactBusinessList, CrmContactBusinessDO::getBusinessId));
     }
 
+    @Override
+    public Long getBusinessCountByCustomerId(Long customerId) {
+        return businessMapper.selectCount(CrmBusinessDO::getCustomerId, customerId);
+    }
+
 }

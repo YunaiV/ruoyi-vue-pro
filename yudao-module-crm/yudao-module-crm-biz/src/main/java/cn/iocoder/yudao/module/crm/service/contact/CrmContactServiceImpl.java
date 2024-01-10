@@ -187,6 +187,11 @@ public class CrmContactServiceImpl implements CrmContactService {
         LogRecordContext.putVariable("contact", contact);
     }
 
+    @Override
+    public void updateOwnerUserIdByCustomerId(Long customerId, Long ownerUserId) {
+        contactMapper.updateOwnerUserIdByCustomerId(customerId, ownerUserId);
+    }
+
     //======================= 查询相关 =======================
 
     @Override
@@ -217,6 +222,11 @@ public class CrmContactServiceImpl implements CrmContactService {
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#pageVO.customerId", level = CrmPermissionLevelEnum.READ)
     public PageResult<CrmContactDO> getContactPageByCustomerId(CrmContactPageReqVO pageVO) {
         return contactMapper.selectPageByCustomerId(pageVO);
+    }
+
+    @Override
+    public Long getContactCountByCustomerId(Long customerId) {
+        return contactMapper.selectCount(CrmContactDO::getCustomerId, customerId);
     }
 
 }

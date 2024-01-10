@@ -59,4 +59,11 @@ public interface CrmPermissionMapper extends BaseMapperX<CrmPermissionDO> {
                 .eq(CrmPermissionDO::getBizId, bizId));
     }
 
+    default Long selectListByBiz(Collection<Integer> bizTypes, Collection<Long> bizIds, Collection<Long> userIds) {
+        return selectCount(new LambdaQueryWrapperX<CrmPermissionDO>()
+                .in(CrmPermissionDO::getBizType, bizTypes)
+                .in(CrmPermissionDO::getBizId, bizIds)
+                .in(CrmPermissionDO::getUserId, userIds));
+    }
+
 }

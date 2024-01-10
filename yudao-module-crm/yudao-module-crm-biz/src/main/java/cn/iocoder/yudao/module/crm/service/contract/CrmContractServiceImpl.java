@@ -167,5 +167,10 @@ public class CrmContractServiceImpl implements CrmContractService {
         return contractMapper.selectCountByContactId(contactId);
     }
 
+    @Override
+    public Long getContractCountByCustomerId(Long customerId) {
+        return contractMapper.selectCount(CrmContractDO::getCustomerId, customerId);
+    }
+
     // TODO @合同待定：需要新增一个 ContractConfigDO 表，合同配置，重点是到期提醒；
 }

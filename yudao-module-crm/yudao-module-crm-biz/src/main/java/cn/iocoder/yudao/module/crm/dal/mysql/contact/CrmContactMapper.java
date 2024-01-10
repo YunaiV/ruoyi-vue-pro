@@ -28,6 +28,12 @@ public interface CrmContactMapper extends BaseMapperX<CrmContactDO> {
                 .set(CrmContactDO::getOwnerUserId, ownerUserId));
     }
 
+    default int updateOwnerUserIdByCustomerId(Long customerId, Long ownerUserId) {
+        return update(new LambdaUpdateWrapper<CrmContactDO>()
+                .eq(CrmContactDO::getCustomerId, customerId)
+                .set(CrmContactDO::getOwnerUserId, ownerUserId));
+    }
+
     default PageResult<CrmContactDO> selectPageByCustomerId(CrmContactPageReqVO pageVO) {
         return selectPage(pageVO, new LambdaQueryWrapperX<CrmContactDO>()
                 .eq(CrmContactDO::getCustomerId, pageVO.getCustomerId()) // 指定客户编号

@@ -18,6 +18,9 @@ import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.framework.permission.core.util.CrmPermissionUtils;
+import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
+import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
+import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -59,6 +62,12 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     private CrmPermissionService permissionService;
     @Resource
     private CrmCustomerLimitConfigService customerLimitConfigService;
+    @Resource
+    private CrmContactService contactService;
+    @Resource
+    private CrmBusinessService businessService;
+    @Resource
+    private CrmContractService contractService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -116,8 +125,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     public void deleteCustomer(Long id) {
         // 校验存在
         CrmCustomerDO customer = validateCustomerExists(id);
-        // TODO @puhui999：如果有联系人、商机，则不允许删除；
-
+        // 检查引用
+        checkCustomerReference(id);
         // 删除
         customerMapper.deleteById(id);
         // 删除数据权限
@@ -126,6 +135,23 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
         // 记录操作日志上下文
         LogRecordContext.putVariable("customerName", customer.getName());
+    }
+
+    /**
+     * 校验客户是否被引用
+     *
+     * @param id 客户编号
+     */
+    private void checkCustomerReference(Long id) {
+        if (contactService.getContactCountByCustomerId(id) > 0) {
+            throw exception(CUSTOMER_DELETE_FAIL_HAVE_REFERENCE, CrmBizTypeEnum.CRM_CONTACT.getName());
+        }
+        if (businessService.getBusinessCountByCustomerId(id) > 0) {
+            throw exception(CUSTOMER_DELETE_FAIL_HAVE_REFERENCE, CrmBizTypeEnum.CRM_BUSINESS.getName());
+        }
+        if (contractService.getContractCountByCustomerId(id) > 0) {
+            throw exception(CUSTOMER_DELETE_FAIL_HAVE_REFERENCE, CrmBizTypeEnum.CRM_CONTRACT.getName());
+        }
     }
 
     @Override
@@ -200,6 +226,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         permissionService.deletePermission(CrmBizTypeEnum.CRM_CUSTOMER.getType(), customer.getId(),
                 CrmPermissionLevelEnum.OWNER.getLevel());
         // TODO @puhui999：联系人的负责人，也要设置为 null；这块和领取是对应的；因为领取后，负责人也要关联过来；
+        //      提问：那是不是可以这样理解客户所有联系人的负责人默认为客户的负责人，然后添加客户团队成员时才存在“同时分配给”的操作？
+        contactService.updateOwnerUserIdByCustomerId(customer.getId(), null);
 
         // 记录操作日志上下文
         LogRecordContext.putVariable("customerName", customer.getName());

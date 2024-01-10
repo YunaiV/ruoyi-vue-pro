@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.crm.service.contact;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactSaveReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactTransferReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import jakarta.validation.Valid;
@@ -38,6 +40,22 @@ public interface CrmContactService {
      * @param id 编号
      */
     void deleteContact(Long id);
+
+    /**
+     * 联系人转移
+     *
+     * @param reqVO  请求
+     * @param userId 用户编号
+     */
+    void transferContact(CrmContactTransferReqVO reqVO, Long userId);
+
+    /**
+     * 更新客户联系人负责人
+     *
+     * @param customerId  客户编号
+     * @param ownerUserId 用户编号
+     */
+    void updateOwnerUserIdByCustomerId(Long customerId, Long ownerUserId);
 
     /**
      * 获得联系人
@@ -85,11 +103,11 @@ public interface CrmContactService {
     PageResult<CrmContactDO> getContactPageByCustomerId(CrmContactPageReqVO pageVO);
 
     /**
-     * 联系人转移
+     * 获取关联客户的联系人数量
      *
-     * @param reqVO  请求
-     * @param userId 用户编号
+     * @param customerId 客户编号
+     * @return 数量
      */
-    void transferContact(CrmContactTransferReqVO reqVO, Long userId);
+    Long getContactCountByCustomerId(Long customerId);
 
 }
