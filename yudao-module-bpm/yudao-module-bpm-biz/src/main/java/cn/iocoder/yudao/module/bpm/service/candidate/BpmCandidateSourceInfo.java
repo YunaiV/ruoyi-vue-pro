@@ -33,6 +33,9 @@ public class BpmCandidateSourceInfo {
     @NotEmpty(message = "不允许空规则")
     private Set<BpmTaskCandidateRuleVO> rules;
 
+    @Schema(description = "发起抄送的用户")
+    private String creator;
+
     public void addRule(BpmTaskCandidateRuleVO vo) {
         assert vo != null;
         if (rules == null) {

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -71,6 +72,8 @@ public class BpmProcessInstanceCopyServiceImpl implements BpmProcessInstanceCopy
             }
             copyDO.setStartUserId(FlowableUtils.getStartUserIdFromProcessInstance(processInstance));
             copyDO.setName(FlowableUtils.getFlowName(processInstance.getProcessDefinitionId()));
+            copyDO.setCreator(sourceInfo.getCreator());
+            copyDO.setCreateTime(LocalDateTime.now());
             List<BpmProcessInstanceCopyDO> copyList = new ArrayList<>(ccCandidates.size());
             for (Long userId : ccCandidates) {
                 BpmProcessInstanceCopyDO copy = BpmProcessInstanceCopyConvert.INSTANCE.copy(copyDO);

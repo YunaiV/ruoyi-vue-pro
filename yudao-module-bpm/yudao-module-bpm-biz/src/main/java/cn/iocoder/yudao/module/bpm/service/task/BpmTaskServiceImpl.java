@@ -249,6 +249,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             sourceInfo.setTaskId(reqVO.getId());
             sourceInfo.setProcessInstanceId(instance.getId());
             sourceInfo.addRule(reqVO.getCcCandidateRule());
+            sourceInfo.setCreator(String.valueOf(userId));
             if (!processInstanceCopyService.makeCopy(sourceInfo)) {
                 throw new RuntimeException("抄送任务失败");
             }
