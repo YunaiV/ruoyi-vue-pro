@@ -81,8 +81,9 @@ public class AppProductBrowseHistoryController {
         // 转换 VO 结果
         PageResult<AppProductBrowseHistoryRespVO> result = BeanUtils.toBean(pageResult, AppProductBrowseHistoryRespVO.class,
                 vo -> Optional.ofNullable(spuMap.get(vo.getSpuId())).ifPresent(spu -> {
-                    vo.setSpuName(spu.getName());
-                    vo.setPicUrl(spu.getPicUrl());
+                    vo.setSpuName(spu.getName())
+                            .setPicUrl(spu.getPicUrl())
+                            .setPrice(spu.getPrice());
                 }));
         return success(result);
     }
