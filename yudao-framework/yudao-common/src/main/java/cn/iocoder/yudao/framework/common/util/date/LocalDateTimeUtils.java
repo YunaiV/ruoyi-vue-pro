@@ -122,7 +122,12 @@ public class LocalDateTimeUtils {
         return date.with(TemporalAdjusters.lastDayOfMonth()).with(LocalTime.MAX);
     }
 
-    // TODO @puhui999：加下注释哈；
+    /**
+     * 获取指定日期到现在过了几天，如果指定日期在当前日期之后，获取结果为负。
+     *
+     * @param dateTime 日期
+     * @return 相差天数
+     */
     public static Long between(LocalDateTime dateTime) {
         return LocalDateTimeUtil.between(dateTime, LocalDateTime.now(), ChronoUnit.DAYS);
     }

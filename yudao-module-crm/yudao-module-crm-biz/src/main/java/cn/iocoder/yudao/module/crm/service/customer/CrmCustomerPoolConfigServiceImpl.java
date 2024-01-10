@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.module.crm.service.customer;
 
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.poolconfig.CrmCustomerPoolConfigSaveReqVO;
-import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.customer.CrmCustomerPoolConfigMapper;
 import com.mzt.logapi.context.LogRecordContext;
@@ -34,8 +33,7 @@ public class CrmCustomerPoolConfigServiceImpl implements CrmCustomerPoolConfigSe
      */
     @Override
     public CrmCustomerPoolConfigDO getCustomerPoolConfig() {
-        // TODO @puhui999：这个要搞到 mapper 里噢。
-        return customerPoolConfigMapper.selectOne(new LambdaQueryWrapperX<CrmCustomerPoolConfigDO>().last("LIMIT 1"));
+        return customerPoolConfigMapper.selectOne();
     }
 
     /**
@@ -49,7 +47,7 @@ public class CrmCustomerPoolConfigServiceImpl implements CrmCustomerPoolConfigSe
     public void saveCustomerPoolConfig(CrmCustomerPoolConfigSaveReqVO saveReqVO) {
         // 存在，则进行更新
         CrmCustomerPoolConfigDO dbConfig = getCustomerPoolConfig();
-        CrmCustomerPoolConfigDO poolConfig = CrmCustomerConvert.INSTANCE.convert(saveReqVO);
+        CrmCustomerPoolConfigDO poolConfig = BeanUtils.toBean(saveReqVO, CrmCustomerPoolConfigDO.class);
         if (Objects.nonNull(dbConfig)) {
             customerPoolConfigMapper.updateById(poolConfig.setId(dbConfig.getId()));
             // 记录操作日志上下文

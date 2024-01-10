@@ -7,6 +7,9 @@ import lombok.Data;
 
 import java.util.List;
 
+import static cn.iocoder.yudao.module.system.enums.operatelog.SysParseFunctionNameConstants.GET_ADMIN_USER_BY_ID;
+import static cn.iocoder.yudao.module.system.enums.operatelog.SysParseFunctionNameConstants.GET_DEPT_BY_ID;
+
 @Schema(description = "管理后台 - 客户限制配置创建/更新 Request VO")
 @Data
 public class CrmCustomerLimitConfigSaveReqVO {
@@ -19,13 +22,12 @@ public class CrmCustomerLimitConfigSaveReqVO {
     @DiffLogField(name = "规则类型")
     private Integer type;
 
-    // TODO @puhui999：可以把 Function 那的 functionName 搞成 NAME 枚举，这里直接引用。这样后续改动更方便哈。
     @Schema(description = "规则适用人群")
-    @DiffLogField(name = "规则适用人群", function = "getAdminUserById")
+    @DiffLogField(name = "规则适用人群", function = GET_ADMIN_USER_BY_ID)
     private List<Long> userIds;
 
     @Schema(description = "规则适用部门")
-    @DiffLogField(name = "规则适用部门", function = "getDeptById")
+    @DiffLogField(name = "规则适用部门", function = GET_DEPT_BY_ID)
     private List<Long> deptIds;
 
     @Schema(description = "数量上限", requiredMode = Schema.RequiredMode.REQUIRED, example = "28384")

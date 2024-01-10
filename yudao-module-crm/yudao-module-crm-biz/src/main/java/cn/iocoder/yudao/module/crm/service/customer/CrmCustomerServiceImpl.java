@@ -73,7 +73,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         validateCustomerExceedOwnerLimit(createReqVO.getOwnerUserId(), 1);
 
         // 2. 插入客户
-        CrmCustomerDO customer = CrmCustomerConvert.INSTANCE.convert(createReqVO)
+        CrmCustomerDO customer = BeanUtils.toBean(createReqVO, CrmCustomerDO.class)
                 .setLockStatus(false).setDealStatus(false)
                 .setContactLastTime(LocalDateTime.now());
         // TODO @puhui999：可能要加个 receiveTime 字段，记录最后接收时间
@@ -100,7 +100,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         CrmCustomerDO oldCustomer = validateCustomerExists(updateReqVO.getId());
 
         // 2. 更新客户
-        CrmCustomerDO updateObj = CrmCustomerConvert.INSTANCE.convert(updateReqVO);
+        CrmCustomerDO updateObj = BeanUtils.toBean(updateReqVO, CrmCustomerDO.class);
         customerMapper.updateById(updateObj);
 
         // 3. 记录操作日志上下文

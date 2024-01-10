@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.module.crm.framework.operatelog.core;
 
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
 import com.mzt.logapi.service.IParseFunction;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import static cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_INDUSTRY;
+import static cn.iocoder.yudao.module.crm.enums.operatelog.CrmParseFunctionNameConstants.GET_CUSTOMER_INDUSTRY;
 
 /**
  * 行业的 {@link IParseFunction} 实现类
@@ -15,12 +16,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class CrmSysUserParseFunction implements IParseFunction {
-
-    public static final String NAME = "getUserById";
-
-    @Resource
-    private AdminUserApi adminUserApi;
+public class CrmCustomerIndustryParseFunction implements IParseFunction {
 
     @Override
     public boolean executeBefore() {
@@ -29,7 +25,7 @@ public class CrmSysUserParseFunction implements IParseFunction {
 
     @Override
     public String functionName() {
-        return NAME;
+        return GET_CUSTOMER_INDUSTRY;
     }
 
     @Override
@@ -37,8 +33,7 @@ public class CrmSysUserParseFunction implements IParseFunction {
         if (StrUtil.isEmptyIfStr(value)) {
             return "";
         }
-        AdminUserRespDTO adminUserRespDTO = adminUserApi.getUser(Long.parseLong(value.toString()));
-        return adminUserRespDTO == null ? "" : adminUserRespDTO.getNickname();
+        return DictFrameworkUtils.getDictDataLabel(CRM_CUSTOMER_INDUSTRY, value.toString());
     }
 
 }

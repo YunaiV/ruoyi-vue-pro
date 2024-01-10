@@ -6,6 +6,8 @@ import com.mzt.logapi.service.IParseFunction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import static cn.iocoder.yudao.module.system.enums.operatelog.SysParseFunctionNameConstants.GET_AREA;
+
 /**
  * 地名的 {@link IParseFunction} 实现类
  *
@@ -22,7 +24,7 @@ public class AreaParseFunction implements IParseFunction {
 
     @Override
     public String functionName() {
-        return "getAreaById";
+        return GET_AREA;
     }
 
     @Override

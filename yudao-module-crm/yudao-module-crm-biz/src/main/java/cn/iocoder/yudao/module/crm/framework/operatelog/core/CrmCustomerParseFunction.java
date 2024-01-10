@@ -8,16 +8,16 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import static cn.iocoder.yudao.module.crm.enums.operatelog.CrmParseFunctionNameConstants.GET_CUSTOMER_BY_ID;
+
 /**
- * 行业的 {@link IParseFunction} 实现类
+ * CRM 客户的 {@link IParseFunction} 实现类
  *
  * @author HUIHUI
  */
 @Component
 @Slf4j
 public class CrmCustomerParseFunction implements IParseFunction {
-
-    public static final String NAME = "getCustomerById";
 
     @Resource
     private CrmCustomerService customerService;
@@ -29,7 +29,7 @@ public class CrmCustomerParseFunction implements IParseFunction {
 
     @Override
     public String functionName() {
-        return NAME;
+        return GET_CUSTOMER_BY_ID;
     }
 
     @Override
