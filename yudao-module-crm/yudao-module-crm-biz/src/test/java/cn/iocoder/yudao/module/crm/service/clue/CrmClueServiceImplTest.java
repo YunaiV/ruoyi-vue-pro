@@ -2,9 +2,8 @@ package cn.iocoder.yudao.module.crm.service.clue;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.clue.CrmClueMapper;
 import jakarta.annotation.Resource;
@@ -43,7 +42,7 @@ public class CrmClueServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateClue_success() {
         // 准备参数
-        CrmClueCreateReqVO reqVO = randomPojo(CrmClueCreateReqVO.class);
+        CrmClueSaveReqVO reqVO = randomPojo(CrmClueSaveReqVO.class);
 
         // 调用
         Long clueId = clueService.createClue(reqVO);
@@ -60,7 +59,7 @@ public class CrmClueServiceImplTest extends BaseDbUnitTest {
         CrmClueDO dbClue = randomPojo(CrmClueDO.class);
         clueMapper.insert(dbClue);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        CrmClueUpdateReqVO reqVO = randomPojo(CrmClueUpdateReqVO.class, o -> {
+        CrmClueSaveReqVO reqVO = randomPojo(CrmClueSaveReqVO.class, o -> {
             o.setId(dbClue.getId()); // 设置更新的 ID
         });
 
@@ -74,7 +73,7 @@ public class CrmClueServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateClue_notExists() {
         // 准备参数
-        CrmClueUpdateReqVO reqVO = randomPojo(CrmClueUpdateReqVO.class);
+        CrmClueSaveReqVO reqVO = randomPojo(CrmClueSaveReqVO.class);
 
         // 调用, 并断言异常
         assertServiceException(() -> clueService.updateClue(reqVO), CLUE_NOT_EXISTS);

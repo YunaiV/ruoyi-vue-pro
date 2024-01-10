@@ -11,18 +11,19 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-/**
- * 线索 Base VO，提供给添加、修改、详细的子 VO 使用
- * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
- */
+@Schema(description = "管理后台 - CRM 线索 创建/更新 Request VO")
 @Data
-public class CrmClueBaseVO {
+public class CrmClueSaveReqVO {
+
+    @Schema(description = "编号", example = "10969")
+    private Long id;
 
     @Schema(description = "线索名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "线索xxx")
     @NotEmpty(message = "线索名称不能为空")
     private String name;
 
-    @Schema(description = "客户 id", requiredMode = Schema.RequiredMode.REQUIRED, example = "520")
+    // TODO @min：是不是不传递 customerId？
+    @Schema(description = "客户 id", example = "520")
     private Long customerId;
 
     @Schema(description = "下次联系时间", example = "2023-10-18 01:00:00")
@@ -44,7 +45,7 @@ public class CrmClueBaseVO {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime contactLastTime;
 
-    @Schema(description = "负责人编号")
+    @Schema(description = "负责人编号", example = "2048")
     private Long ownerUserId;
 
     @Schema(description = "备注", example = "随便")
