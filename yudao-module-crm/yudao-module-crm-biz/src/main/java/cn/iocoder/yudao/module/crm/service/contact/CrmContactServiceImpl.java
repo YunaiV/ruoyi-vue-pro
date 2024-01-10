@@ -33,7 +33,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.CRM_CONTACT_TYPE;
+import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_EXISTS;
 import static java.util.Collections.singletonList;
 
@@ -65,7 +65,8 @@ public class CrmContactServiceImpl implements CrmContactService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_CONTACT_TYPE, subType = "创建联系人", bizNo = "{{#contactId}}", success = "创建了联系人[{{#contactName}}]")
+    @LogRecord(type = CRM_CONTACT_TYPE, subType = CRM_CONTACT_CREATE_SUB_TYPE, bizNo = "{{#contact.id}}",
+            success = CRM_CONTACT_CREATE_SUCCESS)
     public Long createContact(CrmContactSaveReqVO createReqVO, Long userId) {
         // 1. 校验
         validateRelationDataExists(createReqVO);
@@ -86,18 +87,18 @@ public class CrmContactServiceImpl implements CrmContactService {
         }
 
         // 5. 记录操作日志
-        LogRecordContext.putVariable("contactId", contact.getId());
-        LogRecordContext.putVariable("contactName", contact.getName());
+        LogRecordContext.putVariable("contact", contact);
         return contact.getId();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_CONTACT_TYPE, subType = "更新联系人", bizNo = "{{#updateReqVO.id}}", success = "更新了联系人{_DIFF{#updateReqVO}}")
+    @LogRecord(type = CRM_CONTACT_TYPE, subType = CRM_CONTACT_UPDATE_SUB_TYPE, bizNo = "{{#updateReqVO.id}}",
+            success = CRM_CONTACT_UPDATE_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateContact(CrmContactSaveReqVO updateReqVO) {
         // 1. 校验存在
-        CrmContactDO contactDO = validateContactExists(updateReqVO.getId());
+        CrmContactDO oldContact = validateContactExists(updateReqVO.getId());
         validateRelationDataExists(updateReqVO);
 
         // 2. 更新联系人
@@ -105,7 +106,8 @@ public class CrmContactServiceImpl implements CrmContactService {
         contactMapper.updateById(updateObj);
 
         // 3. 记录操作日志
-        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(contactDO, CrmContactSaveReqVO.class));
+        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldContact, CrmContactSaveReqVO.class));
+        LogRecordContext.putVariable("contactName", oldContact.getName());
     }
 
     /**
@@ -133,11 +135,13 @@ public class CrmContactServiceImpl implements CrmContactService {
     }
 
     @Override
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     @Transactional(rollbackFor = Exception.class)
+    @LogRecord(type = CRM_CONTACT_TYPE, subType = CRM_CONTACT_DELETE_SUB_TYPE, bizNo = "{{#id}}",
+            success = CRM_CONTACT_DELETE_SUCCESS)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void deleteContact(Long id) {
         // 1.1 校验存在
-        validateContactExists(id);
+        CrmContactDO contact = validateContactExists(id);
         // 1.2 校验是否关联合同
         if (contractService.getContractCountByContactId(id) > 0) {
             throw exception(CONTACT_DELETE_FAIL_CONTRACT_LINK_EXISTS);
@@ -151,6 +155,9 @@ public class CrmContactServiceImpl implements CrmContactService {
         // 4.2 删除商机关联
         contactBusinessService.deleteContactBusinessByContactId(id);
         // TODO @puhui999：删除跟进记录
+
+        // 记录操作日志上下文
+        LogRecordContext.putVariable("contactName", contact.getName());
     }
 
     private CrmContactDO validateContactExists(Long id) {
@@ -160,6 +167,27 @@ public class CrmContactServiceImpl implements CrmContactService {
         }
         return contactDO;
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @LogRecord(type = CRM_CONTACT_TYPE, subType = CRM_CONTACT_TRANSFER_SUB_TYPE, bizNo = "{{#reqVO.id}}",
+            success = CRM_CONTACT_TRANSFER_SUCCESS)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#reqVO.id", level = CrmPermissionLevelEnum.OWNER)
+    public void transferContact(CrmContactTransferReqVO reqVO, Long userId) {
+        // 1 校验联系人是否存在
+        CrmContactDO contact = validateContactExists(reqVO.getId());
+
+        // 2.1 数据权限转移
+        permissionService.transferPermission(
+                CrmContactConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_CONTACT.getType()));
+        // 2.2 设置新的负责人
+        contactMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
+
+        // 3. 记录转移日志
+        LogRecordContext.putVariable("contact", contact);
+    }
+
+    //======================= 查询相关 =======================
 
     @Override
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#id", level = CrmPermissionLevelEnum.READ)
@@ -189,22 +217,6 @@ public class CrmContactServiceImpl implements CrmContactService {
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#pageVO.customerId", level = CrmPermissionLevelEnum.READ)
     public PageResult<CrmContactDO> getContactPageByCustomerId(CrmContactPageReqVO pageVO) {
         return contactMapper.selectPageByCustomerId(pageVO);
-    }
-
-    @Override
-    // TODO @puhui999：权限校验
-    // TODO @puhui999：记录操作日志；将联系人【名字】转移给【新负责人】
-    public void transferContact(CrmContactTransferReqVO reqVO, Long userId) {
-        // 1 校验联系人是否存在
-        validateContactExists(reqVO.getId());
-
-        // 2.1 数据权限转移
-        permissionService.transferPermission(
-                CrmContactConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_CONTACT.getType()));
-        // 2.2 设置新的负责人
-        contactMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
-
-        // 3. TODO 记录转移日志
     }
 
 }

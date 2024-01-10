@@ -13,5 +13,6 @@ public interface CrmParseFunctionNameConstants {
     String GET_CUSTOMER_INDUSTRY = "getCustomerIndustry"; // 获取客户行业信息
     String GET_CUSTOMER_LEVEL = "getCustomerLevel"; // 获取客户级别
     String GET_CUSTOMER_SOURCE = "getCustomerSource"; // 获取客户来源
+    String GET_CONTRACT_BY_ID = "getContractById"; // 获取合同信息
 
 }

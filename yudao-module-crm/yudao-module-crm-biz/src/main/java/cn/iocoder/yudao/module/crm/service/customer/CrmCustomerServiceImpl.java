@@ -145,10 +145,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         // 2.2 转移后重新设置负责人
         customerMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
 
-        // 3. TODO 记录转移日志
-        // 记录操作日志上下文
-        // TODO @puhui999：crmCustomer=》customer，也看看其他有没类似的情况哈
-        LogRecordContext.putVariable("crmCustomer", customer);
+        // 3. 记录转移日志
+        LogRecordContext.putVariable("customer", customer);
     }
 
     @Override
@@ -172,7 +170,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
         // 3. 记录操作日志上下文
         // tips: 因为这里使用的是老的状态所以记录时反着记录，也就是 lockStatus 为 true 那么就是解锁反之为锁定
-        LogRecordContext.putVariable("crmCustomer", customer);
+        LogRecordContext.putVariable("customer", customer);
     }
 
     // ==================== 公海相关操作 ====================
