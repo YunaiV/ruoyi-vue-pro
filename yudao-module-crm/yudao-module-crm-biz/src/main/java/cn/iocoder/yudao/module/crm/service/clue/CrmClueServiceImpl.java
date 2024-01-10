@@ -3,12 +3,13 @@ package cn.iocoder.yudao.module.crm.service.clue;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTransferReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTransformReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerSaveReqVO;
 import cn.iocoder.yudao.module.crm.convert.clue.CrmClueConvert;
-import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.clue.CrmClueMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
@@ -139,8 +140,9 @@ public class CrmClueServiceImpl implements CrmClueService {
 
         // 遍历线索，创建对应的客户
         clues.forEach(clue -> {
+            clue.setId(null);
             // 创建客户
-            customerService.createCustomer(CrmCustomerConvert.INSTANCE.convert(clue), userId);
+            customerService.createCustomer(BeanUtils.toBean(clue, CrmCustomerSaveReqVO.class), userId);
             // 更新线索状态
             // TODO @min：新建一个 CrmClueDO 去更新。尽量规避直接用原本的对象去更新。因为这样万一并发更新，会存在覆盖的问题。
             // TODO @puhui999：如果有跟进记录，需要一起转过去；
