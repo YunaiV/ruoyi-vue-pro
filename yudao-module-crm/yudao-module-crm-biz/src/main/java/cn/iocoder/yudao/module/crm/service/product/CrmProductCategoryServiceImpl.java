@@ -5,6 +5,10 @@ import cn.iocoder.yudao.module.crm.controller.admin.product.vo.category.CrmProdu
 import cn.iocoder.yudao.module.crm.controller.admin.product.vo.category.CrmProductCategoryListReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductCategoryDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.product.CrmProductCategoryMapper;
+import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
+import com.mzt.logapi.starter.annotation.LogRecord;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -17,6 +21,7 @@ import java.util.Objects;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductCategoryDO.PARENT_ID_NULL;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
 
 /**
  * CRM 产品分类 Service 实现类
@@ -35,12 +40,16 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
     private CrmProductService crmProductService;
 
     @Override
-    // TODO @puhui999：操作日志
+    @LogRecord(type = CRM_PRODUCT_CATEGORY_TYPE, subType = CRM_PRODUCT_CATEGORY_CREATE_SUB_TYPE, bizNo = "{{#createReqVO.id}}",
+            success = CRM_PRODUCT_CATEGORY_CREATE_SUCCESS)
+    // TODO @hao：产品分类，应该没数据权限。可以删除下哈；
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PRODUCT, bizId = "#createReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public Long createProductCategory(CrmProductCategoryCreateReqVO createReqVO) {
         // 1.1 校验父分类存在
         validateParentProductCategory(createReqVO.getParentId());
         // 1.2 分类名称是否存在
         validateProductNameExists(null, createReqVO.getParentId(), createReqVO.getName());
+
         // 2. 插入分类
         CrmProductCategoryDO category = BeanUtils.toBean(createReqVO, CrmProductCategoryDO.class);
         productCategoryMapper.insert(category);
@@ -48,7 +57,9 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
     }
 
     @Override
-    // TODO @puhui999：操作日志
+    @LogRecord(type = CRM_PRODUCT_CATEGORY_TYPE, subType = CRM_PRODUCT_CATEGORY_UPDATE_SUB_TYPE, bizNo = "{{#updateReqVO.id}}",
+            success = CRM_PRODUCT_CATEGORY_UPDATE_SUCCESS)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PRODUCT, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateProductCategory(CrmProductCategoryCreateReqVO updateReqVO) {
         // 1.1 校验存在
         validateProductCategoryExists(updateReqVO.getId());
@@ -56,6 +67,7 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
         validateParentProductCategory(updateReqVO.getParentId());
         // 1.3 分类名称是否存在
         validateProductNameExists(updateReqVO.getId(), updateReqVO.getParentId(), updateReqVO.getName());
+
         // 2. 更新分类
         CrmProductCategoryDO updateObj = BeanUtils.toBean(updateReqVO, CrmProductCategoryDO.class);
         productCategoryMapper.updateById(updateObj);
@@ -93,7 +105,9 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
     }
 
     @Override
-    // TODO @puhui999：操作日志
+    @LogRecord(type = CRM_PRODUCT_CATEGORY_TYPE, subType = CRM_PRODUCT_CATEGORY_DELETE_SUB_TYPE, bizNo = "{{#id}}",
+            success = CRM_PRODUCT_CATEGORY_DELETE_SUCCESS)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PRODUCT, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void deleteProductCategory(Long id) {
         // 1.1 校验存在
         validateProductCategoryExists(id);
@@ -110,16 +124,19 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
     }
 
     @Override
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PRODUCT, bizId = "#id", level = CrmPermissionLevelEnum.READ)
     public CrmProductCategoryDO getProductCategory(Long id) {
         return productCategoryMapper.selectById(id);
     }
 
     @Override
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PRODUCT, bizId = "#listReqVO.id", level = CrmPermissionLevelEnum.READ)
     public List<CrmProductCategoryDO> getProductCategoryList(CrmProductCategoryListReqVO listReqVO) {
         return productCategoryMapper.selectList(listReqVO);
     }
 
     @Override
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PRODUCT, bizId = "#listReqVO.id", level = CrmPermissionLevelEnum.READ)
     public List<CrmProductCategoryDO> getProductCategoryList(Collection<Long> ids) {
         return productCategoryMapper.selectBatchIds(ids);
     }

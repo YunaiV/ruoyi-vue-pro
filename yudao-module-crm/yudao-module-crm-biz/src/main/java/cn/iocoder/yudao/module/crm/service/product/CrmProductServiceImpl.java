@@ -11,22 +11,26 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.product.CrmProductMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.mzt.logapi.starter.annotation.LogRecord;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
 
-// TODO 芋艿：数据权限
+
 /**
  * CRM 产品 Service 实现类
  *
@@ -48,7 +52,10 @@ public class CrmProductServiceImpl implements CrmProductService {
     private AdminUserApi adminUserApi;
 
     @Override
-    // TODO @puhui999：操作日志
+    @Transactional(rollbackFor = Exception.class)
+    @LogRecord(type = CRM_PRODUCT_TYPE, subType = CRM_PRODUCT_CREATE_SUB_TYPE, bizNo = "{{#createReqVO.id}}",
+            success = CRM_PRODUCT_CREATE_SUCCESS)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PRODUCT, bizId = "#createReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public Long createProduct(CrmProductSaveReqVO createReqVO) {
         // 校验产品
         adminUserApi.validateUserList(Collections.singleton(createReqVO.getOwnerUserId()));
@@ -67,7 +74,9 @@ public class CrmProductServiceImpl implements CrmProductService {
     }
 
     @Override
-    // TODO @puhui999：操作日志
+    @LogRecord(type = CRM_PRODUCT_TYPE, subType = CRM_PRODUCT_UPDATE_SUB_TYPE, bizNo = "{{#updateReqVO.id}}",
+            success = CRM_PRODUCT_UPDATE_SUCCESS)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PRODUCT, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateProduct(CrmProductSaveReqVO updateReqVO) {
         // 校验产品
         updateReqVO.setOwnerUserId(null); // 不修改负责人
@@ -90,7 +99,7 @@ public class CrmProductServiceImpl implements CrmProductService {
     private void validateProductNoDuplicate(Long id, String no) {
         CrmProductDO product = productMapper.selectByNo(no);
         if (product == null
-            || product.getId().equals(id)) {
+                || product.getId().equals(id)) {
             return;
         }
         throw exception(PRODUCT_NO_EXISTS);
@@ -104,7 +113,9 @@ public class CrmProductServiceImpl implements CrmProductService {
     }
 
     @Override
-    // TODO @puhui999：操作日志
+    @LogRecord(type = CRM_PRODUCT_TYPE, subType = CRM_PRODUCT_DELETE_SUB_TYPE, bizNo = "{{#id}}",
+            success = CRM_PRODUCT_DELETE_SUCCESS)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PRODUCT, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void deleteProduct(Long id) {
         // 校验存在
         validateProductExists(id);
@@ -113,6 +124,7 @@ public class CrmProductServiceImpl implements CrmProductService {
     }
 
     @Override
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PRODUCT, bizId = "#id", level = CrmPermissionLevelEnum.READ)
     public CrmProductDO getProduct(Long id) {
         return productMapper.selectById(id);
     }
@@ -126,6 +138,7 @@ public class CrmProductServiceImpl implements CrmProductService {
     }
 
     @Override
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PRODUCT, bizId = "#pageReqVO.id", level = CrmPermissionLevelEnum.READ)
     public PageResult<CrmProductDO> getProductPage(CrmProductPageReqVO pageReqVO) {
         return productMapper.selectPage(pageReqVO);
     }

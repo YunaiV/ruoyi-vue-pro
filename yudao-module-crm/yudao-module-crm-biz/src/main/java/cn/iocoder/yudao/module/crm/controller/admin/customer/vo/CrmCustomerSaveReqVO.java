@@ -5,6 +5,9 @@ import cn.iocoder.yudao.framework.common.validation.Mobile;
 import cn.iocoder.yudao.framework.common.validation.Telephone;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.module.crm.enums.customer.CrmCustomerLevelEnum;
+import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmIndustryParseFunction;
+import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmLevelParseFunction;
+import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmSourceParseFunction;
 import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
@@ -18,12 +21,12 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 import static cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_INDUSTRY;
 
-/**
- * 客户 Base VO，提供给添加、修改、详细的子 VO 使用
- * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
- */
+@Schema(description = "管理后台 - CRM 客户新增/修改 Request VO")
 @Data
-public class CrmCustomerBaseVO {
+public class CrmCustomerSaveReqVO {
+
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "13563")
+    private Long id;
 
     @Schema(description = "客户名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "赵六")
     @DiffLogField(name = "客户名称")
@@ -31,17 +34,17 @@ public class CrmCustomerBaseVO {
     private String name;
 
     @Schema(description = "所属行业", example = "1")
-    @DiffLogField(name = "所属行业", function = "getIndustryById")
+    @DiffLogField(name = "所属行业", function = CrmIndustryParseFunction.NAME)
     @DictFormat(CRM_CUSTOMER_INDUSTRY)
     private Integer industryId;
 
     @Schema(description = "客户等级", example = "2")
-    @DiffLogField(name = "客户等级", function = "getLevel")
+    @DiffLogField(name = "客户等级", function = CrmLevelParseFunction.NAME)
     @InEnum(CrmCustomerLevelEnum.class)
     private Integer level;
 
     @Schema(description = "客户来源", example = "3")
-    @DiffLogField(name = "客户来源", function = "getSource")
+    @DiffLogField(name = "客户来源", function = CrmSourceParseFunction.NAME)
     private Integer source;
 
     @Schema(description = "手机", example = "18000000000")
@@ -95,5 +98,8 @@ public class CrmCustomerBaseVO {
     @DiffLogField(name = "下次联系时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime contactNextTime;
+
+    @Schema(description = "负责人的用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "13563")
+    private Long ownerUserId;
 
 }

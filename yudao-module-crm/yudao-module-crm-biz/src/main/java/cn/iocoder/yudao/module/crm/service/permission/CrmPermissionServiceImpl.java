@@ -188,6 +188,11 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
     }
 
     @Override
+    public List<CrmPermissionDO> getPermissionListByBiz(Integer bizType, Collection<Long> bizIds) {
+        return crmPermissionMapper.selectByBizTypeAndBizIds(bizType, bizIds);
+    }
+
+    @Override
     public List<CrmPermissionDO> getPermissionListByBizTypeAndUserId(Integer bizType, Long userId) {
         return crmPermissionMapper.selectListByBizTypeAndUserId(bizType, userId);
     }

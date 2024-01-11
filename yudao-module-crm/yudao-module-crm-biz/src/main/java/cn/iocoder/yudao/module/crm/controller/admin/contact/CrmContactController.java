@@ -17,6 +17,9 @@ import cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactBusinessService;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
+import cn.iocoder.yudao.module.system.api.logger.OperateLogApi;
+import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2PageReqDTO;
+import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2RespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.google.common.collect.Lists;
@@ -40,10 +43,10 @@ import java.util.stream.Stream;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertListByFlatMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.CRM_CONTACT_TYPE;
 
 @Tag(name = "管理后台 - CRM 联系人")
 @RestController
@@ -57,23 +60,25 @@ public class CrmContactController {
     @Resource
     private CrmCustomerService customerService;
     @Resource
-    private AdminUserApi adminUserApi;
-
-    @Resource
     private CrmContactBusinessService contactBusinessLinkService;
 
-    // TODO @zyna：CrmContactCreateReqVO、CrmContactUpdateReqVO、CrmContactRespVO 按照新的 VO 规范搞哈；可以参考 dept 模块
+    @Resource
+    private AdminUserApi adminUserApi;
+    @Resource
+    private OperateLogApi operateLogApi;
+
     @PostMapping("/create")
     @Operation(summary = "创建联系人")
     @PreAuthorize("@ss.hasPermission('crm:contact:create')")
-    public CommonResult<Long> createContact(@Valid @RequestBody CrmContactCreateReqVO createReqVO) {
+    public CommonResult<Long> createContact(@Valid @RequestBody CrmContactSaveReqVO createReqVO) {
         return success(contactService.createContact(createReqVO, getLoginUserId()));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新联系人")
+    @OperateLog(enable = false)
     @PreAuthorize("@ss.hasPermission('crm:contact:update')")
-    public CommonResult<Boolean> updateContact(@Valid @RequestBody CrmContactUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateContact(@Valid @RequestBody CrmContactSaveReqVO updateReqVO) {
         contactService.updateContact(updateReqVO);
         return success(true);
     }
@@ -109,14 +114,12 @@ public class CrmContactController {
     }
 
     @GetMapping("/simple-all-list")
-    @Operation(summary = "获得联系人列表")
+    @Operation(summary = "获得联系人的精简列表")
     @PreAuthorize("@ss.hasPermission('crm:contact:query')")
-    public CommonResult<List<CrmContactSimpleRespVO>> getSimpleContactList() {
-        // TODO @zyna：建议 contactService 单独搞个 list 接口哈
-        CrmContactPageReqVO pageReqVO = new CrmContactPageReqVO();
-        pageReqVO.setPageSize(PAGE_SIZE_NONE);
-        List<CrmContactDO> list = contactService.getContactPage(pageReqVO, getLoginUserId()).getList();
-        return success(BeanUtils.toBean(list, CrmContactSimpleRespVO.class));
+    public CommonResult<List<CrmContactRespVO>> getSimpleContactList() {
+        List<CrmContactDO> list = contactService.getContactList();
+        return success(convertList(list, contact -> // 只返回 id、name 字段
+                new CrmContactRespVO().setId(contact.getId()).setName(contact.getName())));
     }
 
     @GetMapping("/page")
@@ -145,6 +148,17 @@ public class CrmContactController {
         PageResult<CrmContactDO> pageResult = contactService.getContactPage(exportReqVO, getLoginUserId());
         ExcelUtils.write(response, "联系人.xls", "数据", CrmContactRespVO.class,
                 buildContactDetailPage(pageResult).getList());
+    }
+
+    @GetMapping("/operate-log-page")
+    @Operation(summary = "获得客户操作日志")
+    @PreAuthorize("@ss.hasPermission('crm:customer:query')")
+    public CommonResult<PageResult<OperateLogV2RespDTO>> getCustomerOperateLog(@RequestParam("bizId")Long bizId) {
+        OperateLogV2PageReqDTO reqVO = new OperateLogV2PageReqDTO();
+        reqVO.setPageSize(PAGE_SIZE_NONE); // 不分页
+        reqVO.setBizType(CRM_CONTACT_TYPE);
+        reqVO.setBizId(bizId);
+        return success(operateLogApi.getOperateLogPage(BeanUtils.toBean(reqVO, OperateLogV2PageReqDTO.class)));
     }
 
     /**
@@ -181,7 +195,7 @@ public class CrmContactController {
     // ================== 关联/取关联系人  ===================
 
     @PostMapping("/create-business-list")
-    @Operation(summary = "创建联系人与联系人的关联")
+    @Operation(summary = "创建联系人与商机的关联")
     @PreAuthorize("@ss.hasPermission('crm:contact:create-business')")
     public CommonResult<Boolean> createContactBusinessList(@Valid @RequestBody CrmContactBusinessReqVO createReqVO) {
         contactBusinessLinkService.createContactBusinessList(createReqVO);

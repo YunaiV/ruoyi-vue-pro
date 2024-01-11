@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.crm.controller.admin.business;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
@@ -29,11 +28,13 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CUSTOMER_NOT_EXISTS;
 
 @Tag(name = "管理后台 - 商机")
 @RestController
@@ -95,7 +96,9 @@ public class CrmBusinessController {
     @GetMapping("/page-by-customer")
     @Operation(summary = "获得商机分页，基于指定客户")
     public CommonResult<PageResult<CrmBusinessRespVO>> getBusinessPageByCustomer(@Valid CrmBusinessPageReqVO pageReqVO) {
-        Assert.notNull(pageReqVO.getCustomerId(), "客户编号不能为空");
+        if (pageReqVO.getCustomerId() == null) {
+            throw exception(CUSTOMER_NOT_EXISTS);
+        }
         PageResult<CrmBusinessDO> pageResult = businessService.getBusinessPageByCustomerId(pageReqVO);
         return success(buildBusinessDetailPageResult(pageResult));
     }

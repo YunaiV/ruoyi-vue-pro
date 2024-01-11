@@ -2,17 +2,15 @@ package cn.iocoder.yudao.module.crm.service.customerlimitconfig;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerLimitConfigDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.customer.CrmCustomerLimitConfigMapper;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerLimitConfigServiceImpl;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-
-import jakarta.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -40,7 +38,7 @@ public class CrmCustomerLimitConfigServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateCustomerLimitConfig_success() {
         // 准备参数
-        CrmCustomerLimitConfigCreateReqVO reqVO = randomPojo(CrmCustomerLimitConfigCreateReqVO.class);
+        CrmCustomerLimitConfigSaveReqVO reqVO = randomPojo(CrmCustomerLimitConfigSaveReqVO.class);
 
         // 调用
         Long customerLimitConfigId = customerLimitConfigService.createCustomerLimitConfig(reqVO);
@@ -57,7 +55,7 @@ public class CrmCustomerLimitConfigServiceImplTest extends BaseDbUnitTest {
         CrmCustomerLimitConfigDO dbCustomerLimitConfig = randomPojo(CrmCustomerLimitConfigDO.class);
         customerLimitConfigMapper.insert(dbCustomerLimitConfig);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        CrmCustomerLimitConfigUpdateReqVO reqVO = randomPojo(CrmCustomerLimitConfigUpdateReqVO.class, o -> {
+        CrmCustomerLimitConfigSaveReqVO reqVO = randomPojo(CrmCustomerLimitConfigSaveReqVO.class, o -> {
             o.setId(dbCustomerLimitConfig.getId()); // 设置更新的 ID
         });
 
@@ -71,7 +69,7 @@ public class CrmCustomerLimitConfigServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateCustomerLimitConfig_notExists() {
         // 准备参数
-        CrmCustomerLimitConfigUpdateReqVO reqVO = randomPojo(CrmCustomerLimitConfigUpdateReqVO.class);
+        CrmCustomerLimitConfigSaveReqVO reqVO = randomPojo(CrmCustomerLimitConfigSaveReqVO.class);
 
         // 调用, 并断言异常
         assertServiceException(() -> customerLimitConfigService.updateCustomerLimitConfig(reqVO), CUSTOMER_LIMIT_CONFIG_NOT_EXISTS);

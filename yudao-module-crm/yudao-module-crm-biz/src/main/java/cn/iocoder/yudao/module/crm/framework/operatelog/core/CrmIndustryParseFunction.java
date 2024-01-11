@@ -13,9 +13,11 @@ import static cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_I
  *
  * @author HUIHUI
  */
-@Slf4j
 @Component
+@Slf4j
 public class CrmIndustryParseFunction implements IParseFunction {
+
+    public static final String NAME = "getIndustryById";
 
     @Override
     public boolean executeBefore() {
@@ -24,7 +26,7 @@ public class CrmIndustryParseFunction implements IParseFunction {
 
     @Override
     public String functionName() {
-        return "getIndustryById";
+        return NAME;
     }
 
     @Override

@@ -2,11 +2,8 @@ package cn.iocoder.yudao.module.crm.controller.admin.contact.vo;
 
 import cn.iocoder.yudao.framework.common.validation.Mobile;
 import cn.iocoder.yudao.framework.common.validation.Telephone;
-import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
-import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
-import cn.iocoder.yudao.module.infra.enums.DictTypeConstants;
-import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
-import com.alibaba.excel.annotation.ExcelProperty;
+import cn.iocoder.yudao.module.crm.framework.operatelog.core.*;
+import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -18,86 +15,89 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-// TODO zyna：要不按照新的，干掉这个 basevo，都放子类里
-/**
- * CRM 联系人 Base VO，提供给添加、修改、详细的子 VO 使用
- * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
- */
+@Schema(description = "管理后台 - CRM 联系人创建/更新 Request VO")
 @Data
-@ExcelIgnoreUnannotated
-public class CrmContactBaseVO {
+public class CrmContactSaveReqVO  {
 
-    @ExcelProperty(value = "姓名",order = 1)
+    @Schema(description = "主键", example = "3167")
+    private Long id;
+
     @Schema(description = "姓名", example = "芋艿")
     @NotNull(message = "姓名不能为空")
+    @DiffLogField(name = "姓名")
     private String name;
 
     @Schema(description = "客户编号", example = "10795")
+    @DiffLogField(name = "姓名", function = CrmCustomerParseFunction.NAME)
     private Long customerId;
 
-    @ExcelProperty(value = "性别", converter = DictConvert.class, order = 3)
-    @DictFormat(cn.iocoder.yudao.module.system.enums.DictTypeConstants.USER_SEX)
     @Schema(description = "性别")
+    @DiffLogField(name = "性别", function = CrmSexParseFunction.NAME)
     private Integer sex;
 
     @Schema(description = "职位")
-    @ExcelProperty(value = "职位", order = 3)
+    @DiffLogField(name = "职位")
     private String post;
 
     @Schema(description = "是否关键决策人")
-    @ExcelProperty(value = "是否关键决策人", converter = DictConvert.class, order = 3)
-    @DictFormat(DictTypeConstants.BOOLEAN_STRING)
+    @DiffLogField(name = "关键决策人", function = CrmBooleanParseFunction.NAME)
     private Boolean master;
 
     @Schema(description = "直属上级", example = "23457")
+    @DiffLogField(name = "直属上级", function = CrmContactParseFunction.NAME)
     private Long parentId;
 
-    @Schema(description = "手机号",example = "1387171766")
+    @Schema(description = "手机号", example = "1387171766")
     @Mobile
-    @ExcelProperty(value = "手机号",order = 4)
+    @DiffLogField(name = "手机号")
     private String mobile;
 
-    @Schema(description = "座机",example = "021-0029922")
+    @Schema(description = "电话", example = "021-0029922")
     @Telephone
-    @ExcelProperty(value = "座机",order = 4)
+    @DiffLogField(name = "电话")
     private String telephone;
 
-    @ExcelProperty(value = "QQ",order = 4)
-    @Schema(description = "QQ",example = "197272662")
+    @Schema(description = "QQ", example = "197272662")
+    @DiffLogField(name = "QQ")
     private Long qq;
 
-    @ExcelProperty(value = "微信",order = 4)
-    @Schema(description = "微信",example = "zzz3883")
+    @Schema(description = "微信", example = "zzz3883")
+    @DiffLogField(name = "微信")
     private String wechat;
 
-    @Schema(description = "电子邮箱",example = "1111@22.com")
+    @Schema(description = "电子邮箱", example = "1111@22.com")
+    @DiffLogField(name = "邮箱")
     @Email
-    @ExcelProperty(value = "邮箱",order = 4)
     private String email;
 
     @Schema(description = "地区编号", example = "20158")
+    @DiffLogField(name = "所在地", function = "getAreaById")
     private Integer areaId;
 
-    @ExcelProperty(value = "地址",order = 5)
     @Schema(description = "地址")
+    @DiffLogField(name = "地址")
     private String detailAddress;
 
     @Schema(description = "备注", example = "你说的对")
-    @ExcelProperty(value = "备注",order = 6)
+    @DiffLogField(name = "备注")
     private String remark;
 
     @Schema(description = "负责人用户编号", example = "14334")
     @NotNull(message = "负责人不能为空")
+    @DiffLogField(name = "负责人", function = CrmSysUserParseFunction.NAME)
     private Long ownerUserId;
 
     @Schema(description = "最后跟进时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ExcelProperty(value = "最后跟进时间",order = 6)
+    @DiffLogField(name = "最后跟进时间")
     private LocalDateTime contactLastTime;
 
     @Schema(description = "下次联系时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY)
-    @ExcelProperty(value = "下次联系时间",order = 6)
+    @DiffLogField(name = "下次联系时间")
     private LocalDateTime contactNextTime;
+
+    @Schema(description = "关联商机 ID", example = "122233")
+    private Long businessId; // 注意：该字段用于在【商机】详情界面「新建联系人」时，自动进行关联
 
 }

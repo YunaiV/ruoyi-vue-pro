@@ -135,5 +135,10 @@ public class CrmContractServiceImpl implements CrmContractService {
         contractMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
     }
 
+    @Override
+    public Long getContractCountByContactId(Long contactId) {
+        return contractMapper.selectCountByContactId(contactId);
+    }
+
     // TODO @合同待定：需要新增一个 ContractConfigDO 表，合同配置，重点是到期提醒；
 }

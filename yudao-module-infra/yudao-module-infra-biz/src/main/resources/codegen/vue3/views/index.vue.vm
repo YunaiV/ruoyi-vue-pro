@@ -252,15 +252,11 @@ import ${subSimpleClassName}List from './components/${subSimpleClassName}List.vu
 /** ${table.classComment} 列表 */
 defineOptions({ name: '${table.className}' })
 
-// 消息弹窗
-const message = useMessage()
-// 国际化
-const { t } = useI18n()
+const message = useMessage() // 消息弹窗
+const { t } = useI18n() // 国际化
 
-// 列表的加载中
-const loading = ref(true)
-// 列表的数据
-const list = ref<${simpleClassName}VO[]>([])
+const loading = ref(true) // 列表的加载中
+const list = ref<${simpleClassName}VO[]>([]) // 列表的数据
 ## 特殊：树表专属逻辑（树不需要分页接口）
 #if ( $table.templateType != 2 )
 // 列表的总页数
@@ -283,10 +279,8 @@ const queryParams = reactive({
     #end
   #end
 })
-// 搜索的表单
-const queryFormRef = ref()
-// 导出的加载中
-const exportLoading = ref(false)
+const queryFormRef = ref() // 搜索的表单
+const exportLoading = ref(false) // 导出的加载中
 
 /** 查询列表 */
 const getList = async () => {

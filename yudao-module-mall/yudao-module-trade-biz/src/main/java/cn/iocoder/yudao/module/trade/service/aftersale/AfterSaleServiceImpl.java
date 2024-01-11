@@ -262,7 +262,7 @@ public class AfterSaleServiceImpl implements AfterSaleService {
         // 记录售后日志
         AfterSaleLogUtils.setAfterSaleInfo(afterSale.getId(), afterSale.getStatus(),
                 AfterSaleStatusEnum.BUYER_DELIVERY.getStatus(),
-                MapUtil.<String, Object>builder().put("expressName", express.getName())
+                MapUtil.<String, Object>builder().put("deliveryName", express.getName())
                         .put("logisticsNo", deliveryReqVO.getLogisticsNo()).build());
 
         // TODO 发送售后消息

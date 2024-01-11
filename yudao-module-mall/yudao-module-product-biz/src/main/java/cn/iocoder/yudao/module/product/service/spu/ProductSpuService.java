@@ -6,6 +6,8 @@ import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageRe
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 
 import jakarta.validation.Valid;
+import org.springframework.scheduling.annotation.Async;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -154,6 +156,7 @@ public interface ProductSpuService {
      * @param id        商品 SPU 编号
      * @param incrCount 增加的数量
      */
+    @Async
     void updateBrowseCount(Long id, int incrCount);
 
 }

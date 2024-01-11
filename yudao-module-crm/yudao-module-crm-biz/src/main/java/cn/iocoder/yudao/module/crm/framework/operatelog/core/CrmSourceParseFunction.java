@@ -13,9 +13,11 @@ import static cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_S
  *
  * @author HUIHUI
  */
-@Slf4j
 @Component
+@Slf4j
 public class CrmSourceParseFunction implements IParseFunction {
+
+    public static final String NAME = "getSource";
 
     @Override
     public boolean executeBefore() {
@@ -24,7 +26,7 @@ public class CrmSourceParseFunction implements IParseFunction {
 
     @Override
     public String functionName() {
-        return "getSource";
+        return NAME;
     }
 
     @Override

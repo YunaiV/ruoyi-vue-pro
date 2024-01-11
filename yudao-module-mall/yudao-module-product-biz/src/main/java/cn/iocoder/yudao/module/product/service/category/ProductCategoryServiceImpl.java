@@ -161,7 +161,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     }
 
     @Override
-    public List<ProductCategoryDO> getEnableCategoryList(ProductCategoryListReqVO listReqVO) {
+    public List<ProductCategoryDO> getCategoryList(ProductCategoryListReqVO listReqVO) {
         return productCategoryMapper.selectList(listReqVO);
     }
 

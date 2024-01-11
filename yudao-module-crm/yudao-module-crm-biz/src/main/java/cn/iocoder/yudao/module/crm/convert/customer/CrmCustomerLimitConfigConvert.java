@@ -2,9 +2,8 @@ package cn.iocoder.yudao.module.crm.convert.customer;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerLimitConfigDO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
@@ -24,9 +23,8 @@ public interface CrmCustomerLimitConfigConvert {
 
     CrmCustomerLimitConfigConvert INSTANCE = Mappers.getMapper(CrmCustomerLimitConfigConvert.class);
 
-    CrmCustomerLimitConfigDO convert(CrmCustomerLimitConfigCreateReqVO bean);
-
-    CrmCustomerLimitConfigDO convert(CrmCustomerLimitConfigUpdateReqVO bean);
+    // TODO @puhui999：可以把 convert 改成 BeanUtils
+    CrmCustomerLimitConfigDO convert(CrmCustomerLimitConfigSaveReqVO bean);
 
     CrmCustomerLimitConfigRespVO convert(CrmCustomerLimitConfigDO bean);
 

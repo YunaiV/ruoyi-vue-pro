@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.product.service.history;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.history.vo.ProductBrowseHistoryPageReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.history.ProductBrowseHistoryDO;
+import org.springframework.scheduling.annotation.Async;
 
 import java.util.Collection;
 
@@ -20,6 +21,7 @@ public interface ProductBrowseHistoryService {
      * @param spuId  SPU 编号
      * @return 编号
      */
+    @Async
     Long createBrowseHistory(Long userId, Long spuId);
 
     /**
@@ -29,14 +31,6 @@ public interface ProductBrowseHistoryService {
      * @param spuId  SPU 编号
      */
     void hideUserBrowseHistory(Long userId, Collection<Long> spuId);
-
-    /**
-     * 获得商品浏览记录
-     *
-     * @param id 编号
-     * @return 商品浏览记录
-     */
-    ProductBrowseHistoryDO getBrowseHistory(Long id);
 
     /**
      * 获取用户记录数量

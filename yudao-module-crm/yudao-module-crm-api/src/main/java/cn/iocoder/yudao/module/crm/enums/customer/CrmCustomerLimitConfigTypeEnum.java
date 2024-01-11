@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.crm.enums.customer;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,6 +37,12 @@ public enum CrmCustomerLimitConfigTypeEnum implements IntArrayValuable {
      * 状态名
      */
     private final String name;
+
+    public static String getNameByType(Integer type) {
+        CrmCustomerLimitConfigTypeEnum typeEnum = CollUtil.findOne(CollUtil.newArrayList(CrmCustomerLimitConfigTypeEnum.values()),
+                item -> ObjUtil.equal(item.type, type));
+        return typeEnum == null ? null : typeEnum.getName();
+    }
 
     @Override
     public int[] array() {

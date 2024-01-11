@@ -3,11 +3,10 @@ package cn.iocoder.yudao.module.crm.controller.admin.clue.vo;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
 import cn.iocoder.yudao.framework.common.validation.Telephone;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -24,7 +23,6 @@ public class CrmClueBaseVO {
     private String name;
 
     @Schema(description = "客户 id", requiredMode = Schema.RequiredMode.REQUIRED, example = "520")
-    @NotNull(message = "客户不能为空")
     private Long customerId;
 
     @Schema(description = "下次联系时间", example = "2023-10-18 01:00:00")
@@ -45,6 +43,9 @@ public class CrmClueBaseVO {
     @Schema(description = "最后跟进时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime contactLastTime;
+
+    @Schema(description = "负责人编号")
+    private Long ownerUserId;
 
     @Schema(description = "备注", example = "随便")
     private String remark;
