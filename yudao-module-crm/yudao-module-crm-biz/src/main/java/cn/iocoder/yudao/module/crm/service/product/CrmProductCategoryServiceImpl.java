@@ -5,15 +5,13 @@ import cn.iocoder.yudao.module.crm.controller.admin.product.vo.category.CrmProdu
 import cn.iocoder.yudao.module.crm.controller.admin.product.vo.category.CrmProductCategoryListReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductCategoryDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.product.CrmProductCategoryMapper;
-import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
-import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
-import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
+import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.starter.annotation.LogRecord;
+import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -40,10 +38,8 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
     private CrmProductService crmProductService;
 
     @Override
-    @LogRecord(type = CRM_PRODUCT_CATEGORY_TYPE, subType = CRM_PRODUCT_CATEGORY_CREATE_SUB_TYPE, bizNo = "{{#createReqVO.id}}",
+    @LogRecord(type = CRM_PRODUCT_CATEGORY_TYPE, subType = CRM_PRODUCT_CATEGORY_CREATE_SUB_TYPE, bizNo = "{{#productCategoryId}}",
             success = CRM_PRODUCT_CATEGORY_CREATE_SUCCESS)
-    // TODO @hao：产品分类，应该没数据权限。可以删除下哈；
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PRODUCT, bizId = "#createReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public Long createProductCategory(CrmProductCategoryCreateReqVO createReqVO) {
         // 1.1 校验父分类存在
         validateParentProductCategory(createReqVO.getParentId());
@@ -53,13 +49,14 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
         // 2. 插入分类
         CrmProductCategoryDO category = BeanUtils.toBean(createReqVO, CrmProductCategoryDO.class);
         productCategoryMapper.insert(category);
+        // 记录操作日志上下文
+        LogRecordContext.putVariable("productCategoryId", category.getId());
         return category.getId();
     }
 
     @Override
     @LogRecord(type = CRM_PRODUCT_CATEGORY_TYPE, subType = CRM_PRODUCT_CATEGORY_UPDATE_SUB_TYPE, bizNo = "{{#updateReqVO.id}}",
             success = CRM_PRODUCT_CATEGORY_UPDATE_SUCCESS)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PRODUCT, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateProductCategory(CrmProductCategoryCreateReqVO updateReqVO) {
         // 1.1 校验存在
         validateProductCategoryExists(updateReqVO.getId());
@@ -107,7 +104,6 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
     @Override
     @LogRecord(type = CRM_PRODUCT_CATEGORY_TYPE, subType = CRM_PRODUCT_CATEGORY_DELETE_SUB_TYPE, bizNo = "{{#id}}",
             success = CRM_PRODUCT_CATEGORY_DELETE_SUCCESS)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PRODUCT, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void deleteProductCategory(Long id) {
         // 1.1 校验存在
         validateProductCategoryExists(id);
@@ -124,19 +120,16 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
     }
 
     @Override
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PRODUCT, bizId = "#id", level = CrmPermissionLevelEnum.READ)
     public CrmProductCategoryDO getProductCategory(Long id) {
         return productCategoryMapper.selectById(id);
     }
 
     @Override
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PRODUCT, bizId = "#listReqVO.id", level = CrmPermissionLevelEnum.READ)
     public List<CrmProductCategoryDO> getProductCategoryList(CrmProductCategoryListReqVO listReqVO) {
         return productCategoryMapper.selectList(listReqVO);
     }
 
     @Override
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PRODUCT, bizId = "#listReqVO.id", level = CrmPermissionLevelEnum.READ)
     public List<CrmProductCategoryDO> getProductCategoryList(Collection<Long> ids) {
         return productCategoryMapper.selectBatchIds(ids);
     }
