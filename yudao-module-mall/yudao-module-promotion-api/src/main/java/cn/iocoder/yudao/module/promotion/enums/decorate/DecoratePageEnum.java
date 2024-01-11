@@ -16,7 +16,7 @@ import java.util.Arrays;
 public enum DecoratePageEnum implements IntArrayValuable {
 
     INDEX(1, "首页"),
-    MY(2, "个人中心"),
+    MY(2, "我的"),
     ;
 
     private static final int[] ARRAYS = Arrays.stream(values()).mapToInt(DecoratePageEnum::getPage).toArray();
