@@ -44,12 +44,11 @@ public class DiyPageDO extends BaseDO {
      * 备注
      */
     private String remark;
-    // TODO @疯狂：这个字段要不改成 previewPicUrls，和别的模块一样用 pic 作为图片哇？
     /**
      * 预览图，多个逗号分隔
      */
     @TableField(typeHandler = StringListTypeHandler.class)
-    private List<String> previewImageUrls;
+    private List<String> previewPicUrls;
     /**
      * 页面属性，JSON 格式
      */
