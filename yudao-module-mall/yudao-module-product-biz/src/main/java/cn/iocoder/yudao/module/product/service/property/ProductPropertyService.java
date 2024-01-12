@@ -22,14 +22,14 @@ public interface ProductPropertyService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createProperty(@Valid ProductPropertyCreateReqVO createReqVO);
+    Long createProperty(@Valid ProductPropertySaveReqVO createReqVO);
 
     /**
      * 更新属性项
      *
      * @param updateReqVO 更新信息
      */
-    void updateProperty(@Valid ProductPropertyUpdateReqVO updateReqVO);
+    void updateProperty(@Valid ProductPropertySaveReqVO updateReqVO);
 
     /**
      * 删除属性项
@@ -37,14 +37,6 @@ public interface ProductPropertyService {
      * @param id 编号
      */
     void deleteProperty(Long id);
-
-    /**
-     * 获得属性项列表
-     *
-     * @param listReqVO 集合查询
-     * @return 属性项集合
-     */
-    List<ProductPropertyDO> getPropertyList(ProductPropertyListReqVO listReqVO);
 
     /**
      * 获取属性名称分页

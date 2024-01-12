@@ -2,8 +2,11 @@ package cn.iocoder.yudao.module.product.controller.admin.property;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.*;
-import cn.iocoder.yudao.module.product.convert.property.ProductPropertyConvert;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyPageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertySaveReqVO;
+import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,8 +16,6 @@ import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -30,14 +31,14 @@ public class ProductPropertyController {
     @PostMapping("/create")
     @Operation(summary = "创建属性项")
     @PreAuthorize("@ss.hasPermission('product:property:create')")
-    public CommonResult<Long> createProperty(@Valid @RequestBody ProductPropertyCreateReqVO createReqVO) {
+    public CommonResult<Long> createProperty(@Valid @RequestBody ProductPropertySaveReqVO createReqVO) {
         return success(productPropertyService.createProperty(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新属性项")
     @PreAuthorize("@ss.hasPermission('product:property:update')")
-    public CommonResult<Boolean> updateProperty(@Valid @RequestBody ProductPropertyUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateProperty(@Valid @RequestBody ProductPropertySaveReqVO updateReqVO) {
         productPropertyService.updateProperty(updateReqVO);
         return success(true);
     }
@@ -56,21 +57,16 @@ public class ProductPropertyController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('product:property:query')")
     public CommonResult<ProductPropertyRespVO> getProperty(@RequestParam("id") Long id) {
-        return success(ProductPropertyConvert.INSTANCE.convert(productPropertyService.getProperty(id)));
-    }
-
-    @GetMapping("/list")
-    @Operation(summary = "获得属性项列表")
-    @PreAuthorize("@ss.hasPermission('product:property:query')")
-    public CommonResult<List<ProductPropertyRespVO>> getPropertyList(@Valid ProductPropertyListReqVO listReqVO) {
-        return success(ProductPropertyConvert.INSTANCE.convertList(productPropertyService.getPropertyList(listReqVO)));
+        ProductPropertyDO property = productPropertyService.getProperty(id);
+        return success(BeanUtils.toBean(property, ProductPropertyRespVO.class));
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得属性项分页")
     @PreAuthorize("@ss.hasPermission('product:property:query')")
     public CommonResult<PageResult<ProductPropertyRespVO>> getPropertyPage(@Valid ProductPropertyPageReqVO pageVO) {
-        return success(ProductPropertyConvert.INSTANCE.convertPage(productPropertyService.getPropertyPage(pageVO)));
+        PageResult<ProductPropertyDO> pageResult = productPropertyService.getPropertyPage(pageVO);
+        return success(BeanUtils.toBean(pageResult, ProductPropertyRespVO.class));
     }
 
 }

@@ -1,17 +1,16 @@
 package cn.iocoder.yudao.module.product.controller.admin.property.vo.value;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
-/**
-* 属性值 Base VO，提供给添加、修改、详细的子 VO 使用
-* 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
-*/
+@Schema(description = "管理后台 - 商品属性值新增/更新 Request VO")
 @Data
-public class ProductPropertyValueBaseVO {
+public class ProductPropertyValueSaveReqVO {
+
+    @Schema(description = "主键", example = "1024")
+    private Long id;
 
     @Schema(description = "属性项的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "属性项的编号不能为空")
