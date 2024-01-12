@@ -7,7 +7,6 @@ package cn.iocoder.yudao.module.product.enums;
  */
 public interface DictTypeConstants {
 
-    String PRODUCT_UNIT = "product_unit";  // 商品单位
     String PRODUCT_SPU_STATUS = "product_spu_status"; // 商品 SPU 状态
 
 }

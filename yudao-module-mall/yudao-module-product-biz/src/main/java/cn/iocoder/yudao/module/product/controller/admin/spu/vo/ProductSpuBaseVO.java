@@ -47,13 +47,6 @@ public class ProductSpuBaseVO {
     @Schema(description = "商品轮播图", requiredMode = Schema.RequiredMode.REQUIRED, example = "[https://www.iocoder.cn/xx.png, https://www.iocoder.cn/xxx.png]")
     private List<String> sliderPicUrls;
 
-    @Schema(description = "商品视频", example = "https://www.iocoder.cn/xx.mp4")
-    private String videoUrl;
-
-    @Schema(description = "单位", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @NotNull(message = "商品单位不能为空")
-    private Integer unit;
-
     @Schema(description = "排序字段", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "商品排序字段不能为空")
     private Integer sort;
@@ -66,31 +59,15 @@ public class ProductSpuBaseVO {
 
     // ========== 物流相关字段 =========
 
+    @Schema(description = "配送方式数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @NotEmpty(message = "配送方式不能为空")
+    private List<Integer> deliveryTypes;
+
     @Schema(description = "物流配置模板编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "111")
     @NotNull(message = "物流配置模板编号不能为空")
     private Long deliveryTemplateId;
 
     // ========== 营销相关字段 =========
-
-    @Schema(description = "是否热卖推荐", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
-    @NotNull(message = "商品推荐不能为空")
-    private Boolean recommendHot;
-
-    @Schema(description = "是否优惠推荐", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
-    @NotNull(message = "商品推荐不能为空")
-    private Boolean recommendBenefit;
-
-    @Schema(description = "是否精品推荐", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
-    @NotNull(message = "商品推荐不能为空")
-    private Boolean recommendBest;
-
-    @Schema(description = "是否新品推荐", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
-    @NotNull(message = "商品推荐不能为空")
-    private Boolean recommendNew;
-
-    @Schema(description = "是否优品推荐", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
-    @NotNull(message = "商品推荐不能为空")
-    private Boolean recommendGood;
 
     @Schema(description = "赠送积分", requiredMode = Schema.RequiredMode.REQUIRED, example = "111")
     @NotNull(message = "商品赠送积分不能为空")
@@ -99,9 +76,6 @@ public class ProductSpuBaseVO {
     @Schema(description = "分销类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     @NotNull(message = "商品分销类型不能为空")
     private Boolean subCommissionType;
-
-    @Schema(description = "活动展示顺序", example = "[1, 3, 2, 4, 5]")
-    private List<Integer> activityOrders;
 
     // ========== 统计相关字段 =========
 

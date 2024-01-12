@@ -44,13 +44,6 @@ public class ProductSpuExcelVO {
     @ExcelProperty("商品封面图")
     private String picUrl;
 
-    @ExcelProperty("商品视频")
-    private String videoUrl;
-
-    @ExcelProperty(value = "商品单位", converter = DictConvert.class)
-    @DictFormat(DictTypeConstants.PRODUCT_UNIT)
-    private Integer unit;
-
     @ExcelProperty("排序字段")
     private Integer sort;
 
@@ -75,21 +68,6 @@ public class ProductSpuExcelVO {
 
     @ExcelProperty("物流配置模板编号")
     private Long deliveryTemplateId;
-
-    @ExcelProperty("是否热卖推荐")
-    private Boolean recommendHot;
-
-    @ExcelProperty("是否优惠推荐")
-    private Boolean recommendBenefit;
-
-    @ExcelProperty("是否精品推荐")
-    private Boolean recommendBest;
-
-    @ExcelProperty("是否新品推荐")
-    private Boolean recommendNew;
-
-    @ExcelProperty("是否优品推荐")
-    private Boolean recommendGood;
 
     @ExcelProperty("赠送积分")
     private Integer giveIntegral;

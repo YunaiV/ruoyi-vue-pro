@@ -103,11 +103,9 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         ProductSpuCreateReqVO createReqVO = randomPojo(ProductSpuCreateReqVO.class,o->{
             o.setCategoryId(generateId());
             o.setBrandId(generateId());
-            o.setUnit(RandomUtil.randomInt(1,20)); // 限制商品单位范围
             o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
             o.setGiveIntegral(generaInt()); // 限制范围为正整数
             o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
-            o.setActivityOrders(newArrayList(1,3,2,4,5)); // 活动排序
             o.setSkus(newArrayList(skuCreateOrUpdateReqVO,skuCreateOrUpdateReqVO,skuCreateOrUpdateReqVO));
         });
         when(categoryService.getCategoryLevel(eq(createReqVO.getCategoryId()))).thenReturn(2);
@@ -123,11 +121,9 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
             o.setCategoryId(generateId());
             o.setBrandId(generateId());
             o.setDeliveryTemplateId(generateId());
-            o.setUnit(RandomUtil.randomInt(1,20)); // 限制商品单位范围
             o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
             o.setGiveIntegral(generaInt()); // 限制范围为正整数
             o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
-            o.setActivityOrders(newArrayList(1,3,2,4,5)); // 活动排序
             o.setPrice(generaInt()); // 限制范围为正整数
             o.setMarketPrice(generaInt()); // 限制范围为正整数
             o.setCostPrice(generaInt()); // 限制范围为正整数
@@ -156,11 +152,9 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
             o.setId(createReqVO.getId()); // 设置更新的 ID
             o.setCategoryId(generateId());
             o.setBrandId(generateId());
-            o.setUnit(RandomUtil.randomInt(1,20)); // 限制商品单位范围
             o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
             o.setGiveIntegral(generaInt()); // 限制范围为正整数
             o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
-            o.setActivityOrders(newArrayList(1,3,2,4,5)); // 活动排序
             o.setGiveIntegral(generaInt()); // 限制范围为正整数
             o.setSalesCount(generaInt()); // 限制范围为正整数
             o.setBrowseCount(generaInt()); // 限制范围为正整数
@@ -189,11 +183,9 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
             o.setCategoryId(generateId());
             o.setBrandId(generateId());
             o.setDeliveryTemplateId(generateId());
-            o.setUnit(RandomUtil.randomInt(1,20)); // 限制商品单位范围
             o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
             o.setGiveIntegral(generaInt()); // 限制范围为正整数
             o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
-            o.setActivityOrders(newArrayList(1,3,2,4,5)); // 活动排序
             o.setPrice(generaInt()); // 限制范围为正整数
             o.setMarketPrice(generaInt()); // 限制范围为正整数
             o.setCostPrice(generaInt()); // 限制范围为正整数
@@ -218,11 +210,9 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
             o.setCategoryId(generateId());
             o.setBrandId(generateId());
             o.setDeliveryTemplateId(generateId());
-            o.setUnit(RandomUtil.randomInt(1,20)); // 限制商品单位范围
             o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
             o.setGiveIntegral(generaInt()); // 限制范围为正整数
             o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
-            o.setActivityOrders(newArrayList(1,3,2,4,5)); // 活动排序
             o.setPrice(generaInt()); // 限制范围为正整数
             o.setMarketPrice(generaInt()); // 限制范围为正整数
             o.setCostPrice(generaInt()); // 限制范围为正整数
@@ -244,11 +234,9 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
             o.setCategoryId(generateId());
             o.setBrandId(generateId());
             o.setDeliveryTemplateId(generateId());
-            o.setUnit(RandomUtil.randomInt(1,20)); // 限制商品单位范围
             o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
             o.setGiveIntegral(generaInt()); // 限制范围为正整数
             o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
-            o.setActivityOrders(newArrayList(1,3,2,4,5)); // 活动排序
             o.setPrice(generaInt()); // 限制范围为正整数
             o.setMarketPrice(generaInt()); // 限制范围为正整数
             o.setCostPrice(generaInt()); // 限制范围为正整数
@@ -260,11 +248,9 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
             o.setCategoryId(generateId());
             o.setBrandId(generateId());
             o.setDeliveryTemplateId(generateId());
-            o.setUnit(RandomUtil.randomInt(1,20)); // 限制商品单位范围
             o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
             o.setGiveIntegral(generaInt()); // 限制范围为正整数
             o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
-            o.setActivityOrders(newArrayList(1,3,2,4,5)); // 活动排序
             o.setPrice(generaInt()); // 限制范围为正整数
             o.setMarketPrice(generaInt()); // 限制范围为正整数
             o.setCostPrice(generaInt()); // 限制范围为正整数
@@ -287,11 +273,9 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
             o.setCategoryId(generateId());
             o.setBrandId(generateId());
             o.setDeliveryTemplateId(generateId());
-            o.setUnit(RandomUtil.randomInt(1,20)); // 限制商品单位范围
             o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
             o.setGiveIntegral(generaInt()); // 限制范围为正整数
             o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
-            o.setActivityOrders(newArrayList(1,3,2,4,5)); // 活动排序
             o.setPrice(generaInt()); // 限制范围为正整数
             o.setMarketPrice(generaInt()); // 限制范围为正整数
             o.setCostPrice(generaInt()); // 限制范围为正整数
@@ -303,11 +287,9 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
             o.setCategoryId(generateId());
             o.setBrandId(generateId());
             o.setDeliveryTemplateId(generateId());
-            o.setUnit(RandomUtil.randomInt(1,20)); // 限制商品单位范围
             o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
             o.setGiveIntegral(generaInt()); // 限制范围为正整数
             o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
-            o.setActivityOrders(newArrayList(1,3,2,4,5)); // 活动排序
             o.setPrice(generaInt()); // 限制范围为正整数
             o.setMarketPrice(generaInt()); // 限制范围为正整数
             o.setCostPrice(generaInt()); // 限制范围为正整数
@@ -335,11 +317,9 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
             o.setCategoryId(generateId());
             o.setBrandId(generateId());
             o.setDeliveryTemplateId(generateId());
-            o.setUnit(RandomUtil.randomInt(1,20)); // 限制商品单位范围
             o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
             o.setGiveIntegral(generaInt()); // 限制范围为正整数
             o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
-            o.setActivityOrders(newArrayList(1,3,2,4,5)); // 活动排序
             o.setPrice(generaInt()); // 限制范围为正整数
             o.setMarketPrice(generaInt()); // 限制范围为正整数
             o.setCostPrice(generaInt()); // 限制范围为正整数
@@ -351,11 +331,9 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
             o.setCategoryId(generateId());
             o.setBrandId(generateId());
             o.setDeliveryTemplateId(generateId());
-            o.setUnit(RandomUtil.randomInt(1,20)); // 限制商品单位范围
             o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
             o.setGiveIntegral(generaInt()); // 限制范围为正整数
             o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
-            o.setActivityOrders(newArrayList(1,3,2,4,5)); // 活动排序
             o.setPrice(generaInt()); // 限制范围为正整数
             o.setMarketPrice(generaInt()); // 限制范围为正整数
             o.setCostPrice(generaInt()); // 限制范围为正整数
@@ -379,11 +357,9 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
             o.setCategoryId(generateId());
             o.setBrandId(generateId());
             o.setDeliveryTemplateId(generateId());
-            o.setUnit(RandomUtil.randomInt(1,20)); // 限制商品单位范围
             o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
             o.setGiveIntegral(generaInt()); // 限制范围为正整数
             o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
-            o.setActivityOrders(newArrayList(1,3,2,4,5)); // 活动排序
             o.setPrice(generaInt()); // 限制范围为正整数
             o.setMarketPrice(generaInt()); // 限制范围为正整数
             o.setCostPrice(generaInt()); // 限制范围为正整数
@@ -462,11 +438,9 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
             o.setCategoryId(generateId());
             o.setBrandId(generateId());
             o.setDeliveryTemplateId(generateId());
-            o.setUnit(RandomUtil.randomInt(1,20)); // 限制商品单位范围
             o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
             o.setGiveIntegral(generaInt()); // 限制范围为正整数
             o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
-            o.setActivityOrders(newArrayList(1,3,2,4,5)); // 活动排序
             o.setPrice(generaInt()); // 限制范围为正整数
             o.setMarketPrice(generaInt()); // 限制范围为正整数
             o.setCostPrice(generaInt()); // 限制范围为正整数
@@ -480,11 +454,9 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
             o.setCategoryId(generateId());
             o.setBrandId(generateId());
             o.setDeliveryTemplateId(generateId());
-            o.setUnit(RandomUtil.randomInt(1,20)); // 限制商品单位范围
             o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
             o.setGiveIntegral(generaInt()); // 限制范围为正整数
             o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
-            o.setActivityOrders(newArrayList(1,3,2,4,5)); // 活动排序
             o.setPrice(generaInt()); // 限制范围为正整数
             o.setMarketPrice(generaInt()); // 限制范围为正整数
             o.setCostPrice(generaInt()); // 限制范围为正整数

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.product.dal.dataobject.spu;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.IntegerListTypeHandler;
 import cn.iocoder.yudao.module.product.dal.dataobject.brand.ProductBrandDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
@@ -80,17 +81,7 @@ public class ProductSpuDO extends BaseDO {
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<String> sliderPicUrls;
-    /**
-     * 商品视频
-     */
-    private String videoUrl;
 
-    /**
-     * 单位
-     *
-     * 对应 product_unit 数据字典
-     */
-    private Integer unit;
     /**
      * 排序字段
      */
@@ -139,6 +130,13 @@ public class ProductSpuDO extends BaseDO {
     // ========== 物流相关字段 =========
 
     /**
+     * 配送方式数组
+     *
+     * 对应 DeliveryTypeEnum 枚举
+     */
+    @TableField(typeHandler = IntegerListTypeHandler.class)
+    private List<Integer> deliveryTypes;
+    /**
      * 物流配置模板编号
      *
      * 对应 TradeDeliveryExpressTemplateDO 的 id 编号
@@ -146,26 +144,6 @@ public class ProductSpuDO extends BaseDO {
     private Long deliveryTemplateId;
 
     // ========== 营销相关字段 =========
-    /**
-     * 是否热卖推荐
-     */
-    private Boolean recommendHot;
-    /**
-     * 是否优惠推荐
-     */
-    private Boolean recommendBenefit;
-    /**
-     * 是否精品推荐
-     */
-    private Boolean recommendBest;
-    /**
-     * 是否新品推荐
-     */
-    private Boolean recommendNew;
-    /**
-     * 是否优品推荐
-     */
-    private Boolean recommendGood;
 
     /**
      * 赠送积分
@@ -187,14 +165,6 @@ public class ProductSpuDO extends BaseDO {
      * true - 自行设置
      */
     private Boolean subCommissionType;
-
-    /**
-     * 活动展示顺序
-     *
-     * 对应 PromotionTypeEnum 枚举
-     */
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<Integer> activityOrders; // TODO @芋艿： 活动顺序字段长度需要增加
 
     // ========== 统计相关字段 =========
 

@@ -152,8 +152,8 @@ public class ProductCategoryServiceImplTest extends BaseDbUnitTest {
         reqVO.setParentId(PARENT_ID_NULL);
 
         // 调用
-        List<ProductCategoryDO> list = productCategoryService.getEnableCategoryList(reqVO);
-        List<ProductCategoryDO> all = productCategoryService.getEnableCategoryList(new ProductCategoryListReqVO());
+        List<ProductCategoryDO> list = productCategoryService.getCategoryList(reqVO);
+        List<ProductCategoryDO> all = productCategoryService.getCategoryList(new ProductCategoryListReqVO());
         // 断言
         assertEquals(1, list.size());
         assertEquals(4, all.size());

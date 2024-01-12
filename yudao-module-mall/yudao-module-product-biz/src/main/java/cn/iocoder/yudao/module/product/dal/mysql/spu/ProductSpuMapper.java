@@ -64,18 +64,6 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
                 .inIfPresent(ProductSpuDO::getCategoryId, categoryIds);
         // 上架状态 且有库存
         query.eq(ProductSpuDO::getStatus, ProductSpuStatusEnum.ENABLE.getStatus());
-        // 推荐类型的过滤条件
-        if (ObjUtil.equal(pageReqVO.getRecommendType(), AppProductSpuPageReqVO.RECOMMEND_TYPE_HOT)) {
-            query.eq(ProductSpuDO::getRecommendHot, true);
-        } else if (ObjUtil.equal(pageReqVO.getRecommendType(), AppProductSpuPageReqVO.RECOMMEND_TYPE_BENEFIT)) {
-            query.eq(ProductSpuDO::getRecommendBenefit, true);
-        } else if (ObjUtil.equal(pageReqVO.getRecommendType(), AppProductSpuPageReqVO.RECOMMEND_TYPE_BEST)) {
-            query.eq(ProductSpuDO::getRecommendBest, true);
-        } else if (ObjUtil.equal(pageReqVO.getRecommendType(), AppProductSpuPageReqVO.RECOMMEND_TYPE_NEW)) {
-            query.eq(ProductSpuDO::getRecommendNew, true);
-        } else if (ObjUtil.equal(pageReqVO.getRecommendType(), AppProductSpuPageReqVO.RECOMMEND_TYPE_GOOD)) {
-            query.eq(ProductSpuDO::getRecommendGood, true);
-        }
 
         // 排序逻辑
         if (Objects.equals(pageReqVO.getSortField(), AppProductSpuPageReqVO.SORT_FIELD_SALES_COUNT)) {

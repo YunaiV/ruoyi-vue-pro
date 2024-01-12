@@ -27,9 +27,6 @@ public class AppProductSpuPageRespVO {
     @Schema(description = "商品轮播图", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<String> sliderPicUrls;
 
-    @Schema(description = "单位名", requiredMode = Schema.RequiredMode.REQUIRED, example = "个")
-    private String unitName;
-
     // ========== SKU 相关字段 =========
 
     @Schema(description = "规格类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
@@ -43,14 +40,11 @@ public class AppProductSpuPageRespVO {
 
     @Schema(description = "VIP 价格，单位使用：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "968") // 通过会员等级，计算出折扣后价格
     private Integer vipPrice;
-    
+
     @Schema(description = "库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "666")
     private Integer stock;
 
     // ========== 营销相关字段 =========
-
-    @Schema(description = "活动排序数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    private List<Integer> activityOrders;
 
     // ========== 统计相关字段 =========
 

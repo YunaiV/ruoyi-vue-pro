@@ -33,16 +33,7 @@ public class AppProductSpuDetailRespVO {
     @Schema(description = "商品轮播图", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<String> sliderPicUrls;
 
-    @Schema(description = "商品视频", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String videoUrl;
-
-    @Schema(description = "单位名", requiredMode = Schema.RequiredMode.REQUIRED, example = "个")
-    private String unitName;
-
     // ========== 营销相关字段 =========
-
-    @Schema(description = "活动排序数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    private List<Integer> activityOrders;
 
     // ========== SKU 相关字段 =========
 
