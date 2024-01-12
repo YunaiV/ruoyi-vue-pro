@@ -4,7 +4,6 @@ import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -54,10 +53,6 @@ public interface ProductSkuMapper extends BaseMapperX<ProductSkuDO> {
                 .eq(ProductSkuDO::getId, id)
                 .ge(ProductSkuDO::getStock, -incrCount); // cas 逻辑
         return update(null, updateWrapper);
-    }
-
-    default List<ProductSkuDO> selectListByAlarmStock() {
-        return selectList(new QueryWrapper<ProductSkuDO>().apply("stock <= warn_stock"));
     }
 
 }

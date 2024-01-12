@@ -1,20 +1,15 @@
-package cn.iocoder.yudao.module.product.controller.admin.sku.vo;
+package cn.iocoder.yudao.module.product.controller.admin.spu.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.*;
+
 import java.util.List;
 
-/**
-* 商品 SKU Base VO，提供给添加、修改、详细的子 VO 使用
-* 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
-*/
+@Schema(description = "管理后台 - 商品 SKU 创建/更新 Request VO")
 @Data
-public class ProductSkuBaseVO {
+public class ProductSkuSaveReqVO {
 
     @Schema(description = "商品 SKU 名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "清凉小短袖")
     @NotEmpty(message = "商品 SKU 名字不能为空")
@@ -40,9 +35,6 @@ public class ProductSkuBaseVO {
     @Schema(description = "库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "200")
     @NotNull(message = "库存不能为空")
     private Integer stock;
-
-    @Schema(description = "预警预存", example = "10")
-    private Integer warnStock;
 
     @Schema(description = "商品重量,单位：kg 千克", example = "1.2")
     private Double weight;

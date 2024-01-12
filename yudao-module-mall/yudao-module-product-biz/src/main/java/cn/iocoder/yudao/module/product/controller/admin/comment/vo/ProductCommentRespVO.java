@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.product.controller.admin.comment.vo;
 
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSkuSaveReqVO;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -58,6 +58,6 @@ public class ProductCommentRespVO extends ProductCommentBaseVO {
     private String skuPicUrl;
 
     @Schema(description = "商品 SKU 规格值数组")
-    private List<ProductSkuBaseVO.Property> skuProperties;
+    private List<ProductSkuSaveReqVO.Property> skuProperties;
 
 }

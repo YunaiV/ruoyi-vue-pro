@@ -54,11 +54,6 @@ public class ProductSpuDO extends BaseDO {
      * 商品详情
      */
     private String description;
-    // TODO @芋艿：是不是要删除
-    /**
-     * 商品条码（一维码）
-     */
-    private String barCode;
 
     /**
      * 商品分类编号

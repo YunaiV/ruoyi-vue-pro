@@ -7,7 +7,7 @@ import java.util.List;
 
 @Schema(description = "用户 App - 商品 SPU Response VO")
 @Data
-public class AppProductSpuPageRespVO {
+public class AppProductSpuRespVO {
 
     @Schema(description = "商品 SPU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;

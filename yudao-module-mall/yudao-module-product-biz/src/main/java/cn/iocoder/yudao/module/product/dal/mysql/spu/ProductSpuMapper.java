@@ -1,12 +1,9 @@
 package cn.iocoder.yudao.module.product.dal.mysql.spu;
 
-import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuExportReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
@@ -15,7 +12,6 @@ import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -81,21 +77,6 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
         return selectPage(pageReqVO, query);
     }
 
-    default List<ProductSpuDO> selectListByRecommendType(String recommendType, Integer count) {
-        QueryWrapperX<ProductSpuDO> query = new QueryWrapperX<>();
-        // 上架状态 且有库存
-        query.eq("status", ProductSpuStatusEnum.ENABLE.getStatus()).gt("stock", 0);
-        // 推荐类型的过滤条件
-        if (ObjUtil.equal(recommendType, AppProductSpuPageReqVO.RECOMMEND_TYPE_HOT)) {
-            query.eq("recommend_hot", true);
-        } else if (ObjUtil.equal(recommendType, AppProductSpuPageReqVO.RECOMMEND_TYPE_GOOD)) {
-            query.eq("recommend_good", true);
-        }
-        // 设置最大长度
-        query.limitN(count);
-        return selectList(query);
-    }
-
     /**
      * 更新商品 SPU 库存
      *
@@ -108,22 +89,6 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
                 .setSql(" stock = stock +" + incrCount)
                 .eq(ProductSpuDO::getId, id);
         update(null, updateWrapper);
-    }
-
-    /**
-     * 获得 Spu 列表
-     *
-     * @param reqVO 查询条件
-     * @return Spu 列表
-     */
-    default List<ProductSpuDO> selectList(ProductSpuExportReqVO reqVO) {
-        Integer tabType = reqVO.getTabType();
-        LambdaQueryWrapperX<ProductSpuDO> queryWrapper = new LambdaQueryWrapperX<>();
-        queryWrapper.eqIfPresent(ProductSpuDO::getName, reqVO.getName());
-        queryWrapper.eqIfPresent(ProductSpuDO::getCategoryId, reqVO.getCategoryId());
-        queryWrapper.betweenIfPresent(ProductSpuDO::getCreateTime, reqVO.getCreateTime());
-        appendTabQuery(tabType, queryWrapper);
-        return selectList(queryWrapper);
     }
 
     /**

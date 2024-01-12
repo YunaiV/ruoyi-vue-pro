@@ -1,20 +1,19 @@
 package cn.iocoder.yudao.module.product.controller.admin.spu.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
 import java.util.List;
 
-/**
-* 商品 SPU Base VO，提供给添加、修改、详细的子 VO 使用
-* 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
- *
- * @author HUIHUI
- */
+@Schema(description = "管理后台 - 商品 SPU 新增/更新 Request VO")
 @Data
-public class ProductSpuBaseVO {
+public class ProductSpuSaveReqVO {
+
+    @Schema(description = "商品编号", example = "1")
+    private Long id;
 
     @Schema(description = "商品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "清凉小短袖")
     @NotEmpty(message = "商品名称不能为空")
@@ -44,7 +43,8 @@ public class ProductSpuBaseVO {
     @NotEmpty(message = "商品封面图不能为空")
     private String picUrl;
 
-    @Schema(description = "商品轮播图", requiredMode = Schema.RequiredMode.REQUIRED, example = "[https://www.iocoder.cn/xx.png, https://www.iocoder.cn/xxx.png]")
+    @Schema(description = "商品轮播图", requiredMode = Schema.RequiredMode.REQUIRED,
+            example = "[https://www.iocoder.cn/xx.png, https://www.iocoder.cn/xxx.png]")
     private List<String> sliderPicUrls;
 
     @Schema(description = "排序字段", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
@@ -64,7 +64,6 @@ public class ProductSpuBaseVO {
     private List<Integer> deliveryTypes;
 
     @Schema(description = "物流配置模板编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "111")
-    @NotNull(message = "物流配置模板编号不能为空")
     private Long deliveryTemplateId;
 
     // ========== 营销相关字段 =========
@@ -81,5 +80,17 @@ public class ProductSpuBaseVO {
 
     @Schema(description = "虚拟销量", example = "66")
     private Integer virtualSalesCount;
+
+    @Schema(description = "商品销量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1999")
+    private Integer salesCount;
+
+    @Schema(description = "浏览量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1999")
+    private Integer browseCount;
+
+    // ========== SKU 相关字段 =========
+
+    @Schema(description = "SKU 数组")
+    @Valid
+    private List<ProductSkuSaveReqVO> skus;
 
 }
