@@ -11,11 +11,11 @@ import cn.iocoder.yudao.module.promotion.convert.diy.DiyPageConvert;
 import cn.iocoder.yudao.module.promotion.convert.diy.DiyTemplateConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.diy.DiyTemplateDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.diy.DiyTemplateMapper;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -36,7 +36,7 @@ public class DiyTemplateServiceImpl implements DiyTemplateService {
     @Resource
     private DiyPageService diyPageService;
 
-    // TODO @疯狂：事务；
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Long createDiyTemplate(DiyTemplateCreateReqVO createReqVO) {
         // 校验名称唯一
@@ -121,8 +121,8 @@ public class DiyTemplateServiceImpl implements DiyTemplateService {
         return diyTemplateMapper.selectPage(pageReqVO);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
-    // TODO @疯狂：事务；
     public void useDiyTemplate(Long id) {
         // 校验存在
         validateDiyTemplateExists(id);
@@ -134,10 +134,23 @@ public class DiyTemplateServiceImpl implements DiyTemplateService {
             if (used.getId().equals(id)) {
                 return;
             }
-            this.updateUsed(used.getId(), false, null);
+            this.updateTemplateUsed(used.getId(), false, null);
         }
         // 更新为已使用
-        this.updateUsed(id, true, LocalDateTime.now());
+        this.updateTemplateUsed(id, true, LocalDateTime.now());
+    }
+
+    /**
+     * 更新模板是否使用
+     *
+     * @param id       模板编号
+     * @param used     是否使用
+     * @param usedTime 使用时间
+     */
+    private void updateTemplateUsed(Long id, Boolean used, LocalDateTime usedTime) {
+        DiyTemplateDO updateObj = new DiyTemplateDO().setId(id)
+                .setUsed(used).setUsedTime(usedTime);
+        diyTemplateMapper.updateById(updateObj);
     }
 
     @Override
@@ -153,20 +166,6 @@ public class DiyTemplateServiceImpl implements DiyTemplateService {
     @Override
     public DiyTemplateDO getUsedDiyTemplate() {
         return diyTemplateMapper.selectByUsed(true);
-    }
-
-    // TODO @疯狂：挪到 useDiyTemplate 下面，改名 updateTemplateUsed 会不会好点哈；
-    /**
-     * 更新模板是否使用
-     *
-     * @param id       模板编号
-     * @param used     是否使用
-     * @param usedTime 使用时间
-     */
-    private void updateUsed(Long id, Boolean used, LocalDateTime usedTime) {
-        DiyTemplateDO updateObj = new DiyTemplateDO().setId(id)
-                .setUsed(used).setUsedTime(usedTime);
-        diyTemplateMapper.updateById(updateObj);
     }
 
 }

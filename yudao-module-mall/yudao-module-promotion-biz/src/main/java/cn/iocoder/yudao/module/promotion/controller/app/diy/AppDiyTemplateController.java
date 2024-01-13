@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.promotion.controller.app.diy.vo.AppDiyTemplatePro
 import cn.iocoder.yudao.module.promotion.convert.diy.DiyTemplateConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.diy.DiyPageDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.diy.DiyTemplateDO;
+import cn.iocoder.yudao.module.promotion.enums.decorate.DecoratePageEnum;
 import cn.iocoder.yudao.module.promotion.service.diy.DiyPageService;
 import cn.iocoder.yudao.module.promotion.service.diy.DiyTemplateService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,9 +56,8 @@ public class AppDiyTemplateController {
         }
         // 查询模板下的页面
         List<DiyPageDO> pages = diyPageService.getDiyPageByTemplateId(diyTemplate.getId());
-        // TODO @疯狂：首页、我的，要不枚举到 DiyPageDO 例如说 NAME_USER，NAME_HOME 类似这种哈；
-        String home = findFirst(pages, page -> "首页".equals(page.getName()), DiyPageDO::getProperty);
-        String user = findFirst(pages, page -> "我的".equals(page.getName()), DiyPageDO::getProperty);
+        String home = findFirst(pages, page -> DecoratePageEnum.INDEX.getName().equals(page.getName()), DiyPageDO::getProperty);
+        String user = findFirst(pages, page -> DecoratePageEnum.MY.getName().equals(page.getName()), DiyPageDO::getProperty);
         // 拼接返回
         return DiyTemplateConvert.INSTANCE.convertPropertyVo2(diyTemplate, home, user);
     }
