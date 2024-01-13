@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPageVO;
+import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordPageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -141,6 +142,13 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
 
     default List<CombinationRecordDO> selectListByHeadId(Long headId) {
         return selectList(CombinationRecordDO::getHeadId, headId);
+    }
+
+    default PageResult<CombinationRecordDO> selectPage(Long userId, AppCombinationRecordPageReqVO pageReqVO) {
+        LambdaQueryWrapperX<CombinationRecordDO> queryWrapper = new LambdaQueryWrapperX<CombinationRecordDO>()
+                .eq(CombinationRecordDO::getUserId, userId)
+                .eqIfPresent(CombinationRecordDO::getStatus, pageReqVO.getStatus());
+        return selectPage(pageReqVO, queryWrapper);
     }
 
 }

@@ -19,10 +19,9 @@ public interface ProductBrowseHistoryService {
      *
      * @param userId 用户编号
      * @param spuId  SPU 编号
-     * @return 编号
      */
     @Async
-    Long createBrowseHistory(Long userId, Long spuId);
+    void createBrowseHistory(Long userId, Long spuId);
 
     /**
      * 隐藏用户商品浏览记录

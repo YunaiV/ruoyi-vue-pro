@@ -22,6 +22,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RequestMapping("/promotion/diy-page")
 @Validated
 public class AppDiyPageController {
+
     @Resource
     private DiyPageService diyPageService;
 

@@ -26,10 +26,10 @@ public class ProductBrowseHistoryServiceImpl implements ProductBrowseHistoryServ
     private ProductBrowseHistoryMapper browseHistoryMapper;
 
     @Override
-    public Long createBrowseHistory(Long userId, Long spuId) {
+    public void createBrowseHistory(Long userId, Long spuId) {
         // 用户未登录时不记录
         if (userId == null) {
-            return null;
+            return;
         }
 
         // 情况一：同一个商品，只保留最新的一条记录
@@ -50,7 +50,6 @@ public class ProductBrowseHistoryServiceImpl implements ProductBrowseHistoryServ
                 .setUserId(userId)
                 .setSpuId(spuId);
         browseHistoryMapper.insert(browseHistory);
-        return browseHistory.getId();
     }
 
     @Override
