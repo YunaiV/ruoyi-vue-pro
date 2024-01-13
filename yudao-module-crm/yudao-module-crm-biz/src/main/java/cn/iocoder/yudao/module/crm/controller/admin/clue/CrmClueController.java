@@ -84,8 +84,8 @@ public class CrmClueController {
         pageReqVO.setPageSize(PAGE_SIZE_NONE);
         List<CrmClueDO> list = clueService.getCluePage(pageReqVO, getLoginUserId()).getList();
         // 导出 Excel
-        List<CrmClueExcelVO> datas = BeanUtils.toBean(list, CrmClueExcelVO.class);
-        ExcelUtils.write(response, "线索.xls", "数据", CrmClueExcelVO.class, datas);
+        List<CrmClueRespVO> datas = BeanUtils.toBean(list, CrmClueRespVO.class);
+        ExcelUtils.write(response, "线索.xls", "数据", CrmClueRespVO.class, datas);
     }
 
     @PutMapping("/transfer")
