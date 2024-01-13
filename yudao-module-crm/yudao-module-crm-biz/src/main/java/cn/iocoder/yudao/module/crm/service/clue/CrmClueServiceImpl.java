@@ -141,17 +141,13 @@ public class CrmClueServiceImpl implements CrmClueService {
         // 遍历线索(过滤掉已转化的线索)，创建对应的客户
         clues.stream().filter(clue -> ObjectUtil.notEqual(Boolean.TRUE, clue.getTransformStatus()))
                 .forEach(clue -> {
-                    // 1.创建客户
-                    CrmCustomerSaveReqVO customerSaveReqVO = BeanUtils.toBean(clue, CrmCustomerSaveReqVO.class)
-                            .setId(null);
+                    // 1. 创建客户
+                    CrmCustomerSaveReqVO customerSaveReqVO = BeanUtils.toBean(clue, CrmCustomerSaveReqVO.class).setId(null);
                     Long customerId = customerService.createCustomer(customerSaveReqVO, userId);
                     // TODO @puhui999：如果有跟进记录，需要一起转过去；
-                    // 2.更新线索，新建一个 CrmClueDO 去更新。尽量规避直接用原本的对象去更新。因为这样万一并发更新，会存在覆盖的问题。
-                    clueMapper.updateById(BeanUtils.toBean(clue, CrmClueDO.class)
-                            // 线索状态设置为已转化
-                            .setTransformStatus(Boolean.TRUE)
-                            // 设置关联的客户编号
-                            .setCustomerId(customerId));
+                    // 2. 更新线索
+                    clueMapper.updateById(new CrmClueDO().setId(clue.getId())
+                            .setTransformStatus(Boolean.TRUE).setCustomerId(customerId));
                 });
     }
 
