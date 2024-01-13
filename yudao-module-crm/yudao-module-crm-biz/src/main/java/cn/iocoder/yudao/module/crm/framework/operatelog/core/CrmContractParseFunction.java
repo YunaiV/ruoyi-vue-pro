@@ -1,26 +1,26 @@
 package cn.iocoder.yudao.module.crm.framework.operatelog.core;
 
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
+import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import com.mzt.logapi.service.IParseFunction;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import static cn.iocoder.yudao.module.crm.enums.operatelog.CrmParseFunctionNameConstants.GET_CONTRACT_BY_ID;
+
 /**
- * 行业的 {@link IParseFunction} 实现类
+ * CRM 合同的 {@link IParseFunction} 实现类
  *
  * @author HUIHUI
  */
 @Component
 @Slf4j
-public class CrmSysUserParseFunction implements IParseFunction {
-
-    public static final String NAME = "getUserById";
+public class CrmContractParseFunction implements IParseFunction {
 
     @Resource
-    private AdminUserApi adminUserApi;
+    private CrmContractService contractService;
 
     @Override
     public boolean executeBefore() {
@@ -29,7 +29,7 @@ public class CrmSysUserParseFunction implements IParseFunction {
 
     @Override
     public String functionName() {
-        return NAME;
+        return GET_CONTRACT_BY_ID;
     }
 
     @Override
@@ -37,8 +37,8 @@ public class CrmSysUserParseFunction implements IParseFunction {
         if (StrUtil.isEmptyIfStr(value)) {
             return "";
         }
-        AdminUserRespDTO adminUserRespDTO = adminUserApi.getUser(Long.parseLong(value.toString()));
-        return adminUserRespDTO == null ? "" : adminUserRespDTO.getNickname();
+        CrmContractDO contract = contractService.getContract(Long.parseLong(value.toString()));
+        return contract == null ? "" : contract.getName();
     }
 
 }

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.crm.service.contract;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
@@ -15,6 +16,9 @@ import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
+import com.mzt.logapi.context.LogRecordContext;
+import com.mzt.logapi.service.impl.DiffParseFunction;
+import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +29,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CONTRACT_NOT_EXISTS;
+import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
 
 /**
  * CRM 合同 Service 实现类
@@ -42,7 +47,9 @@ public class CrmContractServiceImpl implements CrmContractService {
     private CrmPermissionService crmPermissionService;
 
     @Override
-    // TODO @puhui999：添加操作日志
+    @Transactional(rollbackFor = Exception.class)
+    @LogRecord(type = CRM_CONTRACT_TYPE, subType = CRM_CONTRACT_CREATE_SUB_TYPE, bizNo = "{{#contract.id}}",
+            success = CRM_CONTRACT_CREATE_SUCCESS)
     public Long createContract(CrmContractCreateReqVO createReqVO, Long userId) {
         // TODO @合同待定：插入合同商品；需要搞个 BusinessProductDO
         // 插入合同
@@ -53,38 +60,52 @@ public class CrmContractServiceImpl implements CrmContractService {
         crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setUserId(userId)
                 .setBizType(CrmBizTypeEnum.CRM_CONTRACT.getType()).setBizId(contract.getId())
                 .setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
+
+        // 4. 记录操作日志上下文
+        LogRecordContext.putVariable("contract", contract);
         return contract.getId();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @LogRecord(type = CRM_CONTRACT_TYPE, subType = CRM_CONTRACT_UPDATE_SUB_TYPE, bizNo = "{{#updateReqVO.id}}",
+            success = CRM_CONTRACT_UPDATE_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
-    // TODO @puhui999：添加操作日志
     public void updateContract(CrmContractUpdateReqVO updateReqVO) {
         // TODO @合同待定：只有草稿、审批中，可以编辑；
         // 校验存在
-        validateContractExists(updateReqVO.getId());
+        CrmContractDO oldContract = validateContractExists(updateReqVO.getId());
         // 更新合同
         CrmContractDO updateObj = CrmContractConvert.INSTANCE.convert(updateReqVO);
         contractMapper.updateById(updateObj);
         // TODO @合同待定：插入合同商品；需要搞个 BusinessProductDO
+
+        // 3. 记录操作日志上下文
+        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldContract, CrmContractUpdateReqVO.class));
+        LogRecordContext.putVariable("contractName", oldContract.getName());
     }
 
     // TODO @合同待定：缺一个取消合同的接口；只有草稿、审批中可以取消；CrmAuditStatusEnum
 
     // TODO @合同待定：缺一个发起审批的接口；只有草稿可以发起审批；CrmAuditStatusEnum
 
+
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @LogRecord(type = CRM_CONTRACT_TYPE, subType = CRM_CONTRACT_DELETE_SUB_TYPE, bizNo = "{{#id}}",
+            success = CRM_CONTRACT_DELETE_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void deleteContract(Long id) {
         // TODO @合同待定：如果被 CrmReceivableDO 所使用，则不允许删除
         // 校验存在
-        validateContractExists(id);
+        CrmContractDO contract = validateContractExists(id);
         // 删除
         contractMapper.deleteById(id);
         // 删除数据权限
         crmPermissionService.deletePermission(CrmBizTypeEnum.CRM_CONTRACT.getType(), id);
+
+        // 记录操作日志上下文
+        LogRecordContext.putVariable("contractName", contract.getName());
     }
 
     private CrmContractDO validateContractExists(Long id) {
@@ -94,6 +115,27 @@ public class CrmContractServiceImpl implements CrmContractService {
         }
         return contract;
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @LogRecord(type = CRM_CONTRACT_TYPE, subType = CRM_CONTRACT_TRANSFER_SUB_TYPE, bizNo = "{{#reqVO.id}}",
+            success = CRM_CONTRACT_TRANSFER_SUCCESS)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, bizId = "#reqVO.id", level = CrmPermissionLevelEnum.OWNER)
+    public void transferContract(CrmContractTransferReqVO reqVO, Long userId) {
+        // 1. 校验合同是否存在
+        CrmContractDO contract = validateContractExists(reqVO.getId());
+
+        // 2.1 数据权限转移
+        crmPermissionService.transferPermission(
+                CrmContractConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_CONTRACT.getType()));
+        // 2.2 设置负责人
+        contractMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
+
+        // 3. 记录转移日志
+        LogRecordContext.putVariable("contract", contract);
+    }
+
+    //======================= 查询相关 =======================
 
     @Override
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, bizId = "#id", level = CrmPermissionLevelEnum.READ)
@@ -121,23 +163,13 @@ public class CrmContractServiceImpl implements CrmContractService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    // 3. TODO @puhui999：记录转移日志
-    // TODO @puhui999：权限校验，这里要搞哇？
-    public void transferContract(CrmContractTransferReqVO reqVO, Long userId) {
-        // 1. 校验合同是否存在
-        validateContractExists(reqVO.getId());
-
-        // 2.1 数据权限转移
-        crmPermissionService.transferPermission(
-                CrmContractConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_CONTRACT.getType()));
-        // 2.2 设置负责人
-        contractMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
+    public Long getContractCountByContactId(Long contactId) {
+        return contractMapper.selectCountByContactId(contactId);
     }
 
     @Override
-    public Long getContractCountByContactId(Long contactId) {
-        return contractMapper.selectCountByContactId(contactId);
+    public Long getContractCountByCustomerId(Long customerId) {
+        return contractMapper.selectCount(CrmContractDO::getCustomerId, customerId);
     }
 
     // TODO @合同待定：需要新增一个 ContractConfigDO 表，合同配置，重点是到期提醒；

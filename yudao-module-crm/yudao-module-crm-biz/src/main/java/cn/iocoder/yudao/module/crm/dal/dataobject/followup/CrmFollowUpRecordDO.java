@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.followup;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -21,7 +23,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-@TableName(value = "crm_follow_up_record")
+@TableName(value = "crm_follow_up_record", autoResultMap = true)
 @KeySequence("crm_follow_up_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -70,12 +72,14 @@ public class CrmFollowUpRecordDO extends BaseDO {
      *
      * 关联 {@link CrmBusinessDO#getId()}
      */
+    @TableField(typeHandler = LongListTypeHandler.class)
     private List<Long> businessIds;
     /**
      * 关联的联系人编号数组
      *
      * 关联 {@link CrmContactDO#getId()}
      */
+    @TableField(typeHandler = LongListTypeHandler.class)
     private List<Long> contactIds;
 
 }

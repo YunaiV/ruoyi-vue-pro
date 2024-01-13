@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.crm.controller.admin.customer;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
@@ -32,6 +34,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -112,32 +115,40 @@ public class CrmCustomerController {
         }
 
         // 2. 拼接数据
-        Map<Long, Long> poolDayMap = getPoolDayMap(pageResult);  // 距离进入公海的时间
+        Map<Long, Long> poolDayMap = null;
+        if (ObjUtil.notEqual(pageVO.getPool(), Boolean.TRUE)) {
+            poolDayMap = getPoolDayMap(pageResult.getList());  // 距离进入公海的时间
+        }
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSetByFlatMap(pageResult.getList(), user -> Stream.of(Long.parseLong(user.getCreator()), user.getOwnerUserId())));
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
         return success(CrmCustomerConvert.INSTANCE.convertPage(pageResult, userMap, deptMap, poolDayMap));
     }
 
-    // TODO @puhui999：加下注释哈；
-    private Map<Long, Long> getPoolDayMap(PageResult<CrmCustomerDO> pageResult) {
-        Map<Long, Long> poolDayMap = null;
+    /**
+     * 获取距离进入公海的时间
+     *
+     * @param customerList 客户列表
+     * @return Map<key 客户编号, value 距离进入公海的时间>
+     */
+    private Map<Long, Long> getPoolDayMap(List<CrmCustomerDO> customerList) {
         CrmCustomerPoolConfigDO customerPoolConfig = customerPoolConfigService.getCustomerPoolConfig();
-        // TODO @puhui999：if return 减少括号
-        if (customerPoolConfig != null && customerPoolConfig.getEnabled()) { // 有公海配置的情况
-            // TODO @puhui999：item 改成 customer 更好，容易理解；
-            poolDayMap = convertMap(pageResult.getList(), CrmCustomerDO::getId, item -> {
-                long dealExpireDay = 0;
-                if (!item.getDealStatus()) { // 检查是否成交
-                    dealExpireDay = customerPoolConfig.getDealExpireDays() - LocalDateTimeUtils.between(item.getCreateTime());
-                }
-                // TODO @puhui999：需要考虑 contactLastTime 为空的情况哈；
-                long contactExpireDay = customerPoolConfig.getContactExpireDays() - LocalDateTimeUtils.between(item.getContactLastTime());
-                return dealExpireDay == 0 ? contactExpireDay : Math.min(dealExpireDay, contactExpireDay);
-            });
-            // TODO @puhui999：需要考虑 lock 的情况么？
+        if (customerPoolConfig == null || !customerPoolConfig.getEnabled()) {
+            return MapUtil.empty();
         }
-        return poolDayMap;
+        // TODO @puhui999：需要考虑 lock 的情况么？ 回复：锁定正常显示距离进入公海的时间有个提示
+        return convertMap(customerList, CrmCustomerDO::getId, customer -> {
+            long dealExpireDay = 0;
+            if (!customer.getDealStatus()) { // 检查是否成交
+                dealExpireDay = customerPoolConfig.getDealExpireDays() - LocalDateTimeUtils.between(customer.getCreateTime());
+            }
+            LocalDateTime lastTime = customer.getContactLastTime() != null ? customer.getContactLastTime() : customer.getCreateTime();
+            long contactExpireDay = customerPoolConfig.getContactExpireDays() - LocalDateTimeUtils.between(lastTime);
+            if (contactExpireDay < 0) {
+                contactExpireDay = 0; // 如果为负的话重置为零
+            }
+            return Math.min(dealExpireDay, contactExpireDay);
+        });
     }
 
     @GetMapping(value = "/list-all-simple")

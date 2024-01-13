@@ -95,4 +95,12 @@ public interface CrmContractService {
      */
     Long getContractCountByContactId(Long contactId);
 
+    /**
+     * 获取关联客户的合同数量
+     *
+     * @param customerId 客户编号
+     * @return 数量
+     */
+    Long getContractCountByCustomerId(Long customerId);
+
 }

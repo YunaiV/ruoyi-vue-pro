@@ -3,13 +3,8 @@ package cn.iocoder.yudao.module.crm.convert.customer;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTransferReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.poolconfig.CrmCustomerPoolConfigRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.poolconfig.CrmCustomerPoolConfigSaveReqVO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
@@ -30,9 +25,6 @@ import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAnd
 public interface CrmCustomerConvert {
 
     CrmCustomerConvert INSTANCE = Mappers.getMapper(CrmCustomerConvert.class);
-
-    // TODO @puhui999：可以清理掉可以用 BeanUtil 替代的方法哈
-    CrmCustomerDO convert(CrmCustomerSaveReqVO bean);
 
     CrmCustomerRespVO convert(CrmCustomerDO bean);
 
@@ -73,13 +65,5 @@ public interface CrmCustomerConvert {
         });
         return result;
     }
-
-    CrmCustomerPoolConfigRespVO convert(CrmCustomerPoolConfigDO customerPoolConfig);
-
-    CrmCustomerPoolConfigDO convert(CrmCustomerPoolConfigSaveReqVO updateReqVO);
-
-    // TODO @min：使用 BeanUtils 拷贝哈。我们慢慢简单的对象，不再直接基于 convert 做啦。
-    @Mapping(ignore = true, target = "id")
-    CrmCustomerSaveReqVO convert(CrmClueDO bean);
 
 }

@@ -5,9 +5,6 @@ import cn.iocoder.yudao.framework.common.validation.Mobile;
 import cn.iocoder.yudao.framework.common.validation.Telephone;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.module.crm.enums.customer.CrmCustomerLevelEnum;
-import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmIndustryParseFunction;
-import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmLevelParseFunction;
-import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmSourceParseFunction;
 import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
@@ -20,6 +17,8 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 import static cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_INDUSTRY;
+import static cn.iocoder.yudao.module.crm.enums.operatelog.CrmParseFunctionNameConstants.*;
+import static cn.iocoder.yudao.module.system.enums.operatelog.SysParseFunctionNameConstants.GET_AREA;
 
 @Schema(description = "管理后台 - CRM 客户新增/修改 Request VO")
 @Data
@@ -34,17 +33,17 @@ public class CrmCustomerSaveReqVO {
     private String name;
 
     @Schema(description = "所属行业", example = "1")
-    @DiffLogField(name = "所属行业", function = CrmIndustryParseFunction.NAME)
+    @DiffLogField(name = "所属行业", function = GET_CUSTOMER_INDUSTRY)
     @DictFormat(CRM_CUSTOMER_INDUSTRY)
     private Integer industryId;
 
     @Schema(description = "客户等级", example = "2")
-    @DiffLogField(name = "客户等级", function = CrmLevelParseFunction.NAME)
+    @DiffLogField(name = "客户等级", function = GET_CUSTOMER_LEVEL)
     @InEnum(CrmCustomerLevelEnum.class)
     private Integer level;
 
     @Schema(description = "客户来源", example = "3")
-    @DiffLogField(name = "客户来源", function = CrmSourceParseFunction.NAME)
+    @DiffLogField(name = "客户来源", function = GET_CUSTOMER_SOURCE)
     private Integer source;
 
     @Schema(description = "手机", example = "18000000000")
@@ -87,7 +86,7 @@ public class CrmCustomerSaveReqVO {
     private String remark;
 
     @Schema(description = "地区编号", example = "20158")
-    @DiffLogField(name = "地区编号", function = "getAreaById")
+    @DiffLogField(name = "地区编号", function = GET_AREA)
     private Integer areaId;
 
     @Schema(description = "详细地址", example = "北京市海淀区")

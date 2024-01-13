@@ -18,6 +18,9 @@ import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.framework.permission.core.util.CrmPermissionUtils;
+import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
+import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
+import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -26,6 +29,7 @@ import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -59,6 +63,15 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     private CrmPermissionService permissionService;
     @Resource
     private CrmCustomerLimitConfigService customerLimitConfigService;
+    @Resource
+    @Lazy
+    private CrmContactService contactService;
+    @Resource
+    @Lazy
+    private CrmBusinessService businessService;
+    @Resource
+    @Lazy
+    private CrmContractService contractService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -73,7 +86,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         validateCustomerExceedOwnerLimit(createReqVO.getOwnerUserId(), 1);
 
         // 2. 插入客户
-        CrmCustomerDO customer = CrmCustomerConvert.INSTANCE.convert(createReqVO)
+        CrmCustomerDO customer = BeanUtils.toBean(createReqVO, CrmCustomerDO.class)
                 .setLockStatus(false).setDealStatus(false)
                 .setContactLastTime(LocalDateTime.now());
         // TODO @puhui999：可能要加个 receiveTime 字段，记录最后接收时间
@@ -100,7 +113,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         CrmCustomerDO oldCustomer = validateCustomerExists(updateReqVO.getId());
 
         // 2. 更新客户
-        CrmCustomerDO updateObj = CrmCustomerConvert.INSTANCE.convert(updateReqVO);
+        CrmCustomerDO updateObj = BeanUtils.toBean(updateReqVO, CrmCustomerDO.class);
         customerMapper.updateById(updateObj);
 
         // 3. 记录操作日志上下文
@@ -116,8 +129,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     public void deleteCustomer(Long id) {
         // 校验存在
         CrmCustomerDO customer = validateCustomerExists(id);
-        // TODO @puhui999：如果有联系人、商机，则不允许删除；
-
+        // 检查引用
+        checkCustomerReference(id);
         // 删除
         customerMapper.deleteById(id);
         // 删除数据权限
@@ -126,6 +139,23 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
         // 记录操作日志上下文
         LogRecordContext.putVariable("customerName", customer.getName());
+    }
+
+    /**
+     * 校验客户是否被引用
+     *
+     * @param id 客户编号
+     */
+    private void checkCustomerReference(Long id) {
+        if (contactService.getContactCountByCustomerId(id) > 0) {
+            throw exception(CUSTOMER_DELETE_FAIL_HAVE_REFERENCE, CrmBizTypeEnum.CRM_CONTACT.getName());
+        }
+        if (businessService.getBusinessCountByCustomerId(id) > 0) {
+            throw exception(CUSTOMER_DELETE_FAIL_HAVE_REFERENCE, CrmBizTypeEnum.CRM_BUSINESS.getName());
+        }
+        if (contractService.getContractCountByCustomerId(id) > 0) {
+            throw exception(CUSTOMER_DELETE_FAIL_HAVE_REFERENCE, CrmBizTypeEnum.CRM_CONTRACT.getName());
+        }
     }
 
     @Override
@@ -145,10 +175,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         // 2.2 转移后重新设置负责人
         customerMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
 
-        // 3. TODO 记录转移日志
-        // 记录操作日志上下文
-        // TODO @puhui999：crmCustomer=》customer，也看看其他有没类似的情况哈
-        LogRecordContext.putVariable("crmCustomer", customer);
+        // 3. 记录转移日志
+        LogRecordContext.putVariable("customer", customer);
     }
 
     @Override
@@ -172,7 +200,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
         // 3. 记录操作日志上下文
         // tips: 因为这里使用的是老的状态所以记录时反着记录，也就是 lockStatus 为 true 那么就是解锁反之为锁定
-        LogRecordContext.putVariable("crmCustomer", customer);
+        LogRecordContext.putVariable("customer", customer);
     }
 
     // ==================== 公海相关操作 ====================
@@ -202,6 +230,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         permissionService.deletePermission(CrmBizTypeEnum.CRM_CUSTOMER.getType(), customer.getId(),
                 CrmPermissionLevelEnum.OWNER.getLevel());
         // TODO @puhui999：联系人的负责人，也要设置为 null；这块和领取是对应的；因为领取后，负责人也要关联过来；
+        //      提问：那是不是可以这样理解客户所有联系人的负责人默认为客户的负责人，然后添加客户团队成员时才存在“同时分配给”的操作？
+        contactService.updateOwnerUserIdByCustomerId(customer.getId(), null);
 
         // 记录操作日志上下文
         LogRecordContext.putVariable("customerName", customer.getName());

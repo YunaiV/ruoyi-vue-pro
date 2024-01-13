@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigSaveReqVO;
-import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerLimitConfigConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerLimitConfigDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.customer.CrmCustomerLimitConfigMapper;
 import cn.iocoder.yudao.module.crm.enums.customer.CrmCustomerLimitConfigTypeEnum;
@@ -49,7 +48,7 @@ public class CrmCustomerLimitConfigServiceImpl implements CrmCustomerLimitConfig
     public Long createCustomerLimitConfig(CrmCustomerLimitConfigSaveReqVO createReqVO) {
         validateUserAndDept(createReqVO.getUserIds(), createReqVO.getDeptIds());
         // 插入
-        CrmCustomerLimitConfigDO customerLimitConfig = CrmCustomerLimitConfigConvert.INSTANCE.convert(createReqVO);
+        CrmCustomerLimitConfigDO customerLimitConfig = BeanUtils.toBean(createReqVO, CrmCustomerLimitConfigDO.class);
         customerLimitConfigMapper.insert(customerLimitConfig);
 
         // 记录操作日志上下文
@@ -66,7 +65,7 @@ public class CrmCustomerLimitConfigServiceImpl implements CrmCustomerLimitConfig
         CrmCustomerLimitConfigDO oldLimitConfig = validateCustomerLimitConfigExists(updateReqVO.getId());
         validateUserAndDept(updateReqVO.getUserIds(), updateReqVO.getDeptIds());
         // 更新
-        CrmCustomerLimitConfigDO updateObj = CrmCustomerLimitConfigConvert.INSTANCE.convert(updateReqVO);
+        CrmCustomerLimitConfigDO updateObj = BeanUtils.toBean(updateReqVO, CrmCustomerLimitConfigDO.class);
         customerLimitConfigMapper.updateById(updateObj);
 
         // 记录操作日志上下文

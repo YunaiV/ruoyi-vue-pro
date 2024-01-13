@@ -8,6 +8,8 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import static cn.iocoder.yudao.module.system.enums.operatelog.SysParseFunctionNameConstants.GET_DEPT_BY_ID;
+
 /**
  * 管理员名字的 {@link IParseFunction} 实现类
  *
@@ -22,7 +24,7 @@ public class DeptParseFunction implements IParseFunction {
 
     @Override
     public String functionName() {
-        return "getDeptById";
+        return GET_DEPT_BY_ID;
     }
 
     @Override

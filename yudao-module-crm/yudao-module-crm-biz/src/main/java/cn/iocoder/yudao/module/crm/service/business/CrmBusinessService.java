@@ -98,4 +98,12 @@ public interface CrmBusinessService {
      */
     void transferBusiness(CrmBusinessTransferReqVO reqVO, Long userId);
 
+    /**
+     * 获取关联客户的商机数量
+     *
+     * @param customerId 客户编号
+     * @return 数量
+     */
+    Long getBusinessCountByCustomerId(Long customerId);
+
 }
