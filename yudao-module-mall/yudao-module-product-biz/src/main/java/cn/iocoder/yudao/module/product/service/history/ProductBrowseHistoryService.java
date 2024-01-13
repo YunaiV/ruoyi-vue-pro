@@ -32,15 +32,6 @@ public interface ProductBrowseHistoryService {
     void hideUserBrowseHistory(Long userId, Collection<Long> spuId);
 
     /**
-     * 获取用户记录数量
-     *
-     * @param userId      用户编号
-     * @param userDeleted 用户是否删除
-     * @return 数量
-     */
-    Long getBrowseHistoryCount(Long userId, Boolean userDeleted);
-
-    /**
      * 获得商品浏览记录分页
      *
      * @param pageReqVO 分页查询
