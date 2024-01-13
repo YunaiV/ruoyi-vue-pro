@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.product.service.category;
 
-import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryListReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryUpdateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategorySaveReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
-
 import jakarta.validation.Valid;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -22,14 +21,14 @@ public interface ProductCategoryService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createCategory(@Valid ProductCategoryCreateReqVO createReqVO);
+    Long createCategory(@Valid ProductCategorySaveReqVO createReqVO);
 
     /**
      * 更新商品分类
      *
      * @param updateReqVO 更新信息
      */
-    void updateCategory(@Valid ProductCategoryUpdateReqVO updateReqVO);
+    void updateCategory(@Valid ProductCategorySaveReqVO updateReqVO);
 
     /**
      * 删除商品分类
