@@ -7,8 +7,6 @@ import com.mzt.logapi.service.IParseFunction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import static cn.iocoder.yudao.module.system.enums.operatelog.SysParseFunctionNameConstants.GET_SEX;
-
 /**
  * 行业的 {@link IParseFunction} 实现类
  *
@@ -18,6 +16,8 @@ import static cn.iocoder.yudao.module.system.enums.operatelog.SysParseFunctionNa
 @Slf4j
 public class SexParseFunction implements IParseFunction {
 
+    public static final String NAME = "getSex";
+
     @Override
     public boolean executeBefore() {
         return true; // 先转换值后对比
@@ -25,7 +25,7 @@ public class SexParseFunction implements IParseFunction {
 
     @Override
     public String functionName() {
-        return GET_SEX;
+        return NAME;
     }
 
     @Override

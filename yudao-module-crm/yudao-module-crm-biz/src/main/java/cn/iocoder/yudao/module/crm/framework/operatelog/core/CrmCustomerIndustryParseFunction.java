@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import static cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_INDUSTRY;
-import static cn.iocoder.yudao.module.crm.enums.operatelog.CrmParseFunctionNameConstants.GET_CUSTOMER_INDUSTRY;
 
 /**
  * 行业的 {@link IParseFunction} 实现类
@@ -18,6 +17,8 @@ import static cn.iocoder.yudao.module.crm.enums.operatelog.CrmParseFunctionNameC
 @Slf4j
 public class CrmCustomerIndustryParseFunction implements IParseFunction {
 
+    public static final String NAME = "getCustomerIndustry";
+
     @Override
     public boolean executeBefore() {
         return true; // 先转换值后对比
@@ -25,7 +26,7 @@ public class CrmCustomerIndustryParseFunction implements IParseFunction {
 
     @Override
     public String functionName() {
-        return GET_CUSTOMER_INDUSTRY;
+        return NAME;
     }
 
     @Override

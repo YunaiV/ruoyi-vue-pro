@@ -1,14 +1,13 @@
 package cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig;
 
+import cn.iocoder.yudao.module.crm.framework.operatelog.core.SysAdminUserParseFunction;
+import cn.iocoder.yudao.module.crm.framework.operatelog.core.SysDeptParseFunction;
 import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.List;
-
-import static cn.iocoder.yudao.module.system.enums.operatelog.SysParseFunctionNameConstants.GET_ADMIN_USER_BY_ID;
-import static cn.iocoder.yudao.module.system.enums.operatelog.SysParseFunctionNameConstants.GET_DEPT_BY_ID;
 
 @Schema(description = "管理后台 - 客户限制配置创建/更新 Request VO")
 @Data
@@ -23,11 +22,11 @@ public class CrmCustomerLimitConfigSaveReqVO {
     private Integer type;
 
     @Schema(description = "规则适用人群")
-    @DiffLogField(name = "规则适用人群", function = GET_ADMIN_USER_BY_ID)
+    @DiffLogField(name = "规则适用人群", function = SysAdminUserParseFunction.NAME)
     private List<Long> userIds;
 
     @Schema(description = "规则适用部门")
-    @DiffLogField(name = "规则适用部门", function = GET_DEPT_BY_ID)
+    @DiffLogField(name = "规则适用部门", function = SysDeptParseFunction.NAME)
     private List<Long> deptIds;
 
     @Schema(description = "数量上限", requiredMode = Schema.RequiredMode.REQUIRED, example = "28384")

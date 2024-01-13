@@ -28,13 +28,6 @@
             <artifactId>spring-boot-starter-validation</artifactId>
             <optional>true</optional>
         </dependency>
-        <!-- TODO @puhui999：api 之间，不直接引入哈；然后，logrecord function 在微服务下，这么跑会高不起来，所以每个服务自己写 function -->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-system-api</artifactId>
-            <version>${revision}</version>
-            <optional>true</optional>
-        </dependency>
     </dependencies>
 
 </project>

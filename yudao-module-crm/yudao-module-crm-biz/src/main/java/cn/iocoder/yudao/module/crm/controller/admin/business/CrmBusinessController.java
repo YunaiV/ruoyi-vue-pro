@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.crm.controller.admin.business;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.*;
@@ -83,6 +84,14 @@ public class CrmBusinessController {
     public CommonResult<CrmBusinessRespVO> getBusiness(@RequestParam("id") Long id) {
         CrmBusinessDO business = businessService.getBusiness(id);
         return success(CrmBusinessConvert.INSTANCE.convert(business));
+    }
+
+    @GetMapping("/list-by-ids")
+    @Operation(summary = "获得商机列表")
+    @Parameter(name = "ids", description = "编号", required = true, example = "[1024]")
+    @PreAuthorize("@ss.hasPermission('crm:business:query')")
+    public CommonResult<List<CrmBusinessRespVO>> getContactListByIds(@RequestParam("ids") List<Long> ids) {
+        return success(BeanUtils.toBean(businessService.getBusinessList(ids, getLoginUserId()), CrmBusinessRespVO.class));
     }
 
     @GetMapping("/page")

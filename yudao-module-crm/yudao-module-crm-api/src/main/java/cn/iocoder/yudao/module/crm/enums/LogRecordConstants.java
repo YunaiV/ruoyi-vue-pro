@@ -1,8 +1,5 @@
 package cn.iocoder.yudao.module.crm.enums;
 
-import static cn.iocoder.yudao.module.crm.enums.operatelog.CrmParseFunctionNameConstants.GET_CONTRACT_BY_ID;
-import static cn.iocoder.yudao.module.system.enums.operatelog.SysParseFunctionNameConstants.GET_ADMIN_USER_BY_ID;
-
 /**
  * CRM 操作日志枚举
  * 目的：统一管理，也减少 Service 里各种“复杂”字符串
@@ -25,7 +22,7 @@ public interface LogRecordConstants {
     String CRM_CUSTOMER_DELETE_SUB_TYPE = "删除客户";
     String CRM_CUSTOMER_DELETE_SUCCESS = "删除了客户【{{#customerName}}】";
     String CRM_CUSTOMER_TRANSFER_SUB_TYPE = "转移客户";
-    String CRM_CUSTOMER_TRANSFER_SUCCESS = "将客户【{{#customer.name}}】的负责人从【{" + GET_ADMIN_USER_BY_ID + "{#customer.ownerUserId}}】变更为了【{" + GET_ADMIN_USER_BY_ID + "{#reqVO.newOwnerUserId}}】";
+    String CRM_CUSTOMER_TRANSFER_SUCCESS = "将客户【{{#customer.name}}】的负责人从【{getAdminUserById{#customer.ownerUserId}}】变更为了【{getAdminUserById{#reqVO.newOwnerUserId}}】";
     String CRM_CUSTOMER_LOCK_SUB_TYPE = "{{#customer.lockStatus ? '解锁客户' : '锁定客户'}}";
     String CRM_CUSTOMER_LOCK_SUCCESS = "{{#customer.lockStatus ? '将客户【' + #customer.name + '】解锁' : '将客户【' + #customer.name + '】锁定'}}";
     String CRM_CUSTOMER_POOL_SUB_TYPE = "客户放入公海";
@@ -59,7 +56,7 @@ public interface LogRecordConstants {
     String CRM_CONTACT_DELETE_SUB_TYPE = "删除联系人";
     String CRM_CONTACT_DELETE_SUCCESS = "删除了联系人【{{#contactName}}】";
     String CRM_CONTACT_TRANSFER_SUB_TYPE = "转移联系人";
-    String CRM_CONTACT_TRANSFER_SUCCESS = "将联系人【{{#contact.name}}】的负责人从【{" + GET_ADMIN_USER_BY_ID + "{#contact.ownerUserId}}】变更为了【{" + GET_ADMIN_USER_BY_ID + "{#reqVO.newOwnerUserId}}】";
+    String CRM_CONTACT_TRANSFER_SUCCESS = "将联系人【{{#contact.name}}】的负责人从【{getAdminUserById{#contact.ownerUserId}}】变更为了【{getAdminUserById{#reqVO.newOwnerUserId}}】";
 
     // ======================= CRM_BUSINESS 商机 =======================
 
@@ -71,7 +68,7 @@ public interface LogRecordConstants {
     String CRM_BUSINESS_DELETE_SUB_TYPE = "删除商机";
     String CRM_BUSINESS_DELETE_SUCCESS = "删除了商机【{{#businessName}}】";
     String CRM_BUSINESS_TRANSFER_SUB_TYPE = "转移商机";
-    String CRM_BUSINESS_TRANSFER_SUCCESS = "将商机【{{#business.name}}】的负责人从【{" + GET_ADMIN_USER_BY_ID + "{#business.ownerUserId}}】变更为了【{" + GET_ADMIN_USER_BY_ID + "{#reqVO.newOwnerUserId}}】";
+    String CRM_BUSINESS_TRANSFER_SUCCESS = "将商机【{{#business.name}}】的负责人从【{getAdminUserById{#business.ownerUserId}}】变更为了【{getAdminUserById{#reqVO.newOwnerUserId}}】";
 
     // ======================= CRM_CONTRACT 合同 =======================
 
@@ -83,7 +80,7 @@ public interface LogRecordConstants {
     String CRM_CONTRACT_DELETE_SUB_TYPE = "删除合同";
     String CRM_CONTRACT_DELETE_SUCCESS = "删除了合同【{{#contractName}}】";
     String CRM_CONTRACT_TRANSFER_SUB_TYPE = "转移合同";
-    String CRM_CONTRACT_TRANSFER_SUCCESS = "将合同【{{#contract.name}}】的负责人从【{" + GET_ADMIN_USER_BY_ID + "{#contract.ownerUserId}}】变更为了【{" + GET_ADMIN_USER_BY_ID + "{#reqVO.newOwnerUserId}}】";
+    String CRM_CONTRACT_TRANSFER_SUCCESS = "将合同【{{#contract.name}}】的负责人从【{getAdminUserById{#contract.ownerUserId}}】变更为了【{getAdminUserById{#reqVO.newOwnerUserId}}】";
 
     // ======================= CRM_PRODUCT 产品 =======================
 
@@ -109,20 +106,20 @@ public interface LogRecordConstants {
 
     String CRM_RECEIVABLE_TYPE = "CRM 回款";
     String CRM_RECEIVABLE_CREATE_SUB_TYPE = "创建回款";
-    String CRM_RECEIVABLE_CREATE_SUCCESS = "创建了合同【{" + GET_CONTRACT_BY_ID + "{#receivable.contractId}}】的第【{{#receivable.period}}】期回款";
+    String CRM_RECEIVABLE_CREATE_SUCCESS = "创建了合同【{getContractById{#receivable.contractId}}】的第【{{#receivable.period}}】期回款";
     String CRM_RECEIVABLE_UPDATE_SUB_TYPE = "更新回款";
-    String CRM_RECEIVABLE_UPDATE_SUCCESS = "更新了合同【{" + GET_CONTRACT_BY_ID + "{#receivable.contractId}}】的第【{{#receivable.period}}】期回款: {_DIFF{#updateReqVO}}";
+    String CRM_RECEIVABLE_UPDATE_SUCCESS = "更新了合同【{getContractById{#receivable.contractId}}】的第【{{#receivable.period}}】期回款: {_DIFF{#updateReqVO}}";
     String CRM_RECEIVABLE_DELETE_SUB_TYPE = "删除回款";
-    String CRM_RECEIVABLE_DELETE_SUCCESS = "删除了合同【{" + GET_CONTRACT_BY_ID + "{#receivable.contractId}}】的第【{{#receivable.period}}】期回款";
+    String CRM_RECEIVABLE_DELETE_SUCCESS = "删除了合同【{getContractById{#receivable.contractId}}】的第【{{#receivable.period}}】期回款";
 
     // ======================= CRM_RECEIVABLE_PLAN 回款计划 =======================
 
     String CRM_RECEIVABLE_PLAN_TYPE = "CRM 回款计划";
     String CRM_RECEIVABLE_PLAN_CREATE_SUB_TYPE = "创建回款计划";
-    String CRM_RECEIVABLE_PLAN_CREATE_SUCCESS = "创建了合同【{" + GET_CONTRACT_BY_ID + "{#receivablePlan.contractId}}】的第【{{#receivablePlan.period}}】期回款计划";
+    String CRM_RECEIVABLE_PLAN_CREATE_SUCCESS = "创建了合同【{getContractById{#receivablePlan.contractId}}】的第【{{#receivablePlan.period}}】期回款计划";
     String CRM_RECEIVABLE_PLAN_UPDATE_SUB_TYPE = "更新回款计划";
-    String CRM_RECEIVABLE_PLAN_UPDATE_SUCCESS = "更新了合同【{" + GET_CONTRACT_BY_ID + "{#receivablePlan.contractId}}】的第【{{#receivablePlan.period}}】期回款计划: {_DIFF{#updateReqVO}}";
+    String CRM_RECEIVABLE_PLAN_UPDATE_SUCCESS = "更新了合同【{getContractById{#receivablePlan.contractId}}】的第【{{#receivablePlan.period}}】期回款计划: {_DIFF{#updateReqVO}}";
     String CRM_RECEIVABLE_PLAN_DELETE_SUB_TYPE = "删除回款计划";
-    String CRM_RECEIVABLE_PLAN_DELETE_SUCCESS = "删除了合同【{" + GET_CONTRACT_BY_ID + "{#receivablePlan.contractId}}】的第【{{#receivablePlan.period}}】期回款计划";
+    String CRM_RECEIVABLE_PLAN_DELETE_SUCCESS = "删除了合同【{getContractById{#receivablePlan.contractId}}】的第【{{#receivablePlan.period}}】期回款计划";
 
 }
