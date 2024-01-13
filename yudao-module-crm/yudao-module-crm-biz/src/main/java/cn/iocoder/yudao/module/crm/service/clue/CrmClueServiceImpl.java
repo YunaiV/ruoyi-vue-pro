@@ -27,9 +27,12 @@ import org.springframework.validation.annotation.Validated;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CLUE_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_EXISTS;
 
 /**
@@ -132,23 +135,34 @@ public class CrmClueServiceImpl implements CrmClueService {
     @Transactional(rollbackFor = Exception.class)
     public void translateCustomer(CrmClueTransformReqVO reqVO, Long userId) {
         // 校验线索都存在
-        List<CrmClueDO> clues = getClueList(reqVO.getIds(), userId);
-        if (CollUtil.isEmpty(clues)) {
-            throw exception(CLUE_NOT_EXISTS);
+        Set<Long> clueIds = reqVO.getIds();
+        List<CrmClueDO> clues = getClueList(clueIds, userId);
+        if (CollUtil.isEmpty(clues) || ObjectUtil.notEqual(clues.size(), clueIds.size())) {
+            // 提示不存在的线索编号
+            clueIds.removeAll(convertSet(clues, CrmClueDO::getId));
+            throw exception(ANY_CLUE_NOT_EXISTS, clueIds.stream().map(String::valueOf).collect(Collectors.joining(",")));
         }
-        // TODO @min：如果已经转化，则不能重复转化
 
-        // 遍历线索(过滤掉已转化的线索)，创建对应的客户
-        clues.stream().filter(clue -> ObjectUtil.notEqual(Boolean.TRUE, clue.getTransformStatus()))
-                .forEach(clue -> {
-                    // 1. 创建客户
-                    CrmCustomerSaveReqVO customerSaveReqVO = BeanUtils.toBean(clue, CrmCustomerSaveReqVO.class).setId(null);
-                    Long customerId = customerService.createCustomer(customerSaveReqVO, userId);
-                    // TODO @puhui999：如果有跟进记录，需要一起转过去；
-                    // 2. 更新线索
-                    clueMapper.updateById(new CrmClueDO().setId(clue.getId())
-                            .setTransformStatus(Boolean.TRUE).setCustomerId(customerId));
-                });
+        // 过滤出未转化的客户
+        List<CrmClueDO> unTransformClues = clues.stream()
+                .filter(clue -> ObjectUtil.notEqual(Boolean.TRUE, clue.getTransformStatus())).toList();
+        // 传入的线索中包含已经转化的情况，抛出业务异常
+        if (ObjectUtil.notEqual(clues.size(), unTransformClues.size())) {
+            // 提示已经转化的线索编号
+            clueIds.removeAll(convertSet(unTransformClues, CrmClueDO::getId));
+            throw exception(ANY_CLUE_ALREADY_TRANSLATED, clueIds.stream().map(String::valueOf).collect(Collectors.joining(",")));
+        }
+
+        // 遍历线索(未转化的线索)，创建对应的客户
+        unTransformClues.forEach(clue -> {
+            // 1. 创建客户
+            CrmCustomerSaveReqVO customerSaveReqVO = BeanUtils.toBean(clue, CrmCustomerSaveReqVO.class).setId(null);
+            Long customerId = customerService.createCustomer(customerSaveReqVO, userId);
+            // TODO @puhui999：如果有跟进记录，需要一起转过去；
+            // 2. 更新线索
+            clueMapper.updateById(new CrmClueDO().setId(clue.getId())
+                    .setTransformStatus(Boolean.TRUE).setCustomerId(customerId));
+        });
     }
 
     private void validateRelationDataExists(CrmClueSaveReqVO reqVO) {
