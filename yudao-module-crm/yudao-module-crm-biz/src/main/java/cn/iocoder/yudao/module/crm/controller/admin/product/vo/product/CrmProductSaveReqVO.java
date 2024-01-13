@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.crm.controller.admin.product.vo.product;
 
+import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmProductStatusParseFunction;
+import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmProductUnitParseFunction;
 import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -23,7 +25,7 @@ public class CrmProductSaveReqVO {
     private String no;
 
     @Schema(description = "单位", example = "2")
-    @DiffLogField(name = "单位", function = "getProductUnitName")
+    @DiffLogField(name = "单位", function = CrmProductUnitParseFunction.NAME)
     private Integer unit;
 
     @Schema(description = "价格, 单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "8911")
@@ -33,7 +35,7 @@ public class CrmProductSaveReqVO {
 
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "上架")
     @NotNull(message = "状态不能为空")
-    @DiffLogField(name = "状态", function = "getProductStatusName")
+    @DiffLogField(name = "状态", function = CrmProductStatusParseFunction.NAME)
     private Integer status;
 
     @Schema(description = "产品分类编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")

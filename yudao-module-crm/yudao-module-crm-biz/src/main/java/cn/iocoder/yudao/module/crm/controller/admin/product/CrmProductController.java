@@ -136,8 +136,7 @@ public class CrmProductController {
     public CommonResult<PageResult<OperateLogV2RespDTO>> getProductOperateLog(@RequestParam("bizId") Long bizId) {
         OperateLogV2PageReqDTO reqVO = new OperateLogV2PageReqDTO();
         reqVO.setPageSize(PAGE_SIZE_NONE); // 不分页
-        reqVO.setBizType(CRM_PRODUCT_TYPE);
-        reqVO.setBizId(bizId);
+        reqVO.setBizType(CRM_PRODUCT_TYPE).setBizId(bizId);
         return success(operateLogApi.getOperateLogPage(BeanUtils.toBean(reqVO, OperateLogV2PageReqDTO.class)));
     }
 

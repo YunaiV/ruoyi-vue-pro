@@ -49,7 +49,8 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
         // 2. 插入分类
         CrmProductCategoryDO category = BeanUtils.toBean(createReqVO, CrmProductCategoryDO.class);
         productCategoryMapper.insert(category);
-        // 记录操作日志上下文
+
+        // 3. 记录操作日志上下文
         LogRecordContext.putVariable("productCategoryId", category.getId());
         return category.getId();
     }

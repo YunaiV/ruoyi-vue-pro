@@ -58,21 +58,21 @@ public class CrmProductServiceImpl implements CrmProductService {
     @LogRecord(type = CRM_PRODUCT_TYPE, subType = CRM_PRODUCT_CREATE_SUB_TYPE, bizNo = "{{#productId}}",
             success = CRM_PRODUCT_CREATE_SUCCESS)
     public Long createProduct(CrmProductSaveReqVO createReqVO) {
-        // 校验产品
+        // 1. 校验产品
         adminUserApi.validateUserList(Collections.singleton(createReqVO.getOwnerUserId()));
         validateProductNoDuplicate(null, createReqVO.getNo());
         validateProductCategoryExists(createReqVO.getCategoryId());
 
-        // 插入产品
+        // 2. 插入产品
         CrmProductDO product = BeanUtils.toBean(createReqVO, CrmProductDO.class);
         productMapper.insert(product);
 
-        // 插入数据权限
+        // 3. 插入数据权限
         permissionService.createPermission(new CrmPermissionCreateReqBO().setUserId(product.getOwnerUserId())
                 .setBizType(CrmBizTypeEnum.CRM_PRODUCT.getType()).setBizId(product.getId())
                 .setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
 
-        // 记录操作日志上下文
+        // 4. 记录操作日志上下文
         LogRecordContext.putVariable("productId", product.getId());
         return product.getId();
     }
@@ -82,17 +82,17 @@ public class CrmProductServiceImpl implements CrmProductService {
             success = CRM_PRODUCT_UPDATE_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_PRODUCT, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateProduct(CrmProductSaveReqVO updateReqVO) {
-        // 校验产品
+        // 1. 校验产品
         updateReqVO.setOwnerUserId(null); // 不修改负责人
         CrmProductDO crmProductDO = validateProductExists(updateReqVO.getId());
         validateProductNoDuplicate(updateReqVO.getId(), updateReqVO.getNo());
         validateProductCategoryExists(updateReqVO.getCategoryId());
 
-        // 更新产品
+        // 2. 更新产品
         CrmProductDO updateObj = BeanUtils.toBean(updateReqVO, CrmProductDO.class);
         productMapper.updateById(updateObj);
 
-        // 记录操作日志上下文
+        // 3. 记录操作日志上下文
         LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(crmProductDO,CrmProductSaveReqVO.class));
     }
 
@@ -145,6 +145,7 @@ public class CrmProductServiceImpl implements CrmProductService {
         return productMapper.selectBatchIds(ids);
     }
 
+    // TODO @anhaohao：可以接入数据权限，参考 CrmCustomerService 的 getCustomerPage
     @Override
     public PageResult<CrmProductDO> getProductPage(CrmProductPageReqVO pageReqVO) {
         return productMapper.selectPage(pageReqVO);
