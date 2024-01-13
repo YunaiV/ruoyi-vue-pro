@@ -4,16 +4,13 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanTransferReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivableDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivablePlanDO;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -55,8 +52,5 @@ public interface CrmReceivablePlanConvert {
         });
         return voPageResult;
     }
-
-    @Mapping(target = "bizId", source = "reqVO.id")
-    CrmPermissionTransferReqBO convert(CrmReceivablePlanTransferReqVO reqVO, Long userId);
 
 }

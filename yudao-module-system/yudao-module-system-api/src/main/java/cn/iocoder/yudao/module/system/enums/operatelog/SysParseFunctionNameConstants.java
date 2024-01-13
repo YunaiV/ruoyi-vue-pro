@@ -6,6 +6,7 @@ package cn.iocoder.yudao.module.system.enums.operatelog;
  *
  * @author HUIHUI
  */
+// TODO @puhui999：这个枚举，还是放在对应的 Function 里好。主要考虑，和 Function 实现可以更近一点哈
 public interface SysParseFunctionNameConstants {
 
     String GET_ADMIN_USER_BY_ID = "getAdminUserById"; // 获取用户信息

@@ -29,8 +29,8 @@ public class CrmCustomerPoolConfigController {
     @Operation(summary = "获取客户公海规则设置")
     @PreAuthorize("@ss.hasPermission('crm:customer-pool-config:query')")
     public CommonResult<CrmCustomerPoolConfigRespVO> getCustomerPoolConfig() {
-        CrmCustomerPoolConfigDO customerPoolConfig = customerPoolConfigService.getCustomerPoolConfig();
-        return success(BeanUtils.toBean(customerPoolConfig, CrmCustomerPoolConfigRespVO.class));
+        CrmCustomerPoolConfigDO poolConfig = customerPoolConfigService.getCustomerPoolConfig();
+        return success(BeanUtils.toBean(poolConfig, CrmCustomerPoolConfigRespVO.class));
     }
 
     @PutMapping("/save")

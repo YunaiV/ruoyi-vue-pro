@@ -115,10 +115,8 @@ public class CrmCustomerController {
         }
 
         // 2. 拼接数据
-        Map<Long, Long> poolDayMap = null;
-        if (ObjUtil.notEqual(pageVO.getPool(), Boolean.TRUE)) {
-            poolDayMap = getPoolDayMap(pageResult.getList());  // 距离进入公海的时间
-        }
+        Map<Long, Long> poolDayMap = Boolean.TRUE.equals(pageVO.getPool()) ? null :
+                getPoolDayMap(pageResult.getList()); // 客户界面，需要查看距离进入公海的时间
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSetByFlatMap(pageResult.getList(), user -> Stream.of(Long.parseLong(user.getCreator()), user.getOwnerUserId())));
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
@@ -132,21 +130,23 @@ public class CrmCustomerController {
      * @return Map<key 客户编号, value 距离进入公海的时间>
      */
     private Map<Long, Long> getPoolDayMap(List<CrmCustomerDO> customerList) {
-        CrmCustomerPoolConfigDO customerPoolConfig = customerPoolConfigService.getCustomerPoolConfig();
-        if (customerPoolConfig == null || !customerPoolConfig.getEnabled()) {
+        CrmCustomerPoolConfigDO poolConfig = customerPoolConfigService.getCustomerPoolConfig();
+        if (poolConfig == null || !poolConfig.getEnabled()) {
             return MapUtil.empty();
         }
-        // TODO @puhui999：需要考虑 lock 的情况么？ 回复：锁定正常显示距离进入公海的时间有个提示
         return convertMap(customerList, CrmCustomerDO::getId, customer -> {
+            // 1.1 未成交放入公海天数
             long dealExpireDay = 0;
-            if (!customer.getDealStatus()) { // 检查是否成交
-                dealExpireDay = customerPoolConfig.getDealExpireDays() - LocalDateTimeUtils.between(customer.getCreateTime());
+            if (!customer.getDealStatus()) {
+                dealExpireDay = poolConfig.getDealExpireDays() - LocalDateTimeUtils.between(customer.getCreateTime());
             }
-            LocalDateTime lastTime = customer.getContactLastTime() != null ? customer.getContactLastTime() : customer.getCreateTime();
-            long contactExpireDay = customerPoolConfig.getContactExpireDays() - LocalDateTimeUtils.between(lastTime);
+            // 1.2 未跟进放入公海天数
+            LocalDateTime lastTime = ObjUtil.defaultIfNull(customer.getContactLastTime(), customer.getCreateTime());
+            long contactExpireDay = poolConfig.getContactExpireDays() - LocalDateTimeUtils.between(lastTime);
             if (contactExpireDay < 0) {
-                contactExpireDay = 0; // 如果为负的话重置为零
+                contactExpireDay = 0;
             }
+            // 2. 返回最小的天数
             return Math.min(dealExpireDay, contactExpireDay);
         });
     }

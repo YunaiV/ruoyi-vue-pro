@@ -127,17 +127,17 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
             success = CRM_CUSTOMER_DELETE_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void deleteCustomer(Long id) {
-        // 校验存在
+        // 1.1 校验存在
         CrmCustomerDO customer = validateCustomerExists(id);
-        // 检查引用
+        // 1.2 检查引用
         checkCustomerReference(id);
-        // 删除
-        customerMapper.deleteById(id);
-        // 删除数据权限
-        permissionService.deletePermission(CrmBizTypeEnum.CRM_CUSTOMER.getType(), id);
-        // TODO @puhui999：删除跟进记录
 
-        // 记录操作日志上下文
+        // 2. 删除
+        customerMapper.deleteById(id);
+        // 3. 删除数据权限
+        permissionService.deletePermission(CrmBizTypeEnum.CRM_CUSTOMER.getType(), id);
+
+        // 4. 记录操作日志上下文
         LogRecordContext.putVariable("customerName", customer.getName());
     }
 

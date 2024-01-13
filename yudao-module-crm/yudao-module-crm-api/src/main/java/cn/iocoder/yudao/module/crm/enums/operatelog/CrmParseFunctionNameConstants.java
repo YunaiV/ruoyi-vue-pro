@@ -6,6 +6,7 @@ package cn.iocoder.yudao.module.crm.enums.operatelog;
  *
  * @author HUIHUI
  */
+// TODO @puhui999：这个枚举，还是放在对应的 Function 里好。主要考虑，和 Function 实现可以更近一点哈
 public interface CrmParseFunctionNameConstants {
 
     String GET_CONTACT_BY_ID = "getContactById"; // 获取联系人信息

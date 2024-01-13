@@ -123,7 +123,7 @@ public class LocalDateTimeUtils {
     }
 
     /**
-     * 获取指定日期到现在过了几天，如果指定日期在当前日期之后，获取结果为负。
+     * 获取指定日期到现在过了几天，如果指定日期在当前日期之后，获取结果为负
      *
      * @param dateTime 日期
      * @return 相差天数

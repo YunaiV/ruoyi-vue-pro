@@ -77,7 +77,8 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
         permissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_RECEIVABLE.getType())
                 .setBizId(receivable.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
         // TODO @liuhongfeng：需要更新关联的 plan
-        // 记录操作日志上下文
+
+        // 4. 记录操作日志上下文
         LogRecordContext.putVariable("receivable", receivable);
         return receivable.getId();
     }

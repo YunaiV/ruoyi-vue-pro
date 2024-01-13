@@ -154,7 +154,6 @@ public class CrmContactServiceImpl implements CrmContactService {
         permissionService.deletePermission(CrmBizTypeEnum.CRM_CONTACT.getType(), id);
         // 4.2 删除商机关联
         contactBusinessService.deleteContactBusinessByContactId(id);
-        // TODO @puhui999：删除跟进记录
 
         // 记录操作日志上下文
         LogRecordContext.putVariable("contactName", contact.getName());

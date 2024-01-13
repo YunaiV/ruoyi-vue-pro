@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.crm.convert.customer;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTransferReqVO;
@@ -26,7 +27,22 @@ public interface CrmCustomerConvert {
 
     CrmCustomerConvert INSTANCE = Mappers.getMapper(CrmCustomerConvert.class);
 
-    CrmCustomerRespVO convert(CrmCustomerDO bean);
+    default CrmCustomerRespVO convert(CrmCustomerDO customer, Map<Long, AdminUserRespDTO> userMap,
+                                      Map<Long, DeptRespDTO> deptMap) {
+        CrmCustomerRespVO customerResp = BeanUtils.toBean(customer, CrmCustomerRespVO.class);
+        setUserInfo(customerResp, userMap, deptMap);
+        return customerResp;
+    }
+
+    default PageResult<CrmCustomerRespVO> convertPage(PageResult<CrmCustomerDO> pageResult, Map<Long, AdminUserRespDTO> userMap,
+                                                      Map<Long, DeptRespDTO> deptMap, Map<Long, Long> poolDayMap) {
+        PageResult<CrmCustomerRespVO> result = BeanUtils.toBean(pageResult, CrmCustomerRespVO.class);
+        result.getList().forEach(item -> {
+            setUserInfo(item, userMap, deptMap);
+            findAndThen(poolDayMap, item.getId(), item::setPoolDay);
+        });
+        return result;
+    }
 
     /**
      * 设置用户信息
@@ -46,24 +62,5 @@ public interface CrmCustomerConvert {
 
     @Mapping(target = "bizId", source = "reqVO.id")
     CrmPermissionTransferReqBO convert(CrmCustomerTransferReqVO reqVO, Long userId);
-
-    PageResult<CrmCustomerRespVO> convertPage(PageResult<CrmCustomerDO> page);
-
-    default CrmCustomerRespVO convert(CrmCustomerDO customer, Map<Long, AdminUserRespDTO> userMap,
-                                      Map<Long, DeptRespDTO> deptMap) {
-        CrmCustomerRespVO customerResp = convert(customer);
-        setUserInfo(customerResp, userMap, deptMap);
-        return customerResp;
-    }
-
-    default PageResult<CrmCustomerRespVO> convertPage(PageResult<CrmCustomerDO> pageResult, Map<Long, AdminUserRespDTO> userMap,
-                                                      Map<Long, DeptRespDTO> deptMap, Map<Long, Long> poolDayMap) {
-        PageResult<CrmCustomerRespVO> result = convertPage(pageResult);
-        result.getList().forEach(item -> {
-            setUserInfo(item, userMap, deptMap);
-            findAndThen(poolDayMap, item.getId(), item::setPoolDay);
-        });
-        return result;
-    }
 
 }

@@ -48,13 +48,13 @@ public class CrmCustomerLimitConfigServiceImpl implements CrmCustomerLimitConfig
     public Long createCustomerLimitConfig(CrmCustomerLimitConfigSaveReqVO createReqVO) {
         validateUserAndDept(createReqVO.getUserIds(), createReqVO.getDeptIds());
         // 插入
-        CrmCustomerLimitConfigDO customerLimitConfig = BeanUtils.toBean(createReqVO, CrmCustomerLimitConfigDO.class);
-        customerLimitConfigMapper.insert(customerLimitConfig);
+        CrmCustomerLimitConfigDO limitConfig = BeanUtils.toBean(createReqVO, CrmCustomerLimitConfigDO.class);
+        customerLimitConfigMapper.insert(limitConfig);
 
         // 记录操作日志上下文
-        LogRecordContext.putVariable("limitType", CrmCustomerLimitConfigTypeEnum.getNameByType(customerLimitConfig.getType()));
-        LogRecordContext.putVariable("limitId", customerLimitConfig.getId());
-        return customerLimitConfig.getId();
+        LogRecordContext.putVariable("limitType", CrmCustomerLimitConfigTypeEnum.getNameByType(limitConfig.getType()));
+        LogRecordContext.putVariable("limitId", limitConfig.getId());
+        return limitConfig.getId();
     }
 
     @Override
@@ -77,12 +77,12 @@ public class CrmCustomerLimitConfigServiceImpl implements CrmCustomerLimitConfig
             success = CRM_CUSTOMER_LIMIT_CONFIG_DELETE_SUCCESS)
     public void deleteCustomerLimitConfig(Long id) {
         // 校验存在
-        CrmCustomerLimitConfigDO limitConfigDO = validateCustomerLimitConfigExists(id);
+        CrmCustomerLimitConfigDO limitConfig = validateCustomerLimitConfigExists(id);
         // 删除
         customerLimitConfigMapper.deleteById(id);
 
         // 记录操作日志上下文
-        LogRecordContext.putVariable("limitType", CrmCustomerLimitConfigTypeEnum.getNameByType(limitConfigDO.getType()));
+        LogRecordContext.putVariable("limitType", CrmCustomerLimitConfigTypeEnum.getNameByType(limitConfig.getType()));
     }
 
     @Override

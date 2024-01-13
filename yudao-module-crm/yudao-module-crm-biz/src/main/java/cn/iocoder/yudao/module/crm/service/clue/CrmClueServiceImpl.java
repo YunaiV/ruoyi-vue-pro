@@ -142,9 +142,11 @@ public class CrmClueServiceImpl implements CrmClueService {
         clues.forEach(clue -> {
             clue.setId(null);
             // 创建客户
+            // TODO @puhui999：上面的 id 置空，适合 bean copy 后，在设置为 null，不直接修改 clu 哈
             customerService.createCustomer(BeanUtils.toBean(clue, CrmCustomerSaveReqVO.class), userId);
             // 更新线索状态
             // TODO @min：新建一个 CrmClueDO 去更新。尽量规避直接用原本的对象去更新。因为这样万一并发更新，会存在覆盖的问题。
+            // TODO @min：customerId 没有更新进去
             // TODO @puhui999：如果有跟进记录，需要一起转过去；
             clue.setTransformStatus(Boolean.TRUE);
             clueMapper.updateById(clue);
