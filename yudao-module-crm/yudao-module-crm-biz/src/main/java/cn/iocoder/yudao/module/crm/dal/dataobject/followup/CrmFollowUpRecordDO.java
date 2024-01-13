@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
+import cn.iocoder.yudao.module.crm.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -53,9 +54,8 @@ public class CrmFollowUpRecordDO extends BaseDO {
     private Long bizId;
 
     /**
-     * 跟进类型
+     * 跟进类型,关联字典{@link DictTypeConstants#CRM_FOLLOW_UP_TYPE}
      *
-     * TODO @puhui999：可以搞个数据字典，打电话、发短信、上门拜访、微信、邮箱、QQ
      */
     private Integer type;
     /**

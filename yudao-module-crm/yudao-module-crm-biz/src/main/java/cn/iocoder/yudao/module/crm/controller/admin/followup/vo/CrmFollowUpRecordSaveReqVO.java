@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "管理后台 - 跟进记录新增/修改 Request VO")
 @Data
@@ -35,9 +36,9 @@ public class CrmFollowUpRecordSaveReqVO {
     private LocalDateTime nextTime;
 
     @Schema(description = "关联的商机编号数组")
-    private String businessIds;
+    private List<Long> businessIds;
 
     @Schema(description = "关联的联系人编号数组")
-    private String contactIds;
+    private List<Long> contactIds;
 
 }

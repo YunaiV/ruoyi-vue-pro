@@ -156,6 +156,11 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
+    public List<CrmBusinessDO> getBusinessList(Collection<Long> ids) {
+        return businessMapper.selectBatchIds(ids);
+    }
+
+    @Override
     public PageResult<CrmBusinessDO> getBusinessPage(CrmBusinessPageReqVO pageReqVO, Long userId) {
         return businessMapper.selectPage(pageReqVO, userId);
     }

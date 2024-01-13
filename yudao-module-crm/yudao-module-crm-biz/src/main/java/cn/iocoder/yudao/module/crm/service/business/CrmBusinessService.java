@@ -60,6 +60,14 @@ public interface CrmBusinessService {
     List<CrmBusinessDO> getBusinessList(Collection<Long> ids, Long userId);
 
     /**
+     * 获得商机列表
+     *
+     * @param ids 编号
+     * @return 商机列表
+     */
+    List<CrmBusinessDO> getBusinessList(Collection<Long> ids);
+
+    /**
      * 获得商机分页
      *
      * 数据权限：基于 {@link CrmBusinessDO}

@@ -208,6 +208,11 @@ public class CrmContactServiceImpl implements CrmContactService {
     }
 
     @Override
+    public List<CrmContactDO> getContactList(Collection<Long> ids) {
+        return contactMapper.selectBatchIds(ids);
+    }
+
+    @Override
     public List<CrmContactDO> getContactList() {
         return contactMapper.selectList();
     }
