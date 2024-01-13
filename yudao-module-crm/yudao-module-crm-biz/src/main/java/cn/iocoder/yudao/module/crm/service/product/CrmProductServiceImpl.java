@@ -16,6 +16,8 @@ import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.mzt.logapi.context.LogRecordContext;
+import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -53,9 +55,8 @@ public class CrmProductServiceImpl implements CrmProductService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_PRODUCT_TYPE, subType = CRM_PRODUCT_CREATE_SUB_TYPE, bizNo = "{{#createReqVO.id}}",
+    @LogRecord(type = CRM_PRODUCT_TYPE, subType = CRM_PRODUCT_CREATE_SUB_TYPE, bizNo = "{{#productId}}",
             success = CRM_PRODUCT_CREATE_SUCCESS)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PRODUCT, bizId = "#createReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public Long createProduct(CrmProductSaveReqVO createReqVO) {
         // 校验产品
         adminUserApi.validateUserList(Collections.singleton(createReqVO.getOwnerUserId()));
@@ -70,6 +71,9 @@ public class CrmProductServiceImpl implements CrmProductService {
         permissionService.createPermission(new CrmPermissionCreateReqBO().setUserId(product.getOwnerUserId())
                 .setBizType(CrmBizTypeEnum.CRM_PRODUCT.getType()).setBizId(product.getId())
                 .setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
+
+        // 记录操作日志上下文
+        LogRecordContext.putVariable("productId", product.getId());
         return product.getId();
     }
 
@@ -80,20 +84,24 @@ public class CrmProductServiceImpl implements CrmProductService {
     public void updateProduct(CrmProductSaveReqVO updateReqVO) {
         // 校验产品
         updateReqVO.setOwnerUserId(null); // 不修改负责人
-        validateProductExists(updateReqVO.getId());
+        CrmProductDO crmProductDO = validateProductExists(updateReqVO.getId());
         validateProductNoDuplicate(updateReqVO.getId(), updateReqVO.getNo());
         validateProductCategoryExists(updateReqVO.getCategoryId());
 
         // 更新产品
         CrmProductDO updateObj = BeanUtils.toBean(updateReqVO, CrmProductDO.class);
         productMapper.updateById(updateObj);
+
+        // 记录操作日志上下文
+        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(crmProductDO,CrmProductSaveReqVO.class));
     }
 
-    private void validateProductExists(Long id) {
+    private CrmProductDO validateProductExists(Long id) {
         CrmProductDO product = productMapper.selectById(id);
         if (product == null) {
             throw exception(PRODUCT_NOT_EXISTS);
         }
+        return product;
     }
 
     private void validateProductNoDuplicate(Long id, String no) {
@@ -138,7 +146,6 @@ public class CrmProductServiceImpl implements CrmProductService {
     }
 
     @Override
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_PRODUCT, bizId = "#pageReqVO.id", level = CrmPermissionLevelEnum.READ)
     public PageResult<CrmProductDO> getProductPage(CrmProductPageReqVO pageReqVO) {
         return productMapper.selectPage(pageReqVO);
     }

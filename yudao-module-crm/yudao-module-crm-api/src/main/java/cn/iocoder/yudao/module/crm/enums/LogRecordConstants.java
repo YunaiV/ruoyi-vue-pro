@@ -87,7 +87,6 @@ public interface LogRecordConstants {
 
     // ======================= CRM_PRODUCT 产品 =======================
 
-    // TODO @hao：可以把 CRM 产品、和 CRM 产品分类分开哈，量程两个 type；
     String CRM_PRODUCT_TYPE = "CRM 产品";
     String CRM_PRODUCT_CREATE_SUB_TYPE = "创建产品";
     String CRM_PRODUCT_CREATE_SUCCESS = "创建了产品【{{#createReqVO.name}}】";
@@ -95,6 +94,9 @@ public interface LogRecordConstants {
     String CRM_PRODUCT_UPDATE_SUCCESS = "更新了产品【{{#updateReqVO.name}}】: {_DIFF{#updateReqVO}}";
     String CRM_PRODUCT_DELETE_SUB_TYPE = "删除产品";
     String CRM_PRODUCT_DELETE_SUCCESS = "删除了产品【{{#product.name}}】";
+
+    // ======================= CRM_PRODUCT_CATEGORY 产品分类 =======================
+
     String CRM_PRODUCT_CATEGORY_TYPE = "CRM 产品分类";
     String CRM_PRODUCT_CATEGORY_CREATE_SUB_TYPE = "创建产品分类";
     String CRM_PRODUCT_CATEGORY_CREATE_SUCCESS = "创建了产品分类【{{#createReqVO.name}}】";
