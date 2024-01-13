@@ -11,6 +11,7 @@ import java.util.Set;
 public class CrmClueTransformReqVO {
 
     @Schema(description = "线索编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "[1024, 1025]")
-    @NotEmpty(message = "线索编号不能为空") Set<Long> ids; // TODO @min：应该空行噢
+    @NotEmpty(message = "线索编号不能为空")
+    private Set<Long> ids;
 
 }

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.crm.service.clue;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
@@ -29,7 +30,6 @@ import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CLUE_NOT_EXISTS;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CUSTOMER_NOT_EXISTS;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_EXISTS;
 
 /**
@@ -60,7 +60,7 @@ public class CrmClueServiceImpl implements CrmClueService {
         validateRelationDataExists(createReqVO);
 
         // 插入
-        CrmClueDO clue = CrmClueConvert.INSTANCE.convert(createReqVO);
+        CrmClueDO clue = BeanUtils.toBean(createReqVO, CrmClueDO.class);
         clueMapper.insert(clue);
         // 返回
         return clue.getId();
@@ -75,7 +75,7 @@ public class CrmClueServiceImpl implements CrmClueService {
         validateRelationDataExists(updateReqVO);
 
         // 更新
-        CrmClueDO updateObj = CrmClueConvert.INSTANCE.convert(updateReqVO);
+        CrmClueDO updateObj = BeanUtils.toBean(updateReqVO, CrmClueDO.class);
         clueMapper.updateById(updateObj);
     }
 
@@ -130,7 +130,7 @@ public class CrmClueServiceImpl implements CrmClueService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void translate(CrmClueTransformReqVO reqVO, Long userId) {
+    public void translateCustomer(CrmClueTransformReqVO reqVO, Long userId) {
         // 校验线索都存在
         List<CrmClueDO> clues = getClueList(reqVO.getIds(), userId);
         if (CollUtil.isEmpty(clues)) {
@@ -138,29 +138,25 @@ public class CrmClueServiceImpl implements CrmClueService {
         }
         // TODO @min：如果已经转化，则不能重复转化
 
-        // 遍历线索，创建对应的客户
-        clues.forEach(clue -> {
-            clue.setId(null);
-            // 创建客户
-            // TODO @puhui999：上面的 id 置空，适合 bean copy 后，在设置为 null，不直接修改 clu 哈
-            customerService.createCustomer(BeanUtils.toBean(clue, CrmCustomerSaveReqVO.class), userId);
-            // 更新线索状态
-            // TODO @min：新建一个 CrmClueDO 去更新。尽量规避直接用原本的对象去更新。因为这样万一并发更新，会存在覆盖的问题。
-            // TODO @min：customerId 没有更新进去
-            // TODO @puhui999：如果有跟进记录，需要一起转过去；
-            clue.setTransformStatus(Boolean.TRUE);
-            clueMapper.updateById(clue);
-        });
+        // 遍历线索(过滤掉已转化的线索)，创建对应的客户
+        clues.stream().filter(clue -> ObjectUtil.notEqual(Boolean.TRUE, clue.getTransformStatus()))
+                .forEach(clue -> {
+                    // 1.创建客户
+                    CrmCustomerSaveReqVO customerSaveReqVO = BeanUtils.toBean(clue, CrmCustomerSaveReqVO.class)
+                            .setId(null);
+                    Long customerId = customerService.createCustomer(customerSaveReqVO, userId);
+                    // TODO @puhui999：如果有跟进记录，需要一起转过去；
+                    // 2.更新线索，新建一个 CrmClueDO 去更新。尽量规避直接用原本的对象去更新。因为这样万一并发更新，会存在覆盖的问题。
+                    clueMapper.updateById(BeanUtils.toBean(clue, CrmClueDO.class)
+                            // 线索状态设置为已转化
+                            .setTransformStatus(Boolean.TRUE)
+                            // 设置关联的客户编号
+                            .setCustomerId(customerId));
+                });
     }
 
     private void validateRelationDataExists(CrmClueSaveReqVO reqVO) {
-        // 校验客户
-        if (Objects.nonNull(reqVO.getCustomerId()) &&
-                Objects.isNull(customerService.getCustomer(reqVO.getCustomerId()))) {
-            throw exception(CUSTOMER_NOT_EXISTS);
-        }
         // 校验负责人
-        // 2. 校验负责人
         if (Objects.nonNull(reqVO.getOwnerUserId()) &&
                 Objects.isNull(adminUserApi.getUser(reqVO.getOwnerUserId()))) {
             throw exception(USER_NOT_EXISTS);
