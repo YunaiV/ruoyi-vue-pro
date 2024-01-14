@@ -39,7 +39,7 @@ public class CrmBusinessStatusDO {
      *
      * TODO 这里是不是改成 Integer 存储，百分比 * 100 ；
      */
-    private String percent;
+    private Integer percent;
     /**
      * 排序
      */

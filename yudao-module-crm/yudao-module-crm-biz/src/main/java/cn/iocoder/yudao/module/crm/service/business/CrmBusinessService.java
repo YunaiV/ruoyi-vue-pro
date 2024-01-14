@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.module.crm.service.business;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessCreateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessTransferReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
@@ -27,14 +24,14 @@ public interface CrmBusinessService {
      * @param userId      用户编号
      * @return 编号
      */
-    Long createBusiness(@Valid CrmBusinessCreateReqVO createReqVO, Long userId);
+    Long createBusiness(@Valid CrmBusinessSaveReqVO createReqVO, Long userId);
 
     /**
      * 更新商机
      *
      * @param updateReqVO 更新信息
      */
-    void updateBusiness(@Valid CrmBusinessUpdateReqVO updateReqVO);
+    void updateBusiness(@Valid CrmBusinessSaveReqVO updateReqVO);
 
     /**
      * 删除商机

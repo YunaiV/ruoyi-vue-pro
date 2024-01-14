@@ -24,6 +24,6 @@ public class CrmBusinessStatusTypeSaveReqVO {
 
     // TODO @ljlleo VO 里面，我们不使用默认值哈。这里 Lists.newArrayList() 看看怎么去掉。上面 deptIds 也是类似噢
     @Schema(description = "商机状态集合", requiredMode = Schema.RequiredMode.REQUIRED)
-    private List<CrmBusinessStatusSaveReqVO> statusList = Lists.newArrayList();
+    private List<CrmBusinessStatusSaveReqVO> statusList;
 
 }

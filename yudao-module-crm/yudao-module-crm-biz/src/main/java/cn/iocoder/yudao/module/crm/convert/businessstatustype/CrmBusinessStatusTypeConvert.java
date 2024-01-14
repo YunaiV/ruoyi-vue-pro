@@ -41,9 +41,9 @@ public interface CrmBusinessStatusTypeConvert {
 
     default CrmBusinessStatusTypeRespVO convert(CrmBusinessStatusTypeDO bean, List<CrmBusinessStatusDO> statusList) {
         // TODO @ljlleo 可以链式赋值，简化成一行；
-        CrmBusinessStatusTypeRespVO result = convert(bean);
-        result.setStatusList(statusList);
-        return result;
+//        CrmBusinessStatusTypeRespVO result = convert(bean);
+//        result.setStatusList(statusList);
+        return convert(bean).setStatusList(statusList);
     }
 
 }

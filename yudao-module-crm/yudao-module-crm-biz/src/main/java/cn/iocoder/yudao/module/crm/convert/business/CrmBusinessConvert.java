@@ -27,7 +27,7 @@ public interface CrmBusinessConvert {
 
     CrmBusinessConvert INSTANCE = Mappers.getMapper(CrmBusinessConvert.class);
 
-    CrmBusinessDO convert(CrmBusinessCreateReqVO bean);
+    CrmBusinessDO convert(CrmBusinessSaveReqVO bean);
 
     CrmBusinessDO convert(CrmBusinessUpdateReqVO bean);
 
