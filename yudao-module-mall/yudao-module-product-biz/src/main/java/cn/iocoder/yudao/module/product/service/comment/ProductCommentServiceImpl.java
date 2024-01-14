@@ -9,8 +9,6 @@ import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommen
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentReplyReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentUpdateVisibleReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentPageReqVO;
-import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentStatisticsRespVO;
-import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppProductCommentRespVO;
 import cn.iocoder.yudao.module.product.convert.comment.ProductCommentConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
@@ -18,13 +16,12 @@ import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.comment.ProductCommentMapper;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
+import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
@@ -54,28 +51,28 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     @Override
     public void createComment(ProductCommentCreateReqVO createReqVO) {
         // 校验 SKU
-        ProductSkuDO skuDO = validateSku(createReqVO.getSkuId());
+        ProductSkuDO sku = validateSku(createReqVO.getSkuId());
         // 校验 SPU
-        ProductSpuDO spuDO = validateSpu(skuDO.getSpuId());
+        ProductSpuDO spu = validateSpu(sku.getSpuId());
 
         // 创建评论
-        ProductCommentDO comment = ProductCommentConvert.INSTANCE.convert(createReqVO, spuDO, skuDO);
+        ProductCommentDO comment = ProductCommentConvert.INSTANCE.convert(createReqVO, spu, sku);
         productCommentMapper.insert(comment);
     }
 
     @Override
     public Long createComment(ProductCommentCreateReqDTO createReqDTO) {
         // 校验 SKU
-        ProductSkuDO skuDO = validateSku(createReqDTO.getSkuId());
+        ProductSkuDO sku = validateSku(createReqDTO.getSkuId());
         // 校验 SPU
-        ProductSpuDO spuDO = validateSpu(skuDO.getSpuId());
+        ProductSpuDO spu = validateSpu(sku.getSpuId());
         // 校验评论
         validateCommentExists(createReqDTO.getUserId(), createReqDTO.getOrderId());
         // 获取用户详细信息
         MemberUserRespDTO user = memberUserApi.getUser(createReqDTO.getUserId());
 
         // 创建评论
-        ProductCommentDO comment = ProductCommentConvert.INSTANCE.convert(createReqDTO, spuDO, skuDO, user);
+        ProductCommentDO comment = ProductCommentConvert.INSTANCE.convert(createReqDTO, spu, sku, user);
         productCommentMapper.insert(comment);
         return comment.getId();
     }
@@ -135,23 +132,6 @@ public class ProductCommentServiceImpl implements ProductCommentService {
             throw exception(COMMENT_NOT_EXISTS);
         }
         return productComment;
-    }
-
-    @Override
-    public AppCommentStatisticsRespVO getCommentStatistics(Long spuId, Boolean visible) {
-        return ProductCommentConvert.INSTANCE.convert(
-                // 查询商品 id = spuId 的所有好评数量
-                productCommentMapper.selectCountBySpuId(spuId, visible, AppCommentPageReqVO.GOOD_COMMENT),
-                // 查询商品 id = spuId 的所有中评数量
-                productCommentMapper.selectCountBySpuId(spuId, visible, AppCommentPageReqVO.MEDIOCRE_COMMENT),
-                // 查询商品 id = spuId 的所有差评数量
-                productCommentMapper.selectCountBySpuId(spuId, visible, AppCommentPageReqVO.NEGATIVE_COMMENT)
-        );
-    }
-
-    @Override
-    public List<AppProductCommentRespVO> getCommentList(Long spuId, Integer count) {
-        return ProductCommentConvert.INSTANCE.convertList02(productCommentMapper.selectCommentList(spuId, count).getList());
     }
 
     @Override
