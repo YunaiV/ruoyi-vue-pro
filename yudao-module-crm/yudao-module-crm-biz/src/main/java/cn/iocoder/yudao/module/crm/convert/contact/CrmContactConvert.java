@@ -4,7 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
-import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactTransferReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
@@ -30,10 +31,6 @@ public interface CrmContactConvert {
     CrmContactConvert INSTANCE = Mappers.getMapper(CrmContactConvert.class);
 
     CrmContactRespVO convert(CrmContactDO bean);
-
-    List<CrmContactRespVO> convertList(List<CrmContactDO> list);
-
-    PageResult<CrmContactRespVO> convertPage(PageResult<CrmContactDO> page);
 
     @Mapping(target = "bizId", source = "reqVO.id")
     CrmPermissionTransferReqBO convert(CrmContactTransferReqVO reqVO, Long userId);

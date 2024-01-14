@@ -2,28 +2,20 @@ package cn.iocoder.yudao.module.crm.controller.admin.contract.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
-
-/**
- * 合同 Base VO，提供给添加、修改、详细的子 VO 使用
- * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
- */
+@Schema(description = "管理后台 - CRM 合同 Response VO")
 @Data
-public class CrmContractBaseVO {
+public class CrmContractRespVO {
 
-    // TODO @dhb52：类似 no 字段的 example 要写xia 哈；
+    @Schema(description = "合同编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
+    private Long id;
 
     @Schema(description = "合同名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "王五")
-    @NotNull(message = "合同名称不能为空")
     private String name;
 
-    // TODO @dhb52：这个必须传递
-    @Schema(description = "客户编号", example = "18336")
+    @Schema(description = "客户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "18336")
     private Long customerId;
 
     @Schema(description = "商机编号", example = "10864")
@@ -32,26 +24,20 @@ public class CrmContractBaseVO {
     @Schema(description = "工作流编号", example = "1043")
     private Long processInstanceId;
 
-    // TODO @dhb52：这个必须传递
-    @Schema(description = "下单日期")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    @Schema(description = "下单日期", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime orderDate;
 
-    // TODO @dhb52：这个必须传递
-    @Schema(description = "负责人的用户编号", example = "17144")
+    @Schema(description = "负责人的用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17144")
     private Long ownerUserId;
 
     // TODO @芋艿：未来应该支持自动生成；
-    // TODO @dhb52：这个必须传递；
-    @Schema(description = "合同编号")
+    @Schema(description = "合同编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "20230101")
     private String no;
 
     @Schema(description = "开始时间")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime startTime;
 
     @Schema(description = "结束时间")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime endTime;
 
     @Schema(description = "合同金额", example = "5617")
@@ -70,12 +56,27 @@ public class CrmContractBaseVO {
     private Long signUserId;
 
     @Schema(description = "最后跟进时间")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime contactLastTime;
 
     @Schema(description = "备注", example = "你猜")
     private String remark;
 
-    // TODO @dhb52：增加一个 status 字段：具体有哪些值，你来枚举下；主要页面上有个【草稿】【提交审核】的流程，可以看看。然后要对接工作流，这块也可以看看，不确定的地方问我。
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    private LocalDateTime createTime;
+
+    @Schema(description = "创建人", example = "25682")
+    private String creator;
+
+    @Schema(description = "创建人名字", example = "test")
+    private String creatorName;
+
+    @Schema(description = "客户名字", example = "test")
+    private String customerName;
+
+    @Schema(description = "负责人", example = "test")
+    private String ownerUserName;
+
+    @Schema(description = "审批状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
+    private Integer auditStatus;
 
 }

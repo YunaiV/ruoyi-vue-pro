@@ -15,8 +15,6 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-// TODO @puhui999：界面：做成一个 list 列表，字段是 id、跟进人、跟进方式、跟进时间、跟进内容、下次联系时间、关联联系人、关联商机
-// TODO @puhui999：界面：记录时，弹窗，表单字段是跟进方式、跟进内容、下次联系时间、关联联系人、关联商机；其中关联联系人、关联商机，要做成对应的组件列。
 /**
  * 跟进记录 DO
  *

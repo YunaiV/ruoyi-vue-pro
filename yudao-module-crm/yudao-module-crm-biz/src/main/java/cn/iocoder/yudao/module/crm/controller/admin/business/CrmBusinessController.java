@@ -6,7 +6,10 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.*;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessSaveReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessTransferReqVO;
 import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
@@ -32,6 +35,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -52,18 +56,17 @@ public class CrmBusinessController {
     @Resource
     private CrmBusinessStatusService businessStatusService;
 
-    // TODO @商机待定：CrmBusinessCreateReqVO、CrmBusinessUpdateReqVO、CrmBusinessRespVO 按照新的 VO 规范
     @PostMapping("/create")
     @Operation(summary = "创建商机")
     @PreAuthorize("@ss.hasPermission('crm:business:create')")
-    public CommonResult<Long> createBusiness(@Valid @RequestBody CrmBusinessCreateReqVO createReqVO) {
+    public CommonResult<Long> createBusiness(@Valid @RequestBody CrmBusinessSaveReqVO createReqVO) {
         return success(businessService.createBusiness(createReqVO, getLoginUserId()));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新商机")
     @PreAuthorize("@ss.hasPermission('crm:business:update')")
-    public CommonResult<Boolean> updateBusiness(@Valid @RequestBody CrmBusinessUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateBusiness(@Valid @RequestBody CrmBusinessSaveReqVO updateReqVO) {
         businessService.updateBusiness(updateReqVO);
         return success(true);
     }
@@ -83,7 +86,7 @@ public class CrmBusinessController {
     @PreAuthorize("@ss.hasPermission('crm:business:query')")
     public CommonResult<CrmBusinessRespVO> getBusiness(@RequestParam("id") Long id) {
         CrmBusinessDO business = businessService.getBusiness(id);
-        return success(CrmBusinessConvert.INSTANCE.convert(business));
+        return success(BeanUtils.toBean(business, CrmBusinessRespVO.class));
     }
 
     @GetMapping("/list-by-ids")
@@ -92,6 +95,17 @@ public class CrmBusinessController {
     @PreAuthorize("@ss.hasPermission('crm:business:query')")
     public CommonResult<List<CrmBusinessRespVO>> getContactListByIds(@RequestParam("ids") List<Long> ids) {
         return success(BeanUtils.toBean(businessService.getBusinessList(ids, getLoginUserId()), CrmBusinessRespVO.class));
+    }
+
+    @GetMapping("/simple-all-list")
+    @Operation(summary = "获得联系人的精简列表")
+    @PreAuthorize("@ss.hasPermission('crm:contact:query')")
+    public CommonResult<List<CrmBusinessRespVO>> getSimpleContactList() {
+        CrmBusinessPageReqVO reqVO = new CrmBusinessPageReqVO();
+        reqVO.setPageSize(PAGE_SIZE_NONE); // 不分页
+        PageResult<CrmBusinessDO> pageResult = businessService.getBusinessPage(reqVO, getLoginUserId());
+        return success(convertList(pageResult.getList(), business -> // 只返回 id、name 字段
+                new CrmBusinessRespVO().setId(business.getId()).setName(business.getName())));
     }
 
     @GetMapping("/page")

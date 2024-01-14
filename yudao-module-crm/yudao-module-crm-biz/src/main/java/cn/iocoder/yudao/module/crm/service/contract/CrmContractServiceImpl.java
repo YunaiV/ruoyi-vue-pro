@@ -4,10 +4,9 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractUpdateReqVO;
 import cn.iocoder.yudao.module.crm.convert.contract.CrmContractConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractMapper;
@@ -50,10 +49,11 @@ public class CrmContractServiceImpl implements CrmContractService {
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_CONTRACT_TYPE, subType = CRM_CONTRACT_CREATE_SUB_TYPE, bizNo = "{{#contract.id}}",
             success = CRM_CONTRACT_CREATE_SUCCESS)
-    public Long createContract(CrmContractCreateReqVO createReqVO, Long userId) {
+    public Long createContract(CrmContractSaveReqVO createReqVO, Long userId) {
+        createReqVO.setId(null);
         // TODO @合同待定：插入合同商品；需要搞个 BusinessProductDO
         // 插入合同
-        CrmContractDO contract = CrmContractConvert.INSTANCE.convert(createReqVO);
+        CrmContractDO contract = BeanUtils.toBean(createReqVO, CrmContractDO.class);
         contractMapper.insert(contract);
 
         // 创建数据权限
@@ -71,17 +71,17 @@ public class CrmContractServiceImpl implements CrmContractService {
     @LogRecord(type = CRM_CONTRACT_TYPE, subType = CRM_CONTRACT_UPDATE_SUB_TYPE, bizNo = "{{#updateReqVO.id}}",
             success = CRM_CONTRACT_UPDATE_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
-    public void updateContract(CrmContractUpdateReqVO updateReqVO) {
+    public void updateContract(CrmContractSaveReqVO updateReqVO) {
         // TODO @合同待定：只有草稿、审批中，可以编辑；
         // 校验存在
         CrmContractDO oldContract = validateContractExists(updateReqVO.getId());
         // 更新合同
-        CrmContractDO updateObj = CrmContractConvert.INSTANCE.convert(updateReqVO);
+        CrmContractDO updateObj = BeanUtils.toBean(updateReqVO, CrmContractDO.class);
         contractMapper.updateById(updateObj);
         // TODO @合同待定：插入合同商品；需要搞个 BusinessProductDO
 
         // 3. 记录操作日志上下文
-        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldContract, CrmContractUpdateReqVO.class));
+        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldContract, CrmContractSaveReqVO.class));
         LogRecordContext.putVariable("contractName", oldContract.getName());
     }
 

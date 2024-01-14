@@ -28,7 +28,7 @@ public class CrmContactSaveReqVO {
     private String name;
 
     @Schema(description = "客户编号", example = "10795")
-    @DiffLogField(name = "姓名", function = CrmCustomerParseFunction.NAME)
+    @DiffLogField(name = "客户", function = CrmCustomerParseFunction.NAME)
     private Long customerId;
 
     @Schema(description = "性别")

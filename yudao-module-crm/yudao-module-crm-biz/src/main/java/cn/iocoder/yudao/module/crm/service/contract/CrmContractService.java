@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.module.crm.service.contract;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import jakarta.validation.Valid;
@@ -26,14 +25,14 @@ public interface CrmContractService {
      * @param userId      用户编号
      * @return 编号
      */
-    Long createContract(@Valid CrmContractCreateReqVO createReqVO, Long userId);
+    Long createContract(@Valid CrmContractSaveReqVO createReqVO, Long userId);
 
     /**
      * 更新合同
      *
      * @param updateReqVO 更新信息
      */
-    void updateContract(@Valid CrmContractUpdateReqVO updateReqVO);
+    void updateContract(@Valid CrmContractSaveReqVO updateReqVO);
 
     /**
      * 删除合同

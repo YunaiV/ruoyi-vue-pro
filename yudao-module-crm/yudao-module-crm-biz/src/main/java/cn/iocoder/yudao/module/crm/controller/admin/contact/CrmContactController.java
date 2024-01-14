@@ -125,8 +125,10 @@ public class CrmContactController {
     @Operation(summary = "获得联系人的精简列表")
     @PreAuthorize("@ss.hasPermission('crm:contact:query')")
     public CommonResult<List<CrmContactRespVO>> getSimpleContactList() {
-        List<CrmContactDO> list = contactService.getContactList();
-        return success(convertList(list, contact -> // 只返回 id、name 字段
+        CrmContactPageReqVO reqVO = new CrmContactPageReqVO();
+        reqVO.setPageSize(PAGE_SIZE_NONE); // 不分页
+        PageResult<CrmContactDO> pageResult = contactService.getContactPage(reqVO, getLoginUserId());
+        return success(convertList(pageResult.getList(), contact -> // 只返回 id、name 字段
                 new CrmContactRespVO().setId(contact.getId()).setName(contact.getName())));
     }
 
