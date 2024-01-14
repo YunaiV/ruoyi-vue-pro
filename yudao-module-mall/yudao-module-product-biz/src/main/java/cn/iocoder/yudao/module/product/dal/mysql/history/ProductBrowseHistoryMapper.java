@@ -20,6 +20,12 @@ import java.util.Collection;
 @Mapper
 public interface ProductBrowseHistoryMapper extends BaseMapperX<ProductBrowseHistoryDO> {
 
+    default ProductBrowseHistoryDO selectByUserIdAndSpuId(Long userId, Long spuId) {
+        return selectOne(new LambdaQueryWrapperX<ProductBrowseHistoryDO>()
+                .eq(ProductBrowseHistoryDO::getUserId, userId)
+                .eq(ProductBrowseHistoryDO::getSpuId, spuId));
+    }
+
     default PageResult<ProductBrowseHistoryDO> selectPage(ProductBrowseHistoryPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ProductBrowseHistoryDO>()
                 .eqIfPresent(ProductBrowseHistoryDO::getUserId, reqVO.getUserId())
@@ -34,12 +40,6 @@ public interface ProductBrowseHistoryMapper extends BaseMapperX<ProductBrowseHis
                 .eq(ProductBrowseHistoryDO::getUserId, userId)
                 .in(CollUtil.isNotEmpty(spuIds), ProductBrowseHistoryDO::getSpuId, spuIds)
                 .set(ProductBrowseHistoryDO::getUserDeleted, userDeleted));
-    }
-
-    default Long selectCountByUserIdAndUserDeleted(Long userId, Boolean userDeleted) {
-        return selectCount(new LambdaQueryWrapperX<ProductBrowseHistoryDO>()
-                .eq(ProductBrowseHistoryDO::getUserId, userId)
-                .eqIfPresent(ProductBrowseHistoryDO::getUserDeleted, userDeleted));
     }
 
     default Page<ProductBrowseHistoryDO> selectPageByUserIdOrderByCreateTimeAsc(Long userId, Integer pageNo, Integer pageSize) {

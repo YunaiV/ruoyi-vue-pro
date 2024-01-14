@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryListReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryUpdateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategorySaveReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
 import cn.iocoder.yudao.module.product.dal.mysql.category.ProductCategoryMapper;
 import org.junit.jupiter.api.Disabled;
@@ -65,7 +65,7 @@ public class ProductCategoryServiceImplTest extends BaseDbUnitTest {
         ProductCategoryDO dbCategory = randomPojo(ProductCategoryDO.class);
         productCategoryMapper.insert(dbCategory);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        ProductCategoryUpdateReqVO reqVO = randomPojo(ProductCategoryUpdateReqVO.class, o -> {
+        ProductCategorySaveReqVO reqVO = randomPojo(ProductCategorySaveReqVO.class, o -> {
             o.setId(dbCategory.getId()); // 设置更新的 ID
         });
         // mock 父类
@@ -82,7 +82,7 @@ public class ProductCategoryServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateCategory_notExists() {
         // 准备参数
-        ProductCategoryUpdateReqVO reqVO = randomPojo(ProductCategoryUpdateReqVO.class);
+        ProductCategorySaveReqVO reqVO = randomPojo(ProductCategorySaveReqVO.class);
 
         // 调用, 并断言异常
         assertServiceException(() -> productCategoryService.updateCategory(reqVO), CATEGORY_NOT_EXISTS);

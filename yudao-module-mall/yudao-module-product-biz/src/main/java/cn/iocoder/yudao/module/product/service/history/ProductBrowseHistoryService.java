@@ -19,10 +19,9 @@ public interface ProductBrowseHistoryService {
      *
      * @param userId 用户编号
      * @param spuId  SPU 编号
-     * @return 编号
      */
     @Async
-    Long createBrowseHistory(Long userId, Long spuId);
+    void createBrowseHistory(Long userId, Long spuId);
 
     /**
      * 隐藏用户商品浏览记录
@@ -31,15 +30,6 @@ public interface ProductBrowseHistoryService {
      * @param spuId  SPU 编号
      */
     void hideUserBrowseHistory(Long userId, Collection<Long> spuId);
-
-    /**
-     * 获取用户记录数量
-     *
-     * @param userId      用户编号
-     * @param userDeleted 用户是否删除
-     * @return 数量
-     */
-    Long getBrowseHistoryCount(Long userId, Boolean userDeleted);
 
     /**
      * 获得商品浏览记录分页

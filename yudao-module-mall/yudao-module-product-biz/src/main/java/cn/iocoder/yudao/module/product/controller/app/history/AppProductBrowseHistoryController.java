@@ -28,7 +28,6 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
-// TODO 芋艿：后面再看
 @Tag(name = "用户 APP - 商品浏览记录")
 @RestController
 @RequestMapping("/product/browse-history")
@@ -50,16 +49,9 @@ public class AppProductBrowseHistoryController {
     @DeleteMapping(value = "/clean")
     @Operation(summary = "清空商品浏览记录")
     @PreAuthenticated
-    public CommonResult<Boolean> cleanBrowseHistory() {
+    public CommonResult<Boolean> deleteBrowseHistory() {
         productBrowseHistoryService.hideUserBrowseHistory(getLoginUserId(), null);
         return success(Boolean.TRUE);
-    }
-
-    @GetMapping(value = "/get-count")
-    @Operation(summary = "获得商品浏览记录数量")
-    @PreAuthenticated
-    public CommonResult<Long> getBrowseHistoryCount() {
-        return success(productBrowseHistoryService.getBrowseHistoryCount(getLoginUserId(), false));
     }
 
     @GetMapping(value = "/page")

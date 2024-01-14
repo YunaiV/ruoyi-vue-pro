@@ -16,6 +16,7 @@ import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationValidateJoinRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPageVO;
+import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordPageReqVO;
 import cn.iocoder.yudao.module.promotion.convert.combination.CombinationActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
@@ -23,14 +24,14 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationR
 import cn.iocoder.yudao.module.promotion.dal.mysql.combination.CombinationRecordMapper;
 import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.api.order.TradeOrderApi;
+import jakarta.annotation.Nullable;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Nullable;
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -159,7 +160,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         // 2.1. 如果是团长需要设置 headId 为 CombinationRecordDO#HEAD_ID_GROUP
         if (record.getHeadId() == null) {
             record.setStartTime(LocalDateTime.now())
-                    .setExpireTime(keyValue.getKey().getStartTime().plusHours(keyValue.getKey().getLimitDuration()))
+                    .setExpireTime(LocalDateTime.now().plusHours(keyValue.getKey().getLimitDuration()))
                     .setHeadId(CombinationRecordDO.HEAD_ID_GROUP);
         } else {
             // 2.2.有团长的情况下需要设置开始时间和过期时间为团长的
@@ -406,6 +407,11 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         });
         combinationRecordMapper.updateBatch(updateRecords);
         return records;
+    }
+
+    @Override
+    public PageResult<CombinationRecordDO> getCombinationRecordPage(Long userId, AppCombinationRecordPageReqVO pageReqVO) {
+        return combinationRecordMapper.selectPage(userId, pageReqVO);
     }
 
     /**

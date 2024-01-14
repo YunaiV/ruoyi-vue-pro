@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.product.controller.app.category.vo.AppCategoryRespVO;
-import cn.iocoder.yudao.module.product.convert.category.ProductCategoryConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
 import cn.iocoder.yudao.module.product.service.category.ProductCategoryService;
 import io.swagger.v3.oas.annotations.Operation;
