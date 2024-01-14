@@ -7,13 +7,9 @@ import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommen
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentReplyReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentUpdateVisibleReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentPageReqVO;
-import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentStatisticsRespVO;
-import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppProductCommentRespVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-
-import java.util.List;
 
 /**
  * 商品评论 Service 接口
@@ -72,23 +68,5 @@ public interface ProductCommentService {
      * @return 商品评价分页
      */
     PageResult<ProductCommentDO> getCommentPage(AppCommentPageReqVO pageVO, Boolean visible);
-
-    /**
-     * 获得商品的评价统计
-     *
-     * @param spuId   spu id
-     * @param visible 是否可见
-     * @return 评价统计
-     */
-    AppCommentStatisticsRespVO getCommentStatistics(Long spuId, Boolean visible);
-
-    /**
-     * 得到评论列表
-     *
-     * @param spuId 商品 id
-     * @param count 数量
-     * @return {@link Object}
-     */
-    List<AppProductCommentRespVO> getCommentList(Long spuId, Integer count);
 
 }
