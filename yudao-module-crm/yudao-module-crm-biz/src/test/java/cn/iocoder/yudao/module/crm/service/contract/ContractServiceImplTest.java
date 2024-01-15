@@ -2,9 +2,8 @@ package cn.iocoder.yudao.module.crm.service.contract;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractMapper;
 import jakarta.annotation.Resource;
@@ -38,7 +37,7 @@ public class ContractServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateContract_success() {
         // 准备参数
-        CrmContractCreateReqVO reqVO = randomPojo(CrmContractCreateReqVO.class);
+        CrmContractSaveReqVO reqVO = randomPojo(CrmContractSaveReqVO.class);
 
         // 调用
         Long contractId = contractService.createContract(reqVO, getLoginUserId());
@@ -55,7 +54,7 @@ public class ContractServiceImplTest extends BaseDbUnitTest {
         CrmContractDO dbContract = randomPojo(CrmContractDO.class);
         contractMapper.insert(dbContract);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        CrmContractUpdateReqVO reqVO = randomPojo(CrmContractUpdateReqVO.class, o -> {
+        CrmContractSaveReqVO reqVO = randomPojo(CrmContractSaveReqVO.class, o -> {
             o.setId(dbContract.getId()); // 设置更新的 ID
         });
 
@@ -69,7 +68,7 @@ public class ContractServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateContract_notExists() {
         // 准备参数
-        CrmContractUpdateReqVO reqVO = randomPojo(CrmContractUpdateReqVO.class);
+        CrmContractSaveReqVO reqVO = randomPojo(CrmContractSaveReqVO.class);
 
         // 调用, 并断言异常
         assertServiceException(() -> contractService.updateContract(reqVO), CONTRACT_NOT_EXISTS);

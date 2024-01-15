@@ -1,31 +1,33 @@
 package cn.iocoder.yudao.module.crm.controller.admin.followup;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.followup.vo.CrmFollowUpRecordPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.followup.vo.CrmFollowUpRecordRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.followup.vo.CrmFollowUpRecordSaveReqVO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.followup.CrmFollowUpRecordDO;
+import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
+import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.followup.CrmFollowUpRecordService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSetByFlatMap;
 
 
 @Tag(name = "管理后台 - 跟进记录")
@@ -36,6 +38,10 @@ public class CrmFollowUpRecordController {
 
     @Resource
     private CrmFollowUpRecordService crmFollowUpRecordService;
+    @Resource
+    private CrmContactService contactService;
+    @Resource
+    private CrmBusinessService businessService;
 
     @PostMapping("/create")
     @Operation(summary = "创建跟进记录")
@@ -75,20 +81,19 @@ public class CrmFollowUpRecordController {
     @PreAuthorize("@ss.hasPermission('crm:follow-up-record:query')")
     public CommonResult<PageResult<CrmFollowUpRecordRespVO>> getFollowUpRecordPage(@Valid CrmFollowUpRecordPageReqVO pageReqVO) {
         PageResult<CrmFollowUpRecordDO> pageResult = crmFollowUpRecordService.getFollowUpRecordPage(pageReqVO);
-        return success(BeanUtils.toBean(pageResult, CrmFollowUpRecordRespVO.class));
-    }
-
-    @GetMapping("/export-excel")
-    @Operation(summary = "导出跟进记录 Excel")
-    @PreAuthorize("@ss.hasPermission('crm:follow-up-record:export')")
-    @OperateLog(type = EXPORT)
-    public void exportFollowUpRecordExcel(@Valid CrmFollowUpRecordPageReqVO pageReqVO,
-                                          HttpServletResponse response) throws IOException {
-        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<CrmFollowUpRecordDO> list = crmFollowUpRecordService.getFollowUpRecordPage(pageReqVO).getList();
-        // 导出 Excel
-        ExcelUtils.write(response, "跟进记录.xls", "数据", CrmFollowUpRecordRespVO.class,
-                BeanUtils.toBean(list, CrmFollowUpRecordRespVO.class));
+        /// 拼接数据
+        Map<Long, CrmContactDO> contactMap = convertMap(contactService.getContactList(
+                convertSetByFlatMap(pageResult.getList(), item -> item.getContactIds().stream())), CrmContactDO::getId);
+        Map<Long, CrmBusinessDO> businessMap = convertMap(businessService.getBusinessList(
+                convertSetByFlatMap(pageResult.getList(), item -> item.getBusinessIds().stream())), CrmBusinessDO::getId);
+        PageResult<CrmFollowUpRecordRespVO> voPageResult = BeanUtils.toBean(pageResult, CrmFollowUpRecordRespVO.class, record -> {
+            record.setContactNames(new ArrayList<>()).setBusinessNames(new ArrayList<>());
+            record.getContactIds().forEach(id -> MapUtils.findAndThen(contactMap, id,
+                    contact -> record.getContactNames().add(contact.getName())));
+            record.getContactIds().forEach(id -> MapUtils.findAndThen(businessMap, id,
+                    business -> record.getBusinessNames().add(business.getName())));
+        });
+        return success(voPageResult);
     }
 
 }

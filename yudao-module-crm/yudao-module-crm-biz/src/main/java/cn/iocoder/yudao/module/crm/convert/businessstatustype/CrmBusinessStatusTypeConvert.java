@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.crm.convert.businessstatustype;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypeRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypeSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusTypeDO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
@@ -25,7 +24,6 @@ public interface CrmBusinessStatusTypeConvert {
 
     CrmBusinessStatusTypeConvert INSTANCE = Mappers.getMapper(CrmBusinessStatusTypeConvert.class);
 
-    CrmBusinessStatusTypeDO convert(CrmBusinessStatusTypeSaveReqVO bean);
 
     CrmBusinessStatusTypeRespVO convert(CrmBusinessStatusTypeDO bean);
 

@@ -113,12 +113,23 @@ public class CrmContactController {
         return success(CrmContactConvert.INSTANCE.convert(contact, userMap, customerList, parentContactList));
     }
 
+    @GetMapping("/list-by-ids")
+    @Operation(summary = "获得联系人列表")
+    @Parameter(name = "ids", description = "编号", required = true, example = "[1024]")
+    @PreAuthorize("@ss.hasPermission('crm:contact:query')")
+    public CommonResult<List<CrmContactRespVO>> getContactListByIds(@RequestParam("ids") List<Long> ids) {
+        return success(BeanUtils.toBean(contactService.getContactList(ids, getLoginUserId()), CrmContactRespVO.class));
+    }
+
     @GetMapping("/simple-all-list")
     @Operation(summary = "获得联系人的精简列表")
     @PreAuthorize("@ss.hasPermission('crm:contact:query')")
     public CommonResult<List<CrmContactRespVO>> getSimpleContactList() {
-        List<CrmContactDO> list = contactService.getContactList();
-        return success(convertList(list, contact -> // 只返回 id、name 字段
+        // TODO @puhui999：这种还是搞个 getContactList 方法好点哈；
+        CrmContactPageReqVO reqVO = new CrmContactPageReqVO();
+        reqVO.setPageSize(PAGE_SIZE_NONE); // 不分页
+        PageResult<CrmContactDO> pageResult = contactService.getContactPage(reqVO, getLoginUserId());
+        return success(convertList(pageResult.getList(), contact -> // 只返回 id、name 字段
                 new CrmContactRespVO().setId(contact.getId()).setName(contact.getName())));
     }
 
@@ -153,7 +164,7 @@ public class CrmContactController {
     @GetMapping("/operate-log-page")
     @Operation(summary = "获得客户操作日志")
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
-    public CommonResult<PageResult<OperateLogV2RespDTO>> getCustomerOperateLog(@RequestParam("bizId")Long bizId) {
+    public CommonResult<PageResult<OperateLogV2RespDTO>> getCustomerOperateLog(@RequestParam("bizId") Long bizId) {
         OperateLogV2PageReqDTO reqVO = new OperateLogV2PageReqDTO();
         reqVO.setPageSize(PAGE_SIZE_NONE); // 不分页
         reqVO.setBizType(CRM_CONTACT_TYPE);

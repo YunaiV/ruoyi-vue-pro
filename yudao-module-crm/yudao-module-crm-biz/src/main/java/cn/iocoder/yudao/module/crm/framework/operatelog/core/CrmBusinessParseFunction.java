@@ -1,23 +1,26 @@
 package cn.iocoder.yudao.module.crm.framework.operatelog.core;
 
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
+import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
+import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
 import com.mzt.logapi.service.IParseFunction;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import static cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_LEVEL;
-
 /**
- * 客户等级的 {@link IParseFunction} 实现类
+ * CRM 商机的 {@link IParseFunction} 实现类
  *
  * @author HUIHUI
  */
 @Component
 @Slf4j
-public class CrmCustomerLevelParseFunction implements IParseFunction {
+public class CrmBusinessParseFunction implements IParseFunction {
 
-    public static final String NAME = "getCustomerLevel";
+    public static final String NAME = "getBusinessById";
+
+    @Resource
+    private CrmBusinessService businessService;
 
     @Override
     public boolean executeBefore() {
@@ -34,7 +37,8 @@ public class CrmCustomerLevelParseFunction implements IParseFunction {
         if (StrUtil.isEmptyIfStr(value)) {
             return "";
         }
-        return DictFrameworkUtils.getDictDataLabel(CRM_CUSTOMER_LEVEL, value.toString());
+        CrmBusinessDO businessDO = businessService.getBusiness(Long.parseLong(value.toString()));
+        return businessDO == null ? "" : businessDO.getName();
     }
 
 }

@@ -14,6 +14,8 @@ public interface ErrorCodeConstants {
 
     // ========== 线索管理 1-020-001-000 ==========
     ErrorCode CLUE_NOT_EXISTS = new ErrorCode(1_020_001_000, "线索不存在");
+    ErrorCode CLUE_ANY_CLUE_NOT_EXISTS = new ErrorCode(1_020_001_001, "线索【{}】不存在");
+    ErrorCode CLUE_ANY_CLUE_ALREADY_TRANSLATED = new ErrorCode(1_020_001_002, "线索【{}】已经转化过了，请勿重复转化");
 
     // ========== 商机管理 1-020-002-000 ==========
     ErrorCode BUSINESS_NOT_EXISTS = new ErrorCode(1_020_002_000, "商机不存在");

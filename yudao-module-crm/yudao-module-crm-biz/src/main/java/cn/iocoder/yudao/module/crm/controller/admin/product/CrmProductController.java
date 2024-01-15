@@ -42,6 +42,7 @@ import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSetByFlatMap;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.CRM_PRODUCT_TYPE;
 
 @Tag(name = "管理后台 - CRM 产品")
@@ -102,7 +103,7 @@ public class CrmProductController {
     @Operation(summary = "获得产品分页")
     @PreAuthorize("@ss.hasPermission('crm:product:query')")
     public CommonResult<PageResult<CrmProductRespVO>> getProductPage(@Valid CrmProductPageReqVO pageVO) {
-        PageResult<CrmProductDO> pageResult = productService.getProductPage(pageVO);
+        PageResult<CrmProductDO> pageResult = productService.getProductPage(pageVO, getLoginUserId());
         return success(new PageResult<>(getProductDetailList(pageResult.getList()), pageResult.getTotal()));
     }
 
@@ -113,7 +114,7 @@ public class CrmProductController {
     public void exportProductExcel(@Valid CrmProductPageReqVO exportReqVO,
                                    HttpServletResponse response) throws IOException {
         exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<CrmProductDO> list = productService.getProductPage(exportReqVO).getList();
+        List<CrmProductDO> list = productService.getProductPage(exportReqVO, getLoginUserId()).getList();
         // 导出 Excel
         ExcelUtils.write(response, "产品.xls", "数据", CrmProductRespVO.class,
                 getProductDetailList(list));

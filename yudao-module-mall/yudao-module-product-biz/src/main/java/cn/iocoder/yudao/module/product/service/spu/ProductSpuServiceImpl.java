@@ -168,6 +168,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         if (ObjectUtil.notEqual(spuDO.getStatus(), ProductSpuStatusEnum.RECYCLE.getStatus())) {
             throw exception(SPU_NOT_RECYCLE);
         }
+        // TODO 芋艿：【可选】参与活动中的商品，不允许删除？？？
 
         // 删除 SPU
         productSpuMapper.deleteById(id);
@@ -235,6 +236,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     public void updateSpuStatus(ProductSpuUpdateStatusReqVO updateReqVO) {
         // 校验存在
         validateSpuExists(updateReqVO.getId());
+        // TODO 芋艿：【可选】参与活动中的商品，不允许下架？？？
 
         // 更新状态
         ProductSpuDO productSpuDO = productSpuMapper.selectById(updateReqVO.getId()).setStatus(updateReqVO.getStatus());

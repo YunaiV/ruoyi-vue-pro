@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
+import cn.iocoder.yudao.module.crm.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -14,8 +15,6 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-// TODO @puhui999：界面：做成一个 list 列表，字段是 id、跟进人、跟进方式、跟进时间、跟进内容、下次联系时间、关联联系人、关联商机
-// TODO @puhui999：界面：记录时，弹窗，表单字段是跟进方式、跟进内容、下次联系时间、关联联系人、关联商机；其中关联联系人、关联商机，要做成对应的组件列。
 /**
  * 跟进记录 DO
  *
@@ -55,7 +54,7 @@ public class CrmFollowUpRecordDO extends BaseDO {
     /**
      * 跟进类型
      *
-     * TODO @puhui999：可以搞个数据字典，打电话、发短信、上门拜访、微信、邮箱、QQ
+     * 关联 {@link DictTypeConstants#CRM_FOLLOW_UP_TYPE} 字典
      */
     private Integer type;
     /**

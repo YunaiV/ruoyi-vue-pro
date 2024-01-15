@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.crm.service.business;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.*;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessSaveReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessTransferReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
@@ -55,6 +57,14 @@ public interface CrmBusinessService {
      * @return 商机列表
      */
     List<CrmBusinessDO> getBusinessList(Collection<Long> ids, Long userId);
+
+    /**
+     * 获得商机列表
+     *
+     * @param ids 编号
+     * @return 商机列表
+     */
+    List<CrmBusinessDO> getBusinessList(Collection<Long> ids);
 
     /**
      * 获得商机分页

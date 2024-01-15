@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.framework.operatelog.core;
+package cn.iocoder.yudao.module.crm.framework.operatelog.core;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class DeptParseFunction implements IParseFunction {
+public class SysDeptParseFunction implements IParseFunction {
 
     public static final String NAME = "getDeptById";
 

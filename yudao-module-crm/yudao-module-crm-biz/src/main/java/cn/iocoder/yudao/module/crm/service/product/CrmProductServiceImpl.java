@@ -93,7 +93,7 @@ public class CrmProductServiceImpl implements CrmProductService {
         productMapper.updateById(updateObj);
 
         // 3. 记录操作日志上下文
-        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(crmProductDO,CrmProductSaveReqVO.class));
+        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(crmProductDO, CrmProductSaveReqVO.class));
     }
 
     private CrmProductDO validateProductExists(Long id) {
@@ -145,10 +145,9 @@ public class CrmProductServiceImpl implements CrmProductService {
         return productMapper.selectBatchIds(ids);
     }
 
-    // TODO @anhaohao：可以接入数据权限，参考 CrmCustomerService 的 getCustomerPage
     @Override
-    public PageResult<CrmProductDO> getProductPage(CrmProductPageReqVO pageReqVO) {
-        return productMapper.selectPage(pageReqVO);
+    public PageResult<CrmProductDO> getProductPage(CrmProductPageReqVO pageReqVO, Long userId) {
+        return productMapper.selectPage(pageReqVO, userId);
     }
 
     @Override
