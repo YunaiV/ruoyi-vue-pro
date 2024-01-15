@@ -7,23 +7,19 @@ import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.crm.controller.admin.backlog.vo.CrmTodayCustomerPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.followup.CrmFollowUpRecordDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.util.CrmQueryWrapperUtils;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.lang.Nullable;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.TemporalUnit;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.BACKLOG_CONTACT_STATUS_ERROR;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.BACKLOG_CONTACT_STATUS_INVALID;
 
 /**
  * 客户 Mapper
@@ -89,8 +85,8 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
         query.selectAll(CrmCustomerDO.class);
 
         // 拼接自身的查询条件
-        LocalDateTime beginOfToday =  LocalDateTime.now().toLocalDate().atTime(LocalTime.MIN);
-        LocalDateTime endOfToday =  LocalDateTime.now().toLocalDate().atTime(LocalTime.MAX);
+        LocalDateTime beginOfToday = LocalDateTime.now().toLocalDate().atTime(LocalTime.MIN);
+        LocalDateTime endOfToday = LocalDateTime.now().toLocalDate().atTime(LocalTime.MAX);
         if (pageReqVO.getContactStatus().equals(CrmTodayCustomerPageReqVO.CONTACT_TODAY)) {
             // 今天需联系
             query.between(CrmCustomerDO::getContactNextTime, beginOfToday, endOfToday);
@@ -101,7 +97,7 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
             // 已联系
             query.between(CrmCustomerDO::getContactLastTime, beginOfToday, endOfToday);
         } else {
-            throw exception(BACKLOG_CONTACT_STATUS_ERROR);
+            throw exception(BACKLOG_CONTACT_STATUS_INVALID);
         }
 
         return selectJoinPage(pageReqVO, CrmCustomerDO.class, query);

@@ -85,6 +85,6 @@ public interface ErrorCodeConstants {
     ErrorCode FOLLOW_UP_RECORD_NOT_EXISTS = new ErrorCode(1_020_013_000, "跟进记录不存在");
 
     // ========== 待办消息 1_020_014_000 ==========
-    ErrorCode BACKLOG_CONTACT_STATUS_ERROR = new ErrorCode(1_020_014_000, "客户联系状态有误");
+    ErrorCode BACKLOG_CONTACT_STATUS_INVALID = new ErrorCode(1_020_014_000, "客户联系状态有误");
 
 }
