@@ -18,7 +18,4 @@ public class BpmTaskApproveReqVO {
     @NotEmpty(message = "审批意见不能为空")
     private String reason;
 
-    @Schema(description = "审批时流程抄送人", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private BpmTaskCandidateRuleVO ccCandidateRule;
-
 }

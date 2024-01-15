@@ -31,7 +31,7 @@ public class BpmProcessInstanceCopyDO extends BaseDO {
      */
     private Long startUserId;
     /**
-     * 表单名
+     * 流程名
      */
     private String name;
     /**
@@ -48,5 +48,9 @@ public class BpmProcessInstanceCopyDO extends BaseDO {
      */
     private Long userId;
 
+    /**
+     * 抄送原因
+     */
+    private String reason;
 
 }

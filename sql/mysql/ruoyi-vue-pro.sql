@@ -2478,6 +2478,15 @@ INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_i
 INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2523, '客户限制配置导出', 'crm:customer-limit-config:export', 3, 5, 2518, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2023-11-18 13:33:53', '', '2023-11-18 13:33:53', b'0');
 INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2524, '系统配置', '', 1, 99, 2397, 'config', 'ep:connection', '', '', 0, b'1', b'1', b'1', '1', '2023-11-18 21:58:00', '1', '2023-11-18 21:58:00', b'0');
 INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2525, 'WebSocket 测试', '', 2, 7, 2, 'websocket', 'ep:connection', 'infra/webSocket/index', 'InfraWebSocket', 0, b'1', b'1', b'1', '1', '2023-11-23 19:41:55', '1', '2023-11-24 19:22:30', b'0');
+INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`,
+                           `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`,
+                           `updater`, `update_time`, `deleted`)
+VALUES (2526, '抄送流程', '', 2, 21, 1200, 'processInstanceCC', 'eye', '/bpm/task/cc/index',
+        'BpmCCProcessInstance', 0, true, true, true, 1, '2023-01-13 16:14:00', '1', '2023-01-13 16:14:00', false),
+       (2527, '抄送流程查询', 'bpm:process-instance-cc:query', 3, 1, 2526, '', '', '', NULL, 0, b'1', b'1', b'1', '1',
+        '2023-01-13 16:14:00', '1', '2023-01-13 16:14:00', b'0'),
+       (2528, '抄送流程创建', 'bpm:process-instance-cc:create', 3, 2, 2526, '', '', '', NULL, 0, b'1', b'1', b'1', '1',
+        '2023-01-13 16:14:00', '1', '2023-01-13 16:14:00', b'0');
 COMMIT;
 
 -- ----------------------------

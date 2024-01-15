@@ -1,21 +1,13 @@
-package cn.iocoder.yudao.module.bpm.service.cc;
+package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance;
 
-import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
-
-/**
- * 流程抄送视图对象 wf_copy
- *
- * @author ruoyi
- * @date 2022-05-19
- */
+@Schema(description = "管理后台 - 流程实例抄送的分页 Item Response VO")
 @Data
-public class BpmProcessInstanceCopyVO {
+public class BpmProcessInstanceCCPageItemRespVO {
 
     /**
      * 编号
@@ -42,15 +34,16 @@ public class BpmProcessInstanceCopyVO {
     @Schema(description = "流程实例的主键")
     private String processInstanceId;
 
-    @Schema(description = "流程实例的名字")
+    @Schema(description = "流程实例的名称")
     private String processInstanceName;
-
     /**
      * 任务主键
      */
     @Schema(description = "发起抄送的任务编号")
     private String taskId;
 
+    @Schema(description = "发起抄送的任务名称")
+    private String taskName;
     /**
      * 用户主键
      */
@@ -58,7 +51,10 @@ public class BpmProcessInstanceCopyVO {
     private Long userId;
 
     @Schema(description = "用户别名")
-    private Long userNickname;
+    private String userNickname;
+
+    @Schema(description = "抄送原因")
+    private String reason;
 
     @Schema(description = "抄送时间")
     private LocalDateTime createTime;

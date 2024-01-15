@@ -36,6 +36,10 @@ public class BpmCandidateSourceInfo {
     @Schema(description = "发起抄送的用户")
     private String creator;
 
+    @Schema(description = "抄送原因", requiredMode = Schema.RequiredMode.REQUIRED, example = "请帮忙审查下！")
+    @NotEmpty(message = "抄送原因不能为空")
+    private String reason;
+
     public void addRule(BpmTaskCandidateRuleVO vo) {
         assert vo != null;
         if (rules == null) {

@@ -242,18 +242,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                         .setReason(reqVO.getReason()));
         // 处理加签任务
         handleParentTask(task);
-
-        // 在能正常审批的情况下抄送流程
-        if (null != reqVO.getCcCandidateRule()) {
-            BpmCandidateSourceInfo sourceInfo = new BpmCandidateSourceInfo();
-            sourceInfo.setTaskId(reqVO.getId());
-            sourceInfo.setProcessInstanceId(instance.getId());
-            sourceInfo.addRule(reqVO.getCcCandidateRule());
-            sourceInfo.setCreator(String.valueOf(userId));
-            if (!processInstanceCopyService.makeCopy(sourceInfo)) {
-                throw new RuntimeException("抄送任务失败");
-            }
-        }
     }
 
 

@@ -48,7 +48,9 @@ public class BpmCandidateSourceInfoProcessorChain {
         for (BpmCandidateSourceInfoProcessor processor : processorList) {
             try {
                 for (BpmTaskCandidateRuleVO vo : sourceInfo.getRules()) {
-                    processor.validRuleOptions(vo.getType(), vo.getOptions());
+                    if (CollUtil.contains(processor.getSupportedTypes(), vo.getType())) {
+                        processor.validRuleOptions(vo.getType(), vo.getOptions());
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
