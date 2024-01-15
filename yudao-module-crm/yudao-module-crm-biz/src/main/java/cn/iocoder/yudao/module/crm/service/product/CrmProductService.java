@@ -4,8 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
-
 import jakarta.validation.Valid;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -60,7 +60,7 @@ public interface CrmProductService {
      * @param pageReqVO 分页查询
      * @return 产品分页
      */
-    PageResult<CrmProductDO> getProductPage(CrmProductPageReqVO pageReqVO);
+    PageResult<CrmProductDO> getProductPage(CrmProductPageReqVO pageReqVO, Long userId);
 
     /**
      * 获得产品
