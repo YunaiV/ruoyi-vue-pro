@@ -25,6 +25,7 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
     @Resource
     private CrmFollowUpRecordMapper crmFollowUpRecordMapper;
 
+    // TODO @puhui999：数据权限
     @Override
     public Long createFollowUpRecord(CrmFollowUpRecordSaveReqVO createReqVO) {
         CrmFollowUpRecordDO followUpRecord = BeanUtils.toBean(createReqVO, CrmFollowUpRecordDO.class);
@@ -34,6 +35,7 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
         return followUpRecord.getId();
     }
 
+    // TODO @puhui999：不能编辑~~~
     @Override
     public void updateFollowUpRecord(CrmFollowUpRecordSaveReqVO updateReqVO) {
         // 校验存在
@@ -43,6 +45,7 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
         crmFollowUpRecordMapper.updateById(updateObj);
     }
 
+    // TODO @puhui999：数据权限
     @Override
     public void deleteFollowUpRecord(Long id) {
         // 校验存在
@@ -62,6 +65,7 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
         return crmFollowUpRecordMapper.selectById(id);
     }
 
+    // TODO @puhui999：数据权限
     @Override
     public PageResult<CrmFollowUpRecordDO> getFollowUpRecordPage(CrmFollowUpRecordPageReqVO pageReqVO) {
         return crmFollowUpRecordMapper.selectPage(pageReqVO);
