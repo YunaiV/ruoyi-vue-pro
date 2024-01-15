@@ -125,6 +125,7 @@ public class CrmContactController {
     @Operation(summary = "获得联系人的精简列表")
     @PreAuthorize("@ss.hasPermission('crm:contact:query')")
     public CommonResult<List<CrmContactRespVO>> getSimpleContactList() {
+        // TODO @puhui999：这种还是搞个 getContactList 方法好点哈；
         CrmContactPageReqVO reqVO = new CrmContactPageReqVO();
         reqVO.setPageSize(PAGE_SIZE_NONE); // 不分页
         PageResult<CrmContactDO> pageResult = contactService.getContactPage(reqVO, getLoginUserId());

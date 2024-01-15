@@ -27,10 +27,10 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
 
     @Override
     public Long createFollowUpRecord(CrmFollowUpRecordSaveReqVO createReqVO) {
-        // 插入
         CrmFollowUpRecordDO followUpRecord = BeanUtils.toBean(createReqVO, CrmFollowUpRecordDO.class);
         crmFollowUpRecordMapper.insert(followUpRecord);
-        // 返回
+        // TODO @puhui999：需要更新 bizId 对应的记录；
+        // TODO @puhui999：需要更新 businessIds、contactIds 对应的记录；
         return followUpRecord.getId();
     }
 

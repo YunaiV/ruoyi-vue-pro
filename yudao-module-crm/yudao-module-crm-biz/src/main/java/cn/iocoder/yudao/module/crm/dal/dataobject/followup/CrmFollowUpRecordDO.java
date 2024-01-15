@@ -52,8 +52,9 @@ public class CrmFollowUpRecordDO extends BaseDO {
     private Long bizId;
 
     /**
-     * 跟进类型,关联字典{@link DictTypeConstants#CRM_FOLLOW_UP_TYPE}
+     * 跟进类型
      *
+     * 关联 {@link DictTypeConstants#CRM_FOLLOW_UP_TYPE} 字典
      */
     private Integer type;
     /**

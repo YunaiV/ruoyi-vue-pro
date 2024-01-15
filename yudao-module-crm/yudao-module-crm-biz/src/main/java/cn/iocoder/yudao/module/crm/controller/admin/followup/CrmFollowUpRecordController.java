@@ -23,9 +23,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
@@ -83,32 +81,19 @@ public class CrmFollowUpRecordController {
     @PreAuthorize("@ss.hasPermission('crm:follow-up-record:query')")
     public CommonResult<PageResult<CrmFollowUpRecordRespVO>> getFollowUpRecordPage(@Valid CrmFollowUpRecordPageReqVO pageReqVO) {
         PageResult<CrmFollowUpRecordDO> pageResult = crmFollowUpRecordService.getFollowUpRecordPage(pageReqVO);
-        Set<Long> contactIds = convertSetByFlatMap(pageResult.getList(), item -> item.getContactIds().stream());
-        Set<Long> businessIds = convertSetByFlatMap(pageResult.getList(), item -> item.getBusinessIds().stream());
-        Map<Long, CrmContactDO> contactMap = convertMap(contactService.getContactList(contactIds), CrmContactDO::getId);
-        Map<Long, CrmBusinessDO> businessMap = convertMap(businessService.getBusinessList(businessIds), CrmBusinessDO::getId);
-        PageResult<CrmFollowUpRecordRespVO> result = BeanUtils.toBean(pageResult, CrmFollowUpRecordRespVO.class);
-        result.getList().forEach(item -> {
-            setContactNames(item, contactMap);
-            setBusinessNames(item, businessMap);
+        /// 拼接数据
+        Map<Long, CrmContactDO> contactMap = convertMap(contactService.getContactList(
+                convertSetByFlatMap(pageResult.getList(), item -> item.getContactIds().stream())), CrmContactDO::getId);
+        Map<Long, CrmBusinessDO> businessMap = convertMap(businessService.getBusinessList(
+                convertSetByFlatMap(pageResult.getList(), item -> item.getBusinessIds().stream())), CrmBusinessDO::getId);
+        PageResult<CrmFollowUpRecordRespVO> voPageResult = BeanUtils.toBean(pageResult, CrmFollowUpRecordRespVO.class, record -> {
+            record.setContactNames(new ArrayList<>()).setBusinessNames(new ArrayList<>());
+            record.getContactIds().forEach(id -> MapUtils.findAndThen(contactMap, id,
+                    contact -> record.getContactNames().add(contact.getName())));
+            record.getContactIds().forEach(id -> MapUtils.findAndThen(businessMap, id,
+                    business -> record.getBusinessNames().add(business.getName())));
         });
-        return success(result);
-    }
-
-    private static void setContactNames(CrmFollowUpRecordRespVO vo, Map<Long, CrmContactDO> contactMap) {
-        List<String> names = new ArrayList<>();
-        vo.getContactIds().forEach(id -> {
-            MapUtils.findAndThen(contactMap, id, contactDO -> names.add(contactDO.getName()));
-        });
-        vo.setContactNames(names);
-    }
-
-    private static void setBusinessNames(CrmFollowUpRecordRespVO vo, Map<Long, CrmBusinessDO> businessMap) {
-        List<String> names = new ArrayList<>();
-        vo.getContactIds().forEach(id -> {
-            MapUtils.findAndThen(businessMap, id, businessDO -> names.add(businessDO.getName()));
-        });
-        vo.setBusinessNames(names);
+        return success(voPageResult);
     }
 
 }
