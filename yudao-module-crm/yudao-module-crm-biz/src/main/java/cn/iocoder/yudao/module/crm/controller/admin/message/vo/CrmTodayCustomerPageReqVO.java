@@ -15,6 +15,8 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class CrmTodayCustomerPageReqVO extends PageParam {
 
+    // TODO @dbh52：CrmContactStatusEnum 可以直接枚举三个 Integer；一般来说，枚举类尽量给数据模型用，这样枚举类少，更聚焦；这里的枚举，更多是专门给这个接口用的哈
+
     @Schema(description = "联系状态", example = "1")
     @InEnum(CrmContactStatusEnum.class)
     private Integer contactStatus;
