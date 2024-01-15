@@ -138,19 +138,20 @@ public class CrmClueServiceImpl implements CrmClueService {
         Set<Long> clueIds = reqVO.getIds();
         List<CrmClueDO> clues = getClueList(clueIds, userId);
         if (CollUtil.isEmpty(clues) || ObjectUtil.notEqual(clues.size(), clueIds.size())) {
-            // 提示不存在的线索编号
             clueIds.removeAll(convertSet(clues, CrmClueDO::getId));
-            throw exception(ANY_CLUE_NOT_EXISTS, clueIds.stream().map(String::valueOf).collect(Collectors.joining(",")));
+            // TODO @min：可以使用 StrUtil.join(",", clueIds) 简化这种常见操作
+            throw exception(CLUE_ANY_CLUE_NOT_EXISTS, clueIds.stream().map(String::valueOf).collect(Collectors.joining(",")));
         }
 
         // 过滤出未转化的客户
+        // TODO @min：1）存在已经转化的，直接提示哈。避免操作的用户，以为都转化成功了；2）常见的过滤逻辑，可以使用 CollectionUtils.filterList()
         List<CrmClueDO> unTransformClues = clues.stream()
                 .filter(clue -> ObjectUtil.notEqual(Boolean.TRUE, clue.getTransformStatus())).toList();
         // 传入的线索中包含已经转化的情况，抛出业务异常
         if (ObjectUtil.notEqual(clues.size(), unTransformClues.size())) {
-            // 提示已经转化的线索编号
+            // TODO @min：可以使用 StrUtil.join(",", clueIds) 简化这种常见操作
             clueIds.removeAll(convertSet(unTransformClues, CrmClueDO::getId));
-            throw exception(ANY_CLUE_ALREADY_TRANSLATED, clueIds.stream().map(String::valueOf).collect(Collectors.joining(",")));
+            throw exception(CLUE_ANY_CLUE_ALREADY_TRANSLATED, clueIds.stream().map(String::valueOf).collect(Collectors.joining(",")));
         }
 
         // 遍历线索(未转化的线索)，创建对应的客户
