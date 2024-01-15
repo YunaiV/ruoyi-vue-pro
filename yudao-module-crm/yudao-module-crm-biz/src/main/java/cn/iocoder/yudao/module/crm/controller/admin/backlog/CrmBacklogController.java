@@ -1,12 +1,12 @@
-package cn.iocoder.yudao.module.crm.controller.admin.message;
+package cn.iocoder.yudao.module.crm.controller.admin.backlog;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.message.vo.CrmTodayCustomerPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.backlog.vo.CrmTodayCustomerPageReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-import cn.iocoder.yudao.module.crm.service.message.CrmMessageService;
+import cn.iocoder.yudao.module.crm.service.message.CrmBacklogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -20,19 +20,19 @@ import org.springframework.web.bind.annotation.RestController;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
-@Tag(name = "管理后台 - CRM消息")
+@Tag(name = "管理后台 - CRM待办消息")
 @RestController
-@RequestMapping("/crm/message")
+@RequestMapping("/crm/backlog")
 @Validated
-public class CrmMessageController {
+public class CrmBacklogController {
 
     @Resource
-    private CrmMessageService crmMessageService;
+    private CrmBacklogService crmMessageService;
 
     // TODO 芋艿：未来可能合并到 CrmCustomerController
-    @GetMapping("/todayCustomer") // TODO @dbh52：【优先级低】url 使用中划线，项目规范。然后叫 today-customer-page，通过 page 体现出它是个分页接口
+    @GetMapping("/today-customer-page")
     @Operation(summary = "今日需联系客户")
-    @PreAuthorize("@ss.hasPermission('crm:message:todayCustomer')")
+    @PreAuthorize("@ss.hasPermission('crm:customer:query')")
     public CommonResult<PageResult<CrmCustomerRespVO>> getTodayCustomerPage(@Valid CrmTodayCustomerPageReqVO pageReqVO) {
         PageResult<CrmCustomerDO> pageResult = crmMessageService.getTodayCustomerPage(pageReqVO, getLoginUserId());
         return success(BeanUtils.toBean(pageResult, CrmCustomerRespVO.class));

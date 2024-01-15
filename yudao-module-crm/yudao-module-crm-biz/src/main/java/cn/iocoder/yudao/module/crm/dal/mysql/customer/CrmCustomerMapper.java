@@ -4,20 +4,26 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
+import cn.iocoder.yudao.module.crm.controller.admin.backlog.vo.CrmTodayCustomerPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.message.vo.CrmTodayCustomerPageReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.followup.CrmFollowUpRecordDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
-import cn.iocoder.yudao.module.crm.enums.message.CrmContactStatusEnum;
 import cn.iocoder.yudao.module.crm.util.CrmQueryWrapperUtils;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.lang.Nullable;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.TemporalUnit;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.BACKLOG_CONTACT_STATUS_ERROR;
 
 /**
  * 客户 Mapper
@@ -80,41 +86,22 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
         CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CUSTOMER.getType(),
                 CrmCustomerDO::getId, userId, pageReqVO.getSceneType(), null);
 
-        query.selectAll(CrmCustomerDO.class)
-                .leftJoin(CrmFollowUpRecordDO.class, CrmFollowUpRecordDO::getBizId, CrmCustomerDO::getId)
-                .eq(CrmFollowUpRecordDO::getType, CrmBizTypeEnum.CRM_CUSTOMER.getType());
+        query.selectAll(CrmCustomerDO.class);
 
         // 拼接自身的查询条件
-        // TODO @dbh52：这里不仅仅要获得 today、tomorrow。而是 today 要获取今天的 00:00:00 这种；
-        LocalDate today = LocalDate.now();
-        LocalDate tomorrow = today.plusDays(1);
-        LocalDate yesterday = today.minusDays(1);
-        if (pageReqVO.getContactStatus().equals(CrmContactStatusEnum.NEEDED_TODAY.getType())) {
-            // 今天需联系：
-            // 1.【客户】的【下一次联系时间】 是【今天】
-            // 2. 无法找到【今天】创建的【跟进】记录
-            query.between(CrmCustomerDO::getContactNextTime, today, tomorrow)
-                    // TODO @dbh52：是不是查询 CrmCustomerDO::contactLastTime < today？因为今天联系过，应该会更新该字段，减少链表查询；
-                    .between(CrmFollowUpRecordDO::getCreateTime, today, tomorrow)
-                    .isNull(CrmFollowUpRecordDO::getId);
-        } else if (pageReqVO.getContactStatus().equals(CrmContactStatusEnum.EXPIRED.getType())) {
-            // 已逾期：
-            // 1. 【客户】的【下一次联系时间】 <= 【昨天】
-            // 2. 无法找到【今天】创建的【跟进】记录
-            //  TODO @dbh52：是不是 contactNextTime 在当前时间之前，且 contactLastTime < contactNextTime？说白了，就是下次联系时间超过当前时间，且最后联系时间没去联系；
-            query.le(CrmCustomerDO::getContactNextTime, yesterday)
-                    .between(CrmFollowUpRecordDO::getCreateTime, today, tomorrow)
-                    .isNull(CrmFollowUpRecordDO::getId);
-        } else if (pageReqVO.getContactStatus().equals(CrmContactStatusEnum.ALREADY_CONTACT.getType())) {
-            // 已联系：
-            // 1.【客户】的【下一次联系时间】 是【今天】
-            // 2. 找到【今天】创建的【跟进】记录
-            query.between(CrmCustomerDO::getContactNextTime, today, tomorrow)
-                    // TODO @dbh52：contactLastTime 是今天
-                    .between(CrmFollowUpRecordDO::getCreateTime, today, tomorrow)
-                    .isNotNull(CrmFollowUpRecordDO::getId);
+        LocalDateTime beginOfToday =  LocalDateTime.now().toLocalDate().atTime(LocalTime.MIN);
+        LocalDateTime endOfToday =  LocalDateTime.now().toLocalDate().atTime(LocalTime.MAX);
+        if (pageReqVO.getContactStatus().equals(CrmTodayCustomerPageReqVO.CONTACT_TODAY)) {
+            // 今天需联系
+            query.between(CrmCustomerDO::getContactNextTime, beginOfToday, endOfToday);
+        } else if (pageReqVO.getContactStatus().equals(CrmTodayCustomerPageReqVO.CONTACT_EXPIRED)) {
+            // 已逾期
+            query.lt(CrmCustomerDO::getContactNextTime, beginOfToday);
+        } else if (pageReqVO.getContactStatus().equals(CrmTodayCustomerPageReqVO.CONTACT_ALREADY)) {
+            // 已联系
+            query.between(CrmCustomerDO::getContactLastTime, beginOfToday, endOfToday);
         } else {
-            // TODO: 参数错误，是不是要兜一下底；直接抛出异常就好啦；
+            throw exception(BACKLOG_CONTACT_STATUS_ERROR);
         }
 
         return selectJoinPage(pageReqVO, CrmCustomerDO.class, query);
