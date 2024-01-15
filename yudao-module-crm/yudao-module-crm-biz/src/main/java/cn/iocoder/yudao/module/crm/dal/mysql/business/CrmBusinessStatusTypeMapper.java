@@ -28,4 +28,15 @@ public interface CrmBusinessStatusTypeMapper extends BaseMapperX<CrmBusinessStat
                 .eqIfPresent(CrmBusinessStatusTypeDO::getStatus, queryVO.getStatus())
                 .inIfPresent(CrmBusinessStatusTypeDO::getId, queryVO.getIdList()));
     }
+
+    /**
+     * 根据ID和name查询
+     *
+     * @param id 商机状态类型id
+     * @param name 状态类型名
+     * @return result
+     */
+    default CrmBusinessStatusTypeDO selectByIdAndName(Long id, String name) {
+        return selectOne(CrmBusinessStatusTypeDO::getId, id, CrmBusinessStatusTypeDO::getName, name);
+    }
 }

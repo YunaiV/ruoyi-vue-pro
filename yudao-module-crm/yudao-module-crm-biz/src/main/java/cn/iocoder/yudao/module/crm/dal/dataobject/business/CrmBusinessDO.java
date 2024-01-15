@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.business;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -52,6 +54,7 @@ public class CrmBusinessDO extends BaseDO {
      * 客户编号
      *
      * TODO @ljileo：这个字段，后续要写下关联的实体哈
+     * 关联 {@link CrmCustomerDO#getId()}
      */
     private Long customerId;
     /**
@@ -101,6 +104,7 @@ public class CrmBusinessDO extends BaseDO {
      * 负责人的用户编号
      *
      * 关联 AdminUserDO 的 id 字段
+     * {@link AdminUserDO#getId()}
      */
     private Long ownerUserId;
 

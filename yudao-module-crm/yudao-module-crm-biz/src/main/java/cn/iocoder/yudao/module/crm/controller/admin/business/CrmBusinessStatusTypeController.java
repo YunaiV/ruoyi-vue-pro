@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
@@ -101,11 +102,12 @@ public class CrmBusinessStatusTypeController {
         PageResult<CrmBusinessStatusTypeDO> pageResult = businessStatusTypeService.getBusinessStatusTypePage(pageReqVO);
         // 处理部门回显
         // TODO @ljlleo：可以使用 CollectionUtils.convertSet 替代常用的 stream 操作，更简洁一点；下面几个也是哈；
-        Set<Long> deptIds = pageResult.getList().stream()
-                .map(CrmBusinessStatusTypeDO::getDeptIds)
-                .filter(Objects::nonNull)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toSet());
+//        Set<Long> deptIds = pageResult.getList().stream()
+//                .map(CrmBusinessStatusTypeDO::getDeptIds)
+//                .filter(Objects::nonNull)
+//                .flatMap(Collection::stream)
+//                .collect(Collectors.toSet());
+        Set<Long> deptIds = CollectionUtils.convertSetByFlatMap(pageResult.getList(), CrmBusinessStatusTypeDO::getDeptIds,Collection::stream);
         List<DeptRespDTO> deptList = deptApi.getDeptList(deptIds);
         return success(CrmBusinessStatusTypeConvert.INSTANCE.convertPage(pageResult, deptList));
     }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.business;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -43,6 +44,7 @@ public class CrmBusinessStatusTypeDO extends BaseDO {
      * 开启状态
      *
      * TODO 改成 Integer，关联 CommonStatus
+     * {@link CommonStatusEnum}
      */
     private Boolean status;
 

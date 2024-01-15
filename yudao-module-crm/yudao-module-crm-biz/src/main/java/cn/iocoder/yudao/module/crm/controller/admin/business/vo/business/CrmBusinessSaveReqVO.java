@@ -1,5 +1,8 @@
 package cn.iocoder.yudao.module.crm.controller.admin.business.vo.business;
 
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.product.CrmBusinessProductSaveReqVO;
+import cn.iocoder.yudao.module.crm.enums.business.CrmBizEndStatus;
 import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmCustomerParseFunction;
 import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -9,6 +12,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -66,7 +71,17 @@ public class CrmBusinessSaveReqVO {
     @Schema(description = "备注", example = "随便")
     @DiffLogField(name = "备注")
     private String remark;
-
     // TODO @ljileo：修改的时候，应该可以传递添加的产品；
+    @Schema(description = "联系人编号", example = "110")
+    @NotNull(message = "联系人编号不能为空")
+    private Long contactId;
+
+    @Schema(description = "1赢单2输单3无效", example = "1")
+    @InEnum(CrmBizEndStatus.class)
+    private Integer endStatus;
+
+    @Schema(description = "商机产品列表", example = "")
+    private List<CrmBusinessProductSaveReqVO> products = new ArrayList<>();
+
 
 }
