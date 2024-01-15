@@ -4,10 +4,9 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessTransferReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessUpdateReqVO;
 import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactBusinessDO;
@@ -55,9 +54,11 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_BUSINESS_TYPE, subType = CRM_BUSINESS_CREATE_SUB_TYPE, bizNo = "{{#business.id}}",
             success = CRM_BUSINESS_CREATE_SUCCESS)
-    public Long createBusiness(CrmBusinessCreateReqVO createReqVO, Long userId) {
+    public Long createBusiness(CrmBusinessSaveReqVO createReqVO, Long userId) {
+        createReqVO.setId(null);
         // 1. 插入商机
-        CrmBusinessDO business = CrmBusinessConvert.INSTANCE.convert(createReqVO);
+        CrmBusinessDO business = BeanUtils.toBean(createReqVO, CrmBusinessDO.class)
+                .setOwnerUserId(userId);
         businessMapper.insert(business);
         // TODO 商机待定：插入商机与产品的关联表；校验商品存在
 
@@ -77,18 +78,18 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     @LogRecord(type = CRM_BUSINESS_TYPE, subType = CRM_BUSINESS_UPDATE_SUB_TYPE, bizNo = "{{#updateReqVO.id}}",
             success = CRM_BUSINESS_UPDATE_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
-    public void updateBusiness(CrmBusinessUpdateReqVO updateReqVO) {
+    public void updateBusiness(CrmBusinessSaveReqVO updateReqVO) {
         // 1. 校验存在
         CrmBusinessDO oldBusiness = validateBusinessExists(updateReqVO.getId());
 
         // 2. 更新商机
-        CrmBusinessDO updateObj = CrmBusinessConvert.INSTANCE.convert(updateReqVO);
+        CrmBusinessDO updateObj = BeanUtils.toBean(updateReqVO, CrmBusinessDO.class);
         businessMapper.updateById(updateObj);
         // TODO 商机待定：插入商机与产品的关联表；校验商品存在
 
         // TODO @商机待定：如果状态发生变化，插入商机状态变更记录表
         // 3. 记录操作日志上下文
-        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldBusiness, CrmBusinessUpdateReqVO.class));
+        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldBusiness, CrmBusinessSaveReqVO.class));
         LogRecordContext.putVariable("businessName", oldBusiness.getName());
     }
 
@@ -153,6 +154,14 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
             return ListUtil.empty();
         }
         return businessMapper.selectBatchIds(ids, userId);
+    }
+
+    @Override
+    public List<CrmBusinessDO> getBusinessList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return ListUtil.empty();
+        }
+        return businessMapper.selectBatchIds(ids);
     }
 
     @Override

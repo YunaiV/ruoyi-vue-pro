@@ -77,6 +77,14 @@ public interface CrmContactService {
     /**
      * 获得联系人列表
      *
+     * @param ids 编号
+     * @return 联系人列表
+     */
+    List<CrmContactDO> getContactList(Collection<Long> ids);
+
+    /**
+     * 获得联系人列表
+     *
      * @return 联系人列表
      */
     List<CrmContactDO> getContactList();

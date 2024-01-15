@@ -19,9 +19,6 @@ public interface CrmFollowUpRecordMapper extends BaseMapperX<CrmFollowUpRecordDO
         return selectPage(reqVO, new LambdaQueryWrapperX<CrmFollowUpRecordDO>()
                 .eqIfPresent(CrmFollowUpRecordDO::getBizType, reqVO.getBizType())
                 .eqIfPresent(CrmFollowUpRecordDO::getBizId, reqVO.getBizId())
-                .eqIfPresent(CrmFollowUpRecordDO::getType, reqVO.getType())
-                .betweenIfPresent(CrmFollowUpRecordDO::getNextTime, reqVO.getNextTime())
-                .betweenIfPresent(CrmFollowUpRecordDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(CrmFollowUpRecordDO::getId));
     }
 

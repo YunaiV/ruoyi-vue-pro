@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import static cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_SOURCE;
-import static cn.iocoder.yudao.module.crm.enums.operatelog.CrmParseFunctionNameConstants.GET_CUSTOMER_SOURCE;
 
 /**
  * CRM 客户来源的 {@link IParseFunction} 实现类
@@ -27,7 +26,7 @@ public class CrmCustomerSourceParseFunction implements IParseFunction {
 
     @Override
     public String functionName() {
-        return GET_CUSTOMER_SOURCE;
+        return NAME;
     }
 
     @Override

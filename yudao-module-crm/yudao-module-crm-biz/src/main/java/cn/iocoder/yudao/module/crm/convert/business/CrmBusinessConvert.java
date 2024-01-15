@@ -2,7 +2,8 @@ package cn.iocoder.yudao.module.crm.convert.business;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.*;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessTransferReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusTypeDO;
@@ -26,15 +27,6 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 public interface CrmBusinessConvert {
 
     CrmBusinessConvert INSTANCE = Mappers.getMapper(CrmBusinessConvert.class);
-
-    CrmBusinessDO convert(CrmBusinessCreateReqVO bean);
-
-    CrmBusinessDO convert(CrmBusinessUpdateReqVO bean);
-
-    CrmBusinessRespVO convert(CrmBusinessDO bean);
-    List<CrmBusinessRespVO> convert(List<CrmBusinessDO> bean);
-
-    List<CrmBusinessExcelVO> convertList02(List<CrmBusinessDO> list);
 
     @Mapping(target = "bizId", source = "reqVO.id")
     CrmPermissionTransferReqBO convert(CrmBusinessTransferReqVO reqVO, Long userId);

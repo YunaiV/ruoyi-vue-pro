@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.crm.controller.admin.contact.vo;
 
 import cn.iocoder.yudao.framework.common.validation.Mobile;
 import cn.iocoder.yudao.framework.common.validation.Telephone;
+import cn.iocoder.yudao.module.crm.framework.operatelog.core.*;
 import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
@@ -13,9 +14,6 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
-import static cn.iocoder.yudao.module.crm.enums.operatelog.CrmParseFunctionNameConstants.GET_CONTACT_BY_ID;
-import static cn.iocoder.yudao.module.crm.enums.operatelog.CrmParseFunctionNameConstants.GET_CUSTOMER_BY_ID;
-import static cn.iocoder.yudao.module.system.enums.operatelog.SysParseFunctionNameConstants.*;
 
 @Schema(description = "管理后台 - CRM 联系人创建/更新 Request VO")
 @Data
@@ -30,11 +28,11 @@ public class CrmContactSaveReqVO {
     private String name;
 
     @Schema(description = "客户编号", example = "10795")
-    @DiffLogField(name = "姓名", function = GET_CUSTOMER_BY_ID)
+    @DiffLogField(name = "客户", function = CrmCustomerParseFunction.NAME)
     private Long customerId;
 
     @Schema(description = "性别")
-    @DiffLogField(name = "性别", function = GET_SEX)
+    @DiffLogField(name = "性别", function = SysSexParseFunction.NAME)
     private Integer sex;
 
     @Schema(description = "职位")
@@ -42,11 +40,11 @@ public class CrmContactSaveReqVO {
     private String post;
 
     @Schema(description = "是否关键决策人")
-    @DiffLogField(name = "关键决策人", function = GET_BOOLEAN)
+    @DiffLogField(name = "关键决策人", function = SysBooleanParseFunction.NAME)
     private Boolean master;
 
     @Schema(description = "直属上级", example = "23457")
-    @DiffLogField(name = "直属上级", function = GET_CONTACT_BY_ID)
+    @DiffLogField(name = "直属上级", function = CrmContactParseFunction.NAME)
     private Long parentId;
 
     @Schema(description = "手机号", example = "1387171766")
@@ -73,7 +71,7 @@ public class CrmContactSaveReqVO {
     private String email;
 
     @Schema(description = "地区编号", example = "20158")
-    @DiffLogField(name = "所在地", function = GET_AREA)
+    @DiffLogField(name = "所在地", function = SysAreaParseFunction.NAME)
     private Integer areaId;
 
     @Schema(description = "地址")
@@ -86,7 +84,7 @@ public class CrmContactSaveReqVO {
 
     @Schema(description = "负责人用户编号", example = "14334")
     @NotNull(message = "负责人不能为空")
-    @DiffLogField(name = "负责人", function = GET_ADMIN_USER_BY_ID)
+    @DiffLogField(name = "负责人", function = SysAdminUserParseFunction.NAME)
     private Long ownerUserId;
 
     @Schema(description = "最后跟进时间")

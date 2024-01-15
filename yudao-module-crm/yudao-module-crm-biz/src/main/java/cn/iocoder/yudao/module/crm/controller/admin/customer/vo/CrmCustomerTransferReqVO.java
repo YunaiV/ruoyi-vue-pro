@@ -28,6 +28,4 @@ public class CrmCustomerTransferReqVO {
     @Schema(description = "老负责人加入团队后的权限级别", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     private Integer oldOwnerPermissionLevel;
 
-    // TODO @puhui999：联系人、商机、合同的转移
-
 }

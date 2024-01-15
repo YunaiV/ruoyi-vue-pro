@@ -68,6 +68,7 @@ public class CrmContactServiceImpl implements CrmContactService {
     @LogRecord(type = CRM_CONTACT_TYPE, subType = CRM_CONTACT_CREATE_SUB_TYPE, bizNo = "{{#contact.id}}",
             success = CRM_CONTACT_CREATE_SUCCESS)
     public Long createContact(CrmContactSaveReqVO createReqVO, Long userId) {
+        createReqVO.setId(null);
         // 1. 校验
         validateRelationDataExists(createReqVO);
 
@@ -205,6 +206,14 @@ public class CrmContactServiceImpl implements CrmContactService {
             return ListUtil.empty();
         }
         return contactMapper.selectBatchIds(ids, userId);
+    }
+
+    @Override
+    public List<CrmContactDO> getContactList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return ListUtil.empty();
+        }
+        return contactMapper.selectBatchIds(ids);
     }
 
     @Override

@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.*;
@@ -53,14 +54,14 @@ public class CrmContractController {
     @PostMapping("/create")
     @Operation(summary = "创建合同")
     @PreAuthorize("@ss.hasPermission('crm:contract:create')")
-    public CommonResult<Long> createContract(@Valid @RequestBody CrmContractCreateReqVO createReqVO) {
+    public CommonResult<Long> createContract(@Valid @RequestBody CrmContractSaveReqVO createReqVO) {
         return success(contractService.createContract(createReqVO, getLoginUserId()));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新合同")
     @PreAuthorize("@ss.hasPermission('crm:contract:update')")
-    public CommonResult<Boolean> updateContract(@Valid @RequestBody CrmContractUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateContract(@Valid @RequestBody CrmContractSaveReqVO updateReqVO) {
         contractService.updateContract(updateReqVO);
         return success(true);
     }
@@ -78,22 +79,22 @@ public class CrmContractController {
     @Operation(summary = "获得合同")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('crm:contract:query')")
-    public CommonResult<ContractRespVO> getContract(@RequestParam("id") Long id) {
+    public CommonResult<CrmContractRespVO> getContract(@RequestParam("id") Long id) {
         CrmContractDO contract = contractService.getContract(id);
-        return success(CrmContractConvert.INSTANCE.convert(contract));
+        return success(BeanUtils.toBean(contract, CrmContractRespVO.class));
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得合同分页")
     @PreAuthorize("@ss.hasPermission('crm:contract:query')")
-    public CommonResult<PageResult<ContractRespVO>> getContractPage(@Valid CrmContractPageReqVO pageVO) {
+    public CommonResult<PageResult<CrmContractRespVO>> getContractPage(@Valid CrmContractPageReqVO pageVO) {
         PageResult<CrmContractDO> pageResult = contractService.getContractPage(pageVO, getLoginUserId());
         return success(buildContractDetailPage(pageResult));
     }
 
     @GetMapping("/page-by-customer")
     @Operation(summary = "获得联系人分页，基于指定客户")
-    public CommonResult<PageResult<ContractRespVO>> getContractPageByCustomer(@Valid CrmContractPageReqVO pageVO) {
+    public CommonResult<PageResult<CrmContractRespVO>> getContractPageByCustomer(@Valid CrmContractPageReqVO pageVO) {
         Assert.notNull(pageVO.getCustomerId(), "客户编号不能为空");
         PageResult<CrmContractDO> pageResult = contractService.getContractPageByCustomerId(pageVO);
         return success(buildContractDetailPage(pageResult));
@@ -108,7 +109,7 @@ public class CrmContractController {
         PageResult<CrmContractDO> pageResult = contractService.getContractPage(exportReqVO, getLoginUserId());
         // 导出 Excel
         ExcelUtils.write(response, "合同.xls", "数据", CrmContractExcelVO.class,
-                CrmContractConvert.INSTANCE.convertList02(pageResult.getList()));
+                BeanUtils.toBean(pageResult.getList(), CrmContractExcelVO.class));
     }
 
     /**
@@ -117,7 +118,7 @@ public class CrmContractController {
      * @param pageResult 简单的合同分页结果
      * @return 详细的合同分页结果
      */
-    private PageResult<ContractRespVO> buildContractDetailPage(PageResult<CrmContractDO> pageResult) {
+    private PageResult<CrmContractRespVO> buildContractDetailPage(PageResult<CrmContractDO> pageResult) {
         List<CrmContractDO> contactList = pageResult.getList();
         if (CollUtil.isEmpty(contactList)) {
             return PageResult.empty(pageResult.getTotal());
