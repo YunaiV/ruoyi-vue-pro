@@ -8,7 +8,6 @@ import cn.iocoder.yudao.module.bpm.controller.admin.candidate.vo.BpmTaskCandidat
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmUserGroupDO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskRuleScriptEnum;
-import cn.iocoder.yudao.module.bpm.framework.bpm.config.BpmCandidateProcessorConfiguration;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.script.BpmTaskAssignScript;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.script.impl.BpmTaskAssignLeaderX1Script;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.script.impl.BpmTaskAssignLeaderX2Script;
@@ -22,12 +21,12 @@ import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
 import cn.iocoder.yudao.module.system.api.permission.RoleApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import jakarta.annotation.Resource;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-@Import({BpmCandidateSourceInfoProcessorChain.class, BpmCandidateProcessorConfiguration.class,
+@Import({BpmCandidateSourceInfoProcessorChain.class,
         BpmCandidateScriptApiSourceInfoProcessor.class, BpmTaskAssignLeaderX1Script.class,
         BpmTaskAssignLeaderX2Script.class})
 public class BpmCandidateSourceInfoProcessorChainTest extends BaseDbUnitTest {
