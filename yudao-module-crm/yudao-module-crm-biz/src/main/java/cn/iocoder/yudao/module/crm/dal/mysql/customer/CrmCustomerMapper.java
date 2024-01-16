@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.lang.Nullable;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Collection;
@@ -85,8 +86,8 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
         query.selectAll(CrmCustomerDO.class);
 
         // 拼接自身的查询条件
-        LocalDateTime beginOfToday = LocalDateTime.now().toLocalDate().atTime(LocalTime.MIN);
-        LocalDateTime endOfToday = LocalDateTime.now().toLocalDate().atTime(LocalTime.MAX);
+        LocalDateTime beginOfToday = LocalDate.now().atTime(LocalTime.MIN);
+        LocalDateTime endOfToday = LocalDate.now().atTime(LocalTime.MAX);
         if (pageReqVO.getContactStatus().equals(CrmTodayCustomerPageReqVO.CONTACT_TODAY)) {
             // 今天需联系
             query.between(CrmCustomerDO::getContactNextTime, beginOfToday, endOfToday);
