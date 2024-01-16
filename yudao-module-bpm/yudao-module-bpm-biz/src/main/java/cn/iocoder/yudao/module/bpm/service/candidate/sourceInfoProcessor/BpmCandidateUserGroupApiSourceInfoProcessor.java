@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.bpm.service.candidate.BpmCandidateSourceInfoProce
 import cn.iocoder.yudao.module.bpm.service.definition.BpmUserGroupService;
 import org.flowable.engine.delegate.DelegateExecution;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

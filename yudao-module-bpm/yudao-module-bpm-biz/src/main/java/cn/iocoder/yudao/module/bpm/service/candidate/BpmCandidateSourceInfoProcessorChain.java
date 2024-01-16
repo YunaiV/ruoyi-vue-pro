@@ -10,7 +10,7 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.*;
 
 @Service

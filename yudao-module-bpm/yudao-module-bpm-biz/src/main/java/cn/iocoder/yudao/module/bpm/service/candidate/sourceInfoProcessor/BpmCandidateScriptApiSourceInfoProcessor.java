@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.springframework.beans.factory.ObjectProvider;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
