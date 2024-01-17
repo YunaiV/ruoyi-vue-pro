@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.enums.decorate;
+package cn.iocoder.yudao.module.promotion.enums.diy;
 
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
@@ -13,13 +13,13 @@ import java.util.Arrays;
  */
 @AllArgsConstructor
 @Getter
-public enum DecoratePageEnum implements IntArrayValuable {
+public enum DiyPageEnum implements IntArrayValuable {
 
     INDEX(1, "首页"),
     MY(2, "我的"),
     ;
 
-    private static final int[] ARRAYS = Arrays.stream(values()).mapToInt(DecoratePageEnum::getPage).toArray();
+    private static final int[] ARRAYS = Arrays.stream(values()).mapToInt(DiyPageEnum::getPage).toArray();
 
     /**
      * 页面编号
