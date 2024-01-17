@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
+import cn.iocoder.yudao.module.crm.service.contact.bo.CrmContactUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
@@ -32,6 +33,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_EXISTS;
@@ -192,6 +194,11 @@ public class CrmContactServiceImpl implements CrmContactService {
         contactMapper.updateOwnerUserIdByCustomerId(customerId, ownerUserId);
     }
 
+    @Override
+    public void updateContactFollowUpBatch(List<CrmContactUpdateFollowUpReqBO> updateFollowUpReqBOList) {
+        contactMapper.updateBatch(BeanUtils.toBean(updateFollowUpReqBOList, CrmContactDO.class));
+    }
+
     //======================= 查询相关 =======================
 
     @Override
@@ -219,6 +226,13 @@ public class CrmContactServiceImpl implements CrmContactService {
     @Override
     public List<CrmContactDO> getContactList() {
         return contactMapper.selectList();
+    }
+
+    @Override
+    public List<CrmContactDO> getSimpleContactList(Long userId) {
+        CrmContactPageReqVO reqVO = new CrmContactPageReqVO();
+        reqVO.setPageSize(PAGE_SIZE_NONE); // 不分页
+        return contactMapper.selectPage(reqVO, userId).getList();
     }
 
     @Override
