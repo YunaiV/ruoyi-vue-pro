@@ -21,6 +21,7 @@ import cn.iocoder.yudao.module.crm.framework.permission.core.util.CrmPermissionU
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
+import cn.iocoder.yudao.module.crm.service.customer.bo.CrmCustomerUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -203,6 +204,11 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         LogRecordContext.putVariable("customer", customer);
     }
 
+    @Override
+    public void updateCustomerFollowUp(CrmCustomerUpdateFollowUpReqBO customerUpdateFollowUpReqBO) {
+        customerMapper.updateById(BeanUtils.toBean(customerUpdateFollowUpReqBO, CrmCustomerDO.class));
+    }
+
     // ==================== 公海相关操作 ====================
 
     @Override
@@ -229,8 +235,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         // 3. 删除负责人数据权限
         permissionService.deletePermission(CrmBizTypeEnum.CRM_CUSTOMER.getType(), customer.getId(),
                 CrmPermissionLevelEnum.OWNER.getLevel());
-        // TODO @puhui999：联系人的负责人，也要设置为 null；这块和领取是对应的；因为领取后，负责人也要关联过来；
-        //      提问：那是不是可以这样理解客户所有联系人的负责人默认为客户的负责人，然后添加客户团队成员时才存在“同时分配给”的操作？
+        // 联系人的负责人，也要设置为 null；这块和领取是对应的；因为领取后，负责人也要关联过来；
         contactService.updateOwnerUserIdByCustomerId(customer.getId(), null);
 
         // 记录操作日志上下文

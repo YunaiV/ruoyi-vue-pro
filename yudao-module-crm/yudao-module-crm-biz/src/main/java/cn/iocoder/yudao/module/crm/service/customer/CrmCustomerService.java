@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageR
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTransferReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.service.customer.bo.CrmCustomerUpdateFollowUpReqBO;
 import jakarta.validation.Valid;
 
 import java.util.Collection;
@@ -89,6 +90,13 @@ public interface CrmCustomerService {
      * @param userId    用户编号
      */
     void lockCustomer(@Valid CrmCustomerLockReqVO lockReqVO, Long userId);
+
+    /**
+     * 更新客户相关更进信息
+     *
+     * @param customerUpdateFollowUpReqBO 请求
+     */
+    void updateCustomerFollowUp(CrmCustomerUpdateFollowUpReqBO customerUpdateFollowUpReqBO);
 
     // ==================== 公海相关操作 ====================
 
