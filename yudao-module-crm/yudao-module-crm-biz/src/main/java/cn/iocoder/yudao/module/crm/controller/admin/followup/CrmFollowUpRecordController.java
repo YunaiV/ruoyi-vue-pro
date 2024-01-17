@@ -28,6 +28,7 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSetByFlatMap;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 
 @Tag(name = "管理后台 - 跟进记录")
@@ -50,20 +51,12 @@ public class CrmFollowUpRecordController {
         return success(crmFollowUpRecordService.createFollowUpRecord(createReqVO));
     }
 
-    @PutMapping("/update")
-    @Operation(summary = "更新跟进记录")
-    @PreAuthorize("@ss.hasPermission('crm:follow-up-record:update')")
-    public CommonResult<Boolean> updateFollowUpRecord(@Valid @RequestBody CrmFollowUpRecordSaveReqVO updateReqVO) {
-        crmFollowUpRecordService.updateFollowUpRecord(updateReqVO);
-        return success(true);
-    }
-
     @DeleteMapping("/delete")
     @Operation(summary = "删除跟进记录")
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('crm:follow-up-record:delete')")
     public CommonResult<Boolean> deleteFollowUpRecord(@RequestParam("id") Long id) {
-        crmFollowUpRecordService.deleteFollowUpRecord(id);
+        crmFollowUpRecordService.deleteFollowUpRecord(id, getLoginUserId());
         return success(true);
     }
 

@@ -8,7 +8,6 @@ import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusi
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessTransferReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.product.CrmBusinessProductSaveReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductSaveReqVO;
 import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
 import cn.iocoder.yudao.module.crm.convert.businessproduct.CrmBusinessProductConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
@@ -22,6 +21,7 @@ import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
+import cn.iocoder.yudao.module.crm.service.business.bo.CrmBusinessUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactBusinessService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
@@ -33,7 +33,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -95,9 +94,10 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         LogRecordContext.putVariable("business", business);
         return business.getId();
     }
+
     /**
      * @param businessId 商机id
-     * @param contactId 联系人id
+     * @param contactId  联系人id
      * @throws
      * @description 联系人与商机的关联
      * @author lzxhqs
@@ -164,6 +164,11 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
+    public void updateContactFollowUpBatch(List<CrmBusinessUpdateFollowUpReqBO> updateFollowUpReqBOList) {
+        businessMapper.updateBatch(BeanUtils.toBean(updateFollowUpReqBOList, CrmBusinessDO.class));
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_BUSINESS_TYPE, subType = CRM_BUSINESS_DELETE_SUB_TYPE, bizNo = "{{#id}}",
             success = CRM_BUSINESS_DELETE_SUCCESS)
@@ -191,7 +196,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
      */
     private void validateContractExists(Long businessId) {
         CrmContractDO contract = contractMapper.selectByBizId(businessId);
-        if(contract != null) {
+        if (contract != null) {
             throw exception(BUSINESS_CONTRACT_EXISTS);
         }
     }

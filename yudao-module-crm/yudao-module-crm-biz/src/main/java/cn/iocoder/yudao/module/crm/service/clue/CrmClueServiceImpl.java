@@ -16,6 +16,7 @@ import cn.iocoder.yudao.module.crm.dal.mysql.clue.CrmClueMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
+import cn.iocoder.yudao.module.crm.service.clue.bo.CrmClueUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -80,6 +81,11 @@ public class CrmClueServiceImpl implements CrmClueService {
         // 更新
         CrmClueDO updateObj = BeanUtils.toBean(updateReqVO, CrmClueDO.class);
         clueMapper.updateById(updateObj);
+    }
+
+    @Override
+    public void updateClueFollowUp(CrmClueUpdateFollowUpReqBO clueUpdateFollowUpReqBO) {
+        clueMapper.updateById(BeanUtils.toBean(clueUpdateFollowUpReqBO, CrmClueDO.class));
     }
 
     @Override
@@ -159,7 +165,7 @@ public class CrmClueServiceImpl implements CrmClueService {
             // 1. 创建客户
             CrmCustomerSaveReqVO customerSaveReqVO = BeanUtils.toBean(clue, CrmCustomerSaveReqVO.class).setId(null);
             Long customerId = customerService.createCustomer(customerSaveReqVO, userId);
-            // TODO @puhui999：如果有跟进记录，需要一起转过去；
+            // TODO @puhui999：如果有跟进记录，需要一起转过去；提问：艿艿这里是复制线索所有的跟进吗？还是直接把线索相关的跟进 bizType、bizId 全改为关联客户？
             // 2. 更新线索
             clueMapper.updateById(new CrmClueDO().setId(clue.getId())
                     .setTransformStatus(Boolean.TRUE).setCustomerId(customerId));
