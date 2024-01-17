@@ -33,7 +33,7 @@ public class BpmProcessInstanceCopyDO extends BaseDO {
     /**
      * 流程名
      */
-    private String name;
+    private String processInstanceName;
     /**
      * 流程主键
      */
@@ -43,6 +43,12 @@ public class BpmProcessInstanceCopyDO extends BaseDO {
      * 任务主键
      */
     private String taskId;
+
+    /**
+     * 任务名称
+     */
+    private String taskName;
+
     /**
      * 用户主键
      */
@@ -52,5 +58,10 @@ public class BpmProcessInstanceCopyDO extends BaseDO {
      * 抄送原因
      */
     private String reason;
+
+    /**
+     * 流程分类
+     */
+    private String processDefinitionCategory;
 
 }

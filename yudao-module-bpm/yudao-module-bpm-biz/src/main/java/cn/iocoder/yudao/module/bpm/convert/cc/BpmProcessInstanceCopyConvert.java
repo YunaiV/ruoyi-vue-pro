@@ -35,15 +35,15 @@ public interface BpmProcessInstanceCopyConvert {
             , Map<Long/* userId */, String/* userName */> userMap
     ) {
         List<BpmProcessInstanceCCPageItemRespVO> list = convertList(page.getList());
-        for (BpmProcessInstanceCCPageItemRespVO vo:list){
-            MapUtils.findAndThen(userMap, vo.getUserId(),
-                    userName -> vo.setUserNickname(userName));
+        for (BpmProcessInstanceCCPageItemRespVO vo : list) {
+            MapUtils.findAndThen(userMap, Long.valueOf(vo.getCreator()),
+                    vo::setCreatorNickname);
             MapUtils.findAndThen(userMap, vo.getStartUserId(),
-                    userName -> vo.setStartUserNickname(userName));
+                    vo::setStartUserNickname);
             MapUtils.findAndThen(taskMap, vo.getTaskId(),
-                    name -> vo.setTaskName(name));
+                    vo::setTaskName);
             MapUtils.findAndThen(processInstaneMap, vo.getProcessInstanceId(),
-                    name -> vo.setProcessInstanceName(name));
+                    vo::setProcessInstanceName);
         }
         return new PageResult<>(list, page.getTotal());
     }

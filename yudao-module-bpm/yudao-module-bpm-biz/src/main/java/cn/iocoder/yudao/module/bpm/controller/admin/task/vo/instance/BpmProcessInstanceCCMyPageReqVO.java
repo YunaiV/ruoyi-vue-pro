@@ -18,7 +18,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 public class BpmProcessInstanceCCMyPageReqVO extends PageParam {
 
     @Schema(description = "流程名称", example = "芋道")
-    private String name;
+    private String processInstanceName;
 
     @Schema(description = "流程编号", example = "123456768")
     private String processInstanceId;

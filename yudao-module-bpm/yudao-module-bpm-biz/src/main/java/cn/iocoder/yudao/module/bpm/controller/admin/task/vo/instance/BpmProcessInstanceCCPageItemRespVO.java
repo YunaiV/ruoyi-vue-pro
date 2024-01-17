@@ -23,11 +23,7 @@ public class BpmProcessInstanceCCPageItemRespVO {
 
     @Schema(description = "发起人别名")
     private String startUserNickname;
-    /**
-     * 表单名
-     */
-    @Schema(description = "流程实例的名字")
-    private String name;
+
     /**
      * 流程主键
      */
@@ -44,17 +40,15 @@ public class BpmProcessInstanceCCPageItemRespVO {
 
     @Schema(description = "发起抄送的任务名称")
     private String taskName;
-    /**
-     * 用户主键
-     */
-    @Schema(description = "用户编号")
-    private Long userId;
-
-    @Schema(description = "用户别名")
-    private String userNickname;
 
     @Schema(description = "抄送原因")
     private String reason;
+
+    @Schema(description = "抄送人")
+    private String creator;
+
+    @Schema(description = "抄送人别名")
+    private String creatorNickname;
 
     @Schema(description = "抄送时间")
     private LocalDateTime createTime;

@@ -31,10 +31,15 @@ public class FlowableUtils {
      * @param processDefinitionId
      * @return
      */
-    public static String getFlowName(String processDefinitionId) {
+    public static String getProcessDefinitionName(String processDefinitionId) {
         RepositoryService repositoryService = SpringUtil.getBean(RepositoryService.class);
         ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processDefinitionId);
         return processDefinition.getName();
+    }
+
+    public static ProcessDefinition getProcessDefinition(String processDefinitionId) {
+        RepositoryService repositoryService = SpringUtil.getBean(RepositoryService.class);
+        return repositoryService.getProcessDefinition(processDefinitionId);
     }
 
     /**

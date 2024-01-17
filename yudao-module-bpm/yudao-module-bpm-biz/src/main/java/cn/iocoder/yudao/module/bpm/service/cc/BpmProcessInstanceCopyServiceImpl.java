@@ -18,6 +18,7 @@ import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -75,6 +76,7 @@ public class BpmProcessInstanceCopyServiceImpl implements BpmProcessInstanceCopy
             // 调用
             // 设置任务id
             copyDO.setTaskId(sourceInfo.getTaskId());
+            copyDO.setTaskName(FlowableUtils.getTaskNameByTaskId(sourceInfo.getTaskId()));
             copyDO.setProcessInstanceId(sourceInfo.getProcessInstanceId());
             ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
                     .processInstanceId(sourceInfo.getProcessInstanceId())
@@ -84,7 +86,9 @@ public class BpmProcessInstanceCopyServiceImpl implements BpmProcessInstanceCopy
                 return false;
             }
             copyDO.setStartUserId(FlowableUtils.getStartUserIdFromProcessInstance(processInstance));
-            copyDO.setName(FlowableUtils.getFlowName(processInstance.getProcessDefinitionId()));
+            copyDO.setProcessInstanceName(processInstance.getName());
+            ProcessDefinition processDefinition = FlowableUtils.getProcessDefinition(processInstance.getProcessDefinitionId());
+            copyDO.setProcessDefinitionCategory(processDefinition.getCategory());
             copyDO.setReason(sourceInfo.getReason());
             copyDO.setCreator(sourceInfo.getCreator());
             copyDO.setCreateTime(LocalDateTime.now());
@@ -131,7 +135,6 @@ public class BpmProcessInstanceCopyServiceImpl implements BpmProcessInstanceCopy
             userIds.add(doItem.getStartUserId());
             Long userId = Long.valueOf(doItem.getCreator());
             userIds.add(userId);
-            doItem.setUserId(userId);
         }
 
         Map<String, String> taskNameByTaskIds = FlowableUtils.getTaskNameByTaskIds(taskIds);
