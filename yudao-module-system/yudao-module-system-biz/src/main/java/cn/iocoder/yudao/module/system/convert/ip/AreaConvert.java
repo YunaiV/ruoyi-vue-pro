@@ -17,4 +17,12 @@ public interface AreaConvert {
 
     List<AppAreaNodeRespVO> convertList3(List<Area> list);
 
+    /**
+     * 缺少单个转换
+     * @param value
+     * @return
+     */
+    AreaNodeRespVO map(Area value);
+
+    AppAreaNodeRespVO map3(Area value);
 }
