@@ -44,7 +44,7 @@ public class CrmBusinessStatusTypeDO extends BaseDO {
      * 开启状态
      *
      * TODO 改成 Integer，关联 CommonStatus
-     * {@link CommonStatusEnum}
+     * 枚举 {@link CommonStatusEnum}
      */
     private Boolean status;
 

@@ -14,6 +14,7 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
+// TODO @lzxhqs：看看是不是用 BeanUtils 替代了
 /**
  * 商机状态类型 Convert
  *
@@ -23,7 +24,6 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 public interface CrmBusinessStatusTypeConvert {
 
     CrmBusinessStatusTypeConvert INSTANCE = Mappers.getMapper(CrmBusinessStatusTypeConvert.class);
-
 
     CrmBusinessStatusTypeRespVO convert(CrmBusinessStatusTypeDO bean);
 
@@ -38,9 +38,6 @@ public interface CrmBusinessStatusTypeConvert {
     }
 
     default CrmBusinessStatusTypeRespVO convert(CrmBusinessStatusTypeDO bean, List<CrmBusinessStatusDO> statusList) {
-        // TODO @ljlleo 可以链式赋值，简化成一行；
-//        CrmBusinessStatusTypeRespVO result = convert(bean);
-//        result.setStatusList(statusList);
         return convert(bean).setStatusList(statusList);
     }
 

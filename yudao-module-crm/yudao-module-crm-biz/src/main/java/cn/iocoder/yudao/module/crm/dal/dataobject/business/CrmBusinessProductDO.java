@@ -31,17 +31,20 @@ public class CrmBusinessProductDO extends BaseDO {
     private Long id;
 
     /**
-     * 商机ID
+     * 商机编号
+     *
      * 关联 {@link CrmBusinessDO#getId()}
      */
     private Long businessId;
 
     /**
-     * 产品ID
-     * 关联{@link CrmProductDO#getId()}
+     * 产品编号
+     *
+     * 关联 {@link CrmProductDO#getId()}
      */
     private Long productId;
 
+    // TODO @lzxhqs：改成 Integer，单位：分。目前整体倾向放大 100 倍哈
     /**
      * 产品单价
      */
@@ -52,16 +55,19 @@ public class CrmBusinessProductDO extends BaseDO {
      */
     private BigDecimal salesPrice;
 
+    // TODO @lzxhqs：改成 count
     /**
      * 数量
      */
     private BigDecimal num;
 
+    // TODO @lzxhqs：改成 discountPercent
     /**
      * 折扣
      */
     private BigDecimal discount;
 
+    // TODO @lzxhqs：改成 totalPrice；总计价格，和现有项目风格一致；
     /**
      * 小计（折扣后价格）
      */

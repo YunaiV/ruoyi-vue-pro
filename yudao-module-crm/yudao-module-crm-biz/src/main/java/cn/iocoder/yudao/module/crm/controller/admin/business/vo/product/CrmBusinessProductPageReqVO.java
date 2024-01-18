@@ -6,10 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-
-/**
- * @author lzxhqs
- */
+// TODO @lzxhqs：这个类，如果没用到，可以考虑删除哈
 @Schema(description = "管理后台 - 商机产品分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)

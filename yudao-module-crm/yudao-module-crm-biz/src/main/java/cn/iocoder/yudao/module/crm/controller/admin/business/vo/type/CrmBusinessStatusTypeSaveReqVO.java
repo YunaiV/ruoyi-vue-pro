@@ -19,10 +19,10 @@ public class CrmBusinessStatusTypeSaveReqVO {
     @NotEmpty(message = "状态类型名不能为空")
     private String name;
 
+    // TODO @lzxhqs： VO 里面，我们不使用默认值哈。这里 Lists.newArrayList() 看看怎么去掉。上面 deptIds 也是类似噢
     @Schema(description = "使用的部门编号", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<Long> deptIds = Lists.newArrayList();
 
-    // TODO @ljlleo VO 里面，我们不使用默认值哈。这里 Lists.newArrayList() 看看怎么去掉。上面 deptIds 也是类似噢
     @Schema(description = "商机状态集合", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<CrmBusinessStatusSaveReqVO> statusList;
 

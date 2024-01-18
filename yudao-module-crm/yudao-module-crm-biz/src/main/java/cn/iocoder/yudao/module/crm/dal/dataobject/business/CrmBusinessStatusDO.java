@@ -35,9 +35,7 @@ public class CrmBusinessStatusDO {
      */
     private String name;
     /**
-     * 赢单率
-     *
-     * TODO 这里是不是改成 Integer 存储，百分比 * 100 ；
+     * 赢单率，百分比
      */
     private Integer percent;
     /**

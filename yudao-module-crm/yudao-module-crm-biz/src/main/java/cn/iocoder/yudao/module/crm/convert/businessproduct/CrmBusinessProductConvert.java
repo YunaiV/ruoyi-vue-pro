@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+// TODO @lzxhqs：看看是不是用 BeanUtils 替代了
 /**
  * @author lzxhqs
  * @version 1.0
