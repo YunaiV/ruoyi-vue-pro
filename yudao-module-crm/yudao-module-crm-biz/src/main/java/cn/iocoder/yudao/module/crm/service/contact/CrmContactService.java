@@ -65,7 +65,6 @@ public interface CrmContactService {
      */
     void updateContactFollowUpBatch(List<CrmContactUpdateFollowUpReqBO> updateFollowUpReqBOList);
 
-
     /**
      * 获得联系人
      *

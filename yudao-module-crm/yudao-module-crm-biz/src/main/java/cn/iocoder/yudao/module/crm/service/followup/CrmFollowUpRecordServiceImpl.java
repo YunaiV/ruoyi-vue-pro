@@ -59,10 +59,11 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
         crmFollowUpRecordMapper.insert(followUpRecord);
 
         LocalDateTime now = LocalDateTime.now();
-        // 更新 bizId 对应的记录；
+        // 2. 更新 bizId 对应的记录；
         followUpHandlers.forEach(handler -> handler.execute(followUpRecord, now));
-        // 更新 contactIds 对应的记录
+        // 3.1 更新 contactIds 对应的记录
         if (CollUtil.isNotEmpty(createReqVO.getContactIds())) {
+            // TODO @puhui999：可以用链式设置哈
             contactService.updateContactFollowUpBatch(convertList(createReqVO.getContactIds(), contactId -> {
                 CrmContactUpdateFollowUpReqBO crmContactUpdateFollowUpReqBO = new CrmContactUpdateFollowUpReqBO();
                 crmContactUpdateFollowUpReqBO.setId(contactId).setContactNextTime(followUpRecord.getNextTime())
@@ -70,7 +71,7 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
                 return crmContactUpdateFollowUpReqBO;
             }));
         }
-        // 需要更新 businessIds、contactIds 对应的记录
+        // 3.2 需要更新 businessIds、contactIds 对应的记录
         if (CollUtil.isNotEmpty(createReqVO.getBusinessIds())) {
             businessService.updateContactFollowUpBatch(convertList(createReqVO.getBusinessIds(), businessId -> {
                 CrmBusinessUpdateFollowUpReqBO crmBusinessUpdateFollowUpReqBO = new CrmBusinessUpdateFollowUpReqBO();

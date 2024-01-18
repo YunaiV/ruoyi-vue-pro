@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+// TODO @puhui999：是不是搞个通用的 ReqBO 就好了
 /**
  * 跟进信息 Update Req BO
  *

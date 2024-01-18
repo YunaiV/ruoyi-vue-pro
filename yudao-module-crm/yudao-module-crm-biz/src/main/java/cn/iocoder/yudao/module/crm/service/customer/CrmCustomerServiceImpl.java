@@ -227,15 +227,16 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         // 1.3. 校验客户是否锁定
         validateCustomerIsLocked(customer, true);
 
-        // 2. 设置负责人为 NULL
+        // 2.1 设置负责人为 NULL
         int updateOwnerUserIncr = customerMapper.updateOwnerUserIdById(customer.getId(), null);
         if (updateOwnerUserIncr == 0) {
             throw exception(CUSTOMER_UPDATE_OWNER_USER_FAIL);
         }
-        // 3. 删除负责人数据权限
+        // 2.2 删除负责人数据权限
         permissionService.deletePermission(CrmBizTypeEnum.CRM_CUSTOMER.getType(), customer.getId(),
                 CrmPermissionLevelEnum.OWNER.getLevel());
-        // 联系人的负责人，也要设置为 null；这块和领取是对应的；因为领取后，负责人也要关联过来；
+
+        // 3. 联系人的负责人，也要设置为 null。因为：因为领取后，负责人也要关联过来，这块和 receiveCustomer 是对应的
         contactService.updateOwnerUserIdByCustomerId(customer.getId(), null);
 
         // 记录操作日志上下文
