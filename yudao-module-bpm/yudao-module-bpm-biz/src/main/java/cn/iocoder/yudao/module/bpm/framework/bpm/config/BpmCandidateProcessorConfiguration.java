@@ -6,8 +6,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
-
+// TODO @芋艿：Candidate 相关还在完善中，用户可以暂时忽略，仅 yudao 开发的同学需要关注~计划是把 Candidate 和 Assign 融合成一套
 /**
  * BPM 通用的 Configuration 配置类，提供给 Activiti 和 Flowable
  * @author kyle

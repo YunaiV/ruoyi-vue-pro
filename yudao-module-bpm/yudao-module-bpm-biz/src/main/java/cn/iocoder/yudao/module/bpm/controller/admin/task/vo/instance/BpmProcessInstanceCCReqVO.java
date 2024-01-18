@@ -9,8 +9,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Set;
-
+// TODO @kyle：这个 VO 可以改成 BpmProcessInstanceCopyCreateReqVO
 @Schema(description = "管理后台 - 流程实例的抄送 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -33,7 +32,6 @@ public class BpmProcessInstanceCCReqVO extends BpmTaskCandidateRuleVO {
     @NotNull(message = "发起流程的用户的编号不能为空")
     private Long startUserId;
 
-
     @Schema(description = "任务实例名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotEmpty(message = "任务实例名称不能为空")
     private String processInstanceName;
@@ -41,4 +39,9 @@ public class BpmProcessInstanceCCReqVO extends BpmTaskCandidateRuleVO {
     @Schema(description = "抄送原因", requiredMode = Schema.RequiredMode.REQUIRED, example = "请帮忙审查下！")
     @NotBlank(message = "抄送原因不能为空")
     private String reason;
+
+    // TODO @kyle：看了下字段有点多，尽量不传递可推导的字段；
+    // 需要传递：taskId（任务编号）、reason、userIds（被抄送的人）
+    // 不需要传递：taskKey、taskName、processInstanceKey、startUserId、processInstanceName 因为这些可以后端查询到
+
 }

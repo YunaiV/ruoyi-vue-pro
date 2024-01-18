@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Data
 public class BpmProcessInstanceCCPageItemRespVO {
 
+    // TODO @kyle：如果已经写了 swagger 注解，可以不用写 java 注释哈；
     /**
      * 编号
      */
@@ -52,4 +53,5 @@ public class BpmProcessInstanceCCPageItemRespVO {
 
     @Schema(description = "抄送时间")
     private LocalDateTime createTime;
+
 }

@@ -6,10 +6,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * 流程抄送对象
+ * 流程抄送 DO
  *
  * @author kyle
- * @date 2022-05-19
+ * @date 2022-05-19 TODO @kyle：@date 不是标准 java doc，可以使用 @since 替代，然后日期是不是不对
  */
 @TableName(value = "bpm_process_instance_copy", autoResultMap = true)
 @Data
@@ -26,8 +26,9 @@ public class BpmProcessInstanceCopyDO extends BaseDO {
     @TableId
     private Long id;
 
+    // TODO @kyle：字段如果是关联或者冗余，要写下注释。以 processInstanceId 举例子。
     /**
-     * 发起人Id
+     * 发起人 Id
      */
     private Long startUserId;
     /**
@@ -35,7 +36,9 @@ public class BpmProcessInstanceCopyDO extends BaseDO {
      */
     private String processInstanceName;
     /**
-     * 流程主键
+     * 流程实例的编号
+     *
+     * 关联 ProcessInstance 的 id 属性
      */
     private String processInstanceId;
 
@@ -50,7 +53,7 @@ public class BpmProcessInstanceCopyDO extends BaseDO {
     private String taskName;
 
     /**
-     * 用户主键
+     * 用户编号
      */
     private Long userId;
 
@@ -59,6 +62,7 @@ public class BpmProcessInstanceCopyDO extends BaseDO {
      */
     private String reason;
 
+    // TODO @kyle：这个字段，可以用 category 简化点
     /**
      * 流程分类
      */

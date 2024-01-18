@@ -31,7 +31,4 @@ public class SocialUserBindReqVO {
     @NotEmpty(message = "state 不能为空")
     private String state;
 
-    public Integer getType() {
-        return type;
-    }
 }

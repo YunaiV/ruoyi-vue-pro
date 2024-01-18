@@ -88,6 +88,7 @@ public class FlowableUtils {
         return task.getName();
     }
 
+    // TODO @kyle：Utils 里不做查询；可以封装到 bpmTaskService 里
     public static Map<String/* taskId */, String/* taskName */> getTaskNameByTaskIds(Collection<String> taskIds) {
         TaskService taskService = SpringUtil.getBean(TaskService.class);
         List<Task> tasks = taskService.createTaskQuery().taskIds(taskIds).list();
@@ -109,6 +110,7 @@ public class FlowableUtils {
         return processInstance.getName();
     }
 
+    // TODO @kyle：Utils 里不做查询；可以封装到 bpmTaskService 里
     public static Map<String/* processInstaneId */, String/* processInstaneName */> getProcessInstanceNameByTaskIds(Set<String> taskIds) {
         RuntimeService runtimeService = SpringUtil.getBean(RuntimeService.class);
         List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().processInstanceIds(taskIds).list();

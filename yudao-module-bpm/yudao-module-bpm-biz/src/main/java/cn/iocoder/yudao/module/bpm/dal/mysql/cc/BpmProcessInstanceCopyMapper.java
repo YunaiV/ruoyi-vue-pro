@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.bpm.dal.dataobject.cc.BpmProcessInstanceCopyDO;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface BpmProcessInstanceCopyMapper extends BaseMapperX<BpmProcessInstanceCopyDO> {
+public interface BpmProcessInstanceCopyMapper extends BaseMapperX<BpmProcessInstanceCopyDO> { // TODO @kyle：方法和类之间要空行下；
     default PageResult<BpmProcessInstanceCopyDO> selectPage(Long loginUserId, BpmProcessInstanceCCMyPageReqVO reqVO){
         return selectPage(reqVO, new LambdaQueryWrapperX<BpmProcessInstanceCopyDO>()
                 .eqIfPresent(BpmProcessInstanceCopyDO::getUserId, loginUserId)
