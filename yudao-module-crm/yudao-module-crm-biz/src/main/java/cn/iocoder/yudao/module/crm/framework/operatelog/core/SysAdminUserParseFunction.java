@@ -4,9 +4,10 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.mzt.logapi.service.IParseFunction;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * 管理员名字的 {@link IParseFunction} 实现类

@@ -7,11 +7,11 @@ import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.Produc
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
 import cn.iocoder.yudao.module.product.dal.mysql.property.ProductPropertyValueMapper;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
-import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 

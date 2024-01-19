@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.crm.controller.admin.clue.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.Set;
 
 @Schema(description = "管理后台 - 线索转化为客户 Request VO")

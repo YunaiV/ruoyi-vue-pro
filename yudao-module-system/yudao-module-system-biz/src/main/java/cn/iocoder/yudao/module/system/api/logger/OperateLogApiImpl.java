@@ -11,11 +11,11 @@ import cn.iocoder.yudao.module.system.dal.dataobject.logger.OperateLogV2DO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.service.logger.OperateLogService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
-import jakarta.annotation.Resource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;

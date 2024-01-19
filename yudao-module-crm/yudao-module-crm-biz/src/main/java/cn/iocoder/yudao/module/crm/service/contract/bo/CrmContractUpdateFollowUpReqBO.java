@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.crm.service.contract.bo;
 
 import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 // TODO @puhui999：是不是搞个通用的 ReqBO 就好了

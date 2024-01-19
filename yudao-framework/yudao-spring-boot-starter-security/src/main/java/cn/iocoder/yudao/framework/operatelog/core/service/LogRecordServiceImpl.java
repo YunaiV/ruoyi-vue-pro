@@ -8,10 +8,10 @@ import cn.iocoder.yudao.module.system.api.logger.OperateLogApi;
 import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2CreateReqDTO;
 import com.mzt.logapi.beans.LogRecord;
 import com.mzt.logapi.service.ILogRecordService;
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**

@@ -20,11 +20,11 @@ import cn.iocoder.yudao.module.crm.service.clue.bo.CrmClueUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -152,7 +152,7 @@ public class CrmClueServiceImpl implements CrmClueService {
         // 过滤出未转化的客户
         // TODO @min：1）存在已经转化的，直接提示哈。避免操作的用户，以为都转化成功了；2）常见的过滤逻辑，可以使用 CollectionUtils.filterList()
         List<CrmClueDO> unTransformClues = clues.stream()
-                .filter(clue -> ObjectUtil.notEqual(Boolean.TRUE, clue.getTransformStatus())).toList();
+                .filter(clue -> ObjectUtil.notEqual(Boolean.TRUE, clue.getTransformStatus())).collect(Collectors.toList());
         // 传入的线索中包含已经转化的情况，抛出业务异常
         if (ObjectUtil.notEqual(clues.size(), unTransformClues.size())) {
             // TODO @min：可以使用 StrUtil.join(",", clueIds) 简化这种常见操作

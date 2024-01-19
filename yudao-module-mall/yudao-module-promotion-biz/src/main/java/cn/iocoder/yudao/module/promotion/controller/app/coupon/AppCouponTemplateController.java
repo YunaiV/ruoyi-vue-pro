@@ -29,6 +29,7 @@ import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
+import static java.util.Collections.singletonList;
 
 @Tag(name = "用户 App - 优惠劵模板")
 @RestController
@@ -53,7 +54,7 @@ public class AppCouponTemplateController {
             return success(null);
         }
         // 处理是否可领取
-        Map<Long, Boolean> canCanTakeMap = couponService.getUserCanCanTakeMap(getLoginUserId(), List.of(template));
+        Map<Long, Boolean> canCanTakeMap = couponService.getUserCanCanTakeMap(getLoginUserId(), singletonList(template));
         return success(BeanUtils.toBean(template, AppCouponTemplateRespVO.class)
                 .setCanTake(canCanTakeMap.get(template.getId())));
     }
@@ -72,7 +73,7 @@ public class AppCouponTemplateController {
         // 1.1 处理查询条件：商品范围编号
         Long productScopeValue = getProductScopeValue(productScope, spuId);
         // 1.2 处理查询条件：领取方式 = 直接领取
-        List<Integer> canTakeTypes = Collections.singletonList(CouponTakeTypeEnum.USER.getValue());
+        List<Integer> canTakeTypes = singletonList(CouponTakeTypeEnum.USER.getValue());
 
         // 2. 查询
         List<CouponTemplateDO> list = couponTemplateService.getCouponTemplateList(canTakeTypes, productScope,
@@ -104,7 +105,7 @@ public class AppCouponTemplateController {
         // 1.1 处理查询条件：商品范围编号
         Long productScopeValue = getProductScopeValue(pageReqVO.getProductScope(), pageReqVO.getSpuId());
         // 1.2 处理查询条件：领取方式 = 直接领取
-        List<Integer> canTakeTypes = Collections.singletonList(CouponTakeTypeEnum.USER.getValue());
+        List<Integer> canTakeTypes = singletonList(CouponTakeTypeEnum.USER.getValue());
 
         // 2. 分页查询
         PageResult<CouponTemplateDO> pageResult = couponTemplateService.getCouponTemplatePage(

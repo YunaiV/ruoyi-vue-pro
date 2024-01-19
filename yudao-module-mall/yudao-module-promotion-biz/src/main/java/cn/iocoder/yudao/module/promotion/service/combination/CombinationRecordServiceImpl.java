@@ -24,14 +24,14 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationR
 import cn.iocoder.yudao.module.promotion.dal.mysql.combination.CombinationRecordMapper;
 import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.api.order.TradeOrderApi;
-import jakarta.annotation.Nullable;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Nullable;
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
 
