@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.*;
@@ -259,7 +260,7 @@ public class MemberLevelServiceImpl implements MemberLevelService {
         }
 
         // 3. 更新会员表上的等级编号、经验值
-        memberUserService.updateUserLevel(user.getId(), levelRecord.getLevelId(), userExperience);
+        memberUserService.updateUserLevel(user.getId(), Optional.ofNullable(levelRecord.getLevelId()).orElse(user.getLevelId()), userExperience);
     }
 
     /**
