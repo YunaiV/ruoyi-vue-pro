@@ -48,7 +48,7 @@ public class DiyPageDO extends BaseDO {
      * 预览图，多个逗号分隔
      */
     @TableField(typeHandler = StringListTypeHandler.class)
-    private List<String> previewImageUrls;
+    private List<String> previewPicUrls;
     /**
      * 页面属性，JSON 格式
      */

@@ -6,8 +6,9 @@ import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivi
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
-
 import jakarta.validation.Valid;
+
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -70,5 +71,15 @@ public interface RewardActivityService {
      * @return 满减送活动列表
      */
     List<RewardActivityMatchRespDTO> getMatchRewardActivityList(Collection<Long> spuIds);
+
+    /**
+     * 获取指定 spu 编号最近参加的活动，每个 spuId 只返回一条记录
+     *
+     * @param spuIds   spu 编号
+     * @param status   状态
+     * @param dateTime 当前日期时间
+     * @return 满减送活动列表
+     */
+    List<RewardActivityDO> getRewardActivityBySpuIdsAndStatusAndDateTimeLt(Collection<Long> spuIds, Integer status, LocalDateTime dateTime);
 
 }

@@ -36,9 +36,9 @@ public class LoginLogCreateReqDTO {
     private Integer userType;
     /**
      * 用户账号
+     *
+     * 不再强制校验 username 非空，因为 Member 社交登录时，此时暂时没有 username(mobile）！
      */
-    @NotBlank(message = "用户账号不能为空")
-    @Size(max = 30, message = "用户账号长度不能超过30个字符")
     private String username;
 
     /**

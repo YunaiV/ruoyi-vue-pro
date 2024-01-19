@@ -3,16 +3,16 @@ package cn.iocoder.yudao.module.bpm.controller.admin.task;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
+import cn.iocoder.yudao.module.bpm.service.cc.BpmProcessInstanceCopyService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -25,6 +25,9 @@ public class BpmProcessInstanceController {
 
     @Resource
     private BpmProcessInstanceService processInstanceService;
+
+    @Resource
+    private BpmProcessInstanceCopyService processInstanceCopyService;
 
     @GetMapping("/my-page")
     @Operation(summary = "获得我的实例分页列表", description = "在【我的流程】菜单中，进行调用")
@@ -56,4 +59,22 @@ public class BpmProcessInstanceController {
         processInstanceService.cancelProcessInstance(getLoginUserId(), cancelReqVO);
         return success(true);
     }
+
+    // TODO @kyle：抄送要不单独 controller？
+
+    @PostMapping("/cc/create")
+    @Operation(summary = "抄送流程")
+    @PreAuthorize("@ss.hasPermission('bpm:process-instance-cc:create')")
+    public CommonResult<Boolean> createProcessInstanceCC(@Valid @RequestBody BpmProcessInstanceCCReqVO createReqVO) {
+        return success(processInstanceCopyService.ccProcessInstance(getLoginUserId(), createReqVO));
+    }
+
+    @GetMapping("/cc/my-page")
+    @Operation(summary = "获得抄送流程分页列表")
+    @PreAuthorize("@ss.hasPermission('bpm:process-instance-cc:query')")
+    public CommonResult<PageResult<BpmProcessInstanceCCPageItemRespVO>> getProcessInstanceCCPage(
+            @Valid BpmProcessInstanceCCMyPageReqVO pageReqVO) {
+        return success(processInstanceCopyService.getMyProcessInstanceCCPage(getLoginUserId(), pageReqVO));
+    }
+
 }

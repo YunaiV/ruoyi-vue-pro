@@ -6,6 +6,7 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
+// TODO 芋艿：弱化这个状态
 /**
  * 促销活动的状态枚举
  *

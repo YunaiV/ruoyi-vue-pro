@@ -60,7 +60,6 @@ public interface CombinationActivityConvert {
 
     List<CombinationActivityRespVO> convertList(List<CombinationActivityDO> list);
 
-
     default PageResult<CombinationActivityPageItemRespVO> convertPage(PageResult<CombinationActivityDO> page,
                                                                       List<CombinationProductDO> productList,
                                                                       Map<Long, Integer> groupCountMap,
@@ -125,7 +124,6 @@ public interface CombinationActivityConvert {
                 .setNickname(user.getNickname()).setAvatar(user.getAvatar())
                 // 商品信息
                 .setSpuName(spu.getName()).setPicUrl(sku.getPicUrl());
-
     }
 
     List<AppCombinationActivityRespVO> convertAppList(List<CombinationActivityDO> list);

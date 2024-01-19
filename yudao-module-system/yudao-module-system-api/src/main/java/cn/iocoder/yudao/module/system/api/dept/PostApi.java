@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.system.api.dept;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.system.api.dept.dto.PostRespDTO;
 
@@ -26,6 +28,10 @@ public interface PostApi {
     List<PostRespDTO> getPostList(Collection<Long> ids);
 
     default Map<Long, PostRespDTO> getPostMap(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return MapUtil.empty();
+        }
+
         List<PostRespDTO> list = getPostList(ids);
         return CollectionUtils.convertMap(list, PostRespDTO::getId);
     }

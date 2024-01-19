@@ -177,4 +177,14 @@ public class DateUtils {
         return LocalDateTimeUtil.isSameDay(date, LocalDateTime.now());
     }
 
+    /**
+     * 是否昨天
+     *
+     * @param date 日期
+     * @return 是否
+     */
+    public static boolean isYesterday(LocalDateTime date) {
+        return LocalDateTimeUtil.isSameDay(date, LocalDateTime.now().minusDays(1));
+    }
+
 }

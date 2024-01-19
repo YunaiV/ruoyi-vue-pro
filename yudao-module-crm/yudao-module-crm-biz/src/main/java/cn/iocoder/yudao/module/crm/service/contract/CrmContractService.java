@@ -1,14 +1,14 @@
 package cn.iocoder.yudao.module.crm.service.contract;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-
+import cn.iocoder.yudao.module.crm.service.contract.bo.CrmContractUpdateFollowUpReqBO;
 import jakarta.validation.Valid;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -26,14 +26,14 @@ public interface CrmContractService {
      * @param userId      用户编号
      * @return 编号
      */
-    Long createContract(@Valid CrmContractCreateReqVO createReqVO, Long userId);
+    Long createContract(@Valid CrmContractSaveReqVO createReqVO, Long userId);
 
     /**
      * 更新合同
      *
      * @param updateReqVO 更新信息
      */
-    void updateContract(@Valid CrmContractUpdateReqVO updateReqVO);
+    void updateContract(@Valid CrmContractSaveReqVO updateReqVO);
 
     /**
      * 删除合同
@@ -41,6 +41,21 @@ public interface CrmContractService {
      * @param id 编号
      */
     void deleteContract(Long id);
+
+    /**
+     * 合同转移
+     *
+     * @param reqVO  请求
+     * @param userId 用户编号
+     */
+    void transferContract(CrmContractTransferReqVO reqVO, Long userId);
+
+    /**
+     * 更新合同相关的更进信息
+     *
+     * @param contractUpdateFollowUpReqBO 信息
+     */
+    void updateContractFollowUp(CrmContractUpdateFollowUpReqBO contractUpdateFollowUpReqBO);
 
     /**
      * 获得合同
@@ -64,9 +79,10 @@ public interface CrmContractService {
      * 数据权限：基于 {@link CrmContractDO} 读取
      *
      * @param pageReqVO 分页查询
+     * @param userId    用户编号
      * @return 合同分页
      */
-    PageResult<CrmContractDO> getContractPage(CrmContractPageReqVO pageReqVO);
+    PageResult<CrmContractDO> getContractPage(CrmContractPageReqVO pageReqVO, Long userId);
 
     /**
      * 获得合同分页，基于指定客户
@@ -76,14 +92,22 @@ public interface CrmContractService {
      * @param pageReqVO 分页查询
      * @return 联系人分页
      */
-    PageResult<CrmContractDO> getContractPageByCustomer(CrmContractPageReqVO pageReqVO);
+    PageResult<CrmContractDO> getContractPageByCustomerId(CrmContractPageReqVO pageReqVO);
 
     /**
-     * 合同转移
+     * 查询属于某个联系人的合同数量
      *
-     * @param reqVO  请求
-     * @param userId 用户编号
+     * @param contactId 联系人ID
+     * @return 合同
      */
-    void transferContract(CrmContractTransferReqVO reqVO, Long userId);
+    Long getContractCountByContactId(Long contactId);
+
+    /**
+     * 获取关联客户的合同数量
+     *
+     * @param customerId 客户编号
+     * @return 数量
+     */
+    Long getContractCountByCustomerId(Long customerId);
 
 }

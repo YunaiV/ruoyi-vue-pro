@@ -63,7 +63,7 @@ public class BargainRecordDO extends BaseDO {
      *
      * 砍价成功的条件是：（2 选 1）
      *  1. 砍价到 {@link BargainActivityDO#getBargainMinPrice()} 底价
-     *  2. 助力人数到达 {@link BargainActivityDO#getUserSize()} 人
+     *  2. 助力人数到达 {@link BargainActivityDO#getHelpMaxCount()} 人
      *
      * 枚举 {@link BargainRecordStatusEnum}
      */

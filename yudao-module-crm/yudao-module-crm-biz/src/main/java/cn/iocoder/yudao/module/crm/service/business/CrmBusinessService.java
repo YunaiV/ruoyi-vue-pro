@@ -1,15 +1,15 @@
 package cn.iocoder.yudao.module.crm.service.business;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessTransferReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessUpdateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-
+import cn.iocoder.yudao.module.crm.service.business.bo.CrmBusinessUpdateFollowUpReqBO;
 import jakarta.validation.Valid;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -27,14 +27,21 @@ public interface CrmBusinessService {
      * @param userId      用户编号
      * @return 编号
      */
-    Long createBusiness(@Valid CrmBusinessCreateReqVO createReqVO, Long userId);
+    Long createBusiness(@Valid CrmBusinessSaveReqVO createReqVO, Long userId);
 
     /**
      * 更新商机
      *
      * @param updateReqVO 更新信息
      */
-    void updateBusiness(@Valid CrmBusinessUpdateReqVO updateReqVO);
+    void updateBusiness(@Valid CrmBusinessSaveReqVO updateReqVO);
+
+    /**
+     * 更新商机相关跟进信息
+     *
+     * @param updateFollowUpReqBOList 跟进信息
+     */
+    void updateContactFollowUpBatch(List<CrmBusinessUpdateFollowUpReqBO> updateFollowUpReqBOList);
 
     /**
      * 删除商机
@@ -50,6 +57,14 @@ public interface CrmBusinessService {
      * @return 商机
      */
     CrmBusinessDO getBusiness(Long id);
+
+    /**
+     * 获得商机列表
+     *
+     * @param ids 编号
+     * @return 商机列表
+     */
+    List<CrmBusinessDO> getBusinessList(Collection<Long> ids, Long userId);
 
     /**
      * 获得商机列表
@@ -76,9 +91,19 @@ public interface CrmBusinessService {
      * 数据权限：基于 {@link CrmCustomerDO} 读取
      *
      * @param pageReqVO 分页查询
-     * @return 联系人分页
+     * @return 商机分页
      */
-    PageResult<CrmBusinessDO> getBusinessPageByCustomer(CrmContractPageReqVO pageReqVO);
+    PageResult<CrmBusinessDO> getBusinessPageByCustomerId(CrmBusinessPageReqVO pageReqVO);
+
+    /**
+     * 获得商机分页，基于指定联系人
+     *
+     * 数据权限：基于 {@link CrmContactDO} 读取
+     *
+     * @param pageReqVO 分页参数
+     * @return 商机分页
+     */
+    PageResult<CrmBusinessDO> getBusinessPageByContact(CrmBusinessPageReqVO pageReqVO);
 
     /**
      * 商机转移
@@ -87,5 +112,13 @@ public interface CrmBusinessService {
      * @param userId 用户编号
      */
     void transferBusiness(CrmBusinessTransferReqVO reqVO, Long userId);
+
+    /**
+     * 获取关联客户的商机数量
+     *
+     * @param customerId 客户编号
+     * @return 数量
+     */
+    Long getBusinessCountByCustomerId(Long customerId);
 
 }

@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
@@ -24,19 +25,17 @@ import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
@@ -85,13 +84,13 @@ public class CrmBusinessStatusTypeController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('crm:business-status-type:query')")
     public CommonResult<CrmBusinessStatusTypeRespVO> getBusinessStatusType(@RequestParam("id") Long id) {
-        CrmBusinessStatusTypeDO businessStatusType = businessStatusTypeService.getBusinessStatusType(id);
+        CrmBusinessStatusTypeDO statusType = businessStatusTypeService.getBusinessStatusType(id);
         // 处理状态回显
-        // TODO @ljlleo：可以使用 CollectionUtils.convertSet 替代常用的 stream 操作，更简洁一点；下面几个也是哈；
+        // TODO @lzxhqs：可以在 businessStatusService 加个 getBusinessStatusListByTypeId 方法，直接返回 List<CrmBusinessStatusDO> 哈，常用的，尽量封装个简单易懂的方法，不用追求绝对通用哈；
         CrmBusinessStatusQueryVO queryVO = new CrmBusinessStatusQueryVO();
         queryVO.setTypeId(id);
         List<CrmBusinessStatusDO> statusList = businessStatusService.selectList(queryVO);
-        return success(CrmBusinessStatusTypeConvert.INSTANCE.convert(businessStatusType, statusList));
+        return success(CrmBusinessStatusTypeConvert.INSTANCE.convert(statusType, statusList));
     }
 
     @GetMapping("/page")
@@ -100,12 +99,7 @@ public class CrmBusinessStatusTypeController {
     public CommonResult<PageResult<CrmBusinessStatusTypeRespVO>> getBusinessStatusTypePage(@Valid CrmBusinessStatusTypePageReqVO pageReqVO) {
         PageResult<CrmBusinessStatusTypeDO> pageResult = businessStatusTypeService.getBusinessStatusTypePage(pageReqVO);
         // 处理部门回显
-        // TODO @ljlleo：可以使用 CollectionUtils.convertSet 替代常用的 stream 操作，更简洁一点；下面几个也是哈；
-        Set<Long> deptIds = pageResult.getList().stream()
-                .map(CrmBusinessStatusTypeDO::getDeptIds)
-                .filter(Objects::nonNull)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toSet());
+        Set<Long> deptIds = CollectionUtils.convertSetByFlatMap(pageResult.getList(), CrmBusinessStatusTypeDO::getDeptIds,Collection::stream);
         List<DeptRespDTO> deptList = deptApi.getDeptList(deptIds);
         return success(CrmBusinessStatusTypeConvert.INSTANCE.convertPage(pageResult, deptList));
     }

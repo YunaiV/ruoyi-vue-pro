@@ -17,8 +17,8 @@ public class YudaoFlowableConfiguration {
      *
      * 如果不创建，会导致项目启动时，Flowable 报错的问题
      */
-    @Bean
-    @ConditionalOnMissingBean
+    @Bean(name = "applicationTaskExecutor")
+    @ConditionalOnMissingBean(name = "applicationTaskExecutor")
     public AsyncListenableTaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(8);

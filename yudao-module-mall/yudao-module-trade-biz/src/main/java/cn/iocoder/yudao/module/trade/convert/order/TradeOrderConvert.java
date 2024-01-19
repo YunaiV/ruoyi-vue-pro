@@ -69,8 +69,7 @@ public interface TradeOrderConvert {
             @Mapping(source = "calculateRespBO.price.vipPrice", target = "vipPrice"),
             @Mapping(source = "calculateRespBO.price.payPrice", target = "payPrice")
     })
-    TradeOrderDO convert(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO,
-                         TradePriceCalculateRespBO calculateRespBO);
+    TradeOrderDO convert(Long userId, AppTradeOrderCreateReqVO createReqVO, TradePriceCalculateRespBO calculateRespBO);
 
     TradeOrderRespDTO convert(TradeOrderDO orderDO);
 

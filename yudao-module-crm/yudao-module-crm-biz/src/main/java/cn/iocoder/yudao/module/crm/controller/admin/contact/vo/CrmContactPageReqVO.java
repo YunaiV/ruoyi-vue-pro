@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.crm.controller.admin.contact.vo;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.crm.enums.common.CrmSceneTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,5 +34,9 @@ public class CrmContactPageReqVO extends PageParam {
 
     @Schema(description = "微信", example = "zzZ98373")
     private String wechat;
+
+    @Schema(description = "场景类型", example = "1")
+    @InEnum(CrmSceneTypeEnum.class)
+    private Integer sceneType; // 场景类型，为 null 时则表示全部
 
 }

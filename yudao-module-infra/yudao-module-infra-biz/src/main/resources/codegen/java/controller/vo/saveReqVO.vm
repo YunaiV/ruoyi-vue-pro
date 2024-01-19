@@ -5,7 +5,6 @@ import lombok.*;
 import java.util.*;
 import jakarta.validation.constraints.*;
 ## 处理 BigDecimal 字段的引入
-import java.util.*;
 #foreach ($column in $columns)
 #if (${column.javaType} == "BigDecimal")
 import java.math.BigDecimal;

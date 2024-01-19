@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.trade.controller.app.order.vo;
 
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemRespVO;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -19,6 +20,9 @@ public class AppTradeOrderDetailRespVO {
 
     @Schema(description = "订单流水号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1146347329394184195")
     private String no;
+
+    @Schema(description = "订单类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
+    private Integer type;
 
     @Schema(description = "下单时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
@@ -117,6 +121,12 @@ public class AppTradeOrderDetailRespVO {
     private String pickUpVerifyCode;
 
     // ========== 售后基本信息 ==========
+
+    @Schema(description = "售后状态", example = "0")
+    private Integer refundStatus;
+
+    @Schema(description = "退款金额，单位：分", example = "100")
+    private Integer refundPrice;
 
     // ========== 营销基本信息 ==========
 

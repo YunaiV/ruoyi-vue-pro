@@ -1,15 +1,13 @@
 package cn.iocoder.yudao.module.crm.service.business;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessCreateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessMapper;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-
-import jakarta.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -39,7 +37,7 @@ public class CrmBusinessServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateBusiness_success() {
         // 准备参数
-        CrmBusinessCreateReqVO reqVO = randomPojo(CrmBusinessCreateReqVO.class);
+        CrmBusinessSaveReqVO reqVO = randomPojo(CrmBusinessSaveReqVO.class);
 
         // 调用
         Long businessId = businessService.createBusiness(reqVO, getLoginUserId());
@@ -56,7 +54,7 @@ public class CrmBusinessServiceImplTest extends BaseDbUnitTest {
         CrmBusinessDO dbBusiness = randomPojo(CrmBusinessDO.class);
         businessMapper.insert(dbBusiness);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        CrmBusinessUpdateReqVO reqVO = randomPojo(CrmBusinessUpdateReqVO.class, o -> {
+        CrmBusinessSaveReqVO reqVO = randomPojo(CrmBusinessSaveReqVO.class, o -> {
             o.setId(dbBusiness.getId()); // 设置更新的 ID
         });
 
@@ -70,7 +68,7 @@ public class CrmBusinessServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateBusiness_notExists() {
         // 准备参数
-        CrmBusinessUpdateReqVO reqVO = randomPojo(CrmBusinessUpdateReqVO.class);
+        CrmBusinessSaveReqVO reqVO = randomPojo(CrmBusinessSaveReqVO.class);
 
         // 调用, 并断言异常
         assertServiceException(() -> businessService.updateBusiness(reqVO), BUSINESS_NOT_EXISTS);

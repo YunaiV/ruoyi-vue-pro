@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.promotion.controller.app.coupon;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
@@ -43,11 +44,25 @@ public class AppCouponTemplateController {
     @Resource
     private ProductSpuApi productSpuApi;
 
+    @GetMapping("/get")
+    @Operation(summary = "获得优惠劵模版")
+    @Parameter(name = "id", description = "优惠券模板编号", required = true, example = "1024")
+    public CommonResult<AppCouponTemplateRespVO> getCouponTemplate(Long id) {
+        CouponTemplateDO template = couponTemplateService.getCouponTemplate(id);
+        if (template == null) {
+            return success(null);
+        }
+        // 处理是否可领取
+        Map<Long, Boolean> canCanTakeMap = couponService.getUserCanCanTakeMap(getLoginUserId(), List.of(template));
+        return success(BeanUtils.toBean(template, AppCouponTemplateRespVO.class)
+                .setCanTake(canCanTakeMap.get(template.getId())));
+    }
+
     @GetMapping("/list")
     @Operation(summary = "获得优惠劵模版列表")
     @Parameters({
             @Parameter(name = "spuId", description = "商品 SPU 编号"), // 目前主要给商品详情使用
-            @Parameter(name = "useType", description = "使用类型"),
+            @Parameter(name = "productScope", description = "使用类型"),
             @Parameter(name = "count", description = "数量", required = true)
     })
     public CommonResult<List<AppCouponTemplateRespVO>> getCouponTemplateList(

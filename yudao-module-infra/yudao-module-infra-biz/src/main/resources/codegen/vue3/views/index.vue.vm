@@ -240,7 +240,7 @@ import { dateFormatter } from '@/utils/formatTime'
 import { handleTree } from '@/utils/tree'
 #end
 import download from '@/utils/download'
-import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${table.businessName}'
+import { ${simpleClassName}Api, ${simpleClassName}VO } from '@/api/${table.moduleName}/${table.businessName}'
 import ${simpleClassName}Form from './${simpleClassName}Form.vue'
 ## 特殊：主子表专属逻辑
 #if ( $table.templateType != 10 )
@@ -249,16 +249,18 @@ import ${subSimpleClassName}List from './components/${subSimpleClassName}List.vu
 #end
 #end
 
+/** ${table.classComment} 列表 */
 defineOptions({ name: '${table.className}' })
 
 const message = useMessage() // 消息弹窗
 const { t } = useI18n() // 国际化
 
 const loading = ref(true) // 列表的加载中
-const list = ref([]) // 列表的数据
+const list = ref<${simpleClassName}VO[]>([]) // 列表的数据
 ## 特殊：树表专属逻辑（树不需要分页接口）
 #if ( $table.templateType != 2 )
-const total = ref(0) // 列表的总页数
+// 列表的总页数
+const total = ref(0)
 #end
 const queryParams = reactive({
 ## 特殊：树表专属逻辑（树不需要分页接口）

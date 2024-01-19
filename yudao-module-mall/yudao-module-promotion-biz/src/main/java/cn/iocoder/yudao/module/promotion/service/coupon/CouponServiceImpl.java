@@ -315,6 +315,11 @@ public class CouponServiceImpl implements CouponService {
         userIds.removeIf(userId -> MapUtil.getInt(userTakeCountMap, userId, 0) >= couponTemplate.getTakeLimitCount());
     }
 
+    @Override
+    public CouponDO getCoupon(Long userId, Long id) {
+        return couponMapper.selectByIdAndUserId(id, userId);
+    }
+
     /**
      * 获得自身的代理对象，解决 AOP 生效问题
      *
