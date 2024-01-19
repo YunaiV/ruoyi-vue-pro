@@ -3,7 +3,7 @@ package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePac
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
-import jakarta.validation.constraints.*;
+import ${jakartaPackage}.validation.constraints.*;
 ## 处理 BigDecimal 字段的引入
 #foreach ($column in $columns)
 #if (${column.javaType} == "BigDecimal")

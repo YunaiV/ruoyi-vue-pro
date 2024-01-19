@@ -70,7 +70,7 @@ public class CouponServiceImpl implements CouponService {
             throw exception(COUPON_STATUS_NOT_UNUSED);
         }
         // 校验有效期；为避免定时器没跑，实际优惠劵已经过期
-        if (LocalDateTimeUtils.isBetween(coupon.getValidStartTime(), coupon.getValidEndTime())) {
+        if (!LocalDateTimeUtils.isBetween(coupon.getValidStartTime(), coupon.getValidEndTime())) {
             throw exception(COUPON_VALID_TIME_NOT_NOW);
         }
     }
