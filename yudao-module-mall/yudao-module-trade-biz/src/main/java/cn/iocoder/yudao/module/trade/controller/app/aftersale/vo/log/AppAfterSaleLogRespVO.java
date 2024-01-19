@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.log;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDateTime;
