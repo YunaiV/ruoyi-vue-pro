@@ -27,12 +27,12 @@ public class AppCommentPageReqVO extends PageParam {
      */
     public static final Integer NEGATIVE_COMMENT = 3;
 
-    @Schema(description = "商品SPU编号", example = "29502")
-    @NotNull(message = "商品SPU编号不能为空")
+    @Schema(description = "商品 SPU 编号", example = "29502")
+    @NotNull(message = "商品 SPU 编号不能为空")
     private Long spuId;
 
     @Schema(description = "app 评论页 tab 类型 (0 全部、1 好评、2 中评、3 差评)", example = "0")
-    @NotNull(message = "商品SPU编号不能为空")
+    @NotNull(message = "商品 SPU 编号不能为空")
     private Integer type;
 
 }

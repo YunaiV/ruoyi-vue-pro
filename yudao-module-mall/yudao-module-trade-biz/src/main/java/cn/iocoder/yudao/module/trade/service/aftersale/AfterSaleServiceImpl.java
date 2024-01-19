@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.trade.service.aftersale;
 
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
@@ -262,7 +263,7 @@ public class AfterSaleServiceImpl implements AfterSaleService {
         // 记录售后日志
         AfterSaleLogUtils.setAfterSaleInfo(afterSale.getId(), afterSale.getStatus(),
                 AfterSaleStatusEnum.BUYER_DELIVERY.getStatus(),
-                MapUtil.<String, Object>builder().put("expressName", express.getName())
+                MapUtil.<String, Object>builder().put("deliveryName", express.getName())
                         .put("logisticsNo", deliveryReqVO.getLogisticsNo()).build());
 
         // TODO 发送售后消息
@@ -368,7 +369,8 @@ public class AfterSaleServiceImpl implements AfterSaleService {
             @Override
             public void afterCommit() {
                 // 创建退款单
-                PayRefundCreateReqDTO createReqDTO = AfterSaleConvert.INSTANCE.convert(userIp, afterSale, tradeOrderProperties);
+                PayRefundCreateReqDTO createReqDTO = AfterSaleConvert.INSTANCE.convert(userIp, afterSale, tradeOrderProperties)
+                        .setReason(StrUtil.format("退款【{}】", afterSale.getSpuName()));
                 Long payRefundId = payRefundApi.createRefund(createReqDTO);
                 // 更新售后单的退款单号
                 tradeAfterSaleMapper.updateById(new AfterSaleDO().setId(afterSale.getId()).setPayRefundId(payRefundId));

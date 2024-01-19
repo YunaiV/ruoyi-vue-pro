@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.controller.app.diy.vo;
 
+import com.fasterxml.jackson.annotation.JsonRawValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.ToString;
@@ -16,6 +17,7 @@ public class AppDiyPagePropertyRespVO {
     private String name;
 
     @Schema(description = "页面属性", example = "[]")
+    @JsonRawValue
     private String property;
 
 }

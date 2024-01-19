@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.pay.service.wallet;
 
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.recharge.AppPayWalletRechargeCreateReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletRechargeDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletRechargePackageDO;
 
 /**
  * 钱包充值 Service 接口
@@ -21,6 +24,18 @@ public interface PayWalletRechargeService {
      */
     PayWalletRechargeDO createWalletRecharge(Long userId, Integer userType, String userIp,
                                              AppPayWalletRechargeCreateReqVO createReqVO);
+
+    /**
+     * 获得钱包充值记录分页
+     *
+     * @param userId 用户编号
+     * @param userType 用户类型
+     * @param pageReqVO 分页请求
+     * @param payStatus 是否支付
+     * @return 钱包充值记录分页
+     */
+    PageResult<PayWalletRechargeDO> getWalletRechargePackagePage(Long userId, Integer userType,
+                                                                 PageParam pageReqVO, Boolean payStatus);
 
     /**
      * 更新钱包充值成功

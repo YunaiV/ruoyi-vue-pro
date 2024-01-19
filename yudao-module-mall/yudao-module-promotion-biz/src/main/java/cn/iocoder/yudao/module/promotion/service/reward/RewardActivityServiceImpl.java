@@ -11,14 +11,17 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.reward.RewardActivityMapper;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionActivityStatusEnum;
 import cn.iocoder.yudao.module.promotion.util.PromotionUtils;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 import static java.util.Arrays.asList;
 
@@ -100,10 +103,11 @@ public class RewardActivityServiceImpl implements RewardActivityService {
     }
 
     // TODO @芋艿：逻辑有问题，需要优化；要分成全场、和指定来校验；
+
     /**
      * 校验商品参加的活动是否冲突
      *
-     * @param id 活动编号
+     * @param id     活动编号
      * @param spuIds 商品 SPU 编号数组
      */
     private void validateRewardActivitySpuConflicts(Long id, Collection<Long> spuIds) {
@@ -125,7 +129,7 @@ public class RewardActivityServiceImpl implements RewardActivityService {
     /**
      * 获得商品参加的满减送活动的数组
      *
-     * @param spuIds 商品 SPU 编号数组
+     * @param spuIds   商品 SPU 编号数组
      * @param statuses 活动状态数组
      * @return 商品参加的满减送活动的数组
      */
@@ -161,6 +165,18 @@ public class RewardActivityServiceImpl implements RewardActivityService {
 //        return convertMap(productActivityList, activity -> activity,
 //                rewardActivityDO -> intersectionDistinct(rewardActivityDO.getProductSpuIds(), spuIds)); // 求交集返回
         return null;
+    }
+
+    @Override
+    public List<RewardActivityDO> getRewardActivityBySpuIdsAndStatusAndDateTimeLt(Collection<Long> spuIds, Integer status, LocalDateTime dateTime) {
+        // 1. 查询出指定 spuId 的 spu 参加的活动
+        List<RewardActivityDO> rewardActivityList = rewardActivityMapper.selectListBySpuIdsAndStatus(spuIds, status);
+        if (CollUtil.isEmpty(rewardActivityList)) {
+            return Collections.emptyList();
+        }
+
+        // 2. 查询活动详情
+        return rewardActivityMapper.selectListByIdsAndDateTimeLt(convertSet(rewardActivityList, RewardActivityDO::getId), dateTime);
     }
 
 }

@@ -2,17 +2,15 @@ package cn.iocoder.yudao.module.member.service.user;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
-import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserResetPasswordReqVO;
-import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateMobileReqVO;
-import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdatePasswordReqVO;
-import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateReqVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.*;
 import cn.iocoder.yudao.module.member.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
@@ -20,6 +18,8 @@ import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
 import cn.iocoder.yudao.module.member.mq.producer.user.MemberUserProducer;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeUseReqDTO;
+import cn.iocoder.yudao.module.system.api.social.SocialClientApi;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxPhoneNumberInfoRespDTO;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +56,9 @@ public class MemberUserServiceImpl implements MemberUserService {
     private SmsCodeApi smsCodeApi;
 
     @Resource
+    private SocialClientApi socialClientApi;
+
+    @Resource
     private PasswordEncoder passwordEncoder;
 
     @Resource
@@ -80,10 +83,17 @@ public class MemberUserServiceImpl implements MemberUserService {
             return user;
         }
         // 用户不存在，则进行创建
-        return createUser(mobile, registerIp, terminal);
+        return createUser(mobile, null, null, registerIp, terminal);
     }
 
-    private MemberUserDO createUser(String mobile, String registerIp, Integer terminal) {
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public MemberUserDO createUser(String nickname, String avtar, String registerIp, Integer terminal) {
+        return createUser(null, nickname, avtar, registerIp, terminal);
+    }
+
+    private MemberUserDO createUser(String mobile, String nickname, String avtar,
+                                    String registerIp, Integer terminal) {
         // 生成密码
         String password = IdUtil.fastSimpleUUID();
         // 插入用户
@@ -91,8 +101,12 @@ public class MemberUserServiceImpl implements MemberUserService {
         user.setMobile(mobile);
         user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
         user.setPassword(encodePassword(password)); // 加密密码
-        user.setRegisterIp(registerIp);
-        user.setRegisterTerminal(terminal);
+        user.setRegisterIp(registerIp).setRegisterTerminal(terminal);
+        user.setNickname(nickname).setAvatar(avtar); // 基础信息
+        if (StrUtil.isEmpty(nickname)) {
+            // 昵称为空时，随机一个名字，避免一些依赖 nickname 的逻辑报错，或者有点丑。例如说，短信发送有昵称时~
+            user.setNickname("用户" + RandomUtil.randomNumbers(6));
+        }
         memberUserMapper.insert(user);
 
         // 发送 MQ 消息：用户创建
@@ -128,27 +142,43 @@ public class MemberUserServiceImpl implements MemberUserService {
 
     @Override
     public void updateUser(Long userId, AppMemberUserUpdateReqVO reqVO) {
-        memberUserMapper.updateById(new MemberUserDO().setId(userId)
-                .setNickname(reqVO.getNickname()).setAvatar(reqVO.getAvatar()));
+        MemberUserDO updateObj = BeanUtils.toBean(reqVO, MemberUserDO.class).setId(userId);
+        memberUserMapper.updateById(updateObj);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateUserMobile(Long userId, AppMemberUserUpdateMobileReqVO reqVO) {
-        // 检测用户是否存在
+        // 1.1 检测用户是否存在
         MemberUserDO user = validateUserExists(userId);
-        // 校验新手机是否已经被绑定
+        // 1.2 校验新手机是否已经被绑定
         validateMobileUnique(null, reqVO.getMobile());
 
-        // 校验旧手机和旧验证码
-        smsCodeApi.useSmsCode(new SmsCodeUseReqDTO().setMobile(user.getMobile()).setCode(reqVO.getOldCode())
-                .setScene(SmsSceneEnum.MEMBER_UPDATE_MOBILE.getScene()).setUsedIp(getClientIP()));
-        // 使用新验证码
+        // 2.1 校验旧手机和旧验证码
+        // 补充说明：从安全性来说，老手机也校验 oldCode 验证码会更安全。但是由于 uni-app 商城界面暂时没做，所以这里不强制校验
+        if (StrUtil.isNotEmpty(reqVO.getOldCode())) {
+            smsCodeApi.useSmsCode(new SmsCodeUseReqDTO().setMobile(user.getMobile()).setCode(reqVO.getOldCode())
+                    .setScene(SmsSceneEnum.MEMBER_UPDATE_MOBILE.getScene()).setUsedIp(getClientIP()));
+        }
+        // 2.2 使用新验证码
         smsCodeApi.useSmsCode(new SmsCodeUseReqDTO().setMobile(reqVO.getMobile()).setCode(reqVO.getCode())
                 .setScene(SmsSceneEnum.MEMBER_UPDATE_MOBILE.getScene()).setUsedIp(getClientIP()));
 
-        // 更新用户手机
+        // 3. 更新用户手机
         memberUserMapper.updateById(MemberUserDO.builder().id(userId).mobile(reqVO.getMobile()).build());
+    }
+
+    @Override
+    public void updateUserMobileByWeixin(Long userId, AppMemberUserUpdateMobileByWeixinReqVO reqVO) {
+        // 1.1 获得对应的手机号信息
+        SocialWxPhoneNumberInfoRespDTO phoneNumberInfo = socialClientApi.getWxMaPhoneNumberInfo(
+                UserTypeEnum.MEMBER.getValue(), reqVO.getCode());
+        Assert.notNull(phoneNumberInfo, "获得手机信息失败，结果为空");
+        // 1.2 校验新手机是否已经被绑定
+        validateMobileUnique(userId, phoneNumberInfo.getPhoneNumber());
+
+        // 2. 更新用户手机
+        memberUserMapper.updateById(MemberUserDO.builder().id(userId).mobile(phoneNumberInfo.getPhoneNumber()).build());
     }
 
     @Override

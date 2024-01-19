@@ -60,4 +60,12 @@ public interface PayWalletRechargePackageService {
      */
     PageResult<PayWalletRechargePackageDO> getWalletRechargePackagePage(WalletRechargePackagePageReqVO pageReqVO);
 
+    /**
+     * 获得充值套餐列表
+     *
+     * @param status 状态
+     * @return 充值套餐列表
+     */
+    List<PayWalletRechargePackageDO> getWalletRechargePackageList(Integer status);
+
 }

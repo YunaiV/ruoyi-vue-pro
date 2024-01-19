@@ -26,7 +26,6 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.AUTH_THIRD_LOGIN_NOT_BIND;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SOCIAL_USER_NOT_FOUND;
 
 /**
@@ -94,18 +93,30 @@ public class SocialUserServiceImpl implements SocialUserService {
     }
 
     @Override
-    public SocialUserRespDTO getSocialUser(Integer userType, Integer socialType, String code, String state) {
+    public SocialUserRespDTO getSocialUserByUserId(Integer userType, Long userId, Integer socialType) {
+        // 获得绑定用户
+        SocialUserBindDO socialUserBind = socialUserBindMapper.selectByUserIdAndUserTypeAndSocialType(userId, userType, socialType);
+        if (socialUserBind == null) {
+            return null;
+        }
+        // 获得社交用户
+        SocialUserDO socialUser = socialUserMapper.selectById(socialUserBind.getSocialUserId());
+        Assert.notNull(socialUser, "社交用户不能为空");
+        return new SocialUserRespDTO(socialUser.getOpenid(), socialUser.getNickname(), socialUser.getAvatar(),
+                socialUserBind.getUserId());
+    }
+
+    @Override
+    public SocialUserRespDTO getSocialUserByCode(Integer userType, Integer socialType, String code, String state) {
         // 获得社交用户
         SocialUserDO socialUser = authSocialUser(socialType, userType, code, state);
         Assert.notNull(socialUser, "社交用户不能为空");
 
-        // 如果未绑定的社交用户，则无法自动登录，进行报错
+        // 获得绑定用户
         SocialUserBindDO socialUserBind = socialUserBindMapper.selectByUserTypeAndSocialUserId(userType,
                 socialUser.getId());
-        if (socialUserBind == null) {
-            throw exception(AUTH_THIRD_LOGIN_NOT_BIND);
-        }
-        return new SocialUserRespDTO(socialUser.getOpenid(), socialUserBind.getUserId());
+        return new SocialUserRespDTO(socialUser.getOpenid(), socialUser.getNickname(), socialUser.getAvatar(),
+                socialUserBind != null ? socialUserBind.getUserId() : null);
     }
 
     /**

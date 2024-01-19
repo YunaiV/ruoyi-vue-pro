@@ -21,11 +21,11 @@ public class CrmBusinessStatusSaveReqVO {
     @NotEmpty(message = "状态名不能为空")
     private String name;
 
-    // TODO @lilleo：percent 应该是 Integer；
+    // TODO @lzxhqs：：percent 应该是 Integer；
     @Schema(description = "赢单率")
     private String percent;
 
-    // TODO @lilleo：这个是不是不用前端新增和修改的时候传递，交给顺序计算出来，存储起来就好了；
+    // TODO @lzxhqs：这个是不是不用前端新增和修改的时候传递，交给顺序计算出来，存储起来就好了；
     @Schema(description = "排序")
     private Integer sort;
 

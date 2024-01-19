@@ -71,6 +71,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
         if (StrUtil.isNotEmpty(config.getPrivateCertContent())) {
             payConfig.setPrivateCertPath(FileUtils.createTempFile(config.getPrivateCertContent()).getPath());
         }
+//        payConfig.setCertSerialNo();
 
         // 创建 client 客户端
         client = new WxPayServiceImpl();

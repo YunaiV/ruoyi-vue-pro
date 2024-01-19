@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.product.service.property;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValuePageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueUpdateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueSaveReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
 
 import java.util.Collection;
@@ -23,14 +22,14 @@ public interface ProductPropertyValueService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createPropertyValue(ProductPropertyValueCreateReqVO createReqVO);
+    Long createPropertyValue(ProductPropertyValueSaveReqVO createReqVO);
 
     /**
      * 更新属性值
      *
      * @param updateReqVO 更新信息
      */
-    void updatePropertyValue(ProductPropertyValueUpdateReqVO updateReqVO);
+    void updatePropertyValue(ProductPropertyValueSaveReqVO updateReqVO);
 
     /**
      * 删除属性值

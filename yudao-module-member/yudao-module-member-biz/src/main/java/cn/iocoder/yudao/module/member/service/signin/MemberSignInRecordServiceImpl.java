@@ -19,14 +19,12 @@ import cn.iocoder.yudao.module.member.enums.point.MemberPointBizTypeEnum;
 import cn.iocoder.yudao.module.member.service.level.MemberLevelService;
 import cn.iocoder.yudao.module.member.service.point.MemberPointRecordService;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
+import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
-import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -77,48 +75,13 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
         }
         summary.setTodaySignIn(DateUtils.isToday(lastRecord.getCreateTime()));
 
-        // 4. 校验今天是否签到，没有签到则直接返回
+        // 4.1 校验今天是否签到，没有签到则直接返回
         if (!summary.getTodaySignIn()) {
             return summary;
         }
-        // 4.1. 判断连续签到天数
-        // TODO @puhui999：连续签到，可以基于 lastRecord 的 day 和当前时间判断呀？按 day 统计连续签到天数可能不准确
-        //      1. day 只是记录第几天签到的有可能不连续，比如第一次签到是周一，第二次签到是周三这样 lastRecord 的 day 为 2 但是并不是连续的两天
-        //      2. day 超出签到规则的最大天数会重置到从第一天开始签到（我理解为开始下一轮，类似一周签到七天七天结束下周又从周一开始签到）
-        // 1. 回复：周三签到，day 要归 1 呀。连续签到哈；
-        List<MemberSignInRecordDO> signInRecords = signInRecordMapper.selectListByUserId(userId);
-        signInRecords.sort(Comparator.comparing(MemberSignInRecordDO::getCreateTime).reversed()); // 根据签到时间倒序
-        summary.setContinuousDay(calculateConsecutiveDays(signInRecords));
+        // 4.2 连续签到天数
+        summary.setContinuousDay(lastRecord.getDay());
         return summary;
-    }
-
-    /**
-     * 计算连续签到天数
-     *
-     * @param signInRecords 签到记录列表
-     * @return int 连续签到天数
-     */
-    public int calculateConsecutiveDays(List<MemberSignInRecordDO> signInRecords) {
-        int consecutiveDays = 1;  // 初始连续天数为1
-        LocalDate previousDate = null;
-
-        for (MemberSignInRecordDO record : signInRecords) {
-            LocalDate currentDate = record.getCreateTime().toLocalDate();
-
-            if (previousDate != null) {
-                // 检查相邻两个日期是否连续
-                if (currentDate.minusDays(1).isEqual(previousDate)) {
-                    consecutiveDays++;
-                } else {
-                    // 如果日期不连续，停止遍历
-                    break;
-                }
-            }
-
-            previousDate = currentDate;
-        }
-
-        return consecutiveDays;
     }
 
     @Override

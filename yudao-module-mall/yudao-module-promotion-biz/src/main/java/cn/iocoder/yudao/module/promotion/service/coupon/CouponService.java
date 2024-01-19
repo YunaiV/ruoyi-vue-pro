@@ -168,4 +168,13 @@ public interface CouponService {
      */
     Map<Long, Boolean> getUserCanCanTakeMap(Long userId, List<CouponTemplateDO> templates);
 
+    /**
+     * 获得优惠劵
+     *
+     * @param userId 用户编号
+     * @param id     编号
+     * @return 优惠劵
+     */
+    CouponDO getCoupon(Long userId, Long id);
+
 }
