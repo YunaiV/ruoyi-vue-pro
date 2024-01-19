@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class AppMemberPointRecordRespVO {
 
     @Schema(description = "自增主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "31457")
-    private Long id;;
+    private Long id;
 
     @Schema(description = "积分标题", requiredMode = Schema.RequiredMode.REQUIRED, example = "你猜")
     private String title;
