@@ -7,7 +7,6 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-
 /**
  * 跟进信息 Update Req BO
  *

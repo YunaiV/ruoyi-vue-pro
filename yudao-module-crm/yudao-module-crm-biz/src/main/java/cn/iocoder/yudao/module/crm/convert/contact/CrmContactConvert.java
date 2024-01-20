@@ -70,8 +70,8 @@ public interface CrmContactConvert {
     @Mapping(target = "id", source = "reqBO.bizId")
     CrmContactDO convert(CrmUpdateFollowUpReqBO reqBO);
 
-    default List<CrmContactDO> convertList(List<CrmUpdateFollowUpReqBO> updateFollowUpReqBOList) {
-        return CollectionUtils.convertList(updateFollowUpReqBOList, INSTANCE::convert);
+    default List<CrmContactDO> convertList(List<CrmUpdateFollowUpReqBO> list) {
+        return CollectionUtils.convertList(list, INSTANCE::convert);
     }
 
 }

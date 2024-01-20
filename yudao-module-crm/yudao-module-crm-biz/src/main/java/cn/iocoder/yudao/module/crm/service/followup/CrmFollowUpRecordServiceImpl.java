@@ -66,6 +66,7 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
         crmFollowUpRecordMapper.insert(followUpRecord);
 
         LocalDateTime now = LocalDateTime.now();
+        // TODO @puhui999：感觉可以这里基于 type 做 102 到 104 这种判断；然后，每个类型的调用封装一个小方法，之后调用这些小方法；再之后，74-76、80-82 也是等价的处理；
         // 2. 更新 bizId 对应的记录；
         updateBizTypeFollowUp(followUpRecord, now);
         // 3.1 更新 contactIds 对应的记录
