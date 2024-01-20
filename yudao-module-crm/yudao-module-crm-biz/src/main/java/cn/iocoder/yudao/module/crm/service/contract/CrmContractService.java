@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractSaveR
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-import cn.iocoder.yudao.module.crm.service.contract.bo.CrmContractUpdateFollowUpReqBO;
+import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import jakarta.validation.Valid;
 
 import java.util.Collection;
@@ -55,7 +55,7 @@ public interface CrmContractService {
      *
      * @param contractUpdateFollowUpReqBO 信息
      */
-    void updateContractFollowUp(CrmContractUpdateFollowUpReqBO contractUpdateFollowUpReqBO);
+    void updateContractFollowUp(CrmUpdateFollowUpReqBO contractUpdateFollowUpReqBO);
 
     /**
      * 获得合同

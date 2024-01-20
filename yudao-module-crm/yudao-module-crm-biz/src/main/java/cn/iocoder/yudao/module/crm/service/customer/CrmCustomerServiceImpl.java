@@ -21,7 +21,7 @@ import cn.iocoder.yudao.module.crm.framework.permission.core.util.CrmPermissionU
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
-import cn.iocoder.yudao.module.crm.service.customer.bo.CrmCustomerUpdateFollowUpReqBO;
+import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -205,8 +205,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     }
 
     @Override
-    public void updateCustomerFollowUp(CrmCustomerUpdateFollowUpReqBO customerUpdateFollowUpReqBO) {
-        customerMapper.updateById(BeanUtils.toBean(customerUpdateFollowUpReqBO, CrmCustomerDO.class));
+    public void updateCustomerFollowUp(CrmUpdateFollowUpReqBO customerUpdateFollowUpReqBO) {
+        customerMapper.updateById(BeanUtils.toBean(customerUpdateFollowUpReqBO, CrmCustomerDO.class).setId(customerUpdateFollowUpReqBO.getBizId()));
     }
 
     // ==================== 公海相关操作 ====================

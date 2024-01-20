@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTransferReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTransformReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
-import cn.iocoder.yudao.module.crm.service.clue.bo.CrmClueUpdateFollowUpReqBO;
+import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import jakarta.validation.Valid;
 
 import java.util.Collection;
@@ -39,7 +39,7 @@ public interface CrmClueService {
      *
      * @param clueUpdateFollowUpReqBO 信息
      */
-    void updateClueFollowUp(CrmClueUpdateFollowUpReqBO clueUpdateFollowUpReqBO);
+    void updateClueFollowUp(CrmUpdateFollowUpReqBO clueUpdateFollowUpReqBO);
 
     /**
      * 删除线索

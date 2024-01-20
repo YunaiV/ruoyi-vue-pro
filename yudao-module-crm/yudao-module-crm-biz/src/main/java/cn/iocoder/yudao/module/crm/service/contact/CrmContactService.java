@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactSaveReq
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactTransferReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-import cn.iocoder.yudao.module.crm.service.contact.bo.CrmContactUpdateFollowUpReqBO;
+import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import jakarta.validation.Valid;
 
 import java.util.Collection;
@@ -63,7 +63,7 @@ public interface CrmContactService {
      *
      * @param updateFollowUpReqBOList 跟进信息
      */
-    void updateContactFollowUpBatch(List<CrmContactUpdateFollowUpReqBO> updateFollowUpReqBOList);
+    void updateContactFollowUpBatch(List<CrmUpdateFollowUpReqBO> updateFollowUpReqBOList);
 
     /**
      * 获得联系人

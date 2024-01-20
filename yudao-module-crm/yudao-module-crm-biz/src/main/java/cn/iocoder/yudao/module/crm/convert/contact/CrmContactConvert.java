@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactTransferReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.mapstruct.Mapper;
@@ -64,6 +65,13 @@ public interface CrmContactConvert {
         contactRespVO.setAreaName(AreaUtils.format(contactRespVO.getAreaId()));
         findAndThen(userMap, contactRespVO.getOwnerUserId(), user -> contactRespVO.setOwnerUserName(user.getNickname()));
         findAndThen(userMap, Long.parseLong(contactRespVO.getCreator()), user -> contactRespVO.setCreatorName(user.getNickname()));
+    }
+
+    @Mapping(target = "id", source = "reqBO.bizId")
+    CrmContactDO convert(CrmUpdateFollowUpReqBO reqBO);
+
+    default List<CrmContactDO> convertList(List<CrmUpdateFollowUpReqBO> updateFollowUpReqBOList) {
+        return CollectionUtils.convertList(updateFollowUpReqBOList, INSTANCE::convert);
     }
 
 }

@@ -16,8 +16,8 @@ import cn.iocoder.yudao.module.crm.dal.mysql.clue.CrmClueMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
-import cn.iocoder.yudao.module.crm.service.clue.bo.CrmClueUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
+import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import jakarta.annotation.Resource;
@@ -84,8 +84,8 @@ public class CrmClueServiceImpl implements CrmClueService {
     }
 
     @Override
-    public void updateClueFollowUp(CrmClueUpdateFollowUpReqBO clueUpdateFollowUpReqBO) {
-        clueMapper.updateById(BeanUtils.toBean(clueUpdateFollowUpReqBO, CrmClueDO.class));
+    public void updateClueFollowUp(CrmUpdateFollowUpReqBO clueUpdateFollowUpReqBO) {
+        clueMapper.updateById(BeanUtils.toBean(clueUpdateFollowUpReqBO, CrmClueDO.class).setId(clueUpdateFollowUpReqBO.getBizId()));
     }
 
     @Override
