@@ -69,7 +69,6 @@ public class CrmClueServiceImpl implements CrmClueService {
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_LEADS_TYPE, subType = CRM_LEADS_CREATE_SUB_TYPE, bizNo = "{{#clue.id}}",
             success = CRM_LEADS_CREATE_SUCCESS)
-    // TODO @min：补充相关几个方法的操作日志；
     public Long createClue(CrmClueSaveReqVO createReqVO) {
         // 1. 校验关联数据
         validateRelationDataExists(createReqVO);
@@ -111,7 +110,6 @@ public class CrmClueServiceImpl implements CrmClueService {
         // 3. 记录操作日志上下文
         LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldClue, CrmCustomerSaveReqVO.class));
         LogRecordContext.putVariable("clueName", oldClue.getName());
-
     }
 
     @Override
@@ -189,23 +187,21 @@ public class CrmClueServiceImpl implements CrmClueService {
             throw exception(CLUE_ANY_CLUE_NOT_EXISTS, StrUtil.join(",", clueIds));
         }
 
-        // 过滤出未转化的客户
-        List<CrmClueDO> unTransformClues = CollectionUtils.filterList(clues,
-                clue -> ObjectUtil.notEqual(Boolean.TRUE, clue.getTransformStatus()));
         // 存在已经转化的，直接提示哈。避免操作的用户，以为都转化成功了
-        if (ObjectUtil.notEqual(clues.size(), unTransformClues.size())) {
-            clueIds.removeAll(convertSet(unTransformClues, CrmClueDO::getId));
-            throw exception(CLUE_ANY_CLUE_ALREADY_TRANSLATED, StrUtil.join(",", clueIds));
+        List<CrmClueDO> translatedClues = CollectionUtils.filterList(clues,
+                clue -> ObjectUtil.equal(Boolean.TRUE, clue.getTransformStatus()));
+        if (CollUtil.isNotEmpty(translatedClues)) {
+            throw exception(CLUE_ANY_CLUE_ALREADY_TRANSLATED, StrUtil.join(",", convertSet(translatedClues, CrmClueDO::getId)));
         }
 
         // 遍历线索(未转化的线索)，创建对应的客户
-        unTransformClues.forEach(clue -> {
+        reqVO.getIds().forEach(id -> {
             // 1. 创建客户
-            CrmCustomerSaveReqVO customerSaveReqVO = BeanUtils.toBean(clue, CrmCustomerSaveReqVO.class).setId(null);
+            CrmCustomerSaveReqVO customerSaveReqVO = BeanUtils.toBean(id, CrmCustomerSaveReqVO.class).setId(null);
             Long customerId = customerService.createCustomer(customerSaveReqVO, userId);
             // TODO @puhui999：如果有跟进记录，需要一起转过去；提问：艿艿这里是复制线索所有的跟进吗？还是直接把线索相关的跟进 bizType、bizId 全改为关联客户？
             // 2. 更新线索
-            clueMapper.updateById(new CrmClueDO().setId(clue.getId())
+            clueMapper.updateById(new CrmClueDO().setId(id)
                     .setTransformStatus(Boolean.TRUE).setCustomerId(customerId));
         });
     }
