@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.crm.service.clue;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -23,6 +24,9 @@ import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import com.mzt.logapi.context.LogRecordContext;
+import com.mzt.logapi.service.impl.DiffParseFunction;
+import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +41,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_EXISTS;
 
 /**
@@ -62,6 +67,9 @@ public class CrmClueServiceImpl implements CrmClueService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @LogRecord(type = CRM_LEADS_TYPE, subType = CRM_LEADS_CREATE_SUB_TYPE, bizNo = "{{#clue.id}}",
+            success = CRM_LEADS_CREATE_SUCCESS)
+    // TODO @min：补充相关几个方法的操作日志；
     public Long createClue(CrmClueSaveReqVO createReqVO) {
         // 1. 校验关联数据
         validateRelationDataExists(createReqVO);
@@ -79,20 +87,31 @@ public class CrmClueServiceImpl implements CrmClueService {
                 .setLevel(CrmPermissionLevelEnum.OWNER.getLevel());
         crmPermissionService.createPermission(createReqBO);
 
+        // 4. 记录操作日志上下文
+        LogRecordContext.putVariable("clue", clue);
         return clue.getId();
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    @LogRecord(type = CRM_LEADS_TYPE, subType = CRM_LEADS_UPDATE_SUB_TYPE, bizNo = "{{#updateReqVO.id}}",
+            success = CRM_LEADS_UPDATE_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_LEADS, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateClue(CrmClueSaveReqVO updateReqVO) {
-        // 校验线索是否存在
-        validateClueExists(updateReqVO.getId());
-        // 校验关联数据
+        Assert.notNull(updateReqVO.getId(), "线索编号不能为空");
+        // 1. 校验线索是否存在
+        CrmClueDO oldClue = validateClueExists(updateReqVO.getId());
+        // 2. 校验关联数据
         validateRelationDataExists(updateReqVO);
 
-        // 更新
+        // 3. 更新
         CrmClueDO updateObj = BeanUtils.toBean(updateReqVO, CrmClueDO.class);
         clueMapper.updateById(updateObj);
+
+        // 3. 记录操作日志上下文
+        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldClue, CrmCustomerSaveReqVO.class));
+        LogRecordContext.putVariable("clueName", oldClue.getName());
+
     }
 
     @Override
@@ -102,6 +121,8 @@ public class CrmClueServiceImpl implements CrmClueService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @LogRecord(type = CRM_LEADS_TYPE, subType = CRM_LEADS_DELETE_SUB_TYPE, bizNo = "{{#id}}",
+            success = CRM_LEADS_DELETE_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_LEADS, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void deleteClue(Long id) {
         // 1. 校验存在
@@ -113,6 +134,8 @@ public class CrmClueServiceImpl implements CrmClueService {
         // 3. 删除数据权限
         crmPermissionService.deletePermission(CrmBizTypeEnum.CRM_LEADS.getType(), id);
 
+        // 4. 记录操作日志上下文
+        LogRecordContext.putVariable("clueName", clue.getName());
     }
 
     private CrmClueDO validateClueExists(Long id) {
