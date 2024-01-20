@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusi
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import jakarta.validation.Valid;
 
 import java.util.Collection;
@@ -34,6 +35,13 @@ public interface CrmBusinessService {
      * @param updateReqVO 更新信息
      */
     void updateBusiness(@Valid CrmBusinessSaveReqVO updateReqVO);
+
+    /**
+     * 更新商机相关跟进信息
+     *
+     * @param updateFollowUpReqBOList 跟进信息
+     */
+    void updateBusinessFollowUpBatch(List<CrmUpdateFollowUpReqBO> updateFollowUpReqBOList);
 
     /**
      * 删除商机

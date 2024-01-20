@@ -7,14 +7,22 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessTransferReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.product.CrmBusinessProductSaveReqVO;
 import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
+import cn.iocoder.yudao.module.crm.convert.businessproduct.CrmBusinessProductConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactBusinessDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessMapper;
+import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessProductMapper;
+import cn.iocoder.yudao.module.crm.dal.mysql.contactbusinesslink.CrmContactBusinessMapper;
+import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactBusinessService;
+import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import com.mzt.logapi.context.LogRecordContext;
@@ -25,11 +33,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.BUSINESS_CONTRACT_EXISTS;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.BUSINESS_NOT_EXISTS;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
 
@@ -46,6 +56,15 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     private CrmBusinessMapper businessMapper;
 
     @Resource
+    private CrmBusinessProductMapper businessProductMapper;
+    // TODO @lzxhqs：不直接调用这个 mapper，要调用对方的 service；每个业务独立收敛
+    @Resource
+    private CrmContractMapper contractMapper;
+
+    // TODO @lzxhqs：不直接调用这个 mapper，要调用对方的 service；每个业务独立收敛
+    @Resource
+    private CrmContactBusinessMapper contactBusinessMapper;
+    @Resource
     private CrmPermissionService permissionService;
     @Resource
     private CrmContactBusinessService contactBusinessService;
@@ -61,16 +80,70 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
                 .setOwnerUserId(userId);
         businessMapper.insert(business);
         // TODO 商机待定：插入商机与产品的关联表；校验商品存在
-
+        // TODO lzxhqs：新增时，是不是不用调用这个方法哈；
+        verifyCrmBusinessProduct(business.getId());
+        // TODO @lzxhqs：用 CollUtils.isNotEmpty；
+        if (!createReqVO.getProducts().isEmpty()) {
+            createBusinessProducts(createReqVO.getProducts(), business.getId());
+        }
         // TODO 商机待定：在联系人的详情页，如果直接【新建商机】，则需要关联下。这里要搞个 CrmContactBusinessDO 表
+        createContactBusiness(business.getId(), createReqVO.getContactId());
 
         // 2. 创建数据权限
+        // 设置当前操作的人为负责人
         permissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType())
-                .setBizId(business.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
+                .setBizId(business.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
 
         // 4. 记录操作日志上下文
         LogRecordContext.putVariable("business", business);
         return business.getId();
+    }
+
+    // TODO @lzxhqs：CrmContactBusinessService 调用这个；这样逻辑才能收敛哈；
+    /**
+     * @param businessId 商机id
+     * @param contactId  联系人id
+     * @throws
+     * @description 联系人与商机的关联
+     * @author lzxhqs
+     */
+    private void createContactBusiness(Long businessId, Long contactId) {
+        CrmContactBusinessDO contactBusiness = new CrmContactBusinessDO();
+        contactBusiness.setBusinessId(businessId);
+        contactBusiness.setContactId(contactId);
+        contactBusinessMapper.insert(contactBusiness);
+
+    }
+
+    // TODO @lzxhqs：这个方法注释格式不对；删除@description，然后把 插入商机产品关联表 作为方法注释；
+    /**
+     * @param products 产品集合
+     * @description 插入商机产品关联表
+     * @author lzxhqs
+     */
+    private void createBusinessProducts(List<CrmBusinessProductSaveReqVO> products, Long businessId) {
+        // TODO @lzxhqs：可以用 CollectionUtils.convertList；
+        List<CrmBusinessProductDO> list = new ArrayList<>();
+        for (CrmBusinessProductSaveReqVO product : products) {
+            CrmBusinessProductDO businessProductDO = CrmBusinessProductConvert.INSTANCE.convert(product);
+            businessProductDO.setBusinessId(businessId);
+            list.add(businessProductDO);
+        }
+        businessProductMapper.insertBatch(list);
+    }
+
+    /**
+     * @param id businessId
+     * @description 校验管理的产品存在则删除
+     * @author lzxhqs
+     */
+    private void verifyCrmBusinessProduct(Long id) {
+        CrmBusinessProductDO businessProductDO = businessProductMapper.selectByBusinessId(id);
+        if (businessProductDO != null) {
+            //通过商机Id删除
+            businessProductMapper.deleteByBusinessId(id);
+        }
+
     }
 
     @Override
@@ -86,11 +159,21 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         CrmBusinessDO updateObj = BeanUtils.toBean(updateReqVO, CrmBusinessDO.class);
         businessMapper.updateById(updateObj);
         // TODO 商机待定：插入商机与产品的关联表；校验商品存在
+        // TODO @lzxhqs：更新时，可以调用 CollectionUtils 的 diffList，尽量避免这种先删除再插入；而是新增的插入、变更的更新，没的删除；不然这个表每次更新，会多好多数据；
+        verifyCrmBusinessProduct(updateReqVO.getId());
+        if (!updateReqVO.getProducts().isEmpty()) {
+            createBusinessProducts(updateReqVO.getProducts(), updateReqVO.getId());
+        }
 
         // TODO @商机待定：如果状态发生变化，插入商机状态变更记录表
         // 3. 记录操作日志上下文
         LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldBusiness, CrmBusinessSaveReqVO.class));
         LogRecordContext.putVariable("businessName", oldBusiness.getName());
+    }
+
+    @Override
+    public void updateBusinessFollowUpBatch(List<CrmUpdateFollowUpReqBO> updateFollowUpReqBOList) {
+        businessMapper.updateBatch(CrmBusinessConvert.INSTANCE.convertList(updateFollowUpReqBOList));
     }
 
     @Override
@@ -102,6 +185,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         // 校验存在
         CrmBusinessDO business = validateBusinessExists(id);
         // TODO @商机待定：需要校验有没关联合同。CrmContractDO 的 businessId 字段
+        validateContractExists(id);
 
         // 删除
         businessMapper.deleteById(id);
@@ -110,6 +194,19 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
         // 记录操作日志上下文
         LogRecordContext.putVariable("businessName", business.getName());
+    }
+
+    /**
+     * @param businessId 商机id
+     * @throws
+     * @description 删除校验合同是关联合同
+     * @author lzxhqs
+     */
+    private void validateContractExists(Long businessId) {
+        CrmContractDO contract = contractMapper.selectByBizId(businessId);
+        if (contract != null) {
+            throw exception(BUSINESS_CONTRACT_EXISTS);
+        }
     }
 
     private CrmBusinessDO validateBusinessExists(Long id) {

@@ -11,8 +11,7 @@ import jakarta.validation.constraints.Size;
 @Data
 public class NoticeSaveReqVO {
 
-    @Schema(description = "岗位公告编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    @NotNull(message = "岗位公告编号不能为空")
+    @Schema(description = "岗位公告编号", example = "1024")
     private Long id;
 
     @Schema(description = "公告标题", requiredMode = Schema.RequiredMode.REQUIRED, example = "小博主")

@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.business;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.enums.business.CrmBizEndStatus;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -52,6 +54,7 @@ public class CrmBusinessDO extends BaseDO {
      * 客户编号
      *
      * TODO @ljileo：这个字段，后续要写下关联的实体哈
+     * 关联 {@link CrmCustomerDO#getId()}
      */
     private Long customerId;
     /**
@@ -77,9 +80,9 @@ public class CrmBusinessDO extends BaseDO {
      */
     private String remark;
     /**
-     * 1赢单2输单3无效
+     * 结束状态
      *
-     * TODO @lijie：搞个枚举；
+     * 枚举 {@link CrmBizEndStatus}
      */
     private Integer endStatus;
     /**
@@ -93,7 +96,7 @@ public class CrmBusinessDO extends BaseDO {
     /**
      * 跟进状态
      *
-     * TODO @lijie：目前就是 Boolean；是否跟进
+     * TODO @lzxhqs：目前就是 Boolean；是否跟进
      */
     private Integer followUpStatus;
 

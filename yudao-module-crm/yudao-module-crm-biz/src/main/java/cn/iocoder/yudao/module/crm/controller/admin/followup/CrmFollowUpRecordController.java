@@ -28,6 +28,7 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSetByFlatMap;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 
 @Tag(name = "管理后台 - 跟进记录")
@@ -37,7 +38,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 public class CrmFollowUpRecordController {
 
     @Resource
-    private CrmFollowUpRecordService crmFollowUpRecordService;
+    private CrmFollowUpRecordService followUpRecordService;
     @Resource
     private CrmContactService contactService;
     @Resource
@@ -47,15 +48,7 @@ public class CrmFollowUpRecordController {
     @Operation(summary = "创建跟进记录")
     @PreAuthorize("@ss.hasPermission('crm:follow-up-record:create')")
     public CommonResult<Long> createFollowUpRecord(@Valid @RequestBody CrmFollowUpRecordSaveReqVO createReqVO) {
-        return success(crmFollowUpRecordService.createFollowUpRecord(createReqVO));
-    }
-
-    @PutMapping("/update")
-    @Operation(summary = "更新跟进记录")
-    @PreAuthorize("@ss.hasPermission('crm:follow-up-record:update')")
-    public CommonResult<Boolean> updateFollowUpRecord(@Valid @RequestBody CrmFollowUpRecordSaveReqVO updateReqVO) {
-        crmFollowUpRecordService.updateFollowUpRecord(updateReqVO);
-        return success(true);
+        return success(followUpRecordService.createFollowUpRecord(createReqVO));
     }
 
     @DeleteMapping("/delete")
@@ -63,7 +56,7 @@ public class CrmFollowUpRecordController {
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('crm:follow-up-record:delete')")
     public CommonResult<Boolean> deleteFollowUpRecord(@RequestParam("id") Long id) {
-        crmFollowUpRecordService.deleteFollowUpRecord(id);
+        followUpRecordService.deleteFollowUpRecord(id, getLoginUserId());
         return success(true);
     }
 
@@ -72,7 +65,7 @@ public class CrmFollowUpRecordController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('crm:follow-up-record:query')")
     public CommonResult<CrmFollowUpRecordRespVO> getFollowUpRecord(@RequestParam("id") Long id) {
-        CrmFollowUpRecordDO followUpRecord = crmFollowUpRecordService.getFollowUpRecord(id);
+        CrmFollowUpRecordDO followUpRecord = followUpRecordService.getFollowUpRecord(id);
         return success(BeanUtils.toBean(followUpRecord, CrmFollowUpRecordRespVO.class));
     }
 
@@ -80,7 +73,7 @@ public class CrmFollowUpRecordController {
     @Operation(summary = "获得跟进记录分页")
     @PreAuthorize("@ss.hasPermission('crm:follow-up-record:query')")
     public CommonResult<PageResult<CrmFollowUpRecordRespVO>> getFollowUpRecordPage(@Valid CrmFollowUpRecordPageReqVO pageReqVO) {
-        PageResult<CrmFollowUpRecordDO> pageResult = crmFollowUpRecordService.getFollowUpRecordPage(pageReqVO);
+        PageResult<CrmFollowUpRecordDO> pageResult = followUpRecordService.getFollowUpRecordPage(pageReqVO);
         /// 拼接数据
         Map<Long, CrmContactDO> contactMap = convertMap(contactService.getContactList(
                 convertSetByFlatMap(pageResult.getList(), item -> item.getContactIds().stream())), CrmContactDO::getId);

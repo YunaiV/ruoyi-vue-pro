@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactSaveReq
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactTransferReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import jakarta.validation.Valid;
 
 import java.util.Collection;
@@ -58,6 +59,13 @@ public interface CrmContactService {
     void updateOwnerUserIdByCustomerId(Long customerId, Long ownerUserId);
 
     /**
+     * 更新联系人相关跟进信息
+     *
+     * @param updateFollowUpReqBOList 跟进信息
+     */
+    void updateContactFollowUpBatch(List<CrmUpdateFollowUpReqBO> updateFollowUpReqBOList);
+
+    /**
      * 获得联系人
      *
      * @param id 编号
@@ -88,6 +96,14 @@ public interface CrmContactService {
      * @return 联系人列表
      */
     List<CrmContactDO> getContactList();
+
+    /**
+     * 获取联系人列表（校验权限）
+     *
+     * @param userId 用户编号
+     * @return 联系人列表
+     */
+    List<CrmContactDO> getSimpleContactList(Long userId);
 
     /**
      * 获得联系人分页

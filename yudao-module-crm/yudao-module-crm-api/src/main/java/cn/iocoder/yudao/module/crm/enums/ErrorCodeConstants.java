@@ -19,6 +19,7 @@ public interface ErrorCodeConstants {
 
     // ========== 商机管理 1-020-002-000 ==========
     ErrorCode BUSINESS_NOT_EXISTS = new ErrorCode(1_020_002_000, "商机不存在");
+    ErrorCode BUSINESS_CONTRACT_EXISTS = new ErrorCode(1_020_002_001, "商机已关联合同，不能删除");
 
     // TODO @lilleo：商机状态、商机类型，都单独错误码段
 
@@ -83,6 +84,7 @@ public interface ErrorCodeConstants {
 
     // ========== 跟进记录 1_020_013_000 ==========
     ErrorCode FOLLOW_UP_RECORD_NOT_EXISTS = new ErrorCode(1_020_013_000, "跟进记录不存在");
+    ErrorCode FOLLOW_UP_RECORD_DELETE_DENIED = new ErrorCode(1_020_013_001, "删除跟进记录失败，原因：没有权限");
 
     // ========== 待办消息 1_020_014_000 ==========
     ErrorCode BACKLOG_CONTACT_STATUS_INVALID = new ErrorCode(1_020_014_000, "客户联系状态有误");

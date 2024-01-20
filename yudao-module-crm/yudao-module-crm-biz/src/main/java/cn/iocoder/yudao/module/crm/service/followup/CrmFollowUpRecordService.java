@@ -14,7 +14,7 @@ import jakarta.validation.Valid;
 public interface CrmFollowUpRecordService {
 
     /**
-     * 创建跟进记录
+     * 创建跟进记录 (数据权限基于 bizType、 bizId)
      *
      * @param createReqVO 创建信息
      * @return 编号
@@ -22,18 +22,12 @@ public interface CrmFollowUpRecordService {
     Long createFollowUpRecord(@Valid CrmFollowUpRecordSaveReqVO createReqVO);
 
     /**
-     * 更新跟进记录
+     * 删除跟进记录 (数据权限基于 bizType、 bizId)
      *
-     * @param updateReqVO 更新信息
+     * @param id     编号
+     * @param userId 用户编号
      */
-    void updateFollowUpRecord(@Valid CrmFollowUpRecordSaveReqVO updateReqVO);
-
-    /**
-     * 删除跟进记录
-     *
-     * @param id 编号
-     */
-    void deleteFollowUpRecord(Long id);
+    void deleteFollowUpRecord(Long id, Long userId);
 
     /**
      * 获得跟进记录
@@ -44,7 +38,7 @@ public interface CrmFollowUpRecordService {
     CrmFollowUpRecordDO getFollowUpRecord(Long id);
 
     /**
-     * 获得跟进记录分页
+     * 获得跟进记录分页 (数据权限基于 bizType、 bizId)
      *
      * @param pageReqVO 分页查询
      * @return 跟进记录分页

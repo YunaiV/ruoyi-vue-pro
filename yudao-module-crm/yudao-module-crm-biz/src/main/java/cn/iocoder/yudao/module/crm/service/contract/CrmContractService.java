@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractSaveR
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import jakarta.validation.Valid;
 
 import java.util.Collection;
@@ -40,6 +41,21 @@ public interface CrmContractService {
      * @param id 编号
      */
     void deleteContract(Long id);
+
+    /**
+     * 合同转移
+     *
+     * @param reqVO  请求
+     * @param userId 用户编号
+     */
+    void transferContract(CrmContractTransferReqVO reqVO, Long userId);
+
+    /**
+     * 更新合同相关的更进信息
+     *
+     * @param contractUpdateFollowUpReqBO 信息
+     */
+    void updateContractFollowUp(CrmUpdateFollowUpReqBO contractUpdateFollowUpReqBO);
 
     /**
      * 获得合同
@@ -77,14 +93,6 @@ public interface CrmContractService {
      * @return 联系人分页
      */
     PageResult<CrmContractDO> getContractPageByCustomerId(CrmContractPageReqVO pageReqVO);
-
-    /**
-     * 合同转移
-     *
-     * @param reqVO  请求
-     * @param userId 用户编号
-     */
-    void transferContract(CrmContractTransferReqVO reqVO, Long userId);
 
     /**
      * 查询属于某个联系人的合同数量
