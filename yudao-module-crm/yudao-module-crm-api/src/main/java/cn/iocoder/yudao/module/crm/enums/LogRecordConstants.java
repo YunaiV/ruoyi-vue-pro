@@ -11,6 +11,12 @@ public interface LogRecordConstants {
     // ======================= CRM_LEADS 线索 =======================
 
     String CRM_LEADS_TYPE = "CRM 线索";
+    String CRM_LEADS_CREATE_SUB_TYPE = "创建线索";
+    String CRM_LEADS_CREATE_SUCCESS = "创建了线索{{#clue.name}}";
+    String CRM_LEADS_UPDATE_SUB_TYPE = "更新线索";
+    String CRM_LEADS_UPDATE_SUCCESS = "更新了线索【{{#clueName}}】: {_DIFF{#updateReqVO}}";
+    String CRM_LEADS_DELETE_SUB_TYPE = "删除线索";
+    String CRM_LEADS_DELETE_SUCCESS = "删除了线索【{{#clueName}}】";
 
     // ======================= CRM_CUSTOMER 客户 =======================
 
