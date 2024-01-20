@@ -54,10 +54,11 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
     }
 
     default List<CrmContractDO> selectBatchIds(Collection<Long> ids, Long userId) {
-        MPJLambdaWrapperX<CrmContractDO> mpjLambdaWrapperX = new MPJLambdaWrapperX<>();
+        MPJLambdaWrapperX<CrmContractDO> query = new MPJLambdaWrapperX<>();
         // 构建数据权限连表条件
-        CrmQueryWrapperUtils.appendPermissionCondition(mpjLambdaWrapperX, CrmBizTypeEnum.CRM_CONTACT.getType(), ids, userId);
-        return selectJoinList(CrmContractDO.class, mpjLambdaWrapperX);
+        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTACT.getType(), ids, userId);
+        query.selectAll(CrmContractDO.class).in(CrmContractDO::getId, ids).orderByDesc(CrmContractDO::getId);
+        return selectJoinList(CrmContractDO.class, query);
     }
 
     default Long selectCountByContactId(Long contactId) {

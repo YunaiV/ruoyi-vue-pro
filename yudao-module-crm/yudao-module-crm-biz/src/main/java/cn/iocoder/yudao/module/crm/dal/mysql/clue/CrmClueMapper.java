@@ -45,6 +45,7 @@ public interface CrmClueMapper extends BaseMapperX<CrmClueDO> {
         MPJLambdaWrapperX<CrmClueDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
         CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_LEADS.getType(), ids, userId);
+        query.selectAll(CrmClueDO.class).in(CrmClueDO::getId, ids).orderByDesc(CrmClueDO::getId);
         return selectJoinList(CrmClueDO.class, query);
     }
 
