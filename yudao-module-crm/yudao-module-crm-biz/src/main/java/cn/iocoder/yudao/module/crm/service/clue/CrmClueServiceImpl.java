@@ -3,7 +3,9 @@ package cn.iocoder.yudao.module.crm.service.clue;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueSaveReqVO;
@@ -25,11 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -145,19 +143,16 @@ public class CrmClueServiceImpl implements CrmClueService {
         List<CrmClueDO> clues = getClueList(clueIds, userId);
         if (CollUtil.isEmpty(clues) || ObjectUtil.notEqual(clues.size(), clueIds.size())) {
             clueIds.removeAll(convertSet(clues, CrmClueDO::getId));
-            // TODO @min：可以使用 StrUtil.join(",", clueIds) 简化这种常见操作
-            throw exception(CLUE_ANY_CLUE_NOT_EXISTS, clueIds.stream().map(String::valueOf).collect(Collectors.joining(",")));
+            throw exception(CLUE_ANY_CLUE_NOT_EXISTS, StrUtil.join(",", clueIds));
         }
 
         // 过滤出未转化的客户
-        // TODO @min：1）存在已经转化的，直接提示哈。避免操作的用户，以为都转化成功了；2）常见的过滤逻辑，可以使用 CollectionUtils.filterList()
-        List<CrmClueDO> unTransformClues = clues.stream()
-                .filter(clue -> ObjectUtil.notEqual(Boolean.TRUE, clue.getTransformStatus())).toList();
-        // 传入的线索中包含已经转化的情况，抛出业务异常
+        List<CrmClueDO> unTransformClues = CollectionUtils.filterList(clues,
+                clue -> ObjectUtil.notEqual(Boolean.TRUE, clue.getTransformStatus()));
+        // 存在已经转化的，直接提示哈。避免操作的用户，以为都转化成功了
         if (ObjectUtil.notEqual(clues.size(), unTransformClues.size())) {
-            // TODO @min：可以使用 StrUtil.join(",", clueIds) 简化这种常见操作
             clueIds.removeAll(convertSet(unTransformClues, CrmClueDO::getId));
-            throw exception(CLUE_ANY_CLUE_ALREADY_TRANSLATED, clueIds.stream().map(String::valueOf).collect(Collectors.joining(",")));
+            throw exception(CLUE_ANY_CLUE_ALREADY_TRANSLATED, StrUtil.join(",", clueIds));
         }
 
         // 遍历线索(未转化的线索)，创建对应的客户
