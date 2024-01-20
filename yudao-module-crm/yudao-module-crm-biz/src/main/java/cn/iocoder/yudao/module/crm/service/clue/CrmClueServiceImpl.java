@@ -21,16 +21,21 @@ import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPerm
 import cn.iocoder.yudao.module.crm.service.clue.bo.CrmClueUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_EXISTS;
 
@@ -56,15 +61,24 @@ public class CrmClueServiceImpl implements CrmClueService {
     private AdminUserApi adminUserApi;
 
     @Override
-    // TODO @min：补充相关几个方法的操作日志；
+    @Transactional(rollbackFor = Exception.class)
     public Long createClue(CrmClueSaveReqVO createReqVO) {
-        // 校验关联数据
+        // 1. 校验关联数据
         validateRelationDataExists(createReqVO);
 
-        // 插入
+        // 2. 插入
         CrmClueDO clue = BeanUtils.toBean(createReqVO, CrmClueDO.class);
         clueMapper.insert(clue);
-        // 返回
+
+        // 3. 创建数据权限
+        CrmPermissionCreateReqBO createReqBO = new CrmPermissionCreateReqBO()
+                .setBizType(CrmBizTypeEnum.CRM_LEADS.getType())
+                .setBizId(clue.getId())
+                // 设置当前操作的人为负责人
+                .setUserId(getLoginUserId())
+                .setLevel(CrmPermissionLevelEnum.OWNER.getLevel());
+        crmPermissionService.createPermission(createReqBO);
+
         return clue.getId();
     }
 
@@ -87,20 +101,26 @@ public class CrmClueServiceImpl implements CrmClueService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_LEADS, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void deleteClue(Long id) {
-        // 校验存在
-        validateClueExists(id);
-        // 删除
+        // 1. 校验存在
+        CrmClueDO clue = validateClueExists(id);
+
+        // 2. 删除
         clueMapper.deleteById(id);
-        // 删除数据权限
+
+        // 3. 删除数据权限
         crmPermissionService.deletePermission(CrmBizTypeEnum.CRM_LEADS.getType(), id);
+
     }
 
-    private void validateClueExists(Long id) {
-        if (clueMapper.selectById(id) == null) {
+    private CrmClueDO validateClueExists(Long id) {
+        CrmClueDO crmClueDO = clueMapper.selectById(id);
+        if (crmClueDO == null) {
             throw exception(CLUE_NOT_EXISTS);
         }
+        return crmClueDO;
     }
 
     @Override
