@@ -66,88 +66,34 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
         crmFollowUpRecordMapper.insert(followUpRecord);
 
         LocalDateTime now = LocalDateTime.now();
-        // TODO @puhui999：感觉可以这里基于 type 做 102 到 104 这种判断；然后，每个类型的调用封装一个小方法，之后调用这些小方法；再之后，74-76、80-82 也是等价的处理；
+        CrmUpdateFollowUpReqBO updateFollowUpReqBO = new CrmUpdateFollowUpReqBO().setBizId(followUpRecord.getBizId())
+                .setContactLastTime(now).setContactNextTime(followUpRecord.getNextTime()).setContactLastContent(followUpRecord.getContent());
         // 2. 更新 bizId 对应的记录；
-        updateBizTypeFollowUp(followUpRecord, now);
+        if (ObjUtil.notEqual(CrmBizTypeEnum.CRM_BUSINESS.getType(), followUpRecord.getBizType())) { // 更新商机跟进信息
+            businessService.updateBusinessFollowUpBatch(Collections.singletonList(updateFollowUpReqBO));
+        }
+        if (ObjUtil.notEqual(CrmBizTypeEnum.CRM_LEADS.getType(), followUpRecord.getBizType())) { // 更新线索跟进信息
+            clueService.updateClueFollowUp(updateFollowUpReqBO);
+        }
+        if (ObjUtil.notEqual(CrmBizTypeEnum.CRM_CONTACT.getType(), followUpRecord.getBizType())) { // 更新联系人跟进信息
+            contactService.updateContactFollowUpBatch(Collections.singletonList(updateFollowUpReqBO));
+        }
+        if (ObjUtil.notEqual(CrmBizTypeEnum.CRM_CONTRACT.getType(), followUpRecord.getBizType())) { // 更新合同跟进信息
+            contractService.updateContractFollowUp(updateFollowUpReqBO);
+        }
+        if (ObjUtil.notEqual(CrmBizTypeEnum.CRM_CUSTOMER.getType(), followUpRecord.getBizType())) { // 更新客户跟进信息
+            customerService.updateCustomerFollowUp(updateFollowUpReqBO);
+        }
+
         // 3.1 更新 contactIds 对应的记录
         if (CollUtil.isNotEmpty(createReqVO.getContactIds())) {
-            contactService.updateContactFollowUpBatch(convertList(createReqVO.getContactIds(), contactId ->
-                    new CrmUpdateFollowUpReqBO().setBizId(contactId).setContactNextTime(followUpRecord.getNextTime())
-                            .setContactLastTime(now).setContactLastContent(followUpRecord.getContent())));
+            contactService.updateContactFollowUpBatch(convertList(createReqVO.getContactIds(), updateFollowUpReqBO::setBizId));
         }
         // 3.2 需要更新 businessIds、contactIds 对应的记录
         if (CollUtil.isNotEmpty(createReqVO.getBusinessIds())) {
-            businessService.updateBusinessFollowUpBatch(convertList(createReqVO.getBusinessIds(), businessId ->
-                    new CrmUpdateFollowUpReqBO().setBizId(businessId).setContactNextTime(followUpRecord.getNextTime())
-                            .setContactLastTime(now).setContactLastContent(followUpRecord.getContent())));
+            businessService.updateBusinessFollowUpBatch(convertList(createReqVO.getBusinessIds(), updateFollowUpReqBO::setBizId));
         }
         return followUpRecord.getId();
-    }
-
-    /**
-     * 执行更新
-     *
-     * @param followUpRecord 跟进记录
-     * @param now            跟进时间
-     */
-    private void updateBizTypeFollowUp(CrmFollowUpRecordDO followUpRecord, LocalDateTime now) {
-        updateBusinessFollowUp(followUpRecord, now);
-        updateClueFollowUp(followUpRecord, now);
-        updateContactFollowUp(followUpRecord, now);
-        updateContractFollowUp(followUpRecord, now);
-        updateCustomerFollowUp(followUpRecord, now);
-    }
-
-    private void updateBusinessFollowUp(CrmFollowUpRecordDO followUpRecord, LocalDateTime now) {
-        if (ObjUtil.notEqual(CrmBizTypeEnum.CRM_BUSINESS.getType(), followUpRecord.getBizType())) {
-            return;
-        }
-
-        // 更新商机跟进信息
-        businessService.updateBusinessFollowUpBatch(Collections.singletonList(new CrmUpdateFollowUpReqBO()
-                .setBizId(followUpRecord.getBizId()).setContactNextTime(followUpRecord.getNextTime()).setContactLastTime(now)
-                .setContactLastContent(followUpRecord.getContent())));
-    }
-
-    private void updateClueFollowUp(CrmFollowUpRecordDO followUpRecord, LocalDateTime now) {
-        if (ObjUtil.notEqual(CrmBizTypeEnum.CRM_LEADS.getType(), followUpRecord.getBizType())) {
-            return;
-        }
-
-        // 更新线索跟进信息
-        clueService.updateClueFollowUp(new CrmUpdateFollowUpReqBO().setBizId(followUpRecord.getBizId()).setContactLastTime(now)
-                .setContactNextTime(followUpRecord.getNextTime()).setContactLastContent(followUpRecord.getContent()));
-    }
-
-    private void updateContactFollowUp(CrmFollowUpRecordDO followUpRecord, LocalDateTime now) {
-        if (ObjUtil.notEqual(CrmBizTypeEnum.CRM_CONTACT.getType(), followUpRecord.getBizType())) {
-            return;
-        }
-
-        // 更新联系人跟进信息
-        contactService.updateContactFollowUpBatch(Collections.singletonList(new CrmUpdateFollowUpReqBO()
-                .setBizId(followUpRecord.getBizId()).setContactNextTime(followUpRecord.getNextTime()).setContactLastTime(now)
-                .setContactLastContent(followUpRecord.getContent())));
-    }
-
-    private void updateContractFollowUp(CrmFollowUpRecordDO followUpRecord, LocalDateTime now) {
-        if (ObjUtil.notEqual(CrmBizTypeEnum.CRM_CONTRACT.getType(), followUpRecord.getBizType())) {
-            return;
-        }
-
-        // 更新合同跟进信息
-        contractService.updateContractFollowUp(new CrmUpdateFollowUpReqBO().setBizId(followUpRecord.getBizId()).setContactLastTime(now)
-                .setContactNextTime(followUpRecord.getNextTime()).setContactLastContent(followUpRecord.getContent()));
-    }
-
-    private void updateCustomerFollowUp(CrmFollowUpRecordDO followUpRecord, LocalDateTime now) {
-        if (ObjUtil.notEqual(CrmBizTypeEnum.CRM_CUSTOMER.getType(), followUpRecord.getBizType())) {
-            return;
-        }
-
-        // 更新客户跟进信息
-        customerService.updateCustomerFollowUp(new CrmUpdateFollowUpReqBO().setBizId(followUpRecord.getBizId()).setContactLastTime(now)
-                .setContactNextTime(followUpRecord.getNextTime()).setContactLastContent(followUpRecord.getContent()));
     }
 
     @Override
