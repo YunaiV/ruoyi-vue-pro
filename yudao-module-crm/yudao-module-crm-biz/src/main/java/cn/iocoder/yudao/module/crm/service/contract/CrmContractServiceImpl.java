@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
-import cn.iocoder.yudao.module.crm.service.contract.bo.CrmContractUpdateFollowUpReqBO;
+import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import com.mzt.logapi.context.LogRecordContext;
@@ -137,8 +137,8 @@ public class CrmContractServiceImpl implements CrmContractService {
     }
 
     @Override
-    public void updateContractFollowUp(CrmContractUpdateFollowUpReqBO contractUpdateFollowUpReqBO) {
-        contractMapper.updateById(BeanUtils.toBean(contractUpdateFollowUpReqBO, CrmContractDO.class));
+    public void updateContractFollowUp(CrmUpdateFollowUpReqBO contractUpdateFollowUpReqBO) {
+        contractMapper.updateById(BeanUtils.toBean(contractUpdateFollowUpReqBO, CrmContractDO.class).setId(contractUpdateFollowUpReqBO.getBizId()));
     }
 
     //======================= 查询相关 =======================

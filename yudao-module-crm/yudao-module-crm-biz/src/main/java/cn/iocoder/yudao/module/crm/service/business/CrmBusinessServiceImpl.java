@@ -21,8 +21,8 @@ import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
-import cn.iocoder.yudao.module.crm.service.business.bo.CrmBusinessUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactBusinessService;
+import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import com.mzt.logapi.context.LogRecordContext;
@@ -172,8 +172,8 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
-    public void updateContactFollowUpBatch(List<CrmBusinessUpdateFollowUpReqBO> updateFollowUpReqBOList) {
-        businessMapper.updateBatch(BeanUtils.toBean(updateFollowUpReqBOList, CrmBusinessDO.class));
+    public void updateBusinessFollowUpBatch(List<CrmUpdateFollowUpReqBO> updateFollowUpReqBOList) {
+        businessMapper.updateBatch(CrmBusinessConvert.INSTANCE.convertList(updateFollowUpReqBOList));
     }
 
     @Override

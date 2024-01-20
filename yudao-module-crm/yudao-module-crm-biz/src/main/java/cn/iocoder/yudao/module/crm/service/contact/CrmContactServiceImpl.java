@@ -15,9 +15,9 @@ import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
-import cn.iocoder.yudao.module.crm.service.contact.bo.CrmContactUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
+import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -195,8 +195,8 @@ public class CrmContactServiceImpl implements CrmContactService {
     }
 
     @Override
-    public void updateContactFollowUpBatch(List<CrmContactUpdateFollowUpReqBO> updateFollowUpReqBOList) {
-        contactMapper.updateBatch(BeanUtils.toBean(updateFollowUpReqBOList, CrmContactDO.class));
+    public void updateContactFollowUpBatch(List<CrmUpdateFollowUpReqBO> updateFollowUpReqBOList) {
+        contactMapper.updateBatch(CrmContactConvert.INSTANCE.convertList(updateFollowUpReqBOList));
     }
 
     //======================= 查询相关 =======================

@@ -1,25 +1,28 @@
-package cn.iocoder.yudao.module.crm.service.customer.bo;
+package cn.iocoder.yudao.module.crm.service.followup.bo;
 
 import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
-// TODO @puhui999：是不是搞个通用的 ReqBO 就好了
+
 /**
  * 跟进信息 Update Req BO
  *
  * @author HUIHUI
  */
 @Data
-public class CrmCustomerUpdateFollowUpReqBO {
+public class CrmUpdateFollowUpReqBO {
 
-    @Schema(description = "主键", example = "3167")
-    private Long id;
+    @Schema(description = "数据编号", example = "3167")
+    @NotNull(message = "数据编号不能为空")
+    private Long bizId;
 
     @Schema(description = "最后跟进时间")
     @DiffLogField(name = "最后跟进时间")
+    @NotNull(message = "最后跟进时间不能为空")
     private LocalDateTime contactLastTime;
 
     @Schema(description = "下次联系时间")
@@ -28,6 +31,7 @@ public class CrmCustomerUpdateFollowUpReqBO {
 
     @Schema(description = "最后更进内容")
     @DiffLogField(name = "最后更进内容")
+    @NotNull(message = "最后更进内容不能为空")
     private String contactLastContent;
 
 }
