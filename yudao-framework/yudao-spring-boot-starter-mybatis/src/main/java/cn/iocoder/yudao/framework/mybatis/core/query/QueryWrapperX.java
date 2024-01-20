@@ -151,7 +151,7 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
         switch (SqlConstants.DB_TYPE) {
             case ORACLE:
             case ORACLE_12C:
-                super.eq("ROWNUM", n);
+                super.le("ROWNUM", n);
                 break;
             case SQL_SERVER:
             case SQL_SERVER2005:
