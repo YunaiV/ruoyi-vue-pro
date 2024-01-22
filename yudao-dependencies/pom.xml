@@ -28,7 +28,7 @@
         <mybatis-plus-generator.version>3.5.5</mybatis-plus-generator.version>
         <dynamic-datasource.version>4.3.0</dynamic-datasource.version>
         <mybatis-plus-join.version>1.4.10</mybatis-plus-join.version>
-        <redisson.version>3.26.0</redisson.version>
+        <redisson.version>3.18.0</redisson.version> <!-- Spring Boot 2.X 最多使用 3.18.0 版本，否则会报 Tuple NoClassDefFoundError -->
         <dm8.jdbc.version>8.1.3.62</dm8.jdbc.version>
         <!-- 消息队列 -->
         <rocketmq-spring.version>2.2.3</rocketmq-spring.version>
