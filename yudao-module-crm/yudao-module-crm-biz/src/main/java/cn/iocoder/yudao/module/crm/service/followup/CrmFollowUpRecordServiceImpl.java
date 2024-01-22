@@ -21,6 +21,7 @@ import cn.iocoder.yudao.module.crm.service.followup.bo.CrmFollowUpCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -48,16 +49,22 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
     private CrmFollowUpRecordMapper crmFollowUpRecordMapper;
 
     @Resource
+    @Lazy
     private CrmPermissionService permissionService;
     @Resource
+    @Lazy
     private CrmBusinessService businessService;
     @Resource
+    @Lazy
     private CrmClueService clueService;
     @Resource
+    @Lazy
     private CrmContactService contactService;
     @Resource
+    @Lazy
     private CrmContractService contractService;
     @Resource
+    @Lazy
     private CrmCustomerService customerService;
 
     @Override
