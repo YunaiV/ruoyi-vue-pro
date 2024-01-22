@@ -98,7 +98,7 @@ public class CrmBusinessDO extends BaseDO {
      *
      * TODO @lzxhqs：目前就是 Boolean；是否跟进
      */
-    private Integer followUpStatus;
+    private Boolean followUpStatus;
 
     /**
      * 负责人的用户编号

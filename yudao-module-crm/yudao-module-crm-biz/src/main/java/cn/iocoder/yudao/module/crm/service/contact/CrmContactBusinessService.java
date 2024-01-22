@@ -42,4 +42,9 @@ public interface CrmContactBusinessService {
      */
     List<CrmContactBusinessDO> getContactBusinessListByContactId(Long contactId);
 
+    /**
+     * 新增联系人与商机的
+     * @param contactBusiness 新增联系人与商机的对象
+     */
+    void insert(CrmContactBusinessDO contactBusiness);
 }

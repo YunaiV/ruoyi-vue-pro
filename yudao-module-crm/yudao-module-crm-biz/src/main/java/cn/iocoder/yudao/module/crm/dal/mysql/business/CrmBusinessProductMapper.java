@@ -7,10 +7,12 @@ import org.apache.ibatis.annotations.Mapper;
 
 /**
  * 商机产品 Mapper // TODO @lzxhqs：类注释，和作者之间要有一个空行
+ *
  * @author lzxhqs
  */
 @Mapper
 public interface CrmBusinessProductMapper extends BaseMapperX<CrmBusinessProductDO> {
+
     default void deleteByBusinessId(Long id) { // TODO @lzxhqs：第一个方法，和类之间最好空一行；
         delete(CrmBusinessProductDO::getBusinessId, id);
     }
