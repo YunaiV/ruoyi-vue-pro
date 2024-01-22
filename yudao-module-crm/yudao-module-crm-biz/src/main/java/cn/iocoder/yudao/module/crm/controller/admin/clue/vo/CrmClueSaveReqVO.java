@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.crm.controller.admin.clue.vo;
 
 import cn.iocoder.yudao.framework.common.validation.Mobile;
 import cn.iocoder.yudao.framework.common.validation.Telephone;
+import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
@@ -19,32 +20,39 @@ public class CrmClueSaveReqVO {
     private Long id;
 
     @Schema(description = "线索名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "线索xxx")
+    @DiffLogField(name = "线索名称")
     @NotEmpty(message = "线索名称不能为空")
     private String name;
 
     @Schema(description = "下次联系时间", example = "2023-10-18 01:00:00")
+    @DiffLogField(name = "下次联系时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime contactNextTime;
 
     @Schema(description = "电话", example = "18000000000")
+    @DiffLogField(name = "电话")
     @Telephone
     private String telephone;
 
     @Schema(description = "手机号", example = "18000000000")
+    @DiffLogField(name = "手机号")
     @Mobile
     private String mobile;
 
     @Schema(description = "地址", example = "北京市海淀区")
+    @DiffLogField(name = "地址")
     private String address;
 
     @Schema(description = "最后跟进时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    @DiffLogField(name = "最后跟进时间")
     private LocalDateTime contactLastTime;
 
     @Schema(description = "负责人编号", example = "2048")
     private Long ownerUserId;
 
     @Schema(description = "备注", example = "随便")
+    @DiffLogField(name = "备注")
     private String remark;
 
 }
