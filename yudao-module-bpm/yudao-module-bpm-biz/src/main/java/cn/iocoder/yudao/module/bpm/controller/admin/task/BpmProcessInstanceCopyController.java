@@ -59,13 +59,9 @@ public class BpmProcessInstanceCopyController {
     @PreAuthorize("@ss.hasPermission('bpm:process-instance-cc:query')")
     public CommonResult<PageResult<BpmProcessInstanceCopyPageItemRespVO>> getProcessInstanceCCPage(
             @Valid BpmProcessInstanceCopyMyPageReqVO pageReqVO) {
-        return success(getMyProcessInstanceCopyPage(getLoginUserId(), pageReqVO));
-    }
-
-    public PageResult<BpmProcessInstanceCopyPageItemRespVO> getMyProcessInstanceCopyPage(Long loginUserId, BpmProcessInstanceCopyMyPageReqVO pageReqVO) {
-        PageResult<BpmProcessInstanceCopyDO> pageResult = processInstanceCopyService.getMyProcessInstanceCopyPage(loginUserId, pageReqVO);
+        PageResult<BpmProcessInstanceCopyDO> pageResult = processInstanceCopyService.getMyProcessInstanceCopyPage(getLoginUserId(), pageReqVO);
         if (CollUtil.isEmpty(pageResult.getList())) {
-            return new PageResult<>(pageResult.getTotal());
+            return success(new PageResult<>(pageResult.getTotal()));
         }
 
         Map<String, String> taskNameByTaskIds = bpmTaskService.getTaskNameByTaskIds(convertSet(pageResult.getList(), BpmProcessInstanceCopyDO::getTaskId));
@@ -81,6 +77,7 @@ public class BpmProcessInstanceCopyController {
                 AdminUserRespDTO::getId, AdminUserRespDTO::getNickname));
 
         // 转换返回
-        return BpmProcessInstanceCopyConvert.INSTANCE.convertPage(pageResult, taskNameByTaskIds, processInstanceNameByProcessInstanceIds, userMap);
+        return success(BpmProcessInstanceCopyConvert.INSTANCE.convertPage(pageResult, taskNameByTaskIds, processInstanceNameByProcessInstanceIds, userMap));
     }
+
 }
