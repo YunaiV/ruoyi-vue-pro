@@ -3,10 +3,9 @@ package cn.iocoder.yudao.module.crm.controller.admin.customer;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigSaveReqVO;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerLimitConfigConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerLimitConfigDO;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerLimitConfigService;
@@ -46,14 +45,14 @@ public class CrmCustomerLimitConfigController {
     @PostMapping("/create")
     @Operation(summary = "创建客户限制配置")
     @PreAuthorize("@ss.hasPermission('crm:customer-limit-config:create')")
-    public CommonResult<Long> createCustomerLimitConfig(@Valid @RequestBody CrmCustomerLimitConfigCreateReqVO createReqVO) {
+    public CommonResult<Long> createCustomerLimitConfig(@Valid @RequestBody CrmCustomerLimitConfigSaveReqVO createReqVO) {
         return success(customerLimitConfigService.createCustomerLimitConfig(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新客户限制配置")
     @PreAuthorize("@ss.hasPermission('crm:customer-limit-config:update')")
-    public CommonResult<Boolean> updateCustomerLimitConfig(@Valid @RequestBody CrmCustomerLimitConfigUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateCustomerLimitConfig(@Valid @RequestBody CrmCustomerLimitConfigSaveReqVO updateReqVO) {
         customerLimitConfigService.updateCustomerLimitConfig(updateReqVO);
         return success(true);
     }

@@ -1,7 +1,11 @@
 package cn.iocoder.yudao.module.promotion.controller.app.combination;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordDetailRespVO;
+import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordSummaryRespVO;
 import cn.iocoder.yudao.module.promotion.convert.combination.CombinationActivityConvert;
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import java.util.Collections;
 import java.util.List;
@@ -73,8 +78,18 @@ public class AppCombinationRecordController {
             @RequestParam(value = "activityId", required = false) Long activityId,
             @RequestParam("status") Integer status,
             @RequestParam(value = "count", defaultValue = "20") @Max(20) Integer count) {
-        return success(CombinationActivityConvert.INSTANCE.convertList3(
-                combinationRecordService.getHeadCombinationRecordList(activityId, status, count)));
+        List<CombinationRecordDO> list = combinationRecordService.getHeadCombinationRecordList(activityId, status, count);
+        return success(BeanUtils.toBean(list, AppCombinationRecordRespVO.class));
+    }
+
+    @GetMapping("/page")
+    @Operation(summary = "获得我的拼团记录分页")
+    @PreAuthenticated
+    public CommonResult<PageResult<AppCombinationRecordRespVO>> getCombinationRecordPage(
+            @Valid AppCombinationRecordPageReqVO pageReqVO) {
+        PageResult<CombinationRecordDO> pageResult = combinationRecordService.getCombinationRecordPage(
+                getLoginUserId(), pageReqVO);
+        return success(BeanUtils.toBean(pageResult, AppCombinationRecordRespVO.class));
     }
 
     @GetMapping("/get-detail")

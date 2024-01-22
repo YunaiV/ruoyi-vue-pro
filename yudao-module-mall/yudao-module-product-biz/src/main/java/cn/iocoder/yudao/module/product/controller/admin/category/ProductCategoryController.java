@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.product.controller.admin.category;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryCreateReqVO;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryListReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryRespVO;
-import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryUpdateReqVO;
-import cn.iocoder.yudao.module.product.convert.category.ProductCategoryConvert;
+import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategorySaveReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
 import cn.iocoder.yudao.module.product.service.category.ProductCategoryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,14 +33,14 @@ public class ProductCategoryController {
     @PostMapping("/create")
     @Operation(summary = "创建商品分类")
     @PreAuthorize("@ss.hasPermission('product:category:create')")
-    public CommonResult<Long> createCategory(@Valid @RequestBody ProductCategoryCreateReqVO createReqVO) {
+    public CommonResult<Long> createCategory(@Valid @RequestBody ProductCategorySaveReqVO createReqVO) {
         return success(categoryService.createCategory(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新商品分类")
     @PreAuthorize("@ss.hasPermission('product:category:update')")
-    public CommonResult<Boolean> updateCategory(@Valid @RequestBody ProductCategoryUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateCategory(@Valid @RequestBody ProductCategorySaveReqVO updateReqVO) {
         categoryService.updateCategory(updateReqVO);
         return success(true);
     }
@@ -61,16 +60,16 @@ public class ProductCategoryController {
     @PreAuthorize("@ss.hasPermission('product:category:query')")
     public CommonResult<ProductCategoryRespVO> getCategory(@RequestParam("id") Long id) {
         ProductCategoryDO category = categoryService.getCategory(id);
-        return success(ProductCategoryConvert.INSTANCE.convert(category));
+        return success(BeanUtils.toBean(category, ProductCategoryRespVO.class));
     }
 
     @GetMapping("/list")
     @Operation(summary = "获得商品分类列表")
     @PreAuthorize("@ss.hasPermission('product:category:query')")
-    public CommonResult<List<ProductCategoryRespVO>> getCategoryList(@Valid ProductCategoryListReqVO treeListReqVO) {
-        List<ProductCategoryDO> list = categoryService.getEnableCategoryList(treeListReqVO);
+    public CommonResult<List<ProductCategoryRespVO>> getCategoryList(@Valid ProductCategoryListReqVO listReqVO) {
+        List<ProductCategoryDO> list = categoryService.getCategoryList(listReqVO);
         list.sort(Comparator.comparing(ProductCategoryDO::getSort));
-        return success(ProductCategoryConvert.INSTANCE.convertList(list));
+        return success(BeanUtils.toBean(list, ProductCategoryRespVO.class));
     }
 
 }

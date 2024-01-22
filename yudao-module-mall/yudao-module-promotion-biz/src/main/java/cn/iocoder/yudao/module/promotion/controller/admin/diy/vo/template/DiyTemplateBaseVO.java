@@ -21,6 +21,6 @@ public class DiyTemplateBaseVO {
     private String remark;
 
     @Schema(description = "预览图", example = "[https://www.iocoder.cn/1.jpg]")
-    private List<String> previewImageUrls;
+    private List<String> previewPicUrls;
 
 }

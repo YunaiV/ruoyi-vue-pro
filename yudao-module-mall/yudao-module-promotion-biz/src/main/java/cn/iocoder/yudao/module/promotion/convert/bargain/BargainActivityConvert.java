@@ -2,9 +2,7 @@ package cn.iocoder.yudao.module.promotion.convert.bargain;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
-import cn.iocoder.yudao.module.product.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.BargainActivityBaseVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.BargainActivityPageItemRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.BargainActivityRespVO;
@@ -64,8 +62,7 @@ public interface BargainActivityConvert {
     default AppBargainActivityDetailRespVO convert(BargainActivityDO bean, Integer successUserCount, ProductSpuRespDTO spu) {
         AppBargainActivityDetailRespVO detail = convert1(bean).setSuccessUserCount(successUserCount);
         if (spu != null) {
-            detail.setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice())
-                    .setUnitName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.PRODUCT_UNIT, spu.getUnit()));
+            detail.setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice());
         }
         return detail;
     }

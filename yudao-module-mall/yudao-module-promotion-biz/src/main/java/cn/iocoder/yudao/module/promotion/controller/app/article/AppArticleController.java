@@ -2,9 +2,11 @@ package cn.iocoder.yudao.module.promotion.controller.app.article;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.promotion.controller.app.article.vo.article.AppArticlePageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.article.vo.article.AppArticleRespVO;
 import cn.iocoder.yudao.module.promotion.convert.article.ArticleConvert;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleDO;
 import cn.iocoder.yudao.module.promotion.service.article.ArticleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -51,9 +53,15 @@ public class AppArticleController {
 
     @RequestMapping("/get")
     @Operation(summary = "获得文章详情")
-    @Parameter(name = "id", description = "文章编号", example = "1024")
-    public CommonResult<AppArticleRespVO> getArticlePage(@RequestParam("id") Long id) {
-        return success(ArticleConvert.INSTANCE.convert01(articleService.getArticle(id)));
+    @Parameters({
+            @Parameter(name = "id", description = "文章编号", example = "1024"),
+            @Parameter(name = "title", description = "文章标题", example = "1024"),
+    })
+    public CommonResult<AppArticleRespVO> getArticle(@RequestParam(value = "id", required = false) Long id,
+                                                     @RequestParam(value = "title", required = false) String title) {
+        ArticleDO article = id != null ? articleService.getArticle(id)
+                : articleService.getLastArticleByTitle(title);
+        return success(BeanUtils.toBean(article, AppArticleRespVO.class));
     }
 
     @PutMapping("/add-browse-count")

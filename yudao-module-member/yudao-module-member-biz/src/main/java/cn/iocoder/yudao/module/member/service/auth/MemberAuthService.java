@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.member.service.auth;
 
-import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
 
 import javax.validation.Valid;
@@ -33,10 +32,9 @@ public interface MemberAuthService {
      * 手机 + 验证码登陆
      *
      * @param reqVO    登陆信息
-     * @param terminal 终端 {@link TerminalEnum}
      * @return 登录结果
      */
-    AppAuthLoginRespVO smsLogin(@Valid AppAuthSmsLoginReqVO reqVO, Integer terminal);
+    AppAuthLoginRespVO smsLogin(@Valid AppAuthSmsLoginReqVO reqVO);
 
     /**
      * 社交登录，使用 code 授权码

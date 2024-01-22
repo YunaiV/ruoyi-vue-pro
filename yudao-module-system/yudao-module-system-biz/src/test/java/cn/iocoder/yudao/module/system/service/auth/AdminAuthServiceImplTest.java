@@ -236,8 +236,8 @@ public class AdminAuthServiceImplTest extends BaseDbUnitTest {
         AuthSocialLoginReqVO reqVO = randomPojo(AuthSocialLoginReqVO.class);
         // mock 方法（绑定的用户编号）
         Long userId = 1L;
-        when(socialUserService.getSocialUser(eq(UserTypeEnum.ADMIN.getValue()), eq(reqVO.getType()),
-                eq(reqVO.getCode()), eq(reqVO.getState()))).thenReturn(new SocialUserRespDTO(randomString(), userId));
+        when(socialUserService.getSocialUserByCode(eq(UserTypeEnum.ADMIN.getValue()), eq(reqVO.getType()),
+                eq(reqVO.getCode()), eq(reqVO.getState()))).thenReturn(new SocialUserRespDTO(randomString(), randomString(), randomString(), userId));
         // mock（用户）
         AdminUserDO user = randomPojo(AdminUserDO.class, o -> o.setId(userId));
         when(userService.getUser(eq(userId))).thenReturn(user);

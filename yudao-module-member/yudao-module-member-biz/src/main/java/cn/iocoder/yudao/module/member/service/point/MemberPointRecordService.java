@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.member.service.point;
 
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.MemberPointRecordPageReqVO;
+import cn.iocoder.yudao.module.member.controller.app.point.vo.AppMemberPointRecordPageReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.point.MemberPointRecordDO;
 import cn.iocoder.yudao.module.member.enums.point.MemberPointBizTypeEnum;
 
@@ -25,10 +25,10 @@ public interface MemberPointRecordService {
      * 【会员】获得积分记录分页
      *
      * @param userId 用户编号
-     * @param pageVO 分页查询
+     * @param pageReqVO 分页查询
      * @return 签到记录分页
      */
-    PageResult<MemberPointRecordDO> getPointRecordPage(Long userId, PageParam pageVO);
+    PageResult<MemberPointRecordDO> getPointRecordPage(Long userId, AppMemberPointRecordPageReqVO pageReqVO);
 
     /**
      * 创建用户积分记录

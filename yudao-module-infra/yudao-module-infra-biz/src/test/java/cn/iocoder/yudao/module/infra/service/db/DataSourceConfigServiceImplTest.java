@@ -9,7 +9,7 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.db.DataSourceConfigDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.db.DataSourceConfigMapper;
-import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DataSourceProperty;
+import com.baomidou.dynamic.datasource.creator.DataSourceProperty;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,8 +61,11 @@ public class DataSourceConfigServiceImplTest extends BaseDbUnitTest {
 
         // mock DynamicDataSourceProperties
         when(dynamicDataSourceProperties.getPrimary()).thenReturn("primary");
-        when(dynamicDataSourceProperties.getDatasource()).thenReturn(MapUtil.of("primary",
-                new DataSourceProperty().setUrl("http://localhost:3306").setUsername("yunai").setPassword("tudou")));
+        DataSourceProperty dataSourceProperty = new DataSourceProperty();
+        dataSourceProperty.setUrl("http://localhost:3306");
+        dataSourceProperty.setUsername("yunai");
+        dataSourceProperty.setPassword("tudou");
+        when(dynamicDataSourceProperties.getDatasource()).thenReturn(MapUtil.of("primary", dataSourceProperty));
     }
 
     @Test

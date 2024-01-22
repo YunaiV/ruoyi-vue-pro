@@ -50,13 +50,14 @@ public class DiyTemplateDO extends BaseDO {
      * 备注
      */
     private String remark;
+
     /**
      * 预览图
      */
     @TableField(typeHandler = StringListTypeHandler.class)
-    private List<String> previewImageUrls;
+    private List<String> previewPicUrls;
     /**
-     * 底部导航属性，JSON 格式
+     * uni-app 底部导航属性，JSON 格式
      */
     private String property;
 

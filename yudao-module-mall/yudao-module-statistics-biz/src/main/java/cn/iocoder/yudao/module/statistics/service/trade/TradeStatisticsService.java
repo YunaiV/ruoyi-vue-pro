@@ -20,7 +20,7 @@ public interface TradeStatisticsService {
      *
      * @return 统计数据对照
      */
-    DataComparisonRespVO<TradeTrendSummaryRespVO> getTradeTrendSummaryComparison(
+    DataComparisonRespVO<TradeTrendSummaryRespVO> getTradeStatisticsAnalyse(
             LocalDateTime beginTime, LocalDateTime endTime);
 
     /**

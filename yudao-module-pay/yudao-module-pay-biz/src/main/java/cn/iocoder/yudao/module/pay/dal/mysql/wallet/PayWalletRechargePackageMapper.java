@@ -8,6 +8,8 @@ import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.rechargepackage.Wa
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletRechargePackageDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface PayWalletRechargePackageMapper extends BaseMapperX<PayWalletRechargePackageDO> {
 
@@ -19,9 +21,12 @@ public interface PayWalletRechargePackageMapper extends BaseMapperX<PayWalletRec
                 .orderByDesc(PayWalletRechargePackageDO::getPayPrice));
     }
 
-    // TODO @jason：这里要有空格哈；String name) {
-    default PayWalletRechargePackageDO selectByName(String name){
+    default PayWalletRechargePackageDO selectByName(String name) {
         return selectOne(PayWalletRechargePackageDO::getName, name);
+    }
+
+    default List<PayWalletRechargePackageDO> selectListByStatus(Integer status) {
+        return selectList(PayWalletRechargePackageDO::getStatus, status);
     }
 
 }

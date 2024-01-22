@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.mp.service.message;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.mp.controller.admin.message.vo.message.MpMessagePageReqVO;
@@ -72,6 +73,13 @@ public class MpMessageServiceImpl implements MpMessageService {
         // 获得关联信息
         MpAccountDO account = mpAccountService.getAccountFromCache(appId);
         Assert.notNull(account, "公众号账号({}) 不存在", appId);
+
+        // 订阅事件不记录，因为此时公众号粉丝表中还没有此粉丝的数据
+        // TODO @芋艿：这个修复，后续看看还有啥问题
+        if (ObjUtil.equal(wxMessage.getEvent(), WxConsts.EventType.SUBSCRIBE)) {
+            return;
+        }
+
         MpUserDO user = mpUserService.getUser(appId, wxMessage.getFromUser());
         Assert.notNull(user, "公众号粉丝({}/{}) 不存在", appId, wxMessage.getFromUser());
 

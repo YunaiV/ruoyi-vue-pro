@@ -60,7 +60,7 @@ public interface CrmProductService {
      * @param pageReqVO 分页查询
      * @return 产品分页
      */
-    PageResult<CrmProductDO> getProductPage(CrmProductPageReqVO pageReqVO);
+    PageResult<CrmProductDO> getProductPage(CrmProductPageReqVO pageReqVO, Long userId);
 
     /**
      * 获得产品

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.crm.convert.permission;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionCreateReqVO;
@@ -15,6 +16,7 @@ import com.google.common.collect.Multimaps;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -46,10 +48,12 @@ public interface CrmPermissionConvert {
         return CollectionUtils.convertList(convert(permission), item -> {
             findAndThen(userMap, item.getUserId(), user -> {
                 item.setNickname(user.getNickname());
-                findAndThen(deptMap, user.getDeptId(), deptRespDTO -> {
-                    item.setDeptName(deptRespDTO.getName());
-                });
+                findAndThen(deptMap, user.getDeptId(), deptRespDTO -> item.setDeptName(deptRespDTO.getName()));
                 List<PostRespDTO> postRespList = MapUtils.getList(Multimaps.forMap(postMap), user.getPostIds());
+                if (CollUtil.isEmpty(postRespList)) {
+                    item.setPostNames(Collections.emptySet());
+                    return;
+                }
                 item.setPostNames(CollectionUtils.convertSet(postRespList, PostRespDTO::getName));
             });
             return item;

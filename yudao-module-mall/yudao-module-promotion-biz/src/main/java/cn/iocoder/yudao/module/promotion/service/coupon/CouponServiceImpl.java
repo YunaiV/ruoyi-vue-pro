@@ -70,7 +70,7 @@ public class CouponServiceImpl implements CouponService {
             throw exception(COUPON_STATUS_NOT_UNUSED);
         }
         // 校验有效期；为避免定时器没跑，实际优惠劵已经过期
-        if (LocalDateTimeUtils.isBetween(coupon.getValidStartTime(), coupon.getValidEndTime())) {
+        if (!LocalDateTimeUtils.isBetween(coupon.getValidStartTime(), coupon.getValidEndTime())) {
             throw exception(COUPON_VALID_TIME_NOT_NOW);
         }
     }
@@ -313,6 +313,11 @@ public class CouponServiceImpl implements CouponService {
         // 移除达到领取限制的用户
         Map<Long, Integer> userTakeCountMap = CollStreamUtil.groupBy(alreadyTakeCoupons, CouponDO::getUserId, Collectors.summingInt(c -> 1));
         userIds.removeIf(userId -> MapUtil.getInt(userTakeCountMap, userId, 0) >= couponTemplate.getTakeLimitCount());
+    }
+
+    @Override
+    public CouponDO getCoupon(Long userId, Long id) {
+        return couponMapper.selectByIdAndUserId(id, userId);
     }
 
     /**

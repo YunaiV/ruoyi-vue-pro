@@ -70,8 +70,6 @@ public interface BrokerageRecordConvert {
 
     BrokerageRecordPageReqVO convert(AppBrokerageRecordPageReqVO pageReqVO, Long userId);
 
-    PageResult<AppBrokerageRecordRespVO> convertPage02(PageResult<BrokerageRecordDO> pageResult);
-
     default PageResult<AppBrokerageUserRankByPriceRespVO> convertPage03(PageResult<AppBrokerageUserRankByPriceRespVO> pageResult, Map<Long, MemberUserRespDTO> userMap) {
         for (AppBrokerageUserRankByPriceRespVO vo : pageResult.getList()) {
             copyTo(userMap.get(vo.getId()), vo);

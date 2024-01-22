@@ -36,9 +36,11 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertListByFlatMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - CRM 回款")
 @RestController
@@ -60,7 +62,7 @@ public class CrmReceivableController {
     @Operation(summary = "创建回款")
     @PreAuthorize("@ss.hasPermission('crm:receivable:create')")
     public CommonResult<Long> createReceivable(@Valid @RequestBody CrmReceivableCreateReqVO createReqVO) {
-        return success(receivableService.createReceivable(createReqVO));
+        return success(receivableService.createReceivable(createReqVO, getLoginUserId()));
     }
 
     @PutMapping("/update")
@@ -93,16 +95,16 @@ public class CrmReceivableController {
     @Operation(summary = "获得回款分页")
     @PreAuthorize("@ss.hasPermission('crm:receivable:query')")
     public CommonResult<PageResult<CrmReceivableRespVO>> getReceivablePage(@Valid CrmReceivablePageReqVO pageReqVO) {
-        PageResult<CrmReceivableDO> pageResult = receivableService.getReceivablePage(pageReqVO);
-        return success(convertDetailReceivablePage(pageResult));
+        PageResult<CrmReceivableDO> pageResult = receivableService.getReceivablePage(pageReqVO, getLoginUserId());
+        return success(buildReceivableDetailPage(pageResult));
     }
 
     @GetMapping("/page-by-customer")
     @Operation(summary = "获得回款分页，基于指定客户")
     public CommonResult<PageResult<CrmReceivableRespVO>> getReceivablePageByCustomer(@Valid CrmReceivablePageReqVO pageReqVO) {
         Assert.notNull(pageReqVO.getCustomerId(), "客户编号不能为空");
-        PageResult<CrmReceivableDO> pageResult = receivableService.getReceivablePageByCustomer(pageReqVO);
-        return success(convertDetailReceivablePage(pageResult));
+        PageResult<CrmReceivableDO> pageResult = receivableService.getReceivablePageByCustomerId(pageReqVO);
+        return success(buildReceivableDetailPage(pageResult));
     }
 
     // TODO 芋艿：后面在优化导出
@@ -111,20 +113,21 @@ public class CrmReceivableController {
     @PreAuthorize("@ss.hasPermission('crm:receivable:export')")
     @OperateLog(type = EXPORT)
     public void exportReceivableExcel(@Valid CrmReceivablePageReqVO exportReqVO,
-              HttpServletResponse response) throws IOException {
-        PageResult<CrmReceivableDO> pageResult = receivableService.getReceivablePage(exportReqVO);
+                                      HttpServletResponse response) throws IOException {
+        exportReqVO.setPageSize(PAGE_SIZE_NONE);
+        PageResult<CrmReceivableDO> pageResult = receivableService.getReceivablePage(exportReqVO, getLoginUserId());
         // 导出 Excel
         ExcelUtils.write(response, "回款.xls", "数据", CrmReceivableRespVO.class,
-                convertDetailReceivablePage(pageResult).getList());
+                buildReceivableDetailPage(pageResult).getList());
     }
 
     /**
-     * 转换成详细的回款分页，即读取关联信息
+     * 构建详细的回款分页结果
      *
-     * @param pageResult 回款分页
-     * @return 详细的回款分页
+     * @param pageResult 简单的回款分页结果
+     * @return 详细的回款分页结果
      */
-    private PageResult<CrmReceivableRespVO> convertDetailReceivablePage(PageResult<CrmReceivableDO> pageResult) {
+    private PageResult<CrmReceivableRespVO> buildReceivableDetailPage(PageResult<CrmReceivableDO> pageResult) {
         List<CrmReceivableDO> receivableList = pageResult.getList();
         if (CollUtil.isEmpty(receivableList)) {
             return PageResult.empty(pageResult.getTotal());

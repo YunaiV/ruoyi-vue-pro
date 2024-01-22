@@ -1,8 +1,11 @@
 package cn.iocoder.yudao.framework.web.core.util;
 
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.extra.servlet.ServletUtil;
+import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -24,6 +27,13 @@ public class WebFrameworkUtils {
     private static final String REQUEST_ATTRIBUTE_COMMON_RESULT = "common_result";
 
     public static final String HEADER_TENANT_ID = "tenant-id";
+
+    /**
+     * 终端的 Header
+     *
+     * @see cn.iocoder.yudao.framework.common.enums.TerminalEnum
+     */
+    public static final String HEADER_TERMINAL = "terminal";
 
     private static WebProperties properties;
 
@@ -105,6 +115,15 @@ public class WebFrameworkUtils {
     public static Long getLoginUserId() {
         HttpServletRequest request = getRequest();
         return getLoginUserId(request);
+    }
+
+    public static Integer getTerminal() {
+        HttpServletRequest request = getRequest();
+        if (request == null) {
+            return TerminalEnum.UNKNOWN.getTerminal();
+        }
+        String terminalValue = request.getHeader(HEADER_TERMINAL);
+        return NumberUtil.parseInt(terminalValue, TerminalEnum.UNKNOWN.getTerminal());
     }
 
     public static void setCommonResult(ServletRequest request, CommonResult<?> result) {

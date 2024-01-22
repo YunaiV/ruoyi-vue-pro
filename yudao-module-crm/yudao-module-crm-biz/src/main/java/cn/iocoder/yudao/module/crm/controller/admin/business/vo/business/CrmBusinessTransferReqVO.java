@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 public class CrmBusinessTransferReqVO {
 
     @Schema(description = "商机编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
-    @NotNull(message = "联系人编号不能为空")
+    @NotNull(message = "商机编号不能为空")
     private Long id;
 
     /**

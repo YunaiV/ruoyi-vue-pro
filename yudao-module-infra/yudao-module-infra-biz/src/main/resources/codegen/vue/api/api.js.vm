@@ -63,7 +63,7 @@ export function export${simpleClassName}Excel(params) {
     responseType: 'blob'
   })
 }
-## 特殊：主子表专属逻辑 TODO @puhui999：下面方法的【空格】不太对
+## 特殊：主子表专属逻辑
 #foreach ($subTable in $subTables)
   #set ($index = $foreach.count - 1)
   #set ($subSimpleClassName = $subSimpleClassNames.get($index))
@@ -76,8 +76,7 @@ export function export${simpleClassName}Excel(params) {
 
 // ==================== 子表（$subTable.classComment） ====================
   ## 情况一：MASTER_ERP 时，需要分查询页子表
-  #if ( $table.templateType == 11 )
-
+  #if ($table.templateType == 11)
   // 获得${subTable.classComment}分页
   export function get${subSimpleClassName}Page(params) {
     return request({
@@ -88,58 +87,53 @@ export function export${simpleClassName}Excel(params) {
   }
     ## 情况二：非 MASTER_ERP 时，需要列表查询子表
   #else
-    #if ( $subTable.subJoinMany )
-
+    #if ($subTable.subJoinMany)
     // 获得${subTable.classComment}列表
     export function get${subSimpleClassName}ListBy${SubJoinColumnName}(${subJoinColumn.javaField}) {
       return request({
-        url: `${baseURL}/${subSimpleClassName_strikeCase}/list-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=` + ${subJoinColumn.javaField},
+        url: '${baseURL}/${subSimpleClassName_strikeCase}/list-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=' + ${subJoinColumn.javaField},
         method: 'get'
       })
     }
     #else
-
     // 获得${subTable.classComment}
     export function get${subSimpleClassName}By${SubJoinColumnName}(${subJoinColumn.javaField}) {
       return request({
-        url: `${baseURL}/${subSimpleClassName_strikeCase}/get-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=` + ${subJoinColumn.javaField},
+        url: '${baseURL}/${subSimpleClassName_strikeCase}/get-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=' + ${subJoinColumn.javaField},
         method: 'get'
       })
     }
     #end
   #end
   ## 特殊：MASTER_ERP 时，支持单个的新增、修改、删除操作
-  #if ( $table.templateType == 11 )
+  #if ($table.templateType == 11)
   // 新增${subTable.classComment}
   export function create${subSimpleClassName}(data) {
     return request({
-      url: `${baseURL}/${subSimpleClassName_strikeCase}/create`,
+      url: '${baseURL}/${subSimpleClassName_strikeCase}/create',
       method: 'post',
       data
     })
   }
-
   // 修改${subTable.classComment}
   export function update${subSimpleClassName}(data) {
     return request({
-      url: `${baseURL}/${subSimpleClassName_strikeCase}/update`,
+      url: '${baseURL}/${subSimpleClassName_strikeCase}/update',
       method: 'post',
       data
     })
   }
-
   // 删除${subTable.classComment}
   export function delete${subSimpleClassName}(id) {
     return request({
-      url: `${baseURL}/${subSimpleClassName_strikeCase}/delete?id=` + id,
+      url: '${baseURL}/${subSimpleClassName_strikeCase}/delete?id=' + id,
       method: 'delete'
     })
   }
-
   // 获得${subTable.classComment}
   export function get${subSimpleClassName}(id) {
     return request({
-      url: `${baseURL}/${subSimpleClassName_strikeCase}/get?id=` + id,
+      url: '${baseURL}/${subSimpleClassName_strikeCase}/get?id=' + id,
       method: 'get'
     })
   }

@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.crm.service.business;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypePageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypeQueryVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypeSaveReqVO;
@@ -11,17 +10,17 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusTypeDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessStatusMapper;
 import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessStatusTypeMapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.BUSINESS_STATUS_TYPE_NOT_EXISTS;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.BUSINESS_STATUS_TYPE_NAME_EXISTS;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.BUSINESS_STATUS_TYPE_NOT_EXISTS;
 
 /**
  * 商机状态类型 Service 实现类
@@ -93,14 +92,18 @@ public class CrmBusinessStatusTypeServiceImpl implements CrmBusinessStatusTypeSe
 
     // TODO @ljlleo 这个方法，这个参考 validateDeptNameUnique 实现。
     private void validateBusinessStatusTypeExists(String name, Long id) {
-        LambdaQueryWrapper<CrmBusinessStatusTypeDO> wrapper = new LambdaQueryWrapperX<>();
-        if(null != id) {
-            wrapper.ne(CrmBusinessStatusTypeDO::getId, id);
-        }
-        long cnt = businessStatusTypeMapper.selectCount(wrapper.eq(CrmBusinessStatusTypeDO::getName, name));
-        if (cnt > 0) {
+        CrmBusinessStatusTypeDO businessStatusTypeDO = businessStatusTypeMapper.selectByIdAndName(id, name);
+        if (businessStatusTypeDO != null) {
             throw exception(BUSINESS_STATUS_TYPE_NAME_EXISTS);
         }
+//        LambdaQueryWrapper<CrmBusinessStatusTypeDO> wrapper = new LambdaQueryWrapperX<>();
+//        if(null != id) {
+//            wrapper.ne(CrmBusinessStatusTypeDO::getId, id);
+//        }
+//        long cnt = businessStatusTypeMapper.selectCount(wrapper.eq(CrmBusinessStatusTypeDO::getName, name));
+//        if (cnt > 0) {
+//            throw exception(BUSINESS_STATUS_TYPE_NAME_EXISTS);
+//        }
     }
 
     @Override
@@ -116,6 +119,11 @@ public class CrmBusinessStatusTypeServiceImpl implements CrmBusinessStatusTypeSe
     @Override
     public List<CrmBusinessStatusTypeDO> selectList(CrmBusinessStatusTypeQueryVO queryVO) {
         return businessStatusTypeMapper.selectList(queryVO);
+    }
+
+    @Override
+    public List<CrmBusinessStatusTypeDO> getBusinessStatusTypeList(Collection<Long> ids) {
+        return businessStatusTypeMapper.selectBatchIds(ids);
     }
 
 }
