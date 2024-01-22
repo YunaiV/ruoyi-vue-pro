@@ -67,6 +67,7 @@ public interface CrmContactMapper extends BaseMapperX<CrmContactDO> {
         MPJLambdaWrapperX<CrmContactDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
         CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTACT.getType(), ids, userId);
+        // 拼接自身的查询条件
         query.selectAll(CrmContactDO.class).in(CrmContactDO::getId, ids).orderByDesc(CrmContactDO::getId);
         return selectJoinList(CrmContactDO.class, query);
     }

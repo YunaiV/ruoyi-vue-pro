@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.crm.convert.permission;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionCreateReqVO;
@@ -48,12 +49,12 @@ public interface CrmPermissionConvert {
             findAndThen(userMap, item.getUserId(), user -> {
                 item.setNickname(user.getNickname());
                 findAndThen(deptMap, user.getDeptId(), deptRespDTO -> item.setDeptName(deptRespDTO.getName()));
-                if (user.getPostIds() == null) {
+                if (CollUtil.isEmpty(user.getPostIds())) {
                     item.setPostNames(Collections.emptySet());
                     return;
                 }
-                List<PostRespDTO> postRespList = MapUtils.getList(Multimaps.forMap(postMap), user.getPostIds());
-                item.setPostNames(CollectionUtils.convertSet(postRespList, PostRespDTO::getName));
+                List<PostRespDTO> postList = MapUtils.getList(Multimaps.forMap(postMap), user.getPostIds());
+                item.setPostNames(CollectionUtils.convertSet(postList, PostRespDTO::getName));
             });
             return item;
         });
@@ -64,6 +65,7 @@ public interface CrmPermissionConvert {
                 id -> new CrmPermissionDO().setId(id).setLevel(updateReqVO.getLevel()));
     }
 
+    // TODO @puhui999：搞成 BeanUtils
     List<CrmPermissionDO> convertList(List<CrmPermissionCreateReqBO> list);
 
 }

@@ -72,7 +72,6 @@ public class CrmFollowUpRecordDO extends BaseDO {
      */
     @TableField(typeHandler = StringListTypeHandler.class)
     private List<String> picUrls;
-
     /**
      * 附件
      */

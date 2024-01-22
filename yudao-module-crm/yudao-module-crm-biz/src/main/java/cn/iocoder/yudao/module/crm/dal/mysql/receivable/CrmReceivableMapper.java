@@ -53,6 +53,7 @@ public interface CrmReceivableMapper extends BaseMapperX<CrmReceivableDO> {
         MPJLambdaWrapperX<CrmReceivableDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
         CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_RECEIVABLE.getType(), ids, userId);
+        // 拼接自身的查询条件
         query.selectAll(CrmReceivableDO.class).in(CrmReceivableDO::getId, ids).orderByDesc(CrmReceivableDO::getId);
         return selectJoinList(CrmReceivableDO.class, query);
     }

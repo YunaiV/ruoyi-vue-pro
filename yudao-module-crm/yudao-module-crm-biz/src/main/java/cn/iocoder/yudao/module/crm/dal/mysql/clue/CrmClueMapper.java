@@ -46,6 +46,7 @@ public interface CrmClueMapper extends BaseMapperX<CrmClueDO> {
         // 拼接数据权限的查询条件
         CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_LEADS.getType(), ids, userId);
         query.selectAll(CrmClueDO.class).in(CrmClueDO::getId, ids).orderByDesc(CrmClueDO::getId);
+        // 拼接自身的查询条件
         return selectJoinList(CrmClueDO.class, query);
     }
 

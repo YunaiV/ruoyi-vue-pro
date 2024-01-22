@@ -104,12 +104,8 @@ public class CrmPermissionController {
         // 拼接数据
         List<AdminUserRespDTO> userList = adminUserApi.getUserList(convertSet(permission, CrmPermissionDO::getUserId));
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userList, AdminUserRespDTO::getDeptId));
-        Set<Long> postIds = CollectionUtils.convertSetByFlatMap(userList, AdminUserRespDTO::getPostIds, item -> {
-            if (item == null) {
-                return Stream.empty();
-            }
-            return item.stream();
-        });
+        Set<Long> postIds = CollectionUtils.convertSetByFlatMap(userList, AdminUserRespDTO::getPostIds,
+                item -> item != null ? item.stream() : Stream.empty());
         Map<Long, PostRespDTO> postMap = postApi.getPostMap(postIds);
         return success(CrmPermissionConvert.INSTANCE.convert(permission, userList, deptMap, postMap));
     }

@@ -48,7 +48,10 @@ public class CouponDO extends BaseDO {
      *
      * 枚举 {@link CouponStatusEnum}
      */
+    // TODO 芋艿：已作废？
     private Integer status;
+
+    // TODO 芋艿：发放 adminid？
 
     // ========== 基本信息 END ==========
 

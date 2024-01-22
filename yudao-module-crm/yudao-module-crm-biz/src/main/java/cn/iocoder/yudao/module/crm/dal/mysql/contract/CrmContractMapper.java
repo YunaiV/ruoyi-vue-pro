@@ -57,6 +57,7 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
         MPJLambdaWrapperX<CrmContractDO> query = new MPJLambdaWrapperX<>();
         // 构建数据权限连表条件
         CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTACT.getType(), ids, userId);
+        // 拼接自身的查询条件
         query.selectAll(CrmContractDO.class).in(CrmContractDO::getId, ids).orderByDesc(CrmContractDO::getId);
         return selectJoinList(CrmContractDO.class, query);
     }

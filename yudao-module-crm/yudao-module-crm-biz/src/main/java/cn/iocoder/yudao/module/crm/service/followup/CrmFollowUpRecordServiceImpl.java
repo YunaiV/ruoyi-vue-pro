@@ -126,7 +126,6 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
         return crmFollowUpRecordMapper.selectById(id);
     }
 
-
     @Override
     @CrmPermission(bizTypeValue = "#pageReqVO.bizType", bizId = "#pageReqVO.bizId", level = CrmPermissionLevelEnum.READ)
     public PageResult<CrmFollowUpRecordDO> getFollowUpRecordPage(CrmFollowUpRecordPageReqVO pageReqVO) {

@@ -58,6 +58,7 @@ public interface CrmBusinessMapper extends BaseMapperX<CrmBusinessDO> {
         MPJLambdaWrapperX<CrmBusinessDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
         CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_BUSINESS.getType(), ids, userId);
+        // 拼接自身的查询条件
         query.selectAll(CrmBusinessDO.class).in(CrmBusinessDO::getId, ids).orderByDesc(CrmBusinessDO::getId);
         return selectJoinList(CrmBusinessDO.class, query);
     }
