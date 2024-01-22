@@ -5,8 +5,9 @@ import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusiness
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypeQueryVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypeSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusTypeDO;
-
 import jakarta.validation.Valid;
+
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -62,5 +63,13 @@ public interface CrmBusinessStatusTypeService {
      * @return 商机状态类型列表
      */
     List<CrmBusinessStatusTypeDO> selectList(CrmBusinessStatusTypeQueryVO queryVO);
+
+    /**
+     * 获得商机状态类型列表
+     *
+     * @param ids 编号数组
+     * @return 商机状态类型列表
+     */
+    List<CrmBusinessStatusTypeDO> getBusinessStatusTypeList(Collection<Long> ids);
 
 }

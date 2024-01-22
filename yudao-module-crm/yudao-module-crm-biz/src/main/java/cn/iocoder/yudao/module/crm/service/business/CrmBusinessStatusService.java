@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.crm.controller.admin.business.vo.status.CrmBusine
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
 
 import jakarta.validation.Valid;
+
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -63,5 +65,13 @@ public interface CrmBusinessStatusService {
      * @return 商机状态分页
      */
     List<CrmBusinessStatusDO> selectList(CrmBusinessStatusQueryVO queryVO);
+
+    /**
+     * 获得商机状态列表
+     *
+     * @param ids 编号数组
+     * @return 商机状态列表
+     */
+    List<CrmBusinessStatusDO> getBusinessStatusList(Collection<Long> ids);
 
 }

@@ -1,41 +1,50 @@
 package cn.iocoder.yudao.module.crm.controller.admin.customer;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
+import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerPoolConfigService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.system.api.logger.OperateLogApi;
+import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2PageReqDTO;
+import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2RespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.mapstruct.ap.internal.util.Collections;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSetByFlatMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.CRM_CUSTOMER_TYPE;
 
 @Tag(name = "管理后台 - CRM 客户")
 @RestController
@@ -45,30 +54,33 @@ public class CrmCustomerController {
 
     @Resource
     private CrmCustomerService customerService;
-
+    @Resource
+    private CrmCustomerPoolConfigService customerPoolConfigService;
     @Resource
     private DeptApi deptApi;
     @Resource
     private AdminUserApi adminUserApi;
+    @Resource
+    private OperateLogApi operateLogApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建客户")
     @PreAuthorize("@ss.hasPermission('crm:customer:create')")
-    public CommonResult<Long> createCustomer(@Valid @RequestBody CrmCustomerCreateReqVO createReqVO) {
+    public CommonResult<Long> createCustomer(@Valid @RequestBody CrmCustomerSaveReqVO createReqVO) {
         return success(customerService.createCustomer(createReqVO, getLoginUserId()));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新客户")
     @PreAuthorize("@ss.hasPermission('crm:customer:update')")
-    public CommonResult<Boolean> updateCustomer(@Valid @RequestBody CrmCustomerUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateCustomer(@Valid @RequestBody CrmCustomerSaveReqVO updateReqVO) {
         customerService.updateCustomer(updateReqVO);
         return success(true);
     }
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除客户")
-    @Parameter(name = "id", description = "编号", required = true)
+    @Parameter(name = "id", description = "客户编号", required = true)
     @PreAuthorize("@ss.hasPermission('crm:customer:delete')")
     public CommonResult<Boolean> deleteCustomer(@RequestParam("id") Long id) {
         customerService.deleteCustomer(id);
@@ -103,10 +115,50 @@ public class CrmCustomerController {
         }
 
         // 2. 拼接数据
+        Map<Long, Long> poolDayMap = Boolean.TRUE.equals(pageVO.getPool()) ? null :
+                getPoolDayMap(pageResult.getList()); // 客户界面，需要查看距离进入公海的时间
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSetByFlatMap(pageResult.getList(), user -> Stream.of(Long.parseLong(user.getCreator()), user.getOwnerUserId())));
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
-        return success(CrmCustomerConvert.INSTANCE.convertPage(pageResult, userMap, deptMap));
+        return success(CrmCustomerConvert.INSTANCE.convertPage(pageResult, userMap, deptMap, poolDayMap));
+    }
+
+    /**
+     * 获取距离进入公海的时间
+     *
+     * @param customerList 客户列表
+     * @return Map<key 客户编号, value 距离进入公海的时间>
+     */
+    private Map<Long, Long> getPoolDayMap(List<CrmCustomerDO> customerList) {
+        CrmCustomerPoolConfigDO poolConfig = customerPoolConfigService.getCustomerPoolConfig();
+        if (poolConfig == null || !poolConfig.getEnabled()) {
+            return MapUtil.empty();
+        }
+        return convertMap(customerList, CrmCustomerDO::getId, customer -> {
+            // 1.1 未成交放入公海天数
+            long dealExpireDay = 0;
+            if (!customer.getDealStatus()) {
+                dealExpireDay = poolConfig.getDealExpireDays() - LocalDateTimeUtils.between(customer.getCreateTime());
+            }
+            // 1.2 未跟进放入公海天数
+            LocalDateTime lastTime = ObjUtil.defaultIfNull(customer.getContactLastTime(), customer.getCreateTime());
+            long contactExpireDay = poolConfig.getContactExpireDays() - LocalDateTimeUtils.between(lastTime);
+            if (contactExpireDay < 0) {
+                contactExpireDay = 0;
+            }
+            // 2. 返回最小的天数
+            return Math.min(dealExpireDay, contactExpireDay);
+        });
+    }
+
+    @GetMapping(value = "/list-all-simple")
+    @Operation(summary = "获取客户精简信息列表", description = "只包含有读权限的客户，主要用于前端的下拉选项")
+    public CommonResult<List<CrmCustomerRespVO>> getSimpleDeptList() {
+        CrmCustomerPageReqVO reqVO = new CrmCustomerPageReqVO();
+        reqVO.setPageSize(PAGE_SIZE_NONE); // 不分页
+        List<CrmCustomerDO> list = customerService.getCustomerPage(reqVO, getLoginUserId()).getList();
+        return success(convertList(list, customer -> // 只返回 id、name 精简字段
+                new CrmCustomerRespVO().setId(customer.getId()).setName(customer.getName())));
     }
 
     @GetMapping("/export-excel")
@@ -118,24 +170,35 @@ public class CrmCustomerController {
         pageVO.setPageSize(PAGE_SIZE_NONE); // 不分页
         List<CrmCustomerDO> list = customerService.getCustomerPage(pageVO, getLoginUserId()).getList();
         // 导出 Excel
-        List<CrmCustomerExcelVO> datas = CrmCustomerConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "客户.xls", "数据", CrmCustomerExcelVO.class, datas);
+        ExcelUtils.write(response, "客户.xls", "数据", CrmCustomerRespVO.class,
+                BeanUtils.toBean(list, CrmCustomerRespVO.class));
     }
 
     @PutMapping("/transfer")
-    @Operation(summary = "客户转移")
+    @Operation(summary = "转移客户")
     @PreAuthorize("@ss.hasPermission('crm:customer:update')")
     public CommonResult<Boolean> transfer(@Valid @RequestBody CrmCustomerTransferReqVO reqVO) {
         customerService.transferCustomer(reqVO, getLoginUserId());
         return success(true);
     }
 
-    // TODO @Joey：单独建一个属于自己业务的 ReqVO；因为前端如果模拟请求，是不是可以更新其它字段了；
+    @GetMapping("/operate-log-page")
+    @Operation(summary = "获得客户操作日志")
+    @Parameter(name = "id", description = "客户编号", required = true)
+    @PreAuthorize("@ss.hasPermission('crm:customer:query')")
+    public CommonResult<PageResult<OperateLogV2RespDTO>> getCustomerOperateLog(@RequestParam("id") Long id) {
+        OperateLogV2PageReqDTO reqDTO = new OperateLogV2PageReqDTO();
+        reqDTO.setPageSize(PAGE_SIZE_NONE); // 不分页
+        reqDTO.setBizType(CRM_CUSTOMER_TYPE);
+        reqDTO.setBizId(id);
+        return success(operateLogApi.getOperateLogPage(reqDTO));
+    }
+
     @PutMapping("/lock")
     @Operation(summary = "锁定/解锁客户")
     @PreAuthorize("@ss.hasPermission('crm:customer:update')")
-    public CommonResult<Boolean> lockCustomer(@Valid @RequestBody CrmCustomerUpdateReqVO updateReqVO) {
-        customerService.lockCustomer(updateReqVO);
+    public CommonResult<Boolean> lockCustomer(@Valid @RequestBody CrmCustomerLockReqVO lockReqVO) {
+        customerService.lockCustomer(lockReqVO, getLoginUserId());
         return success(true);
     }
 
@@ -155,32 +218,16 @@ public class CrmCustomerController {
     @Parameter(name = "ids", description = "编号数组", required = true, example = "1,2,3")
     @PreAuthorize("@ss.hasPermission('crm:customer:receive')")
     public CommonResult<Boolean> receiveCustomer(@RequestParam(value = "ids") List<Long> ids) {
-        customerService.receiveCustomer(ids, getLoginUserId());
+        customerService.receiveCustomer(ids, getLoginUserId(), Boolean.TRUE);
         return success(true);
     }
 
     @PutMapping("/distribute")
     @Operation(summary = "分配公海给对应负责人")
-    @Parameters({
-            @Parameter(name = "ids", description = "客户编号数组", required = true, example = "1,2,3"),
-            @Parameter(name = "ownerUserId", description = "分配的负责人编号", required = true, example = "12345")
-    })
     @PreAuthorize("@ss.hasPermission('crm:customer:distribute')")
-    public CommonResult<Boolean> distributeCustomer(@RequestParam(value = "ids") List<Long> ids,
-                                                    @RequestParam(value = "ownerUserId") Long ownerUserId) {
-        // 领取公海数据
-        customerService.receiveCustomer(ids, ownerUserId);
+    public CommonResult<Boolean> distributeCustomer(@Valid @RequestBody CrmCustomerDistributeReqVO distributeReqVO) {
+        customerService.receiveCustomer(distributeReqVO.getIds(), distributeReqVO.getOwnerUserId(), Boolean.FALSE);
         return success(true);
-    }
-
-    // TODO 芋艿：这个接口要调整下
-    @GetMapping("/query-all-list")
-    @Operation(summary = "查询客户列表")
-    @PreAuthorize("@ss.hasPermission('crm:customer:all')")
-    public CommonResult<List<CrmCustomerQueryAllRespVO>> queryAll() {
-        List<CrmCustomerDO> crmCustomerDOList = customerService.getCustomerList();
-        List<CrmCustomerQueryAllRespVO> data = CrmCustomerConvert.INSTANCE.convertQueryAll(crmCustomerDOList);
-        return success(data);
     }
 
 }

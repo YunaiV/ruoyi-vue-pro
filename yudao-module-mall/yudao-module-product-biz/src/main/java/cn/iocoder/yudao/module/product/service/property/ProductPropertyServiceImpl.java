@@ -2,20 +2,18 @@ package cn.iocoder.yudao.module.product.service.property;
 
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyCreateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyListReqVO;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyPageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyUpdateReqVO;
-import cn.iocoder.yudao.module.product.convert.property.ProductPropertyConvert;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertySaveReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
 import cn.iocoder.yudao.module.product.dal.mysql.property.ProductPropertyMapper;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
+import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 
@@ -43,7 +41,7 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long createProperty(ProductPropertyCreateReqVO createReqVO) {
+    public Long createProperty(ProductPropertySaveReqVO createReqVO) {
         // 如果已经添加过该属性项，直接返回
         ProductPropertyDO dbProperty = productPropertyMapper.selectByName(createReqVO.getName());
         if (dbProperty != null) {
@@ -51,7 +49,7 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
         }
 
         // 插入
-        ProductPropertyDO property = ProductPropertyConvert.INSTANCE.convert(createReqVO);
+        ProductPropertyDO property = BeanUtils.toBean(createReqVO, ProductPropertyDO.class);
         productPropertyMapper.insert(property);
         // 返回
         return property.getId();
@@ -59,17 +57,17 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateProperty(ProductPropertyUpdateReqVO updateReqVO) {
+    public void updateProperty(ProductPropertySaveReqVO updateReqVO) {
         validatePropertyExists(updateReqVO.getId());
         // 校验名字重复
-        ProductPropertyDO productPropertyDO = productPropertyMapper.selectByName(updateReqVO.getName());
-        if (productPropertyDO != null &&
-                ObjUtil.notEqual(productPropertyDO.getId(), updateReqVO.getId())) {
+        ProductPropertyDO property = productPropertyMapper.selectByName(updateReqVO.getName());
+        if (property != null &&
+                ObjUtil.notEqual(property.getId(), updateReqVO.getId())) {
             throw exception(PROPERTY_EXISTS);
         }
 
         // 更新
-        ProductPropertyDO updateObj = ProductPropertyConvert.INSTANCE.convert(updateReqVO);
+        ProductPropertyDO updateObj = BeanUtils.toBean(updateReqVO, ProductPropertyDO.class);
         productPropertyMapper.updateById(updateObj);
         // 更新 sku 相关属性
         productSkuService.updateSkuProperty(updateObj.getId(), updateObj.getName());
@@ -94,11 +92,6 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
         if (productPropertyMapper.selectById(id) == null) {
             throw exception(PROPERTY_NOT_EXISTS);
         }
-    }
-
-    @Override
-    public List<ProductPropertyDO> getPropertyList(ProductPropertyListReqVO listReqVO) {
-        return productPropertyMapper.selectList(listReqVO);
     }
 
     @Override

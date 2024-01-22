@@ -35,6 +35,12 @@ public class AppAfterSaleRespVO {
     @Schema(description = "补充凭证图片", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private List<String> applyPicUrls;
 
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    private LocalDateTime createTime;
+
+    @Schema(description = "更新时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    private LocalDateTime updateTime;
+
     // ========== 交易订单相关 ==========
 
     @Schema(description = "交易订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")

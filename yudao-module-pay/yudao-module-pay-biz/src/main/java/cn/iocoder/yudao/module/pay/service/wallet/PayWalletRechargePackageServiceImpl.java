@@ -6,12 +6,14 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.rechargepackage.WalletRechargePackageCreateReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.rechargepackage.WalletRechargePackagePageReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.rechargepackage.WalletRechargePackageUpdateReqVO;
-import cn.iocoder.yudao.module.pay.convert.wallet.WalletRechargePackageConvert;
+import cn.iocoder.yudao.module.pay.convert.wallet.PayWalletRechargePackageConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletRechargePackageDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletRechargePackageMapper;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.Resource;
+
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
@@ -50,7 +52,7 @@ public class PayWalletRechargePackageServiceImpl implements PayWalletRechargePac
         validateRechargePackageNameUnique(null, createReqVO.getName());
 
         // 插入
-        PayWalletRechargePackageDO walletRechargePackage = WalletRechargePackageConvert.INSTANCE.convert(createReqVO);
+        PayWalletRechargePackageDO walletRechargePackage = PayWalletRechargePackageConvert.INSTANCE.convert(createReqVO);
         walletRechargePackageMapper.insert(walletRechargePackage);
         // 返回
         return walletRechargePackage.getId();
@@ -64,7 +66,7 @@ public class PayWalletRechargePackageServiceImpl implements PayWalletRechargePac
         validateRechargePackageNameUnique(updateReqVO.getId(), updateReqVO.getName());
 
         // 更新
-        PayWalletRechargePackageDO updateObj = WalletRechargePackageConvert.INSTANCE.convert(updateReqVO);
+        PayWalletRechargePackageDO updateObj = PayWalletRechargePackageConvert.INSTANCE.convert(updateReqVO);
         walletRechargePackageMapper.updateById(updateObj);
     }
 
@@ -101,6 +103,11 @@ public class PayWalletRechargePackageServiceImpl implements PayWalletRechargePac
     @Override
     public PageResult<PayWalletRechargePackageDO> getWalletRechargePackagePage(WalletRechargePackagePageReqVO pageReqVO) {
         return walletRechargePackageMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<PayWalletRechargePackageDO> getWalletRechargePackageList(Integer status) {
+        return walletRechargePackageMapper.selectListByStatus(status);
     }
 
 }

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.trade.controller.app.brokerage;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.record.AppBrokerageProductPriceRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.record.AppBrokerageRecordPageReqVO;
@@ -39,7 +40,7 @@ public class AppBrokerageRecordController {
     public CommonResult<PageResult<AppBrokerageRecordRespVO>> getBrokerageRecordPage(@Valid AppBrokerageRecordPageReqVO pageReqVO) {
         PageResult<BrokerageRecordDO> pageResult = brokerageRecordService.getBrokerageRecordPage(
                 BrokerageRecordConvert.INSTANCE.convert(pageReqVO, getLoginUserId()));
-        return success(BrokerageRecordConvert.INSTANCE.convertPage02(pageResult));
+        return success(BeanUtils.toBean(pageResult, AppBrokerageRecordRespVO.class));
     }
 
     @GetMapping("/get-product-brokerage-price")

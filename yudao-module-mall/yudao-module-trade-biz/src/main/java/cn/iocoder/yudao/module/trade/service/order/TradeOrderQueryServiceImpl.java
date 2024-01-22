@@ -206,7 +206,8 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
 
     /**
      * 查询物流轨迹
-     * 加个 spring 缓存，30 分钟；主要考虑及时性要求不高，但是每次调用需要钱；TODO @艿艿：这个时间不会搞了。。。交给你了哈哈哈
+     *
+     * 缓存的目的：考虑及时性要求不高，但是每次调用需要钱
      *
      * @param code           快递公司编码
      * @param logisticsNo    发货快递单号
@@ -216,7 +217,6 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
     @Cacheable(cacheNames = RedisKeyConstants.EXPRESS_TRACK, key = "#code + '-' + #logisticsNo + '-' + #receiverMobile",
             condition = "#result != null")
     public List<ExpressTrackRespDTO> getExpressTrackList(String code, String logisticsNo, String receiverMobile) {
-        // 查询物流轨迹
         return expressClientFactory.getDefaultExpressClient().getExpressTrackList(
                 new ExpressTrackQueryReqDTO().setExpressCode(code).setLogisticsNo(logisticsNo)
                         .setPhone(receiverMobile));

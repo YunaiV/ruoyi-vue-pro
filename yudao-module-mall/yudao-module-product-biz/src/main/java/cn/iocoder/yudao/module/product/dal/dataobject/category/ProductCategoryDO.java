@@ -49,12 +49,6 @@ public class ProductCategoryDO extends BaseDO {
      */
     private String picUrl;
     /**
-     * PC 端分类图
-     *
-     * 建议 468*340 分辨率
-     */
-    private String bigPicUrl;
-    /**
      * 分类排序
      */
     private Integer sort;

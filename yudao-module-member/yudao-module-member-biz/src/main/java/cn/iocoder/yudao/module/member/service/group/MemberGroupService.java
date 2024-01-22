@@ -64,7 +64,6 @@ public interface MemberGroupService {
      */
     PageResult<MemberGroupDO> getGroupPage(MemberGroupPageReqVO pageReqVO);
 
-
     /**
      * 获得指定状态的用户分组列表
      *
@@ -72,7 +71,6 @@ public interface MemberGroupService {
      * @return 用户分组列表
      */
     List<MemberGroupDO> getGroupListByStatus(Integer status);
-
 
     /**
      * 获得开启状态的用户分组列表

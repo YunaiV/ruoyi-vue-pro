@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.MemberPointRecordPageReqVO;
+import cn.iocoder.yudao.module.member.controller.app.point.vo.AppMemberPointRecordPageReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.point.MemberPointRecordDO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -27,9 +28,14 @@ public interface MemberPointRecordMapper extends BaseMapperX<MemberPointRecordDO
                 .orderByDesc(MemberPointRecordDO::getId));
     }
 
-    default PageResult<MemberPointRecordDO> selectPage(Long userId, PageParam pageVO) {
-        return selectPage(pageVO, new LambdaQueryWrapperX<MemberPointRecordDO>()
+    default PageResult<MemberPointRecordDO> selectPage(Long userId, AppMemberPointRecordPageReqVO pageReqVO) {
+        return selectPage(pageReqVO, new LambdaQueryWrapperX<MemberPointRecordDO>()
                 .eq(MemberPointRecordDO::getUserId, userId)
+                .betweenIfPresent(MemberPointRecordDO::getCreateTime, pageReqVO.getCreateTime())
+                .gt(Boolean.TRUE.equals(pageReqVO.getAddStatus()),
+                        MemberPointRecordDO::getPoint, 0)
+                .lt(Boolean.FALSE.equals(pageReqVO.getAddStatus()),
+                        MemberPointRecordDO::getPoint, 0)
                 .orderByDesc(MemberPointRecordDO::getId));
     }
 

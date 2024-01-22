@@ -1,16 +1,17 @@
 package cn.iocoder.yudao.module.product.service.spu;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuSaveReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuUpdateStatusReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
-
 import jakarta.validation.Valid;
+import org.springframework.scheduling.annotation.Async;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * 商品 SPU Service 接口
@@ -25,14 +26,14 @@ public interface ProductSpuService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createSpu(@Valid ProductSpuCreateReqVO createReqVO);
+    Long createSpu(@Valid ProductSpuSaveReqVO createReqVO);
 
     /**
      * 更新商品 SPU
      *
      * @param updateReqVO 更新信息
      */
-    void updateSpu(@Valid ProductSpuUpdateReqVO updateReqVO);
+    void updateSpu(@Valid ProductSpuSaveReqVO updateReqVO);
 
     /**
      * 删除商品 SPU
@@ -58,30 +59,12 @@ public interface ProductSpuService {
     List<ProductSpuDO> getSpuList(Collection<Long> ids);
 
     /**
-     * 获得商品 SPU 映射
-     *
-     * @param ids 编号数组
-     * @return 商品 SPU 映射
-     */
-    default Map<Long, ProductSpuDO> getSpuMap(Collection<Long> ids) {
-        return convertMap(getSpuList(ids), ProductSpuDO::getId);
-    }
-
-    /**
      * 获得指定状态的商品 SPU 列表
      *
      * @param status 状态
      * @return 商品 SPU 列表
      */
     List<ProductSpuDO> getSpuListByStatus(Integer status);
-
-    /**
-     * 获得所有商品 SPU 列表
-     *
-     * @param reqVO 导出条件
-     * @return 商品 SPU 列表
-     */
-    List<ProductSpuDO> getSpuList(ProductSpuExportReqVO reqVO);
 
     /**
      * 获得商品 SPU 分页，提供给挂你兰后台使用
@@ -98,15 +81,6 @@ public interface ProductSpuService {
      * @return 商品 SPU 分页
      */
     PageResult<ProductSpuDO> getSpuPage(AppProductSpuPageReqVO pageReqVO);
-
-    /**
-     * 获得商品 SPU 列表，提供给用户 App 使用
-     *
-     * @param recommendType 推荐类型
-     * @param count 数量
-     * @return 商品 SPU 列表
-     */
-    List<ProductSpuDO> getSpuList(String recommendType, Integer count);
 
     /**
      * 更新商品 SPU 库存（增量）
@@ -147,5 +121,14 @@ public interface ProductSpuService {
      * @return 商品 SPU 列表
      */
     List<ProductSpuDO> validateSpuList(Collection<Long> ids);
+
+    /**
+     * 更新商品 SPU 浏览量
+     *
+     * @param id        商品 SPU 编号
+     * @param incrCount 增加的数量
+     */
+    @Async
+    void updateBrowseCount(Long id, int incrCount);
 
 }

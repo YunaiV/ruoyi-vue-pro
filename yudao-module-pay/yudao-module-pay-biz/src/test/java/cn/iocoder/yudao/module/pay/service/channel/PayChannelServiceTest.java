@@ -197,7 +197,7 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         channelMapper.insert(dbChannel);// @Sql: 先插入出一条存在的数据
         // 准备参数
         Long appId = dbChannel.getAppId();
-        String code = dbChannel.getCode();;
+        String code = dbChannel.getCode();
 
         // 调用
         PayChannelDO channel = channelService.getChannelByAppIdAndCode(appId, code);

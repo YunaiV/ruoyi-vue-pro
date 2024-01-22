@@ -20,6 +20,9 @@ public class AppMemberUserInfoRespVO {
     @Schema(description = "用户手机号", requiredMode = Schema.RequiredMode.REQUIRED, example = "15601691300")
     private String mobile;
 
+    @Schema(description = "用户性别", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    private Integer sex;
+
     @Schema(description = "积分", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     private Integer point;
 

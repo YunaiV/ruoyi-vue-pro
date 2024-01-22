@@ -45,7 +45,9 @@ public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
 
     @BeforeEach
     public void setUp() {
+        codegenEngine.setJakartaEnable(true); // 强制使用 jakarta，保证单测可以基于 jakarta 断言
         codegenEngine.initGlobalBindingMap();
+        // 单测强制使用
         // 获取测试文件 resources 路径
         String absolutePath = FileUtil.getAbsolutePath("application-unit-test.yaml");
         // 系统不一样生成的文件也有差异，那就各自生成各自的

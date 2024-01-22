@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.crm.controller.admin.product.vo.category;
 
+import com.mzt.logapi.starter.annotation.DiffLogField;
 import lombok.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -14,6 +15,7 @@ public class CrmProductCategoryCreateReqVO{
 
     @Schema(description = "分类名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "赵六")
     @NotNull(message = "分类名称不能为空")
+    @DiffLogField(name = "分类名称")
     private String name;
 
     @Schema(description = "父级编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "4680")

@@ -33,11 +33,17 @@ public class AppCombinationRecordRespVO {
     @Schema(description = "拼团状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer status;
 
+    @Schema(description = "订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
+    private Long orderId;
+
     @Schema(description = "商品名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "我是大黄豆")
     private String spuName;
 
     @Schema(description = "商品图片", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/1.png")
     private String picUrl;
+
+    @Schema(description = "购买的商品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    private Integer count;
 
     @Schema(description = "拼团金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
     private Integer combinationPrice;

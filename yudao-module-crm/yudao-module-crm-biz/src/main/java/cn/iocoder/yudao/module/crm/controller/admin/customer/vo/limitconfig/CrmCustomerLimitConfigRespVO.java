@@ -4,20 +4,31 @@ import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Schema(description = "管理后台 - 客户限制配置 Response VO")
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public class CrmCustomerLimitConfigRespVO extends CrmCustomerLimitConfigBaseVO {
+public class CrmCustomerLimitConfigRespVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "27930")
     private Long id;
+
+    @Schema(description = "规则类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    private Integer type;
+
+    @Schema(description = "规则适用人群")
+    private List<Long> userIds;
+
+    @Schema(description = "规则适用部门")
+    private List<Long> deptIds;
+
+    @Schema(description = "数量上限", requiredMode = Schema.RequiredMode.REQUIRED, example = "28384")
+    private Integer maxCount;
+
+    @Schema(description = "成交客户是否占有拥有客户数")
+    private Boolean dealCountEnabled;
 
     @Schema(description = "规则适用人群名称")
     private List<AdminUserRespDTO> users;

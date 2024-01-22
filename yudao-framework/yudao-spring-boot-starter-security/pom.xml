@@ -12,7 +12,10 @@
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
-    <description>用户的认证、权限的校验</description>
+    <description>
+        1. security：用户的认证、权限的校验，实现「谁」可以做「什么事」
+        2. operatelog：操作日志，实现「谁」在「什么时间」对「什么」做了「什么事」
+    </description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <dependencies>
@@ -48,6 +51,13 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+        </dependency>
+
+        <dependency>
+            <!-- Spring Boot 通用操作日志组件，基于注解实现 -->
+            <!-- 此组件解决的问题是：「谁」在「什么时间」对「什么」做了「什么事」 -->
+            <groupId>io.github.mouzt</groupId>
+            <artifactId>bizlog-sdk</artifactId>
         </dependency>
 
         <!-- 业务组件 -->

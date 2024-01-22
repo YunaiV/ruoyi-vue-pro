@@ -22,4 +22,5 @@ public class AppPayWalletRechargeCreateReqVO {
     public boolean isValidPayPriceAndPackageId() {
         return Objects.nonNull(payPrice) || Objects.nonNull(packageId);
     }
+
 }
