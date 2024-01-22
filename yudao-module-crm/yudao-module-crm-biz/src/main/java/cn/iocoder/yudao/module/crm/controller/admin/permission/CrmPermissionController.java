@@ -28,6 +28,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -103,7 +104,12 @@ public class CrmPermissionController {
         // 拼接数据
         List<AdminUserRespDTO> userList = adminUserApi.getUserList(convertSet(permission, CrmPermissionDO::getUserId));
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userList, AdminUserRespDTO::getDeptId));
-        Set<Long> postIds = CollectionUtils.convertSetByFlatMap(userList, AdminUserRespDTO::getPostIds, Collection::stream);
+        Set<Long> postIds = CollectionUtils.convertSetByFlatMap(userList, AdminUserRespDTO::getPostIds, item -> {
+            if (item == null) {
+                return Stream.empty();
+            }
+            return item.stream();
+        });
         Map<Long, PostRespDTO> postMap = postApi.getPostMap(postIds);
         return success(CrmPermissionConvert.INSTANCE.convert(permission, userList, deptMap, postMap));
     }

@@ -44,6 +44,11 @@ public class CrmFollowUpRecordRespVO {
     @Schema(description = "关联的联系人名称数组")
     private List<String> contactNames;
 
+    @Schema(description = "图片")
+    private List<String> picUrls;
+    @Schema(description = "附件")
+    private List<String> fileUrls;
+
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
