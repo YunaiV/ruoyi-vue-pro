@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCopyCreateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCopyMyPageReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCopyPageItemRespVO;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.cc.BpmProcessInstanceCopyDO;
 import cn.iocoder.yudao.module.bpm.service.candidate.BpmCandidateSourceInfo;
 
 /**
@@ -35,6 +36,6 @@ public interface BpmProcessInstanceCopyService {
      * @param pageReqVO 分页请求
      * @return 抄送的分页结果
      */
-    PageResult<BpmProcessInstanceCopyPageItemRespVO> getMyProcessInstanceCopyPage(Long loginUserId,
-                                                                                  BpmProcessInstanceCopyMyPageReqVO pageReqVO);
+    PageResult<BpmProcessInstanceCopyDO> getMyProcessInstanceCopyPage(Long loginUserId,
+                                                                      BpmProcessInstanceCopyMyPageReqVO pageReqVO);
 }

@@ -62,12 +62,6 @@ public class BpmProcessInstanceCopyServiceImpl implements BpmProcessInstanceCopy
     @Lazy
     private BpmTaskService bpmTaskService;
 
-    @Resource
-    @Lazy // 解决循环依赖
-    private BpmProcessInstanceService bpmProcessInstanceService;
-    @Resource
-    private AdminUserApi adminUserApi;
-
     @Override
     public boolean makeCopy(BpmCandidateSourceInfo sourceInfo) {
         if (null == sourceInfo) {
@@ -163,28 +157,9 @@ public class BpmProcessInstanceCopyServiceImpl implements BpmProcessInstanceCopy
     }
 
     @Override
-    public PageResult<BpmProcessInstanceCopyPageItemRespVO> getMyProcessInstanceCopyPage(Long loginUserId, BpmProcessInstanceCopyMyPageReqVO pageReqVO) {
+    public PageResult<BpmProcessInstanceCopyDO> getMyProcessInstanceCopyPage(Long loginUserId, BpmProcessInstanceCopyMyPageReqVO pageReqVO) {
         // 通过 BpmProcessInstanceExtDO 表，先查询到对应的分页
-        // TODO @kyle：一般读逻辑，Service 返回 PageResult<BpmProcessInstanceCopyDO> 即可。关联数据的查询和拼接，交给 Controller；目的是：保证 Service 聚焦写逻辑，清晰简洁；
-        PageResult<BpmProcessInstanceCopyDO> pageResult = processInstanceCopyMapper.selectPage(loginUserId, pageReqVO);
-        if (CollUtil.isEmpty(pageResult.getList())) {
-            return new PageResult<>(pageResult.getTotal());
-        }
-
-        Map<String, String> taskNameByTaskIds = bpmTaskService.getTaskNameByTaskIds(convertSet(pageResult.getList(), BpmProcessInstanceCopyDO::getTaskId));
-        Map<String, String> processInstanceNameByProcessInstanceIds = bpmTaskService.getProcessInstanceNameByProcessInstanceIds(convertSet(pageResult.getList(), BpmProcessInstanceCopyDO::getProcessInstanceId));
-
-        Set<Long/* userId */> userIds = new HashSet<>();
-        for (BpmProcessInstanceCopyDO doItem : pageResult.getList()) {
-            userIds.add(doItem.getStartUserId());
-            Long userId = Long.valueOf(doItem.getCreator());
-            userIds.add(userId);
-        }
-        Map<Long, String> userMap = adminUserApi.getUserList(userIds).stream().collect(Collectors.toMap(
-                AdminUserRespDTO::getId, AdminUserRespDTO::getNickname));
-
-        // 转换返回
-        return BpmProcessInstanceCopyConvert.INSTANCE.convertPage(pageResult, taskNameByTaskIds, processInstanceNameByProcessInstanceIds, userMap);
+        return processInstanceCopyMapper.selectPage(loginUserId, pageReqVO);
     }
 
 }
