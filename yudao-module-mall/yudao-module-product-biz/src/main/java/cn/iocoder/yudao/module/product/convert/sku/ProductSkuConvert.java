@@ -2,10 +2,7 @@ package cn.iocoder.yudao.module.product.convert.sku;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -24,24 +21,6 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 public interface ProductSkuConvert {
 
     ProductSkuConvert INSTANCE = Mappers.getMapper(ProductSkuConvert.class);
-
-    ProductSkuDO convert(ProductSkuCreateOrUpdateReqVO bean);
-
-    ProductSkuRespVO convert(ProductSkuDO bean);
-
-    List<ProductSkuRespVO> convertList(List<ProductSkuDO> list);
-
-    List<ProductSkuDO> convertList06(List<ProductSkuCreateOrUpdateReqVO> list);
-
-    default List<ProductSkuDO> convertList06(List<ProductSkuCreateOrUpdateReqVO> list, Long spuId) {
-        List<ProductSkuDO> result = convertList06(list);
-        result.forEach(item -> item.setSpuId(spuId));
-        return result;
-    }
-
-    ProductSkuRespDTO convert02(ProductSkuDO bean);
-
-    List<ProductSkuRespDTO> convertList04(List<ProductSkuDO> list);
 
     /**
      * 获得 SPU 的库存变化 Map

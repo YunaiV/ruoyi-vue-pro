@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.trade.controller.app.aftersale;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.log.AfterSaleLogRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppAfterSaleCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppAfterSaleDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppAfterSaleRespVO;
@@ -16,6 +17,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.annotation.Resource;
+
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -42,12 +45,6 @@ public class AppAfterSaleController {
     @Parameter(name = "id", description = "售后编号", required = true, example = "1")
     public CommonResult<AppAfterSaleRespVO> getAfterSale(@RequestParam("id") Long id) {
         return success(AfterSaleConvert.INSTANCE.convert(afterSaleService.getAfterSale(getLoginUserId(), id)));
-    }
-
-    @GetMapping(value = "/get-applying-count")
-    @Operation(summary = "获得进行中的售后订单数量")
-    public CommonResult<Long> getApplyingAfterSaleCount() {
-        return success(afterSaleService.getApplyingAfterSaleCount(getLoginUserId()));
     }
 
     @PostMapping(value = "/create")

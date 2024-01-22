@@ -18,6 +18,9 @@ import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -25,9 +28,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
@@ -49,7 +49,6 @@ public class TradeStatisticsController {
     @Resource
     private BrokerageStatisticsService brokerageStatisticsService;
 
-    // TODO 芋艿：已经 review
     @GetMapping("/summary")
     @Operation(summary = "获得交易统计")
     @PreAuthorize("@ss.hasPermission('statistics:trade:query')")
@@ -67,17 +66,14 @@ public class TradeStatisticsController {
         return success(TradeStatisticsConvert.INSTANCE.convert(yesterdayData, beforeYesterdayData, monthData, lastMonthData));
     }
 
-    // TODO @疯狂：【晚点再改和讨论；等首页的接口出来】这个要不还是叫 analyse，对比选中的时间段，和上一个时间段；类似 MemberStatisticsController 的 getMemberAnalyse
-    @GetMapping("/trend/summary")
+    @GetMapping("/analyse")
     @Operation(summary = "获得交易状况统计")
     @PreAuthorize("@ss.hasPermission('statistics:trade:query')")
-    public CommonResult<DataComparisonRespVO<TradeTrendSummaryRespVO>> getTradeTrendSummaryComparison(
-            TradeTrendReqVO reqVO) {
-        return success(tradeStatisticsService.getTradeTrendSummaryComparison(ArrayUtil.get(reqVO.getTimes(), 0),
+    public CommonResult<DataComparisonRespVO<TradeTrendSummaryRespVO>> getTradeStatisticsAnalyse(TradeTrendReqVO reqVO) {
+        return success(tradeStatisticsService.getTradeStatisticsAnalyse(ArrayUtil.get(reqVO.getTimes(), 0),
                 ArrayUtil.get(reqVO.getTimes(), 1)));
     }
 
-    // TODO 芋艿：已经 review
     @GetMapping("/list")
     @Operation(summary = "获得交易状况明细")
     @PreAuthorize("@ss.hasPermission('statistics:trade:query')")
@@ -87,7 +83,6 @@ public class TradeStatisticsController {
         return success(TradeStatisticsConvert.INSTANCE.convertList(list));
     }
 
-    // TODO 芋艿：已经 review
     @GetMapping("/export-excel")
     @Operation(summary = "导出获得交易状况明细 Excel")
     @PreAuthorize("@ss.hasPermission('statistics:trade:export')")
@@ -100,7 +95,6 @@ public class TradeStatisticsController {
         ExcelUtils.write(response, "交易状况.xls", "数据", TradeTrendSummaryExcelVO.class, data);
     }
 
-    // TODO 芋艿：已经 review
     @GetMapping("/order-count")
     @Operation(summary = "获得交易订单数量")
     @PreAuthorize("@ss.hasPermission('statistics:trade:query')")
@@ -118,7 +112,6 @@ public class TradeStatisticsController {
         return success(TradeStatisticsConvert.INSTANCE.convert(undeliveredCount, pickUpCount, afterSaleApplyCount, auditingWithdrawCount));
     }
 
-    // TODO 芋艿：已经 review
     @GetMapping("/order-comparison")
     @Operation(summary = "获得交易订单数量")
     @PreAuthorize("@ss.hasPermission('statistics:trade:query')")
@@ -126,7 +119,6 @@ public class TradeStatisticsController {
         return success(tradeOrderStatisticsService.getOrderComparison());
     }
 
-    // TODO 芋艿：已经 review
     @GetMapping("/order-count-trend")
     @Operation(summary = "获得订单量趋势统计")
     @PreAuthorize("@ss.hasPermission('statistics:trade:query')")

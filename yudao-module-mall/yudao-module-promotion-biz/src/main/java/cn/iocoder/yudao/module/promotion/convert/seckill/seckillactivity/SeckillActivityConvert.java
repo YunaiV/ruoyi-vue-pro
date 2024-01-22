@@ -3,9 +3,7 @@ package cn.iocoder.yudao.module.promotion.convert.seckill.seckillactivity;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
-import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
-import cn.iocoder.yudao.module.product.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.promotion.api.seckill.dto.SeckillValidateJoinRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityDetailRespVO;
@@ -104,8 +102,7 @@ public interface SeckillActivityConvert {
             item.setSeckillPrice(getMinValue(productMap.get(item.getId()), SeckillProductDO::getSeckillPrice));
             // spu 信息
             findAndThen(spuMap, item.getSpuId(), spu ->
-                    item.setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice())
-                            .setUnitName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.PRODUCT_UNIT, spu.getUnit())));
+                    item.setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice()));
             return item;
         }));
         return respVO;
@@ -121,8 +118,7 @@ public interface SeckillActivityConvert {
             // product 信息
             item.setSeckillPrice(getMinValue(productMap.get(item.getId()), SeckillProductDO::getSeckillPrice));
             // spu 信息
-            findAndThen(spuMap, item.getSpuId(), spu -> item.setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice())
-                    .setUnitName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.PRODUCT_UNIT, spu.getUnit())));
+            findAndThen(spuMap, item.getSpuId(), spu -> item.setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice()));
             return item;
         });
         result.setList(list);

@@ -19,8 +19,7 @@ public class AppSeckillActivityRespVO {
     @Schema(description = "商品图片", requiredMode = Schema.RequiredMode.REQUIRED, // 从 SPU 的 picUrl 读取
             example = "https://www.iocoder.cn/xx.png")
     private String picUrl;
-    @Schema(description = "单位名", requiredMode = Schema.RequiredMode.REQUIRED, example = "个")
-    private String unitName;
+
     @Schema(description = "商品市场价，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, // 从 SPU 的 marketPrice 读取
             example = "50")
     private Integer marketPrice;

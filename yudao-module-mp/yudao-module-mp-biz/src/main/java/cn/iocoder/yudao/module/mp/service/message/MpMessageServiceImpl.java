@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.mp.service.message;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.mp.controller.admin.message.vo.message.MpMessagePageReqVO;
@@ -17,6 +18,8 @@ import cn.iocoder.yudao.module.mp.service.account.MpAccountService;
 import cn.iocoder.yudao.module.mp.service.material.MpMaterialService;
 import cn.iocoder.yudao.module.mp.service.message.bo.MpMessageSendOutReqBO;
 import cn.iocoder.yudao.module.mp.service.user.MpUserService;
+import jakarta.annotation.Resource;
+import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.common.error.WxErrorException;
@@ -27,9 +30,6 @@ import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-
-import jakarta.annotation.Resource;
-import jakarta.validation.Validator;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.MESSAGE_SEND_FAIL;
@@ -72,6 +72,13 @@ public class MpMessageServiceImpl implements MpMessageService {
         // 获得关联信息
         MpAccountDO account = mpAccountService.getAccountFromCache(appId);
         Assert.notNull(account, "公众号账号({}) 不存在", appId);
+
+        // 订阅事件不记录，因为此时公众号粉丝表中还没有此粉丝的数据
+        // TODO @芋艿：这个修复，后续看看还有啥问题
+        if (ObjUtil.equal(wxMessage.getEvent(), WxConsts.EventType.SUBSCRIBE)) {
+            return;
+        }
+
         MpUserDO user = mpUserService.getUser(appId, wxMessage.getFromUser());
         Assert.notNull(user, "公众号粉丝({}/{}) 不存在", appId, wxMessage.getFromUser());
 

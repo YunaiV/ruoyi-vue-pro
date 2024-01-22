@@ -28,7 +28,7 @@ public class AppArticleRespVO {
     private String introduction;
 
     @Schema(description = "文章内容", requiredMode = Schema.RequiredMode.REQUIRED, example = "我是详细")
-    private String description;
+    private String content;
 
     @Schema(description = "发布时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;

@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationValidateJoinRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.combination.vo.recrod.CombinationRecordReqPageVO;
+import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordPageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
@@ -162,5 +163,14 @@ public interface CombinationRecordService {
      * @return key 过期拼团数量, value 虚拟成团数量
      */
     KeyValue<Integer, Integer> expireCombinationRecord();
+
+    /**
+     * 获得拼团记录分页数据
+     *
+     * @param userId 用户编号
+     * @param pageReqVO 分页请求
+     * @return 拼团记录分页数据
+     */
+    PageResult<CombinationRecordDO> getCombinationRecordPage(Long userId, AppCombinationRecordPageReqVO pageReqVO);
 
 }

@@ -7,13 +7,13 @@ import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.Crm
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivableUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivableDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.receivable.CrmReceivableMapper;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import jakarta.annotation.Resource;
-
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
@@ -43,7 +43,7 @@ public class CrmCrmReceivableServiceImplTest extends BaseDbUnitTest {
         CrmReceivableCreateReqVO reqVO = randomPojo(CrmReceivableCreateReqVO.class);
 
         // 调用
-        Long receivableId = receivableService.createReceivable(reqVO);
+        Long receivableId = receivableService.createReceivable(reqVO, getLoginUserId());
         // 断言
         assertNotNull(receivableId);
         // 校验记录的属性是否正确
@@ -133,7 +133,7 @@ public class CrmCrmReceivableServiceImplTest extends BaseDbUnitTest {
        reqVO.setCustomerId(null);
 
        // 调用
-       PageResult<CrmReceivableDO> pageResult = receivableService.getReceivablePage(reqVO);
+        PageResult<CrmReceivableDO> pageResult = receivableService.getReceivablePage(reqVO, 1L);
        // 断言
        assertEquals(1, pageResult.getTotal());
        assertEquals(1, pageResult.getList().size());

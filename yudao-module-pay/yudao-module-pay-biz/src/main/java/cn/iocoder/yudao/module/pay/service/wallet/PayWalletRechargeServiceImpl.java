@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.pay.service.wallet;
 
 import cn.hutool.core.lang.Assert;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.pay.core.enums.refund.PayRefundStatusRespEnum;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
@@ -64,7 +66,6 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
     @Transactional(rollbackFor = Exception.class)
     public PayWalletRechargeDO createWalletRecharge(Long userId, Integer userType, String userIp,
                                                     AppPayWalletRechargeCreateReqVO reqVO) {
-
         // 1.1 计算充值金额
         int payPrice;
         int bonusPrice = 0;
@@ -91,6 +92,13 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
         walletRechargeMapper.updateById(new PayWalletRechargeDO().setId(recharge.getId()).setPayOrderId(payOrderId));
         recharge.setPayOrderId(payOrderId);
         return recharge;
+    }
+
+    @Override
+    public PageResult<PayWalletRechargeDO> getWalletRechargePackagePage(Long userId, Integer userType,
+                                                                               PageParam pageReqVO, Boolean payStatus) {
+        PayWalletDO wallet = payWalletService.getOrCreateWallet(userId, userType);
+        return walletRechargeMapper.selectPage(pageReqVO, wallet.getId(), payStatus);
     }
 
     @Override

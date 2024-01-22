@@ -73,6 +73,13 @@ public class CrmClueDO extends BaseDO {
      */
     private String remark;
 
+    /**
+     * 负责人的用户编号
+     *
+     * 关联 AdminUserDO 的 id 字段
+     */
+    private Long ownerUserId;
+
     // TODO 芋艿：客户级别；
     // TODO 芋艿：线索来源；
     // TODO 芋艿：客户行业；

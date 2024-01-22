@@ -4,7 +4,7 @@ import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.test.core.util.AssertUtils;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSkuSaveReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.sku.ProductSkuMapper;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyService;
@@ -74,13 +74,13 @@ public class ProductSkuServiceTest extends BaseDbUnitTest {
         // 准备参数
         Long spuId = 1L;
         String spuName = "测试商品";
-        List<ProductSkuCreateOrUpdateReqVO> skus = Arrays.asList(
-                randomPojo(ProductSkuCreateOrUpdateReqVO.class, o -> { // 测试更新
-                    o.setProperties(singletonList(new ProductSkuCreateOrUpdateReqVO.Property(
+        List<ProductSkuSaveReqVO> skus = Arrays.asList(
+                randomPojo(ProductSkuSaveReqVO.class, o -> { // 测试更新
+                    o.setProperties(singletonList(new ProductSkuSaveReqVO.Property(
                             10L, "颜色", 20L, "红色")));
                 }),
-                randomPojo(ProductSkuCreateOrUpdateReqVO.class, o -> { // 测试新增
-                    o.setProperties(singletonList(new ProductSkuCreateOrUpdateReqVO.Property(
+                randomPojo(ProductSkuSaveReqVO.class, o -> { // 测试新增
+                    o.setProperties(singletonList(new ProductSkuSaveReqVO.Property(
                             10L, "颜色", 20L, "红色")));
                 })
         );

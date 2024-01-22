@@ -5,11 +5,13 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryListReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSkuSaveReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuSaveReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuUpdateStatusReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
-import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
@@ -18,17 +20,16 @@ import cn.iocoder.yudao.module.product.service.brand.ProductBrandService;
 import cn.iocoder.yudao.module.product.service.category.ProductCategoryService;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import com.google.common.collect.Maps;
+import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getMinValue;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getSumValue;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO.CATEGORY_LEVEL;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
 
@@ -54,15 +55,15 @@ public class ProductSpuServiceImpl implements ProductSpuService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long createSpu(ProductSpuCreateReqVO createReqVO) {
+    public Long createSpu(ProductSpuSaveReqVO createReqVO) {
         // 校验分类、品牌
         validateCategory(createReqVO.getCategoryId());
         brandService.validateProductBrand(createReqVO.getBrandId());
         // 校验 SKU
-        List<ProductSkuCreateOrUpdateReqVO> skuSaveReqList = createReqVO.getSkus();
+        List<ProductSkuSaveReqVO> skuSaveReqList = createReqVO.getSkus();
         productSkuService.validateSkuList(skuSaveReqList, createReqVO.getSpecType());
 
-        ProductSpuDO spu = ProductSpuConvert.INSTANCE.convert(createReqVO);
+        ProductSpuDO spu = BeanUtils.toBean(createReqVO, ProductSpuDO.class);
         // 初始化 SPU 中 SKU 相关属性
         initSpuFromSkus(spu, skuSaveReqList);
         // 插入 SPU
@@ -75,18 +76,18 @@ public class ProductSpuServiceImpl implements ProductSpuService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateSpu(ProductSpuUpdateReqVO updateReqVO) {
+    public void updateSpu(ProductSpuSaveReqVO updateReqVO) {
         // 校验 SPU 是否存在
         validateSpuExists(updateReqVO.getId());
         // 校验分类、品牌
         validateCategory(updateReqVO.getCategoryId());
         brandService.validateProductBrand(updateReqVO.getBrandId());
         // 校验SKU
-        List<ProductSkuCreateOrUpdateReqVO> skuSaveReqList = updateReqVO.getSkus();
+        List<ProductSkuSaveReqVO> skuSaveReqList = updateReqVO.getSkus();
         productSkuService.validateSkuList(skuSaveReqList, updateReqVO.getSpecType());
 
         // 更新 SPU
-        ProductSpuDO updateObj = ProductSpuConvert.INSTANCE.convert(updateReqVO);
+        ProductSpuDO updateObj = BeanUtils.toBean(updateReqVO, ProductSpuDO.class);
         initSpuFromSkus(updateObj, skuSaveReqList);
         productSpuMapper.updateById(updateObj);
         // 批量更新 SKU
@@ -100,26 +101,20 @@ public class ProductSpuServiceImpl implements ProductSpuService {
      * @param spu  商品 SPU
      * @param skus 商品 SKU 数组
      */
-    private void initSpuFromSkus(ProductSpuDO spu, List<ProductSkuCreateOrUpdateReqVO> skus) {
+    private void initSpuFromSkus(ProductSpuDO spu, List<ProductSkuSaveReqVO> skus) {
         // sku 单价最低的商品的价格
-        spu.setPrice(getMinValue(skus, ProductSkuCreateOrUpdateReqVO::getPrice));
+        spu.setPrice(getMinValue(skus, ProductSkuSaveReqVO::getPrice));
         // sku 单价最低的商品的市场价格
-        spu.setMarketPrice(getMinValue(skus, ProductSkuCreateOrUpdateReqVO::getMarketPrice));
+        spu.setMarketPrice(getMinValue(skus, ProductSkuSaveReqVO::getMarketPrice));
         // sku 单价最低的商品的成本价格
-        spu.setCostPrice(getMinValue(skus, ProductSkuCreateOrUpdateReqVO::getCostPrice));
-        // sku 单价最低的商品的条形码 TODO 芋艿：条形码字段，是不是可以删除
-        spu.setBarCode("");
-//        spu.setBarCode(getMinValue(skus, ProductSkuCreateOrUpdateReqVO::getBarCode));
+        spu.setCostPrice(getMinValue(skus, ProductSkuSaveReqVO::getCostPrice));
         // skus 库存总数
-        spu.setStock(getSumValue(skus, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
+        spu.setStock(getSumValue(skus, ProductSkuSaveReqVO::getStock, Integer::sum));
         // 若是 spu 已有状态则不处理
         if (spu.getStatus() == null) {
-            // 默认状态为上架
-            spu.setStatus(ProductSpuStatusEnum.ENABLE.getStatus());
-            // 默认商品销量
-            spu.setSalesCount(0);
-            // 默认商品浏览量
-            spu.setBrowseCount(0);
+            spu.setStatus(ProductSpuStatusEnum.ENABLE.getStatus()); // 默认状态为上架
+            spu.setSalesCount(0); // 默认商品销量
+            spu.setBrowseCount(0); // 默认商品浏览量
         }
     }
 
@@ -158,6 +153,11 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     }
 
     @Override
+    public void updateBrowseCount(Long id, int incrCount) {
+        productSpuMapper.updateBrowseCount(id , incrCount);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteSpu(Long id) {
         // 校验存在
@@ -168,6 +168,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         if (ObjectUtil.notEqual(spuDO.getStatus(), ProductSpuStatusEnum.RECYCLE.getStatus())) {
             throw exception(SPU_NOT_RECYCLE);
         }
+        // TODO 芋艿：【可选】参与活动中的商品，不允许删除？？？
 
         // 删除 SPU
         productSpuMapper.deleteById(id);
@@ -200,11 +201,6 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     }
 
     @Override
-    public List<ProductSpuDO> getSpuList(ProductSpuExportReqVO reqVO) {
-        return productSpuMapper.selectList(reqVO);
-    }
-
-    @Override
     public PageResult<ProductSpuDO> getSpuPage(ProductSpuPageReqVO pageReqVO) {
         return productSpuMapper.selectPage(pageReqVO);
     }
@@ -215,17 +211,18 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         Set<Long> categoryIds = new HashSet<>();
         if (pageReqVO.getCategoryId() != null && pageReqVO.getCategoryId() > 0) {
             categoryIds.add(pageReqVO.getCategoryId());
-            List<ProductCategoryDO> categoryChildren = categoryService.getEnableCategoryList(new ProductCategoryListReqVO()
-                    .setParentId(pageReqVO.getCategoryId()).setStatus(CommonStatusEnum.ENABLE.getStatus()));
-            categoryIds.addAll(CollectionUtils.convertList(categoryChildren, ProductCategoryDO::getId));
+            List<ProductCategoryDO> categoryChildren = categoryService.getCategoryList(new ProductCategoryListReqVO()
+                    .setStatus(CommonStatusEnum.ENABLE.getStatus()).setParentId(pageReqVO.getCategoryId()));
+            categoryIds.addAll(convertList(categoryChildren, ProductCategoryDO::getId));
+        }
+        if (CollUtil.isNotEmpty(pageReqVO.getCategoryIds())) {
+            categoryIds.addAll(pageReqVO.getCategoryIds());
+            List<ProductCategoryDO> categoryChildren = categoryService.getCategoryList(new ProductCategoryListReqVO()
+                    .setStatus(CommonStatusEnum.ENABLE.getStatus()).setParentIds(pageReqVO.getCategoryIds()));
+            categoryIds.addAll(convertList(categoryChildren, ProductCategoryDO::getId));
         }
         // 分页查询
         return productSpuMapper.selectPage(pageReqVO, categoryIds);
-    }
-
-    @Override
-    public List<ProductSpuDO> getSpuList(String recommendType, Integer count) {
-        return productSpuMapper.selectListByRecommendType(recommendType, count);
     }
 
     @Override
@@ -239,6 +236,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     public void updateSpuStatus(ProductSpuUpdateStatusReqVO updateReqVO) {
         // 校验存在
         validateSpuExists(updateReqVO.getId());
+        // TODO 芋艿：【可选】参与活动中的商品，不允许下架？？？
 
         // 更新状态
         ProductSpuDO productSpuDO = productSpuMapper.selectById(updateReqVO.getId()).setStatus(updateReqVO.getStatus());

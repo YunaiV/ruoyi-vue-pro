@@ -73,9 +73,8 @@ public class AppAuthController {
 
     @PostMapping("/sms-login")
     @Operation(summary = "使用手机 + 验证码登录")
-    public CommonResult<AppAuthLoginRespVO> smsLogin(@RequestBody @Valid AppAuthSmsLoginReqVO reqVO,
-                                                     @RequestHeader Integer terminal) {
-        return success(authService.smsLogin(reqVO, terminal));
+    public CommonResult<AppAuthLoginRespVO> smsLogin(@RequestBody @Valid AppAuthSmsLoginReqVO reqVO) {
+        return success(authService.smsLogin(reqVO));
     }
 
     @PostMapping("/send-sms-code")

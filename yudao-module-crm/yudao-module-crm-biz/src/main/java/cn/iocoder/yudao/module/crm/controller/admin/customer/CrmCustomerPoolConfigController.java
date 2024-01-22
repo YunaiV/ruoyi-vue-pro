@@ -1,19 +1,18 @@
 package cn.iocoder.yudao.module.crm.controller.admin.customer;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.poolconfig.CrmCustomerPoolConfigRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.poolconfig.CrmCustomerPoolConfigSaveReqVO;
-import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerPoolConfigService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -30,8 +29,8 @@ public class CrmCustomerPoolConfigController {
     @Operation(summary = "获取客户公海规则设置")
     @PreAuthorize("@ss.hasPermission('crm:customer-pool-config:query')")
     public CommonResult<CrmCustomerPoolConfigRespVO> getCustomerPoolConfig() {
-        CrmCustomerPoolConfigDO customerPoolConfig = customerPoolConfigService.getCustomerPoolConfig();
-        return success(CrmCustomerConvert.INSTANCE.convert(customerPoolConfig));
+        CrmCustomerPoolConfigDO poolConfig = customerPoolConfigService.getCustomerPoolConfig();
+        return success(BeanUtils.toBean(poolConfig, CrmCustomerPoolConfigRespVO.class));
     }
 
     @PutMapping("/save")

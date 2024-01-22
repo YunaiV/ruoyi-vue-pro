@@ -12,7 +12,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class TradeTrendSummaryRespVO {
 
-    @Schema(description = "日期", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    @Schema(description = "日期", requiredMode = Schema.RequiredMode.REQUIRED, example = "2023-12-16")
     @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY)
     private LocalDate date;
 

@@ -3,10 +3,12 @@ package cn.iocoder.yudao.module.system.api.social.dto;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.NoArgsConstructor;
 
 /**
  * 社交绑定 Request DTO，使用 code 授权码
@@ -14,6 +16,8 @@ import jakarta.validation.constraints.NotNull;
  * @author 芋道源码
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class SocialUserUnbindReqDTO {
 
     /**

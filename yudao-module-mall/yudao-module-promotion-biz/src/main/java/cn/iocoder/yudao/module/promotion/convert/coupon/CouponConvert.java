@@ -58,8 +58,4 @@ public interface CouponConvert {
 
     CouponPageReqVO convert(AppCouponPageReqVO pageReqVO, Collection<Long> userIds);
 
-    PageResult<AppCouponRespVO> convertAppPage(PageResult<CouponDO> pageResult);
-
-    List<AppCouponMatchRespVO> convertList(List<CouponDO> list);
-
 }

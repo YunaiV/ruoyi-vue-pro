@@ -2,10 +2,10 @@ package cn.iocoder.yudao.module.system.controller.app.ip;
 
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.ip.core.Area;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.system.controller.app.ip.vo.AppAreaNodeRespVO;
-import cn.iocoder.yudao.module.system.convert.ip.AreaConvert;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
@@ -28,7 +28,7 @@ public class AppAreaController {
     public CommonResult<List<AppAreaNodeRespVO>> getAreaTree() {
         Area area = AreaUtils.getArea(Area.ID_CHINA);
         Assert.notNull(area, "获取不到中国");
-        return success(AreaConvert.INSTANCE.convertList3(area.getChildren()));
+        return success(BeanUtils.toBean(area.getChildren(), AppAreaNodeRespVO.class));
     }
 
 }

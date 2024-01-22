@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import jakarta.annotation.Resource;
+
+import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -93,14 +95,18 @@ public class CrmBusinessStatusTypeServiceImpl implements CrmBusinessStatusTypeSe
 
     // TODO @ljlleo 这个方法，这个参考 validateDeptNameUnique 实现。
     private void validateBusinessStatusTypeExists(String name, Long id) {
-        LambdaQueryWrapper<CrmBusinessStatusTypeDO> wrapper = new LambdaQueryWrapperX<>();
-        if(null != id) {
-            wrapper.ne(CrmBusinessStatusTypeDO::getId, id);
-        }
-        long cnt = businessStatusTypeMapper.selectCount(wrapper.eq(CrmBusinessStatusTypeDO::getName, name));
-        if (cnt > 0) {
+        CrmBusinessStatusTypeDO businessStatusTypeDO = businessStatusTypeMapper.selectByIdAndName(id, name);
+        if (businessStatusTypeDO != null) {
             throw exception(BUSINESS_STATUS_TYPE_NAME_EXISTS);
         }
+//        LambdaQueryWrapper<CrmBusinessStatusTypeDO> wrapper = new LambdaQueryWrapperX<>();
+//        if(null != id) {
+//            wrapper.ne(CrmBusinessStatusTypeDO::getId, id);
+//        }
+//        long cnt = businessStatusTypeMapper.selectCount(wrapper.eq(CrmBusinessStatusTypeDO::getName, name));
+//        if (cnt > 0) {
+//            throw exception(BUSINESS_STATUS_TYPE_NAME_EXISTS);
+//        }
     }
 
     @Override
@@ -116,6 +122,11 @@ public class CrmBusinessStatusTypeServiceImpl implements CrmBusinessStatusTypeSe
     @Override
     public List<CrmBusinessStatusTypeDO> selectList(CrmBusinessStatusTypeQueryVO queryVO) {
         return businessStatusTypeMapper.selectList(queryVO);
+    }
+
+    @Override
+    public List<CrmBusinessStatusTypeDO> getBusinessStatusTypeList(Collection<Long> ids) {
+        return businessStatusTypeMapper.selectBatchIds(ids);
     }
 
 }

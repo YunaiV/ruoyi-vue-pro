@@ -24,6 +24,6 @@ public class DiyPageBaseVO {
     private String remark;
 
     @Schema(description = "预览图")
-    private List<String> previewImageUrls;
+    private List<String> previewPicUrls;
 
 }

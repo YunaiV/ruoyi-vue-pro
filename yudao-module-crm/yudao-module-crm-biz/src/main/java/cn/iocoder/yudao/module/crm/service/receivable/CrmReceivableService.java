@@ -6,8 +6,8 @@ import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.Crm
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivableUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivableDO;
-
 import jakarta.validation.Valid;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -22,9 +22,10 @@ public interface CrmReceivableService {
      * 创建回款
      *
      * @param createReqVO 创建信息
+     * @param userId      用户编号
      * @return 编号
      */
-    Long createReceivable(@Valid CrmReceivableCreateReqVO createReqVO);
+    Long createReceivable(@Valid CrmReceivableCreateReqVO createReqVO, Long userId);
 
     /**
      * 更新回款
@@ -62,9 +63,10 @@ public interface CrmReceivableService {
      * 数据权限：基于 {@link CrmReceivableDO} 读取
      *
      * @param pageReqVO 分页查询
+     * @param userId    用户编号
      * @return 回款分页
      */
-    PageResult<CrmReceivableDO> getReceivablePage(CrmReceivablePageReqVO pageReqVO);
+    PageResult<CrmReceivableDO> getReceivablePage(CrmReceivablePageReqVO pageReqVO, Long userId);
 
     /**
      * 获得回款分页，基于指定客户
@@ -74,6 +76,6 @@ public interface CrmReceivableService {
      * @param pageReqVO 分页查询
      * @return 回款分页
      */
-    PageResult<CrmReceivableDO> getReceivablePageByCustomer(CrmReceivablePageReqVO pageReqVO);
+    PageResult<CrmReceivableDO> getReceivablePageByCustomerId(CrmReceivablePageReqVO pageReqVO);
 
 }

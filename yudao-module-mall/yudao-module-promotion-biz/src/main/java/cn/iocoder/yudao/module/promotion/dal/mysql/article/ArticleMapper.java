@@ -38,6 +38,10 @@ public interface ArticleMapper extends BaseMapperX<ArticleDO> {
                 .eqIfPresent(ArticleDO::getRecommendBanner, recommendBanner));
     }
 
+    default List<ArticleDO> selectListByTitle(String title) {
+        return selectList(ArticleDO::getTitle, title);
+    }
+
     default PageResult<ArticleDO> selectPage(AppArticlePageReqVO pageReqVO) {
         return selectPage(pageReqVO, new LambdaQueryWrapperX<ArticleDO>()
                 .eqIfPresent(ArticleDO::getCategoryId, pageReqVO.getCategoryId()));

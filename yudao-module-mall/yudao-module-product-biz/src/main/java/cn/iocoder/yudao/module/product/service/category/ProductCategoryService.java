@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.product.service.category;
 
-import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryListReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryUpdateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategorySaveReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
-
 import jakarta.validation.Valid;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -22,14 +21,14 @@ public interface ProductCategoryService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createCategory(@Valid ProductCategoryCreateReqVO createReqVO);
+    Long createCategory(@Valid ProductCategorySaveReqVO createReqVO);
 
     /**
      * 更新商品分类
      *
      * @param updateReqVO 更新信息
      */
-    void updateCategory(@Valid ProductCategoryUpdateReqVO updateReqVO);
+    void updateCategory(@Valid ProductCategorySaveReqVO updateReqVO);
 
     /**
      * 删除商品分类
@@ -67,7 +66,7 @@ public interface ProductCategoryService {
      * @param listReqVO 查询条件
      * @return 商品分类列表
      */
-    List<ProductCategoryDO> getEnableCategoryList(ProductCategoryListReqVO listReqVO);
+    List<ProductCategoryDO> getCategoryList(ProductCategoryListReqVO listReqVO);
 
     /**
      * 获得开启状态的商品分类列表
@@ -77,6 +76,14 @@ public interface ProductCategoryService {
     List<ProductCategoryDO> getEnableCategoryList();
 
     /**
+     * 获得开启状态的商品分类列表，指定编号
+     *
+     * @param ids 商品分类编号数组
+     * @return 商品分类列表
+     */
+    List<ProductCategoryDO> getEnableCategoryList(List<Long> ids);
+
+    /**
      * 校验商品分类是否有效。如下情况，视为无效：
      * 1. 商品分类编号不存在
      * 2. 商品分类被禁用
@@ -84,4 +91,5 @@ public interface ProductCategoryService {
      * @param ids 商品分类编号数组
      */
     void validateCategoryList(Collection<Long> ids);
+
 }
