@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.crm.dal.mysql.customer;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -13,14 +14,9 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.lang.Nullable;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Collection;
 import java.util.List;
-
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.BACKLOG_CONTACT_STATUS_INVALID;
 
 /**
  * 客户 Mapper
@@ -85,24 +81,21 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
         CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CUSTOMER.getType(),
                 CrmCustomerDO::getId, userId, pageReqVO.getSceneType(), null);
 
-        query.selectAll(CrmCustomerDO.class);
-
         // 拼接自身的查询条件
-        LocalDateTime beginOfToday = LocalDate.now().atTime(LocalTime.MIN);
-        LocalDateTime endOfToday = LocalDate.now().atTime(LocalTime.MAX);
-        if (pageReqVO.getContactStatus().equals(CrmTodayCustomerPageReqVO.CONTACT_TODAY)) {
-            // 今天需联系
-            query.between(CrmCustomerDO::getContactNextTime, beginOfToday, endOfToday);
-        } else if (pageReqVO.getContactStatus().equals(CrmTodayCustomerPageReqVO.CONTACT_EXPIRED)) {
-            // 已逾期
-            query.lt(CrmCustomerDO::getContactNextTime, beginOfToday);
-        } else if (pageReqVO.getContactStatus().equals(CrmTodayCustomerPageReqVO.CONTACT_ALREADY)) {
-            // 已联系
-            query.between(CrmCustomerDO::getContactLastTime, beginOfToday, endOfToday);
-        } else {
-            throw exception(BACKLOG_CONTACT_STATUS_INVALID);
+        query.selectAll(CrmCustomerDO.class);
+        if (pageReqVO.getContactStatus() != null) {
+            LocalDateTime beginOfToday = LocalDateTimeUtil.beginOfDay(LocalDateTime.now());
+            LocalDateTime endOfToday = LocalDateTimeUtil.endOfDay(LocalDateTime.now());
+            if (pageReqVO.getContactStatus().equals(CrmTodayCustomerPageReqVO.CONTACT_TODAY)) { // 今天需联系
+                query.between(CrmCustomerDO::getContactNextTime, beginOfToday, endOfToday);
+            } else if (pageReqVO.getContactStatus().equals(CrmTodayCustomerPageReqVO.CONTACT_EXPIRED)) { // 已逾期
+                query.lt(CrmCustomerDO::getContactNextTime, beginOfToday);
+            } else if (pageReqVO.getContactStatus().equals(CrmTodayCustomerPageReqVO.CONTACT_ALREADY)) { // 已联系
+                query.between(CrmCustomerDO::getContactLastTime, beginOfToday, endOfToday);
+            } else {
+                throw new IllegalArgumentException("未知联系状态：" + pageReqVO.getContactStatus());
+            }
         }
-
         return selectJoinPage(pageReqVO, CrmCustomerDO.class, query);
     }
 

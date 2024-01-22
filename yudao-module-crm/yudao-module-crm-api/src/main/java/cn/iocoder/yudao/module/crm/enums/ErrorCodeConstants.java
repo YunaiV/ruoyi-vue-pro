@@ -87,6 +87,5 @@ public interface ErrorCodeConstants {
     ErrorCode FOLLOW_UP_RECORD_DELETE_DENIED = new ErrorCode(1_020_013_001, "删除跟进记录失败，原因：没有权限");
 
     // ========== 待办消息 1_020_014_000 ==========
-    ErrorCode BACKLOG_CONTACT_STATUS_INVALID = new ErrorCode(1_020_014_000, "客户联系状态有误");
 
 }

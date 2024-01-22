@@ -14,10 +14,18 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class CrmTodayCustomerPageReqVO extends PageParam {
 
+    /**
+     * 联系状态 - 今日需联系
+     */
     public static final int CONTACT_TODAY = 1;
+    /**
+     * 联系状态 - 已逾期
+     */
     public static final int CONTACT_EXPIRED = 2;
+    /**
+     * 联系状态 - 已联系
+     */
     public static final int CONTACT_ALREADY = 3;
-
 
     @Schema(description = "联系状态", example = "1")
     private Integer contactStatus;
