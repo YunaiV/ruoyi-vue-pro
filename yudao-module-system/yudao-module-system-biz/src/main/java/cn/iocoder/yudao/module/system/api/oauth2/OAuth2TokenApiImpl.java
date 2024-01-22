@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2TokenService;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 
 /**
  * OAuth2.0 Token API 实现类

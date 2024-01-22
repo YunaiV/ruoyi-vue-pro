@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.annotation.Resource;
-import jakarta.annotation.security.PermitAll;
-import jakarta.servlet.http.HttpServletRequest;
+import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
+import javax.servlet.http.HttpServletRequest;
 
 @Tag(name = "管理后台 - 验证码")
 @RestController("adminCaptchaController")

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.pay.api.order;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 /**
  * 支付单 API 接口

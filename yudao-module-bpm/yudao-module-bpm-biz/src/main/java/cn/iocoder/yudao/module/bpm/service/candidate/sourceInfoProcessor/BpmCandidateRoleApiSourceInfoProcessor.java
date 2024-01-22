@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
 import cn.iocoder.yudao.module.system.api.permission.RoleApi;
 import org.flowable.engine.delegate.DelegateExecution;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import java.util.Set;
 
 public class BpmCandidateRoleApiSourceInfoProcessor implements BpmCandidateSourceInfoProcessor {

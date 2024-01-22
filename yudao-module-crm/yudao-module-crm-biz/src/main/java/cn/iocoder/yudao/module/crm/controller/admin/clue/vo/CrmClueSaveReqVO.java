@@ -3,10 +3,10 @@ package cn.iocoder.yudao.module.crm.controller.admin.clue.vo;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
 import cn.iocoder.yudao.framework.common.validation.Telephone;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;

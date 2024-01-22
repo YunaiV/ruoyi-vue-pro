@@ -4,8 +4,8 @@ import cn.iocoder.yudao.framework.file.core.client.FileClientConfig;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
  * Sftp 文件客户端的配置类

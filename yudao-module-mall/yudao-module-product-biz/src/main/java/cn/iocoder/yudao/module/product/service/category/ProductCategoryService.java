@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.product.service.category;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryListReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategorySaveReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
-import jakarta.validation.Valid;
 
+import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 

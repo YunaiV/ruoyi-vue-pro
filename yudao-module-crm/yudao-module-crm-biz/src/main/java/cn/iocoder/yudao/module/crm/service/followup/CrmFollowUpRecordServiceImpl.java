@@ -17,10 +17,10 @@ import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.contact.bo.CrmContactUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.followup.handle.CrmFollowUpHandler;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 

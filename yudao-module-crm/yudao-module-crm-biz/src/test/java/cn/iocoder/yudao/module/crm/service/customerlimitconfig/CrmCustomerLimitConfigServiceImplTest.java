@@ -7,10 +7,11 @@ import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmC
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerLimitConfigDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.customer.CrmCustomerLimitConfigMapper;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerLimitConfigServiceImpl;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
+
+import javax.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;

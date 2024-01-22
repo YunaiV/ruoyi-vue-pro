@@ -2,16 +2,16 @@ package cn.iocoder.yudao.framework.common.util.servlet;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.servlet.JakartaServletUtil;
+import cn.hutool.extra.servlet.ServletUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.MediaType;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Map;
@@ -32,7 +32,7 @@ public class ServletUtils {
     @SuppressWarnings("deprecation") // 必须使用 APPLICATION_JSON_UTF8_VALUE，否则会乱码
     public static void writeJSON(HttpServletResponse response, Object object) {
         String content = JsonUtils.toJsonString(object);
-        JakartaServletUtil.write(response, content, MediaType.APPLICATION_JSON_UTF8_VALUE);
+        ServletUtil.write(response, content, MediaType.APPLICATION_JSON_UTF8_VALUE);
     }
 
     /**
@@ -85,7 +85,7 @@ public class ServletUtils {
         if (request == null) {
             return null;
         }
-        return JakartaServletUtil.getClientIP(request);
+        return ServletUtil.getClientIP(request);
     }
 
     public static boolean isJsonRequest(ServletRequest request) {
@@ -93,19 +93,19 @@ public class ServletUtils {
     }
 
     public static String getBody(HttpServletRequest request) {
-        return JakartaServletUtil.getBody(request);
+        return ServletUtil.getBody(request);
     }
 
     public static byte[] getBodyBytes(HttpServletRequest request) {
-        return JakartaServletUtil.getBodyBytes(request);
+        return ServletUtil.getBodyBytes(request);
     }
 
     public static String getClientIP(HttpServletRequest request) {
-        return JakartaServletUtil.getClientIP(request);
+        return ServletUtil.getClientIP(request);
     }
 
     public static Map<String, String> getParamMap(HttpServletRequest request) {
-        return JakartaServletUtil.getParamMap(request);
+        return ServletUtil.getParamMap(request);
     }
 
 }

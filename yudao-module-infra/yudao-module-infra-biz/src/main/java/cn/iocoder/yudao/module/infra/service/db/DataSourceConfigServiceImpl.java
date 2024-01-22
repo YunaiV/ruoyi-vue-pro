@@ -10,7 +10,7 @@ import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSour
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
 

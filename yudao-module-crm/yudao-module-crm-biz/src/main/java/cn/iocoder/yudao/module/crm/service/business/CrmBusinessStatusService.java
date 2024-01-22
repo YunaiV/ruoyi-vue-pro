@@ -6,8 +6,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.business.vo.status.CrmBusine
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.status.CrmBusinessStatusSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
 
-import jakarta.validation.Valid;
-
+import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 

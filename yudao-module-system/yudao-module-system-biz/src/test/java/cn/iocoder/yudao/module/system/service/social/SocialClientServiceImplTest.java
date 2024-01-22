@@ -31,7 +31,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
@@ -291,7 +291,7 @@ public class SocialClientServiceImplTest extends BaseDbUnitTest {
         // mock 方法
         WxMaUserService userService = mock(WxMaUserService.class);
         when(wxMaService.getUserService()).thenReturn(userService);
-        WxErrorException wxErrorException = new WxErrorException(new NullPointerException());
+        WxErrorException wxErrorException = randomPojo(WxErrorException.class);
         when(userService.getPhoneNoInfo(eq(phoneCode))).thenThrow(wxErrorException);
 
         // 调用并断言异常

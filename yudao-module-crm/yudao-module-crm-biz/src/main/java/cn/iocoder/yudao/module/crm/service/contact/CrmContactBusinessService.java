@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.crm.service.contact;
 
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactBusinessReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactBusinessDO;
-import jakarta.validation.Valid;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**

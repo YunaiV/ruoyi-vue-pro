@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.crm.controller.admin.business.vo.product;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 @Schema(description = "管理后台 - CRM 商机产品关联表 创建/更新 Request VO")

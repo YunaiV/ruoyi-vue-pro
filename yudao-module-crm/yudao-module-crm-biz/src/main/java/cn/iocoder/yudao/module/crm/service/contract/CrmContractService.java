@@ -7,8 +7,8 @@ import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTrans
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.service.contract.bo.CrmContractUpdateFollowUpReqBO;
-import jakarta.validation.Valid;
 
+import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 

@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
 /**

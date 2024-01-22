@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.bpm.controller.admin.candidate.vo.BpmTaskCandidat
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import jakarta.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 @Schema(description = "管理后台 - 通过流程任务的 Request VO")
 @Data

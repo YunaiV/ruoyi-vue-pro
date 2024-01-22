@@ -7,10 +7,11 @@ import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceiv
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivablePlanDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.receivable.CrmReceivablePlanMapper;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
+
+import javax.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;

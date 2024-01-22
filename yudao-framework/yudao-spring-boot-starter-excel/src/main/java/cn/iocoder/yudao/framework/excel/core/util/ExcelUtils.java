@@ -5,7 +5,7 @@ import com.alibaba.excel.converters.longconverter.LongStringConverter;
 import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -38,7 +38,7 @@ public class ExcelUtils {
                 .registerConverter(new LongStringConverter()) // 避免 Long 类型丢失精度
                 .sheet(sheetName).doWrite(data);
         // 设置 header 和 contentType。写在最后的原因是，避免报错时，响应 contentType 已经被修改了
-        response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, StandardCharsets.UTF_8));
+        response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, StandardCharsets.UTF_8.name()));
         response.setContentType("application/vnd.ms-excel;charset=UTF-8");
     }
 

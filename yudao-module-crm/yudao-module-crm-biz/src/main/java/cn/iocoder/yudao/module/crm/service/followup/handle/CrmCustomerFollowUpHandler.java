@@ -5,9 +5,9 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.followup.CrmFollowUpRecordDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.customer.bo.CrmCustomerUpdateFollowUpReqBO;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
 /**

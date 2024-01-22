@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.bpm.service.candidate.BpmCandidateSourceInfoProce
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import org.flowable.engine.delegate.DelegateExecution;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import java.util.Set;
 
 public class BpmCandidateAdminUserApiSourceInfoProcessor implements BpmCandidateSourceInfoProcessor {

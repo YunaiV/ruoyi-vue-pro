@@ -7,11 +7,11 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contactbusinesslink.CrmContactBusinessMapper;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
-import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
