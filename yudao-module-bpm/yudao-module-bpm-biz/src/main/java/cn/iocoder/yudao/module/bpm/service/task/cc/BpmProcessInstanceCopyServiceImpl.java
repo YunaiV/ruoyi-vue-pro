@@ -59,6 +59,7 @@ public class BpmProcessInstanceCopyServiceImpl implements BpmProcessInstanceCopy
     private BpmCandidateSourceInfoProcessorChain processorChain;
 
     @Resource
+    @Lazy
     private BpmTaskService bpmTaskService;
 
     @Resource

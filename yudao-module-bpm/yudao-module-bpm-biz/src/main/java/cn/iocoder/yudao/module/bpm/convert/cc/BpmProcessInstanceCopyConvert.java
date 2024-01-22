@@ -31,8 +31,7 @@ public interface BpmProcessInstanceCopyConvert {
             , Map<String, String/* processInstaneName */> processInstaneMap
             , Map<Long, String/* userName */> userMap
     ) {
-        List<BpmProcessInstanceCopyPageItemRespVO> list = convertList(page.getList());
-        List<BpmProcessInstanceCopyPageItemRespVO> list2 = BeanUtils.toBean(page.getList(),
+        List<BpmProcessInstanceCopyPageItemRespVO> list = BeanUtils.toBean(page.getList(),
                 BpmProcessInstanceCopyPageItemRespVO.class,
                 copy -> {
                     MapUtils.findAndThen(userMap, Long.valueOf(copy.getCreator()), copy::setCreatorNickname);
