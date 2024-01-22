@@ -11,12 +11,11 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-// TODO @kyle：建议改成 BpmProcessInstanceCopyMyPageReqVO；cc 缩写不容易理解，所以改成 copy，虽然会长一点，但是可读性更重要；
 @Schema(description = "管理后台 - 流程实例抄送的分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class BpmProcessInstanceCCMyPageReqVO extends PageParam {
+public class BpmProcessInstanceCopyMyPageReqVO extends PageParam {
 
     @Schema(description = "流程名称", example = "芋道")
     private String processInstanceName;

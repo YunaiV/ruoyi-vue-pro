@@ -2,12 +2,12 @@ package cn.iocoder.yudao.module.bpm.service.candidate;
 
 import cn.iocoder.yudao.module.bpm.controller.admin.candidate.vo.BpmTaskCandidateRuleVO;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,11 +18,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Data
 public class BpmCandidateSourceInfo {
-
-    @Schema(description = "流程id")
-    @NotNull
-    private String processInstanceId;
-
     @Schema(description = "当前任务ID")
     @NotNull
     private String taskId;

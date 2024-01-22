@@ -4,11 +4,13 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
+import jakarta.validation.Valid;
 import org.flowable.task.api.Task;
 
-import jakarta.validation.Valid;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 流程任务实例 Service 接口
@@ -132,6 +134,8 @@ public interface BpmTaskService {
      */
     void updateTaskExtAssign(Task task);
 
+    Task getTask(String id);
+
     /**
      * 获取当前任务的可回退的流程集合
      *
@@ -181,4 +185,19 @@ public interface BpmTaskService {
      */
     List<BpmTaskSubSignRespVO> getChildrenTaskList(String parentId);
 
+    /**
+     * 通过任务id查询任务名
+     *
+     * @param taskIds 任务id
+     * @return 对应的映射关系
+     */
+    Map<String/* taskId */, String/* taskName */> getTaskNameByTaskIds(Collection<String> taskIds);
+
+    /**
+     * 通过流程实例id获取到流程实例名
+     *
+     * @param processInstaneIds 流程实例Id
+     * @return 对应的映射关系
+     */
+    Map<String/* processInstaneId */, String/* processInstaneName */> getProcessInstanceNameByProcessInstanceIds(Set<String> processInstaneIds);
 }

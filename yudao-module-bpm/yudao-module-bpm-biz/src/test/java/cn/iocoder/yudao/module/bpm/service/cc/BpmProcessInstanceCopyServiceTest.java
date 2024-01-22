@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.bpm.service.cc;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.module.bpm.service.task.cc.BpmProcessInstanceCopyServiceImpl;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
