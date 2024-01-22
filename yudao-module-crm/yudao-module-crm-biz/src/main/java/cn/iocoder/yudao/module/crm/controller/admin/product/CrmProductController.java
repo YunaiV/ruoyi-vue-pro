@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductPageReqVO;
@@ -16,9 +15,6 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductCategoryDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
 import cn.iocoder.yudao.module.crm.service.product.CrmProductCategoryService;
 import cn.iocoder.yudao.module.crm.service.product.CrmProductService;
-import cn.iocoder.yudao.module.system.api.logger.OperateLogApi;
-import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2PageReqDTO;
-import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2RespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,12 +34,10 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSetByFlatMap;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
-import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.CRM_PRODUCT_TYPE;
 
 @Tag(name = "管理后台 - CRM 产品")
 @RestController
@@ -55,8 +49,6 @@ public class CrmProductController {
     private CrmProductService productService;
     @Resource
     private CrmProductCategoryService productCategoryService;
-    @Resource
-    private OperateLogApi operateLogApi;
     @Resource
     private AdminUserApi adminUserApi;
 
@@ -129,16 +121,6 @@ public class CrmProductController {
         List<CrmProductCategoryDO> productCategoryList = productCategoryService.getProductCategoryList(
                 convertSet(list, CrmProductDO::getCategoryId));
         return CrmProductConvert.INSTANCE.convertList(list, userMap, productCategoryList);
-    }
-
-    @GetMapping("/operate-log-page")
-    @Operation(summary = "获得产品操作日志")
-    @PreAuthorize("@ss.hasPermission('crm:product:query')")
-    public CommonResult<PageResult<OperateLogV2RespDTO>> getProductOperateLog(@RequestParam("bizId") Long bizId) {
-        OperateLogV2PageReqDTO reqVO = new OperateLogV2PageReqDTO();
-        reqVO.setPageSize(PAGE_SIZE_NONE); // 不分页
-        reqVO.setBizType(CRM_PRODUCT_TYPE).setBizId(bizId);
-        return success(operateLogApi.getOperateLogPage(BeanUtils.toBean(reqVO, OperateLogV2PageReqDTO.class)));
     }
 
 }
