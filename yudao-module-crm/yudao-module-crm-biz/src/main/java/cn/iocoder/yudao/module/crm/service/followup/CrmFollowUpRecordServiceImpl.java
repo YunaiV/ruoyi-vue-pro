@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.crm.service.clue.CrmClueService;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
+import cn.iocoder.yudao.module.crm.service.followup.bo.CrmFollowUpCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import jakarta.annotation.Resource;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -97,6 +99,16 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
     }
 
     @Override
+    public void createFollowUpRecordBatch(List<CrmFollowUpCreateReqBO> followUpCreateReqBOs) {
+        if (CollUtil.isEmpty(followUpCreateReqBOs)) {
+            return;
+        }
+
+        List<CrmFollowUpRecordDO> followUpRecords = BeanUtils.toBean(followUpCreateReqBOs, CrmFollowUpRecordDO.class);
+        crmFollowUpRecordMapper.insertBatch(followUpRecords);
+    }
+
+    @Override
     public void deleteFollowUpRecord(Long id, Long userId) {
         // 校验存在
         CrmFollowUpRecordDO followUpRecord = validateFollowUpRecordExists(id);
@@ -111,6 +123,12 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
 
         // 删除
         crmFollowUpRecordMapper.deleteById(id);
+    }
+
+    @Override
+    public void deleteFollowUpRecordByBiz(Integer bizType, Long bizId) {
+        // 删除
+        crmFollowUpRecordMapper.deleteByBiz(bizType, bizId);
     }
 
     private CrmFollowUpRecordDO validateFollowUpRecordExists(Long id) {
@@ -130,6 +148,11 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
     @CrmPermission(bizTypeValue = "#pageReqVO.bizType", bizId = "#pageReqVO.bizId", level = CrmPermissionLevelEnum.READ)
     public PageResult<CrmFollowUpRecordDO> getFollowUpRecordPage(CrmFollowUpRecordPageReqVO pageReqVO) {
         return crmFollowUpRecordMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<CrmFollowUpRecordDO> getFollowUpRecordByBiz(Integer bizType, Collection<Long> bizIds) {
+        return crmFollowUpRecordMapper.selectListByBiz(bizType, bizIds);
     }
 
 }

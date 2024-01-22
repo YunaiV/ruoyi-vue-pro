@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageR
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTransferReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.service.customer.bo.CrmCustomerCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import jakarta.validation.Valid;
 
@@ -97,6 +98,15 @@ public interface CrmCustomerService {
      * @param customerUpdateFollowUpReqBO 请求
      */
     void updateCustomerFollowUp(CrmUpdateFollowUpReqBO customerUpdateFollowUpReqBO);
+
+    /**
+     * 批量创建客户
+     *
+     * @param customerCreateReqBOs 请求
+     * @param userId               用户编号
+     * @return 客户列表
+     */
+    List<CrmCustomerDO> createCustomerBatch(List<CrmCustomerCreateReqBO> customerCreateReqBOs, Long userId);
 
     // ==================== 公海相关操作 ====================
 

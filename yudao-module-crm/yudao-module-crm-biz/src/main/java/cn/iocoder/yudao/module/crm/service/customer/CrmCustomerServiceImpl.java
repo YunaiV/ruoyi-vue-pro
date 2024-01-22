@@ -21,6 +21,7 @@ import cn.iocoder.yudao.module.crm.framework.permission.core.util.CrmPermissionU
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
+import cn.iocoder.yudao.module.crm.service.customer.bo.CrmCustomerCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
@@ -42,10 +43,12 @@ import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.customer.CrmCustomerLimitConfigTypeEnum.CUSTOMER_LOCK_LIMIT;
 import static cn.iocoder.yudao.module.crm.enums.customer.CrmCustomerLimitConfigTypeEnum.CUSTOMER_OWNER_LIMIT;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 /**
@@ -207,6 +210,25 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     @Override
     public void updateCustomerFollowUp(CrmUpdateFollowUpReqBO customerUpdateFollowUpReqBO) {
         customerMapper.updateById(BeanUtils.toBean(customerUpdateFollowUpReqBO, CrmCustomerDO.class).setId(customerUpdateFollowUpReqBO.getBizId()));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public List<CrmCustomerDO> createCustomerBatch(List<CrmCustomerCreateReqBO> customerCreateReqBOs, Long userId) {
+        if (CollUtil.isEmpty(customerCreateReqBOs)) {
+            return emptyList();
+        }
+
+        // 创建客户
+        List<CrmCustomerDO> customers = convertList(customerCreateReqBOs, customerBO ->
+                BeanUtils.toBean(customerBO, CrmCustomerDO.class).setOwnerUserId(userId));
+        customerMapper.insertBatch(customers);
+
+        // 创建负责人数据权限
+        permissionService.createPermissionBatch(convertList(customers, customer -> new CrmPermissionCreateReqBO()
+                .setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType()).setBizId(customer.getId()).setUserId(userId)
+                .setLevel(CrmPermissionLevelEnum.OWNER.getLevel())));
+        return customers;
     }
 
     // ==================== 公海相关操作 ====================

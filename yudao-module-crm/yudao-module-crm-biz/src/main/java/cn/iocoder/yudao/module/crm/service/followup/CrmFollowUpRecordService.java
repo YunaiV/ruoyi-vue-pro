@@ -4,7 +4,11 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.followup.vo.CrmFollowUpRecordPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.followup.vo.CrmFollowUpRecordSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.followup.CrmFollowUpRecordDO;
+import cn.iocoder.yudao.module.crm.service.followup.bo.CrmFollowUpCreateReqBO;
 import jakarta.validation.Valid;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 跟进记录 Service 接口
@@ -22,12 +26,27 @@ public interface CrmFollowUpRecordService {
     Long createFollowUpRecord(@Valid CrmFollowUpRecordSaveReqVO createReqVO);
 
     /**
+     * 创建更进
+     *
+     * @param followUpCreateReqBOs 请求
+     */
+    void createFollowUpRecordBatch(List<CrmFollowUpCreateReqBO> followUpCreateReqBOs);
+
+    /**
      * 删除跟进记录 (数据权限基于 bizType、 bizId)
      *
      * @param id     编号
      * @param userId 用户编号
      */
     void deleteFollowUpRecord(Long id, Long userId);
+
+    /**
+     * 删除跟进
+     *
+     * @param bizType 模块类型
+     * @param bizId   模块数据编号
+     */
+    void deleteFollowUpRecordByBiz(Integer bizType, Long bizId);
 
     /**
      * 获得跟进记录
@@ -44,5 +63,14 @@ public interface CrmFollowUpRecordService {
      * @return 跟进记录分页
      */
     PageResult<CrmFollowUpRecordDO> getFollowUpRecordPage(CrmFollowUpRecordPageReqVO pageReqVO);
+
+    /**
+     * 获取跟进记录
+     *
+     * @param bizType 模块类型
+     * @param bizIds  模块数据编号
+     * @return 跟进列表
+     */
+    List<CrmFollowUpRecordDO> getFollowUpRecordByBiz(Integer bizType, Collection<Long> bizIds);
 
 }
