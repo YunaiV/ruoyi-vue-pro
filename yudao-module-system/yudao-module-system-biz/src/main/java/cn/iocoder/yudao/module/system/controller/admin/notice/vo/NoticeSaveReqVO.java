@@ -12,7 +12,7 @@ import javax.validation.constraints.Size;
 public class NoticeSaveReqVO {
 
     @Schema(description = "岗位公告编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    @NotNull(message = "岗位公告编号不能为空")
+//    @NotNull(message = "岗位公告编号不能为空")
     private Long id;
 
     @Schema(description = "公告标题", requiredMode = Schema.RequiredMode.REQUIRED, example = "小博主")
