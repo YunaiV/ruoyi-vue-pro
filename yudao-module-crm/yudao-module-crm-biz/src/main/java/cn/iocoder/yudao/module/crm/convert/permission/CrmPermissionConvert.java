@@ -29,6 +29,7 @@ public interface CrmPermissionConvert {
 
     CrmPermissionConvert INSTANCE = Mappers.getMapper(CrmPermissionConvert.class);
 
+    // TODO @puhui999：这个要不也搞到 copy 里
     List<CrmPermissionRespVO> convert(List<CrmPermissionDO> permission);
 
     default List<CrmPermissionRespVO> convert(List<CrmPermissionDO> permission, List<AdminUserRespDTO> userList,

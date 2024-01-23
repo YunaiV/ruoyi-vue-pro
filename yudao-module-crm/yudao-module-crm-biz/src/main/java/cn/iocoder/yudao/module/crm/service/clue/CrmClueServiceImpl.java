@@ -73,17 +73,17 @@ public class CrmClueServiceImpl implements CrmClueService {
     @LogRecord(type = CRM_LEADS_TYPE, subType = CRM_LEADS_CREATE_SUB_TYPE, bizNo = "{{#clue.id}}",
             success = CRM_LEADS_CREATE_SUCCESS)
     public Long createClue(CrmClueSaveReqVO createReqVO, Long userId) {
-        // 1. 校验关联数据
+        // 1.1 校验关联数据
         validateRelationDataExists(createReqVO);
+        // 1.2 校验负责人是否存在
+        if (createReqVO.getOwnerUserId() != null) {
+            adminUserApi.validateUserList(singletonList(createReqVO.getOwnerUserId()));
+        } else {
+            createReqVO.setOwnerUserId(userId); // 如果没有设置负责人那么默认操作人为负责人
+        }
 
         // 2. 插入
         CrmClueDO clue = BeanUtils.toBean(createReqVO, CrmClueDO.class).setId(null);
-        if (ObjUtil.isNull(createReqVO.getOwnerUserId())) {
-            clue.setOwnerUserId(userId); // 如果没有设置负责人那么默认操作人为负责人
-        } else {
-            // 校验负责人是否存在
-            adminUserApi.validateUserList(singletonList(createReqVO.getOwnerUserId()));
-        }
         clueMapper.insert(clue);
 
         // 3. 创建数据权限
@@ -193,10 +193,13 @@ public class CrmClueServiceImpl implements CrmClueService {
         }
 
         // 2. 遍历线索(未转化的线索)，创建对应的客户
+        // TODO @puhui999：这里不用过滤了；
         List<CrmClueDO> translateClues = filterList(clues, clue -> ObjUtil.equal(Boolean.FALSE, clue.getTransformStatus()));
         List<CrmCustomerDO> customers = customerService.createCustomerBatch(convertList(translateClues, clue ->
                 BeanUtils.toBean(clue, CrmCustomerCreateReqBO.class)), userId);
 
+        // TODO @puhui999：这里不用搞一个 clueCustomerIdMap 出来；可以考虑逐个创建，然后把 customerId 设置回 CrmClueDO；避免 name 匹配，极端会有问题哈；
+        // TODO 是不是就直接 foreach 处理好了；因为本身量不大，for 处理性能 ok，可阅读性好
         Map<Long, Long> clueCustomerIdMap = new HashMap<>(translateClues.size());
         // 2.1 更新线索
         clueMapper.updateBatch(convertList(customers, customer -> {
@@ -209,6 +212,7 @@ public class CrmClueServiceImpl implements CrmClueService {
 
         // 3. 记录操作日志
         for (CrmClueDO clue : translateClues) {
+            // TODO @puhui999：这里优化下，translate 操作日志
             getSelf().receiveClueLog(clue);
         }
     }

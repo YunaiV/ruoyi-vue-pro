@@ -120,11 +120,12 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
         // 校验存在
         CrmFollowUpRecordDO followUpRecord = validateFollowUpRecordExists(id);
         // 校验权限
+        // TODO @puhui999：是不是封装一个 hasPermission，更简介一点；
         List<CrmPermissionDO> permissionList = permissionService.getPermissionListByBiz(
                 followUpRecord.getBizType(), followUpRecord.getBizId());
-        boolean condition = anyMatch(permissionList, permission ->
+        boolean hasPermission = anyMatch(permissionList, permission ->
                 ObjUtil.equal(permission.getUserId(), userId) && ObjUtil.equal(permission.getLevel(), CrmPermissionLevelEnum.OWNER.getLevel()));
-        if (!condition) {
+        if (!hasPermission) {
             throw exception(FOLLOW_UP_RECORD_DELETE_DENIED);
         }
 
@@ -134,7 +135,6 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
 
     @Override
     public void deleteFollowUpRecordByBiz(Integer bizType, Long bizId) {
-        // 删除
         crmFollowUpRecordMapper.deleteByBiz(bizType, bizId);
     }
 
