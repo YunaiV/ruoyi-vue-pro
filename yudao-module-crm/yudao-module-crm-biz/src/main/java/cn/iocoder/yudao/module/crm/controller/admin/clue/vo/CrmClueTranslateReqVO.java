@@ -8,7 +8,7 @@ import java.util.Set;
 
 @Schema(description = "管理后台 - 线索转化为客户 Request VO")
 @Data
-public class CrmClueTransformReqVO {
+public class CrmClueTranslateReqVO {
 
     @Schema(description = "线索编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "[1024, 1025]")
     @NotEmpty(message = "线索编号不能为空")

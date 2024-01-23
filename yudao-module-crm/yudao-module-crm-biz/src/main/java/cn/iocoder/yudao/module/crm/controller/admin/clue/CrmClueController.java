@@ -99,7 +99,7 @@ public class CrmClueController {
     @PostMapping("/transform")
     @Operation(summary = "线索转化为客户")
     @PreAuthorize("@ss.hasPermission('crm:clue:update')")
-    public CommonResult<Boolean> translateCustomer(@Valid @RequestBody CrmClueTransformReqVO reqVO) {
+    public CommonResult<Boolean> translateCustomer(@Valid @RequestBody CrmClueTranslateReqVO reqVO) {
         clueService.translateCustomer(reqVO, getLoginUserId());
         return success(Boolean.TRUE);
     }

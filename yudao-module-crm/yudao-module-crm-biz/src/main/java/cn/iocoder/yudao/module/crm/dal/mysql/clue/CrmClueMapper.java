@@ -37,6 +37,9 @@ public interface CrmClueMapper extends BaseMapperX<CrmClueDO> {
                 .likeIfPresent(CrmClueDO::getName, pageReqVO.getName())
                 .likeIfPresent(CrmClueDO::getTelephone, pageReqVO.getTelephone())
                 .likeIfPresent(CrmClueDO::getMobile, pageReqVO.getMobile())
+                .eqIfPresent(CrmClueDO::getIndustryId, pageReqVO.getIndustryId())
+                .eqIfPresent(CrmClueDO::getLevel, pageReqVO.getLevel())
+                .eqIfPresent(CrmClueDO::getSource, pageReqVO.getSource())
                 .orderByDesc(CrmClueDO::getId);
         return selectJoinPage(pageReqVO, CrmClueDO.class, query);
     }
