@@ -43,12 +43,10 @@ import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.customer.CrmCustomerLimitConfigTypeEnum.CUSTOMER_LOCK_LIMIT;
 import static cn.iocoder.yudao.module.crm.enums.customer.CrmCustomerLimitConfigTypeEnum.CUSTOMER_OWNER_LIMIT;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 /**
@@ -91,9 +89,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
         // 2. 插入客户
         CrmCustomerDO customer = BeanUtils.toBean(createReqVO, CrmCustomerDO.class)
-                .setLockStatus(false).setDealStatus(false)
-                .setContactLastTime(LocalDateTime.now());
-        // TODO @puhui999：可能要加个 receiveTime 字段，记录最后接收时间
+                .setLockStatus(false).setDealStatus(false).setContactLastTime(LocalDateTime.now());
         customerMapper.insert(customer);
 
         // 3. 创建数据权限
@@ -214,24 +210,24 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public List<CrmCustomerDO> createCustomerBatch(List<CrmCustomerCreateReqBO> customerCreateReqBOs, Long userId) {
-        if (CollUtil.isEmpty(customerCreateReqBOs)) {
-            return emptyList();
-        }
+    @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_CREATE_SUB_TYPE, bizNo = "{{#customer.id}}",
+            success = CRM_CUSTOMER_CREATE_SUCCESS)
+    public Long createCustomer(CrmCustomerCreateReqBO customerCreateReq, Long userId) {
+        // 1. 插入客户
+        CrmCustomerDO customer = BeanUtils.toBean(customerCreateReq, CrmCustomerDO.class).setOwnerUserId(userId)
+                .setLockStatus(false).setDealStatus(false).setReceiveTime(LocalDateTime.now());
+        customerMapper.insert(customer);
 
-        // 创建客户
-        List<CrmCustomerDO> customers = convertList(customerCreateReqBOs, customerBO ->
-                BeanUtils.toBean(customerBO, CrmCustomerDO.class).setOwnerUserId(userId));
-        customerMapper.insertBatch(customers);
+        // 2. 创建数据权限
+        permissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
+                .setBizId(customer.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
 
-        // 创建负责人数据权限
-        permissionService.createPermissionBatch(convertList(customers, customer -> new CrmPermissionCreateReqBO()
-                .setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType()).setBizId(customer.getId()).setUserId(userId)
-                .setLevel(CrmPermissionLevelEnum.OWNER.getLevel())));
-        return customers;
+        // 3. 记录操作日志上下文
+        LogRecordContext.putVariable("customer", customer);
+        return customer.getId();
     }
 
-    // ==================== 公海相关操作 ====================
+// ==================== 公海相关操作 ====================
 
     @Override
     @Transactional(rollbackFor = Exception.class)

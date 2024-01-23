@@ -2,14 +2,14 @@ package cn.iocoder.yudao.module.crm.controller.admin.operatelog;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.operatelog.vo.CrmOperateLogPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.operatelog.vo.CrmOperateLogV2RespVO;
 import cn.iocoder.yudao.module.crm.enums.LogRecordConstants;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.system.api.logger.OperateLogApi;
 import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2PageReqDTO;
-import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2RespDTO;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -51,16 +51,14 @@ public class CrmOperateLogController {
         BIZ_TYPE_MAP.put(CrmBizTypeEnum.CRM_RECEIVABLE_PLAN.getType(), CRM_RECEIVABLE_PLAN_TYPE);
     }
 
-    // TODO @puhui999：还是搞个 VO 出来哈
     @GetMapping("/page")
     @Operation(summary = "获得操作日志")
-    @Parameter(name = "id", description = "客户编号", required = true)
-    @PreAuthorize("@ss.hasPermission('crm:customer:query')")
-    public CommonResult<PageResult<OperateLogV2RespDTO>> getCustomerOperateLog(@Valid CrmOperateLogPageReqVO pageReqVO) {
+    @PreAuthorize("@ss.hasPermission('crm:operate-log:query')")
+    public CommonResult<PageResult<CrmOperateLogV2RespVO>> getCustomerOperateLog(@Valid CrmOperateLogPageReqVO pageReqVO) {
         OperateLogV2PageReqDTO reqDTO = new OperateLogV2PageReqDTO();
         reqDTO.setPageSize(PAGE_SIZE_NONE); // 默认不分页，需要分页需注释
         reqDTO.setBizType(BIZ_TYPE_MAP.get(pageReqVO.getBizType())).setBizId(pageReqVO.getBizId());
-        return success(operateLogApi.getOperateLogPage(reqDTO));
+        return success(BeanUtils.toBean(operateLogApi.getOperateLogPage(reqDTO), CrmOperateLogV2RespVO.class));
     }
 
 }

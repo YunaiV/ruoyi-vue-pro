@@ -100,13 +100,13 @@ public interface CrmCustomerService {
     void updateCustomerFollowUp(CrmUpdateFollowUpReqBO customerUpdateFollowUpReqBO);
 
     /**
-     * 批量创建客户
+     * 创建客户
      *
-     * @param customerCreateReqBOs 请求
-     * @param userId               用户编号
+     * @param customerCreateReq 请求信息
+     * @param userId            用户编号
      * @return 客户列表
      */
-    List<CrmCustomerDO> createCustomerBatch(List<CrmCustomerCreateReqBO> customerCreateReqBOs, Long userId);
+    Long createCustomer(CrmCustomerCreateReqBO customerCreateReq, Long userId);
 
     // ==================== 公海相关操作 ====================
 

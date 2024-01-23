@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.crm.convert.permission;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
@@ -29,13 +30,10 @@ public interface CrmPermissionConvert {
 
     CrmPermissionConvert INSTANCE = Mappers.getMapper(CrmPermissionConvert.class);
 
-    // TODO @puhui999：这个要不也搞到 copy 里
-    List<CrmPermissionRespVO> convert(List<CrmPermissionDO> permission);
-
-    default List<CrmPermissionRespVO> convert(List<CrmPermissionDO> permission, List<AdminUserRespDTO> userList,
+    default List<CrmPermissionRespVO> convert(List<CrmPermissionDO> permissions, List<AdminUserRespDTO> userList,
                                               Map<Long, DeptRespDTO> deptMap, Map<Long, PostRespDTO> postMap) {
         Map<Long, AdminUserRespDTO> userMap = CollectionUtils.convertMap(userList, AdminUserRespDTO::getId);
-        return CollectionUtils.convertList(convert(permission), item -> {
+        return CollectionUtils.convertList(BeanUtils.toBean(permissions, CrmPermissionRespVO.class), item -> {
             findAndThen(userMap, item.getUserId(), user -> {
                 item.setNickname(user.getNickname());
                 findAndThen(deptMap, user.getDeptId(), deptRespDTO -> item.setDeptName(deptRespDTO.getName()));
