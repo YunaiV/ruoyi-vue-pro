@@ -39,7 +39,7 @@ public class CrmClueController {
     @Operation(summary = "创建线索")
     @PreAuthorize("@ss.hasPermission('crm:clue:create')")
     public CommonResult<Long> createClue(@Valid @RequestBody CrmClueSaveReqVO createReqVO) {
-        return success(clueService.createClue(createReqVO));
+        return success(clueService.createClue(createReqVO, getLoginUserId()));
     }
 
     @PutMapping("/update")

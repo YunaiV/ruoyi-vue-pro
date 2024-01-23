@@ -23,9 +23,10 @@ public interface CrmClueService {
      * 创建线索
      *
      * @param createReqVO 创建信息
+     * @param userId      用户编号
      * @return 编号
      */
-    Long createClue(@Valid CrmClueSaveReqVO createReqVO);
+    Long createClue(@Valid CrmClueSaveReqVO createReqVO, Long userId);
 
     /**
      * 更新线索

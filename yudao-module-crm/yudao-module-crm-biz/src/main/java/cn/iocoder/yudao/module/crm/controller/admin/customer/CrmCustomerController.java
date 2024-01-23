@@ -17,9 +17,6 @@ import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerPoolConfigService
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
-import cn.iocoder.yudao.module.system.api.logger.OperateLogApi;
-import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2PageReqDTO;
-import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2RespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,7 +41,6 @@ import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
-import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.CRM_CUSTOMER_TYPE;
 
 @Tag(name = "管理后台 - CRM 客户")
 @RestController
@@ -60,8 +56,7 @@ public class CrmCustomerController {
     private DeptApi deptApi;
     @Resource
     private AdminUserApi adminUserApi;
-    @Resource
-    private OperateLogApi operateLogApi;
+
 
     @PostMapping("/create")
     @Operation(summary = "创建客户")
@@ -180,19 +175,6 @@ public class CrmCustomerController {
     public CommonResult<Boolean> transfer(@Valid @RequestBody CrmCustomerTransferReqVO reqVO) {
         customerService.transferCustomer(reqVO, getLoginUserId());
         return success(true);
-    }
-
-    // TODO @puhui999：要不搞个通用的 CrmOperateLogController，之后所有业务都调用它？
-    @GetMapping("/operate-log-page")
-    @Operation(summary = "获得客户操作日志")
-    @Parameter(name = "id", description = "客户编号", required = true)
-    @PreAuthorize("@ss.hasPermission('crm:customer:query')")
-    public CommonResult<PageResult<OperateLogV2RespDTO>> getCustomerOperateLog(@RequestParam("id") Long id) {
-        OperateLogV2PageReqDTO reqDTO = new OperateLogV2PageReqDTO();
-        reqDTO.setPageSize(PAGE_SIZE_NONE); // 不分页
-        reqDTO.setBizType(CRM_CUSTOMER_TYPE);
-        reqDTO.setBizId(id);
-        return success(operateLogApi.getOperateLogPage(reqDTO));
     }
 
     @PutMapping("/lock")

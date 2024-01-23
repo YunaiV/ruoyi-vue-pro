@@ -3,12 +3,9 @@ package cn.iocoder.yudao.module.crm.convert.permission;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
-import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionUpdateReqBO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.PostRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
@@ -31,14 +28,6 @@ import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAnd
 public interface CrmPermissionConvert {
 
     CrmPermissionConvert INSTANCE = Mappers.getMapper(CrmPermissionConvert.class);
-
-    CrmPermissionDO convert(CrmPermissionCreateReqBO createBO);
-
-    CrmPermissionDO convert(CrmPermissionUpdateReqBO updateBO);
-
-    CrmPermissionCreateReqBO convert(CrmPermissionCreateReqVO reqVO);
-
-    CrmPermissionUpdateReqBO convert(CrmPermissionUpdateReqVO updateReqVO);
 
     List<CrmPermissionRespVO> convert(List<CrmPermissionDO> permission);
 
@@ -64,8 +53,5 @@ public interface CrmPermissionConvert {
         return CollectionUtils.convertList(updateReqVO.getIds(),
                 id -> new CrmPermissionDO().setId(id).setLevel(updateReqVO.getLevel()));
     }
-
-    // TODO @puhui999：搞成 BeanUtils
-    List<CrmPermissionDO> convertList(List<CrmPermissionCreateReqBO> list);
 
 }

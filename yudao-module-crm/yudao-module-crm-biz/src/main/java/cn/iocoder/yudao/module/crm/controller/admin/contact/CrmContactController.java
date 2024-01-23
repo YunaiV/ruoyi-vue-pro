@@ -17,9 +17,6 @@ import cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactBusinessService;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
-import cn.iocoder.yudao.module.system.api.logger.OperateLogApi;
-import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2PageReqDTO;
-import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2RespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.google.common.collect.Lists;
@@ -46,7 +43,6 @@ import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
-import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.CRM_CONTACT_TYPE;
 
 @Tag(name = "管理后台 - CRM 联系人")
 @RestController
@@ -64,8 +60,6 @@ public class CrmContactController {
 
     @Resource
     private AdminUserApi adminUserApi;
-    @Resource
-    private OperateLogApi operateLogApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建联系人")
@@ -156,17 +150,6 @@ public class CrmContactController {
         PageResult<CrmContactDO> pageResult = contactService.getContactPage(exportReqVO, getLoginUserId());
         ExcelUtils.write(response, "联系人.xls", "数据", CrmContactRespVO.class,
                 buildContactDetailPage(pageResult).getList());
-    }
-
-    @GetMapping("/operate-log-page")
-    @Operation(summary = "获得客户操作日志")
-    @PreAuthorize("@ss.hasPermission('crm:customer:query')")
-    public CommonResult<PageResult<OperateLogV2RespDTO>> getCustomerOperateLog(@RequestParam("bizId") Long bizId) {
-        OperateLogV2PageReqDTO reqVO = new OperateLogV2PageReqDTO();
-        reqVO.setPageSize(PAGE_SIZE_NONE); // 不分页
-        reqVO.setBizType(CRM_CONTACT_TYPE);
-        reqVO.setBizId(bizId);
-        return success(operateLogApi.getOperateLogPage(BeanUtils.toBean(reqVO, OperateLogV2PageReqDTO.class)));
     }
 
     /**
