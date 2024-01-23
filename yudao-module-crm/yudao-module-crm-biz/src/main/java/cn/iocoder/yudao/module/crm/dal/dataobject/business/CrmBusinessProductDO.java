@@ -48,7 +48,7 @@ public class CrmBusinessProductDO extends BaseDO {
     /**
      * 产品单价
      */
-    private BigDecimal price;
+    private Integer price;
 
     /**
      * 销售价格
@@ -59,19 +59,19 @@ public class CrmBusinessProductDO extends BaseDO {
     /**
      * 数量
      */
-    private BigDecimal num;
+    private BigDecimal count;
 
     // TODO @lzxhqs：改成 discountPercent
     /**
      * 折扣
      */
-    private BigDecimal discount;
+    private BigDecimal discountPercent;
 
     // TODO @lzxhqs：改成 totalPrice；总计价格，和现有项目风格一致；
     /**
      * 小计（折扣后价格）
      */
-    private BigDecimal subtotal;
+    private BigDecimal totalPrice;
 
     /**
      * 单位

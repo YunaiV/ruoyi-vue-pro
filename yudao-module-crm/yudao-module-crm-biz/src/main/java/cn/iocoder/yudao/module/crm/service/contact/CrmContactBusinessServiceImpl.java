@@ -85,4 +85,9 @@ public class CrmContactBusinessServiceImpl implements CrmContactBusinessService 
         return contactBusinessMapper.selectListByContactId(contactId);
     }
 
+    @Override
+    public void insert(CrmContactBusinessDO contactBusiness) {
+        contactBusinessMapper.insert(contactBusiness);
+    }
+
 }

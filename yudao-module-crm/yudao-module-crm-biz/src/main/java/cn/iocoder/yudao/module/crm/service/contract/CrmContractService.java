@@ -110,4 +110,10 @@ public interface CrmContractService {
      */
     Long getContractCountByCustomerId(Long customerId);
 
+    /**
+     * 根据商机ID获取关联客户的合同数量
+     * @param businessId 商机ID
+     * @return 数量
+     */
+    Long selectCountByBusinessId(Long businessId);
 }
