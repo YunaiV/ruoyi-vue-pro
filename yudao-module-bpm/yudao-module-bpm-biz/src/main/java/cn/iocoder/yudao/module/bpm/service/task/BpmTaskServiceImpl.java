@@ -21,7 +21,6 @@ import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskAddSignTypeEnum;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.module.bpm.service.message.BpmMessageService;
-import cn.iocoder.yudao.module.bpm.service.task.cc.BpmProcessInstanceCopyService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -94,9 +93,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Resource
     private ManagementService managementService;
-
-    @Resource
-    private BpmProcessInstanceCopyService processInstanceCopyService;
 
     @Override
     public PageResult<BpmTaskTodoPageItemRespVO> getTodoTaskPage(Long userId, BpmTaskTodoPageReqVO pageVO) {
@@ -972,28 +968,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
-    public Map<String/* taskId */, String/* taskName */> getTaskNameByTaskIds(Collection<String> taskIds) {
-        List<Task> tasks = taskService.createTaskQuery().taskIds(taskIds).list();
-        if (CollUtil.isNotEmpty(tasks)) {
-            Map<String/* taskId */, String/* taskName */> taskMap = new HashMap<>(tasks.size());
-            for (Task task : tasks) {
-                taskMap.putIfAbsent(task.getId(), task.getName());
-            }
-            return taskMap;
+    public Map<String, String> getTaskNameByTaskIds(Collection<String> taskIds) {
+        if (CollUtil.isEmpty(taskIds)) {
+            return Collections.emptyMap();
         }
-        return Collections.emptyMap();
+        List<Task> tasks = taskService.createTaskQuery().taskIds(taskIds).list();
+        return convertMap(tasks, Task::getId, Task::getName);
     }
 
-    @Override
-    public Map<String/* processInstaneId */, String/* processInstaneName */> getProcessInstanceNameByProcessInstanceIds(Set<String> processInstanceIds) {
-        List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().processInstanceIds(processInstanceIds).list();
-        if (CollUtil.isNotEmpty(processInstances)) {
-            Map<String/* processInstaneId */, String/* processInstaneName */> processInstaneMap = new HashMap<>(processInstances.size());
-            for (ProcessInstance processInstance : processInstances) {
-                processInstaneMap.putIfAbsent(processInstance.getId(), processInstance.getName());
-            }
-            return processInstaneMap;
-        }
-        return Collections.emptyMap();
-    }
 }

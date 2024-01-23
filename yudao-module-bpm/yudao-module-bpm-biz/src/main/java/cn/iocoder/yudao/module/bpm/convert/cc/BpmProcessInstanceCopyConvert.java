@@ -4,8 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCopyPageItemRespVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmProcessInstanceCopyVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.cc.BpmProcessInstanceCopyDO;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -22,22 +22,17 @@ public interface BpmProcessInstanceCopyConvert {
 
     BpmProcessInstanceCopyConvert INSTANCE = Mappers.getMapper(BpmProcessInstanceCopyConvert.class);
 
-    BpmProcessInstanceCopyVO convert(BpmProcessInstanceCopyDO bean);
-
-    List<BpmProcessInstanceCopyPageItemRespVO> convertList(List<BpmProcessInstanceCopyDO> list);
-
-    default PageResult<BpmProcessInstanceCopyPageItemRespVO> convertPage(PageResult<BpmProcessInstanceCopyDO> page
-            , Map<String, String/* taskName */> taskMap
-            , Map<String, String/* processInstaneName */> processInstaneMap
-            , Map<Long, String/* userName */> userMap
-    ) {
+    default PageResult<BpmProcessInstanceCopyPageItemRespVO> convertPage(PageResult<BpmProcessInstanceCopyDO> page,
+                                                                         Map<String, String> taskNameMap,
+                                                                         Map<String, String> processInstaneNameMap,
+                                                                         Map<Long, AdminUserRespDTO> userMap) {
         List<BpmProcessInstanceCopyPageItemRespVO> list = BeanUtils.toBean(page.getList(),
                 BpmProcessInstanceCopyPageItemRespVO.class,
                 copy -> {
-                    MapUtils.findAndThen(userMap, Long.valueOf(copy.getCreator()), copy::setCreatorNickname);
-                    MapUtils.findAndThen(userMap, copy.getStartUserId(), copy::setStartUserNickname);
-                    MapUtils.findAndThen(taskMap, copy.getTaskId(), copy::setTaskName);
-                    MapUtils.findAndThen(processInstaneMap, copy.getProcessInstanceId(), copy::setProcessInstanceName);
+                    MapUtils.findAndThen(userMap, Long.valueOf(copy.getCreator()), user -> user.setNickname(user.getNickname()));
+                    MapUtils.findAndThen(userMap, copy.getStartUserId(), user -> copy.setStartUserNickname(user.getNickname()));
+                    MapUtils.findAndThen(taskNameMap, copy.getTaskId(), copy::setTaskName);
+                    MapUtils.findAndThen(processInstaneNameMap, copy.getProcessInstanceId(), copy::setProcessInstanceName);
                 });
         return new PageResult<>(list, page.getTotal());
     }

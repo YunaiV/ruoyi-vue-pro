@@ -17,17 +17,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertListByFlatMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -41,6 +39,7 @@ public class BpmProcessInstanceCopyController {
     private BpmProcessInstanceCopyService processInstanceCopyService;
     @Resource
     private BpmProcessInstanceService bpmProcessInstanceService;
+
     @Resource
     private AdminUserApi adminUserApi;
 
@@ -50,8 +49,9 @@ public class BpmProcessInstanceCopyController {
     @PostMapping("/create")
     @Operation(summary = "抄送流程")
     @PreAuthorize("@ss.hasPermission('bpm:process-instance-cc:create')")
-    public CommonResult<Void> createProcessInstanceCC(@Valid @RequestBody BpmProcessInstanceCopyCreateReqVO createReqVO) {
-        return success(processInstanceCopyService.createProcessInstanceCopy(getLoginUserId(), createReqVO));
+    public CommonResult<Boolean> createProcessInstanceCC(@Valid @RequestBody BpmProcessInstanceCopyCreateReqVO createReqVO) {
+        processInstanceCopyService.createProcessInstanceCopy(getLoginUserId(), createReqVO);
+        return success(true);
     }
 
     @GetMapping("/my-page")
@@ -64,20 +64,14 @@ public class BpmProcessInstanceCopyController {
             return success(new PageResult<>(pageResult.getTotal()));
         }
 
-        Map<String, String> taskNameByTaskIds = bpmTaskService.getTaskNameByTaskIds(convertSet(pageResult.getList(), BpmProcessInstanceCopyDO::getTaskId));
-        Map<String, String> processInstanceNameByProcessInstanceIds = bpmTaskService.getProcessInstanceNameByProcessInstanceIds(convertSet(pageResult.getList(), BpmProcessInstanceCopyDO::getProcessInstanceId));
-
-        Set<Long/* userId */> userIds = new HashSet<>();
-        for (BpmProcessInstanceCopyDO doItem : pageResult.getList()) {
-            userIds.add(doItem.getStartUserId());
-            Long userId = Long.valueOf(doItem.getCreator());
-            userIds.add(userId);
-        }
-        Map<Long, String> userMap = adminUserApi.getUserList(userIds).stream().collect(Collectors.toMap(
-                AdminUserRespDTO::getId, AdminUserRespDTO::getNickname));
-
-        // 转换返回
-        return success(BpmProcessInstanceCopyConvert.INSTANCE.convertPage(pageResult, taskNameByTaskIds, processInstanceNameByProcessInstanceIds, userMap));
+        // 拼接返回
+        Map<String, String> taskNameMap = bpmTaskService.getTaskNameByTaskIds(
+                convertSet(pageResult.getList(), BpmProcessInstanceCopyDO::getTaskId));
+        Map<String, String> processNameMap = bpmProcessInstanceService.getProcessInstanceNameMap(
+                convertSet(pageResult.getList(), BpmProcessInstanceCopyDO::getProcessInstanceId));
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(pageResult.getList(),
+                copy -> Stream.of(copy.getStartUserId(), Long.parseLong(copy.getCreator()))));
+        return success(BpmProcessInstanceCopyConvert.INSTANCE.convertPage(pageResult, taskNameMap, processNameMap, userMap));
     }
 
 }

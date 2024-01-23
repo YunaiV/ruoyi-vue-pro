@@ -12,7 +12,7 @@ public class BpmProcessInstanceCopyPageItemRespVO {
     @Schema(description = "抄送主键")
     private Long id;
 
-    @Schema(description = "发起人Id")
+    @Schema(description = "发起人 ID")
     private Long startUserId;
 
     @Schema(description = "发起人别名")

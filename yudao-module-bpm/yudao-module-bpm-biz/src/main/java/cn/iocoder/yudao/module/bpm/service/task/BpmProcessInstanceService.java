@@ -47,6 +47,17 @@ public interface BpmProcessInstanceService {
     }
 
     /**
+     * 获得流程实例名字 Map
+     *
+     * @param ids 流程实例的编号集合
+     * @return 对应的映射关系
+     */
+    default Map<String, String> getProcessInstanceNameMap(Set<String> ids) {
+        return CollectionUtils.convertMap(getProcessInstances(ids),
+                ProcessInstance::getProcessInstanceId, ProcessInstance::getName);
+    }
+
+    /**
      * 获得流程实例的分页
      *
      * @param userId    用户编号

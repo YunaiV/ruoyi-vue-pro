@@ -10,7 +10,6 @@ import org.flowable.task.api.Task;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 流程任务实例 Service 接口
@@ -186,18 +185,11 @@ public interface BpmTaskService {
     List<BpmTaskSubSignRespVO> getChildrenTaskList(String parentId);
 
     /**
-     * 通过任务id查询任务名
+     * 通过任务 ID，查询任务名 Map
      *
-     * @param taskIds 任务id
-     * @return 对应的映射关系
+     * @param taskIds 任务 ID
+     * @return 任务 ID 与名字的 Map
      */
-    Map<String/* taskId */, String/* taskName */> getTaskNameByTaskIds(Collection<String> taskIds);
+    Map<String, String> getTaskNameByTaskIds(Collection<String> taskIds);
 
-    /**
-     * 通过流程实例id获取到流程实例名
-     *
-     * @param processInstaneIds 流程实例Id
-     * @return 对应的映射关系
-     */
-    Map<String/* processInstaneId */, String/* processInstaneName */> getProcessInstanceNameByProcessInstanceIds(Set<String> processInstaneIds);
 }

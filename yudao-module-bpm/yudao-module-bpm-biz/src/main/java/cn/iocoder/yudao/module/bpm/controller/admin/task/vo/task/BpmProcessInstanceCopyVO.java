@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+// TODO @kyle：1）明确是 Req 还是 Resp；2）注释可以合并到 swagger 里；3）example 写一下，这样一些 mock 接口平台可以读取 example
 /**
  * 流程抄送视图对象
  */
@@ -60,4 +61,5 @@ public class BpmProcessInstanceCopyVO {
 
     @Schema(description = "抄送时间")
     private LocalDateTime createTime;
+
 }
