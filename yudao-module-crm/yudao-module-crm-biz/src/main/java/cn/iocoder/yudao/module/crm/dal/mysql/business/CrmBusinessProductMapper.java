@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * 商机产品 Mapper // TODO @lzxhqs：类注释，和作者之间要有一个空行
+ * 商机产品 Mapper
  *
  * @author lzxhqs
  */
@@ -17,7 +17,8 @@ public interface CrmBusinessProductMapper extends BaseMapperX<CrmBusinessProduct
         delete(CrmBusinessProductDO::getBusinessId, id);
     }
 
-    default CrmBusinessProductDO selectByBusinessId(Long id) { // TODO @lzxhqs：id 最好改成 businessId，上面也是；这样一看更容易懂
+    default CrmBusinessProductDO selectByBusinessId(Long id) {
         return selectOne(CrmBusinessProductDO::getBusinessId, id);
     }
+
 }

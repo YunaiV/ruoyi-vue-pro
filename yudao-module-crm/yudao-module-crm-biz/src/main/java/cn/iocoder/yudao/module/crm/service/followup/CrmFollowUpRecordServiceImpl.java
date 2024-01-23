@@ -94,6 +94,7 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
             customerService.updateCustomerFollowUp(updateFollowUpReqBO);
         }
 
+        // TODO @puhui999：这两个，不更新 contactLastTime、contactLastContent，只更新 nextTime
         // 3.1 更新 contactIds 对应的记录
         if (CollUtil.isNotEmpty(createReqVO.getContactIds())) {
             contactService.updateContactFollowUpBatch(convertList(createReqVO.getContactIds(), updateFollowUpReqBO::setBizId));

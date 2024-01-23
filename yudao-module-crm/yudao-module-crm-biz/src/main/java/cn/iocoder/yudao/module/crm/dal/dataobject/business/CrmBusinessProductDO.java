@@ -44,7 +44,6 @@ public class CrmBusinessProductDO extends BaseDO {
      */
     private Long productId;
 
-    // TODO @lzxhqs：改成 Integer，单位：分。目前整体倾向放大 100 倍哈
     /**
      * 产品单价
      */
@@ -55,7 +54,6 @@ public class CrmBusinessProductDO extends BaseDO {
      */
     private BigDecimal salesPrice;
 
-    // TODO @lzxhqs：改成 count
     /**
      * 数量
      */

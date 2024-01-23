@@ -95,8 +95,6 @@ public class CrmBusinessDO extends BaseDO {
     private LocalDateTime contactLastTime;
     /**
      * 跟进状态
-     *
-     * TODO @lzxhqs：目前就是 Boolean；是否跟进
      */
     private Boolean followUpStatus;
 

@@ -55,12 +55,8 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
     @Resource
     private CrmBusinessProductService businessProductService;
-    // TODO @lzxhqs：不直接调用这个 mapper，要调用对方的 service；每个业务独立收敛
     @Resource
     private CrmContractService contractService;
-
-    // TODO @lzxhqs：不直接调用这个 mapper，要调用对方的 service；每个业务独立收敛
-
     @Resource
     private CrmPermissionService permissionService;
     @Resource
@@ -77,8 +73,6 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
                 .setOwnerUserId(userId);
         businessMapper.insert(business);
         // TODO 商机待定：插入商机与产品的关联表；校验商品存在
-        // TODO lzxhqs：新增时，是不是不用调用这个方法哈；
-        // TODO @lzxhqs：用 CollUtils.isNotEmpty；
         if (CollUtil.isNotEmpty(createReqVO.getProducts())) {
             createBusinessProducts(createReqVO.getProducts(), business.getId(), false);
         }
@@ -108,7 +102,6 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         contactBusiness.setBusinessId(businessId);
         contactBusiness.setContactId(contactId);
         contactBusinessService.insert(contactBusiness);
-
     }
 
     // TODO @lzxhqs：这个方法注释格式不对；删除@description，然后把 插入商机产品关联表 作为方法注释；
@@ -121,7 +114,6 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
      * @author lzxhqs
      */
     private void createBusinessProducts(List<CrmBusinessProductSaveReqVO> products, Long businessId, Boolean updateFlag) {
-        // TODO @lzxhqs：可以用 CollectionUtils.convertList；
         List<CrmBusinessProductDO> list = CollectionUtils.convertList(products, product ->
                 CrmBusinessProductConvert.INSTANCE.convert(product).setBusinessId(businessId));
         if (Boolean.TRUE.equals(updateFlag)) {
@@ -141,7 +133,6 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         } else {
             businessProductService.insertBatch(list);
         }
-
     }
 
     @Override
@@ -157,7 +148,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         CrmBusinessDO updateObj = BeanUtils.toBean(updateReqVO, CrmBusinessDO.class);
         businessMapper.updateById(updateObj);
         // TODO 商机待定：插入商机与产品的关联表；校验商品存在
-        // TODO @lzxhqs：更新时，可以调用 CollectionUtils 的 diffList，尽量避免这种先删除再插入；而是新增的插入、变更的更新，没的删除；不然这个表每次更新，会多好多数据；
+        // TODO @lzxhqs：createBusinessProducts 可以抽成两个方法，一个新增；一个修改，修改需要把 businessProductService.deleteByBusinessId(updateReqVO.getId()); 一起处理进去；
         if (CollUtil.isNotEmpty(updateReqVO.getProducts())) {
             createBusinessProducts(updateReqVO.getProducts(), updateReqVO.getId(), true);
         } else {
@@ -202,6 +193,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
      * @author lzxhqs
      */
     private void validateContractExists(Long businessId) {
+        // TODO @lzxhqs：保持风格的统一，selectCountByBusinessId 改成 getContractCountByBusinessId；另外，可以不用声明 count，因为就一次性使用，直接把 197 和 198 合并成一行；
         Long count = contractService.selectCountByBusinessId(businessId);
         if (count > 0) {
             throw exception(BUSINESS_CONTRACT_EXISTS);

@@ -17,6 +17,7 @@ import java.util.List;
 @Service
 @Validated
 public class CrmBusinessProductServiceImpl implements CrmBusinessProductService {
+
     @Resource
     private CrmBusinessProductMapper businessProductMapper;
 
@@ -35,14 +36,15 @@ public class CrmBusinessProductServiceImpl implements CrmBusinessProductService 
         businessProductMapper.updateBatch(list);
     }
 
+    // TODO @lzxhqs：这个方法，可以直接调用 deleteList 方法，然后传递 ids 就好了；
     @Override
     public void deleteBatch(List<CrmBusinessProductDO> list) {
-        businessProductMapper.deleteBatchIds(CollectionUtils.convertList(list,CrmBusinessProductDO::getId));
-
+        businessProductMapper.deleteBatchIds(CollectionUtils.convertList(list, CrmBusinessProductDO::getId));
     }
 
     @Override
     public void deleteByBusinessId(Long businessId) {
         businessProductMapper.deleteByBusinessId(businessId);
     }
+
 }

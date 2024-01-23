@@ -111,7 +111,7 @@ public interface CrmContractService {
     Long getContractCountByCustomerId(Long customerId);
 
     /**
-     * 根据商机ID获取关联客户的合同数量
+     * 根据商机ID获取关联客户的合同数量 TODO @lzxhqs：1）方法注释，和参数注释之间要有空行；2）中英文之间有空格，更清晰，例如说 商机 ID
      * @param businessId 商机ID
      * @return 数量
      */

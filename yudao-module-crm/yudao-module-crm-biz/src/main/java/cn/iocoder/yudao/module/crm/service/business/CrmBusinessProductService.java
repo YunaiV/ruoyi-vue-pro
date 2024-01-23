@@ -4,6 +4,7 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
 
 import java.util.List;
 
+// TODO @lzxhqs：方法名上，带下 BusinessProduct；主要考虑不精简的原因，是因为一个逻辑，可能会出现一些超越它自身方法，省略不容易懂；
 /**
  * 商机产品关联表 Service 接口
  *

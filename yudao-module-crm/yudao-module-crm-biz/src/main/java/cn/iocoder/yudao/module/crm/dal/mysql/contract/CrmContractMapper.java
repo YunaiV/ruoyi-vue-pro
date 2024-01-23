@@ -66,7 +66,7 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
         return selectCount(CrmContractDO::getContactId, contactId);
     }
 
-    default Long selectCountByBusinessId(Long businessId) { // TODO @lzxhqs：1）方法和方法之间要有空行；2）selectCountByBusinessId，一个是应该求数量，一个是不要缩写 BizId 可读性；
+    default Long selectCountByBusinessId(Long businessId) {
         return selectCount(CrmContractDO::getBusinessId, businessId);
     }
 
