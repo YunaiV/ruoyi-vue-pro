@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.bpm.util;
 
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import org.flowable.bpmn.model.BpmnModel;
@@ -15,7 +14,8 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 流程引擎工具类封装
@@ -86,42 +86,6 @@ public class FlowableUtils {
         TaskService taskService = SpringUtil.getBean(TaskService.class);
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         return task.getName();
-    }
-
-    // TODO @kyle：Utils 里不做查询；可以封装到 bpmTaskService 里
-    public static Map<String/* taskId */, String/* taskName */> getTaskNameByTaskIds(Collection<String> taskIds) {
-        TaskService taskService = SpringUtil.getBean(TaskService.class);
-        List<Task> tasks = taskService.createTaskQuery().taskIds(taskIds).list();
-        if (CollUtil.isNotEmpty(tasks)) {
-            Map<String/* taskId */, String/* taskName */> taskMap = new HashMap<>(tasks.size());
-            for (Task task : tasks) {
-                taskMap.putIfAbsent(task.getId(), task.getName());
-            }
-            return taskMap;
-        }
-        return Collections.emptyMap();
-    }
-
-    public static String getProcessInstanceNameByTaskId(String processInstanceId) {
-        RuntimeService runtimeService = SpringUtil.getBean(RuntimeService.class);
-        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
-                .processInstanceId(processInstanceId)
-                .singleResult();
-        return processInstance.getName();
-    }
-
-    // TODO @kyle：Utils 里不做查询；可以封装到 bpmTaskService 里
-    public static Map<String/* processInstaneId */, String/* processInstaneName */> getProcessInstanceNameByTaskIds(Set<String> taskIds) {
-        RuntimeService runtimeService = SpringUtil.getBean(RuntimeService.class);
-        List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().processInstanceIds(taskIds).list();
-        if (CollUtil.isNotEmpty(processInstances)) {
-            Map<String/* processInstaneId */, String/* processInstaneName */> processInstaneMap = new HashMap<>(processInstances.size());
-            for (ProcessInstance processInstance : processInstances) {
-                processInstaneMap.putIfAbsent(processInstance.getId(), processInstance.getName());
-            }
-            return processInstaneMap;
-        }
-        return Collections.emptyMap();
     }
 
 }

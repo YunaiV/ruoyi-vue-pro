@@ -19,14 +19,15 @@ import cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceDeleteReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskAddSignTypeEnum;
-import cn.iocoder.yudao.module.bpm.service.candidate.BpmCandidateSourceInfo;
-import cn.iocoder.yudao.module.bpm.service.cc.BpmProcessInstanceCopyService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.module.bpm.service.message.BpmMessageService;
+import cn.iocoder.yudao.module.bpm.service.task.cc.BpmProcessInstanceCopyService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
@@ -51,8 +52,6 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Stream;
@@ -558,7 +557,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         return task;
     }
 
-    private Task getTask(String id) {
+    @Override
+    public Task getTask(String id) {
         return taskService.createTaskQuery().taskId(id).singleResult();
     }
 
@@ -971,4 +971,29 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         return BpmTaskConvert.INSTANCE.convertList(taskExtList, userMap, idTaskMap);
     }
 
+    @Override
+    public Map<String/* taskId */, String/* taskName */> getTaskNameByTaskIds(Collection<String> taskIds) {
+        List<Task> tasks = taskService.createTaskQuery().taskIds(taskIds).list();
+        if (CollUtil.isNotEmpty(tasks)) {
+            Map<String/* taskId */, String/* taskName */> taskMap = new HashMap<>(tasks.size());
+            for (Task task : tasks) {
+                taskMap.putIfAbsent(task.getId(), task.getName());
+            }
+            return taskMap;
+        }
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public Map<String/* processInstaneId */, String/* processInstaneName */> getProcessInstanceNameByProcessInstanceIds(Set<String> processInstanceIds) {
+        List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().processInstanceIds(processInstanceIds).list();
+        if (CollUtil.isNotEmpty(processInstances)) {
+            Map<String/* processInstaneId */, String/* processInstaneName */> processInstaneMap = new HashMap<>(processInstances.size());
+            for (ProcessInstance processInstance : processInstances) {
+                processInstaneMap.putIfAbsent(processInstance.getId(), processInstance.getName());
+            }
+            return processInstaneMap;
+        }
+        return Collections.emptyMap();
+    }
 }

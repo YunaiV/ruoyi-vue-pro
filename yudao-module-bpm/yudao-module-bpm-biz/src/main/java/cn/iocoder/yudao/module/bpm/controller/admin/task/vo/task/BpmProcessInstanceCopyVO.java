@@ -1,15 +1,16 @@
-package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance;
+package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@Schema(description = "管理后台 - 流程实例抄送的分页 Item Response VO")
+/**
+ * 流程抄送视图对象
+ */
 @Data
-public class BpmProcessInstanceCCPageItemRespVO {
+public class BpmProcessInstanceCopyVO {
 
-    // TODO @kyle：如果已经写了 swagger 注解，可以不用写 java 注释哈；
     /**
      * 编号
      */
@@ -31,8 +32,9 @@ public class BpmProcessInstanceCCPageItemRespVO {
     @Schema(description = "流程实例的主键")
     private String processInstanceId;
 
-    @Schema(description = "流程实例的名称")
+    @Schema(description = "流程实例的名字")
     private String processInstanceName;
+
     /**
      * 任务主键
      */
@@ -41,6 +43,14 @@ public class BpmProcessInstanceCCPageItemRespVO {
 
     @Schema(description = "发起抄送的任务名称")
     private String taskName;
+    /**
+     * 用户主键
+     */
+    @Schema(description = "用户编号")
+    private Long userId;
+
+    @Schema(description = "用户别名")
+    private Long userNickname;
 
     @Schema(description = "抄送原因")
     private String reason;
@@ -48,10 +58,6 @@ public class BpmProcessInstanceCCPageItemRespVO {
     @Schema(description = "抄送人")
     private String creator;
 
-    @Schema(description = "抄送人别名")
-    private String creatorNickname;
-
     @Schema(description = "抄送时间")
     private LocalDateTime createTime;
-
 }

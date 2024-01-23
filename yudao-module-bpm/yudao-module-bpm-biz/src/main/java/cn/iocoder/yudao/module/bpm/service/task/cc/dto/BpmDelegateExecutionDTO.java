@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.service.cc.dto;
+package cn.iocoder.yudao.module.bpm.service.task.cc.dto;
 
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableListener;
