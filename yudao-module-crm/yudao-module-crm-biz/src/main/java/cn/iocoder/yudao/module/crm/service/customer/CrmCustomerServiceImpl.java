@@ -2,9 +2,11 @@ package cn.iocoder.yudao.module.crm.service.customer;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerLockReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
@@ -13,6 +15,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTrans
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerLimitConfigDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.customer.CrmCustomerMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
@@ -31,6 +34,7 @@ import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,6 +59,7 @@ import static java.util.Collections.singletonList;
  * @author Wanwan
  */
 @Service
+@Slf4j
 @Validated
 public class CrmCustomerServiceImpl implements CrmCustomerService {
 
@@ -65,6 +70,9 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     private CrmPermissionService permissionService;
     @Resource
     private CrmCustomerLimitConfigService customerLimitConfigService;
+    @Resource
+    @Lazy
+    private CrmCustomerPoolConfigService customerPoolConfigService;
     @Resource
     @Lazy
     private CrmContactService contactService;
@@ -245,17 +253,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         // 1.3. 校验客户是否锁定
         validateCustomerIsLocked(customer, true);
 
-        // 2.1 设置负责人为 NULL
-        int updateOwnerUserIncr = customerMapper.updateOwnerUserIdById(customer.getId(), null);
-        if (updateOwnerUserIncr == 0) {
-            throw exception(CUSTOMER_UPDATE_OWNER_USER_FAIL);
-        }
-        // 2.2 删除负责人数据权限
-        permissionService.deletePermission(CrmBizTypeEnum.CRM_CUSTOMER.getType(), customer.getId(),
-                CrmPermissionLevelEnum.OWNER.getLevel());
-
-        // 3. 联系人的负责人，也要设置为 null。因为：因为领取后，负责人也要关联过来，这块和 receiveCustomer 是对应的
-        contactService.updateOwnerUserIdByCustomerId(customer.getId(), null);
+        // 2. 客户放入公海
+        putCustomerPool(customer);
 
         // 记录操作日志上下文
         LogRecordContext.putVariable("customerName", customer.getName());
@@ -311,6 +310,49 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         for (CrmCustomerDO customer : customers) {
             getSelf().receiveCustomerLog(customer, user == null ? null : user.getNickname());
         }
+    }
+
+    @Override
+    public int customerAutoPutPoolBySystem() {
+        CrmCustomerPoolConfigDO poolConfig = customerPoolConfigService.getCustomerPoolConfig();
+        if (poolConfig == null || !poolConfig.getEnabled()) {
+            return 0;
+        }
+        // 获取没有锁定的不在公海的客户
+        List<CrmCustomerDO> customerList = customerMapper.selectListByLockStatusAndOwnerUserIdNotNull(Boolean.FALSE);
+        List<CrmCustomerDO> poolCustomerList = CollectionUtils.filterList(customerList, customer -> {
+            // 1.1 未成交放入公海
+            if (!customer.getDealStatus()) {
+                return (poolConfig.getDealExpireDays() - LocalDateTimeUtils.between(customer.getCreateTime())) <= 0;
+            }
+            // 1.2 未跟进放入公海
+            LocalDateTime lastTime = ObjUtil.defaultIfNull(customer.getContactLastTime(), customer.getCreateTime());
+            return (poolConfig.getContactExpireDays() - LocalDateTimeUtils.between(lastTime)) <= 0;
+        });
+        int count = 0;
+        for (CrmCustomerDO customer : poolCustomerList) {
+            try {
+                getSelf().putCustomerPool(customer);
+                count++;
+            } catch (Throwable e) {
+                log.error("[customerAutoPutPoolBySystem][Customer 客户({}) 放入公海异常]", customer.getId(), e);
+            }
+        }
+        return count;
+    }
+
+    private void putCustomerPool(CrmCustomerDO customer) {
+        // 1. 设置负责人为 NULL
+        int updateOwnerUserIncr = customerMapper.updateOwnerUserIdById(customer.getId(), null);
+        if (updateOwnerUserIncr == 0) {
+            throw exception(CUSTOMER_UPDATE_OWNER_USER_FAIL);
+        }
+        // 2. 删除负责人数据权限
+        permissionService.deletePermission(CrmBizTypeEnum.CRM_CUSTOMER.getType(), customer.getId(),
+                CrmPermissionLevelEnum.OWNER.getLevel());
+
+        // 3. 联系人的负责人，也要设置为 null。因为：因为领取后，负责人也要关联过来，这块和 receiveCustomer 是对应的
+        contactService.updateOwnerUserIdByCustomerId(customer.getId(), null);
     }
 
     @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_RECEIVE_SUB_TYPE, bizNo = "{{#customer.id}}",

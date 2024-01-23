@@ -126,4 +126,11 @@ public interface CrmCustomerService {
      */
     void receiveCustomer(List<Long> ids, Long ownerUserId, Boolean isReceive);
 
+    /**
+     * 【系统】客户自动掉入公海
+     *
+     * @return 掉入公海数量
+     */
+    int customerAutoPutPoolBySystem();
+
 }
