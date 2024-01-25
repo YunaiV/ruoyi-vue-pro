@@ -92,23 +92,23 @@ public class CrmClueRespVO {
     @DictFormat(cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_SOURCE)
     private Integer source;
 
-    @Schema(description = "负责人的用户编号", example = "25682")
+    @Schema(description = "网址", example = "25682")
     @ExcelProperty("网址")
     private String website;
 
-    @Schema(description = "负责人的用户编号", example = "25682")
+    @Schema(description = "QQ", example = "25682")
     @ExcelProperty("QQ")
     private String qq;
 
-    @Schema(description = "负责人的用户编号", example = "25682")
+    @Schema(description = "wechat", example = "25682")
     @ExcelProperty("wechat")
     private String wechat;
 
-    @Schema(description = "负责人的用户编号", example = "25682")
+    @Schema(description = "email", example = "25682")
     @ExcelProperty("email")
     private String email;
 
-    @Schema(description = "负责人的用户编号", example = "25682")
+    @Schema(description = "客户描述", example = "25682")
     @ExcelProperty("客户描述")
     private String description;
 }
