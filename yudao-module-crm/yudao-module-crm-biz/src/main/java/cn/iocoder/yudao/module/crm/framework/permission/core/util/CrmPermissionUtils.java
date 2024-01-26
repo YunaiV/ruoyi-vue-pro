@@ -30,6 +30,7 @@ public class CrmPermissionUtils {
         return SingletonManager.getPermissionApi().hasAnyRoles(getLoginUserId(), CrmPermissionRoleCodeEnum.CRM_ADMIN.getCode());
     }
 
+    // TODO @puhui999：这个貌似直接放到 CrmPermissionService 会更好？
     /**
      * 校验权限
      *

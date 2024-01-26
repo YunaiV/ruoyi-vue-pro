@@ -126,6 +126,7 @@ public interface CrmCustomerService {
      */
     void receiveCustomer(List<Long> ids, Long ownerUserId, Boolean isReceive);
 
+    // TODO @puhui999：autoPutCustomerPool，注释说明是系统就好哈；
     /**
      * 【系统】客户自动掉入公海
      *

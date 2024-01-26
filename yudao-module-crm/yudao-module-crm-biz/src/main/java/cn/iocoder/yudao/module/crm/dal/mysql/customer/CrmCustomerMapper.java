@@ -103,6 +103,7 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
     default List<CrmCustomerDO> selectListByLockStatusAndOwnerUserIdNotNull(Boolean lockStatus) {
         return selectList(new LambdaQueryWrapper<CrmCustomerDO>()
                 .eq(CrmCustomerDO::getLockStatus, lockStatus)
+                // TODO @puhui999：not null 可以转化成大于 0
                 .isNotNull(CrmCustomerDO::getOwnerUserId));
     }
 

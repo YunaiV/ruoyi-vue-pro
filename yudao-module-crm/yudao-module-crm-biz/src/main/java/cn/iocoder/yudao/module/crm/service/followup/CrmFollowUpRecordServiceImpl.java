@@ -93,12 +93,12 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
             customerService.updateCustomerFollowUp(updateFollowUpReqBO);
         }
 
-        // 3.1 更新 contactIds 对应的记录
+        // 3.1 更新 contactIds 对应的记录，不更新 lastTime 和 lastContent
         if (CollUtil.isNotEmpty(createReqVO.getContactIds())) {
             contactService.updateContactFollowUpBatch(convertList(createReqVO.getContactIds(),
                     contactId -> updateFollowUpReqBO.setBizId(contactId).setContactLastTime(null).setContactLastContent(null)));
         }
-        // 3.2 需要更新 businessIds、contactIds 对应的记录
+        // 3.2 需要更新 businessIds 对应的记录，不更新 lastTime 和 lastContent
         if (CollUtil.isNotEmpty(createReqVO.getBusinessIds())) {
             businessService.updateBusinessFollowUpBatch(convertList(createReqVO.getBusinessIds(),
                     businessId -> updateFollowUpReqBO.setBizId(businessId).setContactLastTime(null).setContactLastContent(null)));
@@ -107,12 +107,11 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
     }
 
     @Override
-    public void createFollowUpRecordBatch(List<CrmFollowUpCreateReqBO> followUpCreateReqBOs) {
-        if (CollUtil.isEmpty(followUpCreateReqBOs)) {
+    public void createFollowUpRecordBatch(List<CrmFollowUpCreateReqBO> list) {
+        if (CollUtil.isEmpty(list)) {
             return;
         }
-
-        crmFollowUpRecordMapper.insertBatch(BeanUtils.toBean(followUpCreateReqBOs, CrmFollowUpRecordDO.class));
+        crmFollowUpRecordMapper.insertBatch(BeanUtils.toBean(list, CrmFollowUpRecordDO.class));
     }
 
     @Override

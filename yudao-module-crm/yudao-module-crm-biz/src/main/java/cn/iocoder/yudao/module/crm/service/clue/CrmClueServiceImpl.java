@@ -190,32 +190,36 @@ public class CrmClueServiceImpl implements CrmClueService {
             throw exception(CLUE_ANY_CLUE_ALREADY_TRANSLATED, convertSet(translatedClues, CrmClueDO::getId));
         }
 
-        // 2. 遍历线索(未转化的线索)，创建对应的客户
+        // 2.1 遍历线索(未转化的线索)，创建对应的客户
         clues.forEach(clue -> {
             Long customerId = customerService.createCustomer(BeanUtils.toBean(clue, CrmCustomerCreateReqBO.class), userId);
             clue.setCustomerId(customerId);
         });
+        // 2.2 更新线索
+        clueMapper.updateBatch(convertList(clues, clue -> new CrmClueDO().setId(clue.getId())
+                .setTransformStatus(Boolean.TRUE).setCustomerId(clue.getCustomerId())));
+        // 2.3 复制跟进记录
+        copyFollowUpRecords(clues);
 
-        // 2.1 更新线索
-        clueMapper.updateBatch(convertList(clues, clue -> new CrmClueDO().setId(clue.getId()).setTransformStatus(Boolean.TRUE)
-                .setCustomerId(clue.getCustomerId())));
-        // 2.3 复制跟进
-        updateFollowUpRecords(clues);
         // 3. 记录操作日志
         for (CrmClueDO clue : clues) {
             getSelf().translateCustomerLog(clue);
         }
     }
 
-    private void updateFollowUpRecords(List<CrmClueDO> clues) {
+    /**
+     * 线索被转换客户后，需要将线索的跟进记录，复制到客户上
+     *
+     * @param clues 被转化的线索
+     */
+    private void copyFollowUpRecords(List<CrmClueDO> clues) {
         List<CrmFollowUpRecordDO> followUpRecords = followUpRecordService.getFollowUpRecordByBiz(
                 CrmBizTypeEnum.CRM_LEADS.getType(), convertSet(clues, CrmClueDO::getId));
         if (CollUtil.isEmpty(followUpRecords)) {
             return;
         }
-
-        Map<Long, CrmClueDO> clueMap = convertMap(clues, CrmClueDO::getId);
         // 创建跟进
+        Map<Long, CrmClueDO> clueMap = convertMap(clues, CrmClueDO::getId);
         followUpRecordService.createFollowUpRecordBatch(convertList(followUpRecords, followUpRecord ->
                 BeanUtils.toBean(followUpRecord, CrmFollowUpCreateReqBO.class).setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
                         .setBizId(clueMap.get(followUpRecord.getBizId()).getCustomerId())));
