@@ -318,9 +318,10 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         if (poolConfig == null || !poolConfig.getEnabled()) {
             return 0;
         }
-        // 获取没有锁定的不在公海的客户
+        // 1. 获取没有锁定的不在公海的客户
         List<CrmCustomerDO> customerList = customerMapper.selectListByLockStatusAndOwnerUserIdNotNull(Boolean.FALSE);
         List<CrmCustomerDO> poolCustomerList = CollectionUtils.filterList(customerList, customer -> {
+            // TODO @puhui999：建议这里作为一个查询条件哈，不放内存里过滤；
             // 1.1 未成交放入公海
             if (!customer.getDealStatus()) {
                 return (poolConfig.getDealExpireDays() - LocalDateTimeUtils.between(customer.getCreateTime())) <= 0;
@@ -329,6 +330,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
             LocalDateTime lastTime = ObjUtil.defaultIfNull(customer.getContactLastTime(), customer.getCreateTime());
             return (poolConfig.getContactExpireDays() - LocalDateTimeUtils.between(lastTime)) <= 0;
         });
+
+        // 2. 逐个放入公海
         int count = 0;
         for (CrmCustomerDO customer : poolCustomerList) {
             try {

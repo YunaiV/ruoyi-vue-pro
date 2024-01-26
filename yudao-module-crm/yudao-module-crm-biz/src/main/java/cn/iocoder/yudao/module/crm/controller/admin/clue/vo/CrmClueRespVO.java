@@ -111,4 +111,5 @@ public class CrmClueRespVO {
     @Schema(description = "客户描述", example = "25682")
     @ExcelProperty("客户描述")
     private String description;
+
 }
