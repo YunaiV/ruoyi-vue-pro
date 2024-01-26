@@ -115,9 +115,14 @@ public class CrmCustomerDO extends BaseDO {
     private String detailAddress;
 
     /**
+     * 最后接收时间
+     */
+    private LocalDateTime receiveTime;
+    /**
      * 最后跟进时间
      */
     private LocalDateTime contactLastTime;
+
     /**
      * 最后跟进内容
      */

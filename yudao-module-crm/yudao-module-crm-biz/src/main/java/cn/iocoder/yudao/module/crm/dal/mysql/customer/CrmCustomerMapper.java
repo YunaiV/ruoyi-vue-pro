@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageR
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.util.CrmQueryWrapperUtils;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.lang.Nullable;
@@ -97,6 +98,12 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
             }
         }
         return selectJoinPage(pageReqVO, CrmCustomerDO.class, query);
+    }
+
+    default List<CrmCustomerDO> selectListByLockStatusAndOwnerUserIdNotNull(Boolean lockStatus) {
+        return selectList(new LambdaQueryWrapper<CrmCustomerDO>()
+                .eq(CrmCustomerDO::getLockStatus, lockStatus)
+                .isNotNull(CrmCustomerDO::getOwnerUserId));
     }
 
 }
