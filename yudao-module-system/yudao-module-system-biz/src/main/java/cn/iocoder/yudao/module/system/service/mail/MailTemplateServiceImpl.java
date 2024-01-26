@@ -59,7 +59,7 @@ public class MailTemplateServiceImpl implements MailTemplateService {
     }
 
     @Override
-    @CacheEvict(cacheNames = RedisKeyConstants.NOTIFY_TEMPLATE,
+    @CacheEvict(cacheNames = RedisKeyConstants.MAIL_TEMPLATE,
             allEntries = true) // allEntries 清空所有缓存，因为可能修改到 code 字段，不好清理
     public void updateMailTemplate(@Valid MailTemplateSaveReqVO updateReqVO) {
         // 校验是否存在
@@ -87,7 +87,7 @@ public class MailTemplateServiceImpl implements MailTemplateService {
     }
 
     @Override
-    @CacheEvict(cacheNames = RedisKeyConstants.NOTIFY_TEMPLATE,
+    @CacheEvict(cacheNames = RedisKeyConstants.MAIL_TEMPLATE,
             allEntries = true) // allEntries 清空所有缓存，因为 id 不是直接的缓存 code，不好清理
     public void deleteMailTemplate(Long id) {
         // 校验是否存在
