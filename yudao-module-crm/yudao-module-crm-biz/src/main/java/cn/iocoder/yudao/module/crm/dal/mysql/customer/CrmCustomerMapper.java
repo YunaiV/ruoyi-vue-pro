@@ -100,11 +100,11 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
         return selectJoinPage(pageReqVO, CrmCustomerDO.class, query);
     }
 
-    default List<CrmCustomerDO> selectListByLockStatusAndOwnerUserIdNotNull(Boolean lockStatus) {
+    default List<CrmCustomerDO> selectListByLockAndDealStatusAndNotPool(Boolean lockStatus, Boolean dealStatus) {
         return selectList(new LambdaQueryWrapper<CrmCustomerDO>()
                 .eq(CrmCustomerDO::getLockStatus, lockStatus)
-                // TODO @puhui999：not null 可以转化成大于 0
-                .isNotNull(CrmCustomerDO::getOwnerUserId));
+                .eq(CrmCustomerDO::getDealStatus, dealStatus)
+                .gt(CrmCustomerDO::getOwnerUserId, 0));
     }
 
 }

@@ -20,7 +20,7 @@ public class CrmCustomerAutoPutPoolJob implements JobHandler {
     @Override
     @TenantJob
     public String execute(String param) {
-        int count = customerService.customerAutoPutPoolBySystem();
+        int count = customerService.autoPutCustomerPool();
         return String.format("掉入公海客户 %s 个", count);
     }
 

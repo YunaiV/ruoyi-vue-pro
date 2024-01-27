@@ -47,6 +47,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.customer.CrmCustomerLimitConfigTypeEnum.CUSTOMER_LOCK_LIMIT;
@@ -313,23 +314,22 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     }
 
     @Override
-    public int customerAutoPutPoolBySystem() {
+    public int autoPutCustomerPool() {
         CrmCustomerPoolConfigDO poolConfig = customerPoolConfigService.getCustomerPoolConfig();
         if (poolConfig == null || !poolConfig.getEnabled()) {
             return 0;
         }
-        // 1. 获取没有锁定的不在公海的客户
-        List<CrmCustomerDO> customerList = customerMapper.selectListByLockStatusAndOwnerUserIdNotNull(Boolean.FALSE);
-        List<CrmCustomerDO> poolCustomerList = CollectionUtils.filterList(customerList, customer -> {
-            // TODO @puhui999：建议这里作为一个查询条件哈，不放内存里过滤；
-            // 1.1 未成交放入公海
-            if (!customer.getDealStatus()) {
-                return (poolConfig.getDealExpireDays() - LocalDateTimeUtils.between(customer.getCreateTime())) <= 0;
-            }
-            // 1.2 未跟进放入公海
+        // 1.1 获取没有锁定的不在公海的客户且没有成交的
+        List<CrmCustomerDO> notDealCustomerList = customerMapper.selectListByLockAndDealStatusAndNotPool(Boolean.FALSE, Boolean.FALSE);
+        // 1.2 获取没有锁定的不在公海的客户且成交的
+        List<CrmCustomerDO> dealCustomerList = customerMapper.selectListByLockAndDealStatusAndNotPool(Boolean.FALSE, Boolean.TRUE);
+        List<CrmCustomerDO> poolCustomerList = new ArrayList<>();
+        poolCustomerList.addAll(filterList(notDealCustomerList, customer ->
+                (poolConfig.getDealExpireDays() - LocalDateTimeUtils.between(customer.getCreateTime())) <= 0));
+        poolCustomerList.addAll(filterList(dealCustomerList, customer -> {
             LocalDateTime lastTime = ObjUtil.defaultIfNull(customer.getContactLastTime(), customer.getCreateTime());
             return (poolConfig.getContactExpireDays() - LocalDateTimeUtils.between(lastTime)) <= 0;
-        });
+        }));
 
         // 2. 逐个放入公海
         int count = 0;
