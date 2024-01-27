@@ -140,4 +140,12 @@ public class CrmContractController {
         return success(true);
     }
 
+    @PutMapping("/approve")
+    @Operation(summary = "发起合同审批流程")
+    @PreAuthorize("@ss.hasPermission('crm:contract:update')")
+    public CommonResult<Boolean> transfer(@RequestParam("id") Long id) {
+        contractService.handleApprove(id, getLoginUserId());
+        return success(true);
+    }
+
 }

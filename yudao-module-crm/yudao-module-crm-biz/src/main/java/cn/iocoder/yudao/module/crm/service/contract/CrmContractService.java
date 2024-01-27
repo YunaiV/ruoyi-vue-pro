@@ -58,6 +58,14 @@ public interface CrmContractService {
     void updateContractFollowUp(CrmUpdateFollowUpReqBO contractUpdateFollowUpReqBO);
 
     /**
+     * 发起合同审批流程
+     *
+     * @param id     合同编号
+     * @param userId 用户编号
+     */
+    void handleApprove(Long id, Long userId);
+
+    /**
      * 获得合同
      *
      * @param id 编号
@@ -111,9 +119,11 @@ public interface CrmContractService {
     Long getContractCountByCustomerId(Long customerId);
 
     /**
-     * 根据商机ID获取关联客户的合同数量 TODO @lzxhqs：1）方法注释，和参数注释之间要有空行；2）中英文之间有空格，更清晰，例如说 商机 ID
-     * @param businessId 商机ID
+     * 根据商机ID获取关联客户的合同数量
+     *
+     * @param businessId 商机编号
      * @return 数量
      */
     Long selectCountByBusinessId(Long businessId);
+
 }

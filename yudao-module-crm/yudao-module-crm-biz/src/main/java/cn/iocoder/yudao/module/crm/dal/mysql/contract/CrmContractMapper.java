@@ -41,7 +41,7 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
     default PageResult<CrmContractDO> selectPage(CrmContractPageReqVO pageReqVO, Long userId) {
         MPJLambdaWrapperX<CrmContractDO> mpjLambdaWrapperX = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
-        CrmQueryWrapperUtils.appendPermissionCondition(mpjLambdaWrapperX, CrmBizTypeEnum.CRM_CONTACT.getType(),
+        CrmQueryWrapperUtils.appendPermissionCondition(mpjLambdaWrapperX, CrmBizTypeEnum.CRM_CONTRACT.getType(),
                 CrmContractDO::getId, userId, pageReqVO.getSceneType(), Boolean.FALSE);
         // 拼接自身的查询条件
         mpjLambdaWrapperX.selectAll(CrmContractDO.class)
@@ -56,7 +56,7 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
     default List<CrmContractDO> selectBatchIds(Collection<Long> ids, Long userId) {
         MPJLambdaWrapperX<CrmContractDO> query = new MPJLambdaWrapperX<>();
         // 构建数据权限连表条件
-        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTACT.getType(), ids, userId);
+        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTRACT.getType(), ids, userId);
         // 拼接自身的查询条件
         query.selectAll(CrmContractDO.class).in(CrmContractDO::getId, ids).orderByDesc(CrmContractDO::getId);
         return selectJoinList(CrmContractDO.class, query);

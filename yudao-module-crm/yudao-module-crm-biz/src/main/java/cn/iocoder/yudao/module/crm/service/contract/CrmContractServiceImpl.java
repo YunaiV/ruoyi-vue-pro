@@ -4,6 +4,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.bpm.api.task.BpmProcessInstanceApi;
+import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
@@ -13,6 +15,7 @@ import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
+import cn.iocoder.yudao.module.crm.service.business.CrmBusinessProductService;
 import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
@@ -40,28 +43,33 @@ import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
 @Validated
 public class CrmContractServiceImpl implements CrmContractService {
 
+    public static final String CONTRACT_APPROVE = "contract-approve"; // 合同审批流程标识
+
     @Resource
     private CrmContractMapper contractMapper;
 
     @Resource
     private CrmPermissionService crmPermissionService;
+    @Resource
+    private CrmBusinessProductService businessProductService;
+
+    @Resource
+    private BpmProcessInstanceApi bpmProcessInstanceApi;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_CONTRACT_TYPE, subType = CRM_CONTRACT_CREATE_SUB_TYPE, bizNo = "{{#contract.id}}",
             success = CRM_CONTRACT_CREATE_SUCCESS)
     public Long createContract(CrmContractSaveReqVO createReqVO, Long userId) {
-        createReqVO.setId(null);
         // TODO @合同待定：插入合同商品；需要搞个 BusinessProductDO
         // 插入合同
-        CrmContractDO contract = BeanUtils.toBean(createReqVO, CrmContractDO.class);
+        CrmContractDO contract = BeanUtils.toBean(createReqVO, CrmContractDO.class).setId(null);
         contractMapper.insert(contract);
 
         // 创建数据权限
         crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setUserId(userId)
                 .setBizType(CrmBizTypeEnum.CRM_CONTRACT.getType()).setBizId(contract.getId())
                 .setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
-
         // 4. 记录操作日志上下文
         LogRecordContext.putVariable("contract", contract);
         return contract.getId();
@@ -141,6 +149,16 @@ public class CrmContractServiceImpl implements CrmContractService {
         contractMapper.updateById(BeanUtils.toBean(contractUpdateFollowUpReqBO, CrmContractDO.class).setId(contractUpdateFollowUpReqBO.getBizId()));
     }
 
+    @Override
+    public void handleApprove(Long id, Long userId) {
+        // 创建合同审批流程实例
+        String processInstanceId = bpmProcessInstanceApi.createProcessInstance(userId, new BpmProcessInstanceCreateReqDTO()
+                .setProcessDefinitionKey(CONTRACT_APPROVE).setBusinessKey(String.valueOf(id)));
+
+        // 更新合同工作流编号
+        contractMapper.updateById(new CrmContractDO().setId(id).setProcessInstanceId(processInstanceId));
+    }
+
     //======================= 查询相关 =======================
 
     @Override
@@ -182,6 +200,5 @@ public class CrmContractServiceImpl implements CrmContractService {
     public Long selectCountByBusinessId(Long businessId) {
         return contractMapper.selectCountByBusinessId(businessId);
     }
-
     // TODO @合同待定：需要新增一个 ContractConfigDO 表，合同配置，重点是到期提醒；
 }
