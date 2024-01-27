@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.erp.enums;
 
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
+
 /**
  * ERP 错误码枚举类
  * <p>
@@ -7,5 +9,7 @@ package cn.iocoder.yudao.module.erp.enums;
  */
 public interface ErrorCodeConstants {
 
+    // ========== 销售订单（1-030-000-000） ==========
+    ErrorCode SALE_ORDER_NOT_EXISTS = new ErrorCode(1_030_000_000, "销售订单不存在");
 
 }
