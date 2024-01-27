@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
- * 系统操作日志 Create Req BO
+ * 系统操作日志 Create Request DTO
  *
  * @author HUIHUI
  */

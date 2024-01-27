@@ -15,13 +15,13 @@
         <!-- 各种 module 拓展 -->
         <module>yudao-module-system</module>
         <module>yudao-module-infra</module>
-        <module>yudao-module-member</module>
+<!--        <module>yudao-module-member</module>-->
 <!--        <module>yudao-module-bpm</module>-->
 <!--        <module>yudao-module-report</module>-->
 <!--        <module>yudao-module-mp</module>-->
-        <module>yudao-module-pay</module>
-        <module>yudao-module-mall</module>
-        <module>yudao-module-crm</module>
+<!--        <module>yudao-module-pay</module>-->
+<!--        <module>yudao-module-mall</module>-->
+<!--        <module>yudao-module-crm</module>-->
         <!-- 示例项目 -->
 <!--        <module>yudao-example</module>-->
     </modules>
@@ -41,7 +41,7 @@
         <flatten-maven-plugin.version>1.5.0</flatten-maven-plugin.version>
         <!-- 看看咋放到 bom 里 -->
         <lombok.version>1.18.30</lombok.version>
-        <spring.boot.version>3.2.0</spring.boot.version>
+        <spring.boot.version>3.2.2</spring.boot.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
