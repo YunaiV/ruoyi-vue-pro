@@ -12,7 +12,7 @@
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
-    <description>Web 框架，全局异常、API 日志等</description>
+    <description>Web 框架，全局异常、API 日志、脱敏、错误码等</description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <dependencies>
@@ -54,6 +54,11 @@
             <artifactId>yudao-module-infra-api</artifactId> <!-- 需要使用它，进行操作日志的记录 -->
             <version>${revision}</version>
         </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-system-api</artifactId> <!-- 需要使用它，进行错误码的记录 -->
+            <version>${revision}</version>
+        </dependency>
 
         <!-- xss -->
         <dependency>
@@ -61,6 +66,17 @@
             <artifactId>jsoup</artifactId>
         </dependency>
 
+        <!-- Test 测试相关 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>
