@@ -93,7 +93,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         validateCustomerExceedOwnerLimit(createReqVO.getOwnerUserId(), 1);
 
         // 2. 插入客户
-        CrmCustomerDO customer = BeanUtils.toBean(createReqVO, CrmCustomerDO.class)
+        CrmCustomerDO customer = BeanUtils.toBean(createReqVO, CrmCustomerDO.class).setOwnerUserId(userId)
                 .setLockStatus(false).setDealStatus(false).setContactLastTime(LocalDateTime.now());
         customerMapper.insert(customer);
 
@@ -233,7 +233,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     }
 
     @Override
-    public CrmCustomerImportRespVO importCustomerList(List<CrmCustomerImportExcelVO> importCustomers, Boolean isUpdateSupport) {
+    public CrmCustomerImportRespVO importCustomerList(List<CrmCustomerImportExcelVO> importCustomers, Boolean isUpdateSupport, Long userId) {
         if (CollUtil.isEmpty(importCustomers)) {
             throw exception(CUSTOMER_IMPORT_LIST_IS_EMPTY);
         }
@@ -250,8 +250,13 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
             // 判断如果不存在，在进行插入
             CrmCustomerDO existCustomer = customerMapper.selectByCustomerName(importCustomer.getName());
             if (existCustomer == null) {
-                customerMapper.insert(BeanUtils.toBean(importCustomer, CrmCustomerDO.class));
+                CrmCustomerDO customer = BeanUtils.toBean(importCustomer, CrmCustomerDO.class).setOwnerUserId(userId)
+                        .setLockStatus(false).setDealStatus(false).setContactLastTime(LocalDateTime.now());
+                customerMapper.insert(customer);
                 respVO.getCreateCustomerNames().add(importCustomer.getName());
+                // 创建数据权限
+                permissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
+                        .setBizId(customer.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
                 return;
             }
             // 如果存在，判断是否允许更新

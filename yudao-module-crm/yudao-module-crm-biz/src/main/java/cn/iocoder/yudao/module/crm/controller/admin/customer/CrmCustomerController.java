@@ -198,7 +198,7 @@ public class CrmCustomerController {
     public CommonResult<CrmCustomerImportRespVO> importExcel(@RequestParam("file") MultipartFile file,
                                                              @RequestParam(value = "updateSupport", required = false, defaultValue = "false") Boolean updateSupport) throws Exception {
         List<CrmCustomerImportExcelVO> list = ExcelUtils.read(file, CrmCustomerImportExcelVO.class);
-        return success(customerService.importCustomerList(list, updateSupport));
+        return success(customerService.importCustomerList(list, updateSupport, getLoginUserId()));
     }
 
 
