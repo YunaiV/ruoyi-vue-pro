@@ -8,17 +8,17 @@
         <version>${revision}</version>
     </parent>
     <modules>
-        <module>yudao-module-crm-api</module>
-        <module>yudao-module-crm-biz</module>
+        <module>yudao-module-erp-api</module>
+        <module>yudao-module-erp-biz</module>
     </modules>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>yudao-module-crm</artifactId>
+    <artifactId>yudao-module-erp</artifactId>
     <packaging>pom</packaging>
 
     <name>${project.artifactId}</name>
     <description>
-        crm 包下，客户关系管理（Customer Relationship Management）。
-        例如说：客户、联系人、商机、合同、回款等等
+        erp 包下，企业资源管理（Enterprise Resource Planning）。
+        例如说：采购、销售、库存、财务、产品等等
     </description>
 
 </project>

@@ -40,7 +40,7 @@ import java.util.Set;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-@Tag(name = "管理后台 - 商机状态类型")
+@Tag(name = "管理后台 - CRM 商机状态类型")
 @RestController
 @RequestMapping("/crm/business-status-type")
 @Validated
