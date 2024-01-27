@@ -3,15 +3,14 @@ package cn.iocoder.yudao.module.crm.service.customer;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerLockReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerSaveReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTransferReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerLimitConfigDO;
@@ -41,10 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
@@ -236,7 +232,50 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         return customer.getId();
     }
 
-// ==================== 公海相关操作 ====================
+    @Override
+    public CrmCustomerImportRespVO importCustomerList(List<CrmCustomerImportExcelVO> importCustomers, Boolean isUpdateSupport) {
+        if (CollUtil.isEmpty(importCustomers)) {
+            throw exception(CUSTOMER_IMPORT_LIST_IS_EMPTY);
+        }
+        CrmCustomerImportRespVO respVO = CrmCustomerImportRespVO.builder().createCustomerNames(new ArrayList<>())
+                .updateCustomerNames(new ArrayList<>()).failureCustomerNames(new LinkedHashMap<>()).build();
+        importCustomers.forEach(importCustomer -> {
+            // 校验，判断是否有不符合的原因
+            try {
+                validateCustomerForCreate(importCustomer);
+            } catch (ServiceException ex) {
+                respVO.getFailureCustomerNames().put(importCustomer.getName(), ex.getMessage());
+                return;
+            }
+            // 判断如果不存在，在进行插入
+            CrmCustomerDO existCustomer = customerMapper.selectByCustomerName(importCustomer.getName());
+            if (existCustomer == null) {
+                customerMapper.insert(BeanUtils.toBean(importCustomer, CrmCustomerDO.class));
+                respVO.getCreateCustomerNames().add(importCustomer.getName());
+                return;
+            }
+            // 如果存在，判断是否允许更新
+            if (!isUpdateSupport) {
+                respVO.getFailureCustomerNames().put(importCustomer.getName(),
+                        StrUtil.format(CUSTOMER_NAME_EXISTS.getMsg(), importCustomer.getName()));
+                return;
+            }
+            CrmCustomerDO updateCustomer = BeanUtils.toBean(importCustomer, CrmCustomerDO.class);
+            updateCustomer.setId(existCustomer.getId());
+            customerMapper.updateById(updateCustomer);
+            respVO.getUpdateCustomerNames().add(importCustomer.getName());
+        });
+        return respVO;
+    }
+
+    private void validateCustomerForCreate(CrmCustomerImportExcelVO importCustomer) {
+        // 校验客户名称不能为空
+        if (StrUtil.isEmptyIfStr(importCustomer.getName())) {
+            throw exception(CUSTOMER_CREATE_NAME_NOT_NULL);
+        }
+    }
+
+    // ==================== 公海相关操作 ====================
 
     @Override
     @Transactional(rollbackFor = Exception.class)

@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.module.crm.service.customer;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerLockReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerSaveReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTransferReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.service.customer.bo.CrmCustomerCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
@@ -107,6 +104,15 @@ public interface CrmCustomerService {
      * @return 客户列表
      */
     Long createCustomer(CrmCustomerCreateReqBO customerCreateReq, Long userId);
+
+    /**
+     * 批量导入客户
+     *
+     * @param importCustomers 导入客户列表
+     * @param isUpdateSupport 是否支持更新
+     * @return 导入结果
+     */
+    CrmCustomerImportRespVO importCustomerList(List<CrmCustomerImportExcelVO> importCustomers, Boolean isUpdateSupport);
 
     // ==================== 公海相关操作 ====================
 

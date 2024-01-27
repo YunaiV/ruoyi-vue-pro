@@ -21,6 +21,7 @@ import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
@@ -29,9 +30,11 @@ import org.mapstruct.ap.internal.util.Collections;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -168,6 +171,36 @@ public class CrmCustomerController {
         ExcelUtils.write(response, "客户.xls", "数据", CrmCustomerRespVO.class,
                 BeanUtils.toBean(list, CrmCustomerRespVO.class));
     }
+
+    @GetMapping("/get-import-template")
+    @Operation(summary = "获得导入客户模板")
+    public void importTemplate(HttpServletResponse response) throws IOException {
+        // 手动创建导出 demo
+        List<CrmCustomerImportExcelVO> list = Arrays.asList(
+                CrmCustomerImportExcelVO.builder().name("芋道").industryId(1).level(1).source(1).mobile("15601691300").telephone("")
+                        .website("https://doc.iocoder.cn/").qq("").wechat("").email("yunai@iocoder.cn").description("").remark("")
+                        .areaId(null).detailAddress("").build(),
+                CrmCustomerImportExcelVO.builder().name("源码").industryId(1).level(1).source(1).mobile("15601691300").telephone("")
+                        .website("https://doc.iocoder.cn/").qq("").wechat("").email("yunai@iocoder.cn").description("").remark("")
+                        .areaId(null).detailAddress("").build()
+        );
+        // 输出
+        ExcelUtils.write(response, "客户导入模板.xls", "客户列表", CrmCustomerImportExcelVO.class, list);
+    }
+
+    @PostMapping("/import")
+    @Operation(summary = "导入客户")
+    @Parameters({
+            @Parameter(name = "file", description = "Excel 文件", required = true),
+            @Parameter(name = "updateSupport", description = "是否支持更新，默认为 false", example = "true")
+    })
+    @PreAuthorize("@ss.hasPermission('system:customer:import')")
+    public CommonResult<CrmCustomerImportRespVO> importExcel(@RequestParam("file") MultipartFile file,
+                                                             @RequestParam(value = "updateSupport", required = false, defaultValue = "false") Boolean updateSupport) throws Exception {
+        List<CrmCustomerImportExcelVO> list = ExcelUtils.read(file, CrmCustomerImportExcelVO.class);
+        return success(customerService.importCustomerList(list, updateSupport));
+    }
+
 
     @PutMapping("/transfer")
     @Operation(summary = "转移客户")

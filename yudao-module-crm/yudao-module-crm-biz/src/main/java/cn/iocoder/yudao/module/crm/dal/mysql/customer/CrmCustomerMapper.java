@@ -107,4 +107,8 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
                 .gt(CrmCustomerDO::getOwnerUserId, 0));
     }
 
+    default CrmCustomerDO selectByCustomerName(String name) {
+        return selectOne(CrmCustomerDO::getName, name);
+    }
+
 }
