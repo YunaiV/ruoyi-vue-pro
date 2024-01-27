@@ -387,6 +387,12 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         return customerMapper.selectPage(pageReqVO, userId);
     }
 
+    public PageResult<CrmCustomerDO> getPutInPoolRemindCustomerPage(CrmCustomerPageReqVO pageReqVO,
+                                                                    CrmCustomerPoolConfigDO poolConfigDO,
+                                                                    Long userId) {
+        return customerMapper.selectPutInPoolRemindCustomerPage(pageReqVO, poolConfigDO, userId);
+    }
+
     // ======================= 校验相关 =======================
 
     /**

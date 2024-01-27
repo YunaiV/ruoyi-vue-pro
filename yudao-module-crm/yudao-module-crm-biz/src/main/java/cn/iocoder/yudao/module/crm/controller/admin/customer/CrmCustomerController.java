@@ -36,11 +36,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CUSTOMER_POOL_CONFIG_NOT_EXISTS_OR_DISABLED;
 
 @Tag(name = "管理后台 - CRM 客户")
 @RestController
@@ -115,6 +117,35 @@ public class CrmCustomerController {
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSetByFlatMap(pageResult.getList(), user -> Stream.of(Long.parseLong(user.getCreator()), user.getOwnerUserId())));
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
+        return success(CrmCustomerConvert.INSTANCE.convertPage(pageResult, userMap, deptMap, poolDayMap));
+    }
+
+
+    @GetMapping("/put-in-pool-remind-page")
+    @Operation(summary = "获得待进入公海客户分页")
+    @PreAuthorize("@ss.hasPermission('crm:customer:query')")
+    public CommonResult<PageResult<CrmCustomerRespVO>> getPutInPoolRemindCustomerPage(@Valid CrmCustomerPageReqVO pageVO) {
+        // 获取公海配置
+        CrmCustomerPoolConfigDO poolConfigDO = customerPoolConfigService.getCustomerPoolConfig();
+        if (ObjUtil.isNull(poolConfigDO)
+                || Boolean.FALSE.equals(poolConfigDO.getEnabled())
+                || Boolean.FALSE.equals(poolConfigDO.getNotifyEnabled())
+        ) {
+            throw exception(CUSTOMER_POOL_CONFIG_NOT_EXISTS_OR_DISABLED);
+        }
+
+        // 1. 查询客户分页
+        PageResult<CrmCustomerDO> pageResult = customerService.getPutInPoolRemindCustomerPage(pageVO, poolConfigDO, getLoginUserId());
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty(pageResult.getTotal()));
+        }
+
+        // 2. 拼接数据
+        Map<Long, Long> poolDayMap = getPoolDayMap(pageResult.getList()); // 客户界面，需要查看距离进入公海的时间
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
+                convertSetByFlatMap(pageResult.getList(), user -> Stream.of(Long.parseLong(user.getCreator()), user.getOwnerUserId())));
+        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
+
         return success(CrmCustomerConvert.INSTANCE.convertPage(pageResult, userMap, deptMap, poolDayMap));
     }
 
