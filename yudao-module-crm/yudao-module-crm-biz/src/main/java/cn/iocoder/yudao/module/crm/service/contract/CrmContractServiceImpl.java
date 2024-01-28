@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTrans
 import cn.iocoder.yudao.module.crm.convert.contract.CrmContractConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractMapper;
+import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
@@ -156,7 +157,8 @@ public class CrmContractServiceImpl implements CrmContractService {
                 .setProcessDefinitionKey(CONTRACT_APPROVE).setBusinessKey(String.valueOf(id)));
 
         // 更新合同工作流编号
-        contractMapper.updateById(new CrmContractDO().setId(id).setProcessInstanceId(processInstanceId));
+        contractMapper.updateById(new CrmContractDO().setId(id).setProcessInstanceId(processInstanceId)
+                .setAuditStatus(CrmAuditStatusEnum.PROCESS.getStatus()));
     }
 
     //======================= 查询相关 =======================

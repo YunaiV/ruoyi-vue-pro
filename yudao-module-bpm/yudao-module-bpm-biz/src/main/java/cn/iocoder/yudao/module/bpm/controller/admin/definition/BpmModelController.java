@@ -6,15 +6,14 @@ import cn.iocoder.yudao.framework.common.util.io.IoUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.*;
 import cn.iocoder.yudao.module.bpm.convert.definition.BpmModelConvert;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 
 import java.io.IOException;
 
@@ -41,6 +40,15 @@ public class BpmModelController {
     @PreAuthorize("@ss.hasPermission('bpm:model:query')")
     public CommonResult<BpmModelRespVO> getModel(@RequestParam("id") String id) {
         BpmModelRespVO model = modelService.getModel(id);
+        return success(model);
+    }
+
+    @GetMapping("/get-by-key")
+    @Operation(summary = "获得模型")
+    @Parameter(name = "key", description = "流程标识", required = true, example = "oa_leave")
+    @PreAuthorize("@ss.hasPermission('bpm:model:query')")
+    public CommonResult<BpmModelRespVO> getModelByKey(@RequestParam("key") String key) {
+        BpmModelRespVO model = modelService.getBpmnModelByKey(key);
         return success(model);
     }
 
