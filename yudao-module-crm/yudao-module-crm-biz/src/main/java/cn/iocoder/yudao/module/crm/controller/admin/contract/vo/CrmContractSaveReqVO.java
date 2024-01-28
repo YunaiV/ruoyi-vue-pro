@@ -89,6 +89,9 @@ public class CrmContractSaveReqVO {
     @DiffLogField(name = "备注")
     private String remark;
 
+    @Schema(description = "审批状态", example = "1")
+    private Integer auditStatus;
+
     @Schema(description = "产品列表")
     private List<CrmContractProductItem> productItems;
 
@@ -104,7 +107,7 @@ public class CrmContractSaveReqVO {
 
         @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "8911")
         @NotNull(message = "产品数量不能为空")
-        private Long count;
+        private Integer count;
 
         @Schema(description = "产品折扣")
         private Integer discountPercent;
