@@ -10,6 +10,8 @@
     <modules>
         <module>yudao-module-crm-api</module>
         <module>yudao-module-crm-biz</module>
+        <module>yudao-module-bi-biz</module>
+        <module>yudao-module-bi-api</module>
     </modules>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>yudao-module-crm</artifactId>
@@ -20,6 +22,7 @@
     <description>
         crm 包下，客户关系管理（Customer Relationship Management）。
         例如说：客户、联系人、商机、合同、回款等等
+        商业智能 BI 模块，包括：报表、图表、数据大屏等等
     </description>
 
 </project>
