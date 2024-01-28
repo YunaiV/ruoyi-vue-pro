@@ -35,7 +35,7 @@
                 #{item}
             </foreach>
         </if>
-        AND DATE_FORMAT(t.order_date,'${sqlDateFormat}') between #{beginTime} and #{finalTime}
+        AND DATE_FORMAT(t.return_time,'${sqlDateFormat}') between #{beginTime} and #{finalTime}
         GROUP BY t.owner_user_id
         ORDER BY price DESC
     </select>
