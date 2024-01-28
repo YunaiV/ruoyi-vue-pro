@@ -30,4 +30,13 @@ public class CrmCluePageReqVO extends PageParam {
     @Schema(description = "是否为公海数据", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
     private Boolean pool; // null 则表示为不是公海数据
 
+    @Schema(description = "所属行业", example = "1")
+    private Integer industryId;
+
+    @Schema(description = "客户等级", example = "1")
+    private Integer level;
+
+    @Schema(description = "客户来源", example = "1")
+    private Integer source;
+
 }

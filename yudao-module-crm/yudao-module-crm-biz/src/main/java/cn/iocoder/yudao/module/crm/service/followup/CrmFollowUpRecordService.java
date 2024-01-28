@@ -28,9 +28,9 @@ public interface CrmFollowUpRecordService {
     /**
      * 创建更进
      *
-     * @param followUpCreateReqBOs 请求
+     * @param list 请求
      */
-    void createFollowUpRecordBatch(List<CrmFollowUpCreateReqBO> followUpCreateReqBOs);
+    void createFollowUpRecordBatch(List<CrmFollowUpCreateReqBO> list);
 
     /**
      * 删除跟进记录 (数据权限基于 bizType、 bizId)

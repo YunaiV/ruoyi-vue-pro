@@ -100,13 +100,13 @@ public interface CrmCustomerService {
     void updateCustomerFollowUp(CrmUpdateFollowUpReqBO customerUpdateFollowUpReqBO);
 
     /**
-     * 批量创建客户
+     * 创建客户
      *
-     * @param customerCreateReqBOs 请求
-     * @param userId               用户编号
+     * @param customerCreateReq 请求信息
+     * @param userId            用户编号
      * @return 客户列表
      */
-    List<CrmCustomerDO> createCustomerBatch(List<CrmCustomerCreateReqBO> customerCreateReqBOs, Long userId);
+    Long createCustomer(CrmCustomerCreateReqBO customerCreateReq, Long userId);
 
     // ==================== 公海相关操作 ====================
 
@@ -125,5 +125,13 @@ public interface CrmCustomerService {
      * @param isReceive   是/否领取
      */
     void receiveCustomer(List<Long> ids, Long ownerUserId, Boolean isReceive);
+
+    // TODO @puhui999：autoPutCustomerPool，注释说明是系统就好哈；
+    /**
+     * 【系统】客户自动掉入公海
+     *
+     * @return 掉入公海数量
+     */
+    int customerAutoPutPoolBySystem();
 
 }

@@ -18,7 +18,6 @@
     <packaging>pom</packaging>
 
     <name>${project.artifactId}</name>
-
     <description>
         crm 包下，客户关系管理（Customer Relationship Management）。
         例如说：客户、联系人、商机、合同、回款等等

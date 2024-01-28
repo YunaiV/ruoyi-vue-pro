@@ -41,7 +41,7 @@ import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.E
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CUSTOMER_NOT_EXISTS;
 
-@Tag(name = "管理后台 - 商机")
+@Tag(name = "管理后台 - CRM 商机")
 @RestController
 @RequestMapping("/crm/business")
 @Validated

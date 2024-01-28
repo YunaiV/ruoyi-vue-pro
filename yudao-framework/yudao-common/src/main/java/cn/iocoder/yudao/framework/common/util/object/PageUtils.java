@@ -9,7 +9,7 @@ import cn.iocoder.yudao.framework.common.pojo.SortablePageParam;
 import cn.iocoder.yudao.framework.common.pojo.SortingField;
 import org.springframework.util.Assert;
 
-import java.util.List;
+import static java.util.Collections.singletonList;
 
 /**
  * {@link cn.iocoder.yudao.framework.common.pojo.PageParam} 工具类
@@ -60,7 +60,7 @@ public class PageUtils {
      */
     public static <T> void buildDefaultSortingField(SortablePageParam sortablePageParam, Func1<T, ?> func) {
         if (sortablePageParam != null && CollUtil.isEmpty(sortablePageParam.getSortingFields())) {
-            sortablePageParam.setSortingFields(List.of(buildSortingField(func)));
+            sortablePageParam.setSortingFields(singletonList(buildSortingField(func)));
         }
     }
 
