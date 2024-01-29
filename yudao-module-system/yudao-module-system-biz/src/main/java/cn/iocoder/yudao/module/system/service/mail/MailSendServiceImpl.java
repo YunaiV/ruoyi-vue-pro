@@ -89,13 +89,14 @@ public class MailSendServiceImpl implements MailSendService {
 
         // 创建发送日志。如果模板被禁用，则不发送短信，只记录日志
         Boolean isSend = CommonStatusEnum.ENABLE.getStatus().equals(template.getStatus());
+        String title = mailTemplateService.formatMailTemplateContent(template.getTitle(), templateParams);
         String content = mailTemplateService.formatMailTemplateContent(template.getContent(), templateParams);
         Long sendLogId = mailLogService.createMailLog(userId, userType, mail,
                 account, template, content, templateParams, isSend);
         // 发送 MQ 消息，异步执行发送短信
         if (isSend) {
             mailProducer.sendMailSendMessage(sendLogId, mail, account.getId(),
-                    template.getNickname(), template.getTitle(), content);
+                    template.getNickname(), title, content);
         }
         return sendLogId;
     }

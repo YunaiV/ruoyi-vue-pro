@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.promotion.dal.dataobject.discount;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.promotion.enums.common.PromotionActivityStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -36,7 +36,9 @@ public class DiscountActivityDO extends BaseDO {
     /**
      * 状态
      *
-     * 枚举 {@link PromotionActivityStatusEnum}
+     * 枚举 {@link CommonStatusEnum}
+     *
+     * 活动被关闭后，不允许再次开启。
      */
     private Integer status;
     /**

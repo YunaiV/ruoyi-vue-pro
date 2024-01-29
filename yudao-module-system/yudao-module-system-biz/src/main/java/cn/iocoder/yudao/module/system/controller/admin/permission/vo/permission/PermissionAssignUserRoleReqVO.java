@@ -11,7 +11,7 @@ import java.util.Set;
 @Data
 public class PermissionAssignUserRoleReqVO {
 
-    @Schema(description = "用户编号", required = true, example = "1")
+    @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "用户编号不能为空")
     private Long userId;
 

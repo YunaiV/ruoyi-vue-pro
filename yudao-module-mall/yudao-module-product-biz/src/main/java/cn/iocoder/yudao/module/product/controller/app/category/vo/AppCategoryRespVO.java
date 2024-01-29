@@ -10,18 +10,18 @@ import javax.validation.constraints.NotNull;
 @Schema(description = "用户 APP - 商品分类 Response VO")
 public class AppCategoryRespVO {
 
-    @Schema(description = "分类编号", required = true, example = "2")
+    @Schema(description = "分类编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     private Long id;
 
-    @Schema(description = "父分类编号", required = true, example = "1")
+    @Schema(description = "父分类编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "父分类编号不能为空")
     private Long parentId;
 
-    @Schema(description = "分类名称", required = true, example = "办公文具")
+    @Schema(description = "分类名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "办公文具")
     @NotBlank(message = "分类名称不能为空")
     private String name;
 
-    @Schema(description = "分类图片", required = true)
+    @Schema(description = "分类图片", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "分类图片不能为空")
     private String picUrl;
 

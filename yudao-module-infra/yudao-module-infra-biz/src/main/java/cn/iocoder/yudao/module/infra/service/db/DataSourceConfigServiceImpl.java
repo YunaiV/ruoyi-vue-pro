@@ -1,12 +1,11 @@
 package cn.iocoder.yudao.module.infra.service.db;
 
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
-import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigCreateReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigUpdateReqVO;
-import cn.iocoder.yudao.module.infra.convert.db.DataSourceConfigConvert;
+import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.db.DataSourceConfigDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.db.DataSourceConfigMapper;
-import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DataSourceProperty;
+import com.baomidou.dynamic.datasource.creator.DataSourceProperty;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -35,21 +34,21 @@ public class DataSourceConfigServiceImpl implements DataSourceConfigService {
     private DynamicDataSourceProperties dynamicDataSourceProperties;
 
     @Override
-    public Long createDataSourceConfig(DataSourceConfigCreateReqVO createReqVO) {
-        DataSourceConfigDO dataSourceConfig = DataSourceConfigConvert.INSTANCE.convert(createReqVO);
-        validateConnectionOK(dataSourceConfig);
+    public Long createDataSourceConfig(DataSourceConfigSaveReqVO createReqVO) {
+        DataSourceConfigDO config = BeanUtils.toBean(createReqVO, DataSourceConfigDO.class);
+        validateConnectionOK(config);
 
         // 插入
-        dataSourceConfigMapper.insert(dataSourceConfig);
+        dataSourceConfigMapper.insert(config);
         // 返回
-        return dataSourceConfig.getId();
+        return config.getId();
     }
 
     @Override
-    public void updateDataSourceConfig(DataSourceConfigUpdateReqVO updateReqVO) {
+    public void updateDataSourceConfig(DataSourceConfigSaveReqVO updateReqVO) {
         // 校验存在
         validateDataSourceConfigExists(updateReqVO.getId());
-        DataSourceConfigDO updateObj = DataSourceConfigConvert.INSTANCE.convert(updateReqVO);
+        DataSourceConfigDO updateObj = BeanUtils.toBean(updateReqVO, DataSourceConfigDO.class);
         validateConnectionOK(updateObj);
 
         // 更新

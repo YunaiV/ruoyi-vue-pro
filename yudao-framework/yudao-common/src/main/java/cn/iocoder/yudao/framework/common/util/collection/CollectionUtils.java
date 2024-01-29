@@ -2,14 +2,15 @@ package cn.iocoder.yudao.framework.common.util.collection;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ArrayUtil;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.*;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.Arrays.asList;
 
 /**
  * Collection 工具类
@@ -19,11 +20,15 @@ import java.util.stream.Collectors;
 public class CollectionUtils {
 
     public static boolean containsAny(Object source, Object... targets) {
-        return Arrays.asList(targets).contains(source);
+        return asList(targets).contains(source);
     }
 
     public static boolean isAnyEmpty(Collection<?>... collections) {
         return Arrays.stream(collections).anyMatch(CollectionUtil::isEmpty);
+    }
+
+    public static <T> boolean anyMatch(Collection<T> from, Predicate<T> predicate) {
+        return from.stream().anyMatch(predicate);
     }
 
     public static <T> List<T> filterList(Collection<T> from, Predicate<T> predicate) {
@@ -47,6 +52,13 @@ public class CollectionUtils {
         return new ArrayList<>(convertMap(from, keyMapper, Function.identity(), cover).values());
     }
 
+    public static <T, U> List<U> convertList(T[] from, Function<T, U> func) {
+        if (ArrayUtil.isEmpty(from)) {
+            return new ArrayList<>();
+        }
+        return convertList(Arrays.asList(from), func);
+    }
+
     public static <T, U> List<U> convertList(Collection<T> from, Function<T, U> func) {
         if (CollUtil.isEmpty(from)) {
             return new ArrayList<>();
@@ -61,6 +73,30 @@ public class CollectionUtils {
         return from.stream().filter(filter).map(func).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
+    public static <T, U> List<U> convertListByFlatMap(Collection<T> from,
+                                                      Function<T, ? extends Stream<? extends U>> func) {
+        if (CollUtil.isEmpty(from)) {
+            return new ArrayList<>();
+        }
+        return from.stream().flatMap(func).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
+    public static <T, U, R> List<R> convertListByFlatMap(Collection<T> from,
+                                                         Function<? super T, ? extends U> mapper,
+                                                         Function<U, ? extends Stream<? extends R>> func) {
+        if (CollUtil.isEmpty(from)) {
+            return new ArrayList<>();
+        }
+        return from.stream().map(mapper).flatMap(func).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
+    public static <K, V> List<V> mergeValuesFromMap(Map<K, List<V>> map) {
+        return map.values()
+                .stream()
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+    }
+
     public static <T, U> Set<U> convertSet(Collection<T> from, Function<T, U> func) {
         if (CollUtil.isEmpty(from)) {
             return new HashSet<>();
@@ -73,6 +109,30 @@ public class CollectionUtils {
             return new HashSet<>();
         }
         return from.stream().filter(filter).map(func).filter(Objects::nonNull).collect(Collectors.toSet());
+    }
+
+    public static <T, K> Map<K, T> convertMapByFilter(Collection<T> from, Predicate<T> filter, Function<T, K> keyFunc) {
+        if (CollUtil.isEmpty(from)) {
+            return new HashMap<>();
+        }
+        return from.stream().filter(filter).collect(Collectors.toMap(keyFunc, v -> v));
+    }
+
+    public static <T, U> Set<U> convertSetByFlatMap(Collection<T> from,
+                                                    Function<T, ? extends Stream<? extends U>> func) {
+        if (CollUtil.isEmpty(from)) {
+            return new HashSet<>();
+        }
+        return from.stream().flatMap(func).filter(Objects::nonNull).collect(Collectors.toSet());
+    }
+
+    public static <T, U, R> Set<R> convertSetByFlatMap(Collection<T> from,
+                                                       Function<? super T, ? extends U> mapper,
+                                                       Function<U, ? extends Stream<? extends R>> func) {
+        if (CollUtil.isEmpty(from)) {
+            return new HashSet<>();
+        }
+        return from.stream().map(mapper).flatMap(func).filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
     public static <T, K> Map<K, T> convertMap(Collection<T> from, Function<T, K> keyFunc) {
@@ -149,6 +209,46 @@ public class CollectionUtils {
         return builder.build();
     }
 
+    /**
+     * 对比老、新两个列表，找出新增、修改、删除的数据
+     *
+     * @param oldList  老列表
+     * @param newList  新列表
+     * @param sameFunc 对比函数，返回 true 表示相同，返回 false 表示不同
+     *                 注意，same 是通过每个元素的“标识”，判断它们是不是同一个数据
+     * @return [新增列表、修改列表、删除列表]
+     */
+    public static <T> List<List<T>> diffList(Collection<T> oldList, Collection<T> newList,
+                                             BiFunction<T, T, Boolean> sameFunc) {
+        List<T> createList = new LinkedList<>(newList); // 默认都认为是新增的，后续会进行移除
+        List<T> updateList = new ArrayList<>();
+        List<T> deleteList = new ArrayList<>();
+
+        // 通过以 oldList 为主遍历，找出 updateList 和 deleteList
+        for (T oldObj : oldList) {
+            // 1. 寻找是否有匹配的
+            T foundObj = null;
+            for (Iterator<T> iterator = createList.iterator(); iterator.hasNext(); ) {
+                T newObj = iterator.next();
+                // 1.1 不匹配，则直接跳过
+                if (!sameFunc.apply(oldObj, newObj)) {
+                    continue;
+                }
+                // 1.2 匹配，则移除，并结束寻找
+                iterator.remove();
+                foundObj = newObj;
+                break;
+            }
+            // 2. 匹配添加到 updateList；不匹配则添加到 deleteList 中
+            if (foundObj != null) {
+                updateList.add(foundObj);
+            } else {
+                deleteList.add(oldObj);
+            }
+        }
+        return asList(createList, updateList, deleteList);
+    }
+
     public static boolean containsAny(Collection<?> source, Collection<?> candidates) {
         return org.springframework.util.CollectionUtils.containsAny(source, candidates);
     }
@@ -158,17 +258,21 @@ public class CollectionUtils {
     }
 
     public static <T> T findFirst(List<T> from, Predicate<T> predicate) {
-        if (CollUtil.isEmpty(from)) {
-            return null;
-        }
-        return from.stream().filter(predicate).findFirst().orElse(null);
+        return findFirst(from, predicate, Function.identity());
     }
 
-    public static <T, V extends Comparable<? super V>> V getMaxValue(List<T> from, Function<T, V> valueFunc) {
+    public static <T, U> U findFirst(List<T> from, Predicate<T> predicate, Function<T, U> func) {
         if (CollUtil.isEmpty(from)) {
             return null;
         }
-        assert from.size() > 0; // 断言，避免告警
+        return from.stream().filter(predicate).findFirst().map(func).orElse(null);
+    }
+
+    public static <T, V extends Comparable<? super V>> V getMaxValue(Collection<T> from, Function<T, V> valueFunc) {
+        if (CollUtil.isEmpty(from)) {
+            return null;
+        }
+        assert !from.isEmpty(); // 断言，避免告警
         T t = from.stream().max(Comparator.comparing(valueFunc)).get();
         return valueFunc.apply(t);
     }
@@ -182,7 +286,8 @@ public class CollectionUtils {
         return valueFunc.apply(t);
     }
 
-    public static <T, V extends Comparable<? super V>> V getSumValue(List<T> from, Function<T, V> valueFunc, BinaryOperator<V> accumulator) {
+    public static <T, V extends Comparable<? super V>> V getSumValue(List<T> from, Function<T, V> valueFunc,
+                                                                     BinaryOperator<V> accumulator) {
         if (CollUtil.isEmpty(from)) {
             return null;
         }

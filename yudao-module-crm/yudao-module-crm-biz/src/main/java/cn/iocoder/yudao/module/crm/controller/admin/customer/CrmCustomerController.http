@@ -1,0 +1,16 @@
+### 请求 /transfer
+PUT {{baseUrl}}/crm/customer/transfer
+Content-Type: application/-id: {{adminTenentId}}json
+Authorization: Bearer {{token}}
+tenant
+
+{
+  "id": 10,
+  "newOwnerUserId": 127
+}
+
+### 自定义日志记录结果
+### 操作日志 ===> OperateLogV2CreateReqBO(traceId=, userId=1, userType=2, module=CRM-客户, name=客户转移, bizId=10, content=把客户【张三】的负责人从【芋道源码(15612345678)】变更为了【tttt】, requestMethod=PUT, requestUrl=/admin-api/crm/customer/transfer, userIp=127.0.0.1, userAgent=Apache-HttpClient/4.5.14 (Java/17.0.9))
+
+### diff 日志
+### | 操作日志 ===> OperateLogV2CreateReqBO(traceId=, userId=1, userType=2, module=CRM-客户, name=更新客户, bizId=11, content=更新了客户【所属行业】从【H 住宿和餐饮业】修改为【D 电力、热力、燃气及水生产和供应业】；【客户等级】从【C （非优先客户）】修改为【A （重点客户）】；【客户来源】从【线上咨询】修改为【预约上门】, requestMethod=PUT, requestUrl=/admin-api/crm/customer/update, userIp=0:0:0:0:0:0:0:1, userAgent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36)

@@ -1,0 +1,236 @@
+import type {BasicColumn, FormSchema} from '@/components/Table'
+import {useRender} from '@/components/Table'
+import {DICT_TYPE, getDictOptions} from '@/utils/dict'
+
+export const columns: BasicColumn[] = [
+#foreach($column in $columns)
+#if ($column.listOperationResult)
+  #set ($dictType=$column.dictType)
+  #set ($javaField = $column.javaField)
+  #set ($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+  #set ($comment=$column.columnComment)
+#if ($column.javaType == "LocalDateTime")## 时间类型
+  {
+    title: '${comment}',
+    dataIndex: '${javaField}',
+    width: 180,
+    customRender: ({ text }) => {
+      return useRender.renderDate(text)
+    },
+  },
+#elseif("" != $column.dictType)## 数据字典
+  {
+    title: '${comment}',
+    dataIndex: '${javaField}',
+    width: 180,
+    customRender: ({ text }) => {
+      return useRender.renderDict(text, DICT_TYPE.$dictType.toUpperCase())
+    },
+  },
+#else
+  {
+    title: '${comment}',
+    dataIndex: '${javaField}',
+    width: 160,
+  },
+#end
+#end
+#end
+]
+
+export const searchFormSchema: FormSchema[] = [
+#foreach($column in $columns)
+#if ($column.listOperation)
+  #set ($dictType=$column.dictType)
+  #set ($javaField = $column.javaField)
+  #set ($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+  #set ($comment=$column.columnComment)
+  {
+    label: '${comment}',
+    field: '${javaField}',
+  #if ($column.htmlType == "input")
+    component: 'Input',
+  #elseif ($column.htmlType == "select")
+    component: 'Select',
+    componentProps: {
+      #if ("" != $dictType)## 设置了 dictType 数据字典的情况
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase()),
+      #else## 未设置 dictType 数据字典的情况
+        options: [],
+      #end
+    },
+  #elseif ($column.htmlType == "radio")
+    component: 'Radio',
+    componentProps: {
+      #if ("" != $dictType)## 设置了 dictType 数据字典的情况
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase()),
+      #else## 未设置 dictType 数据字典的情况
+        options: [],
+      #end
+    },
+  #elseif($column.htmlType == "datetime")
+    component: 'RangePicker',
+    #end
+    colProps: { span: 8 },
+  },
+#end
+#end
+]
+
+export const createFormSchema: FormSchema[] = [
+  {
+    label: '编号',
+    field: 'id',
+    show: false,
+    component: 'Input',
+  },
+#foreach($column in $columns)
+#if ($column.createOperation)
+  #set ($dictType = $column.dictType)
+  #set ($javaField = $column.javaField)
+  #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+  #set ($comment = $column.columnComment)
+#if (!$column.primaryKey)## 忽略主键，不用在表单里
+  {
+    label: '${comment}',
+    field: '${javaField}',
+  #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
+    required: true,
+    #end
+  #if ($column.htmlType == "input")
+    component: 'Input',
+  #elseif($column.htmlType == "imageUpload")## 图片上传
+    component: 'FileUpload',
+    componentProps: {
+      fileType: 'image',
+      maxCount: 1,
+    },
+  #elseif($column.htmlType == "fileUpload")## 文件上传
+    component: 'FileUpload',
+    componentProps: {
+      fileType: 'file',
+      maxCount: 1,
+    },
+  #elseif($column.htmlType == "editor")## 文本编辑器
+    component: 'Editor',
+  #elseif($column.htmlType == "select")## 下拉框
+    component: 'Select',
+    componentProps: {
+      #if ("" != $dictType)## 有数据字典
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number'),
+      #else##没数据字典
+        options:[],
+      #end
+    },
+  #elseif($column.htmlType == "checkbox")## 多选框
+    component: 'Checkbox',
+    componentProps: {
+      #if ("" != $dictType)## 有数据字典
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number'),
+      #else##没数据字典
+        options:[],
+      #end
+    },
+  #elseif($column.htmlType == "radio")## 单选框
+    component: 'RadioButtonGroup',
+    componentProps: {
+      #if ("" != $dictType)## 有数据字典
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number'),
+      #else##没数据字典
+        options:[],
+      #end
+    },
+  #elseif($column.htmlType == "datetime")## 时间框
+    component: 'DatePicker',
+    componentProps: {
+      showTime: true,
+      format: 'YYYY-MM-DD HH:mm:ss',
+      valueFormat: 'x',
+    },
+  #elseif($column.htmlType == "textarea")## 文本域
+    component: 'InputTextArea',
+  #end
+  },
+#end
+#end
+#end
+]
+
+export const updateFormSchema: FormSchema[] = [
+  {
+    label: '编号',
+    field: 'id',
+    show: false,
+    component: 'Input',
+  },
+#foreach($column in $columns)
+#if ($column.updateOperation)
+#set ($dictType = $column.dictType)
+#set ($javaField = $column.javaField)
+#set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+#set ($comment = $column.columnComment)
+  #if (!$column.primaryKey)## 忽略主键，不用在表单里
+  {
+    label: '${comment}',
+    field: '${javaField}',
+    #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
+    required: true,
+    #end
+    #if ($column.htmlType == "input")
+    component: 'Input',
+    #elseif($column.htmlType == "imageUpload")## 图片上传
+    component: 'FileUpload',
+    componentProps: {
+      fileType: 'image',
+      maxCount: 1,
+    },
+    #elseif($column.htmlType == "fileUpload")## 文件上传
+    component: 'FileUpload',
+    componentProps: {
+      fileType: 'file',
+      maxCount: 1,
+    },
+    #elseif($column.htmlType == "editor")## 文本编辑器
+    component: 'Editor',
+    #elseif($column.htmlType == "select")## 下拉框
+    component: 'Select',
+    componentProps: {
+      #if ("" != $dictType)## 有数据字典
+      options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number'),
+      #else##没数据字典
+      options:[],
+      #end
+    },
+    #elseif($column.htmlType == "checkbox")## 多选框
+    component: 'Checkbox',
+    componentProps: {
+      #if ("" != $dictType)## 有数据字典
+      options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number'),
+      #else##没数据字典
+      options:[],
+      #end
+    },
+    #elseif($column.htmlType == "radio")## 单选框
+    component: 'RadioButtonGroup',
+    componentProps: {
+      #if ("" != $dictType)## 有数据字典
+      options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number'),
+      #else##没数据字典
+      options:[],
+      #end
+    },
+    #elseif($column.htmlType == "datetime")## 时间框
+    component: 'DatePicker',
+    componentProps: {
+      showTime: true,
+      format: 'YYYY-MM-DD HH:mm:ss',
+      valueFormat: 'x',
+    },
+    #elseif($column.htmlType == "textarea")## 文本域
+    component: 'InputTextArea',
+    #end
+  },
+  #end
+#end
+#end
+]

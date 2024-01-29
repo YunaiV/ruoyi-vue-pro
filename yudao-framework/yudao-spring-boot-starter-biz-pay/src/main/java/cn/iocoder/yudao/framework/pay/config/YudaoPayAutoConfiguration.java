@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Bean;
  * @author 芋道源码
  */
 @AutoConfiguration
-@EnableConfigurationProperties(PayProperties.class)
 public class YudaoPayAutoConfiguration {
 
     @Bean

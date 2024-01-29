@@ -2,10 +2,13 @@ package cn.iocoder.yudao.module.trade.dal.dataobject.order;
 
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO.OrderItem;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryPickUpStoreDO;
+import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderCancelTypeEnum;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderAfterSaleStatusEnum;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderDeliveryStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -28,6 +31,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TradeOrderDO extends BaseDO {
+
+    /**
+     * 发货物流公司编号 - 空（无需发货）
+     */
+    public static final Long LOGISTICS_ID_NULL = 0L;
 
     // ========== 订单基本信息 ==========
     /**
@@ -94,6 +102,20 @@ public class TradeOrderDO extends BaseDO {
      * 商家备注
      */
     private String remark;
+    /**
+     * 是否评价
+     *
+     * true - 已评价
+     * false - 未评价
+     */
+    private Boolean commentStatus;
+
+    /**
+     * 推广人编号
+     *
+     * 关联 {@link BrokerageUserDO#getId()} 字段，即 {@link MemberUserRespDTO#getId()} 字段
+     */
+    private Long brokerageUserId;
 
     // ========== 价格 + 支付基本信息 ==========
 
@@ -113,7 +135,7 @@ public class TradeOrderDO extends BaseDO {
      * true - 已经支付过
      * false - 没有支付过
      */
-    private Boolean payed;
+    private Boolean payStatus;
     /**
      * 付款时间
      */
@@ -126,24 +148,15 @@ public class TradeOrderDO extends BaseDO {
     private String payChannelCode;
 
     /**
-     * 商品原价（总），单位：分
+     * 商品原价，单位：分
      *
-     * 基于 {@link TradeOrderItemDO#getOriginalPrice()} 求和
+     * totalPrice = {@link TradeOrderItemDO#getPrice()} * {@link TradeOrderItemDO#getCount()} 求和
      *
      * 对应 taobao 的 trade.total_fee 字段
      */
-    private Integer originalPrice;
+    private Integer totalPrice;
     /**
-     * 订单原价（总），单位：分
-     *
-     * 基于 {@link OrderItem#getPayPrice()} 求和
-     * 和 {@link #originalPrice} 的差异：去除商品级优惠
-     */
-    private Integer orderPrice;
-    /**
-     * 订单优惠（总），单位：分
-     *
-     * 订单级优惠：对主订单的优惠，常见如：订单满 200 元减 10 元；订单满 80 包邮。
+     * 优惠金额，单位：分
      *
      * 对应 taobao 的 order.discount_fee 字段
      */
@@ -153,7 +166,7 @@ public class TradeOrderDO extends BaseDO {
      */
     private Integer deliveryPrice;
     /**
-     * 订单调价（总），单位：分
+     * 订单调价，单位：分
      *
      * 正数，加价；负数，减价
      */
@@ -161,36 +174,37 @@ public class TradeOrderDO extends BaseDO {
     /**
      * 应付金额（总），单位：分
      *
-     * = {@link OrderItem#getPayPrice()} 求和
+     * = {@link #totalPrice}
      * - {@link #couponPrice}
      * - {@link #pointPrice}
-     * + {@link #deliveryPrice}
      * - {@link #discountPrice}
+     * + {@link #deliveryPrice}
      * + {@link #adjustPrice}
+     * - {@link #vipPrice}
      */
     private Integer payPrice;
 
     // ========== 收件 + 物流基本信息 ==========
     /**
-     * 配置模板的编号
+     * 配送方式
      *
-     * 关联 DeliveryTemplateDO 的 id 编号
+     * 枚举 {@link DeliveryTypeEnum}
      */
-    private Long deliveryTemplateId;
+    private Integer deliveryType;
     /**
      * 发货物流公司编号
+     *
+     * 如果无需发货，则 logisticsId 设置为 0。原因是，不想再添加额外字段
+     *
+     * 关联 {@link DeliveryExpressDO#getId()}
      */
     private Long logisticsId;
     /**
      * 发货物流单号
+     *
+     * 如果无需发货，则 logisticsNo 设置 ""。原因是，不想再添加额外字段
      */
     private String logisticsNo;
-    /**
-     * 发货状态
-     *
-     * 枚举 {@link TradeOrderDeliveryStatusEnum}
-     */
-    private Integer deliveryStatus;
     /**
      * 发货时间
      */
@@ -213,21 +227,28 @@ public class TradeOrderDO extends BaseDO {
      */
     private Integer receiverAreaId;
     /**
-     * 收件人邮编
-     */
-    private Integer receiverPostCode;
-    /**
      * 收件人详细地址
      */
     private String receiverDetailAddress;
 
+    /**
+     * 自提门店编号
+     *
+     * 关联 {@link DeliveryPickUpStoreDO#getId()}
+     */
+    private Long pickUpStoreId;
+    /**
+     * 自提核销码
+     */
+    private String pickUpVerifyCode;
+
     // ========== 售后基本信息 ==========
     /**
-     * 收货状态
+     * 售后状态
      *
-     * 枚举 {@link TradeOrderAfterSaleStatusEnum}
+     * 枚举 {@link TradeOrderRefundStatusEnum}
      */
-    private Integer afterSaleStatus;
+    private Integer refundStatus;
     /**
      * 退款金额，单位：分
      *
@@ -248,10 +269,65 @@ public class TradeOrderDO extends BaseDO {
      */
     private Integer couponPrice;
     /**
+     * 使用的积分
+     */
+    private Integer usePoint;
+    /**
      * 积分抵扣的金额，单位：分
      *
      * 对应 taobao 的 trade.point_fee 字段
      */
     private Integer pointPrice;
+    /**
+     * 赠送的积分
+     */
+    private Integer givePoint;
+    /**
+     * 退还的使用的积分
+     */
+    private Integer refundPoint;
+    /**
+     * VIP 减免金额，单位：分
+     */
+    private Integer vipPrice;
+
+    /**
+     * 秒杀活动编号
+     *
+     * 关联 SeckillActivityDO 的 id 字段
+     */
+    private Long seckillActivityId;
+
+    /**
+     * 砍价活动编号
+     *
+     * 关联 BargainActivityDO 的 id 字段
+     */
+    private Long bargainActivityId;
+    /**
+     * 砍价记录编号
+     *
+     * 关联 BargainRecordDO 的 id 字段
+     */
+    private Long bargainRecordId;
+
+    /**
+     * 拼团活动编号
+     *
+     * 关联 CombinationActivityDO 的 id 字段
+     */
+    private Long combinationActivityId;
+    /**
+     * 拼团团长编号
+     *
+     * 关联 CombinationRecordDO 的 headId 字段
+     */
+    private Long combinationHeadId;
+    /**
+     * 拼团记录编号
+     *
+     * 关联 CombinationRecordDO 的 id 字段
+     */
+    private Long combinationRecordId;
 
 }

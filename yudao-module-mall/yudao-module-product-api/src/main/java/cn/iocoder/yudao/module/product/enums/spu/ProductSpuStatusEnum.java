@@ -17,7 +17,7 @@ public enum ProductSpuStatusEnum implements IntArrayValuable {
 
     RECYCLE(-1, "回收站"),
     DISABLE(0, "下架"),
-    ENABLE(1, "上架"),;
+    ENABLE(1, "上架");
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ProductSpuStatusEnum::getStatus).toArray();
 

@@ -18,4 +18,8 @@ public interface SmsChannelMapper extends BaseMapperX<SmsChannelDO> {
                 .orderByDesc(SmsChannelDO::getId));
     }
 
+    default SmsChannelDO selectByCode(String code) {
+        return selectOne(SmsChannelDO::getCode, code);
+    }
+
 }

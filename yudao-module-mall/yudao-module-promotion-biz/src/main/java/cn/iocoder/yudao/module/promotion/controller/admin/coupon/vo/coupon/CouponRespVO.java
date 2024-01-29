@@ -13,10 +13,10 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class CouponRespVO extends CouponBaseVO {
 
-    @Schema(description = "优惠劵编号", required = true, example = "1024")
+    @Schema(description = "优惠劵编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "创建时间", required = true)
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
 }

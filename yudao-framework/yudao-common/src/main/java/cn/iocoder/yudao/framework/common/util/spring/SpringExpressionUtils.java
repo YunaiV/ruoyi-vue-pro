@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.common.util.spring;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
-import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
@@ -24,7 +24,13 @@ import java.util.Map;
  */
 public class SpringExpressionUtils {
 
+    /**
+     * Spring EL 表达式解析器
+     */
     private static final ExpressionParser EXPRESSION_PARSER = new SpelExpressionParser();
+    /**
+     * 参数名发现器
+     */
     private static final ParameterNameDiscoverer PARAMETER_NAME_DISCOVERER = new DefaultParameterNameDiscoverer();
 
     private SpringExpressionUtils() {
@@ -33,11 +39,11 @@ public class SpringExpressionUtils {
     /**
      * 从切面中，单个解析 EL 表达式的结果
      *
-     * @param joinPoint  切面点
+     * @param joinPoint        切面点
      * @param expressionString EL 表达式数组
      * @return 执行界面
      */
-    public static Object parseExpression(ProceedingJoinPoint joinPoint, String expressionString) {
+    public static Object parseExpression(JoinPoint joinPoint, String expressionString) {
         Map<String, Object> result = parseExpressions(joinPoint, Collections.singletonList(expressionString));
         return result.get(expressionString);
     }
@@ -45,11 +51,11 @@ public class SpringExpressionUtils {
     /**
      * 从切面中，批量解析 EL 表达式的结果
      *
-     * @param joinPoint   切面点
+     * @param joinPoint         切面点
      * @param expressionStrings EL 表达式数组
      * @return 结果，key 为表达式，value 为对应值
      */
-    public static Map<String, Object> parseExpressions(ProceedingJoinPoint joinPoint, List<String> expressionStrings) {
+    public static Map<String, Object> parseExpressions(JoinPoint joinPoint, List<String> expressionStrings) {
         // 如果为空，则不进行解析
         if (CollUtil.isEmpty(expressionStrings)) {
             return MapUtil.newHashMap();
@@ -79,4 +85,5 @@ public class SpringExpressionUtils {
         });
         return result;
     }
+
 }

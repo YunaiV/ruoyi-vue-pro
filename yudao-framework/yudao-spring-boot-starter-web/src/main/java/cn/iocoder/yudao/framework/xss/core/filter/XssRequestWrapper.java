@@ -64,7 +64,7 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
     public Object getAttribute(String name) {
         Object value = super.getAttribute(name);
         if (value instanceof String) {
-            xssCleaner.clean((String) value);
+            return xssCleaner.clean((String) value);
         }
         return value;
     }

@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.member.service.address;
 
 import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressCreateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressUpdateReqVO;
-import cn.iocoder.yudao.module.member.dal.dataobject.address.AddressDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.address.MemberAddressDO;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -46,7 +46,7 @@ public interface AddressService {
      * @param id 编号
      * @return 用户收件地址
      */
-    AddressDO getAddress(Long userId, Long id);
+    MemberAddressDO getAddress(Long userId, Long id);
 
     /**
      * 获得用户收件地址列表
@@ -54,7 +54,7 @@ public interface AddressService {
      * @param userId 用户编号
      * @return 用户收件地址列表
      */
-    List<AddressDO> getAddressList(Long userId);
+    List<MemberAddressDO> getAddressList(Long userId);
 
     /**
      * 获得用户默认的收件地址
@@ -62,6 +62,6 @@ public interface AddressService {
      * @param userId 用户编号
      * @return 用户收件地址
      */
-    AddressDO getDefaultUserAddress(Long userId);
+    MemberAddressDO getDefaultUserAddress(Long userId);
 
 }

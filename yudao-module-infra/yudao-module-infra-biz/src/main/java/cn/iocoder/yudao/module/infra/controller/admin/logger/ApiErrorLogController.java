@@ -1,20 +1,19 @@
 package cn.iocoder.yudao.module.infra.controller.admin.logger;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apierrorlog.ApiErrorLogExcelVO;
-import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apierrorlog.ApiErrorLogExportReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apierrorlog.ApiErrorLogPageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apierrorlog.ApiErrorLogRespVO;
-import cn.iocoder.yudao.module.infra.convert.logger.ApiErrorLogConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.logger.ApiErrorLogDO;
 import cn.iocoder.yudao.module.infra.service.logger.ApiErrorLogService;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -54,21 +53,22 @@ public class ApiErrorLogController {
     @GetMapping("/page")
     @Operation(summary = "获得 API 错误日志分页")
     @PreAuthorize("@ss.hasPermission('infra:api-error-log:query')")
-    public CommonResult<PageResult<ApiErrorLogRespVO>> getApiErrorLogPage(@Valid ApiErrorLogPageReqVO pageVO) {
-        PageResult<ApiErrorLogDO> pageResult = apiErrorLogService.getApiErrorLogPage(pageVO);
-        return success(ApiErrorLogConvert.INSTANCE.convertPage(pageResult));
+    public CommonResult<PageResult<ApiErrorLogRespVO>> getApiErrorLogPage(@Valid ApiErrorLogPageReqVO pageReqVO) {
+        PageResult<ApiErrorLogDO> pageResult = apiErrorLogService.getApiErrorLogPage(pageReqVO);
+        return success(BeanUtils.toBean(pageResult, ApiErrorLogRespVO.class));
     }
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出 API 错误日志 Excel")
     @PreAuthorize("@ss.hasPermission('infra:api-error-log:export')")
     @OperateLog(type = EXPORT)
-    public void exportApiErrorLogExcel(@Valid ApiErrorLogExportReqVO exportReqVO,
+    public void exportApiErrorLogExcel(@Valid ApiErrorLogPageReqVO exportReqVO,
               HttpServletResponse response) throws IOException {
-        List<ApiErrorLogDO> list = apiErrorLogService.getApiErrorLogList(exportReqVO);
+        exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        List<ApiErrorLogDO> list = apiErrorLogService.getApiErrorLogPage(exportReqVO).getList();
         // 导出 Excel
-        List<ApiErrorLogExcelVO> datas = ApiErrorLogConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "API 错误日志.xls", "数据", ApiErrorLogExcelVO.class, datas);
+        ExcelUtils.write(response, "API 错误日志.xls", "数据", ApiErrorLogRespVO.class,
+                BeanUtils.toBean(list, ApiErrorLogRespVO.class));
     }
 
 }

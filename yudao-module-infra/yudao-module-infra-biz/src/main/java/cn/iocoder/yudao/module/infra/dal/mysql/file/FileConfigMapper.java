@@ -18,4 +18,8 @@ public interface FileConfigMapper extends BaseMapperX<FileConfigDO> {
                 .orderByDesc(FileConfigDO::getId));
     }
 
+    default FileConfigDO selectByMaster() {
+        return selectOne(FileConfigDO::getMaster, true);
+    }
+
 }

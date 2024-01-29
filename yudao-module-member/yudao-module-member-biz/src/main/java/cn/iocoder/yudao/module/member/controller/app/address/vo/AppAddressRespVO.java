@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.member.controller.app.address.vo;
+
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.time.LocalDateTime;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Schema(description = "用户 APP - 用户收件地址 Response VO")
 @Data
@@ -9,10 +11,10 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class AppAddressRespVO extends AppAddressBaseVO {
 
-    @Schema(description = "编号", required = true)
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "创建时间", required = true)
-    private LocalDateTime createTime;
+    @Schema(description = "地区名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "上海上海市普陀区")
+    private String areaName;
 
 }

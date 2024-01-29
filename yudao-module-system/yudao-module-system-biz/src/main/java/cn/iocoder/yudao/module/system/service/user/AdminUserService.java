@@ -22,17 +22,17 @@ public interface AdminUserService {
     /**
      * 创建用户
      *
-     * @param reqVO 用户信息
+     * @param createReqVO 用户信息
      * @return 用户编号
      */
-    Long createUser(@Valid UserCreateReqVO reqVO);
+    Long createUser(@Valid UserSaveReqVO createReqVO);
 
     /**
      * 修改用户
      *
-     * @param reqVO 用户信息
+     * @param updateReqVO 用户信息
      */
-    void updateUser(@Valid UserUpdateReqVO reqVO);
+    void updateUser(@Valid UserSaveReqVO updateReqVO);
 
     /**
      * 更新用户的最后登陆信息
@@ -166,14 +166,6 @@ public interface AdminUserService {
         }
         return CollectionUtils.convertMap(getUserList(ids), AdminUserDO::getId);
     }
-
-    /**
-     * 获得用户列表
-     *
-     * @param reqVO 列表请求
-     * @return 用户列表
-     */
-    List<AdminUserDO> getUserList(UserExportReqVO reqVO);
 
     /**
      * 获得用户列表，基于昵称模糊匹配

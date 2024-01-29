@@ -15,7 +15,7 @@
     <name>${project.artifactId}</name>
 
     <description>
-        商城大模块，由 product 商品、promotion 营销、trade 交易等组成
+        商城大模块，由 product 商品、promotion 营销、trade 交易、statistics 统计等组成
     </description>
     <modules>
         <module>yudao-module-promotion-api</module>
@@ -24,6 +24,8 @@
         <module>yudao-module-product-biz</module>
         <module>yudao-module-trade-api</module>
         <module>yudao-module-trade-biz</module>
+        <module>yudao-module-statistics-api</module>
+        <module>yudao-module-statistics-biz</module>
     </modules>
 
 </project>

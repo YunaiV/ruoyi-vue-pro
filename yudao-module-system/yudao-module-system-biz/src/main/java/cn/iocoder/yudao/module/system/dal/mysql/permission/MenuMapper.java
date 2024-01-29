@@ -25,4 +25,7 @@ public interface MenuMapper extends BaseMapperX<MenuDO> {
                 .eqIfPresent(MenuDO::getStatus, reqVO.getStatus()));
     }
 
+    default List<MenuDO> selectListByPermission(String permission) {
+        return selectList(MenuDO::getPermission, permission);
+    }
 }

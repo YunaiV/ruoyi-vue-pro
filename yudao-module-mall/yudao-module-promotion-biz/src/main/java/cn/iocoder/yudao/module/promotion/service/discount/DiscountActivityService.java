@@ -6,12 +6,11 @@ import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountAc
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProductDO;
-import cn.iocoder.yudao.module.promotion.service.discount.bo.DiscountProductDetailBO;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 限时折扣 Service 接口
@@ -28,7 +27,7 @@ public interface DiscountActivityService {
      * @param skuIds SKU 编号数组
      * @return 匹配的限时折扣商品
      */
-    Map<Long, DiscountProductDetailBO> getMatchDiscountProducts(Collection<Long> skuIds);
+    List<DiscountProductDO> getMatchDiscountProductList(Collection<Long> skuIds);
 
     /**
      * 创建限时折扣活动
@@ -50,7 +49,7 @@ public interface DiscountActivityService {
      *
      * @param id 编号
      */
-    void closeRewardActivity(Long id);
+    void closeDiscountActivity(Long id);
 
     /**
      * 删除限时折扣活动
@@ -82,5 +81,24 @@ public interface DiscountActivityService {
      * @return 活动的商品列表
      */
     List<DiscountProductDO> getDiscountProductsByActivityId(Long activityId);
+
+    /**
+     * 获得活动编号，对应对应的商品列表
+     *
+     * @param activityIds 活动编号
+     * @return 活动的商品列表
+     */
+    List<DiscountProductDO> getDiscountProductsByActivityId(Collection<Long> activityIds);
+
+    /**
+     * 获取指定 spu 编号最近参加的活动，每个 spuId 只返回一条记录
+     *
+     * @param spuIds   spu 编号
+     * @param status   状态
+     * @param dateTime 当前日期时间
+     * @return 折扣活动列表
+     */
+    List<DiscountActivityDO> getDiscountActivityBySpuIdsAndStatusAndDateTimeLt(
+            Collection<Long> spuIds, Integer status, LocalDateTime dateTime);
 
 }

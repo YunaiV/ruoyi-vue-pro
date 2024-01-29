@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - 公众号菜单 Response VO")
 @Data
@@ -13,16 +13,16 @@ import java.util.Date;
 @ToString(callSuper = true)
 public class MpMenuRespVO extends MpMenuBaseVO {
 
-    @Schema(description = "主键", required = true, example = "1024")
+    @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "公众号账号的编号", required = true, example = "2048")
+    @Schema(description = "公众号账号的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
     private Long accountId;
 
-    @Schema(description = "公众号 appId", required = true, example = "wx1234567890ox")
+    @Schema(description = "公众号 appId", requiredMode = Schema.RequiredMode.REQUIRED, example = "wx1234567890ox")
     private String appId;
 
-    @Schema(description = "创建时间", required = true)
-    private Date createTime;
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    private LocalDateTime createTime;
 
 }

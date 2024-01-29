@@ -12,25 +12,61 @@
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
-    <description>WebSocket</description>
+    <description>WebSocket 框架，支持多节点的广播</description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
 
     <dependencies>
-
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-common</artifactId>
         </dependency>
 
+        <!-- Web 相关 -->
         <dependency>
+            <!-- 为什么是 websocket 依赖 security 呢？而不是 security 拓展 websocket 呢？
+                 因为 websocket 和 LoginUser 当前登录的用户有一定的相关性，具体可见 WebSocketSessionManagerImpl 逻辑。
+                 如果让 security 拓展 websocket 的话，会导致 websocket 组件的封装很散，进而增大理解成本。
+            -->
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-security</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+
+        <!-- 消息队列相关 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-mq</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.amqp</groupId>
+            <artifactId>spring-rabbit</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-spring-boot-starter</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- 业务组件 -->
+        <dependency>
+            <!-- 为什么要依赖 tenant 组件？
+                因为广播某个类型的用户时候，需要根据租户过滤下，避免广播到别的租户！
+            -->
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-biz-tenant</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

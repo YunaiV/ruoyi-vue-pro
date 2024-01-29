@@ -14,27 +14,27 @@ import java.util.List;
 @AllArgsConstructor
 public class OAuth2OpenCheckTokenRespVO {
 
-    @Schema(description = "用户编号", required = true, example = "666")
+    @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "666")
     @JsonProperty("user_id")
     private Long userId;
-    @Schema(description = "用户类型,参见 UserTypeEnum 枚举", required = true, example = "2")
+    @Schema(description = "用户类型，参见 UserTypeEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @JsonProperty("user_type")
     private Integer userType;
-    @Schema(description = "租户编号", required = true, example = "1024")
+    @Schema(description = "租户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @JsonProperty("tenant_id")
     private Long tenantId;
 
-    @Schema(description = "客户端编号", required = true, example = "car")
+    @Schema(description = "客户端编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "car")
     @JsonProperty("client_id")
     private String clientId;
-    @Schema(description = "授权范围", required = true, example = "user_info")
+    @Schema(description = "授权范围", requiredMode = Schema.RequiredMode.REQUIRED, example = "user_info")
     private List<String> scopes;
 
-    @Schema(description = "访问令牌", required = true, example = "tudou")
+    @Schema(description = "访问令牌", requiredMode = Schema.RequiredMode.REQUIRED, example = "tudou")
     @JsonProperty("access_token")
     private String accessToken;
 
-    @Schema(description = "过期时间,时间戳 / 1000，即单位：秒", required = true, example = "1593092157")
+    @Schema(description = "过期时间，时间戳 / 1000，即单位：秒", requiredMode = Schema.RequiredMode.REQUIRED, example = "1593092157")
     private Long exp;
 
 }

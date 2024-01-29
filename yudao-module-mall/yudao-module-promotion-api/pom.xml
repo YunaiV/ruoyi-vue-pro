@@ -13,7 +13,7 @@
 
     <name>${project.artifactId}</name>
     <description>
-        market 模块 API，暴露给其它模块调用
+        promotion 模块 API，暴露给其它模块调用
     </description>
 
     <dependencies>
@@ -26,6 +26,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- 工具类中使用了 -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
             <optional>true</optional>
         </dependency>
     </dependencies>

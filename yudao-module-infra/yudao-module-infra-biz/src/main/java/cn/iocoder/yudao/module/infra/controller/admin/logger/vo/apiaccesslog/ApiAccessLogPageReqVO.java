@@ -26,11 +26,11 @@ public class ApiAccessLogPageReqVO extends PageParam {
     @Schema(description = "应用名", example = "dashboard")
     private String applicationName;
 
-    @Schema(description = "请求地址,模糊匹配", example = "/xxx/yyy")
+    @Schema(description = "请求地址，模糊匹配", example = "/xxx/yyy")
     private String requestUrl;
 
+    @Schema(description = "开始时间", example = "[2022-07-01 00:00:00, 2022-07-01 23:59:59]")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @Schema(description = "开始请求时间")
     private LocalDateTime[] beginTime;
 
     @Schema(description = "执行时长,大于等于，单位：毫秒", example = "100")

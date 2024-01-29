@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.product.api.sku.dto;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
 import lombok.Data;
 
 import java.util.List;
@@ -22,15 +22,11 @@ public class ProductSkuRespDTO {
      * SPU 编号
      */
     private Long spuId;
-    /**
-     * SPU 名字
-     */
-    private String spuName;
 
     /**
-     * 属性数组，JSON 格式
+     * 属性数组
      */
-    private List<Property> properties;
+    private List<ProductPropertyValueDetailRespDTO> properties;
     /**
      * 销售价格，单位：分
      */
@@ -52,19 +48,9 @@ public class ProductSkuRespDTO {
      */
     private String picUrl;
     /**
-     * SKU 状态
-     * <p>
-     * 枚举 {@link CommonStatusEnum}
-     */
-    private Integer status;
-    /**
      * 库存
      */
     private Integer stock;
-    /**
-     * 预警预存
-     */
-    private Integer warnStock;
     /**
      * 商品重量，单位：kg 千克
      */
@@ -73,23 +59,13 @@ public class ProductSkuRespDTO {
      * 商品体积，单位：m^3 平米
      */
     private Double volume;
-
     /**
-     * 商品属性
+     * 一级分销的佣金，单位：分
      */
-    @Data
-    public static class Property {
-
-        /**
-         * 属性编号
-         */
-        private Long propertyId;
-        /**
-         * 属性值编号
-         */
-        private Long valueId;
-
-    }
-
+    private Integer firstBrokeragePrice;
+    /**
+     * 二级分销的佣金，单位：分
+     */
+    private Integer secondBrokeragePrice;
 
 }

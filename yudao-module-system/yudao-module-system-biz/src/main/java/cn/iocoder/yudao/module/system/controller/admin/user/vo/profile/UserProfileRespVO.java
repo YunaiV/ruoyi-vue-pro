@@ -1,101 +1,73 @@
 package cn.iocoder.yudao.module.system.controller.admin.user.vo.profile;
 
-import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserBaseVO;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSimpleRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostSimpleRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleSimpleRespVO;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @Data
-@EqualsAndHashCode(callSuper = true)
-@NoArgsConstructor
-@AllArgsConstructor
 @Schema(description = "管理后台 - 用户个人中心信息 Response VO")
-public class UserProfileRespVO extends UserBaseVO {
+public class UserProfileRespVO {
 
-    @Schema(description = "用户编号", required = true, example = "1")
+    @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
-    @Schema(description = "状态,参见 CommonStatusEnum 枚举类", required = true, example = "1")
-    private Integer status;
+    @Schema(description = "用户账号", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudao")
+    private String username;
 
-    @Schema(description = "最后登录 IP", required = true, example = "192.168.1.1")
+    @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
+    private String nickname;
+
+    @Schema(description = "用户邮箱", example = "yudao@iocoder.cn")
+    private String email;
+
+    @Schema(description = "手机号码", example = "15601691300")
+    private String mobile;
+
+    @Schema(description = "用户性别，参见 SexEnum 枚举类", example = "1")
+    private Integer sex;
+
+    @Schema(description = "用户头像", example = "https://www.iocoder.cn/xxx.png")
+    private String avatar;
+
+    @Schema(description = "最后登录 IP", requiredMode = Schema.RequiredMode.REQUIRED, example = "192.168.1.1")
     private String loginIp;
 
-    @Schema(description = "最后登录时间", required = true, example = "时间戳格式")
+    @Schema(description = "最后登录时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "时间戳格式")
     private LocalDateTime loginDate;
 
-    @Schema(description = "创建时间", required = true, example = "时间戳格式")
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "时间戳格式")
     private LocalDateTime createTime;
 
     /**
      * 所属角色
      */
-    private List<Role> roles;
-
+    private List<RoleSimpleRespVO> roles;
     /**
      * 所在部门
      */
-    private Dept dept;
-
+    private DeptSimpleRespVO dept;
     /**
      * 所属岗位数组
      */
-    private List<Post> posts;
+    private List<PostSimpleRespVO> posts;
     /**
      * 社交用户数组
      */
     private List<SocialUser> socialUsers;
 
-    @Schema(description = "角色")
-    @Data
-    public static class Role {
-
-        @Schema(description = "角色编号", required = true, example = "1")
-        private Long id;
-
-        @Schema(description = "角色名称", required = true, example = "普通角色")
-        private String name;
-
-    }
-
-    @Schema(description = "部门")
-    @Data
-    public static class Dept {
-
-        @Schema(description = "部门编号", required = true, example = "1")
-        private Long id;
-
-        @Schema(description = "部门名称", required = true, example = "研发部")
-        private String name;
-
-    }
-
-    @Schema(description = "岗位")
-    @Data
-    public static class Post {
-
-        @Schema(description = "岗位编号", required = true, example = "1")
-        private Long id;
-
-        @Schema(description = "岗位名称", required = true, example = "开发")
-        private String name;
-
-    }
-
     @Schema(description = "社交用户")
     @Data
     public static class SocialUser {
 
-        @Schema(description = "社交平台的类型,参见 SocialTypeEnum 枚举类", required = true, example = "10")
+        @Schema(description = "社交平台的类型，参见 SocialTypeEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
         private Integer type;
 
-        @Schema(description = "社交用户的 openid", required = true, example = "IPRmJ0wvBptiPIlGEZiPewGwiEiE")
+        @Schema(description = "社交用户的 openid", requiredMode = Schema.RequiredMode.REQUIRED, example = "IPRmJ0wvBptiPIlGEZiPewGwiEiE")
         private String openid;
 
     }

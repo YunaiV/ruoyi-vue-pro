@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.product.api.sku;
 
-import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 
 import java.util.Collection;
 import java.util.List;
@@ -31,7 +31,15 @@ public interface ProductSkuApi {
     List<ProductSkuRespDTO> getSkuList(Collection<Long> ids);
 
     /**
-     * 更新 SKU 库存
+     * 批量查询 SKU 数组
+     *
+     * @param spuIds SPU 编号列表
+     * @return SKU 数组
+     */
+    List<ProductSkuRespDTO> getSkuListBySpuId(Collection<Long> spuIds);
+
+    /**
+     * 更新 SKU 库存（增加 or 减少）
      *
      * @param updateStockReqDTO 更新请求
      */

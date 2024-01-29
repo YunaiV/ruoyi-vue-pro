@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.datapermission.core.rule.DataPermissionRule;
 import cn.iocoder.yudao.framework.datapermission.core.rule.DataPermissionRuleFactory;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
-import com.alibaba.ttl.TransmittableThreadLocal;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.PluginUtils;
 import com.baomidou.mybatisplus.extension.parser.JsqlParserSupport;
@@ -497,7 +496,8 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
         Expression allExpression = null;
         for (DataPermissionRule rule : ContextHolder.getRules()) {
             // 判断表名是否匹配
-            if (!rule.getTableNames().contains(table.getName())) {
+            String tableName = MyBatisUtils.getTableName(table);
+            if (!rule.getTableNames().contains(tableName)) {
                 continue;
             }
             // 如果有匹配的规则，说明可重写。
@@ -506,8 +506,10 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
             ContextHolder.setRewrite(true);
 
             // 单条规则的条件
-            String tableName = MyBatisUtils.getTableName(table);
             Expression oneExpress = rule.getExpression(tableName, table.getAlias());
+            if (oneExpress == null){
+                continue;
+            }
             // 拼接到 allExpression 中
             allExpression = allExpression == null ? oneExpress
                     : new AndExpression(allExpression, oneExpress);

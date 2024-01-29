@@ -11,14 +11,19 @@ import java.util.Map;
 @Data
 public class NotifyTemplateSendReqVO {
 
-    @Schema(description = "用户id", required = true, example = "01")
+    @Schema(description = "用户id", requiredMode = Schema.RequiredMode.REQUIRED, example = "01")
     @NotNull(message = "用户id不能为空")
     private Long userId;
 
-    @Schema(description = "模板编码", required = true, example = "01")
+    @Schema(description = "用户类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @NotNull(message = "用户类型不能为空")
+    private Integer userType;
+
+    @Schema(description = "模板编码", requiredMode = Schema.RequiredMode.REQUIRED, example = "01")
     @NotEmpty(message = "模板编码不能为空")
     private String templateCode;
 
     @Schema(description = "模板参数")
     private Map<String, Object> templateParams;
+
 }

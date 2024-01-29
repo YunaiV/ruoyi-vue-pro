@@ -20,7 +20,7 @@ public class JobLogPageReqVO extends PageParam {
     @Schema(description = "任务编号", example = "10")
     private Long jobId;
 
-    @Schema(description = "处理器的名字,模糊匹配")
+    @Schema(description = "处理器的名字，模糊匹配")
     private String handlerName;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
@@ -31,7 +31,7 @@ public class JobLogPageReqVO extends PageParam {
     @Schema(description = "结束执行时间")
     private LocalDateTime endTime;
 
-    @Schema(description = "任务状态,参见 JobLogStatusEnum 枚举")
+    @Schema(description = "任务状态，参见 JobLogStatusEnum 枚举")
     private Integer status;
 
 }

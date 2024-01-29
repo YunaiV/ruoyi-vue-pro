@@ -1,4 +1,5 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.oa.vo;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -14,13 +15,13 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class BpmOALeaveRespVO extends BpmOALeaveBaseVO {
 
-    @Schema(description = "请假表单主键", required = true, example = "1024")
+    @Schema(description = "请假表单主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "状态-参见 bpm_process_instance_result 枚举", required = true, example = "1")
+    @Schema(description = "状态-参见 bpm_process_instance_result 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer result;
 
-    @Schema(description = "申请时间", required = true)
+    @Schema(description = "申请时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "申请时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime createTime;

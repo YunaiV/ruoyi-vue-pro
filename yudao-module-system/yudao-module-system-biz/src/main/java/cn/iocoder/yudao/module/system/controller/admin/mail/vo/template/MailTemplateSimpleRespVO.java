@@ -7,10 +7,10 @@ import lombok.Data;
 @Data
 public class MailTemplateSimpleRespVO {
 
-    @Schema(description = "模版编号", required = true, example = "1024")
+    @Schema(description = "模版编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "模版名字", required = true, example = "哒哒哒")
+    @Schema(description = "模版名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "哒哒哒")
     private String name;
 
 }

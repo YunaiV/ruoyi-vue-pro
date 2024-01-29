@@ -14,37 +14,37 @@ import java.util.List;
 @Data
 public class MpMessageSendReqVO {
 
-    @Schema(description = "公众号粉丝的编号", required = true, example = "1024")
+    @Schema(description = "公众号粉丝的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "公众号粉丝的编号不能为空")
     private Long userId;
 
     // ========== 消息内容 ==========
 
-    @Schema(description = "消息类型 TEXT/IMAGE/VOICE/VIDEO/NEWS", required = true, example = "text")
+    @Schema(description = "消息类型 TEXT/IMAGE/VOICE/VIDEO/NEWS", requiredMode = Schema.RequiredMode.REQUIRED, example = "text")
     @NotEmpty(message = "消息类型不能为空")
     public String type;
 
-    @Schema(description = "消息内容", required = true, example = "你好呀")
+    @Schema(description = "消息内容", requiredMode = Schema.RequiredMode.REQUIRED, example = "你好呀")
     @NotEmpty(message = "消息内容不能为空", groups = TextMessageGroup.class)
     private String content;
 
-    @Schema(description = "媒体 ID", required = true, example = "qqc_2Fot30Jse-HDoZmo5RrUDijz2nGUkP")
+    @Schema(description = "媒体 ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "qqc_2Fot30Jse-HDoZmo5RrUDijz2nGUkP")
     @NotEmpty(message = "消息内容不能为空", groups = {ImageMessageGroup.class, VoiceMessageGroup.class, VideoMessageGroup.class})
     private String mediaId;
 
-    @Schema(description = "标题", required = true, example = "没有标题")
+    @Schema(description = "标题", requiredMode = Schema.RequiredMode.REQUIRED, example = "没有标题")
     @NotEmpty(message = "消息内容不能为空", groups = VideoMessageGroup.class)
     private String title;
 
-    @Schema(description = "描述", required = true, example = "你猜")
+    @Schema(description = "描述", requiredMode = Schema.RequiredMode.REQUIRED, example = "你猜")
     @NotEmpty(message = "消息描述不能为空", groups = VideoMessageGroup.class)
     private String description;
 
-    @Schema(description = "缩略图的媒体 id", required = true, example = "qqc_2Fot30Jse-HDoZmo5RrUDijz2nGUkP")
+    @Schema(description = "缩略图的媒体 id", requiredMode = Schema.RequiredMode.REQUIRED, example = "qqc_2Fot30Jse-HDoZmo5RrUDijz2nGUkP")
     @NotEmpty(message = "缩略图的媒体 id 不能为空", groups = MusicMessageGroup.class)
     private String thumbMediaId;
 
-    @Schema(description = "图文消息", required = true)
+    @Schema(description = "图文消息", requiredMode = Schema.RequiredMode.REQUIRED)
     @Valid
     @NotNull(message = "图文消息不能为空", groups = NewsMessageGroup.class)
     private List<MpMessageDO.Article> articles;

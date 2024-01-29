@@ -4,7 +4,7 @@ import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayChannelDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig;
-import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPayClientConfig;
+import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WXPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.test.BaseDbIntegrationTest;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,6 @@ public class PayChannelMapperIntegrationTest extends BaseDbIntegrationTest {
         payChannelDO.setCode(PayChannelEnum.WX_PUB.getCode());
         payChannelDO.setStatus(CommonStatusEnum.ENABLE.getStatus());
         payChannelDO.setFeeRate(1D);
-        payChannelDO.setMerchantId(1L);
         payChannelDO.setAppId(6L);
         // 配置
         WXPayClientConfig config = new WXPayClientConfig();
@@ -55,7 +54,6 @@ public class PayChannelMapperIntegrationTest extends BaseDbIntegrationTest {
         payChannelDO.setCode(PayChannelEnum.ALIPAY_QR.getCode());
         payChannelDO.setStatus(CommonStatusEnum.ENABLE.getStatus());
         payChannelDO.setFeeRate(1D);
-        payChannelDO.setMerchantId(1L);
         payChannelDO.setAppId(6L);
         // 配置
         AlipayPayClientConfig config = new AlipayPayClientConfig();

@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.framework.common.util.validation;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import org.springframework.util.StringUtils;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.Validation;
 import javax.validation.Validator;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -35,6 +37,12 @@ public class ValidationUtils {
     public static boolean isXmlNCName(String str) {
         return StringUtils.hasText(str)
                 && PATTERN_XML_NCNAME.matcher(str).matches();
+    }
+
+    public static void validate(Object object, Class<?>... groups) {
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        Assert.notNull(validator);
+        validate(validator, object, groups);
     }
 
     public static void validate(Validator validator, Object object, Class<?>... groups) {

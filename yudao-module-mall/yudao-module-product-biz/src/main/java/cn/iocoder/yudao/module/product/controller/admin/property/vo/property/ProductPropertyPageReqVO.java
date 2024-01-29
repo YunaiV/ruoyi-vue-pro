@@ -20,7 +20,7 @@ public class ProductPropertyPageReqVO extends PageParam {
     @Schema(description = "名称", example = "颜色")
     private String name;
 
-    @Schema(description = "状态", required = true, example = "1")
+    @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer status;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

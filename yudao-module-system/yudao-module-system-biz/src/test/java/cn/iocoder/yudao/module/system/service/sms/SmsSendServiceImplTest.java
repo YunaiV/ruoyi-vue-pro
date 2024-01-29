@@ -4,11 +4,9 @@ import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
-import cn.iocoder.yudao.framework.sms.core.client.SmsClient;
-import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
-import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
-import cn.iocoder.yudao.framework.sms.core.client.dto.SmsReceiveRespDTO;
-import cn.iocoder.yudao.framework.sms.core.client.dto.SmsSendRespDTO;
+import cn.iocoder.yudao.module.system.framework.sms.core.client.SmsClient;
+import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsReceiveRespDTO;
+import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
@@ -18,6 +16,7 @@ import cn.iocoder.yudao.module.system.mq.producer.sms.SmsProducer;
 import cn.iocoder.yudao.module.system.service.member.MemberService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import org.assertj.core.util.Lists;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -37,7 +36,7 @@ import static org.mockito.Mockito.*;
 public class SmsSendServiceImplTest extends BaseMockitoUnitTest {
 
     @InjectMocks
-    private SmsSendServiceImpl smsService;
+    private SmsSendServiceImpl smsSendService;
 
     @Mock
     private AdminUserService adminUserService;
@@ -51,9 +50,6 @@ public class SmsSendServiceImplTest extends BaseMockitoUnitTest {
     private SmsLogService smsLogService;
     @Mock
     private SmsProducer smsProducer;
-
-    @Mock
-    private SmsClientFactory smsClientFactory;
 
     @Test
     public void testSendSingleSmsToAdmin() {
@@ -85,7 +81,7 @@ public class SmsSendServiceImplTest extends BaseMockitoUnitTest {
                 eq(content), eq(templateParams))).thenReturn(smsLogId);
 
         // 调用
-        Long resultSmsLogId = smsService.sendSingleSmsToAdmin(null, userId, templateCode, templateParams);
+        Long resultSmsLogId = smsSendService.sendSingleSmsToAdmin(null, userId, templateCode, templateParams);
         // 断言
         assertEquals(smsLogId, resultSmsLogId);
         // 断言调用
@@ -124,7 +120,7 @@ public class SmsSendServiceImplTest extends BaseMockitoUnitTest {
                 eq(content), eq(templateParams))).thenReturn(smsLogId);
 
         // 调用
-        Long resultSmsLogId = smsService.sendSingleSmsToMember(null, userId, templateCode, templateParams);
+        Long resultSmsLogId = smsSendService.sendSingleSmsToMember(null, userId, templateCode, templateParams);
         // 断言
         assertEquals(smsLogId, resultSmsLogId);
         // 断言调用
@@ -164,7 +160,7 @@ public class SmsSendServiceImplTest extends BaseMockitoUnitTest {
                 eq(content), eq(templateParams))).thenReturn(smsLogId);
 
         // 调用
-        Long resultSmsLogId = smsService.sendSingleSms(mobile, userId, userType, templateCode, templateParams);
+        Long resultSmsLogId = smsSendService.sendSingleSms(mobile, userId, userType, templateCode, templateParams);
         // 断言
         assertEquals(smsLogId, resultSmsLogId);
         // 断言调用
@@ -204,7 +200,7 @@ public class SmsSendServiceImplTest extends BaseMockitoUnitTest {
                 eq(content), eq(templateParams))).thenReturn(smsLogId);
 
         // 调用
-        Long resultSmsLogId = smsService.sendSingleSms(mobile, userId, userType, templateCode, templateParams);
+        Long resultSmsLogId = smsSendService.sendSingleSms(mobile, userId, userType, templateCode, templateParams);
         // 断言
         assertEquals(smsLogId, resultSmsLogId);
         // 断言调用
@@ -219,7 +215,7 @@ public class SmsSendServiceImplTest extends BaseMockitoUnitTest {
         // mock 方法
 
         // 调用，并断言异常
-        assertServiceException(() -> smsService.validateSmsTemplate(templateCode),
+        assertServiceException(() -> smsSendService.validateSmsTemplate(templateCode),
                 SMS_SEND_TEMPLATE_NOT_EXISTS);
     }
 
@@ -232,7 +228,7 @@ public class SmsSendServiceImplTest extends BaseMockitoUnitTest {
         // mock 方法
 
         // 调用，并断言异常
-        assertServiceException(() -> smsService.buildTemplateParams(template, templateParams),
+        assertServiceException(() -> smsSendService.buildTemplateParams(template, templateParams),
                 SMS_SEND_MOBILE_TEMPLATE_PARAM_MISS, "code");
     }
 
@@ -242,29 +238,43 @@ public class SmsSendServiceImplTest extends BaseMockitoUnitTest {
         // mock 方法
 
         // 调用，并断言异常
-        assertServiceException(() -> smsService.validateMobile(null),
+        assertServiceException(() -> smsSendService.validateMobile(null),
                 SMS_SEND_MOBILE_NOT_EXISTS);
     }
 
     @Test
+    public void testSendBatchNotify() {
+        // 准备参数
+        // mock 方法
+
+        // 调用
+        UnsupportedOperationException exception = Assertions.assertThrows(
+                UnsupportedOperationException.class,
+                () -> smsSendService.sendBatchSms(null, null, null, null, null)
+        );
+        // 断言
+        assertEquals("暂时不支持该操作，感兴趣可以实现该功能哟！", exception.getMessage());
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
-    public void testDoSendSms() {
+    public void testDoSendSms() throws Throwable {
         // 准备参数
         SmsSendMessage message = randomPojo(SmsSendMessage.class);
         // mock SmsClientFactory 的方法
         SmsClient smsClient = spy(SmsClient.class);
-        when(smsClientFactory.getSmsClient(eq(message.getChannelId()))).thenReturn(smsClient);
+        when(smsChannelService.getSmsClient(eq(message.getChannelId()))).thenReturn(smsClient);
         // mock SmsClient 的方法
-        SmsCommonResult<SmsSendRespDTO> sendResult = randomPojo(SmsCommonResult.class, SmsSendRespDTO.class);
+        SmsSendRespDTO sendResult = randomPojo(SmsSendRespDTO.class);
         when(smsClient.sendSms(eq(message.getLogId()), eq(message.getMobile()), eq(message.getApiTemplateId()),
                 eq(message.getTemplateParams()))).thenReturn(sendResult);
 
         // 调用
-        smsService.doSendSms(message);
+        smsSendService.doSendSms(message);
         // 断言
         verify(smsLogService).updateSmsSendResult(eq(message.getLogId()),
-                eq(sendResult.getCode()), eq(sendResult.getMsg()), eq(sendResult.getApiCode()),
-                eq(sendResult.getApiMsg()), eq(sendResult.getApiRequestId()), eq(sendResult.getData().getSerialNo()));
+                eq(sendResult.getSuccess()), eq(sendResult.getApiCode()),
+                eq(sendResult.getApiMsg()), eq(sendResult.getApiRequestId()), eq(sendResult.getSerialNo()));
     }
 
     @Test
@@ -274,12 +284,12 @@ public class SmsSendServiceImplTest extends BaseMockitoUnitTest {
         String text = randomString();
         // mock SmsClientFactory 的方法
         SmsClient smsClient = spy(SmsClient.class);
-        when(smsClientFactory.getSmsClient(eq(channelCode))).thenReturn(smsClient);
+        when(smsChannelService.getSmsClient(eq(channelCode))).thenReturn(smsClient);
         // mock SmsClient 的方法
         List<SmsReceiveRespDTO> receiveResults = randomPojoList(SmsReceiveRespDTO.class);
 
         // 调用
-        smsService.receiveSmsStatus(channelCode, text);
+        smsSendService.receiveSmsStatus(channelCode, text);
         // 断言
         receiveResults.forEach(result -> smsLogService.updateSmsReceiveResult(eq(result.getLogId()), eq(result.getSuccess()),
                 eq(result.getReceiveTime()), eq(result.getErrorCode()), eq(result.getErrorCode())));

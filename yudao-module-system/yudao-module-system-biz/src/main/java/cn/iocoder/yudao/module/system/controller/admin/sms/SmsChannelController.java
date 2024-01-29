@@ -1,14 +1,17 @@
 package cn.iocoder.yudao.module.system.controller.admin.sms;
 
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.*;
-import cn.iocoder.yudao.module.system.convert.sms.SmsChannelConvert;
-import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
-import cn.iocoder.yudao.module.system.service.sms.SmsChannelService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelSaveReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelSimpleRespVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
+import cn.iocoder.yudao.module.system.service.sms.SmsChannelService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,14 +33,14 @@ public class SmsChannelController {
     @PostMapping("/create")
     @Operation(summary = "创建短信渠道")
     @PreAuthorize("@ss.hasPermission('system:sms-channel:create')")
-    public CommonResult<Long> createSmsChannel(@Valid @RequestBody SmsChannelCreateReqVO createReqVO) {
+    public CommonResult<Long> createSmsChannel(@Valid @RequestBody SmsChannelSaveReqVO createReqVO) {
         return success(smsChannelService.createSmsChannel(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新短信渠道")
     @PreAuthorize("@ss.hasPermission('system:sms-channel:update')")
-    public CommonResult<Boolean> updateSmsChannel(@Valid @RequestBody SmsChannelUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateSmsChannel(@Valid @RequestBody SmsChannelSaveReqVO updateReqVO) {
         smsChannelService.updateSmsChannel(updateReqVO);
         return success(true);
     }
@@ -56,8 +59,8 @@ public class SmsChannelController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('system:sms-channel:query')")
     public CommonResult<SmsChannelRespVO> getSmsChannel(@RequestParam("id") Long id) {
-        SmsChannelDO smsChannel = smsChannelService.getSmsChannel(id);
-        return success(SmsChannelConvert.INSTANCE.convert(smsChannel));
+        SmsChannelDO channel = smsChannelService.getSmsChannel(id);
+        return success(BeanUtils.toBean(channel, SmsChannelRespVO.class));
     }
 
     @GetMapping("/page")
@@ -65,16 +68,15 @@ public class SmsChannelController {
     @PreAuthorize("@ss.hasPermission('system:sms-channel:query')")
     public CommonResult<PageResult<SmsChannelRespVO>> getSmsChannelPage(@Valid SmsChannelPageReqVO pageVO) {
         PageResult<SmsChannelDO> pageResult = smsChannelService.getSmsChannelPage(pageVO);
-        return success(SmsChannelConvert.INSTANCE.convertPage(pageResult));
+        return success(BeanUtils.toBean(pageResult, SmsChannelRespVO.class));
     }
 
-    @GetMapping("/list-all-simple")
+    @GetMapping({"/list-all-simple", "/simple-list"})
     @Operation(summary = "获得短信渠道精简列表", description = "包含被禁用的短信渠道")
     public CommonResult<List<SmsChannelSimpleRespVO>> getSimpleSmsChannelList() {
         List<SmsChannelDO> list = smsChannelService.getSmsChannelList();
-        // 排序后，返回给前端
         list.sort(Comparator.comparing(SmsChannelDO::getId));
-        return success(SmsChannelConvert.INSTANCE.convertList03(list));
+        return success(BeanUtils.toBean(list, SmsChannelSimpleRespVO.class));
     }
 
 }

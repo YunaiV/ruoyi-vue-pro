@@ -12,22 +12,22 @@ import javax.validation.constraints.NotNull;
 @Data
 public class ProductBrandBaseVO {
 
-    @Schema(description = "品牌名称", required = true, example = "芋道")
+    @Schema(description = "品牌名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "苹果")
     @NotNull(message = "品牌名称不能为空")
     private String name;
 
-    @Schema(description = "品牌图片", required = true)
+    @Schema(description = "品牌图片", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "品牌图片不能为空")
     private String picUrl;
 
-    @Schema(description = "品牌排序", required = true, example = "1")
+    @Schema(description = "品牌排序", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "品牌排序不能为空")
     private Integer sort;
 
     @Schema(description = "品牌描述", example = "描述")
     private String description;
 
-    @Schema(description = "状态", required = true, example = "0")
+    @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     @NotNull(message = "状态不能为空")
     private Integer status;
 

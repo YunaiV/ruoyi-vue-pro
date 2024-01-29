@@ -1,22 +1,22 @@
 package cn.iocoder.yudao.module.pay.convert.order;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.*;
-import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitReqVO;
 import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitRespVO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 支付订单 Convert
@@ -32,71 +32,42 @@ public interface PayOrderConvert {
 
     PayOrderRespDTO convert2(PayOrderDO order);
 
-    PayOrderDetailsRespVO orderDetailConvert(PayOrderDO bean);
-
-    PayOrderDetailsRespVO.PayOrderExtension orderDetailExtensionConvert(PayOrderExtensionDO bean);
-
-    List<PayOrderRespVO> convertList(List<PayOrderDO> list);
-
-    PageResult<PayOrderRespVO> convertPage(PageResult<PayOrderDO> page);
-
-    List<PayOrderExcelVO> convertList02(List<PayOrderDO> list);
-
-    /**
-     * 订单 DO 转自定义分页对象
-     *
-     * @param bean 订单DO
-     * @return 分页对象
-     */
-    PayOrderPageItemRespVO pageConvertItemPage(PayOrderDO bean);
-
-    // TODO 芋艿：优化下 convert 逻辑
-    default PayOrderExcelVO excelConvert(PayOrderDO bean) {
-        if (bean == null) {
-            return null;
+    default PayOrderDetailsRespVO convert(PayOrderDO order, PayOrderExtensionDO orderExtension, PayAppDO app) {
+        PayOrderDetailsRespVO respVO = convertDetail(order);
+        respVO.setExtension(convert(orderExtension));
+        if (app != null) {
+            respVO.setAppName(app.getName());
         }
-
-        PayOrderExcelVO payOrderExcelVO = new PayOrderExcelVO();
-
-        payOrderExcelVO.setId(bean.getId());
-        payOrderExcelVO.setSubject(bean.getSubject());
-        payOrderExcelVO.setMerchantOrderId(bean.getMerchantOrderId());
-        payOrderExcelVO.setChannelOrderNo(bean.getChannelOrderNo());
-        payOrderExcelVO.setStatus(bean.getStatus());
-        payOrderExcelVO.setNotifyStatus(bean.getNotifyStatus());
-        payOrderExcelVO.setNotifyUrl(bean.getNotifyUrl());
-        payOrderExcelVO.setCreateTime(bean.getCreateTime());
-        payOrderExcelVO.setSuccessTime(bean.getSuccessTime());
-        payOrderExcelVO.setExpireTime(bean.getExpireTime());
-        payOrderExcelVO.setNotifyTime(bean.getNotifyTime());
-        payOrderExcelVO.setUserIp(bean.getUserIp());
-        payOrderExcelVO.setRefundStatus(bean.getRefundStatus());
-        payOrderExcelVO.setRefundTimes(bean.getRefundTimes());
-        payOrderExcelVO.setBody(bean.getBody());
-
-        BigDecimal multiple = new BigDecimal(100);
-
-        payOrderExcelVO.setAmount(BigDecimal.valueOf(bean.getAmount())
-                .divide(multiple, 2, RoundingMode.HALF_UP).toString());
-
-        payOrderExcelVO.setChannelFeeAmount(BigDecimal.valueOf(bean.getChannelFeeAmount())
-                .divide(multiple, 2, RoundingMode.HALF_UP).toString());
-        payOrderExcelVO.setChannelFeeRate(java.math.BigDecimal.valueOf(bean.getChannelFeeRate())
-                .multiply(multiple).toString());
-        payOrderExcelVO.setRefundAmount(BigDecimal.valueOf(bean.getRefundAmount())
-                .divide(multiple, 2, RoundingMode.HALF_UP).toString());
-
-        return payOrderExcelVO;
+        return respVO;
     }
+    PayOrderDetailsRespVO convertDetail(PayOrderDO bean);
+    PayOrderDetailsRespVO.PayOrderExtension convert(PayOrderExtensionDO bean);
+
+    default PageResult<PayOrderPageItemRespVO> convertPage(PageResult<PayOrderDO> page, Map<Long, PayAppDO> appMap) {
+        PageResult<PayOrderPageItemRespVO> result = convertPage(page);
+        result.getList().forEach(order -> MapUtils.findAndThen(appMap, order.getAppId(), app -> order.setAppName(app.getName())));
+        return result;
+    }
+    PageResult<PayOrderPageItemRespVO> convertPage(PageResult<PayOrderDO> page);
+
+    default List<PayOrderExcelVO> convertList(List<PayOrderDO> list, Map<Long, PayAppDO> appMap) {
+        return CollectionUtils.convertList(list, order -> {
+            PayOrderExcelVO excelVO = convertExcel(order);
+            MapUtils.findAndThen(appMap, order.getAppId(), app -> excelVO.setAppName(app.getName()));
+            return excelVO;
+        });
+    }
+    PayOrderExcelVO convertExcel(PayOrderDO bean);
 
     PayOrderDO convert(PayOrderCreateReqDTO bean);
 
     @Mapping(target = "id", ignore = true)
     PayOrderExtensionDO convert(PayOrderSubmitReqVO bean, String userIp);
 
-    PayOrderUnifiedReqDTO convert2(PayOrderSubmitReqVO reqVO);
+    PayOrderUnifiedReqDTO convert2(PayOrderSubmitReqVO reqVO, String userIp);
 
-    PayOrderSubmitRespVO convert(PayOrderUnifiedRespDTO bean);
+    @Mapping(source = "order.status", target = "status")
+    PayOrderSubmitRespVO convert(PayOrderDO order, cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO respDTO);
 
     AppPayOrderSubmitRespVO convert3(PayOrderSubmitRespVO bean);
 

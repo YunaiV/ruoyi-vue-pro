@@ -23,8 +23,6 @@ public enum TradeOrderStatusEnum implements IntArrayValuable {
     COMPLETED(30, "已完成"),
     CANCELED(40, "已取消");
 
-    // TODO 芋艿： TAKE("待核验")：虚拟订单需要核验商品
-
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(TradeOrderStatusEnum::getStatus).toArray();
 
     /**

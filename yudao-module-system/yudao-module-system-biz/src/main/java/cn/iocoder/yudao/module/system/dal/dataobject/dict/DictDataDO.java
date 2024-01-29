@@ -2,9 +2,7 @@ package cn.iocoder.yudao.module.system.dal.dataobject.dict;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import com.baomidou.mybatisplus.annotation.KeySequence;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -57,6 +55,7 @@ public class DictDataDO extends BaseDO {
     /**
      * css 样式
      */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String cssClass;
     /**
      * 备注

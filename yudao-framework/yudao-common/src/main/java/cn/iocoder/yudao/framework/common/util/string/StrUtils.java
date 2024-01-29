@@ -40,9 +40,30 @@ public class StrUtils {
         return false;
     }
 
-    public static List<Long> splitToLong(String value,  CharSequence separator) {
+    public static List<Long> splitToLong(String value, CharSequence separator) {
         long[] longs = StrUtil.splitToLong(value, separator);
         return Arrays.stream(longs).boxed().collect(Collectors.toList());
+    }
+
+    public static List<Integer> splitToInteger(String value, CharSequence separator) {
+        int[] integers = StrUtil.splitToInt(value, separator);
+        return Arrays.stream(integers).boxed().collect(Collectors.toList());
+    }
+
+    /**
+     * 移除字符串中，包含指定字符串的行
+     *
+     * @param content 字符串
+     * @param sequence 包含的字符串
+     * @return 移除后的字符串
+     */
+    public static String removeLineContains(String content, String sequence) {
+        if (StrUtil.isEmpty(content) || StrUtil.isEmpty(sequence)) {
+            return content;
+        }
+        return Arrays.stream(content.split("\n"))
+                .filter(line -> !line.contains(sequence))
+                .collect(Collectors.joining("\n"));
     }
 
 }

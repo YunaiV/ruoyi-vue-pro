@@ -30,9 +30,10 @@ public class SimpleTrie {
      * @param strs 字符串数组
      */
     public SimpleTrie(Collection<String> strs) {
-        children = new HashMap<>();
+        // 排序，优先使用较短的前缀
+        strs = CollUtil.sort(strs, String::compareTo);
         // 构建树
-        CollUtil.sort(strs, String::compareTo); // 排序，优先使用较短的前缀
+        children = new HashMap<>();
         for (String str : strs) {
             Map<Character, Object> child = children;
             // 遍历每个字符
@@ -56,11 +57,11 @@ public class SimpleTrie {
      * 验证文本是否合法，即不包含敏感词
      *
      * @param text 文本
-     * @return 是否 ok
+     * @return 是否 true-合法 false-不合法
      */
     public boolean isValid(String text) {
         // 遍历 text，使用每一个 [i, n) 段的字符串，使用 children 前缀树匹配，是否包含敏感词
-        for (int i = 0; i < text.length() - 1; i++) {
+        for (int i = 0; i < text.length(); i++) {
             Map<Character, Object> child = (Map<Character, Object>) children.get(text.charAt(i));
             if (child == null) {
                 continue;
@@ -74,14 +75,17 @@ public class SimpleTrie {
     }
 
     /**
-     * 验证文本从指定位置开始，是否包含某个敏感词
+     * 验证文本从指定位置开始，是否不包含某个敏感词
      *
      * @param text  文本
      * @param index 开始位置
      * @param child 节点（当前遍历到的）
-     * @return 是否包含
+     * @return 是否不包含 true-不包含 false-包含
      */
     private boolean recursion(String text, int index, Map<Character, Object> child) {
+        if (child.containsKey(CHARACTER_END)) {
+            return false;
+        }
         if (index == text.length()) {
             return true;
         }
@@ -99,7 +103,7 @@ public class SimpleTrie {
      */
     public List<String> validate(String text) {
         Set<String> results = new HashSet<>();
-        for (int i = 0; i < text.length() - 1; i++) {
+        for (int i = 0; i < text.length(); i++) {
             Character c = text.charAt(i);
             Map<Character, Object> child = (Map<Character, Object>) children.get(c);
             if (child == null) {
@@ -127,6 +131,9 @@ public class SimpleTrie {
      */
     @SuppressWarnings("unchecked")
     private static boolean recursionWithResult(String text, int index, Map<Character, Object> child, StringBuilder result) {
+        if (child.containsKey(CHARACTER_END)) {
+            return false;
+        }
         if (index == text.length()) {
             return true;
         }

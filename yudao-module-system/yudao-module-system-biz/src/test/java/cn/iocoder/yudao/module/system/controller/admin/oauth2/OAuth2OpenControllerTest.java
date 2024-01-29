@@ -39,6 +39,9 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServic
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
 import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -289,7 +292,10 @@ public class OAuth2OpenControllerTest extends BaseMockitoUnitTest {
                 scope, redirectUri, true, state);
         // 断言
         assertEquals(0, result.getCode());
-        assertEquals("https://www.iocoder.cn#access_token=test_access_token&token_type=bearer&state=test&expires_in=30&scope=read", result.getData());
+        assertThat(result.getData(), anyOf( // 29 和 30 都有一定概率，主要是时间计算
+                is("https://www.iocoder.cn#access_token=test_access_token&token_type=bearer&state=test&expires_in=29&scope=read"),
+                is("https://www.iocoder.cn#access_token=test_access_token&token_type=bearer&state=test&expires_in=30&scope=read")
+        ));
     }
 
     @Test // autoApprove = false，通过 + code

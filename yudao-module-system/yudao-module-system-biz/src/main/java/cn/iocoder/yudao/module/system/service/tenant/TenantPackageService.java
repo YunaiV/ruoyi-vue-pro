@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.system.service.tenant;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackageCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackagePageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackageUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackageSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantPackageDO;
 
 import javax.validation.Valid;
@@ -22,14 +21,14 @@ public interface TenantPackageService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createTenantPackage(@Valid TenantPackageCreateReqVO createReqVO);
+    Long createTenantPackage(@Valid TenantPackageSaveReqVO createReqVO);
 
     /**
      * 更新租户套餐
      *
      * @param updateReqVO 更新信息
      */
-    void updateTenantPackage(@Valid TenantPackageUpdateReqVO updateReqVO);
+    void updateTenantPackage(@Valid TenantPackageSaveReqVO updateReqVO);
 
     /**
      * 删除租户套餐

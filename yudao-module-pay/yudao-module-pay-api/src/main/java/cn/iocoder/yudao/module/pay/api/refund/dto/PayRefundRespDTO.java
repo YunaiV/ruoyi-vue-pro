@@ -8,8 +8,6 @@ import java.time.LocalDateTime;
 /**
  * 退款单信息 Response DTO
  *
- * TODO 芋艿：还没定好字段
- *
  * @author 芋道源码
  */
 @Data
@@ -30,7 +28,7 @@ public class PayRefundRespDTO {
     /**
      * 退款金额，单位：分
      */
-    private Integer refundAmount;
+    private Integer refundPrice;
 
     // ========== 商户相关字段 ==========
     /**

@@ -1,17 +1,16 @@
 package cn.iocoder.yudao.module.system.service.sms;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
-import cn.iocoder.yudao.framework.sms.core.client.SmsClient;
-import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
-import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
-import cn.iocoder.yudao.framework.sms.core.client.dto.SmsReceiveRespDTO;
-import cn.iocoder.yudao.framework.sms.core.client.dto.SmsSendRespDTO;
+import cn.iocoder.yudao.module.system.framework.sms.core.client.SmsClient;
+import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsReceiveRespDTO;
+import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
@@ -20,6 +19,7 @@ import cn.iocoder.yudao.module.system.mq.producer.sms.SmsProducer;
 import cn.iocoder.yudao.module.system.service.member.MemberService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.google.common.annotations.VisibleForTesting;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -36,6 +36,7 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
  * @author 芋道源码
  */
 @Service
+@Slf4j
 public class SmsSendServiceImpl implements SmsSendService {
 
     @Resource
@@ -48,9 +49,6 @@ public class SmsSendServiceImpl implements SmsSendService {
     private SmsTemplateService smsTemplateService;
     @Resource
     private SmsLogService smsLogService;
-
-    @Resource
-    private SmsClientFactory smsClientFactory;
 
     @Resource
     private SmsProducer smsProducer;
@@ -95,7 +93,6 @@ public class SmsSendServiceImpl implements SmsSendService {
         // 创建发送日志。如果模板被禁用，则不发送短信，只记录日志
         Boolean isSend = CommonStatusEnum.ENABLE.getStatus().equals(template.getStatus())
                 && CommonStatusEnum.ENABLE.getStatus().equals(smsChannel.getStatus());
-        ;
         String content = smsTemplateService.formatSmsTemplateContent(template.getContent(), templateParams);
         Long sendLogId = smsLogService.createSmsLog(mobile, userId, userType, isSend, template, content, templateParams);
 
@@ -132,7 +129,7 @@ public class SmsSendServiceImpl implements SmsSendService {
     /**
      * 将参数模板，处理成有序的 KeyValue 数组
      * <p>
-     * 原因是，部分短信平台并不是使用 key 作为参数，而是数组下标，例如说腾讯云 https://cloud.tencent.com/document/product/382/39023
+     * 原因是，部分短信平台并不是使用 key 作为参数，而是数组下标，例如说 <a href="https://cloud.tencent.com/document/product/382/39023">腾讯云</a>
      *
      * @param template       短信模板
      * @param templateParams 原始参数
@@ -160,20 +157,26 @@ public class SmsSendServiceImpl implements SmsSendService {
     @Override
     public void doSendSms(SmsSendMessage message) {
         // 获得渠道对应的 SmsClient 客户端
-        SmsClient smsClient = smsClientFactory.getSmsClient(message.getChannelId());
+        SmsClient smsClient = smsChannelService.getSmsClient(message.getChannelId());
         Assert.notNull(smsClient, "短信客户端({}) 不存在", message.getChannelId());
         // 发送短信
-        SmsCommonResult<SmsSendRespDTO> sendResult = smsClient.sendSms(message.getLogId(), message.getMobile(),
-                message.getApiTemplateId(), message.getTemplateParams());
-        smsLogService.updateSmsSendResult(message.getLogId(), sendResult.getCode(), sendResult.getMsg(),
-                sendResult.getApiCode(), sendResult.getApiMsg(), sendResult.getApiRequestId(),
-                sendResult.getData() != null ? sendResult.getData().getSerialNo() : null);
+        try {
+            SmsSendRespDTO sendResponse = smsClient.sendSms(message.getLogId(), message.getMobile(),
+                    message.getApiTemplateId(), message.getTemplateParams());
+            smsLogService.updateSmsSendResult(message.getLogId(), sendResponse.getSuccess(),
+                    sendResponse.getApiCode(), sendResponse.getApiMsg(),
+                    sendResponse.getApiRequestId(), sendResponse.getSerialNo());
+        } catch (Throwable ex) {
+            log.error("[doSendSms][发送短信异常，日志编号({})]", message.getLogId(), ex);
+            smsLogService.updateSmsSendResult(message.getLogId(), false,
+                    "EXCEPTION", ExceptionUtil.getRootCauseMessage(ex), null, null);
+        }
     }
 
     @Override
     public void receiveSmsStatus(String channelCode, String text) throws Throwable {
         // 获得渠道对应的 SmsClient 客户端
-        SmsClient smsClient = smsClientFactory.getSmsClient(channelCode);
+        SmsClient smsClient = smsChannelService.getSmsClient(channelCode);
         Assert.notNull(smsClient, "短信客户端({}) 不存在", channelCode);
         // 解析内容
         List<SmsReceiveRespDTO> receiveResults = smsClient.parseSmsReceiveStatus(text);

@@ -22,13 +22,18 @@ public class PayOrderApiImpl implements PayOrderApi {
 
     @Override
     public Long createOrder(PayOrderCreateReqDTO reqDTO) {
-        return payOrderService.createPayOrder(reqDTO);
+        return payOrderService.createOrder(reqDTO);
     }
 
     @Override
     public PayOrderRespDTO getOrder(Long id) {
         PayOrderDO order = payOrderService.getOrder(id);
         return PayOrderConvert.INSTANCE.convert2(order);
+    }
+
+    @Override
+    public void updatePayOrderPrice(Long id, Integer payPrice) {
+        payOrderService.updatePayOrderPrice(id, payPrice);
     }
 
 }

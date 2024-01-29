@@ -9,7 +9,7 @@ import javax.validation.constraints.*;
 @ToString(callSuper = true)
 public class AppAddressUpdateReqVO extends AppAddressBaseVO {
 
-    @Schema(description = "编号", required = true)
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "编号不能为空")
     private Long id;
 

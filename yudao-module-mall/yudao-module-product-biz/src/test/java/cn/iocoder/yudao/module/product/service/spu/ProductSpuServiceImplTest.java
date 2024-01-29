@@ -5,20 +5,12 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSkuSaveReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuRespVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuUpdateReqVO;
-import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
-import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
-import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuSaveReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
-import cn.iocoder.yudao.module.product.enums.spu.ProductSpuSpecTypeEnum;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import cn.iocoder.yudao.module.product.service.brand.ProductBrandServiceImpl;
 import cn.iocoder.yudao.module.product.service.category.ProductCategoryServiceImpl;
@@ -29,19 +21,25 @@ import com.google.common.collect.Lists;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static org.assertj.core.util.Lists.newArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 // TODO @芋艿：review 下单元测试
 
@@ -50,8 +48,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author 芋道源码
  */
+@Disabled // TODO 芋艿：后续 fix 补充的单测
 @Import(ProductSpuServiceImpl.class)
-@Disabled // TODO 芋艿：临时去掉
 public class ProductSpuServiceImplTest extends BaseDbUnitTest {
 
     @Resource
@@ -79,49 +77,87 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         return RandomUtil.randomLong(100000, 999999);
     }
 
+    public int generaInt(){return RandomUtil.randomInt(1,9999999);}
+
+    // TODO @芋艿：单测后续 review 哈
+
     @Test
     public void testCreateSpu_success() {
         // 准备参数
-        ProductSpuCreateReqVO createReqVO = randomPojo(ProductSpuCreateReqVO.class, o -> {
-            o.setSpecType(ProductSpuSpecTypeEnum.DISABLE.getType());
-            o.setStatus(ProductSpuStatusEnum.ENABLE.getStatus());
+        ProductSkuSaveReqVO skuCreateOrUpdateReqVO = randomPojo(ProductSkuSaveReqVO.class, o->{
+            // 限制范围为正整数
+            o.setCostPrice(generaInt());
+            o.setPrice(generaInt());
+            o.setMarketPrice(generaInt());
+            o.setStock(generaInt());
+            o.setFirstBrokeragePrice(generaInt());
+            o.setSecondBrokeragePrice(generaInt());
+            // 限制分数为两位数
+            o.setWeight(RandomUtil.randomDouble(10,2, RoundingMode.HALF_UP));
+            o.setVolume(RandomUtil.randomDouble(10,2, RoundingMode.HALF_UP));
         });
-
-        // 校验SKU
-        List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = createReqVO.getSkus();
-
+        ProductSpuSaveReqVO createReqVO = randomPojo(ProductSpuSaveReqVO.class,o->{
+            o.setCategoryId(generateId());
+            o.setBrandId(generateId());
+            o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
+            o.setSkus(newArrayList(skuCreateOrUpdateReqVO,skuCreateOrUpdateReqVO,skuCreateOrUpdateReqVO));
+        });
+        when(categoryService.getCategoryLevel(eq(createReqVO.getCategoryId()))).thenReturn(2);
         Long spu = productSpuService.createSpu(createReqVO);
         ProductSpuDO productSpuDO = productSpuMapper.selectById(spu);
-
-        createReqVO.setMarketPrice(CollectionUtils.getMaxValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getMarketPrice));
-//        createReqVO.setMaxPrice(CollectionUtils.getMaxValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
-//        createReqVO.setMinPrice(CollectionUtils.getMinValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
-//        createReqVO.setTotalStock(CollectionUtils.getSumValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
-
         assertPojoEquals(createReqVO, productSpuDO);
-
     }
 
     @Test
     public void testUpdateSpu_success() {
         // 准备参数
-        ProductSpuDO createReqVO = randomPojo(ProductSpuDO.class);
+        ProductSpuDO createReqVO = randomPojo(ProductSpuDO.class,o->{
+            o.setCategoryId(generateId());
+            o.setBrandId(generateId());
+            o.setDeliveryTemplateId(generateId());
+            o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
+            o.setPrice(generaInt()); // 限制范围为正整数
+            o.setMarketPrice(generaInt()); // 限制范围为正整数
+            o.setCostPrice(generaInt()); // 限制范围为正整数
+            o.setStock(generaInt()); // 限制范围为正整数
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setSalesCount(generaInt()); // 限制范围为正整数
+            o.setBrowseCount(generaInt()); // 限制范围为正整数
+        });
         productSpuMapper.insert(createReqVO);
         // 准备参数
-        ProductSpuUpdateReqVO reqVO = randomPojo(ProductSpuUpdateReqVO.class, o -> {
-            o.setId(createReqVO.getId()); // 设置更新的 ID
-            o.setSpecType(ProductSpuSpecTypeEnum.DISABLE.getType());
-            o.setStatus(ProductSpuStatusEnum.DISABLE.getStatus());
+        ProductSkuSaveReqVO skuCreateOrUpdateReqVO = randomPojo(ProductSkuSaveReqVO.class, o->{
+            // 限制范围为正整数
+            o.setCostPrice(generaInt());
+            o.setPrice(generaInt());
+            o.setMarketPrice(generaInt());
+            o.setStock(generaInt());
+            o.setFirstBrokeragePrice(generaInt());
+            o.setSecondBrokeragePrice(generaInt());
+            // 限制分数为两位数
+            o.setWeight(RandomUtil.randomDouble(10,2, RoundingMode.HALF_UP));
+            o.setVolume(RandomUtil.randomDouble(10,2, RoundingMode.HALF_UP));
         });
+        // 准备参数
+        ProductSpuSaveReqVO reqVO = randomPojo(ProductSpuSaveReqVO.class, o -> {
+            o.setId(createReqVO.getId()); // 设置更新的 ID
+            o.setCategoryId(generateId());
+            o.setBrandId(generateId());
+            o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setSalesCount(generaInt()); // 限制范围为正整数
+            o.setBrowseCount(generaInt()); // 限制范围为正整数
+            o.setSkus(newArrayList(skuCreateOrUpdateReqVO,skuCreateOrUpdateReqVO,skuCreateOrUpdateReqVO));
+        });
+        when(categoryService.getCategoryLevel(eq(reqVO.getCategoryId()))).thenReturn(2);
         // 调用
         productSpuService.updateSpu(reqVO);
-
-        List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = reqVO.getSkus();
-        reqVO.setMarketPrice(CollectionUtils.getMaxValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getMarketPrice));
-//        reqVO.setMaxPrice(CollectionUtils.getMaxValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
-//        reqVO.setMinPrice(CollectionUtils.getMinValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
-//        reqVO.setTotalStock(CollectionUtils.getSumValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
-
         // 校验是否更新正确
         ProductSpuDO spu = productSpuMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, spu);
@@ -129,10 +165,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testValidateSpuExists_exception() {
-        ProductSpuUpdateReqVO reqVO = randomPojo(ProductSpuUpdateReqVO.class, o -> {
-            o.setSpecType(ProductSpuSpecTypeEnum.DISABLE.getType());
-            o.setStatus(ProductSpuStatusEnum.DISABLE.getStatus());
-        });
+        ProductSpuSaveReqVO reqVO = randomPojo(ProductSpuSaveReqVO.class);
         // 调用
         Assertions.assertThrows(ServiceException.class, () -> productSpuService.updateSpu(reqVO));
     }
@@ -140,7 +173,22 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
     @Test
     void deleteSpu() {
         // 准备参数
-        ProductSpuDO createReqVO = randomPojo(ProductSpuDO.class);
+        ProductSpuDO createReqVO = randomPojo(ProductSpuDO.class,o->{
+            o.setCategoryId(generateId());
+            o.setBrandId(generateId());
+            o.setDeliveryTemplateId(generateId());
+            o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
+            o.setPrice(generaInt()); // 限制范围为正整数
+            o.setMarketPrice(generaInt()); // 限制范围为正整数
+            o.setCostPrice(generaInt()); // 限制范围为正整数
+            o.setStock(generaInt()); // 限制范围为正整数
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setSalesCount(generaInt()); // 限制范围为正整数
+            o.setBrowseCount(generaInt()); // 限制范围为正整数
+            o.setStatus(-1); // 加入回收站才可删除
+        });
         productSpuMapper.insert(createReqVO);
 
         // 调用
@@ -152,7 +200,21 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
     @Test
     void getSpu() {
         // 准备参数
-        ProductSpuDO createReqVO = randomPojo(ProductSpuDO.class);
+        ProductSpuDO createReqVO = randomPojo(ProductSpuDO.class,o->{
+            o.setCategoryId(generateId());
+            o.setBrandId(generateId());
+            o.setDeliveryTemplateId(generateId());
+            o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
+            o.setPrice(generaInt()); // 限制范围为正整数
+            o.setMarketPrice(generaInt()); // 限制范围为正整数
+            o.setCostPrice(generaInt()); // 限制范围为正整数
+            o.setStock(generaInt()); // 限制范围为正整数
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setSalesCount(generaInt()); // 限制范围为正整数
+            o.setBrowseCount(generaInt()); // 限制范围为正整数
+        });
         productSpuMapper.insert(createReqVO);
 
         ProductSpuDO spu = productSpuService.getSpu(createReqVO.getId());
@@ -162,19 +224,78 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
     @Test
     void getSpuList() {
         // 准备参数
-        ArrayList<ProductSpuDO> createReqVO = Lists.newArrayList(randomPojo(ProductSpuDO.class), randomPojo(ProductSpuDO.class));
-        productSpuMapper.insertBatch(createReqVO);
+        ArrayList<ProductSpuDO> createReqVOs = Lists.newArrayList(randomPojo(ProductSpuDO.class,o->{
+            o.setCategoryId(generateId());
+            o.setBrandId(generateId());
+            o.setDeliveryTemplateId(generateId());
+            o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
+            o.setPrice(generaInt()); // 限制范围为正整数
+            o.setMarketPrice(generaInt()); // 限制范围为正整数
+            o.setCostPrice(generaInt()); // 限制范围为正整数
+            o.setStock(generaInt()); // 限制范围为正整数
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setSalesCount(generaInt()); // 限制范围为正整数
+            o.setBrowseCount(generaInt()); // 限制范围为正整数
+        }), randomPojo(ProductSpuDO.class,o->{
+            o.setCategoryId(generateId());
+            o.setBrandId(generateId());
+            o.setDeliveryTemplateId(generateId());
+            o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
+            o.setPrice(generaInt()); // 限制范围为正整数
+            o.setMarketPrice(generaInt()); // 限制范围为正整数
+            o.setCostPrice(generaInt()); // 限制范围为正整数
+            o.setStock(generaInt()); // 限制范围为正整数
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setSalesCount(generaInt()); // 限制范围为正整数
+            o.setBrowseCount(generaInt()); // 限制范围为正整数
+        }));
+        productSpuMapper.insertBatch(createReqVOs);
 
         // 调用
-        List<ProductSpuDO> spuList = productSpuService.getSpuList(createReqVO.stream().map(ProductSpuDO::getId).collect(Collectors.toList()));
-        Assertions.assertIterableEquals(createReqVO, spuList);
+        List<ProductSpuDO> spuList = productSpuService.getSpuList(createReqVOs.stream().map(ProductSpuDO::getId).collect(Collectors.toList()));
+        Assertions.assertIterableEquals(createReqVOs, spuList);
     }
 
     @Test
     void getSpuPage_alarmStock_empty() {
+        // 准备参数
+        ArrayList<ProductSpuDO> createReqVOs = Lists.newArrayList(randomPojo(ProductSpuDO.class,o->{
+            o.setCategoryId(generateId());
+            o.setBrandId(generateId());
+            o.setDeliveryTemplateId(generateId());
+            o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
+            o.setPrice(generaInt()); // 限制范围为正整数
+            o.setMarketPrice(generaInt()); // 限制范围为正整数
+            o.setCostPrice(generaInt()); // 限制范围为正整数
+            o.setStock(11); // 限制范围为正整数
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setSalesCount(generaInt()); // 限制范围为正整数
+            o.setBrowseCount(generaInt()); // 限制范围为正整数
+        }), randomPojo(ProductSpuDO.class,o->{
+            o.setCategoryId(generateId());
+            o.setBrandId(generateId());
+            o.setDeliveryTemplateId(generateId());
+            o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
+            o.setPrice(generaInt()); // 限制范围为正整数
+            o.setMarketPrice(generaInt()); // 限制范围为正整数
+            o.setCostPrice(generaInt()); // 限制范围为正整数
+            o.setStock(11); // 限制范围为正整数
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setSalesCount(generaInt()); // 限制范围为正整数
+            o.setBrowseCount(generaInt()); // 限制范围为正整数
+        }));
+        productSpuMapper.insertBatch(createReqVOs);
         // 调用
         ProductSpuPageReqVO productSpuPageReqVO = new ProductSpuPageReqVO();
-        productSpuPageReqVO.setAlarmStock(true);
+        productSpuPageReqVO.setTabType(ProductSpuPageReqVO.ALERT_STOCK);
 
         PageResult<ProductSpuDO> spuPage = productSpuService.getSpuPage(productSpuPageReqVO);
 
@@ -185,77 +306,61 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
 
     @Test
     void getSpuPage_alarmStock() {
-        // mock 数据
-        Long brandId = generateId();
-        Long categoryId = generateId();
-        String code = generateNo();
-
         // 准备参数
-        ProductSpuDO createReqVO = randomPojo(ProductSpuDO.class, o->{
-            o.setStatus(ProductSpuStatusEnum.ENABLE.getStatus());
-            o.setTotalStock(500);
-            o.setMinPrice(1);
-            o.setMaxPrice(50);
-            o.setMarketPrice(25);
-            o.setSpecType(ProductSpuSpecTypeEnum.RECYCLE.getType());
-            o.setBrandId(brandId);
-            o.setCategoryId(categoryId);
-            o.setClickCount(100);
-            o.setCode(code);
-            o.setDescription("测试商品");
-            o.setPicUrls(new ArrayList<>());
-            o.setName("测试");
-            o.setSalesCount(100);
-            o.setSellPoint("超级加倍");
-            o.setShowStock(true);
-            o.setVideoUrl("");
-        });
-        productSpuMapper.insert(createReqVO);
-
-        Set<Long> alarmStockSpuIds = SetUtils.asSet(createReqVO.getId());
-
-        List<ProductSkuDO> productSpuDOS = Arrays.asList(randomPojo(ProductSkuDO.class, o -> {
-            o.setSpuId(createReqVO.getId());
-        }), randomPojo(ProductSkuDO.class, o -> {
-            o.setSpuId(createReqVO.getId());
+        ArrayList<ProductSpuDO> createReqVOs = Lists.newArrayList(randomPojo(ProductSpuDO.class,o->{
+            o.setCategoryId(generateId());
+            o.setBrandId(generateId());
+            o.setDeliveryTemplateId(generateId());
+            o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
+            o.setPrice(generaInt()); // 限制范围为正整数
+            o.setMarketPrice(generaInt()); // 限制范围为正整数
+            o.setCostPrice(generaInt()); // 限制范围为正整数
+            o.setStock(5); // 限制范围为正整数
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setSalesCount(generaInt()); // 限制范围为正整数
+            o.setBrowseCount(generaInt()); // 限制范围为正整数
+        }), randomPojo(ProductSpuDO.class,o->{
+            o.setCategoryId(generateId());
+            o.setBrandId(generateId());
+            o.setDeliveryTemplateId(generateId());
+            o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
+            o.setPrice(generaInt()); // 限制范围为正整数
+            o.setMarketPrice(generaInt()); // 限制范围为正整数
+            o.setCostPrice(generaInt()); // 限制范围为正整数
+            o.setStock(9); // 限制范围为正整数
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setSalesCount(generaInt()); // 限制范围为正整数
+            o.setBrowseCount(generaInt()); // 限制范围为正整数
         }));
-
-        Mockito.when(productSkuService.getSkuListByAlarmStock()).thenReturn(productSpuDOS);
-
+        productSpuMapper.insertBatch(createReqVOs);
         // 调用
         ProductSpuPageReqVO productSpuPageReqVO = new ProductSpuPageReqVO();
-        productSpuPageReqVO.setAlarmStock(true);
+        productSpuPageReqVO.setTabType(ProductSpuPageReqVO.ALERT_STOCK);
         PageResult<ProductSpuDO> spuPage = productSpuService.getSpuPage(productSpuPageReqVO);
-
-        PageResult<ProductSpuRespVO> result = ProductSpuConvert.INSTANCE.convertPage(productSpuMapper.selectPage(productSpuPageReqVO, alarmStockSpuIds));
-        Assertions.assertIterableEquals(result.getList(), spuPage.getList());
-        assertEquals(spuPage.getTotal(), result.getTotal());
+        assertEquals(createReqVOs.size(), spuPage.getTotal());
     }
 
     @Test
-    void getSpuPage() {
-        // mock 数据
-        Long brandId = generateId();
-        Long categoryId = generateId();
-
+    void testGetSpuPage() {
         // 准备参数
-        ProductSpuDO createReqVO = randomPojo(ProductSpuDO.class, o->{
-            o.setStatus(ProductSpuStatusEnum.ENABLE.getStatus());
-            o.setTotalStock(1);
-            o.setMinPrice(1);
-            o.setMaxPrice(1);
-            o.setMarketPrice(1);
-            o.setSpecType(ProductSpuSpecTypeEnum.RECYCLE.getType());
-            o.setBrandId(brandId);
-            o.setCategoryId(categoryId);
-            o.setClickCount(1);
-            o.setCode(generateNo());
-            o.setDescription("测试商品");
-            o.setPicUrls(new ArrayList<>());
-            o.setName("测试");
-            o.setSalesCount(1);
-            o.setSellPoint("卖点");
-            o.setShowStock(true);
+        ProductSpuDO createReqVO = randomPojo(ProductSpuDO.class,o->{
+            o.setCategoryId(generateId());
+            o.setBrandId(generateId());
+            o.setDeliveryTemplateId(generateId());
+            o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
+            o.setPrice(generaInt()); // 限制范围为正整数
+            o.setMarketPrice(generaInt()); // 限制范围为正整数
+            o.setCostPrice(generaInt()); // 限制范围为正整数
+            o.setStock(generaInt()); // 限制范围为正整数
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setSalesCount(generaInt()); // 限制范围为正整数
+            o.setBrowseCount(generaInt()); // 限制范围为正整数
         });
 
         // 准备参数
@@ -264,7 +369,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         productSpuMapper.insert(cloneIgnoreId(createReqVO, o -> o.setStatus(ProductSpuStatusEnum.DISABLE.getStatus())));
         productSpuMapper.insert(cloneIgnoreId(createReqVO, o -> o.setStatus(ProductSpuStatusEnum.RECYCLE.getStatus())));
         // 测试 SpecType 不匹配
-        productSpuMapper.insert(cloneIgnoreId(createReqVO, o -> o.setSpecType(ProductSpuSpecTypeEnum.DISABLE.getType())));
+        productSpuMapper.insert(cloneIgnoreId(createReqVO, o -> o.setSpecType(true)));
         // 测试 BrandId 不匹配
         productSpuMapper.insert(cloneIgnoreId(createReqVO, o -> o.setBrandId(generateId())));
         // 测试 CategoryId 不匹配
@@ -272,43 +377,19 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         ProductSpuPageReqVO productSpuPageReqVO = new ProductSpuPageReqVO();
-        productSpuPageReqVO.setAlarmStock(false);
-        productSpuPageReqVO.setBrandId(brandId);
-        productSpuPageReqVO.setStatus(ProductSpuStatusEnum.ENABLE.getStatus());
-        productSpuPageReqVO.setCategoryId(categoryId);
+        // 查询条件 按需打开
+        //productSpuPageReqVO.setTabType(ProductSpuPageReqVO.ALERT_STOCK);
+        //productSpuPageReqVO.setTabType(ProductSpuPageReqVO.RECYCLE_BIN);
+        //productSpuPageReqVO.setTabType(ProductSpuPageReqVO.FOR_SALE);
+        //productSpuPageReqVO.setTabType(ProductSpuPageReqVO.IN_WAREHOUSE);
+        //productSpuPageReqVO.setTabType(ProductSpuPageReqVO.SOLD_OUT);
+        //productSpuPageReqVO.setName(createReqVO.getName());
+        //productSpuPageReqVO.setCategoryId(createReqVO.getCategoryId());
 
         PageResult<ProductSpuDO> spuPage = productSpuService.getSpuPage(productSpuPageReqVO);
 
-        PageResult<ProductSpuRespVO> result = ProductSpuConvert.INSTANCE.convertPage(productSpuMapper.selectPage(productSpuPageReqVO, (Set<Long>) null));
-        assertEquals(result, spuPage);
+        assertEquals(1, spuPage.getTotal());
     }
-
-    @Test
-    void testGetSpuPage() {
-// 准备参数
-        ProductSpuDO createReqVO = randomPojo(ProductSpuDO.class, o -> {
-            o.setCategoryId(2L);
-        });
-        productSpuMapper.insert(createReqVO);
-
-        // 调用
-        AppProductSpuPageReqVO appSpuPageReqVO = new AppProductSpuPageReqVO();
-        appSpuPageReqVO.setCategoryId(2L);
-
-//        PageResult<AppSpuPageItemRespVO> spuPage = productSpuService.getSpuPage(appSpuPageReqVO);
-//
-//        PageResult<ProductSpuDO> result = productSpuMapper.selectPage(
-//                ProductSpuConvert.INSTANCE.convert(appSpuPageReqVO));
-//
-//        List<AppSpuPageItemRespVO> collect = result.getList()
-//                .stream()
-//                .map(ProductSpuConvert.INSTANCE::convertAppResp)
-//                .collect(Collectors.toList());
-//
-//        Assertions.assertIterableEquals(collect, spuPage.getList());
-//        assertEquals(spuPage.getTotal(), result.getTotal());
-    }
-
 
     /**
      * 生成笛卡尔积
@@ -346,14 +427,44 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         Map<Long, Integer> stockIncrCounts = MapUtil.builder(1L, 10).put(2L, -20).build();
         // mock 方法（数据）
-        productSpuMapper.insert(randomPojo(ProductSpuDO.class, o -> o.setId(1L).setTotalStock(20)));
-        productSpuMapper.insert(randomPojo(ProductSpuDO.class, o -> o.setId(2L).setTotalStock(30)));
+        productSpuMapper.insert(randomPojo(ProductSpuDO.class, o ->{
+            o.setCategoryId(generateId());
+            o.setBrandId(generateId());
+            o.setDeliveryTemplateId(generateId());
+            o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
+            o.setPrice(generaInt()); // 限制范围为正整数
+            o.setMarketPrice(generaInt()); // 限制范围为正整数
+            o.setCostPrice(generaInt()); // 限制范围为正整数
+            o.setStock(generaInt()); // 限制范围为正整数
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setSalesCount(generaInt()); // 限制范围为正整数
+            o.setBrowseCount(generaInt()); // 限制范围为正整数
+            o.setId(1L).setStock(20);
+        }));
+        productSpuMapper.insert(randomPojo(ProductSpuDO.class, o -> {
+            o.setCategoryId(generateId());
+            o.setBrandId(generateId());
+            o.setDeliveryTemplateId(generateId());
+            o.setSort(RandomUtil.randomInt(1,100)); // 限制排序范围
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setVirtualSalesCount(generaInt()); // 限制范围为正整数
+            o.setPrice(generaInt()); // 限制范围为正整数
+            o.setMarketPrice(generaInt()); // 限制范围为正整数
+            o.setCostPrice(generaInt()); // 限制范围为正整数
+            o.setStock(generaInt()); // 限制范围为正整数
+            o.setGiveIntegral(generaInt()); // 限制范围为正整数
+            o.setSalesCount(generaInt()); // 限制范围为正整数
+            o.setBrowseCount(generaInt()); // 限制范围为正整数
+            o.setId(2L).setStock(30);
+        }));
 
         // 调用
         productSpuService.updateSpuStock(stockIncrCounts);
         // 断言
-        assertEquals(productSpuService.getSpu(1L).getTotalStock(), 30);
-        assertEquals(productSpuService.getSpu(2L).getTotalStock(), 10);
+        assertEquals(productSpuService.getSpu(1L).getStock(), 30);
+        assertEquals(productSpuService.getSpu(2L).getStock(), 10);
     }
 
 }

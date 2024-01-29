@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @ToString(callSuper = true)
 public class MpTagUpdateReqVO extends MpTagBaseVO {
 
-    @Schema(description = "编号", required = true)
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "编号不能为空")
     private Long id;
 

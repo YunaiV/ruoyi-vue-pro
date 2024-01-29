@@ -1,10 +1,8 @@
 package cn.iocoder.yudao.module.system.mq.producer.mail;
 
-import cn.iocoder.yudao.framework.mq.core.RedisMQTemplate;
-import cn.iocoder.yudao.module.system.mq.message.mail.MailAccountRefreshMessage;
 import cn.iocoder.yudao.module.system.mq.message.mail.MailSendMessage;
-import cn.iocoder.yudao.module.system.mq.message.mail.MailTemplateRefreshMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -20,23 +18,7 @@ import javax.annotation.Resource;
 public class MailProducer {
 
     @Resource
-    private RedisMQTemplate redisMQTemplate;
-
-    /**
-     * 发送 {@link MailTemplateRefreshMessage} 消息
-     */
-    public void sendMailTemplateRefreshMessage() {
-        MailTemplateRefreshMessage message = new MailTemplateRefreshMessage();
-        redisMQTemplate.send(message);
-    }
-
-    /**
-     * 发送 {@link MailAccountRefreshMessage} 消息
-     */
-    public void sendMailAccountRefreshMessage() {
-        MailAccountRefreshMessage message = new MailAccountRefreshMessage();
-        redisMQTemplate.send(message);
-    }
+    private ApplicationContext applicationContext;
 
     /**
      * 发送 {@link MailSendMessage} 消息
@@ -53,7 +35,7 @@ public class MailProducer {
         MailSendMessage message = new MailSendMessage()
                 .setLogId(sendLogId).setMail(mail).setAccountId(accountId)
                 .setNickname(nickname).setTitle(title).setContent(content);
-        redisMQTemplate.send(message);
+        applicationContext.publishEvent(message);
     }
 
 }

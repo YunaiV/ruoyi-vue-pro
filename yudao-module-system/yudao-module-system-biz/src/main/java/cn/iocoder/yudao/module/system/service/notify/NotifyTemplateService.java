@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.system.service.notify;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplatePageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyTemplateDO;
 
 import javax.validation.Valid;
@@ -17,32 +16,19 @@ import java.util.Map;
 public interface NotifyTemplateService {
 
     /**
-     * 初始化站内信模板的本地缓存
-     */
-    void initLocalCache();
-
-    /**
-     * 获得站内信模板，从缓存中
-     *
-     * @param code 模板编码
-     * @return 站内信模板
-     */
-    NotifyTemplateDO getNotifyTemplateByCodeFromCache(String code);
-
-    /**
      * 创建站内信模版
      *
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createNotifyTemplate(@Valid NotifyTemplateCreateReqVO createReqVO);
+    Long createNotifyTemplate(@Valid NotifyTemplateSaveReqVO createReqVO);
 
     /**
      * 更新站内信模版
      *
      * @param updateReqVO 更新信息
      */
-    void updateNotifyTemplate(@Valid NotifyTemplateUpdateReqVO updateReqVO);
+    void updateNotifyTemplate(@Valid NotifyTemplateSaveReqVO updateReqVO);
 
     /**
      * 删除站内信模版
@@ -58,6 +44,14 @@ public interface NotifyTemplateService {
      * @return 站内信模版
      */
     NotifyTemplateDO getNotifyTemplate(Long id);
+
+    /**
+     * 获得站内信模板，从缓存中
+     *
+     * @param code 模板编码
+     * @return 站内信模板
+     */
+    NotifyTemplateDO getNotifyTemplateByCodeFromCache(String code);
 
     /**
      * 获得站内信模版分页

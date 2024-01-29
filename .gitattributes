@@ -1,1 +1,0 @@
-*.sql linguist-language=java

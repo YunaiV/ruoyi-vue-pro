@@ -28,6 +28,18 @@ public class TradeOrderProperties {
      * 支付超时时间
      */
     @NotNull(message = "支付超时时间不能为空")
-    private Duration expireTime;
+    private Duration payExpireTime;
+
+    /**
+     * 收货超时时间
+     */
+    @NotNull(message = "收货超时时间不能为空")
+    private Duration receiveExpireTime;
+
+    /**
+     * 评论超时时间
+     */
+    @NotNull(message = "评论超时时间不能为空")
+    private Duration commentExpireTime;
 
 }

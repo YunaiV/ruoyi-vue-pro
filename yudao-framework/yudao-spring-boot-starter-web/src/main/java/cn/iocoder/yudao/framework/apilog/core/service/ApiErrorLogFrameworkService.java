@@ -13,5 +13,4 @@ public interface ApiErrorLogFrameworkService {
      * @param apiErrorLog API 错误日志
      */
     void createApiErrorLog(ApiErrorLog apiErrorLog);
-
 }

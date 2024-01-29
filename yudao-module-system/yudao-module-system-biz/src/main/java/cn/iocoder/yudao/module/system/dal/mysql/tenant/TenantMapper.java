@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.system.dal.mysql.tenant;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import org.apache.ibatis.annotations.Mapper;
@@ -28,18 +27,12 @@ public interface TenantMapper extends BaseMapperX<TenantDO> {
                 .orderByDesc(TenantDO::getId));
     }
 
-    default List<TenantDO> selectList(TenantExportReqVO reqVO) {
-        return selectList(new LambdaQueryWrapperX<TenantDO>()
-                .likeIfPresent(TenantDO::getName, reqVO.getName())
-                .likeIfPresent(TenantDO::getContactName, reqVO.getContactName())
-                .likeIfPresent(TenantDO::getContactMobile, reqVO.getContactMobile())
-                .eqIfPresent(TenantDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(TenantDO::getCreateTime, reqVO.getCreateTime())
-                .orderByDesc(TenantDO::getId));
-    }
-
     default TenantDO selectByName(String name) {
         return selectOne(TenantDO::getName, name);
+    }
+
+    default TenantDO selectByWebsite(String website) {
+        return selectOne(TenantDO::getWebsite, website);
     }
 
     default Long selectCountByPackageId(Long packageId) {

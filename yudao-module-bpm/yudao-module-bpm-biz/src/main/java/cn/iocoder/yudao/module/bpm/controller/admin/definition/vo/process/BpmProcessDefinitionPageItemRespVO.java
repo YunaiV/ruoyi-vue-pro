@@ -16,7 +16,7 @@ public class BpmProcessDefinitionPageItemRespVO extends BpmProcessDefinitionResp
     @Schema(description = "表单名字", example = "请假表单")
     private String formName;
 
-    @Schema(description = "部署时间", required = true)
+    @Schema(description = "部署时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime deploymentTime;
 
 }

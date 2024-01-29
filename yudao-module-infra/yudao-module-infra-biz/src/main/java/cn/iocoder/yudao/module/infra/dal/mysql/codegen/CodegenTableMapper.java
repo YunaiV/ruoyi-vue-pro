@@ -21,11 +21,19 @@ public interface CodegenTableMapper extends BaseMapperX<CodegenTableDO> {
         return selectPage(pageReqVO, new LambdaQueryWrapperX<CodegenTableDO>()
                 .likeIfPresent(CodegenTableDO::getTableName, pageReqVO.getTableName())
                 .likeIfPresent(CodegenTableDO::getTableComment, pageReqVO.getTableComment())
-                .betweenIfPresent(CodegenTableDO::getCreateTime, pageReqVO.getCreateTime()));
+                .likeIfPresent(CodegenTableDO::getClassName, pageReqVO.getClassName())
+                .betweenIfPresent(CodegenTableDO::getCreateTime, pageReqVO.getCreateTime())
+                .orderByDesc(CodegenTableDO::getUpdateTime)
+        );
     }
 
     default List<CodegenTableDO> selectListByDataSourceConfigId(Long dataSourceConfigId) {
         return selectList(CodegenTableDO::getDataSourceConfigId, dataSourceConfigId);
+    }
+
+    default List<CodegenTableDO> selectListByTemplateTypeAndMasterTableId(Integer templateType, Long masterTableId) {
+        return selectList(CodegenTableDO::getTemplateType, templateType,
+                CodegenTableDO::getMasterTableId, masterTableId);
     }
 
 }

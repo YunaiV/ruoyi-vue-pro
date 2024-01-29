@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.infra.dal.dataobject.codegen;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.db.DataSourceConfigDO;
+import cn.iocoder.yudao.module.infra.enums.codegen.CodegenFrontTypeEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenTemplateTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -99,6 +100,12 @@ public class CodegenTableDO extends BaseDO {
      * 枚举 {@link CodegenTemplateTypeEnum}
      */
     private Integer templateType;
+    /**
+     * 代码生成的前端类型
+     *
+     * 枚举 {@link CodegenFrontTypeEnum}
+     */
+    private Integer frontType;
 
     // ========== 菜单相关字段 ==========
 
@@ -108,5 +115,44 @@ public class CodegenTableDO extends BaseDO {
      * 关联 MenuDO 的 id 属性
      */
     private Long parentMenuId;
+
+    // ========== 主子表相关字段 ==========
+
+    /**
+     * 主表的编号
+     *
+     * 关联 {@link CodegenTableDO#getId()}
+     */
+    private Long masterTableId;
+    /**
+     * 【自己】子表关联主表的字段编号
+     *
+     * 关联 {@link CodegenColumnDO#getId()}
+     */
+    private Long subJoinColumnId;
+    /**
+     * 主表与子表是否一对多
+     *
+     * true：一对多
+     * false：一对一
+     */
+    private Boolean subJoinMany;
+
+    // ========== 树表相关字段 ==========
+
+    /**
+     * 树表的父字段编号
+     *
+     * 关联 {@link CodegenColumnDO#getId()}
+     */
+    private Long treeParentColumnId;
+    /**
+     * 树表的名字字段编号
+     *
+     * 名字的用途：新增或修改时，select 框展示的字段
+     *
+     * 关联 {@link CodegenColumnDO#getId()}
+     */
+    private Long treeNameColumnId;
 
 }

@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageItemRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponSendReqVO;
 import cn.iocoder.yudao.module.promotion.convert.coupon.CouponConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
 import cn.iocoder.yudao.module.promotion.service.coupon.CouponService;
@@ -21,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.Map;
-import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -36,15 +36,6 @@ public class CouponController {
     private CouponService couponService;
     @Resource
     private MemberUserApi memberUserApi;
-
-//    @GetMapping("/get")
-//    @Operation(summary = "获得优惠劵")
-//    @Parameter(name = "id", description = "编号", required = true, example = "1024")
-//    @PreAuthorize("@ss.hasPermission('promotion:coupon:query')")
-//    public CommonResult<CouponRespVO> getCoupon(@RequestParam("id") Long id) {
-//        CouponDO coupon = couponService.getCoupon(id);
-//        return success(CouponConvert.INSTANCE.convert(coupon));
-//    }
 
     @DeleteMapping("/delete")
     @Operation(summary = "回收优惠劵")
@@ -64,12 +55,20 @@ public class CouponController {
         if (CollUtil.isEmpty(pageResulVO.getList())) {
             return success(pageResulVO);
         }
+
         // 读取用户信息，进行拼接
-        Set<Long> userIds = convertSet(pageResult.getList(), CouponDO::getUserId);
-        Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(userIds);
+        Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(convertSet(pageResult.getList(), CouponDO::getUserId));
         pageResulVO.getList().forEach(itemRespVO -> MapUtils.findAndThen(userMap, itemRespVO.getUserId(),
                 userRespDTO -> itemRespVO.setNickname(userRespDTO.getNickname())));
         return success(pageResulVO);
+    }
+
+    @PostMapping("/send")
+    @Operation(summary = "发送优惠劵")
+    @PreAuthorize("@ss.hasPermission('promotion:coupon:send')")
+    public CommonResult<Boolean> sendCoupon(@Valid @RequestBody CouponSendReqVO reqVO) {
+        couponService.takeCouponByAdmin(reqVO.getTemplateId(), reqVO.getUserIds());
+        return success(true);
     }
 
 }

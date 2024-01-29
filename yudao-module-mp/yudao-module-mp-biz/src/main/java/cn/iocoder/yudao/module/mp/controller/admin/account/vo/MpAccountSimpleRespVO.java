@@ -7,10 +7,10 @@ import lombok.Data;
 @Data
 public class MpAccountSimpleRespVO {
 
-    @Schema(description = "编号", required = true, example = "1024")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "公众号名称", required = true, example = "芋道源码")
+    @Schema(description = "公众号名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
     private String name;
 
 }

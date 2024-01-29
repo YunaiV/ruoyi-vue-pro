@@ -25,4 +25,8 @@ public class ServletUtils {
         ServletUtil.write(response, content, MediaType.APPLICATION_JSON_UTF8_VALUE);
     }
 
+    public static void write(HttpServletResponse response, String text, String contentType) {
+        ServletUtil.write(response, text, contentType);
+    }
+
 }

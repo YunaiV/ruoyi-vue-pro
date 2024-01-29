@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 @Data
 public class PayOrderCreateReqDTO implements Serializable {
 
+    public static final int SUBJECT_MAX_LENGTH = 32;
+
     /**
      * 应用编号
      */
@@ -37,12 +39,11 @@ public class PayOrderCreateReqDTO implements Serializable {
      * 商品标题
      */
     @NotEmpty(message = "商品标题不能为空")
-    @Length(max = 32, message = "商品标题不能超过 32")
+    @Length(max = SUBJECT_MAX_LENGTH, message = "商品标题不能超过 32")
     private String subject;
     /**
      * 商品描述
      */
-//    @NotEmpty(message = "商品描述信息不能为空")
     @Length(max = 128, message = "商品描述信息长度不能超过128")
     private String body;
 
@@ -53,7 +54,7 @@ public class PayOrderCreateReqDTO implements Serializable {
      */
     @NotNull(message = "支付金额不能为空")
     @DecimalMin(value = "0", inclusive = false, message = "支付金额必须大于零")
-    private Integer amount;
+    private Integer price;
 
     /**
      * 支付过期时间

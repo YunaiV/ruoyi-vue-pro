@@ -1,0 +1,127 @@
+<template>
+  <div class="app-container">
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :rules="formRules"
+        label-width="100px"
+        v-loading="formLoading"
+      >
+                     <el-form-item label="名字" prop="name">
+                      <el-input v-model="formData.name" placeholder="请输入名字" />
+                    </el-form-item>
+                    <el-form-item label="简介" prop="description">
+                      <el-input v-model="formData.description" type="textarea" placeholder="请输入简介" />
+                    </el-form-item>
+                    <el-form-item label="出生日期" prop="birthday">
+                      <el-date-picker clearable v-model="formData.birthday" type="date" value-format="timestamp" placeholder="选择出生日期" />
+                    </el-form-item>
+                    <el-form-item label="性别" prop="sex">
+                      <el-select v-model="formData.sex" placeholder="请选择性别">
+                            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYSTEM_USER_SEX)"
+                                       :key="dict.value" :label="dict.label" :value="parseInt(dict.value)" />
+                      </el-select>
+                    </el-form-item>
+                    <el-form-item label="是否有效" prop="enabled">
+                      <el-radio-group v-model="formData.enabled">
+                            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_BOOLEAN_STRING)"
+                                      :key="dict.value" :label="dict.value">{{dict.label}}</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="头像">
+                      <ImageUpload v-model="formData.avatar"/>
+                    </el-form-item>
+                    <el-form-item label="附件">
+                      <FileUpload v-model="formData.video"/>
+                    </el-form-item>
+                    <el-form-item label="备注">
+                      <Editor v-model="formData.memo" :min-height="192"/>
+                    </el-form-item>
+      </el-form>
+  </div>
+</template>
+
+<script>
+  import * as StudentApi from '@/api/infra/demo';
+      import ImageUpload from '@/components/ImageUpload';
+      import FileUpload from '@/components/FileUpload';
+      import Editor from '@/components/Editor';
+  export default {
+    name: "StudentTeacherForm",
+    components: {
+          ImageUpload,
+          FileUpload,
+          Editor,
+    },
+    props:[
+      'studentId'
+    ],// 学生编号（主表的关联字段）
+    data() {
+      return {
+        // 表单的加载中：1）修改时的数据加载；2）提交的按钮禁用
+        formLoading: false,
+        // 表单参数
+        formData: [],
+        // 表单校验
+        formRules: {
+                        studentId: [{ required: true, message: "学生编号不能为空", trigger: "blur" }],
+                        name: [{ required: true, message: "名字不能为空", trigger: "blur" }],
+                        description: [{ required: true, message: "简介不能为空", trigger: "blur" }],
+                        birthday: [{ required: true, message: "出生日期不能为空", trigger: "blur" }],
+                        sex: [{ required: true, message: "性别不能为空", trigger: "change" }],
+                        enabled: [{ required: true, message: "是否有效不能为空", trigger: "blur" }],
+                        avatar: [{ required: true, message: "头像不能为空", trigger: "blur" }],
+                        memo: [{ required: true, message: "备注不能为空", trigger: "blur" }],
+        },
+      };
+    },
+    watch:{/** 监听主表的关联字段的变化，加载对应的子表数据 */
+      studentId:{
+        handler(val) {
+          // 1. 重置表单
+              this.formData = {
+                                  id: undefined,
+                                  studentId: undefined,
+                                  name: undefined,
+                                  description: undefined,
+                                  birthday: undefined,
+                                  sex: undefined,
+                                  enabled: undefined,
+                                  avatar: undefined,
+                                  video: undefined,
+                                  memo: undefined,
+              }
+          // 2. val 非空，则加载数据
+          if (!val) {
+            return;
+          }
+          try {
+            this.formLoading = true;
+            // 这里还是需要获取一下 this 的不然取不到 formData
+            const that = this;
+            StudentApi.getStudentTeacherByStudentId(val).then(function (res){
+              const data = res.data;
+              if (!data) {
+                return
+              }
+              that.formData = data;
+            })
+          } finally {
+            this.formLoading = false;
+          }
+        },
+        immediate: true
+      }
+    },
+    methods: {
+      /** 表单校验 */
+      validate(){
+        return this.$refs["formRef"].validate();
+      },
+      /** 表单值 */
+      getData(){
+        return this.formData;
+      }
+    }
+  };
+</script>

@@ -11,7 +11,7 @@ import java.util.Set;
 @Data
 public class PermissionAssignRoleMenuReqVO {
 
-    @Schema(description = "角色编号", required = true, example = "1")
+    @Schema(description = "角色编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "角色编号不能为空")
     private Long roleId;
 

@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.system.dal.mysql.dict;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -41,11 +40,10 @@ public interface DictDataMapper extends BaseMapperX<DictDataDO> {
                 .orderByDesc(Arrays.asList(DictDataDO::getDictType, DictDataDO::getSort)));
     }
 
-    default List<DictDataDO> selectList(DictDataExportReqVO reqVO) {
+    default List<DictDataDO> selectListByStatusAndDictType(Integer status, String dictType) {
         return selectList(new LambdaQueryWrapperX<DictDataDO>()
-                .likeIfPresent(DictDataDO::getLabel, reqVO.getLabel())
-                .eqIfPresent(DictDataDO::getDictType, reqVO.getDictType())
-                .eqIfPresent(DictDataDO::getStatus, reqVO.getStatus()));
+                .eqIfPresent(DictDataDO::getStatus, status)
+                .eqIfPresent(DictDataDO::getDictType, dictType));
     }
 
 }

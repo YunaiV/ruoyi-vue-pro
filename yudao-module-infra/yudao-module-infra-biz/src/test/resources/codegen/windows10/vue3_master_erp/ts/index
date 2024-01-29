@@ -1,0 +1,95 @@
+import request from '@/config/axios'
+
+export interface StudentVO {
+  id: number
+  name: string
+  description: string
+  birthday: Date
+  sex: number
+  enabled: boolean
+  avatar: string
+  video: string
+  memo: string
+}
+
+// 查询学生分页
+export const getStudentPage = async (params) => {
+  return await request.get({ url: `/infra/student/page`, params })
+}
+
+// 查询学生详情
+export const getStudent = async (id: number) => {
+  return await request.get({ url: `/infra/student/get?id=` + id })
+}
+
+// 新增学生
+export const createStudent = async (data: StudentVO) => {
+  return await request.post({ url: `/infra/student/create`, data })
+}
+
+// 修改学生
+export const updateStudent = async (data: StudentVO) => {
+  return await request.put({ url: `/infra/student/update`, data })
+}
+
+// 删除学生
+export const deleteStudent = async (id: number) => {
+  return await request.delete({ url: `/infra/student/delete?id=` + id })
+}
+
+// 导出学生 Excel
+export const exportStudent = async (params) => {
+  return await request.download({ url: `/infra/student/export-excel`, params })
+}
+
+// ==================== 子表（学生联系人） ====================
+
+// 获得学生联系人分页
+export const getStudentContactPage = async (params) => {
+  return await request.get({ url: `/infra/student/student-contact/page`, params })
+}
+// 新增学生联系人
+export const createStudentContact = async (data) => {
+  return await request.post({ url: `/infra/student/student-contact/create`, data })
+}
+
+// 修改学生联系人
+export const updateStudentContact = async (data) => {
+  return await request.put({ url: `/infra/student/student-contact/update`, data })
+}
+
+// 删除学生联系人
+export const deleteStudentContact = async (id: number) => {
+  return await request.delete({ url: `/infra/student/student-contact/delete?id=` + id })
+}
+
+// 获得学生联系人
+export const getStudentContact = async (id: number) => {
+  return await request.get({ url: `/infra/student/student-contact/get?id=` + id })
+}
+
+// ==================== 子表（学生班主任） ====================
+
+// 获得学生班主任分页
+export const getStudentTeacherPage = async (params) => {
+  return await request.get({ url: `/infra/student/student-teacher/page`, params })
+}
+// 新增学生班主任
+export const createStudentTeacher = async (data) => {
+  return await request.post({ url: `/infra/student/student-teacher/create`, data })
+}
+
+// 修改学生班主任
+export const updateStudentTeacher = async (data) => {
+  return await request.put({ url: `/infra/student/student-teacher/update`, data })
+}
+
+// 删除学生班主任
+export const deleteStudentTeacher = async (id: number) => {
+  return await request.delete({ url: `/infra/student/student-teacher/delete?id=` + id })
+}
+
+// 获得学生班主任
+export const getStudentTeacher = async (id: number) => {
+  return await request.get({ url: `/infra/student/student-teacher/get?id=` + id })
+}

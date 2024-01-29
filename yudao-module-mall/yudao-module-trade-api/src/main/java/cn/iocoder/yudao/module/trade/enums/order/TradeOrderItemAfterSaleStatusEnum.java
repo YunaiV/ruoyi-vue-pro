@@ -17,8 +17,8 @@ import java.util.Arrays;
 public enum TradeOrderItemAfterSaleStatusEnum implements IntArrayValuable {
 
     NONE(0, "未售后"),
-    APPLY(1, "售后中"),
-    SUCCESS(2, "已退款");
+    APPLY(10, "售后中"),
+    SUCCESS(20, "售后成功");
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(TradeOrderItemAfterSaleStatusEnum::getStatus).toArray();
 
@@ -30,9 +30,6 @@ public enum TradeOrderItemAfterSaleStatusEnum implements IntArrayValuable {
      * 状态名
      */
     private final String name;
-
-    // TODO 芋艿：EXPIRED 已失效不允许申请售后
-    // TODO 芋艿：PART_AFTER_SALE 部分售后
 
     @Override
     public int[] array() {

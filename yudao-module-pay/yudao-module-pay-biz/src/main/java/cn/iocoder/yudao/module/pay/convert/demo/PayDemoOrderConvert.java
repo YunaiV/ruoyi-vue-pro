@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.pay.convert.demo;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.pay.controller.admin.demo.vo.PayDemoOrderCreateReqVO;
-import cn.iocoder.yudao.module.pay.controller.admin.demo.vo.PayDemoOrderRespVO;
+import cn.iocoder.yudao.module.pay.controller.admin.demo.vo.order.PayDemoOrderCreateReqVO;
+import cn.iocoder.yudao.module.pay.controller.admin.demo.vo.order.PayDemoOrderRespVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.demo.PayDemoOrderDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

@@ -4,9 +4,15 @@ import lombok.*;
 import java.util.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import ${PageParamClassName};
-## 处理 Date 字段的引入
 #foreach ($column in $columns)
-#if (${column.listOperation} && ${column.javaType} == "LocalDateTime")## 时间类型
+#if (${column.javaType} == "BigDecimal")
+import java.math.BigDecimal;
+#break
+#end
+#end
+## 处理 LocalDateTime 字段的引入
+#foreach ($column in $columns)
+#if (${column.listOperationCondition} && ${column.javaType} == "LocalDateTime")
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 

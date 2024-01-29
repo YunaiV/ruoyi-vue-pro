@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.controller.admin.order.vo;
 
+import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
@@ -9,6 +10,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -29,12 +31,17 @@ public class TradeOrderPageReqVO extends PageParam {
     @Mobile
     private String userMobile;
 
-    @Schema(description = "收件人名称", example = "小红")
-    private String receiverName;
+    @Schema(description = "配送方式", example = "1")
+    private Integer deliveryType;
 
-    @Schema(description = "收件人手机", example = "1560")
-    @Mobile
-    private String receiverMobile;
+    @Schema(description = "发货物流公司编号", example = "1")
+    private Long logisticsId;
+
+    @Schema(description = "自提门店编号", example = "[1,2]")
+    private List<Long> pickUpStoreIds;
+
+    @Schema(description = "自提核销码", example = "12345678")
+    private String pickUpVerifyCode;
 
     @Schema(description = "订单类型", example = "1")
     private Integer type;
@@ -49,5 +56,9 @@ public class TradeOrderPageReqVO extends PageParam {
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
+
+    @Schema(description = "订单来源", example = "10")
+    @InEnum(value = TerminalEnum.class, message = "订单来源 {value}")
+    private Integer terminal;
 
 }

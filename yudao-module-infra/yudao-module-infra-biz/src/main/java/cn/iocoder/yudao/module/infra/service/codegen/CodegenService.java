@@ -49,6 +49,14 @@ public interface CodegenService {
     void deleteCodegen(Long tableId);
 
     /**
+     * 获得表定义列表
+     *
+     * @param dataSourceConfigId 数据源配置的编号
+     * @return 表定义列表
+     */
+    List<CodegenTableDO> getCodegenTableList(Long dataSourceConfigId);
+
+    /**
      * 获得表定义分页
      *
      * @param pageReqVO 分页条件
@@ -62,7 +70,7 @@ public interface CodegenService {
      * @param id 表编号
      * @return 表定义
      */
-    CodegenTableDO getCodegenTablePage(Long id);
+    CodegenTableDO getCodegenTable(Long id);
 
     /**
      * 获得指定表的字段定义数组
@@ -82,7 +90,6 @@ public interface CodegenService {
 
     /**
      * 获得数据库自带的表定义列表
-     *
      *
      * @param dataSourceConfigId 数据源的配置编号
      * @param name 表名称

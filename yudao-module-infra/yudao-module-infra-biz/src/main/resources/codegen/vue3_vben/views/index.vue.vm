@@ -1,0 +1,91 @@
+<script lang="ts" setup>
+import ${simpleClassName}Modal from './${simpleClassName}Modal.vue'
+import { columns, searchFormSchema } from './${classNameVar}.data'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useMessage } from '@/hooks/web/useMessage'
+import { useModal } from '@/components/Modal'
+import { useTable } from '@/components/Table'
+import { delete${simpleClassName}, export${simpleClassName}, get${simpleClassName}Page } from '@/api/${table.moduleName}/${table.businessName}'
+
+defineOptions({ name: '${table.className}' })
+
+const { t } = useI18n()
+const { createConfirm, createMessage } = useMessage()
+const [registerModal, { openModal }] = useModal()
+
+const [registerTable, { getForm, reload }] = useTable({
+  title: '${table.classComment}列表',
+  api: get${simpleClassName}Page,
+    columns,
+    formConfig: { labelWidth: 120, schemas: searchFormSchema },
+    useSearchForm: true,
+    showTableSetting: true,
+    actionColumn: {
+      width: 140,
+      title: t('common.action'),
+      dataIndex: 'action',
+      fixed: 'right',
+    },
+})
+
+function handleCreate() {
+  openModal(true, { isUpdate: false })
+}
+
+function handleEdit(record: Recordable) {
+  openModal(true, { record, isUpdate: true })
+}
+
+async function handleExport() {
+  createConfirm({
+    title: t('common.exportTitle'),
+    iconType: 'warning',
+    content: t('common.exportMessage'),
+    async onOk() {
+      await export${simpleClassName}(getForm().getFieldsValue())
+      createMessage.success(t('common.exportSuccessText'))
+    },
+  })
+}
+
+async function handleDelete(record: Recordable) {
+  await delete${simpleClassName}(record.id)
+  createMessage.success(t('common.delSuccessText'))
+  reload()
+}
+</script>
+<template>
+  <div>
+    <BasicTable @register="registerTable">
+      <template #toolbar>
+        <a-button type="primary" v-auth="['${permissionPrefix}:create']" :preIcon="IconEnum.ADD" @click="handleCreate">
+          {{ t('action.create') }}
+        </a-button>
+        <a-button v-auth="['${permissionPrefix}:export']" :preIcon="IconEnum.EXPORT" @click="handleExport">
+          {{ t('action.export') }}
+        </a-button>
+      </template>
+      <template #bodyCell="{ column, record }">
+        <template v-if="column.key === 'action'">
+          <TableAction
+            :actions="[
+              { icon: IconEnum.EDIT, label: t('action.edit'), auth: '${permissionPrefix}:update', onClick: handleEdit.bind(null, record) },
+              {
+                icon: IconEnum.DELETE,
+                danger: true,
+                label: t('action.delete'),
+                auth: '${permissionPrefix}:delete',
+                popConfirm: {
+                  title: t('common.delMessage'),
+                  placement: 'left',
+                  confirm: handleDelete.bind(null, record),
+                },
+              },
+            ]"
+          />
+        </template>
+      </template>
+    </BasicTable>
+    <${simpleClassName}Modal @register="registerModal" @success="reload()" />
+  </div>
+</template>

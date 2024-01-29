@@ -4,7 +4,6 @@ import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.servlet.ServletUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -221,7 +220,7 @@ public class OperateLogAspect {
         // 补全请求信息
         operateLogObj.setRequestMethod(request.getMethod());
         operateLogObj.setRequestUrl(request.getRequestURI());
-        operateLogObj.setUserIp(ServletUtil.getClientIP(request));
+        operateLogObj.setUserIp(ServletUtils.getClientIP(request));
         operateLogObj.setUserAgent(ServletUtils.getUserAgent(request));
     }
 

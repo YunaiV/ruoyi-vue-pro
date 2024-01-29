@@ -1,17 +1,16 @@
 package cn.iocoder.yudao.module.product.service.sku;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSkuSaveReqVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.sku.ProductSkuMapper;
-import cn.iocoder.yudao.module.product.enums.ErrorCodeConstants;
-import cn.iocoder.yudao.module.product.enums.spu.ProductSpuSpecTypeEnum;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyService;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
@@ -45,6 +44,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     @Lazy // 循环依赖，避免报错
     private ProductSpuService productSpuService;
     @Resource
+    @Lazy // 循环依赖，避免报错
     private ProductPropertyService productPropertyService;
     @Resource
     private ProductPropertyValueService productPropertyValueService;
@@ -69,26 +69,37 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     }
 
     @Override
-    public List<ProductSkuDO> getSkuList() {
-        return productSkuMapper.selectList();
-    }
-
-    @Override
     public List<ProductSkuDO> getSkuList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return ListUtil.empty();
+        }
         return productSkuMapper.selectBatchIds(ids);
     }
 
     @Override
-    public void validateSkuList(List<ProductSkuCreateOrUpdateReqVO> skus, Integer specType) {
-        // 非多规格，不需要校验
-        if (ObjectUtil.notEqual(specType, ProductSpuSpecTypeEnum.DISABLE.getType())) {
-            return;
+    public void validateSkuList(List<ProductSkuSaveReqVO> skus, Boolean specType) {
+        // 0、校验skus是否为空
+        if (CollUtil.isEmpty(skus)) {
+            throw exception(SKU_NOT_EXISTS);
+        }
+        // 单规格，赋予单规格默认属性
+        if (ObjectUtil.equal(specType, false)) {
+            ProductSkuSaveReqVO skuVO = skus.get(0);
+            List<ProductSkuSaveReqVO.Property> properties = new ArrayList<>();
+            ProductSkuSaveReqVO.Property property = new ProductSkuSaveReqVO.Property()
+                    .setPropertyId(ProductPropertyDO.ID_DEFAULT).setPropertyName(ProductPropertyDO.NAME_DEFAULT)
+                    .setValueId(ProductPropertyValueDO.ID_DEFAULT).setValueName(ProductPropertyValueDO.NAME_DEFAULT);
+            properties.add(property);
+            skuVO.setProperties(properties);
+            return; // 单规格不需要后续的校验
         }
 
         // 1、校验属性项存在
         Set<Long> propertyIds = skus.stream().filter(p -> p.getProperties() != null)
-                .flatMap(p -> p.getProperties().stream()) // 遍历多个 Property 属性
-                .map(ProductSkuBaseVO.Property::getPropertyId) // 将每个 Property 转换成对应的 propertyId，最后形成集合
+                // 遍历多个 Property 属性
+                .flatMap(p -> p.getProperties().stream())
+                // 将每个 Property 转换成对应的 propertyId，最后形成集合
+                .map(ProductSkuSaveReqVO.Property::getPropertyId)
                 .collect(Collectors.toSet());
         List<ProductPropertyDO> propertyList = productPropertyService.getPropertyList(propertyIds);
         if (propertyList.size() != propertyIds.size()) {
@@ -108,22 +119,25 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         int attrValueIdsSize = skus.get(0).getProperties().size();
         for (int i = 1; i < skus.size(); i++) {
             if (attrValueIdsSize != skus.get(i).getProperties().size()) {
-                throw exception(ErrorCodeConstants.SPU_ATTR_NUMBERS_MUST_BE_EQUALS);
+                throw exception(SPU_ATTR_NUMBERS_MUST_BE_EQUALS);
             }
         }
 
         // 4. 最后校验，每个 Sku 之间不是重复的
-        Set<Set<Long>> skuAttrValues = new HashSet<>(); // 每个元素，都是一个 Sku 的 attrValueId 集合。这样，通过最外层的 Set ，判断是否有重复的.
-        for (ProductSkuCreateOrUpdateReqVO sku : skus) {
-            if (!skuAttrValues.add(convertSet(sku.getProperties(), ProductSkuBaseVO.Property::getValueId))) { // 添加失败，说明重复
-                throw exception(ErrorCodeConstants.SPU_SKU_NOT_DUPLICATE);
+        // 每个元素，都是一个 Sku 的 attrValueId 集合。这样，通过最外层的 Set ，判断是否有重复的.
+        Set<Set<Long>> skuAttrValues = new HashSet<>();
+        for (ProductSkuSaveReqVO sku : skus) {
+            // 添加失败，说明重复
+            if (!skuAttrValues.add(convertSet(sku.getProperties(), ProductSkuSaveReqVO.Property::getValueId))) {
+                throw exception(SPU_SKU_NOT_DUPLICATE);
             }
         }
     }
 
     @Override
-    public void createSkuList(Long spuId, String spuName, List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList) {
-        productSkuMapper.insertBatch(ProductSkuConvert.INSTANCE.convertList06(skuCreateReqList, spuId, spuName));
+    public void createSkuList(Long spuId, List<ProductSkuSaveReqVO> skuCreateReqList) {
+        List<ProductSkuDO> skus = BeanUtils.toBean(skuCreateReqList, ProductSkuDO.class, sku -> sku.setSpuId(spuId));
+        productSkuMapper.insertBatch(skus);
     }
 
     @Override
@@ -132,12 +146,10 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     }
 
     @Override
-    public List<ProductSkuDO> getSkuListBySpuIdAndStatus(Long spuId, Integer status) {
-        return productSkuMapper.selectListBySpuIdAndStatus(spuId, status);
-    }
-
-    @Override
-    public List<ProductSkuDO> getSkuListBySpuId(List<Long> spuIds) {
+    public List<ProductSkuDO> getSkuListBySpuId(Collection<Long> spuIds) {
+        if (CollUtil.isEmpty(spuIds)) {
+            return Collections.emptyList();
+        }
         return productSkuMapper.selectListBySpuId(spuIds);
     }
 
@@ -147,13 +159,57 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     }
 
     @Override
-    public List<ProductSkuDO> getSkuListByAlarmStock() {
-        return productSkuMapper.selectListByAlarmStock();
+    public int updateSkuProperty(Long propertyId, String propertyName) {
+        // 获取所有的 sku
+        List<ProductSkuDO> skuDOList = productSkuMapper.selectList();
+        // 处理后需要更新的 sku
+        List<ProductSkuDO> updateSkus = new ArrayList<>();
+        if (CollUtil.isEmpty(skuDOList)) {
+            return 0;
+        }
+        skuDOList.stream().filter(sku -> sku.getProperties() != null)
+                .forEach(sku -> sku.getProperties().forEach(property -> {
+                    if (property.getPropertyId().equals(propertyId)) {
+                        property.setPropertyName(propertyName);
+                        updateSkus.add(sku);
+                    }
+                }));
+        if (CollUtil.isEmpty(updateSkus)) {
+            return 0;
+        }
+
+        productSkuMapper.updateBatch(updateSkus);
+        return updateSkus.size();
+    }
+
+    @Override
+    public int updateSkuPropertyValue(Long propertyValueId, String propertyValueName) {
+        // 获取所有的 sku
+        List<ProductSkuDO> skuDOList = productSkuMapper.selectList();
+        // 处理后需要更新的 sku
+        List<ProductSkuDO> updateSkus = new ArrayList<>();
+        if (CollUtil.isEmpty(skuDOList)) {
+            return 0;
+        }
+        skuDOList.stream()
+                .filter(sku -> sku.getProperties() != null)
+                .forEach(sku -> sku.getProperties().forEach(property -> {
+                    if (property.getValueId().equals(propertyValueId)) {
+                        property.setValueName(propertyValueName);
+                        updateSkus.add(sku);
+                    }
+                }));
+        if (CollUtil.isEmpty(updateSkus)) {
+            return 0;
+        }
+
+        productSkuMapper.updateBatch(updateSkus);
+        return updateSkus.size();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateSkuList(Long spuId, String spuName, List<ProductSkuCreateOrUpdateReqVO> skus) {
+    public void updateSkuList(Long spuId, List<ProductSkuSaveReqVO> skus) {
         // 构建属性与 SKU 的映射关系;
         Map<String, Long> existsSkuMap = convertMap(productSkuMapper.selectListBySpuId(spuId),
                 ProductSkuConvert.INSTANCE::buildPropertyKey, ProductSkuDO::getId);
@@ -161,7 +217,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         // 拆分三个集合，新插入的、需要更新的、需要删除的
         List<ProductSkuDO> insertSkus = new ArrayList<>();
         List<ProductSkuDO> updateSkus = new ArrayList<>();
-        List<ProductSkuDO> allUpdateSkus = ProductSkuConvert.INSTANCE.convertList06(skus, null, spuName);
+        List<ProductSkuDO> allUpdateSkus = BeanUtils.toBean(skus, ProductSkuDO.class, sku -> sku.setSpuId(spuId));
         allUpdateSkus.forEach(sku -> {
             String propertiesKey = ProductSkuConvert.INSTANCE.buildPropertyKey(sku);
             // 1、找得到的，进行更新

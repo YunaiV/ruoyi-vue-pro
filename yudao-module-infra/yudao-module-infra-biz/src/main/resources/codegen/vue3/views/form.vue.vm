@@ -1,0 +1,301 @@
+<template>
+  <Dialog :title="dialogTitle" v-model="dialogVisible">
+    <el-form
+      ref="formRef"
+      :model="formData"
+      :rules="formRules"
+      label-width="100px"
+      v-loading="formLoading"
+    >
+#foreach($column in $columns)
+    #if ($column.createOperation || $column.updateOperation)
+        #set ($dictType = $column.dictType)
+        #set ($javaField = $column.javaField)
+        #set ($javaType = $column.javaType)
+        #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+        #set ($comment = $column.columnComment)
+        #set ($dictMethod = "getDictOptions")## 计算使用哪个 dict 字典方法
+        #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+            #set ($dictMethod = "getIntDictOptions")
+        #elseif ($javaType == "String")
+            #set ($dictMethod = "getStrDictOptions")
+        #elseif ($javaType == "Boolean")
+            #set ($dictMethod = "getBoolDictOptions")
+        #end
+        #if ( $table.templateType == 2 && $column.id == $treeParentColumn.id )
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-tree-select
+          v-model="formData.${javaField}"
+          :data="${classNameVar}Tree"
+          #if ($treeNameColumn.javaField == "name")
+          :props="defaultProps"
+          #else
+          :props="{...defaultProps, label: '$treeNameColumn.javaField'}"
+          #end
+          check-strictly
+          default-expand-all
+          placeholder="请选择${comment}"
+        />
+      </el-form-item>
+        #elseif ($column.htmlType == "input" && !$column.primaryKey)## 忽略主键，不用在表单里
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-input v-model="formData.${javaField}" placeholder="请输入${comment}" />
+      </el-form-item>
+        #elseif($column.htmlType == "imageUpload")## 图片上传
+      <el-form-item label="${comment}" prop="${javaField}">
+        <UploadImg v-model="formData.${javaField}" />
+      </el-form-item>
+        #elseif($column.htmlType == "fileUpload")## 文件上传
+      <el-form-item label="${comment}" prop="${javaField}">
+        <UploadFile v-model="formData.${javaField}" />
+      </el-form-item>
+        #elseif($column.htmlType == "editor")## 文本编辑器
+      <el-form-item label="${comment}" prop="${javaField}">
+        <Editor v-model="formData.${javaField}" height="150px" />
+      </el-form-item>
+        #elseif($column.htmlType == "select")## 下拉框
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-select v-model="formData.${javaField}" placeholder="请选择${comment}">
+                #if ("" != $dictType)## 有数据字典
+          <el-option
+            v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+          />
+                #else##没数据字典
+          <el-option label="请选择字典生成" value="" />
+                #end
+        </el-select>
+      </el-form-item>
+        #elseif($column.htmlType == "checkbox")## 多选框
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-checkbox-group v-model="formData.${javaField}">
+                #if ("" != $dictType)## 有数据字典
+          <el-checkbox
+            v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
+            :key="dict.value"
+            :label="dict.value"
+          >
+            {{ dict.label }}
+          </el-checkbox>
+                #else##没数据字典
+          <el-checkbox>请选择字典生成</el-checkbox>
+                #end
+        </el-checkbox-group>
+      </el-form-item>
+        #elseif($column.htmlType == "radio")## 单选框
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-radio-group v-model="formData.${javaField}">
+                #if ("" != $dictType)## 有数据字典
+          <el-radio
+            v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
+            :key="dict.value"
+            :label="dict.value"
+          >
+            {{ dict.label }}
+          </el-radio>
+                #else##没数据字典
+          <el-radio label="1">请选择字典生成</el-radio>
+                #end
+        </el-radio-group>
+      </el-form-item>
+        #elseif($column.htmlType == "datetime")## 时间框
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-date-picker
+          v-model="formData.${javaField}"
+          type="date"
+          value-format="x"
+          placeholder="选择${comment}"
+        />
+      </el-form-item>
+        #elseif($column.htmlType == "textarea")## 文本框
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-input v-model="formData.${javaField}" type="textarea" placeholder="请输入${comment}" />
+      </el-form-item>
+        #end
+    #end
+#end
+    </el-form>
+## 特殊：主子表专属逻辑
+#if ( $table.templateType == 10 || $table.templateType == 12 )
+    <!-- 子表的表单 -->
+    <el-tabs v-model="subTabsName">
+    #foreach ($subTable in $subTables)
+      #set ($index = $foreach.count - 1)
+      #set ($subClassNameVar = $subClassNameVars.get($index))
+      #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+      #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
+      <el-tab-pane label="${subTable.classComment}" name="$subClassNameVar">
+        <${subSimpleClassName}Form ref="${subClassNameVar}FormRef" :${subJoinColumn_strikeCase}="formData.id" />
+      </el-tab-pane>
+    #end
+    </el-tabs>
+#end
+    <template #footer>
+      <el-button @click="submitForm" type="primary" :disabled="formLoading">确 定</el-button>
+      <el-button @click="dialogVisible = false">取 消</el-button>
+    </template>
+  </Dialog>
+</template>
+<script setup lang="ts">
+import { getIntDictOptions, getStrDictOptions, getBoolDictOptions, DICT_TYPE } from '@/utils/dict'
+import { ${simpleClassName}Api, ${simpleClassName}VO } from '@/api/${table.moduleName}/${table.businessName}'
+## 特殊：树表专属逻辑
+#if ( $table.templateType == 2 )
+import { defaultProps, handleTree } from '@/utils/tree'
+#end
+## 特殊：主子表专属逻辑
+#if ( $table.templateType == 10 || $table.templateType == 12 )
+#foreach ($subSimpleClassName in $subSimpleClassNames)
+import ${subSimpleClassName}Form from './components/${subSimpleClassName}Form.vue'
+#end
+#end
+
+/** ${table.classComment} 表单 */
+defineOptions({ name: '${simpleClassName}Form' })
+
+const { t } = useI18n() // 国际化
+const message = useMessage() // 消息弹窗
+
+const dialogVisible = ref(false) // 弹窗的是否展示
+const dialogTitle = ref('') // 弹窗的标题
+const formLoading = ref(false) // 表单的加载中：1）修改时的数据加载；2）提交的按钮禁用
+const formType = ref('') // 表单的类型：create - 新增；update - 修改
+const formData = ref({
+#foreach ($column in $columns)
+    #if ($column.createOperation || $column.updateOperation)
+      #if ($column.htmlType == "checkbox")
+  $column.javaField: [],
+      #else
+  $column.javaField: undefined,
+      #end
+    #end
+#end
+})
+const formRules = reactive({
+#foreach ($column in $columns)
+    #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
+        #set($comment=$column.columnComment)
+  $column.javaField: [{ required: true, message: '${comment}不能为空', trigger: #if($column.htmlType == 'select')'change'#else'blur'#end }],
+    #end
+#end
+})
+const formRef = ref() // 表单 Ref
+## 特殊：树表专属逻辑
+#if ( $table.templateType == 2 )
+const ${classNameVar}Tree = ref() // 树形结构
+#end
+## 特殊：主子表专属逻辑
+#if ( $table.templateType == 10 || $table.templateType == 12 )
+#if ( $subTables && $subTables.size() > 0 )
+
+/** 子表的表单 */
+const subTabsName = ref('$subClassNameVars.get(0)')
+#foreach ($subClassNameVar in $subClassNameVars)
+const ${subClassNameVar}FormRef = ref()
+#end
+#end
+#end
+
+/** 打开弹窗 */
+const open = async (type: string, id?: number) => {
+  dialogVisible.value = true
+  dialogTitle.value = t('action.' + type)
+  formType.value = type
+  resetForm()
+  // 修改时，设置数据
+  if (id) {
+    formLoading.value = true
+    try {
+      formData.value = await ${simpleClassName}Api.get${simpleClassName}(id)
+    } finally {
+      formLoading.value = false
+    }
+  }
+## 特殊：树表专属逻辑
+#if ( $table.templateType == 2 )
+  await get${simpleClassName}Tree()
+#end
+}
+defineExpose({ open }) // 提供 open 方法，用于打开弹窗
+
+/** 提交表单 */
+const emit = defineEmits(['success']) // 定义 success 事件，用于操作成功后的回调
+const submitForm = async () => {
+  // 校验表单
+  await formRef.value.validate()
+## 特殊：主子表专属逻辑
+#if ( $table.templateType == 10 || $table.templateType == 12 )
+#if ( $subTables && $subTables.size() > 0 )
+  // 校验子表单
+  #foreach ($subTable in $subTables)
+  #set ($index = $foreach.count - 1)
+  #set ($subClassNameVar = $subClassNameVars.get($index))
+  try {
+    await ${subClassNameVar}FormRef.value.validate()
+  } catch (e) {
+    subTabsName.value = '${subClassNameVar}'
+    return
+  }
+  #end
+#end
+#end
+  // 提交请求
+  formLoading.value = true
+  try {
+    const data = formData.value as unknown as ${simpleClassName}Api.${simpleClassName}VO
+## 特殊：主子表专属逻辑
+#if ( $table.templateType == 10 || $table.templateType == 12 )
+#if ( $subTables && $subTables.size() > 0 )
+    // 拼接子表的数据
+  #foreach ($subTable in $subTables)
+  #set ($index = $foreach.count - 1)
+  #set ($subClassNameVar = $subClassNameVars.get($index))
+    data.${subClassNameVar}#if ( $subTable.subJoinMany)s#end = ${subClassNameVar}FormRef.value.getData()
+  #end
+#end
+#end
+    if (formType.value === 'create') {
+      await ${simpleClassName}Api.create${simpleClassName}(data)
+      message.success(t('common.createSuccess'))
+    } else {
+      await ${simpleClassName}Api.update${simpleClassName}(data)
+      message.success(t('common.updateSuccess'))
+    }
+    dialogVisible.value = false
+    // 发送操作成功的事件
+    emit('success')
+  } finally {
+    formLoading.value = false
+  }
+}
+
+/** 重置表单 */
+const resetForm = () => {
+  formData.value = {
+#foreach ($column in $columns)
+  #if ($column.createOperation || $column.updateOperation)
+      #if ($column.htmlType == "checkbox")
+    $column.javaField: [],
+      #else
+    $column.javaField: undefined,
+      #end
+  #end
+#end
+  }
+  formRef.value?.resetFields()
+}
+## 特殊：树表专属逻辑
+#if ( $table.templateType == 2 )
+
+/** 获得${table.classComment}树 */
+const get${simpleClassName}Tree = async () => {
+  ${classNameVar}Tree.value = []
+  const data = await ${simpleClassName}Api.get${simpleClassName}List()
+  const root: Tree = { id: 0, name: '顶级${table.classComment}', children: [] }
+  root.children = handleTree(data, 'id', '${treeParentColumn.javaField}')
+  ${classNameVar}Tree.value.push(root)
+}
+#end
+</script>

@@ -23,6 +23,14 @@ public interface AdminUserApi {
     AdminUserRespDTO getUser(Long id);
 
     /**
+     * 通过用户 ID 查询用户下属
+     *
+     * @param userId 用户编号
+     * @return 用户下属用户列表
+     */
+    List<AdminUserRespDTO> getUserListBySubordinate(Long userId);
+
+    /**
      * 通过用户 ID 查询用户们
      *
      * @param ids 用户 ID 们
@@ -44,7 +52,7 @@ public interface AdminUserApi {
      * @param postIds 岗位数组
      * @return 用户数组
      */
-    List<AdminUserRespDTO> getUsersByPostIds(Collection<Long> postIds);
+    List<AdminUserRespDTO> getUserListByPostIds(Collection<Long> postIds);
 
     /**
      * 获得用户 Map

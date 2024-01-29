@@ -2,6 +2,7 @@
 POST {{baseUrl}}/system/auth/login
 Content-Type: application/json
 tenant-id: {{adminTenentId}}
+tag: Yunai.local
 
 {
   "username": "admin",

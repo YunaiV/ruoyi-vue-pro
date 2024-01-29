@@ -2,8 +2,3 @@
 GET {{baseUrl}}/infra/redis/get-monitor-info
 Authorization: Bearer {{token}}
 tenant-id: {{adminTenentId}}
-
-### 请求 /infra/redis/get-key-list 接口 => 成功
-GET {{baseUrl}}/infra/redis/get-key-list
-Authorization: Bearer {{token}}
-tenant-id: {{adminTenentId}}

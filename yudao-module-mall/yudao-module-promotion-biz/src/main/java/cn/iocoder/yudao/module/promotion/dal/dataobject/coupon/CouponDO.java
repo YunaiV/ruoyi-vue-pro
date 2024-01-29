@@ -36,7 +36,7 @@ public class CouponDO extends BaseDO {
      *
      * 关联 {@link CouponTemplateDO#getId()}
      */
-    private Integer templateId;
+    private Long templateId;
     /**
      * 优惠劵名
      *
@@ -89,12 +89,12 @@ public class CouponDO extends BaseDO {
      */
     private Integer productScope;
     /**
-     * 商品 SPU 编号的数组
+     * 商品范围编号的数组
      *
-     * 冗余 {@link CouponTemplateDO#getProductSpuIds()}
+     * 冗余 {@link CouponTemplateDO#getProductScopeValues()}
      */
     @TableField(typeHandler = LongListTypeHandler.class)
-    private List<Long> productSpuIds;
+    private List<Long> productScopeValues;
     // ========== 使用规则 END ==========
 
     // ========== 使用效果 BEGIN ==========

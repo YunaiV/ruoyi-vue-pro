@@ -1,11 +1,11 @@
 -- 菜单 SQL
 INSERT INTO system_menu(
     name, permission, type, sort, parent_id,
-    path, icon, component, status
+    path, icon, component, status, component_name
 )
 VALUES (
     '${table.classComment}管理', '', 2, 0, ${table.parentMenuId},
-    '${simpleClassName_strikeCase}', '', '${table.moduleName}/${classNameVar}/index', 0
+    '${simpleClassName_strikeCase}', '', '${table.moduleName}/${table.businessName}/index', 0, '${table.className}'
 );
 
 -- 按钮父菜单ID

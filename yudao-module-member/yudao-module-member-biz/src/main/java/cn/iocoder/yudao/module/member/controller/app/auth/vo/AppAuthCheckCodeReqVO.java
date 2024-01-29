@@ -27,7 +27,7 @@ public class AppAuthCheckCodeReqVO {
     @Mobile
     private String mobile;
 
-    @Schema(description = "手机验证码", required = true, example = "1024")
+    @Schema(description = "手机验证码", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotBlank(message = "手机验证码不能为空")
     @Length(min = 4, max = 6, message = "手机验证码长度为 4-6 位")
     @Pattern(regexp = "^[0-9]+$", message = "手机验证码必须都是数字")

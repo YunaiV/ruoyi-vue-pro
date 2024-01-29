@@ -1,11 +1,9 @@
 package cn.iocoder.yudao.module.product.service.property;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValuePageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueUpdateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueSaveReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
-import cn.iocoder.yudao.module.product.service.property.bo.ProductPropertyValueDetailRespBO;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,14 +22,14 @@ public interface ProductPropertyValueService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createPropertyValue(ProductPropertyValueCreateReqVO createReqVO);
+    Long createPropertyValue(ProductPropertyValueSaveReqVO createReqVO);
 
     /**
      * 更新属性值
      *
      * @param updateReqVO 更新信息
      */
-    void updatePropertyValue(ProductPropertyValueUpdateReqVO updateReqVO);
+    void updatePropertyValue(ProductPropertyValueSaveReqVO updateReqVO);
 
     /**
      * 删除属性值
@@ -55,14 +53,6 @@ public interface ProductPropertyValueService {
      * @return 属性值列表
      */
     List<ProductPropertyValueDO> getPropertyValueListByPropertyId(Collection<Long> propertyIds);
-
-    /**
-     * 根据编号数组，获得属性值列表
-     *
-     * @param ids 编号数组
-     * @return 属性值明细列表
-     */
-    List<ProductPropertyValueDetailRespBO> getPropertyValueDetailList(Collection<Long> ids);
 
     /**
      * 根据属性项编号，活的属性值数量

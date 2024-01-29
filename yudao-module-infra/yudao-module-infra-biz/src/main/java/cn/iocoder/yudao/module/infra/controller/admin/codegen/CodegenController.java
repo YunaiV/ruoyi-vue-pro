@@ -4,6 +4,7 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ZipUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenCreateListReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenDetailRespVO;
@@ -60,12 +61,21 @@ public class CodegenController {
         return success(codegenService.getDatabaseTableList(dataSourceConfigId, name, comment));
     }
 
+    @GetMapping("/table/list")
+    @Operation(summary = "获得表定义列表")
+    @Parameter(name = "dataSourceConfigId", description = "数据源配置的编号", required = true, example = "1")
+    @PreAuthorize("@ss.hasPermission('infra:codegen:query')")
+    public CommonResult<List<CodegenTableRespVO>> getCodegenTableList(@RequestParam(value = "dataSourceConfigId") Long dataSourceConfigId) {
+        List<CodegenTableDO> list = codegenService.getCodegenTableList(dataSourceConfigId);
+        return success(BeanUtils.toBean(list, CodegenTableRespVO.class));
+    }
+
     @GetMapping("/table/page")
     @Operation(summary = "获得表定义分页")
     @PreAuthorize("@ss.hasPermission('infra:codegen:query')")
-    public CommonResult<PageResult<CodegenTableRespVO>> getCodeGenTablePage(@Valid CodegenTablePageReqVO pageReqVO) {
+    public CommonResult<PageResult<CodegenTableRespVO>> getCodegenTablePage(@Valid CodegenTablePageReqVO pageReqVO) {
         PageResult<CodegenTableDO> pageResult = codegenService.getCodegenTablePage(pageReqVO);
-        return success(CodegenConvert.INSTANCE.convertPage(pageResult));
+        return success(BeanUtils.toBean(pageResult, CodegenTableRespVO.class));
     }
 
     @GetMapping("/detail")
@@ -73,7 +83,7 @@ public class CodegenController {
     @Parameter(name = "tableId", description = "表编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('infra:codegen:query')")
     public CommonResult<CodegenDetailRespVO> getCodegenDetail(@RequestParam("tableId") Long tableId) {
-        CodegenTableDO table = codegenService.getCodegenTablePage(tableId);
+        CodegenTableDO table = codegenService.getCodegenTable(tableId);
         List<CodegenColumnDO> columns = codegenService.getCodegenColumnListByTableId(tableId);
         // 拼装返回
         return success(CodegenConvert.INSTANCE.convert(table, columns));

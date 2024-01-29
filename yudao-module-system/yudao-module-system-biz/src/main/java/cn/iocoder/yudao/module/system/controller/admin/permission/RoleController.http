@@ -40,6 +40,3 @@ tenant-id: {{adminTenentId}}
 GET {{baseUrl}}/system/role/page?pageNo=1&pageSize=10
 Authorization: Bearer {{token}}
 tenant-id: {{adminTenentId}}
-
-###
-

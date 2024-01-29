@@ -117,6 +117,11 @@ public class MpTagServiceImpl implements MpTagService {
     }
 
     @Override
+    public MpTagDO get(Long id) {
+        return mpTagMapper.selectById(id);
+    }
+
+    @Override
     public List<MpTagDO> getTagList() {
         return mpTagMapper.selectList();
     }

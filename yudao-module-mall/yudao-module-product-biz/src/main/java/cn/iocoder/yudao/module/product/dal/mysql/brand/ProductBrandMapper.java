@@ -31,4 +31,7 @@ public interface ProductBrandMapper extends BaseMapperX<ProductBrandDO> {
         return selectOne(ProductBrandDO::getName, name);
     }
 
+    default List<ProductBrandDO> selectListByStatus(Integer status) {
+        return selectList(ProductBrandDO::getStatus, status);
+    }
 }

@@ -1,0 +1,42 @@
+### 请求 /trade/cart/add 接口 => 成功
+POST {{appApi}}/trade/cart/add
+tenant-id: {{appTenentId}}
+Authorization: Bearer {{appToken}}
+Content-Type: application/json
+
+{
+  "skuId": 1,
+  "count": 10,
+  "addStatus": true
+}
+
+### 请求 /trade/cart/update 接口 => 成功
+PUT {{appApi}}/trade/cart/update
+tenant-id: {{appTenentId}}
+Authorization: Bearer {{appToken}}
+Content-Type: application/json
+
+{
+  "id": 35,
+  "count": 5
+}
+
+### 请求 /trade/cart/delete 接口 => 成功
+DELETE {{appApi}}/trade/cart/delete?ids=1
+tenant-id: {{appTenentId}}
+Authorization: Bearer {{appToken}}
+
+### 请求 /trade/cart/get-count 接口 => 成功
+GET {{appApi}}/trade/cart/get-count
+tenant-id: {{appTenentId}}
+Authorization: Bearer {{appToken}}
+
+### 请求 /trade/cart/get-count-map 接口 => 成功
+GET {{appApi}}/trade/cart/get-count-map
+tenant-id: {{appTenentId}}
+Authorization: Bearer {{appToken}}
+
+### 请求 /trade/cart/list 接口 => 成功
+GET {{appApi}}/trade/cart/list
+tenant-id: {{appTenentId}}
+Authorization: Bearer {{appToken}}

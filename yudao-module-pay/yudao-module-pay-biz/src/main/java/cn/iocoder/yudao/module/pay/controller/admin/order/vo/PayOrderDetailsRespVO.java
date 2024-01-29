@@ -13,35 +13,33 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class PayOrderDetailsRespVO extends PayOrderBaseVO {
 
-    @Schema(description = "支付订单编号")
+    @Schema(description = "支付订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "商户名称")
-    private String merchantName;
-
-    @Schema(description = "应用名称")
+    @Schema(description = "应用名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
     private String appName;
 
-    @Schema(description = "渠道编号名称")
-    private String channelCodeName;
-
-    @Schema(description = "创建时间")
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
+
+    @Schema(description = "更新时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    private LocalDateTime updateTime;
 
     /**
      * 支付订单扩展
      */
-    private PayOrderExtension payOrderExtension;
+    private PayOrderExtension extension;
 
     @Data
     @Schema(description = "支付订单扩展")
     public static class PayOrderExtension {
 
-        @Schema(description = "支付订单号")
+        @Schema(description = "支付订单号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
         private String no;
 
         @Schema(description = "支付异步通知的内容")
         private String channelNotifyData;
+
     }
 
 }

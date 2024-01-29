@@ -11,11 +11,11 @@ import java.util.List;
 @ToString(callSuper = true)
 public class BpmFormCreateReqVO extends BpmFormBaseVO {
 
-    @Schema(description = "表单的配置-JSON 字符串", required = true)
+    @Schema(description = "表单的配置-JSON 字符串", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "表单的配置不能为空")
     private String conf;
 
-    @Schema(description = "表单项的数组-JSON 字符串的数组", required = true)
+    @Schema(description = "表单项的数组-JSON 字符串的数组", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "表单项的数组不能为空")
     private List<String> fields;
 

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity;
 
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.product.SeckillProductRespVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,28 +15,43 @@ import java.util.List;
 @ToString(callSuper = true)
 public class SeckillActivityRespVO extends SeckillActivityBaseVO {
 
-    @Schema(description = "秒杀活动id", required = true, example = "1")
+    @Schema(description = "秒杀活动 id", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
-    @Schema(description = "付款订单数", required = true, example = "1")
+    @Schema(description = "秒杀商品", requiredMode = Schema.RequiredMode.REQUIRED)
+    private List<SeckillProductRespVO> products;
+
+    @Schema(description = "活动状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
+    private Integer status;
+
+    @Schema(description = "订单实付金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "22354")
+    private Integer totalPrice;
+
+    @Schema(description = "秒杀库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
+    private Integer stock;
+
+    @Schema(description = "秒杀总库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "20")
+    private Integer totalStock;
+
+    @Schema(description = "新增订单数", requiredMode = Schema.RequiredMode.REQUIRED, example = "20")
     private Integer orderCount;
 
-    @Schema(description = "付款人数", required = true, example = "1")
+    @Schema(description = "付款人数", requiredMode = Schema.RequiredMode.REQUIRED, example = "20")
     private Integer userCount;
 
-    @Schema(description = "创建时间", required = true)
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
-    @Schema(description = "秒杀时段id", required = true, example = "1,3")
-    private List<Long> timeIds;
+    // ========== 商品字段 ==========
 
-    @Schema(description = "排序", required = true, example = "1")
-    private Integer sort;
-
-    @Schema(description = "备注", example = "限时秒杀活动")
-    private String remark;
-
-    @Schema(description = "活动状态", example = "进行中")
-    private Integer status;
+    @Schema(description = "商品名称", requiredMode = Schema.RequiredMode.REQUIRED, // 从 SPU 的 name 读取
+            example = "618大促")
+    private String spuName;
+    @Schema(description = "商品主图", requiredMode = Schema.RequiredMode.REQUIRED, // 从 SPU 的 picUrl 读取
+            example = "https://www.iocoder.cn/xx.png")
+    private String picUrl;
+    @Schema(description = "商品市场价，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, // 从 SPU 的 marketPrice 读取
+            example = "50")
+    private Integer marketPrice;
 
 }

@@ -1,17 +1,20 @@
 package cn.iocoder.yudao.module.member.controller.app.auth;
 
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.security.config.SecurityProperties;
-import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
+import cn.iocoder.yudao.module.member.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.member.service.auth.MemberAuthService;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import cn.iocoder.yudao.module.system.api.social.SocialClientApi;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxJsapiSignatureRespDTO;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +38,9 @@ public class AppAuthController {
     private MemberAuthService authService;
 
     @Resource
+    private SocialClientApi socialClientApi;
+
+    @Resource
     private SecurityProperties securityProperties;
 
     @PostMapping("/login")
@@ -47,7 +53,8 @@ public class AppAuthController {
     @PermitAll
     @Operation(summary = "登出系统")
     public CommonResult<Boolean> logout(HttpServletRequest request) {
-        String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getTokenHeader());
+        String token = SecurityFrameworkUtils.obtainAuthorization(request,
+                securityProperties.getTokenHeader(), securityProperties.getTokenParameter());
         if (StrUtil.isNotBlank(token)) {
             authService.logout(token);
         }
@@ -77,19 +84,10 @@ public class AppAuthController {
         return success(true);
     }
 
-    @PostMapping("/reset-password")
-    @Operation(summary = "重置密码", description = "用户忘记密码时使用")
-    @PreAuthenticated
-    public CommonResult<Boolean> resetPassword(@RequestBody @Valid AppAuthResetPasswordReqVO reqVO) {
-        authService.resetPassword(reqVO);
-        return success(true);
-    }
-
-    @PostMapping("/update-password")
-    @Operation(summary = "修改用户密码", description = "用户修改密码时使用")
-    @PreAuthenticated
-    public CommonResult<Boolean> updatePassword(@RequestBody @Valid AppAuthUpdatePasswordReqVO reqVO) {
-        authService.updatePassword(getLoginUserId(), reqVO);
+    @PostMapping("/validate-sms-code")
+    @Operation(summary = "校验手机验证码")
+    public CommonResult<Boolean> validateSmsCode(@RequestBody @Valid AppAuthSmsValidateReqVO reqVO) {
+        authService.validateSmsCode(getLoginUserId(), reqVO);
         return success(true);
     }
 
@@ -116,6 +114,15 @@ public class AppAuthController {
     @Operation(summary = "微信小程序的一键登录")
     public CommonResult<AppAuthLoginRespVO> weixinMiniAppLogin(@RequestBody @Valid AppAuthWeixinMiniAppLoginReqVO reqVO) {
         return success(authService.weixinMiniAppLogin(reqVO));
+    }
+
+    @PostMapping("/create-weixin-jsapi-signature")
+    @Operation(summary = "创建微信 JS SDK 初始化所需的签名",
+            description = "参考 https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html 文档")
+    public CommonResult<SocialWxJsapiSignatureRespDTO> createWeixinMpJsapiSignature(@RequestParam("url") String url) {
+        SocialWxJsapiSignatureRespDTO signature = socialClientApi.createWxMpJsapiSignature(
+                UserTypeEnum.MEMBER.getValue(), url);
+        return success(AuthConvert.INSTANCE.convert(signature));
     }
 
 }

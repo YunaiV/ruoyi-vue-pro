@@ -1,29 +1,51 @@
-### /trade-order/confirm-create-order-info 基于商品，确认创建订单
-GET {{appApi}}/trade/order/get-create-info?items[0].skuId=1&items[0].count=1
-Authorization: Bearer {{user-access-token}}
+### /trade-order/settlement 获得订单结算信息（基于商品）
+GET {{appApi}}/trade/order/settlement?type=0&items[0].skuId=1&items[0].count=2&items[1].skuId=2&items[1].count=3&couponId=1
+Authorization: Bearer {{appToken}}
 tenant-id: {{appTenentId}}
 
-### /trade-order/confirm-create-order-info-from-cart 基于购物车，确认创建订单
-GET {{shop-api-base-url}}/trade-order/confirm-create-order-info-from-cart
-Content-Type: application/x-www-form-urlencoded
-Authorization: Bearer {{user-access-token}}
+### /trade-order/settlement 获得订单结算信息（基于购物车）
+GET {{appApi}}/trade/order/settlement?type=0&items[0].cartId=50&couponId=1
+Authorization: Bearer {{appToken}}
+tenant-id: {{appTenentId}}
 
-### /trade-order/create 基于商品，创建订单
+### /trade-order/create 创建订单（基于商品）【快递】
 POST {{appApi}}/trade/order/create
 Content-Type: application/json
 Authorization: Bearer {{appToken}}
 tenant-id: {{appTenentId}}
 
 {
+  "pointStatus": true,
+  "deliveryType": 1,
   "addressId": 21,
-  "remark": "我是备注",
-  "fromCart": false,
   "items": [
     {
-      "skuId": 29,
-      "count": 1
+      "skuId": 1,
+      "count": 2
     }
-  ]
+  ],
+  "remark": "我是备注"
+}
+
+### /trade-order/create 创建订单（基于商品）【自提】
+POST {{appApi}}/trade/order/create
+Content-Type: application/json
+Authorization: Bearer {{appToken}}
+tenant-id: {{appTenentId}}
+
+{
+  "pointStatus": true,
+  "deliveryType": 2,
+  "pickUpStoreId": 1,
+  "items": [
+    {
+      "skuId": 1,
+      "count": 2
+    }
+  ],
+  "remark": "我是备注",
+  "receiverName": "土豆",
+  "receiverMobile": "15601691300"
 }
 
 ### 获得订单交易的分页
@@ -33,5 +55,10 @@ tenant-id: {{appTenentId}}
 
 ### 获得订单交易的详细
 GET {{appApi}}/trade/order/get-detail?id=21
+Authorization: Bearer {{appToken}}
+tenant-id: {{appTenentId}}
+
+### 获得交易订单的物流轨迹
+GET {{appApi}}/trade/order/get-express-track-list?id=70
 Authorization: Bearer {{appToken}}
 tenant-id: {{appTenentId}}

@@ -1,16 +1,19 @@
 package cn.iocoder.yudao.module.system.controller.admin.sensitiveword;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.*;
-import cn.iocoder.yudao.module.system.convert.sensitiveword.SensitiveWordConvert;
+import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.SensitiveWordPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.SensitiveWordRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.SensitiveWordSaveVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sensitiveword.SensitiveWordDO;
 import cn.iocoder.yudao.module.system.service.sensitiveword.SensitiveWordService;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -37,14 +40,14 @@ public class SensitiveWordController {
     @PostMapping("/create")
     @Operation(summary = "创建敏感词")
     @PreAuthorize("@ss.hasPermission('system:sensitive-word:create')")
-    public CommonResult<Long> createSensitiveWord(@Valid @RequestBody SensitiveWordCreateReqVO createReqVO) {
+    public CommonResult<Long> createSensitiveWord(@Valid @RequestBody SensitiveWordSaveVO createReqVO) {
         return success(sensitiveWordService.createSensitiveWord(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新敏感词")
     @PreAuthorize("@ss.hasPermission('system:sensitive-word:update')")
-    public CommonResult<Boolean> updateSensitiveWord(@Valid @RequestBody SensitiveWordUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateSensitiveWord(@Valid @RequestBody SensitiveWordSaveVO updateReqVO) {
         sensitiveWordService.updateSensitiveWord(updateReqVO);
         return success(true);
     }
@@ -64,7 +67,7 @@ public class SensitiveWordController {
     @PreAuthorize("@ss.hasPermission('system:sensitive-word:query')")
     public CommonResult<SensitiveWordRespVO> getSensitiveWord(@RequestParam("id") Long id) {
         SensitiveWordDO sensitiveWord = sensitiveWordService.getSensitiveWord(id);
-        return success(SensitiveWordConvert.INSTANCE.convert(sensitiveWord));
+        return success(BeanUtils.toBean(sensitiveWord, SensitiveWordRespVO.class));
     }
 
     @GetMapping("/page")
@@ -72,19 +75,20 @@ public class SensitiveWordController {
     @PreAuthorize("@ss.hasPermission('system:sensitive-word:query')")
     public CommonResult<PageResult<SensitiveWordRespVO>> getSensitiveWordPage(@Valid SensitiveWordPageReqVO pageVO) {
         PageResult<SensitiveWordDO> pageResult = sensitiveWordService.getSensitiveWordPage(pageVO);
-        return success(SensitiveWordConvert.INSTANCE.convertPage(pageResult));
+        return success(BeanUtils.toBean(pageResult, SensitiveWordRespVO.class));
     }
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出敏感词 Excel")
     @PreAuthorize("@ss.hasPermission('system:sensitive-word:export')")
     @OperateLog(type = EXPORT)
-    public void exportSensitiveWordExcel(@Valid SensitiveWordExportReqVO exportReqVO,
+    public void exportSensitiveWordExcel(@Valid SensitiveWordPageReqVO exportReqVO,
               HttpServletResponse response) throws IOException {
-        List<SensitiveWordDO> list = sensitiveWordService.getSensitiveWordList(exportReqVO);
+        exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        List<SensitiveWordDO> list = sensitiveWordService.getSensitiveWordPage(exportReqVO).getList();
         // 导出 Excel
-        List<SensitiveWordExcelVO> datas = SensitiveWordConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "敏感词.xls", "数据", SensitiveWordExcelVO.class, datas);
+        ExcelUtils.write(response, "敏感词.xls", "数据", SensitiveWordRespVO.class,
+                BeanUtils.toBean(list, SensitiveWordRespVO.class));
     }
 
     @GetMapping("/get-tags")

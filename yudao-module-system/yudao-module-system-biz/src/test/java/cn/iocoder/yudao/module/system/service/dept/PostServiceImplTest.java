@@ -4,10 +4,8 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dept.PostMapper;
 import org.junit.jupiter.api.Test;
@@ -44,8 +42,9 @@ public class PostServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreatePost_success() {
         // 准备参数
-        PostCreateReqVO reqVO = randomPojo(PostCreateReqVO.class,
-                o -> o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()));
+        PostSaveReqVO reqVO = randomPojo(PostSaveReqVO.class,
+                o -> o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()))
+                .setId(null); // 防止 id 被设置
         // 调用
         Long postId = postService.createPost(reqVO);
 
@@ -53,7 +52,7 @@ public class PostServiceImplTest extends BaseDbUnitTest {
         assertNotNull(postId);
         // 校验记录的属性是否正确
         PostDO post = postMapper.selectById(postId);
-        assertPojoEquals(reqVO, post);
+        assertPojoEquals(reqVO, post, "id");
     }
 
     @Test
@@ -62,7 +61,7 @@ public class PostServiceImplTest extends BaseDbUnitTest {
         PostDO postDO = randomPostDO();
         postMapper.insert(postDO);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        PostUpdateReqVO reqVO = randomPojo(PostUpdateReqVO.class, o -> {
+        PostSaveReqVO reqVO = randomPojo(PostSaveReqVO.class, o -> {
             // 设置更新的 ID
             o.setId(postDO.getId());
             o.setStatus(randomEle(CommonStatusEnum.values()).getStatus());
@@ -103,7 +102,7 @@ public class PostServiceImplTest extends BaseDbUnitTest {
         PostDO postDO = randomPostDO();
         postMapper.insert(postDO);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        PostCreateReqVO reqVO = randomPojo(PostCreateReqVO.class,
+        PostSaveReqVO reqVO = randomPojo(PostSaveReqVO.class,
             // 模拟 name 重复
             o -> o.setName(postDO.getName()));
         assertServiceException(() -> postService.createPost(reqVO), POST_NAME_DUPLICATE);
@@ -118,7 +117,7 @@ public class PostServiceImplTest extends BaseDbUnitTest {
         PostDO codePostDO = randomPostDO();
         postMapper.insert(codePostDO);
         // 准备参数
-        PostUpdateReqVO reqVO = randomPojo(PostUpdateReqVO.class, o -> {
+        PostSaveReqVO reqVO = randomPojo(PostSaveReqVO.class, o -> {
             // 设置更新的 ID
             o.setId(postDO.getId());
             // 模拟 code 重复
@@ -155,31 +154,25 @@ public class PostServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testGetPostList_export() {
+    public void testGetPostList() {
         // mock 数据
-        PostDO postDO = randomPojo(PostDO.class, o -> {
-            o.setName("码仔");
-            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        });
-        postMapper.insert(postDO);
-        // 测试 name 不匹配
-        postMapper.insert(cloneIgnoreId(postDO, o -> o.setName("程序员")));
-        // 测试 status 不匹配
-        postMapper.insert(cloneIgnoreId(postDO, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+        PostDO postDO01 = randomPojo(PostDO.class);
+        postMapper.insert(postDO01);
+        // 测试 id 不匹配
+        PostDO postDO02 = randomPojo(PostDO.class);
+        postMapper.insert(postDO02);
         // 准备参数
-        PostExportReqVO reqVO = new PostExportReqVO();
-        reqVO.setName("码");
-        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        List<Long> ids = singletonList(postDO01.getId());
 
         // 调用
-        List<PostDO> list = postService.getPostList(reqVO);
+        List<PostDO> list = postService.getPostList(ids);
         // 断言
         assertEquals(1, list.size());
-        assertPojoEquals(postDO, list.get(0));
+        assertPojoEquals(postDO01, list.get(0));
     }
 
     @Test
-    public void testGetPostList() {
+    public void testGetPostList_idsAndStatus() {
         // mock 数据
         PostDO postDO01 = randomPojo(PostDO.class, o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus()));
         postMapper.insert(postDO01);
@@ -251,4 +244,5 @@ public class PostServiceImplTest extends BaseDbUnitTest {
         };
         return randomPojo(PostDO.class, ArrayUtils.append(consumer, consumers));
     }
+
 }

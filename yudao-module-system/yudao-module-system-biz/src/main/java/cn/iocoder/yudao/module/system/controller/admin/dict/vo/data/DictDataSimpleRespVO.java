@@ -7,17 +7,18 @@ import lombok.Data;
 @Data
 public class DictDataSimpleRespVO {
 
-    @Schema(description = "字典类型", required = true, example = "gender")
+    @Schema(description = "字典类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "gender")
     private String dictType;
 
-    @Schema(description = "字典键值", required = true, example = "1")
+    @Schema(description = "字典键值", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private String value;
 
-    @Schema(description = "字典标签", required = true, example = "男")
+    @Schema(description = "字典标签", requiredMode = Schema.RequiredMode.REQUIRED, example = "男")
     private String label;
 
-    @Schema(description = "颜色类型,default、primary、success、info、warning、danger", example = "default")
+    @Schema(description = "颜色类型，default、primary、success、info、warning、danger", example = "default")
     private String colorType;
+
     @Schema(description = "css 样式", example = "btn-visible")
     private String cssClass;
 

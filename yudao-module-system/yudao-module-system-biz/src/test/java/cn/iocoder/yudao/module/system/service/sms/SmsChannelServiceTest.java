@@ -2,26 +2,27 @@ package cn.iocoder.yudao.module.system.service.sms;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.system.framework.sms.core.client.SmsClient;
+import cn.iocoder.yudao.module.system.framework.sms.core.client.SmsClientFactory;
+import cn.iocoder.yudao.module.system.framework.sms.core.property.SmsChannelProperties;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsChannelMapper;
-import cn.iocoder.yudao.module.system.mq.producer.sms.SmsProducer;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
-import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SMS_CHANNEL_HAS_CHILDREN;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SMS_CHANNEL_NOT_EXISTS;
@@ -42,30 +43,12 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
     private SmsClientFactory smsClientFactory;
     @MockBean
     private SmsTemplateService smsTemplateService;
-    @MockBean
-    private SmsProducer smsProducer;
-
-    @Test
-    public void testInitLocalCache_success() {
-        // mock 数据
-        SmsChannelDO smsChannelDO01 = randomPojo(SmsChannelDO.class);
-        smsChannelMapper.insert(smsChannelDO01);
-        SmsChannelDO smsChannelDO02 = randomPojo(SmsChannelDO.class);
-        smsChannelMapper.insert(smsChannelDO02);
-
-        // 调用
-        smsChannelService.initLocalCache();
-        // 校验调用
-        verify(smsClientFactory, times(1)).createOrUpdateSmsClient(
-                argThat(properties -> isPojoEquals(smsChannelDO01, properties)));
-        verify(smsClientFactory, times(1)).createOrUpdateSmsClient(
-                argThat(properties -> isPojoEquals(smsChannelDO02, properties)));
-    }
 
     @Test
     public void testCreateSmsChannel_success() {
         // 准备参数
-        SmsChannelCreateReqVO reqVO = randomPojo(SmsChannelCreateReqVO.class, o -> o.setStatus(randomCommonStatus()));
+        SmsChannelSaveReqVO reqVO = randomPojo(SmsChannelSaveReqVO.class, o -> o.setStatus(randomCommonStatus()))
+                .setId(null); // 防止 id 被赋值
 
         // 调用
         Long smsChannelId = smsChannelService.createSmsChannel(reqVO);
@@ -73,9 +56,10 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
         assertNotNull(smsChannelId);
         // 校验记录的属性是否正确
         SmsChannelDO smsChannel = smsChannelMapper.selectById(smsChannelId);
-        assertPojoEquals(reqVO, smsChannel);
-        // 校验调用
-        verify(smsProducer, times(1)).sendSmsChannelRefreshMessage();
+        assertPojoEquals(reqVO, smsChannel, "id");
+        // 断言 cache
+        assertNull(smsChannelService.getIdClientCache().getIfPresent(smsChannel.getId()));
+        assertNull(smsChannelService.getCodeClientCache().getIfPresent(smsChannel.getCode()));
     }
 
     @Test
@@ -84,7 +68,7 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
         SmsChannelDO dbSmsChannel = randomPojo(SmsChannelDO.class);
         smsChannelMapper.insert(dbSmsChannel);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        SmsChannelUpdateReqVO reqVO = randomPojo(SmsChannelUpdateReqVO.class, o -> {
+        SmsChannelSaveReqVO reqVO = randomPojo(SmsChannelSaveReqVO.class, o -> {
             o.setId(dbSmsChannel.getId()); // 设置更新的 ID
             o.setStatus(randomCommonStatus());
             o.setCallbackUrl(randomString());
@@ -95,14 +79,15 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
         // 校验是否更新正确
         SmsChannelDO smsChannel = smsChannelMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, smsChannel);
-        // 校验调用
-        verify(smsProducer, times(1)).sendSmsChannelRefreshMessage();
+        // 断言 cache
+        assertNull(smsChannelService.getIdClientCache().getIfPresent(smsChannel.getId()));
+        assertNull(smsChannelService.getCodeClientCache().getIfPresent(smsChannel.getCode()));
     }
 
     @Test
     public void testUpdateSmsChannel_notExists() {
         // 准备参数
-        SmsChannelUpdateReqVO reqVO = randomPojo(SmsChannelUpdateReqVO.class);
+        SmsChannelSaveReqVO reqVO = randomPojo(SmsChannelSaveReqVO.class);
 
         // 调用, 并断言异常
         assertServiceException(() -> smsChannelService.updateSmsChannel(reqVO), SMS_CHANNEL_NOT_EXISTS);
@@ -118,10 +103,11 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
 
         // 调用
         smsChannelService.deleteSmsChannel(id);
-       // 校验数据不存在了
-       assertNull(smsChannelMapper.selectById(id));
-        // 校验调用
-        verify(smsProducer, times(1)).sendSmsChannelRefreshMessage();
+        // 校验数据不存在了
+        assertNull(smsChannelMapper.selectById(id));
+        // 断言 cache
+        assertNull(smsChannelService.getIdClientCache().getIfPresent(dbSmsChannel.getId()));
+        assertNull(smsChannelService.getCodeClientCache().getIfPresent(dbSmsChannel.getCode()));
     }
 
     @Test
@@ -141,7 +127,7 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
         // 准备参数
         Long id = dbSmsChannel.getId();
         // mock 方法
-        when(smsTemplateService.countByChannelId(eq(id))).thenReturn(10L);
+        when(smsTemplateService.getSmsTemplateCountByChannelId(eq(id))).thenReturn(10L);
 
         // 调用, 并断言异常
         assertServiceException(() -> smsChannelService.deleteSmsChannel(id), SMS_CHANNEL_HAS_CHILDREN);
@@ -203,6 +189,48 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
        assertEquals(1, pageResult.getTotal());
        assertEquals(1, pageResult.getList().size());
        assertPojoEquals(dbSmsChannel, pageResult.getList().get(0));
+    }
+
+    @Test
+    public void testGetSmsClient_id() {
+        // mock 数据
+        SmsChannelDO channel = randomPojo(SmsChannelDO.class);
+        smsChannelMapper.insert(channel);
+        // mock 参数
+        Long id = channel.getId();
+        // mock 方法
+        SmsClient mockClient = mock(SmsClient.class);
+        when(smsClientFactory.getSmsClient(eq(id))).thenReturn(mockClient);
+
+        // 调用
+        SmsClient client = smsChannelService.getSmsClient(id);
+        // 断言
+        assertSame(client, mockClient);
+        verify(smsClientFactory).createOrUpdateSmsClient(argThat(arg -> {
+            SmsChannelProperties properties = BeanUtils.toBean(channel, SmsChannelProperties.class);
+            return properties.equals(arg);
+        }));
+    }
+
+    @Test
+    public void testGetSmsClient_code() {
+        // mock 数据
+        SmsChannelDO channel = randomPojo(SmsChannelDO.class);
+        smsChannelMapper.insert(channel);
+        // mock 参数
+        String code = channel.getCode();
+        // mock 方法
+        SmsClient mockClient = mock(SmsClient.class);
+        when(smsClientFactory.getSmsClient(eq(code))).thenReturn(mockClient);
+
+        // 调用
+        SmsClient client = smsChannelService.getSmsClient(code);
+        // 断言
+        assertSame(client, mockClient);
+        verify(smsClientFactory).createOrUpdateSmsClient(argThat(arg -> {
+            SmsChannelProperties properties = BeanUtils.toBean(channel, SmsChannelProperties.class);
+            return properties.equals(arg);
+        }));
     }
 
 }

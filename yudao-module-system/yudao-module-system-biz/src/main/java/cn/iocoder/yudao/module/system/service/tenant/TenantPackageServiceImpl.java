@@ -3,16 +3,15 @@ package cn.iocoder.yudao.module.system.service.tenant;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackageCreateReqVO;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackagePageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackageUpdateReqVO;
-import cn.iocoder.yudao.module.system.convert.tenant.TenantPackageConvert;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackageSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantPackageDO;
 import cn.iocoder.yudao.module.system.dal.mysql.tenant.TenantPackageMapper;
+import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -38,21 +37,21 @@ public class TenantPackageServiceImpl implements TenantPackageService {
     private TenantService tenantService;
 
     @Override
-    public Long createTenantPackage(TenantPackageCreateReqVO createReqVO) {
+    public Long createTenantPackage(TenantPackageSaveReqVO createReqVO) {
         // 插入
-        TenantPackageDO tenantPackage = TenantPackageConvert.INSTANCE.convert(createReqVO);
+        TenantPackageDO tenantPackage = BeanUtils.toBean(createReqVO, TenantPackageDO.class);
         tenantPackageMapper.insert(tenantPackage);
         // 返回
         return tenantPackage.getId();
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateTenantPackage(TenantPackageUpdateReqVO updateReqVO) {
+    @DSTransactional // 多数据源，使用 @DSTransactional 保证本地事务，以及数据源的切换
+    public void updateTenantPackage(TenantPackageSaveReqVO updateReqVO) {
         // 校验存在
         TenantPackageDO tenantPackage = validateTenantPackageExists(updateReqVO.getId());
         // 更新
-        TenantPackageDO updateObj = TenantPackageConvert.INSTANCE.convert(updateReqVO);
+        TenantPackageDO updateObj = BeanUtils.toBean(updateReqVO, TenantPackageDO.class);
         tenantPackageMapper.updateById(updateObj);
         // 如果菜单发生变化，则修改每个租户的菜单
         if (!CollUtil.isEqualList(tenantPackage.getMenuIds(), updateReqVO.getMenuIds())) {

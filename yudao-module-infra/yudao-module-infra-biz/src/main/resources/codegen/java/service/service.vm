@@ -1,10 +1,15 @@
 package ${basePackage}.module.${table.moduleName}.service.${table.businessName};
 
 import java.util.*;
-import javax.validation.*;
+import ${jakartaPackage}.validation.*;
 import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
 import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
+## 特殊：主子表专属逻辑
+#foreach ($subTable in $subTables)
+import ${basePackage}.module.${subTable.moduleName}.dal.dataobject.${subTable.businessName}.${subTable.className}DO;
+#end
 import ${PageResultClassName};
+import ${PageParamClassName};
 
 /**
  * ${table.classComment} Service 接口
@@ -19,14 +24,14 @@ public interface ${table.className}Service {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    ${primaryColumn.javaType} create${simpleClassName}(@Valid ${sceneEnum.prefixClass}${table.className}CreateReqVO createReqVO);
+    ${primaryColumn.javaType} create${simpleClassName}(@Valid ${sceneEnum.prefixClass}${table.className}SaveReqVO createReqVO);
 
     /**
      * 更新${table.classComment}
      *
      * @param updateReqVO 更新信息
      */
-    void update${simpleClassName}(@Valid ${sceneEnum.prefixClass}${table.className}UpdateReqVO updateReqVO);
+    void update${simpleClassName}(@Valid ${sceneEnum.prefixClass}${table.className}SaveReqVO updateReqVO);
 
     /**
      * 删除${table.classComment}
@@ -43,14 +48,8 @@ public interface ${table.className}Service {
      */
     ${table.className}DO get${simpleClassName}(${primaryColumn.javaType} id);
 
-    /**
-     * 获得${table.classComment}列表
-     *
-     * @param ids 编号
-     * @return ${table.classComment}列表
-     */
-    List<${table.className}DO> get${simpleClassName}List(Collection<${primaryColumn.javaType}> ids);
-
+## 特殊：树表专属逻辑（树不需要分页接口）
+#if ( $table.templateType != 2 )
     /**
      * 获得${table.classComment}分页
      *
@@ -58,13 +57,91 @@ public interface ${table.className}Service {
      * @return ${table.classComment}分页
      */
     PageResult<${table.className}DO> get${simpleClassName}Page(${sceneEnum.prefixClass}${table.className}PageReqVO pageReqVO);
-
+#else
     /**
-     * 获得${table.classComment}列表, 用于 Excel 导出
+     * 获得${table.classComment}列表
      *
-     * @param exportReqVO 查询条件
+     * @param listReqVO 查询条件
      * @return ${table.classComment}列表
      */
-    List<${table.className}DO> get${simpleClassName}List(${sceneEnum.prefixClass}${table.className}ExportReqVO exportReqVO);
+    List<${table.className}DO> get${simpleClassName}List(${sceneEnum.prefixClass}${table.className}ListReqVO listReqVO);
+#end
 
+## 特殊：主子表专属逻辑
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subSimpleClassName = $subSimpleClassNames.get($index))
+#set ($subPrimaryColumn = $subPrimaryColumns.get($index))##当前 primary 字段
+#set ($subJoinColumn = $subJoinColumns.get($index))##当前 join 字段
+#set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
+#set ($subClassNameVar = $subClassNameVars.get($index))
+    // ==================== 子表（$subTable.classComment） ====================
+
+## 情况一：MASTER_ERP 时，需要分查询页子表
+#if ( $table.templateType == 11 )
+    /**
+     * 获得${subTable.classComment}分页
+     *
+     * @param pageReqVO 分页查询
+     * @param ${subJoinColumn.javaField} ${subJoinColumn.columnComment}
+     * @return ${subTable.classComment}分页
+     */
+    PageResult<${subTable.className}DO> get${subSimpleClassName}Page(PageParam pageReqVO, ${subJoinColumn.javaType} ${subJoinColumn.javaField});
+
+## 情况二：非 MASTER_ERP 时，需要列表查询子表
+#else
+    #if ( $subTable.subJoinMany )
+    /**
+     * 获得${subTable.classComment}列表
+     *
+     * @param ${subJoinColumn.javaField} ${subJoinColumn.columnComment}
+     * @return ${subTable.classComment}列表
+     */
+    List<${subTable.className}DO> get${subSimpleClassName}ListBy${SubJoinColumnName}(${subJoinColumn.javaType} ${subJoinColumn.javaField});
+
+    #else
+    /**
+     * 获得${subTable.classComment}
+     *
+     * @param ${subJoinColumn.javaField} ${subJoinColumn.columnComment}
+     * @return ${subTable.classComment}
+     */
+    ${subTable.className}DO get${subSimpleClassName}By${SubJoinColumnName}(${subJoinColumn.javaType} ${subJoinColumn.javaField});
+
+    #end
+#end
+## 特殊：MASTER_ERP 时，支持单个的新增、修改、删除操作
+#if ( $table.templateType == 11 )
+    /**
+     * 创建${subTable.classComment}
+     *
+     * @param ${subClassNameVar} 创建信息
+     * @return 编号
+     */
+    ${subPrimaryColumn.javaType} create${subSimpleClassName}(@Valid ${subTable.className}DO ${subClassNameVar});
+
+    /**
+     * 更新${subTable.classComment}
+     *
+     * @param ${subClassNameVar} 更新信息
+     */
+    void update${subSimpleClassName}(@Valid ${subTable.className}DO ${subClassNameVar});
+
+    /**
+     * 删除${subTable.classComment}
+     *
+     * @param id 编号
+     */
+    void delete${subSimpleClassName}(${subPrimaryColumn.javaType} id);
+
+	/**
+	 * 获得${subTable.classComment}
+	 *
+	 * @param id 编号
+     * @return ${subTable.classComment}
+	 */
+    ${subTable.className}DO get${subSimpleClassName}(${subPrimaryColumn.javaType} id);
+
+#end
+#end
 }

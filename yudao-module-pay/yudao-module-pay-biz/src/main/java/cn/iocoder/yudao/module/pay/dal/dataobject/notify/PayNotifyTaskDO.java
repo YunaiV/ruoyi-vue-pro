@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.module.pay.dal.dataobject.notify;
 
-import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayAppDO;
-import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayMerchantDO;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
 import java.time.LocalDateTime;
 
 /**
- * 商户支付、退款等的通知
+ * 支付通知
  * 在支付系统收到支付渠道的支付、退款的结果后，需要不断的通知到业务系统，直到成功。
  *
  * @author 芋道源码
@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
-public class PayNotifyTaskDO extends BaseDO {
+public class PayNotifyTaskDO extends TenantBaseDO {
 
     /**
      * 通知频率，单位为秒。
@@ -41,13 +41,8 @@ public class PayNotifyTaskDO extends BaseDO {
     /**
      * 编号，自增
      */
+    @TableId
     private Long id;
-    /**
-     * 商户编号
-     *
-     * 关联 {@link PayMerchantDO#getId()}
-     */
-    private Long merchantId;
     /**
      * 应用编号
      *
@@ -71,6 +66,10 @@ public class PayNotifyTaskDO extends BaseDO {
      * 商户订单编号
      */
     private String merchantOrderId;
+    /**
+     * 商户转账单编号
+     */
+    private String merchantTransferId;
     /**
      * 通知状态
      *

@@ -2,10 +2,8 @@ package cn.iocoder.yudao.module.system.service.tenant;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantInfoHandler;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantMenuHandler;
@@ -27,14 +25,14 @@ public interface TenantService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createTenant(@Valid TenantCreateReqVO createReqVO);
+    Long createTenant(@Valid TenantSaveReqVO createReqVO);
 
     /**
      * 更新租户
      *
      * @param updateReqVO 更新信息
      */
-    void updateTenant(@Valid TenantUpdateReqVO updateReqVO);
+    void updateTenant(@Valid TenantSaveReqVO updateReqVO);
 
     /**
      * 更新租户的角色菜单
@@ -68,20 +66,20 @@ public interface TenantService {
     PageResult<TenantDO> getTenantPage(TenantPageReqVO pageReqVO);
 
     /**
-     * 获得租户列表, 用于 Excel 导出
-     *
-     * @param exportReqVO 查询条件
-     * @return 租户列表
-     */
-    List<TenantDO> getTenantList(TenantExportReqVO exportReqVO);
-
-    /**
      * 获得名字对应的租户
      *
-     * @param name 组户名
+     * @param name 租户名
      * @return 租户
      */
     TenantDO getTenantByName(String name);
+
+    /**
+     * 获得域名对应的租户
+     *
+     * @param website 域名
+     * @return 租户
+     */
+    TenantDO getTenantByWebsite(String website);
 
     /**
      * 获得使用指定套餐的租户数量
@@ -128,4 +126,5 @@ public interface TenantService {
      * @param id 租户编号
      */
     void validTenant(Long id);
+
 }

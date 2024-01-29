@@ -46,6 +46,13 @@ public interface MpTagService {
      */
     PageResult<MpTagDO> getTagPage(MpTagPageReqVO pageReqVO);
 
+    /**
+     * 获得公众号标签详情
+     * @param id id查询
+     * @return 公众号标签详情
+     */
+    MpTagDO get(Long id);
+
     List<MpTagDO> getTagList();
 
     /**

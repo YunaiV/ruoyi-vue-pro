@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.statistics.dal.mysql.trade.TradeStatisticsMapper">
+
+    <select id="selectOrderCreateCountSumAndOrderPayPriceSumByTimeBetween"
+            resultType="cn.iocoder.yudao.module.statistics.service.trade.bo.TradeSummaryRespBO">
+        SELECT IFNULL(SUM(order_create_count), 0) AS count,
+               IFNULL(SUM(order_pay_price), 0) AS summary
+        FROM trade_statistics
+        WHERE time BETWEEN #{beginTime} AND #{endTime}
+          AND deleted = FALSE
+    </select>
+
+    <select id="selectVoByTimeBetween"
+            resultType="cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeTrendSummaryRespVO">
+        SELECT
+            -- 营业额 = 商品支付金额 + 充值金额
+            SUM(order_pay_price + recharge_pay_price)                                    AS turnoverPrice,
+            SUM(order_pay_price)                                                         AS orderPayPrice,
+            SUM(recharge_pay_price)                                                      AS rechargePrice,
+            -- 支出金额 = 余额支付金额 + 支付佣金金额 + 商品退款金额
+            SUM(wallet_pay_price + brokerage_settlement_price + after_sale_refund_price) AS expensePrice,
+            SUM(wallet_pay_price)                                                        AS walletPayPrice,
+            SUM(brokerage_settlement_price)                                              AS brokerageSettlementPrice,
+            SUM(after_sale_refund_price)                                                 AS afterSaleRefundPrice
+        FROM trade_statistics
+        WHERE time BETWEEN #{beginTime} AND #{endTime}
+          AND deleted = FALSE
+    </select>
+
+    <select id="selectExpensePriceByTimeBetween" resultType="java.lang.Integer">
+        SELECT -- 支出金额 = 余额支付金额 + 支付佣金金额 + 商品退款金额
+               SUM(wallet_pay_price + brokerage_settlement_price + after_sale_refund_price) AS expensePrice
+        FROM trade_statistics
+        WHERE deleted = FALSE
+        <if test="beginTime != null">
+            AND time >= #{beginTime}
+        </if>
+        <if test="endTime != null">
+            AND time &lt;= #{endTime}
+        </if>
+    </select>
+
+</mapper>

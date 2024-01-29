@@ -23,11 +23,6 @@
     <dependencies>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-member-biz</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-module-system-biz</artifactId>
             <version>${revision}</version>
         </dependency>
@@ -36,24 +31,27 @@
             <artifactId>yudao-module-infra-biz</artifactId>
             <version>${revision}</version>
         </dependency>
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-biz-error-code</artifactId>
-        </dependency>
 
-        <!-- 数据报表 -->
+        <!-- 会员中心。默认注释，保证编译速度 -->
+<!--        <dependency>-->
+<!--            <groupId>cn.iocoder.boot</groupId>-->
+<!--            <artifactId>yudao-module-member-biz</artifactId>-->
+<!--            <version>${revision}</version>-->
+<!--        </dependency>-->
+
+        <!-- 数据报表。默认注释，保证编译速度 -->
 <!--        <dependency>-->
 <!--            <groupId>cn.iocoder.boot</groupId>-->
 <!--            <artifactId>yudao-module-report-biz</artifactId>-->
 <!--            <version>${revision}</version>-->
 <!--        </dependency>-->
-        <!-- 工作流 -->
+        <!-- 工作流。默认注释，保证编译速度 -->
 <!--        <dependency>-->
 <!--            <groupId>cn.iocoder.boot</groupId>-->
 <!--            <artifactId>yudao-module-bpm-biz</artifactId>-->
 <!--            <version>${revision}</version>-->
 <!--        </dependency>-->
-        <!-- 支付服务 -->
+        <!-- 支付服务。默认注释，保证编译速度 -->
 <!--        <dependency>-->
 <!--            <groupId>cn.iocoder.boot</groupId>-->
 <!--            <artifactId>yudao-module-pay-biz</artifactId>-->
@@ -67,7 +65,7 @@
 <!--            <version>${revision}</version>-->
 <!--        </dependency>-->
 
-        <!-- 商城相关模块。默认注释，保证编译速度 -->
+        <!-- 商城相关模块。默认注释，保证编译速度-->
 <!--        <dependency>-->
 <!--            <groupId>cn.iocoder.boot</groupId>-->
 <!--            <artifactId>yudao-module-promotion-biz</artifactId>-->
@@ -83,16 +81,24 @@
 <!--            <artifactId>yudao-module-trade-biz</artifactId>-->
 <!--            <version>${revision}</version>-->
 <!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>cn.iocoder.boot</groupId>-->
+<!--            <artifactId>yudao-module-statistics-biz</artifactId>-->
+<!--            <version>${revision}</version>-->
+<!--        </dependency>-->
+
+        <!-- CRM 相关模块。默认注释，保证编译速度 -->
+<!--        <dependency>-->
+<!--            <groupId>cn.iocoder.boot</groupId>-->
+<!--            <artifactId>yudao-module-crm-biz</artifactId>-->
+<!--            <version>${revision}</version>-->
+<!--        </dependency>-->
 
         <!-- spring boot 配置所需依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-banner</artifactId>
         </dependency>
 
         <!-- 服务保障相关 -->
@@ -111,10 +117,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>2.7.8</version> <!-- 如果 spring.boot.version 版本修改，则这里也要跟着修改 -->
-                <configuration>
-                    <fork>true</fork>
-                </configuration>
+                <version>${spring.boot.version}</version>
                 <executions>
                     <execution>
                         <goals>

@@ -24,31 +24,31 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.TIME_ZONE_DE
 public class CouponBaseVO {
 
     // ========== 基本信息 BEGIN ==========
-    @Schema(description = "优惠劵模板编号", required = true, example = "1024")
+    @Schema(description = "优惠劵模板编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "优惠劵模板编号不能为空")
-    private Integer templateId;
+    private Long templateId;
 
-    @Schema(description = "优惠劵名", required = true, example = "春节送送送")
+    @Schema(description = "优惠劵名", requiredMode = Schema.RequiredMode.REQUIRED, example = "春节送送送")
     @NotNull(message = "优惠劵名不能为空")
     private String name;
 
-    @Schema(description = "优惠码状态", required = true, example = "1")
+    @Schema(description = "优惠码状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer status;
 
     // ========== 基本信息 END ==========
 
     // ========== 领取情况 BEGIN ==========
-    @Schema(description = "用户编号", required = true, example = "1")
+    @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "用户编号不能为空")
     private Long userId;
 
-    @Schema(description = "领取方式", required = true, example = "1")
+    @Schema(description = "领取方式", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "领取方式不能为空")
     private Integer takeType;
     // ========== 领取情况 END ==========
 
     // ========== 使用规则 BEGIN ==========
-    @Schema(description = "是否设置满多少金额可用", required = true, example = "100") // 单位：分；0 - 不限制
+    @Schema(description = "是否设置满多少金额可用", requiredMode = Schema.RequiredMode.REQUIRED, example = "100") // 单位：分；0 - 不限制
     @NotNull(message = "是否设置满多少金额可用不能为空")
     private Integer usePrice;
 
@@ -62,17 +62,17 @@ public class CouponBaseVO {
     @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
     private LocalDateTime validEndTime;
 
-    @Schema(description = "商品范围", required = true, example = "1")
+    @Schema(description = "商品范围", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "商品范围不能为空")
     @InEnum(PromotionProductScopeEnum.class)
     private Integer productScope;
 
-    @Schema(description = "商品 SPU 编号的数组", example = "1,3")
-    private List<Long> productSpuIds;
+    @Schema(description = "商品范围编号的数组", example = "1,3")
+    private List<Long> productScopeValues;
     // ========== 使用规则 END ==========
 
     // ========== 使用效果 BEGIN ==========
-    @Schema(description = "优惠类型", required = true, example = "1")
+    @Schema(description = "优惠类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "优惠类型不能为空")
     @InEnum(PromotionDiscountTypeEnum.class)
     private Integer discountType;

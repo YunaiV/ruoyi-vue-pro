@@ -5,6 +5,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
+
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 @Schema(description = "管理后台 - 商品 SPU 分页 Request VO")
 @Data
@@ -12,34 +17,42 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class ProductSpuPageReqVO extends PageParam {
 
-    @Schema(description = "商品名称", example = "yutou")
+    /**
+     * 出售中商品
+     */
+    public static final Integer FOR_SALE = 0;
+
+    /**
+     * 仓库中商品
+     */
+    public static final Integer IN_WAREHOUSE = 1;
+
+    /**
+     * 已售空商品
+     */
+    public static final Integer SOLD_OUT = 2;
+
+    /**
+     * 警戒库存
+     */
+    public static final Integer ALERT_STOCK = 3;
+
+    /**
+     * 商品回收站
+     */
+    public static final Integer RECYCLE_BIN = 4;
+
+    @Schema(description = "商品名称", example = "清凉小短袖")
     private String name;
 
-    @Schema(description = "商品编码", example = "yudaoyuanma")
-    private String code;
+    @Schema(description = "前端请求的tab类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    private Integer tabType;
 
-    @Schema(description = "分类编号", example = "1")
+    @Schema(description = "商品分类编号", example = "1")
     private Long categoryId;
 
-    @Schema(description = "商品品牌编号", example = "1")
-    private Long brandId;
-
-    @Schema(description = "上下架状态", example = "1")
-    private Integer status;
-
-    @Schema(description = "销量最小值", example = "1")
-    private Integer salesCountMin;
-
-    @Schema(description = "销量最大值", example = "1024")
-    private Integer salesCountMax;
-
-    @Schema(description = "市场价最小值", example = "1")
-    private Integer marketPriceMin;
-
-    @Schema(description = "市场价最大值", example = "1024")
-    private Integer marketPriceMax;
-
-    @Schema(description = "是否库存告警", example = "true")
-    private Boolean alarmStock;
+    @Schema(description = "创建时间", example = "[2022-07-01 00:00:00, 2022-07-01 23:59:59]")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime[] createTime;
 
 }

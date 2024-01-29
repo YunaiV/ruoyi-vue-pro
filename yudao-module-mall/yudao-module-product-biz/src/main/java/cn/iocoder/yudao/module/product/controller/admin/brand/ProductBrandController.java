@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.controller.admin.brand;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.brand.vo.*;
@@ -60,6 +61,15 @@ public class ProductBrandController {
     public CommonResult<ProductBrandRespVO> getBrand(@RequestParam("id") Long id) {
         ProductBrandDO brand = brandService.getBrand(id);
         return success(ProductBrandConvert.INSTANCE.convert(brand));
+    }
+
+    @GetMapping("/list-all-simple")
+    @Operation(summary = "获取品牌精简信息列表", description = "主要用于前端的下拉选项")
+    public CommonResult<List<ProductBrandSimpleRespVO>> getSimpleBrandList() {
+        // 获取品牌列表，只要开启状态的
+        List<ProductBrandDO> list = brandService.getBrandListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        // 排序后，返回给前端
+        return success(ProductBrandConvert.INSTANCE.convertList1(list));
     }
 
     @GetMapping("/page")

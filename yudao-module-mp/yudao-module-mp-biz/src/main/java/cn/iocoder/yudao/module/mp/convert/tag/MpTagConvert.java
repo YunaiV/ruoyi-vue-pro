@@ -37,6 +37,8 @@ public interface MpTagConvert {
     })
     MpTagDO convert(WxUserTag tag, MpAccountDO account);
 
+    MpTagRespVO convert(MpTagDO mpTagDO);
+
     List<MpTagSimpleRespVO> convertList02(List<MpTagDO> list);
 
 }

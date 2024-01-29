@@ -1,14 +1,16 @@
 package cn.iocoder.yudao.module.promotion.service.reward;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.promotion.api.reward.dto.RewardActivityMatchRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 
 import javax.validation.Valid;
-import java.util.Map;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 满减送活动 Service 接口
@@ -66,8 +68,18 @@ public interface RewardActivityService {
      * 基于指定的 SPU 编号数组，获得它们匹配的满减送活动
      *
      * @param spuIds SPU 编号数组
-     * @return 满减送活动，与对应的 SPU 编号的映射。即，value 就是 SPU 编号的集合
+     * @return 满减送活动列表
      */
-    Map<RewardActivityDO, Set<Long>> getMatchRewardActivities(Set<Long> spuIds);
+    List<RewardActivityMatchRespDTO> getMatchRewardActivityList(Collection<Long> spuIds);
+
+    /**
+     * 获取指定 spu 编号最近参加的活动，每个 spuId 只返回一条记录
+     *
+     * @param spuIds   spu 编号
+     * @param status   状态
+     * @param dateTime 当前日期时间
+     * @return 满减送活动列表
+     */
+    List<RewardActivityDO> getRewardActivityBySpuIdsAndStatusAndDateTimeLt(Collection<Long> spuIds, Integer status, LocalDateTime dateTime);
 
 }

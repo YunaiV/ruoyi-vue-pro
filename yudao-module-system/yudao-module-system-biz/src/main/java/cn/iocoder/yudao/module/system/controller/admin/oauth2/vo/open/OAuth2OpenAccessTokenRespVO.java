@@ -12,19 +12,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class OAuth2OpenAccessTokenRespVO {
 
-    @Schema(description = "访问令牌", required = true, example = "tudou")
+    @Schema(description = "访问令牌", requiredMode = Schema.RequiredMode.REQUIRED, example = "tudou")
     @JsonProperty("access_token")
     private String accessToken;
 
-    @Schema(description = "刷新令牌", required = true, example = "nice")
+    @Schema(description = "刷新令牌", requiredMode = Schema.RequiredMode.REQUIRED, example = "nice")
     @JsonProperty("refresh_token")
     private String refreshToken;
 
-    @Schema(description = "令牌类型", required = true, example = "bearer")
+    @Schema(description = "令牌类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "bearer")
     @JsonProperty("token_type")
     private String tokenType;
 
-    @Schema(description = "过期时间,单位：秒", required = true, example = "42430")
+    @Schema(description = "过期时间,单位：秒", requiredMode = Schema.RequiredMode.REQUIRED, example = "42430")
     @JsonProperty("expires_in")
     private Long expiresIn;
 

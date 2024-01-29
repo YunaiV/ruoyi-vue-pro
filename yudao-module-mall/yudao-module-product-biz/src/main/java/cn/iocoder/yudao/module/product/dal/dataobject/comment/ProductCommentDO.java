@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.product.dal.dataobject.comment;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
-import cn.iocoder.yudao.module.product.enums.comment.ProductCommentAuditStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -18,7 +18,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-@TableName("product_comment")
+@TableName(value = "product_comment", autoResultMap = true)
 @KeySequence("product_comment_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -29,16 +29,35 @@ import java.util.List;
 public class ProductCommentDO extends BaseDO {
 
     /**
+     * 默认匿名昵称
+     */
+    public static final String NICKNAME_ANONYMOUS = "匿名用户";
+
+    /**
      * 评论编号，主键自增
      */
     @TableId
     private Long id;
+
     /**
-     * 商品 SPU 编号
+     * 评价人的用户编号
      *
-     * 关联 {@link ProductSpuDO#getId()}
+     * 关联 MemberUserDO 的 id 编号
      */
-    private Long spuId;
+    private Long userId;
+    /**
+     * 评价人名称
+     */
+    private String userNickname;
+    /**
+     * 评价人头像
+     */
+    private String userAvatar;
+    /**
+     * 是否匿名
+     */
+    private Boolean anonymous;
+
     /**
      * 交易订单编号
      *
@@ -51,27 +70,64 @@ public class ProductCommentDO extends BaseDO {
      * 关联 TradeOrderItemDO 的 id 编号
      */
     private Long orderItemId;
-    /**
-     * 审核状态
-     *
-     * 枚举 {@link ProductCommentAuditStatusEnum}
-     */
-    private Integer auditStatus;
 
     /**
-     * 用户编号
+     * 商品 SPU 编号
      *
-     * 关联 MemberUserDO 的 id 编号
+     * 关联 {@link ProductSpuDO#getId()}
      */
-    private Long userId;
+    private Long spuId;
     /**
-     * 用户 IP
+     * 商品 SPU 名称
+     *
+     * 关联 {@link ProductSpuDO#getName()}
      */
-    private String userIp;
+    private String spuName;
     /**
-     * 是否匿名
+     * 商品 SKU 编号
+     *
+     * 关联 {@link ProductSkuDO#getId()}
      */
-    private Boolean anonymous;
+    private Long skuId;
+    /**
+     * 商品 SKU 图片地址
+     *
+     * 关联 {@link ProductSkuDO#getPicUrl()}
+     */
+    private String skuPicUrl;
+    /**
+     * 属性数组，JSON 格式
+     *
+     * 关联 {@link ProductSkuDO#getProperties()}
+     */
+    @TableField(typeHandler = ProductSkuDO.PropertyTypeHandler.class)
+    private List<ProductSkuDO.Property> skuProperties;
+
+    /**
+     * 是否可见
+     *
+     * true:显示
+     * false:隐藏
+     */
+    private Boolean visible;
+    /**
+     * 评分星级
+     *
+     * 1-5 分
+     */
+    private Integer scores;
+    /**
+     * 描述星级
+     *
+     * 1-5 星
+     */
+    private Integer descriptionScores;
+    /**
+     * 服务星级
+     *
+     * 1-5 星
+     */
+    private Integer benefitScores;
     /**
      * 评论内容
      */
@@ -81,35 +137,16 @@ public class ProductCommentDO extends BaseDO {
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<String> picUrls;
-    /**
-     * 描述相符星级
-     *
-     * 1-5 星
-     */
-    private Integer descriptionScore;
-    /**
-     * 商品评论星级
-     *
-     * 1-5 星
-     */
-    private Integer productScore;
-    /**
-     * 服务评论星级
-     *
-     * 1-5 星
-     */
-    private Integer serviceScore;
-    /**
-     * 物流评论星级
-     *
-     * 1-5 星
-     */
-    private Integer expressComment;
 
     /**
      * 商家是否回复
      */
-    private Boolean replied;
+    private Boolean replyStatus;
+    /**
+     * 回复管理员编号
+     * 关联 AdminUserDO 的 id 编号
+     */
+    private Long replyUserId;
     /**
      * 商家回复内容
      */
@@ -118,12 +155,5 @@ public class ProductCommentDO extends BaseDO {
      * 商家回复时间
      */
     private LocalDateTime replyTime;
-
-    /**
-     * 有用的计数
-     *
-     * 其他用户看到评论时，可点击「有用」按钮
-     */
-    private Integer usefulCount;
 
 }

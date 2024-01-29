@@ -49,18 +49,34 @@ import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePack
 @Mapper
 public interface ${table.className}Mapper extends BaseMapperX<${table.className}DO> {
 
+## 特殊：树表专属逻辑（树不需要分页接口）
+#if ( $table.templateType != 2 )
     default PageResult<${table.className}DO> selectPage(${sceneEnum.prefixClass}${table.className}PageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<${table.className}DO>()
 			#listCondition()
                 .orderByDesc(${table.className}DO::getId));## 大多数情况下，id 倒序
 
     }
-
-    default List<${table.className}DO> selectList(${sceneEnum.prefixClass}${table.className}ExportReqVO reqVO) {
+#else
+    default List<${table.className}DO> selectList(${sceneEnum.prefixClass}${table.className}ListReqVO reqVO) {
         return selectList(new LambdaQueryWrapperX<${table.className}DO>()
 			#listCondition()
                 .orderByDesc(${table.className}DO::getId));## 大多数情况下，id 倒序
 
     }
+#end
 
+## 特殊：树表专属逻辑
+#if ( $table.templateType == 2 )
+#set ($TreeParentJavaField = $treeParentColumn.javaField.substring(0,1).toUpperCase() + ${treeParentColumn.javaField.substring(1)})##首字母大写
+#set ($TreeNameJavaField = $treeNameColumn.javaField.substring(0,1).toUpperCase() + ${treeNameColumn.javaField.substring(1)})##首字母大写
+	default ${table.className}DO selectBy${TreeParentJavaField}And${TreeNameJavaField}(Long ${treeParentColumn.javaField}, String ${treeNameColumn.javaField}) {
+	    return selectOne(${table.className}DO::get${TreeParentJavaField}, ${treeParentColumn.javaField}, ${table.className}DO::get${TreeNameJavaField}, ${treeNameColumn.javaField});
+	}
+
+    default Long selectCountBy${TreeParentJavaField}(${treeParentColumn.javaType} ${treeParentColumn.javaField}) {
+        return selectCount(${table.className}DO::get${TreeParentJavaField}, ${treeParentColumn.javaField});
+    }
+
+#end
 }

@@ -11,11 +11,11 @@ import javax.validation.constraints.NotNull;
 @Data
 public class CouponTemplateUpdateStatusReqVO {
 
-    @Schema(description = "优惠劵模板编号", required = true, example = "1024")
+    @Schema(description = "优惠劵模板编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "优惠劵模板编号不能为空")
     private Long id;
 
-    @Schema(description = "状态", required = true, example = "1")
+    @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "状态不能为空")
     @InEnum(value = CommonStatusEnum.class, message = "修改状态必须是 {value}")
     private Integer status;

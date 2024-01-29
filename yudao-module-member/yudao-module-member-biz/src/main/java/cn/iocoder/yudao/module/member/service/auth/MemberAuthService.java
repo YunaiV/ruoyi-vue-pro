@@ -31,7 +31,7 @@ public interface MemberAuthService {
     /**
      * 手机 + 验证码登陆
      *
-     * @param reqVO 登陆信息
+     * @param reqVO    登陆信息
      * @return 登录结果
      */
     AppAuthLoginRespVO smsLogin(@Valid AppAuthSmsLoginReqVO reqVO);
@@ -62,25 +62,20 @@ public interface MemberAuthService {
     String getSocialAuthorizeUrl(Integer type, String redirectUri);
 
     /**
-     * 修改用户密码
-     * @param userId 用户id
-     * @param userReqVO 用户请求实体类
-     */
-    void updatePassword(Long userId, AppAuthUpdatePasswordReqVO userReqVO);
-
-    /**
-     * 忘记密码
-     * @param userReqVO 用户请求实体类
-     */
-    void resetPassword(AppAuthResetPasswordReqVO userReqVO);
-
-    /**
      * 给用户发送短信验证码
      *
      * @param userId 用户编号
      * @param reqVO 发送信息
      */
     void sendSmsCode(Long userId, AppAuthSmsSendReqVO reqVO);
+
+    /**
+     * 校验短信验证码是否正确
+     *
+     * @param userId 用户编号
+     * @param reqVO 校验信息
+     */
+    void validateSmsCode(Long userId, AppAuthSmsValidateReqVO reqVO);
 
     /**
      * 刷新访问令牌

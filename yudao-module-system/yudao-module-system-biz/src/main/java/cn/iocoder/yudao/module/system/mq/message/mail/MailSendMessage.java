@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.module.system.mq.message.mail;
 
-import cn.iocoder.yudao.framework.mq.core.stream.AbstractStreamMessage;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -13,8 +11,7 @@ import javax.validation.constraints.NotNull;
  * @author 芋道源码
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class MailSendMessage extends AbstractStreamMessage {
+public class MailSendMessage {
 
     /**
      * 邮件日志编号
@@ -46,10 +43,5 @@ public class MailSendMessage extends AbstractStreamMessage {
      */
     @NotEmpty(message = "邮件内容不能为空")
     private String content;
-
-    @Override
-    public String getStreamKey() {
-        return "system.mail.send";
-    }
 
 }

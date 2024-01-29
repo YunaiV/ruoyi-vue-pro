@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.flowable.config;
 import cn.iocoder.yudao.framework.common.enums.WebFilterOrderEnum;
 import cn.iocoder.yudao.framework.flowable.core.web.FlowableWebFilter;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.task.AsyncListenableTaskExecutor;
@@ -16,7 +17,8 @@ public class YudaoFlowableConfiguration {
      *
      * 如果不创建，会导致项目启动时，Flowable 报错的问题
      */
-    @Bean
+    @Bean(name = "applicationTaskExecutor")
+    @ConditionalOnMissingBean(name = "applicationTaskExecutor")
     public AsyncListenableTaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(8);
@@ -40,4 +42,5 @@ public class YudaoFlowableConfiguration {
         registrationBean.setOrder(WebFilterOrderEnum.FLOWABLE_FILTER);
         return registrationBean;
     }
+
 }
