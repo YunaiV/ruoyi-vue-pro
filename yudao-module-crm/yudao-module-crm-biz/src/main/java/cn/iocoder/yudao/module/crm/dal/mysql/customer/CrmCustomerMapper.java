@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.crm.controller.admin.backlog.vo.CrmTodayCustomerPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.util.CrmQueryWrapperUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -105,6 +106,57 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
                 .eq(CrmCustomerDO::getLockStatus, lockStatus)
                 // TODO @puhui999：not null 可以转化成大于 0
                 .isNotNull(CrmCustomerDO::getOwnerUserId));
+    }
+
+    default PageResult<CrmCustomerDO> selectPutInPoolRemindCustomerPage(CrmCustomerPageReqVO pageReqVO,
+                                                                        CrmCustomerPoolConfigDO poolConfigDO,
+                                                                        Long userId) {
+        MPJLambdaWrapperX<CrmCustomerDO> query = new MPJLambdaWrapperX<>();
+        // 拼接数据权限的查询条件
+        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CUSTOMER.getType(),
+                CrmCustomerDO::getId, userId, pageReqVO.getSceneType(), null);
+
+        // 拼接自身的查询条件
+        query.selectAll(CrmCustomerDO.class);
+
+        // 未跟进放入公海天数
+        final Integer contactExpireDays = poolConfigDO.getContactExpireDays();
+        // 未成交放入公海天数
+        final Integer dealExpireDays = poolConfigDO.getDealExpireDays();
+        // 提前提醒天数
+        final Integer notifyDays = poolConfigDO.getNotifyDays();
+
+        // 未成交提醒日期区间
+        // dealExpireDays 开始提醒
+        LocalDateTime startDealRemindDate = LocalDateTimeUtil.beginOfDay(LocalDateTime.now())
+                .minusDays(dealExpireDays);
+        // dealExpireDays - notifyDays 结束提醒
+        LocalDateTime endDealRemindDate = LocalDateTimeUtil.endOfDay(LocalDateTime.now())
+                .minusDays(Math.max(dealExpireDays - notifyDays, 0));
+
+        // 未跟进提醒日期区间
+        // contactExpireDays 开始提醒
+        LocalDateTime startContactRemindDate = LocalDateTimeUtil.beginOfDay(LocalDateTime.now())
+                .minusDays(contactExpireDays);
+        // contactExpireDays - notifyDays 结束提醒
+        LocalDateTime endContactRemindDate = LocalDateTimeUtil.endOfDay(LocalDateTime.now())
+                .minusDays(Math.max(contactExpireDays - notifyDays, 0));
+
+        query
+                // 1.1 未成交放入公海提醒
+                .eq(CrmCustomerDO::getDealStatus, false)
+                .between(CrmCustomerDO::getCreateTime, startDealRemindDate, endDealRemindDate)
+                .or()
+                // 1.2 未跟进放入公海提醒
+                // 1.2.1 ContactLastTime 为空
+                .isNull(CrmCustomerDO::getContactLastTime)
+                .between(CrmCustomerDO::getCreateTime, startContactRemindDate, endContactRemindDate)
+                .or()
+                // 1.2.2 ContactLastTime 不为空
+                .between(CrmCustomerDO::getContactLastTime, startContactRemindDate, endContactRemindDate)
+        ;
+
+        return selectJoinPage(pageReqVO, CrmCustomerDO.class, query);
     }
 
 }

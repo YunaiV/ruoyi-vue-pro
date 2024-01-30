@@ -26,8 +26,8 @@ public interface ErrorCodeConstants {
 
     // ========== 联系人管理 1-020-003-000 ==========
     ErrorCode CONTACT_NOT_EXISTS = new ErrorCode(1_020_003_000, "联系人不存在");
-    ErrorCode CONTACT_BUSINESS_LINK_NOT_EXISTS = new ErrorCode( 1_020_003_001, "联系人商机关联不存在");
-    ErrorCode CONTACT_DELETE_FAIL_CONTRACT_LINK_EXISTS = new ErrorCode( 1_020_003_002, "联系人已关联合同，不能删除");
+    ErrorCode CONTACT_BUSINESS_LINK_NOT_EXISTS = new ErrorCode(1_020_003_001, "联系人商机关联不存在");
+    ErrorCode CONTACT_DELETE_FAIL_CONTRACT_LINK_EXISTS = new ErrorCode(1_020_003_002, "联系人已关联合同，不能删除");
 
     // ========== 回款 1-020-004-000 ==========
     ErrorCode RECEIVABLE_NOT_EXISTS = new ErrorCode(1_020_004_000, "回款不存在");
@@ -80,7 +80,8 @@ public interface ErrorCodeConstants {
     ErrorCode BUSINESS_STATUS_NOT_EXISTS = new ErrorCode(1_020_011_000, "商机状态不存在");
 
     // ========== 客户公海规则设置 1_020_012_000 ==========
-    ErrorCode CUSTOMER_LIMIT_CONFIG_NOT_EXISTS = new ErrorCode(1_020_012_000, "客户限制配置不存在");
+    ErrorCode CUSTOMER_POOL_CONFIG_NOT_EXISTS_OR_DISABLED = new ErrorCode(1_020_012_000, "客户公海配置不存在或未启用");
+    ErrorCode CUSTOMER_LIMIT_CONFIG_NOT_EXISTS = new ErrorCode(1_020_012_001, "客户限制配置不存在");
 
     // ========== 跟进记录 1_020_013_000 ==========
     ErrorCode FOLLOW_UP_RECORD_NOT_EXISTS = new ErrorCode(1_020_013_000, "跟进记录不存在");
