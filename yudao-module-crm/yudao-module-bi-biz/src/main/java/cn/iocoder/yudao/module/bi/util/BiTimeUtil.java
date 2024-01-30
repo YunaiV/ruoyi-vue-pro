@@ -28,6 +28,7 @@ public class BiTimeUtil {
         // 解析时间
         BiTimeEntity biTimeEntity = analyzeTime(biParams);
         // 解析权限
+        // TODO @anhaohao：涉及到数据的读取，不放在 Util 里，还是搞会到 Service 哈；
         biTimeEntity.setUserIds(analyzeAuth(biParams));
         return biTimeEntity;
     }

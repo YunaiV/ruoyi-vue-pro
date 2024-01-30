@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.bi.controller.admin.ranking.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+// TODO @anhaohao：参考 BiContractRanKingRespVO 的建议
 /**
  * 管理后台 - BI 排行榜 Response VO
  *
@@ -20,4 +21,5 @@ public class BiReceivablesRanKingRespVO {
 
     @Schema(description = "部门名称", example = "研发部")
     private String deptName;
+
 }

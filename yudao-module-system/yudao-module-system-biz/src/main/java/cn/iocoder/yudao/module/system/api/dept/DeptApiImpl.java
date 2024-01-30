@@ -46,5 +46,4 @@ public class DeptApiImpl implements DeptApi {
         return BeanUtils.toBean(childDeptList, DeptRespDTO.class);
     }
 
-
 }

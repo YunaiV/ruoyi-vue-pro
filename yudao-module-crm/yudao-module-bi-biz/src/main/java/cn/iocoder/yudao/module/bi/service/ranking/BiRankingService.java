@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @author anhaohao
  */
-public interface BiRankingService {
+public interface BiRankingService { // TODO @anhaohao：第一个方法，和类要有一个空行
     /**
      * 合同金额排行榜
      *

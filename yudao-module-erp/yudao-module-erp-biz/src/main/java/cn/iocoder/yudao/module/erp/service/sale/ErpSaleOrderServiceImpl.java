@@ -40,9 +40,14 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
         saleOrderMapper.insert(saleOrder);
 
         // 插入子表
-        createSalesOrderItemsList(saleOrder.getId(), createReqVO.getSalesOrderItems());
+//        createSalesOrderItemsList(saleOrder.getId(), createReqVO.getSalesOrderItems());
         // 返回
         return saleOrder.getId();
+    }
+
+    private void createSalesOrderItemsList(Long id, List<ErpSalesOrderItemDO> list) {
+        list.forEach(o -> o.setId(id));
+        salesOrderItemMapper.insertBatch(list);
     }
 
     @Override
@@ -55,7 +60,13 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
         saleOrderMapper.updateById(updateObj);
 
         // 更新子表
-        updateSalesOrderItemsList(updateReqVO.getId(), updateReqVO.getSalesOrderItems());
+//        updateSalesOrderItemsList(updateReqVO.getId(), updateReqVO.getSalesOrderItems());
+    }
+
+    private void updateSalesOrderItemsList(Long id, List<ErpSalesOrderItemDO> list) {
+        deleteSalesOrderItemsById(id);
+        list.forEach(o -> o.setId(null).setUpdater(null).setUpdateTime(null)); // 解决更新情况下：1）id 冲突；2）updateTime 不更新
+        createSalesOrderItemsList(id, list);
     }
 
     @Override
@@ -87,17 +98,6 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
     }
 
     // ==================== 子表（ERP 销售订单明细） ====================
-
-    private void createSalesOrderItemsList(Long id, List<ErpSalesOrderItemDO> list) {
-        list.forEach(o -> o.setId(id));
-        salesOrderItemMapper.insertBatch(list);
-    }
-
-    private void updateSalesOrderItemsList(Long id, List<ErpSalesOrderItemDO> list) {
-        deleteSalesOrderItemsById(id);
-		list.forEach(o -> o.setId(null).setUpdater(null).setUpdateTime(null)); // 解决更新情况下：1）id 冲突；2）updateTime 不更新
-        createSalesOrderItemsList(id, list);
-    }
 
     private void deleteSalesOrderItemsById(Long id) {
         salesOrderItemMapper.deleteById(id);

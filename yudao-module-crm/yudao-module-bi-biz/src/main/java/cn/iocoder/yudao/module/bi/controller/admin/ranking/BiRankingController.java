@@ -19,6 +19,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
+// TODO @anhaohao：写了 swagger 注解，不写注释哈
 /**
  * @author anhaohao
  */
@@ -50,4 +51,5 @@ public class BiRankingController {
     public CommonResult<List<BiReceivablesRanKingRespVO>> receivablesRanKing(BiRankReqVO biRankReqVO) {
         return success(biRankingService.receivablesRanKing(biRankReqVO));
     }
+
 }
