@@ -33,7 +33,6 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.FOLLOW_UP_RECORD_DELETE_DENIED;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.FOLLOW_UP_RECORD_NOT_EXISTS;
-import static cn.iocoder.yudao.module.crm.framework.permission.core.util.CrmPermissionUtils.hasPermission;
 
 /**
  * 跟进记录 Service 实现类
@@ -119,7 +118,7 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
         // 校验存在
         CrmFollowUpRecordDO followUpRecord = validateFollowUpRecordExists(id);
         // 校验权限
-        if (!hasPermission(followUpRecord.getBizType(), followUpRecord.getBizId(), userId, CrmPermissionLevelEnum.OWNER)) {
+        if (!permissionService.hasPermission(followUpRecord.getBizType(), followUpRecord.getBizId(), userId, CrmPermissionLevelEnum.OWNER)) {
             throw exception(FOLLOW_UP_RECORD_DELETE_DENIED);
         }
 

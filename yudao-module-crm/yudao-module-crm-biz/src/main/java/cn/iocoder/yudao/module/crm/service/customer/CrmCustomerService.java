@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.module.crm.service.customer;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerLockReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerSaveReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTransferReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
 import cn.iocoder.yudao.module.crm.service.customer.bo.CrmCustomerCreateReqBO;
@@ -109,6 +106,16 @@ public interface CrmCustomerService {
      */
     Long createCustomer(CrmCustomerCreateReqBO customerCreateReq, Long userId);
 
+    /**
+     * 批量导入客户
+     *
+     * @param importCustomers 导入客户列表
+     * @param isUpdateSupport 是否支持更新
+     * @param userId          用户编号
+     * @return 导入结果
+     */
+    CrmCustomerImportRespVO importCustomerList(List<CrmCustomerImportExcelVO> importCustomers, Boolean isUpdateSupport, Long userId);
+
     // ==================== 公海相关操作 ====================
 
     /**
@@ -127,13 +134,12 @@ public interface CrmCustomerService {
      */
     void receiveCustomer(List<Long> ids, Long ownerUserId, Boolean isReceive);
 
-    // TODO @puhui999：autoPutCustomerPool，注释说明是系统就好哈；
     /**
      * 【系统】客户自动掉入公海
      *
      * @return 掉入公海数量
      */
-    int customerAutoPutPoolBySystem();
+    int autoPutCustomerPool();
 
     PageResult<CrmCustomerDO> getPutInPoolRemindCustomerPage(CrmCustomerPageReqVO pageVO,
                                                              CrmCustomerPoolConfigDO poolConfigDO,

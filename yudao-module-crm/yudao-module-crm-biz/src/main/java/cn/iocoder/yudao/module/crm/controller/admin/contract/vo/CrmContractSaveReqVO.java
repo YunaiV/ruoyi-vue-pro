@@ -7,10 +7,13 @@ import cn.iocoder.yudao.module.crm.framework.operatelog.core.SysAdminUserParseFu
 import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -34,10 +37,6 @@ public class CrmContractSaveReqVO {
     @Schema(description = "商机编号", example = "10864")
     @DiffLogField(name = "商机", function = CrmBusinessParseFunction.NAME)
     private Long businessId;
-
-    @Schema(description = "工作流编号", example = "1043")
-    @DiffLogField(name = "工作流编号")
-    private Long processInstanceId;
 
     @Schema(description = "下单日期", requiredMode = Schema.RequiredMode.REQUIRED)
     @DiffLogField(name = "下单日期")
@@ -86,16 +85,33 @@ public class CrmContractSaveReqVO {
     @DiffLogField(name = "公司签约人", function = SysAdminUserParseFunction.NAME)
     private Long signUserId;
 
-    @Schema(description = "最后跟进时间")
-    @DiffLogField(name = "最后跟进时间")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime contactLastTime;
-
     @Schema(description = "备注", example = "你猜")
     @DiffLogField(name = "备注")
     private String remark;
 
-    // TODO @dhb52：增加一个 status 字段：具体有哪些值，你来枚举下；主要页面上有个【草稿】【提交审核】的流程，可以看看。然后要对接工作流，这块也可以看看，不确定的地方问我。
+    @Schema(description = "审批状态", example = "1")
+    private Integer auditStatus;
 
+    @Schema(description = "产品列表")
+    private List<CrmContractProductItem> productItems;
+
+    @Schema(description = "商品属性")
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CrmContractProductItem {
+
+        @Schema(description = "产品编号", example = "20529")
+        @NotNull(message = "产品编号不能为空")
+        private Long id;
+
+        @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "8911")
+        @NotNull(message = "产品数量不能为空")
+        private Integer count;
+
+        @Schema(description = "产品折扣")
+        private Integer discountPercent;
+
+    }
 
 }

@@ -2,9 +2,8 @@ package cn.iocoder.yudao.module.bpm.service.definition;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.*;
-import org.flowable.bpmn.model.BpmnModel;
-
 import jakarta.validation.Valid;
+import org.flowable.bpmn.model.BpmnModel;
 
 /**
  * Flowable流程模型接口
@@ -39,6 +38,14 @@ public interface BpmModelService {
     BpmModelRespVO getModel(String id);
 
     /**
+     * 获得流程模块
+     *
+     * @param key 流程标识
+     * @return 流程模型
+     */
+    BpmModelRespVO getBpmnModelByKey(String key);
+
+    /**
      * 修改流程模型
      *
      * @param updateReqVO 更新信息
@@ -62,7 +69,7 @@ public interface BpmModelService {
     /**
      * 修改模型的状态，实际更新的部署的流程定义的状态
      *
-     * @param id 编号
+     * @param id    编号
      * @param state 状态
      */
     void updateModelState(String id, Integer state);

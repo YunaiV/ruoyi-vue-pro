@@ -45,7 +45,7 @@ public class CrmContractDO extends BaseDO {
     /**
      * 工作流编号
      */
-    private Long processInstanceId;
+    private String processInstanceId;
     /**
      * 下单日期
      */

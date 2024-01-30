@@ -2,12 +2,11 @@ package cn.iocoder.yudao.module.crm.dal.dataobject.business;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
+import cn.iocoder.yudao.module.crm.enums.DictTypeConstants;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
-
-import java.math.BigDecimal;
 
 /**
  * 商机产品关联表 DO
@@ -29,14 +28,12 @@ public class CrmBusinessProductDO extends BaseDO {
      */
     @TableId
     private Long id;
-
     /**
      * 商机编号
      *
      * 关联 {@link CrmBusinessDO#getId()}
      */
     private Long businessId;
-
     /**
      * 产品编号
      *
@@ -50,29 +47,27 @@ public class CrmBusinessProductDO extends BaseDO {
     private Integer price;
 
     /**
-     * 销售价格
+     * 销售价格, 单位：分
      */
-    private BigDecimal salesPrice;
-
+    private Integer salesPrice;
     /**
      * 数量
      */
-    private BigDecimal count;
-
-    // TODO @lzxhqs：改成 discountPercent
+    private Integer count;
     /**
      * 折扣
      */
-    private BigDecimal discountPercent;
-
-    // TODO @lzxhqs：改成 totalPrice；总计价格，和现有项目风格一致；
+    private Integer discountPercent;
     /**
-     * 小计（折扣后价格）
+     * 总计价格（折扣后价格）
      */
-    private BigDecimal totalPrice;
+    private Integer totalPrice;
 
     /**
      * 单位
+     *
+     * 字典 {@link DictTypeConstants#CRM_PRODUCT_UNIT}
      */
-    private String unit;
+    private Integer unit;
+
 }

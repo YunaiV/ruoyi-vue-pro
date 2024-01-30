@@ -3,15 +3,14 @@ package cn.iocoder.yudao.module.crm.service.customer;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerLockReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerSaveReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTransferReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerLimitConfigDO;
@@ -41,12 +40,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.customer.CrmCustomerLimitConfigTypeEnum.CUSTOMER_LOCK_LIMIT;
@@ -96,7 +93,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         validateCustomerExceedOwnerLimit(createReqVO.getOwnerUserId(), 1);
 
         // 2. 插入客户
-        CrmCustomerDO customer = BeanUtils.toBean(createReqVO, CrmCustomerDO.class)
+        CrmCustomerDO customer = BeanUtils.toBean(createReqVO, CrmCustomerDO.class).setOwnerUserId(userId)
                 .setLockStatus(false).setDealStatus(false).setContactLastTime(LocalDateTime.now());
         customerMapper.insert(customer);
 
@@ -235,7 +232,55 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         return customer.getId();
     }
 
-// ==================== 公海相关操作 ====================
+    @Override
+    public CrmCustomerImportRespVO importCustomerList(List<CrmCustomerImportExcelVO> importCustomers, Boolean isUpdateSupport, Long userId) {
+        if (CollUtil.isEmpty(importCustomers)) {
+            throw exception(CUSTOMER_IMPORT_LIST_IS_EMPTY);
+        }
+        CrmCustomerImportRespVO respVO = CrmCustomerImportRespVO.builder().createCustomerNames(new ArrayList<>())
+                .updateCustomerNames(new ArrayList<>()).failureCustomerNames(new LinkedHashMap<>()).build();
+        importCustomers.forEach(importCustomer -> {
+            // 校验，判断是否有不符合的原因
+            try {
+                validateCustomerForCreate(importCustomer);
+            } catch (ServiceException ex) {
+                respVO.getFailureCustomerNames().put(importCustomer.getName(), ex.getMessage());
+                return;
+            }
+            // 判断如果不存在，在进行插入
+            CrmCustomerDO existCustomer = customerMapper.selectByCustomerName(importCustomer.getName());
+            if (existCustomer == null) {
+                CrmCustomerDO customer = BeanUtils.toBean(importCustomer, CrmCustomerDO.class).setOwnerUserId(userId)
+                        .setLockStatus(false).setDealStatus(false).setContactLastTime(LocalDateTime.now());
+                customerMapper.insert(customer);
+                respVO.getCreateCustomerNames().add(importCustomer.getName());
+                // 创建数据权限
+                permissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
+                        .setBizId(customer.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
+                return;
+            }
+            // 如果存在，判断是否允许更新
+            if (!isUpdateSupport) {
+                respVO.getFailureCustomerNames().put(importCustomer.getName(),
+                        StrUtil.format(CUSTOMER_NAME_EXISTS.getMsg(), importCustomer.getName()));
+                return;
+            }
+            CrmCustomerDO updateCustomer = BeanUtils.toBean(importCustomer, CrmCustomerDO.class);
+            updateCustomer.setId(existCustomer.getId());
+            customerMapper.updateById(updateCustomer);
+            respVO.getUpdateCustomerNames().add(importCustomer.getName());
+        });
+        return respVO;
+    }
+
+    private void validateCustomerForCreate(CrmCustomerImportExcelVO importCustomer) {
+        // 校验客户名称不能为空
+        if (StrUtil.isEmptyIfStr(importCustomer.getName())) {
+            throw exception(CUSTOMER_CREATE_NAME_NOT_NULL);
+        }
+    }
+
+    // ==================== 公海相关操作 ====================
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -313,23 +358,22 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     }
 
     @Override
-    public int customerAutoPutPoolBySystem() {
+    public int autoPutCustomerPool() {
         CrmCustomerPoolConfigDO poolConfig = customerPoolConfigService.getCustomerPoolConfig();
         if (poolConfig == null || !poolConfig.getEnabled()) {
             return 0;
         }
-        // 1. 获取没有锁定的不在公海的客户
-        List<CrmCustomerDO> customerList = customerMapper.selectListByLockStatusAndOwnerUserIdNotNull(Boolean.FALSE);
-        List<CrmCustomerDO> poolCustomerList = CollectionUtils.filterList(customerList, customer -> {
-            // TODO @puhui999：建议这里作为一个查询条件哈，不放内存里过滤；
-            // 1.1 未成交放入公海
-            if (!customer.getDealStatus()) {
-                return (poolConfig.getDealExpireDays() - LocalDateTimeUtils.between(customer.getCreateTime())) <= 0;
-            }
-            // 1.2 未跟进放入公海
+        // 1.1 获取没有锁定的不在公海的客户且没有成交的
+        List<CrmCustomerDO> notDealCustomerList = customerMapper.selectListByLockAndDealStatusAndNotPool(Boolean.FALSE, Boolean.FALSE);
+        // 1.2 获取没有锁定的不在公海的客户且成交的
+        List<CrmCustomerDO> dealCustomerList = customerMapper.selectListByLockAndDealStatusAndNotPool(Boolean.FALSE, Boolean.TRUE);
+        List<CrmCustomerDO> poolCustomerList = new ArrayList<>();
+        poolCustomerList.addAll(filterList(notDealCustomerList, customer ->
+                (poolConfig.getDealExpireDays() - LocalDateTimeUtils.between(customer.getCreateTime())) <= 0));
+        poolCustomerList.addAll(filterList(dealCustomerList, customer -> {
             LocalDateTime lastTime = ObjUtil.defaultIfNull(customer.getContactLastTime(), customer.getCreateTime());
             return (poolConfig.getContactExpireDays() - LocalDateTimeUtils.between(lastTime)) <= 0;
-        });
+        }));
 
         // 2. 逐个放入公海
         int count = 0;
