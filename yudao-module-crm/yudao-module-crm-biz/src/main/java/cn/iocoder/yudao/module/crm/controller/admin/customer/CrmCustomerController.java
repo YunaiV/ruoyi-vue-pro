@@ -59,7 +59,6 @@ public class CrmCustomerController {
     @Resource
     private AdminUserApi adminUserApi;
 
-
     @PostMapping("/create")
     @Operation(summary = "创建客户")
     @PreAuthorize("@ss.hasPermission('crm:customer:create')")
@@ -120,17 +119,16 @@ public class CrmCustomerController {
         return success(CrmCustomerConvert.INSTANCE.convertPage(pageResult, userMap, deptMap, poolDayMap));
     }
 
-
     @GetMapping("/put-in-pool-remind-page")
     @Operation(summary = "获得待进入公海客户分页")
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
     public CommonResult<PageResult<CrmCustomerRespVO>> getPutInPoolRemindCustomerPage(@Valid CrmCustomerPageReqVO pageVO) {
-        // 获取公海配置
+        // 获取公海配置 TODO @dbh52：合并到 getPutInPoolRemindCustomerPage 会更合适哈；
         CrmCustomerPoolConfigDO poolConfigDO = customerPoolConfigService.getCustomerPoolConfig();
         if (ObjUtil.isNull(poolConfigDO)
                 || Boolean.FALSE.equals(poolConfigDO.getEnabled())
                 || Boolean.FALSE.equals(poolConfigDO.getNotifyEnabled())
-        ) {
+        ) { // TODO @dbh52：这个括号，一般不换行，在 java 这里；
             throw exception(CUSTOMER_POOL_CONFIG_NOT_EXISTS_OR_DISABLED);
         }
 
@@ -141,11 +139,11 @@ public class CrmCustomerController {
         }
 
         // 2. 拼接数据
+        // TODO @芋艿：合并 getCustomerPage 和 getPutInPoolRemindCustomerPage 的后置处理；
         Map<Long, Long> poolDayMap = getPoolDayMap(pageResult.getList()); // 客户界面，需要查看距离进入公海的时间
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSetByFlatMap(pageResult.getList(), user -> Stream.of(Long.parseLong(user.getCreator()), user.getOwnerUserId())));
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
-
         return success(CrmCustomerConvert.INSTANCE.convertPage(pageResult, userMap, deptMap, poolDayMap));
     }
 

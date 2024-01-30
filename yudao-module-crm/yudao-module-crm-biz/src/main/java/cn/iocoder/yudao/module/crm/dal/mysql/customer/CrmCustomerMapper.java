@@ -115,47 +115,32 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
         // 拼接数据权限的查询条件
         CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CUSTOMER.getType(),
                 CrmCustomerDO::getId, userId, pageReqVO.getSceneType(), null);
+        // TODO @dhb52：lock 的情况，不需要提醒哈；
 
         // 拼接自身的查询条件
         query.selectAll(CrmCustomerDO.class);
-
-        // 未跟进放入公海天数
-        final Integer contactExpireDays = poolConfigDO.getContactExpireDays();
-        // 未成交放入公海天数
-        final Integer dealExpireDays = poolConfigDO.getDealExpireDays();
-        // 提前提醒天数
-        final Integer notifyDays = poolConfigDO.getNotifyDays();
-
-        // 未成交提醒日期区间
-        // dealExpireDays 开始提醒
+        // 情况一：未成交提醒日期区间
+        Integer dealExpireDays = poolConfigDO.getDealExpireDays();
         LocalDateTime startDealRemindDate = LocalDateTimeUtil.beginOfDay(LocalDateTime.now())
                 .minusDays(dealExpireDays);
-        // dealExpireDays - notifyDays 结束提醒
         LocalDateTime endDealRemindDate = LocalDateTimeUtil.endOfDay(LocalDateTime.now())
-                .minusDays(Math.max(dealExpireDays - notifyDays, 0));
-
-        // 未跟进提醒日期区间
-        // contactExpireDays 开始提醒
+                .minusDays(Math.max(dealExpireDays - poolConfigDO.getNotifyDays(), 0));
+        // 情况二：未跟进提醒日期区间
+        Integer contactExpireDays = poolConfigDO.getContactExpireDays();
         LocalDateTime startContactRemindDate = LocalDateTimeUtil.beginOfDay(LocalDateTime.now())
                 .minusDays(contactExpireDays);
-        // contactExpireDays - notifyDays 结束提醒
         LocalDateTime endContactRemindDate = LocalDateTimeUtil.endOfDay(LocalDateTime.now())
-                .minusDays(Math.max(contactExpireDays - notifyDays, 0));
-
+                .minusDays(Math.max(contactExpireDays - poolConfigDO.getNotifyDays(), 0));
         query
-                // 1.1 未成交放入公海提醒
+                // 情况一：1. 未成交放入公海提醒
                 .eq(CrmCustomerDO::getDealStatus, false)
                 .between(CrmCustomerDO::getCreateTime, startDealRemindDate, endDealRemindDate)
-                .or()
-                // 1.2 未跟进放入公海提醒
-                // 1.2.1 ContactLastTime 为空
+                // 情况二：未跟进放入公海提醒
+                .or() // 2.1 contactLastTime 为空 TODO 芋艿：这个要不要搞个默认值；
                 .isNull(CrmCustomerDO::getContactLastTime)
                 .between(CrmCustomerDO::getCreateTime, startContactRemindDate, endContactRemindDate)
-                .or()
-                // 1.2.2 ContactLastTime 不为空
-                .between(CrmCustomerDO::getContactLastTime, startContactRemindDate, endContactRemindDate)
-        ;
-
+                .or() // 2.2 ContactLastTime 不为空
+                .between(CrmCustomerDO::getContactLastTime, startContactRemindDate, endContactRemindDate);
         return selectJoinPage(pageReqVO, CrmCustomerDO.class, query);
     }
 
