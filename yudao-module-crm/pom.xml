@@ -10,8 +10,6 @@
     <modules>
         <module>yudao-module-crm-api</module>
         <module>yudao-module-crm-biz</module>
-        <module>yudao-module-bi-biz</module>
-        <module>yudao-module-bi-api</module>
     </modules>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>yudao-module-crm</artifactId>

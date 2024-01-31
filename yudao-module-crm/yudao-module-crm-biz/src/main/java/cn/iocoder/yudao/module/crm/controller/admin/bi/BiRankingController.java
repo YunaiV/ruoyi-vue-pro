@@ -1,11 +1,11 @@
-package cn.iocoder.yudao.module.bi.controller.admin.ranking;
+package cn.iocoder.yudao.module.crm.controller.admin.bi;
+
 
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.bi.controller.admin.ranking.vo.BiContractRanKingRespVO;
-import cn.iocoder.yudao.module.bi.controller.admin.ranking.vo.BiRankReqVO;
-import cn.iocoder.yudao.module.bi.controller.admin.ranking.vo.BiReceivablesRanKingRespVO;
-import cn.iocoder.yudao.module.bi.service.ranking.BiRankingService;
+import cn.iocoder.yudao.module.crm.controller.admin.bi.vo.BiRanKingRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.bi.vo.BiRankingReqVO;
+import cn.iocoder.yudao.module.crm.service.bi.BiRankingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -19,13 +19,10 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-// TODO @anhaohao：写了 swagger 注解，不写注释哈
-/**
- * @author anhaohao
- */
+
 @Tag(name = "管理后台 - 排行榜")
 @RestController
-@RequestMapping("/bi/ranking")
+@RequestMapping("/crm/bi-ranking")
 @Validated
 public class BiRankingController {
 
@@ -38,8 +35,8 @@ public class BiRankingController {
     @GetMapping("/contract-ranking")
     @Operation(summary = "合同金额排行榜")
     @PreAuthorize("@ss.hasPermission('bi:ranking:query')")
-    public CommonResult<List<BiContractRanKingRespVO>> contractAmountRanking(BiRankReqVO biRankReqVO) {
-        return success(biRankingService.contractRanKing(biRankReqVO));
+    public CommonResult<List<BiRanKingRespVO>> contractAmountRanking(BiRankingReqVO biRankingReqVO) {
+        return success(biRankingService.contractRanKing(biRankingReqVO));
     }
 
     /**
@@ -48,8 +45,8 @@ public class BiRankingController {
     @GetMapping("/receivables-ranking")
     @Operation(summary = "回款金额排行榜")
     @PreAuthorize("@ss.hasPermission('bi:ranking:query')")
-    public CommonResult<List<BiReceivablesRanKingRespVO>> receivablesRanKing(BiRankReqVO biRankReqVO) {
-        return success(biRankingService.receivablesRanKing(biRankReqVO));
+    public CommonResult<List<BiRanKingRespVO>> receivablesRanKing(BiRankingReqVO biRankingReqVO) {
+        return success(biRankingService.receivablesRanKing(biRankingReqVO));
     }
 
 }
