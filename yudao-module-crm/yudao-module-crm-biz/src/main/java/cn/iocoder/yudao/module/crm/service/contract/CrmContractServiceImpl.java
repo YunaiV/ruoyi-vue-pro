@@ -6,6 +6,7 @@ import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.bpm.api.listener.dto.BpmResultListenerRespDTO;
 import cn.iocoder.yudao.module.bpm.api.task.BpmProcessInstanceApi;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
@@ -33,6 +34,7 @@ import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -73,8 +75,10 @@ public class CrmContractServiceImpl implements CrmContractService {
     @Resource
     private CrmCustomerService customerService;
     @Resource
+    @Lazy
     private CrmContactService contactService;
     @Resource
+    @Lazy
     private CrmBusinessService businessService;
     @Resource
     private AdminUserApi adminUserApi;
@@ -242,6 +246,12 @@ public class CrmContractServiceImpl implements CrmContractService {
         // 更新合同工作流编号
         contractMapper.updateById(new CrmContractDO().setId(id).setProcessInstanceId(processInstanceId)
                 .setAuditStatus(CrmAuditStatusEnum.PROCESS.getStatus()));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateContractAuditStatus(BpmResultListenerRespDTO event) {
+        contractMapper.updateById(new CrmContractDO().setId(Long.parseLong(event.getBusinessKey())).setAuditStatus(event.getResult()));
     }
 
     //======================= 查询相关 =======================
