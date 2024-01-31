@@ -34,6 +34,13 @@ public class MultiInstanceHandler {
     @Resource
     private PermissionApi permissionApi;
 
+    /**
+     * 流程发起人那种情况不需要处理，
+     * 由 flowable 完成
+     *
+     * @param execution flowable的执行对象
+     * @return 用户ID
+     */
     public Set<String> getUserIds(DelegateExecution execution) {
         Set<String> candidateUserIds = new LinkedHashSet<>();
         FlowElement flowElement = execution.getCurrentFlowElement();
