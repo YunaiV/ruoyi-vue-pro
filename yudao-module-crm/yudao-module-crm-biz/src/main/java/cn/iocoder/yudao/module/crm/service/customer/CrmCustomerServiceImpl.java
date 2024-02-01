@@ -232,8 +232,10 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         return customer.getId();
     }
 
+    // TODO @puhui999：操作日志
     @Override
-    public CrmCustomerImportRespVO importCustomerList(List<CrmCustomerImportExcelVO> importCustomers, Boolean isUpdateSupport, Long userId) {
+    public CrmCustomerImportRespVO importCustomerList(List<CrmCustomerImportExcelVO> importCustomers,
+                                                      Boolean isUpdateSupport, Long userId) {
         if (CollUtil.isEmpty(importCustomers)) {
             throw exception(CUSTOMER_IMPORT_LIST_IS_EMPTY);
         }
@@ -241,6 +243,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
                 .updateCustomerNames(new ArrayList<>()).failureCustomerNames(new LinkedHashMap<>()).build();
         importCustomers.forEach(importCustomer -> {
             // 校验，判断是否有不符合的原因
+            // TODO @puhui999：可以用 ValidationUtils 做参数校验；可能要封装一个方法，返回 message；这样的话，就可以在 CrmCustomerImportExcelVO 写需要校验的参数啦；
             try {
                 validateCustomerForCreate(importCustomer);
             } catch (ServiceException ex) {
@@ -250,6 +253,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
             // 判断如果不存在，在进行插入
             CrmCustomerDO existCustomer = customerMapper.selectByCustomerName(importCustomer.getName());
             if (existCustomer == null) {
+                // TODO @puhui999：可以搞个 initCustomer 方法；这样可以把 create 和导入复用下这个方法；
                 CrmCustomerDO customer = BeanUtils.toBean(importCustomer, CrmCustomerDO.class).setOwnerUserId(userId)
                         .setLockStatus(false).setDealStatus(false).setContactLastTime(LocalDateTime.now());
                 customerMapper.insert(customer);
@@ -366,6 +370,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         // 1.1 获取没有锁定的不在公海的客户且没有成交的
         List<CrmCustomerDO> notDealCustomerList = customerMapper.selectListByLockAndDealStatusAndNotPool(Boolean.FALSE, Boolean.FALSE);
         // 1.2 获取没有锁定的不在公海的客户且成交的
+        // TODO @puhui999：下面也搞到 sql 里去哈；写 or 查询，问题不大的；
         List<CrmCustomerDO> dealCustomerList = customerMapper.selectListByLockAndDealStatusAndNotPool(Boolean.FALSE, Boolean.TRUE);
         List<CrmCustomerDO> poolCustomerList = new ArrayList<>();
         poolCustomerList.addAll(filterList(notDealCustomerList, customer ->
@@ -382,7 +387,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
                 getSelf().putCustomerPool(customer);
                 count++;
             } catch (Throwable e) {
-                log.error("[customerAutoPutPoolBySystem][Customer 客户({}) 放入公海异常]", customer.getId(), e);
+                log.error("[autoPutCustomerPool][Customer 客户({}) 放入公海异常]", customer.getId(), e);
             }
         }
         return count;

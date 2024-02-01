@@ -132,6 +132,7 @@ public class CrmContractController {
         return CrmContractConvert.INSTANCE.convertPage(pageResult, userMap, customerList);
     }
 
+    // TODO @puhui999：transferContract
     @PutMapping("/transfer")
     @Operation(summary = "合同转移")
     @PreAuthorize("@ss.hasPermission('crm:contract:update')")
@@ -140,6 +141,7 @@ public class CrmContractController {
         return success(true);
     }
 
+    // TODO @puhui999：方法名不对哈；要不改成 submit？提交审核的意思
     @PutMapping("/approve")
     @Operation(summary = "发起合同审批流程")
     @PreAuthorize("@ss.hasPermission('crm:contract:update')")
