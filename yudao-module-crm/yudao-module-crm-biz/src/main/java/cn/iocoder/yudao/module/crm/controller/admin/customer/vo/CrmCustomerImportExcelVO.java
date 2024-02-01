@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.crm.controller.admin.customer.vo;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import com.alibaba.excel.annotation.ExcelProperty;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,6 +24,7 @@ public class CrmCustomerImportExcelVO {
     @ExcelProperty("客户名称")
     private String name;
 
+    // TODO @puhui999：industryId、level、source 字段，可以研究下怎么搞下拉框
     @ExcelProperty(value = "所属行业", converter = DictConvert.class)
     @DictFormat(CRM_CUSTOMER_INDUSTRY)
     private Integer industryId;
@@ -46,25 +46,22 @@ public class CrmCustomerImportExcelVO {
     @ExcelProperty("网址")
     private String website;
 
-    @Size(max = 20, message = "QQ长度不能超过 20 个字符")
     @ExcelProperty("QQ")
     private String qq;
 
-    @Size(max = 255, message = "微信长度不能超过 255 个字符")
     @ExcelProperty("微信")
     private String wechat;
 
-    @Size(max = 255, message = "邮箱长度不能超过 255 个字符")
     @ExcelProperty("邮箱")
     private String email;
 
-    @Size(max = 4096, message = "客户描述长度不能超过 4096 个字符")
     @ExcelProperty("客户描述")
     private String description;
 
     @ExcelProperty("备注")
     private String remark;
 
+    // TODO @puhui999：需要选择省市区，需要研究下，怎么搞合理点；
     @ExcelProperty("地区编号")
     private Integer areaId;
 

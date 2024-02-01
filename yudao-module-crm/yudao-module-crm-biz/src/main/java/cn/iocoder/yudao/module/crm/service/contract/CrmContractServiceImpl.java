@@ -6,7 +6,6 @@ import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.bpm.api.listener.dto.BpmResultListenerRespDTO;
 import cn.iocoder.yudao.module.bpm.api.task.BpmProcessInstanceApi;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
@@ -23,7 +22,6 @@ import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessProductService;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
-import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
@@ -34,7 +32,6 @@ import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.Resource;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -71,17 +68,14 @@ public class CrmContractServiceImpl implements CrmContractService {
     @Resource
     private CrmProductService productService;
     @Resource
-    private BpmProcessInstanceApi bpmProcessInstanceApi;
-    @Resource
     private CrmCustomerService customerService;
     @Resource
-    @Lazy
-    private CrmContactService contactService;
-    @Resource
-    @Lazy
     private CrmBusinessService businessService;
+
     @Resource
     private AdminUserApi adminUserApi;
+    @Resource
+    private BpmProcessInstanceApi bpmProcessInstanceApi;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -89,19 +83,19 @@ public class CrmContractServiceImpl implements CrmContractService {
             success = CRM_CONTRACT_CREATE_SUCCESS)
     public Long createContract(CrmContractSaveReqVO createReqVO, Long userId) {
         validateRelationDataExists(createReqVO);
-        // 插入合同
+        // 1.1 插入合同
         CrmContractDO contract = BeanUtils.toBean(createReqVO, CrmContractDO.class).setId(null);
         contractMapper.insert(contract);
+        // 1.2 插入商机关联商品
+        List<CrmBusinessProductDO> businessProduct = convertBusinessProductList(createReqVO);
+        businessProductService.insertBatch(businessProduct);
 
-        // 创建数据权限
+        // 2. 创建数据权限
         crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setUserId(userId)
                 .setBizType(CrmBizTypeEnum.CRM_CONTRACT.getType()).setBizId(contract.getId())
                 .setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
 
-        // 插入商机关联商品
-        List<CrmBusinessProductDO> businessProduct = convertBusinessProductList(createReqVO);
-        businessProductService.insertBatch(businessProduct);
-        // 4. 记录操作日志上下文
+        // 3. 记录操作日志上下文
         LogRecordContext.putVariable("contract", contract);
         return contract.getId();
     }
@@ -125,6 +119,7 @@ public class CrmContractServiceImpl implements CrmContractService {
         contractMapper.updateById(updateObj);
 
         // TODO puhui999: @芋艿：合同变更关联的商机后商品怎么处理？
+        // TODO @puhui999：和商品 spu、sku 编辑一样；新增的插入；修改的更新；删除的删除
         //List<CrmBusinessProductDO> businessProduct = convertBusinessProductList(updateReqVO);
         //businessProductService.selectListByBusinessId()
         //diffList()
@@ -145,6 +140,7 @@ public class CrmContractServiceImpl implements CrmContractService {
         }
         Map<Long, CrmProductDO> productMap = convertMap(productList, CrmProductDO::getId);
         return convertList(reqVO.getProductItems(), productItem -> {
+            // TODO @puhui999：这里可以改成直接 return，不用弄一个 businessProduct 变量哈；
             CrmBusinessProductDO businessProduct = BeanUtils.toBean(productMap.get(productItem.getId()), CrmBusinessProductDO.class);
             businessProduct.setId(null).setBusinessId(reqVO.getBusinessId()).setProductId(productItem.getId())
                     .setCount(productItem.getCount()).setDiscountPercent(productItem.getDiscountPercent()).setTotalPrice(calculator(businessProduct));
@@ -158,6 +154,7 @@ public class CrmContractServiceImpl implements CrmContractService {
      * @param businessProduct 关联商品
      * @return 商品总价
      */
+    // TODO @puhui999：这个逻辑的计算，是不是可以封装到 calculateRatePriceFloor 里；
     private Integer calculator(CrmBusinessProductDO businessProduct) {
         int price = businessProduct.getPrice() * businessProduct.getCount();
         if (businessProduct.getDiscountPercent() == null) {
@@ -180,7 +177,7 @@ public class CrmContractServiceImpl implements CrmContractService {
         if (reqVO.getOwnerUserId() != null && adminUserApi.getUser(reqVO.getOwnerUserId()) == null) {
             throw exception(USER_NOT_EXISTS);
         }
-        // 4. 如果有关联商机，则需要校验存在
+        // 3. 如果有关联商机，则需要校验存在
         if (reqVO.getBusinessId() != null && businessService.getBusiness(reqVO.getBusinessId()) == null) {
             throw exception(BUSINESS_NOT_EXISTS);
         }
@@ -239,6 +236,8 @@ public class CrmContractServiceImpl implements CrmContractService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void handleApprove(Long id, Long userId) {
+        // TODO @puhui999：需要做状态检查
+
         // 创建合同审批流程实例
         String processInstanceId = bpmProcessInstanceApi.createProcessInstance(userId, new BpmProcessInstanceCreateReqDTO()
                 .setProcessDefinitionKey(CONTRACT_APPROVE).setBusinessKey(String.valueOf(id)));
@@ -246,12 +245,6 @@ public class CrmContractServiceImpl implements CrmContractService {
         // 更新合同工作流编号
         contractMapper.updateById(new CrmContractDO().setId(id).setProcessInstanceId(processInstanceId)
                 .setAuditStatus(CrmAuditStatusEnum.PROCESS.getStatus()));
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateContractAuditStatus(BpmResultListenerRespDTO event) {
-        contractMapper.updateById(new CrmContractDO().setId(Long.parseLong(event.getBusinessKey())).setAuditStatus(event.getResult()));
     }
 
     //======================= 查询相关 =======================

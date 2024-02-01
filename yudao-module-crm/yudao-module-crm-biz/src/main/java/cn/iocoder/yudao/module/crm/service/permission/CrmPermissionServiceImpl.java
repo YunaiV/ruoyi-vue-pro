@@ -213,10 +213,10 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
     }
 
     @Override
-    public boolean hasPermission(Integer bizType, Long bizId, Long userId, CrmPermissionLevelEnum levelEnum) {
+    public boolean hasPermission(Integer bizType, Long bizId, Long userId, CrmPermissionLevelEnum level) {
         List<CrmPermissionDO> permissionList = permissionMapper.selectByBizTypeAndBizId(bizType, bizId);
         return anyMatch(permissionList, permission ->
-                ObjUtil.equal(permission.getUserId(), userId) && ObjUtil.equal(permission.getLevel(), levelEnum.getLevel()));
+                ObjUtil.equal(permission.getUserId(), userId) && ObjUtil.equal(permission.getLevel(), level.getLevel()));
     }
 
 }
