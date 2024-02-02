@@ -45,7 +45,6 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 public class CrmContractController {
 
     @Resource
-    @Lazy
     private CrmContractService contractService;
     @Resource
     private CrmCustomerService customerService;

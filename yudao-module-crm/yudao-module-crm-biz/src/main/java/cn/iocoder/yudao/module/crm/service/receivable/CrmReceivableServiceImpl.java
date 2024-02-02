@@ -51,7 +51,6 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
     private CrmReceivableMapper receivableMapper;
 
     @Resource
-    @Lazy
     private CrmContractService contractService;
     @Resource
     private CrmCustomerService customerService;
