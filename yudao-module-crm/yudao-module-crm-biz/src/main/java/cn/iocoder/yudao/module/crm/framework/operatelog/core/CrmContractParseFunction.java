@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import com.mzt.logapi.service.IParseFunction;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,6 +21,7 @@ public class CrmContractParseFunction implements IParseFunction {
     public static final String NAME = "getContractById";
 
     @Resource
+    @Lazy
     private CrmContractService contractService;
 
     @Override
