@@ -10,10 +10,14 @@ import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.*;
 import cn.iocoder.yudao.module.crm.convert.contract.CrmContractConvert;
+import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
+import cn.iocoder.yudao.module.crm.service.business.CrmBusinessProductService;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
+import cn.iocoder.yudao.module.crm.service.product.CrmProductService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,8 +36,8 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertListByFlatMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -47,6 +51,10 @@ public class CrmContractController {
     private CrmContractService contractService;
     @Resource
     private CrmCustomerService customerService;
+    @Resource
+    private CrmBusinessProductService businessProductService;
+    @Resource
+    private CrmProductService productService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -81,7 +89,18 @@ public class CrmContractController {
     @PreAuthorize("@ss.hasPermission('crm:contract:query')")
     public CommonResult<CrmContractRespVO> getContract(@RequestParam("id") Long id) {
         CrmContractDO contract = contractService.getContract(id);
-        return success(BeanUtils.toBean(contract, CrmContractRespVO.class));
+        CrmContractRespVO respVO = BeanUtils.toBean(contract, CrmContractRespVO.class);
+        List<CrmBusinessProductDO> businessProductList = businessProductService.getBusinessProductListByContractId(id);
+        Map<Long, CrmBusinessProductDO> businessProductMap = convertMap(businessProductList, CrmBusinessProductDO::getProductId);
+        List<CrmProductDO> productList = productService.getProductListByIds(convertSet(businessProductList, CrmBusinessProductDO::getProductId));
+        respVO.setProductItems(convertList(productList, product -> {
+            CrmContractRespVO.CrmContractProductItemRespVO productItemRespVO = BeanUtils.toBean(product, CrmContractRespVO.CrmContractProductItemRespVO.class);
+            findAndThen(businessProductMap, product.getId(), businessProduct -> {
+                productItemRespVO.setCount(businessProduct.getCount()).setDiscountPercent(businessProduct.getDiscountPercent());
+            });
+            return productItemRespVO;
+        }));
+        return success(respVO);
     }
 
     @GetMapping("/page")

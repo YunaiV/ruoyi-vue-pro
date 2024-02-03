@@ -7,6 +7,7 @@ import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.bpm.api.listener.dto.BpmResultListenerRespDTO;
 import cn.iocoder.yudao.module.bpm.api.task.BpmProcessInstanceApi;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
@@ -91,7 +92,8 @@ public class CrmContractServiceImpl implements CrmContractService {
         // 1.2 插入商机关联商品
         if (CollUtil.isNotEmpty(createReqVO.getProductItems())) { // 如果有的话
             List<CrmBusinessProductDO> businessProduct = convertBusinessProductList(createReqVO, contract.getId());
-            businessProductService.insertBatch(businessProduct);
+            businessProductService.createBusinessProductBatch(businessProduct);
+            // 更新合同商品总金额
         }
 
         // 2. 创建数据权限
@@ -113,8 +115,8 @@ public class CrmContractServiceImpl implements CrmContractService {
         Assert.notNull(updateReqVO.getId(), "合同编号不能为空");
         CrmContractDO contract = validateContractExists(updateReqVO.getId());
         // 只有草稿、审批中，可以编辑；
-        if (ObjUtil.notEqual(contract.getAuditStatus(), CrmAuditStatusEnum.DRAFT.getStatus()) ||
-                ObjUtil.notEqual(contract.getAuditStatus(), CrmAuditStatusEnum.PROCESS.getStatus())) {
+        if (!ObjectUtils.equalsAny(contract.getAuditStatus(), CrmAuditStatusEnum.DRAFT.getStatus(),
+                CrmAuditStatusEnum.PROCESS.getStatus())) {
             throw exception(CONTRACT_UPDATE_FAIL_EDITING_PROHIBITED);
         }
         validateRelationDataExists(updateReqVO);
@@ -136,7 +138,7 @@ public class CrmContractServiceImpl implements CrmContractService {
             return;
         }
         List<CrmBusinessProductDO> newProductList = convertBusinessProductList(updateReqVO, contractId);
-        List<CrmBusinessProductDO> oldProductList = businessProductService.selectListByContractId(contractId);
+        List<CrmBusinessProductDO> oldProductList = businessProductService.getBusinessProductListByContractId(contractId);
         List<List<CrmBusinessProductDO>> diffList = diffList(oldProductList, newProductList, (oldObj, newObj) -> {
             if (ObjUtil.notEqual(oldObj.getProductId(), newObj.getProductId())) {
                 return false;
@@ -145,13 +147,13 @@ public class CrmContractServiceImpl implements CrmContractService {
             return true;
         });
         if (CollUtil.isNotEmpty(diffList.getFirst())) {
-            businessProductService.insertBatch(diffList.getFirst());
+            businessProductService.createBusinessProductBatch(diffList.getFirst());
         }
         if (CollUtil.isNotEmpty(diffList.get(1))) {
-            businessProductService.updateBatch(diffList.get(1));
+            businessProductService.updateBusinessProductBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            businessProductService.deleteBatch(diffList.get(2));
+            businessProductService.deleteBusinessProductBatch(diffList.get(2));
         }
     }
 

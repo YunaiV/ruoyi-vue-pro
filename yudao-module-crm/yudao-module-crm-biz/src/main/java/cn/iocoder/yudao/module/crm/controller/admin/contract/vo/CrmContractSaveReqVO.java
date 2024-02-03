@@ -93,7 +93,7 @@ public class CrmContractSaveReqVO {
     @Schema(description = "产品列表")
     private List<CrmContractProductItem> productItems;
 
-    @Schema(description = "商品属性")
+    @Schema(description = "产品列表")
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
