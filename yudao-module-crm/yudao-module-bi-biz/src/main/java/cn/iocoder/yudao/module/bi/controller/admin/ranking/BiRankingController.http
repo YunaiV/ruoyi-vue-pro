@@ -1,9 +1,0 @@
-### 合同金额排行榜
-GET {{baseUrl}}/bi/rank/contract-ranKing
-Authorization: Bearer {{token}}
-tenant-id: {{adminTenentId}}
-
-### 回款金额排行榜
-GET {{baseUrl}}/bi/rank/receivables-ranKing
-Authorization: Bearer {{token}}
-tenant-id: {{adminTenentId}}

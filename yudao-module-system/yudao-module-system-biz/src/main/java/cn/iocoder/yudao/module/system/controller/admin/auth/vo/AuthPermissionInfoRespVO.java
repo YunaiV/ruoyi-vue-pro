@@ -44,6 +44,9 @@ public class AuthPermissionInfoRespVO {
         @Schema(description = "用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xx.jpg")
         private String avatar;
 
+        @Schema(description = "部门编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
+        private Long deptId;
+
     }
 
     @Schema(description = "管理后台 - 登录用户的菜单信息 Response VO")

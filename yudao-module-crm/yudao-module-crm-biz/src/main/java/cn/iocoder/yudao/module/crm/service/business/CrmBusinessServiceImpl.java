@@ -57,7 +57,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     @Resource
     private CrmBusinessProductService businessProductService;
     @Resource
-    @Lazy
+    @Lazy // 延迟加载，避免循环依赖
     private CrmContractService contractService;
     @Resource
     private CrmPermissionService permissionService;

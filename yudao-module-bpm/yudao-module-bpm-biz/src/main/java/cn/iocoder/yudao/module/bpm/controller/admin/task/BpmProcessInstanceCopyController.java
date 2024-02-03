@@ -49,7 +49,7 @@ public class BpmProcessInstanceCopyController {
     @PostMapping("/create")
     @Operation(summary = "抄送流程")
     @PreAuthorize("@ss.hasPermission('bpm:process-instance-cc:create')")
-    public CommonResult<Boolean> createProcessInstanceCC(@Valid @RequestBody BpmProcessInstanceCopyCreateReqVO createReqVO) {
+    public CommonResult<Boolean> createProcessInstanceCopy(@Valid @RequestBody BpmProcessInstanceCopyCreateReqVO createReqVO) {
         processInstanceCopyService.createProcessInstanceCopy(getLoginUserId(), createReqVO);
         return success(true);
     }
@@ -57,7 +57,7 @@ public class BpmProcessInstanceCopyController {
     @GetMapping("/my-page")
     @Operation(summary = "获得抄送流程分页列表")
     @PreAuthorize("@ss.hasPermission('bpm:process-instance-cc:query')")
-    public CommonResult<PageResult<BpmProcessInstanceCopyPageItemRespVO>> getProcessInstanceCCPage(
+    public CommonResult<PageResult<BpmProcessInstanceCopyPageItemRespVO>> getProcessInstanceCopyPage(
             @Valid BpmProcessInstanceCopyMyPageReqVO pageReqVO) {
         PageResult<BpmProcessInstanceCopyDO> pageResult = processInstanceCopyService.getMyProcessInstanceCopyPage(getLoginUserId(), pageReqVO);
         if (CollUtil.isEmpty(pageResult.getList())) {

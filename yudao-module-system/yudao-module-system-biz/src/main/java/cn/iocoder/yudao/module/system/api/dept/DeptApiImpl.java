@@ -20,7 +20,6 @@ import java.util.List;
 public class DeptApiImpl implements DeptApi {
 
     @Resource
-    @Lazy // 延迟加载，解决相互依赖的问题
     private DeptService deptService;
 
     @Override
