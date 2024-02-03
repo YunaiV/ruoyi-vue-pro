@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.handler;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.iocoder.yudao.framework.flowable.core.enums.ProcessConstants;
+import cn.iocoder.yudao.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
+// TODO @芋艿：bpmn 分配人融合时，需要搞下这块；
 /**
  * 多实例处理类
  */
@@ -45,7 +46,7 @@ public class MultiInstanceHandler {
         Set<String> candidateUserIds = new LinkedHashSet<>();
         FlowElement flowElement = execution.getCurrentFlowElement();
         if (ObjectUtil.isNotEmpty(flowElement) && flowElement instanceof UserTask userTask) {
-            String dataType = userTask.getAttributeValue(ProcessConstants.NAMESPASE, ProcessConstants.PROCESS_CUSTOM_DATA_TYPE);
+            String dataType = userTask.getAttributeValue(BpmnModelConstants.NAMESPACE, BpmnModelConstants.PROCESS_CUSTOM_DATA_TYPE);
             if ("USERS".equals(dataType) && CollUtil.isNotEmpty(userTask.getCandidateUsers())) {
                 // 添加候选用户id
                 candidateUserIds.addAll(userTask.getCandidateUsers());
@@ -71,4 +72,5 @@ public class MultiInstanceHandler {
         }
         return candidateUserIds;
     }
+
 }

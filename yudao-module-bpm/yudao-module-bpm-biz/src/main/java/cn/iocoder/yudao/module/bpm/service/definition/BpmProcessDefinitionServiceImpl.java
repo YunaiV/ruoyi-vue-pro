@@ -5,7 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
-import cn.iocoder.yudao.framework.flowable.core.enums.ProcessConstants;
+import cn.iocoder.yudao.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionListReqVO;
@@ -122,7 +122,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         // 创建 Deployment 部署
         Deployment deploy = repositoryService.createDeployment()
                 .key(createReqDTO.getKey()).name(createReqDTO.getName()).category(createReqDTO.getCategory())
-                .addBytes(createReqDTO.getKey() + ProcessConstants.BPMN_FILE_SUFFIX, createReqDTO.getBpmnBytes())
+                .addBytes(createReqDTO.getKey() + BpmnModelConstants.BPMN_FILE_SUFFIX, createReqDTO.getBpmnBytes())
                 .tenantId(TenantContextHolder.getTenantIdStr())
                 .deploy();
 
