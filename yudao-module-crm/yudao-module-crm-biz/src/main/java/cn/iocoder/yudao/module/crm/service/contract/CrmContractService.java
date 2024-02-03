@@ -64,7 +64,7 @@ public interface CrmContractService {
      * @param id     合同编号
      * @param userId 用户编号
      */
-    void handleApprove(Long id, Long userId);
+    void submitContract(Long id, Long userId);
 
     /**
      * 更新合同流程审批结果
@@ -125,13 +125,12 @@ public interface CrmContractService {
      */
     Long getContractCountByCustomerId(Long customerId);
 
-    // TODO @puhui999：要不改成 getContractCountByBusinessId
     /**
      * 根据商机ID获取关联客户的合同数量
      *
      * @param businessId 商机编号
      * @return 数量
      */
-    Long selectCountByBusinessId(Long businessId);
+    Long getContractCountByBusinessId(Long businessId);
 
 }

@@ -89,9 +89,6 @@ public class CrmContractSaveReqVO {
     @DiffLogField(name = "备注")
     private String remark;
 
-    // TODO @puhui999：这个字段，按道理不用传递？
-    @Schema(description = "审批状态", example = "1")
-    private Integer auditStatus;
 
     @Schema(description = "产品列表")
     private List<CrmContractProductItem> productItems;

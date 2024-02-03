@@ -28,7 +28,7 @@ public class CrmBusinessProductServiceImpl implements CrmBusinessProductService 
 
     @Override
     public List<CrmBusinessProductDO> selectListByBusinessId(Long businessId) {
-        return businessProductMapper.selectList(CrmBusinessProductDO::getBusinessId,businessId);
+        return businessProductMapper.selectList(CrmBusinessProductDO::getBusinessId, businessId);
     }
 
     @Override
@@ -45,6 +45,11 @@ public class CrmBusinessProductServiceImpl implements CrmBusinessProductService 
     @Override
     public void deleteByBusinessId(Long businessId) {
         businessProductMapper.deleteByBusinessId(businessId);
+    }
+
+    @Override
+    public List<CrmBusinessProductDO> selectListByContractId(Long contractId) {
+        return businessProductMapper.selectList(CrmBusinessProductDO::getContractId, contractId);
     }
 
 }

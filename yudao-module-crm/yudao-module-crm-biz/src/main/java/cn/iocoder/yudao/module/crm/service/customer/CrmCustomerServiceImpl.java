@@ -93,8 +93,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         validateCustomerExceedOwnerLimit(createReqVO.getOwnerUserId(), 1);
 
         // 2. 插入客户
-        CrmCustomerDO customer = BeanUtils.toBean(createReqVO, CrmCustomerDO.class).setOwnerUserId(userId)
-                .setLockStatus(false).setDealStatus(false).setContactLastTime(LocalDateTime.now());
+        CrmCustomerDO customer = initCustomer(createReqVO, userId);
         customerMapper.insert(customer);
 
         // 3. 创建数据权限
@@ -232,7 +231,6 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         return customer.getId();
     }
 
-    // TODO @puhui999：操作日志
     @Override
     public CrmCustomerImportRespVO importCustomerList(List<CrmCustomerImportExcelVO> importCustomers,
                                                       Boolean isUpdateSupport, Long userId) {
@@ -253,14 +251,14 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
             // 判断如果不存在，在进行插入
             CrmCustomerDO existCustomer = customerMapper.selectByCustomerName(importCustomer.getName());
             if (existCustomer == null) {
-                // TODO @puhui999：可以搞个 initCustomer 方法；这样可以把 create 和导入复用下这个方法；
-                CrmCustomerDO customer = BeanUtils.toBean(importCustomer, CrmCustomerDO.class).setOwnerUserId(userId)
-                        .setLockStatus(false).setDealStatus(false).setContactLastTime(LocalDateTime.now());
+                CrmCustomerDO customer = initCustomer(importCustomer, userId);
                 customerMapper.insert(customer);
                 respVO.getCreateCustomerNames().add(importCustomer.getName());
                 // 创建数据权限
                 permissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
                         .setBizId(customer.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
+                // 记录操作日志
+                getSelf().importCustomerLog(customer, false);
                 return;
             }
             // 如果存在，判断是否允许更新
@@ -273,8 +271,23 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
             updateCustomer.setId(existCustomer.getId());
             customerMapper.updateById(updateCustomer);
             respVO.getUpdateCustomerNames().add(importCustomer.getName());
+            // 记录操作日志
+            getSelf().importCustomerLog(updateCustomer, true);
         });
         return respVO;
+    }
+
+    private static CrmCustomerDO initCustomer(Object customer, Long userId) {
+        return BeanUtils.toBean(customer, CrmCustomerDO.class).setOwnerUserId(userId)
+                .setLockStatus(false).setDealStatus(false).setContactLastTime(LocalDateTime.now());
+    }
+
+    @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_IMPORT_SUB_TYPE, bizNo = "{{#customer.id}}",
+            success = CRM_CUSTOMER_IMPORT_SUCCESS)
+    public void importCustomerLog(CrmCustomerDO customer, boolean isUpdate) {
+        // 记录操作日志上下文
+        LogRecordContext.putVariable("customer", customer);
+        LogRecordContext.putVariable("isUpdate", isUpdate);
     }
 
     private void validateCustomerForCreate(CrmCustomerImportExcelVO importCustomer) {
@@ -367,15 +380,15 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         if (poolConfig == null || !poolConfig.getEnabled()) {
             return 0;
         }
-        // 1.1 获取没有锁定的不在公海的客户且没有成交的
-        List<CrmCustomerDO> notDealCustomerList = customerMapper.selectListByLockAndDealStatusAndNotPool(Boolean.FALSE, Boolean.FALSE);
-        // 1.2 获取没有锁定的不在公海的客户且成交的
-        // TODO @puhui999：下面也搞到 sql 里去哈；写 or 查询，问题不大的；
-        List<CrmCustomerDO> dealCustomerList = customerMapper.selectListByLockAndDealStatusAndNotPool(Boolean.FALSE, Boolean.TRUE);
+        // 1.1 获取没有锁定的不在公海的客户
+        List<CrmCustomerDO> customerList = customerMapper.selectListByLockAndNotPool(Boolean.FALSE);
         List<CrmCustomerDO> poolCustomerList = new ArrayList<>();
-        poolCustomerList.addAll(filterList(notDealCustomerList, customer ->
-                (poolConfig.getDealExpireDays() - LocalDateTimeUtils.between(customer.getCreateTime())) <= 0));
-        poolCustomerList.addAll(filterList(dealCustomerList, customer -> {
+        poolCustomerList.addAll(filterList(customerList, customer ->
+                !customer.getDealStatus() && (poolConfig.getDealExpireDays() - LocalDateTimeUtils.between(customer.getCreateTime())) <= 0));
+        poolCustomerList.addAll(filterList(customerList, customer -> {
+            if (!customer.getDealStatus()) { // 这里只处理成交的
+                return false;
+            }
             LocalDateTime lastTime = ObjUtil.defaultIfNull(customer.getContactLastTime(), customer.getCreateTime());
             return (poolConfig.getContactExpireDays() - LocalDateTimeUtils.between(lastTime)) <= 0;
         }));

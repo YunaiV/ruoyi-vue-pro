@@ -196,7 +196,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
      */
     private void validateContractExists(Long businessId) {
         // TODO @lzxhqs：保持风格的统一，selectCountByBusinessId 改成 getContractCountByBusinessId；另外，可以不用声明 count，因为就一次性使用，直接把 197 和 198 合并成一行；
-        Long count = contractService.selectCountByBusinessId(businessId);
+        Long count = contractService.getContractCountByBusinessId(businessId);
         if (count > 0) {
             throw exception(BUSINESS_CONTRACT_EXISTS);
         }

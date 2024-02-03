@@ -132,21 +132,19 @@ public class CrmContractController {
         return CrmContractConvert.INSTANCE.convertPage(pageResult, userMap, customerList);
     }
 
-    // TODO @puhui999：transferContract
-    @PutMapping("/transfer")
+    @PutMapping("/transfer-contract")
     @Operation(summary = "合同转移")
     @PreAuthorize("@ss.hasPermission('crm:contract:update')")
-    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmContractTransferReqVO reqVO) {
+    public CommonResult<Boolean> transferContract(@Valid @RequestBody CrmContractTransferReqVO reqVO) {
         contractService.transferContract(reqVO, getLoginUserId());
         return success(true);
     }
 
-    // TODO @puhui999：方法名不对哈；要不改成 submit？提交审核的意思
-    @PutMapping("/approve")
-    @Operation(summary = "发起合同审批流程")
+    @PutMapping("/submit")
+    @Operation(summary = "提交合同审批")
     @PreAuthorize("@ss.hasPermission('crm:contract:update')")
-    public CommonResult<Boolean> transfer(@RequestParam("id") Long id) {
-        contractService.handleApprove(id, getLoginUserId());
+    public CommonResult<Boolean> submitContract(@RequestParam("id") Long id) {
+        contractService.submitContract(id, getLoginUserId());
         return success(true);
     }
 
