@@ -175,7 +175,7 @@ public class CrmContactController {
         return CrmContactConvert.INSTANCE.convertPage(pageResult, userMap, crmCustomerDOList, parentContactList);
     }
 
-    @PutMapping("/transfer-contact")
+    @PutMapping("/transfer")
     @Operation(summary = "联系人转移")
     @PreAuthorize("@ss.hasPermission('crm:contact:update')")
     public CommonResult<Boolean> transferContact(@Valid @RequestBody CrmContactTransferReqVO reqVO) {

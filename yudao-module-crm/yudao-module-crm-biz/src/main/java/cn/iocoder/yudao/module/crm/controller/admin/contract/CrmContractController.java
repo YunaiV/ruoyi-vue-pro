@@ -168,7 +168,7 @@ public class CrmContractController {
         return CrmContractConvert.INSTANCE.convertList(contractList, userMap, customerList, contactMap, businessMap);
     }
 
-    @PutMapping("/transfer-contract")
+    @PutMapping("/transfer")
     @Operation(summary = "合同转移")
     @PreAuthorize("@ss.hasPermission('crm:contract:update')")
     public CommonResult<Boolean> transferContract(@Valid @RequestBody CrmContractTransferReqVO reqVO) {

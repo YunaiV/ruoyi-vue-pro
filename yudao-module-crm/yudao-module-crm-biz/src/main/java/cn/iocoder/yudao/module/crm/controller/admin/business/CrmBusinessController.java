@@ -166,7 +166,7 @@ public class CrmBusinessController {
         return CrmBusinessConvert.INSTANCE.convertPage(pageResult, customerList, statusTypeList, statusList);
     }
 
-    @PutMapping("/transfer-business")
+    @PutMapping("/transfer")
     @Operation(summary = "商机转移")
     @PreAuthorize("@ss.hasPermission('crm:business:update')")
     public CommonResult<Boolean> transferBusiness(@Valid @RequestBody CrmBusinessTransferReqVO reqVO) {
