@@ -88,10 +88,10 @@ public class CrmClueController {
         ExcelUtils.write(response, "线索.xls", "数据", CrmClueRespVO.class, datas);
     }
 
-    @PutMapping("/transfer")
+    @PutMapping("/transfer-clue")
     @Operation(summary = "线索转移")
     @PreAuthorize("@ss.hasPermission('crm:clue:update')")
-    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmClueTransferReqVO reqVO) {
+    public CommonResult<Boolean> transferClue(@Valid @RequestBody CrmClueTransferReqVO reqVO) {
         clueService.transferClue(reqVO, getLoginUserId());
         return success(true);
     }

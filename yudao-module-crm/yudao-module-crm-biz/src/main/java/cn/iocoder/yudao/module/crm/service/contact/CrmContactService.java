@@ -80,7 +80,7 @@ public interface CrmContactService {
      * @param userId 用户编号
      * @return 联系人列表
      */
-    List<CrmContactDO> getContactList(Collection<Long> ids, Long userId);
+    List<CrmContactDO> getContactListByIds(Collection<Long> ids, Long userId);
 
     /**
      * 获得联系人列表
@@ -88,7 +88,7 @@ public interface CrmContactService {
      * @param ids 编号
      * @return 联系人列表
      */
-    List<CrmContactDO> getContactList(Collection<Long> ids);
+    List<CrmContactDO> getContactListByIds(Collection<Long> ids);
 
     /**
      * 获得联系人列表

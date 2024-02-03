@@ -29,10 +29,16 @@ public class CrmContractRespVO {
     @Schema(description = "客户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "18336")
     @ExcelProperty("客户编号")
     private Long customerId;
+    @Schema(description = "客户名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "18336")
+    @ExcelProperty("客户名称")
+    private String customerName;
 
     @Schema(description = "商机编号", example = "10864")
     @ExcelProperty("商机编号")
     private Long businessId;
+    @Schema(description = "商机名称", example = "10864")
+    @ExcelProperty("商机名称")
+    private String businessName;
 
     @Schema(description = "工作流编号", example = "1043")
     @ExcelProperty("工作流编号")
@@ -77,10 +83,16 @@ public class CrmContractRespVO {
     @Schema(description = "联系人编号", example = "18546")
     @ExcelProperty("联系人编号")
     private Long contactId;
+    @Schema(description = "联系人编号", example = "18546")
+    @ExcelProperty("联系人编号")
+    private String contactName;
 
     @Schema(description = "公司签约人", example = "14036")
     @ExcelProperty("公司签约人")
     private Long signUserId;
+    @Schema(description = "公司签约人", example = "14036")
+    @ExcelProperty("公司签约人")
+    private String signUserName;
 
     @Schema(description = "最后跟进时间")
     @ExcelProperty("最后跟进时间")
@@ -103,10 +115,6 @@ public class CrmContractRespVO {
     @Schema(description = "创建人名字", example = "test")
     @ExcelProperty("创建人名字")
     private String creatorName;
-
-    @Schema(description = "客户名字", example = "test")
-    @ExcelProperty("客户名字")
-    private String customerName;
 
     @Schema(description = "负责人", example = "test")
     @ExcelProperty("负责人")
