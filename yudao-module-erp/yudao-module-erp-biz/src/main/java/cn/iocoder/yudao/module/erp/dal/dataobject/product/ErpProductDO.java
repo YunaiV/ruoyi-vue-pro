@@ -45,9 +45,9 @@ public class ErpProductDO extends BaseDO {
     /**
      * 单位编号
      *
-     * TODO 芋艿，关联
+     * 关联 {@link ErpProductUnitDO#getId()}
      */
-    private Integer unitId;
+    private Long unitId;
     /**
      * 产品状态
      *

@@ -69,4 +69,14 @@ public class ErpProductServiceImpl implements ErpProductService {
         return productMapper.selectPage(pageReqVO);
     }
 
+    @Override
+    public Long getProductCountByCategoryId(Long categoryId) {
+        return productMapper.selectCountByCategoryId(categoryId);
+    }
+
+    @Override
+    public Long getProductCountByUnitId(Long unitId) {
+        return productMapper.selectCountByUnitId(unitId);
+    }
+
 }

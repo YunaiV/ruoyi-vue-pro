@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.erp.controller.admin.product.vo.unit.ErpProductUn
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductUnitDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * ERP 产品单位 Mapper
  *
@@ -19,8 +21,15 @@ public interface ErpProductUnitMapper extends BaseMapperX<ErpProductUnitDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<ErpProductUnitDO>()
                 .likeIfPresent(ErpProductUnitDO::getName, reqVO.getName())
                 .eqIfPresent(ErpProductUnitDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(ErpProductUnitDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(ErpProductUnitDO::getId));
+    }
+
+    default ErpProductUnitDO selectByName(String name) {
+        return selectOne(ErpProductUnitDO::getName, name);
+    }
+
+    default List<ErpProductUnitDO> selectListByStatus(Integer status) {
+        return selectList(ErpProductUnitDO::getStatus, status);
     }
 
 }

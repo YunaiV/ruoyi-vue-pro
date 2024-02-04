@@ -6,9 +6,11 @@ import cn.iocoder.yudao.module.erp.controller.admin.product.vo.category.ErpProdu
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductCategoryDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductCategoryMapper;
 import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,6 +28,10 @@ public class ErpProductCategoryServiceImpl implements ErpProductCategoryService 
 
     @Resource
     private ErpProductCategoryMapper productCategoryMapper;
+
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private ErpProductService productService;
 
     @Override
     public Long createProductCategory(ErpProductCategorySaveReqVO createReqVO) {
@@ -57,13 +63,17 @@ public class ErpProductCategoryServiceImpl implements ErpProductCategoryService 
 
     @Override
     public void deleteProductCategory(Long id) {
-        // 校验存在
+        // 1.1 校验存在
         validateProductCategoryExists(id);
-        // 校验是否有子产品分类
+        // 1.2 校验是否有子产品分类
         if (productCategoryMapper.selectCountByParentId(id) > 0) {
             throw exception(PRODUCT_CATEGORY_EXITS_CHILDREN);
         }
-        // 删除
+        // 1.3 校验是否有产品
+        if (productService.getProductCountByCategoryId(id) > 0) {
+            throw exception(PRODUCT_CATEGORY_EXITS_PRODUCT);
+        }
+        // 2. 删除
         productCategoryMapper.deleteById(id);
     }
 
@@ -129,6 +139,11 @@ public class ErpProductCategoryServiceImpl implements ErpProductCategoryService 
     @Override
     public List<ErpProductCategoryDO> getProductCategoryList(ErpProductCategoryListReqVO listReqVO) {
         return productCategoryMapper.selectList(listReqVO);
+    }
+
+    @Override
+    public List<ErpProductCategoryDO> getProductCategoryList(Collection<Long> ids) {
+        return productCategoryMapper.selectBatchIds(ids);
     }
 
 }

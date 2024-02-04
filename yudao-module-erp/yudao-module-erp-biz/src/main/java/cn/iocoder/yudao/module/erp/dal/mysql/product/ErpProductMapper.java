@@ -23,4 +23,12 @@ public interface ErpProductMapper extends BaseMapperX<ErpProductDO> {
                 .orderByDesc(ErpProductDO::getId));
     }
 
+    default Long selectCountByCategoryId(Long categoryId) {
+        return selectCount(ErpProductDO::getCategoryId, categoryId);
+    }
+
+    default Long selectCountByUnitId(Long unitId) {
+        return selectCount(ErpProductDO::getUnitId, unitId);
+    }
+
 }

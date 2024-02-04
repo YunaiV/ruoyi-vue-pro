@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.erp.controller.admin.product.vo.unit;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -18,6 +20,7 @@ public class ErpProductUnitSaveReqVO {
 
     @Schema(description = "单位状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "单位状态不能为空")
+    @InEnum(CommonStatusEnum.class)
     private Integer status;
 
 }
