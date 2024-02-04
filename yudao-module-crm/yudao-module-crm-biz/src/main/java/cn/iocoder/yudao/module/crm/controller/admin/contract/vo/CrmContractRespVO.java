@@ -116,6 +116,11 @@ public class CrmContractRespVO {
     @ExcelProperty("创建人名字")
     private String creatorName;
 
+    @Schema(description = "更新时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("更新时间")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime updateTime;
+
     @Schema(description = "负责人", example = "test")
     @ExcelProperty("负责人")
     private String ownerUserName;

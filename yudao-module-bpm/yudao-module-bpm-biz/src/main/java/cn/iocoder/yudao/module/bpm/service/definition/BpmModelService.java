@@ -38,14 +38,6 @@ public interface BpmModelService {
     BpmModelRespVO getModel(String id);
 
     /**
-     * 获得流程模块
-     *
-     * @param key 流程标识
-     * @return 流程模型
-     */
-    BpmModelRespVO getBpmnModelByKey(String key);
-
-    /**
      * 修改流程模型
      *
      * @param updateReqVO 更新信息

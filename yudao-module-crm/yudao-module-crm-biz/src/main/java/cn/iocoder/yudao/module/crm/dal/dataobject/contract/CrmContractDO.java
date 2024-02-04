@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.contract;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -31,29 +34,35 @@ public class CrmContractDO extends BaseDO {
     @TableId
     private Long id;
     /**
+     * 合同编号
+     */
+    private String no;
+    /**
      * 合同名称
      */
     private String name;
     /**
      * 客户编号
+     *
+     * 关联 {@link CrmCustomerDO#getId()}
      */
     private Long customerId;
     /**
      * 商机编号
+     *
+     * 关联 {@link CrmBusinessDO#getId()}
      */
     private Long businessId;
     /**
      * 工作流编号
+     *
+     * 关联 ProcessInstance 的 id 属性
      */
     private String processInstanceId;
     /**
      * 下单日期
      */
     private LocalDateTime orderDate;
-    /**
-     * 合同编号
-     */
-    private String no;
     /**
      * 开始时间
      */
@@ -63,7 +72,7 @@ public class CrmContractDO extends BaseDO {
      */
     private LocalDateTime endTime;
     /**
-     * 合同金额
+     * 合同金额，单位：分
      */
     private Integer price;
     /**
@@ -71,15 +80,19 @@ public class CrmContractDO extends BaseDO {
      */
     private Integer discountPercent;
     /**
-     * 产品总金额
+     * 产品总金额，单位：分
      */
     private Integer productPrice;
     /**
-     * 联系人编号
+     * 客户签约人
+     *
+     * 关联 {@link CrmContactDO#getId()}
      */
     private Long contactId;
     /**
      * 公司签约人
+     *
+     * 关联 AdminUserDO 的 id 字段
      */
     private Long signUserId;
     /**

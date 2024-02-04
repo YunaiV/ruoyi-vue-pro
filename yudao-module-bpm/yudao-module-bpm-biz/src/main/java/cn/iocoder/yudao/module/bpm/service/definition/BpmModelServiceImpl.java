@@ -135,19 +135,6 @@ public class BpmModelServiceImpl implements BpmModelService {
     }
 
     @Override
-    public BpmModelRespVO getBpmnModelByKey(String key) {
-        Model model = getModelByKey(key);
-        if (model == null) {
-            return null;
-        }
-        BpmModelRespVO modelRespVO = BpmModelConvert.INSTANCE.convert(model);
-        // 拼接 bpmn XML
-        byte[] bpmnBytes = repositoryService.getModelEditorSource(model.getId());
-        modelRespVO.setBpmnXml(StrUtil.utf8Str(bpmnBytes));
-        return modelRespVO;
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class) // 因为进行多个操作，所以开启事务
     public void updateModel(@Valid BpmModelUpdateReqVO updateReqVO) {
         // 校验流程模型存在

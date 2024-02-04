@@ -43,17 +43,6 @@ public class BpmModelController {
         return success(model);
     }
 
-    // TODO @puhui999：这个接口的目的是啥呀？业务表单预览流程🤣；
-    // TODO @puhui999：捉摸是不是搞成前端跳转过去，不另外做 bpmn 组件哈；
-    @GetMapping("/get-by-key")
-    @Operation(summary = "获得模型")
-    @Parameter(name = "key", description = "流程标识", required = true, example = "oa_leave")
-    @PreAuthorize("@ss.hasPermission('bpm:model:query')")
-    public CommonResult<BpmModelRespVO> getModelByKey(@RequestParam("key") String key) {
-        BpmModelRespVO model = modelService.getBpmnModelByKey(key);
-        return success(model);
-    }
-
     @PostMapping("/create")
     @Operation(summary = "新建模型")
     @PreAuthorize("@ss.hasPermission('bpm:model:create')")
