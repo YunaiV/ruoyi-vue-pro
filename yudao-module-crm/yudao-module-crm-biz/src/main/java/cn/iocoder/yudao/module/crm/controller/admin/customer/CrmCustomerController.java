@@ -235,7 +235,7 @@ public class CrmCustomerController {
     @PutMapping("/transfer")
     @Operation(summary = "转移客户")
     @PreAuthorize("@ss.hasPermission('crm:customer:update')")
-    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmCustomerTransferReqVO reqVO) {
+    public CommonResult<Boolean> transferCustomer(@Valid @RequestBody CrmCustomerTransferReqVO reqVO) {
         customerService.transferCustomer(reqVO, getLoginUserId());
         return success(true);
     }

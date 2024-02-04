@@ -3,10 +3,13 @@ package cn.iocoder.yudao.module.crm.controller.admin.contract.vo;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -26,10 +29,16 @@ public class CrmContractRespVO {
     @Schema(description = "客户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "18336")
     @ExcelProperty("客户编号")
     private Long customerId;
+    @Schema(description = "客户名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "18336")
+    @ExcelProperty("客户名称")
+    private String customerName;
 
     @Schema(description = "商机编号", example = "10864")
     @ExcelProperty("商机编号")
     private Long businessId;
+    @Schema(description = "商机名称", example = "10864")
+    @ExcelProperty("商机名称")
+    private String businessName;
 
     @Schema(description = "工作流编号", example = "1043")
     @ExcelProperty("工作流编号")
@@ -74,10 +83,16 @@ public class CrmContractRespVO {
     @Schema(description = "联系人编号", example = "18546")
     @ExcelProperty("联系人编号")
     private Long contactId;
+    @Schema(description = "联系人编号", example = "18546")
+    @ExcelProperty("联系人编号")
+    private String contactName;
 
     @Schema(description = "公司签约人", example = "14036")
     @ExcelProperty("公司签约人")
     private Long signUserId;
+    @Schema(description = "公司签约人", example = "14036")
+    @ExcelProperty("公司签约人")
+    private String signUserName;
 
     @Schema(description = "最后跟进时间")
     @ExcelProperty("最后跟进时间")
@@ -101,10 +116,6 @@ public class CrmContractRespVO {
     @ExcelProperty("创建人名字")
     private String creatorName;
 
-    @Schema(description = "客户名字", example = "test")
-    @ExcelProperty("客户名字")
-    private String customerName;
-
     @Schema(description = "负责人", example = "test")
     @ExcelProperty("负责人")
     private String ownerUserName;
@@ -112,5 +123,37 @@ public class CrmContractRespVO {
     @Schema(description = "审批状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     @ExcelProperty("审批状态")
     private Integer auditStatus;
+
+    @Schema(description = "产品列表")
+    private List<CrmContractProductItemRespVO> productItems;
+
+    @Schema(description = "产品列表")
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CrmContractProductItemRespVO {
+
+        @Schema(description = "产品编号", example = "20529")
+        private Long id;
+
+        @Schema(description = "产品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "8911")
+        private String name;
+
+        @Schema(description = "产品编码", requiredMode = Schema.RequiredMode.REQUIRED, example = "8911")
+        private String no;
+
+        @Schema(description = "单位", requiredMode = Schema.RequiredMode.REQUIRED, example = "8911")
+        private Integer unit;
+
+        @Schema(description = "价格，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "8911")
+        private Integer price;
+
+        @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "8911")
+        private Integer count;
+
+        @Schema(description = "产品折扣")
+        private Integer discountPercent;
+
+    }
 
 }

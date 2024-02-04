@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.business;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
 import cn.iocoder.yudao.module.crm.enums.DictTypeConstants;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -40,6 +41,12 @@ public class CrmBusinessProductDO extends BaseDO {
      * 关联 {@link CrmProductDO#getId()}
      */
     private Long productId;
+    /**
+     * 合同编号
+     *
+     * 关联 {@link CrmContractDO#getId()}
+     */
+    private Long contractId;
 
     /**
      * 产品单价

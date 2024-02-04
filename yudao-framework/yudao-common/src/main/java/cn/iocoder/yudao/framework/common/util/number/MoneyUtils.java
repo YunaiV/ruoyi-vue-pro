@@ -38,6 +38,22 @@ public class MoneyUtils {
     /**
      * 计算百分比金额
      *
+     * @param price   金额（单位分）
+     * @param count   数量
+     * @param percent 折扣（单位分），列如 60.2%，则传入 6020
+     * @return 商品总价
+     */
+    public static Integer calculator(Integer price, Integer count, Integer percent) {
+        price = price * count;
+        if (percent == null) {
+            return price;
+        }
+        return MoneyUtils.calculateRatePriceFloor(price, (double) (percent / 100));
+    }
+
+    /**
+     * 计算百分比金额
+     *
      * @param price        金额
      * @param rate         百分比，例如说 56.77% 则传入 56.77
      * @param scale        保留小数位数

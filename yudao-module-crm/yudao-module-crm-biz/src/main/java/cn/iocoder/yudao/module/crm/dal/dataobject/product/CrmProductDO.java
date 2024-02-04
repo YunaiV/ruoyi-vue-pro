@@ -45,7 +45,7 @@ public class CrmProductDO extends BaseDO {
     /**
      * 价格，单位：分
      */
-    private Long price;
+    private Integer price;
     /**
      * 状态
      *

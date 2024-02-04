@@ -25,6 +25,7 @@ import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -56,6 +57,7 @@ public class CrmContactServiceImpl implements CrmContactService {
     @Resource
     private CrmPermissionService permissionService;
     @Resource
+    @Lazy
     private CrmContractService contractService;
     @Resource
     private CrmContactBusinessService contactBusinessService;
@@ -208,7 +210,7 @@ public class CrmContactServiceImpl implements CrmContactService {
     }
 
     @Override
-    public List<CrmContactDO> getContactList(Collection<Long> ids, Long userId) {
+    public List<CrmContactDO> getContactListByIds(Collection<Long> ids, Long userId) {
         if (CollUtil.isEmpty(ids)) {
             return ListUtil.empty();
         }
@@ -216,7 +218,7 @@ public class CrmContactServiceImpl implements CrmContactService {
     }
 
     @Override
-    public List<CrmContactDO> getContactList(Collection<Long> ids) {
+    public List<CrmContactDO> getContactListByIds(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return ListUtil.empty();
         }

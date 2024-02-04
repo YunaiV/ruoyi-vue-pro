@@ -10,10 +10,18 @@ import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.*;
 import cn.iocoder.yudao.module.crm.convert.contract.CrmContractConvert;
+import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
+import cn.iocoder.yudao.module.crm.service.business.CrmBusinessProductService;
+import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
+import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
+import cn.iocoder.yudao.module.crm.service.product.CrmProductService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,13 +36,14 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertListByFlatMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -48,6 +57,15 @@ public class CrmContractController {
     private CrmContractService contractService;
     @Resource
     private CrmCustomerService customerService;
+    @Resource
+    private CrmContactService contactService;
+    @Resource
+    private CrmBusinessService businessService;
+    @Resource
+    @Lazy
+    private CrmBusinessProductService businessProductService;
+    @Resource
+    private CrmProductService productService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -82,7 +100,19 @@ public class CrmContractController {
     @PreAuthorize("@ss.hasPermission('crm:contract:query')")
     public CommonResult<CrmContractRespVO> getContract(@RequestParam("id") Long id) {
         CrmContractDO contract = contractService.getContract(id);
-        return success(BeanUtils.toBean(contract, CrmContractRespVO.class));
+        List<CrmContractRespVO> respVOList = buildContractDetail(Collections.singletonList(contract));
+        CrmContractRespVO respVO = respVOList.getFirst();
+        List<CrmBusinessProductDO> businessProductList = businessProductService.getBusinessProductListByContractId(id);
+        Map<Long, CrmBusinessProductDO> businessProductMap = convertMap(businessProductList, CrmBusinessProductDO::getProductId);
+        List<CrmProductDO> productList = productService.getProductListByIds(convertSet(businessProductList, CrmBusinessProductDO::getProductId));
+        respVO.setProductItems(convertList(productList, product -> {
+            CrmContractRespVO.CrmContractProductItemRespVO productItemRespVO = BeanUtils.toBean(product, CrmContractRespVO.CrmContractProductItemRespVO.class);
+            findAndThen(businessProductMap, product.getId(), businessProduct -> {
+                productItemRespVO.setCount(businessProduct.getCount()).setDiscountPercent(businessProduct.getDiscountPercent());
+            });
+            return productItemRespVO;
+        }));
+        return success(respVO);
     }
 
     @GetMapping("/page")
@@ -90,15 +120,15 @@ public class CrmContractController {
     @PreAuthorize("@ss.hasPermission('crm:contract:query')")
     public CommonResult<PageResult<CrmContractRespVO>> getContractPage(@Valid CrmContractPageReqVO pageVO) {
         PageResult<CrmContractDO> pageResult = contractService.getContractPage(pageVO, getLoginUserId());
-        return success(buildContractDetailPage(pageResult));
+        return success(BeanUtils.toBean(pageResult, CrmContractRespVO.class).setList(buildContractDetail(pageResult.getList())));
     }
 
     @GetMapping("/page-by-customer")
-    @Operation(summary = "获得联系人分页，基于指定客户")
+    @Operation(summary = "获得合同分页，基于指定客户")
     public CommonResult<PageResult<CrmContractRespVO>> getContractPageByCustomer(@Valid CrmContractPageReqVO pageVO) {
         Assert.notNull(pageVO.getCustomerId(), "客户编号不能为空");
         PageResult<CrmContractDO> pageResult = contractService.getContractPageByCustomerId(pageVO);
-        return success(buildContractDetailPage(pageResult));
+        return success(BeanUtils.toBean(pageResult, CrmContractRespVO.class).setList(buildContractDetail(pageResult.getList())));
     }
 
     @GetMapping("/export-excel")
@@ -114,40 +144,43 @@ public class CrmContractController {
     }
 
     /**
-     * 构建详细的合同分页结果
+     * 构建详细的合同结果
      *
-     * @param pageResult 简单的合同分页结果
-     * @return 详细的合同分页结果
+     * @param contractList 原始合同信息
+     * @return 细的合同结果
      */
-    private PageResult<CrmContractRespVO> buildContractDetailPage(PageResult<CrmContractDO> pageResult) {
-        List<CrmContractDO> contactList = pageResult.getList();
-        if (CollUtil.isEmpty(contactList)) {
-            return PageResult.empty(pageResult.getTotal());
+    private List<CrmContractRespVO> buildContractDetail(List<CrmContractDO> contractList) {
+        if (CollUtil.isEmpty(contractList)) {
+            return Collections.emptyList();
         }
         // 1. 获取客户列表
         List<CrmCustomerDO> customerList = customerService.getCustomerList(
-                convertSet(contactList, CrmContractDO::getCustomerId));
+                convertSet(contractList, CrmContractDO::getCustomerId));
         // 2. 获取创建人、负责人列表
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(contactList,
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(contractList,
                 contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getOwnerUserId())));
-        return CrmContractConvert.INSTANCE.convertPage(pageResult, userMap, customerList);
+        // 3. 获取联系人
+        Map<Long, CrmContactDO> contactMap = convertMap(contactService.getContactListByIds(convertSet(contractList,
+                CrmContractDO::getContactId)), CrmContactDO::getId);
+        // 4. 获取商机
+        Map<Long, CrmBusinessDO> businessMap = convertMap(businessService.getBusinessList(convertSet(contractList,
+                CrmContractDO::getBusinessId)), CrmBusinessDO::getId);
+        return CrmContractConvert.INSTANCE.convertList(contractList, userMap, customerList, contactMap, businessMap);
     }
 
-    // TODO @puhui999：transferContract
     @PutMapping("/transfer")
     @Operation(summary = "合同转移")
     @PreAuthorize("@ss.hasPermission('crm:contract:update')")
-    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmContractTransferReqVO reqVO) {
+    public CommonResult<Boolean> transferContract(@Valid @RequestBody CrmContractTransferReqVO reqVO) {
         contractService.transferContract(reqVO, getLoginUserId());
         return success(true);
     }
 
-    // TODO @puhui999：方法名不对哈；要不改成 submit？提交审核的意思
-    @PutMapping("/approve")
-    @Operation(summary = "发起合同审批流程")
+    @PutMapping("/submit")
+    @Operation(summary = "提交合同审批")
     @PreAuthorize("@ss.hasPermission('crm:contract:update')")
-    public CommonResult<Boolean> transfer(@RequestParam("id") Long id) {
-        contractService.handleApprove(id, getLoginUserId());
+    public CommonResult<Boolean> submitContract(@RequestParam("id") Long id) {
+        contractService.submitContract(id, getLoginUserId());
         return success(true);
     }
 

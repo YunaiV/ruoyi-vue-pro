@@ -169,7 +169,7 @@ public class CrmBusinessController {
     @PutMapping("/transfer")
     @Operation(summary = "商机转移")
     @PreAuthorize("@ss.hasPermission('crm:business:update')")
-    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmBusinessTransferReqVO reqVO) {
+    public CommonResult<Boolean> transferBusiness(@Valid @RequestBody CrmBusinessTransferReqVO reqVO) {
         businessService.transferBusiness(reqVO, getLoginUserId());
         return success(true);
     }
