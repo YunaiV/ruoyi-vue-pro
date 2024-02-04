@@ -120,8 +120,8 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
     }
 
     @Override
-    public String getPresignedObjectUrl(String fileName) throws Exception {
-        return client.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
+    public FilePresignedUrlBO getPresignedObjectUrl(String fileName) throws Exception {
+        String uploadUrl = client.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
                 .method(Method.PUT)
                 .bucket(config.getBucket())
                 .object(fileName)
@@ -132,5 +132,6 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
                 .expiry(10, TimeUnit.MINUTES)
                 .build()
         );
+        return new FilePresignedUrlBO(uploadUrl, config.getDomain() + "/" + fileName);
     }
 }

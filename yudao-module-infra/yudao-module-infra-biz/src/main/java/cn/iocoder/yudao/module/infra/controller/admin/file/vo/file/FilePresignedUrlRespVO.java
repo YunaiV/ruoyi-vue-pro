@@ -14,6 +14,9 @@ public class FilePresignedUrlRespVO {
     @Schema(description = "配置编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "11")
     private Long configId;
 
+    @Schema(description = "文件上传 URL", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/yudao.jpg")
+    private String uploadUrl;
+
     @Schema(description = "文件 URL", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/yudao.jpg")
     private String url;
 

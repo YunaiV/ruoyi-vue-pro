@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.io.FileUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.file.core.client.FileClient;
+import cn.iocoder.yudao.framework.file.core.client.s3.FilePresignedUrlBO;
 import cn.iocoder.yudao.framework.file.core.utils.FileTypeUtils;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FileCreateReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FilePageReqVO;
@@ -109,8 +110,8 @@ public class FileServiceImpl implements FileService {
     @Override
     public FilePresignedUrlRespVO getFilePresignedUrl(String fileName) throws Exception {
         FileClient fileClient = fileConfigService.getMasterFileClient();
-        String url = fileClient.getPresignedObjectUrl(fileName);
-        return new FilePresignedUrlRespVO(fileClient.getId(), url);
+        FilePresignedUrlBO bo = fileClient.getPresignedObjectUrl(fileName);
+        return BeanUtils.toBean(bo, FilePresignedUrlRespVO.class, f -> f.setConfigId(fileClient.getId()));
     }
 
 }
