@@ -1,18 +1,18 @@
 package cn.iocoder.yudao.module.crm.controller.admin.business.vo.business;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.product.CrmBusinessProductSaveReqVO;
 import cn.iocoder.yudao.module.crm.enums.business.CrmBizEndStatus;
 import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmCustomerParseFunction;
 import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -58,7 +58,6 @@ public class CrmBusinessSaveReqVO {
     @DiffLogField(name = "商机金额")
     private Integer price;
 
-    // TODO @lzxhqs：折扣使用 Integer 类型，存储时，默认 * 100；展示的时候，前端需要 / 100；避免精度丢失问题
     @Schema(description = "整单折扣")
     @DiffLogField(name = "整单折扣")
     private Integer discountPercent;
@@ -75,11 +74,29 @@ public class CrmBusinessSaveReqVO {
     @InEnum(CrmBizEndStatus.class)
     private Integer endStatus;
 
-    // TODO @lzxhqs：不设置默认 new ArrayList<>()；一般 pojo 不设置默认值哈
-    @Schema(description = "商机产品列表")
-    private List<CrmBusinessProductSaveReqVO> products = new ArrayList<>();
-
     @Schema(description = "联系人编号", example = "110")
     private Long contactId; // 使用场景，在【联系人详情】添加商机时，如果需要关联两者，需要传递 contactId 字段
+
+    @Schema(description = "产品列表")
+    private List<CrmBusinessProductItem> productItems;
+
+    @Schema(description = "产品列表")
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CrmBusinessProductItem {
+
+        @Schema(description = "产品编号", example = "20529")
+        @NotNull(message = "产品编号不能为空")
+        private Long id;
+
+        @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "8911")
+        @NotNull(message = "产品数量不能为空")
+        private Integer count;
+
+        @Schema(description = "产品折扣")
+        private Integer discountPercent;
+
+    }
 
 }

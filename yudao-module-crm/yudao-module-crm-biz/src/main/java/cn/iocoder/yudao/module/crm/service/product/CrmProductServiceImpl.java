@@ -160,7 +160,7 @@ public class CrmProductServiceImpl implements CrmProductService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return productMapper.selectListByIds(ids);
+        return productMapper.selectBatchIds(ids);
     }
 
 }

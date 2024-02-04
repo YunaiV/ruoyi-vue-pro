@@ -11,12 +11,11 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.*;
 import cn.iocoder.yudao.module.crm.convert.contract.CrmContractConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
-import cn.iocoder.yudao.module.crm.service.business.CrmBusinessProductService;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
@@ -30,7 +29,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +41,6 @@ import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -62,11 +59,7 @@ public class CrmContractController {
     @Resource
     private CrmBusinessService businessService;
     @Resource
-    @Lazy
-    private CrmBusinessProductService businessProductService;
-    @Resource
     private CrmProductService productService;
-
     @Resource
     private AdminUserApi adminUserApi;
 
@@ -105,22 +98,9 @@ public class CrmContractController {
             return success(null);
         }
 
-        // 2.1 拼接合同信息
+        // 2. 拼接合同信息
         List<CrmContractRespVO> respVOList = buildContractDetailList(Collections.singletonList(contract));
-        // 2.2 拼接产品信息
-        // TODO @puhui999：下面这块也可以搞到 convert 里哈；可以在 ContractDetailList 加个开关，是不是查询商品信息；ps：jdk21 的方法不太能去用，因为 jdk8 项目要兼容；
-        CrmContractRespVO respVO = respVOList.get(0);
-        List<CrmBusinessProductDO> businessProductList = businessProductService.getBusinessProductListByContractId(id);
-        Map<Long, CrmBusinessProductDO> businessProductMap = convertMap(businessProductList, CrmBusinessProductDO::getProductId);
-        List<CrmProductDO> productList = productService.getProductListByIds(convertSet(businessProductList, CrmBusinessProductDO::getProductId));
-        respVO.setProductItems(convertList(productList, product -> {
-            CrmContractRespVO.CrmContractProductItemRespVO productItemRespVO = BeanUtils.toBean(product, CrmContractRespVO.CrmContractProductItemRespVO.class);
-            findAndThen(businessProductMap, product.getId(), businessProduct -> {
-                productItemRespVO.setCount(businessProduct.getCount()).setDiscountPercent(businessProduct.getDiscountPercent());
-            });
-            return productItemRespVO;
-        }));
-        return success(respVO);
+        return success(respVOList.get(0));
     }
 
     @GetMapping("/page")
@@ -151,6 +131,22 @@ public class CrmContractController {
                 BeanUtils.toBean(pageResult.getList(), CrmContractExcelVO.class));
     }
 
+    @PutMapping("/transfer")
+    @Operation(summary = "合同转移")
+    @PreAuthorize("@ss.hasPermission('crm:contract:update')")
+    public CommonResult<Boolean> transferContract(@Valid @RequestBody CrmContractTransferReqVO reqVO) {
+        contractService.transferContract(reqVO, getLoginUserId());
+        return success(true);
+    }
+
+    @PutMapping("/submit")
+    @Operation(summary = "提交合同审批")
+    @PreAuthorize("@ss.hasPermission('crm:contract:update')")
+    public CommonResult<Boolean> submitContract(@RequestParam("id") Long id) {
+        contractService.submitContract(id, getLoginUserId());
+        return success(true);
+    }
+
     /**
      * 构建详细的合同结果
      *
@@ -173,23 +169,15 @@ public class CrmContractController {
         // 4. 获取商机
         Map<Long, CrmBusinessDO> businessMap = convertMap(businessService.getBusinessList(convertSet(contractList,
                 CrmContractDO::getBusinessId)), CrmBusinessDO::getId);
-        return CrmContractConvert.INSTANCE.convertList(contractList, userMap, customerList, contactMap, businessMap);
-    }
-
-    @PutMapping("/transfer")
-    @Operation(summary = "合同转移")
-    @PreAuthorize("@ss.hasPermission('crm:contract:update')")
-    public CommonResult<Boolean> transferContract(@Valid @RequestBody CrmContractTransferReqVO reqVO) {
-        contractService.transferContract(reqVO, getLoginUserId());
-        return success(true);
-    }
-
-    @PutMapping("/submit")
-    @Operation(summary = "提交合同审批")
-    @PreAuthorize("@ss.hasPermission('crm:contract:update')")
-    public CommonResult<Boolean> submitContract(@RequestParam("id") Long id) {
-        contractService.submitContract(id, getLoginUserId());
-        return success(true);
+        // 5. 获取合同关联的商品
+        Map<Long, CrmContractProductDO> contractProductMap = null;
+        List<CrmProductDO> productList = null;
+        if (contractList.size() == 1) {
+            List<CrmContractProductDO> contractProductList = contractService.getContractProductListByContractId(contractList.get(0).getId());
+            contractProductMap = convertMap(contractProductList, CrmContractProductDO::getProductId);
+            productList = productService.getProductListByIds(convertSet(contractProductList, CrmContractProductDO::getProductId));
+        }
+        return CrmContractConvert.INSTANCE.convertList(contractList, userMap, customerList, contactMap, businessMap, contractProductMap, productList);
     }
 
 }

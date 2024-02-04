@@ -2,8 +2,11 @@ package cn.iocoder.yudao.module.crm.dal.mysql.business;
 
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 /**
  * 商机产品 Mapper
@@ -19,6 +22,10 @@ public interface CrmBusinessProductMapper extends BaseMapperX<CrmBusinessProduct
 
     default CrmBusinessProductDO selectByBusinessId(Long id) {
         return selectOne(CrmBusinessProductDO::getBusinessId, id);
+    }
+
+    default List<CrmBusinessProductDO> selectListByBusinessId(Long businessId) {
+        return selectList(new LambdaQueryWrapperX<CrmBusinessProductDO>().eq(CrmBusinessProductDO::getBusinessId, businessId));
     }
 
 }

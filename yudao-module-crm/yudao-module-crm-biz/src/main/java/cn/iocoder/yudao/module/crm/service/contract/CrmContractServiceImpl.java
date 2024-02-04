@@ -15,15 +15,15 @@ import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageR
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
 import cn.iocoder.yudao.module.crm.convert.contract.CrmContractConvert;
-import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractMapper;
+import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractProductMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
-import cn.iocoder.yudao.module.crm.service.business.CrmBusinessProductService;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
@@ -63,11 +63,11 @@ public class CrmContractServiceImpl implements CrmContractService {
 
     @Resource
     private CrmContractMapper contractMapper;
+    @Resource
+    private CrmContractProductMapper contractProductMapper;
 
     @Resource
     private CrmPermissionService crmPermissionService;
-    @Resource
-    private CrmBusinessProductService businessProductService;
     @Resource
     private CrmProductService productService;
     @Resource
@@ -89,11 +89,14 @@ public class CrmContractServiceImpl implements CrmContractService {
         // 1.1 插入合同
         CrmContractDO contract = BeanUtils.toBean(createReqVO, CrmContractDO.class).setId(null);
         contractMapper.insert(contract);
-        // 1.2 插入商机关联商品
+        // 1.2 插入合同关联商品
         if (CollUtil.isNotEmpty(createReqVO.getProductItems())) { // 如果有的话
-            List<CrmBusinessProductDO> businessProduct = convertBusinessProductList(createReqVO, contract.getId());
-            businessProductService.createBusinessProductBatch(businessProduct);
+            List<CrmContractProductDO> productList = convertContractProductList(createReqVO, contract.getId());
+            contractProductMapper.insertBatch(productList);
             // 更新合同商品总金额
+            contractMapper.updateById(new CrmContractDO().setId(contract.getId()).setProductPrice(
+                    getSumValue(productList, CrmContractProductDO::getTotalPrice, Integer::sum)));
+            // TODO @puhui999: 如果存在合同关联了商机则更新商机商品关联
         }
 
         // 2. 创建数据权限
@@ -137,29 +140,29 @@ public class CrmContractServiceImpl implements CrmContractService {
         if (CollUtil.isEmpty(updateReqVO.getProductItems())) {
             return;
         }
-        List<CrmBusinessProductDO> newProductList = convertBusinessProductList(updateReqVO, contractId);
-        List<CrmBusinessProductDO> oldProductList = businessProductService.getBusinessProductListByContractId(contractId);
-        List<List<CrmBusinessProductDO>> diffList = diffList(oldProductList, newProductList, (oldObj, newObj) -> {
-            if (ObjUtil.notEqual(oldObj.getProductId(), newObj.getProductId())) {
-                return false;
+        List<CrmContractProductDO> newProductList = convertContractProductList(updateReqVO, contractId);
+        List<CrmContractProductDO> oldProductList = contractProductMapper.selectListByContractId(contractId);
+        List<List<CrmContractProductDO>> diffList = diffList(oldProductList, newProductList, (oldObj, newObj) -> {
+            boolean equal = ObjUtil.equal(oldObj.getProductId(), newObj.getProductId());
+            if (equal) {
+                newObj.setId(oldObj.getId()); // 设置一下老的编号更新时需要使用
             }
-            newObj.setId(oldObj.getId()); // 设置一下老的编号更新时需要使用
-            return true;
+            return equal;
         });
-        if (CollUtil.isNotEmpty(diffList.getFirst())) {
-            businessProductService.createBusinessProductBatch(diffList.getFirst());
+        if (CollUtil.isNotEmpty(diffList.get(0))) {
+            contractProductMapper.insertBatch(diffList.get(0));
         }
         if (CollUtil.isNotEmpty(diffList.get(1))) {
-            businessProductService.updateBusinessProductBatch(diffList.get(1));
+            contractProductMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            businessProductService.deleteBusinessProductBatch(diffList.get(2));
+            contractProductMapper.deleteBatchIds(convertList(diffList.get(2), CrmContractProductDO::getId));
         }
     }
 
     // TODO @合同待定：缺一个取消合同的接口；只有草稿、审批中可以取消；CrmAuditStatusEnum
 
-    private List<CrmBusinessProductDO> convertBusinessProductList(CrmContractSaveReqVO reqVO, Long contractId) {
+    private List<CrmContractProductDO> convertContractProductList(CrmContractSaveReqVO reqVO, Long contractId) {
         // 校验商品存在
         Set<Long> productIds = convertSet(reqVO.getProductItems(), CrmContractSaveReqVO.CrmContractProductItem::getId);
         List<CrmProductDO> productList = productService.getProductList(productIds);
@@ -169,8 +172,8 @@ public class CrmContractServiceImpl implements CrmContractService {
         Map<Long, CrmProductDO> productMap = convertMap(productList, CrmProductDO::getId);
         return convertList(reqVO.getProductItems(), productItem -> {
             CrmProductDO product = productMap.get(productItem.getId());
-            return BeanUtils.toBean(product, CrmBusinessProductDO.class)
-                    .setId(null).setBusinessId(reqVO.getBusinessId()).setProductId(productItem.getId()).setContractId(contractId)
+            return BeanUtils.toBean(product, CrmContractProductDO.class)
+                    .setId(null).setProductId(productItem.getId()).setContractId(contractId)
                     .setCount(productItem.getCount()).setDiscountPercent(productItem.getDiscountPercent())
                     .setTotalPrice(MoneyUtils.calculator(product.getPrice(), productItem.getCount(), productItem.getDiscountPercent()));
         });
@@ -313,5 +316,11 @@ public class CrmContractServiceImpl implements CrmContractService {
     public Long getContractCountByBusinessId(Long businessId) {
         return contractMapper.selectCountByBusinessId(businessId);
     }
+
+    @Override
+    public List<CrmContractProductDO> getContractProductListByContractId(Long contactId) {
+        return contractProductMapper.selectListByContractId(contactId);
+    }
+
     // TODO @合同待定：需要新增一个 ContractConfigDO 表，合同配置，重点是到期提醒；
 }
