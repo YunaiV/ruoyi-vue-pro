@@ -50,4 +50,5 @@ public class BpmProcessInstanceEventListener extends AbstractFlowableEngineEvent
     protected void processCompleted(FlowableEngineEntityEvent event) {
         processInstanceService.updateProcessInstanceExtComplete((ProcessInstance)event.getEntity());
     }
+
 }

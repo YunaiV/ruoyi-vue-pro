@@ -133,25 +133,25 @@ public class CrmContractRespVO {
     @AllArgsConstructor
     public static class CrmContractProductItemRespVO {
 
-        @Schema(description = "产品编号", example = "20529")
+        @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "20529")
         private Long id;
 
-        @Schema(description = "产品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "8911")
+        @Schema(description = "产品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "我是产品")
         private String name;
 
-        @Schema(description = "产品编码", requiredMode = Schema.RequiredMode.REQUIRED, example = "8911")
+        @Schema(description = "产品编码", requiredMode = Schema.RequiredMode.REQUIRED, example = "N881")
         private String no;
 
-        @Schema(description = "单位", requiredMode = Schema.RequiredMode.REQUIRED, example = "8911")
+        @Schema(description = "单位", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
         private Integer unit;
 
-        @Schema(description = "价格，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "8911")
+        @Schema(description = "价格，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
         private Integer price;
 
-        @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "8911")
+        @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "20")
         private Integer count;
 
-        @Schema(description = "产品折扣")
+        @Schema(description = "产品折扣", example = "99")
         private Integer discountPercent;
 
     }

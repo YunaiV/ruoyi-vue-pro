@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+// TODO @芋艿：后续改成支持 RPC
 /**
  * 业务流程结果监听器实现类
  *

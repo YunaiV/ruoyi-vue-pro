@@ -38,6 +38,7 @@ public interface CrmProductMapper extends BaseMapperX<CrmProductDO> {
         return selectOne(CrmProductDO::getNo, no);
     }
 
+    // TODO @puhui999：selectBatchIds
     default List<CrmProductDO> selectListByIds(Collection<Long> ids) {
         return selectList(new LambdaQueryWrapperX<CrmProductDO>().in(CrmProductDO::getId, ids));
     }

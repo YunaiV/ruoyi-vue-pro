@@ -113,24 +113,24 @@ public class CrmContractServiceImpl implements CrmContractService {
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateContract(CrmContractSaveReqVO updateReqVO) {
         Assert.notNull(updateReqVO.getId(), "合同编号不能为空");
+        // 1.1 校验存在
         CrmContractDO contract = validateContractExists(updateReqVO.getId());
-        // 只有草稿、审批中，可以编辑；
+        // 1.2 只有草稿、审批中，可以编辑；
         if (!ObjectUtils.equalsAny(contract.getAuditStatus(), CrmAuditStatusEnum.DRAFT.getStatus(),
                 CrmAuditStatusEnum.PROCESS.getStatus())) {
             throw exception(CONTRACT_UPDATE_FAIL_EDITING_PROHIBITED);
         }
         validateRelationDataExists(updateReqVO);
-        // 校验存在
-        CrmContractDO oldContract = validateContractExists(updateReqVO.getId());
-        // 更新合同
+
+        // 2.1 更新合同
         CrmContractDO updateObj = BeanUtils.toBean(updateReqVO, CrmContractDO.class);
         contractMapper.updateById(updateObj);
-        // 更新合同关联商品
+        // 2.2 更新合同关联商品
         updateContractProduct(updateReqVO, updateObj.getId());
 
         // 3. 记录操作日志上下文
-        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldContract, CrmContractSaveReqVO.class));
-        LogRecordContext.putVariable("contractName", oldContract.getName());
+        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(contract, CrmContractSaveReqVO.class));
+        LogRecordContext.putVariable("contractName", contract.getName());
     }
 
     private void updateContractProduct(CrmContractSaveReqVO updateReqVO, Long contractId) {
@@ -248,23 +248,26 @@ public class CrmContractServiceImpl implements CrmContractService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    // TODO @puhui999：操作日志；
     public void submitContract(Long id, Long userId) {
         // 1. 校验合同是否在审批
         CrmContractDO contract = validateContractExists(id);
         if (ObjUtil.notEqual(contract.getAuditStatus(), CrmAuditStatusEnum.DRAFT.getStatus())) {
             throw exception(CONTRACT_SUBMIT_FAIL_NOT_DRAFT);
         }
-        // 创建合同审批流程实例
+
+        // 2. 创建合同审批流程实例
         String processInstanceId = bpmProcessInstanceApi.createProcessInstance(userId, new BpmProcessInstanceCreateReqDTO()
                 .setProcessDefinitionKey(CONTRACT_APPROVE).setBusinessKey(String.valueOf(id)));
 
-        // 更新合同工作流编号
+        // 3. 更新合同工作流编号
         contractMapper.updateById(new CrmContractDO().setId(id).setProcessInstanceId(processInstanceId)
                 .setAuditStatus(CrmAuditStatusEnum.PROCESS.getStatus()));
     }
 
     @Override
     public void updateContractAuditStatus(BpmResultListenerRespDTO event) {
+        // TODO @puhui999：可能要判断下状态是否符合预期
         contractMapper.updateById(new CrmContractDO().setId(Long.parseLong(event.getBusinessKey()))
                 .setAuditStatus(event.getResult()));
     }

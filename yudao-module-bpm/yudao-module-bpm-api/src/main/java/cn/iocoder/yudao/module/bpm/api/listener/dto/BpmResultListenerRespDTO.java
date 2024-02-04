@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.bpm.api.listener.dto;
 
 import lombok.Data;
 
+// TODO @芋艿：后续改成支持 RPC
 /**
  * 业务流程实例的结果 Response DTO
  *

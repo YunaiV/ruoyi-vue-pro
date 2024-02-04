@@ -72,6 +72,7 @@ public interface CrmContractService {
      * @param event 审批结果
      */
     void updateContractAuditStatus(BpmResultListenerRespDTO event);
+
     /**
      * 获得合同
      *

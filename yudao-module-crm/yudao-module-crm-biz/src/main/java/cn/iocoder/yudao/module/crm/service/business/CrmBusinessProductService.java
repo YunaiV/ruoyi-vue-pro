@@ -4,8 +4,6 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
 
 import java.util.List;
 
-// TODO @lzxhqs：方法名上，带下 BusinessProduct；主要考虑不精简的原因，是因为一个逻辑，可能会出现一些超越它自身方法，省略不容易懂；
-
 /**
  * 商机产品关联表 Service 接口
  *
@@ -19,13 +17,6 @@ public interface CrmBusinessProductService {
      * @param list 商机产品集合
      */
     void createBusinessProductBatch(List<CrmBusinessProductDO> list);
-
-    /**
-     * 根据商机id获取商机产品关联数据集合
-     *
-     * @param businessId 商机id
-     */
-    List<CrmBusinessProductDO> getBusinessProductListByBusinessId(Long businessId);
 
     /**
      * 批量更新商机产品表
@@ -42,14 +33,21 @@ public interface CrmBusinessProductService {
     void deleteBusinessProductBatch(List<CrmBusinessProductDO> list);
 
     /**
-     * 根据商机id删除商机产品关联数据
+     * 根据商机编号，删除商机产品关联数据
      *
      * @param businessId 商机id
      */
     void deleteBusinessProductByBusinessId(Long businessId);
 
     /**
-     * 获得合同关联的商品列表
+     * 根据商机编号，获取商机产品关联数据集合
+     *
+     * @param businessId 商机编号
+     */
+    List<CrmBusinessProductDO> getBusinessProductListByBusinessId(Long businessId);
+
+    /**
+     * 根据合同编号，获得合同关联的商品列表
      *
      * @param contractId 合同编号
      * @return 关联的商品列表

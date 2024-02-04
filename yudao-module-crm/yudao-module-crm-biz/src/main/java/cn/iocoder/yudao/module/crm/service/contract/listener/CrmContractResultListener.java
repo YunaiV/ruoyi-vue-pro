@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.crm.service.contract.CrmContractServiceImpl;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
+// TODO @芋艿：后续改成支持 RPC
 /**
  * 合同审批的结果的监听器实现类
  *

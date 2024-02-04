@@ -41,6 +41,7 @@ public class CrmBusinessProductDO extends BaseDO {
      * 关联 {@link CrmProductDO#getId()}
      */
     private Long productId;
+    // TODO 芋艿：需要在看下 CRM
     /**
      * 合同编号
      *

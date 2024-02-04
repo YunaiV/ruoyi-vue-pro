@@ -105,6 +105,18 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         return customer.getId();
     }
 
+    /**
+     * 初始化客户的通用字段
+     *
+     * @param customer 客户信息
+     * @param ownerUserId 负责人编号
+     * @return 客户信息 DO
+     */
+    private static CrmCustomerDO initCustomer(Object customer, Long ownerUserId) {
+        return BeanUtils.toBean(customer, CrmCustomerDO.class).setOwnerUserId(ownerUserId)
+                .setLockStatus(false).setDealStatus(false).setContactLastTime(LocalDateTime.now());
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_UPDATE_SUB_TYPE, bizNo = "{{#updateReqVO.id}}",
@@ -248,44 +260,47 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
                 respVO.getFailureCustomerNames().put(importCustomer.getName(), ex.getMessage());
                 return;
             }
-            // 判断如果不存在，在进行插入
+            // 情况一：判断如果不存在，在进行插入
             CrmCustomerDO existCustomer = customerMapper.selectByCustomerName(importCustomer.getName());
             if (existCustomer == null) {
+                // 1.1 插入客户信息
                 CrmCustomerDO customer = initCustomer(importCustomer, userId);
                 customerMapper.insert(customer);
                 respVO.getCreateCustomerNames().add(importCustomer.getName());
-                // 创建数据权限
+                // 1.2 创建数据权限
                 permissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
                         .setBizId(customer.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
-                // 记录操作日志
+                // 1.3 记录操作日志
                 getSelf().importCustomerLog(customer, false);
                 return;
             }
-            // 如果存在，判断是否允许更新
+
+            // 情况二：如果存在，判断是否允许更新
             if (!isUpdateSupport) {
                 respVO.getFailureCustomerNames().put(importCustomer.getName(),
                         StrUtil.format(CUSTOMER_NAME_EXISTS.getMsg(), importCustomer.getName()));
                 return;
             }
-            CrmCustomerDO updateCustomer = BeanUtils.toBean(importCustomer, CrmCustomerDO.class);
-            updateCustomer.setId(existCustomer.getId());
+            // 2.1 更新客户信息
+            CrmCustomerDO updateCustomer = BeanUtils.toBean(importCustomer, CrmCustomerDO.class)
+                    .setId(existCustomer.getId());
             customerMapper.updateById(updateCustomer);
             respVO.getUpdateCustomerNames().add(importCustomer.getName());
-            // 记录操作日志
+            // 2.2 记录操作日志
             getSelf().importCustomerLog(updateCustomer, true);
         });
         return respVO;
     }
 
-    private static CrmCustomerDO initCustomer(Object customer, Long userId) {
-        return BeanUtils.toBean(customer, CrmCustomerDO.class).setOwnerUserId(userId)
-                .setLockStatus(false).setDealStatus(false).setContactLastTime(LocalDateTime.now());
-    }
-
+    /**
+     * 记录导入客户时的操作日志
+     *
+     * @param customer 客户信息
+     * @param isUpdate 是否更新；true - 更新，false - 新增
+     */
     @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_IMPORT_SUB_TYPE, bizNo = "{{#customer.id}}",
             success = CRM_CUSTOMER_IMPORT_SUCCESS)
     public void importCustomerLog(CrmCustomerDO customer, boolean isUpdate) {
-        // 记录操作日志上下文
         LogRecordContext.putVariable("customer", customer);
         LogRecordContext.putVariable("isUpdate", isUpdate);
     }
@@ -382,6 +397,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         }
         // 1.1 获取没有锁定的不在公海的客户
         List<CrmCustomerDO> customerList = customerMapper.selectListByLockAndNotPool(Boolean.FALSE);
+        // TODO @puhui999：下面也搞到 sql 里去哈；写 or 查询，问题不大的；低 393 到 402；原因是，避免无用的太多数据查询到 java 进程里；
         List<CrmCustomerDO> poolCustomerList = new ArrayList<>();
         poolCustomerList.addAll(filterList(customerList, customer ->
                 !customer.getDealStatus() && (poolConfig.getDealExpireDays() - LocalDateTimeUtils.between(customer.getCreateTime())) <= 0));

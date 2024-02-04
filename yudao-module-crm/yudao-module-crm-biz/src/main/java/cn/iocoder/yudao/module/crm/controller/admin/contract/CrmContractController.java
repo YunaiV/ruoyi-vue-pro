@@ -99,9 +99,17 @@ public class CrmContractController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('crm:contract:query')")
     public CommonResult<CrmContractRespVO> getContract(@RequestParam("id") Long id) {
+        // 1. 查询合同
         CrmContractDO contract = contractService.getContract(id);
-        List<CrmContractRespVO> respVOList = buildContractDetail(Collections.singletonList(contract));
-        CrmContractRespVO respVO = respVOList.getFirst();
+        if (contract == null) {
+            return success(null);
+        }
+
+        // 2.1 拼接合同信息
+        List<CrmContractRespVO> respVOList = buildContractDetailList(Collections.singletonList(contract));
+        // 2.2 拼接产品信息
+        // TODO @puhui999：下面这块也可以搞到 convert 里哈；可以在 ContractDetailList 加个开关，是不是查询商品信息；ps：jdk21 的方法不太能去用，因为 jdk8 项目要兼容；
+        CrmContractRespVO respVO = respVOList.get(0);
         List<CrmBusinessProductDO> businessProductList = businessProductService.getBusinessProductListByContractId(id);
         Map<Long, CrmBusinessProductDO> businessProductMap = convertMap(businessProductList, CrmBusinessProductDO::getProductId);
         List<CrmProductDO> productList = productService.getProductListByIds(convertSet(businessProductList, CrmBusinessProductDO::getProductId));
@@ -120,7 +128,7 @@ public class CrmContractController {
     @PreAuthorize("@ss.hasPermission('crm:contract:query')")
     public CommonResult<PageResult<CrmContractRespVO>> getContractPage(@Valid CrmContractPageReqVO pageVO) {
         PageResult<CrmContractDO> pageResult = contractService.getContractPage(pageVO, getLoginUserId());
-        return success(BeanUtils.toBean(pageResult, CrmContractRespVO.class).setList(buildContractDetail(pageResult.getList())));
+        return success(BeanUtils.toBean(pageResult, CrmContractRespVO.class).setList(buildContractDetailList(pageResult.getList())));
     }
 
     @GetMapping("/page-by-customer")
@@ -128,7 +136,7 @@ public class CrmContractController {
     public CommonResult<PageResult<CrmContractRespVO>> getContractPageByCustomer(@Valid CrmContractPageReqVO pageVO) {
         Assert.notNull(pageVO.getCustomerId(), "客户编号不能为空");
         PageResult<CrmContractDO> pageResult = contractService.getContractPageByCustomerId(pageVO);
-        return success(BeanUtils.toBean(pageResult, CrmContractRespVO.class).setList(buildContractDetail(pageResult.getList())));
+        return success(BeanUtils.toBean(pageResult, CrmContractRespVO.class).setList(buildContractDetailList(pageResult.getList())));
     }
 
     @GetMapping("/export-excel")
@@ -149,7 +157,7 @@ public class CrmContractController {
      * @param contractList 原始合同信息
      * @return 细的合同结果
      */
-    private List<CrmContractRespVO> buildContractDetail(List<CrmContractDO> contractList) {
+    private List<CrmContractRespVO> buildContractDetailList(List<CrmContractDO> contractList) {
         if (CollUtil.isEmpty(contractList)) {
             return Collections.emptyList();
         }

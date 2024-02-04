@@ -27,16 +27,11 @@ public class CrmBusinessProductServiceImpl implements CrmBusinessProductService 
     }
 
     @Override
-    public List<CrmBusinessProductDO> getBusinessProductListByBusinessId(Long businessId) {
-        return businessProductMapper.selectList(CrmBusinessProductDO::getBusinessId, businessId);
-    }
-
-    @Override
     public void updateBusinessProductBatch(List<CrmBusinessProductDO> list) {
         businessProductMapper.updateBatch(list);
     }
 
-    // TODO @lzxhqs：这个方法，可以直接调用 deleteList 方法，然后传递 ids 就好了；
+    // TODO @puhui999：这个方法，可以直接调用 deleteList 方法，然后传递 ids 就好了；
     @Override
     public void deleteBusinessProductBatch(List<CrmBusinessProductDO> list) {
         businessProductMapper.deleteBatchIds(CollectionUtils.convertList(list, CrmBusinessProductDO::getId));
@@ -50,6 +45,11 @@ public class CrmBusinessProductServiceImpl implements CrmBusinessProductService 
     @Override
     public List<CrmBusinessProductDO> getBusinessProductListByContractId(Long contractId) {
         return businessProductMapper.selectList(CrmBusinessProductDO::getContractId, contractId);
+    }
+
+    @Override
+    public List<CrmBusinessProductDO> getBusinessProductListByBusinessId(Long businessId) {
+        return businessProductMapper.selectList(CrmBusinessProductDO::getBusinessId, businessId);
     }
 
 }
