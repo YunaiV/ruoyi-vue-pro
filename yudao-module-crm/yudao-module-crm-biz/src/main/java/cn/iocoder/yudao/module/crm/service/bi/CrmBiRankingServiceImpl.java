@@ -49,6 +49,36 @@ public class CrmBiRankingServiceImpl implements CrmBiRankingService {
         return getRank(rankReqVO, biRankingMapper::selectReceivablePriceRank);
     }
 
+    @Override
+    public List<CrmBiRanKRespVO> getContractCountRank(CrmBiRankReqVO rankReqVO) {
+        return getRank(rankReqVO, biRankingMapper::selectContractCountRank);
+    }
+
+    @Override
+    public List<CrmBiRanKRespVO> getProductSalesRank(CrmBiRankReqVO rankReqVO) {
+        return getRank(rankReqVO, biRankingMapper::selectProductSalesRank);
+    }
+
+    @Override
+    public List<CrmBiRanKRespVO> getCustomerCountRank(CrmBiRankReqVO rankReqVO) {
+        return getRank(rankReqVO, biRankingMapper::selectCustomerCountRank);
+    }
+
+    @Override
+    public List<CrmBiRanKRespVO> getContactsCountRank(CrmBiRankReqVO rankReqVO) {
+        return getRank(rankReqVO, biRankingMapper::selectContactsCountRank);
+    }
+
+    @Override
+    public List<CrmBiRanKRespVO> getFollowCountRank(CrmBiRankReqVO rankReqVO) {
+        return getRank(rankReqVO, biRankingMapper::selectFollowCountRank);
+    }
+
+    @Override
+    public List<CrmBiRanKRespVO> getFollowCustomerCountRank(CrmBiRankReqVO rankReqVO) {
+        return getRank(rankReqVO, biRankingMapper::selectFollowCustomerCountRank);
+    }
+
     /**
      * 获得排行版数据
      *
