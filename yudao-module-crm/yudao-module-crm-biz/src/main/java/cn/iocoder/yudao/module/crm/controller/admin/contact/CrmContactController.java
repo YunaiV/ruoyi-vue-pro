@@ -102,7 +102,7 @@ public class CrmContactController {
         List<CrmCustomerDO> customerList = customerService.getCustomerList(
                 Collections.singletonList(contact.getCustomerId()));
         // 3. 直属上级
-        List<CrmContactDO> parentContactList = contactService.getContactList(
+        List<CrmContactDO> parentContactList = contactService.getContactListByIds(
                 Collections.singletonList(contact.getParentId()), getLoginUserId());
         return success(CrmContactConvert.INSTANCE.convert(contact, userMap, customerList, parentContactList));
     }
@@ -112,7 +112,7 @@ public class CrmContactController {
     @Parameter(name = "ids", description = "编号", required = true, example = "[1024]")
     @PreAuthorize("@ss.hasPermission('crm:contact:query')")
     public CommonResult<List<CrmContactRespVO>> getContactListByIds(@RequestParam("ids") List<Long> ids) {
-        return success(BeanUtils.toBean(contactService.getContactList(ids, getLoginUserId()), CrmContactRespVO.class));
+        return success(BeanUtils.toBean(contactService.getContactListByIds(ids, getLoginUserId()), CrmContactRespVO.class));
     }
 
     @GetMapping("/simple-all-list")
@@ -170,7 +170,7 @@ public class CrmContactController {
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(contactList,
                 contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getOwnerUserId())));
         // 3. 直属上级
-        List<CrmContactDO> parentContactList = contactService.getContactList(
+        List<CrmContactDO> parentContactList = contactService.getContactListByIds(
                 convertSet(contactList, CrmContactDO::getParentId), getLoginUserId());
         return CrmContactConvert.INSTANCE.convertPage(pageResult, userMap, crmCustomerDOList, parentContactList);
     }
@@ -178,7 +178,7 @@ public class CrmContactController {
     @PutMapping("/transfer")
     @Operation(summary = "联系人转移")
     @PreAuthorize("@ss.hasPermission('crm:contact:update')")
-    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmContactTransferReqVO reqVO) {
+    public CommonResult<Boolean> transferContact(@Valid @RequestBody CrmContactTransferReqVO reqVO) {
         contactService.transferContact(reqVO, getLoginUserId());
         return success(true);
     }

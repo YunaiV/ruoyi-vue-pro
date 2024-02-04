@@ -17,47 +17,47 @@
         <revision>2.0.0-snapshot</revision>
         <flatten-maven-plugin.version>1.5.0</flatten-maven-plugin.version>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>3.2.0</spring.boot.version>
+        <spring.boot.version>3.2.2</spring.boot.version>
         <!-- Web 相关 -->
         <springdoc.version>2.2.0</springdoc.version>
         <knife4j.version>4.3.0</knife4j.version>
         <!-- DB 相关 -->
-        <druid.version>1.2.20</druid.version>
-        <mybatis-plus.version>3.5.4.1</mybatis-plus.version>
-        <mybatis-plus-generator.version>3.5.4.1</mybatis-plus-generator.version>
-        <dynamic-datasource.version>4.2.0</dynamic-datasource.version>
-        <mybatis-plus-join.version>1.4.8.1</mybatis-plus-join.version>
-        <redisson.version>3.25.0</redisson.version>
+        <druid.version>1.2.21</druid.version>
+        <mybatis-plus.version>3.5.5</mybatis-plus.version>
+        <mybatis-plus-generator.version>3.5.5</mybatis-plus-generator.version>
+        <dynamic-datasource.version>4.3.0</dynamic-datasource.version>
+        <mybatis-plus-join.version>1.4.10</mybatis-plus-join.version>
+        <redisson.version>3.26.0</redisson.version>
         <dm8.jdbc.version>8.1.3.62</dm8.jdbc.version>
         <!-- 消息队列 -->
         <rocketmq-spring.version>2.2.3</rocketmq-spring.version>
         <!-- 服务保障相关 -->
-        <lock4j.version>2.2.5</lock4j.version>
+        <lock4j.version>2.2.7</lock4j.version>
         <resilience4j.version>2.1.0</resilience4j.version>
         <!-- 监控相关 -->
         <skywalking.version>9.0.0</skywalking.version>
-        <spring-boot-admin.version>3.1.8</spring-boot-admin.version>
+        <spring-boot-admin.version>3.2.1</spring-boot-admin.version>
         <opentracing.version>0.33.0</opentracing.version>
         <!-- Test 测试相关 -->
-        <podam.version>8.0.0.RELEASE</podam.version>
-        <jedis-mock.version>1.0.12</jedis-mock.version>
+        <podam.version>8.0.1.RELEASE</podam.version>
+        <jedis-mock.version>1.0.13</jedis-mock.version>
         <mockito-inline.version>5.2.0</mockito-inline.version>
         <!-- Bpm 工作流相关 -->
-        <flowable.version>7.0.0</flowable.version>
+        <flowable.version>7.0.1</flowable.version>
         <!-- 工具类相关 -->
         <captcha-plus.version>2.0.3</captcha-plus.version>
-        <jsoup.version>1.17.1</jsoup.version>
+        <jsoup.version>1.17.2</jsoup.version>
         <lombok.version>1.18.30</lombok.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
-        <hutool-5.version>5.8.23</hutool-5.version>
-        <hutool-6.version>6.0.0-M8</hutool-6.version>
+        <hutool-5.version>5.8.25</hutool-5.version>
+        <hutool-6.version>6.0.0-M10</hutool-6.version>
         <easyexcel.verion>3.3.3</easyexcel.verion>
         <velocity.version>2.3</velocity.version>
         <screw.version>1.0.5</screw.version>
         <fastjson.version>1.2.83</fastjson.version>
-        <guava.version>32.1.3-jre</guava.version>
+        <guava.version>33.0.0-jre</guava.version>
         <guice.version>5.1.0</guice.version>
-        <transmittable-thread-local.version>2.14.4</transmittable-thread-local.version>
+        <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
         <commons-net.version>3.10.0</commons-net.version>
         <jsch.version>0.1.55</jsch.version>
         <tika-core.version>2.9.1</tika-core.version>
@@ -66,15 +66,15 @@
         <!-- 三方云服务相关 -->
         <okio.version>3.5.0</okio.version>
         <okhttp3.version>4.11.0</okhttp3.version>
-        <commons-io.version>2.11.0</commons-io.version>
-        <minio.version>8.5.6</minio.version>
+        <commons-io.version>2.15.1</commons-io.version>
+        <minio.version>8.5.7</minio.version>
         <aliyun-java-sdk-core.version>4.6.4</aliyun-java-sdk-core.version>
         <aliyun-java-sdk-dysmsapi.version>2.2.1</aliyun-java-sdk-dysmsapi.version>
         <tencentcloud-sdk-java.version>3.1.880</tencentcloud-sdk-java.version>
         <justauth.version>2.0.5</justauth.version>
         <jimureport.version>1.6.6-beta2</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
-        <weixin-java.version>4.5.7.B</weixin-java.version>
+        <weixin-java.version>4.6.0</weixin-java.version>
         <ureport2.version>2.2.9</ureport2.version>
     </properties>
 
@@ -90,11 +90,6 @@
             </dependency>
 
             <!-- 业务组件 -->
-            <dependency>
-                <groupId>cn.iocoder.boot</groupId>
-                <artifactId>yudao-spring-boot-starter-banner</artifactId>
-                <version>${revision}</version>
-            </dependency>
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-operatelog</artifactId>
@@ -118,11 +113,6 @@
             </dependency>
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
-                <artifactId>yudao-spring-boot-starter-biz-sms</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-pay</artifactId>
                 <version>${revision}</version>
             </dependency>
@@ -134,11 +124,6 @@
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-data-permission</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.iocoder.boot</groupId>
-                <artifactId>yudao-spring-boot-starter-biz-error-code</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>

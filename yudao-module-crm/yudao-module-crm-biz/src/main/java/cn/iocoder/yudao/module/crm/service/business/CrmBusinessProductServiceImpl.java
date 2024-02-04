@@ -22,29 +22,34 @@ public class CrmBusinessProductServiceImpl implements CrmBusinessProductService 
     private CrmBusinessProductMapper businessProductMapper;
 
     @Override
-    public void insertBatch(List<CrmBusinessProductDO> list) {
+    public void createBusinessProductBatch(List<CrmBusinessProductDO> list) {
         businessProductMapper.insertBatch(list);
     }
 
     @Override
-    public List<CrmBusinessProductDO> selectListByBusinessId(Long businessId) {
-        return businessProductMapper.selectList(CrmBusinessProductDO::getBusinessId,businessId);
-    }
-
-    @Override
-    public void updateBatch(List<CrmBusinessProductDO> list) {
+    public void updateBusinessProductBatch(List<CrmBusinessProductDO> list) {
         businessProductMapper.updateBatch(list);
     }
 
-    // TODO @lzxhqs：这个方法，可以直接调用 deleteList 方法，然后传递 ids 就好了；
+    // TODO @puhui999：这个方法，可以直接调用 deleteList 方法，然后传递 ids 就好了；
     @Override
-    public void deleteBatch(List<CrmBusinessProductDO> list) {
+    public void deleteBusinessProductBatch(List<CrmBusinessProductDO> list) {
         businessProductMapper.deleteBatchIds(CollectionUtils.convertList(list, CrmBusinessProductDO::getId));
     }
 
     @Override
-    public void deleteByBusinessId(Long businessId) {
+    public void deleteBusinessProductByBusinessId(Long businessId) {
         businessProductMapper.deleteByBusinessId(businessId);
+    }
+
+    @Override
+    public List<CrmBusinessProductDO> getBusinessProductListByContractId(Long contractId) {
+        return businessProductMapper.selectList(CrmBusinessProductDO::getContractId, contractId);
+    }
+
+    @Override
+    public List<CrmBusinessProductDO> getBusinessProductListByBusinessId(Long businessId) {
+        return businessProductMapper.selectList(CrmBusinessProductDO::getBusinessId, businessId);
     }
 
 }

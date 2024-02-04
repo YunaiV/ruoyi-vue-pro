@@ -91,7 +91,7 @@ public class CrmClueController {
     @PutMapping("/transfer")
     @Operation(summary = "线索转移")
     @PreAuthorize("@ss.hasPermission('crm:clue:update')")
-    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmClueTransferReqVO reqVO) {
+    public CommonResult<Boolean> transferClue(@Valid @RequestBody CrmClueTransferReqVO reqVO) {
         clueService.transferClue(reqVO, getLoginUserId());
         return success(true);
     }
@@ -99,7 +99,7 @@ public class CrmClueController {
     @PostMapping("/transform")
     @Operation(summary = "线索转化为客户")
     @PreAuthorize("@ss.hasPermission('crm:clue:update')")
-    public CommonResult<Boolean> translateCustomer(@Valid @RequestBody CrmClueTransformReqVO reqVO) {
+    public CommonResult<Boolean> translateCustomer(@Valid @RequestBody CrmClueTranslateReqVO reqVO) {
         clueService.translateCustomer(reqVO, getLoginUserId());
         return success(Boolean.TRUE);
     }

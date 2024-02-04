@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.crm.service.clue;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -11,11 +10,10 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTransferReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTransformReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTranslateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerSaveReqVO;
 import cn.iocoder.yudao.module.crm.convert.clue.CrmClueConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.followup.CrmFollowUpRecordDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.clue.CrmClueMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
@@ -177,7 +175,7 @@ public class CrmClueServiceImpl implements CrmClueService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_LEADS, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
-    public void translateCustomer(CrmClueTransformReqVO reqVO, Long userId) {
+    public void translateCustomer(CrmClueTranslateReqVO reqVO, Long userId) {
         // 1.1 校验线索都存在
         Set<Long> clueIds = reqVO.getIds();
         List<CrmClueDO> clues = getClueList(clueIds, userId);
@@ -192,47 +190,44 @@ public class CrmClueServiceImpl implements CrmClueService {
             throw exception(CLUE_ANY_CLUE_ALREADY_TRANSLATED, convertSet(translatedClues, CrmClueDO::getId));
         }
 
-        // 2. 遍历线索(未转化的线索)，创建对应的客户
-        // TODO @puhui999：这里不用过滤了；
-        List<CrmClueDO> translateClues = filterList(clues, clue -> ObjUtil.equal(Boolean.FALSE, clue.getTransformStatus()));
-        List<CrmCustomerDO> customers = customerService.createCustomerBatch(convertList(translateClues, clue ->
-                BeanUtils.toBean(clue, CrmCustomerCreateReqBO.class)), userId);
-
-        // TODO @puhui999：这里不用搞一个 clueCustomerIdMap 出来；可以考虑逐个创建，然后把 customerId 设置回 CrmClueDO；避免 name 匹配，极端会有问题哈；
-        // TODO 是不是就直接 foreach 处理好了；因为本身量不大，for 处理性能 ok，可阅读性好
-        Map<Long, Long> clueCustomerIdMap = new HashMap<>(translateClues.size());
-        // 2.1 更新线索
-        clueMapper.updateBatch(convertList(customers, customer -> {
-            CrmClueDO firstClue = findFirst(translateClues, clue -> ObjUtil.equal(clue.getName(), customer.getName()));
-            clueCustomerIdMap.put(firstClue.getId(), customer.getId());
-            return new CrmClueDO().setId(firstClue.getId()).setTransformStatus(Boolean.TRUE).setCustomerId(customer.getId());
-        }));
-        // 2.3 复制跟进
-        updateFollowUpRecords(clueCustomerIdMap);
+        // 2.1 遍历线索(未转化的线索)，创建对应的客户
+        clues.forEach(clue -> {
+            Long customerId = customerService.createCustomer(BeanUtils.toBean(clue, CrmCustomerCreateReqBO.class), userId);
+            clue.setCustomerId(customerId);
+        });
+        // 2.2 更新线索
+        clueMapper.updateBatch(convertList(clues, clue -> new CrmClueDO().setId(clue.getId())
+                .setTransformStatus(Boolean.TRUE).setCustomerId(clue.getCustomerId())));
+        // 2.3 复制跟进记录
+        copyFollowUpRecords(clues);
 
         // 3. 记录操作日志
-        for (CrmClueDO clue : translateClues) {
-            // TODO @puhui999：这里优化下，translate 操作日志
-            getSelf().receiveClueLog(clue);
+        for (CrmClueDO clue : clues) {
+            getSelf().translateCustomerLog(clue);
         }
     }
 
-    private void updateFollowUpRecords(Map<Long, Long> clueCustomerIdMap) {
+    /**
+     * 线索被转换客户后，需要将线索的跟进记录，复制到客户上
+     *
+     * @param clues 被转化的线索
+     */
+    private void copyFollowUpRecords(List<CrmClueDO> clues) {
         List<CrmFollowUpRecordDO> followUpRecords = followUpRecordService.getFollowUpRecordByBiz(
-                CrmBizTypeEnum.CRM_LEADS.getType(), clueCustomerIdMap.keySet());
+                CrmBizTypeEnum.CRM_LEADS.getType(), convertSet(clues, CrmClueDO::getId));
         if (CollUtil.isEmpty(followUpRecords)) {
             return;
         }
-
         // 创建跟进
+        Map<Long, CrmClueDO> clueMap = convertMap(clues, CrmClueDO::getId);
         followUpRecordService.createFollowUpRecordBatch(convertList(followUpRecords, followUpRecord ->
                 BeanUtils.toBean(followUpRecord, CrmFollowUpCreateReqBO.class).setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
-                        .setBizId(clueCustomerIdMap.get(followUpRecord.getBizId()))));
+                        .setBizId(clueMap.get(followUpRecord.getBizId()).getCustomerId())));
     }
 
     @LogRecord(type = CRM_LEADS_TYPE, subType = CRM_LEADS_TRANSLATE_SUB_TYPE, bizNo = "{{#clue.id}}",
             success = CRM_LEADS_TRANSLATE_SUCCESS)
-    public void receiveClueLog(CrmClueDO clue) {
+    public void translateCustomerLog(CrmClueDO clue) {
         // 记录操作日志上下文
         LogRecordContext.putVariable("clue", clue);
     }

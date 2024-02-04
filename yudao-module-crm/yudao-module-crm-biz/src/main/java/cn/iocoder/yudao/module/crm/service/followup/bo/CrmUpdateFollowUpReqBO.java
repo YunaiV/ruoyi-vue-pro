@@ -21,7 +21,6 @@ public class CrmUpdateFollowUpReqBO {
 
     @Schema(description = "最后跟进时间")
     @DiffLogField(name = "最后跟进时间")
-    @NotNull(message = "最后跟进时间不能为空")
     private LocalDateTime contactLastTime;
 
     @Schema(description = "下次联系时间")
@@ -30,7 +29,6 @@ public class CrmUpdateFollowUpReqBO {
 
     @Schema(description = "最后更进内容")
     @DiffLogField(name = "最后更进内容")
-    @NotNull(message = "最后更进内容不能为空")
     private String contactLastContent;
 
 }

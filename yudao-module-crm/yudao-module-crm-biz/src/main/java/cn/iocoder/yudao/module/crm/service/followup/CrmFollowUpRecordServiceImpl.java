@@ -7,7 +7,6 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.followup.vo.CrmFollowUpRecordPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.followup.vo.CrmFollowUpRecordSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.followup.CrmFollowUpRecordDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.followup.CrmFollowUpRecordMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
@@ -31,7 +30,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.anyMatch;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.FOLLOW_UP_RECORD_DELETE_DENIED;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.FOLLOW_UP_RECORD_NOT_EXISTS;
@@ -94,26 +92,25 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
             customerService.updateCustomerFollowUp(updateFollowUpReqBO);
         }
 
-        // TODO @puhui999：这两个，不更新 contactLastTime、contactLastContent，只更新 nextTime
-        // 3.1 更新 contactIds 对应的记录
+        // 3.1 更新 contactIds 对应的记录，不更新 lastTime 和 lastContent
         if (CollUtil.isNotEmpty(createReqVO.getContactIds())) {
-            contactService.updateContactFollowUpBatch(convertList(createReqVO.getContactIds(), updateFollowUpReqBO::setBizId));
+            contactService.updateContactFollowUpBatch(convertList(createReqVO.getContactIds(),
+                    contactId -> updateFollowUpReqBO.setBizId(contactId).setContactLastTime(null).setContactLastContent(null)));
         }
-        // 3.2 需要更新 businessIds、contactIds 对应的记录
+        // 3.2 需要更新 businessIds 对应的记录，不更新 lastTime 和 lastContent
         if (CollUtil.isNotEmpty(createReqVO.getBusinessIds())) {
-            businessService.updateBusinessFollowUpBatch(convertList(createReqVO.getBusinessIds(), updateFollowUpReqBO::setBizId));
+            businessService.updateBusinessFollowUpBatch(convertList(createReqVO.getBusinessIds(),
+                    businessId -> updateFollowUpReqBO.setBizId(businessId).setContactLastTime(null).setContactLastContent(null)));
         }
         return followUpRecord.getId();
     }
 
     @Override
-    public void createFollowUpRecordBatch(List<CrmFollowUpCreateReqBO> followUpCreateReqBOs) {
-        if (CollUtil.isEmpty(followUpCreateReqBOs)) {
+    public void createFollowUpRecordBatch(List<CrmFollowUpCreateReqBO> list) {
+        if (CollUtil.isEmpty(list)) {
             return;
         }
-
-        List<CrmFollowUpRecordDO> followUpRecords = BeanUtils.toBean(followUpCreateReqBOs, CrmFollowUpRecordDO.class);
-        crmFollowUpRecordMapper.insertBatch(followUpRecords);
+        crmFollowUpRecordMapper.insertBatch(BeanUtils.toBean(list, CrmFollowUpRecordDO.class));
     }
 
     @Override
@@ -121,12 +118,7 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
         // 校验存在
         CrmFollowUpRecordDO followUpRecord = validateFollowUpRecordExists(id);
         // 校验权限
-        // TODO @puhui999：是不是封装一个 hasPermission，更简介一点；
-        List<CrmPermissionDO> permissionList = permissionService.getPermissionListByBiz(
-                followUpRecord.getBizType(), followUpRecord.getBizId());
-        boolean hasPermission = anyMatch(permissionList, permission ->
-                ObjUtil.equal(permission.getUserId(), userId) && ObjUtil.equal(permission.getLevel(), CrmPermissionLevelEnum.OWNER.getLevel()));
-        if (!hasPermission) {
+        if (!permissionService.hasPermission(followUpRecord.getBizType(), followUpRecord.getBizId(), userId, CrmPermissionLevelEnum.OWNER)) {
             throw exception(FOLLOW_UP_RECORD_DELETE_DENIED);
         }
 

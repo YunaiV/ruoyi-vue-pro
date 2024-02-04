@@ -155,4 +155,12 @@ public class CrmProductServiceImpl implements CrmProductService {
         return productMapper.selectOne(new LambdaQueryWrapper<CrmProductDO>().eq(CrmProductDO::getCategoryId, categoryId));
     }
 
+    @Override
+    public List<CrmProductDO> getProductListByIds(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return productMapper.selectListByIds(ids);
+    }
+
 }

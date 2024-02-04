@@ -74,7 +74,7 @@ function stop() {
                 if [ -n "$PID" ]; then
                     echo -e ".\c"
                 else
-                    echo '[stop] 停止 $BASE_PATH/$SERVER_NAME 成功'
+                    echo "[stop] 停止 $BASE_PATH/$SERVER_NAME 成功"
                     break
                 fi
 		    done

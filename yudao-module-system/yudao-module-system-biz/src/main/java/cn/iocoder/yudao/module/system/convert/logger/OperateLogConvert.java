@@ -37,7 +37,7 @@ public interface OperateLogConvert {
 
     OperateLogV2RespDTO convert(OperateLogV2DO operateLogV2DO);
 
-    private List<OperateLogV2RespDTO> setUserInfo(List<OperateLogV2DO> logList, List<AdminUserDO> userList) {
+    default List<OperateLogV2RespDTO> setUserInfo(List<OperateLogV2DO> logList, List<AdminUserDO> userList) {
         Map<Long, AdminUserDO> userMap = convertMap(userList, AdminUserDO::getId);
         return CollectionUtils.convertList(logList, item -> {
             OperateLogV2RespDTO respDTO = convert(item);

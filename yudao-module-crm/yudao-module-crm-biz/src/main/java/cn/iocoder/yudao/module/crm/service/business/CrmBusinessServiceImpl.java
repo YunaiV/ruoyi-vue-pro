@@ -28,6 +28,7 @@ import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -56,6 +57,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     @Resource
     private CrmBusinessProductService businessProductService;
     @Resource
+    @Lazy // 延迟加载，避免循环依赖
     private CrmContractService contractService;
     @Resource
     private CrmPermissionService permissionService;
@@ -118,20 +120,20 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
                 CrmBusinessProductConvert.INSTANCE.convert(product).setBusinessId(businessId));
         if (Boolean.TRUE.equals(updateFlag)) {
 //            根据商机 id从商机产品关联表中获取已存在的数据集合
-            List<CrmBusinessProductDO> oldProducts = businessProductService.selectListByBusinessId(businessId);
+            List<CrmBusinessProductDO> oldProducts = businessProductService.getBusinessProductListByBusinessId(businessId);
             List<List<CrmBusinessProductDO>> diffList = CollectionUtils.diffList(oldProducts, list, (oldValue, newValue) ->
                     ObjectUtil.equal(oldValue.getProductId(), newValue.getProductId()));
             if (CollUtil.isNotEmpty(diffList.getFirst())) {
-                businessProductService.insertBatch(diffList.getFirst());
+                businessProductService.createBusinessProductBatch(diffList.getFirst());
             }
             if (CollUtil.isNotEmpty(diffList.get(1))) {
-                businessProductService.updateBatch(diffList.get(1));
+                businessProductService.updateBusinessProductBatch(diffList.get(1));
             }
             if (CollUtil.isNotEmpty(diffList.get(2))) {
-                businessProductService.deleteBatch(diffList.get(2));
+                businessProductService.deleteBusinessProductBatch(diffList.get(2));
             }
         } else {
-            businessProductService.insertBatch(list);
+            businessProductService.createBusinessProductBatch(list);
         }
     }
 
@@ -152,7 +154,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         if (CollUtil.isNotEmpty(updateReqVO.getProducts())) {
             createBusinessProducts(updateReqVO.getProducts(), updateReqVO.getId(), true);
         } else {
-            businessProductService.deleteByBusinessId(updateReqVO.getId());
+            businessProductService.deleteBusinessProductByBusinessId(updateReqVO.getId());
         }
 
         // TODO @商机待定：如果状态发生变化，插入商机状态变更记录表
@@ -193,9 +195,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
      * @author lzxhqs
      */
     private void validateContractExists(Long businessId) {
-        // TODO @lzxhqs：保持风格的统一，selectCountByBusinessId 改成 getContractCountByBusinessId；另外，可以不用声明 count，因为就一次性使用，直接把 197 和 198 合并成一行；
-        Long count = contractService.selectCountByBusinessId(businessId);
-        if (count > 0) {
+        if (contractService.getContractCountByBusinessId(businessId) > 0) {
             throw exception(BUSINESS_CONTRACT_EXISTS);
         }
     }
