@@ -7,4 +7,6 @@ package cn.iocoder.yudao.module.erp.enums;
  */
 public interface DictTypeConstants {
 
+    String STOCK_RECORD_BIZ_TYPE = "erp_stock_record_biz_type"; // 库存明细的业务类型
+
 }

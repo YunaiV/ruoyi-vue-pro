@@ -6,6 +6,12 @@ import cn.iocoder.yudao.module.erp.controller.admin.stock.vo.warehouse.ErpWareho
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO;
 import jakarta.validation.Valid;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+
 /**
  * ERP 仓库 Service 接口
  *
@@ -50,6 +56,32 @@ public interface ErpWarehouseService {
      * @return 仓库
      */
     ErpWarehouseDO getWarehouse(Long id);
+
+    /**
+     * 获得指定状态的仓库列表
+     *
+     * @param status 状态
+     * @return 仓库列表
+     */
+    List<ErpWarehouseDO> getWarehouseListByStatus(Integer status);
+
+    /**
+     * 获得仓库列表
+     *
+     * @param ids 编号数组
+     * @return 仓库列表
+     */
+    List<ErpWarehouseDO> getWarehouseList(Collection<Long> ids);
+
+    /**
+     * 获得仓库 Map
+     *
+     * @param ids 编号数组
+     * @return 仓库 Map
+     */
+    default Map<Long, ErpWarehouseDO> getWarehouseMap(Collection<Long> ids) {
+        return convertMap(getWarehouseList(ids), ErpWarehouseDO::getId);
+    }
 
     /**
      * 获得仓库分页

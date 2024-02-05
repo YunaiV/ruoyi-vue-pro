@@ -3,9 +3,11 @@ package cn.iocoder.yudao.module.erp.dal.mysql.product;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductPageReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductPageReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 /**
  * ERP 产品 Mapper
@@ -15,7 +17,7 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface ErpProductMapper extends BaseMapperX<ErpProductDO> {
 
-    default PageResult<ErpProductDO> selectPage(ProductPageReqVO reqVO) {
+    default PageResult<ErpProductDO> selectPage(ErpProductPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ErpProductDO>()
                 .likeIfPresent(ErpProductDO::getName, reqVO.getName())
                 .eqIfPresent(ErpProductDO::getCategoryId, reqVO.getCategoryId())
@@ -29,6 +31,10 @@ public interface ErpProductMapper extends BaseMapperX<ErpProductDO> {
 
     default Long selectCountByUnitId(Long unitId) {
         return selectCount(ErpProductDO::getUnitId, unitId);
+    }
+
+    default List<ErpProductDO> selectListByStatus(Integer status) {
+        return selectList(ErpProductDO::getStatus, status);
     }
 
 }

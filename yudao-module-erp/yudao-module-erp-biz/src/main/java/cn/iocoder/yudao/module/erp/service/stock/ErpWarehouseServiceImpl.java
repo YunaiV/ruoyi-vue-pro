@@ -11,8 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Collection;
+import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.erp.ErrorCodeConstants.WAREHOUSE_NOT_EXISTS;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.WAREHOUSE_NOT_EXISTS;
 
 /**
  * ERP 仓库 Service 实现类
@@ -78,6 +81,16 @@ public class ErpWarehouseServiceImpl implements ErpWarehouseService {
     @Override
     public ErpWarehouseDO getWarehouse(Long id) {
         return warehouseMapper.selectById(id);
+    }
+
+    @Override
+    public List<ErpWarehouseDO> getWarehouseListByStatus(Integer status) {
+        return warehouseMapper.selectListByStatus(status);
+    }
+
+    @Override
+    public List<ErpWarehouseDO> getWarehouseList(Collection<Long> ids) {
+        return warehouseMapper.selectBatchIds(ids);
     }
 
     @Override

@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.erp.controller.admin.stock.vo.warehouse.ErpWareho
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * ERP 仓库 Mapper
  *
@@ -24,6 +26,10 @@ public interface ErpWarehouseMapper extends BaseMapperX<ErpWarehouseDO> {
 
     default ErpWarehouseDO selectByDefaultStatus() {
         return selectOne(ErpWarehouseDO::getDefaultStatus, true);
+    }
+
+    default List<ErpWarehouseDO> selectListByStatus(Integer status) {
+        return selectList(ErpWarehouseDO::getStatus, status);
     }
 
 }

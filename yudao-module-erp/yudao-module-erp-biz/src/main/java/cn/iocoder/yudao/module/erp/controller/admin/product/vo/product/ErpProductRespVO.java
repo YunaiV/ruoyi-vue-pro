@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Schema(description = "管理后台 - ERP 产品 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class ProductRespVO {
+public class ErpProductRespVO {
 
     @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "15672")
     @ExcelProperty("产品编号")

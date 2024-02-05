@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.erp.controller.admin.stock;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -88,6 +89,13 @@ public class ErpWarehouseController {
     public CommonResult<PageResult<ErpWarehouseRespVO>> getWarehousePage(@Valid ErpWarehousePageReqVO pageReqVO) {
         PageResult<ErpWarehouseDO> pageResult = warehouseService.getWarehousePage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, ErpWarehouseRespVO.class));
+    }
+
+    @GetMapping("/simple-list")
+    @Operation(summary = "获得仓库精简列表", description = "只包含被开启的仓库，主要用于前端的下拉选项")
+    public CommonResult<List<ErpWarehouseRespVO>> getWarehouseSimpleList() {
+        List<ErpWarehouseDO> list = warehouseService.getWarehouseListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        return success(BeanUtils.toBean(list, ErpWarehouseRespVO.class));
     }
 
     @GetMapping("/export-excel")

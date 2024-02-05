@@ -1,22 +1,17 @@
 package cn.iocoder.yudao.module.erp.controller.admin.product;
 
-import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductPageReqVO;
-import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductRespVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductPageReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductSaveReqVO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductCategoryDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductUnitDO;
-import cn.iocoder.yudao.module.erp.service.product.ErpProductCategoryService;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
-import cn.iocoder.yudao.module.erp.service.product.ErpProductUnitService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,10 +23,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Tag(name = "管理后台 - ERP 产品")
@@ -42,10 +36,6 @@ public class ErpProductController {
 
     @Resource
     private ErpProductService productService;
-    @Resource
-    private ErpProductCategoryService productCategoryService;
-    @Resource
-    private ErpProductUnitService productUnitService;
 
     @PostMapping("/create")
     @Operation(summary = "创建产品")
@@ -75,46 +65,36 @@ public class ErpProductController {
     @Operation(summary = "获得产品")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('erp:product:query')")
-    public CommonResult<ProductRespVO> getProduct(@RequestParam("id") Long id) {
+    public CommonResult<ErpProductRespVO> getProduct(@RequestParam("id") Long id) {
         ErpProductDO product = productService.getProduct(id);
-        return success(BeanUtils.toBean(product, ProductRespVO.class));
+        return success(BeanUtils.toBean(product, ErpProductRespVO.class));
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得产品分页")
     @PreAuthorize("@ss.hasPermission('erp:product:query')")
-    public CommonResult<PageResult<ProductRespVO>> getProductPage(@Valid ProductPageReqVO pageReqVO) {
-        PageResult<ErpProductDO> pageResult = productService.getProductPage(pageReqVO);
-        return success(buildProductDetailPage(pageResult));
+    public CommonResult<PageResult<ErpProductRespVO>> getProductPage(@Valid ErpProductPageReqVO pageReqVO) {
+        return success(productService.getProductVOPage(pageReqVO));
+    }
+
+    @GetMapping("/simple-list")
+    @Operation(summary = "获得产品精简列表", description = "只包含被开启的产品，主要用于前端的下拉选项")
+    public CommonResult<List<ErpProductRespVO>> getProductSimpleList() {
+        List<ErpProductDO> list = productService.getProductListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        return success(BeanUtils.toBean(list, ErpProductRespVO.class));
     }
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出产品 Excel")
     @PreAuthorize("@ss.hasPermission('erp:product:export')")
     @OperateLog(type = EXPORT)
-    public void exportProductExcel(@Valid ProductPageReqVO pageReqVO,
+    public void exportProductExcel(@Valid ErpProductPageReqVO pageReqVO,
               HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        PageResult<ErpProductDO> pageResult = productService.getProductPage(pageReqVO);
+        PageResult<ErpProductRespVO> pageResult = productService.getProductVOPage(pageReqVO);
         // 导出 Excel
-        ExcelUtils.write(response, "产品.xls", "数据", ProductRespVO.class,
-                        buildProductDetailPage(pageResult).getList());
-    }
-
-    private PageResult<ProductRespVO> buildProductDetailPage(PageResult<ErpProductDO> pageResult) {
-        if (CollUtil.isEmpty(pageResult.getList())) {
-            return PageResult.empty(pageResult.getTotal());
-        }
-        Map<Long, ErpProductCategoryDO> categoryMap = productCategoryService.getProductCategoryMap(
-                convertSet(pageResult.getList(), ErpProductDO::getCategoryId));
-        Map<Long, ErpProductUnitDO> unitMap = productUnitService.getProductUnitMap(
-                convertSet(pageResult.getList(), ErpProductDO::getUnitId));
-        return BeanUtils.toBean(pageResult, ProductRespVO.class, product -> {
-            MapUtils.findAndThen(categoryMap, product.getCategoryId(),
-                    category -> product.setCategoryName(category.getName()));
-            MapUtils.findAndThen(unitMap, product.getUnitId(),
-                    unit -> product.setUnitName(unit.getName()));
-        });
+        ExcelUtils.write(response, "产品.xls", "数据", ErpProductRespVO.class,
+                pageResult.getList());
     }
 
 }

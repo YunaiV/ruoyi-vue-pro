@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.erp.service.product;
 
-import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductPageReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductSaveReqVO;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -115,13 +115,13 @@ public class ProductServiceImplTest extends BaseDbUnitTest {
        // 测试 createTime 不匹配
        productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setCreateTime(null)));
        // 准备参数
-       ProductPageReqVO reqVO = new ProductPageReqVO();
+       ErpProductPageReqVO reqVO = new ErpProductPageReqVO();
        reqVO.setName(null);
        reqVO.setCategoryId(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
        // 调用
-       PageResult<ErpProductDO> pageResult = productService.getProductPage(reqVO);
+       PageResult<ErpProductDO> pageResult = productService.getProductVOPage(reqVO);
        // 断言
        assertEquals(1, pageResult.getTotal());
        assertEquals(1, pageResult.getList().size());
