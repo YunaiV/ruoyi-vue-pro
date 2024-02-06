@@ -33,11 +33,19 @@ public interface ErpStockInService {
     void updateStockIn(@Valid ErpStockInSaveReqVO updateReqVO);
 
     /**
-     * 删除其它入库单
+     * 更新其它入库单的状态
      *
      * @param id 编号
+     * @param status 状态
      */
-    void deleteStockIn(Long id);
+    void updateStockInStatus(Long id, Integer status);
+
+    /**
+     * 删除其它入库单
+     *
+     * @param ids 编号数组
+     */
+    void deleteStockIn(List<Long> ids);
 
     /**
      * 获得其它入库单

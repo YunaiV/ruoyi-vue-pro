@@ -75,12 +75,21 @@ public class ErpStockInController {
         return success(true);
     }
 
+    @PutMapping("/update-status")
+    @Operation(summary = "更新其它入库单的状态")
+    @PreAuthorize("@ss.hasPermission('erp:stock-in:update')")
+    public CommonResult<Boolean> updateStockInStatus(@RequestParam("id") Long id,
+                                                     @RequestParam("status") Integer status) {
+        stockInService.updateStockInStatus(id, status);
+        return success(true);
+    }
+
     @DeleteMapping("/delete")
     @Operation(summary = "删除其它入库单")
-    @Parameter(name = "id", description = "编号", required = true)
+    @Parameter(name = "ids", description = "编号数组", required = true)
     @PreAuthorize("@ss.hasPermission('erp:stock-in:delete')")
-    public CommonResult<Boolean> deleteStockIn(@RequestParam("id") Long id) {
-        stockInService.deleteStockIn(id);
+    public CommonResult<Boolean> deleteStockIn(@RequestParam("ids") List<Long> ids) {
+        stockInService.deleteStockIn(ids);
         return success(true);
     }
 
@@ -93,12 +102,15 @@ public class ErpStockInController {
         if (stockIn == null) {
             return success(null);
         }
-        List<ErpStockInItemDO> stockInItems = stockInService.getStockInItemListByInId(id);
-        // TODO 芋艿：有个锤子；
+        List<ErpStockInItemDO> stockInItemList = stockInService.getStockInItemListByInId(id);
+        Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
+                convertSet(stockInItemList, ErpStockInItemDO::getProductId));
         return success(BeanUtils.toBean(stockIn, ErpStockInRespVO.class, stockInVO ->
-                stockInVO.setItems(BeanUtils.toBean(stockInItems, ErpStockInRespVO.Item.class, item -> {
+                stockInVO.setItems(BeanUtils.toBean(stockInItemList, ErpStockInRespVO.Item.class, item -> {
                     ErpStockDO stock = stockService.getStock(item.getProductId(), item.getWarehouseId());
                     item.setStockCount(stock != null ? stock.getCount() : BigDecimal.ZERO);
+                    MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
+                            .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()));
                 }))));
     }
 
@@ -142,8 +154,8 @@ public class ErpStockInController {
         // 2. 开始拼接
         return BeanUtils.toBean(pageResult, ErpStockInRespVO.class, stockIn -> {
             stockIn.setItems(BeanUtils.toBean(stockInItemMap.get(stockIn.getId()), ErpStockInRespVO.Item.class,
-                    item -> MapUtils.findAndThen(productMap, item.getProductId(),
-                            product -> item.setProductName(product.getName()).setProductUnitName(product.getUnitName()))));
+                    item -> MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
+                            .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()))));
             stockIn.setProductNames(CollUtil.join(stockIn.getItems(), "，", ErpStockInRespVO.Item::getProductName));
             MapUtils.findAndThen(supplierMap, stockIn.getSupplierId(), supplier -> stockIn.setSupplierName(supplier.getName()));
             MapUtils.findAndThen(userMap, Long.parseLong(stockIn.getCreator()), user -> stockIn.setCreatorName(user.getNickname()));

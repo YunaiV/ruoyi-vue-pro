@@ -53,8 +53,7 @@ public class ErpStockInSaveReqVO {
         @NotNull(message = "产品编号不能为空")
         private Long productId;
 
-        @Schema(description = "产品单价", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
-        @NotNull(message = "产品单价不能为空")
+        @Schema(description = "产品单价", example = "100.00")
         private BigDecimal productPrice;
 
         @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")

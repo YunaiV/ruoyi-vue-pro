@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.erp.service.stock;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.stock.vo.in.ErpStockInPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.stock.vo.in.ErpStockInSaveReqVO;
@@ -26,9 +27,9 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.STOCK_IN_NOT_EXISTS;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 
-
+// TODO 芋艿：记录操作日志
 /**
  * ERP 其它入库单 Service 实现类
  *
@@ -62,9 +63,9 @@ public class ErpStockInServiceImpl implements ErpStockInService {
         ErpStockInDO stockIn = BeanUtils.toBean(createReqVO, ErpStockInDO.class, in -> in
                 .setStatus(ErpAuditStatus.PROCESS.getStatus())
                 .setTotalCount(getSumValue(stockInItems, ErpStockInItemDO::getCount, BigDecimal::add))
-                .setTotalPrice(getSumValue(stockInItems, ErpStockInItemDO::getTotalPrice, BigDecimal::add)));
+                .setTotalPrice(getSumValue(stockInItems, ErpStockInItemDO::getTotalPrice, BigDecimal::add, BigDecimal.ZERO)));
         stockInMapper.insert(stockIn);
-        // 2. 插入子表
+        // 2.2 插入入库单项
         stockInItems.forEach(o -> o.setInId(stockIn.getId()));
         stockInItemMapper.insertBatch(stockInItems);
         return stockIn.getId();
@@ -89,6 +90,28 @@ public class ErpStockInServiceImpl implements ErpStockInService {
         updateStockInItemList(updateReqVO.getId(), stockInItems);
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateStockInStatus(Long id, Integer status) {
+        // 1.1 校验存在
+        ErpStockInDO stockIn = validateStockInExists(id);
+        // 1.2 校验状态
+        if (stockIn.getStatus().equals(status)) {
+            throw exception(ErpAuditStatus.PROCESS.getStatus().equals(status) ?
+                    STOCK_IN_PROCESS_FAIL : STOCK_IN_APPROVE_FAIL);
+        }
+
+        // 2. 更新状态
+        int updateCount = stockInMapper.updateByIdAndStatus(id, stockIn.getStatus(),
+                new ErpStockInDO().setStatus(status));
+        if (updateCount == 0) {
+            throw exception(ErpAuditStatus.PROCESS.getStatus().equals(status) ?
+                    STOCK_IN_PROCESS_FAIL : STOCK_IN_APPROVE_FAIL);
+        }
+
+        // 3. TODO 芋艿：调整库存记录
+    }
+
     private List<ErpStockInItemDO> validateStockInItems(List<ErpStockInSaveReqVO.Item> list) {
         // 1.1 校验产品存在
         List<ErpProductDO> productList = productService.validProductList(convertSet(list, ErpStockInSaveReqVO.Item::getProductId));
@@ -98,7 +121,7 @@ public class ErpStockInServiceImpl implements ErpStockInService {
         // 2. 转化为 ErpStockInItemDO 列表
         return convertList(list, o -> BeanUtils.toBean(o, ErpStockInItemDO.class, item -> item
                 .setProductUnitId(productMap.get(item.getProductId()).getUnitId())
-                .setTotalPrice(item.getProductPrice().multiply(item.getCount()))));
+                .setTotalPrice(NumberUtils.mul(item.getProductPrice(), item.getCount()))));
     }
 
     private void updateStockInItemList(Long id, List<ErpStockInItemDO> newList) {
@@ -122,21 +145,33 @@ public class ErpStockInServiceImpl implements ErpStockInService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteStockIn(Long id) {
-        // 1. 校验存在
-        validateStockInExists(id);
-        // TODO 芋艿：校验一下；
+    public void deleteStockIn(List<Long> ids) {
+        // 1. 校验不处于已审批
+        List<ErpStockInDO> stockIns = stockInMapper.selectBatchIds(ids);
+        if (CollUtil.isEmpty(stockIns)) {
+            return;
+        }
+        stockIns.forEach(stockIn -> {
+            if (ErpAuditStatus.APPROVE.getStatus().equals(stockIn.getStatus())) {
+                throw exception(STOCK_IN_DELETE_FAIL_APPROVE, stockIn.getNo());
+            }
+        });
 
-        // 2.1 删除
-        stockInMapper.deleteById(id);
-        // 2.2 删除子表
-        stockInItemMapper.deleteByInId(id);
+        // 2. 遍历删除，并记录操作日志
+        stockIns.forEach(stockIn -> {
+            // 2.1 删除入库单
+            stockInMapper.deleteById(stockIn.getId());
+            // 2.2 删除入库单项
+            stockInItemMapper.deleteByInId(stockIn.getId());
+        });
     }
 
-    private void validateStockInExists(Long id) {
-        if (stockInMapper.selectById(id) == null) {
+    private ErpStockInDO validateStockInExists(Long id) {
+        ErpStockInDO stockIn = stockInMapper.selectById(id);
+        if (stockIn == null) {
             throw exception(STOCK_IN_NOT_EXISTS);
         }
+        return stockIn;
     }
 
     @Override
@@ -149,7 +184,7 @@ public class ErpStockInServiceImpl implements ErpStockInService {
         return stockInMapper.selectPage(pageReqVO);
     }
 
-    // ==================== 子表（ERP 其它入库单项） ====================
+    // ==================== 入库项 ====================
 
     @Override
     public List<ErpStockInItemDO> getStockInItemListByInId(Long inId) {
