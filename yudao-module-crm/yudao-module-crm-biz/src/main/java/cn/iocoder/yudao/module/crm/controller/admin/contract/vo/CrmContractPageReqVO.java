@@ -30,4 +30,7 @@ public class CrmContractPageReqVO extends PageParam {
     @InEnum(CrmSceneTypeEnum.class)
     private Integer sceneType; // 场景类型，为 null 时则表示全部
 
+    @Schema(description = "审批状态", example = "20")
+    private Integer auditStatus;
+
 }

@@ -49,6 +49,7 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
                 .likeIfPresent(CrmContractDO::getName, pageReqVO.getName())
                 .eqIfPresent(CrmContractDO::getCustomerId, pageReqVO.getCustomerId())
                 .eqIfPresent(CrmContractDO::getBusinessId, pageReqVO.getBusinessId())
+                .eqIfPresent(CrmContractDO::getAuditStatus, pageReqVO.getAuditStatus())
                 .orderByDesc(CrmContractDO::getId);
         return selectJoinPage(pageReqVO, CrmContractDO.class, mpjLambdaWrapperX);
     }
