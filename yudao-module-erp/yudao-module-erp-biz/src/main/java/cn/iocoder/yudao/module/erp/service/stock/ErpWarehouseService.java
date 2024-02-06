@@ -58,6 +58,14 @@ public interface ErpWarehouseService {
     ErpWarehouseDO getWarehouse(Long id);
 
     /**
+     * 校验仓库列表的有效性
+     *
+     * @param ids 编号数组
+     * @return 仓库列表
+     */
+    List<ErpWarehouseDO> validWarehouseList(Collection<Long> ids);
+
+    /**
      * 获得指定状态的仓库列表
      *
      * @param status 状态

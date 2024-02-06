@@ -18,6 +18,7 @@ import cn.iocoder.yudao.module.erp.service.stock.ErpStockService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpWarehouseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
@@ -52,10 +53,16 @@ public class ErpStockController {
 
     @GetMapping("/get")
     @Operation(summary = "获得产品库存")
-    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @Parameters({
+            @Parameter(name = "id", description = "编号", example = "1"), // 方案一：传递 id
+            @Parameter(name = "productId", description = "产品编号", example = "10"), // 方案二：传递 productId + warehouseId
+            @Parameter(name = "warehouseId", description = "仓库编号", example = "2")
+    })
     @PreAuthorize("@ss.hasPermission('erp:stock:query')")
-    public CommonResult<ErpStockRespVO> getStock(@RequestParam("id") Long id) {
-        ErpStockDO stock = stockService.getStock(id);
+    public CommonResult<ErpStockRespVO> getStock(@RequestParam(value = "id", required = false) Long id,
+                                                 @RequestParam(value = "productId", required = false) Long productId,
+                                                 @RequestParam(value = "warehouseId", required = false) Long warehouseId) {
+        ErpStockDO stock = id != null ? stockService.getStock(id) : stockService.getStock(productId, warehouseId);
         return success(BeanUtils.toBean(stock, ErpStockRespVO.class));
     }
 

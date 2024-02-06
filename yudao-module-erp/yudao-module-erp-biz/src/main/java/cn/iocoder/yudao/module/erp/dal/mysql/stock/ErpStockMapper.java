@@ -22,4 +22,9 @@ public interface ErpStockMapper extends BaseMapperX<ErpStockDO> {
                 .orderByDesc(ErpStockDO::getId));
     }
 
+    default ErpStockDO selectByProductIdAndWarehouseId(Long productId, Long warehouseId) {
+        return selectOne(ErpStockDO::getProductId, productId,
+                ErpStockDO::getWarehouseId, warehouseId);
+    }
+
 }

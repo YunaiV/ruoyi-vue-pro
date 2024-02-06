@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.module.erp.service.stock;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.stock.vo.ErpWarehouseSaveReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.stock.vo.warehouse.ErpWarehousePageReqVO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.stock.ErpWarehouseMapper;
 import jakarta.annotation.Resource;
@@ -12,10 +15,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.WAREHOUSE_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 
 /**
  * ERP 仓库 Service 实现类
@@ -81,6 +87,25 @@ public class ErpWarehouseServiceImpl implements ErpWarehouseService {
     @Override
     public ErpWarehouseDO getWarehouse(Long id) {
         return warehouseMapper.selectById(id);
+    }
+
+    @Override
+    public List<ErpWarehouseDO> validWarehouseList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        List<ErpWarehouseDO> list = warehouseMapper.selectBatchIds(ids);
+        Map<Long, ErpWarehouseDO> warehouseMap = convertMap(list, ErpWarehouseDO::getId);
+        for (Long id : ids) {
+            ErpWarehouseDO warehouse = warehouseMap.get(id);
+            if (warehouseMap.get(id) == null) {
+                throw exception(WAREHOUSE_NOT_EXISTS);
+            }
+            if (CommonStatusEnum.isDisable(warehouse.getStatus())) {
+                throw exception(WAREHOUSE_NOT_ENABLE, warehouse.getName());
+            }
+        }
+        return list;
     }
 
     @Override

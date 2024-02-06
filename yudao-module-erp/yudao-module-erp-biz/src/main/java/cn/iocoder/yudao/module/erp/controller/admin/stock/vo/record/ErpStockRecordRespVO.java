@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.erp.controller.admin.stock.vo.stockrecord;
+package cn.iocoder.yudao.module.erp.controller.admin.stock.vo.record;
 
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;

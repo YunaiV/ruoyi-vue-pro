@@ -43,6 +43,14 @@ public interface ErpProductService {
     void deleteProduct(Long id);
 
     /**
+     * 校验产品们的有效性
+     *
+     * @param ids 编号数组
+     * @return 产品列表
+     */
+    List<ErpProductDO> validProductList(Collection<Long> ids);
+
+    /**
      * 获得产品
      *
      * @param id 编号
@@ -51,12 +59,12 @@ public interface ErpProductService {
     ErpProductDO getProduct(Long id);
 
     /**
-     * 获得指定状态的产品列表
+     * 获得指定状态的产品 VO 列表
      *
      * @param status 状态
-     * @return 产品列表
+     * @return 产品 VO 列表
      */
-    List<ErpProductDO> getProductListByStatus(Integer status);
+    List<ErpProductRespVO> getProductVOListByStatus(Integer status);
 
     /**
      * 获得产品 VO 列表

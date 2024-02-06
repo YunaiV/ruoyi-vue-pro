@@ -26,6 +26,11 @@ public class ErpStockServiceImpl implements ErpStockService {
     }
 
     @Override
+    public ErpStockDO getStock(Long productId, Long warehouseId) {
+        return stockMapper.selectByProductIdAndWarehouseId(productId, warehouseId);
+    }
+
+    @Override
     public PageResult<ErpStockDO> getStockPage(ErpStockPageReqVO pageReqVO) {
         return stockMapper.selectPage(pageReqVO);
     }

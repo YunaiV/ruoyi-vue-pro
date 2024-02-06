@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Tag(name = "管理后台 - ERP 产品")
@@ -80,8 +81,12 @@ public class ErpProductController {
     @GetMapping("/simple-list")
     @Operation(summary = "获得产品精简列表", description = "只包含被开启的产品，主要用于前端的下拉选项")
     public CommonResult<List<ErpProductRespVO>> getProductSimpleList() {
-        List<ErpProductDO> list = productService.getProductListByStatus(CommonStatusEnum.ENABLE.getStatus());
-        return success(BeanUtils.toBean(list, ErpProductRespVO.class));
+        List<ErpProductRespVO> list = productService.getProductVOListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        return success(convertList(list, product -> new ErpProductRespVO().setId(product.getId())
+                .setName(product.getName()).setBarCode(product.getBarCode())
+                .setCategoryId(product.getCategoryId()).setCategoryName(product.getCategoryName())
+                .setUnitId(product.getUnitId()).setUnitName(product.getUnitName())
+                .setPurchasePrice(product.getPurchasePrice()).setSalePrice(product.getSalePrice()).setMinPrice(product.getMinPrice())));
     }
 
     @GetMapping("/export-excel")

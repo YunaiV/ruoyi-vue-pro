@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.erp.controller.admin.stock.vo.stockrecord;
+package cn.iocoder.yudao.module.erp.controller.admin.stock.vo.record;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;

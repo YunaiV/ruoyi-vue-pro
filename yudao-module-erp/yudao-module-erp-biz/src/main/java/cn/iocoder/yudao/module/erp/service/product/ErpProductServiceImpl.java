@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.erp.service.product;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -15,14 +16,11 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PRODUCT_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 
 /**
  * ERP 产品 Service 实现类
@@ -67,6 +65,25 @@ public class ErpProductServiceImpl implements ErpProductService {
         productMapper.deleteById(id);
     }
 
+    @Override
+    public List<ErpProductDO> validProductList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        List<ErpProductDO> list = productMapper.selectBatchIds(ids);
+        Map<Long, ErpProductDO> productMap = convertMap(list, ErpProductDO::getId);
+        for (Long id : ids) {
+            ErpProductDO product = productMap.get(id);
+            if (productMap.get(id) == null) {
+                throw exception(PRODUCT_NOT_EXISTS);
+            }
+            if (CommonStatusEnum.isDisable(product.getStatus())) {
+                throw exception(PRODUCT_NOT_ENABLE, product.getName());
+            }
+        }
+        return list;
+    }
+
     private void validateProductExists(Long id) {
         if (productMapper.selectById(id) == null) {
             throw exception(PRODUCT_NOT_EXISTS);
@@ -79,8 +96,9 @@ public class ErpProductServiceImpl implements ErpProductService {
     }
 
     @Override
-    public List<ErpProductDO> getProductListByStatus(Integer status) {
-        return productMapper.selectListByStatus(status);
+    public List<ErpProductRespVO> getProductVOListByStatus(Integer status) {
+        List<ErpProductDO> list = productMapper.selectListByStatus(status);
+        return buildProductVOList(list);
     }
 
     @Override

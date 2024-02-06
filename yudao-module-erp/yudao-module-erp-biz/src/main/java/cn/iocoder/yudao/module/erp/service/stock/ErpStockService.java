@@ -20,6 +20,15 @@ public interface ErpStockService {
     ErpStockDO getStock(Long id);
 
     /**
+     * 基于产品 + 仓库，获得产品库存
+     *
+     * @param productId 产品编号
+     * @param warehouseId 仓库编号
+     * @return 产品库存
+     */
+    ErpStockDO getStock(Long productId, Long warehouseId);
+
+    /**
      * 获得产品库存分页
      *
      * @param pageReqVO 分页查询
