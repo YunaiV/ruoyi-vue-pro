@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockInDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockInItemDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.stock.ErpStockInItemMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.stock.ErpStockInMapper;
+import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
 import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierService;
@@ -45,6 +46,9 @@ public class ErpStockInServiceImpl implements ErpStockInService {
     private ErpStockInItemMapper stockInItemMapper;
 
     @Resource
+    private ErpNoRedisDAO noRedisDAO;
+
+    @Resource
     private ErpProductService productService;
     @Resource
     private ErpWarehouseService warehouseService;
@@ -58,10 +62,15 @@ public class ErpStockInServiceImpl implements ErpStockInService {
         List<ErpStockInItemDO> stockInItems = validateStockInItems(createReqVO.getItems());
         // 1.2 校验供应商
         supplierService.validateSupplier(createReqVO.getSupplierId());
+        // 1.3
+        String no = noRedisDAO.generate(ErpNoRedisDAO.STOCK_IN_NO_PREFIX);
+        if (stockInMapper.selectByNo(no) != null) {
+            throw exception(STOCK_IN_NO_EXISTS);
+        }
 
         // 2.1 插入入库单
         ErpStockInDO stockIn = BeanUtils.toBean(createReqVO, ErpStockInDO.class, in -> in
-                .setStatus(ErpAuditStatus.PROCESS.getStatus())
+                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus())
                 .setTotalCount(getSumValue(stockInItems, ErpStockInItemDO::getCount, BigDecimal::add))
                 .setTotalPrice(getSumValue(stockInItems, ErpStockInItemDO::getTotalPrice, BigDecimal::add, BigDecimal.ZERO)));
         stockInMapper.insert(stockIn);

@@ -17,10 +17,6 @@ public class ErpStockInSaveReqVO {
     @Schema(description = "入库编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "11756")
     private Long id;
 
-    @Schema(description = "入库单号", requiredMode = Schema.RequiredMode.REQUIRED, example = "S123")
-    @NotEmpty(message = "入库单号不能为空")
-    private String no;
-
     @Schema(description = "供应商编号", example = "3113")
     private Long supplierId;
 

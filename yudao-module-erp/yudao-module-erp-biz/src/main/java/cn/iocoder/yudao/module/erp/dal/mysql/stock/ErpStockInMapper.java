@@ -40,4 +40,8 @@ public interface ErpStockInMapper extends BaseMapperX<ErpStockInDO> {
                 .eq(ErpStockInDO::getId, id).eq(ErpStockInDO::getStatus, status));
     }
 
+    default ErpStockInDO selectByNo(String no) {
+        return selectOne(ErpStockInDO::getNo, no);
+    }
+
 }
