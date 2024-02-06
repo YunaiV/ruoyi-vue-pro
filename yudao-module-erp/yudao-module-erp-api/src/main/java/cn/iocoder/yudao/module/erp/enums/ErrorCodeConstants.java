@@ -9,12 +9,16 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
  */
 public interface ErrorCodeConstants {
 
-    // ========== 销售订单（1-020-000-000） ==========
-    ErrorCode SALE_ORDER_NOT_EXISTS = new ErrorCode(1_020_000_000, "销售订单不存在");
+    // ========== ERP 供应商（1-030-100-000） ==========
+    ErrorCode SUPPLIER_NOT_EXISTS = new ErrorCode(1_030_100_000, "供应商不存在");
+    ErrorCode SUPPLIER_NOT_ENABLE = new ErrorCode(1_030_100_000, "供应商({})未启用");
+
+    // ========== 销售订单（1-030-200-000） ==========
+    ErrorCode SALE_ORDER_NOT_EXISTS = new ErrorCode(1_020_200_000, "销售订单不存在");
 
     // ========== ERP 仓库 1-030-400-000 ==========
     ErrorCode WAREHOUSE_NOT_EXISTS = new ErrorCode(1_030_400_000, "仓库不存在");
-    ErrorCode WAREHOUSE_NOT_ENABLE = new ErrorCode(1_030_500_001, "仓库({})未启用");
+    ErrorCode WAREHOUSE_NOT_ENABLE = new ErrorCode(1_030_400_001, "仓库({})未启用");
 
     // ========== ERP 其它入库单 1-030-401-000 ==========
     ErrorCode STOCK_IN_NOT_EXISTS = new ErrorCode(1_030_401_000, "其它入库单不存在");

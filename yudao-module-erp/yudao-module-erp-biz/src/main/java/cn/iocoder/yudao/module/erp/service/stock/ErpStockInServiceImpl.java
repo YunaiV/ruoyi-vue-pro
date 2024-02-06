@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.erp.dal.mysql.stock.ErpStockInItemMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.stock.ErpStockInMapper;
 import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
+import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,13 +47,16 @@ public class ErpStockInServiceImpl implements ErpStockInService {
     private ErpProductService productService;
     @Resource
     private ErpWarehouseService warehouseService;
+    @Resource
+    private ErpSupplierService supplierService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createStockIn(ErpStockInSaveReqVO createReqVO) {
         // 1.1 校验入库项的有效性
         List<ErpStockInItemDO> stockInItems = validateStockInItems(createReqVO.getItems());
-        // 1.2 TODO 芋艿：校验供应商
+        // 1.2 校验供应商
+        supplierService.validateSupplier(createReqVO.getSupplierId());
 
         // 2.1 插入入库单
         ErpStockInDO stockIn = BeanUtils.toBean(createReqVO, ErpStockInDO.class, in -> in
@@ -71,7 +75,8 @@ public class ErpStockInServiceImpl implements ErpStockInService {
     public void updateStockIn(ErpStockInSaveReqVO updateReqVO) {
         // 1.1 校验存在
         validateStockInExists(updateReqVO.getId());
-        // 1.2 TODO 芋艿：校验供应商
+        // 1.2 校验供应商
+        supplierService.validateSupplier(updateReqVO.getSupplierId());
         // 1.3 校验入库项的有效性
         List<ErpStockInItemDO> stockInItems = validateStockInItems(updateReqVO.getItems());
 

@@ -15,7 +15,9 @@ import cn.iocoder.yudao.module.erp.controller.admin.stock.vo.in.ErpStockInSaveRe
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockInDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockInItemDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.supplier.ErpSupplierDO;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
+import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpStockInService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpStockService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -52,6 +54,8 @@ public class ErpStockInController {
     private ErpStockService stockService;
     @Resource
     private ErpProductService productService;
+    @Resource
+    private ErpSupplierService supplierService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -90,7 +94,7 @@ public class ErpStockInController {
             return success(null);
         }
         List<ErpStockInItemDO> stockInItems = stockInService.getStockInItemListByInId(id);
-
+        // TODO 芋艿：有个锤子；
         return success(BeanUtils.toBean(stockIn, ErpStockInRespVO.class, stockInVO ->
                 stockInVO.setItems(BeanUtils.toBean(stockInItems, ErpStockInRespVO.Item.class, item -> {
                     ErpStockDO stock = stockService.getStock(item.getProductId(), item.getWarehouseId());
@@ -129,7 +133,10 @@ public class ErpStockInController {
         // 1.2 商品信息
         Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
                 convertSet(stockInItemList, ErpStockInItemDO::getProductId));
-        // 1.3 管理员信息
+        // 1.3 供应商信息
+        Map<Long, ErpSupplierDO> supplierMap = supplierService.getSupplierMap(
+                convertSet(pageResult.getList(), ErpStockInDO::getSupplierId));
+        // 1.4 管理员信息
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSet(pageResult.getList(), erpStockRecordDO -> Long.parseLong(erpStockRecordDO.getCreator())));
         // 2. 开始拼接
@@ -138,6 +145,7 @@ public class ErpStockInController {
                     item -> MapUtils.findAndThen(productMap, item.getProductId(),
                             product -> item.setProductName(product.getName()).setProductUnitName(product.getUnitName()))));
             stockIn.setProductNames(CollUtil.join(stockIn.getItems(), "，", ErpStockInRespVO.Item::getProductName));
+            MapUtils.findAndThen(supplierMap, stockIn.getSupplierId(), supplier -> stockIn.setSupplierName(supplier.getName()));
             MapUtils.findAndThen(userMap, Long.parseLong(stockIn.getCreator()), user -> stockIn.setCreatorName(user.getNickname()));
         });
     }

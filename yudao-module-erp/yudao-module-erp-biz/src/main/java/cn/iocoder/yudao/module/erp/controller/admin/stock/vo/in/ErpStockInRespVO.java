@@ -27,8 +27,10 @@ public class ErpStockInRespVO {
     private String no;
 
     @Schema(description = "供应商编号", example = "3113")
-    @ExcelProperty("供应商编号")
     private Long supplierId;
+    @Schema(description = "供应商名称", example = "芋道")
+    @ExcelProperty("供应商名称")
+    private String supplierName;
 
     @Schema(description = "入库时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("入库时间")
