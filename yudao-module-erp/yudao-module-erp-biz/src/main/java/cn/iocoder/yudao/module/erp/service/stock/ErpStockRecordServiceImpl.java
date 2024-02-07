@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.stock.vo.record.ErpStockRecordPageReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockRecordDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.stock.ErpStockRecordMapper;
-import cn.iocoder.yudao.module.erp.service.stock.bo.ErpStockInCreateReqBO;
+import cn.iocoder.yudao.module.erp.service.stock.bo.ErpStockRecordCreateReqBO;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +40,7 @@ public class ErpStockRecordServiceImpl implements ErpStockRecordService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void createStockRecord(ErpStockInCreateReqBO createReqBO) {
+    public void createStockRecord(ErpStockRecordCreateReqBO createReqBO) {
         // 1. 更新库存
         BigDecimal totalCount = stockService.updateStockCountIncrement(
                 createReqBO.getProductId(), createReqBO.getWarehouseId(), createReqBO.getCount());

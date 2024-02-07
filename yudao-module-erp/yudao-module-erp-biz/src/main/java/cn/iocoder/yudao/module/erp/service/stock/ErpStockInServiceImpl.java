@@ -16,7 +16,7 @@ import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.enums.stock.ErpStockRecordBizTypeEnum;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierService;
-import cn.iocoder.yudao.module.erp.service.stock.bo.ErpStockInCreateReqBO;
+import cn.iocoder.yudao.module.erp.service.stock.bo.ErpStockRecordCreateReqBO;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -88,7 +88,10 @@ public class ErpStockInServiceImpl implements ErpStockInService {
     @Transactional(rollbackFor = Exception.class)
     public void updateStockIn(ErpStockInSaveReqVO updateReqVO) {
         // 1.1 校验存在
-        validateStockInExists(updateReqVO.getId());
+        ErpStockInDO stockIn = validateStockInExists(updateReqVO.getId());
+        if (ErpAuditStatus.APPROVE.getStatus().equals(stockIn.getStatus())) {
+            throw exception(STOCK_IN_UPDATE_FAIL_APPROVE, stockIn.getNo());
+        }
         // 1.2 校验供应商
         supplierService.validateSupplier(updateReqVO.getSupplierId());
         // 1.3 校验入库项的有效性
@@ -127,7 +130,7 @@ public class ErpStockInServiceImpl implements ErpStockInService {
                 : ErpStockRecordBizTypeEnum.OTHER_IN_CANCEL.getType();
         stockInItems.forEach(stockInItem -> {
             BigDecimal count = approve ? stockInItem.getCount() : stockInItem.getCount().negate();
-            stockRecordService.createStockRecord(new ErpStockInCreateReqBO(
+            stockRecordService.createStockRecord(new ErpStockRecordCreateReqBO(
                     stockInItem.getProductId(), stockInItem.getWarehouseId(), count,
                     bizType, stockInItem.getInId(), stockInItem.getId(), stockIn.getNo()));
         });

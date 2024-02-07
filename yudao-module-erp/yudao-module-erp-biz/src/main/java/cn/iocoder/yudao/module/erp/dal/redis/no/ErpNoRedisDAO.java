@@ -20,9 +20,13 @@ import java.time.LocalDateTime;
 public class ErpNoRedisDAO {
 
     /**
-     * 其它入库 STOCK_IN
+     * 其它入库 {@link cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockInDO}
      */
     public static final String STOCK_IN_NO_PREFIX = "QTRK";
+    /**
+     * 其它出库 {@link cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockOutDO}
+     */
+    public static final String STOCK_OUT_NO_PREFIX = "QCKD";
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
