@@ -14,6 +14,11 @@ import java.math.RoundingMode;
 public class MoneyUtils {
 
     /**
+     * 金额的小数位数
+     */
+    private static final int PRICE_SCALE = 2;
+
+    /**
      * 计算百分比金额，四舍五入
      *
      * @param price 金额
@@ -84,6 +89,22 @@ public class MoneyUtils {
      */
     public static String fenToYuanStr(int fen) {
         return new Money(0, fen).toString();
+    }
+
+    /**
+     * 金额相乘，默认进行四舍五入
+     *
+     * 位数：{@link #PRICE_SCALE}
+     *
+     * @param price 金额
+     * @param count 数量
+     * @return 金额相乘结果
+     */
+    public static BigDecimal priceMultiply(BigDecimal price, BigDecimal count) {
+        if (price == null || count == null) {
+            return null;
+        }
+        return price.multiply(count).setScale(PRICE_SCALE, RoundingMode.HALF_UP);
     }
 
 }
