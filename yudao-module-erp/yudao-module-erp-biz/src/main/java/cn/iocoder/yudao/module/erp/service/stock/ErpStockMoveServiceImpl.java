@@ -15,7 +15,7 @@ import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
 import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.enums.stock.ErpStockRecordBizTypeEnum;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
-import cn.iocoder.yudao.module.erp.service.sale.ErpCustomerService;
+import cn.iocoder.yudao.module.erp.service.stock.bo.ErpStockRecordCreateReqBO;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -55,8 +56,6 @@ public class ErpStockMoveServiceImpl implements ErpStockMoveService {
     @Resource
     private ErpWarehouseService warehouseService;
     @Resource
-    private ErpCustomerService customerService;
-    @Resource
     private ErpStockRecordService stockRecordService;
 
     @Override
@@ -64,12 +63,10 @@ public class ErpStockMoveServiceImpl implements ErpStockMoveService {
     public Long createStockMove(ErpStockMoveSaveReqVO createReqVO) {
         // 1.1 校验出库项的有效性
         List<ErpStockMoveItemDO> stockMoveItems = validateStockMoveItems(createReqVO.getItems());
-        // 1.2 校验客户
-        customerService.validateCustomer(createReqVO.getCustomerId());
-        // 1.3
-        String no = noRedisDAO.generate(ErpNoRedisDAO.STOCK_OUT_NO_PREFIX);
+        // 1.2 生成调拨单号，并校验唯一性
+        String no = noRedisDAO.generate(ErpNoRedisDAO.STOCK_MOVE_NO_PREFIX);
         if (stockMoveMapper.selectByNo(no) != null) {
-            throw exception(STOCK_OUT_NO_EXISTS);
+            throw exception(STOCK_MOVE_NO_EXISTS);
         }
 
         // 2.1 插入出库单
@@ -90,11 +87,9 @@ public class ErpStockMoveServiceImpl implements ErpStockMoveService {
         // 1.1 校验存在
         ErpStockMoveDO stockMove = validateStockMoveExists(updateReqVO.getId());
         if (ErpAuditStatus.APPROVE.getStatus().equals(stockMove.getStatus())) {
-            throw exception(STOCK_OUT_UPDATE_FAIL_APPROVE, stockMove.getNo());
+            throw exception(STOCK_MOVE_UPDATE_FAIL_APPROVE, stockMove.getNo());
         }
-        // 1.2 校验客户
-        customerService.validateCustomer(updateReqVO.getCustomerId());
-        // 1.3 校验出库项的有效性
+        // 1.2 校验出库项的有效性
         List<ErpStockMoveItemDO> stockMoveItems = validateStockMoveItems(updateReqVO.getItems());
 
         // 2.1 更新出库单
@@ -114,26 +109,31 @@ public class ErpStockMoveServiceImpl implements ErpStockMoveService {
         ErpStockMoveDO stockMove = validateStockMoveExists(id);
         // 1.2 校验状态
         if (stockMove.getStatus().equals(status)) {
-            throw exception(approve ? STOCK_OUT_APPROVE_FAIL : STOCK_OUT_PROCESS_FAIL);
+            throw exception(approve ? STOCK_MOVE_APPROVE_FAIL : STOCK_MOVE_PROCESS_FAIL);
         }
 
         // 2. 更新状态
         int updateCount = stockMoveMapper.updateByIdAndStatus(id, stockMove.getStatus(),
                 new ErpStockMoveDO().setStatus(status));
         if (updateCount == 0) {
-            throw exception(approve ? STOCK_OUT_APPROVE_FAIL : STOCK_OUT_PROCESS_FAIL);
+            throw exception(approve ? STOCK_MOVE_APPROVE_FAIL : STOCK_MOVE_PROCESS_FAIL);
         }
 
         // 3. 变更库存
         List<ErpStockMoveItemDO> stockMoveItems = stockMoveItemMapper.selectListByMoveId(id);
-        Integer bizType = approve ? ErpStockRecordBizTypeEnum.OTHER_OUT.getType()
-                : ErpStockRecordBizTypeEnum.OTHER_OUT_CANCEL.getType();
+        Integer fromBizType = approve ? ErpStockRecordBizTypeEnum.MOVE_OUT.getType()
+                : ErpStockRecordBizTypeEnum.MOVE_OUT_CANCEL.getType();
+        Integer toBizType = approve ? ErpStockRecordBizTypeEnum.MOVE_IN.getType()
+                : ErpStockRecordBizTypeEnum.MOVE_IN_CANCEL.getType();
         stockMoveItems.forEach(stockMoveItem -> {
-            BigDecimal count = approve ? stockMoveItem.getCount() : stockMoveItem.getCount().negate();
-            // TODO 芋艿：稍后搞
-//            stockRecordService.createStockRecord(new ErpStockRecordCreateReqBO(
-//                    stockMoveItem.getProductId(), stockMoveItem.getWarehouseId(), count,
-//                    bizType, stockMoveItem.getMoveId(), stockMoveItem.getId(), stockMove.getNo()));
+            BigDecimal fromCount = approve ? stockMoveItem.getCount().negate() : stockMoveItem.getCount();
+            BigDecimal toCount = approve ? stockMoveItem.getCount() : stockMoveItem.getCount().negate();
+            stockRecordService.createStockRecord(new ErpStockRecordCreateReqBO(
+                    stockMoveItem.getProductId(), stockMoveItem.getFromWarehouseId(), fromCount,
+                    fromBizType, stockMoveItem.getMoveId(), stockMoveItem.getId(), stockMove.getNo()));
+            stockRecordService.createStockRecord(new ErpStockRecordCreateReqBO(
+                    stockMoveItem.getProductId(), stockMoveItem.getToWarehouseId(), toCount,
+                    toBizType, stockMoveItem.getMoveId(), stockMoveItem.getId(), stockMove.getNo()));
         });
     }
 
@@ -143,8 +143,8 @@ public class ErpStockMoveServiceImpl implements ErpStockMoveService {
                 convertSet(list, ErpStockMoveSaveReqVO.Item::getProductId));
         Map<Long, ErpProductDO> productMap = convertMap(productList, ErpProductDO::getId);
         // 1.2 校验仓库存在
-        // TODO 芋艿：稍后搞
-//        warehouseService.validWarehouseList(convertSet(list, ErpStockMoveSaveReqVO.Item::getWarehouseId));
+        warehouseService.validWarehouseList(convertSetByFlatMap(list,
+                item -> Stream.of(item.getFromWarehouseId(),  item.getToWarehouseId())));
         // 2. 转化为 ErpStockMoveItemDO 列表
         return convertList(list, o -> BeanUtils.toBean(o, ErpStockMoveItemDO.class, item -> item
                 .setProductUnitId(productMap.get(item.getProductId()).getUnitId())
@@ -180,7 +180,7 @@ public class ErpStockMoveServiceImpl implements ErpStockMoveService {
         }
         stockMoves.forEach(stockMove -> {
             if (ErpAuditStatus.APPROVE.getStatus().equals(stockMove.getStatus())) {
-                throw exception(STOCK_OUT_DELETE_FAIL_APPROVE, stockMove.getNo());
+                throw exception(STOCK_MOVE_DELETE_FAIL_APPROVE, stockMove.getNo());
             }
         });
 
@@ -196,7 +196,7 @@ public class ErpStockMoveServiceImpl implements ErpStockMoveService {
     private ErpStockMoveDO validateStockMoveExists(Long id) {
         ErpStockMoveDO stockMove = stockMoveMapper.selectById(id);
         if (stockMove == null) {
-            throw exception(STOCK_OUT_NOT_EXISTS);
+            throw exception(STOCK_MOVE_NOT_EXISTS);
         }
         return stockMove;
     }

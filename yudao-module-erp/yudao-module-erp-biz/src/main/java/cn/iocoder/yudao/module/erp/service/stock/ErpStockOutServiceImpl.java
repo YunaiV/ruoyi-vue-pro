@@ -67,7 +67,7 @@ public class ErpStockOutServiceImpl implements ErpStockOutService {
         List<ErpStockOutItemDO> stockOutItems = validateStockOutItems(createReqVO.getItems());
         // 1.2 校验客户
         customerService.validateCustomer(createReqVO.getCustomerId());
-        // 1.3
+        // 1.3 生成出库单号，并校验唯一性
         String no = noRedisDAO.generate(ErpNoRedisDAO.STOCK_OUT_NO_PREFIX);
         if (stockOutMapper.selectByNo(no) != null) {
             throw exception(STOCK_OUT_NO_EXISTS);
@@ -130,7 +130,7 @@ public class ErpStockOutServiceImpl implements ErpStockOutService {
         Integer bizType = approve ? ErpStockRecordBizTypeEnum.OTHER_OUT.getType()
                 : ErpStockRecordBizTypeEnum.OTHER_OUT_CANCEL.getType();
         stockOutItems.forEach(stockOutItem -> {
-            BigDecimal count = approve ? stockOutItem.getCount() : stockOutItem.getCount().negate();
+            BigDecimal count = approve ? stockOutItem.getCount().negate() : stockOutItem.getCount();
             stockRecordService.createStockRecord(new ErpStockRecordCreateReqBO(
                     stockOutItem.getProductId(), stockOutItem.getWarehouseId(), count,
                     bizType, stockOutItem.getOutId(), stockOutItem.getId(), stockOut.getNo()));

@@ -20,6 +20,11 @@ public enum ErpStockRecordBizTypeEnum implements IntArrayValuable {
 
     OTHER_OUT(20, "其它出库"),
     OTHER_OUT_CANCEL(21, "其它出库（作废）"),
+
+    MOVE_IN(30, "调拨入库"),
+    MOVE_IN_CANCEL(31, "调拨入库（作废）"),
+    MOVE_OUT(32, "调拨出库"),
+    MOVE_OUT_CANCEL(33, "调拨出库（作废）"),
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ErpStockRecordBizTypeEnum::getType).toArray();

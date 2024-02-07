@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.erp.controller.admin.stock.vo.move;
 
+import cn.hutool.core.util.ObjectUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -62,6 +65,12 @@ public class ErpStockMoveSaveReqVO {
 
         @Schema(description = "备注", example = "随便")
         private String remark;
+
+        @AssertTrue(message = "调出、调仓仓库不能相同")
+        @JsonIgnore
+        public boolean isWarehouseValid() {
+            return ObjectUtil.notEqual(fromWarehouseId, toWarehouseId);
+        }
 
     }
 

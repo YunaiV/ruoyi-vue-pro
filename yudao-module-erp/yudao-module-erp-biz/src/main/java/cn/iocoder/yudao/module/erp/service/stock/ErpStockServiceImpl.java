@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.erp.controller.admin.stock.vo.stock.ErpStockPageReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.stock.ErpStockMapper;
+import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -29,6 +30,11 @@ public class ErpStockServiceImpl implements ErpStockService {
      * TODO 芋艿：后续做成 db 配置
      */
     private static final Boolean NEGATIVE_STOCK_COUNT_ENABLE = false;
+
+    @Resource
+    private ErpProductService productService;
+    @Resource
+    private ErpWarehouseService warehouseService;
 
     @Resource
     private ErpStockMapper stockMapper;
@@ -58,13 +64,16 @@ public class ErpStockServiceImpl implements ErpStockService {
         }
         // 1.2 校验库存是否充足
         if (!NEGATIVE_STOCK_COUNT_ENABLE && stock.getCount().add(count).compareTo(BigDecimal.ZERO) < 0) {
-            throw exception(STOCK_COUNT_NEGATIVE, stock.getCount(), count);
+            throw exception(STOCK_COUNT_NEGATIVE, productService.getProduct(productId).getName(),
+                    warehouseService.getWarehouse(warehouseId).getName(), stock.getCount(), count);
         }
 
         // 2. 库存变更
         int updateCount = stockMapper.updateCountIncrement(stock.getId(), count, NEGATIVE_STOCK_COUNT_ENABLE);
         if (updateCount == 0) {
-            throw exception(STOCK_COUNT_NEGATIVE2); // 此时不好去查询最新库存，所以直接抛出该提示，不提供具体库存数字
+            // 此时不好去查询最新库存，所以直接抛出该提示，不提供具体库存数字
+            throw exception(STOCK_COUNT_NEGATIVE2, productService.getProduct(productId).getName(),
+                    warehouseService.getWarehouse(warehouseId).getName());
         }
 
         // 3. 返回最新库存

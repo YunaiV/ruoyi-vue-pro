@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
  *
  * @author 芋道源码
  */
-@TableName("erp_stock_in")
-@KeySequence("erp_stock_in_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName("erp_stock_move")
+@KeySequence("erp_stock_move_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
