@@ -14,6 +14,13 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class CrmReceivablePlanPageReqVO extends PageParam {
 
+    // 待回款
+    public final static Integer REMIND_NEEDED = 1;
+    // 已逾期
+    public final static Integer REMIND_EXPIRED = 2;
+    // 已回款
+    public final static Integer REMIND_RECEIVED = 3;
+
     @Schema(description = "客户编号", example = "18026")
     private Long customerId;
 
@@ -24,5 +31,8 @@ public class CrmReceivablePlanPageReqVO extends PageParam {
     @Schema(description = "场景类型", example = "1")
     @InEnum(CrmSceneTypeEnum.class)
     private Integer sceneType; // 场景类型，为 null 时则表示全部
+
+    @Schema(description = "提醒类型", example = "1")
+    private Integer remindType; // 提醒类型，为 null 时则表示全部
 
 }

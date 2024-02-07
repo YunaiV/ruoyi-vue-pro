@@ -45,6 +45,7 @@ public interface CrmReceivableMapper extends BaseMapperX<CrmReceivableDO> {
         query.selectAll(CrmReceivableDO.class)
                 .eqIfPresent(CrmReceivableDO::getNo, pageReqVO.getNo())
                 .eqIfPresent(CrmReceivableDO::getPlanId, pageReqVO.getPlanId())
+                .eqIfPresent(CrmReceivableDO::getAuditStatus, pageReqVO.getAuditStatus())
                 .orderByDesc(CrmReceivableDO::getId);
         return selectJoinPage(pageReqVO, CrmReceivableDO.class, query);
     }

@@ -14,6 +14,9 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class CrmContractPageReqVO extends PageParam {
 
+    public static final Integer EXPIRY_TYPE_ABOUT_TO_EXPIRE = 1;
+    public static  final Integer EXPIRY_TYPE_EXPIRED = 2;
+
     @Schema(description = "合同编号", example = "XYZ008")
     private String no;
 
@@ -32,5 +35,8 @@ public class CrmContractPageReqVO extends PageParam {
 
     @Schema(description = "审批状态", example = "20")
     private Integer auditStatus;
+
+    @Schema(description = "过期类型", example = "1")
+    private Integer expiryType; // 过期类型，为 null 时则表示全部
 
 }
