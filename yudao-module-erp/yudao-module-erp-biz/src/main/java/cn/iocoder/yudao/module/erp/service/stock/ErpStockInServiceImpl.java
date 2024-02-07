@@ -13,8 +13,10 @@ import cn.iocoder.yudao.module.erp.dal.mysql.stock.ErpStockInItemMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.stock.ErpStockInMapper;
 import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
 import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
+import cn.iocoder.yudao.module.erp.enums.stock.ErpStockRecordBizTypeEnum;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierService;
+import cn.iocoder.yudao.module.erp.service.stock.bo.ErpStockInCreateReqBO;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +56,8 @@ public class ErpStockInServiceImpl implements ErpStockInService {
     private ErpWarehouseService warehouseService;
     @Resource
     private ErpSupplierService supplierService;
+    @Resource
+    private ErpStockRecordService stockRecordService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -102,23 +106,31 @@ public class ErpStockInServiceImpl implements ErpStockInService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateStockInStatus(Long id, Integer status) {
+        boolean approve = ErpAuditStatus.APPROVE.getStatus().equals(status);
         // 1.1 校验存在
         ErpStockInDO stockIn = validateStockInExists(id);
         // 1.2 校验状态
         if (stockIn.getStatus().equals(status)) {
-            throw exception(ErpAuditStatus.PROCESS.getStatus().equals(status) ?
-                    STOCK_IN_PROCESS_FAIL : STOCK_IN_APPROVE_FAIL);
+            throw exception(approve ? STOCK_IN_APPROVE_FAIL : STOCK_IN_PROCESS_FAIL);
         }
 
         // 2. 更新状态
         int updateCount = stockInMapper.updateByIdAndStatus(id, stockIn.getStatus(),
                 new ErpStockInDO().setStatus(status));
         if (updateCount == 0) {
-            throw exception(ErpAuditStatus.PROCESS.getStatus().equals(status) ?
-                    STOCK_IN_PROCESS_FAIL : STOCK_IN_APPROVE_FAIL);
+            throw exception(approve ? STOCK_IN_APPROVE_FAIL : STOCK_IN_PROCESS_FAIL);
         }
 
-        // 3. TODO 芋艿：调整库存记录
+        // 3. 变更库存
+        List<ErpStockInItemDO> stockInItems = stockInItemMapper.selectListByInId(id);
+        Integer bizType = approve ? ErpStockRecordBizTypeEnum.OTHER_IN.getType()
+                : ErpStockRecordBizTypeEnum.OTHER_IN_CANCEL.getType();
+        stockInItems.forEach(stockInItem -> {
+            BigDecimal count = approve ? stockInItem.getCount() : stockInItem.getCount().negate();
+            stockRecordService.createStockRecord(new ErpStockInCreateReqBO(
+                    stockInItem.getProductId(), stockInItem.getWarehouseId(), count,
+                    bizType, stockInItem.getInId(), stockInItem.getId(), stockIn.getNo()));
+        });
     }
 
     private List<ErpStockInItemDO> validateStockInItems(List<ErpStockInSaveReqVO.Item> list) {

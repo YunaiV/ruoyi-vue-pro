@@ -27,6 +27,12 @@ public interface ErrorCodeConstants {
     ErrorCode STOCK_IN_APPROVE_FAIL = new ErrorCode(1_030_401_003, "审核失败，只有未审核的入库单才能审核");
     ErrorCode STOCK_IN_NO_EXISTS = new ErrorCode(1_030_401_004, "生成入库单失败，请重新提交");
 
+    // ========== ERP 其它出库单 1-030-402-000 ==========
+
+    // ========== ERP 产品库存 1-030-403-000 ==========
+    ErrorCode STOCK_COUNT_NEGATIVE = new ErrorCode(1_030_403_000, "操作失败，产品当前库存：{}，小于变更数量：{}");
+    ErrorCode STOCK_COUNT_NEGATIVE2 = new ErrorCode(1_030_403_000, "操作失败，库存不足");
+
     // ========== ERP 产品 1-030-500-000 ==========
     ErrorCode PRODUCT_NOT_EXISTS = new ErrorCode(1_030_500_000, "产品不存在");
     ErrorCode PRODUCT_NOT_ENABLE = new ErrorCode(1_030_500_001, "产品({})未启用");

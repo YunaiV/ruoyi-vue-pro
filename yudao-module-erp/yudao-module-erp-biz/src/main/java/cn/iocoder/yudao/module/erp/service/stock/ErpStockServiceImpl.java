@@ -8,6 +8,12 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.math.BigDecimal;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.STOCK_COUNT_NEGATIVE;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.STOCK_COUNT_NEGATIVE2;
+
 /**
  * ERP 产品库存 Service 实现类
  *
@@ -16,6 +22,13 @@ import org.springframework.validation.annotation.Validated;
 @Service
 @Validated
 public class ErpStockServiceImpl implements ErpStockService {
+
+    /**
+     * 允许库存为负数
+     *
+     * TODO 芋艿：后续做成 db 配置
+     */
+    private static final Boolean NEGATIVE_STOCK_COUNT_ENABLE = false;
 
     @Resource
     private ErpStockMapper stockMapper;
@@ -33,6 +46,29 @@ public class ErpStockServiceImpl implements ErpStockService {
     @Override
     public PageResult<ErpStockDO> getStockPage(ErpStockPageReqVO pageReqVO) {
         return stockMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public BigDecimal updateStockCountIncrement(Long productId, Long warehouseId, BigDecimal count) {
+        // 1.1 查询当前库存
+        ErpStockDO stock = stockMapper.selectByProductIdAndWarehouseId(productId, warehouseId);
+        if (stock == null) {
+            stock = new ErpStockDO().setProductId(productId).setWarehouseId(warehouseId).setCount(BigDecimal.ZERO);
+            stockMapper.insert(stock);
+        }
+        // 1.2 校验库存是否充足
+        if (!NEGATIVE_STOCK_COUNT_ENABLE && stock.getCount().add(count).compareTo(BigDecimal.ZERO) < 0) {
+            throw exception(STOCK_COUNT_NEGATIVE, stock.getCount(), count);
+        }
+
+        // 2. 库存变更
+        int updateCount = stockMapper.updateCountIncrement(stock.getId(), count, NEGATIVE_STOCK_COUNT_ENABLE);
+        if (updateCount == 0) {
+            throw exception(STOCK_COUNT_NEGATIVE2); // 此时不好去查询最新库存，所以直接抛出该提示，不提供具体库存数字
+        }
+
+        // 3. 返回最新库存
+        return stock.getCount().add(count);
     }
 
 }

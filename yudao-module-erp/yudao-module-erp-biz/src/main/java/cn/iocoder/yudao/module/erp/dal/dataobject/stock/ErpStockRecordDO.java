@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.erp.dal.dataobject.stock;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
+import cn.iocoder.yudao.module.erp.enums.stock.ErpStockRecordBizTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -56,25 +57,25 @@ public class ErpStockRecordDO extends BaseDO {
     /**
      * 业务类型
      *
-     * 枚举 {@link cn.iocoder.yudao.module.erp.enums.stock.ErpStockRecordBizTypeEnum}
+     * 枚举 {@link ErpStockRecordBizTypeEnum}
      */
     private Integer bizType;
     /**
      * 业务编号
      *
-     * 例如说：TODO
+     * 例如说：{@link ErpStockInDO#getId()}
      */
     private Long bizId;
     /**
      * 业务项编号
      *
-     * 例如说：TODO
+     * 例如说：{@link ErpStockInItemDO#getId()}
      */
     private Long bizItemId;
     /**
      * 业务单号
      *
-     * 例如说：TODO
+     * 例如说：{@link ErpStockInDO#getNo()}
      */
     private String bizNo;
 
