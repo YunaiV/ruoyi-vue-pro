@@ -139,7 +139,8 @@ public class ErpStockOutServiceImpl implements ErpStockOutService {
 
     private List<ErpStockOutItemDO> validateStockOutItems(List<ErpStockOutSaveReqVO.Item> list) {
         // 1.1 校验产品存在
-        List<ErpProductDO> productList = productService.validProductList(convertSet(list, ErpStockOutSaveReqVO.Item::getProductId));
+        List<ErpProductDO> productList = productService.validProductList(
+                convertSet(list, ErpStockOutSaveReqVO.Item::getProductId));
         Map<Long, ErpProductDO> productMap = convertMap(productList, ErpProductDO::getId);
         // 1.2 校验仓库存在
         warehouseService.validWarehouseList(convertSet(list, ErpStockOutSaveReqVO.Item::getWarehouseId));
@@ -212,16 +213,16 @@ public class ErpStockOutServiceImpl implements ErpStockOutService {
     // ==================== 出库项 ====================
 
     @Override
-    public List<ErpStockOutItemDO> getStockOutItemListByOutId(Long inId) {
-        return stockOutItemMapper.selectListByOutId(inId);
+    public List<ErpStockOutItemDO> getStockOutItemListByOutId(Long outId) {
+        return stockOutItemMapper.selectListByOutId(outId);
     }
 
     @Override
-    public List<ErpStockOutItemDO> getStockOutItemListByOutIds(Collection<Long> inIds) {
-        if (CollUtil.isEmpty(inIds)) {
+    public List<ErpStockOutItemDO> getStockOutItemListByOutIds(Collection<Long> outIds) {
+        if (CollUtil.isEmpty(outIds)) {
             return Collections.emptyList();
         }
-        return stockOutItemMapper.selectListByOutIds(inIds);
+        return stockOutItemMapper.selectListByOutIds(outIds);
     }
 
 }

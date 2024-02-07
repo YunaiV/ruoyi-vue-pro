@@ -25,6 +25,11 @@ public enum ErpStockRecordBizTypeEnum implements IntArrayValuable {
     MOVE_IN_CANCEL(31, "调拨入库（作废）"),
     MOVE_OUT(32, "调拨出库"),
     MOVE_OUT_CANCEL(33, "调拨出库（作废）"),
+
+    CHECK_MORE_IN(40, "盘盈入库"),
+    CHECK_MORE_IN_CANCEL(41, "盘盈入库（作废）"),
+    CHECK_LESS_OUT(42, "盘亏出库"),
+    CHECK_LESS_OUT_CANCEL(43, "盘亏出库（作废）"),
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ErpStockRecordBizTypeEnum::getType).toArray();

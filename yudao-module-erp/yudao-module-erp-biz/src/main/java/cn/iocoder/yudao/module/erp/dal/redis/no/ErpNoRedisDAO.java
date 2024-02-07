@@ -33,6 +33,11 @@ public class ErpNoRedisDAO {
      */
     public static final String STOCK_MOVE_NO_PREFIX = "QCDB";
 
+    /**
+     * 库存盘点 {@link cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockCheckDO}
+     */
+    public static final String STOCK_CHECK_NO_PREFIX = "QCPD";
+
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 

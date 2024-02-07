@@ -214,16 +214,16 @@ public class ErpStockMoveServiceImpl implements ErpStockMoveService {
     // ==================== 出库项 ====================
 
     @Override
-    public List<ErpStockMoveItemDO> getStockMoveItemListByMoveId(Long inId) {
-        return stockMoveItemMapper.selectListByMoveId(inId);
+    public List<ErpStockMoveItemDO> getStockMoveItemListByMoveId(Long moveId) {
+        return stockMoveItemMapper.selectListByMoveId(moveId);
     }
 
     @Override
-    public List<ErpStockMoveItemDO> getStockMoveItemListByMoveIds(Collection<Long> inIds) {
-        if (CollUtil.isEmpty(inIds)) {
+    public List<ErpStockMoveItemDO> getStockMoveItemListByMoveIds(Collection<Long> moveIds) {
+        if (CollUtil.isEmpty(moveIds)) {
             return Collections.emptyList();
         }
-        return stockMoveItemMapper.selectListByMoveIds(inIds);
+        return stockMoveItemMapper.selectListByMoveIds(moveIds);
     }
 
 }

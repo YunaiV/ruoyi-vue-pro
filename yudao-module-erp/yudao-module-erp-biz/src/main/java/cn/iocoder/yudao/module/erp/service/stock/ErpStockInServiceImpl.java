@@ -138,10 +138,12 @@ public class ErpStockInServiceImpl implements ErpStockInService {
 
     private List<ErpStockInItemDO> validateStockInItems(List<ErpStockInSaveReqVO.Item> list) {
         // 1.1 校验产品存在
-        List<ErpProductDO> productList = productService.validProductList(convertSet(list, ErpStockInSaveReqVO.Item::getProductId));
+        List<ErpProductDO> productList = productService.validProductList(
+                convertSet(list, ErpStockInSaveReqVO.Item::getProductId));
         Map<Long, ErpProductDO> productMap = convertMap(productList, ErpProductDO::getId);
         // 1.2 校验仓库存在
-        warehouseService.validWarehouseList(convertSet(list, ErpStockInSaveReqVO.Item::getWarehouseId));
+        warehouseService.validWarehouseList(convertSet(
+                list, ErpStockInSaveReqVO.Item::getWarehouseId));
         // 2. 转化为 ErpStockInItemDO 列表
         return convertList(list, o -> BeanUtils.toBean(o, ErpStockInItemDO.class, item -> item
                 .setProductUnitId(productMap.get(item.getProductId()).getUnitId())
