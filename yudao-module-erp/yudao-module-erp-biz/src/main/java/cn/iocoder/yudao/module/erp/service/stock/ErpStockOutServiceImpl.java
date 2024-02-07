@@ -15,7 +15,7 @@ import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
 import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.enums.stock.ErpStockRecordBizTypeEnum;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
-import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierService;
+import cn.iocoder.yudao.module.erp.service.sale.ErpCustomerService;
 import cn.iocoder.yudao.module.erp.service.stock.bo.ErpStockRecordCreateReqBO;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -56,7 +56,7 @@ public class ErpStockOutServiceImpl implements ErpStockOutService {
     @Resource
     private ErpWarehouseService warehouseService;
     @Resource
-    private ErpSupplierService supplierService;
+    private ErpCustomerService customerService;
     @Resource
     private ErpStockRecordService stockRecordService;
 
@@ -65,8 +65,8 @@ public class ErpStockOutServiceImpl implements ErpStockOutService {
     public Long createStockOut(ErpStockOutSaveReqVO createReqVO) {
         // 1.1 校验出库项的有效性
         List<ErpStockOutItemDO> stockOutItems = validateStockOutItems(createReqVO.getItems());
-        // 1.2 校验客户 TODO
-//        supplierService.validateSupplier(createReqVO.getSupplierId());
+        // 1.2 校验客户
+        customerService.validateCustomer(createReqVO.getCustomerId());
         // 1.3
         String no = noRedisDAO.generate(ErpNoRedisDAO.STOCK_OUT_NO_PREFIX);
         if (stockOutMapper.selectByNo(no) != null) {
@@ -93,8 +93,8 @@ public class ErpStockOutServiceImpl implements ErpStockOutService {
         if (ErpAuditStatus.APPROVE.getStatus().equals(stockOut.getStatus())) {
             throw exception(STOCK_OUT_UPDATE_FAIL_APPROVE, stockOut.getNo());
         }
-        // 1.2 校验客户 TODO
-//        supplierService.validateSupplier(updateReqVO.getSupplierId());
+        // 1.2 校验客户
+        customerService.validateCustomer(updateReqVO.getCustomerId());
         // 1.3 校验出库项的有效性
         List<ErpStockOutItemDO> stockOutItems = validateStockOutItems(updateReqVO.getItems());
 

@@ -15,7 +15,7 @@ import cn.iocoder.yudao.module.erp.controller.admin.stock.vo.in.ErpStockInSaveRe
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockInDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockInItemDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.supplier.ErpSupplierDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpStockInService;
@@ -77,7 +77,7 @@ public class ErpStockInController {
 
     @PutMapping("/update-status")
     @Operation(summary = "更新其它入库单的状态")
-    @PreAuthorize("@ss.hasPermission('erp:stock-in:update')")
+    @PreAuthorize("@ss.hasPermission('erp:stock-in:update-status')")
     public CommonResult<Boolean> updateStockInStatus(@RequestParam("id") Long id,
                                                      @RequestParam("status") Integer status) {
         stockInService.updateStockInStatus(id, status);

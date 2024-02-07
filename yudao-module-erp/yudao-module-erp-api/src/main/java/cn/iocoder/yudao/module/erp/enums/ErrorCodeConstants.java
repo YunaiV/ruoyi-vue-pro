@@ -13,8 +13,12 @@ public interface ErrorCodeConstants {
     ErrorCode SUPPLIER_NOT_EXISTS = new ErrorCode(1_030_100_000, "供应商不存在");
     ErrorCode SUPPLIER_NOT_ENABLE = new ErrorCode(1_030_100_000, "供应商({})未启用");
 
-    // ========== ERP 销售订单（1-030-200-000） ==========
-    ErrorCode SALE_ORDER_NOT_EXISTS = new ErrorCode(1_020_200_000, "销售订单不存在");
+    // ========== ERP 客户（1-030-200-000）==========
+    ErrorCode CUSTOMER_NOT_EXISTS = new ErrorCode(1_020_200_000, "客户不存在");
+    ErrorCode CUSTOMER_NOT_ENABLE = new ErrorCode(1_020_200_001, "客户({})未启用");
+
+    // ========== ERP 销售订单（1-030-201-000） ==========
+    ErrorCode SALE_ORDER_NOT_EXISTS = new ErrorCode(1_020_201_000, "销售订单不存在");
 
     // ========== ERP 仓库 1-030-400-000 ==========
     ErrorCode WAREHOUSE_NOT_EXISTS = new ErrorCode(1_030_400_000, "仓库不存在");

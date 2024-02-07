@@ -12,10 +12,12 @@ import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProduc
 import cn.iocoder.yudao.module.erp.controller.admin.stock.vo.out.ErpStockOutPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.stock.vo.out.ErpStockOutRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.stock.vo.out.ErpStockOutSaveReqVO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpCustomerDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockOutDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockOutItemDO;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
+import cn.iocoder.yudao.module.erp.service.sale.ErpCustomerService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpStockOutService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpStockService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -52,8 +54,8 @@ public class ErpStockOutController {
     private ErpStockService stockService;
     @Resource
     private ErpProductService productService;
-//    @Resource
-//    private ErpSupplierService supplierService;
+    @Resource
+    private ErpCustomerService customerService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -75,7 +77,7 @@ public class ErpStockOutController {
 
     @PutMapping("/update-status")
     @Operation(summary = "更新其它出库单的状态")
-    @PreAuthorize("@ss.hasPermission('erp:stock-out:update')")
+    @PreAuthorize("@ss.hasPermission('erp:stock-out:update-status')")
     public CommonResult<Boolean> updateStockOutStatus(@RequestParam("id") Long id,
                                                      @RequestParam("status") Integer status) {
         stockOutService.updateStockOutStatus(id, status);
@@ -143,9 +145,9 @@ public class ErpStockOutController {
         // 1.2 商品信息
         Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
                 convertSet(stockOutItemList, ErpStockOutItemDO::getProductId));
-        // 1.3 客户信息 TODO
-//        Map<Long, ErpSupplierDO> supplierMap = supplierService.getSupplierMap(
-//                convertSet(pageResult.getList(), ErpStockOutDO::getSupplierId));
+        // 1.3 客户信息
+        Map<Long, ErpCustomerDO> customerMap = customerService.getCustomerMap(
+                convertSet(pageResult.getList(), ErpStockOutDO::getCustomerId));
         // 1.4 管理员信息
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSet(pageResult.getList(), erpStockRecordDO -> Long.parseLong(erpStockRecordDO.getCreator())));
@@ -155,7 +157,7 @@ public class ErpStockOutController {
                     item -> MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
                             .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()))));
             stockOut.setProductNames(CollUtil.join(stockOut.getItems(), "，", ErpStockOutRespVO.Item::getProductName));
-//            MapUtils.findAndThen(supplierMap, stockOut.getSupplierId(), supplier -> stockOut.setSupplierName(supplier.getName()));
+            MapUtils.findAndThen(customerMap, stockOut.getCustomerId(), supplier -> stockOut.setCustomerName(supplier.getName()));
             MapUtils.findAndThen(userMap, Long.parseLong(stockOut.getCreator()), user -> stockOut.setCreatorName(user.getNickname()));
         });
     }
