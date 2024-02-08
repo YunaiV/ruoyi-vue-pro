@@ -11,6 +11,7 @@ import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.bpm.api.listener.dto.BpmResultListenerRespDTO;
 import cn.iocoder.yudao.module.bpm.api.task.BpmProcessInstanceApi;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
@@ -25,6 +26,7 @@ import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
+import cn.iocoder.yudao.module.crm.service.business.bo.CrmBusinessUpdateProductReqBO;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
@@ -96,7 +98,11 @@ public class CrmContractServiceImpl implements CrmContractService {
             // 更新合同商品总金额
             contractMapper.updateById(new CrmContractDO().setId(contract.getId()).setProductPrice(
                     getSumValue(productList, CrmContractProductDO::getTotalPrice, Integer::sum)));
-            // TODO @puhui999: 如果存在合同关联了商机则更新商机商品关联
+            // 如果存在合同关联了商机则更新商机商品关联
+            if (contract.getBusinessId() != null) {
+                businessService.updateBusinessProduct(new CrmBusinessUpdateProductReqBO().setId(contract.getBusinessId())
+                        .setProductItems(BeanUtils.toBean(createReqVO.getProductItems(), CrmBusinessUpdateProductReqBO.CrmBusinessProductItem.class)));
+            }
         }
 
         // 2. 创建数据权限
@@ -251,7 +257,8 @@ public class CrmContractServiceImpl implements CrmContractService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    // TODO @puhui999：操作日志；
+    @LogRecord(type = CRM_CONTRACT_TYPE, subType = CRM_CONTRACT_SUBMIT_SUB_TYPE, bizNo = "{{#id}}",
+            success = CRM_CONTRACT_SUBMIT_SUCCESS)
     public void submitContract(Long id, Long userId) {
         // 1. 校验合同是否在审批
         CrmContractDO contract = validateContractExists(id);
@@ -266,13 +273,41 @@ public class CrmContractServiceImpl implements CrmContractService {
         // 3. 更新合同工作流编号
         contractMapper.updateById(new CrmContractDO().setId(id).setProcessInstanceId(processInstanceId)
                 .setAuditStatus(CrmAuditStatusEnum.PROCESS.getStatus()));
+
+        // 3. 记录日志
+        LogRecordContext.putVariable("contractName", contract.getName());
     }
 
     @Override
     public void updateContractAuditStatus(BpmResultListenerRespDTO event) {
-        // TODO @puhui999：可能要判断下状态是否符合预期
+        // 判断下状态是否符合预期
+        if (!isEndResult(event.getResult())) {
+            return;
+        }
+        // 状态转换
+        if (ObjUtil.equal(event.getResult(), BpmProcessInstanceResultEnum.APPROVE.getResult())) {
+            event.setResult(CrmAuditStatusEnum.APPROVE.getStatus());
+        }
+        if (ObjUtil.equal(event.getResult(), BpmProcessInstanceResultEnum.REJECT.getResult())) {
+            event.setResult(CrmAuditStatusEnum.REJECT.getStatus());
+        }
+        if (ObjUtil.equal(event.getResult(), BpmProcessInstanceResultEnum.CANCEL.getResult())) {
+            event.setResult(CrmAuditStatusEnum.CANCEL.getStatus());
+        }
+        // 更新合同状态
         contractMapper.updateById(new CrmContractDO().setId(Long.parseLong(event.getBusinessKey()))
                 .setAuditStatus(event.getResult()));
+    }
+
+    /**
+     * 判断该结果是否处于 End 最终结果
+     *
+     * @param result 结果
+     * @return 是否
+     */
+    public static boolean isEndResult(Integer result) {
+        return ObjectUtils.equalsAny(result, BpmProcessInstanceResultEnum.APPROVE.getResult(),
+                BpmProcessInstanceResultEnum.REJECT.getResult(), BpmProcessInstanceResultEnum.CANCEL.getResult());
     }
 
     //======================= 查询相关 =======================

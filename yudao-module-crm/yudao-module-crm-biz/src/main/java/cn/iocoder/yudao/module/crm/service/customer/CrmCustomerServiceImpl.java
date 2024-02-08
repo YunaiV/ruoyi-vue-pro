@@ -108,7 +108,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     /**
      * 初始化客户的通用字段
      *
-     * @param customer 客户信息
+     * @param customer    客户信息
      * @param ownerUserId 负责人编号
      * @return 客户信息 DO
      */
@@ -244,8 +244,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     }
 
     @Override
-    public CrmCustomerImportRespVO importCustomerList(List<CrmCustomerImportExcelVO> importCustomers,
-                                                      Boolean isUpdateSupport, Long userId) {
+    public CrmCustomerImportRespVO importCustomerList(List<CrmCustomerImportExcelVO> importCustomers, CrmCustomerImportReqVO importReqVO) {
         if (CollUtil.isEmpty(importCustomers)) {
             throw exception(CUSTOMER_IMPORT_LIST_IS_EMPTY);
         }
@@ -264,19 +263,21 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
             CrmCustomerDO existCustomer = customerMapper.selectByCustomerName(importCustomer.getName());
             if (existCustomer == null) {
                 // 1.1 插入客户信息
-                CrmCustomerDO customer = initCustomer(importCustomer, userId);
+                CrmCustomerDO customer = initCustomer(importCustomer, importReqVO.getOwnerUserId());
                 customerMapper.insert(customer);
                 respVO.getCreateCustomerNames().add(importCustomer.getName());
-                // 1.2 创建数据权限
-                permissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
-                        .setBizId(customer.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
+                if (importReqVO.getOwnerUserId() != null) {
+                    // 1.2 创建数据权限
+                    permissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
+                            .setBizId(customer.getId()).setUserId(importReqVO.getOwnerUserId()).setLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
+                }
                 // 1.3 记录操作日志
                 getSelf().importCustomerLog(customer, false);
                 return;
             }
 
             // 情况二：如果存在，判断是否允许更新
-            if (!isUpdateSupport) {
+            if (!importReqVO.getUpdateSupport()) {
                 respVO.getFailureCustomerNames().put(importCustomer.getName(),
                         StrUtil.format(CUSTOMER_NAME_EXISTS.getMsg(), importCustomer.getName()));
                 return;

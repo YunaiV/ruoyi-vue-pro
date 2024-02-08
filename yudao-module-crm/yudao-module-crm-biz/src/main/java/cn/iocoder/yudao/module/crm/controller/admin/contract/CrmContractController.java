@@ -8,7 +8,10 @@ import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractSaveReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
 import cn.iocoder.yudao.module.crm.convert.contract.CrmContractConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
@@ -127,8 +130,8 @@ public class CrmContractController {
                                     HttpServletResponse response) throws IOException {
         PageResult<CrmContractDO> pageResult = contractService.getContractPage(exportReqVO, getLoginUserId());
         // 导出 Excel
-        ExcelUtils.write(response, "合同.xls", "数据", CrmContractExcelVO.class,
-                BeanUtils.toBean(pageResult.getList(), CrmContractExcelVO.class));
+        ExcelUtils.write(response, "合同.xls", "数据", CrmContractRespVO.class,
+                BeanUtils.toBean(pageResult.getList(), CrmContractRespVO.class));
     }
 
     @PutMapping("/transfer")
