@@ -259,8 +259,7 @@ const loading = ref(true) // 列表的加载中
 const list = ref<${simpleClassName}VO[]>([]) // 列表的数据
 ## 特殊：树表专属逻辑（树不需要分页接口）
 #if ( $table.templateType != 2 )
-// 列表的总页数
-const total = ref(0)
+const total = ref(0) // 列表的总页数
 #end
 const queryParams = reactive({
 ## 特殊：树表专属逻辑（树不需要分页接口）

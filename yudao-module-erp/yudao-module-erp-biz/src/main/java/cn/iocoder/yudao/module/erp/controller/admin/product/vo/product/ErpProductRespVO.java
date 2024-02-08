@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Schema(description = "管理后台 - ERP 产品 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class ProductRespVO {
+public class ErpProductRespVO {
 
     @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "15672")
     @ExcelProperty("产品编号")
@@ -26,12 +26,16 @@ public class ProductRespVO {
     private String barCode;
 
     @Schema(description = "产品分类编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "11161")
-    @ExcelProperty("产品分类编号")
     private Long categoryId;
+    @Schema(description = "产品分类", requiredMode = Schema.RequiredMode.REQUIRED, example = "水果")
+    @ExcelProperty("产品分类")
+    private String categoryName;
 
     @Schema(description = "单位编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "8869")
-    @ExcelProperty("单位编号")
-    private Integer unitId;
+    private Long unitId;
+    @Schema(description = "单位", requiredMode = Schema.RequiredMode.REQUIRED, example = "个")
+    @ExcelProperty("单位")
+    private String unitName;
 
     @Schema(description = "产品状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @ExcelProperty("产品状态")

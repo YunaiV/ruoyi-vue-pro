@@ -1,10 +1,8 @@
 package cn.iocoder.yudao.module.erp.controller.admin.product.vo.product;
 
 import lombok.*;
-import java.util.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import java.math.BigDecimal;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 
@@ -14,7 +12,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class ProductPageReqVO extends PageParam {
+public class ErpProductPageReqVO extends PageParam {
 
     @Schema(description = "产品名称", example = "李四")
     private String name;

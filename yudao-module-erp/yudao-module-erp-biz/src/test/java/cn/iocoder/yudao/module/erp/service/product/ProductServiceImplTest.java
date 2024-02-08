@@ -1,23 +1,24 @@
 package cn.iocoder.yudao.module.erp.service.product;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductPageReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductSaveReqVO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
-import cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductMapper;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
+import jakarta.annotation.Resource;
+
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+
+import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
+import cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductMapper;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+
 import org.springframework.context.annotation.Import;
 
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
-import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
-import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
-import static cn.iocoder.yudao.module.erp.ErrorCodeConstants.PRODUCT_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -114,13 +115,13 @@ public class ProductServiceImplTest extends BaseDbUnitTest {
        // 测试 createTime 不匹配
        productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setCreateTime(null)));
        // 准备参数
-       ProductPageReqVO reqVO = new ProductPageReqVO();
+       ErpProductPageReqVO reqVO = new ErpProductPageReqVO();
        reqVO.setName(null);
        reqVO.setCategoryId(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
        // 调用
-       PageResult<ErpProductDO> pageResult = productService.getProductPage(reqVO);
+       PageResult<ErpProductDO> pageResult = productService.getProductVOPage(reqVO);
        // 断言
        assertEquals(1, pageResult.getTotal());
        assertEquals(1, pageResult.getList().size());

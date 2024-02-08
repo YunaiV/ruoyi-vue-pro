@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.erp.controller.admin.product;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Tag(name = "管理后台 - ERP 产品单位")
@@ -75,6 +77,13 @@ public class ErpProductUnitController {
     public CommonResult<PageResult<ErpProductUnitRespVO>> getProductUnitPage(@Valid ErpProductUnitPageReqVO pageReqVO) {
         PageResult<ErpProductUnitDO> pageResult = productUnitService.getProductUnitPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, ErpProductUnitRespVO.class));
+    }
+
+    @GetMapping("/simple-list")
+    @Operation(summary = "获得产品单位精简列表", description = "只包含被开启的单位，主要用于前端的下拉选项")
+    public CommonResult<List<ErpProductUnitRespVO>> getProductUnitSimpleList() {
+        List<ErpProductUnitDO> list = productUnitService.getProductUnitListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        return success(convertList(list, unit -> new ErpProductUnitRespVO().setId(unit.getId()).setName(unit.getName())));
     }
 
     @GetMapping("/export-excel")

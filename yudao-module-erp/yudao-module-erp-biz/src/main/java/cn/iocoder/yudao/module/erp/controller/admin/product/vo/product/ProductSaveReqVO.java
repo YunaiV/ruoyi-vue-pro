@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.erp.controller.admin.product.vo.product;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
 import java.math.BigDecimal;
 
 @Schema(description = "管理后台 - ERP 产品新增/修改 Request VO")
@@ -27,7 +28,7 @@ public class ProductSaveReqVO {
 
     @Schema(description = "单位编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "8869")
     @NotNull(message = "单位编号不能为空")
-    private Integer unitId;
+    private Long unitId;
 
     @Schema(description = "产品状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @NotNull(message = "产品状态不能为空")

@@ -1,13 +1,14 @@
 package cn.iocoder.yudao.module.erp.controller.admin.product;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductPageReqVO;
-import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductRespVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductPageReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Tag(name = "管理后台 - ERP 产品")
@@ -64,30 +66,40 @@ public class ErpProductController {
     @Operation(summary = "获得产品")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('erp:product:query')")
-    public CommonResult<ProductRespVO> getProduct(@RequestParam("id") Long id) {
+    public CommonResult<ErpProductRespVO> getProduct(@RequestParam("id") Long id) {
         ErpProductDO product = productService.getProduct(id);
-        return success(BeanUtils.toBean(product, ProductRespVO.class));
+        return success(BeanUtils.toBean(product, ErpProductRespVO.class));
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得产品分页")
     @PreAuthorize("@ss.hasPermission('erp:product:query')")
-    public CommonResult<PageResult<ProductRespVO>> getProductPage(@Valid ProductPageReqVO pageReqVO) {
-        PageResult<ErpProductDO> pageResult = productService.getProductPage(pageReqVO);
-        return success(BeanUtils.toBean(pageResult, ProductRespVO.class));
+    public CommonResult<PageResult<ErpProductRespVO>> getProductPage(@Valid ErpProductPageReqVO pageReqVO) {
+        return success(productService.getProductVOPage(pageReqVO));
+    }
+
+    @GetMapping("/simple-list")
+    @Operation(summary = "获得产品精简列表", description = "只包含被开启的产品，主要用于前端的下拉选项")
+    public CommonResult<List<ErpProductRespVO>> getProductSimpleList() {
+        List<ErpProductRespVO> list = productService.getProductVOListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        return success(convertList(list, product -> new ErpProductRespVO().setId(product.getId())
+                .setName(product.getName()).setBarCode(product.getBarCode())
+                .setCategoryId(product.getCategoryId()).setCategoryName(product.getCategoryName())
+                .setUnitId(product.getUnitId()).setUnitName(product.getUnitName())
+                .setPurchasePrice(product.getPurchasePrice()).setSalePrice(product.getSalePrice()).setMinPrice(product.getMinPrice())));
     }
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出产品 Excel")
     @PreAuthorize("@ss.hasPermission('erp:product:export')")
     @OperateLog(type = EXPORT)
-    public void exportProductExcel(@Valid ProductPageReqVO pageReqVO,
+    public void exportProductExcel(@Valid ErpProductPageReqVO pageReqVO,
               HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<ErpProductDO> list = productService.getProductPage(pageReqVO).getList();
+        PageResult<ErpProductRespVO> pageResult = productService.getProductVOPage(pageReqVO);
         // 导出 Excel
-        ExcelUtils.write(response, "产品.xls", "数据", ProductRespVO.class,
-                        BeanUtils.toBean(list, ProductRespVO.class));
+        ExcelUtils.write(response, "产品.xls", "数据", ErpProductRespVO.class,
+                pageResult.getList());
     }
 
 }

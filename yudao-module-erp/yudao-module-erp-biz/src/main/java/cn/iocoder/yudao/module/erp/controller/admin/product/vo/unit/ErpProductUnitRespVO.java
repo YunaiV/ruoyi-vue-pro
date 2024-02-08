@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.erp.controller.admin.product.vo.unit;
 
+import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
+import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -23,7 +24,7 @@ public class ErpProductUnitRespVO {
 
     @Schema(description = "单位状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @ExcelProperty("单位状态")
-    @NotNull(message = "分类排序不能为空")
+    @DictFormat(DictTypeConstants.COMMON_STATUS)
     private Integer status;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)

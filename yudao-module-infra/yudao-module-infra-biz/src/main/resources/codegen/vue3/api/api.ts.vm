@@ -5,13 +5,12 @@ import request from '@/config/axios'
 export interface ${simpleClassName}VO {
 #foreach ($column in $columns)
 #if ($column.createOperation || $column.updateOperation)
-  // ${column.columnComment}
 #if(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer" || ${column.javaType.toLowerCase()} == "short" || ${column.javaType.toLowerCase()} == "double" || ${column.javaType.toLowerCase()} == "bigdecimal")
-  ${column.javaField}: number
+  ${column.javaField}: number // ${column.columnComment}
 #elseif(${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdate" || ${column.javaType.toLowerCase()} == "localdatetime")
-  ${column.javaField}: Date
+  ${column.javaField}: Date // ${column.columnComment}
 #else
-  ${column.javaField}: ${column.javaType.toLowerCase()}
+  ${column.javaField}: ${column.javaType.toLowerCase()} // ${column.columnComment}
 #end
 #end
 #end
