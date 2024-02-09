@@ -17,6 +17,19 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class ErpSaleOrderPageReqVO extends PageParam {
 
+    /**
+     * 入库状态 - 无
+     */
+    public static final Integer IN_STATUS_NONE = 0;
+    /**
+     * 入库状态 - 部分
+     */
+    public static final Integer IN_STATUS_PART = 1;
+    /**
+     * 入库状态 - 全部
+     */
+    public static final Integer IN_STATUS_ALL = 2;
+
     @Schema(description = "销售单编号", example = "XS001")
     private String no;
 
@@ -28,12 +41,18 @@ public class ErpSaleOrderPageReqVO extends PageParam {
     private LocalDateTime[] orderTime;
 
     @Schema(description = "备注", example = "你猜")
-    private String description;
+    private String remark;
 
     @Schema(description = "销售状态", example = "2")
     private Integer status;
 
     @Schema(description = "创建者")
     private String creator;
+
+    @Schema(description = "产品编号", example = "1")
+    private Long productId;
+
+    @Schema(description = "入库状态", example = "2")
+    private Integer inStatus;
 
 }

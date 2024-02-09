@@ -50,6 +50,11 @@ public class ErpStockServiceImpl implements ErpStockService {
     }
 
     @Override
+    public BigDecimal getStockCount(Long productId) {
+        return stockMapper.selectSumByProductId(productId);
+    }
+
+    @Override
     public PageResult<ErpStockDO> getStockPage(ErpStockPageReqVO pageReqVO) {
         return stockMapper.selectPage(pageReqVO);
     }

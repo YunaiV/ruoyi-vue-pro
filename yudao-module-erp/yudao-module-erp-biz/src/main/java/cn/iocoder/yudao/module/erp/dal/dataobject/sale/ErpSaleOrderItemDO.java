@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.erp.dal.dataobject.sale;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -13,15 +14,15 @@ import java.math.BigDecimal;
  *
  * @author 芋道源码
  */
-@TableName("erp_sales_order_items")
-@KeySequence("erp_sales_order_items_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName("erp_sale_order_items")
+@KeySequence("erp_sale_order_items_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ErpSalesOrderItemDO extends BaseDO {
+public class ErpSaleOrderItemDO extends BaseDO {
 
     /**
      * 编号
@@ -36,53 +37,58 @@ public class ErpSalesOrderItemDO extends BaseDO {
     private Long orderId;
 
     /**
-     * 商品 SPU 编号
+     * 产品编号
      *
-     * TODO 芋艿 关联
+     * 关联 {@link ErpProductDO#getId()}
      */
-    private Long productSpuId;
+    private Long productId;
     /**
-     * 商品 SKU 编号
+     * 产品单位单位
      *
-     * TODO 芋艿 关联
+     * 冗余 {@link ErpProductDO#getUnitId()}
      */
-    private Long productSkuId;
+    private Long productUnitId;
+
     /**
-     * 商品单位
-     *
-     * TODO 芋艿 冗余
-     */
-    private String productUnit;
-    /**
-     * 商品单价
-     *
-     * TODO 芋艿 冗余
+     * 产品单位单价，单位：元
      */
     private BigDecimal productPrice;
-
     /**
      * 数量
      */
-    private Integer count;
+    private BigDecimal count;
     /**
-     * 总价
+     * 总价，单位：元
+     *
+     * totalPrice = productPrice * count
      */
     private BigDecimal totalPrice;
-    /**
-     * 备注
-     */
-    private String description;
     /**
      * 税率，百分比
      */
     private BigDecimal taxPercent;
     /**
      * 税额，单位：元
+     *
+     * taxPrice = totalPrice * taxPercent
      */
     private BigDecimal taxPrice;
+
     /**
-     * 支付金额，单位：元
+     * 备注
      */
-    private BigDecimal payPrice;
+    private String remark;
+
+    // ========== 销售入库 ==========
+    /**
+     * 销售入库数量
+     */
+    private BigDecimal inCount;
+
+    // ========== 销售退货（出库）） ==========
+    /**
+     * 销售退货数量
+     */
+    private BigDecimal returnCount;
 
 }
