@@ -33,6 +33,8 @@ public interface ErpStockService {
     /**
      * 获得产品库存数量
      *
+     * 如果不存在库存记录，则返回 0
+     *
      * @param productId 产品编号
      * @return 产品库存数量
      */

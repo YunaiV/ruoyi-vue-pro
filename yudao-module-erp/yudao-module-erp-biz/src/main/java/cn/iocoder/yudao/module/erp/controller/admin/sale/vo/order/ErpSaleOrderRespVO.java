@@ -23,22 +23,33 @@ public class ErpSaleOrderRespVO {
     @ExcelProperty("销售单编号")
     private String no;
 
+    @Schema(description = "销售状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @ExcelProperty("销售状态")
+    private Integer status;
+
     @Schema(description = "客户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1724")
     private Long customerId;
     @Schema(description = "客户名称", example = "芋道")
     @ExcelProperty("客户名称")
     private String customerName;
 
-    @Schema(description = "下单时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("下单时间")
-    private LocalDateTime orderTime;
+    @Schema(description = "结算账户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "311.89")
+    @ExcelProperty("结算账户编号")
+    private Long accountId;
 
     @Schema(description = "销售员编号", example = "1888")
     private Long saleUserId;
 
-    @Schema(description = "结算账户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "311.89")
-    @ExcelProperty("结算账户编号")
-    private Long accountId;
+    @Schema(description = "下单时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("下单时间")
+    private LocalDateTime orderTime;
+
+    @Schema(description = "合计数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "15663")
+    @ExcelProperty("合计数量")
+    private BigDecimal totalCount;
+    @Schema(description = "最终合计价格", requiredMode = Schema.RequiredMode.REQUIRED, example = "24906")
+    @ExcelProperty("最终合计价格")
+    private BigDecimal totalPrice;
 
     @Schema(description = "合计产品价格，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "7127")
     private BigDecimal totalProductPrice;
@@ -55,10 +66,6 @@ public class ErpSaleOrderRespVO {
     @Schema(description = "定金金额，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "7127")
     @NotNull(message = "定金金额，单位：元不能为空")
     private BigDecimal depositPrice;
-
-    @Schema(description = "销售状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @ExcelProperty("销售状态")
-    private Integer status;
 
     @Schema(description = "附件地址", example = "https://www.iocoder.cn")
     @ExcelProperty("附件地址")
@@ -84,6 +91,16 @@ public class ErpSaleOrderRespVO {
     @ExcelProperty("产品信息")
     private String productNames;
 
+    // ========== 销售入库 ==========
+
+    @Schema(description = "销售入库数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
+    private BigDecimal inCount;
+
+    // ========== 销售退货（出库）） ==========
+
+    @Schema(description = "销售退货数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
+    private BigDecimal returnCount;
+
     @Data
     public static class Item {
 
@@ -105,6 +122,9 @@ public class ErpSaleOrderRespVO {
 
         @Schema(description = "税率，百分比", example = "99.88")
         private BigDecimal taxPercent;
+
+        @Schema(description = "税额，单位：元", example = "100.00")
+        private BigDecimal taxPrice;
 
         @Schema(description = "备注", example = "随便")
         private String remark;

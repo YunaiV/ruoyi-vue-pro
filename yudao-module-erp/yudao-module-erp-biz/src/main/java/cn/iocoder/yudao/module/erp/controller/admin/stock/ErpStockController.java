@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -64,6 +65,13 @@ public class ErpStockController {
                                                  @RequestParam(value = "warehouseId", required = false) Long warehouseId) {
         ErpStockDO stock = id != null ? stockService.getStock(id) : stockService.getStock(productId, warehouseId);
         return success(BeanUtils.toBean(stock, ErpStockRespVO.class));
+    }
+
+    @GetMapping("/get-count")
+    @Operation(summary = "获得产品库存数量")
+    @Parameter(name = "productId", description = "产品编号", example = "10")
+    public CommonResult<BigDecimal> getStockCount(@RequestParam("productId") Long productId) {
+        return success(stockService.getStockCount(productId));
     }
 
     @GetMapping("/page")

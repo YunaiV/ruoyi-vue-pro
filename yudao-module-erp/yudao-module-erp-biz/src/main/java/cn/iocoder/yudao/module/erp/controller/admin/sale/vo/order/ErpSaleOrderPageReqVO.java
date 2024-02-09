@@ -30,6 +30,19 @@ public class ErpSaleOrderPageReqVO extends PageParam {
      */
     public static final Integer IN_STATUS_ALL = 2;
 
+    /**
+     * 退货状态 - 无
+     */
+    public static final Integer RETURN_STATUS_NONE = 0;
+    /**
+     * 退货状态 - 部分
+     */
+    public static final Integer RETURN_STATUS_PART = 1;
+    /**
+     * 退货状态 - 全部
+     */
+    public static final Integer RETURN_STATUS_ALL = 2;
+
     @Schema(description = "销售单编号", example = "XS001")
     private String no;
 
@@ -54,5 +67,8 @@ public class ErpSaleOrderPageReqVO extends PageParam {
 
     @Schema(description = "入库状态", example = "2")
     private Integer inStatus;
+
+    @Schema(description = "退货状态", example = "2")
+    private Integer returnStatus;
 
 }
