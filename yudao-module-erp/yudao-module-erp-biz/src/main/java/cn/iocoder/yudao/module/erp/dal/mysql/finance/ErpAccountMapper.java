@@ -20,7 +20,7 @@ public interface ErpAccountMapper extends BaseMapperX<ErpAccountDO> {
     default PageResult<ErpAccountDO> selectPage(ErpAccountPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ErpAccountDO>()
                 .likeIfPresent(ErpAccountDO::getName, reqVO.getName())
-                .eqIfPresent(ErpAccountDO::getNo, reqVO.getNo())
+                .likeIfPresent(ErpAccountDO::getNo, reqVO.getNo())
                 .eqIfPresent(ErpAccountDO::getRemark, reqVO.getRemark())
                 .orderByDesc(ErpAccountDO::getId));
     }

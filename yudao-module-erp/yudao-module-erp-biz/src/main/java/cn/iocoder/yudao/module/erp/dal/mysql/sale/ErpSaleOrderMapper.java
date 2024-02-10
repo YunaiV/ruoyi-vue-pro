@@ -22,7 +22,7 @@ public interface ErpSaleOrderMapper extends BaseMapperX<ErpSaleOrderDO> {
 
     default PageResult<ErpSaleOrderDO> selectPage(ErpSaleOrderPageReqVO reqVO) {
         MPJLambdaWrapperX<ErpSaleOrderDO> query = new MPJLambdaWrapperX<ErpSaleOrderDO>()
-                .eqIfPresent(ErpSaleOrderDO::getNo, reqVO.getNo())
+                .likeIfPresent(ErpSaleOrderDO::getNo, reqVO.getNo())
                 .eqIfPresent(ErpSaleOrderDO::getCustomerId, reqVO.getCustomerId())
                 .betweenIfPresent(ErpSaleOrderDO::getOrderTime, reqVO.getOrderTime())
                 .eqIfPresent(ErpSaleOrderDO::getStatus, reqVO.getStatus())

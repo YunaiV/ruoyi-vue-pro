@@ -19,7 +19,7 @@ public interface ErpStockMoveMapper extends BaseMapperX<ErpStockMoveDO> {
 
     default PageResult<ErpStockMoveDO> selectPage(ErpStockMovePageReqVO reqVO) {
         MPJLambdaWrapperX<ErpStockMoveDO> query = new MPJLambdaWrapperX<ErpStockMoveDO>()
-                .eqIfPresent(ErpStockMoveDO::getNo, reqVO.getNo())
+                .likeIfPresent(ErpStockMoveDO::getNo, reqVO.getNo())
                 .betweenIfPresent(ErpStockMoveDO::getMoveTime, reqVO.getMoveTime())
                 .eqIfPresent(ErpStockMoveDO::getStatus, reqVO.getStatus())
                 .likeIfPresent(ErpStockMoveDO::getRemark, reqVO.getRemark())

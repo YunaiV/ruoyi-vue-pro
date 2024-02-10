@@ -19,7 +19,7 @@ public interface ErpStockOutMapper extends BaseMapperX<ErpStockOutDO> {
 
     default PageResult<ErpStockOutDO> selectPage(ErpStockOutPageReqVO reqVO) {
         MPJLambdaWrapperX<ErpStockOutDO> query = new MPJLambdaWrapperX<ErpStockOutDO>()
-                .eqIfPresent(ErpStockOutDO::getNo, reqVO.getNo())
+                .likeIfPresent(ErpStockOutDO::getNo, reqVO.getNo())
                 .eqIfPresent(ErpStockOutDO::getCustomerId, reqVO.getCustomerId())
                 .betweenIfPresent(ErpStockOutDO::getOutTime, reqVO.getOutTime())
                 .eqIfPresent(ErpStockOutDO::getStatus, reqVO.getStatus())

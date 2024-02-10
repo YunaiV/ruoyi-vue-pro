@@ -22,7 +22,7 @@ public interface ErpSaleOutMapper extends BaseMapperX<ErpSaleOutDO> {
 
     default PageResult<ErpSaleOutDO> selectPage(ErpSaleOutPageReqVO reqVO) {
         MPJLambdaWrapperX<ErpSaleOutDO> query = new MPJLambdaWrapperX<ErpSaleOutDO>()
-                .eqIfPresent(ErpSaleOutDO::getNo, reqVO.getNo())
+                .likeIfPresent(ErpSaleOutDO::getNo, reqVO.getNo())
                 .eqIfPresent(ErpSaleOutDO::getCustomerId, reqVO.getCustomerId())
                 .betweenIfPresent(ErpSaleOutDO::getOutTime, reqVO.getOutTime())
                 .eqIfPresent(ErpSaleOutDO::getStatus, reqVO.getStatus())
@@ -31,8 +31,12 @@ public interface ErpSaleOutMapper extends BaseMapperX<ErpSaleOutDO> {
                 .eqIfPresent(ErpSaleOutDO::getAccountId, reqVO.getAccountId())
                 .likeIfPresent(ErpSaleOutDO::getOrderNo, reqVO.getOrderNo())
                 .orderByDesc(ErpSaleOutDO::getId);
-        query.gt(Boolean.TRUE.equals(reqVO.getDebtStatus()), ErpSaleOutDO::getDebtPrice, BigDecimal.ZERO);
-        if (reqVO.getWarehouseId() != null && reqVO.getProductId() != null) {
+        if (Boolean.TRUE.equals(reqVO.getDebtStatus())) {
+            query.gt(ErpSaleOutDO::getDebtPrice, BigDecimal.ZERO);
+        } else if (Boolean.FALSE.equals(reqVO.getDebtStatus())) {
+            query.eq(ErpSaleOutDO::getDebtPrice, BigDecimal.ZERO);
+        }
+        if (reqVO.getWarehouseId() != null || reqVO.getProductId() != null) {
             query.leftJoin(ErpSaleOutItemDO.class, ErpSaleOutItemDO::getOutId, ErpSaleOutDO::getId)
                     .eq(reqVO.getWarehouseId() != null, ErpSaleOutItemDO::getWarehouseId, reqVO.getWarehouseId())
                     .eq(reqVO.getProductId() != null, ErpSaleOutItemDO::getProductId, reqVO.getProductId())

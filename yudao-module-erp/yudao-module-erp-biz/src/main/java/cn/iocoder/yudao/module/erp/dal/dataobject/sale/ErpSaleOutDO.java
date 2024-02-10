@@ -107,8 +107,6 @@ public class ErpSaleOutDO extends BaseDO {
     private BigDecimal discountPrice;
     /**
      * 其它金额，单位：元
-     *
-     * 注意：它不算在 {@link #totalPrice} 中
      */
     private BigDecimal otherPrice;
 
