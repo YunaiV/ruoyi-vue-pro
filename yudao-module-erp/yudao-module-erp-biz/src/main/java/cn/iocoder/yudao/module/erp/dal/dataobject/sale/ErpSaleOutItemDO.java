@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.erp.dal.dataobject.sale;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockOutDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -10,7 +12,7 @@ import lombok.*;
 import java.math.BigDecimal;
 
 /**
- * ERP 销售订单项 DO
+ * ERP 销售出库项 DO
  *
  * @author 芋道源码
  */
@@ -22,7 +24,7 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ErpSaleOrderItemDO extends BaseDO {
+public class ErpSaleOutItemDO extends BaseDO {
 
     /**
      * 编号
@@ -30,11 +32,24 @@ public class ErpSaleOrderItemDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 销售订单编号
+     * 销售出库编号
      *
-     * 关联 {@link ErpSaleOrderDO#getId()}
+     * 关联 {@link ErpStockOutDO##getId()}
      */
-    private Long orderId;
+    private Long outId;
+    /**
+     * 销售订单项编号
+     *
+     * 关联 {@link ErpSaleOrderItemDO#getId()}
+     * 目的：方便更新关联的销售订单项的出库数量
+     */
+    private Long orderItemId;
+    /**
+     * 仓库编号
+     *
+     * 关联 {@link ErpWarehouseDO#getId()}
+     */
+    private Long warehouseId;
     /**
      * 产品编号
      *
@@ -77,17 +92,5 @@ public class ErpSaleOrderItemDO extends BaseDO {
      * 备注
      */
     private String remark;
-
-    // ========== 销售入库 ==========
-    /**
-     * 销售入库数量
-     */
-    private BigDecimal inCount;
-
-    // ========== 销售退货（出库）） ==========
-    /**
-     * 销售退货数量
-     */
-    private BigDecimal returnCount;
 
 }

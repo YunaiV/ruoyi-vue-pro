@@ -11,19 +11,19 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * ERP 销售订单 DO
+ * ERP 销售出库 DO
  *
  * @author 芋道源码
  */
-@TableName(value = "erp_sale_order")
-@KeySequence("erp_sale_order_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName(value = "erp_sale_out")
+@KeySequence("erp_sale_out_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ErpSaleOrderDO extends BaseDO {
+public class ErpSaleOutDO extends BaseDO {
 
     /**
      * 编号
@@ -31,11 +31,11 @@ public class ErpSaleOrderDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 销售订单号
+     * 销售出库单号
      */
     private String no;
     /**
-     * 销售状态
+     * 出库状态
      *
      * 枚举 {@link cn.iocoder.yudao.module.erp.enums.ErpAuditStatus}
      */
@@ -59,9 +59,22 @@ public class ErpSaleOrderDO extends BaseDO {
      */
     private Long saleUserId;
     /**
-     * 下单时间
+     * 出库时间
      */
-    private LocalDateTime orderTime;
+    private LocalDateTime outTime;
+
+    /**
+     * 销售订单编号
+     *
+     * 关联 {@link ErpSaleOrderDO#getId()}
+     */
+    private Long orderId;
+    /**
+     * 销售订单号
+     *
+     * 冗余 {@link ErpSaleOrderDO#getNo()}
+     */
+    private Long orderNo;
 
     /**
      * 合计数量
@@ -93,9 +106,22 @@ public class ErpSaleOrderDO extends BaseDO {
      */
     private BigDecimal discountPrice;
     /**
-     * 定金金额，单位：元
+     * 其它金额，单位：元
+     *
+     * 注意：它不算在 {@link #totalPrice} 中
      */
-    private BigDecimal depositPrice;
+    private BigDecimal otherPrice;
+
+    /**
+     * 本次收款，单位：元
+     *
+     * payPrice = totalPrice + otherPrice - debtPrice
+     */
+    private BigDecimal payPrice;
+    /**
+     * 本次欠款，单位：元
+     */
+    private BigDecimal debtPrice;
 
     /**
      * 附件地址
@@ -105,17 +131,5 @@ public class ErpSaleOrderDO extends BaseDO {
      * 备注
      */
     private String remark;
-
-    // ========== 销售入库 ==========
-    /**
-     * 销售入库数量
-     */
-    private BigDecimal inCount;
-
-    // ========== 销售退货（出库）） ==========
-    /**
-     * 销售退货数量
-     */
-    private BigDecimal returnCount;
 
 }

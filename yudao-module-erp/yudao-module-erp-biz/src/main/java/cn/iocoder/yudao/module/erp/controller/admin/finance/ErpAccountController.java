@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.erp.controller.admin.finance;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Tag(name = "管理后台 - ERP 结算账户")
@@ -80,6 +82,14 @@ public class ErpAccountController {
     public CommonResult<ErpAccountRespVO> getAccount(@RequestParam("id") Long id) {
         ErpAccountDO account = accountService.getAccount(id);
         return success(BeanUtils.toBean(account, ErpAccountRespVO.class));
+    }
+
+    @GetMapping("/simple-list")
+    @Operation(summary = "获得结算账户精简列表", description = "只包含被开启的结算账户，主要用于前端的下拉选项")
+    public CommonResult<List<ErpAccountRespVO>> getWarehouseSimpleList() {
+        List<ErpAccountDO> list = accountService.getAccountListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        return success(convertList(list, account -> new ErpAccountRespVO().setId(account.getId())
+                .setName(account.getName()).setDefaultStatus(account.getDefaultStatus())));
     }
 
     @GetMapping("/page")

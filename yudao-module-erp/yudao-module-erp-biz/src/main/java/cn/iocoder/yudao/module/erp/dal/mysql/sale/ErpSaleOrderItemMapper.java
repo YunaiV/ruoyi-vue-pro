@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * ERP 销售订单明细 Mapper
+ * ERP 销售订单明项目 Mapper
  *
  * @author 芋道源码
  */

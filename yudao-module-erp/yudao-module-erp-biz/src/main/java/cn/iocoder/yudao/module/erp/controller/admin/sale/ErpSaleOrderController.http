@@ -1,4 +1,0 @@
-### 请求 /transfer
-GET {{baseUrl}}/erp/sale-order/demo
-Authorization: Bearer {{token}}
-tenant-id: {{adminTenentId}}

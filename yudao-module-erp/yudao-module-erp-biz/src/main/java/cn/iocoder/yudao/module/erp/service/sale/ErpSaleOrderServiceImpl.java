@@ -222,16 +222,16 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
     // ==================== 订单项 ====================
 
     @Override
-    public List<ErpSaleOrderItemDO> getSaleOrderItemListByOrderId(Long moveId) {
-        return saleOrderItemMapper.selectListByOrderId(moveId);
+    public List<ErpSaleOrderItemDO> getSaleOrderItemListByOrderId(Long orderId) {
+        return saleOrderItemMapper.selectListByOrderId(orderId);
     }
 
     @Override
-    public List<ErpSaleOrderItemDO> getSaleOrderItemListByOrderIds(Collection<Long> moveIds) {
-        if (CollUtil.isEmpty(moveIds)) {
+    public List<ErpSaleOrderItemDO> getSaleOrderItemListByOrderIds(Collection<Long> orderIds) {
+        if (CollUtil.isEmpty(orderIds)) {
             return Collections.emptyList();
         }
-        return saleOrderItemMapper.selectListByOrderIds(moveIds);
+        return saleOrderItemMapper.selectListByOrderIds(orderIds);
     }
 
 }

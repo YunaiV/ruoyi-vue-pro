@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.erp.controller.admin.sale.vo.order;
+package cn.iocoder.yudao.module.erp.controller.admin.sale.vo.out;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -10,21 +10,21 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Schema(description = "管理后台 - ERP 销售订单 Response VO")
+@Schema(description = "管理后台 - ERP 出库出库 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class ErpSaleOrderRespVO {
+public class ErpSaleOutRespVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17386")
     @ExcelProperty("编号")
     private Long id;
 
-    @Schema(description = "销售单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "XS001")
-    @ExcelProperty("销售单编号")
+    @Schema(description = "出库单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "XS001")
+    @ExcelProperty("出库单编号")
     private String no;
 
-    @Schema(description = "销售状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @ExcelProperty("销售状态")
+    @Schema(description = "出库状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @ExcelProperty("出库状态")
     private Integer status;
 
     @Schema(description = "客户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1724")
@@ -37,12 +37,17 @@ public class ErpSaleOrderRespVO {
     @ExcelProperty("结算账户编号")
     private Long accountId;
 
-    @Schema(description = "销售员编号", example = "1888")
+    @Schema(description = "出库员编号", example = "1888")
     private Long saleUserId;
 
-    @Schema(description = "下单时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("下单时间")
-    private LocalDateTime orderTime;
+    @Schema(description = "出库时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("出库时间")
+    private LocalDateTime outTime;
+
+    @Schema(description = "销售订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17386")
+    private Long orderId;
+    @Schema(description = "销售订单号", requiredMode = Schema.RequiredMode.REQUIRED, example = "XS001")
+    private Long orderNo;
 
     @Schema(description = "合计数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "15663")
     @ExcelProperty("合计数量")
@@ -64,7 +69,13 @@ public class ErpSaleOrderRespVO {
     private BigDecimal discountPrice;
 
     @Schema(description = "定金金额，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "7127")
-    private BigDecimal depositPrice;
+    private BigDecimal otherPrice;
+
+    @Schema(description = "本次收款，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "7127")
+    private BigDecimal payPrice;
+    @Schema(description = "本次欠款，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "666")
+    private BigDecimal debtPrice;
+
 
     @Schema(description = "附件地址", example = "https://www.iocoder.cn")
     @ExcelProperty("附件地址")
@@ -83,28 +94,24 @@ public class ErpSaleOrderRespVO {
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
-    @Schema(description = "订单项列表", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "出库项列表", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<Item> items;
 
     @Schema(description = "产品信息", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("产品信息")
     private String productNames;
 
-    // ========== 销售入库 ==========
-
-    @Schema(description = "销售入库数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
-    private BigDecimal inCount;
-
-    // ========== 销售退货（出库）） ==========
-
-    @Schema(description = "销售退货数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
-    private BigDecimal returnCount;
-
     @Data
     public static class Item {
 
-        @Schema(description = "订单项编号", example = "11756")
+        @Schema(description = "出库项编号", example = "11756")
         private Long id;
+
+        @Schema(description = "销售订单项编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "11756")
+        private Long orderItemId;
+
+        @Schema(description = "仓库编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
+        private Long warehouseId;
 
         @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
         private Long productId;

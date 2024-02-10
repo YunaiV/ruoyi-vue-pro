@@ -6,6 +6,8 @@ import cn.iocoder.yudao.module.erp.controller.admin.finance.vo.ErpAccountSaveReq
 import cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpAccountDO;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 /**
  * ERP 结算账户 Service 接口
  *
@@ -58,6 +60,14 @@ public interface ErpAccountService {
      * @return 结算账户
      */
     ErpAccountDO validateAccount(Long id);
+
+    /**
+     * 获得指定状态的结算账户列表
+     *
+     * @param status 状态
+     * @return 结算账户
+     */
+    List<ErpAccountDO> getAccountListByStatus(Integer status);
 
     /**
      * 获得结算账户分页

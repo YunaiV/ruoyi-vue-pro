@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Tag(name = "管理后台 - ERP 仓库")
@@ -95,7 +96,8 @@ public class ErpWarehouseController {
     @Operation(summary = "获得仓库精简列表", description = "只包含被开启的仓库，主要用于前端的下拉选项")
     public CommonResult<List<ErpWarehouseRespVO>> getWarehouseSimpleList() {
         List<ErpWarehouseDO> list = warehouseService.getWarehouseListByStatus(CommonStatusEnum.ENABLE.getStatus());
-        return success(BeanUtils.toBean(list, ErpWarehouseRespVO.class));
+        return success(convertList(list, warehouse -> new ErpWarehouseRespVO().setId(warehouse.getId())
+                .setName(warehouse.getName()).setDefaultStatus(warehouse.getDefaultStatus())));
     }
 
     @GetMapping("/export-excel")

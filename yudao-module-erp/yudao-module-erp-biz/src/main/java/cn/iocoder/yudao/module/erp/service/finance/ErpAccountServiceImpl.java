@@ -11,6 +11,8 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 
@@ -89,6 +91,11 @@ public class ErpAccountServiceImpl implements ErpAccountService {
             throw exception(ACCOUNT_NOT_ENABLE, account.getName());
         }
         return account;
+    }
+
+    @Override
+    public List<ErpAccountDO> getAccountListByStatus(Integer status) {
+        return accountMapper.selectListByStatus(status);
     }
 
     @Override
