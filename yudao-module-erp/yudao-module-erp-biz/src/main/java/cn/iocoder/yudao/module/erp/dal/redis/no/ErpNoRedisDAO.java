@@ -38,6 +38,11 @@ public class ErpNoRedisDAO {
      */
     public static final String STOCK_CHECK_NO_PREFIX = "QCPD";
 
+    /**
+     * 销售订单 {@link cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOrderDO}
+     */
+    public static final String SALE_ORDER_NO_PREFIX = "XSDD";
+
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 

@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.erp.controller.admin.sale.vo.order;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -16,10 +15,6 @@ public class ErpSaleOrderSaveReqVO {
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17386")
     private Long id;
 
-    @Schema(description = "销售单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "XS001")
-    @NotEmpty(message = "销售单编号不能为空")
-    private String no;
-
     @Schema(description = "客户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1724")
     @NotNull(message = "客户编号不能为空")
     private Long customerId;
@@ -31,15 +26,13 @@ public class ErpSaleOrderSaveReqVO {
     @Schema(description = "销售员编号", example = "1888")
     private Long saleUserId;
 
-    @Schema(description = "结算账户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "31189")
-    @NotNull(message = "结算账户编号不能为空")
+    @Schema(description = "结算账户编号", example = "31189")
     private Long accountId;
 
     @Schema(description = "优惠率，百分比", requiredMode = Schema.RequiredMode.REQUIRED, example = "99.88")
     private BigDecimal discountPercent;
 
-    @Schema(description = "定金金额，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "7127")
-    @NotNull(message = "定金金额，单位：元不能为空")
+    @Schema(description = "定金金额，单位：元", example = "7127")
     private BigDecimal depositPrice;
 
     @Schema(description = "附件地址", example = "https://www.iocoder.cn")
