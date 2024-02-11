@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.erp.controller.admin.sale.vo.out;
+package cn.iocoder.yudao.module.erp.controller.admin.sale.vo.returns;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -10,21 +10,21 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Schema(description = "管理后台 - ERP 销售出库 Response VO")
+@Schema(description = "管理后台 - ERP 销售退货 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class ErpSaleOutRespVO {
+public class ErpSaleReturnRespVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17386")
     @ExcelProperty("编号")
     private Long id;
 
-    @Schema(description = "出库单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "XS001")
-    @ExcelProperty("出库单编号")
+    @Schema(description = "退货单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "XS001")
+    @ExcelProperty("退货单编号")
     private String no;
 
-    @Schema(description = "出库状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @ExcelProperty("出库状态")
+    @Schema(description = "退货状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @ExcelProperty("退货状态")
     private Integer status;
 
     @Schema(description = "客户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1724")
@@ -37,11 +37,11 @@ public class ErpSaleOutRespVO {
     @ExcelProperty("结算账户编号")
     private Long accountId;
 
-    @Schema(description = "出库员编号", example = "1888")
+    @Schema(description = "退货员编号", example = "1888")
     private Long saleUserId;
 
-    @Schema(description = "出库时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("出库时间")
+    @Schema(description = "退货时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("退货时间")
     private LocalDateTime outTime;
 
     @Schema(description = "销售订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17386")
@@ -71,8 +71,8 @@ public class ErpSaleOutRespVO {
     @Schema(description = "定金金额，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "7127")
     private BigDecimal otherPrice;
 
-    @Schema(description = "本次收款，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "7127")
-    private BigDecimal payPrice;
+    @Schema(description = "本次退款，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "7127")
+    private BigDecimal refundPrice;
     @Schema(description = "本次欠款，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "666")
     private BigDecimal debtPrice;
 
@@ -94,7 +94,7 @@ public class ErpSaleOutRespVO {
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
-    @Schema(description = "出库项列表", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "退货项列表", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<Item> items;
 
     @Schema(description = "产品信息", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -104,7 +104,7 @@ public class ErpSaleOutRespVO {
     @Data
     public static class Item {
 
-        @Schema(description = "出库项编号", example = "11756")
+        @Schema(description = "退货项编号", example = "11756")
         private Long id;
 
         @Schema(description = "销售订单项编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "11756")

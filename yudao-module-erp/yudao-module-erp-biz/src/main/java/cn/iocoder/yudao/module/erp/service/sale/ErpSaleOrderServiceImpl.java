@@ -149,7 +149,10 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
         if (!approve && saleOrder.getOutCount().compareTo(BigDecimal.ZERO) > 0) {
             throw exception(SALE_ORDER_PROCESS_FAIL_EXISTS_OUT);
         }
-        // TODO @芋艿：需要校验是不是有有退货
+        // 1.4 存在销售退货单，无法反审核
+        if (!approve && saleOrder.getReturnCount().compareTo(BigDecimal.ZERO) > 0) {
+            throw exception(SALE_ORDER_PROCESS_FAIL_EXISTS_RETURN);
+        }
 
         // 2. 更新状态
         int updateCount = saleOrderMapper.updateByIdAndStatus(id, saleOrder.getStatus(),
@@ -157,26 +160,6 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
         if (updateCount == 0) {
             throw exception(approve ? SALE_ORDER_APPROVE_FAIL : SALE_ORDER_PROCESS_FAIL);
         }
-    }
-
-    @Override
-    public void updateSaleOrderOutCount(Long id, Map<Long, BigDecimal> returnCountMap) {
-        List<ErpSaleOrderItemDO> orderItems = saleOrderItemMapper.selectListByOrderId(id);
-        // 1. 更新每个销售订单项
-        orderItems.forEach(item -> {
-            BigDecimal outCount = returnCountMap.getOrDefault(item.getId(), BigDecimal.ZERO);
-            if (item.getOutCount().equals(outCount)) {
-                return;
-            }
-            if (outCount.compareTo(item.getCount()) > 0) {
-                throw exception(SALE_ORDER_ITEM_OUT_FAIL_PRODUCT_EXCEED,
-                        productService.getProduct(item.getProductId()).getName(), item.getCount());
-            }
-            saleOrderItemMapper.updateById(new ErpSaleOrderItemDO().setId(item.getId()).setOutCount(outCount));
-        });
-        // 2. 更新销售订单
-        BigDecimal totalOutCount = getSumValue(returnCountMap.values(), value -> value, BigDecimal::add, BigDecimal.ZERO);
-        saleOrderMapper.updateById(new ErpSaleOrderDO().setId(id).setOutCount(totalOutCount));
     }
 
     private List<ErpSaleOrderItemDO> validateSaleOrderItems(List<ErpSaleOrderSaveReqVO.Item> list) {
@@ -216,6 +199,46 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
         if (CollUtil.isNotEmpty(diffList.get(2))) {
             saleOrderItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpSaleOrderItemDO::getId));
         }
+    }
+
+    @Override
+    public void updateSaleOrderOutCount(Long id, Map<Long, BigDecimal> outCountMap) {
+        List<ErpSaleOrderItemDO> orderItems = saleOrderItemMapper.selectListByOrderId(id);
+        // 1. 更新每个销售订单项
+        orderItems.forEach(item -> {
+            BigDecimal outCount = outCountMap.getOrDefault(item.getId(), BigDecimal.ZERO);
+            if (item.getOutCount().equals(outCount)) {
+                return;
+            }
+            if (outCount.compareTo(item.getCount()) > 0) {
+                throw exception(SALE_ORDER_ITEM_OUT_FAIL_PRODUCT_EXCEED,
+                        productService.getProduct(item.getProductId()).getName(), item.getCount());
+            }
+            saleOrderItemMapper.updateById(new ErpSaleOrderItemDO().setId(item.getId()).setOutCount(outCount));
+        });
+        // 2. 更新销售订单
+        BigDecimal totalOutCount = getSumValue(outCountMap.values(), value -> value, BigDecimal::add, BigDecimal.ZERO);
+        saleOrderMapper.updateById(new ErpSaleOrderDO().setId(id).setOutCount(totalOutCount));
+    }
+
+    @Override
+    public void updateSaleOrderReturnCount(Long orderId, Map<Long, BigDecimal> returnCountMap) {
+        List<ErpSaleOrderItemDO> orderItems = saleOrderItemMapper.selectListByOrderId(orderId);
+        // 1. 更新每个销售订单项
+        orderItems.forEach(item -> {
+            BigDecimal returnCount = returnCountMap.getOrDefault(item.getId(), BigDecimal.ZERO);
+            if (item.getReturnCount().equals(returnCount)) {
+                return;
+            }
+            if (returnCount.compareTo(item.getOutCount()) > 0) {
+                throw exception(SALE_ORDER_ITEM_RETURN_FAIL_OUT_EXCEED,
+                        productService.getProduct(item.getProductId()).getName(), item.getOutCount());
+            }
+            saleOrderItemMapper.updateById(new ErpSaleOrderItemDO().setId(item.getId()).setReturnCount(returnCount));
+        });
+        // 2. 更新销售订单
+        BigDecimal totalReturnCount = getSumValue(returnCountMap.values(), value -> value, BigDecimal::add, BigDecimal.ZERO);
+        saleOrderMapper.updateById(new ErpSaleOrderDO().setId(orderId).setReturnCount(totalReturnCount));
     }
 
     @Override

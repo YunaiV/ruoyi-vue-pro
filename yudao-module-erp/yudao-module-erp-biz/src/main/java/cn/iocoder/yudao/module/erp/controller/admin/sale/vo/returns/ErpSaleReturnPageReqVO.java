@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.erp.controller.admin.sale.vo.out;
+package cn.iocoder.yudao.module.erp.controller.admin.sale.vo.returns;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,11 +11,11 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@Schema(description = "管理后台 - ERP 销售出库分页 Request VO")
+@Schema(description = "管理后台 - ERP 销售退货分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class ErpSaleOutPageReqVO extends PageParam {
+public class ErpSaleReturnPageReqVO extends PageParam {
 
     @Schema(description = "销售单编号", example = "XS001")
     private String no;
@@ -23,14 +23,14 @@ public class ErpSaleOutPageReqVO extends PageParam {
     @Schema(description = "客户编号", example = "1724")
     private Long customerId;
 
-    @Schema(description = "出库时间")
+    @Schema(description = "退货时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime[] outTime;
+    private LocalDateTime[] returnTime;
 
     @Schema(description = "备注", example = "你猜")
     private String remark;
 
-    @Schema(description = "出库状态", example = "2")
+    @Schema(description = "退货状态", example = "2")
     private Integer status;
 
     @Schema(description = "创建者")
@@ -44,9 +44,6 @@ public class ErpSaleOutPageReqVO extends PageParam {
 
     @Schema(description = "结算账号编号", example = "1")
     private Long accountId;
-
-    @Schema(description = "是否欠款", example = "true")
-    private Boolean debtStatus;
 
     @Schema(description = "销售单号", example = "1")
     private String orderNo;

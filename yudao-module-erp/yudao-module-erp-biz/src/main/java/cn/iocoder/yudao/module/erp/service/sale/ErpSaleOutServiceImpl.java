@@ -40,7 +40,7 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 // TODO 芋艿：记录操作日志
 
 /**
- * ERP 销售订单 Service 实现类
+ * ERP 销售出库 Service 实现类
  *
  * @author 芋道源码
  */
@@ -74,7 +74,7 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
     public Long createSaleOut(ErpSaleOutSaveReqVO createReqVO) {
         // 1.1 校验销售订单已审核
         ErpSaleOrderDO saleOrder = saleOrderService.validateSaleOrder(createReqVO.getOrderId());
-        // 1.2 校验订单项的有效性
+        // 1.2 校验出库项的有效性
         List<ErpSaleOutItemDO> saleOutItems = validateSaleOutItems(createReqVO.getItems());
         // 1.3 校验结算账户
         accountService.validateAccount(createReqVO.getAccountId());
@@ -88,13 +88,13 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
             throw exception(SALE_OUT_NO_EXISTS);
         }
 
-        // 2.1 插入订单
+        // 2.1 插入出库
         ErpSaleOutDO saleOut = BeanUtils.toBean(createReqVO, ErpSaleOutDO.class, in -> in
                 .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus()))
                 .setOrderNo(saleOrder.getNo()).setCustomerId(saleOrder.getCustomerId());
         calculateTotalPrice(saleOut, saleOutItems);
         saleOutMapper.insert(saleOut);
-        // 2.2 插入订单项
+        // 2.2 插入出库项
         saleOutItems.forEach(o -> o.setOutId(saleOut.getId()));
         saleOutItemMapper.insertBatch(saleOutItems);
 
@@ -122,12 +122,12 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
         // 1.5 校验订单项的有效性
         List<ErpSaleOutItemDO> saleOutItems = validateSaleOutItems(updateReqVO.getItems());
 
-        // 2.1 更新订单
+        // 2.1 更新出库
         ErpSaleOutDO updateObj = BeanUtils.toBean(updateReqVO, ErpSaleOutDO.class)
                 .setOrderNo(saleOrder.getNo()).setCustomerId(saleOrder.getCustomerId());
         calculateTotalPrice(updateObj, saleOutItems);
         saleOutMapper.updateById(updateObj);
-        // 2.2 更新订单项
+        // 2.2 更新出库项
         updateSaleOutItemList(updateReqVO.getId(), saleOutItems);
 
         // 3.1 更新销售订单的出库数量
@@ -278,7 +278,7 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
         return saleOutMapper.selectPage(pageReqVO);
     }
 
-    // ==================== 订单项 ====================
+    // ==================== 销售出库项 ====================
 
     @Override
     public List<ErpSaleOutItemDO> getSaleOutItemListByOutId(Long outId) {

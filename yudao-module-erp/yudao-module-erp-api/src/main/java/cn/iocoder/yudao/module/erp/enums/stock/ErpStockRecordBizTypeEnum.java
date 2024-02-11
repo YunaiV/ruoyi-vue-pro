@@ -33,6 +33,9 @@ public enum ErpStockRecordBizTypeEnum implements IntArrayValuable {
 
     SALE_OUT(50, "销售出库"),
     SALE_OUT_CANCEL(51, "销售出库（作废）"),
+
+    SALE_RETURN(60, "销售退货入库"),
+    SALE_RETURN_CANCEL(61, "销售退货入库（作废）"),
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ErpStockRecordBizTypeEnum::getType).toArray();
