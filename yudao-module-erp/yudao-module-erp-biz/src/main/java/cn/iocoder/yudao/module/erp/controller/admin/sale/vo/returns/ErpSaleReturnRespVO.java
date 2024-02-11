@@ -42,7 +42,7 @@ public class ErpSaleReturnRespVO {
 
     @Schema(description = "退货时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("退货时间")
-    private LocalDateTime outTime;
+    private LocalDateTime returnTime;
 
     @Schema(description = "销售订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17386")
     private Long orderId;

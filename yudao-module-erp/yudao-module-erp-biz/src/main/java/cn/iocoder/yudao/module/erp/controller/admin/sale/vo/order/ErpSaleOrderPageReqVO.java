@@ -74,4 +74,7 @@ public class ErpSaleOrderPageReqVO extends PageParam {
     @Schema(description = "是否可出库", example = "true")
     private Boolean outEnable;
 
+    @Schema(description = "是否可退货", example = "true")
+    private Boolean returnEnable;
+
 }
