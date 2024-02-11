@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.erp.controller.admin.sale.vo.order.ErpSaleOrderPageReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOrderItemDO;
+import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -44,6 +45,11 @@ public interface ErpSaleOrderMapper extends BaseMapperX<ErpSaleOrderDO> {
             query.gt(ErpSaleOrderDO::getReturnCount, 0).apply("t.return_count < t.total_count");
         } else if (Objects.equals(reqVO.getReturnStatus(), ErpSaleOrderPageReqVO.RETURN_STATUS_ALL)) {
             query.apply("t.return_count = t.total_count");
+        }
+        // 可出库
+        if (Boolean.TRUE.equals(reqVO.getOutEnable())) {
+            query.eq(ErpSaleOrderDO::getStatus, ErpAuditStatus.APPROVE.getStatus())
+                    .apply("t.in_count < t.total_count");
         }
         if (reqVO.getProductId() != null) {
             query.leftJoin(ErpSaleOrderItemDO.class, ErpSaleOrderItemDO::getOrderId, ErpSaleOrderDO::getId)

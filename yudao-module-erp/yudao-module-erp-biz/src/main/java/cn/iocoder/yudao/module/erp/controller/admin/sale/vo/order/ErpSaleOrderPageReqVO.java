@@ -71,4 +71,7 @@ public class ErpSaleOrderPageReqVO extends PageParam {
     @Schema(description = "退货状态", example = "2")
     private Integer returnStatus;
 
+    @Schema(description = "是否可出库", example = "true")
+    private Boolean outEnable;
+
 }
