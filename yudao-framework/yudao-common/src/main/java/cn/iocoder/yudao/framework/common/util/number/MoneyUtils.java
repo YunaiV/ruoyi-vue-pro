@@ -19,6 +19,11 @@ public class MoneyUtils {
     private static final int PRICE_SCALE = 2;
 
     /**
+     * 百分比对应的 BigDecimal 对象
+     */
+    public static final BigDecimal PERCENT_100 = BigDecimal.valueOf(100);
+
+    /**
      * 计算百分比金额，四舍五入
      *
      * @param price 金额
@@ -105,6 +110,22 @@ public class MoneyUtils {
             return null;
         }
         return price.multiply(count).setScale(PRICE_SCALE, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * 金额相乘（百分比），默认进行四舍五入
+     *
+     * 位数：{@link #PRICE_SCALE}
+     *
+     * @param price  金额
+     * @param percent 百分比
+     * @return 金额相乘结果
+     */
+    public static BigDecimal priceMultiplyPercent(BigDecimal price, BigDecimal percent) {
+        if (price == null || percent == null) {
+            return null;
+        }
+        return price.multiply(percent).divide(PERCENT_100, PRICE_SCALE, RoundingMode.HALF_UP);
     }
 
 }

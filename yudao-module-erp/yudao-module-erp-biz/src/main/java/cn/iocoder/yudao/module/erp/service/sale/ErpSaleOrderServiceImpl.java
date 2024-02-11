@@ -131,7 +131,7 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
         if (saleOrder.getDiscountPercent() == null) {
             saleOrder.setDiscountPercent(BigDecimal.ZERO);
         }
-        saleOrder.setDiscountPrice(MoneyUtils.priceMultiply(saleOrder.getTotalPrice(), saleOrder.getDiscountPercent()));
+        saleOrder.setDiscountPrice(MoneyUtils.priceMultiplyPercent(saleOrder.getTotalPrice(), saleOrder.getDiscountPercent()));
         saleOrder.setTotalPrice(saleOrder.getTotalPrice().subtract(saleOrder.getDiscountPrice()));
     }
 
@@ -191,8 +191,11 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
             if (item.getTotalPrice() == null) {
                 return;
             }
-            item.setTaxPrice(MoneyUtils.priceMultiply(item.getTotalPrice(), item.getTaxPercent()));
-            item.setTotalPrice(item.getTotalPrice().add(item.getTaxPrice()));
+            if (item.getTaxPercent() == null) {
+                item.setTaxPercent(BigDecimal.ZERO);
+            } else {
+                item.setTaxPrice(MoneyUtils.priceMultiplyPercent(item.getTotalPrice(), item.getTaxPercent()));
+            }
         }));
     }
 

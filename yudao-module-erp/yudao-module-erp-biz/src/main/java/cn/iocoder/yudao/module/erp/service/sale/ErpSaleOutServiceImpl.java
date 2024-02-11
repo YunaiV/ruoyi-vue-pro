@@ -15,8 +15,11 @@ import cn.iocoder.yudao.module.erp.dal.mysql.sale.ErpSaleOutItemMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.sale.ErpSaleOutMapper;
 import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
 import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
+import cn.iocoder.yudao.module.erp.enums.stock.ErpStockRecordBizTypeEnum;
 import cn.iocoder.yudao.module.erp.service.finance.ErpAccountService;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
+import cn.iocoder.yudao.module.erp.service.stock.ErpStockRecordService;
+import cn.iocoder.yudao.module.erp.service.stock.bo.ErpStockRecordCreateReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
@@ -60,6 +63,8 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
     private ErpSaleOrderService saleOrderService;
     @Resource
     private ErpAccountService accountService;
+    @Resource
+    private ErpStockRecordService stockRecordService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -142,8 +147,11 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
         if (saleOut.getDiscountPercent() == null) {
             saleOut.setDiscountPercent(BigDecimal.ZERO);
         }
-        saleOut.setDiscountPrice(MoneyUtils.priceMultiply(saleOut.getTotalPrice(), saleOut.getDiscountPercent()));
+        saleOut.setDiscountPrice(MoneyUtils.priceMultiplyPercent(saleOut.getTotalPrice(), saleOut.getDiscountPercent()));
         saleOut.setTotalPrice(saleOut.getTotalPrice().subtract(saleOut.getDiscountPrice()));
+        // 计算应收金额
+        BigDecimal allPrice = saleOut.getTotalPrice().add(saleOut.getOtherPrice());
+        saleOut.setDebtPrice(allPrice.subtract(saleOut.getPayPrice()));
     }
 
     private void updateSaleOrderOutCount(Long orderId) {
@@ -173,6 +181,17 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
         if (updateCount == 0) {
             throw exception(approve ? SALE_OUT_APPROVE_FAIL : SALE_OUT_PROCESS_FAIL);
         }
+
+        // 3. 变更库存
+        List<ErpSaleOutItemDO> saleOutItems = saleOutItemMapper.selectListByOutId(id);
+        Integer bizType = approve ? ErpStockRecordBizTypeEnum.SALE_OUT.getType()
+                : ErpStockRecordBizTypeEnum.SALE_OUT_CANCEL.getType();
+        saleOutItems.forEach(saleOutItem -> {
+            BigDecimal count = approve ? saleOutItem.getCount().negate() : saleOutItem.getCount();
+            stockRecordService.createStockRecord(new ErpStockRecordCreateReqBO(
+                    saleOutItem.getProductId(), saleOutItem.getWarehouseId(), count,
+                    bizType, saleOutItem.getOutId(), saleOutItem.getId(), saleOut.getNo()));
+        });
     }
 
     private List<ErpSaleOutItemDO> validateSaleOutItems(List<ErpSaleOutSaveReqVO.Item> list) {
@@ -187,8 +206,11 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
             if (item.getTotalPrice() == null) {
                 return;
             }
-            item.setTaxPrice(MoneyUtils.priceMultiply(item.getTotalPrice(), item.getTaxPercent()));
-            item.setTotalPrice(item.getTotalPrice().add(item.getTaxPrice()));
+            if (item.getTaxPercent() == null) {
+                item.setTaxPercent(BigDecimal.ZERO);
+            } else {
+                item.setTaxPrice(MoneyUtils.priceMultiplyPercent(item.getTotalPrice(), item.getTaxPercent()));
+            }
         }));
     }
 
