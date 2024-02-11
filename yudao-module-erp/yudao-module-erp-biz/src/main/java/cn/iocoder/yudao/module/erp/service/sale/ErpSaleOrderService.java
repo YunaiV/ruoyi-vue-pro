@@ -7,8 +7,10 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOrderItemDO;
 import jakarta.validation.Valid;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * ERP 销售订单 Service 接口
@@ -41,6 +43,14 @@ public interface ErpSaleOrderService {
     void updateSaleOrderStatus(Long id, Integer status);
 
     /**
+     * 更新销售订单的出库数量
+     *
+     * @param id 编号
+     * @param returnCountMap 出库数量 Map：key 销售订单项编号；value 出库数量
+     */
+    void updateSaleOrderOutCount(Long id, Map<Long, BigDecimal> returnCountMap);
+
+    /**
      * 删除销售订单
      *
      * @param ids 编号数组
@@ -54,6 +64,14 @@ public interface ErpSaleOrderService {
      * @return 销售订单
      */
     ErpSaleOrderDO getSaleOrder(Long id);
+
+    /**
+     * 校验销售订单，已经审核通过
+     *
+     * @param id 编号
+     * @return 销售订单
+     */
+    ErpSaleOrderDO validateSaleOrder(Long id);
 
     /**
      * 获得销售订单分页

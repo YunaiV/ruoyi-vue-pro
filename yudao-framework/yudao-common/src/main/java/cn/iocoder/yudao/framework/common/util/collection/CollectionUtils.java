@@ -291,7 +291,7 @@ public class CollectionUtils {
         return getSumValue(from, valueFunc, accumulator, null);
     }
 
-    public static <T, V extends Comparable<? super V>> V getSumValue(List<T> from, Function<T, V> valueFunc,
+    public static <T, V extends Comparable<? super V>> V getSumValue(Collection<T> from, Function<T, V> valueFunc,
                                                                      BinaryOperator<V> accumulator, V defaultValue) {
         if (CollUtil.isEmpty(from)) {
             return defaultValue;

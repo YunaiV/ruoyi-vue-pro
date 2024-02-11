@@ -42,6 +42,10 @@ public class ErpNoRedisDAO {
      * 销售订单 {@link cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOrderDO}
      */
     public static final String SALE_ORDER_NO_PREFIX = "XSDD";
+    /**
+     * 销售出库 {@link cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOutDO}
+     */
+    public static final String SALE_OUT_NO_PREFIX = "XSCK";
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;

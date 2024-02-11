@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.erp.service.sale;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -15,6 +16,7 @@ import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
 import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.service.finance.ErpAccountService;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,6 +58,9 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
     @Resource
     private ErpAccountService accountService;
 
+    @Resource
+    private AdminUserApi adminUserApi;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createSaleOrder(ErpSaleOrderSaveReqVO createReqVO) {
@@ -67,7 +72,11 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
         if (createReqVO.getAccountId() != null) {
             accountService.validateAccount(createReqVO.getAccountId());
         }
-        // 1.4 生成调拨单号，并校验唯一性
+        // 1.4 校验销售人员
+        if (createReqVO.getSaleUserId() != null) {
+            adminUserApi.validateUser(createReqVO.getSaleUserId());
+        }
+        // 1.5 生成调拨单号，并校验唯一性
         String no = noRedisDAO.generate(ErpNoRedisDAO.SALE_ORDER_NO_PREFIX);
         if (saleOrderMapper.selectByNo(no) != null) {
             throw exception(SALE_ORDER_NO_EXISTS);
@@ -98,7 +107,11 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
         if (updateReqVO.getAccountId() != null) {
             accountService.validateAccount(updateReqVO.getAccountId());
         }
-        // 1.4 校验订单项的有效性
+        // 1.4 校验销售人员
+        if (updateReqVO.getSaleUserId() != null) {
+            adminUserApi.validateUser(updateReqVO.getSaleUserId());
+        }
+        // 1.5 校验订单项的有效性
         List<ErpSaleOrderItemDO> saleOrderItems = validateSaleOrderItems(updateReqVO.getItems());
 
         // 2.1 更新订单
@@ -132,7 +145,11 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
         if (saleOrder.getStatus().equals(status)) {
             throw exception(approve ? SALE_ORDER_APPROVE_FAIL : SALE_ORDER_PROCESS_FAIL);
         }
-        // TODO @芋艿：需要校验是不是有入库、有退货
+        // 1.3 存在销售出库单，无法反审核
+        if (!approve && saleOrder.getOutCount().compareTo(BigDecimal.ZERO) > 0) {
+            throw exception(SALE_ORDER_PROCESS_FAIL_EXISTS_OUT);
+        }
+        // TODO @芋艿：需要校验是不是有有退货
 
         // 2. 更新状态
         int updateCount = saleOrderMapper.updateByIdAndStatus(id, saleOrder.getStatus(),
@@ -140,6 +157,26 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
         if (updateCount == 0) {
             throw exception(approve ? SALE_ORDER_APPROVE_FAIL : SALE_ORDER_PROCESS_FAIL);
         }
+    }
+
+    @Override
+    public void updateSaleOrderOutCount(Long id, Map<Long, BigDecimal> returnCountMap) {
+        List<ErpSaleOrderItemDO> orderItems = saleOrderItemMapper.selectListByOrderId(id);
+        // 1. 更新每个销售订单项
+        orderItems.forEach(item -> {
+            BigDecimal outCount = returnCountMap.getOrDefault(item.getId(), BigDecimal.ZERO);
+            if (item.getOutCount().equals(outCount)) {
+                return;
+            }
+            if (outCount.compareTo(item.getCount()) > 0) {
+                throw exception(SALE_ORDER_ITEM_OUT_FAIL_PRODUCT_EXCEED,
+                        productService.getProduct(item.getProductId()).getName(), item.getCount());
+            }
+            saleOrderItemMapper.updateById(new ErpSaleOrderItemDO().setId(item.getId()).setOutCount(outCount));
+        });
+        // 2. 更新销售订单
+        BigDecimal totalOutCount = getSumValue(returnCountMap.values(), value -> value, BigDecimal::add, BigDecimal.ZERO);
+        saleOrderMapper.updateById(new ErpSaleOrderDO().setId(id).setOutCount(totalOutCount));
     }
 
     private List<ErpSaleOrderItemDO> validateSaleOrderItems(List<ErpSaleOrderSaveReqVO.Item> list) {
@@ -212,6 +249,15 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
     @Override
     public ErpSaleOrderDO getSaleOrder(Long id) {
         return saleOrderMapper.selectById(id);
+    }
+
+    @Override
+    public ErpSaleOrderDO validateSaleOrder(Long id) {
+        ErpSaleOrderDO saleOrder = validateSaleOrderExists(id);
+        if (ObjectUtil.notEqual(saleOrder.getStatus(), ErpAuditStatus.APPROVE.getStatus())) {
+            throw exception(SALE_ORDER_NOT_APPROVE);
+        }
+        return saleOrder;
     }
 
     @Override

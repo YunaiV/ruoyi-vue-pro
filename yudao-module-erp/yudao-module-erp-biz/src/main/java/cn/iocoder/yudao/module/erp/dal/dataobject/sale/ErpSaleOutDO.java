@@ -74,7 +74,7 @@ public class ErpSaleOutDO extends BaseDO {
      *
      * 冗余 {@link ErpSaleOrderDO#getNo()}
      */
-    private Long orderNo;
+    private String orderNo;
 
     /**
      * 合计数量

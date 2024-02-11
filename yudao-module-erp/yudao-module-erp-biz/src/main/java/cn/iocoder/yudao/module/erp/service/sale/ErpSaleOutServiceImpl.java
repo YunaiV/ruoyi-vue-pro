@@ -1,12 +1,14 @@
 package cn.iocoder.yudao.module.erp.service.sale;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.sale.vo.out.ErpSaleOutPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.sale.vo.out.ErpSaleOutSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOutDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOutItemDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.sale.ErpSaleOutItemMapper;
@@ -15,7 +17,9 @@ import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
 import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.service.finance.ErpAccountService;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -52,33 +56,45 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
     @Resource
     private ErpProductService productService;
     @Resource
-    private ErpCustomerService customerService;
+    @Lazy // 延迟加载，避免循环依赖
+    private ErpSaleOrderService saleOrderService;
     @Resource
     private ErpAccountService accountService;
+
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createSaleOut(ErpSaleOutSaveReqVO createReqVO) {
-        // 1.1 校验订单项的有效性
+        // 1.1 校验销售订单已审核
+        ErpSaleOrderDO saleOrder = saleOrderService.validateSaleOrder(createReqVO.getOrderId());
+        // 1.2 校验订单项的有效性
         List<ErpSaleOutItemDO> saleOutItems = validateSaleOutItems(createReqVO.getItems());
-        // 1.2 校验客户 TODO 芋艿：需要在瞅瞅
-//        customerService.validateCustomer(createReqVO.getCustomerId());
         // 1.3 校验结算账户
         accountService.validateAccount(createReqVO.getAccountId());
-        // 1.4 生成调拨单号，并校验唯一性
-        String no = noRedisDAO.generate(ErpNoRedisDAO.SALE_ORDER_NO_PREFIX);
+        // 1.4 校验销售人员
+        if (createReqVO.getSaleUserId() != null) {
+            adminUserApi.validateUser(createReqVO.getSaleUserId());
+        }
+        // 1.5 生成调拨单号，并校验唯一性
+        String no = noRedisDAO.generate(ErpNoRedisDAO.SALE_OUT_NO_PREFIX);
         if (saleOutMapper.selectByNo(no) != null) {
-            throw exception(SALE_ORDER_NO_EXISTS);
+            throw exception(SALE_OUT_NO_EXISTS);
         }
 
         // 2.1 插入订单
         ErpSaleOutDO saleOut = BeanUtils.toBean(createReqVO, ErpSaleOutDO.class, in -> in
-                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus()));
+                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus()))
+                .setOrderNo(saleOrder.getNo()).setCustomerId(saleOrder.getCustomerId());
         calculateTotalPrice(saleOut, saleOutItems);
         saleOutMapper.insert(saleOut);
         // 2.2 插入订单项
         saleOutItems.forEach(o -> o.setOutId(saleOut.getId()));
         saleOutItemMapper.insertBatch(saleOutItems);
+
+        // 3. 更新销售订单的出库数量
+        updateSaleOrderOutCount(createReqVO.getOrderId());
         return saleOut.getId();
     }
 
@@ -88,21 +104,33 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
         // 1.1 校验存在
         ErpSaleOutDO saleOut = validateSaleOutExists(updateReqVO.getId());
         if (ErpAuditStatus.APPROVE.getStatus().equals(saleOut.getStatus())) {
-            throw exception(SALE_ORDER_UPDATE_FAIL_APPROVE, saleOut.getNo());
+            throw exception(SALE_OUT_UPDATE_FAIL_APPROVE, saleOut.getNo());
         }
-        // 1.2 校验客户 TODO 芋艿：需要在瞅瞅
-//        customerService.validateCustomer(updateReqVO.getCustomerId());
+        // 1.2 校验销售订单已审核
+        ErpSaleOrderDO saleOrder = saleOrderService.validateSaleOrder(updateReqVO.getOrderId());
         // 1.3 校验结算账户
         accountService.validateAccount(updateReqVO.getAccountId());
-        // 1.4 校验订单项的有效性
+        // 1.4 校验销售人员
+        if (updateReqVO.getSaleUserId() != null) {
+            adminUserApi.validateUser(updateReqVO.getSaleUserId());
+        }
+        // 1.5 校验订单项的有效性
         List<ErpSaleOutItemDO> saleOutItems = validateSaleOutItems(updateReqVO.getItems());
 
         // 2.1 更新订单
-        ErpSaleOutDO updateObj = BeanUtils.toBean(updateReqVO, ErpSaleOutDO.class);
+        ErpSaleOutDO updateObj = BeanUtils.toBean(updateReqVO, ErpSaleOutDO.class)
+                .setOrderNo(saleOrder.getNo()).setCustomerId(saleOrder.getCustomerId());
         calculateTotalPrice(updateObj, saleOutItems);
         saleOutMapper.updateById(updateObj);
         // 2.2 更新订单项
         updateSaleOutItemList(updateReqVO.getId(), saleOutItems);
+
+        // 3.1 更新销售订单的出库数量
+        updateSaleOrderOutCount(updateObj.getOrderId());
+        // 3.2 注意：如果销售订单编号变更了，需要更新“老”销售订单的出库数量
+        if (ObjectUtil.notEqual(saleOut.getOrderId(), updateObj.getOrderId())) {
+            updateSaleOrderOutCount(saleOut.getOrderId());
+        }
     }
 
     private void calculateTotalPrice(ErpSaleOutDO saleOut, List<ErpSaleOutItemDO> saleOutItems) {
@@ -118,6 +146,16 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
         saleOut.setTotalPrice(saleOut.getTotalPrice().subtract(saleOut.getDiscountPrice()));
     }
 
+    private void updateSaleOrderOutCount(Long orderId) {
+        // 1.1 查询销售订单对应的销售出库单列表
+        List<ErpSaleOutDO> saleOuts = saleOutMapper.selectListByOrderId(orderId);
+        // 1.2 查询对应的销售订单项的出库数量
+        Map<Long, BigDecimal> returnCountMap = saleOutItemMapper.selectOrderItemCountSumMapByOutIds(
+                convertList(saleOuts, ErpSaleOutDO::getId));
+        // 2. 更新销售订单的出库数量
+        saleOrderService.updateSaleOrderOutCount(orderId, returnCountMap);
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateSaleOutStatus(Long id, Integer status) {
@@ -126,15 +164,14 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
         ErpSaleOutDO saleOut = validateSaleOutExists(id);
         // 1.2 校验状态
         if (saleOut.getStatus().equals(status)) {
-            throw exception(approve ? SALE_ORDER_APPROVE_FAIL : SALE_ORDER_PROCESS_FAIL);
+            throw exception(approve ? SALE_OUT_APPROVE_FAIL : SALE_OUT_PROCESS_FAIL);
         }
-        // TODO @芋艿：需要校验是不是有入库、有退货
 
         // 2. 更新状态
         int updateCount = saleOutMapper.updateByIdAndStatus(id, saleOut.getStatus(),
                 new ErpSaleOutDO().setStatus(status));
         if (updateCount == 0) {
-            throw exception(approve ? SALE_ORDER_APPROVE_FAIL : SALE_ORDER_PROCESS_FAIL);
+            throw exception(approve ? SALE_OUT_APPROVE_FAIL : SALE_OUT_PROCESS_FAIL);
         }
     }
 
@@ -184,7 +221,7 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
         }
         saleOuts.forEach(saleOut -> {
             if (ErpAuditStatus.APPROVE.getStatus().equals(saleOut.getStatus())) {
-                throw exception(SALE_ORDER_DELETE_FAIL_APPROVE, saleOut.getNo());
+                throw exception(SALE_OUT_DELETE_FAIL_APPROVE, saleOut.getNo());
             }
         });
 
@@ -194,13 +231,17 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
             saleOutMapper.deleteById(saleOut.getId());
             // 2.2 删除订单项
             saleOutItemMapper.deleteByOutId(saleOut.getId());
+
+            // 2.3 更新销售订单的出库数量
+            updateSaleOrderOutCount(saleOut.getOrderId());
         });
+
     }
 
     private ErpSaleOutDO validateSaleOutExists(Long id) {
         ErpSaleOutDO saleOut = saleOutMapper.selectById(id);
         if (saleOut == null) {
-            throw exception(SALE_ORDER_NOT_EXISTS);
+            throw exception(SALE_OUT_NOT_EXISTS);
         }
         return saleOut;
     }

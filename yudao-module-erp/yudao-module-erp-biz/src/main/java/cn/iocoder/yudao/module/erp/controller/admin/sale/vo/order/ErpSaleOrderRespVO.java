@@ -90,10 +90,10 @@ public class ErpSaleOrderRespVO {
     @ExcelProperty("产品信息")
     private String productNames;
 
-    // ========== 销售入库 ==========
+    // ========== 销售出库 ==========
 
-    @Schema(description = "销售入库数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
-    private BigDecimal inCount;
+    @Schema(description = "销售出库数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
+    private BigDecimal outCount;
 
     // ========== 销售退货（出库）） ==========
 
@@ -127,6 +127,16 @@ public class ErpSaleOrderRespVO {
 
         @Schema(description = "备注", example = "随便")
         private String remark;
+
+        // ========== 销售出库 ==========
+
+        @Schema(description = "销售出库数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
+        private BigDecimal outCount;
+
+        // ========== 销售退货（出库）） ==========
+
+        @Schema(description = "销售退货数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
+        private BigDecimal returnCount;
 
         // ========== 关联字段 ==========
 

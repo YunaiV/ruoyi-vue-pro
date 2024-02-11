@@ -106,11 +106,11 @@ public class ErpSaleOrderDO extends BaseDO {
      */
     private String remark;
 
-    // ========== 销售入库 ==========
+    // ========== 销售出库 ==========
     /**
-     * 销售入库数量
+     * 销售出库数量
      */
-    private BigDecimal inCount;
+    private BigDecimal outCount;
 
     // ========== 销售退货（出库）） ==========
     /**

@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * ERP 销售出库 Mapper
@@ -52,6 +53,10 @@ public interface ErpSaleOutMapper extends BaseMapperX<ErpSaleOutDO> {
 
     default ErpSaleOutDO selectByNo(String no) {
         return selectOne(ErpSaleOutDO::getNo, no);
+    }
+
+    default List<ErpSaleOutDO> selectListByOrderId(Long orderId) {
+        return selectList(ErpSaleOutDO::getOrderId, orderId);
     }
 
 }

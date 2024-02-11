@@ -30,13 +30,13 @@ public interface ErpSaleOrderMapper extends BaseMapperX<ErpSaleOrderDO> {
                 .likeIfPresent(ErpSaleOrderDO::getRemark, reqVO.getRemark())
                 .eqIfPresent(ErpSaleOrderDO::getCreator, reqVO.getCreator())
                 .orderByDesc(ErpSaleOrderDO::getId);
-        // 入库状态。为什么需要 t. 的原因，是因为联表查询时，需要指定表名，不然会报 in_count 错误
+        // 入库状态。为什么需要 t. 的原因，是因为联表查询时，需要指定表名，不然会报 out_count 错误
         if (Objects.equals(reqVO.getInStatus(), ErpSaleOrderPageReqVO.IN_STATUS_NONE)) {
-            query.eq(ErpSaleOrderDO::getInCount, 0);
+            query.eq(ErpSaleOrderDO::getOutCount, 0);
         } else if (Objects.equals(reqVO.getInStatus(), ErpSaleOrderPageReqVO.IN_STATUS_PART)) {
-            query.gt(ErpSaleOrderDO::getInCount, 0).apply("t.in_count < t.total_count");
+            query.gt(ErpSaleOrderDO::getOutCount, 0).apply("t.out_count < t.total_count");
         } else if (Objects.equals(reqVO.getInStatus(), ErpSaleOrderPageReqVO.IN_STATUS_ALL)) {
-            query.apply("t.in_count = t.total_count");
+            query.apply("t.out_count = t.total_count");
         }
         // 退货状态
         if (Objects.equals(reqVO.getReturnStatus(), ErpSaleOrderPageReqVO.RETURN_STATUS_NONE)) {
@@ -49,7 +49,7 @@ public interface ErpSaleOrderMapper extends BaseMapperX<ErpSaleOrderDO> {
         // 可出库
         if (Boolean.TRUE.equals(reqVO.getOutEnable())) {
             query.eq(ErpSaleOrderDO::getStatus, ErpAuditStatus.APPROVE.getStatus())
-                    .apply("t.in_count < t.total_count");
+                    .apply("t.out_count < t.total_count");
         }
         if (reqVO.getProductId() != null) {
             query.leftJoin(ErpSaleOrderItemDO.class, ErpSaleOrderItemDO::getOrderId, ErpSaleOrderDO::getId)
