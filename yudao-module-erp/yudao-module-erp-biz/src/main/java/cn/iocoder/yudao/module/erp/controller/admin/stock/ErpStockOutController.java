@@ -142,7 +142,7 @@ public class ErpStockOutController {
         List<ErpStockOutItemDO> stockOutItemList = stockOutService.getStockOutItemListByOutIds(
                 convertSet(pageResult.getList(), ErpStockOutDO::getId));
         Map<Long, List<ErpStockOutItemDO>> stockOutItemMap = convertMultiMap(stockOutItemList, ErpStockOutItemDO::getOutId);
-        // 1.2 商品信息
+        // 1.2 产品信息
         Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
                 convertSet(stockOutItemList, ErpStockOutItemDO::getProductId));
         // 1.3 客户信息

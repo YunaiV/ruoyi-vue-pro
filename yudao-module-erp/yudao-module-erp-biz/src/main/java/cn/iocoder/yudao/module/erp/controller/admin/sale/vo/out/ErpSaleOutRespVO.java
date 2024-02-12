@@ -85,9 +85,9 @@ public class ErpSaleOutRespVO {
     @ExcelProperty("备注")
     private String remark;
 
-    @Schema(description = "审核人", example = "芋道")
+    @Schema(description = "创建人", example = "芋道")
     private String creator;
-    @Schema(description = "审核人名称", example = "芋道")
+    @Schema(description = "创建人名称", example = "芋道")
     private String creatorName;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)

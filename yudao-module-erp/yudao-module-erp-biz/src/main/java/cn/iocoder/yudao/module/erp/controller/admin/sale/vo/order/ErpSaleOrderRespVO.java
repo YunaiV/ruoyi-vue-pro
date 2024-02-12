@@ -74,9 +74,9 @@ public class ErpSaleOrderRespVO {
     @ExcelProperty("备注")
     private String remark;
 
-    @Schema(description = "审核人", example = "芋道")
+    @Schema(description = "创建人", example = "芋道")
     private String creator;
-    @Schema(description = "审核人名称", example = "芋道")
+    @Schema(description = "创建人名称", example = "芋道")
     private String creatorName;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -133,7 +133,7 @@ public class ErpSaleOrderRespVO {
         @Schema(description = "销售出库数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
         private BigDecimal outCount;
 
-        // ========== 销售退货（出库）） ==========
+        // ========== 销售退货（入库）） ==========
 
         @Schema(description = "销售退货数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
         private BigDecimal returnCount;

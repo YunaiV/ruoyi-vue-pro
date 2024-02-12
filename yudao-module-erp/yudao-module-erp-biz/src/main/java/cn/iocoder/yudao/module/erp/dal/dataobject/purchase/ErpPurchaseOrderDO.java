@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.erp.dal.dataobject.sale;
+package cn.iocoder.yudao.module.erp.dal.dataobject.purchase;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpAccountDO;
@@ -11,19 +11,19 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * ERP 销售订单 DO
+ * ERP 采购订单 DO
  *
  * @author 芋道源码
  */
-@TableName(value = "erp_sale_order")
-@KeySequence("erp_sale_order_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName(value = "erp_purchase_order")
+@KeySequence("erp_purchase_order_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ErpSaleOrderDO extends BaseDO {
+public class ErpPurchaseOrderDO extends BaseDO {
 
     /**
      * 编号
@@ -31,33 +31,27 @@ public class ErpSaleOrderDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 销售订单号
+     * 采购订单号
      */
     private String no;
     /**
-     * 销售状态
+     * 采购状态
      *
      * 枚举 {@link cn.iocoder.yudao.module.erp.enums.ErpAuditStatus}
      */
     private Integer status;
     /**
-     * 客户编号
+     * 供应商编号
      *
-     * 关联 {@link ErpCustomerDO#getId()}
+     * 关联 {@link ErpSupplierDO#getId()}
      */
-    private Long customerId;
+    private Long supplierId;
     /**
      * 结算账户编号
      *
      * 关联 {@link ErpAccountDO#getId()}
      */
     private Long accountId;
-    /**
-     * 销售员编号
-     *
-     * 关联 AdminUserDO 的 id 字段
-     */
-    private Long saleUserId;
     /**
      * 下单时间
      */
@@ -106,15 +100,15 @@ public class ErpSaleOrderDO extends BaseDO {
      */
     private String remark;
 
-    // ========== 销售出库 ==========
+    // ========== 采购入库 ==========
     /**
-     * 销售出库数量
+     * 采购入库数量
      */
-    private BigDecimal outCount;
+    private BigDecimal inCount;
 
-    // ========== 销售退货（入库）） ==========
+    // ========== 采购退货（出库）） ==========
     /**
-     * 销售退货数量
+     * 采购退货数量
      */
     private BigDecimal returnCount;
 

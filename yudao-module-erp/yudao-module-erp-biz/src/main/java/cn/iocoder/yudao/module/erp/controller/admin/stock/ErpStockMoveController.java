@@ -138,7 +138,7 @@ public class ErpStockMoveController {
         List<ErpStockMoveItemDO> stockMoveItemList = stockMoveService.getStockMoveItemListByMoveIds(
                 convertSet(pageResult.getList(), ErpStockMoveDO::getId));
         Map<Long, List<ErpStockMoveItemDO>> stockMoveItemMap = convertMultiMap(stockMoveItemList, ErpStockMoveItemDO::getMoveId);
-        // 1.2 商品信息
+        // 1.2 产品信息
         Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
                 convertSet(stockMoveItemList, ErpStockMoveItemDO::getProductId));
         // 1.3 TODO 芋艿：搞仓库信息

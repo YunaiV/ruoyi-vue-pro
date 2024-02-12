@@ -130,7 +130,7 @@ public class ErpStockCheckController {
         List<ErpStockCheckItemDO> stockCheckItemList = stockCheckService.getStockCheckItemListByCheckIds(
                 convertSet(pageResult.getList(), ErpStockCheckDO::getId));
         Map<Long, List<ErpStockCheckItemDO>> stockCheckItemMap = convertMultiMap(stockCheckItemList, ErpStockCheckItemDO::getCheckId);
-        // 1.2 商品信息
+        // 1.2 产品信息
         Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
                 convertSet(stockCheckItemList, ErpStockCheckItemDO::getProductId));
         // 1.3 管理员信息

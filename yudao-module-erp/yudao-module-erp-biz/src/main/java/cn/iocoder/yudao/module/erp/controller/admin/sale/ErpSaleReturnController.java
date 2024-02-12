@@ -62,14 +62,14 @@ public class ErpSaleReturnController {
 
     @PostMapping("/create")
     @Operation(summary = "创建销售退货")
-    @PreAuthorize("@ss.hasPermission('erp:stock-return:create')")
+    @PreAuthorize("@ss.hasPermission('erp:sale-return:create')")
     public CommonResult<Long> createSaleReturn(@Valid @RequestBody ErpSaleReturnSaveReqVO createReqVO) {
         return success(saleReturnService.createSaleReturn(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新销售退货")
-    @PreAuthorize("@ss.hasPermission('erp:stock-return:update')")
+    @PreAuthorize("@ss.hasPermission('erp:sale-return:update')")
     public CommonResult<Boolean> updateSaleReturn(@Valid @RequestBody ErpSaleReturnSaveReqVO updateReqVO) {
         saleReturnService.updateSaleReturn(updateReqVO);
         return success(true);
@@ -77,7 +77,7 @@ public class ErpSaleReturnController {
 
     @PutMapping("/update-status")
     @Operation(summary = "更新销售退货的状态")
-    @PreAuthorize("@ss.hasPermission('erp:stock-return:update-status')")
+    @PreAuthorize("@ss.hasPermission('erp:sale-return:update-status')")
     public CommonResult<Boolean> updateSaleReturnStatus(@RequestParam("id") Long id,
                                                       @RequestParam("status") Integer status) {
         saleReturnService.updateSaleReturnStatus(id, status);
@@ -87,7 +87,7 @@ public class ErpSaleReturnController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除销售退货")
     @Parameter(name = "ids", description = "编号数组", required = true)
-    @PreAuthorize("@ss.hasPermission('erp:stock-return:delete')")
+    @PreAuthorize("@ss.hasPermission('erp:sale-return:delete')")
     public CommonResult<Boolean> deleteSaleReturn(@RequestParam("ids") List<Long> ids) {
         saleReturnService.deleteSaleReturn(ids);
         return success(true);
@@ -96,7 +96,7 @@ public class ErpSaleReturnController {
     @GetMapping("/get")
     @Operation(summary = "获得销售退货")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('erp:stock-return:query')")
+    @PreAuthorize("@ss.hasPermission('erp:sale-return:query')")
     public CommonResult<ErpSaleReturnRespVO> getSaleReturn(@RequestParam("id") Long id) {
         ErpSaleReturnDO saleReturn = saleReturnService.getSaleReturn(id);
         if (saleReturn == null) {
@@ -116,7 +116,7 @@ public class ErpSaleReturnController {
 
     @GetMapping("/page")
     @Operation(summary = "获得销售退货分页")
-    @PreAuthorize("@ss.hasPermission('erp:stock-return:query')")
+    @PreAuthorize("@ss.hasPermission('erp:sale-return:query')")
     public CommonResult<PageResult<ErpSaleReturnRespVO>> getSaleReturnPage(@Valid ErpSaleReturnPageReqVO pageReqVO) {
         PageResult<ErpSaleReturnDO> pageResult = saleReturnService.getSaleReturnPage(pageReqVO);
         return success(buildSaleReturnVOPageResult(pageResult));
@@ -124,7 +124,7 @@ public class ErpSaleReturnController {
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出销售退货 Excel")
-    @PreAuthorize("@ss.hasPermission('erp:stock-return:export')")
+    @PreAuthorize("@ss.hasPermission('erp:sale-return:export')")
     @OperateLog(type = EXPORT)
     public void exportSaleReturnExcel(@Valid ErpSaleReturnPageReqVO pageReqVO,
                                     HttpServletResponse response) throws IOException {
@@ -142,7 +142,7 @@ public class ErpSaleReturnController {
         List<ErpSaleReturnItemDO> saleReturnItemList = saleReturnService.getSaleReturnItemListByReturnIds(
                 convertSet(pageResult.getList(), ErpSaleReturnDO::getId));
         Map<Long, List<ErpSaleReturnItemDO>> saleReturnItemMap = convertMultiMap(saleReturnItemList, ErpSaleReturnItemDO::getReturnId);
-        // 1.2 商品信息
+        // 1.2 产品信息
         Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
                 convertSet(saleReturnItemList, ErpSaleReturnItemDO::getProductId));
         // 1.3 客户信息

@@ -187,7 +187,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
         Integer bizType = approve ? ErpStockRecordBizTypeEnum.SALE_RETURN.getType()
                 : ErpStockRecordBizTypeEnum.SALE_RETURN_CANCEL.getType();
         saleReturnItems.forEach(saleReturnItem -> {
-            BigDecimal count = approve ? saleReturnItem.getCount().negate() : saleReturnItem.getCount();
+            BigDecimal count = approve ? saleReturnItem.getCount() : saleReturnItem.getCount().negate();
             stockRecordService.createStockRecord(new ErpStockRecordCreateReqBO(
                     saleReturnItem.getProductId(), saleReturnItem.getWarehouseId(), count,
                     bizType, saleReturnItem.getReturnId(), saleReturnItem.getId(), saleReturn.getNo()));

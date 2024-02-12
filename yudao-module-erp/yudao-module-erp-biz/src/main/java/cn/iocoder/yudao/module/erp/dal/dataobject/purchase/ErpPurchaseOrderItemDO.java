@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.erp.dal.dataobject.sale;
+package cn.iocoder.yudao.module.erp.dal.dataobject.purchase;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
@@ -10,7 +10,7 @@ import lombok.*;
 import java.math.BigDecimal;
 
 /**
- * ERP 销售订单项 DO
+ * ERP 采购订单项 DO
  *
  * @author 芋道源码
  */
@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ErpSaleOrderItemDO extends BaseDO {
+public class ErpPurchaseOrderItemDO extends BaseDO {
 
     /**
      * 编号
@@ -30,9 +30,9 @@ public class ErpSaleOrderItemDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 销售订单编号
+     * 采购订单编号
      *
-     * 关联 {@link ErpSaleOrderDO#getId()}
+     * 关联 {@link ErpPurchaseOrderDO#getId()}
      */
     private Long orderId;
     /**
@@ -78,15 +78,15 @@ public class ErpSaleOrderItemDO extends BaseDO {
      */
     private String remark;
 
-    // ========== 销售出库 ==========
+    // ========== 采购入库 ==========
     /**
-     * 销售出库数量
+     * 采购入库数量
      */
-    private BigDecimal outCount;
+    private BigDecimal inCount;
 
-    // ========== 销售退货（入库）） ==========
+    // ========== 采购退货（出库）） ==========
     /**
-     * 销售退货数量
+     * 采购退货数量
      */
     private BigDecimal returnCount;
 

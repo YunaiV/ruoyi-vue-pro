@@ -51,6 +51,11 @@ public class ErpNoRedisDAO {
      */
     public static final String SALE_RETURN_NO_PREFIX = "XSTH";
 
+    /**
+     * 采购订单 {@link cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO}
+     */
+    public static final String PURCHASE_ORDER_NO_PREFIX = "CGDD";
+
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 

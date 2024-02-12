@@ -62,14 +62,14 @@ public class ErpSaleOutController {
 
     @PostMapping("/create")
     @Operation(summary = "创建销售出库")
-    @PreAuthorize("@ss.hasPermission('erp:stock-out:create')")
+    @PreAuthorize("@ss.hasPermission('erp:sale-out:create')")
     public CommonResult<Long> createSaleOut(@Valid @RequestBody ErpSaleOutSaveReqVO createReqVO) {
         return success(saleOutService.createSaleOut(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新销售出库")
-    @PreAuthorize("@ss.hasPermission('erp:stock-out:update')")
+    @PreAuthorize("@ss.hasPermission('erp:sale-out:update')")
     public CommonResult<Boolean> updateSaleOut(@Valid @RequestBody ErpSaleOutSaveReqVO updateReqVO) {
         saleOutService.updateSaleOut(updateReqVO);
         return success(true);
@@ -77,7 +77,7 @@ public class ErpSaleOutController {
 
     @PutMapping("/update-status")
     @Operation(summary = "更新销售出库的状态")
-    @PreAuthorize("@ss.hasPermission('erp:stock-out:update-status')")
+    @PreAuthorize("@ss.hasPermission('erp:sale-out:update-status')")
     public CommonResult<Boolean> updateSaleOutStatus(@RequestParam("id") Long id,
                                                       @RequestParam("status") Integer status) {
         saleOutService.updateSaleOutStatus(id, status);
@@ -87,7 +87,7 @@ public class ErpSaleOutController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除销售出库")
     @Parameter(name = "ids", description = "编号数组", required = true)
-    @PreAuthorize("@ss.hasPermission('erp:stock-out:delete')")
+    @PreAuthorize("@ss.hasPermission('erp:sale-out:delete')")
     public CommonResult<Boolean> deleteSaleOut(@RequestParam("ids") List<Long> ids) {
         saleOutService.deleteSaleOut(ids);
         return success(true);
@@ -96,7 +96,7 @@ public class ErpSaleOutController {
     @GetMapping("/get")
     @Operation(summary = "获得销售出库")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('erp:stock-out:query')")
+    @PreAuthorize("@ss.hasPermission('erp:sale-out:query')")
     public CommonResult<ErpSaleOutRespVO> getSaleOut(@RequestParam("id") Long id) {
         ErpSaleOutDO saleOut = saleOutService.getSaleOut(id);
         if (saleOut == null) {
@@ -116,7 +116,7 @@ public class ErpSaleOutController {
 
     @GetMapping("/page")
     @Operation(summary = "获得销售出库分页")
-    @PreAuthorize("@ss.hasPermission('erp:stock-out:query')")
+    @PreAuthorize("@ss.hasPermission('erp:sale-out:query')")
     public CommonResult<PageResult<ErpSaleOutRespVO>> getSaleOutPage(@Valid ErpSaleOutPageReqVO pageReqVO) {
         PageResult<ErpSaleOutDO> pageResult = saleOutService.getSaleOutPage(pageReqVO);
         return success(buildSaleOutVOPageResult(pageResult));
@@ -124,7 +124,7 @@ public class ErpSaleOutController {
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出销售出库 Excel")
-    @PreAuthorize("@ss.hasPermission('erp:stock-out:export')")
+    @PreAuthorize("@ss.hasPermission('erp:sale-out:export')")
     @OperateLog(type = EXPORT)
     public void exportSaleOutExcel(@Valid ErpSaleOutPageReqVO pageReqVO,
                                     HttpServletResponse response) throws IOException {
@@ -142,7 +142,7 @@ public class ErpSaleOutController {
         List<ErpSaleOutItemDO> saleOutItemList = saleOutService.getSaleOutItemListByOutIds(
                 convertSet(pageResult.getList(), ErpSaleOutDO::getId));
         Map<Long, List<ErpSaleOutItemDO>> saleOutItemMap = convertMultiMap(saleOutItemList, ErpSaleOutItemDO::getOutId);
-        // 1.2 商品信息
+        // 1.2 产品信息
         Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
                 convertSet(saleOutItemList, ErpSaleOutItemDO::getProductId));
         // 1.3 客户信息

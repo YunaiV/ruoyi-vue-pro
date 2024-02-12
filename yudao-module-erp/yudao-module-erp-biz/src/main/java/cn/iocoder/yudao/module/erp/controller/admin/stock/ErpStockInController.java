@@ -142,7 +142,7 @@ public class ErpStockInController {
         List<ErpStockInItemDO> stockInItemList = stockInService.getStockInItemListByInIds(
                 convertSet(pageResult.getList(), ErpStockInDO::getId));
         Map<Long, List<ErpStockInItemDO>> stockInItemMap = convertMultiMap(stockInItemList, ErpStockInItemDO::getInId);
-        // 1.2 商品信息
+        // 1.2 产品信息
         Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
                 convertSet(stockInItemList, ErpStockInItemDO::getProductId));
         // 1.3 供应商信息
