@@ -45,7 +45,7 @@ public interface ErpPurchaseOrderMapper extends BaseMapperX<ErpPurchaseOrderDO> 
         } else if (Objects.equals(reqVO.getReturnStatus(), ErpPurchaseOrderPageReqVO.RETURN_STATUS_ALL)) {
             query.apply("t.return_count = t.total_count");
         }
-        // 可采购出库
+        // 可采购入库
         if (Boolean.TRUE.equals(reqVO.getInEnable())) {
             query.eq(ErpPurchaseOrderDO::getStatus, ErpAuditStatus.APPROVE.getStatus())
                     .apply("t.in_count < t.total_count");

@@ -59,6 +59,10 @@ public class ErpNoRedisDAO {
      * 采购入库 {@link cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInDO}
      */
     public static final String PURCHASE_IN_NO_PREFIX = "CGRK";
+    /**
+     * 采购退货 {@link cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseReturnDO}
+     */
+    public static final String PURCHASE_RETURN_NO_PREFIX = "CGTH";
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -76,7 +80,7 @@ public class ErpNoRedisDAO {
         String key = RedisKeyConstants.NO + noPrefix;
         Long no = stringRedisTemplate.opsForValue().increment(key);
         // 设置过期时间
-        stringRedisTemplate.expire(key, Duration.ofMinutes(1L));
+        stringRedisTemplate.expire(key, Duration.ofDays(1L));
         return noPrefix + String.format("%06d", no);
     }
 

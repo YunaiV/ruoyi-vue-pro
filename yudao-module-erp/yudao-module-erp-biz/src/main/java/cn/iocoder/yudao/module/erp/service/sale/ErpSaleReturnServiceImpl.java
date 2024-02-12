@@ -157,7 +157,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
     private void updateSaleOrderReturnCount(Long orderId) {
         // 1.1 查询销售订单对应的销售出库单列表
         List<ErpSaleReturnDO> saleReturns = saleReturnMapper.selectListByOrderId(orderId);
-        // 1.2 查询对应的销售订单项的出库数量
+        // 1.2 查询对应的销售订单项的退货数量
         Map<Long, BigDecimal> returnCountMap = saleReturnItemMapper.selectOrderItemCountSumMapByReturnIds(
                 convertList(saleReturns, ErpSaleReturnDO::getId));
         // 2. 更新销售订单的出库数量

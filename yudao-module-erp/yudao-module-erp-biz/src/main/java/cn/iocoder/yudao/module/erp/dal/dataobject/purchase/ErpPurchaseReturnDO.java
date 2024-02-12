@@ -11,19 +11,19 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * ERP 采购入库 DO
+ * ERP 采购退货 DO
  *
  * @author 芋道源码
  */
-@TableName(value = "erp_purchase_in")
-@KeySequence("erp_purchase_in_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName(value = "erp_purchase_return")
+@KeySequence("erp_purchase_return_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ErpPurchaseInDO extends BaseDO {
+public class ErpPurchaseReturnDO extends BaseDO {
 
     /**
      * 编号
@@ -31,11 +31,11 @@ public class ErpPurchaseInDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 采购入库单号
+     * 采购退货单号
      */
     private String no;
     /**
-     * 入库状态
+     * 退货状态
      *
      * 枚举 {@link cn.iocoder.yudao.module.erp.enums.ErpAuditStatus}
      */
@@ -53,9 +53,9 @@ public class ErpPurchaseInDO extends BaseDO {
      */
     private Long accountId;
     /**
-     * 入库时间
+     * 退货时间
      */
-    private LocalDateTime inTime;
+    private LocalDateTime returnTime;
 
     /**
      * 采购订单编号

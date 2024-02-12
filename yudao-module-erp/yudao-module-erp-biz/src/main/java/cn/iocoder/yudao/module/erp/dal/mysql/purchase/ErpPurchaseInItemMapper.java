@@ -35,10 +35,10 @@ public interface ErpPurchaseInItemMapper extends BaseMapperX<ErpPurchaseInItemDO
     }
 
     /**
-     * 基于销售订单编号，查询每个销售订单项的入库数量之和
+     * 基于采购订单编号，查询每个采购订单项的入库数量之和
      *
      * @param inIds 入库订单项编号数组
-     * @return key：销售订单项编号；value：入库数量之和
+     * @return key：采购订单项编号；value：入库数量之和
      */
     default Map<Long, BigDecimal> selectOrderItemCountSumMapByInIds(Collection<Long> inIds) {
         if (CollUtil.isEmpty(inIds)) {
