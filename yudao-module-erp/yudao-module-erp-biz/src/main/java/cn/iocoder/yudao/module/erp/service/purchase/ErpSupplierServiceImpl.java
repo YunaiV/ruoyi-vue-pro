@@ -68,10 +68,10 @@ public class ErpSupplierServiceImpl implements ErpSupplierService {
     public ErpSupplierDO validateSupplier(Long id) {
         ErpSupplierDO supplier = supplierMapper.selectById(id);
         if (supplier == null) {
-            throw exception(WAREHOUSE_NOT_EXISTS);
+            throw exception(SUPPLIER_NOT_EXISTS);
         }
         if (CommonStatusEnum.isDisable(supplier.getStatus())) {
-            throw exception(WAREHOUSE_NOT_ENABLE, supplier.getName());
+            throw exception(SUPPLIER_NOT_ENABLE, supplier.getName());
         }
         return supplier;
     }

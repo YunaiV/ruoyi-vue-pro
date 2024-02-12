@@ -174,9 +174,7 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
             if (item.getTotalPrice() == null) {
                 return;
             }
-            if (item.getTaxPercent() == null) {
-                item.setTaxPercent(BigDecimal.ZERO);
-            } else {
+            if (item.getTaxPercent() != null) {
                 item.setTaxPrice(MoneyUtils.priceMultiplyPercent(item.getTotalPrice(), item.getTaxPercent()));
             }
         }));
