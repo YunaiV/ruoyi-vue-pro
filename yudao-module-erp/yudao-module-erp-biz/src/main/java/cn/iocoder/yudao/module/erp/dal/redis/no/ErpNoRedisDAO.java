@@ -55,6 +55,10 @@ public class ErpNoRedisDAO {
      * 采购订单 {@link cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO}
      */
     public static final String PURCHASE_ORDER_NO_PREFIX = "CGDD";
+    /**
+     * 采购入库 {@link cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInDO}
+     */
+    public static final String PURCHASE_IN_NO_PREFIX = "CGRK";
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
