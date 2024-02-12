@@ -107,9 +107,9 @@ public class ErpPurchaseInDO extends BaseDO {
     /**
      * 本次收款，单位：元
      *
-     * payPrice = totalPrice + otherPrice - debtPrice
+     * refundPrice = totalPrice + otherPrice - debtPrice
      */
-    private BigDecimal payPrice;
+    private BigDecimal refundPrice;
     /**
      * 本次欠款，单位：元
      */

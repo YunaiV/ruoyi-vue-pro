@@ -68,8 +68,8 @@ public class ErpPurchaseInRespVO {
     @Schema(description = "定金金额，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "7127")
     private BigDecimal otherPrice;
 
-    @Schema(description = "本次收款，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "7127")
-    private BigDecimal payPrice;
+    @Schema(description = "本次付款，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "7127")
+    private BigDecimal refundPrice;
     @Schema(description = "本次欠款，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "666")
     private BigDecimal debtPrice;
 

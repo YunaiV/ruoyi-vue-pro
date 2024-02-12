@@ -143,7 +143,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
         purchaseIn.setTotalPrice(purchaseIn.getTotalPrice().subtract(purchaseIn.getDiscountPrice()));
         // 计算应收金额
         BigDecimal allPrice = purchaseIn.getTotalPrice().add(purchaseIn.getOtherPrice());
-        purchaseIn.setDebtPrice(allPrice.subtract(purchaseIn.getPayPrice()));
+        purchaseIn.setDebtPrice(allPrice.subtract(purchaseIn.getRefundPrice()));
     }
 
     private void updatePurchaseOrderInCount(Long orderId) {
