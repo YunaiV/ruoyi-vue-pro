@@ -17,6 +17,10 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class ErpPurchaseInPageReqVO extends PageParam {
 
+    public static final Integer PAYMENT_STATUS_NONE = 0;
+    public static final Integer PAYMENT_STATUS_PART = 1;
+    public static final Integer PAYMENT_STATUS_ALL = 2;
+
     @Schema(description = "采购单编号", example = "XS001")
     private String no;
 
@@ -45,8 +49,11 @@ public class ErpPurchaseInPageReqVO extends PageParam {
     @Schema(description = "结算账号编号", example = "1")
     private Long accountId;
 
-    @Schema(description = "是否欠款", example = "true")
-    private Boolean debtStatus;
+    @Schema(description = "付款状态", example = "1")
+    private Integer paymentStatus;
+
+    @Schema(description = "是否可付款", example = "true")
+    private Boolean paymentEnable; // 对应 paymentStatus = [0, 1]
 
     @Schema(description = "采购单号", example = "1")
     private String orderNo;

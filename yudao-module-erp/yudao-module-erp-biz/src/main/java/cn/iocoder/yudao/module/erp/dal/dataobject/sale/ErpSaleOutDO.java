@@ -110,6 +110,7 @@ public class ErpSaleOutDO extends BaseDO {
      */
     private BigDecimal otherPrice;
 
+    // TODO 芋艿：receiptPrice
     /**
      * 本次收款，单位：元
      *

@@ -77,9 +77,15 @@ public class ErpPurchaseInDO extends BaseDO {
     /**
      * 最终合计价格，单位：元
      *
-     * totalPrice = totalProductPrice + totalTaxPrice - discountPrice
+     * totalPrice = totalProductPrice + totalTaxPrice - discountPrice + otherPrice
      */
     private BigDecimal totalPrice;
+    /**
+     * 已支付金额，单位：元
+     *
+     * 目的：和 TODO erp_finance_payment 结合，记录已支付金额
+     */
+    private BigDecimal paymentPrice;
 
     /**
      * 合计产品价格，单位：元
@@ -103,17 +109,6 @@ public class ErpPurchaseInDO extends BaseDO {
      * 其它金额，单位：元
      */
     private BigDecimal otherPrice;
-
-    /**
-     * 本次退款，单位：元
-     *
-     * refundPrice = totalPrice + otherPrice - debtPrice
-     */
-    private BigDecimal refundPrice;
-    /**
-     * 本次欠款，单位：元
-     */
-    private BigDecimal debtPrice;
 
     /**
      * 附件地址

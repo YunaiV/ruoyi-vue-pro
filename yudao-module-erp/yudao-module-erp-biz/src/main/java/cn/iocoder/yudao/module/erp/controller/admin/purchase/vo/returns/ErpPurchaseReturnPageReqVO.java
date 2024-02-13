@@ -17,6 +17,10 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class ErpPurchaseReturnPageReqVO extends PageParam {
 
+    public static final Integer REFUND_STATUS_NONE = 0;
+    public static final Integer REFUND_STATUS_PART = 1;
+    public static final Integer REFUND_STATUS_ALL = 2;
+
     @Schema(description = "采购单编号", example = "XS001")
     private String no;
 
@@ -47,5 +51,11 @@ public class ErpPurchaseReturnPageReqVO extends PageParam {
 
     @Schema(description = "采购单号", example = "1")
     private String orderNo;
+
+    @Schema(description = "退款状态", example = "1")
+    private Integer refundStatus;
+
+    @Schema(description = "是否可退款", example = "true")
+    private Boolean refundEnable; // 对应 refundStatus = [0, 1]
 
 }
