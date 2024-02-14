@@ -56,6 +56,14 @@ public interface ErpPurchaseReturnService {
     ErpPurchaseReturnDO getPurchaseReturn(Long id);
 
     /**
+     * 校验采购退货，已经审核通过
+     *
+     * @param id 编号
+     * @return 采购退货
+     */
+    ErpPurchaseReturnDO validatePurchaseReturn(Long id);
+
+    /**
      * 获得采购退货分页
      *
      * @param pageReqVO 分页查询

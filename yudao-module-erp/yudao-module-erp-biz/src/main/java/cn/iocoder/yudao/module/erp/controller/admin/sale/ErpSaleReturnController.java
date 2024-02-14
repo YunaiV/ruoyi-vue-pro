@@ -150,7 +150,7 @@ public class ErpSaleReturnController {
                 convertSet(pageResult.getList(), ErpSaleReturnDO::getCustomerId));
         // 1.4 管理员信息
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
-                convertSet(pageResult.getList(), erpStockRecordDO -> Long.parseLong(erpStockRecordDO.getCreator())));
+                convertSet(pageResult.getList(), saleReturn -> Long.parseLong(saleReturn.getCreator())));
         // 2. 开始拼接
         return BeanUtils.toBean(pageResult, ErpSaleReturnRespVO.class, saleReturn -> {
             saleReturn.setItems(BeanUtils.toBean(saleReturnItemMap.get(saleReturn.getId()), ErpSaleReturnRespVO.Item.class,

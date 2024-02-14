@@ -138,7 +138,7 @@ public class ErpSaleOrderController {
         if (CollUtil.isEmpty(pageResult.getList())) {
             return PageResult.empty(pageResult.getTotal());
         }
-        // 1.1 出库项
+        // 1.1 订单项
         List<ErpSaleOrderItemDO> saleOrderItemList = saleOrderService.getSaleOrderItemListByOrderIds(
                 convertSet(pageResult.getList(), ErpSaleOrderDO::getId));
         Map<Long, List<ErpSaleOrderItemDO>> saleOrderItemMap = convertMultiMap(saleOrderItemList, ErpSaleOrderItemDO::getOrderId);
@@ -150,7 +150,7 @@ public class ErpSaleOrderController {
                 convertSet(pageResult.getList(), ErpSaleOrderDO::getCustomerId));
         // 1.4 管理员信息
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
-                convertSet(pageResult.getList(), erpStockRecordDO -> Long.parseLong(erpStockRecordDO.getCreator())));
+                convertSet(pageResult.getList(), saleOrder -> Long.parseLong(saleOrder.getCreator())));
         // 2. 开始拼接
         return BeanUtils.toBean(pageResult, ErpSaleOrderRespVO.class, saleOrder -> {
             saleOrder.setItems(BeanUtils.toBean(saleOrderItemMap.get(saleOrder.getId()), ErpSaleOrderRespVO.Item.class,

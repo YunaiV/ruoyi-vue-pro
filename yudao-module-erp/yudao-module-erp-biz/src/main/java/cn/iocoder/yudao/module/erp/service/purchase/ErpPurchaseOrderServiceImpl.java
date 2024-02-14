@@ -68,7 +68,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         if (createReqVO.getAccountId() != null) {
             accountService.validateAccount(createReqVO.getAccountId());
         }
-        // 1.4 生成调拨单号，并校验唯一性
+        // 1.4 生成订单号，并校验唯一性
         String no = noRedisDAO.generate(ErpNoRedisDAO.PURCHASE_ORDER_NO_PREFIX);
         if (purchaseOrderMapper.selectByNo(no) != null) {
             throw exception(PURCHASE_ORDER_NO_EXISTS);

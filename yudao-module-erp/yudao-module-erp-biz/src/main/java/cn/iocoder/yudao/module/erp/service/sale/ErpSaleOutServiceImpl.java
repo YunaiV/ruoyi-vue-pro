@@ -82,7 +82,7 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
         if (createReqVO.getSaleUserId() != null) {
             adminUserApi.validateUser(createReqVO.getSaleUserId());
         }
-        // 1.5 生成调拨单号，并校验唯一性
+        // 1.5 生成出库单号，并校验唯一性
         String no = noRedisDAO.generate(ErpNoRedisDAO.SALE_OUT_NO_PREFIX);
         if (saleOutMapper.selectByNo(no) != null) {
             throw exception(SALE_OUT_NO_EXISTS);

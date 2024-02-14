@@ -56,6 +56,14 @@ public interface ErpPurchaseInService {
     ErpPurchaseInDO getPurchaseIn(Long id);
 
     /**
+     * 校验采购入库，已经审核通过
+     *
+     * @param id 编号
+     * @return 采购入库
+     */
+    ErpPurchaseInDO validatePurchaseIn(Long id);
+
+    /**
      * 获得采购入库分页
      *
      * @param pageReqVO 分页查询

@@ -78,7 +78,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
         List<ErpPurchaseInItemDO> purchaseInItems = validatePurchaseInItems(createReqVO.getItems());
         // 1.3 校验结算账户
         accountService.validateAccount(createReqVO.getAccountId());
-        // 1.4 生成调拨单号，并校验唯一性
+        // 1.4 生成入库单号，并校验唯一性
         String no = noRedisDAO.generate(ErpNoRedisDAO.PURCHASE_IN_NO_PREFIX);
         if (purchaseInMapper.selectByNo(no) != null) {
             throw exception(PURCHASE_IN_NO_EXISTS);
@@ -163,6 +163,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
         if (purchaseIn.getStatus().equals(status)) {
             throw exception(approve ? PURCHASE_IN_APPROVE_FAIL : PURCHASE_IN_PROCESS_FAIL);
         }
+        // TODO 芋艿：稍后加下校验
 
         // 2. 更新状态
         int updateCount = purchaseInMapper.updateByIdAndStatus(id, purchaseIn.getStatus(),
@@ -258,6 +259,15 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     @Override
     public ErpPurchaseInDO getPurchaseIn(Long id) {
         return purchaseInMapper.selectById(id);
+    }
+
+    @Override
+    public ErpPurchaseInDO validatePurchaseIn(Long id) {
+        ErpPurchaseInDO purchaseIn = validatePurchaseInExists(id);
+        if (ObjectUtil.notEqual(purchaseIn.getStatus(), ErpAuditStatus.APPROVE.getStatus())) {
+            throw exception(PURCHASE_IN_NOT_APPROVE);
+        }
+        return purchaseIn;
     }
 
     @Override

@@ -41,7 +41,6 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-
 @Tag(name = "管理后台 - ERP 采购订单")
 @RestController
 @RequestMapping("/erp/purchase-order")
@@ -62,14 +61,14 @@ public class ErpPurchaseOrderController {
 
     @PostMapping("/create")
     @Operation(summary = "创建采购订单")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-out:create')")
+    @PreAuthorize("@ss.hasPermission('erp:purchase-create:create')")
     public CommonResult<Long> createPurchaseOrder(@Valid @RequestBody ErpPurchaseOrderSaveReqVO createReqVO) {
         return success(purchaseOrderService.createPurchaseOrder(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新采购订单")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-out:update')")
+    @PreAuthorize("@ss.hasPermission('erp:purchase-create:update')")
     public CommonResult<Boolean> updatePurchaseOrder(@Valid @RequestBody ErpPurchaseOrderSaveReqVO updateReqVO) {
         purchaseOrderService.updatePurchaseOrder(updateReqVO);
         return success(true);
@@ -77,7 +76,7 @@ public class ErpPurchaseOrderController {
 
     @PutMapping("/update-status")
     @Operation(summary = "更新采购订单的状态")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-out:update-status')")
+    @PreAuthorize("@ss.hasPermission('erp:purchase-create:update-status')")
     public CommonResult<Boolean> updatePurchaseOrderStatus(@RequestParam("id") Long id,
                                                       @RequestParam("status") Integer status) {
         purchaseOrderService.updatePurchaseOrderStatus(id, status);
@@ -87,7 +86,7 @@ public class ErpPurchaseOrderController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除采购订单")
     @Parameter(name = "ids", description = "编号数组", required = true)
-    @PreAuthorize("@ss.hasPermission('erp:purchase-out:delete')")
+    @PreAuthorize("@ss.hasPermission('erp:purchase-create:delete')")
     public CommonResult<Boolean> deletePurchaseOrder(@RequestParam("ids") List<Long> ids) {
         purchaseOrderService.deletePurchaseOrder(ids);
         return success(true);
@@ -96,7 +95,7 @@ public class ErpPurchaseOrderController {
     @GetMapping("/get")
     @Operation(summary = "获得采购订单")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-out:query')")
+    @PreAuthorize("@ss.hasPermission('erp:purchase-create:query')")
     public CommonResult<ErpPurchaseOrderRespVO> getPurchaseOrder(@RequestParam("id") Long id) {
         ErpPurchaseOrderDO purchaseOrder = purchaseOrderService.getPurchaseOrder(id);
         if (purchaseOrder == null) {
@@ -116,7 +115,7 @@ public class ErpPurchaseOrderController {
 
     @GetMapping("/page")
     @Operation(summary = "获得采购订单分页")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-out:query')")
+    @PreAuthorize("@ss.hasPermission('erp:purchase-create:query')")
     public CommonResult<PageResult<ErpPurchaseOrderRespVO>> getPurchaseOrderPage(@Valid ErpPurchaseOrderPageReqVO pageReqVO) {
         PageResult<ErpPurchaseOrderDO> pageResult = purchaseOrderService.getPurchaseOrderPage(pageReqVO);
         return success(buildPurchaseOrderVOPageResult(pageResult));
@@ -124,7 +123,7 @@ public class ErpPurchaseOrderController {
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出采购订单 Excel")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-out:export')")
+    @PreAuthorize("@ss.hasPermission('erp:purchase-create:export')")
     @OperateLog(type = EXPORT)
     public void exportPurchaseOrderExcel(@Valid ErpPurchaseOrderPageReqVO pageReqVO,
                                     HttpServletResponse response) throws IOException {
@@ -138,7 +137,7 @@ public class ErpPurchaseOrderController {
         if (CollUtil.isEmpty(pageResult.getList())) {
             return PageResult.empty(pageResult.getTotal());
         }
-        // 1.1 出库项
+        // 1.1 订单项
         List<ErpPurchaseOrderItemDO> purchaseOrderItemList = purchaseOrderService.getPurchaseOrderItemListByOrderIds(
                 convertSet(pageResult.getList(), ErpPurchaseOrderDO::getId));
         Map<Long, List<ErpPurchaseOrderItemDO>> purchaseOrderItemMap = convertMultiMap(purchaseOrderItemList, ErpPurchaseOrderItemDO::getOrderId);
@@ -150,7 +149,7 @@ public class ErpPurchaseOrderController {
                 convertSet(pageResult.getList(), ErpPurchaseOrderDO::getSupplierId));
         // 1.4 管理员信息
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
-                convertSet(pageResult.getList(), erpStockRecordDO -> Long.parseLong(erpStockRecordDO.getCreator())));
+                convertSet(pageResult.getList(), purchaseOrder -> Long.parseLong(purchaseOrder.getCreator())));
         // 2. 开始拼接
         return BeanUtils.toBean(pageResult, ErpPurchaseOrderRespVO.class, purchaseOrder -> {
             purchaseOrder.setItems(BeanUtils.toBean(purchaseOrderItemMap.get(purchaseOrder.getId()), ErpPurchaseOrderRespVO.Item.class,

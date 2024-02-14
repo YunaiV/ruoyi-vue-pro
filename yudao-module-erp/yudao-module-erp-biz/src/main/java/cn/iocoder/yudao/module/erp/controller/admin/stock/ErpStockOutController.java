@@ -150,7 +150,7 @@ public class ErpStockOutController {
                 convertSet(pageResult.getList(), ErpStockOutDO::getCustomerId));
         // 1.4 管理员信息
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
-                convertSet(pageResult.getList(), erpStockRecordDO -> Long.parseLong(erpStockRecordDO.getCreator())));
+                convertSet(pageResult.getList(), stockOut -> Long.parseLong(stockOut.getCreator())));
         // 2. 开始拼接
         return BeanUtils.toBean(pageResult, ErpStockOutRespVO.class, stockOut -> {
             stockOut.setItems(BeanUtils.toBean(stockOutItemMap.get(stockOut.getId()), ErpStockOutRespVO.Item.class,

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.erp.controller.admin.finance.vo;
+package cn.iocoder.yudao.module.erp.controller.admin.finance.vo.account;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;

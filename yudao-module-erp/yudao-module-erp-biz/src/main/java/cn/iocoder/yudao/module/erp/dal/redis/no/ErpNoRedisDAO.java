@@ -64,6 +64,11 @@ public class ErpNoRedisDAO {
      */
     public static final String PURCHASE_RETURN_NO_PREFIX = "CGTH";
 
+    /**
+     * 付款单 {@link cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpFinancePaymentDO}
+     */
+    public static final String FINANCE_PAYMENT_NO_PREFIX = "FKD";
+
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 

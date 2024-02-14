@@ -134,7 +134,7 @@ public class ErpStockMoveController {
         if (CollUtil.isEmpty(pageResult.getList())) {
             return PageResult.empty(pageResult.getTotal());
         }
-        // 1.1 出库项
+        // 1.1 调拨项
         List<ErpStockMoveItemDO> stockMoveItemList = stockMoveService.getStockMoveItemListByMoveIds(
                 convertSet(pageResult.getList(), ErpStockMoveDO::getId));
         Map<Long, List<ErpStockMoveItemDO>> stockMoveItemMap = convertMultiMap(stockMoveItemList, ErpStockMoveItemDO::getMoveId);
@@ -144,7 +144,7 @@ public class ErpStockMoveController {
         // 1.3 TODO 芋艿：搞仓库信息
         // 1.4 管理员信息
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
-                convertSet(pageResult.getList(), erpStockRecordDO -> Long.parseLong(erpStockRecordDO.getCreator())));
+                convertSet(pageResult.getList(), stockMove -> Long.parseLong(stockMove.getCreator())));
         // 2. 开始拼接
         return BeanUtils.toBean(pageResult, ErpStockMoveRespVO.class, stockMove -> {
             stockMove.setItems(BeanUtils.toBean(stockMoveItemMap.get(stockMove.getId()), ErpStockMoveRespVO.Item.class,

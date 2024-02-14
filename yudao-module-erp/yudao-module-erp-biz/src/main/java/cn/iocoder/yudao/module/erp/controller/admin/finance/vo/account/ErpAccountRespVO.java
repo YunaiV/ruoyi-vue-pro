@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.erp.controller.admin.finance.vo;
+package cn.iocoder.yudao.module.erp.controller.admin.finance.vo.account;
 
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.module.system.enums.DictTypeConstants;

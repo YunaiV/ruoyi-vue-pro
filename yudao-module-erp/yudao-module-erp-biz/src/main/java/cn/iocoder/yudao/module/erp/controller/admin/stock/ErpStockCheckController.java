@@ -126,7 +126,7 @@ public class ErpStockCheckController {
         if (CollUtil.isEmpty(pageResult.getList())) {
             return PageResult.empty(pageResult.getTotal());
         }
-        // 1.1 出库项
+        // 1.1 盘点项
         List<ErpStockCheckItemDO> stockCheckItemList = stockCheckService.getStockCheckItemListByCheckIds(
                 convertSet(pageResult.getList(), ErpStockCheckDO::getId));
         Map<Long, List<ErpStockCheckItemDO>> stockCheckItemMap = convertMultiMap(stockCheckItemList, ErpStockCheckItemDO::getCheckId);
@@ -135,7 +135,7 @@ public class ErpStockCheckController {
                 convertSet(stockCheckItemList, ErpStockCheckItemDO::getProductId));
         // 1.3 管理员信息
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
-                convertSet(pageResult.getList(), erpStockRecordDO -> Long.parseLong(erpStockRecordDO.getCreator())));
+                convertSet(pageResult.getList(), stockCheck -> Long.parseLong(stockCheck.getCreator())));
         // 2. 开始拼接
         return BeanUtils.toBean(pageResult, ErpStockCheckRespVO.class, stockCheck -> {
             stockCheck.setItems(BeanUtils.toBean(stockCheckItemMap.get(stockCheck.getId()), ErpStockCheckRespVO.Item.class,

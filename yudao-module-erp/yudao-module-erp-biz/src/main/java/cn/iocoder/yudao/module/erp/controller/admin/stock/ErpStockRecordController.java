@@ -93,7 +93,7 @@ public class ErpStockRecordController {
         Map<Long, ErpWarehouseDO> warehouseMap = warehouseService.getWarehouseMap(
                 convertSet(pageResult.getList(), ErpStockRecordDO::getWarehouseId));
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
-                convertSet(pageResult.getList(), erpStockRecordDO -> Long.parseLong(erpStockRecordDO.getCreator())));
+                convertSet(pageResult.getList(), record -> Long.parseLong(record.getCreator())));
         return BeanUtils.toBean(pageResult, ErpStockRecordRespVO.class, stock -> {
             MapUtils.findAndThen(productMap, stock.getProductId(), product -> stock.setProductName(product.getName())
                     .setCategoryName(product.getCategoryName()).setUnitName(product.getUnitName()));

@@ -82,7 +82,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
         if (createReqVO.getSaleUserId() != null) {
             adminUserApi.validateUser(createReqVO.getSaleUserId());
         }
-        // 1.5 生成调拨单号，并校验唯一性
+        // 1.5 生成退货单号，并校验唯一性
         String no = noRedisDAO.generate(ErpNoRedisDAO.SALE_RETURN_NO_PREFIX);
         if (saleReturnMapper.selectByNo(no) != null) {
             throw exception(SALE_RETURN_NO_EXISTS);

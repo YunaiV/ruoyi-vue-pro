@@ -74,7 +74,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
         List<ErpPurchaseReturnItemDO> purchaseReturnItems = validatePurchaseReturnItems(createReqVO.getItems());
         // 1.3 校验结算账户
         accountService.validateAccount(createReqVO.getAccountId());
-        // 1.4 生成调拨单号，并校验唯一性
+        // 1.4 生成退货单号，并校验唯一性
         String no = noRedisDAO.generate(ErpNoRedisDAO.PURCHASE_RETURN_NO_PREFIX);
         if (purchaseReturnMapper.selectByNo(no) != null) {
             throw exception(PURCHASE_RETURN_NO_EXISTS);
@@ -159,6 +159,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
         if (purchaseReturn.getStatus().equals(status)) {
             throw exception(approve ? PURCHASE_RETURN_APPROVE_FAIL : PURCHASE_RETURN_PROCESS_FAIL);
         }
+        // TODO 芋艿：稍后加下校验
 
         // 2. 更新状态
         int updateCount = purchaseReturnMapper.updateByIdAndStatus(id, purchaseReturn.getStatus(),
@@ -254,6 +255,15 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
     @Override
     public ErpPurchaseReturnDO getPurchaseReturn(Long id) {
         return purchaseReturnMapper.selectById(id);
+    }
+
+    @Override
+    public ErpPurchaseReturnDO validatePurchaseReturn(Long id) {
+        ErpPurchaseReturnDO purchaseReturn = getPurchaseReturn(id);
+        if (ObjectUtil.notEqual(purchaseReturn.getStatus(), ErpAuditStatus.APPROVE.getStatus())) {
+            throw exception(PURCHASE_RETURN_NOT_APPROVE);
+        }
+        return purchaseReturn;
     }
 
     @Override

@@ -76,7 +76,7 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
         if (createReqVO.getSaleUserId() != null) {
             adminUserApi.validateUser(createReqVO.getSaleUserId());
         }
-        // 1.5 生成调拨单号，并校验唯一性
+        // 1.5 生成订单号，并校验唯一性
         String no = noRedisDAO.generate(ErpNoRedisDAO.SALE_ORDER_NO_PREFIX);
         if (saleOrderMapper.selectByNo(no) != null) {
             throw exception(SALE_ORDER_NO_EXISTS);
