@@ -6,7 +6,11 @@ import cn.iocoder.yudao.module.erp.controller.admin.finance.vo.account.ErpAccoun
 import cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpAccountDO;
 import jakarta.validation.Valid;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * ERP 结算账户 Service 接口
@@ -68,6 +72,24 @@ public interface ErpAccountService {
      * @return 结算账户
      */
     List<ErpAccountDO> getAccountListByStatus(Integer status);
+
+    /**
+     * 获得结算账户列表
+     *
+     * @param ids 编号数组
+     * @return 结算账户列表
+     */
+    List<ErpAccountDO> getAccountList(Collection<Long> ids);
+
+    /**
+     * 获得结算账户 Map
+     *
+     * @param ids 编号数组
+     * @return 结算账户 Map
+     */
+    default Map<Long, ErpAccountDO> getAccountMap(Collection<Long> ids) {
+        return convertMap(getAccountList(ids), ErpAccountDO::getId);
+    }
 
     /**
      * 获得结算账户分页

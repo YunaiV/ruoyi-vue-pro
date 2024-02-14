@@ -12,9 +12,11 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.erp.controller.admin.finance.vo.payment.ErpFinancePaymentPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.finance.vo.payment.ErpFinancePaymentRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.finance.vo.payment.ErpFinancePaymentSaveReqVO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpAccountDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpFinancePaymentDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpFinancePaymentItemDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
+import cn.iocoder.yudao.module.erp.service.finance.ErpAccountService;
 import cn.iocoder.yudao.module.erp.service.finance.ErpFinancePaymentService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -48,6 +50,8 @@ public class ErpFinancePaymentController {
     private ErpFinancePaymentService financePaymentService;
     @Resource
     private ErpSupplierService supplierService;
+    @Resource
+    private ErpAccountService accountService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -130,13 +134,17 @@ public class ErpFinancePaymentController {
         // 1.2 供应商信息
         Map<Long, ErpSupplierDO> supplierMap = supplierService.getSupplierMap(
                 convertSet(pageResult.getList(), ErpFinancePaymentDO::getSupplierId));
-        // 1.3 管理员信息
+        // 1.3 结算账户信息
+        Map<Long, ErpAccountDO> accountMap = accountService.getAccountMap(
+                convertSet(pageResult.getList(), ErpFinancePaymentDO::getAccountId));
+        // 1.4 管理员信息
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(pageResult.getList(),
                 contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getFinanceUserId())));
         // 2. 开始拼接
         return BeanUtils.toBean(pageResult, ErpFinancePaymentRespVO.class, payment -> {
             payment.setItems(BeanUtils.toBean(financePaymentItemMap.get(payment.getId()), ErpFinancePaymentRespVO.Item.class));
             MapUtils.findAndThen(supplierMap, payment.getSupplierId(), supplier -> payment.setSupplierName(supplier.getName()));
+            MapUtils.findAndThen(accountMap, payment.getAccountId(), account -> payment.setAccountName(account.getName()));
             MapUtils.findAndThen(userMap, Long.parseLong(payment.getCreator()), user -> payment.setCreatorName(user.getNickname()));
             MapUtils.findAndThen(userMap, payment.getFinanceUserId(), user -> payment.setFinanceUserName(user.getNickname()));
         });

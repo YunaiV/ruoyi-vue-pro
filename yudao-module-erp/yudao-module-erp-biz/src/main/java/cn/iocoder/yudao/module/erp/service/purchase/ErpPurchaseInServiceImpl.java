@@ -163,7 +163,10 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
         if (purchaseIn.getStatus().equals(status)) {
             throw exception(approve ? PURCHASE_IN_APPROVE_FAIL : PURCHASE_IN_PROCESS_FAIL);
         }
-        // TODO 芋艿：稍后加下校验
+        // 1.3 校验已付款
+        if (approve && purchaseIn.getPaymentPrice().compareTo(BigDecimal.ZERO) > 0) {
+            throw exception(PURCHASE_IN_PROCESS_FAIL_EXISTS_PAYMENT);
+        }
 
         // 2. 更新状态
         int updateCount = purchaseInMapper.updateByIdAndStatus(id, purchaseIn.getStatus(),
@@ -182,6 +185,18 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
                     purchaseInItem.getProductId(), purchaseInItem.getWarehouseId(), count,
                     bizType, purchaseInItem.getInId(), purchaseInItem.getId(), purchaseIn.getNo()));
         });
+    }
+
+    @Override
+    public void updatePurchaseInPaymentPrice(Long id, BigDecimal paymentPrice) {
+        ErpPurchaseInDO purchaseIn = purchaseInMapper.selectById(id);
+        if (purchaseIn.getPaymentPrice().equals(paymentPrice)) {
+            return;
+        }
+        if (paymentPrice.compareTo(purchaseIn.getTotalPrice()) > 0) {
+            throw exception(PURCHASE_IN_FAIL_PAYMENT_PRICE_EXCEED, purchaseIn.getTotalPrice(), paymentPrice);
+        }
+        purchaseInMapper.updateById(new ErpPurchaseInDO().setId(id).setPaymentPrice(paymentPrice));
     }
 
     private List<ErpPurchaseInItemDO> validatePurchaseInItems(List<ErpPurchaseInSaveReqVO.Item> list) {

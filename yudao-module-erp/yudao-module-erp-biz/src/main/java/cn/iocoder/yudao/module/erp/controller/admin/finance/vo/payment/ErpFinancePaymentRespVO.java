@@ -37,6 +37,8 @@ public class ErpFinancePaymentRespVO {
 
     @Schema(description = "付款账户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "28989")
     private Long accountId;
+    @Schema(description = "付款账户名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "张三")
+    private String accountName;
 
     @Schema(description = "合计价格，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "13832")
     private BigDecimal totalPrice;

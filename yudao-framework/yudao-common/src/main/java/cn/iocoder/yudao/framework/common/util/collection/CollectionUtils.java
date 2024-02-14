@@ -311,4 +311,8 @@ public class CollectionUtils {
         return obj == null ? Collections.emptyList() : Collections.singleton(obj);
     }
 
+    public static <T> List<T> newArrayList(List<List<T>> list) {
+        return list.stream().flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
 }

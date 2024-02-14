@@ -17,10 +17,6 @@ public class ErpFinancePaymentSaveReqVO {
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "23752")
     private Long id;
 
-    @Schema(description = "付款单号", requiredMode = Schema.RequiredMode.REQUIRED, example = "FKD888")
-    @NotEmpty(message = "付款单号不能为空")
-    private String no;
-
     @Schema(description = "付款时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "付款时间不能为空")
     private LocalDateTime paymentTime;

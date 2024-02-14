@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInItemDO;
 import jakarta.validation.Valid;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
@@ -39,6 +40,14 @@ public interface ErpPurchaseInService {
      * @param status 状态
      */
     void updatePurchaseInStatus(Long id, Integer status);
+
+    /**
+     * 更新采购入库的付款金额
+     *
+     * @param id 编号
+     * @param paymentPrice 付款金额
+     */
+    void updatePurchaseInPaymentPrice(Long id, BigDecimal paymentPrice);
 
     /**
      * 删除采购入库

@@ -159,7 +159,10 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
         if (purchaseReturn.getStatus().equals(status)) {
             throw exception(approve ? PURCHASE_RETURN_APPROVE_FAIL : PURCHASE_RETURN_PROCESS_FAIL);
         }
-        // TODO 芋艿：稍后加下校验
+        // 1.3 校验已退款
+        if (approve && purchaseReturn.getRefundPrice().compareTo(BigDecimal.ZERO) > 0) {
+            throw exception(PURCHASE_RETURN_PROCESS_FAIL_EXISTS_REFUND);
+        }
 
         // 2. 更新状态
         int updateCount = purchaseReturnMapper.updateByIdAndStatus(id, purchaseReturn.getStatus(),
@@ -178,6 +181,18 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
                     purchaseReturnItem.getProductId(), purchaseReturnItem.getWarehouseId(), count,
                     bizType, purchaseReturnItem.getReturnId(), purchaseReturnItem.getId(), purchaseReturn.getNo()));
         });
+    }
+
+    @Override
+    public void updatePurchaseReturnRefundPrice(Long id, BigDecimal refundPrice) {
+        ErpPurchaseReturnDO purchaseReturn = purchaseReturnMapper.selectById(id);
+        if (purchaseReturn.getRefundPrice().equals(refundPrice)) {
+            return;
+        }
+        if (refundPrice.compareTo(purchaseReturn.getTotalPrice()) > 0) {
+            throw exception(PURCHASE_RETURN_FAIL_REFUND_PRICE_EXCEED, purchaseReturn.getTotalPrice(), refundPrice);
+        }
+        purchaseReturnMapper.updateById(new ErpPurchaseReturnDO().setId(id).setRefundPrice(refundPrice));
     }
 
     private List<ErpPurchaseReturnItemDO> validatePurchaseReturnItems(List<ErpPurchaseReturnSaveReqVO.Item> list) {

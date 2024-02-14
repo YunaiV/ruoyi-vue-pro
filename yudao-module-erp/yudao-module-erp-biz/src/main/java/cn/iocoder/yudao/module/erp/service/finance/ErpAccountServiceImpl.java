@@ -11,6 +11,7 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -96,6 +97,11 @@ public class ErpAccountServiceImpl implements ErpAccountService {
     @Override
     public List<ErpAccountDO> getAccountListByStatus(Integer status) {
         return accountMapper.selectListByStatus(status);
+    }
+
+    @Override
+    public List<ErpAccountDO> getAccountList(Collection<Long> ids) {
+        return accountMapper.selectBatchIds(ids);
     }
 
     @Override
