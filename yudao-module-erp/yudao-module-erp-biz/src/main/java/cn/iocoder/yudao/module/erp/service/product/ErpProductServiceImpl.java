@@ -105,6 +105,9 @@ public class ErpProductServiceImpl implements ErpProductService {
 
     @Override
     public List<ErpProductRespVO> getProductVOList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
         List<ErpProductDO> list = productMapper.selectBatchIds(ids);
         return buildProductVOList(list);
     }

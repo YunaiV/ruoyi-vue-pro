@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.supplier.ErpSupplierPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.supplier.ErpSupplierSaveReqVO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.supplier.ErpSupplierDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpSupplierMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -68,10 +68,10 @@ public class ErpSupplierServiceImpl implements ErpSupplierService {
     public ErpSupplierDO validateSupplier(Long id) {
         ErpSupplierDO supplier = supplierMapper.selectById(id);
         if (supplier == null) {
-            throw exception(WAREHOUSE_NOT_EXISTS);
+            throw exception(SUPPLIER_NOT_EXISTS);
         }
         if (CommonStatusEnum.isDisable(supplier.getStatus())) {
-            throw exception(WAREHOUSE_NOT_ENABLE, supplier.getName());
+            throw exception(SUPPLIER_NOT_ENABLE, supplier.getName());
         }
         return supplier;
     }

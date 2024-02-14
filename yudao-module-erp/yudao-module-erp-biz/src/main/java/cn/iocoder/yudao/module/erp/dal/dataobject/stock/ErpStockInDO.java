@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.erp.dal.dataobject.stock;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -36,7 +37,7 @@ public class ErpStockInDO extends BaseDO {
     /**
      * 供应商编号
      *
-     * TODO 芋艿：待关联
+     * 关联 {@link ErpSupplierDO#getId()}
      */
     private Long supplierId;
     /**

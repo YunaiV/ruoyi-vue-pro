@@ -74,7 +74,7 @@ public class ErpProductUnitServiceImpl implements ErpProductUnitService {
     public void deleteProductUnit(Long id) {
         // 1.1 校验存在
         validateProductUnitExists(id);
-        // 1.2 校验商品是否使用
+        // 1.2 校验产品是否使用
         if (productService.getProductCountByUnitId(id) > 0) {
             throw exception(PRODUCT_UNIT_EXITS_PRODUCT);
         }
