@@ -190,7 +190,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
             return;
         }
         if (refundPrice.compareTo(purchaseReturn.getTotalPrice()) > 0) {
-            throw exception(PURCHASE_RETURN_FAIL_REFUND_PRICE_EXCEED, purchaseReturn.getTotalPrice(), refundPrice);
+            throw exception(PURCHASE_RETURN_FAIL_REFUND_PRICE_EXCEED, refundPrice, purchaseReturn.getTotalPrice());
         }
         purchaseReturnMapper.updateById(new ErpPurchaseReturnDO().setId(id).setRefundPrice(refundPrice));
     }

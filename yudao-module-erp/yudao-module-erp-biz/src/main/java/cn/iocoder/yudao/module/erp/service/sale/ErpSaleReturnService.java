@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleReturnDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleReturnItemDO;
 import jakarta.validation.Valid;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
@@ -41,6 +42,14 @@ public interface ErpSaleReturnService {
     void updateSaleReturnStatus(Long id, Integer status);
 
     /**
+     * 更新销售退货的退款金额
+     *
+     * @param id 编号
+     * @param refundPrice 退款金额
+     */
+    void updateSaleReturnRefundPrice(Long id, BigDecimal refundPrice);
+
+    /**
      * 删除销售退货
      *
      * @param ids 编号数组
@@ -54,6 +63,14 @@ public interface ErpSaleReturnService {
      * @return 销售退货
      */
     ErpSaleReturnDO getSaleReturn(Long id);
+
+    /**
+     * 校验销售退货，已经审核通过
+     *
+     * @param id 编号
+     * @return 销售退货
+     */
+    ErpSaleReturnDO validateSaleReturn(Long id);
 
     /**
      * 获得销售退货分页

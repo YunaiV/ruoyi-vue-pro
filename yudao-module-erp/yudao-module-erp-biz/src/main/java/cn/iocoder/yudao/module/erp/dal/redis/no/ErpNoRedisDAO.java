@@ -68,6 +68,10 @@ public class ErpNoRedisDAO {
      * 付款单 {@link cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpFinancePaymentDO}
      */
     public static final String FINANCE_PAYMENT_NO_PREFIX = "FKD";
+    /**
+     * 收款单 {@link cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpFinanceReceiptDO}
+     */
+    public static final String FINANCE_RECEIPT_NO_PREFIX = "SKD";
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;

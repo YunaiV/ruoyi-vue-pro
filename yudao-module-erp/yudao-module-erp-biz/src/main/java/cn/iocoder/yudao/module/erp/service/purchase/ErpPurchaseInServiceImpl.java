@@ -194,7 +194,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
             return;
         }
         if (paymentPrice.compareTo(purchaseIn.getTotalPrice()) > 0) {
-            throw exception(PURCHASE_IN_FAIL_PAYMENT_PRICE_EXCEED, purchaseIn.getTotalPrice(), paymentPrice);
+            throw exception(PURCHASE_IN_FAIL_PAYMENT_PRICE_EXCEED, paymentPrice, purchaseIn.getTotalPrice());
         }
         purchaseInMapper.updateById(new ErpPurchaseInDO().setId(id).setPaymentPrice(paymentPrice));
     }

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.erp.controller.admin.finance.vo.payment;
+package cn.iocoder.yudao.module.erp.controller.admin.finance.vo.receipt;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -9,35 +9,35 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Schema(description = "管理后台 - ERP 付款单 Response VO")
+@Schema(description = "管理后台 - ERP 收款单 Response VO")
 @Data
-public class ErpFinancePaymentRespVO {
+public class ErpFinanceReceiptRespVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "23752")
     private Long id;
 
-    @Schema(description = "付款单号", requiredMode = Schema.RequiredMode.REQUIRED, example = "FKD888")
+    @Schema(description = "收款单号", requiredMode = Schema.RequiredMode.REQUIRED, example = "FKD888")
     private String no;
 
-    @Schema(description = "付款状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "收款状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer status;
 
-    @Schema(description = "付款时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    private LocalDateTime paymentTime;
+    @Schema(description = "收款时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    private LocalDateTime receiptTime;
 
     @Schema(description = "财务人员编号", example = "19690")
     private Long financeUserId;
     @Schema(description = "财务人员名称", example = "张三")
     private String financeUserName;
 
-    @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "29399")
-    private Long supplierId;
-    @Schema(description = "供应商名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "小番茄公司")
-    private String supplierName;
+    @Schema(description = "客户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "29399")
+    private Long customerId;
+    @Schema(description = "客户名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "小番茄公司")
+    private String customerName;
 
-    @Schema(description = "付款账户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "28989")
+    @Schema(description = "收款账户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "28989")
     private Long accountId;
-    @Schema(description = "付款账户名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "张三")
+    @Schema(description = "收款账户名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "张三")
     private String accountName;
 
     @Schema(description = "合计价格，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "13832")
@@ -47,7 +47,7 @@ public class ErpFinancePaymentRespVO {
     private BigDecimal discountPrice;
 
     @Schema(description = "实际价格，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "10000")
-    private BigDecimal paymentPrice;
+    private BigDecimal receiptPrice;
 
     @Schema(description = "备注", example = "你猜")
     private String remark;
@@ -61,13 +61,13 @@ public class ErpFinancePaymentRespVO {
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
-    @Schema(description = "付款项列表", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "收款项列表", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<Item> items;
 
     @Data
     public static class Item {
 
-        @Schema(description = "付款项编号", example = "11756")
+        @Schema(description = "收款项编号", example = "11756")
         private Long id;
 
         @Schema(description = "业务类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
@@ -79,15 +79,15 @@ public class ErpFinancePaymentRespVO {
         @Schema(description = "业务单号", requiredMode = Schema.RequiredMode.REQUIRED, example = "11756")
         private String bizNo;
 
-        @Schema(description = "应付金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "10000")
+        @Schema(description = "应收金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "10000")
         private BigDecimal totalPrice;
 
-        @Schema(description = "已付金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "10000")
-        private BigDecimal paidPrice;
+        @Schema(description = "已收金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "10000")
+        private BigDecimal receiptedPrice;
 
-        @Schema(description = "本次付款，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "10000")
-        @NotNull(message = "本次付款不能为空")
-        private BigDecimal paymentPrice;
+        @Schema(description = "本次收款，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "10000")
+        @NotNull(message = "本次收款不能为空")
+        private BigDecimal receiptPrice;
 
         @Schema(description = "备注", example = "随便")
         private String remark;

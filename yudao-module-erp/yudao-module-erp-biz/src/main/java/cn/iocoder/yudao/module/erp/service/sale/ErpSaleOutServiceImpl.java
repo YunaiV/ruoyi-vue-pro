@@ -171,6 +171,10 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
         if (saleOut.getStatus().equals(status)) {
             throw exception(approve ? SALE_OUT_APPROVE_FAIL : SALE_OUT_PROCESS_FAIL);
         }
+        // 1.3 校验已退款
+        if (approve && saleOut.getReceiptPrice().compareTo(BigDecimal.ZERO) > 0) {
+            throw exception(SALE_OUT_PROCESS_FAIL_EXISTS_RECEIPT);
+        }
 
         // 2. 更新状态
         int updateCount = saleOutMapper.updateByIdAndStatus(id, saleOut.getStatus(),
@@ -189,6 +193,18 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
                     saleOutItem.getProductId(), saleOutItem.getWarehouseId(), count,
                     bizType, saleOutItem.getOutId(), saleOutItem.getId(), saleOut.getNo()));
         });
+    }
+
+    @Override
+    public void updateSaleInReceiptPrice(Long id, BigDecimal receiptPrice) {
+        ErpSaleOutDO saleOut = saleOutMapper.selectById(id);
+        if (saleOut.getReceiptPrice().equals(receiptPrice)) {
+            return;
+        }
+        if (receiptPrice.compareTo(saleOut.getTotalPrice()) > 0) {
+            throw exception(SALE_OUT_FAIL_RECEIPT_PRICE_EXCEED, receiptPrice,  saleOut.getTotalPrice());
+        }
+        saleOutMapper.updateById(new ErpSaleOutDO().setId(id).setReceiptPrice(receiptPrice));
     }
 
     private List<ErpSaleOutItemDO> validateSaleOutItems(List<ErpSaleOutSaveReqVO.Item> list) {
@@ -266,6 +282,15 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
     @Override
     public ErpSaleOutDO getSaleOut(Long id) {
         return saleOutMapper.selectById(id);
+    }
+
+    @Override
+    public ErpSaleOutDO validateSaleOut(Long id) {
+        ErpSaleOutDO saleOut = validateSaleOut(id);
+        if (ObjectUtil.notEqual(saleOut.getStatus(), ErpAuditStatus.APPROVE.getStatus())) {
+            throw exception(SALE_OUT_NOT_APPROVE);
+        }
+        return saleOut;
     }
 
     @Override
