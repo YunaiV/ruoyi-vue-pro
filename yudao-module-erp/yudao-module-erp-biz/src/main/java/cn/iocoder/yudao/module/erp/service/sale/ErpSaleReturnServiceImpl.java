@@ -148,10 +148,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
             saleReturn.setDiscountPercent(BigDecimal.ZERO);
         }
         saleReturn.setDiscountPrice(MoneyUtils.priceMultiplyPercent(saleReturn.getTotalPrice(), saleReturn.getDiscountPercent()));
-        saleReturn.setTotalPrice(saleReturn.getTotalPrice().subtract(saleReturn.getDiscountPrice()));
-        // 计算应退金额
-        BigDecimal allPrice = saleReturn.getTotalPrice().add(saleReturn.getOtherPrice());
-        saleReturn.setDebtPrice(allPrice.subtract(saleReturn.getRefundPrice()));
+        saleReturn.setTotalPrice(saleReturn.getTotalPrice().subtract(saleReturn.getDiscountPrice().add(saleReturn.getOtherPrice())));
     }
 
     private void updateSaleOrderReturnCount(Long orderId) {

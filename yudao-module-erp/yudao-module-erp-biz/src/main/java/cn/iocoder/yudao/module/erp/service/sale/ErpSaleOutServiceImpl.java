@@ -148,10 +148,7 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
             saleOut.setDiscountPercent(BigDecimal.ZERO);
         }
         saleOut.setDiscountPrice(MoneyUtils.priceMultiplyPercent(saleOut.getTotalPrice(), saleOut.getDiscountPercent()));
-        saleOut.setTotalPrice(saleOut.getTotalPrice().subtract(saleOut.getDiscountPrice()));
-        // 计算应收金额
-        BigDecimal allPrice = saleOut.getTotalPrice().add(saleOut.getOtherPrice());
-        saleOut.setDebtPrice(allPrice.subtract(saleOut.getPayPrice()));
+        saleOut.setTotalPrice(saleOut.getTotalPrice().subtract(saleOut.getDiscountPrice().add(saleOut.getOtherPrice())));
     }
 
     private void updateSaleOrderOutCount(Long orderId) {

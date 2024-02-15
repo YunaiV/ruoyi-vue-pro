@@ -83,9 +83,15 @@ public class ErpSaleOutDO extends BaseDO {
     /**
      * 最终合计价格，单位：元
      *
-     * totalPrice = totalProductPrice + totalTaxPrice - discountPrice
+     * totalPrice = totalProductPrice + totalTaxPrice - discountPrice + otherPrice
      */
     private BigDecimal totalPrice;
+    /**
+     * 已收款金额，单位：元
+     *
+     * 目的：和 {@link cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpFinanceReceiptDO} 结合，记录已收款金额
+     */
+    private BigDecimal receiptPrice;
 
     /**
      * 合计产品价格，单位：元
@@ -109,18 +115,6 @@ public class ErpSaleOutDO extends BaseDO {
      * 其它金额，单位：元
      */
     private BigDecimal otherPrice;
-
-    // TODO 芋艿：receiptPrice
-    /**
-     * 本次收款，单位：元
-     *
-     * payPrice = totalPrice + otherPrice - debtPrice
-     */
-    private BigDecimal payPrice;
-    /**
-     * 本次欠款，单位：元
-     */
-    private BigDecimal debtPrice;
 
     /**
      * 附件地址
