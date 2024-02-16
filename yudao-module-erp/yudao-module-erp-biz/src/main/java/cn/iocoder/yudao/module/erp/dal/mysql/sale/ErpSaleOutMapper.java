@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.erp.controller.admin.sale.vo.out.ErpSaleOutPageReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOutDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOutItemDO;
+import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -41,7 +42,8 @@ public interface ErpSaleOutMapper extends BaseMapperX<ErpSaleOutDO> {
             query.apply("t.receipt_price = t.total_price");
         }
         if (Boolean.TRUE.equals(reqVO.getReceiptEnable())) {
-            query.apply("t.receipt_price < t.total_price");
+            query.eq(ErpSaleOutDO::getStatus, ErpAuditStatus.APPROVE.getStatus())
+                    .apply("t.receipt_price < t.total_price");
         }
         if (reqVO.getWarehouseId() != null || reqVO.getProductId() != null) {
             query.leftJoin(ErpSaleOutItemDO.class, ErpSaleOutItemDO::getOutId, ErpSaleOutDO::getId)

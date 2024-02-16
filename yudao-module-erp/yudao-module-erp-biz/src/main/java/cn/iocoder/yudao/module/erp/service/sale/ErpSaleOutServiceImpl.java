@@ -286,7 +286,7 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
 
     @Override
     public ErpSaleOutDO validateSaleOut(Long id) {
-        ErpSaleOutDO saleOut = validateSaleOut(id);
+        ErpSaleOutDO saleOut = validateSaleOutExists(id);
         if (ObjectUtil.notEqual(saleOut.getStatus(), ErpAuditStatus.APPROVE.getStatus())) {
             throw exception(SALE_OUT_NOT_APPROVE);
         }

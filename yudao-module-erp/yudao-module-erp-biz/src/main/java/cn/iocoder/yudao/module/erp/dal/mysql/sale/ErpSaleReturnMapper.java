@@ -5,8 +5,10 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.erp.controller.admin.sale.vo.returns.ErpSaleReturnPageReqVO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOutDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleReturnDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleReturnItemDO;
+import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -41,7 +43,8 @@ public interface ErpSaleReturnMapper extends BaseMapperX<ErpSaleReturnDO> {
             query.apply("t.refund_price = t.total_price");
         }
         if (Boolean.TRUE.equals(reqVO.getRefundEnable())) {
-            query.apply("t.refund_price < t.total_price");
+            query.eq(ErpSaleOutDO::getStatus, ErpAuditStatus.APPROVE.getStatus())
+                    .apply("t.refund_price < t.total_price");
         }
         if (reqVO.getWarehouseId() != null || reqVO.getProductId() != null) {
             query.leftJoin(ErpSaleReturnItemDO.class, ErpSaleReturnItemDO::getReturnId, ErpSaleReturnDO::getId)

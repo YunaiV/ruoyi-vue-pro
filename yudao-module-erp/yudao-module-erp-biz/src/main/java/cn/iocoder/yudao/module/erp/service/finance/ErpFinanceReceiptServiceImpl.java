@@ -96,6 +96,9 @@ public class ErpFinanceReceiptServiceImpl implements ErpFinanceReceiptService {
         // 2.2 插入收款单项
         receiptItems.forEach(o -> o.setReceiptId(receipt.getId()));
         financeReceiptItemMapper.insertBatch(receiptItems);
+
+        // 3. 更新销售出库、退货的收款金额情况
+        updateSalePrice(receiptItems);
         return receipt.getId();
     }
 
@@ -127,9 +130,6 @@ public class ErpFinanceReceiptServiceImpl implements ErpFinanceReceiptService {
         financeReceiptMapper.updateById(updateObj);
         // 2.2 更新收款单项
         updateFinanceReceiptItemList(updateReqVO.getId(), receiptItems);
-
-        // 3. 更新销售出库、退货的收款金额情况
-        updateSalePrice(receiptItems);
     }
 
     private void calculateTotalPrice(ErpFinanceReceiptDO receipt, List<ErpFinanceReceiptItemDO> receiptItems) {
