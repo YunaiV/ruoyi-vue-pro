@@ -96,6 +96,9 @@ public class ErpFinancePaymentServiceImpl implements ErpFinancePaymentService {
         // 2.2 插入付款单项
         paymentItems.forEach(o -> o.setPaymentId(payment.getId()));
         financePaymentItemMapper.insertBatch(paymentItems);
+
+        // 3. 更新采购入库、退货的付款金额情况
+        updatePurchasePrice(paymentItems);
         return payment.getId();
     }
 
@@ -127,9 +130,6 @@ public class ErpFinancePaymentServiceImpl implements ErpFinancePaymentService {
         financePaymentMapper.updateById(updateObj);
         // 2.2 更新付款单项
         updateFinancePaymentItemList(updateReqVO.getId(), paymentItems);
-
-        // 3. 更新采购入库、退货的付款金额情况
-        updatePurchasePrice(paymentItems);
     }
 
     private void calculateTotalPrice(ErpFinancePaymentDO payment, List<ErpFinancePaymentItemDO> paymentItems) {

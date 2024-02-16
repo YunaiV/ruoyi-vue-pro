@@ -35,10 +35,6 @@ public class ErpSaleOutSaveReqVO {
     @Schema(description = "其它金额，单位：元", example = "7127")
     private BigDecimal otherPrice;
 
-    @Schema(description = "本次收款，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "7127")
-    @NotNull(message = "本次收款不能为空")
-    private BigDecimal payPrice;
-
     @Schema(description = "附件地址", example = "https://www.iocoder.cn")
     private String fileUrl;
 

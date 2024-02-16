@@ -55,6 +55,8 @@ public class ErpSaleOutRespVO {
     @Schema(description = "最终合计价格", requiredMode = Schema.RequiredMode.REQUIRED, example = "24906")
     @ExcelProperty("最终合计价格")
     private BigDecimal totalPrice;
+    @Schema(description = "已收款金额，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "7127")
+    private BigDecimal receiptPrice;
 
     @Schema(description = "合计产品价格，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "7127")
     private BigDecimal totalProductPrice;
@@ -68,14 +70,8 @@ public class ErpSaleOutRespVO {
     @Schema(description = "优惠金额，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "7127")
     private BigDecimal discountPrice;
 
-    @Schema(description = "定金金额，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "7127")
+    @Schema(description = "其它金额，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "7127")
     private BigDecimal otherPrice;
-
-    @Schema(description = "本次收款，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "7127")
-    private BigDecimal payPrice;
-    @Schema(description = "本次欠款，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "666")
-    private BigDecimal debtPrice;
-
 
     @Schema(description = "附件地址", example = "https://www.iocoder.cn")
     @ExcelProperty("附件地址")

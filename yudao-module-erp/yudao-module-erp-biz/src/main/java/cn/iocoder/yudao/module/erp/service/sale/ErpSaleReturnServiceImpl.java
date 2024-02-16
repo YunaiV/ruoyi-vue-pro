@@ -148,10 +148,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
             saleReturn.setDiscountPercent(BigDecimal.ZERO);
         }
         saleReturn.setDiscountPrice(MoneyUtils.priceMultiplyPercent(saleReturn.getTotalPrice(), saleReturn.getDiscountPercent()));
-        saleReturn.setTotalPrice(saleReturn.getTotalPrice().subtract(saleReturn.getDiscountPrice()));
-        // 计算应退金额
-        BigDecimal allPrice = saleReturn.getTotalPrice().add(saleReturn.getOtherPrice());
-        saleReturn.setDebtPrice(allPrice.subtract(saleReturn.getRefundPrice()));
+        saleReturn.setTotalPrice(saleReturn.getTotalPrice().subtract(saleReturn.getDiscountPrice().add(saleReturn.getOtherPrice())));
     }
 
     private void updateSaleOrderReturnCount(Long orderId) {
@@ -174,6 +171,10 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
         if (saleReturn.getStatus().equals(status)) {
             throw exception(approve ? SALE_RETURN_APPROVE_FAIL : SALE_RETURN_PROCESS_FAIL);
         }
+        // 1.3 校验已退款
+        if (approve && saleReturn.getRefundPrice().compareTo(BigDecimal.ZERO) > 0) {
+            throw exception(SALE_RETURN_PROCESS_FAIL_EXISTS_REFUND);
+        }
 
         // 2. 更新状态
         int updateCount = saleReturnMapper.updateByIdAndStatus(id, saleReturn.getStatus(),
@@ -192,6 +193,18 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
                     saleReturnItem.getProductId(), saleReturnItem.getWarehouseId(), count,
                     bizType, saleReturnItem.getReturnId(), saleReturnItem.getId(), saleReturn.getNo()));
         });
+    }
+
+    @Override
+    public void updateSaleReturnRefundPrice(Long id, BigDecimal refundPrice) {
+        ErpSaleReturnDO saleReturn = saleReturnMapper.selectById(id);
+        if (saleReturn.getRefundPrice().equals(refundPrice)) {
+            return;
+        }
+        if (refundPrice.compareTo(saleReturn.getTotalPrice()) > 0) {
+            throw exception(SALE_RETURN_FAIL_REFUND_PRICE_EXCEED, refundPrice, saleReturn.getTotalPrice());
+        }
+        saleReturnMapper.updateById(new ErpSaleReturnDO().setId(id).setRefundPrice(refundPrice));
     }
 
     private List<ErpSaleReturnItemDO> validateSaleReturnItems(List<ErpSaleReturnSaveReqVO.Item> list) {
@@ -269,6 +282,15 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
     @Override
     public ErpSaleReturnDO getSaleReturn(Long id) {
         return saleReturnMapper.selectById(id);
+    }
+
+    @Override
+    public ErpSaleReturnDO validateSaleReturn(Long id) {
+        ErpSaleReturnDO saleReturn = validateSaleReturnExists(id);
+        if (ObjectUtil.notEqual(saleReturn.getStatus(), ErpAuditStatus.APPROVE.getStatus())) {
+            throw exception(SALE_RETURN_NOT_APPROVE);
+        }
+        return saleReturn;
     }
 
     @Override

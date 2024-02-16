@@ -83,7 +83,7 @@ public class ErpPurchaseReturnDO extends BaseDO {
     /**
      * 已退款金额，单位：元
      *
-     * 目的：和 TODO erp_finance_payment 结合，记录已退款金额
+     * 目的：和 {@link cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpFinancePaymentDO} 结合，记录已支付金额
      */
     private BigDecimal refundPrice;
 
