@@ -130,8 +130,7 @@ public class CrmCustomerController {
         CrmCustomerPoolConfigDO poolConfigDO = customerPoolConfigService.getCustomerPoolConfig();
         if (ObjUtil.isNull(poolConfigDO)
                 || Boolean.FALSE.equals(poolConfigDO.getEnabled())
-                || Boolean.FALSE.equals(poolConfigDO.getNotifyEnabled())
-        ) { // TODO @dbh52：这个括号，一般不换行，在 java 这里；
+                || Boolean.FALSE.equals(poolConfigDO.getNotifyEnabled())) {
             throw exception(CUSTOMER_POOL_CONFIG_NOT_EXISTS_OR_DISABLED);
         }
 

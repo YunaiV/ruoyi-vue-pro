@@ -14,6 +14,19 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class CrmCustomerPageReqVO extends PageParam {
 
+    /**
+     * 联系状态 - 今日需联系
+     */
+    public static final int CONTACT_TODAY = 1;
+    /**
+     * 联系状态 - 已逾期
+     */
+    public static final int CONTACT_EXPIRED = 2;
+    /**
+     * 联系状态 - 已联系
+     */
+    public static final int CONTACT_ALREADY = 3;
+
     @Schema(description = "客户名称", example = "赵六")
     private String name;
 
@@ -35,5 +48,11 @@ public class CrmCustomerPageReqVO extends PageParam {
 
     @Schema(description = "是否为公海数据", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
     private Boolean pool; // null 则表示为不是公海数据
+
+    @Schema(description = "联系状态", example = "1")
+    private Integer contactStatus; // backlog查询条件, null 则表示为不做查询
+
+    @Schema(description = "跟进状态", example = "true")
+    private Boolean followUpStatus; // backlog查询条件, null 则表示为不做查询
 
 }
