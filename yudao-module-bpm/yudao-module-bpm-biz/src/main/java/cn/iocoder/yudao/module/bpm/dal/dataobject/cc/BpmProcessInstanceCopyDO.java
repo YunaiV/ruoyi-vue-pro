@@ -9,7 +9,7 @@ import lombok.*;
  * 流程抄送 DO
  *
  * @author kyle
- * @date 2022-05-19 TODO @kyle：@date 不是标准 java doc，可以使用 @since 替代，然后日期是不是不对
+ * @since 2024-01-22
  */
 @TableName(value = "bpm_process_instance_copy", autoResultMap = true)
 @Data
@@ -26,13 +26,16 @@ public class BpmProcessInstanceCopyDO extends BaseDO {
     @TableId
     private Long id;
 
-    // TODO @kyle：字段如果是关联或者冗余，要写下注释。以 processInstanceId 举例子。
     /**
      * 发起人 Id
+     *
+     * 关联 system_users 的 id 属性
      */
     private Long startUserId;
     /**
      * 流程名
+     *
+     * 冗余 ProcessInstance 的 name 字段
      */
     private String processInstanceName;
     /**
@@ -44,16 +47,22 @@ public class BpmProcessInstanceCopyDO extends BaseDO {
 
     /**
      * 任务主键
+     *
+     * 关联 Task 的 id 属性
      */
     private String taskId;
 
     /**
      * 任务名称
+     *
+     * 冗余 Task 的 name 属性
      */
     private String taskName;
 
     /**
      * 用户编号
+     *
+     * 关联 system_users 的 id 属性
      */
     private Long userId;
 
@@ -62,10 +71,11 @@ public class BpmProcessInstanceCopyDO extends BaseDO {
      */
     private String reason;
 
-    // TODO @kyle：这个字段，可以用 category 简化点
     /**
      * 流程分类
+     *
+     * 冗余 ProcessInstance 的 category 字段
      */
-    private String processDefinitionCategory;
+    private String category;
 
 }

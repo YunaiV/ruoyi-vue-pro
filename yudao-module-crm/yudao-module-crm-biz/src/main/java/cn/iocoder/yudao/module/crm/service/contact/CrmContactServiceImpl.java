@@ -15,20 +15,21 @@ import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
-import cn.iocoder.yudao.module.crm.service.contact.bo.CrmContactUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
+import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
+import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 
@@ -56,6 +57,7 @@ public class CrmContactServiceImpl implements CrmContactService {
     @Resource
     private CrmPermissionService permissionService;
     @Resource
+    @Lazy
     private CrmContractService contractService;
     @Resource
     private CrmContactBusinessService contactBusinessService;
@@ -195,8 +197,8 @@ public class CrmContactServiceImpl implements CrmContactService {
     }
 
     @Override
-    public void updateContactFollowUpBatch(List<CrmContactUpdateFollowUpReqBO> updateFollowUpReqBOList) {
-        contactMapper.updateBatch(BeanUtils.toBean(updateFollowUpReqBOList, CrmContactDO.class));
+    public void updateContactFollowUpBatch(List<CrmUpdateFollowUpReqBO> updateFollowUpReqBOList) {
+        contactMapper.updateBatch(CrmContactConvert.INSTANCE.convertList(updateFollowUpReqBOList));
     }
 
     //======================= 查询相关 =======================
@@ -208,7 +210,7 @@ public class CrmContactServiceImpl implements CrmContactService {
     }
 
     @Override
-    public List<CrmContactDO> getContactList(Collection<Long> ids, Long userId) {
+    public List<CrmContactDO> getContactListByIds(Collection<Long> ids, Long userId) {
         if (CollUtil.isEmpty(ids)) {
             return ListUtil.empty();
         }
@@ -216,7 +218,7 @@ public class CrmContactServiceImpl implements CrmContactService {
     }
 
     @Override
-    public List<CrmContactDO> getContactList(Collection<Long> ids) {
+    public List<CrmContactDO> getContactListByIds(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return ListUtil.empty();
         }

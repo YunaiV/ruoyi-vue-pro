@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.crm.controller.admin.permission;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionUpdateReqVO;
@@ -11,6 +12,7 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.PostApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -54,7 +57,7 @@ public class CrmPermissionController {
     @PreAuthorize("@ss.hasPermission('crm:permission:create')")
     @CrmPermission(bizTypeValue = "#reqVO.bizType", bizId = "#reqVO.bizId", level = CrmPermissionLevelEnum.OWNER)
     public CommonResult<Boolean> addPermission(@Valid @RequestBody CrmPermissionCreateReqVO reqVO) {
-        permissionService.createPermission(CrmPermissionConvert.INSTANCE.convert(reqVO));
+        permissionService.createPermission(BeanUtils.toBean(reqVO, CrmPermissionCreateReqBO.class));
         return success(true);
     }
 
@@ -103,7 +106,8 @@ public class CrmPermissionController {
         // 拼接数据
         List<AdminUserRespDTO> userList = adminUserApi.getUserList(convertSet(permission, CrmPermissionDO::getUserId));
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userList, AdminUserRespDTO::getDeptId));
-        Set<Long> postIds = CollectionUtils.convertSetByFlatMap(userList, AdminUserRespDTO::getPostIds, Collection::stream);
+        Set<Long> postIds = CollectionUtils.convertSetByFlatMap(userList, AdminUserRespDTO::getPostIds,
+                item -> item != null ? item.stream() : Stream.empty());
         Map<Long, PostRespDTO> postMap = postApi.getPostMap(postIds);
         return success(CrmPermissionConvert.INSTANCE.convert(permission, userList, deptMap, postMap));
     }

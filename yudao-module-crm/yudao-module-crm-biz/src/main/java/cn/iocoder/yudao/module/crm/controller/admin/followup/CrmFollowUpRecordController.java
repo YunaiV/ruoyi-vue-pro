@@ -75,7 +75,7 @@ public class CrmFollowUpRecordController {
     public CommonResult<PageResult<CrmFollowUpRecordRespVO>> getFollowUpRecordPage(@Valid CrmFollowUpRecordPageReqVO pageReqVO) {
         PageResult<CrmFollowUpRecordDO> pageResult = followUpRecordService.getFollowUpRecordPage(pageReqVO);
         /// 拼接数据
-        Map<Long, CrmContactDO> contactMap = convertMap(contactService.getContactList(
+        Map<Long, CrmContactDO> contactMap = convertMap(contactService.getContactListByIds(
                 convertSetByFlatMap(pageResult.getList(), item -> item.getContactIds().stream())), CrmContactDO::getId);
         Map<Long, CrmBusinessDO> businessMap = convertMap(businessService.getBusinessList(
                 convertSetByFlatMap(pageResult.getList(), item -> item.getBusinessIds().stream())), CrmBusinessDO::getId);

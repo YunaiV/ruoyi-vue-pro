@@ -288,11 +288,16 @@ public class CollectionUtils {
 
     public static <T, V extends Comparable<? super V>> V getSumValue(List<T> from, Function<T, V> valueFunc,
                                                                      BinaryOperator<V> accumulator) {
+        return getSumValue(from, valueFunc, accumulator, null);
+    }
+
+    public static <T, V extends Comparable<? super V>> V getSumValue(Collection<T> from, Function<T, V> valueFunc,
+                                                                     BinaryOperator<V> accumulator, V defaultValue) {
         if (CollUtil.isEmpty(from)) {
-            return null;
+            return defaultValue;
         }
-        assert from.size() > 0; // 断言，避免告警
-        return from.stream().map(valueFunc).reduce(accumulator).get();
+        assert !from.isEmpty(); // 断言，避免告警
+        return from.stream().map(valueFunc).filter(Objects::nonNull).reduce(accumulator).orElse(defaultValue);
     }
 
     public static <T> void addIfNotNull(Collection<T> coll, T item) {
@@ -302,8 +307,12 @@ public class CollectionUtils {
         coll.add(item);
     }
 
-    public static <T> Collection<T> singleton(T deptId) {
-        return deptId == null ? Collections.emptyList() : Collections.singleton(deptId);
+    public static <T> Collection<T> singleton(T obj) {
+        return obj == null ? Collections.emptyList() : Collections.singleton(obj);
+    }
+
+    public static <T> List<T> newArrayList(List<List<T>> list) {
+        return list.stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
 
 }

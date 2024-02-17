@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.crm.dal.mysql.bi.CrmBiRankingMapper">
+
+    <select id="selectContractPriceRank"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.bi.vo.CrmBiRanKRespVO">
+        SELECT IFNULL(SUM(price), 0) AS count, owner_user_id
+        FROM crm_contract
+        WHERE deleted = 0
+        AND audit_status = 20
+        and owner_user_id in
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+        AND order_date between #{times[0],javaType=java.time.LocalDateTime} and
+            #{times[1],javaType=java.time.LocalDateTime}
+        GROUP BY owner_user_id
+    </select>
+
+    <select id="selectReceivablePriceRank"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.bi.vo.CrmBiRanKRespVO">
+        SELECT IFNULL(SUM(price), 0) AS count, owner_user_id
+        FROM crm_receivable
+        WHERE deleted = 0
+        AND audit_status = 20
+        AND owner_user_id in
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+        AND return_time between #{times[0],javaType=java.time.LocalDateTime} and
+            #{times[1],javaType=java.time.LocalDateTime}
+        GROUP BY owner_user_id
+    </select>
+
+    <select id="selectContractCountRank"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.bi.vo.CrmBiRanKRespVO">
+        SELECT COUNT(1) AS count, owner_user_id
+        FROM crm_contract
+        WHERE deleted = 0
+        AND audit_status = 20
+        AND owner_user_id in
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+        AND order_date between #{times[0],javaType=java.time.LocalDateTime} and
+            #{times[1],javaType=java.time.LocalDateTime}
+        GROUP BY owner_user_id
+    </select>
+
+    <!-- TODO 待定 这里是否需要关联 crm_contract_product 表，计算销售额 -->
+    <select id="selectProductSalesRank"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.bi.vo.CrmBiRanKRespVO">
+        SELECT COUNT(1) AS count, owner_user_id
+        FROM crm_contract
+        WHERE deleted = 0
+        AND audit_status = 20
+        AND owner_user_id in
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+        AND order_date between #{times[0],javaType=java.time.LocalDateTime} and
+            #{times[1],javaType=java.time.LocalDateTime}
+        GROUP BY owner_user_id
+    </select>
+
+    <select id="selectCustomerCountRank"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.bi.vo.CrmBiRanKRespVO">
+        SELECT COUNT(1) AS count, owner_user_id
+        FROM crm_customer
+        WHERE deleted = 0
+        AND owner_user_id in
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+        AND create_time between #{times[0],javaType=java.time.LocalDateTime} and
+            #{times[1],javaType=java.time.LocalDateTime}
+        GROUP BY owner_user_id
+    </select>
+
+    <select id="selectContactsCountRank"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.bi.vo.CrmBiRanKRespVO">
+        SELECT COUNT(1) AS count, owner_user_id
+        FROM crm_contact
+        WHERE deleted = 0
+        AND owner_user_id in
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+        AND create_time between #{times[0],javaType=java.time.LocalDateTime} and
+            #{times[1],javaType=java.time.LocalDateTime}
+        GROUP BY owner_user_id
+    </select>
+
+    <select id="selectFollowCountRank"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.bi.vo.CrmBiRanKRespVO">
+        SELECT COUNT(1) AS count, cc.owner_user_id
+        FROM crm_follow_up_record AS cfur
+        LEFT JOIN crm_contact AS cc ON FIND_IN_SET(cc.id, cfur.contact_ids)
+        WHERE cfur.deleted = 0
+        AND cc.deleted = 0
+        AND cc.owner_user_id in
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+        AND cfur.create_time between #{times[0],javaType=java.time.LocalDateTime} and
+            #{times[1],javaType=java.time.LocalDateTime}
+        GROUP BY cc.owner_user_id
+    </select>
+
+    <select id="selectFollowCustomerCountRank"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.bi.vo.CrmBiRanKRespVO">
+        SELECT COUNT(DISTINCT cc.id) AS count, cc.owner_user_id
+        FROM crm_follow_up_record AS cfur
+        LEFT JOIN crm_contact AS cc ON FIND_IN_SET(cc.id, cfur.contact_ids)
+        WHERE cfur.deleted = 0
+        AND cc.deleted = 0
+        AND cc.owner_user_id in
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+        AND cfur.create_time between #{times[0],javaType=java.time.LocalDateTime} and
+            #{times[1],javaType=java.time.LocalDateTime}
+        GROUP BY cc.owner_user_id
+    </select>
+
+</mapper>

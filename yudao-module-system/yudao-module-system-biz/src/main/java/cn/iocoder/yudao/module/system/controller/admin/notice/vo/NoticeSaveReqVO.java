@@ -3,16 +3,15 @@ package cn.iocoder.yudao.module.system.controller.admin.notice.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Schema(description = "管理后台 - 通知公告创建/修改 Request VO")
 @Data
 public class NoticeSaveReqVO {
 
-    @Schema(description = "岗位公告编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-//    @NotNull(message = "岗位公告编号不能为空")
+    @Schema(description = "岗位公告编号", example = "1024")
     private Long id;
 
     @Schema(description = "公告标题", requiredMode = Schema.RequiredMode.REQUIRED, example = "小博主")

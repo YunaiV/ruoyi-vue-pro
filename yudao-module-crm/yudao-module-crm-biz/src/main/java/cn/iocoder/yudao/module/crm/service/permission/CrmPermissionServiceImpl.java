@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.crm.service.permission;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionUpdateReqVO;
 import cn.iocoder.yudao.module.crm.convert.permission.CrmPermissionConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.anyMatch;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum.isOwner;
@@ -50,7 +52,7 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
         adminUserApi.validateUserList(Collections.singletonList(createReqBO.getUserId()));
 
         // 2. 创建
-        CrmPermissionDO permission = CrmPermissionConvert.INSTANCE.convert(createReqBO);
+        CrmPermissionDO permission = BeanUtils.toBean(createReqBO, CrmPermissionDO.class);
         permissionMapper.insert(permission);
         return permission.getId();
     }
@@ -62,7 +64,7 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
         adminUserApi.validateUserList(convertSet(createReqBOs, CrmPermissionCreateReqBO::getUserId));
 
         // 2. 创建
-        List<CrmPermissionDO> permissions = CrmPermissionConvert.INSTANCE.convertList(createReqBOs);
+        List<CrmPermissionDO> permissions = BeanUtils.toBean(createReqBOs, CrmPermissionDO.class);
         permissionMapper.insertBatch(permissions);
     }
 
@@ -167,7 +169,10 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
             throw exception(CRM_PERMISSION_DELETE_FAIL);
         }
         // 校验操作人是否为负责人
-        CrmPermissionDO permission = permissionMapper.selectByIdAndUserId(permissions.get(0).getBizId(), userId);
+        CrmPermissionDO permission = permissionMapper.selectByBizIdAndUserId(permissions.getFirst().getBizId(), userId);
+        if (permission == null) {
+            throw exception(CRM_PERMISSION_DELETE_DENIED);
+        }
         if (!CrmPermissionLevelEnum.isOwner(permission.getLevel())) {
             throw exception(CRM_PERMISSION_DELETE_DENIED);
         }
@@ -205,6 +210,13 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
     @Override
     public List<CrmPermissionDO> getPermissionListByBizTypeAndUserId(Integer bizType, Long userId) {
         return permissionMapper.selectListByBizTypeAndUserId(bizType, userId);
+    }
+
+    @Override
+    public boolean hasPermission(Integer bizType, Long bizId, Long userId, CrmPermissionLevelEnum level) {
+        List<CrmPermissionDO> permissionList = permissionMapper.selectByBizTypeAndBizId(bizType, bizId);
+        return anyMatch(permissionList, permission ->
+                ObjUtil.equal(permission.getUserId(), userId) && ObjUtil.equal(permission.getLevel(), level.getLevel()));
     }
 
 }

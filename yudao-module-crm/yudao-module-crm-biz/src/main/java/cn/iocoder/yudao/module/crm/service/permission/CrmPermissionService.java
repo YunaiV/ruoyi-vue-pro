@@ -108,4 +108,15 @@ public interface CrmPermissionService {
      */
     List<CrmPermissionDO> getPermissionListByBizTypeAndUserId(Integer bizType, Long userId);
 
+    /**
+     * 校验是否有指定数据的操作权限
+     *
+     * @param bizType   数据类型，关联 {@link CrmBizTypeEnum}
+     * @param bizId     数据编号，关联 {@link CrmBizTypeEnum} 对应模块 DO#getId()
+     * @param userId    用户编号
+     * @param level 权限级别
+     * @return 是否有权限
+     */
+    boolean hasPermission(Integer bizType, Long bizId, Long userId, CrmPermissionLevelEnum level);
+
 }

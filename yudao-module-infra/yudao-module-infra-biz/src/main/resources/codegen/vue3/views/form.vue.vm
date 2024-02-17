@@ -244,7 +244,7 @@ const submitForm = async () => {
   // 提交请求
   formLoading.value = true
   try {
-    const data = formData.value as unknown as ${simpleClassName}Api.${simpleClassName}VO
+    const data = formData.value as unknown as ${simpleClassName}VO
 ## 特殊：主子表专属逻辑
 #if ( $table.templateType == 10 || $table.templateType == 12 )
 #if ( $subTables && $subTables.size() > 0 )

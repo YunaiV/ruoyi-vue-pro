@@ -19,14 +19,14 @@ import cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceDeleteReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskAddSignTypeEnum;
-import cn.iocoder.yudao.module.bpm.service.candidate.BpmCandidateSourceInfo;
-import cn.iocoder.yudao.module.bpm.service.cc.BpmProcessInstanceCopyService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.module.bpm.service.message.BpmMessageService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
@@ -51,8 +51,6 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
-import javax.annotation.Resource;
-import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Stream;
@@ -95,9 +93,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Resource
     private ManagementService managementService;
-
-    @Resource
-    private BpmProcessInstanceCopyService processInstanceCopyService;
 
     @Override
     public PageResult<BpmTaskTodoPageItemRespVO> getTodoTaskPage(Long userId, BpmTaskTodoPageReqVO pageVO) {
@@ -558,7 +553,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         return task;
     }
 
-    private Task getTask(String id) {
+    @Override
+    public Task getTask(String id) {
         return taskService.createTaskQuery().taskId(id).singleResult();
     }
 
@@ -969,6 +965,15 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         List<BpmTaskExtDO> taskExtList = taskExtMapper.selectProcessListByTaskIds(childrenTaskIdList);
         Map<String, Task> idTaskMap = convertMap(taskList, TaskInfo::getId);
         return BpmTaskConvert.INSTANCE.convertList(taskExtList, userMap, idTaskMap);
+    }
+
+    @Override
+    public Map<String, String> getTaskNameByTaskIds(Collection<String> taskIds) {
+        if (CollUtil.isEmpty(taskIds)) {
+            return Collections.emptyMap();
+        }
+        List<Task> tasks = taskService.createTaskQuery().taskIds(taskIds).list();
+        return convertMap(tasks, Task::getId, Task::getName);
     }
 
 }

@@ -5,8 +5,10 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.file.core.client.AbstractFileClient;
 import io.minio.*;
+import io.minio.http.Method;
 
 import java.io.ByteArrayInputStream;
+import java.util.concurrent.TimeUnit;
 
 import static cn.iocoder.yudao.framework.file.core.client.s3.S3FileClientConfig.ENDPOINT_ALIYUN;
 import static cn.iocoder.yudao.framework.file.core.client.s3.S3FileClientConfig.ENDPOINT_TENCENT;
@@ -115,6 +117,18 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
                 .object(path) // 相对路径作为 key
                 .build());
         return IoUtil.readBytes(response);
+    }
+
+    @Override
+    public FilePresignedUrlRespDTO getPresignedObjectUrl(String path) throws Exception {
+        String uploadUrl = client.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
+                .method(Method.PUT)
+                .bucket(config.getBucket())
+                .object(path)
+                .expiry(10, TimeUnit.MINUTES) // 过期时间（秒数）取值范围：1 秒 ~ 7 天
+                .build()
+        );
+        return new FilePresignedUrlRespDTO(uploadUrl, config.getDomain() + "/" + path);
     }
 
 }

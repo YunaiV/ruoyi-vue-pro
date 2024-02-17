@@ -17,9 +17,6 @@ import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerPoolConfigService
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
-import cn.iocoder.yudao.module.system.api.logger.OperateLogApi;
-import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2PageReqDTO;
-import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2RespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,16 +32,18 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
-import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.CRM_CUSTOMER_TYPE;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CUSTOMER_POOL_CONFIG_NOT_EXISTS_OR_DISABLED;
 
 @Tag(name = "管理后台 - CRM 客户")
 @RestController
@@ -60,8 +59,6 @@ public class CrmCustomerController {
     private DeptApi deptApi;
     @Resource
     private AdminUserApi adminUserApi;
-    @Resource
-    private OperateLogApi operateLogApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建客户")
@@ -123,6 +120,34 @@ public class CrmCustomerController {
         return success(CrmCustomerConvert.INSTANCE.convertPage(pageResult, userMap, deptMap, poolDayMap));
     }
 
+    @GetMapping("/put-in-pool-remind-page")
+    @Operation(summary = "获得待进入公海客户分页")
+    @PreAuthorize("@ss.hasPermission('crm:customer:query')")
+    public CommonResult<PageResult<CrmCustomerRespVO>> getPutInPoolRemindCustomerPage(@Valid CrmCustomerPageReqVO pageVO) {
+        // 获取公海配置 TODO @dbh52：合并到 getPutInPoolRemindCustomerPage 会更合适哈；
+        CrmCustomerPoolConfigDO poolConfigDO = customerPoolConfigService.getCustomerPoolConfig();
+        if (ObjUtil.isNull(poolConfigDO)
+                || Boolean.FALSE.equals(poolConfigDO.getEnabled())
+                || Boolean.FALSE.equals(poolConfigDO.getNotifyEnabled())
+        ) { // TODO @dbh52：这个括号，一般不换行，在 java 这里；
+            throw exception(CUSTOMER_POOL_CONFIG_NOT_EXISTS_OR_DISABLED);
+        }
+
+        // 1. 查询客户分页
+        PageResult<CrmCustomerDO> pageResult = customerService.getPutInPoolRemindCustomerPage(pageVO, poolConfigDO, getLoginUserId());
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty(pageResult.getTotal()));
+        }
+
+        // 2. 拼接数据
+        // TODO @芋艿：合并 getCustomerPage 和 getPutInPoolRemindCustomerPage 的后置处理；
+        Map<Long, Long> poolDayMap = getPoolDayMap(pageResult.getList()); // 客户界面，需要查看距离进入公海的时间
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
+                convertSetByFlatMap(pageResult.getList(), user -> Stream.of(Long.parseLong(user.getCreator()), user.getOwnerUserId())));
+        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
+        return success(CrmCustomerConvert.INSTANCE.convertPage(pageResult, userMap, deptMap, poolDayMap));
+    }
+
     /**
      * 获取距离进入公海的时间
      *
@@ -161,6 +186,7 @@ public class CrmCustomerController {
                 new CrmCustomerRespVO().setId(customer.getId()).setName(customer.getName())));
     }
 
+    // TODO @puhui999：公海的导出，前端可以接下
     @GetMapping("/export-excel")
     @Operation(summary = "导出客户 Excel")
     @PreAuthorize("@ss.hasPermission('crm:customer:export')")
@@ -174,24 +200,37 @@ public class CrmCustomerController {
                 BeanUtils.toBean(list, CrmCustomerRespVO.class));
     }
 
+    @GetMapping("/get-import-template")
+    @Operation(summary = "获得导入客户模板")
+    public void importTemplate(HttpServletResponse response) throws IOException {
+        // 手动创建导出 demo
+        List<CrmCustomerImportExcelVO> list = Arrays.asList(
+                CrmCustomerImportExcelVO.builder().name("芋道").industryId(1).level(1).source(1).mobile("15601691300").telephone("")
+                        .website("https://doc.iocoder.cn/").qq("").wechat("").email("yunai@iocoder.cn").description("").remark("")
+                        .areaId(null).detailAddress("").build(),
+                CrmCustomerImportExcelVO.builder().name("源码").industryId(1).level(1).source(1).mobile("15601691300").telephone("")
+                        .website("https://doc.iocoder.cn/").qq("").wechat("").email("yunai@iocoder.cn").description("").remark("")
+                        .areaId(null).detailAddress("").build()
+        );
+        // 输出
+        ExcelUtils.write(response, "客户导入模板.xls", "客户列表", CrmCustomerImportExcelVO.class, list);
+    }
+
+    @PostMapping("/import")
+    @Operation(summary = "导入客户")
+    @PreAuthorize("@ss.hasPermission('system:customer:import')")
+    public CommonResult<CrmCustomerImportRespVO> importExcel(@Valid @RequestBody CrmCustomerImportReqVO importReqVO)
+            throws Exception {
+        List<CrmCustomerImportExcelVO> list = ExcelUtils.read(importReqVO.getFile(), CrmCustomerImportExcelVO.class);
+        return success(customerService.importCustomerList(list, importReqVO));
+    }
+
     @PutMapping("/transfer")
     @Operation(summary = "转移客户")
     @PreAuthorize("@ss.hasPermission('crm:customer:update')")
-    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmCustomerTransferReqVO reqVO) {
+    public CommonResult<Boolean> transferCustomer(@Valid @RequestBody CrmCustomerTransferReqVO reqVO) {
         customerService.transferCustomer(reqVO, getLoginUserId());
         return success(true);
-    }
-
-    @GetMapping("/operate-log-page")
-    @Operation(summary = "获得客户操作日志")
-    @Parameter(name = "id", description = "客户编号", required = true)
-    @PreAuthorize("@ss.hasPermission('crm:customer:query')")
-    public CommonResult<PageResult<OperateLogV2RespDTO>> getCustomerOperateLog(@RequestParam("id") Long id) {
-        OperateLogV2PageReqDTO reqDTO = new OperateLogV2PageReqDTO();
-        reqDTO.setPageSize(PAGE_SIZE_NONE); // 不分页
-        reqDTO.setBizType(CRM_CUSTOMER_TYPE);
-        reqDTO.setBizId(id);
-        return success(operateLogApi.getOperateLogPage(reqDTO));
     }
 
     @PutMapping("/lock")

@@ -1,14 +1,13 @@
 package cn.iocoder.yudao.module.crm.service.customer;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerLockReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerSaveReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerTransferReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-import cn.iocoder.yudao.module.crm.service.customer.bo.CrmCustomerUpdateFollowUpReqBO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
+import cn.iocoder.yudao.module.crm.service.customer.bo.CrmCustomerCreateReqBO;
+import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
+import jakarta.validation.Valid;
 
-import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 
@@ -96,7 +95,25 @@ public interface CrmCustomerService {
      *
      * @param customerUpdateFollowUpReqBO 请求
      */
-    void updateCustomerFollowUp(CrmCustomerUpdateFollowUpReqBO customerUpdateFollowUpReqBO);
+    void updateCustomerFollowUp(CrmUpdateFollowUpReqBO customerUpdateFollowUpReqBO);
+
+    /**
+     * 创建客户
+     *
+     * @param customerCreateReq 请求信息
+     * @param userId            用户编号
+     * @return 客户列表
+     */
+    Long createCustomer(CrmCustomerCreateReqBO customerCreateReq, Long userId);
+
+    /**
+     * 批量导入客户
+     *
+     * @param importCustomers 导入客户列表
+     * @param importReqVO     请求
+     * @return 导入结果
+     */
+    CrmCustomerImportRespVO importCustomerList(List<CrmCustomerImportExcelVO> importCustomers, CrmCustomerImportReqVO importReqVO);
 
     // ==================== 公海相关操作 ====================
 
@@ -116,4 +133,14 @@ public interface CrmCustomerService {
      */
     void receiveCustomer(List<Long> ids, Long ownerUserId, Boolean isReceive);
 
+    /**
+     * 【系统】客户自动掉入公海
+     *
+     * @return 掉入公海数量
+     */
+    int autoPutCustomerPool();
+
+    PageResult<CrmCustomerDO> getPutInPoolRemindCustomerPage(CrmCustomerPageReqVO pageVO,
+                                                             CrmCustomerPoolConfigDO poolConfigDO,
+                                                             Long loginUserId);
 }

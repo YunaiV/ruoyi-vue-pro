@@ -2,45 +2,48 @@ package cn.iocoder.yudao.module.crm.service.business;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessTransferReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.product.CrmBusinessProductSaveReqVO;
 import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
-import cn.iocoder.yudao.module.crm.convert.businessproduct.CrmBusinessProductConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactBusinessDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessMapper;
 import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessProductMapper;
-import cn.iocoder.yudao.module.crm.dal.mysql.contactbusinesslink.CrmContactBusinessMapper;
-import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
-import cn.iocoder.yudao.module.crm.service.business.bo.CrmBusinessUpdateFollowUpReqBO;
+import cn.iocoder.yudao.module.crm.service.business.bo.CrmBusinessUpdateProductReqBO;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactBusinessService;
+import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
+import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
+import cn.iocoder.yudao.module.crm.service.product.CrmProductService;
 import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
+import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.BUSINESS_CONTRACT_EXISTS;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.BUSINESS_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
 
 /**
@@ -54,20 +57,18 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
     @Resource
     private CrmBusinessMapper businessMapper;
-
     @Resource
     private CrmBusinessProductMapper businessProductMapper;
-    // TODO @lzxhqs：不直接调用这个 mapper，要调用对方的 service；每个业务独立收敛
-    @Resource
-    private CrmContractMapper contractMapper;
 
-    // TODO @lzxhqs：不直接调用这个 mapper，要调用对方的 service；每个业务独立收敛
     @Resource
-    private CrmContactBusinessMapper contactBusinessMapper;
+    @Lazy // 延迟加载，避免循环依赖
+    private CrmContractService contractService;
     @Resource
     private CrmPermissionService permissionService;
     @Resource
     private CrmContactBusinessService contactBusinessService;
+    @Resource
+    private CrmProductService productService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -76,17 +77,17 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     public Long createBusiness(CrmBusinessSaveReqVO createReqVO, Long userId) {
         createReqVO.setId(null);
         // 1. 插入商机
-        CrmBusinessDO business = BeanUtils.toBean(createReqVO, CrmBusinessDO.class)
-                .setOwnerUserId(userId);
+        CrmBusinessDO business = BeanUtils.toBean(createReqVO, CrmBusinessDO.class).setOwnerUserId(userId);
         businessMapper.insert(business);
-        // TODO 商机待定：插入商机与产品的关联表；校验商品存在
-        // TODO lzxhqs：新增时，是不是不用调用这个方法哈；
-        verifyCrmBusinessProduct(business.getId());
-        // TODO @lzxhqs：用 CollUtils.isNotEmpty；
-        if (!createReqVO.getProducts().isEmpty()) {
-            createBusinessProducts(createReqVO.getProducts(), business.getId());
+        // 1.2 插入商机关联商品
+        if (CollUtil.isNotEmpty(createReqVO.getProductItems())) { // 如果有的话
+            List<CrmBusinessProductDO> productList = buildBusinessProductList(createReqVO.getProductItems(), business.getId());
+            businessProductMapper.insertBatch(productList);
+            // 更新合同商品总金额
+            businessMapper.updateById(new CrmBusinessDO().setId(business.getId()).setProductPrice(
+                    getSumValue(productList, CrmBusinessProductDO::getTotalPrice, Integer::sum)));
         }
-        // TODO 商机待定：在联系人的详情页，如果直接【新建商机】，则需要关联下。这里要搞个 CrmContactBusinessDO 表
+        // TODO @puhui999：在联系人的详情页，如果直接【新建商机】，则需要关联下。这里要搞个 CrmContactBusinessDO 表
         createContactBusiness(business.getId(), createReqVO.getContactId());
 
         // 2. 创建数据权限
@@ -94,56 +95,17 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         permissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType())
                 .setBizId(business.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
 
-        // 4. 记录操作日志上下文
+        // 3. 记录操作日志上下文
         LogRecordContext.putVariable("business", business);
         return business.getId();
     }
 
     // TODO @lzxhqs：CrmContactBusinessService 调用这个；这样逻辑才能收敛哈；
-    /**
-     * @param businessId 商机id
-     * @param contactId  联系人id
-     * @throws
-     * @description 联系人与商机的关联
-     * @author lzxhqs
-     */
     private void createContactBusiness(Long businessId, Long contactId) {
         CrmContactBusinessDO contactBusiness = new CrmContactBusinessDO();
         contactBusiness.setBusinessId(businessId);
         contactBusiness.setContactId(contactId);
-        contactBusinessMapper.insert(contactBusiness);
-
-    }
-
-    // TODO @lzxhqs：这个方法注释格式不对；删除@description，然后把 插入商机产品关联表 作为方法注释；
-    /**
-     * @param products 产品集合
-     * @description 插入商机产品关联表
-     * @author lzxhqs
-     */
-    private void createBusinessProducts(List<CrmBusinessProductSaveReqVO> products, Long businessId) {
-        // TODO @lzxhqs：可以用 CollectionUtils.convertList；
-        List<CrmBusinessProductDO> list = new ArrayList<>();
-        for (CrmBusinessProductSaveReqVO product : products) {
-            CrmBusinessProductDO businessProductDO = CrmBusinessProductConvert.INSTANCE.convert(product);
-            businessProductDO.setBusinessId(businessId);
-            list.add(businessProductDO);
-        }
-        businessProductMapper.insertBatch(list);
-    }
-
-    /**
-     * @param id businessId
-     * @description 校验管理的产品存在则删除
-     * @author lzxhqs
-     */
-    private void verifyCrmBusinessProduct(Long id) {
-        CrmBusinessProductDO businessProductDO = businessProductMapper.selectByBusinessId(id);
-        if (businessProductDO != null) {
-            //通过商机Id删除
-            businessProductMapper.deleteByBusinessId(id);
-        }
-
+        contactBusinessService.insert(contactBusiness);
     }
 
     @Override
@@ -155,15 +117,12 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         // 1. 校验存在
         CrmBusinessDO oldBusiness = validateBusinessExists(updateReqVO.getId());
 
-        // 2. 更新商机
+        // 2.1 更新商机
         CrmBusinessDO updateObj = BeanUtils.toBean(updateReqVO, CrmBusinessDO.class);
         businessMapper.updateById(updateObj);
-        // TODO 商机待定：插入商机与产品的关联表；校验商品存在
-        // TODO @lzxhqs：更新时，可以调用 CollectionUtils 的 diffList，尽量避免这种先删除再插入；而是新增的插入、变更的更新，没的删除；不然这个表每次更新，会多好多数据；
-        verifyCrmBusinessProduct(updateReqVO.getId());
-        if (!updateReqVO.getProducts().isEmpty()) {
-            createBusinessProducts(updateReqVO.getProducts(), updateReqVO.getId());
-        }
+        // 2.2 更新商机关联商品
+        List<CrmBusinessProductDO> productList = buildBusinessProductList(updateReqVO.getProductItems(), updateObj.getId());
+        updateBusinessProduct(productList, updateObj.getId());
 
         // TODO @商机待定：如果状态发生变化，插入商机状态变更记录表
         // 3. 记录操作日志上下文
@@ -172,8 +131,8 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
-    public void updateContactFollowUpBatch(List<CrmBusinessUpdateFollowUpReqBO> updateFollowUpReqBOList) {
-        businessMapper.updateBatch(BeanUtils.toBean(updateFollowUpReqBOList, CrmBusinessDO.class));
+    public void updateBusinessFollowUpBatch(List<CrmUpdateFollowUpReqBO> updateFollowUpReqBOList) {
+        businessMapper.updateBatch(CrmBusinessConvert.INSTANCE.convertList(updateFollowUpReqBOList));
     }
 
     @Override
@@ -196,15 +155,52 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         LogRecordContext.putVariable("businessName", business.getName());
     }
 
+    private void updateBusinessProduct(List<CrmBusinessProductDO> newProductList, Long businessId) {
+        List<CrmBusinessProductDO> oldProducts = businessProductMapper.selectListByBusinessId(businessId);
+        List<List<CrmBusinessProductDO>> diffList = CollectionUtils.diffList(oldProducts, newProductList, (oldValue, newValue) -> {
+            boolean condition = ObjectUtil.equal(oldValue.getProductId(), newValue.getProductId());
+            if (condition) {
+                newValue.setId(oldValue.getId()); // 更新需要原始编号
+            }
+            return condition;
+        });
+        if (CollUtil.isNotEmpty(diffList.get(0))) {
+            businessProductMapper.insertBatch(diffList.get(0));
+        }
+        if (CollUtil.isNotEmpty(diffList.get(1))) {
+            businessProductMapper.updateBatch(diffList.get(1));
+        }
+        if (CollUtil.isNotEmpty(diffList.get(2))) {
+            businessProductMapper.deleteBatchIds(convertSet(diffList.get(2), CrmBusinessProductDO::getId));
+        }
+    }
+
+    private List<CrmBusinessProductDO> buildBusinessProductList(List<CrmBusinessSaveReqVO.CrmBusinessProductItem> productItems,
+                                                                Long businessId) {
+        // 校验商品存在
+        Set<Long> productIds = convertSet(productItems, CrmBusinessSaveReqVO.CrmBusinessProductItem::getId);
+        List<CrmProductDO> productList = productService.getProductList(productIds);
+        if (CollUtil.isEmpty(productIds) || productList.size() != productIds.size()) {
+            throw exception(PRODUCT_NOT_EXISTS);
+        }
+        Map<Long, CrmProductDO> productMap = convertMap(productList, CrmProductDO::getId);
+        return convertList(productItems, productItem -> {
+            CrmProductDO product = productMap.get(productItem.getId());
+            return BeanUtils.toBean(product, CrmBusinessProductDO.class)
+                    .setId(null).setProductId(productItem.getId()).setBusinessId(businessId)
+                    .setCount(productItem.getCount()).setDiscountPercent(productItem.getDiscountPercent())
+                    .setTotalPrice(MoneyUtils.calculator(product.getPrice(), productItem.getCount(), productItem.getDiscountPercent()));
+        });
+    }
+
     /**
+     * 删除校验合同是关联合同
+     *
      * @param businessId 商机id
-     * @throws
-     * @description 删除校验合同是关联合同
      * @author lzxhqs
      */
     private void validateContractExists(Long businessId) {
-        CrmContractDO contract = contractMapper.selectByBizId(businessId);
-        if (contract != null) {
+        if (contractService.getContractCountByBusinessId(businessId) > 0) {
             throw exception(BUSINESS_CONTRACT_EXISTS);
         }
     }
@@ -235,6 +231,14 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
         // 记录操作日志上下文
         LogRecordContext.putVariable("business", business);
+    }
+
+    @Override
+    public void updateBusinessProduct(CrmBusinessUpdateProductReqBO updateProductReqBO) {
+        // 更新商机关联商品
+        List<CrmBusinessProductDO> productList = buildBusinessProductList(
+                BeanUtils.toBean(updateProductReqBO.getProductItems(), CrmBusinessSaveReqVO.CrmBusinessProductItem.class), updateProductReqBO.getId());
+        updateBusinessProduct(productList, updateProductReqBO.getId());
     }
 
     //======================= 查询相关 =======================

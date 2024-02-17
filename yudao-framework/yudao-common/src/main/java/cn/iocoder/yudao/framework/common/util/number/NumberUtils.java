@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.framework.common.util.number;
 
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
+
+import java.math.BigDecimal;
 
 /**
  * 数字的工具类，补全 {@link cn.hutool.core.util.NumberUtil} 的功能
@@ -35,6 +38,23 @@ public class NumberUtils {
         distance = distance * 6378.137;
         distance = Math.round(distance * 10000d) / 10000d;
         return distance;
+    }
+
+    /**
+     * 提供精确的乘法运算
+     *
+     * 和 hutool {@link NumberUtil#mul(BigDecimal...)} 的差别是，如果存在 null，则返回 null
+     *
+     * @param values 多个被乘值
+     * @return 积
+     */
+    public static BigDecimal mul(BigDecimal... values) {
+        for (BigDecimal value : values) {
+            if (value == null) {
+                return null;
+            }
+        }
+        return NumberUtil.mul(values);
     }
 
 }

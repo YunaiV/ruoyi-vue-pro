@@ -69,4 +69,13 @@ public interface CrmProductService {
      * @return 产品
      */
     CrmProductDO getProductByCategoryId(Long categoryId);
+
+    /**
+     * 获得产品列表
+     *
+     * @param ids 产品编号
+     * @return 产品列表
+     */
+    List<CrmProductDO> getProductListByIds(Collection<Long> ids);
+
 }

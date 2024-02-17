@@ -4,9 +4,10 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
+import jakarta.validation.Valid;
 import org.flowable.task.api.Task;
 
-import javax.validation.Valid;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -132,6 +133,8 @@ public interface BpmTaskService {
      */
     void updateTaskExtAssign(Task task);
 
+    Task getTask(String id);
+
     /**
      * 获取当前任务的可回退的流程集合
      *
@@ -180,5 +183,13 @@ public interface BpmTaskService {
      * @return 子任务列表
      */
     List<BpmTaskSubSignRespVO> getChildrenTaskList(String parentId);
+
+    /**
+     * 通过任务 ID，查询任务名 Map
+     *
+     * @param taskIds 任务 ID
+     * @return 任务 ID 与名字的 Map
+     */
+    Map<String, String> getTaskNameByTaskIds(Collection<String> taskIds);
 
 }

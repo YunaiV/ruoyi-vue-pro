@@ -1,14 +1,16 @@
 package cn.iocoder.yudao.module.crm.service.contract;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.bpm.api.listener.dto.BpmResultListenerRespDTO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-import cn.iocoder.yudao.module.crm.service.contract.bo.CrmContractUpdateFollowUpReqBO;
+import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
+import jakarta.validation.Valid;
 
-import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 
@@ -55,7 +57,22 @@ public interface CrmContractService {
      *
      * @param contractUpdateFollowUpReqBO 信息
      */
-    void updateContractFollowUp(CrmContractUpdateFollowUpReqBO contractUpdateFollowUpReqBO);
+    void updateContractFollowUp(CrmUpdateFollowUpReqBO contractUpdateFollowUpReqBO);
+
+    /**
+     * 发起合同审批流程
+     *
+     * @param id     合同编号
+     * @param userId 用户编号
+     */
+    void submitContract(Long id, Long userId);
+
+    /**
+     * 更新合同流程审批结果
+     *
+     * @param event 审批结果
+     */
+    void updateContractAuditStatus(BpmResultListenerRespDTO event);
 
     /**
      * 获得合同
@@ -109,5 +126,21 @@ public interface CrmContractService {
      * @return 数量
      */
     Long getContractCountByCustomerId(Long customerId);
+
+    /**
+     * 根据商机ID获取关联客户的合同数量
+     *
+     * @param businessId 商机编号
+     * @return 数量
+     */
+    Long getContractCountByBusinessId(Long businessId);
+
+    /**
+     * 获取合同商品列表
+     *
+     * @param contactId 合同编号
+     * @return 合同商品列表
+     */
+    List<CrmContractProductDO> getContractProductListByContractId(Long contactId);
 
 }

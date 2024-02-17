@@ -11,6 +11,16 @@ public interface LogRecordConstants {
     // ======================= CRM_LEADS 线索 =======================
 
     String CRM_LEADS_TYPE = "CRM 线索";
+    String CRM_LEADS_CREATE_SUB_TYPE = "创建线索";
+    String CRM_LEADS_CREATE_SUCCESS = "创建了线索{{#clue.name}}";
+    String CRM_LEADS_UPDATE_SUB_TYPE = "更新线索";
+    String CRM_LEADS_UPDATE_SUCCESS = "更新了线索【{{#clueName}}】: {_DIFF{#updateReq}}";
+    String CRM_LEADS_DELETE_SUB_TYPE = "删除线索";
+    String CRM_LEADS_DELETE_SUCCESS = "删除了线索【{{#clueName}}】";
+    String CRM_LEADS_TRANSFER_SUB_TYPE = "转移线索";
+    String CRM_LEADS_TRANSFER_SUCCESS = "将线索【{{#clue.name}}】的负责人从【{getAdminUserById{#clue.ownerUserId}}】变更为了【{getAdminUserById{#reqVO.newOwnerUserId}}】";
+    String CRM_LEADS_TRANSLATE_SUB_TYPE = "线索转化为客户";
+    String CRM_LEADS_TRANSLATE_SUCCESS = "将线索【{{#clue.name}}】转化为客户";
 
     // ======================= CRM_CUSTOMER 客户 =======================
 
@@ -29,6 +39,8 @@ public interface LogRecordConstants {
     String CRM_CUSTOMER_POOL_SUCCESS = "将客户【{{#customerName}}】放入了公海";
     String CRM_CUSTOMER_RECEIVE_SUB_TYPE = "{{#ownerUserName != null ? '分配客户' : '领取客户'}}";
     String CRM_CUSTOMER_RECEIVE_SUCCESS = "{{#ownerUserName != null ? '将客户【' + #customer.name + '】分配给【' + #ownerUserName + '】' : '领取客户【' + #customer.name + '】'}}";
+    String CRM_CUSTOMER_IMPORT_SUB_TYPE = "{{#isUpdate ? '导入并更新客户' : '导入客户'}}";
+    String CRM_CUSTOMER_IMPORT_SUCCESS = "{{#isUpdate ? '导入并更新了客户【'+ #customer.name +'】' : '导入了客户【'+ #customer.name +'】'}}";
 
     // ======================= CRM_CUSTOMER_LIMIT_CONFIG 客户限制配置 =======================
 
@@ -81,6 +93,8 @@ public interface LogRecordConstants {
     String CRM_CONTRACT_DELETE_SUCCESS = "删除了合同【{{#contractName}}】";
     String CRM_CONTRACT_TRANSFER_SUB_TYPE = "转移合同";
     String CRM_CONTRACT_TRANSFER_SUCCESS = "将合同【{{#contract.name}}】的负责人从【{getAdminUserById{#contract.ownerUserId}}】变更为了【{getAdminUserById{#reqVO.newOwnerUserId}}】";
+    String CRM_CONTRACT_SUBMIT_SUB_TYPE = "提交合同审批";
+    String CRM_CONTRACT_SUBMIT_SUCCESS = "提交合同【{{#contractName}}】审批成功";
 
     // ======================= CRM_PRODUCT 产品 =======================
 

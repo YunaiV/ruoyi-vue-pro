@@ -1,21 +1,22 @@
 package cn.iocoder.yudao.module.crm.dal.mysql.customer;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
+import cn.iocoder.yudao.module.crm.controller.admin.backlog.vo.CrmTodayCustomerPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.message.vo.CrmTodayCustomerPageReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.followup.CrmFollowUpRecordDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
-import cn.iocoder.yudao.module.crm.enums.message.CrmContactStatusEnum;
 import cn.iocoder.yudao.module.crm.util.CrmQueryWrapperUtils;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.lang.Nullable;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -64,6 +65,8 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
         MPJLambdaWrapperX<CrmCustomerDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
         CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CUSTOMER.getType(), ids, userId);
+        // 拼接自身的查询条件
+        query.selectAll(CrmCustomerDO.class).in(CrmCustomerDO::getId, ids).orderByDesc(CrmCustomerDO::getId);
         return selectJoinList(CrmCustomerDO.class, query);
     }
 
@@ -80,43 +83,67 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
         CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CUSTOMER.getType(),
                 CrmCustomerDO::getId, userId, pageReqVO.getSceneType(), null);
 
-        query.selectAll(CrmCustomerDO.class)
-                .leftJoin(CrmFollowUpRecordDO.class, CrmFollowUpRecordDO::getBizId, CrmCustomerDO::getId)
-                .eq(CrmFollowUpRecordDO::getType, CrmBizTypeEnum.CRM_CUSTOMER.getType());
+        // 拼接自身的查询条件
+        query.selectAll(CrmCustomerDO.class);
+        if (pageReqVO.getContactStatus() != null) {
+            LocalDateTime beginOfToday = LocalDateTimeUtil.beginOfDay(LocalDateTime.now());
+            LocalDateTime endOfToday = LocalDateTimeUtil.endOfDay(LocalDateTime.now());
+            if (pageReqVO.getContactStatus().equals(CrmTodayCustomerPageReqVO.CONTACT_TODAY)) { // 今天需联系
+                query.between(CrmCustomerDO::getContactNextTime, beginOfToday, endOfToday);
+            } else if (pageReqVO.getContactStatus().equals(CrmTodayCustomerPageReqVO.CONTACT_EXPIRED)) { // 已逾期
+                query.lt(CrmCustomerDO::getContactNextTime, beginOfToday);
+            } else if (pageReqVO.getContactStatus().equals(CrmTodayCustomerPageReqVO.CONTACT_ALREADY)) { // 已联系
+                query.between(CrmCustomerDO::getContactLastTime, beginOfToday, endOfToday);
+            } else {
+                throw new IllegalArgumentException("未知联系状态：" + pageReqVO.getContactStatus());
+            }
+        }
+        return selectJoinPage(pageReqVO, CrmCustomerDO.class, query);
+    }
+
+    default List<CrmCustomerDO> selectListByLockAndNotPool(Boolean lockStatus) {
+        return selectList(new LambdaQueryWrapper<CrmCustomerDO>()
+                .eq(CrmCustomerDO::getLockStatus, lockStatus)
+                .gt(CrmCustomerDO::getOwnerUserId, 0));
+    }
+
+    default CrmCustomerDO selectByCustomerName(String name) {
+        return selectOne(CrmCustomerDO::getName, name);
+    }
+
+    default PageResult<CrmCustomerDO> selectPutInPoolRemindCustomerPage(CrmCustomerPageReqVO pageReqVO,
+                                                                        CrmCustomerPoolConfigDO poolConfigDO,
+                                                                        Long userId) {
+        MPJLambdaWrapperX<CrmCustomerDO> query = new MPJLambdaWrapperX<>();
+        // 拼接数据权限的查询条件
+        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CUSTOMER.getType(),
+                CrmCustomerDO::getId, userId, pageReqVO.getSceneType(), null);
+        // TODO @dhb52：lock 的情况，不需要提醒哈；
 
         // 拼接自身的查询条件
-        // TODO @dbh52：这里不仅仅要获得 today、tomorrow。而是 today 要获取今天的 00:00:00 这种；
-        LocalDate today = LocalDate.now();
-        LocalDate tomorrow = today.plusDays(1);
-        LocalDate yesterday = today.minusDays(1);
-        if (pageReqVO.getContactStatus().equals(CrmContactStatusEnum.NEEDED_TODAY.getType())) {
-            // 今天需联系：
-            // 1.【客户】的【下一次联系时间】 是【今天】
-            // 2. 无法找到【今天】创建的【跟进】记录
-            query.between(CrmCustomerDO::getContactNextTime, today, tomorrow)
-                    // TODO @dbh52：是不是查询 CrmCustomerDO::contactLastTime < today？因为今天联系过，应该会更新该字段，减少链表查询；
-                    .between(CrmFollowUpRecordDO::getCreateTime, today, tomorrow)
-                    .isNull(CrmFollowUpRecordDO::getId);
-        } else if (pageReqVO.getContactStatus().equals(CrmContactStatusEnum.EXPIRED.getType())) {
-            // 已逾期：
-            // 1. 【客户】的【下一次联系时间】 <= 【昨天】
-            // 2. 无法找到【今天】创建的【跟进】记录
-            //  TODO @dbh52：是不是 contactNextTime 在当前时间之前，且 contactLastTime < contactNextTime？说白了，就是下次联系时间超过当前时间，且最后联系时间没去联系；
-            query.le(CrmCustomerDO::getContactNextTime, yesterday)
-                    .between(CrmFollowUpRecordDO::getCreateTime, today, tomorrow)
-                    .isNull(CrmFollowUpRecordDO::getId);
-        } else if (pageReqVO.getContactStatus().equals(CrmContactStatusEnum.ALREADY_CONTACT.getType())) {
-            // 已联系：
-            // 1.【客户】的【下一次联系时间】 是【今天】
-            // 2. 找到【今天】创建的【跟进】记录
-            query.between(CrmCustomerDO::getContactNextTime, today, tomorrow)
-                    // TODO @dbh52：contactLastTime 是今天
-                    .between(CrmFollowUpRecordDO::getCreateTime, today, tomorrow)
-                    .isNotNull(CrmFollowUpRecordDO::getId);
-        } else {
-            // TODO: 参数错误，是不是要兜一下底；直接抛出异常就好啦；
-        }
-
+        query.selectAll(CrmCustomerDO.class);
+        // 情况一：未成交提醒日期区间
+        Integer dealExpireDays = poolConfigDO.getDealExpireDays();
+        LocalDateTime startDealRemindDate = LocalDateTimeUtil.beginOfDay(LocalDateTime.now())
+                .minusDays(dealExpireDays);
+        LocalDateTime endDealRemindDate = LocalDateTimeUtil.endOfDay(LocalDateTime.now())
+                .minusDays(Math.max(dealExpireDays - poolConfigDO.getNotifyDays(), 0));
+        // 情况二：未跟进提醒日期区间
+        Integer contactExpireDays = poolConfigDO.getContactExpireDays();
+        LocalDateTime startContactRemindDate = LocalDateTimeUtil.beginOfDay(LocalDateTime.now())
+                .minusDays(contactExpireDays);
+        LocalDateTime endContactRemindDate = LocalDateTimeUtil.endOfDay(LocalDateTime.now())
+                .minusDays(Math.max(contactExpireDays - poolConfigDO.getNotifyDays(), 0));
+        query
+                // 情况一：1. 未成交放入公海提醒
+                .eq(CrmCustomerDO::getDealStatus, false)
+                .between(CrmCustomerDO::getCreateTime, startDealRemindDate, endDealRemindDate)
+                // 情况二：未跟进放入公海提醒
+                .or() // 2.1 contactLastTime 为空 TODO 芋艿：这个要不要搞个默认值；
+                .isNull(CrmCustomerDO::getContactLastTime)
+                .between(CrmCustomerDO::getCreateTime, startContactRemindDate, endContactRemindDate)
+                .or() // 2.2 ContactLastTime 不为空
+                .between(CrmCustomerDO::getContactLastTime, startContactRemindDate, endContactRemindDate);
         return selectJoinPage(pageReqVO, CrmCustomerDO.class, query);
     }
 

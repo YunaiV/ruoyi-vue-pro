@@ -77,4 +77,39 @@ public class CrmClueRespVO {
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
+    @Schema(description = "所属行业", requiredMode = Schema.RequiredMode.REQUIRED, example = "13563")
+    @ExcelProperty(value = "所属行业", converter = DictConvert.class)
+    @DictFormat(cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_INDUSTRY)
+    private Integer industryId;
+
+    @Schema(description = "客户等级", requiredMode = Schema.RequiredMode.REQUIRED, example = "13563")
+    @ExcelProperty(value = "客户等级", converter = DictConvert.class)
+    @DictFormat(cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_LEVEL)
+    private Integer level;
+
+    @Schema(description = "客户来源", requiredMode = Schema.RequiredMode.REQUIRED, example = "13563")
+    @ExcelProperty(value = "客户来源", converter = DictConvert.class)
+    @DictFormat(cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_SOURCE)
+    private Integer source;
+
+    @Schema(description = "网址", example = "25682")
+    @ExcelProperty("网址")
+    private String website;
+
+    @Schema(description = "QQ", example = "25682")
+    @ExcelProperty("QQ")
+    private String qq;
+
+    @Schema(description = "wechat", example = "25682")
+    @ExcelProperty("wechat")
+    private String wechat;
+
+    @Schema(description = "email", example = "25682")
+    @ExcelProperty("email")
+    private String email;
+
+    @Schema(description = "客户描述", example = "25682")
+    @ExcelProperty("客户描述")
+    private String description;
+
 }

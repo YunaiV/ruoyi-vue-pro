@@ -37,6 +37,9 @@ public interface CrmClueMapper extends BaseMapperX<CrmClueDO> {
                 .likeIfPresent(CrmClueDO::getName, pageReqVO.getName())
                 .likeIfPresent(CrmClueDO::getTelephone, pageReqVO.getTelephone())
                 .likeIfPresent(CrmClueDO::getMobile, pageReqVO.getMobile())
+                .eqIfPresent(CrmClueDO::getIndustryId, pageReqVO.getIndustryId())
+                .eqIfPresent(CrmClueDO::getLevel, pageReqVO.getLevel())
+                .eqIfPresent(CrmClueDO::getSource, pageReqVO.getSource())
                 .orderByDesc(CrmClueDO::getId);
         return selectJoinPage(pageReqVO, CrmClueDO.class, query);
     }
@@ -45,6 +48,8 @@ public interface CrmClueMapper extends BaseMapperX<CrmClueDO> {
         MPJLambdaWrapperX<CrmClueDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
         CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_LEADS.getType(), ids, userId);
+        query.selectAll(CrmClueDO.class).in(CrmClueDO::getId, ids).orderByDesc(CrmClueDO::getId);
+        // 拼接自身的查询条件
         return selectJoinList(CrmClueDO.class, query);
     }
 

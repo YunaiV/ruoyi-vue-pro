@@ -4,15 +4,18 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.io.FileUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.file.core.client.FileClient;
+import cn.iocoder.yudao.framework.file.core.client.s3.FilePresignedUrlRespDTO;
 import cn.iocoder.yudao.framework.file.core.utils.FileTypeUtils;
+import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FileCreateReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FilePageReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FilePresignedUrlRespVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.file.FileMapper;
+import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_NOT_EXISTS;
@@ -67,6 +70,13 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    public Long createFile(FileCreateReqVO createReqVO) {
+        FileDO file = BeanUtils.toBean(createReqVO, FileDO.class);
+        fileMapper.insert(file);
+        return file.getId();
+    }
+
+    @Override
     public void deleteFile(Long id) throws Exception {
         // 校验存在
         FileDO file = validateFileExists(id);
@@ -93,6 +103,14 @@ public class FileServiceImpl implements FileService {
         FileClient client = fileConfigService.getFileClient(configId);
         Assert.notNull(client, "客户端({}) 不能为空", configId);
         return client.getContent(path);
+    }
+
+    @Override
+    public FilePresignedUrlRespVO getFilePresignedUrl(String path) throws Exception {
+        FileClient fileClient = fileConfigService.getMasterFileClient();
+        FilePresignedUrlRespDTO presignedObjectUrl = fileClient.getPresignedObjectUrl(path);
+        return BeanUtils.toBean(presignedObjectUrl, FilePresignedUrlRespVO.class,
+                object -> object.setConfigId(fileClient.getId()));
     }
 
 }

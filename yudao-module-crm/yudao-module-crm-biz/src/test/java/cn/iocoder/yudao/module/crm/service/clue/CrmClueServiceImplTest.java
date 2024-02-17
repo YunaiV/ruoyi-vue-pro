@@ -15,6 +15,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
@@ -45,7 +46,7 @@ public class CrmClueServiceImplTest extends BaseDbUnitTest {
         CrmClueSaveReqVO reqVO = randomPojo(CrmClueSaveReqVO.class);
 
         // 调用
-        Long clueId = clueService.createClue(reqVO);
+        Long clueId = clueService.createClue(reqVO, getLoginUserId());
         // 断言
         assertNotNull(clueId);
         // 校验记录的属性是否正确

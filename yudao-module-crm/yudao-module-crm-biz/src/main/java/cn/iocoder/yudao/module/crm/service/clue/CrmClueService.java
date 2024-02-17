@@ -4,11 +4,11 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTransferReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTransformReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTranslateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
-import cn.iocoder.yudao.module.crm.service.clue.bo.CrmClueUpdateFollowUpReqBO;
+import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
+import jakarta.validation.Valid;
 
-import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 
@@ -23,9 +23,10 @@ public interface CrmClueService {
      * 创建线索
      *
      * @param createReqVO 创建信息
+     * @param userId      用户编号
      * @return 编号
      */
-    Long createClue(@Valid CrmClueSaveReqVO createReqVO);
+    Long createClue(@Valid CrmClueSaveReqVO createReqVO, Long userId);
 
     /**
      * 更新线索
@@ -39,7 +40,7 @@ public interface CrmClueService {
      *
      * @param clueUpdateFollowUpReqBO 信息
      */
-    void updateClueFollowUp(CrmClueUpdateFollowUpReqBO clueUpdateFollowUpReqBO);
+    void updateClueFollowUp(CrmUpdateFollowUpReqBO clueUpdateFollowUpReqBO);
 
     /**
      * 删除线索
@@ -87,6 +88,6 @@ public interface CrmClueService {
      * @param reqVO  线索编号
      * @param userId 用户编号
      */
-    void translateCustomer(CrmClueTransformReqVO reqVO, Long userId);
+    void translateCustomer(CrmClueTranslateReqVO reqVO, Long userId);
 
 }
