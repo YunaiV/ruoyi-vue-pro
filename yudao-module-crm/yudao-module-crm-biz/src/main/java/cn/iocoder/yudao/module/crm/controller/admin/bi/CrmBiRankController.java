@@ -42,4 +42,46 @@ public class CrmBiRankController {
         return success(rankingService.getReceivablePriceRank(rankingReqVO));
     }
 
+    @GetMapping("/get-contract-count-rank")
+    @Operation(summary = "获得签约合同数量排行榜")
+    @PreAuthorize("@ss.hasPermission('crm:bi-rank:query')")
+    public CommonResult<List<CrmBiRanKRespVO>> getContractCountRank(@Valid CrmBiRankReqVO rankingReqVO) {
+        return success(rankingService.getContractCountRank(rankingReqVO));
+    }
+
+    @GetMapping("/get-product-sales-rank")
+    @Operation(summary = "获得产品销量排行榜")
+    @PreAuthorize("@ss.hasPermission('crm:bi-rank:query')")
+    public CommonResult<List<CrmBiRanKRespVO>> getProductSalesRank(@Valid CrmBiRankReqVO rankingReqVO) {
+        return success(rankingService.getProductSalesRank(rankingReqVO));
+    }
+
+    @GetMapping("/get-customer-count-rank")
+    @Operation(summary = "获得新增客户数排行榜")
+    @PreAuthorize("@ss.hasPermission('crm:bi-rank:query')")
+    public CommonResult<List<CrmBiRanKRespVO>> getCustomerCountRank(@Valid CrmBiRankReqVO rankingReqVO) {
+        return success(rankingService.getCustomerCountRank(rankingReqVO));
+    }
+
+    @GetMapping("/get-contacts-count-rank")
+    @Operation(summary = "获得新增联系人数排行榜")
+    @PreAuthorize("@ss.hasPermission('crm:bi-rank:query')")
+    public CommonResult<List<CrmBiRanKRespVO>> getContactsCountRank(@Valid CrmBiRankReqVO rankingReqVO) {
+        return success(rankingService.getContactsCountRank(rankingReqVO));
+    }
+
+    @GetMapping("/get-follow-count-rank")
+    @Operation(summary = "获得跟进次数排行榜")
+    @PreAuthorize("@ss.hasPermission('crm:bi-rank:query')")
+    public CommonResult<List<CrmBiRanKRespVO>> getFollowCountRank(@Valid CrmBiRankReqVO rankingReqVO) {
+        return success(rankingService.getFollowCountRank(rankingReqVO));
+    }
+
+    @GetMapping("/get-follow-customer-count-rank")
+    @Operation(summary = "获得跟进客户数排行榜")
+    @PreAuthorize("@ss.hasPermission('crm:bi-rank:query')")
+    public CommonResult<List<CrmBiRanKRespVO>> getFollowCustomerCountRank(@Valid CrmBiRankReqVO rankingReqVO) {
+        return success(rankingService.getFollowCustomerCountRank(rankingReqVO));
+    }
+
 }
