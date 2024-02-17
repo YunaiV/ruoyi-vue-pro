@@ -93,6 +93,8 @@ public interface LogRecordConstants {
     String CRM_CONTRACT_DELETE_SUCCESS = "删除了合同【{{#contractName}}】";
     String CRM_CONTRACT_TRANSFER_SUB_TYPE = "转移合同";
     String CRM_CONTRACT_TRANSFER_SUCCESS = "将合同【{{#contract.name}}】的负责人从【{getAdminUserById{#contract.ownerUserId}}】变更为了【{getAdminUserById{#reqVO.newOwnerUserId}}】";
+    String CRM_CONTRACT_SUBMIT_SUB_TYPE = "提交合同审批";
+    String CRM_CONTRACT_SUBMIT_SUCCESS = "提交合同【{{#contractName}}】审批成功";
 
     // ======================= CRM_PRODUCT 产品 =======================
 

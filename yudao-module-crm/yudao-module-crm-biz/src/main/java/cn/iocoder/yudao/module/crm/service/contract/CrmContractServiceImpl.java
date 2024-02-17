@@ -11,20 +11,22 @@ import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.bpm.api.listener.dto.BpmResultListenerRespDTO;
 import cn.iocoder.yudao.module.bpm.api.task.BpmProcessInstanceApi;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
 import cn.iocoder.yudao.module.crm.convert.contract.CrmContractConvert;
-import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractMapper;
+import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractProductMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
-import cn.iocoder.yudao.module.crm.service.business.CrmBusinessProductService;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
+import cn.iocoder.yudao.module.crm.service.business.bo.CrmBusinessUpdateProductReqBO;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
@@ -63,11 +65,11 @@ public class CrmContractServiceImpl implements CrmContractService {
 
     @Resource
     private CrmContractMapper contractMapper;
+    @Resource
+    private CrmContractProductMapper contractProductMapper;
 
     @Resource
     private CrmPermissionService crmPermissionService;
-    @Resource
-    private CrmBusinessProductService businessProductService;
     @Resource
     private CrmProductService productService;
     @Resource
@@ -89,11 +91,18 @@ public class CrmContractServiceImpl implements CrmContractService {
         // 1.1 插入合同
         CrmContractDO contract = BeanUtils.toBean(createReqVO, CrmContractDO.class).setId(null);
         contractMapper.insert(contract);
-        // 1.2 插入商机关联商品
+        // 1.2 插入合同关联商品
         if (CollUtil.isNotEmpty(createReqVO.getProductItems())) { // 如果有的话
-            List<CrmBusinessProductDO> businessProduct = convertBusinessProductList(createReqVO, contract.getId());
-            businessProductService.createBusinessProductBatch(businessProduct);
+            List<CrmContractProductDO> productList = convertContractProductList(createReqVO, contract.getId());
+            contractProductMapper.insertBatch(productList);
             // 更新合同商品总金额
+            contractMapper.updateById(new CrmContractDO().setId(contract.getId()).setProductPrice(
+                    getSumValue(productList, CrmContractProductDO::getTotalPrice, Integer::sum)));
+            // 如果存在合同关联了商机则更新商机商品关联
+            if (contract.getBusinessId() != null) {
+                businessService.updateBusinessProduct(new CrmBusinessUpdateProductReqBO().setId(contract.getBusinessId())
+                        .setProductItems(BeanUtils.toBean(createReqVO.getProductItems(), CrmBusinessUpdateProductReqBO.CrmBusinessProductItem.class)));
+            }
         }
 
         // 2. 创建数据权限
@@ -137,29 +146,29 @@ public class CrmContractServiceImpl implements CrmContractService {
         if (CollUtil.isEmpty(updateReqVO.getProductItems())) {
             return;
         }
-        List<CrmBusinessProductDO> newProductList = convertBusinessProductList(updateReqVO, contractId);
-        List<CrmBusinessProductDO> oldProductList = businessProductService.getBusinessProductListByContractId(contractId);
-        List<List<CrmBusinessProductDO>> diffList = diffList(oldProductList, newProductList, (oldObj, newObj) -> {
-            if (ObjUtil.notEqual(oldObj.getProductId(), newObj.getProductId())) {
-                return false;
+        List<CrmContractProductDO> newProductList = convertContractProductList(updateReqVO, contractId);
+        List<CrmContractProductDO> oldProductList = contractProductMapper.selectListByContractId(contractId);
+        List<List<CrmContractProductDO>> diffList = diffList(oldProductList, newProductList, (oldObj, newObj) -> {
+            boolean equal = ObjUtil.equal(oldObj.getProductId(), newObj.getProductId());
+            if (equal) {
+                newObj.setId(oldObj.getId()); // 设置一下老的编号更新时需要使用
             }
-            newObj.setId(oldObj.getId()); // 设置一下老的编号更新时需要使用
-            return true;
+            return equal;
         });
-        if (CollUtil.isNotEmpty(diffList.getFirst())) {
-            businessProductService.createBusinessProductBatch(diffList.getFirst());
+        if (CollUtil.isNotEmpty(diffList.get(0))) {
+            contractProductMapper.insertBatch(diffList.get(0));
         }
         if (CollUtil.isNotEmpty(diffList.get(1))) {
-            businessProductService.updateBusinessProductBatch(diffList.get(1));
+            contractProductMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            businessProductService.deleteBusinessProductBatch(diffList.get(2));
+            contractProductMapper.deleteBatchIds(convertList(diffList.get(2), CrmContractProductDO::getId));
         }
     }
 
     // TODO @合同待定：缺一个取消合同的接口；只有草稿、审批中可以取消；CrmAuditStatusEnum
 
-    private List<CrmBusinessProductDO> convertBusinessProductList(CrmContractSaveReqVO reqVO, Long contractId) {
+    private List<CrmContractProductDO> convertContractProductList(CrmContractSaveReqVO reqVO, Long contractId) {
         // 校验商品存在
         Set<Long> productIds = convertSet(reqVO.getProductItems(), CrmContractSaveReqVO.CrmContractProductItem::getId);
         List<CrmProductDO> productList = productService.getProductList(productIds);
@@ -169,8 +178,8 @@ public class CrmContractServiceImpl implements CrmContractService {
         Map<Long, CrmProductDO> productMap = convertMap(productList, CrmProductDO::getId);
         return convertList(reqVO.getProductItems(), productItem -> {
             CrmProductDO product = productMap.get(productItem.getId());
-            return BeanUtils.toBean(product, CrmBusinessProductDO.class)
-                    .setId(null).setBusinessId(reqVO.getBusinessId()).setProductId(productItem.getId()).setContractId(contractId)
+            return BeanUtils.toBean(product, CrmContractProductDO.class)
+                    .setId(null).setProductId(productItem.getId()).setContractId(contractId)
                     .setCount(productItem.getCount()).setDiscountPercent(productItem.getDiscountPercent())
                     .setTotalPrice(MoneyUtils.calculator(product.getPrice(), productItem.getCount(), productItem.getDiscountPercent()));
         });
@@ -248,7 +257,8 @@ public class CrmContractServiceImpl implements CrmContractService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    // TODO @puhui999：操作日志；
+    @LogRecord(type = CRM_CONTRACT_TYPE, subType = CRM_CONTRACT_SUBMIT_SUB_TYPE, bizNo = "{{#id}}",
+            success = CRM_CONTRACT_SUBMIT_SUCCESS)
     public void submitContract(Long id, Long userId) {
         // 1. 校验合同是否在审批
         CrmContractDO contract = validateContractExists(id);
@@ -263,13 +273,41 @@ public class CrmContractServiceImpl implements CrmContractService {
         // 3. 更新合同工作流编号
         contractMapper.updateById(new CrmContractDO().setId(id).setProcessInstanceId(processInstanceId)
                 .setAuditStatus(CrmAuditStatusEnum.PROCESS.getStatus()));
+
+        // 3. 记录日志
+        LogRecordContext.putVariable("contractName", contract.getName());
     }
 
     @Override
     public void updateContractAuditStatus(BpmResultListenerRespDTO event) {
-        // TODO @puhui999：可能要判断下状态是否符合预期
+        // 判断下状态是否符合预期
+        if (!isEndResult(event.getResult())) {
+            return;
+        }
+        // 状态转换
+        if (ObjUtil.equal(event.getResult(), BpmProcessInstanceResultEnum.APPROVE.getResult())) {
+            event.setResult(CrmAuditStatusEnum.APPROVE.getStatus());
+        }
+        if (ObjUtil.equal(event.getResult(), BpmProcessInstanceResultEnum.REJECT.getResult())) {
+            event.setResult(CrmAuditStatusEnum.REJECT.getStatus());
+        }
+        if (ObjUtil.equal(event.getResult(), BpmProcessInstanceResultEnum.CANCEL.getResult())) {
+            event.setResult(CrmAuditStatusEnum.CANCEL.getStatus());
+        }
+        // 更新合同状态
         contractMapper.updateById(new CrmContractDO().setId(Long.parseLong(event.getBusinessKey()))
                 .setAuditStatus(event.getResult()));
+    }
+
+    /**
+     * 判断该结果是否处于 End 最终结果
+     *
+     * @param result 结果
+     * @return 是否
+     */
+    public static boolean isEndResult(Integer result) {
+        return ObjectUtils.equalsAny(result, BpmProcessInstanceResultEnum.APPROVE.getResult(),
+                BpmProcessInstanceResultEnum.REJECT.getResult(), BpmProcessInstanceResultEnum.CANCEL.getResult());
     }
 
     //======================= 查询相关 =======================
@@ -313,5 +351,11 @@ public class CrmContractServiceImpl implements CrmContractService {
     public Long getContractCountByBusinessId(Long businessId) {
         return contractMapper.selectCountByBusinessId(businessId);
     }
+
+    @Override
+    public List<CrmContractProductDO> getContractProductListByContractId(Long contactId) {
+        return contractProductMapper.selectListByContractId(contactId);
+    }
+
     // TODO @合同待定：需要新增一个 ContractConfigDO 表，合同配置，重点是到期提醒；
 }

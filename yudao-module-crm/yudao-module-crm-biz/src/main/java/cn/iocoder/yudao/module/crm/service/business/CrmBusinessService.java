@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusi
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.service.business.bo.CrmBusinessUpdateProductReqBO;
 import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import jakarta.validation.Valid;
 
@@ -49,6 +50,21 @@ public interface CrmBusinessService {
      * @param id 编号
      */
     void deleteBusiness(Long id);
+
+    /**
+     * 商机转移
+     *
+     * @param reqVO  请求
+     * @param userId 用户编号
+     */
+    void transferBusiness(CrmBusinessTransferReqVO reqVO, Long userId);
+
+    /**
+     * 更新商机关联商品
+     *
+     * @param updateProductReqBO 请求
+     */
+    void updateBusinessProduct(CrmBusinessUpdateProductReqBO updateProductReqBO);
 
     /**
      * 获得商机
@@ -104,14 +120,6 @@ public interface CrmBusinessService {
      * @return 商机分页
      */
     PageResult<CrmBusinessDO> getBusinessPageByContact(CrmBusinessPageReqVO pageReqVO);
-
-    /**
-     * 商机转移
-     *
-     * @param reqVO  请求
-     * @param userId 用户编号
-     */
-    void transferBusiness(CrmBusinessTransferReqVO reqVO, Long userId);
 
     /**
      * 获取关联客户的商机数量
