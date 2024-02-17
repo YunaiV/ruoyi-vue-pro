@@ -77,4 +77,5 @@ public interface CrmBiRankingMapper {
      * @return 跟进客户数排行榜
      */
     List<CrmBiRanKRespVO> selectFollowCustomerCountRank(CrmBiRankReqVO rankReqVO);
+
 }
