@@ -276,4 +276,9 @@ public class CrmClueServiceImpl implements CrmClueService {
         return SpringUtil.getBean(getClass());
     }
 
+    @Override
+    public Long getFollowLeadsCount(Long userId) {
+        return clueMapper.getFollowLeadsCount(userId);
+    }
+
 }

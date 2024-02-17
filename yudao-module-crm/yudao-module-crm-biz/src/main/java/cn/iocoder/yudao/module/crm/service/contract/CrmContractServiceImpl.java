@@ -314,4 +314,15 @@ public class CrmContractServiceImpl implements CrmContractService {
         return contractMapper.selectCountByBusinessId(businessId);
     }
     // TODO @合同待定：需要新增一个 ContractConfigDO 表，合同配置，重点是到期提醒；
+
+    @Override
+    public Long getCheckContractCount(Long userId) {
+        return contractMapper.getCheckContractCount(userId);
+    }
+
+    @Override
+    public Long getEndContractCount(Long userId) {
+        return contractMapper.getEndContractCount(userId);
+    }
+
 }

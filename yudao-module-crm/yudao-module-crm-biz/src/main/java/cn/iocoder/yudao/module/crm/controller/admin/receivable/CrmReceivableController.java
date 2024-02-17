@@ -144,4 +144,12 @@ public class CrmReceivableController {
         return CrmReceivableConvert.INSTANCE.convertPage(pageResult, userMap, customerList, contractList);
     }
 
+
+    @GetMapping("/check-receivables-count")
+    @Operation(summary = "获得待审核回款数量")
+    @PreAuthorize("@ss.hasPermission('crm:receivable:query')")
+    public CommonResult<Long> getCheckReceivablesCount() {
+        return success(receivableService.getCheckReceivablesCount(getLoginUserId()));
+    }
+
 }

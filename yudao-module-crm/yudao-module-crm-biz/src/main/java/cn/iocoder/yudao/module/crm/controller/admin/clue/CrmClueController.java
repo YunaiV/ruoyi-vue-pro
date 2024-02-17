@@ -104,4 +104,11 @@ public class CrmClueController {
         return success(Boolean.TRUE);
     }
 
+    @GetMapping("/follow-leads-count")
+    @Operation(summary = "获得分配给我的线索数量")
+    @PreAuthorize("@ss.hasPermission('crm:clue:query')")
+    public CommonResult<Long> getFollowLeadsCount() {
+        return success(clueService.getFollowLeadsCount(getLoginUserId()));
+    }
+
 }

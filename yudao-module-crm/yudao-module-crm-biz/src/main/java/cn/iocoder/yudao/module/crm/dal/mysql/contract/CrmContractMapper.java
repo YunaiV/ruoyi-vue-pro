@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageR
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.enums.common.CrmSceneTypeEnum;
 import cn.iocoder.yudao.module.crm.util.CrmQueryWrapperUtils;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -90,4 +91,33 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
         return selectCount(CrmContractDO::getBusinessId, businessId);
     }
 
+    default Long getCheckContractCount(Long userId) {
+        MPJLambdaWrapperX<CrmContractDO> query = new MPJLambdaWrapperX<>();
+
+        // 我负责的, 非公海
+        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTRACT.getType(),
+                CrmContractDO::getId, userId, CrmSceneTypeEnum.OWNER.getType(), Boolean.FALSE);
+
+        // 未提交 or 审核不通过
+        query.in(CrmContractDO::getAuditStatus, CrmAuditStatusEnum.DRAFT.getStatus(), CrmAuditStatusEnum.REJECT.getStatus());
+
+        return selectCount(query);
+    }
+
+    default Long getEndContractCount(Long userId) {
+        MPJLambdaWrapperX<CrmContractDO> query = new MPJLambdaWrapperX<>();
+
+        // 我负责的, 非公海
+        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTRACT.getType(),
+                CrmContractDO::getId, userId, CrmSceneTypeEnum.OWNER.getType(), Boolean.FALSE);
+
+        // 即将到期
+        LocalDateTime beginOfToday = LocalDateTimeUtil.beginOfDay(LocalDateTime.now());
+        LocalDateTime endOfToday = LocalDateTimeUtil.endOfDay(LocalDateTime.now());
+        int REMIND_DAYS = 20;
+        query.eq(CrmContractDO::getAuditStatus, CrmAuditStatusEnum.APPROVE.getStatus())
+                .between(CrmContractDO::getEndTime, beginOfToday, endOfToday.plusDays(REMIND_DAYS));
+
+        return selectCount(query);
+    }
 }

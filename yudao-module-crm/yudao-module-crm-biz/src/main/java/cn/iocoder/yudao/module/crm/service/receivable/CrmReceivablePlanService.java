@@ -77,4 +77,11 @@ public interface CrmReceivablePlanService {
      */
     PageResult<CrmReceivablePlanDO> getReceivablePlanPageByCustomerId(CrmReceivablePlanPageReqVO pageReqVO);
 
+    /**
+     * 获得待回款提醒数量
+     *
+     * @param userId 用户编号
+     * @return 提醒数量
+     */
+    Long getRemindReceivablePlanCount(Long userId);
 }

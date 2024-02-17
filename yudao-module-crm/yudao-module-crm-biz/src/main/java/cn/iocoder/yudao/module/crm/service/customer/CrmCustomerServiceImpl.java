@@ -465,10 +465,28 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         return customerMapper.selectPage(pageReqVO, userId);
     }
 
+    @Override
     public PageResult<CrmCustomerDO> getPutInPoolRemindCustomerPage(CrmCustomerPageReqVO pageReqVO,
                                                                     CrmCustomerPoolConfigDO poolConfigDO,
                                                                     Long userId) {
         return customerMapper.selectPutInPoolRemindCustomerPage(pageReqVO, poolConfigDO, userId);
+    }
+
+    @Override
+    public Long getPutInPoolRemindCustomerCount(CrmCustomerPageReqVO pageReqVO,
+                                                CrmCustomerPoolConfigDO poolConfigDO,
+                                                Long userId) {
+        return customerMapper.selectPutInPoolRemindCustomerCount(pageReqVO, poolConfigDO, userId);
+    }
+
+    @Override
+    public Long getTodayCustomerCount(Long userId) {
+        return customerMapper.getTodayCustomerCount(userId);
+    }
+
+    @Override
+    public Long getFollowCustomerCount(Long userId) {
+        return customerMapper.getFollowCustomerCount(userId);
     }
 
     // ======================= 校验相关 =======================

@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
+import cn.iocoder.yudao.module.crm.enums.common.CrmSceneTypeEnum;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerPoolConfigService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -148,6 +149,41 @@ public class CrmCustomerController {
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
         return success(CrmCustomerConvert.INSTANCE.convertPage(pageResult, userMap, deptMap, poolDayMap));
     }
+
+    @GetMapping("/put-in-pool-remind-count")
+    @Operation(summary = "获得待进入公海客户数量")
+    @PreAuthorize("@ss.hasPermission('crm:customer:query')")
+    public CommonResult<Long> getPutInPoolRemindCustomerCount() {
+        // 获取公海配置 TODO @dbh52：合并到 getPutInPoolRemindCustomerPage 会更合适哈；
+        CrmCustomerPoolConfigDO poolConfigDO = customerPoolConfigService.getCustomerPoolConfig();
+        if (ObjUtil.isNull(poolConfigDO)
+                || Boolean.FALSE.equals(poolConfigDO.getEnabled())
+                || Boolean.FALSE.equals(poolConfigDO.getNotifyEnabled())) {
+            throw exception(CUSTOMER_POOL_CONFIG_NOT_EXISTS_OR_DISABLED);
+        }
+
+        CrmCustomerPageReqVO pageVO = new CrmCustomerPageReqVO();
+        pageVO.setPool(null);
+        pageVO.setContactStatus(CrmCustomerPageReqVO.CONTACT_TODAY);
+        pageVO.setSceneType(CrmSceneTypeEnum.OWNER.getType());
+
+        return success(customerService.getPutInPoolRemindCustomerCount(pageVO, poolConfigDO, getLoginUserId()));
+    }
+
+    @GetMapping("/today-customer-count")
+    @Operation(summary = "获得今日需联系客户数量")
+    @PreAuthorize("@ss.hasPermission('crm:customer:query')")
+    public CommonResult<Long> getTodayCustomerCount() {
+        return success(customerService.getTodayCustomerCount(getLoginUserId()));
+    }
+
+    @GetMapping("/follow-customer-count")
+    @Operation(summary = "获得分配给我的客户数量")
+    @PreAuthorize("@ss.hasPermission('crm:customer:query')")
+    public CommonResult<Long> getFollowCustomerCount() {
+        return success(customerService.getFollowCustomerCount(getLoginUserId()));
+    }
+
 
     /**
      * 获取距离进入公海的时间

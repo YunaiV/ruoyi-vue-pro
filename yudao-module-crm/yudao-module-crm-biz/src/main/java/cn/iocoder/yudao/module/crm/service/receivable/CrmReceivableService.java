@@ -78,4 +78,12 @@ public interface CrmReceivableService {
      */
     PageResult<CrmReceivableDO> getReceivablePageByCustomerId(CrmReceivablePageReqVO pageReqVO);
 
+    /**
+     * 获得待审核回款数量
+     *
+     * @param userId 用户编号
+     * @return 提醒数量
+     */
+    Long getCheckReceivablesCount(Long userId);
+
 }

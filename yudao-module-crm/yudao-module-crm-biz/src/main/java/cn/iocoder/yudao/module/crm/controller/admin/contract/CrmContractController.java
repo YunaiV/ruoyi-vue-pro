@@ -192,4 +192,19 @@ public class CrmContractController {
         return success(true);
     }
 
+    @GetMapping("/check-contract-count")
+    @Operation(summary = "获得待审核合同数量")
+    @PreAuthorize("@ss.hasPermission('crm:contract:query')")
+    public CommonResult<Long> getCheckContractCount() {
+        return success(contractService.getCheckContractCount(getLoginUserId()));
+    }
+
+
+    @GetMapping("/end-contract-count")
+    @Operation(summary = "获得即将到期的合同数量")
+    @PreAuthorize("@ss.hasPermission('crm:contract:query')")
+    public CommonResult<Long> getEndContractCount() {
+        return success(contractService.getEndContractCount(getLoginUserId()));
+    }
+
 }
