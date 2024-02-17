@@ -27,7 +27,7 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 public class ErpProductCategoryServiceImpl implements ErpProductCategoryService {
 
     @Resource
-    private ErpProductCategoryMapper productCategoryMapper;
+    private ErpProductCategoryMapper erpProductCategoryMapper;
 
     @Resource
     @Lazy // 延迟加载，避免循环依赖
@@ -42,7 +42,7 @@ public class ErpProductCategoryServiceImpl implements ErpProductCategoryService 
 
         // 插入
         ErpProductCategoryDO category = BeanUtils.toBean(createReqVO, ErpProductCategoryDO.class);
-        productCategoryMapper.insert(category);
+        erpProductCategoryMapper.insert(category);
         // 返回
         return category.getId();
     }
@@ -58,7 +58,7 @@ public class ErpProductCategoryServiceImpl implements ErpProductCategoryService 
 
         // 更新
         ErpProductCategoryDO updateObj = BeanUtils.toBean(updateReqVO, ErpProductCategoryDO.class);
-        productCategoryMapper.updateById(updateObj);
+        erpProductCategoryMapper.updateById(updateObj);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class ErpProductCategoryServiceImpl implements ErpProductCategoryService 
         // 1.1 校验存在
         validateProductCategoryExists(id);
         // 1.2 校验是否有子产品分类
-        if (productCategoryMapper.selectCountByParentId(id) > 0) {
+        if (erpProductCategoryMapper.selectCountByParentId(id) > 0) {
             throw exception(PRODUCT_CATEGORY_EXITS_CHILDREN);
         }
         // 1.3 校验是否有产品
@@ -74,11 +74,11 @@ public class ErpProductCategoryServiceImpl implements ErpProductCategoryService 
             throw exception(PRODUCT_CATEGORY_EXITS_PRODUCT);
         }
         // 2. 删除
-        productCategoryMapper.deleteById(id);
+        erpProductCategoryMapper.deleteById(id);
     }
 
     private void validateProductCategoryExists(Long id) {
-        if (productCategoryMapper.selectById(id) == null) {
+        if (erpProductCategoryMapper.selectById(id) == null) {
             throw exception(PRODUCT_CATEGORY_NOT_EXISTS);
         }
     }
@@ -92,7 +92,7 @@ public class ErpProductCategoryServiceImpl implements ErpProductCategoryService 
             throw exception(PRODUCT_CATEGORY_PARENT_ERROR);
         }
         // 2. 父产品分类不存在
-        ErpProductCategoryDO parentCategory = productCategoryMapper.selectById(parentId);
+        ErpProductCategoryDO parentCategory = erpProductCategoryMapper.selectById(parentId);
         if (parentCategory == null) {
             throw exception(PRODUCT_CATEGORY_PARENT_NOT_EXITS);
         }
@@ -110,7 +110,7 @@ public class ErpProductCategoryServiceImpl implements ErpProductCategoryService 
             if (parentId == null || ErpProductCategoryDO.PARENT_ID_ROOT.equals(parentId)) {
                 break;
             }
-            parentCategory = productCategoryMapper.selectById(parentId);
+            parentCategory = erpProductCategoryMapper.selectById(parentId);
             if (parentCategory == null) {
                 break;
             }
@@ -118,7 +118,7 @@ public class ErpProductCategoryServiceImpl implements ErpProductCategoryService 
     }
 
     private void validateProductCategoryNameUnique(Long id, Long parentId, String name) {
-        ErpProductCategoryDO productCategory = productCategoryMapper.selectByParentIdAndName(parentId, name);
+        ErpProductCategoryDO productCategory = erpProductCategoryMapper.selectByParentIdAndName(parentId, name);
         if (productCategory == null) {
             return;
         }
@@ -133,17 +133,17 @@ public class ErpProductCategoryServiceImpl implements ErpProductCategoryService 
 
     @Override
     public ErpProductCategoryDO getProductCategory(Long id) {
-        return productCategoryMapper.selectById(id);
+        return erpProductCategoryMapper.selectById(id);
     }
 
     @Override
     public List<ErpProductCategoryDO> getProductCategoryList(ErpProductCategoryListReqVO listReqVO) {
-        return productCategoryMapper.selectList(listReqVO);
+        return erpProductCategoryMapper.selectList(listReqVO);
     }
 
     @Override
     public List<ErpProductCategoryDO> getProductCategoryList(Collection<Long> ids) {
-        return productCategoryMapper.selectBatchIds(ids);
+        return erpProductCategoryMapper.selectBatchIds(ids);
     }
 
 }

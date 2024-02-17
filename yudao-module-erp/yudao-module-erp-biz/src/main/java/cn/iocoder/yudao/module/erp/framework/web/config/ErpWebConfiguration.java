@@ -17,7 +17,7 @@ public class ErpWebConfiguration {
      * erp 模块的 API 分组
      */
     @Bean
-    public GroupedOpenApi tradeGroupedOpenApi() {
+    public GroupedOpenApi erpGroupedOpenApi() {
         return YudaoSwaggerAutoConfiguration.buildGroupedOpenApi("erp");
     }
 
