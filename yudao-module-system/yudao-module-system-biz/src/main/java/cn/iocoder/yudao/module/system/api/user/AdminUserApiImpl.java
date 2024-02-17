@@ -38,9 +38,9 @@ public class AdminUserApiImpl implements AdminUserApi {
     }
 
     @Override
-    public List<AdminUserRespDTO> getUserListBySubordinate(Long userId) {
+    public List<AdminUserRespDTO> getUserListBySubordinate(Long id) {
         // 1.1 获取用户负责的部门
-        AdminUserDO user = userService.getUser(userId);
+        AdminUserDO user = userService.getUser(id);
         if (user == null) {
             return Collections.emptyList();
         }
@@ -49,7 +49,7 @@ public class AdminUserApiImpl implements AdminUserApi {
         if (dept == null) {
             return Collections.emptyList();
         }
-        if (ObjUtil.notEqual(dept.getLeaderUserId(), userId)) { // 校验为负责人
+        if (ObjUtil.notEqual(dept.getLeaderUserId(), id)) { // 校验为负责人
             return Collections.emptyList();
         }
         deptIds.add(dept.getId());
@@ -61,7 +61,7 @@ public class AdminUserApiImpl implements AdminUserApi {
 
         // 2. 获取部门对应的用户信息
         List<AdminUserDO> users = userService.getUserListByDeptIds(deptIds);
-        users.removeIf(item -> ObjUtil.equal(item.getId(), userId)); // 排除自己
+        users.removeIf(item -> ObjUtil.equal(item.getId(), id)); // 排除自己
         return BeanUtils.toBean(users, AdminUserRespDTO.class);
     }
 
