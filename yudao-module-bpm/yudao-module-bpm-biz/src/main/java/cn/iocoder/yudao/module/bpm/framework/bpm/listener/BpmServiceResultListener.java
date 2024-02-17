@@ -5,10 +5,10 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.bpm.api.listener.BpmResultListenerApi;
 import cn.iocoder.yudao.module.bpm.api.listener.dto.BpmResultListenerRespDTO;
 import cn.iocoder.yudao.module.bpm.framework.bpm.core.event.BpmProcessInstanceResultEvent;
-import jakarta.annotation.Resource;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 // TODO @芋艿：后续改成支持 RPC

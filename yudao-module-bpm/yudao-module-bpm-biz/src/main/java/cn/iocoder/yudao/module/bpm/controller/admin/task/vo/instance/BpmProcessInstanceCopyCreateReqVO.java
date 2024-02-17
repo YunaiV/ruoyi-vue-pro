@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Schema(description = "管理后台 - 流程实例抄送的创建 Request VO")

@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.math.BigDecimal;

@@ -7,8 +7,8 @@ import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTransferReqVO
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTranslateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
 import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
-import jakarta.validation.Valid;
 
+import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 

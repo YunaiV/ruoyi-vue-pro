@@ -5,8 +5,8 @@ import cn.iocoder.yudao.module.erp.controller.admin.stock.vo.in.ErpStockInPageRe
 import cn.iocoder.yudao.module.erp.controller.admin.stock.vo.in.ErpStockInSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockInDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockInItemDO;
-import jakarta.validation.Valid;
 
+import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 

@@ -4,8 +4,9 @@ import cn.iocoder.yudao.module.bpm.api.listener.BpmResultListenerApi;
 import cn.iocoder.yudao.module.bpm.api.listener.dto.BpmResultListenerRespDTO;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractServiceImpl;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 // TODO @芋艿：后续改成支持 RPC
 /**

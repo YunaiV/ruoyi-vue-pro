@@ -6,13 +6,13 @@ import cn.iocoder.yudao.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-import jakarta.annotation.Resource;
 import lombok.AllArgsConstructor;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -45,7 +45,8 @@ public class MultiInstanceHandler {
     public Set<String> getUserIds(DelegateExecution execution) {
         Set<String> candidateUserIds = new LinkedHashSet<>();
         FlowElement flowElement = execution.getCurrentFlowElement();
-        if (ObjectUtil.isNotEmpty(flowElement) && flowElement instanceof UserTask userTask) {
+        if (ObjectUtil.isNotEmpty(flowElement) && flowElement instanceof UserTask) {
+            UserTask userTask = (UserTask) flowElement;
             String dataType = userTask.getAttributeValue(BpmnModelConstants.NAMESPACE, BpmnModelConstants.PROCESS_CUSTOM_DATA_TYPE);
             if ("USERS".equals(dataType) && CollUtil.isNotEmpty(userTask.getCandidateUsers())) {
                 // 添加候选用户id

@@ -15,7 +15,6 @@ import cn.iocoder.yudao.module.bpm.service.candidate.BpmCandidateSourceInfoProce
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
 import cn.iocoder.yudao.module.bpm.service.task.cc.dto.BpmDelegateExecutionDTO;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -25,6 +24,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -93,7 +93,7 @@ public class BpmProcessInstanceCopyServiceImpl implements BpmProcessInstanceCopy
             }
             copyDO.setStartUserId(Long.parseLong(processInstance.getStartUserId()));
             copyDO.setProcessInstanceName(processInstance.getName());
-            copyDO.setCategory(processInstance.getProcessDefinitionCategory());
+            copyDO.setCategory(null); // TODO 芋艿：貌似新版本，没 processInstance.getProcessDefinitionCategory() 字段？
             copyDO.setReason(sourceInfo.getReason());
             copyDO.setCreator(sourceInfo.getCreator());
             copyDO.setCreateTime(LocalDateTime.now());
@@ -126,7 +126,8 @@ public class BpmProcessInstanceCopyServiceImpl implements BpmProcessInstanceCopy
         BpmProcessInstanceCopyDO copy = new BpmProcessInstanceCopyDO()
                 .setTaskId(reqVO.getTaskId()).setTaskName(task.getName())
                 .setProcessInstanceId(processInstanceId).setStartUserId(Long.valueOf(processInstance.getStartUserId()))
-                .setProcessInstanceName(processInstance.getName()).setCategory(processInstance.getProcessDefinitionCategory())
+                .setProcessInstanceName(processInstance.getName())
+                .setCategory(null)  // TODO 芋艿：貌似新版本，没 processInstance.getProcessDefinitionCategory() 字段？
                 .setReason(reqVO.getReason());
         processInstanceCopyMapper.insert(copy);
     }

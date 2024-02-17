@@ -4,9 +4,10 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.backlog.vo.CrmTodayCustomerPageReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.customer.CrmCustomerMapper;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
+
+import javax.annotation.Resource;
 
 /**
  * 待办消息 Service 实现类

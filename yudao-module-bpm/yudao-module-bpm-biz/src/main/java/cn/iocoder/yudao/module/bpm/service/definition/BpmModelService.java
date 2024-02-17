@@ -2,8 +2,9 @@ package cn.iocoder.yudao.module.bpm.service.definition;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.*;
-import jakarta.validation.Valid;
 import org.flowable.bpmn.model.BpmnModel;
+
+import javax.validation.Valid;
 
 /**
  * Flowable流程模型接口
