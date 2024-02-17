@@ -58,18 +58,15 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
         // Backlog: 即将到期的合同
         LocalDateTime beginOfToday = LocalDateTimeUtil.beginOfDay(LocalDateTime.now());
         LocalDateTime endOfToday = LocalDateTimeUtil.endOfDay(LocalDateTime.now());
-        if (CrmContractPageReqVO.EXPIRY_TYPE_ABOUT_TO_EXPIRE.equals(pageReqVO.getExpiryType())) {
-            // 即将到期
+        if (CrmContractPageReqVO.EXPIRY_TYPE_ABOUT_TO_EXPIRE.equals(pageReqVO.getExpiryType())) { // 即将到期
             // TODO: @芋艿 需要配置 提前提醒天数
             int REMIND_DAYS = 20;
             query.eq(CrmContractDO::getAuditStatus, CrmAuditStatusEnum.APPROVE.getStatus())
                     .between(CrmContractDO::getEndTime, beginOfToday, endOfToday.plusDays(REMIND_DAYS));
-        } else if (CrmContractPageReqVO.EXPIRY_TYPE_EXPIRED.equals(pageReqVO.getExpiryType())) {
-            // 已到期
+        } else if (CrmContractPageReqVO.EXPIRY_TYPE_EXPIRED.equals(pageReqVO.getExpiryType())) { // 已到期
             query.eq(CrmContractDO::getAuditStatus, CrmAuditStatusEnum.APPROVE.getStatus())
                     .lt(CrmContractDO::getEndTime, endOfToday);
         }
-
         return selectJoinPage(pageReqVO, CrmContractDO.class, query);
     }
 
