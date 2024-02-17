@@ -16,13 +16,13 @@
         <module>yudao-module-system</module>
         <module>yudao-module-infra</module>
 <!--        <module>yudao-module-member</module>-->
-        <module>yudao-module-bpm</module>
+<!--        <module>yudao-module-bpm</module>-->
 <!--        <module>yudao-module-report</module>-->
 <!--        <module>yudao-module-mp</module>-->
 <!--        <module>yudao-module-pay</module>-->
 <!--        <module>yudao-module-mall</module>-->
-        <module>yudao-module-crm</module>
-        <module>yudao-module-erp</module>
+<!--        <module>yudao-module-crm</module>-->
+<!--        <module>yudao-module-erp</module>-->
         <!-- 示例项目 -->
 <!--        <module>yudao-example</module>-->
     </modules>
@@ -32,7 +32,7 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>2.0.0-snapshot</revision>
+        <revision>2.0.1-snapshot</revision>
         <!-- Maven 相关 -->
         <java.version>21</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
