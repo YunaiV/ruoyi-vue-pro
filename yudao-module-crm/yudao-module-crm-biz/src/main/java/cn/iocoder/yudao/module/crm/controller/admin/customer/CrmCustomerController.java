@@ -22,7 +22,6 @@ import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,7 +30,6 @@ import org.mapstruct.ap.internal.util.Collections;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -253,19 +251,13 @@ public class CrmCustomerController {
         ExcelUtils.write(response, "客户导入模板.xls", "客户列表", CrmCustomerImportExcelVO.class, list);
     }
 
-    // TODO @puhui999：updateSupport 要不改成前端必须传递；哈哈哈，代码排版看着有点乱；
-    // TODO @puhui999：加一个选择负责人；允许空，空就进入公海；
     @PostMapping("/import")
     @Operation(summary = "导入客户")
-    @Parameters({
-            @Parameter(name = "file", description = "Excel 文件", required = true),
-            @Parameter(name = "updateSupport", description = "是否支持更新，默认为 false", example = "true")
-    })
     @PreAuthorize("@ss.hasPermission('system:customer:import')")
-    public CommonResult<CrmCustomerImportRespVO> importExcel(@RequestParam("file") MultipartFile file, @RequestParam(value = "updateSupport", required = false, defaultValue = "false") Boolean updateSupport)
+    public CommonResult<CrmCustomerImportRespVO> importExcel(@Valid @RequestBody CrmCustomerImportReqVO importReqVO)
             throws Exception {
-        List<CrmCustomerImportExcelVO> list = ExcelUtils.read(file, CrmCustomerImportExcelVO.class);
-        return success(customerService.importCustomerList(list, updateSupport, getLoginUserId()));
+        List<CrmCustomerImportExcelVO> list = ExcelUtils.read(importReqVO.getFile(), CrmCustomerImportExcelVO.class);
+        return success(customerService.importCustomerList(list, importReqVO));
     }
 
     @PutMapping("/transfer")

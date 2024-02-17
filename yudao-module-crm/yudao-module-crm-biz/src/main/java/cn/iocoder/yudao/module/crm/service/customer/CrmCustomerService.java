@@ -110,11 +110,10 @@ public interface CrmCustomerService {
      * 批量导入客户
      *
      * @param importCustomers 导入客户列表
-     * @param isUpdateSupport 是否支持更新
-     * @param userId          用户编号
+     * @param importReqVO     请求
      * @return 导入结果
      */
-    CrmCustomerImportRespVO importCustomerList(List<CrmCustomerImportExcelVO> importCustomers, Boolean isUpdateSupport, Long userId);
+    CrmCustomerImportRespVO importCustomerList(List<CrmCustomerImportExcelVO> importCustomers, CrmCustomerImportReqVO importReqVO);
 
     // ==================== 公海相关操作 ====================
 

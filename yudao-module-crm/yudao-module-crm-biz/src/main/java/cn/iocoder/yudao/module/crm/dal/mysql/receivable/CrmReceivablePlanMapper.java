@@ -52,22 +52,20 @@ public interface CrmReceivablePlanMapper extends BaseMapperX<CrmReceivablePlanDO
         // Backlog: 回款提醒类型
         LocalDateTime beginOfToday = LocalDateTimeUtil.beginOfDay(LocalDateTime.now());
         LocalDateTime endOfToday = LocalDateTimeUtil.endOfDay(LocalDateTime.now());
-        if (CrmReceivablePlanPageReqVO.REMIND_NEEDED.equals(pageReqVO.getRemindType())) {
-            // 待回款
+        if (CrmReceivablePlanPageReqVO.REMIND_TYPE_NEEDED.equals(pageReqVO.getRemindType())) { // 待回款
             query.isNull(CrmReceivablePlanDO::getReceivableId)
                     .gt(CrmReceivablePlanDO::getReturnTime, beginOfToday)
+                    // TODO @dhb52：这里看看怎么改成不要使用 to_days
                     .apply("to_days(return_time) <= to_days(now())+ remind_days");
-        } else if (CrmReceivablePlanPageReqVO.REMIND_EXPIRED.equals(pageReqVO.getRemindType())) {
-            // 已逾期
+        } else if (CrmReceivablePlanPageReqVO.REMIND_TYPE_EXPIRED.equals(pageReqVO.getRemindType())) {  // 已逾期
             query.isNull(CrmReceivablePlanDO::getReceivableId)
                     .lt(CrmReceivablePlanDO::getReturnTime, endOfToday);
-        } else if (CrmReceivablePlanPageReqVO.REMIND_RECEIVED.equals(pageReqVO.getRemindType())) {
-            // 已回款
+        } else if (CrmReceivablePlanPageReqVO.REMIND_TYPE_RECEIVED.equals(pageReqVO.getRemindType())) { // 已回款
             query.isNotNull(CrmReceivablePlanDO::getReceivableId)
                     .gt(CrmReceivablePlanDO::getReturnTime, beginOfToday)
+                    // TODO @dhb52：这里看看怎么改成不要使用 to_days
                     .apply("to_days(return_time) <= to_days(now()) + remind_days");
         }
-
 
         return selectJoinPage(pageReqVO, CrmReceivablePlanDO.class, query);
     }

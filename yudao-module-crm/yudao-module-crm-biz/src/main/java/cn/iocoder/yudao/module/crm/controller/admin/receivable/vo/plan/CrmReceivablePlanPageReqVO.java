@@ -14,12 +14,18 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class CrmReceivablePlanPageReqVO extends PageParam {
 
-    // 待回款
-    public final static Integer REMIND_NEEDED = 1;
-    // 已逾期
-    public final static Integer REMIND_EXPIRED = 2;
-    // 已回款
-    public final static Integer REMIND_RECEIVED = 3;
+    /**
+     * 提醒类型 - 待回款
+     */
+    public final static Integer REMIND_TYPE_NEEDED = 1;
+    /**
+     * 提醒类型 - 已逾期
+     */
+    public final static Integer REMIND_TYPE_EXPIRED = 2;
+    /**
+     * 提醒类型 - 已回款
+     */
+    public final static Integer REMIND_TYPE_RECEIVED = 3;
 
     @Schema(description = "客户编号", example = "18026")
     private Long customerId;

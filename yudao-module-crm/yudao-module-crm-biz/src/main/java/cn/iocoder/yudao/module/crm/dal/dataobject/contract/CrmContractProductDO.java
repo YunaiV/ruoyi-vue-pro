@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.dal.dataobject.business;
+package cn.iocoder.yudao.module.crm.dal.dataobject.contract;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
@@ -8,19 +8,19 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * 商机产品关联表 DO
+ * 合同产品关联表 DO
  *
- * @author lzxhqs
+ * @author HUIHUI
  */
-@TableName("crm_business_product")
-@KeySequence("crm_business_product_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName("crm_contract_product")
+@KeySequence("crm_contract_product_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CrmBusinessProductDO extends BaseDO {
+public class CrmContractProductDO extends BaseDO {
 
     /**
      * 主键
@@ -28,17 +28,17 @@ public class CrmBusinessProductDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 商机编号
-     *
-     * 关联 {@link CrmBusinessDO#getId()}
-     */
-    private Long businessId;
-    /**
      * 产品编号
      *
      * 关联 {@link CrmProductDO#getId()}
      */
     private Long productId;
+    /**
+     * 合同编号
+     *
+     * 关联 {@link CrmContractDO#getId()}
+     */
+    private Long contractId;
     /**
      * 产品单价
      */
@@ -57,6 +57,8 @@ public class CrmBusinessProductDO extends BaseDO {
     private Integer discountPercent;
     /**
      * 总计价格（折扣后价格）
+     *
+     * TODO @puhui999：可以写下计算公式哈；
      */
     private Integer totalPrice;
 

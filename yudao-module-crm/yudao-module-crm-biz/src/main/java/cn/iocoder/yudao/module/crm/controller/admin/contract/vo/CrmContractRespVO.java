@@ -132,6 +132,7 @@ public class CrmContractRespVO {
     @Schema(description = "产品列表")
     private List<CrmContractProductItemRespVO> productItems;
 
+    // TODO @puhui999：可以直接叫 Item
     @Schema(description = "产品列表")
     @Data
     @NoArgsConstructor

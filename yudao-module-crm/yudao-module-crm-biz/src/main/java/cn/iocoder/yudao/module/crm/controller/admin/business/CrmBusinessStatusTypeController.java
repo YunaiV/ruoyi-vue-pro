@@ -14,8 +14,8 @@ import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusiness
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypeQueryVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypeRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypeSaveReqVO;
-import cn.iocoder.yudao.module.crm.convert.businessstatus.CrmBusinessStatusConvert;
-import cn.iocoder.yudao.module.crm.convert.businessstatustype.CrmBusinessStatusTypeConvert;
+import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessStatusConvert;
+import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessStatusTypeConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusTypeDO;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessStatusService;

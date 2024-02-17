@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.convert.businessstatustype;
+package cn.iocoder.yudao.module.crm.convert.business;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.type.CrmBusinessStatusTypeRespVO;
