@@ -16,6 +16,7 @@ import java.util.List;
 @Mapper
 public interface CrmContractProductMapper extends BaseMapperX<CrmContractProductDO> {
 
+    // TODO @puhui999：用不到的方法，看看是不是删除哈
     default void deleteByContractId(Long contractId) { // TODO @lzxhqs：第一个方法，和类之间最好空一行；
         delete(CrmContractProductDO::getContractId, contractId);
     }

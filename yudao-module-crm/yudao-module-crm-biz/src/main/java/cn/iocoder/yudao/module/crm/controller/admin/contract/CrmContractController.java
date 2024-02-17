@@ -46,6 +46,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static java.util.Collections.singletonList;
 
 @Tag(name = "管理后台 - CRM 合同")
 @RestController
@@ -102,7 +103,7 @@ public class CrmContractController {
         }
 
         // 2. 拼接合同信息
-        List<CrmContractRespVO> respVOList = buildContractDetailList(Collections.singletonList(contract));
+        List<CrmContractRespVO> respVOList = buildContractDetailList(singletonList(contract));
         return success(respVOList.get(0));
     }
 

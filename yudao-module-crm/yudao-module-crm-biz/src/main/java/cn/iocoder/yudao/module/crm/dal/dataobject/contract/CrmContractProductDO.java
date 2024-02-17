@@ -57,6 +57,8 @@ public class CrmContractProductDO extends BaseDO {
     private Integer discountPercent;
     /**
      * 总计价格（折扣后价格）
+     *
+     * TODO @puhui999：可以写下计算公式哈；
      */
     private Integer totalPrice;
 

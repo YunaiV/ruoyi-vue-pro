@@ -77,6 +77,7 @@ public class CrmBusinessSaveReqVO {
     @Schema(description = "联系人编号", example = "110")
     private Long contactId; // 使用场景，在【联系人详情】添加商机时，如果需要关联两者，需要传递 contactId 字段
 
+    // TODO @puhui999：传递 items 就行啦；
     @Schema(description = "产品列表")
     private List<CrmBusinessProductItem> productItems;
 
@@ -86,7 +87,7 @@ public class CrmBusinessSaveReqVO {
     @AllArgsConstructor
     public static class CrmBusinessProductItem {
 
-        @Schema(description = "产品编号", example = "20529")
+        @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "20529")
         @NotNull(message = "产品编号不能为空")
         private Long id;
 

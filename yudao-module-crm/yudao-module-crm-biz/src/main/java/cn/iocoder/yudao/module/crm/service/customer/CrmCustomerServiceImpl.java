@@ -266,10 +266,10 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
                 CrmCustomerDO customer = initCustomer(importCustomer, importReqVO.getOwnerUserId());
                 customerMapper.insert(customer);
                 respVO.getCreateCustomerNames().add(importCustomer.getName());
+                // 1.2 创建数据权限
                 if (importReqVO.getOwnerUserId() != null) {
-                    // 1.2 创建数据权限
                     permissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
-                            .setBizId(customer.getId()).setUserId(importReqVO.getOwnerUserId()).setLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
+                            .setBizId(customer.getId()).setUserId(importReqVO.getOwnerUserId()).setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
                 }
                 // 1.3 记录操作日志
                 getSelf().importCustomerLog(customer, false);

@@ -23,6 +23,7 @@ public class CrmBusinessUpdateProductReqBO {
     @NotNull(message = "商机编号不能为空")
     private Long id;
 
+    // TODO @芋艿：再想想
     @NotEmpty(message = "产品列表不能为空")
     private List<CrmBusinessProductItem> productItems;
 

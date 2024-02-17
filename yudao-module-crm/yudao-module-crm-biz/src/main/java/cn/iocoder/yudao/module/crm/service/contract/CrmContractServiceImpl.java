@@ -61,7 +61,10 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_E
 @Validated
 public class CrmContractServiceImpl implements CrmContractService {
 
-    public static final String CONTRACT_APPROVE = "contract-approve"; // 合同审批流程标识
+    /**
+     * BPM 合同审批流程标识
+     */
+    public static final String CONTRACT_APPROVE = "contract-approve";
 
     @Resource
     private CrmContractMapper contractMapper;
@@ -149,11 +152,11 @@ public class CrmContractServiceImpl implements CrmContractService {
         List<CrmContractProductDO> newProductList = convertContractProductList(updateReqVO, contractId);
         List<CrmContractProductDO> oldProductList = contractProductMapper.selectListByContractId(contractId);
         List<List<CrmContractProductDO>> diffList = diffList(oldProductList, newProductList, (oldObj, newObj) -> {
-            boolean equal = ObjUtil.equal(oldObj.getProductId(), newObj.getProductId());
-            if (equal) {
+            boolean match = ObjUtil.equal(oldObj.getProductId(), newObj.getProductId());
+            if (match) {
                 newObj.setId(oldObj.getId()); // 设置一下老的编号更新时需要使用
             }
-            return equal;
+            return match;
         });
         if (CollUtil.isNotEmpty(diffList.get(0))) {
             contractProductMapper.insertBatch(diffList.get(0));

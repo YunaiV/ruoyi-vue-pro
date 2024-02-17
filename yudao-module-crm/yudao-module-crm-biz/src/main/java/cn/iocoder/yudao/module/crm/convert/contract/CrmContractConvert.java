@@ -61,9 +61,8 @@ public interface CrmContractConvert {
                                                List<CrmProductDO> productList) {
         respVO.setProductItems(CollectionUtils.convertList(productList, product -> {
             CrmContractRespVO.CrmContractProductItemRespVO productItemRespVO = BeanUtils.toBean(product, CrmContractRespVO.CrmContractProductItemRespVO.class);
-            findAndThen(contractProductMap, product.getId(), contractProduct -> {
-                productItemRespVO.setCount(contractProduct.getCount()).setDiscountPercent(contractProduct.getDiscountPercent());
-            });
+            findAndThen(contractProductMap, product.getId(), contractProduct ->
+                    productItemRespVO.setCount(contractProduct.getCount()).setDiscountPercent(contractProduct.getDiscountPercent()));
             return productItemRespVO;
         }));
     }
