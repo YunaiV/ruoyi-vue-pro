@@ -251,7 +251,7 @@
 
 ### ERP 系统
 
-![功能图](/.image/common/erp-preview.png)
+![功能图](/.image/common/erp-feature.png)
 
 演示地址：<https://doc.iocoder.cn/erp-preview/>
 
