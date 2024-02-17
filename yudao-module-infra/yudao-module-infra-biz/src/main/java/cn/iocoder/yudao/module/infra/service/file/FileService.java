@@ -58,9 +58,9 @@ public interface FileService {
     /**
      * 生成文件预签名地址信息
      *
-     * @param fileName 文件名称
+     * @param path 文件路径
      * @return 预签名地址信息
      */
-    FilePresignedUrlRespVO getFilePresignedUrl(String fileName) throws Exception;
+    FilePresignedUrlRespVO getFilePresignedUrl(String path) throws Exception;
 
 }

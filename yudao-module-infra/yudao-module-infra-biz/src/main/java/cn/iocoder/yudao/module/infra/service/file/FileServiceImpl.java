@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.io.FileUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.file.core.client.FileClient;
-import cn.iocoder.yudao.framework.file.core.client.s3.FilePresignedUrlBO;
+import cn.iocoder.yudao.framework.file.core.client.s3.FilePresignedUrlRespDTO;
 import cn.iocoder.yudao.framework.file.core.utils.FileTypeUtils;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FileCreateReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FilePageReqVO;
@@ -71,10 +71,8 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public Long createFile(FileCreateReqVO createReqVO) {
-        // 插入
         FileDO file = BeanUtils.toBean(createReqVO, FileDO.class);
         fileMapper.insert(file);
-        // 返回
         return file.getId();
     }
 
@@ -108,10 +106,11 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public FilePresignedUrlRespVO getFilePresignedUrl(String fileName) throws Exception {
+    public FilePresignedUrlRespVO getFilePresignedUrl(String path) throws Exception {
         FileClient fileClient = fileConfigService.getMasterFileClient();
-        FilePresignedUrlBO bo = fileClient.getPresignedObjectUrl(fileName);
-        return BeanUtils.toBean(bo, FilePresignedUrlRespVO.class, f -> f.setConfigId(fileClient.getId()));
+        FilePresignedUrlRespDTO presignedObjectUrl = fileClient.getPresignedObjectUrl(path);
+        return BeanUtils.toBean(presignedObjectUrl, FilePresignedUrlRespVO.class,
+                object -> object.setConfigId(fileClient.getId()));
     }
 
 }

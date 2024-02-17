@@ -24,7 +24,7 @@ public class FileCreateReqVO {
     @Schema(description = "文件 URL", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/yudao.jpg")
     private String url;
 
-    @Schema(description = "文件MIME类型", example = "application/octet-stream")
+    @Schema(description = "文件 MIME 类型", example = "application/octet-stream")
     private String type;
 
     @Schema(description = "文件大小", example = "2048", requiredMode = Schema.RequiredMode.REQUIRED)

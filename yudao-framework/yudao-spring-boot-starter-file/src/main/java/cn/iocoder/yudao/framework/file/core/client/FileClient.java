@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.framework.file.core.client;
 
-import cn.iocoder.yudao.framework.file.core.client.s3.FilePresignedUrlBO;
+import cn.iocoder.yudao.framework.file.core.client.s3.FilePresignedUrlRespDTO;
 
 /**
  * 文件客户端
@@ -45,10 +45,10 @@ public interface FileClient {
     /**
      * 获得文件预签名地址
      *
-     * @param fileName 文件名称
+     * @param path 相对路径
      * @return 文件预签名地址
      */
-    default FilePresignedUrlBO getPresignedObjectUrl(String fileName) throws Exception {
+    default FilePresignedUrlRespDTO getPresignedObjectUrl(String path) throws Exception {
         throw new UnsupportedOperationException("不支持的操作");
     }
 

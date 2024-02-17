@@ -120,18 +120,15 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
     }
 
     @Override
-    public FilePresignedUrlBO getPresignedObjectUrl(String fileName) throws Exception {
+    public FilePresignedUrlRespDTO getPresignedObjectUrl(String path) throws Exception {
         String uploadUrl = client.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
                 .method(Method.PUT)
                 .bucket(config.getBucket())
-                .object(fileName)
-                /**
-                 * 过期时间（秒数）取值范围：1秒 ~ 7天
-                 * {@link GetPresignedObjectUrlArgs.Builder#validateExpiry(int)}
-                 */
-                .expiry(10, TimeUnit.MINUTES)
+                .object(path)
+                .expiry(10, TimeUnit.MINUTES) // 过期时间（秒数）取值范围：1 秒 ~ 7 天
                 .build()
         );
-        return new FilePresignedUrlBO(uploadUrl, config.getDomain() + "/" + fileName);
+        return new FilePresignedUrlRespDTO(uploadUrl, config.getDomain() + "/" + path);
     }
+
 }
