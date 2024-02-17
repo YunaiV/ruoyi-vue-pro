@@ -55,4 +55,7 @@ public class CrmCustomerPageReqVO extends PageParam {
     @Schema(description = "跟进状态", example = "true")
     private Boolean followUpStatus; // backlog查询条件, null 则表示为不做查询
 
+    @Schema(description = "跟进状态", example = "true")
+    private Boolean followUpStatus;
+
 }

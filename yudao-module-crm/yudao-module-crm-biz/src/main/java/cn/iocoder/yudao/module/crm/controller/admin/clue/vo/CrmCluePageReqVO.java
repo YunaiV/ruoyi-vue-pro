@@ -39,4 +39,7 @@ public class CrmCluePageReqVO extends PageParam {
     @Schema(description = "客户来源", example = "1")
     private Integer source;
 
+    @Schema(description = "跟进状态", example = "true")
+    private Boolean followUpStatus;
+
 }
