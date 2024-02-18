@@ -152,19 +152,17 @@ public class CrmCustomerController {
     @Operation(summary = "获得待进入公海客户数量")
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
     public CommonResult<Long> getPutInPoolRemindCustomerCount() {
-        // 获取公海配置 TODO @dbh52：合并到 getPutInPoolRemindCustomerPage 会更合适哈；
+        // 获取公海配置
         CrmCustomerPoolConfigDO poolConfigDO = customerPoolConfigService.getCustomerPoolConfig();
         if (ObjUtil.isNull(poolConfigDO)
                 || Boolean.FALSE.equals(poolConfigDO.getEnabled())
                 || Boolean.FALSE.equals(poolConfigDO.getNotifyEnabled())) {
             throw exception(CUSTOMER_POOL_CONFIG_NOT_EXISTS_OR_DISABLED);
         }
-
-        CrmCustomerPageReqVO pageVO = new CrmCustomerPageReqVO();
-        pageVO.setPool(null);
-        pageVO.setContactStatus(CrmCustomerPageReqVO.CONTACT_TODAY);
-        pageVO.setSceneType(CrmSceneTypeEnum.OWNER.getType());
-
+        CrmCustomerPageReqVO pageVO = new CrmCustomerPageReqVO()
+                .setPool(null)
+                .setContactStatus(CrmCustomerPageReqVO.CONTACT_TODAY)
+                .setSceneType(CrmSceneTypeEnum.OWNER.getType());
         return success(customerService.getPutInPoolRemindCustomerCount(pageVO, poolConfigDO, getLoginUserId()));
     }
 
@@ -181,7 +179,6 @@ public class CrmCustomerController {
     public CommonResult<Long> getFollowCustomerCount() {
         return success(customerService.getFollowCustomerCount(getLoginUserId()));
     }
-
 
     /**
      * 获取距离进入公海的时间

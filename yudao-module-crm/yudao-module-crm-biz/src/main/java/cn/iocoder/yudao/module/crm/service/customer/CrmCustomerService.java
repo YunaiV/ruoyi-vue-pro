@@ -179,4 +179,5 @@ public interface CrmCustomerService {
      * @return 提醒数量
      */
     Long getFollowCustomerCount(Long userId);
+
 }

@@ -55,17 +55,16 @@ public interface CrmClueMapper extends BaseMapperX<CrmClueDO> {
         return selectJoinList(CrmClueDO.class, query);
     }
 
+    // TODO @dhb52：db 统一都是 select 关键字；
     default Long getFollowLeadsCount(Long userId) {
         MPJLambdaWrapperX<CrmClueDO> query = new MPJLambdaWrapperX<>();
-
-        // 我负责的, 非公海
+        // 我负责的 + 非公海
         CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_LEADS.getType(),
                 CrmClueDO::getId, userId, CrmSceneTypeEnum.OWNER.getType(), Boolean.FALSE);
-
-        // 未跟进, 未转化
+        // 未跟进 + 未转化 TODO @dhb52：是不是 eq 会更好哈；mysql 不等于，对索引不友好
         query.ne(CrmClueDO::getFollowUpStatus, true)
                 .ne(CrmClueDO::getTransformStatus, true);
-
         return selectCount(query);
     }
+
 }

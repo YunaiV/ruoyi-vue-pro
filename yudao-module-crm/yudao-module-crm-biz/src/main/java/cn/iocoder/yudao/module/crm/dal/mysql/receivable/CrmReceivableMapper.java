@@ -62,16 +62,14 @@ public interface CrmReceivableMapper extends BaseMapperX<CrmReceivableDO> {
         return selectJoinList(CrmReceivableDO.class, query);
     }
 
+    // TODO @dhb52：db 统一都是 select 关键字；
     default Long getCheckReceivablesCount(Long userId) {
         MPJLambdaWrapperX<CrmReceivableDO> query = new MPJLambdaWrapperX<>();
-
-        // 我负责的, 非公海
+        // 我负责的 + 非公海
         CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_RECEIVABLE.getType(),
                 CrmReceivableDO::getId, userId, CrmSceneTypeEnum.OWNER.getType(), Boolean.FALSE);
-
         // 未提交 or 审核不通过
         query.in(CrmContractDO::getAuditStatus, CrmAuditStatusEnum.DRAFT.getStatus(), CrmAuditStatusEnum.REJECT.getStatus());
-
         return selectCount(query);
     }
 

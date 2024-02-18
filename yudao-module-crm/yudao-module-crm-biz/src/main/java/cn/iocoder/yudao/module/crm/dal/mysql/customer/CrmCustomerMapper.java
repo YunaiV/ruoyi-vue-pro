@@ -99,8 +99,7 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
 
         // backlog 查询
         if (ObjUtil.isNotNull(pageReqVO.getContactStatus())) {
-            Assert.isNull(pageReqVO.getPool(), "[是否为公海数据]必须是null");
-
+            Assert.isNull(pageReqVO.getPool(), "pool 必须是 null");
             LocalDateTime beginOfToday = LocalDateTimeUtil.beginOfDay(LocalDateTime.now());
             LocalDateTime endOfToday = LocalDateTimeUtil.endOfDay(LocalDateTime.now());
             if (pageReqVO.getContactStatus().equals(CrmCustomerPageReqVO.CONTACT_TODAY)) { // 今天需联系
@@ -113,7 +112,6 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
                 throw new IllegalArgumentException("未知联系状态：" + pageReqVO.getContactStatus());
             }
         }
-
         return selectJoinPage(pageReqVO, CrmCustomerDO.class, query);
     }
 
@@ -150,31 +148,28 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
         return selectCount(query);
     }
 
+    // TODO @dhb52：db 统一都是 select 关键字；
     default Long getTodayCustomerCount(Long userId) {
         MPJLambdaWrapperX<CrmCustomerDO> query = new MPJLambdaWrapperX<>();
-
-        // 我负责的, 非公海
+        // 我负责的 + 非公海
         CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CUSTOMER.getType(),
                 CrmCustomerDO::getId, userId, CrmSceneTypeEnum.OWNER.getType(), Boolean.FALSE);
-
         // 今天需联系
         LocalDateTime beginOfToday = LocalDateTimeUtil.beginOfDay(LocalDateTime.now());
         LocalDateTime endOfToday = LocalDateTimeUtil.endOfDay(LocalDateTime.now());
         query.between(CrmCustomerDO::getContactNextTime, beginOfToday, endOfToday);
-
         return selectCount(query);
     }
 
+    // TODO @dhb52：db 统一都是 select 关键字；
     default Long getFollowCustomerCount(Long userId) {
         MPJLambdaWrapperX<CrmCustomerDO> query = new MPJLambdaWrapperX<>();
-
-        // 我负责的, 非公海
+        // 我负责的 + 非公海
         CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CUSTOMER.getType(),
                 CrmCustomerDO::getId, userId, CrmSceneTypeEnum.OWNER.getType(), Boolean.FALSE);
-
-        // 未跟进
+        // 未跟进 TODO @dhb52：是不是 eq 会更好哈；mysql 不等于，对索引不友好
         query.ne(CrmClueDO::getFollowUpStatus, true);
-
         return selectCount(query);
     }
+
 }

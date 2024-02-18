@@ -191,7 +191,6 @@ public class CrmContractController {
         return success(contractService.getCheckContractCount(getLoginUserId()));
     }
 
-
     @GetMapping("/end-contract-count")
     @Operation(summary = "获得即将到期的合同数量")
     @PreAuthorize("@ss.hasPermission('crm:contract:query')")
