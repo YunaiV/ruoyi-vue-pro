@@ -482,12 +482,12 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     public Long getTodayCustomerCount(Long userId) {
-        return customerMapper.getTodayCustomerCount(userId);
+        return customerMapper.selectTodayCustomerCount(userId);
     }
 
     @Override
     public Long getFollowCustomerCount(Long userId) {
-        return customerMapper.getFollowCustomerCount(userId);
+        return customerMapper.selectFollowCustomerCount(userId);
     }
 
     // ======================= 校验相关 =======================

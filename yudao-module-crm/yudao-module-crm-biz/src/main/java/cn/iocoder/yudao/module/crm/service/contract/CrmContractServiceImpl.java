@@ -364,12 +364,12 @@ public class CrmContractServiceImpl implements CrmContractService {
 
     @Override
     public Long getCheckContractCount(Long userId) {
-        return contractMapper.getCheckContractCount(userId);
+        return contractMapper.selectCheckContractCount(userId);
     }
 
     @Override
     public Long getEndContractCount(Long userId) {
-        return contractMapper.getEndContractCount(userId);
+        return contractMapper.selectEndContractCount(userId);
     }
 
 }

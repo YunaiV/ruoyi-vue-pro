@@ -278,7 +278,7 @@ public class CrmClueServiceImpl implements CrmClueService {
 
     @Override
     public Long getFollowLeadsCount(Long userId) {
-        return clueMapper.getFollowLeadsCount(userId);
+        return clueMapper.selectFollowLeadsCount(userId);
     }
 
 }
