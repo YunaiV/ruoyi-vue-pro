@@ -160,7 +160,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
             throw exception(approve ? PURCHASE_RETURN_APPROVE_FAIL : PURCHASE_RETURN_PROCESS_FAIL);
         }
         // 1.3 校验已退款
-        if (approve && purchaseReturn.getRefundPrice().compareTo(BigDecimal.ZERO) > 0) {
+        if (!approve && purchaseReturn.getRefundPrice().compareTo(BigDecimal.ZERO) > 0) {
             throw exception(PURCHASE_RETURN_PROCESS_FAIL_EXISTS_REFUND);
         }
 

@@ -24,7 +24,6 @@ public interface TradeOrderStatisticsService {
      */
     TradeOrderSummaryRespBO getOrderSummary(LocalDateTime beginTime, LocalDateTime endTime);
 
-    // TODO 芋艿：已经 review
     /**
      * 获取地区订单统计
      *
@@ -32,7 +31,6 @@ public interface TradeOrderStatisticsService {
      */
     List<MemberAreaStatisticsRespBO> getSummaryListByAreaId();
 
-    // TODO 芋艿：已经 review
     /**
      * 获取下单用户数量
      *
@@ -42,7 +40,6 @@ public interface TradeOrderStatisticsService {
      */
     Integer getOrderUserCount(LocalDateTime beginTime, LocalDateTime endTime);
 
-    // TODO 芋艿：已经 review
     /**
      * 获取支付用户数量
      *
@@ -52,7 +49,6 @@ public interface TradeOrderStatisticsService {
      */
     Integer getPayUserCount(LocalDateTime beginTime, LocalDateTime endTime);
 
-    // TODO 芋艿：已经 review
     /**
      * 获取支付金额
      *
@@ -69,7 +65,6 @@ public interface TradeOrderStatisticsService {
      */
     Long getCountByStatusAndDeliveryType(Integer status, Integer deliveryType);
 
-    // TODO 芋艿：已经 review
     /**
      * 交易订单销售额对照
      *
@@ -77,7 +72,6 @@ public interface TradeOrderStatisticsService {
      */
     DataComparisonRespVO<TradeOrderSummaryRespVO> getOrderComparison();
 
-    // TODO 芋艿：已经 review
     /**
      * 获得订单量趋势统计
      *

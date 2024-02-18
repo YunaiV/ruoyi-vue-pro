@@ -172,7 +172,7 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
             throw exception(approve ? SALE_OUT_APPROVE_FAIL : SALE_OUT_PROCESS_FAIL);
         }
         // 1.3 校验已退款
-        if (approve && saleOut.getReceiptPrice().compareTo(BigDecimal.ZERO) > 0) {
+        if (!approve && saleOut.getReceiptPrice().compareTo(BigDecimal.ZERO) > 0) {
             throw exception(SALE_OUT_PROCESS_FAIL_EXISTS_RECEIPT);
         }
 

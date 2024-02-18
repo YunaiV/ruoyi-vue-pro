@@ -19,30 +19,23 @@ import java.util.List;
 @Mapper
 public interface TradeOrderStatisticsMapper extends BaseMapperX<TradeStatisticsDO> {
 
-    // TODO 芋艿：已经 review
     List<MemberAreaStatisticsRespBO> selectSummaryListByAreaId();
 
-    // TODO 芋艿：已经 review
     Integer selectCountByCreateTimeBetween(@Param("beginTime") LocalDateTime beginTime,
                                            @Param("endTime") LocalDateTime endTime);
 
-    // TODO 芋艿：已经 review
     Integer selectCountByPayTimeBetween(@Param("beginTime") LocalDateTime beginTime,
                                         @Param("endTime") LocalDateTime endTime);
 
-    // TODO 芋艿：已经 review
     Integer selectSummaryPriceByPayTimeBetween(@Param("beginTime") LocalDateTime beginTime,
                                                @Param("endTime") LocalDateTime endTime);
 
-    // TODO 芋艿：已经 review
     Integer selectUserCountByCreateTimeBetween(@Param("beginTime") LocalDateTime beginTime,
                                                @Param("endTime") LocalDateTime endTime);
 
-    // TODO 芋艿：已经 review
     Integer selectUserCountByPayTimeBetween(@Param("beginTime") LocalDateTime beginTime,
                                             @Param("endTime") LocalDateTime endTime);
 
-    // TODO 芋艿：已经 review
     /**
      * 按照支付时间统计订单（按天分组）
      *
@@ -53,7 +46,6 @@ public interface TradeOrderStatisticsMapper extends BaseMapperX<TradeStatisticsD
     List<TradeOrderTrendRespVO> selectListByPayTimeBetweenAndGroupByDay(@Param("beginTime") LocalDateTime beginTime,
                                                                         @Param("endTime") LocalDateTime endTime);
 
-    // TODO 芋艿：已经 review
     /**
      * 按照支付时间统计订单（按月分组）
      *
@@ -64,10 +56,8 @@ public interface TradeOrderStatisticsMapper extends BaseMapperX<TradeStatisticsD
     List<TradeOrderTrendRespVO> selectListByPayTimeBetweenAndGroupByMonth(@Param("beginTime") LocalDateTime beginTime,
                                                                           @Param("endTime") LocalDateTime endTime);
 
-    // TODO @芋艿：已经 review
     Long selectCountByStatusAndDeliveryType(@Param("status") Integer status, @Param("deliveryType") Integer deliveryType);
 
-    // TODO 芋艿：已经 review
     TradeOrderSummaryRespVO selectPaySummaryByStatusAndPayTimeBetween(@Param("status") Integer status,
                                                                       @Param("beginTime") LocalDateTime beginTime,
                                                                       @Param("endTime") LocalDateTime endTime);

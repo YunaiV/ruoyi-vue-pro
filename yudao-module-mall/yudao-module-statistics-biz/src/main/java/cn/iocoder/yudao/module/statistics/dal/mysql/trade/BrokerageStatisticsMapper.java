@@ -15,13 +15,11 @@ import java.time.LocalDateTime;
 @Mapper
 public interface BrokerageStatisticsMapper extends BaseMapperX<TradeStatisticsDO> {
 
-    // TODO 芋艿：已经 review
     Integer selectSummaryPriceByStatusAndUnfreezeTimeBetween(@Param("bizType") Integer bizType,
                                                              @Param("status") Integer status,
                                                              @Param("beginTime") LocalDateTime beginTime,
                                                              @Param("endTime") LocalDateTime endTime);
 
-    // TODO 芋艿：已经 review
     Long selectWithdrawCountByStatus(@Param("status") Integer status);
 
 }
