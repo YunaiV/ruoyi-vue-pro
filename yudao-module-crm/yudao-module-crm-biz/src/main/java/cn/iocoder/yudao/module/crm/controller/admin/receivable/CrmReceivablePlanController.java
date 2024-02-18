@@ -153,4 +153,12 @@ public class CrmReceivablePlanController {
         return CrmReceivablePlanConvert.INSTANCE.convertPage(pageResult, userMap, customerList, contractList, receivableList);
     }
 
+
+    @GetMapping("/remind-receivable-plan-count")
+    @Operation(summary = "获得待回款提醒数量")
+    @PreAuthorize("@ss.hasPermission('crm:receivable-plan:query')")
+    public CommonResult<Long> getRemindReceivablesCount() {
+        return success(receivablePlanService.getRemindReceivablePlanCount(getLoginUserId()));
+    }
+
 }

@@ -140,7 +140,43 @@ public interface CrmCustomerService {
      */
     int autoPutCustomerPool();
 
+    /**
+     * 获得放入公海提醒的客户分页数据
+     *
+     * @param pageVO       分页查询
+     * @param poolConfigDO 公海配置
+     * @param userId       用户编号
+     * @return 客户分页
+     */
     PageResult<CrmCustomerDO> getPutInPoolRemindCustomerPage(CrmCustomerPageReqVO pageVO,
                                                              CrmCustomerPoolConfigDO poolConfigDO,
-                                                             Long loginUserId);
+                                                             Long userId);
+
+    /**
+     * 获得今日需联系客户数量
+     *
+     * @param userId 用户编号
+     * @return 提醒数量
+     */
+    Long getTodayCustomerCount(Long userId);
+
+    /**
+     * 获得待进入公海的客户数量
+     *
+     * @param pageVO       分页查询
+     * @param poolConfigDO 公海配置
+     * @param userId       用户编号
+     * @return 提醒数量
+     */
+    Long getPutInPoolRemindCustomerCount(CrmCustomerPageReqVO pageVO,
+                                         CrmCustomerPoolConfigDO poolConfigDO,
+                                         Long userId);
+
+    /**
+     * 获得分配给我的客户数量
+     *
+     * @param userId 用户编号
+     * @return 提醒数量
+     */
+    Long getFollowCustomerCount(Long userId);
 }

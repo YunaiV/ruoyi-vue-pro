@@ -24,7 +24,6 @@ import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.Resource;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -161,6 +160,11 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#pageReqVO.customerId", level = CrmPermissionLevelEnum.READ)
     public PageResult<CrmReceivablePlanDO> getReceivablePlanPageByCustomerId(CrmReceivablePlanPageReqVO pageReqVO) {
         return receivablePlanMapper.selectPageByCustomerId(pageReqVO);
+    }
+
+    @Override
+    public Long getRemindReceivablePlanCount(Long userId) {
+        return receivablePlanMapper.getRemindReceivablePlanCount(userId);
     }
 
 }

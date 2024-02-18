@@ -90,4 +90,12 @@ public interface CrmClueService {
      */
     void translateCustomer(CrmClueTranslateReqVO reqVO, Long userId);
 
+    /**
+     * 获得分配给我的线索数量
+     *
+     * @param userId 用户编号
+     * @return 提醒数量
+     */
+    Long getFollowLeadsCount(Long userId);
+
 }

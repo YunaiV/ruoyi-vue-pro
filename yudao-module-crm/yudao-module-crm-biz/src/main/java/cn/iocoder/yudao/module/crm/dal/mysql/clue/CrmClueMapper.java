@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.enums.common.CrmSceneTypeEnum;
 import cn.iocoder.yudao.module.crm.util.CrmQueryWrapperUtils;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -40,6 +41,7 @@ public interface CrmClueMapper extends BaseMapperX<CrmClueDO> {
                 .eqIfPresent(CrmClueDO::getIndustryId, pageReqVO.getIndustryId())
                 .eqIfPresent(CrmClueDO::getLevel, pageReqVO.getLevel())
                 .eqIfPresent(CrmClueDO::getSource, pageReqVO.getSource())
+                .eqIfPresent(CrmClueDO::getFollowUpStatus, pageReqVO.getFollowUpStatus())
                 .orderByDesc(CrmClueDO::getId);
         return selectJoinPage(pageReqVO, CrmClueDO.class, query);
     }
@@ -53,4 +55,17 @@ public interface CrmClueMapper extends BaseMapperX<CrmClueDO> {
         return selectJoinList(CrmClueDO.class, query);
     }
 
+    default Long getFollowLeadsCount(Long userId) {
+        MPJLambdaWrapperX<CrmClueDO> query = new MPJLambdaWrapperX<>();
+
+        // 我负责的, 非公海
+        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_LEADS.getType(),
+                CrmClueDO::getId, userId, CrmSceneTypeEnum.OWNER.getType(), Boolean.FALSE);
+
+        // 未跟进, 未转化
+        query.ne(CrmClueDO::getFollowUpStatus, true)
+                .ne(CrmClueDO::getTransformStatus, true);
+
+        return selectCount(query);
+    }
 }

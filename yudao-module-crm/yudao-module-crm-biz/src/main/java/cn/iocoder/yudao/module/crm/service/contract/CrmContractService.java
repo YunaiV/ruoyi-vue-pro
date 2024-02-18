@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageR
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import jakarta.validation.Valid;
@@ -135,12 +134,21 @@ public interface CrmContractService {
      */
     Long getContractCountByBusinessId(Long businessId);
 
+
     /**
-     * 获取合同商品列表
+     * 获得待审核合同数量
      *
-     * @param contactId 合同编号
-     * @return 合同商品列表
+     * @param userId 用户编号
+     * @return 提醒数量
      */
-    List<CrmContractProductDO> getContractProductListByContractId(Long contactId);
+    Long getCheckContractCount(Long userId);
+
+    /**
+     * 获得即将到期的合同数量
+     *
+     * @param userId 用户编号
+     * @return 提醒数量
+     */
+    Long getEndContractCount(Long userId);
 
 }
