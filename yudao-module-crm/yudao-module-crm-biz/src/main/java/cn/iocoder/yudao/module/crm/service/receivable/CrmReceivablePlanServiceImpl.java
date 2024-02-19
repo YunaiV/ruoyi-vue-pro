@@ -164,7 +164,7 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
 
     @Override
     public Long getRemindReceivablePlanCount(Long userId) {
-        return receivablePlanMapper.getRemindReceivablePlanCount(userId);
+        return receivablePlanMapper.selectRemindReceivablePlanCount(userId);
     }
 
 }

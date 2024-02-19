@@ -148,8 +148,7 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
         return selectCount(query);
     }
 
-    // TODO @dhb52：db 统一都是 select 关键字；
-    default Long getTodayCustomerCount(Long userId) {
+    default Long selectTodayCustomerCount(Long userId) {
         MPJLambdaWrapperX<CrmCustomerDO> query = new MPJLambdaWrapperX<>();
         // 我负责的 + 非公海
         CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CUSTOMER.getType(),
@@ -161,14 +160,13 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
         return selectCount(query);
     }
 
-    // TODO @dhb52：db 统一都是 select 关键字；
-    default Long getFollowCustomerCount(Long userId) {
+    default Long selectFollowCustomerCount(Long userId) {
         MPJLambdaWrapperX<CrmCustomerDO> query = new MPJLambdaWrapperX<>();
         // 我负责的 + 非公海
         CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CUSTOMER.getType(),
                 CrmCustomerDO::getId, userId, CrmSceneTypeEnum.OWNER.getType(), Boolean.FALSE);
-        // 未跟进 TODO @dhb52：是不是 eq 会更好哈；mysql 不等于，对索引不友好
-        query.ne(CrmClueDO::getFollowUpStatus, true);
+        // 未跟进
+        query.eq(CrmClueDO::getFollowUpStatus, false);
         return selectCount(query);
     }
 

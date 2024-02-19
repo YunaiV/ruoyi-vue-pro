@@ -184,7 +184,7 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
 
     @Override
     public Long getCheckReceivablesCount(Long userId) {
-        return receivableMapper.getCheckReceivablesCount(userId);
+        return receivableMapper.selectCheckReceivablesCount(userId);
     }
 
 }

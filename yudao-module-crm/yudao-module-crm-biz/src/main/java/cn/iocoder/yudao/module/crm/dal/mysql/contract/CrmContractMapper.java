@@ -88,8 +88,7 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
         return selectCount(CrmContractDO::getBusinessId, businessId);
     }
 
-    // TODO @dhb52：db 统一都是 select 关键字；
-    default Long getCheckContractCount(Long userId) {
+    default Long selectCheckContractCount(Long userId) {
         MPJLambdaWrapperX<CrmContractDO> query = new MPJLambdaWrapperX<>();
         // 我负责的 + 非公海
         CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTRACT.getType(),
@@ -99,8 +98,7 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
         return selectCount(query);
     }
 
-    // TODO @dhb52：db 统一都是 select 关键字；
-    default Long getEndContractCount(Long userId) {
+    default Long selectEndContractCount(Long userId) {
         MPJLambdaWrapperX<CrmContractDO> query = new MPJLambdaWrapperX<>();
         // 我负责的 + 非公海
         CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTRACT.getType(),
@@ -108,7 +106,7 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
         // 即将到期
         LocalDateTime beginOfToday = LocalDateTimeUtil.beginOfDay(LocalDateTime.now());
         LocalDateTime endOfToday = LocalDateTimeUtil.endOfDay(LocalDateTime.now());
-        // TODO: @芋艿 需要配置 提前提醒天数
+        // TODO: @dhb52 需要配置 提前提醒天数
         int REMIND_DAYS = 20;
         query.eq(CrmContractDO::getAuditStatus, CrmAuditStatusEnum.APPROVE.getStatus())
                 .between(CrmContractDO::getEndTime, beginOfToday, endOfToday.plusDays(REMIND_DAYS));
