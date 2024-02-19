@@ -81,10 +81,6 @@ public class CrmClueDO extends BaseDO {
      */
     private String telephone;
     /**
-     * 网址
-     */
-    private String website;
-    /**
      * QQ
      */
     private String qq;
@@ -97,9 +93,15 @@ public class CrmClueDO extends BaseDO {
      */
     private String email;
     /**
-     * 地址
+     * 所在地
+     *
+     * 关联 {@link cn.iocoder.yudao.framework.ip.core.Area#getId()} 字段
      */
-    private String address;
+    private Integer areaId;
+    /**
+     * 详细地址
+     */
+    private String detailAddress;
     /**
      * 所属行业
      *
@@ -118,10 +120,6 @@ public class CrmClueDO extends BaseDO {
      * 对应字典 {@link DictTypeConstants#CRM_CUSTOMER_SOURCE}
      */
     private Integer source;
-    /**
-     * 客户描述
-     */
-    private String description;
     /**
      * 备注
      */

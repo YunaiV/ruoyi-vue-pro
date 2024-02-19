@@ -239,10 +239,10 @@ public class CrmCustomerController {
         // 手动创建导出 demo
         List<CrmCustomerImportExcelVO> list = Arrays.asList(
                 CrmCustomerImportExcelVO.builder().name("芋道").industryId(1).level(1).source(1).mobile("15601691300").telephone("")
-                        .website("https://doc.iocoder.cn/").qq("").wechat("").email("yunai@iocoder.cn").description("").remark("")
+                        .qq("").wechat("").email("yunai@iocoder.cn").description("").remark("")
                         .areaId(null).detailAddress("").build(),
                 CrmCustomerImportExcelVO.builder().name("源码").industryId(1).level(1).source(1).mobile("15601691300").telephone("")
-                        .website("https://doc.iocoder.cn/").qq("").wechat("").email("yunai@iocoder.cn").description("").remark("")
+                        .qq("").wechat("").email("yunai@iocoder.cn").description("").remark("")
                         .areaId(null).detailAddress("").build()
         );
         // 输出

@@ -43,9 +43,6 @@ public class CrmCustomerImportExcelVO {
     @ExcelProperty("电话")
     private String telephone;
 
-    @ExcelProperty("网址")
-    private String website;
-
     @ExcelProperty("QQ")
     private String qq;
 

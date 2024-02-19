@@ -70,10 +70,6 @@ public class CrmClueRespVO {
     @ExcelProperty("电话")
     private String telephone;
 
-    @Schema(description = "网址", example = "25682")
-    @ExcelProperty("网址")
-    private String website;
-
     @Schema(description = "QQ", example = "25682")
     @ExcelProperty("QQ")
     private String qq;
@@ -86,9 +82,15 @@ public class CrmClueRespVO {
     @ExcelProperty("email")
     private String email;
 
-    @Schema(description = "地址", example = "北京市海淀区")
-    @ExcelProperty("地址")
-    private String address;
+    @Schema(description = "地区编号", example = "1024")
+    @ExcelProperty("地区编号")
+    private Integer areaId;
+    @Schema(description = "地区名称", example = "北京市")
+    @ExcelProperty("地区名称")
+    private String areaName;
+    @Schema(description = "详细地址", example = "北京市成华大道")
+    @ExcelProperty("详细地址")
+    private String detailAddress;
 
     @Schema(description = "所属行业", requiredMode = Schema.RequiredMode.REQUIRED, example = "13563")
     @ExcelProperty(value = "所属行业", converter = DictConvert.class)
@@ -104,10 +106,6 @@ public class CrmClueRespVO {
     @ExcelProperty(value = "客户来源", converter = DictConvert.class)
     @DictFormat(cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_SOURCE)
     private Integer source;
-
-    @Schema(description = "客户描述", example = "25682")
-    @ExcelProperty("客户描述")
-    private String description;
 
     @Schema(description = "备注", example = "随便")
     @ExcelProperty("备注")

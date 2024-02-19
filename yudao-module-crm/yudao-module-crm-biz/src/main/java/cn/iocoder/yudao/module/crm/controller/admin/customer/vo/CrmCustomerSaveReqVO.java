@@ -58,10 +58,6 @@ public class CrmCustomerSaveReqVO {
     @Telephone
     private String telephone;
 
-    @Schema(description = "网址", example = "https://www.baidu.com")
-    @DiffLogField(name = "网址")
-    private String website;
-
     @Schema(description = "QQ", example = "123456789")
     @DiffLogField(name = "QQ")
     @Size(max = 20, message = "QQ长度不能超过 20 个字符")

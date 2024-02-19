@@ -80,10 +80,6 @@ public class CrmCustomerDO extends BaseDO {
      */
     private String telephone;
     /**
-     * 网址
-     */
-    private String website;
-    /**
      * QQ
      */
     private String qq;
@@ -123,10 +119,6 @@ public class CrmCustomerDO extends BaseDO {
      * 对应字典 {@link DictTypeConstants#CRM_CUSTOMER_SOURCE}
      */
     private Integer source;
-    /**
-     * 客户描述
-     */
-    private String description;
     /**
      * 备注
      */

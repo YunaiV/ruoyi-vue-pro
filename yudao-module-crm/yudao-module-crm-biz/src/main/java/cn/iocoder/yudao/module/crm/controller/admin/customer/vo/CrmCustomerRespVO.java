@@ -65,10 +65,6 @@ public class CrmCustomerRespVO {
     private String telephone;
 
     @Schema(description = "负责人的用户编号", example = "25682")
-    @ExcelProperty("网址")
-    private String website;
-
-    @Schema(description = "负责人的用户编号", example = "25682")
     @ExcelProperty("QQ")
     private String qq;
 
@@ -79,10 +75,6 @@ public class CrmCustomerRespVO {
     @Schema(description = "负责人的用户编号", example = "25682")
     @ExcelProperty("email")
     private String email;
-
-    @Schema(description = "负责人的用户编号", example = "25682")
-    @ExcelProperty("客户描述")
-    private String description;
 
     @Schema(description = "负责人的用户编号", example = "25682")
     @ExcelProperty("备注")

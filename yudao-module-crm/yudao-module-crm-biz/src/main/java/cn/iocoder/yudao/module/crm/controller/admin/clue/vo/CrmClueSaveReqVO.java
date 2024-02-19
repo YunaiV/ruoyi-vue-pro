@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.crm.enums.customer.CrmCustomerLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmCustomerIndustryParseFunction;
 import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmCustomerLevelParseFunction;
 import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmCustomerSourceParseFunction;
+import cn.iocoder.yudao.module.crm.framework.operatelog.core.SysAreaParseFunction;
 import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
@@ -56,10 +57,6 @@ public class CrmClueSaveReqVO {
     @Telephone
     private String telephone;
 
-    @Schema(description = "网址", example = "https://www.baidu.com")
-    @DiffLogField(name = "网址")
-    private String website;
-
     @Schema(description = "QQ", example = "123456789")
     @DiffLogField(name = "QQ")
     @Size(max = 20, message = "QQ长度不能超过 20 个字符")
@@ -76,9 +73,13 @@ public class CrmClueSaveReqVO {
     @Size(max = 255, message = "邮箱长度不能超过 255 个字符")
     private String email;
 
-    @Schema(description = "地址", example = "北京市海淀区")
-    @DiffLogField(name = "地址")
-    private String address;
+    @Schema(description = "地区编号", example = "20158")
+    @DiffLogField(name = "地区编号", function = SysAreaParseFunction.NAME)
+    private Integer areaId;
+
+    @Schema(description = "详细地址", example = "北京市海淀区")
+    @DiffLogField(name = "详细地址")
+    private String detailAddress;
 
     @Schema(description = "所属行业", example = "1")
     @DiffLogField(name = "所属行业", function = CrmCustomerIndustryParseFunction.NAME)

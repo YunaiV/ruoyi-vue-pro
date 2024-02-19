@@ -65,10 +65,6 @@ public class CrmCustomerCreateReqBO {
     @Telephone
     private String telephone;
     /**
-     * 网址
-     */
-    private String website;
-    /**
      * QQ
      */
     private String qq;
