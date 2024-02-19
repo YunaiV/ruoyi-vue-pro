@@ -3,9 +3,11 @@ package cn.iocoder.yudao.module.crm.service.permission.bo;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.NoArgsConstructor;
 
 /**
  * 数据权限转移 Request BO
@@ -13,6 +15,8 @@ import jakarta.validation.constraints.NotNull;
  * @author HUIHUI
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class CrmPermissionTransferReqBO {
 
     /**

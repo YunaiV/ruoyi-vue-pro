@@ -9,7 +9,10 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueSaveReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTransferReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.service.clue.CrmClueService;
@@ -36,7 +39,8 @@ import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertListByFlatMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -151,18 +155,18 @@ public class CrmClueController {
 
     @PutMapping("/transform")
     @Operation(summary = "线索转化为客户")
-    @Parameter(name = "ids", description = "线索编号数组", required = true)
+    @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('crm:clue:update')")
-    public CommonResult<Boolean> transformClue(@RequestParam("ids") List<Long> ids) {
-        clueService.transformClue(ids, getLoginUserId());
+    public CommonResult<Boolean> transformClue(@RequestParam("id") Long id) {
+        clueService.transformClue(id, getLoginUserId());
         return success(Boolean.TRUE);
     }
 
-    @GetMapping("/follow-leads-count")
-    @Operation(summary = "获得分配给我的线索数量")
+    @GetMapping("/follow-count")
+    @Operation(summary = "获得分配给我的、待跟进的线索数量")
     @PreAuthorize("@ss.hasPermission('crm:clue:query')")
-    public CommonResult<Long> getFollowLeadsCount() {
-        return success(clueService.getFollowLeadsCount(getLoginUserId()));
+    public CommonResult<Long> getFollowClueCount() {
+        return success(clueService.getFollowClueCount(getLoginUserId()));
     }
 
 }

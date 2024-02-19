@@ -5,9 +5,9 @@ import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTransferReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
-import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import jakarta.validation.Valid;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -36,9 +36,11 @@ public interface CrmClueService {
     /**
      * 更新线索相关的跟进信息
      *
-     * @param clueUpdateFollowUpReqBO 信息
+     * @param id 编号
+     * @param contactNextTime 下次联系时间
+     * @param contactLastContent 最后联系内容
      */
-    void updateClueFollowUp(CrmUpdateFollowUpReqBO clueUpdateFollowUpReqBO);
+    void updateClueFollowUp(Long id, LocalDateTime contactNextTime, String contactLastContent);
 
     /**
      * 删除线索
@@ -83,17 +85,17 @@ public interface CrmClueService {
     /**
      * 线索转化为客户
      *
-     * @param ids  线索编号数组
+     * @param id  线索编号
      * @param userId 用户编号
      */
-    void transformClue(List<Long> ids, Long userId);
+    void transformClue(Long id, Long userId);
 
     /**
-     * 获得分配给我的线索数量
+     * 获得分配给我的、待跟进的线索数量
      *
      * @param userId 用户编号
-     * @return 提醒数量
+     * @return 数量
      */
-    Long getFollowLeadsCount(Long userId);
+    Long getFollowClueCount(Long userId);
 
 }

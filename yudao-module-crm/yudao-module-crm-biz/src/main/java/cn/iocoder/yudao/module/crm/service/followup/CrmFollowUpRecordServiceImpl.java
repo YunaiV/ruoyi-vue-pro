@@ -79,8 +79,8 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
         if (ObjUtil.notEqual(CrmBizTypeEnum.CRM_BUSINESS.getType(), followUpRecord.getBizType())) { // 更新商机跟进信息
             businessService.updateBusinessFollowUpBatch(Collections.singletonList(updateFollowUpReqBO));
         }
-        if (ObjUtil.notEqual(CrmBizTypeEnum.CRM_LEADS.getType(), followUpRecord.getBizType())) { // 更新线索跟进信息
-            clueService.updateClueFollowUp(updateFollowUpReqBO);
+        if (ObjUtil.notEqual(CrmBizTypeEnum.CRM_CLUE.getType(), followUpRecord.getBizType())) { // 更新线索跟进信息
+            clueService.updateClueFollowUp(followUpRecord.getId(), followUpRecord.getNextTime(), followUpRecord.getContent());
         }
         if (ObjUtil.notEqual(CrmBizTypeEnum.CRM_CONTACT.getType(), followUpRecord.getBizType())) { // 更新联系人跟进信息
             contactService.updateContactFollowUpBatch(Collections.singletonList(updateFollowUpReqBO));

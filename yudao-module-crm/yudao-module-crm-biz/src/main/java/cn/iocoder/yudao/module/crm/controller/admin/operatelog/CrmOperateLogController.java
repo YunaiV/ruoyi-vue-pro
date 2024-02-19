@@ -41,7 +41,7 @@ public class CrmOperateLogController {
     private static final Map<Integer, String> BIZ_TYPE_MAP = new HashMap<>();
 
     static {
-        BIZ_TYPE_MAP.put(CrmBizTypeEnum.CRM_LEADS.getType(), CRM_LEADS_TYPE);
+        BIZ_TYPE_MAP.put(CrmBizTypeEnum.CRM_CLUE.getType(), CRM_CLUE_TYPE);
         BIZ_TYPE_MAP.put(CrmBizTypeEnum.CRM_CUSTOMER.getType(), CRM_CUSTOMER_TYPE);
         BIZ_TYPE_MAP.put(CrmBizTypeEnum.CRM_CONTACT.getType(), CRM_CONTACT_TYPE);
         BIZ_TYPE_MAP.put(CrmBizTypeEnum.CRM_BUSINESS.getType(), CRM_BUSINESS_TYPE);
