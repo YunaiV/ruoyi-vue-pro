@@ -40,9 +40,13 @@ public class CrmClueDO extends BaseDO {
      */
     private Boolean followUpStatus;
     /**
-     * 最后跟进时间 TODO 添加跟进记录时更新该值
+     * 最后跟进时间
      */
     private LocalDateTime contactLastTime;
+    /**
+     * 最后跟进内容
+     */
+    private String contactLastContent;
     /**
      * 下次联系时间
      */

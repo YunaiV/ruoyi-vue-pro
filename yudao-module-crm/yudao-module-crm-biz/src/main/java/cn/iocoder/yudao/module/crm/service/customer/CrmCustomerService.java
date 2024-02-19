@@ -10,6 +10,9 @@ import jakarta.validation.Valid;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * 客户 Service 接口
@@ -57,6 +60,16 @@ public interface CrmCustomerService {
      * @author ljlleo
      */
     List<CrmCustomerDO> getCustomerList(Collection<Long> ids);
+
+    /**
+     * 获得客户 Map
+     *
+     * @param ids 客户编号数组
+     * @return 客户 Map
+     */
+    default Map<Long, CrmCustomerDO> getCustomerMap(Collection<Long> ids) {
+        return convertMap(getCustomerList(ids), CrmCustomerDO::getId);
+    }
 
     /**
      * 获得客户分页

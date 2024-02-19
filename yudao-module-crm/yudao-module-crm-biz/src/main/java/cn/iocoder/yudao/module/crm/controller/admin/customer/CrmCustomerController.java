@@ -56,6 +56,7 @@ public class CrmCustomerController {
     private CrmCustomerService customerService;
     @Resource
     private CrmCustomerPoolConfigService customerPoolConfigService;
+
     @Resource
     private DeptApi deptApi;
     @Resource

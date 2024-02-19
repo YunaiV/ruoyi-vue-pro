@@ -8,11 +8,8 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.ToString;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
-
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 @Schema(description = "管理后台 - 线索 Response VO")
 @Data
@@ -34,19 +31,25 @@ public class CrmClueRespVO {
     private Boolean followUpStatus;
 
     @Schema(description = "最后跟进时间")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @ExcelProperty("最后跟进时间")
     private LocalDateTime contactLastTime;
 
+    @Schema(description = "最后跟进内容", example = "吃饭、睡觉、打逗逗")
+    @ExcelProperty("最后跟进内容")
+    private String contactLastContent;
+
     @Schema(description = "下次联系时间", example = "2023-10-18 01:00:00")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @ExcelProperty("下次联系时间")
     private LocalDateTime contactNextTime;
 
     @Schema(description = "负责人编号")
-    @ExcelProperty("负责人的用户编号")
-    // TODO 这里需要导出成负责人的名字
     private Long ownerUserId;
+    @Schema(description = "负责人名字", example = "25682")
+    @ExcelProperty("负责人名字")
+    private String ownerUserName;
+    @Schema(description = "负责人部门")
+    @ExcelProperty("负责人部门")
+    private String ownerUserDeptName;
 
     @Schema(description = "转化状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     @ExcelProperty(value = "转化状态", converter = DictConvert.class)
@@ -54,9 +57,10 @@ public class CrmClueRespVO {
     private Boolean transformStatus;
 
     @Schema(description = "客户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "520")
-    // TODO 这里需要导出成客户名称
-    @ExcelProperty("客户编号")
     private Long customerId;
+    @Schema(description = "客户名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "客户名称")
+    @ExcelProperty("客户名称")
+    private String customerName;
 
     @Schema(description = "手机号", example = "18000000000")
     @ExcelProperty("手机号")
@@ -109,8 +113,19 @@ public class CrmClueRespVO {
     @ExcelProperty("备注")
     private String remark;
 
+    @Schema(description = "创建人", example = "1024")
+    @ExcelProperty("创建人")
+    private String creator;
+    @Schema(description = "创建人名字", example = "芋道源码")
+    @ExcelProperty("创建人名字")
+    private String creatorName;
+
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
+
+    @Schema(description = "更新时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("更新时间")
+    private LocalDateTime updateTime;
 
 }

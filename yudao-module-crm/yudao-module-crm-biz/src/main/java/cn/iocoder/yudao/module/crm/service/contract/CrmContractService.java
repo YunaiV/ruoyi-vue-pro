@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageR
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import jakarta.validation.Valid;
@@ -127,13 +128,20 @@ public interface CrmContractService {
     Long getContractCountByCustomerId(Long customerId);
 
     /**
-     * 根据商机ID获取关联客户的合同数量
+     * 根据商机编号，获取关联客户的合同数量
      *
      * @param businessId 商机编号
      * @return 数量
      */
     Long getContractCountByBusinessId(Long businessId);
 
+    /**
+     * 根据合同编号，获得合同的产品列表
+     *
+     * @param contactId 合同编号
+     * @return 产品列表
+     */
+    List<CrmContractProductDO> getContractProductListByContractId(Long contactId);
 
     /**
      * 获得待审核合同数量

@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -81,7 +82,8 @@ public class CrmClueServiceImpl implements CrmClueService {
         }
 
         // 2. 插入
-        CrmClueDO clue = BeanUtils.toBean(createReqVO, CrmClueDO.class).setId(null);
+        CrmClueDO clue = BeanUtils.toBean(createReqVO, CrmClueDO.class)
+                .setContactLastTime(LocalDateTime.now());
         clueMapper.insert(clue);
 
         // 3. 创建数据权限
