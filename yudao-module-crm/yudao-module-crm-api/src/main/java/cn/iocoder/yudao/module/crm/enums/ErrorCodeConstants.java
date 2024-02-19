@@ -16,15 +16,14 @@ public interface ErrorCodeConstants {
 
     // ========== 线索管理 1-020-001-000 ==========
     ErrorCode CLUE_NOT_EXISTS = new ErrorCode(1_020_001_000, "线索不存在");
-    ErrorCode CLUE_ANY_CLUE_NOT_EXISTS = new ErrorCode(1_020_001_001, "线索【{}】不存在");
-    ErrorCode CLUE_ANY_CLUE_ALREADY_TRANSLATED = new ErrorCode(1_020_001_002, "线索【{}】已经转化过了，请勿重复转化");
+    ErrorCode CLUE_NOT_EXISTS_ANY = new ErrorCode(1_020_001_001, "线索【{}】不存在");
+    ErrorCode CLUE_TRANSFORM_FAIL_ALREADY = new ErrorCode(1_020_001_002, "线索【{}】已经转化过了，请勿重复转化");
 
     // ========== 商机管理 1-020-002-000 ==========
     ErrorCode BUSINESS_NOT_EXISTS = new ErrorCode(1_020_002_000, "商机不存在");
     ErrorCode BUSINESS_CONTRACT_EXISTS = new ErrorCode(1_020_002_001, "商机已关联合同，不能删除");
 
     // TODO @lilleo：商机状态、商机类型，都单独错误码段
-
 
     // ========== 联系人管理 1-020-003-000 ==========
     ErrorCode CONTACT_NOT_EXISTS = new ErrorCode(1_020_003_000, "联系人不存在");

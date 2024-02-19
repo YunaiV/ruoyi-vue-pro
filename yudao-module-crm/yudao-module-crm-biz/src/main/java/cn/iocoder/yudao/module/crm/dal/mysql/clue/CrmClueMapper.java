@@ -36,6 +36,7 @@ public interface CrmClueMapper extends BaseMapperX<CrmClueDO> {
         // 拼接自身的查询条件
         query.selectAll(CrmClueDO.class)
                 .likeIfPresent(CrmClueDO::getName, pageReqVO.getName())
+                .eqIfPresent(CrmClueDO::getTransformStatus, pageReqVO.getTransformStatus())
                 .likeIfPresent(CrmClueDO::getTelephone, pageReqVO.getTelephone())
                 .likeIfPresent(CrmClueDO::getMobile, pageReqVO.getMobile())
                 .eqIfPresent(CrmClueDO::getIndustryId, pageReqVO.getIndustryId())

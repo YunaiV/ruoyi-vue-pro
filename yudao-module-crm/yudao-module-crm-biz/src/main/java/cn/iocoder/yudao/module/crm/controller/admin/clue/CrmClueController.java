@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
@@ -35,8 +36,7 @@ import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertListByFlatMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -60,7 +60,7 @@ public class CrmClueController {
     @Operation(summary = "创建线索")
     @PreAuthorize("@ss.hasPermission('crm:clue:create')")
     public CommonResult<Long> createClue(@Valid @RequestBody CrmClueSaveReqVO createReqVO) {
-        return success(clueService.createClue(createReqVO, getLoginUserId()));
+        return success(clueService.createClue(createReqVO));
     }
 
     @PutMapping("/update")
@@ -86,7 +86,14 @@ public class CrmClueController {
     @PreAuthorize("@ss.hasPermission('crm:clue:query')")
     public CommonResult<CrmClueRespVO> getClue(@RequestParam("id") Long id) {
         CrmClueDO clue = clueService.getClue(id);
-        return success(BeanUtils.toBean(clue, CrmClueRespVO.class));
+        return success(buildClueDetail(clue));
+    }
+
+    public CrmClueRespVO buildClueDetail(CrmClueDO clue) {
+        if (clue == null) {
+            return null;
+        }
+        return buildClueDetailList(Collections.singletonList(clue)).get(0);
     }
 
     @GetMapping("/page")
@@ -121,6 +128,7 @@ public class CrmClueController {
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
         // 2. 转换成 VO
         return BeanUtils.toBean(list, CrmClueRespVO.class, clueVO -> {
+            clueVO.setAreaName(AreaUtils.format(clueVO.getAreaId()));
             // 2.1 设置客户名称
             MapUtils.findAndThen(customerMap, clueVO.getCustomerId(), customer -> clueVO.setCustomerName(customer.getName()));
             // 2.2 设置创建人、负责人名称
@@ -141,11 +149,12 @@ public class CrmClueController {
         return success(true);
     }
 
-    @PostMapping("/transform")
+    @PutMapping("/transform")
     @Operation(summary = "线索转化为客户")
+    @Parameter(name = "ids", description = "线索编号数组", required = true)
     @PreAuthorize("@ss.hasPermission('crm:clue:update')")
-    public CommonResult<Boolean> translateCustomer(@Valid @RequestBody CrmClueTranslateReqVO reqVO) {
-        clueService.translateCustomer(reqVO, getLoginUserId());
+    public CommonResult<Boolean> transformClue(@RequestParam("ids") List<Long> ids) {
+        clueService.transformClue(ids, getLoginUserId());
         return success(Boolean.TRUE);
     }
 

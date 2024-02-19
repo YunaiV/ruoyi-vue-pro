@@ -4,7 +4,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTransferReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTranslateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
 import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import jakarta.validation.Valid;
@@ -23,10 +22,9 @@ public interface CrmClueService {
      * 创建线索
      *
      * @param createReqVO 创建信息
-     * @param userId      用户编号
      * @return 编号
      */
-    Long createClue(@Valid CrmClueSaveReqVO createReqVO, Long userId);
+    Long createClue(@Valid CrmClueSaveReqVO createReqVO);
 
     /**
      * 更新线索
@@ -85,10 +83,10 @@ public interface CrmClueService {
     /**
      * 线索转化为客户
      *
-     * @param reqVO  线索编号
+     * @param ids  线索编号数组
      * @param userId 用户编号
      */
-    void translateCustomer(CrmClueTranslateReqVO reqVO, Long userId);
+    void transformClue(List<Long> ids, Long userId);
 
     /**
      * 获得分配给我的线索数量

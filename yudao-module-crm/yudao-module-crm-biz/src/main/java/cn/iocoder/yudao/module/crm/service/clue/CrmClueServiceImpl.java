@@ -10,7 +10,6 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTransferReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTranslateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerSaveReqVO;
 import cn.iocoder.yudao.module.crm.convert.clue.CrmClueConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
@@ -36,14 +35,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_EXISTS;
-import static java.util.Collections.singletonList;
 
 /**
  * 线索 Service 实现类
@@ -71,17 +72,13 @@ public class CrmClueServiceImpl implements CrmClueService {
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_LEADS_TYPE, subType = CRM_LEADS_CREATE_SUB_TYPE, bizNo = "{{#clue.id}}",
             success = CRM_LEADS_CREATE_SUCCESS)
-    public Long createClue(CrmClueSaveReqVO createReqVO, Long userId) {
+    public Long createClue(CrmClueSaveReqVO createReqVO) {
         // 1.1 校验关联数据
         validateRelationDataExists(createReqVO);
         // 1.2 校验负责人是否存在
-        if (createReqVO.getOwnerUserId() != null) {
-            adminUserApi.validateUserList(singletonList(createReqVO.getOwnerUserId()));
-        } else {
-            createReqVO.setOwnerUserId(userId); // 如果没有设置负责人那么默认操作人为负责人
-        }
+        adminUserApi.validateUser(createReqVO.getOwnerUserId());
 
-        // 2. 插入
+        // 2. 插入线索
         CrmClueDO clue = BeanUtils.toBean(createReqVO, CrmClueDO.class)
                 .setContactLastTime(LocalDateTime.now());
         clueMapper.insert(clue);
@@ -103,12 +100,12 @@ public class CrmClueServiceImpl implements CrmClueService {
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_LEADS, bizId = "#updateReq.id", level = CrmPermissionLevelEnum.OWNER)
     public void updateClue(CrmClueSaveReqVO updateReq) {
         Assert.notNull(updateReq.getId(), "线索编号不能为空");
-        // 1. 校验线索是否存在
+        // 1.1 校验线索是否存在
         CrmClueDO oldClue = validateClueExists(updateReq.getId());
-        // 2. 校验关联数据
+        // 1.2 校验关联数据
         validateRelationDataExists(updateReq);
 
-        // 3. 更新
+        // 2. 更新线索
         CrmClueDO updateObj = BeanUtils.toBean(updateReq, CrmClueDO.class);
         clueMapper.updateById(updateObj);
 
@@ -130,7 +127,6 @@ public class CrmClueServiceImpl implements CrmClueService {
         // 3. 记录操作日志上下文
         LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldClue, CrmUpdateFollowUpReqBO.class));
         LogRecordContext.putVariable("clueName", oldClue.getName());
-
     }
 
     @Override
@@ -155,12 +151,11 @@ public class CrmClueServiceImpl implements CrmClueService {
         LogRecordContext.putVariable("clueName", clue.getName());
     }
 
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_LEADS_TYPE, subType = CRM_LEADS_TRANSFER_SUB_TYPE, bizNo = "{{#reqVO.id}}",
             success = CRM_LEADS_TRANSFER_SUCCESS)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_LEADS, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_LEADS, bizId = "#reqVO.id", level = CrmPermissionLevelEnum.OWNER)
     public void transferClue(CrmClueTransferReqVO reqVO, Long userId) {
         // 1 校验线索是否存在
         CrmClueDO clue = validateClueExists(reqVO.getId());
@@ -176,20 +171,19 @@ public class CrmClueServiceImpl implements CrmClueService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_LEADS, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
-    public void translateCustomer(CrmClueTranslateReqVO reqVO, Long userId) {
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_LEADS, bizId = "#ids", level = CrmPermissionLevelEnum.OWNER)
+    public void transformClue(List<Long> ids, Long userId) {
         // 1.1 校验线索都存在
-        Set<Long> clueIds = reqVO.getIds();
-        List<CrmClueDO> clues = getClueList(clueIds, userId);
-        if (CollUtil.isEmpty(clues) || ObjectUtil.notEqual(clues.size(), clueIds.size())) {
-            clueIds.removeAll(convertSet(clues, CrmClueDO::getId));
-            throw exception(CLUE_ANY_CLUE_NOT_EXISTS, clueIds);
+        List<CrmClueDO> clues = getClueList(ids, userId);
+        if (CollUtil.isEmpty(clues) || ObjectUtil.notEqual(clues.size(), ids.size())) {
+            ids.removeAll(convertSet(clues, CrmClueDO::getId));
+            throw exception(CLUE_NOT_EXISTS_ANY, ids);
         }
         // 1.2 存在已经转化的，直接提示哈。避免操作的用户，以为都转化成功了
         List<CrmClueDO> translatedClues = filterList(clues,
                 clue -> ObjectUtil.equal(Boolean.TRUE, clue.getTransformStatus()));
         if (CollUtil.isNotEmpty(translatedClues)) {
-            throw exception(CLUE_ANY_CLUE_ALREADY_TRANSLATED, convertSet(translatedClues, CrmClueDO::getId));
+            throw exception(CLUE_TRANSFORM_FAIL_ALREADY, convertSet(translatedClues, CrmClueDO::getId));
         }
 
         // 2.1 遍历线索(未转化的线索)，创建对应的客户
