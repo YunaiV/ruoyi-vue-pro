@@ -114,6 +114,22 @@ public interface CrmCustomerService {
     Long getPutPoolRemindCustomerCount(Long userId);
 
     /**
+     * 获得今日需联系客户数量
+     *
+     * @param userId 用户编号
+     * @return 提醒数量
+     */
+    Long getTodayContactCustomerCount(Long userId);
+
+    /**
+     * 获得分配给我的客户数量
+     *
+     * @param userId 用户编号
+     * @return 提醒数量
+     */
+    Long getFollowCustomerCount(Long userId);
+
+    /**
      * 校验客户是否存在
      *
      * @param customerId 客户 id
@@ -168,7 +184,7 @@ public interface CrmCustomerService {
      *
      * @param ids         要领取的客户编号数组
      * @param ownerUserId 负责人
-     * @param isReceive   是/否领取
+     * @param isReceive   是/否领取；true - 领取；false - 分配
      */
     void receiveCustomer(List<Long> ids, Long ownerUserId, Boolean isReceive);
 
@@ -178,21 +194,5 @@ public interface CrmCustomerService {
      * @return 掉入公海数量
      */
     int autoPutCustomerPool();
-
-    /**
-     * 获得今日需联系客户数量
-     *
-     * @param userId 用户编号
-     * @return 提醒数量
-     */
-    Long getTodayCustomerCount(Long userId);
-
-    /**
-     * 获得分配给我的客户数量
-     *
-     * @param userId 用户编号
-     * @return 提醒数量
-     */
-    Long getFollowCustomerCount(Long userId);
 
 }

@@ -18,7 +18,6 @@ import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmSceneTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
-import cn.iocoder.yudao.module.crm.framework.permission.core.util.CrmPermissionUtils;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
@@ -191,23 +190,6 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         LogRecordContext.putVariable("customerName", customer.getName());
     }
 
-    /**
-     * 校验客户是否被引用
-     *
-     * @param id 客户编号
-     */
-    private void validateCustomerReference(Long id) {
-        if (contactService.getContactCountByCustomerId(id) > 0) {
-            throw exception(CUSTOMER_DELETE_FAIL_HAVE_REFERENCE, CrmBizTypeEnum.CRM_CONTACT.getName());
-        }
-        if (businessService.getBusinessCountByCustomerId(id) > 0) {
-            throw exception(CUSTOMER_DELETE_FAIL_HAVE_REFERENCE, CrmBizTypeEnum.CRM_BUSINESS.getName());
-        }
-        if (contractService.getContractCountByCustomerId(id) > 0) {
-            throw exception(CUSTOMER_DELETE_FAIL_HAVE_REFERENCE, CrmBizTypeEnum.CRM_CONTRACT.getName());
-        }
-    }
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_TRANSFER_SUB_TYPE, bizNo = "{{#reqVO.id}}",
@@ -336,13 +318,6 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         LogRecordContext.putVariable("isUpdate", isUpdate);
     }
 
-    private void validateCustomerForCreate(CrmCustomerImportExcelVO importCustomer) {
-        // 校验客户名称不能为空
-        if (StrUtil.isEmptyIfStr(importCustomer.getName())) {
-            throw exception(CUSTOMER_CREATE_NAME_NOT_NULL);
-        }
-    }
-
     // ==================== 公海相关操作 ====================
 
     @Override
@@ -371,18 +346,14 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void receiveCustomer(List<Long> ids, Long ownerUserId, Boolean isReceive) {
-        if (!isReceive && !CrmPermissionUtils.isCrmAdmin()) { // 只有管理员可以分配
-            throw exception(CRM_PERMISSION_DENIED, CrmBizTypeEnum.CRM_CUSTOMER.getName());
-        }
-
         // 1.1 校验存在
         List<CrmCustomerDO> customers = customerMapper.selectBatchIds(ids);
         if (customers.size() != ids.size()) {
             throw exception(CUSTOMER_NOT_EXISTS);
         }
-        // 1.2. 校验负责人是否存在
+        // 1.2 校验负责人是否存在
         adminUserApi.validateUserList(singletonList(ownerUserId));
-        // 1.3. 校验状态
+        // 1.3 校验状态
         customers.forEach(customer -> {
             // 校验是否已有负责人
             validateCustomerOwnerExists(customer, false);
@@ -513,16 +484,40 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     }
 
     @Override
-    public Long getTodayCustomerCount(Long userId) {
-        return customerMapper.selectTodayCustomerCount(userId);
+    public Long getTodayContactCustomerCount(Long userId) {
+        return customerMapper.selectCountByTodayContact(userId);
     }
 
     @Override
     public Long getFollowCustomerCount(Long userId) {
-        return customerMapper.selectFollowCustomerCount(userId);
+        return customerMapper.selectCountByFollow(userId);
     }
 
     // ======================= 校验相关 =======================
+
+    private void validateCustomerForCreate(CrmCustomerImportExcelVO importCustomer) {
+        // 校验客户名称不能为空
+        if (StrUtil.isEmptyIfStr(importCustomer.getName())) {
+            throw exception(CUSTOMER_CREATE_NAME_NOT_NULL);
+        }
+    }
+
+    /**
+     * 校验客户是否被引用
+     *
+     * @param id 客户编号
+     */
+    private void validateCustomerReference(Long id) {
+        if (contactService.getContactCountByCustomerId(id) > 0) {
+            throw exception(CUSTOMER_DELETE_FAIL_HAVE_REFERENCE, CrmBizTypeEnum.CRM_CONTACT.getName());
+        }
+        if (businessService.getBusinessCountByCustomerId(id) > 0) {
+            throw exception(CUSTOMER_DELETE_FAIL_HAVE_REFERENCE, CrmBizTypeEnum.CRM_BUSINESS.getName());
+        }
+        if (contractService.getContractCountByCustomerId(id) > 0) {
+            throw exception(CUSTOMER_DELETE_FAIL_HAVE_REFERENCE, CrmBizTypeEnum.CRM_CONTRACT.getName());
+        }
+    }
 
     /**
      * 校验客户是否存在

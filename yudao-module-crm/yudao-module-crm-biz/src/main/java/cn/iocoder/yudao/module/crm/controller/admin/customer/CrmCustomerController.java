@@ -174,15 +174,15 @@ public class CrmCustomerController {
         return success(customerService.getPutPoolRemindCustomerCount(getLoginUserId()));
     }
 
-    @GetMapping("/today-customer-count")
+    @GetMapping("/today-contact-count")
     @Operation(summary = "获得今日需联系客户数量")
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
-    public CommonResult<Long> getTodayCustomerCount() {
-        return success(customerService.getTodayCustomerCount(getLoginUserId()));
+    public CommonResult<Long> getTodayContactCustomerCount() {
+        return success(customerService.getTodayContactCustomerCount(getLoginUserId()));
     }
 
-    @GetMapping("/follow-customer-count")
-    @Operation(summary = "获得分配给我的客户数量")
+    @GetMapping("/follow-count")
+    @Operation(summary = "获得分配给我、待跟进的线索数量的客户数量")
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
     public CommonResult<Long> getFollowCustomerCount() {
         return success(customerService.getFollowCustomerCount(getLoginUserId()));
@@ -222,9 +222,9 @@ public class CrmCustomerController {
         });
     }
 
-    @GetMapping(value = "/list-all-simple")
+    @GetMapping(value = "/simple-list")
     @Operation(summary = "获取客户精简信息列表", description = "只包含有读权限的客户，主要用于前端的下拉选项")
-    public CommonResult<List<CrmCustomerRespVO>> getSimpleDeptList() {
+    public CommonResult<List<CrmCustomerRespVO>> getCustomerSimpleList() {
         CrmCustomerPageReqVO reqVO = new CrmCustomerPageReqVO();
         reqVO.setPageSize(PAGE_SIZE_NONE); // 不分页
         List<CrmCustomerDO> list = customerService.getCustomerPage(reqVO, getLoginUserId()).getList();
@@ -232,7 +232,6 @@ public class CrmCustomerController {
                 new CrmCustomerRespVO().setId(customer.getId()).setName(customer.getName())));
     }
 
-    // TODO @puhui999：公海的导出，前端可以接下
     @GetMapping("/export-excel")
     @Operation(summary = "导出客户 Excel")
     @PreAuthorize("@ss.hasPermission('crm:customer:export')")
