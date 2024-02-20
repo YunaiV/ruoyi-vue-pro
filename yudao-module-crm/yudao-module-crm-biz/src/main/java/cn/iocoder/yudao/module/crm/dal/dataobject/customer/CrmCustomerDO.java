@@ -57,6 +57,10 @@ public class CrmCustomerDO extends BaseDO {
      * 关联 AdminUserDO 的 id 字段
      */
     private Long ownerUserId;
+    /**
+     * 成为负责人的时间
+     */
+    private LocalDateTime ownerTime;
 
     /**
      * 锁定状态

@@ -78,8 +78,7 @@ public class CrmClueServiceImpl implements CrmClueService {
         adminUserApi.validateUser(createReqVO.getOwnerUserId());
 
         // 2. 插入线索
-        CrmClueDO clue = BeanUtils.toBean(createReqVO, CrmClueDO.class)
-                .setContactLastTime(LocalDateTime.now());
+        CrmClueDO clue = BeanUtils.toBean(createReqVO, CrmClueDO.class);
         clueMapper.insert(clue);
 
         // 3. 创建数据权限
@@ -129,7 +128,7 @@ public class CrmClueServiceImpl implements CrmClueService {
         // 校验线索是否存在
         CrmClueDO oldClue = validateClueExists(id);
 
-        // 更新
+        // 更新线索
         clueMapper.updateById(new CrmClueDO().setId(id).setFollowUpStatus(true).setContactNextTime(contactNextTime)
                 .setContactLastTime(LocalDateTime.now()).setContactLastContent(contactLastContent));
 

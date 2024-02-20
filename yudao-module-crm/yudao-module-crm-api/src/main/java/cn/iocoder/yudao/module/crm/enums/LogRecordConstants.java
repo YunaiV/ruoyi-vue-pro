@@ -45,6 +45,8 @@ public interface LogRecordConstants {
     String CRM_CUSTOMER_IMPORT_SUCCESS = "{{#isUpdate ? '导入并更新了客户【'+ #customer.name +'】' : '导入了客户【'+ #customer.name +'】'}}";
     String CRM_CUSTOMER_UPDATE_DEAL_STATUS_SUB_TYPE = "更新客户成交状态";
     String CRM_CUSTOMER_UPDATE_DEAL_STATUS_SUCCESS = "更新了客户【{{#customerName}}】的成交状态为【{{#dealStatus ? '已成交' : '未成交'}}】";
+    String CRM_CUSTOMER_FOLLOW_UP_SUB_TYPE = "客户跟进";
+    String CRM_CUSTOMER_FOLLOW_UP_SUCCESS = "客户跟进【{{#customerName}}】";
 
     // ======================= CRM_CUSTOMER_LIMIT_CONFIG 客户限制配置 =======================
 

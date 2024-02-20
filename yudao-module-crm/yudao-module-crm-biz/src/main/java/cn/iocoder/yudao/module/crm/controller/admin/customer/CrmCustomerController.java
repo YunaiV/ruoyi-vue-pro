@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.crm.controller.admin.customer;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
@@ -15,7 +15,6 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.customer.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
-import cn.iocoder.yudao.module.crm.enums.common.CrmSceneTypeEnum;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerPoolConfigService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -40,13 +39,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CUSTOMER_POOL_CONFIG_NOT_EXISTS_OR_DISABLED;
 import static java.util.Collections.singletonList;
 
 @Tag(name = "管理后台 - CRM 客户")
@@ -123,6 +120,7 @@ public class CrmCustomerController {
     @Operation(summary = "获得客户分页")
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
     public CommonResult<PageResult<CrmCustomerRespVO>> getCustomerPage(@Valid CrmCustomerPageReqVO pageVO) {
+        customerService.autoPutCustomerPool();
         // 1. 查询客户分页
         PageResult<CrmCustomerDO> pageResult = customerService.getCustomerPage(pageVO, getLoginUserId());
         if (CollUtil.isEmpty(pageResult.getList())) {
@@ -159,45 +157,21 @@ public class CrmCustomerController {
         });
     }
 
-    // TODO @芋艿：需要 review 下
-    @GetMapping("/put-in-pool-remind-page")
+    @GetMapping("/put-pool-remind-page")
     @Operation(summary = "获得待进入公海客户分页")
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
-    public CommonResult<PageResult<CrmCustomerRespVO>> getPutInPoolRemindCustomerPage(@Valid CrmCustomerPageReqVO pageVO) {
-        // 获取公海配置 TODO @dbh52：合并到 getPutInPoolRemindCustomerPage 会更合适哈；
-        CrmCustomerPoolConfigDO poolConfigDO = customerPoolConfigService.getCustomerPoolConfig();
-        if (ObjUtil.isNull(poolConfigDO)
-                || Boolean.FALSE.equals(poolConfigDO.getEnabled())
-                || Boolean.FALSE.equals(poolConfigDO.getNotifyEnabled())) {
-            throw exception(CUSTOMER_POOL_CONFIG_NOT_EXISTS_OR_DISABLED);
-        }
-
+    public CommonResult<PageResult<CrmCustomerRespVO>> getPutPoolRemindCustomerPage(@Valid CrmCustomerPageReqVO pageVO) {
         // 1. 查询客户分页
-        PageResult<CrmCustomerDO> pageResult = customerService.getPutInPoolRemindCustomerPage(pageVO, poolConfigDO, getLoginUserId());
-        if (CollUtil.isEmpty(pageResult.getList())) {
-            return success(PageResult.empty(pageResult.getTotal()));
-        }
-
+        PageResult<CrmCustomerDO> pageResult = customerService.getPutPoolRemindCustomerPage(pageVO, getLoginUserId());
         // 2. 拼接数据
         return success(new PageResult<>(buildCustomerDetailList(pageResult.getList()), pageResult.getTotal()));
     }
 
-    @GetMapping("/put-in-pool-remind-count")
+    @GetMapping("/put-pool-remind-count")
     @Operation(summary = "获得待进入公海客户数量")
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
-    public CommonResult<Long> getPutInPoolRemindCustomerCount() {
-        // 获取公海配置
-        CrmCustomerPoolConfigDO poolConfigDO = customerPoolConfigService.getCustomerPoolConfig();
-        if (ObjUtil.isNull(poolConfigDO)
-                || Boolean.FALSE.equals(poolConfigDO.getEnabled())
-                || Boolean.FALSE.equals(poolConfigDO.getNotifyEnabled())) {
-            throw exception(CUSTOMER_POOL_CONFIG_NOT_EXISTS_OR_DISABLED);
-        }
-        CrmCustomerPageReqVO pageVO = new CrmCustomerPageReqVO()
-                .setPool(null)
-                .setContactStatus(CrmCustomerPageReqVO.CONTACT_TODAY)
-                .setSceneType(CrmSceneTypeEnum.OWNER.getType());
-        return success(customerService.getPutInPoolRemindCustomerCount(pageVO, poolConfigDO, getLoginUserId()));
+    public CommonResult<Long> getPutPoolRemindCustomerCount() {
+        return success(customerService.getPutPoolRemindCustomerCount(getLoginUserId()));
     }
 
     @GetMapping("/today-customer-count")
@@ -225,24 +199,26 @@ public class CrmCustomerController {
         if (poolConfig == null || !poolConfig.getEnabled()) {
             return MapUtil.empty();
         }
+        list = CollectionUtils.filterList(list, customer -> {
+            // 特殊：如果没负责人，则说明已经在公海，不用计算
+            if (customer.getOwnerUserId() == null) {
+                return false;
+            }
+            // 已成交 or 已锁定，不进入公海
+            return !customer.getDealStatus() && !customer.getLockStatus();
+        });
         return convertMap(list, CrmCustomerDO::getId, customer -> {
-            // TODO 芋艿：这样计算，貌似有点问题
             // 1.1 未成交放入公海天数
-            long dealExpireDay = 0;
-            if (!customer.getDealStatus()) {
-                dealExpireDay = poolConfig.getDealExpireDays() - LocalDateTimeUtils.between(customer.getCreateTime());
-            }
-            if (dealExpireDay < 0) {
-                dealExpireDay = 0;
-            }
+            long dealExpireDay = poolConfig.getDealExpireDays() - LocalDateTimeUtils.between(customer.getOwnerTime());
             // 1.2 未跟进放入公海天数
-            LocalDateTime lastTime = ObjUtil.defaultIfNull(customer.getContactLastTime(), customer.getCreateTime());
-            long contactExpireDay = poolConfig.getContactExpireDays() - LocalDateTimeUtils.between(lastTime);
-            if (contactExpireDay < 0) {
-                contactExpireDay = 0;
+            LocalDateTime lastTime = customer.getOwnerTime();
+            if (customer.getContactLastTime() != null && customer.getContactLastTime().isAfter(lastTime)) {
+                lastTime = customer.getContactLastTime();
             }
+            long contactExpireDay = poolConfig.getContactExpireDays() - LocalDateTimeUtils.between(lastTime);
             // 2. 返回最小的天数
-            return Math.min(dealExpireDay, contactExpireDay);
+            long poolDay = Math.min(dealExpireDay, contactExpireDay);
+            return poolDay > 0 ? poolDay : 0;
         });
     }
 

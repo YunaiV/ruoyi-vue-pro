@@ -31,40 +31,6 @@ import java.util.List;
 @Mapper
 public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
 
-    private static MPJLambdaWrapperX<CrmCustomerDO> buildPutInPoolRemindCustomerWrapper(CrmCustomerPageReqVO pageReqVO, CrmCustomerPoolConfigDO poolConfigDO, Long userId) {
-        MPJLambdaWrapperX<CrmCustomerDO> query = new MPJLambdaWrapperX<>();
-        // 拼接数据权限的查询条件
-        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CUSTOMER.getType(),
-                CrmCustomerDO::getId, userId, pageReqVO.getSceneType(), null);
-
-        // 锁定状态不需要提醒
-        query.ne(CrmCustomerDO::getLockStatus, true);
-
-        // 情况一：未成交提醒日期区间
-        Integer dealExpireDays = poolConfigDO.getDealExpireDays();
-        LocalDateTime startDealRemindDate = LocalDateTimeUtil.beginOfDay(LocalDateTime.now())
-                .minusDays(dealExpireDays);
-        LocalDateTime endDealRemindDate = LocalDateTimeUtil.endOfDay(LocalDateTime.now())
-                .minusDays(Math.max(dealExpireDays - poolConfigDO.getNotifyDays(), 0));
-        // 情况二：未跟进提醒日期区间
-        Integer contactExpireDays = poolConfigDO.getContactExpireDays();
-        LocalDateTime startContactRemindDate = LocalDateTimeUtil.beginOfDay(LocalDateTime.now())
-                .minusDays(contactExpireDays);
-        LocalDateTime endContactRemindDate = LocalDateTimeUtil.endOfDay(LocalDateTime.now())
-                .minusDays(Math.max(contactExpireDays - poolConfigDO.getNotifyDays(), 0));
-        query
-                // 情况一：1. 未成交放入公海提醒
-                .eq(CrmCustomerDO::getDealStatus, false)
-                .between(CrmCustomerDO::getCreateTime, startDealRemindDate, endDealRemindDate)
-                // 情况二：未跟进放入公海提醒
-                .or() // 2.1 contactLastTime 为空 TODO 芋艿：这个要不要搞个默认值；
-                .isNull(CrmCustomerDO::getContactLastTime)
-                .between(CrmCustomerDO::getCreateTime, startContactRemindDate, endContactRemindDate)
-                .or() // 2.2 ContactLastTime 不为空
-                .between(CrmCustomerDO::getContactLastTime, startContactRemindDate, endContactRemindDate);
-        return query;
-    }
-
     default Long selectCountByLockStatusAndOwnerUserId(Boolean lockStatus, Long ownerUserId) {
         return selectCount(new LambdaUpdateWrapper<CrmCustomerDO>()
                 .eq(CrmCustomerDO::getLockStatus, lockStatus)
@@ -124,28 +90,78 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
         return selectJoinList(CrmCustomerDO.class, query);
     }
 
-    default List<CrmCustomerDO> selectListByLockAndNotPool(Boolean lockStatus) {
-        return selectList(new LambdaQueryWrapper<CrmCustomerDO>()
-                .eq(CrmCustomerDO::getLockStatus, lockStatus)
-                .gt(CrmCustomerDO::getOwnerUserId, 0));
-    }
-
     default CrmCustomerDO selectByCustomerName(String name) {
         return selectOne(CrmCustomerDO::getName, name);
     }
 
-    default PageResult<CrmCustomerDO> selectPutInPoolRemindCustomerPage(CrmCustomerPageReqVO pageReqVO,
-                                                                        CrmCustomerPoolConfigDO poolConfigDO,
-                                                                        Long userId) {
-        final MPJLambdaWrapperX<CrmCustomerDO> query = buildPutInPoolRemindCustomerWrapper(pageReqVO, poolConfigDO, userId);
+    default PageResult<CrmCustomerDO> selectPutPoolRemindCustomerPage(CrmCustomerPageReqVO pageReqVO,
+                                                                      CrmCustomerPoolConfigDO poolConfig,
+                                                                      Long userId) {
+        final MPJLambdaWrapperX<CrmCustomerDO> query = buildPutPoolRemindCustomerQuery(pageReqVO, poolConfig, userId);
         return selectJoinPage(pageReqVO, CrmCustomerDO.class, query.selectAll(CrmCustomerDO.class));
     }
 
-    default Long selectPutInPoolRemindCustomerCount(CrmCustomerPageReqVO pageReqVO,
-                                                    CrmCustomerPoolConfigDO poolConfigDO,
-                                                    Long userId) {
-        final MPJLambdaWrapperX<CrmCustomerDO> query = buildPutInPoolRemindCustomerWrapper(pageReqVO, poolConfigDO, userId);
+    default Long selectPutPoolRemindCustomerCount(CrmCustomerPageReqVO pageReqVO,
+                                                  CrmCustomerPoolConfigDO poolConfigDO,
+                                                  Long userId) {
+        final MPJLambdaWrapperX<CrmCustomerDO> query = buildPutPoolRemindCustomerQuery(pageReqVO, poolConfigDO, userId);
         return selectCount(query);
+    }
+
+    private static MPJLambdaWrapperX<CrmCustomerDO> buildPutPoolRemindCustomerQuery(CrmCustomerPageReqVO pageReqVO,
+                                                                                    CrmCustomerPoolConfigDO poolConfig,
+                                                                                    Long userId) {
+        MPJLambdaWrapperX<CrmCustomerDO> query = new MPJLambdaWrapperX<>();
+        // 拼接数据权限的查询条件
+        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CUSTOMER.getType(),
+                CrmCustomerDO::getId, userId, pageReqVO.getSceneType(), null);
+
+        // 未锁定 + 未成交
+        query.eq(CrmCustomerDO::getLockStatus, false).eq(CrmCustomerDO::getDealStatus, false);
+
+        // 情况一：未成交提醒日期区间
+        Integer dealExpireDays = poolConfig.getDealExpireDays();
+        LocalDateTime startDealRemindTime = LocalDateTime.now().minusDays(dealExpireDays);
+        LocalDateTime endDealRemindTime = LocalDateTime.now()
+                .minusDays(Math.max(dealExpireDays - poolConfig.getNotifyDays(), 0));
+        // 情况二：未跟进提醒日期区间
+        Integer contactExpireDays = poolConfig.getContactExpireDays();
+        LocalDateTime startContactRemindTime = LocalDateTime.now().minusDays(contactExpireDays);
+        LocalDateTime endContactRemindTime = LocalDateTime.now()
+                .minusDays(Math.max(contactExpireDays - poolConfig.getNotifyDays(), 0));
+        query.and(q -> {
+            // 情况一：成交超时提醒
+            q.between(CrmCustomerDO::getOwnerTime, startDealRemindTime, endDealRemindTime)
+            // 情况二：跟进超时提醒
+            .or(w -> w.between(CrmCustomerDO::getOwnerTime, startContactRemindTime, endContactRemindTime)
+                    .and(p -> p.between(CrmCustomerDO::getContactLastTime, startContactRemindTime, endContactRemindTime)
+                            .or().isNull(CrmCustomerDO::getContactLastTime)));
+        });
+        return query;
+    }
+
+    /**
+     * 获得需要过期到公海的客户列表
+     *
+     * @return 客户列表
+     */
+    default List<CrmCustomerDO> selectListByAutoPool(CrmCustomerPoolConfigDO poolConfig) {
+        LambdaQueryWrapper<CrmCustomerDO> query = new LambdaQueryWrapper<>();
+        query.gt(CrmCustomerDO::getOwnerUserId, 0);
+        // 未锁定 + 未成交
+        query.eq(CrmCustomerDO::getLockStatus, false).eq(CrmCustomerDO::getDealStatus, false);
+        // 已经超时
+        LocalDateTime dealExpireTime = LocalDateTime.now().minusDays(poolConfig.getDealExpireDays());
+        LocalDateTime contactExpireTime = LocalDateTime.now().minusDays(poolConfig.getContactExpireDays());
+        query.and(q -> {
+            // 情况一：成交超时
+            q.lt(CrmCustomerDO::getOwnerTime, dealExpireTime)
+            // 情况二：跟进超时
+            .or(w -> w.lt(CrmCustomerDO::getOwnerTime, contactExpireTime)
+                    .and(p -> p.lt(CrmCustomerDO::getContactLastTime, contactExpireTime)
+                            .or().isNull(CrmCustomerDO::getContactLastTime)));
+        });
+        return selectList(query);
     }
 
     default Long selectTodayCustomerCount(Long userId) {

@@ -43,6 +43,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static java.util.Collections.singletonList;
 
 @Tag(name = "管理后台 - 线索")
 @RestController
@@ -93,11 +94,11 @@ public class CrmClueController {
         return success(buildClueDetail(clue));
     }
 
-    public CrmClueRespVO buildClueDetail(CrmClueDO clue) {
+    private CrmClueRespVO buildClueDetail(CrmClueDO clue) {
         if (clue == null) {
             return null;
         }
-        return buildClueDetailList(Collections.singletonList(clue)).get(0);
+        return buildClueDetailList(singletonList(clue)).get(0);
     }
 
     @GetMapping("/page")
