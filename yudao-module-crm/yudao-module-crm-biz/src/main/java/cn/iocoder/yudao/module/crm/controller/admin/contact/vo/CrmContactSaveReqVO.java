@@ -27,6 +27,7 @@ public class CrmContactSaveReqVO {
     private String name;
 
     @Schema(description = "客户编号", example = "10795")
+    @NotNull(message = "客户编号不能为空")
     @DiffLogField(name = "客户", function = CrmCustomerParseFunction.NAME)
     private Long customerId;
 

@@ -75,6 +75,8 @@ public interface LogRecordConstants {
     String CRM_CONTACT_DELETE_SUCCESS = "删除了联系人【{{#contactName}}】";
     String CRM_CONTACT_TRANSFER_SUB_TYPE = "转移联系人";
     String CRM_CONTACT_TRANSFER_SUCCESS = "将联系人【{{#contact.name}}】的负责人从【{getAdminUserById{#contact.ownerUserId}}】变更为了【{getAdminUserById{#reqVO.newOwnerUserId}}】";
+    String CRM_CONTACT_FOLLOW_UP_SUB_TYPE = "联系人跟进";
+    String CRM_CONTACT_FOLLOW_UP_SUCCESS = "联系人跟进【{{#contactName}}】";
 
     // ======================= CRM_BUSINESS 商机 =======================
 

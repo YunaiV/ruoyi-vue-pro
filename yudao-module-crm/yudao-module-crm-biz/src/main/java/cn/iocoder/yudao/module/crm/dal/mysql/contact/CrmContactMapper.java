@@ -22,12 +22,6 @@ import java.util.List;
 @Mapper
 public interface CrmContactMapper extends BaseMapperX<CrmContactDO> {
 
-    default int updateOwnerUserIdById(Long id, Long ownerUserId) {
-        return update(new LambdaUpdateWrapper<CrmContactDO>()
-                .eq(CrmContactDO::getId, id)
-                .set(CrmContactDO::getOwnerUserId, ownerUserId));
-    }
-
     default int updateOwnerUserIdByCustomerId(Long customerId, Long ownerUserId) {
         return update(new LambdaUpdateWrapper<CrmContactDO>()
                 .eq(CrmContactDO::getCustomerId, customerId)

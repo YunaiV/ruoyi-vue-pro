@@ -6,9 +6,9 @@ import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactSaveReq
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactTransferReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import jakarta.validation.Valid;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +54,7 @@ public interface CrmContactService {
     void transferContact(CrmContactTransferReqVO reqVO, Long userId);
 
     /**
-     * 更新客户联系人负责人
+     * 更新指定客户的联系人的负责人
      *
      * @param customerId  客户编号
      * @param ownerUserId 用户编号
@@ -64,9 +64,20 @@ public interface CrmContactService {
     /**
      * 更新联系人相关跟进信息
      *
-     * @param updateFollowUpReqBOList 跟进信息
+     * @param id 编号
+     * @param contactNextTime 下次联系时间
+     * @param contactLastContent 最后联系内容
      */
-    void updateContactFollowUpBatch(List<CrmUpdateFollowUpReqBO> updateFollowUpReqBOList);
+    void updateContactFollowUp(Long id, LocalDateTime contactNextTime, String contactLastContent);
+
+    /**
+     * 更新联系人相关跟进信息
+     *
+     * @param ids 编号数组
+     * @param contactNextTime 下次联系时间
+     * @param contactLastContent 最后联系内容
+     */
+    void updateContactFollowUpBatch(Collection<Long> ids, LocalDateTime contactNextTime, String contactLastContent);
 
     /**
      * 获得联系人
@@ -104,19 +115,12 @@ public interface CrmContactService {
     }
 
     /**
-     * 获得联系人列表
-     *
-     * @return 联系人列表
-     */
-    List<CrmContactDO> getContactList();
-
-    /**
      * 获取联系人列表（校验权限）
      *
      * @param userId 用户编号
      * @return 联系人列表
      */
-    List<CrmContactDO> getSimpleContactList(Long userId);
+    List<CrmContactDO> getContactList(Long userId);
 
     /**
      * 获得联系人分页

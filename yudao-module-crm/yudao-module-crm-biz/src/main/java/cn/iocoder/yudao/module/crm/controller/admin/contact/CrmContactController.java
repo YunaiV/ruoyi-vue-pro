@@ -118,7 +118,7 @@ public class CrmContactController {
     @Operation(summary = "获得联系人的精简列表")
     @PreAuthorize("@ss.hasPermission('crm:contact:query')")
     public CommonResult<List<CrmContactRespVO>> getSimpleContactList() {
-        List<CrmContactDO> list = contactService.getSimpleContactList(getLoginUserId());
+        List<CrmContactDO> list = contactService.getContactList(getLoginUserId());
         return success(convertList(list, contact -> // 只返回 id、name 字段
                 new CrmContactRespVO().setId(contact.getId()).setName(contact.getName())));
     }

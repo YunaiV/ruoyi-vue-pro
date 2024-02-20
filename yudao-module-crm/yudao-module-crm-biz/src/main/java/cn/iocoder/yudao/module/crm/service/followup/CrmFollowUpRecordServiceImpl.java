@@ -68,41 +68,40 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
     @Override
     @CrmPermission(bizTypeValue = "#createReqVO.bizType", bizId = "#createReqVO.bizId", level = CrmPermissionLevelEnum.WRITE)
     public Long createFollowUpRecord(CrmFollowUpRecordSaveReqVO createReqVO) {
-        // 创建更进记录
-        CrmFollowUpRecordDO followUpRecord = BeanUtils.toBean(createReqVO, CrmFollowUpRecordDO.class);
-        crmFollowUpRecordMapper.insert(followUpRecord);
+        // 1. 创建更进记录
+        CrmFollowUpRecordDO record = BeanUtils.toBean(createReqVO, CrmFollowUpRecordDO.class);
+        crmFollowUpRecordMapper.insert(record);
 
-        // 2. 更新 bizId 对应的记录；
-        CrmUpdateFollowUpReqBO updateFollowUpReqBO = new CrmUpdateFollowUpReqBO().setBizId(followUpRecord.getBizId())
+        // 2. 更新 bizId 对应的记录
+        CrmUpdateFollowUpReqBO updateFollowUpReqBO = new CrmUpdateFollowUpReqBO().setBizId(record.getBizId())
                 .setContactLastTime(LocalDateTime.now())
-                .setContactNextTime(followUpRecord.getNextTime()).setContactLastContent(followUpRecord.getContent());
-        if (ObjUtil.equal(CrmBizTypeEnum.CRM_BUSINESS.getType(), followUpRecord.getBizType())) { // 更新商机跟进信息
+                .setContactNextTime(record.getNextTime()).setContactLastContent(record.getContent());
+        if (ObjUtil.equal(CrmBizTypeEnum.CRM_BUSINESS.getType(), record.getBizType())) { // 更新商机跟进信息
             businessService.updateBusinessFollowUpBatch(Collections.singletonList(updateFollowUpReqBO));
         }
-        if (ObjUtil.equal(CrmBizTypeEnum.CRM_CLUE.getType(), followUpRecord.getBizType())) { // 更新线索跟进信息
-            clueService.updateClueFollowUp(followUpRecord.getId(), followUpRecord.getNextTime(), followUpRecord.getContent());
+        if (ObjUtil.equal(CrmBizTypeEnum.CRM_CLUE.getType(), record.getBizType())) { // 更新线索跟进信息
+            clueService.updateClueFollowUp(record.getBizId(), record.getNextTime(), record.getContent());
         }
-        if (ObjUtil.equal(CrmBizTypeEnum.CRM_CONTACT.getType(), followUpRecord.getBizType())) { // 更新联系人跟进信息
-            contactService.updateContactFollowUpBatch(Collections.singletonList(updateFollowUpReqBO));
+        if (ObjUtil.equal(CrmBizTypeEnum.CRM_CONTACT.getType(), record.getBizType())) { // 更新联系人跟进信息
+            contactService.updateContactFollowUp(record.getBizId(), record.getNextTime(), record.getContent());
         }
-        if (ObjUtil.equal(CrmBizTypeEnum.CRM_CONTRACT.getType(), followUpRecord.getBizType())) { // 更新合同跟进信息
+        if (ObjUtil.equal(CrmBizTypeEnum.CRM_CONTRACT.getType(), record.getBizType())) { // 更新合同跟进信息
             contractService.updateContractFollowUp(updateFollowUpReqBO);
         }
-        if (ObjUtil.equal(CrmBizTypeEnum.CRM_CUSTOMER.getType(), followUpRecord.getBizType())) { // 更新客户跟进信息
-            customerService.updateCustomerFollowUp(followUpRecord.getBizId(), followUpRecord.getNextTime(), followUpRecord.getContent());
+        if (ObjUtil.equal(CrmBizTypeEnum.CRM_CUSTOMER.getType(), record.getBizType())) { // 更新客户跟进信息
+            customerService.updateCustomerFollowUp(record.getBizId(), record.getNextTime(), record.getContent());
         }
 
         // 3.1 更新 contactIds 对应的记录，不更新 lastTime 和 lastContent
         if (CollUtil.isNotEmpty(createReqVO.getContactIds())) {
-            contactService.updateContactFollowUpBatch(convertList(createReqVO.getContactIds(),
-                    contactId -> updateFollowUpReqBO.setBizId(contactId).setContactLastTime(null).setContactLastContent(null)));
+            contactService.updateContactFollowUpBatch(createReqVO.getContactIds(), null, null);
         }
         // 3.2 需要更新 businessIds 对应的记录，不更新 lastTime 和 lastContent
         if (CollUtil.isNotEmpty(createReqVO.getBusinessIds())) {
             businessService.updateBusinessFollowUpBatch(convertList(createReqVO.getBusinessIds(),
                     businessId -> updateFollowUpReqBO.setBizId(businessId).setContactLastTime(null).setContactLastContent(null)));
         }
-        return followUpRecord.getId();
+        return record.getId();
     }
 
     @Override

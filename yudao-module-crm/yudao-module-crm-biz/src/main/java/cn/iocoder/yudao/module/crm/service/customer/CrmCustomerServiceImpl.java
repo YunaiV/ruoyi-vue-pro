@@ -164,7 +164,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
         // 2. 更新客户的跟进信息
         customerMapper.updateById(new CrmCustomerDO().setId(id).setFollowUpStatus(true).setContactNextTime(contactNextTime)
-                .setContactLastTime(LocalDateTime.now()));
+                .setContactLastTime(LocalDateTime.now()).setContactLastContent(contactLastContent));
 
         // 3. 记录操作日志上下文
         LogRecordContext.putVariable("customerName", customer.getName());
@@ -521,11 +521,11 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     /**
      * 校验客户是否存在
      *
-     * @param customerId 客户 id
+     * @param id 客户 id
      */
     @Override
-    public void validateCustomer(Long customerId) {
-        validateCustomerExists(customerId);
+    public void validateCustomer(Long id) {
+        validateCustomerExists(id);
     }
 
     private void validateCustomerOwnerExists(CrmCustomerDO customer, Boolean pool) {
