@@ -168,7 +168,7 @@ public class CrmContractController {
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(contractList,
                 contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getOwnerUserId())));
         // 3. 获取联系人
-        Map<Long, CrmContactDO> contactMap = convertMap(contactService.getContactListByIds(convertSet(contractList,
+        Map<Long, CrmContactDO> contactMap = convertMap(contactService.getContactList(convertSet(contractList,
                 CrmContractDO::getContactId)), CrmContactDO::getId);
         // 4. 获取商机
         Map<Long, CrmBusinessDO> businessMap = convertMap(businessService.getBusinessList(convertSet(contractList,

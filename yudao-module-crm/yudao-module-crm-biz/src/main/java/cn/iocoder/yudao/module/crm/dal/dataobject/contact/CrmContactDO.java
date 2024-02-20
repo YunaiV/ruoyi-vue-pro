@@ -30,76 +30,15 @@ public class CrmContactDO extends BaseDO {
     @TableId
     private Long id;
     /**
+     * 联系人姓名
+     */
+    private String name;
+    /**
      * 客户编号
      *
      * 关联 {@link CrmCustomerDO#getId()}
      */
     private Long customerId;
-    /**
-     * 手机号
-     */
-    private String mobile;
-    /**
-     * 电话
-     */
-    private String telephone;
-    /**
-     * 电子邮箱
-     */
-    private String email;
-    /**
-     * 所在地
-     *
-     * 关联 {@link cn.iocoder.yudao.framework.ip.core.Area#getId()} 字段
-     */
-    private Integer areaId;
-    /**
-     * 详细地址
-     */
-    private String detailAddress;
-    /**
-     * 备注
-     */
-    private String remark;
-
-    /**
-     * 直属上级
-     *
-     * 关联 {@link CrmContactDO#id}
-     */
-    private Long parentId;
-    /**
-     * 姓名
-     */
-    private String name;
-    /**
-     * 职位
-     */
-    private String post;
-    /**
-     * QQ
-     */
-    private Long qq;
-    /**
-     * 微信
-     */
-    private String wechat;
-    /**
-     * 性别
-     *
-     * 枚举 {@link cn.iocoder.yudao.module.system.enums.common.SexEnum}
-     */
-    private Integer sex;
-    /**
-     * 是否关键决策人
-     */
-    private Boolean master;
-    /**
-     * 负责人用户编号
-     *
-     * 关联 AdminUserDO 的 id 字段
-     */
-    private Long ownerUserId;
 
     /**
      * 最后跟进时间
@@ -113,5 +52,67 @@ public class CrmContactDO extends BaseDO {
      * 下次联系时间
      */
     private LocalDateTime contactNextTime;
+
+    /**
+     * 负责人用户编号
+     *
+     * 关联 AdminUserDO 的 id 字段
+     */
+    private Long ownerUserId;
+
+    /**
+     * 手机号
+     */
+    private String mobile;
+    /**
+     * 电话
+     */
+    private String telephone;
+    /**
+     * 电子邮箱
+     */
+    private String email;
+    /**
+     * QQ
+     */
+    private Long qq;
+    /**
+     * 微信
+     */
+    private String wechat;
+    /**
+     * 所在地
+     *
+     * 关联 {@link cn.iocoder.yudao.framework.ip.core.Area#getId()} 字段
+     */
+    private Integer areaId;
+    /**
+     * 详细地址
+     */
+    private String detailAddress;
+    /**
+     * 性别
+     *
+     * 枚举 {@link cn.iocoder.yudao.module.system.enums.common.SexEnum}
+     */
+    private Integer sex;
+    /**
+     * 是否关键决策人
+     */
+    private Boolean master;
+    /**
+     * 职位
+     */
+    private String post;
+    /**
+     * 直属上级
+     *
+     * 关联 {@link CrmContactDO#id}
+     */
+    private Long parentId;
+    /**
+     * 备注
+     */
+    private String remark;
 
 }

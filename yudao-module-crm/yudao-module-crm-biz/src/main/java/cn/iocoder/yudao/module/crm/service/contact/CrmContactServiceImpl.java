@@ -218,7 +218,7 @@ public class CrmContactServiceImpl implements CrmContactService {
     }
 
     @Override
-    public List<CrmContactDO> getContactListByIds(Collection<Long> ids) {
+    public List<CrmContactDO> getContactList(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return ListUtil.empty();
         }

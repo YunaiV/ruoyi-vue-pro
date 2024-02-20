@@ -11,6 +11,9 @@ import jakarta.validation.Valid;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * CRM 联系人 Service 接口
@@ -88,7 +91,17 @@ public interface CrmContactService {
      * @param ids 编号
      * @return 联系人列表
      */
-    List<CrmContactDO> getContactListByIds(Collection<Long> ids);
+    List<CrmContactDO> getContactList(Collection<Long> ids);
+
+    /**
+     * 获得联系人 Map
+     *
+     * @param ids 编号
+     * @return 联系人 Map
+     */
+    default Map<Long, CrmContactDO> getContactMap(Collection<Long> ids) {
+        return convertMap(getContactList(ids), CrmContactDO::getId);
+    }
 
     /**
      * 获得联系人列表

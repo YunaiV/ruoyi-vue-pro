@@ -264,7 +264,6 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
                 .updateCustomerNames(new ArrayList<>()).failureCustomerNames(new LinkedHashMap<>()).build();
         importCustomers.forEach(importCustomer -> {
             // 校验，判断是否有不符合的原因
-            // TODO @puhui999：可以用 ValidationUtils 做参数校验；可能要封装一个方法，返回 message；这样的话，就可以在 CrmCustomerImportExcelVO 写需要校验的参数啦；
             try {
                 validateCustomerForCreate(importCustomer);
             } catch (ServiceException ex) {
