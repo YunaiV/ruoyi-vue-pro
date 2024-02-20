@@ -10,8 +10,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
-import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.customer.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerLimitConfigDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
@@ -27,6 +26,7 @@ import cn.iocoder.yudao.module.crm.service.customer.bo.CrmCustomerCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.mzt.logapi.context.LogRecordContext;
@@ -138,6 +138,26 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     }
 
     @Override
+    @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_UPDATE_DEAL_STATUS_SUB_TYPE, bizNo = "{{#id}}",
+            success = CRM_CUSTOMER_UPDATE_DEAL_STATUS_SUCCESS)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#id", level = CrmPermissionLevelEnum.WRITE)
+    public void updateCustomerDealStatus(Long id, Boolean dealStatus) {
+        // 1.1 校验存在
+        CrmCustomerDO customer = validateCustomerExists(id);
+        // 1.2 校验是否重复操作
+        if (Objects.equals(customer.getDealStatus(), dealStatus)) {
+            throw exception(CUSTOMER_UPDATE_DEAL_STATUS_FAIL);
+        }
+
+        // 2. 更新客户的成交状态
+        customerMapper.updateById(new CrmCustomerDO().setId(id).setDealStatus(dealStatus));
+
+        // 3. 记录操作日志上下文
+        LogRecordContext.putVariable("customerName", customer.getName());
+        LogRecordContext.putVariable("dealStatus", dealStatus);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_DELETE_SUB_TYPE, bizNo = "{{#id}}",
             success = CRM_CUSTOMER_DELETE_SUCCESS)
@@ -146,7 +166,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         // 1.1 校验存在
         CrmCustomerDO customer = validateCustomerExists(id);
         // 1.2 检查引用
-        checkCustomerReference(id);
+        validateCustomerReference(id);
 
         // 2. 删除
         customerMapper.deleteById(id);
@@ -162,7 +182,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
      *
      * @param id 客户编号
      */
-    private void checkCustomerReference(Long id) {
+    private void validateCustomerReference(Long id) {
         if (contactService.getContactCountByCustomerId(id) > 0) {
             throw exception(CUSTOMER_DELETE_FAIL_HAVE_REFERENCE, CrmBizTypeEnum.CRM_CONTACT.getName());
         }
@@ -186,8 +206,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         validateCustomerExceedOwnerLimit(reqVO.getNewOwnerUserId(), 1);
 
         // 2.1 数据权限转移
-        permissionService.transferPermission(
-                CrmCustomerConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType()));
+        permissionService.transferPermission(new CrmPermissionTransferReqBO(userId, CrmBizTypeEnum.CRM_CUSTOMER.getType(),
+                        reqVO.getId(), reqVO.getNewOwnerUserId(), reqVO.getOldOwnerPermissionLevel()));
         // 2.2 转移后重新设置负责人
         customerMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
 
@@ -230,8 +250,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
             success = CRM_CUSTOMER_CREATE_SUCCESS)
     public Long createCustomer(CrmCustomerCreateReqBO customerCreateReq, Long userId) {
         // 1. 插入客户
-        CrmCustomerDO customer = BeanUtils.toBean(customerCreateReq, CrmCustomerDO.class).setOwnerUserId(userId)
-                .setLockStatus(false).setDealStatus(false).setReceiveTime(LocalDateTime.now());
+        CrmCustomerDO customer = BeanUtils.toBean(customerCreateReq, CrmCustomerDO.class).setOwnerUserId(userId);
         customerMapper.insert(customer);
 
         // 2. 创建数据权限

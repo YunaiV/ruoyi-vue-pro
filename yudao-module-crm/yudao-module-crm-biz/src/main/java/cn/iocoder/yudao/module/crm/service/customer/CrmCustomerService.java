@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.crm.service.customer;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.customer.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
 import cn.iocoder.yudao.module.crm.service.customer.bo.CrmCustomerCreateReqBO;
@@ -36,6 +36,14 @@ public interface CrmCustomerService {
      * @param updateReqVO 更新信息
      */
     void updateCustomer(@Valid CrmCustomerSaveReqVO updateReqVO);
+
+    /**
+     * 更新客户的跟进状态
+     *
+     * @param id        编号
+     * @param dealStatus 跟进状态
+     */
+    void updateCustomerDealStatus(Long id, Boolean dealStatus);
 
     /**
      * 删除客户

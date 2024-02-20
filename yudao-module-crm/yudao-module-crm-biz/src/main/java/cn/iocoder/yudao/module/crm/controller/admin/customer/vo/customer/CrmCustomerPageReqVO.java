@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.controller.admin.customer.vo;
+package cn.iocoder.yudao.module.crm.controller.admin.customer.vo.customer;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
