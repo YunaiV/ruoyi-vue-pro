@@ -68,7 +68,7 @@ public class CrmBusinessStatusServiceImpl implements CrmBusinessStatusService {
     @Transactional(rollbackFor = Exception.class)
     public void updateBusinessStatus(CrmBusinessStatusSaveReqVO updateReqVO) {
         // 1.1 校验存在
-        validateBusinessStatusTypeNameUnique(updateReqVO.getId());
+        validateBusinessStatusTypeExists(updateReqVO.getId());
         // 1.2 校验名称是否存在
         validateBusinessStatusTypeNameUnique(updateReqVO.getName(), updateReqVO.getId());
         // 1.3 设置状态的排序
@@ -104,7 +104,7 @@ public class CrmBusinessStatusServiceImpl implements CrmBusinessStatusService {
         }
     }
 
-    private void validateBusinessStatusTypeNameUnique(Long id) {
+    private void validateBusinessStatusTypeExists(Long id) {
         if (businessStatusTypeMapper.selectById(id) == null) {
             throw exception(BUSINESS_STATUS_TYPE_NOT_EXISTS);
         }
@@ -123,7 +123,7 @@ public class CrmBusinessStatusServiceImpl implements CrmBusinessStatusService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteBusinessStatusType(Long id) {
         // 1.1 校验存在
-        validateBusinessStatusTypeNameUnique(id);
+        validateBusinessStatusTypeExists(id);
         // 1.2 已经使用，无法更新
         if (businessService.getBusinessCountByStatusTypeId(id) > 0) {
             throw exception(BUSINESS_STATUS_DELETE_FAIL_USED);
@@ -141,13 +141,18 @@ public class CrmBusinessStatusServiceImpl implements CrmBusinessStatusService {
     }
 
     @Override
+    public void validateBusinessStatusType(Long id) {
+        validateBusinessStatusTypeExists(id);
+    }
+
+    @Override
     public List<CrmBusinessStatusTypeDO> getBusinessStatusTypeList() {
         return businessStatusTypeMapper.selectList();
     }
 
     @Override
     public PageResult<CrmBusinessStatusTypeDO> getBusinessStatusTypePage(PageParam pageReqVO) {
-        return null;
+        return businessStatusTypeMapper.selectPage(pageReqVO);
     }
 
     @Override

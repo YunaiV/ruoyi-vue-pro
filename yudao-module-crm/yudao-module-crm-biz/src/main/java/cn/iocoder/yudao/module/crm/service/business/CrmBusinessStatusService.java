@@ -51,6 +51,13 @@ public interface CrmBusinessStatusService {
     CrmBusinessStatusTypeDO getBusinessStatusType(Long id);
 
     /**
+     * 校验商机状态组
+     *
+     * @param id 编号
+     */
+    void validateBusinessStatusType(Long id);
+
+    /**
      * 获得商机状态组列表
      *
      * @return 商机状态组列表

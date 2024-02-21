@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.crm.controller.admin.business.vo.status;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -24,6 +25,7 @@ public class CrmBusinessStatusSaveReqVO {
 
     @Schema(description = "商机状态集合", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "商机状态集合不能为空")
+    @Valid
     private List<Status> statuses;
 
     @Data

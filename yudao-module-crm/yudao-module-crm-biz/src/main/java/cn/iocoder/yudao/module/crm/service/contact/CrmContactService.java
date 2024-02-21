@@ -88,6 +88,13 @@ public interface CrmContactService {
     CrmContactDO getContact(Long id);
 
     /**
+     * 校验联系人
+     *
+     * @param id 编号
+     */
+    void validateContact(Long id);
+
+    /**
      * 获得联系人列表
      *
      * @param ids    编号

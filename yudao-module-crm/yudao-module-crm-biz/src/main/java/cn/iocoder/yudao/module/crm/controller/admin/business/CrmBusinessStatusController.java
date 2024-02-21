@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.crm.controller.admin.business;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -29,6 +30,7 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - CRM 商机状态")
 @RestController
@@ -62,7 +64,7 @@ public class CrmBusinessStatusController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除商机状态")
     @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('crm:business-status-type:delete')")
+    @PreAuthorize("@ss.hasPermission('crm:business-status:delete')")
     public CommonResult<Boolean> deleteBusinessStatusType(@RequestParam("id") Long id) {
         businessStatusTypeService.deleteBusinessStatusType(id);
         return success(true);
@@ -71,7 +73,7 @@ public class CrmBusinessStatusController {
     @GetMapping("/get")
     @Operation(summary = "获得商机状态")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('crm:business-status-type:query')")
+    @PreAuthorize("@ss.hasPermission('crm:business-status:query')")
     public CommonResult<CrmBusinessStatusRespVO> getBusinessStatusType(@RequestParam("id") Long id) {
         CrmBusinessStatusTypeDO statusType = businessStatusTypeService.getBusinessStatusType(id);
         if (statusType == null) {
@@ -84,10 +86,13 @@ public class CrmBusinessStatusController {
 
     @GetMapping("/page")
     @Operation(summary = "获得商机状态分页")
-    @PreAuthorize("@ss.hasPermission('crm:business-status-type:query')")
-    public CommonResult<PageResult<CrmBusinessStatusRespVO>> getBusinessStatusTypePage(@Valid PageParam pageReqVO) {
+    @PreAuthorize("@ss.hasPermission('crm:business-status:query')")
+    public CommonResult<PageResult<CrmBusinessStatusRespVO>> getBusinessStatusPage(@Valid PageParam pageReqVO) {
         // 1. 查询数据
         PageResult<CrmBusinessStatusTypeDO> pageResult = businessStatusTypeService.getBusinessStatusTypePage(pageReqVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty(pageResult.getTotal()));
+        }
         // 2. 拼接数据
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSet(pageResult.getList(), statusType -> Long.parseLong(statusType.getCreator())));
@@ -101,9 +106,12 @@ public class CrmBusinessStatusController {
     }
 
     @GetMapping("/type-simple-list")
-    @Operation(summary = "获得商机状态列表")
+    @Operation(summary = "获得商机状态组列表")
     public CommonResult<List<CrmBusinessStatusRespVO>> getBusinessStatusTypeSimpleList() {
         List<CrmBusinessStatusTypeDO> list = businessStatusTypeService.getBusinessStatusTypeList();
+        // 过滤掉部门不匹配的
+        Long deptId = adminUserApi.getUser(getLoginUserId()).getDeptId();
+        list.removeIf(statusType -> CollUtil.isNotEmpty(statusType.getDeptIds()) && !statusType.getDeptIds().contains(deptId));
         return success(BeanUtils.toBean(list, CrmBusinessStatusRespVO.class));
     }
 

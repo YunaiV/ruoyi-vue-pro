@@ -19,11 +19,14 @@ import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.business.bo.CrmBusinessUpdateProductReqBO;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactBusinessService;
+import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
+import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.product.CrmProductService;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
@@ -58,14 +61,24 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     private CrmBusinessProductMapper businessProductMapper;
 
     @Resource
+    private CrmBusinessStatusService businessStatusService;
+    @Resource
     @Lazy // 延迟加载，避免循环依赖
     private CrmContractService contractService;
+    @Resource
+    private CrmCustomerService customerService;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private CrmContactService contactService;
     @Resource
     private CrmPermissionService permissionService;
     @Resource
     private CrmContactBusinessService contactBusinessService;
     @Resource
     private CrmProductService productService;
+
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -74,10 +87,12 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     public Long createBusiness(CrmBusinessSaveReqVO createReqVO, Long userId) {
         // 1.1 校验产品项的有效性
         List<CrmBusinessProductDO> businessProducts = validateBusinessProducts(createReqVO.getProducts());
-        // 1.2 TODO 芋艿：校验关联字
+        // 1.2 校验关联字段
+        validateBusinessForCreate(createReqVO);
 
         // 2.1 插入商机
         CrmBusinessDO business = BeanUtils.toBean(createReqVO, CrmBusinessDO.class).setOwnerUserId(userId);
+        business.setStatusId(businessStatusService.getBusinessStatusListByTypeId(createReqVO.getStatusTypeId()).get(0).getId()); // 默认状态
         calculateTotalPrice(business, businessProducts);
         businessMapper.insert(business);
         // 2.2 插入商机关联商品
@@ -101,6 +116,9 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
     // TODO @lzxhqs：CrmContactBusinessService 调用这个；这样逻辑才能收敛哈；
     private void createContactBusiness(Long businessId, Long contactId) {
+        if  (contactId == null) {
+            return;
+        }
         CrmContactBusinessDO contactBusiness = new CrmContactBusinessDO();
         contactBusiness.setBusinessId(businessId);
         contactBusiness.setContactId(contactId);
@@ -113,11 +131,13 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
             success = CRM_BUSINESS_UPDATE_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateBusiness(CrmBusinessSaveReqVO updateReqVO) {
+        updateReqVO.setOwnerUserId(null).setStatusTypeId(null); // 不允许更新的字段
         // 1.1 校验存在
         CrmBusinessDO oldBusiness = validateBusinessExists(updateReqVO.getId());
         // 1.2 校验产品项的有效性
         List<CrmBusinessProductDO> businessProducts = validateBusinessProducts(updateReqVO.getProducts());
-        // 1.3 TODO 芋艿：校验关联字
+        // 1.3 校验关联字段
+        validateBusinessForCreate(updateReqVO);
 
         // 2.1 更新商机
         CrmBusinessDO updateObj = BeanUtils.toBean(updateReqVO, CrmBusinessDO.class);
@@ -145,6 +165,25 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
             businessProductMapper.deleteBatchIds(convertSet(diffList.get(2), CrmBusinessProductDO::getId));
+        }
+    }
+
+    private void validateBusinessForCreate(CrmBusinessSaveReqVO saveReqVO) {
+        // 校验商机状态
+        if (saveReqVO.getStatusTypeId() != null) {
+            businessStatusService.validateBusinessStatusType(saveReqVO.getStatusTypeId());
+        }
+        // 校验客户
+        if (saveReqVO.getCustomerId() != null) {
+            customerService.validateCustomer(saveReqVO.getCustomerId());
+        }
+        // 校验联系人
+        if (saveReqVO.getContactId() != null) {
+            contactService.validateContact(saveReqVO.getContactId());
+        }
+        // 校验负责人
+        if (saveReqVO.getOwnerUserId() != null) {
+            adminUserApi.validateUser(saveReqVO.getOwnerUserId());
         }
     }
 

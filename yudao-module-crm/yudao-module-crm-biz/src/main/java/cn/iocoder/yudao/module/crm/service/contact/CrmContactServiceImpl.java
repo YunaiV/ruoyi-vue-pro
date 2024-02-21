@@ -230,6 +230,11 @@ public class CrmContactServiceImpl implements CrmContactService {
     }
 
     @Override
+    public void validateContact(Long id) {
+        validateContactExists(id);
+    }
+
+    @Override
     public List<CrmContactDO> getContactListByIds(Collection<Long> ids, Long userId) {
         if (CollUtil.isEmpty(ids)) {
             return ListUtil.empty();
