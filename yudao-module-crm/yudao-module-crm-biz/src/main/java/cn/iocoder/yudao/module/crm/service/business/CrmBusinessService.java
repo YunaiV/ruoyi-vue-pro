@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusi
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessTransferReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.service.business.bo.CrmBusinessUpdateProductReqBO;
@@ -91,6 +92,14 @@ public interface CrmBusinessService {
     List<CrmBusinessDO> getBusinessList(Collection<Long> ids);
 
     /**
+     * 获得指定商机编号的产品列表
+     *
+     * @param businessId 商机编号
+     * @return 商机产品列表
+     */
+    List<CrmBusinessProductDO> getBusinessProductListByBusinessId(Long businessId);
+
+    /**
      * 获得商机分页
      *
      * 数据权限：基于 {@link CrmBusinessDO}
@@ -128,5 +137,13 @@ public interface CrmBusinessService {
      * @return 数量
      */
     Long getBusinessCountByCustomerId(Long customerId);
+
+    /**
+     * 获得使用指定商机状态组的商机数量
+     *
+     * @param statusTypeId 商机状态组编号
+     * @return 数量
+     */
+    Long getBusinessCountByStatusTypeId(Long statusTypeId);
 
 }
