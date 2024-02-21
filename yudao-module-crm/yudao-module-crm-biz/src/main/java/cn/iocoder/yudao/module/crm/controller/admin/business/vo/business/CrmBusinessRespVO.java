@@ -52,10 +52,10 @@ public class CrmBusinessRespVO {
     @ExcelProperty("负责人部门")
     private String ownerUserDeptName;
 
-    @Schema(description = "商机状态类型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "25714")
+    @Schema(description = "商机状态组编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "25714")
     private Long statusTypeId;
-    @Schema(description = "状态类型名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "进行中")
-    @ExcelProperty("商机状态类型")
+    @Schema(description = "商机状组名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "进行中")
+    @ExcelProperty("商机状态组")
     private String statusTypeName;
 
     @Schema(description = "商机状态编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "30320")

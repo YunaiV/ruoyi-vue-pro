@@ -63,7 +63,7 @@ public class CrmBusinessDO extends BaseDO {
     private Long ownerUserId;
 
     /**
-     * 商机状态类型编号
+     * 商机状态组编号
      *
      *  关联 {@link CrmBusinessStatusTypeDO#getId()}
      */

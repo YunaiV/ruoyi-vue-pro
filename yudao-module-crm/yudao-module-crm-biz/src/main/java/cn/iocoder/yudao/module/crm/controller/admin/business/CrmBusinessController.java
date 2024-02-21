@@ -20,7 +20,6 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessStatusService;
-import cn.iocoder.yudao.module.crm.service.business.CrmBusinessStatusTypeService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.product.CrmProductService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -62,7 +61,7 @@ public class CrmBusinessController {
     @Resource
     private CrmCustomerService customerService;
     @Resource
-    private CrmBusinessStatusTypeService businessStatusTypeService;
+    private CrmBusinessStatusService businessStatusTypeService;
     @Resource
     private CrmBusinessStatusService businessStatusService;
     @Resource

@@ -295,4 +295,9 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         return businessMapper.selectCount(CrmBusinessDO::getCustomerId, customerId);
     }
 
+    @Override
+    public Long getBusinessCountByStatusTypeId(Long statusTypeId) {
+        return businessMapper.selectCountByStatusTypeId(statusTypeId);
+    }
+
 }

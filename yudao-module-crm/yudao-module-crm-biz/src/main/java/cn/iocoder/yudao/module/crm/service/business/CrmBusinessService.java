@@ -138,4 +138,12 @@ public interface CrmBusinessService {
      */
     Long getBusinessCountByCustomerId(Long customerId);
 
+    /**
+     * 获得使用指定商机状态组的商机数量
+     *
+     * @param statusTypeId 商机状态组编号
+     * @return 数量
+     */
+    Long getBusinessCountByStatusTypeId(Long statusTypeId);
+
 }

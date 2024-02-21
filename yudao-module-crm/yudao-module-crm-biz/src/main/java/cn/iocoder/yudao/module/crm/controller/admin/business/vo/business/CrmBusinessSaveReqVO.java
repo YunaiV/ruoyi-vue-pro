@@ -43,9 +43,9 @@ public class CrmBusinessSaveReqVO {
     @DiffLogField(name = "负责人", function = SysAdminUserParseFunction.NAME)
     private Long ownerUserId;
 
-    @Schema(description = "商机状态类型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "25714")
-    @DiffLogField(name = "商机状态")
-    @NotNull(message = "商机状态类型不能为空")
+    @Schema(description = "商机状态组编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "25714")
+    @DiffLogField(name = "商机状态组")
+    @NotNull(message = "商机状态组不能为空")
     private Long statusTypeId;
 
     @Schema(description = "预计成交日期")

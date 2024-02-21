@@ -63,4 +63,8 @@ public interface CrmBusinessMapper extends BaseMapperX<CrmBusinessDO> {
         return selectJoinList(CrmBusinessDO.class, query);
     }
 
+    default Long selectCountByStatusTypeId(Long statusTypeId) {
+        return selectCount(CrmBusinessDO::getStatusTypeId, statusTypeId);
+    }
+
 }
